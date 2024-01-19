@@ -1,0 +1,18 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net6.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+	</PropertyGroup>
+
+	<ItemGroup>
+	  <PackageReference Include="SqlSugarCore" Version="5.1.4.64" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\GHMonitoringCenterApi.Domain.Shared\GHMonitoringCenterApi.Domain.Shared.csproj" />
+	</ItemGroup>
+
+</Project>

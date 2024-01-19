@@ -1,0 +1,55 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.4.33110.190
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GHMonitoringCenterApi", "GHMonitoringCenterApi\GHMonitoringCenterApi.csproj", "{A3745A61-964A-4667-B308-5DDB8C2BAB8F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GHMonitoringCenterApi.Application", "GHMonitoringCenterApi.Application\GHMonitoringCenterApi.Application.csproj", "{5E3F2CCE-7011-4C2B-9D9F-759351EF47C7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GHMonitoringCenterApi.Application.Contracts", "GHMonitoringCenterApi.Application.Contracts\GHMonitoringCenterApi.Application.Contracts.csproj", "{A4CE75D4-C35A-45FE-A438-E741714B0F18}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GHMonitoringCenterApi.Domain", "GHMonitoringCenterApi.Domain\GHMonitoringCenterApi.Domain.csproj", "{D1D2AB73-7F63-4857-ADF7-62B49292BE7C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GHMonitoringCenterApi.Domain.Shared", "GHMonitoringCenterApi.Domain.Shared\GHMonitoringCenterApi.Domain.Shared.csproj", "{D7E6DD7A-7EFB-410E-AB92-E96643DBC72F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GHMonitoringCenterApi.SqlSugarCore", "GHMonitoringCenterApi.SqlSugarCore\GHMonitoringCenterApi.SqlSugarCore.csproj", "{A399D879-8098-449A-89EE-23BC6473E053}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A3745A61-964A-4667-B308-5DDB8C2BAB8F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A3745A61-964A-4667-B308-5DDB8C2BAB8F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A3745A61-964A-4667-B308-5DDB8C2BAB8F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A3745A61-964A-4667-B308-5DDB8C2BAB8F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5E3F2CCE-7011-4C2B-9D9F-759351EF47C7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5E3F2CCE-7011-4C2B-9D9F-759351EF47C7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5E3F2CCE-7011-4C2B-9D9F-759351EF47C7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5E3F2CCE-7011-4C2B-9D9F-759351EF47C7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A4CE75D4-C35A-45FE-A438-E741714B0F18}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A4CE75D4-C35A-45FE-A438-E741714B0F18}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A4CE75D4-C35A-45FE-A438-E741714B0F18}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A4CE75D4-C35A-45FE-A438-E741714B0F18}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D1D2AB73-7F63-4857-ADF7-62B49292BE7C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D1D2AB73-7F63-4857-ADF7-62B49292BE7C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D1D2AB73-7F63-4857-ADF7-62B49292BE7C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D1D2AB73-7F63-4857-ADF7-62B49292BE7C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D7E6DD7A-7EFB-410E-AB92-E96643DBC72F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D7E6DD7A-7EFB-410E-AB92-E96643DBC72F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D7E6DD7A-7EFB-410E-AB92-E96643DBC72F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D7E6DD7A-7EFB-410E-AB92-E96643DBC72F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A399D879-8098-449A-89EE-23BC6473E053}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A399D879-8098-449A-89EE-23BC6473E053}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A399D879-8098-449A-89EE-23BC6473E053}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A399D879-8098-449A-89EE-23BC6473E053}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {256887E1-D1F4-4087-9B6C-EA1C5E704625}
+	EndGlobalSection
+EndGlobal

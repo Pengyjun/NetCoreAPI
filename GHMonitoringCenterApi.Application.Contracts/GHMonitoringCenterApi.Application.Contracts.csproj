@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net6.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+	</PropertyGroup>
+
+	<ItemGroup>
+	  <Compile Remove="Dto\Timing\PomClassificationCriteriaRespomseDto.cs" />
+	  <Compile Remove="Dto\Timing\PomConstructionQualificationRespomseDto.cs" />
+	  <Compile Remove="Dto\Timing\PomStakeholderUnitResponseDto.cs" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="AutoMapper" Version="12.0.1" />
+		<PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.0" />
+		<PackageReference Include="MiniExcel" Version="1.30.2" />
+		<PackageReference Include="NSwag.Annotations" Version="13.18.2" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\GHMonitoringCenterApi.Domain.Shared\GHMonitoringCenterApi.Domain.Shared.csproj" />
+		<ProjectReference Include="..\GHMonitoringCenterApi.SqlSugarCore\GHMonitoringCenterApi.SqlSugarCore.csproj" />
+	</ItemGroup>
+
+</Project>

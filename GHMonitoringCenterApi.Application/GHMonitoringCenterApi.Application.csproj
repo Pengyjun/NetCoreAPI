@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net6.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\GHMonitoringCenterApi.Application.Contracts\GHMonitoringCenterApi.Application.Contracts.csproj" />
+		<ProjectReference Include="..\GHMonitoringCenterApi.Domain\GHMonitoringCenterApi.Domain.csproj" />
+	</ItemGroup>
+
+</Project>
