@@ -39,6 +39,7 @@ using System.Linq;
 using GHMonitoringCenterApi.Application.Service.Authorize;
 using GHMonitoringCenterApi.Application.Contracts.IService.BizAuthorize;
 using System.Collections.Generic;
+using static GHMonitoringCenterApi.Application.Contracts.Dto.Project.ProjectDayReportResponseDto;
 
 namespace GHMonitoringCenterApi.Application.Service.Projects
 {
@@ -632,6 +633,16 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 resDayReport.ProcessStatus = dayReport.ProcessStatus;
                 resDayReport.IsHoliday = dayReport.IsHoliday;
             }
+
+            #region 修改汇率
+            if (resDayReport != null && resDayReport.Construction != null)
+            {
+                if (resDayReport.Construction.CurrencyId != Guid.Empty && resDayReport.Construction.CurrencyId != CommonData.RMBCurrencyId)
+                {
+                    resDayReport.Construction.CurrencyExchangeRate = await GetCurrencyRateAsync(resDayReport.Construction.CurrencyId);
+                }
+            }
+            #endregion
 
             // 统计月度计划产值
             var sumMonthProjectPlanned = await SumMonthProjectPlannedAsync(model.ProjectId, dayTime);
@@ -2482,7 +2493,15 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 resMonthReport.CurrencyId = currencyId;
                 resMonthReport.CurrencyExchangeRate = currencyExchangeRate;
             }
-         
+
+
+            #region 修改汇率
+            if (resMonthReport.CurrencyId != Guid.Empty && resMonthReport.CurrencyId != CommonData.RMBCurrencyId)
+            {
+                resMonthReport.CurrencyExchangeRate = await GetCurrencyRateAsync(resMonthReport.CurrencyId);
+            }
+
+            #endregion
             resMonthReport.Status = status;
             resMonthReport.StatusText = statusText;
             resMonthReport.DateMonth = dateMonth;

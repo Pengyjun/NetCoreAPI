@@ -252,6 +252,11 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                         item.ExchangeRate = exrate.ExchangeRate;
                     }
                 }
+                var exrateReplace = rate.Where(x => x.CurrencyId == item.CurrencyId.ToString()).FirstOrDefault();
+                if (exrateReplace != null)
+                {
+                    item.ExchangeRate = exrateReplace.ExchangeRate;
+                }
                 item.CompanyName = projectCompanyList.FirstOrDefault(x => x.PomId == item.CompanyId)?.Name;
                 item.AreaName = item.AreaName == null ? null : await baseService.GetProvincemarket(provinceList, item.AreaName.ToGuid());
                 item.Amount = searchRequestDto.IsConvert == true ?
