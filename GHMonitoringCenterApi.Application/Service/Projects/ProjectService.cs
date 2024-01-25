@@ -718,7 +718,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             //币种
             projectDeteilSingle.CurrencyName = await dbContext.Queryable<Currency>().Where(x => x.IsDelete == 1 && x.PomId == projectDeteilSingle.CurrencyId).Select(x => x.Zcurrencyname).SingleAsync();
             //获取币种汇率
-            projectDeteilSingle.ExchangeRate = await dbContext.Queryable<CurrencyConverter>().Where(x => x.IsDelete == 1 && x.CurrencyId == projectDeteilSingle.CurrencyId.ToString()).Select(x => x.ExchangeRate).SingleAsync();
+            projectDeteilSingle.ExchangeRate = await dbContext.Queryable<CurrencyConverter>().Where(x => x.IsDelete == 1 && x.CurrencyId == projectDeteilSingle.CurrencyId.ToString()&&x.Year==DateTime.Now.Year).Select(x => x.ExchangeRate).SingleAsync();
             //项目状态
             projectDeteilSingle.StatusName = await dbContext.Queryable<ProjectStatus>().Where(x => x.IsDelete == 1 && x.StatusId == projectDeteilSingle.StatusId).Select(x => x.Name).SingleAsync();
             //项目规模
