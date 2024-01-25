@@ -6169,5 +6169,34 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             }
             return days;
         }
+
+
+        /// <summary>
+        /// 获取已填报月份集合
+        /// </summary>
+        /// <returns></returns>
+        public async Task<ResponseAjaxResult<ReportedMonthResponseDto>> SearchReportedMonthsAsync(ReportedMonthRequestDto model)
+        {
+            var maxMonthTime = GetDefaultReportDateMonthTime();
+            var result = new ResponseAjaxResult<ReportedMonthResponseDto>();
+            var reportedMonths = new List<string>();
+            var dateMonths = await _dbMonthReport.AsQueryable().Where(t => t.IsDelete == 1 && t.ProjectId == model.ProjectId).OrderByDescending(t => t.DateMonth).Select(t => t.DateMonth).ToListAsync();
+            dateMonths.ForEach(item =>
+            {
+                ConvertHelper.TryParseFromDateMonth(item, out DateTime monthTime);
+                reportedMonths.Add(monthTime.ToString("yyyy-MM"));
+            });
+            return result.SuccessResult(new ReportedMonthResponseDto() { ReportedMonth = reportedMonths, MaxReportMonth = maxMonthTime.ToString("yyyy-MM") });
+        }
+
+        /// <summary>
+        /// 获取默认允许填报的月份
+        /// </summary>
+        /// <returns></returns>
+        private DateTime GetDefaultReportDateMonthTime()
+        {
+            DateTime time = DateTime.Now;
+            return time.Day < 26 ? time.AddMonths(-1) : time;
+        }
     }
 }

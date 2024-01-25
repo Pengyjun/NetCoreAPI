@@ -675,5 +675,14 @@ namespace GHMonitoringCenterApi.Controllers.Project
         {
             return await projectReportService.GetProjectShiftProductionAsync();
         }
-	}
+        /// <summary>
+        /// 获取已填报月份集合
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("SearchReportedMonths")]
+        public async Task<ResponseAjaxResult<ReportedMonthResponseDto>> SearchReportedMonthsAsync([FromQuery] ReportedMonthRequestDto model)
+        {
+            return await projectReportService.SearchReportedMonthsAsync(model);
+        }
+    }
 }

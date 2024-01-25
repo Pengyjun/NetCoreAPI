@@ -219,5 +219,10 @@ namespace GHMonitoringCenterApi.Application.Contracts.IService.Project
         /// </summary>
         /// <returns></returns>
         Task<ResponseAjaxResult<ProjectShiftProductionResponseDto>> GetProjectShiftProductionAsync();
-	}
+        /// <summary>
+        /// 获取已填报月份集合
+        /// </summary>
+        /// <returns></returns>
+        Task<ResponseAjaxResult<ReportedMonthResponseDto>> SearchReportedMonthsAsync(ReportedMonthRequestDto model);
+    }
 }

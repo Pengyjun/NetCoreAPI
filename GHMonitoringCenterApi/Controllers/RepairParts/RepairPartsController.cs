@@ -378,6 +378,16 @@ namespace GHMonitoringCenterApi.Controllers.RepairParts
             HttpContext.Response.Headers.Add("Content-Disposition", $"attachment;filename={HttpUtility.UrlEncode($"自动统计.xlsx", System.Text.Encoding.UTF8)}");
             return new FileStreamResult(new MemoryStream(bytes), Domain.Shared.Const.ContentType.APPLICATIONSTREAM);
         }
+
+        /// <summary>
+        /// 搜索自动统计列表
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("SearchAutomaticParts")]
+        public async Task<ResponseAjaxResult<AutomaticPartsResponseDto>> SearchAutomaticPartsAsync([FromQuery] AutomaticPartsRequestDto model)
+        {
+            return await repairPartsService.SearchAutomaticPartsAsync(model);
+        }
         #endregion
 
     }

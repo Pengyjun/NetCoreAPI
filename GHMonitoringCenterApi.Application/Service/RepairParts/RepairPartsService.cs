@@ -842,6 +842,83 @@ namespace GHMonitoringCenterApi.Application.Service.RepairParts
 
         #endregion
 
+        /// <summary>
+        ///获取自动统计数据
+        /// </summary>
+        /// <returns></returns>
+        private async Task<List<AutomaticPartResponseDto>> GetAutomaticPartsAsync()
+        {
+            var result = new ResponseAjaxResult<List<AutomaticPartResponseDto>>();
+            var list = new List<AutomaticPartResponseDto>();
+            // 修理项目清单
+            var repairList = await repairProjectList.AsQueryable().Where(t => t.IsDelete == 1 && !string.IsNullOrEmpty(t.ProjectNo) && !string.IsNullOrEmpty(t.ShipName))
+                             .GroupBy(t => new { t.ProjectNo, t.ShipName })
+                             .Select(t => new AutomaticPartResponseDto()
+                             {
+                                 ProjectNo = t.ProjectNo,
+                                 ShipName = t.ShipName,
+                                 UnsettledAmount = SqlFunc.AggregateSum(t.SettlementAmount == null && (t.ExpenseNO == null || t.ExpenseNO == "") ? t.ContractMoney : 0),
+                                 SettleAmount = SqlFunc.AggregateSum(t.SettlementAmount != null && (t.ExpenseNO == null || t.ExpenseNO == "") ? t.SettlementAmount : 0),
+                                 ReportedAmount = SqlFunc.AggregateSum(t.SettlementAmount != null && t.ExpenseNO != null && t.ExpenseNO != "" ? t.SettlementAmount : 0)
+                             }).ToListAsync();
+            // 发船备件清单
+            var sendQuery = baseRepository.AsQueryable().Where(t => t.IsDelete == 1 && t.SubmitFinanceTime != null && t.OutboundAmount != null)
+                            .Select(t => new SumSendShipSparePartList()
+                            {
+                                SubmitFinanceYear = SqlFunc.Substring(t.SubmitFinanceTime, 0, 4),
+                                MaterialRequisitionUnit = t.MaterialRequisitionUnit,
+                                OutboundAmount = t.OutboundAmount
+                            });
+            var sendList = await _dbContext.Queryable(sendQuery)
+                           .GroupBy(t => new { t.SubmitFinanceYear, t.MaterialRequisitionUnit })
+                           .Select(t => new SumSendShipSparePartList
+                           {
+                               SubmitFinanceYear = t.SubmitFinanceYear,
+                               MaterialRequisitionUnit = t.MaterialRequisitionUnit,
+                               OutboundAmount = SqlFunc.AggregateSum(t.OutboundAmount ?? 0)
+                           }).ToListAsync();
+            // 统计仓储运输金额
+            var sumTransportations = repairList.GroupBy(t => t.ProjectNo).Select(t => new { ProjectNo = t.Key, ReportedAmount = t.Sum(i => i.ReportedAmount ?? 0) });
+            repairList.ForEach(item =>
+            {
+                item.OutboundAmount = sendList.FirstOrDefault(t => t.SubmitFinanceYear == item.ProjectNo && t.MaterialRequisitionUnit == item.ShipName)?.OutboundAmount;
+                item.TransportationAmount = sumTransportations.Single(t => t.ProjectNo == item.ProjectNo).ReportedAmount;
+            });
+            return repairList;
+        }
+        /// <summary>
+        /// 搜索自动统计列表
+        /// </summary>
+        /// <returns></returns>
+        public async Task<ResponseAjaxResult<AutomaticPartsResponseDto>> SearchAutomaticPartsAsync(AutomaticPartsRequestDto model)
+        {
+            var result = new ResponseAjaxResult<AutomaticPartsResponseDto>();
+            var list = (await GetAutomaticPartsAsync()).OrderByDescending(t => t.ProjectNo).ThenBy(t => t.ShipName).ToList();
+            decimal transportationAmount = 0;
+            string? projectNo = model.ProjectCode;
+            if (string.IsNullOrWhiteSpace(projectNo))
+            {
+                projectNo = DateTime.Now.Year.ToString();
+            }
+            list = list.Where(t => t.ProjectNo == projectNo).ToList();
+            if (list.Any())
+            {
+                transportationAmount = Math.Round(list.First().TransportationAmount ?? 0, 2);
+            }
+            list.ForEach(item =>
+            {
+                item.SettleAmount = Math.Round(item.SettleAmount ?? 0, 2);
+                item.OutboundAmount = Math.Round(item.OutboundAmount ?? 0, 2);
+                item.UnsettledAmount = Math.Round(item.UnsettledAmount ?? 0, 2);
+                item.ReportedAmount = Math.Round(item.ReportedAmount ?? 0, 2);
+            });
+            var data = new AutomaticPartsResponseDto()
+            {
+                List = list,
+                TransportationAmount = transportationAmount,
+            };
+            return result.SuccessResult(data);
+        }
     }
 }
 

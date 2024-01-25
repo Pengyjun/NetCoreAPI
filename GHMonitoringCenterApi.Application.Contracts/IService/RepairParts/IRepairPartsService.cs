@@ -131,5 +131,10 @@ namespace GHMonitoringCenterApi.Application.Contracts.IService.RepairParts
         /// </summary>
         /// <returns></returns>
         Task<byte[]> ExportExcelAutomaticPartsAsync();
+        /// <summary>
+        /// 搜索自动统计列表
+        /// </summary>
+        /// <returns></returns>
+        Task<ResponseAjaxResult<AutomaticPartsResponseDto>> SearchAutomaticPartsAsync(AutomaticPartsRequestDto model);
     }
 }
