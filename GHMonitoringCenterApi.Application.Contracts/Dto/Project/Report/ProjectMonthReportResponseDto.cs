@@ -15,6 +15,27 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project.Report
     /// </summary>
     public class ProjectMonthReportResponseDto : ProjectMonthReportDto<ResTreeProjectWBSDetailDto, ResMonthReportDetail>
     {
+
+        #region 新增字段
+        /// <summary>
+        /// 本年甲方确认产值
+        /// </summary>
+
+        public decimal CurrentYearOffirmProductionValue { get; set; }
+        /// <summary>
+        /// 开累甲方确认产值
+        /// </summary>
+        public decimal TotalYearKaileaOffirmProductionValue { get; set; }
+        /// <summary>
+        /// 本年甲方付款金额 
+        /// </summary>
+        public decimal CurrenYearCollection { get; set; }
+        /// <summary>
+        /// 开累甲方付款金额
+        /// </summary>
+        public decimal TotalYearCollection { get; set; }
+        #endregion
+
         /// <summary>
         /// 填报月份时间格式（前端可以根据需求获取年，月拼接）
         /// </summary>
@@ -137,7 +158,10 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project.Report
         public class ResTreeProjectWBSDetailDto : TreeProjectWBSDetailDto<ResTreeProjectWBSDetailDto, ResMonthReportDetail>
         {
 
+
+
             
+
             /// <summary>
             /// 本月外包支出
             /// </summary>

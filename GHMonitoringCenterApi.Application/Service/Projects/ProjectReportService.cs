@@ -2494,6 +2494,18 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 resMonthReport.CurrencyExchangeRate = currencyExchangeRate;
             }
 
+            #region 增加四个字段
+            if (resMonthReport != null)
+            {
+               var resultData=await GetProjectProductionValue(model.ProjectId);
+                resMonthReport.CurrentYearOffirmProductionValue = resultData.Item1;
+                resMonthReport.TotalYearKaileaOffirmProductionValue = resultData.Item2;
+                resMonthReport.CurrenYearCollection = resultData.Item3;
+                resMonthReport.TotalYearCollection = resultData.Item4;
+            }
+            
+
+            #endregion
 
             #region 修改汇率
             if (resMonthReport.CurrencyId != Guid.Empty && resMonthReport.CurrencyId != CommonData.RMBCurrencyId)
@@ -6197,6 +6209,59 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
         {
             DateTime time = DateTime.Now;
             return time.Day < 26 ? time.AddMonths(-1) : time;
+        }
+
+        /// <summary>
+        /// 第一个 本年甲方确认产值
+        /// 第二个 开累甲方确认产值
+        /// 第三个 本年甲方付款金额
+        /// 第四个 开累甲方付款金额
+        /// </summary>
+        /// <param name="projectId">项目ID</param>
+        /// <returns></returns>
+        public async  Task<Tuple<decimal, decimal, decimal, decimal>> GetProjectProductionValue(Guid projectId)
+        {
+            var currentYearOffirmProductionValue = 0M;
+            var totalYearKaileaOffirmProductionValue = 0M;
+            var currenYearCollection = 0M;
+            var totalYearCollection = 0M;
+            try
+            {
+                var currentYear = DateTime.Now.Year;
+                var projectMonthReportHistory = await _dbContext.Queryable<ProjectMonthReportHistory>()
+                   .Where(x => x.IsDelete == 1 && x.ProjectId == projectId).FirstAsync();
+                
+                var currentTotalYearOffirmProductionValue= await _dbContext.Queryable<MonthReport>()
+                    .Where(x => x.IsDelete == 1 && x.ProjectId == projectId&&x.DateYear<= currentYear).ToListAsync();
+                //本年甲方确认产值(当年)
+                 currentYearOffirmProductionValue= currentTotalYearOffirmProductionValue.Where(x => x.DateYear == currentYear)
+                    .Sum(x => x.PartyAConfirmedProductionAmount);
+
+                //开累甲方确认产值(历史数据+2023-7至12月的数据+2024年的数据）
+                if (projectMonthReportHistory != null && currentTotalYearOffirmProductionValue.Any())
+                { 
+                totalYearKaileaOffirmProductionValue = projectMonthReportHistory.KaileiOwnerConfirmation.Value
+                   + currentTotalYearOffirmProductionValue.Sum(x => x.PartyAConfirmedProductionAmount);
+                }
+
+                var currenTotalYearCollection = await _dbContext.Queryable<MonthReport>()
+                    .Where(x => x.IsDelete == 1 && x.ProjectId == projectId && x.DateYear<= currentYear).ToListAsync();
+                
+                //本年甲方付款金额
+                 currenYearCollection= currenTotalYearCollection.Where(x => x.DateYear == currentYear).Sum(x => x.PartyAPayAmount);
+                if (projectMonthReportHistory != null && currenTotalYearCollection.Any()) {
+                    //开累甲方付款金额
+                    totalYearCollection = projectMonthReportHistory.KaileiProjectPayment.Value
+                    + currenTotalYearCollection.Sum(x => x.PartyAPayAmount);
+                }
+                    
+            }
+            catch (Exception ex)
+            {
+
+                
+            }
+            return Tuple.Create(currentYearOffirmProductionValue, totalYearKaileaOffirmProductionValue, currenYearCollection, totalYearCollection);
         }
     }
 }
