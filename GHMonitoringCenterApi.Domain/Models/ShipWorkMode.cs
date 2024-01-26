@@ -10,7 +10,7 @@ namespace GHMonitoringCenterApi.Domain.Models
     /// <summary>
     /// 工艺方式
     /// </summary>
-    [SugarTable("t_shipWorkmode", IsDisabledDelete = true)]
+    [SugarTable("t_shipworkmode", IsDisabledDelete = true)]
     public class ShipWorkMode : BaseEntity<Guid>
     {
         /// <summary>
