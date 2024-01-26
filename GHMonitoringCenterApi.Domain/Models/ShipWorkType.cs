@@ -10,7 +10,7 @@ namespace GHMonitoringCenterApi.Domain.Models
     /// <summary>
     /// 疏浚吹填分类
     /// </summary>
-    [SugarTable("t_shipWorktype", IsDisabledDelete = true)]
+    [SugarTable("t_shipworktype", IsDisabledDelete = true)]
     public class ShipWorkType : BaseEntity<Guid>
     {
         /// <summary>
