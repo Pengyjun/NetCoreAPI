@@ -158,11 +158,11 @@ namespace GHMonitoringCenterApi.Application.Service.Timing
                 //token = AppsettingsHelper.GetValue("InitDbDataItem:DealingUnitDataItem:Token");
                 //跟改为获取主数据往来单位
                 url = AppsettingsHelper.GetValue("MDM:BusinessRelatedUnit:Url");
-                url = url.Replace("@updateTime", DateTime.Now.ToString("yyyy-MM-dd"));
+                url += DateTime.Now.ToString("yyyy-MM-dd");
                 systemIdentificationCode = AppsettingsHelper.GetValue("MDM:BusinessRelatedUnit:SystemIdentificationCode");
                 functionAuthorizationCode = AppsettingsHelper.GetValue("MDM:BusinessRelatedUnit:FunctionAuthorizationCode");
                 url += "&systemIdentificationCode=" + systemIdentificationCode + "&functionAuthorizationCode=" + functionAuthorizationCode;
-                dirParame.Add("pageSize", "1000000");
+                dirParame.Add("pageSize", "100000");
             }
             else if (parame == 6)
             {
@@ -888,7 +888,7 @@ namespace GHMonitoringCenterApi.Application.Service.Timing
                                 var noExistProjects = pomInstitutionList.Where(x => intersectIds.Contains(x.PomId)).ToList();
                                 if (noExistProjects.Any())
                                 {
-                                    await basePomInstitutionRepository.AsUpdateable(noExistProjects).WhereColumns(x => x.PomId).IgnoreColumns(x =>new { x.Id,x.Status}).ExecuteCommandAsync();
+                                    await basePomInstitutionRepository.AsUpdateable(noExistProjects).WhereColumns(x => x.PomId).IgnoreColumns(x => new { x.Id, x.Status }).ExecuteCommandAsync();
                                 }
                             }
                             //不存在的新增
@@ -937,7 +937,7 @@ namespace GHMonitoringCenterApi.Application.Service.Timing
                                 if (noExistProjects.Any())
                                 {
                                     var pomIds = noExistProjects.Select(x => x.PomId).ToList();
-                                    await baseUserRepository.AsUpdateable(noExistProjects).WhereColumns(x => x.IdentityCard).IgnoreColumns(x => new { x.Id , x.PomId , x.CompanyId , x.DepartmentId }).ExecuteCommandAsync();
+                                    await baseUserRepository.AsUpdateable(noExistProjects).WhereColumns(x => x.IdentityCard).IgnoreColumns(x => new { x.Id, x.PomId, x.CompanyId, x.DepartmentId }).ExecuteCommandAsync();
                                 }
                             }
                             //不存在的新增
