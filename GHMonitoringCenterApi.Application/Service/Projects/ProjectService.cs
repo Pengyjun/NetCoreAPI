@@ -1966,10 +1966,12 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
         /// <exception cref="NotImplementedException"></exception>
         public async Task<ResponseAjaxResult<ProjectCurrencyResponseDto>> GetCurrentcyRate(Guid currencyId)
         {
+            var year = DateTime.Now.Year;
             ResponseAjaxResult<ProjectCurrencyResponseDto> responseAjaxResult = new ResponseAjaxResult<ProjectCurrencyResponseDto>();
             ProjectCurrencyResponseDto projectCurrencyResponseDto = new ProjectCurrencyResponseDto();
             //获取汇率表中的数据
-            var rate = await dbContext.Queryable<CurrencyConverter>().Where(x => x.CurrencyId == currencyId.ToString()).Select(x => x.ExchangeRate).SingleAsync();
+            var rate = await dbContext.Queryable<CurrencyConverter>().Where(x => x.CurrencyId == currencyId.ToString()
+            &&x.Year== year).Select(x => x.ExchangeRate).SingleAsync();
             projectCurrencyResponseDto.ExchangeRate = rate;
             responseAjaxResult.Data = projectCurrencyResponseDto;
             responseAjaxResult.Success(ResponseMessage.OPERATION_SUCCESS);
