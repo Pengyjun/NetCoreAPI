@@ -910,6 +910,88 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             var projectDutys = new List<ProjectOrg>();
             //增改项目干系人员
             var proLeaderList = new List<ProjectLeader>();
+            #region 计算项目停工天数 供交建通每天发消息使用
+            //项目ID
+            Guid projectId = GuidUtil.Next();
+            //计算当前周期已过多少天
+            var nowDay = DateTime.Now.Day;
+            //当前月的最后一天
+            DateTime currentDate = DateTime.Now;
+            var stopDay = 0;
+            var monthLastDay = new DateTime(currentDate.Year, currentDate.Month, 1).AddMonths(1).AddDays(-1).Day;
+            if (nowDay > 26 && nowDay <= monthLastDay)
+            {
+                stopDay = monthLastDay;
+            }
+            else
+            {
+                stopDay = nowDay + monthLastDay;
+
+            }
+
+            if (addOrUpdateProjectRequestDto.RequestType)
+            {
+                //新增操作（如果新增的是在建项目的就会记录表里面）
+                if (CommonData.PConstruc == addOrUpdateProjectRequestDto.StatusId.ToString())
+                {
+                    ProjectStatusChangeRecord projectStatusChangeRecord = new ProjectStatusChangeRecord()
+                    {
+                        Id = projectId,
+                        OldStatus = projectObject.StatusId.Value,
+                        NewStatus = addOrUpdateProjectRequestDto.StatusId.Value,
+                        ChangeTime = DateTime.Now,
+                        IsValid = 1,
+                        StopDay = stopDay
+                    };
+                    var isExist = await dbContext.Queryable<Project>().Where(x => x.IsDelete == 1 && x.Id == projectId).CountAsync();
+                    if (isExist == 0)
+                    {
+                        await dbContext.Insertable(projectStatusChangeRecord).ExecuteCommandAsync();
+                    }
+
+                }
+
+            }
+            else 
+            {
+               var  projectStatusChangeSingle = await dbContext.Queryable<ProjectStatusChangeRecord>().SingleAsync(x => x.IsValid == 1 
+                && x.Id == addOrUpdateProjectRequestDto.Id);
+
+                //修改操作  修改状态之前还是在建状态  所以停工天数不计算  生产日报也不会推送 等下再改为在建的时候 就会记录停工天数
+                if (projectStatusChangeSingle != null && projectStatusChangeSingle.NewStatus == CommonData.PConstruc.ToGuid() && projectStatusChangeSingle.NewStatus != addOrUpdateProjectRequestDto.StatusId)
+                {
+                    //说明停工 不算每天生产日报推送数据里面了 
+                    ProjectStatusChangeRecord projectStatusChangeRecord = new ProjectStatusChangeRecord()
+                    {
+                        Id = addOrUpdateProjectRequestDto.Id.Value,
+                        OldStatus = CommonData.PConstruc.ToGuid(),
+                        NewStatus = addOrUpdateProjectRequestDto.StatusId.Value,
+                        ChangeTime = DateTime.Now,
+                        IsValid = 1,
+                        StopDay = 0
+                    };
+                    await dbContext.Updateable(projectStatusChangeRecord).ExecuteCommandAsync();
+                }
+                //修改状态之前  原来状态不是在建状态了 这个时候要计算停工天数
+                else if(projectStatusChangeSingle != null && projectStatusChangeSingle.NewStatus!= CommonData.PConstruc.ToGuid() &&addOrUpdateProjectRequestDto.StatusId== CommonData.PConstruc.ToGuid()){
+                    var diffDays=TimeHelper.GetTimeSpan(projectStatusChangeSingle.ChangeTime, DateTime.Now).Days;
+                    stopDay = projectStatusChangeSingle.StopDay.Value+ diffDays;
+                    ProjectStatusChangeRecord projectStatusChangeRecord = new ProjectStatusChangeRecord()
+                    {
+                        Id = addOrUpdateProjectRequestDto.Id.Value,
+                        OldStatus = CommonData.PConstruc.ToGuid(),
+                        NewStatus = addOrUpdateProjectRequestDto.StatusId.Value,
+                        ChangeTime = DateTime.Now,
+                        IsValid = 1,
+                        StopDay = stopDay
+                    };
+                    await dbContext.Updateable(projectStatusChangeRecord).ExecuteCommandAsync();
+                }
+            
+            }
+            #endregion
+
+
             if (addOrUpdateProjectRequestDto.RequestType)
             {
                 projectObject = mapper.Map<AddOrUpdateProjectRequestDto, Project>(addOrUpdateProjectRequestDto);
@@ -917,7 +999,8 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 {
                     projectObject.PomId = Convert.ToInt32(TimeHelper.DateTimeToTimeStamp(DateTime.Now));
                 }
-                projectObject.Id = GuidUtil.Next();
+                projectObject.Id = projectId;
+                //projectObject.Id = GuidUtil.Next();
                 projectObject.MasterProjectId = Guid.NewGuid();
                 projectObject.Rate = projectObject.Rate / 100;
                 projectObject.ExchangeRate = await dbContext.Queryable<CurrencyConverter>().Where(x => x.Year == DateTime.Now.Year && x.CurrencyId == projectObject.CurrencyId.ToString()).Select(x => x.ExchangeRate).SingleAsync();
@@ -983,19 +1066,19 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 }
 
                 #region 记录在建的项目状态
-                if (CommonData.status.Contains(addOrUpdateProjectRequestDto.StatusId.ToString()))
-                {
-                    ProjectStatusChangeRecord projectStatusChangeRecord = new ProjectStatusChangeRecord()
-                    {
-                        Id = projectObject.Id,
-                        OldStatus = projectObject.StatusId.Value,
-                        NewStatus = addOrUpdateProjectRequestDto.StatusId.Value,
-                        ChangeTime = DateTime.Now,
-                        IsValid = 1,
-                        StopDay = 0
-                    };
-                    await dbContext.Insertable(projectStatusChangeRecord).ExecuteCommandAsync();
-                }
+                //if (CommonData.status.Contains(addOrUpdateProjectRequestDto.StatusId.ToString()))
+                //{
+                //    ProjectStatusChangeRecord projectStatusChangeRecord = new ProjectStatusChangeRecord()
+                //    {
+                //        Id = projectObject.Id,
+                //        OldStatus = projectObject.StatusId.Value,
+                //        NewStatus = addOrUpdateProjectRequestDto.StatusId.Value,
+                //        ChangeTime = DateTime.Now,
+                //        IsValid = 1,
+                //        StopDay = 0
+                //    };
+                //    await dbContext.Insertable(projectStatusChangeRecord).ExecuteCommandAsync();
+                //}
                 #endregion
 
                 #region 记录停工的项目状态
@@ -1038,97 +1121,97 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 #endregion
 
                 #region 记录项目状态改变
-                if (addOrUpdateProjectRequestDto.TypeId != CommonData.NoConstrutionProjectType)
-                {
-                    int days = DateTime.DaysInMonth(DateTime.Now.Year, DateTime.Now.AddMonths(-1).Month);
-                    var ofdays = DateTime.Now.Day <= 26 ? (DateTime.Now.Day + ((days - 26))) : DateTime.Now.Day - 26;
-                    var stopDay = 0;
-                    List<ProjectStatusChangeRecord> result = new List<ProjectStatusChangeRecord>();
-                    ProjectStatusChangeRecord projectStatusChangeRecord = new ProjectStatusChangeRecord()
-                    {
-                        Id = projectObject.Id,
-                        OldStatus = projectObject.StatusId.Value,
-                        NewStatus = addOrUpdateProjectRequestDto.StatusId.Value,
-                        ChangeTime = DateTime.Now,
-                        IsValid = 1,
-                        StopDay = 0
-                    };
-                    //只有把项目状态更改为在建状态时才会触发   其他状态不计算 （此逻辑是交建通每天推送日报数据使用  其他逻辑暂无使用）
-                    if (addOrUpdateProjectRequestDto.StatusId.Value == CommonData.PConstruc.ToGuid())
-                    {
-                        var startTime = DateTime.Now.AddMonths(-1).ToString("yyyy-MM-26 00:00:00");
-                        var endTime = DateTime.Now.ToString("yyyy-MM-25 23:59:59");
-                        result = await dbContext.Queryable<ProjectStatusChangeRecord>()
-                            .Where(x => x.IsValid == 1 && x.Id == projectObject.Id && x.ChangeTime >= SqlFunc.ToDate(startTime)
-                            && x.ChangeTime <= SqlFunc.ToDate(endTime)).OrderBy(x => x.ChangeTime).ToListAsync();
-                        var count = result.Count;
-                        if (result != null && count > 1)
-                        {
-                            var time1 = result[count - 1].ChangeTime.ToDateDay();//最新一次一定是在建
-                                                                                 //求其他状态的时间 
-                            var lastStatusTime = result.Where(x => x.NewStatus != CommonData.PConstruc.ToGuid()).OrderBy(x => x.ChangeTime).ToList();
-                            if (lastStatusTime != null && lastStatusTime.Any())
-                            {
-                                var time2 = lastStatusTime[0].ChangeTime.ToDateDay();//取暂停的时间
-                                if (result[0].StopDay.Value + (time1 - time2) <= ofdays)
-                                {
-                                    stopDay = result[0].StopDay.Value + (time1 - time2);
-                                }
-                                else {
-                                    stopDay = result[0].StopDay.Value;
-                                }
+                //if (addOrUpdateProjectRequestDto.TypeId != CommonData.NoConstrutionProjectType)
+                //{
+                //    int days = DateTime.DaysInMonth(DateTime.Now.Year, DateTime.Now.AddMonths(-1).Month);
+                //    var ofdays = DateTime.Now.Day <= 26 ? (DateTime.Now.Day + ((days - 26))) : DateTime.Now.Day - 26;
+                //    var stopDay = 0;
+                //    List<ProjectStatusChangeRecord> result = new List<ProjectStatusChangeRecord>();
+                //    ProjectStatusChangeRecord projectStatusChangeRecord = new ProjectStatusChangeRecord()
+                //    {
+                //        Id = projectObject.Id,
+                //        OldStatus = projectObject.StatusId.Value,
+                //        NewStatus = addOrUpdateProjectRequestDto.StatusId.Value,
+                //        ChangeTime = DateTime.Now,
+                //        IsValid = 1,
+                //        StopDay = 0
+                //    };
+                //    //只有把项目状态更改为在建状态时才会触发   其他状态不计算 （此逻辑是交建通每天推送日报数据使用  其他逻辑暂无使用）
+                //    if (addOrUpdateProjectRequestDto.StatusId.Value == CommonData.PConstruc.ToGuid())
+                //    {
+                //        var startTime = DateTime.Now.AddMonths(-1).ToString("yyyy-MM-26 00:00:00");
+                //        var endTime = DateTime.Now.ToString("yyyy-MM-25 23:59:59");
+                //        result = await dbContext.Queryable<ProjectStatusChangeRecord>()
+                //            .Where(x => x.IsValid == 1 && x.Id == projectObject.Id && x.ChangeTime >= SqlFunc.ToDate(startTime)
+                //            && x.ChangeTime <= SqlFunc.ToDate(endTime)).OrderBy(x => x.ChangeTime).ToListAsync();
+                //        var count = result.Count;
+                //        if (result != null && count > 1)
+                //        {
+                //            var time1 = result[count - 1].ChangeTime.ToDateDay();//最新一次一定是在建
+                //                                                                 //求其他状态的时间 
+                //            var lastStatusTime = result.Where(x => x.NewStatus != CommonData.PConstruc.ToGuid()).OrderBy(x => x.ChangeTime).ToList();
+                //            if (lastStatusTime != null && lastStatusTime.Any())
+                //            {
+                //                var time2 = lastStatusTime[0].ChangeTime.ToDateDay();//取暂停的时间
+                //                if (result[0].StopDay.Value + (time1 - time2) <= ofdays)
+                //                {
+                //                    stopDay = result[0].StopDay.Value + (time1 - time2);
+                //                }
+                //                else {
+                //                    stopDay = result[0].StopDay.Value;
+                //                }
                                 
-                            }
-                            else
-                            {
-                                if (DateTime.Now.Day >= 26)
-                                {
-                                    stopDay = (DateTime.Now.Day - 26);
-                                }
-                                else
-                                {
-                                    stopDay = DateTime.Now.Day + ((days - 26));
-                                }
-                            }
-                        }
-                        else
-                        {
-                            if (DateTime.Now.Day >= 26)
-                            {
-                                stopDay = (DateTime.Now.Day - 26);
-                            }
-                            else
-                            {
-                                stopDay = DateTime.Now.Day + ((days - 26));
-                            }
-                        }
+                //            }
+                //            else
+                //            {
+                //                if (DateTime.Now.Day >= 26)
+                //                {
+                //                    stopDay = (DateTime.Now.Day - 26);
+                //                }
+                //                else
+                //                {
+                //                    stopDay = DateTime.Now.Day + ((days - 26));
+                //                }
+                //            }
+                //        }
+                //        else
+                //        {
+                //            if (DateTime.Now.Day >= 26)
+                //            {
+                //                stopDay = (DateTime.Now.Day - 26);
+                //            }
+                //            else
+                //            {
+                //                stopDay = DateTime.Now.Day + ((days - 26));
+                //            }
+                //        }
 
-                    }
-                    else
-                    {
-                        if (DateTime.Now.Day >= 26)
-                        {
-                            stopDay = (DateTime.Now.Day - 26);
-                        }
-                        else
-                        {
-                            stopDay = DateTime.Now.Day + ((days - 26));
-                        }
-                    }
-                    projectStatusChangeRecord.StopDay = stopDay;
-                     await dbContext.Insertable<ProjectStatusChangeRecord>(projectStatusChangeRecord).ExecuteCommandAsync();
-                    foreach (var item in result)
-                    {
-                        item.StopDay = stopDay;
-                    }
+                //    }
+                //    else
+                //    {
+                //        if (DateTime.Now.Day >= 26)
+                //        {
+                //            stopDay = (DateTime.Now.Day - 26);
+                //        }
+                //        else
+                //        {
+                //            stopDay = DateTime.Now.Day + ((days - 26));
+                //        }
+                //    }
+                //    projectStatusChangeRecord.StopDay = stopDay;
+                //     await dbContext.Insertable<ProjectStatusChangeRecord>(projectStatusChangeRecord).ExecuteCommandAsync();
+                //    foreach (var item in result)
+                //    {
+                //        item.StopDay = stopDay;
+                //    }
                   
-                    if (result != null && result.Count > 0)
-                    {
-                        //更新暂停天数
-                        await dbContext.Updateable<ProjectStatusChangeRecord>(result).Where(x => x.IsValid.Value == 1).WhereColumns(x => new { x.Id }).UpdateColumns(x => new { x.StopDay })
-                            .ExecuteCommandAsync();
-                    }
-                }
+                //    if (result != null && result.Count > 0)
+                //    {
+                //        //更新暂停天数
+                //        await dbContext.Updateable<ProjectStatusChangeRecord>(result).Where(x => x.IsValid.Value == 1).WhereColumns(x => new { x.Id }).UpdateColumns(x => new { x.StopDay })
+                //            .ExecuteCommandAsync();
+                //    }
+                //}
                 #endregion
                 #region 记录状态变更 停工记录 日报未填报使用
                 //判断项目状态是否修改
