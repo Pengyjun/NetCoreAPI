@@ -252,10 +252,10 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
         /// </summary>
         private readonly IBaseService _baseService;
 
-		/// <summary>
-		/// 业务授权层
-		/// </summary>
-		private readonly IBizAuthorizeService _bizAuthorizeService;
+        /// <summary>
+        /// 业务授权层
+        /// </summary>
+        private readonly IBizAuthorizeService _bizAuthorizeService;
 
         /// <summary>
         /// 匹配
@@ -279,101 +279,101 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
         private CurrentUser _currentUser { get { return _globalObject.CurrentUser; } }
 
 
-		/// <summary>
-		/// 构造
-		/// </summary>
-		public ProjectReportService(IBaseRepository<Project> dbProject
-			, IBaseRepository<DayReport> dbDayReport
-			, IBaseRepository<DayReportConstruction> dbDayReportConstruction
-			, IBaseRepository<Files> dbFile
-			, IBaseRepository<DealingUnit> dbDealingUnit
-			, IBaseRepository<SubShip> dbSubShip
-			, IBaseRepository<OwnerShip> dbOwnerShip
-			, IBaseRepository<ProjectWBS> dbProjectWBS
-			, IBaseRepository<Domain.Models.User> dbUser
-			, IBaseRepository<DictionaryTable> dbDictionaryTable
-			, IBaseRepository<SafeSupervisionDayReport> dbSafeSupervisionDayReport
-			, IBaseRepository<ShipDayReport> dbShipDayReport
-			, IBaseRepository<PortData> dbPortData
-			, IBaseRepository<MonthReport> dbMonthReport
-			, IBaseRepository<MonthReportDetail> dbMonthReportDetail
-			, IBaseRepository<ShipDynamicMonthReport> dbShipDynamicMonthReport
-			, IBaseRepository<ShipDynamicMonthReportDetail> dbShipDynamicMonthReportDetail
-			, IBaseRepository<SubShipMonthReport> dbSubShipMonthReport
-			, IBaseRepository<OwnerShipMonthReport> dbOwnerShipMonthReport
-			, IBaseRepository<OwnerShipMonthReportSoil> dbOwnerShipMonthReportSoil
-			, IBaseRepository<ShipMovement> dbShipMovement
-			, IBaseRepository<ShipPingType> dbShipPingType
-			, IBaseRepository<ProjectPlanProduction> dbProjectAnnualPlan
-			, IBaseRepository<CrossDateDay> dbCrossDateDay
-			, IBaseRepository<ProjectType> dbProjectType
-			, IBaseRepository<ProjectStatus> dbProjectStatus
-			, IBaseRepository<Institution> dbInstitution
-			, IBaseRepository<Province> dbProvince
-			, IBaseRepository<CrossMonth> dbCrossMonth
-			, IBaseRepository<ProjectArea> dbProjectArea
-			, IBaseRepository<ProjectOrg> dbProjectOrg
-			, IBaseRepository<IndustryClassification> dbIndustryClassification
-			, IBaseRepository<ProjectLeader> dbProjectLeader
-			, IBaseRepository<ConstructionQualification> dbConstructionQualification
-			, IBaseRepository<StagingData> dbStagingData
-			, IBaseRepository<CurrencyConverter> dbCurrencyConverter
-			, IBaseRepository<Domain.Models.Job> dbJob
-			, IEntityChangeService entityChangeService
-			, IBaseService baseService
-			, IBizAuthorizeService bizAuthorizeService
+        /// <summary>
+        /// 构造
+        /// </summary>
+        public ProjectReportService(IBaseRepository<Project> dbProject
+            , IBaseRepository<DayReport> dbDayReport
+            , IBaseRepository<DayReportConstruction> dbDayReportConstruction
+            , IBaseRepository<Files> dbFile
+            , IBaseRepository<DealingUnit> dbDealingUnit
+            , IBaseRepository<SubShip> dbSubShip
+            , IBaseRepository<OwnerShip> dbOwnerShip
+            , IBaseRepository<ProjectWBS> dbProjectWBS
+            , IBaseRepository<Domain.Models.User> dbUser
+            , IBaseRepository<DictionaryTable> dbDictionaryTable
+            , IBaseRepository<SafeSupervisionDayReport> dbSafeSupervisionDayReport
+            , IBaseRepository<ShipDayReport> dbShipDayReport
+            , IBaseRepository<PortData> dbPortData
+            , IBaseRepository<MonthReport> dbMonthReport
+            , IBaseRepository<MonthReportDetail> dbMonthReportDetail
+            , IBaseRepository<ShipDynamicMonthReport> dbShipDynamicMonthReport
+            , IBaseRepository<ShipDynamicMonthReportDetail> dbShipDynamicMonthReportDetail
+            , IBaseRepository<SubShipMonthReport> dbSubShipMonthReport
+            , IBaseRepository<OwnerShipMonthReport> dbOwnerShipMonthReport
+            , IBaseRepository<OwnerShipMonthReportSoil> dbOwnerShipMonthReportSoil
+            , IBaseRepository<ShipMovement> dbShipMovement
+            , IBaseRepository<ShipPingType> dbShipPingType
+            , IBaseRepository<ProjectPlanProduction> dbProjectAnnualPlan
+            , IBaseRepository<CrossDateDay> dbCrossDateDay
+            , IBaseRepository<ProjectType> dbProjectType
+            , IBaseRepository<ProjectStatus> dbProjectStatus
+            , IBaseRepository<Institution> dbInstitution
+            , IBaseRepository<Province> dbProvince
+            , IBaseRepository<CrossMonth> dbCrossMonth
+            , IBaseRepository<ProjectArea> dbProjectArea
+            , IBaseRepository<ProjectOrg> dbProjectOrg
+            , IBaseRepository<IndustryClassification> dbIndustryClassification
+            , IBaseRepository<ProjectLeader> dbProjectLeader
+            , IBaseRepository<ConstructionQualification> dbConstructionQualification
+            , IBaseRepository<StagingData> dbStagingData
+            , IBaseRepository<CurrencyConverter> dbCurrencyConverter
+            , IBaseRepository<Domain.Models.Job> dbJob
+            , IEntityChangeService entityChangeService
+            , IBaseService baseService
+            , IBizAuthorizeService bizAuthorizeService
             , IMapper mapper
-			, GlobalObject globalObject
-			, ISqlSugarClient dbContext
-			, IPushPomService iPushPomService
-			)
-		{
+            , GlobalObject globalObject
+            , ISqlSugarClient dbContext
+            , IPushPomService iPushPomService
+            )
+        {
 
-			_dbProject = dbProject;
-			_dbDayReport = dbDayReport;
-			_dbDayReportConstruction = dbDayReportConstruction;
-			_dbFile = dbFile;
-			_dbcrossMonth = dbCrossMonth;
-			_dbSubShip = dbSubShip;
-			_dbDealingUnit = dbDealingUnit;
-			_dbOwnerShip = dbOwnerShip;
-			_dbProjectWBS = dbProjectWBS;
-			_dbUser = dbUser;
-			_dbDictionaryTable = dbDictionaryTable;
-			_dbSafeSupervisionDayReport = dbSafeSupervisionDayReport;
-			_dbShipDayReport = dbShipDayReport;
-			_dbPortData = dbPortData;
-			_dbMonthReport = dbMonthReport;
-			_dbMonthReportDetail = dbMonthReportDetail;
-			_dbShipDynamicMonthReport = dbShipDynamicMonthReport;
-			_dbShipDynamicMonthReportDetail = dbShipDynamicMonthReportDetail;
-			_dbSubShipMonthReport = dbSubShipMonthReport;
-			_dbOwnerShipMonthReport = dbOwnerShipMonthReport;
-			_dbOwnerShipMonthReportSoil = dbOwnerShipMonthReportSoil;
-			_dbShipMovement = dbShipMovement;
-			_dbShipPingType = dbShipPingType;
-			_dbProjectAnnualPlan = dbProjectAnnualPlan;
-			_dbCrossDateDay = dbCrossDateDay;
-			_dbProjectType = dbProjectType;
-			_dbProjectStatus = dbProjectStatus;
-			_dbInstitution = dbInstitution;
-			_dbProvince = dbProvince;
-			_dbProjectArea = dbProjectArea;
-			_dbProjectOrg = dbProjectOrg;
-			_dbConstructionQualification = dbConstructionQualification;
-			_dbIndustryClassification = dbIndustryClassification;
-			_dbProjectLeader = dbProjectLeader;
-			_dbStagingData = dbStagingData;
-			_dbCurrencyConverter = dbCurrencyConverter;
-			_dbJob = dbJob;
-			_entityChangeService = entityChangeService;
-			_baseService = baseService;
-			_bizAuthorizeService = bizAuthorizeService;
+            _dbProject = dbProject;
+            _dbDayReport = dbDayReport;
+            _dbDayReportConstruction = dbDayReportConstruction;
+            _dbFile = dbFile;
+            _dbcrossMonth = dbCrossMonth;
+            _dbSubShip = dbSubShip;
+            _dbDealingUnit = dbDealingUnit;
+            _dbOwnerShip = dbOwnerShip;
+            _dbProjectWBS = dbProjectWBS;
+            _dbUser = dbUser;
+            _dbDictionaryTable = dbDictionaryTable;
+            _dbSafeSupervisionDayReport = dbSafeSupervisionDayReport;
+            _dbShipDayReport = dbShipDayReport;
+            _dbPortData = dbPortData;
+            _dbMonthReport = dbMonthReport;
+            _dbMonthReportDetail = dbMonthReportDetail;
+            _dbShipDynamicMonthReport = dbShipDynamicMonthReport;
+            _dbShipDynamicMonthReportDetail = dbShipDynamicMonthReportDetail;
+            _dbSubShipMonthReport = dbSubShipMonthReport;
+            _dbOwnerShipMonthReport = dbOwnerShipMonthReport;
+            _dbOwnerShipMonthReportSoil = dbOwnerShipMonthReportSoil;
+            _dbShipMovement = dbShipMovement;
+            _dbShipPingType = dbShipPingType;
+            _dbProjectAnnualPlan = dbProjectAnnualPlan;
+            _dbCrossDateDay = dbCrossDateDay;
+            _dbProjectType = dbProjectType;
+            _dbProjectStatus = dbProjectStatus;
+            _dbInstitution = dbInstitution;
+            _dbProvince = dbProvince;
+            _dbProjectArea = dbProjectArea;
+            _dbProjectOrg = dbProjectOrg;
+            _dbConstructionQualification = dbConstructionQualification;
+            _dbIndustryClassification = dbIndustryClassification;
+            _dbProjectLeader = dbProjectLeader;
+            _dbStagingData = dbStagingData;
+            _dbCurrencyConverter = dbCurrencyConverter;
+            _dbJob = dbJob;
+            _entityChangeService = entityChangeService;
+            _baseService = baseService;
+            _bizAuthorizeService = bizAuthorizeService;
             _mapper = mapper;
-			_globalObject = globalObject;
-			_dbContext = dbContext;
-			_iPushPomService = iPushPomService;
-		}
+            _globalObject = globalObject;
+            _dbContext = dbContext;
+            _iPushPomService = iPushPomService;
+        }
 
         #region 项目日报
 
@@ -2435,19 +2435,19 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             var constructionNatures = await GetDictionarysAsync(DictionaryTypeNo.ConstructionNature);
             resDetails.ForEach(item =>
             {
-
                 var thisSumYearDetail = sumYearDetails.FirstOrDefault(t => t.ProjectWBSId == item.ProjectWBSId && t.OutPutType == item.OutPutType && t.ShipId == item.ShipId && t.UnitPrice == item.UnitPrice && t.ConstructionNature == t.ConstructionNature);
                 var thisSumDetail = sumDetails.FirstOrDefault(t => t.ProjectWBSId == item.ProjectWBSId && t.OutPutType == item.OutPutType && t.ShipId == item.ShipId && t.UnitPrice == item.UnitPrice && t.ConstructionNature == t.ConstructionNature);
+
                 if (thisSumYearDetail != null)
                 {
                     item.YearCompletedQuantity = Math.Round(thisSumYearDetail.CompletedQuantity, 2);
-                    item.YearCompleteProductionAmount = Math.Round(thisSumYearDetail.CurrencyCompleteProductionAmount, 2);
+                    item.YearCompleteProductionAmount = Math.Round(thisSumYearDetail.CurrencyCompleteProductionAmount);
                     item.YearOutsourcingExpensesAmount = Math.Round(thisSumYearDetail.OutsourcingExpensesAmount, 2);
                 }
                 if (thisSumDetail != null)
                 {
                     item.TotalCompletedQuantity = Math.Round(thisSumDetail.CompletedQuantity, 2);
-                    item.TotalCompleteProductionAmount = Math.Round(thisSumDetail.CurrencyCompleteProductionAmount, 2);
+                    item.TotalCompleteProductionAmount = Math.Round(thisSumDetail.CurrencyCompleteProductionAmount);
                     item.TotalOutsourcingExpensesAmount = Math.Round(thisSumDetail.OutsourcingExpensesAmount, 2);
                 }
                 if (item.OutPutType == ConstructionOutPutType.SubPackage)
@@ -2497,13 +2497,13 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             #region 增加四个字段
             if (resMonthReport != null)
             {
-               var resultData=await GetProjectProductionValue(model.ProjectId);
+                var resultData = await GetProjectProductionValue(model.ProjectId);
                 resMonthReport.CurrentYearOffirmProductionValue = resultData.Item1;
                 resMonthReport.TotalYearKaileaOffirmProductionValue = resultData.Item2;
                 resMonthReport.CurrenYearCollection = resultData.Item3;
                 resMonthReport.TotalYearCollection = resultData.Item4;
             }
-            
+
 
             #endregion
 
@@ -2542,31 +2542,31 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
         ///是否允许提交
         /// </summary>
         /// <returns></returns>
-        private async Task<bool> IsCanSubmitAsync(MonthReport? monthReport,  int dateMonth, int nowDateMonth)
+        private async Task<bool> IsCanSubmitAsync(MonthReport? monthReport, int dateMonth, int nowDateMonth)
         {
             if (dateMonth > nowDateMonth)
             {
-				return false;
+                return false;
             }
             if (monthReport != null && monthReport.Status == MonthReportStatus.Approveling)
             {
                 return false;
             }
-            if (monthReport != null && monthReport.Status == MonthReportStatus.Finish )
+            if (monthReport != null && monthReport.Status == MonthReportStatus.Finish)
             {
-                var  unFinishIob= await GetUnFinishMonthReportJobPartAsync(monthReport.ProjectId, monthReport.DateMonth);
-				if(unFinishIob!=null)
-				{
+                var unFinishIob = await GetUnFinishMonthReportJobPartAsync(monthReport.ProjectId, monthReport.DateMonth);
+                if (unFinishIob != null)
+                {
                     return false;
                 }
             }
-			if(dateMonth== nowDateMonth&& monthReport!=null && monthReport.Status == MonthReportStatus.Finish)
-			{
+            if (dateMonth == nowDateMonth && monthReport != null && monthReport.Status == MonthReportStatus.Finish)
+            {
                 return await _bizAuthorizeService.IsAuthorizedAsync(_currentUser.Id, BizModule.MonthReport);
             }
-			if(dateMonth< nowDateMonth&&(monthReport==null|| monthReport.Status == MonthReportStatus.Finish))
-			{
-				return await _bizAuthorizeService.IsAuthorizedAsync(_currentUser.Id, BizModule.MonthReport);
+            if (dateMonth < nowDateMonth && (monthReport == null || monthReport.Status == MonthReportStatus.Finish))
+            {
+                return await _bizAuthorizeService.IsAuthorizedAsync(_currentUser.Id, BizModule.MonthReport);
             }
             return true;
         }
@@ -2602,8 +2602,8 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
         /// <returns></returns>
         private async Task<Model.Job?> GetUnFinishMonthReportJobPartAsync(Guid projectId, int datemonth)
         {
-            var query =   _dbJob.AsQueryable().Where(t => t.IsDelete == 1 && t.ProjectId == projectId && t.DateMonth == datemonth && t.BizModule == BizModule.MonthReport && t.IsFinish == false);
-			return await  query.Select(t => new Model.Job { Id = t.Id, ApproveStatus = t.ApproveStatus, IsFinish = t.IsFinish }).FirstAsync();
+            var query = _dbJob.AsQueryable().Where(t => t.IsDelete == 1 && t.ProjectId == projectId && t.DateMonth == datemonth && t.BizModule == BizModule.MonthReport && t.IsFinish == false);
+            return await query.Select(t => new Model.Job { Id = t.Id, ApproveStatus = t.ApproveStatus, IsFinish = t.IsFinish }).FirstAsync();
         }
 
         /// <summary>
@@ -2746,17 +2746,17 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             return sumReport;
         }
 
-            #endregion
+        #endregion
 
         #region 船舶月报
 
-            #region 船舶动态月报(暂未启用)
+        #region 船舶动态月报(暂未启用)
 
-            /// <summary>
-            ///保存一条船舶动态月报
-            /// </summary>
-            /// <returns></returns>
-            public async Task<ResponseAjaxResult<bool>> SaveShipDynamicMonthReportAsync(SaveShipDynamicMonthReportRequestDto model)
+        /// <summary>
+        ///保存一条船舶动态月报
+        /// </summary>
+        /// <returns></returns>
+        public async Task<ResponseAjaxResult<bool>> SaveShipDynamicMonthReportAsync(SaveShipDynamicMonthReportRequestDto model)
         {
             var result = new ResponseAjaxResult<bool>();
             var now = DateTime.Now;
@@ -5067,14 +5067,14 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             // 排除掉的项目（斯里兰卡科伦坡港口城发展项目）
             var excludeProjectIds = new Guid[] { "08db3b35-fb38-4bb9-8213-fe97a3275400".ToGuid() };
             // 统计的公司
-            var totalCompanys = await _dbContext.Queryable<ProductionMonitoringOperationDayReport>().Where(t => t.IsDelete==1&& t.Type == 1).ToListAsync();
+            var totalCompanys = await _dbContext.Queryable<ProductionMonitoringOperationDayReport>().Where(t => t.IsDelete == 1 && t.Type == 1).ToListAsync();
             totalCompanys = totalCompanys.Where(t => !excludeNames.Contains(t.Name)).ToList();
-            var totalCompanyIds = totalCompanys.Where(t=> !excludeNames.Contains( t.Name)).Select(t => t.ItemId).ToArray();
+            var totalCompanyIds = totalCompanys.Where(t => !excludeNames.Contains(t.Name)).Select(t => t.ItemId).ToArray();
             // 统计的项目
-            var projects = await  _dbContext.Queryable<Project>().Where(t => t.IsDelete == 1 && totalCompanyIds.Contains(t.CompanyId)).ToListAsync();
+            var projects = await _dbContext.Queryable<Project>().Where(t => t.IsDelete == 1 && totalCompanyIds.Contains(t.CompanyId)).ToListAsync();
             projects = projects.Where(t => !excludeProjectIds.Contains(t.Id)).ToList();
             var projectDeptIds = projects.Select(t => t.ProjectDept).Distinct().ToArray();
-            var institutions = _dbContext.Queryable<Institution>().Where(t=>t.IsDelete==1&& projectDeptIds.Contains(t.PomId)).ToArray();
+            var institutions = _dbContext.Queryable<Institution>().Where(t => t.IsDelete == 1 && projectDeptIds.Contains(t.PomId)).ToArray();
             var company = new List<baseProjectData>();
             projects.ForEach(item =>
             {
@@ -5082,7 +5082,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 var ba = new baseProjectData() { ProjectId = item.Id, ProjectName = item.Name };
                 ba.CompanyName = sortCommany?.Name;
                 ba.DeptName = institutions.FirstOrDefault(t => t.PomId == item.ProjectDept)?.Name;
-                ba.Sort= sortCommany?.Sort;
+                ba.Sort = sortCommany?.Sort;
                 ba.CompanyId = sortCommany?.ItemId;
                 company.Add(ba);
             });
@@ -5216,7 +5216,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             };
             // outPutInfos = outPutInfos.OrderBy(x => x.CompanyName).ToList();
             List<OutPutInfo> SumList = new List<OutPutInfo>();
-            var SumCompanyGroup = outPutInfos.GroupBy(x => new  { x.CompanyId, x.CompanyName,x.CompanySort } );
+            var SumCompanyGroup = outPutInfos.GroupBy(x => new { x.CompanyId, x.CompanyName, x.CompanySort });
             foreach (var item in SumCompanyGroup)
             {
                 OutPutInfo model = new OutPutInfo();
@@ -5250,7 +5250,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 //按公司插入汇总的数据
                 AllList.Add(item);
                 //然后按顺序插入公司对应的数据
-                var ComList = outPutInfos.Where(x => item.CompanyId==x.CompanyId).ToList();
+                var ComList = outPutInfos.Where(x => item.CompanyId == x.CompanyId).ToList();
                 AllList.AddRange(ComList);
             }
 
@@ -5723,9 +5723,9 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
 
             // 获取排序配置
             var selTypes = new int?[] { 2, 3 };
-            var sortOptions = await  _dbContext.Queryable<ProductionMonitoringOperationDayReport>().Where(t => selTypes.Contains(t.Type)&&t.IsDelete==1).ToListAsync();
+            var sortOptions = await _dbContext.Queryable<ProductionMonitoringOperationDayReport>().Where(t => selTypes.Contains(t.Type) && t.IsDelete == 1).ToListAsync();
             // 历史船舶数据
-            var sumHistoryShipReports = await  SumHistoryPojectShipReportAsync(endTime.Year);
+            var sumHistoryShipReports = await SumHistoryPojectShipReportAsync(endTime.Year);
             //获取项目信息
             var projectList = projects.Where(x => x.IsDelete == 1 && projectIds.Contains(x.Id)).ToList();
             //获取船舶信息
@@ -5773,9 +5773,9 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 }
                 // 加入排序
                 var thisOwnerShip = shipList.FirstOrDefault(t => t.PomId == item.ShipId);
-                if(thisOwnerShip!=null)
+                if (thisOwnerShip != null)
                 {
-                    var shipTypeSortOption = sortOptions.FirstOrDefault(t => t.Type==2&&t.ItemId == thisOwnerShip.TypeId);
+                    var shipTypeSortOption = sortOptions.FirstOrDefault(t => t.Type == 2 && t.ItemId == thisOwnerShip.TypeId);
                     var shipSortOption = sortOptions.FirstOrDefault(t => t.Type == 3 && t.ItemId == thisOwnerShip.PomId);
                     keynote.ShipTypeSort = shipTypeSortOption?.Sort;
                     keynote.ShipSort = shipSortOption?.Sort;
@@ -5802,7 +5802,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             //    }
             //}
             List<KeynoteShipInfo> sumShipInfos = new List<KeynoteShipInfo>();
-            var groupList = keynoteList.GroupBy(x =>new { x.ShipId ,x.ShipName, x.ShipTypeSort,x.ShipSort}).ToList();
+            var groupList = keynoteList.GroupBy(x => new { x.ShipId, x.ShipName, x.ShipTypeSort, x.ShipSort }).ToList();
             foreach (var item in groupList)
             {
 
@@ -5837,99 +5837,99 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             return allKeynoteList;
         }
 
-		/// <summary>
-		/// 获取月报导出Word数据
-		/// </summary>
-		/// <returns></returns>
-		/// <exception cref="NotImplementedException"></exception>
-		public async Task<ResponseAjaxResult<List<MonthReportProjectWordResponseDto>>> SearchMonthReportProjectWordAsync(MonthtReportsRequstDto model)
-		{
-			var projectTypeId = "048120ae-1e9f-46d8-a38f-5d5e9e49ecba".ToGuid();
-			//项目状态Id
-			var projectStatusId = await _dbContext.Queryable<ProjectStatus>().Where(x => x.Sequence == 1 || x.Sequence == 2 || x.Sequence == 3).Select(x => x.StatusId).ToListAsync();
-			//公司排序Id
-			List<Guid> company = new List<Guid>()
-			{
-				new Guid("bd840460-1e3a-45c8-abed-6e66903eb465"),
-				new Guid("3c5b138b-601a-442a-9519-2508ec1c1eb2"),
-				new Guid("a8db9bb0-4667-4320-b03d-b0b7f8728b61"),
-				new Guid("11c9c978-9ef3-411d-ba70-0d0eed93e048"),
-				new Guid("5a8f39de-8515-456b-8620-c0d01c012e04"),
-				new Guid("c0d51e81-03dd-4ef8-bd83-6eb1355879e1"),
-				new Guid("65052a94-6ea7-44ba-96b4-cf648de0d28a"),
-				new Guid("ef7bdb95-e802-4bf5-a7ae-9ef5205cd624")
-			};
-			var responseAjaxResult = new ResponseAjaxResult<List<MonthReportProjectWordResponseDto>>();
-			var data = await SearchMonthReportsAsync(model);
-			var projectMonthReportHistory = await _dbContext.Queryable<ProjectMonthReportHistory>().ToListAsync();
-			var projectHistoryData = await _dbContext.Queryable<ProjectHistoryData>().ToListAsync();
-			var time = model.StartTime.Value.Year;
-			var ids = data.Data.Reports.Select(x => x.Id).ToList();
-			var userAuthForData = await GetCurrentUserAuthForDataAsync();
-			var monthReport = await _dbContext.Queryable<MonthReport>().ToListAsync();
-			var currencyConverter = await _dbContext.Queryable<CurrencyConverter>().ToListAsync(); 
-			var projectBaseInfo = await _dbContext.Queryable<MonthReport>()
-				.LeftJoin<Project>((x, y) => x.ProjectId == y.Id)
-				.LeftJoin<Institution>((x, y, z) => y.CompanyId == z.PomId)
-				.LeftJoin<ProjectType>((x, y, z, s) => y.TypeId == s.PomId)
-				.LeftJoin<ProjectScale>((x, y, z, s, q) => y.GradeId == q.PomId)
-				.LeftJoin<ProjectStatus>((x, y, z, s, q, t) => y.StatusId == t.StatusId)
-				.OrderBy((x, y) => y.Category)
-				.OrderByDescending((x, y) => y.Latitude)
-				.Where((x, y) => x.IsDelete == 1 && ids.Contains(x.Id) && company.Contains(y.CompanyId.Value) && projectStatusId.Contains(y.StatusId.Value) && y.TypeId != projectTypeId)
-				.Select((x, y, z, s, q, t) => new MonthReportProjectWordResponseDto
-				{
-					Id = x.Id,
-					CompanyId = y.CompanyId,
-					ProjectId = x.ProjectId,
-					MonthTime = x.DateMonth,
-					ProjectBelonging = z.Shortname,
-					ProjectName = y.Name,
-					ProjectType = s.Name,
-					ProjectGrade = q.Name,
-					ProjectLocation = y.ProjectLocation,
-					ProjectState = t.Name,
-					CompanyName = z.Shortname,
-					ProjectContent = y.QuantityRemarks,
+        /// <summary>
+        /// 获取月报导出Word数据
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        public async Task<ResponseAjaxResult<List<MonthReportProjectWordResponseDto>>> SearchMonthReportProjectWordAsync(MonthtReportsRequstDto model)
+        {
+            var projectTypeId = "048120ae-1e9f-46d8-a38f-5d5e9e49ecba".ToGuid();
+            //项目状态Id
+            var projectStatusId = await _dbContext.Queryable<ProjectStatus>().Where(x => x.Sequence == 1 || x.Sequence == 2 || x.Sequence == 3).Select(x => x.StatusId).ToListAsync();
+            //公司排序Id
+            List<Guid> company = new List<Guid>()
+            {
+                new Guid("bd840460-1e3a-45c8-abed-6e66903eb465"),
+                new Guid("3c5b138b-601a-442a-9519-2508ec1c1eb2"),
+                new Guid("a8db9bb0-4667-4320-b03d-b0b7f8728b61"),
+                new Guid("11c9c978-9ef3-411d-ba70-0d0eed93e048"),
+                new Guid("5a8f39de-8515-456b-8620-c0d01c012e04"),
+                new Guid("c0d51e81-03dd-4ef8-bd83-6eb1355879e1"),
+                new Guid("65052a94-6ea7-44ba-96b4-cf648de0d28a"),
+                new Guid("ef7bdb95-e802-4bf5-a7ae-9ef5205cd624")
+            };
+            var responseAjaxResult = new ResponseAjaxResult<List<MonthReportProjectWordResponseDto>>();
+            var data = await SearchMonthReportsAsync(model);
+            var projectMonthReportHistory = await _dbContext.Queryable<ProjectMonthReportHistory>().ToListAsync();
+            var projectHistoryData = await _dbContext.Queryable<ProjectHistoryData>().ToListAsync();
+            var time = model.StartTime.Value.Year;
+            var ids = data.Data.Reports.Select(x => x.Id).ToList();
+            var userAuthForData = await GetCurrentUserAuthForDataAsync();
+            var monthReport = await _dbContext.Queryable<MonthReport>().ToListAsync();
+            var currencyConverter = await _dbContext.Queryable<CurrencyConverter>().ToListAsync();
+            var projectBaseInfo = await _dbContext.Queryable<MonthReport>()
+                .LeftJoin<Project>((x, y) => x.ProjectId == y.Id)
+                .LeftJoin<Institution>((x, y, z) => y.CompanyId == z.PomId)
+                .LeftJoin<ProjectType>((x, y, z, s) => y.TypeId == s.PomId)
+                .LeftJoin<ProjectScale>((x, y, z, s, q) => y.GradeId == q.PomId)
+                .LeftJoin<ProjectStatus>((x, y, z, s, q, t) => y.StatusId == t.StatusId)
+                .OrderBy((x, y) => y.Category)
+                .OrderByDescending((x, y) => y.Latitude)
+                .Where((x, y) => x.IsDelete == 1 && ids.Contains(x.Id) && company.Contains(y.CompanyId.Value) && projectStatusId.Contains(y.StatusId.Value) && y.TypeId != projectTypeId)
+                .Select((x, y, z, s, q, t) => new MonthReportProjectWordResponseDto
+                {
+                    Id = x.Id,
+                    CompanyId = y.CompanyId,
+                    ProjectId = x.ProjectId,
+                    MonthTime = x.DateMonth,
+                    ProjectBelonging = z.Shortname,
+                    ProjectName = y.Name,
+                    ProjectType = s.Name,
+                    ProjectGrade = q.Name,
+                    ProjectLocation = y.ProjectLocation,
+                    ProjectState = t.Name,
+                    CompanyName = z.Shortname,
+                    ProjectContent = y.QuantityRemarks,
                     CurrencyConverterId = y.CurrencyId,
                     OriginalContractAmount = y.Amount,
                     //ChangeAmount = SqlFunc.Round((y.ECAmount - y.Amount) / 10000, 2),
-                    ActualContractAmount =y.ECAmount,
+                    ActualContractAmount = y.ECAmount,
                     //ContractChangeInformation = 
                     DurationInformation = y.DurationInformation,
-					ContractChangeInformation = y.ContractChangeInfo,
-					// MonthProjectDebriefing =
-					//工程产值
-					EngineeringMonthOutputValue = SqlFunc.Round(x.CompleteProductionAmount / 10000 , 2),
-					//业主确认
-					OwnerMonthOutputValue = SqlFunc.Round(x.PartyAConfirmedProductionAmount / 10000, 2),
-					//工程收款
-					ProjectMonthOutputValue = SqlFunc.Round(x.PartyAPayAmount / 10000, 2),
-					MonthProjectDebriefing = x.ProgressDescription,
-					ExistingProblems = x.ProblemDescription,
-					TakeSteps = x.SolveProblemDescription,
-					CoordinationMatters = x.CoordinationMatters
-				}).ToListAsync();
-			var projectBaseInfo1 = projectBaseInfo.Where(x => company.Contains(x.CompanyId.Value)).OrderBy(x => company.IndexOf(x.CompanyId.Value)).ToList();
-			var projectBaseInfo2 = projectBaseInfo.Where(x => !company.Contains(x.CompanyId.Value)).ToList();
-			projectBaseInfo = projectBaseInfo1.Concat(projectBaseInfo2).ToList();
-			foreach (var item in projectBaseInfo)
-			{ 
-				var exchangeRate = currencyConverter.FirstOrDefault(x => x.CurrencyId == item.CurrencyConverterId.ToString())?.ExchangeRate;
-					item.OriginalContractAmount = Math.Round(Convert.ToDecimal((item.OriginalContractAmount)* exchangeRate / 10000 ) , 2);
-                    item.ActualContractAmount = Math.Round(Convert.ToDecimal((item.ActualContractAmount) * exchangeRate / 10000 ) , 2);
-                    item.ChangeAmount = Math.Round(Convert.ToDecimal(item.ActualContractAmount - item.OriginalContractAmount), 2);
+                    ContractChangeInformation = y.ContractChangeInfo,
+                    // MonthProjectDebriefing =
+                    //工程产值
+                    EngineeringMonthOutputValue = SqlFunc.Round(x.CompleteProductionAmount / 10000, 2),
+                    //业主确认
+                    OwnerMonthOutputValue = SqlFunc.Round(x.PartyAConfirmedProductionAmount / 10000, 2),
+                    //工程收款
+                    ProjectMonthOutputValue = SqlFunc.Round(x.PartyAPayAmount / 10000, 2),
+                    MonthProjectDebriefing = x.ProgressDescription,
+                    ExistingProblems = x.ProblemDescription,
+                    TakeSteps = x.SolveProblemDescription,
+                    CoordinationMatters = x.CoordinationMatters
+                }).ToListAsync();
+            var projectBaseInfo1 = projectBaseInfo.Where(x => company.Contains(x.CompanyId.Value)).OrderBy(x => company.IndexOf(x.CompanyId.Value)).ToList();
+            var projectBaseInfo2 = projectBaseInfo.Where(x => !company.Contains(x.CompanyId.Value)).ToList();
+            projectBaseInfo = projectBaseInfo1.Concat(projectBaseInfo2).ToList();
+            foreach (var item in projectBaseInfo)
+            {
+                var exchangeRate = currencyConverter.FirstOrDefault(x => x.CurrencyId == item.CurrencyConverterId.ToString())?.ExchangeRate;
+                item.OriginalContractAmount = Math.Round(Convert.ToDecimal((item.OriginalContractAmount) * exchangeRate / 10000), 2);
+                item.ActualContractAmount = Math.Round(Convert.ToDecimal((item.ActualContractAmount) * exchangeRate / 10000), 2);
+                item.ChangeAmount = Math.Round(Convert.ToDecimal(item.ActualContractAmount - item.OriginalContractAmount), 2);
                 if (item.MonthTime.ToString().Contains("2023"))
-				{
-					item.EngineeringYeahOutputValue = Math.Round((monthReport.Where(h => h.IsDelete == 1 && h.DateMonth.ToString().Contains(time.ToString()) && h.DateMonth > 202306 && h.ProjectId == item.ProjectId && h.DateMonth <= item.MonthTime).Sum(h => h.CompleteProductionAmount) + Convert.ToDecimal(projectHistoryData.FirstOrDefault(x => x.ProjectId == item.ProjectId)?.OutputValue)) / 10000, 2);
-					item.OwnerYeahOutputValue = Math.Round(monthReport.Where(h => h.IsDelete == 1 && h.DateMonth > 202308 && h.DateMonth.ToString().Contains(time.ToString()) && h.DateMonth >= 202308 && h.DateMonth <= item.MonthTime && h.ProjectId == item.ProjectId).Sum(h => h.PartyAConfirmedProductionAmount) / 10000, 2) + Convert.ToDecimal(projectMonthReportHistory.FirstOrDefault(x => x.ProjectId == item.ProjectId)?.YearOwnerConfirmation);
-					item.ProjectYeahOutputValue = Math.Round(monthReport.Where(h => h.IsDelete == 1 && h.DateMonth > 202308 && h.DateMonth.ToString().Contains(time.ToString()) && h.ProjectId == item.ProjectId && h.DateMonth <= item.MonthTime).Sum(h => h.PartyAPayAmount) / 10000, 2) + Convert.ToDecimal(projectMonthReportHistory.FirstOrDefault(x => x.ProjectId == item.ProjectId)?.YearProjectPayment); ;
-				}
-				else
-				{
-					item.EngineeringYeahOutputValue = Math.Round(monthReport.Where(h => h.IsDelete == 1 && h.DateMonth <= item.MonthTime && h.DateMonth.ToString().Contains(time.ToString()) && h.ProjectId == item.ProjectId).Sum(h => h.CompleteProductionAmount) / 1000, 2);
-					item.OwnerYeahOutputValue = Math.Round(monthReport.Where(h => h.IsDelete == 1 && h.DateMonth <= item.MonthTime && h.DateMonth.ToString().Contains(time.ToString()) && h.ProjectId == item.ProjectId).Sum(h => h.PartyAConfirmedProductionAmount) / 1000, 2);
-					item.ProjectYeahOutputValue = Math.Round(monthReport.Where(h => h.IsDelete == 1 && h.DateMonth <= item.MonthTime && h.DateMonth.ToString().Contains(time.ToString()) && h.ProjectId == item.ProjectId).Sum(h => h.PartyAPayAmount) / 1000, 2);
+                {
+                    item.EngineeringYeahOutputValue = Math.Round((monthReport.Where(h => h.IsDelete == 1 && h.DateMonth.ToString().Contains(time.ToString()) && h.DateMonth > 202306 && h.ProjectId == item.ProjectId && h.DateMonth <= item.MonthTime).Sum(h => h.CompleteProductionAmount) + Convert.ToDecimal(projectHistoryData.FirstOrDefault(x => x.ProjectId == item.ProjectId)?.OutputValue)) / 10000, 2);
+                    item.OwnerYeahOutputValue = Math.Round(monthReport.Where(h => h.IsDelete == 1 && h.DateMonth > 202308 && h.DateMonth.ToString().Contains(time.ToString()) && h.DateMonth >= 202308 && h.DateMonth <= item.MonthTime && h.ProjectId == item.ProjectId).Sum(h => h.PartyAConfirmedProductionAmount) / 10000, 2) + Convert.ToDecimal(projectMonthReportHistory.FirstOrDefault(x => x.ProjectId == item.ProjectId)?.YearOwnerConfirmation);
+                    item.ProjectYeahOutputValue = Math.Round(monthReport.Where(h => h.IsDelete == 1 && h.DateMonth > 202308 && h.DateMonth.ToString().Contains(time.ToString()) && h.ProjectId == item.ProjectId && h.DateMonth <= item.MonthTime).Sum(h => h.PartyAPayAmount) / 10000, 2) + Convert.ToDecimal(projectMonthReportHistory.FirstOrDefault(x => x.ProjectId == item.ProjectId)?.YearProjectPayment); ;
+                }
+                else
+                {
+                    item.EngineeringYeahOutputValue = Math.Round(monthReport.Where(h => h.IsDelete == 1 && h.DateMonth <= item.MonthTime && h.DateMonth.ToString().Contains(time.ToString()) && h.ProjectId == item.ProjectId).Sum(h => h.CompleteProductionAmount) / 1000, 2);
+                    item.OwnerYeahOutputValue = Math.Round(monthReport.Where(h => h.IsDelete == 1 && h.DateMonth <= item.MonthTime && h.DateMonth.ToString().Contains(time.ToString()) && h.ProjectId == item.ProjectId).Sum(h => h.PartyAConfirmedProductionAmount) / 1000, 2);
+                    item.ProjectYeahOutputValue = Math.Round(monthReport.Where(h => h.IsDelete == 1 && h.DateMonth <= item.MonthTime && h.DateMonth.ToString().Contains(time.ToString()) && h.ProjectId == item.ProjectId).Sum(h => h.PartyAPayAmount) / 1000, 2);
 
                 }
                 item.EngineeringAccumulatedEngineering = Math.Round((monthReport.Where(h => h.IsDelete == 1 && h.DateMonth > 202306 && h.ProjectId == item.ProjectId && h.DateMonth <= item.MonthTime).Sum(h => h.CompleteProductionAmount) + Convert.ToDecimal(projectHistoryData.FirstOrDefault(x => x.ProjectId == item.ProjectId)?.AccumulatedOutputValue)) / 10000, 2);
@@ -6219,7 +6219,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
         /// </summary>
         /// <param name="projectId">项目ID</param>
         /// <returns></returns>
-        public async  Task<Tuple<decimal, decimal, decimal, decimal>> GetProjectProductionValue(Guid projectId)
+        public async Task<Tuple<decimal, decimal, decimal, decimal>> GetProjectProductionValue(Guid projectId)
         {
             var currentYearOffirmProductionValue = 0M;
             var totalYearKaileaOffirmProductionValue = 0M;
@@ -6230,36 +6230,37 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 var currentYear = DateTime.Now.Year;
                 var projectMonthReportHistory = await _dbContext.Queryable<ProjectMonthReportHistory>()
                    .Where(x => x.IsDelete == 1 && x.ProjectId == projectId).FirstAsync();
-                
-                var currentTotalYearOffirmProductionValue= await _dbContext.Queryable<MonthReport>()
-                    .Where(x => x.IsDelete == 1 && x.ProjectId == projectId&&x.DateYear<= currentYear).ToListAsync();
+
+                var currentTotalYearOffirmProductionValue = await _dbContext.Queryable<MonthReport>()
+                    .Where(x => x.IsDelete == 1 && x.ProjectId == projectId && x.DateYear <= currentYear).ToListAsync();
                 //本年甲方确认产值(当年)
-                 currentYearOffirmProductionValue= currentTotalYearOffirmProductionValue.Where(x => x.DateYear == currentYear)
-                    .Sum(x => x.PartyAConfirmedProductionAmount);
+                currentYearOffirmProductionValue = currentTotalYearOffirmProductionValue.Where(x => x.DateYear == currentYear)
+                   .Sum(x => x.PartyAConfirmedProductionAmount);
 
                 //开累甲方确认产值(历史数据+2023-7至12月的数据+2024年的数据）
                 if (projectMonthReportHistory != null && currentTotalYearOffirmProductionValue.Any())
-                { 
-                totalYearKaileaOffirmProductionValue = projectMonthReportHistory.KaileiOwnerConfirmation.Value
-                   + currentTotalYearOffirmProductionValue.Sum(x => x.PartyAConfirmedProductionAmount);
+                {
+                    totalYearKaileaOffirmProductionValue = projectMonthReportHistory.KaileiOwnerConfirmation.Value
+                       + currentTotalYearOffirmProductionValue.Sum(x => x.PartyAConfirmedProductionAmount);
                 }
 
                 var currenTotalYearCollection = await _dbContext.Queryable<MonthReport>()
-                    .Where(x => x.IsDelete == 1 && x.ProjectId == projectId && x.DateYear<= currentYear).ToListAsync();
-                
+                    .Where(x => x.IsDelete == 1 && x.ProjectId == projectId && x.DateYear <= currentYear).ToListAsync();
+
                 //本年甲方付款金额
-                 currenYearCollection= currenTotalYearCollection.Where(x => x.DateYear == currentYear).Sum(x => x.PartyAPayAmount);
-                if (projectMonthReportHistory != null && currenTotalYearCollection.Any()) {
+                currenYearCollection = currenTotalYearCollection.Where(x => x.DateYear == currentYear).Sum(x => x.PartyAPayAmount);
+                if (projectMonthReportHistory != null && currenTotalYearCollection.Any())
+                {
                     //开累甲方付款金额
                     totalYearCollection = projectMonthReportHistory.KaileiProjectPayment.Value
                     + currenTotalYearCollection.Sum(x => x.PartyAPayAmount);
                 }
-                    
+
             }
             catch (Exception ex)
             {
 
-                
+
             }
             return Tuple.Create(currentYearOffirmProductionValue, totalYearKaileaOffirmProductionValue, currenYearCollection, totalYearCollection);
         }

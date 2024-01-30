@@ -3451,5 +3451,8 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
             return responseAjaxResult;
         }
         #endregion
+
+
+
     }
 }
