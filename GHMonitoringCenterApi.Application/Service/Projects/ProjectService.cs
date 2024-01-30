@@ -921,7 +921,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             var monthLastDay = new DateTime(currentDate.Year, currentDate.Month, 1).AddMonths(1).AddDays(-1).Day;
             if (nowDay > 26 && nowDay <= monthLastDay)
             {
-                stopDay = monthLastDay;
+                stopDay = monthLastDay-26;
             }
             else
             {
@@ -954,7 +954,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             }
             else 
             {
-               var  projectStatusChangeSingle = await dbContext.Queryable<ProjectStatusChangeRecord>().SingleAsync(x => x.IsValid == 1 
+               var  projectStatusChangeSingle = await dbContext.Queryable<ProjectStatusChangeRecord>().FirstAsync(x => x.IsValid == 1 
                 && x.Id == addOrUpdateProjectRequestDto.Id);
 
                 //修改操作  修改状态之前还是在建状态  所以停工天数不计算  生产日报也不会推送 等下再改为在建的时候 就会记录停工天数
@@ -973,9 +973,10 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     await dbContext.Updateable(projectStatusChangeRecord).ExecuteCommandAsync();
                 }
                 //修改状态之前  原来状态不是在建状态了 这个时候要计算停工天数
-                else if(projectStatusChangeSingle != null && projectStatusChangeSingle.NewStatus!= CommonData.PConstruc.ToGuid() &&addOrUpdateProjectRequestDto.StatusId== CommonData.PConstruc.ToGuid()){
-                    var diffDays=TimeHelper.GetTimeSpan(projectStatusChangeSingle.ChangeTime, DateTime.Now).Days;
-                    stopDay = projectStatusChangeSingle.StopDay.Value+ diffDays;
+                else if (projectStatusChangeSingle != null && projectStatusChangeSingle.NewStatus != CommonData.PConstruc.ToGuid() && addOrUpdateProjectRequestDto.StatusId == CommonData.PConstruc.ToGuid())
+                {
+                    var diffDays = TimeHelper.GetTimeSpan(projectStatusChangeSingle.ChangeTime, DateTime.Now).Days;
+                    stopDay = projectStatusChangeSingle.StopDay.Value + diffDays;
                     ProjectStatusChangeRecord projectStatusChangeRecord = new ProjectStatusChangeRecord()
                     {
                         Id = addOrUpdateProjectRequestDto.Id.Value,
@@ -987,7 +988,32 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     };
                     await dbContext.Updateable(projectStatusChangeRecord).ExecuteCommandAsync();
                 }
-            
+                else if (projectStatusChangeSingle == null && addOrUpdateProjectRequestDto.StatusId == CommonData.PConstruc.ToGuid())
+                {
+                    //说明是有原来的非在建状态改为在建状态的
+                    var projectSingle = await dbContext.Queryable<Project>().SingleAsync(x => x.IsDelete == 1 && x.Id == addOrUpdateProjectRequestDto.Id);
+                    
+                    var currentMonth = String.Empty;
+                    if (DateTime.Now.Day > 26 && DateTime.Now.Day <= monthLastDay)
+                    {
+                        currentMonth =DateTime.Now.ToString("MM");
+                    }
+                    else {
+                        currentMonth = DateTime.Now.AddMonths(-1).ToString("MM");
+                    }
+                    var initDay=Convert.ToDateTime(DateTime.Now.ToString("yyyy-") + currentMonth + "-26");
+                    var diffDays = TimeHelper.GetTimeSpan(initDay, DateTime.Now).Days-1;
+                    ProjectStatusChangeRecord projectStatusChangeRecord = new ProjectStatusChangeRecord()
+                    {
+                        Id = projectSingle.Id,
+                        OldStatus = projectSingle != null ? projectSingle.StatusId.Value : Guid.Empty,
+                        NewStatus = addOrUpdateProjectRequestDto.StatusId.Value,
+                        ChangeTime = DateTime.Now,
+                        IsValid = 1,
+                        StopDay = diffDays
+                    };
+                    await dbContext.Insertable(projectStatusChangeRecord).ExecuteCommandAsync();
+                }
             }
             #endregion
 
