@@ -937,7 +937,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     ProjectStatusChangeRecord projectStatusChangeRecord = new ProjectStatusChangeRecord()
                     {
                         Id = projectId,
-                        OldStatus = projectObject.StatusId.Value,
+                        OldStatus = addOrUpdateProjectRequestDto.StatusId.Value,
                         NewStatus = addOrUpdateProjectRequestDto.StatusId.Value,
                         ChangeTime = DateTime.Now,
                         IsValid = 1,
