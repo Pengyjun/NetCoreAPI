@@ -117,6 +117,9 @@ namespace GHMonitoringCenterApi.Domain.Shared.Const
         /// </summary>
         public static readonly string ChenCuiGroupCode = "2016146340";
 
+        /// <summary>
+        /// 完工 交工  竣工  终止
+        /// </summary>
 
         public static string NoStatus = "28bc58dc-41ed-4135-8628-a4e6a571032b,2a30d69d-ad3a-4a51-a1d7-7b363150437d,62986752-9b40-4d02-8887-b014a6ee7a9d,51b3cf5e-5148-422e-a8ad-4480bee435b6";
 

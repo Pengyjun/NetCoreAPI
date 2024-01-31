@@ -200,6 +200,20 @@ namespace GHMonitoringCenterApi.Application.Contracts.IService.Project
         Task<ResponseAjaxResult<ProjectPlanDetailResponseDto>> SearchProjectPlanDetailAsync(ProjectPlanSearchRequestDto requestDto);
 
 
+        /// <summary>
+        /// 查询公司在手项目列表
+        /// </summary>
+        /// <param name="companyProjectDetailsdRequestDto"></param>
+        /// <returns></returns>
+
+        Task<ResponseAjaxResult<List<CompanyProjectDetailedResponseDto>>> SearchCompanyProjectListAsync(CompanyProjectDetailsdRequestDto companyProjectDetailsdRequestDto);
+
+        /// <summary>
+        /// 公司在手项目下拉框选择
+        /// </summary>
+        /// <returns></returns>
+        Task<ResponseAjaxResult<List<BasePullDownResponseDto>>> SearchCompanyProjectPullDownAsync();
+
 
     }
 }
