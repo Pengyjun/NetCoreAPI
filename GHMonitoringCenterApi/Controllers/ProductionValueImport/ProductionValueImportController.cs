@@ -2,7 +2,6 @@
 using GHMonitoringCenterApi.Application.Contracts.Dto.ProductionValueImport;
 using GHMonitoringCenterApi.Application.Contracts.IService.ProductionValueImport;
 using GHMonitoringCenterApi.Domain.Shared;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GHMonitoringCenterApi.Controllers.ProductionValueImport
