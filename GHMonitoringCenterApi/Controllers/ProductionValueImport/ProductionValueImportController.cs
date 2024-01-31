@@ -24,9 +24,9 @@ namespace GHMonitoringCenterApi.Controllers.ProductionValueImport
         /// <param name="importHistoryProductionValuesRequestDto"></param>
         /// <returns></returns>
         [HttpGet("ImportProduction")]
-        public async Task<IActionResult> ImportProductionValuesAsync([FromQuery] ImportHistoryProductionValuesRequestDto importHistoryProductionValuesRequestDto)
+        public IActionResult ImportProductionValuesAsync([FromQuery] ImportHistoryProductionValuesRequestDto importHistoryProductionValuesRequestDto)
         {
-            return File(await _productionValueImportService.ImportProductionValuesAsync(importHistoryProductionValuesRequestDto), "application/vnd.ms-excel");
+            return File(_productionValueImportService.ImportProductionValuesAsync(importHistoryProductionValuesRequestDto), "application/vnd.ms-excel");
         }
     }
 }
