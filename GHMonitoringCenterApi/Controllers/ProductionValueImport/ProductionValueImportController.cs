@@ -2,7 +2,6 @@
 using GHMonitoringCenterApi.Application.Contracts.Dto.ProductionValueImport;
 using GHMonitoringCenterApi.Application.Contracts.IService.ProductionValueImport;
 using GHMonitoringCenterApi.Domain.Shared;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GHMonitoringCenterApi.Controllers.ProductionValueImport
@@ -29,6 +28,16 @@ namespace GHMonitoringCenterApi.Controllers.ProductionValueImport
         public async Task<ResponseAjaxResult<JjtSendMessageMonitoringDayReportResponseDto>> ImportHistoryProdutionValueAsync(ImportHistoryProductionValuesRequestDto importHistoryProductionValuesRequestDto) 
         {
             return await productionValueImportService.ImportProductionValuesAsync(importHistoryProductionValuesRequestDto);
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("ExcelJJtSendMessageWrite")]
+
+        public async Task<ResponseAjaxResult<bool>> ExcelJJtSendMessageWriteAsync()
+        {
+            return await productionValueImportService.ExcelJJtSendMessageWriteAsync();
         }
     }
 }

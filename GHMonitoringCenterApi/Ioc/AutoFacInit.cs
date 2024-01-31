@@ -10,6 +10,7 @@ using GHMonitoringCenterApi.Application.Contracts.IService.Job;
 using GHMonitoringCenterApi.Application.Contracts.IService.Menu;
 using GHMonitoringCenterApi.Application.Contracts.IService.OperationLog;
 using GHMonitoringCenterApi.Application.Contracts.IService.PersonnelOrganizeAdjust;
+using GHMonitoringCenterApi.Application.Contracts.IService.ProductionValueImport;
 using GHMonitoringCenterApi.Application.Contracts.IService.Project;
 using GHMonitoringCenterApi.Application.Contracts.IService.ProjectMasterData;
 using GHMonitoringCenterApi.Application.Contracts.IService.ProjectProductionReport;
@@ -35,6 +36,7 @@ using GHMonitoringCenterApi.Application.Service.Job;
 using GHMonitoringCenterApi.Application.Service.Menu;
 using GHMonitoringCenterApi.Application.Service.OperationLog;
 using GHMonitoringCenterApi.Application.Service.PersonnelOrganizeAdjust;
+using GHMonitoringCenterApi.Application.Service.ProductionValueImport;
 using GHMonitoringCenterApi.Application.Service.ProjectMasterData;
 using GHMonitoringCenterApi.Application.Service.ProjectProductionReport;
 using GHMonitoringCenterApi.Application.Service.Projects;
@@ -127,6 +129,7 @@ namespace GHMonitoringCenterApi.Ioc
             builder.RegisterType<BizAuthorizeService>().As<IBizAuthorizeService>().InstancePerLifetimeScope();
             builder.RegisterType<ShipSurveyService>().As<IShipSurveyService>().InstancePerLifetimeScope();
             builder.RegisterType<ProjectYearPlanService>().As<IProjectYearPlanService>().InstancePerLifetimeScope();
+            builder.RegisterType<ProductionValueImportService>().As<IProductionValueImportService>().InstancePerLifetimeScope();
         }
     }
 }

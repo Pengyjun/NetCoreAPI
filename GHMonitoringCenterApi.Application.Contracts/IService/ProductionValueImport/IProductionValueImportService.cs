@@ -22,5 +22,10 @@ namespace GHMonitoringCenterApi.Application.Contracts.IService.ProductionValueIm
         /// <param name="importHistoryProductionValuesRequestDto">请求参数</param>
         /// <returns></returns>
         Task<ResponseAjaxResult<JjtSendMessageMonitoringDayReportResponseDto>> ImportProductionValuesAsync(ImportHistoryProductionValuesRequestDto importHistoryProductionValuesRequestDto);
+        /// <summary>
+        /// Excel 智慧运营监控中心图片数据写入表
+        /// </summary>
+        /// <returns></returns>
+        Task<ResponseAjaxResult<bool>> ExcelJJtSendMessageWriteAsync();
     }
 }
