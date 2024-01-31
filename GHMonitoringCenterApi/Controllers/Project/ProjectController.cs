@@ -704,7 +704,7 @@ namespace GHMonitoringCenterApi.Controllers.Project
         public async Task<IActionResult> ImportCompanyProjectListAsync([FromQuery] CompanyProjectDetailsdRequestDto companyProjectDetailsdRequestDto)
         {
             //var tempPath = "D:\\projectconllection\\dotnet\\szgh\\GHMonitoringCenterApi.Domain.Shared\\Template\\Excel\\CompanyOnProjectTemplate.xlsx";
-            var tempPath = "/Template/Excel/CompanyOnProjectTemplate.xlsx";
+            var tempPath = "Template/Excel/CompanyOnProjectTemplate.xlsx";
             var data= await projectService.SearchCompanyProjectListAsync(companyProjectDetailsdRequestDto);
             var value = new
             {
