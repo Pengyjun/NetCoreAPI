@@ -2724,5 +2724,47 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             responseAjaxResult.Data = true;
             return responseAjaxResult;
         }
+
+
+        /// <summary>
+        /// 查询公司在手项目清单
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        public async Task<ResponseAjaxResult<List<CompanyProjectDetailedResponseDto>>> SearchCompanyProjectListAsync()
+        {
+            ResponseAjaxResult<List<CompanyProjectDetailedResponseDto>> responseAjaxResult = new ResponseAjaxResult<List<CompanyProjectDetailedResponseDto>>();
+            //List<CompanyProjectDetailedResponseDto> companyProjectDetailedResponseDtos = new List<CompanyProjectDetailedResponseDto>();
+           // var companyList = await dbContext.Queryable<ProductionMonitoringOperationDayReport>().Where(x => x.IsDelete == 1 && x.Type == 1).OrderBy(x=>x.Sort).ToListAsync();
+            //项目状态ID 
+            var projectStatusIds = CommonData.NoStatus.Split(",").Select(x => x.ToGuid()).ToList();
+            var result =await dbContext.Queryable<Project>()
+                .LeftJoin<ProductionMonitoringOperationDayReport>((x, y) => x.CompanyId == y.ItemId && y.Type==1&&y.Collect==0&&!string.IsNullOrWhiteSpace(y.Name))
+                .LeftJoin<ProjectType>((x, y, z) => x.TypeId == z.PomId)
+                .LeftJoin<ProjectStatus>((x, y, z, a) => x.StatusId == a.StatusId)
+                .Where(x => x.IsDelete == 1&&!projectStatusIds.Contains(x.StatusId.Value))
+                .OrderBy((x, y, z, a)=>new { y.Sort ,a.Sequence})
+                .Select((x, y, z, a) => new CompanyProjectDetailedResponseDto
+                {
+                    Id = x.Id,
+                    ProjectName = x.Name,
+                    CompanyId=y.ItemId.Value,
+                    CompanyName = y.Name,
+                    StatusSort=a.Sequence.Value,
+                    StatusName = a.Name,
+                    TypeName = z.Name,
+                    ContractAmount = x.Amount.Value,
+                    CommencementDate = x.CommencementTime.Value,
+                    //ProjectProgress=
+                }).ToListAsync();
+            //foreach (var item in companyList)
+            //{
+            //    companyProjectDetailedResponseDtos.AddRange(result.Where(x => x.CompanyId == item.ItemId).OrderBy(x => x.StatusSort).ToList());
+            //}
+            responseAjaxResult.Data = result;
+            responseAjaxResult.Count = result.Count;
+            responseAjaxResult.Success();
+            return responseAjaxResult;
+        }
     }
 }

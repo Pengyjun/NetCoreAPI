@@ -684,5 +684,16 @@ namespace GHMonitoringCenterApi.Controllers.Project
         {
             return await projectReportService.SearchReportedMonthsAsync(model);
         }
+
+
+        /// <summary>
+        /// 查询公司在手项目清单
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("SearchCompanyProjectList")]
+        public async Task<ResponseAjaxResult<List<CompanyProjectDetailedResponseDto>>> SearchCompanyProjectListAsync()
+        {
+            return await projectService.SearchCompanyProjectListAsync();
+        }
     }
 }
