@@ -2441,13 +2441,13 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 if (thisSumYearDetail != null)
                 {
                     item.YearCompletedQuantity = Math.Round(thisSumYearDetail.CompletedQuantity, 2);
-                    item.YearCompleteProductionAmount = Math.Round(thisSumYearDetail.CurrencyCompleteProductionAmount);
+                    item.YearCompleteProductionAmount = thisSumYearDetail.CurrencyCompleteProductionAmount;
                     item.YearOutsourcingExpensesAmount = Math.Round(thisSumYearDetail.OutsourcingExpensesAmount, 2);
                 }
                 if (thisSumDetail != null)
                 {
                     item.TotalCompletedQuantity = Math.Round(thisSumDetail.CompletedQuantity, 2);
-                    item.TotalCompleteProductionAmount = Math.Round(thisSumDetail.CurrencyCompleteProductionAmount);
+                    item.TotalCompleteProductionAmount = thisSumDetail.CurrencyCompleteProductionAmount;
                     item.TotalOutsourcingExpensesAmount = Math.Round(thisSumDetail.OutsourcingExpensesAmount, 2);
                 }
                 if (item.OutPutType == ConstructionOutPutType.SubPackage)
