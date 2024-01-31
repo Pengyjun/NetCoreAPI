@@ -1,4 +1,7 @@
-﻿using System;
+﻿using AutoMapper.Configuration.Annotations;
+using MiniExcelLibs.Attributes;
+using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -16,7 +19,6 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project
         /// <summary>
         /// 项目名称
         /// </summary>
-
         public string ProjectName { get; set; }     
         public Guid CompanyId { get; set; }
         /// <summary>
@@ -45,11 +47,12 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project
         /// <summary>
         /// 开工日期
         /// </summary>
-        public DateTime CommencementDate { get; set; }
+        public string CommencementDate { get; set; }
 
         /// <summary>
         /// 备注
         /// </summary>
-        public string Remark { get { return   (CommencementDate.Year==DateTime.Now.Year?"新中标":""); }}
+        //public string Remark { get { return   (CommencementDates.Year==DateTime.Now.Year?"新中标":""); }}
+        public string Remark { get; set; }
     }
 }
