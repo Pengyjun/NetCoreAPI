@@ -2,6 +2,7 @@
 using GHMonitoringCenterApi.Application.Contracts.Dto;
 using GHMonitoringCenterApi.Application.Contracts.Dto.File;
 using GHMonitoringCenterApi.Application.Contracts.Dto.Information;
+using GHMonitoringCenterApi.Application.Contracts.Dto.JjtSendMsg;
 using GHMonitoringCenterApi.Application.Contracts.Dto.Job;
 using GHMonitoringCenterApi.Application.Contracts.Dto.Menu;
 using GHMonitoringCenterApi.Application.Contracts.Dto.PersonnelOrganizeAdjust;
@@ -103,8 +104,8 @@ namespace GHMonitoringCenterApi.Application.Contracts.AutoMapper
             mapperConfigurationExpression.CreateMap<PomProjectDepartmentResponseDto, ProjectDepartment>()
                .ForMember(x => x.PomId, y => y.MapFrom(u => u.Id));
             mapperConfigurationExpression.CreateMap<ProjectResponseDto, ProjectExcelImportResponseDto>();
-			mapperConfigurationExpression.CreateMap<ProjectExcelSearchResponseDto, ProjectExcelImportResponseDto>();
-			mapperConfigurationExpression.CreateMap<AddOrUpdateProjectWBSRequsetDto, ProjectWBS>();
+            mapperConfigurationExpression.CreateMap<ProjectExcelSearchResponseDto, ProjectExcelImportResponseDto>();
+            mapperConfigurationExpression.CreateMap<AddOrUpdateProjectWBSRequsetDto, ProjectWBS>();
 
             mapperConfigurationExpression.CreateMap<AddOrUpdateDayReportRequestDto.ReqDayReport, DayReport>();
             mapperConfigurationExpression.CreateMap<AddOrUpdateDayReportRequestDto.ReqConstruction, DayReportConstruction>();
@@ -199,7 +200,7 @@ namespace GHMonitoringCenterApi.Application.Contracts.AutoMapper
             mapperConfigurationExpression.CreateMap<SaveProjectWBSRequestDto.ReqProjectWBSNode, ProjectWBS>();
             mapperConfigurationExpression.CreateMap<ProjectWBS, ProjectWBSComposeResponseDto.ResProjectWBSNode>();
             mapperConfigurationExpression.CreateMap<JobRecord, JobRecordsResponseDto.ResJobRecord>();
-            mapperConfigurationExpression.CreateMap<AddShipMovementRequestDto, ShipMovement > ();
+            mapperConfigurationExpression.CreateMap<AddShipMovementRequestDto, ShipMovement>();
             mapperConfigurationExpression.CreateMap<ShipMovement, ShipMovementResponseDto>().ForMember(x => x.ShipMovementId, y => y.MapFrom(u => u.Id));
             mapperConfigurationExpression.CreateMap<SaveShipDynamicDayReportRequestDto, ShipDynamicDayReport>();
             mapperConfigurationExpression.CreateMap<ShipDynamicDayReport, ShipDynamicDayReportReportResponseDto>();
@@ -208,7 +209,7 @@ namespace GHMonitoringCenterApi.Application.Contracts.AutoMapper
             mapperConfigurationExpression.CreateMap<PomShipPingTypeResponseDto, ShipPingType>()
               .ForMember(x => x.PomId, y => y.MapFrom(u => u.Id));
             mapperConfigurationExpression.CreateMap<SaveShipDynamicMonthReportRequestDto, ShipDynamicMonthReport>();
-            mapperConfigurationExpression.CreateMap<ShipDynamicMonthReport, ShipDynamicMonthReportResponseDto >();
+            mapperConfigurationExpression.CreateMap<ShipDynamicMonthReport, ShipDynamicMonthReportResponseDto>();
             mapperConfigurationExpression.CreateMap<SaveShipDynamicMonthReportRequestDto.ReqShipDynamicMonthReportDetail, ShipDynamicMonthReportDetail>();
             mapperConfigurationExpression.CreateMap<ShipDynamicMonthReportDetail, ShipDynamicMonthReportResponseDto.ResShipDynamicMonthReportDetail>().ForMember(x => x.DetailId, y => y.MapFrom(u => u.Id));
             mapperConfigurationExpression.CreateMap<ShipDynamicDayReport, ShipDynamicMonthReportResponseDto.ResShipDynamicMonthReportDetail>();
@@ -227,11 +228,11 @@ namespace GHMonitoringCenterApi.Application.Contracts.AutoMapper
             mapperConfigurationExpression.CreateMap<SubShipMonthReport, SubShipMonthReportResponseDto>();
             mapperConfigurationExpression.CreateMap<PomShipClassicResponseDto, ShipClassic>().ForMember(x => x.PomId, y => y.MapFrom(u => u.Id));
             mapperConfigurationExpression.CreateMap<AddSubShipUserRequestDto, SubShip>();
-			mapperConfigurationExpression.CreateMap<ResTreeProjectWBSDetailDto, ProjectWbsData>();
-			mapperConfigurationExpression.CreateMap<ResMonthReportDetail, ProjectWbsData>();
+            mapperConfigurationExpression.CreateMap<ResTreeProjectWBSDetailDto, ProjectWbsData>();
+            mapperConfigurationExpression.CreateMap<ResMonthReportDetail, ProjectWbsData>();
             mapperConfigurationExpression.CreateMap<Project, ModifyInsertProjectRequestDto>()
                 .ForMember(x => x.ProjectId, y => y.MapFrom(u => u.PomId))
-                .ForMember(x=>x.Scale,y=>y.MapFrom(u=>u.GradeId));
+                .ForMember(x => x.Scale, y => y.MapFrom(u => u.GradeId));
             mapperConfigurationExpression.CreateMap<ProjectLeader, ProjectStakeholders>();
             mapperConfigurationExpression.CreateMap<ProjectOrg, ProjectStakeholderUnit>();
             mapperConfigurationExpression.CreateMap<SaveProjectPlanRequestDto, ProjectPlanProduction>();
@@ -251,6 +252,26 @@ namespace GHMonitoringCenterApi.Application.Contracts.AutoMapper
             mapperConfigurationExpression.CreateMap<ExcelSparePartStorageRequerDto, SparePartStorageList>();
             mapperConfigurationExpression.CreateMap<SaveShipSurveyRequestDto, GHMonitoringCenterApi.Domain.Models.ShipSurvey>();
             mapperConfigurationExpression.CreateMap<InsertProjectYearPlanRequestDto, YearInitProjectPlan>();
+
+            //运营监控中心 需要导入的映射
+            mapperConfigurationExpression.CreateMap<CompanyProjectBasePoduction, ExcelCompanyProjectBasePoduction>()
+                .ForMember(x => x.UnitName, y => y.MapFrom(u => u.Name));
+            mapperConfigurationExpression.CreateMap<CompanyBasePoductionValue, ExcelCompanyBasePoductionValue>()
+                .ForMember(x => x.UnitName, y => y.MapFrom(u => u.Name));
+            mapperConfigurationExpression.CreateMap<CompanyShipBuildInfo, ExcelCompanyShipBuildInfo>()
+                .ForMember(x => x.ShipTypeName, y => y.MapFrom(u => u.Name));
+            mapperConfigurationExpression.CreateMap<CompanyShipProductionValueInfo, ExcelCompanyShipProductionValueInfo>()
+                .ForMember(x => x.ShipTypeName, y => y.MapFrom(u => u.Name));
+            mapperConfigurationExpression.CreateMap<ShipProductionValue, ExcelShipProductionValue>();
+            mapperConfigurationExpression.CreateMap<SpecialProjectInfo, ExcelSpecialProjectInfo>();
+            mapperConfigurationExpression.CreateMap<CompanyWriteReportInfo, ExcelCompanyWriteReportInfo>()
+                .ForMember(x => x.CompanyName, y => y.MapFrom(u => u.Name));
+            mapperConfigurationExpression.CreateMap<CompanyUnWriteReportInfo, ExcelCompanyUnWriteReportInfo>()
+                .ForMember(x => x.UnitName, y => y.MapFrom(u => u.Name));
+            mapperConfigurationExpression.CreateMap<CompanyShipUnWriteReportInfo, ExcelCompanyShipUnWriteReportInfo>();
+            mapperConfigurationExpression.CreateMap<ProjectShiftProductionInfo, ExcelProjectShiftProductionInfo>();
+            mapperConfigurationExpression.CreateMap<UnProjectShitInfo, ExcelUnProjectShitInfo>()
+                .ForMember(x => x.UnitName, y => y.MapFrom(u => u.CompanyName));
         }
     }
 }

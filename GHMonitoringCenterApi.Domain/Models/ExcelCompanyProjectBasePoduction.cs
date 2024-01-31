@@ -53,6 +53,11 @@ namespace GHMonitoringCenterApi.Domain.Models
         [SugarColumn(ColumnDataType = "int")]
         public int RiskWorkCount { get; set; } = 0;
         /// <summary>
+        /// 单位排序
+        /// </summary>
+        [SugarColumn(ColumnDataType = "int")]
+        public int UnitDesc { get; set; }
+        /// <summary>
         /// 年份
         /// </summary>
         [SugarColumn(ColumnDataType = "int")]
