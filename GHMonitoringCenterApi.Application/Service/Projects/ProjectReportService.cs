@@ -2442,7 +2442,8 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 {
                     item.YearCompletedQuantity = Math.Round(thisSumYearDetail.CompletedQuantity, 2);
                     item.YearCompleteProductionAmount = thisSumYearDetail.CurrencyCompleteProductionAmount;
-                    item.YearOutsourcingExpensesAmount = Math.Round(thisSumYearDetail.OutsourcingExpensesAmount, 2);
+                    //item.YearOutsourcingExpensesAmount = Math.Round(thisSumYearDetail.OutsourcingExpensesAmount, 2);
+                    item.YearOutsourcingExpensesAmount = thisSumYearDetail.OutsourcingExpensesAmount;
                 }
                 if (thisSumDetail != null)
                 {
@@ -5927,9 +5928,9 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 }
                 else
                 {
-                    item.EngineeringYeahOutputValue = Math.Round(monthReport.Where(h => h.IsDelete == 1 && h.DateMonth <= item.MonthTime && h.DateMonth.ToString().Contains(time.ToString()) && h.ProjectId == item.ProjectId).Sum(h => h.CompleteProductionAmount) / 1000, 2);
-                    item.OwnerYeahOutputValue = Math.Round(monthReport.Where(h => h.IsDelete == 1 && h.DateMonth <= item.MonthTime && h.DateMonth.ToString().Contains(time.ToString()) && h.ProjectId == item.ProjectId).Sum(h => h.PartyAConfirmedProductionAmount) / 1000, 2);
-                    item.ProjectYeahOutputValue = Math.Round(monthReport.Where(h => h.IsDelete == 1 && h.DateMonth <= item.MonthTime && h.DateMonth.ToString().Contains(time.ToString()) && h.ProjectId == item.ProjectId).Sum(h => h.PartyAPayAmount) / 1000, 2);
+                    item.EngineeringYeahOutputValue = Math.Round(monthReport.Where(h => h.IsDelete == 1 && h.DateMonth <= item.MonthTime && h.DateMonth.ToString().Contains(time.ToString()) && h.ProjectId == item.ProjectId).Sum(h => h.CompleteProductionAmount) / 10000, 2);
+                    item.OwnerYeahOutputValue = Math.Round(monthReport.Where(h => h.IsDelete == 1 && h.DateMonth <= item.MonthTime && h.DateMonth.ToString().Contains(time.ToString()) && h.ProjectId == item.ProjectId).Sum(h => h.PartyAConfirmedProductionAmount) / 10000, 2);
+                    item.ProjectYeahOutputValue = Math.Round(monthReport.Where(h => h.IsDelete == 1 && h.DateMonth <= item.MonthTime && h.DateMonth.ToString().Contains(time.ToString()) && h.ProjectId == item.ProjectId).Sum(h => h.PartyAPayAmount) / 10000, 2);
 
                 }
                 item.EngineeringAccumulatedEngineering = Math.Round((monthReport.Where(h => h.IsDelete == 1 && h.DateMonth > 202306 && h.ProjectId == item.ProjectId && h.DateMonth <= item.MonthTime).Sum(h => h.CompleteProductionAmount) + Convert.ToDecimal(projectHistoryData.FirstOrDefault(x => x.ProjectId == item.ProjectId)?.AccumulatedOutputValue)) / 10000, 2);
@@ -6240,7 +6241,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 //开累甲方确认产值(历史数据+2023-7至12月的数据+2024年的数据）
                 if (projectMonthReportHistory != null && currentTotalYearOffirmProductionValue.Any())
                 {
-                    totalYearKaileaOffirmProductionValue = projectMonthReportHistory.KaileiOwnerConfirmation.Value
+                    totalYearKaileaOffirmProductionValue = projectMonthReportHistory.KaileiOwnerConfirmation.Value*10000
                        + currentTotalYearOffirmProductionValue.Sum(x => x.PartyAConfirmedProductionAmount);
                 }
 
