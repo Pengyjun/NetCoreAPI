@@ -88,10 +88,7 @@ namespace GHMonitoringCenterApi.Application.Service.ProductionValueImport
             var excelUnProjectShitInfo = getNewYearDayData.Data.unProjectShitInfos;
 
             //数据写入
-            if ()
-            {
 
-            }
 
             return responseAjaxResult;
         }
