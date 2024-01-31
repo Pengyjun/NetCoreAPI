@@ -684,5 +684,45 @@ namespace GHMonitoringCenterApi.Controllers.Project
         {
             return await projectReportService.SearchReportedMonthsAsync(model);
         }
+
+
+        /// <summary>
+        /// 查询公司在手项目清单
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("SearchCompanyProjectList")]
+        public async Task<ResponseAjaxResult<List<CompanyProjectDetailedResponseDto>>> SearchCompanyProjectListAsync([FromQuery]CompanyProjectDetailsdRequestDto companyProjectDetailsdRequestDto)
+        {
+            return await projectService.SearchCompanyProjectListAsync(companyProjectDetailsdRequestDto);
+        }
+
+        /// <summary>
+        /// 查询公司在手项目清单导出Excel
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("ImportCompanyProjectList")]
+        public async Task<IActionResult> ImportCompanyProjectListAsync([FromQuery] CompanyProjectDetailsdRequestDto companyProjectDetailsdRequestDto)
+        {
+            //var tempPath = "D:\\projectconllection\\dotnet\\szgh\\GHMonitoringCenterApi.Domain.Shared\\Template\\Excel\\CompanyOnProjectTemplate.xlsx";
+            var tempPath = "Template/Excel/CompanyOnProjectTemplate.xlsx";
+            var data= await projectService.SearchCompanyProjectListAsync(companyProjectDetailsdRequestDto);
+            var value = new
+            {
+                Year = DateTime.Now.Year,
+                result = data.Data
+            };
+            return await ExcelTemplateImportAsync(tempPath, value, $"{DateTime.Now.Year}年公司在手项目清单");
+        }
+
+        /// <summary>
+        /// 查询公司在手项目清单下拉框选择
+        /// </summary>
+        /// <param name=""></param>
+        /// <returns></returns>
+        [HttpGet("SearchCompanyProjectPullDown")]
+        public async Task<ResponseAjaxResult<List<BasePullDownResponseDto>>> SearchCompanyProjectPullDownAsync()
+        {
+            return await projectService.SearchCompanyProjectPullDownAsync();
+        }
     }
 }

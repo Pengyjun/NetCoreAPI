@@ -18,6 +18,7 @@ using GHMonitoringCenterApi.Domain.Shared.Util;
 using Microsoft.IdentityModel.Tokens;
 using Org.BouncyCastle.Asn1.Pkcs;
 using SqlSugar;
+using System.Collections.Generic;
 using System.Text;
 using UtilsSharp;
 
@@ -970,7 +971,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                         IsValid = 1,
                         StopDay = 0
                     };
-                    await dbContext.Updateable(projectStatusChangeRecord).ExecuteCommandAsync();
+                    await dbContext.Updateable(projectStatusChangeRecord).Where(x=>x.IsValid==1).ExecuteCommandAsync();
                 }
                 //修改状态之前  原来状态不是在建状态了 这个时候要计算停工天数
                 else if (projectStatusChangeSingle != null && projectStatusChangeSingle.NewStatus != CommonData.PConstruc.ToGuid() && addOrUpdateProjectRequestDto.StatusId == CommonData.PConstruc.ToGuid())
@@ -986,7 +987,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                         IsValid = 1,
                         StopDay = stopDay
                     };
-                    await dbContext.Updateable(projectStatusChangeRecord).ExecuteCommandAsync();
+                    await dbContext.Updateable(projectStatusChangeRecord).Where(x => x.IsValid == 1).ExecuteCommandAsync();
                 }
                 else if (projectStatusChangeSingle == null && addOrUpdateProjectRequestDto.StatusId == CommonData.PConstruc.ToGuid())
                 {
@@ -2722,6 +2723,98 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 }
             }
             responseAjaxResult.Data = true;
+            return responseAjaxResult;
+        }
+
+
+        /// <summary>
+        /// 查询公司在手项目清单
+        /// </summary>
+        /// <param name="companyProjectDetailsdRequestDto"></param>
+        /// <returns></returns>
+        public async Task<ResponseAjaxResult<List<CompanyProjectDetailedResponseDto>>> SearchCompanyProjectListAsync(CompanyProjectDetailsdRequestDto companyProjectDetailsdRequestDto)
+        {
+            ResponseAjaxResult<List<CompanyProjectDetailedResponseDto>> responseAjaxResult = new ResponseAjaxResult<List<CompanyProjectDetailedResponseDto>>();
+            //项目状态ID 
+            var projectStatusIds = CommonData.NoStatus.Split(",").Select(x => x.ToGuid()).ToList();
+            var result =await dbContext.Queryable<Project>()
+                .LeftJoin<ProductionMonitoringOperationDayReport>((x, y) => x.CompanyId == y.ItemId &&
+                y.Type==1&&y.Collect==0&&!string.IsNullOrWhiteSpace(y.Name))
+                .LeftJoin<ProjectType>((x, y, z) => x.TypeId == z.PomId)
+                .LeftJoin<ProjectStatus>((x, y, z, a) => x.StatusId == a.StatusId)
+                .WhereIF(companyProjectDetailsdRequestDto.StatusId!=null, (x, y, z, a)=>a.StatusId== companyProjectDetailsdRequestDto.StatusId)
+                .WhereIF(companyProjectDetailsdRequestDto.TypeId!=null, (x, y, z, a)=>x.TypeId== companyProjectDetailsdRequestDto.TypeId)
+                .WhereIF(companyProjectDetailsdRequestDto.CompanyId!=null, (x, y, z, a)=>x.CompanyId== companyProjectDetailsdRequestDto.CompanyId)
+                //.WhereIF(companyProjectDetailsdRequestDto.CommencementDate!=null, (x, y, z, a)=>x.CommencementTime== companyProjectDetailsdRequestDto.CompanyId)
+                .Where(x => x.IsDelete == 1&&!projectStatusIds.Contains(x.StatusId.Value) && x.TypeId != "048120ae-1e9f-46d8-a38f-5d5e9e49ecba".ToGuid())
+                .OrderBy((x, y, z, a)=>new { y.Sort ,a.Sequence})
+                .Select((x, y, z, a) => new CompanyProjectDetailedResponseDto
+                {
+                    Id = x.Id,
+                    ProjectName = x.Name,
+                    CompanyId=y.ItemId.Value,
+                    CompanyName = y.Name,
+                    StatusSort=a.Sequence.Value,
+                    StatusName = a.Name,
+                    TypeName = z.Name,
+                    ContractAmount = x.Amount.Value,
+                    CommencementDate =x.CommencementTime.Value.ToString(),
+                   
+                }).ToListAsync();
+            #region 计算项目累计产值
+            //查询历史产值
+            var historyProjectList = await dbContext.Queryable<ProjectHistoryData>().Where(x => x.IsDelete == 1).ToListAsync();
+            //2023-7-至今
+            var currentYear = DateTime.Now.Year;
+            var projectIds = result.Select(x => x.Id).ToList();
+            var currentTotalYearOffirmProductionValue = await dbContext.Queryable<MonthReport>()
+                    .Where(x => x.IsDelete == 1 && projectIds.Contains(x.ProjectId) && x.DateYear <= currentYear).ToListAsync();
+            foreach (var item in result)
+            {
+                item.Remark = item.CommencementDate?.IndexOf(currentYear.ToString()) >= 0 ? "新中标" : "";
+                if (item.ContractAmount != 0)
+                {
+                    //计算工程进度
+                    item.ProjectProgress = Math.Round(
+                        (GetProjectTotalProductionValue(item.Id, historyProjectList, currentTotalYearOffirmProductionValue) / item.ContractAmount) * 100, 2);
+                }
+                
+            }
+            #endregion
+
+            responseAjaxResult.Data = result;
+            responseAjaxResult.Count = result.Count;
+            responseAjaxResult.Success();
+            return responseAjaxResult;
+        }
+
+        /// <summary>
+        /// 计算项目累计产值
+        /// </summary>
+        /// <param name="id">项目iD</param>
+        /// <param name="data">历史数据</param>
+        /// <param name="currentTotalYearOffirmProductionValue">每月完成产值</param>
+        /// <returns></returns>
+        public  static decimal GetProjectTotalProductionValue(Guid id, List<ProjectHistoryData> data,List<MonthReport> currentTotalYearOffirmProductionValue)
+        {
+            var projectSingleProductionValue=data.Where(x => x.ProjectId == id).SingleOrDefault();
+            var totalYearKaileaOffirmProductionValue = projectSingleProductionValue?.AccumulatedOutputValue??0+
+                currentTotalYearOffirmProductionValue.Where(x=>x.ProjectId==id).Sum(x => x.CurrencyCompleteProductionAmount);
+            return totalYearKaileaOffirmProductionValue;
+        }
+
+        public async Task<ResponseAjaxResult<List<BasePullDownResponseDto>>> SearchCompanyProjectPullDownAsync()
+        {
+            ResponseAjaxResult<List<BasePullDownResponseDto>> responseAjaxResult = new ResponseAjaxResult<List<BasePullDownResponseDto>>();
+            responseAjaxResult.Data=( await dbContext.Queryable<ProductionMonitoringOperationDayReport>().Where(x => x.IsDelete == 1 && x.Type == 1 && x.Collect == 0 && x.Name != null)
+                .OrderBy(x => x.Sort.Value)
+                .Select(x=>new BasePullDownResponseDto() { 
+                 Id= x.ItemId,
+                 Name=x.Name,
+                  Type=x.Sort.Value
+                }).ToListAsync());
+            responseAjaxResult.Count = responseAjaxResult.Data.Count;
+            responseAjaxResult.Success();
             return responseAjaxResult;
         }
     }
