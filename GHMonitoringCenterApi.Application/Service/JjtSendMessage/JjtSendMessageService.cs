@@ -3452,7 +3452,5 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
         }
         #endregion
 
-
-
     }
 }
