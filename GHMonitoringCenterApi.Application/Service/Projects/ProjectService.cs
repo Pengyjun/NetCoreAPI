@@ -970,7 +970,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                         IsValid = 1,
                         StopDay = 0
                     };
-                    await dbContext.Updateable(projectStatusChangeRecord).ExecuteCommandAsync();
+                    await dbContext.Updateable(projectStatusChangeRecord).Where(x=>x.IsValid==1).ExecuteCommandAsync();
                 }
                 //修改状态之前  原来状态不是在建状态了 这个时候要计算停工天数
                 else if (projectStatusChangeSingle != null && projectStatusChangeSingle.NewStatus != CommonData.PConstruc.ToGuid() && addOrUpdateProjectRequestDto.StatusId == CommonData.PConstruc.ToGuid())
@@ -986,7 +986,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                         IsValid = 1,
                         StopDay = stopDay
                     };
-                    await dbContext.Updateable(projectStatusChangeRecord).ExecuteCommandAsync();
+                    await dbContext.Updateable(projectStatusChangeRecord).Where(x => x.IsValid == 1).ExecuteCommandAsync();
                 }
                 else if (projectStatusChangeSingle == null && addOrUpdateProjectRequestDto.StatusId == CommonData.PConstruc.ToGuid())
                 {

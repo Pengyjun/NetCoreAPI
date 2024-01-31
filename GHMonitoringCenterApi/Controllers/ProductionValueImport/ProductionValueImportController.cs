@@ -25,6 +25,7 @@ namespace GHMonitoringCenterApi.Controllers.ProductionValueImport
         /// 导出历史数据产值信息
         /// </summary>
         /// <returns></returns>
+        [HttpGet("ImportHistoryProdutionValue")]
         public async Task<ResponseAjaxResult<JjtSendMessageMonitoringDayReportResponseDto>> ImportHistoryProdutionValueAsync(ImportHistoryProductionValuesRequestDto importHistoryProductionValuesRequestDto) 
         {
             return await productionValueImportService.ImportProductionValuesAsync(importHistoryProductionValuesRequestDto);
