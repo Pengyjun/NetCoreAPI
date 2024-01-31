@@ -8,7 +8,11 @@ using GHMonitoringCenterApi.Application.Contracts.IService.Project;
 using GHMonitoringCenterApi.Domain.Models;
 using GHMonitoringCenterApi.Domain.Shared;
 using GHMonitoringCenterApi.Domain.Shared.Util;
+using NPOI.SS.UserModel;
+using NPOI.Util;
+using NPOI.XSSF.UserModel;
 using SqlSugar;
+using System;
 
 namespace GHMonitoringCenterApi.Application.Service.ProductionValueImport
 {
@@ -52,9 +56,173 @@ namespace GHMonitoringCenterApi.Application.Service.ProductionValueImport
         /// <param name="importHistoryProductionValuesRequestDto"></param>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
-        public async Task<ResponseAjaxResult<JjtSendMessageMonitoringDayReportResponseDto>> ImportProductionValuesAsync(ImportHistoryProductionValuesRequestDto importHistoryProductionValuesRequestDto)
+        public async Task<Stream> ImportProductionValuesAsync(ImportHistoryProductionValuesRequestDto importHistoryProductionValuesRequestDto)
         {
-            throw new NotImplementedException();
+            //数据读取
+            var responseAjaxData = await ReadImportProductionData(importHistoryProductionValuesRequestDto);
+
+            var startDate = importHistoryProductionValuesRequestDto.GetStartDate();
+            var endDate = importHistoryProductionValuesRequestDto.GetEndDate();
+
+            ConvertHelper.TryConvertDateTimeFromDateDay(startDate, out DateTime startTime);
+            ConvertHelper.TryConvertDateTimeFromDateDay(endDate, out DateTime endTime);
+
+            var templeFile = @"E:\\szghupload\\ExcelHistoryProdution.xlsx";
+            //区分月份  starttime-endTime 几个月份 几个sheet
+            var newDate = DateTime.MinValue;
+            int sheetNum = startDate == endDate ? 1 : endTime.Month - startTime.Month + 1;
+            XSSFWorkbook workbook = null;
+            //获取表格数据
+            var memory = new MemoryStream();
+            using (var fs = new FileStream(templeFile, FileMode.Open, FileAccess.Read))
+            {
+                workbook = new XSSFWorkbook(fs);
+                ISheet sheet = null;
+                sheet = workbook.GetSheetAt(0);
+                sheet.DisplayGridlines = true;
+                for (int i = 0; i < sheetNum; i++)
+                {
+                    newDate = startTime;
+                    //外层循环控制sheet个数
+                    var sheetName = workbook.CreateSheet(newDate.ToString("yyyy年MM月"));
+                    //当月天数 控制多少张表格
+                    int daysInMonth = DateTime.DaysInMonth(newDate.Year, newDate.Month);
+
+                    for (int days = 0; days < daysInMonth; days++)
+                    {
+                        //控制表格数量
+                        for (int tab = 0; tab < 1; tab++)
+                        {
+                            var oneTable = responseAjaxData.ExcelCompanyProjectBasePoductions;
+                            //创建行
+                            var rowIndex = 1;
+                            foreach (var item in oneTable)
+                            {
+                                var datarow = sheet.CreateRow(rowIndex);
+                                datarow.CreateCell(0).SetCellValue(rowIndex);
+                                datarow.CreateCell(1).SetCellValue(item.UnitName);
+                                datarow.CreateCell(2).SetCellValue(item.OnContractProjectCount);
+                                rowIndex++;
+                            }
+                        }
+                    }
+                    newDate = newDate.AddMonths(1);
+                }
+                workbook.Write(memory);
+                memory.Position = 0;
+                memory.Flush();
+            }
+            return memory;
+
+        }
+
+        /// <summary>
+        /// 根据日期读取所含日期内的数据
+        /// </summary>
+        /// <param name="importHistoryProductionValuesRequestDto"></param>
+        /// <returns></returns>
+        public async Task<ImportHistoryProductionValuesResponseDto> ReadImportProductionData(ImportHistoryProductionValuesRequestDto importHistoryProductionValuesRequestDto)
+        {
+            var readData = new ImportHistoryProductionValuesResponseDto();
+
+            //读取12张表的数据
+            var startDate = importHistoryProductionValuesRequestDto.GetStartDate();
+            var endDate = importHistoryProductionValuesRequestDto.GetEndDate();
+
+            var excelCompanyProjectBasePoductions = await _dbContext.Queryable<ExcelCompanyProjectBasePoduction>()
+              .Where(x => x.IsDelete == 1 && x.DateDay >= startDate && x.DateDay <= endDate)
+              .WhereIF(importHistoryProductionValuesRequestDto.Year != 0, x => importHistoryProductionValuesRequestDto.Year == x.Year)
+              .WhereIF(importHistoryProductionValuesRequestDto.Month != 0, x => importHistoryProductionValuesRequestDto.Month == x.Month)
+              .OrderBy(x => x.UnitDesc)
+              .ToListAsync();
+
+            var excelCompanyBasePoductionValue = await _dbContext.Queryable<ExcelCompanyBasePoductionValue>()
+              .Where(x => x.IsDelete == 1 && x.DateDay >= startDate && x.DateDay <= endDate)
+              .WhereIF(importHistoryProductionValuesRequestDto.Year != 0, x => importHistoryProductionValuesRequestDto.Year == x.Year)
+              .WhereIF(importHistoryProductionValuesRequestDto.Month != 0, x => importHistoryProductionValuesRequestDto.Month == x.Month)
+              .OrderBy(x => x.UnitDesc)
+              .ToListAsync();
+
+            var excelCompanyShipBuildInfo = await _dbContext.Queryable<ExcelCompanyShipBuildInfo>()
+              .Where(x => x.IsDelete == 1 && x.DateDay >= startDate && x.DateDay <= endDate)
+              .WhereIF(importHistoryProductionValuesRequestDto.Year != 0, x => importHistoryProductionValuesRequestDto.Year == x.Year)
+              .WhereIF(importHistoryProductionValuesRequestDto.Month != 0, x => importHistoryProductionValuesRequestDto.Month == x.Month)
+              .OrderBy(x => x.ShipTypeDesc)
+              .ToListAsync();
+
+            var excelCompanyShipProductionValueInfo = await _dbContext.Queryable<ExcelCompanyShipProductionValueInfo>()
+              .Where(x => x.IsDelete == 1 && x.DateDay >= startDate && x.DateDay <= endDate)
+              .WhereIF(importHistoryProductionValuesRequestDto.Year != 0, x => importHistoryProductionValuesRequestDto.Year == x.Year)
+              .WhereIF(importHistoryProductionValuesRequestDto.Month != 0, x => importHistoryProductionValuesRequestDto.Month == x.Month)
+              .OrderBy(x => x.ShipTypeDesc)
+              .ToListAsync();
+
+            var excelShipProductionValue = await _dbContext.Queryable<ExcelShipProductionValue>()
+              .Where(x => x.IsDelete == 1 && x.DateDay >= startDate && x.DateDay <= endDate)
+              .WhereIF(importHistoryProductionValuesRequestDto.Year != 0, x => importHistoryProductionValuesRequestDto.Year == x.Year)
+              .WhereIF(importHistoryProductionValuesRequestDto.Month != 0, x => importHistoryProductionValuesRequestDto.Month == x.Month)
+              .ToListAsync();
+
+            var excelSpecialProjectInfo = await _dbContext.Queryable<ExcelSpecialProjectInfo>()
+              .Where(x => x.IsDelete == 1 && x.DateDay >= startDate && x.DateDay <= endDate)
+              .WhereIF(importHistoryProductionValuesRequestDto.Year != 0, x => importHistoryProductionValuesRequestDto.Year == x.Year)
+              .WhereIF(importHistoryProductionValuesRequestDto.Month != 0, x => importHistoryProductionValuesRequestDto.Month == x.Month)
+              .ToListAsync();
+
+            var excelCompanyWriteReportInfo = await _dbContext.Queryable<ExcelCompanyWriteReportInfo>()
+              .Where(x => x.IsDelete == 1 && x.DateDay >= startDate && x.DateDay <= endDate)
+              .WhereIF(importHistoryProductionValuesRequestDto.Year != 0, x => importHistoryProductionValuesRequestDto.Year == x.Year)
+              .WhereIF(importHistoryProductionValuesRequestDto.Month != 0, x => importHistoryProductionValuesRequestDto.Month == x.Month)
+              .OrderBy(x => x.UnitDesc)
+              .ToListAsync();
+
+            var excelCompanyUnWriteReportInfo = await _dbContext.Queryable<ExcelCompanyUnWriteReportInfo>()
+              .Where(x => x.IsDelete == 1 && x.DateDay >= startDate && x.DateDay <= endDate)
+              .WhereIF(importHistoryProductionValuesRequestDto.Year != 0, x => importHistoryProductionValuesRequestDto.Year == x.Year)
+              .WhereIF(importHistoryProductionValuesRequestDto.Month != 0, x => importHistoryProductionValuesRequestDto.Month == x.Month)
+              .ToListAsync();
+
+            var excelCompanyShipUnWriteReportInfo = await _dbContext.Queryable<ExcelCompanyShipUnWriteReportInfo>()
+              .Where(x => x.IsDelete == 1 && x.DateDay >= startDate && x.DateDay <= endDate)
+              .WhereIF(importHistoryProductionValuesRequestDto.Year != 0, x => importHistoryProductionValuesRequestDto.Year == x.Year)
+              .WhereIF(importHistoryProductionValuesRequestDto.Month != 0, x => importHistoryProductionValuesRequestDto.Month == x.Month)
+              .ToListAsync();
+
+            var excelProjectShiftProductionInfo = await _dbContext.Queryable<ExcelProjectShiftProductionInfo>()
+              .Where(x => x.IsDelete == 1 && x.DateDay >= startDate && x.DateDay <= endDate)
+              .WhereIF(importHistoryProductionValuesRequestDto.Year != 0, x => importHistoryProductionValuesRequestDto.Year == x.Year)
+              .WhereIF(importHistoryProductionValuesRequestDto.Month != 0, x => importHistoryProductionValuesRequestDto.Month == x.Month)
+              .ToListAsync();
+
+            var excelUnProjectShitInfo = await _dbContext.Queryable<ExcelUnProjectShitInfo>()
+              .Where(x => x.IsDelete == 1 && x.DateDay >= startDate && x.DateDay <= endDate)
+              .WhereIF(importHistoryProductionValuesRequestDto.Year != 0, x => importHistoryProductionValuesRequestDto.Year == x.Year)
+              .WhereIF(importHistoryProductionValuesRequestDto.Month != 0, x => importHistoryProductionValuesRequestDto.Month == x.Month)
+              .OrderBy(x => x.UnitDesc)
+              .ToListAsync();
+
+            var excelTitle = await _dbContext.Queryable<ExcelTitle>()
+              .Where(x => x.IsDelete == 1 && x.DateDay >= startDate && x.DateDay <= endDate)
+              .WhereIF(importHistoryProductionValuesRequestDto.Year != 0, x => importHistoryProductionValuesRequestDto.Year == x.Year)
+              .WhereIF(importHistoryProductionValuesRequestDto.Month != 0, x => importHistoryProductionValuesRequestDto.Month == x.Month)
+              .ToListAsync();
+
+            readData = new ImportHistoryProductionValuesResponseDto
+            {
+                ExcelCompanyProjectBasePoductions = excelCompanyProjectBasePoductions,
+                ExcelCompanyBasePoductions = excelCompanyBasePoductionValue,
+                ExcelCompanyShipBuildInfos = excelCompanyShipBuildInfo,
+                ExcelCompanyShipProductionValueInfos = excelCompanyShipProductionValueInfo,
+                ExcelShipProductionValues = excelShipProductionValue,
+                ExcelSpecialProjectInfos = excelSpecialProjectInfo,
+                ExcelCompanyWriteReportInfos = excelCompanyWriteReportInfo,
+                ExcelCompanyUnWriteReportInfos = excelCompanyUnWriteReportInfo,
+                ExcelCompanyShipUnWriteReportInfos = excelCompanyShipUnWriteReportInfo,
+                ExcelProjectShiftProductionInfos = excelProjectShiftProductionInfo,
+                ExcelUnProjectShitInfos = excelUnProjectShitInfo,
+                ExcelTitles = excelTitle
+            };
+            return readData;
         }
 
         /// <summary>
@@ -96,8 +264,8 @@ namespace GHMonitoringCenterApi.Application.Service.ProductionValueImport
             var excelUnProjectShitInfo = getNewYearDayData.Data.unProjectShitInfos;
 
             //数据写入(只写了新增)
-            var year = DateTime.Now.AddDays(-1).Year;
-            var month = DateTime.Now.AddDays(-1).Month;
+            var year = DateTime.Now.AddDays(-1).ToDateYear();
+            var month = DateTime.Now.AddDays(-1).ToDateMonth();
             var dateDay = DateTime.Now.AddDays(-1).ToDateDay();
             //titile集合
             var excelTitles = new List<ExcelTitle>();
