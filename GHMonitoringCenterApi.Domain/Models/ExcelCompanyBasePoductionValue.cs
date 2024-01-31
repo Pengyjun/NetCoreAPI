@@ -17,17 +17,22 @@ namespace GHMonitoringCenterApi.Domain.Models
         /// 当日产值 万元
         /// </summary>
         [SugarColumn(ColumnDataType = "decimal(18,4)")]
-        public decimal DayOutputVal { get; set; }
+        public decimal DayProductionValue { get; set; }
         /// <summary>
         /// 年累产值
         /// </summary>
         [SugarColumn(ColumnDataType = "decimal(18,4)")]
-        public decimal YearProjectAccumulateOutputVal { get; set; }
+        public decimal TotalYearProductionValue { get; set; }
         /// <summary>
         /// 年度产值占比 占广航局
         /// </summary>
         [SugarColumn(ColumnDataType = "decimal(18,4)")]
-        public decimal YearAccumulateOutputValProp { get; set; }
+        public decimal YearProductionValueProgressPercent { get; set; }
+        /// <summary>
+        /// 单位排序
+        /// </summary>
+        [SugarColumn(ColumnDataType = "int")]
+        public int UnitDesc { get; set; }
         /// <summary>
         /// 年份
         /// </summary>

@@ -13,12 +13,17 @@ namespace GHMonitoringCenterApi.Domain.Models
 		/// </summary>
         [SugarColumn(Length = 50)]
 
-        public string CompanyName { get; set; }
+        public string UnitName { get; set; }
         /// <summary>
         /// 项目名称
         /// </summary>
         [SugarColumn(Length = 200)]
         public string ProjectName { get; set; }
+        /// <summary>
+        /// 单位排序
+        /// </summary>
+        [SugarColumn(ColumnDataType = "int")]
+        public int UnitDesc { get; set; }
         /// <summary>
         /// 年份
         /// </summary>

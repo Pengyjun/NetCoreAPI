@@ -38,6 +38,11 @@ namespace GHMonitoringCenterApi.Domain.Models
         [SugarColumn(ColumnDataType = "decimal(18,4)")]
         public decimal TimePercent { get; set; }
         /// <summary>
+        /// 单位排序
+        /// </summary>
+        [SugarColumn(ColumnDataType = "int")]
+        public int ShipTypeDesc { get; set; }
+        /// <summary>
         /// 年份
         /// </summary>
         [SugarColumn(ColumnDataType = "int")]

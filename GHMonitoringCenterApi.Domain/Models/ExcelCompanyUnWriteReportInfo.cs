@@ -25,5 +25,20 @@ namespace GHMonitoringCenterApi.Domain.Models
         /// </summary>
         [SugarColumn(ColumnDataType = "int")]
         public int Count { get; set; } = 0;
+        /// <summary>
+        /// 年份
+        /// </summary>
+        [SugarColumn(ColumnDataType = "int")]
+        public int Year { get; set; }
+        /// <summary>
+        /// 月份
+        /// </summary>
+        [SugarColumn(ColumnDataType = "int")]
+        public int Month { get; set; }
+        /// <summary>
+        /// 天
+        /// </summary>
+        [SugarColumn(ColumnDataType = "int")]
+        public int DateDay { get; set; }
     }
 }
