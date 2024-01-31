@@ -9,10 +9,8 @@ using GHMonitoringCenterApi.Domain.Models;
 using GHMonitoringCenterApi.Domain.Shared;
 using GHMonitoringCenterApi.Domain.Shared.Util;
 using NPOI.SS.UserModel;
-using NPOI.Util;
 using NPOI.XSSF.UserModel;
 using SqlSugar;
-using System;
 
 namespace GHMonitoringCenterApi.Application.Service.ProductionValueImport
 {
@@ -71,48 +69,46 @@ namespace GHMonitoringCenterApi.Application.Service.ProductionValueImport
             //区分月份  starttime-endTime 几个月份 几个sheet
             var newDate = DateTime.MinValue;
             int sheetNum = startDate == endDate ? 1 : endTime.Month - startTime.Month + 1;
+
             XSSFWorkbook workbook = null;
-            //获取表格数据
-            var memory = new MemoryStream();
             using (var fs = new FileStream(templeFile, FileMode.Open, FileAccess.Read))
             {
-                workbook = new XSSFWorkbook(fs);
-                ISheet sheet = null;
-                sheet = workbook.GetSheetAt(0);
-                sheet.DisplayGridlines = true;
-                for (int i = 0; i < sheetNum; i++)
+                MemoryStream memory = new MemoryStream();
+                for (int i = 0; i < 1; i++)
                 {
+                    workbook = new XSSFWorkbook(fs);
+                    ISheet sheet = null;
+                    sheet = workbook.GetSheetAt(i);
                     newDate = startTime;
                     //外层循环控制sheet个数
                     var sheetName = workbook.CreateSheet(newDate.ToString("yyyy年MM月"));
                     //当月天数 控制多少张表格
                     int daysInMonth = DateTime.DaysInMonth(newDate.Year, newDate.Month);
-
+                    var inDateTime = newDate;
                     for (int days = 0; days < daysInMonth; days++)
                     {
-                        //控制表格数量
-                        for (int tab = 0; tab < 1; tab++)
+                        //更新当前日期
+                        var inDateDay = inDateTime.ToDateDay();
+                        var oneTable = responseAjaxData.ExcelCompanyProjectBasePoductions.Where(x => x.DateDay == inDateDay).ToList();
+                        //创建行
+                        var rowIndex = 1;
+                        foreach (var item in oneTable)
                         {
-                            var oneTable = responseAjaxData.ExcelCompanyProjectBasePoductions;
-                            //创建行
-                            var rowIndex = 1;
-                            foreach (var item in oneTable)
-                            {
-                                var datarow = sheet.CreateRow(rowIndex);
-                                datarow.CreateCell(0).SetCellValue(rowIndex);
-                                datarow.CreateCell(1).SetCellValue(item.UnitName);
-                                datarow.CreateCell(2).SetCellValue(item.OnContractProjectCount);
-                                rowIndex++;
-                            }
+                            var datarow = sheet.CreateRow(rowIndex);
+                            datarow.CreateCell(0).SetCellValue(rowIndex);
+                            datarow.CreateCell(1).SetCellValue(item.UnitName);
+                            datarow.CreateCell(2).SetCellValue(item.OnContractProjectCount);
+                            rowIndex++;
                         }
+                        inDateTime = inDateTime.AddDays(1);
                     }
                     newDate = newDate.AddMonths(1);
                 }
                 workbook.Write(memory);
                 memory.Position = 0;
                 memory.Flush();
+                return memory;
             }
-            return memory;
 
         }
 
