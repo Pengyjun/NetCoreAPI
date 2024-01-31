@@ -4,15 +4,19 @@ using GHMonitoringCenterApi.Application.Contracts.IService.JjtSendMessage;
 using GHMonitoringCenterApi.Application.Contracts.IService.ProductionValueImport;
 using GHMonitoringCenterApi.Application.Contracts.IService.Project;
 using GHMonitoringCenterApi.Domain.Shared;
+using SqlSugar;
 
 namespace GHMonitoringCenterApi.Application.Service.ProductionValueImport
 {
-
     /// <summary>
     ///  生产日报每天推送和节假日日报推送历史数据导出实现层
     /// </summary>
     public class ProductionValueImportService : IProductionValueImportService
     {
+        /// <summary>
+        /// 上下文注入
+        /// </summary>
+        public ISqlSugarClient _dbContext { get; set; }
         /// <summary>
         /// 注入发消息内容
         /// </summary>
@@ -25,10 +29,13 @@ namespace GHMonitoringCenterApi.Application.Service.ProductionValueImport
         /// 依赖注入
         /// </summary>
         /// <param name="jjtSendMessageService"></param>
-        public ProductionValueImportService(IJjtSendMessageService jjtSendMessageService, IProjectReportService projectReportService)
+        /// <param name="projectReportService"></param>
+        /// <param name="dbContext"></param>
+        public ProductionValueImportService(IJjtSendMessageService jjtSendMessageService, IProjectReportService projectReportService, ISqlSugarClient dbContext)
         {
             this._jjtSendMessageService = jjtSendMessageService;
             this._projectReportService = projectReportService;
+            this._dbContext = dbContext;
         }
         /// <summary>
         /// 导出历史数据产值信息
@@ -80,7 +87,11 @@ namespace GHMonitoringCenterApi.Application.Service.ProductionValueImport
             //项目带班生产动态未填报项目
             var excelUnProjectShitInfo = getNewYearDayData.Data.unProjectShitInfos;
 
+            //数据写入
+            if ()
+            {
 
+            }
 
             return responseAjaxResult;
         }
