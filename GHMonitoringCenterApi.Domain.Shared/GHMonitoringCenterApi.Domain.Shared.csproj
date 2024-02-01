@@ -30,6 +30,9 @@
 	  <None Update="Template\Excel\AutomaticPartTemplate.xlsx">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </None>
+	  <None Update="Template\Excel\ProductionDayReport.xlsx">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
 	  <None Update="Template\Excel\ExcelHistoryProdution.xlsx">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </None>
