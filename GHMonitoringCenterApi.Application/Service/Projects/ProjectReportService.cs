@@ -6253,7 +6253,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 if (projectMonthReportHistory != null && currenTotalYearCollection.Any())
                 {
                     //开累甲方付款金额
-                    totalYearCollection = projectMonthReportHistory.KaileiProjectPayment.Value
+                    totalYearCollection = projectMonthReportHistory.KaileiProjectPayment.Value * 10000
                     + currenTotalYearCollection.Sum(x => x.PartyAPayAmount);
                 }
 

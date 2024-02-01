@@ -2742,6 +2742,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 y.Type==1&&y.Collect==0&&!string.IsNullOrWhiteSpace(y.Name))
                 .LeftJoin<ProjectType>((x, y, z) => x.TypeId == z.PomId)
                 .LeftJoin<ProjectStatus>((x, y, z, a) => x.StatusId == a.StatusId)
+                 .WhereIF(!string.IsNullOrWhiteSpace(companyProjectDetailsdRequestDto.ProjectName), (x, y, z, a) => x.Name.Contains(companyProjectDetailsdRequestDto.ProjectName))
                 .WhereIF(companyProjectDetailsdRequestDto.StatusId!=null, (x, y, z, a)=>a.StatusId== companyProjectDetailsdRequestDto.StatusId)
                 .WhereIF(companyProjectDetailsdRequestDto.TypeId!=null, (x, y, z, a)=>x.TypeId== companyProjectDetailsdRequestDto.TypeId)
                 .WhereIF(companyProjectDetailsdRequestDto.CompanyId!=null, (x, y, z, a)=>x.CompanyId== companyProjectDetailsdRequestDto.CompanyId)

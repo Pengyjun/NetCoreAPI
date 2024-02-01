@@ -709,10 +709,10 @@ namespace GHMonitoringCenterApi.Controllers.File
         {
             //获取logo图片
             //测试或生产地址
-            var templatePath = @$"D:\projectconllection\dotnet\szgh\GHMonitoringCenterApi.Domain.Shared\Template\Images\logo.png";
+            //var templatePath = @$"D:\projectconllection\dotnet\szgh\GHMonitoringCenterApi.Domain.Shared\Template\Images\logo.png";
             //本机地址
             //var templatePath = @$"D:\SZGH\wom.api\GHMonitoringCenterApi.Domain.Shared\Template\Images\logo.png";
-            //var templatePath = $"Template/Images/logo.png";
+            var templatePath = $"Template/Images/logo.png";
             BaseConfig config = new BaseConfig()
             {
                 Foot = "仿宋",
