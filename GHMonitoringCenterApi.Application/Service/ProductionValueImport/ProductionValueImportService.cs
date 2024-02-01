@@ -223,46 +223,46 @@ namespace GHMonitoringCenterApi.Application.Service.ProductionValueImport
         /// Excel 智慧运营监控中心图片数据写入表
         /// </summary>
         /// <returns></returns>
-        //public async Task<ResponseAjaxResult<bool>> ExcelJJtSendMessageWriteAsync()
-        //{
-        //    var responseAjaxResult = new ResponseAjaxResult<bool>();
+        public async Task<ResponseAjaxResult<bool>> ExcelJJtSendMessageWriteAsync()
+        {
+            var responseAjaxResult = new ResponseAjaxResult<bool>();
 
-        //    //调用监控中心图片信息方法
-        //    var getData = await _jjtSendMessageService.JjtTextCardMsgDetailsAsync();
+            //调用监控中心图片信息方法
+            var getData = await _jjtSendMessageService.JjtTextCardMsgDetailsAsync();
 
-        //    //各个公司基本项目情况
-        //    var excelCompanyProjectBasePoduction = getData.Data.projectBasePoduction.CompanyProjectBasePoductions;
-        //    //各个公司基本产值情况
-        //    var excelCompanyBasePoductionValue = getData.Data.projectBasePoduction.CompanyBasePoductionValues;
-        //    //自有船施工运转情况
-        //    var excelOwnerShipBuildInfo = getData.Data.OwnerShipBuildInfo.companyShipBuildInfos;
-        //    //各个公司自有船施工产值情况集合
-        //    var excelCompanyShipProductionValueInfo = getData.Data.OwnerShipBuildInfo.companyShipProductionValueInfos;
-        //    //前五船舶产值
-        //    var excelShipProductionValue = getData.Data.OwnerShipBuildInfo.companyShipTopFiveInfoList;
-        //    //特殊情况
-        //    var excelSpecialProjectInfo = getData.Data.SpecialProjectInfo;
-        //    //各单位填报情况
-        //    var excelCompanyWriteReportInfo = getData.Data.CompanyWriteReportInfos;
-        //    //项目生产数据存在不完整部分主要是以下项目未填报
-        //    var excelCompanyUnWriteReportInfo = getData.Data.CompanyUnWriteReportInfos;
-        //    //船舶生产数据存在不完整部分主要是项目部未填报以下船舶
-        //    var excelCompanyShipUnWriteReportInfo = getData.Data.CompanyShipUnWriteReportInfos;
+            //各个公司基本项目情况
+            var excelCompanyProjectBasePoduction = getData.Data.projectBasePoduction.CompanyProjectBasePoductions;
+            //各个公司基本产值情况
+            var excelCompanyBasePoductionValue = getData.Data.projectBasePoduction.CompanyBasePoductionValues;
+            //自有船施工运转情况
+            var excelOwnerShipBuildInfo = getData.Data.OwnerShipBuildInfo.companyShipBuildInfos;
+            //各个公司自有船施工产值情况集合
+            var excelCompanyShipProductionValueInfo = getData.Data.OwnerShipBuildInfo.companyShipProductionValueInfos;
+            //前五船舶产值
+            var excelShipProductionValue = getData.Data.OwnerShipBuildInfo.companyShipTopFiveInfoList;
+            //特殊情况
+            var excelSpecialProjectInfo = getData.Data.SpecialProjectInfo;
+            //各单位填报情况
+            var excelCompanyWriteReportInfo = getData.Data.CompanyWriteReportInfos;
+            //项目生产数据存在不完整部分主要是以下项目未填报
+            var excelCompanyUnWriteReportInfo = getData.Data.CompanyUnWriteReportInfos;
+            //船舶生产数据存在不完整部分主要是项目部未填报以下船舶
+            var excelCompanyShipUnWriteReportInfo = getData.Data.CompanyShipUnWriteReportInfos;
 
-        //    //调用元旦期间各在建项目带班生产动态
-        //    var getNewYearDayData = await _projectReportService.GetProjectShiftProductionAsync();
+            //调用元旦期间各在建项目带班生产动态
+            var getNewYearDayData = await _projectReportService.GetProjectShiftProductionAsync();
 
-        //    //项目带班生产动态已填报项目
-        //    var excelProjectShiftProductionInfo = getNewYearDayData.Data.projectShiftProductionInfos;
-        //    //项目带班生产动态未填报项目
-        //    var excelUnProjectShitInfo = getNewYearDayData.Data.unProjectShitInfos;
+            //项目带班生产动态已填报项目
+            var excelProjectShiftProductionInfo = getNewYearDayData.Data.projectShiftProductionInfos;
+            //项目带班生产动态未填报项目
+            var excelUnProjectShitInfo = getNewYearDayData.Data.unProjectShitInfos;
 
-        //    //数据写入(只写了新增)
-        //    var year = DateTime.Now.AddDays(-1).ToDateYear();
-        //    var month = DateTime.Now.AddDays(-1).ToDateMonth();
-        //    var dateDay = DateTime.Now.AddDays(-1).ToDateDay();
-        //    //titile集合
-        //    var excelTitles = new List<ExcelTitle>();
+            //数据写入(只写了新增)
+            var year = DateTime.Now.AddDays(-1).ToDateYear();
+            var month = DateTime.Now.AddDays(-1).ToDateMonth();
+            var dateDay = DateTime.Now.AddDays(-1).ToDateDay();
+            //titile集合
+            var excelTitles = new List<ExcelTitle>();
 
             //各个公司基本项目情况
             if (excelCompanyProjectBasePoduction.Count() > 0)
@@ -521,84 +521,84 @@ namespace GHMonitoringCenterApi.Application.Service.ProductionValueImport
                 }
                 await _dbContext.Insertable(result).ExecuteCommandAsync();
 
-        //        //titile写入
-        //        string titleNine = "说明：船舶生产数据存在不完整部分主要是项目部未填报以下船舶：";
-        //        excelTitles.Add(new ExcelTitle()
-        //        {
-        //            CreateTime = DateTime.Now,
-        //            Id = GuidUtil.Next(),
-        //            Month = month,
-        //            TitleName = "【" + dateDay + "】广航局生产运营监控日报 各单位填报情况",
-        //            TtileContent = titleNine,
-        //            DateDay = dateDay,
-        //            Type = 9,
-        //            Year = year
-        //        });
-        //    }
-        //    //项目带班生产动态已填报项目
-        //    if (excelProjectShiftProductionInfo.Count() > 0)
-        //    {
-        //        //数据映射
-        //        var result = _mapper.Map<List<ProjectShiftProductionInfo>, List<ExcelProjectShiftProductionInfo>>(excelProjectShiftProductionInfo);
-        //        foreach (var item in result)
-        //        {
-        //            item.Id = GuidUtil.Next();
-        //            item.DateDay = dateDay;
-        //            item.Year = year;
-        //            item.Month = month;
-        //        }
-        //        await _dbContext.Insertable(result).ExecuteCommandAsync();
+                //titile写入
+                string titleNine = "说明：船舶生产数据存在不完整部分主要是项目部未填报以下船舶：";
+                excelTitles.Add(new ExcelTitle()
+                {
+                    CreateTime = DateTime.Now,
+                    Id = GuidUtil.Next(),
+                    Month = month,
+                    TitleName = "【" + dateDay + "】广航局生产运营监控日报 各单位填报情况",
+                    TtileContent = titleNine,
+                    DateDay = dateDay,
+                    Type = 9,
+                    Year = year
+                });
+            }
+            //项目带班生产动态已填报项目
+            if (excelProjectShiftProductionInfo.Count() > 0)
+            {
+                //数据映射
+                var result = _mapper.Map<List<ProjectShiftProductionInfo>, List<ExcelProjectShiftProductionInfo>>(excelProjectShiftProductionInfo);
+                foreach (var item in result)
+                {
+                    item.Id = GuidUtil.Next();
+                    item.DateDay = dateDay;
+                    item.Year = year;
+                    item.Month = month;
+                }
+                await _dbContext.Insertable(result).ExecuteCommandAsync();
 
-        //        //titile写入
-        //        string titleTen = getNewYearDayData.Data.TimeValue.ToString("yyyy年MM月dd日") + "，广航局在建项目" + result.Count() + "个，现场管理人员" + getNewYearDayData.Data.sumInfo.SumSiteManagementPersonNum + "人，陆域作业" + getNewYearDayData.Data.sumInfo.SumSiteConstructionPersonNum + "人， 陆域设备" + getNewYearDayData.Data.sumInfo.SumConstructionDeviceNum + "台，在场船舶" + getNewYearDayData.Data.sumInfo.SumSiteShipNum + "艘，在船人员" + getNewYearDayData.Data.sumInfo.SumOnShipPersonNum + "人，危大工程施工" + getNewYearDayData.Data.sumInfo.SumHazardousConstructionNum + "项，陆地3~9人作业工点" + getNewYearDayData.Data.sumInfo.SumFewLandWorkplace + "处，陆地10人以上作业工点" + getNewYearDayData.Data.sumInfo.SumLandWorkplace + "处。";
-        //        excelTitles.Add(new ExcelTitle()
-        //        {
-        //            CreateTime = DateTime.Now,
-        //            Id = GuidUtil.Next(),
-        //            Month = month,
-        //            TitleName = "【" + dateDay + "】广航局生产运营监控日报 元旦期间各在建项目带班生产动态",
-        //            TtileContent = titleTen,
-        //            DateDay = dateDay,
-        //            Type = 10,
-        //            Year = year
-        //        });
-        //    }
-        //    //项目带班生产动态未填报项目
-        //    if (excelUnProjectShitInfo.Count() > 0)
-        //    {
-        //        //数据映射
-        //        var result = _mapper.Map<List<UnProjectShitInfo>, List<ExcelUnProjectShitInfo>>(excelUnProjectShitInfo);
-        //        foreach (var item in result)
-        //        {
-        //            item.Id = GuidUtil.Next();
-        //            item.DateDay = dateDay;
-        //            item.Year = year;
-        //            item.Month = month;
-        //            item.UnitDesc = GetUnitDesc(item.UnitName);
-        //        }
-        //        await _dbContext.Insertable(result).ExecuteCommandAsync();
+                //titile写入
+                string titleTen = getNewYearDayData.Data.TimeValue.ToString("yyyy年MM月dd日") + "，广航局在建项目" + result.Count() + "个，现场管理人员" + getNewYearDayData.Data.sumInfo.SumSiteManagementPersonNum + "人，陆域作业" + getNewYearDayData.Data.sumInfo.SumSiteConstructionPersonNum + "人， 陆域设备" + getNewYearDayData.Data.sumInfo.SumConstructionDeviceNum + "台，在场船舶" + getNewYearDayData.Data.sumInfo.SumSiteShipNum + "艘，在船人员" + getNewYearDayData.Data.sumInfo.SumOnShipPersonNum + "人，危大工程施工" + getNewYearDayData.Data.sumInfo.SumHazardousConstructionNum + "项，陆地3~9人作业工点" + getNewYearDayData.Data.sumInfo.SumFewLandWorkplace + "处，陆地10人以上作业工点" + getNewYearDayData.Data.sumInfo.SumLandWorkplace + "处。";
+                excelTitles.Add(new ExcelTitle()
+                {
+                    CreateTime = DateTime.Now,
+                    Id = GuidUtil.Next(),
+                    Month = month,
+                    TitleName = "【" + dateDay + "】广航局生产运营监控日报 元旦期间各在建项目带班生产动态",
+                    TtileContent = titleTen,
+                    DateDay = dateDay,
+                    Type = 10,
+                    Year = year
+                });
+            }
+            //项目带班生产动态未填报项目
+            if (excelUnProjectShitInfo.Count() > 0)
+            {
+                //数据映射
+                var result = _mapper.Map<List<UnProjectShitInfo>, List<ExcelUnProjectShitInfo>>(excelUnProjectShitInfo);
+                foreach (var item in result)
+                {
+                    item.Id = GuidUtil.Next();
+                    item.DateDay = dateDay;
+                    item.Year = year;
+                    item.Month = month;
+                    item.UnitDesc = GetUnitDesc(item.UnitName);
+                }
+                await _dbContext.Insertable(result).ExecuteCommandAsync();
 
-        //        //titile写入
-        //        string titleEleven = "注：陆域3～9人作业工点要求项目领导带班旁站，陆域10人及以上作业工点要求所属三级单位领导带班驻点；以下为未填报项目清单：" + result.Count() + "个。";
-        //        excelTitles.Add(new ExcelTitle()
-        //        {
-        //            CreateTime = DateTime.Now,
-        //            Id = GuidUtil.Next(),
-        //            Month = month,
-        //            TitleName = "【" + dateDay + "】广航局生产运营监控日报 元旦期间各在建项目带班生产动态",
-        //            TtileContent = titleEleven,
-        //            DateDay = dateDay,
-        //            Type = 11,
-        //            Year = year
-        //        });
-        //    }
+                //titile写入
+                string titleEleven = "注：陆域3～9人作业工点要求项目领导带班旁站，陆域10人及以上作业工点要求所属三级单位领导带班驻点；以下为未填报项目清单：" + result.Count() + "个。";
+                excelTitles.Add(new ExcelTitle()
+                {
+                    CreateTime = DateTime.Now,
+                    Id = GuidUtil.Next(),
+                    Month = month,
+                    TitleName = "【" + dateDay + "】广航局生产运营监控日报 元旦期间各在建项目带班生产动态",
+                    TtileContent = titleEleven,
+                    DateDay = dateDay,
+                    Type = 11,
+                    Year = year
+                });
+            }
 
-        //    await _dbContext.Insertable(excelTitles).ExecuteCommandAsync();
-        //    responseAjaxResult.Success();
-        //    responseAjaxResult.Data = true;
+            await _dbContext.Insertable(excelTitles).ExecuteCommandAsync();
+            responseAjaxResult.Success();
+            responseAjaxResult.Data = true;
 
-        //    return responseAjaxResult;
-        //}
+            return responseAjaxResult;
+        }
         /// <summary>
         /// 获取单位序号
         /// </summary>
