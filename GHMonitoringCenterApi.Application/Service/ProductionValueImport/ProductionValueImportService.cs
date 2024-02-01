@@ -54,7 +54,7 @@ namespace GHMonitoringCenterApi.Application.Service.ProductionValueImport
         /// <param name="importHistoryProductionValuesRequestDto"></param>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
-        public Stream ImportProductionValuesAsync(ImportHistoryProductionValuesRequestDto importHistoryProductionValuesRequestDto)
+        public Stream ImportProductionValues(ImportHistoryProductionValuesRequestDto importHistoryProductionValuesRequestDto)
         {
             //数据读取
             var responseAjaxData = ReadImportProductionData(importHistoryProductionValuesRequestDto);
@@ -69,17 +69,15 @@ namespace GHMonitoringCenterApi.Application.Service.ProductionValueImport
             //区分月份  starttime-endTime 几个月份 几个sheet
             var newDate = DateTime.MinValue;
             int sheetNum = startDate == endDate ? 1 : endTime.Month - startTime.Month + 1;
-
-            XSSFWorkbook workbook = null;
+            XSSFWorkbook workbook;
             using (var fs = new FileStream(templeFile, FileMode.Open, FileAccess.Read))
             {
+                workbook = new XSSFWorkbook(fs);
+                ISheet sheet = workbook.GetSheetAt(0);
                 var memory = new MemoryStream();
+                sheet.DisplayGridlines = true;
                 for (int i = 0; i < 1; i++)
                 {
-                    workbook = new XSSFWorkbook(fs);
-                    ISheet sheet = null;
-                    sheet = workbook.GetSheetAt(0);
-                    sheet.DisplayGridlines = true;
                     newDate = startTime;
                     //外层循环控制sheet个数
                     var sheetName = workbook.CreateSheet(newDate.ToString("yyyy年MM月"));

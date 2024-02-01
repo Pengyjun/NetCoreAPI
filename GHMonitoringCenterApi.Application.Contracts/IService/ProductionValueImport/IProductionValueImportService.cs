@@ -13,7 +13,7 @@ namespace GHMonitoringCenterApi.Application.Contracts.IService.ProductionValueIm
         /// </summary>
         /// <param name="importHistoryProductionValuesRequestDto">请求参数</param>
         /// <returns></returns>
-        Stream ImportProductionValuesAsync(ImportHistoryProductionValuesRequestDto importHistoryProductionValuesRequestDto);
+        //Stream ImportProductionValues(ImportHistoryProductionValuesRequestDto importHistoryProductionValuesRequestDto);
         /// <summary>
         /// 根据日期读取所含日期内的数据
         /// </summary>
