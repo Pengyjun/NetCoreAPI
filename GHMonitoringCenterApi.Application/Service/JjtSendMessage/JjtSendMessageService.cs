@@ -1545,28 +1545,18 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
             //当前时间上限int类型
             var currentTimeIntUp = int.Parse(Convert.ToDateTime(startTime).ToString("yyyyMM26"));
             //当前时间下限int类型
-            // var currentTimeInt = int.Parse(Convert.ToDateTime(startTime).AddMonths(1).ToString("yyyyMM25"));
-            var currentTimeInt = DateTime.Now.AddDays(-1).ToDateDay();
-            //var nowTimeInt = DateTime.Now.AddDays(-1).ToDateDay();
+            var currentTimeInt =DateTime.Now.AddDays(-1).ToDateDay();
             //本年的月份
             var month = Convert.ToDateTime(startTime).AddMonths(1).Month;
-            
-            //if (DateTime.Now.Day> 27)
-            //{
-            //    month = Convert.ToDateTime(startTime).Month;
-            //}
-            //else
-            //{
-            //    month = Convert.ToDateTime(startTime).AddMonths(1).Month;
-            //}
             //本年的年份 
             var yearStartTime = DateTime.Now.Year.ToString();
             //年累计开始时间（每年的开始时间）
             var startYearTimeInt = int.Parse(DateTime.Now.AddYears(-1).ToString("yyyy") + "1226");//int.Parse(DateTime.Now.AddYears(-1).ToString("yyyy1226"));
             //年累计结束时间
             var endYearTimeInt = int.Parse(DateTime.Now.ToString("yyyyMMdd")) > 1226 && int.Parse(DateTime.Now.ToString("yyyyMMdd")) <= 31 ? int.Parse(DateTime.Now.AddYears(1).ToString("yyyy1225")): int.Parse(DateTime.Now.ToString("yyyy1225")); //int.Parse(DateTime.Now.ToString("yyyy1225"));
-            //每月多少天
-            int days = DateTime.DaysInMonth(int.Parse(endYearTimeInt.ToString().Substring(0, 4)), month);  //DateTime.DaysInMonth(DateTime.Now.Year, DateTime.Now.AddMonths(-1).Month);
+                                                                                                                                                                                                                                                     //每月多少天
+                                                                                                                                                                                                                                                     // int days = DateTime.DaysInMonth(int.Parse(endYearTimeInt.ToString().Substring(0, 4)), month);  //DateTime.DaysInMonth(DateTime.Now.Year, DateTime.Now.AddMonths(-1).Month);
+            int days = TimeHelper.GetTimeSpan(Convert.ToDateTime(startTime), Convert.ToDateTime(endTime)).Days+1;
             //已过多少天
             var ofdays = DateTime.Now.Day <= 26 ? (DateTime.Now.Day + ((days - 26))) : DateTime.Now.Day - 26;
             //今年已过多少天
@@ -1574,7 +1564,6 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
             //if (int.Parse(DateTime.Now.ToString("yyyyMMdd")) > startYearTimeInt && int.Parse(DateTime.Now.ToString("yyyyMMdd")) < int.Parse(DateTime.Now.AddYears(-1).ToString("yyyy1231")))
             if (int.Parse(DateTime.Now.ToString("yyyyMMdd")) > startYearTimeInt && int.Parse(DateTime.Now.ToString("yyyyMMdd"))<int.Parse(yearStartTime+"1231"))
             {
-                //dayOfYear = (int.Parse(DateTime.Now.ToString("yyyyMMdd")) - startYearTimeInt) + 1;
                 dayOfYear = ofdays;
             }
             else
