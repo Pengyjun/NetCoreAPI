@@ -1,18 +1,12 @@
-﻿using Aspose.Words;
-using AutoMapper;
-using GHMonitoringCenterApi.Application.Contracts.Dto;
+﻿using AutoMapper;
 using GHMonitoringCenterApi.Application.Contracts.Dto.ConstructionProjectDaily;
 using GHMonitoringCenterApi.Application.Contracts.Dto.EquipmentManagement;
 using GHMonitoringCenterApi.Application.Contracts.Dto.File;
-using GHMonitoringCenterApi.Application.Contracts.Dto.JjtSendMsg;
 using GHMonitoringCenterApi.Application.Contracts.Dto.Project;
-using GHMonitoringCenterApi.Application.Contracts.Dto.Project.ExcelImport;
 using GHMonitoringCenterApi.Application.Contracts.Dto.Project.Report;
 using GHMonitoringCenterApi.Application.Contracts.Dto.ProjectPlanProduction;
-using GHMonitoringCenterApi.Application.Contracts.Dto.ProjectProductionReport;
 using GHMonitoringCenterApi.Application.Contracts.Dto.ProjectWBSUpload;
 using GHMonitoringCenterApi.Application.Contracts.Dto.Ship;
-using GHMonitoringCenterApi.Application.Contracts.Dto.Upload;
 using GHMonitoringCenterApi.Application.Contracts.Dto.Word;
 using GHMonitoringCenterApi.Application.Contracts.IService;
 using GHMonitoringCenterApi.Application.Contracts.IService.EquipmentManagement;
@@ -22,29 +16,15 @@ using GHMonitoringCenterApi.Application.Contracts.IService.Project;
 using GHMonitoringCenterApi.Application.Contracts.IService.ProjectProductionReport;
 using GHMonitoringCenterApi.Application.Contracts.IService.ResourceManagement;
 using GHMonitoringCenterApi.Application.Contracts.IService.Word;
-using GHMonitoringCenterApi.Application.Service.File;
-using GHMonitoringCenterApi.Application.Service.OperationLog;
-using GHMonitoringCenterApi.Domain.Models;
 using GHMonitoringCenterApi.Domain.Shared;
 using GHMonitoringCenterApi.Domain.Shared.Const;
-using GHMonitoringCenterApi.Domain.Shared.Enums;
 using GHMonitoringCenterApi.Domain.Shared.Util;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MiniExcelLibs;
-using MiniExcelLibs.OpenXml;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using NPOI.HPSF;
 using NPOI.SS.UserModel;
 using NSwag.Annotations;
-using Org.BouncyCastle.Utilities;
-using Spire.Doc.Documents;
 using SqlSugar;
-using SqlSugar.Extensions;
-using System.Diagnostics.CodeAnalysis;
-using System.IO;
-using System.Text;
 using System.Web;
 using UtilsSharp;
 
@@ -219,16 +199,16 @@ namespace GHMonitoringCenterApi.Controllers.File
             };
             await logService.WriteLogAsync(logObj);
             #endregion
-           
+
             //默认全量导出
             searchRequestDto.IsFullExport = true;
             string templatePath;
             //获取数据
             var data = await projectProductionReportService.SearchDayReportExcelAsync(searchRequestDto);
-            if (data.Data.dayReportExcels.Select(x=>x.IsHoliday).Contains(true))
+            if (data.Data.dayReportExcels.Select(x => x.IsHoliday).Contains(true))
             {
                 //模板位置
-                 templatePath = $"Template/Excel/HolidayDayReportTemplate.xlsx";
+                templatePath = $"Template/Excel/HolidayDayReportTemplate.xlsx";
                 //templatePath = @"D:\GHJ1007\wom.api\GHMonitoringCenterApi.Domain.Shared\Template\Excel\HolidayDayReportTemplate.xlsx";
 
 
@@ -236,8 +216,8 @@ namespace GHMonitoringCenterApi.Controllers.File
             else
             {
                 //模板位置
-                 templatePath = $"Template/Excel/DayReportTemplate.xlsx";
-               // templatePath = @"D:\GHJ1007\wom.api\GHMonitoringCenterApi.Domain.Shared\Template\Excel\DayReportTemplate.xlsx";
+                templatePath = $"Template/Excel/DayReportTemplate.xlsx";
+                // templatePath = @"D:\GHJ1007\wom.api\GHMonitoringCenterApi.Domain.Shared\Template\Excel\DayReportTemplate.xlsx";
             }
             var importData = new
             {
@@ -729,10 +709,10 @@ namespace GHMonitoringCenterApi.Controllers.File
         {
             //获取logo图片
             //测试或生产地址
-            //var templatePath = @$"C:\Users\xgg\Desktop\新建文件夹 (6)\wom.api\GHMonitoringCenterApi.Domain.Shared\Template\Images\logo.png";
+            var templatePath = @$"D:\projectconllection\dotnet\szgh\GHMonitoringCenterApi.Domain.Shared\Template\Images\logo.png";
             //本机地址
             //var templatePath = @$"D:\SZGH\wom.api\GHMonitoringCenterApi.Domain.Shared\Template\Images\logo.png";
-            var templatePath = $"Template/Images/logo.png";
+            //var templatePath = $"Template/Images/logo.png";
             BaseConfig config = new BaseConfig()
             {
                 Foot = "仿宋",
@@ -744,8 +724,8 @@ namespace GHMonitoringCenterApi.Controllers.File
                 WordImageSetup = new WordImageSetup()
                 {
                     type = PictureType.PNG,
-                    FileName = Path.GetFileName(templatePath),
-                    LogoStream = new FileStream(templatePath, FileMode.Open, FileAccess.Read)
+                     FileName = Path.GetFileName(templatePath),
+                     LogoStream = new FileStream(templatePath, FileMode.Open, FileAccess.Read)
                 }
             };
             var stream = await wordService.MonthReportImportWordAsync(config, model);
@@ -1104,7 +1084,7 @@ namespace GHMonitoringCenterApi.Controllers.File
                 //templatePath = @"Template\Excel\ExportLandEquipmentImport.xlsx";
                 return await ExcelTemplateImportAsync(templatePath, importData, "修理项目模板");
             }
-            else if(type == 3) // 发船备件清单
+            else if (type == 3) // 发船备件清单
             {
                 templatePath = $"Template/Excel/SendShipSparePartTemplate.xlsx";
                 //templatePath = @"Template\Excel\ExportSpecialEquipmentImport.xlsx";
@@ -1170,7 +1150,7 @@ namespace GHMonitoringCenterApi.Controllers.File
                 //var a = new StreamContent(file, (int)file.Length);
                 formData.Add(new StreamContent(file, (int)file.Length), name, fileName);
                 var _httpclient = new HttpClient();
-                 response =await  _httpclient.PostAsync(url, formData).Result.Content.ReadAsStreamAsync();
+                response = await _httpclient.PostAsync(url, formData).Result.Content.ReadAsStreamAsync();
             }
             System.IO.File.Delete(path);
             return await WordTemplateImportAsync(response, "项目月报简报导出", "pdf");
