@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using GHMonitoringCenterApi.Application.Contracts.Dto;
 using GHMonitoringCenterApi.Application.Contracts.Dto.File;
 using GHMonitoringCenterApi.Application.Contracts.Dto.Information;
 using GHMonitoringCenterApi.Application.Contracts.Dto.JjtSendMsg;
@@ -12,21 +11,13 @@ using GHMonitoringCenterApi.Application.Contracts.Dto.Project.ExcelImport;
 using GHMonitoringCenterApi.Application.Contracts.Dto.Project.Report;
 using GHMonitoringCenterApi.Application.Contracts.Dto.Project.ShipMovements;
 using GHMonitoringCenterApi.Application.Contracts.Dto.ProjectPlanProduction;
-using GHMonitoringCenterApi.Application.Contracts.Dto.ProjectWBSUpload;
 using GHMonitoringCenterApi.Application.Contracts.Dto.ProjectYearPlan;
 using GHMonitoringCenterApi.Application.Contracts.Dto.Push;
 using GHMonitoringCenterApi.Application.Contracts.Dto.RepairParts;
 using GHMonitoringCenterApi.Application.Contracts.Dto.ShipSurvey;
 using GHMonitoringCenterApi.Application.Contracts.Dto.Timing;
 using GHMonitoringCenterApi.Application.Contracts.Dto.Upload;
-using GHMonitoringCenterApi.Domain.Enums;
 using GHMonitoringCenterApi.Domain.Models;
-using GHMonitoringCenterApi.Domain.Shared;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using static GHMonitoringCenterApi.Application.Contracts.Dto.Project.Report.ProjectMonthReportResponseDto;
 
 namespace GHMonitoringCenterApi.Application.Contracts.AutoMapper

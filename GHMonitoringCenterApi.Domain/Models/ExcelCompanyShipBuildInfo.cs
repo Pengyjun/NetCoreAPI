@@ -3,7 +3,7 @@
 namespace GHMonitoringCenterApi.Domain.Models
 {
     /// <summary>
-    /// Excel各个公司自有船施工运转情况
+    /// Excel各个公司自有船施工运转情况（数量）
     /// </summary>
     [SugarTable("t_excelcompanyshipbuildinfo", IsDisabledDelete = true)]
     public class ExcelCompanyShipBuildInfo : BaseEntity<Guid>

@@ -1,4 +1,5 @@
 ﻿using GHMonitoringCenterApi.Application.Contracts.Dto.ProductionValueImport;
+using GHMonitoringCenterApi.Domain.Models;
 using GHMonitoringCenterApi.Domain.Shared;
 
 namespace GHMonitoringCenterApi.Application.Contracts.IService.ProductionValueImport
@@ -19,11 +20,12 @@ namespace GHMonitoringCenterApi.Application.Contracts.IService.ProductionValueIm
         /// </summary>
         /// <param name="importHistoryProductionValuesRequestDto"></param>
         /// <returns></returns>
-        ImportHistoryProductionValuesResponseDto ReadImportProductionData(ImportHistoryProductionValuesRequestDto importHistoryProductionValuesRequestDto);
+        //ImportHistoryProductionValuesResponseDto ReadImportProductionData(ImportHistoryProductionValuesRequestDto importHistoryProductionValuesRequestDto);
         /// <summary>
         /// Excel 智慧运营监控中心图片数据写入表
         /// </summary>
         /// <returns></returns>
         Task<ResponseAjaxResult<bool>> ExcelJJtSendMessageWriteAsync();
+        Task<ResponseAjaxResult<List<ProductionDayReportHistoryResponseDto>>> ExcelJJtSendMessageAsync(ImportHistoryProductionValuesRequestDto importHistoryProductionValuesRequestDto);
     }
 }

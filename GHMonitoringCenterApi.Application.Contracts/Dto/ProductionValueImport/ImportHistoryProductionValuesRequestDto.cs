@@ -19,40 +19,54 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.ProductionValueImport
         /// <summary>
         /// 开始日期
         /// </summary>
-        public DateTime? StartTime { get; set; }
-        /// <summary>
-        /// 结束日期
-        /// </summary>
-        public DateTime? EndTime { get; set; }
+        //public DateTime? StartTime { get; set; }
+        ///// <summary>
+        ///// 结束日期
+        ///// </summary>
+        //public DateTime? EndTime { get; set; }
+        public DateTime? TimeValue { get; set; }
         /// <summary>
         /// 日期转换
         /// </summary>
-        public int GetStartDate()
+        public void GetYearAndMonth()
         {
-            if (StartTime == DateTime.MinValue || string.IsNullOrWhiteSpace(StartTime.ToString()))
+            if (TimeValue == DateTime.MinValue || string.IsNullOrWhiteSpace(TimeValue.ToString()))
             {
-                return DateTime.Now.AddDays(-1).ToDateDay();
+                Year = DateTime.Now.ToDateYear();
+                Month = DateTime.Now.ToDateMonth();
             }
             else
             {
-                return Convert.ToDateTime(StartTime).ToDateDay();
+                Year = TimeValue.Value.ToDateYear();
+                Month = TimeValue.Value.ToDateMonth();
             }
+        }
+        //public int GetStartDate()
+        //{
+        //    if (StartTime == DateTime.MinValue || string.IsNullOrWhiteSpace(StartTime.ToString()))
+        //    {
+        //        return DateTime.Now.AddDays(-1).ToDateDay();
+        //    }
+        //    else
+        //    {
+        //        return Convert.ToDateTime(StartTime).ToDateDay();
+        //    }
 
-        }
-        /// <summary>
-        /// 日期转换
-        /// </summary>
-        public int GetEndDate()
-        {
-            if (EndTime == DateTime.MinValue || string.IsNullOrWhiteSpace(EndTime.ToString()))
-            {
-                return DateTime.Now.AddDays(-1).ToDateDay();
-            }
-            else
-            {
-                return Convert.ToDateTime(EndTime).ToDateDay();
-            }
-        }
+        //}
+        ///// <summary>
+        ///// 日期转换
+        ///// </summary>
+        //public int GetEndDate()
+        //{
+        //    if (EndTime == DateTime.MinValue || string.IsNullOrWhiteSpace(EndTime.ToString()))
+        //    {
+        //        return DateTime.Now.AddDays(-1).ToDateDay();
+        //    }
+        //    else
+        //    {
+        //        return Convert.ToDateTime(EndTime).ToDateDay();
+        //    }
+        //}
     }
     /// <summary>
     /// excel 导出数据响应调dto

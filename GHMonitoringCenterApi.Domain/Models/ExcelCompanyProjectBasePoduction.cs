@@ -2,7 +2,7 @@
 namespace GHMonitoringCenterApi.Domain.Models
 {
     /// <summary>
-    /// Excel各个公司基本项目情况
+    /// Excel各个公司基本项目情况(数量)
     /// </summary>
     [SugarTable("t_excelcompanyprojectbasepoduction", IsDisabledDelete = true)]
     public class ExcelCompanyProjectBasePoduction : BaseEntity<Guid>

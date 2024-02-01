@@ -2,7 +2,7 @@
 namespace GHMonitoringCenterApi.Domain.Models
 {
     /// <summary>
-    /// Excel船舶产值
+    /// Excel船舶产值(船舶前五)
     /// </summary>
     [SugarTable("t_excelshipproductionvalue", IsDisabledDelete = true)]
     public class ExcelShipProductionValue : BaseEntity<Guid>

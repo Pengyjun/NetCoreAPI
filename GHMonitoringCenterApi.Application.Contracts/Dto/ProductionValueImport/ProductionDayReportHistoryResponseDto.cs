@@ -1,177 +1,32 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using GHMonitoringCenterApi.Application.Contracts.Dto.Project.Report;
+using GHMonitoringCenterApi.Domain.Models;
 using System.Text.Json.Serialization;
-using System.Threading.Tasks;
 
-namespace GHMonitoringCenterApi.Application.Contracts.Dto.JjtSendMsg
+namespace GHMonitoringCenterApi.Application.Contracts.Dto.ProductionValueImport
 {
 
-
     /// <summary>
-    /// 交建通发消息（图文消息） 监控运营生产日报
+    /// 导入生产日报推送历史数据
     /// </summary>
-    public class JjtSendMessageMonitoringDayReportResponseDto
+    public class ProductionDayReportHistoryResponseDto
     {
-        /// <summary>
-        /// 当前年份
-        /// </summary>
-        public int Year { get; set; }
-        /// <summary>
-        /// 当前月份
-        /// </summary>
-        public int Month { get; set; }
-        /// <summary>
-        /// 数据质量程度 几颗星
-        /// </summary>
-        public int QualityLevel { get; set; }
-        /// <summary>
-        /// 通报日期
-        /// </summary>
-        public string DayTime { get; set; }
-        /// <summary>
-        /// 项目总体生产情况
-        /// </summary>
-        public ProjectBasePoduction projectBasePoduction { get; set; }
-        /// <summary>
-        /// 自有船施工运转情况
-        /// </summary>
-        public OwnerShipBuildInfo OwnerShipBuildInfo { get; set; }
-        /// <summary>
-        /// 特殊情况
-        /// </summary>
-        public List<SpecialProjectInfo> SpecialProjectInfo { get; set; }
-        /// <summary>
-        /// 各单位填报情况
-        /// </summary>
-        public List<CompanyWriteReportInfo> CompanyWriteReportInfos { get; set; }
-        /// <summary>
-        /// 项目生产数据存在不完整部分主要是以下项目未填报
-        /// </summary>
-        public List<CompanyUnWriteReportInfo> CompanyUnWriteReportInfos { get; set; }
-        /// <summary>
-        /// 船舶生产数据存在不完整部分主要是项目部未填报以下船舶
-        /// </summary>
-        public List<CompanyShipUnWriteReportInfo> CompanyShipUnWriteReportInfos { get; set; }
 
+        public List<CompanyProjectBasePoduction> CompanyProjectBasePoduction { get; set; }
+        public List<CompanyBasePoductionValue> CompanyBasePoductionValue { get; set; }
+        public List<CompanyShipBuildInfo> CompanyShipBuildInfo { get; set; }
+        public List<CompanyShipProductionValueInfo> CompanyShipProductionValueInfo { get; set; }
+        public List<SpecialProjectInfo> SpecialProjectInfo { get; set; }
+        public List<CompanyWriteReportInfo> CompanyWriteReportInfo { get; set; }
+        public List<CompanyUnWriteReportInfo> CompanyUnWriteReportInfo { get; set; }
+        public List<CompanyShipUnWriteReportInfo> CompanyShipUnWriteReportInfo { get; set; }
+        public List<ShipProductionValue> ShipProductionValue { get; set; }
+        public List<ProjectShiftProductionInfo> ProjectShiftProductionInfo { get; set; }
+        public List<UnProjectShitInfo> UnProjectShitInfo { get; set; }
+        public List<ExcelTitle> ExcelTitle { get; set; }
     }
+
 
     #region 项目总体生产情况
-    /// <summary>
-    /// 项目总体生产情况
-    /// </summary>
-    public class ProjectBasePoduction
-    {
-        /// <summary>
-        /// 总日产值
-        /// </summary>
-        public decimal YearTopFiveTotalOutput { get; set; }
-
-        /// <summary>
-        /// 总年产值
-        /// </summary>
-        public decimal YearFiveTotalOutput { get; set; }
-        /// <summary>
-        /// 占自有船舶总产值的百分比
-        /// </summary>
-        public decimal YearFiveTimeRate { get; set; }
-        /// <summary>
-        /// 年日报运转时间百分比
-        /// </summary>
-        public decimal YearTotalTopFiveOutputPercent { get; set; }
-        public decimal TotalCurrentYearPlanProductionValue { get; set; }
-        public decimal TotalCurrentYearCompleteProductionValue { get; set; }
-        public decimal TotalCompleteRate { get; set; }
-        public decimal SumCompleteRate { get; set; }
-        /// <summary>
-        /// 收入保障指数 几颗星  广航局当日总产值除以3000万
-        /// </summary>
-        public int IncomeSecurityLevel { get; set; }
-
-        /// <summary>
-        ///广航局合同项目数量
-        /// </summary>
-        public int TotalOnContractProjectCount { get; set; }
-        /// <summary>
-        /// 广航局在建项目数量
-        /// </summary>
-        public int TotalOnBuildProjectCount { get; set; }
-        /// <summary>
-        /// 广航局停缓建数量
-        /// </summary>
-        public int TotalStopBuildProjectCount { get; set; }
-        /// <summary>
-        /// 广航局在建数量占比
-        /// </summary>
-        public decimal TotalBuildCountPercent { get; set; }
-
-        /// <summary>
-        /// 当日产值
-        /// </summary>
-        public decimal DayProductionValue { get; set; }
-        /// <summary>
-        /// 年累计总产值
-        /// </summary>
-        public decimal TotalYearProductionValue { get; set; }
-        /// <summary>
-        /// 较产值进度 滞后
-        /// </summary>
-        public decimal ProductionValueProgressPercent { get; set; }
-        /// <summary>
-        /// 超序时进度
-        /// </summary>
-        public decimal SupersequenceProgress { get; set; }
-
-        /// <summary>
-        /// 总设备数量
-        /// </summary>
-        public int TotalFacilityCount { get; set; }
-
-        /// <summary>
-        /// 总工人数量
-        /// </summary>
-        public int TotalWorkerCount { get; set; }
-        /// <summary>
-        /// 总危大施工项数量
-        /// </summary>
-        public int TotalRiskWorkCount { get; set; }
-
-        /// <summary>
-        /// 产值前10条汇总
-        /// </summary>
-        public decimal SumProjectRanksTen { get; set; }
-        /// <summary>
-        /// 产值总汇总
-        /// </summary>
-        public decimal SumProjectRanks { get; set; }
-        /// <summary>
-        /// 总产值占比
-        /// </summary>
-        public decimal TotalProportion { get; set; }
-        /// <summary>
-        /// 各个公司基本项目情况
-        /// </summary>
-        public List<CompanyProjectBasePoduction> CompanyProjectBasePoductions { get; set; }
-        /// <summary>
-        /// 各个公司基本产值情况
-        /// </summary>
-        public List<CompanyBasePoductionValue> CompanyBasePoductionValues { get; set; }
-        /// <summary>
-        /// 柱形图
-        /// </summary>
-        public CompanyProductionCompare CompanyProductionCompares { get; set; }
-
-        /// <summary>
-        /// 项目完成产值排名
-        /// </summary>
-        public List<ProjectRank> ProjectRanks { get; set; }
-
-        /// <summary>
-        /// 项目产值强度表格
-        /// </summary>
-        public List<ProjectIntensity> ProjectIntensities { get; set; }
-    }
 
     /// <summary>
     /// 各个公司基本项目情况
@@ -377,67 +232,6 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.JjtSendMsg
 
     #region 自有船施工运转情况
     /// <summary>
-    /// 自有船施工运转情况
-    /// </summary>
-    public class OwnerShipBuildInfo
-    {
-
-        /// <summary>
-        /// 广航局三类船舶总数量
-        /// </summary>
-        public int TotalCount { get; set; }
-        /// <summary>
-        /// 施工数量
-        /// </summary>
-        public int BuildCount { get; set; }
-        /// <summary>
-        /// 检修数量
-        /// </summary>
-        public int ReconditionCount { get; set; }
-        /// <summary>
-        /// 调遣数量
-        /// </summary>
-        public int AssignCount { get; set; }
-        /// <summary>
-        /// 待命数量
-        /// </summary>
-        public int AwaitCount { get; set; }
-
-        /// <summary>
-        /// 开工率
-        /// </summary>
-        public decimal BuildPercent { get; set; }
-
-        /// <summary>
-        /// 自由船舶施工产值
-        /// </summary>
-        public decimal BulidProductionValue { get; set; }
-        /// <summary>
-        /// 当日运转小时
-        /// </summary>
-        public decimal DayTurnHours { get; set; }
-        /// <summary>
-        /// 当年累计产值
-        /// </summary>
-        public decimal YearTotalProductionValue { get; set; }
-        /// <summary>
-        /// 当年累计运转小时
-        /// </summary>
-        public decimal YearTotalTurnHours { get; set; }
-        /// <summary>
-        /// 各个公司自有船施工运转情况集合
-        /// 
-        /// </summary>
-        public List<CompanyShipBuildInfo> companyShipBuildInfos { get; set; }
-        /// <summary>
-        /// 各个公司自有船施工产值情况集合
-        /// </summary>
-        public List<CompanyShipProductionValueInfo> companyShipProductionValueInfos { get; set; }
-
-        public List<ShipProductionValue> companyShipTopFiveInfoList { get; set; }
-    }
-
-    /// <summary>
     /// 各个公司自有船施工运转情况
     /// </summary>
     public class CompanyShipBuildInfo
@@ -605,45 +399,7 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.JjtSendMsg
     }
     #endregion
 
-    #region  施工船舶产值强度低于80%
-    public class ShipOutputIntensity
-    {
-        /// <summary>
-        /// 船舶名称
-        /// </summary>
-        public string ShipName { get; set; }
-        /// <summary>
-        /// 日均生产指标(万元)
-        /// </summary>
-        public decimal? DailyProductionIndex { get; set; }
-        /// <summary>
-        /// 当日船舶产值(万元)
-        /// </summary>
-        public decimal? DayShipOutPut { get; set; }
-        /// <summary>
-        /// 指标完成率(升序)
-        /// </summary>
-        public decimal? IndicatorRate { get; set; }
-        /// <summary>
-        /// 当日船舶生产不理想原因
-        /// </summary>
-        public string? ShipRemark { get; set; }
-    }
-    #endregion
-
-
-    #region 更新船舶在场天数DTO
-    /// <summary>
-    /// 更新船舶在场天数DTO
-    /// </summary>
-    public class ShipOnDay
-    {
-        public Guid Id { get; set; }
-        public decimal OnDayCount { get; set; }
-
-    }
-    #endregion
-
+    #region 自由船舶前五的
     /// <summary>
     /// 船舶产值
     /// </summary>
@@ -670,4 +426,33 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.JjtSendMsg
         public decimal ConstructionDays { get; set; }
 
     }
+    #endregion
+
+    #region  施工船舶产值强度低于80%  暂时不需要
+    //public class ShipOutputIntensity
+    //{
+    //    /// <summary>
+    //    /// 船舶名称
+    //    /// </summary>
+    //    public string ShipName { get; set; }
+    //    /// <summary>
+    //    /// 日均生产指标(万元)
+    //    /// </summary>
+    //    public decimal? DailyProductionIndex { get; set; }
+    //    /// <summary>
+    //    /// 当日船舶产值(万元)
+    //    /// </summary>
+    //    public decimal? DayShipOutPut { get; set; }
+    //    /// <summary>
+    //    /// 指标完成率(升序)
+    //    /// </summary>
+    //    public decimal? IndicatorRate { get; set; }
+    //    /// <summary>
+    //    /// 当日船舶生产不理想原因
+    //    /// </summary>
+    //    public string? ShipRemark { get; set; }
+    //}
+    #endregion
+
+
 }
