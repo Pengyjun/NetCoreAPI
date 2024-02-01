@@ -106,7 +106,7 @@ namespace GHMonitoringCenterApi.Controllers.ProductionValueImport
             var value = new
             {
                 datesheet1 = importHistoryProductionValuesRequestDto.TimeValue.HasValue ? importHistoryProductionValuesRequestDto.TimeValue.Value.ToString("yyyy年MM月") : DateTime.Now.AddDays(-1).ToString("yyyy年MM月"),
-                days1heet1 = importHistoryProductionValuesRequestDto.Year + "年" + importHistoryProductionValuesRequestDto.Month + "月" + "01日",
+                days1heet1 = importHistoryProductionValuesRequestDto.TimeValue.HasValue ? importHistoryProductionValuesRequestDto.TimeValue.Value.ToString("yyyy年MM月dd日") : DateTime.Now.AddDays(-1).ToString("yyyy年MM月dd日"),
                 result1 = baseProject.Data[0].CompanyProjectBasePoduction,
                 result2 = baseProject.Data[0].CompanyBasePoductionValue,
                 result3 = baseProject.Data[0].CompanyShipBuildInfo,
