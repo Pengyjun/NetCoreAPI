@@ -13,13 +13,13 @@ namespace GHMonitoringCenterApi.Application.Contracts.IService.ProductionValueIm
         /// </summary>
         /// <param name="importHistoryProductionValuesRequestDto">请求参数</param>
         /// <returns></returns>
-        Task<Stream> ImportProductionValuesAsync(ImportHistoryProductionValuesRequestDto importHistoryProductionValuesRequestDto);
+        Stream ImportProductionValuesAsync(ImportHistoryProductionValuesRequestDto importHistoryProductionValuesRequestDto);
         /// <summary>
         /// 根据日期读取所含日期内的数据
         /// </summary>
         /// <param name="importHistoryProductionValuesRequestDto"></param>
         /// <returns></returns>
-        Task<ImportHistoryProductionValuesResponseDto> ReadImportProductionData(ImportHistoryProductionValuesRequestDto importHistoryProductionValuesRequestDto);
+        ImportHistoryProductionValuesResponseDto ReadImportProductionData(ImportHistoryProductionValuesRequestDto importHistoryProductionValuesRequestDto);
         /// <summary>
         /// Excel 智慧运营监控中心图片数据写入表
         /// </summary>
