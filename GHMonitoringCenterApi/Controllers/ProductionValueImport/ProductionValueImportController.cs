@@ -1,4 +1,5 @@
 ﻿using GHMonitoringCenterApi.Application.Contracts.Dto.ProductionValueImport;
+using GHMonitoringCenterApi.Application.Contracts.Dto.Project;
 using GHMonitoringCenterApi.Application.Contracts.IService.ProductionValueImport;
 using GHMonitoringCenterApi.Domain.Shared;
 using Microsoft.AspNetCore.Mvc;
@@ -120,6 +121,49 @@ namespace GHMonitoringCenterApi.Controllers.ProductionValueImport
 
             };
             return await ExcelTemplateImportAsync(tempPath, value, $"{importHistoryProductionValuesRequestDto.Year}年广航局生产运营监控日报");
+        }
+
+        /// <summary>
+        /// 测试
+        /// </summary>
+        /// <param name="importHistoryProductionValuesRequestDto"></param>
+        /// <returns></returns>
+        [HttpGet("ImportHistoryProduction")]
+        public async Task<IActionResult> ImportHistoryProduction([FromQuery] ImportHistoryProductionValuesRequestDto importHistoryProductionValuesRequestDto)
+        {
+            ResponseAjaxResult<bool> responseAjaxResult = new ResponseAjaxResult<bool>();
+            //需要导入几个月
+            var needMonth = 1;
+            #region 逻辑判断
+            if (importHistoryProductionValuesRequestDto.StartTime.HasValue==false && importHistoryProductionValuesRequestDto.EndTime.HasValue==true)
+            {
+                responseAjaxResult.Fail("时间格式不合法");
+                return Ok(responseAjaxResult);
+            }
+            if (importHistoryProductionValuesRequestDto.StartTime.HasValue&& importHistoryProductionValuesRequestDto.EndTime.HasValue
+                && importHistoryProductionValuesRequestDto.StartTime.Value >importHistoryProductionValuesRequestDto.EndTime.Value)
+            {
+                responseAjaxResult.Fail("开始时间不能大于结束时间");
+                return Ok(responseAjaxResult);
+            }
+            if (importHistoryProductionValuesRequestDto.StartTime.HasValue == true 
+                &&importHistoryProductionValuesRequestDto.EndTime.HasValue == true
+                &&importHistoryProductionValuesRequestDto.StartTime.Value!=importHistoryProductionValuesRequestDto.EndTime.Value)
+            {
+                needMonth=importHistoryProductionValuesRequestDto.EndTime.Value.Month - importHistoryProductionValuesRequestDto.StartTime.Value.Month;
+            }
+            #endregion
+            var tempPath = "D:\\projectconllection\\dotnet\\szgh\\GHMonitoringCenterApi.Domain.Shared\\Template\\Excel\\ProductionDayReport.xlsx";
+            //var tempPath = "Template/Excel/CompanyOnProjectTemplate.xlsx";
+            var baseProject = await _productionValueImportService.ExcelJJtSendMessageAsync(importHistoryProductionValuesRequestDto,needMonth);
+            var value = new
+            {
+                day = DateTime.Now.ToString("yyyy/MM/dd"),
+                result = baseProject.Data[0].CompanyProjectBasePoduction,
+                result1= baseProject.Data[0].CompanyBasePoductionValue
+
+            };
+            return await ExcelTemplateImportAsync(tempPath, value, $"{DateTime.Now.Year}年公司在手项目清单");
         }
     }
 }

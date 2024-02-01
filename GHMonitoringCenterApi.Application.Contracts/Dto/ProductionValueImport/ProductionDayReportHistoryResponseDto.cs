@@ -1,6 +1,7 @@
 ﻿using GHMonitoringCenterApi.Application.Contracts.Dto.Project.Report;
 using GHMonitoringCenterApi.Domain.Models;
 using System.Text.Json.Serialization;
+using System.Threading.Tasks;
 
 namespace GHMonitoringCenterApi.Application.Contracts.Dto.ProductionValueImport
 {
@@ -399,6 +400,7 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.ProductionValueImport
     }
     #endregion
 
+
     #region 自由船舶前五的
     /// <summary>
     /// 船舶产值
@@ -427,6 +429,7 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.ProductionValueImport
 
     }
     #endregion
+
 
     #region  施工船舶产值强度低于80%  暂时不需要
     //public class ShipOutputIntensity
