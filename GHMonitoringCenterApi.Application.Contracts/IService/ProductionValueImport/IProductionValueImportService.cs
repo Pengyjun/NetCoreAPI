@@ -26,6 +26,6 @@ namespace GHMonitoringCenterApi.Application.Contracts.IService.ProductionValueIm
         /// </summary>
         /// <returns></returns>
         Task<ResponseAjaxResult<bool>> ExcelJJtSendMessageWriteAsync();
-        Task<ResponseAjaxResult<List<ProductionDayReportHistoryResponseDto>>> ExcelJJtSendMessageAsync(ImportHistoryProductionValuesRequestDto importHistoryProductionValuesRequestDto);
+        Task<ResponseAjaxResult<List<ProductionDayReportHistoryResponseDto>>> ExcelJJtSendMessageAsync(int year,int month);
     }
 }

@@ -11,11 +11,11 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.ProductionValueImport
         /// <summary>
         /// 年
         /// </summary>
-        public int Year { get; set; }
+       // public int Year { get; set; }
         /// <summary>
         /// 月
         /// </summary>
-        public int Month { get; set; }
+       // public int Month { get; set; }
         /// <summary>
         /// 开始日期
         /// </summary>
@@ -28,19 +28,19 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.ProductionValueImport
         /// <summary>
         /// 日期转换
         /// </summary>
-        public void GetYearAndMonth()
-        {
-            if (TimeValue == DateTime.MinValue || string.IsNullOrWhiteSpace(TimeValue.ToString()))
-            {
-                Year = DateTime.Now.ToDateYear();
-                Month = DateTime.Now.ToDateMonth();
-            }
-            else
-            {
-                Year = TimeValue.Value.ToDateYear();
-                Month = TimeValue.Value.ToDateMonth();
-            }
-        }
+        //public void GetYearAndMonth()
+        //{
+        //    //if (TimeValue == DateTime.MinValue || string.IsNullOrWhiteSpace(TimeValue.ToString()))
+        //    //{
+        //    //    Year = DateTime.Now.ToDateYear();
+        //    //    Month = DateTime.Now.ToDateMonth();
+        //    //}
+        //    //else
+        //    //{
+        //    //    Year = TimeValue.Value.ToDateYear();
+        //    //    Month = TimeValue.Value.ToDateMonth();
+        //    //}
+        //}
         //public int GetStartDate()
         //{
         //    if (StartTime == DateTime.MinValue || string.IsNullOrWhiteSpace(StartTime.ToString()))

@@ -26,6 +26,7 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project.Report
 
     public class ProjectShiftProductionSumInfo
     {
+        public int DateDay { get; set; }
         /// <summary>
         /// 现场管理人员
         /// </summary>
@@ -61,10 +62,11 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project.Report
     }
 	public class ProjectShiftProductionInfo
     {
-		/// <summary>
-		/// 日报id
-		/// </summary>
-		public Guid? DayReportId { get; set; }
+        public int DateDay { get; set; }
+        /// <summary>
+        /// 日报id
+        /// </summary>
+        public Guid? DayReportId { get; set; }
         /// <summary>
         /// 公司ID
         /// </summary>
@@ -126,10 +128,11 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project.Report
 
     public class UnProjectShitInfo
     {
-		/// <summary>
-		/// 公司名称
-		/// </summary>
-		public string? CompanyName { get; set; }
+        public int DateDay { get; set; }
+        /// <summary>
+        /// 公司名称
+        /// </summary>
+        public string? CompanyName { get; set; }
 		/// <summary>
 		/// 项目名称
 		/// </summary>

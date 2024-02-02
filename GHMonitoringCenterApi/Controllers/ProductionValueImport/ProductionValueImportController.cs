@@ -93,17 +93,37 @@ namespace GHMonitoringCenterApi.Controllers.ProductionValueImport
         [HttpGet("ImportHistoryProduction")]
         public async Task<IActionResult> ImportHistoryProduction([FromQuery] ImportHistoryProductionValuesRequestDto importHistoryProductionValuesRequestDto)
         {
-            ResponseAjaxResult<bool> responseAjaxResult = new ResponseAjaxResult<bool>();
-
             #region 逻辑判断
+            int year = 2024, month = 1;
+            if (importHistoryProductionValuesRequestDto.TimeValue.HasValue == false)
+            {
+                //说明没有传  默认当前时间前一天
+                year = DateTime.Now.Year;
+                month = DateTime.Now.Month;
+            }
+            else {
+                var time = importHistoryProductionValuesRequestDto.TimeValue.Value;
+                year = time.Year;
+                month = time.Month;
+            }
 
             #endregion
-            var tempPath = "E:\\project\\HNKC.SZGHAPI\\GHMonitoringCenterApi.Domain.Shared\\Template\\Excel\\ProductionDayReport.xlsx";
-            //var tempPath = "D:\\projectconllection\\dotnet\\szgh\\GHMonitoringCenterApi.Domain.Shared\\Template\\Excel\\ProductionDayReport.xlsx";
-            //var tempPath = "Template/Excel/CompanyOnProjectTemplate.xlsx";
-            var baseProject = await _productionValueImportService.ExcelJJtSendMessageAsync(importHistoryProductionValuesRequestDto);
 
-            importHistoryProductionValuesRequestDto.GetYearAndMonth();
+            #region 模版路径
+            //var tempPath = "E:\\project\\HNKC.SZGHAPI\\GHMonitoringCenterApi.Domain.Shared\\Template\\Excel\\ProductionDayReport.xlsx";
+            var tempPath = "D:\\projectconllection\\dotnet\\szgh\\GHMonitoringCenterApi.Domain.Shared\\Template\\Excel\\ProductionDayReport.xlsx";
+            //var tempPath = "Template/Excel/CompanyOnProjectTemplate.xlsx";
+
+            //importHistoryProductionValuesRequestDto.GetYearAndMonth();
+            #endregion
+
+            #region 查询数据
+            var baseProject = await _productionValueImportService.ExcelJJtSendMessageAsync(year,month);
+            #endregion
+
+
+           
+
             var value = new 
             {
                 datesheet1 = importHistoryProductionValuesRequestDto.TimeValue.HasValue ? importHistoryProductionValuesRequestDto.TimeValue.Value.ToString("yyyy年MM月") : DateTime.Now.AddDays(-1).ToString("yyyy年MM月"),
@@ -121,7 +141,7 @@ namespace GHMonitoringCenterApi.Controllers.ProductionValueImport
                 //result11 = baseProject.Data[0].UnProjectShitInfo
 
             };
-            return await ExcelTemplateImportAsync(tempPath, value, $"{importHistoryProductionValuesRequestDto.Year}年广航局生产运营监控日报");
+            return await ExcelTemplateImportAsync(tempPath, value, $"{year}年广航局生产运营监控日报");
         }
 
     }

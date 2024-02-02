@@ -24,6 +24,20 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.ProductionValueImport
         public List<ProjectShiftProductionInfo> ProjectShiftProductionInfo { get; set; }
         public List<UnProjectShitInfo> UnProjectShitInfo { get; set; }
         public List<ExcelTitle> ExcelTitle { get; set; }
+
+
+        //public  CompanyProjectBasePoduction CompanyProjectBasePoduction { get; set; }
+        //public  CompanyBasePoductionValue CompanyBasePoductionValue { get; set; }
+        //public  CompanyShipBuildInfo CompanyShipBuildInfo { get; set; }
+        //public  CompanyShipProductionValueInfo CompanyShipProductionValueInfo { get; set; }
+        //public  SpecialProjectInfo SpecialProjectInfo { get; set; }
+        //public  CompanyWriteReportInfo CompanyWriteReportInfo { get; set; }
+        //public  CompanyUnWriteReportInfo CompanyUnWriteReportInfo { get; set; }
+        //public  CompanyShipUnWriteReportInfo CompanyShipUnWriteReportInfo { get; set; }
+        //public  ShipProductionValue ShipProductionValue { get; set; }
+        //public  ProjectShiftProductionInfo ProjectShiftProductionInfo { get; set; }
+        //public  UnProjectShitInfo UnProjectShitInfo { get; set; }
+        //public  ExcelTitle ExcelTitle { get; set; }
     }
 
 
@@ -34,6 +48,7 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.ProductionValueImport
     /// </summary>
     public class CompanyProjectBasePoduction
     {
+        public int DateDay { get; set; }
         /// <summary>
         /// 项目名称
         /// </summary>
@@ -81,6 +96,7 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.ProductionValueImport
     /// </summary>
     public class CompanyBasePoductionValue
     {
+        public int DateDay { get; set; }
         /// <summary>
         /// 项目名称
         /// </summary>
@@ -118,6 +134,7 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.ProductionValueImport
     /// </summary>
     public class CompanyProductionCompare
     {
+        public int DateDay { get; set; }
         /// <summary>
         /// 计划产值最大值  
         /// </summary>
@@ -168,6 +185,7 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.ProductionValueImport
     /// </summary>
     public class ProjectRank
     {
+        public int DateDay { get; set; }
         /// <summary>
         /// 项目名称
         /// </summary>
@@ -202,6 +220,7 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.ProductionValueImport
     /// </summary>
     public class ProjectIntensity
     {
+        public int DateDay { get; set; }
         /// <summary>
         /// 公司ID
         /// </summary>
@@ -237,6 +256,7 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.ProductionValueImport
     /// </summary>
     public class CompanyShipBuildInfo
     {
+        public int DateDay { get; set; }
         public string Name { get; set; }
         /// <summary>
         /// 每个公司船舶的数量
@@ -269,6 +289,7 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.ProductionValueImport
     /// </summary>
     public class CompanyShipProductionValueInfo
     {
+        public int DateDay { get; set; }
         public string Name { get; set; }
         /// <summary>
         /// 当日产值
@@ -299,6 +320,7 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.ProductionValueImport
     /// </summary>
     public class SpecialProjectInfo
     {
+        public int DateDay { get; set; }
         /// <summary>
         /// 项目Id
         /// </summary>
@@ -329,6 +351,7 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.ProductionValueImport
     /// </summary>
     public class CompanyWriteReportInfo
     {
+        public int DateDay { get; set; }
         /// <summary>
         /// 
         /// </summary>
@@ -365,6 +388,7 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.ProductionValueImport
     /// </summary>
     public class CompanyUnWriteReportInfo
     {
+        public int DateDay { get; set; }
         /// <summary>
         /// 公司名称
         /// </summary>
@@ -388,6 +412,7 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.ProductionValueImport
     /// </summary>
     public class CompanyShipUnWriteReportInfo
     {
+        public int DateDay { get; set; }
         /// <summary>
         /// 公司名称
         /// </summary>
@@ -410,7 +435,7 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.ProductionValueImport
     /// </summary>
     public class ShipProductionValue
     {
-
+        public int DateDay { get; set; }
         public Guid? ShipId { get; set; }
         public string ShipName { get; set; }
 
