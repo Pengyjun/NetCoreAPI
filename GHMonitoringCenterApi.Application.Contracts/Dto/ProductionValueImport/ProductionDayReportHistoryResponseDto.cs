@@ -315,6 +315,7 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.ProductionValueImport
         /// 类型  1异常预警 2 嘉奖通报
         /// </summary>
         public int Type { get; set; }
+        public string TypeDesc { get; set; }
         /// <summary>
         /// 描述
         /// </summary>
@@ -376,6 +377,8 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.ProductionValueImport
         /// 未填报次数
         /// </summary>
         public int Count { get; set; }
+
+        public string unCount { get; set; }
     }
     #endregion
 

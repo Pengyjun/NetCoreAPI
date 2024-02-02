@@ -668,7 +668,7 @@ namespace GHMonitoringCenterApi.Application.Service.ProductionValueImport
             ProductionDayReportHistoryResponseDto productionDayReportHistoryResponseDto = new ProductionDayReportHistoryResponseDto();
             importHistoryProductionValuesRequestDto.GetYearAndMonth();
             int year = importHistoryProductionValuesRequestDto.Year;
-            int month = importHistoryProductionValuesRequestDto.Month;
+            int month = importHistoryProductionValuesRequestDto.Month-1;
 
             #region 数据基础查询
             var baseProjectInfo = await _dbContext.Queryable<ExcelCompanyProjectBasePoduction>()
@@ -684,8 +684,7 @@ namespace GHMonitoringCenterApi.Application.Service.ProductionValueImport
                     RiskWorkCount = x.RiskWorkCount,
                     StopBuildProjectCount = x.StopBuildProjectCount,
                     WorkerCount = x.WorkerCount
-                })
-                .ToListAsync();
+                }).ToListAsync();
             var baseProjectProductionValue = await _dbContext.Queryable<ExcelCompanyBasePoductionValue>()
                 .Where(x => x.IsDelete == 1 && x.Year == year && x.Month == month)
                 .Select(x => new model.CompanyBasePoductionValue()
@@ -738,9 +737,20 @@ namespace GHMonitoringCenterApi.Application.Service.ProductionValueImport
                 {
                     SourceMatter = x.SourceMatter,
                     Type = x.Type,
+                    TypeDesc = x.Type == 1 ? "1异常预警" : x.Type == 2 ? "嘉奖通报" : "提醒事项",
                     Description = x.Description
-                })
-                .ToListAsync();
+                }).ToListAsync();
+               if (baseSpecialProjectInfo == null|| baseSpecialProjectInfo.Count==0)
+                {
+                    baseSpecialProjectInfo.Add(new SpecialProjectInfo()
+                    {
+                        SourceMatter = "无",
+                        Type = 1,
+                        Name = "111",
+                        Description = "无"
+                    });
+                }
+               
             var baseCompanyWriteReportInfo = await _dbContext.Queryable<ExcelCompanyWriteReportInfo>()
                 .Where(x => x.IsDelete == 1 && x.Year == year && x.Month == month)
                 .Select(x => new model.CompanyWriteReportInfo()
@@ -758,9 +768,20 @@ namespace GHMonitoringCenterApi.Application.Service.ProductionValueImport
                 {
                     Name = x.UnitName,
                     Count = x.Count,
-                    ProjectName = x.ProjectName
+                    ProjectName = x.ProjectName,
                 })
                 .ToListAsync();
+
+            foreach (var item in baseCompanyUnWriteReportInfo) {
+
+                string xingxing = string.Empty;
+                for (var i = 1; i <= item.Count; i++) {
+
+                    xingxing += "★";
+                }
+                item.unCount = xingxing;
+            }
+
             var baseCompanyShipUnWriteReportInfo = await _dbContext.Queryable<ExcelCompanyShipUnWriteReportInfo>()
                 .Where(x => x.IsDelete == 1 && x.Year == year && x.Month == month)
                 .Select(x => new model.CompanyShipUnWriteReportInfo()

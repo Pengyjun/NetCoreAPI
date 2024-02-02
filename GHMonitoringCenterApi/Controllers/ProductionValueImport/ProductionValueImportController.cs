@@ -98,7 +98,7 @@ namespace GHMonitoringCenterApi.Controllers.ProductionValueImport
             #region 逻辑判断
 
             #endregion
-            var tempPath = "E:\\project\\HNKC.SZGHAPI\\GHMonitoringCenterApi.Domain.Shared\\Template\\Excel\\ProductionDayReport.xlsx";
+            var tempPath = "D:\\projectconllection\\dotnet\\szgh\\GHMonitoringCenterApi.Domain.Shared\\Template\\Excel\\ProductionDayReport.xlsx";
             //var tempPath = "Template/Excel/CompanyOnProjectTemplate.xlsx";
             var baseProject = await _productionValueImportService.ExcelJJtSendMessageAsync(importHistoryProductionValuesRequestDto);
 
@@ -106,18 +106,19 @@ namespace GHMonitoringCenterApi.Controllers.ProductionValueImport
             var value = new
             {
                 datesheet1 = importHistoryProductionValuesRequestDto.TimeValue.HasValue ? importHistoryProductionValuesRequestDto.TimeValue.Value.ToString("yyyy年MM月") : DateTime.Now.AddDays(-1).ToString("yyyy年MM月"),
-                days1heet1 = importHistoryProductionValuesRequestDto.TimeValue.HasValue ? importHistoryProductionValuesRequestDto.TimeValue.Value.ToString("yyyy年MM月dd日") : DateTime.Now.AddDays(-1).ToString("yyyy年MM月dd日"),
+                //days1heet1 = importHistoryProductionValuesRequestDto.TimeValue.HasValue ? importHistoryProductionValuesRequestDto.TimeValue.Value.ToString("yyyy年MM月dd日") : DateTime.Now.AddDays(-1).ToString("yyyy年MM月dd日"),
                 result1 = baseProject.Data[0].CompanyProjectBasePoduction,
                 result2 = baseProject.Data[0].CompanyBasePoductionValue,
                 result3 = baseProject.Data[0].CompanyShipBuildInfo,
                 result4 = baseProject.Data[0].CompanyShipProductionValueInfo,
-                result5 = baseProject.Data[0].SpecialProjectInfo,
-                result6 = baseProject.Data[0].CompanyWriteReportInfo,
-                result7 = baseProject.Data[0].CompanyUnWriteReportInfo,
-                result8 = baseProject.Data[0].CompanyShipUnWriteReportInfo,
-                result9 = baseProject.Data[0].ShipProductionValue,
-                result10 = baseProject.Data[0].ProjectShiftProductionInfo,
-                result11 = baseProject.Data[0].UnProjectShitInfo
+                result5 = baseProject.Data[0].ShipProductionValue,
+                result6 = baseProject.Data[0].SpecialProjectInfo,
+                result7 = baseProject.Data[0].CompanyWriteReportInfo,
+                result8 = baseProject.Data[0].CompanyUnWriteReportInfo,
+                result9 = baseProject.Data[0].CompanyShipUnWriteReportInfo,
+
+                //result10 = baseProject.Data[0].ProjectShiftProductionInfo,
+                //result11 = baseProject.Data[0].UnProjectShitInfo
 
             };
             return await ExcelTemplateImportAsync(tempPath, value, $"{importHistoryProductionValuesRequestDto.Year}年广航局生产运营监控日报");
