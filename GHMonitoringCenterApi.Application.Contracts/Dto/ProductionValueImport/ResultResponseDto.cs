@@ -1,4 +1,10 @@
 ﻿using GHMonitoringCenterApi.Application.Contracts.Dto.Project.Report;
+using GHMonitoringCenterApi.Domain.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace GHMonitoringCenterApi.Application.Contracts.Dto.ProductionValueImport
 {
