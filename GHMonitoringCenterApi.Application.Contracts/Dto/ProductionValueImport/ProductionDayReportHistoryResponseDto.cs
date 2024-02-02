@@ -320,6 +320,7 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.ProductionValueImport
     /// </summary>
     public class SpecialProjectInfo
     {
+        public int No { get; set; }
         public int DateDay { get; set; }
         /// <summary>
         /// 项目Id
@@ -388,6 +389,7 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.ProductionValueImport
     /// </summary>
     public class CompanyUnWriteReportInfo
     {
+        public int No { get; set; }
         public int DateDay { get; set; }
         /// <summary>
         /// 公司名称
@@ -412,6 +414,7 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.ProductionValueImport
     /// </summary>
     public class CompanyShipUnWriteReportInfo
     {
+        public int No { get; set; }
         public int DateDay { get; set; }
         /// <summary>
         /// 公司名称

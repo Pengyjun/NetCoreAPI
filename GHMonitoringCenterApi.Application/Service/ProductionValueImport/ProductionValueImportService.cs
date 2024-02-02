@@ -7,7 +7,6 @@ using GHMonitoringCenterApi.Application.Contracts.IService.Project;
 using GHMonitoringCenterApi.Domain.Models;
 using GHMonitoringCenterApi.Domain.Shared;
 using GHMonitoringCenterApi.Domain.Shared.Util;
-using SixLabors.ImageSharp.Processing;
 using SqlSugar;
 using SqlSugar.Extensions;
 using UtilsSharp;
@@ -676,18 +675,19 @@ namespace GHMonitoringCenterApi.Application.Service.ProductionValueImport
             List<ProductionDayReportHistoryResponseDto> productionDayReportHistoryResponseDtos = new List<ProductionDayReportHistoryResponseDto>();
             #region 时间判断
             //周期开始时间
-            var startIime =string.Empty; 
+            var startIime = string.Empty;
             var endIime = string.Empty;
             var monthFormat = string.Empty;
             if (month == 1)
             {
-                startIime = (year-1)+"1226";
-                endIime = year+(monthFormat + "25");
+                startIime = (year - 1) + "1226";
+                endIime = year + (monthFormat + "25");
             }
-            else {
-                monthFormat=(month).ToString().Length == 1 ? "0" + (month - 1) : (month - 1).ToString();
-                startIime = (year)+monthFormat + "26";
-                endIime = year + ((month.ToString().Length==1?"0" + month:month) + "25");
+            else
+            {
+                monthFormat = (month).ToString().Length == 1 ? "0" + (month - 1) : (month - 1).ToString();
+                startIime = (year) + monthFormat + "26";
+                endIime = year + ((month.ToString().Length == 1 ? "0" + month : month) + "25");
             }
             var formatAlfterStartTime = int.Parse(startIime);
             var formatAlfterEndTime = int.Parse(endIime);
@@ -708,7 +708,7 @@ namespace GHMonitoringCenterApi.Application.Service.ProductionValueImport
 
             #region 数据基础查询
             var baseProjectInfo = await _dbContext.Queryable<ExcelCompanyProjectBasePoduction>()
-                .Where(x => x.IsDelete == 1&&x.DateDay>= formatAlfterStartTime && x.DateDay<= formatAlfterEndTime)
+                .Where(x => x.IsDelete == 1 && x.DateDay >= formatAlfterStartTime && x.DateDay <= formatAlfterEndTime)
                 .Select(x => new model.CompanyProjectBasePoduction()
                 {
                     Name = x.UnitName,
@@ -720,8 +720,8 @@ namespace GHMonitoringCenterApi.Application.Service.ProductionValueImport
                     RiskWorkCount = x.RiskWorkCount,
                     StopBuildProjectCount = x.StopBuildProjectCount,
                     WorkerCount = x.WorkerCount,
-                    DateDay=x.DateDay
-                }).OrderBy(x=>x.DateDay).ToListAsync();
+                    DateDay = x.DateDay
+                }).OrderBy(x => x.DateDay).ToListAsync();
             var baseProjectProductionValue = await _dbContext.Queryable<ExcelCompanyBasePoductionValue>()
                 .Where(x => x.IsDelete == 1 && x.DateDay >= formatAlfterStartTime && x.DateDay <= formatAlfterEndTime)
                 .Select(x => new model.CompanyBasePoductionValue()
@@ -761,7 +761,7 @@ namespace GHMonitoringCenterApi.Application.Service.ProductionValueImport
                 })
                 .OrderBy(x => x.DateDay).ToListAsync();
             var baseShipProductionValue = await _dbContext.Queryable<ExcelShipProductionValue>()
-                .Where(x => x.IsDelete == 1 &&x.DateDay>= formatAlfterStartTime && x.DateDay<= formatAlfterEndTime)
+                .Where(x => x.IsDelete == 1 && x.DateDay >= formatAlfterStartTime && x.DateDay <= formatAlfterEndTime)
                 .Select(x => new model.ShipProductionValue()
                 {
                     ShipName = x.ShipName,
@@ -773,7 +773,7 @@ namespace GHMonitoringCenterApi.Application.Service.ProductionValueImport
                 .OrderBy(x => x.DateDay).ToListAsync();
 
             var baseSpecialProjectInfo = await _dbContext.Queryable<ExcelSpecialProjectInfo>()
-                .Where(x => x.IsDelete == 1 &&x.DateDay>= formatAlfterStartTime && x.DateDay<= formatAlfterEndTime)
+                .Where(x => x.IsDelete == 1 && x.DateDay >= formatAlfterStartTime && x.DateDay <= formatAlfterEndTime)
                 .Select(x => new model.SpecialProjectInfo()
                 {
                     SourceMatter = x.SourceMatter,
@@ -795,7 +795,7 @@ namespace GHMonitoringCenterApi.Application.Service.ProductionValueImport
             //}
 
             var baseCompanyWriteReportInfo = await _dbContext.Queryable<ExcelCompanyWriteReportInfo>()
-                .Where(x => x.IsDelete == 1 &&x.DateDay>= formatAlfterStartTime && x.DateDay<= formatAlfterEndTime)
+                .Where(x => x.IsDelete == 1 && x.DateDay >= formatAlfterStartTime && x.DateDay <= formatAlfterEndTime)
                 .Select(x => new model.CompanyWriteReportInfo()
                 {
                     Name = x.CompanyName,
@@ -807,7 +807,7 @@ namespace GHMonitoringCenterApi.Application.Service.ProductionValueImport
                 })
                 .OrderBy(x => x.DateDay).ToListAsync();
             var baseCompanyUnWriteReportInfo = await _dbContext.Queryable<ExcelCompanyUnWriteReportInfo>()
-                .Where(x => x.IsDelete == 1 &&x.DateDay>= formatAlfterStartTime && x.DateDay<= formatAlfterEndTime)
+                .Where(x => x.IsDelete == 1 && x.DateDay >= formatAlfterStartTime && x.DateDay <= formatAlfterEndTime)
                 .Select(x => new model.CompanyUnWriteReportInfo()
                 {
                     Name = x.UnitName,
@@ -830,7 +830,7 @@ namespace GHMonitoringCenterApi.Application.Service.ProductionValueImport
             }
 
             var baseCompanyShipUnWriteReportInfo = await _dbContext.Queryable<ExcelCompanyShipUnWriteReportInfo>()
-                .Where(x => x.IsDelete == 1 &&x.DateDay>= formatAlfterStartTime && x.DateDay<= formatAlfterEndTime)
+                .Where(x => x.IsDelete == 1 && x.DateDay >= formatAlfterStartTime && x.DateDay <= formatAlfterEndTime)
                 .Select(x => new model.CompanyShipUnWriteReportInfo()
                 {
                     Name = x.ShipName,
@@ -840,7 +840,7 @@ namespace GHMonitoringCenterApi.Application.Service.ProductionValueImport
                 })
                 .OrderBy(x => x.DateDay).ToListAsync();
             var baseProjectShiftProductionInfo = await _dbContext.Queryable<ExcelProjectShiftProductionInfo>()
-             .Where(x => x.IsDelete == 1 &&x.DateDay>= formatAlfterStartTime && x.DateDay<= formatAlfterEndTime)
+             .Where(x => x.IsDelete == 1 && x.DateDay >= formatAlfterStartTime && x.DateDay <= formatAlfterEndTime)
              .Select(x => new ProjectShiftProductionInfo()
              {
                  ProjectName = x.ProjectName,
@@ -859,7 +859,7 @@ namespace GHMonitoringCenterApi.Application.Service.ProductionValueImport
              })
              .OrderBy(x => x.DateDay).ToListAsync();
             var baseUnProjectShitInfo = await _dbContext.Queryable<ExcelUnProjectShitInfo>()
-                .Where(x => x.IsDelete == 1 &&x.DateDay>= formatAlfterStartTime && x.DateDay<= formatAlfterEndTime)
+                .Where(x => x.IsDelete == 1 && x.DateDay >= formatAlfterStartTime && x.DateDay <= formatAlfterEndTime)
                 .Select(x => new UnProjectShitInfo()
                 {
                     CompanyName = x.UnitName,
@@ -868,7 +868,7 @@ namespace GHMonitoringCenterApi.Application.Service.ProductionValueImport
                 })
                 .OrderBy(x => x.DateDay).ToListAsync();
             var baseExcelTitle = await _dbContext.Queryable<ExcelTitle>()
-                .Where(x => x.IsDelete == 1 &&x.DateDay>= formatAlfterStartTime && x.DateDay<= formatAlfterEndTime)
+                .Where(x => x.IsDelete == 1 && x.DateDay >= formatAlfterStartTime && x.DateDay <= formatAlfterEndTime)
                .OrderBy(x => x.DateDay).ToListAsync();
             #endregion
 
@@ -899,8 +899,8 @@ namespace GHMonitoringCenterApi.Application.Service.ProductionValueImport
             for (int i = 1; i <= dayByMonth.Count; i++)
             {
                 ProductionDayReportHistoryResponseDto productionDayReportHistoryResponseDto = new ProductionDayReportHistoryResponseDto();
-                var currentDay = dayByMonth[i-1].ObjToDate().ToDateDay();
-                productionDayReportHistoryResponseDto.CompanyProjectBasePoduction = baseProjectInfo.Where(x=>x.DateDay== currentDay).ToList();
+                var currentDay = dayByMonth[i - 1].ObjToDate().ToDateDay();
+                productionDayReportHistoryResponseDto.CompanyProjectBasePoduction = baseProjectInfo.Where(x => x.DateDay == currentDay).ToList();
                 productionDayReportHistoryResponseDto.CompanyBasePoductionValue = baseProjectProductionValue.Where(x => x.DateDay == currentDay).ToList();
                 productionDayReportHistoryResponseDto.CompanyShipBuildInfo = baseCompanyShipBuildInfo.Where(x => x.DateDay == currentDay).ToList();
                 productionDayReportHistoryResponseDto.CompanyShipProductionValueInfo = baseCompanyShipProductionValueInfo.Where(x => x.DateDay == currentDay).ToList();
@@ -911,10 +911,30 @@ namespace GHMonitoringCenterApi.Application.Service.ProductionValueImport
                 productionDayReportHistoryResponseDto.ShipProductionValue = baseShipProductionValue.Where(x => x.DateDay == currentDay).ToList();
                 productionDayReportHistoryResponseDto.ProjectShiftProductionInfo = baseProjectShiftProductionInfo.Where(x => x.DateDay == currentDay).ToList();
                 productionDayReportHistoryResponseDto.UnProjectShitInfo = baseUnProjectShitInfo.Where(x => x.DateDay == currentDay).ToList();
+
+                int no = 1;
+                //添加序号
+                foreach (var item in productionDayReportHistoryResponseDto.CompanyUnWriteReportInfo)
+                {
+                    item.No = no;
+                    no++;
+                }
+                no = 1;
+                foreach (var item in productionDayReportHistoryResponseDto.CompanyShipUnWriteReportInfo)
+                {
+                    item.No = no;
+                    no++;
+                }
+                no = 1;
+                foreach (var item in productionDayReportHistoryResponseDto.SpecialProjectInfo)
+                {
+                    item.No = no;
+                    no++;
+                }
                 productionDayReportHistoryResponseDto.ExcelTitle = baseExcelTitle.Where(x => x.DateDay == currentDay).ToList();
                 productionDayReportHistoryResponseDtos.Add(productionDayReportHistoryResponseDto);
             }
-           
+
             responseAjaxResult.Data = productionDayReportHistoryResponseDtos;
             responseAjaxResult.Success();
             return responseAjaxResult;
