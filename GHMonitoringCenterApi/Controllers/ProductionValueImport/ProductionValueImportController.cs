@@ -112,9 +112,9 @@ namespace GHMonitoringCenterApi.Controllers.ProductionValueImport
             #endregion
 
             #region 模版路径
-            var tempPath = "E:\\project\\HNKC.SZGHAPI\\GHMonitoringCenterApi.Domain.Shared\\Template\\Excel\\ProductionDayReport.xlsx";
+            //var tempPath = "E:\\project\\HNKC.SZGHAPI\\GHMonitoringCenterApi.Domain.Shared\\Template\\Excel\\ProductionDayReport.xlsx";
             //var tempPath = "D:\\projectconllection\\dotnet\\szgh\\GHMonitoringCenterApi.Domain.Shared\\Template\\Excel\\ProductionDayReport.xlsx";
-            //var tempPath = "Template/Excel/CompanyOnProjectTemplate.xlsx";
+            var tempPath = "Template/Excel/CompanyOnProjectTemplate.xlsx";
 
             //importHistoryProductionValuesRequestDto.GetYearAndMonth();
             #endregion
