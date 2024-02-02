@@ -1,15 +1,13 @@
 ﻿using GHMonitoringCenterApi.Application.Contracts.Dto.Project.Report;
-using GHMonitoringCenterApi.Domain.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace GHMonitoringCenterApi.Application.Contracts.Dto.ProductionValueImport
 {
     public class ResultResponseDto
     {
+        public string titileProjectShiftProductionInfo {  get; set; }
+        public string titileUnProjectShitInfo {  get; set; }
+        public string date {  get; set; }
+
         public string titleone1 { get; set; }
         public string titleone2 { get; set; }
         public string titleone3 { get; set; }

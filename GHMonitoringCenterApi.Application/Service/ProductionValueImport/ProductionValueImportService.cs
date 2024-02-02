@@ -581,7 +581,7 @@ namespace GHMonitoringCenterApi.Application.Service.ProductionValueImport
                 await _dbContext.Insertable(result).ExecuteCommandAsync();
 
                 //titile写入
-                string titleEleven = "注：陆域3～9人作业工点要求项目领导带班旁站，陆域10人及以上作业工点要求所属三级单位领导带班驻点；以下为未填报项目清单：" + result.Count() + "个。";
+                string titleEleven = "以下为未填报项目清单："; //+ result.Count() + "个。";
                 excelTitles.Add(new ExcelTitle()
                 {
                     CreateTime = DateTime.Now,
@@ -782,18 +782,6 @@ namespace GHMonitoringCenterApi.Application.Service.ProductionValueImport
                     Description = x.Description,
                     DateDay = x.DateDay
                 }).OrderBy(x => x.DateDay).ToListAsync();
-            //if (baseSpecialProjectInfo == null || baseSpecialProjectInfo.Count == 0)
-            //{
-            //    baseSpecialProjectInfo.Add(new SpecialProjectInfo()
-            //    {
-            //        SourceMatter = "无",
-            //        Type = 1,
-            //        TypeDesc = "无",
-            //        Name = "111",
-            //        Description = "无"
-            //    });
-            //}
-
             var baseCompanyWriteReportInfo = await _dbContext.Queryable<ExcelCompanyWriteReportInfo>()
                 .Where(x => x.IsDelete == 1 && x.DateDay >= formatAlfterStartTime && x.DateDay <= formatAlfterEndTime)
                 .Select(x => new model.CompanyWriteReportInfo()
@@ -909,8 +897,6 @@ namespace GHMonitoringCenterApi.Application.Service.ProductionValueImport
                 productionDayReportHistoryResponseDto.CompanyUnWriteReportInfo = baseCompanyUnWriteReportInfo.Where(x => x.DateDay == currentDay).ToList();
                 productionDayReportHistoryResponseDto.CompanyShipUnWriteReportInfo = baseCompanyShipUnWriteReportInfo.Where(x => x.DateDay == currentDay).ToList();
                 productionDayReportHistoryResponseDto.ShipProductionValue = baseShipProductionValue.Where(x => x.DateDay == currentDay).ToList();
-                productionDayReportHistoryResponseDto.ProjectShiftProductionInfo = baseProjectShiftProductionInfo.Where(x => x.DateDay == currentDay).ToList();
-                productionDayReportHistoryResponseDto.UnProjectShitInfo = baseUnProjectShitInfo.Where(x => x.DateDay == currentDay).ToList();
 
                 int no = 1;
                 //添加序号
@@ -931,10 +917,123 @@ namespace GHMonitoringCenterApi.Application.Service.ProductionValueImport
                     item.No = no;
                     no++;
                 }
+                no = 1;
+                foreach (var item in productionDayReportHistoryResponseDto.ProjectShiftProductionInfo)
+                {
+                    item.No = no;
+                    no++;
+                }
+                no = 1;
+                foreach (var item in productionDayReportHistoryResponseDto.UnProjectShitInfo)
+                {
+                    item.No = no;
+                    no++;
+                }
+
                 productionDayReportHistoryResponseDto.ExcelTitle = baseExcelTitle.Where(x => x.DateDay == currentDay).ToList();
                 productionDayReportHistoryResponseDtos.Add(productionDayReportHistoryResponseDto);
             }
 
+            responseAjaxResult.Data = productionDayReportHistoryResponseDtos;
+            responseAjaxResult.Success();
+            return responseAjaxResult;
+        }
+        /// <summary>
+        /// 节假日数据查询
+        /// </summary>
+        /// <param name="year"></param>
+        /// <param name="month"></param>
+        /// <returns></returns>
+
+        public async Task<ResponseAjaxResult<ProductionDayReportHistoryResponseDto>> ExcelJJtSendMessageHolidaysAsync(int year, int month)
+        {
+            ResponseAjaxResult<ProductionDayReportHistoryResponseDto> responseAjaxResult = new ResponseAjaxResult<ProductionDayReportHistoryResponseDto>();
+
+            ProductionDayReportHistoryResponseDto productionDayReportHistoryResponseDtos = new ProductionDayReportHistoryResponseDto();
+            #region 时间判断
+            //周期开始时间
+            var startIime = string.Empty;
+            var endIime = string.Empty;
+            var monthFormat = string.Empty;
+            if (month == 1)
+            {
+                startIime = (year - 1) + "1226";
+                endIime = year + (monthFormat + "25");
+            }
+            else
+            {
+                monthFormat = (month).ToString().Length == 1 ? "0" + (month - 1) : (month - 1).ToString();
+                startIime = (year) + monthFormat + "26";
+                endIime = year + ((month.ToString().Length == 1 ? "0" + month : month) + "25");
+            }
+            var formatAlfterStartTime = int.Parse(startIime);
+            var formatAlfterEndTime = int.Parse(endIime);
+            //当前月一共多少天
+            var startTime = string.Empty;
+            if (DateTime.Now.Day >= 27)
+            {
+                startTime = DateTime.Now.ToString("yyyy-MM-26 00:00:00");
+            }
+            else
+            {
+                startTime = DateTime.Now.AddMonths(-1).ToString("yyyy-MM-26 00:00:00");
+            }
+            var endTime = Convert.ToDateTime(startTime).AddMonths(1).ToString("yyyy-MM-25 23:59:59");
+            //这个范围多少天（非自然月）
+            int days = TimeHelper.GetTimeSpan(Convert.ToDateTime(startTime), Convert.ToDateTime(endTime)).Days + 1;
+            #endregion
+
+            #region 数据查询
+            var baseProjectShiftProductionInfo = await _dbContext.Queryable<ExcelProjectShiftProductionInfo>()
+             .Where(x => x.IsDelete == 1 && x.DateDay >= formatAlfterStartTime && x.DateDay <= formatAlfterEndTime)
+             .Select(x => new ProjectShiftProductionInfo()
+             {
+                 ProjectName = x.ProjectName,
+                 ConstructionDeviceNum = x.ConstructionDeviceNum,
+                 FewLandWorkplace = x.FewLandWorkplace,
+                 HazardousConstructionDescription = x.HazardousConstructionDescription,
+                 HazardousConstructionNum = x.HazardousConstructionNum.Value,
+                 LandWorkplace = x.LandWorkplace,
+                 OnShipPersonNum = x.OnShipPersonNum,
+                 ShiftLeader = x.ShiftLeader,
+                 ShiftPhone = x.ShiftPhone,
+                 SiteConstructionPersonNum = x.SiteConstructionPersonNum,
+                 SiteManagementPersonNum = x.SiteManagementPersonNum,
+                 SiteShipNum = x.SiteShipNum,
+                 DateDay = x.DateDay
+             })
+             .OrderByDescending(x => x.DateDay).ToListAsync();
+            var baseUnProjectShitInfo = await _dbContext.Queryable<ExcelUnProjectShitInfo>()
+                .Where(x => x.IsDelete == 1 && x.DateDay >= formatAlfterStartTime && x.DateDay <= formatAlfterEndTime)
+                .Select(x => new UnProjectShitInfo()
+                {
+                    CompanyName = x.UnitName,
+                    ProjectName = x.ProjectName,
+                    DateDay = x.DateDay
+                })
+                .OrderByDescending(x => x.DateDay).ToListAsync();
+            var baseExcelTitle = await _dbContext.Queryable<ExcelTitle>()
+                .Where(x => x.IsDelete == 1 && x.DateDay >= formatAlfterStartTime && x.DateDay <= formatAlfterEndTime)
+                .ToListAsync();
+            #endregion
+            int no = 1;
+            foreach (var item in baseProjectShiftProductionInfo)
+            {
+                item.DateNow = DateTime.ParseExact(item.DateDay.ToString(), "yyyyMMdd", System.Globalization.CultureInfo.InvariantCulture).ToString("yyyy年MM月dd日");
+                item.No = no;
+                no++;
+            }
+            no = 1;
+            foreach (var item in baseUnProjectShitInfo)
+            {
+                item.DateNow = DateTime.ParseExact(item.DateDay.ToString(), "yyyyMMdd", System.Globalization.CultureInfo.InvariantCulture).ToString("yyyy年MM月dd日");
+                item.No = no;
+                no++;
+            }
+
+            productionDayReportHistoryResponseDtos.ProjectShiftProductionInfo = baseProjectShiftProductionInfo;
+            productionDayReportHistoryResponseDtos.UnProjectShitInfo = baseUnProjectShitInfo;
+            productionDayReportHistoryResponseDtos.ExcelTitle = baseExcelTitle;
             responseAjaxResult.Data = productionDayReportHistoryResponseDtos;
             responseAjaxResult.Success();
             return responseAjaxResult;

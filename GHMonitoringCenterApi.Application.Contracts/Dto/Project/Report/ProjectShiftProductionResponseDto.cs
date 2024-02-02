@@ -62,7 +62,9 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project.Report
     }
 	public class ProjectShiftProductionInfo
     {
+        public int No {  get; set; }
         public int DateDay { get; set; }
+        public string DateNow { get; set; }
         /// <summary>
         /// 日报id
         /// </summary>
@@ -128,7 +130,9 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project.Report
 
     public class UnProjectShitInfo
     {
+        public int No { get; set; }
         public int DateDay { get; set; }
+        public string DateNow { get; set; }
         /// <summary>
         /// 公司名称
         /// </summary>

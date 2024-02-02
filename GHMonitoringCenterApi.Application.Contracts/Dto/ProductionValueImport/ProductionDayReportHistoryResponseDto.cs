@@ -1,7 +1,6 @@
 ﻿using GHMonitoringCenterApi.Application.Contracts.Dto.Project.Report;
 using GHMonitoringCenterApi.Domain.Models;
 using System.Text.Json.Serialization;
-using System.Threading.Tasks;
 
 namespace GHMonitoringCenterApi.Application.Contracts.Dto.ProductionValueImport
 {

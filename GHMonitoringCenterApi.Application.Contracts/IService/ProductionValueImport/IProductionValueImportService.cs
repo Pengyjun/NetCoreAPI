@@ -26,6 +26,20 @@ namespace GHMonitoringCenterApi.Application.Contracts.IService.ProductionValueIm
         /// </summary>
         /// <returns></returns>
         Task<ResponseAjaxResult<bool>> ExcelJJtSendMessageWriteAsync();
+        /// <summary>
+        /// 生产监控日报
+        /// </summary>
+        /// <param name="year"></param>
+        /// <param name="month"></param>
+        /// <returns></returns>
         Task<ResponseAjaxResult<List<ProductionDayReportHistoryResponseDto>>> ExcelJJtSendMessageAsync(int year,int month);
+        /// <summary>
+        /// 节假日数据
+        /// </summary>
+        /// <param name="year"></param>
+        /// <param name="month"></param>
+        /// <returns></returns>
+
+        Task<ResponseAjaxResult<ProductionDayReportHistoryResponseDto>> ExcelJJtSendMessageHolidaysAsync(int year, int month);
     }
 }

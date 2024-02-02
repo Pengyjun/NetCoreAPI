@@ -1,5 +1,6 @@
 ﻿using GHMonitoringCenterApi.Application.Contracts.Dto.ProductionValueImport;
 using GHMonitoringCenterApi.Application.Contracts.Dto.Project;
+using GHMonitoringCenterApi.Application.Contracts.Dto.Project.Report;
 using GHMonitoringCenterApi.Application.Contracts.IService.ProductionValueImport;
 using GHMonitoringCenterApi.Domain.Shared;
 using Microsoft.AspNetCore.Mvc;
@@ -87,7 +88,7 @@ namespace GHMonitoringCenterApi.Controllers.ProductionValueImport
             return _productionValueImportService.ExcelJJtSendMessageWriteAsync();
         }
         /// <summary>
-        /// 测试
+        /// 导出广航局监控日报历史数据
         /// </summary>
         /// <param name="importHistoryProductionValuesRequestDto"></param>
         /// <returns></returns>
@@ -114,9 +115,8 @@ namespace GHMonitoringCenterApi.Controllers.ProductionValueImport
             #region 模版路径
             //var tempPath = "E:\\project\\HNKC.SZGHAPI\\GHMonitoringCenterApi.Domain.Shared\\Template\\Excel\\ProductionDayReport.xlsx";
             //var tempPath = "D:\\projectconllection\\dotnet\\szgh\\GHMonitoringCenterApi.Domain.Shared\\Template\\Excel\\ProductionDayReport.xlsx";
-            var tempPath = "Template/Excel/CompanyOnProjectTemplate.xlsx";
+            var tempPath = "Template/Excel/ProductionDayReport.xlsx";
 
-            //importHistoryProductionValuesRequestDto.GetYearAndMonth();
             #endregion
 
             #region 查询数据
@@ -801,6 +801,52 @@ namespace GHMonitoringCenterApi.Controllers.ProductionValueImport
             };
             return await ExcelTemplateImportAsync(tempPath, value, $"{year}年广航局生产运营监控日报");
         }
+        /// <summary>
+        /// 导出节假日数据
+        /// </summary>
+        /// <param name="importHistoryProductionValuesRequestDto"></param>
+        /// <returns></returns>
+        [HttpGet("ImportHistoryHolidays")]
+        public async Task<IActionResult> ImportHistoryHolidays([FromQuery] ImportHistoryProductionValuesRequestDto importHistoryProductionValuesRequestDto)
+        {
+            #region 逻辑判断
+            int year = 2024, month = 1;
+            if (importHistoryProductionValuesRequestDto.TimeValue.HasValue == false)
+            {
+                //说明没有传  默认当前时间前一天
+                year = DateTime.Now.Year;
+                month = DateTime.Now.Month;
+            }
+            else
+            {
+                var time = importHistoryProductionValuesRequestDto.TimeValue.Value;
+                year = time.Year;
+                month = time.Month;
+            }
+            #endregion
+            #region 模版路径
+            var tempPath = "E:\\project\\HNKC.SZGHAPI\\GHMonitoringCenterApi.Domain.Shared\\Template\\Excel\\HistoryHolidayReport.xlsx";
+            //var tempPath = "Template/Excel/HistoryHolidayReport.xlsx";
 
+            #endregion
+
+
+            #region 查询数据
+
+            var baseProject = await _productionValueImportService.ExcelJJtSendMessageHolidaysAsync(year, month);
+            #endregion
+
+            var value = new ResultResponseDto
+            {
+                titileProjectShiftProductionInfo = baseProject.Data.ExcelTitle.Where(x => x.Type == 10).FirstOrDefault()?.TtileContent,
+                titileUnProjectShitInfo = baseProject.Data.ExcelTitle.Where(x => x.Type == 11).FirstOrDefault()?.TtileContent + baseProject.Data.UnProjectShitInfo.Count() + "个。",
+                ProjectShiftProductionInfo = baseProject.Data.ProjectShiftProductionInfo,
+                UnProjectShitInfo = baseProject.Data.UnProjectShitInfo,
+                date = $"{year}年{month}月"
+            };
+
+            return await ExcelTemplateImportAsync(tempPath, value, $"{year}年{month}月在建项目带班生产动态");
+
+        }
     }
 }
