@@ -668,7 +668,7 @@ namespace GHMonitoringCenterApi.Application.Service.ProductionValueImport
             ProductionDayReportHistoryResponseDto productionDayReportHistoryResponseDto = new ProductionDayReportHistoryResponseDto();
             importHistoryProductionValuesRequestDto.GetYearAndMonth();
             int year = importHistoryProductionValuesRequestDto.Year;
-            int month = importHistoryProductionValuesRequestDto.Month-1;
+            int month = importHistoryProductionValuesRequestDto.Month - 1;
 
             #region 数据基础查询
             var baseProjectInfo = await _dbContext.Queryable<ExcelCompanyProjectBasePoduction>()
@@ -740,17 +740,18 @@ namespace GHMonitoringCenterApi.Application.Service.ProductionValueImport
                     TypeDesc = x.Type == 1 ? "1异常预警" : x.Type == 2 ? "嘉奖通报" : "提醒事项",
                     Description = x.Description
                 }).ToListAsync();
-               if (baseSpecialProjectInfo == null|| baseSpecialProjectInfo.Count==0)
-                {
-                    baseSpecialProjectInfo.Add(new SpecialProjectInfo()
-                    {
-                        SourceMatter = "无",
-                        Type = 1,
-                        Name = "111",
-                        Description = "无"
-                    });
-                }
-               
+            //if (baseSpecialProjectInfo == null || baseSpecialProjectInfo.Count == 0)
+            //{
+            //    baseSpecialProjectInfo.Add(new SpecialProjectInfo()
+            //    {
+            //        SourceMatter = "无",
+            //        Type = 1,
+            //        TypeDesc = "无",
+            //        Name = "111",
+            //        Description = "无"
+            //    });
+            //}
+
             var baseCompanyWriteReportInfo = await _dbContext.Queryable<ExcelCompanyWriteReportInfo>()
                 .Where(x => x.IsDelete == 1 && x.Year == year && x.Month == month)
                 .Select(x => new model.CompanyWriteReportInfo()
@@ -772,10 +773,12 @@ namespace GHMonitoringCenterApi.Application.Service.ProductionValueImport
                 })
                 .ToListAsync();
 
-            foreach (var item in baseCompanyUnWriteReportInfo) {
+            foreach (var item in baseCompanyUnWriteReportInfo)
+            {
 
                 string xingxing = string.Empty;
-                for (var i = 1; i <= item.Count; i++) {
+                for (var i = 1; i <= item.Count; i++)
+                {
 
                     xingxing += "★";
                 }
