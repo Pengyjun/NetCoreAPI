@@ -121,22 +121,22 @@ namespace GHMonitoringCenterApi.Controllers.ProductionValueImport
             var baseProject = await _productionValueImportService.ExcelJJtSendMessageAsync(year,month);
             #endregion
 
-
            
-
-            var value = new 
+            
+            var value = new ResultResponseDto
             {
-                datesheet1 = importHistoryProductionValuesRequestDto.TimeValue.HasValue ? importHistoryProductionValuesRequestDto.TimeValue.Value.ToString("yyyy年MM月") : DateTime.Now.AddDays(-1).ToString("yyyy年MM月"),
+
+                datesheetone1 = importHistoryProductionValuesRequestDto.TimeValue.HasValue ? importHistoryProductionValuesRequestDto.TimeValue.Value.ToString("yyyy年MM月") : DateTime.Now.AddDays(-1).ToString("yyyy年MM月"),
                 //days1heet1 = importHistoryProductionValuesRequestDto.TimeValue.HasValue ? importHistoryProductionValuesRequestDto.TimeValue.Value.ToString("yyyy年MM月dd日") : DateTime.Now.AddDays(-1).ToString("yyyy年MM月dd日"),
-                result1 = baseProject.Data[0].CompanyProjectBasePoduction,
-                result2 = baseProject.Data[0].CompanyBasePoductionValue,
-                result3 = baseProject.Data[0].CompanyShipBuildInfo,
-                result4 = baseProject.Data[0].CompanyShipProductionValueInfo,
-                result5 = baseProject.Data[0].ShipProductionValue,
-                result6 = baseProject.Data[0].SpecialProjectInfo,
-                result7 = baseProject.Data[0].CompanyWriteReportInfo,
-                result8 = baseProject.Data[0].CompanyUnWriteReportInfo,
-                result9 = baseProject.Data[0].CompanyShipUnWriteReportInfo,
+                resultone1 = baseProject.Data[5].CompanyProjectBasePoduction,
+                resultone2 = baseProject.Data[5].CompanyBasePoductionValue,
+                resultone3 = baseProject.Data[5].CompanyShipBuildInfo,
+                resultone4 = baseProject.Data[5].CompanyShipProductionValueInfo,
+                resultone5 = baseProject.Data[5].ShipProductionValue,
+                resultone6 = baseProject.Data[5].SpecialProjectInfo,
+                resultone7 = baseProject.Data[5].CompanyWriteReportInfo,
+                resultone8 = baseProject.Data[5].CompanyUnWriteReportInfo,
+                resultone9 = baseProject.Data[5].CompanyShipUnWriteReportInfo,
 
                 //result10 = baseProject.Data[0].ProjectShiftProductionInfo,
                 //result11 = baseProject.Data[0].UnProjectShitInfo
