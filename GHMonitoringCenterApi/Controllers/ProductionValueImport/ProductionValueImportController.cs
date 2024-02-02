@@ -98,17 +98,17 @@ namespace GHMonitoringCenterApi.Controllers.ProductionValueImport
             #region 逻辑判断
 
             #endregion
-            var tempPath = "E:\\project\\HNKC.SZGHAPI\\GHMonitoringCenterApi.Domain.Shared\\Template\\Excel\\ProductionDayReport.xlsx";
-            //var tempPath = "D:\\projectconllection\\dotnet\\szgh\\GHMonitoringCenterApi.Domain.Shared\\Template\\Excel\\ProductionDayReport.xlsx";
+            //var tempPath = "E:\\project\\HNKC.SZGHAPI\\GHMonitoringCenterApi.Domain.Shared\\Template\\Excel\\ProductionDayReport.xlsx";
+            var tempPath = "D:\\projectconllection\\dotnet\\szgh\\GHMonitoringCenterApi.Domain.Shared\\Template\\Excel\\ProductionDayReport.xlsx";
             //var tempPath = "Template/Excel/CompanyOnProjectTemplate.xlsx";
             var baseProject = await _productionValueImportService.ExcelJJtSendMessageAsync(importHistoryProductionValuesRequestDto);
 
             importHistoryProductionValuesRequestDto.GetYearAndMonth();
-            var value = new 
+            var value = new
             {
                 datesheet1 = importHistoryProductionValuesRequestDto.TimeValue.HasValue ? importHistoryProductionValuesRequestDto.TimeValue.Value.ToString("yyyy年MM月") : DateTime.Now.AddDays(-1).ToString("yyyy年MM月"),
                 //days1heet1 = importHistoryProductionValuesRequestDto.TimeValue.HasValue ? importHistoryProductionValuesRequestDto.TimeValue.Value.ToString("yyyy年MM月dd日") : DateTime.Now.AddDays(-1).ToString("yyyy年MM月dd日"),
-                result1 =new List<CompanyProjectBasePoduction>(),// baseProject.Data[0].CompanyProjectBasePoduction,
+                result1 = baseProject.Data[0].CompanyProjectBasePoduction,
                 result2 = baseProject.Data[0].CompanyBasePoductionValue,
                 result3 = baseProject.Data[0].CompanyShipBuildInfo,
                 result4 = baseProject.Data[0].CompanyShipProductionValueInfo,
