@@ -917,18 +917,6 @@ namespace GHMonitoringCenterApi.Application.Service.ProductionValueImport
                     item.No = no;
                     no++;
                 }
-                no = 1;
-                foreach (var item in productionDayReportHistoryResponseDto.ProjectShiftProductionInfo)
-                {
-                    item.No = no;
-                    no++;
-                }
-                no = 1;
-                foreach (var item in productionDayReportHistoryResponseDto.UnProjectShitInfo)
-                {
-                    item.No = no;
-                    no++;
-                }
 
                 productionDayReportHistoryResponseDto.ExcelTitle = baseExcelTitle.Where(x => x.DateDay == currentDay).ToList();
                 productionDayReportHistoryResponseDtos.Add(productionDayReportHistoryResponseDto);
