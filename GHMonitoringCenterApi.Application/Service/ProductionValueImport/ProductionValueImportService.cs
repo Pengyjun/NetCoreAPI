@@ -225,12 +225,12 @@ namespace GHMonitoringCenterApi.Application.Service.ProductionValueImport
         /// Excel 智慧运营监控中心图片数据写入表
         /// </summary>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<bool>> ExcelJJtSendMessageWriteAsync()
+        public async Task<ResponseAjaxResult<bool>> ExcelJJtSendMessageWriteAsync(DateTime date)
         {
             var responseAjaxResult = new ResponseAjaxResult<bool>();
 
             //调用监控中心图片信息方法
-            var getData = await _jjtSendMessageService.JjtTextCardMsgDetailsAsync();
+            var getData = await _jjtSendMessageService.JjtTextCardMsgDetailsAsync(date);
 
             //各个公司基本项目情况
             var excelCompanyProjectBasePoduction = getData.Data.projectBasePoduction.CompanyProjectBasePoductions;
@@ -260,9 +260,9 @@ namespace GHMonitoringCenterApi.Application.Service.ProductionValueImport
             var excelUnProjectShitInfo = getNewYearDayData.Data.unProjectShitInfos;
 
             //数据写入(只写了新增)
-            var year = DateTime.Now.AddDays(-1).ToDateYear();
-            var month = DateTime.Now.AddDays(-1).ToDateMonth();
-            var dateDay = DateTime.Now.AddDays(-1).ToDateDay();
+            var year = date.AddDays(-1).ToDateYear();
+            var month = date.AddDays(-1).ToDateMonth();
+            var dateDay = date.AddDays(-1).ToDateDay();
             //titile集合
             var excelTitles = new List<ExcelTitle>();
 
@@ -601,6 +601,7 @@ namespace GHMonitoringCenterApi.Application.Service.ProductionValueImport
 
             return responseAjaxResult;
         }
+
         /// <summary>
         /// 获取单位序号
         /// </summary>
@@ -628,11 +629,14 @@ namespace GHMonitoringCenterApi.Application.Service.ProductionValueImport
                 case "福建公司":
                     num = 6;
                     break;
-                case "直营项目":
+                case "菲律宾公司":
                     num = 7;
                     break;
-                case "广航局总体":
+                case "直营项目":
                     num = 8;
+                    break;
+                case "广航局总体":
+                    num = 9;
                     break;
             }
             return num;
@@ -709,6 +713,7 @@ namespace GHMonitoringCenterApi.Application.Service.ProductionValueImport
             #region 数据基础查询
             var baseProjectInfo = await _dbContext.Queryable<ExcelCompanyProjectBasePoduction>()
                 .Where(x => x.IsDelete == 1 && x.DateDay >= formatAlfterStartTime && x.DateDay <= formatAlfterEndTime)
+                .OrderBy(x => x.UnitDesc)
                 .Select(x => new model.CompanyProjectBasePoduction()
                 {
                     Name = x.UnitName,
@@ -724,6 +729,7 @@ namespace GHMonitoringCenterApi.Application.Service.ProductionValueImport
                 }).OrderBy(x => x.DateDay).ToListAsync();
             var baseProjectProductionValue = await _dbContext.Queryable<ExcelCompanyBasePoductionValue>()
                 .Where(x => x.IsDelete == 1 && x.DateDay >= formatAlfterStartTime && x.DateDay <= formatAlfterEndTime)
+                .OrderBy(x => x.UnitDesc)
                 .Select(x => new model.CompanyBasePoductionValue()
                 {
                     DayProductionValue = x.DayProductionValue,
@@ -784,6 +790,7 @@ namespace GHMonitoringCenterApi.Application.Service.ProductionValueImport
                 }).OrderBy(x => x.DateDay).ToListAsync();
             var baseCompanyWriteReportInfo = await _dbContext.Queryable<ExcelCompanyWriteReportInfo>()
                 .Where(x => x.IsDelete == 1 && x.DateDay >= formatAlfterStartTime && x.DateDay <= formatAlfterEndTime)
+                .OrderBy(x => x.UnitDesc)
                 .Select(x => new model.CompanyWriteReportInfo()
                 {
                     Name = x.CompanyName,
@@ -918,7 +925,10 @@ namespace GHMonitoringCenterApi.Application.Service.ProductionValueImport
                     no++;
                 }
 
+
+
                 productionDayReportHistoryResponseDto.ExcelTitle = baseExcelTitle.Where(x => x.DateDay == currentDay).ToList();
+
                 productionDayReportHistoryResponseDtos.Add(productionDayReportHistoryResponseDto);
             }
 

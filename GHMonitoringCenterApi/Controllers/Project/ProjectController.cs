@@ -691,6 +691,7 @@ namespace GHMonitoringCenterApi.Controllers.Project
         /// </summary>
         /// <returns></returns>
         [HttpGet("SearchCompanyProjectList")]
+        [AllowAnonymous]
         public async Task<ResponseAjaxResult<List<CompanyProjectDetailedResponseDto>>> SearchCompanyProjectListAsync([FromQuery]CompanyProjectDetailsdRequestDto companyProjectDetailsdRequestDto)
         {
             return await projectService.SearchCompanyProjectListAsync(companyProjectDetailsdRequestDto);
@@ -701,6 +702,7 @@ namespace GHMonitoringCenterApi.Controllers.Project
         /// </summary>
         /// <returns></returns>
         [HttpGet("ImportCompanyProjectList")]
+        [AllowAnonymous]
         public async Task<IActionResult> ImportCompanyProjectListAsync([FromQuery] CompanyProjectDetailsdRequestDto companyProjectDetailsdRequestDto)
         {
             //var tempPath = "D:\\projectconllection\\dotnet\\szgh\\GHMonitoringCenterApi.Domain.Shared\\Template\\Excel\\CompanyOnProjectTemplate.xlsx";
@@ -720,6 +722,7 @@ namespace GHMonitoringCenterApi.Controllers.Project
         /// <param name=""></param>
         /// <returns></returns>
         [HttpGet("SearchCompanyProjectPullDown")]
+        [AllowAnonymous]
         public async Task<ResponseAjaxResult<List<BasePullDownResponseDto>>> SearchCompanyProjectPullDownAsync()
         {
             return await projectService.SearchCompanyProjectPullDownAsync();

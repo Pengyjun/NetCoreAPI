@@ -192,6 +192,12 @@ namespace GHMonitoringCenterApi.Application.Service.Menu
                                 {
                                     menuList = menuList.Where(x => x.Name != "项目审核审批人" && x.Name !="全部任务").ToList();
                                 }
+                                //登录人不是刘国银和大东  隐藏
+                                List<string> userAccountss = new List<string> { "2018015149", "2022002687" };
+                                if (!userAccountss.Contains(_currentUser.Account))
+                                {
+                                    menuList = menuList.Where(x => x.Name != "图文推送导出").ToList();
+                                }
                                 #region 注释代码
                                 //if (_currentUser.Account == "2016147624"
                                 //    || _currentUser.Account == "2019012604"

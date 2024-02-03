@@ -76,6 +76,7 @@ namespace GHMonitoringCenterApi.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet("SearchProjectStatusPullPullDown")]
+        [AllowAnonymous]
         public async Task<ResponseAjaxResult<List<BasePullDownResponseDto>>> SearchProjectStatusPullDownAsync()
         {
             return await baseService.SearchProjectStatusPullDownAsync();
@@ -127,6 +128,7 @@ namespace GHMonitoringCenterApi.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet("PorjectType")]
+        [AllowAnonymous]
         public async Task<ResponseAjaxResult<List<BasePullDownResponseDto>>> SearchProjectTypePullDownAsync([FromQuery] ProjectTypRequsetDto projectTypRequsetDto)
         {
             return await baseService.SearchProjectTypePullDownAsync(projectTypRequsetDto);
