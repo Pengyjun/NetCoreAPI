@@ -799,7 +799,7 @@ namespace GHMonitoringCenterApi.Controllers.ProductionValueImport
                 titlethirtyone9 = baseProject.Data[30].ExcelTitle.Where(x => x.Type == 9).FirstOrDefault()?.TtileContent,
 
             };
-            return await ExcelTemplateImportAsync(tempPath, value, $"{year}年广航局生产运营监控日报");
+            return await ExcelTemplateImportAsync(tempPath, value, $"{year}年{month}月广航局生产运营监控日报");
         }
         /// <summary>
         /// 导出节假日数据
