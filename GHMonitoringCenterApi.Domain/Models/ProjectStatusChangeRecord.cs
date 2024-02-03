@@ -15,6 +15,8 @@ namespace GHMonitoringCenterApi.Domain.Models
     [SugarTable("t_projectstatuschangerecord", IsDisabledDelete = true)]
     public class ProjectStatusChangeRecord
     {
+        [SugarColumn(IsPrimaryKey = true)]
+        public Guid ItemId { get; set; }
         [SugarColumn(Length = 36)]
         public Guid Id { get; set; }
         [SugarColumn(Length = 36)]

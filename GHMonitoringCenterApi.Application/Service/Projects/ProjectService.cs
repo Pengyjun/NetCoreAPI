@@ -963,7 +963,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 {
                     //说明停工 不算每天生产日报推送数据里面了 
                     ProjectStatusChangeRecord projectStatusChangeRecord = new ProjectStatusChangeRecord()
-                    {
+                    { ItemId= projectStatusChangeSingle.ItemId,
                         Id = addOrUpdateProjectRequestDto.Id.Value,
                         OldStatus = CommonData.PConstruc.ToGuid(),
                         NewStatus = addOrUpdateProjectRequestDto.StatusId.Value,
@@ -971,7 +971,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                         IsValid = 1,
                         StopDay = 0
                     };
-                    await dbContext.Updateable(projectStatusChangeRecord).Where(x=>x.IsValid==1).ExecuteCommandAsync();
+                   await dbContext.Updateable(projectStatusChangeRecord).ExecuteCommandAsync();
                 }
                 //修改状态之前  原来状态不是在建状态了 这个时候要计算停工天数
                 else if (projectStatusChangeSingle != null && projectStatusChangeSingle.NewStatus != CommonData.PConstruc.ToGuid() && addOrUpdateProjectRequestDto.StatusId == CommonData.PConstruc.ToGuid())
@@ -980,6 +980,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     stopDay = projectStatusChangeSingle.StopDay.Value + diffDays;
                     ProjectStatusChangeRecord projectStatusChangeRecord = new ProjectStatusChangeRecord()
                     {
+                        ItemId = projectStatusChangeSingle.ItemId,
                         Id = addOrUpdateProjectRequestDto.Id.Value,
                         OldStatus = CommonData.PConstruc.ToGuid(),
                         NewStatus = addOrUpdateProjectRequestDto.StatusId.Value,
@@ -987,7 +988,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                         IsValid = 1,
                         StopDay = stopDay
                     };
-                    await dbContext.Updateable(projectStatusChangeRecord).Where(x => x.IsValid == 1).ExecuteCommandAsync();
+                    await dbContext.Updateable(projectStatusChangeRecord).ExecuteCommandAsync();
                 }
                 else if (projectStatusChangeSingle == null && addOrUpdateProjectRequestDto.StatusId == CommonData.PConstruc.ToGuid())
                 {
@@ -1006,6 +1007,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     var diffDays = TimeHelper.GetTimeSpan(initDay, DateTime.Now).Days-1;
                     ProjectStatusChangeRecord projectStatusChangeRecord = new ProjectStatusChangeRecord()
                     {
+                        ItemId = projectStatusChangeSingle.ItemId,
                         Id = projectSingle.Id,
                         OldStatus = projectSingle != null ? projectSingle.StatusId.Value : Guid.Empty,
                         NewStatus = addOrUpdateProjectRequestDto.StatusId.Value,
