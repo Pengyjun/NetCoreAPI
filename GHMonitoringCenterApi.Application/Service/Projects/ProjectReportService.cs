@@ -590,7 +590,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 resDayReport.Construction.CurrencyExchangeRate = currencyExchangeRate;
                 resDayReport.Construction.IsShowWorkStatusOfSpringFestival = IsShowWorkStatusOfSpringFestival(dayTime);
                 resDayReport.CreateUserName = _currentUser.Name;
-                resDayReport.IsHoliday = IsHoliday(dateDay);
+                resDayReport.IsHoliday = true;//IsHoliday(dateDay);
 
             }
             else
@@ -631,7 +631,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     resDayReport.CreateUserName = user?.Name;
                 }
                 resDayReport.ProcessStatus = dayReport.ProcessStatus;
-                resDayReport.IsHoliday = dayReport.IsHoliday;
+                resDayReport.IsHoliday = true;//dayReport.IsHoliday;
             }
 
             #region 修改汇率
@@ -5983,10 +5983,33 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             //获取当前用户授权数据
             //var userAuthForData = await GetCurrentUserAuthForDataAsync();
             var time = DateTime.Now.AddDays(-1).ToDateDay();
-            var statusList = CommonData.status.Split(',').Select(x => x.ToGuid()).ToList();
-            var list = await _dbProject.AsQueryable().LeftJoin<DayReport>((p, d) => p.Id == d.ProjectId && d.DateDay == time)
+            var statusList = CommonData.PConstruc.Split(',').Select(x => x.ToGuid()).ToList();
+            //var list = await _dbProject.AsQueryable().LeftJoin<DayReport>((p, d) => p.Id == d.ProjectId && d.DateDay == time)
+            //    .LeftJoin<Institution>((p, d, c) => p.CompanyId == c.PomId)
+            //    .Where((p, d, c) => statusList.Contains((Guid)p.StatusId) && p.TypeId != CommonData.NoConstrutionProjectType)
+            //    //.WhereIF(!userAuthForData.IsAdmin, (p, d, c) => userAuthForData.CompanyIds.Contains(p.ProjectDept))
+            //    .Select((p, d, c) => new ProjectShiftProductionInfo
+            //    {
+            //        DayReportId = d.Id,
+            //        CompanyId = c.PomId,
+            //        CompanyName = c.Name,
+            //        ProjectName = p.ShortName,
+            //        ShiftLeader = d.ShiftLeader,
+            //        ShiftPhone = d.ShiftLeaderPhone,
+            //        SiteManagementPersonNum = d.SiteManagementPersonNum,
+            //        SiteConstructionPersonNum = d.SiteConstructionPersonNum,
+            //        ConstructionDeviceNum = d.ConstructionDeviceNum,
+            //        FewLandWorkplace = d.FewLandWorkplace,
+            //        LandWorkplace = d.LandWorkplace,
+            //        SiteShipNum = d.SiteShipNum,
+            //        OnShipPersonNum = d.OnShipPersonNum,
+            //        HazardousConstructionNum = d.HazardousConstructionNum,
+            //        HazardousConstructionDescription = d.HazardousConstructionDescription
+            //    }).ToListAsync();
+            var list = await _dbProject.AsQueryable()
+                .LeftJoin<DayReport>((p, d) => p.Id == d.ProjectId && d.DateDay == time)
                 .LeftJoin<Institution>((p, d, c) => p.CompanyId == c.PomId)
-                .Where((p, d, c) => statusList.Contains((Guid)p.StatusId) && p.TypeId != CommonData.NoConstrutionProjectType)
+                .Where((p, d, c) => statusList.Contains(p.StatusId.Value) && p.TypeId != CommonData.NoConstrutionProjectType)
                 //.WhereIF(!userAuthForData.IsAdmin, (p, d, c) => userAuthForData.CompanyIds.Contains(p.ProjectDept))
                 .Select((p, d, c) => new ProjectShiftProductionInfo
                 {
