@@ -1962,7 +1962,9 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
                     {
                         Name = name,
                         DayProductionValue = dayTotalPoductionValues,
-                        TotalYearProductionValue = Math.Round(yearProductionValue / 100000000, 2),
+                       // TotalYearProductionValue = Math.Round(yearProductionValue / 100000000, 2),
+                       TotalYearProductionValue = Math.Round(companyBasePoductionValues.Sum(x=>x.TotalYearProductionValue) / 100000000, 2),
+
                         YearProductionValueProgressPercent = 100,
                         ProductionValueProgressPercent = productionValueProgressPercent,
                         SupersequenceProgress = projectBasePoduction.SupersequenceProgress
