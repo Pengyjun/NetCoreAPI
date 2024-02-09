@@ -6053,7 +6053,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             productionSumInfo.SumOnShipPersonNum = completedList.Sum(t => t.OnShipPersonNum);
             productionSumInfo.SumHazardousConstructionNum = completedList.Sum(t => t.HazardousConstructionNum);
 
-            responseDto.TimeValue = DateTime.Now.AddDays(-1).Date;
+            responseDto.TimeValue = DateTime.Now.Date;
             responseDto.sumInfo = productionSumInfo;
             //排序
             completedList = completedList.OrderByDescending(x => x.HazardousConstructionNum).ToList();
