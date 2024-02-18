@@ -303,6 +303,8 @@ namespace GHMonitoringCenterApi.Application.Service.ProductionValueImport
             {
                 //数据映射
                 var result = _mapper.Map<List<models.CompanyBasePoductionValue>, List<ExcelCompanyBasePoductionValue>>(excelCompanyBasePoductionValue);
+                //总体合计  数据处理
+                var totalSum = 0M;
                 foreach (var item in result)
                 {
                     item.Id = GuidUtil.Next();
@@ -310,11 +312,18 @@ namespace GHMonitoringCenterApi.Application.Service.ProductionValueImport
                     item.Year = year;
                     item.Month = month;
                     item.UnitDesc = GetUnitDesc(item.UnitName);
+                    if (item.UnitName == "广航局总体")
+                    {
+                        //总体合计  数据处理
+                        var totalList = result.Where(x => x.UnitName != "广航局总体").ToList();
+                        item.TotalYearProductionValue = totalList.Sum(x => x.TotalYearProductionValue);
+                        totalSum = item.TotalYearProductionValue;
+                    }
                 }
                 await _dbContext.Insertable(result).ExecuteCommandAsync();
 
                 //titile写入
-                string titleTwo = DateTime.Now.AddDays(-1).ToString("MM月dd日") + " 广航局在建项目产值" + getData.Data.projectBasePoduction.DayProductionValue + "万元，" + getData.Data.Year + "年累计施工产值" + getData.Data.projectBasePoduction.TotalYearProductionValue + "亿元。";
+                string titleTwo = DateTime.Now.AddDays(-1).ToString("MM月dd日") + " 广航局在建项目产值" + getData.Data.projectBasePoduction.DayProductionValue + "万元，" + getData.Data.Year + "年累计施工产值" + totalSum + "亿元。";
                 excelTitles.Add(new ExcelTitle()
                 {
                     CreateTime = DateTime.Now,
