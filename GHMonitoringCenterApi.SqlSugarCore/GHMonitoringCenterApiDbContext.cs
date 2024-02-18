@@ -21,7 +21,7 @@ namespace GHMonitoringCenterApi.SqlSugarCore
         public static void AddSqlSugarContext(this IServiceCollection services, IConfiguration configuration, string dbCon)
         {
             //是否打开无参数化sql监视
-            bool isOpenSql = false;
+            bool isOpenSql = true;
             SqlSugarClient sqlSugarClient = new SqlSugarClient(new ConnectionConfig()
             {
                 ConnectionString = dbCon,
@@ -44,7 +44,7 @@ namespace GHMonitoringCenterApi.SqlSugarCore
                         }
                     }
                     //调试时打印sql语句 生产时注释掉
-                   //Console.WriteLine($"{sqlParmae}");
+                   Console.WriteLine($"{sqlParmae}");
                 };
                 //db.Aop.OnError=(sql) => {
                 //  //记录出错的sql语句

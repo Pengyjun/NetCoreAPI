@@ -590,7 +590,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 resDayReport.Construction.CurrencyExchangeRate = currencyExchangeRate;
                 resDayReport.Construction.IsShowWorkStatusOfSpringFestival = IsShowWorkStatusOfSpringFestival(dayTime);
                 resDayReport.CreateUserName = _currentUser.Name;
-                resDayReport.IsHoliday = IsHoliday(dateDay);
+                resDayReport.IsHoliday = true;//IsHoliday(dateDay);
 
             }
             else
@@ -631,7 +631,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     resDayReport.CreateUserName = user?.Name;
                 }
                 resDayReport.ProcessStatus = dayReport.ProcessStatus;
-                resDayReport.IsHoliday = dayReport.IsHoliday;
+                resDayReport.IsHoliday = true;//dayReport.IsHoliday;
             }
 
             #region 修改汇率
@@ -5983,10 +5983,33 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             //获取当前用户授权数据
             //var userAuthForData = await GetCurrentUserAuthForDataAsync();
             var time = DateTime.Now.AddDays(-1).ToDateDay();
-            var statusList = CommonData.status.Split(',').Select(x => x.ToGuid()).ToList();
-            var list = await _dbProject.AsQueryable().LeftJoin<DayReport>((p, d) => p.Id == d.ProjectId && d.DateDay == time)
+            var statusList = CommonData.PConstruc.Split(',').Select(x => x.ToGuid()).ToList();
+            //var list = await _dbProject.AsQueryable().LeftJoin<DayReport>((p, d) => p.Id == d.ProjectId && d.DateDay == time)
+            //    .LeftJoin<Institution>((p, d, c) => p.CompanyId == c.PomId)
+            //    .Where((p, d, c) => statusList.Contains((Guid)p.StatusId) && p.TypeId != CommonData.NoConstrutionProjectType)
+            //    //.WhereIF(!userAuthForData.IsAdmin, (p, d, c) => userAuthForData.CompanyIds.Contains(p.ProjectDept))
+            //    .Select((p, d, c) => new ProjectShiftProductionInfo
+            //    {
+            //        DayReportId = d.Id,
+            //        CompanyId = c.PomId,
+            //        CompanyName = c.Name,
+            //        ProjectName = p.ShortName,
+            //        ShiftLeader = d.ShiftLeader,
+            //        ShiftPhone = d.ShiftLeaderPhone,
+            //        SiteManagementPersonNum = d.SiteManagementPersonNum,
+            //        SiteConstructionPersonNum = d.SiteConstructionPersonNum,
+            //        ConstructionDeviceNum = d.ConstructionDeviceNum,
+            //        FewLandWorkplace = d.FewLandWorkplace,
+            //        LandWorkplace = d.LandWorkplace,
+            //        SiteShipNum = d.SiteShipNum,
+            //        OnShipPersonNum = d.OnShipPersonNum,
+            //        HazardousConstructionNum = d.HazardousConstructionNum,
+            //        HazardousConstructionDescription = d.HazardousConstructionDescription
+            //    }).ToListAsync();
+            var list = await _dbProject.AsQueryable()
+                .LeftJoin<DayReport>((p, d) => p.Id == d.ProjectId && d.DateDay == time)
                 .LeftJoin<Institution>((p, d, c) => p.CompanyId == c.PomId)
-                .Where((p, d, c) => statusList.Contains((Guid)p.StatusId) && p.TypeId != CommonData.NoConstrutionProjectType)
+                .Where((p, d, c) => statusList.Contains(p.StatusId.Value) && p.TypeId != CommonData.NoConstrutionProjectType)
                 //.WhereIF(!userAuthForData.IsAdmin, (p, d, c) => userAuthForData.CompanyIds.Contains(p.ProjectDept))
                 .Select((p, d, c) => new ProjectShiftProductionInfo
                 {
@@ -6030,7 +6053,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             productionSumInfo.SumOnShipPersonNum = completedList.Sum(t => t.OnShipPersonNum);
             productionSumInfo.SumHazardousConstructionNum = completedList.Sum(t => t.HazardousConstructionNum);
 
-            responseDto.TimeValue = DateTime.Now.AddDays(-1).Date;
+            responseDto.TimeValue = DateTime.Now.Date;
             responseDto.sumInfo = productionSumInfo;
             //排序
             completedList = completedList.OrderByDescending(x => x.HazardousConstructionNum).ToList();
@@ -6040,6 +6063,102 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             responseAjaxResult.Success();
             return responseAjaxResult;
         }
+
+
+
+
+        public async Task<ResponseAjaxResult<ProjectShiftProductionResponseDto>> GetProjectShiftProductionAsync(DateTime date)
+        {
+            ResponseAjaxResult<ProjectShiftProductionResponseDto> responseAjaxResult = new ResponseAjaxResult<ProjectShiftProductionResponseDto>();
+            ProjectShiftProductionResponseDto responseDto = new ProjectShiftProductionResponseDto();
+            ProjectShiftProductionSumInfo productionSumInfo = new ProjectShiftProductionSumInfo();
+            //获取当前用户授权数据
+            //var userAuthForData = await GetCurrentUserAuthForDataAsync();
+            var time = date.AddDays(-1).ToDateDay();
+            var statusList = CommonData.PConstruc.Split(',').Select(x => x.ToGuid()).ToList();
+            //var list = await _dbProject.AsQueryable().LeftJoin<DayReport>((p, d) => p.Id == d.ProjectId && d.DateDay == time)
+            //    .LeftJoin<Institution>((p, d, c) => p.CompanyId == c.PomId)
+            //    .Where((p, d, c) => statusList.Contains((Guid)p.StatusId) && p.TypeId != CommonData.NoConstrutionProjectType)
+            //    //.WhereIF(!userAuthForData.IsAdmin, (p, d, c) => userAuthForData.CompanyIds.Contains(p.ProjectDept))
+            //    .Select((p, d, c) => new ProjectShiftProductionInfo
+            //    {
+            //        DayReportId = d.Id,
+            //        CompanyId = c.PomId,
+            //        CompanyName = c.Name,
+            //        ProjectName = p.ShortName,
+            //        ShiftLeader = d.ShiftLeader,
+            //        ShiftPhone = d.ShiftLeaderPhone,
+            //        SiteManagementPersonNum = d.SiteManagementPersonNum,
+            //        SiteConstructionPersonNum = d.SiteConstructionPersonNum,
+            //        ConstructionDeviceNum = d.ConstructionDeviceNum,
+            //        FewLandWorkplace = d.FewLandWorkplace,
+            //        LandWorkplace = d.LandWorkplace,
+            //        SiteShipNum = d.SiteShipNum,
+            //        OnShipPersonNum = d.OnShipPersonNum,
+            //        HazardousConstructionNum = d.HazardousConstructionNum,
+            //        HazardousConstructionDescription = d.HazardousConstructionDescription
+            //    }).ToListAsync();
+            var list = await _dbProject.AsQueryable()
+                .LeftJoin<DayReport>((p, d) => p.Id == d.ProjectId && d.DateDay == time)
+                .LeftJoin<Institution>((p, d, c) => p.CompanyId == c.PomId)
+                .Where((p, d, c) => statusList.Contains(p.StatusId.Value) && p.TypeId != CommonData.NoConstrutionProjectType)
+                //.WhereIF(!userAuthForData.IsAdmin, (p, d, c) => userAuthForData.CompanyIds.Contains(p.ProjectDept))
+                .Select((p, d, c) => new ProjectShiftProductionInfo
+                {
+                    DayReportId = d.Id,
+                    CompanyId = c.PomId,
+                    CompanyName = c.Name,
+                    ProjectName = p.ShortName,
+                    ShiftLeader = d.ShiftLeader,
+                    ShiftPhone = d.ShiftLeaderPhone,
+                    SiteManagementPersonNum = d.SiteManagementPersonNum,
+                    SiteConstructionPersonNum = d.SiteConstructionPersonNum,
+                    ConstructionDeviceNum = d.ConstructionDeviceNum,
+                    FewLandWorkplace = d.FewLandWorkplace,
+                    LandWorkplace = d.LandWorkplace,
+                    SiteShipNum = d.SiteShipNum,
+                    OnShipPersonNum = d.OnShipPersonNum,
+                    HazardousConstructionNum = d.HazardousConstructionNum,
+                    HazardousConstructionDescription = d.HazardousConstructionDescription
+                }).ToListAsync();
+
+            //已填报项目
+            var completedList = list.Where(t => t.DayReportId != null).ToList();
+            //获取相关公司
+            var companyList = await _dbContext.Queryable<ProductionMonitoringOperationDayReport>().Where(t => t.IsDelete == 1 && t.Type == 1 && t.Name != "" && t.Name != "广航局总体(个)").ToListAsync();
+            //未填报项目
+            var unCompleteList = list.Where(t => t.DayReportId == null).ToList();
+            foreach (var item in unCompleteList)
+            {
+                UnProjectShitInfo unProjectShitInfo = new UnProjectShitInfo();
+                unProjectShitInfo.CompanyName = companyList.Where(t => t.ItemId == item.CompanyId).FirstOrDefault() == null ? item.CompanyName : companyList.Where(t => t.ItemId == item.CompanyId).FirstOrDefault().Name;
+                unProjectShitInfo.ProjectName = item.ProjectName;
+                responseDto.unProjectShitInfos.Add(unProjectShitInfo);
+            }
+
+            productionSumInfo.SumSiteManagementPersonNum = completedList.Sum(t => t.SiteManagementPersonNum);
+            productionSumInfo.SumSiteConstructionPersonNum = completedList.Sum(t => t.SiteConstructionPersonNum);
+            productionSumInfo.SumConstructionDeviceNum = completedList.Sum(t => t.ConstructionDeviceNum);
+            productionSumInfo.SumFewLandWorkplace = completedList.Sum(t => t.FewLandWorkplace);
+            productionSumInfo.SumLandWorkplace = completedList.Sum(t => t.LandWorkplace);
+            productionSumInfo.SumSiteShipNum = completedList.Sum(t => t.SiteShipNum);
+            productionSumInfo.SumOnShipPersonNum = completedList.Sum(t => t.OnShipPersonNum);
+            productionSumInfo.SumHazardousConstructionNum = completedList.Sum(t => t.HazardousConstructionNum);
+
+            responseDto.TimeValue = date.Date;
+            responseDto.sumInfo = productionSumInfo;
+            //排序
+            completedList = completedList.OrderByDescending(x => x.HazardousConstructionNum).ToList();
+
+            responseDto.projectShiftProductionInfos = completedList;
+            responseAjaxResult.Data = responseDto;
+            responseAjaxResult.Success();
+            return responseAjaxResult;
+        }
+
+
+
+
 
         /// <summary>
         /// 获取完工项目信息

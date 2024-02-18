@@ -230,7 +230,10 @@ namespace GHMonitoringCenterApi.Application.Service.ProductionValueImport
             var responseAjaxResult = new ResponseAjaxResult<bool>();
 
             //调用监控中心图片信息方法
-            var getData = await _jjtSendMessageService.JjtTextCardMsgDetailsAsync(date);
+            //var getData = await _jjtSendMessageService.JjtTextCardMsgDetailsAsync(date);
+
+
+            var getData = await _jjtSendMessageService.JjtTextCardMsgDetailsAsync();
 
             //各个公司基本项目情况
             var excelCompanyProjectBasePoduction = getData.Data.projectBasePoduction.CompanyProjectBasePoductions;
@@ -260,9 +263,9 @@ namespace GHMonitoringCenterApi.Application.Service.ProductionValueImport
             var excelUnProjectShitInfo = getNewYearDayData.Data.unProjectShitInfos;
 
             //数据写入(只写了新增)
-            var year = date.AddDays(-1).ToDateYear();
-            var month = date.AddDays(-1).ToDateMonth();
-            var dateDay = date.AddDays(-1).ToDateDay();
+            var year = DateTime.Now.AddDays(-1).ToDateYear();
+            var month = DateTime.Now.AddDays(-1).ToDateMonth();
+            var dateDay = DateTime.Now.AddDays(-1).ToDateDay();
             //titile集合
             var excelTitles = new List<ExcelTitle>();
 

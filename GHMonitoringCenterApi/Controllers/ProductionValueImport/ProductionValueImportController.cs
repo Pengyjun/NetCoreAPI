@@ -86,16 +86,16 @@ namespace GHMonitoringCenterApi.Controllers.ProductionValueImport
         [HttpGet("ExcelJJtSendMessageWrite")]
         public async Task<ResponseAjaxResult<bool>> ExcelJJtSendMessageWriteAsync([FromQuery] DateTime date)
         {
-            DateTime startTime = Convert.ToDateTime("2024-02-19");
+            //DateTime startTime = Convert.ToDateTime("2024-02-19");
 
-            var difDays = TimeHelper.GetTimeSpan(Convert.ToDateTime(startTime), date).Days;
-            for (int i = 0; i < difDays; i++)
-            {
-                await _productionValueImportService.ExcelJJtSendMessageWriteAsync(startTime);
-                startTime = startTime.AddDays(1);
-            }
-            var res = new ResponseAjaxResult<bool>();
-            return res;
+            //var difDays = TimeHelper.GetTimeSpan(Convert.ToDateTime(startTime), date).Days;
+            //for (int i = 0; i < difDays; i++)
+            //{
+            return await _productionValueImportService.ExcelJJtSendMessageWriteAsync(date);
+            //startTime = startTime.AddDays(1);
+            //}
+            //var res = new ResponseAjaxResult<bool>();
+            //return res;
         }
         /// <summary>
         /// 导出广航局监控日报历史数据

@@ -1716,8 +1716,12 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
                     DayActualProductionAmount = x.DayActualProductionAmount
                 }).ToListAsync();
             //广航局年累计产值(基础数据累加+几个公司的所有日产值)
-            // var yearProductionValue = companyList.Sum(x => x.YearProductionValue) + dayProductionValueList.Sum(x => x.DayActualProductionAmount);
-            var yearProductionValue = dayProductionValueList.Sum(x => x.DayActualProductionAmount);
+           // var yearProductionValue = companyList.Sum(x => x.YearProductionValue) + dayProductionValueList.Sum(x => x.DayActualProductionAmount);
+            var yearProductionValue =  dayProductionValueList.Sum(x => x.DayActualProductionAmount);
+            //项目月报数据
+            var monthReport=await dbContext.Queryable<MonthReport>().Where(x => x.IsDelete == 1 && x.DateYear == 2024).ToListAsync();
+            //
+            var  projectIds= await dbContext.Queryable<Project>().Where(x => x.IsDelete == 1).ToListAsync();
             foreach (var item in companyList)
             {
                 //当前公司日产值 || x.UpdateTime >= SqlFunc.ToDate(startTime) && x.UpdateTime <= SqlFunc.ToDate(endTime))
@@ -1726,8 +1730,11 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
                   //&& x.CreateTime >= SqlFunc.ToDate(startTime) && x.CreateTime <= SqlFunc.ToDate(endTime)
                   //|| x.UpdateTime >= SqlFunc.ToDate(startTime) && x.UpdateTime <= SqlFunc.ToDate(endTime)
                   ).Sum(x => x.DayActualProductionAmount);
-                //当前公司的累计产值
-                var currentMonthCompanyCount = dayProductionValueList.Where(x => x.CompanyId == item.ItemId).Sum(x => x.DayActualProductionAmount);
+                //当前公司的累计产值（前几个月报产值加上日产值）
+                var currentMonthCompanyCount = dayProductionValueList
+                    .Where(x => x.CompanyId == item.ItemId&&x.DateDay>= currentTimeIntUp&& x.DateDay<= currentTimeInt)
+                    .Sum(x => x.DayActualProductionAmount)
+                    +GetCompanyProductuionValue(item.ItemId.Value, monthReport, projectIds);
                 //年度产值占比 （广航局）
                 //var yearProductionValuePercent = Math.Round(((decimal)(item.YearProductionValue + currentMonthCompanyCount) / yearProductionValue) * 100, 2);
                 var yearProductionValuePercent = Math.Round(((decimal)(currentMonthCompanyCount) / yearProductionValue) * 100, 2);
@@ -1955,7 +1962,9 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
                     {
                         Name = name,
                         DayProductionValue = dayTotalPoductionValues,
-                        TotalYearProductionValue = Math.Round(yearProductionValue / 100000000, 2),
+                       // TotalYearProductionValue = Math.Round(yearProductionValue / 100000000, 2),
+                       TotalYearProductionValue = Math.Round(companyBasePoductionValues.Sum(x=>x.TotalYearProductionValue) / 100000000, 2),
+
                         YearProductionValueProgressPercent = 100,
                         ProductionValueProgressPercent = productionValueProgressPercent,
                         SupersequenceProgress = projectBasePoduction.SupersequenceProgress
@@ -4679,5 +4688,11 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
         }
         #endregion
 
+
+        public static decimal GetCompanyProductuionValue(Guid companyId, List<MonthReport> data,List<Project> projects)
+        {
+            var ids = projects.Where(x => x.CompanyId.Value == companyId).Select(x=>x.Id).ToList();
+           return data.Where(x => ids.Contains(x.ProjectId)).Sum(x => x.CompleteProductionAmount);
+        }
     }
 }
