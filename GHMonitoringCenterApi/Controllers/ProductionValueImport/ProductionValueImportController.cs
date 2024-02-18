@@ -442,7 +442,7 @@ namespace GHMonitoringCenterApi.Controllers.ProductionValueImport
                 titlefourteen9 = baseProject.Data[13].ExcelTitle.Where(x => x.Type == 9).FirstOrDefault()?.TtileContent,
 
 
-                datesheetfifteen1 = baseProject.Data[14].CompanyProjectBasePoduction.Count() == 0 ? "" : DateTime.ParseExact(baseProject.Data[14].CompanyProjectBasePoduction[14].DateDay.ToString(), "yyyyMMdd", System.Globalization.CultureInfo.InvariantCulture).ToString("yyyy年MM月dd日"),
+                datesheetfifteen1 = baseProject.Data[14].CompanyProjectBasePoduction.Count() == 0 ? "" : DateTime.ParseExact(baseProject.Data[14].CompanyProjectBasePoduction[5].DateDay.ToString(), "yyyyMMdd", System.Globalization.CultureInfo.InvariantCulture).ToString("yyyy年MM月dd日"),
                 resultfifteen1 = baseProject.Data[14].CompanyProjectBasePoduction,
                 resultfifteen2 = baseProject.Data[14].CompanyBasePoductionValue,
                 resultfifteen3 = baseProject.Data[14].CompanyShipBuildInfo,
@@ -463,7 +463,7 @@ namespace GHMonitoringCenterApi.Controllers.ProductionValueImport
                 titlefifteen9 = baseProject.Data[14].ExcelTitle.Where(x => x.Type == 9).FirstOrDefault()?.TtileContent,
 
 
-                datesheetsixteen1 = baseProject.Data[15].CompanyProjectBasePoduction.Count() == 0 ? "" : DateTime.ParseExact(baseProject.Data[15].CompanyProjectBasePoduction[15].DateDay.ToString(), "yyyyMMdd", System.Globalization.CultureInfo.InvariantCulture).ToString("yyyy年MM月dd日"),
+                datesheetsixteen1 = baseProject.Data[15].CompanyProjectBasePoduction.Count() == 0 ? "" : DateTime.ParseExact(baseProject.Data[15].CompanyProjectBasePoduction[5].DateDay.ToString(), "yyyyMMdd", System.Globalization.CultureInfo.InvariantCulture).ToString("yyyy年MM月dd日"),
                 resultsixteen1 = baseProject.Data[15].CompanyProjectBasePoduction,
                 resultsixteen2 = baseProject.Data[15].CompanyBasePoductionValue,
                 resultsixteen3 = baseProject.Data[15].CompanyShipBuildInfo,
@@ -484,7 +484,7 @@ namespace GHMonitoringCenterApi.Controllers.ProductionValueImport
                 titlesixteen9 = baseProject.Data[15].ExcelTitle.Where(x => x.Type == 9).FirstOrDefault()?.TtileContent,
 
 
-                datesheetsevevnteen1 = baseProject.Data[16].CompanyProjectBasePoduction.Count() == 0 ? "" : DateTime.ParseExact(baseProject.Data[16].CompanyProjectBasePoduction[16].DateDay.ToString(), "yyyyMMdd", System.Globalization.CultureInfo.InvariantCulture).ToString("yyyy年MM月dd日"),
+                datesheetsevevnteen1 = baseProject.Data[16].CompanyProjectBasePoduction.Count() == 0 ? "" : DateTime.ParseExact(baseProject.Data[16].CompanyProjectBasePoduction[5].DateDay.ToString(), "yyyyMMdd", System.Globalization.CultureInfo.InvariantCulture).ToString("yyyy年MM月dd日"),
                 resultsevevnteen1 = baseProject.Data[16].CompanyProjectBasePoduction,
                 resultsevevnteen2 = baseProject.Data[16].CompanyBasePoductionValue,
                 resultsevevnteen3 = baseProject.Data[16].CompanyShipBuildInfo,
@@ -505,7 +505,7 @@ namespace GHMonitoringCenterApi.Controllers.ProductionValueImport
                 titlesevevnteen9 = baseProject.Data[16].ExcelTitle.Where(x => x.Type == 9).FirstOrDefault()?.TtileContent,
 
 
-                datesheeteighteen1 = baseProject.Data[17].CompanyProjectBasePoduction.Count() == 0 ? "" : DateTime.ParseExact(baseProject.Data[17].CompanyProjectBasePoduction[17].DateDay.ToString(), "yyyyMMdd", System.Globalization.CultureInfo.InvariantCulture).ToString("yyyy年MM月dd日"),
+                datesheeteighteen1 = baseProject.Data[17].CompanyProjectBasePoduction.Count() == 0 ? "" : DateTime.ParseExact(baseProject.Data[17].CompanyProjectBasePoduction[5].DateDay.ToString(), "yyyyMMdd", System.Globalization.CultureInfo.InvariantCulture).ToString("yyyy年MM月dd日"),
                 resulteighteen1 = baseProject.Data[17].CompanyProjectBasePoduction,
                 resulteighteen2 = baseProject.Data[17].CompanyBasePoductionValue,
                 resulteighteen3 = baseProject.Data[17].CompanyShipBuildInfo,
@@ -526,7 +526,7 @@ namespace GHMonitoringCenterApi.Controllers.ProductionValueImport
                 titleeighteen9 = baseProject.Data[17].ExcelTitle.Where(x => x.Type == 9).FirstOrDefault()?.TtileContent,
 
 
-                datesheetnineteen1 = baseProject.Data[18].CompanyProjectBasePoduction.Count() == 0 ? "" : DateTime.ParseExact(baseProject.Data[18].CompanyProjectBasePoduction[18].DateDay.ToString(), "yyyyMMdd", System.Globalization.CultureInfo.InvariantCulture).ToString("yyyy年MM月dd日"),
+                datesheetnineteen1 = baseProject.Data[18].CompanyProjectBasePoduction.Count() == 0 ? "" : DateTime.ParseExact(baseProject.Data[18].CompanyProjectBasePoduction[5].DateDay.ToString(), "yyyyMMdd", System.Globalization.CultureInfo.InvariantCulture).ToString("yyyy年MM月dd日"),
                 resultnineteen1 = baseProject.Data[18].CompanyProjectBasePoduction,
                 resultnineteen2 = baseProject.Data[18].CompanyBasePoductionValue,
                 resultnineteen3 = baseProject.Data[18].CompanyShipBuildInfo,
@@ -547,7 +547,7 @@ namespace GHMonitoringCenterApi.Controllers.ProductionValueImport
                 titlenineteen9 = baseProject.Data[18].ExcelTitle.Where(x => x.Type == 9).FirstOrDefault()?.TtileContent,
 
 
-                datesheettwenty1 = baseProject.Data[19].CompanyProjectBasePoduction.Count() == 0 ? "" : DateTime.ParseExact(baseProject.Data[19].CompanyProjectBasePoduction[19].DateDay.ToString(), "yyyyMMdd", System.Globalization.CultureInfo.InvariantCulture).ToString("yyyy年MM月dd日"),
+                datesheettwenty1 = baseProject.Data[19].CompanyProjectBasePoduction.Count() == 0 ? "" : DateTime.ParseExact(baseProject.Data[19].CompanyProjectBasePoduction[5].DateDay.ToString(), "yyyyMMdd", System.Globalization.CultureInfo.InvariantCulture).ToString("yyyy年MM月dd日"),
                 resulttwenty1 = baseProject.Data[19].CompanyProjectBasePoduction,
                 resulttwenty2 = baseProject.Data[19].CompanyBasePoductionValue,
                 resulttwenty3 = baseProject.Data[19].CompanyShipBuildInfo,
@@ -568,7 +568,7 @@ namespace GHMonitoringCenterApi.Controllers.ProductionValueImport
                 titletwenty9 = baseProject.Data[19].ExcelTitle.Where(x => x.Type == 9).FirstOrDefault()?.TtileContent,
 
 
-                datesheettwentyone1 = baseProject.Data[20].CompanyProjectBasePoduction.Count() == 0 ? "" : DateTime.ParseExact(baseProject.Data[20].CompanyProjectBasePoduction[20].DateDay.ToString(), "yyyyMMdd", System.Globalization.CultureInfo.InvariantCulture).ToString("yyyy年MM月dd日"),
+                datesheettwentyone1 = baseProject.Data[20].CompanyProjectBasePoduction.Count() == 0 ? "" : DateTime.ParseExact(baseProject.Data[20].CompanyProjectBasePoduction[5].DateDay.ToString(), "yyyyMMdd", System.Globalization.CultureInfo.InvariantCulture).ToString("yyyy年MM月dd日"),
                 resulttwentyone1 = baseProject.Data[20].CompanyProjectBasePoduction,
                 resulttwentyone2 = baseProject.Data[20].CompanyBasePoductionValue,
                 resulttwentyone3 = baseProject.Data[20].CompanyShipBuildInfo,
@@ -589,7 +589,7 @@ namespace GHMonitoringCenterApi.Controllers.ProductionValueImport
                 titletwentyone9 = baseProject.Data[20].ExcelTitle.Where(x => x.Type == 9).FirstOrDefault()?.TtileContent,
 
 
-                datesheettwentytwo1 = baseProject.Data[21].CompanyProjectBasePoduction.Count() == 0 ? "" : DateTime.ParseExact(baseProject.Data[21].CompanyProjectBasePoduction[21].DateDay.ToString(), "yyyyMMdd", System.Globalization.CultureInfo.InvariantCulture).ToString("yyyy年MM月dd日"),
+                datesheettwentytwo1 = baseProject.Data[21].CompanyProjectBasePoduction.Count() == 0 ? "" : DateTime.ParseExact(baseProject.Data[21].CompanyProjectBasePoduction[5].DateDay.ToString(), "yyyyMMdd", System.Globalization.CultureInfo.InvariantCulture).ToString("yyyy年MM月dd日"),
                 resulttwentytwo1 = baseProject.Data[21].CompanyProjectBasePoduction,
                 resulttwentytwo2 = baseProject.Data[21].CompanyBasePoductionValue,
                 resulttwentytwo3 = baseProject.Data[21].CompanyShipBuildInfo,
@@ -610,7 +610,7 @@ namespace GHMonitoringCenterApi.Controllers.ProductionValueImport
                 titletwentytwo9 = baseProject.Data[21].ExcelTitle.Where(x => x.Type == 9).FirstOrDefault()?.TtileContent,
 
 
-                datesheettwentythree1 = baseProject.Data[22].CompanyProjectBasePoduction.Count() == 0 ? "" : DateTime.ParseExact(baseProject.Data[22].CompanyProjectBasePoduction[22].DateDay.ToString(), "yyyyMMdd", System.Globalization.CultureInfo.InvariantCulture).ToString("yyyy年MM月dd日"),
+                datesheettwentythree1 = baseProject.Data[22].CompanyProjectBasePoduction.Count() == 0 ? "" : DateTime.ParseExact(baseProject.Data[22].CompanyProjectBasePoduction[5].DateDay.ToString(), "yyyyMMdd", System.Globalization.CultureInfo.InvariantCulture).ToString("yyyy年MM月dd日"),
                 resulttwentythree1 = baseProject.Data[22].CompanyProjectBasePoduction,
                 resulttwentythree2 = baseProject.Data[22].CompanyBasePoductionValue,
                 resulttwentythree3 = baseProject.Data[22].CompanyShipBuildInfo,
@@ -631,7 +631,7 @@ namespace GHMonitoringCenterApi.Controllers.ProductionValueImport
                 titletwentythree9 = baseProject.Data[22].ExcelTitle.Where(x => x.Type == 9).FirstOrDefault()?.TtileContent,
 
 
-                datesheettwentyfour1 = baseProject.Data[23].CompanyProjectBasePoduction.Count() == 0 ? "" : DateTime.ParseExact(baseProject.Data[23].CompanyProjectBasePoduction[23].DateDay.ToString(), "yyyyMMdd", System.Globalization.CultureInfo.InvariantCulture).ToString("yyyy年MM月dd日"),
+                datesheettwentyfour1 = baseProject.Data[23].CompanyProjectBasePoduction.Count() == 0 ? "" : DateTime.ParseExact(baseProject.Data[23].CompanyProjectBasePoduction[5].DateDay.ToString(), "yyyyMMdd", System.Globalization.CultureInfo.InvariantCulture).ToString("yyyy年MM月dd日"),
                 resulttwentyfour1 = baseProject.Data[23].CompanyProjectBasePoduction,
                 resulttwentyfour2 = baseProject.Data[23].CompanyBasePoductionValue,
                 resulttwentyfour3 = baseProject.Data[23].CompanyShipBuildInfo,
@@ -652,7 +652,7 @@ namespace GHMonitoringCenterApi.Controllers.ProductionValueImport
                 titletwentyfour9 = baseProject.Data[23].ExcelTitle.Where(x => x.Type == 9).FirstOrDefault()?.TtileContent,
 
 
-                datesheettwentyfive1 = baseProject.Data[24].CompanyProjectBasePoduction.Count() == 0 ? "" : DateTime.ParseExact(baseProject.Data[24].CompanyProjectBasePoduction[24].DateDay.ToString(), "yyyyMMdd", System.Globalization.CultureInfo.InvariantCulture).ToString("yyyy年MM月dd日"),
+                datesheettwentyfive1 = baseProject.Data[24].CompanyProjectBasePoduction.Count() == 0 ? "" : DateTime.ParseExact(baseProject.Data[24].CompanyProjectBasePoduction[5].DateDay.ToString(), "yyyyMMdd", System.Globalization.CultureInfo.InvariantCulture).ToString("yyyy年MM月dd日"),
                 resulttwentyfive1 = baseProject.Data[24].CompanyProjectBasePoduction,
                 resulttwentyfive2 = baseProject.Data[24].CompanyBasePoductionValue,
                 resulttwentyfive3 = baseProject.Data[24].CompanyShipBuildInfo,
@@ -673,7 +673,7 @@ namespace GHMonitoringCenterApi.Controllers.ProductionValueImport
                 titletwentyfive9 = baseProject.Data[24].ExcelTitle.Where(x => x.Type == 9).FirstOrDefault()?.TtileContent,
 
 
-                datesheettwentysix1 = baseProject.Data[25].CompanyProjectBasePoduction.Count() == 0 ? "" : DateTime.ParseExact(baseProject.Data[25].CompanyProjectBasePoduction[25].DateDay.ToString(), "yyyyMMdd", System.Globalization.CultureInfo.InvariantCulture).ToString("yyyy年MM月dd日"),
+                datesheettwentysix1 = baseProject.Data[25].CompanyProjectBasePoduction.Count() == 0 ? "" : DateTime.ParseExact(baseProject.Data[25].CompanyProjectBasePoduction[5].DateDay.ToString(), "yyyyMMdd", System.Globalization.CultureInfo.InvariantCulture).ToString("yyyy年MM月dd日"),
                 resulttwentysix1 = baseProject.Data[25].CompanyProjectBasePoduction,
                 resulttwentysix2 = baseProject.Data[25].CompanyBasePoductionValue,
                 resulttwentysix3 = baseProject.Data[25].CompanyShipBuildInfo,
@@ -694,7 +694,7 @@ namespace GHMonitoringCenterApi.Controllers.ProductionValueImport
                 titletwentysix9 = baseProject.Data[25].ExcelTitle.Where(x => x.Type == 9).FirstOrDefault()?.TtileContent,
 
 
-                datesheettwentyseven1 = baseProject.Data[26].CompanyProjectBasePoduction.Count() == 0 ? "" : DateTime.ParseExact(baseProject.Data[26].CompanyProjectBasePoduction[26].DateDay.ToString(), "yyyyMMdd", System.Globalization.CultureInfo.InvariantCulture).ToString("yyyy年MM月dd日"),
+                datesheettwentyseven1 = baseProject.Data[26].CompanyProjectBasePoduction.Count() == 0 ? "" : DateTime.ParseExact(baseProject.Data[26].CompanyProjectBasePoduction[5].DateDay.ToString(), "yyyyMMdd", System.Globalization.CultureInfo.InvariantCulture).ToString("yyyy年MM月dd日"),
                 resulttwentyseven1 = baseProject.Data[26].CompanyProjectBasePoduction,
                 resulttwentyseven2 = baseProject.Data[26].CompanyBasePoductionValue,
                 resulttwentyseven3 = baseProject.Data[26].CompanyShipBuildInfo,
@@ -715,7 +715,7 @@ namespace GHMonitoringCenterApi.Controllers.ProductionValueImport
                 titletwentyseven9 = baseProject.Data[26].ExcelTitle.Where(x => x.Type == 9).FirstOrDefault()?.TtileContent,
 
 
-                datesheettwentyeight1 = baseProject.Data[27].CompanyProjectBasePoduction.Count() == 0 ? "" : DateTime.ParseExact(baseProject.Data[27].CompanyProjectBasePoduction[27].DateDay.ToString(), "yyyyMMdd", System.Globalization.CultureInfo.InvariantCulture).ToString("yyyy年MM月dd日"),
+                datesheettwentyeight1 = baseProject.Data[27].CompanyProjectBasePoduction.Count() == 0 ? "" : DateTime.ParseExact(baseProject.Data[27].CompanyProjectBasePoduction[5].DateDay.ToString(), "yyyyMMdd", System.Globalization.CultureInfo.InvariantCulture).ToString("yyyy年MM月dd日"),
                 resulttwentyeight1 = baseProject.Data[27].CompanyProjectBasePoduction,
                 resulttwentyeight2 = baseProject.Data[27].CompanyBasePoductionValue,
                 resulttwentyeight3 = baseProject.Data[27].CompanyShipBuildInfo,
@@ -736,7 +736,7 @@ namespace GHMonitoringCenterApi.Controllers.ProductionValueImport
                 titletwentyeight9 = baseProject.Data[27].ExcelTitle.Where(x => x.Type == 9).FirstOrDefault()?.TtileContent,
 
 
-                datesheettwentynine1 = baseProject.Data[28].CompanyProjectBasePoduction.Count() == 0 ? "" : DateTime.ParseExact(baseProject.Data[28].CompanyProjectBasePoduction[28].DateDay.ToString(), "yyyyMMdd", System.Globalization.CultureInfo.InvariantCulture).ToString("yyyy年MM月dd日"),
+                datesheettwentynine1 = baseProject.Data[28].CompanyProjectBasePoduction.Count() == 0 ? "" : DateTime.ParseExact(baseProject.Data[28].CompanyProjectBasePoduction[5].DateDay.ToString(), "yyyyMMdd", System.Globalization.CultureInfo.InvariantCulture).ToString("yyyy年MM月dd日"),
                 resulttwentynine1 = baseProject.Data[28].CompanyProjectBasePoduction,
                 resulttwentynine2 = baseProject.Data[28].CompanyBasePoductionValue,
                 resulttwentynine3 = baseProject.Data[28].CompanyShipBuildInfo,
@@ -757,7 +757,7 @@ namespace GHMonitoringCenterApi.Controllers.ProductionValueImport
                 titletwentynine9 = baseProject.Data[28].ExcelTitle.Where(x => x.Type == 9).FirstOrDefault()?.TtileContent,
 
 
-                datesheetthirty1 = baseProject.Data[29].CompanyProjectBasePoduction.Count() == 0 ? "" : DateTime.ParseExact(baseProject.Data[29].CompanyProjectBasePoduction[29].DateDay.ToString(), "yyyyMMdd", System.Globalization.CultureInfo.InvariantCulture).ToString("yyyy年MM月dd日"),
+                datesheetthirty1 = baseProject.Data[29].CompanyProjectBasePoduction.Count() == 0 ? "" : DateTime.ParseExact(baseProject.Data[29].CompanyProjectBasePoduction[5].DateDay.ToString(), "yyyyMMdd", System.Globalization.CultureInfo.InvariantCulture).ToString("yyyy年MM月dd日"),
                 resultthirty1 = baseProject.Data[29].CompanyProjectBasePoduction,
                 resultthirty2 = baseProject.Data[29].CompanyBasePoductionValue,
                 resultthirty3 = baseProject.Data[29].CompanyShipBuildInfo,
@@ -778,7 +778,7 @@ namespace GHMonitoringCenterApi.Controllers.ProductionValueImport
                 titlethirty9 = baseProject.Data[29].ExcelTitle.Where(x => x.Type == 9).FirstOrDefault()?.TtileContent,
 
 
-                datesheetthirtyone1 = baseProject.Data[30].CompanyProjectBasePoduction.Count() == 0 ? "" : DateTime.ParseExact(baseProject.Data[30].CompanyProjectBasePoduction[30].DateDay.ToString(), "yyyyMMdd", System.Globalization.CultureInfo.InvariantCulture).ToString("yyyy年MM月dd日"),
+                datesheetthirtyone1 = baseProject.Data[30].CompanyProjectBasePoduction.Count() == 0 ? "" : DateTime.ParseExact(baseProject.Data[30].CompanyProjectBasePoduction[5].DateDay.ToString(), "yyyyMMdd", System.Globalization.CultureInfo.InvariantCulture).ToString("yyyy年MM月dd日"),
                 resultthirtyone1 = baseProject.Data[30].CompanyProjectBasePoduction,
                 resultthirtyone2 = baseProject.Data[30].CompanyBasePoductionValue,
                 resultthirtyone3 = baseProject.Data[30].CompanyShipBuildInfo,
