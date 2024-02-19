@@ -163,7 +163,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             var project = dbContext.Queryable<Project>()
                 .LeftJoin<ProjectStatus>((p, ps) => p.StatusId == ps.StatusId)
                 .Where(p => departmentIds.Contains(p.ProjectDept.Value))
-                .Where(p =>p.StatusId != "0c686c96-889e-4c4d-b24d-fa2886d9dceb".ToGuid())
+                .Where(p => p.StatusId != "0c686c96-889e-4c4d-b24d-fa2886d9dceb".ToGuid())
                 .WhereIF(true, p => p.IsDelete == 1)
                 .WhereIF(searchRequestDto.CompanyId != null, p => p.CompanyId == searchRequestDto.CompanyId)
                 .WhereIF(searchRequestDto.ProjectDept != null, p => p.ProjectDept == searchRequestDto.ProjectDept)
@@ -711,7 +711,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             //获取省份
             var provinceList = await dbContext.Queryable<Province>().Where(x => x.IsDelete == 1).ToListAsync();
             //获取地点名称
-            projectDeteilSingle.AreaName =  await baseService.GetProvincemarket(provinceList, projectDeteilSingle.AreaName.ToGuid());
+            projectDeteilSingle.AreaName = await baseService.GetProvincemarket(provinceList, projectDeteilSingle.AreaName.ToGuid());
             //获取区域名称
             projectDeteilSingle.RegionName = await dbContext.Queryable<ProjectArea>().Where(x => x.IsDelete == 1 && x.AreaId == projectDeteilSingle.RegionId).Select(x => x.Name).SingleAsync();
             //类型
@@ -719,7 +719,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             //币种
             projectDeteilSingle.CurrencyName = await dbContext.Queryable<Currency>().Where(x => x.IsDelete == 1 && x.PomId == projectDeteilSingle.CurrencyId).Select(x => x.Zcurrencyname).SingleAsync();
             //获取币种汇率
-            projectDeteilSingle.ExchangeRate = await dbContext.Queryable<CurrencyConverter>().Where(x => x.IsDelete == 1 && x.CurrencyId == projectDeteilSingle.CurrencyId.ToString()&&x.Year==DateTime.Now.Year).Select(x => x.ExchangeRate).SingleAsync();
+            projectDeteilSingle.ExchangeRate = await dbContext.Queryable<CurrencyConverter>().Where(x => x.IsDelete == 1 && x.CurrencyId == projectDeteilSingle.CurrencyId.ToString() && x.Year == DateTime.Now.Year).Select(x => x.ExchangeRate).SingleAsync();
             //项目状态
             projectDeteilSingle.StatusName = await dbContext.Queryable<ProjectStatus>().Where(x => x.IsDelete == 1 && x.StatusId == projectDeteilSingle.StatusId).Select(x => x.Name).SingleAsync();
             //项目规模
@@ -843,7 +843,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             if (projectDeteilSingle.projectDutyDtos != null && projectDeteilSingle.projectDutyDtos.Count > 0)
             {
                 //查询人员名称
-                var dutyName = await dbContext.Queryable<GHMonitoringCenterApi.Domain.Models.User>().Where(x => dutyList.Select(x => x.AssistantManagerId).Contains(x.PomId)).Select(x => new { x.PomId, x.Name,x.Phone }).ToListAsync();
+                var dutyName = await dbContext.Queryable<GHMonitoringCenterApi.Domain.Models.User>().Where(x => dutyList.Select(x => x.AssistantManagerId).Contains(x.PomId)).Select(x => new { x.PomId, x.Name, x.Phone }).ToListAsync();
                 //查询项目干系人员名称
                 var orgTypeName = await dbContext.Queryable<DictionaryTable>().Where(x => x.IsDelete == 1 && x.TypeNo == 1).ToListAsync();
                 foreach (var item in projectDeteilSingle.projectDutyDtos)
@@ -853,36 +853,37 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 }
                 projectDeteilSingle.projectDutyDtos = projectDeteilSingle.projectDutyDtos.OrderBy(x => x.Type).ThenByDescending(x => x.IsPresent).ToList();
             }
-            if (projectDeteilSingle.projectDutyDtos != null && !projectDeteilSingle.projectDutyDtos.Any()) 
+            if (projectDeteilSingle.projectDutyDtos != null && !projectDeteilSingle.projectDutyDtos.Any())
             {
                 projectDeteilSingle.projectDutyDtos = projectDeteilSingle.projectDutyDtos.DistinctBy(t => new { t.AssistantManagerId, t.Type, t.IsPresent }).ToList();
             }
             #region 去重人员单位信息
             List<ProjectDutyDto> projectDutyDtoList = new List<ProjectDutyDto>();
-            if (projectDeteilSingle!=null&&projectDeteilSingle.projectDutyDtos!=null&&projectDeteilSingle.projectDutyDtos.Any())
+            if (projectDeteilSingle != null && projectDeteilSingle.projectDutyDtos != null && projectDeteilSingle.projectDutyDtos.Any())
             {
-                
+
                 foreach (var item in projectDeteilSingle.projectDutyDtos)
                 {
-                    var  projectDutyList= projectDeteilSingle.projectDutyDtos.Where(x => x.Type == item.Type).ToList();
+                    var projectDutyList = projectDeteilSingle.projectDutyDtos.Where(x => x.Type == item.Type).ToList();
                     if (projectDutyList.Any() && projectDutyList.Count >= 2)
                     {
                         foreach (var pro in projectDutyList)
                         {
-                            if (pro.ProjectId == projectDeteilSingle.Id&& !projectDutyDtoList.Exists(x => x.Type == item.Type))
+                            if (pro.ProjectId == projectDeteilSingle.Id && !projectDutyDtoList.Exists(x => x.Type == item.Type))
                             {
                                 projectDutyDtoList.Add(pro);
                             }
                         }
                     }
-                    else {
+                    else
+                    {
                         if (!projectDutyDtoList.Exists(x => x.Type == item.Type))
                         {
                             projectDutyDtoList.Add(item);
                         }
-                        
+
                     }
-                   
+
                 }
             }
 
@@ -922,7 +923,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             var monthLastDay = new DateTime(currentDate.Year, currentDate.Month, 1).AddMonths(1).AddDays(-1).Day;
             if (nowDay > 26 && nowDay <= monthLastDay)
             {
-                stopDay = monthLastDay-26;
+                stopDay = monthLastDay - 26;
             }
             else
             {
@@ -953,17 +954,18 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 }
 
             }
-            else 
+            else
             {
-               var  projectStatusChangeSingle = await dbContext.Queryable<ProjectStatusChangeRecord>().FirstAsync(x => x.IsValid == 1 
-                && x.Id == addOrUpdateProjectRequestDto.Id);
+                var projectStatusChangeSingle = await dbContext.Queryable<ProjectStatusChangeRecord>().FirstAsync(x => x.IsValid == 1
+                 && x.Id == addOrUpdateProjectRequestDto.Id);
 
                 //修改操作  修改状态之前还是在建状态  所以停工天数不计算  生产日报也不会推送 等下再改为在建的时候 就会记录停工天数
                 if (projectStatusChangeSingle != null && projectStatusChangeSingle.NewStatus == CommonData.PConstruc.ToGuid() && projectStatusChangeSingle.NewStatus != addOrUpdateProjectRequestDto.StatusId)
                 {
                     //说明停工 不算每天生产日报推送数据里面了 
                     ProjectStatusChangeRecord projectStatusChangeRecord = new ProjectStatusChangeRecord()
-                    { ItemId= projectStatusChangeSingle.ItemId,
+                    {
+                        ItemId = projectStatusChangeSingle.ItemId,
                         Id = addOrUpdateProjectRequestDto.Id.Value,
                         OldStatus = CommonData.PConstruc.ToGuid(),
                         NewStatus = addOrUpdateProjectRequestDto.StatusId.Value,
@@ -971,7 +973,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                         IsValid = 1,
                         StopDay = 0
                     };
-                   await dbContext.Updateable(projectStatusChangeRecord).ExecuteCommandAsync();
+                    await dbContext.Updateable(projectStatusChangeRecord).ExecuteCommandAsync();
                 }
                 //修改状态之前  原来状态不是在建状态了 这个时候要计算停工天数
                 else if (projectStatusChangeSingle != null && projectStatusChangeSingle.NewStatus != CommonData.PConstruc.ToGuid() && addOrUpdateProjectRequestDto.StatusId == CommonData.PConstruc.ToGuid())
@@ -994,20 +996,21 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 {
                     //说明是有原来的非在建状态改为在建状态的
                     var projectSingle = await dbContext.Queryable<Project>().SingleAsync(x => x.IsDelete == 1 && x.Id == addOrUpdateProjectRequestDto.Id);
-                    
+
                     var currentMonth = String.Empty;
                     if (DateTime.Now.Day > 26 && DateTime.Now.Day <= monthLastDay)
                     {
-                        currentMonth =DateTime.Now.ToString("MM");
+                        currentMonth = DateTime.Now.ToString("MM");
                     }
-                    else {
+                    else
+                    {
                         currentMonth = DateTime.Now.AddMonths(-1).ToString("MM");
                     }
-                    var initDay=Convert.ToDateTime(DateTime.Now.ToString("yyyy-") + currentMonth + "-26");
-                    var diffDays = TimeHelper.GetTimeSpan(initDay, DateTime.Now).Days-1;
+                    var initDay = Convert.ToDateTime(DateTime.Now.ToString("yyyy-") + currentMonth + "-26");
+                    var diffDays = TimeHelper.GetTimeSpan(initDay, DateTime.Now).Days - 1;
                     ProjectStatusChangeRecord projectStatusChangeRecord = new ProjectStatusChangeRecord()
                     {
-                        ItemId = projectStatusChangeSingle.ItemId,
+                        ItemId = GuidUtil.Next(),
                         Id = projectSingle.Id,
                         OldStatus = projectSingle != null ? projectSingle.StatusId.Value : Guid.Empty,
                         NewStatus = addOrUpdateProjectRequestDto.StatusId.Value,
@@ -1189,7 +1192,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 //                else {
                 //                    stopDay = result[0].StopDay.Value;
                 //                }
-                                
+
                 //            }
                 //            else
                 //            {
@@ -1233,7 +1236,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 //    {
                 //        item.StopDay = stopDay;
                 //    }
-                  
+
                 //    if (result != null && result.Count > 0)
                 //    {
                 //        //更新暂停天数
@@ -2083,7 +2086,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             ProjectCurrencyResponseDto projectCurrencyResponseDto = new ProjectCurrencyResponseDto();
             //获取汇率表中的数据
             var rate = await dbContext.Queryable<CurrencyConverter>().Where(x => x.CurrencyId == currencyId.ToString()
-            &&x.Year== year).Select(x => x.ExchangeRate).SingleAsync();
+            && x.Year == year).Select(x => x.ExchangeRate).SingleAsync();
             projectCurrencyResponseDto.ExchangeRate = rate;
             responseAjaxResult.Data = projectCurrencyResponseDto;
             responseAjaxResult.Success(ResponseMessage.OPERATION_SUCCESS);
@@ -2397,7 +2400,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     };
                     #endregion
                     sub.PomId = sinleSubShip.PomId;
-					var result = await dbContext.Updateable(sub).IgnoreColumns(x => x.CreateId).EnableDiffLogEvent(logDto).ExecuteCommandAsync();
+                    var result = await dbContext.Updateable(sub).IgnoreColumns(x => x.CreateId).EnableDiffLogEvent(logDto).ExecuteCommandAsync();
                     if (result > 0)
                     {
                         responseAjaxResult.Data = true;
@@ -2415,8 +2418,8 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
 
             }
             //记录分包船舶的变更
-			await entityChangeService.RecordEntitysChangeAsync(EntityType.SubShip, sub.Id);
-			return responseAjaxResult;
+            await entityChangeService.RecordEntitysChangeAsync(EntityType.SubShip, sub.Id);
+            return responseAjaxResult;
         }
 
         /// <summary>
@@ -2553,7 +2556,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             var result = await dbContext.Queryable<Project>()
                .LeftJoin<ProjectPlanProduction>((x, y) => x.Id == y.ProjectId && y.Year == DateTime.Now.Year)
                .Where(x => x.IsDelete == 1 && departmentIds.Contains(x.ProjectDept.Value))
-               .WhereIF(monthlyPlanRequestDto.CompanyId != null , (x, y) => x.CompanyId == monthlyPlanRequestDto.CompanyId)
+               .WhereIF(monthlyPlanRequestDto.CompanyId != null, (x, y) => x.CompanyId == monthlyPlanRequestDto.CompanyId)
                .WhereIF(!string.IsNullOrWhiteSpace(monthlyPlanRequestDto.KeyWords), (x, y) => x.Name.Contains(monthlyPlanRequestDto.KeyWords))
                .OrderBy(x => x.CompanyId)
                .Select((x, y) => new ProjectPlanSearchInfo()
@@ -2739,30 +2742,30 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             ResponseAjaxResult<List<CompanyProjectDetailedResponseDto>> responseAjaxResult = new ResponseAjaxResult<List<CompanyProjectDetailedResponseDto>>();
             //项目状态ID 
             var projectStatusIds = CommonData.NoStatus.Split(",").Select(x => x.ToGuid()).ToList();
-            var result =await dbContext.Queryable<Project>()
+            var result = await dbContext.Queryable<Project>()
                 .LeftJoin<ProductionMonitoringOperationDayReport>((x, y) => x.CompanyId == y.ItemId &&
-                y.Type==1&&y.Collect==0&&!string.IsNullOrWhiteSpace(y.Name))
+                y.Type == 1 && y.Collect == 0 && !string.IsNullOrWhiteSpace(y.Name))
                 .LeftJoin<ProjectType>((x, y, z) => x.TypeId == z.PomId)
                 .LeftJoin<ProjectStatus>((x, y, z, a) => x.StatusId == a.StatusId)
                  .WhereIF(!string.IsNullOrWhiteSpace(companyProjectDetailsdRequestDto.ProjectName), (x, y, z, a) => x.Name.Contains(companyProjectDetailsdRequestDto.ProjectName))
-                .WhereIF(companyProjectDetailsdRequestDto.StatusId!=null, (x, y, z, a)=>a.StatusId== companyProjectDetailsdRequestDto.StatusId)
-                .WhereIF(companyProjectDetailsdRequestDto.TypeId!=null, (x, y, z, a)=>x.TypeId== companyProjectDetailsdRequestDto.TypeId)
-                .WhereIF(companyProjectDetailsdRequestDto.CompanyId!=null, (x, y, z, a)=>x.CompanyId== companyProjectDetailsdRequestDto.CompanyId)
+                .WhereIF(companyProjectDetailsdRequestDto.StatusId != null, (x, y, z, a) => a.StatusId == companyProjectDetailsdRequestDto.StatusId)
+                .WhereIF(companyProjectDetailsdRequestDto.TypeId != null, (x, y, z, a) => x.TypeId == companyProjectDetailsdRequestDto.TypeId)
+                .WhereIF(companyProjectDetailsdRequestDto.CompanyId != null, (x, y, z, a) => x.CompanyId == companyProjectDetailsdRequestDto.CompanyId)
                 //.WhereIF(companyProjectDetailsdRequestDto.CommencementDate!=null, (x, y, z, a)=>x.CommencementTime== companyProjectDetailsdRequestDto.CompanyId)
-                .Where(x => x.IsDelete == 1&&!projectStatusIds.Contains(x.StatusId.Value) && x.TypeId != "048120ae-1e9f-46d8-a38f-5d5e9e49ecba".ToGuid())
-                .OrderBy((x, y, z, a)=>new { y.Sort ,a.Sequence})
+                .Where(x => x.IsDelete == 1 && !projectStatusIds.Contains(x.StatusId.Value) && x.TypeId != "048120ae-1e9f-46d8-a38f-5d5e9e49ecba".ToGuid())
+                .OrderBy((x, y, z, a) => new { y.Sort, a.Sequence })
                 .Select((x, y, z, a) => new CompanyProjectDetailedResponseDto
                 {
                     Id = x.Id,
                     ProjectName = x.Name,
-                    CompanyId=y.ItemId.Value,
+                    CompanyId = y.ItemId.Value,
                     CompanyName = y.Name,
-                    StatusSort=a.Sequence.Value,
+                    StatusSort = a.Sequence.Value,
                     StatusName = a.Name,
                     TypeName = z.Name,
                     ContractAmount = x.Amount.Value,
-                    CommencementDate =x.CommencementTime.Value.ToString(),
-                   
+                    CommencementDate = x.CommencementTime.Value.ToString(),
+
                 }).ToListAsync();
             #region 计算项目累计产值
             //查询历史产值
@@ -2781,7 +2784,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     item.ProjectProgress = Math.Round(
                         (GetProjectTotalProductionValue(item.Id, historyProjectList, currentTotalYearOffirmProductionValue) / item.ContractAmount) * 100, 2);
                 }
-                
+
             }
             #endregion
 
@@ -2798,23 +2801,24 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
         /// <param name="data">历史数据</param>
         /// <param name="currentTotalYearOffirmProductionValue">每月完成产值</param>
         /// <returns></returns>
-        public  static decimal GetProjectTotalProductionValue(Guid id, List<ProjectHistoryData> data,List<MonthReport> currentTotalYearOffirmProductionValue)
+        public static decimal GetProjectTotalProductionValue(Guid id, List<ProjectHistoryData> data, List<MonthReport> currentTotalYearOffirmProductionValue)
         {
-            var projectSingleProductionValue=data.Where(x => x.ProjectId == id).SingleOrDefault();
-            var totalYearKaileaOffirmProductionValue = projectSingleProductionValue?.AccumulatedOutputValue??0+
-                currentTotalYearOffirmProductionValue.Where(x=>x.ProjectId==id).Sum(x => x.CurrencyCompleteProductionAmount);
+            var projectSingleProductionValue = data.Where(x => x.ProjectId == id).SingleOrDefault();
+            var totalYearKaileaOffirmProductionValue = projectSingleProductionValue?.AccumulatedOutputValue ?? 0 +
+                currentTotalYearOffirmProductionValue.Where(x => x.ProjectId == id).Sum(x => x.CurrencyCompleteProductionAmount);
             return totalYearKaileaOffirmProductionValue;
         }
 
         public async Task<ResponseAjaxResult<List<BasePullDownResponseDto>>> SearchCompanyProjectPullDownAsync()
         {
             ResponseAjaxResult<List<BasePullDownResponseDto>> responseAjaxResult = new ResponseAjaxResult<List<BasePullDownResponseDto>>();
-            responseAjaxResult.Data=( await dbContext.Queryable<ProductionMonitoringOperationDayReport>().Where(x => x.IsDelete == 1 && x.Type == 1 && x.Collect == 0 && x.Name != null)
+            responseAjaxResult.Data = (await dbContext.Queryable<ProductionMonitoringOperationDayReport>().Where(x => x.IsDelete == 1 && x.Type == 1 && x.Collect == 0 && x.Name != null)
                 .OrderBy(x => x.Sort.Value)
-                .Select(x=>new BasePullDownResponseDto() { 
-                 Id= x.ItemId,
-                 Name=x.Name,
-                  Type=x.Sort.Value
+                .Select(x => new BasePullDownResponseDto()
+                {
+                    Id = x.ItemId,
+                    Name = x.Name,
+                    Type = x.Sort.Value
                 }).ToListAsync());
             responseAjaxResult.Count = responseAjaxResult.Data.Count;
             responseAjaxResult.Success();
