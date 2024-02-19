@@ -123,9 +123,9 @@ namespace GHMonitoringCenterApi.Controllers.ProductionValueImport
             #endregion
 
             #region 模版路径
-            var tempPath = "E:\\project\\HNKC.SZGHAPI\\GHMonitoringCenterApi.Domain.Shared\\Template\\Excel\\ProductionDayReport.xlsx";
+            //var tempPath = "E:\\project\\HNKC.SZGHAPI\\GHMonitoringCenterApi.Domain.Shared\\Template\\Excel\\ProductionDayReport.xlsx";
             //var tempPath = "D:\\projectconllection\\dotnet\\szgh\\GHMonitoringCenterApi.Domain.Shared\\Template\\Excel\\ProductionDayReport.xlsx";
-            //var tempPath = "Template/Excel/ProductionDayReport.xlsx";
+            var tempPath = "Template/Excel/ProductionDayReport.xlsx";
 
             #endregion
 
@@ -156,7 +156,7 @@ namespace GHMonitoringCenterApi.Controllers.ProductionValueImport
             }
             #endregion
 
-            var s = baseProject.Data[13].CompanyProjectBasePoduction;
+           // var s = baseProject.Data[13].CompanyProjectBasePoduction;
 
 
             var value = new ResultResponseDto
@@ -838,8 +838,8 @@ namespace GHMonitoringCenterApi.Controllers.ProductionValueImport
             }
             #endregion
             #region 模版路径
-            var tempPath = "E:\\project\\HNKC.SZGHAPI\\GHMonitoringCenterApi.Domain.Shared\\Template\\Excel\\HistoryHolidayReport.xlsx";
-            //var tempPath = "Template/Excel/HistoryHolidayReport.xlsx";
+            //var tempPath = "E:\\project\\HNKC.SZGHAPI\\GHMonitoringCenterApi.Domain.Shared\\Template\\Excel\\HistoryHolidayReport.xlsx";
+            var tempPath = "Template/Excel/HistoryHolidayReport.xlsx";
 
             #endregion
 
