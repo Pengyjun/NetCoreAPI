@@ -552,14 +552,17 @@ namespace GHMonitoringCenterApi.Application.Service.ProductionValueImport
             //项目带班生产动态已填报项目
             if (excelProjectShiftProductionInfo.Count() > 0)
             {
+                var nowYear = DateTime.Now.ToDateYear();
+                var nowMonth = DateTime.Now.ToDateMonth();
+                var nowDateDay = DateTime.Now.ToDateDay();
                 //数据映射
                 var result = _mapper.Map<List<ProjectShiftProductionInfo>, List<ExcelProjectShiftProductionInfo>>(excelProjectShiftProductionInfo);
                 foreach (var item in result)
                 {
                     item.Id = GuidUtil.Next();
-                    item.DateDay = dateDay;
-                    item.Year = year;
-                    item.Month = month;
+                    item.DateDay = nowDateDay;
+                    item.Year = nowYear;
+                    item.Month = nowMonth;
                 }
                 await _dbContext.Insertable(result).ExecuteCommandAsync();
 
@@ -569,25 +572,28 @@ namespace GHMonitoringCenterApi.Application.Service.ProductionValueImport
                 {
                     CreateTime = DateTime.Now,
                     Id = GuidUtil.Next(),
-                    Month = month,
-                    TitleName = "【" + dateDay + "】广航局生产运营监控日报 元旦期间各在建项目带班生产动态",
+                    Month = nowMonth,
+                    TitleName = "【" + nowDateDay + "】广航局生产运营监控日报 元旦期间各在建项目带班生产动态",
                     TtileContent = titleTen,
-                    DateDay = dateDay,
+                    DateDay = nowDateDay,
                     Type = 10,
-                    Year = year
+                    Year = nowYear
                 });
             }
             //项目带班生产动态未填报项目
             if (excelUnProjectShitInfo.Count() > 0)
             {
+                var nowYear = DateTime.Now.ToDateYear();
+                var nowMonth = DateTime.Now.ToDateMonth();
+                var nowDateDay = DateTime.Now.ToDateDay();
                 //数据映射
                 var result = _mapper.Map<List<UnProjectShitInfo>, List<ExcelUnProjectShitInfo>>(excelUnProjectShitInfo);
                 foreach (var item in result)
                 {
                     item.Id = GuidUtil.Next();
-                    item.DateDay = dateDay;
-                    item.Year = year;
-                    item.Month = month;
+                    item.DateDay = nowDateDay;
+                    item.Year = nowYear;
+                    item.Month = nowMonth;
                     item.UnitDesc = GetUnitDesc(item.UnitName);
                 }
                 await _dbContext.Insertable(result).ExecuteCommandAsync();
@@ -598,12 +604,12 @@ namespace GHMonitoringCenterApi.Application.Service.ProductionValueImport
                 {
                     CreateTime = DateTime.Now,
                     Id = GuidUtil.Next(),
-                    Month = month,
-                    TitleName = "【" + dateDay + "】广航局生产运营监控日报 元旦期间各在建项目带班生产动态",
+                    Month = nowMonth,
+                    TitleName = "【" + nowDateDay + "】广航局生产运营监控日报 元旦期间各在建项目带班生产动态",
                     TtileContent = titleEleven,
-                    DateDay = dateDay,
+                    DateDay = nowDateDay,
                     Type = 11,
-                    Year = year
+                    Year = nowYear
                 });
             }
 
