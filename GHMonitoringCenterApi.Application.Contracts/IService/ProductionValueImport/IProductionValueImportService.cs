@@ -25,7 +25,7 @@ namespace GHMonitoringCenterApi.Application.Contracts.IService.ProductionValueIm
         /// Excel 智慧运营监控中心图片数据写入表
         /// </summary>
         /// <returns></returns>
-        Task<ResponseAjaxResult<bool>> ExcelJJtSendMessageWriteAsync();
+        Task<ResponseAjaxResult<bool>> ExcelJJtSendMessageWriteAsync(DateTime date);
         /// <summary>
         /// 生产监控日报
         /// </summary>

@@ -5,6 +5,7 @@ using GHMonitoringCenterApi.Application.Contracts.IService.ProductionValueImport
 using GHMonitoringCenterApi.Domain.Shared;
 using Microsoft.AspNetCore.Mvc;
 using SqlSugar.Extensions;
+using UtilsSharp;
 
 namespace GHMonitoringCenterApi.Controllers.ProductionValueImport
 {
@@ -83,9 +84,18 @@ namespace GHMonitoringCenterApi.Controllers.ProductionValueImport
         //    return File(bytes, "application/octet-stream", $"{System.DateTime.Now.ToString("yyyyMMdd")}.xlsx");
         //}
         [HttpGet("ExcelJJtSendMessageWrite")]
-        public Task<ResponseAjaxResult<bool>> ExcelJJtSendMessageWriteAsync()
+        public async Task<ResponseAjaxResult<bool>> ExcelJJtSendMessageWriteAsync([FromQuery] DateTime date)
         {
-            return _productionValueImportService.ExcelJJtSendMessageWriteAsync();
+            //DateTime startTime = Convert.ToDateTime("2024-02-19");
+
+            //var difDays = TimeHelper.GetTimeSpan(Convert.ToDateTime(startTime), date).Days;
+            //for (int i = 0; i < difDays; i++)
+            //{
+            return await _productionValueImportService.ExcelJJtSendMessageWriteAsync(date);
+            //startTime = startTime.AddDays(1);
+            //}
+            //var res = new ResponseAjaxResult<bool>();
+            //return res;
         }
         /// <summary>
         /// 导出广航局监控日报历史数据
@@ -113,9 +123,9 @@ namespace GHMonitoringCenterApi.Controllers.ProductionValueImport
             #endregion
 
             #region 模版路径
-            //var tempPath = "E:\\project\\HNKC.SZGHAPI\\GHMonitoringCenterApi.Domain.Shared\\Template\\Excel\\ProductionDayReport.xlsx";
+            var tempPath = "E:\\project\\HNKC.SZGHAPI\\GHMonitoringCenterApi.Domain.Shared\\Template\\Excel\\ProductionDayReport.xlsx";
             //var tempPath = "D:\\projectconllection\\dotnet\\szgh\\GHMonitoringCenterApi.Domain.Shared\\Template\\Excel\\ProductionDayReport.xlsx";
-            var tempPath = "Template/Excel/ProductionDayReport.xlsx";
+            //var tempPath = "Template/Excel/ProductionDayReport.xlsx";
 
             #endregion
 
@@ -145,6 +155,9 @@ namespace GHMonitoringCenterApi.Controllers.ProductionValueImport
                 }
             }
             #endregion
+
+            var s = baseProject.Data[13].CompanyProjectBasePoduction;
+
 
             var value = new ResultResponseDto
             {
@@ -421,7 +434,7 @@ namespace GHMonitoringCenterApi.Controllers.ProductionValueImport
                 titlethirteen9 = baseProject.Data[12].ExcelTitle.Where(x => x.Type == 9).FirstOrDefault()?.TtileContent,
 
 
-                datesheetfourteen1 = baseProject.Data[13].CompanyProjectBasePoduction.Count() == 0 ? "" : DateTime.ParseExact(baseProject.Data[13].CompanyProjectBasePoduction[13].DateDay.ToString(), "yyyyMMdd", System.Globalization.CultureInfo.InvariantCulture).ToString("yyyy年MM月dd日"),
+                datesheetfourteen1 = baseProject.Data[13].CompanyProjectBasePoduction.Count() == 0 ? "" : DateTime.ParseExact(baseProject.Data[13].CompanyProjectBasePoduction[5].DateDay.ToString(), "yyyyMMdd", System.Globalization.CultureInfo.InvariantCulture).ToString("yyyy年MM月dd日"),
                 resultfourteen1 = baseProject.Data[13].CompanyProjectBasePoduction,
                 resultfourteen2 = baseProject.Data[13].CompanyBasePoductionValue,
                 resultfourteen3 = baseProject.Data[13].CompanyShipBuildInfo,
@@ -825,8 +838,8 @@ namespace GHMonitoringCenterApi.Controllers.ProductionValueImport
             }
             #endregion
             #region 模版路径
-            //var tempPath = "E:\\project\\HNKC.SZGHAPI\\GHMonitoringCenterApi.Domain.Shared\\Template\\Excel\\HistoryHolidayReport.xlsx";
-            var tempPath = "Template/Excel/HistoryHolidayReport.xlsx";
+            var tempPath = "E:\\project\\HNKC.SZGHAPI\\GHMonitoringCenterApi.Domain.Shared\\Template\\Excel\\HistoryHolidayReport.xlsx";
+            //var tempPath = "Template/Excel/HistoryHolidayReport.xlsx";
 
             #endregion
 
