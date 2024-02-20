@@ -2778,6 +2778,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             foreach (var item in result)
             {
                 item.Remark = item.CommencementDate?.IndexOf(currentYear.ToString()) >= 0 ? "新中标" : "";
+                item.ContractAmount = Math.Round(item.ContractAmount / 10000, 2);
                 if (item.ContractAmount != 0)
                 {
                     //计算工程进度
