@@ -63,6 +63,8 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.JjtSendMsg
     /// </summary>
     public class ProjectBasePoduction
     {
+        //排名前十的 当日产值合计
+       // public decimal TotalTopTenProductionValue { get; set; } 
         /// <summary>
         /// 总日产值
         /// </summary>

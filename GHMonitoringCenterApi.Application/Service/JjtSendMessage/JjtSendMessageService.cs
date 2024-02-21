@@ -1823,7 +1823,7 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
                     productionValueProgressPercent = Math.Round((baseCalc.Value) / baseCalc.Value * 100, 2);
                 }
                 //每年公司完成指标
-                //var yearIndex = comonDataProductionList.Where(x => x.CompanyId == item.ItemId.Value).First().YearIndex;
+                var yearIndex = comonDataProductionList.Where(x => x.CompanyId == item.ItemId.Value).First().YearIndex;
                 //序时进度
                 var timeProgress = Math.Round((dayOfYear / 365M) * 100, 2);
                 if (item.Collect == 0)
@@ -1831,7 +1831,7 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
                     //var totalYearProductionValue = Math.Round(((item.YearProductionValue + currentMonthCompanyCount) / 100000000), 2);
                     var totalYearProductionValue = Math.Round(((currentMonthCompanyCount) / 100000000), 2);
                     //超序时进度
-                    //var supersequenceProgress = yearIndex.Value != 0 ? (Math.Round(totalYearProductionValue / yearIndex.Value, 2) * 100 - timeProgress) : 0;
+                    var supersequenceProgress = yearIndex.Value != 0 ? (Math.Round(totalYearProductionValue / yearIndex.Value, 2) * 100 - timeProgress) : 0;
                     companyBasePoductionValues.Add(new CompanyBasePoductionValue()
                     {
                         Name = item.Name,
@@ -1839,7 +1839,7 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
                         TotalYearProductionValue = totalYearProductionValue,
                         YearProductionValueProgressPercent = yearProductionValuePercent,
                         ProductionValueProgressPercent = productionValueProgressPercent,
-                        //SupersequenceProgress = supersequenceProgress
+                        SupersequenceProgress = supersequenceProgress
                     });
                 }
                 else
@@ -1955,9 +1955,9 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
                     companyBasePoductionValues = companyBasePoductionValues.Where(x => !string.IsNullOrWhiteSpace(x.Name)).ToList();
                     projectBasePoduction.CompanyBasePoductionValues = companyBasePoductionValues;
                     //广航局年度指标
-                    //yearIndex = comonDataProductionList.Sum(x => x.YearIndex.Value);
+                    yearIndex = comonDataProductionList.Sum(x => x.YearIndex.Value);
                     //超序时进度
-                    //projectBasePoduction.SupersequenceProgress = yearIndex.Value != 0 ? (Math.Round(projectBasePoduction.TotalYearProductionValue / yearIndex.Value, 2) * 100 - timeProgress) : 0;
+                    projectBasePoduction.SupersequenceProgress = yearIndex.Value != 0 ? (Math.Round(projectBasePoduction.TotalYearProductionValue / yearIndex.Value, 2) * 100 - timeProgress) : 0;
                     companyBasePoductionValues.Add(new CompanyBasePoductionValue()
                     {
                         Name = name,
@@ -2010,6 +2010,9 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
                 {
                     var completeRate = Math.Round((((decimal)currentMonthCompanyProductionValue.CompleteProductionValue) / currentMonthCompanyProductionValue.PlanProductionValue) * 100, 0);
                     companyProductionCompares.PlanCompleteRate.Add(completeRate);
+                }
+                else {
+                    companyProductionCompares.PlanCompleteRate.Add(0);
                 }
                 //时间进度
                 var timeSchedult = Math.Round((ofdays / 31M) * 100, 0);
@@ -2096,34 +2099,40 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
             && projectLists.Select(x => x.Id).ToList().Contains(x.ProjectId))
                  .GroupBy(x => x.ProjectId)
                  .Select(x => new { x.ProjectId, productionValue = SqlFunc.AggregateSum(x.DayActualProductionAmount) }).ToListAsync();
-            //projectSumDayProductionValue = projectSumDayProductionValue.OrderByDescending(x => x.productionValue).Take(10).ToList();
+           projectSumDayProductionValue = projectSumDayProductionValue.OrderByDescending(x => x.productionValue).Take(10).ToList();
             var planList = await dbContext.Queryable<ProjectPlanProduction>().Where(x => x.IsDelete == 1 && x.Year == Convert.ToInt32(yearStartTime)).ToListAsync();
-            var projectPlanProductionData = await dbContext.Queryable<ProjectPlanProduction>().Where(x => x.IsDelete == 1).ToListAsync();
-            var dayReportData = await dbContext.Queryable<DayReport>().Where(x => x.IsDelete == 1).ToListAsync();
+            var projectPlanProductionData = await dbContext.Queryable<ProjectPlanProduction>().Where(x => x.IsDelete == 1&&x.Year==DateTime.Now.Year).ToListAsync();
+            var dayReportData = await dbContext.Queryable<DayReport>().Where(x => x.IsDelete == 1&&x.DateDay>= startYearTimeInt
+            &&x.DateDay<=endYearTimeInt).ToListAsync();
             //项目完成产值历史数据
             var historyOutPut = await dbContext.Queryable<ProjectHistoryData>().Where(x => x.IsDelete == 1).ToListAsync();
             var monthStartTime = int.Parse(startYearTimeInt.ToString().Substring(0, 6));
             var monthEndTime = int.Parse(endYearTimeInt.ToString().Substring(0, 6));
             //月报数据
             var monthDataList = await dbContext.Queryable<MonthReport>().Where(x => x.IsDelete == 1
-            && x.DateMonth >= monthStartTime && x.DateMonth <= monthEndTime).ToListAsync();
+            && x.DateMonth > monthStartTime && x.DateMonth <= monthEndTime).ToListAsync();
             foreach (var item in projectSumDayProductionValue)
             {
                 ProjectRank model = new ProjectRank();
                 //var planValue = GetProjectPlanValue(month, planList.Where(x => x.ProjectId == item.ProjectId && x.CompanyId == item.CompanyId).FirstOrDefault());
                 var projectInfo = projectLists.Where(x => x.Id == item.ProjectId).SingleOrDefault();
                 model.ProjectName = projectInfo == null ? string.Empty : projectInfo.ShortName;
-                if (model.ProjectName == "茂名港博贺项目")
-                {
+                //if (model.ProjectName == "茂名港博贺项目")
+                //{
 
-                }
+                //}
                 model.CurrentYearPlanProductionValue = Math.Round(GetRrojectProductionValue(projectPlanProductionData, item.ProjectId).Value, 2);
                 model.CurrentYearCompleteProductionValue = Math.Round(GetRrojectCompletProductionValue(dayReportData, historyOutPut, monthDataList, currentTimeIntUp, currentTimeInt, item.ProjectId), 2);
                 if (model.CurrentYearPlanProductionValue != 0)
                 {
                     model.CompleteRate = Math.Round(model.CurrentYearCompleteProductionValue / model.CurrentYearPlanProductionValue * 100, 2);
                 }
-                //model.DayActualValue = Math.Round(item.MonthAmount / 10000, 2);
+                //当日产值
+                var time = DateTime.Now.AddDays(-1).ToDateDay();
+                var currentDayProduction=dayReportData.Where(x =>x.ProjectId== item.ProjectId&& x.DateDay == time).FirstOrDefault();
+                 //model.DayActualValue = Math.Round(item.productionValue / 10000, 2);
+                 if(currentDayProduction!=null)
+                 model.DayActualValue = Math.Round(currentDayProduction.DayActualProductionAmount / 10000, 2);
                 projectRankList.Add(model);
             }
             projectBasePoduction.ProjectRanks = projectRankList;
@@ -2148,6 +2157,7 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
             {
                 projectBasePoduction.SumCompleteRate = Math.Round((projectBasePoduction.TotalCurrentYearCompleteProductionValue / projectBasePoduction.TotalCurrentYearPlanProductionValue) * 100, 2);
             }
+            projectBasePoduction.SumProjectRanksTen = projectBasePoduction.ProjectRanks.Sum(x => x.DayActualValue);
             #endregion
 
             #region 项目产值强度表格
@@ -2423,7 +2433,7 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
             //    ).ToListAsync();
             //自有船舶历史数据
             var histotyShipList = await dbContext.Queryable<OwnerShipHistory>()
-                 .Where(x => x.IsDelete == 1 && x.Year == 2023).OrderBy(x => x.Sort)
+                 .Where(x => x.IsDelete == 1 && x.Year == 2024).OrderBy(x => x.Sort)
                   .ToListAsync();
             foreach (var item in histotyShipList)
             {
@@ -3347,10 +3357,10 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
                 //var planValue = GetProjectPlanValue(month, planList.Where(x => x.ProjectId == item.ProjectId && x.CompanyId == item.CompanyId).FirstOrDefault());
                 var projectInfo = projectLists.Where(x => x.Id == item.ProjectId).SingleOrDefault();
                 model.ProjectName = projectInfo == null ? string.Empty : projectInfo.ShortName;
-                if (model.ProjectName == "茂名港博贺项目")
-                {
+                //if (model.ProjectName == "茂名港博贺项目")
+                //{
 
-                }
+                //}
                 model.CurrentYearPlanProductionValue = Math.Round(GetRrojectProductionValue(projectPlanProductionData, item.ProjectId).Value, 2);
                 model.CurrentYearCompleteProductionValue = Math.Round(GetRrojectCompletProductionValue(dayReportData, historyOutPut, monthDataList, currentTimeIntUp, currentTimeInt, item.ProjectId), 2);
                 if (model.CurrentYearPlanProductionValue != 0)
@@ -3382,6 +3392,8 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
             {
                 projectBasePoduction.SumCompleteRate = Math.Round((projectBasePoduction.TotalCurrentYearCompleteProductionValue / projectBasePoduction.TotalCurrentYearPlanProductionValue) * 100, 2);
             }
+            
+
             #endregion
 
             #region 项目产值强度表格
