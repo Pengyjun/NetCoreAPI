@@ -1716,12 +1716,12 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
                     DayActualProductionAmount = x.DayActualProductionAmount
                 }).ToListAsync();
             //广航局年累计产值(基础数据累加+几个公司的所有日产值)
-           // var yearProductionValue = companyList.Sum(x => x.YearProductionValue) + dayProductionValueList.Sum(x => x.DayActualProductionAmount);
-            var yearProductionValue =  dayProductionValueList.Sum(x => x.DayActualProductionAmount);
+            // var yearProductionValue = companyList.Sum(x => x.YearProductionValue) + dayProductionValueList.Sum(x => x.DayActualProductionAmount);
+            var yearProductionValue = dayProductionValueList.Sum(x => x.DayActualProductionAmount);
             //项目月报数据
-            var monthReport=await dbContext.Queryable<MonthReport>().Where(x => x.IsDelete == 1 && x.DateYear == 2024).ToListAsync();
+            var monthReport = await dbContext.Queryable<MonthReport>().Where(x => x.IsDelete == 1 && x.DateYear == 2024).ToListAsync();
             //
-            var  projectIds= await dbContext.Queryable<Project>().Where(x => x.IsDelete == 1).ToListAsync();
+            var projectIds = await dbContext.Queryable<Project>().Where(x => x.IsDelete == 1).ToListAsync();
             foreach (var item in companyList)
             {
                 //当前公司日产值 || x.UpdateTime >= SqlFunc.ToDate(startTime) && x.UpdateTime <= SqlFunc.ToDate(endTime))
@@ -1732,9 +1732,9 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
                   ).Sum(x => x.DayActualProductionAmount);
                 //当前公司的累计产值（前几个月报产值加上日产值）
                 var currentMonthCompanyCount = dayProductionValueList
-                    .Where(x => x.CompanyId == item.ItemId&&x.DateDay>= currentTimeIntUp&& x.DateDay<= currentTimeInt)
+                    .Where(x => x.CompanyId == item.ItemId && x.DateDay >= currentTimeIntUp && x.DateDay <= currentTimeInt)
                     .Sum(x => x.DayActualProductionAmount)
-                    +GetCompanyProductuionValue(item.ItemId.Value, monthReport, projectIds);
+                    + GetCompanyProductuionValue(item.ItemId.Value, monthReport, projectIds);
                 //年度产值占比 （广航局）
                 //var yearProductionValuePercent = Math.Round(((decimal)(item.YearProductionValue + currentMonthCompanyCount) / yearProductionValue) * 100, 2);
                 var yearProductionValuePercent = Math.Round(((decimal)(currentMonthCompanyCount) / yearProductionValue) * 100, 2);
@@ -1962,8 +1962,8 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
                     {
                         Name = name,
                         DayProductionValue = dayTotalPoductionValues,
-                       // TotalYearProductionValue = Math.Round(yearProductionValue / 100000000, 2),
-                       TotalYearProductionValue = companyBasePoductionValues.Sum(x => x.TotalYearProductionValue),
+                        // TotalYearProductionValue = Math.Round(yearProductionValue / 100000000, 2),
+                        TotalYearProductionValue = companyBasePoductionValues.Sum(x => x.TotalYearProductionValue),
 
                         YearProductionValueProgressPercent = 100,
                         ProductionValueProgressPercent = productionValueProgressPercent,
@@ -2011,7 +2011,8 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
                     var completeRate = Math.Round((((decimal)currentMonthCompanyProductionValue.CompleteProductionValue) / currentMonthCompanyProductionValue.PlanProductionValue) * 100, 0);
                     companyProductionCompares.PlanCompleteRate.Add(completeRate);
                 }
-                else {
+                else
+                {
                     companyProductionCompares.PlanCompleteRate.Add(0);
                 }
                 //时间进度
@@ -2099,11 +2100,11 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
             && projectLists.Select(x => x.Id).ToList().Contains(x.ProjectId))
                  .GroupBy(x => x.ProjectId)
                  .Select(x => new { x.ProjectId, productionValue = SqlFunc.AggregateSum(x.DayActualProductionAmount) }).ToListAsync();
-           projectSumDayProductionValue = projectSumDayProductionValue.OrderByDescending(x => x.productionValue).Take(10).ToList();
+            projectSumDayProductionValue = projectSumDayProductionValue.OrderByDescending(x => x.productionValue).Take(10).ToList();
             var planList = await dbContext.Queryable<ProjectPlanProduction>().Where(x => x.IsDelete == 1 && x.Year == Convert.ToInt32(yearStartTime)).ToListAsync();
-            var projectPlanProductionData = await dbContext.Queryable<ProjectPlanProduction>().Where(x => x.IsDelete == 1&&x.Year==DateTime.Now.Year).ToListAsync();
-            var dayReportData = await dbContext.Queryable<DayReport>().Where(x => x.IsDelete == 1&&x.DateDay>= startYearTimeInt
-            &&x.DateDay<=endYearTimeInt).ToListAsync();
+            var projectPlanProductionData = await dbContext.Queryable<ProjectPlanProduction>().Where(x => x.IsDelete == 1 && x.Year == DateTime.Now.Year).ToListAsync();
+            var dayReportData = await dbContext.Queryable<DayReport>().Where(x => x.IsDelete == 1 && x.DateDay >= startYearTimeInt
+            && x.DateDay <= endYearTimeInt).ToListAsync();
             //项目完成产值历史数据
             var historyOutPut = await dbContext.Queryable<ProjectHistoryData>().Where(x => x.IsDelete == 1).ToListAsync();
             var monthStartTime = int.Parse(startYearTimeInt.ToString().Substring(0, 6));
@@ -2129,10 +2130,10 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
                 }
                 //当日产值
                 var time = DateTime.Now.AddDays(-1).ToDateDay();
-                var currentDayProduction=dayReportData.Where(x =>x.ProjectId== item.ProjectId&& x.DateDay == time).FirstOrDefault();
-                 //model.DayActualValue = Math.Round(item.productionValue / 10000, 2);
-                 if(currentDayProduction!=null)
-                 model.DayActualValue = Math.Round(currentDayProduction.DayActualProductionAmount / 10000, 2);
+                var currentDayProduction = dayReportData.Where(x => x.ProjectId == item.ProjectId && x.DateDay == time).FirstOrDefault();
+                //model.DayActualValue = Math.Round(item.productionValue / 10000, 2);
+                if (currentDayProduction != null)
+                    model.DayActualValue = Math.Round(currentDayProduction.DayActualProductionAmount / 10000, 2);
                 projectRankList.Add(model);
             }
             projectBasePoduction.ProjectRanks = projectRankList;
@@ -2807,8 +2808,8 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
             var startYearTimeInt = int.Parse(date.AddYears(-1).ToString("yyyy") + "1226");//int.Parse(DateTime.Now.AddYears(-1).ToString("yyyy1226"));
             //年累计结束时间
             var endYearTimeInt = int.Parse(date.ToString("yyyyMMdd")) > 1226 && int.Parse(date.ToString("yyyyMMdd")) <= 31 ? int.Parse(date.AddYears(1).ToString("yyyy1225")) : int.Parse(date.ToString("yyyy1225")); //int.Parse(DateTime.Now.ToString("yyyy1225"));
-                                                                                                                                                                                                                                                      //每月多少天
-                                                                                                                                                                                                                                                      // int days = DateTime.DaysInMonth(int.Parse(endYearTimeInt.ToString().Substring(0, 4)), month);  //DateTime.DaysInMonth(DateTime.Now.Year, DateTime.Now.AddMonths(-1).Month);
+                                                                                                                                                                                                                      //每月多少天
+                                                                                                                                                                                                                      // int days = DateTime.DaysInMonth(int.Parse(endYearTimeInt.ToString().Substring(0, 4)), month);  //DateTime.DaysInMonth(DateTime.Now.Year, DateTime.Now.AddMonths(-1).Month);
             int days = TimeHelper.GetTimeSpan(Convert.ToDateTime(startTime), Convert.ToDateTime(endTime)).Days + 1;
             //已过多少天
             var ofdays = date.Day <= 26 ? (date.Day + ((days - 26))) : date.Day - 26;
@@ -3392,7 +3393,7 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
             {
                 projectBasePoduction.SumCompleteRate = Math.Round((projectBasePoduction.TotalCurrentYearCompleteProductionValue / projectBasePoduction.TotalCurrentYearPlanProductionValue) * 100, 2);
             }
-            
+
 
             #endregion
 
@@ -4701,10 +4702,10 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
         #endregion
 
 
-        public static decimal GetCompanyProductuionValue(Guid companyId, List<MonthReport> data,List<Project> projects)
+        public static decimal GetCompanyProductuionValue(Guid companyId, List<MonthReport> data, List<Project> projects)
         {
-            var ids = projects.Where(x => x.CompanyId.Value == companyId).Select(x=>x.Id).ToList();
-           return data.Where(x => ids.Contains(x.ProjectId)).Sum(x => x.CompleteProductionAmount);
+            var ids = projects.Where(x => x.CompanyId.Value == companyId).Select(x => x.Id).ToList();
+            return data.Where(x => ids.Contains(x.ProjectId)).Sum(x => x.CompleteProductionAmount);
         }
     }
 }
