@@ -291,8 +291,8 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
         /// <returns></returns>
         public async Task<ResponseAjaxResult<EnterShipsResponseDto>> SearchEnterShipsAsync(EnterShipsRequestDto model)
         {
-			//耙吸船、绞吸船 和 抓斗船 非关联项目过滤条件
-			var filtShipType = CommonData.ShipType.Split(',').ToList();
+            //耙吸船、绞吸船 和 抓斗船 非关联项目过滤条件
+            var filtShipType = CommonData.ShipType.Split(',').ToList();
             var result = new ResponseAjaxResult<EnterShipsResponseDto>();
             var dateDayTime = model.DateDayTime ?? DateTime.Now.AddDays(-1);
             var dateDay = dateDayTime.ToDateDay();
@@ -315,10 +315,6 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             var projects = await GetProjectInfoAsync();
             ownShips.ForEach(ship =>
             {
-                if (ship.PomId == "d5ba0594-e902-4faa-8a91-f62caff10f83".ToGuid())
-                {
-                    var a = "";
-                }
                 //获取船舶进退场时间
                 var shipMovement = shipMovements.Where(t => t.ShipId == ship.PomId).ToList();// SingleOrDefault(t => t.ShipId == ship.PomId);
                 //获取船舶填报时间
@@ -347,15 +343,28 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                         AssociationProject = 2,
                         FillReportStatus = GetFillState(model.DateDayTime, null, fillReportTime)
                     };
-					//判断当前船舶类型是否在耙吸船、绞吸船 和 抓斗船范围内
-					if (filtShipType.Contains(ship.ShipKindTypeId.Value.ToString()))
+                    //判断当前船舶类型是否在耙吸船、绞吸船 和 抓斗船范围内
+                    if (filtShipType.Contains(ship.ShipKindTypeId.Value.ToString()))
                     {
-						resShips.Add(resShipMovement);
-					}
+                        resShips.Add(resShipMovement);
+                    }
                 }
                 if (shipMovement.Count() > 1)
                 {
                     shipMovement = shipMovement.Where(x => x.ProjectId == model.ProjectId).ToList();
+
+
+                    //查询船舶日报表中是否关联项目
+                    foreach (var item in shipMovement)
+                    {
+                        var isExist = fillReportShips.FirstOrDefault(x => x.ProjectId == item.ProjectId && x.PomId == item.ShipId);
+                        if (isExist == null)
+                        {
+                            item.ProjectId = Guid.Empty;
+                        }
+                    }
+
+
                 }
                 shipMovement.ForEach(item =>
                 {
@@ -373,15 +382,15 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                         AssociationProject = item.Status == ShipMovementStatus.Quit && !(item.EnterTime <= model.DateDayTime && item.QuitTime >= model.DateDayTime) ? 2 : item.ProjectId == Guid.Empty ? 2 : 1,
                         FillReportStatus = GetFillState(model.DateDayTime, item.EnterTime, fillReportTime)
                     };
-					//判断当前船舶是否未非关联项目  并且类型是否在耙吸船、绞吸船 和 抓斗船范围内
-					if (resShipMovement.AssociationProject == 2 && filtShipType.Contains(ship.ShipKindTypeId.Value.ToString()))
+                    //判断当前船舶是否未非关联项目  并且类型是否在耙吸船、绞吸船 和 抓斗船范围内
+                    if (resShipMovement.AssociationProject == 2 && filtShipType.Contains(ship.ShipKindTypeId.Value.ToString()))
                     {
-						resShips.Add(resShipMovement);
-					}
+                        resShips.Add(resShipMovement);
+                    }
                     if (resShipMovement.AssociationProject == 1)
                     {
-						resShips.Add(resShipMovement);
-					}
+                        resShips.Add(resShipMovement);
+                    }
                 });
             });
             //获取当前角色信息
@@ -518,7 +527,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
         /// <returns></returns>
         private async Task<List<ShipPartDto>> GetFillReportShipsAsync(Guid[] shipIds, int dateDay)
         {
-            return await _dbShipDayReport.AsQueryable().Where(t => t.IsDelete == 1 && shipIds.Contains(t.ShipId) && t.DateDay == dateDay).Select(t => new ShipPartDto() { PomId = t.ShipId, FillReportDateDay = t.DateDay }).ToListAsync();
+            return await _dbShipDayReport.AsQueryable().Where(t => t.IsDelete == 1 && shipIds.Contains(t.ShipId) && t.DateDay == dateDay).Select(t => new ShipPartDto() { PomId = t.ShipId, FillReportDateDay = t.DateDay, ProjectId = t.ProjectId }).ToListAsync();
         }
 
         /// <summary>

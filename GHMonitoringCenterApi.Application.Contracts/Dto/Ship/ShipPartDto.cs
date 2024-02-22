@@ -17,7 +17,10 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Ship
         /// PomId
         /// </summary>
         public Guid? PomId { get; set; }
-
+        /// <summary>
+        /// 项目id
+        /// </summary>
+        public Guid? ProjectId { get; set; }
         /// <summary>
         /// 船舶名称
         /// </summary>
