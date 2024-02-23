@@ -354,15 +354,15 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     shipMovement = shipMovement.Where(x => x.ProjectId == model.ProjectId).ToList();
 
 
-                    //查询船舶日报表中是否关联项目
-                    foreach (var item in shipMovement)
-                    {
-                        var isExist = fillReportShips.FirstOrDefault(x => x.ProjectId == item.ProjectId && x.PomId == item.ShipId);
-                        if (isExist == null)
-                        {
-                            item.ProjectId = Guid.Empty;
-                        }
-                    }
+                    ////查询船舶日报表中是否关联项目
+                    //foreach (var item in shipMovement)
+                    //{
+                    //    var isExist = fillReportShips.FirstOrDefault(x => x.ProjectId == item.ProjectId && x.PomId == item.ShipId);
+                    //    if (isExist == null)
+                    //    {
+                    //        item.ProjectId = Guid.Empty;
+                    //    }
+                    //}
 
 
                 }
