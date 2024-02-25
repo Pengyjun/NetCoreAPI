@@ -5933,7 +5933,8 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     item.ProjectYeahOutputValue = Math.Round(monthReport.Where(h => h.IsDelete == 1 && h.DateMonth <= item.MonthTime && h.DateMonth.ToString().Contains(time.ToString()) && h.ProjectId == item.ProjectId).Sum(h => h.PartyAPayAmount) / 10000, 2);
 
                 }
-                item.EngineeringAccumulatedEngineering = Math.Round((monthReport.Where(h => h.IsDelete == 1 && h.DateMonth >=202306 && h.ProjectId == item.ProjectId && h.DateMonth <= item.MonthTime).Sum(h => h.CompleteProductionAmount) + Convert.ToDecimal(projectHistoryData.FirstOrDefault(x => x.ProjectId == item.ProjectId)?.AccumulatedOutputValue)) / 10000, 2);
+                //item.EngineeringAccumulatedEngineering = Math.Round((monthReport.Where(h => h.IsDelete == 1 && h.DateMonth >=202306 && h.ProjectId == item.ProjectId && h.DateMonth <= item.MonthTime).Sum(h => h.CompleteProductionAmount) + Convert.ToDecimal(projectHistoryData.FirstOrDefault(x => x.ProjectId == item.ProjectId)?.AccumulatedOutputValue)) / 10000, 2);
+                item.EngineeringAccumulatedEngineering = Math.Round((monthReport.Where(h => h.IsDelete == 1 && h.DateMonth >=202306 && h.ProjectId == item.ProjectId && h.DateMonth <= item.MonthTime).Sum(h => h.CompleteProductionAmount))/10000,2);
                 if (item.ActualContractAmount != 0 && item.ActualContractAmount != null && item.EngineeringAccumulatedEngineering != null)
                 {
                     item.EngineeringProportion = Math.Round(item.EngineeringAccumulatedEngineering.Value / item.ActualContractAmount.Value, 4);
