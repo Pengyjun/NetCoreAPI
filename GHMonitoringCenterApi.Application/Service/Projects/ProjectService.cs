@@ -2763,7 +2763,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     StatusSort = a.Sequence.Value,
                     StatusName = a.Name,
                     TypeName = z.Name,
-                    ContractAmount = x.Amount.Value,
+                    ContractAmount = x.Amount.Value* x.ExchangeRate.Value,
                     CommencementDate = x.CommencementTime.Value.ToString(),
 
                 }).ToListAsync();
@@ -2804,8 +2804,11 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
         /// <returns></returns>
         public static decimal GetProjectTotalProductionValue(Guid id, List<ProjectHistoryData> data, List<MonthReport> currentTotalYearOffirmProductionValue)
         {
-            var projectSingleProductionValue = data.Where(x => x.ProjectId == id).SingleOrDefault();
-            var totalYearKaileaOffirmProductionValue = projectSingleProductionValue?.AccumulatedOutputValue ?? 0 +
+            //var projectSingleProductionValue = data.Where(x => x.ProjectId == id).SingleOrDefault();
+            //var totalYearKaileaOffirmProductionValue = projectSingleProductionValue?.AccumulatedOutputValue ?? 0 +
+            //    currentTotalYearOffirmProductionValue.Where(x => x.ProjectId == id).Sum(x => x.CurrencyCompleteProductionAmount);
+            //return totalYearKaileaOffirmProductionValue;
+            var totalYearKaileaOffirmProductionValue = 
                 currentTotalYearOffirmProductionValue.Where(x => x.ProjectId == id).Sum(x => x.CurrencyCompleteProductionAmount);
             return totalYearKaileaOffirmProductionValue;
         }
