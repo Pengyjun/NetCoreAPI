@@ -355,14 +355,14 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
 
 
                     //查询船舶日报表中是否关联项目
-                    foreach (var item in shipMovement)
-                    {
-                        var isExist = fillReportShips.FirstOrDefault(x => x.ProjectId == item.ProjectId && x.PomId == item.ShipId);
-                        if (isExist == null)
-                        {
-                            item.ProjectId = Guid.Empty;
-                        }
-                    }
+                    //foreach (var item in shipMovement)
+                    //{
+                    //    var isExist = fillReportShips.FirstOrDefault(x => x.ProjectId == item.ProjectId && x.PomId == item.ShipId);
+                    //    if (isExist == null)
+                    //    {
+                    //        item.ProjectId = Guid.Empty;
+                    //    }
+                    //}
 
 
                 }
