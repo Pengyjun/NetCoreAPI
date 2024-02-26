@@ -2763,7 +2763,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     StatusSort = a.Sequence.Value,
                     StatusName = a.Name,
                     TypeName = z.Name,
-                    ContractAmount = x.Amount.Value* x.ExchangeRate.Value,
+                    ContractAmount = x.ECAmount.Value* x.ExchangeRate.Value,
                     CommencementDate = x.CommencementTime.Value.ToString(),
 
                 }).ToListAsync();
