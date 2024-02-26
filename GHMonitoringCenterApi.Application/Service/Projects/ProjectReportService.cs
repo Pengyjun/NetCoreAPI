@@ -2340,6 +2340,8 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             var result = new ResponseAjaxResult<ProjectMonthReportResponseDto>();
             var resMonthReport = new ProjectMonthReportResponseDto();
             var project = await GetProjectPartAsync(model.ProjectId);
+            var projectTotalMonthProdcutionValue = await _dbContext.Queryable<MonthReport>().Where(x => x.IsDelete == 1).GroupBy(x => x.ProjectId)
+                .SumAsync(x => x.CompleteProductionAmount);
             if (project == null)
             {
                 return result.FailResult(HttpStatusCode.DataNotEXIST, ResponseMessage.DATA_NOTEXIST_PROJECT);
@@ -2468,7 +2470,10 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 if (thisSumDetail != null)
                 {
                     item.TotalCompletedQuantity = Math.Round(thisSumDetail.CompletedQuantity, 2);
-                    item.TotalCompleteProductionAmount = thisSumDetail.CurrencyCompleteProductionAmount;
+                    //累计完成值
+                    // item.TotalCompleteProductionAmount = thisSumDetail.CurrencyCompleteProductionAmount;
+                    //目前是月度完成产值 暂时不取项目结构子项相加
+                    item.TotalCompleteProductionAmount = Math.Round(projectTotalMonthProdcutionValue,2);
                     item.TotalOutsourcingExpensesAmount = Math.Round(thisSumDetail.OutsourcingExpensesAmount, 2);
                 }
                 if (item.OutPutType == ConstructionOutPutType.SubPackage)
