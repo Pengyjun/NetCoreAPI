@@ -5933,7 +5933,8 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     item.ProjectYeahOutputValue = Math.Round(monthReport.Where(h => h.IsDelete == 1 && h.DateMonth <= item.MonthTime && h.DateMonth.ToString().Contains(time.ToString()) && h.ProjectId == item.ProjectId).Sum(h => h.PartyAPayAmount) / 10000, 2);
 
                 }
-                item.EngineeringAccumulatedEngineering = Math.Round((monthReport.Where(h => h.IsDelete == 1 && h.DateMonth > 202306 && h.ProjectId == item.ProjectId && h.DateMonth <= item.MonthTime).Sum(h => h.CompleteProductionAmount) + Convert.ToDecimal(projectHistoryData.FirstOrDefault(x => x.ProjectId == item.ProjectId)?.AccumulatedOutputValue)) / 10000, 2);
+                //item.EngineeringAccumulatedEngineering = Math.Round((monthReport.Where(h => h.IsDelete == 1 && h.DateMonth >=202306 && h.ProjectId == item.ProjectId && h.DateMonth <= item.MonthTime).Sum(h => h.CompleteProductionAmount) + Convert.ToDecimal(projectHistoryData.FirstOrDefault(x => x.ProjectId == item.ProjectId)?.AccumulatedOutputValue)) / 10000, 2);
+                item.EngineeringAccumulatedEngineering = Math.Round((monthReport.Where(h => h.IsDelete == 1 && h.DateMonth >=202306 && h.ProjectId == item.ProjectId && h.DateMonth <= item.MonthTime).Sum(h => h.CompleteProductionAmount))/10000,2);
                 if (item.ActualContractAmount != 0 && item.ActualContractAmount != null && item.EngineeringAccumulatedEngineering != null)
                 {
                     item.EngineeringProportion = Math.Round(item.EngineeringAccumulatedEngineering.Value / item.ActualContractAmount.Value, 4);
@@ -6352,7 +6353,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                    .Where(x => x.IsDelete == 1 && x.ProjectId == projectId).FirstAsync();
 
                 var currentTotalYearOffirmProductionValue = await _dbContext.Queryable<MonthReport>()
-                    .Where(x => x.IsDelete == 1 && x.ProjectId == projectId && x.DateYear <= currentYear).ToListAsync();
+                    .Where(x => x.IsDelete == 1 && x.ProjectId == projectId).ToListAsync();
                 //本年甲方确认产值(当年)
                 currentYearOffirmProductionValue = currentTotalYearOffirmProductionValue.Where(x => x.DateYear == currentYear)
                    .Sum(x => x.PartyAConfirmedProductionAmount);
@@ -6360,8 +6361,12 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 //开累甲方确认产值(历史数据+2023-7至12月的数据+2024年的数据）
                 if (projectMonthReportHistory != null && currentTotalYearOffirmProductionValue.Any())
                 {
-                    totalYearKaileaOffirmProductionValue = projectMonthReportHistory.KaileiOwnerConfirmation.Value*10000
+                    totalYearKaileaOffirmProductionValue = projectMonthReportHistory.KaileiOwnerConfirmation.Value * 10000
                        + currentTotalYearOffirmProductionValue.Sum(x => x.PartyAConfirmedProductionAmount);
+                }
+                else {
+                    totalYearKaileaOffirmProductionValue = 
+                            currentTotalYearOffirmProductionValue.Sum(x => x.PartyAConfirmedProductionAmount);
                 }
 
                 var currenTotalYearCollection = await _dbContext.Queryable<MonthReport>()
@@ -6374,6 +6379,10 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     //开累甲方付款金额
                     totalYearCollection = projectMonthReportHistory.KaileiProjectPayment.Value * 10000
                     + currenTotalYearCollection.Sum(x => x.PartyAPayAmount);
+                }
+                else {
+                    //开累甲方付款金额
+                    totalYearCollection =currenTotalYearCollection.Sum(x => x.PartyAPayAmount);
                 }
 
             }
