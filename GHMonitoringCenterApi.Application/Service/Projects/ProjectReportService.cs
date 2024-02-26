@@ -1683,13 +1683,13 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     item.CumulativeCompleted = Math.Round(model.IsConvert == true ? sumMonthReport.CompleteProductionAmount : sumMonthReport.CurrencyCompleteProductionAmount, 2);
                     //item.CumulativePaymentAmount = Math.Round(sumMonthReport.PartyAPayAmount, 2);
                     // item.CumulativeValue = Math.Round(sumMonthReport.PartyAConfirmedProductionAmount, 2);
-                   var itemHistotyMonth=sumHistoryMonthReports.Where(x => x.ProjectId == item.RegionId).FirstOrDefault();
+                   var itemHistotyMonth=sumHistoryMonthReports.Where(x => x.ProjectId == item.ProjectId).FirstOrDefault();
                
                     if (itemHistotyMonth != null)
                     {
-                        item.CumulativePaymentAmount = Math.Round(sumMonthReport.PartyAPayAmount, 2) + Math.Round(itemHistotyMonth.KaileiProjectPayment.Value / 10000, 2);
+                        item.CumulativePaymentAmount = Math.Round(sumMonthReport.PartyAPayAmount, 2) + Math.Round(itemHistotyMonth.KaileiProjectPayment.Value * 10000, 2);
                         item.CumulativeValue = Math.Round(sumMonthReport.PartyAConfirmedProductionAmount, 2) +
-                        Math.Round(itemHistotyMonth.KaileiOwnerConfirmation.Value/10000, 2);
+                        Math.Round(itemHistotyMonth.KaileiOwnerConfirmation.Value*10000, 2);
                     }
                     else {
                         item.CumulativePaymentAmount = Math.Round(sumMonthReport.PartyAPayAmount, 2);
