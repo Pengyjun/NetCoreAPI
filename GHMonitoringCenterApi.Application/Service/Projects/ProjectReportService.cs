@@ -1688,6 +1688,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     if (itemHistotyMonth != null)
                     {
                         item.CumulativePaymentAmount = Math.Round(sumMonthReport.PartyAPayAmount, 2) + Math.Round(itemHistotyMonth.KaileiProjectPayment.Value * 10000, 2);
+
                         item.CumulativeValue = Math.Round(sumMonthReport.PartyAConfirmedProductionAmount, 2) +
                         Math.Round(itemHistotyMonth.KaileiOwnerConfirmation.Value*10000, 2);
                     }
@@ -2340,7 +2341,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             var result = new ResponseAjaxResult<ProjectMonthReportResponseDto>();
             var resMonthReport = new ProjectMonthReportResponseDto();
             var project = await GetProjectPartAsync(model.ProjectId);
-            var projectTotalMonthProdcutionValue = await _dbContext.Queryable<MonthReport>().Where(x => x.IsDelete == 1).GroupBy(x => x.ProjectId)
+            var projectTotalMonthProdcutionValue = await _dbContext.Queryable<MonthReport>().Where(x => x.IsDelete == 1 && x.ProjectId == model.ProjectId)
                 .SumAsync(x => x.CompleteProductionAmount);
             if (project == null)
             {
