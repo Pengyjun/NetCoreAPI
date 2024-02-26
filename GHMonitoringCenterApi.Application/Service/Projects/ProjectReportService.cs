@@ -1683,13 +1683,14 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     item.CumulativeCompleted = Math.Round(model.IsConvert == true ? sumMonthReport.CompleteProductionAmount : sumMonthReport.CurrencyCompleteProductionAmount, 2);
                     //item.CumulativePaymentAmount = Math.Round(sumMonthReport.PartyAPayAmount, 2);
                     // item.CumulativeValue = Math.Round(sumMonthReport.PartyAConfirmedProductionAmount, 2);
-                   var itemHistotyMonth=sumHistoryMonthReports.Where(x => x.ProjectId == item.RegionId).FirstOrDefault();
+                   var itemHistotyMonth=sumHistoryMonthReports.Where(x => x.ProjectId == item.ProjectId).FirstOrDefault();
                
                     if (itemHistotyMonth != null)
                     {
-                        item.CumulativePaymentAmount = Math.Round(sumMonthReport.PartyAPayAmount, 2) + Math.Round(itemHistotyMonth.KaileiProjectPayment.Value / 10000, 2);
+                        item.CumulativePaymentAmount = Math.Round(sumMonthReport.PartyAPayAmount, 2) + Math.Round(itemHistotyMonth.KaileiProjectPayment.Value * 10000, 2);
+
                         item.CumulativeValue = Math.Round(sumMonthReport.PartyAConfirmedProductionAmount, 2) +
-                        Math.Round(itemHistotyMonth.KaileiOwnerConfirmation.Value/10000, 2);
+                        Math.Round(itemHistotyMonth.KaileiOwnerConfirmation.Value*10000, 2);
                     }
                     else {
                         item.CumulativePaymentAmount = Math.Round(sumMonthReport.PartyAPayAmount, 2);
@@ -2340,6 +2341,8 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             var result = new ResponseAjaxResult<ProjectMonthReportResponseDto>();
             var resMonthReport = new ProjectMonthReportResponseDto();
             var project = await GetProjectPartAsync(model.ProjectId);
+            var projectTotalMonthProdcutionValue = await _dbContext.Queryable<MonthReport>().Where(x => x.IsDelete == 1 && x.ProjectId == model.ProjectId)
+                .SumAsync(x => x.CompleteProductionAmount);
             if (project == null)
             {
                 return result.FailResult(HttpStatusCode.DataNotEXIST, ResponseMessage.DATA_NOTEXIST_PROJECT);
@@ -2468,7 +2471,10 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 if (thisSumDetail != null)
                 {
                     item.TotalCompletedQuantity = Math.Round(thisSumDetail.CompletedQuantity, 2);
-                    item.TotalCompleteProductionAmount = thisSumDetail.CurrencyCompleteProductionAmount;
+                    //累计完成值
+                    // item.TotalCompleteProductionAmount = thisSumDetail.CurrencyCompleteProductionAmount;
+                    //目前是月度完成产值 暂时不取项目结构子项相加
+                    //item.TotalCompleteProductionAmount = Math.Round(projectTotalMonthProdcutionValue,2);
                     item.TotalOutsourcingExpensesAmount = Math.Round(thisSumDetail.OutsourcingExpensesAmount, 2);
                 }
                 if (item.OutPutType == ConstructionOutPutType.SubPackage)
@@ -2535,6 +2541,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             }
 
             #endregion
+            resMonthReport.TotalProductionAmount = Math.Round(projectTotalMonthProdcutionValue, 2);
             resMonthReport.Status = status;
             resMonthReport.StatusText = statusText;
             resMonthReport.DateMonth = dateMonth;
