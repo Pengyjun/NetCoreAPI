@@ -2474,7 +2474,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     //累计完成值
                     // item.TotalCompleteProductionAmount = thisSumDetail.CurrencyCompleteProductionAmount;
                     //目前是月度完成产值 暂时不取项目结构子项相加
-                    item.TotalCompleteProductionAmount = Math.Round(projectTotalMonthProdcutionValue,2);
+                    //item.TotalCompleteProductionAmount = Math.Round(projectTotalMonthProdcutionValue,2);
                     item.TotalOutsourcingExpensesAmount = Math.Round(thisSumDetail.OutsourcingExpensesAmount, 2);
                 }
                 if (item.OutPutType == ConstructionOutPutType.SubPackage)
@@ -2541,6 +2541,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             }
 
             #endregion
+            resMonthReport.TotalProductionAmount = Math.Round(projectTotalMonthProdcutionValue, 2);
             resMonthReport.Status = status;
             resMonthReport.StatusText = statusText;
             resMonthReport.DateMonth = dateMonth;

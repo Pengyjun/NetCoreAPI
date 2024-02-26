@@ -15,6 +15,11 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project.Report
     public abstract  class ProjectMonthReportDto<TTreeDetail,TDetail> where TTreeDetail : TreeProjectWBSDetailDto<TTreeDetail,TDetail> where TDetail : MonthReportDetailDto<TDetail>
     {
         /// <summary>
+        /// 产值累计
+        /// </summary>
+        public decimal TotalProductionAmount { get; set; }
+        
+        /// <summary>
         /// 项目Id
         /// </summary>
         public Guid ProjectId { get; set; }
