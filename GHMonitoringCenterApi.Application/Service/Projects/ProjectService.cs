@@ -2809,7 +2809,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             //    currentTotalYearOffirmProductionValue.Where(x => x.ProjectId == id).Sum(x => x.CurrencyCompleteProductionAmount);
             //return totalYearKaileaOffirmProductionValue;
             var totalYearKaileaOffirmProductionValue = 
-                currentTotalYearOffirmProductionValue.Where(x => x.ProjectId == id).Sum(x => x.CurrencyCompleteProductionAmount);
+                currentTotalYearOffirmProductionValue.Where(x => x.ProjectId == id).Sum(x => x.CompleteProductionAmount);
             return totalYearKaileaOffirmProductionValue;
         }
 
