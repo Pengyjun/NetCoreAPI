@@ -23,6 +23,8 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.ProductionValueImport
         public List<ProjectShiftProductionInfo> ProjectShiftProductionInfo { get; set; }
         public List<UnProjectShitInfo> UnProjectShitInfo { get; set; }
         public List<ExcelTitle> ExcelTitle { get; set; }
+        public List<ProjectRank> ProjectRank { get; set; }
+        public List<ProjectIntensity> ProjectIntensity { get; set; }
 
 
         //public  CompanyProjectBasePoduction CompanyProjectBasePoduction { get; set; }
@@ -184,6 +186,7 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.ProductionValueImport
     /// </summary>
     public class ProjectRank
     {
+        public int No {  get; set; }
         public int DateDay { get; set; }
         /// <summary>
         /// 项目名称
@@ -219,6 +222,7 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.ProductionValueImport
     /// </summary>
     public class ProjectIntensity
     {
+        public int No { get; set; }
         public int DateDay { get; set; }
         /// <summary>
         /// 公司ID

@@ -143,4 +143,7 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project.Report
 		public string? ProjectName { get; set; }
 	}
 
+
+
+
 }

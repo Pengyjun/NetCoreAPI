@@ -17,6 +17,8 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.ProductionValueImport
         public string titleone7 { get; set; }
         public string titleone8 { get; set; }
         public string titleone9 { get; set; }
+        public string titleone12 { get; set; }
+        public string titleone13 { get; set; }
         public string datesheetone1 { get; set; }
         public List<CompanyProjectBasePoduction> resultone1 { get; set; }
         public List<CompanyBasePoductionValue> resultone2 { get; set; }
@@ -29,6 +31,8 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.ProductionValueImport
         public List<ShipProductionValue> resultone5 { get; set; }
         public List<ProjectShiftProductionInfo> ProjectShiftProductionInfo { get; set; }
         public List<UnProjectShitInfo> UnProjectShitInfo { get; set; }
+        public List<ProjectRank> resultone12 { get; set; }
+        public List<ProjectIntensity> resultone13 { get; set; }
 
 
         public string titletwo1 { get; set; }
@@ -40,6 +44,8 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.ProductionValueImport
         public string titletwo7 { get; set; }
         public string titletwo8 { get; set; }
         public string titletwo9 { get; set; }
+        public string titletwo12 { get; set; }
+        public string titletwo13 { get; set; }
         public string datesheettwo1 { get; set; }
         public List<CompanyProjectBasePoduction> resulttwo1 { get; set; }
         public List<CompanyBasePoductionValue> resulttwo2 { get; set; }
@@ -50,6 +56,8 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.ProductionValueImport
         public List<CompanyUnWriteReportInfo> resulttwo8 { get; set; }
         public List<CompanyShipUnWriteReportInfo> resulttwo9 { get; set; }
         public List<ShipProductionValue> resulttwo5 { get; set; }
+        public List<ProjectRank> resulttwo12 { get; set; }
+        public List<ProjectIntensity> resulttwo13 { get; set; }
 
 
         public string titlethird1 { get; set; }
@@ -61,6 +69,8 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.ProductionValueImport
         public string titlethird7 { get; set; }
         public string titlethird8 { get; set; }
         public string titlethird9 { get; set; }
+        public string titlethird12 { get; set; }
+        public string titlethird13 { get; set; }
         public string datesheetthird1 { get; set; }
         public List<CompanyProjectBasePoduction> resultthird1 { get; set; }
         public List<CompanyBasePoductionValue> resultthird2 { get; set; }
@@ -71,6 +81,11 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.ProductionValueImport
         public List<CompanyUnWriteReportInfo> resultthird8 { get; set; }
         public List<CompanyShipUnWriteReportInfo> resultthird9 { get; set; }
         public List<ShipProductionValue> resultthird5 { get; set; }
+        public List<ProjectRank> resultthird12 { get; set; }
+        public List<ProjectIntensity> resultthird13 { get; set; }
+
+
+
 
         public string titlefour1 { get; set; }
         public string titlefour2 { get; set; }
@@ -81,6 +96,8 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.ProductionValueImport
         public string titlefour7 { get; set; }
         public string titlefour8 { get; set; }
         public string titlefour9 { get; set; }
+        public string titlefour12 { get; set; }
+        public string titlefour13 { get; set; }
         public string datesheetfour1 { get; set; }
         public List<CompanyProjectBasePoduction>    resultfour1 { get; set; }
         public List<CompanyBasePoductionValue>      resultfour2 { get; set; }
@@ -91,6 +108,8 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.ProductionValueImport
         public List<CompanyUnWriteReportInfo>       resultfour8 { get; set; }
         public List<CompanyShipUnWriteReportInfo>   resultfour9 { get; set; }
         public List<ShipProductionValue>            resultfour5 { get; set; }
+        public List<ProjectRank> resultfour12 { get; set; }
+        public List<ProjectIntensity> resultfour13 { get; set; }
 
 
         public string titlefive1 { get; set; }
@@ -102,6 +121,8 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.ProductionValueImport
         public string titlefive7 { get; set; }
         public string titlefive8 { get; set; }
         public string titlefive9 { get; set; }
+        public string titlefive12 { get; set; }
+        public string titlefive13 { get; set; }
         public string datesheetfive1 { get; set; }
         public List<CompanyProjectBasePoduction>    resultfive1 { get; set; }
         public List<CompanyBasePoductionValue>      resultfive2 { get; set; }
@@ -112,6 +133,10 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.ProductionValueImport
         public List<CompanyUnWriteReportInfo>       resultfive8 { get; set; }
         public List<CompanyShipUnWriteReportInfo>   resultfive9 { get; set; }
         public List<ShipProductionValue>            resultfive5 { get; set; }
+        public List<ProjectRank> resultfive12 { get; set; }
+        public List<ProjectIntensity> resultfive13 { get; set; }
+
+
 
         public string titlesix1 { get; set; }
         public string titlesix2 { get; set; }
@@ -122,6 +147,8 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.ProductionValueImport
         public string titlesix7 { get; set; }
         public string titlesix8 { get; set; }
         public string titlesix9 { get; set; }
+        public string titlesix12 { get; set; }
+        public string titlesix13 { get; set; }
         public string datesheetsix1 { get; set; }
         public List<CompanyProjectBasePoduction>    resultsix1 { get; set; }
         public List<CompanyBasePoductionValue>      resultsix2 { get; set; }
@@ -132,6 +159,8 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.ProductionValueImport
         public List<CompanyUnWriteReportInfo>       resultsix8 { get; set; }
         public List<CompanyShipUnWriteReportInfo>   resultsix9 { get; set; }
         public List<ShipProductionValue>            resultsix5 { get; set; }
+        public List<ProjectRank> resultsix12 { get; set; }
+        public List<ProjectIntensity> resultsix13 { get; set; }
 
 
         public string titleseven1 { get; set; }
@@ -143,6 +172,8 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.ProductionValueImport
         public string titleseven7 { get; set; }
         public string titleseven8 { get; set; }
         public string titleseven9 { get; set; }
+        public string titleseven12 { get; set; }
+        public string titleseven13 { get; set; }
         public string datesheetseven1 { get; set; }
         public List<CompanyProjectBasePoduction>    resultseven1 { get; set; }
         public List<CompanyBasePoductionValue>      resultseven2 { get; set; }
@@ -153,6 +184,10 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.ProductionValueImport
         public List<CompanyUnWriteReportInfo>       resultseven8 { get; set; }
         public List<CompanyShipUnWriteReportInfo>   resultseven9 { get; set; }
         public List<ShipProductionValue>            resultseven5 { get; set; }
+        public List<ProjectRank> resultseven12 { get; set; }
+        public List<ProjectIntensity> resultseven13 { get; set; }
+
+
 
         public string titleeight1 { get; set; }
         public string titleeight2 { get; set; }
@@ -163,6 +198,8 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.ProductionValueImport
         public string titleeight7 { get; set; }
         public string titleeight8 { get; set; }
         public string titleeight9 { get; set; }
+        public string titleeight12 { get; set; }
+        public string titleeight13 { get; set; }
         public string datesheeteight1 { get; set; }
         public List<CompanyProjectBasePoduction>    resulteight1 { get; set; }
         public List<CompanyBasePoductionValue>      resulteight2 { get; set; }
@@ -173,6 +210,10 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.ProductionValueImport
         public List<CompanyUnWriteReportInfo>       resulteight8 { get; set; }
         public List<CompanyShipUnWriteReportInfo>   resulteight9 { get; set; }
         public List<ShipProductionValue>            resulteight5 { get; set; }
+        public List<ProjectRank> resulteight12 { get; set; }
+        public List<ProjectIntensity> resulteight13 { get; set; }
+
+
 
         public string titlenine1 { get; set; }
         public string titlenine2 { get; set; }
@@ -183,6 +224,8 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.ProductionValueImport
         public string titlenine7 { get; set; }
         public string titlenine8 { get; set; }
         public string titlenine9 { get; set; }
+        public string titlenine12 { get; set; }
+        public string titlenine13 { get; set; }
         public string datesheetnine1 { get; set; }
         public List<CompanyProjectBasePoduction>    resultnine1 { get; set; }
         public List<CompanyBasePoductionValue>      resultnine2 { get; set; }
@@ -193,6 +236,10 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.ProductionValueImport
         public List<CompanyUnWriteReportInfo>       resultnine8 { get; set; }
         public List<CompanyShipUnWriteReportInfo>   resultnine9 { get; set; }
         public List<ShipProductionValue>            resultnine5 { get; set; }
+        public List<ProjectRank> resultnine12 { get; set; }
+        public List<ProjectIntensity> resultnine13 { get; set; }
+
+
 
         public string titleten1 { get; set; }
         public string titleten2 { get; set; }
@@ -203,6 +250,8 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.ProductionValueImport
         public string titleten7 { get; set; }
         public string titleten8 { get; set; }
         public string titleten9 { get; set; }
+        public string titleten12 { get; set; }
+        public string titleten13 { get; set; }
         public string datesheetten1 { get; set; }
         public List<CompanyProjectBasePoduction>    resultten1 { get; set; }
         public List<CompanyBasePoductionValue>      resultten2 { get; set; }
@@ -213,6 +262,11 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.ProductionValueImport
         public List<CompanyUnWriteReportInfo>       resultten8 { get; set; }
         public List<CompanyShipUnWriteReportInfo>   resultten9 { get; set; }
         public List<ShipProductionValue>            resultten5 { get; set; }
+        public List<ProjectRank> resultten12 { get; set; }
+        public List<ProjectIntensity> resultten13 { get; set; }
+
+
+
 
         public string titleeleven1 { get; set; }
         public string titleeleven2 { get; set; }
@@ -223,6 +277,8 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.ProductionValueImport
         public string titleeleven7 { get; set; }
         public string titleeleven8 { get; set; }
         public string titleeleven9 { get; set; }
+        public string titleeleven12 { get; set; }
+        public string titleeleven13 { get; set; }
         public string datesheeteleven1 { get; set; }
         public List<CompanyProjectBasePoduction>    resulteleven1 { get; set; }
         public List<CompanyBasePoductionValue>      resulteleven2 { get; set; }
@@ -233,6 +289,10 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.ProductionValueImport
         public List<CompanyUnWriteReportInfo>       resulteleven8 { get; set; }
         public List<CompanyShipUnWriteReportInfo>   resulteleven9 { get; set; }
         public List<ShipProductionValue>            resulteleven5 { get; set; }
+        public List<ProjectRank> resulteleven12 { get; set; }
+        public List<ProjectIntensity> resulteleven13 { get; set; }
+
+
 
         public string titletwelve1 { get; set; }
         public string titletwelve2 { get; set; }
@@ -243,6 +303,8 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.ProductionValueImport
         public string titletwelve7 { get; set; }
         public string titletwelve8 { get; set; }
         public string titletwelve9 { get; set; }
+        public string titletwelve12 { get; set; }
+        public string titletwelve13 { get; set; }
         public string datesheettwelve1 { get; set; }
         public List<CompanyProjectBasePoduction>    resulttwelve1 { get; set; }
         public List<CompanyBasePoductionValue>      resulttwelve2 { get; set; }
@@ -253,6 +315,10 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.ProductionValueImport
         public List<CompanyUnWriteReportInfo>       resulttwelve8 { get; set; }
         public List<CompanyShipUnWriteReportInfo>   resulttwelve9 { get; set; }
         public List<ShipProductionValue>            resulttwelve5 { get; set; }
+        public List<ProjectRank> resulttwelve12 { get; set; }
+        public List<ProjectIntensity> resulttwelve13 { get; set; }
+
+
 
 
         public string titlethirteen1 { get; set; }
@@ -264,6 +330,8 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.ProductionValueImport
         public string titlethirteen7 { get; set; }
         public string titlethirteen8 { get; set; }
         public string titlethirteen9 { get; set; }
+        public string titlethirteen12 { get; set; }
+        public string titlethirteen13 { get; set; }
         public string datesheetthirteen1 { get; set; }
         public List<CompanyProjectBasePoduction>    resultthirteen1 { get; set; }
         public List<CompanyBasePoductionValue>      resultthirteen2 { get; set; }
@@ -274,6 +342,10 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.ProductionValueImport
         public List<CompanyUnWriteReportInfo>       resultthirteen8 { get; set; }
         public List<CompanyShipUnWriteReportInfo>   resultthirteen9 { get; set; }
         public List<ShipProductionValue>            resultthirteen5 { get; set; }
+        public List<ProjectRank> resultthirteen12 { get; set; }
+        public List<ProjectIntensity> resultthirteen13 { get; set; }
+
+
 
         public string titlefourteen1 { get; set; }
         public string titlefourteen2 { get; set; }
@@ -284,6 +356,8 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.ProductionValueImport
         public string titlefourteen7 { get; set; }
         public string titlefourteen8 { get; set; }
         public string titlefourteen9 { get; set; }
+        public string titlefourteen12 { get; set; }
+        public string titlefourteen13 { get; set; }
         public string datesheetfourteen1 { get; set; }
         public List<CompanyProjectBasePoduction>    resultfourteen1 { get; set; }
         public List<CompanyBasePoductionValue>      resultfourteen2 { get; set; }
@@ -294,6 +368,10 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.ProductionValueImport
         public List<CompanyUnWriteReportInfo>       resultfourteen8 { get; set; }
         public List<CompanyShipUnWriteReportInfo>   resultfourteen9 { get; set; }
         public List<ShipProductionValue>            resultfourteen5 { get; set; }
+        public List<ProjectRank> resultfourteen12 { get; set; }
+        public List<ProjectIntensity> resultfourteen13 { get; set; }
+
+
 
         public string titlefifteen1 { get; set; }
         public string titlefifteen2 { get; set; }
@@ -304,6 +382,8 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.ProductionValueImport
         public string titlefifteen7 { get; set; }
         public string titlefifteen8 { get; set; }
         public string titlefifteen9 { get; set; }
+        public string titlefifteen12 { get; set; }
+        public string titlefifteen13 { get; set; }
         public string datesheetfifteen1 { get; set; }
         public List<CompanyProjectBasePoduction>    resultfifteen1 { get; set; }
         public List<CompanyBasePoductionValue>      resultfifteen2 { get; set; }
@@ -314,6 +394,10 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.ProductionValueImport
         public List<CompanyUnWriteReportInfo>       resultfifteen8 { get; set; }
         public List<CompanyShipUnWriteReportInfo>   resultfifteen9 { get; set; }
         public List<ShipProductionValue>            resultfifteen5 { get; set; }
+        public List<ProjectRank> resultfifteen12 { get; set; }
+        public List<ProjectIntensity> resultfifteen13 { get; set; }
+
+
 
         public string titlesixteen1 { get; set; }
         public string titlesixteen2 { get; set; }
@@ -324,6 +408,8 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.ProductionValueImport
         public string titlesixteen7 { get; set; }
         public string titlesixteen8 { get; set; }
         public string titlesixteen9 { get; set; }
+        public string titlesixteen12 { get; set; }
+        public string titlesixteen13 { get; set; }
         public string datesheetsixteen1 { get; set; }
         public List<CompanyProjectBasePoduction>    resultsixteen1 { get; set; }
         public List<CompanyBasePoductionValue>      resultsixteen2 { get; set; }
@@ -334,6 +420,10 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.ProductionValueImport
         public List<CompanyUnWriteReportInfo>       resultsixteen8 { get; set; }
         public List<CompanyShipUnWriteReportInfo>   resultsixteen9 { get; set; }
         public List<ShipProductionValue>            resultsixteen5 { get; set; }
+        public List<ProjectRank> resultsixteen12 { get; set; }
+        public List<ProjectIntensity> resultsixteen13 { get; set; }
+
+
 
         public string titlesevevnteen1 { get; set; }
         public string titlesevevnteen2 { get; set; }
@@ -344,6 +434,8 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.ProductionValueImport
         public string titlesevevnteen7 { get; set; }
         public string titlesevevnteen8 { get; set; }
         public string titlesevevnteen9 { get; set; }
+        public string titlesevevnteen12 { get; set; }
+        public string titlesevevnteen13 { get; set; }
         public string datesheetsevevnteen1 { get; set; }
         public List<CompanyProjectBasePoduction>    resultsevevnteen1 { get; set; }
         public List<CompanyBasePoductionValue>      resultsevevnteen2 { get; set; }
@@ -354,6 +446,10 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.ProductionValueImport
         public List<CompanyUnWriteReportInfo>       resultsevevnteen8 { get; set; }
         public List<CompanyShipUnWriteReportInfo>   resultsevevnteen9 { get; set; }
         public List<ShipProductionValue>            resultsevevnteen5 { get; set; }
+        public List<ProjectRank> resultsevevnteen12 { get; set; }
+        public List<ProjectIntensity> resultsevevnteen13 { get; set; }
+
+
 
         public string titleeighteen1 { get; set; }
         public string titleeighteen2 { get; set; }
@@ -364,6 +460,8 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.ProductionValueImport
         public string titleeighteen7 { get; set; }
         public string titleeighteen8 { get; set; }
         public string titleeighteen9 { get; set; }
+        public string titleeighteen12 { get; set; }
+        public string titleeighteen13 { get; set; }
         public string datesheeteighteen1 { get; set; }
         public List<CompanyProjectBasePoduction>    resulteighteen1 { get; set; }
         public List<CompanyBasePoductionValue>      resulteighteen2 { get; set; }
@@ -374,6 +472,10 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.ProductionValueImport
         public List<CompanyUnWriteReportInfo>       resulteighteen8 { get; set; }
         public List<CompanyShipUnWriteReportInfo>   resulteighteen9 { get; set; }
         public List<ShipProductionValue>            resulteighteen5 { get; set; }
+        public List<ProjectRank> resulteighteen12 { get; set; }
+        public List<ProjectIntensity> resulteighteen13 { get; set; }
+
+
 
         public string titlenineteen1 { get; set; }
         public string titlenineteen2 { get; set; }
@@ -384,6 +486,8 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.ProductionValueImport
         public string titlenineteen7 { get; set; }
         public string titlenineteen8 { get; set; }
         public string titlenineteen9 { get; set; }
+        public string titlenineteen12 { get; set; }
+        public string titlenineteen13 { get; set; }
         public string datesheetnineteen1 { get; set; }
         public List<CompanyProjectBasePoduction>    resultnineteen1 { get; set; }
         public List<CompanyBasePoductionValue>      resultnineteen2 { get; set; }
@@ -394,6 +498,11 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.ProductionValueImport
         public List<CompanyUnWriteReportInfo>       resultnineteen8 { get; set; }
         public List<CompanyShipUnWriteReportInfo>   resultnineteen9 { get; set; }
         public List<ShipProductionValue>            resultnineteen5 { get; set; }
+        public List<ProjectRank> resultnineteen12 { get; set; }
+        public List<ProjectIntensity> resultnineteen13 { get; set; }
+
+
+
 
         public string titletwenty1 { get; set; }
         public string titletwenty2 { get; set; }
@@ -404,6 +513,8 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.ProductionValueImport
         public string titletwenty7 { get; set; }
         public string titletwenty8 { get; set; }
         public string titletwenty9 { get; set; }
+        public string titletwenty12 { get; set; }
+        public string titletwenty13 { get; set; }
         public string datesheettwenty1 { get; set; }
         public List<CompanyProjectBasePoduction>    resulttwenty1 { get; set; }
         public List<CompanyBasePoductionValue>      resulttwenty2 { get; set; }
@@ -414,6 +525,11 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.ProductionValueImport
         public List<CompanyUnWriteReportInfo>       resulttwenty8 { get; set; }
         public List<CompanyShipUnWriteReportInfo>   resulttwenty9 { get; set; }
         public List<ShipProductionValue>            resulttwenty5 { get; set; }
+        public List<ProjectRank> resulttwenty12 { get; set; }
+        public List<ProjectIntensity> resulttwenty13 { get; set; }
+
+
+
 
         public string titletwentyone1 { get; set; }
         public string titletwentyone2 { get; set; }
@@ -424,6 +540,8 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.ProductionValueImport
         public string titletwentyone7 { get; set; }
         public string titletwentyone8 { get; set; }
         public string titletwentyone9 { get; set; }
+        public string titletwentyone12 { get; set; }
+        public string titletwentyone13 { get; set; }
         public string datesheettwentyone1 { get; set; }
         public List<CompanyProjectBasePoduction>    resulttwentyone1 { get; set; }
         public List<CompanyBasePoductionValue>      resulttwentyone2 { get; set; }
@@ -434,6 +552,10 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.ProductionValueImport
         public List<CompanyUnWriteReportInfo>       resulttwentyone8 { get; set; }
         public List<CompanyShipUnWriteReportInfo>   resulttwentyone9 { get; set; }
         public List<ShipProductionValue>            resulttwentyone5 { get; set; }
+        public List<ProjectRank> resulttwentyone12 { get; set; }
+        public List<ProjectIntensity> resulttwentyone13 { get; set; }
+
+
 
         public string titletwentytwo1 { get; set; }
         public string titletwentytwo2 { get; set; }
@@ -444,6 +566,8 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.ProductionValueImport
         public string titletwentytwo7 { get; set; }
         public string titletwentytwo8 { get; set; }
         public string titletwentytwo9 { get; set; }
+        public string titletwentytwo12 { get; set; }
+        public string titletwentytwo13 { get; set; }
         public string datesheettwentytwo1 { get; set; }
         public List<CompanyProjectBasePoduction>    resulttwentytwo1 { get; set; }
         public List<CompanyBasePoductionValue>      resulttwentytwo2 { get; set; }
@@ -454,6 +578,10 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.ProductionValueImport
         public List<CompanyUnWriteReportInfo>       resulttwentytwo8 { get; set; }
         public List<CompanyShipUnWriteReportInfo>   resulttwentytwo9 { get; set; }
         public List<ShipProductionValue>            resulttwentytwo5 { get; set; }
+        public List<ProjectRank> resulttwentytwo12 { get; set; }
+        public List<ProjectIntensity> resulttwentytwo13 { get; set; }
+
+
 
         public string titletwentythree1 { get; set; }
         public string titletwentythree2 { get; set; }
@@ -464,6 +592,8 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.ProductionValueImport
         public string titletwentythree7 { get; set; }
         public string titletwentythree8 { get; set; }
         public string titletwentythree9 { get; set; }
+        public string titletwentythree12 { get; set; }
+        public string titletwentythree13 { get; set; }
         public string datesheettwentythree1 { get; set; }
         public List<CompanyProjectBasePoduction>    resulttwentythree1 { get; set; }
         public List<CompanyBasePoductionValue>      resulttwentythree2 { get; set; }
@@ -474,6 +604,11 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.ProductionValueImport
         public List<CompanyUnWriteReportInfo>       resulttwentythree8 { get; set; }
         public List<CompanyShipUnWriteReportInfo>   resulttwentythree9 { get; set; }
         public List<ShipProductionValue>            resulttwentythree5 { get; set; }
+        public List<ProjectRank> resulttwentythree12 { get; set; }
+        public List<ProjectIntensity> resulttwentythree13 { get; set; }
+
+
+
 
         public string titletwentyfour1 { get; set; }
         public string titletwentyfour2 { get; set; }
@@ -484,6 +619,8 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.ProductionValueImport
         public string titletwentyfour7 { get; set; }
         public string titletwentyfour8 { get; set; }
         public string titletwentyfour9 { get; set; }
+        public string titletwentyfour12 { get; set; }
+        public string titletwentyfour13 { get; set; }
         public string datesheettwentyfour1 { get; set; }
         public List<CompanyProjectBasePoduction>    resulttwentyfour1 { get; set; }
         public List<CompanyBasePoductionValue>      resulttwentyfour2 { get; set; }
@@ -494,6 +631,11 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.ProductionValueImport
         public List<CompanyUnWriteReportInfo>       resulttwentyfour8 { get; set; }
         public List<CompanyShipUnWriteReportInfo>   resulttwentyfour9 { get; set; }
         public List<ShipProductionValue>            resulttwentyfour5 { get; set; }
+        public List<ProjectRank> resulttwentyfour12 { get; set; }
+        public List<ProjectIntensity> resulttwentyfour13 { get; set; }
+
+
+
 
         public string titletwentyfive1 { get; set; }
         public string titletwentyfive2 { get; set; }
@@ -504,6 +646,8 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.ProductionValueImport
         public string titletwentyfive7 { get; set; }
         public string titletwentyfive8 { get; set; }
         public string titletwentyfive9 { get; set; }
+        public string titletwentyfive12 { get; set; }
+        public string titletwentyfive13 { get; set; }
         public string datesheettwentyfive1 { get; set; }
         public List<CompanyProjectBasePoduction>    resulttwentyfive1 { get; set; }
         public List<CompanyBasePoductionValue>      resulttwentyfive2 { get; set; }
@@ -514,6 +658,11 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.ProductionValueImport
         public List<CompanyUnWriteReportInfo>       resulttwentyfive8 { get; set; }
         public List<CompanyShipUnWriteReportInfo>   resulttwentyfive9 { get; set; }
         public List<ShipProductionValue>            resulttwentyfive5 { get; set; }
+        public List<ProjectRank> resulttwentyfive12 { get; set; }
+        public List<ProjectIntensity> resulttwentyfive13 { get; set; }
+
+
+
 
         public string titletwentysix1 { get; set; }
         public string titletwentysix2 { get; set; }
@@ -524,6 +673,8 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.ProductionValueImport
         public string titletwentysix7 { get; set; }
         public string titletwentysix8 { get; set; }
         public string titletwentysix9 { get; set; }
+        public string titletwentysix12 { get; set; }
+        public string titletwentysix13 { get; set; }
         public string datesheettwentysix1 { get; set; }
         public List<CompanyProjectBasePoduction>    resulttwentysix1 { get; set; }
         public List<CompanyBasePoductionValue>      resulttwentysix2 { get; set; }
@@ -534,6 +685,11 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.ProductionValueImport
         public List<CompanyUnWriteReportInfo>       resulttwentysix8 { get; set; }
         public List<CompanyShipUnWriteReportInfo>   resulttwentysix9 { get; set; }
         public List<ShipProductionValue>            resulttwentysix5 { get; set; }
+        public List<ProjectRank> resulttwentysix12 { get; set; }
+        public List<ProjectIntensity> resulttwentysix13 { get; set; }
+
+
+
 
         public string titletwentyseven1 { get; set; }
         public string titletwentyseven2 { get; set; }
@@ -544,6 +700,8 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.ProductionValueImport
         public string titletwentyseven7 { get; set; }
         public string titletwentyseven8 { get; set; }
         public string titletwentyseven9 { get; set; }
+        public string titletwentyseven12 { get; set; }
+        public string titletwentyseven13 { get; set; }
         public string datesheettwentyseven1 { get; set; }
         public List<CompanyProjectBasePoduction>    resulttwentyseven1 { get; set; }
         public List<CompanyBasePoductionValue>      resulttwentyseven2 { get; set; }
@@ -554,6 +712,11 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.ProductionValueImport
         public List<CompanyUnWriteReportInfo>       resulttwentyseven8 { get; set; }
         public List<CompanyShipUnWriteReportInfo>   resulttwentyseven9 { get; set; }
         public List<ShipProductionValue>            resulttwentyseven5 { get; set; }
+        public List<ProjectRank> resulttwentyseven12 { get; set; }
+        public List<ProjectIntensity> resulttwentyseven13 { get; set; }
+
+
+
 
         public string titletwentyeight1 { get; set; }
         public string titletwentyeight2 { get; set; }
@@ -564,6 +727,8 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.ProductionValueImport
         public string titletwentyeight7 { get; set; }
         public string titletwentyeight8 { get; set; }
         public string titletwentyeight9 { get; set; }
+        public string titletwentyeight12 { get; set; }
+        public string titletwentyeight13 { get; set; }
         public string datesheettwentyeight1 { get; set; }
         public List<CompanyProjectBasePoduction>    resulttwentyeight1 { get; set; }
         public List<CompanyBasePoductionValue>      resulttwentyeight2 { get; set; }
@@ -574,6 +739,12 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.ProductionValueImport
         public List<CompanyUnWriteReportInfo>       resulttwentyeight8 { get; set; }
         public List<CompanyShipUnWriteReportInfo>   resulttwentyeight9 { get; set; }
         public List<ShipProductionValue>            resulttwentyeight5 { get; set; }
+        public List<ProjectRank> resulttwentyeight12 { get; set; }
+        public List<ProjectIntensity> resulttwentyeight13 { get; set; }
+
+
+
+
 
         public string titletwentynine1 { get; set; }
         public string titletwentynine2 { get; set; }
@@ -584,6 +755,8 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.ProductionValueImport
         public string titletwentynine7 { get; set; }
         public string titletwentynine8 { get; set; }
         public string titletwentynine9 { get; set; }
+        public string titletwentynine12 { get; set; }
+        public string titletwentynine13 { get; set; }
         public string datesheettwentynine1 { get; set; }
         public List<CompanyProjectBasePoduction>    resulttwentynine1 { get; set; }
         public List<CompanyBasePoductionValue>      resulttwentynine2 { get; set; }
@@ -594,6 +767,11 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.ProductionValueImport
         public List<CompanyUnWriteReportInfo>       resulttwentynine8 { get; set; }
         public List<CompanyShipUnWriteReportInfo>   resulttwentynine9 { get; set; }
         public List<ShipProductionValue>            resulttwentynine5 { get; set; }
+        public List<ProjectRank> resulttwentynine12 { get; set; }
+        public List<ProjectIntensity> resulttwentynine13 { get; set; }
+
+
+
 
         public string titlethirty1 { get; set; }
         public string titlethirty2 { get; set; }
@@ -604,6 +782,8 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.ProductionValueImport
         public string titlethirty7 { get; set; }
         public string titlethirty8 { get; set; }
         public string titlethirty9 { get; set; }
+        public string titlethirty12 { get; set; }
+        public string titlethirty13 { get; set; }
         public string datesheetthirty1 { get; set; }
         public List<CompanyProjectBasePoduction>    resultthirty1 { get; set; }
         public List<CompanyBasePoductionValue>      resultthirty2 { get; set; }
@@ -614,6 +794,11 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.ProductionValueImport
         public List<CompanyUnWriteReportInfo>       resultthirty8 { get; set; }
         public List<CompanyShipUnWriteReportInfo>   resultthirty9 { get; set; }
         public List<ShipProductionValue>            resultthirty5 { get; set; }
+        public List<ProjectRank> resultthirty12 { get; set; }
+        public List<ProjectIntensity> resultthirty13 { get; set; }
+
+
+
 
         public string titlethirtyone1 { get; set; }
         public string titlethirtyone2 { get; set; }
@@ -624,6 +809,8 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.ProductionValueImport
         public string titlethirtyone7 { get; set; }
         public string titlethirtyone8 { get; set; }
         public string titlethirtyone9 { get; set; }
+        public string titlethirtyone12 { get; set; }
+        public string titlethirtyone13 { get; set; }
         public string datesheetthirtyone1 { get; set; }
         public List<CompanyProjectBasePoduction>    resultthirtyone1 { get; set; }
         public List<CompanyBasePoductionValue>      resultthirtyone2 { get; set; }
@@ -634,6 +821,8 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.ProductionValueImport
         public List<CompanyUnWriteReportInfo>       resultthirtyone8 { get; set; }
         public List<CompanyShipUnWriteReportInfo>   resultthirtyone9 { get; set; }
         public List<ShipProductionValue>            resultthirtyone5 { get; set; }
+        public List<ProjectRank> resultthirtyone12 { get; set; }
+        public List<ProjectIntensity> resultthirtyone13 { get; set; }
 
     }
 }

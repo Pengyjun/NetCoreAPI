@@ -263,6 +263,9 @@ namespace GHMonitoringCenterApi.Application.Contracts.AutoMapper
             mapperConfigurationExpression.CreateMap<ProjectShiftProductionInfo, ExcelProjectShiftProductionInfo>();
             mapperConfigurationExpression.CreateMap<UnProjectShitInfo, ExcelUnProjectShitInfo>()
                 .ForMember(x => x.UnitName, y => y.MapFrom(u => u.CompanyName));
+
+            mapperConfigurationExpression.CreateMap<ProjectRank, ExcelProjectRank>();
+            mapperConfigurationExpression.CreateMap<ProjectIntensity, ExcelProjectIntensity>();
         }
     }
 }

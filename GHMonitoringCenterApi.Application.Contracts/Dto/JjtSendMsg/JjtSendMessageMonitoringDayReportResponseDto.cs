@@ -338,7 +338,6 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.JjtSendMsg
 
 
 
-
     }
     #endregion
 

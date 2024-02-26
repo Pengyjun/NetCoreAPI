@@ -239,6 +239,10 @@ namespace GHMonitoringCenterApi.Application.Service.ProductionValueImport
             var excelCompanyProjectBasePoduction = getData.Data.projectBasePoduction.CompanyProjectBasePoductions;
             //各个公司基本产值情况
             var excelCompanyBasePoductionValue = getData.Data.projectBasePoduction.CompanyBasePoductionValues;
+            //产值排名前十的项目
+            var excelProjectRanks = getData.Data.projectBasePoduction.ProjectRanks;
+            //产值强度低于80%的项目
+            var excelProjectIntensity = getData.Data.projectBasePoduction.ProjectIntensities;
             //自有船施工运转情况
             var excelOwnerShipBuildInfo = getData.Data.OwnerShipBuildInfo.companyShipBuildInfos;
             //各个公司自有船施工产值情况集合
@@ -333,6 +337,76 @@ namespace GHMonitoringCenterApi.Application.Service.ProductionValueImport
                     TtileContent = titleTwo,
                     DateDay = dateDay,
                     Type = 2,
+                    Year = year
+                });
+            }
+            //产值排名前十的项目
+            if (excelProjectRanks.Count() > 0)
+            {
+                //数据映射
+                var result = _mapper.Map<List<models.ProjectRank>, List<ExcelProjectRank>>(excelProjectRanks);
+                foreach (var item in result)
+                {
+                    item.Id = GuidUtil.Next();
+                    item.DateDay = dateDay;
+                    item.Year = year;
+                    item.Month = month;
+                }
+                //合计
+                result.Add(new ExcelProjectRank
+                {
+                    Id = GuidUtil.Next(),
+                    CreateTime = DateTime.Now,
+                    DateDay = dateDay,
+                    Month = month,
+                    CurrentYearCompleteProductionValue = getData.Data.projectBasePoduction.TotalCurrentYearCompleteProductionValue,
+                    DayActualValue = getData.Data.projectBasePoduction.SumProjectRanksTen,
+                    ProjectName = "合计",
+                    CompleteRate = getData.Data.projectBasePoduction.SumCompleteRate,
+                    CurrentYearPlanProductionValue = getData.Data.projectBasePoduction.TotalCurrentYearPlanProductionValue,
+                    Year = year
+                });
+                await _dbContext.Insertable(result).ExecuteCommandAsync();
+
+                //titile写入
+                string titletweleve = year + "年 产值排名前十的项目如下表所示，当年合计产值 " + getData.Data.projectBasePoduction.TotalCurrentYearCompleteProductionValue + " 亿元， 占公司当年产值的 " + getData.Data.projectBasePoduction.TotalCompleteRate + "%；";
+                excelTitles.Add(new ExcelTitle()
+                {
+                    CreateTime = DateTime.Now,
+                    Id = GuidUtil.Next(),
+                    Month = month,
+                    TitleName = "【" + dateDay + "】广航局生产运营监控日报 项目总体生产情况",
+                    TtileContent = titletweleve,
+                    DateDay = dateDay,
+                    Type = 12,
+                    Year = year
+                });
+            }
+            //产值强度低于80%的项目
+            if (excelProjectIntensity.Count() > 0)
+            {
+                //数据映射
+                var result = _mapper.Map<List<models.ProjectIntensity>, List<ExcelProjectIntensity>>(excelProjectIntensity);
+                foreach (var item in result)
+                {
+                    item.Id = GuidUtil.Next();
+                    item.DateDay = dateDay;
+                    item.Year = year;
+                    item.Month = month;
+                }
+                await _dbContext.Insertable(result).ExecuteCommandAsync();
+
+                //titile写入
+                string titlethirteen = DateTime.Now.AddDays(-1).ToString("MM月dd日") + " 在建项目产值强度低于其当月日均产值计划 80% 的项目有 " + result.Count() + " 个，具体为：";
+                excelTitles.Add(new ExcelTitle()
+                {
+                    CreateTime = DateTime.Now,
+                    Id = GuidUtil.Next(),
+                    Month = month,
+                    TitleName = "【" + dateDay + "】广航局生产运营监控日报 项目总体生产情况",
+                    TtileContent = titlethirteen,
+                    DateDay = dateDay,
+                    Type = 13,
                     Year = year
                 });
             }
@@ -883,6 +957,35 @@ namespace GHMonitoringCenterApi.Application.Service.ProductionValueImport
             var baseExcelTitle = await _dbContext.Queryable<ExcelTitle>()
                 .Where(x => x.IsDelete == 1 && x.DateDay >= formatAlfterStartTime && x.DateDay <= formatAlfterEndTime)
                .OrderBy(x => x.DateDay).ToListAsync();
+
+            var baseExcelProjectRank = await _dbContext.Queryable<ExcelProjectRank>()
+                .Where(x => x.IsDelete == 1 && x.DateDay >= formatAlfterStartTime && x.DateDay <= formatAlfterEndTime)
+                .OrderBy(x => x.DateDay)
+                .Select(x => new ProjectRank
+                {
+                    CompleteRate = x.CompleteRate,
+                    CurrentYearCompleteProductionValue = x.CurrentYearCompleteProductionValue,
+                    CurrentYearPlanProductionValue = x.CurrentYearPlanProductionValue,
+                    DateDay = x.DateDay,
+                    DayActualValue = x.DayActualValue,
+                    ProjectName = x.ProjectName
+                })
+                .ToListAsync();
+
+            var baseExcelProjectIntensity = await _dbContext.Queryable<ExcelProjectIntensity>()
+                .Where(x => x.IsDelete == 1 && x.DateDay >= formatAlfterStartTime && x.DateDay <= formatAlfterEndTime)
+                .OrderBy(x => x.DateDay)
+                .Select(x => new ProjectIntensity
+                {
+                    DateDay = x.DateDay,
+                    CompleteDayProducitonRate = x.CompleteDayProducitonRate,
+                    DayProduciton = x.DayProduciton,
+                    PlanDayProduciton = x.PlanDayProduciton,
+                    DayProductionIntensityDesc = x.DayProductionIntensityDesc,
+                    Name = x.Name
+                })
+                .ToListAsync();
+
             #endregion
 
             #region 治理天数
@@ -922,6 +1025,9 @@ namespace GHMonitoringCenterApi.Application.Service.ProductionValueImport
                 productionDayReportHistoryResponseDto.CompanyUnWriteReportInfo = baseCompanyUnWriteReportInfo.Where(x => x.DateDay == currentDay).ToList();
                 productionDayReportHistoryResponseDto.CompanyShipUnWriteReportInfo = baseCompanyShipUnWriteReportInfo.Where(x => x.DateDay == currentDay).ToList();
                 productionDayReportHistoryResponseDto.ShipProductionValue = baseShipProductionValue.Where(x => x.DateDay == currentDay).ToList();
+                productionDayReportHistoryResponseDto.ProjectRank = baseExcelProjectRank.Where(x => x.DateDay == currentDay).ToList();
+                productionDayReportHistoryResponseDto.ProjectIntensity = baseExcelProjectIntensity.Where(x => x.DateDay == currentDay).ToList();
+
 
                 int no = 1;
                 //添加序号
@@ -942,8 +1048,18 @@ namespace GHMonitoringCenterApi.Application.Service.ProductionValueImport
                     item.No = no;
                     no++;
                 }
-
-
+                no = 1;
+                foreach (var item in productionDayReportHistoryResponseDto.ProjectRank)
+                {
+                    item.No = no;
+                    no++;
+                }
+                no = 1;
+                foreach (var item in productionDayReportHistoryResponseDto.ProjectIntensity)
+                {
+                    item.No = no;
+                    no++;
+                }
 
                 productionDayReportHistoryResponseDto.ExcelTitle = baseExcelTitle.Where(x => x.DateDay == currentDay).ToList();
 

@@ -1610,6 +1610,9 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             var projectAnnualPlans = await GetProjectAnnualPlansAsync(projectIds, years);
             // 累计产值/产量
             var sumMonthReports = await SumMonthReportsAsync(projectIds);
+            //项目历史确认和收款产值
+            var sumHistoryMonthReports = await _dbContext.Queryable<ProjectMonthReportHistory>().Where(x=>x.IsDelete==1&&projectIds.Contains(x.ProjectId.Value)).ToListAsync();
+
             // 年度累计产值/产量
             var sumYearMonthReports = await SumMonthReportsByYearAsync(projectIds, startTime.Year, endTime.Year);
             // 年度计划
@@ -1678,8 +1681,21 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     item.AccumulativeQuantities = Math.Round(sumMonthReport.CompletedQuantity, 2);
                     item.CumulativeAccomplishCost = Math.Round(sumMonthReport.CostAmount, 2);
                     item.CumulativeCompleted = Math.Round(model.IsConvert == true ? sumMonthReport.CompleteProductionAmount : sumMonthReport.CurrencyCompleteProductionAmount, 2);
-                    item.CumulativePaymentAmount = Math.Round(sumMonthReport.PartyAPayAmount, 2);
-                    item.CumulativeValue = Math.Round(sumMonthReport.PartyAConfirmedProductionAmount, 2);
+                    //item.CumulativePaymentAmount = Math.Round(sumMonthReport.PartyAPayAmount, 2);
+                    // item.CumulativeValue = Math.Round(sumMonthReport.PartyAConfirmedProductionAmount, 2);
+                   var itemHistotyMonth=sumHistoryMonthReports.Where(x => x.ProjectId == item.RegionId).FirstOrDefault();
+               
+                    if (itemHistotyMonth != null)
+                    {
+                        item.CumulativePaymentAmount = Math.Round(sumMonthReport.PartyAPayAmount, 2) + Math.Round(itemHistotyMonth.KaileiProjectPayment.Value / 10000, 2);
+                        item.CumulativeValue = Math.Round(sumMonthReport.PartyAConfirmedProductionAmount, 2) +
+                        Math.Round(itemHistotyMonth.KaileiOwnerConfirmation.Value/10000, 2);
+                    }
+                    else {
+                        item.CumulativePaymentAmount = Math.Round(sumMonthReport.PartyAPayAmount, 2);
+                        item.CumulativeValue = Math.Round(sumMonthReport.PartyAConfirmedProductionAmount, 2);
+                    }
+                     
                     item.CumulativeOutsourcingExpensesAmount = Math.Round(sumMonthReport.OutsourcingExpensesAmount, 2);
 
                 }
@@ -1985,6 +2001,10 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
         {
             model.ResetModelProperty();
             var result = new ResponseAjaxResult<bool>();
+            if (model.DateMonth == 202306)
+            {
+                return result.FailResult(HttpStatusCode.SaveFail, "由于历史数据的缘故，系统不允许修改6月份月报数据");
+            }
             //if (!(now.Day >= 26 || (now.Day >= 1 && now.Day <= 5)))
             //{
             //    return result.FailResult(HttpStatusCode.SaveFail, "填报时间已过，时间截至在当月26号 - 次月5号");
