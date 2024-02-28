@@ -1577,6 +1577,7 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
             var commonDataList = await dbContext.Queryable<ProductionMonitoringOperationDayReport>().Where(x => x.IsDelete == 1).ToListAsync();
             var comonDataProductionList = await dbContext.Queryable<CompanyProductionValueInfo>()
                 .Where(x => x.IsDelete == 1 && x.DateDay == DateTime.Now.Year).ToListAsync();
+            var monthDiffProductionValue= await dbContext.Queryable<MonthDiffProductionValue>().Where(x => x.IsDelete == 1).ToListAsync();
             #endregion
 
             #region 项目总体生产情况
@@ -1734,7 +1735,7 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
                 var currentMonthCompanyCount = dayProductionValueList
                     .Where(x => x.CompanyId == item.ItemId && x.DateDay >= currentTimeIntUp && x.DateDay <= currentTimeInt)
                     .Sum(x => x.DayActualProductionAmount)
-                    + GetCompanyProductuionValue(item.ItemId.Value, monthReport, projectIds);
+                    + GetCompanyProductuionValue(item.ItemId.Value, monthReport, projectIds, monthDiffProductionValue);
                 //年度产值占比 （广航局）
                 //var yearProductionValuePercent = Math.Round(((decimal)(item.YearProductionValue + currentMonthCompanyCount) / yearProductionValue) * 100, 2);
                 var yearProductionValuePercent = Math.Round(((decimal)(currentMonthCompanyCount) / yearProductionValue) * 100, 2);
@@ -4702,10 +4703,26 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
         #endregion
 
 
-        public static decimal GetCompanyProductuionValue(Guid companyId, List<MonthReport> data, List<Project> projects)
+        public static decimal GetCompanyProductuionValue(Guid companyId, List<MonthReport> data, List<Project> projects,
+            List<MonthDiffProductionValue> monthDiffProductionValues)
         {
-            var ids = projects.Where(x => x.CompanyId.Value == companyId).Select(x => x.Id).ToList();
-            return data.Where(x => ids.Contains(x.ProjectId)).Sum(x => x.CompleteProductionAmount);
+            //此事件段是填写月报的时间  此时间段不加入 当前月报产值
+            //判断是否加入当前月的月报产值
+            var day = DateTime.Now.Day;
+            if (day >= 27 || day <= 5)
+            {
+                var singleCompany = monthDiffProductionValues.SingleOrDefault(x => x.IsDelete == 1 && x.CompanyId == companyId);
+                if(singleCompany!=null)
+                return singleCompany.ProductionValue.Value*100000000;
+                return 0M;
+            }
+            else {
+                var ids = projects.Where(x => x.CompanyId.Value == companyId).Select(x => x.Id).ToList();
+                //已完成月报的产值
+                return  data.Where(x =>ids.Contains(x.ProjectId)).Sum(x => x.CompleteProductionAmount);
+
+            }
+           
         }
     }
 }
