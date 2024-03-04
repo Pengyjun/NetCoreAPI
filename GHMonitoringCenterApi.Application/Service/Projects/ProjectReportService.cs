@@ -1778,7 +1778,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
 
             }).FirstAsync();
             totalMonthtReport = totalMonthtReport ?? new MonthtReportsResponseDto.TotalMonthtReportsDto();
-            return result.SuccessResult(new MonthtReportsResponseDto() { Reports = list, Total = totalMonthtReport }, total);
+            return result.SuccessResult(new MonthtReportsResponseDto() { Reports = list, Total = totalMonthtReport}, total,"注意:由于历史数据原因,查询2023年6月份月报数据的累计产值是包含2023年6月份之前的所有累计产值数据");
         }
 
         /// <summary>
