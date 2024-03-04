@@ -699,6 +699,10 @@ namespace GHMonitoringCenterApi.Application.Service.ProjectProductionReport
 			{
 				IsAdmin = false;
 			}
+			//船舶进退场（新逻辑）
+		    var shiMovenmentList=await dbContext.Queryable<ShipMovement>().Where(x => x.IsDelete == 1).ToListAsync();
+		    var projectList=await dbContext.Queryable<Project>().Where(x => x.IsDelete == 1).ToListAsync();
+
 			//获取需要查询的字段
 			var selectExpr = GetSelectExp();
 			var list = await dbContext.Queryable<ShipDayReport, Project, OwnerShip>(
@@ -724,8 +728,26 @@ namespace GHMonitoringCenterApi.Application.Service.ProjectProductionReport
 				.WhereIF(tag2List != null && tag2List.Any(), (d, p) => tag2List.Contains(p.Tag2))
 				.Select(selectExpr).ToListAsync();
 
-			#region 获取所有的数据
-			shipsDayReportResponseDto.sumShipDayValue = await GetSumShipValueAsync(list);
+            #region 新逻辑
+            //新逻辑
+            var primaryIds = list.Where(t => t.ProjectId == Guid.Empty).Select(t => new { id = t.Id, shipId = t.ShipId, DateDay = t.DateDay, ProjectId = t.ProjectId }).ToList();
+			foreach (var item in primaryIds)
+			{
+				var isExistProject=shiMovenmentList.Where(x => x.IsDelete == 1 && x.ShipId == item.shipId && x.EnterTime.Value.ToDateDay() <= item.DateDay && x.QuitTime.Value.ToDateDay() >= item.DateDay).FirstOrDefault();
+				if (isExistProject != null)
+				{
+					var oldValue=list.Where(t => t.ProjectId == Guid.Empty).FirstOrDefault();
+					if (oldValue != null) { 
+                        oldValue.ProjectId = isExistProject.ProjectId;
+						oldValue.ProjectName = projectList.Where(x => x.Id == isExistProject.ProjectId).FirstOrDefault()?.ShortName;
+                    }
+                }
+			}
+			
+			#endregion
+
+            #region 获取所有的数据
+            shipsDayReportResponseDto.sumShipDayValue = await GetSumShipValueAsync(list);
 			#endregion
 			//是否全量导出
 			var shipList = new List<ShipsDayReportInfo>();
@@ -765,10 +787,9 @@ namespace GHMonitoringCenterApi.Application.Service.ProjectProductionReport
 			}
 			//获取处理完的数据
 			var result = await GetShipResponseDtosAsync(shipList, institution);
-			var removeList = result.Where(t => t.ShipState == 0 && t.ProjectName == "非关联项目").Select(t=>t.Id).ToList();
+			var removeList = result.Where(t => t.ShipState == 0 && t.ProjectName == "非关联项目").Select(t => t.Id).ToList();
 			result = result.Where(t => !removeList.Contains(t.Id)).ToList();
-			shipsDayReportResponseDto.shipsDayReportInfos = result;
-
+            shipsDayReportResponseDto.shipsDayReportInfos = result;
 			responseAjaxResult.Data = shipsDayReportResponseDto;
 			responseAjaxResult.Count = total;
 			responseAjaxResult.Success();

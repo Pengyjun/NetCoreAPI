@@ -368,6 +368,12 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 }
                 shipMovement.ForEach(item =>
                 {
+
+
+                    if (item.ProjectId != "08dc04fe-2b63-4636-816e-5b967d881645".ToGuid())
+                    {
+                        return;
+                    }
                     var resShipMovement = new EnterShipsResponseDto.ResEnterShipDto()
                     {
                         ProjectId = item.Status == ShipMovementStatus.Quit && !(item.EnterTime <= model.DateDayTime && item.QuitTime >= model.DateDayTime) ? Guid.Empty : item.ProjectId,
@@ -382,6 +388,20 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                         AssociationProject = item.Status == ShipMovementStatus.Quit && !(item.EnterTime <= model.DateDayTime && item.QuitTime >= model.DateDayTime) ? 2 : item.ProjectId == Guid.Empty ? 2 : 1,
                         FillReportStatus = GetFillState(model.DateDayTime, item.EnterTime, fillReportTime)
                     };
+                    #region 添加的逻辑
+                    if (item.Status == ShipMovementStatus.Enter && model.DateDayTime<item.EnterTime && item.QuitTime == null)
+                    {
+                        resShipMovement.ProjectId =Guid.Empty;
+                        resShipMovement.AssociationProject = 2;
+                        resShipMovement.ProjectName = string.Empty;
+                    }
+                    if (item.Status == ShipMovementStatus.Quit && model.DateDayTime >item.QuitTime && item.QuitTime != null)
+                    {
+                        resShipMovement.ProjectId = Guid.Empty;
+                        resShipMovement.AssociationProject = 3;
+                        resShipMovement.ProjectName = string.Empty;
+                    }
+                    #endregion
                     //判断当前船舶是否未非关联项目  并且类型是否在耙吸船、绞吸船 和 抓斗船范围内
                     if (resShipMovement.AssociationProject == 2 && filtShipType.Contains(ship.ShipKindTypeId.Value.ToString()))
                     {
