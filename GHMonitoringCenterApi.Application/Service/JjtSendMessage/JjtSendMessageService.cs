@@ -2732,6 +2732,12 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
                                     });
                                 }
                             }
+                            else {
+                                companyShipUnWriteReportInfos.Add(new CompanyShipUnWriteReportInfo()
+                                {
+                                    ShipName = shipInfo?.Name,
+                                });
+                            }
                         }
                     }
                 }
@@ -3728,6 +3734,20 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
 
             #endregion
 
+
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
             #region 特殊情况
             var specialProjectList = new List<SpecialProjectInfo>();
             var dayRepNoticeData = await dbContext.Queryable<DayReport>().Where(x => x.IsDelete == 1 && x.DateDay == currentTimeInt && (x.IsHaveProductionWarning == 1 || x.IsHaveProductionWarning == 2 || x.IsHaveProductionWarning == 3))
