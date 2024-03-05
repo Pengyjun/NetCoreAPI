@@ -370,10 +370,10 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 {
 
 
-                    if (item.ProjectId != "08dc04fe-2b63-4636-816e-5b967d881645".ToGuid())
-                    {
-                        return;
-                    }
+                    //if (item.ProjectId != "08dc04fe-2b63-4636-816e-5b967d881645".ToGuid())
+                    //{
+                    //    return;
+                    //}
                     var resShipMovement = new EnterShipsResponseDto.ResEnterShipDto()
                     {
                         ProjectId = item.Status == ShipMovementStatus.Quit && !(item.EnterTime <= model.DateDayTime && item.QuitTime >= model.DateDayTime) ? Guid.Empty : item.ProjectId,
@@ -389,13 +389,13 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                         FillReportStatus = GetFillState(model.DateDayTime, item.EnterTime, fillReportTime)
                     };
                     #region 添加的逻辑
-                    if (item.Status == ShipMovementStatus.Enter && model.DateDayTime<item.EnterTime && item.QuitTime == null)
+                    if (item.Status == ShipMovementStatus.Enter && model.DateDayTime < item.EnterTime && item.QuitTime == null)
                     {
-                        resShipMovement.ProjectId =Guid.Empty;
+                        resShipMovement.ProjectId = Guid.Empty;
                         resShipMovement.AssociationProject = 2;
                         resShipMovement.ProjectName = string.Empty;
                     }
-                    if (item.Status == ShipMovementStatus.Quit && model.DateDayTime >item.QuitTime && item.QuitTime != null)
+                    if (item.Status == ShipMovementStatus.Quit && model.DateDayTime > item.QuitTime && item.QuitTime != null)
                     {
                         resShipMovement.ProjectId = Guid.Empty;
                         resShipMovement.AssociationProject = 3;
