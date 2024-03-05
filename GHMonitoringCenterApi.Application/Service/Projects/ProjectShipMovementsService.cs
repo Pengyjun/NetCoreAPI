@@ -395,10 +395,10 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                         resShipMovement.AssociationProject = 2;
                         resShipMovement.ProjectName = string.Empty;
                     }
-                    if (item.Status == ShipMovementStatus.Quit && model.DateDayTime > item.QuitTime && item.QuitTime != null)
+                    if (item.Status == ShipMovementStatus.Quit && item.QuitTime != null && model.DateDayTime > item.QuitTime )
                     {
                         resShipMovement.ProjectId = Guid.Empty;
-                        resShipMovement.AssociationProject = 3;
+                        resShipMovement.AssociationProject = 2;
                         resShipMovement.ProjectName = string.Empty;
                     }
                     #endregion
