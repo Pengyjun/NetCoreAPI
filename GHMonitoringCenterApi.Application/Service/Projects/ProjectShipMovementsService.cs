@@ -315,6 +315,10 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             var projects = await GetProjectInfoAsync();
             ownShips.ForEach(ship =>
             {
+                //if (ship.PomId != "d38e3b12-f68a-40c3-9d3a-07f8daa4f923".ToGuid())
+                //{
+                //    return;
+                //}
                 //获取船舶进退场时间
                 var shipMovement = shipMovements.Where(t => t.ShipId == ship.PomId).ToList();// SingleOrDefault(t => t.ShipId == ship.PomId);
                 //获取船舶填报时间
@@ -349,7 +353,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                         resShips.Add(resShipMovement);
                     }
                 }
-                if (shipMovement.Count() > 1)
+                if (shipMovement.Count() > 1&& model.ProjectId!=null&& model.ProjectId!=Guid.Empty)
                 {
                     shipMovement = shipMovement.Where(x => x.ProjectId == model.ProjectId).ToList();
 
@@ -370,10 +374,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 {
 
 
-                    //if (item.ProjectId != "08dc04fe-2b63-4636-816e-5b967d881645".ToGuid())
-                    //{
-                    //    return;
-                    //}
+                   
                     var resShipMovement = new EnterShipsResponseDto.ResEnterShipDto()
                     {
                         ProjectId = item.Status == ShipMovementStatus.Quit && !(item.EnterTime <= model.DateDayTime && item.QuitTime >= model.DateDayTime) ? Guid.Empty : item.ProjectId,
@@ -412,6 +413,25 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                         resShips.Add(resShipMovement);
                     }
                 });
+                #region 添加的逻辑
+                if (shipMovement == null)
+                {
+                    var resShipMovement = new EnterShipsResponseDto.ResEnterShipDto()
+                    {
+
+                        ShipId = ship.PomId.Value,
+                        DateDayTime = Convert.ToDateTime(fillReportTime),
+                        ShipName = ship.Name,
+
+                        ShipCompanyId = ship.CompanyId,
+                        ShipKindTypeName = shipKindTypes.FirstOrDefault(t => t.PomId == ship.ShipKindTypeId)?.Name,
+                        FillReportTime = fillReportTime,
+                        AssociationProject = 2,
+                        FillReportStatus = GetFillState(model.DateDayTime, null, fillReportTime)
+                    };
+                    resShips.Add(resShipMovement);
+                }
+                #endregion
             });
             //获取当前角色信息
             var curRoleInfo = _currentUser.RoleInfos.Where(role => role.Oid == _currentUser.CurrentLoginInstitutionOid).FirstOrDefault();
