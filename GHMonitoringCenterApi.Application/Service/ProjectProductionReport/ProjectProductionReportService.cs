@@ -740,7 +740,7 @@ namespace GHMonitoringCenterApi.Application.Service.ProjectProductionReport
                     if (project.QuitTime.HasValue&& project.QuitTime.Value.ToDateDay()>=item.DateDay)
                     {
 
-						var oldValue = list.Where(t => t.ProjectId == Guid.Empty).FirstOrDefault();
+						var oldValue = list.Where(t => t.ShipId== project.ShipId&&t.DateDay== item.DateDay).FirstOrDefault();
 						if (oldValue != null)
 						{
 							oldValue.ProjectId = project.ProjectId;
@@ -751,7 +751,7 @@ namespace GHMonitoringCenterApi.Application.Service.ProjectProductionReport
                     if (project.EnterTime.HasValue && project.QuitTime.HasValue==false && project.EnterTime.Value.ToDateDay()<= item.DateDay)
                     {
 
-                        var oldValue = list.Where(t => t.ProjectId == Guid.Empty).FirstOrDefault();
+                        var oldValue = list.Where(t => t.ShipId == project.ShipId && t.DateDay == item.DateDay).FirstOrDefault();
                         if (oldValue != null)
                         {
                             oldValue.ProjectId = project.ProjectId;
@@ -759,10 +759,10 @@ namespace GHMonitoringCenterApi.Application.Service.ProjectProductionReport
                             oldValue.shipDayReportType = 1;
                         }
                     }
-                    if (project.EnterTime.HasValue && project.QuitTime.HasValue&& project.EnterTime.Value.ToDateDay() <= item.DateDay)
+                    if (project.EnterTime.HasValue && project.QuitTime.HasValue&& project.QuitTime.Value.ToDateDay() >= item.DateDay)
                     {
 
-                        var oldValue = list.Where(t => t.ProjectId == Guid.Empty).FirstOrDefault();
+                        var oldValue = list.Where(t => t.ShipId == project.ShipId && t.DateDay == item.DateDay).FirstOrDefault();
                         if (oldValue != null)
                         {
                             oldValue.ProjectId = project.ProjectId;
