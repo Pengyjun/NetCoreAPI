@@ -759,6 +759,17 @@ namespace GHMonitoringCenterApi.Application.Service.ProjectProductionReport
                             oldValue.shipDayReportType = 1;
                         }
                     }
+                    if (project.EnterTime.HasValue && project.QuitTime.HasValue&& project.EnterTime.Value.ToDateDay() <= item.DateDay)
+                    {
+
+                        var oldValue = list.Where(t => t.ProjectId == Guid.Empty).FirstOrDefault();
+                        if (oldValue != null)
+                        {
+                            oldValue.ProjectId = project.ProjectId;
+                            oldValue.ProjectName = projectList.Where(x => x.Id == project.ProjectId).FirstOrDefault()?.Name;
+                            oldValue.shipDayReportType = 1;
+                        }
+                    }
                 }
 				
 			}
