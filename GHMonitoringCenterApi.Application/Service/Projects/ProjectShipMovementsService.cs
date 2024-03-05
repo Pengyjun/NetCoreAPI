@@ -367,7 +367,25 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     //        item.ProjectId = Guid.Empty;
                     //    }
                     //}
+                    #region 添加的逻辑
+                    if (!shipMovement.Any())
+                    {
+                        var resShipMovement = new EnterShipsResponseDto.ResEnterShipDto()
+                        {
 
+                            ShipId = ship.PomId.Value,
+                            DateDayTime = Convert.ToDateTime(fillReportTime),
+                            ShipName = ship.Name,
+
+                            ShipCompanyId = ship.CompanyId,
+                            ShipKindTypeName = shipKindTypes.FirstOrDefault(t => t.PomId == ship.ShipKindTypeId)?.Name,
+                            FillReportTime = fillReportTime,
+                            AssociationProject = 2,
+                            FillReportStatus = GetFillState(model.DateDayTime, null, fillReportTime)
+                        };
+                        resShips.Add(resShipMovement);
+                    }
+                    #endregion
 
                 }
                 shipMovement.ForEach(item =>
@@ -413,25 +431,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                         resShips.Add(resShipMovement);
                     }
                 });
-                #region 添加的逻辑
-                if (shipMovement == null)
-                {
-                    var resShipMovement = new EnterShipsResponseDto.ResEnterShipDto()
-                    {
-
-                        ShipId = ship.PomId.Value,
-                        DateDayTime = Convert.ToDateTime(fillReportTime),
-                        ShipName = ship.Name,
-
-                        ShipCompanyId = ship.CompanyId,
-                        ShipKindTypeName = shipKindTypes.FirstOrDefault(t => t.PomId == ship.ShipKindTypeId)?.Name,
-                        FillReportTime = fillReportTime,
-                        AssociationProject = 2,
-                        FillReportStatus = GetFillState(model.DateDayTime, null, fillReportTime)
-                    };
-                    resShips.Add(resShipMovement);
-                }
-                #endregion
+              
             });
             //获取当前角色信息
             var curRoleInfo = _currentUser.RoleInfos.Where(role => role.Oid == _currentUser.CurrentLoginInstitutionOid).FirstOrDefault();
