@@ -1180,9 +1180,12 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             var startDateDay = new DateTime(lastDateMonthTime.Year, lastDateMonthTime.Month, 26).ToDateDay();
             var endDateDay = new DateTime(monthTime.Year, monthTime.Month, 25).ToDateDay();
             var monthReport = await GetOwnerShipMonthReportAsync(shipDayReport.ProjectId, shipDayReport.ShipId, monthTime.ToDateMonth());
+            //项目信息
+            var projectList = await _dbContext.Queryable<Project>().Where(x => x.IsDelete == 1).ToListAsync();
+            var sipMovementList = await _dbContext.Queryable<ShipMovement>().Where(x => x.IsDelete == 1).ToListAsync();
             if (monthReport != null)
             {
-                var sumShipDayReport = await SumShipDayReportAsync(shipDayReport.ProjectId, shipDayReport.ShipId, startDateDay, endDateDay);
+                var sumShipDayReport = await SumShipDayReportAsync(shipDayReport.ProjectId, shipDayReport.ShipId, startDateDay, endDateDay, projectList, sipMovementList);
                 if (monthReport.WorkingHours != sumShipDayReport.WorkingHours)
                 {
                     monthReport.WorkingHours = sumShipDayReport.WorkingHours;
@@ -1197,7 +1200,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 var oldMonthReport = await GetOwnerShipMonthReportAsync((Guid)oldProjectId, shipDayReport.ShipId, monthTime.ToDateMonth());
                 if (oldMonthReport != null)
                 {
-                    var sumShipDayReport = await SumShipDayReportAsync((Guid)oldProjectId, shipDayReport.ShipId, startDateDay, endDateDay);
+                    var sumShipDayReport = await SumShipDayReportAsync((Guid)oldProjectId, shipDayReport.ShipId, startDateDay, endDateDay,projectList, sipMovementList);
                     if (oldMonthReport.WorkingHours != sumShipDayReport.WorkingHours)
                     {
                         oldMonthReport.WorkingHours = sumShipDayReport.WorkingHours;
@@ -1405,14 +1408,72 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
         /// 项目-自有船舶-统计
         /// </summary>
         /// <returns></returns>
-        private async Task<SumShipReportDto> SumShipDayReportAsync(Guid projectId, Guid shipId, int startDateDay, int endDateDay)
+        private async Task<SumShipReportDto> SumShipDayReportAsync(Guid projectId, Guid shipId, int startDateDay, int endDateDay,List<Project> projects,List<ShipMovement> shipMovements)
         {
+            var num = 0M;
             var sumReport = await _dbShipDayReport.AsQueryable().Where(t => t.ProjectId == projectId && t.ShipId == shipId && t.DateDay >= startDateDay && t.DateDay <= endDateDay && t.IsDelete == 1)
                 .GroupBy(t => new { t.ProjectId, t.ShipId }).Select(t => new SumShipReportDto()
                 {
                     // 生产运转
                     WorkingHours = SqlFunc.AggregateSum(t.Dredge ?? 0) + SqlFunc.AggregateSum(t.Sail ?? 0) + SqlFunc.AggregateSum(t.BlowingWater ?? 0) + SqlFunc.AggregateSum(t.SedimentDisposal ?? 0) + SqlFunc.AggregateSum(t.BlowShore ?? 0)
                 }).FirstAsync();
+
+
+            #region 新逻辑
+            if (projects != null && projects.Any() && shipMovements != null && shipMovements.Any())
+            {  
+                //新逻辑
+                var list = await _dbShipDayReport.AsQueryable().Where(t => t.ProjectId == Guid.Empty && t.ShipId == shipId && t.DateDay >= startDateDay && t.DateDay <= endDateDay && t.IsDelete == 1).ToListAsync();
+                var primaryIds = list.Where(t => t.ProjectId == Guid.Empty).Select(t => new { id = t.Id, shipId = t.ShipId, DateDay = t.DateDay, ProjectId = t.ProjectId }).ToList();
+                foreach (var item in primaryIds)
+                {
+                    var isExistProject = shipMovements.Where(x => x.IsDelete == 1 && x.ShipId == item.shipId && x.EnterTime.HasValue == true && (x.EnterTime.Value.ToDateDay() <= item.DateDay || x.QuitTime.HasValue == true && x.QuitTime.Value.ToDateDay() >= item.DateDay)).OrderByDescending(x => x.EnterTime).ToList();
+                    foreach (var project in isExistProject)
+                    {
+
+                        if (project.QuitTime.HasValue && project.QuitTime.Value.ToDateDay() >= item.DateDay)
+                        {
+
+                            var oldValue = list.Where(t => t.ShipId == project.ShipId && t.DateDay == item.DateDay).FirstOrDefault();
+                            if (oldValue != null)
+                            {
+                                oldValue.ProjectId = project.ProjectId;
+
+                            }
+                        }
+                        if (project.EnterTime.HasValue && project.QuitTime.HasValue == false && project.EnterTime.Value.ToDateDay() <= item.DateDay)
+                        {
+
+                            var oldValue = list.Where(t => t.ShipId == project.ShipId && t.DateDay == item.DateDay).FirstOrDefault();
+                            if (oldValue != null)
+                            {
+                                oldValue.ProjectId = project.ProjectId;
+
+                            }
+                        }
+                        if (project.EnterTime.HasValue && project.QuitTime.HasValue && project.QuitTime.Value.ToDateDay() >= item.DateDay)
+                        {
+
+                            var oldValue = list.Where(t => t.ShipId == project.ShipId && t.DateDay == item.DateDay).FirstOrDefault();
+                            if (oldValue != null)
+                            {
+                                oldValue.ProjectId = project.ProjectId;
+
+                            }
+                        }
+                    }
+
+                }
+
+                foreach (var item in list)
+                {
+                    num+=((item.Dredge??0)+(item.Sail??0)+(item.BlowingWater??0)+(item.SedimentDisposal??0)+(item.BlowingWater??0));
+                }
+            }
+            sumReport.WorkingHours += num;
+            #endregion
+
+
             sumReport = sumReport ?? new SumShipReportDto();
             sumReport.ProjectId = projectId;
             sumReport.ShipId = shipId;
@@ -3439,7 +3500,10 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             var endDateDay = new DateTime(dateMonthTime.Year, dateMonthTime.Month, 25).ToDateDay();
             var monthReport = await GetOwnerShipMonthReportAsync(model.ProjectId, model.ShipId, model.DateMonth);
             var sumMonthReport = await SumMonthReportDetailAsync(model.ProjectId, model.ShipId, ConstructionOutPutType.Self, model.DateMonth);
-            var sumShipDayReport = await SumShipDayReportAsync(model.ProjectId, model.ShipId, startDateDay, endDateDay);
+            //项目信息
+           var projectList= await _dbContext.Queryable<Project>().Where(x => x.IsDelete == 1).ToListAsync();
+           var sipMovementList = await _dbContext.Queryable<ShipMovement>().Where(x => x.IsDelete == 1).ToListAsync();
+            var sumShipDayReport = await SumShipDayReportAsync(model.ProjectId, model.ShipId, startDateDay, endDateDay, projectList, sipMovementList);
             var addSoils = new List<OwnerShipMonthReportSoil>();
             var updateSoils = new List<OwnerShipMonthReportSoil>();
             var removeSoils = new List<OwnerShipMonthReportSoil>();
@@ -3532,13 +3596,15 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             //判断月份天数范围
             ConvertHelper.TryParseFromDateMonth(dateMonth, out DateTime dateMonthTime);
             var resMonthReport = new OwnerShipMonthReportResponseDto();
+            var projectList = await _dbContext.Queryable<Project>().Where(x => x.IsDelete == 1).ToListAsync();
+            var sipMovementList = await _dbContext.Queryable<ShipMovement>().Where(x => x.IsDelete == 1).ToListAsync();
             if (monthReport == null)
             {
                 var lastDateMonthTime = dateMonthTime.AddMonths(-1);
                 var startDateDay = new DateTime(lastDateMonthTime.Year, lastDateMonthTime.Month, 26).ToDateDay();
                 var endDateDay = new DateTime(dateMonthTime.Year, dateMonthTime.Month, 25).ToDateDay();
                 var sumMonthReport = await SumMonthReportDetailAsync(model.ProjectId, model.ShipId, ConstructionOutPutType.Self, dateMonth);
-                var sumShipDayReport = await SumShipDayReportAsync(model.ProjectId, model.ShipId, startDateDay, endDateDay);
+                var sumShipDayReport = await SumShipDayReportAsync(model.ProjectId, model.ShipId, startDateDay, endDateDay, projectList, sipMovementList);
                 //获取船舶进出场
                 var shipMovement = await GetShipMovementAsync(model.ProjectId, model.ShipId, ShipType.OwnerShip);
                 resMonthReport.DateMonth = dateMonth;
