@@ -1284,7 +1284,11 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     }
                 }
                 #endregion
-
+                if (projectObject.CommencementTime.HasValue&& addOrUpdateProjectRequestDto.CommencementTime.HasValue==false)
+                {
+                    addOrUpdateProjectRequestDto.CommencementTime = projectObject.CommencementTime.Value;
+                }
+               
                 mapper.Map(addOrUpdateProjectRequestDto, projectObject);
                 //税率
                 projectObject.Rate = projectObject.Rate / 100;
@@ -1429,14 +1433,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 #endregion
 
                 //修改项目信息
-                if (projectObject.CommencementTime.HasValue)
-                {
-                    await dbContext.Updateable(projectObject).IgnoreColumns(x=>x.CommencementTime).EnableDiffLogEvent(logDto).ExecuteCommandAsync();
-                }
-                else {
-                    await dbContext.Updateable(projectObject).EnableDiffLogEvent(logDto).ExecuteCommandAsync();
-                }
-                
+                await dbContext.Updateable(projectObject).EnableDiffLogEvent(logDto).ExecuteCommandAsync();
                 //项目变更记录
                 await entityChangeService.RecordEntitysChangeAsync(EntityType.Project, projectObject.Id);
                 //更改后直接推送项目信息
