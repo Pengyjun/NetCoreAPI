@@ -3634,9 +3634,11 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
         /// 获取一条自有船舶月报
         /// </summary>
         /// <returns></returns>
-        private async Task<OwnerShipMonthReport?> GetOwnerShipMonthReportAsync(Guid projectId, Guid shipId, int dateMonth)
+        private async Task<OwnerShipMonthReport?> GetOwnerShipMonthReportAsync(Guid projectId, Guid shipId, int dateMonth
+            )
         {
             return await _dbOwnerShipMonthReport.GetFirstAsync(t => t.ProjectId == projectId && t.ShipId == shipId && t.DateMonth == dateMonth && t.IsDelete == 1);
+           
         }
 
         /// <summary>
@@ -4005,6 +4007,83 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             //	var exchangeRate = currencyConverter.Where(z => z.CurrencyId.ToString() == currencyId).Select(z => z.ExchangeRate).First().Value;
             //	item.MonthOutputVal = Math.Round(monthReportDetailList.Where(y => y.ShipId == item.OwnShipId && y.ProjectId == item.ProjectId).Select(y => y.CompleteProductionAmount).Sum(), 2);
             //}
+            #endregion
+
+            #region 新逻辑
+            if (result.Any())
+            {
+                var startTime=0;
+                var endTime = 0;
+                if (requestDto.InEndDate.HasValue)
+                {
+                    startTime=int.Parse(requestDto.InEndDate.Value.AddMonths(-1).ToString("yyyyMM26"));
+                    endTime = int.Parse(requestDto.InEndDate.Value.ToString("yyyyMM25"));
+                }
+               
+                //项目信息
+                var projectList = await _dbContext.Queryable<Project>().Where(x => x.IsDelete == 1).ToListAsync();
+                var sipMovementList = await _dbContext.Queryable<ShipMovement>().Where(x => x.IsDelete == 1).ToListAsync();
+                foreach (var res in result)
+                {
+                    #region 新逻辑
+                    var num = 0M;
+                    if (projectList != null && projectList.Any() && sipMovementList != null && sipMovementList.Any())
+                    {
+
+                        //新逻辑
+                        var list1 = await _dbShipDayReport.AsQueryable().Where(t => t.ProjectId == Guid.Empty && t.ShipId == res.OwnShipId && t.DateDay >= startTime && t.DateDay <= endTime && t.IsDelete == 1).ToListAsync();
+                        var primaryIds = list1.Where(t => t.ProjectId == Guid.Empty).Select(t => new { id = t.Id, shipId = t.ShipId, DateDay = t.DateDay, ProjectId = t.ProjectId }).ToList();
+                        foreach (var item in primaryIds)
+                        {
+                            var isExistProject = sipMovementList.Where(x => x.IsDelete == 1 && x.ShipId == item.shipId && x.EnterTime.HasValue == true && (x.EnterTime.Value.ToDateDay() <= item.DateDay || x.QuitTime.HasValue == true && x.QuitTime.Value.ToDateDay() >= item.DateDay)).OrderByDescending(x => x.EnterTime).ToList();
+                            foreach (var project in isExistProject)
+                            {
+
+                                if (project.QuitTime.HasValue && project.QuitTime.Value.ToDateDay() >= item.DateDay)
+                                {
+
+                                    var oldValue = list1.Where(t => t.ShipId == project.ShipId && t.DateDay == item.DateDay).FirstOrDefault();
+                                    if (oldValue != null)
+                                    {
+                                        oldValue.ProjectId = project.ProjectId;
+
+                                    }
+                                }
+                                if (project.EnterTime.HasValue && project.QuitTime.HasValue == false && project.EnterTime.Value.ToDateDay() <= item.DateDay)
+                                {
+
+                                    var oldValue = list1.Where(t => t.ShipId == project.ShipId && t.DateDay == item.DateDay).FirstOrDefault();
+                                    if (oldValue != null)
+                                    {
+                                        oldValue.ProjectId = project.ProjectId;
+
+                                    }
+                                }
+                                if (project.EnterTime.HasValue && project.QuitTime.HasValue && project.QuitTime.Value.ToDateDay() >= item.DateDay)
+                                {
+
+                                    var oldValue = list1.Where(t => t.ShipId == project.ShipId && t.DateDay == item.DateDay).FirstOrDefault();
+                                    if (oldValue != null)
+                                    {
+                                        oldValue.ProjectId = project.ProjectId;
+
+                                    }
+                                }
+                            }
+
+                        }
+
+                        foreach (var item in list1)
+                        {
+                            num += ((item.Dredge ?? 0) + (item.Sail ?? 0) + (item.BlowingWater ?? 0) + (item.SedimentDisposal ?? 0) + (item.BlowingWater ?? 0));
+                        }
+                    }
+                    res.MonthWorkHours += num;
+                    res.YearWorkHours += num;
+                    #endregion
+                }
+
+            }
             #endregion
             list.searchOwnShipMonthReps = result;
             list.ownShipMonth = sumInfo;
