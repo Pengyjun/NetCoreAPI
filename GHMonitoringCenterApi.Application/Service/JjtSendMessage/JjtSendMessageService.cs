@@ -2639,7 +2639,7 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
             onBuildProjectIds = onBuildProjectIds.Where(x => satisfyIds.Contains(x)).ToList();
             foreach (var item in onBuildProjectIds)
             {
-                //if (item != "08db3b35-fb38-4be0-8ad8-5a0a29a2d73f".ToGuid())
+                //if (item != "08dbc96f-e397-468f-87ef-4e76075ee535".ToGuid())
                 //    continue;
 
                 //查询当前项目什么时间变更状态的(变更时间就是当前填写日报的时间)
@@ -2660,7 +2660,8 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
                 }
                 else
                 {
-                    currentWriteReportCount = days - (((days - 26)) + changeTimeInt - 1);
+                    //currentWriteReportCount = days - (((days - 26)) + changeTimeInt - 1);
+                    currentWriteReportCount = days - (((days - 26)) + changeTimeInt);
                 }
                 //未过天数
                 var unDays = days - ofdays;
