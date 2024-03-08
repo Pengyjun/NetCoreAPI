@@ -18,6 +18,7 @@ using GHMonitoringCenterApi.Domain.Shared.Util;
 using Microsoft.IdentityModel.Tokens;
 using Org.BouncyCastle.Asn1.Pkcs;
 using SqlSugar;
+using SqlSugar.Extensions;
 using System.Collections.Generic;
 using System.Text;
 using UtilsSharp;
@@ -920,17 +921,29 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             //当前月的最后一天
             DateTime currentDate = DateTime.Now;
             var stopDay = 0;
-            var monthLastDay = new DateTime(currentDate.Year, currentDate.Month, 1).AddMonths(1).AddDays(-1).Day;
-            if (nowDay > 26 && nowDay <= monthLastDay)
+           var monthLastDay = new DateTime(currentDate.Year, currentDate.Month, 1).AddMonths(1).AddDays(-1).Day;
+            
+            if (nowDay==27)
             {
-                stopDay = monthLastDay - 26;
+                stopDay = 1;
             }
-            else
+            else if(nowDay!= 26)
             {
-                stopDay = nowDay + monthLastDay;
-
+                //stopDay = nowDay + (monthLastDay-26);
+                var startDay =  DateTime.Now.AddMonths(-1).ToString("yyyy-MM-26").ObjToDate();
+                var endDay = DateTime.Now.ToString("yyyy-MM-dd").ObjToDate();
+                stopDay = TimeHelper.GetTimeSpan(startDay, endDay).Days;
             }
-
+            //获取周期
+            var startTime = 0;
+            var endTime=0;
+            Utils.GetDateRange(DateTime.Now,out startTime,out endTime);
+            var dayCount = 0;
+            if (addOrUpdateProjectRequestDto.Id.HasValue)
+            {
+                dayCount= await dbContext.Queryable<DayReport>().Where(x => x.IsDelete == 1 && x.ProjectId == addOrUpdateProjectRequestDto.Id.Value && x.DateDay >= startTime && x.DateDay <=endTime).CountAsync();
+            }
+            stopDay = stopDay - dayCount>=0? (stopDay - dayCount):0;
             if (addOrUpdateProjectRequestDto.RequestType)
             {
                 //新增操作（如果新增的是在建项目的就会记录表里面）

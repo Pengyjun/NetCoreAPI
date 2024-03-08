@@ -733,5 +733,27 @@ namespace GHMonitoringCenterApi.Domain.Shared.Util
         }
         #endregion
 
+
+
+        #region 传入一个时间获取周期
+        /// <summary>
+        /// 传入一个时间获取周期
+        /// </summary>
+        /// <param name="time"></param>
+        /// <param name="startTime"></param>
+        /// <param name="endTime"></param>
+        public static void GetDateRange(DateTime time,out int startTime, out int endTime) {
+            if (time.Day > 26 && time.Day <= 31)
+            {
+                startTime = int.Parse(time.ToString("yyyyMM26"));
+                endTime = int.Parse(time.AddMonths(1).ToString("yyyyMM25"));
+            }
+            else {
+                startTime = int.Parse(time.AddMonths(-1).ToString("yyyyMM26"));
+                endTime = int.Parse(time.ToString("yyyyMM25"));
+            }
+            
+        }
+        #endregion
     }
 }
