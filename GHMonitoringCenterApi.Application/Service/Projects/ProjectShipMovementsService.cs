@@ -243,9 +243,6 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             {
                 return result.FailResult(HttpStatusCode.DataNotEXIST, "船舶进出场对象不存在");
             }
-            // 原来数据删除状态更改为2 
-            shipMovement.IsDelete = 2;
-            await _dbShipMovement.AsUpdateable(shipMovement).WhereColumns(x => x.Id).UpdateColumns(x => x.IsDelete).ExecuteCommandAsync();
             if (shipMovement.Status == ShipMovementStatus.Enter)
             {
                 var enterShipMovement = await GetShipMovementAsync(shipMovement.ShipId, shipMovement.ShipType, ShipMovementStatus.Enter, shipMovement.ProjectId);
@@ -260,6 +257,9 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                         return result.FailResult(HttpStatusCode.InsertFail, $"当前船舶已经在{hasOtherEnterProject.Name}项目上进场");
                     }
                 }
+                // 原来数据删除状态更改为2 
+                shipMovement.IsDelete = 2;
+                await _dbShipMovement.AsUpdateable(shipMovement).WhereColumns(x => x.Id).UpdateColumns(x => x.IsDelete).ExecuteCommandAsync();
                 //新增最新进场数据
                 var addShipMovement = new ShipMovement()
                 {
@@ -306,6 +306,23 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 };
                 #endregion
                 await _dbShipMovement.AsUpdateable(shipMovement).EnableDiffLogEvent(logDto).ExecuteCommandAsync();
+            }
+            else if (shipMovement.Status == ShipMovementStatus.None)
+            {
+                shipMovement.EnterTime = model.EnterOrQuitTime;
+                shipMovement.UpdateId = _currentUser.Id;
+                shipMovement.Status = model.Status;
+                shipMovement.Remarks = model.Remarks;
+                LogInfo addLogDto = new LogInfo()
+                {
+                    Id = GuidUtil.Increment(),
+                    OperationId = _currentUser.Id,
+                    OperationName = _currentUser.Name,
+                    DataId = shipMovement.ProjectId,
+                    BusinessModule = "/装备管理/船舶进出场/进场",
+                    BusinessRemark = "/装备管理/船舶进出场/进场"
+                };
+                await _dbShipMovement.AsUpdateable(shipMovement).WhereColumns(x => x.Id).UpdateColumns(x => new { x.UpdateId, x.UpdateTime, x.Status, x.Remarks, x.EnterTime }).EnableDiffLogEvent(addLogDto).ExecuteCommandAsync();
             }
             return result.SuccessResult(true, EnumExtension.GetEnumDescription(model.Status) + "成功");
         }
