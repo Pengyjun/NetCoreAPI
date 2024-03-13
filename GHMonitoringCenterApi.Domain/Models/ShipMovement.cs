@@ -50,6 +50,7 @@ namespace GHMonitoringCenterApi.Domain.Models
         [SugarColumn(ColumnDataType = "datetime")]
         public DateTime? QuitTime { get; set; }
 
+
         /// <summary>
         /// 备注
         /// </summary>

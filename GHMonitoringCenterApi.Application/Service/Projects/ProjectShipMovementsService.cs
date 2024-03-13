@@ -168,6 +168,69 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             return result.SuccessResult(true, ResponseMessage.OPERATION_INSERT_SUCCESS);
         }
 
+
+        #region 旧更改船舶进出场状态
+
+        /// <summary>
+        ///  更改船舶进出场状态
+        /// </summary>
+        /// <returns></returns>
+        //public async Task<ResponseAjaxResult<bool>> ChangeShipMovementStatusAsync(ChangeShipMovementStatusRequestDto model)
+        //{
+        //    var result = new ResponseAjaxResult<bool>();
+        //    var shipMovement = await GetShipMovementAsync(model.ShipMovementId);
+        //    if (shipMovement == null)
+        //    {
+        //        return result.FailResult(HttpStatusCode.DataNotEXIST, "船舶进出场对象不存在");
+        //    }
+        //    shipMovement.UpdateId = _currentUser.Id;
+        //    shipMovement.Status = model.Status;
+        //    shipMovement.Remarks = model.Remarks;
+        //    if (shipMovement.Status == ShipMovementStatus.Enter)
+        //    {
+        //        var enterShipMovement = await GetShipMovementAsync(shipMovement.ShipId, shipMovement.ShipType, ShipMovementStatus.Enter, shipMovement.ProjectId);
+        //        if (enterShipMovement != null)
+        //        {
+        //            var hasOtherEnterProject = await GetProjectPartAsync(enterShipMovement.ProjectId);
+        //            if (hasOtherEnterProject != null)
+        //            {
+        //                var project = await GetProjectPartAsync(shipMovement.ProjectId);
+        //                await JjtMessageReminder(shipMovement.ShipId, shipMovement.ShipType, hasOtherEnterProject.Name, project.Name);
+        //                //todo 交建通发送一条消息至陈翠  消息内容 “（船舶名称）目前在（已在场项目名称）进行进场，（触发提示用户）需要进场至（后面项目名称）中，请协调处理！”
+        //                return result.FailResult(HttpStatusCode.InsertFail, $"当前船舶已经在{hasOtherEnterProject.Name}项目上进场");
+        //            }
+        //        }
+        //        //这次进场之后，有进场时间，并没有出场，出场时间置空
+        //        shipMovement.EnterTime = model.EnterOrQuitTime;
+        //        shipMovement.QuitTime = null;
+        //    }
+        //    else if (shipMovement.Status == ShipMovementStatus.Quit)
+        //    {
+        //        if (shipMovement.EnterTime > model.EnterOrQuitTime)
+        //        {
+        //            return result.FailResult(HttpStatusCode.SaveFail, "退场时间不能小于进场时间");
+        //        }
+        //        shipMovement.QuitTime = model.EnterOrQuitTime;
+        //    }
+        //    #region 日志信息
+        //    LogInfo logDto = new LogInfo()
+        //    {
+        //        Id = GuidUtil.Increment(),
+        //        OperationId = _currentUser.Id,
+        //        OperationName = _currentUser.Name,
+        //        DataId = shipMovement.ProjectId,
+        //        BusinessModule = "/装备管理/船舶进出场/退场",
+        //        BusinessRemark = "/装备管理/船舶进出场/退场"
+        //    };
+        //    #endregion
+        //    await _dbShipMovement.AsUpdateable(shipMovement).EnableDiffLogEvent(logDto).ExecuteCommandAsync();
+        //    return result.SuccessResult(true, EnumExtension.GetEnumDescription(model.Status) + "成功");
+        //}
+
+        #endregion
+
+        #region 新 更改船舶进出场状态
+
         /// <summary>
         ///  更改船舶进出场状态
         /// </summary>
@@ -180,9 +243,6 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             {
                 return result.FailResult(HttpStatusCode.DataNotEXIST, "船舶进出场对象不存在");
             }
-            shipMovement.UpdateId = _currentUser.Id;
-            shipMovement.Status = model.Status;
-            shipMovement.Remarks = model.Remarks;
             if (shipMovement.Status == ShipMovementStatus.Enter)
             {
                 var enterShipMovement = await GetShipMovementAsync(shipMovement.ShipId, shipMovement.ShipType, ShipMovementStatus.Enter, shipMovement.ProjectId);
@@ -197,9 +257,35 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                         return result.FailResult(HttpStatusCode.InsertFail, $"当前船舶已经在{hasOtherEnterProject.Name}项目上进场");
                     }
                 }
-                //这次进场之后，有进场时间，并没有出场，出场时间置空
-                shipMovement.EnterTime = model.EnterOrQuitTime;
-                shipMovement.QuitTime = null;
+                // 原来数据删除状态更改为2 
+                shipMovement.IsDelete = 2;
+                await _dbShipMovement.AsUpdateable(shipMovement).WhereColumns(x => x.Id).UpdateColumns(x => x.IsDelete).ExecuteCommandAsync();
+                //新增最新进场数据
+                var addShipMovement = new ShipMovement()
+                {
+                    Id = GuidUtil.Next(),
+                    CreateId = shipMovement.CreateId,
+                    CreateTime = shipMovement.CreateTime,
+                    EnterTime = model.EnterOrQuitTime,
+                    QuitTime = null,
+                    UpdateId = _currentUser.Id,
+                    Status = model.Status,
+                    Remarks = model.Remarks,
+                    ProjectId = shipMovement.ProjectId,
+                    ShipId = shipMovement.ShipId,
+                    ShipType = shipMovement.ShipType,
+                    UpdateTime = DateTime.Now
+                };
+                LogInfo addLogDto = new LogInfo()
+                {
+                    Id = GuidUtil.Increment(),
+                    OperationId = _currentUser.Id,
+                    OperationName = _currentUser.Name,
+                    DataId = shipMovement.ProjectId,
+                    BusinessModule = "/装备管理/船舶进出场/进场",
+                    BusinessRemark = "/装备管理/船舶进出场/进场"
+                };
+                await _dbShipMovement.AsInsertable(addShipMovement).EnableDiffLogEvent(addLogDto).ExecuteCommandAsync();
             }
             else if (shipMovement.Status == ShipMovementStatus.Quit)
             {
@@ -208,21 +294,40 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     return result.FailResult(HttpStatusCode.SaveFail, "退场时间不能小于进场时间");
                 }
                 shipMovement.QuitTime = model.EnterOrQuitTime;
+                #region 日志信息
+                LogInfo logDto = new LogInfo()
+                {
+                    Id = GuidUtil.Increment(),
+                    OperationId = _currentUser.Id,
+                    OperationName = _currentUser.Name,
+                    DataId = shipMovement.ProjectId,
+                    BusinessModule = "/装备管理/船舶进出场/退场",
+                    BusinessRemark = "/装备管理/船舶进出场/退场"
+                };
+                #endregion
+                await _dbShipMovement.AsUpdateable(shipMovement).EnableDiffLogEvent(logDto).ExecuteCommandAsync();
             }
-            #region 日志信息
-            LogInfo logDto = new LogInfo()
+            else if (shipMovement.Status == ShipMovementStatus.None)
             {
-                Id = GuidUtil.Increment(),
-                OperationId = _currentUser.Id,
-                OperationName = _currentUser.Name,
-                DataId = shipMovement.ProjectId,
-                BusinessModule = "/装备管理/船舶进出场/退场",
-                BusinessRemark = "/装备管理/船舶进出场/退场"
-            };
-            #endregion
-            await _dbShipMovement.AsUpdateable(shipMovement).EnableDiffLogEvent(logDto).ExecuteCommandAsync();
+                shipMovement.EnterTime = model.EnterOrQuitTime;
+                shipMovement.UpdateId = _currentUser.Id;
+                shipMovement.Status = model.Status;
+                shipMovement.Remarks = model.Remarks;
+                LogInfo addLogDto = new LogInfo()
+                {
+                    Id = GuidUtil.Increment(),
+                    OperationId = _currentUser.Id,
+                    OperationName = _currentUser.Name,
+                    DataId = shipMovement.ProjectId,
+                    BusinessModule = "/装备管理/船舶进出场/进场",
+                    BusinessRemark = "/装备管理/船舶进出场/进场"
+                };
+                await _dbShipMovement.AsUpdateable(shipMovement).WhereColumns(x => x.Id).UpdateColumns(x => new { x.UpdateId, x.UpdateTime, x.Status, x.Remarks, x.EnterTime }).EnableDiffLogEvent(addLogDto).ExecuteCommandAsync();
+            }
             return result.SuccessResult(true, EnumExtension.GetEnumDescription(model.Status) + "成功");
         }
+
+        #endregion
 
         /// <summary>
         ///  移除船舶进出场
@@ -353,7 +458,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                         resShips.Add(resShipMovement);
                     }
                 }
-                if (shipMovement.Count() > 1&& model.ProjectId!=null&& model.ProjectId!=Guid.Empty)
+                if (shipMovement.Count() > 1 && model.ProjectId != null && model.ProjectId != Guid.Empty)
                 {
                     shipMovement = shipMovement.Where(x => x.ProjectId == model.ProjectId).ToList();
 
@@ -392,7 +497,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 {
 
 
-                   
+
                     var resShipMovement = new EnterShipsResponseDto.ResEnterShipDto()
                     {
                         ProjectId = item.Status == ShipMovementStatus.Quit && !(item.EnterTime <= model.DateDayTime && item.QuitTime >= model.DateDayTime) ? Guid.Empty : item.ProjectId,
@@ -414,7 +519,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                         resShipMovement.AssociationProject = 2;
                         resShipMovement.ProjectName = string.Empty;
                     }
-                    if (item.Status == ShipMovementStatus.Quit && item.QuitTime != null && model.DateDayTime > item.QuitTime )
+                    if (item.Status == ShipMovementStatus.Quit && item.QuitTime != null && model.DateDayTime > item.QuitTime)
                     {
                         resShipMovement.ProjectId = Guid.Empty;
                         resShipMovement.AssociationProject = 2;
@@ -431,7 +536,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                         resShips.Add(resShipMovement);
                     }
                 });
-              
+
             });
             //获取当前角色信息
             var curRoleInfo = _currentUser.RoleInfos.Where(role => role.Oid == _currentUser.CurrentLoginInstitutionOid).FirstOrDefault();
