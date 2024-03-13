@@ -28,7 +28,7 @@ namespace GHMonitoringCenterApi.Application.Service.Word
     /// </summary>
     public class WordService : IWordService
     {
-        
+
 
         #region 依赖注入
         public ILogger<WordService> logger { get; set; }
@@ -47,10 +47,10 @@ namespace GHMonitoringCenterApi.Application.Service.Word
         /// </summary>
         /// <param name="baseConfig"></param>
         /// <returns></returns>
-        public async Task<Stream> MonthReportImportWordAsync(BaseConfig baseConfig ,MonthtReportsRequstDto model)
+        public async Task<Stream> MonthReportImportWordAsync(BaseConfig baseConfig, MonthtReportsRequstDto model)
         {
             MemoryStream memoryStream = new MemoryStream();
-            var fileName=Guid.NewGuid().ToString();
+            var fileName = Guid.NewGuid().ToString();
             var path = $"Template/{fileName}.docx";
             //var path = @$"C:\Users\12413\Desktop\{fileName}.docx";
             XWPFDocument word = new XWPFDocument();
@@ -99,7 +99,7 @@ namespace GHMonitoringCenterApi.Application.Service.Word
             run.AddBreak();
             #endregion
             model.IsFullExport = true;
-            if (model.StartTime == null )
+            if (model.StartTime == null)
             {
                 if (DateTime.Now.Day > 25)
                 {
@@ -441,10 +441,10 @@ namespace GHMonitoringCenterApi.Application.Service.Word
                 cells.SetParagraph(para);
                 for (int i = 0; i < outputValueCount; i++)
                 {
-                   
 
-                    oneTable.GetRow(i+1).GetCell(1).SetText(outputValue[i].CompanyName);
-                   
+
+                    oneTable.GetRow(i + 1).GetCell(1).SetText(outputValue[i].CompanyName);
+
                     oneTable.GetRow(i + 1).GetCell(2).SetText(outputValue[i].ProjectName);
 
                     oneTable.GetRow(i + 1).GetCell(3).SetText(Math.Round((outputValue[i].EngineeringProportion * 100).Value, 2).ToString() + "%");
@@ -452,7 +452,7 @@ namespace GHMonitoringCenterApi.Application.Service.Word
                     oneTable.GetRow(i + 1).GetCell(4).SetText(Math.Round((outputValue[i].OwnerProportion * 100).Value, 2).ToString() + "%");
 
                     oneTable.GetRow(i + 1).GetCell(5).SetText(outputValue[0].EngineeringRemarks);
-                    
+
                 }
                 #endregion
 
@@ -499,7 +499,7 @@ namespace GHMonitoringCenterApi.Application.Service.Word
                 Number++;
                 var paragraph2 = word.CreateParagraph();
                 var run2 = paragraph2.CreateRun();
-                run2.SetText(Number + "."+ item.ProjectName);
+                run2.SetText(Number + "." + item.ProjectName);
                 XWPFTable oneTable = word.CreateTable(16, 7);
 
                 #region 设置单元格样式
@@ -514,7 +514,7 @@ namespace GHMonitoringCenterApi.Application.Service.Word
                     XWPFTableRow row = oneTable.GetRow(i);
                     for (int col = 0; col < row.GetTableCells().Count; col++)
                     {
-                       
+
                         XWPFTableCell cell = oneTable.GetRow(i).GetCell(col);
                         //paragraph.Alignment = ParagraphAlignment.CENTER;
                         // 设置单元格样式
@@ -561,12 +561,12 @@ namespace GHMonitoringCenterApi.Application.Service.Word
                 CT_VerticalJc vertAligns = new CT_VerticalJc();
                 vertAligns.val = ST_VerticalJc.center; // 垂直居中
                 tcPrs.AddNewVAlign().val = ST_VerticalJc.center; // 垂直居中
-                 cells = oneTable.GetRow(8).GetCell(1);
-                 tcPrs = cells.GetCTTc().AddNewTcPr();
-                 vertAligns = new CT_VerticalJc();
+                cells = oneTable.GetRow(8).GetCell(1);
+                tcPrs = cells.GetCTTc().AddNewTcPr();
+                vertAligns = new CT_VerticalJc();
                 vertAligns.val = ST_VerticalJc.center; // 垂直居中
                 tcPrs.AddNewVAlign().val = ST_VerticalJc.center; // 垂直居中
-                 
+
                 #region 合并单元格（同列不同行）
                 MYMergeCells(oneTable, 0, 0, 9, 12);
                 #endregion
@@ -639,7 +639,7 @@ namespace GHMonitoringCenterApi.Application.Service.Word
 
                 oneTable.GetRow(6).GetCell(0).SetText("合同变更信息");
                 oneTable.GetRow(6).GetCell(0).SetColor("#EEEEEE");
-                oneTable.GetRow(6).GetCell(1).SetText(item.ContractChangeInformation);
+                oneTable.GetRow(6).GetCell(1).SetText(item.ContractChangeInformation + item.CommencementTime);
 
                 oneTable.GetRow(7).GetCell(0).SetText("工期信息");
                 oneTable.GetRow(7).GetCell(0).SetColor("#EEEEEE");
@@ -683,7 +683,7 @@ namespace GHMonitoringCenterApi.Application.Service.Word
                 oneTable.GetRow(10).GetCell(3).SetColor("#F5F9FA");
                 oneTable.GetRow(10).GetCell(4).SetText(item.EngineeringAccumulatedEngineering.ToString());
                 oneTable.GetRow(10).GetCell(4).SetColor("#F5F9FA");
-                oneTable.GetRow(10).GetCell(5).SetText(Math.Round((item.EngineeringProportion * 100).Value,2).ToString() + "%");
+                oneTable.GetRow(10).GetCell(5).SetText(Math.Round((item.EngineeringProportion * 100).Value, 2).ToString() + "%");
                 oneTable.GetRow(10).GetCell(5).SetColor("#F5F9FA");
                 oneTable.GetRow(10).GetCell(6).SetText(item.EngineeringRemarks);
                 oneTable.GetRow(10).GetCell(6).SetColor("#F5F9FA");
@@ -696,7 +696,7 @@ namespace GHMonitoringCenterApi.Application.Service.Word
                 oneTable.GetRow(11).GetCell(3).SetColor("#F5F9FA");
                 oneTable.GetRow(11).GetCell(4).SetText(item.OwnerAccumulatedEngineering.ToString());
                 oneTable.GetRow(11).GetCell(4).SetColor("#F5F9FA");
-                oneTable.GetRow(11).GetCell(5).SetText(Math.Round((item.OwnerProportion * 100).Value,2).ToString() + "%");
+                oneTable.GetRow(11).GetCell(5).SetText(Math.Round((item.OwnerProportion * 100).Value, 2).ToString() + "%");
                 oneTable.GetRow(11).GetCell(5).SetColor("#F5F9FA");
                 oneTable.GetRow(11).GetCell(6).SetText(item.OwnerRemarks);
                 oneTable.GetRow(11).GetCell(6).SetColor("#F5F9FA");
@@ -709,7 +709,7 @@ namespace GHMonitoringCenterApi.Application.Service.Word
                 oneTable.GetRow(12).GetCell(3).SetColor("#F5F9FA");
                 oneTable.GetRow(12).GetCell(4).SetText(item.ProjectAccumulatedEngineering.ToString());
                 oneTable.GetRow(12).GetCell(4).SetColor("#F5F9FA");
-                oneTable.GetRow(12).GetCell(5).SetText(Math.Round((item.ProjectProportion * 100).Value,2).ToString() + "%");
+                oneTable.GetRow(12).GetCell(5).SetText(Math.Round((item.ProjectProportion * 100).Value, 2).ToString() + "%");
                 oneTable.GetRow(12).GetCell(5).SetColor("#F5F9FA");
                 oneTable.GetRow(12).GetCell(6).SetText(item.ProjectRemarks);
                 oneTable.GetRow(12).GetCell(6).SetColor("#F5F9FA");
@@ -773,37 +773,37 @@ namespace GHMonitoringCenterApi.Application.Service.Word
 
             //return await Task.Factory.StartNew(() => {
             try
+            {
+
+                using (FileStream fs = new FileStream(path, FileMode.Create, FileAccess.ReadWrite))
                 {
-                   
-                    using (FileStream fs = new FileStream(path, FileMode.Create, FileAccess.ReadWrite))
-                    {
-                        word.Write(fs);
-                    }
-                    using (FileStream fs = new FileStream(path, FileMode.Open, FileAccess.Read))
-                    {
-                        //读取文件流
-                        byte[] bytes = new byte[fs.Length];
-                        fs.Read(bytes, 0, bytes.Length);
-                        memoryStream.Write(bytes, 0, bytes.Length);
-                        #region 删除文件
-                        
-                        #endregion
-                    }
+                    word.Write(fs);
+                }
+                using (FileStream fs = new FileStream(path, FileMode.Open, FileAccess.Read))
+                {
+                    //读取文件流
+                    byte[] bytes = new byte[fs.Length];
+                    fs.Read(bytes, 0, bytes.Length);
+                    memoryStream.Write(bytes, 0, bytes.Length);
+                    #region 删除文件
+
+                    #endregion
+                }
                 System.IO.File.Delete(path);
             }
-                catch (Exception ex)
+            catch (Exception ex)
+            {
+                try
                 {
-                    try
-                    {
-                        System.IO.File.Delete(path);
-                    }
-                    catch (Exception exs)
-                    {
-                        logger.LogError($"删除文件失败:{exs}");
-                    }
-                    logger.LogError($"项目月报简报导出Word失败错误信息:{ex}");
+                    System.IO.File.Delete(path);
                 }
-                return memoryStream;
+                catch (Exception exs)
+                {
+                    logger.LogError($"删除文件失败:{exs}");
+                }
+                logger.LogError($"项目月报简报导出Word失败错误信息:{ex}");
+            }
+            return memoryStream;
             //});
         }
         #endregion

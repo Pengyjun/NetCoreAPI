@@ -74,6 +74,10 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.ProjectProductionRepor
         /// </summary>
         public string? ContractChangeInformation { get; set; } = "暂无";
         /// <summary>
+        /// 开工时间
+        /// </summary>
+        public string? CommencementTime { get; set; } 
+        /// <summary>
         /// 工期信息
         /// </summary>
         public string? DurationInformation { get; set; }

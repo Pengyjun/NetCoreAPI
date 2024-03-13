@@ -631,7 +631,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     resDayReport.CreateUserName = user?.Name;
                 }
                 resDayReport.ProcessStatus = dayReport.ProcessStatus;
-                resDayReport.IsHoliday =dayReport.IsHoliday;
+                resDayReport.IsHoliday = dayReport.IsHoliday;
             }
 
             #region 修改汇率
@@ -1200,7 +1200,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 var oldMonthReport = await GetOwnerShipMonthReportAsync((Guid)oldProjectId, shipDayReport.ShipId, monthTime.ToDateMonth());
                 if (oldMonthReport != null)
                 {
-                    var sumShipDayReport = await SumShipDayReportAsync((Guid)oldProjectId, shipDayReport.ShipId, startDateDay, endDateDay,projectList, sipMovementList);
+                    var sumShipDayReport = await SumShipDayReportAsync((Guid)oldProjectId, shipDayReport.ShipId, startDateDay, endDateDay, projectList, sipMovementList);
                     if (oldMonthReport.WorkingHours != sumShipDayReport.WorkingHours)
                     {
                         oldMonthReport.WorkingHours = sumShipDayReport.WorkingHours;
@@ -1408,7 +1408,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
         /// 项目-自有船舶-统计
         /// </summary>
         /// <returns></returns>
-        private async Task<SumShipReportDto> SumShipDayReportAsync(Guid projectId, Guid shipId, int startDateDay, int endDateDay,List<Project> projects,List<ShipMovement> shipMovements)
+        private async Task<SumShipReportDto> SumShipDayReportAsync(Guid projectId, Guid shipId, int startDateDay, int endDateDay, List<Project> projects, List<ShipMovement> shipMovements)
         {
             var num = 0M;
             var sumReport = await _dbShipDayReport.AsQueryable().Where(t => t.ProjectId == projectId && t.ShipId == shipId && t.DateDay >= startDateDay && t.DateDay <= endDateDay && t.IsDelete == 1)
@@ -1421,7 +1421,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
 
             #region 新逻辑
             if (projects != null && projects.Any() && shipMovements != null && shipMovements.Any())
-            {  
+            {
                 //新逻辑
                 var list = await _dbShipDayReport.AsQueryable().Where(t => t.ProjectId == Guid.Empty && t.ShipId == shipId && t.DateDay >= startDateDay && t.DateDay <= endDateDay && t.IsDelete == 1).ToListAsync();
                 var primaryIds = list.Where(t => t.ProjectId == Guid.Empty).Select(t => new { id = t.Id, shipId = t.ShipId, DateDay = t.DateDay, ProjectId = t.ProjectId }).ToList();
@@ -1467,7 +1467,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
 
                 foreach (var item in list)
                 {
-                    num+=((item.Dredge??0)+(item.Sail??0)+(item.BlowingWater??0)+(item.SedimentDisposal??0)+(item.BlowingWater??0));
+                    num += ((item.Dredge ?? 0) + (item.Sail ?? 0) + (item.BlowingWater ?? 0) + (item.SedimentDisposal ?? 0) + (item.BlowingWater ?? 0));
                 }
             }
             sumReport.WorkingHours += num;
@@ -1672,7 +1672,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             // 累计产值/产量
             var sumMonthReports = await SumMonthReportsAsync(projectIds);
             //项目历史确认和收款产值
-            var sumHistoryMonthReports = await _dbContext.Queryable<ProjectMonthReportHistory>().Where(x=>x.IsDelete==1&&projectIds.Contains(x.ProjectId.Value)).ToListAsync();
+            var sumHistoryMonthReports = await _dbContext.Queryable<ProjectMonthReportHistory>().Where(x => x.IsDelete == 1 && projectIds.Contains(x.ProjectId.Value)).ToListAsync();
 
             // 年度累计产值/产量
             var sumYearMonthReports = await SumMonthReportsByYearAsync(projectIds, startTime.Year, endTime.Year);
@@ -1744,20 +1744,21 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     item.CumulativeCompleted = Math.Round(model.IsConvert == true ? sumMonthReport.CompleteProductionAmount : sumMonthReport.CurrencyCompleteProductionAmount, 2);
                     //item.CumulativePaymentAmount = Math.Round(sumMonthReport.PartyAPayAmount, 2);
                     // item.CumulativeValue = Math.Round(sumMonthReport.PartyAConfirmedProductionAmount, 2);
-                   var itemHistotyMonth=sumHistoryMonthReports.Where(x => x.ProjectId == item.ProjectId).FirstOrDefault();
-               
+                    var itemHistotyMonth = sumHistoryMonthReports.Where(x => x.ProjectId == item.ProjectId).FirstOrDefault();
+
                     if (itemHistotyMonth != null)
                     {
                         item.CumulativePaymentAmount = Math.Round(sumMonthReport.PartyAPayAmount, 2) + Math.Round(itemHistotyMonth.KaileiProjectPayment.Value * 10000, 2);
 
                         item.CumulativeValue = Math.Round(sumMonthReport.PartyAConfirmedProductionAmount, 2) +
-                        Math.Round(itemHistotyMonth.KaileiOwnerConfirmation.Value*10000, 2);
+                        Math.Round(itemHistotyMonth.KaileiOwnerConfirmation.Value * 10000, 2);
                     }
-                    else {
+                    else
+                    {
                         item.CumulativePaymentAmount = Math.Round(sumMonthReport.PartyAPayAmount, 2);
                         item.CumulativeValue = Math.Round(sumMonthReport.PartyAConfirmedProductionAmount, 2);
                     }
-                     
+
                     item.CumulativeOutsourcingExpensesAmount = Math.Round(sumMonthReport.OutsourcingExpensesAmount, 2);
 
                 }
@@ -1839,7 +1840,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
 
             }).FirstAsync();
             totalMonthtReport = totalMonthtReport ?? new MonthtReportsResponseDto.TotalMonthtReportsDto();
-            return result.SuccessResult(new MonthtReportsResponseDto() { Reports = list, Total = totalMonthtReport}, total);
+            return result.SuccessResult(new MonthtReportsResponseDto() { Reports = list, Total = totalMonthtReport }, total);
         }
 
         /// <summary>
@@ -3501,8 +3502,8 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             var monthReport = await GetOwnerShipMonthReportAsync(model.ProjectId, model.ShipId, model.DateMonth);
             var sumMonthReport = await SumMonthReportDetailAsync(model.ProjectId, model.ShipId, ConstructionOutPutType.Self, model.DateMonth);
             //项目信息
-           var projectList= await _dbContext.Queryable<Project>().Where(x => x.IsDelete == 1).ToListAsync();
-           var sipMovementList = await _dbContext.Queryable<ShipMovement>().Where(x => x.IsDelete == 1).ToListAsync();
+            var projectList = await _dbContext.Queryable<Project>().Where(x => x.IsDelete == 1).ToListAsync();
+            var sipMovementList = await _dbContext.Queryable<ShipMovement>().Where(x => x.IsDelete == 1).ToListAsync();
             var sumShipDayReport = await SumShipDayReportAsync(model.ProjectId, model.ShipId, startDateDay, endDateDay, projectList, sipMovementList);
             var addSoils = new List<OwnerShipMonthReportSoil>();
             var updateSoils = new List<OwnerShipMonthReportSoil>();
@@ -3638,7 +3639,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             )
         {
             return await _dbOwnerShipMonthReport.GetFirstAsync(t => t.ProjectId == projectId && t.ShipId == shipId && t.DateMonth == dateMonth && t.IsDelete == 1);
-           
+
         }
 
         /// <summary>
@@ -4012,14 +4013,14 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             #region 新逻辑
             if (result.Any())
             {
-                var startTime=0;
+                var startTime = 0;
                 var endTime = 0;
                 if (requestDto.InEndDate.HasValue)
                 {
-                    startTime=int.Parse(requestDto.InEndDate.Value.AddMonths(-1).ToString("yyyyMM26"));
+                    startTime = int.Parse(requestDto.InEndDate.Value.AddMonths(-1).ToString("yyyyMM26"));
                     endTime = int.Parse(requestDto.InEndDate.Value.ToString("yyyyMM25"));
                 }
-               
+
                 //项目信息
                 var projectList = await _dbContext.Queryable<Project>().Where(x => x.IsDelete == 1).ToListAsync();
                 var sipMovementList = await _dbContext.Queryable<ShipMovement>().Where(x => x.IsDelete == 1).ToListAsync();
@@ -6066,6 +6067,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     ProjectContent = y.QuantityRemarks,
                     CurrencyConverterId = y.CurrencyId,
                     OriginalContractAmount = y.Amount,
+                    CommencementTime = string.IsNullOrWhiteSpace(y.CommencementTime.ToString()) ? null : "开工日期：" + y.CommencementTime.Value.ToString("yyyy年MM月dd日"),
                     //ChangeAmount = SqlFunc.Round((y.ECAmount - y.Amount) / 10000, 2),
                     ActualContractAmount = y.ECAmount,
                     //ContractChangeInformation = 
@@ -6106,7 +6108,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
 
                 }
                 //item.EngineeringAccumulatedEngineering = Math.Round((monthReport.Where(h => h.IsDelete == 1 && h.DateMonth >=202306 && h.ProjectId == item.ProjectId && h.DateMonth <= item.MonthTime).Sum(h => h.CompleteProductionAmount) + Convert.ToDecimal(projectHistoryData.FirstOrDefault(x => x.ProjectId == item.ProjectId)?.AccumulatedOutputValue)) / 10000, 2);
-                item.EngineeringAccumulatedEngineering = Math.Round((monthReport.Where(h => h.IsDelete == 1 && h.DateMonth >=202306 && h.ProjectId == item.ProjectId && h.DateMonth <= item.MonthTime).Sum(h => h.CompleteProductionAmount))/10000,2);
+                item.EngineeringAccumulatedEngineering = Math.Round((monthReport.Where(h => h.IsDelete == 1 && h.DateMonth >= 202306 && h.ProjectId == item.ProjectId && h.DateMonth <= item.MonthTime).Sum(h => h.CompleteProductionAmount)) / 10000, 2);
                 if (item.ActualContractAmount != 0 && item.ActualContractAmount != null && item.EngineeringAccumulatedEngineering != null)
                 {
                     item.EngineeringProportion = Math.Round(item.EngineeringAccumulatedEngineering.Value / item.ActualContractAmount.Value, 4);
@@ -6536,8 +6538,9 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     totalYearKaileaOffirmProductionValue = projectMonthReportHistory.KaileiOwnerConfirmation.Value * 10000
                        + currentTotalYearOffirmProductionValue.Sum(x => x.PartyAConfirmedProductionAmount);
                 }
-                else {
-                    totalYearKaileaOffirmProductionValue = 
+                else
+                {
+                    totalYearKaileaOffirmProductionValue =
                             currentTotalYearOffirmProductionValue.Sum(x => x.PartyAConfirmedProductionAmount);
                 }
 
@@ -6552,9 +6555,10 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     totalYearCollection = projectMonthReportHistory.KaileiProjectPayment.Value * 10000
                     + currenTotalYearCollection.Sum(x => x.PartyAPayAmount);
                 }
-                else {
+                else
+                {
                     //开累甲方付款金额
-                    totalYearCollection =currenTotalYearCollection.Sum(x => x.PartyAPayAmount);
+                    totalYearCollection = currenTotalYearCollection.Sum(x => x.PartyAPayAmount);
                 }
 
             }
