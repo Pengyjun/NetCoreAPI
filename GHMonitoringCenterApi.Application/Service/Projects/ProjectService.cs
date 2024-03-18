@@ -475,6 +475,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 .Select((p, ps) => new ProjectExcelSearchResponseDto
                 {
                     Id = p.Id,
+                    MasterProjectId=p.MasterProjectId.Value,
                     Name = p.Name,
                     Category = p.Category,
                     TypeName = p.TypeId.ToString(),
@@ -641,9 +642,12 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 users.Add(5);
                 users.Add(8);
                 var ids = projectList.Select(x => x.Id).ToList();
+                var idss = projectList.Select(x => x.MasterProjectId.Value).ToList();
+                ids.AddRange(idss);
+                ids= ids.Distinct().ToList();
                 //获取项目干系单位
                 var orgList = await dbContext.Queryable<ProjectOrg>()
-                    .Where(p => p.IsDelete == 1).ToListAsync();
+                    .Where(p => p.IsDelete == 1&& ids.Contains(p.ProjectId.Value)).ToListAsync();
                 //查询项目干系单位名称
                 var orgTypeName = await dbContext.Queryable<DictionaryTable>().Where(x => x.IsDelete == 1 && (x.TypeNo == 2
                 ||x.TypeNo==1)&& types.Contains(x.Type)).ToListAsync();
@@ -652,7 +656,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     .Where(x => x.IsDelete==1).ToListAsync();
 
                 var dutyList = await dbContext.Queryable<ProjectLeader>()
-                .Where(pl =>pl.IsDelete == 1)
+                .Where(pl =>pl.IsDelete == 1&& ids.Contains(pl.ProjectId.Value))
                 .ToListAsync();
                 var userList= await dbContext.Queryable<GHMonitoringCenterApi.Domain.Models.User>()
                     .Where(x => x.IsDelete == 1).ToListAsync();
@@ -660,7 +664,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 {
                     #region 干系单位类型
                     var typeList = orgTypeName.Where(x=>x.TypeNo==2).Select(x => x.Type.ToString()).ToList();
-                    var  orgs=orgList.Where(x => x.ProjectId == item.Id && typeList.Contains(x.Type)).ToList();
+                    var  orgs=orgList.Where(x => x.ProjectId == item.Id || x.ProjectId == item.MasterProjectId && typeList.Contains(x.Type)).ToList();
                     var oid= orgs.SingleOrDefault(x => x.Type == "1")?.OrganizationId;
                     if (oid.HasValue)
                     {
@@ -680,7 +684,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
 
                     #region 人员职位类型
                     var typeUserList = orgTypeName.Where(x => x.TypeNo == 1 && users.Contains(x.Type)).Select(x => x.Type.ToString()).ToList();
-                    var userTypeList = dutyList.Where(x => x.ProjectId == item.Id && users.Contains(x.Type)).ToList();
+                    var userTypeList = dutyList.Where(x => x.ProjectId == item.Id|| x.ProjectId == item.MasterProjectId && users.Contains(x.Type)).ToList();
                     var assistantManagerId = userTypeList.FirstOrDefault(x => x.Type == 1)?.AssistantManagerId;
                     if(assistantManagerId!=null)
                     item.XmJlName = userList.FirstOrDefault(x => x.PomId == assistantManagerId)?.Name;
@@ -912,8 +916,6 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 }
                 projectDeteilSingle.projectOrgDtos = projectDeteilSingle.projectOrgDtos.OrderBy(x => x.Type).ToList();
             }
-
-
             //获取项目干系人员信息
             var dutyList = await dbContext.Queryable<ProjectLeader>()
                 .Where(pl => (pl.ProjectId == projectDeteilSingle.Id || pl.ProjectId == projectDeteilSingle.MasterProjectId) && pl.IsDelete == 1)

@@ -24,10 +24,11 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project.ExcelImport
 	/// </summary>
 	public class ProjectExcelSearchResponseDto
 	{
-		/// <summary>
-		/// 项目Id
-		/// </summary>
-		public Guid Id { get; set; }
+        public Guid? MasterProjectId { get; set; }
+        /// <summary>
+        /// 项目Id
+        /// </summary>
+        public Guid Id { get; set; }
 		/// <summary>
 		/// 项目名称
 		/// </summary>
