@@ -642,7 +642,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 users.Add(5);
                 users.Add(8);
                 var ids = projectList.Select(x => x.Id).ToList();
-                var idss = projectList.Select(x => x.MasterProjectId.Value).ToList();
+                var idss = projectList.Where(x=>x.MasterProjectId.HasValue == true).Select(x => x.MasterProjectId.Value).ToList();
                 ids.AddRange(idss);
                 ids= ids.Distinct().ToList();
                 //获取项目干系单位
