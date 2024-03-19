@@ -158,11 +158,12 @@ namespace GHMonitoringCenterApi.Application.Service.Timing
                 //token = AppsettingsHelper.GetValue("InitDbDataItem:DealingUnitDataItem:Token");
                 //跟改为获取主数据往来单位
                 url = AppsettingsHelper.GetValue("MDM:BusinessRelatedUnit:Url");
-                url += DateTime.Now.ToString("yyyy-MM-dd");
+                //url += DateTime.Now.ToString("yyyy-MM-dd");
+                url += Convert.ToDateTime("2009-01-01");
                 systemIdentificationCode = AppsettingsHelper.GetValue("MDM:BusinessRelatedUnit:SystemIdentificationCode");
                 functionAuthorizationCode = AppsettingsHelper.GetValue("MDM:BusinessRelatedUnit:FunctionAuthorizationCode");
                 url += "&systemIdentificationCode=" + systemIdentificationCode + "&functionAuthorizationCode=" + functionAuthorizationCode;
-                dirParame.Add("pageSize", "100000");
+                dirParame.Add("pageSize", "1000000");
             }
             else if (parame == 6)
             {
@@ -527,9 +528,9 @@ namespace GHMonitoringCenterApi.Application.Service.Timing
                 if (parame == 5)
                 {
                     //广航所有往来单位数据
-                    var dealingUnits = await baseDealingUnitRepository.AsQueryable().Where(x => x.IsDelete == 1).ToListAsync();
+                    var dealingUnits = await baseDealingUnitRepository.AsQueryable().Where(x => x.IsDelete == 1 && !string.IsNullOrWhiteSpace(x.ZUSCC)).ToListAsync();
                     //zbps   zusccs
-                    var zbps = dealingUnits.Select(x => x.ZBP).ToList();
+                    var zbps = dealingUnits.Select(x => x.ZUSCC).ToList();
                     var responseData = responseResult.Result.Data as List<PomDealingUnitResponseDto>;
                     //筛掉名称且信用码为空的
                     //responseData = responseData.Where(x => !string.IsNullOrWhiteSpace(x.ZBPNAME_ZH) || !string.IsNullOrWhiteSpace(x.ZUSCC)).ToList();
@@ -539,10 +540,10 @@ namespace GHMonitoringCenterApi.Application.Service.Timing
                     {
                         var responsePagesData = responseData.Skip(i * 1000).Take(1000).ToList();
                         //需要修改的数据
-                        var updealingUnitResponseDtos = responsePagesData.Where(x => zbps.Any(y => y == x.ZBP)).ToList();
+                        var updealingUnitResponseDtos = responsePagesData.Where(x => zbps.Any(y => y == x.ZUSCC)).ToList();
                         //不包含  需要新增的往来单位 
-                        var noContainsResponseData = updealingUnitResponseDtos.Select(x => x.ZBP).ToList();
-                        var insdealingUnitResponseDtos = responsePagesData.Where(x => !noContainsResponseData.Contains(x.ZBP)).ToList();
+                        var noContainsResponseData = updealingUnitResponseDtos.Select(x => x.ZUSCC).ToList();
+                        var insdealingUnitResponseDtos = responsePagesData.Where(x => !noContainsResponseData.Contains(x.ZUSCC)).ToList();
 
                         if (insdealingUnitResponseDtos.Count() > 0)
                         {
@@ -557,11 +558,11 @@ namespace GHMonitoringCenterApi.Application.Service.Timing
 
                         if (updealingUnitResponseDtos.Count() > 0)
                         {
-                            var newZbps = updealingUnitResponseDtos.Select(x => x.ZBP).ToList();
-                            var newDealingUnits = dealingUnits.Where(x => newZbps.Contains(x.ZBP)).ToList();
+                            var newZbps = updealingUnitResponseDtos.Select(x => x.ZUSCC).ToList();
+                            var newDealingUnits = dealingUnits.Where(x => newZbps.Contains(x.ZUSCC)).ToList();
                             foreach (var item in updealingUnitResponseDtos)
                             {
-                                var exist = newDealingUnits.FirstOrDefault(x => x.ZBP == item.ZBP && x.ZUSCC == item.ZUSCC);
+                                var exist = newDealingUnits.FirstOrDefault(x => x.ZUSCC == item.ZUSCC);
                                 if (exist != null)
                                 {
                                     item.PomId = exist.PomId;
