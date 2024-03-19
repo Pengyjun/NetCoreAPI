@@ -158,8 +158,8 @@ namespace GHMonitoringCenterApi.Application.Service.Timing
                 //token = AppsettingsHelper.GetValue("InitDbDataItem:DealingUnitDataItem:Token");
                 //跟改为获取主数据往来单位
                 url = AppsettingsHelper.GetValue("MDM:BusinessRelatedUnit:Url");
-                //url += DateTime.Now.ToString("yyyy-MM-dd");
-                url += Convert.ToDateTime("2009-01-01");
+                url += DateTime.Now.ToString("yyyy-MM-dd");
+                //url += Convert.ToDateTime("2009-01-01");
                 systemIdentificationCode = AppsettingsHelper.GetValue("MDM:BusinessRelatedUnit:SystemIdentificationCode");
                 functionAuthorizationCode = AppsettingsHelper.GetValue("MDM:BusinessRelatedUnit:FunctionAuthorizationCode");
                 url += "&systemIdentificationCode=" + systemIdentificationCode + "&functionAuthorizationCode=" + functionAuthorizationCode;
