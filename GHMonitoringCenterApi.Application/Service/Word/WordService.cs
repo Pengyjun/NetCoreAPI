@@ -639,11 +639,11 @@ namespace GHMonitoringCenterApi.Application.Service.Word
 
                 oneTable.GetRow(6).GetCell(0).SetText("合同变更信息");
                 oneTable.GetRow(6).GetCell(0).SetColor("#EEEEEE");
-                oneTable.GetRow(6).GetCell(1).SetText(item.ContractChangeInformation + item.CommencementTime);
+                oneTable.GetRow(6).GetCell(1).SetText(item.ContractChangeInformation);
 
                 oneTable.GetRow(7).GetCell(0).SetText("工期信息");
                 oneTable.GetRow(7).GetCell(0).SetColor("#EEEEEE");
-                oneTable.GetRow(7).GetCell(1).SetText(item.DurationInformation);
+                oneTable.GetRow(7).GetCell(1).SetText(item.DurationInformation + item.CommencementTime);
 
                 oneTable.GetRow(8).GetCell(0).SetText("项目进展");
                 oneTable.GetRow(8).GetCell(0).SetColor("#EEEEEE");
