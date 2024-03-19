@@ -24,10 +24,11 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project.ExcelImport
 	/// </summary>
 	public class ProjectExcelSearchResponseDto
 	{
-		/// <summary>
-		/// 项目Id
-		/// </summary>
-		public Guid Id { get; set; }
+        public Guid? MasterProjectId { get; set; }
+        /// <summary>
+        /// 项目Id
+        /// </summary>
+        public Guid Id { get; set; }
 		/// <summary>
 		/// 项目名称
 		/// </summary>
@@ -232,5 +233,42 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project.ExcelImport
         /// 合同变更原因
         /// </summary>
         public string? ContractChangeInfo { get; set; }
+
+
+        #region 新增字段
+		/// <summary>
+		/// 业主单位
+		/// </summary>
+        public string? YeZhuUnitName { get; set; }
+		/// <summary>
+		/// 监理单位
+		/// </summary>
+        public string? JianLiUnitName { get; set; }
+		/// <summary>
+		/// 设计单位
+		/// </summary>
+        public string? SheJiUnitName { get; set; }
+
+		/// <summary>
+		/// 项目经理人员名称
+		/// </summary>
+        public string? XmJlName { get; set; }
+		/// <summary>
+		/// 项目书记人员名称
+		/// </summary>
+        public string? XmSjName { get; set; }
+		/// <summary>
+		/// 项目总共人员名称
+		/// </summary>
+        public string? XmZgName { get; set; }
+		/// <summary>
+		/// 项目总监人员名称
+		/// </summary>
+        public string? XmZjName { get; set; }
+		/// <summary>
+		/// 现场主要负责人人员名称
+		/// </summary>
+        public string? XmZyFerName { get; set; }
+        #endregion
     }
 }
