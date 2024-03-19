@@ -128,8 +128,8 @@ namespace GHMonitoringCenterApi.Controllers.File
             await logService.WriteLogAsync(logObj);
             #endregion
             //模板位置      
-             //var templatePath = $"Template/Excel/ProjectTemplate.xlsx";
-            var templatePath = @"D:\projectconllection\dotnet\szgh\GHMonitoringCenterApi.Domain.Shared\Template\Excel\ProjectTemplate.xlsx";
+             var templatePath = $"Template/Excel/ProjectTemplate.xlsx";
+            //var templatePath = @"D:\projectconllection\dotnet\szgh\GHMonitoringCenterApi.Domain.Shared\Template\Excel\ProjectTemplate.xlsx";
             //获取数据
             var data = await projectService.GetProjectExcelAsync(projectSearchRequestDto);
             return await ExcelTemplateImportAsync(templatePath, data.Data, "广航局项目信息清单");
