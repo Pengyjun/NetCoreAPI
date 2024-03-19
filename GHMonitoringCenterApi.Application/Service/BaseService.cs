@@ -589,7 +589,8 @@ namespace GHMonitoringCenterApi.Application.Service
             ResponseAjaxResult<List<BasePullDownResponseDto>> responseAjaxResult = new ResponseAjaxResult<List<BasePullDownResponseDto>>();
             var DictionaryTableList = await baseDictionaryTableRepository.AsQueryable()
                 .Where(x => x.TypeNo == baseDictionaryTableRequestDto.Type)
-                .Select(x => new BasePullDownResponseDto { Type = x.Type, Name = x.Name, Code = x.Remark }).ToListAsync();
+                .Select(x => new BasePullDownResponseDto { Type = x.Type, Name = x.Name, Code = x.Remark })
+                .OrderBy(x=>x.Type).ToListAsync();
             responseAjaxResult.Data = DictionaryTableList;
             responseAjaxResult.Count = DictionaryTableList.Count;
             responseAjaxResult.Success();

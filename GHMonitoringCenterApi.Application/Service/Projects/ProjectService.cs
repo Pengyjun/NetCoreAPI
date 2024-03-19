@@ -475,6 +475,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 .Select((p, ps) => new ProjectExcelSearchResponseDto
                 {
                     Id = p.Id,
+                    MasterProjectId=p.MasterProjectId.Value,
                     Name = p.Name,
                     Category = p.Category,
                     TypeName = p.TypeId.ToString(),
@@ -621,6 +622,90 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     item.ClassifyStandard = item.ClassifyStandard.Substring(0, item.ClassifyStandard.Length - 1);
                 }
             }
+
+            #region 新增逻辑
+            if (searchRequestDto.IsFullExport)
+            {
+                List<int> types = new List<int>();
+                types.Add(1);
+                types.Add(6);
+                types.Add(4);
+                List<int> users = new List<int>();
+                types.Add(1);
+                types.Add(3);
+                types.Add(4);
+                types.Add(5);
+                types.Add(8);
+                users.Add(1);
+                users.Add(3);
+                users.Add(4);
+                users.Add(5);
+                users.Add(8);
+                var ids = projectList.Select(x => x.Id).ToList();
+                var idss = projectList.Where(x=>x.MasterProjectId.HasValue == true).Select(x => x.MasterProjectId.Value).ToList();
+                ids.AddRange(idss);
+                ids= ids.Distinct().ToList();
+                //获取项目干系单位
+                var orgList = await dbContext.Queryable<ProjectOrg>()
+                    .Where(p => p.IsDelete == 1&& ids.Contains(p.ProjectId.Value)).ToListAsync();
+                //查询项目干系单位名称
+                var orgTypeName = await dbContext.Queryable<DictionaryTable>().Where(x => x.IsDelete == 1 && (x.TypeNo == 2
+                ||x.TypeNo==1)&& types.Contains(x.Type)).ToListAsync();
+                //查询往来单位名称
+                var unitName = await dbContext.Queryable<DealingUnit>()
+                    .Where(x => x.IsDelete==1).ToListAsync();
+
+                var dutyList = await dbContext.Queryable<ProjectLeader>()
+                .Where(pl =>pl.IsDelete == 1&& ids.Contains(pl.ProjectId.Value))
+                .ToListAsync();
+                var userList= await dbContext.Queryable<GHMonitoringCenterApi.Domain.Models.User>()
+                    .Where(x => x.IsDelete == 1).ToListAsync();
+                foreach (var item in projectList)
+                {
+                    #region 干系单位类型
+                    var typeList = orgTypeName.Where(x=>x.TypeNo==2).Select(x => x.Type.ToString()).ToList();
+                    var  orgs=orgList.Where(x => x.ProjectId == item.Id || x.ProjectId == item.MasterProjectId && typeList.Contains(x.Type)).ToList();
+                    var oid= orgs.SingleOrDefault(x => x.Type == "1")?.OrganizationId;
+                    if (oid.HasValue)
+                    {
+                        item.YeZhuUnitName = unitName.FirstOrDefault(x => x.PomId == oid)?.ZBPNAME_ZH;
+                    }
+                     oid = orgs.FirstOrDefault(x => x.Type == "6")?.OrganizationId;
+                    if (oid.HasValue)
+                    {
+                        item.JianLiUnitName = unitName.SingleOrDefault(x => x.PomId == oid)?.ZBPNAME_ZH;
+                    }
+                    oid = orgs.FirstOrDefault(x => x.Type == "4")?.OrganizationId;
+                    if (oid.HasValue)
+                    {
+                        item.SheJiUnitName = unitName.SingleOrDefault(x => x.PomId == oid)?.ZBPNAME_ZH;
+                    }
+                    #endregion
+
+                    #region 人员职位类型
+                    var typeUserList = orgTypeName.Where(x => x.TypeNo == 1 && users.Contains(x.Type)).Select(x => x.Type.ToString()).ToList();
+                    var userTypeList = dutyList.Where(x => x.ProjectId == item.Id|| x.ProjectId == item.MasterProjectId && users.Contains(x.Type)).ToList();
+                    var assistantManagerId = userTypeList.FirstOrDefault(x => x.Type == 1)?.AssistantManagerId;
+                    if(assistantManagerId!=null)
+                    item.XmJlName = userList.FirstOrDefault(x => x.PomId == assistantManagerId)?.Name;
+                    assistantManagerId = userTypeList.FirstOrDefault(x => x.Type == 3)?.AssistantManagerId;
+                    if (assistantManagerId != null)
+                        item.XmSjName = userList.FirstOrDefault(x => x.PomId == assistantManagerId)?.Name;
+                    assistantManagerId = userTypeList.FirstOrDefault(x => x.Type == 4)?.AssistantManagerId;
+                    if (assistantManagerId != null)
+                        item.XmZgName = userList.FirstOrDefault(x => x.PomId == assistantManagerId)?.Name;
+                    assistantManagerId = userTypeList.FirstOrDefault(x => x.Type == 5)?.AssistantManagerId;
+                    if (assistantManagerId != null)
+                        item.XmZjName = userList.FirstOrDefault(x => x.PomId == assistantManagerId)?.Name;
+                    assistantManagerId = userTypeList.FirstOrDefault(x => x.Type == 8)?.AssistantManagerId;
+                    if (assistantManagerId != null)
+                        item.XmZyFerName = userList.FirstOrDefault(x => x.PomId == assistantManagerId)?.Name;
+                    #endregion
+                }
+            }
+           
+
+            #endregion
             //排序
             projectList = projectList.OrderBy(x => x.Sequence).ThenByDescending(x => x.CreateTime).ToList();
 
@@ -831,8 +916,6 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 }
                 projectDeteilSingle.projectOrgDtos = projectDeteilSingle.projectOrgDtos.OrderBy(x => x.Type).ToList();
             }
-
-
             //获取项目干系人员信息
             var dutyList = await dbContext.Queryable<ProjectLeader>()
                 .Where(pl => (pl.ProjectId == projectDeteilSingle.Id || pl.ProjectId == projectDeteilSingle.MasterProjectId) && pl.IsDelete == 1)

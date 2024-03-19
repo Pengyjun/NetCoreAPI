@@ -4730,7 +4730,7 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
             //此事件段是填写月报的时间  此时间段不加入 当前月报产值
             //判断是否加入当前月的月报产值
             var day = DateTime.Now.Day;
-            if (day >= 27 || day <=18)
+            if (day >= 27 || day <=25)
             {
                 var singleCompany = monthDiffProductionValues.SingleOrDefault(x => x.IsDelete == 1 && x.CompanyId == companyId);
                 if(singleCompany!=null)
