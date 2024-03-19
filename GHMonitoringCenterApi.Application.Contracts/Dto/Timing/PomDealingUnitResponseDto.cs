@@ -71,5 +71,6 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Timing
         public string? UpdatedBy { get; set; }
 
         public DateTime CreateTime { get; set; } = DateTime.Now;
+
     }
 }
