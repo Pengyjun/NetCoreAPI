@@ -159,10 +159,11 @@ namespace GHMonitoringCenterApi.Application.Service.Timing
                 //跟改为获取主数据往来单位
                 url = AppsettingsHelper.GetValue("MDM:BusinessRelatedUnit:Url");
                 url += DateTime.Now.ToString("yyyy-MM-dd");
+                //url += Convert.ToDateTime("2000-01-01");
                 systemIdentificationCode = AppsettingsHelper.GetValue("MDM:BusinessRelatedUnit:SystemIdentificationCode");
                 functionAuthorizationCode = AppsettingsHelper.GetValue("MDM:BusinessRelatedUnit:FunctionAuthorizationCode");
                 url += "&systemIdentificationCode=" + systemIdentificationCode + "&functionAuthorizationCode=" + functionAuthorizationCode;
-                dirParame.Add("pageSize", "100000");
+                dirParame.Add("pageSize", "1000000");
             }
             else if (parame == 6)
             {
@@ -529,46 +530,80 @@ namespace GHMonitoringCenterApi.Application.Service.Timing
                     //广航所有往来单位数据
                     var dealingUnits = await baseDealingUnitRepository.AsQueryable().Where(x => x.IsDelete == 1).ToListAsync();
                     //zbps   zusccs
-                    var zbps = dealingUnits.Select(x => x.ZBP).ToList();
+                    //国内的
+                    var chinaZuscc = dealingUnits.Where(x => !string.IsNullOrWhiteSpace(x.ZUSCC)).Select(x => x.ZUSCC).ToList();
+                    //海外的
+                    var haiwaiZbp = dealingUnits.Where(x => string.IsNullOrWhiteSpace(x.ZUSCC)).Select(x => x.ZBP).ToList();
                     var responseData = responseResult.Result.Data as List<PomDealingUnitResponseDto>;
-                    //筛掉名称且信用码为空的
-                    //responseData = responseData.Where(x => !string.IsNullOrWhiteSpace(x.ZBPNAME_ZH) || !string.IsNullOrWhiteSpace(x.ZUSCC)).ToList();
                     //循环次数
                     var forCount = responseData.Count() % 1000M == 0 ? responseData.Count() / 1000M : Math.Floor(responseData.Count() / 1000M) + 1;
                     for (int i = 0; i < forCount; i++)
                     {
                         var responsePagesData = responseData.Skip(i * 1000).Take(1000).ToList();
                         //需要修改的数据
-                        var updealingUnitResponseDtos = responsePagesData.Where(x => zbps.Any(y => y == x.ZBP)).ToList();
-                        //不包含  需要新增的往来单位 
-                        var noContainsResponseData = updealingUnitResponseDtos.Select(x => x.ZBP).ToList();
-                        var insdealingUnitResponseDtos = responsePagesData.Where(x => !noContainsResponseData.Contains(x.ZBP)).ToList();
+                        //一种国内的数据  ZUSCC信用编码不可能为空
+                        var chinaData = responsePagesData.Where(x => !string.IsNullOrWhiteSpace(x.ZUSCC)).ToList();
+                        //一种国外的数据 zbp不会是空  ZUSCC信用编码为空
+                        var haiwaiData = responsePagesData.Where(x => string.IsNullOrWhiteSpace(x.ZUSCC)).ToList();
 
-                        if (insdealingUnitResponseDtos.Count() > 0)
+                        //需要新增的国内的
+                        var addChinaData = chinaData.Where(x => !chinaZuscc.Contains(x.ZUSCC)).ToList();
+                        //需要新增的海外的
+                        var addHaiwaiData = haiwaiData.Where(x => !haiwaiZbp.Contains(x.ZBP)).ToList();
+
+                        var addZuscc = addChinaData.Select(x => x.ZUSCC).ToList();
+                        var addZbp = addHaiwaiData.Select(x => x.ZBP).ToList();
+                        //需要修改的国内的  不包含新增的数据
+                        var upChinaData = chinaData.Where(x => !addZuscc.Contains(x.ZUSCC)).ToList();
+                        //需要修改的海外的
+                        var upHaiWaiData = haiwaiData.Where(x => !addZbp.Contains(x.ZBP)).ToList();
+
+                        if (addChinaData.Count() > 0)
                         {
-                            foreach (var item in insdealingUnitResponseDtos)
+                            foreach (var item in addChinaData)
                             {
                                 item.PomId = GuidUtil.Next();
                                 item.Id = GuidUtil.Next();
                             }
-                            var insdealingUnitList = mapper.Map<List<PomDealingUnitResponseDto>, List<DealingUnit>>(insdealingUnitResponseDtos);
+                            var insdealingUnitList = mapper.Map<List<PomDealingUnitResponseDto>, List<DealingUnit>>(addChinaData);
                             await dbContext.Fastest<DealingUnit>().BulkCopyAsync(insdealingUnitList);
                         }
-
-                        if (updealingUnitResponseDtos.Count() > 0)
+                        if (addHaiwaiData.Count() > 0)
                         {
-                            var newZbps = updealingUnitResponseDtos.Select(x => x.ZBP).ToList();
-                            var newDealingUnits = dealingUnits.Where(x => newZbps.Contains(x.ZBP)).ToList();
-                            foreach (var item in updealingUnitResponseDtos)
+                            foreach (var item in addHaiwaiData)
                             {
-                                var exist = newDealingUnits.FirstOrDefault(x => x.ZBP == item.ZBP && x.ZUSCC == item.ZUSCC);
+                                item.PomId = GuidUtil.Next();
+                                item.Id = GuidUtil.Next();
+                            }
+                            var insdealingUnitList = mapper.Map<List<PomDealingUnitResponseDto>, List<DealingUnit>>(addHaiwaiData);
+                            await dbContext.Fastest<DealingUnit>().BulkCopyAsync(insdealingUnitList);
+                        }
+                        if (upChinaData.Count() > 0)
+                        {
+                            foreach (var item in upChinaData)
+                            {
+                                var exist = dealingUnits.FirstOrDefault(x => x.ZUSCC == item.ZUSCC);
                                 if (exist != null)
                                 {
                                     item.PomId = exist.PomId;
                                     item.Id = exist.Id;
                                 }
                             }
-                            var updealingUnitList = mapper.Map<List<PomDealingUnitResponseDto>, List<DealingUnit>>(updealingUnitResponseDtos);
+                            var updealingUnitList = mapper.Map<List<PomDealingUnitResponseDto>, List<DealingUnit>>(upChinaData);
+                            await dbContext.Fastest<DealingUnit>().BulkUpdateAsync(updealingUnitList);
+                        }
+                        if (upHaiWaiData.Count() > 0)
+                        {
+                            foreach (var item in upHaiWaiData)
+                            {
+                                var exist = dealingUnits.FirstOrDefault(x => x.ZBP == item.ZBP);
+                                if (exist != null)
+                                {
+                                    item.PomId = exist.PomId;
+                                    item.Id = exist.Id;
+                                }
+                            }
+                            var updealingUnitList = mapper.Map<List<PomDealingUnitResponseDto>, List<DealingUnit>>(upHaiWaiData);
                             await dbContext.Fastest<DealingUnit>().BulkUpdateAsync(updealingUnitList);
                         }
                     }
