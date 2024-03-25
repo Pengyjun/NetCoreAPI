@@ -2173,7 +2173,8 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
             //查询历史数据
             var projectPlanProductionData = await dbContext.Queryable<ProjectHistoryData>().Where(x => x.IsDelete == 1 ).ToListAsync();
             //项目月报数据
-            var projectMonthData = await dbContext.Queryable<MonthReport>().Where(x => x.IsDelete == 1&&x.DateYear==DateTime.Now.Year).ToListAsync();
+            var year = int.Parse(DateTime.Now.ToString("yyyy01"));
+            var projectMonthData = await dbContext.Queryable<MonthReport>().Where(x => x.IsDelete == 1&&x.DateMonth>= year).ToListAsync();
             foreach (var item in projectLists)
             {
                 //if (item.Id != "08db3b35-fb38-4bd7-8c32-5423575bad59".ToGuid())
