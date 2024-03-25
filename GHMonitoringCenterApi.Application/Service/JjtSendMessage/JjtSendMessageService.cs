@@ -2093,73 +2093,131 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
 
             #endregion
 
-            #region 项目年度产值完成排名
-            List<ProjectRank> projectRankList = new List<ProjectRank>();
+            #region 项目年度产值完成排名 暂时不用
+            //List<ProjectRank> projectRankList = new List<ProjectRank>();
+            //var projectLists = await dbContext.Queryable<Project>().Where(x => x.IsDelete == 1)
+            //    .Select(x => new { x.Id, x.ShortName, x.CompanyId }).ToListAsync();
+            //var projectSumDayProductionValue = await dbContext.Queryable<DayReport>().Where(x => x.IsDelete == 1
+            //&& projectLists.Select(x => x.Id).ToList().Contains(x.ProjectId))
+            //     .GroupBy(x => x.ProjectId)
+            //     .Select(x => new { x.ProjectId, productionValue = SqlFunc.AggregateSum(x.DayActualProductionAmount) }).ToListAsync();
+            //projectSumDayProductionValue = projectSumDayProductionValue.OrderByDescending(x => x.productionValue).Take(1000).ToList();
+            //var planList = await dbContext.Queryable<ProjectPlanProduction>().Where(x => x.IsDelete == 1 && x.Year == Convert.ToInt32(yearStartTime)).ToListAsync();
+            //var projectPlanProductionData = await dbContext.Queryable<ProjectPlanProduction>().Where(x => x.IsDelete == 1 && x.Year == DateTime.Now.Year).ToListAsync();
+            //var dayReportData = await dbContext.Queryable<DayReport>().Where(x => x.IsDelete == 1 && x.DateDay >= startYearTimeInt
+            //&& x.DateDay <= endYearTimeInt).ToListAsync();
+            ////项目完成产值历史数据
+            //var historyOutPut = await dbContext.Queryable<ProjectHistoryData>().Where(x => x.IsDelete == 1).ToListAsync();
+            //var monthStartTime = int.Parse(startYearTimeInt.ToString().Substring(0, 6));
+            //var monthEndTime = int.Parse(endYearTimeInt.ToString().Substring(0, 6));
+            ////月报数据
+            //var monthDataList = await dbContext.Queryable<MonthReport>().Where(x => x.IsDelete == 1
+            //&& x.DateMonth > monthStartTime && x.DateMonth <= monthEndTime).ToListAsync();
+            //foreach (var item in projectSumDayProductionValue)
+            //{
+            //    ProjectRank model = new ProjectRank();
+            //    //var planValue = GetProjectPlanValue(month, planList.Where(x => x.ProjectId == item.ProjectId && x.CompanyId == item.CompanyId).FirstOrDefault());
+            //    var projectInfo = projectLists.Where(x => x.Id == item.ProjectId).SingleOrDefault();
+            //    model.ProjectName = projectInfo == null ? string.Empty : projectInfo.ShortName;
+            //    //if (model.ProjectName == "茂名港博贺项目")
+            //    //{
+
+            //    //}
+            //    model.CurrentYearPlanProductionValue = Math.Round(GetRrojectProductionValue(projectPlanProductionData, item.ProjectId).Value, 2);
+            //    model.CurrentYearCompleteProductionValue = Math.Round(GetRrojectCompletProductionValue(dayReportData, historyOutPut, monthDataList, currentTimeIntUp, currentTimeInt, item.ProjectId), 2);
+            //    if (model.CurrentYearPlanProductionValue != 0)
+            //    {
+            //        model.CompleteRate = Math.Round(model.CurrentYearCompleteProductionValue / model.CurrentYearPlanProductionValue * 100, 2);
+            //    }
+            //    //当日产值
+            //    var time = DateTime.Now.AddDays(-1).ToDateDay();
+            //    var currentDayProduction = dayReportData.Where(x => x.ProjectId == item.ProjectId && x.DateDay == time).FirstOrDefault();
+            //    //model.DayActualValue = Math.Round(item.productionValue / 10000, 2);
+            //    if (currentDayProduction != null)
+            //        model.DayActualValue = Math.Round(currentDayProduction.DayActualProductionAmount / 10000, 2);
+            //    projectRankList.Add(model);
+            //}
+            //projectBasePoduction.ProjectRanks = projectRankList;
+            //projectBasePoduction.ProjectRanks = projectBasePoduction.ProjectRanks.OrderByDescending(x => x.CurrentYearCompleteProductionValue).Take(10).ToList();
+
+            ////合计
+            //var totalYearPlanProductionValue = projectBasePoduction.ProjectRanks.Sum(x => x.CurrentYearPlanProductionValue);
+            //var totalYearCompletProductionValue = projectBasePoduction.ProjectRanks.Sum(x => x.CurrentYearCompleteProductionValue);
+            //decimal totalYearCompletRate = 0;
+            //if (totalYearPlanProductionValue != 0)
+            //{
+            //    totalYearCompletRate = Math.Round((totalYearCompletProductionValue / totalYearPlanProductionValue) * 100, 2);
+            //}
+            //projectBasePoduction.TotalCurrentYearPlanProductionValue = totalYearPlanProductionValue;
+            //projectBasePoduction.TotalCurrentYearCompleteProductionValue = totalYearCompletProductionValue;
+            //// projectBasePoduction.TotalCompleteRate = totalYearCompletRate;
+            //if (projectBasePoduction.TotalYearProductionValue != 0)
+            //{
+            //    projectBasePoduction.TotalCompleteRate = Math.Round((projectBasePoduction.TotalCurrentYearCompleteProductionValue / projectBasePoduction.TotalYearProductionValue) * 100, 2);
+            //}
+            //if (projectBasePoduction.TotalCurrentYearPlanProductionValue != 0)
+            //{
+            //    projectBasePoduction.SumCompleteRate = Math.Round((projectBasePoduction.TotalCurrentYearCompleteProductionValue / projectBasePoduction.TotalCurrentYearPlanProductionValue) * 100, 2);
+            //}
+             //projectBasePoduction.SumProjectRanksTen = projectBasePoduction.ProjectRanks.Sum(x => x.DayActualValue);
+            #endregion
+
+            #region 项目年度产值完成排名新版
+            List < ProjectRank > projectRankList = new List<ProjectRank>();
             var projectLists = await dbContext.Queryable<Project>().Where(x => x.IsDelete == 1)
                 .Select(x => new { x.Id, x.ShortName, x.CompanyId }).ToListAsync();
-            var projectSumDayProductionValue = await dbContext.Queryable<DayReport>().Where(x => x.IsDelete == 1
-            && projectLists.Select(x => x.Id).ToList().Contains(x.ProjectId))
-                 .GroupBy(x => x.ProjectId)
-                 .Select(x => new { x.ProjectId, productionValue = SqlFunc.AggregateSum(x.DayActualProductionAmount) }).ToListAsync();
-            projectSumDayProductionValue = projectSumDayProductionValue.OrderByDescending(x => x.productionValue).Take(10).ToList();
-            var planList = await dbContext.Queryable<ProjectPlanProduction>().Where(x => x.IsDelete == 1 && x.Year == Convert.ToInt32(yearStartTime)).ToListAsync();
-            var projectPlanProductionData = await dbContext.Queryable<ProjectPlanProduction>().Where(x => x.IsDelete == 1 && x.Year == DateTime.Now.Year).ToListAsync();
-            var dayReportData = await dbContext.Queryable<DayReport>().Where(x => x.IsDelete == 1 && x.DateDay >= startYearTimeInt
-            && x.DateDay <= endYearTimeInt).ToListAsync();
-            //项目完成产值历史数据
-            var historyOutPut = await dbContext.Queryable<ProjectHistoryData>().Where(x => x.IsDelete == 1).ToListAsync();
-            var monthStartTime = int.Parse(startYearTimeInt.ToString().Substring(0, 6));
-            var monthEndTime = int.Parse(endYearTimeInt.ToString().Substring(0, 6));
-            //月报数据
-            var monthDataList = await dbContext.Queryable<MonthReport>().Where(x => x.IsDelete == 1
-            && x.DateMonth > monthStartTime && x.DateMonth <= monthEndTime).ToListAsync();
-            foreach (var item in projectSumDayProductionValue)
+            //当年完成产值
+           var eachProjectProductionValue=await dbContext.Queryable<DayReport>().Where(x => x.IsDelete == 1 && x.DateDay >= startYearTimeInt && x.DateDay <= endYearTimeInt).ToListAsync();
+            //当年各个项目计划产值
+             var projectYearPlanProductionData = await dbContext.Queryable<ProjectPlanProduction>().Where(x => x.IsDelete == 1 && x.Year == DateTime.Now.Year).ToListAsync();
+            //查询历史数据
+            var projectPlanProductionData = await dbContext.Queryable<ProjectHistoryData>().Where(x => x.IsDelete == 1 ).ToListAsync();
+            //项目月报数据
+            var projectMonthData = await dbContext.Queryable<MonthReport>().Where(x => x.IsDelete == 1&&x.DateYear==DateTime.Now.Year).ToListAsync();
+            foreach (var item in projectLists)
             {
-                ProjectRank model = new ProjectRank();
-                //var planValue = GetProjectPlanValue(month, planList.Where(x => x.ProjectId == item.ProjectId && x.CompanyId == item.CompanyId).FirstOrDefault());
-                var projectInfo = projectLists.Where(x => x.Id == item.ProjectId).SingleOrDefault();
-                model.ProjectName = projectInfo == null ? string.Empty : projectInfo.ShortName;
-                //if (model.ProjectName == "茂名港博贺项目")
+                //if (item.Id != "08db3b35-fb38-4bd7-8c32-5423575bad59".ToGuid())
                 //{
-
+                //    continue;
                 //}
-                model.CurrentYearPlanProductionValue = Math.Round(GetRrojectProductionValue(projectPlanProductionData, item.ProjectId).Value, 2);
-                model.CurrentYearCompleteProductionValue = Math.Round(GetRrojectCompletProductionValue(dayReportData, historyOutPut, monthDataList, currentTimeIntUp, currentTimeInt, item.ProjectId), 2);
-                if (model.CurrentYearPlanProductionValue != 0)
-                {
-                    model.CompleteRate = Math.Round(model.CurrentYearCompleteProductionValue / model.CurrentYearPlanProductionValue * 100, 2);
-                }
-                //当日产值
-                var time = DateTime.Now.AddDays(-1).ToDateDay();
-                var currentDayProduction = dayReportData.Where(x => x.ProjectId == item.ProjectId && x.DateDay == time).FirstOrDefault();
-                //model.DayActualValue = Math.Round(item.productionValue / 10000, 2);
-                if (currentDayProduction != null)
-                    model.DayActualValue = Math.Round(currentDayProduction.DayActualProductionAmount / 10000, 2);
-                projectRankList.Add(model);
-            }
-            projectBasePoduction.ProjectRanks = projectRankList;
-            projectBasePoduction.ProjectRanks = projectBasePoduction.ProjectRanks.OrderByDescending(x => x.CurrentYearCompleteProductionValue).Take(10).ToList();
+                 //当年项目完成产值
+                 var projectYearTotalProductionValue = eachProjectProductionValue.Where(x => x.ProjectId == item.Id&&x.DateDay>=currentTimeIntUp&&x.DateDay<=currentTimeInt).Sum(x => x.DayActualProductionAmount);
+                //当年项目计划产值
+                var projectPalnProduction = Math.Round(GetRrojectProductionValue(projectYearPlanProductionData, item.Id).Value, 2);
+                //今日完成产值
+                var day = DateTime.Now.AddDays(-1).ToDateDay();
+                var dayProductionValue = eachProjectProductionValue.Where(x => x.ProjectId == item.Id && x.DateDay == day).SingleOrDefault();
+                //计算历史计划产值
+                //var projectHistoryProduciton= projectYearPlanProductionData.Where(x => x.ProjectId == item.Id).SingleOrDefault();
+                //计算2023-06月之前的数据
+                var  proejctHistoty=projectPlanProductionData.Where(x => x.ProjectId == item.Id&&x.OutputValue.HasValue==true).Select(x=>x.OutputValue.Value).SingleOrDefault();
+                //月份相加产值
+               var monthValue= projectMonthData.Where(x => x.ProjectId == item.Id).Sum(x => x.CompleteProductionAmount);
 
-            //合计
-            var totalYearPlanProductionValue = projectBasePoduction.ProjectRanks.Sum(x => x.CurrentYearPlanProductionValue);
-            var totalYearCompletProductionValue = projectBasePoduction.ProjectRanks.Sum(x => x.CurrentYearCompleteProductionValue);
-            decimal totalYearCompletRate = 0;
-            if (totalYearPlanProductionValue != 0)
-            {
-                totalYearCompletRate = Math.Round((totalYearCompletProductionValue / totalYearPlanProductionValue) * 100, 2);
+                var dayValue = 0M;
+                if (dayProductionValue!=null)
+                {
+                    dayValue=Math.Round(dayProductionValue.DayActualProductionAmount / 10000000, 2);
+                }
+                ProjectRank projectRank = new ProjectRank()
+                {
+                    ProjectName = item.ShortName,
+                    //CurrentYearCompleteProductionValue = (Math.Round(projectYearTotalProductionValue / 100000000, 2) ),
+                    CurrentYearCompleteProductionValue = Math.Round(monthValue / 100000000, 2) + Math.Round(projectYearTotalProductionValue / 100000000, 2),
+                    CurrentYearPlanProductionValue = projectPalnProduction,
+                    DayActualValue = dayValue,
+                };
+                if (projectPalnProduction!=0) {
+                    projectRank.CompleteRate = Math.Round(projectRank.CurrentYearCompleteProductionValue / projectRank.CurrentYearPlanProductionValue, 2);
+                }
+                projectRankList.Add(projectRank);
             }
-            projectBasePoduction.TotalCurrentYearPlanProductionValue = totalYearPlanProductionValue;
-            projectBasePoduction.TotalCurrentYearCompleteProductionValue = totalYearCompletProductionValue;
-            // projectBasePoduction.TotalCompleteRate = totalYearCompletRate;
-            if (projectBasePoduction.TotalYearProductionValue != 0)
-            {
-                projectBasePoduction.TotalCompleteRate = Math.Round((projectBasePoduction.TotalCurrentYearCompleteProductionValue / projectBasePoduction.TotalYearProductionValue) * 100, 2);
-            }
-            if (projectBasePoduction.TotalCurrentYearPlanProductionValue != 0)
-            {
-                projectBasePoduction.SumCompleteRate = Math.Round((projectBasePoduction.TotalCurrentYearCompleteProductionValue / projectBasePoduction.TotalCurrentYearPlanProductionValue) * 100, 2);
-            }
-            projectBasePoduction.SumProjectRanksTen = projectBasePoduction.ProjectRanks.Sum(x => x.DayActualValue);
+            projectBasePoduction.ProjectRanks = projectRankList.OrderByDescending(x=>x.CurrentYearCompleteProductionValue).Take(10).ToList();
+            //总计
+            projectBasePoduction.TotalCurrentYearPlanProductionValue = projectBasePoduction.ProjectRanks.Sum(x => x.CurrentYearPlanProductionValue);
+            projectBasePoduction.TotalCurrentYearCompleteProductionValue= projectBasePoduction.ProjectRanks.Sum(x => x.CurrentYearCompleteProductionValue);
+            projectBasePoduction.SumCompleteRate = Math.Round((projectBasePoduction.TotalCurrentYearCompleteProductionValue / projectBasePoduction.TotalCurrentYearPlanProductionValue) * 100, 2);
+            projectBasePoduction.SumProjectRanksTen = projectBasePoduction.ProjectRanks.Sum(x => x.DayActualValue.Value);
             #endregion
 
             #region 项目产值强度表格

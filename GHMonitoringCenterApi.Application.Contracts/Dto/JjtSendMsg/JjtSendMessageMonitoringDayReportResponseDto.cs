@@ -322,7 +322,7 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.JjtSendMsg
         /// <summary>
         ///当日产值
         /// </summary>
-        public decimal DayActualValue { get; set; }
+        public decimal? DayActualValue { get; set; }
         /// <summary>
         /// 当年计划产值
         /// </summary>

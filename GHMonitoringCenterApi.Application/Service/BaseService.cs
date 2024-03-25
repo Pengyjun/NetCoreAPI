@@ -201,7 +201,6 @@ namespace GHMonitoringCenterApi.Application.Service
                           .OrderBy(x => x.Sno)
                           .Select(x => new BasePullDownResponseDto { Id = x.PomId, Name = x.Name })
                           .ToList();
-
                 }
                 else
                 {
