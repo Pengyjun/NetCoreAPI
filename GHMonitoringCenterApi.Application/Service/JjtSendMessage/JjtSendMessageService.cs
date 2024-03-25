@@ -2219,9 +2219,9 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
             projectBasePoduction.TotalCurrentYearCompleteProductionValue= projectBasePoduction.ProjectRanks.Sum(x => x.CurrentYearCompleteProductionValue);
             projectBasePoduction.SumCompleteRate = Math.Round((projectBasePoduction.TotalCurrentYearCompleteProductionValue / projectBasePoduction.TotalCurrentYearPlanProductionValue) * 100, 2);
             var totalYearCompletRate = 0M;
-            if (projectBasePoduction.TotalCurrentYearCompleteProductionValue != 0)
+            if (projectBasePoduction.TotalYearProductionValue != 0)
             {
-                totalYearCompletRate = Math.Round((projectBasePoduction.TotalCurrentYearCompleteProductionValue / projectBasePoduction.TotalCurrentYearPlanProductionValue) * 100, 2);
+                totalYearCompletRate = Math.Round((projectBasePoduction.TotalCurrentYearCompleteProductionValue / projectBasePoduction.TotalYearProductionValue) * 100, 2);
             }
             projectBasePoduction.TotalCompleteRate = totalYearCompletRate;
             projectBasePoduction.SumProjectRanksTen = projectBasePoduction.ProjectRanks.Sum(x => x.DayActualValue.Value);
@@ -4794,8 +4794,8 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
         {
             //此事件段是填写月报的时间  此时间段不加入 当前月报产值
             //判断是否加入当前月的月报产值
-            var day = DateTime.Now.Day;
-            if (day >= 27 || day <=25)
+            var day = DateTime.Now.AddDays(-1).Day;
+            if (day >= 27 || day <=26)
             {
                 var singleCompany = monthDiffProductionValues.SingleOrDefault(x => x.IsDelete == 1 && x.CompanyId == companyId);
                 if(singleCompany!=null)
