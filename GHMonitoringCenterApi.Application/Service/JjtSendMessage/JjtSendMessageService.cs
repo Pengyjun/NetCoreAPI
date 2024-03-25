@@ -2209,7 +2209,7 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
                     DayActualValue = dayValue,
                 };
                 if (projectPalnProduction!=0) {
-                    projectRank.CompleteRate = Math.Round(projectRank.CurrentYearCompleteProductionValue / projectRank.CurrentYearPlanProductionValue, 2);
+                    projectRank.CompleteRate = Math.Round((projectRank.CurrentYearCompleteProductionValue / projectRank.CurrentYearPlanProductionValue)*100, 2);
                 }
                 projectRankList.Add(projectRank);
             }
@@ -2218,6 +2218,12 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
             projectBasePoduction.TotalCurrentYearPlanProductionValue = projectBasePoduction.ProjectRanks.Sum(x => x.CurrentYearPlanProductionValue);
             projectBasePoduction.TotalCurrentYearCompleteProductionValue= projectBasePoduction.ProjectRanks.Sum(x => x.CurrentYearCompleteProductionValue);
             projectBasePoduction.SumCompleteRate = Math.Round((projectBasePoduction.TotalCurrentYearCompleteProductionValue / projectBasePoduction.TotalCurrentYearPlanProductionValue) * 100, 2);
+            var totalYearCompletRate = 0M;
+            if (projectBasePoduction.TotalCurrentYearCompleteProductionValue != 0)
+            {
+                totalYearCompletRate = Math.Round((projectBasePoduction.TotalCurrentYearCompleteProductionValue / projectBasePoduction.TotalCurrentYearPlanProductionValue) * 100, 2);
+            }
+            projectBasePoduction.TotalCompleteRate = totalYearCompletRate;
             projectBasePoduction.SumProjectRanksTen = projectBasePoduction.ProjectRanks.Sum(x => x.DayActualValue.Value);
             #endregion
 
