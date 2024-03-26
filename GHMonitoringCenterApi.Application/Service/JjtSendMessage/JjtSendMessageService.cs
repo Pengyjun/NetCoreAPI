@@ -18,6 +18,7 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using NPOI.SS.Formula.Functions;
 using SqlSugar;
+using SqlSugar.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -2683,11 +2684,12 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
             #region 说明：项目生产数据存在不完整部分主要是以下项目未填报
             List<CompanyUnWriteReportInfo> companyUnWriteReportInfos = new List<CompanyUnWriteReportInfo>();
             //统计本周期内已填报的日报
+            var endTimes = endTime.ObjToDate().AddDays(1);
             var writeCompanyReportList = await dbContext.Queryable<DayReport>()
              .Where(x => x.IsDelete == 1
-              && x.CreateTime >= SqlFunc.ToDate(startTime) && x.CreateTime <= SqlFunc.ToDate(endTime)
+              && x.CreateTime >= SqlFunc.ToDate(startTime) && x.CreateTime <= SqlFunc.ToDate(endTimes)
               && x.DateDay >= currentTimeIntUp && x.DateDay <= currentTimeInt
-              && (x.UpdateTime == null || x.UpdateTime >= SqlFunc.ToDate(startTime) && x.UpdateTime <= SqlFunc.ToDate(endTime)))
+              && (x.UpdateTime == null || x.UpdateTime >= SqlFunc.ToDate(startTime) && x.UpdateTime <= SqlFunc.ToDate(endTimes)))
              .ToListAsync();
             //查询项目信息
             var projectList = await dbContext.Queryable<Project>().Where(x => x.IsDelete == 1 && onBuildProjectIds.Contains(x.Id)).ToListAsync();
@@ -2704,7 +2706,7 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
             onBuildProjectIds = onBuildProjectIds.Where(x => satisfyIds.Contains(x)).ToList();
             foreach (var item in onBuildProjectIds)
             {
-                //if (item != "08dbc96f-e397-468f-87ef-4e76075ee535".ToGuid())
+                //if (item != "08db3b35-fb38-4bd7-8839-a36e77dfa19a".ToGuid())
                 //    continue;
 
                 //查询当前项目什么时间变更状态的(变更时间就是当前填写日报的时间)
@@ -2721,7 +2723,7 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
                 var currentWriteReportCount = 0;
                 if (changeTimeInt >= 26)
                 {
-                    currentWriteReportCount = days - changeTimeInt + 26;
+                    currentWriteReportCount = days - (changeTimeInt-1) + 26;
                 }
                 else
                 {
