@@ -2201,7 +2201,7 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
                 var dayValue = 0M;
                 if (dayProductionValue!=null)
                 {
-                    dayValue=Math.Round(dayProductionValue.DayActualProductionAmount / 10000000, 2);
+                    dayValue=Math.Round(dayProductionValue.DayActualProductionAmount / 10000, 2);
                 }
                 ProjectRank projectRank = new ProjectRank()
                 {
