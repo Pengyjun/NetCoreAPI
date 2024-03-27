@@ -1726,8 +1726,8 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
             var projectIds = await dbContext.Queryable<Project>().Where(x => x.IsDelete == 1).ToListAsync();
             foreach (var item in companyList)
             {
-                if (item.ItemId != "11c9c978-9ef3-411d-ba70-0d0eed93e048".ToGuid())
-                    continue;
+                //if (item.ItemId != "11c9c978-9ef3-411d-ba70-0d0eed93e048".ToGuid())
+                //    continue;
                 //当前公司日产值 || x.UpdateTime >= SqlFunc.ToDate(startTime) && x.UpdateTime <= SqlFunc.ToDate(endTime))
                 decimal currentCompanyCount = dayProductionValueList.Where(x => x.CompanyId == item.ItemId
                   && x.DateDay == currentTimeInt
