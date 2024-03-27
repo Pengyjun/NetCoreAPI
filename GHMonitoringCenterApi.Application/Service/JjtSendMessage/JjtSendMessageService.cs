@@ -1734,7 +1734,7 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
                   ).Sum(x => x.DayActualProductionAmount);
                 //当前公司的累计产值（前几个月报产值加上日产值）
                 var currentMonthCompanyCount = dayProductionValueList
-                    .Where(x => x.CompanyId == item.ItemId && x.DateDay >= currentTimeIntUp && x.DateDay <= currentTimeInt)
+                    .Where(x => x.CompanyId == item.ItemId && x.DateDay >= 20240225 && x.DateDay <= currentTimeInt)
                     .Sum(x => x.DayActualProductionAmount)
                     + GetCompanyProductuionValue(item.ItemId.Value, monthReport, projectIds, monthDiffProductionValue);
                 //年度产值占比 （广航局）
@@ -2706,7 +2706,7 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
             onBuildProjectIds = onBuildProjectIds.Where(x => satisfyIds.Contains(x)).ToList();
             foreach (var item in onBuildProjectIds)
             {
-                //if (item != "08db3b35-fb38-4bd7-8839-a36e77dfa19a".ToGuid())
+                //if (item != "08dbc93a-4536-4ee3-83f2-d63866bbdd1e".ToGuid())
                 //    continue;
 
                 //查询当前项目什么时间变更状态的(变更时间就是当前填写日报的时间)

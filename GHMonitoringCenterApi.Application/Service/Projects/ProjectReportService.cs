@@ -1470,7 +1470,11 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     num += ((item.Dredge ?? 0) + (item.Sail ?? 0) + (item.BlowingWater ?? 0) + (item.SedimentDisposal ?? 0) + (item.BlowingWater ?? 0));
                 }
             }
-            sumReport.WorkingHours += num;
+            if (sumReport != null)
+            {
+                sumReport.WorkingHours += num;
+            }
+           
             #endregion
 
 
