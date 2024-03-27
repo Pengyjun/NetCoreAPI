@@ -1736,7 +1736,7 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
                   ).Sum(x => x.DayActualProductionAmount);
                 //当前公司的累计产值（前几个月报产值加上日产值）
                 var currentMonthCompanyCount = dayProductionValueList
-                    .Where(x => x.CompanyId == item.ItemId && x.DateDay >= 20240225 && x.DateDay <= currentTimeInt)
+                    .Where(x => x.CompanyId == item.ItemId && x.DateDay >20240225 && x.DateDay <= currentTimeInt)
                     .Sum(x => x.DayActualProductionAmount)
                     + GetCompanyProductuionValue(item.ItemId.Value, monthReport, projectIds, monthDiffProductionValue);
                 //年度产值占比 （广航局）
