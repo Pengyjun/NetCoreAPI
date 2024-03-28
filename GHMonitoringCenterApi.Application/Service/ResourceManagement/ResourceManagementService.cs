@@ -124,7 +124,7 @@ namespace GHMonitoringCenterApi.Application.Service.ResourceManagement
                 extendedData.AddRange(shippingList);
                 extendedData.AddRange(dealingUnit);
                 int skipCount = (searchShipTabulationResponseDto.PageIndex - 1) * searchShipTabulationResponseDto.PageSize;
-                var resourcesList = extendedData.Skip(skipCount).Take(searchShipTabulationResponseDto.PageSize).ToList();
+                //var resourcesList = extendedData.Skip(skipCount).Take(searchShipTabulationResponseDto.PageSize).ToList();
                 responseAjaxResult.Data = resourcesList;
                 responseAjaxResult.Count = extendedData.Count;
                 responseAjaxResult.Success();
