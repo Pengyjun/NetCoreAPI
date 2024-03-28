@@ -1474,7 +1474,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             {
                 sumReport.WorkingHours += num;
             }
-           
+
             #endregion
 
 
@@ -5301,9 +5301,14 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             var keyNoteList = await SearchKeynoteShipExcelAsync(putExcelRequestDto, ownShipList, projectList, ownList);
 
             List<OutPutInfo> outPutInfos = new List<OutPutInfo>();
-
+            #region Excel使用
+            var projectIds = projectList.Select(x => x.Id).ToArray();
+            // 累计产值/产量
+            var sumMonthReports = await SumMonthReportsAsync(projectIds);
+            #endregion
             foreach (var item in company)
             {
+                #region 
                 OutPutInfo outPutInfo = new OutPutInfo();
                 outPutInfo.CompanySort = item.Sort;
                 outPutInfo.CompanyId = item.CompanyId;
@@ -5363,10 +5368,21 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 {
                     continue;
                 }
+
+                #endregion
                 //开累值计算
-                var ownValue = monthReportList.Where(x => x.ProjectId == item.ProjectId && x.OutPutType == ConstructionOutPutType.Self && x.DateMonth <= endTime.ToDateMonth() && x.DateMonth > 202306).Sum(x => x.CompleteProductionAmount) / 10000;
-                var subValue = monthReportList.Where(x => x.ProjectId == item.ProjectId && x.OutPutType == ConstructionOutPutType.SubPackage && x.DateMonth <= endTime.ToDateMonth() && x.DateMonth > 202306).Sum(x => x.CompleteProductionAmount) / 10000;
-                outPutInfo.TotalOutPutValue = ownValue + subValue + (Convert.ToDecimal(projectHistoryData.FirstOrDefault(x => x.ProjectId == item.ProjectId)?.AccumulatedOutputValue) / 10000);
+                #region 原来的
+                //var ownValue = monthReportList.Where(x => x.ProjectId == item.ProjectId && x.OutPutType == ConstructionOutPutType.Self && x.DateMonth <= endTime.ToDateMonth() && x.DateMonth > 202306).Sum(x => x.CompleteProductionAmount) / 10000;
+                //var subValue = monthReportList.Where(x => x.ProjectId == item.ProjectId && x.OutPutType == ConstructionOutPutType.SubPackage && x.DateMonth <= endTime.ToDateMonth() && x.DateMonth > 202306).Sum(x => x.CompleteProductionAmount) / 10000;
+                //outPutInfo.TotalOutPutValue = ownValue + subValue + (Convert.ToDecimal(projectHistoryData.FirstOrDefault(x => x.ProjectId == item.ProjectId)?.AccumulatedOutputValue) / 10000);
+                #endregion
+                //开累值计算
+                // 项目月报累计统计
+                var sumMonthReport = sumMonthReports.FirstOrDefault(t => t.ProjectId == item.ProjectId);
+                if (sumMonthReport != null)
+                {
+                    outPutInfo.TotalOutPutValue = Math.Round(sumMonthReport.CompleteProductionAmount, 2);
+                }
                 outPutInfos.Add(outPutInfo);
             }
 
@@ -5450,6 +5466,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
         {
             //获取产值产量汇总
             var data = SearchProjectOutPutExcelAsync(putExcelRequestDto);
+
             //模板位置
             //var templatePath = @"D:\GHJCode\wom.api\GHMonitoringCenterApi.Domain.Shared\Template\Excel\ProjectMonthOutPutTemplate.xlsx";
             var templatePath = $"Template/Excel/ProjectMonthOutPutTemplate.xlsx";

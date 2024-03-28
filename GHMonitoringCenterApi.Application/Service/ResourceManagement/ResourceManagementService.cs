@@ -62,9 +62,9 @@ namespace GHMonitoringCenterApi.Application.Service.ResourceManagement
                 .Select((x, y) => new SearchShipTabulationRequestDto { Id = x.PomId, Name = x.Name, DealingUnitName = y.Name, TypeName = "自有船舶", RequestType = false })
                .ToListAsync();
                 extendedData.AddRange(shippingList);
-                int skipCount = (searchShipTabulationResponseDto.PageIndex - 1) * searchShipTabulationResponseDto.PageSize;
-                var resourcesList = extendedData.Skip(skipCount).Take(searchShipTabulationResponseDto.PageSize).ToList();
-                responseAjaxResult.Data = resourcesList;
+               // int skipCount = (searchShipTabulationResponseDto.PageIndex - 1) * searchShipTabulationResponseDto.PageSize;
+                //var resourcesList = extendedData.Skip(skipCount).Take(searchShipTabulationResponseDto.PageSize).ToList();
+                responseAjaxResult.Data = extendedData;
                 responseAjaxResult.Count = extendedData.Count;
                 responseAjaxResult.Success();
             }

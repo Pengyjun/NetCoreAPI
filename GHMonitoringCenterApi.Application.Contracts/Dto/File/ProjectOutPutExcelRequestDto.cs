@@ -16,5 +16,6 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.File
 		/// 查询日期
 		/// </summary>
 		public DateTime SearchTime { get; set; }
-	}
+
+    }
 }
