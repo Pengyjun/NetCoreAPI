@@ -1563,14 +1563,25 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
             //今年已过多少天
             var dayOfYear = 0;
             //if (int.Parse(DateTime.Now.ToString("yyyyMMdd")) > startYearTimeInt && int.Parse(DateTime.Now.ToString("yyyyMMdd")) < int.Parse(DateTime.Now.AddYears(-1).ToString("yyyy1231")))
-            if (int.Parse(DateTime.Now.ToString("yyyyMMdd")) > startYearTimeInt && int.Parse(DateTime.Now.ToString("yyyyMMdd")) < int.Parse(yearStartTime + "1231"))
+            //if (int.Parse(DateTime.Now.ToString("yyyyMMdd")) > startYearTimeInt && int.Parse(DateTime.Now.ToString("yyyyMMdd")) < int.Parse(yearStartTime + "1231"))
+            //{
+            //    dayOfYear = ofdays+ DateTime.Now.DayOfYear;
+            //}
+            //else
+            //{
+            //    //这个6天是上一年1226-1231之间的天数
+            //    dayOfYear = DateTime.Now.DayOfYear + 5;
+            //}
+
+            if (int.Parse(DateTime.Now.ToString("yyyyMMdd"))>int.Parse(DateTime.Now.Year+ "1231"))
             {
-                dayOfYear = ofdays+ DateTime.Now.DayOfYear;
+                var diffDay = TimeHelper.GetTimeSpan(DateTime.Now.ToString("yyyy-12-26").ObjToDate(), DateTime.Now);
+                dayOfYear = diffDay.Days;
             }
             else
             {
                 //这个6天是上一年1226-1231之间的天数
-                dayOfYear = DateTime.Now.DayOfYear + 6;
+                dayOfYear = DateTime.Now.DayOfYear-1 + 5;
             }
             #endregion
 
@@ -1721,7 +1732,7 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
             // var yearProductionValue = companyList.Sum(x => x.YearProductionValue) + dayProductionValueList.Sum(x => x.DayActualProductionAmount);
             var yearProductionValue = dayProductionValueList.Sum(x => x.DayActualProductionAmount);
             //项目月报数据
-            var monthReport = await dbContext.Queryable<MonthReport>().Where(x => x.IsDelete == 1 && x.DateYear == 2024).ToListAsync();
+            var monthReport = await dbContext.Queryable<MonthReport>().Where(x => x.IsDelete == 1 && x.DateMonth>=202401).ToListAsync();
             //
             var projectIds = await dbContext.Queryable<Project>().Where(x => x.IsDelete == 1).ToListAsync();
             foreach (var item in companyList)
@@ -1735,9 +1746,9 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
                   //|| x.UpdateTime >= SqlFunc.ToDate(startTime) && x.UpdateTime <= SqlFunc.ToDate(endTime)
                   ).Sum(x => x.DayActualProductionAmount);
                 //当前公司的累计产值（前几个月报产值加上日产值）
-                var currentMonthCompanyCount = dayProductionValueList
-                    .Where(x => x.CompanyId == item.ItemId && x.DateDay >=20240225 && x.DateDay <= currentTimeInt)
-                    .Sum(x => x.DayActualProductionAmount)
+                var currentMonthCompanyCount =Math.Round( dayProductionValueList
+                    .Where(x => x.CompanyId == item.ItemId && x.DateDay >20240326 && x.DateDay <= currentTimeInt)
+                    .Sum(x => x.DayActualProductionAmount),2)
                     + GetCompanyProductuionValue(item.ItemId.Value, monthReport, projectIds, monthDiffProductionValue);
                 //年度产值占比 （广航局）
                 //var yearProductionValuePercent = Math.Round(((decimal)(item.YearProductionValue + currentMonthCompanyCount) / yearProductionValue) * 100, 2);
@@ -4798,20 +4809,21 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
         {
             //此事件段是填写月报的时间  此时间段不加入 当前月报产值
             //判断是否加入当前月的月报产值
-            var day = DateTime.Now.AddDays(-1).Day;
-            if (day >= 27 || day <=26)
-            {
-                var singleCompany = monthDiffProductionValues.SingleOrDefault(x => x.IsDelete == 1 && x.CompanyId == companyId);
-                if(singleCompany!=null)
-                return singleCompany.ProductionValue.Value*100000000;
-                return 0M;
-            }
-            else {
+            //var day = DateTime.Now.AddDays(-1).Day;
+            //if (day >= 27 || day <=15)
+            //{
+            //    var singleCompany = monthDiffProductionValues.SingleOrDefault(x => x.IsDelete == 1 && x.CompanyId == companyId);
+            //    if(singleCompany!=null)
+            //    return singleCompany.ProductionValue.Value*100000000;
+            //    return 0M;
+            //}
+            //else {
                 var ids = projects.Where(x => x.CompanyId.Value == companyId).Select(x => x.Id).ToList();
                 //已完成月报的产值
-                return  data.Where(x =>ids.Contains(x.ProjectId)).Sum(x => x.CompleteProductionAmount);
+                var res=  data.Where(x =>ids.Contains(x.ProjectId)).Sum(x => x.CompleteProductionAmount);
+            return res;
 
-            }
+           // }
            
         }
     }
