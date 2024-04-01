@@ -1747,7 +1747,7 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
                   ).Sum(x => x.DayActualProductionAmount);
                 //当前公司的累计产值（前几个月报产值加上日产值）
                 var currentMonthCompanyCount =Math.Round( dayProductionValueList
-                    .Where(x => x.CompanyId == item.ItemId && x.DateDay >20240326 && x.DateDay <= currentTimeInt)
+                    .Where(x => x.CompanyId == item.ItemId && x.DateDay >=20240326 && x.DateDay <= currentTimeInt)
                     .Sum(x => x.DayActualProductionAmount),2)
                     + GetCompanyProductuionValue(item.ItemId.Value, monthReport, projectIds, monthDiffProductionValue);
                 //年度产值占比 （广航局）
@@ -1846,7 +1846,7 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
                     //var totalYearProductionValue = Math.Round(((item.YearProductionValue + currentMonthCompanyCount) / 100000000), 2);
                     var totalYearProductionValue = Math.Round(((currentMonthCompanyCount) / 100000000), 2);
                     //超序时进度
-                    var supersequenceProgress = yearIndex.Value != 0 ? (Math.Round(totalYearProductionValue / yearIndex.Value, 2) * 100 - timeProgress) : 0;
+                    var supersequenceProgress = yearIndex.Value != 0 ? (Math.Round((totalYearProductionValue / yearIndex.Value) * 100,2) - timeProgress) : 0;
                     companyBasePoductionValues.Add(new CompanyBasePoductionValue()
                     {
                         Name = item.Name,
@@ -1972,7 +1972,7 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
                     //广航局年度指标
                     yearIndex = comonDataProductionList.Sum(x => x.YearIndex.Value);
                     //超序时进度
-                    projectBasePoduction.SupersequenceProgress = yearIndex.Value != 0 ? (Math.Round(projectBasePoduction.TotalYearProductionValue / yearIndex.Value, 2) * 100 - timeProgress) : 0;
+                    projectBasePoduction.SupersequenceProgress = yearIndex.Value != 0 ? (Math.Round((projectBasePoduction.TotalYearProductionValue / yearIndex.Value)*100,2) - timeProgress) : 0;
                     companyBasePoductionValues.Add(new CompanyBasePoductionValue()
                     {
                         Name = name,
