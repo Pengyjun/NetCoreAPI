@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
+using CH.Simple.Web.Extensions;
 
 namespace CH.Simple.APP.API.Controllers
 {
@@ -38,14 +39,8 @@ namespace CH.Simple.APP.API.Controllers
             if (!string.IsNullOrEmpty(name))
                 queryable = queryable.Where(x => x.Name.Contains(name));
 
-            var pageResult = new PageResult<User>
-            {
-                PageIndex = pageIndex,
-                PageSize = pageSize,
-                TotalCount = queryable.LongCount(),
-                List = await queryable._Page(pageIndex, pageSize).ToListAsync()
-            };
-            return Ok(pageResult);
+            var list = await queryable.ToPageResultAsync(pageIndex, pageSize);
+            return Ok(list);
         }
 
         /// <summary>
@@ -135,6 +130,6 @@ namespace CH.Simple.APP.API.Controllers
             _context.SaveChanges();
             return Ok("修改成功");
         }
-      
+
     }
 }

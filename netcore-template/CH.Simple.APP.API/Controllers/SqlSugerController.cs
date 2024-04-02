@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SqlSugar;
 using System.Drawing.Printing;
+using CH.Simple.Web.Extensions;
 
 namespace CH.Simple.APP.API.Controllers
 {
@@ -32,16 +33,9 @@ namespace CH.Simple.APP.API.Controllers
         public async Task<IActionResult> GetUserAsync([FromQuery] string? name, [FromQuery] int pageIndex = 1, [FromQuery] int pageSize = 15)
         {
             int totalCount=0;
-            var list = _context.Queryable<User>().ToPageList(pageIndex, pageSize, ref totalCount);
+            var list = _context.Queryable<User>().ToPageResult(pageIndex, pageSize, ref totalCount);
 
-            var pageResult = new PageResult<User>
-            {
-                PageIndex = pageIndex,
-                PageSize = pageSize,
-                TotalCount = totalCount,
-                List = list
-            };
-            return Ok(pageResult);
+            return Ok(list);
         }
 
         /// <summary>
