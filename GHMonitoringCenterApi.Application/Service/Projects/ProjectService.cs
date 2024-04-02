@@ -732,6 +732,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                  {
                      Id = p.Id,
                      Name = p.Name,
+                     MasterCode = p.MasterCode,
                      Code = p.Code,
                      ShortName = p.ShortName,
                      AreaName = p.AreaId.ToString(),
