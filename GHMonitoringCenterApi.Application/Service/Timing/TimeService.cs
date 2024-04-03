@@ -47,6 +47,7 @@ namespace GHMonitoringCenterApi.Application.Service.Timing
         public IBaseRepository<Company> baseCompanyRepository { get; set; }
         public IBaseRepository<Model.User> baseUserRepository { get; set; }
         public IBaseRepository<Currency> baseCurrencyRepository { get; set; }
+        public IBaseRepository<DealingUnitCache> baseDealingUnitCacheRepository { get; set; }
         public IBaseRepository<DealingUnit> baseDealingUnitRepository { get; set; }
         public IBaseRepository<Project> baseProjectRepository { get; set; }
         public IBaseRepository<ProjectStatus> baseProjectStatusRepository { get; set; }
@@ -66,13 +67,14 @@ namespace GHMonitoringCenterApi.Application.Service.Timing
         public ISqlSugarClient dbContext { get; set; }
 
         private readonly ILogger<TimeService> _logger;
-        public TimeService(IBaseRepository<Model.ProjectMasterData> baseProjectMasterDataRepository, IBaseRepository<SubShip> baseSubShipRepository, IBaseRepository<OwnerShip> baseOwnerShipRepository, IBaseRepository<ShipPingType> baseShipPingTypeRepository, IBaseRepository<ProjectDepartment> baseProjectDepartmentRepository, IBaseRepository<WaterCarriage> baseWaterCarriageRepository, IBaseRepository<IndustryClassification> baseIndustryClassificationRepository, IBaseRepository<ConstructionQualification> baseConstructionQualificationRepository, IBaseRepository<ProjectScale> baseProjectScaleRepository, IBaseRepository<ProjectType> baseProjectTypeRepository, IBaseRepository<Province> baseProvinceRepository, IBaseRepository<ProjectLeader> baseProjectLeaderRepository, IBaseRepository<Company> baseCompanyRepository, IBaseRepository<Model.User> baseUserRepository, IBaseRepository<Currency> baseCurrencyRepository, IBaseRepository<DealingUnit> baseDealingUnitRepository, IBaseRepository<Project> baseProjectRepository, IBaseRepository<ProjectStatus> baseProjectStatusRepository, IBaseRepository<ProjectArea> baseProjectAreaRepository, IBaseRepository<Institution> basePomInstitutionRepository, IBaseRepository<ProjectOrg> basePomProjectOrgRepository, IBaseRepository<ProjectAnnualPlan> basePomProjectYearPlan, IBaseRepository<PortData> basePortDataRepository,
+        public TimeService(IBaseRepository<Model.ProjectMasterData> baseProjectMasterDataRepository, IBaseRepository<SubShip> baseSubShipRepository, IBaseRepository<OwnerShip> baseOwnerShipRepository, IBaseRepository<ShipPingType> baseShipPingTypeRepository, IBaseRepository<ProjectDepartment> baseProjectDepartmentRepository, IBaseRepository<WaterCarriage> baseWaterCarriageRepository, IBaseRepository<IndustryClassification> baseIndustryClassificationRepository, IBaseRepository<ConstructionQualification> baseConstructionQualificationRepository, IBaseRepository<ProjectScale> baseProjectScaleRepository, IBaseRepository<ProjectType> baseProjectTypeRepository, IBaseRepository<Province> baseProvinceRepository, IBaseRepository<ProjectLeader> baseProjectLeaderRepository, IBaseRepository<Company> baseCompanyRepository, IBaseRepository<Model.User> baseUserRepository, IBaseRepository<Currency> baseCurrencyRepository, IBaseRepository<DealingUnitCache> baseDealingUnitRepository, IBaseRepository<Project> baseProjectRepository, IBaseRepository<ProjectStatus> baseProjectStatusRepository, IBaseRepository<ProjectArea> baseProjectAreaRepository, IBaseRepository<Institution> basePomInstitutionRepository, IBaseRepository<ProjectOrg> basePomProjectOrgRepository, IBaseRepository<ProjectAnnualPlan> basePomProjectYearPlan, IBaseRepository<PortData> basePortDataRepository,
             IBaseRepository<Soil> baseSoilRepository,
             IBaseRepository<ShipWorkType> baseShipWorkTypeRepository,
             IBaseRepository<ShipWorkMode> baseShipWorkModeRepository,
             IBaseRepository<SoilGrade> baseSoilGradeRepository,
             IBaseRepository<ShipClassic> baseShipClassicRepository,
-            IMapper mapper, ISqlSugarClient dbContext, ILogger<TimeService> logger)
+            IMapper mapper, ISqlSugarClient dbContext, ILogger<TimeService> logger,
+            IBaseRepository<DealingUnit> baseUnitRepository)
         {
             this.baseProjectMasterDataRepository = baseProjectMasterDataRepository;
             this.baseSubShipRepository = baseSubShipRepository;
@@ -89,7 +91,8 @@ namespace GHMonitoringCenterApi.Application.Service.Timing
             this.baseCompanyRepository = baseCompanyRepository;
             this.baseUserRepository = baseUserRepository;
             this.baseCurrencyRepository = baseCurrencyRepository;
-            this.baseDealingUnitRepository = baseDealingUnitRepository;
+            this.baseDealingUnitCacheRepository = baseDealingUnitCacheRepository;
+            this.baseDealingUnitRepository = baseUnitRepository;
             this.baseProjectRepository = baseProjectRepository;
             this.baseProjectStatusRepository = baseProjectStatusRepository;
             this.baseProjectAreaRepository = baseProjectAreaRepository;
@@ -163,7 +166,7 @@ namespace GHMonitoringCenterApi.Application.Service.Timing
                 systemIdentificationCode = AppsettingsHelper.GetValue("MDM:BusinessRelatedUnit:SystemIdentificationCode");
                 functionAuthorizationCode = AppsettingsHelper.GetValue("MDM:BusinessRelatedUnit:FunctionAuthorizationCode");
                 url += "&systemIdentificationCode=" + systemIdentificationCode + "&functionAuthorizationCode=" + functionAuthorizationCode;
-                dirParame.Add("pageSize", "1000000");
+                dirParame.Add("pageSize", "10000000");
             }
             else if (parame == 6)
             {
@@ -528,103 +531,53 @@ namespace GHMonitoringCenterApi.Application.Service.Timing
                 if (parame == 5)
                 {
                     //广航所有往来单位数据
-                    var dealingUnits = await baseDealingUnitRepository.AsQueryable().Where(x => x.IsDelete == 1).ToListAsync();
-
-                    ////zbps   zusccs
-                    ////国内的
-                    //var chinaZuscc = dealingUnits.Where(x => !string.IsNullOrWhiteSpace(x.ZUSCC)).Select(x => x.ZUSCC).ToList();
-                    ////海外的
-                    //var haiwaiZbp = dealingUnits.Where(x => string.IsNullOrWhiteSpace(x.ZUSCC)).Select(x => x.ZBP).ToList();
+                    var dealingUnits = await baseDealingUnitCacheRepository.AsQueryable().Where(x => x.IsDelete == 1).ToListAsync();
                     var responseData = responseResult.Result.Data as List<PomDealingUnitResponseDto>;
-
-                    //循环次数
-                    var forCount = responseData.Count() % 1000M == 0 ? responseData.Count() / 1000M : Math.Floor(responseData.Count() / 1000M) + 1;
-
-                    if (responseData.Count() > 0)//获取到了数据 删掉原来的所有的数据 重新全部写入
+                    List<DealingUnitCache> dealingUnitCaches = new List<DealingUnitCache>();
+                    foreach (var item in responseData)
                     {
-                        await dbContext.Deleteable<DealingUnit>().ExecuteCommandAsync();
-
-                        for (int i = 0; i < forCount; i++)
+                        var res = dealingUnits.Where(x => x.PomId == item.PomId && x.ZBPNAME_ZH == item.ZBPNAME_ZH).SingleOrDefault();
+                        if (res == null)
                         {
-                            var responsePagesData = responseData.Skip(i * 1000).Take(1000).ToList();
-                            foreach (var item in responsePagesData)
+                            dealingUnitCaches.Add(new DealingUnitCache()
                             {
-                                item.PomId = GuidUtil.Next();
-                                item.Id = GuidUtil.Next();
-                                item.CreateTime = DateTime.Now;
-                            }
-
-                            var insdealingUnitList = mapper.Map<List<PomDealingUnitResponseDto>, List<DealingUnit>>(responsePagesData);
-                            await dbContext.Fastest<DealingUnit>().BulkCopyAsync(insdealingUnitList);
-
-                            ////需要修改的数据
-                            ////一种国内的数据  ZUSCC信用编码不可能为空
-                            //var chinaData = responsePagesData.Where(x => !string.IsNullOrWhiteSpace(x.ZUSCC)).ToList();
-                            ////一种国外的数据 zbp不会是空  ZUSCC信用编码为空
-                            //var haiwaiData = responsePagesData.Where(x => string.IsNullOrWhiteSpace(x.ZUSCC)).ToList();
-
-                            ////需要新增的国内的
-                            //var addChinaData = chinaData.Where(x => !chinaZuscc.Contains(x.ZUSCC)).ToList();
-                            ////需要新增的海外的
-                            //var addHaiwaiData = haiwaiData.Where(x => !haiwaiZbp.Contains(x.ZBP)).ToList();
-
-                            //var addZuscc = addChinaData.Select(x => x.ZUSCC).ToList();
-                            //var addZbp = addHaiwaiData.Select(x => x.ZBP).ToList();
-                            ////需要修改的国内的  不包含新增的数据
-                            //var upChinaData = chinaData.Where(x => !addZuscc.Contains(x.ZUSCC)).ToList();
-                            ////需要修改的海外的
-                            //var upHaiWaiData = haiwaiData.Where(x => !addZbp.Contains(x.ZBP)).ToList();
-
-                            //if (addChinaData.Count() > 0)
-                            //{
-                            //    foreach (var item in addChinaData)
-                            //    {
-                            //        item.PomId = GuidUtil.Next();
-                            //        item.Id = GuidUtil.Next();
-                            //    }
-                            //    var insdealingUnitList = mapper.Map<List<PomDealingUnitResponseDto>, List<DealingUnit>>(addChinaData);
-                            //    await dbContext.Fastest<DealingUnit>().BulkCopyAsync(insdealingUnitList);
-                            //}
-                            //if (addHaiwaiData.Count() > 0)
-                            //{
-                            //    foreach (var item in addHaiwaiData)
-                            //    {
-                            //        item.PomId = GuidUtil.Next();
-                            //        item.Id = GuidUtil.Next();
-                            //    }
-                            //    var insdealingUnitList = mapper.Map<List<PomDealingUnitResponseDto>, List<DealingUnit>>(addHaiwaiData);
-                            //    await dbContext.Fastest<DealingUnit>().BulkCopyAsync(insdealingUnitList);
-                            //}
-                            //if (upChinaData.Count() > 0)
-                            //{
-                            //    foreach (var item in upChinaData)
-                            //    {
-                            //        var exist = dealingUnits.FirstOrDefault(x => x.ZUSCC == item.ZUSCC);
-                            //        if (exist != null)
-                            //        {
-                            //            item.PomId = exist.PomId;
-                            //            item.Id = exist.Id;
-                            //        }
-                            //    }
-                            //    var updealingUnitList = mapper.Map<List<PomDealingUnitResponseDto>, List<DealingUnit>>(upChinaData);
-                            //    await dbContext.Fastest<DealingUnit>().BulkUpdateAsync(updealingUnitList);
-                            //}
-                            //if (upHaiWaiData.Count() > 0)
-                            //{
-                            //    foreach (var item in upHaiWaiData)
-                            //    {
-                            //        var exist = dealingUnits.FirstOrDefault(x => x.ZBP == item.ZBP);
-                            //        if (exist != null)
-                            //        {
-                            //            item.PomId = exist.PomId;
-                            //            item.Id = exist.Id;
-                            //        }
-                            //    }
-                            //    var updealingUnitList = mapper.Map<List<PomDealingUnitResponseDto>, List<DealingUnit>>(upHaiWaiData);
-                            //    await dbContext.Fastest<DealingUnit>().BulkUpdateAsync(updealingUnitList);
-                            //}
+                                ZBPNAME_ZH = item.ZBPNAME_ZH,
+                                Id = GuidUtil.Next(),
+                                ZBPNAME_EN = item.ZBPNAME_EN,
+                                ZBP = item.ZBP,
+                                ZBRNO = item.ZBRNO,
+                                ZBPSTATE = item.ZBPSTATE,
+                                ZIDNO = item.ZIDNO,
+                                ZUSCC = item.ZUSCC,
+                                CreateTime = DateTime.Now
+                            });
                         }
                     }
+                    await dbContext.Fastest<DealingUnitCache>().BulkCopyAsync(dealingUnitCaches);
+
+                    ////循环次数
+                    //var forCount = responseData.Count() % 1000M == 0 ? responseData.Count() / 1000M : Math.Floor(responseData.Count() / 1000M) + 1;
+
+                    //if (responseData.Count() > 0)//获取到了数据 删掉原来的所有的数据 重新全部写入
+                    //{
+                    //    await dbContext.Deleteable<DealingUnit>().ExecuteCommandAsync();
+
+                    //    for (int i = 0; i < forCount; i++)
+                    //    {
+                    //        var responsePagesData = responseData.Skip(i * 1000).Take(1000).ToList();
+                    //        foreach (var item in responsePagesData)
+                    //        {
+                    //            item.PomId = GuidUtil.Next();
+                    //            item.Id = GuidUtil.Next();
+                    //            item.CreateTime = DateTime.Now;
+                    //        }
+
+                    //        var insdealingUnitList = mapper.Map<List<PomDealingUnitResponseDto>, List<DealingUnit>>(responsePagesData);
+                    //        await dbContext.Fastest<DealingUnit>().BulkCopyAsync(insdealingUnitList);
+
+
+                    //    }
+                    //}
 
                     #region 原代码
                     //try
@@ -2188,9 +2141,6 @@ namespace GHMonitoringCenterApi.Application.Service.Timing
         #endregion
 
 
-
-
-
         #region 定时同步每个公司的每天的完成产值汇总 
         /// <summary>
         /// 定时同步每个公司的每天的完成产值汇总 
@@ -2325,5 +2275,48 @@ namespace GHMonitoringCenterApi.Application.Service.Timing
 
         }
         #endregion
+
+
+
+        /// <summary>
+        /// 定时同步往来单位数据
+        /// </summary>
+        /// <returns></returns>
+        public async Task<string> SynchronizationDealUnitsync() 
+        {
+            try
+            {
+                //中间表
+                 var baseDealCache= await baseDealingUnitCacheRepository.AsQueryable().Where(x => x.IsDelete == 1).ToListAsync();
+                //目标表
+                var baseDeal= await baseDealingUnitRepository.AsQueryable().Where(x => x.IsDelete == 1).ToListAsync();
+
+                List<DealingUnit>  dealingUnits = new List<DealingUnit>();
+                foreach (var item in baseDealCache)
+                {
+                    var res = baseDeal.Where(x => x.PomId == item.PomId && x.ZBPNAME_ZH == item.ZBPNAME_ZH).SingleOrDefault();
+                    dealingUnits.Add(new DealingUnit()
+                    {
+                        ZBPNAME_ZH = item.ZBPNAME_ZH,
+                        Id = GuidUtil.Next(),
+                        ZBPNAME_EN = item.ZBPNAME_EN,
+                        ZBP = item.ZBP,
+                        ZBRNO = item.ZBRNO,
+                        ZBPSTATE = item.ZBPSTATE,
+                        ZIDNO = item.ZIDNO,
+                        ZUSCC = item.ZUSCC,
+                        CreateTime = DateTime.Now,
+                        UpdateTime = DateTime.Now,
+                    });
+                }
+                var flag= await dbContext.Insertable<DealingUnit>(dealingUnits).ExecuteCommandAsync();
+                return flag > 0 ? "成功" : "失败";
+            }
+            catch (Exception ex)
+            {
+
+                return (ex.Message + Environment.NewLine + ex.StackTrace).ToString();
+            }
+        }
     }
 }
