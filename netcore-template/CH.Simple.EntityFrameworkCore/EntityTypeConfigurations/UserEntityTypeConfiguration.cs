@@ -37,7 +37,7 @@ namespace CH.Simple.EntityFrameworkCore.EntityTypeConfigurations
             builder.Property(e => e.Modified)
                 .HasColumnName("modified");
 
-            builder.Property(e => e.ModifieBy)
+            builder.Property(e => e.ModifiedBy)
                 .HasColumnName("modifie_by");
 
             builder.Property(e => e.IsDelete)

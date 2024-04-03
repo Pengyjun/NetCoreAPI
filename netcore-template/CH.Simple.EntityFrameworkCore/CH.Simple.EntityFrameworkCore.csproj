@@ -11,6 +11,7 @@
 	</ItemGroup>
 	<ItemGroup>
 	  <ProjectReference Include="..\CH.Simple.Entities\CH.Simple.Entities.csproj" />
+	  <ProjectReference Include="..\CH.Simple.Utils\CH.Simple.Utils.csproj" />
 	</ItemGroup>
 
 </Project>

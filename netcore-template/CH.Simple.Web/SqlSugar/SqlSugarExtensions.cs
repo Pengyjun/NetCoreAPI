@@ -1,6 +1,5 @@
 ﻿using CH.Simple.Utils;
-using HNKC.Tide.Entities.BaseEntities;
-using HNKC.Tide.Utils;
+using CH.Simple.Web.Models;
 using Microsoft.Extensions.DependencyInjection;
 using SqlSugar;
 
@@ -8,6 +7,11 @@ namespace CH.Simple.Web.SqlSugar
 {
     public static class SqlSugarExtensions
     {
+        /// <summary>
+        /// 注入SqlSugar
+        /// </summary>
+        /// <param name="services"></param>
+        /// <param name="conn"></param>
         public static void AddSqlSugarContext(this IServiceCollection services, string conn)
         {
             //注册上下文：AOP里面可以获取IOC对象，如果有现成框架比如Furion可以不写这一行
@@ -70,6 +74,46 @@ namespace CH.Simple.Web.SqlSugar
                });
                 return sqlSugar;
             });
+        }
+
+        /// <summary>
+        /// SqlSugar分页查询 同步
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="sugarQueryable"></param>
+        /// <param name="pageIndex"></param>
+        /// <param name="pageSize"></param>
+        /// <param name="totalNumber"></param>
+        /// <returns></returns>
+        public static PageResult<T> ToPageResult<T>(this ISugarQueryable<T> sugarQueryable, int pageIndex, int pageSize, ref int totalNumber)
+        {
+            return new PageResult<T>
+            {
+                PageIndex = pageIndex,
+                PageSize = pageSize,
+                TotalCount = totalNumber,
+                List = sugarQueryable.ToPageList(pageIndex, pageSize, ref totalNumber)
+            };
+        }
+
+        /// <summary>
+        /// SqlSugar分页查询 异步
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="sugarQueryable"></param>
+        /// <param name="pageIndex"></param>
+        /// <param name="pageSize"></param>
+        /// <param name="totalNumber"></param>
+        /// <returns></returns>
+        public static async Task<PageResult<T>> ToPageResultAsync<T>(this ISugarQueryable<T> sugarQueryable, int pageIndex, int pageSize, RefAsync<int> totalNumber)
+        {
+            return new PageResult<T>
+            {
+                PageIndex = pageIndex,
+                PageSize = pageSize,
+                TotalCount = totalNumber,
+                List = await sugarQueryable.ToPageListAsync(pageIndex, pageSize, totalNumber)
+            };
         }
     }
 }

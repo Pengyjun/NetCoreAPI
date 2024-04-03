@@ -8,8 +8,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SqlSugar;
 using System.Drawing.Printing;
-using CH.Simple.Web.Extensions;
 using CH.Simple.Utils;
+using CH.Simple.Web.EFCore;
+using CH.Simple.Web.SqlSugar;
 
 namespace CH.Simple.APP.API.Controllers
 {
@@ -76,7 +77,7 @@ namespace CH.Simple.APP.API.Controllers
                 Created = nowTime,
                 IsDelete = false,
                 Modified = nowTime,
-                ModifieBy = "system"
+                ModifiedBy = "system"
             }).ExecuteCommand();
             return Ok("添加成功！");
         }
@@ -113,7 +114,7 @@ namespace CH.Simple.APP.API.Controllers
                 Id = model.Id,
                 Name = model.Name,
                 Mobile = model.Mobile,
-                ModifieBy = "system",
+                ModifiedBy = "system",
                 Modified = DateTime.Now
             };
             _context.Updateable(user);

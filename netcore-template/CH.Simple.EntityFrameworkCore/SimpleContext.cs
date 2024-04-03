@@ -1,5 +1,6 @@
 ﻿using CH.Simple.Entities;
 using CH.Simple.Entities.BaseEntities;
+using CH.Simple.Utils;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;

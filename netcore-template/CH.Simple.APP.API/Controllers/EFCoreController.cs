@@ -8,8 +8,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
-using CH.Simple.Web.Extensions;
 using CH.Simple.Utils;
+using CH.Simple.Web.EFCore;
 
 namespace CH.Simple.APP.API.Controllers
 {
@@ -81,7 +81,7 @@ namespace CH.Simple.APP.API.Controllers
                 Created = nowTime,
                 IsDelete = false,
                 Modified = nowTime,
-                ModifieBy = "system"
+                ModifiedBy = "system"
             });
             _context.SaveChanges();
             return Ok("添加成功！");
@@ -127,7 +127,7 @@ namespace CH.Simple.APP.API.Controllers
             user.Name = model.Name;
             user.Mobile = model.Mobile;
             user.Modified = DateTime.Now;
-            user.ModifieBy = "system";
+            user.ModifiedBy = "system";
             _context.SaveChanges();
             return Ok("修改成功");
         }
