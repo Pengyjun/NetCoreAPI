@@ -531,9 +531,11 @@ namespace GHMonitoringCenterApi.Application.Service.Timing
                 //往来单位信息
                 if (parame == 5)
                 {
+                    await baseDealingUnitCacheRepository.AsDeleteable().ExecuteCommandAsync();
                     //广航所有往来单位数据
                     var dealingUnits = await baseDealingUnitCacheRepository.AsQueryable().Where(x => x.IsDelete == 1).ToListAsync();
                     var responseData = responseResult.Result.Data as List<PomDealingUnitResponseDto>;
+                    await Console.Out.WriteLineAsync($"拉取数据有:{responseData.Count}");
                     List<DealingUnitCache> dealingUnitCaches = new List<DealingUnitCache>();
                     foreach (var item in responseData)
                     {
@@ -543,8 +545,8 @@ namespace GHMonitoringCenterApi.Application.Service.Timing
                             dealingUnitCaches.Add(new DealingUnitCache()
                             {
                                 ZBPNAME_ZH = item.ZBPNAME_ZH,
-                                Id = GuidUtil.Next(),
-                                PomId = GuidUtil.Next(),
+                                Id = Guid.NewGuid(),
+                                PomId = Guid.NewGuid(),
                                 ZBPNAME_EN = item.ZBPNAME_EN,
                                 ZBP = item.ZBP,
                                 ZBRNO = item.ZBRNO,
@@ -555,8 +557,8 @@ namespace GHMonitoringCenterApi.Application.Service.Timing
                             });
                         }
                     }
-                    await dbContext.Fastest<DealingUnitCache>().BulkCopyAsync(dealingUnitCaches);
-
+                   var count= await dbContext.Fastest<DealingUnitCache>().BulkCopyAsync(dealingUnitCaches);
+                    await Console.Out.WriteLineAsync($"保存成功有多少条:{count}");
                     ////循环次数
                     //var forCount = responseData.Count() % 1000M == 0 ? responseData.Count() / 1000M : Math.Floor(responseData.Count() / 1000M) + 1;
 
