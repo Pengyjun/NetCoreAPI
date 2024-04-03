@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CH.Simple.EntityFrameworkCore
+namespace CH.Simple.Utils
 {
     public class PKManager
     {

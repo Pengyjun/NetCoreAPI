@@ -18,15 +18,15 @@ namespace CH.Simple.Entities.BaseEntities
 
 
         [SugarColumn(ColumnName = "create_by")]//数据库与实体不一样设置列名 
-        public string CreateBy { get; set; }
+        public string? CreateBy { get; set; }
 
 
         [SugarColumn(ColumnName = "modified")]//数据库与实体不一样设置列名 
-        public DateTime Modified { get; set; }
+        public DateTime? Modified { get; set; }
 
 
-        [SugarColumn(ColumnName = "modifie_by")]//数据库与实体不一样设置列名 
-        public string ModifieBy { get; set; }
+        [SugarColumn(ColumnName = "modified_by")]//数据库与实体不一样设置列名 
+        public string? ModifiedBy { get; set; }
 
 
         [SugarColumn(ColumnName = "is_delete")]//数据库与实体不一样设置列名 

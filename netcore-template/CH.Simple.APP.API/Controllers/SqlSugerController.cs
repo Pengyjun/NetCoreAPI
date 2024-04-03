@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using SqlSugar;
 using System.Drawing.Printing;
 using CH.Simple.Web.Extensions;
+using CH.Simple.Utils;
 
 namespace CH.Simple.APP.API.Controllers
 {
