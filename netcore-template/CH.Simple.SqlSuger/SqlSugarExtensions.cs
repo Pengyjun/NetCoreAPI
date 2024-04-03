@@ -3,6 +3,7 @@ using CH.Simple.Utils;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using SqlSugar;
+using System.Security.Claims;
 
 namespace CH.Simple.SqlSuger
 {
@@ -57,7 +58,7 @@ namespace CH.Simple.SqlSuger
                                {
                                    var serviceBuilder = services.BuildServiceProvider();
                                    var _context = serviceBuilder.GetService<IHttpContextAccessor>();
-                                   entityInfo.SetValue(_context?.HttpContext?.User?.FindFirst("userId")?.Value ?? null);
+                                   entityInfo.SetValue(_context?.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? null);
                                }
                                break;
                            case DataFilterType.UpdateByObject:
@@ -70,7 +71,7 @@ namespace CH.Simple.SqlSuger
                                    //获取token内容写入操作人
                                    var serviceBuilder = services.BuildServiceProvider();
                                    var _context = serviceBuilder.GetService<IHttpContextAccessor>();
-                                   entityInfo.SetValue(_context?.HttpContext?.User?.FindFirst("userId")?.Value ?? null);
+                                   entityInfo.SetValue(_context?.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? null);
                                }
                                break;
                        }
