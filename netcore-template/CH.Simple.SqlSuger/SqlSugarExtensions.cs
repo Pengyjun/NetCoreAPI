@@ -68,6 +68,9 @@ namespace CH.Simple.SqlSuger
                                if (entityInfo.PropertyName == "ModifiedBy")//修改人
                                {
                                    //获取token内容写入操作人
+                                   var serviceBuilder = services.BuildServiceProvider();
+                                   var _context = serviceBuilder.GetService<IHttpContextAccessor>();
+                                   entityInfo.SetValue(_context?.HttpContext?.User?.FindFirst("userId")?.Value ?? null);
                                }
                                break;
                        }
