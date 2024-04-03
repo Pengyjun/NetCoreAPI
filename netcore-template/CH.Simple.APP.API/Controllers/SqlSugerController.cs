@@ -48,7 +48,7 @@ namespace CH.Simple.APP.API.Controllers
                 .InSingle(id);
 
             if (user == null)
-                throw new SimpleException("用户不存在");
+                throw new ResultMessageException("用户不存在");
 
             return Ok(user);
         }
@@ -68,7 +68,7 @@ namespace CH.Simple.APP.API.Controllers
                 Id = PKManager.UUID(),
                 Name = model.Name,
                 Mobile = model.Mobile,
-                CreateBy = "system",
+                CreatedBy = "system",
                 Created = nowTime,
                 IsDelete = false,
                 Modified = nowTime,
@@ -82,7 +82,7 @@ namespace CH.Simple.APP.API.Controllers
         /// </summary>
         /// <param name="id">用户id</param>
         /// <returns></returns>
-        /// <exception cref="SimpleException"></exception>
+        /// <exception cref="ResultMessageException"></exception>
         [Route("del")]
         [HttpPost]
         public async Task<IActionResult> DelUserAsync([FromForm] string id)
@@ -99,7 +99,7 @@ namespace CH.Simple.APP.API.Controllers
         /// </summary>
         /// <param name="model">数据模型</param>
         /// <returns></returns>
-        /// <exception cref="SimpleException"></exception>
+        /// <exception cref="ResultMessageException"></exception>
         [Route("modify")]
         [HttpPost]
         public async Task<IActionResult> ModifyUserAsync([FromBody] VUser model)

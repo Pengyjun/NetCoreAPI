@@ -31,7 +31,7 @@ namespace CH.Simple.EntityFrameworkCore.EntityTypeConfigurations
             builder.Property(e => e.Created)
                 .HasColumnName("created");
 
-            builder.Property(e => e.CreateBy)
+            builder.Property(e => e.CreatedBy)
                 .HasColumnName("create_by");
 
             builder.Property(e => e.Modified)

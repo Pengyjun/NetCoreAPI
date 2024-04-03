@@ -17,8 +17,8 @@ namespace CH.Simple.Entities.BaseEntities
         public DateTime Created { get; set; }
 
 
-        [SugarColumn(ColumnName = "create_by")]//数据库与实体不一样设置列名 
-        public string? CreateBy { get; set; }
+        [SugarColumn(ColumnName = "created_by")]//数据库与实体不一样设置列名 
+        public string? CreatedBy { get; set; }
 
 
         [SugarColumn(ColumnName = "modified")]//数据库与实体不一样设置列名 

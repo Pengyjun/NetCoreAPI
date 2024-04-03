@@ -6,16 +6,16 @@ using System.Threading.Tasks;
 
 namespace CH.Simple.Exceptions
 {
-    public class SimpleException : Exception
+    public class ResultMessageException : Exception
     {
-        public SimpleException()
+        public ResultMessageException()
         { }
 
-        public SimpleException(string message)
+        public ResultMessageException(string message)
             : base(message)
         { }
 
-        public SimpleException(string message, Exception innerException)
+        public ResultMessageException(string message, Exception innerException)
             : base(message, innerException)
         { }
     }

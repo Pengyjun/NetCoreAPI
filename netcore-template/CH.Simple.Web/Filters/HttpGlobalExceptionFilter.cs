@@ -13,7 +13,7 @@ namespace CH.Simple.Web.Filters
     {
         public void OnException(ExceptionContext context)
         {
-            if (context.Exception.GetType() == typeof(SimpleException))
+            if (context.Exception.GetType() == typeof(ResultMessageException))
             {
                 context.Result = new OkObjectResult(Result.Fail(context.Exception.Message));
                 context.HttpContext.Response.StatusCode = (int)HttpStatusCode.OK;

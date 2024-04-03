@@ -1,3 +1,4 @@
+using CH.Simple.APP.API;
 using CH.Simple.EntityFrameworkCore;
 using CH.Simple.Web.DateTimeHandler;
 using CH.Simple.Web.Filters;
@@ -46,36 +47,7 @@ builder.Services.AddDbContext<SimpleContext>(options =>
 #endregion
 
 #region SqlSuger
-//注册上下文：AOP里面可以获取IOC对象，如果有现成框架比如Furion可以不写这一行
-builder.Services.AddHttpContextAccessor();
-//注册SqlSugar用AddScoped
-builder.Services.AddScoped<ISqlSugarClient>(s =>
-{
-    //Scoped用SqlSugarClient 
-    SqlSugarClient sqlSugar = new SqlSugarClient(new ConnectionConfig()
-    {
-        DbType = SqlSugar.DbType.MySql,
-        ConnectionString = conn,
-        IsAutoCloseConnection = true,
-    },
-   db =>
-   {
-       //每次上下文都会执行
-
-       //获取IOC对象不要求在一个上下文
-       //var log=s.GetService<Log>()
-
-       //获取IOC对象要求在一个上下文
-       //var appServive = s.GetService<IHttpContextAccessor>();
-       //var log= appServive?.HttpContext?.RequestServices.GetService<Log>();
-
-       db.Aop.OnLogExecuting = (sql, pars) =>
-       {
-
-       };
-   });
-    return sqlSugar;
-});
+builder.AddSqlSugar();
 #endregion
 
 
