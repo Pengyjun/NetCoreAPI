@@ -2299,6 +2299,22 @@ namespace GHMonitoringCenterApi.Application.Service.Timing
                 foreach (var item in baseDealCache)
                 {
                     var res = baseDeal.Where(x => x.ZBP == item.ZBP && x.ZBPNAME_ZH == item.ZBPNAME_ZH).SingleOrDefault();
+                    if (res == null)
+                    {
+                        dealingUnits.Add(new DealingUnit() {
+
+                            ZBPNAME_ZH = item.ZBPNAME_ZH,
+                            Id = item.Id,
+                            PomId = item.PomId.Value,
+                            ZBPNAME_EN = item.ZBPNAME_EN,
+                            ZBP = item.ZBP,
+                            ZBRNO = item.ZBRNO,
+                            ZBPSTATE = item.ZBPSTATE,
+                            ZIDNO = item.ZIDNO,
+                            ZUSCC = item.ZUSCC,
+                            CreateTime = DateTime.Now
+                        });
+                    }
                     dealingUnits.Add(res);
                 }
                 var flag= await dbContext.Insertable<DealingUnit>(dealingUnits).ExecuteCommandAsync();
