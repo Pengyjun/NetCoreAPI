@@ -311,6 +311,7 @@ namespace GHMonitoringCenterApi.Application.Service.Timing
                 token = AppsettingsHelper.GetValue("InitDbDataItem:PomShipClassicDataItem:Token");
             }
             WebHelper webHelper = new WebHelper();
+            webHelper.Timeout = 300;
             if (parame == 1 || parame >= 4 && parame <= 31 && parame != 5)
             {
                 webHelper.Headers.Add("token", token);
@@ -536,14 +537,14 @@ namespace GHMonitoringCenterApi.Application.Service.Timing
                     List<DealingUnitCache> dealingUnitCaches = new List<DealingUnitCache>();
                     foreach (var item in responseData)
                     {
-                        var res = dealingUnits.Where(x => x.PomId == item.PomId && x.ZBPNAME_ZH == item.ZBPNAME_ZH).SingleOrDefault();
+                        var res = dealingUnits.Where(x => x.ZBP == item.ZBP && x.ZBPNAME_ZH == item.ZBPNAME_ZH).SingleOrDefault();
                         if (res == null)
                         {
                             dealingUnitCaches.Add(new DealingUnitCache()
                             {
                                 ZBPNAME_ZH = item.ZBPNAME_ZH,
                                 Id = GuidUtil.Next(),
-                                PomId = item.PomId,
+                                PomId = GuidUtil.Next(),
                                 ZBPNAME_EN = item.ZBPNAME_EN,
                                 ZBP = item.ZBP,
                                 ZBRNO = item.ZBRNO,
@@ -2295,7 +2296,7 @@ namespace GHMonitoringCenterApi.Application.Service.Timing
                 List<DealingUnit>  dealingUnits = new List<DealingUnit>();
                 foreach (var item in baseDealCache)
                 {
-                    var res = baseDeal.Where(x => x.PomId == item.PomId && x.ZBPNAME_ZH == item.ZBPNAME_ZH).SingleOrDefault();
+                    var res = baseDeal.Where(x => x.ZBP == item.ZBP && x.ZBPNAME_ZH == item.ZBPNAME_ZH).SingleOrDefault();
                     dealingUnits.Add(res);
                 }
                 var flag= await dbContext.Insertable<DealingUnit>(dealingUnits).ExecuteCommandAsync();
