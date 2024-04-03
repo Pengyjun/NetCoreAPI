@@ -14,6 +14,7 @@ namespace CH.Simple.Models.CommonResult
         public int Code { get; set; }
         public string Message { get; set; }
         public object? Data { get; set; }
+        public bool IsSuccess { get => Code == 200; }
 
         /// <summary>
         /// 返回成功
