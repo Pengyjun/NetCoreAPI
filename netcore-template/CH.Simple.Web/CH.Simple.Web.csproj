@@ -14,6 +14,7 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\CH.Simple.Exceptions\CH.Simple.Exceptions.csproj" />
+		<ProjectReference Include="..\CH.Simple.Models\CH.Simple.Models.csproj" />
 		<ProjectReference Include="..\CH.Simple.Utils\CH.Simple.Utils.csproj" />
 	</ItemGroup>
 </Project>

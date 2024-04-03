@@ -1,14 +1,8 @@
-﻿using CH.Simple.Web.Models;
-using Microsoft.AspNetCore.Http;
+﻿using CH.Simple.Models.CommonResult;
 using Microsoft.EntityFrameworkCore;
 using SqlSugar;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace CH.Simple.Web.EFCore
+namespace CH.Simple.EntityFrameworkCore
 {
     public static class EntityFrameworkExtensions
     {

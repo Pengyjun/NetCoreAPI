@@ -2,14 +2,9 @@
 using CH.Simple.Entities;
 using CH.Simple.EntityFrameworkCore;
 using CH.Simple.Exceptions;
-using CH.Simple.Web.Models;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
-using System.Linq;
 using CH.Simple.Utils;
-using CH.Simple.Web.EFCore;
 
 namespace CH.Simple.APP.API.Controllers
 {

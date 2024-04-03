@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CH.Simple.Web.Models
+namespace CH.Simple.Models.CommonResult
 {
     /// <summary>
     /// 不带数据返回的结果格式
@@ -89,14 +89,14 @@ namespace CH.Simple.Web.Models
         {
             get
             {
-                return this._PageIndex;
+                return _PageIndex;
             }
             set
             {
                 if (value <= 0)
-                    this._PageIndex = 1;
+                    _PageIndex = 1;
                 else
-                    this._PageIndex = value;
+                    _PageIndex = value;
             }
         }
 
@@ -105,7 +105,7 @@ namespace CH.Simple.Web.Models
         {
             get
             {
-                return this._PageSize;
+                return _PageSize;
             }
             set
             {

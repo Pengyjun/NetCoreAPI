@@ -1,9 +1,9 @@
-﻿using CH.Simple.Utils;
-using CH.Simple.Web.Models;
+﻿using CH.Simple.Models.CommonResult;
+using CH.Simple.Utils;
 using Microsoft.Extensions.DependencyInjection;
 using SqlSugar;
 
-namespace CH.Simple.Web.SqlSugar
+namespace CH.Simple.SqlSuger
 {
     public static class SqlSugarExtensions
     {
@@ -14,8 +14,6 @@ namespace CH.Simple.Web.SqlSugar
         /// <param name="conn"></param>
         public static void AddSqlSugarContext(this IServiceCollection services, string conn)
         {
-            //注册上下文：AOP里面可以获取IOC对象，如果有现成框架比如Furion可以不写这一行
-            services.AddHttpContextAccessor();
             //注册SqlSugar用AddScoped
             services.AddScoped<ISqlSugarClient>(s =>
             {

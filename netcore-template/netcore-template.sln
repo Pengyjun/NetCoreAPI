@@ -9,25 +9,27 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "BuildingBlocks", "BuildingB
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Services", "Services", "{5B400D4B-5CE1-41B8-BF4B-FC5DABED1826}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CH.Simple.Entities", "CH.Simple.Entities\CH.Simple.Entities.csproj", "{59B8257C-82A9-45B5-A937-C8BE59B0C5E4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CH.Simple.Entities", "CH.Simple.Entities\CH.Simple.Entities.csproj", "{59B8257C-82A9-45B5-A937-C8BE59B0C5E4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CH.Simple.Enums", "CH.Simple.Enums\CH.Simple.Enums.csproj", "{9F02F23E-BC3A-473A-8240-C30495ED6DDF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CH.Simple.Enums", "CH.Simple.Enums\CH.Simple.Enums.csproj", "{9F02F23E-BC3A-473A-8240-C30495ED6DDF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CH.Simple.Utils", "CH.Simple.Utils\CH.Simple.Utils.csproj", "{33A67E75-9573-4774-961C-B750BD5442D3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CH.Simple.Utils", "CH.Simple.Utils\CH.Simple.Utils.csproj", "{33A67E75-9573-4774-961C-B750BD5442D3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CH.Simple.Service", "CH.Simple.Service\CH.Simple.Service.csproj", "{02C05EBB-B40A-44B2-832A-D9E70ECDA5C4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CH.Simple.Service", "CH.Simple.Service\CH.Simple.Service.csproj", "{02C05EBB-B40A-44B2-832A-D9E70ECDA5C4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CH.Simple.Web", "CH.Simple.Web\CH.Simple.Web.csproj", "{2B740C77-EFFD-4BEC-8833-D25DACB9249E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CH.Simple.Web", "CH.Simple.Web\CH.Simple.Web.csproj", "{2B740C77-EFFD-4BEC-8833-D25DACB9249E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CH.Simple.Web.API", "CH.Simple.Web.API\CH.Simple.Web.API.csproj", "{B3F026E0-463E-4DAB-84A5-FB299FA38381}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CH.Simple.Web.API", "CH.Simple.Web.API\CH.Simple.Web.API.csproj", "{B3F026E0-463E-4DAB-84A5-FB299FA38381}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CH.Simple.APP.API", "CH.Simple.APP.API\CH.Simple.APP.API.csproj", "{64A952BC-B73D-4B9E-9223-D10F4EE34026}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CH.Simple.APP.API", "CH.Simple.APP.API\CH.Simple.APP.API.csproj", "{64A952BC-B73D-4B9E-9223-D10F4EE34026}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CH.Simple.Exceptions", "CH.Simple.Exceptions\CH.Simple.Exceptions.csproj", "{26C63E6A-F562-4300-A93B-9709DFE9766E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CH.Simple.Exceptions", "CH.Simple.Exceptions\CH.Simple.Exceptions.csproj", "{26C63E6A-F562-4300-A93B-9709DFE9766E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CH.Simple.EntityFrameworkCore", "CH.Simple.EntityFrameworkCore\CH.Simple.EntityFrameworkCore.csproj", "{3F195133-CED8-4598-98CC-EFAAA97ED3B0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CH.Simple.EntityFrameworkCore", "CH.Simple.EntityFrameworkCore\CH.Simple.EntityFrameworkCore.csproj", "{3F195133-CED8-4598-98CC-EFAAA97ED3B0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CH.Simple.SqlSuger", "CH.Simple.SqlSuger\CH.Simple.SqlSuger.csproj", "{F448D2A3-5BE4-4BF7-A83B-EFE0A9B0DA73}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CH.Simple.SqlSuger", "CH.Simple.SqlSuger\CH.Simple.SqlSuger.csproj", "{F448D2A3-5BE4-4BF7-A83B-EFE0A9B0DA73}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CH.Simple.Models", "CH.Simple.Models\CH.Simple.Models.csproj", "{4407EE9C-A953-4B2B-8EEC-CCF10A524C47}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -75,6 +77,10 @@ Global
 		{F448D2A3-5BE4-4BF7-A83B-EFE0A9B0DA73}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F448D2A3-5BE4-4BF7-A83B-EFE0A9B0DA73}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F448D2A3-5BE4-4BF7-A83B-EFE0A9B0DA73}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4407EE9C-A953-4B2B-8EEC-CCF10A524C47}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4407EE9C-A953-4B2B-8EEC-CCF10A524C47}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4407EE9C-A953-4B2B-8EEC-CCF10A524C47}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4407EE9C-A953-4B2B-8EEC-CCF10A524C47}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -92,6 +98,7 @@ Global
 		{26C63E6A-F562-4300-A93B-9709DFE9766E} = {0D84E496-EBCD-4587-B867-7C6BBC5D2623}
 		{3F195133-CED8-4598-98CC-EFAAA97ED3B0} = {0D84E496-EBCD-4587-B867-7C6BBC5D2623}
 		{F448D2A3-5BE4-4BF7-A83B-EFE0A9B0DA73} = {0D84E496-EBCD-4587-B867-7C6BBC5D2623}
+		{4407EE9C-A953-4B2B-8EEC-CCF10A524C47} = {0D84E496-EBCD-4587-B867-7C6BBC5D2623}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {B66B428A-6EED-48C2-A9E4-45B692B68346}

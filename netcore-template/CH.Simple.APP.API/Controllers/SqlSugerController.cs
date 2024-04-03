@@ -2,15 +2,10 @@
 using CH.Simple.Entities;
 using CH.Simple.EntityFrameworkCore;
 using CH.Simple.Exceptions;
-using CH.Simple.Web.Models;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using SqlSugar;
-using System.Drawing.Printing;
 using CH.Simple.Utils;
-using CH.Simple.Web.EFCore;
-using CH.Simple.Web.SqlSugar;
+using CH.Simple.SqlSuger;
 
 namespace CH.Simple.APP.API.Controllers
 {
