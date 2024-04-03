@@ -543,6 +543,7 @@ namespace GHMonitoringCenterApi.Application.Service.Timing
                             {
                                 ZBPNAME_ZH = item.ZBPNAME_ZH,
                                 Id = GuidUtil.Next(),
+                                PomId = item.PomId,
                                 ZBPNAME_EN = item.ZBPNAME_EN,
                                 ZBP = item.ZBP,
                                 ZBRNO = item.ZBRNO,
@@ -2295,19 +2296,7 @@ namespace GHMonitoringCenterApi.Application.Service.Timing
                 foreach (var item in baseDealCache)
                 {
                     var res = baseDeal.Where(x => x.PomId == item.PomId && x.ZBPNAME_ZH == item.ZBPNAME_ZH).SingleOrDefault();
-                    dealingUnits.Add(new DealingUnit()
-                    {
-                        ZBPNAME_ZH = item.ZBPNAME_ZH,
-                        Id = GuidUtil.Next(),
-                        ZBPNAME_EN = item.ZBPNAME_EN,
-                        ZBP = item.ZBP,
-                        ZBRNO = item.ZBRNO,
-                        ZBPSTATE = item.ZBPSTATE,
-                        ZIDNO = item.ZIDNO,
-                        ZUSCC = item.ZUSCC,
-                        CreateTime = DateTime.Now,
-                        UpdateTime = DateTime.Now,
-                    });
+                    dealingUnits.Add(res);
                 }
                 var flag= await dbContext.Insertable<DealingUnit>(dealingUnits).ExecuteCommandAsync();
                 return flag > 0 ? "成功" : "失败";
