@@ -302,7 +302,7 @@ namespace GHMonitoringCenterApi.Application.Service.File
                 var pushJjtUserList = await dbContext.Queryable<DayReportJjtPushConfi>().Where(x => x.IsDelete == 1)
            .ToListAsync();
                 var currentTimeDay = DateTime.Now.Hour;
-                if (currentTimeDay == 11)
+                if (currentTimeDay == 9)
                 {
                     //九点第一批人员发送
                     var pushUsers = pushJjtUserList.Where(x => x.Type == 0).Select(x => x.PushAccount).ToList();
@@ -318,7 +318,7 @@ namespace GHMonitoringCenterApi.Application.Service.File
                     logger.LogWarning($"九点第一批推送人员结果:{pushResult}");
 
                 }
-                else if (currentTimeDay == 10)
+                else if (currentTimeDay ==10)
                 {
                     #region 第二批人员推送 个项目部管理人员
                     //10 第二批人员推送 个项目部管理人员
@@ -363,7 +363,7 @@ namespace GHMonitoringCenterApi.Application.Service.File
                     logger.LogWarning($"10点第二批推送群组人员结果:{pushResult}");
                     #endregion
                 }
-                else if (currentTimeDay >= 12 && currentTimeDay <= 23)
+                else if (currentTimeDay >= 14 && currentTimeDay <= 23)
                 {
                     #region 测试使用
                     ////测试使用 
