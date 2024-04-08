@@ -2231,6 +2231,7 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
             //总计
             projectBasePoduction.TotalCurrentYearPlanProductionValue = projectBasePoduction.ProjectRanks.Sum(x => x.CurrentYearPlanProductionValue);
             projectBasePoduction.TotalCurrentYearCompleteProductionValue= projectBasePoduction.ProjectRanks.Sum(x => x.CurrentYearCompleteProductionValue);
+            if (projectBasePoduction.TotalCurrentYearPlanProductionValue!=0)
             projectBasePoduction.SumCompleteRate = Math.Round((projectBasePoduction.TotalCurrentYearCompleteProductionValue / projectBasePoduction.TotalCurrentYearPlanProductionValue) * 100, 2);
             var totalYearCompletRate = 0M;
             if (projectBasePoduction.TotalYearProductionValue != 0)
