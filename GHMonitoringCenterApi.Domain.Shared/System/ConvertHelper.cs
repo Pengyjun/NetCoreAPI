@@ -110,6 +110,11 @@ namespace System
             //有闰月则实际月份减1
             int month = flag > 0 ? calendar.GetMonth(date) - 1 : calendar.GetMonth(date);
             int day = calendar.GetDayOfMonth(date);
+            if (flag==0&& month==2)//润年
+            {
+                return new DateTime(year, month, 29);
+            }
+
             return new DateTime(year, month, day);
         }
     }
