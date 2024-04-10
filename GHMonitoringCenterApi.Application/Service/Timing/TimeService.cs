@@ -2286,7 +2286,7 @@ namespace GHMonitoringCenterApi.Application.Service.Timing
         /// 定时同步往来单位数据
         /// </summary>
         /// <returns></returns>
-        public async Task<string> SynchronizationDealUnitsync() 
+        public async Task<string> SynchronizationDealUnitsync()
         {
             try
             {
@@ -2294,35 +2294,31 @@ namespace GHMonitoringCenterApi.Application.Service.Timing
                  var baseDealCache= await baseDealingUnitCacheRepository.AsQueryable().Where(x => x.IsDelete == 1).ToListAsync();
                 //目标表
                 var baseDeal= await baseDealingUnitRepository.AsQueryable().Where(x => x.IsDelete == 1).ToListAsync();
-
                 List<DealingUnit>  dealingUnits = new List<DealingUnit>();
-                foreach (var item in baseDealCache)
+                var zbp= baseDeal.Select(x=>x.ZBP).ToList();
+                var  baseDealCachea = baseDealCache.Where(x => !zbp.Contains(x.ZBP)).ToList();
+                foreach (var item in baseDealCachea)
                 {
-                    var res = baseDeal.Where(x => x.ZBP == item.ZBP && x.ZBPNAME_ZH == item.ZBPNAME_ZH).SingleOrDefault();
-                    if (res == null)
+                    dealingUnits.Add(new DealingUnit()
                     {
-                        dealingUnits.Add(new DealingUnit() {
-
-                            ZBPNAME_ZH = item.ZBPNAME_ZH,
-                            Id = item.Id,
-                            PomId = item.PomId.Value,
-                            ZBPNAME_EN = item.ZBPNAME_EN,
-                            ZBP = item.ZBP,
-                            ZBRNO = item.ZBRNO,
-                            ZBPSTATE = item.ZBPSTATE,
-                            ZIDNO = item.ZIDNO,
-                            ZUSCC = item.ZUSCC,
-                            CreateTime = DateTime.Now
-                        });
-                    }
-                    dealingUnits.Add(res);
+                        ZBPNAME_ZH = item.ZBPNAME_ZH,
+                        Id = Guid.NewGuid(),
+                        PomId = Guid.NewGuid(),
+                        ZBPNAME_EN = item.ZBPNAME_EN,
+                        ZBP = item.ZBP,
+                        ZBRNO = item.ZBRNO,
+                        ZBPSTATE = item.ZBPSTATE,
+                        ZIDNO = item.ZIDNO,
+                        ZUSCC = item.ZUSCC,
+                        CreateTime = DateTime.Now
+                    });
                 }
-                var flag= await dbContext.Insertable<DealingUnit>(dealingUnits).ExecuteCommandAsync();
+                // var flag= await dbContext.Insertable<DealingUnit>(dealingUnits).ExecuteCommandAsync();
+                var flag = await dbContext.Fastest<DealingUnit>().BulkCopyAsync(dealingUnits);
                 return flag > 0 ? "成功" : "失败";
             }
             catch (Exception ex)
             {
-
                 return (ex.Message + Environment.NewLine + ex.StackTrace).ToString();
             }
         }
