@@ -2393,8 +2393,8 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
 
              .WhereIF(!string.IsNullOrWhiteSpace(sub.Name), (x, y, z, ship) => SqlFunc.Contains(x.Name, sub.Name))
              .WhereIF(sub.TypeId != null, (x, y, z, ship) => x.TypeId == sub.TypeId).Where((x, y) => x.IsDelete == 1)
-            .OrderBy(x => x.CreateId, OrderByType.Desc)
-            .OrderBy(x => x.CreateTime, OrderByType.Desc)
+            //.OrderBy(x => x.CreateId, OrderByType.Desc)
+            .OrderBy(x => x.CreateTime, OrderByType.Asc)
             .Select((x, y, z, ship) => new SubShipUserResponseDto
             {
                 Id = x.Id,
