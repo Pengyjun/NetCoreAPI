@@ -36,6 +36,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
         /// 项目
         /// </summary>
         private readonly IBaseRepository<Project> _dbProject;
+        private readonly IBaseRepository<ShipMovementRecord> baseRepositoryShipMovementRecord;
 
         /// <summary>
         /// 船舶动向
@@ -104,6 +105,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             , IBaseService baseService
             , IMapper mapper
             , GlobalObject globalObject
+            , IBaseRepository<ShipMovementRecord> baseRepositoryShipMovementRecord
             )
         {
 
@@ -119,6 +121,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             _dbInstitution = dbInstitution;
             _baseService = baseService;
             _dbRole = dbRole;
+            this.baseRepositoryShipMovementRecord = baseRepositoryShipMovementRecord;
         }
 
         /// <summary>
@@ -163,6 +166,16 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 BusinessModule = "/装备管理/船舶进出场/新增船舶",
                 BusinessRemark = "/装备管理/船舶进出场/新增船舶"
             };
+            #endregion
+            #region 记录船舶进退场
+            ShipMovementRecord shipMovementRecord = new ShipMovementRecord()
+            {
+                ShipMovementId = shipMovement.Id,
+                ShipId = model.ShipId,
+                ProjectId = model.ProjectId,
+                Status = 0,
+            };
+            await  baseRepositoryShipMovementRecord.InsertAsync(shipMovementRecord);
             #endregion
             await _dbShipMovement.AsInsertable(shipMovement).EnableDiffLogEvent(logDto).ExecuteCommandAsync();
             return result.SuccessResult(true, ResponseMessage.OPERATION_INSERT_SUCCESS);
@@ -325,7 +338,23 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 await _dbShipMovement.AsUpdateable(shipMovement).WhereColumns(x => x.Id).UpdateColumns(x => new { x.UpdateId, x.UpdateTime, x.Status, x.Remarks, x.EnterTime }).EnableDiffLogEvent(addLogDto).ExecuteCommandAsync();
             }
 
-
+            #region 船舶进退场
+            //获取船舶进退场记录表
+           var shiMovementRecord= await baseRepositoryShipMovementRecord.GetFirstAsync(x => x.Id == model.ShipMovementId);
+            if (shiMovementRecord != null)
+            {
+                if (model.Status == ShipMovementStatus.Enter)
+                {
+                    shiMovementRecord.EnterTime = model.EnterOrQuitTime;
+                    shiMovementRecord.Status = (int)ShipMovementStatus.Enter;
+                }
+                else {
+                    shiMovementRecord.QuitTime = model.EnterOrQuitTime;
+                    shiMovementRecord.Status = (int)ShipMovementStatus.Quit;
+                }
+            }
+            await baseRepositoryShipMovementRecord.UpdateAsync(shiMovementRecord);
+            #endregion
 
             return result.SuccessResult(true, EnumExtension.GetEnumDescription(model.Status) + "成功");
         }

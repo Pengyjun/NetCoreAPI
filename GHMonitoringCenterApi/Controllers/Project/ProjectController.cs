@@ -738,5 +738,17 @@ namespace GHMonitoringCenterApi.Controllers.Project
         {
             return await projectService.SearchStartListAsync(startWorkRequestDto.Id, startWorkRequestDto.PageIndex, startWorkRequestDto.PageSize);
         }
+
+
+        /// <summary>
+        /// 获取船舶进退场记录
+        /// </summary>
+        /// <param name="baseRequestDto"></param>
+        ///// <returns></returns>
+        [HttpGet("SearchShipMovement")]
+        public async Task<ResponseAjaxResult<List<ShipMovementRecordResponseDto>>> SearchShipMovementAsync([FromQuery] StartWorkRequestDto startWorkRequestDto)
+        {
+            return await projectService.SearchShipMovementAsync(startWorkRequestDto.Id, startWorkRequestDto.PageIndex, startWorkRequestDto.PageSize);
+        }
     }
 }

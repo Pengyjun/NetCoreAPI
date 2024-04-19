@@ -2967,5 +2967,37 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             responseAjaxResult.Success();
             return responseAjaxResult;
         }
+
+        /// <summary>
+        /// 查询船舶进退场记录
+        /// </summary>
+        /// <param name="projectid"></param>
+        /// <param name="pageIndex"></param>
+        /// <param name="pageSize"></param>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        public async Task<ResponseAjaxResult<List<ShipMovementRecordResponseDto>>> SearchShipMovementAsync(Guid projectid, int pageIndex, int pageSize)
+        {
+            ResponseAjaxResult<List<ShipMovementRecordResponseDto>> responseAjaxResult = new();
+            RefAsync<int> total = 0;
+           var res=await dbContext.Queryable<ShipMovementRecord>().Where(x => x.IsDelete == 1)
+                .LeftJoin<OwnerShip>((x, y) => x.ShipId == y.PomId)
+                .Where((x, y) => y.IsDelete == 1)
+                .Select((x, y) => new ShipMovementRecordResponseDto()
+                {
+                    ProjectId = x.ProjectId,
+                    ProjectName = x.ProjectName,
+                    EnterTime = x.EnterTime,
+                    QuitTime = x.QuitTime,
+                    Status = x.Status,
+                    ShipMovementId = x.ShipMovementId,
+                    ShipId = x.ShipId,
+                    ShipName = y.Name
+                }).ToPageListAsync(pageIndex, pageSize, total);
+            responseAjaxResult.Data = res;
+            responseAjaxResult.Count = total;
+            responseAjaxResult.Success();
+            return responseAjaxResult;
+        }
     }
 }
