@@ -226,6 +226,6 @@ namespace GHMonitoringCenterApi.Application.Contracts.IService.Project
         /// 获取开停工记录时间
         /// </summary>
         /// <returns></returns>
-        Task<ResponseAjaxResult<List<ShipMovementRecordResponseDto>>> SearchShipMovementAsync(Guid projectid, int pageIndex, int pageSize);
+        Task<ResponseAjaxResult<List<ShipMovementRecordResponseDto>>> SearchShipMovementAsync(Guid shipId, int pageIndex, int pageSize);
     }
 }

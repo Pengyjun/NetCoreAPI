@@ -12,7 +12,7 @@ namespace GHMonitoringCenterApi.Domain.Models
     /// 开停工记录表
     /// </summary>
     [SugarTable("t_startworkrecord", IsDisabledDelete = true)]
-    public class StartWorkRecord:BaseEntity<Guid>
+    public class StartWorkRecord : BaseEntity<Guid>
     {
         /// <summary>
         /// 项目ID
@@ -30,11 +30,6 @@ namespace GHMonitoringCenterApi.Domain.Models
         [SugarColumn(Length = 50)]
         public Guid? CompanyId { get; set; }
         /// <summary>
-        /// 公司名称
-        /// </summary>
-        [SugarColumn(Length = 200)]
-        public string? CompanyName { get; set; }
-        /// <summary>
         /// 开工时间
         /// </summary>
         [SugarColumn(ColumnDataType = "datetime")]
@@ -44,5 +39,27 @@ namespace GHMonitoringCenterApi.Domain.Models
         /// </summary>
         [SugarColumn(ColumnDataType = "datetime")]
         public DateTime? EndWorkTime { get; set; }
+        /// <summary>
+        /// 停工原因
+        /// </summary>
+        [SugarColumn(Length = 1000)]
+        public string? StopWorkReson { get; set; }
+        /// <summary>
+        /// 修改前状态
+        /// </summary>
+        [SugarColumn(Length = 200)]
+        public string? BeforeStatus { get; set; }
+        /// <summary>
+        /// 修改后状态
+        /// </summary>
+        [SugarColumn(Length = 200)]
+        public string? AfterStatus { get; set; }
+        /// <summary>
+        /// 修改人
+        /// </summary>
+        [SugarColumn(Length = 200)]
+        public string? UpdateUser { get; set; }
+
+
     }
 }
