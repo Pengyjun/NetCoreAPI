@@ -42,7 +42,6 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
         public IPushPomService _pushPomService { get; set; }
         public IBaseService baseService { get; set; }
         public ILogService logService { get; set; }
-
         public IEntityChangeService entityChangeService { get; set; }
 
         /// <summary>
@@ -1120,9 +1119,26 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             }
             #endregion
 
+            #region 开停工记录
+            //开停工记录
+            StartWorkRecord startWorkRecord = new StartWorkRecord()
+            {
+                Id = GuidUtil.Next(),
+                CompanyId = addOrUpdateProjectRequestDto.CompanyId,
+                ProjectId = addOrUpdateProjectRequestDto.Id.Value,
+                Name = addOrUpdateProjectRequestDto.Name,
+                StartWorkTime = addOrUpdateProjectRequestDto.CommencementTime.Value,
+                EndWorkTime = addOrUpdateProjectRequestDto.ShutdownDate.Value,
+            };
+
+            await dbContext.Insertable<StartWorkRecord>(startWorkRecord).ExecuteCommandAsync();
+            #endregion
+
 
             if (addOrUpdateProjectRequestDto.RequestType)
             {
+               
+
                 projectObject = mapper.Map<AddOrUpdateProjectRequestDto, Project>(addOrUpdateProjectRequestDto);
                 lock (projectObject)
                 {
@@ -1240,6 +1256,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             }
             else  //修改项目
             {
+                
                 projectObject = await dbContext.Queryable<Project>().SingleAsync(x => x.IsDelete == 1 && x.Id == addOrUpdateProjectRequestDto.Id);
                 #region 业务判断
                 if (projectObject == null)
@@ -2926,6 +2943,27 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     Type = x.Sort.Value
                 }).ToListAsync());
             responseAjaxResult.Count = responseAjaxResult.Data.Count;
+            responseAjaxResult.Success();
+            return responseAjaxResult;
+        }
+
+        public async Task<ResponseAjaxResult<List<StartWorkResponseDto>>> SearchStartListAsync(Guid projectid,int pageIndex,int pageSize)
+        {
+            ResponseAjaxResult<List<StartWorkResponseDto>> responseAjaxResult = new
+                ();
+            List<StartWorkResponseDto> startWorkResponseDtos = new();
+            RefAsync<int> total = 0;
+            startWorkResponseDtos = await dbContext.Queryable<StartWorkRecord>().Where(x => x.IsDelete == 1)
+                .Select(x => new StartWorkResponseDto() {
+                    EndWorkTime = x.EndWorkTime,
+                    Name = x.Name,
+                    ProjectId = x.ProjectId,
+                    StartWorkTime = x.StartWorkTime
+                })
+                 .ToPageListAsync(pageIndex, pageSize, total);
+
+            responseAjaxResult.Data = startWorkResponseDtos;
+            responseAjaxResult.Count = total;
             responseAjaxResult.Success();
             return responseAjaxResult;
         }

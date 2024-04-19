@@ -324,6 +324,9 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 };
                 await _dbShipMovement.AsUpdateable(shipMovement).WhereColumns(x => x.Id).UpdateColumns(x => new { x.UpdateId, x.UpdateTime, x.Status, x.Remarks, x.EnterTime }).EnableDiffLogEvent(addLogDto).ExecuteCommandAsync();
             }
+
+
+
             return result.SuccessResult(true, EnumExtension.GetEnumDescription(model.Status) + "成功");
         }
 

@@ -363,7 +363,7 @@ namespace GHMonitoringCenterApi.Application.Service.File
                     logger.LogWarning($"10点第二批推送群组人员结果:{pushResult}");
                     #endregion
                 }
-                else if (currentTimeDay >= 14 && currentTimeDay <= 23)
+                else if (currentTimeDay >= 12 && currentTimeDay <= 23)
                 {
                     #region 测试使用
                     ////测试使用 

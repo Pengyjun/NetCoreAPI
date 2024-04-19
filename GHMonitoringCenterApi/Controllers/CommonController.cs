@@ -493,6 +493,7 @@ namespace GHMonitoringCenterApi.Controllers
         public async Task<ResponseAjaxResult<List<BasePullDownResponseDto>>> GetDeviceInformationAsync([FromQuery] GetDeviceInformationRequesDto getDeviceInformationResponseDto)
         {
             return await baseService.GetDeviceInformationAsync(getDeviceInformationResponseDto);
+           
         }
         /// <summary>
         /// 获取用户信息

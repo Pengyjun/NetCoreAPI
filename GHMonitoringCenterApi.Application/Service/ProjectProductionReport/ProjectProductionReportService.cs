@@ -963,8 +963,11 @@ namespace GHMonitoringCenterApi.Application.Service.ProjectProductionReport
 				item.ShipName = shipList.FirstOrDefault(x => x.PomId == item.ShipId)?.Name;
 				item.TypeClass = shipList.FirstOrDefault(x => x.PomId == item.ShipId)?.TypeClass;
 				item.OperatingTime = (item.ProductionOperatingTime ?? 0) + (item.ProductionStoppage ?? 0) + (item.NonProductionStoppage ?? 0) + (item.Dispatch ?? 0) + (item.TimedPause ?? 0) + (item.OtherTime ?? 0);
-				item.TimeAvailability = Math.Round(Convert.ToDecimal(item.ProductionOperatingTime / item.OperatingTime * 100), 2);
-				item.ConstructionEfficiency = Math.Round(Convert.ToDecimal(item.ShipReportedProduction / item.OperatingTime), 2);
+				if(item.OperatingTime!=0)
+				//item.TimeAvailability = Math.Round((Convert.ToDecimal(item.ProductionOperatingTime / item.OperatingTime) * 100), 2);
+				item.TimeAvailability = Math.Round((Convert.ToDecimal(item.ProductionOperatingTime / 24) * 100), 2);
+				if(item.ProductionOperatingTime!=0)
+				item.ConstructionEfficiency = Math.Round(Convert.ToDecimal(item.ShipReportedProduction / item.ProductionOperatingTime), 2);
 				item.EnterTime = shipMoveMent.FirstOrDefault(x => x.ProjectId == item.ProjectId && x.ShipId == item.ShipId)?.EnterTime;
 				item.Quittime = shipMoveMent.FirstOrDefault(x => x.ProjectId == item.ProjectId && x.ShipId == item.ShipId)?.QuitTime;
 				item.AverageEDepth = Math.Round(Convert.ToDecimal(item.AverageEDepth), 2);

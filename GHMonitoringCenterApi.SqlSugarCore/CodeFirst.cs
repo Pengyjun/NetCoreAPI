@@ -91,7 +91,7 @@ namespace GHMonitoringCenterApi.SqlSugarCore
                 };
             });
             Type[] types = typeof(Company).Assembly.GetTypes()
-            .Where(it => it.FullName.Contains("GHMonitoringCenterApi.Domain.Models.AuditLogs"))
+            .Where(it => it.FullName.Contains("GHMonitoringCenterApi.Domain.Models.StartWorkRecord"))
             .ToArray();
             db.CodeFirst.InitTables(types);
         }

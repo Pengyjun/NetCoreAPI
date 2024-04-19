@@ -214,6 +214,10 @@ namespace GHMonitoringCenterApi.Application.Contracts.IService.Project
         /// <returns></returns>
         Task<ResponseAjaxResult<List<BasePullDownResponseDto>>> SearchCompanyProjectPullDownAsync();
 
-
+       /// <summary>
+       /// 获取开停工记录时间
+       /// </summary>
+       /// <returns></returns>
+        Task<ResponseAjaxResult<List<StartWorkResponseDto>>> SearchStartListAsync(Guid projectid,int pageIndex,int pageSize);
     }
 }

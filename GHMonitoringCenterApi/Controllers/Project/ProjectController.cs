@@ -727,5 +727,16 @@ namespace GHMonitoringCenterApi.Controllers.Project
         {
             return await projectService.SearchCompanyProjectPullDownAsync();
         }
+
+        /// <summary>
+        /// 获取开停工记录
+        /// </summary>
+        /// <param name="baseRequestDto"></param>
+        ///// <returns></returns>
+        [HttpGet("SearchStartList")]
+        public async Task<ResponseAjaxResult<List<StartWorkResponseDto>>> SearchStartList([FromQuery] StartWorkRequestDto   startWorkRequestDto)
+        {
+            return await projectService.SearchStartListAsync(startWorkRequestDto.Id, startWorkRequestDto.PageIndex, startWorkRequestDto.PageSize);
+        }
     }
 }
