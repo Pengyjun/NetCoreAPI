@@ -2976,23 +2976,23 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
         /// <param name="pageSize"></param>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
-        public async Task<ResponseAjaxResult<List<ShipMovementRecordResponseDto>>> SearchShipMovementAsync(Guid projectid, int pageIndex, int pageSize)
+        public async Task<ResponseAjaxResult<List<ShipMovementRecordResponseDto>>> SearchShipMovementAsync(Guid shipId, int pageIndex, int pageSize)
         {
             ResponseAjaxResult<List<ShipMovementRecordResponseDto>> responseAjaxResult = new();
             RefAsync<int> total = 0;
-           var res=await dbContext.Queryable<ShipMovementRecord>().Where(x => x.IsDelete == 1)
-                .LeftJoin<OwnerShip>((x, y) => x.ShipId == y.PomId)
+           var res=await dbContext.Queryable<OwnerShip>().Where(x => x.IsDelete == 1&&x.PomId== shipId)
+                .LeftJoin<ShipMovementRecord>((x, y) => x.PomId == y.ShipId)
                 .Where((x, y) => y.IsDelete == 1)
                 .Select((x, y) => new ShipMovementRecordResponseDto()
                 {
-                    ProjectId = x.ProjectId,
-                    ProjectName = x.ProjectName,
-                    EnterTime = x.EnterTime,
-                    QuitTime = x.QuitTime,
-                    Status = x.Status,
-                    ShipMovementId = x.ShipMovementId,
-                    ShipId = x.ShipId,
-                    ShipName = y.Name
+                    ProjectId = y.ProjectId,
+                    ProjectName = y.ProjectName,
+                    EnterTime = y.EnterTime,
+                    QuitTime = y.QuitTime,
+                    Status = y.Status,
+                    ShipMovementId = y.ShipMovementId,
+                    ShipId = y.ShipId,
+                    ShipName = x.Name
                 }).ToPageListAsync(pageIndex, pageSize, total);
             responseAjaxResult.Data = res;
             responseAjaxResult.Count = total;
