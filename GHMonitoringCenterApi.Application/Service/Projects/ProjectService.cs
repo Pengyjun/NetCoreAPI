@@ -2992,7 +2992,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             startWorkResponseDtos = await dbContext.Queryable<StartWorkRecord>()
                 .LeftJoin<Project>((sw, pro) => sw.ProjectId == pro.Id)
                 .LeftJoin<Institution>((sw, pro, ins) => pro.CompanyId == ins.PomId)
-                .Where((sw, pro, ins) => sw.IsDelete == 1)
+                .Where((sw, pro, ins) => sw.IsDelete == 1 && projectid == sw.ProjectId)
                 .OrderByDescending((sw, pro, ins) => sw.CreateTime)
                 .Select((sw, pro, ins) => new StartWorkResponseDto()
                 {
