@@ -27,7 +27,7 @@
         /// <summary>
         /// 停工原因
         /// </summary>
-        public string? StopWorkReson { get; set; }
+        public string? StopWorkReason { get; set; }
         /// <summary>
         /// 修改前状态
         /// </summary>
@@ -40,5 +40,9 @@
         /// 修改人
         /// </summary>
         public string? UpdateUser { get; set; }
+        /// <summary>
+        /// 修改时间
+        /// </summary>
+        public string? UpdateTime { get; set; }
     }
 }

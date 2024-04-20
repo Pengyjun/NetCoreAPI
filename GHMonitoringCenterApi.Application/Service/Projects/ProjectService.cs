@@ -3000,9 +3000,10 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     Name = sw.Name,
                     ProjectId = sw.ProjectId,
                     StartWorkTime = sw.StartWorkTime,
-                    StopWorkReson = sw.StopWorkReson,
+                    StopWorkReason = sw.StopWorkReson,
                     UpdateUser = sw.UpdateUser,
-                    CompanyName = ins.Shortname
+                    CompanyName = ins.Shortname,
+                    UpdateTime = sw.CreateTime.Value.ToString("yyyy-MM-dd HH:mm:ss")
                 })
                  .ToPageListAsync(pageIndex, pageSize, total);
 
