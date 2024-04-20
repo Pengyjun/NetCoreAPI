@@ -3003,14 +3003,16 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     StopWorkReason = sw.StopWorkReson,
                     UpdateUser = sw.UpdateUser,
                     CompanyName = ins.Shortname,
+                    AfterStatusId = sw.AfterStatus,
+                    BeforeStatusId = sw.BeforeStatus,
                     UpdateTime = sw.CreateTime.Value.ToString("yyyy-MM-dd HH:mm:ss")
                 })
                  .ToPageListAsync(pageIndex, pageSize, total);
 
             foreach (var item in startWorkResponseDtos)
             {
-                item.AfterStatus = projectStatus.FirstOrDefault(x => x.StatusId.ToString() == item.BeforeStatus)?.Name;
-                item.BeforeStatus = projectStatus.FirstOrDefault(x => x.StatusId.ToString() == item.BeforeStatus)?.Name;
+                item.AfterStatus = projectStatus.FirstOrDefault(x => x.StatusId.ToString() == item.AfterStatusId)?.Name;
+                item.BeforeStatus = projectStatus.FirstOrDefault(x => x.StatusId.ToString() == item.BeforeStatusId)?.Name;
             }
 
             responseAjaxResult.Data = startWorkResponseDtos;

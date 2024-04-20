@@ -32,10 +32,12 @@
         /// 修改前状态
         /// </summary>
         public string? BeforeStatus { get; set; }
+        public string? BeforeStatusId { get; set; }
         /// <summary>
         /// 修改后状态
         /// </summary>
         public string? AfterStatus { get; set; }
+        public string? AfterStatusId { get; set; }
         /// <summary>
         /// 修改人
         /// </summary>
