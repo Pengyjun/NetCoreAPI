@@ -474,7 +474,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 .Select((p, ps) => new ProjectExcelSearchResponseDto
                 {
                     Id = p.Id,
-                    MasterProjectId=p.MasterProjectId.Value,
+                    MasterProjectId = p.MasterProjectId.Value,
                     Name = p.Name,
                     Category = p.Category,
                     TypeName = p.TypeId.ToString(),
@@ -641,35 +641,35 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 users.Add(5);
                 users.Add(8);
                 var ids = projectList.Select(x => x.Id).ToList();
-                var idss = projectList.Where(x=>x.MasterProjectId.HasValue == true).Select(x => x.MasterProjectId.Value).ToList();
+                var idss = projectList.Where(x => x.MasterProjectId.HasValue == true).Select(x => x.MasterProjectId.Value).ToList();
                 ids.AddRange(idss);
-                ids= ids.Distinct().ToList();
+                ids = ids.Distinct().ToList();
                 //获取项目干系单位
                 var orgList = await dbContext.Queryable<ProjectOrg>()
-                    .Where(p => p.IsDelete == 1&& ids.Contains(p.ProjectId.Value)).ToListAsync();
+                    .Where(p => p.IsDelete == 1 && ids.Contains(p.ProjectId.Value)).ToListAsync();
                 //查询项目干系单位名称
                 var orgTypeName = await dbContext.Queryable<DictionaryTable>().Where(x => x.IsDelete == 1 && (x.TypeNo == 2
-                ||x.TypeNo==1)&& types.Contains(x.Type)).ToListAsync();
+                || x.TypeNo == 1) && types.Contains(x.Type)).ToListAsync();
                 //查询往来单位名称
                 var unitName = await dbContext.Queryable<DealingUnit>()
-                    .Where(x => x.IsDelete==1).ToListAsync();
+                    .Where(x => x.IsDelete == 1).ToListAsync();
 
                 var dutyList = await dbContext.Queryable<ProjectLeader>()
-                .Where(pl =>pl.IsDelete == 1&& ids.Contains(pl.ProjectId.Value))
+                .Where(pl => pl.IsDelete == 1 && ids.Contains(pl.ProjectId.Value))
                 .ToListAsync();
-                var userList= await dbContext.Queryable<GHMonitoringCenterApi.Domain.Models.User>()
+                var userList = await dbContext.Queryable<GHMonitoringCenterApi.Domain.Models.User>()
                     .Where(x => x.IsDelete == 1).ToListAsync();
                 foreach (var item in projectList)
                 {
                     #region 干系单位类型
-                    var typeList = orgTypeName.Where(x=>x.TypeNo==2).Select(x => x.Type.ToString()).ToList();
-                    var  orgs=orgList.Where(x => x.ProjectId == item.Id || x.ProjectId == item.MasterProjectId && typeList.Contains(x.Type)).ToList();
-                    var oid= orgs.SingleOrDefault(x => x.Type == "1")?.OrganizationId;
+                    var typeList = orgTypeName.Where(x => x.TypeNo == 2).Select(x => x.Type.ToString()).ToList();
+                    var orgs = orgList.Where(x => x.ProjectId == item.Id || x.ProjectId == item.MasterProjectId && typeList.Contains(x.Type)).ToList();
+                    var oid = orgs.SingleOrDefault(x => x.Type == "1")?.OrganizationId;
                     if (oid.HasValue)
                     {
                         item.YeZhuUnitName = unitName.FirstOrDefault(x => x.PomId == oid)?.ZBPNAME_ZH;
                     }
-                     oid = orgs.FirstOrDefault(x => x.Type == "6")?.OrganizationId;
+                    oid = orgs.FirstOrDefault(x => x.Type == "6")?.OrganizationId;
                     if (oid.HasValue)
                     {
                         item.JianLiUnitName = unitName.SingleOrDefault(x => x.PomId == oid)?.ZBPNAME_ZH;
@@ -683,10 +683,10 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
 
                     #region 人员职位类型
                     var typeUserList = orgTypeName.Where(x => x.TypeNo == 1 && users.Contains(x.Type)).Select(x => x.Type.ToString()).ToList();
-                    var userTypeList = dutyList.Where(x => x.ProjectId == item.Id|| x.ProjectId == item.MasterProjectId && users.Contains(x.Type)).ToList();
+                    var userTypeList = dutyList.Where(x => x.ProjectId == item.Id || x.ProjectId == item.MasterProjectId && users.Contains(x.Type)).ToList();
                     var assistantManagerId = userTypeList.FirstOrDefault(x => x.Type == 1)?.AssistantManagerId;
-                    if(assistantManagerId!=null)
-                    item.XmJlName = userList.FirstOrDefault(x => x.PomId == assistantManagerId)?.Name;
+                    if (assistantManagerId != null)
+                        item.XmJlName = userList.FirstOrDefault(x => x.PomId == assistantManagerId)?.Name;
                     assistantManagerId = userTypeList.FirstOrDefault(x => x.Type == 3)?.AssistantManagerId;
                     if (assistantManagerId != null)
                         item.XmSjName = userList.FirstOrDefault(x => x.PomId == assistantManagerId)?.Name;
@@ -702,7 +702,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     #endregion
                 }
             }
-           
+
 
             #endregion
             //排序
@@ -996,6 +996,54 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             var projectDutys = new List<ProjectOrg>();
             //增改项目干系人员
             var proLeaderList = new List<ProjectLeader>();
+
+            var startWorkRecord = new StartWorkRecord();
+            if (addOrUpdateProjectRequestDto.RequestType == true)
+            {
+                #region 开停工记录
+                //开停工记录
+                startWorkRecord = new StartWorkRecord()
+                {
+                    Id = GuidUtil.Next(),
+                    CompanyId = addOrUpdateProjectRequestDto.CompanyId,
+                    ProjectId = addOrUpdateProjectRequestDto.Id.Value,
+                    Name = addOrUpdateProjectRequestDto.Name,
+                    StartWorkTime = addOrUpdateProjectRequestDto.CommencementTime.Value,
+                    EndWorkTime = addOrUpdateProjectRequestDto.ShutdownDate.Value,
+                    BeforeStatus = addOrUpdateProjectRequestDto.StatusId.ToString(),
+                    StopWorkReson = addOrUpdateProjectRequestDto.ShutDownReason,
+                    CreateTime = DateTime.Now,
+                    UpdateUser = _currentUser.Name + "新增项目",
+                    AfterStatus = addOrUpdateProjectRequestDto.StatusId.ToString()
+                };
+                await dbContext.Insertable<StartWorkRecord>(startWorkRecord).ExecuteCommandAsync();
+                #endregion
+            }
+            else
+            {
+                var isFirst = projectList.FirstOrDefault(x => x.Id == addOrUpdateProjectRequestDto.Id);
+                if (isFirst != null)
+                {
+                    startWorkRecord = new StartWorkRecord()
+                    {
+                        Id = GuidUtil.Next(),
+                        CompanyId = addOrUpdateProjectRequestDto.CompanyId,
+                        ProjectId = addOrUpdateProjectRequestDto.Id.Value,
+                        Name = addOrUpdateProjectRequestDto.Name,
+                        StartWorkTime = addOrUpdateProjectRequestDto.CommencementTime,
+                        EndWorkTime = addOrUpdateProjectRequestDto.ShutdownDate,
+                        BeforeStatus = isFirst.StatusId.ToString(),
+                        StopWorkReson = addOrUpdateProjectRequestDto.ShutDownReason,
+                        CreateTime = DateTime.Now,
+                        UpdateUser = _currentUser.Name + "修改项目",
+                        AfterStatus = addOrUpdateProjectRequestDto.StatusId.ToString()
+                    };
+                    await dbContext.Insertable<StartWorkRecord>(startWorkRecord).ExecuteCommandAsync();
+                }
+            }
+
+
+
             #region 计算项目停工天数 供交建通每天发消息使用
             //项目ID
             Guid projectId = GuidUtil.Next();
@@ -1004,29 +1052,29 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             //当前月的最后一天
             DateTime currentDate = DateTime.Now;
             var stopDay = 0;
-           var monthLastDay = new DateTime(currentDate.Year, currentDate.Month, 1).AddMonths(1).AddDays(-1).Day;
-            
-            if (nowDay==27)
+            var monthLastDay = new DateTime(currentDate.Year, currentDate.Month, 1).AddMonths(1).AddDays(-1).Day;
+
+            if (nowDay == 27)
             {
                 stopDay = 1;
             }
-            else if(nowDay!= 26)
+            else if (nowDay != 26)
             {
                 //stopDay = nowDay + (monthLastDay-26);
-                var startDay =  DateTime.Now.AddMonths(-1).ToString("yyyy-MM-26").ObjToDate();
+                var startDay = DateTime.Now.AddMonths(-1).ToString("yyyy-MM-26").ObjToDate();
                 var endDay = DateTime.Now.ToString("yyyy-MM-dd").ObjToDate();
                 stopDay = TimeHelper.GetTimeSpan(startDay, endDay).Days;
             }
             //获取周期
             var startTime = 0;
-            var endTime=0;
-            Utils.GetDateRange(DateTime.Now,out startTime,out endTime);
+            var endTime = 0;
+            Utils.GetDateRange(DateTime.Now, out startTime, out endTime);
             var dayCount = 0;
             if (addOrUpdateProjectRequestDto.Id.HasValue)
             {
-                dayCount= await dbContext.Queryable<DayReport>().Where(x => x.IsDelete == 1 && x.ProjectId == addOrUpdateProjectRequestDto.Id.Value && x.DateDay >= startTime && x.DateDay <=endTime).CountAsync();
+                dayCount = await dbContext.Queryable<DayReport>().Where(x => x.IsDelete == 1 && x.ProjectId == addOrUpdateProjectRequestDto.Id.Value && x.DateDay >= startTime && x.DateDay <= endTime).CountAsync();
             }
-            stopDay = stopDay - dayCount>=0? (stopDay - dayCount):0;
+            stopDay = stopDay - dayCount >= 0 ? (stopDay - dayCount) : 0;
             if (addOrUpdateProjectRequestDto.RequestType)
             {
                 //新增操作（如果新增的是在建项目的就会记录表里面）
@@ -1119,25 +1167,11 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             }
             #endregion
 
-            #region 开停工记录
-            //开停工记录
-            StartWorkRecord startWorkRecord = new StartWorkRecord()
-            {
-                Id = GuidUtil.Next(),
-                CompanyId = addOrUpdateProjectRequestDto.CompanyId,
-                ProjectId = addOrUpdateProjectRequestDto.Id.Value,
-                Name = addOrUpdateProjectRequestDto.Name,
-                StartWorkTime = addOrUpdateProjectRequestDto.CommencementTime.Value,
-                EndWorkTime = addOrUpdateProjectRequestDto.ShutdownDate.Value,
-            };
-
-            await dbContext.Insertable<StartWorkRecord>(startWorkRecord).ExecuteCommandAsync();
-            #endregion
 
 
             if (addOrUpdateProjectRequestDto.RequestType)
             {
-               
+
 
                 projectObject = mapper.Map<AddOrUpdateProjectRequestDto, Project>(addOrUpdateProjectRequestDto);
                 lock (projectObject)
@@ -1256,7 +1290,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             }
             else  //修改项目
             {
-                
+
                 projectObject = await dbContext.Queryable<Project>().SingleAsync(x => x.IsDelete == 1 && x.Id == addOrUpdateProjectRequestDto.Id);
                 #region 业务判断
                 if (projectObject == null)
@@ -1398,11 +1432,11 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     }
                 }
                 #endregion
-                if (projectObject.CommencementTime.HasValue&& addOrUpdateProjectRequestDto.CommencementTime.HasValue==false)
+                if (projectObject.CommencementTime.HasValue && addOrUpdateProjectRequestDto.CommencementTime.HasValue == false)
                 {
                     addOrUpdateProjectRequestDto.CommencementTime = projectObject.CommencementTime.Value;
                 }
-               
+
                 mapper.Map(addOrUpdateProjectRequestDto, projectObject);
                 //税率
                 projectObject.Rate = projectObject.Rate / 100;
@@ -2881,7 +2915,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     StatusSort = a.Sequence.Value,
                     StatusName = a.Name,
                     TypeName = z.Name,
-                    ContractAmount = x.ECAmount.Value* x.ExchangeRate.Value,
+                    ContractAmount = x.ECAmount.Value * x.ExchangeRate.Value,
                     CommencementDate = x.CommencementTime.Value.ToString(),
 
                 }).ToListAsync();
@@ -2926,7 +2960,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             //var totalYearKaileaOffirmProductionValue = projectSingleProductionValue?.AccumulatedOutputValue ?? 0 +
             //    currentTotalYearOffirmProductionValue.Where(x => x.ProjectId == id).Sum(x => x.CurrencyCompleteProductionAmount);
             //return totalYearKaileaOffirmProductionValue;
-            var totalYearKaileaOffirmProductionValue = 
+            var totalYearKaileaOffirmProductionValue =
                 currentTotalYearOffirmProductionValue.Where(x => x.ProjectId == id).Sum(x => x.CompleteProductionAmount);
             return totalYearKaileaOffirmProductionValue;
         }
@@ -2947,20 +2981,39 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             return responseAjaxResult;
         }
 
-        public async Task<ResponseAjaxResult<List<StartWorkResponseDto>>> SearchStartListAsync(Guid projectid,int pageIndex,int pageSize)
+        public async Task<ResponseAjaxResult<List<StartWorkResponseDto>>> SearchStartListAsync(Guid projectid, int pageIndex, int pageSize)
         {
             ResponseAjaxResult<List<StartWorkResponseDto>> responseAjaxResult = new
                 ();
             List<StartWorkResponseDto> startWorkResponseDtos = new();
             RefAsync<int> total = 0;
-            startWorkResponseDtos = await dbContext.Queryable<StartWorkRecord>().Where(x => x.IsDelete == 1)
-                .Select(x => new StartWorkResponseDto() {
-                    EndWorkTime = x.EndWorkTime,
-                    Name = x.Name,
-                    ProjectId = x.ProjectId,
-                    StartWorkTime = x.StartWorkTime
+            //项目状态表
+            var projectStatus = await dbContext.Queryable<ProjectStatus>().Where(x => x.IsDelete == 1).Select(x => new { x.StatusId, x.Name }).ToListAsync();
+            startWorkResponseDtos = await dbContext.Queryable<StartWorkRecord>()
+                .LeftJoin<Project>((sw, pro) => sw.ProjectId == pro.Id)
+                .LeftJoin<Institution>((sw, pro, ins) => pro.CompanyId == ins.PomId)
+                .Where((sw, pro, ins) => sw.IsDelete == 1 && projectid == sw.ProjectId)
+                .OrderByDescending((sw, pro, ins) => sw.CreateTime)
+                .Select((sw, pro, ins) => new StartWorkResponseDto()
+                {
+                    EndWorkTime = sw.EndWorkTime,
+                    Name = sw.Name,
+                    ProjectId = sw.ProjectId,
+                    StartWorkTime = sw.StartWorkTime,
+                    StopWorkReason = sw.StopWorkReson,
+                    UpdateUser = sw.UpdateUser,
+                    CompanyName = ins.Shortname,
+                    AfterStatusId = sw.AfterStatus,
+                    BeforeStatusId = sw.BeforeStatus,
+                    UpdateTime = sw.CreateTime.Value.ToString("yyyy-MM-dd HH:mm:ss")
                 })
                  .ToPageListAsync(pageIndex, pageSize, total);
+
+            foreach (var item in startWorkResponseDtos)
+            {
+                item.AfterStatus = projectStatus.FirstOrDefault(x => x.StatusId.ToString() == item.AfterStatusId)?.Name;
+                item.BeforeStatus = projectStatus.FirstOrDefault(x => x.StatusId.ToString() == item.BeforeStatusId)?.Name;
+            }
 
             responseAjaxResult.Data = startWorkResponseDtos;
             responseAjaxResult.Count = total;
@@ -2980,20 +3033,20 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
         {
             ResponseAjaxResult<List<ShipMovementRecordResponseDto>> responseAjaxResult = new();
             RefAsync<int> total = 0;
-           var res=await dbContext.Queryable<OwnerShip>().Where(x => x.IsDelete == 1&&x.PomId== shipId)
-                .LeftJoin<ShipMovementRecord>((x, y) => x.PomId == y.ShipId)
-                .Where((x, y) => y.IsDelete == 1)
-                .Select((x, y) => new ShipMovementRecordResponseDto()
-                {
-                    ProjectId = y.ProjectId,
-                    ProjectName = y.ProjectName,
-                    EnterTime = y.EnterTime,
-                    QuitTime = y.QuitTime,
-                    Status = y.Status,
-                    ShipMovementId = y.ShipMovementId,
-                    ShipId = y.ShipId,
-                    ShipName = x.Name
-                }).ToPageListAsync(pageIndex, pageSize, total);
+            var res = await dbContext.Queryable<OwnerShip>().Where(x => x.IsDelete == 1 && x.PomId == shipId)
+                 .LeftJoin<ShipMovementRecord>((x, y) => x.PomId == y.ShipId)
+                 .Where((x, y) => y.IsDelete == 1)
+                 .Select((x, y) => new ShipMovementRecordResponseDto()
+                 {
+                     ProjectId = y.ProjectId,
+                     ProjectName = y.ProjectName,
+                     EnterTime = y.EnterTime,
+                     QuitTime = y.QuitTime,
+                     Status = y.Status,
+                     ShipMovementId = y.ShipMovementId,
+                     ShipId = y.ShipId,
+                     ShipName = x.Name
+                 }).ToPageListAsync(pageIndex, pageSize, total);
             responseAjaxResult.Data = res;
             responseAjaxResult.Count = total;
             responseAjaxResult.Success();

@@ -90,7 +90,7 @@ namespace GHMonitoringCenterApi.SqlSugarCore
                     //Console.WriteLine(sql);
                 };
             });
-            Type[] types = typeof(Company).Assembly.GetTypes()
+            Type[] types = typeof(StartWorkRecord).Assembly.GetTypes()
             .Where(it => it.FullName.Contains("GHMonitoringCenterApi.Domain.Models.ShipMovementRecord"))
             .ToArray();
             db.CodeFirst.InitTables(types);
