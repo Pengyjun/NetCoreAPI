@@ -227,5 +227,12 @@ namespace GHMonitoringCenterApi.Application.Contracts.IService.Project
         /// </summary>
         /// <returns></returns>
         Task<ResponseAjaxResult<List<ShipMovementRecordResponseDto>>> SearchShipMovementAsync(Guid shipId, int pageIndex, int pageSize);
+
+        /// <summary>
+        /// 撤回本月项目月报  
+        /// </summary>
+        /// <param name="id">项目月报</param>
+        /// <returns></returns>
+        Task<ResponseAjaxResult<bool>> RevocationProjectMonthAsync(Guid id);
     }
 }

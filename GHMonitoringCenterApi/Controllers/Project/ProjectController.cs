@@ -750,5 +750,17 @@ namespace GHMonitoringCenterApi.Controllers.Project
         {
             return await projectService.SearchShipMovementAsync(startWorkRequestDto.Id, startWorkRequestDto.PageIndex, startWorkRequestDto.PageSize);
         }
+
+        /// <summary>
+        /// 撤回项目月报
+        /// </summary>
+        /// <param name="basePrimaryRequestDto"></param>
+        /// <returns></returns>
+        [HttpGet("RevocationProjectMonth")]
+        [UnitOfWork]
+        public async Task<ResponseAjaxResult<bool>> RevocationProjectMonthAsync(BasePrimaryRequestDto basePrimaryRequestDto)
+        {
+          return await  projectService.RevocationProjectMonthAsync(basePrimaryRequestDto.Id);
+        }
     }
 }

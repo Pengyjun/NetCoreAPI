@@ -226,7 +226,7 @@ namespace GHMonitoringCenterApi.Application.Service.Job
                     ApproveLevel = ApproveLevel.None,
                     FinishApproveLevel = model.FinishApproveLevel,
                     DateDay = model.DateDay,
-                    DateMonth = model.DateMonth
+                    DateMonth = model.DateMonth,
                 };
                 var jobApprovers = new List<JobApprover>();
                 foreach (var approver in model.Approvers)

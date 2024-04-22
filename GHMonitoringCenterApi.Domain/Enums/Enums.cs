@@ -249,7 +249,7 @@ namespace GHMonitoringCenterApi.Domain.Enums
 
     }
     /// <summary>
-    /// 审批状态（1：驳回，2：通过）
+    /// 审批状态（1：驳回，2：通过  3:撤回）
     /// </summary>
     public enum JobApproveStatus
     {
@@ -268,7 +268,12 @@ namespace GHMonitoringCenterApi.Domain.Enums
         /// 审核通过
         /// </summary>
         [Description("通过")]
-        Pass = 2
+        Pass = 2,
+        /// <summary>
+        /// 一级审批撤回
+        /// </summary>
+        [Description("撤回")]
+        Revoca = 3
     }
 
     /// <summary>

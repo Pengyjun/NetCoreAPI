@@ -2999,5 +2999,86 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             responseAjaxResult.Success();
             return responseAjaxResult;
         }
+
+
+        /// <summary>
+        /// 撤回项目月报
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        public async Task<ResponseAjaxResult<bool>> RevocationProjectMonthAsync(Guid id)
+        {
+            ResponseAjaxResult<bool> ajaxResult = new ResponseAjaxResult<bool>();
+            #region 时间判断
+            //查询当前是第几月
+            var nowYear = DateTime.Now.Year;
+            var nowMonth = DateTime.Now.Month;
+            var nowDay = DateTime.Now.Day;
+            var monthDay = 0;
+            if (nowDay > 26)
+            {
+                nowMonth += 1;
+            }
+            if (int.Parse(DateTime.Now.ToString("MMdd")) > 1226)
+            {
+                nowYear += 1;
+            }
+            if (nowMonth.ToString().Length == 1)
+            {
+                monthDay = int.Parse(nowYear + $"0{nowMonth}");
+            }
+            else {
+                monthDay = int.Parse(nowYear + $"{nowMonth}");
+            }
+            #endregion
+
+           var projectMonth= await dbContext.Queryable<MonthReport>().Where(x => x.IsDelete == 1 && x.ProjectId == id && x.DateMonth == monthDay).FirstAsync();
+            if (projectMonth == null)
+            {
+                ajaxResult.Data = false;
+                ajaxResult.Success();
+                return ajaxResult;
+            }
+
+           var job= await dbContext.Queryable<GHMonitoringCenterApi.Domain.Models.Job>().Where(x => x.IsDelete == 1
+            && x.ProjectId == id && x.DateMonth == monthDay).FirstAsync();
+            if(job==null)
+            {
+                ajaxResult.Data = false;
+                ajaxResult.Success();
+                return ajaxResult;
+            }
+
+            var jobApprover = await dbContext.Queryable<GHMonitoringCenterApi.Domain.Models.JobApprover>().Where(x => x.IsDelete == 1
+          && x.JobId == job.Id).FirstAsync();
+            if (jobApprover == null)
+            {
+                ajaxResult.Data = false;
+                ajaxResult.Success();
+                return ajaxResult;
+            }
+            //
+            var jobRecord = await dbContext.Queryable<GHMonitoringCenterApi.Domain.Models.JobRecord>().Where(x => x.IsDelete == 1
+           &&x.JobId== job.Id).FirstAsync();
+            if (jobRecord == null)
+            {
+                ajaxResult.Data = false;
+                ajaxResult.Success();
+                return ajaxResult;
+            }
+
+            //修改审批状态
+            job.ApproveStatus = JobApproveStatus.Revoca;
+            jobRecord.ApproveStatus= JobApproveStatus.Revoca;
+            jobApprover.IsDelete = 0;
+
+          await  dbContext.Updateable(job).ExecuteCommandAsync();
+          await  dbContext.Updateable(jobRecord).ExecuteCommandAsync();
+          await  dbContext.Updateable(jobApprover).ExecuteCommandAsync();
+            ajaxResult.Data = true;
+            ajaxResult.Success();
+            return ajaxResult;
+        }
     }
 }
