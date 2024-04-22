@@ -28,6 +28,10 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project
         /// 船舶类型名称
         /// </summary>
         public string? ShipKindTypeName { get; set; }
+        /// <summary>
+        /// 舱容/斗容
+        /// </summary>
+        public string? CabinCapacityOrDouRong {  get; set; }
 
         /// <summary>
         /// 所在港口名称

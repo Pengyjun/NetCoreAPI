@@ -1,14 +1,5 @@
-﻿using SqlSugar;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project
+﻿namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project
 {
-
-
     /// <summary>
     /// 开停工时间
     /// </summary>
@@ -22,6 +13,10 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project
         /// 项目名称
         /// </summary>
         public string? Name { get; set; }
+        /// <summary>
+        /// 公司名称
+        /// </summary>
+        public string? CompanyName { get; set; }
         /// 开工时间
         /// </summary>
         public DateTime? StartWorkTime { get; set; }
@@ -29,5 +24,27 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project
         /// 停工时间
         /// </summary>
         public DateTime? EndWorkTime { get; set; }
+        /// <summary>
+        /// 停工原因
+        /// </summary>
+        public string? StopWorkReason { get; set; }
+        /// <summary>
+        /// 修改前状态
+        /// </summary>
+        public string? BeforeStatus { get; set; }
+        public string? BeforeStatusId { get; set; }
+        /// <summary>
+        /// 修改后状态
+        /// </summary>
+        public string? AfterStatus { get; set; }
+        public string? AfterStatusId { get; set; }
+        /// <summary>
+        /// 修改人
+        /// </summary>
+        public string? UpdateUser { get; set; }
+        /// <summary>
+        /// 修改时间
+        /// </summary>
+        public string? UpdateTime { get; set; }
     }
 }

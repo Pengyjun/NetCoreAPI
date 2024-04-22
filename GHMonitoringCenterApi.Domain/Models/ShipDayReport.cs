@@ -475,6 +475,11 @@ namespace GHMonitoringCenterApi.Domain.Models
         /// </summary>
         [SugarColumn(ColumnDataType = "int", DefaultValue = "0")]
         public ProjectShipState ShipState { get; set; }
+        /// <summary>
+        /// 斗容/舱容
+        /// </summary>
+        [SugarColumn(Length = 200)]
+        public string? CabinCapacityOrDouRong { get; set; }
 
     }
 }
