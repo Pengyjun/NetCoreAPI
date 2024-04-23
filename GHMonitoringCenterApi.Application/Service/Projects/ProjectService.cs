@@ -3084,6 +3084,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             else {
                 monthDay = int.Parse(nowYear + $"{nowMonth}");
             }
+            monthDay = 202403;
             #endregion
 
            var projectMonth= await dbContext.Queryable<MonthReport>().Where(x => x.IsDelete == 1 && x.ProjectId == id && x.DateMonth == monthDay).FirstAsync();
@@ -3122,11 +3123,17 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             }
 
             //修改审批状态
-            job.ApproveStatus = JobApproveStatus.Revoca;
-            jobRecord.ApproveStatus= JobApproveStatus.Revoca;
-            jobApprover.IsDelete = 0;
-
-          await  dbContext.Updateable(job).ExecuteCommandAsync();
+            //job.IsFinish = true;
+            //job.FinishApproveLevel = ApproveLevel.Level2;
+            //job.ApproveStatus = JobApproveStatus.Revoca;
+            //jobRecord.ApproveStatus= JobApproveStatus.Revoca;
+            job.IsDelete = 0;
+            jobApprover.IsDelete = 1;
+            jobRecord.IsDelete = 1;
+            projectMonth.Status =MonthReportStatus.Revoca;
+            projectMonth.StatusText = "已撤回";
+        await dbContext.Updateable(projectMonth).ExecuteCommandAsync();
+        await  dbContext.Updateable(job).ExecuteCommandAsync();
           await  dbContext.Updateable(jobRecord).ExecuteCommandAsync();
           await  dbContext.Updateable(jobApprover).ExecuteCommandAsync();
             ajaxResult.Data = true;
