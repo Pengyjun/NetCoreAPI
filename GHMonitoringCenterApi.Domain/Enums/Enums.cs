@@ -662,9 +662,13 @@ namespace GHMonitoringCenterApi.Domain.Enums
     public enum MonthReportStatus
     {
         /// <summary>
+        /// 撤回
+        /// </summary>
+        Revoca = -1,
+        /// <summary>
         /// 未知状态
         /// </summary>
-        None=0,
+        None =0,
 
         /// <summary>
         /// 审批中
@@ -675,6 +679,7 @@ namespace GHMonitoringCenterApi.Domain.Enums
         /// 审批驳回
         /// </summary>
         ApproveReject = 2,
+
 
         /// <summary>
         /// 完成

@@ -758,7 +758,7 @@ namespace GHMonitoringCenterApi.Controllers.Project
         /// <returns></returns>
         [HttpGet("RevocationProjectMonth")]
         [UnitOfWork]
-        public async Task<ResponseAjaxResult<bool>> RevocationProjectMonthAsync(BasePrimaryRequestDto basePrimaryRequestDto)
+        public async Task<ResponseAjaxResult<bool>> RevocationProjectMonthAsync([FromQuery]BasePrimaryRequestDto basePrimaryRequestDto)
         {
           return await  projectService.RevocationProjectMonthAsync(basePrimaryRequestDto.Id);
         }
