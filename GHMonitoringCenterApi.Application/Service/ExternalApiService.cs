@@ -182,5 +182,31 @@ namespace GHMonitoringCenterApi.Application.Service
             return responseAjaxResult;
 
         }
+        /// <summary>
+        /// 项目状态
+        /// </summary>
+        /// <returns></returns>
+        public async Task<ResponseAjaxResult<List<ProjectStatusInfos>>> GetProjectStatusInfosAsync()
+        {
+            var responseAjaxResult = new ResponseAjaxResult<List<ProjectStatusInfos>>();
+            var data = await _dbContext.Queryable<Domain.Models.ProjectStatus>()
+                .Where(x => x.IsDelete == 1)
+                .Select(x => new ProjectStatusInfos
+                {
+                    Code = x.Code,
+                    Id = x.Id,
+                    Name = x.Name,
+                    Remarks = x.Remarks,
+                    Sequence = x.Sequence,
+                    StatusId = x.StatusId
+                })
+                .ToListAsync();
+
+            responseAjaxResult.Count = data.Count;
+            responseAjaxResult.Data = data;
+            responseAjaxResult.Success();
+
+            return responseAjaxResult;
+        }
     }
 }

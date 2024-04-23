@@ -1,6 +1,4 @@
-﻿using SqlSugar;
-
-namespace GHMonitoringCenterApi.Application.Contracts.Dto
+﻿namespace GHMonitoringCenterApi.Application.Contracts.Dto
 {
     /// <summary>
     /// 对外接口dto
@@ -341,5 +339,35 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto
         /// 备注
         /// </summary>
         public string? Remarks { get; set; }
+    }
+    /// <summary>
+    /// 项目状态信息
+    /// </summary>
+    public class ProjectStatusInfos
+    {
+        /// <summary>
+        /// 监控中心项目状态主键
+        /// </summary>
+        public Guid Id { get; set; }
+        /// <summary>
+        /// 项目状态Id
+        /// </summary>
+        public Guid StatusId { get; set; }
+        /// <summary>
+        /// 编码
+        /// </summary>
+        public string Code { get; set; }
+        /// <summary>
+        /// 名称
+        /// </summary>
+        public string Name { get; set; }
+        /// <summary>
+        /// 备注
+        /// </summary>
+        public string Remarks { get; set; }
+        /// <summary>
+        /// 排序
+        /// </summary>
+        public int? Sequence { get; set; }
     }
 }
