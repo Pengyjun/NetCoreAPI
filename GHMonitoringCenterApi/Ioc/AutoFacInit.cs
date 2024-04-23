@@ -130,6 +130,8 @@ namespace GHMonitoringCenterApi.Ioc
             builder.RegisterType<ShipSurveyService>().As<IShipSurveyService>().InstancePerLifetimeScope();
             builder.RegisterType<ProjectYearPlanService>().As<IProjectYearPlanService>().InstancePerLifetimeScope();
             builder.RegisterType<ProductionValueImportService>().As<IProductionValueImportService>().InstancePerLifetimeScope();
+
+            builder.RegisterType<ExternalApiService>().As<IExternalApiService>().InstancePerLifetimeScope();
         }
     }
 }

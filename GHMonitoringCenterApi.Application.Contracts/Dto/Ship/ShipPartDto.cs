@@ -10,7 +10,7 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Ship
     /// <summary>
     /// 船舶部分字段模型
     /// </summary>
-    public  class ShipPartDto
+    public class ShipPartDto
     {
 
         /// <summary>
@@ -28,7 +28,7 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Ship
         /// <summary>
         /// 船舶所属公司
         /// </summary>
-        public Guid? CompanyId { get;set; }
+        public Guid? CompanyId { get; set; }
 
         /// <summary>
         /// 船舶来源类型
@@ -43,6 +43,6 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Ship
         /// <summary>
         /// 填报时间(int 类型)
         /// </summary>
-        public int FillReportDateDay{ get; set; }
+        public int FillReportDateDay { get; set; }
     }
 }

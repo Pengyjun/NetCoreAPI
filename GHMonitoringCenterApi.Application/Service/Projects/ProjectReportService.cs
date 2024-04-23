@@ -1263,6 +1263,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             resShipDayReport.ShipDayReportType = model.ShipDayReportType;
             resShipDayReport.ShipName = ship.Name;
             resShipDayReport.ShipKindTypeId = ship.ShipKindTypeId;
+            resShipDayReport.CabinCapacityOrDouRong = shipDayReport == null ? null : shipDayReport.CabinCapacityOrDouRong;
             resShipDayReport.ShipKindTypeName = resShipDayReport.ShipKindTypeId == null ? null : (await GetShipPingTypeAsync((Guid)resShipDayReport.ShipKindTypeId))?.Name;
             resShipDayReport.PortName = resShipDayReport.PortId == null ? null : (await GetPortDatasPartAsync(resShipDayReport.PortId.ToString()))?.Name;
             resShipDayReport.IsCanSubmit = VerifyOfShipDayReport(dateDay, shipDayReport);
@@ -5381,7 +5382,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 var sumMonthReport = sumMonthReports.FirstOrDefault(t => t.ProjectId == item.ProjectId);
                 if (sumMonthReport != null)
                 {
-                    outPutInfo.TotalOutPutValue = Math.Round(sumMonthReport.CompleteProductionAmount, 2);
+                    outPutInfo.TotalOutPutValue = Math.Round(sumMonthReport.CompleteProductionAmount / 10000, 2);
                 }
                 outPutInfos.Add(outPutInfo);
             }
@@ -5469,6 +5470,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
 
             //模板位置
             //var templatePath = @"D:\GHJCode\wom.api\GHMonitoringCenterApi.Domain.Shared\Template\Excel\ProjectMonthOutPutTemplate.xlsx";
+            //var templatePath = "E:\\project\\HNKC.SZGHAPI\\GHMonitoringCenterApi.Domain.Shared\\Template\\Excel\\ProjectMonthOutPutTemplate.xlsx";
             var templatePath = $"Template/Excel/ProjectMonthOutPutTemplate.xlsx";
             XSSFWorkbook workbook = null;
             using (var fs = new FileStream(templatePath, FileMode.Open, FileAccess.Read))
