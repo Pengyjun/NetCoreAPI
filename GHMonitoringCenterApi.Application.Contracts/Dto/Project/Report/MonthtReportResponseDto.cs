@@ -11,6 +11,7 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project.Report
     /// </summary>
     public class MonthtReportsResponseDto
     {
+        
         /// <summary>
         /// 合计
         /// </summary>
@@ -59,6 +60,10 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project.Report
         /// </summary>
         public class MonthtReportDto
         {
+            /// <summary>
+            /// 是否显示撤回按钮
+            /// </summary>
+            public bool IsShowRecall { get; set; }
             /// <summary>
             /// Id
             /// </summary>

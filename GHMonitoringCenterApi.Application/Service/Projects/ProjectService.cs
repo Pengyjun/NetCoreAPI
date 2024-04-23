@@ -3084,7 +3084,6 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             else {
                 monthDay = int.Parse(nowYear + $"{nowMonth}");
             }
-            monthDay = 202403;
             #endregion
 
            var projectMonth= await dbContext.Queryable<MonthReport>().Where(x => x.IsDelete == 1 && x.ProjectId == id && x.DateMonth == monthDay).FirstAsync();

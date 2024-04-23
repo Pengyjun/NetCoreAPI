@@ -1569,6 +1569,30 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
         /// </summary>
         public async Task<ResponseAjaxResult<MonthtReportsResponseDto>> SearchMonthReportsAsync(MonthtReportsRequstDto model)
         {
+            #region 时间判断
+            //查询当前是第几月
+            var nowYear = DateTime.Now.Year;
+            var nowMonth = DateTime.Now.Month;
+            var nowDay = DateTime.Now.Day;
+            var monthDay = 0;
+            if (nowDay > 26)
+            {
+                nowMonth += 1;
+            }
+            if (int.Parse(DateTime.Now.ToString("MMdd")) > 1226)
+            {
+                nowYear += 1;
+            }
+            if (nowMonth.ToString().Length == 1)
+            {
+                monthDay = int.Parse(nowYear + $"0{nowMonth}");
+            }
+            else
+            {
+                monthDay = int.Parse(nowYear + $"{nowMonth}");
+            }
+            #endregion
+
             model.ResetModelProperty();
             var result = new ResponseAjaxResult<MonthtReportsResponseDto>();
             List<string> userId = new List<string>()
@@ -1684,6 +1708,11 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             // 年度计划
             list.ForEach(item =>
             {
+                if (nowDay >= 26 && nowDay <= 1)
+                {
+                    item.IsShowRecall = item.DateMonth == monthDay;
+                }
+                
                 var thisMonthTime = item.DateMonthTime;
                 var area = areas.FirstOrDefault(t => t.PomId == item.AreaId);
                 var thispProjectOrgs = projectOrgs.Where(t => t.ProjectId == item.ProjectId).ToList();
