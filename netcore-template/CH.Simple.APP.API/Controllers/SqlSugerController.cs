@@ -6,12 +6,13 @@ using Microsoft.AspNetCore.Mvc;
 using SqlSugar;
 using CH.Simple.Utils;
 using CH.Simple.SqlSuger;
+using CH.Simple.Web.Controllers;
 
 namespace CH.Simple.APP.API.Controllers
 {
     [Route("api/sqlsuger/user")]
     [ApiController]
-    public class SqlSugerController : ControllerBase
+    public class SqlSugerController : HnkcControllerBase
     {
         private readonly ISqlSugarClient _context;
         public SqlSugerController(ISqlSugarClient db)

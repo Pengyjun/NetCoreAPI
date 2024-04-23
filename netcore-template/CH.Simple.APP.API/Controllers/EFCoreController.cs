@@ -5,12 +5,13 @@ using CH.Simple.Exceptions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using CH.Simple.Utils;
+using CH.Simple.Web.Controllers;
 
 namespace CH.Simple.APP.API.Controllers
 {
     [Route("api/efcore/user")]
     [ApiController]
-    public class EFCoreController : ControllerBase
+    public class EFCoreController : HnkcControllerBase
     {
         private readonly SimpleContext _context;
         public EFCoreController(SimpleContext context)

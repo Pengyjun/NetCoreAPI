@@ -1,4 +1,5 @@
 ﻿using CH.Simple.Models.CommonResult;
+using CH.Simple.Web.Modles;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 
@@ -22,7 +23,10 @@ namespace CH.Simple.Web.Filters
                         case 200:
                             if (objectResult.Value is not Result)
                             {
-                                context.Result = new OkObjectResult(Result.Success(data: objectResult.Value, message: "获取数据成功"));
+                                if (objectResult is OkMsgObjectResult)
+                                    context.Result = new OkObjectResult(Result.Success(message: objectResult.Value.ToString()));
+                                else
+                                    context.Result = new OkObjectResult(Result.Success(data: objectResult.Value, message: "获取数据成功"));
                             }
                             break;
                         case 401:
