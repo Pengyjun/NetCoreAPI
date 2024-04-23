@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 
 namespace CH.Simple.Web.Filters
 {
@@ -18,7 +19,7 @@ namespace CH.Simple.Web.Filters
                 var result = context.ModelState.Keys
                         .SelectMany(key => context.ModelState[key].Errors.Select(x => x.ErrorMessage))
                         .ToList();
-                context.Result = new ObjectResult(result[0]);
+                context.Result = new ObjectResult(result[0]) { StatusCode = StatusCodes.Status400BadRequest };
             }
         }
 
