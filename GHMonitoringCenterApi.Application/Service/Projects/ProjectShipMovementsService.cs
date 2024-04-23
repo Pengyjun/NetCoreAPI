@@ -340,26 +340,24 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
 
             #region 船舶进退场
             //获取船舶进退场记录表
-           var shiMovementRecord= await baseRepositoryShipMovementRecord.GetFirstAsync(x => x.Id == model.ShipMovementId);
+           var shiMovementRecord= await baseRepositoryShipMovementRecord.GetFirstAsync(x => x.ShipMovementId == model.ShipMovementId);
             if (shiMovementRecord != null)
             {
                 if (model.Status == ShipMovementStatus.Enter)
                 {
                     shiMovementRecord.EnterTime = model.EnterOrQuitTime;
                     shiMovementRecord.Status = (int)ShipMovementStatus.Enter;
+                    await baseRepositoryShipMovementRecord.InsertAsync(shiMovementRecord);
                 }
                 else {
                     shiMovementRecord.QuitTime = model.EnterOrQuitTime;
                     shiMovementRecord.Status = (int)ShipMovementStatus.Quit;
+                    await baseRepositoryShipMovementRecord.UpdateAsync(shiMovementRecord);
                 }
-                await baseRepositoryShipMovementRecord.UpdateAsync(shiMovementRecord);
             }
-            
             #endregion
-
             return result.SuccessResult(true, EnumExtension.GetEnumDescription(model.Status) + "成功");
         }
-
         #endregion
 
         /// <summary>

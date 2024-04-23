@@ -3035,11 +3035,12 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             RefAsync<int> total = 0;
             var res = await dbContext.Queryable<OwnerShip>().Where(x => x.IsDelete == 1 && x.PomId == shipId)
                  .LeftJoin<ShipMovementRecord>((x, y) => x.PomId == y.ShipId)
+                 .LeftJoin<Project>((x, y,z) => y.ProjectId==z.Id)
                  .Where((x, y) => y.IsDelete == 1)
-                 .Select((x, y) => new ShipMovementRecordResponseDto()
+                 .Select((x, y,z) => new ShipMovementRecordResponseDto()
                  {
                      ProjectId = y.ProjectId,
-                     ProjectName = y.ProjectName,
+                     ProjectName = z.ShortName,
                      EnterTime = y.EnterTime,
                      QuitTime = y.QuitTime,
                      Status = y.Status,
