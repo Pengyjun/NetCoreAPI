@@ -352,8 +352,9 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     shiMovementRecord.QuitTime = model.EnterOrQuitTime;
                     shiMovementRecord.Status = (int)ShipMovementStatus.Quit;
                 }
+                await baseRepositoryShipMovementRecord.UpdateAsync(shiMovementRecord);
             }
-            await baseRepositoryShipMovementRecord.UpdateAsync(shiMovementRecord);
+            
             #endregion
 
             return result.SuccessResult(true, EnumExtension.GetEnumDescription(model.Status) + "成功");
