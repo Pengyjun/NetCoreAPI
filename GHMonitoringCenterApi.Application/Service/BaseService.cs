@@ -1193,6 +1193,20 @@ namespace GHMonitoringCenterApi.Application.Service
                 {
                     switch (item)
                     {
+                        case "电子档案系统":
+                            result.OutputColumn.Add(new ColumnInfo()
+                            {
+                                ProjectId = projectId,
+                                MenuName = "电子档案系统",
+                            });
+                            break;
+                        case "任务督办系统":
+                            result.OutputColumn.Add(new ColumnInfo()
+                            {
+                                ProjectId = projectId,
+                                MenuName = "任务督办系统",
+                            });
+                            break;
                         case "船舶日报":
                             if (projectList.TypeId == projectType)
                             {

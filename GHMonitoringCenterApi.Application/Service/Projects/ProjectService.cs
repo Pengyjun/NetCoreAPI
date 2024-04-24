@@ -1014,7 +1014,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     StopWorkReson = addOrUpdateProjectRequestDto.ShutDownReason,
                     CreateTime = DateTime.Now,
                     UpdateUser = _currentUser.Name + "新增项目",
-                    AfterStatus = addOrUpdateProjectRequestDto.StatusId.ToString()
+                    AfterStatus = addOrUpdateProjectRequestDto.StatusId.ToString(),
                 };
                 await dbContext.Insertable<StartWorkRecord>(startWorkRecord).ExecuteCommandAsync();
                 #endregion
@@ -1043,7 +1043,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             }
 
 
-
+            await Console.Out.WriteLineAsync("11");
             #region 计算项目停工天数 供交建通每天发消息使用
             //项目ID
             Guid projectId = GuidUtil.Next();
@@ -1168,7 +1168,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             #endregion
 
 
-
+            await Console.Out.WriteLineAsync("22221");
             if (addOrUpdateProjectRequestDto.RequestType)
             {
 
@@ -1590,6 +1590,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 responseAjaxResult.Success(ResponseMessage.OPERATION_UPDATE_SUCCESS);
                 return responseAjaxResult;
             }
+            await Console.Out.WriteLineAsync("33333");
         }
 
         #region 删除项目
