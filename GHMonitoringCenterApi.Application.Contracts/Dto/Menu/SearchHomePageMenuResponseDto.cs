@@ -38,6 +38,7 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Menu
     /// </summary>
     public class ColumnInfo
     {
+
         /// <summary>
         /// 项目id
         /// </summary>
@@ -58,6 +59,10 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Menu
         /// 项目类型提示   是非施工类类型为true
         /// </summary>
         public bool? TypePrompt { get; set; } = false;
+        /// <summary>
+        /// 
+        /// </summary>
+        public string Url { get; set; }
 
     }
 }

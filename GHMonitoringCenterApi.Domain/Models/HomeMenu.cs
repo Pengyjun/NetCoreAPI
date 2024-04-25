@@ -28,5 +28,12 @@ namespace GHMonitoringCenterApi.Domain.Models
         /// </summary>
         [SugarColumn(ColumnDataType = "int")]
         public int? Sort { get; set; }
+
+
+        /// <summary>
+        /// 调整URL
+        /// </summary>
+        [SugarColumn(Length = 255)]
+        public string? Url { get; set; }
     }
 }
