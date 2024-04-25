@@ -256,6 +256,9 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             {
                 return result.FailResult(HttpStatusCode.DataNotEXIST, "船舶进出场对象不存在");
             }
+            shipMovement.UpdateId = _currentUser.Id;
+            shipMovement.Status = model.Status;
+            shipMovement.Remarks = model.Remarks;
             if (shipMovement.Status == ShipMovementStatus.Enter)
             {
                 var enterShipMovement = await GetShipMovementAsync(shipMovement.ShipId, shipMovement.ShipType, ShipMovementStatus.Enter, shipMovement.ProjectId);
@@ -270,25 +273,25 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                         return result.FailResult(HttpStatusCode.InsertFail, $"当前船舶已经在{hasOtherEnterProject.Name}项目上进场");
                     }
                 }
-                // 原来数据删除状态更改为2 
-                shipMovement.IsDelete = 2;
-                await _dbShipMovement.AsUpdateable(shipMovement).WhereColumns(x => x.Id).UpdateColumns(x => x.IsDelete).ExecuteCommandAsync();
+                //// 原来数据删除状态更改为2 
+                //shipMovement.IsDelete = 2;
+                //await _dbShipMovement.AsUpdateable(shipMovement).WhereColumns(x => x.Id).UpdateColumns(x => x.IsDelete).ExecuteCommandAsync();
                 //新增最新进场数据
-                var addShipMovement = new ShipMovement()
-                {
-                    Id = GuidUtil.Next(),
-                    CreateId = shipMovement.CreateId,
-                    CreateTime = shipMovement.CreateTime,
-                    EnterTime = model.EnterOrQuitTime,
-                    QuitTime = null,
-                    UpdateId = _currentUser.Id,
-                    Status = model.Status,
-                    Remarks = model.Remarks,
-                    ProjectId = shipMovement.ProjectId,
-                    ShipId = shipMovement.ShipId,
-                    ShipType = shipMovement.ShipType,
-                    UpdateTime = DateTime.Now
-                };
+                //var addShipMovement = new ShipMovement()
+                //{
+                //    Id = GuidUtil.Next(),
+                //    CreateId = shipMovement.CreateId,
+                //    CreateTime = shipMovement.CreateTime,
+                //    EnterTime = model.EnterOrQuitTime,
+                //    QuitTime = null,
+                //    UpdateId = _currentUser.Id,
+                //    Status = model.Status,
+                //    Remarks = model.Remarks,
+                //    ProjectId = shipMovement.ProjectId,
+                //    ShipId = shipMovement.ShipId,
+                //    ShipType = shipMovement.ShipType,
+                //    UpdateTime = DateTime.Now
+                //};
                 LogInfo addLogDto = new LogInfo()
                 {
                     Id = GuidUtil.Increment(),
@@ -298,10 +301,43 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     BusinessModule = "/装备管理/船舶进出场/进场",
                     BusinessRemark = "/装备管理/船舶进出场/进场"
                 };
-                await _dbShipMovement.AsInsertable(addShipMovement).EnableDiffLogEvent(addLogDto).ExecuteCommandAsync();
+
+                #region 船舶进退场
+                //获取船舶进退场记录表
+                var shiMovementRecord = await baseRepositoryShipMovementRecord.GetFirstAsync(x => x.ShipMovementId == model.ShipMovementId);
+                if (shiMovementRecord != null)
+                {
+                    if (model.Status == ShipMovementStatus.Enter)
+                    {
+                        shiMovementRecord.EnterTime = model.EnterOrQuitTime;
+                        shiMovementRecord.Status = (int)ShipMovementStatus.Enter;
+                        shiMovementRecord.ShipId = shipMovement.ShipId;
+                        shiMovementRecord.ShipType = (int)shipMovement.ShipType;
+                        await baseRepositoryShipMovementRecord.UpdateAsync(shiMovementRecord);
+                    }
+                   
+                }
+                #endregion
+
+                await _dbShipMovement.AsUpdateable(shipMovement).EnableDiffLogEvent(addLogDto).ExecuteCommandAsync();
             }
             else if (shipMovement.Status == ShipMovementStatus.Quit)
             {
+                #region 船舶进退场
+                //获取船舶进退场记录表
+                var shiMovementRecord = await baseRepositoryShipMovementRecord.GetFirstAsync(x => x.ShipMovementId == model.ShipMovementId);
+                if (shiMovementRecord != null)
+                {
+                    if (model.Status == ShipMovementStatus.Quit)
+                    {
+                     
+                        shiMovementRecord.QuitTime = model.EnterOrQuitTime;
+                        shiMovementRecord.Status = (int)ShipMovementStatus.Quit;
+                        await baseRepositoryShipMovementRecord.UpdateAsync(shiMovementRecord);
+                    }
+                }
+                #endregion
+
                 if (shipMovement.EnterTime > model.EnterOrQuitTime)
                 {
                     return result.FailResult(HttpStatusCode.SaveFail, "退场时间不能小于进场时间");
@@ -319,6 +355,9 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 };
                 #endregion
                 await _dbShipMovement.AsUpdateable(shipMovement).EnableDiffLogEvent(logDto).ExecuteCommandAsync();
+
+
+
             }
             else if (shipMovement.Status == ShipMovementStatus.None)
             {
@@ -335,27 +374,21 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     BusinessModule = "/装备管理/船舶进出场/进场",
                     BusinessRemark = "/装备管理/船舶进出场/进场"
                 };
+                #region 船舶进退场
+                //获取船舶进退场记录表
+                var shiMovementRecord = await baseRepositoryShipMovementRecord.GetFirstAsync(x => x.ShipMovementId == model.ShipMovementId);
+                if (shiMovementRecord != null)
+                {
+                  
+                shiMovementRecord.EnterTime = model.EnterOrQuitTime;
+                shiMovementRecord.Status = (int)ShipMovementStatus.Enter;
+                await baseRepositoryShipMovementRecord.InsertAsync(shiMovementRecord);
+                }
+                #endregion
                 await _dbShipMovement.AsUpdateable(shipMovement).WhereColumns(x => x.Id).UpdateColumns(x => new { x.UpdateId, x.UpdateTime, x.Status, x.Remarks, x.EnterTime }).EnableDiffLogEvent(addLogDto).ExecuteCommandAsync();
             }
 
-            #region 船舶进退场
-            //获取船舶进退场记录表
-           var shiMovementRecord= await baseRepositoryShipMovementRecord.GetFirstAsync(x => x.ShipMovementId == model.ShipMovementId);
-            if (shiMovementRecord != null)
-            {
-                if (model.Status == ShipMovementStatus.Enter)
-                {
-                    shiMovementRecord.EnterTime = model.EnterOrQuitTime;
-                    shiMovementRecord.Status = (int)ShipMovementStatus.Enter;
-                    await baseRepositoryShipMovementRecord.InsertAsync(shiMovementRecord);
-                }
-                else {
-                    shiMovementRecord.QuitTime = model.EnterOrQuitTime;
-                    shiMovementRecord.Status = (int)ShipMovementStatus.Quit;
-                    await baseRepositoryShipMovementRecord.UpdateAsync(shiMovementRecord);
-                }
-            }
-            #endregion
+          
             return result.SuccessResult(true, EnumExtension.GetEnumDescription(model.Status) + "成功");
         }
         #endregion

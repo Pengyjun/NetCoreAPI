@@ -23,6 +23,12 @@ namespace GHMonitoringCenterApi.Domain.Models
         /// </summary>
         [SugarColumn(Length =50)]
         public Guid ShipId { get; set; }
+
+        /// <summary>
+        /// 船舶类型
+        /// </summary>
+        [SugarColumn(ColumnDataType = "int")]
+        public int ShipType { get; set; }
         /// <summary>
         /// 项目ID
         /// </summary>
