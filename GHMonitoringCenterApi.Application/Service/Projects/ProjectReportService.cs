@@ -1826,7 +1826,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     }
                 }
                 // 标后预算预计成本
-                item.PostmarkProjectedCost = Math.Round(item.CumulativeCompleted * (100 - item.BudgetInterestRate ?? 0), 2);
+                item.PostmarkProjectedCost = Math.Round(item.CumulativeCompleted * ((100 - item.BudgetInterestRate ?? 0)/100), 2);
                 // 支付滞后比例(支付滞后比例 = 合同约定的计量支付比例-实际支付比例,   实际支付比例=甲方付款金额/甲方确认产值)
                 if (item.RecognizedValue != 0)
                 {
