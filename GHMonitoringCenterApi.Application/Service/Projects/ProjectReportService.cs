@@ -1708,7 +1708,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             // 年度计划
             list.ForEach(item =>
             {
-                if (nowDay >= 26 && nowDay <= 1)
+                if (nowDay >= 26 || nowDay <= 1)
                 {
                     item.IsShowRecall = item.DateMonth == monthDay;
                 }
