@@ -292,8 +292,18 @@ namespace GHMonitoringCenterApi.Application.Service.File
             var formData = new MultipartFormDataContent();
             formData.Add(new StreamContent(file, (int)file.Length), name, fileName);
             var _httpclient = new HttpClient();
-            var response = _httpclient.PostAsync(url, formData).Result;
-            if (response.IsSuccessStatusCode)
+            HttpResponseMessage response = new HttpResponseMessage();
+            try
+            {
+                 response = await _httpclient.PostAsync(url, formData);
+            }
+            catch (Exception ex)
+            {
+
+                logger.LogError($"生产日报推送消息发送失败:{ex}");
+            }
+          
+            if (response!=null&&response.IsSuccessStatusCode)
             {
                 var media = response.Content.ReadAsStringAsync().Result;
                 responseAjaxResult.Data = true;
@@ -417,8 +427,17 @@ namespace GHMonitoringCenterApi.Application.Service.File
             var formData = new MultipartFormDataContent();
             formData.Add(new StreamContent(file, (int)file.Length), name, fileName);
             var _httpclient = new HttpClient();
-            var response = _httpclient.PostAsync(url, formData).Result;
-            if (response.IsSuccessStatusCode)
+            HttpResponseMessage response = new HttpResponseMessage();
+            try
+            {
+                response = await _httpclient.PostAsync(url, formData);
+            }
+            catch (Exception ex)
+            {
+
+                logger.LogError($"船舶推送消息发送失败:{ex}");
+            }
+            if (response!=null&&response.IsSuccessStatusCode)
             {
                 var media = response.Content.ReadAsStringAsync().Result;
                 responseAjaxResult.Data = true;
@@ -481,8 +500,17 @@ namespace GHMonitoringCenterApi.Application.Service.File
 			var formData = new MultipartFormDataContent();
 			formData.Add(new StreamContent(file, (int)file.Length), name, fileName);
 			var _httpclient = new HttpClient();
-			var response = _httpclient.PostAsync(url, formData).Result;
-			if (response.IsSuccessStatusCode)
+            HttpResponseMessage response = new HttpResponseMessage();
+            try
+            {
+                response = await _httpclient.PostAsync(url, formData);
+            }
+            catch (Exception ex)
+            {
+
+                logger.LogError($"推送消息发送失败:{ex}");
+            }
+            if (response!=null&&response.IsSuccessStatusCode)
 			{
 				var media = response.Content.ReadAsStringAsync().Result;
 				responseAjaxResult.Data = true;
