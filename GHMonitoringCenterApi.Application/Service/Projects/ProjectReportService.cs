@@ -6581,7 +6581,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 var currentTotalYearOffirmProductionValue = await _dbContext.Queryable<MonthReport>()
                     .Where(x => x.IsDelete == 1 && x.ProjectId == projectId).ToListAsync();
                 //本年甲方确认产值(当年)
-                currentYearOffirmProductionValue = currentTotalYearOffirmProductionValue.Where(x => x.DateMonth >= new DateTime(DateTime.Now.Year, 1, 1).ToDateMonth() && x.DateMonth <= dateMonth
+                currentYearOffirmProductionValue = currentTotalYearOffirmProductionValue.Where(x => x.DateMonth >= new DateTime(DateTime.Now.Year, 1, 1).ToDateMonth() && x.DateMonth <= dateMonth)
                    //原来的// x.DateYear==currentYear)
                    .Sum(x => x.PartyAConfirmedProductionAmount);
 
