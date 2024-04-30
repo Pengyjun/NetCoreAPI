@@ -544,6 +544,8 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             var result = new ResponseAjaxResult<ProjectDayReportResponseDto>();
             var now = DateTime.Now;
             int dateDay = model.DateDay ?? now.AddDays(-1).ToDateDay();
+            var holidayConfig = await _dbContext.Queryable<HolidayConfig>().Where(x => x.IsDelete == 1).FirstAsync();
+
             //上一天日期
             int lastDateDay = 0;
             if (ConvertHelper.TryConvertDateTimeFromDateDay(dateDay, out DateTime dayTime))
@@ -590,7 +592,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 resDayReport.Construction.CurrencyExchangeRate = currencyExchangeRate;
                 resDayReport.Construction.IsShowWorkStatusOfSpringFestival = IsShowWorkStatusOfSpringFestival(dayTime);
                 resDayReport.CreateUserName = _currentUser.Name;
-                resDayReport.IsHoliday = true;// IsHoliday(dateDay);
+                resDayReport.IsHoliday = holidayConfig.IsHoliday == 1; //true;// IsHoliday(dateDay);
 
             }
             else
@@ -631,7 +633,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     resDayReport.CreateUserName = user?.Name;
                 }
                 resDayReport.ProcessStatus = dayReport.ProcessStatus;
-                resDayReport.IsHoliday = true; //dayReport.IsHoliday;
+                resDayReport.IsHoliday = holidayConfig.IsHoliday == 1;// true; //dayReport.IsHoliday;
             }
 
             #region 修改汇率
@@ -6207,6 +6209,12 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             ResponseAjaxResult<ProjectShiftProductionResponseDto> responseAjaxResult = new ResponseAjaxResult<ProjectShiftProductionResponseDto>();
             ProjectShiftProductionResponseDto responseDto = new ProjectShiftProductionResponseDto();
             ProjectShiftProductionSumInfo productionSumInfo = new ProjectShiftProductionSumInfo();
+
+            var holidayConfig=await _dbContext.Queryable<HolidayConfig>().Where(x => x.IsDelete == 1).FirstAsync();
+            if (holidayConfig != null)
+            {
+                responseDto.Title = holidayConfig.Title;
+            }
             //获取当前用户授权数据
             //var userAuthForData = await GetCurrentUserAuthForDataAsync();
             var time = DateTime.Now.AddDays(-1).ToDateDay();

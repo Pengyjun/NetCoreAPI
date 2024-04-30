@@ -13,6 +13,10 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project.Report
     public class ProjectShiftProductionResponseDto
     {
         /// <summary>
+        /// 节假日标题
+        /// </summary>
+        public string? Title { get; set; }
+        /// <summary>
         /// 日期
         /// </summary>
         public DateTime TimeValue { get; set; }
