@@ -1708,11 +1708,11 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             // 年度计划
             list.ForEach(item =>
             {
-                if (item.StatusText== "一级审批中" &&(nowDay >= 26 || nowDay <= 1))
+                if (item.StatusText == "一级审批中" && (nowDay >= 26 || nowDay <= 1))
                 {
                     item.IsShowRecall = item.DateMonth == monthDay;
                 }
-                
+
                 var thisMonthTime = item.DateMonthTime;
                 var area = areas.FirstOrDefault(t => t.PomId == item.AreaId);
                 var thispProjectOrgs = projectOrgs.Where(t => t.ProjectId == item.ProjectId).ToList();
@@ -1826,7 +1826,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     }
                 }
                 // 标后预算预计成本
-                item.PostmarkProjectedCost = Math.Round(item.CumulativeCompleted * ((100 - item.BudgetInterestRate ?? 0)/100), 2);
+                item.PostmarkProjectedCost = Math.Round(item.CumulativeCompleted * ((100 - item.BudgetInterestRate ?? 0) / 100), 2);
                 // 支付滞后比例(支付滞后比例 = 合同约定的计量支付比例-实际支付比例,   实际支付比例=甲方付款金额/甲方确认产值)
                 if (item.RecognizedValue != 0)
                 {
@@ -2620,7 +2620,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             #region 增加四个字段
             if (resMonthReport != null)
             {
-                var resultData = await GetProjectProductionValue(model.ProjectId);
+                var resultData = await GetProjectProductionValue(model.ProjectId, model.DateMonth.Value);
                 resMonthReport.CurrentYearOffirmProductionValue = resultData.Item1;
                 resMonthReport.TotalYearKaileaOffirmProductionValue = resultData.Item2;
                 resMonthReport.CurrenYearCollection = resultData.Item3;
@@ -6566,7 +6566,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
         /// </summary>
         /// <param name="projectId">项目ID</param>
         /// <returns></returns>
-        public async Task<Tuple<decimal, decimal, decimal, decimal>> GetProjectProductionValue(Guid projectId)
+        public async Task<Tuple<decimal, decimal, decimal, decimal>> GetProjectProductionValue(Guid projectId, int dateMonth)
         {
             var currentYearOffirmProductionValue = 0M;
             var totalYearKaileaOffirmProductionValue = 0M;
@@ -6581,7 +6581,8 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 var currentTotalYearOffirmProductionValue = await _dbContext.Queryable<MonthReport>()
                     .Where(x => x.IsDelete == 1 && x.ProjectId == projectId).ToListAsync();
                 //本年甲方确认产值(当年)
-                currentYearOffirmProductionValue = currentTotalYearOffirmProductionValue.Where(x => x.DateYear == currentYear)
+                currentYearOffirmProductionValue = currentTotalYearOffirmProductionValue.Where(x => x.DateMonth >= new DateTime(DateTime.Now.Year, 1, 1).ToDateMonth() && x.DateMonth <= dateMonth)
+                   //原来的// x.DateYear==currentYear)
                    .Sum(x => x.PartyAConfirmedProductionAmount);
 
                 //开累甲方确认产值(历史数据+2023-7至12月的数据+2024年的数据）
