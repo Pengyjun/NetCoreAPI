@@ -590,7 +590,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 resDayReport.Construction.CurrencyExchangeRate = currencyExchangeRate;
                 resDayReport.Construction.IsShowWorkStatusOfSpringFestival = IsShowWorkStatusOfSpringFestival(dayTime);
                 resDayReport.CreateUserName = _currentUser.Name;
-                resDayReport.IsHoliday = IsHoliday(dateDay);
+                resDayReport.IsHoliday = true;// IsHoliday(dateDay);
 
             }
             else
@@ -631,7 +631,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     resDayReport.CreateUserName = user?.Name;
                 }
                 resDayReport.ProcessStatus = dayReport.ProcessStatus;
-                resDayReport.IsHoliday = dayReport.IsHoliday;
+                resDayReport.IsHoliday = true; //dayReport.IsHoliday;
             }
 
             #region 修改汇率
