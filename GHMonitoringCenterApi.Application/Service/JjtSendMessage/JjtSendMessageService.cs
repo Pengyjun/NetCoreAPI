@@ -1756,7 +1756,7 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
                 await Console.Out.WriteLineAsync(item.ItemId.ToString());
                 var bb = aa == null ? 0 : aa.Value * 100000000;
                 var currentMonthCompanyCount = Math.Round(dayProductionValueList
-                    .Where(x => x.CompanyId == item.ItemId && x.DateDay >= 20240326 && x.DateDay <= currentTimeInt)
+                    .Where(x => x.CompanyId == item.ItemId && x.DateDay >= 20240426 && x.DateDay <= currentTimeInt)
                     .Sum(x => x.DayActualProductionAmount), 3)
                     + bb;
                 //年度产值占比 （广航局）

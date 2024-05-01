@@ -25,52 +25,53 @@ namespace GHMonitoringCenterApi.Domain.Shared
             //data.Add("01ff7a0e-e827-4b46-9032-0a540ce1fba3", 1.32M);
             //data.Add("bd840460-1e3a-45c8-abed-6e66903eb465", 11.07M);
 
-            dataInits.Add(new DataInit() {
-             CompanyId= "3c5b138b-601a-442a-9519-2508ec1c1eb2",
-              Production= 6.80M
-            });
+            dataInits.Add(new DataInit()
+            {
+                CompanyId = "3c5b138b-601a-442a-9519-2508ec1c1eb2",
+                Production = 8.29M
+            }) ;
             dataInits.Add(new DataInit()
             {
                 CompanyId = "a8db9bb0-4667-4320-b03d-b0b7f8728b61",
-                Production = 8.76M
+                Production =12.05M
             });
 
             dataInits.Add(new DataInit()
             {
                 CompanyId = "11c9c978-9ef3-411d-ba70-0d0eed93e048",
-                Production = 0.67M
+                Production = 0.83M
             });
 
             dataInits.Add(new DataInit()
             {
                 CompanyId = "5a8f39de-8515-456b-8620-c0d01c012e04",
-                Production = 0.01M
+                Production = 0.06M
             });
 
             dataInits.Add(new DataInit()
             {
                 CompanyId = "c0d51e81-03dd-4ef8-bd83-6eb1355879e1",
-                Production = 1.19M
+                Production = 1.66M
             });
 
 
             dataInits.Add(new DataInit()
             {
                 CompanyId = "65052a94-6ea7-44ba-96b4-cf648de0d28a",
-                Production = 0.33M
+                Production = 0.59M
             });
 
 
             dataInits.Add(new DataInit()
             {
                 CompanyId = "01ff7a0e-e827-4b46-9032-0a540ce1fba3",
-                Production = 1.32M
+                Production = 1.34M
             });
 
             dataInits.Add(new DataInit()
             {
                 CompanyId = "bd840460-1e3a-45c8-abed-6e66903eb465",
-                Production = 10.67M
+                Production = 11.95M
             });
             return dataInits;
         }
