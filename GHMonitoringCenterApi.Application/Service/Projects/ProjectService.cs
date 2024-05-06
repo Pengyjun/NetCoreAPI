@@ -16,6 +16,7 @@ using GHMonitoringCenterApi.Domain.Shared.Const;
 using GHMonitoringCenterApi.Domain.Shared.Enums;
 using GHMonitoringCenterApi.Domain.Shared.Util;
 using Microsoft.IdentityModel.Tokens;
+using NPOI.HPSF;
 using Org.BouncyCastle.Asn1.Pkcs;
 using SqlSugar;
 using SqlSugar.Extensions;
@@ -996,7 +997,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             var projectDutys = new List<ProjectOrg>();
             //增改项目干系人员
             var proLeaderList = new List<ProjectLeader>();
-
+            Guid projectId = GuidUtil.Next();
             var startWorkRecord = new StartWorkRecord();
             if (addOrUpdateProjectRequestDto.RequestType == true)
             {
@@ -1006,10 +1007,10 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 {
                     Id = GuidUtil.Next(),
                     CompanyId = addOrUpdateProjectRequestDto.CompanyId,
-                    ProjectId = addOrUpdateProjectRequestDto.Id.Value,
+                    ProjectId = projectId,
                     Name = addOrUpdateProjectRequestDto.Name,
-                    StartWorkTime = addOrUpdateProjectRequestDto.CommencementTime.Value,
-                    EndWorkTime = addOrUpdateProjectRequestDto.ShutdownDate.Value,
+                    StartWorkTime = addOrUpdateProjectRequestDto.CommencementTime.HasValue ? addOrUpdateProjectRequestDto.CommencementTime.Value:null,
+                    EndWorkTime = addOrUpdateProjectRequestDto.ShutdownDate.HasValue?addOrUpdateProjectRequestDto.ShutdownDate.Value:null,
                     BeforeStatus = addOrUpdateProjectRequestDto.StatusId.ToString(),
                     StopWorkReson = addOrUpdateProjectRequestDto.ShutDownReason,
                     CreateTime = DateTime.Now,
@@ -1045,8 +1046,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
 
             await Console.Out.WriteLineAsync("11");
             #region 计算项目停工天数 供交建通每天发消息使用
-            //项目ID
-            Guid projectId = GuidUtil.Next();
+           
             //计算当前周期已过多少天
             var nowDay = DateTime.Now.Day;
             //当前月的最后一天
