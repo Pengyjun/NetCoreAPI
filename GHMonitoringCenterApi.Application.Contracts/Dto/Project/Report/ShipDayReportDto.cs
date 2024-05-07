@@ -137,6 +137,10 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project
         ///船存燃油（t）
         /// </summary>
         public decimal? ShipboardFuel { get; set; }
+        /// <summary>
+        /// 舱容/斗容
+        /// </summary>
+        public string? CabinCapacityOrDouRong { get; set; }
 
 
         #region 生产运转（单位小时）
