@@ -6573,6 +6573,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
         /// 第四个 开累甲方付款金额
         /// </summary>
         /// <param name="projectId">项目ID</param>
+        /// <param name="dateMonth"></param>
         /// <returns></returns>
         public async Task<Tuple<decimal, decimal, decimal, decimal>> GetProjectProductionValue(Guid projectId, int dateMonth)
         {
