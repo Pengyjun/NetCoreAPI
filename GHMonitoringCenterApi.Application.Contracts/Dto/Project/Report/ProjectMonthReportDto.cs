@@ -12,13 +12,13 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project.Report
     /// <summary>
     /// 项目月报Dto
     /// </summary>
-    public abstract  class ProjectMonthReportDto<TTreeDetail,TDetail> where TTreeDetail : TreeProjectWBSDetailDto<TTreeDetail,TDetail> where TDetail : MonthReportDetailDto<TDetail>
+    public abstract class ProjectMonthReportDto<TTreeDetail, TDetail> where TTreeDetail : TreeProjectWBSDetailDto<TTreeDetail, TDetail> where TDetail : MonthReportDetailDto<TDetail>
     {
         /// <summary>
         /// 产值累计
         /// </summary>
         public decimal TotalProductionAmount { get; set; }
-        
+
         /// <summary>
         /// 项目Id
         /// </summary>
@@ -88,7 +88,7 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project.Report
         /// <summary>
         /// 下月估算成本（元）
         /// </summary>
-        public decimal?  NextMonthEstimateCostAmount { get; set; }
+        public decimal? NextMonthEstimateCostAmount { get; set; }
 
         /// <summary>
         /// 进度偏差原因简述
@@ -199,7 +199,7 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project.Report
     /// <summary>
     /// 树状WBS
     /// </summary>
-    public abstract  class   TreeProjectWBSDetailDto<TTreeDetail,TDetail> where TTreeDetail : TreeProjectWBSDetailDto<TTreeDetail, TDetail> where TDetail : MonthReportDetailDto<TDetail>
+    public abstract class TreeProjectWBSDetailDto<TTreeDetail, TDetail> where TTreeDetail : TreeProjectWBSDetailDto<TTreeDetail, TDetail> where TDetail : MonthReportDetailDto<TDetail>
     {
         /// <summary>
         /// 施工分类Id
@@ -252,7 +252,7 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project.Report
     /// <summary>
     /// 项目月报树状明细
     /// </summary>
-    public abstract class MonthReportDetailDto<TDetail> where TDetail: MonthReportDetailDto<TDetail>
+    public abstract class MonthReportDetailDto<TDetail> where TDetail : MonthReportDetailDto<TDetail>
     {
         /// <summary>
         /// 明细Id
@@ -348,5 +348,9 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project.Report
         /// 累计完成产值（元）
         /// </summary>
         public decimal TotalCompleteProductionAmount { get; set; }
+        /// <summary>
+        /// 备注
+        /// </summary>
+        public string? Remark { get; set; }
     }
 }
