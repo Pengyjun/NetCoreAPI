@@ -2622,6 +2622,20 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             #region 增加四个字段
             if (resMonthReport != null)
             {
+                #region 参数问题
+                var startTime = string.Empty;
+                if (model.DateMonth==null||model.DateMonth.HasValue)
+                {
+                    if (DateTime.Now.Day >= 26&& DateTime.Now.Day<=1)
+                    {
+                        model.DateMonth = DateTime.Now.Month;
+                    }
+                    else
+                    {
+                        model.DateMonth = DateTime.Now.AddMonths(-1).Month;
+                    }
+                }
+                #endregion
                 var resultData = await GetProjectProductionValue(model.ProjectId, model.DateMonth.Value);
                 resMonthReport.CurrentYearOffirmProductionValue = resultData.Item1;
                 resMonthReport.TotalYearKaileaOffirmProductionValue = resultData.Item2;
