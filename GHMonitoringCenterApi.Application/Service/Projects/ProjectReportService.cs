@@ -2624,9 +2624,9 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             {
                 #region 参数问题
                 var startTime = string.Empty;
-                if (model.DateMonth==null||model.DateMonth.HasValue)
+                if (model.DateMonth == null || model.DateMonth.HasValue)
                 {
-                    if (DateTime.Now.Day >= 26&& DateTime.Now.Day<=1)
+                    if (DateTime.Now.Day >= 26 && DateTime.Now.Day <= 1)
                     {
                         model.DateMonth = DateTime.Now.Month;
                     }
@@ -6224,7 +6224,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             ProjectShiftProductionResponseDto responseDto = new ProjectShiftProductionResponseDto();
             ProjectShiftProductionSumInfo productionSumInfo = new ProjectShiftProductionSumInfo();
 
-            var holidayConfig=await _dbContext.Queryable<HolidayConfig>().Where(x => x.IsDelete == 1).FirstAsync();
+            var holidayConfig = await _dbContext.Queryable<HolidayConfig>().Where(x => x.IsDelete == 1).FirstAsync();
             if (holidayConfig != null)
             {
                 responseDto.Title = holidayConfig.Title;
@@ -6602,7 +6602,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                    .Where(x => x.IsDelete == 1 && x.ProjectId == projectId).FirstAsync();
 
                 var currentTotalYearOffirmProductionValue = await _dbContext.Queryable<MonthReport>()
-                    .Where(x => x.IsDelete == 1 && x.ProjectId == projectId &&  x.DateMonth <= dateMonth).ToListAsync();
+                    .Where(x => x.IsDelete == 1 && x.ProjectId == projectId && x.DateMonth <= dateMonth).ToListAsync();
                 //本年甲方确认产值(当年)
                 currentYearOffirmProductionValue = currentTotalYearOffirmProductionValue.Where(x => x.DateMonth >= new DateTime(DateTime.Now.Year, 1, 1).ToDateMonth() && x.DateMonth <= dateMonth)
                    //原来的// x.DateYear==currentYear)

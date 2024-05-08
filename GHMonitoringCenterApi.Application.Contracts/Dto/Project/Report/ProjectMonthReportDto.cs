@@ -255,6 +255,10 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project.Report
     public abstract class MonthReportDetailDto<TDetail> where TDetail : MonthReportDetailDto<TDetail>
     {
         /// <summary>
+        /// 备注
+        /// </summary>
+        public string? Remark { get; set; }
+        /// <summary>
         /// 明细Id
         /// </summary>
         public Guid? DetailId { get; set; }
@@ -348,9 +352,5 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project.Report
         /// 累计完成产值（元）
         /// </summary>
         public decimal TotalCompleteProductionAmount { get; set; }
-        /// <summary>
-        /// 备注
-        /// </summary>
-        public string? Remark { get; set; }
     }
 }
