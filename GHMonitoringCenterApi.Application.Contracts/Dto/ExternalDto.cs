@@ -127,6 +127,10 @@
         /// </summary>
         public int PomId { get; set; }
         /// <summary>
+        /// 项目类型id
+        /// </summary>
+        public Guid? ProjectTypeId { get; set; }
+        /// <summary>
 		/// 名称
 		/// </summary>
         public string? Name { get; set; }
@@ -369,5 +373,31 @@
         /// 排序
         /// </summary>
         public int? Sequence { get; set; }
+    }
+    /// <summary>
+    /// 项目类型信息
+    /// </summary>
+    public class ProjectTypeInfos
+    {
+        /// <summary>
+        /// 项目类型主键
+        /// </summary>
+        public Guid Id { get; set; }
+        /// <summary>
+        /// 关联的pomid
+        /// </summary>
+        public Guid PomId { get; set; }
+        /// <summary>
+        /// 编码
+        /// </summary>
+        public string? Code { set; get; }
+        /// <summary>
+        /// 备注
+        /// </summary>
+        public string? Remarks { get; set; }
+        /// <summary>
+        /// 类型名称
+        /// </summary>
+        public string? Name { get; set; }
     }
 }

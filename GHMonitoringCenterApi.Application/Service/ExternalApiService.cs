@@ -1,6 +1,7 @@
 ﻿using GHMonitoringCenterApi.Application.Contracts.Dto;
 using GHMonitoringCenterApi.Application.Contracts.IService;
 using GHMonitoringCenterApi.Domain.Shared;
+using GHMonitoringCenterApi.Domain.Shared.Const;
 using SqlSugar;
 
 namespace GHMonitoringCenterApi.Application.Service
@@ -48,9 +49,7 @@ namespace GHMonitoringCenterApi.Application.Service
                 .ToListAsync();
 
             responseAjaxResult.Count = data.Count;
-            responseAjaxResult.Data = data;
-            responseAjaxResult.Success();
-
+            responseAjaxResult.SuccessResult(data, ResponseMessage.OPERATION_SUCCESS);
             return responseAjaxResult;
         }
         /// <summary>
@@ -82,9 +81,7 @@ namespace GHMonitoringCenterApi.Application.Service
                 .ToListAsync();
 
             responseAjaxResult.Count = data.Count;
-            responseAjaxResult.Data = data;
-            responseAjaxResult.Success();
-
+            responseAjaxResult.SuccessResult(data, ResponseMessage.OPERATION_SUCCESS);
             return responseAjaxResult;
         }
         /// <summary>
@@ -141,16 +138,14 @@ namespace GHMonitoringCenterApi.Application.Service
                     SocietySpecEffect = x.SocietySpecEffect,
                     StartContractDuration = x.StartContractDuration,
                     Tag = x.Tag,
-                    Tag2 = x.Tag2
+                    Tag2 = x.Tag2,
+                    ProjectTypeId = x.TypeId
                 })
                 .ToListAsync();
 
             responseAjaxResult.Count = data.Count;
-            responseAjaxResult.Data = data;
-            responseAjaxResult.Success();
-
+            responseAjaxResult.SuccessResult(data, ResponseMessage.OPERATION_SUCCESS);
             return responseAjaxResult;
-
         }
         /// <summary>
         /// 获取项目干系人列表
@@ -176,11 +171,8 @@ namespace GHMonitoringCenterApi.Application.Service
                 .ToListAsync();
 
             responseAjaxResult.Count = data.Count;
-            responseAjaxResult.Data = data;
-            responseAjaxResult.Success();
-
+            responseAjaxResult.SuccessResult(data, ResponseMessage.OPERATION_SUCCESS);
             return responseAjaxResult;
-
         }
         /// <summary>
         /// 项目状态
@@ -203,9 +195,30 @@ namespace GHMonitoringCenterApi.Application.Service
                 .ToListAsync();
 
             responseAjaxResult.Count = data.Count;
-            responseAjaxResult.Data = data;
-            responseAjaxResult.Success();
+            responseAjaxResult.SuccessResult(data, ResponseMessage.OPERATION_SUCCESS);
+            return responseAjaxResult;
+        }
+        /// <summary>
+        /// 项目类型信息
+        /// </summary>
+        /// <returns></returns>
+        public async Task<ResponseAjaxResult<List<ProjectTypeInfos>>> GetProjectTypeInfosAsync()
+        {
+            var responseAjaxResult = new ResponseAjaxResult<List<ProjectTypeInfos>>();
+            var data = await _dbContext.Queryable<Domain.Models.ProjectType>()
+                .Where(x => x.IsDelete == 1)
+                .Select(x => new ProjectTypeInfos
+                {
+                    Id = x.Id,
+                    Code = x.Code,
+                    PomId = x.PomId,
+                    Remarks = x.Remarks,
+                    Name = x.Name
+                })
+                .ToListAsync();
 
+            responseAjaxResult.Count = data.Count;
+            responseAjaxResult.SuccessResult(data, ResponseMessage.OPERATION_SUCCESS);
             return responseAjaxResult;
         }
     }

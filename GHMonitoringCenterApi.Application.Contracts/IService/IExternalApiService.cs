@@ -33,5 +33,10 @@ namespace GHMonitoringCenterApi.Application.Contracts.IService
         /// </summary>
         /// <returns></returns>
         Task<ResponseAjaxResult<List<ProjectStatusInfos>>> GetProjectStatusInfosAsync();
+        /// <summary>
+        /// 项目类型信息
+        /// </summary>
+        /// <returns></returns>
+        Task<ResponseAjaxResult<List<ProjectTypeInfos>>> GetProjectTypeInfosAsync();
     }
 }
