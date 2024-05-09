@@ -158,10 +158,6 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project.Report
         public class ResTreeProjectWBSDetailDto : TreeProjectWBSDetailDto<ResTreeProjectWBSDetailDto, ResMonthReportDetail>
         {
 
-
-
-            
-
             /// <summary>
             /// 本月外包支出
             /// </summary>

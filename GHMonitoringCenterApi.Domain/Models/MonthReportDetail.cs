@@ -86,5 +86,10 @@ namespace GHMonitoringCenterApi.Domain.Models
         /// </summary>
         [SugarColumn(ColumnDataType = "decimal(20,8)")]
         public decimal CompleteProductionAmount { get; set; }
+        /// <summary>
+        /// 备注
+        /// </summary>
+        [SugarColumn(Length = 800)]
+        public string? Remark { get; set; }
     }
 }
