@@ -65,5 +65,17 @@ namespace GHMonitoringCenterApi.Application.Contracts.IService.File
         /// <param name="media_id"></param>
         /// <returns></returns>
         Task<bool> GetImageJJT(string media_id);
+
+        /// <summary>
+        /// 发送消息失败重试机制
+        /// </summary>
+        /// <param name="_httpclient"></param>
+        /// <param name="media"></param>
+        /// <param name="url"></param>
+        /// <param name="formData"></param>
+        /// <param name="retryCount"></param>
+        /// <returns></returns>
+        Task<string> RetryAsync(HttpClient _httpclient, string media, string url, MultipartFormDataContent formData, int retryCount = 3);
+
     }
 }

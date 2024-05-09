@@ -3,8 +3,10 @@ using GHMonitoringCenterApi.Application.Contracts.IService;
 using GHMonitoringCenterApi.Application.Contracts.IService.File;
 using GHMonitoringCenterApi.Application.Contracts.IService.OperationLog;
 using GHMonitoringCenterApi.Application.Service.File;
+using GHMonitoringCenterApi.Application.Service.JjtSendMessage;
 using GHMonitoringCenterApi.Domain.Shared;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GHMonitoringCenterApi.Controllers.JjtUploadFile
@@ -16,16 +18,19 @@ namespace GHMonitoringCenterApi.Controllers.JjtUploadFile
 	[ApiController]
 	public class JjtUploadFileController : BaseController
 	{
-		#region 依赖注入
-		public IFileService fileService { get; set; }
+        #region 依赖注入
+
+        public ILogger<JjtUploadFileController>  logger { get; set; }
+        public IFileService fileService { get; set; }
 		public ILogService logService { get; set; }
 		private IBaseService baseService { get; set; }
 
-		public JjtUploadFileController(IFileService fileService, ILogService logService, IBaseService baseService)
+		public JjtUploadFileController(IFileService fileService, ILogService logService, IBaseService baseService, ILogger<JjtUploadFileController> logger)
 		{
 			this.fileService = fileService;
 			this.logService = logService;
 			this.baseService = baseService;
+			this.logger = logger;
 		}
 
 		#endregion
@@ -39,9 +44,22 @@ namespace GHMonitoringCenterApi.Controllers.JjtUploadFile
 		/// <exception cref="NotImplementedException"></exception>
 		[HttpPost("UploadImage")]
 		[AllowAnonymous]
-		public async Task<ResponseAjaxResult<bool>> UploadImageJJT(IFormFile formFile)
-		{
-			return await fileService.UploadImageJJT(formFile);
+		public async Task<ResponseAjaxResult<bool>> UploadImageJJT(IFormFile formFile, [FromQuery] int isSystemSend = 0)
+        {
+            if (isSystemSend == 1)
+            {
+                return await fileService.UploadImageJJT(formFile);
+            }
+            else
+            {
+                logger.LogWarning($"人为触发消息推送机制,浏览器版本信息:{Request.Headers["User-Agent"].ToString()}");
+                return new ResponseAjaxResult<bool>()
+                {
+                    Code = GHMonitoringCenterApi.Domain.Shared.Enums.HttpStatusCode.Success,
+                    Message = "发送生产推送日报人为触发",
+                };
+            }
+           
 		}
         /// <summary>
         /// 船舶日报图片
@@ -51,9 +69,22 @@ namespace GHMonitoringCenterApi.Controllers.JjtUploadFile
 
         [HttpPost("UploadShipImage")]
         [AllowAnonymous]
-        public async Task<ResponseAjaxResult<bool>> UploadShipImageJJT(IFormFile formFile)
+        public async Task<ResponseAjaxResult<bool>> UploadShipImageJJT(IFormFile formFile,[FromQuery] int isSystemSend = 0)
         {
-            return await fileService.UploadShipImageJJT(formFile);
+            
+            if (isSystemSend == 1)
+            {
+                return await fileService.UploadShipImageJJT(formFile);
+            }
+            else
+            {
+                logger.LogWarning($"人为触发消息推送机制,浏览器版本信息:{Request.Headers["User-Agent"].ToString()}");
+                return new ResponseAjaxResult<bool>()
+                {
+                    Code = GHMonitoringCenterApi.Domain.Shared.Enums.HttpStatusCode.Success,
+                    Message = "发送船舶动态日报人为触发",
+                };
+            }
         }
 
 		/// <summary>
@@ -63,16 +94,42 @@ namespace GHMonitoringCenterApi.Controllers.JjtUploadFile
 		/// <returns></returns>
 		[HttpPost("UploadProjectShiftImage")]
 		[AllowAnonymous]
-		public async Task<ResponseAjaxResult<bool>> UploadProjectShiftImageJJT(IFormFile formFile)
+		public async Task<ResponseAjaxResult<bool>> UploadProjectShiftImageJJT(IFormFile formFile, [FromQuery] int isSystemSend = 0)
 		{
-			return await fileService.UploadProjectShiftImageJJT(formFile);
+            if (isSystemSend == 1)
+            {
+                return await fileService.UploadProjectShiftImageJJT(formFile);
+            }
+            else
+            {
+                logger.LogWarning($"人为触发消息推送机制,浏览器版本信息:{Request.Headers["User-Agent"].ToString()}");
+                return new ResponseAjaxResult<bool>()
+                {
+                    Code = GHMonitoringCenterApi.Domain.Shared.Enums.HttpStatusCode.Success,
+                    Message = "发送节假日图片人为触发",
+                };
+            }
+           
 		}
 
         [HttpGet("UploadProjectShiftText")]
         [AllowAnonymous]
-        public async Task<ResponseAjaxResult<bool>> UploadProjectShiftTextAsync([FromQuery] string text)
+        public async Task<ResponseAjaxResult<bool>> UploadProjectShiftTextAsync([FromQuery] string text, [FromQuery] int isSystemSend = 0)
         {
-            return await fileService.UploadProjectShiftTextJJT(text);
+            if (isSystemSend == 1)
+            {
+                return await fileService.UploadProjectShiftTextJJT(text);
+            }
+            else
+            {
+                logger.LogWarning($"人为触发消息推送机制,浏览器版本信息:{Request.Headers["User-Agent"].ToString()}");
+                return new ResponseAjaxResult<bool>()
+                {
+                    Code = GHMonitoringCenterApi.Domain.Shared.Enums.HttpStatusCode.Success,
+                    Message = "发送节假日文本人为触发",
+                };
+            }
+            //return await fileService.UploadProjectShiftTextJJT(text);
         }
         /// <summary>
         /// 获取图片

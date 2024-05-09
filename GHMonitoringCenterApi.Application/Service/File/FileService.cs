@@ -33,6 +33,7 @@ using NPOI.SS.Formula.Functions;
 using NPOI.HPSF;
 using System;
 using Microsoft.AspNetCore.Http.Internal;
+using System.Net.Http;
 
 namespace GHMonitoringCenterApi.Application.Service.File
 {
@@ -306,6 +307,45 @@ namespace GHMonitoringCenterApi.Application.Service.File
             if (response!=null&&response.IsSuccessStatusCode)
             {
                 var media = response.Content.ReadAsStringAsync().Result;
+                #region 重试机制
+                media=await RetryAsync(_httpclient, media, url, formData);
+                if (string.IsNullOrWhiteSpace(media.TrimAll()))
+                {
+                    responseAjaxResult.Fail();
+                    return responseAjaxResult;
+                }
+                //if (string.IsNullOrWhiteSpace(media.TrimAll()))
+                //{
+                //    //重试三次
+                //    try
+                //    {
+                //        int retry = 0;
+                //        while (retry<3) 
+                //        {
+
+                //            response = await _httpclient.PostAsync(url, formData);
+                //            media = response.Content.ReadAsStringAsync().Result;
+                //            if (!string.IsNullOrWhiteSpace(media.TrimAll()))
+                //            {
+                //                retry = 4; break;
+                //            }
+                //            else {
+                //                if (retry == 2)
+                //                {
+                //                    //说明重试三次依然失败
+                //                    logger.LogWarning("上传交建通临时素材重试三次依然失败了"); 
+                //                }
+                //                retry += 1;
+                //            }
+                //        }
+                //    }
+                //    catch (Exception ex)
+                //    {
+
+                //        logger.LogError($"生产日报推送消息发送失败:{ex}");
+                //    }
+                //}
+                #endregion
                 responseAjaxResult.Data = true;
                 #region 交建通发送消息
                 //获取推送人员信息
@@ -440,6 +480,14 @@ namespace GHMonitoringCenterApi.Application.Service.File
             if (response!=null&&response.IsSuccessStatusCode)
             {
                 var media = response.Content.ReadAsStringAsync().Result;
+                #region 重试机制
+                media = await RetryAsync(_httpclient, media, url, formData);
+                if (string.IsNullOrWhiteSpace(media.TrimAll()))
+                {
+                    responseAjaxResult.Fail();
+                    return responseAjaxResult;
+                }
+                #endregion
                 responseAjaxResult.Data = true;
                 #region 交建通发送消息
                 //获取推送人员信息
@@ -513,7 +561,15 @@ namespace GHMonitoringCenterApi.Application.Service.File
             if (response!=null&&response.IsSuccessStatusCode)
 			{
 				var media = response.Content.ReadAsStringAsync().Result;
-				responseAjaxResult.Data = true;
+                #region 重试机制
+                media = await RetryAsync(_httpclient, media, url, formData);
+                if (string.IsNullOrWhiteSpace(media.TrimAll()))
+                {
+                    responseAjaxResult.Fail();
+                    return responseAjaxResult;
+                }
+                #endregion
+                responseAjaxResult.Data = true;
                 #region 交建通发送消息
                 //获取推送人员信息
                 var pushJjtUserList = await dbContext.Queryable<DayReportJjtPushConfi>().Where(x => x.IsDelete == 1)
@@ -633,6 +689,56 @@ namespace GHMonitoringCenterApi.Application.Service.File
             string url = "https://jjt.ccccltd.cn/cgi-bin/media/get?access_token=" + responseToken.Result + "&media_id=" + media_id;
             var aa = await webHelper.DoGetAsync(url);
             return true;
+        }
+
+
+        #endregion
+
+
+        #region 发送消息失败重试机制
+        /// <summary>
+        /// 发送消息失败重试机制
+        /// </summary>
+        /// <param name="_httpclient"></param>
+        /// <param name="media"></param>
+        /// <param name="url"></param>
+        /// <param name="formData"></param>
+        /// <param name="retryCount"></param>
+        /// <returns></returns>
+        public async Task<string> RetryAsync(HttpClient _httpclient,string media, string url, MultipartFormDataContent formData ,int retryCount = 3)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(media.TrimAll()))
+                {
+                    //重试三次
+                    int retry = 0;
+                    while (retry < retryCount)
+                    {
+
+                        var response = await _httpclient.PostAsync(url, formData);
+                        media = response.Content.ReadAsStringAsync().Result;
+                        if (!string.IsNullOrWhiteSpace(media.TrimAll()))
+                        {
+                            retry = 4; break;
+                        }
+                        else
+                        {
+                            if (retry == retryCount - 1)
+                            {
+                                //说明重试三次依然失败
+                                logger.LogWarning("上传交建通临时素材重试三次依然失败了");
+                            }
+                            retry += 1;
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.LogError($"重试机制出现错误{ex}");
+            }
+            return media;
         }
         #endregion
     }
