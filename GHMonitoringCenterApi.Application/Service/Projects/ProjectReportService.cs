@@ -5515,8 +5515,8 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
 
             //模板位置
             //var templatePath = @"D:\GHJCode\wom.api\GHMonitoringCenterApi.Domain.Shared\Template\Excel\ProjectMonthOutPutTemplate.xlsx";
-            //var templatePath = "E:\\project\\HNKC.SZGHAPI\\GHMonitoringCenterApi.Domain.Shared\\Template\\Excel\\ProjectMonthOutPutTemplate.xlsx";
-            var templatePath = $"Template/Excel/ProjectMonthOutPutTemplate.xlsx";
+            var templatePath = "D:\\projectconllection\\dotnet\\szgh\\GHMonitoringCenterApi.Domain.Shared\\Template\\Excel\\ProjectMonthOutPutTemplate.xlsx";
+            //var templatePath = $"Template/Excel/ProjectMonthOutPutTemplate.xlsx";
             XSSFWorkbook workbook = null;
             using (var fs = new FileStream(templatePath, FileMode.Open, FileAccess.Read))
             {
@@ -5805,12 +5805,12 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                         datarow.CreateCell(1).SetCellValue("");
                     }
                     datarow.CreateCell(2).SetCellValue(item.ProjectName);
-                    datarow.CreateCell(3).SetCellValue(Math.Round(Convert.ToDouble(item.ProductionValue), 1));
+                    datarow.CreateCell(3).SetCellValue(Math.Round(Convert.ToDouble(item.ProductionValue), 2));
                     datarow.CreateCell(4).SetCellValue(Math.Round(Convert.ToDouble(item.OutputValue), 2));
                     datarow.CreateCell(5).SetCellValue(Math.Round(Convert.ToDouble(item.OnSiteDays), 0));
                     datarow.CreateCell(6).SetCellValue(Math.Round(Convert.ToDouble(item.WorkingHours), 2));
                     datarow.CreateCell(7).SetCellValue(Convert.ToDouble(item.MyPropertyRate1));
-                    datarow.CreateCell(8).SetCellValue(Math.Round(Convert.ToDouble(item.YearProductionValue), 1));
+                    datarow.CreateCell(8).SetCellValue(Math.Round(Convert.ToDouble(item.YearProductionValue), 2));
                     datarow.CreateCell(9).SetCellValue(Math.Round(Convert.ToDouble(item.YearOutputValue), 2));
                     datarow.CreateCell(10).SetCellValue(Math.Round(Convert.ToDouble(item.YearOnSiteDays), 0));
                     datarow.CreateCell(11).SetCellValue(Math.Round(Convert.ToDouble(item.YearWorkingHours), 2));
