@@ -40,6 +40,7 @@ using GHMonitoringCenterApi.Application.Service.Authorize;
 using GHMonitoringCenterApi.Application.Contracts.IService.BizAuthorize;
 using System.Collections.Generic;
 using static GHMonitoringCenterApi.Application.Contracts.Dto.Project.ProjectDayReportResponseDto;
+using SkiaSharp;
 
 namespace GHMonitoringCenterApi.Application.Service.Projects
 {
@@ -503,6 +504,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 }
                 if (addConstructions.Any())
                 {
+                   
                     await _dbDayReportConstruction.AsInsertable(addConstructions).EnableDiffLogEvent(NewLogInfo(EntityType.DayReport, dayReport.Id, modelState)).ExecuteCommandAsync();
                 }
                 await _dbDayReport.AsUpdateable(dayReport).EnableDiffLogEvent(NewLogInfo(EntityType.DayReport, dayReport.Id, modelState)).ExecuteCommandAsync();
@@ -671,6 +673,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             var subShipIds = resConstructions.Where(t => t.SubShipId != null).Select(t => (Guid)t.SubShipId).ToArray();
             var projectWBSIds = resConstructions.Where(t => t.ProjectWBSId != null).Select(t => (Guid)t.ProjectWBSId).ToArray();
             var ownerShipParts = await GetShipResourcesAsync(ownerShipIds, ConstructionOutPutType.Self);
+            ownerShipParts.AddRange( await GetShipResourcesAsync(ownerShipIds, ConstructionOutPutType.SubPackage));
             var subShipParts = await GetShipResourcesAsync(subShipIds, ConstructionOutPutType.SubPackage);
             var projectWBSParts = await GetProjectWBSListAsync(projectId);
             resConstructions.ForEach(item =>
@@ -5515,8 +5518,8 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
 
             //模板位置
             //var templatePath = @"D:\GHJCode\wom.api\GHMonitoringCenterApi.Domain.Shared\Template\Excel\ProjectMonthOutPutTemplate.xlsx";
-            //var templatePath = "D:\\projectconllection\\dotnet\\szgh\\GHMonitoringCenterApi.Domain.Shared\\Template\\Excel\\ProjectMonthOutPutTemplate.xlsx";
-            var templatePath = $"Template/Excel/ProjectMonthOutPutTemplate.xlsx";
+            var templatePath = "D:\\projectconllection\\dotnet\\szgh\\GHMonitoringCenterApi.Domain.Shared\\Template\\Excel\\ProjectMonthOutPutTemplate.xlsx";
+            //var templatePath = $"Template/Excel/ProjectMonthOutPutTemplate.xlsx";
             XSSFWorkbook workbook = null;
             using (var fs = new FileStream(templatePath, FileMode.Open, FileAccess.Read))
             {
@@ -5719,6 +5722,8 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 #endregion
 
                 #region 重点船舶
+
+
                 // 获取工作表
                 ISheet sheet2 = workbook.GetSheetAt(2);
                 ICellStyle sheetTwoCellStyle = workbook.CreateCellStyle();
@@ -5959,6 +5964,47 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             var ownerShipMonthReportList = await _dbContext.Queryable<OwnerShipMonthReport>().ToListAsync();
             var ownShipDay = await _dbContext.Queryable<ShipDayReport>().Where(x => x.DateDay >= startTime.ToDateDay() && x.DateDay <= endTime.ToDateDay()).ToListAsync();
             var shipMovementList = await _dbContext.Queryable<ShipMovement>().ToListAsync();
+         
+            #region 新逻辑
+            //新逻辑
+            var primaryIds = ownShipDay.Where(t => t.ProjectId == Guid.Empty).Select(t => new { id = t.Id, shipId = t.ShipId, DateDay = t.DateDay, ProjectId = t.ProjectId }).ToList();
+            foreach (var item in primaryIds)
+            {
+                var isExistProject = shipMovementList.Where(x => x.IsDelete == 1 && x.ShipId == item.shipId && x.EnterTime.HasValue == true && (x.EnterTime.Value.ToDateDay() <= item.DateDay || x.QuitTime.HasValue == true && x.QuitTime.Value.ToDateDay() >= item.DateDay)).OrderByDescending(x => x.EnterTime).ToList();
+                foreach (var project in isExistProject)
+                {
+
+                    if (project.QuitTime.HasValue && project.QuitTime.Value.ToDateDay() >= item.DateDay)
+                    {
+
+                        var oldValue = ownShipDay.Where(t => t.ShipId == project.ShipId && t.DateDay == item.DateDay).FirstOrDefault();
+                        if (oldValue != null)
+                        {
+                            oldValue.ProjectId = project.ProjectId;
+                        }
+                    }
+                    if (project.EnterTime.HasValue && project.QuitTime.HasValue == false && project.EnterTime.Value.ToDateDay() <= item.DateDay)
+                    {
+                        var oldValue = ownShipDay.Where(t => t.ShipId == project.ShipId && t.DateDay == item.DateDay).FirstOrDefault();
+                        if (oldValue != null)
+                        {
+                            oldValue.ProjectId = project.ProjectId;
+                        }
+                    }
+                    if (project.EnterTime.HasValue && project.QuitTime.HasValue && project.QuitTime.Value.ToDateDay() >= item.DateDay)
+                    {
+
+                        var oldValue = ownShipDay.Where(t => t.ShipId == project.ShipId && t.DateDay == item.DateDay).FirstOrDefault();
+                        if (oldValue != null)
+                        {
+                            oldValue.ProjectId = project.ProjectId;
+                        }
+                    }
+                }
+
+            }
+
+            #endregion
             var ownerMonthList = ownerShips.Where(x => x.DateMonth == endTime.ToDateMonth()).OrderBy(x => x.ShipId).ToList();
             var projectIds = ownerMonthList.Select(x => x.ProjectId).ToList();
             var shipIds = ownerMonthList.Select(x => x.ShipId).ToList();
