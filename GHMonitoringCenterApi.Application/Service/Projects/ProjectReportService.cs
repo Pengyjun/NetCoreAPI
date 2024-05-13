@@ -2451,7 +2451,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             //当前时间月份
             var nowDateMonth = GetDefaultReportDateMonth();
             var dateMonth = model.DateMonth ?? nowDateMonth;
-            var projectWBSList = await GetProjectWBSListAsync(model.ProjectId);
+            var projectWBSList = await GetProjectWBSListAsync(model.ProjectId,model.DateMonth);
             var resWBSList = projectWBSList.Select(t => new ProjectMonthReportResponseDto.ResTreeProjectWBSDetailDto()
             {
                 ProjectWBSId = t.Id,
@@ -4862,9 +4862,69 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
         /// 获取施工分类集合
         /// </summary>
         /// <returns></returns>
-        private async Task<List<ProjectWBS>> GetProjectWBSListAsync(Guid projectId)
+        private async Task<List<ProjectWBS>> GetProjectWBSListAsync(Guid projectId,int? DateMonth=0)
         {
-            return await _dbProjectWBS.AsQueryable().Where(t => t.ProjectId == projectId.ToString() && t.IsDelete == 1).ToListAsync();
+            List<ProjectWBS> projectWBs = new List<ProjectWBS>();
+            #region 参数问题
+            var month = "0";
+            if (DateTime.Now.Day >= 26 && DateTime.Now.Day <= 1)
+            {
+                month = DateTime.Now.Month.ToString();
+            }
+            else
+            {
+                month = DateTime.Now.AddMonths(-1).Month.ToString();
+            }
+            if (month.Length == 1)
+            {
+                month = "0" + month;
+            }
+            var yearMonth = int.Parse((DateTime.Now.Year + month));
+            #endregion
+            if (DateMonth==null||yearMonth == DateMonth)
+            {
+                //查询最新的wbs
+                return await _dbProjectWBS.AsQueryable().Where(t => t.ProjectId == projectId.ToString() && t.IsDelete == 1).ToListAsync();
+            }
+            else
+            {
+               //查询历史数据 
+                var result = await _dbContext.Queryable<ProjectWbsHistoryMonth>().Where(t => t.DateMonth == DateMonth && t.ProjectId == projectId.ToString() && t.IsDelete == 1).ToListAsync();
+                if(result==null||!result.Any())
+                {
+                    //查询最新的wbs
+                    return await _dbProjectWBS.AsQueryable().Where(t => t.ProjectId == projectId.ToString() && t.IsDelete == 1).ToListAsync();
+                }
+                foreach (var item in result)
+                {
+                    projectWBs.Add(new ProjectWBS()
+                    {
+                        ContractAmount = item.ContractAmount,
+                        CreateId = item.CreateId,
+                        CreateTime = item.CreateTime,
+                        Def = item.Def,
+                        DeleteId = item.DeleteId,
+                        DeleteTime = item.DeleteTime,
+                        DownOne = item.DownOne,
+                        EngQuantity = item.EngQuantity,
+                        IsDelete = item.IsDelete,
+                        ItemNum = item.ItemNum,
+                        KeyId = item.KeyId,
+                        Name = item.Name,
+                        Id = item.Id,
+                        Pid = item.Pid,
+                        ProjectId = item.ProjectId,
+                        ProjectNum = item.ProjectNum,
+                        Prev = item.Prev,
+                        ProjectWBSId = item.ProjectWBSId,
+                        UnitPrice = item.UnitPrice,
+                        UpdateId = item.UpdateId,
+                        UpdateTime = item.UpdateTime,
+                    });
+                }
+                return projectWBs;
+            }
+          
         }
 
         /// <summary>

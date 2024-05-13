@@ -1996,20 +1996,130 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             };
 
             #endregion
+            var month=DateTime.Now.ToDateMonth();
             // 删除
             if (removeWBSList.Any())
             {
                 await dbContext.Updateable(removeWBSList).UpdateColumns(t => new { t.IsDelete, t.DeleteId, t.DeleteTime }).EnableDiffLogEvent(logDto).ExecuteCommandAsync();
+                #region 无用代码
+                //List<ProjectWbsHistoryMonth> projectWbsHistoryMonths = new List<ProjectWbsHistoryMonth>();
+                //foreach (var item in removeWBSList)
+                //{
+                //    var projectWbsHistoryMonth = new ProjectWbsHistoryMonth()
+                //    {
+                //        UpdateTime = item.UpdateTime,
+                //        ContractAmount = item.ContractAmount,
+                //        CreateId = item.CreateId,
+                //        CreateTime = item.CreateTime,
+                //        DeleteTime = item.DeleteTime,
+                //        Def = item.Def,
+                //        DownOne = item.DownOne,
+                //        EngQuantity = item.EngQuantity,
+                //        ItemNum = item.ItemNum,
+                //        KeyId = item.KeyId,
+                //        Name = item.Name,
+                //        Prev = item.Prev,
+                //        Pid = item.Pid,
+                //        ProjectNum = item.ProjectNum,
+                //        ProjectWBSId = item.ProjectWBSId,
+                //        UnitPrice = item.UnitPrice,
+                //        ProjectId = item.ProjectId,
+                //        Id = item.Id,
+                //        IsDelete = 0,
+                //        DeleteId = item.DeleteId,
+                //        UpdateId = item.UpdateId,
+                //    };
+                //    projectWbsHistoryMonth.DateMonth = month;
+                //    projectWbsHistoryMonths.Add(projectWbsHistoryMonth);
+                //}
+                //await dbContext.Updateable<ProjectWbsHistoryMonth>(projectWbsHistoryMonths).Where(x => x.DateMonth == month).UpdateColumns(t => new { t.IsDelete, t.DeleteId, t.DeleteTime }).ExecuteCommandAsync();
+                #endregion
+
             }
             // 更新
             if (updateWBSList.Any())
             {
                 await dbContext.Updateable(updateWBSList).EnableDiffLogEvent(logDto).ExecuteCommandAsync();
+                #region 无用代码
+                //List<ProjectWbsHistoryMonth> projectWbsHistoryMonths = new List<ProjectWbsHistoryMonth>();
+                //foreach (var item in updateWBSList)
+                //{
+                //    var projectWbsHistoryMonth = new ProjectWbsHistoryMonth()
+                //    {
+                //        UpdateTime = item.UpdateTime,
+                //        ContractAmount = item.ContractAmount,
+                //        CreateId = item.CreateId,
+                //        CreateTime = item.CreateTime,
+                //        DeleteTime = item.DeleteTime,
+                //        Def = item.Def,
+                //        DownOne = item.DownOne,
+                //        EngQuantity = item.EngQuantity,
+                //        ItemNum = item.ItemNum,
+                //        KeyId = item.KeyId,
+                //        Name = item.Name,
+                //        Prev = item.Prev,
+                //        Pid = item.Pid,
+                //        ProjectNum = item.ProjectNum,
+                //        ProjectWBSId = item.ProjectWBSId,
+                //        UnitPrice = item.UnitPrice,
+                //        ProjectId = item.ProjectId,
+                //        Id = item.Id,
+                //        IsDelete = item.IsDelete,
+                //        DeleteId = item.DeleteId,
+                //        UpdateId = item.UpdateId
+
+
+                //    };
+                //    projectWbsHistoryMonth.DateMonth = month;
+                //    projectWbsHistoryMonths.Add(projectWbsHistoryMonth);
+                //}
+                //await dbContext.Updateable<ProjectWbsHistoryMonth>(projectWbsHistoryMonths).Where(x => x.DateMonth == month).ExecuteCommandAsync();
+                #endregion
             }
             // 新增
             if (addWBSList.Any())
             {
                 await dbContext.Insertable(addWBSList).EnableDiffLogEvent(logDto).ExecuteCommandAsync();
+                addWBSList.AddRange(updateWBSList);
+                List<ProjectWbsHistoryMonth> projectWbsHistoryMonths = new List<ProjectWbsHistoryMonth>();
+                foreach (var item in addWBSList)
+                {
+                    var projectWbsHistoryMonth = new ProjectWbsHistoryMonth()
+                    {
+                        UpdateTime = item.UpdateTime,
+                        ContractAmount = item.ContractAmount,
+                        CreateId = item.CreateId,
+                        CreateTime = item.CreateTime,
+                        DeleteTime = item.DeleteTime,
+                        Def = item.Def,
+                        DownOne = item.DownOne,
+                        EngQuantity = item.EngQuantity,
+                        ItemNum = item.ItemNum,
+                        KeyId = item.KeyId,
+                        Name = item.Name,
+                        Prev = item.Prev,
+                        Pid = item.Pid,
+                        ProjectNum = item.ProjectNum,
+                        ProjectWBSId = item.ProjectWBSId,
+                        UnitPrice = item.UnitPrice,
+                        ProjectId = item.ProjectId,
+                        Id = item.Id,
+                        IsDelete = item.IsDelete,
+                        DeleteId = item.DeleteId,
+                        UpdateId = item.UpdateId
+
+
+                    };
+                    projectWbsHistoryMonth.DateMonth = month;
+                    projectWbsHistoryMonths.Add(projectWbsHistoryMonth);
+                }
+                var existData= await dbContext.Queryable<ProjectWbsHistoryMonth>().Where(x => x.DateMonth == month).ToListAsync();
+                foreach (var item in existData)
+                {
+                    item.IsDelete =0;
+                }
+                await dbContext.Updateable<ProjectWbsHistoryMonth>(existData).ExecuteCommandAsync();
+                await dbContext.Insertable<ProjectWbsHistoryMonth>(projectWbsHistoryMonths).ExecuteCommandAsync();
             }
             return result.SuccessResult(true);
         }
