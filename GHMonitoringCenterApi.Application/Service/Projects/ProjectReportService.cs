@@ -5578,8 +5578,8 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
 
             //模板位置
             //var templatePath = @"D:\GHJCode\wom.api\GHMonitoringCenterApi.Domain.Shared\Template\Excel\ProjectMonthOutPutTemplate.xlsx";
-            var templatePath = "D:\\projectconllection\\dotnet\\szgh\\GHMonitoringCenterApi.Domain.Shared\\Template\\Excel\\ProjectMonthOutPutTemplate.xlsx";
-            //var templatePath = $"Template/Excel/ProjectMonthOutPutTemplate.xlsx";
+            //var templatePath = "D:\\projectconllection\\dotnet\\szgh\\GHMonitoringCenterApi.Domain.Shared\\Template\\Excel\\ProjectMonthOutPutTemplate.xlsx";
+            var templatePath = $"Template/Excel/ProjectMonthOutPutTemplate.xlsx";
             XSSFWorkbook workbook = null;
             using (var fs = new FileStream(templatePath, FileMode.Open, FileAccess.Read))
             {
