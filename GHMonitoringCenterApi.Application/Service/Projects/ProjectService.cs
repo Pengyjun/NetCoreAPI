@@ -34,6 +34,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
 
         #region 依赖注入
         public IBaseRepository<ProjectWBS> baseProjectWBSRepository { get; set; }
+        public IBaseRepository<ProjectWbsHistoryMonth> baseProjectWbsHistory { get; set; }
 
         public ISqlSugarClient dbContext { get; set; }
         public IMapper mapper { get; set; }
@@ -55,7 +56,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
         private CurrentUser _currentUser { get { return _globalObject.CurrentUser; } }
 
         //public ActionExecutingContext context { get; set; }
-        public ProjectService(IBaseRepository<ProjectWBS> baseProjectWBSRepository, ISqlSugarClient dbContext, IMapper mapper, IBaseRepository<Files> baseFilesRepository, IBaseRepository<ProjectOrg> baseProjectOrgRepository, IBaseRepository<ProjectLeader> baseProjectLeaderRepository, IPushPomService pushPomService, IBaseService baseService, ILogService logService, IEntityChangeService entityChangeService, GlobalObject globalObject)
+        public ProjectService(IBaseRepository<ProjectWbsHistoryMonth> baseProjectWbsHistory ,IBaseRepository<ProjectWBS> baseProjectWBSRepository, ISqlSugarClient dbContext, IMapper mapper, IBaseRepository<Files> baseFilesRepository, IBaseRepository<ProjectOrg> baseProjectOrgRepository, IBaseRepository<ProjectLeader> baseProjectLeaderRepository, IPushPomService pushPomService, IBaseService baseService, ILogService logService, IEntityChangeService entityChangeService, GlobalObject globalObject)
         {
             this.baseProjectWBSRepository = baseProjectWBSRepository;
             this.dbContext = dbContext;
@@ -68,6 +69,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             this.logService = logService;
             this.entityChangeService = entityChangeService;
             this._globalObject = globalObject;
+            this.baseProjectWbsHistory = baseProjectWbsHistory;
             //this.context = context;
         }
         #endregion
@@ -2119,7 +2121,8 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     item.IsDelete =0;
                 }
                 await dbContext.Updateable<ProjectWbsHistoryMonth>(existData).ExecuteCommandAsync();
-                await dbContext.Insertable<ProjectWbsHistoryMonth>(projectWbsHistoryMonths).ExecuteCommandAsync();
+                await baseProjectWbsHistory.InsertOrUpdateAsync(projectWbsHistoryMonths);
+                //await dbContext.Insertable<ProjectWbsHistoryMonth>(projectWbsHistoryMonths).ExecuteCommandAsync();
             }
             return result.SuccessResult(true);
         }
