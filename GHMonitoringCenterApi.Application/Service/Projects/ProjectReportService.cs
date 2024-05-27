@@ -2637,6 +2637,10 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     {
                         model.DateMonth = DateTime.Now.AddMonths(-1).Month;
                     }
+                    if (model.DateMonth.Value.ToString().Length == 1)
+                    {
+                        model.DateMonth=int.Parse(DateTime.Now.Year + $"0{model.DateMonth}");
+                    }
                 }
                 #endregion
                 var resultData = await GetProjectProductionValue(model.ProjectId, model.DateMonth.Value);
