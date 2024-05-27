@@ -2627,20 +2627,23 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             {
                 #region 参数问题
                 var startTime = string.Empty;
-                if (model.DateMonth == null || model.DateMonth.HasValue)
+                if (model.DateMonth == null)
                 {
-                    if (DateTime.Now.Day >= 26 && DateTime.Now.Day <= 1)
+                    model.DateMonth = DateTime.Now.AddMonths(-1).Month;
+                }
+                else if (model.DateMonth.HasValue)
+                {
+                    if (DateTime.Now.Day >= 26 || DateTime.Now.Day <= 1)
                     {
                         model.DateMonth = DateTime.Now.Month;
                     }
-                    else
-                    {
+                    else {
                         model.DateMonth = DateTime.Now.AddMonths(-1).Month;
                     }
-                    if (model.DateMonth.Value.ToString().Length == 1)
-                    {
-                        model.DateMonth=int.Parse(DateTime.Now.Year + $"0{model.DateMonth}");
-                    }
+                }
+                if (model.DateMonth.Value.ToString().Length == 1)
+                {
+                    model.DateMonth = int.Parse(DateTime.Now.Year + $"0{model.DateMonth}");
                 }
                 #endregion
                 var resultData = await GetProjectProductionValue(model.ProjectId, model.DateMonth.Value);
