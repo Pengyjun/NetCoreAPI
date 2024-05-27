@@ -2631,16 +2631,16 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 {
                     model.DateMonth = DateTime.Now.AddMonths(-1).Month;
                 }
-                else if (model.DateMonth.HasValue)
-                {
-                    if (DateTime.Now.Day >= 26 || DateTime.Now.Day <= 1)
-                    {
-                        model.DateMonth = DateTime.Now.Month;
-                    }
-                    else {
-                        model.DateMonth = DateTime.Now.AddMonths(-1).Month;
-                    }
-                }
+                //else if (model.DateMonth.HasValue)
+                //{
+                //    if (DateTime.Now.Day >= 26 || DateTime.Now.Day <= 1)
+                //    {
+                //        model.DateMonth = DateTime.Now.Month;
+                //    }
+                //    else {
+                //        model.DateMonth = DateTime.Now.AddMonths(-1).Month;
+                //    }
+                //}
                 if (model.DateMonth.Value.ToString().Length == 1)
                 {
                     model.DateMonth = int.Parse(DateTime.Now.Year + $"0{model.DateMonth}");
@@ -6717,7 +6717,8 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 var currentTotalYearOffirmProductionValue = await _dbContext.Queryable<MonthReport>()
                     .Where(x => x.IsDelete == 1 && x.ProjectId == projectId && x.DateMonth <= dateMonth).ToListAsync();
                 //本年甲方确认产值(当年)
-                currentYearOffirmProductionValue = currentTotalYearOffirmProductionValue.Where(x => x.DateMonth >= new DateTime(DateTime.Now.Year, 1, 1).ToDateMonth() && x.DateMonth <= dateMonth)
+                var initMonth = new DateTime(DateTime.Now.Year, 1, 1).ToDateMonth();
+                currentYearOffirmProductionValue = currentTotalYearOffirmProductionValue.Where(x => x.DateMonth >= initMonth&& x.DateMonth <= dateMonth)
                    //原来的// x.DateYear==currentYear)
                    .Sum(x => x.PartyAConfirmedProductionAmount);
 
