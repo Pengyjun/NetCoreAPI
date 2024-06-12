@@ -1583,7 +1583,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 #endregion
 
                 //修改项目信息
-                await dbContext.Updateable(projectObject).EnableDiffLogEvent(logDto).ExecuteCommandAsync();
+                await dbContext.Updateable(projectObject).IgnoreColumns(x=>x.CommencementTime).EnableDiffLogEvent(logDto).ExecuteCommandAsync();
                 //项目变更记录
                 await entityChangeService.RecordEntitysChangeAsync(EntityType.Project, projectObject.Id);
                 //更改后直接推送项目信息
