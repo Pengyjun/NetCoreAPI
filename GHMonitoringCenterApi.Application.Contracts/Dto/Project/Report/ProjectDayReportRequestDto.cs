@@ -36,6 +36,8 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project
         /// </summary>
         public DateTime? DateDayTime { get; set; }
 
+        //public int Type { get; set; } = 1;
+
         /// <summary>
         /// 重置属性
         /// </summary>

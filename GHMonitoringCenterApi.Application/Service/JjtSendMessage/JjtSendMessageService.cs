@@ -1730,8 +1730,11 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
                 }).ToListAsync();
             //广航局年累计产值(基础数据累加+几个公司的所有日产值)
             // var yearProductionValue = companyList.Sum(x => x.YearProductionValue) + dayProductionValueList.Sum(x => x.DayActualProductionAmount);
-            var yearProductionValue = dayProductionValueList.Sum(x => x.DayActualProductionAmount);
-            var a= new ShareData().Init();
+              //var yearProductionValue = dayProductionValueList.Sum(x => x.DayActualProductionAmount);
+             var companyValue= new ShareData().Init();
+            var yearProductionValue = Math.Round(companyValue.Sum(x => x.Production*100000000) + dayProductionValueList
+                 .Where(x => x.DateDay >= 20240426 && x.DateDay <= currentTimeInt)
+                    .Sum(x => x.DayActualProductionAmount),3);
             //项目月报数据
             var monthReport = await dbContext.Queryable<MonthReport>().Where(x => x.IsDelete == 1 && x.DateMonth>=202401).ToListAsync();
             //
@@ -1752,13 +1755,13 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
                 //    .Sum(x => x.DayActualProductionAmount),2)
                 //    + GetCompanyProductuionValue(item.ItemId.Value, monthReport, projectIds, monthDiffProductionValue);
                 
-                var aa=a.Where(x => x.CompanyId == item.ItemId.ToString()).FirstOrDefault()?.Production;
-                await Console.Out.WriteLineAsync(item.ItemId.ToString());
-                var bb = aa == null ? 0 : aa.Value * 100000000;
+                var eachCompanyValue= companyValue.Where(x => x.CompanyId == item.ItemId.ToString()).FirstOrDefault()?.Production;
+                //await Console.Out.WriteLineAsync(item.ItemId.ToString());
+                var productionValue = eachCompanyValue == null ? 0 : eachCompanyValue.Value * 100000000;
                 var currentMonthCompanyCount = Math.Round(dayProductionValueList
                     .Where(x => x.CompanyId == item.ItemId && x.DateDay >= 20240426 && x.DateDay <= currentTimeInt)
                     .Sum(x => x.DayActualProductionAmount), 3)
-                    + bb;
+                    + productionValue;
                 //年度产值占比 （广航局）
                 //var yearProductionValuePercent = Math.Round(((decimal)(item.YearProductionValue + currentMonthCompanyCount) / yearProductionValue) * 100, 2);
                 var yearProductionValuePercent = Math.Round(((decimal)(currentMonthCompanyCount) / yearProductionValue) * 100, 2);

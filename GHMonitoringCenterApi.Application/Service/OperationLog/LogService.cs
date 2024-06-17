@@ -93,7 +93,7 @@ namespace GHMonitoringCenterApi.Application.Service.OperationLog
                 //获取表数据
                 var logInformation = await webHelper.DoGetAsync<HttpBaseResponseDto<GetProjectChangesResponseDto>>(url, parames);
                 var logInformationLsit = logInformation.Result.Data;
-                if (!logInformationLsit.Any())
+                if (logInformationLsit == null||!logInformationLsit.Any())
                 {
                     responseAjaxResult.Success();
                     return responseAjaxResult;

@@ -40,6 +40,7 @@ using GHMonitoringCenterApi.Application.Service.Authorize;
 using GHMonitoringCenterApi.Application.Contracts.IService.BizAuthorize;
 using System.Collections.Generic;
 using static GHMonitoringCenterApi.Application.Contracts.Dto.Project.ProjectDayReportResponseDto;
+using SkiaSharp;
 
 namespace GHMonitoringCenterApi.Application.Service.Projects
 {
@@ -503,6 +504,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 }
                 if (addConstructions.Any())
                 {
+                   
                     await _dbDayReportConstruction.AsInsertable(addConstructions).EnableDiffLogEvent(NewLogInfo(EntityType.DayReport, dayReport.Id, modelState)).ExecuteCommandAsync();
                 }
                 await _dbDayReport.AsUpdateable(dayReport).EnableDiffLogEvent(NewLogInfo(EntityType.DayReport, dayReport.Id, modelState)).ExecuteCommandAsync();
@@ -671,6 +673,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             var subShipIds = resConstructions.Where(t => t.SubShipId != null).Select(t => (Guid)t.SubShipId).ToArray();
             var projectWBSIds = resConstructions.Where(t => t.ProjectWBSId != null).Select(t => (Guid)t.ProjectWBSId).ToArray();
             var ownerShipParts = await GetShipResourcesAsync(ownerShipIds, ConstructionOutPutType.Self);
+            ownerShipParts.AddRange( await GetShipResourcesAsync(ownerShipIds, ConstructionOutPutType.SubPackage));
             var subShipParts = await GetShipResourcesAsync(subShipIds, ConstructionOutPutType.SubPackage);
             var projectWBSParts = await GetProjectWBSListAsync(projectId);
             resConstructions.ForEach(item =>
@@ -2448,7 +2451,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             //当前时间月份
             var nowDateMonth = GetDefaultReportDateMonth();
             var dateMonth = model.DateMonth ?? nowDateMonth;
-            var projectWBSList = await GetProjectWBSListAsync(model.ProjectId);
+            var projectWBSList = await GetProjectWBSListAsync(model.ProjectId,model.DateMonth);
             var resWBSList = projectWBSList.Select(t => new ProjectMonthReportResponseDto.ResTreeProjectWBSDetailDto()
             {
                 ProjectWBSId = t.Id,
@@ -2624,16 +2627,23 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             {
                 #region 参数问题
                 var startTime = string.Empty;
-                if (model.DateMonth == null || model.DateMonth.HasValue)
+                if (model.DateMonth == null)
                 {
-                    if (DateTime.Now.Day >= 26 && DateTime.Now.Day <= 1)
-                    {
-                        model.DateMonth = DateTime.Now.Month;
-                    }
-                    else
-                    {
-                        model.DateMonth = DateTime.Now.AddMonths(-1).Month;
-                    }
+                    model.DateMonth = DateTime.Now.AddMonths(-1).Month;
+                }
+                //else if (model.DateMonth.HasValue)
+                //{
+                //    if (DateTime.Now.Day >= 26 || DateTime.Now.Day <= 1)
+                //    {
+                //        model.DateMonth = DateTime.Now.Month;
+                //    }
+                //    else {
+                //        model.DateMonth = DateTime.Now.AddMonths(-1).Month;
+                //    }
+                //}
+                if (model.DateMonth.Value.ToString().Length == 1)
+                {
+                    model.DateMonth = int.Parse(DateTime.Now.Year + $"0{model.DateMonth}");
                 }
                 #endregion
                 var resultData = await GetProjectProductionValue(model.ProjectId, model.DateMonth.Value);
@@ -4864,9 +4874,69 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
         /// 获取施工分类集合
         /// </summary>
         /// <returns></returns>
-        private async Task<List<ProjectWBS>> GetProjectWBSListAsync(Guid projectId)
+        private async Task<List<ProjectWBS>> GetProjectWBSListAsync(Guid projectId,int? DateMonth=0)
         {
-            return await _dbProjectWBS.AsQueryable().Where(t => t.ProjectId == projectId.ToString() && t.IsDelete == 1).ToListAsync();
+            List<ProjectWBS> projectWBs = new List<ProjectWBS>();
+            #region 参数问题
+            var month = "0";
+            if (DateTime.Now.Day >= 26 && DateTime.Now.Day <= 1)
+            {
+                month = DateTime.Now.Month.ToString();
+            }
+            else
+            {
+                month = DateTime.Now.AddMonths(-1).Month.ToString();
+            }
+            if (month.Length == 1)
+            {
+                month = "0" + month;
+            }
+            var yearMonth = int.Parse((DateTime.Now.Year + month));
+            #endregion
+            if (DateMonth==null||yearMonth == DateMonth)
+            {
+                //查询最新的wbs
+                return await _dbProjectWBS.AsQueryable().Where(t => t.ProjectId == projectId.ToString() && t.IsDelete == 1).ToListAsync();
+            }
+            else
+            {
+               //查询历史数据 
+                var result = await _dbContext.Queryable<ProjectWbsHistoryMonth>().Where(t => t.DateMonth == DateMonth && t.ProjectId == projectId.ToString() && t.IsDelete == 1).ToListAsync();
+                if(result==null||!result.Any())
+                {
+                    //查询最新的wbs
+                    return await _dbProjectWBS.AsQueryable().Where(t => t.ProjectId == projectId.ToString() && t.IsDelete == 1).ToListAsync();
+                }
+                foreach (var item in result)
+                {
+                    projectWBs.Add(new ProjectWBS()
+                    {
+                        ContractAmount = item.ContractAmount,
+                        CreateId = item.CreateId,
+                        CreateTime = item.CreateTime,
+                        Def = item.Def,
+                        DeleteId = item.DeleteId,
+                        DeleteTime = item.DeleteTime,
+                        DownOne = item.DownOne,
+                        EngQuantity = item.EngQuantity,
+                        IsDelete = item.IsDelete,
+                        ItemNum = item.ItemNum,
+                        KeyId = item.KeyId,
+                        Name = item.Name,
+                        Id = item.Id,
+                        Pid = item.Pid,
+                        ProjectId = item.ProjectId,
+                        ProjectNum = item.ProjectNum,
+                        Prev = item.Prev,
+                        ProjectWBSId = item.ProjectWBSId,
+                        UnitPrice = item.UnitPrice,
+                        UpdateId = item.UpdateId,
+                        UpdateTime = item.UpdateTime,
+                    });
+                }
+                return projectWBs;
+            }
+          
         }
 
         /// <summary>
@@ -5724,6 +5794,8 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 #endregion
 
                 #region 重点船舶
+
+
                 // 获取工作表
                 ISheet sheet2 = workbook.GetSheetAt(2);
                 ICellStyle sheetTwoCellStyle = workbook.CreateCellStyle();
@@ -5964,6 +6036,47 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             var ownerShipMonthReportList = await _dbContext.Queryable<OwnerShipMonthReport>().ToListAsync();
             var ownShipDay = await _dbContext.Queryable<ShipDayReport>().Where(x => x.DateDay >= startTime.ToDateDay() && x.DateDay <= endTime.ToDateDay()).ToListAsync();
             var shipMovementList = await _dbContext.Queryable<ShipMovement>().ToListAsync();
+         
+            #region 新逻辑
+            //新逻辑
+            var primaryIds = ownShipDay.Where(t => t.ProjectId == Guid.Empty).Select(t => new { id = t.Id, shipId = t.ShipId, DateDay = t.DateDay, ProjectId = t.ProjectId }).ToList();
+            foreach (var item in primaryIds)
+            {
+                var isExistProject = shipMovementList.Where(x => x.IsDelete == 1 && x.ShipId == item.shipId && x.EnterTime.HasValue == true && (x.EnterTime.Value.ToDateDay() <= item.DateDay || x.QuitTime.HasValue == true && x.QuitTime.Value.ToDateDay() >= item.DateDay)).OrderByDescending(x => x.EnterTime).ToList();
+                foreach (var project in isExistProject)
+                {
+
+                    if (project.QuitTime.HasValue && project.QuitTime.Value.ToDateDay() >= item.DateDay)
+                    {
+
+                        var oldValue = ownShipDay.Where(t => t.ShipId == project.ShipId && t.DateDay == item.DateDay).FirstOrDefault();
+                        if (oldValue != null)
+                        {
+                            oldValue.ProjectId = project.ProjectId;
+                        }
+                    }
+                    if (project.EnterTime.HasValue && project.QuitTime.HasValue == false && project.EnterTime.Value.ToDateDay() <= item.DateDay)
+                    {
+                        var oldValue = ownShipDay.Where(t => t.ShipId == project.ShipId && t.DateDay == item.DateDay).FirstOrDefault();
+                        if (oldValue != null)
+                        {
+                            oldValue.ProjectId = project.ProjectId;
+                        }
+                    }
+                    if (project.EnterTime.HasValue && project.QuitTime.HasValue && project.QuitTime.Value.ToDateDay() >= item.DateDay)
+                    {
+
+                        var oldValue = ownShipDay.Where(t => t.ShipId == project.ShipId && t.DateDay == item.DateDay).FirstOrDefault();
+                        if (oldValue != null)
+                        {
+                            oldValue.ProjectId = project.ProjectId;
+                        }
+                    }
+                }
+
+            }
+
+            #endregion
             var ownerMonthList = ownerShips.Where(x => x.DateMonth == endTime.ToDateMonth()).OrderBy(x => x.ShipId).ToList();
             var projectIds = ownerMonthList.Select(x => x.ProjectId).ToList();
             var shipIds = ownerMonthList.Select(x => x.ShipId).ToList();
@@ -6609,7 +6722,8 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 var currentTotalYearOffirmProductionValue = await _dbContext.Queryable<MonthReport>()
                     .Where(x => x.IsDelete == 1 && x.ProjectId == projectId && x.DateMonth <= dateMonth).ToListAsync();
                 //本年甲方确认产值(当年)
-                currentYearOffirmProductionValue = currentTotalYearOffirmProductionValue.Where(x => x.DateMonth >= new DateTime(DateTime.Now.Year, 1, 1).ToDateMonth() && x.DateMonth <= dateMonth)
+                var initMonth = new DateTime(DateTime.Now.Year, 1, 1).ToDateMonth();
+                currentYearOffirmProductionValue = currentTotalYearOffirmProductionValue.Where(x => x.DateMonth >= initMonth&& x.DateMonth <= dateMonth)
                    //原来的// x.DateYear==currentYear)
                    .Sum(x => x.PartyAConfirmedProductionAmount);
 
