@@ -1,17 +1,12 @@
 ﻿using GHMonitoringCenterApi.Application.Contracts.Dto.Project;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace GHMonitoringCenterApi.Application.Contracts.Dto.ConstructionProjectDaily
 {
-	/// <summary>
-	/// 船舶日报查询dto
-	/// </summary>
-	public class ShipDailyRequestDto:ProjectSearchRequestDto,IValidatableObject
+    /// <summary>
+    /// 船舶日报查询dto
+    /// </summary>
+    public class ShipDailyRequestDto:ProjectSearchRequestDto,IValidatableObject
 	{
 		/// <summary>
 		/// 船舶Id

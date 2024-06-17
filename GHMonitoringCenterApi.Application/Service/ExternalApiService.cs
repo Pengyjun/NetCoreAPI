@@ -8,6 +8,7 @@ using GHMonitoringCenterApi.Domain.Models;
 using GHMonitoringCenterApi.Domain.Shared;
 using GHMonitoringCenterApi.Domain.Shared.Const;
 using SqlSugar;
+using System;
 
 namespace GHMonitoringCenterApi.Application.Service
 {
@@ -369,7 +370,8 @@ namespace GHMonitoringCenterApi.Application.Service
                 PageIndex = requestDto.PageIndex,
                 PageSize = requestDto.PageSize,
                 StartTime = requestDto.StartTime,
-                EndTime = requestDto.EndTime
+                EndTime = requestDto.EndTime,
+                IsDuiWai = true
             };
 
             var responseData = await _projectProductionReportService.SearchShipDayReportAsync(searchRequestDto);

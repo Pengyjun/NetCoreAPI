@@ -55,5 +55,9 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project
         /// 船舶动态
         /// </summary>
         public ProjectShipState? ShipState { get; set; }
+        /// <summary>
+        /// 是否是对外接口   如果是 为true   权限更改为最高权限级别
+        /// </summary>
+        public bool IsDuiWai { get; set; }
     }
 }
