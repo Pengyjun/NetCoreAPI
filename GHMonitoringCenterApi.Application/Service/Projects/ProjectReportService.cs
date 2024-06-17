@@ -3440,6 +3440,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 SecUnitName = "广航局",
                 ThiUnitName = instinData.FirstOrDefault(y => y.Id == x.ProjectId)?.Name,
                 DynamicContent = dynamicData.FirstOrDefault(y => y.Type == x.DynamicDescriptionType)?.Name,
+                ShipDynamic = x.DynamicDescriptionType,
                 ContractTypeName = contractData.FirstOrDefault(y => y.Type == x.ContractDetailType)?.Name,
                 IsExamine = 0,
                 SubmitDate = MonthDate(x.DateMonth),
@@ -4050,7 +4051,11 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 SubmitDate = MonthDate(x.DateMonth),
                 ContractTypeName = contractData.FirstOrDefault(y => y.Type == x.ContractDetailType)?.Name,
                 ProjectId = x.ProjectId,
-                OwnShipId = x.ShipId
+                OwnShipId = x.ShipId,
+                GYFSId = x.WorkModeId,
+                SJCTId = x.WorkTypeId,
+                GKJBId = x.ConditionGradeId,
+                QDLXId = x.ContractDetailType
             }));
             //foreach (var item in result)
             //{

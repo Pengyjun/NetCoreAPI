@@ -74,5 +74,72 @@ namespace GHMonitoringCenterApi.Controllers
         [AllowAnonymous]//跳过鉴权
         public async Task<ResponseAjaxResult<List<ProjectTypeInfos>>> GetProjectTypeInfosAsync()
             => await _externalApiService.GetProjectTypeInfosAsync();
+        /// <summary>
+        /// 获取清单类型
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("GetListTypes")]
+        [AllowAnonymous]//跳过鉴权
+        public async Task<ResponseAjaxResult<List<ShipCommResponseDto>>> GetListTypesAsync()
+            => await _externalApiService.GetListTypesAsync();
+        /// <summary>
+        /// 获取工艺方式
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("GetProcessMethods")]
+        [AllowAnonymous]//跳过鉴权
+        public async Task<ResponseAjaxResult<List<ShipCommResponseDto>>> GetProcessMethodsAsync()
+            => await _externalApiService.GetProcessMethodsAsync();
+        /// <summary>
+        /// 获取疏浚吹填分类
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("GetReclamationClassification")]
+        [AllowAnonymous]//跳过鉴权
+        public async Task<ResponseAjaxResult<List<ShipCommResponseDto>>> GetReclamationClassificationAsync()
+            => await _externalApiService.GetReclamationClassificationAsync();
+        /// <summary>
+        /// 获取工况级别
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("GetWorkingConditionLevel")]
+        [AllowAnonymous]//跳过鉴权
+        public async Task<ResponseAjaxResult<List<ShipCommResponseDto>>> GetWorkingConditionLevelAsync()
+            => await _externalApiService.GetWorkingConditionLevelAsync();
+        /// <summary>
+        /// 获取船舶动态
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("GetShipDynamics")]
+        [AllowAnonymous]//跳过鉴权
+        public async Task<ResponseAjaxResult<List<ShipCommResponseDto>>> GetShipDynamicAsync()
+            => await _externalApiService.GetShipDynamicAsync();
+        /// <summary>
+        /// 获取船舶日报
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        [HttpGet("GetShipDayReports")]
+        [AllowAnonymous]//跳过鉴权
+        public async Task<ResponseAjaxResult<List<ShipDayReports>>> GetShipDayReportsAsync([FromQuery] ShipDayReportsRequestDto requestDto)
+            => await _externalApiService.GetShipDayReportsAsync(requestDto);
+        /// <summary>
+        /// 获取自有船舶月报
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        [HttpGet("GetOwnShipMonthReps")]
+        [AllowAnonymous]//跳过鉴权
+        public async Task<ResponseAjaxResult<List<ShipMonthReports>>> GetSearchOwnShipMonthRepAsync([FromQuery] ShipMonthRequestDto requestDto)
+            => await _externalApiService.GetSearchOwnShipMonthRepAsync(requestDto);
+        /// <summary>
+        /// 获取分包船舶月报
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        [HttpGet("GetSearchSubShipMonthRep")]
+        [AllowAnonymous]//跳过鉴权
+        public async Task<ResponseAjaxResult<List<SubShipMonthReports>>> GetSearchSubShipMonthRepAsync([FromQuery] ShipMonthRequestDto requestDto)
+            => await _externalApiService.GetSearchSubShipMonthRepAsync(requestDto);
     }
 }

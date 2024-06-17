@@ -1,4 +1,6 @@
-﻿namespace GHMonitoringCenterApi.Application.Contracts.Dto
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace GHMonitoringCenterApi.Application.Contracts.Dto
 {
     /// <summary>
     /// 对外接口dto
@@ -400,4 +402,287 @@
         /// </summary>
         public string? Name { get; set; }
     }
+    /// <summary>
+    /// 对外接口  船舶日报请求dto
+    /// </summary>
+    public class ShipDayReportsRequestDto : IValidatableObject
+    {
+        /// <summary>
+        /// 船舶id
+        /// </summary>
+        public Guid? ShipPingId { get; set; }
+        /// <summary>
+        /// 页码
+        /// </summary>
+        public int PageIndex { get; set; } = 1;
+        /// <summary>
+        /// 页大小
+        /// </summary>
+        public int PageSize { get; set; } = 10;
+        /// <summary>
+        /// 开始日期
+        /// </summary>
+        public DateTime? StartTime { get; set; }
+
+        /// <summary>
+        /// 结束日期
+        /// </summary>
+        public DateTime? EndTime { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="validationContext"></param>
+        /// <returns></returns>
+        public virtual IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+        {
+            //开始日期结束日期都不是空
+            if (!((StartTime == DateTime.MinValue || string.IsNullOrWhiteSpace(StartTime.ToString())) && (EndTime == DateTime.MinValue || string.IsNullOrWhiteSpace(EndTime.ToString()))))
+            {
+                if (StartTime > EndTime)
+                {
+                    yield return new ValidationResult("开始日期大于结束日期", new string[] { nameof(StartTime) });
+                }
+            }
+        }
+    }
+    /// <summary>
+    /// 船舶公用下拉列表数据 清单类型/工艺方式/工况级别/吹填分类
+    /// </summary>
+    public class ShipCommResponseDto
+    {
+        /// <summary>
+        /// 主键id
+        /// </summary>
+        public Guid Id { set; get; }
+        /// <summary>
+        /// pomid
+        /// </summary>
+        public Guid? PomId { set; get; }
+        /// <summary>
+        /// 类型
+        /// </summary>
+        public int Type { get; set; } = 0;
+        /// <summary>
+        /// 名称
+        /// </summary>
+        public string? Name { set; get; }
+        /// <summary>
+        /// 备注
+        /// </summary>
+        public string? Remark { set; get; }
+
+    }
+    /// <summary>
+    /// 船舶日报数据集
+    /// </summary>
+    public class ShipDayReports
+    {
+        /// <summary>
+        /// 监控中心船舶日报主键id
+        /// </summary>
+        public Guid Id { get; set; }
+        /// <summary>
+        /// 项目id
+        /// </summary>
+        public Guid ProjectId { get; set; }
+        /// <summary>
+        /// 日报日期
+        /// </summary>
+        public int? DateDay { get; set; }
+        /// <summary>
+        /// 船舶Id
+        /// </summary>
+        public Guid? ShipId { get; set; }
+        /// <summary>
+        /// 船报产量(方)
+        /// </summary>
+        public decimal? ShipReportedProduction { get; set; }
+        /// <summary>
+        ///管线长度 （m）
+        /// </summary>
+        public decimal? PipelineLength { get; set; }
+        /// <summary>
+        /// 油耗
+        /// </summary>
+        public decimal? OilConsumption { get; set; }
+        /// <summary>
+        /// 估算成本(元)
+        /// </summary>
+        public decimal? EstimatedCostAmount { get; set; }
+        /// <summary>
+        /// 估算产值（元）(船报产量*估算单价) 注：产量和单价都是保留小数两位相乘，保证数据完整性保留四位小数
+        /// </summary>
+        public decimal? EstimatedOutputAmount { get; set; }
+        /// <summary>
+        /// 施工效率
+        /// </summary>
+        public decimal? ConstructionEfficiency { get; set; }
+        /// <summary>
+        /// 生产停歇(h)
+        /// </summary>
+        public decimal? ProductionStoppage { get; set; }
+        /// <summary>
+        /// 非生产停歇(h)
+        /// </summary>
+        public decimal? NonProductionStoppage { get; set; }
+        /// <summary>
+        /// 时间利用率(%)
+        /// </summary>
+        public decimal? TimeAvailability { get; set; }
+        /// <summary>
+        /// 生产运转时间
+        /// </summary>
+        public decimal? ProductionOperatingTime { get; set; }
+        /// <summary>
+		///挖泥
+		/// </summary>
+		public decimal? Dredge { get; set; }
+        /// <summary>
+        ///航行
+        /// </summary>
+        public decimal? Sail { get; set; }
+        /// <summary>
+        ///吹水
+        /// </summary>
+        public decimal? BlowingWater { get; set; }
+        /// <summary>
+        ///抛泥
+        /// </summary>
+        public decimal? SedimentDisposal { get; set; }
+        /// <summary>
+        ///吹岸
+        /// </summary>
+        public decimal? BlowShore { get; set; }
+    }
+    /// <summary>
+    /// 对外接口 自有/分包船舶月报请求dto
+    /// </summary>
+    public class ShipMonthRequestDto : IValidatableObject
+    {
+        /// <summary>
+        /// 页码
+        /// </summary>
+        public int PageIndex { get; set; } = 1;
+        /// <summary>
+        /// 页大小
+        /// </summary>
+        public int PageSize { get; set; } = 10;
+        /// <summary>
+        /// 传入开始日期
+        /// </summary>
+        public DateTime? InStartDate { get; set; }
+        /// <summary>
+        /// 传入结束日期
+        /// </summary>
+        public DateTime? InEndDate { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="validationContext"></param>
+        /// <returns></returns>
+        public virtual IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+        {
+            //开始日期结束日期都不是空
+            if (!(InStartDate == DateTime.MinValue || string.IsNullOrWhiteSpace(InStartDate.ToString())) && (InEndDate == DateTime.MinValue || string.IsNullOrWhiteSpace(InEndDate.ToString())))
+            {
+                if (InStartDate > InEndDate)
+                {
+                    yield return new ValidationResult("开始日期大于结束日期", new string[] { nameof(InStartDate) });
+                }
+            }
+        }
+    }
+    /// <summary>
+    /// 对外接口 自有/分包船舶月报数据集
+    /// </summary>
+    public class ShipMonthReports
+    {
+        /// <summary>
+        /// 月报id
+        /// </summary>
+        public Guid? Id { get; set; }
+        /// <summary>
+        /// 项目id
+        /// </summary>
+        public Guid? ProjectId { get; set; }
+        /// <summary>
+        /// 船舶名称
+        /// </summary>
+        public string? ShipName { get; set; }
+        /// <summary>
+        /// 进场时间
+        /// </summary>
+        public string? EnterTime { get; set; }
+        /// <summary>
+        /// 退场时间
+        /// </summary>
+        public string? QuitTime { get; set; }
+        /// <summary>
+        /// 本月施工天数
+        /// </summary>
+        public decimal MonthWorkDays { get; set; }
+        /// <summary>
+        /// 本月运转时间
+        /// </summary>
+        public decimal MonthWorkHours { get; set; }
+        /// <summary>
+        /// 工况级别
+        /// </summary>
+        public Guid? GKJBId { get; set; }
+        /// <summary>
+        /// 工艺方式
+        /// </summary>
+        public Guid? GYFSId { get; set; }
+        /// <summary>
+        /// 疏浚吹填分类
+        /// </summary>
+        public Guid? SJCTId { get; set; }
+        /// <summary>
+        /// 合同清单类型(字典表typeno=9)
+        /// </summary>
+        public int QDLXId { get; set; }
+        /// <summary>
+        /// 合同清单名称
+        /// </summary>
+        public string? QDLXName { get; set; }
+        /// <summary>
+        /// 本月完成工程量
+        /// </summary>
+        public decimal MonthQuantity { get; set; }
+        /// <summary>
+        /// 本月施工产值
+        /// </summary>
+        public decimal MonthOutputVal { get; set; }
+    }
+    /// <summary>
+    /// 分包船舶月报数据集
+    /// </summary>
+    public class SubShipMonthReports
+    {
+        /// <summary>
+        /// 月报id
+        /// </summary>
+        public Guid? Id { get; set; }
+        /// <summary>
+        /// 项目id
+        /// </summary>
+        public Guid? ProjectId { get; set; }
+        /// <summary>
+        /// 分包船舶id
+        /// </summary>
+        public Guid? SubShipId { get; set; }
+        /// <summary>
+        /// 船舶动态
+        /// </summary>
+        public int ShipDynamic { get; set; }
+        /// <summary>
+        /// 进场时间
+        /// </summary>
+        public string? EnterTime { get; set; }
+        /// <summary>
+        /// 退场时间
+        /// </summary>
+        public string? QuitTime { get; set; }
+    }
+
 }

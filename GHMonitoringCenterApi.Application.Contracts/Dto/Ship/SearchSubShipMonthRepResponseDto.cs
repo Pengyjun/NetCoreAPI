@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace GHMonitoringCenterApi.Application.Contracts.Dto.Ship
+﻿namespace GHMonitoringCenterApi.Application.Contracts.Dto.Ship
 {
     /// <summary>
     /// 分包船舶月报列表
@@ -22,7 +16,7 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Ship
         /// <summary>
         /// 分包船舶id
         /// </summary>
-        public Guid? SubShipId { get;set; }
+        public Guid? SubShipId { get; set; }
         /// <summary>
         /// 分包船名称
         /// </summary>
@@ -119,6 +113,10 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Ship
         /// 动态概述
         /// </summary>
         public string? DynamicContent { get; set; }
+        /// <summary>
+        /// 船舶动态
+        /// </summary>
+        public int ShipDynamic { get; set; }
         /// <summary>
         /// 是否审核
         /// </summary>
