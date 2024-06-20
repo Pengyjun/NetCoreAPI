@@ -412,6 +412,10 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto
         /// </summary>
         public Guid? ShipPingId { get; set; }
         /// <summary>
+        /// 船舶名称
+        /// </summary>
+        public string? ShipName { get; set; }
+        /// <summary>
         /// 页码
         /// </summary>
         public int PageIndex { get; set; } = 1;
@@ -560,6 +564,10 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto
     public class ShipMonthRequestDto : IValidatableObject
     {
         /// <summary>
+        /// 船舶名称
+        /// </summary>
+        public string? ShipName { get; set; }
+        /// <summary>
         /// 页码
         /// </summary>
         public int PageIndex { get; set; } = 1;
@@ -684,5 +692,70 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto
         /// </summary>
         public string? QuitTime { get; set; }
     }
+    /// <summary>
+    /// 对外接口自有船舶信息
+    /// </summary>
+    public class ShipInfos
+    {
+        /// <summary>
+        /// 监控中心主键id
+        /// </summary>
+        public Guid Id { get; set; }
+        /// <summary>
+        /// 关联的pomid
+        /// </summary>
+        public Guid? PomId { get; set; }
+        /// <summary>
+        /// 船舶名称
+        /// </summary>
+        public string? ShipName { get; set; }
+        /// <summary>
+        /// 船舶类型id
+        /// </summary>
+        public Guid? ShipTypeId { get; set; }
+        /// <summary>
+        /// mmsi
+        /// </summary>
+        public string? Mmsi { get; set; }
+    }
+    /// <summary>
+    /// 项目日报对外接口请求dto
+    /// </summary>
+    public class DayReportRequestDto : IValidatableObject
+    {
+        /// <summary>
+        /// 项目名称
+        /// </summary>
+        public string? ProjectName { get; set; }
+        /// <summary>
+        /// 项目状态
+        /// </summary>
+        public string[]? ProjectStatusId { get; set; }
+        /// <summary>
+        /// 开始日期
+        /// </summary>
+        public DateTime? StartTime { get; set; }
 
+        /// <summary>
+        /// 结束日期
+        /// </summary>
+        public DateTime? EndTime { get; set; }
+        /// <summary>
+        /// 校验
+        /// </summary>
+        /// <param name="validationContext"></param>
+        /// <returns></returns>
+
+        public virtual IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+        {
+            //开始日期结束日期都不是空
+            if (!((StartTime == DateTime.MinValue || string.IsNullOrWhiteSpace(StartTime.ToString())) && (EndTime == DateTime.MinValue || string.IsNullOrWhiteSpace(EndTime.ToString()))))
+            {
+                if (StartTime > EndTime)
+                {
+                    yield return new ValidationResult("开始日期大于结束日期", new string[] { nameof(StartTime) });
+                }
+            }
+        }
+    }
 }

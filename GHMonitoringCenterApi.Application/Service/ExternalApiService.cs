@@ -1,5 +1,7 @@
 ﻿using GHMonitoringCenterApi.Application.Contracts.Dto;
 using GHMonitoringCenterApi.Application.Contracts.Dto.ConstructionProjectDaily;
+using GHMonitoringCenterApi.Application.Contracts.Dto.Project.Report;
+using GHMonitoringCenterApi.Application.Contracts.Dto.ProjectProductionReport;
 using GHMonitoringCenterApi.Application.Contracts.Dto.Ship;
 using GHMonitoringCenterApi.Application.Contracts.IService;
 using GHMonitoringCenterApi.Application.Contracts.IService.Project;
@@ -7,8 +9,9 @@ using GHMonitoringCenterApi.Application.Contracts.IService.ProjectProductionRepo
 using GHMonitoringCenterApi.Domain.Models;
 using GHMonitoringCenterApi.Domain.Shared;
 using GHMonitoringCenterApi.Domain.Shared.Const;
+using GHMonitoringCenterApi.Domain.Shared.Util;
 using SqlSugar;
-using System;
+using static GHMonitoringCenterApi.Application.Contracts.Dto.Project.Report.MonthtReportsResponseDto;
 
 namespace GHMonitoringCenterApi.Application.Service
 {
@@ -22,11 +25,21 @@ namespace GHMonitoringCenterApi.Application.Service
         /// </summary>
         private readonly ISqlSugarClient _dbContext;
         /// <summary>
+        /// 全局对象
+        /// </summary>
+        private readonly GlobalObject _globalObject;
+        /// <summary>
+        /// 当前登录用户
+        /// </summary>
+        private CurrentUser _currentUser { get { return _globalObject.CurrentUser; } set { } }
+        /// <summary>
         /// 项目船舶日报相关接口注入
+        /// 项目日报相关接口注入
         /// </summary>
         private IProjectProductionReportService _projectProductionReportService { get; set; }
         /// <summary>
         /// 项目船舶月报接口注入
+        /// 项目月报接口注入
         /// </summary>
         private IProjectReportService _projectReportService { get; set; }
         /// <summary>
@@ -35,11 +48,13 @@ namespace GHMonitoringCenterApi.Application.Service
         /// <param name="sqlSugarClient"></param>
         /// <param name="projectProductionReportService"></param>
         /// <param name="projectReportService"></param>
-        public ExternalApiService(ISqlSugarClient sqlSugarClient, IProjectProductionReportService projectProductionReportService, IProjectReportService projectReportService)
+        /// <param name="globalObject"></param>
+        public ExternalApiService(ISqlSugarClient sqlSugarClient, IProjectProductionReportService projectProductionReportService, IProjectReportService projectReportService, GlobalObject globalObject)
         {
             this._dbContext = sqlSugarClient;
             this._projectProductionReportService = projectProductionReportService;
             this._projectReportService = projectReportService;
+            this._globalObject = globalObject;
         }
         /// <summary>
         /// s获取人员信息
@@ -371,7 +386,8 @@ namespace GHMonitoringCenterApi.Application.Service
                 PageSize = requestDto.PageSize,
                 StartTime = requestDto.StartTime,
                 EndTime = requestDto.EndTime,
-                IsDuiWai = true
+                IsDuiWai = true,
+                ShipName = requestDto.ShipName
             };
 
             var responseData = await _projectProductionReportService.SearchShipDayReportAsync(searchRequestDto);
@@ -421,7 +437,8 @@ namespace GHMonitoringCenterApi.Application.Service
                 InEndDate = requestDto.InEndDate,
                 InStartDate = requestDto.InStartDate,
                 PageIndex = requestDto.PageIndex,
-                PageSize = requestDto.PageSize
+                PageSize = requestDto.PageSize,
+                ShipName = requestDto.ShipName
             };
 
             var responseData = await _projectReportService.GetSearchOwnShipMonthRepAsync(monthRepRequest, 1);
@@ -487,6 +504,98 @@ namespace GHMonitoringCenterApi.Application.Service
             var pageData = resList.Skip((requestDto.PageIndex - 1) * requestDto.PageSize).Take(requestDto.PageSize).ToList();
             responseAjaxResult.Count = responseData.Count;
             responseAjaxResult.SuccessResult(pageData, ResponseMessage.OPERATION_SUCCESS);
+            return responseAjaxResult;
+        }
+        /// <summary>
+        /// 船舶信息
+        /// </summary>
+        /// <param name="shipType">船舶类型 自有1：分包2</param>
+        /// <returns></returns>
+        public async Task<ResponseAjaxResult<List<ShipInfos>>> GetShipInfosAsync(int shipType)
+        {
+            var responseAjaxResult = new ResponseAjaxResult<List<ShipInfos>>();
+            var resList = new List<ShipInfos>();
+
+            switch (shipType)
+            {
+                case 1:
+                    resList = await _dbContext.Queryable<OwnerShip>()
+                        .Where(x => x.IsDelete == 1)
+                        .Select(x => new ShipInfos
+                        {
+                            Id = x.Id,
+                            Mmsi = x.Mmsi,
+                            PomId = x.PomId,
+                            ShipName = x.Name,
+                            ShipTypeId = x.TypeId
+                        })
+                        .ToListAsync();
+                    break;
+                case 2:
+                    resList = await _dbContext.Queryable<SubShip>()
+                        .Where(x => x.IsDelete == 1)
+                        .Select(x => new ShipInfos
+                        {
+                            Id = x.Id,
+                            Mmsi = x.Mmsi,
+                            PomId = x.PomId,
+                            ShipName = x.Name,
+                            ShipTypeId = x.TypeId
+                        })
+                        .ToListAsync();
+                    break;
+            }
+
+            responseAjaxResult.Count = resList.Count;
+            responseAjaxResult.SuccessResult(resList, ResponseMessage.OPERATION_SUCCESS);
+            return responseAjaxResult;
+        }
+        /// <summary>
+        /// 获取项目日报
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        public async Task<ResponseAjaxResult<List<DayReportInfo>>> GetSearchDayReportAsync(DayReportRequestDto requestDto)
+        {
+            var responseAjaxResult = new ResponseAjaxResult<List<DayReportInfo>>();
+            var searchRequestDto = new ProductionSafetyRequestDto
+            {
+                ProjectName = requestDto.ProjectName,
+                ProjectStatusId = requestDto.ProjectStatusId,
+                StartTime = requestDto.StartTime,
+                EndTime = requestDto.EndTime,
+                IsDuiWai = true
+            };
+
+            var responseData = await _projectProductionReportService.SearchDayReportAsync(searchRequestDto);
+            var resList = responseData.Data.dayReportInfos;
+
+            responseAjaxResult.Count = responseData.Count;
+            responseAjaxResult.SuccessResult(resList, ResponseMessage.OPERATION_SUCCESS);
+            return responseAjaxResult;
+        }
+        /// <summary>
+        /// 获取项目月报
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        public async Task<ResponseAjaxResult<List<MonthtReportDto>>> GetMonthReportInfosAsync(MonthReportInfosRequestDto requestDto)
+        {
+            var responseAjaxResult = new ResponseAjaxResult<List<MonthtReportDto>>();
+            var model = new MonthtReportsRequstDto
+            {
+                ProjectName = requestDto.ProjectName,
+                StartTime = requestDto.StartTime,
+                EndTime = requestDto.EndTime,
+                IsConvert = requestDto.IsConvert,
+                IsDuiWai = true
+            };
+
+            var responseData = await _projectReportService.SearchMonthReportsAsync(model);
+            var resList = responseData.Data.Reports;
+
+            responseAjaxResult.Count = responseData.Count;
+            responseAjaxResult.SuccessResult(resList, ResponseMessage.OPERATION_SUCCESS);
             return responseAjaxResult;
         }
     }

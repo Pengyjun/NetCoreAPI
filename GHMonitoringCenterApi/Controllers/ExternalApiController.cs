@@ -1,8 +1,10 @@
 ﻿using GHMonitoringCenterApi.Application.Contracts.Dto;
+using GHMonitoringCenterApi.Application.Contracts.Dto.ProjectProductionReport;
 using GHMonitoringCenterApi.Application.Contracts.IService;
 using GHMonitoringCenterApi.Domain.Shared;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using static GHMonitoringCenterApi.Application.Contracts.Dto.Project.Report.MonthtReportsResponseDto;
 
 namespace GHMonitoringCenterApi.Controllers
 
@@ -115,6 +117,15 @@ namespace GHMonitoringCenterApi.Controllers
         public async Task<ResponseAjaxResult<List<ShipCommResponseDto>>> GetShipDynamicAsync()
             => await _externalApiService.GetShipDynamicAsync();
         /// <summary>
+        /// 船舶信息
+        /// </summary>
+        /// <param name="shipType">船舶类型 自有1：分包2</param>
+        /// <returns></returns>
+        [HttpGet("GetShipInfos")]
+        [AllowAnonymous]//跳过鉴权
+        public async Task<ResponseAjaxResult<List<ShipInfos>>> GetShipInfosAsync([FromQuery] int shipType)
+            => await _externalApiService.GetShipInfosAsync(shipType);
+        /// <summary>
         /// 获取船舶日报
         /// </summary>
         /// <param name="requestDto"></param>
@@ -141,5 +152,23 @@ namespace GHMonitoringCenterApi.Controllers
         [AllowAnonymous]//跳过鉴权
         public async Task<ResponseAjaxResult<List<SubShipMonthReports>>> GetSearchSubShipMonthRepAsync([FromQuery] ShipMonthRequestDto requestDto)
             => await _externalApiService.GetSearchSubShipMonthRepAsync(requestDto);
+        /// <summary>
+        /// 获取项目日报
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        [HttpGet("GetSearchDayReport")]
+        [AllowAnonymous]//跳过鉴权
+        public async Task<ResponseAjaxResult<List<DayReportInfo>>> GetSearchDayReportAsync([FromQuery] DayReportRequestDto requestDto)
+            => await _externalApiService.GetSearchDayReportAsync(requestDto);
+        /// <summary>
+        /// 获取项目月报
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        [HttpGet("GetMonthReportInfos")]
+        [AllowAnonymous]//跳过鉴权
+        public async Task<ResponseAjaxResult<List<MonthtReportDto>>> GetMonthReportInfosAsync([FromQuery] MonthReportInfosRequestDto requestDto)
+            => await _externalApiService.GetMonthReportInfosAsync(requestDto);
     }
 }

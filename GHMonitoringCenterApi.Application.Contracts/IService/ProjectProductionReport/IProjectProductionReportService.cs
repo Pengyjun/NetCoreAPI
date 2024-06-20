@@ -1,21 +1,14 @@
 ﻿using GHMonitoringCenterApi.Application.Contracts.Dto.ConstructionProjectDaily;
-using GHMonitoringCenterApi.Application.Contracts.Dto.Project;
 using GHMonitoringCenterApi.Application.Contracts.Dto.ProjectProductionReport;
 using GHMonitoringCenterApi.Domain.Models;
 using GHMonitoringCenterApi.Domain.Shared;
-using SqlSugar;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace GHMonitoringCenterApi.Application.Contracts.IService.ProjectProductionReport
 {
-	/// <summary>
-	/// 项目生产报表接口层
-	/// </summary>
-	public interface IProjectProductionReportService
+    /// <summary>
+    /// 项目生产报表接口层
+    /// </summary>
+    public interface IProjectProductionReportService
 	{
 		/// <summary>
 		/// 产值日报列表

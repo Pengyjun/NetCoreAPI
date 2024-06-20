@@ -212,6 +212,7 @@ namespace GHMonitoringCenterApi.Application.Service.ProjectProductionReport
             List<Guid> departmentIds = new List<Guid>();
             //获取所有机构
             //var institution = await dbContext.Queryable<Institution>().ToListAsync();
+            if (searchRequestDto.IsDuiWai) { _currentUser.CurrentLoginIsAdmin = true; }
             if (_currentUser.CurrentLoginIsAdmin)
             {
                 departmentIds = institution.Select(x => x.PomId.Value).ToList();
