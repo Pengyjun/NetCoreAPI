@@ -523,7 +523,8 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     ShutdownDate = p.ShutdownDate.Value.ToString("yyyy-MM-dd"),
                     DurationInformation = p.DurationInformation,
                     ShutDownReason = p.ShutDownReason,
-                    ContractChangeInfo = p.ContractChangeInfo
+                    ContractChangeInfo = p.ContractChangeInfo,
+                    MasterCode = p.MasterCode
                 });
 
             //是否全量导出
