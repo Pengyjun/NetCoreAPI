@@ -6,10 +6,10 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Ship
         public List<SearchOwnShipMonthRep> searchOwnShipMonthReps { get; set; }
         public SumOwnShipMonth ownShipMonth { get; set; }
     }
-	/// <summary>
-	/// 自有船舶月报列表
-	/// </summary>
-	public class SearchOwnShipMonthRep
+    /// <summary>
+    /// 自有船舶月报列表
+    /// </summary>
+    public class SearchOwnShipMonthRep
     {
         /// <summary>
         /// 月报id
@@ -116,26 +116,42 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Ship
         /// 币种
         /// </summary>
         public Guid? CurrencyId { get; set; }
+        /// <summary>
+        /// 工况级别
+        /// </summary>
+        public Guid? GKJBId { get; set; }
+        /// <summary>
+        /// 工艺方式
+        /// </summary>
+        public Guid? GYFSId { get; set; }
+        /// <summary>
+        /// 疏浚吹填分类
+        /// </summary>
+        public Guid? SJCTId { get; set; }
+        /// <summary>
+        /// 合同清单类型(字典表typeno=9)
+        /// </summary>
+        public int QDLXId { get; set; }
 
     }
 
     public class SumOwnShipMonth
     {
-		/// <summary>
-		/// 本月完成工程量
-		/// </summary>
-		public decimal SumMonthQuantity { get; set; }
-		/// <summary>
-		/// 本月施工产值
-		/// </summary>
-		public decimal SumMonthOutputVal { get; set; }
-		/// <summary>
-		/// 年度完成工程量
-		/// </summary>
-		public decimal SumYearQuantity { get; set; }
-		/// <summary>
-		/// 年度完成产值
-		/// </summary>
-		public decimal SumYearOutputVal { get; set; }
-	}
+        /// <summary>
+        /// 本月完成工程量
+        /// </summary>
+        public decimal SumMonthQuantity { get; set; }
+        /// <summary>
+        /// 本月施工产值
+        /// </summary>
+        public decimal SumMonthOutputVal { get; set; }
+        /// <summary>
+        /// 年度完成工程量
+        /// </summary>
+        public decimal SumYearQuantity { get; set; }
+        /// <summary>
+        /// 年度完成产值
+        /// </summary>
+        public decimal SumYearOutputVal { get; set; }
+    }
 }

@@ -1,16 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using SqlSugar;
+﻿using SqlSugar;
 
 namespace GHMonitoringCenterApi.Domain.Models
 {
-		/// <summary>
-		/// 船舶日报表
-		/// </summary>
-		[SugarTable("t_shipday", IsDisabledDelete = true)]
+    /// <summary>
+    /// 船舶日报表
+    /// </summary>
+    [SugarTable("t_shipday", IsDisabledDelete = true)]
 		public class ShipDay
 		{
 			/// <summary>

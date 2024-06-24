@@ -1,20 +1,16 @@
 ﻿using GHMonitoringCenterApi.Application.Contracts.Dto.ConstructionProjectDaily;
-using GHMonitoringCenterApi.Application.Contracts.Dto.Project;
 using GHMonitoringCenterApi.Application.Contracts.Dto.ProjectProductionReport;
 using GHMonitoringCenterApi.Application.Contracts.IService.ProjectProductionReport;
-using GHMonitoringCenterApi.Application.Service.ProjectProductionReport;
-using GHMonitoringCenterApi.Application.Service.Projects;
-using GHMonitoringCenterApi.Domain.Models;
 using GHMonitoringCenterApi.Domain.Shared;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GHMonitoringCenterApi.Controllers.ProjectProductionReport
 {
-	/// <summary>
-	/// 在建项目生产相关数据
-	/// </summary>
-	[Route("api/[controller]")]
+    /// <summary>
+    /// 在建项目生产相关数据
+    /// </summary>
+    [Route("api/[controller]")]
 	[ApiController]
 	[Authorize]
 	public class ProjectProductionReportController : BaseController
