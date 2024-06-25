@@ -54,7 +54,7 @@ namespace CH.Simple.Web.Filters
                 switch (statusCodeResult.StatusCode)
                 {
                     case 200:
-                        context.Result = new OkObjectResult(Result.Success(message: "响应成功"));
+                        context.Result = new OkObjectResult(Result.Success(message: "调用成功"));
                         break;
                     case 401:
                         context.Result = new UnauthorizedObjectResult(Result.NoAuth());
