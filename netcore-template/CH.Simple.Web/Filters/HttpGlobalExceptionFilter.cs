@@ -6,6 +6,7 @@ using System.Net;
 using CH.Simple.Exceptions;
 using CH.Simple.Utils;
 using CH.Simple.Models.CommonResult;
+using Microsoft.Extensions.Logging;
 
 namespace CH.Simple.Web.Filters
 {
@@ -13,19 +14,27 @@ namespace CH.Simple.Web.Filters
     {
         public void OnException(ExceptionContext context)
         {
-            if (context.Exception.GetType() == typeof(ResultMessageException))
+            var loggerFactory = context.HttpContext?.RequestServices?.GetService(typeof(ILoggerFactory)) as ILoggerFactory;
+            var logger = loggerFactory.CreateLogger(GetType());
+            switch (context.Exception)
             {
-                context.Result = new OkObjectResult(Result.Fail(context.Exception.Message));
-                context.HttpContext.Response.StatusCode = (int)HttpStatusCode.OK;
+                case ResultMessageException:
+                    context.Result = new OkObjectResult(Result.Fail(context.Exception.Message));
+                    context.HttpContext.Response.StatusCode = (int)HttpStatusCode.OK;
+                    context.ExceptionHandled = true;
+                    break;
+                case UnauthorizedException:
+                    logger.LogError(JsonConvert.SerializeObject(context.Exception));
+                    context.Result = new UnauthorizedObjectResult(Result.NoAuth(context.Exception.Message));
+                    context.HttpContext.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
+                    context.ExceptionHandled = true;
+                    break;
+                default:
+                    logger.LogError(JsonConvert.SerializeObject(context.Exception));
+                    context.Result = new InternalServerErrorObjectResult(Result.Fail("服务器错误,请重试."));
+                    context.HttpContext.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+                    return;
             }
-            else
-            {
-                LogUtil.Error(JsonConvert.SerializeObject(context.Exception));
-                context.Result = new InternalServerErrorObjectResult(Result.Fail("服务器错误,请重试."));
-                context.HttpContext.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
-                return;
-            }
-            context.ExceptionHandled = true;
         }
     }
 }

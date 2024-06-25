@@ -7,6 +7,7 @@ using SqlSugar;
 using CH.Simple.Utils;
 using CH.Simple.SqlSuger;
 using CH.Simple.Web.Controllers;
+using CH.Simple.Web.Extensions;
 
 namespace CH.Simple.APP.API.Controllers
 {
@@ -30,10 +31,10 @@ namespace CH.Simple.APP.API.Controllers
         [HttpGet]
         public async Task<IActionResult> GetUserAsync([FromQuery] string? name, [FromQuery] int pageIndex = 1, [FromQuery] int pageSize = 15)
         {
-            int totalCount=0;
+            int totalCount = 0;
             var list = _context.Queryable<User>().ToPageResult(pageIndex, pageSize, ref totalCount);
 
-            return Ok(list);
+            return this.OkMessage("测试");
         }
 
         /// <summary>
@@ -64,7 +65,7 @@ namespace CH.Simple.APP.API.Controllers
         public async Task<IActionResult> AddUserAsync([FromBody] VUser model)
         {
             var nowTime = DateTime.Now;
-            var result= _context.Insertable<User>(new User
+            var result = _context.Insertable<User>(new User
             {
                 Id = PKManager.UUID(),
                 Name = model.Name,

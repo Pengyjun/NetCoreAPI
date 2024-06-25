@@ -5,11 +5,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CH.Simple.Web.Modles
+namespace CH.Simple.Web.ActionResults
 {
-    public class OkMsgObjectResult : ObjectResult
+    public class OkMessageObjectResult : ObjectResult
     {
-        public OkMsgObjectResult(object value) : base(value)
+        public OkMessageObjectResult(object value) : base(value)
         {
             StatusCode = 200;
         }

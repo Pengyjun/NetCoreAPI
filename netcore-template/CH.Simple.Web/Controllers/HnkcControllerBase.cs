@@ -1,4 +1,4 @@
-﻿using CH.Simple.Web.Modles;
+﻿using CH.Simple.Web.ActionResults;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CH.Simple.Web.Controllers
@@ -13,7 +13,7 @@ namespace CH.Simple.Web.Controllers
         [NonAction]
         protected virtual ObjectResult OkMsg(string msg)
         {
-            return new OkMsgObjectResult(msg);
+            return new OkMessageObjectResult(msg);
         }
     }
 }
