@@ -1,6 +1,8 @@
 ﻿using GHMonitoringCenterApi.Application.Contracts.Dto;
 using GHMonitoringCenterApi.Application.Contracts.Dto.ConstructionProjectDaily;
+using GHMonitoringCenterApi.Application.Contracts.Dto.Project;
 using GHMonitoringCenterApi.Application.Contracts.Dto.Project.Report;
+using GHMonitoringCenterApi.Application.Contracts.Dto.Project.ShipMovements;
 using GHMonitoringCenterApi.Application.Contracts.Dto.ProjectProductionReport;
 using GHMonitoringCenterApi.Application.Contracts.Dto.Ship;
 using GHMonitoringCenterApi.Application.Contracts.IService;
@@ -9,8 +11,6 @@ using GHMonitoringCenterApi.Application.Contracts.IService.ProjectProductionRepo
 using GHMonitoringCenterApi.Domain.Models;
 using GHMonitoringCenterApi.Domain.Shared;
 using GHMonitoringCenterApi.Domain.Shared.Const;
-using GHMonitoringCenterApi.Domain.Shared.Util;
-using NPOI.POIFS.Crypt.Dsig;
 using SqlSugar;
 using static GHMonitoringCenterApi.Application.Contracts.Dto.Project.Report.MonthtReportsResponseDto;
 
@@ -39,6 +39,10 @@ namespace GHMonitoringCenterApi.Application.Service
         /// </summary>
         private IProjectProductionReportService _projectProductionReportService { get; set; }
         /// <summary>
+        /// 船舶进退场接口注入
+        /// </summary>
+        private IProjectShipMovementsService _shipMovementService { get; set; }
+        /// <summary>
         /// 项目船舶月报接口注入
         /// 项目月报接口注入
         /// </summary>
@@ -50,12 +54,14 @@ namespace GHMonitoringCenterApi.Application.Service
         /// <param name="projectProductionReportService"></param>
         /// <param name="projectReportService"></param>
         /// <param name="globalObject"></param>
-        public ExternalApiService(ISqlSugarClient sqlSugarClient, IProjectProductionReportService projectProductionReportService, IProjectReportService projectReportService, GlobalObject globalObject)
+        /// <param name="shipMovementService"></param>
+        public ExternalApiService(ISqlSugarClient sqlSugarClient, IProjectProductionReportService projectProductionReportService, IProjectReportService projectReportService, GlobalObject globalObject, IProjectShipMovementsService shipMovementService)
         {
             this._dbContext = sqlSugarClient;
             this._projectProductionReportService = projectProductionReportService;
             this._projectReportService = projectReportService;
             this._globalObject = globalObject;
+            this._shipMovementService = shipMovementService;
         }
         /// <summary>
         /// s获取人员信息
@@ -489,7 +495,11 @@ namespace GHMonitoringCenterApi.Application.Service
                     QDLXName = item.ContractTypeName,
                     QuitTime = item.QuitTime,
                     SJCTId = item.SJCTId,
-                    UpdateTime = item.UpdateTime
+                    UpdateTime = item.UpdateTime,
+                    DateMonth = item.SubmitDate,
+                    DigDeep = item.DigDeep,
+                    BlowingDistance = item.BlowingDistance,
+                    HaulDistance = item.HaulDistance
                 });
             }
 
@@ -625,6 +635,22 @@ namespace GHMonitoringCenterApi.Application.Service
 
             var responseData = await _projectReportService.SearchMonthReportsAsync(model);
             var resList = responseData.Data.Reports;
+
+            responseAjaxResult.Count = responseData.Count;
+            responseAjaxResult.SuccessResult(resList, ResponseMessage.OPERATION_SUCCESS);
+            return responseAjaxResult;
+        }
+        /// <summary>
+        /// 获取船舶进退场
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        public async Task<ResponseAjaxResult<List<ShipMovementResponseDto>>> GetShipMovementAsync(ShipMovementsRequestDto model)
+        {
+            var responseAjaxResult = new ResponseAjaxResult<List<ShipMovementResponseDto>>();
+
+            var responseData = await _shipMovementService.SearchShipMovementsAsync(model);
+            var resList = responseData.Data;
 
             responseAjaxResult.Count = responseData.Count;
             responseAjaxResult.SuccessResult(resList, ResponseMessage.OPERATION_SUCCESS);

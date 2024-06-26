@@ -1,4 +1,6 @@
 ﻿using GHMonitoringCenterApi.Application.Contracts.Dto;
+using GHMonitoringCenterApi.Application.Contracts.Dto.Project.ShipMovements;
+using GHMonitoringCenterApi.Application.Contracts.Dto.Project;
 using GHMonitoringCenterApi.Application.Contracts.Dto.ProjectProductionReport;
 using GHMonitoringCenterApi.Domain.Shared;
 using static GHMonitoringCenterApi.Application.Contracts.Dto.Project.Report.MonthtReportsResponseDto;
@@ -106,5 +108,11 @@ namespace GHMonitoringCenterApi.Application.Contracts.IService
         /// <param name="requestDto"></param>
         /// <returns></returns>
         Task<ResponseAjaxResult<List<MonthtReportDto>>> GetMonthReportInfosAsync(MonthReportInfosRequestDto requestDto);
+        /// <summary>
+        /// 船舶进退场
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        Task<ResponseAjaxResult<List<ShipMovementResponseDto>>> GetShipMovementAsync(ShipMovementsRequestDto model);
     }
 }

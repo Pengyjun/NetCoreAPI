@@ -4092,7 +4092,10 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 SJCTId = x.WorkTypeId,
                 GKJBId = x.ConditionGradeId,
                 QDLXId = x.ContractDetailType,
-                UpdateTime = x.UpdateTime
+                UpdateTime = x.UpdateTime,
+                DigDeep = x.DigDeep,
+                BlowingDistance = x.BlowingDistance,
+                HaulDistance = x.HaulDistance
             }));
             //foreach (var item in result)
             //{

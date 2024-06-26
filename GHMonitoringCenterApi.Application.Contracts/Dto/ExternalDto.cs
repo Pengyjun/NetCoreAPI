@@ -703,6 +703,22 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto
         /// 更新时间
         /// </summary>
         public DateTime? UpdateTime { get; set; }
+        /// <summary>
+        ///挖深（m）
+        /// </summary>
+        public decimal DigDeep { get; set; }
+        /// <summary>
+        /// 吹距(KM)
+        /// </summary>
+        public decimal BlowingDistance { get; set; }
+        /// <summary>
+        /// 运距(KM)
+        /// </summary>
+        public decimal HaulDistance { get; set; }
+        /// <summary>
+        /// 月份
+        /// </summary>
+        public DateTime DateMonth { get; set; }
     }
     /// <summary>
     /// 分包船舶月报数据集
