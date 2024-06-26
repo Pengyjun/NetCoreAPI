@@ -56,7 +56,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
         private CurrentUser _currentUser { get { return _globalObject.CurrentUser; } }
 
         //public ActionExecutingContext context { get; set; }
-        public ProjectService(IBaseRepository<ProjectWbsHistoryMonth> baseProjectWbsHistory ,IBaseRepository<ProjectWBS> baseProjectWBSRepository, ISqlSugarClient dbContext, IMapper mapper, IBaseRepository<Files> baseFilesRepository, IBaseRepository<ProjectOrg> baseProjectOrgRepository, IBaseRepository<ProjectLeader> baseProjectLeaderRepository, IPushPomService pushPomService, IBaseService baseService, ILogService logService, IEntityChangeService entityChangeService, GlobalObject globalObject)
+        public ProjectService(IBaseRepository<ProjectWbsHistoryMonth> baseProjectWbsHistory, IBaseRepository<ProjectWBS> baseProjectWBSRepository, ISqlSugarClient dbContext, IMapper mapper, IBaseRepository<Files> baseFilesRepository, IBaseRepository<ProjectOrg> baseProjectOrgRepository, IBaseRepository<ProjectLeader> baseProjectLeaderRepository, IPushPomService pushPomService, IBaseService baseService, ILogService logService, IEntityChangeService entityChangeService, GlobalObject globalObject)
         {
             this.baseProjectWBSRepository = baseProjectWBSRepository;
             this.dbContext = dbContext;
@@ -1012,8 +1012,8 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     CompanyId = addOrUpdateProjectRequestDto.CompanyId,
                     ProjectId = projectId,
                     Name = addOrUpdateProjectRequestDto.Name,
-                    StartWorkTime = addOrUpdateProjectRequestDto.CommencementTime.HasValue ? addOrUpdateProjectRequestDto.CommencementTime.Value:null,
-                    EndWorkTime = addOrUpdateProjectRequestDto.ShutdownDate.HasValue?addOrUpdateProjectRequestDto.ShutdownDate.Value:null,
+                    StartWorkTime = addOrUpdateProjectRequestDto.CommencementTime.HasValue ? addOrUpdateProjectRequestDto.CommencementTime.Value : null,
+                    EndWorkTime = addOrUpdateProjectRequestDto.ShutdownDate.HasValue ? addOrUpdateProjectRequestDto.ShutdownDate.Value : null,
                     BeforeStatus = addOrUpdateProjectRequestDto.StatusId.ToString(),
                     StopWorkReson = addOrUpdateProjectRequestDto.ShutDownReason,
                     CreateTime = DateTime.Now,
@@ -1049,7 +1049,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
 
             await Console.Out.WriteLineAsync("11");
             #region 计算项目停工天数 供交建通每天发消息使用
-           
+
             //计算当前周期已过多少天
             var nowDay = DateTime.Now.Day;
             //当前月的最后一天
@@ -1435,10 +1435,6 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     }
                 }
                 #endregion
-                if (projectObject.CommencementTime.HasValue && addOrUpdateProjectRequestDto.CommencementTime.HasValue == false)
-                {
-                    addOrUpdateProjectRequestDto.CommencementTime = projectObject.CommencementTime.Value;
-                }
 
                 mapper.Map(addOrUpdateProjectRequestDto, projectObject);
                 //税率
@@ -1582,9 +1578,18 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     await dbContext.Updateable(removeLeaderList).EnableDiffLogEvent(logDto).ExecuteCommandAsync();
                 }
                 #endregion
-
-                //修改项目信息
-                await dbContext.Updateable(projectObject).IgnoreColumns(x=>x.CommencementTime).EnableDiffLogEvent(logDto).ExecuteCommandAsync();
+                //重新查询数据是否有开工日期
+                var newProjectObject = await dbContext.Queryable<Project>().SingleAsync(x => x.IsDelete == 1 && x.Id == addOrUpdateProjectRequestDto.Id);
+                if (newProjectObject.CommencementTime != DateTime.MinValue && !string.IsNullOrEmpty(newProjectObject.CommencementTime.ToString()))
+                {
+                    //修改项目信息
+                    await dbContext.Updateable(projectObject).IgnoreColumns(x => x.CommencementTime).EnableDiffLogEvent(logDto).ExecuteCommandAsync();
+                }
+                else
+                {
+                    //修改项目信息
+                    await dbContext.Updateable(projectObject).EnableDiffLogEvent(logDto).ExecuteCommandAsync();
+                }
                 //项目变更记录
                 await entityChangeService.RecordEntitysChangeAsync(EntityType.Project, projectObject.Id);
                 //更改后直接推送项目信息
@@ -1999,7 +2004,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             };
 
             #endregion
-            var month=DateTime.Now.ToDateMonth();
+            var month = DateTime.Now.ToDateMonth();
             // 删除
             if (removeWBSList.Any())
             {
@@ -2116,10 +2121,10 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     projectWbsHistoryMonth.DateMonth = month;
                     projectWbsHistoryMonths.Add(projectWbsHistoryMonth);
                 }
-                var existData= await dbContext.Queryable<ProjectWbsHistoryMonth>().Where(x => x.DateMonth == month).ToListAsync();
+                var existData = await dbContext.Queryable<ProjectWbsHistoryMonth>().Where(x => x.DateMonth == month).ToListAsync();
                 foreach (var item in existData)
                 {
-                    item.IsDelete =0;
+                    item.IsDelete = 0;
                 }
                 await dbContext.Updateable<ProjectWbsHistoryMonth>(existData).ExecuteCommandAsync();
                 await baseProjectWbsHistory.InsertOrUpdateAsync(projectWbsHistoryMonths);
@@ -3150,9 +3155,9 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             RefAsync<int> total = 0;
             var res = await dbContext.Queryable<OwnerShip>().Where(x => x.IsDelete == 1 && x.PomId == shipId)
                  .LeftJoin<ShipMovementRecord>((x, y) => x.PomId == y.ShipId)
-                 .LeftJoin<Project>((x, y,z) => y.ProjectId==z.Id)
+                 .LeftJoin<Project>((x, y, z) => y.ProjectId == z.Id)
                  .Where((x, y) => y.IsDelete == 1)
-                 .Select((x, y,z) => new ShipMovementRecordResponseDto()
+                 .Select((x, y, z) => new ShipMovementRecordResponseDto()
                  {
                      ProjectId = y.ProjectId,
                      ProjectName = z.ShortName,
@@ -3197,12 +3202,13 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             {
                 monthDay = int.Parse(nowYear + $"0{nowMonth}");
             }
-            else {
+            else
+            {
                 monthDay = int.Parse(nowYear + $"{nowMonth}");
             }
             #endregion
 
-           var projectMonth= await dbContext.Queryable<MonthReport>().Where(x => x.IsDelete == 1 && x.ProjectId == id && x.DateMonth == monthDay).FirstAsync();
+            var projectMonth = await dbContext.Queryable<MonthReport>().Where(x => x.IsDelete == 1 && x.ProjectId == id && x.DateMonth == monthDay).FirstAsync();
             if (projectMonth == null)
             {
                 ajaxResult.Data = false;
@@ -3210,9 +3216,9 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 return ajaxResult;
             }
 
-           var job= await dbContext.Queryable<GHMonitoringCenterApi.Domain.Models.Job>().Where(x => x.IsDelete == 1
-            && x.ProjectId == id && x.DateMonth == monthDay).FirstAsync();
-            if(job==null)
+            var job = await dbContext.Queryable<GHMonitoringCenterApi.Domain.Models.Job>().Where(x => x.IsDelete == 1
+             && x.ProjectId == id && x.DateMonth == monthDay).FirstAsync();
+            if (job == null)
             {
                 ajaxResult.Data = false;
                 ajaxResult.Success();
@@ -3229,7 +3235,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             }
             //
             var jobRecord = await dbContext.Queryable<GHMonitoringCenterApi.Domain.Models.JobRecord>().Where(x => x.IsDelete == 1
-           &&x.JobId== job.Id).FirstAsync();
+           && x.JobId == job.Id).FirstAsync();
             if (jobRecord == null)
             {
                 ajaxResult.Data = false;
@@ -3245,12 +3251,12 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             job.IsDelete = 0;
             jobApprover.IsDelete = 1;
             jobRecord.IsDelete = 1;
-            projectMonth.Status =MonthReportStatus.Revoca;
+            projectMonth.Status = MonthReportStatus.Revoca;
             projectMonth.StatusText = "已撤回";
-        await dbContext.Updateable(projectMonth).ExecuteCommandAsync();
-        await  dbContext.Updateable(job).ExecuteCommandAsync();
-          await  dbContext.Updateable(jobRecord).ExecuteCommandAsync();
-          await  dbContext.Updateable(jobApprover).ExecuteCommandAsync();
+            await dbContext.Updateable(projectMonth).ExecuteCommandAsync();
+            await dbContext.Updateable(job).ExecuteCommandAsync();
+            await dbContext.Updateable(jobRecord).ExecuteCommandAsync();
+            await dbContext.Updateable(jobApprover).ExecuteCommandAsync();
             ajaxResult.Data = true;
             ajaxResult.Success();
             return ajaxResult;
