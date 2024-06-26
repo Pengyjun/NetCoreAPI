@@ -1,33 +1,18 @@
 ﻿using AutoMapper;
-using GHMonitoringCenterApi.Application.Contracts.IService.OperationLog;
+using GHMonitoringCenterApi.Application.Contracts.Dto.ConstructionProjectDaily;
+using GHMonitoringCenterApi.Application.Contracts.Dto.ProjectProductionReport;
 using GHMonitoringCenterApi.Application.Contracts.IService;
+using GHMonitoringCenterApi.Application.Contracts.IService.OperationLog;
 using GHMonitoringCenterApi.Application.Contracts.IService.ProjectProductionReport;
+using GHMonitoringCenterApi.Domain.Enums;
 using GHMonitoringCenterApi.Domain.IRepository;
 using GHMonitoringCenterApi.Domain.Models;
-using SqlSugar;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using GHMonitoringCenterApi.Domain.Shared;
-using GHMonitoringCenterApi.Application.Contracts.Dto.Project;
-using GHMonitoringCenterApi.Application.Contracts.Dto.ProjectProductionReport;
-using System.Diagnostics;
-using GHMonitoringCenterApi.Domain.Shared.Util;
-using GHMonitoringCenterApi.Domain.Enums;
-using AutoMapper.Features;
-using Dm;
-using Microsoft.AspNetCore.Http;
-using System.Globalization;
-using Spire.Pdf.Exporting.XPS.Schema;
-using UtilsSharp;
-using GHMonitoringCenterApi.Application.Contracts.Dto.ConstructionProjectDaily;
-using System.Linq.Expressions;
-using GHMonitoringCenterApi.Application.Contracts.Dto.Job;
-using System.Reflection;
 using GHMonitoringCenterApi.Domain.Shared.Const;
-using GHMonitoringCenterApi.Application.Contracts.Dto.File;
+using GHMonitoringCenterApi.Domain.Shared.Util;
+using SqlSugar;
+using System.Linq.Expressions;
+using UtilsSharp;
 
 namespace GHMonitoringCenterApi.Application.Service.ProjectProductionReport
 {
@@ -263,6 +248,7 @@ namespace GHMonitoringCenterApi.Application.Service.ProjectProductionReport
             //分页查询
             var dayReport = await dbContext.Queryable<DayReportConstruction>().Where(x => x.IsDelete == 1)
                 .WhereIF(time != 0, x => x.DateDay == time).ToListAsync();
+
             var list = await dbContext.Queryable<Project, DayReport>(
                 (p, d) =>
                 new JoinQueryInfos(
@@ -302,7 +288,10 @@ namespace GHMonitoringCenterApi.Application.Service.ProjectProductionReport
                     Amount = p.Amount,
                     CreateUser = d.CreateId.ToString(),
                     DayActualProductionAmount = d.DayActualProductionAmount,
+                    DayActualPlanAmount = d.MonthPlannedProductionAmount / 30.5M,
+                    DayActualProductionQuantity = d.DayActualProduction,
                     DateDay = d.DateDay,
+                    UpdateTime = d.UpdateTime
                 }).ToListAsync();
             for (int i = 0; i < list.Count; i++)
             {
@@ -909,6 +898,7 @@ namespace GHMonitoringCenterApi.Application.Service.ProjectProductionReport
                 BlowingWater = d.BlowingWater,
                 DateDay = d.DateDay,
                 Remarks = d.Remarks,
+                UpdateTime = d.UpdateTime,
                 ProductionOperatingTime = SqlFunc.IsNull(d.Dredge, 0) + SqlFunc.IsNull(d.Sail, 0) + SqlFunc.IsNull(d.BlowingWater, 0) + SqlFunc.IsNull(d.BlowShore, 0) + SqlFunc.IsNull(d.SedimentDisposal, 0),
                 ProductionStoppage = SqlFunc.IsNull(d.ConstructionLayout, 0) + SqlFunc.IsNull(d.StandbyMachine, 0) + SqlFunc.IsNull(d.DownAnchor, 0) + SqlFunc.IsNull(d.MovingShip, 0) + SqlFunc.IsNull(d.WeldingCutter, 0) + SqlFunc.IsNull(d.ChangeGear, 0) + SqlFunc.IsNull(d.Supply, 0) + SqlFunc.IsNull(d.MeasurementImpact, 0) + SqlFunc.IsNull(d.LayingPipelines, 0) + SqlFunc.IsNull(d.AdjustingPipeline, 0) + SqlFunc.IsNull(d.CleaningPump, 0) + SqlFunc.IsNull(d.CleaningCRS, 0) + SqlFunc.IsNull(d.WaitingBargeAndTowing, 0) + SqlFunc.IsNull(d.ReplaceWire, 0) + SqlFunc.IsNull(d.AvoidingShip, 0),
                 NonProductionStoppage = SqlFunc.IsNull(d.WeatherImpact, 0) + SqlFunc.IsNull(d.TideImpact, 0) + SqlFunc.IsNull(d.SuddenFailure, 0) + SqlFunc.IsNull(d.WaitingSparePartRepair, 0) + SqlFunc.IsNull(d.WaitingOilWaterMaterial, 0) + SqlFunc.IsNull(d.WaitingBargeAndTowing, 0) + SqlFunc.IsNull(d.NotifyShutdown, 0) + SqlFunc.IsNull(d.EquipmentModificationMaintenance, 0) + SqlFunc.IsNull(d.Standby, 0) + SqlFunc.IsNull(d.FSPipeFailure, 0) + SqlFunc.IsNull(d.SunkenTubeFailure, 0) + SqlFunc.IsNull(d.SocialInterference, 0) + SqlFunc.IsNull(d.CofferdamDrainageIssues, 0) + SqlFunc.IsNull(d.Other, 0),

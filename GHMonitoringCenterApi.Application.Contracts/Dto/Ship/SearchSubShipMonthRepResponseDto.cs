@@ -125,5 +125,9 @@
         /// 提交日期
         /// </summary>
         public DateTime SubmitDate { get; set; }
+        /// <summary>
+        /// 更新时间
+        /// </summary>
+        public DateTime? UpdateTime { get; set; }
     }
 }

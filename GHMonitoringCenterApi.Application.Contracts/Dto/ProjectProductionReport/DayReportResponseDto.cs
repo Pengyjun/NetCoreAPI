@@ -125,6 +125,18 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.ProjectProductionRepor
         /// </summary>
         public decimal? DayActualProductionAmount { get; set; }
         /// <summary>
+        /// 计划日产值
+        /// </summary>
+        public decimal? DayActualPlanAmount { get; set; }
+        /// <summary>
+        /// 实际日产量
+        /// </summary>
+        public decimal? DayActualProductionQuantity { get; set; }
+        /// <summary>
+        /// 计划日产量
+        /// </summary>
+        public decimal? DayActualPlanQuantity { get; set; }
+        /// <summary>
         /// 填报人
         /// </summary>
         public string? CreateUser { get; set; }
@@ -133,6 +145,10 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.ProjectProductionRepor
         /// 填报日期(例：20230418)
         /// </summary>
         public int DateDay { get; set; }
+        /// <summary>
+        /// 更新时间
+        /// </summary>
+        public DateTime? UpdateTime { get; set; }
 
         /// <summary>
         /// 日期(时间格式)

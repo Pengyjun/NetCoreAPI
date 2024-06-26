@@ -1,16 +1,11 @@
 ﻿using SqlSugar;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace GHMonitoringCenterApi.Domain.Models
 {
-	/// <summary>
-	/// 项目表
-	/// </summary>
-	[SugarTable("t_project", IsDisabledDelete = true)]
+    /// <summary>
+    /// 项目表
+    /// </summary>
+    [SugarTable("t_project", IsDisabledDelete = true)]
 	public class Project : BaseEntity<Guid>
 	{
 		/// <summary>

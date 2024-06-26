@@ -26,6 +26,11 @@ namespace GHMonitoringCenterApi.Application.Contracts.IService
         /// <returns></returns>
         Task<ResponseAjaxResult<List<ProjectInfos>>> GetProjectInfosAsync();
         /// <summary>
+        /// 获取区域信息
+        /// </summary>
+        /// <returns></returns>
+        Task<ResponseAjaxResult<List<ProjectAreaInfos>>> GetAreaInfosAsync();
+        /// <summary>
         /// 获取项目干系人
         /// </summary>
         /// <returns></returns>

@@ -10,6 +10,7 @@ using GHMonitoringCenterApi.Domain.Models;
 using GHMonitoringCenterApi.Domain.Shared;
 using GHMonitoringCenterApi.Domain.Shared.Const;
 using GHMonitoringCenterApi.Domain.Shared.Util;
+using NPOI.POIFS.Crypt.Dsig;
 using SqlSugar;
 using static GHMonitoringCenterApi.Application.Contracts.Dto.Project.Report.MonthtReportsResponseDto;
 
@@ -172,12 +173,35 @@ namespace GHMonitoringCenterApi.Application.Service
                     StartContractDuration = x.StartContractDuration,
                     Tag = x.Tag,
                     Tag2 = x.Tag2,
-                    ProjectTypeId = x.TypeId
+                    ProjectTypeId = x.TypeId,
+                    RegionId = x.RegionId
                 })
                 .ToListAsync();
 
             responseAjaxResult.Count = data.Count;
             responseAjaxResult.SuccessResult(data, ResponseMessage.OPERATION_SUCCESS);
+            return responseAjaxResult;
+        }
+        /// <summary>
+        /// 获取区域信息
+        /// </summary>
+        /// <returns></returns>
+        public async Task<ResponseAjaxResult<List<ProjectAreaInfos>>> GetAreaInfosAsync()
+        {
+            var responseAjaxResult = new ResponseAjaxResult<List<ProjectAreaInfos>>();
+            var resList = await _dbContext.Queryable<ProjectArea>()
+                .Where(x => x.IsDelete == 1)
+                .Select(x => new ProjectAreaInfos
+                {
+                    Id = x.AreaId,
+                    Name = x.Name,
+                    Code = x.Code,
+                    CreateTime = x.CreateTime
+                })
+            .ToListAsync();
+
+            responseAjaxResult.Count = resList.Count;
+            responseAjaxResult.SuccessResult(resList, ResponseMessage.OPERATION_SUCCESS);
             return responseAjaxResult;
         }
         /// <summary>
@@ -414,7 +438,10 @@ namespace GHMonitoringCenterApi.Application.Service
                     BlowShore = item.BlowShore,
                     Dredge = item.Dredge,
                     Sail = item.Sail,
-                    SedimentDisposal = item.SedimentDisposal
+                    SedimentDisposal = item.SedimentDisposal,
+                    ShipState = item.ShipState,
+                    ShipStateName = item.ShipStateName,
+                    UpdateTime = item.UpdateTime
                 });
             }
 
@@ -438,7 +465,8 @@ namespace GHMonitoringCenterApi.Application.Service
                 InStartDate = requestDto.InStartDate,
                 PageIndex = requestDto.PageIndex,
                 PageSize = requestDto.PageSize,
-                ShipName = requestDto.ShipName
+                ShipName = requestDto.ShipId,
+                IsDuiWai = true
             };
 
             var responseData = await _projectReportService.GetSearchOwnShipMonthRepAsync(monthRepRequest, 1);
@@ -460,7 +488,8 @@ namespace GHMonitoringCenterApi.Application.Service
                     QDLXId = item.QDLXId,
                     QDLXName = item.ContractTypeName,
                     QuitTime = item.QuitTime,
-                    SJCTId = item.SJCTId
+                    SJCTId = item.SJCTId,
+                    UpdateTime = item.UpdateTime
                 });
             }
 
@@ -483,7 +512,9 @@ namespace GHMonitoringCenterApi.Application.Service
                 InEndDate = requestDto.InEndDate,
                 InStartDate = requestDto.InStartDate,
                 PageIndex = requestDto.PageIndex,
-                PageSize = requestDto.PageSize
+                PageSize = requestDto.PageSize,
+                ShipName = requestDto.ShipId,
+                IsDuiWai = true
             };
 
             var responseData = await _projectReportService.GetSearchSubShipMonthRepAsync(monthRepRequest, 1);
@@ -497,7 +528,8 @@ namespace GHMonitoringCenterApi.Application.Service
                     ProjectId = item.ProjectId,
                     QuitTime = item.QuitTime,
                     ShipDynamic = item.ShipDynamic,
-                    SubShipId = item.SubShipId
+                    SubShipId = item.SubShipId,
+                    UpdateTime = item.UpdateTime
                 });
             }
 

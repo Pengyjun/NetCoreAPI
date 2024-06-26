@@ -388,6 +388,10 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.ProjectProductionRepor
 		/// 退场时间
 		/// </summary>
 		public DateTime? Quittime { get; set; }
+		/// <summary>
+		/// 
+		/// </summary>
+		public DateTime? UpdateTime { get; set; }
 
 		/// <summary>
 		/// 填报日期(例：20230418)

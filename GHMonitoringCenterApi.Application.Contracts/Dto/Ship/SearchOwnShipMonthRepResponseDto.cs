@@ -132,6 +132,10 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Ship
         /// 合同清单类型(字典表typeno=9)
         /// </summary>
         public int QDLXId { get; set; }
+        /// <summary>
+        /// 更新时间
+        /// </summary>
+        public DateTime? UpdateTime { get; set; }
 
     }
 

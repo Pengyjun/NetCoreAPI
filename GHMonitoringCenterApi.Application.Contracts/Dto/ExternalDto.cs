@@ -300,6 +300,32 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto
         /// 合同变更原因
         /// </summary>
         public string? ContractChangeInfo { get; set; }
+        /// <summary>
+        /// 区域id
+        /// </summary>
+        public Guid? RegionId { get; set; }
+    }
+    /// <summary>
+    /// 对外接口 项目区域信息
+    /// </summary>
+    public class ProjectAreaInfos
+    {
+        /// <summary>
+        /// 主键id
+        /// </summary>
+        public Guid? Id { get; set; }
+        /// <summary>
+        /// 区域名称
+        /// </summary>
+        public string? Name { get; set; }
+        /// <summary>
+        /// 编码
+        /// </summary>
+        public string? Code { get; set; }
+        /// <summary>
+        /// 创建时间
+        /// </summary>
+        public DateTime? CreateTime { get; set; }
     }
     /// <summary>
     /// 项目关联的干系人
@@ -494,6 +520,14 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto
         /// </summary>
         public int? DateDay { get; set; }
         /// <summary>
+        /// 船舶状态
+        /// </summary>
+        public int ShipState { get; set; }
+        /// <summary>
+        /// 船舶状态名称
+        /// </summary>
+        public string? ShipStateName { get; set; }
+        /// <summary>
         /// 船舶Id
         /// </summary>
         public Guid? ShipId { get; set; }
@@ -538,9 +572,9 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto
         /// </summary>
         public decimal? ProductionOperatingTime { get; set; }
         /// <summary>
-		///挖泥
-		/// </summary>
-		public decimal? Dredge { get; set; }
+        ///挖泥
+        /// </summary>
+        public decimal? Dredge { get; set; }
         /// <summary>
         ///航行
         /// </summary>
@@ -557,6 +591,10 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto
         ///吹岸
         /// </summary>
         public decimal? BlowShore { get; set; }
+        /// <summary>
+        /// 更新时间
+        /// </summary>
+        public DateTime? UpdateTime { get; set; }
     }
     /// <summary>
     /// 对外接口 自有/分包船舶月报请求dto
@@ -564,9 +602,9 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto
     public class ShipMonthRequestDto : IValidatableObject
     {
         /// <summary>
-        /// 船舶名称
+        /// 船舶Id
         /// </summary>
-        public string? ShipName { get; set; }
+        public string? ShipId { get; set; }
         /// <summary>
         /// 页码
         /// </summary>
@@ -661,6 +699,10 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto
         /// 本月施工产值
         /// </summary>
         public decimal MonthOutputVal { get; set; }
+        /// <summary>
+        /// 更新时间
+        /// </summary>
+        public DateTime? UpdateTime { get; set; }
     }
     /// <summary>
     /// 分包船舶月报数据集
@@ -691,6 +733,10 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto
         /// 退场时间
         /// </summary>
         public string? QuitTime { get; set; }
+        /// <summary>
+        /// 更新时间
+        /// </summary>
+        public DateTime? UpdateTime { get; set; }
     }
     /// <summary>
     /// 对外接口自有船舶信息

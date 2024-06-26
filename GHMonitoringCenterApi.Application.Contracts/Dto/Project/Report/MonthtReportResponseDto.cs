@@ -11,7 +11,7 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project.Report
     /// </summary>
     public class MonthtReportsResponseDto
     {
-        
+
         /// <summary>
         /// 合计
         /// </summary>
@@ -72,6 +72,10 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project.Report
             /// 项目id
             /// </summary>
             public Guid ProjectId { get; set; }
+            /// <summary>
+            /// 更新时间
+            /// </summary>
+            public DateTime? UpdateTime { get; set; }
 
             /// <summary>
             /// 填报月份

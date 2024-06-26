@@ -1666,7 +1666,8 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 ProgressDescriptionPushPom = m.ProgressDescriptionPushPom,//形象进度描述（pom）
                 PushStatus = m.IsPushPom,//推送次数
                 StatusText = m.StatusText,
-                OutsourcingExpensesAmount = m.OutsourcingExpensesAmount
+                OutsourcingExpensesAmount = m.OutsourcingExpensesAmount,
+                UpdateTime = m.UpdateTime
             });
 
             var list = model.IsFullExport ? await selQuery.ToListAsync() : await selQuery.ToPageListAsync(model.PageIndex, model.PageSize, total);
@@ -3245,6 +3246,18 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
         public async Task<ResponseAjaxResult<List<SearchSubShipMonthRepResponseDto>>> GetSearchSubShipMonthRepAsync(MonthRepRequestDto requestDto, int import)
         {
             var responseDto = new ResponseAjaxResult<List<SearchSubShipMonthRepResponseDto>>();
+            if (requestDto.IsDuiWai)
+            {
+                _currentUser.Account = "2022002867";
+                _currentUser.CurrentLoginDepartmentId = "bd840460-1e3a-45c8-abed-6e66903e6465".ToGuid();
+                _currentUser.CurrentLoginInstitutionId = "bd840460-1e3a-45c8-abed-6e66903e6465".ToGuid();
+                _currentUser.CurrentLoginInstitutionOid = "101162350";
+                _currentUser.CurrentLoginInstitutionPoid = "101114066";
+                _currentUser.CurrentLoginRoleId = "08db268c-d0d0-4e0f-8a66-39ff15bd3865".ToGuid();
+                _currentUser.CurrentLoginIsAdmin = true;
+                _currentUser.CurrentLoginUserType = 1;
+                _currentUser.Id = "08d63666-7e36-4e20-8024-ee9c96c51623".ToGuid();
+            }
 
             #region 日期控制
             //开始日期结束日期都是空  默认按当天日期匹配
@@ -3455,7 +3468,8 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 IsExamine = 0,
                 SubmitDate = MonthDate(x.DateMonth),
                 ProjectId = x.ProjectId,
-                SubShipId = x.ShipId
+                SubShipId = x.ShipId,
+                UpdateTime = x.UpdateTime
             }));
             #endregion
             responseDto.Count = total;
@@ -3845,6 +3859,18 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             var responseDto = new ResponseAjaxResult<SearchOwnShipMonthRepResponseDto>();
             var list = new SearchOwnShipMonthRepResponseDto();
             var sumInfo = new SumOwnShipMonth();
+            if (requestDto.IsDuiWai)
+            {
+                _currentUser.Account = "2022002867";
+                _currentUser.CurrentLoginDepartmentId = "bd840460-1e3a-45c8-abed-6e66903e6465".ToGuid();
+                _currentUser.CurrentLoginInstitutionId = "bd840460-1e3a-45c8-abed-6e66903e6465".ToGuid();
+                _currentUser.CurrentLoginInstitutionOid = "101162350";
+                _currentUser.CurrentLoginInstitutionPoid = "101114066";
+                _currentUser.CurrentLoginRoleId = "08db268c-d0d0-4e0f-8a66-39ff15bd3865".ToGuid();
+                _currentUser.CurrentLoginIsAdmin = true;
+                _currentUser.CurrentLoginUserType = 1;
+                _currentUser.Id = "08d63666-7e36-4e20-8024-ee9c96c51623".ToGuid();
+            }
             #region 日期控制
             //开始日期结束日期都是空  默认按当天日期匹配
             if ((requestDto.InStartDate == DateTime.MinValue || string.IsNullOrWhiteSpace(requestDto.InStartDate.ToString())) && (requestDto.InEndDate == DateTime.MinValue || string.IsNullOrWhiteSpace(requestDto.InEndDate.ToString())))
@@ -4065,7 +4091,8 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 GYFSId = x.WorkModeId,
                 SJCTId = x.WorkTypeId,
                 GKJBId = x.ConditionGradeId,
-                QDLXId = x.ContractDetailType
+                QDLXId = x.ContractDetailType,
+                UpdateTime = x.UpdateTime
             }));
             //foreach (var item in result)
             //{

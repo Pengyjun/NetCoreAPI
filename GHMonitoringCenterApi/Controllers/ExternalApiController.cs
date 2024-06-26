@@ -53,6 +53,14 @@ namespace GHMonitoringCenterApi.Controllers
         public async Task<ResponseAjaxResult<List<ProjectInfos>>> GetProjectInfosAsync()
             => await _externalApiService.GetProjectInfosAsync();
         /// <summary>
+        /// 获取项目区域信息
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("GetAreaInfos")]
+        [AllowAnonymous]//跳过鉴权
+        public async Task<ResponseAjaxResult<List<ProjectAreaInfos>>> GetAreaInfosAsync()
+            =>await _externalApiService.GetAreaInfosAsync();
+        /// <summary>
         /// 获取项目干系人
         /// </summary>
         /// <returns></returns>
