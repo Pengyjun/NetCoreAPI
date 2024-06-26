@@ -1,4 +1,6 @@
 ﻿using GHMonitoringCenterApi.Application.Contracts.Dto;
+using GHMonitoringCenterApi.Application.Contracts.Dto.Project.ShipMovements;
+using GHMonitoringCenterApi.Application.Contracts.Dto.Project;
 using GHMonitoringCenterApi.Application.Contracts.Dto.ProjectProductionReport;
 using GHMonitoringCenterApi.Application.Contracts.IService;
 using GHMonitoringCenterApi.Domain.Shared;
@@ -59,7 +61,7 @@ namespace GHMonitoringCenterApi.Controllers
         [HttpGet("GetAreaInfos")]
         [AllowAnonymous]//跳过鉴权
         public async Task<ResponseAjaxResult<List<ProjectAreaInfos>>> GetAreaInfosAsync()
-            =>await _externalApiService.GetAreaInfosAsync();
+            => await _externalApiService.GetAreaInfosAsync();
         /// <summary>
         /// 获取项目干系人
         /// </summary>
@@ -178,5 +180,14 @@ namespace GHMonitoringCenterApi.Controllers
         [AllowAnonymous]//跳过鉴权
         public async Task<ResponseAjaxResult<List<MonthtReportDto>>> GetMonthReportInfosAsync([FromQuery] MonthReportInfosRequestDto requestDto)
             => await _externalApiService.GetMonthReportInfosAsync(requestDto);
+        /// <summary>
+        /// 获取船舶进退场
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        [HttpGet("GetShipMovement")]
+        [AllowAnonymous]//跳过鉴权
+        public async Task<ResponseAjaxResult<List<ShipMovementResponseDto>>> GetShipMovementAsync([FromQuery] ShipMovementsRequestDto model)
+            => await _externalApiService.GetShipMovementAsync(model);
     }
 }
