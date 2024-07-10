@@ -899,6 +899,8 @@ namespace GHMonitoringCenterApi.Application.Service
             ResponseAjaxResult<List<BasePullDownResponseDto>> responseAjaxResult = new ResponseAjaxResult<List<BasePullDownResponseDto>>();
             var ProjectDealingUnitList = await baseDealingUnitRepository.AsQueryable()
                 .WhereIF(!string.IsNullOrWhiteSpace(dealingUnitRequseDto.KeyWords), x => SqlFunc.Contains(x.ZBPNAME_ZH, dealingUnitRequseDto.KeyWords))
+                // .Where(x=>x.ZBPNAME_ZH.Contains("机关") || x.ZBPNAME_ZH.Contains("本部") || x.ZBPNAME_ZH.Contains("纳税人"))
+                .Where(x => !x.ZBPNAME_ZH.Contains("汇总）") && !x.ZBPNAME_ZH.Contains("合并）"))
                  .Select(x => new BasePullDownResponseDto { Id = x.PomId, Name = x.ZBPNAME_ZH })
                  .ToListAsync();
             responseAjaxResult.Data = ProjectDealingUnitList;
