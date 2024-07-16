@@ -671,18 +671,23 @@ namespace GHMonitoringCenterApi.Application.Service
              */
             var responseAjaxResult = new ResponseAjaxResult<List<Project>>();
             requestDto.TimeValidatableObject();
+            var sTime = requestDto.StartTimeValue;
+            var eTime = requestDto.EndTimeValue;
 
             /***
              * 数据读取
              */
             var projectData = await _dbContext.Queryable<Project>()
-                .Where(x => string.IsNullOrEmpty(x.UpdateTime.ToString()) || x.UpdateTime == DateTime.MinValue ?
-                  x.IsDelete == 1 && x.CreateTime >= requestDto.StartTimeValue && x.CreateTime <= requestDto.EndTimeValue
-                : x.IsDelete == 1 && x.UpdateTime >= requestDto.StartTimeValue && x.UpdateTime <= requestDto.EndTimeValue)
+                .Where(x => x.IsDelete == 1)
                 .ToListAsync();
+            projectData = projectData
+                .Where(x => string.IsNullOrEmpty(x.UpdateTime.ToString()) || x.UpdateTime == DateTime.MinValue ?
+                  x.CreateTime >= sTime && x.CreateTime <= eTime
+                : x.UpdateTime >= sTime && x.UpdateTime <= eTime)
+                .ToList();
 
-            responseAjaxResult.Data = projectData;
             responseAjaxResult.Count = projectData.Count;
+            responseAjaxResult.SuccessResult(projectData);
             return responseAjaxResult;
         }
         /// <summary>
@@ -697,18 +702,23 @@ namespace GHMonitoringCenterApi.Application.Service
              */
             var responseAjaxResult = new ResponseAjaxResult<List<Institution>>();
             requestDto.TimeValidatableObject();
+            var sTime = requestDto.StartTimeValue;
+            var eTime = requestDto.EndTimeValue;
 
             /***
              * 数据读取
              */
             var institutionData = await _dbContext.Queryable<Institution>()
-                .Where(x => string.IsNullOrEmpty(x.UpdateTime.ToString()) || x.UpdateTime == DateTime.MinValue ?
-                  x.IsDelete == 1 && x.CreateTime >= requestDto.StartTimeValue && x.CreateTime <= requestDto.EndTimeValue
-                : x.IsDelete == 1 && x.UpdateTime >= requestDto.StartTimeValue && x.UpdateTime <= requestDto.EndTimeValue)
+                .Where(x => x.IsDelete == 1)
                 .ToListAsync();
+            institutionData = institutionData
+                .Where(x => string.IsNullOrEmpty(x.UpdateTime.ToString()) || x.UpdateTime == DateTime.MinValue ?
+                  x.CreateTime >= sTime && x.CreateTime <= eTime
+                : x.UpdateTime >= sTime && x.UpdateTime <= eTime)
+                .ToList();
 
-            responseAjaxResult.Data = institutionData;
             responseAjaxResult.Count = institutionData.Count;
+            responseAjaxResult.SuccessResult(institutionData);
             return responseAjaxResult;
         }
         /// <summary>
@@ -724,18 +734,22 @@ namespace GHMonitoringCenterApi.Application.Service
              */
             var responseAjaxResult = new ResponseAjaxResult<List<ProjectType>>();
             requestDto.TimeValidatableObject();
-
+            var sTime = requestDto.StartTimeValue;
+            var eTime = requestDto.EndTimeValue;
             /***
            * 数据读取
            */
             var projectTypeData = await _dbContext.Queryable<ProjectType>()
-                .Where(x => string.IsNullOrEmpty(x.UpdateTime.ToString()) || x.UpdateTime == DateTime.MinValue ?
-                  x.IsDelete == 1 && x.CreateTime >= requestDto.StartTimeValue && x.CreateTime <= requestDto.EndTimeValue
-                : x.IsDelete == 1 && x.UpdateTime >= requestDto.StartTimeValue && x.UpdateTime <= requestDto.EndTimeValue)
+                .Where(x => x.IsDelete == 1)
                 .ToListAsync();
+            projectTypeData = projectTypeData
+                .Where(x => string.IsNullOrEmpty(x.UpdateTime.ToString()) || x.UpdateTime == DateTime.MinValue ?
+                  x.CreateTime >= sTime && x.CreateTime <= eTime
+                : x.UpdateTime >= sTime && x.UpdateTime <= eTime)
+                .ToList();
 
-            responseAjaxResult.Data = projectTypeData;
             responseAjaxResult.Count = projectTypeData.Count;
+            responseAjaxResult.SuccessResult(projectTypeData);
             return responseAjaxResult;
         }
         /// <summary>
@@ -750,18 +764,22 @@ namespace GHMonitoringCenterApi.Application.Service
              */
             var responseAjaxResult = new ResponseAjaxResult<List<ProjectStatus>>();
             requestDto.TimeValidatableObject();
-
+            var sTime = requestDto.StartTimeValue;
+            var eTime = requestDto.EndTimeValue;
             /***
            * 数据读取
            */
             var projectStatusData = await _dbContext.Queryable<ProjectStatus>()
-                .Where(x => string.IsNullOrEmpty(x.UpdateTime.ToString()) || x.UpdateTime == DateTime.MinValue ?
-                  x.IsDelete == 1 && x.CreateTime >= requestDto.StartTimeValue && x.CreateTime <= requestDto.EndTimeValue
-                : x.IsDelete == 1 && x.UpdateTime >= requestDto.StartTimeValue && x.UpdateTime <= requestDto.EndTimeValue)
+                .Where(x => x.IsDelete == 1)
                 .ToListAsync();
+            projectStatusData = projectStatusData
+                .Where(x => string.IsNullOrEmpty(x.UpdateTime.ToString()) || x.UpdateTime == DateTime.MinValue ?
+                  x.CreateTime >= sTime && x.CreateTime <= eTime
+                : x.UpdateTime >= sTime && x.UpdateTime <= eTime)
+                .ToList();
 
-            responseAjaxResult.Data = projectStatusData;
             responseAjaxResult.Count = projectStatusData.Count;
+            responseAjaxResult.SuccessResult(projectStatusData);
             return responseAjaxResult;
         }
         /// <summary>
@@ -776,18 +794,22 @@ namespace GHMonitoringCenterApi.Application.Service
              */
             var responseAjaxResult = new ResponseAjaxResult<List<ProjectScale>>();
             requestDto.TimeValidatableObject();
-
+            var sTime = requestDto.StartTimeValue;
+            var eTime = requestDto.EndTimeValue;
             /***
            * 数据读取
            */
             var projectScaleData = await _dbContext.Queryable<ProjectScale>()
-                .Where(x => string.IsNullOrEmpty(x.UpdateTime.ToString()) || x.UpdateTime == DateTime.MinValue ?
-                  x.IsDelete == 1 && x.CreateTime >= requestDto.StartTimeValue && x.CreateTime <= requestDto.EndTimeValue
-                : x.IsDelete == 1 && x.UpdateTime >= requestDto.StartTimeValue && x.UpdateTime <= requestDto.EndTimeValue)
+                .Where(x => x.IsDelete == 1)
                 .ToListAsync();
+            projectScaleData = projectScaleData
+                .Where(x => string.IsNullOrEmpty(x.UpdateTime.ToString()) || x.UpdateTime == DateTime.MinValue ?
+                  x.CreateTime >= sTime && x.CreateTime <= eTime
+                : x.UpdateTime >= sTime && x.UpdateTime <= eTime)
+                .ToList();
 
-            responseAjaxResult.Data = projectScaleData;
             responseAjaxResult.Count = projectScaleData.Count;
+            responseAjaxResult.SuccessResult(projectScaleData);
             return responseAjaxResult;
         }
         /// <summary>
@@ -802,18 +824,22 @@ namespace GHMonitoringCenterApi.Application.Service
              */
             var responseAjaxResult = new ResponseAjaxResult<List<Province>>();
             requestDto.TimeValidatableObject();
-
+            var sTime = requestDto.StartTimeValue;
+            var eTime = requestDto.EndTimeValue;
             /***
            * 数据读取
            */
             var projectProvinceData = await _dbContext.Queryable<Province>()
-                .Where(x => string.IsNullOrEmpty(x.UpdateTime.ToString()) || x.UpdateTime == DateTime.MinValue ?
-                  x.IsDelete == 1 && x.CreateTime >= requestDto.StartTimeValue && x.CreateTime <= requestDto.EndTimeValue
-                : x.IsDelete == 1 && x.UpdateTime >= requestDto.StartTimeValue && x.UpdateTime <= requestDto.EndTimeValue)
+                .Where(x => x.IsDelete == 1)
                 .ToListAsync();
+            projectProvinceData = projectProvinceData
+                .Where(x => string.IsNullOrEmpty(x.UpdateTime.ToString()) || x.UpdateTime == DateTime.MinValue ?
+                  x.CreateTime >= sTime && x.CreateTime <= eTime
+                : x.UpdateTime >= sTime && x.UpdateTime <= eTime)
+                .ToList();
 
-            responseAjaxResult.Data = projectProvinceData;
             responseAjaxResult.Count = projectProvinceData.Count;
+            responseAjaxResult.SuccessResult(projectProvinceData);
             return responseAjaxResult;
         }
         /// <summary>
@@ -828,18 +854,22 @@ namespace GHMonitoringCenterApi.Application.Service
              */
             var responseAjaxResult = new ResponseAjaxResult<List<ProjectArea>>();
             requestDto.TimeValidatableObject();
-
+            var sTime = requestDto.StartTimeValue;
+            var eTime = requestDto.EndTimeValue;
             /***
            * 数据读取
            */
             var projectAreaData = await _dbContext.Queryable<ProjectArea>()
-                .Where(x => string.IsNullOrEmpty(x.UpdateTime.ToString()) || x.UpdateTime == DateTime.MinValue ?
-                  x.IsDelete == 1 && x.CreateTime >= requestDto.StartTimeValue && x.CreateTime <= requestDto.EndTimeValue
-                : x.IsDelete == 1 && x.UpdateTime >= requestDto.StartTimeValue && x.UpdateTime <= requestDto.EndTimeValue)
+                .Where(x => x.IsDelete == 1)
                 .ToListAsync();
+            projectAreaData = projectAreaData
+                .Where(x => string.IsNullOrEmpty(x.UpdateTime.ToString()) || x.UpdateTime == DateTime.MinValue ?
+                  x.CreateTime >= sTime && x.CreateTime <= eTime
+                : x.UpdateTime >= sTime && x.UpdateTime <= eTime)
+                .ToList();
 
-            responseAjaxResult.Data = projectAreaData;
             responseAjaxResult.Count = projectAreaData.Count;
+            responseAjaxResult.SuccessResult(projectAreaData);
             return responseAjaxResult;
         }
         /// <summary>
@@ -854,18 +884,22 @@ namespace GHMonitoringCenterApi.Application.Service
              */
             var responseAjaxResult = new ResponseAjaxResult<List<OwnerShip>>();
             requestDto.TimeValidatableObject();
-
+            var sTime = requestDto.StartTimeValue;
+            var eTime = requestDto.EndTimeValue;
             /***
            * 数据读取
            */
             var ownshipData = await _dbContext.Queryable<OwnerShip>()
-                .Where(x => string.IsNullOrEmpty(x.UpdateTime.ToString()) || x.UpdateTime == DateTime.MinValue ?
-                  x.IsDelete == 1 && x.CreateTime >= requestDto.StartTimeValue && x.CreateTime <= requestDto.EndTimeValue
-                : x.IsDelete == 1 && x.UpdateTime >= requestDto.StartTimeValue && x.UpdateTime <= requestDto.EndTimeValue)
+                .Where(x => x.IsDelete == 1)
                 .ToListAsync();
+            ownshipData = ownshipData
+                .Where(x => string.IsNullOrEmpty(x.UpdateTime.ToString()) || x.UpdateTime == DateTime.MinValue ?
+                  x.CreateTime >= sTime && x.CreateTime <= eTime
+                : x.UpdateTime >= sTime && x.UpdateTime <= eTime)
+                .ToList();
 
-            responseAjaxResult.Data = ownshipData;
             responseAjaxResult.Count = ownshipData.Count;
+            responseAjaxResult.SuccessResult(ownshipData);
             return responseAjaxResult;
         }
         /// <summary>
@@ -880,18 +914,22 @@ namespace GHMonitoringCenterApi.Application.Service
              */
             var responseAjaxResult = new ResponseAjaxResult<List<SubShip>>();
             requestDto.TimeValidatableObject();
-
+            var sTime = requestDto.StartTimeValue;
+            var eTime = requestDto.EndTimeValue;
             /***
            * 数据读取
            */
             var subShipData = await _dbContext.Queryable<SubShip>()
-                .Where(x => string.IsNullOrEmpty(x.UpdateTime.ToString()) || x.UpdateTime == DateTime.MinValue ?
-                  x.IsDelete == 1 && x.CreateTime >= requestDto.StartTimeValue && x.CreateTime <= requestDto.EndTimeValue
-                : x.IsDelete == 1 && x.UpdateTime >= requestDto.StartTimeValue && x.UpdateTime <= requestDto.EndTimeValue)
+                .Where(x => x.IsDelete == 1)
                 .ToListAsync();
+            subShipData = subShipData
+                .Where(x => string.IsNullOrEmpty(x.UpdateTime.ToString()) || x.UpdateTime == DateTime.MinValue ?
+                  x.CreateTime >= sTime && x.CreateTime <= eTime
+                : x.UpdateTime >= sTime && x.UpdateTime <= eTime)
+                .ToList();
 
-            responseAjaxResult.Data = subShipData;
             responseAjaxResult.Count = subShipData.Count;
+            responseAjaxResult.SuccessResult(subShipData);
             return responseAjaxResult;
         }
         /// <summary>
@@ -906,18 +944,22 @@ namespace GHMonitoringCenterApi.Application.Service
              */
             var responseAjaxResult = new ResponseAjaxResult<List<ShipClassic>>();
             requestDto.TimeValidatableObject();
-
+            var sTime = requestDto.StartTimeValue;
+            var eTime = requestDto.EndTimeValue;
             /***
            * 数据读取
            */
             var shipClassicData = await _dbContext.Queryable<ShipClassic>()
-                .Where(x => string.IsNullOrEmpty(x.UpdateTime.ToString()) || x.UpdateTime == DateTime.MinValue ?
-                  x.IsDelete == 1 && x.CreateTime >= requestDto.StartTimeValue && x.CreateTime <= requestDto.EndTimeValue
-                : x.IsDelete == 1 && x.UpdateTime >= requestDto.StartTimeValue && x.UpdateTime <= requestDto.EndTimeValue)
+                .Where(x => x.IsDelete == 1)
                 .ToListAsync();
+            shipClassicData = shipClassicData
+                .Where(x => string.IsNullOrEmpty(x.UpdateTime.ToString()) || x.UpdateTime == DateTime.MinValue ?
+                  x.CreateTime >= sTime && x.CreateTime <= eTime
+                : x.UpdateTime >= sTime && x.UpdateTime <= eTime)
+                .ToList();
 
-            responseAjaxResult.Data = shipClassicData;
             responseAjaxResult.Count = shipClassicData.Count;
+            responseAjaxResult.SuccessResult(shipClassicData);
             return responseAjaxResult;
         }
         /// <summary>
@@ -932,18 +974,22 @@ namespace GHMonitoringCenterApi.Application.Service
              */
             var responseAjaxResult = new ResponseAjaxResult<List<ShipPingType>>();
             requestDto.TimeValidatableObject();
-
+            var sTime = requestDto.StartTimeValue;
+            var eTime = requestDto.EndTimeValue;
             /***
            * 数据读取
            */
             var shipTypeData = await _dbContext.Queryable<ShipPingType>()
-                .Where(x => string.IsNullOrEmpty(x.UpdateTime.ToString()) || x.UpdateTime == DateTime.MinValue ?
-                  x.IsDelete == 1 && x.CreateTime >= requestDto.StartTimeValue && x.CreateTime <= requestDto.EndTimeValue
-                : x.IsDelete == 1 && x.UpdateTime >= requestDto.StartTimeValue && x.UpdateTime <= requestDto.EndTimeValue)
+                .Where(x => x.IsDelete == 1)
                 .ToListAsync();
+            shipTypeData = shipTypeData
+                .Where(x => string.IsNullOrEmpty(x.UpdateTime.ToString()) || x.UpdateTime == DateTime.MinValue ?
+                  x.CreateTime >= sTime && x.CreateTime <= eTime
+                : x.UpdateTime >= sTime && x.UpdateTime <= eTime)
+                .ToList();
 
-            responseAjaxResult.Data = shipTypeData;
             responseAjaxResult.Count = shipTypeData.Count;
+            responseAjaxResult.SuccessResult(shipTypeData);
             return responseAjaxResult;
         }
         /// <summary>
@@ -958,18 +1004,22 @@ namespace GHMonitoringCenterApi.Application.Service
              */
             var responseAjaxResult = new ResponseAjaxResult<List<ShipStatus>>();
             requestDto.TimeValidatableObject();
-
+            var sTime = requestDto.StartTimeValue;
+            var eTime = requestDto.EndTimeValue;
             /***
            * 数据读取
            */
             var shipStatusData = await _dbContext.Queryable<ShipStatus>()
-                .Where(x => string.IsNullOrEmpty(x.UpdateTime.ToString()) || x.UpdateTime == DateTime.MinValue ?
-                  x.IsDelete == 1 && x.CreateTime >= requestDto.StartTimeValue && x.CreateTime <= requestDto.EndTimeValue
-                : x.IsDelete == 1 && x.UpdateTime >= requestDto.StartTimeValue && x.UpdateTime <= requestDto.EndTimeValue)
+                .Where(x => x.IsDelete == 1)
                 .ToListAsync();
+            shipStatusData = shipStatusData
+                .Where(x => string.IsNullOrEmpty(x.UpdateTime.ToString()) || x.UpdateTime == DateTime.MinValue ?
+                  x.CreateTime >= sTime && x.CreateTime <= eTime
+                : x.UpdateTime >= sTime && x.UpdateTime <= eTime)
+                .ToList();
 
-            responseAjaxResult.Data = shipStatusData;
             responseAjaxResult.Count = shipStatusData.Count;
+            responseAjaxResult.SuccessResult(shipStatusData);
             return responseAjaxResult;
         }
         /// <summary>
@@ -984,18 +1034,22 @@ namespace GHMonitoringCenterApi.Application.Service
              */
             var responseAjaxResult = new ResponseAjaxResult<List<ShipMovement>>();
             requestDto.TimeValidatableObject();
-
+            var sTime = requestDto.StartTimeValue;
+            var eTime = requestDto.EndTimeValue;
             /***
            * 数据读取
            */
             var shipMovementData = await _dbContext.Queryable<ShipMovement>()
-                .Where(x => string.IsNullOrEmpty(x.UpdateTime.ToString()) || x.UpdateTime == DateTime.MinValue ?
-                  x.IsDelete == 1 && x.CreateTime >= requestDto.StartTimeValue && x.CreateTime <= requestDto.EndTimeValue
-                : x.IsDelete == 1 && x.UpdateTime >= requestDto.StartTimeValue && x.UpdateTime <= requestDto.EndTimeValue)
+                .Where(x => x.IsDelete == 1)
                 .ToListAsync();
+            shipMovementData = shipMovementData
+                .Where(x => string.IsNullOrEmpty(x.UpdateTime.ToString()) || x.UpdateTime == DateTime.MinValue ?
+                  x.CreateTime >= sTime && x.CreateTime <= eTime
+                : x.UpdateTime >= sTime && x.UpdateTime <= eTime)
+                .ToList();
 
-            responseAjaxResult.Data = shipMovementData;
             responseAjaxResult.Count = shipMovementData.Count;
+            responseAjaxResult.SuccessResult(shipMovementData);
             return responseAjaxResult;
         }
         #endregion
