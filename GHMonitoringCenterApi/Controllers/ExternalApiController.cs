@@ -208,9 +208,9 @@ namespace GHMonitoringCenterApi.Controllers
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
-        [HttpGet(" GetInstitutionTable")]
+        [HttpGet("GetInstitutionTable")]
         [AllowAnonymous]//跳过鉴权
-        public async Task<ResponseAjaxResult<List<Institution>>> GetInstitutionTableAsync(ExternalRequestDto requestDto)
+        public async Task<ResponseAjaxResult<List<Institution>>> GetInstitutionTableAsync([FromQuery] ExternalRequestDto requestDto)
             => await _externalApiService.GetInstitutionTableAsync(requestDto);
         /// <summary>
         /// 获取项目类型全量字段表
