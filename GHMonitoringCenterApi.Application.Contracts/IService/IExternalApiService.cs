@@ -4,6 +4,9 @@ using GHMonitoringCenterApi.Application.Contracts.Dto.Project;
 using GHMonitoringCenterApi.Application.Contracts.Dto.ProjectProductionReport;
 using GHMonitoringCenterApi.Domain.Shared;
 using static GHMonitoringCenterApi.Application.Contracts.Dto.Project.Report.MonthtReportsResponseDto;
+using GHMonitoringCenterApi.Application.Contracts.Dto.External;
+using Model = GHMonitoringCenterApi.Domain.Models;
+using GHMonitoringCenterApi.Domain.Models;
 
 namespace GHMonitoringCenterApi.Application.Contracts.IService
 {
@@ -114,5 +117,85 @@ namespace GHMonitoringCenterApi.Application.Contracts.IService
         /// <param name="model"></param>
         /// <returns></returns>
         Task<ResponseAjaxResult<List<ShipMovementResponseDto>>> GetShipMovementAsync(ShipMovementsRequestDto model);
+        #region 返回全表字段信息
+        /// <summary>
+        /// 获取全表字段项目信息
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        Task<ResponseAjaxResult<List<Model.Project>>> GetProjectsTableAsync(ExternalRequestDto requestDto);
+        /// <summary>
+        /// 获取全表字段公司机构
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        Task<ResponseAjaxResult<List<Institution>>> GetInstitutionTableAsync(ExternalRequestDto requestDto);
+        /// <summary>
+        /// 获取全表字段项目类型
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        Task<ResponseAjaxResult<List<ProjectType>>> GetProjectTypeTableAsync(ExternalRequestDto requestDto);
+        /// <summary>
+        /// 获取全表字段项目状态
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        Task<ResponseAjaxResult<List<ProjectStatus>>> GetProjectStatusTableAsync(ExternalRequestDto requestDto);
+        /// <summary>
+        /// 获取全表字段项目规模
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        Task<ResponseAjaxResult<List<ProjectScale>>> GetProjectScaleTableAsync(ExternalRequestDto requestDto);
+        /// <summary>
+        /// 获取全表字段施工地点
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        Task<ResponseAjaxResult<List<Province>>> GetProjectProvinceTableAsync(ExternalRequestDto requestDto);
+        /// <summary>
+        /// 获取全表字段施工区域
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        Task<ResponseAjaxResult<List<ProjectArea>>> GetProjectAreaTableAsync(ExternalRequestDto requestDto);
+        /// <summary>
+        /// 获取全表字段自有船舶
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        Task<ResponseAjaxResult<List<OwnerShip>>> GetOwnerShipTableAsync(ExternalRequestDto requestDto);
+        /// <summary>
+        /// 获取全表字段分包船舶
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        Task<ResponseAjaxResult<List<SubShip>>> GetSubShipTableAsync(ExternalRequestDto requestDto);
+        /// <summary>
+        /// 获取全表字段船级社
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        Task<ResponseAjaxResult<List<ShipClassic>>> GetShipClassicTableAsync(ExternalRequestDto requestDto);
+        /// <summary>
+        /// 获取全表字段船舶类型
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        Task<ResponseAjaxResult<List<ShipPingType>>> GetShipPingTypeTableAsync(ExternalRequestDto requestDto);
+        /// <summary>
+        /// 获取全表字段船舶状态
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        Task<ResponseAjaxResult<List<ShipStatus>>> GetShipStatusTableAsync(ExternalRequestDto requestDto);
+        /// <summary>
+        /// 获取全表字段船舶进退场
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        Task<ResponseAjaxResult<List<ShipMovement>>> GetShipMovementTableAsync(ExternalRequestDto requestDto);
+        #endregion
     }
 }

@@ -1,17 +1,9 @@
-﻿using GHMonitoringCenterApi.Domain.Enums;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Policy;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace GHMonitoringCenterApi.Application.Contracts.Dto.ProjectProductionReport
+﻿namespace GHMonitoringCenterApi.Application.Contracts.Dto.ProjectProductionReport
 {
-	/// <summary>
-	/// 船舶日报响应类
-	/// </summary>
-	public class ShipsDayReportResponseDto
+    /// <summary>
+    /// 船舶日报响应类
+    /// </summary>
+    public class ShipsDayReportResponseDto
 	{
 		/// <summary>
 		/// excel导出所需标题字段

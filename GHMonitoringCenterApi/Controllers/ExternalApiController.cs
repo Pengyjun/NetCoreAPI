@@ -1,12 +1,15 @@
 ﻿using GHMonitoringCenterApi.Application.Contracts.Dto;
-using GHMonitoringCenterApi.Application.Contracts.Dto.Project.ShipMovements;
+using GHMonitoringCenterApi.Application.Contracts.Dto.External;
 using GHMonitoringCenterApi.Application.Contracts.Dto.Project;
+using GHMonitoringCenterApi.Application.Contracts.Dto.Project.ShipMovements;
 using GHMonitoringCenterApi.Application.Contracts.Dto.ProjectProductionReport;
 using GHMonitoringCenterApi.Application.Contracts.IService;
+using GHMonitoringCenterApi.Domain.Models;
 using GHMonitoringCenterApi.Domain.Shared;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using static GHMonitoringCenterApi.Application.Contracts.Dto.Project.Report.MonthtReportsResponseDto;
+using Model = GHMonitoringCenterApi.Domain.Models;
 
 namespace GHMonitoringCenterApi.Controllers
 
@@ -189,5 +192,125 @@ namespace GHMonitoringCenterApi.Controllers
         [AllowAnonymous]//跳过鉴权
         public async Task<ResponseAjaxResult<List<ShipMovementResponseDto>>> GetShipMovementAsync([FromQuery] ShipMovementsRequestDto model)
             => await _externalApiService.GetShipMovementAsync(model);
+
+        #region 返全表信息
+        /// <summary>
+        /// 获取项目信息全量字段表
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        [HttpGet("GetProjectsTable")]
+        [AllowAnonymous]//跳过鉴权
+        public async Task<ResponseAjaxResult<List<Model.Project>>> GetProjectsTableAsync([FromQuery] ExternalRequestDto requestDto)
+            => await _externalApiService.GetProjectsTableAsync(requestDto);
+        /// <summary>
+        /// 获取公司机构全量字段表
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        [HttpGet(" GetInstitutionTable")]
+        [AllowAnonymous]//跳过鉴权
+        public async Task<ResponseAjaxResult<List<Institution>>> GetInstitutionTableAsync(ExternalRequestDto requestDto)
+            => await _externalApiService.GetInstitutionTableAsync(requestDto);
+        /// <summary>
+        /// 获取项目类型全量字段表
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        [HttpGet("GetProjectTypeTable")]
+        [AllowAnonymous]//跳过鉴权
+        public async Task<ResponseAjaxResult<List<ProjectType>>> GetProjectTypeTableAsync([FromQuery] ExternalRequestDto requestDto)
+            => await _externalApiService.GetProjectTypeTableAsync(requestDto);
+        /// <summary>
+        /// 获取项目状态全量字段表
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        [HttpGet("GetProjectStatusTable")]
+        [AllowAnonymous]//跳过鉴权
+        public async Task<ResponseAjaxResult<List<ProjectStatus>>> GetProjectStatusTableAsync([FromQuery] ExternalRequestDto requestDto)
+            => await _externalApiService.GetProjectStatusTableAsync(requestDto);
+        /// <summary>
+        /// 获取项目规模全量字段表
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        [HttpGet("GetProjectScaleTable")]
+        [AllowAnonymous]//跳过鉴权
+        public async Task<ResponseAjaxResult<List<ProjectScale>>> GetProjectScaleTableAsync([FromQuery] ExternalRequestDto requestDto)
+            => await _externalApiService.GetProjectScaleTableAsync(requestDto);
+        /// <summary>
+        /// 获取施工地点全量字段表
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        [HttpGet("GetProjectProvinceTable")]
+        [AllowAnonymous]//跳过鉴权
+        public async Task<ResponseAjaxResult<List<Province>>> GetProjectProvinceTableAsync([FromQuery] ExternalRequestDto requestDto)
+            => await _externalApiService.GetProjectProvinceTableAsync(requestDto);
+        /// <summary>
+        /// 获取项目区域全量字段表
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        [HttpGet("GetProjectAreaTable")]
+        [AllowAnonymous]//跳过鉴权
+        public async Task<ResponseAjaxResult<List<ProjectArea>>> GetProjectAreaTableAsync([FromQuery] ExternalRequestDto requestDto)
+            => await _externalApiService.GetProjectAreaTableAsync(requestDto);
+        /// <summary>
+        /// 获取自有船舶全量字段表
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        [HttpGet("GetOwnerShipTable")]
+        [AllowAnonymous]//跳过鉴权
+        public async Task<ResponseAjaxResult<List<OwnerShip>>> GetOwnerShipTableAsync([FromQuery] ExternalRequestDto requestDto)
+            => await _externalApiService.GetOwnerShipTableAsync(requestDto);
+        /// <summary>
+        /// 获取分包船舶全量字段表
+        /// </summary>
+        [HttpGet("GetSubShipTable")]
+        [AllowAnonymous]//跳过鉴权
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        public async Task<ResponseAjaxResult<List<SubShip>>> GetSubShipTableAsync([FromQuery] ExternalRequestDto requestDto)
+            => await _externalApiService.GetSubShipTableAsync(requestDto);
+        /// <summary>
+        /// 获取船级社全量字段表
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        [HttpGet("GetShipClassicTable")]
+        [AllowAnonymous]//跳过鉴权
+        public async Task<ResponseAjaxResult<List<ShipClassic>>> GetShipClassicTableAsync([FromQuery] ExternalRequestDto requestDto)
+            => await _externalApiService.GetShipClassicTableAsync(requestDto);
+        /// <summary>
+        /// 获取船舶类型全量字段表
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        [HttpGet("GetShipPingTypeTable")]
+        [AllowAnonymous]//跳过鉴权
+        public async Task<ResponseAjaxResult<List<ShipPingType>>> GetShipPingTypeTableAsync([FromQuery] ExternalRequestDto requestDto)
+            => await _externalApiService.GetShipPingTypeTableAsync(requestDto);
+        /// <summary>
+        /// 获取船舶状态全量字段表
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        [HttpGet("GetShipStatusTable")]
+        [AllowAnonymous]//跳过鉴权
+        public async Task<ResponseAjaxResult<List<ShipStatus>>> GetShipStatusTableAsync([FromQuery] ExternalRequestDto requestDto)
+            => await _externalApiService.GetShipStatusTableAsync(requestDto);
+        /// <summary>
+        /// 获取船舶进退场全量字段表
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        [HttpGet("GetShipMovementTable")]
+        [AllowAnonymous]//跳过鉴权
+        public async Task<ResponseAjaxResult<List<ShipMovement>>> GetShipMovementTableAsync([FromQuery] ExternalRequestDto requestDto)
+            => await _externalApiService.GetShipMovementTableAsync(requestDto);
+        #endregion
     }
 }
