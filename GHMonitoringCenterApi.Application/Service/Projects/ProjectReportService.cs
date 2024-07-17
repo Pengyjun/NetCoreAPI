@@ -3426,6 +3426,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                         x.CreateTime >= requestDto.InStartDate && x.CreateTime <= requestDto.InEndDate
                         : x.UpdateTime >= requestDto.InStartDate && x.UpdateTime <= requestDto.InEndDate)
                         .ToList();
+                    total = subShipMonthRepData.Count;
                 }
             }
             else
@@ -3461,6 +3462,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                         : x.UpdateTime >= requestDto.InStartDate && x.UpdateTime <= requestDto.InEndDate)
                         .ToList();
                 }
+                total = subShipMonthRepData.Count;
             }
             //年度产值 、 产量、运转时间、施工天数
             //取最新年份的数据
@@ -3525,12 +3527,12 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 MonthOutputVal = x.ProductionAmount,
                 MonthPlanOutputVal = x.MonthPlanProductionAmount,
                 MonthPlanQuantity = x.MonthPlanProduction,
-                AccumulateOutputVal = subAccumulateData.FirstOrDefault(y => y.ShipId == x.ShipId).AccumulateOutputVal,
-                AccumulateQuantity = subAccumulateData.FirstOrDefault(y => y.ShipId == x.ShipId).AccumulateQuantity,
-                YearWorkHours = subShipYearData.Any() ? subShipYearData.FirstOrDefault(y => y.ShipId == x.ShipId).YearWorkHours : 0,
-                YearWorkDays = subShipYearData.Any() ? subShipYearData.FirstOrDefault(y => y.ShipId == x.ShipId).YearWorkDays : 0,
-                YearQuantity = subShipYearData.Any() ? subShipYearData.FirstOrDefault(y => y.ShipId == x.ShipId).YearQuantity : 0,
-                YearOutputVal = subShipYearData.Any() ? subShipYearData.FirstOrDefault(y => y.ShipId == x.ShipId).YearOutputVal : 0,
+                AccumulateOutputVal = subAccumulateData.FirstOrDefault(y => y.ShipId == x.ShipId) != null ? subAccumulateData.FirstOrDefault(y => y.ShipId == x.ShipId).AccumulateOutputVal : 0,
+                AccumulateQuantity = subAccumulateData.FirstOrDefault(y => y.ShipId == x.ShipId) != null ? subAccumulateData.FirstOrDefault(y => y.ShipId == x.ShipId).AccumulateQuantity : 0,
+                YearWorkHours = subShipYearData.Any() && subShipYearData.FirstOrDefault(y => y.ShipId == x.ShipId) != null ? subShipYearData.FirstOrDefault(y => y.ShipId == x.ShipId).YearWorkHours : 0,
+                YearWorkDays = subShipYearData.Any() && subShipYearData.FirstOrDefault(y => y.ShipId == x.ShipId) != null ? subShipYearData.FirstOrDefault(y => y.ShipId == x.ShipId).YearWorkDays : 0,
+                YearQuantity = subShipYearData.Any() && subShipYearData.FirstOrDefault(y => y.ShipId == x.ShipId) != null ? subShipYearData.FirstOrDefault(y => y.ShipId == x.ShipId).YearQuantity : 0,
+                YearOutputVal = subShipYearData.Any() && subShipYearData.FirstOrDefault(y => y.ShipId == x.ShipId) != null ? subShipYearData.FirstOrDefault(y => y.ShipId == x.ShipId).YearOutputVal : 0,
                 SecUnitName = "广航局",
                 ThiUnitName = instinData.FirstOrDefault(y => y.Id == x.ProjectId)?.Name,
                 DynamicContent = dynamicData.FirstOrDefault(y => y.Type == x.DynamicDescriptionType)?.Name,
@@ -4074,6 +4076,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     shipId = ownShipMonthRepData.Select(osm => osm.ShipId).ToList().Distinct().ToArray();
                     sumInfo.SumMonthOutputVal = Math.Round(ownShipMonthRepData.Sum(osm => osm.ProductionAmount), 2);
                     sumInfo.SumMonthQuantity = Math.Round(ownShipMonthRepData.Sum(osm => osm.Production), 2);
+                    total = ownShipMonthRepData.Count;
                 }
             }
             else
@@ -4109,6 +4112,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                         : x.UpdateTime >= requestDto.InStartDate && x.UpdateTime <= requestDto.InEndDate)
                         .ToList();
                 }
+                total = ownShipMonthRepData.Count;
             }
             //年度产值 、 产量、运转时间、施工天数
             //取最新年份的数据
@@ -4173,10 +4177,10 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 MonthWorkDays = x.ConstructionDays,
                 MonthQuantity = Math.Round(x.Production, 2),
                 MonthOutputVal = Math.Round(x.ProductionAmount, 2),
-                YearOutputVal = ownShipYearData.Any() ? Math.Round(ownShipYearData.FirstOrDefault(y => y.ShipId == x.ShipId && y.ProjectId == x.ProjectId).YearOutputVal, 2) : 0,
-                YearQuantity = ownShipYearData.Any() ? Math.Round(ownShipYearData.FirstOrDefault(y => y.ShipId == x.ShipId && y.ProjectId == x.ProjectId).YearQuantity, 2) : 0,
-                YearWorkDays = ownShipYearData.Any() ? ownShipYearData.FirstOrDefault(y => y.ShipId == x.ShipId && y.ProjectId == x.ProjectId).YearWorkDays : 0,
-                YearWorkHours = ownShipYearData.Any() ? Math.Round(ownShipYearData.FirstOrDefault(y => y.ShipId == x.ShipId && y.ProjectId == x.ProjectId).YearWorkHours, 2) : 0,
+                YearOutputVal = ownShipYearData.Any() && ownShipYearData.FirstOrDefault(y => y.ShipId == x.ShipId && y.ProjectId == x.ProjectId) != null ? Math.Round(ownShipYearData.FirstOrDefault(y => y.ShipId == x.ShipId && y.ProjectId == x.ProjectId).YearOutputVal, 2) : 0,
+                YearQuantity = ownShipYearData.Any() && ownShipYearData.FirstOrDefault(y => y.ShipId == x.ShipId && y.ProjectId == x.ProjectId) != null ? Math.Round(ownShipYearData.FirstOrDefault(y => y.ShipId == x.ShipId && y.ProjectId == x.ProjectId).YearQuantity, 2) : 0,
+                YearWorkDays = ownShipYearData.Any() && ownShipYearData.FirstOrDefault(y => y.ShipId == x.ShipId && y.ProjectId == x.ProjectId) != null ? ownShipYearData.FirstOrDefault(y => y.ShipId == x.ShipId && y.ProjectId == x.ProjectId).YearWorkDays : 0,
+                YearWorkHours = ownShipYearData.Any() && ownShipYearData.FirstOrDefault(y => y.ShipId == x.ShipId && y.ProjectId == x.ProjectId) != null ? Math.Round(ownShipYearData.FirstOrDefault(y => y.ShipId == x.ShipId && y.ProjectId == x.ProjectId).YearWorkHours, 2) : 0,
                 SecUnitName = "广航局",
                 ThiUnitName = instinData.FirstOrDefault(y => y.Id == x.ProjectId)?.Name,
                 HeadUserName = usersData.FirstOrDefault(y => y.Id == x.ProjectId)?.Name,
@@ -4192,7 +4196,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 SJCTId = x.WorkTypeId,
                 GKJBId = x.ConditionGradeId,
                 QDLXId = x.ContractDetailType,
-                UpdateTime = x.UpdateTime,
+                UpdateTime = string.IsNullOrEmpty(x.UpdateTime.ToString()) ? null : x.UpdateTime,
                 CreateTime = x.CreateTime,
                 DigDeep = x.DigDeep,
                 BlowingDistance = x.BlowingDistance,
