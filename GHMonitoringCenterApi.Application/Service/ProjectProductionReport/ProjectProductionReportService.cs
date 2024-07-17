@@ -248,51 +248,107 @@ namespace GHMonitoringCenterApi.Application.Service.ProjectProductionReport
             //分页查询
             var dayReport = await dbContext.Queryable<DayReportConstruction>().Where(x => x.IsDelete == 1)
                 .WhereIF(time != 0, x => x.DateDay == time).ToListAsync();
-
-            var list = await dbContext.Queryable<Project, DayReport>(
-                (p, d) =>
-                new JoinQueryInfos(
-                    JoinType.Inner, p.Id == d.ProjectId && d.ProcessStatus == DayReportProcessStatus.Submited
-                ))
-                .WhereIF(true, (p, d) => p.IsDelete == 1)
-                .WhereIF(true, p => departmentIds.Contains(p.ProjectDept.Value))
-                .WhereIF(searchRequestDto.StartTime == null && searchRequestDto.EndTime == null, (p, d) => d.DateDay == time)
-                .WhereIF(searchRequestDto.StartTime != null && searchRequestDto.EndTime != null, (p, d) => d.DateDay >= searchRequestDto.StartTime.Value.ToDateDay() && d.DateDay <= searchRequestDto.EndTime.Value.ToDateDay())
-                .WhereIF(searchRequestDto.CompanyId != null, (p, d) => p.CompanyId == searchRequestDto.CompanyId)
-                .WhereIF(searchRequestDto.ProjectDept != null, (p, d) => p.ProjectDept == searchRequestDto.ProjectDept)
-                .WhereIF(searchRequestDto.ProjectStatusId != null && searchRequestDto.ProjectStatusId.Any(), (p, d) => searchRequestDto.ProjectStatusId.Contains(p.StatusId.Value.ToString()))
-                .WhereIF(searchRequestDto.ProjectTypeId != null, (p, d) => p.TypeId == searchRequestDto.ProjectTypeId)
-                .WhereIF(!string.IsNullOrWhiteSpace(searchRequestDto.ProjectName), (p, d) => SqlFunc.Contains(p.Name, searchRequestDto.ProjectName))
-                .WhereIF(categoryList != null && categoryList.Any(), (p, d) => categoryList.Contains(p.Category))
-                .WhereIF(tagList != null && tagList.Any(), (p, d) => tagList.Contains(p.Tag))
-                .WhereIF(tag2List != null && tag2List.Any(), (p, d) => tag2List.Contains(p.Tag2))
-                .Select((p, d) => new DayReportInfo
-                {
-                    Id = d.Id,
-                    ProjectId = p.Id,
-                    DayId = d.Id,
-                    LandWorkplace = d.LandWorkplace,
-                    ShiftLeader = d.ShiftLeader,
-                    ShiftLeaderPhone = d.ShiftLeaderPhone,
-                    FewLandWorkplace = d.FewLandWorkplace,
-                    SiteShipNum = d.SiteShipNum,
-                    OnShipPersonNum = d.OnShipPersonNum,
-                    HazardousConstructionDescription = d.HazardousConstructionDescription,
-                    ProjectName = p.Name,
-                    IsHoliday = d.IsHoliday,
-                    CompanyName = p.CompanyId.ToString(),
-                    ProjectCategory = SqlFunc.IIF(p.Category == 0, "境内", "境外"),
-                    CurrencyExchangeRate = d.CurrencyExchangeRate,
-                    ProjectType = p.TypeId.ToString(),
-                    ProjectStatus = p.StatusId.ToString(),
-                    Amount = p.Amount,
-                    CreateUser = d.CreateId.ToString(),
-                    DayActualProductionAmount = d.DayActualProductionAmount,
-                    DayActualPlanAmount = d.MonthPlannedProductionAmount / 30.5M,
-                    DayActualProductionQuantity = d.DayActualProduction,
-                    DateDay = d.DateDay,
-                    UpdateTime = d.UpdateTime
-                }).ToListAsync();
+            var list = new List<DayReportInfo>();
+            if (!searchRequestDto.IsDuiWai)//非对外查询接口  监控中心自己用
+            {
+                list = await dbContext.Queryable<Project, DayReport>(
+                   (p, d) =>
+                   new JoinQueryInfos(
+                       JoinType.Inner, p.Id == d.ProjectId && d.ProcessStatus == DayReportProcessStatus.Submited
+                   ))
+                   .WhereIF(true, (p, d) => p.IsDelete == 1)
+                   .WhereIF(true, p => departmentIds.Contains(p.ProjectDept.Value))
+                   .WhereIF(searchRequestDto.StartTime == null && searchRequestDto.EndTime == null, (p, d) => d.DateDay == time)
+                   .WhereIF(searchRequestDto.StartTime != null && searchRequestDto.EndTime != null, (p, d) => d.DateDay >= searchRequestDto.StartTime.Value.ToDateDay() && d.DateDay <= searchRequestDto.EndTime.Value.ToDateDay())
+                   .WhereIF(searchRequestDto.CompanyId != null, (p, d) => p.CompanyId == searchRequestDto.CompanyId)
+                   .WhereIF(searchRequestDto.ProjectDept != null, (p, d) => p.ProjectDept == searchRequestDto.ProjectDept)
+                   .WhereIF(searchRequestDto.ProjectStatusId != null && searchRequestDto.ProjectStatusId.Any(), (p, d) => searchRequestDto.ProjectStatusId.Contains(p.StatusId.Value.ToString()))
+                   .WhereIF(searchRequestDto.ProjectTypeId != null, (p, d) => p.TypeId == searchRequestDto.ProjectTypeId)
+                   .WhereIF(!string.IsNullOrWhiteSpace(searchRequestDto.ProjectName), (p, d) => SqlFunc.Contains(p.Name, searchRequestDto.ProjectName))
+                   .WhereIF(categoryList != null && categoryList.Any(), (p, d) => categoryList.Contains(p.Category))
+                   .WhereIF(tagList != null && tagList.Any(), (p, d) => tagList.Contains(p.Tag))
+                   .WhereIF(tag2List != null && tag2List.Any(), (p, d) => tag2List.Contains(p.Tag2))
+                   .Select((p, d) => new DayReportInfo
+                   {
+                       Id = d.Id,
+                       ProjectId = p.Id,
+                       DayId = d.Id,
+                       LandWorkplace = d.LandWorkplace,
+                       ShiftLeader = d.ShiftLeader,
+                       ShiftLeaderPhone = d.ShiftLeaderPhone,
+                       FewLandWorkplace = d.FewLandWorkplace,
+                       SiteShipNum = d.SiteShipNum,
+                       OnShipPersonNum = d.OnShipPersonNum,
+                       HazardousConstructionDescription = d.HazardousConstructionDescription,
+                       ProjectName = p.Name,
+                       IsHoliday = d.IsHoliday,
+                       CompanyName = p.CompanyId.ToString(),
+                       ProjectCategory = SqlFunc.IIF(p.Category == 0, "境内", "境外"),
+                       CurrencyExchangeRate = d.CurrencyExchangeRate,
+                       ProjectType = p.TypeId.ToString(),
+                       ProjectStatus = p.StatusId.ToString(),
+                       Amount = p.Amount,
+                       CreateUser = d.CreateId.ToString(),
+                       DayActualProductionAmount = d.DayActualProductionAmount,
+                       DayActualPlanAmount = d.MonthPlannedProductionAmount / 30.5M,
+                       DayActualProductionQuantity = d.DayActualProduction,
+                       DateDay = d.DateDay,
+                       UpdateTime = d.UpdateTime,
+                       CreateTime = d.CreateTime
+                   }).ToListAsync();
+            }
+            else
+            {
+                list = await dbContext.Queryable<Project, DayReport>(
+                   (p, d) =>
+                   new JoinQueryInfos(
+                       JoinType.Inner, p.Id == d.ProjectId && d.ProcessStatus == DayReportProcessStatus.Submited
+                   ))
+                   .WhereIF(true, (p, d) => p.IsDelete == 1)
+                   .WhereIF(true, p => departmentIds.Contains(p.ProjectDept.Value))
+                   .WhereIF(searchRequestDto.CompanyId != null, (p, d) => p.CompanyId == searchRequestDto.CompanyId)
+                   .WhereIF(searchRequestDto.ProjectDept != null, (p, d) => p.ProjectDept == searchRequestDto.ProjectDept)
+                   .WhereIF(searchRequestDto.ProjectStatusId != null && searchRequestDto.ProjectStatusId.Any(), (p, d) => searchRequestDto.ProjectStatusId.Contains(p.StatusId.Value.ToString()))
+                   .WhereIF(searchRequestDto.ProjectTypeId != null, (p, d) => p.TypeId == searchRequestDto.ProjectTypeId)
+                   .WhereIF(!string.IsNullOrWhiteSpace(searchRequestDto.ProjectName), (p, d) => SqlFunc.Contains(p.Name, searchRequestDto.ProjectName))
+                   .WhereIF(categoryList != null && categoryList.Any(), (p, d) => categoryList.Contains(p.Category))
+                   .WhereIF(tagList != null && tagList.Any(), (p, d) => tagList.Contains(p.Tag))
+                   .WhereIF(tag2List != null && tag2List.Any(), (p, d) => tag2List.Contains(p.Tag2))
+                   .Select((p, d) => new DayReportInfo
+                   {
+                       Id = d.Id,
+                       ProjectId = p.Id,
+                       DayId = d.Id,
+                       LandWorkplace = d.LandWorkplace,
+                       ShiftLeader = d.ShiftLeader,
+                       ShiftLeaderPhone = d.ShiftLeaderPhone,
+                       FewLandWorkplace = d.FewLandWorkplace,
+                       SiteShipNum = d.SiteShipNum,
+                       OnShipPersonNum = d.OnShipPersonNum,
+                       HazardousConstructionDescription = d.HazardousConstructionDescription,
+                       ProjectName = p.Name,
+                       IsHoliday = d.IsHoliday,
+                       CompanyName = p.CompanyId.ToString(),
+                       ProjectCategory = SqlFunc.IIF(p.Category == 0, "境内", "境外"),
+                       CurrencyExchangeRate = d.CurrencyExchangeRate,
+                       ProjectType = p.TypeId.ToString(),
+                       ProjectStatus = p.StatusId.ToString(),
+                       Amount = p.Amount,
+                       CreateUser = d.CreateId.ToString(),
+                       DayActualProductionAmount = d.DayActualProductionAmount,
+                       DayActualPlanAmount = d.MonthPlannedProductionAmount / 30.5M,
+                       DayActualProductionQuantity = d.DayActualProduction,
+                       DateDay = d.DateDay,
+                       UpdateTime = d.UpdateTime,
+                       CreateTime = d.CreateTime
+                   }).ToListAsync();
+                //对外接口日期筛选
+                list = list
+                    .Where(x => string.IsNullOrEmpty(x.UpdateTime.ToString()) || x.UpdateTime == DateTime.MinValue ?
+                     x.CreateTime >= searchRequestDto.StartTime && x.CreateTime <= searchRequestDto.EndTime
+                    : x.UpdateTime >= searchRequestDto.StartTime && x.UpdateTime <= searchRequestDto.EndTime)
+                    .ToList();
+            }
             for (int i = 0; i < list.Count; i++)
             {
                 for (int j = 0; j < searchRequestDto.Sort.Length; j++)
@@ -706,28 +762,61 @@ namespace GHMonitoringCenterApi.Application.Service.ProjectProductionReport
 
             //获取需要查询的字段
             var selectExpr = GetSelectExp();
-            var list = await dbContext.Queryable<ShipDayReport, Project, OwnerShip>(
-                (d, p, s) =>
-                new JoinQueryInfos(
-                    JoinType.Left, d.ProjectId == p.Id && departmentIdss.Contains(p.ProjectDept),
-                    JoinType.Left, d.ShipId == s.PomId
-                ))
-                .OrderBy((d, p) => new { DateDay = SqlFunc.Desc(d.DateDay), Name = SqlFunc.Desc(p.Name) })
-                .WhereIF(!string.IsNullOrWhiteSpace(searchRequestDto.ShipPingId.ToString()), (d, p) => d.ShipId == searchRequestDto.ShipPingId)
-                .WhereIF(searchRequestDto.StartTime == null && searchRequestDto.EndTime == null, (d, p) => d.DateDay == time)
-                .WhereIF(searchRequestDto.StartTime != null && searchRequestDto.EndTime != null, (d, p) => d.DateDay >= searchRequestDto.StartTime.Value.Date.ToDateDay() && d.DateDay <= searchRequestDto.EndTime.Value.Date.ToDateDay())
-                .WhereIF(IsAdmin, (d, p) => d.ShipDayReportType == ShipDayReportType.ProjectShip)
-                .WhereIF(searchRequestDto.ShipState != null, (d, p) => d.ShipState == searchRequestDto.ShipState)
-                .WhereIF(searchRequestDto.CompanyId != null, (d, p) => p.CompanyId == searchRequestDto.CompanyId)
-                .WhereIF(searchRequestDto.ProjectDept != null, (d, p) => p.ProjectDept == searchRequestDto.ProjectDept)
-                .WhereIF(searchRequestDto.ProjectStatusId != null && searchRequestDto.ProjectStatusId.Any(), (d, p) => searchRequestDto.ProjectStatusId.Contains(p.StatusId.Value.ToString()))
-                .WhereIF(searchRequestDto.ProjectTypeId != null, (d, p) => p.TypeId == searchRequestDto.ProjectTypeId)
-                .WhereIF(searchRequestDto.ShipTypeId != null, (d, p, s) => s.TypeId == searchRequestDto.ShipTypeId)
-                .WhereIF(!string.IsNullOrWhiteSpace(searchRequestDto.ProjectName), (d, p) => SqlFunc.Contains(p.Name, searchRequestDto.ProjectName))
-                .WhereIF(categoryList != null && categoryList.Any(), (d, p) => categoryList.Contains(p.Category))
-                .WhereIF(tagList != null && tagList.Any(), (d, p) => tagList.Contains(p.Tag))
-                .WhereIF(tag2List != null && tag2List.Any(), (d, p) => tag2List.Contains(p.Tag2))
-                .Select(selectExpr).ToListAsync();
+            var list = new List<ShipsDayReportInfo>();
+            if (!searchRequestDto.IsDuiWai)//不是对外接口  属于监控中心列表
+            {
+                list = await dbContext.Queryable<ShipDayReport, Project, OwnerShip>(
+                    (d, p, s) =>
+                    new JoinQueryInfos(
+                        JoinType.Left, d.ProjectId == p.Id && departmentIdss.Contains(p.ProjectDept),
+                        JoinType.Left, d.ShipId == s.PomId
+                    ))
+                    .OrderBy((d, p) => new { DateDay = SqlFunc.Desc(d.DateDay), Name = SqlFunc.Desc(p.Name) })
+                    .WhereIF(!string.IsNullOrWhiteSpace(searchRequestDto.ShipPingId.ToString()), (d, p) => d.ShipId == searchRequestDto.ShipPingId)
+                    .WhereIF(searchRequestDto.StartTime == null && searchRequestDto.EndTime == null, (d, p) => d.DateDay == time)
+                    .WhereIF(searchRequestDto.StartTime != null && searchRequestDto.EndTime != null, (d, p) => d.DateDay >= searchRequestDto.StartTime.Value.Date.ToDateDay() && d.DateDay <= searchRequestDto.EndTime.Value.Date.ToDateDay())
+                    .WhereIF(IsAdmin, (d, p) => d.ShipDayReportType == ShipDayReportType.ProjectShip)
+                    .WhereIF(searchRequestDto.ShipState != null, (d, p) => d.ShipState == searchRequestDto.ShipState)
+                    .WhereIF(searchRequestDto.CompanyId != null, (d, p) => p.CompanyId == searchRequestDto.CompanyId)
+                    .WhereIF(searchRequestDto.ProjectDept != null, (d, p) => p.ProjectDept == searchRequestDto.ProjectDept)
+                    .WhereIF(searchRequestDto.ProjectStatusId != null && searchRequestDto.ProjectStatusId.Any(), (d, p) => searchRequestDto.ProjectStatusId.Contains(p.StatusId.Value.ToString()))
+                    .WhereIF(searchRequestDto.ProjectTypeId != null, (d, p) => p.TypeId == searchRequestDto.ProjectTypeId)
+                    .WhereIF(searchRequestDto.ShipTypeId != null, (d, p, s) => s.TypeId == searchRequestDto.ShipTypeId)
+                    .WhereIF(!string.IsNullOrWhiteSpace(searchRequestDto.ProjectName), (d, p) => SqlFunc.Contains(p.Name, searchRequestDto.ProjectName))
+                    .WhereIF(categoryList != null && categoryList.Any(), (d, p) => categoryList.Contains(p.Category))
+                    .WhereIF(tagList != null && tagList.Any(), (d, p) => tagList.Contains(p.Tag))
+                    .WhereIF(tag2List != null && tag2List.Any(), (d, p) => tag2List.Contains(p.Tag2))
+                    .Select(selectExpr).ToListAsync();
+            }
+            else
+            {
+                list = await dbContext.Queryable<ShipDayReport, Project, OwnerShip>(
+                    (d, p, s) =>
+                    new JoinQueryInfos(
+                        JoinType.Left, d.ProjectId == p.Id && departmentIdss.Contains(p.ProjectDept),
+                        JoinType.Left, d.ShipId == s.PomId
+                    ))
+                    .OrderBy((d, p) => new { DateDay = SqlFunc.Desc(d.DateDay), Name = SqlFunc.Desc(p.Name) })
+                    .WhereIF(!string.IsNullOrWhiteSpace(searchRequestDto.ShipPingId.ToString()), (d, p) => d.ShipId == searchRequestDto.ShipPingId)
+                    .WhereIF(IsAdmin, (d, p) => d.ShipDayReportType == ShipDayReportType.ProjectShip)
+                    .WhereIF(searchRequestDto.ShipState != null, (d, p) => d.ShipState == searchRequestDto.ShipState)
+                    .WhereIF(searchRequestDto.CompanyId != null, (d, p) => p.CompanyId == searchRequestDto.CompanyId)
+                    .WhereIF(searchRequestDto.ProjectDept != null, (d, p) => p.ProjectDept == searchRequestDto.ProjectDept)
+                    .WhereIF(searchRequestDto.ProjectStatusId != null && searchRequestDto.ProjectStatusId.Any(), (d, p) => searchRequestDto.ProjectStatusId.Contains(p.StatusId.Value.ToString()))
+                    .WhereIF(searchRequestDto.ProjectTypeId != null, (d, p) => p.TypeId == searchRequestDto.ProjectTypeId)
+                    .WhereIF(searchRequestDto.ShipTypeId != null, (d, p, s) => s.TypeId == searchRequestDto.ShipTypeId)
+                    .WhereIF(!string.IsNullOrWhiteSpace(searchRequestDto.ProjectName), (d, p) => SqlFunc.Contains(p.Name, searchRequestDto.ProjectName))
+                    .WhereIF(categoryList != null && categoryList.Any(), (d, p) => categoryList.Contains(p.Category))
+                    .WhereIF(tagList != null && tagList.Any(), (d, p) => tagList.Contains(p.Tag))
+                    .WhereIF(tag2List != null && tag2List.Any(), (d, p) => tag2List.Contains(p.Tag2))
+                    .Select(selectExpr).ToListAsync();
+                //对外接口日期条件筛选
+                list = list
+                    .Where(x => string.IsNullOrEmpty(x.UpdateTime.ToString()) || x.UpdateTime == DateTime.MinValue ?
+                     x.CreateTime >= searchRequestDto.StartTime && x.CreateTime <= searchRequestDto.EndTime
+                    : x.UpdateTime >= searchRequestDto.StartTime && x.UpdateTime <= searchRequestDto.EndTime)
+                    .ToList();
+            }
 
             #region 新逻辑
             //新逻辑
@@ -899,6 +988,7 @@ namespace GHMonitoringCenterApi.Application.Service.ProjectProductionReport
                 DateDay = d.DateDay,
                 Remarks = d.Remarks,
                 UpdateTime = d.UpdateTime,
+                CreateTime = d.CreateTime,
                 ProductionOperatingTime = SqlFunc.IsNull(d.Dredge, 0) + SqlFunc.IsNull(d.Sail, 0) + SqlFunc.IsNull(d.BlowingWater, 0) + SqlFunc.IsNull(d.BlowShore, 0) + SqlFunc.IsNull(d.SedimentDisposal, 0),
                 ProductionStoppage = SqlFunc.IsNull(d.ConstructionLayout, 0) + SqlFunc.IsNull(d.StandbyMachine, 0) + SqlFunc.IsNull(d.DownAnchor, 0) + SqlFunc.IsNull(d.MovingShip, 0) + SqlFunc.IsNull(d.WeldingCutter, 0) + SqlFunc.IsNull(d.ChangeGear, 0) + SqlFunc.IsNull(d.Supply, 0) + SqlFunc.IsNull(d.MeasurementImpact, 0) + SqlFunc.IsNull(d.LayingPipelines, 0) + SqlFunc.IsNull(d.AdjustingPipeline, 0) + SqlFunc.IsNull(d.CleaningPump, 0) + SqlFunc.IsNull(d.CleaningCRS, 0) + SqlFunc.IsNull(d.WaitingBargeAndTowing, 0) + SqlFunc.IsNull(d.ReplaceWire, 0) + SqlFunc.IsNull(d.AvoidingShip, 0),
                 NonProductionStoppage = SqlFunc.IsNull(d.WeatherImpact, 0) + SqlFunc.IsNull(d.TideImpact, 0) + SqlFunc.IsNull(d.SuddenFailure, 0) + SqlFunc.IsNull(d.WaitingSparePartRepair, 0) + SqlFunc.IsNull(d.WaitingOilWaterMaterial, 0) + SqlFunc.IsNull(d.WaitingBargeAndTowing, 0) + SqlFunc.IsNull(d.NotifyShutdown, 0) + SqlFunc.IsNull(d.EquipmentModificationMaintenance, 0) + SqlFunc.IsNull(d.Standby, 0) + SqlFunc.IsNull(d.FSPipeFailure, 0) + SqlFunc.IsNull(d.SunkenTubeFailure, 0) + SqlFunc.IsNull(d.SocialInterference, 0) + SqlFunc.IsNull(d.CofferdamDrainageIssues, 0) + SqlFunc.IsNull(d.Other, 0),

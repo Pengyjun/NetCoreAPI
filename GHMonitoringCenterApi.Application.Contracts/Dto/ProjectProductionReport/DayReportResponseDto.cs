@@ -149,6 +149,7 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.ProjectProductionRepor
         /// 更新时间
         /// </summary>
         public DateTime? UpdateTime { get; set; }
+        public DateTime? CreateTime { get; set; }
 
         /// <summary>
         /// 日期(时间格式)

@@ -384,6 +384,7 @@
 		/// 
 		/// </summary>
 		public DateTime? UpdateTime { get; set; }
+		public DateTime? CreateTime { get; set; }
 
 		/// <summary>
 		/// 填报日期(例：20230418)
