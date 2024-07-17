@@ -1620,8 +1620,18 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             ResolveTagNames(model.TagName, out List<int> categoryList, out List<int> tagList, out List<int> tag2List);
             RefAsync<int> total = 0;
             var query = _dbMonthReport.AsQueryable().LeftJoin(_dbProject.AsQueryable(), (m, p) => m.ProjectId == p.Id && p.IsDelete == 1);
-            query = MonthReportsWheres(query, model, startMonth, endMonth, userAuthForData, categoryList, tagList, tag2List)
-            .OrderBy((m, p) => new { m.ProjectId, m.DateMonth });
+            if (!model.IsDuiWai)//非对外 监控中心自己使用
+            {
+                query = MonthReportsWheres(query, model, startMonth, endMonth, userAuthForData, categoryList, tagList, tag2List)
+                        .OrderBy((m, p) => new { m.ProjectId, m.DateMonth });
+            }
+            else
+            {
+                //对外接口使用
+                query = MonthReportsWheres(query, model, userAuthForData, categoryList, tagList, tag2List)
+                        .OrderBy((m, p) => new { m.ProjectId, m.DateMonth });
+            }
+
             var selQuery = query.Select((m, p) => new MonthtReportsResponseDto.MonthtReportDto()
             {
                 Id = m.Id,
@@ -1667,10 +1677,20 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 PushStatus = m.IsPushPom,//推送次数
                 StatusText = m.StatusText,
                 OutsourcingExpensesAmount = m.OutsourcingExpensesAmount,
-                UpdateTime = m.UpdateTime
+                UpdateTime = m.UpdateTime,
+                CreateTime = m.CreateTime
             });
 
             var list = model.IsFullExport ? await selQuery.ToListAsync() : await selQuery.ToPageListAsync(model.PageIndex, model.PageSize, total);
+            if (!model.IsDuiWai)
+            {
+                list = list
+                .Where(x => string.IsNullOrEmpty(x.UpdateTime.ToString()) || x.UpdateTime == DateTime.MinValue ?
+                  x.CreateTime >= model.StartTime && x.CreateTime <= model.EndTime
+                : x.UpdateTime >= model.StartTime && x.UpdateTime <= model.EndTime)
+                .ToList();
+            }
+
             var projectIds = list.Select(t => t.ProjectId).Distinct().ToArray();
             var companyIds = list.Select(t => t.CompanyId).Distinct().ToArray();
             var regionIds = list.Select(t => t.RegionId).Distinct().ToArray();
@@ -1903,6 +1923,29 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                   .WhereIF(categoryList.Any(), (m, p) => categoryList.Contains(p.Category))
                   .WhereIF(model.IsMajor == true, (m, p) => p.IsMajor == 1)
                   .WhereIF(model.Status != null, (m, p) => m.Status == model.Status);
+        }
+
+        /// <summary>
+        /// 月报列表筛选条件（对外接口调用时使用）
+        /// </summary>
+        /// <returns></returns>
+        private ISugarQueryable<MonthReport, Project> MonthReportsWheres(ISugarQueryable<MonthReport, Project> query, MonthtReportsRequstDto model, UserAuthForDataDto userAuthForData, List<int> categoryList, List<int> tagList, List<int> tag2List)
+        {
+            return query
+              //.Where((m, p) => m.DateMonth >= startMonth && m.DateMonth <= endMonth)
+              .WhereIF(!userAuthForData.IsAdmin, (m, p) => userAuthForData.CompanyIds.Contains(p.ProjectDept))
+              .WhereIF(model.CompanyId != null, (m, p) => p.CompanyId == model.CompanyId)
+              .WhereIF(model.ProjectDept != null, (m, p) => p.ProjectDept == model.ProjectDept)
+              .WhereIF(model.ProjectStatusId != null && model.ProjectStatusId.Any(), (m, p) => model.ProjectStatusId.Contains(p.StatusId))
+              .WhereIF(model.ProjectRegionId != null, (m, p) => p.RegionId == model.ProjectRegionId)
+              .WhereIF(model.ProjectTypeId != null, (m, p) => p.TypeId == model.ProjectTypeId)
+              .WhereIF(!string.IsNullOrWhiteSpace(model.ProjectName), (m, p) => SqlFunc.Contains(p.Name, model.ProjectName))
+              .WhereIF(model.ProjectAreaId! != null, (m, p) => p.AreaId == model.ProjectAreaId)
+              .WhereIF(tagList.Any(), (m, p) => tagList.Contains(p.Tag))
+              .WhereIF(tag2List.Any(), (m, p) => tag2List.Contains(p.Tag2))
+              .WhereIF(categoryList.Any(), (m, p) => categoryList.Contains(p.Category))
+              .WhereIF(model.IsMajor == true, (m, p) => p.IsMajor == 1)
+              .WhereIF(model.Status != null, (m, p) => m.Status == model.Status);
         }
 
 
@@ -3970,7 +4013,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 var data = _dbContext.Queryable<OwnerShipMonthReport>()
                                     .LeftJoin<Project>((osm, p) => osm.ProjectId == p.Id)
                                     .LeftJoin<OwnerShip>((osm, p, own) => osm.ShipId == own.PomId)
-                                    .Where((osm, p) => osm.IsDelete == 1 && osm.DateMonth >= startMonth && osm.DateMonth <= endMonth)
+                                    //.Where((osm, p) => osm.IsDelete == 1 && osm.DateMonth >= startMonth && osm.DateMonth <= endMonth)
                                     .WhereIF(requestDto.CompanyId != null, (osm, p) => p.CompanyId == requestDto.CompanyId)
                                     .WhereIF(requestDto.ProjectDept != null, (osm, p) => p.ProjectDept == requestDto.ProjectDept)
                                     .WhereIF(requestDto.ProjectStatusId != null && requestDto.ProjectStatusId.Any(), (osm, p) => requestDto.ProjectStatusId.Contains(p.StatusId.Value.ToString()))
@@ -3984,18 +4027,32 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                                     .WhereIF(!string.IsNullOrWhiteSpace(requestDto.ShipName), (osm, p, own) => own.PomId.ToString() == requestDto.ShipName)
                                     .WhereIF(requestDto.ShipTypeId != Guid.Empty && !string.IsNullOrWhiteSpace(requestDto.ShipTypeId.ToString()), (osm, p, own) => requestDto.ShipTypeId == own.TypeId)
                                     .OrderByDescending((osm, p) => new { p.Id, osm.DateMonth });
-                shipId = data.Select(osm => osm.ShipId).ToList().Distinct().ToArray();
-                sumInfo.SumMonthOutputVal = Math.Round(data.Sum(osm => osm.ProductionAmount), 2);
-                sumInfo.SumMonthQuantity = Math.Round(data.Sum(osm => osm.Production), 2);
-
-                ownShipMonthRepData = await data.ToPageListAsync(requestDto.PageIndex, requestDto.PageSize, total);
+                if (!requestDto.IsDuiWai)//监控中心自己用 非对外接口
+                {
+                    data = data.Where((osm, p) => osm.IsDelete == 1 && osm.DateMonth >= startMonth && osm.DateMonth <= endMonth);
+                    shipId = data.Select(osm => osm.ShipId).ToList().Distinct().ToArray();
+                    sumInfo.SumMonthOutputVal = Math.Round(data.Sum(osm => osm.ProductionAmount), 2);
+                    sumInfo.SumMonthQuantity = Math.Round(data.Sum(osm => osm.Production), 2);
+                    ownShipMonthRepData = await data.ToPageListAsync(requestDto.PageIndex, requestDto.PageSize, total);
+                }
+                else
+                {
+                    ownShipMonthRepData = data.ToList();
+                    ownShipMonthRepData= ownShipMonthRepData
+                        .Where(x => string.IsNullOrEmpty(x.UpdateTime.ToString()) || x.UpdateTime == DateTime.MinValue ?
+                         x.CreateTime >= requestDto.InStartDate && x.CreateTime <= requestDto.InEndDate
+                        : x.UpdateTime >= requestDto.InStartDate && x.UpdateTime <= requestDto.InEndDate)
+                        .ToList();
+                    shipId = ownShipMonthRepData.Select(osm => osm.ShipId).ToList().Distinct().ToArray();
+                    sumInfo.SumMonthOutputVal = Math.Round(ownShipMonthRepData.Sum(osm => osm.ProductionAmount), 2);
+                    sumInfo.SumMonthQuantity = Math.Round(ownShipMonthRepData.Sum(osm => osm.Production), 2);
+                }
             }
             else
             {
                 ownShipMonthRepData = await _dbContext.Queryable<OwnerShipMonthReport>()
                                     .LeftJoin<Project>((osm, p) => osm.ProjectId == p.Id)
                                     .LeftJoin<OwnerShip>((osm, p, own) => osm.ShipId == own.PomId)
-                                    .Where((osm, p) => osm.IsDelete == 1 && osm.DateMonth >= startMonth && osm.DateMonth <= endMonth)
                                     .WhereIF(requestDto.CompanyId != null, (osm, p) => p.CompanyId == requestDto.CompanyId)
                                     .WhereIF(requestDto.ProjectDept != null, (osm, p) => p.ProjectDept == requestDto.ProjectDept)
                                     .WhereIF(requestDto.ProjectStatusId != null && requestDto.ProjectStatusId.Any(), (osm, p) => requestDto.ProjectStatusId.Contains(p.StatusId.Value.ToString()))
@@ -4009,6 +4066,21 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                                     .WhereIF(!string.IsNullOrWhiteSpace(requestDto.ShipName), (osm, p, own) => own.PomId.ToString() == requestDto.ShipName)
                                     .WhereIF(requestDto.ShipTypeId != Guid.Empty && !string.IsNullOrWhiteSpace(requestDto.ShipTypeId.ToString()), (osm, p, own) => requestDto.ShipTypeId == own.TypeId)
                                     .OrderByDescending((osm, p) => osm.DateMonth).ToListAsync();
+
+                if (!requestDto.IsDuiWai)//监控中心自己用 非对外接口
+                {
+                    ownShipMonthRepData = ownShipMonthRepData
+                                    .Where((osm, p) => osm.IsDelete == 1 && osm.DateMonth >= startMonth && osm.DateMonth <= endMonth)
+                                    .ToList();
+                }
+                else
+                {
+                    ownShipMonthRepData = ownShipMonthRepData
+                        .Where(x => string.IsNullOrEmpty(x.UpdateTime.ToString()) || x.UpdateTime == DateTime.MinValue ?
+                         x.CreateTime >= requestDto.InStartDate && x.CreateTime <= requestDto.InEndDate
+                        : x.UpdateTime >= requestDto.InStartDate && x.UpdateTime <= requestDto.InEndDate)
+                        .ToList();
+                }
             }
             //年度产值 、 产量、运转时间、施工天数
             //取最新年份的数据
@@ -4093,6 +4165,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 GKJBId = x.ConditionGradeId,
                 QDLXId = x.ContractDetailType,
                 UpdateTime = x.UpdateTime,
+                CreateTime = x.CreateTime,
                 DigDeep = x.DigDeep,
                 BlowingDistance = x.BlowingDistance,
                 HaulDistance = x.HaulDistance

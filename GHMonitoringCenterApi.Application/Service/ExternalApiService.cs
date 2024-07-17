@@ -483,6 +483,7 @@ namespace GHMonitoringCenterApi.Application.Service
                 resList.Add(new ShipMonthReports
                 {
                     Id = item.Id,
+                    ShipId = item.OwnShipId,
                     EnterTime = item.EnterTime,
                     GKJBId = item.GKJBId,
                     GYFSId = item.GYFSId,

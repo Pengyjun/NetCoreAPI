@@ -656,6 +656,10 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto
         /// </summary>
         public string? ShipName { get; set; }
         /// <summary>
+        /// 船舶id
+        /// </summary>
+        public Guid? ShipId { get; set; }
+        /// <summary>
         /// 进场时间
         /// </summary>
         public string? EnterTime { get; set; }

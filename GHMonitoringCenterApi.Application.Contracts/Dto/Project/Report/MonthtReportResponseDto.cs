@@ -76,6 +76,7 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project.Report
             /// 更新时间
             /// </summary>
             public DateTime? UpdateTime { get; set; }
+            public DateTime? CreateTime { get; set; }
 
             /// <summary>
             /// 填报月份
