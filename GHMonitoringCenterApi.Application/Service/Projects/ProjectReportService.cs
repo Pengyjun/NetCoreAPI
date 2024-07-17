@@ -3396,30 +3396,43 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             RefAsync<int> total = 0;
             if (import == 1)
             {
-                subShipMonthRepData = await _dbContext.Queryable<SubShipMonthReport>()
-                                .LeftJoin<Project>((smr, p) => smr.ProjectId == p.Id)
-                                .LeftJoin<SubShip>((smr, p, sub) => smr.ShipId == sub.PomId)
-                                .Where((smr, p) => p.IsDelete == 1 && smr.IsDelete == 1 && smr.DateMonth >= startMonth && smr.DateMonth <= endMonth)
-                                .WhereIF(requestDto.CompanyId != null, (smr, p) => p.CompanyId == requestDto.CompanyId)
-                                .WhereIF(requestDto.ProjectDept != null, (smr, p) => p.ProjectDept == requestDto.ProjectDept)
-                                .WhereIF(requestDto.ProjectStatusId != null && requestDto.ProjectStatusId.Any(), (smr, p) => requestDto.ProjectStatusId.Contains(p.StatusId.Value.ToString()))
-                                .WhereIF(requestDto.ProjectRegionId != null, (smr, p) => p.RegionId == requestDto.ProjectRegionId)
-                                .WhereIF(requestDto.ProjectTypeId != null, (smr, p) => p.TypeId == requestDto.ProjectTypeId)
-                                .WhereIF(!string.IsNullOrWhiteSpace(requestDto.ProjectName), (smr, p) => SqlFunc.Contains(p.Name, requestDto.ProjectName))
-                                .WhereIF(requestDto.ProjectAreaId! != null, (smr, p) => p.AreaId == requestDto.ProjectAreaId)
-                                .WhereIF(categoryList != null && categoryList.Any(), (smr, p) => categoryList.Contains(p.Category))
-                                .WhereIF(tagList != null && tagList.Any(), (smr, p) => tagList.Contains(p.Tag))
-                                .WhereIF(tag2List != null && tag2List.Any(), (smr, p) => tag2List.Contains(p.Tag2))
-                                .WhereIF(!string.IsNullOrWhiteSpace(requestDto.ShipName), (smr, p, sub) => sub.Name.Contains(requestDto.ShipName))
-                                .WhereIF(requestDto.ShipTypeId != Guid.Empty && !string.IsNullOrWhiteSpace(requestDto.ShipTypeId.ToString()), (smr, p, sub) => requestDto.ShipTypeId == sub.TypeId)
-                                .OrderByDescending((smr, p) => new { p.Id, smr.DateMonth }).ToPageListAsync(requestDto.PageIndex, requestDto.PageSize, total);
+                var ssubShipMonthRepData = _dbContext.Queryable<SubShipMonthReport>()
+                                 .LeftJoin<Project>((smr, p) => smr.ProjectId == p.Id)
+                                 .LeftJoin<SubShip>((smr, p, sub) => smr.ShipId == sub.PomId)
+                                 .WhereIF(requestDto.CompanyId != null, (smr, p) => p.CompanyId == requestDto.CompanyId)
+                                 .WhereIF(requestDto.ProjectDept != null, (smr, p) => p.ProjectDept == requestDto.ProjectDept)
+                                 .WhereIF(requestDto.ProjectStatusId != null && requestDto.ProjectStatusId.Any(), (smr, p) => requestDto.ProjectStatusId.Contains(p.StatusId.Value.ToString()))
+                                 .WhereIF(requestDto.ProjectRegionId != null, (smr, p) => p.RegionId == requestDto.ProjectRegionId)
+                                 .WhereIF(requestDto.ProjectTypeId != null, (smr, p) => p.TypeId == requestDto.ProjectTypeId)
+                                 .WhereIF(!string.IsNullOrWhiteSpace(requestDto.ProjectName), (smr, p) => SqlFunc.Contains(p.Name, requestDto.ProjectName))
+                                 .WhereIF(requestDto.ProjectAreaId! != null, (smr, p) => p.AreaId == requestDto.ProjectAreaId)
+                                 .WhereIF(categoryList != null && categoryList.Any(), (smr, p) => categoryList.Contains(p.Category))
+                                 .WhereIF(tagList != null && tagList.Any(), (smr, p) => tagList.Contains(p.Tag))
+                                 .WhereIF(tag2List != null && tag2List.Any(), (smr, p) => tag2List.Contains(p.Tag2))
+                                 .WhereIF(!string.IsNullOrWhiteSpace(requestDto.ShipName), (smr, p, sub) => sub.Name.Contains(requestDto.ShipName))
+                                 .WhereIF(requestDto.ShipTypeId != Guid.Empty && !string.IsNullOrWhiteSpace(requestDto.ShipTypeId.ToString()), (smr, p, sub) => requestDto.ShipTypeId == sub.TypeId)
+                                 .OrderByDescending((smr, p) => new { p.Id, smr.DateMonth });
+                if (!requestDto.IsDuiWai)
+                {
+                    subShipMonthRepData = await ssubShipMonthRepData
+                                .Where((smr, p) => smr.IsDelete == 1 && smr.DateMonth >= startMonth && smr.DateMonth <= endMonth)
+                                .ToPageListAsync(requestDto.PageIndex, requestDto.PageSize, total);
+                }
+                else
+                {
+                    var res = await ssubShipMonthRepData.ToListAsync();
+                    subShipMonthRepData = res
+                        .Where(x => string.IsNullOrEmpty(x.UpdateTime.ToString()) || x.UpdateTime == DateTime.MinValue ?
+                        x.CreateTime >= requestDto.InStartDate && x.CreateTime <= requestDto.InEndDate
+                        : x.UpdateTime >= requestDto.InStartDate && x.UpdateTime <= requestDto.InEndDate)
+                        .ToList();
+                }
             }
             else
             {
                 subShipMonthRepData = await _dbContext.Queryable<SubShipMonthReport>()
                                 .LeftJoin<Project>((smr, p) => smr.ProjectId == p.Id)
                                 .LeftJoin<SubShip>((smr, p, sub) => smr.ShipId == sub.PomId)
-                                .Where((smr, p) => p.IsDelete == 1 && smr.IsDelete == 1 && smr.DateMonth >= startMonth && smr.DateMonth <= endMonth)
                                 .WhereIF(requestDto.CompanyId != null, (smr, p) => p.CompanyId == requestDto.CompanyId)
                                 .WhereIF(requestDto.ProjectDept != null, (smr, p) => p.ProjectDept == requestDto.ProjectDept)
                                 .WhereIF(requestDto.ProjectStatusId != null && requestDto.ProjectStatusId.Any(), (smr, p) => requestDto.ProjectStatusId.Contains(p.StatusId.Value.ToString()))
@@ -3432,7 +3445,22 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                                 .WhereIF(tag2List != null && tag2List.Any(), (smr, p) => tag2List.Contains(p.Tag2))
                                 .WhereIF(!string.IsNullOrWhiteSpace(requestDto.ShipName), (smr, p, sub) => sub.Name.Contains(requestDto.ShipName))
                                 .WhereIF(requestDto.ShipTypeId != Guid.Empty && !string.IsNullOrWhiteSpace(requestDto.ShipTypeId.ToString()), (smr, p, sub) => requestDto.ShipTypeId == sub.TypeId)
-                                .OrderByDescending((smr, p) => smr.DateMonth).ToListAsync();
+                                .OrderByDescending((smr, p) => smr.DateMonth)
+                                .ToListAsync();
+                if (!requestDto.IsDuiWai)
+                {
+                    subShipMonthRepData = subShipMonthRepData
+                                .Where((smr, p) => smr.IsDelete == 1 && smr.DateMonth >= startMonth && smr.DateMonth <= endMonth)
+                                .ToList();
+                }
+                else
+                {
+                    subShipMonthRepData = subShipMonthRepData
+                        .Where(x => string.IsNullOrEmpty(x.UpdateTime.ToString()) || x.UpdateTime == DateTime.MinValue ?
+                        x.CreateTime >= requestDto.InStartDate && x.CreateTime <= requestDto.InEndDate
+                        : x.UpdateTime >= requestDto.InStartDate && x.UpdateTime <= requestDto.InEndDate)
+                        .ToList();
+                }
             }
             //年度产值 、 产量、运转时间、施工天数
             //取最新年份的数据
@@ -4038,7 +4066,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 else
                 {
                     ownShipMonthRepData = data.ToList();
-                    ownShipMonthRepData= ownShipMonthRepData
+                    ownShipMonthRepData = ownShipMonthRepData
                         .Where(x => string.IsNullOrEmpty(x.UpdateTime.ToString()) || x.UpdateTime == DateTime.MinValue ?
                          x.CreateTime >= requestDto.InStartDate && x.CreateTime <= requestDto.InEndDate
                         : x.UpdateTime >= requestDto.InStartDate && x.UpdateTime <= requestDto.InEndDate)
