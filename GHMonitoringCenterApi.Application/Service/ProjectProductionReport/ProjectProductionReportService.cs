@@ -78,6 +78,13 @@ namespace GHMonitoringCenterApi.Application.Service.ProjectProductionReport
             //获取产值日报的项目基础数据
             var list = await BaseSearchDatReportListAsync(searchRequestDto, institution);
 
+            if (list.Data.dayReportInfos == null)
+            {
+                responseAjaxResult.Data = responseDtos;
+                responseAjaxResult.Count = list.Count;
+                responseAjaxResult.Success();
+                return responseAjaxResult;
+            }
             var result = await GetDayResponseDtosAsync(list.Data.dayReportInfos, institution);
             // result = result.OrderByDescending(x => x.DateDay).ThenByDescending(x=>x.ProSumActualDailyProductionAmount).Skip((searchRequestDto.PageIndex - 1) * searchRequestDto.PageSize).Take(searchRequestDto.PageSize).ToList();
 
@@ -247,7 +254,9 @@ namespace GHMonitoringCenterApi.Application.Service.ProjectProductionReport
             }
             //分页查询
             var dayReport = await dbContext.Queryable<DayReportConstruction>().Where(x => x.IsDelete == 1)
-                .WhereIF(time != 0, x => x.DateDay == time).ToListAsync();
+                .WhereIF(time != 0, x => x.DateDay == time)
+                .Select(x => new { x.DayReportId, x.ActualDailyProductionAmount, x.OutsourcingExpensesAmount, x.ActualDailyProduction, x.UnitPrice })
+                .ToListAsync();
             var list = new List<DayReportInfo>();
             if (!searchRequestDto.IsDuiWai)//非对外查询接口  监控中心自己用
             {
@@ -349,6 +358,14 @@ namespace GHMonitoringCenterApi.Application.Service.ProjectProductionReport
                     : x.UpdateTime >= searchRequestDto.StartTime && x.UpdateTime <= searchRequestDto.EndTime)
                     .ToList();
             }
+            if (!list.Any())
+            {
+                responseAjaxResult.Data = responseDtos;
+                responseAjaxResult.Count = total;
+                return responseAjaxResult;
+            }
+            var dayIds = list.Select(x => x.DayId).ToList();
+            dayReport = dayReport.Where(x => dayIds.Contains(x.DayReportId)).ToList();
             for (int i = 0; i < list.Count; i++)
             {
                 for (int j = 0; j < searchRequestDto.Sort.Length; j++)
