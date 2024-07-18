@@ -4224,15 +4224,17 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 //项目信息
                 var projectList = await _dbContext.Queryable<Project>().Where(x => x.IsDelete == 1).ToListAsync();
                 var sipMovementList = await _dbContext.Queryable<ShipMovement>().Where(x => x.IsDelete == 1).ToListAsync();
+                //船舶日报
+                var shipDailyData = await _dbShipDayReport.AsQueryable().Where(t => t.ProjectId == Guid.Empty && t.DateDay >= startTime && t.DateDay <= endTime && t.IsDelete == 1).ToListAsync();
                 foreach (var res in result)
                 {
                     #region 新逻辑
                     var num = 0M;
                     if (projectList != null && projectList.Any() && sipMovementList != null && sipMovementList.Any())
                     {
-
                         //新逻辑
-                        var list1 = await _dbShipDayReport.AsQueryable().Where(t => t.ProjectId == Guid.Empty && t.ShipId == res.OwnShipId && t.DateDay >= startTime && t.DateDay <= endTime && t.IsDelete == 1).ToListAsync();
+                        //var list1 = await _dbShipDayReport.AsQueryable().Where(t => t.ProjectId == Guid.Empty && t.ShipId == res.OwnShipId && t.DateDay >= startTime && t.DateDay <= endTime && t.IsDelete == 1).ToListAsync();
+                        var list1 = shipDailyData.Where(t => t.ShipId == res.OwnShipId).ToList();
                         var primaryIds = list1.Where(t => t.ProjectId == Guid.Empty).Select(t => new { id = t.Id, shipId = t.ShipId, DateDay = t.DateDay, ProjectId = t.ProjectId }).ToList();
                         foreach (var item in primaryIds)
                         {
