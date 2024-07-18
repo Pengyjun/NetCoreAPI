@@ -608,7 +608,9 @@ namespace GHMonitoringCenterApi.Application.Service
                 ProjectStatusId = requestDto.ProjectStatusId,
                 StartTime = requestDto.StartTime,
                 EndTime = requestDto.EndTime,
-                IsDuiWai = true
+                IsDuiWai = true,
+                PageIndex = requestDto.PageIndex,
+                PageSize = requestDto.PageSize
             };
 
             var responseData = await _projectProductionReportService.SearchDayReportAsync(searchRequestDto);

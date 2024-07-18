@@ -807,6 +807,14 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto
         /// </summary>
         public DateTime? EndTime { get; set; }
         /// <summary>
+        /// 页码
+        /// </summary>
+        public int PageIndex { get; set; } = 1;
+        /// <summary>
+        /// 页大小
+        /// </summary>
+        public int PageSize { get; set; } = 10;
+        /// <summary>
         /// 校验
         /// </summary>
         /// <param name="validationContext"></param>
