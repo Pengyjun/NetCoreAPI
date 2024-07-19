@@ -315,7 +315,7 @@ namespace GHMonitoringCenterApi.Application.Service.User
                                                 Type = item.Type.Value,
                                                 IsAdmin = item.IsAdmin,
                                                 IsApprove = item.IsApprove,
-                                                OperationType= item.OperationType,
+                                                OperationType = item.OperationType,
                                                 InstitutionId = currentRoleInstitutionId.Value,
                                                 Oid = institution?.Oid,
                                                 Grule = institution?.Grule,
@@ -403,9 +403,8 @@ namespace GHMonitoringCenterApi.Application.Service.User
                        .Where(x => x.IsDelete == 1)
                        .WhereIF(userIds.Any(), x => !userIds.Contains(x.Id))
                        .WhereIF(companyIds.Count > 0, x => companyIds.Contains(x.DepartmentId.Value))
-                       .WhereIF(!string.IsNullOrWhiteSpace(searchUserRequestDto.KeyWords), x => SqlFunc.Contains(x.Name, searchUserRequestDto.KeyWords)
-                       || SqlFunc.Contains(x.Phone, searchUserRequestDto.KeyWords))
-                       .ToPageListAsync(searchUserRequestDto.PageIndex, searchUserRequestDto.PageSize, total);
+                       .ToListAsync();
+                    //.ToPageListAsync(searchUserRequestDto.PageIndex, searchUserRequestDto.PageSize, total);
                 }
                 #region 人员组织调整附加逻辑
                 var userExtendedList = await dbContent.Queryable<UserExtended>().Where(x => x.IsDelete == 1 && x.DepartmentId == institutionRoleSingle.InstitutionId).ToListAsync();
@@ -446,6 +445,11 @@ namespace GHMonitoringCenterApi.Application.Service.User
                 {
                     var cIds = usersList.Select(x => x.CompanyId.Value).ToList();
                     var companyList = await dbContent.Queryable<Company>().Where(x => cIds.Contains(x.PomId.Value)).ToListAsync();
+                    usersList = usersList
+                       .WhereIF(!string.IsNullOrWhiteSpace(searchUserRequestDto.KeyWords), x => SqlFunc.Contains(x.Name, searchUserRequestDto.KeyWords)
+                       || SqlFunc.Contains(x.Phone, searchUserRequestDto.KeyWords))
+                       .ToList();
+                    usersList = usersList.Skip((searchUserRequestDto.PageIndex - 1) * searchUserRequestDto.PageSize).Take(searchUserRequestDto.PageSize).ToList();
                     informationResponseDtos = mapper.Map<List<Model.User>, List<InformationResponseDto>>(usersList);
                     var udepIds = usersList.Select(x => x.DepartmentId).ToList();
                     var institutinsData = institutins.Where(x => !string.IsNullOrWhiteSpace(x.Ocode) && udepIds.Contains(x.PomId)).ToList();
@@ -454,13 +458,12 @@ namespace GHMonitoringCenterApi.Application.Service.User
                         informationResponseDtos[i].Company = companyList.SingleOrDefault(x => x.PomId == usersList[i].CompanyId.Value)?.Name;
                         informationResponseDtos[i].DepartmentName = institutins.SingleOrDefault(x => x.PomId == usersList[i].DepartmentId.Value)?.Name;
                     }
-
+                    total = informationResponseDtos.Count;
                 }
             }
 
-            responseAjaxResult.Data = informationResponseDtos;
             responseAjaxResult.Count = total;
-            responseAjaxResult.Success();
+            responseAjaxResult.SuccessResult(informationResponseDtos);
             return responseAjaxResult;
         }
         #endregion
