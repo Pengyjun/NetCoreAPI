@@ -482,6 +482,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     Category = p.Category,
                     TypeName = p.TypeId.ToString(),
                     Amount = p.Amount,
+                    CurrencyId = p.CurrencyId.ToString(),
                     ZCURRENCYNAME = p.CurrencyId.ToString(),
                     CompanyName = p.CompanyId.ToString(),
                     Status = p.StatusId.ToString(),
@@ -599,10 +600,16 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 item.TypeName = projectTypeList.FirstOrDefault(x => x.PomId.ToString() == item.TypeName)?.Name;
                 item.ZCURRENCYNAME = searchRequestDto.IsConvert == true ? "CNY-人民币" : projectCurrencyList.FirstOrDefault(x => x.PomId.ToString() == item.ZCURRENCYNAME)?.Zcurrencyname;
                 item.CompanyName = projectCompanyList.FirstOrDefault(x => x.PomId.ToString() == item.CompanyName)?.Name;
+                item.Ecamount = searchRequestDto.IsConvert == true ?
+                    item.CurrencyId == "edea1eb4-936f-465a-8ffa-1d1669bc3776" ?
+                    Math.Round(Convert.ToDecimal(item.Ecamount * rate.Single(x => x.CurrencyId == "edea1eb4-936f-465a-8ffa-1d1669bc3776").ExchangeRate), 2)
+                    : item.CurrencyId == "43e52b6c-f41f-48c8-822c-103732f81cc1" ?
+                    Math.Round(Convert.ToDecimal(item.Ecamount * rate.Single(x => x.CurrencyId == "43e52b6c-f41f-48c8-822c-103732f81cc1").ExchangeRate), 2)
+                    : item.Ecamount : item.Ecamount;
                 item.Amount = searchRequestDto.IsConvert == true ?
-                    item.ZCURRENCYNAME == "edea1eb4-936f-465a-8ffa-1d1669bc3776" ?
+                    item.CurrencyId == "edea1eb4-936f-465a-8ffa-1d1669bc3776" ?
                     Math.Round(Convert.ToDecimal(item.Amount * rate.Single(x => x.CurrencyId == "edea1eb4-936f-465a-8ffa-1d1669bc3776").ExchangeRate), 2)
-                    : item.ZCURRENCYNAME == "43e52b6c-f41f-48c8-822c-103732f81cc1" ?
+                    : item.CurrencyId == "43e52b6c-f41f-48c8-822c-103732f81cc1" ?
                     Math.Round(Convert.ToDecimal(item.Amount * rate.Single(x => x.CurrencyId == "43e52b6c-f41f-48c8-822c-103732f81cc1").ExchangeRate), 2)
                     : item.Amount : item.Amount;
                 item.ConditiongradeName = conditiongradeList.FirstOrDefault(x => x.PomId.ToString() == item.ConditiongradeName)?.Remarks;

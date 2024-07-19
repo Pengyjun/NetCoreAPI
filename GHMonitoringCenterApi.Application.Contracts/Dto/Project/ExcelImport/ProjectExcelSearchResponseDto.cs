@@ -49,11 +49,15 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project.ExcelImport
 		/// 合同金额
 		/// </summary>
 		public decimal? Amount { get; set; }
-
 		/// <summary>
-		/// 货币名称
+		/// 币种ID
 		/// </summary>
-		public string? ZCURRENCYNAME { get; set; }
+        public string? CurrencyId { get; set; }
+
+        /// <summary>
+        /// 货币名称
+        /// </summary>
+        public string? ZCURRENCYNAME { get; set; }
 
 		/// <summary>
 		/// 公司名称
