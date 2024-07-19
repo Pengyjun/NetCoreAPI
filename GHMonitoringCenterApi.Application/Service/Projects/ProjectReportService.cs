@@ -1682,7 +1682,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             });
 
             var list = model.IsFullExport ? await selQuery.ToListAsync() : await selQuery.ToPageListAsync(model.PageIndex, model.PageSize, total);
-            if (!model.IsDuiWai)
+            if (model.IsDuiWai)
             {
                 list = list
                 .Where(x => string.IsNullOrEmpty(x.UpdateTime.ToString()) || x.UpdateTime == DateTime.MinValue ?
