@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace GHMonitoringCenterApi.Application.Contracts.Dto.EquipmentManagement
+﻿namespace GHMonitoringCenterApi.Application.Contracts.Dto.EquipmentManagement
 {
     /// <summary>
     /// 获取设备管理请求Dto
@@ -31,5 +25,9 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.EquipmentManagement
         /// 结束时间
         /// </summary>
         public DateTime? EndTime { get; set; }
+        /// <summary>
+        /// 是否是对外使用
+        /// </summary>
+        public bool IsDuiWai {  get; set; }
     }
 }

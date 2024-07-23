@@ -6,7 +6,6 @@ using GHMonitoringCenterApi.Domain.Models;
 using GHMonitoringCenterApi.Domain.Shared;
 using GHMonitoringCenterApi.Domain.Shared.Const;
 using GHMonitoringCenterApi.Domain.Shared.Enums;
-using NPOI.SS.Formula.Functions;
 using SqlSugar;
 using System.Globalization;
 
@@ -43,8 +42,13 @@ namespace GHMonitoringCenterApi.Application.Service.EquipmentManagement
             RefAsync<int> total = 0;
             if (searchEquipmentManagementRequestDto.DeviceType == 1)//水上设备
             {
+
                 DateTime? dateTime;
-                var marineEquipmentList = await dbContext.Queryable<MarineEquipment>()
+                var marineEquipmentList = new List<MarineEquipment>();
+                if (!searchEquipmentManagementRequestDto.IsDuiWai)
+                {
+                    //监控中心自己使用
+                    marineEquipmentList = await dbContext.Queryable<MarineEquipment>()
                     //.LeftJoin<Project>((x, y) => x.ProjectId == y.Id)
                     //.LeftJoin<ShipPingType>((x, y, z) => x.ShipTypeId == z.PomId)
                     //.LeftJoin<Institution>((x, y, z, p) => x.CompanyId == p.PomId)
@@ -56,6 +60,22 @@ namespace GHMonitoringCenterApi.Application.Service.EquipmentManagement
                     .WhereIF(searchEquipmentManagementRequestDto.ProjectId != null, x => x.ProjectId == searchEquipmentManagementRequestDto.ProjectId)
                     .OrderByDescending(x => x.ReportingMonth)
                     .ToPageListAsync(searchEquipmentManagementRequestDto.PageIndex, searchEquipmentManagementRequestDto.PageSize, total);
+                }
+                else
+                {
+                    //对外接口
+                    marineEquipmentList = await dbContext.Queryable<MarineEquipment>()
+                        .Where(x => x.IsDelete == 1)
+                        .OrderByDescending(x => x.ReportingMonth)
+                        .ToListAsync();
+                    marineEquipmentList = marineEquipmentList
+                        .Where(x => string.IsNullOrEmpty(x.UpdateTime.ToString()) || x.UpdateTime == DateTime.MinValue ?
+                        x.CreateTime >= searchEquipmentManagementRequestDto.StarTime && x.CreateTime <= searchEquipmentManagementRequestDto.EndTime
+                        : x.UpdateTime >= searchEquipmentManagementRequestDto.StarTime && x.UpdateTime <= searchEquipmentManagementRequestDto.EndTime)
+                        .ToList();
+                    total = marineEquipmentList.Count;
+                }
+
                 List<SearchEquipmentManagementResponseDto> searchEquipmentManagementResponseDto = new List<SearchEquipmentManagementResponseDto>();
                 foreach (var item in marineEquipmentList)
                 {
@@ -85,7 +105,9 @@ namespace GHMonitoringCenterApi.Application.Service.EquipmentManagement
                         EntryDate = item.EntryDate,
                         ExitDate = item.ExitDate,
                         PresentNot = item.PresentNot.ToString(),
-                        Notes = item.Notes
+                        Notes = item.Notes,
+                        CreateTime = item.CreateTime,
+                        UpdateTime = item.UpdateTime
                     };
                     searchEquipmentManagementResponseDto.Add(searchEquipmentManagementResponseDto1);
                 }

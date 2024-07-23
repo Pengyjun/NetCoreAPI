@@ -84,6 +84,8 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.EquipmentManagement
         /// 出厂日期
         /// </summary>
         public DateTime? FactoryDate { get; set; }
+        public DateTime? UpdateTime { get; set; }
+        public DateTime? CreateTime { get; set; }
         /// <summary>
         /// 出厂合格证号
         /// </summary>

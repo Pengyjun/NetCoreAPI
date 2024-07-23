@@ -7,6 +7,7 @@ using static GHMonitoringCenterApi.Application.Contracts.Dto.Project.Report.Mont
 using GHMonitoringCenterApi.Application.Contracts.Dto.External;
 using Model = GHMonitoringCenterApi.Domain.Models;
 using GHMonitoringCenterApi.Domain.Models;
+using GHMonitoringCenterApi.Application.Contracts.Dto.EquipmentManagement;
 
 namespace GHMonitoringCenterApi.Application.Contracts.IService
 {
@@ -196,6 +197,17 @@ namespace GHMonitoringCenterApi.Application.Contracts.IService
         /// <param name="requestDto"></param>
         /// <returns></returns>
         Task<ResponseAjaxResult<List<ShipMovement>>> GetShipMovementTableAsync(ExternalRequestDto requestDto);
+        /// <summary>
+        /// 获取全表字段项目产值计划
+        /// </summary>
+        /// <returns></returns>
+        Task<ResponseAjaxResult<List<ProjectPlanProduction>>> GetProjectPlanProductionAsync();
+        /// <summary>
+        /// 获取全表字段水上设备
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        Task<ResponseAjaxResult<List<SearchEquipmentManagementResponseDto>>> GetSearchEquipmentManagementAsync(ExternalRequestDto requestDto);
         #endregion
     }
 }

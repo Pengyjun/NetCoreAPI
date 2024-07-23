@@ -1,5 +1,6 @@
 ﻿using GHMonitoringCenterApi.Application.Contracts.Dto;
 using GHMonitoringCenterApi.Application.Contracts.Dto.ConstructionProjectDaily;
+using GHMonitoringCenterApi.Application.Contracts.Dto.EquipmentManagement;
 using GHMonitoringCenterApi.Application.Contracts.Dto.External;
 using GHMonitoringCenterApi.Application.Contracts.Dto.Project;
 using GHMonitoringCenterApi.Application.Contracts.Dto.Project.Report;
@@ -7,6 +8,7 @@ using GHMonitoringCenterApi.Application.Contracts.Dto.Project.ShipMovements;
 using GHMonitoringCenterApi.Application.Contracts.Dto.ProjectProductionReport;
 using GHMonitoringCenterApi.Application.Contracts.Dto.Ship;
 using GHMonitoringCenterApi.Application.Contracts.IService;
+using GHMonitoringCenterApi.Application.Contracts.IService.EquipmentManagement;
 using GHMonitoringCenterApi.Application.Contracts.IService.Project;
 using GHMonitoringCenterApi.Application.Contracts.IService.ProjectProductionReport;
 using GHMonitoringCenterApi.Domain.Models;
@@ -49,6 +51,10 @@ namespace GHMonitoringCenterApi.Application.Service
         /// </summary>
         private IProjectReportService _projectReportService { get; set; }
         /// <summary>
+        /// 注入设备管理层
+        /// </summary>
+        private IEquipmentManagementService _eqipment { get; set; }
+        /// <summary>
         /// 依赖注入
         /// </summary>
         /// <param name="sqlSugarClient"></param>
@@ -56,13 +62,14 @@ namespace GHMonitoringCenterApi.Application.Service
         /// <param name="projectReportService"></param>
         /// <param name="globalObject"></param>
         /// <param name="shipMovementService"></param>
-        public ExternalApiService(ISqlSugarClient sqlSugarClient, IProjectProductionReportService projectProductionReportService, IProjectReportService projectReportService, GlobalObject globalObject, IProjectShipMovementsService shipMovementService)
+        public ExternalApiService(ISqlSugarClient sqlSugarClient, IProjectProductionReportService projectProductionReportService, IProjectReportService projectReportService, GlobalObject globalObject, IProjectShipMovementsService shipMovementService, IEquipmentManagementService eqipment)
         {
             this._dbContext = sqlSugarClient;
             this._projectProductionReportService = projectProductionReportService;
             this._projectReportService = projectReportService;
             this._globalObject = globalObject;
             this._shipMovementService = shipMovementService;
+            this._eqipment = eqipment;
         }
         /// <summary>
         /// s获取人员信息
@@ -1053,6 +1060,45 @@ namespace GHMonitoringCenterApi.Application.Service
 
             responseAjaxResult.Count = shipMovementData.Count;
             responseAjaxResult.SuccessResult(shipMovementData);
+            return responseAjaxResult;
+        }
+        /// <summary>
+        /// 获取全表字段项目产值计划
+        /// </summary>
+        /// <returns></returns>
+        public async Task<ResponseAjaxResult<List<ProjectPlanProduction>>> GetProjectPlanProductionAsync()
+        {
+            var responseAjaxRestult = new ResponseAjaxResult<List<ProjectPlanProduction>>();
+            var result = await _dbContext.Queryable<ProjectPlanProduction>()
+                .Where(x => x.IsDelete == 1)
+                .ToListAsync();
+
+            responseAjaxRestult.Count = result.Count;
+            responseAjaxRestult.SuccessResult(result);
+            return responseAjaxRestult;
+
+        }
+        /// <summary>
+        /// 获取全表字段水上设备
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        public async Task<ResponseAjaxResult<List<SearchEquipmentManagementResponseDto>>> GetSearchEquipmentManagementAsync(ExternalRequestDto requestDto)
+        {
+            var responseAjaxResult = new ResponseAjaxResult<List<SearchEquipmentManagementResponseDto>>();
+            var searchEquipmentManagementRequestDto = new SearchEquipmentManagementRequestDto()
+            {
+                IsDuiWai = true,
+                StarTime = requestDto.StartTime,
+                EndTime = requestDto.EndTime,
+                DeviceType = 1
+            };
+
+            var responseData = await _eqipment.SearchEquipmentManagementAsync(searchEquipmentManagementRequestDto);
+            var res = responseData.Data;
+
+            responseAjaxResult.Count = responseData.Count;
+            responseAjaxResult.SuccessResult(res);
             return responseAjaxResult;
         }
         #endregion

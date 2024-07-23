@@ -1,4 +1,5 @@
 ﻿using GHMonitoringCenterApi.Application.Contracts.Dto;
+using GHMonitoringCenterApi.Application.Contracts.Dto.EquipmentManagement;
 using GHMonitoringCenterApi.Application.Contracts.Dto.External;
 using GHMonitoringCenterApi.Application.Contracts.Dto.Project;
 using GHMonitoringCenterApi.Application.Contracts.Dto.Project.ShipMovements;
@@ -311,6 +312,23 @@ namespace GHMonitoringCenterApi.Controllers
         [AllowAnonymous]//跳过鉴权
         public async Task<ResponseAjaxResult<List<ShipMovement>>> GetShipMovementTableAsync([FromQuery] ExternalRequestDto requestDto)
             => await _externalApiService.GetShipMovementTableAsync(requestDto);
+        /// <summary>
+        /// 获取全表字段项目产值计划
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("GetProjectPlanProduction")]
+        [AllowAnonymous]//跳过鉴权
+        public async Task<ResponseAjaxResult<List<ProjectPlanProduction>>> GetProjectPlanProductionAsync()
+            => await _externalApiService.GetProjectPlanProductionAsync();
+        /// <summary>
+        /// 获取全表字段水上设备
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        [HttpGet("GetSearchEquipmentManagement")]
+        [AllowAnonymous]//跳过鉴权
+        public async Task<ResponseAjaxResult<List<SearchEquipmentManagementResponseDto>>> GetSearchEquipmentManagementAsync([FromQuery] ExternalRequestDto requestDto)
+            => await _externalApiService.GetSearchEquipmentManagementAsync(requestDto);
         #endregion
     }
 }
