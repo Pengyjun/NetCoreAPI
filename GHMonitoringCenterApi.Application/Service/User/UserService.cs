@@ -446,8 +446,8 @@ namespace GHMonitoringCenterApi.Application.Service.User
                     var cIds = usersList.Select(x => x.CompanyId.Value).ToList();
                     var companyList = await dbContent.Queryable<Company>().Where(x => cIds.Contains(x.PomId.Value)).ToListAsync();
                     usersList = usersList
-                       .WhereIF(!string.IsNullOrWhiteSpace(searchUserRequestDto.KeyWords), x => SqlFunc.Contains(x.Name, searchUserRequestDto.KeyWords)
-                       || SqlFunc.Contains(x.Phone, searchUserRequestDto.KeyWords))
+                       .WhereIF(!string.IsNullOrWhiteSpace(searchUserRequestDto.KeyWords), x => (!string.IsNullOrEmpty(x.Name) && SqlFunc.Contains(x.Name, searchUserRequestDto.KeyWords))
+                       || (!string.IsNullOrEmpty(x.Phone) && SqlFunc.Contains(x.Phone, searchUserRequestDto.KeyWords)))
                        .ToList();
                     usersList = usersList.Skip((searchUserRequestDto.PageIndex - 1) * searchUserRequestDto.PageSize).Take(searchUserRequestDto.PageSize).ToList();
                     informationResponseDtos = mapper.Map<List<Model.User>, List<InformationResponseDto>>(usersList);
