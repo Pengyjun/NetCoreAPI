@@ -397,14 +397,14 @@ namespace GHMonitoringCenterApi.Application.Service.User
                 #endregion
                 List<Model.User> usersList = new List<Model.User>();
 
-                if (companyIds.Count != 0)
+                if (companyIds.Count > 0)
                 {
                     usersList = await baseUserRepository.AsQueryable()
                        .Where(x => x.IsDelete == 1)
                        .WhereIF(userIds.Any(), x => !userIds.Contains(x.Id))
-                       .WhereIF(companyIds.Count > 0, x => companyIds.Contains(x.DepartmentId.Value))
                        .ToListAsync();
-                    //.ToPageListAsync(searchUserRequestDto.PageIndex, searchUserRequestDto.PageSize, total);
+                    usersList = usersList
+                               .Where(x => !string.IsNullOrEmpty(x.DepartmentId.ToString()) ? companyIds.Contains(x.DepartmentId.Value) : companyIds.Contains(x.CompanyId.Value)).ToList();
                 }
                 #region 人员组织调整附加逻辑
                 var userExtendedList = await dbContent.Queryable<UserExtended>().Where(x => x.IsDelete == 1 && x.DepartmentId == institutionRoleSingle.InstitutionId).ToListAsync();
@@ -449,16 +449,16 @@ namespace GHMonitoringCenterApi.Application.Service.User
                        .WhereIF(!string.IsNullOrWhiteSpace(searchUserRequestDto.KeyWords), x => (!string.IsNullOrEmpty(x.Name) && SqlFunc.Contains(x.Name, searchUserRequestDto.KeyWords))
                        || (!string.IsNullOrEmpty(x.Phone) && SqlFunc.Contains(x.Phone, searchUserRequestDto.KeyWords)))
                        .ToList();
+                    total = usersList.Count;
                     usersList = usersList.Skip((searchUserRequestDto.PageIndex - 1) * searchUserRequestDto.PageSize).Take(searchUserRequestDto.PageSize).ToList();
                     informationResponseDtos = mapper.Map<List<Model.User>, List<InformationResponseDto>>(usersList);
                     var udepIds = usersList.Select(x => x.DepartmentId).ToList();
                     var institutinsData = institutins.Where(x => !string.IsNullOrWhiteSpace(x.Ocode) && udepIds.Contains(x.PomId)).ToList();
                     for (int i = 0; i < informationResponseDtos.Count; i++)
                     {
-                        informationResponseDtos[i].Company = companyList.SingleOrDefault(x => x.PomId == usersList[i].CompanyId.Value)?.Name;
-                        informationResponseDtos[i].DepartmentName = institutins.SingleOrDefault(x => x.PomId == usersList[i].DepartmentId.Value)?.Name;
+                        informationResponseDtos[i].Company = companyList.FirstOrDefault(x => x.PomId == usersList[i].CompanyId.Value)?.Name;
+                        informationResponseDtos[i].DepartmentName = institutins.FirstOrDefault(x => x.PomId == usersList[i]?.DepartmentId)?.Name;
                     }
-                    total = informationResponseDtos.Count;
                 }
             }
 
