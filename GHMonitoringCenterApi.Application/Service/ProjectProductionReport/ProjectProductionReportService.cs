@@ -303,7 +303,10 @@ namespace GHMonitoringCenterApi.Application.Service.ProjectProductionReport
                        DayActualProductionQuantity = d.DayActualProduction,
                        DateDay = d.DateDay,
                        UpdateTime = d.UpdateTime,
-                       CreateTime = d.CreateTime
+                       CreateTime = d.CreateTime,
+                       Sitemanagementpersonnum = d.SiteManagementPersonNum,
+                       Siteconstructionpersonnum = d.SiteConstructionPersonNum,
+                       Hazardousconstructionnum = d.HazardousConstructionNum
                    }).ToListAsync();
             }
             else
@@ -349,7 +352,10 @@ namespace GHMonitoringCenterApi.Application.Service.ProjectProductionReport
                        DayActualProductionQuantity = d.DayActualProduction,
                        DateDay = d.DateDay,
                        UpdateTime = d.UpdateTime,
-                       CreateTime = d.CreateTime
+                       CreateTime = d.CreateTime,
+                       Sitemanagementpersonnum = d.SiteManagementPersonNum,
+                       Siteconstructionpersonnum = d.SiteConstructionPersonNum,
+                       Hazardousconstructionnum = d.HazardousConstructionNum
                    }).ToListAsync();
                 //对外接口日期筛选
                 list = list

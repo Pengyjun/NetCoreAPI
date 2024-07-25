@@ -641,6 +641,8 @@ namespace GHMonitoringCenterApi.Application.Service
                 StartTime = requestDto.StartTime,
                 EndTime = requestDto.EndTime,
                 IsConvert = requestDto.IsConvert,
+                PageIndex = requestDto.PageIndex,
+                PageSize = requestDto.PageSize,
                 IsDuiWai = true
             };
 

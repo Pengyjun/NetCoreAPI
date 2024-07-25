@@ -1,4 +1,5 @@
 ﻿using GHMonitoringCenterApi.Domain.Enums;
+using System.ComponentModel.DataAnnotations;
 
 namespace GHMonitoringCenterApi.Application.Contracts.Dto.ProjectProductionReport
 {
@@ -73,7 +74,18 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.ProjectProductionRepor
         /// 所属公司
         /// </summary>
         public string? CompanyName { get; set; }
-
+        /// <summary>
+        /// 现场管理人员数量
+        /// </summary>
+        public int Sitemanagementpersonnum {  get; set; }
+        /// <summary>
+        /// 施工人员数量
+        /// </summary>
+        public int Siteconstructionpersonnum {  get; set; }
+        /// <summary>
+        /// 危大工程施工数量
+        /// </summary>
+        public int Hazardousconstructionnum {  get; set; }
         /// <summary>
         /// 项目类别
         /// </summary>
@@ -302,6 +314,26 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.ProjectProductionRepor
         /// 是否切换人民币
         /// </summary>
         public bool? IsConvert { get; set; }
+        /// <summary>
+        /// 页码
+        /// </summary>
+        public int PageIndex { get; set; } = 1;
+        /// <summary>
+        /// 页大小
+        /// </summary>
+        public int PageSize { get; set; } = 10;
+
+        public virtual IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+        {
+            if (PageIndex < 1)
+            {
+                yield return new ValidationResult("页码参数不合法值必须大于等于1", new string[] { nameof(BaseRequestDto.PageIndex) });
+            }
+            if (PageSize < 5)
+            {
+                yield return new ValidationResult("页大小参数不合法值必须大于等于5 默认是10", new string[] { nameof(BaseRequestDto.PageSize) });
+            }
+        }
     }
 
 
