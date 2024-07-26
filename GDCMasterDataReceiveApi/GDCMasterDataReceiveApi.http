@@ -1,0 +1,6 @@
+@GDCMasterDataApi_HostAddress = http://localhost:5036
+
+GET {{GDCMasterDataApi_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

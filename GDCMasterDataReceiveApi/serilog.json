@@ -1,0 +1,155 @@
+{
+  //基于Net6配置
+  "Serilog": {
+    "Using": [ "Serilog.Expressions" ],
+    "MinimumLevel": {
+      "Default": "Debug",
+      "Override": {
+        "Microsoft": "Warning", 
+        "Microsoft.AspNetCore": "Warning"
+        //"System": "Warning"
+      }
+    },
+    "WriteTo": [
+      {
+        "Name": "Logger",
+        "Args": {
+          "ConfigureLogger": {
+            "Filter": [
+              {
+                "Name": "ByIncludingOnly",
+                "Args": {
+                  "expression": "@l= 'Information'"
+                }
+              }
+            ],
+            "WriteTo": [
+              {
+                "Name": "Async",
+                "Args": {
+                  "configure": [
+                    {
+                      "Name": "File",
+                      "Args": {
+                        "path": "Logs\\Info\\.txt",
+                        "rollingInterval": "Hour",
+                        "fileSizeLimitBytes": "20971520",
+                        "rollOnFileSizeLimit": true,
+                        "outputTemplate": "{Timestamp:yyyy-MM-dd HH:mm:ss.fff} [{Level}] [{SourceContext}] {Message}{NewLine}{Exception}----------------------------------------------------------------------------------------------------{NewLine}"
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      },
+      {
+        "Name": "Logger",
+        "Args": {
+          "configureLogger": {
+            "Filter": [
+              {
+                "Name": "ByIncludingOnly",
+                "Args": {
+                  "expression": "@l= 'Debug'"
+                }
+              }
+            ],
+            "WriteTo": [
+              {
+                "Name": "Async",
+                "Args": {
+                  "configure": [
+                    {
+                      "Name": "File",
+                      "Args": {
+                        "path": "Logs\\Debug\\.txt",
+                        "rollingInterval": "Hour",
+                        "fileSizeLimitBytes": "20971520",
+                        "rollOnFileSizeLimit": true,
+                        "outputTemplate": "{RequestMethod}{Timestamp:yyyy-MM-dd HH:mm:ss.fff} [{Level}] [{SourceContext}] {Message}{NewLine}{Exception}----------------------------------------------------------------------------------------------------{NewLine}",
+                        "formatter": "Serilog.Formatting.Compact.RenderedCompactJsonFormatter"
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      },
+      {
+        "Name": "Logger",
+        "Args": {
+          "configureLogger": {
+            "Filter": [
+              {
+                "Name": "ByIncludingOnly",
+                "Args": {
+                  "expression": "@l= 'Error'"
+                }
+              }
+            ],
+            "WriteTo": [
+              {
+                "Name": "Async",
+                "Args": {
+                  "configure": [
+                    {
+                      "Name": "File",
+                      "Args": {
+                        "path": "Logs\\Error\\.txt",
+                        "rollingInterval": "Hour",
+                        "fileSizeLimitBytes": "20971520",
+                        "rollOnFileSizeLimit": true,
+                        "outputTemplate": "{Timestamp:yyyy-MM-dd HH:mm:ss.fff} [{Level}] [{SourceContext}] {Message}{NewLine}{Exception}----------------------------------------------------------------------------------------------------{NewLine}"
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      },
+      {
+        "Name": "Logger",
+        "Args": {
+          "configureLogger": {
+            "Filter": [
+              {
+                "Name": "ByIncludingOnly",
+                "Args": {
+                  "expression": "@l= 'Warning'"
+                }
+              }
+            ],
+            "WriteTo": [
+              {
+                "Name": "Async",
+                "Args": {
+                  "configure": [
+                    {
+                      "Name": "File",
+                      "Args": {
+                        "path": "Logs\\Warning\\.txt",
+                        "rollingInterval": "Hour",
+                        "fileSizeLimitBytes": "20971520",
+                        "rollOnFileSizeLimit": true,
+                        "outputTemplate": "{Timestamp:yyyy-MM-dd HH:mm:ss.fff} [{Level}] [{SourceContext}] {Message}{NewLine}{Exception}----------------------------------------------------------------------------------------------------{NewLine}"
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      }
+     
+    ],
+    "Enrich": [ "FromLogContext"]
+  }
+}
