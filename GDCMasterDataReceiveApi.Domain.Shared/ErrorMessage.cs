@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace GDCMasterDataReceiveApi.Domain.Shared
+﻿namespace GDCMasterDataReceiveApi.Domain.Shared
 {
-	public class ErrorMessage
+    public class ErrorMessage
 	{
 		/// <summary>
 		/// 错误字段

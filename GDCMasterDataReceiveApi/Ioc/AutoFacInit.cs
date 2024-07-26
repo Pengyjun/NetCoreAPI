@@ -1,13 +1,7 @@
 ﻿using Autofac;
-using Autofac.Features.Scanning;
-using AutoMapper.Internal;
-using GDCMasterDataReceiveApi.Application.Contracts;
 using GDCMasterDataReceiveApi.Domain.IRepository;
-using GDCMasterDataReceiveApi.Domain.Shared.Utils;
 using GDCMasterDataReceiveApi.SqlSugarCore;
-using System;
 using System.Reflection;
-using System.Reflection.Metadata;
 
 namespace GDCMasterDataReceiveApi.Ioc
 {

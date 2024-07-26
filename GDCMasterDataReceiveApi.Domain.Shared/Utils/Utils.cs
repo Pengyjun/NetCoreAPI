@@ -1,20 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.VisualBasic;
-using Newtonsoft.Json.Linq;
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.Data;
-using System.Diagnostics;
-using System.Drawing.Drawing2D;
 using System.IO.Compression;
-using System.Linq;
 using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using UtilsSharp;
 
 namespace GDCMasterDataReceiveApi.Domain.Shared.Utils

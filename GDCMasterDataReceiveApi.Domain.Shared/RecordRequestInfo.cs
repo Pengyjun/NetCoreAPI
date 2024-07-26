@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data.SqlTypes;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace GDCMasterDataReceiveApi.Domain.Shared
+﻿namespace GDCMasterDataReceiveApi.Domain.Shared
 {
     /// <summary>
     /// 记录请求信息类

@@ -1,5 +1,4 @@
-﻿using GDCMasterDataReceiveApi.Application.Contracts.Dto;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace GDCMasterDataReceiveApi.Application.Contracts.Dto
 {

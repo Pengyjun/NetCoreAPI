@@ -1,6 +1,5 @@
 ﻿using GDCMasterDataReceiveApi.Application.Contracts;
 using GDCMasterDataReceiveApi.Domain.Shared;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Web;
 

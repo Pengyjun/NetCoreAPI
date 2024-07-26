@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace GDCMasterDataReceiveApi.Domain.Shared.Utils
+﻿namespace GDCMasterDataReceiveApi.Domain.Shared.Utils
 {
     /// <summary>
     /// list 转树帮助类

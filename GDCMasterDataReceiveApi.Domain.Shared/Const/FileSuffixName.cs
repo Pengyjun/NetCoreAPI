@@ -1,12 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace GDCMasterDataReceiveApi.Domain.Shared.Const
+﻿namespace GDCMasterDataReceiveApi.Domain.Shared.Const
 {
-
     /// <summary>
     /// 文件后缀名常量
     /// </summary>
