@@ -21,5 +21,12 @@ namespace GDCMasterDataReceiveApi.Application.Contracts
         /// </summary>
         /// <returns></returns>
         Task<ResponseAjaxResult<bool>> AddTestAsync();
+        /// <summary>
+        /// 统计数据库所有表每天的增量数据
+        /// </summary>
+        /// <param name="schema"></param>
+        /// <param name="date"></param>
+        /// <returns></returns>
+        ResponseAjaxResult<bool> GetDailyIncrementalData(string schema, DateTime date);
     }
 }
