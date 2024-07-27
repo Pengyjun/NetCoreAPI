@@ -36,42 +36,42 @@ namespace GDCMasterDataReceiveApi.SqlSugarCore
                             p.IsNullable = true;
 
                         }
-                        if (c.Name == "id" && c.PropertyType.FullName.ToLower().IndexOf("guid") >= 0)
+                        if (c.Name == "Id" && c.PropertyType.FullName.ToLower().IndexOf("guid") >= 0)
                         {
                             p.DataType = "varchar";
                             p.Length = 36;
                         }
-                        if (c.Name == "createid" && c.PropertyType.FullName.ToLower().IndexOf("guid") >= 0)
+                        if (c.Name == "CreateId" && c.PropertyType.FullName.ToLower().IndexOf("guid") >= 0)
                         {
                             p.DataType = "varchar";
                             p.Length = 36;
                         }
-                        if (c.Name == "updateid" && c.PropertyType.FullName.ToLower().IndexOf("guid") >= 0)
+                        if (c.Name == "UpdateId" && c.PropertyType.FullName.ToLower().IndexOf("guid") >= 0)
                         {
                             p.DataType = "varchar";
                             p.Length = 36;
                         }
-                        if (c.Name == "deleteid" && c.PropertyType.FullName.ToLower().IndexOf("guid") >= 0)
+                        if (c.Name == "DeleteId" && c.PropertyType.FullName.ToLower().IndexOf("guid") >= 0)
                         {
                             p.DataType = "varchar";
                             p.Length = 36;
                         }
-                        if (c.Name == "id" && c.PropertyType.FullName.ToLower().IndexOf("guid") >= 0)
+                        if (c.Name == "Id" && c.PropertyType.FullName.ToLower().IndexOf("guid") >= 0)
                         {
                             p.DataType = "varchar";
                             p.Length = 36;
                         }
-                        if (c.Name == "createid" && c.PropertyType.FullName.ToLower().IndexOf("guid") >= 0)
+                        if (c.Name == "CreateId" && c.PropertyType.FullName.ToLower().IndexOf("guid") >= 0)
                         {
                             p.DataType = "varchar";
                             p.Length = 36;
                         }
-                        if (c.Name == "updateid" && c.PropertyType.FullName.ToLower().IndexOf("guid") >= 0)
+                        if (c.Name == "UpdateId" && c.PropertyType.FullName.ToLower().IndexOf("guid") >= 0)
                         {
                             p.DataType = "varchar";
                             p.Length = 36;
                         }
-                        if (c.Name == "deleteid" && c.PropertyType.FullName.ToLower().IndexOf("guid") >= 0)
+                        if (c.Name == "DeleteId" && c.PropertyType.FullName.ToLower().IndexOf("guid") >= 0)
                         {
                             p.DataType = "varchar";
                             p.Length = 36;

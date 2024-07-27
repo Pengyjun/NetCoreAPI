@@ -92,15 +92,15 @@ namespace GDCMasterDataReceiveApi.SqlSugarCore
                 {
                     if (entityInfo.OperationType == DataFilterType.InsertByObject)
                     {
-                        if (entityInfo.PropertyName == "createtime")
+                        if (entityInfo.PropertyName == "CreateTime")
                         {
                             entityInfo.SetValue(DateTime.Now);
                         }
-                        if (entityInfo.PropertyName == "isdelete")
+                        if (entityInfo.PropertyName == "IsDelete")
                         {
                             entityInfo.SetValue(1);
                         }
-                        if (entityInfo.PropertyName == "createid")
+                        if (entityInfo.PropertyName == "CreateId")
                         {
                             var httpContent = HttpContentAccessFactory.Current;
                             if (httpContent != null)
@@ -138,7 +138,7 @@ namespace GDCMasterDataReceiveApi.SqlSugarCore
 
                         }
 
-                        if (entityInfo.PropertyName == "timestamp")
+                        if (entityInfo.PropertyName == "Timestamp")
                         {
                             entityInfo.SetValue(Utils.GetTimeSpan());
                         }
@@ -150,11 +150,11 @@ namespace GDCMasterDataReceiveApi.SqlSugarCore
                             return;
                         }
                         var isDelete = ((GDCMasterDataReceiveApi.Domain.BaseEntity<System.Guid>)entityInfo.EntityValue).IsDelete;
-                        if (isDelete == 1 && entityInfo.PropertyName == "updatetime")
+                        if (isDelete == 1 && entityInfo.PropertyName == "UpdateTime")
                         {
                             entityInfo.SetValue(DateTime.Now);
                         }
-                        if (isDelete == 1 && entityInfo.PropertyName == "updateid")
+                        if (isDelete == 1 && entityInfo.PropertyName == "UpdateId")
                         {
                             var httpContent = HttpContentAccessFactory.Current;
                             if (httpContent != null)
@@ -190,11 +190,11 @@ namespace GDCMasterDataReceiveApi.SqlSugarCore
                                 }
                             }
                         }
-                        if (isDelete == 0 && entityInfo.PropertyName == "deletetime")
+                        if (isDelete == 0 && entityInfo.PropertyName == "DeleteTime")
                         {
                             entityInfo.SetValue(DateTime.Now);
                         }
-                        if (isDelete == 0 && entityInfo.PropertyName == "deleteid")
+                        if (isDelete == 0 && entityInfo.PropertyName == "DeleteId")
                         {
                             var httpContent = HttpContentAccessFactory.Current;
                             if (httpContent != null)
@@ -232,9 +232,9 @@ namespace GDCMasterDataReceiveApi.SqlSugarCore
                             }
                         }
 
-                        if (isDelete == 1 && entityInfo.PropertyName == "timestamp")
+                        if (isDelete == 1 && entityInfo.PropertyName == "Timestamp")
                         {
-                            if (entityInfo.PropertyName == "timestamp")
+                            if (entityInfo.PropertyName == "Timestamp")
                             {
                                 entityInfo.SetValue(Utils.GetTimeSpan());
                             }
@@ -254,7 +254,7 @@ namespace GDCMasterDataReceiveApi.SqlSugarCore
                         var editAfterData = it.AfterData;
                         foreach (var item in editAfterData)
                         {
-                            deleteTotal += editAfterData.Select(x => x.Columns.Where(x => x.Value.ToString() == "1" && x.ColumnName.Equals("isdelete", StringComparison.OrdinalIgnoreCase))).ToList()[0].Count();
+                            deleteTotal += editAfterData.Select(x => x.Columns.Where(x => x.Value.ToString() == "1" && x.ColumnName.Equals("IsDelete", StringComparison.OrdinalIgnoreCase))).ToList()[0].Count();
                         }
                         //说明不是删除数据而是更新数据
                         if (it.DiffType == DiffType.update && deleteTotal == editAfterData.Count)
@@ -267,13 +267,13 @@ namespace GDCMasterDataReceiveApi.SqlSugarCore
                             {
                                 foreach (var beforeItem in item.Columns)
                                 {
-                                    if (beforeItem.ColumnName.ToLower() == "id" ||
-                                    beforeItem.ColumnName.ToLower() == "createtime" ||
-                                    beforeItem.ColumnName.ToLower() == "updatetime" ||
-                                    beforeItem.ColumnName.ToLower() == "deletetime" ||
-                                    beforeItem.ColumnName.ToLower() == "createid" ||
-                                    beforeItem.ColumnName.ToLower() == "updateid" ||
-                                    beforeItem.ColumnName.ToLower() == "deleteid")
+                                    if (beforeItem.ColumnName.ToLower() == "Id" ||
+                                    beforeItem.ColumnName.ToLower() == "CreateTime" ||
+                                    beforeItem.ColumnName.ToLower() == "UpdateTime" ||
+                                    beforeItem.ColumnName.ToLower() == "DeleteTime" ||
+                                    beforeItem.ColumnName.ToLower() == "CreateId" ||
+                                    beforeItem.ColumnName.ToLower() == "UpdateId" ||
+                                    beforeItem.ColumnName.ToLower() == "DeleteId")
                                     {
                                         continue;
                                     }
@@ -308,14 +308,14 @@ namespace GDCMasterDataReceiveApi.SqlSugarCore
                             {
                                 foreach (var beforeItem in item.Columns)
                                 {
-                                    if (beforeItem.ColumnName.ToLower() == "id" ||
-                                    beforeItem.ColumnName.ToLower() == "createtime" ||
-                                    beforeItem.ColumnName.ToLower() == "updatetime" ||
-                                    beforeItem.ColumnName.ToLower() == "deletetime" ||
-                                    beforeItem.ColumnName.ToLower() == "createid" ||
-                                    beforeItem.ColumnName.ToLower() == "updateid" ||
-                                    beforeItem.ColumnName.ToLower() == "deleteid" ||
-                                    beforeItem.ColumnName.ToLower() == "isdelete")
+                                    if (beforeItem.ColumnName.ToLower() == "Id" ||
+                                    beforeItem.ColumnName.ToLower() == "CreateTime" ||
+                                    beforeItem.ColumnName.ToLower() == "UpdateTime" ||
+                                    beforeItem.ColumnName.ToLower() == "DeleteTime" ||
+                                    beforeItem.ColumnName.ToLower() == "CreateId" ||
+                                    beforeItem.ColumnName.ToLower() == "UpdateId" ||
+                                    beforeItem.ColumnName.ToLower() == "DeleteId" ||
+                                    beforeItem.ColumnName.ToLower() == "IsDelete")
                                     {
                                         continue;
                                     }
@@ -341,7 +341,7 @@ namespace GDCMasterDataReceiveApi.SqlSugarCore
                             {
                                 foreach (var beforeItem in item.Columns)
                                 {
-                                    if (beforeItem.ColumnName.ToLower() == "isdelete".ToLower())
+                                    if (beforeItem.ColumnName.ToLower() == "IsDelete".ToLower())
                                     {
                                         LogDiffDto logDiffDto = new LogDiffDto()
                                         {

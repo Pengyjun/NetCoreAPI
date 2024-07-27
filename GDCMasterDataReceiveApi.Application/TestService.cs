@@ -54,7 +54,6 @@ namespace GDCMasterDataReceiveApi.Application
             var res = new DealingUnit()
             {
                 Id = SnowflakeAlgorithmUtil.GenerateSnowflakeId(),
-                CreateTime = Convert.ToDateTime(DateTime.Now.ToString("yyyyyyyy-MM-dd HH:mm:ss"))
             };
             var res2 = new DealingUnit()
             {
@@ -67,7 +66,6 @@ namespace GDCMasterDataReceiveApi.Application
             var user = new User()
             {
                 Id = SnowflakeAlgorithmUtil.GenerateSnowflakeId(),
-                CreateTime = Convert.ToDateTime(DateTime.Now.ToString("yyyyyyyy-MM-dd HH:mm:ss"))
             };
             var user2 = new User()
             {
