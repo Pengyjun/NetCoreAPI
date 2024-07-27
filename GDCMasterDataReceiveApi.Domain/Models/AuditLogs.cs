@@ -15,7 +15,7 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// <summary>
         /// 应用程序名称
         /// </summary>
-        [SugarColumn(Length = 40)]
+        [SugarColumn(Length = 500)]
         public string? ApplicationName { get; set; }
         /// <summary>
         /// 用户ID
@@ -26,12 +26,12 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// 用户名
         /// </summary>
 
-        [SugarColumn(Length = 10)]
+        [SugarColumn(Length = 50)]
         public string? UserName { get; set; }
         /// <summary>
         /// 请求时间
         /// </summary>
-        [SugarColumn(Length = 40)]
+        [SugarColumn(Length = 200)]
         public string? RequestTime { get; set; }
 
         /// <summary>
@@ -43,17 +43,17 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// <summary>
         /// sql执行时间
         /// </summary>
-        [SugarColumn(Length = 200)]
+        [SugarColumn(Length = 500)]
         public string? SqlExecutionDuration { get; set; }
         /// <summary>
         /// 耗时时间
         /// </summary>
-        [SugarColumn(Length = 50)]
+        [SugarColumn(Length = 200)]
         public string? ExecutionDuration { get; set; }
         /// <summary>
         /// 客户端IP地址
         /// </summary>
-        [SugarColumn(Length = 20)]
+        [SugarColumn(Length = 100)]
         public string? ClientIpAddress { get; set; }
         /// <summary>
         /// 浏览器信息
@@ -63,13 +63,13 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// <summary>
         /// 请求方法
         /// </summary>
-        [SugarColumn(Length = 50)]
+        [SugarColumn(Length = 200)]
         public string? HttpMethod { get; set; }
 
         /// <summary>
         /// Action方法名
         /// </summary>
-        [SugarColumn(Length = 100)]
+        [SugarColumn(Length = 500)]
         public string? ActionMethodName { get; set; }
         /// <summary>
         /// 请求参数
@@ -79,7 +79,7 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// <summary>
         /// 请求路由
         /// </summary>
-        [SugarColumn(Length = 200)]
+        [SugarColumn(Length = 500)]
         public string? Url { get; set; }
         /// <summary>
         /// 异常信息

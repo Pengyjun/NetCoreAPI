@@ -10,7 +10,6 @@ using UtilsSharp;
 
 namespace GDCMasterDataReceiveApi.SqlSugarCore
 {
-
     /// <summary>
     /// Sqlsugar上下文
     /// </summary>
@@ -23,8 +22,14 @@ namespace GDCMasterDataReceiveApi.SqlSugarCore
             SqlSugarClient sqlSugarClient = new SqlSugarClient(new ConnectionConfig()
             {
                 ConnectionString = dbCon,
-                DbType = DbType.MySql,
-                IsAutoCloseConnection = true
+                DbType = DbType.Dm,
+                IsAutoCloseConnection = true, //不设成true要手动close
+                MoreSettings = new ConnMoreSettings()
+                {
+                    //SqlSugarCore 5.1.4.157-preview09+版本支持
+                    DatabaseModel = SqlSugar.DbType.MySql, //启用达梦mysql模式分页的兼容
+                    IsAutoToUpper = false, //禁用自动转成大写表 5.1.3.41-preview04
+                }
             }, db =>
             {
                 var sqlParmae = string.Empty;
@@ -32,17 +37,18 @@ namespace GDCMasterDataReceiveApi.SqlSugarCore
                 {
                     if (sql.IndexOf("t_auditlogs") < 0)
                     {
-                        if (isOpenSql)
-                        {
-                            //获取无参数化sql  会影响性能  建议调试使用生产环境禁止使用
-                            sqlParmae = UtilMethods.GetSqlString(DbType.SqlServer, sql, parames);
-                        }
-                        else {
-                            sqlParmae = sql;
-                        }
+                        //if (isOpenSql)
+                        //{
+                        //    //获取无参数化sql  会影响性能  建议调试使用生产环境禁止使用
+                        //    sqlParmae = UtilMethods.GetSqlString(DbType.Dm, sql, parames);
+                        //}
+                        //else
+                        //{
+                        //    sqlParmae = sql;
+                        //}
                     }
                     //调试时打印sql语句 生产时注释掉
-                   // Console.WriteLine($"{sqlParmae}");
+                    //Console.WriteLine($"{sqlParmae}");
                 };
                 //db.Aop.OnError=(sql) => {
                 //  //记录出错的sql语句
@@ -86,15 +92,15 @@ namespace GDCMasterDataReceiveApi.SqlSugarCore
                 {
                     if (entityInfo.OperationType == DataFilterType.InsertByObject)
                     {
-                        if (entityInfo.PropertyName == "CreateTime")
+                        if (entityInfo.PropertyName == "createtime")
                         {
                             entityInfo.SetValue(DateTime.Now);
                         }
-                        if (entityInfo.PropertyName == "IsDelete")
+                        if (entityInfo.PropertyName == "isdelete")
                         {
                             entityInfo.SetValue(1);
                         }
-                        if (entityInfo.PropertyName == "CreateId")
+                        if (entityInfo.PropertyName == "createid")
                         {
                             var httpContent = HttpContentAccessFactory.Current;
                             if (httpContent != null)
@@ -132,7 +138,7 @@ namespace GDCMasterDataReceiveApi.SqlSugarCore
 
                         }
 
-                        if (entityInfo.PropertyName == "Timestamp")
+                        if (entityInfo.PropertyName == "timestamp")
                         {
                             entityInfo.SetValue(Utils.GetTimeSpan());
                         }
@@ -144,19 +150,51 @@ namespace GDCMasterDataReceiveApi.SqlSugarCore
                             return;
                         }
                         var isDelete = ((GDCMasterDataReceiveApi.Domain.BaseEntity<System.Guid>)entityInfo.EntityValue).IsDelete;
-                        if (isDelete == 1 && entityInfo.PropertyName == "UpdateTime")
+                        if (isDelete == 1 && entityInfo.PropertyName == "updatetime")
                         {
                             entityInfo.SetValue(DateTime.Now);
                         }
-                        //if (isDelete == 1 && entityInfo.PropertyName == "CreateTime")
-                        //{
-                        //    entityInfo.EntityColumnInfo.IsIgnore= true;
-                        //}
-                        //if (isDelete == 1 && entityInfo.PropertyName == "IsDelete")
-                        //{
-                        //    entityInfo.EntityColumnInfo.IsIgnore = true;
-                        //}
-                        if (isDelete == 1 && entityInfo.PropertyName == "UpdateId")
+                        if (isDelete == 1 && entityInfo.PropertyName == "updateid")
+                        {
+                            var httpContent = HttpContentAccessFactory.Current;
+                            if (httpContent != null)
+                            {
+                                var token = httpContent.Request.Headers["Authorization"];
+                                token = token.ToString().Replace("Bearer", "").Trim();
+                                #region 获取当前用户信息
+                                var tokenUrl = AppsettingsHelper.GetValue("ParseTokenUrl") + token;
+                                WebHelper webHelper = new WebHelper();
+                                var tokenResult = webHelper.DoGetAsync(tokenUrl).GetAwaiter().GetResult();
+                                var account = string.Empty;
+                                if (tokenResult.Code == 200)
+                                {
+                                    var code = JObject.Parse(tokenResult.Result);
+                                    account = ((Newtonsoft.Json.Linq.JValue)code["account"]).Value.ToString();
+                                }
+                                #endregion
+                                var redis = RedisUtil.Instance;
+
+                                bool existKey = redis.Exists(account);
+                                if (existKey)
+                                {
+
+                                    var userValue = redis.Get(account);
+                                    if (!string.IsNullOrWhiteSpace(userValue))
+                                    {
+                                        var userInfo = JsonConvert.DeserializeObject<GlobalCurrentUser>(userValue);
+                                        if (userInfo != null)
+                                        {
+                                            entityInfo.SetValue(userInfo.Id);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        if (isDelete == 0 && entityInfo.PropertyName == "deletetime")
+                        {
+                            entityInfo.SetValue(DateTime.Now);
+                        }
+                        if (isDelete == 0 && entityInfo.PropertyName == "deleteid")
                         {
                             var httpContent = HttpContentAccessFactory.Current;
                             if (httpContent != null)
@@ -193,59 +231,10 @@ namespace GDCMasterDataReceiveApi.SqlSugarCore
                                 }
                             }
                         }
-                        if (isDelete == 0 && entityInfo.PropertyName == "DeleteTime")
-                        {
-                            entityInfo.SetValue(DateTime.Now);
-                        }
-                        //if (isDelete == 0 && entityInfo.PropertyName == "CreateTime")
-                        //{
-                        //    entityInfo.EntityColumnInfo.IsIgnore = true;
-                        //}
-                        //if (isDelete == 0 && entityInfo.PropertyName == "UpdateTime")
-                        //{
-                        //    entityInfo.EntityColumnInfo.IsIgnore = true;
-                        //}
-                        if (isDelete == 0 && entityInfo.PropertyName == "DeleteId")
-                        {
-                            var httpContent = HttpContentAccessFactory.Current;
-                            if (httpContent != null)
-                            {
-                                var token = httpContent.Request.Headers["Authorization"];
-                                token = token.ToString().Replace("Bearer", "").Trim();
-                                #region 获取当前用户信息
-                                var tokenUrl = AppsettingsHelper.GetValue("ParseTokenUrl") + token;
-                                WebHelper webHelper = new WebHelper();
-                                var tokenResult = webHelper.DoGetAsync(tokenUrl).GetAwaiter().GetResult();
-                                var account = string.Empty;
-                                if (tokenResult.Code == 200)
-                                {
-                                    var code = JObject.Parse(tokenResult.Result);
-                                    account = ((Newtonsoft.Json.Linq.JValue)code["account"]).Value.ToString();
-                                }
-                                #endregion
-                                var redis = RedisUtil.Instance;
 
-                                bool existKey = redis.Exists(account);
-                                if (existKey)
-                                {
-
-                                    var userValue = redis.Get(account);
-                                    //Console.WriteLine("2222:" + userValue);
-                                    if (!string.IsNullOrWhiteSpace(userValue))
-                                    {
-                                        var userInfo = JsonConvert.DeserializeObject<GlobalCurrentUser>(userValue);
-                                        if (userInfo != null)
-                                        {
-                                            entityInfo.SetValue(userInfo.Id);
-                                        }
-                                    }
-                                }
-                            }
-                        }
-
-                        if (isDelete == 1 && entityInfo.PropertyName == "Timestamp")
+                        if (isDelete == 1 && entityInfo.PropertyName == "timestamp")
                         {
-                            if (entityInfo.PropertyName == "Timestamp")
+                            if (entityInfo.PropertyName == "timestamp")
                             {
                                 entityInfo.SetValue(Utils.GetTimeSpan());
                             }
@@ -258,14 +247,14 @@ namespace GDCMasterDataReceiveApi.SqlSugarCore
                     try
                     {
                         var deleteTotal = 0;
-                        var lgoObject = it.BusinessData  as LogInfo;
+                        var lgoObject = it.BusinessData as LogInfo;
                         //插入之前的数据
                         var editBeforeData = it.BeforeData;
                         //插入之后的数据
                         var editAfterData = it.AfterData;
                         foreach (var item in editAfterData)
                         {
-                            deleteTotal += editAfterData.Select(x => x.Columns.Where(x => x.Value.ToString() == "1" && x.ColumnName.Equals("IsDelete", StringComparison.OrdinalIgnoreCase))).ToList()[0].Count();
+                            deleteTotal += editAfterData.Select(x => x.Columns.Where(x => x.Value.ToString() == "1" && x.ColumnName.Equals("isdelete", StringComparison.OrdinalIgnoreCase))).ToList()[0].Count();
                         }
                         //说明不是删除数据而是更新数据
                         if (it.DiffType == DiffType.update && deleteTotal == editAfterData.Count)
@@ -274,11 +263,11 @@ namespace GDCMasterDataReceiveApi.SqlSugarCore
                             lgoObject.logDiffDtos = new List<LogDiffDto>();
                             lgoObject.OperationObject = editBeforeData.Select(x => x.TableName).FirstOrDefault();
                             var i = 0;
-							foreach (var item in editBeforeData)
+                            foreach (var item in editBeforeData)
                             {
-								foreach (var beforeItem in item.Columns)
+                                foreach (var beforeItem in item.Columns)
                                 {
-									if (beforeItem.ColumnName.ToLower() == "id" ||
+                                    if (beforeItem.ColumnName.ToLower() == "id" ||
                                     beforeItem.ColumnName.ToLower() == "createtime" ||
                                     beforeItem.ColumnName.ToLower() == "updatetime" ||
                                     beforeItem.ColumnName.ToLower() == "deletetime" ||
@@ -295,9 +284,8 @@ namespace GDCMasterDataReceiveApi.SqlSugarCore
                                         ColumnName = beforeItem.ColumnName.ToLower(),
                                         OriginalValue = beforeItem.Value.ToString(),
                                     };
-                                    //var newValue =editAfterData.SelectMany(x => x.Columns.Where(x => x.ColumnName == beforeItem.ColumnName).Select(x => x.Value.ToString())).ToList();
-                                    var newValue = editAfterData[i].Columns.Where(x=>x.ColumnName == beforeItem.ColumnName).Select(x=>x.Value.ToString()).ToList();
-									if (newValue.Any())
+                                    var newValue = editAfterData[i].Columns.Where(x => x.ColumnName == beforeItem.ColumnName).Select(x => x.Value.ToString()).ToList();
+                                    if (newValue.Any())
                                     {
                                         //如果旧值等于新值  则不记录
                                         if (logDiffDto.OriginalValue.TrimAll() != newValue[0].ToString().TrimAll())
@@ -337,7 +325,7 @@ namespace GDCMasterDataReceiveApi.SqlSugarCore
                                         Describe = beforeItem.ColumnDescription,
                                         ColumnName = beforeItem.ColumnName.ToLower(),
                                         ChangeValue = beforeItem.Value.ToString(),
-                                        
+
                                     };
                                     lgoObject.logDiffDtos.Add(logDiffDto);
                                 }
@@ -353,7 +341,7 @@ namespace GDCMasterDataReceiveApi.SqlSugarCore
                             {
                                 foreach (var beforeItem in item.Columns)
                                 {
-                                    if (beforeItem.ColumnName.ToLower() == "IsDelete".ToLower())
+                                    if (beforeItem.ColumnName.ToLower() == "isdelete".ToLower())
                                     {
                                         LogDiffDto logDiffDto = new LogDiffDto()
                                         {
@@ -406,7 +394,7 @@ namespace GDCMasterDataReceiveApi.SqlSugarCore
                         }
                         catch (Exception ex)
                         {
-                              //可以提供日志访问  记录日志文件中
+                            //可以提供日志访问  记录日志文件中
                         }
 
                     }

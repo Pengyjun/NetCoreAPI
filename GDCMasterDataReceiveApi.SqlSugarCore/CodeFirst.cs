@@ -14,12 +14,11 @@ namespace GDCMasterDataReceiveApi.SqlSugarCore
             SqlSugarClient db = new SqlSugarClient(new ConnectionConfig()
             {
                 ConnectionString = dbCon,
-                DbType = DbType.MySql,
-                IsAutoCloseConnection = true,
+                DbType = DbType.Dm,
+                IsAutoCloseConnection = true,//不设成true要手动close
                 MoreSettings = new ConnMoreSettings()
                 {
-                    IsAutoToUpper = false,
-                    
+                    IsAutoToUpper = false,//禁用自动转成大写表 5.1.3.41-preview04
                 },
                 ConfigureExternalServices = new ConfigureExternalServices
                 {
@@ -38,49 +37,49 @@ namespace GDCMasterDataReceiveApi.SqlSugarCore
                             p.IsNullable = true;
 
                         }
-                        if (c.Name == "Id" && c.PropertyType.FullName.ToLower().IndexOf("guid") >= 0)
+                        if (c.Name == "id" && c.PropertyType.FullName.ToLower().IndexOf("guid") >= 0)
                         {
                             p.DataType = "varchar";
                             p.Length = 36;
                         }
-                        if (c.Name == "CreateId" && c.PropertyType.FullName.ToLower().IndexOf("guid") >= 0)
+                        if (c.Name == "createid" && c.PropertyType.FullName.ToLower().IndexOf("guid") >= 0)
                         {
                             p.DataType = "varchar";
                             p.Length = 36;
                         }
-                        if (c.Name == "UpdateId" && c.PropertyType.FullName.ToLower().IndexOf("guid") >= 0)
+                        if (c.Name == "updateid" && c.PropertyType.FullName.ToLower().IndexOf("guid") >= 0)
                         {
                             p.DataType = "varchar";
                             p.Length = 36;
                         }
-                        if (c.Name == "DeleteId" && c.PropertyType.FullName.ToLower().IndexOf("guid") >= 0)
+                        if (c.Name == "deleteid" && c.PropertyType.FullName.ToLower().IndexOf("guid") >= 0)
                         {
                             p.DataType = "varchar";
                             p.Length = 36;
                         }
-                        if (c.Name == "Id" && c.PropertyType.FullName.ToLower().IndexOf("guid") >= 0)
+                        if (c.Name == "id" && c.PropertyType.FullName.ToLower().IndexOf("guid") >= 0)
                         {
                             p.DataType = "varchar";
                             p.Length = 36;
                         }
-                        if (c.Name == "CreateId" && c.PropertyType.FullName.ToLower().IndexOf("guid") >= 0)
+                        if (c.Name == "createid" && c.PropertyType.FullName.ToLower().IndexOf("guid") >= 0)
                         {
                             p.DataType = "varchar";
                             p.Length = 36;
                         }
-                        if (c.Name == "UpdateId" && c.PropertyType.FullName.ToLower().IndexOf("guid") >= 0)
+                        if (c.Name == "updateid" && c.PropertyType.FullName.ToLower().IndexOf("guid") >= 0)
                         {
                             p.DataType = "varchar";
                             p.Length = 36;
                         }
-                        if (c.Name == "DeleteId" && c.PropertyType.FullName.ToLower().IndexOf("guid") >= 0)
+                        if (c.Name == "deleteid" && c.PropertyType.FullName.ToLower().IndexOf("guid") >= 0)
                         {
                             p.DataType = "varchar";
                             p.Length = 36;
                         }
                         //字段名全小写
-                        if(!p.IsIgnore)
-                        p.DbColumnName = p.DbColumnName.ToLower();
+                        if (!p.IsIgnore)
+                            p.DbColumnName = p.DbColumnName.ToLower();
                     }
                 }
             }, db =>
@@ -88,7 +87,7 @@ namespace GDCMasterDataReceiveApi.SqlSugarCore
                 db.Aop.OnLogExecuting = (sql, parames) =>
                 {
                     //创建表的sql语句
-                    //Console.WriteLine(sql);
+                    Console.WriteLine(sql);
                 };
             });
             Type[] types = typeof(BaseEntity<long>).Assembly.GetTypes()
