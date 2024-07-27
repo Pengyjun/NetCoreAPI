@@ -10,7 +10,7 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// <summary>
         /// 主键
         /// </summary>
-        [SugarColumn(IsPrimaryKey = true,Length =36)]
+        [SugarColumn(IsPrimaryKey = true, Length = 36)]
         public Guid Id { get; set; }
         /// <summary>
         /// 应用程序名称
@@ -37,7 +37,7 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// <summary>
         /// sql语句
         /// </summary>
-        [SugarColumn(ColumnDataType ="text")]
+        [SugarColumn(ColumnDataType = "text")]
         public string? Sql { get; set; }
 
         /// <summary>
@@ -84,7 +84,7 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// <summary>
         /// 异常信息
         /// </summary>
-        [SugarColumn(ColumnDataType="text")]
+        [SugarColumn(ColumnDataType = "text")]
         public string? Exceptions { get; set; }
         /// <summary>
         /// 请求状态码

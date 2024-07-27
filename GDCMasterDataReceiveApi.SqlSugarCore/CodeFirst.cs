@@ -29,7 +29,6 @@ namespace GDCMasterDataReceiveApi.SqlSugarCore
                         c.PropertyType.GetGenericTypeDefinition() == typeof(Nullable<>))
                         {
                             p.IsNullable = true;
-
                         }
                         if (p.IsPrimarykey == false && new NullabilityInfoContext()
                          .Create(c).WriteState is NullabilityState.Nullable)
@@ -87,7 +86,7 @@ namespace GDCMasterDataReceiveApi.SqlSugarCore
                 db.Aop.OnLogExecuting = (sql, parames) =>
                 {
                     //创建表的sql语句
-                    Console.WriteLine(sql);
+                    //Console.WriteLine(sql);
                 };
             });
             Type[] types = typeof(BaseEntity<long>).Assembly.GetTypes()

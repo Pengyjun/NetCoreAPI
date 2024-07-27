@@ -2,6 +2,7 @@
 using GDCMasterDataReceiveApi.Application.Contracts.Dto;
 using GDCMasterDataReceiveApi.Domain.Models;
 using GDCMasterDataReceiveApi.Domain.Shared;
+using GDCMasterDataReceiveApi.Domain.Shared.Utils;
 using SqlSugar;
 
 namespace GDCMasterDataReceiveApi.Application
@@ -35,6 +36,27 @@ namespace GDCMasterDataReceiveApi.Application
             var data = await _dbContext.Queryable<DealingUnit>()
                 .Where(x => x.IsDelete == 1)
                 .ToPageListAsync(requestDto.PageIndex, requestDto.PageIndex, total);
+
+            responseAjaxResult.SuccessResult(data);
+            return responseAjaxResult;
+        }
+        /// <summary>
+        /// 大数量新增测试
+        /// </summary>
+        /// <returns></returns>
+        public async Task<ResponseAjaxResult<bool>> AddTestAsync()
+        {
+            var responseAjaxResult = new ResponseAjaxResult<bool>();
+
+            var res = new DealingUnit()
+            {
+                Id = SnowflakeAlgorithmUtil.GenerateSnowflakeId(),
+            };
+            var list = new List<DealingUnit>();
+            list.Add(res);
+            await _dbContext.Fastest<DealingUnit>().BulkCopyAsync(list);
+
+            responseAjaxResult.SuccessResult(true);
             return responseAjaxResult;
         }
     }

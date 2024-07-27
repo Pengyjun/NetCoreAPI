@@ -25,8 +25,20 @@ namespace GDCMasterDataReceiveApi.Controller
             var a = SnowflakeAlgorithmUtil.GenerateSnowflakeId();
             return null;
         }
+        /// <summary>
+        /// 列表查询测试
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
         [HttpGet("SearchDelineTest")]
         public async Task<ResponseAjaxResult<List<DealingUnit>>> SearchDelineTestAsync([FromQuery] BaseRequestDto requestDto)
             => await _testService.SearchDelineTest(requestDto);
+        /// <summary>
+        /// 大数据插入测试
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost("AddTest")]
+        public async Task<ResponseAjaxResult<bool>> AddTestAsync()
+            => await _testService.AddTestAsync();
     }
 }

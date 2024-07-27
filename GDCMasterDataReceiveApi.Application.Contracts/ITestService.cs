@@ -16,5 +16,10 @@ namespace GDCMasterDataReceiveApi.Application.Contracts
         /// </summary>
         /// <returns></returns>
         public Task<ResponseAjaxResult<List<DealingUnit>>> SearchDelineTest(BaseRequestDto requestDto);
+        /// <summary>
+        /// 大数据插入
+        /// </summary>
+        /// <returns></returns>
+        Task<ResponseAjaxResult<bool>> AddTestAsync();
     }
 }

@@ -6,7 +6,7 @@ namespace GDCMasterDataReceiveApi.Domain.Models
     /// 往来单位表
     /// </summary>
     [SugarTable("t_dealingunit", IsDisabledDelete = true)]
-    public class DealingUnit : BaseEntity<Guid>
+    public class DealingUnit : BaseEntity<long>
     {
         /// <summary>
         /// pomId
