@@ -75,8 +75,10 @@ namespace GDCMasterDataReceiveApi.Application
             var userList = new List<User>();
             userList.Add(user);
             userList.Add(user2);
-            await _dbContext.Fastest<DealingUnit>().BulkCopyAsync(list);
-            await _dbContext.Fastest<User>().BulkCopyAsync(userList);
+            //await _dbContext.Fastest<DealingUnit>().BulkCopyAsync(list);
+            await _dbContext.Insertable(list).ExecuteCommandAsync();
+            //await _dbContext.Fastest<User>().BulkCopyAsync(userList);
+            await _dbContext.Insertable(userList).ExecuteCommandAsync();
 
             responseAjaxResult.SuccessResult(true);
             return responseAjaxResult;
