@@ -675,7 +675,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     #region 干系单位类型
                     var typeList = orgTypeName.Where(x => x.TypeNo == 2).Select(x => x.Type.ToString()).ToList();
                     var orgs = orgList.Where(x => x.ProjectId == item.Id || x.ProjectId == item.MasterProjectId && typeList.Contains(x.Type)).ToList();
-                    var oid = orgs.SingleOrDefault(x => x.Type == "1")?.OrganizationId;
+                    var oid = orgs.FirstOrDefault(x => x.Type == "1")?.OrganizationId;
                     if (oid.HasValue)
                     {
                         item.YeZhuUnitName = unitName.FirstOrDefault(x => x.PomId == oid)?.ZBPNAME_ZH;
