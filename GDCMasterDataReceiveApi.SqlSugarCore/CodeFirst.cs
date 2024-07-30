@@ -85,7 +85,7 @@ namespace GDCMasterDataReceiveApi.SqlSugarCore
             {
                 db.Aop.OnLogExecuting = (sql, parames) =>
                 {
-                    //创建表的sql语句
+                    ////创建表的sql语句
                     //Console.WriteLine(sql);
                 };
             });

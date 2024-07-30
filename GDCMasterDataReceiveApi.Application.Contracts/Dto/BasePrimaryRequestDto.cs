@@ -24,8 +24,5 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto
                 yield return new ValidationResult("Id参数不能为空", new string[] { nameof(Id) });
             }
         }
-
-        
-
     }
 }

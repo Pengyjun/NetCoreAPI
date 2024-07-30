@@ -5,7 +5,7 @@ namespace GDCMasterDataReceiveApi.Domain.Shared.Utils
     /// <summary>
     /// 雪花算法工具类
     /// </summary>
-    public class SnowflakeAlgorithmUtil
+    public class SnowFlakeAlgorithmUtil
     {
         private static object obj =new object();
 

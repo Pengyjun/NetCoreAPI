@@ -35,24 +35,21 @@ namespace GDCMasterDataReceiveApi.SqlSugarCore
                 var sqlParmae = string.Empty;
                 db.Aop.OnLogExecuting = (sql, parames) =>
                 {
-                    if (sql.IndexOf("t_auditlogs") < 0)
-                    {
-                        //if (isOpenSql)
-                        //{
-                        //    //获取无参数化sql  会影响性能  建议调试使用生产环境禁止使用
-                        //    sqlParmae = UtilMethods.GetSqlString(DbType.Dm, sql, parames);
-                        //}
-                        //else
-                        //{
-                        //    sqlParmae = sql;
-                        //}
-                    }
-                    //调试时打印sql语句 生产时注释掉
+                    //if (sql.IndexOf("t_auditlogs") < 0)
+                    //{
+                    //    if (isOpenSql)
+                    //    {
+                    //        //获取无参数化sql  会影响性能  建议调试使用生产环境禁止使用
+                    //        sqlParmae = UtilMethods.GetSqlString(DbType.Dm, sql, parames);
+                    //    }
+                    //    else
+                    //    {
+                    //        sqlParmae = sql;
+                    //    }
+                    //}
+                    ////调试时打印sql语句 生产时注释掉
                     //Console.WriteLine($"{sqlParmae}");
                 };
-                //db.Aop.OnError=(sql) => {
-                //  //记录出错的sql语句
-                //};
                 db.Aop.OnLogExecuted = (sql, parames) =>
                 {
                     #region 审计日志
@@ -145,11 +142,11 @@ namespace GDCMasterDataReceiveApi.SqlSugarCore
                     }
                     if (entityInfo.OperationType == DataFilterType.UpdateByObject)
                     {
-                        if (!(entityInfo.EntityValue is BaseEntity<Guid>))
+                        if (!(entityInfo.EntityValue is BaseEntity<long>))
                         {
                             return;
                         }
-                        var isDelete = ((GDCMasterDataReceiveApi.Domain.BaseEntity<System.Guid>)entityInfo.EntityValue).IsDelete;
+                        var isDelete = ((GDCMasterDataReceiveApi.Domain.BaseEntity<long>)entityInfo.EntityValue).IsDelete;
                         if (isDelete == 1 && entityInfo.PropertyName == "UpdateTime")
                         {
                             entityInfo.SetValue(DateTime.Now);

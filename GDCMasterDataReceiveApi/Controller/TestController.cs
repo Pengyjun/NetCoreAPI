@@ -4,7 +4,6 @@ using GDCMasterDataReceiveApi.Domain.Models;
 using GDCMasterDataReceiveApi.Domain.Shared;
 using GDCMasterDataReceiveApi.Domain.Shared.Utils;
 using Microsoft.AspNetCore.Mvc;
-using System.Data;
 
 namespace GDCMasterDataReceiveApi.Controller
 {
@@ -23,7 +22,7 @@ namespace GDCMasterDataReceiveApi.Controller
         [HttpGet]
         public GlobalCurrentUser Test()
         {
-            var a = SnowflakeAlgorithmUtil.GenerateSnowflakeId();
+            var a = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
             return null;
         }
         /// <summary>
@@ -41,14 +40,5 @@ namespace GDCMasterDataReceiveApi.Controller
         [HttpPost("AddTest")]
         public async Task<ResponseAjaxResult<bool>> AddTestAsync()
             => await _testService.AddTestAsync();
-        /// <summary>
-        /// 统计数据库所有表每天的增量数据
-        /// </summary>
-        /// <param name="schema"></param>
-        /// <param name="date"></param>
-        /// <returns></returns>
-        [HttpGet("GetDailyIncrementalData")]
-        public ResponseAjaxResult<bool> GetDailyIncrementalData([FromQuery] string schema, [FromQuery] DateTime date)
-            => _testService.GetDailyIncrementalData(schema, date);
     }
 }

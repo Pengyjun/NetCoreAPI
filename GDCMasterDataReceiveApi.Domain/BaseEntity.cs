@@ -2,7 +2,6 @@
 
 namespace GDCMasterDataReceiveApi.Domain
 {
-
     /// <summary>
     /// CodeFirst基本实体全部都要继承此类
     /// </summary>
@@ -17,17 +16,18 @@ namespace GDCMasterDataReceiveApi.Domain
         /// <summary>
         /// 创建人Id
         /// </summary>
-        [SugarColumn(IsOnlyIgnoreUpdate = true)]
-        public T? CreateId { get; set; }
+        [SugarColumn(Length = 100)]
+        public string? CreateId { get; set; }
         /// <summary>
         /// 创建时间
         /// </summary>
-        [SugarColumn(ColumnDataType = "datetime",IsOnlyIgnoreUpdate =true)]
+        [SugarColumn(ColumnDataType = "datetime")]
         public DateTime? CreateTime { get; set; }
         /// <summary>
         /// 更新人Id
         /// </summary>
-        public T? UpdateId { get; set; }
+        [SugarColumn(Length = 100)]
+        public string? UpdateId { get; set; }
         /// <summary>
         /// 更新时间
         /// </summary>
@@ -36,7 +36,8 @@ namespace GDCMasterDataReceiveApi.Domain
         /// <summary>
         /// 删除人Id
         /// </summary>
-        public T? DeleteId { get; set; }
+        [SugarColumn(Length = 100)]
+        public string? DeleteId { get; set; }
         /// <summary>
         /// 删除时间
         /// </summary>
