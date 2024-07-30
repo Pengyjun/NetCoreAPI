@@ -25,7 +25,6 @@ namespace GDCMasterDataReceiveApi.Application.MainTableOfStatisticsService
             this._dbContext = dbContext;
         }
 
-        #region 原来的
         /// <summary>
         /// 统计当前模式所有表（当前指定数据库） 
         /// </summary>
@@ -42,7 +41,7 @@ namespace GDCMasterDataReceiveApi.Application.MainTableOfStatisticsService
             using (var connection = new DmConnection(AppsettingsHelper.GetValue("ConnectionStrings:ConnectionString")))
             {
                 connection.Open();
-                var tables = GetTables(connection, requestDto.Schema);
+                var tables = GetTables(connection, requestDto.Schema, requestDto.ScreenTables);
                 var hourNowDay = Convert.ToInt32(requestDto.Date.ToString("yyyyMMddHH"));
                 var nowDay = Convert.ToInt32(requestDto.Date.ToString("yyyyMMdd"));
                 var incrementalData = new List<DataTable>();
@@ -221,8 +220,9 @@ namespace GDCMasterDataReceiveApi.Application.MainTableOfStatisticsService
         /// </summary>
         /// <param name="connection"></param>
         /// <param name="schema"></param>
+        /// <param name="screenTables">过滤掉的表</param>
         /// <returns></returns>
-        private List<string> GetTables(DmConnection connection, string schema)
+        private List<string> GetTables(DmConnection connection, string schema, List<string>? screenTables)
         {
             var tables = new List<string>();
             var query = $"SELECT TABLE_NAME FROM ALL_TABLES WHERE OWNER = '{schema}'";
@@ -238,6 +238,14 @@ namespace GDCMasterDataReceiveApi.Application.MainTableOfStatisticsService
                         && reader.GetString(0) != "t_maintableofstatistics")
                     {
                         tables.Add(reader.GetString(0));
+                    }
+                }
+                if (screenTables != null && screenTables.Any())
+                {
+                    //过滤掉不需要统计的表
+                    foreach (var table in screenTables)
+                    {
+                        tables = tables.Where(x => x != table).ToList();
                     }
                 }
             }
@@ -263,6 +271,5 @@ namespace GDCMasterDataReceiveApi.Application.MainTableOfStatisticsService
                 return dataTable;
             }
         }
-        #endregion
     }
 }

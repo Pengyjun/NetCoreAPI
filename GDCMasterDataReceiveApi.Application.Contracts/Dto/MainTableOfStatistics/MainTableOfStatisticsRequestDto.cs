@@ -8,13 +8,17 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.MainTableOfStatistic
     public class MainTableOfStatisticsRequestDto : IValidatableObject
     {
         /// <summary>
-        /// 当前指定数据库(模式名)
+        /// 当前指定数据库(模式名:SYSDBA)
         /// </summary>
         public string Schema { get; set; }
         /// <summary>
-        /// 日期(精确到小时)
+        /// 日期(精确到小时yyyy-MM-dd HH:2024-07-24 08)
         /// </summary>
         public DateTime Date { get; set; }
+        /// <summary>
+        /// 需要过滤的表/不需要统计的表
+        /// </summary>
+        public List<string>? ScreenTables { get; set; }
         /// <summary>
         /// 入参校验
         /// </summary>
