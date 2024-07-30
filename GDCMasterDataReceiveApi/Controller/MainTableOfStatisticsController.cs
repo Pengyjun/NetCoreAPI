@@ -4,7 +4,7 @@ using GDCMasterDataReceiveApi.Domain.Shared;
 using GDCMasterDataReceiveApi.Domain.Shared.Annotation;
 using Microsoft.AspNetCore.Mvc;
 
-namespace GDCMasterDataReceiveApi.Controller.MainTableOfStatistics
+namespace GDCMasterDataReceiveApi.Controller
 {
     /// <summary>
     /// 统计数据库每日增改量
@@ -22,7 +22,7 @@ namespace GDCMasterDataReceiveApi.Controller.MainTableOfStatistics
         /// </summary>
         public MainTableOfStatisticsController(IMainTableOfStatisticsService mainTableOfStatisticsService)
         {
-            this._mainTableOfStatisticsService = mainTableOfStatisticsService;
+            _mainTableOfStatisticsService = mainTableOfStatisticsService;
         }
         /// <summary>
         /// 统计当前模式所有表（当前指定数据库 按小时更新）
