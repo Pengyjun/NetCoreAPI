@@ -46,9 +46,9 @@ namespace GDCMasterDataReceiveApi.Application.MainTableOfStatisticsService
                 {
                     connection.Open();
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
-                    responseAjaxResult.FailResult(HttpStatusCode.LinkFail, "链接数据库失败");
+                    responseAjaxResult.FailResult(HttpStatusCode.LinkFail, "链接数据库失败" + ex.Message);
                     return responseAjaxResult;
                 }
                 var tables = GetTables(connection, requestDto.Schema, requestDto.ScreenTables);
