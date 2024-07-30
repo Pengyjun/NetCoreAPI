@@ -188,5 +188,9 @@
         /// 授权失败
         /// </summary>
         AuthoryFail= 100037,
+        /// <summary>
+        /// 链接失败
+        /// </summary>
+        LinkFail= 100038,
     }
 }

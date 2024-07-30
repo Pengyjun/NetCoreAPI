@@ -3,6 +3,7 @@ using GDCMasterDataReceiveApi.Application.Contracts.Dto.MainTableOfStatistics;
 using GDCMasterDataReceiveApi.Application.Contracts.IMainTableOfStatistics;
 using GDCMasterDataReceiveApi.Domain.Models;
 using GDCMasterDataReceiveApi.Domain.Shared;
+using GDCMasterDataReceiveApi.Domain.Shared.Enums;
 using GDCMasterDataReceiveApi.Domain.Shared.Utils;
 using SqlSugar;
 using System.Data;
@@ -38,9 +39,18 @@ namespace GDCMasterDataReceiveApi.Application.MainTableOfStatisticsService
             List<MainTableOfStatisticsDetails> insertMainTableOfStatisticsDetailsList = new List<MainTableOfStatisticsDetails>();
             List<MainTableOfStatisticsDetails> modifyMainTableOfStatisticsDetailsList = new List<MainTableOfStatisticsDetails>();
 
-            using (var connection = new DmConnection(AppsettingsHelper.GetValue("ConnectionStrings:ConnectionString")))
+            string connectionString = $"Server={requestDto.Server};User Id={requestDto.UserId};PWD={requestDto.Pwd};SCHEMA={requestDto.Schema};DATABASE={requestDto.DataBase}";
+            using (var connection = new DmConnection(connectionString))//swagger端口8881
             {
-                connection.Open();
+                try
+                {
+                    connection.Open();
+                }
+                catch (Exception)
+                {
+                    responseAjaxResult.FailResult(HttpStatusCode.LinkFail, "链接数据库失败");
+                    return responseAjaxResult;
+                }
                 var tables = GetTables(connection, requestDto.Schema, requestDto.ScreenTables);
                 var hourNowDay = Convert.ToInt32(requestDto.Date.ToString("yyyyMMddHH"));
                 var nowDay = Convert.ToInt32(requestDto.Date.ToString("yyyyMMdd"));
