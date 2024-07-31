@@ -34,10 +34,7 @@
 #COPY --from=publish /app/publish .
 #ENTRYPOINT ["dotnet", "GDCMasterDataReceiveApi.dll"]
 
-#FROM net5libgdiplus:latest
-# 此阶段用于在快速模式(默认为调试配置)下从 VS 运行时
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
-#FROM aspnetwithzip:6.0 AS base
 WORKDIR /app
 EXPOSE 80
 ##设置时区
