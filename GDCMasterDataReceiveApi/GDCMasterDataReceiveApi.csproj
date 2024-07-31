@@ -6,12 +6,15 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <InvariantGlobalization>true</InvariantGlobalization>
 	  <GenerateDocumentationFile>true</GenerateDocumentationFile>
+	  <UserSecretsId>25d06966-3597-4206-9b8a-79edeb33ca04</UserSecretsId>
+	  <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Autofac" Version="8.0.0" />
     <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="9.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.7" />
+    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.21.0" />
     <PackageReference Include="Serilog" Version="4.0.0" />
     <PackageReference Include="Serilog.AspNetCore" Version="8.0.1" />
     <PackageReference Include="Serilog.Expressions" Version="5.0.0" />
