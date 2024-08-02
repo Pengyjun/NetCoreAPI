@@ -323,6 +323,8 @@ namespace GDCMasterDataReceiveApi.Application.MainTableOfStatisticsService
                     //获取当前表截止到现在位置的所有数据
                     var ids = await GetIncrementalDataAsync(connection, table);
                     #region 统计主表数据
+                    //获取一小时前的数据
+                    var oneHourData = nowDayAllData.FirstOrDefault(x => x.TableName == table && x.HourOfTheDay == oneHourGo);
                     //新增统计当前最新的主表数据
                     //主表是否已经存在数据
                     var isExist = nowDayAllData.FirstOrDefault(x => x.TableName == table && x.HourOfTheDay == nowHour);
@@ -330,7 +332,7 @@ namespace GDCMasterDataReceiveApi.Application.MainTableOfStatisticsService
                     if (isExist != null)//数据修改
                     {
                         snowFlakId = isExist.Id;
-                        isExist.InsertNums = ids.Count() - isExist.BeforeInsertNums;
+                        isExist.InsertNums = oneHourData != null ? ids.Count() - oneHourData.BeforeInsertNums : ids.Count();
                         isExist.UpdateTime = DateTime.Now;
                         isExist.BeforeInsertNums = ids.Count();
                         isExist.Timestamp = Utils.GetTimeSpan();
@@ -338,8 +340,6 @@ namespace GDCMasterDataReceiveApi.Application.MainTableOfStatisticsService
                     }
                     else
                     {
-                        //获取一小时前的数据
-                        var oneHourData = nowDayAllData.FirstOrDefault(x => x.TableName == table && x.HourOfTheDay == oneHourGo);
                         snowFlakId = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
                         MainTableOfStatistics mainTableOfStatistics = new MainTableOfStatistics()
                         {
@@ -365,7 +365,7 @@ namespace GDCMasterDataReceiveApi.Application.MainTableOfStatisticsService
 
             if (modifyMainTableOfStatisticsList != null && modifyMainTableOfStatisticsList.Count() > 0)
             {
-                await _dbContext.Fastest<MainTableOfStatistics>().BulkUpdateAsync(modifyMainTableOfStatisticsList, new string[] { "id" }, new string[] { "beforeinsertnums", "modifynums", "updatetime", "timestamp" });
+                await _dbContext.Fastest<MainTableOfStatistics>().BulkUpdateAsync(modifyMainTableOfStatisticsList, new string[] { "id" }, new string[] { "insertnums","beforeinsertnums", "modifynums", "updatetime", "timestamp" });
             }
 
             responseAjaxResult.SuccessResult(true);
