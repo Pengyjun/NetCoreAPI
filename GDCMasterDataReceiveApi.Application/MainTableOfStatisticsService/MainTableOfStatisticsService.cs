@@ -354,7 +354,7 @@ namespace GDCMasterDataReceiveApi.Application.MainTableOfStatisticsService
                     if (isExist != null)//数据修改
                     {
                         snowFlakId = isExist.Id;
-                        isExist.InsertNums = table.TableRows - beforeNums;
+                        isExist.InsertNums = (table.TableRows - beforeNums) < 0 ? 0 : table.TableRows - beforeNums;
                         isExist.UpdateTime = DateTime.Now;
                         isExist.BeforeInsertNums = table.TableRows;
                         isExist.Timestamp = Utils.GetTimeSpan();
@@ -366,7 +366,7 @@ namespace GDCMasterDataReceiveApi.Application.MainTableOfStatisticsService
                         MainTableOfStatistics mainTableOfStatistics = new MainTableOfStatistics()
                         {
                             Id = snowFlakId,
-                            InsertNums = table.TableRows - beforeNums,
+                            InsertNums = (table.TableRows - beforeNums) < 0 ? 0 : table.TableRows - beforeNums,
                             DateDay = nowDay,
                             HourOfTheDay = nowHour,
                             TableName = table.TableName,
