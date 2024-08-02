@@ -561,7 +561,8 @@ namespace GDCMasterDataReceiveApi.Application.MainTableOfStatisticsService
                     }
                     foreach (var table in tables)
                     {
-                        sql.Append($"alter table {schema}.{table} add column push int default 1 ");
+                        //sql.Append($"alter table {schema}.{table} add column push int default 1 ");
+                        sql.Append($"update  {schema}.{table} set push = 1 ");
                         sql.Append($" union all ");
                     }
                     sql = sql.Remove(sql.Length - 10, 10);
