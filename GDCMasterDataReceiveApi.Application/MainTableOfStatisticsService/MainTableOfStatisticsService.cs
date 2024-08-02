@@ -5,9 +5,14 @@ using GDCMasterDataReceiveApi.Domain.Models;
 using GDCMasterDataReceiveApi.Domain.Shared;
 using GDCMasterDataReceiveApi.Domain.Shared.Enums;
 using GDCMasterDataReceiveApi.Domain.Shared.Utils;
+using GDCMasterDataReceiveApi.SqlSugarCore;
 using MySqlConnector;
 using SqlSugar;
+using SqlSugar.Extensions;
 using System.Data;
+using System.Linq;
+using System.Reflection.PortableExecutable;
+using System.Text;
 
 namespace GDCMasterDataReceiveApi.Application.MainTableOfStatisticsService
 {
@@ -307,8 +312,6 @@ namespace GDCMasterDataReceiveApi.Application.MainTableOfStatisticsService
                     responseAjaxResult.FailResult(HttpStatusCode.LinkFail, "链接失败：" + ex.Message);
                     return responseAjaxResult;
                 }
-                // 获取所有表名
-                var tables = await GetTablesAsync(connection, requestDto.ScreenTables);
                 //获取当前时间主表所有数据
                 var nowDay = Convert.ToInt32(DateTime.Now.ToString("yyyyMMdd"));
                 var nowHour = Convert.ToInt32(DateTime.Now.ToString("yyyyMMddHH"));
@@ -317,24 +320,43 @@ namespace GDCMasterDataReceiveApi.Application.MainTableOfStatisticsService
                     .Where(x => x.IsDelete == 1 && x.DateDay == nowDay)
                     .ToListAsync();
 
+                if (requestDto.IsCreateView)//创建视图/修改视图
+                {
+                    bool success = CreateViewGetTables(requestDto.ViewName, connectionString, requestDto.DataBase, requestDto.ScreenTables);
+                    if (!success)
+                    {
+                        responseAjaxResult.FailResult(HttpStatusCode.ViewFail, "创建/修改视图失败");
+                        return responseAjaxResult;
+                    }
+                }
+                //获取视图数据
+                //获取当前表截止到现在位置的所有数量字典集合
+                var tables = GetDicTables(connectionString, requestDto.ViewName);
                 // 遍历每个表，获取每日增量数据
                 foreach (var table in tables)
                 {
-                    //获取当前表截止到现在位置的所有数据
-                    var ids = await GetIncrementalDataAsync(connection, table);
                     #region 统计主表数据
-                    //获取一小时前的数据
-                    var oneHourData = nowDayAllData.FirstOrDefault(x => x.TableName == table && x.HourOfTheDay == oneHourGo);
+                    int beforeNums = 0;
+                    //获取前一小时的数据
+                    var oneHourData = nowDayAllData.FirstOrDefault(x => x.TableName == table.TableName && x.HourOfTheDay == oneHourGo);
+                    if (oneHourData == null)
+                    {
+                        //如果前一小时没有数据 获取当天最新的数据 并且!=此刻的时间
+                        var nowDayFirst = nowDayAllData.OrderByDescending(x => x.HourOfTheDay).FirstOrDefault(x => x.TableName == table.TableName && x.HourOfTheDay != nowHour);
+                        beforeNums = nowDayFirst == null ? table.TableRows : nowDayFirst.BeforeInsertNums;
+                    }
+                    else
+                    { beforeNums = oneHourData.BeforeInsertNums; }
                     //新增统计当前最新的主表数据
                     //主表是否已经存在数据
-                    var isExist = nowDayAllData.FirstOrDefault(x => x.TableName == table && x.HourOfTheDay == nowHour);
+                    var isExist = nowDayAllData.FirstOrDefault(x => x.TableName == table.TableName && x.HourOfTheDay == nowHour);
                     long snowFlakId = new long();
                     if (isExist != null)//数据修改
                     {
                         snowFlakId = isExist.Id;
-                        isExist.InsertNums = oneHourData != null ? ids.Count() - oneHourData.BeforeInsertNums : ids.Count();
+                        isExist.InsertNums = table.TableRows - beforeNums;
                         isExist.UpdateTime = DateTime.Now;
-                        isExist.BeforeInsertNums = ids.Count();
+                        isExist.BeforeInsertNums = table.TableRows;
                         isExist.Timestamp = Utils.GetTimeSpan();
                         modifyMainTableOfStatisticsList.Add(isExist);
                     }
@@ -344,12 +366,12 @@ namespace GDCMasterDataReceiveApi.Application.MainTableOfStatisticsService
                         MainTableOfStatistics mainTableOfStatistics = new MainTableOfStatistics()
                         {
                             Id = snowFlakId,
-                            InsertNums = oneHourData != null ? ids.Count() - oneHourData.BeforeInsertNums : ids.Count(),
+                            InsertNums = table.TableRows - beforeNums,
                             DateDay = nowDay,
                             HourOfTheDay = nowHour,
-                            TableName = table,
+                            TableName = table.TableName,
                             CreateTime = DateTime.Now,
-                            BeforeInsertNums = ids.Count(),
+                            BeforeInsertNums = table.TableRows,
                             Timestamp = Utils.GetTimeSpan()
                         };
                         insertMainTableOfStatisticsList.Add(mainTableOfStatistics);
@@ -365,61 +387,161 @@ namespace GDCMasterDataReceiveApi.Application.MainTableOfStatisticsService
 
             if (modifyMainTableOfStatisticsList != null && modifyMainTableOfStatisticsList.Count() > 0)
             {
-                await _dbContext.Fastest<MainTableOfStatistics>().BulkUpdateAsync(modifyMainTableOfStatisticsList, new string[] { "id" }, new string[] { "insertnums","beforeinsertnums", "modifynums", "updatetime", "timestamp" });
+                await _dbContext.Fastest<MainTableOfStatistics>().BulkUpdateAsync(modifyMainTableOfStatisticsList, new string[] { "id" }, new string[] { "insertnums", "beforeinsertnums", "modifynums", "updatetime", "timestamp" });
             }
 
             responseAjaxResult.SuccessResult(true);
             return responseAjaxResult;
         }
-
         /// <summary>
-        /// 获取当前数据库的所有表名
+        /// 获取字典tables
+        /// </summary>
+        /// <param name="connstring"></param>
+        /// <param name="viewName"></param>
+        /// <returns></returns>
+        private static List<MainTableDictoryDto> GetDicTables(string connstring, string viewName)
+        {
+            var dic = new List<Dictionary<object, object>>();
+            //获取视图数据
+            string sql = $"select * from {viewName}";
+            using (var connection = new MySqlConnection(connstring))
+            {
+                connection.Open();
+                using (var command = new MySqlCommand(sql, connection))
+                {
+                    var reader = command.ExecuteReader();
+                    while (reader.Read())
+                    {
+                        var a = reader.GetValue(0);
+                        var b = reader.GetString(1);
+
+                        var c = new Dictionary<object, object>();
+                        c.Add(b, a);
+                        dic.Add(c);
+                    }
+                }
+
+            }
+
+            var tables = new List<MainTableDictoryDto>();
+
+            foreach (var item in dic)
+            {
+                var dicList = item.ToList();
+                foreach (var d in dicList)
+                {
+                    tables.Add(new MainTableDictoryDto
+                    {
+                        TableName = d.Key.ToString(),
+                        TableRows = Convert.ToInt32(d.Value)
+                    });
+                }
+            }
+
+
+            return tables;
+        }
+        /// <summary>
+        /// 获取指定表的所有数据
         /// </summary>
         /// <param name="connection"></param>
-        /// <param name="screenTables"></param>
+        /// <param name="table_schema"></param>
         /// <returns></returns>
-        private static async Task<List<string>> GetTablesAsync(MySqlConnection connection, List<string>? screenTables)
+        private static async Task<List<Dictionary<object, object>>> GetIncrementalDataAsync(MySqlConnection connection, string table_schema)
         {
-            var tables = new List<string>();
-            var command = new MySqlCommand("SHOW TABLES", connection);
+
+            var data = new List<Dictionary<object, object>>();
+            var sqls = new List<string>();
+            //var command = new MySqlCommand($"select concat('select \"', TABLE_name, '\", count(*) from ', TABLE_SCHEMA, '.',TABLE_name) from information_schema.tables  WHERE table_schema = @table_schema;", connection);
+            var command = new MySqlCommand($" SELECT GROUP_CONCAT(CONCAT('SELECT ''', table_name, ''' AS table_name, COUNT(*) AS actual_row_count FROM `', @table_schema, '`.`', table_name, '`') SEPARATOR ' UNION ALL ')\r\n    FROM information_schema.tables \r\n    WHERE table_schema = @table_schema\r\n    AND table_type = 'BASE TABLE';", connection);
+            command.Parameters.AddWithValue("@table_schema", table_schema); // 使用参数化查询以防止SQL注入
 
             using (var reader = await command.ExecuteReaderAsync())
             {
                 while (await reader.ReadAsync())
                 {
-                    tables.Add(reader.GetString(0));
-                }
-                //初始不包含统计两张表
-                tables = tables.Where(x => x != "t_maintableofstatistics" && x != "t_maintableofstatisticsdetails" && x != "t_auditlogs").ToList();
-                if (screenTables != null && screenTables.Any())
-                {
-                    //过滤不需要的表
-                    foreach (var table in screenTables)
-                    {
-                        tables = tables.Where(x => x != table).ToList();
-                    }
+                    var sqlQuery = reader.GetString(0); // 获取查询结果
+                    sqls.Add(sqlQuery); // 添加查询结果到列表
                 }
             }
-            return tables;
+            foreach (var item in sqls)
+            {
+                using (var countCommand = new MySqlCommand(item, connection))
+                {
+                    var table = await countCommand.ExecuteReaderAsync();
+                    var dic = new Dictionary<object, object>()
+                    {
+
+                    };
+                }
+            }
+
+            return data; // 返回结果
         }
 
         /// <summary>
-        /// 获取指定表的所有数据
+        /// 获取所有表创建视图
         /// </summary>
-        /// <param name="connection"></param>
-        /// <param name="tableName"></param>
+        /// <param name="viewName"></param>
+        /// <param name="connstring"></param>
+        /// <param name="schema"></param>
+        /// <param name="screenTables">过滤掉的表</param>
         /// <returns></returns>
-        private static async Task<List<string>> GetIncrementalDataAsync(MySqlConnection connection, string tableName)
+        private static bool CreateViewGetTables(string viewName, string connstring, string schema, List<string>? screenTables)
         {
-            var data = new List<string>(500); // 预设容量
-            var command = new MySqlCommand($"SELECT id FROM {tableName};", connection);
-            await using var reader = await command.ExecuteReaderAsync();
-            while (await reader.ReadAsync())
+            var tables = new List<string>();
+            var sql = new StringBuilder();
+            sql.Append($"DROP VIEW IF EXISTS {viewName} ; create VIEW {viewName} as ");
+            var query = $"SELECT table_name FROM information_schema.tables WHERE table_schema = '{schema}' AND table_type = 'BASE TABLE';";
+            try
             {
-                data.Add(reader.GetString(0));
+                using (var connection = new MySqlConnection(connstring))
+                {
+                    connection.Open();
+                    using (var command = new MySqlCommand(query, connection))
+                    {
+                        var reader = command.ExecuteReader();
+                        while (reader.Read())
+                        {
+                            //排除掉审计表&统计增量表&统计增量表详细
+                            if (!reader.GetString(0).Contains("##")
+                                && reader.GetString(0) != "t_auditlogs"
+                                && reader.GetString(0) != "t_maintableofstatisticsdetails"
+                                && reader.GetString(0) != "t_maintableofstatistics")
+                            {
+                                tables.Add(reader.GetString(0));
+                            }
+                        }
+                        if (screenTables != null && screenTables.Any())
+                        {
+                            //过滤掉不需要统计的表
+                            foreach (var table in screenTables)
+                            {
+                                tables = tables.Where(x => x != table).ToList();
+                            }
+                        }
+                        foreach (var table in tables)
+                        {
+                            sql.Append($"select Count(*) as tablerows,'{table}' as 'tablename' from {schema}.{table}");
+                            sql.Append($" union all ");
+                        }
+                        sql = sql.Remove(sql.Length - 10, 10);
+                        connection.Close();
+                    }
+                    using (var cmd = new MySqlCommand(sql.ToString(), connection))
+                    {
+                        connection.Open();
+                        cmd.ExecuteNonQuery();
+                    }
+                }
             }
-            return data; // 返回完整的数据列表
+            catch (Exception ex)
+            {
+                throw;
+            }
+            return true;
         }
+
         #endregion
     }
 }

@@ -15,4 +15,18 @@
         public string InsertOrModify { get; set; }
         public DateTime? UpdateTime { get; set; }
     }
+    /// <summary>
+    /// 查询到的字典表转换dto
+    /// </summary>
+    public class MainTableDictoryDto
+    {
+        /// <summary>
+        /// 表名
+        /// </summary>
+        public string? TableName { get; set; }
+        /// <summary>
+        /// 表行数
+        /// </summary>
+        public int TableRows { get; set; }
+    }
 }

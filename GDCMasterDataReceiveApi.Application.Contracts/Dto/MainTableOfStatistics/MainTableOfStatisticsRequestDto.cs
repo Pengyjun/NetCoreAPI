@@ -88,6 +88,14 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.MainTableOfStatistic
         /// </summary>
         public string Server { get; set; }
         /// <summary>
+        /// 是否需要创建/修改视图 true是
+        /// </summary>
+        public bool IsCreateView {  get; set; }
+        /// <summary>
+        /// 查询的视图名称
+        /// </summary>
+        public string ViewName { get; set; }
+        /// <summary>
         /// 端口
         /// </summary>
         public string Port { get; set; }
@@ -129,6 +137,10 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.MainTableOfStatistic
             if (string.IsNullOrEmpty(DataBase))
             {
                 yield return new ValidationResult("数据库名不能为空", new string[] { nameof(DataBase) });
+            }
+            if (string.IsNullOrEmpty(ViewName))
+            {
+                yield return new ValidationResult("视图名称为空", new string[] { nameof(ViewName) });
             }
         }
     }

@@ -192,5 +192,9 @@
         /// 链接失败
         /// </summary>
         LinkFail= 100038,
+        /// <summary>
+        /// 视图错误
+        /// </summary>
+        ViewFail= 100039,
     }
 }
