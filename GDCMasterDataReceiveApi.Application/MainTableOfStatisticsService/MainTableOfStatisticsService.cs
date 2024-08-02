@@ -5,13 +5,9 @@ using GDCMasterDataReceiveApi.Domain.Models;
 using GDCMasterDataReceiveApi.Domain.Shared;
 using GDCMasterDataReceiveApi.Domain.Shared.Enums;
 using GDCMasterDataReceiveApi.Domain.Shared.Utils;
-using GDCMasterDataReceiveApi.SqlSugarCore;
 using MySqlConnector;
 using SqlSugar;
-using SqlSugar.Extensions;
 using System.Data;
-using System.Linq;
-using System.Reflection.PortableExecutable;
 using System.Text;
 
 namespace GDCMasterDataReceiveApi.Application.MainTableOfStatisticsService
@@ -478,7 +474,6 @@ namespace GDCMasterDataReceiveApi.Application.MainTableOfStatisticsService
 
             return data; // 返回结果
         }
-
         /// <summary>
         /// 获取所有表创建视图
         /// </summary>
@@ -542,6 +537,40 @@ namespace GDCMasterDataReceiveApi.Application.MainTableOfStatisticsService
             return true;
         }
 
+        private static bool aa(string connstring, string schema)
+        {
+            var query = $"SELECT table_name FROM information_schema.tables WHERE table_schema = '{schema}' AND table_type = 'BASE TABLE';";
+            var sql = new StringBuilder();
+            var tables = new List<string>();
+            using (var connection = new MySqlConnection(connstring))
+            {
+                connection.Open();
+                using (var command = new MySqlCommand(query, connection))
+                {
+                    var reader = command.ExecuteReader();
+                    while (reader.Read())
+                    {
+                        //排除掉审计表&统计增量表&统计增量表详细
+                        if (!reader.GetString(0).Contains("##")
+                            && reader.GetString(0) != "t_auditlogs"
+                            && reader.GetString(0) != "t_maintableofstatisticsdetails"
+                            && reader.GetString(0) != "t_maintableofstatistics")
+                        {
+                            tables.Add(reader.GetString(0));
+                        }
+                    }
+                    foreach (var table in tables)
+                    {
+                        sql.Append($"alter table {schema}.{table} add column push int default 1 ");
+                        sql.Append($" union all ");
+                    }
+                    sql = sql.Remove(sql.Length - 10, 10);
+                    connection.Close();
+                }
+            }
+            return true;
+
+        }
         #endregion
     }
 }
