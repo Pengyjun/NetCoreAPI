@@ -5,6 +5,7 @@ using GDCMasterDataReceiveApi.Domain.Models;
 using GDCMasterDataReceiveApi.Domain.Shared;
 using GDCMasterDataReceiveApi.Domain.Shared.Enums;
 using GDCMasterDataReceiveApi.Domain.Shared.Utils;
+using MySqlConnector;
 using SqlSugar;
 using System.Data;
 
@@ -24,7 +25,7 @@ namespace GDCMasterDataReceiveApi.Application.MainTableOfStatisticsService
         {
             this._dbContext = dbContext;
         }
-
+        #region 达梦链接方式
         /// <summary>
         /// 统计当前模式所有表（当前指定数据库） 
         /// </summary>
@@ -280,5 +281,145 @@ namespace GDCMasterDataReceiveApi.Application.MainTableOfStatisticsService
                 return dataTable;
             }
         }
+        #endregion
+
+        #region Mysql链接方式
+        /// <summary>
+        /// 统计当前模式所有表（Mysql当前指定数据库） 
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        public async Task<ResponseAjaxResult<bool>> InsertModifyHourIncrementalData(MainTableOfStatisticsMysqlRequestDto requestDto)
+        {
+            var responseAjaxResult = new ResponseAjaxResult<bool>();
+            List<MainTableOfStatistics> insertMainTableOfStatisticsList = new List<MainTableOfStatistics>();
+            List<MainTableOfStatistics> modifyMainTableOfStatisticsList = new List<MainTableOfStatistics>();
+
+            string connectionString = $"server={requestDto.Server};port={requestDto.Port};user={requestDto.User};password={requestDto.PassWord};database={requestDto.DataBase};sslMode=None;AllowLoadLocalInfile=true";
+            using (var connection = new MySqlConnection(connectionString))
+            {
+                try
+                {
+                    connection.Open();
+                }
+                catch (Exception ex)
+                {
+                    responseAjaxResult.FailResult(HttpStatusCode.LinkFail, "链接失败：" + ex.Message);
+                    return responseAjaxResult;
+                }
+                // 获取所有表名
+                var tables = await GetTablesAsync(connection, requestDto.ScreenTables);
+                //获取当前时间主表所有数据
+                var nowDay = Convert.ToInt32(DateTime.Now.ToString("yyyyMMdd"));
+                var nowHour = Convert.ToInt32(DateTime.Now.ToString("yyyyMMddHH"));
+                var oneHourGo = Convert.ToInt32(DateTime.Now.AddHours(-1).ToString("yyyyMMddHH"));
+                var nowDayAllData = await _dbContext.Queryable<MainTableOfStatistics>()
+                    .Where(x => x.IsDelete == 1 && x.DateDay == nowDay)
+                    .ToListAsync();
+
+                // 遍历每个表，获取每日增量数据
+                foreach (var table in tables)
+                {
+                    //获取当前表截止到现在位置的所有数据
+                    var ids = await GetIncrementalDataAsync(connection, table);
+                    #region 统计主表数据
+                    //新增统计当前最新的主表数据
+                    //主表是否已经存在数据
+                    var isExist = nowDayAllData.FirstOrDefault(x => x.TableName == table && x.HourOfTheDay == nowHour);
+                    long snowFlakId = new long();
+                    if (isExist != null)//数据修改
+                    {
+                        snowFlakId = isExist.Id;
+                        isExist.InsertNums = ids.Count() - isExist.BeforeInsertNums;
+                        isExist.UpdateTime = DateTime.Now;
+                        isExist.BeforeInsertNums = ids.Count();
+                        isExist.Timestamp = Utils.GetTimeSpan();
+                        modifyMainTableOfStatisticsList.Add(isExist);
+                    }
+                    else
+                    {
+                        //获取一小时前的数据
+                        var oneHourData = nowDayAllData.FirstOrDefault(x => x.TableName == table && x.HourOfTheDay == oneHourGo);
+                        snowFlakId = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
+                        MainTableOfStatistics mainTableOfStatistics = new MainTableOfStatistics()
+                        {
+                            Id = snowFlakId,
+                            InsertNums = oneHourData != null ? ids.Count() - oneHourData.BeforeInsertNums : ids.Count(),
+                            DateDay = nowDay,
+                            HourOfTheDay = nowHour,
+                            TableName = table,
+                            CreateTime = DateTime.Now,
+                            BeforeInsertNums = ids.Count(),
+                            Timestamp = Utils.GetTimeSpan()
+                        };
+                        insertMainTableOfStatisticsList.Add(mainTableOfStatistics);
+                    }
+                    #endregion
+                }
+            }
+
+            if (insertMainTableOfStatisticsList != null && insertMainTableOfStatisticsList.Count() > 0)
+            {
+                await _dbContext.Fastest<MainTableOfStatistics>().PageSize(100000).BulkCopyAsync(insertMainTableOfStatisticsList);
+            }
+
+            if (modifyMainTableOfStatisticsList != null && modifyMainTableOfStatisticsList.Count() > 0)
+            {
+                await _dbContext.Fastest<MainTableOfStatistics>().BulkUpdateAsync(modifyMainTableOfStatisticsList, new string[] { "id" }, new string[] { "beforeinsertnums", "modifynums", "updatetime", "timestamp" });
+            }
+
+            responseAjaxResult.SuccessResult(true);
+            return responseAjaxResult;
+        }
+
+        /// <summary>
+        /// 获取当前数据库的所有表名
+        /// </summary>
+        /// <param name="connection"></param>
+        /// <param name="screenTables"></param>
+        /// <returns></returns>
+        private static async Task<List<string>> GetTablesAsync(MySqlConnection connection, List<string>? screenTables)
+        {
+            var tables = new List<string>();
+            var command = new MySqlCommand("SHOW TABLES", connection);
+
+            using (var reader = await command.ExecuteReaderAsync())
+            {
+                while (await reader.ReadAsync())
+                {
+                    tables.Add(reader.GetString(0));
+                }
+                //初始不包含统计两张表
+                tables = tables.Where(x => x != "t_maintableofstatistics" && x != "t_maintableofstatisticsdetails" && x != "t_auditlogs").ToList();
+                if (screenTables != null && screenTables.Any())
+                {
+                    //过滤不需要的表
+                    foreach (var table in screenTables)
+                    {
+                        tables = tables.Where(x => x != table).ToList();
+                    }
+                }
+            }
+            return tables;
+        }
+
+        /// <summary>
+        /// 获取指定表的所有数据
+        /// </summary>
+        /// <param name="connection"></param>
+        /// <param name="tableName"></param>
+        /// <returns></returns>
+        private static async Task<List<string>> GetIncrementalDataAsync(MySqlConnection connection, string tableName)
+        {
+            var data = new List<string>(500); // 预设容量
+            var command = new MySqlCommand($"SELECT id FROM {tableName};", connection);
+            await using var reader = await command.ExecuteReaderAsync();
+            while (await reader.ReadAsync())
+            {
+                data.Add(reader.GetString(0));
+            }
+            return data; // 返回完整的数据列表
+        }
+        #endregion
     }
 }

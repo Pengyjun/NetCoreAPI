@@ -11,7 +11,8 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// <summary>
         /// 增改量主表id
         /// </summary>
-        [SugarColumn(ColumnDataType = "number", Length = 19)]
+        [SugarColumn(ColumnDataType = "bigint", Length = 20)]//mysql修改为20
+        //[SugarColumn(ColumnDataType = "number", Length = 19)]
         public long MainTableOfStatisticsId { get; set; }
         /// <summary>
         /// 增改表主键id（如 user表主键id  "增改量主表id 对 userid;1对多"）

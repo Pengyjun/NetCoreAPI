@@ -29,10 +29,18 @@ namespace GDCMasterDataReceiveApi.Controller
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
-        [HttpPost("InsertModifyHourIncrementalData")]
+        [HttpPost("InsertModifyHourIncrementalDmData")]
         [UnitOfWork]
-        public ResponseAjaxResult<bool> InsertModifyHourIncrementalData(MainTableOfStatisticsRequestDto requestDto)
+        public ResponseAjaxResult<bool> InsertModifyHourIncrementalDmData([FromBody] MainTableOfStatisticsRequestDto requestDto)
             => _mainTableOfStatisticsService.InsertModifyHourIncrementalData(requestDto);
-
+        /// <summary>
+        /// 统计当前模式所有表（Mysql当前指定数据库）
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        [HttpPost("InsertModifyHourIncrementalMysqlData")]
+        [UnitOfWork]
+        public async Task<ResponseAjaxResult<bool>> InsertModifyHourIncrementalDataAsync([FromBody] MainTableOfStatisticsMysqlRequestDto requestDto)
+            => await _mainTableOfStatisticsService.InsertModifyHourIncrementalData(requestDto);
     }
 }

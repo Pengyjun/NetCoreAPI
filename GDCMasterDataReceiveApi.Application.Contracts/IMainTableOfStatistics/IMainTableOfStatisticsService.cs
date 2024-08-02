@@ -16,5 +16,11 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.IMainTableOfStatistics
         /// <param name="requestDto"></param>
         /// <returns></returns>
         ResponseAjaxResult<bool> InsertModifyHourIncrementalData(MainTableOfStatisticsRequestDto requestDto);
+        /// <summary>
+        /// 统计当前模式所有表（Mysql当前指定数据库）
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        Task<ResponseAjaxResult<bool>> InsertModifyHourIncrementalData(MainTableOfStatisticsMysqlRequestDto requestDto);
     }
 }

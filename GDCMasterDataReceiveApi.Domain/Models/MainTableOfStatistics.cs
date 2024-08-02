@@ -24,6 +24,16 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         [SugarColumn(ColumnDataType = "int")]
         public int ModifyNums { get; set; }
         /// <summary>
+        /// 新增之前的总数
+        /// </summary>
+        [SugarColumn(ColumnDataType = "int")]
+        public int BeforeInsertNums { get; set; }
+        /// <summary>
+        /// 修改之前的总数
+        /// </summary>
+        [SugarColumn(ColumnDataType = "int")]
+        public int BeforeModifyNums { get; set; }
+        /// <summary>
         /// 表更新日期
         /// </summary>
         [SugarColumn(ColumnDataType = "int")]

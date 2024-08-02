@@ -1,20 +1,20 @@
-using Autofac.Extensions.DependencyInjection;
 using Autofac;
-using GDCMasterDataReceiveApi.Ioc;
-using Serilog;
-using Serilog.Events;
-using Microsoft.OpenApi.Models;
+using Autofac.Extensions.DependencyInjection;
+using GDCMasterDataReceiveApi;
+using GDCMasterDataReceiveApi.Application.Contracts.AutoMapper;
 using GDCMasterDataReceiveApi.Domain.Shared;
 using GDCMasterDataReceiveApi.Filters;
-using GHElectronicFileApi.Middleware;
-using Microsoft.AspNetCore.Authorization;
-using GDCMasterDataReceiveApi;
-using UtilsSharp;
+using GDCMasterDataReceiveApi.Ioc;
 using GDCMasterDataReceiveApi.SqlSugarCore;
-using GDCMasterDataReceiveApi.Application.Contracts.AutoMapper;
+using GHElectronicFileApi.Middleware;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
+using Serilog;
+using Serilog.Events;
 using System.Text;
+using UtilsSharp;
 
 
 var builder = WebApplication.CreateBuilder(args);

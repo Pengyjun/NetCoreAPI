@@ -14,7 +14,8 @@ namespace GDCMasterDataReceiveApi.SqlSugarCore
             SqlSugarClient db = new SqlSugarClient(new ConnectionConfig()
             {
                 ConnectionString = dbCon,
-                DbType = DbType.Dm,
+                //DbType = DbType.Dm,
+                DbType = DbType.MySql,
                 IsAutoCloseConnection = true,//不设成true要手动close
                 MoreSettings = new ConnMoreSettings()
                 {
@@ -90,7 +91,9 @@ namespace GDCMasterDataReceiveApi.SqlSugarCore
                 };
             });
             Type[] types = typeof(BaseEntity<long>).Assembly.GetTypes()
-            .Where(it => it.FullName.Contains("GDCMasterDataReceiveApi.Domain.Models"))
+            //.Where(it => it.FullName.Contains("GDCMasterDataReceiveApi.Domain.Models"))
+            //.Where(it => it.FullName.Contains("AuditLogs"))
+            //.Where(it => it.FullName.Contains("MainTableOfStatisticsDetails"))
             .ToArray();
             db.CodeFirst.InitTables(types);
         }
