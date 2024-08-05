@@ -28,5 +28,9 @@
         /// 表行数
         /// </summary>
         public int TableRows { get; set; }
+        /// <summary>
+        /// 主键id 查看详细写入
+        /// </summary>
+        public string? TableId { get; set; }
     }
 }

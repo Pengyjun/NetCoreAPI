@@ -295,6 +295,8 @@ namespace GDCMasterDataReceiveApi.Application.MainTableOfStatisticsService
             var responseAjaxResult = new ResponseAjaxResult<bool>();
             List<MainTableOfStatistics> insertMainTableOfStatisticsList = new List<MainTableOfStatistics>();
             List<MainTableOfStatistics> modifyMainTableOfStatisticsList = new List<MainTableOfStatistics>();
+            List<MainTableOfStatisticsDetails> insertMainTableOfStatisticsDetailsList = new List<MainTableOfStatisticsDetails>();
+            List<MainTableOfStatisticsDetails> modifyMainTableOfStatisticsDetailsList = new List<MainTableOfStatisticsDetails>();
 
             string connectionString = $"server={requestDto.Server};port={requestDto.Port};user={requestDto.User};password={requestDto.PassWord};database={requestDto.DataBase};sslMode=None;AllowLoadLocalInfile=true";
             using (var connection = new MySqlConnection(connectionString))
@@ -308,7 +310,8 @@ namespace GDCMasterDataReceiveApi.Application.MainTableOfStatisticsService
                     responseAjaxResult.FailResult(HttpStatusCode.LinkFail, "链接失败：" + ex.Message);
                     return responseAjaxResult;
                 }
-                //获取当前时间主表所有数据
+
+                //获取当天主表所有数据
                 var nowDay = Convert.ToInt32(DateTime.Now.ToString("yyyyMMdd"));
                 var nowHour = Convert.ToInt32(DateTime.Now.ToString("yyyyMMddHH"));
                 var oneHourGo = Convert.ToInt32(DateTime.Now.AddHours(-1).ToString("yyyyMMddHH"));
@@ -316,7 +319,13 @@ namespace GDCMasterDataReceiveApi.Application.MainTableOfStatisticsService
                     .Where(x => x.IsDelete == 1 && x.DateDay == nowDay)
                     .ToListAsync();
 
-                if (requestDto.IsCreateView)//创建视图/修改视图
+                //获取当天细表所有数据
+                var nowDayAllDetailsData = await _dbContext.Queryable<MainTableOfStatisticsDetails>()
+                    .Where(x => x.IsDelete == 1 && nowDayAllData.Select(y => y.Id).Contains(x.MainTableOfStatisticsId))
+                    .ToListAsync();
+
+                //创建视图/修改视图
+                if (requestDto.IsCreateView)
                 {
                     bool success = CreateViewGetTables(requestDto.ViewName, connectionString, requestDto.DataBase, requestDto.ScreenTables);
                     if (!success)
@@ -325,13 +334,16 @@ namespace GDCMasterDataReceiveApi.Application.MainTableOfStatisticsService
                         return responseAjaxResult;
                     }
                 }
-                //获取视图数据
+
+                //获取视图数据 主表数据
                 //获取当前表截止到现在位置的所有数量字典集合
                 var tables = GetDicTables(connectionString, requestDto.ViewName);
+                //获取视图数据 详细数据
+                var tableDetails = GetDicTables(connectionString, $"{requestDto.ViewName}Details");
                 // 遍历每个表，获取每日增量数据
                 foreach (var table in tables)
                 {
-                    #region 统计主表数据
+                    #region 统计写入主表数据
                     int beforeNums = 0;
                     //获取前一小时的数据
                     var oneHourData = nowDayAllData.FirstOrDefault(x => x.TableName == table.TableName && x.HourOfTheDay == oneHourGo);
@@ -373,6 +385,56 @@ namespace GDCMasterDataReceiveApi.Application.MainTableOfStatisticsService
                         insertMainTableOfStatisticsList.Add(mainTableOfStatistics);
                     }
                     #endregion
+
+                    #region 统计写入细表数据
+                    //根据表查找详细数据
+                    var details = tableDetails.Where(x => x.TableId == table.TableName).ToList();
+                    foreach (var det in details)
+                    {
+                        //查询细表当天是否已经存在相同数据
+                        var ssameDetails = nowDayAllDetailsData.Where(x => x.TableId == det.TableName && snowFlakId == x.MainTableOfStatisticsId).ToList();
+                        foreach (var det2 in ssameDetails)
+                        {
+                            var sameDetails = nowDayAllDetailsData.FirstOrDefault(x => x.TableId == det2.TableId && x.InsertOrModify == "modify");
+                            if (sameDetails != null)
+                            {
+                                //存在修改的数据
+                                if (sameDetails.InsertOrModify == "modify")
+                                {
+                                    sameDetails.UpdateTime = DateTime.Now;
+                                    sameDetails.Timestamp = Utils.GetTimeSpan();
+                                    modifyMainTableOfStatisticsDetailsList.Add(sameDetails);
+                                }
+                            }
+                            else
+                            {
+                                //新增修改的数据
+                                insertMainTableOfStatisticsDetailsList.Add(new MainTableOfStatisticsDetails
+                                {
+                                    Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                                    Timestamp = Utils.GetTimeSpan(),
+                                    CreateTime = DateTime.Now,
+                                    InsertOrModify = "modify",
+                                    MainTableOfStatisticsId = snowFlakId,
+                                    TableId = det2.TableId
+                                });
+                            }
+                        }
+                        if (!ssameDetails.Any())
+                        {
+                            insertMainTableOfStatisticsDetailsList.Add(new MainTableOfStatisticsDetails
+                            {
+                                Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                                Timestamp = Utils.GetTimeSpan(),
+                                CreateTime = DateTime.Now,
+                                InsertOrModify = "insert",
+                                MainTableOfStatisticsId = snowFlakId,
+                                TableId = det.TableName
+                            });
+                        }
+                    }
+
+                    #endregion
                 }
             }
 
@@ -385,6 +447,19 @@ namespace GDCMasterDataReceiveApi.Application.MainTableOfStatisticsService
             {
                 await _dbContext.Fastest<MainTableOfStatistics>().BulkUpdateAsync(modifyMainTableOfStatisticsList, new string[] { "id" }, new string[] { "insertnums", "beforeinsertnums", "modifynums", "updatetime", "timestamp" });
             }
+
+            if (insertMainTableOfStatisticsDetailsList != null && insertMainTableOfStatisticsDetailsList.Count() > 0)
+            {
+                await _dbContext.Fastest<MainTableOfStatisticsDetails>().PageSize(100000).BulkCopyAsync(insertMainTableOfStatisticsDetailsList);
+            }
+
+            if (modifyMainTableOfStatisticsDetailsList != null && modifyMainTableOfStatisticsDetailsList.Count() > 0)
+            {
+                await _dbContext.Fastest<MainTableOfStatisticsDetails>().BulkUpdateAsync(modifyMainTableOfStatisticsDetailsList, new string[] { "id" }, new string[] { "updatetime", "timestamp" });
+            }
+
+            //修改库推送字段值
+            ModifyDataBaseColumForView(connectionString, requestDto.DataBase);
 
             responseAjaxResult.SuccessResult(true);
             return responseAjaxResult;
@@ -405,10 +480,11 @@ namespace GDCMasterDataReceiveApi.Application.MainTableOfStatisticsService
                 connection.Open();
                 using (var command = new MySqlCommand(sql, connection))
                 {
+                    command.CommandTimeout = 300;
                     var reader = command.ExecuteReader();
                     while (reader.Read())
                     {
-                        var a = reader.GetValue(0);
+                        var a = viewName.Contains("Details") ? reader.GetString(0) : reader.GetValue(0);
                         var b = reader.GetString(1);
 
                         var c = new Dictionary<object, object>();
@@ -429,72 +505,38 @@ namespace GDCMasterDataReceiveApi.Application.MainTableOfStatisticsService
                     tables.Add(new MainTableDictoryDto
                     {
                         TableName = d.Key.ToString(),
-                        TableRows = Convert.ToInt32(d.Value)
+                        TableRows = viewName.Contains("Details") ? 0 : Convert.ToInt32(d.Value),
+                        TableId = viewName.Contains("Details") ? d.Value.ToString() : null
                     });
                 }
             }
 
-
             return tables;
-        }
-        /// <summary>
-        /// 获取指定表的所有数据
-        /// </summary>
-        /// <param name="connection"></param>
-        /// <param name="table_schema"></param>
-        /// <returns></returns>
-        private static async Task<List<Dictionary<object, object>>> GetIncrementalDataAsync(MySqlConnection connection, string table_schema)
-        {
-
-            var data = new List<Dictionary<object, object>>();
-            var sqls = new List<string>();
-            //var command = new MySqlCommand($"select concat('select \"', TABLE_name, '\", count(*) from ', TABLE_SCHEMA, '.',TABLE_name) from information_schema.tables  WHERE table_schema = @table_schema;", connection);
-            var command = new MySqlCommand($" SELECT GROUP_CONCAT(CONCAT('SELECT ''', table_name, ''' AS table_name, COUNT(*) AS actual_row_count FROM `', @table_schema, '`.`', table_name, '`') SEPARATOR ' UNION ALL ')\r\n    FROM information_schema.tables \r\n    WHERE table_schema = @table_schema\r\n    AND table_type = 'BASE TABLE';", connection);
-            command.Parameters.AddWithValue("@table_schema", table_schema); // 使用参数化查询以防止SQL注入
-
-            using (var reader = await command.ExecuteReaderAsync())
-            {
-                while (await reader.ReadAsync())
-                {
-                    var sqlQuery = reader.GetString(0); // 获取查询结果
-                    sqls.Add(sqlQuery); // 添加查询结果到列表
-                }
-            }
-            foreach (var item in sqls)
-            {
-                using (var countCommand = new MySqlCommand(item, connection))
-                {
-                    var table = await countCommand.ExecuteReaderAsync();
-                    var dic = new Dictionary<object, object>()
-                    {
-
-                    };
-                }
-            }
-
-            return data; // 返回结果
         }
         /// <summary>
         /// 获取所有表创建视图
         /// </summary>
         /// <param name="viewName"></param>
-        /// <param name="connstring"></param>
+        /// <param name="connString"></param>
         /// <param name="schema"></param>
         /// <param name="screenTables">过滤掉的表</param>
         /// <returns></returns>
-        private static bool CreateViewGetTables(string viewName, string connstring, string schema, List<string>? screenTables)
+        private static bool CreateViewGetTables(string viewName, string connString, string schema, List<string>? screenTables)
         {
             var tables = new List<string>();
             var sql = new StringBuilder();
+            var sql2 = new StringBuilder();
             sql.Append($"DROP VIEW IF EXISTS {viewName} ; create VIEW {viewName} as ");
+            sql2.Append($"DROP VIEW IF EXISTS {viewName}Details ; create VIEW {viewName}Details as ");
             var query = $"SELECT table_name FROM information_schema.tables WHERE table_schema = '{schema}' AND table_type = 'BASE TABLE';";
             try
             {
-                using (var connection = new MySqlConnection(connstring))
+                using (var connection = new MySqlConnection(connString))
                 {
                     connection.Open();
                     using (var command = new MySqlCommand(query, connection))
                     {
+                        command.CommandTimeout = 300;
                         var reader = command.ExecuteReader();
                         while (reader.Read())
                         {
@@ -517,14 +559,25 @@ namespace GDCMasterDataReceiveApi.Application.MainTableOfStatisticsService
                         }
                         foreach (var table in tables)
                         {
-                            sql.Append($"select Count(*) as tablerows,'{table}' as 'tablename' from {schema}.{table}");
+                            sql.Append($"select Count(*) as tablerows,'{table}' as 'tablename' from {schema}.{table} where push = 0 ");
+                            sql2.Append($"select '{table}' as 'tablename',id as 'id' from {schema}.{table} where push = 0 group by tablename,id ");
                             sql.Append($" union all ");
+                            sql2.Append($" union all ");
                         }
                         sql = sql.Remove(sql.Length - 10, 10);
+                        sql2 = sql2.Remove(sql2.Length - 10, 10);
                         connection.Close();
                     }
                     using (var cmd = new MySqlCommand(sql.ToString(), connection))
                     {
+                        cmd.CommandTimeout = 300;
+                        connection.Open();
+                        cmd.ExecuteNonQuery();
+                        connection.Close();
+                    }
+                    using (var cmd = new MySqlCommand(sql2.ToString(), connection))
+                    {
+                        cmd.CommandTimeout = 300;
                         connection.Open();
                         cmd.ExecuteNonQuery();
                     }
@@ -536,8 +589,13 @@ namespace GDCMasterDataReceiveApi.Application.MainTableOfStatisticsService
             }
             return true;
         }
-
-        private static bool aa(string connstring, string schema)
+        /// <summary>
+        /// 插入数据后 最终修改库所有推送字段值
+        /// </summary>
+        /// <param name="connstring"></param>
+        /// <param name="schema"></param>
+        /// <returns></returns>
+        private static bool ModifyDataBaseColumForView(string connstring, string schema)
         {
             var query = $"SELECT table_name FROM information_schema.tables WHERE table_schema = '{schema}' AND table_type = 'BASE TABLE';";
             var sql = new StringBuilder();
@@ -547,6 +605,7 @@ namespace GDCMasterDataReceiveApi.Application.MainTableOfStatisticsService
                 connection.Open();
                 using (var command = new MySqlCommand(query, connection))
                 {
+                    command.CommandTimeout = 300;
                     var reader = command.ExecuteReader();
                     while (reader.Read())
                     {
@@ -561,16 +620,20 @@ namespace GDCMasterDataReceiveApi.Application.MainTableOfStatisticsService
                     }
                     foreach (var table in tables)
                     {
-                        //sql.Append($"alter table {schema}.{table} add column push int default 1 ");
-                        sql.Append($"update  {schema}.{table} set push = 1 ");
-                        sql.Append($" union all ");
+                        //sql.Append($"alter table {schema}.{table} add column push int default 1 ");//新增字段sql
+                        sql.Append($"update  {schema}.{table} set push = 1 where push= 0 ; ");
+                        //sql.Append($" union all ");
                     }
-                    sql = sql.Remove(sql.Length - 10, 10);
                     connection.Close();
+                }
+                using (var cmd = new MySqlCommand(sql.ToString(), connection))
+                {
+                    cmd.CommandTimeout = 300;
+                    connection.Open();
+                    cmd.ExecuteNonQuery();
                 }
             }
             return true;
-
         }
         #endregion
     }
