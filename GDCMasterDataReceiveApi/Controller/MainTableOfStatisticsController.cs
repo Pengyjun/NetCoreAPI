@@ -41,6 +41,19 @@ namespace GDCMasterDataReceiveApi.Controller
         [HttpPost("InsertModifyHourIncrementalMysqlData")]
         [UnitOfWork]
         public async Task<ResponseAjaxResult<bool>> InsertModifyHourIncrementalDataAsync([FromBody] MainTableOfStatisticsMysqlRequestDto requestDto)
+            /***
+             * {
+                  "date": "2024-08-01 01:58:24",
+                  "screenTables": [],
+                  "iscreateview":true,
+                  "viewname":"view_gettableandrows",
+                  "server": "124.71.79.52",
+                  "port": "3306",
+                  "user": "root",
+                  "passWord": "hhkcsql@123",
+                  "dataBase": "datalake_xg"
+                }
+             */
             => await _mainTableOfStatisticsService.InsertModifyHourIncrementalData(requestDto);
     }
 }

@@ -9,6 +9,7 @@ using MySqlConnector;
 using SqlSugar;
 using System.Data;
 using System.Text;
+using static Npgsql.Replication.PgOutput.Messages.RelationMessage;
 
 namespace GDCMasterDataReceiveApi.Application.MainTableOfStatisticsService
 {
@@ -327,7 +328,7 @@ namespace GDCMasterDataReceiveApi.Application.MainTableOfStatisticsService
                 //创建视图/修改视图
                 if (requestDto.IsCreateView)
                 {
-                    bool success = CreateViewGetTables(requestDto.ViewName, connectionString, requestDto.DataBase, requestDto.ScreenTables);
+                    bool success = await CreateModifyView(requestDto.ViewName, connectionString, requestDto.DataBase, requestDto.ScreenTables);
                     if (!success)
                     {
                         responseAjaxResult.FailResult(HttpStatusCode.ViewFail, "创建/修改视图失败");
@@ -344,17 +345,19 @@ namespace GDCMasterDataReceiveApi.Application.MainTableOfStatisticsService
                 foreach (var table in tables)
                 {
                     #region 统计写入主表数据
-                    int beforeNums = 0;
+                    int nums = 0;
                     //获取前一小时的数据
                     var oneHourData = nowDayAllData.FirstOrDefault(x => x.TableName == table.TableName && x.HourOfTheDay == oneHourGo);
                     if (oneHourData == null)
                     {
                         //如果前一小时没有数据 获取当天最新的数据 并且!=此刻的时间
                         var nowDayFirst = nowDayAllData.OrderByDescending(x => x.HourOfTheDay).FirstOrDefault(x => x.TableName == table.TableName && x.HourOfTheDay != nowHour);
-                        beforeNums = nowDayFirst == null ? table.TableRows : nowDayFirst.BeforeInsertNums;
+                        nums = nowDayFirst == null ? table.TableRows : table.TableRows - nowDayFirst.BeforeInsertNums < 0 ? 0 : table.TableRows - nowDayFirst.BeforeInsertNums;
                     }
                     else
-                    { beforeNums = oneHourData.BeforeInsertNums; }
+                    {
+                        nums = table.TableRows - oneHourData.BeforeInsertNums < 0 ? 0 : table.TableRows - oneHourData.BeforeInsertNums;
+                    }
                     //新增统计当前最新的主表数据
                     //主表是否已经存在数据
                     var isExist = nowDayAllData.FirstOrDefault(x => x.TableName == table.TableName && x.HourOfTheDay == nowHour);
@@ -362,7 +365,7 @@ namespace GDCMasterDataReceiveApi.Application.MainTableOfStatisticsService
                     if (isExist != null)//数据修改
                     {
                         snowFlakId = isExist.Id;
-                        isExist.InsertNums = (table.TableRows - beforeNums) < 0 ? 0 : table.TableRows - beforeNums;
+                        isExist.InsertNums = nums;
                         isExist.UpdateTime = DateTime.Now;
                         isExist.BeforeInsertNums = table.TableRows;
                         isExist.Timestamp = Utils.GetTimeSpan();
@@ -374,7 +377,7 @@ namespace GDCMasterDataReceiveApi.Application.MainTableOfStatisticsService
                         MainTableOfStatistics mainTableOfStatistics = new MainTableOfStatistics()
                         {
                             Id = snowFlakId,
-                            InsertNums = (table.TableRows - beforeNums) < 0 ? 0 : table.TableRows - beforeNums,
+                            InsertNums = nums,
                             DateDay = nowDay,
                             HourOfTheDay = nowHour,
                             TableName = table.TableName,
@@ -388,11 +391,11 @@ namespace GDCMasterDataReceiveApi.Application.MainTableOfStatisticsService
 
                     #region 统计写入细表数据
                     //根据表查找详细数据
-                    var details = tableDetails.Where(x => x.TableId == table.TableName).ToList();
+                    var details = tableDetails.Where(x => x.TableName == table.TableName).ToList();
                     foreach (var det in details)
                     {
                         //查询细表当天是否已经存在相同数据
-                        var ssameDetails = nowDayAllDetailsData.Where(x => x.TableId == det.TableName && snowFlakId == x.MainTableOfStatisticsId).ToList();
+                        var ssameDetails = nowDayAllDetailsData.Where(x => x.TableId == det.TableId && snowFlakId == x.MainTableOfStatisticsId).ToList();
                         foreach (var det2 in ssameDetails)
                         {
                             var sameDetails = nowDayAllDetailsData.FirstOrDefault(x => x.TableId == det2.TableId && x.InsertOrModify == "modify");
@@ -429,11 +432,10 @@ namespace GDCMasterDataReceiveApi.Application.MainTableOfStatisticsService
                                 CreateTime = DateTime.Now,
                                 InsertOrModify = "insert",
                                 MainTableOfStatisticsId = snowFlakId,
-                                TableId = det.TableName
+                                TableId = det.TableId
                             });
                         }
                     }
-
                     #endregion
                 }
             }
@@ -459,7 +461,7 @@ namespace GDCMasterDataReceiveApi.Application.MainTableOfStatisticsService
             }
 
             //修改库推送字段值
-            ModifyDataBaseColumForView(connectionString, requestDto.DataBase);
+            await ModifyDataBaseColumForView(connectionString, requestDto.DataBase);
 
             responseAjaxResult.SuccessResult(true);
             return responseAjaxResult;
@@ -473,14 +475,14 @@ namespace GDCMasterDataReceiveApi.Application.MainTableOfStatisticsService
         private static List<MainTableDictoryDto> GetDicTables(string connstring, string viewName)
         {
             var dic = new List<Dictionary<object, object>>();
+            var column = viewName.Contains("Details") ? "id" : "tablerows";
             //获取视图数据
-            string sql = $"select * from {viewName}";
+            string sql = $"select {column}, tablename from  {viewName}";
             using (var connection = new MySqlConnection(connstring))
             {
                 connection.Open();
                 using (var command = new MySqlCommand(sql, connection))
                 {
-                    command.CommandTimeout = 300;
                     var reader = command.ExecuteReader();
                     while (reader.Read())
                     {
@@ -492,7 +494,6 @@ namespace GDCMasterDataReceiveApi.Application.MainTableOfStatisticsService
                         dic.Add(c);
                     }
                 }
-
             }
 
             var tables = new List<MainTableDictoryDto>();
@@ -514,15 +515,16 @@ namespace GDCMasterDataReceiveApi.Application.MainTableOfStatisticsService
             return tables;
         }
         /// <summary>
-        /// 获取所有表创建视图
+        /// 创建/更新视图
         /// </summary>
         /// <param name="viewName"></param>
         /// <param name="connString"></param>
         /// <param name="schema"></param>
         /// <param name="screenTables">过滤掉的表</param>
         /// <returns></returns>
-        private static bool CreateViewGetTables(string viewName, string connString, string schema, List<string>? screenTables)
+        private static async Task<bool> CreateModifyView(string viewName, string connString, string schema, List<string>? screenTables)
         {
+            #region 原来的
             var tables = new List<string>();
             var sql = new StringBuilder();
             var sql2 = new StringBuilder();
@@ -531,16 +533,16 @@ namespace GDCMasterDataReceiveApi.Application.MainTableOfStatisticsService
             var query = $"SELECT table_name FROM information_schema.tables WHERE table_schema = '{schema}' AND table_type = 'BASE TABLE';";
             try
             {
+                // 第一次连接并读取表名
                 using (var connection = new MySqlConnection(connString))
                 {
-                    connection.Open();
+                    await connection.OpenAsync(); // 使用异步方法打开连接
                     using (var command = new MySqlCommand(query, connection))
                     {
-                        command.CommandTimeout = 300;
-                        var reader = command.ExecuteReader();
-                        while (reader.Read())
+                        var reader = await command.ExecuteReaderAsync(); // 使用异步方法执行读取
+                        while (await reader.ReadAsync()) // 使用异步方法读取数据
                         {
-                            //排除掉审计表&统计增量表&统计增量表详细
+                            // 排除掉审计表&统计增量表&统计增量表详细
                             if (!reader.GetString(0).Contains("##")
                                 && reader.GetString(0) != "t_auditlogs"
                                 && reader.GetString(0) != "t_maintableofstatisticsdetails"
@@ -551,42 +553,45 @@ namespace GDCMasterDataReceiveApi.Application.MainTableOfStatisticsService
                         }
                         if (screenTables != null && screenTables.Any())
                         {
-                            //过滤掉不需要统计的表
+                            // 过滤掉不需要统计的表
                             foreach (var table in screenTables)
                             {
                                 tables = tables.Where(x => x != table).ToList();
                             }
                         }
-                        foreach (var table in tables)
-                        {
-                            sql.Append($"select Count(*) as tablerows,'{table}' as 'tablename' from {schema}.{table} where push = 0 ");
-                            sql2.Append($"select '{table}' as 'tablename',id as 'id' from {schema}.{table} where push = 0 group by tablename,id ");
-                            sql.Append($" union all ");
-                            sql2.Append($" union all ");
-                        }
-                        sql = sql.Remove(sql.Length - 10, 10);
-                        sql2 = sql2.Remove(sql2.Length - 10, 10);
-                        connection.Close();
                     }
+                }
+
+                // 第二次连接并执行统计查询
+                using (var connection = new MySqlConnection(connString))
+                {
+                    await connection.OpenAsync(); // 使用异步方法打开连接
+                    foreach (var table in tables)
+                    {
+                        sql.Append($"select Count(*) as tablerows,'{table}' as 'tablename' from {schema}.{table} where push = 0 ");
+                        sql2.Append($"select '{table}' as 'tablename',id as 'id' from {schema}.{table} where push = 0  ");
+                        sql.Append($" union all ");
+                        sql2.Append($" union all ");
+                    }
+                    sql = sql.Remove(sql.Length - 10, 10);
+                    sql2 = sql2.Remove(sql2.Length - 10, 10);
+
                     using (var cmd = new MySqlCommand(sql.ToString(), connection))
                     {
-                        cmd.CommandTimeout = 300;
-                        connection.Open();
-                        cmd.ExecuteNonQuery();
-                        connection.Close();
+                        await cmd.ExecuteNonQueryAsync(); // 使用异步方法执行非查询
                     }
                     using (var cmd = new MySqlCommand(sql2.ToString(), connection))
                     {
-                        cmd.CommandTimeout = 300;
-                        connection.Open();
-                        cmd.ExecuteNonQuery();
+                        await cmd.ExecuteNonQueryAsync(); // 使用异步方法执行非查询
                     }
                 }
             }
             catch (Exception ex)
             {
+                // 考虑记录异常以便于调试
                 throw;
             }
+            #endregion
             return true;
         }
         /// <summary>
@@ -595,19 +600,18 @@ namespace GDCMasterDataReceiveApi.Application.MainTableOfStatisticsService
         /// <param name="connstring"></param>
         /// <param name="schema"></param>
         /// <returns></returns>
-        private static bool ModifyDataBaseColumForView(string connstring, string schema)
+        private static async Task<bool> ModifyDataBaseColumForView(string connstring, string schema)
         {
             var query = $"SELECT table_name FROM information_schema.tables WHERE table_schema = '{schema}' AND table_type = 'BASE TABLE';";
             var sql = new StringBuilder();
             var tables = new List<string>();
             using (var connection = new MySqlConnection(connstring))
             {
-                connection.Open();
+                await connection.OpenAsync();
                 using (var command = new MySqlCommand(query, connection))
                 {
-                    command.CommandTimeout = 300;
-                    var reader = command.ExecuteReader();
-                    while (reader.Read())
+                    var reader = await command.ExecuteReaderAsync();
+                    while (await reader.ReadAsync())
                     {
                         //排除掉审计表&统计增量表&统计增量表详细
                         if (!reader.GetString(0).Contains("##")
@@ -621,16 +625,19 @@ namespace GDCMasterDataReceiveApi.Application.MainTableOfStatisticsService
                     foreach (var table in tables)
                     {
                         //sql.Append($"alter table {schema}.{table} add column push int default 1 ");//新增字段sql
-                        sql.Append($"update  {schema}.{table} set push = 1 where push= 0 ; ");
-                        //sql.Append($" union all ");
+                        // 使用分页查询来处理大数据量
+                        sql.Append($"UPDATE `{schema}`.`{table}` SET push = 1 WHERE push = 0 AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema = '{schema}' AND table_name = '{table}' AND column_name = 'push'); ");
                     }
-                    connection.Close();
                 }
+            }
+
+            using (var connection = new MySqlConnection(connstring))
+            {
+                await connection.OpenAsync();
                 using (var cmd = new MySqlCommand(sql.ToString(), connection))
                 {
-                    cmd.CommandTimeout = 300;
-                    connection.Open();
-                    cmd.ExecuteNonQuery();
+                    cmd.CommandTimeout = 600;
+                    await cmd.ExecuteNonQueryAsync(); // 使用异步方法执行非查询
                 }
             }
             return true;
