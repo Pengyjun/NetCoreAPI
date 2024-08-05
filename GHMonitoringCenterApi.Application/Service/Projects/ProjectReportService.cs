@@ -3489,7 +3489,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 .Where((p, i) => instinIds.Contains(p.CompanyId) && proIds.Contains(p.Id) && p.IsDelete == 1 && i.IsDelete == 1)
                 .Select((p, i) => new { i.PomId, i.Name, p.Id }).ToListAsync();
             //单位机构
-            var unitIds = subShipData.Select(x => x.CompanyId.ToString()).ToList();
+            var unitIds = subShipData.Where(x=>!string.IsNullOrWhiteSpace(x.CompanyId)).Select(x =>x.CompanyId.ToString()).ToList();
             var unitData = await _dbContext.Queryable<SubShipMonthReport>()
                 .LeftJoin<SubShip>((rep, sub) => rep.ShipId == sub.PomId)
                 .LeftJoin<DealingUnit>((rep, sub, dea) => sub.CompanyId == dea.PomId.ToString())
