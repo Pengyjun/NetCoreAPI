@@ -15,6 +15,7 @@ using GHMonitoringCenterApi.Domain.Models;
 using GHMonitoringCenterApi.Domain.Shared;
 using GHMonitoringCenterApi.Domain.Shared.Const;
 using SqlSugar;
+using SqlSugar.Extensions;
 using static GHMonitoringCenterApi.Application.Contracts.Dto.Project.Report.MonthtReportsResponseDto;
 
 namespace GHMonitoringCenterApi.Application.Service
@@ -634,23 +635,98 @@ namespace GHMonitoringCenterApi.Application.Service
         /// <returns></returns>
         public async Task<ResponseAjaxResult<List<MonthtReportDto>>> GetMonthReportInfosAsync(MonthReportInfosRequestDto requestDto)
         {
-            var responseAjaxResult = new ResponseAjaxResult<List<MonthtReportDto>>();
-            var model = new MonthtReportsRequstDto
+
+            #region 旧版
+            //var responseAjaxResult = new ResponseAjaxResult<List<MonthtReportDto>>();
+            //var model = new MonthtReportsRequstDto
+            //{
+            //    ProjectName = requestDto.ProjectName,
+            //    StartTime = requestDto.StartTime,
+            //    EndTime = requestDto.EndTime,
+            //    IsConvert = requestDto.IsConvert,
+            //    PageIndex = requestDto.PageIndex,
+            //    PageSize = requestDto.PageSize,
+            //    IsDuiWai = true
+            //};
+
+            //var responseData = await _projectReportService.SearchMonthReportsAsync(model);
+            //var resList = responseData.Data.Reports;
+
+            //responseAjaxResult.Count = responseData.Count;
+            #endregion
+
+            #region 参数校验
+            
+            var startTime = string.Empty;
+            if (DateTime.Now.Day >= 27)
             {
-                ProjectName = requestDto.ProjectName,
-                StartTime = requestDto.StartTime,
-                EndTime = requestDto.EndTime,
-                IsConvert = requestDto.IsConvert,
-                PageIndex = requestDto.PageIndex,
-                PageSize = requestDto.PageSize,
-                IsDuiWai = true
-            };
+                startTime = DateTime.Now.ToString("yyyy-MM-26 00:00:00");
+            }
+            else
+            {
+                startTime = DateTime.Now.AddMonths(-1).ToString("yyyy-MM-26 00:00:00");
+            }
+            //当前月份
+            var month =Convert.ToDateTime(startTime).Month.ToString();
+            if (month.Length == 1)
+            {
+                month = "0" + month;
+            }
+           var  currentMonth =int.Parse(DateTime.Now.Year + month);
+            //当年开始时间
+            var yearStartIime = DateTime.Now.ToString("yyyy01").ObjToInt();
+            var yearEndTime = DateTime.Now.ToString("yyyy12").ObjToInt();
 
-            var responseData = await _projectReportService.SearchMonthReportsAsync(model);
-            var resList = responseData.Data.Reports;
+            #endregion
 
-            responseAjaxResult.Count = responseData.Count;
-            responseAjaxResult.SuccessResult(resList, ResponseMessage.OPERATION_SUCCESS);
+            var responseAjaxResult = new ResponseAjaxResult<List<MonthtReportDto>>();
+            List<MonthtReportDto> monthtReportDtos = new List<MonthtReportDto>();
+            var projectMonthList = await _dbContext.Queryable<MonthReport>().Where(x => x.IsDelete == 1)
+                .WhereIF(requestDto.StartTime!=null&& requestDto.EndTime!=null,x=> (x.CreateTime>= requestDto.StartTime.Value&&x.CreateTime<=requestDto.EndTime.Value)
+                || (x.UpdateTime >= requestDto.StartTime.Value && x.UpdateTime <= requestDto.EndTime.Value)).ToListAsync();
+            if (projectMonthList.Any())
+            {
+                foreach (var item in projectMonthList)
+                {
+                    //当月产值
+                   var currentProjectMonthRepost=projectMonthList.Where(x=>x.DateMonth== currentMonth && x.ProjectId==item.ProjectId).FirstOrDefault();
+                    //当年完成产值
+                    var yearCompletProductionValue = projectMonthList.Where(x => x.DateMonth == currentMonth && x.ProjectId == item.ProjectId
+                    &&x.DateMonth>= yearStartIime&&x.DateMonth<= yearEndTime).ToList();
+                    //累计完成成本
+                    var yearTotalCompletProductionValue = projectMonthList.Where(x => x.DateMonth == currentMonth && x.ProjectId == item.ProjectId
+                   ).ToList();
+                    if (currentProjectMonthRepost != null)
+                    {
+                        monthtReportDtos .Add(new MonthtReportDto()
+                        {
+                            ProjectId = item.ProjectId,
+                            AccomplishQuantities = currentProjectMonthRepost.CompletedQuantity,
+                            YearAccomplishQuantities= yearCompletProductionValue.Sum(x => x.CompletedQuantity),
+                            AccumulativeQuantities= yearTotalCompletProductionValue.Sum(x => x.CompletedQuantity),
+
+                            RecognizedValue = currentProjectMonthRepost.PartyAConfirmedProductionAmount,
+                            YearRecognizedValue = yearCompletProductionValue.Sum(x=>x.PartyAConfirmedProductionAmount),
+                            CumulativeValue = yearTotalCompletProductionValue.Sum(x => x.PartyAConfirmedProductionAmount),
+
+                            PaymentAmount = currentProjectMonthRepost.PartyAPayAmount,
+                            YearPaymentAmount = yearCompletProductionValue.Sum(x => x.PartyAPayAmount),
+                            CumulativePaymentAmount= yearTotalCompletProductionValue.Sum(x => x.PartyAPayAmount),
+
+
+                            AccomplishValue = currentProjectMonthRepost.CompleteProductionAmount,
+                            YearAccomplishCost = yearCompletProductionValue.Sum(x => x.CompleteProductionAmount),
+                            CumulativeAccomplishCost = yearTotalCompletProductionValue.Sum(x => x.CompleteProductionAmount),
+
+                            OutsourcingExpensesAmount= currentProjectMonthRepost.OutsourcingExpensesAmount,
+                        });
+                    }
+                 
+                }
+            }
+            responseAjaxResult.Data = monthtReportDtos;
+            responseAjaxResult.Count = monthtReportDtos.Count;
+            responseAjaxResult.Success();
             return responseAjaxResult;
         }
         /// <summary>
