@@ -656,18 +656,32 @@ namespace GHMonitoringCenterApi.Application.Service
             #endregion
 
             #region 参数校验
-            
-            var startTime = string.Empty;
-            if (DateTime.Now.Day >= 27)
-            {
-                startTime = DateTime.Now.ToString("yyyy-MM-26 00:00:00");
-            }
-            else
-            {
-                startTime = DateTime.Now.AddMonths(-1).ToString("yyyy-MM-26 00:00:00");
-            }
             //当前月份
-            var month =Convert.ToDateTime(startTime).Month.ToString();
+            var month = string.Empty;
+            if (requestDto.StartTime == null || requestDto.EndTime == null)
+            {
+                if (DateTime.Now.Day >= 27)
+                {
+                    requestDto.StartTime = DateTime.Now.ToString("yyyy-MM-26 00:00:00").ObjToDate();
+                }
+                else
+                {
+                    requestDto.StartTime = DateTime.Now.AddMonths(-1).ToString("yyyy-MM-26 00:00:00").ObjToDate();
+                }
+                 month = requestDto.StartTime.Value.Month.ToString();
+            }
+            else {
+                if (requestDto.EndTime.Value.Day > 26)
+                {
+                    month= requestDto.StartTime.Value.Month.ToString();
+                }
+                else
+                {
+                    month = requestDto.EndTime.Value.AddMonths(-1).Month.ToString();
+                }
+
+
+            }
             if (month.Length == 1)
             {
                 month = "0" + month;
@@ -691,15 +705,16 @@ namespace GHMonitoringCenterApi.Application.Service
                     //当月产值
                    var currentProjectMonthRepost=projectMonthList.Where(x=>x.DateMonth== currentMonth && x.ProjectId==item.ProjectId).FirstOrDefault();
                     //当年完成产值
-                    var yearCompletProductionValue = projectMonthList.Where(x => x.DateMonth == currentMonth && x.ProjectId == item.ProjectId
+                    var yearCompletProductionValue = projectMonthList.Where(x => x.ProjectId == item.ProjectId
                     &&x.DateMonth>= yearStartIime&&x.DateMonth<= yearEndTime).ToList();
                     //累计完成成本
-                    var yearTotalCompletProductionValue = projectMonthList.Where(x => x.DateMonth == currentMonth && x.ProjectId == item.ProjectId
+                    var yearTotalCompletProductionValue = projectMonthList.Where(x => x.ProjectId == item.ProjectId
                    ).ToList();
                     if (currentProjectMonthRepost != null)
                     {
                         monthtReportDtos .Add(new MonthtReportDto()
                         {
+                           DateMonth = item.DateMonth,
                             ProjectId = item.ProjectId,
                             AccomplishQuantities = currentProjectMonthRepost.CompletedQuantity,
                             YearAccomplishQuantities= yearCompletProductionValue.Sum(x => x.CompletedQuantity),
