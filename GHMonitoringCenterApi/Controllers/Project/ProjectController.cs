@@ -1,6 +1,7 @@
 ﻿using GHMonitoringCenterApi.Application.Contracts.Dto;
 using GHMonitoringCenterApi.Application.Contracts.Dto.Project;
 using GHMonitoringCenterApi.Application.Contracts.Dto.Project.Approver;
+using GHMonitoringCenterApi.Application.Contracts.Dto.Project.MonthReportForProject;
 using GHMonitoringCenterApi.Application.Contracts.Dto.Project.Report;
 using GHMonitoringCenterApi.Application.Contracts.Dto.Project.ShipMovements;
 using GHMonitoringCenterApi.Application.Contracts.Dto.ProjectDepartMent;
@@ -36,15 +37,17 @@ namespace GHMonitoringCenterApi.Controllers.Project
         public IProjectShipMovementsService projectShipMovementsService { get; set; }
 
         public IProjectApproverService projectApproverService { get; set; }
+        public IMonthReportForProjectService _monthReportForProjectService { get; set; }
 
 
-        public ProjectController(IProjectService projectService, IProjectReportService projectReportService, IProjectDepartMentService projectDepartMentService, IProjectShipMovementsService projectShipMovementsService, IProjectApproverService projectApproverService)
+        public ProjectController(IProjectService projectService, IProjectReportService projectReportService, IProjectDepartMentService projectDepartMentService, IProjectShipMovementsService projectShipMovementsService, IProjectApproverService projectApproverService, IMonthReportForProjectService monthReportForProjectService)
         {
             this.projectService = projectService;
             this.projectReportService = projectReportService;
             this.projectDepartMentService = projectDepartMentService;
             this.projectShipMovementsService = projectShipMovementsService;
             this.projectApproverService = projectApproverService;
+            this._monthReportForProjectService = monthReportForProjectService;
         }
         #endregion
 
@@ -671,7 +674,7 @@ namespace GHMonitoringCenterApi.Controllers.Project
         /// <returns></returns>
         [HttpGet("GetProjectShiftProduction")]
         [AllowAnonymous]
-		public async Task<ResponseAjaxResult<ProjectShiftProductionResponseDto>> GetProjectShiftProductionAsync()
+        public async Task<ResponseAjaxResult<ProjectShiftProductionResponseDto>> GetProjectShiftProductionAsync()
         {
             return await projectReportService.GetProjectShiftProductionAsync();
         }
@@ -692,7 +695,7 @@ namespace GHMonitoringCenterApi.Controllers.Project
         /// <returns></returns>
         [HttpGet("SearchCompanyProjectList")]
         [AllowAnonymous]
-        public async Task<ResponseAjaxResult<List<CompanyProjectDetailedResponseDto>>> SearchCompanyProjectListAsync([FromQuery]CompanyProjectDetailsdRequestDto companyProjectDetailsdRequestDto)
+        public async Task<ResponseAjaxResult<List<CompanyProjectDetailedResponseDto>>> SearchCompanyProjectListAsync([FromQuery] CompanyProjectDetailsdRequestDto companyProjectDetailsdRequestDto)
         {
             return await projectService.SearchCompanyProjectListAsync(companyProjectDetailsdRequestDto);
         }
@@ -708,7 +711,7 @@ namespace GHMonitoringCenterApi.Controllers.Project
             //var tempPath = "D:\\projectconllection\\dotnet\\szgh\\GHMonitoringCenterApi.Domain.Shared\\Template\\Excel\\CompanyOnProjectTemplate.xlsx";
             //var tempPath = "E:\\project\\HNKC.SZGHAPI\\GHMonitoringCenterApi.Domain.Shared\\Template\\Excel\\CompanyOnProjectTemplate.xlsx";
             var tempPath = "Template/Excel/CompanyOnProjectTemplate.xlsx";
-            var data= await projectService.SearchCompanyProjectListAsync(companyProjectDetailsdRequestDto);
+            var data = await projectService.SearchCompanyProjectListAsync(companyProjectDetailsdRequestDto);
             var value = new
             {
                 Year = DateTime.Now.Year,
@@ -735,7 +738,7 @@ namespace GHMonitoringCenterApi.Controllers.Project
         /// <param name="baseRequestDto"></param>
         ///// <returns></returns>
         [HttpGet("SearchStartList")]
-        public async Task<ResponseAjaxResult<List<StartWorkResponseDto>>> SearchStartList([FromQuery] StartWorkRequestDto   startWorkRequestDto)
+        public async Task<ResponseAjaxResult<List<StartWorkResponseDto>>> SearchStartList([FromQuery] StartWorkRequestDto startWorkRequestDto)
         {
             return await projectService.SearchStartListAsync(startWorkRequestDto.Id, startWorkRequestDto.PageIndex, startWorkRequestDto.PageSize);
         }
@@ -759,9 +762,16 @@ namespace GHMonitoringCenterApi.Controllers.Project
         /// <returns></returns>
         [HttpGet("RevocationProjectMonth")]
         [UnitOfWork]
-        public async Task<ResponseAjaxResult<bool>> RevocationProjectMonthAsync([FromQuery]BasePrimaryRequestDto basePrimaryRequestDto)
+        public async Task<ResponseAjaxResult<bool>> RevocationProjectMonthAsync([FromQuery] BasePrimaryRequestDto basePrimaryRequestDto)
         {
-          return await  projectService.RevocationProjectMonthAsync(basePrimaryRequestDto.Id);
+            return await projectService.RevocationProjectMonthAsync(basePrimaryRequestDto.Id);
         }
+
+        #region  新的项目月报列表
+        [HttpGet("aa")]
+        public async Task<List<ConveretTreeForProjectWBSDto>> WBSConvertTree([FromQuery] Guid projectId, [FromQuery] int dateMonth)
+            => await _monthReportForProjectService.WBSConvertTree(projectId, dateMonth);
+
+        #endregion
     }
 }

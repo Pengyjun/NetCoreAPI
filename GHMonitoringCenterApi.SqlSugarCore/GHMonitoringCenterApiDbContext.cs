@@ -34,17 +34,18 @@ namespace GHMonitoringCenterApi.SqlSugarCore
                 {
                     if (sql.IndexOf("t_auditlogs") < 0)
                     {
-                        if (isOpenSql)
-                        {
-                            //获取无参数化sql  会影响性能  建议调试使用生产环境禁止使用
-                            sqlParmae = UtilMethods.GetSqlString(DbType.SqlServer, sql, parames);
-                        }
-                        else {
-                            sqlParmae = sql;
-                        }
+                        //if (isOpenSql)
+                        //{
+                        //    //获取无参数化sql  会影响性能  建议调试使用生产环境禁止使用
+                        //    sqlParmae = UtilMethods.GetSqlString(DbType.SqlServer, sql, parames);
+                        //}
+                        //else
+                        //{
+                        //    sqlParmae = sql;
+                        //}
                     }
-                    //调试时打印sql语句 生产时注释掉
-                   //Console.WriteLine($"{sqlParmae}");
+                    ////调试时打印sql语句 生产时注释掉
+                    //Console.WriteLine($"{sqlParmae}");
                 };
                 //db.Aop.OnError=(sql) => {
                 //  //记录出错的sql语句
