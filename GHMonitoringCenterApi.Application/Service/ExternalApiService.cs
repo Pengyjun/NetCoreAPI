@@ -704,42 +704,40 @@ namespace GHMonitoringCenterApi.Application.Service
                 foreach (var item in projectMonthList)
                 {
                     //当月产值
-                   var currentProjectMonthRepost=projectMonthList.Where(x=>x.DateMonth== currentMonth && x.ProjectId==item.ProjectId).FirstOrDefault();
+                    //var currentProjectMonthRepost = projectMonthList.Where(x =>x.ProjectId == item.ProjectId).FirstOrDefault();
                     //当年完成产值
                     var yearCompletProductionValue = projectMonthList.Where(x => x.ProjectId == item.ProjectId
-                    &&x.DateMonth>= yearStartIime&&x.DateMonth<= yearEndTime).ToList();
+                    && x.DateMonth >= yearStartIime && x.DateMonth <= yearEndTime).ToList();
                     //累计完成成本
                     var yearTotalCompletProductionValue = projectMonthList.Where(x => x.ProjectId == item.ProjectId
                    ).ToList();
-                    if (currentProjectMonthRepost != null)
+                    monthtReportDtos.Add(new MonthtReportDto()
                     {
-                        monthtReportDtos .Add(new MonthtReportDto()
-                        {
-                           DateMonth = item.DateMonth,
-                            ProjectId = item.ProjectId,
-                            AccomplishQuantities = currentProjectMonthRepost.CompletedQuantity,
-                            YearAccomplishQuantities= yearCompletProductionValue.Sum(x => x.CompletedQuantity),
-                            AccumulativeQuantities= yearTotalCompletProductionValue.Sum(x => x.CompletedQuantity),
+                        DateMonth = item.DateMonth,
+                        ProjectId = item.ProjectId,
+                        AccomplishQuantities = item.CompletedQuantity,
+                        YearAccomplishQuantities = yearCompletProductionValue.Sum(x => x.CompletedQuantity),
+                        AccumulativeQuantities = yearTotalCompletProductionValue.Sum(x => x.CompletedQuantity),
 
-                            RecognizedValue = currentProjectMonthRepost.PartyAConfirmedProductionAmount,
-                            YearRecognizedValue = yearCompletProductionValue.Sum(x=>x.PartyAConfirmedProductionAmount),
-                            CumulativeValue = yearTotalCompletProductionValue.Sum(x => x.PartyAConfirmedProductionAmount),
+                        RecognizedValue = item.PartyAConfirmedProductionAmount,
+                        YearRecognizedValue = yearCompletProductionValue.Sum(x => x.PartyAConfirmedProductionAmount),
+                        CumulativeValue = yearTotalCompletProductionValue.Sum(x => x.PartyAConfirmedProductionAmount),
 
-                            PaymentAmount = currentProjectMonthRepost.PartyAPayAmount,
-                            YearPaymentAmount = yearCompletProductionValue.Sum(x => x.PartyAPayAmount),
-                            CumulativePaymentAmount= yearTotalCompletProductionValue.Sum(x => x.PartyAPayAmount),
+                        PaymentAmount = item.PartyAPayAmount,
+                        YearPaymentAmount = yearCompletProductionValue.Sum(x => x.PartyAPayAmount),
+                        CumulativePaymentAmount = yearTotalCompletProductionValue.Sum(x => x.PartyAPayAmount),
 
 
-                            AccomplishValue = currentProjectMonthRepost.CompleteProductionAmount,
-                            YearAccomplishCost = yearCompletProductionValue.Sum(x => x.CompleteProductionAmount),
-                            CumulativeAccomplishCost = yearTotalCompletProductionValue.Sum(x => x.CompleteProductionAmount),
+                        AccomplishValue = item.CompleteProductionAmount,// currentProjectMonthRepost.CompleteProductionAmount,
+                        YearAccomplishCost = yearCompletProductionValue.Sum(x => x.CompleteProductionAmount),
+                        CumulativeAccomplishCost = yearTotalCompletProductionValue.Sum(x => x.CompleteProductionAmount),
 
-                            OutsourcingExpensesAmount= currentProjectMonthRepost.OutsourcingExpensesAmount,
-                        });
-                    }
-                 
+                        OutsourcingExpensesAmount = item.OutsourcingExpensesAmount,
+                    }); 
+
                 }
             }
+           
             responseAjaxResult.Data = monthtReportDtos;
             responseAjaxResult.Count = monthtReportDtos.Count;
             responseAjaxResult.Success();

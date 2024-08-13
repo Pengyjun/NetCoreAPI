@@ -677,7 +677,7 @@ namespace GHMonitoringCenterApi.Application.Service.ProjectProductionReport
         /// <exception cref="NotImplementedException"></exception>
         public async Task<ResponseAjaxResult<ShipsDayReportResponseDto>> SearchShipDayReportAsync(ShipDailyRequestDto searchRequestDto)
         {
-            ResponseAjaxResult<ShipsDayReportResponseDto> responseAjaxResult = new ResponseAjaxResult<ShipsDayReportResponseDto>();
+                ResponseAjaxResult<ShipsDayReportResponseDto> responseAjaxResult = new ResponseAjaxResult<ShipsDayReportResponseDto>();
             ShipsDayReportResponseDto shipsDayReportResponseDto = new ShipsDayReportResponseDto();
             RefAsync<int> total = 0;
             //属性标签
@@ -794,6 +794,7 @@ namespace GHMonitoringCenterApi.Application.Service.ProjectProductionReport
                         JoinType.Left, d.ProjectId == p.Id && departmentIdss.Contains(p.ProjectDept),
                         JoinType.Left, d.ShipId == s.PomId
                     ))
+                    .Where((d, p, s) =>d.IsDelete==1)
                     .OrderBy((d, p) => new { DateDay = SqlFunc.Desc(d.DateDay), Name = SqlFunc.Desc(p.Name) })
                     .WhereIF(!string.IsNullOrWhiteSpace(searchRequestDto.ShipPingId.ToString()), (d, p) => d.ShipId == searchRequestDto.ShipPingId)
                     .WhereIF(searchRequestDto.StartTime == null && searchRequestDto.EndTime == null, (d, p) => d.DateDay == time)
