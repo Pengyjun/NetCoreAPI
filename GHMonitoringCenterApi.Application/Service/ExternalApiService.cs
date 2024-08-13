@@ -14,6 +14,7 @@ using GHMonitoringCenterApi.Application.Contracts.IService.ProjectProductionRepo
 using GHMonitoringCenterApi.Domain.Models;
 using GHMonitoringCenterApi.Domain.Shared;
 using GHMonitoringCenterApi.Domain.Shared.Const;
+using HNKC.OperationLogsAPI.Dto.ResponseDto;
 using SqlSugar;
 using SqlSugar.Extensions;
 using static GHMonitoringCenterApi.Application.Contracts.Dto.Project.Report.MonthtReportsResponseDto;
@@ -1192,6 +1193,38 @@ namespace GHMonitoringCenterApi.Application.Service
 
             responseAjaxResult.Count = responseData.Count;
             responseAjaxResult.SuccessResult(res);
+            return responseAjaxResult;
+        }
+
+        public async Task<ResponseAjaxResult<List<ProjectStatusChangResponse>>> SearchProjectChangeList()
+        {
+            ResponseAjaxResult<List<ProjectStatusChangResponse>> responseAjaxResult = new ResponseAjaxResult<List<ProjectStatusChangResponse>>();
+            List<ProjectStatusChangResponse> projectStatusChangResponses = new List<ProjectStatusChangResponse>();
+            var list = _dbContext.Queryable<StartWorkRecord>()
+               .Where((it) => it.BeforeStatus != it.AfterStatus )
+                .GroupBy(it => it.ProjectId)
+                .Select(it => new
+                {
+                    name = it.ProjectId,
+                    CreateTime = SqlFunc.AggregateMax(it.CreateTime)
+                })
+                .MergeTable()
+                .LeftJoin<StartWorkRecord>((a, b) => a.name == b.ProjectId)
+                  .Where((a,b) => a.CreateTime == b.CreateTime)
+                .Select((a, b) => b).ToList();
+            foreach (var item in list)
+            {
+                projectStatusChangResponses.Add(new ProjectStatusChangResponse()
+                {
+                    AfterStautsId = item.AfterStatus,
+                    BeforeStautsId = item.BeforeStatus,
+                    Id = item.ProjectId.Value,
+                    Time = item.CreateTime.Value
+                });
+            }
+            responseAjaxResult.Count = projectStatusChangResponses.Count;
+            responseAjaxResult.Data = projectStatusChangResponses;
+            responseAjaxResult.Success();
             return responseAjaxResult;
         }
         #endregion

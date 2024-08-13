@@ -7,6 +7,7 @@ using GHMonitoringCenterApi.Application.Contracts.Dto.ProjectProductionReport;
 using GHMonitoringCenterApi.Application.Contracts.IService;
 using GHMonitoringCenterApi.Domain.Models;
 using GHMonitoringCenterApi.Domain.Shared;
+using HNKC.OperationLogsAPI.Dto.ResponseDto;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using static GHMonitoringCenterApi.Application.Contracts.Dto.Project.Report.MonthtReportsResponseDto;
@@ -329,6 +330,12 @@ namespace GHMonitoringCenterApi.Controllers
         [AllowAnonymous]//跳过鉴权
         public async Task<ResponseAjaxResult<List<SearchEquipmentManagementResponseDto>>> GetSearchEquipmentManagementAsync([FromQuery] ExternalRequestDto requestDto)
             => await _externalApiService.GetSearchEquipmentManagementAsync(requestDto);
+
+
+        [HttpGet("SearchProjectChangeList")]
+        [AllowAnonymous]//跳过鉴权
+        public async Task<ResponseAjaxResult<List<ProjectStatusChangResponse>>> SearchProjectChangeList()
+           => await _externalApiService.SearchProjectChangeList();
         #endregion
     }
 }
