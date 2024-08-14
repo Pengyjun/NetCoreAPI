@@ -112,14 +112,12 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
 
                     foreach (ProjectWBSDto finallyNode in node.Children)
                     {
-                        finallyNode.ReportDetails = GetFinallyChildren(node.Children, mReportList, yReportList, klReportList, bData);
+                        finallyNode.ReportDetails = GetFinallyChildren(finallyNode.ProjectWBSId, node.Children, mReportList, yReportList, klReportList, bData);
                     }
 
                     if (!node.Children.Any())
-                    {
                         //当前节点是最终子节点
                         node.ReportDetails = MReportForProjectList(node.ProjectWBSId, mReportList, yReportList, klReportList, bData);
-                    }
 
                     if (node.Pid == "0")
                     {
@@ -156,13 +154,28 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
         /// <param name="yReportList"></param>
         /// <param name="klReportList"></param>
         /// <param name="bData"></param>
+        /// <param name="wbsId"></param>
         /// <returns></returns>
-        public List<ProjectWBSDto> GetFinallyChildren(List<ProjectWBSDto> childrens, List<ProjectWBSDto> mReportList, List<ProjectWBSDto> yReportList, List<ProjectWBSDto> klReportList, List<MonthReportForProjectBaseDataResponseDto> bData)
+        public List<ProjectWBSDto> GetFinallyChildren(Guid wbsId, List<ProjectWBSDto> childrens, List<ProjectWBSDto> mReportList, List<ProjectWBSDto> yReportList, List<ProjectWBSDto> klReportList, List<MonthReportForProjectBaseDataResponseDto> bData)
         {
             List<ProjectWBSDto> childs = new List<ProjectWBSDto>();
 
-            foreach (var children in childrens)
+            var children = childrens.FirstOrDefault(x => x.ProjectWBSId == wbsId);
+
+            if (children != null)
             {
+                if (children.Children == null || !children.Children.Any())
+                {
+                    /***
+                     * 当前节点是最终子节点
+                     */
+                    childs = MReportForProjectList(children.ProjectWBSId, mReportList, yReportList, klReportList, bData);
+                }
+                else
+                {
+                    GetFinallyChildren(children.ProjectWBSId, children.Children, mReportList, yReportList, klReportList, bData);
+                }
+
                 /***
                  * 1.统计当前父节点当年（产值、工程量、外包支出）&& 累计（产值、工程量、外包支出）
                  * 2.重调方法获取最终子节点
@@ -175,18 +188,6 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 children.TotalCompleteProductionAmount = children.Children == null ? 0M : children.Children.Sum(x => x.CompleteProductionAmount);
                 children.TotalCompletedQuantity = children.Children == null ? 0M : children.Children.Sum(x => x.CompletedQuantity);
                 children.TotalOutsourcingExpensesAmount = children.Children == null ? 0M : children.Children.Sum(x => x.OutsourcingExpensesAmount);
-
-                if (children.Children == null || !children.Children.Any())
-                {
-                    /***
-                     * 当前节点是最终子节点
-                     */
-                    childs = MReportForProjectList(children.ProjectWBSId, mReportList, yReportList, klReportList, bData);
-                }
-                else
-                {
-                    GetFinallyChildren(children.Children, mReportList, yReportList, klReportList, bData);
-                }
             }
 
             return childs;
@@ -226,6 +227,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 report.ConstructionNatureName = bData.FirstOrDefault(x => RouseType.ConstructionNature == x.RouseType && x.ConstructionNatureType == report.ConstructionNature)?.Name;
                 report.OutPutTypeName = bData.FirstOrDefault(x => (x.RouseType == RouseType.Self || x.RouseType == RouseType.Sub) && report.OutPutType == x.ShipRouseType)?.Name;
                 report.ShipName = bData.FirstOrDefault(x => x.Id == report.ShipId)?.Name;
+                report.DetailId = report.Id;
                 #endregion
             }
 
