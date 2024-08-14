@@ -1,9 +1,15 @@
 ﻿using AutoMapper;
+using GHMonitoringCenterApi.Application.Contracts.Dto.Enums;
+using GHMonitoringCenterApi.Application.Contracts.Dto.Project;
 using GHMonitoringCenterApi.Application.Contracts.Dto.Project.MonthReportForProject;
+using GHMonitoringCenterApi.Application.Contracts.IService.BizAuthorize;
 using GHMonitoringCenterApi.Application.Contracts.IService.Project;
 using GHMonitoringCenterApi.Domain.Enums;
 using GHMonitoringCenterApi.Domain.Models;
+using GHMonitoringCenterApi.Domain.Shared;
+using GHMonitoringCenterApi.Domain.Shared.Enums;
 using SqlSugar;
+using Models = GHMonitoringCenterApi.Domain.Models;
 
 namespace GHMonitoringCenterApi.Application.Service.Projects
 {
@@ -21,12 +27,26 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
         /// </summary>
         private readonly IMapper _mapper;
         /// <summary>
+        /// 业务授权层
+        /// </summary>
+        private readonly IBizAuthorizeService _bizAuthorizeService;
+        /// <summary>
+        /// 全局对象
+        /// </summary>
+        private readonly GlobalObject _globalObject;
+        /// <summary>
+        /// 当前登录用户
+        /// </summary>
+        private CurrentUser _currentUser { get { return _globalObject.CurrentUser; } }
+        /// <summary>
         /// 服务注入
         /// </summary>
-        public MonthReportForProjectService(ISqlSugarClient dbContext, IMapper mapper)
+        public MonthReportForProjectService(ISqlSugarClient dbContext, IMapper mapper, GlobalObject globalObject, IBizAuthorizeService bizAuthorizeService)
         {
             this._dbContext = dbContext;
             this._mapper = mapper;
+            this._globalObject = globalObject;
+            this._bizAuthorizeService = bizAuthorizeService;
         }
 
         #region 处理WBS树
@@ -39,8 +59,9 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
         /// </summary>
         /// <param name="projectId"></param>
         /// <param name="dateMonth"></param>
+        /// <param name="bData">施工性质、产值属性</param>
         /// <returns></returns>
-        public async Task<List<ConveretTreeForProjectWBSDto>> WBSConvertTree(Guid projectId, int dateMonth)
+        public async Task<List<ProjectWBSDto>> WBSConvertTree(Guid projectId, int? dateMonth, List<MonthReportForProjectBaseDataResponseDto> bData)
         {
             /***
              * 1.获取请求数据
@@ -48,62 +69,79 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
              * 3.获取年度月报详细
              * 4.获取开累月报详细
              * 5.获取WBS数据
+             * 6.获取基础数据(施工性质、产值属性、资源)
              */
             var requestList = await GetWBSDataAsync(projectId, dateMonth);
             var mReportList = requestList.Where(x => x.ValueType == ValueEnumType.NowMonth).ToList();
             var yReportList = requestList.Where(x => x.ValueType == ValueEnumType.NowYear).ToList();
-            var hReportList = requestList.Where(x => x.ValueType == ValueEnumType.AccumulatedCommencement).ToList();
+            var klReportList = requestList.Where(x => x.ValueType == ValueEnumType.AccumulatedCommencement).ToList();
             var wbsList = requestList.Where(x => x.ValueType == ValueEnumType.None).ToList();
 
-            ////映射体转换初始化
-            var mapperWbsList = new List<ConveretTreeForProjectWBSDto>();
-            var mappermReportList = new List<ConveretTreeForProjectWBSDto>();
-            var mapperyReportList = new List<ConveretTreeForProjectWBSDto>();
-            var mapperhReportList = new List<ConveretTreeForProjectWBSDto>();
+            var pWbsTree = await GetChildren(projectId, dateMonth, "0", wbsList, mReportList, yReportList, klReportList, bData);
 
-            /***
-             * 映射对应响应体
-             * 1.映射wbs响应体
-             * 2.映射月报详细响应体
-            */
-            _mapper.Map<List<ProjectWBSDto>, List<ConveretTreeForProjectWBSDto>>(wbsList, mapperWbsList);
-            _mapper.Map<List<ProjectWBSDto>, List<ConveretTreeForProjectWBSDto>>(mReportList, mappermReportList);
-            _mapper.Map<List<ProjectWBSDto>, List<ConveretTreeForProjectWBSDto>>(yReportList, mapperyReportList);
-            _mapper.Map<List<ProjectWBSDto>, List<ConveretTreeForProjectWBSDto>>(hReportList, mapperhReportList);
-
-            var tt = await GetChildren(projectId, dateMonth, "0", mapperWbsList, mappermReportList, mapperyReportList, mapperhReportList);
             //转换wbs树
-            return tt;
+            return pWbsTree;
         }
-
         /// <summary>
         /// 获取子集数据，处理月报详细数据逻辑
         /// </summary>
         /// <param name="projectId"></param>
         /// <param name="dateMonth"></param>
         /// <param name="nodePId"></param>
-        /// <param name="mapperWbsList">wbs响应体</param>
-        /// <param name="mappermReportList">当月月报详细响应体</param>
-        /// <param name="mapperyReportList">当年月报详细响应体</param>
-        /// <param name="mapperhReportList">开累（历史）月报详细响应体</param>
+        /// <param name="wbsList">wbs响应体</param>
+        /// <param name="mReportList">当月月报详细响应体</param>
+        /// <param name="yReportList">当年月报详细响应体</param>
+        /// <param name="klReportList">开累（历史）月报详细响应体</param>
+        /// <param name="bData">施工性质、产值属性</param>
         /// <returns></returns>
-        public async Task<List<ConveretTreeForProjectWBSDto>> GetChildren(Guid projectId, int dateMonth, string? nodePId, List<ConveretTreeForProjectWBSDto> mapperWbsList, List<ConveretTreeForProjectWBSDto> mappermReportList, List<ConveretTreeForProjectWBSDto> mapperyReportList, List<ConveretTreeForProjectWBSDto> mapperhReportList)
+        public async Task<List<ProjectWBSDto>> GetChildren(Guid projectId, int? dateMonth, string? nodePId, List<ProjectWBSDto> wbsList, List<ProjectWBSDto> mReportList, List<ProjectWBSDto> yReportList, List<ProjectWBSDto> klReportList, List<MonthReportForProjectBaseDataResponseDto> bData)
         {
-            var mainNodes = mapperWbsList.Where(x => x.Pid == nodePId).ToList();
-            var otherNodes = mapperWbsList.Where(x => x.Pid != nodePId).ToList();
+            var mainNodes = wbsList.Where(x => x.Pid == nodePId).ToList();
+            var otherNodes = wbsList.Where(x => x.Pid != nodePId).ToList();
             if (otherNodes != null && otherNodes.Any())
             {
-                foreach (var node in mainNodes)
+                foreach (ProjectWBSDto node in mainNodes)
                 {
-                    node.Node = await GetChildren(projectId, dateMonth, node.KeyId, otherNodes, mappermReportList, mapperyReportList, mapperhReportList);
+
+                    node.Children = await GetChildren(projectId, dateMonth, node.KeyId, otherNodes, mReportList, yReportList, klReportList, bData);
 
                     /***
                      * 最后一层节点处理月报详细数据
                      * 1.最后一层节点重新赋值项目月报详细数据
                      */
-                    if (node.Node.Count == 0)
+
+                    foreach (ProjectWBSDto finallyNode in node.Children)
                     {
-                        node.Node = MReportForProjectList(node.KeyId, node.ProjectWBSId, mappermReportList, mapperyReportList, mapperhReportList);
+                        finallyNode.ReportDetails = GetFinallyChildren(node.Children, mReportList, yReportList, klReportList, bData);
+                    }
+
+                    if (!node.Children.Any())
+                    {
+                        //当前节点是最终子节点
+                        node.ReportDetails = MReportForProjectList(node.ProjectWBSId, mReportList, yReportList, klReportList, bData);
+                    }
+
+                    if (node.Pid == "0")
+                    {
+                        /***
+                         * 1.统计根节点当年（产值、工程量、外包支出）&& 累计（产值、工程量、外包支出）&& 当月（产值、工程量、外包支出）
+                         * 2.存在子节点数据 递归回调方法（直到当前节点的子节点没有数据；目的：最后一层节点追加资源/船舶数据）
+                         */
+
+                        node.YearCompleteProductionAmount = yReportList.Sum(x => x.CompleteProductionAmount);
+                        node.YearCompletedQuantity = yReportList.Sum(x => x.CompletedQuantity);
+                        node.YearOutsourcingExpensesAmount = yReportList.Sum(x => x.OutsourcingExpensesAmount);
+
+                        node.TotalCompleteProductionAmount = klReportList.Sum(x => x.CompleteProductionAmount);
+                        node.TotalCompletedQuantity = klReportList.Sum(x => x.CompletedQuantity);
+                        node.TotalOutsourcingExpensesAmount = klReportList.Sum(x => x.OutsourcingExpensesAmount);
+
+                        node.CompleteProductionAmount = node.Children == null ? 0M : node.Children.Sum(x => x.CompleteProductionAmount);
+                        node.CompletedQuantity = node.Children == null ? 0M : node.Children.Sum(x => x.CompletedQuantity);
+                        node.OutsourcingExpensesAmount = node.Children == null ? 0M : node.Children.Sum(x => x.OutsourcingExpensesAmount);
+
+                        node.ContractAmount = node.Children == null ? 0M : node.Children.Sum(x => x.ContractAmount);
+                        node.EngQuantity = node.Children == null ? 0M : node.Children.Sum(x => x.EngQuantity);
                     }
                 }
             }
@@ -111,15 +149,58 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             return mainNodes;
         }
         /// <summary>
+        /// 获取最终子节点（资源/船舶数据）
+        /// </summary>
+        /// <param name="childrens"></param>
+        /// <param name="mReportList"></param>
+        /// <param name="yReportList"></param>
+        /// <param name="klReportList"></param>
+        /// <param name="bData"></param>
+        /// <returns></returns>
+        public List<ProjectWBSDto> GetFinallyChildren(List<ProjectWBSDto> childrens, List<ProjectWBSDto> mReportList, List<ProjectWBSDto> yReportList, List<ProjectWBSDto> klReportList, List<MonthReportForProjectBaseDataResponseDto> bData)
+        {
+            List<ProjectWBSDto> childs = new List<ProjectWBSDto>();
+
+            foreach (var children in childrens)
+            {
+                /***
+                 * 1.统计当前父节点当年（产值、工程量、外包支出）&& 累计（产值、工程量、外包支出）
+                 * 2.重调方法获取最终子节点
+                 */
+
+                children.YearCompleteProductionAmount = children.Children == null ? 0M : children.Children.Sum(x => x.CompleteProductionAmount);
+                children.YearCompletedQuantity = children.Children == null ? 0M : children.Children.Sum(x => x.CompletedQuantity);
+                children.YearOutsourcingExpensesAmount = children.Children == null ? 0M : children.Children.Sum(x => x.OutsourcingExpensesAmount);
+
+                children.TotalCompleteProductionAmount = children.Children == null ? 0M : children.Children.Sum(x => x.CompleteProductionAmount);
+                children.TotalCompletedQuantity = children.Children == null ? 0M : children.Children.Sum(x => x.CompletedQuantity);
+                children.TotalOutsourcingExpensesAmount = children.Children == null ? 0M : children.Children.Sum(x => x.OutsourcingExpensesAmount);
+
+                if (children.Children == null || !children.Children.Any())
+                {
+                    /***
+                     * 当前节点是最终子节点
+                     */
+                    childs = MReportForProjectList(children.ProjectWBSId, mReportList, yReportList, klReportList, bData);
+                }
+                else
+                {
+                    GetFinallyChildren(children.Children, mReportList, yReportList, klReportList, bData);
+                }
+            }
+
+            return childs;
+        }
+        /// <summary>
         /// 最后一层节点处理月报详细数据
         /// </summary>
-        /// <param name="pId">上级的树id（匹配最后的根节点keyid）</param>
         /// <param name="wbsId">wbsid（施工分类）</param>
         /// <param name="mReportList">当月月报详细数据</param>
         /// <param name="yReportList">当年月报详细数据(做统计数据使用)</param>
-        /// <param name="hReportList">开累月报详细数据(做统计数据使用)</param>
+        /// <param name="klReportList">开累月报详细数据(做统计数据使用)</param>
+        /// <param name="bData">施工性质、产值属性</param>
         /// <returns></returns>
-        public List<ConveretTreeForProjectWBSDto> MReportForProjectList(string pId, Guid wbsId, List<ConveretTreeForProjectWBSDto> mReportList, List<ConveretTreeForProjectWBSDto> yReportList, List<ConveretTreeForProjectWBSDto> hReportList)
+        public List<ProjectWBSDto> MReportForProjectList(Guid wbsId, List<ProjectWBSDto> mReportList, List<ProjectWBSDto> yReportList, List<ProjectWBSDto> klReportList, List<MonthReportForProjectBaseDataResponseDto> bData)
         {
             /***
              * 1.根据(当前施工分类)wbsid获取所有资源（船舶）信息
@@ -134,9 +215,18 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 report.YearOutsourcingExpensesAmount = yReportList.Where(x => x.ProjectId == report.ProjectId && report.ShipId == x.ShipId && x.ProjectWBSId == wbsId).Sum(x => x.OutsourcingExpensesAmount);
 
                 //开累统计
-                report.TotalCompleteProductionAmount = hReportList.Where(x => x.ProjectId == report.ProjectId && report.ShipId == x.ShipId && x.ProjectWBSId == wbsId).Sum(x => x.CompleteProductionAmount);
-                report.TotalCompletedQuantity = hReportList.Where(x => x.ProjectId == report.ProjectId && report.ShipId == x.ShipId && x.ProjectWBSId == wbsId).Sum(x => x.CompletedQuantity);
-                report.TotalOutsourcingExpensesAmount = hReportList.Where(x => x.ProjectId == report.ProjectId && report.ShipId == x.ShipId && x.ProjectWBSId == wbsId).Sum(x => x.OutsourcingExpensesAmount);
+                report.TotalCompleteProductionAmount = klReportList.Where(x => x.ProjectId == report.ProjectId && report.ShipId == x.ShipId && x.ProjectWBSId == wbsId).Sum(x => x.CompleteProductionAmount);
+                report.TotalCompletedQuantity = klReportList.Where(x => x.ProjectId == report.ProjectId && report.ShipId == x.ShipId && x.ProjectWBSId == wbsId).Sum(x => x.CompletedQuantity);
+                report.TotalOutsourcingExpensesAmount = klReportList.Where(x => x.ProjectId == report.ProjectId && report.ShipId == x.ShipId && x.ProjectWBSId == wbsId).Sum(x => x.OutsourcingExpensesAmount);
+
+                /***
+                 * 基本信息处理
+                 */
+                #region 基础信息处理
+                report.ConstructionNatureName = bData.FirstOrDefault(x => RouseType.ConstructionNature == x.RouseType && x.ConstructionNatureType == report.ConstructionNature)?.Name;
+                report.OutPutTypeName = bData.FirstOrDefault(x => (x.RouseType == RouseType.Self || x.RouseType == RouseType.Sub) && report.OutPutType == x.ShipRouseType)?.Name;
+                report.ShipName = bData.FirstOrDefault(x => x.Id == report.ShipId)?.Name;
+                #endregion
             }
 
             return mReport;
@@ -147,7 +237,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
         /// <param name="pId">项目id</param>
         /// <param name="dateMonth">填报日期</param>
         /// <returns></returns>
-        public async Task<List<ProjectWBSDto>> GetWBSDataAsync(Guid pId, int dateMonth)
+        public async Task<List<ProjectWBSDto>> GetWBSDataAsync(Guid pId, int? dateMonth)
         {
             var pWBS = new List<ProjectWBSDto>();
             var calculatePWBS = new List<ProjectWBSDto>();
@@ -168,6 +258,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     ValueType = ValueEnumType.None,
                     ProjectId = p.ProjectId,
                     ProjectWBSId = p.Id,
+                    ProjectWBSName = p.Name,
                     UnitPrice = p.UnitPrice,//wbs初始的单价
                     ContractAmount = SqlFunc.ToDecimal(p.EngQuantity) * SqlFunc.ToDecimal(p.UnitPrice)//WBS的初始合同产值=工程量*单价
                 })
@@ -193,12 +284,18 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                        ShipId = p.ShipId,
                        OutPutType = p.OutPutType,
                        ValueType = ValueEnumType.AccumulatedCommencement,
-                       Remark = p.Remark
+                       Remark = p.Remark,
+                       CompleteProductionAmount = SqlFunc.ToDecimal(p.UnitPrice) * SqlFunc.ToDecimal(p.CompletedQuantity)
                    })
                    .ToListAsync();
 
+                foreach (var item in calculatePWBS)
+                {
+                    item.EngQuantity = pWBS.FirstOrDefault(x => x.ProjectWBSId == item.ProjectWBSId)?.EngQuantity;
+                }
+
                 /***
-                 * 1.取当月的填报数据，当月完成产值处理(单价*工程量),其他不变
+                 * 1.取当月的填报数据
                  * 2.业务区分字段为当月
                  * 3.查询当月的月报详细数据允许删除
                  */
@@ -209,7 +306,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     {
                         ValueType = ValueEnumType.NowMonth,
                         IsAllowDelete = true,
-                        CompleteProductionAmount = Convert.ToDecimal(nowMonth.UnitPrice) * Convert.ToDecimal(nowMonth.CompletedQuantity),
+                        CompleteProductionAmount = nowMonth.CompleteProductionAmount,
                         CompletedQuantity = nowMonth.CompletedQuantity,
                         UnitPrice = nowMonth.UnitPrice,
                         ConstructionNature = nowMonth.ConstructionNature,
@@ -240,12 +337,16 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
 
                 /***
                  * 当月填报详细中需要包含历史中存在的资源（船舶）信息，所以在此处valuetype=当月,其他基础信息不变作为本月数据
-                 * 1.取除当月之前的所有填报数据
-                 * 2.根据资源（船舶id）去重
-                 * 3.需要填写的单价、工程量、外包支出、备注全部初始化
+                 * 1.不包含已经存在的资源（船舶）
+                 * 2.取除当月之前的所有填报数据
+                 * 3.根据资源（船舶id）去重
+                 * 4.需要填写的单价、工程量、外包支出、备注全部初始化
                  */
+                var existShipIds = nowMonthReport?.Select(x => x.ShipId).ToList();
                 var historyMonthReport = new List<ProjectWBSDto>();
-                foreach (var kvp in calculatePWBS.Where(x => x.DateMonth < dateMonth).GroupBy(i => i.ShipId, (key, val) => val.First()))
+                foreach (var kvp in calculatePWBS
+                    .WhereIF(existShipIds != null && existShipIds.Any(), x => !existShipIds.Contains(x.ShipId))
+                    .Where(x => x.DateMonth < dateMonth).GroupBy(i => i.ShipId, (key, val) => val.First()))
                 {
                     historyMonthReport.Add(new ProjectWBSDto
                     {
@@ -253,7 +354,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                         UnitPrice = 0M,
                         OutsourcingExpensesAmount = 0M,
                         ValueType = ValueEnumType.NowMonth,
-                        CompleteProductionAmount = kvp.CompleteProductionAmount,
+                        CompleteProductionAmount = 0M,
                         ConstructionNature = kvp.ConstructionNature,
                         ContractAmount = kvp.ContractAmount,
                         DateMonth = kvp.DateMonth,
@@ -328,5 +429,408 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             return pWBS;
         }
         #endregion
+        /// <summary>
+        /// 月报产报列表
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        public async Task<ResponseAjaxResult<MonthReportForProjectResponseDto>> SearchMonthReportForProjectAsync(ProjectMonthReportRequestDto model)
+        {
+            var responseAjaxResult = new ResponseAjaxResult<MonthReportForProjectResponseDto>();
+            var result = new MonthReportForProjectResponseDto();
+
+            //当前时间月份
+            var nowDateMonth = GetDefaultReportDateMonth();
+            var dateMonth = model.DateMonth ?? nowDateMonth;
+
+            /***
+             * 1.获取项目字段信息
+             * 2.取项目月报字段信息
+             * 3.其他定义字段
+             * 4.取树基础数据
+             * 5.取树
+             */
+
+            #region 获取项目字段信息
+
+            //获取项目基本信息
+            var project = await _dbContext.Queryable<Project>()
+                .Where(x => x.IsDelete == 1 && x.Id == model.ProjectId)
+                .FirstAsync();
+            if (project == null) { responseAjaxResult.FailResult(HttpStatusCode.ParameterError, "找不到项目"); return responseAjaxResult; }
+
+            //获取当前项目币种
+            result.CurrencyId = project.CurrencyId.Value;
+
+            //获取当前项目汇率
+            var currencyConverter = await _dbContext.Queryable<CurrencyConverter>().Where(t => t.CurrencyId == project.CurrencyId.ToString() && t.Year == DateTime.Now.Year && t.IsDelete == 1).SingleAsync();
+            if (currencyConverter == null || currencyConverter.ExchangeRate == null) { responseAjaxResult.FailResult(HttpStatusCode.ParameterError, "汇率数据不存在"); return responseAjaxResult; }
+            result.CurrencyExchangeRate = (decimal)currencyConverter.ExchangeRate;
+            #endregion
+
+            #region 取项目月报字段信息
+
+            //截止到当前月份的所有月报信息（目的：统计年累、开累）
+            var monthReportData = await _dbContext.Queryable<MonthReport>()
+                .Where(x => x.IsDelete == 1 && x.DateMonth <= dateMonth && x.ProjectId == model.ProjectId)
+                .ToListAsync();
+
+            //获取当前月报基本信息
+            var monthReport = monthReportData.FirstOrDefault(x => x.DateMonth == dateMonth);
+            if (monthReport == null) { responseAjaxResult.FailResult(HttpStatusCode.ParameterError, "当前项目无月报信息"); return responseAjaxResult; }
+
+            //截止到当前月份的月报明细信息
+            var monthReportDetailsData = await _dbContext.Queryable<MonthReportDetail>()
+                .Where(x => x.IsDelete == 1 && x.ProjectId == model.ProjectId)
+                .ToListAsync();
+
+            //当月月报明细
+            var monthReportDetails = monthReportDetailsData.Where(x => x.IsDelete == 1 && x.DateMonth == dateMonth && x.MonthReportId == monthReport.Id)
+                .ToList();
+
+            //当年月报明细
+            int year = Convert.ToInt32(dateMonth.ToString().Substring(0, 4));
+            var yMonthReports = monthReportData.Where(x => x.DateYear == year)
+                .ToList();
+            var yMonthReportIds = yMonthReports.Select(x => x.Id)
+                .ToList();
+            var yMonthReportDetails = monthReportDetailsData.Where(x => x.IsDelete == 1 && x.DateYear == year && yMonthReportIds.Contains(x.MonthReportId))
+                .ToList();
+
+            //本月&年&累计完成产值和
+            result.CompleteProductionAmount = result.CurrencyExchangeRate == 0M ? 0 : monthReportDetails.Sum(x => x.CompleteProductionAmount) / result.CurrencyExchangeRate;
+            result.TotalProductionAmount = result.CurrencyExchangeRate == 0M ? 0 : yMonthReportDetails.Sum(x => x.CompleteProductionAmount) / result.CurrencyExchangeRate;
+            result.TotalCompleteProductionAmount = result.CurrencyExchangeRate == 0M ? 0 : monthReportDetailsData.Sum(x => x.CompleteProductionAmount) / result.CurrencyExchangeRate;
+
+            //本月&年&累计完成产量和
+            result.CompletedQuantity = monthReportDetails.Sum(x => x.CompletedQuantity);
+            result.YearCompletedQuantity = yMonthReportDetails.Sum(x => x.CompletedQuantity);
+            result.TotalCompletedQuantity = monthReportDetailsData.Sum(x => x.CompletedQuantity);
+
+            //累计&本年外包支出
+            result.TotalOutsourcingExpensesAmount = result.CurrencyExchangeRate == 0M ? 0 : monthReportDetailsData.Sum(x => x.OutsourcingExpensesAmount) / result.CurrencyExchangeRate;
+            result.YearOutsourcingExpensesAmount = result.CurrencyExchangeRate == 0M ? 0 : yMonthReportDetails.Sum(x => x.OutsourcingExpensesAmount) / result.CurrencyExchangeRate;
+
+            //累计合同工程量&合同产值
+            //获取wbs
+            var wbs = await _dbContext.Queryable<ProjectWBS>().Where(x => x.IsDelete == 1 && x.ProjectId == model.ProjectId.ToString())
+                .ToListAsync();
+            result.ContractQuantity = wbs.Sum(x => x.EngQuantity);
+            result.ContractAmount = wbs.Sum(x => (x.UnitPrice * x.EngQuantity));
+
+            //历史甲方确认产值、付款金额
+            var historys = await GetProjectProductionValue(model.ProjectId, dateMonth == null ? 0 : dateMonth);
+
+            //本月&年&开累甲方确认产值(元)
+            result.PartyAConfirmedProductionAmount = monthReport.PartyAConfirmedProductionAmount;
+            result.CurrentYearOffirmProductionValue = yMonthReports.Sum(x => x.PartyAConfirmedProductionAmount) + historys.Item1;
+            result.TotalYearKaileaOffirmProductionValue = monthReportData.Sum(x => x.PartyAConfirmedProductionAmount) + historys.Item2;
+
+            //本月&年&开累甲方付款金额(元)
+            result.PartyAPayAmount = monthReport.PartyAPayAmount;
+            result.CurrenYearCollection = yMonthReports.Sum(x => x.PartyAPayAmount) + historys.Item3;
+            result.TotalYearCollection = monthReportData.Sum(x => x.PartyAPayAmount) + historys.Item4;
+
+            //月度应收账款(元)
+            result.ReceivableAmount = monthReport.ReceivableAmount;
+
+            //进度偏差主因
+            result.ProgressDeviationReason = monthReport.ProgressDeviationReason;
+
+            //进度偏差原因简述
+            result.ProgressDeviationDescription = monthReport.ProgressDeviationDescription;
+
+            //主要形象进度描述
+            result.ProgressDescription = monthReport.ProgressDescription;
+
+            //下月预计成本(元)
+            result.NextMonthEstimateCostAmount = monthReport.NextMonthEstimateCostAmount;
+
+            //本月实际成本(元)
+            result.CostAmount = monthReport.CostAmount;
+
+            //成本偏差主因
+            result.CostDeviationReason = monthReport.CostDeviationReason;
+
+            //成本偏差原因简述
+            result.CostDeviationDescription = monthReport.CostDeviationDescription;
+
+            //存在问题简述
+            result.ProblemDescription = monthReport.ProblemDescription;
+
+            //解决事项简述
+            result.SolveProblemDescription = monthReport.SolveProblemDescription;
+
+            //需公司协调事项
+            result.CoordinationMatters = monthReport.CoordinationMatters;
+            #endregion
+
+            #region 其他定义字段
+
+            //任务提交类型
+            result.JobSubmitType = monthReport != null && monthReport.Status == MonthReportStatus.ApproveReject ? JobSubmitType.ResetJob : JobSubmitType.AddJob;
+
+            //状态
+            result.ModelState = monthReport == null ? ModelState.Add : ModelState.Update;
+
+            //任务id
+            result.JobId = monthReport?.JobId;
+
+            // 月报状态
+            result.Status = monthReport?.Status ?? MonthReportStatus.None;
+
+            // 月报状态文本
+            result.StatusText = string.Empty;
+            if (monthReport != null && monthReport.Status != MonthReportStatus.Finish)
+            { result.StatusText = monthReport.Status == MonthReportStatus.ApproveReject ? monthReport.StatusText + ",原因：" + monthReport.RejectReason : monthReport.StatusText; }
+
+            // 是否从暂存中取的业务数据
+            result.IsFromStaging = false;
+
+            //月报是否暂存
+            result.IsCanStaging = false;
+
+            //是否可提交
+            result.IsCanSubmit = await IsCanSubmitAsync(monthReport, dateMonth, nowDateMonth);
+            var stagingData = await _dbContext.Queryable<StagingData>().FirstAsync(t => t.BizType == StagingBizType.SaveMonthReport && t.ProjectId == model.ProjectId && t.DateMonth == dateMonth && t.IsDelete == 1);
+
+            // 判断业务来源暂存
+            if (result.IsCanSubmit && dateMonth == nowDateMonth)
+            {
+                if (stagingData == null || (!stagingData.IsEffectStaging) || stagingData.BizData == null) { }
+                else { result.IsFromStaging = true; result.StatusText = "暂存中"; }
+                result.IsCanStaging = true;
+            }
+
+            result.DateMonth = dateMonth;
+            #endregion
+
+            //取树基础数据
+            var bData = await GetBaseDataAsync();
+
+            //取树
+            var treeDetails = await WBSConvertTree(model.ProjectId, dateMonth, bData);
+
+            //树组合
+            result.TreeDetails = treeDetails;
+
+            //数据回显
+            responseAjaxResult.SuccessResult(result);
+            return responseAjaxResult;
+        }
+        /// <summary>
+        /// 处理并获取施工性质、产值属性、资源基础数据
+        /// </summary>
+        /// <returns></returns>
+        private async Task<List<MonthReportForProjectBaseDataResponseDto>> GetBaseDataAsync()
+        {
+            var bData = new List<MonthReportForProjectBaseDataResponseDto>();
+
+            /***
+             * 1.字典数据处理
+             * 2.施工性质基础数据
+             * 3.产值属性基础数据
+             * 4.资源基础数据
+             * 5.往来单位在响应树做处理
+             */
+
+            //字典表处理
+            var diData = await _dbContext.Queryable<DictionaryTable>()
+                .Where(t => (t.TypeNo == (int)DictionaryTypeNo.ConstructionNature || t.TypeNo == (int)DictionaryTypeNo.CustomShip) && t.IsDelete == 1)
+                .Select(t => new
+                {
+                    Id = t.Id,
+                    Name = t.Name,
+                    Type = t.Type,
+                    TypeNo = t.TypeNo
+                })
+                .ToListAsync();
+
+            //施工性质
+            var constructionNatures = diData.Where(t => t.TypeNo == (int)DictionaryTypeNo.ConstructionNature)
+                .Select(t => new MonthReportForProjectBaseDataResponseDto
+                {
+                    Id = t.Id,
+                    Name = t.Name,
+                    RouseType = RouseType.ConstructionNature,
+                    ConstructionNatureType = t.Type
+                })
+                .ToList();
+            if (constructionNatures != null && constructionNatures.Any()) bData.AddRange(constructionNatures);
+
+            //自定义产值属性
+            bData.Add(new MonthReportForProjectBaseDataResponseDto { Id = Guid.Empty, Name = "自有", ShipRouseType = ConstructionOutPutType.Self, RouseType = RouseType.Self });
+            bData.Add(new MonthReportForProjectBaseDataResponseDto { Id = Guid.Empty, Name = "分包", ShipRouseType = ConstructionOutPutType.SubPackage, RouseType = RouseType.Sub });
+
+            //自有
+            var ownerShips = await _dbContext.Queryable<OwnerShip>()
+                .Where(x => x.IsDelete == 1)
+                .Select(x => new MonthReportForProjectBaseDataResponseDto
+                {
+                    Id = x.PomId,
+                    Name = x.Name,
+                    ShipRouseType = ConstructionOutPutType.Self,
+                    RouseType = RouseType.Self
+                })
+                .ToListAsync();
+            if (ownerShips != null && ownerShips.Any()) bData.AddRange(ownerShips);
+
+            //分包
+            var subShips = await _dbContext.Queryable<SubShip>()
+                .Where(x => x.IsDelete == 1)
+                .Select(x => new MonthReportForProjectBaseDataResponseDto
+                {
+                    Id = x.PomId,
+                    Name = x.Name,
+                    ShipRouseType = ConstructionOutPutType.SubPackage,
+                    RouseType = RouseType.Sub
+                })
+                .ToListAsync();
+            if (subShips != null && subShips.Any()) bData.AddRange(subShips);
+
+            //资源
+            var dIds = await _dbContext.Queryable<MonthReportDetail>()
+                .Where(x => x.IsDelete == 1)
+                .Select(x => x.ShipId)
+                .Distinct()
+                .ToListAsync();
+            var dealingUnits = await _dbContext.Queryable<DealingUnit>()
+                .Where(x => x.IsDelete == 1 && dIds.Contains(x.PomId.Value))
+                .Select(x => new MonthReportForProjectBaseDataResponseDto
+                {
+                    Id = x.PomId,
+                    Name = x.ZBPNAME_ZH,
+                    RouseType = RouseType.Rouse
+                })
+                .ToListAsync();
+            if (dealingUnits != null && dealingUnits.Any()) bData.AddRange(dealingUnits);
+
+            //资源：客户自定义
+            var customResource = diData.Where(t => t.TypeNo == (int)DictionaryTypeNo.CustomShip)
+               .Select(t => new MonthReportForProjectBaseDataResponseDto
+               {
+                   Id = t.Id,
+                   Name = t.Name,
+                   RouseType = RouseType.Rouse,
+                   ConstructionNatureType = t.Type
+               })
+               .ToList();
+            if (customResource != null && customResource.Any()) bData.AddRange(customResource);
+
+            return bData;
+        }
+        /// <summary>
+        /// 获取默认允许填报的月份
+        /// </summary>
+        /// <returns></returns>
+        private int GetDefaultReportDateMonth()
+        {
+            DateTime time = DateTime.Now;
+            return time.Day < 26 ? time.AddMonths(-1).ToDateMonth() : time.ToDateMonth();
+        }
+        /// <summary>
+        ///是否允许提交
+        /// </summary>
+        /// <returns></returns>
+        private async Task<bool> IsCanSubmitAsync(MonthReport? monthReport, int dateMonth, int nowDateMonth)
+        {
+            if (dateMonth > nowDateMonth)
+            {
+                return false;
+            }
+            if (monthReport != null && monthReport.Status == MonthReportStatus.Approveling)
+            {
+                return false;
+            }
+            if (monthReport != null && monthReport.Status == MonthReportStatus.Finish)
+            {
+                var unFinishIob = await GetUnFinishMonthReportJobPartAsync(monthReport.ProjectId, monthReport.DateMonth);
+                if (unFinishIob != null)
+                {
+                    return false;
+                }
+            }
+            if (dateMonth == nowDateMonth && monthReport != null && monthReport.Status == MonthReportStatus.Finish)
+            {
+                return await _bizAuthorizeService.IsAuthorizedAsync(_currentUser.Id, BizModule.MonthReport);
+            }
+            if (dateMonth < nowDateMonth && (monthReport == null || monthReport.Status == MonthReportStatus.Finish))
+            {
+                return await _bizAuthorizeService.IsAuthorizedAsync(_currentUser.Id, BizModule.MonthReport);
+            }
+            return true;
+        }
+        /// <summary>
+        /// 获取未完成项目月报任务
+        /// </summary>
+        /// <returns></returns>
+        private async Task<Models.Job?> GetUnFinishMonthReportJobPartAsync(Guid projectId, int datemonth)
+        {
+            var query = _dbContext.Queryable<Models.Job>().Where(t => t.IsDelete == 1 && t.ProjectId == projectId && t.DateMonth == datemonth && t.BizModule == BizModule.MonthReport && t.IsFinish == false);
+            return await query.Select(t => new Models.Job { Id = t.Id, ApproveStatus = t.ApproveStatus, IsFinish = t.IsFinish }).FirstAsync();
+        }
+        /// <summary>
+        /// 第一个 本年甲方确认产值
+        /// 第二个 开累甲方确认产值
+        /// 第三个 本年甲方付款金额
+        /// 第四个 开累甲方付款金额
+        /// </summary>
+        /// <param name="projectId">项目ID</param>
+        /// <param name="dateMonth"></param>
+        /// <returns></returns>
+        public async Task<Tuple<decimal, decimal, decimal, decimal>> GetProjectProductionValue(Guid projectId, int dateMonth)
+        {
+            var currentYearOffirmProductionValue = 0M;
+            var totalYearKaileaOffirmProductionValue = 0M;
+            var currenYearCollection = 0M;
+            var totalYearCollection = 0M;
+            try
+            {
+                var currentYear = DateTime.Now.Year;
+                var projectMonthReportHistory = await _dbContext.Queryable<ProjectMonthReportHistory>()
+                   .Where(x => x.IsDelete == 1 && x.ProjectId == projectId).FirstAsync();
+
+                var currentTotalYearOffirmProductionValue = await _dbContext.Queryable<MonthReport>()
+                    .Where(x => x.IsDelete == 1 && x.ProjectId == projectId && x.DateMonth <= dateMonth).ToListAsync();
+                //本年甲方确认产值(当年)
+                var initMonth = new DateTime(DateTime.Now.Year, 1, 1).ToDateMonth();
+                currentYearOffirmProductionValue = currentTotalYearOffirmProductionValue.Where(x => x.DateMonth >= initMonth && x.DateMonth <= dateMonth)
+                   //原来的// x.DateYear==currentYear)
+                   .Sum(x => x.PartyAConfirmedProductionAmount);
+
+                //开累甲方确认产值(历史数据+2023-7至12月的数据+2024年的数据）
+                if (projectMonthReportHistory != null && currentTotalYearOffirmProductionValue.Any())
+                {
+                    totalYearKaileaOffirmProductionValue = projectMonthReportHistory.KaileiOwnerConfirmation.Value * 10000
+                       + currentTotalYearOffirmProductionValue.Sum(x => x.PartyAConfirmedProductionAmount);
+                }
+                else
+                {
+                    totalYearKaileaOffirmProductionValue =
+                            currentTotalYearOffirmProductionValue.Sum(x => x.PartyAConfirmedProductionAmount);
+                }
+
+                var currenTotalYearCollection = await _dbContext.Queryable<MonthReport>()
+                    .Where(x => x.IsDelete == 1 && x.ProjectId == projectId && x.DateYear <= currentYear).ToListAsync();
+
+                //本年甲方付款金额
+                currenYearCollection = currenTotalYearCollection.Where(x => x.DateYear == currentYear).Sum(x => x.PartyAPayAmount);
+                if (projectMonthReportHistory != null && currenTotalYearCollection.Any())
+                {
+                    //开累甲方付款金额
+                    totalYearCollection = projectMonthReportHistory.KaileiProjectPayment.Value * 10000
+                    + currenTotalYearCollection.Sum(x => x.PartyAPayAmount);
+                }
+                else
+                {
+                    //开累甲方付款金额
+                    totalYearCollection = currenTotalYearCollection.Sum(x => x.PartyAPayAmount);
+                }
+
+            }
+            catch (Exception ex)
+            { }
+            return Tuple.Create(currentYearOffirmProductionValue, totalYearKaileaOffirmProductionValue, currenYearCollection, totalYearCollection);
+        }
     }
 }

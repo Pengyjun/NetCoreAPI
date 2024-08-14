@@ -1,4 +1,6 @@
-﻿using GHMonitoringCenterApi.Application.Contracts.Dto.Project.MonthReportForProject;
+﻿using GHMonitoringCenterApi.Application.Contracts.Dto.Project;
+using GHMonitoringCenterApi.Application.Contracts.Dto.Project.MonthReportForProject;
+using GHMonitoringCenterApi.Domain.Shared;
 
 namespace GHMonitoringCenterApi.Application.Contracts.IService.Project
 {
@@ -7,6 +9,11 @@ namespace GHMonitoringCenterApi.Application.Contracts.IService.Project
     /// </summary>
     public interface IMonthReportForProjectService
     {
-        Task<List<ConveretTreeForProjectWBSDto>> WBSConvertTree(Guid projectId, int dateMonth);
+        /// <summary>
+        /// 月报产包构成列表
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        Task<ResponseAjaxResult<MonthReportForProjectResponseDto>> SearchMonthReportForProjectAsync(ProjectMonthReportRequestDto model);
     }
 }

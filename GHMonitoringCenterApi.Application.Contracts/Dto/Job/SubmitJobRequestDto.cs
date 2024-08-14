@@ -1,17 +1,8 @@
-﻿using SqlSugar;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.ComponentModel.DataAnnotations;
-using System.Xml.Linq;
-using GHMonitoringCenterApi.Domain.Models;
+﻿using GHMonitoringCenterApi.Application.Contracts.Dto.Enums;
 using GHMonitoringCenterApi.Domain.Enums;
-using UtilsSharp;
-using GHMonitoringCenterApi.Application.Contracts.Dto.Enums;
-using GHMonitoringCenterApi.Application.Contracts.Dto.Project.Report;
 using Newtonsoft.Json;
+using SqlSugar;
+using System.ComponentModel.DataAnnotations;
 
 namespace GHMonitoringCenterApi.Application.Contracts.Dto.Job
 {

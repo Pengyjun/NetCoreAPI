@@ -270,7 +270,6 @@ namespace GHMonitoringCenterApi.Application.Contracts.AutoMapper
             mapperConfigurationExpression.CreateMap<ProjectIntensity, ExcelProjectIntensity>();
 
 
-            mapperConfigurationExpression.CreateMap<ProjectWBSDto, ConveretTreeForProjectWBSDto>();
         }
     }
 }

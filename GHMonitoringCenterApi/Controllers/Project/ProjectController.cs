@@ -351,9 +351,11 @@ namespace GHMonitoringCenterApi.Controllers.Project
         /// </summary>
         /// <returns></returns>
         [HttpGet("SearchProjectMonthReport")]
-        public async Task<ResponseAjaxResult<ProjectMonthReportResponseDto>> SearchProjectMonthReportAsync([FromQuery] ProjectMonthReportRequestDto model)
+        //public async Task<ResponseAjaxResult<ProjectMonthReportResponseDto>> SearchProjectMonthReportAsync([FromQuery] ProjectMonthReportRequestDto model)
+        public async Task<ResponseAjaxResult<MonthReportForProjectResponseDto>> SearchMonthReportForProjectAsync([FromQuery] ProjectMonthReportRequestDto model)
         {
-            return await projectReportService.SearchProjectMonthReportAsync(model);
+            //return await projectReportService.SearchProjectMonthReportAsync(model);
+            return await _monthReportForProjectService.SearchMonthReportForProjectAsync(model);
         }
 
         /// <summary>
@@ -768,9 +770,9 @@ namespace GHMonitoringCenterApi.Controllers.Project
         }
 
         #region  新的项目月报列表
-        [HttpGet("aa")]
-        public async Task<List<ConveretTreeForProjectWBSDto>> WBSConvertTree([FromQuery] Guid projectId, [FromQuery] int dateMonth)
-            => await _monthReportForProjectService.WBSConvertTree(projectId, dateMonth);
+        //[HttpGet("aa")]
+        //public async Task<ResponseAjaxResult<MonthReportForProjectResponseDto>> SearchMonthReportForProjectAsync([FromQuery] ProjectMonthReportRequestDto model)
+        //    => await _monthReportForProjectService.SearchMonthReportForProjectAsync(model);
 
         #endregion
     }
