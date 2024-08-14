@@ -713,6 +713,7 @@ namespace GHMonitoringCenterApi.Application.Service
                    ).ToList();
                     monthtReportDtos.Add(new MonthtReportDto()
                     {
+                        Id=item.Id,
                         DateMonth = item.DateMonth,
                         ProjectId = item.ProjectId,
                         AccomplishQuantities = item.CompletedQuantity,
