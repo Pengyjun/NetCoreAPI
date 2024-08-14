@@ -3929,6 +3929,9 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
         /// <returns></returns>
         public async Task<ResponseAjaxResult<SearchOwnShipMonthRepResponseDto>> GetSearchOwnShipMonthRepAsync(MonthRepRequestDto requestDto, int import)
         {
+            
+            
+            
             var responseDto = new ResponseAjaxResult<SearchOwnShipMonthRepResponseDto>();
             var list = new SearchOwnShipMonthRepResponseDto();
             var sumInfo = new SumOwnShipMonth();
@@ -4068,11 +4071,17 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 else
                 {
                     ownShipMonthRepData = data.ToList();
-                    ownShipMonthRepData = ownShipMonthRepData
-                        .Where(x => string.IsNullOrEmpty(x.UpdateTime.ToString()) || x.UpdateTime == DateTime.MinValue ?
-                         x.CreateTime >= requestDto.InStartDate && x.CreateTime <= requestDto.InEndDate
-                        : x.UpdateTime >= requestDto.InStartDate && x.UpdateTime <= requestDto.InEndDate)
-                        .ToList();
+                    //ownShipMonthRepData = ownShipMonthRepData
+                    //    .Where(x => string.IsNullOrEmpty(x.UpdateTime.ToString()) || x.UpdateTime == DateTime.MinValue ?
+                    //     x.CreateTime >= requestDto.InStartDate && x.CreateTime <= requestDto.InEndDate
+                    //    : x.UpdateTime >= requestDto.InStartDate && x.UpdateTime <= requestDto.InEndDate)
+                    //    .ToList();
+
+                    ownShipMonthRepData=ownShipMonthRepData
+                        .WhereIF(!string.IsNullOrWhiteSpace(requestDto.ShipName),x=>x.ShipId== requestDto.ShipName.ToGuid())
+                        .WhereIF(requestDto.InStartDate != null && requestDto.InEndDate != null, x => (x.CreateTime >= requestDto.InStartDate.Value && x.CreateTime <= requestDto.InEndDate.Value)
+                || (x.UpdateTime >= requestDto.InStartDate.Value && x.UpdateTime <= requestDto.InEndDate.Value)).ToList();
+
                     shipId = ownShipMonthRepData.Select(osm => osm.ShipId).ToList().Distinct().ToArray();
                     sumInfo.SumMonthOutputVal = Math.Round(ownShipMonthRepData.Sum(osm => osm.ProductionAmount), 2);
                     sumInfo.SumMonthQuantity = Math.Round(ownShipMonthRepData.Sum(osm => osm.Production), 2);
