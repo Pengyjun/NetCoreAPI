@@ -4074,8 +4074,8 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                         : x.UpdateTime >= requestDto.InStartDate && x.UpdateTime <= requestDto.InEndDate)
                         .ToList();
                     shipId = ownShipMonthRepData.Select(osm => osm.ShipId).ToList().Distinct().ToArray();
-                    sumInfo.SumMonthOutputVal = Math.Round(ownShipMonthRepData.Sum(osm => osm.ProductionAmount), 2);
-                    sumInfo.SumMonthQuantity = Math.Round(ownShipMonthRepData.Sum(osm => osm.Production), 2);
+                    sumInfo.SumMonthOutputVal = Math.Round(ownShipMonthRepData.Sum(osm => osm.ProductionAmount));
+                    sumInfo.SumMonthQuantity = Math.Round(ownShipMonthRepData.Sum(osm => osm.Production));
                     total = ownShipMonthRepData.Count;
                 }
             }
