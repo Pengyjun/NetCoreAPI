@@ -56,11 +56,11 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project.MonthReportFor
         /// <summary>
         /// 子节点
         /// </summary>
-        public List<ProjectWBSDto>? Children { get; set; }
+        public List<ProjectWBSDto> Children { get; set; } = new List<ProjectWBSDto> { };
         /// <summary>
         /// 最后资源节点
         /// </summary>
-        public List<ProjectWBSDto>? ReportDetails { get; set; }
+        public List<ProjectWBSDto> ReportDetails { get; set; } = new List<ProjectWBSDto> { };
 
         #region 详细节点字段
         /// <summary>

@@ -227,7 +227,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 report.ConstructionNatureName = bData.FirstOrDefault(x => RouseType.ConstructionNature == x.RouseType && x.ConstructionNatureType == report.ConstructionNature)?.Name;
                 report.OutPutTypeName = bData.FirstOrDefault(x => (x.RouseType == RouseType.Self || x.RouseType == RouseType.Sub) && report.OutPutType == x.ShipRouseType)?.Name;
                 report.ShipName = bData.FirstOrDefault(x => x.Id == report.ShipId)?.Name;
-                report.DetailId = report.Id;
+                report.DetailId = klReportList.FirstOrDefault(x => x.ProjectId == report.ProjectId && report.ShipId == x.ShipId && x.ProjectWBSId == wbsId)?.DetailId;
                 #endregion
             }
 
@@ -287,6 +287,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                        OutPutType = p.OutPutType,
                        ValueType = ValueEnumType.AccumulatedCommencement,
                        Remark = p.Remark,
+                       DetailId = p.Id,
                        CompleteProductionAmount = SqlFunc.ToDecimal(p.UnitPrice) * SqlFunc.ToDecimal(p.CompletedQuantity)
                    })
                    .ToListAsync();
@@ -463,6 +464,9 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
 
             //获取当前项目币种
             result.CurrencyId = project.CurrencyId.Value;
+
+            //项目id
+            result.ProjectId = project.Id;
 
             //获取当前项目汇率
             var currencyConverter = await _dbContext.Queryable<CurrencyConverter>().Where(t => t.CurrencyId == project.CurrencyId.ToString() && t.Year == DateTime.Now.Year && t.IsDelete == 1).SingleAsync();
