@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using Aspose.Words;
+using AutoMapper;
 using GHMonitoringCenterApi.Application.Contracts.Dto.Enums;
 using GHMonitoringCenterApi.Application.Contracts.Dto.Project;
 using GHMonitoringCenterApi.Application.Contracts.Dto.Project.MonthReportForProject;
@@ -8,6 +9,7 @@ using GHMonitoringCenterApi.Domain.Enums;
 using GHMonitoringCenterApi.Domain.Models;
 using GHMonitoringCenterApi.Domain.Shared;
 using GHMonitoringCenterApi.Domain.Shared.Enums;
+using GHMonitoringCenterApi.Domain.Shared.Util;
 using SqlSugar;
 using Models = GHMonitoringCenterApi.Domain.Models;
 
@@ -98,13 +100,13 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
         {
             var mainNodes = wbsList.Where(x => x.Pid == nodePId).ToList();
             var otherNodes = wbsList.Where(x => x.Pid != nodePId).ToList();
-            if (otherNodes != null && otherNodes.Any())
+
+            foreach (ProjectWBSDto node in mainNodes)
             {
-                foreach (ProjectWBSDto node in mainNodes)
-                {
-
+                if (!node.Children.Any())
                     node.Children = await GetChildren(projectId, dateMonth, node.KeyId, otherNodes, mReportList, yReportList, klReportList, bData);
-
+                else
+                {
                     /***
                      * 最后一层节点处理月报详细数据
                      * 1.最后一层节点重新赋值项目月报详细数据
@@ -114,21 +116,11 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     {
                         finallyNode.ReportDetails = GetFinallyChildren(finallyNode.ProjectWBSId, node.Children, mReportList, yReportList, klReportList, bData);
                     }
-
-                    if (!node.Children.Any())
-                        //当前节点是最终子节点
-                        node.ReportDetails = MReportForProjectList(node.ProjectWBSId, mReportList, yReportList, klReportList, bData);
-
-                    if (node.Pid == "0")
-                    {
-                        /***
-                         * 2.存在子节点数据 递归回调方法（直到当前节点的子节点没有数据；目的：最后一层节点追加资源/船舶数据）
-                         */
-
-                        node.ContractAmount = node.Children == null ? 0M : node.Children.Sum(x => x.ContractAmount);
-                        node.EngQuantity = node.Children == null ? 0M : node.Children.Sum(x => x.EngQuantity);
-                    }
                 }
+
+                if (!node.Children.Any())
+                    //当前节点是最终子节点
+                    node.ReportDetails = MReportForProjectList(node.ProjectWBSId, mReportList, yReportList, klReportList, bData);
             }
 
             return mainNodes;
@@ -156,25 +148,30 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     /***
                      * 当前节点是最终子节点
                      */
+
                     childs = MReportForProjectList(children.ProjectWBSId, mReportList, yReportList, klReportList, bData);
+
+                    /***
+                     * 1.统计当前父节点当年（产值、工程量、外包支出）&& 累计（产值、工程量、外包支出）
+                     * 2.重调方法获取最终子节点
+                     */
+
+                    children.ContractAmount = children.Children == null ? 0M : children.Children.Sum(x => x.ContractAmount);
+                    children.EngQuantity = children.Children == null ? 0M : children.Children.Sum(x => x.EngQuantity);
+
+                    children.YearCompleteProductionAmount = children.Children == null ? 0M : children.Children.Sum(x => x.CompleteProductionAmount);
+                    children.YearCompletedQuantity = children.Children == null ? 0M : children.Children.Sum(x => x.CompletedQuantity);
+                    children.YearOutsourcingExpensesAmount = children.Children == null ? 0M : children.Children.Sum(x => x.OutsourcingExpensesAmount);
+
+                    children.TotalCompleteProductionAmount = children.Children == null ? 0M : children.Children.Sum(x => x.CompleteProductionAmount);
+                    children.TotalCompletedQuantity = children.Children == null ? 0M : children.Children.Sum(x => x.CompletedQuantity);
+                    children.TotalOutsourcingExpensesAmount = children.Children == null ? 0M : children.Children.Sum(x => x.OutsourcingExpensesAmount);
                 }
                 else
                 {
                     GetFinallyChildren(children.ProjectWBSId, children.Children, mReportList, yReportList, klReportList, bData);
                 }
 
-                /***
-                 * 1.统计当前父节点当年（产值、工程量、外包支出）&& 累计（产值、工程量、外包支出）
-                 * 2.重调方法获取最终子节点
-                 */
-
-                children.YearCompleteProductionAmount = children.Children == null ? 0M : children.Children.Sum(x => x.CompleteProductionAmount);
-                children.YearCompletedQuantity = children.Children == null ? 0M : children.Children.Sum(x => x.CompletedQuantity);
-                children.YearOutsourcingExpensesAmount = children.Children == null ? 0M : children.Children.Sum(x => x.OutsourcingExpensesAmount);
-
-                children.TotalCompleteProductionAmount = children.Children == null ? 0M : children.Children.Sum(x => x.CompleteProductionAmount);
-                children.TotalCompletedQuantity = children.Children == null ? 0M : children.Children.Sum(x => x.CompletedQuantity);
-                children.TotalOutsourcingExpensesAmount = children.Children == null ? 0M : children.Children.Sum(x => x.OutsourcingExpensesAmount);
             }
 
             return childs;
