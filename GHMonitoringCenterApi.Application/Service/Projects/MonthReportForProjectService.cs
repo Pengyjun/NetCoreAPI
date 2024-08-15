@@ -122,21 +122,8 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     if (node.Pid == "0")
                     {
                         /***
-                         * 1.统计根节点当年（产值、工程量、外包支出）&& 累计（产值、工程量、外包支出）&& 当月（产值、工程量、外包支出）
                          * 2.存在子节点数据 递归回调方法（直到当前节点的子节点没有数据；目的：最后一层节点追加资源/船舶数据）
                          */
-
-                        node.YearCompleteProductionAmount = yReportList.Sum(x => x.CompleteProductionAmount);
-                        node.YearCompletedQuantity = yReportList.Sum(x => x.CompletedQuantity);
-                        node.YearOutsourcingExpensesAmount = yReportList.Sum(x => x.OutsourcingExpensesAmount);
-
-                        node.TotalCompleteProductionAmount = klReportList.Sum(x => x.CompleteProductionAmount);
-                        node.TotalCompletedQuantity = klReportList.Sum(x => x.CompletedQuantity);
-                        node.TotalOutsourcingExpensesAmount = klReportList.Sum(x => x.OutsourcingExpensesAmount);
-
-                        node.CompleteProductionAmount = node.Children == null ? 0M : node.Children.Sum(x => x.CompleteProductionAmount);
-                        node.CompletedQuantity = node.Children == null ? 0M : node.Children.Sum(x => x.CompletedQuantity);
-                        node.OutsourcingExpensesAmount = node.Children == null ? 0M : node.Children.Sum(x => x.OutsourcingExpensesAmount);
 
                         node.ContractAmount = node.Children == null ? 0M : node.Children.Sum(x => x.ContractAmount);
                         node.EngQuantity = node.Children == null ? 0M : node.Children.Sum(x => x.EngQuantity);

@@ -20,6 +20,7 @@ using GHMonitoringCenterApi.Domain.Shared.Const;
 using GHMonitoringCenterApi.Domain.Shared.Enums;
 using GHMonitoringCenterApi.Domain.Shared.Util;
 using Newtonsoft.Json;
+using NPOI.SS.Formula.Functions;
 using NPOI.SS.UserModel;
 using NPOI.SS.Util;
 using NPOI.XSSF.UserModel;
@@ -4068,11 +4069,15 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 else
                 {
                     ownShipMonthRepData = data.ToList();
+                    //ownShipMonthRepData = ownShipMonthRepData
+                    //    .Where(x => string.IsNullOrEmpty(x.UpdateTime.ToString()) || x.UpdateTime == DateTime.MinValue ?
+                    //     x.CreateTime >= requestDto.InStartDate && x.CreateTime <= requestDto.InEndDate
+                    //    : x.UpdateTime >= requestDto.InStartDate && x.UpdateTime <= requestDto.InEndDate)
+                    //    .ToList();
                     ownShipMonthRepData = ownShipMonthRepData
-                        .Where(x => string.IsNullOrEmpty(x.UpdateTime.ToString()) || x.UpdateTime == DateTime.MinValue ?
-                         x.CreateTime >= requestDto.InStartDate && x.CreateTime <= requestDto.InEndDate
-                        : x.UpdateTime >= requestDto.InStartDate && x.UpdateTime <= requestDto.InEndDate)
-                        .ToList();
+                        .WhereIF(!string.IsNullOrWhiteSpace(requestDto.ShipName), x => x.ShipId == requestDto.ShipName.ToGuid())
+                        .WhereIF(requestDto.InStartDate != null && requestDto.InEndDate != null, x => (x.CreateTime >= requestDto.InStartDate.Value && x.CreateTime <= requestDto.InEndDate.Value) || (x.UpdateTime >= requestDto.InStartDate.Value && x.UpdateTime <= requestDto.InEndDate.Value)).ToList();
+
                     shipId = ownShipMonthRepData.Select(osm => osm.ShipId).ToList().Distinct().ToArray();
                     sumInfo.SumMonthOutputVal = Math.Round(ownShipMonthRepData.Sum(osm => osm.ProductionAmount));
                     sumInfo.SumMonthQuantity = Math.Round(ownShipMonthRepData.Sum(osm => osm.Production));
