@@ -234,23 +234,6 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
 
             //获取本身的项目wbs数据
             pWBS = await HandleWBSDataAsync(pId, dateMonth);
-            //pWBS = await _dbContext.Queryable<ProjectWBS>()
-            //    .Where(p => !string.IsNullOrEmpty(p.ProjectId) && p.IsDelete == 1 && SqlFunc.ToGuid(p.ProjectId) == pId)
-            //    .Select(p => new ProjectWBSDto
-            //    {
-            //        EngQuantity = p.EngQuantity,//wbs初始的工程量
-            //        KeyId = p.KeyId,
-            //        Name = p.Name,
-            //        Id = p.Id,
-            //        Pid = p.Pid,
-            //        ValueType = ValueEnumType.None,
-            //        ProjectId = p.ProjectId,
-            //        ProjectWBSId = p.Id,
-            //        ProjectWBSName = p.Name,
-            //        UnitPrice = p.UnitPrice,//wbs初始的单价
-            //        ContractAmount = SqlFunc.ToDecimal(p.EngQuantity) * SqlFunc.ToDecimal(p.UnitPrice)//WBS的初始合同产值=工程量*单价
-            //    })
-            //    .ToListAsync();
 
             //获取需要计算的月报填报数据 
             if (dateMonth != 0 && dateMonth.ToString().Length == 6)
@@ -288,6 +271,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                  * 2.业务区分字段为当月
                  * 3.查询当月的月报详细数据允许删除
                  */
+
                 var nowMonthReport = new List<ProjectWBSDto>();
                 foreach (var nowMonth in calculatePWBS.Where(x => x.DateMonth == dateMonth).ToList())
                 {
@@ -321,6 +305,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                         YearOutsourcingExpensesAmount = nowMonth.YearOutsourcingExpensesAmount
                     });
                 }
+
                 //WBS树追加月报明细树 追加当月的月报详细数据
                 if (nowMonthReport != null && nowMonthReport.Any()) pWBS.AddRange(nowMonthReport);
 
@@ -331,8 +316,14 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                  * 3.根据资源（船舶id）去重
                  * 4.需要填写的单价、工程量、外包支出、备注全部初始化
                  */
-                var existShipIds = nowMonthReport?.Select(x => x.ShipId).ToList();
+
+                var existShipIds = nowMonthReport?.Select(x => x.ShipId).Distinct().ToList();
                 var historyMonthReport = new List<ProjectWBSDto>();
+
+                var s = calculatePWBS
+                    .WhereIF(existShipIds != null && existShipIds.Any(), x => !existShipIds.Contains(x.ShipId))
+                    .Where(x => x.DateMonth < dateMonth).GroupBy(i => i.ShipId, (key, val) => val.First()).ToList();
+
                 foreach (var kvp in calculatePWBS
                     .WhereIF(existShipIds != null && existShipIds.Any(), x => !existShipIds.Contains(x.ShipId))
                     .Where(x => x.DateMonth < dateMonth).GroupBy(i => i.ShipId, (key, val) => val.First()))
@@ -366,6 +357,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                         YearOutsourcingExpensesAmount = kvp.YearOutsourcingExpensesAmount
                     });
                 }
+
                 //WBS树追加月报明细树 追加历史的月报详细数据
                 if (historyMonthReport != null && historyMonthReport.Any()) pWBS.AddRange(historyMonthReport);
 
@@ -373,9 +365,11 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                  * 当年数据，值不做处理 类型字段区分字段valuetype改为当年
                  * 1.截取年份字段
                  */
-                int year = Convert.ToInt32(dateMonth.ToString().Substring(0, 4));
+
+                string year = dateMonth.ToString().Substring(0, 4);
+                int startMonth = Convert.ToInt32(year + "01");
                 var nowYearMonthReport = new List<ProjectWBSDto>();
-                foreach (var nowYear in calculatePWBS.Where(x => x.DateYear == year).ToList())
+                foreach (var nowYear in calculatePWBS.Where(x => x.DateMonth >= startMonth && x.DateMonth <= dateMonth).ToList())
                 {
                     nowYearMonthReport.Add(new ProjectWBSDto
                     {
@@ -406,12 +400,14 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                         YearOutsourcingExpensesAmount = nowYear.YearOutsourcingExpensesAmount
                     });
                 }
+
                 //WBS树追加月报明细树 追加当年的月报详细数据
                 if (nowYearMonthReport != null && nowYearMonthReport.Any()) pWBS.AddRange(nowYearMonthReport);
 
                 /***
                  * 追加开累数据 calculatePWBS
                  */
+
                 pWBS.AddRange(calculatePWBS);
             }
 
