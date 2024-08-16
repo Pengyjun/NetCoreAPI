@@ -2008,7 +2008,8 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             };
 
             #endregion
-            var month = DateTime.Now.ToDateMonth();
+            //var month = DateTime.Now.ToDateMonth();//原来的
+            var month = DateTime.Now.Day >= 25 || (DateTime.Now.Day >= 25 && DateTime.Now.Date <= Convert.ToDateTime(DateTime.Now.AddMonths(1).Date.ToString("yyyy-MM-5"))) ? DateTime.Now.ToDateMonth() : DateTime.Now.AddMonths(-1).ToDateMonth();
             // 删除
             if (removeWBSList.Any())
             {
