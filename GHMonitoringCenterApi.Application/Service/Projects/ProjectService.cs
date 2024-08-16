@@ -789,7 +789,8 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                      ShutdownDate = p.ShutdownDate,
                      DurationInformation = p.DurationInformation,
                      ShutDownReason = p.ShutDownReason,
-                     ContractChangeInfo = p.ContractChangeInfo
+                     ContractChangeInfo = p.ContractChangeInfo,
+                     WorkDay = p.WorkDay
                  }).SingleAsync();
             if (projectDeteilSingle == null)
             {
