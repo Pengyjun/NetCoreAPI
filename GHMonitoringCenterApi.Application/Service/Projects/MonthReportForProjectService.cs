@@ -320,10 +320,6 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 var existShipIds = nowMonthReport?.Select(x => x.ShipId).Distinct().ToList();
                 var historyMonthReport = new List<ProjectWBSDto>();
 
-                var s = calculatePWBS
-                    .WhereIF(existShipIds != null && existShipIds.Any(), x => !existShipIds.Contains(x.ShipId))
-                    .Where(x => x.DateMonth < dateMonth).GroupBy(i => i.ShipId, (key, val) => val.First()).ToList();
-
                 foreach (var kvp in calculatePWBS
                     .WhereIF(existShipIds != null && existShipIds.Any(), x => !existShipIds.Contains(x.ShipId))
                     .Where(x => x.DateMonth < dateMonth).GroupBy(i => i.ShipId, (key, val) => val.First()))
