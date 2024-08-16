@@ -3490,7 +3490,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 .Where((p, i) => instinIds.Contains(p.CompanyId) && proIds.Contains(p.Id) && p.IsDelete == 1 && i.IsDelete == 1)
                 .Select((p, i) => new { i.PomId, i.Name, p.Id }).ToListAsync();
             //单位机构
-            var unitIds = subShipData.Select(x => x.CompanyId.ToString()).ToList();
+            var unitIds = subShipData.Where(x=>!string.IsNullOrWhiteSpace(x.CompanyId)).Select(x =>x.CompanyId.ToString()).ToList();
             var unitData = await _dbContext.Queryable<SubShipMonthReport>()
                 .LeftJoin<SubShip>((rep, sub) => rep.ShipId == sub.PomId)
                 .LeftJoin<DealingUnit>((rep, sub, dea) => sub.CompanyId == dea.PomId.ToString())
@@ -3930,6 +3930,9 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
         /// <returns></returns>
         public async Task<ResponseAjaxResult<SearchOwnShipMonthRepResponseDto>> GetSearchOwnShipMonthRepAsync(MonthRepRequestDto requestDto, int import)
         {
+            
+            
+            
             var responseDto = new ResponseAjaxResult<SearchOwnShipMonthRepResponseDto>();
             var list = new SearchOwnShipMonthRepResponseDto();
             var sumInfo = new SumOwnShipMonth();
@@ -4112,9 +4115,8 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 else
                 {
                     ownShipMonthRepData = ownShipMonthRepData
-                        .Where(x => string.IsNullOrEmpty(x.UpdateTime.ToString()) || x.UpdateTime == DateTime.MinValue ?
-                         x.CreateTime >= requestDto.InStartDate && x.CreateTime <= requestDto.InEndDate
-                        : x.UpdateTime >= requestDto.InStartDate && x.UpdateTime <= requestDto.InEndDate)
+                         .WhereIF(requestDto.InStartDate != null && requestDto.InEndDate != null, x => (x.CreateTime >= requestDto.InStartDate.Value && x.CreateTime <= requestDto.InEndDate.Value)
+                || (x.UpdateTime >= requestDto.InStartDate.Value && x.UpdateTime <= requestDto.InEndDate.Value))
                         .ToList();
                 }
                 total = ownShipMonthRepData.Count;
@@ -4215,83 +4217,84 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             //}
             #endregion
 
-            #region 新逻辑
-            if (result.Any())
-            {
-                var startTime = 0;
-                var endTime = 0;
-                if (requestDto.InEndDate.HasValue)
-                {
-                    startTime = int.Parse(requestDto.InEndDate.Value.AddMonths(-1).ToString("yyyyMM26"));
-                    endTime = int.Parse(requestDto.InEndDate.Value.ToString("yyyyMM25"));
-                }
+            #region 新逻辑  暂时不用
+            //if (result.Any())
+            //{
+            //    var startTime = 0;
+            //    var endTime = 0;
+            //    if (requestDto.InEndDate.HasValue)
+            //    {
+            //        startTime = int.Parse(requestDto.InEndDate.Value.AddMonths(-1).ToString("yyyyMM26"));
+            //        endTime = int.Parse(requestDto.InEndDate.Value.ToString("yyyyMM25"));
+            //    }
 
-                //项目信息
-                var projectList = await _dbContext.Queryable<Project>().Where(x => x.IsDelete == 1).ToListAsync();
-                var sipMovementList = await _dbContext.Queryable<ShipMovement>().Where(x => x.IsDelete == 1).ToListAsync();
-                //船舶日报
-                var shipDailyData = await _dbShipDayReport.AsQueryable().Where(t => t.ProjectId == Guid.Empty && t.DateDay >= startTime && t.DateDay <= endTime && t.IsDelete == 1).ToListAsync();
-                foreach (var res in result)
-                {
-                    #region 新逻辑
-                    var num = 0M;
-                    if (projectList != null && projectList.Any() && sipMovementList != null && sipMovementList.Any())
-                    {
-                        //新逻辑
-                        //var list1 = await _dbShipDayReport.AsQueryable().Where(t => t.ProjectId == Guid.Empty && t.ShipId == res.OwnShipId && t.DateDay >= startTime && t.DateDay <= endTime && t.IsDelete == 1).ToListAsync();
-                        var list1 = shipDailyData.Where(t => t.ShipId == res.OwnShipId).ToList();
-                        var primaryIds = list1.Where(t => t.ProjectId == Guid.Empty).Select(t => new { id = t.Id, shipId = t.ShipId, DateDay = t.DateDay, ProjectId = t.ProjectId }).ToList();
-                        foreach (var item in primaryIds)
-                        {
-                            var isExistProject = sipMovementList.Where(x => x.IsDelete == 1 && x.ShipId == item.shipId && x.EnterTime.HasValue == true && (x.EnterTime.Value.ToDateDay() <= item.DateDay || x.QuitTime.HasValue == true && x.QuitTime.Value.ToDateDay() >= item.DateDay)).OrderByDescending(x => x.EnterTime).ToList();
-                            foreach (var project in isExistProject)
-                            {
+            //    //项目信息
+            //    var projectList = await _dbContext.Queryable<Project>().Where(x => x.IsDelete == 1).ToListAsync();
+            //    var sipMovementList = await _dbContext.Queryable<ShipMovement>().Where(x => x.IsDelete == 1).ToListAsync();
+            //    //船舶日报
+            //    var shipDailyData = await _dbShipDayReport.AsQueryable().Where(t => t.ProjectId == Guid.Empty && t.DateDay >= startTime && t.DateDay <= endTime && t.IsDelete == 1).ToListAsync();
+                
+            //    foreach (var res in result)
+            //    {
+            //        #region 新逻辑
+            //        var num = 0M;
+            //        if (projectList != null && projectList.Any() && sipMovementList != null && sipMovementList.Any())
+            //        {
+            //            //新逻辑
+            //            //var list1 = await _dbShipDayReport.AsQueryable().Where(t => t.ProjectId == Guid.Empty && t.ShipId == res.OwnShipId && t.DateDay >= startTime && t.DateDay <= endTime && t.IsDelete == 1).ToListAsync();
+            //            var list1 = shipDailyData.Where(t => t.ShipId == res.OwnShipId).ToList();
+            //            var primaryIds = list1.Where(t => t.ProjectId == Guid.Empty).Select(t => new { id = t.Id, shipId = t.ShipId, DateDay = t.DateDay, ProjectId = t.ProjectId }).ToList();
+            //            foreach (var item in primaryIds)
+            //            {
+            //                var isExistProject = sipMovementList.Where(x => x.IsDelete == 1 && x.ShipId == item.shipId && x.EnterTime.HasValue == true && (x.EnterTime.Value.ToDateDay() <= item.DateDay || x.QuitTime.HasValue == true && x.QuitTime.Value.ToDateDay() >= item.DateDay)).OrderByDescending(x => x.EnterTime).ToList();
+            //                foreach (var project in isExistProject)
+            //                {
 
-                                if (project.QuitTime.HasValue && project.QuitTime.Value.ToDateDay() >= item.DateDay)
-                                {
+            //                    if (project.QuitTime.HasValue && project.QuitTime.Value.ToDateDay() >= item.DateDay)
+            //                    {
 
-                                    var oldValue = list1.Where(t => t.ShipId == project.ShipId && t.DateDay == item.DateDay).FirstOrDefault();
-                                    if (oldValue != null)
-                                    {
-                                        oldValue.ProjectId = project.ProjectId;
+            //                        var oldValue = list1.Where(t => t.ShipId == project.ShipId && t.DateDay == item.DateDay).FirstOrDefault();
+            //                        if (oldValue != null)
+            //                        {
+            //                            oldValue.ProjectId = project.ProjectId;
 
-                                    }
-                                }
-                                if (project.EnterTime.HasValue && project.QuitTime.HasValue == false && project.EnterTime.Value.ToDateDay() <= item.DateDay)
-                                {
+            //                        }
+            //                    }
+            //                    if (project.EnterTime.HasValue && project.QuitTime.HasValue == false && project.EnterTime.Value.ToDateDay() <= item.DateDay)
+            //                    {
 
-                                    var oldValue = list1.Where(t => t.ShipId == project.ShipId && t.DateDay == item.DateDay).FirstOrDefault();
-                                    if (oldValue != null)
-                                    {
-                                        oldValue.ProjectId = project.ProjectId;
+            //                        var oldValue = list1.Where(t => t.ShipId == project.ShipId && t.DateDay == item.DateDay).FirstOrDefault();
+            //                        if (oldValue != null)
+            //                        {
+            //                            oldValue.ProjectId = project.ProjectId;
 
-                                    }
-                                }
-                                if (project.EnterTime.HasValue && project.QuitTime.HasValue && project.QuitTime.Value.ToDateDay() >= item.DateDay)
-                                {
+            //                        }
+            //                    }
+            //                    if (project.EnterTime.HasValue && project.QuitTime.HasValue && project.QuitTime.Value.ToDateDay() >= item.DateDay)
+            //                    {
 
-                                    var oldValue = list1.Where(t => t.ShipId == project.ShipId && t.DateDay == item.DateDay).FirstOrDefault();
-                                    if (oldValue != null)
-                                    {
-                                        oldValue.ProjectId = project.ProjectId;
+            //                        var oldValue = list1.Where(t => t.ShipId == project.ShipId && t.DateDay == item.DateDay).FirstOrDefault();
+            //                        if (oldValue != null)
+            //                        {
+            //                            oldValue.ProjectId = project.ProjectId;
 
-                                    }
-                                }
-                            }
+            //                        }
+            //                    }
+            //                }
 
-                        }
+            //            }
 
-                        foreach (var item in list1)
-                        {
-                            num += ((item.Dredge ?? 0) + (item.Sail ?? 0) + (item.BlowingWater ?? 0) + (item.SedimentDisposal ?? 0) + (item.BlowingWater ?? 0));
-                        }
-                    }
-                    res.MonthWorkHours += num;
-                    res.YearWorkHours += num;
-                    #endregion
-                }
+            //            foreach (var item in list1)
+            //            {
+            //                num += ((item.Dredge ?? 0) + (item.Sail ?? 0) + (item.BlowingWater ?? 0) + (item.SedimentDisposal ?? 0) + (item.BlowingWater ?? 0));
+            //            }
+            //        }
+            //        res.MonthWorkHours += num;
+            //        res.YearWorkHours += num;
+            //        #endregion
+            //    }
 
-            }
+            //}
             #endregion
             list.searchOwnShipMonthReps = result;
             list.ownShipMonth = sumInfo;

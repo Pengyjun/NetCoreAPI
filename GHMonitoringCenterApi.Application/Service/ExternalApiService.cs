@@ -14,7 +14,9 @@ using GHMonitoringCenterApi.Application.Contracts.IService.ProjectProductionRepo
 using GHMonitoringCenterApi.Domain.Models;
 using GHMonitoringCenterApi.Domain.Shared;
 using GHMonitoringCenterApi.Domain.Shared.Const;
+using HNKC.OperationLogsAPI.Dto.ResponseDto;
 using SqlSugar;
+using SqlSugar.Extensions;
 using static GHMonitoringCenterApi.Application.Contracts.Dto.Project.Report.MonthtReportsResponseDto;
 
 namespace GHMonitoringCenterApi.Application.Service
@@ -634,23 +636,112 @@ namespace GHMonitoringCenterApi.Application.Service
         /// <returns></returns>
         public async Task<ResponseAjaxResult<List<MonthtReportDto>>> GetMonthReportInfosAsync(MonthReportInfosRequestDto requestDto)
         {
-            var responseAjaxResult = new ResponseAjaxResult<List<MonthtReportDto>>();
-            var model = new MonthtReportsRequstDto
+
+            #region 旧版
+            //var responseAjaxResult = new ResponseAjaxResult<List<MonthtReportDto>>();
+            //var model = new MonthtReportsRequstDto
+            //{
+            //    ProjectName = requestDto.ProjectName,
+            //    StartTime = requestDto.StartTime,
+            //    EndTime = requestDto.EndTime,
+            //    IsConvert = requestDto.IsConvert,
+            //    PageIndex = requestDto.PageIndex,
+            //    PageSize = requestDto.PageSize,
+            //    IsDuiWai = true
+            //};
+
+            //var responseData = await _projectReportService.SearchMonthReportsAsync(model);
+            //var resList = responseData.Data.Reports;
+
+            //responseAjaxResult.Count = responseData.Count;
+            #endregion
+
+            #region 参数校验
+            //当前月份
+            var month = string.Empty;
+            if (requestDto.StartTime == null || requestDto.EndTime == null)
             {
-                ProjectName = requestDto.ProjectName,
-                StartTime = requestDto.StartTime,
-                EndTime = requestDto.EndTime,
-                IsConvert = requestDto.IsConvert,
-                PageIndex = requestDto.PageIndex,
-                PageSize = requestDto.PageSize,
-                IsDuiWai = true
-            };
+                if (DateTime.Now.Day >= 27)
+                {
+                    requestDto.StartTime = DateTime.Now.ToString("yyyy-MM-26 00:00:00").ObjToDate();
+                }
+                else
+                {
+                    requestDto.StartTime = DateTime.Now.AddMonths(-1).ToString("yyyy-MM-26 00:00:00").ObjToDate();
+                }
+                 month = requestDto.StartTime.Value.Month.ToString();
+            }
+            else {
+                if (requestDto.EndTime.Value.Day > 26)
+                {
+                    month= requestDto.StartTime.Value.Month.ToString();
+                }
+                else
+                {
+                    month = requestDto.EndTime.Value.AddMonths(-1).Month.ToString();
+                }
 
-            var responseData = await _projectReportService.SearchMonthReportsAsync(model);
-            var resList = responseData.Data.Reports;
 
-            responseAjaxResult.Count = responseData.Count;
-            responseAjaxResult.SuccessResult(resList, ResponseMessage.OPERATION_SUCCESS);
+            }
+            if (month.Length == 1)
+            {
+                month = "0" + month;
+            }
+           var  currentMonth =int.Parse(DateTime.Now.Year + month);
+            //当年开始时间
+            var yearStartIime = DateTime.Now.ToString("yyyy01").ObjToInt();
+            var yearEndTime = DateTime.Now.ToString("yyyy12").ObjToInt();
+
+            #endregion
+
+            var responseAjaxResult = new ResponseAjaxResult<List<MonthtReportDto>>();
+            List<MonthtReportDto> monthtReportDtos = new List<MonthtReportDto>();
+            var projectMonthList = await _dbContext.Queryable<MonthReport>().Where(x => x.IsDelete == 1)
+                .WhereIF(requestDto.StartTime!=null&& requestDto.EndTime!=null,x=> (x.CreateTime>= requestDto.StartTime.Value&&x.CreateTime<=requestDto.EndTime.Value)
+                || (x.UpdateTime >= requestDto.StartTime.Value && x.UpdateTime <= requestDto.EndTime.Value)).ToListAsync();
+            if (projectMonthList.Any())
+            {
+                foreach (var item in projectMonthList)
+                {
+                    //当月产值
+                    //var currentProjectMonthRepost = projectMonthList.Where(x =>x.ProjectId == item.ProjectId).FirstOrDefault();
+                    //当年完成产值
+                    var yearCompletProductionValue = projectMonthList.Where(x => x.ProjectId == item.ProjectId
+                    && x.DateMonth >= yearStartIime && x.DateMonth <= yearEndTime).ToList();
+                    //累计完成成本
+                    var yearTotalCompletProductionValue = projectMonthList.Where(x => x.ProjectId == item.ProjectId
+                   ).ToList();
+                    monthtReportDtos.Add(new MonthtReportDto()
+                    {
+                        Id=item.Id,
+                        DateMonth = item.DateMonth,
+                        ProjectId = item.ProjectId,
+                        AccomplishQuantities = item.CompletedQuantity,
+                        YearAccomplishQuantities = yearCompletProductionValue.Sum(x => x.CompletedQuantity),
+                        AccumulativeQuantities = yearTotalCompletProductionValue.Sum(x => x.CompletedQuantity),
+
+                        RecognizedValue = item.PartyAConfirmedProductionAmount,
+                        YearRecognizedValue = yearCompletProductionValue.Sum(x => x.PartyAConfirmedProductionAmount),
+                        CumulativeValue = yearTotalCompletProductionValue.Sum(x => x.PartyAConfirmedProductionAmount),
+
+                        PaymentAmount = item.PartyAPayAmount,
+                        YearPaymentAmount = yearCompletProductionValue.Sum(x => x.PartyAPayAmount),
+                        CumulativePaymentAmount = yearTotalCompletProductionValue.Sum(x => x.PartyAPayAmount),
+
+
+                        AccomplishValue = item.CompleteProductionAmount,// currentProjectMonthRepost.CompleteProductionAmount,
+                        YearAccomplishCost = yearCompletProductionValue.Sum(x => x.CompleteProductionAmount),
+                        CumulativeAccomplishCost = yearTotalCompletProductionValue.Sum(x => x.CompleteProductionAmount),
+
+                        OutsourcingExpensesAmount = item.OutsourcingExpensesAmount,
+                    }); 
+
+                }
+            }
+           
+            responseAjaxResult.Data = monthtReportDtos;
+            responseAjaxResult.Count = monthtReportDtos.Count;
+            responseAjaxResult.Success();
             return responseAjaxResult;
         }
         /// <summary>
@@ -1101,6 +1192,38 @@ namespace GHMonitoringCenterApi.Application.Service
 
             responseAjaxResult.Count = responseData.Count;
             responseAjaxResult.SuccessResult(res);
+            return responseAjaxResult;
+        }
+
+        public async Task<ResponseAjaxResult<List<ProjectStatusChangResponse>>> SearchProjectChangeList()
+        {
+            ResponseAjaxResult<List<ProjectStatusChangResponse>> responseAjaxResult = new ResponseAjaxResult<List<ProjectStatusChangResponse>>();
+            List<ProjectStatusChangResponse> projectStatusChangResponses = new List<ProjectStatusChangResponse>();
+            var list = _dbContext.Queryable<StartWorkRecord>()
+               .Where((it) => it.BeforeStatus != it.AfterStatus )
+                .GroupBy(it => it.ProjectId)
+                .Select(it => new
+                {
+                    name = it.ProjectId,
+                    CreateTime = SqlFunc.AggregateMax(it.CreateTime)
+                })
+                .MergeTable()
+                .LeftJoin<StartWorkRecord>((a, b) => a.name == b.ProjectId)
+                  .Where((a,b) => a.CreateTime == b.CreateTime)
+                .Select((a, b) => b).ToList();
+            foreach (var item in list)
+            {
+                projectStatusChangResponses.Add(new ProjectStatusChangResponse()
+                {
+                    AfterStautsId = item.AfterStatus,
+                    BeforeStautsId = item.BeforeStatus,
+                    Id = item.ProjectId.Value,
+                    Time = item.CreateTime.Value
+                });
+            }
+            responseAjaxResult.Count = projectStatusChangResponses.Count;
+            responseAjaxResult.Data = projectStatusChangResponses;
+            responseAjaxResult.Success();
             return responseAjaxResult;
         }
         #endregion

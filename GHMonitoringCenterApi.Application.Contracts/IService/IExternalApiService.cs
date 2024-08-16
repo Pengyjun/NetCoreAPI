@@ -8,6 +8,7 @@ using GHMonitoringCenterApi.Application.Contracts.Dto.External;
 using Model = GHMonitoringCenterApi.Domain.Models;
 using GHMonitoringCenterApi.Domain.Models;
 using GHMonitoringCenterApi.Application.Contracts.Dto.EquipmentManagement;
+using HNKC.OperationLogsAPI.Dto.ResponseDto;
 
 namespace GHMonitoringCenterApi.Application.Contracts.IService
 {
@@ -208,6 +209,9 @@ namespace GHMonitoringCenterApi.Application.Contracts.IService
         /// <param name="requestDto"></param>
         /// <returns></returns>
         Task<ResponseAjaxResult<List<SearchEquipmentManagementResponseDto>>> GetSearchEquipmentManagementAsync(ExternalRequestDto requestDto);
+
+        Task<ResponseAjaxResult<List<ProjectStatusChangResponse>>> SearchProjectChangeList();
+        
         #endregion
     }
 }

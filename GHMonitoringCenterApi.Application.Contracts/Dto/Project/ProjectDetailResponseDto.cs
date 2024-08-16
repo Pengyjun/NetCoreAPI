@@ -1,13 +1,4 @@
-﻿using GHMonitoringCenterApi.Domain.Models;
-using SqlSugar;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml;
-
-namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project
+﻿namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project
 {
     /// <summary>
     /// 项目详情返回DTO
@@ -286,6 +277,10 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project
         /// 合同变更原因
         /// </summary>
         public string? ContractChangeInfo { get; set; }
+        /// <summary>
+        /// 工期
+        /// </summary>
+        public int WorkDay { get; set; }
     }
 
     /// <summary>
