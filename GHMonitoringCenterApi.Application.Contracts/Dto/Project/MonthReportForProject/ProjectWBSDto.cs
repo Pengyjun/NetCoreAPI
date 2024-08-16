@@ -149,6 +149,9 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project.MonthReportFor
         public decimal YearOutsourcingExpensesAmount { get; set; }
 
         #endregion
+        /// <summary>
+        /// wbs使用
+        /// </summary>
+        public int IsDelete {  get; set; }
     }
-
 }

@@ -7,6 +7,7 @@ using GHMonitoringCenterApi.CustomAttribute;
 using GHMonitoringCenterApi.Application.Contracts.Dto.Project;
 using GHMonitoringCenterApi.Application.Contracts.Dto.Project.Report;
 using GHMonitoringCenterApi.Domain.Enums;
+using GHMonitoringCenterApi.Domain.Shared.Enums;
 
 namespace GHMonitoringCenterApi.Controllers.Job
 {
@@ -52,6 +53,14 @@ namespace GHMonitoringCenterApi.Controllers.Job
         [UnitOfWork]
         public async Task<ResponseAjaxResult<bool>> SubmitJobOfProjectWBSAsync([FromBody] SubmitJobOfProjectWBSRequestDto model)
         {
+            var result = new ResponseAjaxResult<bool>();
+
+            // 当前日期>=25  并且当天日期在当月25-次月5日之间
+            if (!(DateTime.Now.Day >= 25 || (DateTime.Now.Day >= 25 && DateTime.Now.Date <= Convert.ToDateTime(DateTime.Now.AddMonths(1).Date.ToString("yyyy-MM-5")))))
+            {
+                result.FailResult(HttpStatusCode.ApproveFail, "未在填报范围（当月25日-次月5日），不可修改项目结构树");
+                return result;
+            }
             return await _jobService.SubmitJobAsync(model);
         }
 
@@ -156,7 +165,7 @@ namespace GHMonitoringCenterApi.Controllers.Job
         [HttpGet("SearchJobNotice")]
         public async Task<ResponseAjaxResult<JobNoticeResponseDto>> SearchJobNoticeAsync()
         {
-             return await _jobService.SearchJobNoticeAsync();
+            return await _jobService.SearchJobNoticeAsync();
         }
 
         /// <summary>
@@ -164,7 +173,7 @@ namespace GHMonitoringCenterApi.Controllers.Job
         /// </summary>
         /// <returns></returns>
         [HttpGet("SearchJobApprovers")]
-        public async Task<ResponseAjaxResult<List<JobApproverResponseDto>>> SearchJobApproversAsync([FromQuery]JobApproverRequestDto model)
+        public async Task<ResponseAjaxResult<List<JobApproverResponseDto>>> SearchJobApproversAsync([FromQuery] JobApproverRequestDto model)
         {
             return await _jobService.SearchJobApproversAsync(model);
         }

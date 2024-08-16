@@ -15,12 +15,8 @@ using GHMonitoringCenterApi.Domain.Shared;
 using GHMonitoringCenterApi.Domain.Shared.Const;
 using GHMonitoringCenterApi.Domain.Shared.Enums;
 using GHMonitoringCenterApi.Domain.Shared.Util;
-using Microsoft.IdentityModel.Tokens;
-using NPOI.HPSF;
-using Org.BouncyCastle.Asn1.Pkcs;
 using SqlSugar;
 using SqlSugar.Extensions;
-using System.Collections.Generic;
 using System.Text;
 using UtilsSharp;
 
@@ -1964,6 +1960,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
         public async Task<ResponseAjaxResult<bool>> SaveProjectWBSTreeBizAsync(SaveProjectWBSRequestDto model)
         {
             var result = new ResponseAjaxResult<bool>();
+
             var project = await GetProjectPartAsync(model.ProjectId);
             if (project == null)
             {
@@ -2096,16 +2093,58 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             {
                 await dbContext.Insertable(addWBSList).EnableDiffLogEvent(logDto).ExecuteCommandAsync();
                 addWBSList.AddRange(updateWBSList);
+                //List<ProjectWbsHistoryMonth> projectWbsHistoryMonths = new List<ProjectWbsHistoryMonth>();
+                //foreach (var item in addWBSList)
+                //{
+                //    var projectWbsHistoryMonth = new ProjectWbsHistoryMonth()
+                //    {
+                //        UpdateTime = item.UpdateTime,
+                //        ContractAmount = item.ContractAmount,
+                //        CreateId = item.CreateId,
+                //        CreateTime = item.CreateTime,
+                //        DeleteTime = item.DeleteTime,
+                //        Def = item.Def,
+                //        DownOne = item.DownOne,
+                //        EngQuantity = item.EngQuantity,
+                //        ItemNum = item.ItemNum,
+                //        KeyId = item.KeyId,
+                //        Name = item.Name,
+                //        Prev = item.Prev,
+                //        Pid = item.Pid,
+                //        ProjectNum = item.ProjectNum,
+                //        ProjectWBSId = item.ProjectWBSId,
+                //        UnitPrice = item.UnitPrice,
+                //        ProjectId = item.ProjectId,
+                //        Id = item.Id,
+                //        IsDelete = item.IsDelete,
+                //        DeleteId = item.DeleteId,
+                //        UpdateId = item.UpdateId
+
+
+                //    };
+                //    projectWbsHistoryMonth.DateMonth = month;
+                //    projectWbsHistoryMonths.Add(projectWbsHistoryMonth);
+                //}
+                var existData = await dbContext.Queryable<ProjectWbsHistoryMonth>().Where(x => x.DateMonth == month).ToListAsync();
+                foreach (var item in existData)
+                {
+                    item.IsDelete = 0;
+                }
+                await dbContext.Updateable<ProjectWbsHistoryMonth>(existData).ExecuteCommandAsync();
+                //await baseProjectWbsHistory.InsertOrUpdateAsync(projectWbsHistoryMonths);
+                //await dbContext.Insertable<ProjectWbsHistoryMonth>(projectWbsHistoryMonths).ExecuteCommandAsync();
+            }
+            #region 新增wbs历史
+
+            if (wbsList.Any())
+            {
                 List<ProjectWbsHistoryMonth> projectWbsHistoryMonths = new List<ProjectWbsHistoryMonth>();
-                foreach (var item in addWBSList)
+                foreach (var item in wbsList)
                 {
                     var projectWbsHistoryMonth = new ProjectWbsHistoryMonth()
                     {
-                        UpdateTime = item.UpdateTime,
                         ContractAmount = item.ContractAmount,
-                        CreateId = item.CreateId,
-                        CreateTime = item.CreateTime,
-                        DeleteTime = item.DeleteTime,
+                        CreateTime = DateTime.Now,
                         Def = item.Def,
                         DownOne = item.DownOne,
                         EngQuantity = item.EngQuantity,
@@ -2118,25 +2157,15 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                         ProjectWBSId = item.ProjectWBSId,
                         UnitPrice = item.UnitPrice,
                         ProjectId = item.ProjectId,
-                        Id = item.Id,
                         IsDelete = item.IsDelete,
-                        DeleteId = item.DeleteId,
-                        UpdateId = item.UpdateId
-
-
+                        Id = item.Id
                     };
                     projectWbsHistoryMonth.DateMonth = month;
                     projectWbsHistoryMonths.Add(projectWbsHistoryMonth);
                 }
-                var existData = await dbContext.Queryable<ProjectWbsHistoryMonth>().Where(x => x.DateMonth == month).ToListAsync();
-                foreach (var item in existData)
-                {
-                    item.IsDelete = 0;
-                }
-                await dbContext.Updateable<ProjectWbsHistoryMonth>(existData).ExecuteCommandAsync();
                 await baseProjectWbsHistory.InsertOrUpdateAsync(projectWbsHistoryMonths);
-                //await dbContext.Insertable<ProjectWbsHistoryMonth>(projectWbsHistoryMonths).ExecuteCommandAsync();
             }
+            #endregion
             return result.SuccessResult(true);
         }
 

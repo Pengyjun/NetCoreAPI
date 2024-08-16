@@ -1,13 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using GHMonitoringCenterApi.Application.Contracts.Dto.Job;
-using GHMonitoringCenterApi.Application.Contracts.Dto.Project;
-using GHMonitoringCenterApi.Domain.Enums;
+﻿using GHMonitoringCenterApi.Application.Contracts.Dto.Job;
 using GHMonitoringCenterApi.Domain.Shared;
-using Microsoft.AspNetCore.Mvc;
 
 namespace GHMonitoringCenterApi.Application.Contracts.IService.Job
 {
