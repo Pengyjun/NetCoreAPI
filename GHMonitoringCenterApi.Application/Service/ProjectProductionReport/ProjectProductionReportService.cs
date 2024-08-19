@@ -780,7 +780,7 @@ namespace GHMonitoringCenterApi.Application.Service.ProjectProductionReport
                 IsAdmin = false;
             }
             //船舶进退场（新逻辑）
-            var shiMovenmentList = await dbContext.Queryable<ShipMovement>().Where(x => x.IsDelete == 1).ToListAsync();
+            var shiMovenmentList = await dbContext.Queryable<ShipMovement>().Where(x => x.IsDelete == 1&&x.Status== ShipMovementStatus.Enter).ToListAsync();
             var projectList = await dbContext.Queryable<Project>().Where(x => x.IsDelete == 1).ToListAsync();
 
             //获取需要查询的字段
@@ -847,7 +847,8 @@ namespace GHMonitoringCenterApi.Application.Service.ProjectProductionReport
             var primaryIds = list.Where(t => t.ProjectId == Guid.Empty).Select(t => new { id = t.Id, shipId = t.ShipId, DateDay = t.DateDay, ProjectId = t.ProjectId }).ToList();
             foreach (var item in primaryIds)
             {
-                var isExistProject = shiMovenmentList.Where(x => x.IsDelete == 1 && x.ShipId == item.shipId && x.EnterTime.HasValue == true && (x.EnterTime.Value.ToDateDay() <= item.DateDay || x.QuitTime.HasValue == true && x.QuitTime.Value.ToDateDay() >= item.DateDay)).OrderByDescending(x => x.EnterTime).ToList();
+                //var isExistProject = shiMovenmentList.Where(x => x.IsDelete == 1 && x.ShipId == item.shipId && x.EnterTime.HasValue == true && (x.EnterTime.Value.ToDateDay() <= item.DateDay || x.QuitTime.HasValue == true && x.QuitTime.Value.ToDateDay() >= item.DateDay)).OrderByDescending(x => x.EnterTime).ToList();
+                var isExistProject = shiMovenmentList.Where(x => x.IsDelete == 1 && x.ShipId == item.shipId).OrderByDescending(x => x.EnterTime).ToList();
                 foreach (var project in isExistProject)
                 {
 
@@ -876,6 +877,16 @@ namespace GHMonitoringCenterApi.Application.Service.ProjectProductionReport
                     if (project.EnterTime.HasValue && project.QuitTime.HasValue && project.QuitTime.Value.ToDateDay() >= item.DateDay)
                     {
 
+                        var oldValue = list.Where(t => t.ShipId == project.ShipId && t.DateDay == item.DateDay).FirstOrDefault();
+                        if (oldValue != null)
+                        {
+                            oldValue.ProjectId = project.ProjectId;
+                            oldValue.ProjectName = projectList.Where(x => x.Id == project.ProjectId).FirstOrDefault()?.Name;
+                            oldValue.shipDayReportType = 1;
+                        }
+                    }
+                    if (project.Status == ShipMovementStatus.Enter && project.EnterTime == null && project.QuitTime == null)
+                    {
                         var oldValue = list.Where(t => t.ShipId == project.ShipId && t.DateDay == item.DateDay).FirstOrDefault();
                         if (oldValue != null)
                         {

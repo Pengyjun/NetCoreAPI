@@ -1417,7 +1417,9 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             if (projects != null && projects.Any() && shipMovements != null && shipMovements.Any())
             {
                 //新逻辑
-                var list = await _dbShipDayReport.AsQueryable().Where(t => t.ProjectId == Guid.Empty && t.ShipId == shipId && t.DateDay >= startDateDay && t.DateDay <= endDateDay && t.IsDelete == 1).ToListAsync();
+                //var list = await _dbShipDayReport.AsQueryable().Where(t => t.ProjectId == Guid.Empty && t.ShipId == shipId && t.DateDay >= startDateDay && t.DateDay <= endDateDay && t.IsDelete == 1).ToListAsync();
+
+                var list = await _dbShipDayReport.AsQueryable().Where(t => t.ProjectId == Guid.Empty && t.ShipId == shipId && t.IsDelete == 1).ToListAsync();
                 var primaryIds = list.Where(t => t.ProjectId == Guid.Empty).Select(t => new { id = t.Id, shipId = t.ShipId, DateDay = t.DateDay, ProjectId = t.ProjectId }).ToList();
                 foreach (var item in primaryIds)
                 {
@@ -1448,6 +1450,15 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                         if (project.EnterTime.HasValue && project.QuitTime.HasValue && project.QuitTime.Value.ToDateDay() >= item.DateDay)
                         {
 
+                            var oldValue = list.Where(t => t.ShipId == project.ShipId && t.DateDay == item.DateDay).FirstOrDefault();
+                            if (oldValue != null)
+                            {
+                                oldValue.ProjectId = project.ProjectId;
+
+                            }
+                        }
+                        if (project.Status == ShipMovementStatus.Enter && project.EnterTime == null && project.QuitTime == null)
+                        {
                             var oldValue = list.Where(t => t.ShipId == project.ShipId && t.DateDay == item.DateDay).FirstOrDefault();
                             if (oldValue != null)
                             {
@@ -4274,6 +4285,16 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                                 if (project.EnterTime.HasValue && project.QuitTime.HasValue && project.QuitTime.Value.ToDateDay() >= item.DateDay)
                                 {
 
+                                    var oldValue = list1.Where(t => t.ShipId == project.ShipId && t.DateDay == item.DateDay).FirstOrDefault();
+                                    if (oldValue != null)
+                                    {
+                                        oldValue.ProjectId = project.ProjectId;
+
+                                    }
+                                }
+
+                                if (project.Status == ShipMovementStatus.Enter && project.EnterTime == null && project.QuitTime == null)
+                                {
                                     var oldValue = list1.Where(t => t.ShipId == project.ShipId && t.DateDay == item.DateDay).FirstOrDefault();
                                     if (oldValue != null)
                                     {
