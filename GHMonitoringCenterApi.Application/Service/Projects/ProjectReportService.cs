@@ -1567,351 +1567,351 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
 
 
 
-   //     /// <summary>
-   //     /// 搜索项目月报列表
-   //     /// </summary>
-   //     public async Task<ResponseAjaxResult<MonthtReportsResponseDto>> SearchMonthReportsAsync(MonthtReportsRequstDto model)
-   //     {
-   //         if (model.IsDuiWai)
-   //         {
-   //             _currentUser.Account = "2022002867";
-   //             _currentUser.CurrentLoginDepartmentId = "bd840460-1e3a-45c8-abed-6e66903e6465".ToGuid();
-   //             _currentUser.CurrentLoginInstitutionId = "bd840460-1e3a-45c8-abed-6e66903e6465".ToGuid();
-   //             _currentUser.CurrentLoginInstitutionOid = "101162350";
-   //             _currentUser.CurrentLoginInstitutionPoid = "101114066";
-   //             _currentUser.CurrentLoginRoleId = "08db268c-d0d0-4e0f-8a66-39ff15bd3865".ToGuid();
-   //             _currentUser.CurrentLoginIsAdmin = true;
-   //             _currentUser.CurrentLoginUserType = 1;
-   //             _currentUser.Id = "08d63666-7e36-4e20-8024-ee9c96c51623".ToGuid();
-   //         }
-   //         #region 时间判断
-   //         //查询当前是第几月
-   //         var nowYear = DateTime.Now.Year;
-   //         var nowMonth = DateTime.Now.Month;
-   //         var nowDay = DateTime.Now.Day;
-   //         var monthDay = 0;
-   //         if (nowDay > 26)
-   //         {
-   //             nowMonth += 1;
-   //         }
-   //         if (int.Parse(DateTime.Now.ToString("MMdd")) > 1226)
-   //         {
-   //             nowYear += 1;
-   //         }
-   //         if (nowMonth.ToString().Length == 1)
-   //         {
-   //             monthDay = int.Parse(nowYear + $"0{nowMonth}");
-   //         }
-   //         else
-   //         {
-   //             monthDay = int.Parse(nowYear + $"{nowMonth}");
-   //         }
-   //         #endregion
+        //     /// <summary>
+        //     /// 搜索项目月报列表
+        //     /// </summary>
+        //     public async Task<ResponseAjaxResult<MonthtReportsResponseDto>> SearchMonthReportsAsync(MonthtReportsRequstDto model)
+        //     {
+        //         if (model.IsDuiWai)
+        //         {
+        //             _currentUser.Account = "2022002867";
+        //             _currentUser.CurrentLoginDepartmentId = "bd840460-1e3a-45c8-abed-6e66903e6465".ToGuid();
+        //             _currentUser.CurrentLoginInstitutionId = "bd840460-1e3a-45c8-abed-6e66903e6465".ToGuid();
+        //             _currentUser.CurrentLoginInstitutionOid = "101162350";
+        //             _currentUser.CurrentLoginInstitutionPoid = "101114066";
+        //             _currentUser.CurrentLoginRoleId = "08db268c-d0d0-4e0f-8a66-39ff15bd3865".ToGuid();
+        //             _currentUser.CurrentLoginIsAdmin = true;
+        //             _currentUser.CurrentLoginUserType = 1;
+        //             _currentUser.Id = "08d63666-7e36-4e20-8024-ee9c96c51623".ToGuid();
+        //         }
+        //         #region 时间判断
+        //         //查询当前是第几月
+        //         var nowYear = DateTime.Now.Year;
+        //         var nowMonth = DateTime.Now.Month;
+        //         var nowDay = DateTime.Now.Day;
+        //         var monthDay = 0;
+        //         if (nowDay > 26)
+        //         {
+        //             nowMonth += 1;
+        //         }
+        //         if (int.Parse(DateTime.Now.ToString("MMdd")) > 1226)
+        //         {
+        //             nowYear += 1;
+        //         }
+        //         if (nowMonth.ToString().Length == 1)
+        //         {
+        //             monthDay = int.Parse(nowYear + $"0{nowMonth}");
+        //         }
+        //         else
+        //         {
+        //             monthDay = int.Parse(nowYear + $"{nowMonth}");
+        //         }
+        //         #endregion
 
-   //         model.ResetModelProperty();
-   //         var result = new ResponseAjaxResult<MonthtReportsResponseDto>();
-   //         List<string> userId = new List<string>()
-   //         {
-   //             "L20080287",//赵锐
-			//	"2016042370",//杨加录
-			//	"2020012309", //李倩
-			//	"2017005354", //孟浩
-			//	"2018009624", //王琦
-			//	"2018008722",//陈河元
-			//	"2019013759", //朱智文
-			//	"2016146340"//陈翠
-			//};
-   //         var startTime = (DateTime)model.StartTime;
-   //         var endTime = (DateTime)model.EndTime;
-   //         var startMonth = startTime.ToDateMonth();
-   //         var endMonth = endTime.ToDateMonth();
-   //         var userAuthForData = await GetCurrentUserAuthForDataAsync();
-   //         //解析属性标签
-   //         ResolveTagNames(model.TagName, out List<int> categoryList, out List<int> tagList, out List<int> tag2List);
-   //         RefAsync<int> total = 0;
-   //         var query = _dbMonthReport.AsQueryable().LeftJoin(_dbProject.AsQueryable(), (m, p) => m.ProjectId == p.Id && p.IsDelete == 1);
-   //         if (!model.IsDuiWai)//非对外 监控中心自己使用
-   //         {
-   //             query = MonthReportsWheres(query, model, startMonth, endMonth, userAuthForData, categoryList, tagList, tag2List)
-   //                     .OrderBy((m, p) => new { m.ProjectId, m.DateMonth });
-   //         }
-   //         else
-   //         {
-   //             //对外接口使用
-   //             query = MonthReportsWheres(query, model, userAuthForData, categoryList, tagList, tag2List)
-   //                     .OrderBy((m, p) => new { m.ProjectId, m.DateMonth });
-   //         }
+        //         model.ResetModelProperty();
+        //         var result = new ResponseAjaxResult<MonthtReportsResponseDto>();
+        //         List<string> userId = new List<string>()
+        //         {
+        //             "L20080287",//赵锐
+        //	"2016042370",//杨加录
+        //	"2020012309", //李倩
+        //	"2017005354", //孟浩
+        //	"2018009624", //王琦
+        //	"2018008722",//陈河元
+        //	"2019013759", //朱智文
+        //	"2016146340"//陈翠
+        //};
+        //         var startTime = (DateTime)model.StartTime;
+        //         var endTime = (DateTime)model.EndTime;
+        //         var startMonth = startTime.ToDateMonth();
+        //         var endMonth = endTime.ToDateMonth();
+        //         var userAuthForData = await GetCurrentUserAuthForDataAsync();
+        //         //解析属性标签
+        //         ResolveTagNames(model.TagName, out List<int> categoryList, out List<int> tagList, out List<int> tag2List);
+        //         RefAsync<int> total = 0;
+        //         var query = _dbMonthReport.AsQueryable().LeftJoin(_dbProject.AsQueryable(), (m, p) => m.ProjectId == p.Id && p.IsDelete == 1);
+        //         if (!model.IsDuiWai)//非对外 监控中心自己使用
+        //         {
+        //             query = MonthReportsWheres(query, model, startMonth, endMonth, userAuthForData, categoryList, tagList, tag2List)
+        //                     .OrderBy((m, p) => new { m.ProjectId, m.DateMonth });
+        //         }
+        //         else
+        //         {
+        //             //对外接口使用
+        //             query = MonthReportsWheres(query, model, userAuthForData, categoryList, tagList, tag2List)
+        //                     .OrderBy((m, p) => new { m.ProjectId, m.DateMonth });
+        //         }
 
-   //         var selQuery = query.Select((m, p) => new MonthtReportsResponseDto.MonthtReportDto()
-   //         {
-   //             Id = m.Id,
-   //             ProjectId = m.ProjectId,
-   //             DateMonth = m.DateMonth,
-   //             AccomplishQuantities = SqlFunc.Round(m.CompletedQuantity, 2),
-   //             AccomplishValue = model.IsConvert == true ? SqlFunc.Round(m.CompleteProductionAmount, 2) : SqlFunc.Round(m.CurrencyCompleteProductionAmount, 2),
-   //             RecognizedValue = SqlFunc.Round(m.PartyAConfirmedProductionAmount, 2),
-   //             PaymentAmount = m.PartyAPayAmount,
-   //             ProgressDeviationReasonType = m.ProgressDeviationReason,
-   //             CostDeviationReasonType = m.CostDeviationReason,
-   //             CostDeviationDescription = m.CostDeviationDescription,
-   //             ProjectedCost = SqlFunc.Round(m.MonthEstimateCostAmount, 2),
-   //             Name = p.Name,
-   //             ProjectTypeId = p.TypeId,
-   //             ExchangeRate = p.ExchangeRate,
-   //             ConstructionQualificationId = p.ProjectConstructionQualificationId,
-   //             Tag = p.Tag,
-   //             Tag2 = p.Tag2,
-   //             Category = p.Category,
-   //             CompanyId = p.CompanyId,
-   //             AreaId = p.AreaId,
-   //             RegionId = p.RegionId,
-   //             StatusId = p.StatusId,
-   //             ClassifyStandard = p.ClassifyStandard,
-   //             ContractAmount = p.Amount,//合同额
-   //             ValidContractAmount = p.ECAmount,//有效合同额
-   //             Remarks = p.QuantityRemarks,
-   //             BudgetInterestRate = p.BudgetInterestRate * 100,
-   //             BudgetaryReasons = p.BudgetaryReasons,
-   //             CompilationTime = p.CompilationTime,
-   //             AdministrationNumber = p.Administrator,
-   //             ConstructionNumber = p.Constructor,
-   //             PersonReportForms = p.ReportFormer,
-   //             PhoneReportForms = p.ReportForMertel,
-   //             Code = p.Code, //项目编码
-   //             ContractMeaPayProp = p.ContractMeaPayProp, //比例
-   //             TaxRate = p.Rate * 100,
-   //             ProgressDescription = m.ProgressDescription,//形象进度描述
-   //             ProgressDeviationDescription = m.ProgressDeviationDescription,//进度偏差原因
-   //             ProgressDeviationDescriptionPushPom = m.ProgressDeviationDescriptionPushPom,//进度偏差原因（pom）
-   //             ProgressDescriptionPushPom = m.ProgressDescriptionPushPom,//形象进度描述（pom）
-   //             PushStatus = m.IsPushPom,//推送次数
-   //             StatusText = m.StatusText,
-   //             OutsourcingExpensesAmount = m.OutsourcingExpensesAmount,
-   //             UpdateTime = m.UpdateTime,
-   //             CreateTime = m.CreateTime
-   //         });
+        //         var selQuery = query.Select((m, p) => new MonthtReportsResponseDto.MonthtReportDto()
+        //         {
+        //             Id = m.Id,
+        //             ProjectId = m.ProjectId,
+        //             DateMonth = m.DateMonth,
+        //             AccomplishQuantities = SqlFunc.Round(m.CompletedQuantity, 2),
+        //             AccomplishValue = model.IsConvert == true ? SqlFunc.Round(m.CompleteProductionAmount, 2) : SqlFunc.Round(m.CurrencyCompleteProductionAmount, 2),
+        //             RecognizedValue = SqlFunc.Round(m.PartyAConfirmedProductionAmount, 2),
+        //             PaymentAmount = m.PartyAPayAmount,
+        //             ProgressDeviationReasonType = m.ProgressDeviationReason,
+        //             CostDeviationReasonType = m.CostDeviationReason,
+        //             CostDeviationDescription = m.CostDeviationDescription,
+        //             ProjectedCost = SqlFunc.Round(m.MonthEstimateCostAmount, 2),
+        //             Name = p.Name,
+        //             ProjectTypeId = p.TypeId,
+        //             ExchangeRate = p.ExchangeRate,
+        //             ConstructionQualificationId = p.ProjectConstructionQualificationId,
+        //             Tag = p.Tag,
+        //             Tag2 = p.Tag2,
+        //             Category = p.Category,
+        //             CompanyId = p.CompanyId,
+        //             AreaId = p.AreaId,
+        //             RegionId = p.RegionId,
+        //             StatusId = p.StatusId,
+        //             ClassifyStandard = p.ClassifyStandard,
+        //             ContractAmount = p.Amount,//合同额
+        //             ValidContractAmount = p.ECAmount,//有效合同额
+        //             Remarks = p.QuantityRemarks,
+        //             BudgetInterestRate = p.BudgetInterestRate * 100,
+        //             BudgetaryReasons = p.BudgetaryReasons,
+        //             CompilationTime = p.CompilationTime,
+        //             AdministrationNumber = p.Administrator,
+        //             ConstructionNumber = p.Constructor,
+        //             PersonReportForms = p.ReportFormer,
+        //             PhoneReportForms = p.ReportForMertel,
+        //             Code = p.Code, //项目编码
+        //             ContractMeaPayProp = p.ContractMeaPayProp, //比例
+        //             TaxRate = p.Rate * 100,
+        //             ProgressDescription = m.ProgressDescription,//形象进度描述
+        //             ProgressDeviationDescription = m.ProgressDeviationDescription,//进度偏差原因
+        //             ProgressDeviationDescriptionPushPom = m.ProgressDeviationDescriptionPushPom,//进度偏差原因（pom）
+        //             ProgressDescriptionPushPom = m.ProgressDescriptionPushPom,//形象进度描述（pom）
+        //             PushStatus = m.IsPushPom,//推送次数
+        //             StatusText = m.StatusText,
+        //             OutsourcingExpensesAmount = m.OutsourcingExpensesAmount,
+        //             UpdateTime = m.UpdateTime,
+        //             CreateTime = m.CreateTime
+        //         });
 
-   //         var list = model.IsFullExport ? await selQuery.ToListAsync() : await selQuery.ToPageListAsync(model.PageIndex, model.PageSize, total);
-   //         if (model.IsDuiWai)
-   //         {
-   //             list = list
-   //             .Where(x => string.IsNullOrEmpty(x.UpdateTime.ToString()) || x.UpdateTime == DateTime.MinValue ?
-   //               x.CreateTime >= model.StartTime && x.CreateTime <= model.EndTime
-   //             : x.UpdateTime >= model.StartTime && x.UpdateTime <= model.EndTime)
-   //             .ToList();
-   //         }
+        //         var list = model.IsFullExport ? await selQuery.ToListAsync() : await selQuery.ToPageListAsync(model.PageIndex, model.PageSize, total);
+        //         if (model.IsDuiWai)
+        //         {
+        //             list = list
+        //             .Where(x => string.IsNullOrEmpty(x.UpdateTime.ToString()) || x.UpdateTime == DateTime.MinValue ?
+        //               x.CreateTime >= model.StartTime && x.CreateTime <= model.EndTime
+        //             : x.UpdateTime >= model.StartTime && x.UpdateTime <= model.EndTime)
+        //             .ToList();
+        //         }
 
-   //         var projectIds = list.Select(t => t.ProjectId).Distinct().ToArray();
-   //         var companyIds = list.Select(t => t.CompanyId).Distinct().ToArray();
-   //         var regionIds = list.Select(t => t.RegionId).Distinct().ToArray();
-   //         var areaIds = list.Select(t => t.AreaId).Distinct().ToArray();
-   //         var companys = await GetInstitutionsAsync(companyIds);
-   //         // 项目状态
-   //         var projectStatusList = await GetProjectStatusListAsync();
-   //         // 施工资质
-   //         var constructionQualifications = await GetConstructionQualificationsAsync();
-   //         // 项目类型
-   //         var projectTypes = await GetProjectTypesAsync();
-   //         // 项目所属区域
-   //         var projectAreas = await GetProjectAreasAsync();
-   //         // 施工地点
-   //         var areas = await GetProvincesAsync(areaIds);
-   //         // 省地区
-   //         var provinceAreas = await GetProvincesByLevelAsync(1);
-   //         // 市地区
-   //         var districtAreas = await GetProvincesByLevelAsync(2);
-   //         // 项目干系单位
-   //         var projectOrgs = await GetProjectOrgsAsync(projectIds);
-   //         var organizationIds = projectOrgs.Select(t => t.OrganizationId).Distinct().ToArray();
-   //         // 项目干系单位-往来单位
-   //         var organizationUnits = await GetDealingUnitPartsAsync(organizationIds);
-   //         // 项目负责人
-   //         var projectLeaders = await GetProjectLeadersAsync(projectIds);
-   //         var userIds = projectLeaders.Select(t => t.AssistantManagerId).Distinct().ToArray();
-   //         var projectLeaderUsers = await GetUserPartAsync(userIds);
-   //         // 行业分类
-   //         var industryClassifications = await GetIndustryClassificationsAsync();
-   //         // 年度计划产值/产量
-   //         var years = GetPlanYears(startTime, endTime);
-   //         var projectAnnualPlans = await GetProjectAnnualPlansAsync(projectIds, years);
-   //         // 累计产值/产量
-   //         var sumMonthReports = await SumMonthReportsAsync(projectIds);
-   //         //项目历史确认和收款产值
-   //         var sumHistoryMonthReports = await _dbContext.Queryable<ProjectMonthReportHistory>().Where(x => x.IsDelete == 1 && projectIds.Contains(x.ProjectId.Value)).ToListAsync();
+        //         var projectIds = list.Select(t => t.ProjectId).Distinct().ToArray();
+        //         var companyIds = list.Select(t => t.CompanyId).Distinct().ToArray();
+        //         var regionIds = list.Select(t => t.RegionId).Distinct().ToArray();
+        //         var areaIds = list.Select(t => t.AreaId).Distinct().ToArray();
+        //         var companys = await GetInstitutionsAsync(companyIds);
+        //         // 项目状态
+        //         var projectStatusList = await GetProjectStatusListAsync();
+        //         // 施工资质
+        //         var constructionQualifications = await GetConstructionQualificationsAsync();
+        //         // 项目类型
+        //         var projectTypes = await GetProjectTypesAsync();
+        //         // 项目所属区域
+        //         var projectAreas = await GetProjectAreasAsync();
+        //         // 施工地点
+        //         var areas = await GetProvincesAsync(areaIds);
+        //         // 省地区
+        //         var provinceAreas = await GetProvincesByLevelAsync(1);
+        //         // 市地区
+        //         var districtAreas = await GetProvincesByLevelAsync(2);
+        //         // 项目干系单位
+        //         var projectOrgs = await GetProjectOrgsAsync(projectIds);
+        //         var organizationIds = projectOrgs.Select(t => t.OrganizationId).Distinct().ToArray();
+        //         // 项目干系单位-往来单位
+        //         var organizationUnits = await GetDealingUnitPartsAsync(organizationIds);
+        //         // 项目负责人
+        //         var projectLeaders = await GetProjectLeadersAsync(projectIds);
+        //         var userIds = projectLeaders.Select(t => t.AssistantManagerId).Distinct().ToArray();
+        //         var projectLeaderUsers = await GetUserPartAsync(userIds);
+        //         // 行业分类
+        //         var industryClassifications = await GetIndustryClassificationsAsync();
+        //         // 年度计划产值/产量
+        //         var years = GetPlanYears(startTime, endTime);
+        //         var projectAnnualPlans = await GetProjectAnnualPlansAsync(projectIds, years);
+        //         // 累计产值/产量
+        //         var sumMonthReports = await SumMonthReportsAsync(projectIds);
+        //         //项目历史确认和收款产值
+        //         var sumHistoryMonthReports = await _dbContext.Queryable<ProjectMonthReportHistory>().Where(x => x.IsDelete == 1 && projectIds.Contains(x.ProjectId.Value)).ToListAsync();
 
-   //         // 年度累计产值/产量
-   //         var sumYearMonthReports = await SumMonthReportsByYearAsync(projectIds, startTime.Year, endTime.Year);
-   //         // 年度计划
-   //         list.ForEach(item =>
-   //         {
-   //             if (item.StatusText == "一级审批中" && (nowDay >= 26 || nowDay <= 1))
-   //             {
-   //                 item.IsShowRecall = item.DateMonth == monthDay;
-   //             }
+        //         // 年度累计产值/产量
+        //         var sumYearMonthReports = await SumMonthReportsByYearAsync(projectIds, startTime.Year, endTime.Year);
+        //         // 年度计划
+        //         list.ForEach(item =>
+        //         {
+        //             if (item.StatusText == "一级审批中" && (nowDay >= 26 || nowDay <= 1))
+        //             {
+        //                 item.IsShowRecall = item.DateMonth == monthDay;
+        //             }
 
-   //             var thisMonthTime = item.DateMonthTime;
-   //             var area = areas.FirstOrDefault(t => t.PomId == item.AreaId);
-   //             var thispProjectOrgs = projectOrgs.Where(t => t.ProjectId == item.ProjectId).ToList();
-   //             // 业主单位
-   //             var ownerUnit = organizationUnits.FirstOrDefault(t => t.PomId == thispProjectOrgs.FirstOrDefault(i => i.Type == "1")?.OrganizationId);
-   //             // 甲方单位
-   //             var PartyAUnit = organizationUnits.FirstOrDefault(t => t.PomId == thispProjectOrgs.FirstOrDefault(i => i.Type == "2")?.OrganizationId);
-   //             // 乙方单位
-   //             var PartyBUnit = organizationUnits.FirstOrDefault(t => t.PomId == thispProjectOrgs.FirstOrDefault(i => i.Type == "3")?.OrganizationId);
-   //             // 项目负责人
-   //             var projectLeader = projectLeaderUsers.FirstOrDefault(t => t.PomId == projectLeaders.FirstOrDefault(i => i.ProjectId == item.ProjectId)?.AssistantManagerId);
-   //             // 月度项目计划（产值/产量）
-   //             var sumProjectMonthPlanned = SumMonthProjectPlanned(projectAnnualPlans, item.ProjectId, thisMonthTime);
-   //             // 年度项目计划（产值/产量）
-   //             var sumProjectYearPlanned = SumYearProjectPlannedAsync(projectAnnualPlans, item.ProjectId, thisMonthTime.Year);
-   //             // 项目月报累计统计
-   //             var sumMonthReport = sumMonthReports.FirstOrDefault(t => t.ProjectId == item.ProjectId);
-   //             // 项目月报年度累计统计
-   //             var sumYearMonthReport = sumYearMonthReports.FirstOrDefault(t => t.ProjectId == item.ProjectId && t.DateYear == thisMonthTime.Year);
-   //             item.IsAdmin = userId.Contains(_currentUser.Account) ? true : false;
-   //             item.State = projectStatusList.FirstOrDefault(t => t.StatusId == item.StatusId)?.Name;
-   //             item.Construction = constructionQualifications.FirstOrDefault(t => t.PomId == item.ConstructionQualificationId)?.Name;
-   //             item.ProjectType = projectTypes.FirstOrDefault(t => t.PomId == item.ProjectTypeId)?.Name;
-   //             item.Area = projectAreas.FirstOrDefault(t => t.AreaId == item.RegionId)?.Name;
-   //             item.OwnerUnitName = ownerUnit?.ZBPNAME_ZH;
-   //             item.FirstPartyUnit = PartyAUnit?.ZBPNAME_ZH;
-   //             item.SecondPartyName = PartyBUnit?.ZBPNAME_ZH;
-   //             item.PersonAdministration = projectLeader?.Name;
-   //             item.PhoneAdministration = projectLeader?.Phone;
-   //             item.TweUnit = "中交广州航道局有限公司";
-   //             item.ThreeUnit = companys.FirstOrDefault(t => t.PomId == item.CompanyId)?.Name;
-   //             // 计划产值/工程量
-   //             item.PlanQuantities = Math.Round(sumProjectMonthPlanned.PlannedQuantities, 2);
-   //             item.PlanOutPutValue = Math.Round(sumProjectMonthPlanned.PlannedOutputValue, 2);
-   //             item.YearPlanQuantities = Math.Round(sumProjectYearPlanned.PlannedQuantities, 2);
-   //             item.YearPlanOutPutValue = Math.Round(sumProjectYearPlanned.PlannedOutputValue, 2);
-   //             // 合同金额
-   //             if (item.ContractAmount != null)
-   //             {
-   //                 item.ContractAmount = Math.Round((decimal)(model.IsConvert == true ? item.ContractAmount * (item.ExchangeRate ?? 1m) : item.ContractAmount), 2);
-   //             }
-   //             // 有效合同额
-   //             if (item.ValidContractAmount != null)
-   //             {
-   //                 item.ValidContractAmount = Math.Round((decimal)item.ValidContractAmount, 2);
-   //             }
-   //             // 年度统计月报
-   //             if (sumYearMonthReport != null)
-   //             {
-   //                 item.YearAccomplishQuantities = Math.Round(sumYearMonthReport.CompletedQuantity, 2);
-   //                 item.YearAccomplishCost = Math.Round(sumYearMonthReport.CostAmount, 2);
-   //                 item.YearAccomplishValue = Math.Round(model.IsConvert == true ? sumYearMonthReport.CompleteProductionAmount : sumYearMonthReport.CurrencyCompleteProductionAmount, 2);
-   //                 item.YearPaymentAmount = Math.Round(sumYearMonthReport.PartyAPayAmount, 2);
-   //                 item.YearRecognizedValue = Math.Round(sumYearMonthReport.PartyAConfirmedProductionAmount, 2);
-   //                 item.YearProjectedCost = Math.Round(sumYearMonthReport.EstimateCostAmount, 2);
-   //                 item.YearOutsourcingExpensesAmount = Math.Round(sumYearMonthReport.OutsourcingExpensesAmount, 2);
-   //             }
-   //             // 累计统计月报
-   //             if (sumMonthReport != null)
-   //             {
-   //                 item.AccumulativeQuantities = Math.Round(sumMonthReport.CompletedQuantity, 2);
-   //                 item.CumulativeAccomplishCost = Math.Round(sumMonthReport.CostAmount, 2);
-   //                 item.CumulativeCompleted = Math.Round(model.IsConvert == true ? sumMonthReport.CompleteProductionAmount : sumMonthReport.CurrencyCompleteProductionAmount, 2);
-   //                 //item.CumulativePaymentAmount = Math.Round(sumMonthReport.PartyAPayAmount, 2);
-   //                 // item.CumulativeValue = Math.Round(sumMonthReport.PartyAConfirmedProductionAmount, 2);
-   //                 var itemHistotyMonth = sumHistoryMonthReports.Where(x => x.ProjectId == item.ProjectId).FirstOrDefault();
+        //             var thisMonthTime = item.DateMonthTime;
+        //             var area = areas.FirstOrDefault(t => t.PomId == item.AreaId);
+        //             var thispProjectOrgs = projectOrgs.Where(t => t.ProjectId == item.ProjectId).ToList();
+        //             // 业主单位
+        //             var ownerUnit = organizationUnits.FirstOrDefault(t => t.PomId == thispProjectOrgs.FirstOrDefault(i => i.Type == "1")?.OrganizationId);
+        //             // 甲方单位
+        //             var PartyAUnit = organizationUnits.FirstOrDefault(t => t.PomId == thispProjectOrgs.FirstOrDefault(i => i.Type == "2")?.OrganizationId);
+        //             // 乙方单位
+        //             var PartyBUnit = organizationUnits.FirstOrDefault(t => t.PomId == thispProjectOrgs.FirstOrDefault(i => i.Type == "3")?.OrganizationId);
+        //             // 项目负责人
+        //             var projectLeader = projectLeaderUsers.FirstOrDefault(t => t.PomId == projectLeaders.FirstOrDefault(i => i.ProjectId == item.ProjectId)?.AssistantManagerId);
+        //             // 月度项目计划（产值/产量）
+        //             var sumProjectMonthPlanned = SumMonthProjectPlanned(projectAnnualPlans, item.ProjectId, thisMonthTime);
+        //             // 年度项目计划（产值/产量）
+        //             var sumProjectYearPlanned = SumYearProjectPlannedAsync(projectAnnualPlans, item.ProjectId, thisMonthTime.Year);
+        //             // 项目月报累计统计
+        //             var sumMonthReport = sumMonthReports.FirstOrDefault(t => t.ProjectId == item.ProjectId);
+        //             // 项目月报年度累计统计
+        //             var sumYearMonthReport = sumYearMonthReports.FirstOrDefault(t => t.ProjectId == item.ProjectId && t.DateYear == thisMonthTime.Year);
+        //             item.IsAdmin = userId.Contains(_currentUser.Account) ? true : false;
+        //             item.State = projectStatusList.FirstOrDefault(t => t.StatusId == item.StatusId)?.Name;
+        //             item.Construction = constructionQualifications.FirstOrDefault(t => t.PomId == item.ConstructionQualificationId)?.Name;
+        //             item.ProjectType = projectTypes.FirstOrDefault(t => t.PomId == item.ProjectTypeId)?.Name;
+        //             item.Area = projectAreas.FirstOrDefault(t => t.AreaId == item.RegionId)?.Name;
+        //             item.OwnerUnitName = ownerUnit?.ZBPNAME_ZH;
+        //             item.FirstPartyUnit = PartyAUnit?.ZBPNAME_ZH;
+        //             item.SecondPartyName = PartyBUnit?.ZBPNAME_ZH;
+        //             item.PersonAdministration = projectLeader?.Name;
+        //             item.PhoneAdministration = projectLeader?.Phone;
+        //             item.TweUnit = "中交广州航道局有限公司";
+        //             item.ThreeUnit = companys.FirstOrDefault(t => t.PomId == item.CompanyId)?.Name;
+        //             // 计划产值/工程量
+        //             item.PlanQuantities = Math.Round(sumProjectMonthPlanned.PlannedQuantities, 2);
+        //             item.PlanOutPutValue = Math.Round(sumProjectMonthPlanned.PlannedOutputValue, 2);
+        //             item.YearPlanQuantities = Math.Round(sumProjectYearPlanned.PlannedQuantities, 2);
+        //             item.YearPlanOutPutValue = Math.Round(sumProjectYearPlanned.PlannedOutputValue, 2);
+        //             // 合同金额
+        //             if (item.ContractAmount != null)
+        //             {
+        //                 item.ContractAmount = Math.Round((decimal)(model.IsConvert == true ? item.ContractAmount * (item.ExchangeRate ?? 1m) : item.ContractAmount), 2);
+        //             }
+        //             // 有效合同额
+        //             if (item.ValidContractAmount != null)
+        //             {
+        //                 item.ValidContractAmount = Math.Round((decimal)item.ValidContractAmount, 2);
+        //             }
+        //             // 年度统计月报
+        //             if (sumYearMonthReport != null)
+        //             {
+        //                 item.YearAccomplishQuantities = Math.Round(sumYearMonthReport.CompletedQuantity, 2);
+        //                 item.YearAccomplishCost = Math.Round(sumYearMonthReport.CostAmount, 2);
+        //                 item.YearAccomplishValue = Math.Round(model.IsConvert == true ? sumYearMonthReport.CompleteProductionAmount : sumYearMonthReport.CurrencyCompleteProductionAmount, 2);
+        //                 item.YearPaymentAmount = Math.Round(sumYearMonthReport.PartyAPayAmount, 2);
+        //                 item.YearRecognizedValue = Math.Round(sumYearMonthReport.PartyAConfirmedProductionAmount, 2);
+        //                 item.YearProjectedCost = Math.Round(sumYearMonthReport.EstimateCostAmount, 2);
+        //                 item.YearOutsourcingExpensesAmount = Math.Round(sumYearMonthReport.OutsourcingExpensesAmount, 2);
+        //             }
+        //             // 累计统计月报
+        //             if (sumMonthReport != null)
+        //             {
+        //                 item.AccumulativeQuantities = Math.Round(sumMonthReport.CompletedQuantity, 2);
+        //                 item.CumulativeAccomplishCost = Math.Round(sumMonthReport.CostAmount, 2);
+        //                 item.CumulativeCompleted = Math.Round(model.IsConvert == true ? sumMonthReport.CompleteProductionAmount : sumMonthReport.CurrencyCompleteProductionAmount, 2);
+        //                 //item.CumulativePaymentAmount = Math.Round(sumMonthReport.PartyAPayAmount, 2);
+        //                 // item.CumulativeValue = Math.Round(sumMonthReport.PartyAConfirmedProductionAmount, 2);
+        //                 var itemHistotyMonth = sumHistoryMonthReports.Where(x => x.ProjectId == item.ProjectId).FirstOrDefault();
 
-   //                 if (itemHistotyMonth != null)
-   //                 {
-   //                     item.CumulativePaymentAmount = Math.Round(sumMonthReport.PartyAPayAmount, 2) + Math.Round(itemHistotyMonth.KaileiProjectPayment.Value * 10000, 2);
+        //                 if (itemHistotyMonth != null)
+        //                 {
+        //                     item.CumulativePaymentAmount = Math.Round(sumMonthReport.PartyAPayAmount, 2) + Math.Round(itemHistotyMonth.KaileiProjectPayment.Value * 10000, 2);
 
-   //                     item.CumulativeValue = Math.Round(sumMonthReport.PartyAConfirmedProductionAmount, 2) +
-   //                     Math.Round(itemHistotyMonth.KaileiOwnerConfirmation.Value * 10000, 2);
-   //                 }
-   //                 else
-   //                 {
-   //                     item.CumulativePaymentAmount = Math.Round(sumMonthReport.PartyAPayAmount, 2);
-   //                     item.CumulativeValue = Math.Round(sumMonthReport.PartyAConfirmedProductionAmount, 2);
-   //                 }
+        //                     item.CumulativeValue = Math.Round(sumMonthReport.PartyAConfirmedProductionAmount, 2) +
+        //                     Math.Round(itemHistotyMonth.KaileiOwnerConfirmation.Value * 10000, 2);
+        //                 }
+        //                 else
+        //                 {
+        //                     item.CumulativePaymentAmount = Math.Round(sumMonthReport.PartyAPayAmount, 2);
+        //                     item.CumulativeValue = Math.Round(sumMonthReport.PartyAConfirmedProductionAmount, 2);
+        //                 }
 
-   //                 item.CumulativeOutsourcingExpensesAmount = Math.Round(sumMonthReport.OutsourcingExpensesAmount, 2);
+        //                 item.CumulativeOutsourcingExpensesAmount = Math.Round(sumMonthReport.OutsourcingExpensesAmount, 2);
 
-   //             }
-   //             // (国别|省）/市
-   //             if (area != null)
-   //             {
-   //                 item.Nationality = area.Overseas == "1" ? area.Zaddvsname : GetProvinceArea(provinceAreas, districtAreas, area)?.Zaddvsname;
-   //                 item.District = GetDistrictArea(districtAreas, area)?.Zaddvsname;
-   //             }
-   //             // 行业分类
-   //             if (!string.IsNullOrWhiteSpace(item.ClassifyStandard))
-   //             {
-   //                 var classifyStandardIds = item.ClassifyStandard.Split(",").Select(t => t.ToGuid()).ToArray();
-   //                 if (classifyStandardIds.Length > 0)
-   //                 {
-   //                     var classification = industryClassifications.FirstOrDefault(t => t.PomId == classifyStandardIds[0]);
-   //                     item.OneClassify = classification?.Name;
-   //                     item.OneCode = classification?.Code;
-   //                 }
-   //                 if (classifyStandardIds.Length > 1)
-   //                 {
-   //                     var classification = industryClassifications.FirstOrDefault(t => t.PomId == classifyStandardIds[1]);
-   //                     item.TweClassify = classification?.Name;
-   //                     item.TweCode = classification?.Code;
-   //                 }
-   //                 if (classifyStandardIds.Length > 2)
-   //                 {
-   //                     var classification = industryClassifications.FirstOrDefault(t => t.PomId == classifyStandardIds[2]);
-   //                     item.ThreeClassify = classification?.Name;
-   //                     item.ThreeCode = classification?.Code;
-   //                 }
-   //             }
-   //             // 标后预算预计成本
-   //             item.PostmarkProjectedCost = Math.Round(item.CumulativeCompleted * ((100 - item.BudgetInterestRate ?? 0) / 100), 2);
-   //             // 支付滞后比例(支付滞后比例 = 合同约定的计量支付比例-实际支付比例,   实际支付比例=甲方付款金额/甲方确认产值)
-   //             if (item.RecognizedValue != 0)
-   //             {
-   //                 item.PaymentLagRatio = Math.Round(item.ContractMeaPayProp - ((item.PaymentAmount / item.RecognizedValue) * 100), 2);
-   //             }
-   //             // 实际毛利率
-   //             if (item.CumulativeCompleted > 0)
-   //             {
-   //                 item.EffectiveGrossMargin = Math.Round(((item.CumulativeCompleted - item.CumulativeAccomplishCost) / item.CumulativeCompleted) * 100, 2);
-   //             }
-   //             // 剩余合同金额
-   //             item.ResidueContractAmount = Math.Round((item.ContractAmount ?? 0) - item.CumulativeCompleted, 2);
-   //             // 偏差计算
-   //             //   本月进度偏差  
-   //             item.DeviationQuantities = Math.Round(item.PlanQuantities - item.AccomplishQuantities, 2); ;
-   //             //   年度进度偏差
-   //             item.YearDeviation = Math.Round(item.YearPlanQuantities - item.YearAccomplishQuantities, 2);
-   //             //   本月产值进度偏差 
-   //             item.ScheduleOutPutValue = Math.Round(item.PlanOutPutValue - item.AccomplishValue, 2);
-   //             //   年度产值偏差 
-   //             item.YearAnnualOutputValue = Math.Round(item.YearPlanOutPutValue - item.YearAccomplishValue, 2);
-   //             //   本月产值进度偏差
-   //             item.CostDeviation = Math.Round(item.ProjectedCost - item.AccomplishCost, 2); ;
-   //             //   年度成本偏差
-   //             item.YearCostDeviation = Math.Round(item.YearProjectedCost - item.YearAccomplishCost, 2);
-   //             //   标后预算成本偏差
-   //             item.PostmarkCostDeviation = Math.Round(item.PostmarkProjectedCost - item.CumulativeAccomplishCost, 2);
-   //             //   毛利率偏差
-   //             if (item.BudgetInterestRate != null && item.BudgetInterestRate != 0)
-   //             {
-   //                 item.GrossMarginDeviation = Math.Round(((item.EffectiveGrossMargin - (decimal)item.BudgetInterestRate) / (decimal)item.BudgetInterestRate) * 100, 2);
-   //             }
-   //         });
+        //             }
+        //             // (国别|省）/市
+        //             if (area != null)
+        //             {
+        //                 item.Nationality = area.Overseas == "1" ? area.Zaddvsname : GetProvinceArea(provinceAreas, districtAreas, area)?.Zaddvsname;
+        //                 item.District = GetDistrictArea(districtAreas, area)?.Zaddvsname;
+        //             }
+        //             // 行业分类
+        //             if (!string.IsNullOrWhiteSpace(item.ClassifyStandard))
+        //             {
+        //                 var classifyStandardIds = item.ClassifyStandard.Split(",").Select(t => t.ToGuid()).ToArray();
+        //                 if (classifyStandardIds.Length > 0)
+        //                 {
+        //                     var classification = industryClassifications.FirstOrDefault(t => t.PomId == classifyStandardIds[0]);
+        //                     item.OneClassify = classification?.Name;
+        //                     item.OneCode = classification?.Code;
+        //                 }
+        //                 if (classifyStandardIds.Length > 1)
+        //                 {
+        //                     var classification = industryClassifications.FirstOrDefault(t => t.PomId == classifyStandardIds[1]);
+        //                     item.TweClassify = classification?.Name;
+        //                     item.TweCode = classification?.Code;
+        //                 }
+        //                 if (classifyStandardIds.Length > 2)
+        //                 {
+        //                     var classification = industryClassifications.FirstOrDefault(t => t.PomId == classifyStandardIds[2]);
+        //                     item.ThreeClassify = classification?.Name;
+        //                     item.ThreeCode = classification?.Code;
+        //                 }
+        //             }
+        //             // 标后预算预计成本
+        //             item.PostmarkProjectedCost = Math.Round(item.CumulativeCompleted * ((100 - item.BudgetInterestRate ?? 0) / 100), 2);
+        //             // 支付滞后比例(支付滞后比例 = 合同约定的计量支付比例-实际支付比例,   实际支付比例=甲方付款金额/甲方确认产值)
+        //             if (item.RecognizedValue != 0)
+        //             {
+        //                 item.PaymentLagRatio = Math.Round(item.ContractMeaPayProp - ((item.PaymentAmount / item.RecognizedValue) * 100), 2);
+        //             }
+        //             // 实际毛利率
+        //             if (item.CumulativeCompleted > 0)
+        //             {
+        //                 item.EffectiveGrossMargin = Math.Round(((item.CumulativeCompleted - item.CumulativeAccomplishCost) / item.CumulativeCompleted) * 100, 2);
+        //             }
+        //             // 剩余合同金额
+        //             item.ResidueContractAmount = Math.Round((item.ContractAmount ?? 0) - item.CumulativeCompleted, 2);
+        //             // 偏差计算
+        //             //   本月进度偏差  
+        //             item.DeviationQuantities = Math.Round(item.PlanQuantities - item.AccomplishQuantities, 2); ;
+        //             //   年度进度偏差
+        //             item.YearDeviation = Math.Round(item.YearPlanQuantities - item.YearAccomplishQuantities, 2);
+        //             //   本月产值进度偏差 
+        //             item.ScheduleOutPutValue = Math.Round(item.PlanOutPutValue - item.AccomplishValue, 2);
+        //             //   年度产值偏差 
+        //             item.YearAnnualOutputValue = Math.Round(item.YearPlanOutPutValue - item.YearAccomplishValue, 2);
+        //             //   本月产值进度偏差
+        //             item.CostDeviation = Math.Round(item.ProjectedCost - item.AccomplishCost, 2); ;
+        //             //   年度成本偏差
+        //             item.YearCostDeviation = Math.Round(item.YearProjectedCost - item.YearAccomplishCost, 2);
+        //             //   标后预算成本偏差
+        //             item.PostmarkCostDeviation = Math.Round(item.PostmarkProjectedCost - item.CumulativeAccomplishCost, 2);
+        //             //   毛利率偏差
+        //             if (item.BudgetInterestRate != null && item.BudgetInterestRate != 0)
+        //             {
+        //                 item.GrossMarginDeviation = Math.Round(((item.EffectiveGrossMargin - (decimal)item.BudgetInterestRate) / (decimal)item.BudgetInterestRate) * 100, 2);
+        //             }
+        //         });
 
-   //         //  合计
-   //         var totalQuery = _dbMonthReport.AsQueryable().LeftJoin(_dbProject.AsQueryable(), (m, p) => m.ProjectId == p.Id && p.IsDelete == 1);
-   //         totalQuery = MonthReportsWheres(totalQuery, model, startMonth, endMonth, userAuthForData, categoryList, tagList, tag2List);
-   //         var totalMonthtReport = await totalQuery.Select((m, p) => new MonthtReportsResponseDto.TotalMonthtReportsDto
-   //         {
-   //             AccomplishQuantities = SqlFunc.Round(SqlFunc.AggregateSum(m.CompletedQuantity), 2),
-   //             AccomplishValue = SqlFunc.Round(SqlFunc.AggregateSum(m.CompleteProductionAmount), 2),
-   //             RecognizedValue = SqlFunc.Round(SqlFunc.AggregateSum(m.PartyAConfirmedProductionAmount), 2),
-   //             PaymentAmount = SqlFunc.Round(SqlFunc.AggregateSum(m.PartyAPayAmount), 2),
-   //             OutsourcingExpensesAmount = SqlFunc.Round(SqlFunc.AggregateSum(m.OutsourcingExpensesAmount), 2)
+        //         //  合计
+        //         var totalQuery = _dbMonthReport.AsQueryable().LeftJoin(_dbProject.AsQueryable(), (m, p) => m.ProjectId == p.Id && p.IsDelete == 1);
+        //         totalQuery = MonthReportsWheres(totalQuery, model, startMonth, endMonth, userAuthForData, categoryList, tagList, tag2List);
+        //         var totalMonthtReport = await totalQuery.Select((m, p) => new MonthtReportsResponseDto.TotalMonthtReportsDto
+        //         {
+        //             AccomplishQuantities = SqlFunc.Round(SqlFunc.AggregateSum(m.CompletedQuantity), 2),
+        //             AccomplishValue = SqlFunc.Round(SqlFunc.AggregateSum(m.CompleteProductionAmount), 2),
+        //             RecognizedValue = SqlFunc.Round(SqlFunc.AggregateSum(m.PartyAConfirmedProductionAmount), 2),
+        //             PaymentAmount = SqlFunc.Round(SqlFunc.AggregateSum(m.PartyAPayAmount), 2),
+        //             OutsourcingExpensesAmount = SqlFunc.Round(SqlFunc.AggregateSum(m.OutsourcingExpensesAmount), 2)
 
-   //         }).FirstAsync();
-   //         totalMonthtReport = totalMonthtReport ?? new MonthtReportsResponseDto.TotalMonthtReportsDto();
-   //         return result.SuccessResult(new MonthtReportsResponseDto() { Reports = list, Total = totalMonthtReport }, total);
-   //     }
+        //         }).FirstAsync();
+        //         totalMonthtReport = totalMonthtReport ?? new MonthtReportsResponseDto.TotalMonthtReportsDto();
+        //         return result.SuccessResult(new MonthtReportsResponseDto() { Reports = list, Total = totalMonthtReport }, total);
+        //     }
 
         /// <summary>
         /// 搜索项目月报列表
@@ -1995,6 +1995,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 DateMonth = m.DateMonth,
                 AccomplishQuantities = SqlFunc.Round(m.CompletedQuantity, 2),
                 AccomplishValue = model.IsConvert == true ? m.CompleteProductionAmount : m.CurrencyCompleteProductionAmount,
+                AccomplishValue2 = m.CurrencyCompleteProductionAmount,
                 RecognizedValue = SqlFunc.Round(m.PartyAConfirmedProductionAmount, 2),
                 PaymentAmount = m.PartyAPayAmount,
                 ProgressDeviationReasonType = m.ProgressDeviationReason,
@@ -2157,7 +2158,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 int year = Convert.ToInt32(item.DateMonth.ToString().Substring(0, 4));
                 var taxRate = pRates.FirstOrDefault(x => x.Year == year && x.CurrencyId == item.CurrencyId.ToString());
                 var val = GetMonthReportValue(item.DateMonth, item.ProjectId, taxRate == null ? 0M : taxRate.ExchangeRate, mDetailsData, mReportData, model.IsConvert, wbsList);
-                item.AccomplishValue2 = taxRate != null ? taxRate.ExchangeRate.Value * item.AccomplishValue : 0M;//转换人民币
+                item.AccomplishValue2 = taxRate != null ? taxRate.ExchangeRate.Value * item.AccomplishValue2 : 0M;//转换人民币
                 // 年度统计月报
                 if (sumYearMonthReport != null)
                 {
