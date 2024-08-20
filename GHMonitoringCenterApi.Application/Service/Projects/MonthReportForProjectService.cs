@@ -8,6 +8,7 @@ using GHMonitoringCenterApi.Domain.Enums;
 using GHMonitoringCenterApi.Domain.Models;
 using GHMonitoringCenterApi.Domain.Shared;
 using GHMonitoringCenterApi.Domain.Shared.Enums;
+using GHMonitoringCenterApi.Domain.Shared.Util;
 using SqlSugar;
 using Models = GHMonitoringCenterApi.Domain.Models;
 
@@ -255,7 +256,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                        ValueType = ValueEnumType.AccumulatedCommencement,
                        Remark = p.Remark,
                        DetailId = p.Id,
-                       CompleteProductionAmount = SqlFunc.ToDecimal(p.UnitPrice) * SqlFunc.ToDecimal(p.CompletedQuantity)
+                       CompleteProductionAmount = p.UnitPrice * p.CompletedQuantity
                    })
                    .ToListAsync();
 
@@ -445,7 +446,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     IsDelete = p.IsDelete,
                     DateMonth = SqlFunc.ToInt32(p.DateMonth),
                     UnitPrice = p.UnitPrice,//wbs初始的单价
-                    ContractAmount = SqlFunc.ToDecimal(p.EngQuantity) * SqlFunc.ToDecimal(p.UnitPrice)//WBS的初始合同产值=工程量*单价
+                    ContractAmount = p.EngQuantity * p.UnitPrice//WBS的初始合同产值=工程量*单价
                 })
                 .ToListAsync();
 
@@ -486,7 +487,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                                      ProjectWBSId = p.Id,
                                      ProjectWBSName = p.Name,
                                      UnitPrice = p.UnitPrice,//wbs初始的单价
-                                     ContractAmount = SqlFunc.ToDecimal(p.EngQuantity) * SqlFunc.ToDecimal(p.UnitPrice)//WBS的初始合同产值=工程量*单价
+                                     ContractAmount = p.EngQuantity * p.UnitPrice//WBS的初始合同产值=工程量*单价
                                  })
                                  .ToListAsync();
 
@@ -520,7 +521,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                                          ProjectWBSId = p.Id,
                                          ProjectWBSName = p.Name,
                                          UnitPrice = p.UnitPrice,//wbs初始的单价
-                                         ContractAmount = SqlFunc.ToDecimal(p.EngQuantity) * SqlFunc.ToDecimal(p.UnitPrice)//WBS的初始合同产值=工程量*单价
+                                         ContractAmount = p.EngQuantity * p.UnitPrice//WBS的初始合同产值=工程量*单价
                                      })
                                      .ToListAsync();
 
@@ -555,7 +556,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                                          ProjectWBSId = p.Id,
                                          ProjectWBSName = p.Name,
                                          UnitPrice = p.UnitPrice,//wbs初始的单价
-                                         ContractAmount = SqlFunc.ToDecimal(p.EngQuantity) * SqlFunc.ToDecimal(p.UnitPrice)//WBS的初始合同产值=工程量*单价
+                                         ContractAmount = p.EngQuantity * p.UnitPrice//WBS的初始合同产值=工程量*单价
                                      })
                                      .ToListAsync();
 
@@ -581,7 +582,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                    ProjectWBSId = p.Id,
                    ProjectWBSName = p.Name,
                    UnitPrice = p.UnitPrice,//wbs初始的单价
-                   ContractAmount = SqlFunc.ToDecimal(p.EngQuantity) * SqlFunc.ToDecimal(p.UnitPrice)//WBS的初始合同产值=工程量*单价
+                   ContractAmount = p.EngQuantity * p.UnitPrice//WBS的初始合同产值=工程量*单价
                })
                .ToListAsync();
             return pWBSList;
