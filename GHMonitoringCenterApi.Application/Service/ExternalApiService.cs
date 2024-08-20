@@ -699,6 +699,11 @@ namespace GHMonitoringCenterApi.Application.Service
             var projectMonthList = await _dbContext.Queryable<MonthReport>().Where(x => x.IsDelete == 1)
                 .WhereIF(requestDto.StartTime!=null&& requestDto.EndTime!=null,x=> (x.CreateTime>= requestDto.StartTime.Value&&x.CreateTime<=requestDto.EndTime.Value)
                 || (x.UpdateTime >= requestDto.StartTime.Value && x.UpdateTime <= requestDto.EndTime.Value)).ToListAsync();
+
+            var projectHistoryList =await _dbContext.Queryable<ProjectMonthReportHistory>().Where(x => x.IsDelete == 1).ToListAsync();
+
+
+            var projectValueHistoryList = await _dbContext.Queryable<ProjectHistoryData>().Where(x => x.IsDelete == 1).ToListAsync();
             if (projectMonthList.Any())
             {
                 foreach (var item in projectMonthList)
@@ -718,27 +723,30 @@ namespace GHMonitoringCenterApi.Application.Service
                         ProjectId = item.ProjectId,
                         AccomplishQuantities = item.CompletedQuantity,
                         YearAccomplishQuantities = yearCompletProductionValue.Sum(x => x.CompletedQuantity),
-                        AccumulativeQuantities = yearTotalCompletProductionValue.Sum(x => x.CompletedQuantity),
+                        AccumulativeQuantities = yearTotalCompletProductionValue.Sum(x => x.CompletedQuantity)+ projectValueHistoryList.Where(x => x.ProjectId == item.ProjectId && x.AccumulatedProduction != null).Sum(x => x.AccumulatedProduction.Value),
 
                         RecognizedValue = item.PartyAConfirmedProductionAmount,
                         YearRecognizedValue = yearCompletProductionValue.Sum(x => x.PartyAConfirmedProductionAmount),
-                        CumulativeValue = yearTotalCompletProductionValue.Sum(x => x.PartyAConfirmedProductionAmount),
+                        CumulativeValue = yearTotalCompletProductionValue.Sum(x => x.PartyAConfirmedProductionAmount)+ projectHistoryList.Where(x=>x.ProjectId==item.ProjectId&&x.KaileiOwnerConfirmation!=null).Sum(x=>x.KaileiOwnerConfirmation.Value),
 
                         PaymentAmount = item.PartyAPayAmount,
                         YearPaymentAmount = yearCompletProductionValue.Sum(x => x.PartyAPayAmount),
-                        CumulativePaymentAmount = yearTotalCompletProductionValue.Sum(x => x.PartyAPayAmount),
+                        CumulativePaymentAmount = yearTotalCompletProductionValue.Sum(x => x.PartyAPayAmount) + projectHistoryList.Where(x => x.ProjectId == item.ProjectId && x.KaileiProjectPayment != null).Sum(x => x.KaileiProjectPayment.Value),
 
 
                         AccomplishValue = item.CompleteProductionAmount,// currentProjectMonthRepost.CompleteProductionAmount,
-                        YearAccomplishCost = yearCompletProductionValue.Sum(x => x.CompleteProductionAmount),
-                        CumulativeAccomplishCost = yearTotalCompletProductionValue.Sum(x => x.CompleteProductionAmount),
+                        YearAccomplishValue = yearCompletProductionValue.Sum(x => x.CompleteProductionAmount),
+                        //YearAccomplishCost = yearCompletProductionValue.Sum(x => x.CompleteProductionAmount),
+                       // CumulativeAccomplishCost = yearTotalCompletProductionValue.Sum(x => x.CompleteProductionAmount),
 
+                        CumulativeCompleted= yearTotalCompletProductionValue.Sum(x => x.CompleteProductionAmount)+projectValueHistoryList.Where(x => x.ProjectId == item.ProjectId
+                        && x.AccumulatedOutputValue != null).Sum(x => x.AccumulatedOutputValue.Value),
                         OutsourcingExpensesAmount = item.OutsourcingExpensesAmount,
                     }); 
 
                 }
             }
-           
+            
             responseAjaxResult.Data = monthtReportDtos;
             responseAjaxResult.Count = monthtReportDtos.Count;
             responseAjaxResult.Success();
