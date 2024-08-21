@@ -1962,6 +1962,11 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
         {
             var result = new ResponseAjaxResult<bool>();
 
+            //校验是否在可更改的时间范围内
+            var hMenu = await dbContext.Queryable<HomeMenu>().Where(x => x.IsDelete == 1 && x.Display == true).FirstAsync();
+            if (hMenu != null)//关闭修改结构权限
+            { return result.FailResult(HttpStatusCode.NoAuthorityOperateFail, "填报时间内不可调整项目结构"); }
+
             var project = await GetProjectPartAsync(model.ProjectId);
             if (project == null)
             {
@@ -2010,7 +2015,10 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
 
             #endregion
             //var month = DateTime.Now.ToDateMonth();//原来的
-            var month = DateTime.Now.Day >= 25 || (DateTime.Now.Day >= 25 && DateTime.Now.Date <= Convert.ToDateTime(DateTime.Now.AddMonths(1).Date.ToString("yyyy-MM-5"))) ? DateTime.Now.ToDateMonth() : DateTime.Now.AddMonths(-1).ToDateMonth();
+            //当前日期>=26 & <=addmonth(1) 1  下月1号
+            var month = DateTime.Now.ToDateMonth();
+            if (!(DateTime.Now.Day >= 26 || (DateTime.Now.Day >= 26 && DateTime.Now.Date <= Convert.ToDateTime(DateTime.Now.AddMonths(1).Date.ToString("yyyy-MM-1")))))
+            { month = DateTime.Now.AddMonths(-1).ToDateMonth(); }
             // 删除
             if (removeWBSList.Any())
             {
@@ -2048,7 +2056,6 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 //}
                 //await dbContext.Updateable<ProjectWbsHistoryMonth>(projectWbsHistoryMonths).Where(x => x.DateMonth == month).UpdateColumns(t => new { t.IsDelete, t.DeleteId, t.DeleteTime }).ExecuteCommandAsync();
                 #endregion
-
             }
             // 更新
             if (updateWBSList.Any())

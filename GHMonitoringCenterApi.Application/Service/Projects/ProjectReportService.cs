@@ -2765,10 +2765,6 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             {
                 return result.FailResult(HttpStatusCode.SaveFail, "由于历史数据的缘故，系统不允许修改6月份月报数据");
             }
-            //if (!(now.Day >= 26 || (now.Day >= 1 && now.Day <= 5)))
-            //{
-            //    return result.FailResult(HttpStatusCode.SaveFail, "填报时间已过，时间截至在当月26号 - 次月5号");
-            //}
             if (!ConvertHelper.TryParseFromDateMonth(model.DateMonth, out DateTime monthTime))
             {
                 return result.FailResult(HttpStatusCode.SaveFail, "月份时间格式不正确");

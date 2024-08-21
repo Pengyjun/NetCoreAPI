@@ -53,14 +53,6 @@ namespace GHMonitoringCenterApi.Controllers.Job
         [UnitOfWork]
         public async Task<ResponseAjaxResult<bool>> SubmitJobOfProjectWBSAsync([FromBody] SubmitJobOfProjectWBSRequestDto model)
         {
-            var result = new ResponseAjaxResult<bool>();
-
-            // 当前日期>=25  并且当天日期在当月25-次月5日之间
-            if (!(DateTime.Now.Day >= 25 || (DateTime.Now.Day >= 25 && DateTime.Now.Date <= Convert.ToDateTime(DateTime.Now.AddMonths(1).Date.ToString("yyyy-MM-5")))))
-            {
-                result.FailResult(HttpStatusCode.ApproveFail, "未在填报范围（当月25日-次月5日），不可修改项目结构树");
-                return result;
-            }
             return await _jobService.SubmitJobAsync(model);
         }
 
