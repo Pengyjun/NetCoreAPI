@@ -625,7 +625,8 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             result.ProjectId = project.Id;
 
             //获取当前项目汇率
-            var currencyConverter = await _dbContext.Queryable<CurrencyConverter>().Where(t => t.CurrencyId == project.CurrencyId.ToString() && t.Year == DateTime.Now.Year && t.IsDelete == 1).SingleAsync();
+            int year = Convert.ToInt32(dateMonth.ToString().Substring(0, 4));
+            var currencyConverter = await _dbContext.Queryable<CurrencyConverter>().Where(t => t.CurrencyId == project.CurrencyId.ToString() && t.Year == year && t.IsDelete == 1).SingleAsync();
             if (currencyConverter == null || currencyConverter.ExchangeRate == null) { responseAjaxResult.FailResult(HttpStatusCode.ParameterError, "汇率数据不存在"); return responseAjaxResult; }
             result.CurrencyExchangeRate = (decimal)currencyConverter.ExchangeRate;
             #endregion
@@ -650,7 +651,6 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 .ToList() : new List<MonthReportDetail> { };
 
             //当年月报明细
-            int year = Convert.ToInt32(dateMonth.ToString().Substring(0, 4));
             var yMonthReports = monthReportData.Where(x => x.DateYear == year)
                 .ToList();
             var yMonthReportIds = yMonthReports.Select(x => x.Id)
