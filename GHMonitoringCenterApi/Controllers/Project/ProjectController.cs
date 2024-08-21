@@ -770,9 +770,12 @@ namespace GHMonitoringCenterApi.Controllers.Project
         }
 
         #region  新的项目月报列表
-        //[HttpGet("aa")]
-        //public async Task<ResponseAjaxResult<MonthReportForProjectResponseDto>> SearchMonthReportForProjectAsync([FromQuery] ProjectMonthReportRequestDto model)
-        //    => await _monthReportForProjectService.SearchMonthReportForProjectAsync(model);
+        [HttpGet("aa")]
+        [AllowAnonymous]
+        public bool aa()
+        {
+            return projectService.aa();
+        }
 
         #endregion
     }

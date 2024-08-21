@@ -234,5 +234,6 @@ namespace GHMonitoringCenterApi.Application.Contracts.IService.Project
         /// <param name="id">项目月报</param>
         /// <returns></returns>
         Task<ResponseAjaxResult<bool>> RevocationProjectMonthAsync(Guid id);
+        bool aa();
     }
 }

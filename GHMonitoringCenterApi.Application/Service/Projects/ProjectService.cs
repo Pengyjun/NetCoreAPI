@@ -30,6 +30,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
 
         #region 依赖注入
         public IBaseRepository<ProjectWBS> baseProjectWBSRepository { get; set; }
+        public IBaseRepository<Project> baseProjects { get; set; }
         public IBaseRepository<ProjectWbsHistoryMonth> baseProjectWbsHistory { get; set; }
 
         public ISqlSugarClient dbContext { get; set; }
@@ -52,7 +53,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
         private CurrentUser _currentUser { get { return _globalObject.CurrentUser; } }
 
         //public ActionExecutingContext context { get; set; }
-        public ProjectService(IBaseRepository<ProjectWbsHistoryMonth> baseProjectWbsHistory, IBaseRepository<ProjectWBS> baseProjectWBSRepository, ISqlSugarClient dbContext, IMapper mapper, IBaseRepository<Files> baseFilesRepository, IBaseRepository<ProjectOrg> baseProjectOrgRepository, IBaseRepository<ProjectLeader> baseProjectLeaderRepository, IPushPomService pushPomService, IBaseService baseService, ILogService logService, IEntityChangeService entityChangeService, GlobalObject globalObject)
+        public ProjectService(IBaseRepository<ProjectWbsHistoryMonth> baseProjectWbsHistory, IBaseRepository<ProjectWBS> baseProjectWBSRepository, ISqlSugarClient dbContext, IMapper mapper, IBaseRepository<Files> baseFilesRepository, IBaseRepository<ProjectOrg> baseProjectOrgRepository, IBaseRepository<ProjectLeader> baseProjectLeaderRepository, IPushPomService pushPomService, IBaseService baseService, ILogService logService, IEntityChangeService entityChangeService, GlobalObject globalObject,IBaseRepository<Project> baseProjects)
         {
             this.baseProjectWBSRepository = baseProjectWBSRepository;
             this.dbContext = dbContext;
@@ -66,6 +67,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             this.entityChangeService = entityChangeService;
             this._globalObject = globalObject;
             this.baseProjectWbsHistory = baseProjectWbsHistory;
+            this.baseProjects = baseProjects;
             //this.context = context;
         }
         #endregion
@@ -3305,6 +3307,42 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             ajaxResult.Data = true;
             ajaxResult.Success();
             return ajaxResult;
+        }
+
+        public bool aa()
+        {
+            var str = "087db4dd-5366-48f8-96ac-a7675b2fcd71,660;08db3b35-fb38-4bba-8e23-9070f6a03203,365;08db3b35-fb38-4bbb-867b-f4c153c956af,420;08db3b35-fb38-4bc0-8c22-01063508e54f,1080;08db3b35-fb38-4bc1-8cff-b6b61baf8d53,910;08db3b35-fb38-4bc8-83b9-c067667a0662,365;08db3b35-fb38-4bc8-871c-83f3ed8494d1,730;08db3b35-fb38-4bca-83df-b295051faa1e,2922;08db3b35-fb38-4bce-8861-d043bc2448aa,540;08db3b35-fb38-4bcf-8e64-6381009800a0,730;08db3b35-fb38-4bd0-81c5-256ccfaf1104,720;08db3b35-fb38-4bd2-84ca-4d9c8e2767ea,300;08db3b35-fb38-4bd2-87f4-92d45fb1b837,730;08db3b35-fb38-4bd3-85a1-a99172fb7884,1095;08db3b35-fb38-4bd4-8005-0772d187e107,730;08db3b35-fb38-4bd4-8c9d-e1ca444a050e,395;08db3b35-fb38-4bd5-8358-3db344bfa4dc,490;08db3b35-fb38-4bd5-8b6f-17b516463587,1095;08db3b35-fb38-4bd5-8ea2-3df8a3a49e1c,1095;08db3b35-fb38-4bd7-8839-a36e77dfa19a,540;08db3b35-fb38-4bd8-83d2-9621a5467d6f,130;08db3b35-fb38-4bda-806c-52bf562a880a,365;08db3b35-fb38-4bda-8f1e-6445cdeeed5a,600;08db3b35-fb38-4bdb-8edc-1baf7dd64191,365;08db3b35-fb38-4bdc-82a7-a3fd1867dfd1,540;08db3b35-fb38-4bdc-893d-c3b42e68cd9b,1080;08db3b35-fb38-4bdd-85d8-573caadc18b1,1333;08db3b35-fb38-4bdd-8c93-aafd432a41f5,190;08db3b35-fb38-4bde-80f5-eae129aa8e85,3650;08db3b35-fb38-4bde-8b60-c9cb444c66f7,481;08db3b35-fb38-4bdf-8d59-bb5f13e280d0,429;08db3b35-fb38-4be1-85ed-31b49d26438f,600;08db3b35-fb38-4be2-8000-f46bb5d64fd8,360;08db3b35-fb38-4be2-8845-449842bf7d93,196;08db3b35-fb38-4be3-896d-b174b155113e,1080;08db3b35-fb38-4be4-8549-985b98c7fdb7,365;08db3b35-fb38-4be4-8972-791700b544d2,900;08db3b35-fb38-4be4-8d14-33581ab8f6ad,1050;08db3b35-fb38-4be5-89c7-a4ef00f21167,402;08db3b35-fb38-4be5-8db1-39db1ef97f9f,1080;08db3b35-fb38-4be6-8482-2e99c2ae1bff,395;08db3b35-fb38-4be6-88f7-10fa459fd124,245;08db3b35-fb38-4be8-813b-1942519277c6,640;08db3b35-fb38-4be9-805f-9bfbce952fb8,730;08db3b35-fb38-4be9-84b8-5b90c10f9060,913;08db3b35-fb38-4be9-8815-483744dec8e4,540;08db3b35-fb38-4be9-8f98-365fff1041e1,1095;08db3b35-fb38-4bea-82b1-48dc8cce7ca5,240;08db3b35-fb38-4bea-86ae-8892facf0d33,180;08db3b35-fb38-4bea-8ab5-3d7b1aabc967,1440;08db3b35-fb38-4bea-8ef7-94a1cd48e4bd,730;08db3b35-fb38-4beb-856e-c061e00b7e57,365;08db3b35-fb38-4beb-8b0a-be38c637a1c0,90;08db3b35-fb38-4beb-8f31-7a1654ce60d2,1080;08db3b35-fb38-4bec-83ab-07f8acd848b1,385;08db7eaf-15db-47f3-8df2-1f46fea0e881,500;08db80ea-6e06-4b54-8455-061f6f1eef90,90;08db8665-81e2-4fdf-8099-e57bdde04e90,600;08db8ce3-8f90-49f6-8c69-56587a073e1d,1095;08db8e02-22fc-446e-8995-f420831653c4,720;08db9c8c-c2b3-4aef-8398-c423594da07a,20;08db9dfc-ca98-43c0-84c0-d50b028a9c7c,80;08db9f9a-77b9-4414-87dd-46ac7cc0c27b,300;08dbaf6e-40cc-4164-869a-6fb218965f44,213;08dbb260-b460-49bd-8006-07f40c301b95,730;08dbc93a-4536-4ee3-83f2-d63866bbdd1e,179;08dbc96f-e397-468f-87ef-4e76075ee535,120;08dbd92f-d27d-4cbf-896d-73ef7dc82740,77;08dbd930-8d07-4ae9-8cc6-be1601c03947,730;08dbde9a-0611-410d-8fc7-c45c9637e236,60;08dbea6e-58e8-44b6-8671-41922a3d1989,500;08dbf0b7-347a-49c7-8934-94f61d2e7d35,180;08dbf0b8-fa3c-497d-8aca-c8be3a4f869d,120;08dbf175-f7fc-4085-8843-cf9842c2cb4b,70;08dbf60d-8127-4a71-84d8-85979c96192d,720;08dc02d2-cb09-48a8-8afc-89416b1aff6a,183;08dc03ba-a326-43a2-8f53-3e0276894d73,240;08dc04fe-2b63-4636-816e-5b967d881645,120;08dc051f-abad-49ab-88a7-33d97c084c8e,90;08dc0bf9-e917-412e-8fcd-03efc8158bda,150;08dc10ba-292f-4e35-8919-393ec7692fa8,730;08dc1676-2c4a-4b34-833f-293646af3418,720;08dc1c87-0efa-4d20-87cf-d7f7de24f4f9,2008;08dc1d72-d0ea-4fc4-890f-fd791594a13a,240;08dc1d82-f77a-45d7-82fb-25ec62271d45,180;08dc1d85-d5e2-4d2e-89f6-dceedf6a3440,240;08dc1d86-947c-49e6-827e-019528d46a32,120;08dc1fdf-3c11-4785-8c98-34ca4e3663c2,380;08dc1fdf-e3c6-463f-8c70-d56dcbc557e4,20;08dc217c-3fbd-4be6-8783-efa481396268,364;08dc3dac-49e1-4b30-87fe-c13b3efa19d9,90;08dc4169-09d3-466c-859f-6b52b5999bfe,1440;08dc4242-4a24-4e72-8ec1-70ac66af0d5f,344;08dc4312-78ff-4c4c-8c36-0cd586b6fcd5,540;08dc432c-5057-477e-8554-183f7a3cf4c4,540;08dc4358-579b-4bd5-823c-186e946f2c17,365;08dc4632-246e-4852-84fe-82031c6f34b9,30;08dc4892-6112-4b5d-8a02-53b9da0ccdfb,1095;08dc48d2-81c6-477d-8d6e-914015773e32,360;08dc4a10-c76f-4fd6-8e6f-1e511ded8dc7,150;08dc4ec7-9698-407b-8309-051c37d6edc3,420;08dc4f8e-aa88-401b-8fe0-175d383b297b,200;08dc507d-9d6f-4a8e-841b-e0a881791414,420;08dc52ef-c1bc-4002-80ec-9b9acf41a294,60;08dc6e42-8a87-4395-865d-bf4d84c38078,390;08dc7667-136c-426d-8bc3-2e78b502cf77,30;08dc7e21-2e0a-4cdd-8e81-2350000a5037,720;08dc7f80-a163-4d06-8954-9ff7f9019784,365;08dc8c50-8e3a-4738-8e78-25c6b003d479,60;08dca18c-759b-4e80-8210-cd7fd485073d,913;08dca9f7-c85c-4a1f-81f5-03c03c233b7b,210;08dcad3a-4ced-4f37-8b4f-e78d7894374e,360;08dcb6a2-50ae-4fcd-80b8-233a5ea54f66,1825;08dcb850-871a-437e-89b5-d5325ce03486,365;08dcbb3b-bb96-4bd0-83ef-f37a5b2582db,30;08dcbb45-2fea-4ec2-865d-c39988e1dd77,480;219e55e0-1237-44bf-8752-311ede2ec6e8,365;2cb8d03c-9f6d-4339-9e4c-c21ff68a3aa8,150;4c0c9417-e4cb-4d73-9c21-80cdfabfcee4,120;adf6e450-7b05-49ba-b27b-eff4e207c804,150;b4003549-4fe6-48b6-8b77-9e77ecc43e07,730;d00376b9-f050-4f9e-a16b-7e4f79ba6da1,300;f3320af2-c127-4f2e-8baf-74ae8d0dccd5,540;";
+
+            var dic = new List<Dictionary<Guid, string>>();
+            var strs = str.Split(';').ToList();
+            var gid = new List<Guid>();
+            foreach (var item in strs)
+            {
+                if (item != "")
+                {
+                    var d = item.Split(',');
+                    dic.Add(new Dictionary<Guid, string> { { d[0].ToGuid(), d[1] } });
+                    gid.Add(d[0].ToGuid());
+                }
+            }
+            var pt = dbContext.Queryable<Project>().Where(x => gid.Contains(x.Id)).ToList();
+
+            var projes = new List<Project>();
+            foreach (var item in dic)
+            {
+                var d = item.ToList();
+                foreach (var item2 in d)
+                {
+                    var ex = pt.FirstOrDefault(x => x.Id == item2.Key);
+                    if (ex != null)
+                    {
+                        ex.WorkDay = Convert.ToInt32(item2.Value);
+                        projes.Add(ex);
+                    }
+                }
+            }
+            baseProjects.InsertOrUpdateAsync(projes);
+            return true;
         }
     }
 }
