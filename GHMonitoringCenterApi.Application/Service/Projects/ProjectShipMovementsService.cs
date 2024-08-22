@@ -177,6 +177,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 ShipId = model.ShipId,
                 ProjectId = model.ProjectId,
                 Status = 0,
+                Remark = model.Remarks,
             };
             await  baseRepositoryShipMovementRecord.InsertAsync(shipMovementRecord);
             #endregion
@@ -317,10 +318,19 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                         shiMovementRecord.Status = (int)ShipMovementStatus.Enter;
                         shiMovementRecord.ShipId = shipMovement.ShipId;
                         shiMovementRecord.ShipType = (int)shipMovement.ShipType;
+                        shiMovementRecord.Remark = shipMovement.Remarks;
                         await baseRepositoryShipMovementRecord.UpdateAsync(shiMovementRecord);
                     }
-                   
+
                 }
+                //else {
+                //    shiMovementRecord.EnterTime = model.EnterOrQuitTime;
+                //    shiMovementRecord.Status = (int)ShipMovementStatus.Enter;
+                //    shiMovementRecord.ShipId = shipMovement.ShipId;
+                //    shiMovementRecord.ShipType = (int)shipMovement.ShipType;
+                //    await baseRepositoryShipMovementRecord.InsertAsync(shiMovementRecord);
+
+                //}
                 #endregion
 
                 await _dbShipMovement.AsUpdateable(shipMovement).EnableDiffLogEvent(addLogDto).ExecuteCommandAsync();

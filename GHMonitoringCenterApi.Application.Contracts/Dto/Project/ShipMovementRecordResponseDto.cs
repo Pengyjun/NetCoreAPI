@@ -56,7 +56,7 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project
         /// </summary>
         public int Status { get; set; }
 
-
+        public string Remark { get; set; }
 
     }
 }

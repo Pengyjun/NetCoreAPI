@@ -3161,22 +3161,37 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
         {
             ResponseAjaxResult<List<ShipMovementRecordResponseDto>> responseAjaxResult = new();
             RefAsync<int> total = 0;
-            var res = await dbContext.Queryable<OwnerShip>().Where(x => x.IsDelete == 1 && x.PomId == shipId)
-                 .LeftJoin<ShipMovementRecord>((x, y) => x.PomId == y.ShipId)
-                 .LeftJoin<Project>((x, y, z) => y.ProjectId == z.Id)
-                 .Where((x, y) => y.IsDelete == 1)
-                 .Select((x, y, z) => new ShipMovementRecordResponseDto()
-                 {
-                     ProjectId = y.ProjectId,
-                     ProjectName = z.ShortName,
-                     EnterTime = y.EnterTime,
-                     QuitTime = y.QuitTime,
-                     Status = y.Status,
-                     ShipMovementId = y.ShipMovementId,
-                     ShipId = y.ShipId,
-                     ShipName = x.Name
-                 }).ToPageListAsync(pageIndex, pageSize, total);
-            responseAjaxResult.Data = res;
+            var subShipList =await dbContext.Queryable<SubShip>().Where(x => x.IsDelete == 1 && x.PomId == shipId).Select(x => new { ShipId = x.PomId, Name = x.Name }).ToListAsync();
+            var ownerShipList=await dbContext.Queryable<OwnerShip>().Where(x => x.IsDelete == 1 && x.PomId == shipId).Select(x=>new {ShipId=x.PomId,Name=x.Name }).ToListAsync();
+            foreach (var item in ownerShipList)
+            {
+                var obj = new {
+                    ShipId = item.ShipId,
+                    Name = item.Name
+                };
+                subShipList.Add(obj);
+            }
+            var res = await dbContext.Queryable<ShipMovementRecord>().Where(x => x.IsDelete == 1 && x.ShipId == shipId)
+                .LeftJoin<Project>((x, y) => x.ProjectId == y.Id)
+                .Where((x, y) => y.IsDelete == 1)
+                .Select((x, y) => new ShipMovementRecordResponseDto()
+                {
+                    ProjectId = x.ProjectId,
+                    ProjectName = y.ShortName,
+                    EnterTime = x.EnterTime,
+                    QuitTime = x.QuitTime,
+                    Status = x.Status,
+                    ShipMovementId = x.ShipMovementId,
+                    ShipId = x.ShipId,
+                    Remark=x.Remark
+
+                }).ToPageListAsync(pageIndex, pageSize, total);
+
+            foreach (var item in res)
+            {
+                item.ShipName = subShipList.Where(x => x.ShipId == x.ShipId).Select(x => x.Name).FirstOrDefault();
+            }
+                responseAjaxResult.Data = res;
             responseAjaxResult.Count = total;
             responseAjaxResult.Success();
             return responseAjaxResult;

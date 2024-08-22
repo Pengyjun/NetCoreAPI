@@ -65,5 +65,7 @@ namespace GHMonitoringCenterApi.Domain.Models
         /// </summary>
         [SugarColumn(ColumnDataType = "int")]
         public int Status { get; set; }
+
+        public string Remark { get; set; }
     }
 }
