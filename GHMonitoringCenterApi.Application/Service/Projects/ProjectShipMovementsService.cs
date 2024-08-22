@@ -765,7 +765,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     Ships = resEnterShipDtos
                     .WhereIF(model.AssociationProject != 0, x => x.AssociationProject == model.AssociationProject)
                       .WhereIF(pids.Any(), x => pids.Contains(x.ProjectId))
-                    .Skip((model.PageIndex - 1) * model.PageSize).Take(model.PageSize).OrderBy(x=>x.ProjectId).ToArray(),
+                    .Skip((model.PageIndex - 1) * model.PageSize).Take(model.PageSize).OrderByDescending(x=>x.ProjectId==Guid.Empty).ThenByDescending(x=>x.ProjectId).ToArray(),
                     DateDayTime = model.DateDayTime.Value,
                 };
                 
