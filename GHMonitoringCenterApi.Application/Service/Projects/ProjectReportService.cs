@@ -2785,7 +2785,31 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             // 币种/汇率
             var currencyId = model.CurrencyId;
             var currencyExchangeRate = model.CurrencyExchangeRate;
-            var reqDetails = model.ResolveDetails();
+            //var reqDetails = model.ResolveDetails();//原来代码
+            #region 新 处理审批时重复月报明细数据
+            var reqDetailsList = model.ResolveDetails();
+            var reqDetails = new List<SaveProjectMonthReportRequestDto.ReqMonthReportDetail>();
+            //获取原来的月报明细数据
+            var rDetailsIds = reqDetailsList.Where(x => x.DetailId != Guid.Empty && !string.IsNullOrEmpty(x.DetailId.ToString())).Select(x => x.DetailId).ToList();
+            var oldMDetails = await _dbContext.Queryable<MonthReportDetail>().Where(x => x.IsDelete == 1 && rDetailsIds.Contains(x.Id)).ToListAsync();
+            //循环匹配原来的数据与传入参数值是否完全一致
+            foreach (var item in reqDetailsList)
+            {
+                var existMReport = oldMDetails.FirstOrDefault(x => x.Id == item.DetailId);
+                if (existMReport != null)
+                {
+                    /***
+                     * 匹配数据是否完全一致 (施工性质、产值属性、资源、单价、工程量、外包支出、备注)
+                     * 如果完全一致默认是历史数据  那么不做处理  
+                     */
+                    if (item.ConstructionNature == existMReport.ConstructionNature && item.OutPutType == existMReport.OutPutType && item.ShipId == existMReport.ShipId && item.UnitPrice == existMReport.UnitPrice
+                        && item.CompletedQuantity == existMReport.CompletedQuantity && item.OutsourcingExpensesAmount == existMReport.OutsourcingExpensesAmount && item.Remark == existMReport.Remark)
+                    { }
+                    else reqDetails.Add(item);//否则追加数据做后续逻辑处理
+                }
+                else reqDetails.Add(item);//追加数据做后续逻辑处理
+            }
+            #endregion
             reqDetails.ForEach(item =>
             {
                 // 计算月报明细产值(元)
