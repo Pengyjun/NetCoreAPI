@@ -13,6 +13,8 @@ using GHMonitoringCenterApi.Domain.Shared;
 using GHMonitoringCenterApi.Domain.Shared.Const;
 using GHMonitoringCenterApi.Domain.Shared.Enums;
 using GHMonitoringCenterApi.Domain.Shared.Util;
+using Org.BouncyCastle.Utilities.Date;
+using SkiaSharp;
 using SqlSugar;
 using System;
 using System.Collections.Generic;
@@ -23,6 +25,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using UtilsSharp;
+using static GHMonitoringCenterApi.Application.Contracts.Dto.Project.ShipMovements.EnterShipsResponseDto;
 
 namespace GHMonitoringCenterApi.Application.Service.Projects
 {
@@ -455,203 +458,326 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             return result.SuccessResult(resShipMovements);
         }
 
+        #region 项目-搜索进场船舶（自有船舶   旧代码 
+        /// <summary>
+        /// 项目-搜索进场船舶（自有船舶）
+        /// </summary>
+        /// <returns></returns>
+        //public async Task<ResponseAjaxResult<EnterShipsResponseDto>> SearchEnterShipsAsync(EnterShipsRequestDto model)
+        //{
+        //    //耙吸船、绞吸船 和 抓斗船 非关联项目过滤条件
+        //    var filtShipType = CommonData.ShipType.Split(',').ToList();
+        //    var result = new ResponseAjaxResult<EnterShipsResponseDto>();
+        //    var dateDayTime = model.DateDayTime ?? DateTime.Now.AddDays(-1);
+        //    var dateDay = dateDayTime.ToDateDay();
+        //    //获取所有进场船舶
+        //    var shipMovements = await _dbShipMovement.AsQueryable().Where(t => t.IsDelete == 1 && t.ShipType == ShipType.OwnerShip && t.Status == ShipMovementStatus.Enter || (t.Status == ShipMovementStatus.Quit && t.EnterTime <= model.DateDayTime)).ToListAsync();
+        //    // 追加已退场的船舶 传参日期<=退场日期
+        //    var quitShips = await _dbShipMovement.AsQueryable().Where(t => t.IsDelete == 1 && t.ShipType == ShipType.OwnerShip && t.Status == ShipMovementStatus.Quit && t.QuitTime <= model.DateDayTime).ToListAsync();
+        //    shipMovements.AddRange(quitShips);
+        //    shipMovements = shipMovements.GroupBy(x => new { x.ShipId, x.Status, x.ProjectId }).Select(x => x.First()).ToList();
+        //    //获取所有自有船舶
+        //    var ownShips = await GetShipPartsAsync(ShipType.OwnerShip);
+        //    var shipIds = ownShips.Select(x => x.PomId.Value).ToArray();
+        //    var shipKindTypeIds = ownShips.Select(t => t.ShipKindTypeId).ToArray();
+        //    //获取所有船舶类型
+        //    var shipKindTypes = await GetShipPingTypePartsAsync(shipKindTypeIds);
+        //    //查询所有自有船舶是否填写了日报
+        //    var fillReportShips = await GetFillReportShipsAsync(shipIds, dateDay);
+        //    var resShips = new List<EnterShipsResponseDto.ResEnterShipDto>();
+        //    //获取所有项目信息
+        //    var projects = await GetProjectInfoAsync();
+        //    ownShips.ForEach(ship =>
+        //    {
+        //        //if (ship.PomId != "d38e3b12-f68a-40c3-9d3a-07f8daa4f923".ToGuid())
+        //        //{
+        //        //    return;
+        //        //}
+        //        //获取船舶进退场时间
+        //        var shipMovement = shipMovements.Where(t => t.ShipId == ship.PomId).ToList();// SingleOrDefault(t => t.ShipId == ship.PomId);
+        //        //获取船舶填报时间
+        //        var fillReportShip = fillReportShips.FirstOrDefault(t => t.PomId == ship.PomId);
+        //        DateTime? fillReportTime = null;
+        //        if (fillReportShip != null)
+        //        {
+        //            if (ConvertHelper.TryConvertDateTimeFromDateDay(fillReportShip.FillReportDateDay, out DateTime dayTime))
+        //            {
+        //                fillReportTime = dayTime;
+        //            }
+        //        }
+        //        if (shipMovement.Count() == 0)
+        //        {
+        //            var resShipMovement = new EnterShipsResponseDto.ResEnterShipDto()
+        //            {
+        //                ProjectId = Guid.Empty,
+        //                ProjectName = null,
+        //                ShipId = ship.PomId.Value,
+        //                DateDayTime = Convert.ToDateTime(fillReportTime),
+        //                ShipName = ship.Name,
+        //                EnterTime = null,
+        //                ShipCompanyId = ship.CompanyId,
+        //                ShipKindTypeName = shipKindTypes.FirstOrDefault(t => t.PomId == ship.ShipKindTypeId)?.Name,
+        //                FillReportTime = fillReportTime,
+        //                AssociationProject = 2,
+        //                FillReportStatus = GetFillState(model.DateDayTime, null, fillReportTime)
+        //            };
+        //            //判断当前船舶类型是否在耙吸船、绞吸船 和 抓斗船范围内
+        //            if (filtShipType.Contains(ship.ShipKindTypeId.Value.ToString()))
+        //            {
+        //                resShips.Add(resShipMovement);
+        //            }
+        //        }
+        //        if (shipMovement.Count() > 1 && model.ProjectId != null && model.ProjectId != Guid.Empty)
+        //        {
+        //            shipMovement = shipMovement.Where(x => x.ProjectId == model.ProjectId).ToList();
+
+
+        //            ////查询船舶日报表中是否关联项目
+        //            //foreach (var item in shipMovement)
+        //            //{
+        //            //    var isExist = fillReportShips.FirstOrDefault(x => x.ProjectId == item.ProjectId && x.PomId == item.ShipId);
+        //            //    if (isExist == null)
+        //            //    {
+        //            //        item.ProjectId = Guid.Empty;
+        //            //    }
+        //            //}
+        //            #region 添加的逻辑
+        //            if (!shipMovement.Any())
+        //            {
+        //                var resShipMovement = new EnterShipsResponseDto.ResEnterShipDto()
+        //                {
+
+        //                    ShipId = ship.PomId.Value,
+        //                    DateDayTime = Convert.ToDateTime(fillReportTime),
+        //                    ShipName = ship.Name,
+
+        //                    ShipCompanyId = ship.CompanyId,
+        //                    ShipKindTypeName = shipKindTypes.FirstOrDefault(t => t.PomId == ship.ShipKindTypeId)?.Name,
+        //                    FillReportTime = fillReportTime,
+        //                    AssociationProject = 2,
+        //                    FillReportStatus = GetFillState(model.DateDayTime, null, fillReportTime)
+        //                };
+        //                resShips.Add(resShipMovement);
+        //            }
+        //            #endregion
+
+        //        }
+        //        shipMovement.ForEach(item =>
+        //        {
+
+
+
+        //            var resShipMovement = new EnterShipsResponseDto.ResEnterShipDto()
+        //            {
+        //                ProjectId = item.Status == ShipMovementStatus.Quit && !(item.EnterTime <= model.DateDayTime && item.QuitTime >= model.DateDayTime) ? Guid.Empty : item.ProjectId,
+        //                ProjectName = item.Status == ShipMovementStatus.Quit && !(item.EnterTime <= model.DateDayTime && item.QuitTime >= model.DateDayTime) ? null : projects.Where(p => p.ProjectId == item.ProjectId).SingleOrDefault()?.ProjectName,
+        //                ShipId = ship.PomId.Value,
+        //                DateDayTime = Convert.ToDateTime(fillReportTime),
+        //                ShipName = ship.Name,
+        //                EnterTime = item.EnterTime,
+        //                ShipCompanyId = ship.CompanyId,
+        //                ShipKindTypeName = shipKindTypes.FirstOrDefault(t => t.PomId == ship.ShipKindTypeId)?.Name,
+        //                FillReportTime = fillReportTime,
+        //                AssociationProject = item.Status == ShipMovementStatus.Quit && !(item.EnterTime <= model.DateDayTime && item.QuitTime >= model.DateDayTime) ? 2 : item.ProjectId == Guid.Empty ? 2 : 1,
+        //                FillReportStatus = GetFillState(model.DateDayTime, item.EnterTime, fillReportTime)
+        //            };
+        //            #region 添加的逻辑
+        //            if (item.Status == ShipMovementStatus.Enter && model.DateDayTime < item.EnterTime && item.QuitTime == null)
+        //            {
+        //                resShipMovement.ProjectId = Guid.Empty;
+        //                resShipMovement.AssociationProject = 2;
+        //                resShipMovement.ProjectName = string.Empty;
+        //            }
+        //            if (item.Status == ShipMovementStatus.Quit && item.QuitTime != null && model.DateDayTime > item.QuitTime)
+        //            {
+        //                resShipMovement.ProjectId = Guid.Empty;
+        //                resShipMovement.AssociationProject = 2;
+        //                resShipMovement.ProjectName = string.Empty;
+        //            }
+        //            #endregion
+        //            //判断当前船舶是否未非关联项目  并且类型是否在耙吸船、绞吸船 和 抓斗船范围内
+        //            if (resShipMovement.AssociationProject == 2 && filtShipType.Contains(ship.ShipKindTypeId.Value.ToString()))
+        //            {
+        //                resShips.Add(resShipMovement);
+        //            }
+        //            if (resShipMovement.AssociationProject == 1)
+        //            {
+        //                resShips.Add(resShipMovement);
+        //            }
+        //        });
+
+        //    });
+        //    //获取当前角色信息
+        //    var curRoleInfo = _currentUser.RoleInfos.Where(role => role.Oid == _currentUser.CurrentLoginInstitutionOid).FirstOrDefault();
+        //    //获取角色id
+        //    var role = await _dbRole.AsQueryable().Where(x => x.Id == _currentUser.CurrentLoginRoleId).FirstAsync();
+        //    if (curRoleInfo.IsAdmin || (role != null && role.Type == 2))//超级管理员  或者  管理员
+        //    {
+        //        if (!curRoleInfo.IsAdmin && curRoleInfo.Oid != "101162350")//公司管理员
+        //        {
+        //            //获取当前机构下所有自有船舶
+        //            var institutionFirst = await _dbInstitution.AsQueryable().Where(x => x.Oid == curRoleInfo.Oid).FirstAsync();
+        //            var institutionIdResponse = await _baseService.SearchCompanySubPullDownAsync(institutionFirst.PomId.Value);
+        //            var institutionIds = institutionIdResponse.Data.Select(x => x.Id.Value).ToList();
+        //            //追加当前角色公司
+        //            institutionIds.Add(institutionFirst.PomId.Value);
+        //            //除了可以看公司的以外还要可看当前项目绑定的船舶
+        //            if (model.ProjectId != Guid.Empty && !string.IsNullOrWhiteSpace(model.ProjectId.ToString()))
+        //            {
+        //                var bships = resShips.Where(x => x.ProjectId == model.ProjectId).ToList();
+        //                resShips = resShips.Where(x => institutionIds.Contains(x.ShipCompanyId.Value)).ToList();
+        //                resShips.AddRange(bships);
+        //            }
+        //            else
+        //            {
+        //                resShips = resShips.Where(x => institutionIds.Contains(x.ShipCompanyId.Value)).ToList();
+        //            }
+        //        }
+        //        if (model.ProjectId != Guid.Empty && !string.IsNullOrWhiteSpace(model.ProjectId.ToString()))
+        //        {
+        //            resShips = resShips.Where(x => (x.ProjectId == model.ProjectId && x.AssociationProject == 1) || (x.AssociationProject == 2)).ToList();
+        //        }
+        //        resShips = resShips.GroupBy(x => x).Select(x => x.First()).ToList();
+        //    }
+        //    else
+        //    {
+        //        //项目部人员登陆 只需要看关联项目的船舶
+        //        if (model.ProjectId != Guid.Empty && !string.IsNullOrWhiteSpace(model.ProjectId.ToString()))
+        //        {
+        //            resShips = resShips.Where(x => x.ProjectId == model.ProjectId && x.AssociationProject == 1).ToList();
+        //        }
+        //    }
+        //    resShips = resShips.OrderBy(x => x.AssociationProject).OrderByDescending(x => x.EnterTime).ToList();
+        //    if (model.AssociationProject == 1) resShips = resShips.Where(x => x.AssociationProject == 1).ToList();
+        //    if (model.AssociationProject == 2) resShips = resShips.Where(x => x.AssociationProject == 2).ToList();
+        //    int skipCount = (model.PageIndex - 1) * model.PageSize;
+        //    var pageData = resShips.Skip(skipCount).Take(model.PageSize);
+        //    result.Count = resShips.Count();
+        //    var resEnterShips = new EnterShipsResponseDto() { Ships = pageData.ToArray(), DateDayTime = dateDayTime.Date };
+        //    return result.SuccessResult(resEnterShips);
+        //}
+        #endregion
+
+
+        #region 项目-搜索进场船舶（自有船舶   旧代码
         /// <summary>
         /// 项目-搜索进场船舶（自有船舶）
         /// </summary>
         /// <returns></returns>
         public async Task<ResponseAjaxResult<EnterShipsResponseDto>> SearchEnterShipsAsync(EnterShipsRequestDto model)
         {
-            //耙吸船、绞吸船 和 抓斗船 非关联项目过滤条件
-            var filtShipType = CommonData.ShipType.Split(',').ToList();
             var result = new ResponseAjaxResult<EnterShipsResponseDto>();
-            var dateDayTime = model.DateDayTime ?? DateTime.Now.AddDays(-1);
-            var dateDay = dateDayTime.ToDateDay();
-            //获取所有进场船舶
-            var shipMovements = await _dbShipMovement.AsQueryable().Where(t => t.IsDelete == 1 && t.ShipType == ShipType.OwnerShip && t.Status == ShipMovementStatus.Enter || (t.Status == ShipMovementStatus.Quit && t.EnterTime <= model.DateDayTime)).ToListAsync();
-            // 追加已退场的船舶 传参日期<=退场日期
-            var quitShips = await _dbShipMovement.AsQueryable().Where(t => t.IsDelete == 1 && t.ShipType == ShipType.OwnerShip && t.Status == ShipMovementStatus.Quit && t.QuitTime <= model.DateDayTime).ToListAsync();
-            shipMovements.AddRange(quitShips);
-            shipMovements = shipMovements.GroupBy(x => new { x.ShipId, x.Status, x.ProjectId }).Select(x => x.First()).ToList();
-            //获取所有自有船舶
-            var ownShips = await GetShipPartsAsync(ShipType.OwnerShip);
-            var shipIds = ownShips.Select(x => x.PomId.Value).ToArray();
-            var shipKindTypeIds = ownShips.Select(t => t.ShipKindTypeId).ToArray();
-            //获取所有船舶类型
-            var shipKindTypes = await GetShipPingTypePartsAsync(shipKindTypeIds);
-            //查询所有自有船舶是否填写了日报
-            var fillReportShips = await GetFillReportShipsAsync(shipIds, dateDay);
-            var resShips = new List<EnterShipsResponseDto.ResEnterShipDto>();
-            //获取所有项目信息
-            var projects = await GetProjectInfoAsync();
-            ownShips.ForEach(ship =>
+            var userInfo = _currentUser;
+            #region 权限控制
+            var oids = await _dbInstitution.AsQueryable().Where(x => x.IsDelete == 1 && x.Oid == userInfo.CurrentLoginInstitutionOid).SingleAsync();
+            var InstitutionId = await _baseService.SearchCompanySubPullDownAsync(oids.PomId.Value, false, true);
+            var departmentIds = InstitutionId.Data.Select(x => x.Id.Value).ToList();
+            #endregion
+
+            //项目信息
+            var projectList = await _dbProject.AsQueryable().Where(x => x.IsDelete == 1&& departmentIds.Contains(x.ProjectDept.Value)).ToListAsync();
+            //2019013759   2020012489   2016146340
+            //所有自有船舶数据
+            var allShipList = await _dbOwnerShip.AsQueryable().Where(x => x.IsDelete == 1).ToListAsync();
+            //船舶进退场
+            var projectIds = projectList.Select(x => x.Id).ToList();
+           var shipMovementList = await _dbShipMovement.AsQueryable().Where(x => x.IsDelete == 1&&x.Status==ShipMovementStatus.Enter).ToListAsync();
+            //船舶日报
+            if (!model.DateDayTime.HasValue)
             {
-                //if (ship.PomId != "d38e3b12-f68a-40c3-9d3a-07f8daa4f923".ToGuid())
-                //{
-                //    return;
-                //}
-                //获取船舶进退场时间
-                var shipMovement = shipMovements.Where(t => t.ShipId == ship.PomId).ToList();// SingleOrDefault(t => t.ShipId == ship.PomId);
-                //获取船舶填报时间
-                var fillReportShip = fillReportShips.FirstOrDefault(t => t.PomId == ship.PomId);
-                DateTime? fillReportTime = null;
-                if (fillReportShip != null)
+                model.DateDayTime = DateTime.Now.AddDays(-1);
+            }
+            var currentDayTime = ConvertHelper.ToDateDay(model.DateDayTime.Value);
+            var shipDayReportList = await _dbShipDayReport.AsQueryable().Where(x => x.IsDelete == 1&&x.DateDay== currentDayTime).ToListAsync();
+            //船舶类型
+            var typeIds= CommonData.ShipTypes.Select(x=>x.Value).ToList();
+             var shipTypeList=await _dbShipPingType.AsQueryable().Where(x => x.IsDelete == 1&&typeIds.Contains(x.PomId.Value)).ToListAsync();
+            if (shipMovementList.Any())
+            {
+                List<ResEnterShipDto> resEnterShipDtos = new List<ResEnterShipDto>();
+                    foreach (var item in allShipList)
                 {
-                    if (ConvertHelper.TryConvertDateTimeFromDateDay(fillReportShip.FillReportDateDay, out DateTime dayTime))
+                    ResEnterShipDto res = new ResEnterShipDto()
                     {
-                        fillReportTime = dayTime;
-                    }
-                }
-                if (shipMovement.Count() == 0)
-                {
-                    var resShipMovement = new EnterShipsResponseDto.ResEnterShipDto()
-                    {
-                        ProjectId = Guid.Empty,
-                        ProjectName = null,
-                        ShipId = ship.PomId.Value,
-                        DateDayTime = Convert.ToDateTime(fillReportTime),
-                        ShipName = ship.Name,
-                        EnterTime = null,
-                        ShipCompanyId = ship.CompanyId,
-                        ShipKindTypeName = shipKindTypes.FirstOrDefault(t => t.PomId == ship.ShipKindTypeId)?.Name,
-                        FillReportTime = fillReportTime,
-                        AssociationProject = 2,
-                        FillReportStatus = GetFillState(model.DateDayTime, null, fillReportTime)
+                        DateDayTime = model.DateDayTime.Value,
+                        FillReportTime = model.DateDayTime.Value,
+                        ShipId = item.PomId,
                     };
-                    //判断当前船舶类型是否在耙吸船、绞吸船 和 抓斗船范围内
-                    if (filtShipType.Contains(ship.ShipKindTypeId.Value.ToString()))
+
+                    //进场时间
+                    var currentEnterShipInfo = shipMovementList.Where(x => x.ShipId == item.PomId && x.Status == ShipMovementStatus.Enter).FirstOrDefault();
+                    if (currentEnterShipInfo != null)
                     {
-                        resShips.Add(resShipMovement);
+                        res.EnterTime = currentEnterShipInfo.EnterTime;
+                        res.ProjectId = currentEnterShipInfo.ProjectId;
+                        res.ProjectName= projectList.Where(x=>x.Id== currentEnterShipInfo.ProjectId).Select(x=>x.Name).FirstOrDefault();
+                        res.AssociationProject = 1;
                     }
-                }
-                if (shipMovement.Count() > 1 && model.ProjectId != null && model.ProjectId != Guid.Empty)
-                {
-                    shipMovement = shipMovement.Where(x => x.ProjectId == model.ProjectId).ToList();
+                    else {
+                        res.AssociationProject = 2;
+                    }
 
-
-                    ////查询船舶日报表中是否关联项目
-                    //foreach (var item in shipMovement)
-                    //{
-                    //    var isExist = fillReportShips.FirstOrDefault(x => x.ProjectId == item.ProjectId && x.PomId == item.ShipId);
-                    //    if (isExist == null)
-                    //    {
-                    //        item.ProjectId = Guid.Empty;
-                    //    }
-                    //}
-                    #region 添加的逻辑
-                    if (!shipMovement.Any())
+                    //船舶类型
+                    var shipInfo = allShipList.Where(x => x.PomId == item.PomId).FirstOrDefault();
+                    if (shipInfo != null)
                     {
-                        var resShipMovement = new EnterShipsResponseDto.ResEnterShipDto()
+                        res.ShipName = shipInfo.Name;
+                        var shipType = shipTypeList.Where(x => x.PomId.Value == shipInfo.TypeId).FirstOrDefault();
+                        if (shipType != null)
                         {
-
-                            ShipId = ship.PomId.Value,
-                            DateDayTime = Convert.ToDateTime(fillReportTime),
-                            ShipName = ship.Name,
-
-                            ShipCompanyId = ship.CompanyId,
-                            ShipKindTypeName = shipKindTypes.FirstOrDefault(t => t.PomId == ship.ShipKindTypeId)?.Name,
-                            FillReportTime = fillReportTime,
-                            AssociationProject = 2,
-                            FillReportStatus = GetFillState(model.DateDayTime, null, fillReportTime)
-                        };
-                        resShips.Add(resShipMovement);
+                            res.ShipKindTypeName = shipType.Name;
+                        }
+                        else {
+                            continue;
+                        }
                     }
-                    #endregion
+                    else {
+                        continue;
+                    }
+
+                    //船舶日报
+                   var currentShipDay= shipDayReportList.Where(x => x.ShipId == item.PomId).FirstOrDefault();
+                    if (currentShipDay != null)
+                    {
+                        res.FillReportStatus = 2;
+                    }
+                    else {
+                        res.FillReportStatus = 1;
+                    }
+                    resEnterShipDtos.Add(res);
 
                 }
-                shipMovement.ForEach(item =>
+                var pids= new List<Guid>();
+                if (userInfo.Account != "2019013759" &&
+              userInfo.Account != "2020012489" &&
+              userInfo.Account != "2016146340" &&
+              !userInfo.CurrentLoginIsAdmin)
                 {
-
-
-
-                    var resShipMovement = new EnterShipsResponseDto.ResEnterShipDto()
-                    {
-                        ProjectId = item.Status == ShipMovementStatus.Quit && !(item.EnterTime <= model.DateDayTime && item.QuitTime >= model.DateDayTime) ? Guid.Empty : item.ProjectId,
-                        ProjectName = item.Status == ShipMovementStatus.Quit && !(item.EnterTime <= model.DateDayTime && item.QuitTime >= model.DateDayTime) ? null : projects.Where(p => p.ProjectId == item.ProjectId).SingleOrDefault()?.ProjectName,
-                        ShipId = ship.PomId.Value,
-                        DateDayTime = Convert.ToDateTime(fillReportTime),
-                        ShipName = ship.Name,
-                        EnterTime = item.EnterTime,
-                        ShipCompanyId = ship.CompanyId,
-                        ShipKindTypeName = shipKindTypes.FirstOrDefault(t => t.PomId == ship.ShipKindTypeId)?.Name,
-                        FillReportTime = fillReportTime,
-                        AssociationProject = item.Status == ShipMovementStatus.Quit && !(item.EnterTime <= model.DateDayTime && item.QuitTime >= model.DateDayTime) ? 2 : item.ProjectId == Guid.Empty ? 2 : 1,
-                        FillReportStatus = GetFillState(model.DateDayTime, item.EnterTime, fillReportTime)
-                    };
-                    #region 添加的逻辑
-                    if (item.Status == ShipMovementStatus.Enter && model.DateDayTime < item.EnterTime && item.QuitTime == null)
-                    {
-                        resShipMovement.ProjectId = Guid.Empty;
-                        resShipMovement.AssociationProject = 2;
-                        resShipMovement.ProjectName = string.Empty;
-                    }
-                    if (item.Status == ShipMovementStatus.Quit && item.QuitTime != null && model.DateDayTime > item.QuitTime)
-                    {
-                        resShipMovement.ProjectId = Guid.Empty;
-                        resShipMovement.AssociationProject = 2;
-                        resShipMovement.ProjectName = string.Empty;
-                    }
-                    #endregion
-                    //判断当前船舶是否未非关联项目  并且类型是否在耙吸船、绞吸船 和 抓斗船范围内
-                    if (resShipMovement.AssociationProject == 2 && filtShipType.Contains(ship.ShipKindTypeId.Value.ToString()))
-                    {
-                        resShips.Add(resShipMovement);
-                    }
-                    if (resShipMovement.AssociationProject == 1)
-                    {
-                        resShips.Add(resShipMovement);
-                    }
-                });
-
-            });
-            //获取当前角色信息
-            var curRoleInfo = _currentUser.RoleInfos.Where(role => role.Oid == _currentUser.CurrentLoginInstitutionOid).FirstOrDefault();
-            //获取角色id
-            var role = await _dbRole.AsQueryable().Where(x => x.Id == _currentUser.CurrentLoginRoleId).FirstAsync();
-            if (curRoleInfo.IsAdmin || (role != null && role.Type == 2))//超级管理员  或者  管理员
-            {
-                if (!curRoleInfo.IsAdmin && curRoleInfo.Oid != "101162350")//公司管理员
-                {
-                    //获取当前机构下所有自有船舶
-                    var institutionFirst = await _dbInstitution.AsQueryable().Where(x => x.Oid == curRoleInfo.Oid).FirstAsync();
-                    var institutionIdResponse = await _baseService.SearchCompanySubPullDownAsync(institutionFirst.PomId.Value);
-                    var institutionIds = institutionIdResponse.Data.Select(x => x.Id.Value).ToList();
-                    //追加当前角色公司
-                    institutionIds.Add(institutionFirst.PomId.Value);
-                    //除了可以看公司的以外还要可看当前项目绑定的船舶
-                    if (model.ProjectId != Guid.Empty && !string.IsNullOrWhiteSpace(model.ProjectId.ToString()))
-                    {
-                        var bships = resShips.Where(x => x.ProjectId == model.ProjectId).ToList();
-                        resShips = resShips.Where(x => institutionIds.Contains(x.ShipCompanyId.Value)).ToList();
-                        resShips.AddRange(bships);
-                    }
-                    else
-                    {
-                        resShips = resShips.Where(x => institutionIds.Contains(x.ShipCompanyId.Value)).ToList();
-                    }
+                    pids = projectList.Select(x => x.Id).ToList();
                 }
-                if (model.ProjectId != Guid.Empty && !string.IsNullOrWhiteSpace(model.ProjectId.ToString()))
+                
+                result.Count = resEnterShipDtos
+                    .WhereIF(model.AssociationProject!=0,x=>x.AssociationProject== model.AssociationProject)
+                    .WhereIF(pids.Any(), x=> pids.Contains(x.ProjectId))
+                    .Count();
+                EnterShipsResponseDto enterShipsResponseDto = new EnterShipsResponseDto()
                 {
-                    resShips = resShips.Where(x => (x.ProjectId == model.ProjectId && x.AssociationProject == 1) || (x.AssociationProject == 2)).ToList();
-                }
-                resShips = resShips.GroupBy(x => x).Select(x => x.First()).ToList();
+                    Ships = resEnterShipDtos
+                    .WhereIF(model.AssociationProject != 0, x => x.AssociationProject == model.AssociationProject)
+                      .WhereIF(pids.Any(), x => pids.Contains(x.ProjectId))
+                      .OrderByDescending(x => x.ProjectId == Guid.Empty).ThenByDescending(x => x.ProjectId)
+                    .Skip((model.PageIndex - 1) * model.PageSize).Take(model.PageSize).ToArray(),
+                    DateDayTime = model.DateDayTime.Value,
+                };
+                
+                result.Data = enterShipsResponseDto;
+                
             }
-            else
-            {
-                //项目部人员登陆 只需要看关联项目的船舶
-                if (model.ProjectId != Guid.Empty && !string.IsNullOrWhiteSpace(model.ProjectId.ToString()))
-                {
-                    resShips = resShips.Where(x => x.ProjectId == model.ProjectId && x.AssociationProject == 1).ToList();
-                }
-            }
-            resShips = resShips.OrderBy(x => x.AssociationProject).OrderByDescending(x => x.EnterTime).ToList();
-            if (model.AssociationProject == 1) resShips = resShips.Where(x => x.AssociationProject == 1).ToList();
-            if (model.AssociationProject == 2) resShips = resShips.Where(x => x.AssociationProject == 2).ToList();
-            int skipCount = (model.PageIndex - 1) * model.PageSize;
-            var pageData = resShips.Skip(skipCount).Take(model.PageSize);
-            result.Count = resShips.Count();
-            var resEnterShips = new EnterShipsResponseDto() { Ships = pageData.ToArray(), DateDayTime = dateDayTime.Date };
-            return result.SuccessResult(resEnterShips);
+            result.Success();
+           
+          return result;
         }
+        #endregion
         /// <summary>
         /// 获取填报状态结果
         /// </summary>
