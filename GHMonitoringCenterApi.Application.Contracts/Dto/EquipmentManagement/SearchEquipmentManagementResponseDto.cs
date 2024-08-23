@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace GHMonitoringCenterApi.Application.Contracts.Dto.EquipmentManagement
+﻿namespace GHMonitoringCenterApi.Application.Contracts.Dto.EquipmentManagement
 {
     /// <summary>
     /// 设备管理返回Dto
