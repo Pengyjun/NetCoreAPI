@@ -702,6 +702,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             //船舶类型
             var typeIds= CommonData.ShipTypes.Select(x=>x.Value).ToList();
              var shipTypeList=await _dbShipPingType.AsQueryable().Where(x => x.IsDelete == 1&&typeIds.Contains(x.PomId.Value)).ToListAsync();
+             shipTypeList.Add(new ShipPingType() { PomId = "355874fe-4d07-40fc-9977-3a55f2ae85d3".ToGuid(), Name = "拖轮" });
             if (shipMovementList.Any())
             {
                 List<ResEnterShipDto> resEnterShipDtos = new List<ResEnterShipDto>();
@@ -713,7 +714,6 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                         FillReportTime = model.DateDayTime.Value,
                         ShipId = item.PomId,
                     };
-
                     //进场时间
                     var currentEnterShipInfo = shipMovementList.Where(x => x.ShipId == item.PomId && x.Status == ShipMovementStatus.Enter).FirstOrDefault();
                     if (currentEnterShipInfo != null)
@@ -735,7 +735,18 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                         var shipType = shipTypeList.Where(x => x.PomId.Value == shipInfo.TypeId).FirstOrDefault();
                         if (shipType != null)
                         {
-                            res.ShipKindTypeName = shipType.Name;
+                            if (shipType.Name == "拖轮" && res.AssociationProject == 1)
+                            {
+                                res.ShipKindTypeName = shipType.Name;
+                            }
+                            else if (shipType.Name != "拖轮")
+                            {
+                                res.ShipKindTypeName = shipType.Name;
+                            }
+                            else {
+                                continue;
+                            }
+                           
                         }
                         else {
                             continue;
