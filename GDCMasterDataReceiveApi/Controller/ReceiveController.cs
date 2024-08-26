@@ -252,8 +252,6 @@ namespace GDCMasterDataReceiveApi.Controller
         public Task<ResponseAjaxResult<bool>> InstitutionDataAsync() => _receiveService.InstitutionData();
         #endregion
 
-
-
         #region 拉取4A的人员和机构数据
 
          
