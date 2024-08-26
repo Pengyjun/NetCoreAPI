@@ -52,7 +52,7 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// <summary>
         /// 多语言描述表类型
         /// </summary>
-        [NotMapped]
+        [SugarColumn(IsIgnore = true)]
         public List<ZMDGTT_ZLANG2>? ZLANG_LIST { get; set; }
     }
     /// <summary>

@@ -6,8 +6,8 @@ namespace GDCMasterDataReceiveApi.Domain.Models
     /// <summary>
     /// 通用类字典数据
     /// </summary>
-    [SugarTable("t_common", IsDisabledDelete = true)]
-    public class Common : BaseEntity<long>
+    [SugarTable("t_commons", IsDisabledDelete = true)]
+    public class Commons : BaseEntity<long>
     {
         /// <summary>
         /// 发送记录ID 发送记录的ID，必须保证此ID在同一个发送批次中是唯一的。用于记录发送方对于此发送记录的唯一标识。
@@ -57,7 +57,7 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// <summary>
         /// 系统概述
         /// </summary>
-        [SugarColumn(Length = 5000, ColumnName = "SystemOverview")]
+        [SugarColumn(ColumnDataType ="text", ColumnName = "SystemOverview")]
         public string ZSYSDESC { get; set; }
         /// <summary>
         /// 是否有效:有效：1 无效：2

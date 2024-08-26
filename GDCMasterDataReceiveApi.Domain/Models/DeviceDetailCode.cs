@@ -52,7 +52,7 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// <summary>
         /// 物资设备属性列表
         /// </summary>
-        [NotMapped]
+        [SugarColumn(IsIgnore = true)]
         public List<ZMDGTT_MATATTR_DATA_IF>? ZMATTTR_LIST { get; set; }
     }
     /// <summary>

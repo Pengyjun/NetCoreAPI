@@ -14,8 +14,8 @@ namespace GDCMasterDataReceiveApi.SqlSugarCore
             SqlSugarClient db = new SqlSugarClient(new ConnectionConfig()
             {
                 ConnectionString = dbCon,
-                //DbType = DbType.Dm,
-                DbType = DbType.MySql,
+                DbType = DbType.Dm,
+                //DbType = DbType.MySql,
                 IsAutoCloseConnection = true,//不设成true要手动close
                 MoreSettings = new ConnMoreSettings()
                 {
@@ -37,45 +37,45 @@ namespace GDCMasterDataReceiveApi.SqlSugarCore
                             p.IsNullable = true;
 
                         }
-                        if (c.Name == "Id" && c.PropertyType.FullName.ToLower().IndexOf("guid") >= 0)
+                        if (c.Name == "Id" && c.PropertyType.Name.IndexOf("T") >= 0)
                         {
                             p.DataType = "varchar";
-                            p.Length = 36;
+                            p.Length = 64;
                         }
-                        if (c.Name == "CreateId" && c.PropertyType.FullName.ToLower().IndexOf("guid") >= 0)
+                        if (c.Name == "CreateId" && c.PropertyType.Name.IndexOf("T") >= 0)
                         {
                             p.DataType = "varchar";
-                            p.Length = 36;
+                            p.Length = 64;
                         }
-                        if (c.Name == "UpdateId" && c.PropertyType.FullName.ToLower().IndexOf("guid") >= 0)
+                        if (c.Name == "UpdateId" && c.PropertyType.Name.IndexOf("T") >= 0)
                         {
                             p.DataType = "varchar";
-                            p.Length = 36;
+                            p.Length = 64;
                         }
-                        if (c.Name == "DeleteId" && c.PropertyType.FullName.ToLower().IndexOf("guid") >= 0)
+                        if (c.Name == "DeleteId" && c.PropertyType.Name.IndexOf("T") >= 0)
                         {
                             p.DataType = "varchar";
-                            p.Length = 36;
+                            p.Length = 64;
                         }
-                        if (c.Name == "Id" && c.PropertyType.FullName.ToLower().IndexOf("guid") >= 0)
+                        if (c.Name == "Id" && c.PropertyType.Name.IndexOf("T") >= 0)
                         {
                             p.DataType = "varchar";
-                            p.Length = 36;
+                            p.Length = 64;
                         }
-                        if (c.Name == "CreateId" && c.PropertyType.FullName.ToLower().IndexOf("guid") >= 0)
+                        if (c.Name == "CreateId" && c.PropertyType.Name.IndexOf("T") >= 0)
                         {
                             p.DataType = "varchar";
-                            p.Length = 36;
+                            p.Length = 64;
                         }
-                        if (c.Name == "UpdateId" && c.PropertyType.FullName.ToLower().IndexOf("guid") >= 0)
+                        if (c.Name == "UpdateId" && c.PropertyType.Name.IndexOf("T") >= 0)
                         {
                             p.DataType = "varchar";
-                            p.Length = 36;
+                            p.Length = 64;
                         }
-                        if (c.Name == "DeleteId" && c.PropertyType.FullName.ToLower().IndexOf("guid") >= 0)
+                        if (c.Name == "DeleteId" && c.PropertyType.Name.IndexOf("T") >= 0)
                         {
                             p.DataType = "varchar";
-                            p.Length = 36;
+                            p.Length = 64;
                         }
                         //字段名全小写
                         if (!p.IsIgnore)
@@ -91,9 +91,9 @@ namespace GDCMasterDataReceiveApi.SqlSugarCore
                 };
             });
             Type[] types = typeof(BaseEntity<long>).Assembly.GetTypes()
-            //.Where(it => it.FullName.Contains("GDCMasterDataReceiveApi.Domain.Models"))
-            //.Where(it => it.FullName.Contains("AuditLogs"))
-            //.Where(it => it.FullName.Contains("MainTableOfStatisticsDetails"))
+            .Where(it => it.FullName.Contains("GDCMasterDataReceiveApi.Domain.Models"))
+            .Where(it => !it.FullName.Contains("BusinessProject"))
+            .Where(it => !it.FullName.Contains("ManagementOrganization"))
             .ToArray();
             db.CodeFirst.InitTables(types);
         }

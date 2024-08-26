@@ -37,7 +37,7 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// <summary>
         /// HR上级机构主数据编码 : 上级机构编码，关联机构主数据编码ZZOID（OID）。
         /// </summary>
-        [SugarColumn(Length = 20, ColumnName = "SupOrgMDCode")]
+        [SugarColumn(Length = 20, ColumnName = "SupHROrgMDCode")]
         public string? POID { get; set; }
         /// <summary>
         /// 机构编码:机构编码
