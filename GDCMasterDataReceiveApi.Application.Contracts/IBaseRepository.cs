@@ -1,11 +1,12 @@
 ﻿using GDCMasterDataReceiveApi.Domain.Shared.Annotation;
+using SqlSugar;
 
 namespace GDCMasterDataReceiveApi.Application.Contracts
 {
     /// <summary>
-    /// 基本接口层 
+    /// 
     /// </summary>
-    [DependencyInjection]
-    public interface IBaseService
+    /// <typeparam name="T"></typeparam>
+    public interface IBaseRepository<T> : ISimpleClient<T> where T : class, new()
     { }
 }

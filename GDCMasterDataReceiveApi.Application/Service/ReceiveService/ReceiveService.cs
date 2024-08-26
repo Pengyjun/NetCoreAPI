@@ -1,6 +1,9 @@
-﻿using GDCMasterDataReceiveApi.Application.Contracts.Dto._4A.User;
+﻿using GDCMasterDataReceiveApi.Application.Contracts;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto._4A.User;
 using GDCMasterDataReceiveApi.Application.Contracts.IService.IReceiveService;
+using GDCMasterDataReceiveApi.Domain.Models;
 using GDCMasterDataReceiveApi.Domain.Shared;
+using GDCMasterDataReceiveApi.Domain.Shared.Utils;
 using SqlSugar;
 using UtilsSharp;
 
@@ -12,12 +15,13 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
     public class ReceiveService : IReceiveService
     {
         private readonly ISqlSugarClient _dbContext;
+
         /// <summary>
         /// 注入上下文
         /// </summary>
         public ReceiveService(ISqlSugarClient dbContext)
         {
-            _dbContext = dbContext;
+            this._dbContext = dbContext;
         }
         /// <summary>
         /// 获取通用字典数据
@@ -289,7 +293,25 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
         /// <returns></returns>
         public async Task<ResponseAjaxResult<bool>> LouDongDataAsync()
         {
-
+            ///***
+            // * 测试写入数据
+            // */
+            //var tt = new List<LouDong>();
+            //var test = new LouDong()
+            //{
+            //    Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+            //    ZZSERIAL = "1",
+            //    ZBLDG = "2",
+            //    ZBLDG_NAME = "3",
+            //    ZSTATE = "4",
+            //    ZFORMATINF = "5",
+            //    ZSYSTEM = "6",
+            //    ZPROJECT = "7"
+            //};
+            //tt.Add(test);
+            //var x = _dbContext.Storageable(tt).ToStorage();
+            //await x.AsInsertable.ExecuteCommandAsync();//不存在插入
+            //await x.AsUpdateable.ExecuteCommandAsync();//存在更新
             var responseAjaxResult = new ResponseAjaxResult<bool>();
             responseAjaxResult.SuccessResult(true);
             return responseAjaxResult;
@@ -356,7 +378,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
         public async Task<ResponseAjaxResult<bool>> PersonDataAsync(List<ReceiveUserRequestDto> receiveUserRequestDto)
         {
             var responseAjaxResult = new ResponseAjaxResult<bool>();
-            await Console.Out.WriteLineAsync("接收的数据:"+ receiveUserRequestDto.ToJson());
+            await Console.Out.WriteLineAsync("接收的数据:" + receiveUserRequestDto.ToJson());
             responseAjaxResult.SuccessResult(true);
             return responseAjaxResult;
         }

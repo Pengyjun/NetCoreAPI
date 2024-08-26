@@ -2,6 +2,7 @@
 using GDCMasterDataReceiveApi.Application.Contracts.IService.IReceiveService;
 using GDCMasterDataReceiveApi.Domain.Shared;
 using GDCMasterDataReceiveApi.Domain.Shared.Annotation;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GDCMasterDataReceiveApi.Controller
@@ -199,6 +200,7 @@ namespace GDCMasterDataReceiveApi.Controller
         /// </summary>
         /// <returns></returns>
         [UnitOfWork]
+        [AllowAnonymous]
         [HttpPost("LouDong")]
         public Task<ResponseAjaxResult<bool>> LouDongDataAsync() => _receiveService.LouDongDataAsync();
         /// <summary>

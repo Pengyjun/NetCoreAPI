@@ -6,7 +6,6 @@
     ///起到标记作用
     /// </summary>
     [AttributeUsage(AttributeTargets.Interface)]
-    public class DependencyInjectionAttribute: Attribute
-    {
-    }
+    public class DependencyInjectionAttribute : Attribute
+    { }
 }
