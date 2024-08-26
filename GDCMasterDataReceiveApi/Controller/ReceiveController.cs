@@ -1,4 +1,5 @@
-﻿using GDCMasterDataReceiveApi.Application.Contracts.IReceiveService;
+﻿using GDCMasterDataReceiveApi.Application.Contracts.Dto._4A.User;
+using GDCMasterDataReceiveApi.Application.Contracts.IService.IReceiveService;
 using GDCMasterDataReceiveApi.Domain.Shared;
 using GDCMasterDataReceiveApi.Domain.Shared.Annotation;
 using Microsoft.AspNetCore.Mvc;
@@ -8,9 +9,9 @@ namespace GDCMasterDataReceiveApi.Controller
     /// <summary>
     /// 接收主数据推送接口控制器（此处控制器名称小写因接口规定）
     /// </summary>
-    [Route("api/[controller]/Receive")]
+    [Route("api/mdm/[controller]/")]
     [ApiController]
-    public class mdmController : BaseController
+    public class ReceiveController : BaseController
     {
         /// <summary>
         /// 引入服务
@@ -20,10 +21,11 @@ namespace GDCMasterDataReceiveApi.Controller
         /// 服务注入
         /// </summary>
         /// <param name="receiveService"></param>
-        public mdmController(IReceiveService receiveService)
+        public ReceiveController(IReceiveService receiveService)
         {
             this._receiveService = receiveService;
         }
+        #region 主数据各类数据获取
         /// <summary>
         /// 获取通用字典数据
         /// </summary>
@@ -240,7 +242,7 @@ namespace GDCMasterDataReceiveApi.Controller
         /// <returns></returns>
         [UnitOfWork]
         [HttpPost("Person")]
-        public Task<ResponseAjaxResult<bool>> PersonDataAsync() => _receiveService.PersonData();
+        public Task<ResponseAjaxResult<bool>> PersonDataAsync([FromBody]List<ReceiveUserRequestDto> receiveUserRequestDto) => _receiveService.PersonDataAsync(receiveUserRequestDto);
         /// <summary>
         /// 机构主数据
         /// </summary>
@@ -248,5 +250,13 @@ namespace GDCMasterDataReceiveApi.Controller
         [UnitOfWork]
         [HttpPost("Institution")]
         public Task<ResponseAjaxResult<bool>> InstitutionDataAsync() => _receiveService.InstitutionData();
+        #endregion
+
+
+
+        #region 拉取4A的人员和机构数据
+
+         
+        #endregion
     }
 }

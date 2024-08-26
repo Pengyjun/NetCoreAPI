@@ -1,7 +1,8 @@
-﻿using GDCMasterDataReceiveApi.Domain.Shared;
+﻿using GDCMasterDataReceiveApi.Application.Contracts.Dto._4A.User;
+using GDCMasterDataReceiveApi.Domain.Shared;
 using GDCMasterDataReceiveApi.Domain.Shared.Annotation;
 
-namespace GDCMasterDataReceiveApi.Application.Contracts.IReceiveService
+namespace GDCMasterDataReceiveApi.Application.Contracts.IService.IReceiveService
 {
     /// <summary>
     /// 接收主数据推送接口
@@ -159,15 +160,18 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.IReceiveService
         /// </summary>
         /// <returns></returns>
         Task<ResponseAjaxResult<bool>> AccountingOrganizationData();
+
+        #region 接收主数据人员和机构的数据
         /// <summary>
         /// 人员主数据
         /// </summary>
         /// <returns></returns>
-        Task<ResponseAjaxResult<bool>> PersonData();
+        Task<ResponseAjaxResult<bool>> PersonDataAsync(List<ReceiveUserRequestDto> receiveUserRequestDto);
         /// <summary>
         /// 机构主数据
         /// </summary>
         /// <returns></returns>
         Task<ResponseAjaxResult<bool>> InstitutionData();
+        #endregion
     }
 }

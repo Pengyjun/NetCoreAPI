@@ -8,17 +8,18 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Dto\Mdm\**" />
+    <EmbeddedResource Remove="Dto\Mdm\**" />
+    <None Remove="Dto\Mdm\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="AutoMapper" Version="13.0.1" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\GDCMasterDataReceiveApi.Domain.Shared\GDCMasterDataReceiveApi.Domain.Shared.csproj" />
     <ProjectReference Include="..\GDCMasterDataReceiveApi.SqlSugarCore\GDCMasterDataReceiveApi.SqlSugarCore.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Dto\Mdm\Receive\" />
-    <Folder Include="IService\" />
   </ItemGroup>
 
 </Project>

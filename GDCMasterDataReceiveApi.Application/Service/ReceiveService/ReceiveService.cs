@@ -1,8 +1,10 @@
-﻿using GDCMasterDataReceiveApi.Application.Contracts.IReceiveService;
+﻿using GDCMasterDataReceiveApi.Application.Contracts.Dto._4A.User;
+using GDCMasterDataReceiveApi.Application.Contracts.IService.IReceiveService;
 using GDCMasterDataReceiveApi.Domain.Shared;
 using SqlSugar;
+using UtilsSharp;
 
-namespace GDCMasterDataReceiveApi.Application.ReceiveService
+namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
 {
     /// <summary>
     /// 接收主数据推送接口实现
@@ -15,7 +17,7 @@ namespace GDCMasterDataReceiveApi.Application.ReceiveService
         /// </summary>
         public ReceiveService(ISqlSugarClient dbContext)
         {
-            this._dbContext = dbContext;
+            _dbContext = dbContext;
         }
         /// <summary>
         /// 获取通用字典数据
@@ -351,10 +353,10 @@ namespace GDCMasterDataReceiveApi.Application.ReceiveService
         /// 人员主数据
         /// </summary>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<bool>> PersonData()
+        public async Task<ResponseAjaxResult<bool>> PersonDataAsync(List<ReceiveUserRequestDto> receiveUserRequestDto)
         {
-
             var responseAjaxResult = new ResponseAjaxResult<bool>();
+            await Console.Out.WriteLineAsync("接收的数据:"+ receiveUserRequestDto.ToJson());
             responseAjaxResult.SuccessResult(true);
             return responseAjaxResult;
         }
