@@ -23,7 +23,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
         /// 获取通用字典数据
         /// </summary>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<bool>> CommonData()
+        public async Task<ResponseAjaxResult<bool>> CommonDataAsync()
         {
 
             var responseAjaxResult = new ResponseAjaxResult<bool>();
@@ -34,7 +34,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
         /// 往来单位主数据
         /// </summary>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<bool>> CorresUnitData()
+        public async Task<ResponseAjaxResult<bool>> CorresUnitDataAsync()
         {
 
             var responseAjaxResult = new ResponseAjaxResult<bool>();
@@ -45,7 +45,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
         /// 多组织-税务代管组织(行政)
         /// </summary>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<bool>> EscrowOrganizationData()
+        public async Task<ResponseAjaxResult<bool>> EscrowOrganizationDataAsync()
         {
 
             var responseAjaxResult = new ResponseAjaxResult<bool>();
@@ -56,7 +56,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
         /// 商机项目(含境外商机项目)
         /// </summary>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<bool>> BusinessProjectData()
+        public async Task<ResponseAjaxResult<bool>> BusinessProjectDataAsync()
         {
 
             var responseAjaxResult = new ResponseAjaxResult<bool>();
@@ -67,7 +67,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
         /// 国家地区
         /// </summary>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<bool>> CountryRegionData()
+        public async Task<ResponseAjaxResult<bool>> CountryRegionDataAsync()
         {
 
             var responseAjaxResult = new ResponseAjaxResult<bool>();
@@ -78,7 +78,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
         /// 大洲
         /// </summary>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<bool>> CountryContinentData()
+        public async Task<ResponseAjaxResult<bool>> CountryContinentDataAsync()
         {
 
             var responseAjaxResult = new ResponseAjaxResult<bool>();
@@ -89,7 +89,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
         /// 中交区域总部
         /// </summary>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<bool>> RegionalData()
+        public async Task<ResponseAjaxResult<bool>> RegionalDataAsync()
         {
 
             var responseAjaxResult = new ResponseAjaxResult<bool>();
@@ -100,7 +100,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
         /// 常用计量单位
         /// </summary>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<bool>> UnitMeasurementData()
+        public async Task<ResponseAjaxResult<bool>> UnitMeasurementDataAsync()
         {
 
             var responseAjaxResult = new ResponseAjaxResult<bool>();
@@ -111,7 +111,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
         /// 中交项目行业分类产业分类、业务板块、十二大业务类型、江河湖海对照关系
         /// </summary>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<bool>> ProjectClassificationData()
+        public async Task<ResponseAjaxResult<bool>> ProjectClassificationDataAsync()
         {
 
             var responseAjaxResult = new ResponseAjaxResult<bool>();
@@ -122,7 +122,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
         /// 金融机构
         /// </summary>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<bool>> FinancialInstitutionData()
+        public async Task<ResponseAjaxResult<bool>> FinancialInstitutionDataAsync()
         {
 
             var responseAjaxResult = new ResponseAjaxResult<bool>();
@@ -133,7 +133,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
         /// 物资设备分类编码
         /// </summary>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<bool>> DeviceClassCodeData()
+        public async Task<ResponseAjaxResult<bool>> DeviceClassCodeDataAsync()
         {
 
             var responseAjaxResult = new ResponseAjaxResult<bool>();
@@ -144,7 +144,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
         /// 核算部门
         /// </summary>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<bool>> AccountingDepartmentData()
+        public async Task<ResponseAjaxResult<bool>> AccountingDepartmentDataAsync()
         {
 
             var responseAjaxResult = new ResponseAjaxResult<bool>();
@@ -155,7 +155,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
         /// 中交区域中心
         /// </summary>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<bool>> RegionalCenterData()
+        public async Task<ResponseAjaxResult<bool>> RegionalCenterDataAsync()
         {
 
             var responseAjaxResult = new ResponseAjaxResult<bool>();
@@ -166,7 +166,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
         /// 银行账号
         /// </summary>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<bool>> BankCardData()
+        public async Task<ResponseAjaxResult<bool>> BankCardDataAsync()
         {
 
             var responseAjaxResult = new ResponseAjaxResult<bool>();
@@ -177,7 +177,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
         /// 国民经济行业分类
         /// </summary>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<bool>> NationalEconomyData()
+        public async Task<ResponseAjaxResult<bool>> NationalEconomyDataAsync()
         {
 
             var responseAjaxResult = new ResponseAjaxResult<bool>();
@@ -188,7 +188,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
         /// 多组织-行政组织
         /// </summary>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<bool>> AdministrativeOrganizationData()
+        public async Task<ResponseAjaxResult<bool>> AdministrativeOrganizationDataAsync()
         {
 
             var responseAjaxResult = new ResponseAjaxResult<bool>();
@@ -199,7 +199,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
         /// 发票类型
         /// </summary>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<bool>> InvoiceTypeData()
+        public async Task<ResponseAjaxResult<bool>> InvoiceTypeDataAsync()
         {
 
             var responseAjaxResult = new ResponseAjaxResult<bool>();
@@ -210,7 +210,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
         /// 币种
         /// </summary>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<bool>> CurrencyData()
+        public async Task<ResponseAjaxResult<bool>> CurrencyDataAsync()
         {
 
             var responseAjaxResult = new ResponseAjaxResult<bool>();
@@ -221,7 +221,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
         /// 行政机构和核算机构映射关系
         /// </summary>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<bool>> AdministrativeAccountingMapperData()
+        public async Task<ResponseAjaxResult<bool>> AdministrativeAccountingMapperDataAsync()
         {
 
             var responseAjaxResult = new ResponseAjaxResult<bool>();
@@ -232,7 +232,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
         /// 项目类
         /// </summary>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<bool>> ProjectData()
+        public async Task<ResponseAjaxResult<bool>> ProjectDataAsync()
         {
 
             var responseAjaxResult = new ResponseAjaxResult<bool>();
@@ -243,7 +243,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
         /// 科研项目
         /// </summary>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<bool>> ScientifiCNoProjectData()
+        public async Task<ResponseAjaxResult<bool>> ScientifiCNoProjectDataAsync()
         {
 
             var responseAjaxResult = new ResponseAjaxResult<bool>();
@@ -254,7 +254,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
         /// 商机项目(不含境外商机项目)
         /// </summary>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<bool>> BusinessNoCpportunityData()
+        public async Task<ResponseAjaxResult<bool>> BusinessNoCpportunityDataAsync()
         {
 
             var responseAjaxResult = new ResponseAjaxResult<bool>();
@@ -265,7 +265,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
         /// 委托关系
         /// </summary>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<bool>> RelationalContractsData()
+        public async Task<ResponseAjaxResult<bool>> RelationalContractsDataAsync()
         {
 
             var responseAjaxResult = new ResponseAjaxResult<bool>();
@@ -276,7 +276,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
         /// 生产经营管理组织
         /// </summary>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<bool>> ManagementOrganizationData()
+        public async Task<ResponseAjaxResult<bool>> ManagementOrganizationDataAsync()
         {
 
             var responseAjaxResult = new ResponseAjaxResult<bool>();
@@ -287,7 +287,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
         /// 楼栋
         /// </summary>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<bool>> LouDongData()
+        public async Task<ResponseAjaxResult<bool>> LouDongDataAsync()
         {
 
             var responseAjaxResult = new ResponseAjaxResult<bool>();
@@ -298,7 +298,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
         /// 房号
         /// </summary>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<bool>> RoomNumberData()
+        public async Task<ResponseAjaxResult<bool>> RoomNumberDataAsync()
         {
 
             var responseAjaxResult = new ResponseAjaxResult<bool>();
@@ -309,7 +309,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
         /// 境内行政区划
         /// </summary>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<bool>> AdministrativeDivisionData()
+        public async Task<ResponseAjaxResult<bool>> AdministrativeDivisionDataAsync()
         {
 
             var responseAjaxResult = new ResponseAjaxResult<bool>();
@@ -320,7 +320,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
         /// 语言语种
         /// </summary>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<bool>> LanguageData()
+        public async Task<ResponseAjaxResult<bool>> LanguageDataAsync()
         {
 
             var responseAjaxResult = new ResponseAjaxResult<bool>();
@@ -331,7 +331,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
         /// 物资设备明细编码
         /// </summary>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<bool>> DeviceDetailCodeData()
+        public async Task<ResponseAjaxResult<bool>> DeviceDetailCodeDataAsync()
         {
 
             var responseAjaxResult = new ResponseAjaxResult<bool>();
@@ -342,7 +342,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
         /// 多组织-核算机构
         /// </summary>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<bool>> AccountingOrganizationData()
+        public async Task<ResponseAjaxResult<bool>> AccountingOrganizationDataAsync()
         {
 
             var responseAjaxResult = new ResponseAjaxResult<bool>();
@@ -364,7 +364,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
         /// 机构主数据
         /// </summary>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<bool>> InstitutionData()
+        public async Task<ResponseAjaxResult<bool>> InstitutionDataAsync()
         {
 
             var responseAjaxResult = new ResponseAjaxResult<bool>();
