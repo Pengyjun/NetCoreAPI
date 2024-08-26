@@ -17,22 +17,22 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// <summary>
         /// 金融机构主数据编码:金融机构的唯一编码标识
         /// </summary>
-        [SugarColumn(Length = 10, ColumnName = "FinancialInstitutionMDCode")]
+        [SugarColumn(Length = 10, ColumnName = "MDCode")]
         public string ZFINC { get; set; }
         /// <summary>
         /// 总行编号:开户行总行的唯一编码，若金融机构类型为“银行业存款类金融机构”则该字段为必填项
         /// </summary>
-        [SugarColumn(Length = 30, ColumnName = "HeadOfficeNumber")]
+        [SugarColumn(Length = 30, ColumnName = "No")]
         public string? ZBANK { get; set; }
         /// <summary>
         /// 银行联行号:中国人民银行根据支付系统行名行号的编码规则为银行机构和中国人民银行分支机构编制的用于账户管理系统识别其身份的唯一标识
         /// </summary>
-        [SugarColumn(Length = 12, ColumnName = "BankInterbankNumber")]
+        [SugarColumn(Length = 12, ColumnName = "BankNo")]
         public string? ZBANKN { get; set; }
         /// <summary>
         /// 总行名称:开户行总行的名称，若金融机构类型为“银行业存款类金融机构”则该字段为必填项
         /// </summary>
-        [SugarColumn(Length = 200, ColumnName = "HeadOfficeName")]
+        [SugarColumn(Length = 200, ColumnName = "BankName")]
         public string? ZBANKNAME { get; set; }
         /// <summary>
         /// 国家/地区:该金融机构所在的国家/地区
@@ -57,27 +57,27 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// <summary>
         /// 境内金融机构类型:该金融机构所属类型，境内金融机构必填
         /// </summary>
-        [SugarColumn(Length = 2, ColumnName = "TypesOfDomesticFinancialInstitutions")]
+        [SugarColumn(Length = 2, ColumnName = "TypesOfOrg")]
         public string? ZDFITYPE { get; set; }
         /// <summary>
         /// 金融机构名称:该金融机构的全称
         /// </summary>
-        [SugarColumn(Length = 200, ColumnName = "NameOfFinancialInstitution")]
+        [SugarColumn(Length = 200, ColumnName = "NameOfOrg")]
         public string ZFINAME { get; set; }
         /// <summary>
         /// 英文名称:该金融机构的英文名称
         /// </summary>
-        [SugarColumn(Length = 200, ColumnName = "EngilshNameOfFinancialInstitution")]
+        [SugarColumn(Length = 200, ColumnName = "EnglishName")]
         public string? ZFINAME_E { get; set; }
         /// <summary>
         /// 境外金融机构类型:该金融机构所属类型，境外金融机构必填
         /// </summary>
-        [SugarColumn(Length = 2, ColumnName = "TypesOfOverseasFinancialInstitutions")]
+        [SugarColumn(Length = 2, ColumnName = "TypesOfAbroadOrg")]
         public string? ZOFITYPE { get; set; }
         /// <summary>
         /// 机构主数据编码:行政组织编码，集团内的金融机构必填
         /// </summary>
-        [SugarColumn(Length = 20, ColumnName = "InstitutionalMDCode")]
+        [SugarColumn(Length = 20, ColumnName = "MDCodeofOrg")]
         public string? ZORG { get; set; }
         /// <summary>
         /// swift code:银行国际代码，境外金融机构必填
@@ -87,7 +87,7 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// <summary>
         /// 统一社会信用代码:该金融机构的统一社会信用代码
         /// </summary>
-        [SugarColumn(Length = 18, ColumnName = "UnifiedSocialCreditCode")]
+        [SugarColumn(Length = 18, ColumnName = "RegistrationNo")]
         public string? ZUSCC { get; set; }
         /// <summary>
         /// 状态:数据是否有效的标识:有效：1无效：0
@@ -97,12 +97,12 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// <summary>
         /// 是否删除 数据是否有效的标识:有效：1无效：0
         /// </summary>
-        [SugarColumn(Length = 1, ColumnName = "IsDeleteValidIdentifier")]
+        [SugarColumn(Length = 1, ColumnName = "DataIdentifier")]
         public string ZDELETE { get; set; }
         /// <summary>
         /// 最后修改二级单位 :记录数据最后修改所属二级单位
         /// </summary>
-        [SugarColumn(Length = 20, ColumnName = "SecondUnit")]
+        [SugarColumn(Length = 20, ColumnName = "UnitSec")]
         public string? ZFIN2NDORG { get; set; }
         /// <summary>
         /// 提交时间：该金融机构最后一次修时间

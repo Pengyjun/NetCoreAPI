@@ -17,42 +17,42 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// <summary>
         /// 核算组织编号:9月18日新加
         /// </summary>
-        [SugarColumn(Length = 50, ColumnName = "AccountingOrganizationNumber")]
+        [SugarColumn(Length = 50, ColumnName = "AccOrgCode")]
         public string ZACORGNO { get; set; }
         /// <summary>
         /// 核算部门编号
         /// </summary>
-        [SugarColumn(Length = 50, ColumnName = "AccountingDepartmentNumber")]
+        [SugarColumn(Length = 50, ColumnName = "AccDepCode")]
         public string ZDCODE { get; set; }
         /// <summary>
         /// 核算组织ID
         /// </summary>
-        [SugarColumn(Length = 50, ColumnName = "AccountingOrganizationID")]
+        [SugarColumn(Length = 50, ColumnName = "AccOrgId")]
         public string ZACID { get; set; }
         /// <summary>
         /// 核算部门ID
         /// </summary>
-        [SugarColumn(Length = 36, ColumnName = "AccountingDepartmentID")]
+        [SugarColumn(Length = 36, ColumnName = "AccDepId")]
         public string ZDID { get; set; }
         /// <summary>
         /// 核算部门中文简体名称
         /// </summary>
-        [SugarColumn(Length = 100, ColumnName = "AccountingDepartmentShortName")]
+        [SugarColumn(Length = 100, ColumnName = "AccDepShortName")]
         public string ZDNAME_CHS { get; set; }
         /// <summary>
         /// 核算部门中文繁体名称
         /// </summary>
-        [SugarColumn(Length = 100, ColumnName = "AccountingDepartmentTraditionalName")]
+        [SugarColumn(Length = 100, ColumnName = "AccDepTCCName")]
         public string? ZDNAME_CHT { get; set; }
         /// <summary>
         /// 核算部门英文名称
         /// </summary>
-        [SugarColumn(Length = 200, ColumnName = "AccountingDepartmentEnglishName")]
+        [SugarColumn(Length = 200, ColumnName = "AccDepELName")]
         public string? ZDNAME_EN { get; set; }
         /// <summary>
         /// 上级核算部门ID
         /// </summary>
-        [SugarColumn(Length = 36, ColumnName = "SupAccountingDepartmentID")]
+        [SugarColumn(Length = 36, ColumnName = "SupAccDepId")]
         public string? ZDPARENTID { get; set; }
         /// <summary>
         /// 核算部门停用标志：1:停用0:未停用
@@ -62,7 +62,7 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// <summary>
         /// 数据删除标识：1:删除0：正常
         /// </summary>
-        [SugarColumn(Length = 1, ColumnName = "IsDeleteValidIdentifier")]
+        [SugarColumn(Length = 1, ColumnName = "DataIdentifier")]
         public string? ZDELETE { get; set; }
     }
 }

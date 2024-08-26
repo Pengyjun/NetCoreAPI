@@ -17,7 +17,7 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// <summary>
         /// 物资设备主数据编码
         /// </summary>
-        [SugarColumn(Length = 11, ColumnName = "MaterialAndEquipmentMDCode")]
+        [SugarColumn(Length = 11, ColumnName = "MDCode")]
         public string ZMATERIAL { get; set; }
         /// <summary>
         /// 品名编码:物资设备的品名分类码
@@ -27,12 +27,12 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// <summary>
         /// 物资设备全称:物资设备规范的名称
         /// </summary>
-        [SugarColumn(Length = 100, ColumnName = "MaterialAndEquipmentName")]
+        [SugarColumn(Length = 100, ColumnName = "Name")]
         public string ZMNAME { get; set; }
         /// <summary>
         /// 物资设备说明:物资设备的说明
         /// </summary>
-        [SugarColumn(Length = 100, ColumnName = "MaterialAndEquipmentRemark")]
+        [SugarColumn(Length = 100, ColumnName = "Descption")]
         public string ZMNAMES { get; set; }
         /// <summary>
         /// 物资设备主数据状态:物资设备主数据的使用状态
@@ -42,7 +42,7 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// <summary>
         /// 是否常用编码:0否，1是
         /// </summary>
-        [SugarColumn(Length = 1, ColumnName = "IsEncodingCommonlyUsed")]
+        [SugarColumn(Length = 1, ColumnName = "IsCode")]
         public string? ZOFTENCODE { get; set; }
         /// <summary>
         /// 备注:备注说明

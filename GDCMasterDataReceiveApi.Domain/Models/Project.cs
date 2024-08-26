@@ -17,22 +17,22 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// <summary>
         /// 项目主数据编码
         /// </summary>
-        [SugarColumn(Length = 12, ColumnName = "ProjectMDCode")]
+        [SugarColumn(Length = 12, ColumnName = "MDCode")]
         public string ZPROJECT { get; set; }
         /// <summary>
         /// 项目名称
         /// </summary>
-        [SugarColumn(Length = 200, ColumnName = "ProjectName")]
+        [SugarColumn(Length = 200, ColumnName = "Name")]
         public string? ZPROJNAME { get; set; }
         /// <summary>
         /// 项目外文名称
         /// </summary>
-        [SugarColumn(Length = 500, ColumnName = "ProjectForeignName")]
+        [SugarColumn(Length = 500, ColumnName = "ForeignName")]
         public string? ZPROJENAME { get; set; }
         /// <summary>
         /// 项目类型
         /// </summary>
-        [SugarColumn(Length = 6, ColumnName = "ProjectType")]
+        [SugarColumn(Length = 6, ColumnName = "Type")]
         public string? ZPROJTYPE { get; set; }
         /// <summary>
         /// 国家/地区
@@ -42,22 +42,22 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// <summary>
         /// 项目所在地
         /// </summary>
-        [SugarColumn(Length = 6, ColumnName = "ProjectLocation")]
+        [SugarColumn(Length = 6, ColumnName = "Location")]
         public string? ZPROJLOC { get; set; }
         /// <summary>
         /// 中交项目业务分类
         /// </summary>
-        [SugarColumn(Length = 5, ColumnName = "BusinessClassificationOfCCCCProjects")]
+        [SugarColumn(Length = 5, ColumnName = "BTypeOfCCCC")]
         public string? ZCPBC { get; set; }
         /// <summary>
         /// 投资主体
         /// </summary>
-        [SugarColumn(Length = 9, ColumnName = "InvestmentSubject")]
+        [SugarColumn(Length = 9, ColumnName = "Invest")]
         public string? ZINVERSTOR { get; set; }
         /// <summary>
         /// 项目批复/决议文号
         /// </summary>
-        [SugarColumn(Length = 50, ColumnName = "ResolutionNumber")]
+        [SugarColumn(Length = 50, ColumnName = "ResolutionNo")]
         public string? ZAPPROVAL { get; set; }
         /// <summary>
         /// 项目批复/决议时间
@@ -72,37 +72,37 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// <summary>
         /// 项目机构
         /// </summary>
-        [SugarColumn(Length = 20, ColumnName = "ProjectOrganization")]
+        [SugarColumn(Length = 20, ColumnName = "PjectOrg")]
         public string ZPRO_ORG { get; set; }
         /// <summary>
         /// 项目简称
         /// </summary>
-        [SugarColumn(Length = 200, ColumnName = "ProjectAbbreviation")]
+        [SugarColumn(Length = 200, ColumnName = "Abbreviation")]
         public string? ZHEREINAFTER { get; set; }
         /// <summary>
         /// 上级项目主数据编码
         /// </summary>
-        [SugarColumn(Length = 12, ColumnName = "SupProjectMDCode")]
+        [SugarColumn(Length = 12, ColumnName = "SupMDCode")]
         public string? ZPROJECTUP { get; set; }
         /// <summary>
         /// 项目年份
         /// </summary>
-        [SugarColumn(Length = 4, ColumnName = "ProjectYear")]
+        [SugarColumn(Length = 4, ColumnName = "Year")]
         public string? ZPROJYEAR { get; set; }
         /// <summary>
         /// 项目计划开始日期
         /// </summary>
-        [SugarColumn(Length = 8, ColumnName = "ProjectPlanStartDate")]
+        [SugarColumn(Length = 8, ColumnName = "PlanStartDate")]
         public string? ZSTARTDATE { get; set; }
         /// <summary>
         /// 项目计划完成日期
         /// </summary>
-        [SugarColumn(Length = 8, ColumnName = "ProjectPlanCompletionDate")]
+        [SugarColumn(Length = 8, ColumnName = "PlanCompletionDate")]
         public string? ZFINDATE { get; set; }
         /// <summary>
         /// 项目工程名称
         /// </summary>
-        [SugarColumn(Length = 200, ColumnName = "ProjectEngineeringName")]
+        [SugarColumn(Length = 200, ColumnName = "EngineeringName")]
         public string? ZENG { get; set; }
         /// <summary>
         /// 责任主体
@@ -112,17 +112,17 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// <summary>
         /// 土地成交确认书编号/收并购协议编号
         /// </summary>
-        [SugarColumn(Length = 50, ColumnName = "LandTransactionConfirmationNumber")]
+        [SugarColumn(Length = 50, ColumnName = "LandTransactionNo")]
         public string? ZLDLOC { get; set; }
         /// <summary>
         /// 项目获取时间
         /// </summary>
-        [SugarColumn(Length = 8, ColumnName = "ProjectAcquisitionTime")]
+        [SugarColumn(Length = 8, ColumnName = "AcquisitionTime")]
         public string? ZLDLOCGT { get; set; }
         /// <summary>
         /// 工商变更时间
         /// </summary>
-        [SugarColumn(Length = 8, ColumnName = "BusinessChangeTime")]
+        [SugarColumn(Length = 8, ColumnName = "BChangeTime")]
         public string? ZCBR { get; set; }
         /// <summary>
         /// 操盘情况
@@ -132,7 +132,7 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// <summary>
         /// 保险机构名称
         /// </summary>
-        [SugarColumn(Length = 20, ColumnName = "NameOfInsuranceInstitution")]
+        [SugarColumn(Length = 20, ColumnName = "NameOfInsureOrg")]
         public string? ZINSURANCE { get; set; }
         /// <summary>
         /// 保单号 
@@ -147,12 +147,12 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// <summary>
         /// 保险起始日期
         /// </summary>
-        [SugarColumn(Length = 8, ColumnName = "StartingDateOfInsurance")]
+        [SugarColumn(Length = 8, ColumnName = "StartDateOfInsure")]
         public string? ZISTARTDATE { get; set; }
         /// <summary>
         /// 保险终止日期
         /// </summary>
-        [SugarColumn(Length = 8, ColumnName = "TerminationDateOfInsurance")]
+        [SugarColumn(Length = 8, ColumnName = "EndDateOfInsure")]
         public string? ZIFINDATE { get; set; }
         /// <summary>
         /// 基金主数据编码 
@@ -177,17 +177,17 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// <summary>
         /// 基金组织形式
         /// </summary>
-        [SugarColumn(Length = 3, ColumnName = "FormOfFundOrganization")]
+        [SugarColumn(Length = 3, ColumnName = "FundOrgForm")]
         public string? ZFUNDORGFORM { get; set; }
         /// <summary>
         /// 项目机构
         /// </summary>
-        [SugarColumn(Length = 10, ColumnName = "ProjectOrganization")]
+        [SugarColumn(Length = 10, ColumnName = "PjectOrgBP")]
         public string? ZPRO_BP { get; set; }
         /// <summary>
         /// 基金管理人类型
         /// </summary>
-        [SugarColumn(Length = 8, ColumnName = "TypeOfFundManager")]
+        [SugarColumn(Length = 8, ColumnName = "FundManager")]
         public string? ZFUNDMTYPE { get; set; }
         /// <summary>
         /// 基金成立日期
@@ -217,7 +217,7 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// <summary>
         /// 租赁物名称 
         /// </summary>
-        [SugarColumn(Length = 50, ColumnName = "NameOfLeasedProperty")]
+        [SugarColumn(Length = 50, ColumnName = "NameOfLeased")]
         public string? ZLEASESNAME { get; set; }
         /// <summary>
         /// 起租日期
@@ -232,7 +232,7 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// <summary>
         /// 所属二级单位:二级单位组织机构编码OID
         /// </summary>
-        [SugarColumn(Length = 20, ColumnName = "SecondUnit")]
+        [SugarColumn(Length = 20, ColumnName = "UnitSec")]
         public string Z2NDORG { get; set; }
         /// <summary>
         /// 状态：数据是否有效的标识:有效：1无效：0
@@ -242,17 +242,17 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// <summary>
         /// 停用原因 1完工停用2错误停用
         /// </summary>
-        [SugarColumn(Length = 1, ColumnName = "ReasonForDiscontinuation")]
+        [SugarColumn(Length = 1, ColumnName = "ReasonForDeactivate")]
         public string? ZSTOPREASON { get; set; }
         /// <summary>
         /// 计税方式
         /// </summary>
-        [SugarColumn(Length = 1, ColumnName = "")]
+        [SugarColumn(Length = 1, ColumnName = "TaxMethod")]
         public string ZTAXMETHOD { get; set; }
         /// <summary>
         /// 项目组织形式
         /// </summary>
-        [SugarColumn(Length = 4, ColumnName = "TaxationMethod")]
+        [SugarColumn(Length = 4, ColumnName = "OrgMethod")]
         public string? ZPOS { get; set; }
         /// <summary>
         /// 中标主体
@@ -262,32 +262,32 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// <summary>
         /// 并表情况
         /// </summary>
-        [SugarColumn(Length = 2, ColumnName = "ConsolidatedSituation")]
+        [SugarColumn(Length = 2, ColumnName = "ConsolidatedTable")]
         public string? ZCS { get; set; }
         /// <summary>
         /// 所属事业部
         /// </summary>
-        [SugarColumn(Length = 2, ColumnName = "BusinessUnit")]
+        [SugarColumn(Length = 2, ColumnName = "BDep")]
         public string? ZBIZDEPT { get; set; }
         /// <summary>
         /// 项目管理方式:该项目适用的管理方式
         /// </summary>
-        [SugarColumn(Length = 2, ColumnName = "ProjectManagementApproach")]
+        [SugarColumn(Length = 2, ColumnName = "Management")]
         public string ZMANAGE_MODE { get; set; }
         /// <summary>
         /// 参与二级单位：该项目参与的其他二级单位，支持多值
         /// </summary>
-        [SugarColumn(Length = 500, ColumnName = "ParticipateInSecondUnits")]
+        [SugarColumn(Length = 500, ColumnName = "ParticipateInUnitSecs")]
         public string? ZCY2NDORG { get; set; }
         /// <summary>
         /// 是否联合体项目：是否联合体：1是，2否
         /// </summary>
-        [SugarColumn(Length = 1, ColumnName = "IsConsortiumProject")]
+        [SugarColumn(Length = 1, ColumnName = "IsJoint")]
         public string ZWINNINGC { get; set; }
         /// <summary>
         /// 中标交底项目编号：传入多值时用逗号给开
         /// </summary>
-        [SugarColumn(ColumnDataType = "text", ColumnName = "BidDisclosureProjectNumber")]
+        [SugarColumn(ColumnDataType = "text", ColumnName = "BidDisclosureNo")]
         public string ZAWARDP { get; set; }
         /// <summary>
         /// 创建时间：格式：YYYYMMDDHHMMSS

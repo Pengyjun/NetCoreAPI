@@ -17,12 +17,12 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// <summary>
         /// 中交区域中心代码:中交区域中心编码
         /// </summary>
-        [SugarColumn(Length = 6, ColumnName = "CCCCRegionalCenterCode")]
+        [SugarColumn(Length = 6, ColumnName = "Code")]
         public string ZCRCCODE { get; set; }
         /// <summary>
         /// 中交区域中心描述:编码描述
         /// </summary>
-        [SugarColumn(Length = 100, ColumnName = "DescriptionOfCCCCRegionalCenter")]
+        [SugarColumn(Length = 100, ColumnName = "Description")]
         public string ZCRCNAME { get; set; }
         /// <summary>
         /// 版本
@@ -37,7 +37,7 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// <summary>
         /// 是否删除 数据是否有效的标识:有效：1无效：0
         /// </summary>
-        [SugarColumn(Length = 1, ColumnName = "IsDeleteValidIdentifier")]
+        [SugarColumn(Length = 1, ColumnName = "DataIdentifier")]
         public string ZDELETE { get; set; }
         /// <summary>
         /// 多语言描述表类型

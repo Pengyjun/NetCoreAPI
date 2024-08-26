@@ -32,27 +32,27 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// <summary>
         /// 所属业务部门
         /// </summary>
-        [SugarColumn(Length = 200, ColumnName = "BusinessUnit")]
+        [SugarColumn(Length = 200, ColumnName = "BUnit")]
         public string ZNDEPART { get; set; }
         /// <summary>
         /// 业务对接人
         /// </summary>
-        [SugarColumn(Length = 200, ColumnName = "BusinessLiaisonPerson")]
+        [SugarColumn(Length = 200, ColumnName = "BLiaisonPerson")]
         public string ZLKPERSON { get; set; }
         /// <summary>
         /// 项目经理
         /// </summary>
-        [SugarColumn(Length = 200, ColumnName = "ProjectManager")]
+        [SugarColumn(Length = 200, ColumnName = "PjectManager")]
         public string ZPMANAGER { get; set; }
         /// <summary>
         /// 数字化管理部门
         /// </summary>
-        [SugarColumn(Length = 200, ColumnName = "DigitalManagementDepartment")]
+        [SugarColumn(Length = 200, ColumnName = "DigitalManagementDep")]
         public string ZIADMDEPART { get; set; }
         /// <summary>
         /// 管理部门负责人
         /// </summary>
-        [SugarColumn(Length = 200, ColumnName = "HeadOfManagementDepartment")]
+        [SugarColumn(Length = 200, ColumnName = "HeadOfManagementDept")]
         public string ZIDEPERSON { get; set; }
         /// <summary>
         /// 系统概述

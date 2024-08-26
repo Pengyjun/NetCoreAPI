@@ -32,12 +32,12 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// <summary>
         /// 国标三字符代码
         /// </summary>
-        [SugarColumn(Length = 3, ColumnName = "NationalStandardThreeCharacterCode")]
+        [SugarColumn(Length = 3, ColumnName = "NationalCode")]
         public string? ZGBCHAR { get; set; }
         /// <summary>
         /// 国标数字代码
         /// </summary>
-        [SugarColumn(Length = 3, ColumnName = "NationalStandardNumericalCode")]
+        [SugarColumn(Length = 3, ColumnName = "DigitCode")]
         public string? ZGBNUM { get; set; }
         /// <summary>
         /// 大洲代码
@@ -47,7 +47,7 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// <summary>
         /// 中交区域中心代码
         /// </summary>
-        [SugarColumn(Length = 6, ColumnName = "CCCCRegionalCenterCode")]
+        [SugarColumn(Length = 6, ColumnName = "CCCCCenterCode")]
         public string? ZCRCCODE { get; set; }
         /// <summary>
         /// 版本号:数据的版本号。数据每次变更时，版本号自动加1。
@@ -62,22 +62,22 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// <summary>
         /// 是否删除数据是否有效的标识:    有效：1无效：0
         /// </summary>
-        [SugarColumn(Length = 1, ColumnName = "IsDeleteValidIdentifier")]
+        [SugarColumn(Length = 1, ColumnName = "DataIdentifier")]
         public string ZDELETE { get; set; }
         /// <summary>
         /// 一带一路(国资委):0-否，1-是
         /// </summary>
-        [SugarColumn(Length = 1, ColumnName = "TheBeltAndRoadInitiativeGZW")]
+        [SugarColumn(Length = 1, ColumnName = "RoadGuoZiW")]
         public string ZBRGZW { get; set; }
         /// <summary>
         /// 一带一路(海外):0-否，1-是
         /// </summary>
-        [SugarColumn(Length = 1, ColumnName = "TheBeltAndRoadInitiativeHW")]
+        [SugarColumn(Length = 1, ColumnName = "RoadHaiW")]
         public string ZBRHW { get; set; }
         /// <summary>
         /// 一带一路(共建):0-否，1-是
         /// </summary>
-        [SugarColumn(Length = 1, ColumnName = "TheBeltAndRoadInitiativeGJ")]
+        [SugarColumn(Length = 1, ColumnName = "RoadGongJ")]
         public string ZBRGJ { get; set; }
         /// <summary>
         /// 区域代码

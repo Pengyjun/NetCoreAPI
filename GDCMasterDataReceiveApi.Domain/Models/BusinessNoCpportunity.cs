@@ -17,27 +17,27 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// <summary>
         /// 商机项目主数据编码:新增项目由主数据系统生成并返回主数据编码，修改时必填
         /// </summary>
-        [SugarColumn(Length = 8, ColumnName = "BusinessOpportunityProjectMDCode")]
+        [SugarColumn(Length = 8, ColumnName = "BPjectMDCode")]
         public string ZBOP { get; set; }
         /// <summary>
         /// 商机项目名称:商机项目的中文名称，该字段作为境内和港澳台商机项目的唯一标识
         /// </summary>
-        [SugarColumn(Length = 200, ColumnName = "BusinessOpportunityProjectName")]
+        [SugarColumn(Length = 200, ColumnName = "BPjecttName")]
         public string ZBOPN { get; set; }
         /// <summary>
         /// 商机项目外文名称:商机项目当地官方语言名称，该字段作为境外（不包括港澳台）商机项目的唯一标识
         /// </summary>
-        [SugarColumn(Length = 500, ColumnName = "ForeignNameOfBusinessOpportunityProject")]
+        [SugarColumn(Length = 500, ColumnName = "BPjectForeignName")]
         public string ZBOPN_EN { get; set; }
         /// <summary>
         /// 项目类型:按照字典表进行选择
         /// </summary>
-        [SugarColumn(Length = 6, ColumnName = "ProjectType")]
+        [SugarColumn(Length = 6, ColumnName = "PjectType")]
         public string ZPROJTYPE { get; set; }
         /// <summary>
         /// 中交项目业务分类:按照字典表进行选择，涉及多个业务分类的商机项目，其属性应优先归入合同额占比最大的业务分类，若合同额占比相同，应归入实施难度最大的业务分类
         /// </summary>
-        [SugarColumn(Length = 5, ColumnName = "BusinessClassificationOfCCCCProjects")]
+        [SugarColumn(Length = 5, ColumnName = "BTypeOfCCCCProjects")]
         public string ZCPBC { get; set; }
         /// <summary>
         /// 国家/地区:商机项目所在的国家/地区
@@ -47,7 +47,7 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// <summary>
         /// 项目所在地:参照项目主数据标准要求填写，明确到市级地点，境内项目必填
         /// </summary>
-        [SugarColumn(Length = 6, ColumnName = "ProjectLocation")]
+        [SugarColumn(Length = 6, ColumnName = "PjectLocation")]
         public string ZPROJLOC { get; set; }
         /// <summary>
         /// 开始跟踪日期:填写首次跟踪的日期
@@ -62,7 +62,7 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// <summary>
         /// 所属二级单位
         /// </summary>
-        [SugarColumn(Length = 20, ColumnName = "SecondUnit")]
+        [SugarColumn(Length = 20, ColumnName = "UnitSec")]
         public string Z2NDORG { get; set; }
         /// <summary>
         /// 状态: 数据是否有效的标识: 有效：1无效：0

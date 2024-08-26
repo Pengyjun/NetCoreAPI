@@ -17,32 +17,32 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// <summary>
         /// 分类编码: 分类的唯一性编码
         /// </summary>
-        [SugarColumn(Length = 11, ColumnName = "ClassificationCode")]
+        [SugarColumn(Length = 11, ColumnName = "Code")]
         public string ZCLASS { get; set; }
         /// <summary>
         /// 分类层级: 该分类名称对应的层级。分为1至4级。
         /// </summary>
-        [SugarColumn(Length = 1, ColumnName = "ClassificationLevel")]
+        [SugarColumn(Length = 1, ColumnName = "Level")]
         public string ZCLEVEL { get; set; }
         /// <summary>
         /// 分类名称: 分类的唯一性编码
         /// </summary>
-        [SugarColumn(Length = 100, ColumnName = "ClassificationName")]
+        [SugarColumn(Length = 100, ColumnName = "nName")]
         public string ZCNAME { get; set; }
         /// <summary>
         /// 分类别名:
         /// </summary>
-        [SugarColumn(Length = 100, ColumnName = "CategoryAlias")]
+        [SugarColumn(Length = 100, ColumnName = "AliasName")]
         public string? ZCALIAS { get; set; }
         /// <summary>
         /// 分类说明
         /// </summary>
-        [SugarColumn(Length = 1000, ColumnName = "ClassificationDescription")]
+        [SugarColumn(Length = 1000, ColumnName = "Description")]
         public string? ZCDESC { get; set; }
         /// <summary>
         /// 上级分类编码: 该分类的上级分类的编码，体现分类的层级结构。
         /// </summary>
-        [SugarColumn(Length = 11, ColumnName = "SupClassificationCode")]
+        [SugarColumn(Length = 11, ColumnName = "SupCode")]
         public string? ZCLASSUP { get; set; }
         /// <summary>
         /// 计量单位: 物资设备分类的计量单位代码。
@@ -57,7 +57,7 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// <summary>
         /// 是否删除：该分类是否被标记删除，通过上游失效时间进行判断
         /// </summary>
-        [SugarColumn(Length = 1, ColumnName = "IsDeleteValidIdentifier")]
+        [SugarColumn(Length = 1, ColumnName = "DataIdentifier")]
         public string? ZDELETE { get; set; }
         /// <summary>
         /// 排序规则: 系统排序规则用于前台数据排序使用

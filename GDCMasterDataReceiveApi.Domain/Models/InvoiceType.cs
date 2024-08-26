@@ -17,12 +17,12 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// <summary>
         /// 发票类型代码
         /// </summary>
-        [SugarColumn(Length = 12, ColumnName = "InvoiceTypeCode")]
+        [SugarColumn(Length = 12, ColumnName = "Code")]
         public string ZINVTCODE {  get; set; }
         /// <summary>
         /// 发票类型名称
         /// </summary>
-        [SugarColumn(Length = 50, ColumnName = "InvoiceTypeName")]
+        [SugarColumn(Length = 50, ColumnName = "Name")]
         public string ZINVTNAME {  get; set; }
         /// <summary>
         /// 版本：数据的版本号。数据每次变更时，版本号自动加1。
@@ -37,7 +37,7 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// <summary>
         /// 是否删除 数据是否有效的标识:有效：1无效：0
         /// </summary>
-        [SugarColumn(Length = 1, ColumnName = "IsDeleteValidIdentifier")]
+        [SugarColumn(Length = 1, ColumnName = "DataIdentifier")]
         public string ZDELETE { get; set; }
         /// <summary>
         /// 多语言描述表类型
