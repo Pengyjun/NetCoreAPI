@@ -10,6 +10,17 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.IService.ISearchService
     [DependencyInjection]
     public interface ISearchService
     {
+        /// <summary>
+        /// 楼栋列表
+        /// </summary>
+        /// <param name="louDongDto"></param>
+        /// <returns></returns>
         Task<ResponseAjaxResult<List<LouDongDto>>> GetSearchLouDongAsync(LouDongRequestDto louDongDto);
+        /// <summary>
+        /// 增改楼栋
+        /// </summary>
+        /// <param name="receiveDtos"></param>
+        /// <returns></returns>
+        Task<ResponseAjaxResult<bool>> AddOrModifyLouDongAsync(List<LouDongReceiveDto> receiveDtos);
     }
 }

@@ -3,6 +3,14 @@
     /// <summary>
     /// 可查看字段dto
     /// </summary>
+    public class DataAuthorityRequestDto : BaseRequestDto
+    {
+
+    }
+
+    /// <summary>
+    /// 可查看字段dto
+    /// </summary>
     public class DataAuthorityDto
     {
         /// <summary>

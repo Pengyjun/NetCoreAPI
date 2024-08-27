@@ -23,12 +23,20 @@ namespace GDCMasterDataReceiveApi.Controller
             this._searchService = searchService;
         }
         /// <summary>
-        /// 冬天查询
+        /// 楼栋列表
         /// </summary>
         /// <param name="louDongDto"></param>
         /// <returns></returns>
         [HttpPost("aa")]
         [AllowAnonymous]
         public async Task<ResponseAjaxResult<List<LouDongDto>>> GetSearchLouDongAsync([FromBody] LouDongRequestDto louDongDto) => await _searchService.GetSearchLouDongAsync(louDongDto);
+        /// <summary>
+        /// 增改楼栋
+        /// </summary>
+        /// <param name="receiveDtos"></param>
+        /// <returns></returns>
+        [HttpPost("bb")]
+        [AllowAnonymous]
+        public async Task<ResponseAjaxResult<bool>> AddOrModifyLouDongAsync([FromBody] List<LouDongReceiveDto> receiveDtos) => await _searchService.AddOrModifyLouDongAsync(receiveDtos);
     }
 }
