@@ -22,7 +22,7 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// <summary>
         /// 系统名称
         /// </summary>
-        [SugarColumn(Length = 200, ColumnName = "SystemName")]
+        [SugarColumn(Length = 200, ColumnName = "Name")]
         public string ZSYSNAME { get; set; }
         /// <summary>
         /// 所属单位

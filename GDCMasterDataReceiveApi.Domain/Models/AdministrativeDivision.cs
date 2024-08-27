@@ -22,7 +22,7 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// <summary>
         /// 行政区划名称
         /// </summary>
-        [SugarColumn(Length = 50, ColumnName = "RegionalismName")]
+        [SugarColumn(Length = 50, ColumnName = "Name")]
         public string ZADDVSNAME { get; set; }
         /// <summary>
         /// 上级行政区划代码:第1级行政区划无上级代码。

@@ -27,7 +27,7 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// <summary>
         /// 中交业务分类一级分类名称 
         /// </summary>
-        [SugarColumn(Length = 200, ColumnName = "CCCCBTypeOneName")]
+        [SugarColumn(Length = 200, ColumnName = "Name")]
         public string? ZCPBC1NAME { get; set; }
         /// <summary>
         /// 中交业务分类二级分类代码

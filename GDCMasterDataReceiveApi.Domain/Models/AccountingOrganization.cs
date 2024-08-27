@@ -22,7 +22,7 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// <summary>
         /// 机构名称（中文）:机构的规范全称
         /// </summary>
-        [SugarColumn(Length = 200, ColumnName = "OrgName")]
+        [SugarColumn(Length = 200, ColumnName = "Name")]
         public string ZZTNAME_ZH {  get; set; }
         /// <summary>
         /// 机构简称（中文）:机构的规范简称

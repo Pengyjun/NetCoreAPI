@@ -37,7 +37,7 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// <summary>
         /// 名称（中文）:往来单位中文名称，境内单位必填
         /// </summary>
-        [SugarColumn(Length = 300, ColumnName = "NameChinese")]
+        [SugarColumn(Length = 300, ColumnName = "Name")]
         public string? ZBPNAME_ZH { get; set; }
         /// <summary>
         /// 名称（英文）:往来单位英文名称，境外单位必填，

@@ -22,7 +22,7 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// <summary>
         /// 中文名称
         /// </summary>
-        [SugarColumn(Length = 50, ColumnName = "NameChinese")]
+        [SugarColumn(Length = 50, ColumnName = "Name")]
         public string ZCOUNTRYNAME { get; set; }
         /// <summary>
         /// 英文名称

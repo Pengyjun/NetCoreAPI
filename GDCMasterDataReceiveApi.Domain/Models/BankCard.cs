@@ -27,7 +27,7 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// <summary>
         /// 账户名称：填报银行账户的全称
         /// </summary>
-        [SugarColumn(Length = 200, ColumnName = "NameOfAccount")]
+        [SugarColumn(Length = 200, ColumnName = "Name")]
         public string ZKOINH { get; set; }
         /// <summary>
         /// 银行账号/IBAN：填报银行账号/IBAN，该字段作为银行账户的唯一标识

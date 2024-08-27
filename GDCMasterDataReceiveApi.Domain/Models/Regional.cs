@@ -27,7 +27,7 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// <summary>
         /// 简称:编码描述简称
         /// </summary>
-        [SugarColumn(Length = 100, ColumnName = "ShortName")]
+        [SugarColumn(Length = 100, ColumnName = "Name")]
         public string ZCRHABBR { get; set; }
         /// <summary>
         /// 区域范围:中交区域中心管辖范围

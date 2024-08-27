@@ -37,7 +37,7 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// <summary>
         /// 核算部门中文简体名称
         /// </summary>
-        [SugarColumn(Length = 100, ColumnName = "AccDepShortName")]
+        [SugarColumn(Length = 100, ColumnName = "Name")]
         public string ZDNAME_CHS { get; set; }
         /// <summary>
         /// 核算部门中文繁体名称

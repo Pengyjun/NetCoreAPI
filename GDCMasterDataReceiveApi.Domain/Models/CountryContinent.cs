@@ -22,7 +22,7 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// <summary>
         /// 大洲名称：大洲名称
         /// </summary>
-        [SugarColumn(Length = 12, ColumnName = "ContinentName")]
+        [SugarColumn(Length = 12, ColumnName = "Name")]
         public string ZCONTINENTNAME { get; set; }
         /// <summary>
         /// 区域代码：大洲所属区域代码

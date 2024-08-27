@@ -22,7 +22,7 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// <summary>
         /// 商机项目名称:商机项目的中文名称，该字段作为境内和港澳台商机项目的唯一标识
         /// </summary>
-        [SugarColumn(Length = 200, ColumnName = "BPjecttName")]
+        [SugarColumn(Length = 200, ColumnName = "Name")]
         public string ZBOPN { get; set; }
         /// <summary>
         /// 商机项目外文名称:商机项目当地官方语言名称，该字段作为境外（不包括港澳台）商机项目的唯一标识

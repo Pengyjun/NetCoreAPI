@@ -72,7 +72,7 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// <summary>
         /// 名称（中文:Z0名称（中文）
         /// </summary>
-        [SugarColumn(Length = 100, ColumnName = "NameChinese")]
+        [SugarColumn(Length = 100, ColumnName = "Name")]
         public string? NAME { get; set; }
         /// <summary>
         /// 简称（中文:Z0简称（中文）

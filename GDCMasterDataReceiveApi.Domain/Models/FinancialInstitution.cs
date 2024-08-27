@@ -32,7 +32,7 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// <summary>
         /// 总行名称:开户行总行的名称，若金融机构类型为“银行业存款类金融机构”则该字段为必填项
         /// </summary>
-        [SugarColumn(Length = 200, ColumnName = "BankName")]
+        [SugarColumn(Length = 200, ColumnName = "Name")]
         public string? ZBANKNAME { get; set; }
         /// <summary>
         /// 国家/地区:该金融机构所在的国家/地区
