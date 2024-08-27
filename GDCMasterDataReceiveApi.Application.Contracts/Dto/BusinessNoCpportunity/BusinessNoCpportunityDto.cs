@@ -6,10 +6,6 @@
     public class BusinessNoCpportunityDto
     {
         /// <summary>
-        /// 发送记录ID 发送记录的ID，必须保证此ID在同一个发送批次中是唯一的。用于记录发送方对于此发送记录的唯一标识。
-        /// </summary>
-        public string ZZSERIAL { get; set; }
-        /// <summary>
         /// 商机项目主数据编码:新增项目由主数据系统生成并返回主数据编码，修改时必填
         /// </summary>
         public string BPjectMDCode { get; set; }

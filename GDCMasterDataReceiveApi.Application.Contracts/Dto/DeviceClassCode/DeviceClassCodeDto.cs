@@ -8,10 +8,6 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.DeviceClassCode
     public class DeviceClassCodeDto
     {
         /// <summary>
-        /// 发送记录ID 发送记录的ID，必须保证此ID在同一个发送批次中是唯一的。用于记录发送方对于此发送记录的唯一标识。
-        /// </summary>
-        public string ZZSERIAL { get; set; }
-        /// <summary>
         /// 分类编码: 分类的唯一性编码
         /// </summary>
         public string Code { get; set; }
@@ -51,14 +47,6 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.DeviceClassCode
         /// 排序规则: 系统排序规则用于前台数据排序使用
         /// </summary>
         public string? SortRule { get; set; }
-        /// <summary>
-        /// 物资设备分类的属性列表
-        /// </summary>
-        public List<ZMDGS_PROPERTY>? ZPROPERTY_LIST { get; set; }
-        /// <summary>
-        /// 物资设备分类属性值列表
-        /// </summary>
-        public List<ZMDGS_VALUE>? ZVALUE_LIST { get; set; }
     }
     /// <summary>
     /// 物资设备分类编码 接收

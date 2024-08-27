@@ -8,10 +8,6 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.CountryRegion
     public class CountryRegionDto
     {
         /// <summary>
-        /// 发送记录ID 发送记录的ID，必须保证此ID在同一个发送批次中是唯一的。用于记录发送方对于此发送记录的唯一标识。
-        /// </summary>
-        public string ZZSERIAL { get; set; }
-        /// <summary>
         /// 国家地区代码
         /// </summary>
         public string Country { get; set; }
@@ -67,10 +63,6 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.CountryRegion
         /// 区域代码
         /// </summary>
         public string AreaCode { get; set; }
-        /// <summary>
-        /// 多语言描述表类型
-        /// </summary>
-        public List<ZMDGTT_ZLANG>? ZLANG_LIST { get; set; }
     }
     /// <summary>
     /// 国家地区 接收

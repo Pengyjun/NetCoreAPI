@@ -19,7 +19,7 @@ namespace GDCMasterDataReceiveApi.Application.Contracts
         /// <param name="depId"></param>
         /// <param name="pjectId"></param>
         /// <returns></returns>
-        Task<DataAuthorityDto> GetDataAuthorityAsync(long uId, string rId, long instutionId, long? depId, long? pjectId);
+        Task<ResponseAjaxResult<DataAuthorityDto>> GetDataAuthorityAsync(long? uId, string rId, long instutionId, long? depId, long? pjectId);
         /// <summary>
         /// 新增或修改可授权字段（列表选择字段点击确认后使用）
         /// </summary>
@@ -29,8 +29,8 @@ namespace GDCMasterDataReceiveApi.Application.Contracts
         /// <param name="rId">当前操作人角色id</param>
         /// <param name="instutionId">当前操作人机构id 不可为空</param>
         /// <param name="depId">当前操作人项目部id</param>
-        /// <param name="pjectId">当前操作人项目id</param>
+        /// <param name="pjectId">自己属于的项目id</param>
         /// <returns></returns>
-        Task<ResponseAjaxResult<bool>> InsertOrModifyDataAuthoryAsync(long id, string? colums, long uId, string rId, long instutionId, long? depId, long? pjectId);
+        Task<ResponseAjaxResult<bool>> AddOrModifyDataAuthoryAsync(long id, string? colums, long uId, string rId, long instutionId, long? depId, long? pjectId);
     }
 }

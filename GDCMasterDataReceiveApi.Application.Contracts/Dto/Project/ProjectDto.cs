@@ -8,10 +8,6 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.Project
     public class ProjectDto
     {
         /// <summary>
-        /// 发送记录ID 发送记录的ID，必须保证此ID在同一个发送批次中是唯一的。用于记录发送方对于此发送记录的唯一标识。
-        /// </summary>
-        public string ZZSERIAL { get; set; }
-        /// <summary>
         /// 项目主数据编码
         /// </summary>
         public string MDCode { get; set; }
@@ -235,10 +231,6 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.Project
         /// 创建时间：格式：YYYYMMDDHHMMSS
         /// </summary>
         public string CreateDate { get; set; }
-        /// <summary>
-        /// 曾用名列表
-        /// </summary>
-        public List<ZMDGS_OLDNAME>? ZOLDNAME_LIST { get; set; }
     }
     /// <summary>
     /// 项目 接收

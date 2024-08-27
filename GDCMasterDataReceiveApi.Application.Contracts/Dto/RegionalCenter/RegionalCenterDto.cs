@@ -8,10 +8,6 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.RegionalCenter
     public class RegionalCenterDto
     {
         /// <summary>
-        /// 发送记录ID 发送记录的ID，必须保证此ID在同一个发送批次中是唯一的。用于记录发送方对于此发送记录的唯一标识。
-        /// </summary>
-        public string ZZSERIAL { get; set; }
-        /// <summary>
         /// 中交区域中心代码:中交区域中心编码
         /// </summary>
         public string Code { get; set; }
@@ -31,10 +27,6 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.RegionalCenter
         /// 是否删除 数据是否有效的标识:有效：1无效：0
         /// </summary>
         public string DataIdentifier { get; set; }
-        /// <summary>
-        /// 多语言描述表类型
-        /// </summary>
-        public List<ZMDGS_ZLANG4>? ZMDGTT_ZLANG { get; set; }
     }
     /// <summary>
     /// 中交区域中心 接收

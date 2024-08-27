@@ -31,9 +31,12 @@ namespace GDCMasterDataReceiveApi.Application
         /// <param name="depId">部门id</param>
         /// <param name="pjectId">项目id</param>
         /// <returns></returns>
-        public async Task<DataAuthorityDto> GetDataAuthorityAsync(long uId, string rId, long instutionId, long? depId, long? pjectId)
+        public async Task<ResponseAjaxResult<DataAuthorityDto>> GetDataAuthorityAsync(long? uId, string rId, long instutionId, long? depId, long? pjectId)
         {
+            var responseAjaxResult = new ResponseAjaxResult<DataAuthorityDto>();
+
             var value = await _dbContext.Queryable<DataAuthority>()
+                .WhereIF(!string.IsNullOrWhiteSpace(uId.ToString()), t => t.UId == uId)
                 .WhereIF(!string.IsNullOrWhiteSpace(depId.ToString()), t => t.DepId == depId)
                 .WhereIF(!string.IsNullOrWhiteSpace(pjectId.ToString()), t => t.PjectId == pjectId)
                 .Where(t => t.UId == uId && t.InstutionId == instutionId && t.RId == rId && t.IsDelete == 1)
@@ -43,8 +46,11 @@ namespace GDCMasterDataReceiveApi.Application
              * 查询已授权的可查看的字段
              */
             if (value != null && !string.IsNullOrWhiteSpace(value.AuthorityColumns))
-                return new DataAuthorityDto { Id = value.Id, AuthorityColumns = value.AuthorityColumns.Split(',').ToList() };
-            else return new DataAuthorityDto();
+            {
+                responseAjaxResult.SuccessResult(new DataAuthorityDto { Id = value.Id, AuthorityColumns = value.AuthorityColumns.Split(',').ToList() });
+                return responseAjaxResult;
+            }
+            else return responseAjaxResult.SuccessResult(new DataAuthorityDto { });
         }
         /// <summary>
         /// 新增或修改可授权字段（列表选择字段点击确认后使用）
@@ -55,9 +61,9 @@ namespace GDCMasterDataReceiveApi.Application
         /// <param name="rId">当前操作人角色id</param>
         /// <param name="instutionId">当前操作人机构id 不可为空</param>
         /// <param name="depId">当前操作人项目部id</param>
-        /// <param name="pjectId">当前操作人项目id</param>
+        /// <param name="pjectId">自己属于的项目id</param>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<bool>> InsertOrModifyDataAuthoryAsync(long id, string? colums, long uId, string rId, long instutionId, long? depId, long? pjectId)
+        public async Task<ResponseAjaxResult<bool>> AddOrModifyDataAuthoryAsync(long id, string? colums, long uId, string rId, long instutionId, long? depId, long? pjectId)
         {
             var responseAjaxResult = new ResponseAjaxResult<bool>();
             if (string.IsNullOrEmpty(colums)) { responseAjaxResult.FailResult(HttpStatusCode.SaveFail, "没有选择展示的列名"); return responseAjaxResult; }

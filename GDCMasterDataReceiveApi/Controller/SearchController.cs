@@ -27,7 +27,7 @@ namespace GDCMasterDataReceiveApi.Controller
         /// </summary>
         /// <param name="louDongDto"></param>
         /// <returns></returns>
-        [HttpPost("aa")]
+        [HttpPost("GetSearchLouDong")]
         [AllowAnonymous]
         public async Task<ResponseAjaxResult<List<LouDongDto>>> GetSearchLouDongAsync([FromBody] LouDongRequestDto louDongDto) => await _searchService.GetSearchLouDongAsync(louDongDto);
         /// <summary>
@@ -35,7 +35,7 @@ namespace GDCMasterDataReceiveApi.Controller
         /// </summary>
         /// <param name="receiveDtos"></param>
         /// <returns></returns>
-        [HttpPost("bb")]
+        [HttpPost("AddOrModifyLouDong")]
         [AllowAnonymous]
         public async Task<ResponseAjaxResult<bool>> AddOrModifyLouDongAsync([FromBody] List<LouDongReceiveDto> receiveDtos) => await _searchService.AddOrModifyLouDongAsync(receiveDtos);
     }
