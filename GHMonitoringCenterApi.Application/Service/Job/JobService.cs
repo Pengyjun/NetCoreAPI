@@ -1,17 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.DirectoryServices.ActiveDirectory;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Runtime.CompilerServices;
-using System.Security.Cryptography;
-using System.Text;
-using System.Threading.Tasks;
-using AutoMapper;
+﻿using AutoMapper;
 using CDC.MDM.Core.Common.Util;
-using Dm;
-using GHMonitoringCenterApi.Application.Contracts.Dto;
-using GHMonitoringCenterApi.Application.Contracts.Dto.ApprovalUser;
 using GHMonitoringCenterApi.Application.Contracts.Dto.Enums;
 using GHMonitoringCenterApi.Application.Contracts.Dto.Job;
 using GHMonitoringCenterApi.Application.Contracts.Dto.Project;
@@ -19,7 +7,6 @@ using GHMonitoringCenterApi.Application.Contracts.Dto.Project.Report;
 using GHMonitoringCenterApi.Application.Contracts.IService;
 using GHMonitoringCenterApi.Application.Contracts.IService.Job;
 using GHMonitoringCenterApi.Application.Contracts.IService.Project;
-using GHMonitoringCenterApi.Application.Service.Projects;
 using GHMonitoringCenterApi.Domain.Enums;
 using GHMonitoringCenterApi.Domain.IRepository;
 using GHMonitoringCenterApi.Domain.Models;
@@ -27,13 +14,13 @@ using GHMonitoringCenterApi.Domain.Shared;
 using GHMonitoringCenterApi.Domain.Shared.Const;
 using GHMonitoringCenterApi.Domain.Shared.Enums;
 using GHMonitoringCenterApi.Domain.Shared.Util;
-using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
-using NPOI.POIFS.Crypt.Dsig;
-using Org.BouncyCastle.Bcpg;
-using SixLabors.ImageSharp.Formats.Jpeg;
+using Newtonsoft.Json.Linq;
 using SqlSugar;
 using SqlSugar.Extensions;
+using System.Linq.Expressions;
+using System.Text.Json;
+using System.Text.Json.Nodes;
 using UtilsSharp;
 
 namespace GHMonitoringCenterApi.Application.Service.Job
@@ -143,6 +130,7 @@ namespace GHMonitoringCenterApi.Application.Service.Job
         /// </summary>
 
         private readonly IBaseService _baseService;
+        private readonly ISqlSugarClient _dbContext;
         /// <summary>
         /// 当前登录用户
         /// </summary>
@@ -172,6 +160,7 @@ namespace GHMonitoringCenterApi.Application.Service.Job
             , IBaseService baseService
             , IMapper mapper
             , GlobalObject globalObject
+            , ISqlSugarClient dbContext
             )
         {
             _baseService = baseService;
@@ -194,6 +183,7 @@ namespace GHMonitoringCenterApi.Application.Service.Job
             _projectReportService = projectReportService;
             _mapper = mapper;
             _globalObject = globalObject;
+            _dbContext = dbContext;
         }
         #region 提交任务
 
@@ -205,12 +195,12 @@ namespace GHMonitoringCenterApi.Application.Service.Job
         {
             model.ResetModelProperty();
             var result = new ResponseAjaxResult<bool>();
-            if(!VerifySubmitModel(model,out string msg))
+            if (!VerifySubmitModel(model, out string msg))
             {
                 return result.FailResult(HttpStatusCode.VerifyFail, msg);
             }
             Domain.Models.Job? job;
-           
+
             // 新增任务
             if (model.SubmitType == JobSubmitType.AddJob)
             {
@@ -219,7 +209,7 @@ namespace GHMonitoringCenterApi.Application.Service.Job
                     Id = GuidUtil.Next(),
                     CreateId = _currentUser.Id,
                     CreateTime = DateTime.Now,
-                    SubmitTime=DateTime.Now,
+                    SubmitTime = DateTime.Now,
                     ProjectId = (Guid)model.ProjectId,
                     BizModule = model.BizModule,
                     BizData = model.GetJsonBizData(),
@@ -256,7 +246,7 @@ namespace GHMonitoringCenterApi.Application.Service.Job
                 {
                     return result.FailResult(HttpStatusCode.DataNotEXIST, ResponseMessage.DATA_NOTEXIST_JOB);
                 }
-                if (job.IsFinish||job.ApproveStatus ==JobApproveStatus.Pass)
+                if (job.IsFinish || job.ApproveStatus == JobApproveStatus.Pass)
                 {
                     return result.FailResult(HttpStatusCode.NotAllowChange, ResponseMessage.NOTALLOW_CHANGE_JOB);
                 }
@@ -546,7 +536,7 @@ namespace GHMonitoringCenterApi.Application.Service.Job
                   .WhereIF(model.JobStatus == JobStatus.Handled, (j, p) => j.IsFinish == true)
                   .WhereIF(model.JobStatus == JobStatus.UnHandle, (j, p) => j.IsFinish == false)
                   .WhereIF(!string.IsNullOrEmpty(model.ProjectName), (j, p) => SqlFunc.Contains(p.Name, model.ProjectName))
-                  .WhereIF(model.StartSubmitTime != null, (j,  p) => j.SubmitTime >= model.StartSubmitTime)
+                  .WhereIF(model.StartSubmitTime != null, (j, p) => j.SubmitTime >= model.StartSubmitTime)
                   .WhereIF(model.EndSubmitTime != null, (j, p) => j.SubmitTime < ((DateTime)model.EndSubmitTime).AddDays(1));
             if (model.JobStatus == JobStatus.Handled)
             {
@@ -742,7 +732,7 @@ namespace GHMonitoringCenterApi.Application.Service.Job
                 job.IsPassLevelApprove = false;
                 job.ApproveLevel = jobApprover.ApproveLevel;
             }
-            if (model.ApproveStatus== JobApproveStatus.Pass&& model is IJobBiz jobBiz)
+            if (model.ApproveStatus == JobApproveStatus.Pass && model is IJobBiz jobBiz)
             {
                 job.BizData = jobBiz.GetJsonBizData();
             }
@@ -804,7 +794,7 @@ namespace GHMonitoringCenterApi.Application.Service.Job
         /// <returns></returns>
         private async Task<ResponseAjaxResult<bool>> HandleBizAsync(Domain.Models.Job job)
         {
-             var  result = new ResponseAjaxResult<bool>();
+            var result = new ResponseAjaxResult<bool>();
             if (job.BizModule == BizModule.ProjectWBS)
             {
                 if (!job.IsFinish)
@@ -847,11 +837,11 @@ namespace GHMonitoringCenterApi.Application.Service.Job
         /// 强制转换
         /// </summary>
         /// <exception cref="Exception">强制转换异常</exception>
-        private T CastDeserializeObject<T>( string? bizData) where T:class 
+        private T CastDeserializeObject<T>(string? bizData) where T : class
         {
-            if(string.IsNullOrWhiteSpace(bizData))
+            if (string.IsNullOrWhiteSpace(bizData))
             {
-                throw new  Exception ("bizData不能为空");
+                throw new Exception("bizData不能为空");
             }
             var model = JsonConvert.DeserializeObject<T>(bizData);
             if (model == null)
@@ -979,7 +969,7 @@ namespace GHMonitoringCenterApi.Application.Service.Job
                 resJob.ProjectTypeName = projectTypes.FirstOrDefault(t => t.PomId == resJob.ProjectTypeId)?.Name;
                 resJob.ProjectCompanyName = companys.FirstOrDefault(t => t.PomId == resJob.ProjectCompanyId)?.Name;
                 resJob.ProjectCurrencyName = currencys.FirstOrDefault(t => t.PomId == resJob.ProjectCurrencyId)?.Zcurrencyname;
-                resJob.ApproveStatusText = GetApproveStatusText(resJob.IsFinish,resJob.ApproveLevel,resJob.ApproveStatus);
+                resJob.ApproveStatusText = GetApproveStatusText(resJob.IsFinish, resJob.ApproveLevel, resJob.ApproveStatus);
             }
             return result.SuccessResult(resJobList, total);
         }
@@ -1061,8 +1051,41 @@ namespace GHMonitoringCenterApi.Application.Service.Job
             {
                 return result.FailResult(HttpStatusCode.DataNotMatch, ResponseMessage.DATA_NOTMATCH_BIZ);
             }
+            //读取job中的月份 // 解析 JSON 字符串
+            JObject json = JObject.Parse(job.BizData);
+            int dateMonth = Convert.ToInt32(json["DateMonth"]);
+            //获取历史的
+            var historyData = await GetProjectProductionValue(job.ProjectId, dateMonth);
+            //获取全部数据
+            var data = await _dbContext.Queryable<MonthReport>().Where(x => x.IsDelete == 1 && x.ProjectId == job.ProjectId).Select(x => new { x.PartyAConfirmedProductionAmount, x.PartyAPayAmount, x.ProjectId, x.DateMonth }).ToListAsync();
+
+            //获取本年甲方确认产值
+            var startMonth = Convert.ToInt32(dateMonth.ToString().Substring(0, 4) + "0101");
+            var currentYearOffirmProductionValue = data.Where(x => x.DateMonth >= startMonth && x.DateMonth <= dateMonth).Sum(x => x.PartyAConfirmedProductionAmount) + historyData.Item1;
+
+            //获取本年甲方付款金额
+            var currenYearCollection = data.Where(x => x.DateMonth >= startMonth && x.DateMonth <= dateMonth).Sum(x => x.PartyAPayAmount) + historyData.Item3;
+
+            //获取开累甲方确认产值
+            var totalYearKaileaOffirmProductionValue = data.Where(x => x.DateMonth <= dateMonth).Sum(x => x.PartyAConfirmedProductionAmount) + historyData.Item2;
+
+            //获取开累甲方付款金额
+            var totalYearCollection = data.Where(x => x.DateMonth <= dateMonth).Sum(x => x.PartyAPayAmount) + historyData.Item4;
+
+            // 解析 JSON 字符串
+            JObject jsonObject = JObject.Parse(job.BizData);
+
+            // 添加新字段及其值
+            jsonObject["CurrentYearOffirmProductionValue"] = currentYearOffirmProductionValue;
+            jsonObject["currenYearCollection"] = currenYearCollection;
+            jsonObject["totalYearKaileaOffirmProductionValue"] = totalYearKaileaOffirmProductionValue;
+            jsonObject["totalYearCollection"] = totalYearCollection;
+
+            // 转换回 JSON 字符串
+            job.BizData = jsonObject.ToString();
+
             var bizResult = CastDeserializeObject<TBizResult>(job.BizData);
-            var jobBizRes = new JobBizResponseDto<TBizResult>() { ProjectId = job.ProjectId, JobId = job.Id, BizModule = job.BizModule, BizData= bizResult };
+            var jobBizRes = new JobBizResponseDto<TBizResult>() { ProjectId = job.ProjectId, JobId = job.Id, BizModule = job.BizModule, BizData = bizResult };
             //// 判断是否存在 下一级审批人
             //var nextApproveLevel = job.ApproveLevel + 2;
             //if (nextApproveLevel <= job.FinishApproveLevel)
@@ -1070,6 +1093,74 @@ namespace GHMonitoringCenterApi.Application.Service.Job
             //    jobBizRes.NextApprovers = (await GetResJobApproversAsync(job.Id, nextApproveLevel)).ToArray();
             //}
             return result.SuccessResult(jobBizRes);
+        }
+
+
+        /// <summary>
+        /// 第一个 本年甲方确认产值
+        /// 第二个 开累甲方确认产值
+        /// 第三个 本年甲方付款金额
+        /// 第四个 开累甲方付款金额
+        /// </summary>
+        /// <param name="projectId">项目ID</param>
+        /// <param name="dateMonth"></param>
+        /// <returns></returns>
+        public async Task<Tuple<decimal, decimal, decimal, decimal>> GetProjectProductionValue(Guid projectId, int dateMonth)
+        {
+            var currentYearOffirmProductionValue = 0M;
+            var totalYearKaileaOffirmProductionValue = 0M;
+            var currenYearCollection = 0M;
+            var totalYearCollection = 0M;
+            try
+            {
+                var currentYear = DateTime.Now.Year;
+                var projectMonthReportHistory = await _dbContext.Queryable<ProjectMonthReportHistory>()
+                   .Where(x => x.IsDelete == 1 && x.ProjectId == projectId).FirstAsync();
+
+                var currentTotalYearOffirmProductionValue = await _dbContext.Queryable<MonthReport>()
+                    .Where(x => x.IsDelete == 1 && x.ProjectId == projectId && x.DateMonth <= dateMonth).ToListAsync();
+                //本年甲方确认产值(当年)
+                var initMonth = new DateTime(DateTime.Now.Year, 1, 1).ToDateMonth();
+                currentYearOffirmProductionValue = currentTotalYearOffirmProductionValue.Where(x => x.DateMonth >= initMonth && x.DateMonth <= dateMonth)
+                   //原来的// x.DateYear==currentYear)
+                   .Sum(x => x.PartyAConfirmedProductionAmount);
+
+                //开累甲方确认产值(历史数据+2023-7至12月的数据+2024年的数据）
+                if (projectMonthReportHistory != null && currentTotalYearOffirmProductionValue.Any())
+                {
+                    totalYearKaileaOffirmProductionValue = projectMonthReportHistory.KaileiOwnerConfirmation.Value * 10000
+                       + currentTotalYearOffirmProductionValue.Sum(x => x.PartyAConfirmedProductionAmount);
+                }
+                else
+                {
+                    totalYearKaileaOffirmProductionValue =
+                            currentTotalYearOffirmProductionValue.Sum(x => x.PartyAConfirmedProductionAmount);
+                }
+
+                var currenTotalYearCollection = await _dbContext.Queryable<MonthReport>()
+                    .Where(x => x.IsDelete == 1 && x.ProjectId == projectId && x.DateYear <= currentYear).ToListAsync();
+
+                //本年甲方付款金额
+                currenYearCollection = currenTotalYearCollection.Where(x => x.DateYear == currentYear).Sum(x => x.PartyAPayAmount);
+                if (projectMonthReportHistory != null && currenTotalYearCollection.Any())
+                {
+                    //开累甲方付款金额
+                    totalYearCollection = projectMonthReportHistory.KaileiProjectPayment.Value * 10000
+                    + currenTotalYearCollection.Sum(x => x.PartyAPayAmount);
+                }
+                else
+                {
+                    //开累甲方付款金额
+                    totalYearCollection = currenTotalYearCollection.Sum(x => x.PartyAPayAmount);
+                }
+
+            }
+            catch (Exception ex)
+            {
+
+
+            }
+            return Tuple.Create(currentYearOffirmProductionValue, totalYearKaileaOffirmProductionValue, currenYearCollection, totalYearCollection);
         }
 
         /// <summary>
