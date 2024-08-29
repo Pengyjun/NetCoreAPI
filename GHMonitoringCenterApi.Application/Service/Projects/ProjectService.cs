@@ -53,7 +53,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
         private CurrentUser _currentUser { get { return _globalObject.CurrentUser; } }
 
         //public ActionExecutingContext context { get; set; }
-        public ProjectService(IBaseRepository<ProjectWbsHistoryMonth> baseProjectWbsHistory, IBaseRepository<ProjectWBS> baseProjectWBSRepository, ISqlSugarClient dbContext, IMapper mapper, IBaseRepository<Files> baseFilesRepository, IBaseRepository<ProjectOrg> baseProjectOrgRepository, IBaseRepository<ProjectLeader> baseProjectLeaderRepository, IPushPomService pushPomService, IBaseService baseService, ILogService logService, IEntityChangeService entityChangeService, GlobalObject globalObject,IBaseRepository<Project> baseProjects)
+        public ProjectService(IBaseRepository<ProjectWbsHistoryMonth> baseProjectWbsHistory, IBaseRepository<ProjectWBS> baseProjectWBSRepository, ISqlSugarClient dbContext, IMapper mapper, IBaseRepository<Files> baseFilesRepository, IBaseRepository<ProjectOrg> baseProjectOrgRepository, IBaseRepository<ProjectLeader> baseProjectLeaderRepository, IPushPomService pushPomService, IBaseService baseService, ILogService logService, IEntityChangeService entityChangeService, GlobalObject globalObject, IBaseRepository<Project> baseProjects)
         {
             this.baseProjectWBSRepository = baseProjectWBSRepository;
             this.dbContext = dbContext;
@@ -1968,6 +1968,11 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             var hMenu = await dbContext.Queryable<HomeMenu>().Where(x => x.IsDelete == 1 && x.Display == true).FirstAsync();
             if (hMenu != null)//关闭修改结构权限
             { return result.FailResult(HttpStatusCode.NoAuthorityOperateFail, "填报时间内不可调整项目结构"); }
+            //var month = DateTime.Now.ToDateMonth();//原来的
+            //当前日期>=26 & <=addmonth(1) 1  下月1号
+            var month = DateTime.Now.ToDateMonth();
+            if (DateTime.Now.Day >= 26 || (DateTime.Now.Day >= 26 && DateTime.Now.Date <= Convert.ToDateTime(DateTime.Now.AddMonths(1).Date.ToString("yyyy-MM-1"))))
+            { month = DateTime.Now.AddMonths(-1).ToDateMonth(); }
 
             var project = await GetProjectPartAsync(model.ProjectId);
             if (project == null)
@@ -2016,11 +2021,6 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             };
 
             #endregion
-            //var month = DateTime.Now.ToDateMonth();//原来的
-            //当前日期>=26 & <=addmonth(1) 1  下月1号
-            var month = DateTime.Now.ToDateMonth();
-            if (!(DateTime.Now.Day >= 26 || (DateTime.Now.Day >= 26 && DateTime.Now.Date <= Convert.ToDateTime(DateTime.Now.AddMonths(1).Date.ToString("yyyy-MM-1")))))
-            { month = DateTime.Now.AddMonths(-1).ToDateMonth(); }
             // 删除
             if (removeWBSList.Any())
             {
@@ -3200,11 +3200,12 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
         {
             ResponseAjaxResult<List<ShipMovementRecordResponseDto>> responseAjaxResult = new();
             RefAsync<int> total = 0;
-            var subShipList =await dbContext.Queryable<SubShip>().Where(x => x.IsDelete == 1 && x.PomId == shipId).Select(x => new { ShipId = x.PomId, Name = x.Name }).ToListAsync();
-            var ownerShipList=await dbContext.Queryable<OwnerShip>().Where(x => x.IsDelete == 1 && x.PomId == shipId).Select(x=>new {ShipId=x.PomId,Name=x.Name }).ToListAsync();
+            var subShipList = await dbContext.Queryable<SubShip>().Where(x => x.IsDelete == 1 && x.PomId == shipId).Select(x => new { ShipId = x.PomId, Name = x.Name }).ToListAsync();
+            var ownerShipList = await dbContext.Queryable<OwnerShip>().Where(x => x.IsDelete == 1 && x.PomId == shipId).Select(x => new { ShipId = x.PomId, Name = x.Name }).ToListAsync();
             foreach (var item in ownerShipList)
             {
-                var obj = new {
+                var obj = new
+                {
                     ShipId = item.ShipId,
                     Name = item.Name
                 };
@@ -3222,7 +3223,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     Status = x.Status,
                     ShipMovementId = x.ShipMovementId,
                     ShipId = x.ShipId,
-                    Remark=x.Remark
+                    Remark = x.Remark
 
                 }).ToPageListAsync(pageIndex, pageSize, total);
 
@@ -3230,7 +3231,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             {
                 item.ShipName = subShipList.Where(x => x.ShipId == x.ShipId).Select(x => x.Name).FirstOrDefault();
             }
-                responseAjaxResult.Data = res;
+            responseAjaxResult.Data = res;
             responseAjaxResult.Count = total;
             responseAjaxResult.Success();
             return responseAjaxResult;
