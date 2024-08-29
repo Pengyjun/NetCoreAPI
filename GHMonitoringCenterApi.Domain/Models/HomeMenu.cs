@@ -29,12 +29,6 @@ namespace GHMonitoringCenterApi.Domain.Models
         [SugarColumn(ColumnDataType = "int")]
         public int? Sort { get; set; }
 
-
-        /// <summary>
-        /// 调整URL
-        /// </summary>
-        [SugarColumn(Length = 255)]
-        public string? Url { get; set; }
         /// <summary>
         /// 结构类型monthreport 月报
         /// </summary>

@@ -1966,7 +1966,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
 
             //校验是否在可更改的时间范围内
             var hMenu = await dbContext.Queryable<HomeMenu>().Where(x => x.IsDelete == 1 && x.Display == true).FirstAsync();
-            if (hMenu != null)//关闭修改结构权限
+            if (hMenu == null)//关闭修改结构权限
             { return result.FailResult(HttpStatusCode.NoAuthorityOperateFail, "填报时间内不可调整项目结构"); }
             //var month = DateTime.Now.ToDateMonth();//原来的
             //当前日期>=26 & <=addmonth(1) 1  下月1号
