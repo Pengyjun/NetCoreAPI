@@ -780,6 +780,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             // 判断业务来源暂存
             if (result.IsCanSubmit && dateMonth == nowDateMonth)
             {
+                result.IsCanStaging = true;
                 if (stagingData == null || (!stagingData.IsEffectStaging) || stagingData.BizData == null) { }
                 else
                 {
@@ -807,9 +808,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                         }
                     }
                 }
-                result.IsCanStaging = true;
             }
-
             #endregion
 
             //取树
