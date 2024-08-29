@@ -8,7 +8,10 @@ using GHMonitoringCenterApi.Domain.Enums;
 using GHMonitoringCenterApi.Domain.Models;
 using GHMonitoringCenterApi.Domain.Shared;
 using GHMonitoringCenterApi.Domain.Shared.Enums;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using SqlSugar;
+using UtilsSharp;
 using Models = GHMonitoringCenterApi.Domain.Models;
 
 namespace GHMonitoringCenterApi.Application.Service.Projects
@@ -60,8 +63,10 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
         /// <param name="projectId"></param>
         /// <param name="dateMonth"></param>
         /// <param name="bData">施工性质、产值属性</param>
+        /// <param name="isStaging">是否是暂存</param>
+        /// <param name="stagingList">暂存的数据</param>
         /// <returns></returns>
-        private async Task<List<ProjectWBSDto>> WBSConvertTree(Guid projectId, int? dateMonth, List<MonthReportForProjectBaseDataResponseDto> bData)
+        private async Task<List<ProjectWBSDto>> WBSConvertTree(Guid projectId, int? dateMonth, List<MonthReportForProjectBaseDataResponseDto> bData, bool isStaging, List<ProjectWBSDto> stagingList)
         {
             /***
              * 1.获取请求数据
@@ -76,6 +81,13 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             var yReportList = requestList.Where(x => x.ValueType == ValueEnumType.NowYear).OrderBy(x => x.DateMonth).ToList();
             var klReportList = requestList.Where(x => x.ValueType == ValueEnumType.AccumulatedCommencement).OrderBy(x => x.DateMonth).ToList();
             var wbsList = requestList.Where(x => x.ValueType == ValueEnumType.None).ToList();
+
+            if (isStaging)
+            {
+                mReportList = stagingList;
+                yReportList = stagingList;
+                klReportList = stagingList;
+            }
 
             var pWbsTree = await GetChildren(projectId, dateMonth, "0", wbsList, mReportList, yReportList, klReportList, bData);
 
@@ -757,22 +769,51 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             result.IsCanSubmit = await IsCanSubmitAsync(monthReport, dateMonth, nowDateMonth);
             var stagingData = await _dbContext.Queryable<StagingData>().FirstAsync(t => t.BizType == StagingBizType.SaveMonthReport && t.ProjectId == model.ProjectId && t.DateMonth == dateMonth && t.IsDelete == 1);
 
-            // 判断业务来源暂存
-            if (result.IsCanSubmit && dateMonth == nowDateMonth)
-            {
-                if (stagingData == null || (!stagingData.IsEffectStaging) || stagingData.BizData == null) { }
-                else { result.IsFromStaging = true; result.StatusText = "暂存中"; }
-                result.IsCanStaging = true;
-            }
-
             result.DateMonth = dateMonth;
-            #endregion
 
             //取树基础数据
             var bData = await GetBaseDataAsync();
 
             //取树
-            var treeDetails = await WBSConvertTree(model.ProjectId, dateMonth, bData);
+            List<ProjectWBSDto> treeDetails = new List<ProjectWBSDto>();
+
+            // 判断业务来源暂存
+            if (result.IsCanSubmit && dateMonth == nowDateMonth)
+            {
+                if (stagingData == null || (!stagingData.IsEffectStaging) || stagingData.BizData == null) { }
+                else
+                {
+                    result.IsFromStaging = true; result.StatusText = "暂存中";
+
+                    if (!string.IsNullOrWhiteSpace(stagingData.BizData))
+                    {
+                        // 解析 JSON 字符串为 JObject
+                        var jsonObject = JObject.Parse(stagingData.BizData);
+
+                        // 获取所有的 ReportDetails 数据
+                        var jsonString = GetAllReportDetails(jsonObject).ToJson();
+
+                        var resList = JsonConvert.DeserializeObject<List<ProjectWBSDto>>(jsonString);
+
+                        if (resList != null && resList.Any())
+                        {
+                            treeDetails = await WBSConvertTree(model.ProjectId, dateMonth, bData, result.IsFromStaging, resList);
+                            //树组合
+                            result.TreeDetails = treeDetails;
+
+                            //数据回显
+                            responseAjaxResult.SuccessResult(result);
+                            return responseAjaxResult;
+                        }
+                    }
+                }
+                result.IsCanStaging = true;
+            }
+
+            #endregion
+
+            //取树
+            treeDetails = await WBSConvertTree(model.ProjectId, dateMonth, bData, result.IsFromStaging, new List<ProjectWBSDto>());
 
             //树组合
             result.TreeDetails = treeDetails;
@@ -780,6 +821,22 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             //数据回显
             responseAjaxResult.SuccessResult(result);
             return responseAjaxResult;
+        }
+        /// <summary>
+        /// 获取所有ReportDetails
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <returns></returns>
+        private List<JToken> GetAllReportDetails(JObject obj)
+        {
+            // 使用 LINQ 查询 JObject 的所有子节点
+            return obj.Descendants()
+                      // 筛选出所有类型为 JProperty 且名称为 "ReportDetails" 的节点
+                      .Where(t => t.Type == JTokenType.Property && ((JProperty)t).Name == "ReportDetails")
+                      // 对于每个匹配的 JProperty，获取其值中的所有子节点
+                      .SelectMany(t => ((JProperty)t).Value.Children())
+                      // 转换为 List<JToken> 并返回
+                      .ToList();
         }
         /// <summary>
         /// 处理并获取施工性质、产值属性、资源基础数据

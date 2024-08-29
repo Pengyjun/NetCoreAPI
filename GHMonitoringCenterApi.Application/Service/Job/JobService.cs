@@ -1016,31 +1016,23 @@ namespace GHMonitoringCenterApi.Application.Service.Job
                 {
                     return result.FailResult(HttpStatusCode.DataNotMatch, ResponseMessage.DATA_NOTMATCH_BIZ);
                 }
-                var uIds = await _dbJobApprover.AsQueryable().Where(t => t.IsDelete == 1 && t.JobId == job.Id).Select(t => t.ApproverId).ToListAsync();
-                if (uIds.Any())
-                {
-                    var resJobApprovers = new List<ResJobApproverDto>();
-                    //获取用户信息
-                    var userList = await _dbUser.AsQueryable().Where(x => x.IsDelete == 1 && uIds.Contains(x.Id)).ToListAsync();
-                    foreach (var item in userList)
-                    {
-                        ResJobApproverDto resJobApprover = new ResJobApproverDto();
-                        resJobApprover.ApproverId = item.Id;
-                        resJobApprover.ApproverName = item.Name;
-                        resJobApprover.ApproverPhone = item.Phone;
-                        resJobApprovers.Add(resJobApprover);
-                    }
+                //var uIds = await _dbJobApprover.AsQueryable().Where(t => t.IsDelete == 1 && t.JobId == job.Id).Select(t => t.ApproverId).ToListAsync();
+                //if (uIds.Any())
+                //{
+                //    var resJobApprovers = new List<ResJobApproverDto>();
+                //    //获取用户信息
+                //    var userList = await _dbUser.AsQueryable().Where(x => x.IsDelete == 1 && uIds.Contains(x.Id)).ToListAsync();
+                //    foreach (var item in userList)
+                //    {
+                //        ResJobApproverDto resJobApprover = new ResJobApproverDto();
+                //        resJobApprover.ApproverId = item.Id;
+                //        resJobApprover.ApproverName = item.Name;
+                //        resJobApprover.ApproverPhone = item.Phone;
+                //        resJobApprovers.Add(resJobApprover);
+                //    }
 
-                    // 解析 JSON 字符串
-                    JObject jsonObject = JObject.Parse(job.BizData);
-
-                    // 添加新字段及其值
-                    jsonObject["Approvers"] = JArray.FromObject(resJobApprovers);
-
-                    // 转换回 JSON 字符串
-                    job.BizData = jsonObject.ToString();
-                }
-
+                //    jobBizRes.Approvers = resJobApprovers.ToArray();
+                //}
                 bizResult = JsonConvert.DeserializeObject<TBizResult>(job.BizData);
             }
             else if (model.RequestType == JobBizRequestType.FindDBBizData)
