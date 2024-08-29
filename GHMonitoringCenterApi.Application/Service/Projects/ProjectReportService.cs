@@ -2686,6 +2686,10 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 {
                     model.DateMonth = DateTime.Now.AddMonths(-1).Month;
                 }
+                else
+                {
+                    model.DateMonth = nowDateMonth;
+                }
                 //else if (model.DateMonth.HasValue)
                 //{
                 //    if (DateTime.Now.Day >= 26 || DateTime.Now.Day <= 1)
