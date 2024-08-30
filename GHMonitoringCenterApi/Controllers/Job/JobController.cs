@@ -1,13 +1,12 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using GHMonitoringCenterApi.Application.Contracts.IService.Job;
-using GHMonitoringCenterApi.Domain.Shared;
-using GHMonitoringCenterApi.Application.Contracts.Dto.Job;
-using GHMonitoringCenterApi.CustomAttribute;
+﻿using GHMonitoringCenterApi.Application.Contracts.Dto.Job;
 using GHMonitoringCenterApi.Application.Contracts.Dto.Project;
 using GHMonitoringCenterApi.Application.Contracts.Dto.Project.Report;
+using GHMonitoringCenterApi.Application.Contracts.IService.Job;
+using GHMonitoringCenterApi.CustomAttribute;
 using GHMonitoringCenterApi.Domain.Enums;
-using GHMonitoringCenterApi.Domain.Shared.Enums;
+using GHMonitoringCenterApi.Domain.Shared;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace GHMonitoringCenterApi.Controllers.Job
 {

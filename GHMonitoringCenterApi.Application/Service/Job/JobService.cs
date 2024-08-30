@@ -1073,22 +1073,25 @@ namespace GHMonitoringCenterApi.Application.Service.Job
             int dateMonth = Convert.ToInt32(json["DateMonth"]);
             //获取历史的
             var historyData = await GetProjectProductionValue(job.ProjectId, dateMonth);
-            //获取全部数据
-            var data = await _dbContext.Queryable<MonthReport>().Where(x => x.IsDelete == 1 && x.ProjectId == job.ProjectId).Select(x => new { x.PartyAConfirmedProductionAmount, x.PartyAPayAmount, x.ProjectId, x.DateMonth }).ToListAsync();
+            ////获取全部数据
+            //var data = await _dbContext.Queryable<MonthReport>().Where(x => x.IsDelete == 1 && x.ProjectId == job.ProjectId).Select(x => new { x.PartyAConfirmedProductionAmount, x.PartyAPayAmount, x.ProjectId, x.DateMonth }).ToListAsync();
 
-            //获取本年甲方确认产值
-            var startMonth = Convert.ToInt32(dateMonth.ToString().Substring(0, 4) + "0101");
-            var currentYearOffirmProductionValue = data.Where(x => x.DateMonth >= startMonth && x.DateMonth <= dateMonth).Sum(x => x.PartyAConfirmedProductionAmount) + historyData.Item1;
+            ////获取本年甲方确认产值
+            //var startMonth = Convert.ToInt32(dateMonth.ToString().Substring(0, 4) + "0101");
+            //var currentYearOffirmProductionValue = data.Where(x => x.DateMonth >= startMonth && x.DateMonth <= dateMonth).Sum(x => x.PartyAConfirmedProductionAmount) //+ historyData.Item1;
 
-            //获取本年甲方付款金额
-            var currenYearCollection = data.Where(x => x.DateMonth >= startMonth && x.DateMonth <= dateMonth).Sum(x => x.PartyAPayAmount) + historyData.Item3;
+            ////获取本年甲方付款金额
+            //var currenYearCollection = data.Where(x => x.DateMonth >= startMonth && x.DateMonth <= dateMonth).Sum(x => x.PartyAPayAmount)// + historyData.Item3;
 
-            //获取开累甲方确认产值
-            var totalYearKaileaOffirmProductionValue = data.Where(x => x.DateMonth <= dateMonth).Sum(x => x.PartyAConfirmedProductionAmount) + historyData.Item2;
+            ////获取开累甲方确认产值
+            //var totalYearKaileaOffirmProductionValue = data.Where(x => x.DateMonth <= dateMonth).Sum(x => x.PartyAConfirmedProductionAmount) //+ historyData.Item2;
 
-            //获取开累甲方付款金额
-            var totalYearCollection = data.Where(x => x.DateMonth <= dateMonth).Sum(x => x.PartyAPayAmount) + historyData.Item4;
-
+            ////获取开累甲方付款金额
+            //var totalYearCollection = data.Where(x => x.DateMonth <= dateMonth).Sum(x => x.PartyAPayAmount) //+ historyData.Item4;
+            var currentYearOffirmProductionValue = historyData.Item1;
+            var currenYearCollection = historyData.Item3;
+            var totalYearKaileaOffirmProductionValue = historyData.Item2;
+            var totalYearCollection = historyData.Item4;
             // 解析 JSON 字符串
             JObject jsonObject = JObject.Parse(job.BizData);
 
@@ -1103,12 +1106,7 @@ namespace GHMonitoringCenterApi.Application.Service.Job
 
             var bizResult = CastDeserializeObject<TBizResult>(job.BizData);
             var jobBizRes = new JobBizResponseDto<TBizResult>() { ProjectId = job.ProjectId, JobId = job.Id, BizModule = job.BizModule, BizData = bizResult };
-            //// 判断是否存在 下一级审批人
-            //var nextApproveLevel = job.ApproveLevel + 2;
-            //if (nextApproveLevel <= job.FinishApproveLevel)
-            //{
-            //    jobBizRes.NextApprovers = (await GetResJobApproversAsync(job.Id, nextApproveLevel)).ToArray();
-            //}
+           
             return result.SuccessResult(jobBizRes);
         }
 

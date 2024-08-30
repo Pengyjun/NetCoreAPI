@@ -82,12 +82,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             var klReportList = requestList.Where(x => x.ValueType == ValueEnumType.AccumulatedCommencement).OrderBy(x => x.DateMonth).ToList();
             var wbsList = requestList.Where(x => x.ValueType == ValueEnumType.None).ToList();
 
-            if (isStaging)
-            {
-                mReportList = stagingList;
-                yReportList = stagingList;
-                klReportList = stagingList;
-            }
+            if (isStaging) mReportList = stagingList;//本月的数据为暂存的数据
 
             var pWbsTree = await GetChildren(projectId, dateMonth, "0", wbsList, mReportList, yReportList, klReportList, bData);
 
@@ -248,9 +243,13 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             //获取需要计算的月报填报数据 
             if (dateMonth != 0 && dateMonth.ToString().Length == 6)
             {
+                var mPIds = await _dbContext.Queryable<MonthReport>()
+                    .Where(x => x.IsDelete == 1 && x.Status == MonthReportStatus.Finish)
+                    .Select(x => x.Id)
+                    .ToListAsync();
                 //获取当月前需要计算的的所有填报数据(累计的所有数据/开累)
                 calculatePWBS = await _dbContext.Queryable<MonthReportDetail>()
-                   .Where(p => !string.IsNullOrEmpty(p.ProjectId.ToString()) && p.ProjectId != Guid.Empty && p.IsDelete == 1 && SqlFunc.ToGuid(p.ProjectId) == pId && p.DateMonth <= dateMonth)
+                   .Where(p => mPIds.Contains(p.MonthReportId) && !string.IsNullOrEmpty(p.ProjectId.ToString()) && p.ProjectId != Guid.Empty && p.IsDelete == 1 && SqlFunc.ToGuid(p.ProjectId) == pId && p.DateMonth <= dateMonth)
                    .Select(p => new ProjectWBSDto
                    {
                        Id = p.Id,
@@ -696,13 +695,17 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
 
             //本月&年&开累甲方确认产值(元)
             result.PartyAConfirmedProductionAmount = monthReport == null ? 0M : monthReport.PartyAConfirmedProductionAmount;
-            result.CurrentYearOffirmProductionValue = yMonthReports.Sum(x => x.PartyAConfirmedProductionAmount);
-            result.TotalYearKaileaOffirmProductionValue = monthReportData.Sum(x => x.PartyAConfirmedProductionAmount) + historys.Item2;
+            //result.CurrentYearOffirmProductionValue = yMonthReports.Sum(x => x.PartyAConfirmedProductionAmount);
+            result.CurrentYearOffirmProductionValue = historys.Item1;
+            //result.TotalYearKaileaOffirmProductionValue = monthReportData.Sum(x => x.PartyAConfirmedProductionAmount) + historys.Item2;
+            result.TotalYearKaileaOffirmProductionValue = historys.Item2;
 
             //本月&年&开累甲方付款金额(元)
             result.PartyAPayAmount = monthReport == null ? 0M : monthReport.PartyAPayAmount;
-            result.CurrenYearCollection = yMonthReports.Sum(x => x.PartyAPayAmount);
-            result.TotalYearCollection = monthReportData.Sum(x => x.PartyAPayAmount) + historys.Item4;
+            //result.CurrenYearCollection = yMonthReports.Sum(x => x.PartyAPayAmount);
+            result.CurrenYearCollection = historys.Item3;
+            //result.TotalYearCollection = monthReportData.Sum(x => x.PartyAPayAmount) + historys.Item4;
+            result.TotalYearCollection = historys.Item4;
 
             if (monthReport != null)
             {

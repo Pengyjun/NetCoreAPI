@@ -352,5 +352,9 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project.Report
         /// 累计完成产值（元）
         /// </summary>
         public decimal TotalCompleteProductionAmount { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
+        public bool IsAllowDelete { get; set; }
     }
 }

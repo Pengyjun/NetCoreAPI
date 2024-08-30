@@ -21,9 +21,11 @@ using GHMonitoringCenterApi.Domain.Shared.Const;
 using GHMonitoringCenterApi.Domain.Shared.Enums;
 using GHMonitoringCenterApi.Domain.Shared.Util;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using NPOI.SS.UserModel;
 using NPOI.SS.Util;
 using NPOI.XSSF.UserModel;
+using Org.BouncyCastle.Asn1.Cmp;
 using SqlSugar;
 using SqlSugar.Extensions;
 using System.Data;
@@ -2943,6 +2945,57 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             }
         }
 
+        ///// <summary>
+        /////暂存项目月报
+        ///// </summary>
+        ///// <returns></returns>
+        //public async Task<ResponseAjaxResult<bool>> StagingMonthReportAsync(StagingMonthReportRequestDto model)
+        //{
+        //    var result = new ResponseAjaxResult<bool>();
+        //    var stagingData = await GetMonthReportStagingDataAsync(model.ProjectId, model.DateMonth);
+        //    var isAdd = false;
+        //    if (stagingData == null)
+        //    {
+        //        stagingData = new StagingData()
+        //        {
+        //            Id = GuidUtil.Next(),
+        //            CreateId = _currentUser.Id,
+        //            ProjectId = model.ProjectId,
+        //            DateMonth = model.DateMonth,
+        //            BizType = StagingBizType.SaveMonthReport
+
+        //        };
+        //        isAdd = true;
+        //    }
+        //    else
+        //    {
+        //        stagingData.UpdateId = _currentUser.Id;
+        //    }
+
+        //    stagingData.BizData = JsonConvert.SerializeObject(model);
+
+        //    stagingData.IsEffectStaging = true;
+        //    #region 日志信息
+        //    var logDto = new LogInfo()
+        //    {
+        //        Id = GuidUtil.Increment(),
+        //        DataId = stagingData.Id,
+        //        BusinessModule = "/首页/项目月报/暂存",
+        //        BusinessRemark = "/首页/项目月报/暂存",
+        //        OperationId = _currentUser.Id,
+        //        OperationName = _currentUser.Name,
+        //    };
+        //    #endregion
+        //    if (isAdd)
+        //    {
+        //        await _dbStagingData.AsInsertable(stagingData).EnableDiffLogEvent(logDto).ExecuteCommandAsync();
+        //    }
+        //    else
+        //    {
+        //        await _dbStagingData.AsUpdateable(stagingData).EnableDiffLogEvent(logDto).ExecuteCommandAsync();
+        //    }
+        //    return result.SuccessResult(true);
+        //}
 
         /// <summary>
         ///暂存项目月报
@@ -2970,7 +3023,94 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             {
                 stagingData.UpdateId = _currentUser.Id;
             }
+
             stagingData.BizData = JsonConvert.SerializeObject(model);
+
+            #region 新的逻辑
+            //只要本月的月报数据
+            // 解析 JSON 字符串为 JObject
+            var jsonObject = JObject.Parse(stagingData.BizData);
+
+            // 获取所有的 ReportDetails 数据
+            var jsonString = GetAllReportDetails(jsonObject).ToJson();
+
+            //转换为list
+            var resList = JsonConvert.DeserializeObject<List<ProjectWBSDto>>(jsonString);
+
+            //查询当月是否存在已经填过相同的月报六个值对比  月份对比
+            var mRp = await _dbContext.Queryable<MonthReport>()
+                .Where(x => x.IsDelete == 1 && x.ProjectId == model.ProjectId && x.DateMonth == model.DateMonth)
+                .FirstAsync();
+            if (mRp != null)
+            {
+                var monthReps = await _dbContext.Queryable<MonthReportDetail>()
+                    .Where(x => mRp.Id == x.MonthReportId && x.IsDelete == 1)
+                    .ToListAsync();
+
+                //取本月的月报
+                var nMorthRepDetails = new List<ProjectWBSDto>();
+                if (resList != null && resList.Any())
+                {
+                    foreach (var eRL in resList)
+                    {
+                        if (string.IsNullOrWhiteSpace(eRL.DetailId.ToString()))
+                        {
+                            //追加本月新的
+                            eRL.IsAllowDelete = true;
+                            nMorthRepDetails.Add(eRL);
+                        }
+                        else
+                        {
+                            //判断是否已经填过一模一样的
+                            var value = monthReps.Where(x => x.ConstructionNature == eRL.ConstructionNature && x.OutPutType == eRL.OutPutType && x.ShipId == eRL.ShipId && x.UnitPrice == eRL.UnitPrice
+                                  && x.CompletedQuantity == eRL.CompletedQuantity && x.OutsourcingExpensesAmount == eRL.OutsourcingExpensesAmount && x.Remark == eRL.Remark);
+                            if (value == null)
+                            {
+                                //追加本月的
+                                eRL.IsAllowDelete = true;
+                                nMorthRepDetails.Add(eRL);
+                            }
+                        }
+                    }
+                    //实际本月的月报Ids
+                    var mDIds = nMorthRepDetails.Select(x => x.DetailId).ToList();
+                    //需要移除的月报ids
+                    var rDetailsIds = new HashSet<string>();
+                    foreach (var item in mDIds)
+                    {
+                        if (string.IsNullOrWhiteSpace(item.ToString()))
+                            continue;//为空跳过
+                        var isExist = resList.FirstOrDefault(x => x.DetailId == item);
+                        if (isExist != null)
+                        {
+                            rDetailsIds.Add(isExist.DetailId.ToString());
+                        }
+                    }
+
+                    //如果有需要移除的月报 
+                    if (rDetailsIds.Any())
+                    {
+                        // 修改所有子节点中的 ReportDetails 数组
+                        UpdateReportDetails(jsonObject, rDetailsIds);
+                        // 将修改后的 JObject 转换回 JSON 字符串
+                        stagingData.BizData = jsonObject.ToString(Formatting.Indented);
+                    }
+                }
+            }
+            else
+            {
+                if (resList != null && resList.Any())
+                {
+                    // 递归修改所有子节点的 IsAllowDelete 字段
+                    UpdateIsAllowDelete(jsonObject, true);
+
+                    // 将修改后的 JObject 转换回 JSON 字符串
+                    stagingData.BizData = jsonObject.ToString(Formatting.Indented);
+                }
+            }
+
+            #endregion
+
             stagingData.IsEffectStaging = true;
             #region 日志信息
             var logDto = new LogInfo()
@@ -2992,6 +3132,93 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 await _dbStagingData.AsUpdateable(stagingData).EnableDiffLogEvent(logDto).ExecuteCommandAsync();
             }
             return result.SuccessResult(true);
+        }
+        /// <summary>
+        /// 修改值
+        /// </summary>
+        /// <param name="token"></param>
+        /// <param name="value"></param>
+        private void UpdateIsAllowDelete(JToken token, bool value)
+        {
+            if (token.Type == JTokenType.Object)
+            {
+                var jobject = (JObject)token;
+
+                // 修改当前节点的 IsAllowDelete 字段
+                jobject["IsAllowDelete"] = value;
+
+                // 递归修改所有子节点
+                foreach (var property in jobject.Properties())
+                {
+                    UpdateIsAllowDelete(property.Value, value);
+                }
+            }
+            else if (token.Type == JTokenType.Array)
+            {
+                foreach (var item in (JArray)token)
+                {
+                    UpdateIsAllowDelete(item, value);
+                }
+            }
+        }
+        /// <summary>
+        /// // 递归函数，修改 ReportDetails 中的 IsAllowDelete 字段
+        /// </summary>
+        /// <param name="token"></param>
+        /// <param name="idsToRemove"></param>
+        private void UpdateReportDetails(JToken token, HashSet<string> idsToRemove)
+        {
+            if (token.Type == JTokenType.Object)
+            {
+                var jobject = (JObject)token;
+
+                // 如果是 ReportDetails 数组，进行修改
+                if (jobject["ReportDetails"] != null)
+                {
+                    var reportDetailsArray = jobject["ReportDetails"] as JArray;
+
+                    // 移除 idsToRemove 中包含的项
+                    reportDetailsArray = reportDetailsArray.Where(item => !idsToRemove.Contains(item["DetailId"]?.ToString())) as JArray;
+
+                    if (reportDetailsArray != null && reportDetailsArray.Any())
+                    {
+                        // 修改 IsAllowDelete 并移除 idsToRemove 中的项
+                        foreach (var item in reportDetailsArray.ToList())
+                        {
+                            item["IsAllowDelete"] = true;
+                        }
+                    }
+                }
+
+                // 递归修改所有子节点
+                foreach (var property in jobject.Properties())
+                {
+                    UpdateReportDetails(property.Value, idsToRemove);
+                }
+            }
+            else if (token.Type == JTokenType.Array)
+            {
+                foreach (var item in (JArray)token)
+                {
+                    UpdateReportDetails(item, idsToRemove);
+                }
+            }
+        }
+        /// <summary>
+        /// 获取所有ReportDetails
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <returns></returns>
+        private List<JToken> GetAllReportDetails(JObject obj)
+        {
+            // 使用 LINQ 查询 JObject 的所有子节点
+            return obj.Descendants()
+                      // 筛选出所有类型为 JProperty 且名称为 "ReportDetails" 的节点
+                      .Where(t => t.Type == JTokenType.Property && ((JProperty)t).Name == "ReportDetails")
+                      // 对于每个匹配的 JProperty，获取其值中的所有子节点
+                      .SelectMany(t => ((JProperty)t).Value.Children())
+                      // 转换为 List<JToken> 并返回
+                      .ToList();
         }
 
         /// <summary>
