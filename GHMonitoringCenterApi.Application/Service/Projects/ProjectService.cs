@@ -3247,37 +3247,52 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
         public async Task<ResponseAjaxResult<bool>> RevocationProjectMonthAsync(Guid id)
         {
             ResponseAjaxResult<bool> ajaxResult = new ResponseAjaxResult<bool>();
-            #region 时间判断
-            //查询当前是第几月
-            var nowYear = DateTime.Now.Year;
-            var nowMonth = DateTime.Now.Month;
-            var nowDay = DateTime.Now.Day;
-            var monthDay = 0;
-            if (nowDay > 26)
-            {
-                nowMonth += 1;
-            }
-            if (int.Parse(DateTime.Now.ToString("MMdd")) > 1226)
-            {
-                nowYear += 1;
-            }
-            if (nowMonth.ToString().Length == 1)
-            {
-                monthDay = int.Parse(nowYear + $"0{nowMonth}");
-            }
-            else
-            {
-                monthDay = int.Parse(nowYear + $"{nowMonth}");
-            }
-            #endregion
+            //#region 时间判断
+            ////查询当前是第几月
+            //var nowYear = DateTime.Now.Year;
+            //var nowMonth = DateTime.Now.Month;
+            //var nowDay = DateTime.Now.Day;
+            //var monthDay = 0;
+            //if (nowDay > 26)
+            //{
+            //    nowMonth += 1;
+            //}
+            //if (int.Parse(DateTime.Now.ToString("MMdd")) > 1226)
+            //{
+            //    nowYear += 1;
+            //}
+            //if (nowMonth.ToString().Length == 1)
+            //{
+            //    monthDay = int.Parse(nowYear + $"0{nowMonth}");
+            //}
+            //else
+            //{
+            //    monthDay = int.Parse(nowYear + $"{nowMonth}");
+            //}
+            //#endregion
 
-            var projectMonth = await dbContext.Queryable<MonthReport>().Where(x => x.IsDelete == 1 && x.ProjectId == id && x.DateMonth == monthDay).FirstAsync();
+            var projectMonth = await dbContext.Queryable<MonthReport>().Where(x => x.IsDelete == 1 && x.Id == id).FirstAsync();
+
             if (projectMonth == null)
             {
                 ajaxResult.Data = false;
-                ajaxResult.Success();
+                ajaxResult.FailResult(HttpStatusCode.DataNotEXIST, "数据不存在");
                 return ajaxResult;
             }
+
+            #region 新
+            var monthDay = 0;
+            if (projectMonth != null)
+            {
+                //今天
+                ConvertHelper.TryConvertDateTimeFromDateDay(Convert.ToInt32(projectMonth.DateMonth.ToString() + DateTime.Now.Day), out DateTime nowDateTime);
+                //如果日期>=26  小于等于下月一号
+                if (nowDateTime.Day >= 26 || (nowDateTime.Day >= 26 && nowDateTime <= Convert.ToDateTime(nowDateTime.AddMonths(1).ToString("yyyy-MM-01"))))
+                {
+                    monthDay = nowDateTime.ToDateDay();
+                }
+            }
+            #endregion
 
             var job = await dbContext.Queryable<GHMonitoringCenterApi.Domain.Models.Job>().Where(x => x.IsDelete == 1
              && x.ProjectId == id && x.DateMonth == monthDay).FirstAsync();
