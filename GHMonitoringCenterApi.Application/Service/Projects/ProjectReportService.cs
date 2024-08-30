@@ -2118,7 +2118,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             {
                 #region 新 时间判断
                 //今天
-                ConvertHelper.TryConvertDateTimeFromDateDay(Convert.ToInt32(item.DateMonth + DateTime.Now.Day), out DateTime nowDateTime);
+                ConvertHelper.TryConvertDateTimeFromDateDay(Convert.ToInt32(item.DateMonth.ToString() + DateTime.Now.Day), out DateTime nowDateTime);
                 //如果日期>=26  小于等于下月一号
                 if (nowDateTime.Day >= 26 || (nowDateTime.Day >= 26 && nowDateTime <= Convert.ToDateTime(nowDateTime.AddMonths(1).ToString("yyyy-MM-01"))))
                 {
