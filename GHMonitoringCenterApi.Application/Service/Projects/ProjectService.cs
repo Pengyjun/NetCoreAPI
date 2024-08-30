@@ -3276,7 +3276,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             if (projectMonth == null)
             {
                 ajaxResult.Data = false;
-                ajaxResult.FailResult(HttpStatusCode.DataNotEXIST,"数据不存在");
+                ajaxResult.FailResult(HttpStatusCode.DataNotEXIST, "数据不存在");
                 return ajaxResult;
             }
 
@@ -3295,7 +3295,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             #endregion
 
             var job = await dbContext.Queryable<GHMonitoringCenterApi.Domain.Models.Job>().Where(x => x.IsDelete == 1
-             && x.ProjectId == projectMonth.ProjectId && x.DateMonth == monthDay).FirstAsync();
+             && x.ProjectId == projectMonth.ProjectId && x.DateMonth == monthDay && x.ApproveLevel != ApproveLevel.Level2).FirstAsync();
             if (job == null)
             {
                 ajaxResult.Data = false;
