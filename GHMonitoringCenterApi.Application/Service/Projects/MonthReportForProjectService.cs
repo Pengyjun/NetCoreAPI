@@ -244,7 +244,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             if (dateMonth != 0 && dateMonth.ToString().Length == 6)
             {
                 var mPIds = await _dbContext.Queryable<MonthReport>()
-                    .Where(x => x.IsDelete == 1 && x.Status == MonthReportStatus.Finish)
+                    .Where(x => x.IsDelete == 1)
                     .Select(x => x.Id)
                     .ToListAsync();
                 //获取当月前需要计算的的所有填报数据(累计的所有数据/开累)

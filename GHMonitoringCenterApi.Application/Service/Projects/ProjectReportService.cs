@@ -2117,7 +2117,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             {
                 if (item.StatusText == "一级审批中" && (nowDay >= 26 || nowDay <= 1))
                 {
-                    item.IsShowRecall = item.DateMonth == monthDay;
+                    item.IsShowRecall = item.DateMonth == monthDay ? true : false;
                 }
 
                 var thisMonthTime = item.DateMonthTime;
