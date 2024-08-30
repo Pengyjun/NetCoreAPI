@@ -252,6 +252,10 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project.Report
             public decimal AccomplishValue { get; set; }
 
             /// <summary>
+            /// 本月完成产值 (做累计使用)
+            /// </summary>
+            public decimal AccomplishValue2 { get; set; }
+            /// <summary>
             /// 本月产值进度偏差
             /// </summary>
             public decimal ScheduleOutPutValue { get; set; }
@@ -543,6 +547,11 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project.Report
             /// 累计外包支出（元）
             /// </summary>
             public decimal CumulativeOutsourcingExpensesAmount { get; set; }
+
+            /// <summary>
+            /// 币种
+            /// </summary>
+            public Guid? CurrencyId { get; set; }
         }
     }
 

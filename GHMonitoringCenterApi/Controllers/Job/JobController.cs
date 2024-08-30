@@ -1,12 +1,12 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using GHMonitoringCenterApi.Application.Contracts.IService.Job;
-using GHMonitoringCenterApi.Domain.Shared;
-using GHMonitoringCenterApi.Application.Contracts.Dto.Job;
-using GHMonitoringCenterApi.CustomAttribute;
+﻿using GHMonitoringCenterApi.Application.Contracts.Dto.Job;
 using GHMonitoringCenterApi.Application.Contracts.Dto.Project;
 using GHMonitoringCenterApi.Application.Contracts.Dto.Project.Report;
+using GHMonitoringCenterApi.Application.Contracts.IService.Job;
+using GHMonitoringCenterApi.CustomAttribute;
 using GHMonitoringCenterApi.Domain.Enums;
+using GHMonitoringCenterApi.Domain.Shared;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace GHMonitoringCenterApi.Controllers.Job
 {
@@ -156,7 +156,7 @@ namespace GHMonitoringCenterApi.Controllers.Job
         [HttpGet("SearchJobNotice")]
         public async Task<ResponseAjaxResult<JobNoticeResponseDto>> SearchJobNoticeAsync()
         {
-             return await _jobService.SearchJobNoticeAsync();
+            return await _jobService.SearchJobNoticeAsync();
         }
 
         /// <summary>
@@ -164,7 +164,7 @@ namespace GHMonitoringCenterApi.Controllers.Job
         /// </summary>
         /// <returns></returns>
         [HttpGet("SearchJobApprovers")]
-        public async Task<ResponseAjaxResult<List<JobApproverResponseDto>>> SearchJobApproversAsync([FromQuery]JobApproverRequestDto model)
+        public async Task<ResponseAjaxResult<List<JobApproverResponseDto>>> SearchJobApproversAsync([FromQuery] JobApproverRequestDto model)
         {
             return await _jobService.SearchJobApproversAsync(model);
         }

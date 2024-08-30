@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.ComponentModel.DataAnnotations;
-using GHMonitoringCenterApi.Application.Contracts.Dto.Project.Report;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project
 {
@@ -43,7 +37,11 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project
                 DateMonth = DateMonthTime.Value.ToDateMonth();
             }
         }
-
+        /// <summary>
+        /// 校验
+        /// </summary>
+        /// <param name="validationContext"></param>
+        /// <returns></returns>
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
             if (ProjectId == Guid.Empty)

@@ -11,7 +11,7 @@ namespace GHMonitoringCenterApi.Domain.Models
     /// 菜单时间表
     /// </summary>
     [SugarTable("t_homemenu", IsDisabledDelete = true)]
-    public class HomeMenu:BaseEntity<Guid>
+    public class HomeMenu : BaseEntity<Guid>
     {
         /// <summary>
         /// 菜单名称
@@ -29,11 +29,10 @@ namespace GHMonitoringCenterApi.Domain.Models
         [SugarColumn(ColumnDataType = "int")]
         public int? Sort { get; set; }
 
-
         /// <summary>
-        /// 调整URL
+        /// 结构类型monthreport 月报
         /// </summary>
-        [SugarColumn(Length = 255)]
-        public string? Url { get; set; }
+        [SugarColumn(ColumnDataType = "bit", Length = 1)]
+        public bool? Display { get; set; }
     }
 }

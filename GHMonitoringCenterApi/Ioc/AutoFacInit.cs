@@ -51,7 +51,6 @@ using GHMonitoringCenterApi.Application.Service.SystemUpdatLog;
 using GHMonitoringCenterApi.Application.Service.Timing;
 using GHMonitoringCenterApi.Application.Service.User;
 using GHMonitoringCenterApi.Application.Service.Word;
-using GHMonitoringCenterApi.Controllers.ResourceManagement;
 using GHMonitoringCenterApi.Domain.IRepository;
 using GHMonitoringCenterApi.SqlSugarCore;
 
@@ -132,6 +131,7 @@ namespace GHMonitoringCenterApi.Ioc
             builder.RegisterType<ProductionValueImportService>().As<IProductionValueImportService>().InstancePerLifetimeScope();
 
             builder.RegisterType<ExternalApiService>().As<IExternalApiService>().InstancePerLifetimeScope();
+            builder.RegisterType<MonthReportForProjectService>().As<IMonthReportForProjectService>().InstancePerLifetimeScope();
         }
     }
 }

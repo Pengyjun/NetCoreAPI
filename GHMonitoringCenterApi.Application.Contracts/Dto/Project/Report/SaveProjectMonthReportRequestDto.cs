@@ -1,13 +1,6 @@
-﻿using GHMonitoringCenterApi.Application.Contracts.Dto.Enums;
-using GHMonitoringCenterApi.Domain.Enums;
+﻿using GHMonitoringCenterApi.Domain.Enums;
 using SqlSugar;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using UtilsSharp;
 using static GHMonitoringCenterApi.Application.Contracts.Dto.Project.Report.SaveProjectMonthReportRequestDto;
 

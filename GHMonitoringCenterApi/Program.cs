@@ -3,25 +3,16 @@ using Autofac.Extensions.DependencyInjection;
 using GHMonitoringCenterApi;
 using GHMonitoringCenterApi.Application.Contracts.AutoMapper;
 using GHMonitoringCenterApi.Domain.Shared;
-using GHMonitoringCenterApi.Domain.Shared.Const;
-using GHMonitoringCenterApi.Domain.Shared.Enums;
-using GHMonitoringCenterApi.Domain.Shared.Util;
 using GHMonitoringCenterApi.Filters;
 using GHMonitoringCenterApi.Ioc;
 using GHMonitoringCenterApi.Middleware;
 using GHMonitoringCenterApi.SqlSugarCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using NetTaste;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
 using Serilog;
 using Serilog.Events;
-using System.IdentityModel.Tokens.Jwt;
 using System.Text;
 using UtilsSharp;
 
@@ -193,8 +184,8 @@ app.Use(async (context, next) =>
     await next.Invoke(context);
 });
 #if DEBUG
-app.UseSwagger();
-app.UseSwaggerUI();
+//app.UseSwagger();
+//app.UseSwaggerUI();
 #endif
 
 app.UseCors("Cors");

@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel;
 
 namespace GHMonitoringCenterApi.Domain.Enums
 {
@@ -155,7 +150,7 @@ namespace GHMonitoringCenterApi.Domain.Enums
         /// <summary>
         /// 项目审批人
         /// </summary>
-        ProjectApprover=11,
+        ProjectApprover = 11,
 
         /// <summary>
         /// 分包船舶
@@ -668,12 +663,12 @@ namespace GHMonitoringCenterApi.Domain.Enums
         /// <summary>
         /// 未知状态
         /// </summary>
-        None =0,
+        None = 0,
 
         /// <summary>
         /// 审批中
         /// </summary>
-        Approveling=1,
+        Approveling = 1,
 
         /// <summary>
         /// 审批驳回
@@ -702,7 +697,7 @@ namespace GHMonitoringCenterApi.Domain.Enums
         /// 春节
         /// </summary>
         ChunJie = 121,
-        
+
         /// <summary>
         /// 清明
         /// </summary>
@@ -711,7 +706,7 @@ namespace GHMonitoringCenterApi.Domain.Enums
         /// <summary>
         /// 劳动
         /// </summary>
-        LaoDong=501,
+        LaoDong = 501,
 
         /// <summary>
         /// 端午
@@ -775,5 +770,31 @@ namespace GHMonitoringCenterApi.Domain.Enums
         /// </summary>
         [Description("授权永不过期")]
         AuthorizeForever = 1000
+    }
+    /// <summary>
+    /// 值类型
+    /// </summary>
+    public enum ValueEnumType
+    {
+        /// <summary>
+        /// 初始值（初始wbs值）
+        /// </summary>
+        [Description("初始值")]
+        None = 0,
+        /// <summary>
+        /// 当月
+        /// </summary>
+        [Description("当月")]
+        NowMonth = 1,
+        /// <summary>
+        /// 当年
+        /// </summary>
+        [Description("当年")]
+        NowYear = 2,
+        /// <summary>
+        /// 开累
+        /// </summary>
+        [Description("开累")]
+        AccumulatedCommencement = 3
     }
 }

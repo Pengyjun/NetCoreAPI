@@ -8,6 +8,7 @@ using GHMonitoringCenterApi.Application.Contracts.Dto.PersonnelOrganizeAdjust;
 using GHMonitoringCenterApi.Application.Contracts.Dto.Project;
 using GHMonitoringCenterApi.Application.Contracts.Dto.Project.Approver;
 using GHMonitoringCenterApi.Application.Contracts.Dto.Project.ExcelImport;
+using GHMonitoringCenterApi.Application.Contracts.Dto.Project.MonthReportForProject;
 using GHMonitoringCenterApi.Application.Contracts.Dto.Project.Report;
 using GHMonitoringCenterApi.Application.Contracts.Dto.Project.ShipMovements;
 using GHMonitoringCenterApi.Application.Contracts.Dto.ProjectPlanProduction;
@@ -267,6 +268,8 @@ namespace GHMonitoringCenterApi.Application.Contracts.AutoMapper
 
             mapperConfigurationExpression.CreateMap<ProjectRank, ExcelProjectRank>();
             mapperConfigurationExpression.CreateMap<ProjectIntensity, ExcelProjectIntensity>();
+
+
         }
     }
 }

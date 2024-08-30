@@ -1,10 +1,5 @@
 ﻿using GHMonitoringCenterApi.Domain.Enums;
 using SqlSugar;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace GHMonitoringCenterApi.Domain.Models
 {
@@ -14,7 +9,6 @@ namespace GHMonitoringCenterApi.Domain.Models
     [SugarTable("t_monthreportdetail", IsDisabledDelete = true)]
     public class MonthReportDetail : BaseEntity<Guid>
     {
-
         /// <summary>
         /// 月报Id
         /// </summary>
@@ -70,19 +64,19 @@ namespace GHMonitoringCenterApi.Domain.Models
         public int? ConstructionNature { get; set; }
 
         /// <summary>
-        /// 外包支出
+        /// 本月外包支出
         /// </summary>
         [SugarColumn(ColumnDataType = "decimal(20,8)")]
         public decimal OutsourcingExpensesAmount { get; set; }
 
         /// <summary>
-        /// 完成工程量(方)
+        /// 本月完成工程量(方)
         /// </summary>
         [SugarColumn(ColumnDataType = "decimal(20,8)")]
         public decimal CompletedQuantity { get; set; }
 
         /// <summary>
-        /// 完成产值（元）
+        /// 本月完成产值（元）
         /// </summary>
         [SugarColumn(ColumnDataType = "decimal(20,8)")]
         public decimal CompleteProductionAmount { get; set; }
