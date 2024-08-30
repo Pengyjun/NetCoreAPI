@@ -22,6 +22,7 @@ using GHMonitoringCenterApi.Domain.Shared.Enums;
 using GHMonitoringCenterApi.Domain.Shared.Util;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using NPOI.SS.Formula.Functions;
 using NPOI.SS.UserModel;
 using NPOI.SS.Util;
 using NPOI.XSSF.UserModel;
@@ -1945,26 +1946,26 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             }
             #region 时间判断
             //查询当前是第几月
-            var nowYear = DateTime.Now.Year;
-            var nowMonth = DateTime.Now.Month;
-            var nowDay = DateTime.Now.Day;
-            var monthDay = 0;
-            if (nowDay > 26)
-            {
-                nowMonth += 1;
-            }
-            if (int.Parse(DateTime.Now.ToString("MMdd")) > 1226)
-            {
-                nowYear += 1;
-            }
-            if (nowMonth.ToString().Length == 1)
-            {
-                monthDay = int.Parse(nowYear + $"0{nowMonth}");
-            }
-            else
-            {
-                monthDay = int.Parse(nowYear + $"{nowMonth}");
-            }
+            //var nowYear = DateTime.Now.Year;
+            //var nowMonth = DateTime.Now.Month;
+            //var nowDay = DateTime.Now.Day;
+            //var monthDay = 0;
+            //if (nowDay > 26)
+            //{
+            //    nowMonth += 1;
+            //}
+            //if (int.Parse(DateTime.Now.ToString("MMdd")) > 1226)
+            //{
+            //    nowYear += 1;
+            //}
+            //if (nowMonth.ToString().Length == 1)
+            //{
+            //    monthDay = int.Parse(nowYear + $"0{nowMonth}");
+            //}
+            //else
+            //{
+            //    monthDay = int.Parse(nowYear + $"{nowMonth}");
+            //}
             #endregion
 
             model.ResetModelProperty();
@@ -2115,10 +2116,23 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             // 年度计划
             list.ForEach(item =>
             {
-                if (item.StatusText == "一级审批中" && (nowDay >= 26 || nowDay <= 1))
+                #region 新 时间判断
+                //今天
+                ConvertHelper.TryConvertDateTimeFromDateDay(Convert.ToInt32(item.DateMonth + DateTime.Now.Day), out DateTime nowDateTime);
+                //如果日期>=26  小于等于下月一号
+                if (nowDateTime.Day >= 26 || (nowDateTime.Day >= 26 && nowDateTime <= Convert.ToDateTime(nowDateTime.AddMonths(1).ToString("yyyy-MM-01"))))
                 {
-                    item.IsShowRecall = item.DateMonth == monthDay ? true : false;
+                    if (item.StatusText == "一级审批中")
+                    {
+                        item.IsShowRecall = true;
+                    }
                 }
+
+                #endregion
+                //if (item.StatusText == "一级审批中" && (nowDay >= 26 || nowDay <= 1))
+                //{
+                //    item.IsShowRecall = item.DateMonth == monthDay ? true : false;
+                //}
 
                 var thisMonthTime = item.DateMonthTime;
                 var area = areas.FirstOrDefault(t => t.PomId == item.AreaId);
