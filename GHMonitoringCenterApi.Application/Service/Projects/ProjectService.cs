@@ -1971,8 +1971,17 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             //var month = DateTime.Now.ToDateMonth();//原来的
             //当前日期>=26 & <=addmonth(1) 1  下月1号
             var month = DateTime.Now.ToDateMonth();
-            if (DateTime.Now.Day >= 26 || (DateTime.Now.Day >= 26 && DateTime.Now.Date <= Convert.ToDateTime(DateTime.Now.AddMonths(1).Date.ToString("yyyy-MM-1"))))
-            { month = DateTime.Now.AddMonths(-1).ToDateMonth(); }
+            if (DateTime.Now.Day == 1)//如果是1号   是上月数据最后修改的一天
+            {
+                month = DateTime.Now.AddMonths(-1).ToDateMonth();
+            }
+            else if (DateTime.Now.Day >= 26)//当月的数据
+            { }
+            else
+            {
+                //减掉一个月的数据
+                month = DateTime.Now.AddMonths(-1).ToDateMonth();
+            }
 
             var project = await GetProjectPartAsync(model.ProjectId);
             if (project == null)
