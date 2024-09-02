@@ -1,6 +1,6 @@
 ﻿using GHMonitoringCenterApi.Application.Contracts.Dto.Job;
 using GHMonitoringCenterApi.Application.Contracts.Dto.Project;
-using GHMonitoringCenterApi.Application.Contracts.Dto.Project.Report;
+using GHMonitoringCenterApi.Application.Contracts.Dto.Project.MonthReportForProject;
 using GHMonitoringCenterApi.Application.Contracts.IService.Job;
 using GHMonitoringCenterApi.CustomAttribute;
 using GHMonitoringCenterApi.Domain.Enums;
@@ -55,17 +55,26 @@ namespace GHMonitoringCenterApi.Controllers.Job
             return await _jobService.SubmitJobAsync(model);
         }
 
+        ///// <summary>
+        ///// 搜索项目月报
+        ///// </summary>
+        ///// <returns></returns>
+        //[HttpGet("SearchJobBizOfMonthReport")]
+        //public async Task<ResponseAjaxResult<JobBizResponseDto<ProjectMonthReportResponseDto>>> SearchJobBizOfMonthReportAsync([FromQuery] JobBizRequestV2Dto model)
+        //{
+        //    model.BizModule = BizModule.MonthReport;
+        //    return await _jobService.SearchJobBizV2Async<ProjectMonthReportResponseDto>(model);
+        //}
         /// <summary>
         /// 搜索项目月报
         /// </summary>
         /// <returns></returns>
         [HttpGet("SearchJobBizOfMonthReport")]
-        public async Task<ResponseAjaxResult<JobBizResponseDto<ProjectMonthReportResponseDto>>> SearchJobBizOfMonthReportAsync([FromQuery] JobBizRequestV2Dto model)
+        public async Task<ResponseAjaxResult<MonthReportForProjectResponseDto>> SearchJobOfMonthReportAsync([FromQuery] JobBizRequestV2Dto model)
         {
             model.BizModule = BizModule.MonthReport;
-            return await _jobService.SearchJobBizV2Async<ProjectMonthReportResponseDto>(model);
+            return await _jobService.SearchMonthReportAsync(model);
         }
-
         /// <summary>
         /// 提交任务-项目月报
         /// </summary>
