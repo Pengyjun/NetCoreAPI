@@ -338,7 +338,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                         OutsourcingExpensesAmount = 0M,// kvp.OutsourcingExpensesAmount,// 
                         ValueType = ValueEnumType.NowMonth,
                         CompleteProductionAmount = 0M,//kvp.CompleteProductionAmount,// 
-                        Remark = kvp.Remark,//string.Empty,
+                        Remark = string.Empty,//kvp.Remark,//string.Empty,
                         ConstructionNature = kvp.ConstructionNature,
                         ContractAmount = kvp.ContractAmount,
                         DateMonth = kvp.DateMonth,
