@@ -333,12 +333,12 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 {
                     historyMonthReport.Add(new ProjectWBSDto
                     {
-                        CompletedQuantity = 0M,// kvp.CompletedQuantity,// 
-                        UnitPrice = 0M,//kvp.UnitPrice,//
-                        OutsourcingExpensesAmount = 0M,// kvp.OutsourcingExpensesAmount,// 
+                        CompletedQuantity = kvp.CompletedQuantity,// 0M,//
+                        UnitPrice = kvp.UnitPrice,//0M,//
+                        OutsourcingExpensesAmount = kvp.OutsourcingExpensesAmount,//0M, 
                         ValueType = ValueEnumType.NowMonth,
-                        CompleteProductionAmount = 0M,//kvp.CompleteProductionAmount,// 
-                        Remark = string.Empty,//kvp.Remark,//string.Empty,
+                        CompleteProductionAmount = kvp.CompleteProductionAmount,//0M,// 
+                        Remark = kvp.Remark,//string.Empty,string.Empty,//
                         ConstructionNature = kvp.ConstructionNature,
                         ContractAmount = kvp.ContractAmount,
                         DateMonth = kvp.DateMonth,
