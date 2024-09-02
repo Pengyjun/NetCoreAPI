@@ -3,6 +3,7 @@ using CDC.MDM.Core.Common.Util;
 using GHMonitoringCenterApi.Application.Contracts.Dto.Enums;
 using GHMonitoringCenterApi.Application.Contracts.Dto.Job;
 using GHMonitoringCenterApi.Application.Contracts.Dto.Project;
+using GHMonitoringCenterApi.Application.Contracts.Dto.Project.MonthReportForProject;
 using GHMonitoringCenterApi.Application.Contracts.Dto.Project.Report;
 using GHMonitoringCenterApi.Application.Contracts.IService;
 using GHMonitoringCenterApi.Application.Contracts.IService.Job;
@@ -119,6 +120,10 @@ namespace GHMonitoringCenterApi.Application.Service.Job
         /// 匹配
         /// </summary>
         private readonly IMapper _mapper;
+        /// <summary>
+        /// 新版项目月报wbs列表
+        /// </summary>
+        private readonly IMonthReportForProjectService _mPService;
 
         /// <summary>
         /// 全局对象
@@ -161,6 +166,7 @@ namespace GHMonitoringCenterApi.Application.Service.Job
             , IMapper mapper
             , GlobalObject globalObject
             , ISqlSugarClient dbContext
+            , IMonthReportForProjectService mPService
             )
         {
             _baseService = baseService;
@@ -184,6 +190,7 @@ namespace GHMonitoringCenterApi.Application.Service.Job
             _mapper = mapper;
             _globalObject = globalObject;
             _dbContext = dbContext;
+            _mPService = mPService;
         }
         #region 提交任务
 
@@ -1056,9 +1063,9 @@ namespace GHMonitoringCenterApi.Application.Service.Job
         /// 搜索任务的业务数据-版本2
         /// </summary>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<JobBizResponseDto<TBizResult>>> SearchJobBizV2Async<TBizResult>(JobBizRequestV2Dto model) where TBizResult : class
+        public async Task<ResponseAjaxResult<MonthReportForProjectResponseDto>> SearchMonthReportAsync(JobBizRequestV2Dto model)
         {
-            var result = new ResponseAjaxResult<JobBizResponseDto<TBizResult>>();
+            var result = new ResponseAjaxResult<MonthReportForProjectResponseDto>();
             var job = await GetJobAsync(model.JobId);
             if (job == null)
             {
@@ -1068,47 +1075,94 @@ namespace GHMonitoringCenterApi.Application.Service.Job
             {
                 return result.FailResult(HttpStatusCode.DataNotMatch, ResponseMessage.DATA_NOTMATCH_BIZ);
             }
+
             //读取job中的月份 // 解析 JSON 字符串
             JObject json = JObject.Parse(job.BizData);
             int dateMonth = Convert.ToInt32(json["DateMonth"]);
-            //获取历史的
-            var historyData = await GetProjectProductionValue(job.ProjectId, dateMonth);
-            ////获取全部数据
-            //var data = await _dbContext.Queryable<MonthReport>().Where(x => x.IsDelete == 1 && x.ProjectId == job.ProjectId).Select(x => new { x.PartyAConfirmedProductionAmount, x.PartyAPayAmount, x.ProjectId, x.DateMonth }).ToListAsync();
 
-            ////获取本年甲方确认产值
-            //var startMonth = Convert.ToInt32(dateMonth.ToString().Substring(0, 4) + "0101");
-            //var currentYearOffirmProductionValue = data.Where(x => x.DateMonth >= startMonth && x.DateMonth <= dateMonth).Sum(x => x.PartyAConfirmedProductionAmount) //+ historyData.Item1;
+            //获取新的bizData
+            var projectMonthReportRequestDto = new ProjectMonthReportRequestDto()
+            {
+                DateMonth = dateMonth,
+                JobId = job.Id,
+                ProjectId = job.ProjectId
+            };
 
-            ////获取本年甲方付款金额
-            //var currenYearCollection = data.Where(x => x.DateMonth >= startMonth && x.DateMonth <= dateMonth).Sum(x => x.PartyAPayAmount)// + historyData.Item3;
+            result = await _mPService.SearchMonthReportForProjectAsync(projectMonthReportRequestDto);
+            ////获取历史的
+            //var historyData = await GetProjectProductionValue(job.ProjectId, dateMonth);
 
-            ////获取开累甲方确认产值
-            //var totalYearKaileaOffirmProductionValue = data.Where(x => x.DateMonth <= dateMonth).Sum(x => x.PartyAConfirmedProductionAmount) //+ historyData.Item2;
+            //var currentYearOffirmProductionValue = historyData.Item1;
+            //var currenYearCollection = historyData.Item3;
+            //var totalYearKaileaOffirmProductionValue = historyData.Item2;
+            //var totalYearCollection = historyData.Item4;
+            //// 解析 JSON 字符串
+            //JObject jsonObject = JObject.Parse(job.BizData);
 
-            ////获取开累甲方付款金额
-            //var totalYearCollection = data.Where(x => x.DateMonth <= dateMonth).Sum(x => x.PartyAPayAmount) //+ historyData.Item4;
-            var currentYearOffirmProductionValue = historyData.Item1;
-            var currenYearCollection = historyData.Item3;
-            var totalYearKaileaOffirmProductionValue = historyData.Item2;
-            var totalYearCollection = historyData.Item4;
-            // 解析 JSON 字符串
-            JObject jsonObject = JObject.Parse(job.BizData);
+            //// 添加新字段及其值
+            //jsonObject["CurrentYearOffirmProductionValue"] = currentYearOffirmProductionValue;
+            //jsonObject["currenYearCollection"] = currenYearCollection;
+            //jsonObject["totalYearKaileaOffirmProductionValue"] = totalYearKaileaOffirmProductionValue;
+            //jsonObject["totalYearCollection"] = totalYearCollection;
 
-            // 添加新字段及其值
-            jsonObject["CurrentYearOffirmProductionValue"] = currentYearOffirmProductionValue;
-            jsonObject["currenYearCollection"] = currenYearCollection;
-            jsonObject["totalYearKaileaOffirmProductionValue"] = totalYearKaileaOffirmProductionValue;
-            jsonObject["totalYearCollection"] = totalYearCollection;
+            //// 转换回 JSON 字符串
+            //job.BizData = jsonObject.ToString();
 
-            // 转换回 JSON 字符串
-            job.BizData = jsonObject.ToString();
+            //var bizResult = CastDeserializeObject<TBizResult>(job.BizData);
+            //var jobBizRes = new JobBizResponseDto<TBizResult>() { ProjectId = job.ProjectId, JobId = job.Id, BizModule = job.BizModule, BizData = bizResult };
 
-            var bizResult = CastDeserializeObject<TBizResult>(job.BizData);
-            var jobBizRes = new JobBizResponseDto<TBizResult>() { ProjectId = job.ProjectId, JobId = job.Id, BizModule = job.BizModule, BizData = bizResult };
-           
-            return result.SuccessResult(jobBizRes);
+            return result;
         }
+        ///// <summary>
+        ///// 搜索任务的业务数据-版本2
+        ///// </summary>
+        ///// <returns></returns>
+        //public async Task<ResponseAjaxResult<JobBizResponseDto<TBizResult>>> SearchJobBizV2Async<TBizResult>(JobBizRequestV2Dto model) where TBizResult : class
+        //{
+        //    var result = new ResponseAjaxResult<JobBizResponseDto<TBizResult>>();
+        //    var job = await GetJobAsync(model.JobId);
+        //    if (job == null)
+        //    {
+        //        return result.FailResult(HttpStatusCode.DataNotEXIST, ResponseMessage.DATA_NOTEXIST_JOB);
+        //    }
+        //    if (job.BizModule != model.BizModule)
+        //    {
+        //        return result.FailResult(HttpStatusCode.DataNotMatch, ResponseMessage.DATA_NOTMATCH_BIZ);
+        //    }
+        //    ////获取新的bizData
+        //    //var projectMonthReportRequestDto = new ProjectMonthReportRequestDto()
+        //    //{ 
+        //    //     DateMonth=
+        //    //};
+        //    //var pWbsData = await _mPService.SearchMonthReportForProjectAsync(projectMonthReportRequestDto);
+
+        //    //读取job中的月份 // 解析 JSON 字符串
+        //    JObject json = JObject.Parse(job.BizData);
+        //    int dateMonth = Convert.ToInt32(json["DateMonth"]);
+        //    //获取历史的
+        //    var historyData = await GetProjectProductionValue(job.ProjectId, dateMonth);
+
+        //    var currentYearOffirmProductionValue = historyData.Item1;
+        //    var currenYearCollection = historyData.Item3;
+        //    var totalYearKaileaOffirmProductionValue = historyData.Item2;
+        //    var totalYearCollection = historyData.Item4;
+        //    // 解析 JSON 字符串
+        //    JObject jsonObject = JObject.Parse(job.BizData);
+
+        //    // 添加新字段及其值
+        //    jsonObject["CurrentYearOffirmProductionValue"] = currentYearOffirmProductionValue;
+        //    jsonObject["currenYearCollection"] = currenYearCollection;
+        //    jsonObject["totalYearKaileaOffirmProductionValue"] = totalYearKaileaOffirmProductionValue;
+        //    jsonObject["totalYearCollection"] = totalYearCollection;
+
+        //    // 转换回 JSON 字符串
+        //    job.BizData = jsonObject.ToString();
+
+        //    var bizResult = CastDeserializeObject<TBizResult>(job.BizData);
+        //    var jobBizRes = new JobBizResponseDto<TBizResult>() { ProjectId = job.ProjectId, JobId = job.Id, BizModule = job.BizModule, BizData = bizResult };
+
+        //    return result.SuccessResult(jobBizRes);
+        //}
 
 
         /// <summary>

@@ -1964,15 +1964,36 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
         {
             var result = new ResponseAjaxResult<bool>();
 
-            //校验是否在可更改的时间范围内
-            var hMenu = await dbContext.Queryable<HomeMenu>().Where(x => x.IsDelete == 1 && x.Display == true).FirstAsync();
-            if (hMenu == null)//关闭修改结构权限
-            { return result.FailResult(HttpStatusCode.NoAuthorityOperateFail, "填报时间内不可调整项目结构"); }
             //var month = DateTime.Now.ToDateMonth();//原来的
             //当前日期>=26 & <=addmonth(1) 1  下月1号
             var month = DateTime.Now.ToDateMonth();
-            if (DateTime.Now.Day >= 26 || (DateTime.Now.Day >= 26 && DateTime.Now.Date <= Convert.ToDateTime(DateTime.Now.AddMonths(1).Date.ToString("yyyy-MM-1"))))
-            { month = DateTime.Now.AddMonths(-1).ToDateMonth(); }
+
+            //校验是否在可更改的时间范围内
+            var hMenu = await dbContext.Queryable<HomeMenu>().Where(x => x.IsDelete == 1 && x.Display == true).FirstAsync();
+            if (hMenu == null)
+            {
+                //关闭修改结构权限
+                if (DateTime.Now.Day == 1)//如果是1号   是上月数据最后修改的一天 在填报范围内 不可更改项目结构
+                {
+                    return result.FailResult(HttpStatusCode.NoAuthorityOperateFail, "填报时间内不可调整项目结构");
+                }
+                else if (DateTime.Now.Day >= 26)//当月的数据  在填报范围内 不可更改项目结构
+                {
+                    return result.FailResult(HttpStatusCode.NoAuthorityOperateFail, "填报时间内不可调整项目结构");
+                }
+            }
+
+            if (DateTime.Now.Day == 1)//如果是1号  
+            {
+                month = DateTime.Now.AddMonths(-1).ToDateMonth();
+            }
+            else if (DateTime.Now.Day >= 26)//当月 
+            { }
+            else
+            {
+                //减掉一个月
+                month = DateTime.Now.AddMonths(-1).ToDateMonth();
+            }
 
             var project = await GetProjectPartAsync(model.ProjectId);
             if (project == null)

@@ -1,4 +1,5 @@
 ﻿using GHMonitoringCenterApi.Application.Contracts.Dto.Job;
+using GHMonitoringCenterApi.Application.Contracts.Dto.Project.MonthReportForProject;
 using GHMonitoringCenterApi.Domain.Shared;
 
 namespace GHMonitoringCenterApi.Application.Contracts.IService.Job
@@ -66,7 +67,8 @@ namespace GHMonitoringCenterApi.Application.Contracts.IService.Job
         /// 搜索任务的业务数据-版本2
         /// </summary>
         /// <returns></returns>
-        Task<ResponseAjaxResult<JobBizResponseDto<TBizResult>>> SearchJobBizV2Async<TBizResult>(JobBizRequestV2Dto model) where TBizResult : class;
+        //Task<ResponseAjaxResult<JobBizResponseDto<TBizResult>>> SearchJobBizV2Async<TBizResult>(JobBizRequestV2Dto model) where TBizResult : class;
+        Task<ResponseAjaxResult<MonthReportForProjectResponseDto>> SearchMonthReportAsync(JobBizRequestV2Dto model);
 
         /// <summary>
         /// 搜索任务任务审批人列表
