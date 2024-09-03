@@ -2821,6 +2821,9 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     if (item.ConstructionNature == existMReport.ConstructionNature && item.OutPutType == existMReport.OutPutType && item.ShipId == existMReport.ShipId && item.UnitPrice == existMReport.UnitPrice
                         && item.CompletedQuantity == existMReport.CompletedQuantity && item.OutsourcingExpensesAmount == existMReport.OutsourcingExpensesAmount && item.Remark == existMReport.Remark)
                     { }
+                    else if (item.ConstructionNature == 0 && item.OutPutType == 0 && item.ShipId == existMReport.ShipId && item.UnitPrice == 0
+                        && item.CompletedQuantity == 0 && item.OutsourcingExpensesAmount == 0 && string.IsNullOrWhiteSpace(item.Remark))
+                    { }
                     else reqDetails.Add(item);//否则追加数据做后续逻辑处理
                 }
                 else reqDetails.Add(item);//追加数据做后续逻辑处理
@@ -3080,9 +3083,12 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                                   && x.CompletedQuantity == eRL.CompletedQuantity && x.OutsourcingExpensesAmount == eRL.OutsourcingExpensesAmount && x.Remark == eRL.Remark);
                             if (value == null)
                             {
-                                //追加本月的
-                                eRL.IsAllowDelete = true;
-                                nMorthRepDetails.Add(eRL);
+                                if (!(0 == eRL.ConstructionNature && 0 == eRL.OutPutType && 0 == eRL.UnitPrice && 0 == eRL.CompletedQuantity && 0 == eRL.OutsourcingExpensesAmount && string.IsNullOrWhiteSpace(eRL.Remark)))
+                                {
+                                    //追加本月的
+                                    eRL.IsAllowDelete = true;
+                                    nMorthRepDetails.Add(eRL);
+                                }
                             }
                         }
                     }
