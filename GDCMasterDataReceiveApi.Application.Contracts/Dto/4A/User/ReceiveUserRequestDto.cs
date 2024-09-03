@@ -34,11 +34,11 @@
         /// <summary>
         /// 集合对象
         /// </summary>
-        public List<User> user { get; set; }
+        public Receive4AUser user { get; set; }
     }
 
 
-    public class User 
+    public class Receive4AUser 
     {
         /// <summary>
         /// 人员编码  必填,HR 系统中定义的人员唯  一编码，默认用户名

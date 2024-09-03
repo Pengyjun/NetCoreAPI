@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto._4A.User;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.AccountingDepartment;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.AccountingOrganization;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.AdministrativeAccountingMapper;
@@ -88,7 +89,7 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.AutoMapper
             //国民经济行业分类
             mapperConfigurationExpression.CreateMap<NationalEconomyReceiveDto, NationalEconomy>();
             //人员主数据
-            mapperConfigurationExpression.CreateMap<PersonReceiveDto, Person>();
+            mapperConfigurationExpression.CreateMap<Receive4AUser, User>();
             //项目类
             mapperConfigurationExpression.CreateMap<ProjectReceiveDto, Project>();
             //中交项目行业分类产业分类、业务板块、十二大业务类型、江河湖海对照关系
@@ -102,7 +103,7 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.AutoMapper
             //房号
             mapperConfigurationExpression.CreateMap<RoomNumberReceiveDto, RoomNumber>();
             //科研项目
-            mapperConfigurationExpression.CreateMap<ScientifiCNoProjectReceiveDto, ScientifiCNoProject>();
+            //mapperConfigurationExpression.CreateMap<ScientifiCNoProjectReceiveDto, ScientifiCNoProject>();
             //中标交底项目表类型
             mapperConfigurationExpression.CreateMap<TypeOfBidDisclosureProjectTableReceiveDto, TypeOfBidDisclosureProjectTable>();
             //常用计量单位

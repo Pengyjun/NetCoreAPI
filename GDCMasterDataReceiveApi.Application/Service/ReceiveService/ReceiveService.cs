@@ -1,6 +1,9 @@
-﻿using GDCMasterDataReceiveApi.Application.Contracts.Dto._4A.User;
+﻿using AutoMapper;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto._4A.User;
 using GDCMasterDataReceiveApi.Application.Contracts.IService.IReceiveService;
+using GDCMasterDataReceiveApi.Domain.Models;
 using GDCMasterDataReceiveApi.Domain.Shared;
+using GDCMasterDataReceiveApi.Domain.Shared.Utils;
 using SqlSugar;
 using UtilsSharp;
 
@@ -12,12 +15,14 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
     public class ReceiveService : IReceiveService
     {
         private readonly ISqlSugarClient _dbContext;
+        private readonly IMapper mapper;
         /// <summary>
         /// 注入上下文
         /// </summary>
-        public ReceiveService(ISqlSugarClient dbContext)
+        public ReceiveService(ISqlSugarClient dbContext, IMapper mapper)
         {
             this._dbContext = dbContext;
+            this.mapper = mapper;
         }
         /// <summary>
         /// 获取通用字典数据
@@ -371,15 +376,23 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
         /// 人员主数据
         /// </summary>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<bool>> PersonDataAsync(List<ReceiveUserRequestDto> receiveUserRequestDto)
+        public async Task<ResponseAjaxResult<bool>> PersonDataAsync(ReceiveUserRequestDto receiveUserRequestDto)
         {
             var responseAjaxResult = new ResponseAjaxResult<bool>();
-            await Console.Out.WriteLineAsync("接收的数据:" + receiveUserRequestDto.ToJson());
-            responseAjaxResult.SuccessResult(true);
+            var isExistUser = await _dbContext.Queryable<User>().Where(x => x.IsDelete == 1 && x.EMP_CODE == receiveUserRequestDto.user.EMP_CODE).SingleAsync();
+            if (isExistUser != null)
+            {
+                await _dbContext.Updateable<User>(receiveUserRequestDto.user).Where(x=>x.EMP_CODE== isExistUser.EMP_CODE).IgnoreColumns(x=>x.EMP_CODE).ExecuteCommandAsync();
+            }
+            else
+            {
+                var user = mapper.Map<User>(receiveUserRequestDto.user);
+                user.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
+                await _dbContext.Insertable<User>(user).ExecuteCommandAsync();
+            }
+            responseAjaxResult.Data = true;
+            responseAjaxResult.Success();
             return responseAjaxResult;
-
-
-
         }
         /// <summary>
         /// 机构主数据

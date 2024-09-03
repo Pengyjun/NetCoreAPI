@@ -100,18 +100,18 @@ namespace GDCMasterDataReceiveApi.Application
                         //数据操作人不一致 查询原操作人
                         else
                         {
-                            //获取原操作人
-                            var uInfo = await _dbContext.Queryable<Person>()
-                                .Where(t => t.IsDelete == 1 && t.Id == value.UId)
-                                .FirstAsync();
+                            ////获取原操作人
+                            //var uInfo = await _dbContext.Queryable<Person>()
+                            //    .Where(t => t.IsDelete == 1 && t.Id == value.UId)
+                            //    .FirstAsync();
 
-                            string name = string.Empty;
-                            //字段相同
-                            if (kColumns.Count == paramsColums.Count) name = "更改";
-                            //字段减少
-                            if (kColumns.Count > paramsColums.Count) name = "减少";
-                            responseAjaxResult.FailResult(HttpStatusCode.SaveFail, $"不可{name}原列名数量，如需更改，进入维护页面删除此数据；或联系" + uInfo?.NAME + "（" + uInfo?.PHONE + "）更改/删除");
-                            return responseAjaxResult;
+                            //string name = string.Empty;
+                            ////字段相同
+                            //if (kColumns.Count == paramsColums.Count) name = "更改";
+                            ////字段减少
+                            //if (kColumns.Count > paramsColums.Count) name = "减少";
+                            //responseAjaxResult.FailResult(HttpStatusCode.SaveFail, $"不可{name}原列名数量，如需更改，进入维护页面删除此数据；或联系" + uInfo?.NAME + "（" + uInfo?.PHONE + "）更改/删除");
+                            //return responseAjaxResult;
                         }
                     }
                 }

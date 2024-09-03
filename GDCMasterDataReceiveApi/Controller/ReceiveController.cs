@@ -2,6 +2,7 @@
 using GDCMasterDataReceiveApi.Application.Contracts.IService.IReceiveService;
 using GDCMasterDataReceiveApi.Domain.Shared;
 using GDCMasterDataReceiveApi.Domain.Shared.Annotation;
+using GDCMasterDataReceiveApi.Domain.Shared.WebSecurity;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using UtilsSharp;
@@ -239,13 +240,7 @@ namespace GDCMasterDataReceiveApi.Controller
         [UnitOfWork]
         [HttpPost("AccountingOrganization")]
         public Task<ResponseAjaxResult<bool>> AccountingOrganizationDataAsync() => _receiveService.AccountingOrganizationDataAsync();
-        /// <summary>
-        /// 人员主数据
-        /// </summary>
-        /// <returns></returns>
-        [UnitOfWork]
-        [HttpPost("Person")]
-        public Task<ResponseAjaxResult<bool>> PersonDataAsync([FromBody]List<ReceiveUserRequestDto> receiveUserRequestDto) => _receiveService.PersonDataAsync(receiveUserRequestDto);
+     
         /// <summary>
         /// 机构主数据
         /// </summary>
@@ -258,10 +253,9 @@ namespace GDCMasterDataReceiveApi.Controller
         #region 拉取4A的人员和机构数据
         [Route("api/4A/Receive/Person")]
         [HttpPost]
-        public async Task<bool> PersonAsync([FromBody] ReceiveUserRequestDto receiveUserRequestDto) 
+        public async Task<ResponseAjaxResult<bool>>  PersonAsync([FromBody] ReceiveUserRequestDto receiveUserRequestDto) 
         {
-            await Console.Out.WriteLineAsync("接收的数据："+ receiveUserRequestDto.ToJson());
-            return true;
+            return await _receiveService.PersonDataAsync(receiveUserRequestDto);
         }
         #endregion
     }

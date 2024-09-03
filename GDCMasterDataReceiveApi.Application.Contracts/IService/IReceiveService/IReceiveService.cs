@@ -166,7 +166,7 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.IService.IReceiveService
         /// 人员主数据
         /// </summary>
         /// <returns></returns>
-        Task<ResponseAjaxResult<bool>> PersonDataAsync(List<ReceiveUserRequestDto> receiveUserRequestDto);
+        Task<ResponseAjaxResult<bool>> PersonDataAsync(ReceiveUserRequestDto receiveUserRequestDto);
         /// <summary>
         /// 机构主数据
         /// </summary>
