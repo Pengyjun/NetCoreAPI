@@ -3079,7 +3079,6 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                         {
                             if (string.IsNullOrWhiteSpace(eRL.DetailId.ToString()))
                             {
-
                                 //追加本月新的
                                 eRL.IsAllowDelete = true;
                                 nMorthRepDetails.Add(eRL);
