@@ -266,14 +266,15 @@ namespace GHMonitoringCenterApi.Application.Service
         /// 往来单位数据
         /// </summary>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<List<DealingUnit>>> GetDealingUnitAsync()
+        public async Task<ResponseAjaxResult<List<DealingUnit>>> GetDealingUnitAsync(int pageIndex, int pageSize)
         {
             var responseAjaxResult = new ResponseAjaxResult<List<DealingUnit>>();
+            RefAsync<int> total = 0;
             var data = await _dbContext.Queryable<DealingUnit>()
                 .Where(x => x.IsDelete == 1)
-                .ToListAsync();
+                .ToPageListAsync(pageIndex, pageSize, total);
 
-            responseAjaxResult.Count = data.Count;
+            responseAjaxResult.Count = total;
             responseAjaxResult.SuccessResult(data, ResponseMessage.OPERATION_SUCCESS);
             return responseAjaxResult;
         }
@@ -699,12 +700,13 @@ namespace GHMonitoringCenterApi.Application.Service
                 {
                     requestDto.StartTime = DateTime.Now.AddMonths(-1).ToString("yyyy-MM-26 00:00:00").ObjToDate();
                 }
-                 month = requestDto.StartTime.Value.Month.ToString();
+                month = requestDto.StartTime.Value.Month.ToString();
             }
-            else {
+            else
+            {
                 if (requestDto.EndTime.Value.Day > 26)
                 {
-                    month= requestDto.StartTime.Value.Month.ToString();
+                    month = requestDto.StartTime.Value.Month.ToString();
                 }
                 else
                 {
@@ -717,7 +719,7 @@ namespace GHMonitoringCenterApi.Application.Service
             {
                 month = "0" + month;
             }
-           var  currentMonth =int.Parse(DateTime.Now.Year + month);
+            var currentMonth = int.Parse(DateTime.Now.Year + month);
             //当年开始时间
             var yearStartIime = DateTime.Now.ToString("yyyy01").ObjToInt();
             var yearEndTime = DateTime.Now.ToString("yyyy12").ObjToInt();
@@ -727,10 +729,10 @@ namespace GHMonitoringCenterApi.Application.Service
             var responseAjaxResult = new ResponseAjaxResult<List<MonthtReportDto>>();
             List<MonthtReportDto> monthtReportDtos = new List<MonthtReportDto>();
             var projectMonthList = await _dbContext.Queryable<MonthReport>().Where(x => x.IsDelete == 1)
-                .WhereIF(requestDto.StartTime!=null&& requestDto.EndTime!=null,x=> (x.CreateTime>= requestDto.StartTime.Value&&x.CreateTime<=requestDto.EndTime.Value)
+                .WhereIF(requestDto.StartTime != null && requestDto.EndTime != null, x => (x.CreateTime >= requestDto.StartTime.Value && x.CreateTime <= requestDto.EndTime.Value)
                 || (x.UpdateTime >= requestDto.StartTime.Value && x.UpdateTime <= requestDto.EndTime.Value)).ToListAsync();
 
-            var projectHistoryList =await _dbContext.Queryable<ProjectMonthReportHistory>().Where(x => x.IsDelete == 1).ToListAsync();
+            var projectHistoryList = await _dbContext.Queryable<ProjectMonthReportHistory>().Where(x => x.IsDelete == 1).ToListAsync();
 
 
             var projectValueHistoryList = await _dbContext.Queryable<ProjectHistoryData>().Where(x => x.IsDelete == 1).ToListAsync();
@@ -748,16 +750,16 @@ namespace GHMonitoringCenterApi.Application.Service
                    ).ToList();
                     monthtReportDtos.Add(new MonthtReportDto()
                     {
-                        Id=item.Id,
+                        Id = item.Id,
                         DateMonth = item.DateMonth,
                         ProjectId = item.ProjectId,
                         AccomplishQuantities = item.CompletedQuantity,
                         YearAccomplishQuantities = yearCompletProductionValue.Sum(x => x.CompletedQuantity),
-                        AccumulativeQuantities = yearTotalCompletProductionValue.Sum(x => x.CompletedQuantity)+ projectValueHistoryList.Where(x => x.ProjectId == item.ProjectId && x.AccumulatedProduction != null).Sum(x => x.AccumulatedProduction.Value),
+                        AccumulativeQuantities = yearTotalCompletProductionValue.Sum(x => x.CompletedQuantity) + projectValueHistoryList.Where(x => x.ProjectId == item.ProjectId && x.AccumulatedProduction != null).Sum(x => x.AccumulatedProduction.Value),
 
                         RecognizedValue = item.PartyAConfirmedProductionAmount,
                         YearRecognizedValue = yearCompletProductionValue.Sum(x => x.PartyAConfirmedProductionAmount),
-                        CumulativeValue = yearTotalCompletProductionValue.Sum(x => x.PartyAConfirmedProductionAmount)+ projectHistoryList.Where(x=>x.ProjectId==item.ProjectId&&x.KaileiOwnerConfirmation!=null).Sum(x=>x.KaileiOwnerConfirmation.Value),
+                        CumulativeValue = yearTotalCompletProductionValue.Sum(x => x.PartyAConfirmedProductionAmount) + projectHistoryList.Where(x => x.ProjectId == item.ProjectId && x.KaileiOwnerConfirmation != null).Sum(x => x.KaileiOwnerConfirmation.Value),
 
                         PaymentAmount = item.PartyAPayAmount,
                         YearPaymentAmount = yearCompletProductionValue.Sum(x => x.PartyAPayAmount),
@@ -767,16 +769,16 @@ namespace GHMonitoringCenterApi.Application.Service
                         AccomplishValue = item.CompleteProductionAmount,// currentProjectMonthRepost.CompleteProductionAmount,
                         YearAccomplishValue = yearCompletProductionValue.Sum(x => x.CompleteProductionAmount),
                         //YearAccomplishCost = yearCompletProductionValue.Sum(x => x.CompleteProductionAmount),
-                       // CumulativeAccomplishCost = yearTotalCompletProductionValue.Sum(x => x.CompleteProductionAmount),
+                        // CumulativeAccomplishCost = yearTotalCompletProductionValue.Sum(x => x.CompleteProductionAmount),
 
-                        CumulativeCompleted= yearTotalCompletProductionValue.Sum(x => x.CompleteProductionAmount)+projectValueHistoryList.Where(x => x.ProjectId == item.ProjectId
+                        CumulativeCompleted = yearTotalCompletProductionValue.Sum(x => x.CompleteProductionAmount) + projectValueHistoryList.Where(x => x.ProjectId == item.ProjectId
                         && x.AccumulatedOutputValue != null).Sum(x => x.AccumulatedOutputValue.Value),
                         OutsourcingExpensesAmount = item.OutsourcingExpensesAmount,
-                    }); 
+                    });
 
                 }
             }
-            
+
             responseAjaxResult.Data = monthtReportDtos;
             responseAjaxResult.Count = monthtReportDtos.Count;
             responseAjaxResult.Success();
@@ -1238,7 +1240,7 @@ namespace GHMonitoringCenterApi.Application.Service
             ResponseAjaxResult<List<ProjectStatusChangResponse>> responseAjaxResult = new ResponseAjaxResult<List<ProjectStatusChangResponse>>();
             List<ProjectStatusChangResponse> projectStatusChangResponses = new List<ProjectStatusChangResponse>();
             var list = _dbContext.Queryable<StartWorkRecord>()
-               .Where((it) => it.BeforeStatus != it.AfterStatus )
+               .Where((it) => it.BeforeStatus != it.AfterStatus)
                 .GroupBy(it => it.ProjectId)
                 .Select(it => new
                 {
@@ -1247,7 +1249,7 @@ namespace GHMonitoringCenterApi.Application.Service
                 })
                 .MergeTable()
                 .LeftJoin<StartWorkRecord>((a, b) => a.name == b.ProjectId)
-                  .Where((a,b) => a.CreateTime == b.CreateTime)
+                  .Where((a, b) => a.CreateTime == b.CreateTime)
                 .Select((a, b) => b).ToList();
             foreach (var item in list)
             {

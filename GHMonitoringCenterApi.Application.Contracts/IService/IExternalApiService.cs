@@ -51,7 +51,7 @@ namespace GHMonitoringCenterApi.Application.Contracts.IService
         /// 往来单位
         /// </summary>
         /// <returns></returns>
-        Task<ResponseAjaxResult<List<DealingUnit>>> GetDealingUnitAsync();
+        Task<ResponseAjaxResult<List<DealingUnit>>> GetDealingUnitAsync(int pageIndex, int pageSize);
         /// <summary>
         /// 项目状态
         /// </summary>
