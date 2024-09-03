@@ -1,7 +1,5 @@
-﻿using Dm;
-using GDCMasterDataReceiveApi.Application.Contracts;
+﻿using GDCMasterDataReceiveApi.Application.Contracts;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.LouDong;
-using Microsoft.Data.SqlClient;
 using Newtonsoft.Json;
 using SqlSugar;
 using UtilsSharp;
