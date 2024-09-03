@@ -6,6 +6,10 @@
     public class PersonDto
     {
         /// <summary>
+        /// 主键id
+        /// </summary>
+        public long Id { get; set; }
+        /// <summary>
         /// 人员编码:必填,HR 系统中定义的人员唯 一编码，默认用户名
         /// </summary>
         public string Code { get; set; }

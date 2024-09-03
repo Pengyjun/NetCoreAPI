@@ -36,20 +36,20 @@ namespace GDCMasterDataReceiveApi.SqlSugarCore
                 var sqlParmae = string.Empty;
                 db.Aop.OnLogExecuting = (sql, parames) =>
                 {
-                    //if (sql.IndexOf("t_auditlogs") < 0)
-                    //{
-                    //    if (isOpenSql)
-                    //    {
-                    //        //获取无参数化sql  会影响性能  建议调试使用生产环境禁止使用
-                    //        sqlParmae = UtilMethods.GetSqlString(DbType.Dm, sql, parames);
-                    //    }
-                    //    else
-                    //    {
-                    //        sqlParmae = sql;
-                    //    }
-                    //}
-                    ////调试时打印sql语句 生产时注释掉
-                    //Console.WriteLine($"{sqlParmae}");
+                    if (sql.IndexOf("t_auditlogs") < 0)
+                    {
+                        if (isOpenSql)
+                        {
+                            //获取无参数化sql  会影响性能  建议调试使用生产环境禁止使用
+                            sqlParmae = UtilMethods.GetSqlString(DbType.Dm, sql, parames);
+                        }
+                        else
+                        {
+                            sqlParmae = sql;
+                        }
+                    }
+                    //调试时打印sql语句 生产时注释掉
+                    Console.WriteLine($"{sqlParmae}");
                 };
                 db.Aop.OnLogExecuted = (sql, parames) =>
                 {

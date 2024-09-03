@@ -8,6 +8,10 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.NationalEconomy
     public class NationalEconomyDto
     {
         /// <summary>
+        /// 主键id
+        /// </summary>
+        public long Id { get; set; }
+        /// <summary>
         /// 国民经济行业分类代码
         /// </summary>
         public string Code { get; set; }

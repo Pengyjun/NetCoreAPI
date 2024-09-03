@@ -6,6 +6,10 @@
     public class AccountingDepartmentDto
     {
         /// <summary>
+        /// 主键id
+        /// </summary>
+        public long Id { get; set; }
+        /// <summary>
         /// 核算组织编号:9月18日新加
         /// </summary>
         public string AccOrgCode { get; set; }

@@ -8,6 +8,10 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.ScientifiCNoProject
     public class ScientifiCNoProjectDto
     {
         /// <summary>
+        /// 主键id
+        /// </summary>
+        public long Id { get; set; }
+        /// <summary>
         /// 科研项目主数据编码:科研项目的唯一编码标识
         /// </summary>
         public string MDCode { get; set; }
