@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto._4A.Institution;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto._4A.User;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.AccountingDepartment;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.AccountingOrganization;
@@ -81,7 +82,7 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.AutoMapper
             //金融机构
             mapperConfigurationExpression.CreateMap<FinancialInstitutionReceiveDto, FinancialInstitution>();
             //机构主数据
-            mapperConfigurationExpression.CreateMap<InstitutionReceiveDto, Institution>();
+            mapperConfigurationExpression.CreateMap<InstitutionItem, Institution>();
             //发票类型
             mapperConfigurationExpression.CreateMap<InvoiceTypeReceiveDto, InvoiceType>();
             //语言语种

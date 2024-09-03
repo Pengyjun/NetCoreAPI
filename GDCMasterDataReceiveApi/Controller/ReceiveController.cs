@@ -1,4 +1,5 @@
-﻿using GDCMasterDataReceiveApi.Application.Contracts.Dto._4A.User;
+﻿using GDCMasterDataReceiveApi.Application.Contracts.Dto._4A.Institution;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto._4A.User;
 using GDCMasterDataReceiveApi.Application.Contracts.IService.IReceiveService;
 using GDCMasterDataReceiveApi.Domain.Shared;
 using GDCMasterDataReceiveApi.Domain.Shared.Annotation;
@@ -241,21 +242,28 @@ namespace GDCMasterDataReceiveApi.Controller
         [HttpPost("AccountingOrganization")]
         public Task<ResponseAjaxResult<bool>> AccountingOrganizationDataAsync() => _receiveService.AccountingOrganizationDataAsync();
      
-        /// <summary>
-        /// 机构主数据
-        /// </summary>
-        /// <returns></returns>
-        [UnitOfWork]
-        [HttpPost("Institution")]
-        public Task<ResponseAjaxResult<bool>> InstitutionDataAsync() => _receiveService.InstitutionDataAsync();
+        ///// <summary>
+        ///// 机构主数据
+        ///// </summary>
+        ///// <returns></returns>
+        //[UnitOfWork]
+        //[HttpPost("Institution")]
+        //public Task<ResponseAjaxResult<bool>> InstitutionDataAsync() => _receiveService.InstitutionDataAsync();
         #endregion
 
         #region 拉取4A的人员和机构数据
         [Route("api/4A/Receive/Person")]
         [HttpPost]
-        public async Task<ResponseAjaxResult<bool>>  PersonAsync([FromBody] ReceiveUserRequestDto receiveUserRequestDto) 
+        public async Task<MDMResponseResult>  PersonAsync([FromBody] ReceiveUserRequestDto receiveUserRequestDto) 
         {
             return await _receiveService.PersonDataAsync(receiveUserRequestDto);
+        }
+
+        [Route("api/4A/Receive/Institution")]
+        [HttpPost]
+        public async Task<MDMResponseResult> InstitutionAsync([FromBody] ReceiveInstitutionRequestDto  receiveInstitutionRequestDto)
+        {
+            return await _receiveService.InstitutionDataAsync(receiveInstitutionRequestDto);
         }
         #endregion
     }
