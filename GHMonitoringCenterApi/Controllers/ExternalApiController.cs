@@ -89,8 +89,8 @@ namespace GHMonitoringCenterApi.Controllers
         /// <returns></returns>
         [HttpGet("GetDealingUnit")]
         [AllowAnonymous]//跳过鉴权
-        public async Task<ResponseAjaxResult<List<DealingUnit>>> GetDealingUnitAsync()
-            => await _externalApiService.GetDealingUnitAsync();
+        public async Task<ResponseAjaxResult<List<DealingUnit>>> GetDealingUnitAsync([FromQuery] int pageIndex, [FromQuery] int pageSize)
+            => await _externalApiService.GetDealingUnitAsync(pageIndex, pageSize);
         /// <summary>
         /// 获取项目信息状态
         /// </summary>
