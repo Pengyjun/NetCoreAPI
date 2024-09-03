@@ -17,17 +17,17 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// <summary>
         /// 中交区域总部代码:中交区域中心编码
         /// </summary>
-        [SugarColumn(Length = 2, ColumnName = "CodeOfCCCCRegionalHeadquarters")]
+        [SugarColumn(Length = 2, ColumnName = "Code")]
         public string ZCRHCODE { get; set; }
         /// <summary>
         /// 中交区域总部描述:编码描述
         /// </summary>
-        [SugarColumn(Length = 100, ColumnName = "DescriptionOfCCCCRegionalHeadquarters")]
+        [SugarColumn(Length = 100, ColumnName = "Description")]
         public string ZCRHNAME { get; set; }
         /// <summary>
         /// 简称:编码描述简称
         /// </summary>
-        [SugarColumn(Length = 100, ColumnName = "ShortName")]
+        [SugarColumn(Length = 100, ColumnName = "Name")]
         public string ZCRHABBR { get; set; }
         /// <summary>
         /// 区域范围:中交区域中心管辖范围
@@ -47,12 +47,12 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// <summary>
         /// 是否删除 数据是否有效的标识:有效：1无效：0
         /// </summary>
-        [SugarColumn(Length = 1, ColumnName = "IsDeleteValidIdentifier")]
+        [SugarColumn(Length = 1, ColumnName = "DataIdentifier")]
         public string ZDELETE { get; set; }
         /// <summary>
         /// 多语言描述表类型
         /// </summary>
-        [NotMapped]
+        [SugarColumn(IsIgnore = true)]
         public List<ZMDGTT_ZLANG3>? ZLANG_LIST { get; set; }
     }
     /// <summary>

@@ -17,12 +17,12 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// <summary>
         /// 数字代码:货币数字代码
         /// </summary>
-        [SugarColumn(Length = 3, ColumnName = "NumericalCode")]
+        [SugarColumn(Length = 3, ColumnName = "Code")]
         public string ZCURRENCYCODE {  get; set; }
         /// <summary>
         /// 货币名称:货币的中文描述
         /// </summary>
-        [SugarColumn(Length = 100, ColumnName = "NameOfCurrency")]
+        [SugarColumn(Length = 100, ColumnName = "Name")]
         public string ZCURRENCYNAME {  get; set; }
         /// <summary>
         /// 字母代码:货币字母代码
@@ -32,7 +32,7 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// <summary>
         /// 货币标准名称:货币标准名称
         /// </summary>
-        [SugarColumn(Length = 100, ColumnName = "CurrencyStandardName")]
+        [SugarColumn(Length = 100, ColumnName = "StandardName")]
         public string STANDARDNAMEE {  get; set; }
         /// <summary>
         /// 备注:说明备注
@@ -52,12 +52,12 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// <summary>
         /// 是否删除 数据是否有效的标识:有效：1无效：0
         /// </summary>
-        [SugarColumn(Length = 1, ColumnName = "IsDeleteValidIdentifier")]
+        [SugarColumn(Length = 1, ColumnName = "DataIdentifier")]
         public string ZDELETE { get; set; }
         /// <summary>
         /// 多语言描述表类型
         /// </summary>
-        [NotMapped]
+        [SugarColumn(IsIgnore = true)]
         public List<ZMDGS_ZLANG5>? ZLANG_LIST { get; set; }
     }
 }

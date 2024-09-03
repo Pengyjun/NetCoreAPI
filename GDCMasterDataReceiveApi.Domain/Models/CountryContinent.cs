@@ -22,7 +22,7 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// <summary>
         /// 大洲名称：大洲名称
         /// </summary>
-        [SugarColumn(Length = 12, ColumnName = "ContinentName")]
+        [SugarColumn(Length = 12, ColumnName = "Name")]
         public string ZCONTINENTNAME { get; set; }
         /// <summary>
         /// 区域代码：大洲所属区域代码
@@ -32,7 +32,7 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// <summary>
         /// 区域描述：区域描述
         /// </summary>
-        [SugarColumn(Length = 60, ColumnName = "RegionalDescriptors")]
+        [SugarColumn(Length = 60, ColumnName = "RegionalDescr")]
         public string ZAREANAME { get; set; }
         /// <summary>
         /// 版本：数据的版本号。数据每次变更时，版本号自动加1。
@@ -47,12 +47,12 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// <summary>
         /// 是否删除 数据是否有效的标识:有效：1无效：0
         /// </summary>
-        [SugarColumn(Length = 1, ColumnName = "IsDeleteValidIdentifier")]
+        [SugarColumn(Length = 1, ColumnName = "DataIdentifier")]
         public string ZDELETE { get; set; }
         /// <summary>
         /// 多语言描述表类型
         /// </summary>
-        [NotMapped]
+        [SugarColumn(IsIgnore = true)]
         public List<ZMDGS_ZLANG>? ZLANG_LIST { get; set; }
     }
     /// <summary>

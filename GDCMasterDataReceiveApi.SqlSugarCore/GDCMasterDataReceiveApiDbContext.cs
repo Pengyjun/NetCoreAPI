@@ -22,8 +22,8 @@ namespace GDCMasterDataReceiveApi.SqlSugarCore
             SqlSugarClient sqlSugarClient = new SqlSugarClient(new ConnectionConfig()
             {
                 ConnectionString = dbCon,
-                DbType = DbType.MySql,
-                //DbType = DbType.Dm,
+                //DbType = DbType.MySql,
+                DbType = DbType.Dm,
                 IsAutoCloseConnection = true, //不设成true要手动close
                 MoreSettings = new ConnMoreSettings()
                 {
@@ -143,13 +143,13 @@ namespace GDCMasterDataReceiveApi.SqlSugarCore
                     }
                     if (entityInfo.OperationType == DataFilterType.UpdateByObject)
                     {
-                        //if (!(entityInfo.EntityValue is BaseEntity<long>))
-                        if (!(entityInfo.EntityValue is BaseEntity<Guid>))//mysql数据库默认是guid
+                        if (!(entityInfo.EntityValue is BaseEntity<long>))
+                        //if (!(entityInfo.EntityValue is BaseEntity<Guid>))//mysql数据库默认是guid
                         {
                             return;
                         }
-                        //var isDelete = ((GDCMasterDataReceiveApi.Domain.BaseEntity<long>)entityInfo.EntityValue).IsDelete;
-                        var isDelete = ((GDCMasterDataReceiveApi.Domain.BaseEntity<Guid>)entityInfo.EntityValue).IsDelete;//mysql数据库默认是guid
+                        var isDelete = ((GDCMasterDataReceiveApi.Domain.BaseEntity<long>)entityInfo.EntityValue).IsDelete;
+                        //var isDelete = ((GDCMasterDataReceiveApi.Domain.BaseEntity<Guid>)entityInfo.EntityValue).IsDelete;//mysql数据库默认是guid
                         if (isDelete == 1 && entityInfo.PropertyName == "UpdateTime")
                         {
                             entityInfo.SetValue(DateTime.Now);

@@ -7,8 +7,5 @@ namespace GDCMasterDataReceiveApi.Application.Contracts
     /// </summary>
     [DependencyInjection]
     public interface IBaseService
-    {
-
-        
-    }
+    { }
 }

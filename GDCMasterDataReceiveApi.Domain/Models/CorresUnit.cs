@@ -17,67 +17,67 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// <summary>
         /// 往来单位主数据编码:公司往来单位的唯一编码
         /// </summary>
-        [SugarColumn(Length = 10, ColumnName = "MainDataCodeOfTheContactUnit")]
+        [SugarColumn(Length = 10, ColumnName = "DealUnitMDCode")]
         public string? ZBP { get; set; }
         /// <summary>
         /// 是否集团内单位:是否为中交集团内部单位0:否1:是
         /// </summary>
-        [SugarColumn(Length = 1, ColumnName = "IsItAUnitWithInTheGroup")]
+        [SugarColumn(Length = 1, ColumnName = "IsGroupUnit")]
         public string? ZINCLIENT { get; set; }
         /// <summary>
         /// 核算单位编码:财务核算组织的编码，内部核算单位必填
         /// </summary>
-        [SugarColumn(Length = 18, ColumnName = "AccountingUnitCode")]
+        [SugarColumn(Length = 18, ColumnName = "AccUnitCode")]
         public string? ZACORGNO { get; set; }
         /// <summary>
         /// 机构主数据编码:行政组织的编码，内部行政组织必填
         /// </summary>
-        [SugarColumn(Length = 20, ColumnName = "InstitutionalMasterDataCode")]
+        [SugarColumn(Length = 20, ColumnName = "OrgMDCode")]
         public string? ZORG { get; set; }
         /// <summary>
         /// 名称（中文）:往来单位中文名称，境内单位必填
         /// </summary>
-        [SugarColumn(Length = 300, ColumnName = "NameChinese")]
+        [SugarColumn(Length = 300, ColumnName = "Name")]
         public string? ZBPNAME_ZH { get; set; }
         /// <summary>
         /// 名称（英文）:往来单位英文名称，境外单位必填，
         /// </summary>
-        [SugarColumn(Length = 500, ColumnName = "NameInEnglish")]
+        [SugarColumn(Length = 500, ColumnName = "NameEnglish")]
         public string? ZBPNAME_EN { get; set; }
         /// <summary>
         /// 名称（当地语言）:往来单位当地官方语言名称，当地语言为英文时，该属性与名称（英文）填写内容相同，境外单位必填
         /// </summary>
-        [SugarColumn(Length = 300, ColumnName = "NameInLocalLanguage")]
+        [SugarColumn(Length = 300, ColumnName = "NameInLLanguage")]
         public string? ZBPNAME_LOC { get; set; }
         /// <summary>
         /// 往来单位类别:依据组织机构的功能和性质进行的分类
         /// </summary>
-        [SugarColumn(Length = 3, ColumnName = "CategoryContactUnit")]
+        [SugarColumn(Length = 3, ColumnName = "CategoryUnit")]
         public string? ZBPTYPE { get; set; }
         /// <summary>
         /// 统一社会信用代码:境内单位-企业的唯一性校验标准
         /// </summary>
-        [SugarColumn(Length = 18, ColumnName = "UnifiedSocialCreditCode")]
+        [SugarColumn(Length = 18, ColumnName = "RegistrationNo")]
         public string? ZUSCC { get; set; }
         /// <summary>
         /// 组织机构代码:境内单位获取的组织机构代码证的编号
         /// </summary>
-        [SugarColumn(Length = 9, ColumnName = "OrganizationCode")]
+        [SugarColumn(Length = 9, ColumnName = "OrgCode")]
         public string? ZOIBC { get; set; }
         /// <summary>
         /// 工商注册号:境内单位-企业的工商注册登记号
         /// </summary>
-        [SugarColumn(Length = 50, ColumnName = "BusinessRegistrationNumber")]
+        [SugarColumn(Length = 50, ColumnName = "BRegistrationNo")]
         public string? ZBRNO { get; set; }
         /// <summary>
         /// 纳税人识别号:境内单位-企业在税务登记证上的号码
         /// </summary>
-        [SugarColumn(Length = 20, ColumnName = "TaxpayerIdentificationNumber")]
+        [SugarColumn(Length = 20, ColumnName = "TaxpayerIdentifyNo")]
         public string? ZTRNO { get; set; }
         /// <summary>
         /// 境外注册号:境外单位依法注册的组织编号
         /// </summary>
-        [SugarColumn(Length = 50, ColumnName = "OverseasRegistrationNumber")]
+        [SugarColumn(Length = 50, ColumnName = "AbroadRegistrationNo")]
         public string? ZOSRNO { get; set; }
         /// <summary>
         /// 身份证号码:境内个人必填且为唯一性校验标准
@@ -87,7 +87,7 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// <summary>
         /// 境外社保号/ID:境外个人社保号或境外个人ID（ID针对不同国家可填写为身份证号或护照号），境外个人必填且为唯一性校验标准
         /// </summary>
-        [SugarColumn(Length = 20, ColumnName = "OverseasSocialSecurityNumber")]
+        [SugarColumn(Length = 20, ColumnName = "AbroadSocialSecurityNo")]
         public string? ZSSNO { get; set; }
         /// <summary>
         /// 国家/地区:往来单位所在国家/地区
@@ -117,17 +117,17 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// <summary>
         /// 上级法人单位:往来单位的上级法人单位
         /// </summary>
-        [SugarColumn(Length = 100, ColumnName = "SuperiorLegalEntity")]
+        [SugarColumn(Length = 100, ColumnName = "SupLegalEntity")]
         public string? ZCOMPYREL { get; set; }
         /// <summary>
         /// 往来单位性质:国资监管维度
         /// </summary>
-        [SugarColumn(Length = 4, ColumnName = "NatureOfContactUnit")]
+        [SugarColumn(Length = 4, ColumnName = "NatureOfUnit")]
         public string? ZBPNATURE { get; set; }
         /// <summary>
         /// 往来单位状态:标记往来单位的启/停用状态01启用/02停用
         /// </summary>
-        [SugarColumn(Length = 2, ColumnName = "StatusOfContactUnit")]
+        [SugarColumn(Length = 2, ColumnName = "StatusOfUnit")]
         public string? ZBPSTATE { get; set; }
         /// <summary>
         /// 来源系统:记录数据来源系统
@@ -137,7 +137,7 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// <summary>
         /// 往来单位类型:01客户02供应商03分包商
         /// </summary>
-        [SugarColumn(Length = 10, ColumnName = "TypeOfContactUnit")]
+        [SugarColumn(Length = 10, ColumnName = "TypeOfUnit")]
         public string? ZBPKINDS { get; set; }
         /// <summary>
         /// 创建时间:格式：20230324121212
@@ -162,7 +162,7 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// <summary>
         /// 所属二级单位:记录数据最后修改人的所属二级单位
         /// </summary>
-        [SugarColumn(Length = 20, ColumnName = "SecondUnit")]
+        [SugarColumn(Length = 20, ColumnName = "UnitSec")]
         public string? Z2NDORG { get; set; }
     }
 

@@ -17,17 +17,17 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// <summary>
         /// 计量单位代码:业务主键
         /// </summary>
-        [SugarColumn(Length = 10, ColumnName = "UnitOfMeasurementCode")]
+        [SugarColumn(Length = 10, ColumnName = "Code")]
         public string ZUNITCODE { get; set; }
         /// <summary>
         /// 计量单位名称:计量单位的名称或说明，一般采用中文或常用符号。
         /// </summary>
-        [SugarColumn(Length = 200, ColumnName = "UnitOfMeasurementName")]
+        [SugarColumn(Length = 200, ColumnName = "Name")]
         public string ZUNITNAME { get; set; }
         /// <summary>
         /// 计量单位名称（其它语言的集合）
         /// </summary>
-        [NotMapped]
+        [SugarColumn(IsIgnore = true)]
         public List<ZMDGTT_UNIT_LANG>? ZUNIT_LANG { get; set; }
         /// <summary>
         /// 版本：数据的版本号。数据每次变更时，版本号自动加1。
@@ -42,7 +42,7 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// <summary>
         /// 是否删除 数据是否有效的标识:有效：1无效：0
         /// </summary>
-        [SugarColumn(Length = 1, ColumnName = "IsDeleteValidIdentifier")]
+        [SugarColumn(Length = 1, ColumnName = "DataIdentifier")]
         public string ZDELETE { get; set; }
     }
     /// <summary>

@@ -17,17 +17,17 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// <summary>
         /// 往来单位主数据编码:公司往来单位的唯一编码
         /// </summary>
-        [SugarColumn(Length = 10, ColumnName = "MainDataCodeOfTheContactUnit")]
+        [SugarColumn(Length = 10, ColumnName = "DealUnitCode")]
         public string ZBP { get; set; }
         /// <summary>
         /// 银行账号主键：银行账号主键
         /// </summary>
-        [SugarColumn(Length = 50, ColumnName = "BankAccountPrimaryKey")]
+        [SugarColumn(Length = 50, ColumnName = "BankNoPK")]
         public string ZBANK { get; set; }
         /// <summary>
         /// 账户名称：填报银行账户的全称
         /// </summary>
-        [SugarColumn(Length = 200, ColumnName = "NameOfAccount")]
+        [SugarColumn(Length = 200, ColumnName = "Name")]
         public string ZKOINH { get; set; }
         /// <summary>
         /// 银行账号/IBAN：填报银行账号/IBAN，该字段作为银行账户的唯一标识
@@ -37,12 +37,12 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// <summary>
         /// 金融机构编码：填报具体开户网点，引用金融机构主数据
         /// </summary>
-        [SugarColumn(Length = 10, ColumnName = "FinancialInstitutionCode")]
+        [SugarColumn(Length = 10, ColumnName = "FinancialOrgCode")]
         public string ZFINC { get; set; }
         /// <summary>
         /// 金融机构名称：填报具体开户网点，引用金融机构主数据
         /// </summary>
-        [SugarColumn(Length = 200, ColumnName = "NameOfFinancialInstitution")]
+        [SugarColumn(Length = 200, ColumnName = "FinancialOrgName")]
         public string ZFINAME { get; set; }
         /// <summary>
         /// 账户状态：银行账户所处状态，包括正常、冻结、其他，默认正常。

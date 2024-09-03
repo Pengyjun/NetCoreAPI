@@ -26,9 +26,5 @@ namespace GDCMasterDataReceiveApi.Application.Contracts
         /// <returns></returns>
         Task<MemoryStream> ExcelImportAsync<T>(List<string> ignoreColumns, string sheetName, T data);
 
-
-
-
-
     }
 }

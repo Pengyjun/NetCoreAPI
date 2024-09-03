@@ -22,27 +22,27 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// <summary>
         /// 核算组织ID
         /// </summary>
-        [SugarColumn(Length = 50, ColumnName = "AccountingOrganizationID")]
+        [SugarColumn(Length = 50, ColumnName = "AccOrgId")]
         public string ZAID { get; set; }
         /// <summary>
         /// 核算组织编码
         /// </summary>
-        [SugarColumn(Length = 50, ColumnName = "AccountingOrganizationCode")]
+        [SugarColumn(Length = 50, ColumnName = "AccOrgCode")]
         public string ZAORGNO { get; set; }
         /// <summary>
         /// 行政组织ID
         /// </summary>
-        [SugarColumn(Length = 50, ColumnName = "AdministrativeOrganizationID")]
+        [SugarColumn(Length = 50, ColumnName = "AdministrativeOrgId")]
         public string ZORGID { get; set; }
         /// <summary>
         /// 行政组织编码
         /// </summary>
-        [SugarColumn(Length = 50, ColumnName = "AdministrativeOrganizationCode")]
+        [SugarColumn(Length = 50, ColumnName = "AdministrativeOrgCode")]
         public string ZORGCODE { get; set; }
         /// <summary>
         /// 是否删除: 数据是否有效的标识:   有效：1无效：0
         /// </summary>
-        [SugarColumn(Length = 1, ColumnName = "IsDeleteValidIdentifier")]
+        [SugarColumn(Length = 1, ColumnName = "DataIdentifier")]
         public string ZDELETE { get; set; }
     }
 }

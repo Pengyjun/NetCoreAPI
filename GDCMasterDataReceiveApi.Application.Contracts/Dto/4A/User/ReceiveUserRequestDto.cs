@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace GDCMasterDataReceiveApi.Application.Contracts.Dto._4A.User
+﻿namespace GDCMasterDataReceiveApi.Application.Contracts.Dto._4A.User
 {
     /// <summary>
     /// 接收4A用户传过来的参数

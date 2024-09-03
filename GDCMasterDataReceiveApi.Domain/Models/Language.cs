@@ -17,22 +17,22 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// <summary>
         /// GB/T 4880.2/B目录代码:GB/T 4880.2/B目录代码
         /// </summary>
-        [SugarColumn(Length = 12, ColumnName = "")]
+        [SugarColumn(Length = 12, ColumnName = "DirCode")]
         public string ZLANG_BIB { get; set; }
         /// <summary>
         /// GB/T 4880.2/T术语代码:GB/T 4880.2/T术语代码
         /// </summary>
-        [SugarColumn(Length = 12, ColumnName = "")]
+        [SugarColumn(Length = 12, ColumnName = "TermCode")]
         public string ZLANG_TER { get; set; }
         /// <summary>
         /// 汉语名称
         /// </summary>
-        [SugarColumn(Length = 50, ColumnName = "")]
+        [SugarColumn(Length = 50, ColumnName = "Name")]
         public string ZLANG_ZH { get; set; }
         /// <summary>
         /// 英语名称
         /// </summary>
-        [SugarColumn(Length = 58, ColumnName = "")]
+        [SugarColumn(Length = 58, ColumnName = "EnglishName")]
         public string ZLANG_EN { get; set; }
         /// <summary>
         /// 版本：数据的版本号。数据每次变更时，版本号自动加1。
@@ -47,12 +47,12 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// <summary>
         /// 是否删除 数据是否有效的标识:有效：1无效：0
         /// </summary>
-        [SugarColumn(Length = 1, ColumnName = "IsDeleteValidIdentifier")]
+        [SugarColumn(Length = 1, ColumnName = "DataIdentifier")]
         public string ZDELETE { get; set; }
         /// <summary>
         /// 多语言描述表类型
         /// </summary>
-        [NotMapped]
+        [SugarColumn(IsIgnore = true)]
         public List<ZMDGTT_ZLANG2>? ZLANG_LIST { get; set; }
     }
     /// <summary>

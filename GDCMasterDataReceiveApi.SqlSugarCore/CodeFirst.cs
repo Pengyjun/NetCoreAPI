@@ -36,45 +36,45 @@ namespace GDCMasterDataReceiveApi.SqlSugarCore
                             p.IsNullable = true;
 
                         }
-                        if (c.Name == "Id" && c.PropertyType.FullName.ToLower().IndexOf("guid") >= 0)
+                        if (c.Name == "Id" && c.PropertyType.Name.IndexOf("T") >= 0)
                         {
                             p.DataType = "varchar";
-                            p.Length = 36;
+                            p.Length = 64;
                         }
-                        if (c.Name == "CreateId" && c.PropertyType.FullName.ToLower().IndexOf("guid") >= 0)
+                        if (c.Name == "CreateId" && c.PropertyType.Name.IndexOf("T") >= 0)
                         {
                             p.DataType = "varchar";
-                            p.Length = 36;
+                            p.Length = 64;
                         }
-                        if (c.Name == "UpdateId" && c.PropertyType.FullName.ToLower().IndexOf("guid") >= 0)
+                        if (c.Name == "UpdateId" && c.PropertyType.Name.IndexOf("T") >= 0)
                         {
                             p.DataType = "varchar";
-                            p.Length = 36;
+                            p.Length = 64;
                         }
-                        if (c.Name == "DeleteId" && c.PropertyType.FullName.ToLower().IndexOf("guid") >= 0)
+                        if (c.Name == "DeleteId" && c.PropertyType.Name.IndexOf("T") >= 0)
                         {
                             p.DataType = "varchar";
-                            p.Length = 36;
+                            p.Length = 64;
                         }
-                        if (c.Name == "Id" && c.PropertyType.FullName.ToLower().IndexOf("guid") >= 0)
+                        if (c.Name == "Id" && c.PropertyType.Name.IndexOf("T") >= 0)
                         {
                             p.DataType = "varchar";
-                            p.Length = 36;
+                            p.Length = 64;
                         }
-                        if (c.Name == "CreateId" && c.PropertyType.FullName.ToLower().IndexOf("guid") >= 0)
+                        if (c.Name == "CreateId" && c.PropertyType.Name.IndexOf("T") >= 0)
                         {
                             p.DataType = "varchar";
-                            p.Length = 36;
+                            p.Length = 64;
                         }
-                        if (c.Name == "UpdateId" && c.PropertyType.FullName.ToLower().IndexOf("guid") >= 0)
+                        if (c.Name == "UpdateId" && c.PropertyType.Name.IndexOf("T") >= 0)
                         {
                             p.DataType = "varchar";
-                            p.Length = 36;
+                            p.Length = 64;
                         }
-                        if (c.Name == "DeleteId" && c.PropertyType.FullName.ToLower().IndexOf("guid") >= 0)
+                        if (c.Name == "DeleteId" && c.PropertyType.Name.IndexOf("T") >= 0)
                         {
                             p.DataType = "varchar";
-                            p.Length = 36;
+                            p.Length = 64;
                         }
                         //字段名全小写
                         if (!p.IsIgnore)

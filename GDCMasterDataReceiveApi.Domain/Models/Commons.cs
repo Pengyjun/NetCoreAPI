@@ -6,8 +6,8 @@ namespace GDCMasterDataReceiveApi.Domain.Models
     /// <summary>
     /// 通用类字典数据
     /// </summary>
-    [SugarTable("t_common", IsDisabledDelete = true)]
-    public class Common : BaseEntity<long>
+    [SugarTable("t_commons", IsDisabledDelete = true)]
+    public class Commons : BaseEntity<long>
     {
         /// <summary>
         /// 发送记录ID 发送记录的ID，必须保证此ID在同一个发送批次中是唯一的。用于记录发送方对于此发送记录的唯一标识。
@@ -22,7 +22,7 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// <summary>
         /// 系统名称
         /// </summary>
-        [SugarColumn(Length = 200, ColumnName = "SystemName")]
+        [SugarColumn(Length = 200, ColumnName = "Name")]
         public string ZSYSNAME { get; set; }
         /// <summary>
         /// 所属单位
@@ -32,32 +32,32 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// <summary>
         /// 所属业务部门
         /// </summary>
-        [SugarColumn(Length = 200, ColumnName = "BusinessUnit")]
+        [SugarColumn(Length = 200, ColumnName = "BUnit")]
         public string ZNDEPART { get; set; }
         /// <summary>
         /// 业务对接人
         /// </summary>
-        [SugarColumn(Length = 200, ColumnName = "BusinessLiaisonPerson")]
+        [SugarColumn(Length = 200, ColumnName = "BLiaisonPerson")]
         public string ZLKPERSON { get; set; }
         /// <summary>
         /// 项目经理
         /// </summary>
-        [SugarColumn(Length = 200, ColumnName = "ProjectManager")]
+        [SugarColumn(Length = 200, ColumnName = "PjectManager")]
         public string ZPMANAGER { get; set; }
         /// <summary>
         /// 数字化管理部门
         /// </summary>
-        [SugarColumn(Length = 200, ColumnName = "DigitalManagementDepartment")]
+        [SugarColumn(Length = 200, ColumnName = "DigitalManagementDep")]
         public string ZIADMDEPART { get; set; }
         /// <summary>
         /// 管理部门负责人
         /// </summary>
-        [SugarColumn(Length = 200, ColumnName = "HeadOfManagementDepartment")]
+        [SugarColumn(Length = 200, ColumnName = "HeadOfManagementDept")]
         public string ZIDEPERSON { get; set; }
         /// <summary>
         /// 系统概述
         /// </summary>
-        [SugarColumn(Length = 5000, ColumnName = "SystemOverview")]
+        [SugarColumn(ColumnDataType ="text", ColumnName = "SystemOverview")]
         public string ZSYSDESC { get; set; }
         /// <summary>
         /// 是否有效:有效：1 无效：2
