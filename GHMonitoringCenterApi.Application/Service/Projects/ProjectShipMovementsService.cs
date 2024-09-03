@@ -729,7 +729,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     }
                     else {
                        var existShip= shipDayReportList.Where(x => x.ShipId == item.PomId).FirstOrDefault();
-                        if (existShip != null)
+                        if (existShip != null&& existShip.ProjectId!=Guid.Empty)
                         {
                             res.EnterTime = existShip.CreateTime;
                             res.ProjectId = existShip.ProjectId;
