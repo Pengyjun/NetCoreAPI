@@ -8,6 +8,10 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.CountryContinent
     public class CountryContinentDto
     {
         /// <summary>
+        /// 主键id
+        /// </summary>
+        public long Id { get; set; }
+        /// <summary>
         /// 大洲代码：大洲代码
         /// </summary>
         public string ContinentCode { get; set; }

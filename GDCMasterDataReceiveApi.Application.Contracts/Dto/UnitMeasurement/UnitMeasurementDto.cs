@@ -8,6 +8,10 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.UnitMeasurement
     public class UnitMeasurementDto
     {
         /// <summary>
+        /// 主键id
+        /// </summary>
+        public long Id { get; set; }
+        /// <summary>
         /// 计量单位代码:业务主键
         /// </summary>
         public string Code { get; set; }

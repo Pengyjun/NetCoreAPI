@@ -6,6 +6,10 @@
     public class RoomNumberDto
     {
         /// <summary>
+        /// 主键id
+        /// </summary>
+        public long Id { get; set; }
+        /// <summary>
         /// 楼栋编码:该房号所属的楼栋编码
         /// </summary>
         public string BuildCode { get; set; }

@@ -29,7 +29,8 @@ namespace GDCMasterDataReceiveApi.Controller
         /// <returns></returns>
         [HttpPost("GetSearchLouDong")]
         [AllowAnonymous]
-        public async Task<ResponseAjaxResult<List<LouDongDto>>> GetSearchLouDongAsync([FromBody] LouDongRequestDto louDongDto) => await _searchService.GetSearchLouDongAsync(louDongDto);
+        public async Task<ResponseAjaxResult<List<LouDongDto>>> GetSearchLouDongAsync([FromBody] LouDongRequestDto louDongDto) 
+            => await _searchService.GetSearchLouDongAsync(louDongDto);
         /// <summary>
         /// 增改楼栋
         /// </summary>
@@ -37,6 +38,7 @@ namespace GDCMasterDataReceiveApi.Controller
         /// <returns></returns>
         [HttpPost("AddOrModifyLouDong")]
         [AllowAnonymous]
-        public async Task<ResponseAjaxResult<bool>> AddOrModifyLouDongAsync([FromBody] List<LouDongReceiveDto> receiveDtos) => await _searchService.AddOrModifyLouDongAsync(receiveDtos);
+        public async Task<ResponseAjaxResult<bool>> AddOrModifyLouDongAsync([FromBody] List<LouDongReceiveDto> receiveDtos) 
+            => await _searchService.AddOrModifyLouDongAsync(receiveDtos);
     }
 }

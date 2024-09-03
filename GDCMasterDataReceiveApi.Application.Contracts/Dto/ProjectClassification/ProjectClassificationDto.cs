@@ -6,6 +6,10 @@
     public class ProjectClassificationDto
     {
         /// <summary>
+        /// 主键id
+        /// </summary>
+        public long Id { get; set; }
+        /// <summary>
         /// 中交业务分类三级分类代码
         /// </summary>
         public string CCCCBTypeThirdCode { get; set; }

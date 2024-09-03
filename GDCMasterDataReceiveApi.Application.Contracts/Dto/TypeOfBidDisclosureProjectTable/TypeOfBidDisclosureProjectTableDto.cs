@@ -6,6 +6,10 @@
     public class TypeOfBidDisclosureProjectTableDto
     {
         /// <summary>
+        /// 主键id
+        /// </summary>
+        public long Id { get; set; }
+        /// <summary>
         /// 中标交底项目编码:格式：BO000001-01
         /// </summary>
         public string Code { get; set; }
