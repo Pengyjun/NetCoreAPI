@@ -2053,7 +2053,8 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 CreateTime = m.CreateTime
             });
 
-            var list = model.IsFullExport ? await selQuery.ToListAsync() : await selQuery.ToPageListAsync(model.PageIndex, model.PageSize, total);
+            //var list = model.IsFullExport ? await selQuery.ToListAsync() : await selQuery.ToPageListAsync(model.PageIndex, model.PageSize, total);
+            var list = await selQuery.ToListAsync();
             if (model.IsDuiWai)
             {
                 list = list
@@ -2327,7 +2328,12 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 item.GrossMarginDeviation = item.GrossMarginDeviation != null ? Math.Round(item.GrossMarginDeviation.Value, 2) : 0M;
             }
             #endregion
-            return result.SuccessResult(new MonthtReportsResponseDto() { Reports = list, Total = totalMonthtReport }, total);
+
+            //分页
+            var pageData = list.Skip((model.PageIndex - 1) * model.PageSize).Take(model.PageSize).ToList();
+            total = list.Count;
+
+            return result.SuccessResult(new MonthtReportsResponseDto() { Reports = pageData, Total = totalMonthtReport }, total);
         }
         /// <summary>
         /// 项目月报年度、累计值
