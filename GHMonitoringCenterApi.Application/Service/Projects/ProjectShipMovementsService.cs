@@ -708,6 +708,10 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 List<ResEnterShipDto> resEnterShipDtos = new List<ResEnterShipDto>();
                     foreach (var item in allShipList)
                 {
+                    //if (item.PomId == "d5ba0594-e902-4faa-8a91-f62caff10f83".ToGuid())
+                    //{
+                    //    await Console.Out.WriteLineAsync();
+                    //}
                     ResEnterShipDto res = new ResEnterShipDto()
                     {
                         DateDayTime = model.DateDayTime.Value,
@@ -724,7 +728,17 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                         res.AssociationProject = 1;
                     }
                     else {
-                        res.AssociationProject = 2;
+                       var existShip= shipDayReportList.Where(x => x.ShipId == item.PomId).FirstOrDefault();
+                        if (existShip != null)
+                        {
+                            res.EnterTime = existShip.CreateTime;
+                            res.ProjectId = existShip.ProjectId;
+                            res.ProjectName = projectList.Where(x => x.Id == existShip.ProjectId).Select(x => x.Name).FirstOrDefault();
+                            res.AssociationProject = 1;
+                        }
+                        else {
+                            res.AssociationProject = 2;
+                        }
                     }
 
                     //船舶类型
