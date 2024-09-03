@@ -3,13 +3,14 @@ using GDCMasterDataReceiveApi.Application.Contracts.IService.IReceiveService;
 using GDCMasterDataReceiveApi.Domain.Shared;
 using GDCMasterDataReceiveApi.Domain.Shared.Annotation;
 using Microsoft.AspNetCore.Mvc;
+using UtilsSharp;
 
 namespace GDCMasterDataReceiveApi.Controller
 {
     /// <summary>
     /// 接收主数据推送接口控制器（此处控制器名称小写因接口规定）
     /// </summary>
-    [Route("api/mdm/[controller]/")]
+   
     [ApiController]
     public class ReceiveController : BaseController
     {
@@ -255,8 +256,13 @@ namespace GDCMasterDataReceiveApi.Controller
 
 
         #region 拉取4A的人员和机构数据
-
-         
+        [Route("api/4A/Receive/Person")]
+        [HttpPost]
+        public async Task<bool> PersonAsync([FromBody] ReceiveUserRequestDto receiveUserRequestDto) 
+        {
+            await Console.Out.WriteLineAsync("接收的数据："+ receiveUserRequestDto.ToJson());
+            return true;
+        }
         #endregion
     }
 }

@@ -13,12 +13,6 @@ namespace GDCMasterDataReceiveApi.Ioc
         public static void Init(ContainerBuilder builder) {
             try
             {
-
-                //注入工作单元
-                builder.RegisterType<SqlSugarUnitOfWork>().As<IUnitOfWork>().InstancePerLifetimeScope();
-                //注入基本仓储
-                builder.RegisterGeneric(typeof(BaseRepository<>)).As(typeof(IBaseRepository<>));
-
                 //自定义特性名称
                 var attrName = "DependencyInjectionAttribute";
                 //获取bin目录
@@ -59,6 +53,10 @@ namespace GDCMasterDataReceiveApi.Ioc
                     {
                         builder.RegisterTypes(key.Key).AsImplementedInterfaces().InstancePerLifetimeScope();
                     }
+                    //注入工作单元
+                    builder.RegisterType<SqlSugarUnitOfWork>().As<IUnitOfWork>().InstancePerLifetimeScope();
+                    //注入基本仓储
+                    builder.RegisterGeneric(typeof(BaseRepository<>)).As(typeof(IBaseRepository<>));
                 }
             }
             catch (Exception ex)

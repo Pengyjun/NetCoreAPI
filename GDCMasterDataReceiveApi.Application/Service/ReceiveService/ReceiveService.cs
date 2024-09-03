@@ -359,6 +359,9 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
             await Console.Out.WriteLineAsync("接收的数据:"+ receiveUserRequestDto.ToJson());
             responseAjaxResult.SuccessResult(true);
             return responseAjaxResult;
+
+
+
         }
         /// <summary>
         /// 机构主数据
