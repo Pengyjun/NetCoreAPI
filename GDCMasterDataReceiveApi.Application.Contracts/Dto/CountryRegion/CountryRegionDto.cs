@@ -8,6 +8,10 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.CountryRegion
     public class CountryRegionDto
     {
         /// <summary>
+        /// 主键id
+        /// </summary>
+        public long Id { get; set; }
+        /// <summary>
         /// 国家地区代码
         /// </summary>
         public string Country { get; set; }

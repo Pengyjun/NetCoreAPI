@@ -8,6 +8,10 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.Language
     public class LanguageDto
     {
         /// <summary>
+        /// 主键id
+        /// </summary>
+        public long Id { get; set; }
+        /// <summary>
         /// GB/T 4880.2/B目录代码:GB/T 4880.2/B目录代码
         /// </summary>
         public string DirCode { get; set; }

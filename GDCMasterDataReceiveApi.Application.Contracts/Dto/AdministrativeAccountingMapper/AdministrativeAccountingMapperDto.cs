@@ -6,7 +6,11 @@
     public class AdministrativeAccountingMapperDto
     {
         /// <summary>
-        /// 主键ID，必须唯一
+        /// 主键id
+        /// </summary>
+        public long Id { get; set; }
+        /// <summary>
+        /// 必须唯一
         /// </summary>
         public string KeyId { get; set; }
         /// <summary>

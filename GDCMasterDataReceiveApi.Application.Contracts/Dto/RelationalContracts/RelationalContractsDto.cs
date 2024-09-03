@@ -6,6 +6,10 @@
     public class RelationalContractsDto
     {
         /// <summary>
+        /// 主键id
+        /// </summary>
+        public long Id { get; set; }
+        /// <summary>
         /// 机构主数据编码:2023年2月20日多机构新增
         /// </summary>
         public string MDCode { get; set; }

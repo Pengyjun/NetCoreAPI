@@ -8,6 +8,10 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.DeviceDetailCode
     public class DeviceDetailCodeDto
     {
         /// <summary>
+        /// 主键id
+        /// </summary>
+        public long Id { get; set; }
+        /// <summary>
         /// 物资设备主数据编码
         /// </summary>
         public string MDCode { get; set; }

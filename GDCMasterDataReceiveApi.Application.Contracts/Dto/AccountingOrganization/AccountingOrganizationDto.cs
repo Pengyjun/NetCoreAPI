@@ -6,6 +6,10 @@
     public class AccountingOrganizationDto
     {
         /// <summary>
+        /// 主键id
+        /// </summary>
+        public long Id { get; set; }
+        /// <summary>
         /// 机构主数据编码:机构主数据的唯一标识
         /// </summary>
         public string OrgCode { get; set; }

@@ -6,6 +6,10 @@
     public class FinancialInstitutionDto
     {
         /// <summary>
+        /// 主键id
+        /// </summary>
+        public long Id { get; set; }
+        /// <summary>
         /// 金融机构主数据编码:金融机构的唯一编码标识
         /// </summary>
         public string MDCode { get; set; }

@@ -24,20 +24,27 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto
         /// </summary>
         public int PageSize { get; set; } = 10;
         /// <summary>
-        /// 
+        /// 是否需要分页 后续对下发接口、导出等方便使用
+        /// </summary>
+        public bool IsPaging { get; set; }
+        /// <summary>
+        /// 参数校验
         /// </summary>
         /// <param name="validationContext"></param>
         /// <returns></returns>
 
         public virtual IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
-            if (PageIndex < 1)
+            if (IsPaging)
             {
-                yield return new ValidationResult("页码参数不合法值必须大于等于1", new string[] { nameof(BaseRequestDto.PageIndex) });
-            }
-            if (PageSize < 5)
-            {
-                yield return new ValidationResult("页大小参数不合法值必须大于等于5 默认是10", new string[] { nameof(BaseRequestDto.PageSize) });
+                if (PageIndex < 1)
+                {
+                    yield return new ValidationResult("页码参数不合法值必须大于等于1", new string[] { nameof(BaseRequestDto.PageIndex) });
+                }
+                if (PageSize < 1)
+                {
+                    yield return new ValidationResult("页大小参数不合法值必须大于等于5", new string[] { nameof(BaseRequestDto.PageSize) });
+                }
             }
         }
     }

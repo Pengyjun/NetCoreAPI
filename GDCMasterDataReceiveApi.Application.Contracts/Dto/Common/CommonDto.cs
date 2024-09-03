@@ -6,6 +6,10 @@
     public class CommonDto
     {
         /// <summary>
+        /// 主键id
+        /// </summary>
+        public long Id { get; set; }
+        /// <summary>
         /// 系统代码
         /// </summary>
         public string SystemCode { get; set; }

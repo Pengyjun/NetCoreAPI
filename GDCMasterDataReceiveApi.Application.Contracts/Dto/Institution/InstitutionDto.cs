@@ -6,6 +6,10 @@
     public class InstitutionDto
     {
         /// <summary>
+        /// 主键id
+        /// </summary>
+        public long Id { get; set; }
+        /// <summary>
         /// 机构 ID
         /// </summary>
         public string Oid { get; set; }

@@ -2,12 +2,11 @@
 using GDCMasterDataReceiveApi.Application.Contracts;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.LouDong;
 using GDCMasterDataReceiveApi.Application.Contracts.IService.ISearchService;
-using GDCMasterDataReceiveApi.Domain.Models;
 using GDCMasterDataReceiveApi.Domain.Shared;
-using GDCMasterDataReceiveApi.Domain.Shared.Const;
 using GDCMasterDataReceiveApi.Domain.Shared.Utils;
 using Newtonsoft.Json;
 using SqlSugar;
+using UtilsSharp;
 
 namespace GDCMasterDataReceiveApi.Application.Service.SearchService
 {
@@ -17,16 +16,20 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
     public class SearchService : ISearchService
     {
         private readonly ISqlSugarClient _dbContext;
+        private readonly IBaseService _baseService;
         private readonly IMapper _mapper;
         private readonly IDataAuthorityService _dataAuthorityService;
         /// <summary>
-        /// 注入上下文
+        /// 注入服务
         /// </summary>
         /// <param name="dbContext"></param>
+        /// <param name="mapper"></param>
         /// <param name="dataAuthorityService"></param>
-        public SearchService(ISqlSugarClient dbContext, IMapper mapper, IDataAuthorityService dataAuthorityService)
+        /// <param name="baseService"></param>
+        public SearchService(ISqlSugarClient dbContext, IBaseService baseService, IMapper mapper, IDataAuthorityService dataAuthorityService)
         {
             this._dbContext = dbContext;
+            this._baseService = baseService;
             this._dataAuthorityService = dataAuthorityService;
             this._mapper = mapper;
         }
@@ -39,31 +42,11 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
         {
             var responseAjaxResult = new ResponseAjaxResult<List<LouDongDto>>();
 
-            //sql条件
-            string sqlParam = "";
-            //表名
-            string tableName = "t_loudong";
-            //sql语句
-            string sql = "";
-            if (!(requestDto.Columns != null && requestDto.Columns.Any())) sql = NativeSql.InitialSql + $@" {tableName} where isdelete=1 ";
-            else
-            {
-                var dynamicColumns = string.Join(",", requestDto.Columns);
-                sql = $@"select {dynamicColumns} from {tableName} where isdelete=1 ";
-            }
-            //拼接条件 获取表数据
-            sql += !string.IsNullOrEmpty(sqlParam) ? $@"and @sqlParam={sqlParam}" : null;
-            var dataTable = await _dbContext.Ado.GetDataTableAsync(sql);
+            //读取数据
+            var result = await _baseService.GetSearchListAsync<LouDongDto>("t_loudong", requestDto.Sql, requestDto.FilterParams, true, requestDto.PageIndex, requestDto.PageSize);
 
-            //序列化dataTable
-            var json = JsonConvert.SerializeObject(dataTable, Formatting.Indented);
-            //反序列化对象 
-            var entitys = JsonConvert.DeserializeObject<List<LouDongDto>>(json);
-
-            //分页
-            var result = entitys.Skip((requestDto.PageIndex - 1) * requestDto.PageSize).Take(requestDto.PageSize).ToList();
-
-            responseAjaxResult.Count = entitys.Count;
+            // 设置响应结果的总数
+            responseAjaxResult.Count = result.Count;
             responseAjaxResult.SuccessResult(result);
             return responseAjaxResult;
         }
@@ -88,7 +71,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                 ZZSERIAL = "7"
             };
             afterAddMapper.Add(add);
-            var addMap = _mapper.Map<List<LouDongReceiveDto>, List<LouDong>>(afterAddMapper);
+            var addMap = _mapper.Map<List<LouDongReceiveDto>, List<Domain.Models.LouDong>>(afterAddMapper);
 
             foreach (var item in addMap)
             {

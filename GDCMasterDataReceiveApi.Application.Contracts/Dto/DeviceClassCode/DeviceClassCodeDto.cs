@@ -8,6 +8,10 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.DeviceClassCode
     public class DeviceClassCodeDto
     {
         /// <summary>
+        /// 主键id
+        /// </summary>
+        public long Id { get; set; }
+        /// <summary>
         /// 分类编码: 分类的唯一性编码
         /// </summary>
         public string Code { get; set; }

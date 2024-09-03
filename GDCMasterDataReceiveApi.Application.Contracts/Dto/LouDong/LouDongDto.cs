@@ -6,6 +6,10 @@
     public class LouDongDto
     {
         /// <summary>
+        /// 主键id
+        /// </summary>
+        public long Id {  get; set; }
+        /// <summary>
         /// 楼栋编码：楼栋主数据编码由1位字母和4位数字组成，采用标识符+流水号的编码规则,如：B0001
         /// </summary>
         public string? Code { get; set; }
