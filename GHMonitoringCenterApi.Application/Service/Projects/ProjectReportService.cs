@@ -2826,7 +2826,12 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     { }
                     else reqDetails.Add(item);//否则追加数据做后续逻辑处理
                 }
-                else reqDetails.Add(item);//追加数据做后续逻辑处理
+                else
+                {
+                    if (item.ConstructionNature == 0 && item.OutPutType == 0 && item.UnitPrice == 0 && item.CompletedQuantity == 0 && item.OutsourcingExpensesAmount == 0 && string.IsNullOrWhiteSpace(item.Remark))
+                    { }
+                    else reqDetails.Add(item);//追加数据做后续逻辑处理
+                }
             }
             #endregion
             reqDetails.ForEach(item =>
