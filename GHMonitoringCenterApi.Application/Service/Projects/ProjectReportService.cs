@@ -3075,21 +3075,23 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 {
                     foreach (var eRL in resList)
                     {
-                        if (string.IsNullOrWhiteSpace(eRL.DetailId.ToString()))
+                        if (!(0 == eRL.ConstructionNature && 0 == eRL.OutPutType && 0 == eRL.UnitPrice && 0 == eRL.CompletedQuantity && 0 == eRL.OutsourcingExpensesAmount && string.IsNullOrWhiteSpace(eRL.Remark)))
                         {
-                            //追加本月新的
-                            eRL.IsAllowDelete = true;
-                            nMorthRepDetails.Add(eRL);
-                        }
-                        else
-                        {
-                            //判断是否已经填过一模一样的
-                            var value = monthReps.Where(x => x.ConstructionNature == eRL.ConstructionNature && x.OutPutType == eRL.OutPutType && x.ShipId == eRL.ShipId && x.UnitPrice == eRL.UnitPrice
-                                  && x.CompletedQuantity == eRL.CompletedQuantity && x.OutsourcingExpensesAmount == eRL.OutsourcingExpensesAmount && x.Remark == eRL.Remark);
-                            if (value == null)
+                            if (string.IsNullOrWhiteSpace(eRL.DetailId.ToString()))
                             {
-                                if (!(0 == eRL.ConstructionNature && 0 == eRL.OutPutType && 0 == eRL.UnitPrice && 0 == eRL.CompletedQuantity && 0 == eRL.OutsourcingExpensesAmount && string.IsNullOrWhiteSpace(eRL.Remark)))
+
+                                //追加本月新的
+                                eRL.IsAllowDelete = true;
+                                nMorthRepDetails.Add(eRL);
+                            }
+                            else
+                            {
+                                //判断是否已经填过一模一样的
+                                var value = monthReps.Where(x => x.ConstructionNature == eRL.ConstructionNature && x.OutPutType == eRL.OutPutType && x.ShipId == eRL.ShipId && x.UnitPrice == eRL.UnitPrice
+                                      && x.CompletedQuantity == eRL.CompletedQuantity && x.OutsourcingExpensesAmount == eRL.OutsourcingExpensesAmount && x.Remark == eRL.Remark);
+                                if (value == null)
                                 {
+
                                     //追加本月的
                                     eRL.IsAllowDelete = true;
                                     nMorthRepDetails.Add(eRL);
