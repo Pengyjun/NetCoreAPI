@@ -1089,28 +1089,6 @@ namespace GHMonitoringCenterApi.Application.Service.Job
             };
 
             result = await _mPService.SearchMonthReportForProjectAsync(projectMonthReportRequestDto);
-            ////获取历史的
-            //var historyData = await GetProjectProductionValue(job.ProjectId, dateMonth);
-
-            //var currentYearOffirmProductionValue = historyData.Item1;
-            //var currenYearCollection = historyData.Item3;
-            //var totalYearKaileaOffirmProductionValue = historyData.Item2;
-            //var totalYearCollection = historyData.Item4;
-            //// 解析 JSON 字符串
-            //JObject jsonObject = JObject.Parse(job.BizData);
-
-            //// 添加新字段及其值
-            //jsonObject["CurrentYearOffirmProductionValue"] = currentYearOffirmProductionValue;
-            //jsonObject["currenYearCollection"] = currenYearCollection;
-            //jsonObject["totalYearKaileaOffirmProductionValue"] = totalYearKaileaOffirmProductionValue;
-            //jsonObject["totalYearCollection"] = totalYearCollection;
-
-            //// 转换回 JSON 字符串
-            //job.BizData = jsonObject.ToString();
-
-            //var bizResult = CastDeserializeObject<TBizResult>(job.BizData);
-            //var jobBizRes = new JobBizResponseDto<TBizResult>() { ProjectId = job.ProjectId, JobId = job.Id, BizModule = job.BizModule, BizData = bizResult };
-
             return result;
         }
         ///// <summary>

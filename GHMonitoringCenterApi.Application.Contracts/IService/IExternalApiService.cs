@@ -43,6 +43,16 @@ namespace GHMonitoringCenterApi.Application.Contracts.IService
         /// <returns></returns>
         Task<ResponseAjaxResult<List<ProjectLeaderInfos>>> GetProjectLeaderInfosAsync();
         /// <summary>
+        /// 干系单位
+        /// </summary>
+        /// <returns></returns>
+        Task<ResponseAjaxResult<List<ProjectOrg>>> GetProjectOrgInfosAsync();
+        /// <summary>
+        /// 往来单位
+        /// </summary>
+        /// <returns></returns>
+        Task<ResponseAjaxResult<List<DealingUnit>>> GetDealingUnitAsync();
+        /// <summary>
         /// 项目状态
         /// </summary>
         /// <returns></returns>
@@ -211,7 +221,7 @@ namespace GHMonitoringCenterApi.Application.Contracts.IService
         Task<ResponseAjaxResult<List<SearchEquipmentManagementResponseDto>>> GetSearchEquipmentManagementAsync(ExternalRequestDto requestDto);
 
         Task<ResponseAjaxResult<List<ProjectStatusChangResponse>>> SearchProjectChangeList();
-        
+
         #endregion
     }
 }

@@ -76,6 +76,22 @@ namespace GHMonitoringCenterApi.Controllers
         public async Task<ResponseAjaxResult<List<ProjectLeaderInfos>>> GetProjectLeaderInfosAsync()
             => await _externalApiService.GetProjectLeaderInfosAsync();
         /// <summary>
+        /// 获取项目干系单位
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("GetProjectOrgInfos")]
+        [AllowAnonymous]//跳过鉴权
+        public async Task<ResponseAjaxResult<List<ProjectOrg>>> GetProjectOrgInfosAsync()
+            => await _externalApiService.GetProjectOrgInfosAsync();
+        /// <summary>
+        /// 获取往来单位
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("GetDealingUnit")]
+        [AllowAnonymous]//跳过鉴权
+        public async Task<ResponseAjaxResult<List<DealingUnit>>> GetDealingUnitAsync()
+            => await _externalApiService.GetDealingUnitAsync();
+        /// <summary>
         /// 获取项目信息状态
         /// </summary>
         /// <returns></returns>

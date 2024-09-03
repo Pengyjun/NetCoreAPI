@@ -248,6 +248,36 @@ namespace GHMonitoringCenterApi.Application.Service
             return responseAjaxResult;
         }
         /// <summary>
+        /// 项目干系单位
+        /// </summary>
+        /// <returns></returns>
+        public async Task<ResponseAjaxResult<List<ProjectOrg>>> GetProjectOrgInfosAsync()
+        {
+            var responseAjaxResult = new ResponseAjaxResult<List<ProjectOrg>>();
+            var data = await _dbContext.Queryable<ProjectOrg>()
+                .Where(x => x.IsDelete == 1)
+                .ToListAsync();
+
+            responseAjaxResult.Count = data.Count;
+            responseAjaxResult.SuccessResult(data, ResponseMessage.OPERATION_SUCCESS);
+            return responseAjaxResult;
+        }
+        /// <summary>
+        /// 往来单位数据
+        /// </summary>
+        /// <returns></returns>
+        public async Task<ResponseAjaxResult<List<DealingUnit>>> GetDealingUnitAsync()
+        {
+            var responseAjaxResult = new ResponseAjaxResult<List<DealingUnit>>();
+            var data = await _dbContext.Queryable<DealingUnit>()
+                .Where(x => x.IsDelete == 1)
+                .ToListAsync();
+
+            responseAjaxResult.Count = data.Count;
+            responseAjaxResult.SuccessResult(data, ResponseMessage.OPERATION_SUCCESS);
+            return responseAjaxResult;
+        }
+        /// <summary>
         /// 项目状态
         /// </summary>
         /// <returns></returns>
