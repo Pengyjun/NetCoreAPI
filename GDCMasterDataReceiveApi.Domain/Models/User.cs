@@ -232,5 +232,9 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         ///  扩展字段 5
         /// </summary>
         public string? ATTRIBUTE5 { get; set; }
+        /// <summary>
+        /// 是否启用   0 未启用  1 启用
+        /// </summary>
+        public int Enable { get; set; }
     }
 }
