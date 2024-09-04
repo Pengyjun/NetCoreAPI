@@ -156,17 +156,6 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                      */
 
                     childs = MReportForProjectList(dateMonth, children.ProjectWBSId, mReportList, yReportList, klReportList, bData);
-
-                    /***
-                     * 1.统计当前父节点当年（产值、工程量、外包支出）&& 累计（产值、工程量、外包支出）
-                     * 2.重调方法获取最终子节点
-                     */
-
-                    children.ContractAmount = children.Children == null ? 0M : children.Children.Sum(x => x.ContractAmount);
-                    children.EngQuantity = children.Children == null ? 0M : children.Children.Sum(x => x.EngQuantity);
-
-                    int year = Convert.ToInt32(dateMonth.ToString().Substring(0, 4));
-                    int initDate = new DateTime(year, 1, 1).ToDateMonth();
                 }
                 else
                 {
@@ -193,9 +182,6 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
              * 1.根据(当前施工分类)wbsid获取所有资源（船舶）信息
              * 2.统计资源（每条船）年度、开累值
              */
-
-            int year = Convert.ToInt32(dateMonth.ToString().Substring(0, 4));
-            int initDate = new DateTime(year, 1, 1).ToDateMonth();
 
             var mReport = mReportList.Where(x => x.ProjectWBSId == wbsId).ToList();
             foreach (var report in mReport)

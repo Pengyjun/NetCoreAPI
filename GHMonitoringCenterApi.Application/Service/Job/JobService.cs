@@ -20,8 +20,6 @@ using Newtonsoft.Json.Linq;
 using SqlSugar;
 using SqlSugar.Extensions;
 using System.Linq.Expressions;
-using System.Text.Json;
-using System.Text.Json.Nodes;
 using UtilsSharp;
 
 namespace GHMonitoringCenterApi.Application.Service.Job

@@ -2817,24 +2817,21 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             //循环匹配原来的数据与传入参数值是否完全一致
             foreach (var item in reqDetailsList)
             {
-                if (!(item.ConstructionNature == 0 && item.OutPutType == 0 && item.UnitPrice == 0 && item.CompletedQuantity == 0 && item.OutsourcingExpensesAmount == 0 && string.IsNullOrWhiteSpace(item.Remark)))
+                var existMReport = oldMDetails.FirstOrDefault(x => x.Id == item.DetailId);
+                if (existMReport != null)
                 {
-                    var existMReport = oldMDetails.FirstOrDefault(x => x.Id == item.DetailId);
-                    if (existMReport != null)
-                    {
-                        /***
-                         * 匹配数据是否完全一致 (施工性质、产值属性、资源、单价、工程量、外包支出、备注)
-                         * 如果完全一致默认是历史数据  那么不做处理  
-                         */
-                        if (item.ConstructionNature == existMReport.ConstructionNature && item.OutPutType == existMReport.OutPutType && item.ShipId == existMReport.ShipId && item.UnitPrice == existMReport.UnitPrice
-                            && item.CompletedQuantity == existMReport.CompletedQuantity && item.OutsourcingExpensesAmount == existMReport.OutsourcingExpensesAmount && item.Remark == existMReport.Remark)
-                        { }
-                        else reqDetails.Add(item);//否则追加数据做后续逻辑处理
-                    }
-                    else
-                    {
-                        reqDetails.Add(item);//追加数据做后续逻辑处理
-                    }
+                    /***
+                     * 匹配数据是否完全一致 (施工性质、产值属性、资源、单价、工程量、外包支出、备注)
+                     * 如果完全一致默认是历史数据  那么不做处理  
+                     */
+                    if (item.ConstructionNature == existMReport.ConstructionNature && item.OutPutType == existMReport.OutPutType && item.ShipId == existMReport.ShipId && item.UnitPrice == existMReport.UnitPrice
+                        && item.CompletedQuantity == existMReport.CompletedQuantity && item.OutsourcingExpensesAmount == existMReport.OutsourcingExpensesAmount && item.Remark == existMReport.Remark)
+                    { }
+                    else reqDetails.Add(item);//否则追加数据做后续逻辑处理
+                }
+                else
+                {
+                    reqDetails.Add(item);//追加数据做后续逻辑处理
                 }
             }
             #endregion
@@ -3079,25 +3076,22 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 {
                     foreach (var eRL in resList)
                     {
-                        if (!(0 == eRL.ConstructionNature && 0 == eRL.OutPutType && 0 == eRL.UnitPrice && 0 == eRL.CompletedQuantity && 0 == eRL.OutsourcingExpensesAmount && string.IsNullOrWhiteSpace(eRL.Remark)))
+                        if (string.IsNullOrWhiteSpace(eRL.DetailId.ToString()))
                         {
-                            if (string.IsNullOrWhiteSpace(eRL.DetailId.ToString()))
+                            //追加本月新的
+                            eRL.IsAllowDelete = true;
+                            nMorthRepDetails.Add(eRL);
+                        }
+                        else
+                        {
+                            //判断是否已经填过一模一样的
+                            var value = monthReps.Where(x => x.ConstructionNature == eRL.ConstructionNature && x.OutPutType == eRL.OutPutType && x.ShipId == eRL.ShipId && x.UnitPrice == eRL.UnitPrice
+                                  && x.CompletedQuantity == eRL.CompletedQuantity && x.OutsourcingExpensesAmount == eRL.OutsourcingExpensesAmount && x.Remark == eRL.Remark);
+                            if (value == null)
                             {
-                                //追加本月新的
+                                //追加本月的
                                 eRL.IsAllowDelete = true;
                                 nMorthRepDetails.Add(eRL);
-                            }
-                            else
-                            {
-                                //判断是否已经填过一模一样的
-                                var value = monthReps.Where(x => x.ConstructionNature == eRL.ConstructionNature && x.OutPutType == eRL.OutPutType && x.ShipId == eRL.ShipId && x.UnitPrice == eRL.UnitPrice
-                                      && x.CompletedQuantity == eRL.CompletedQuantity && x.OutsourcingExpensesAmount == eRL.OutsourcingExpensesAmount && x.Remark == eRL.Remark);
-                                if (value == null)
-                                {
-                                    //追加本月的
-                                    eRL.IsAllowDelete = true;
-                                    nMorthRepDetails.Add(eRL);
-                                }
                             }
                         }
                     }
