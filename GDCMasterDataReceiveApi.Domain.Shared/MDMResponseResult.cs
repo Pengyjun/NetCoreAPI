@@ -59,8 +59,8 @@ namespace GDCMasterDataReceiveApi.Domain.Shared
         /// </summary>
         public void   UpdateSuccess()
         {
-            this.RETURN_CODE = "E0003008";
-            this.RETURN_DESC = "未知的程序异常";
+            this.RETURN_CODE = "S0000001";
+            this.RETURN_DESC = "处理成功";
         }
     }
 
