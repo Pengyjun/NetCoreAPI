@@ -12,7 +12,7 @@
         /// <summary>
         /// 机构 ID
         /// </summary>
-        public string Oid { get; set; }
+        public string? Oid { get; set; }
         /// <summary>
         /// "分组所属的实体机构 ID
         /// </summary>
@@ -25,11 +25,11 @@
         /// <summary>
         /// 隶属单位 ID
         /// </summary>
-        public string COid { get; set; }
+        public string? COid { get; set; }
         /// <summary>
         /// 拥有兼管职能
         /// </summary>
-        public string Crossorgan { get; set; }
+        public string? Crossorgan { get; set; }
         /// <summary>
         /// 机构层级（没有用过）
         /// </summary>
@@ -37,12 +37,12 @@
         /// <summary>
         /// 上级机构 id
         /// </summary>
-        public string POid { get; set; }
+        public string? POid { get; set; }
         /// <summary>
         /// "机构状态，类型编码"
         /// 1运营 2筹备 3停用 4撤销
         /// </summary>
-        public string Status { get; set; }
+        public string? Status { get; set; }
         /// <summary>
         /// "版本号
         /// </summary>
@@ -85,7 +85,7 @@
         /// D20：事业部 D40：区域总部 D50：共享服务机构 D60：项目部/指挥部 D70：虚拟机构（行政管理） D80：财务虚拟核算单位 D90：生产单元 G：分组 G10：办事处 G20：子公司 G30：项目公司 G40：项目部
         /// G50：分公司 G80：虚拟分组下的 SPV公司 G99：虚拟机构 G120：直属机构 D80：直属机构 G85：非企业法人
         /// </summary>
-        public string Type { get; set; }
+        public string? Type { get; set; }
         /// <summary>
         /// 机构编码"
         /// </summary>
@@ -93,7 +93,7 @@
         /// <summary>
         /// 分组时的上级机构 ID
         /// </summary>
-        public string GPOid { get; set; }
+        public string? GPOid { get; set; }
         /// <summary>
         /// 项目管理类型
         /// </summary>
@@ -105,7 +105,7 @@
         /// <summary>
         /// 机构全称
         /// </summary>
-        public string Name { get; set; }
+        public string? Name { get; set; }
         /// <summary>
         /// 业务领域
         /// </summary>
@@ -113,7 +113,7 @@
         /// <summary>
         /// 层级
         /// </summary>
-        public string Grade { get; set; }
+        public string? Grade { get; set; }
         /// <summary>
         /// 操作员
         /// </summary>
@@ -139,7 +139,7 @@
         /// <summary>
         /// 机构规则码
         /// </summary>
-        public string Orule { get; set; }
+        public string? Orule { get; set; }
         /// <summary>
         /// 管理层级
         /// </summary>
@@ -167,15 +167,15 @@
         /// <summary>
         /// 主键（机构关联信息 id，非本表主键）
         /// </summary>
-        public string O2Bid { get; set; }
+        public string? O2Bid { get; set; }
         /// <summary>
         /// "组织子属性，类型编码
         /// </summary>
-        public string TypeExt { get; set; }
+        public string? TypeExt { get; set; }
         /// <summary>
         /// 机构简称
         /// </summary>
-        public string ShortName { get; set; }
+        public string? ShortName { get; set; }
         /// <summary>
         /// "独立授权",
         /// </summary>
@@ -187,7 +187,7 @@
         /// hr：人力资源组织
         /// money：疏浚业务组织
         /// </summary>
-        public string BizType { get; set; }
+        public string? BizType { get; set; }
         /// <summary>
         /// :"持股情况 3 全资 2 控股  1 参股  0 不持股
         /// </summary>
@@ -217,7 +217,7 @@
         /// <summary>
         /// 机构 ID
         /// </summary>
-        public string OID { get; set; }
+        public string? OID { get; set; }
         /// <summary>
         /// "分组所属的实体机构 ID
         /// </summary>
@@ -230,11 +230,11 @@
         /// <summary>
         /// 隶属单位 ID
         /// </summary>
-        public string COID { get; set; }
+        public string? COID { get; set; }
         /// <summary>
         /// 拥有兼管职能
         /// </summary>
-        public string CROSSORGAN { get; set; }
+        public string? CROSSORGAN { get; set; }
         /// <summary>
         /// 机构层级（没有用过）
         /// </summary>
@@ -242,12 +242,12 @@
         /// <summary>
         /// 上级机构 id
         /// </summary>
-        public string POID { get; set; }
+        public string? POID { get; set; }
         /// <summary>
         /// "机构状态，类型编码"
         /// 1运营 2筹备 3停用 4撤销
         /// </summary>
-        public string STATUS { get; set; }
+        public string? STATUS { get; set; }
         /// <summary>
         /// "版本号
         /// </summary>
@@ -266,7 +266,7 @@
         public string? ORGPROVINCE { get; set; }
         /// <summary>
         /// 注册码
-        /// </summary>
+        /// </summary
         public string? REGISTERCODE { get; set; }
         /// <summary>
         /// 项目类型"
@@ -290,7 +290,7 @@
         /// D20：事业部 D40：区域总部 D50：共享服务机构 D60：项目部/指挥部 D70：虚拟机构（行政管理） D80：财务虚拟核算单位 D90：生产单元 G：分组 G10：办事处 G20：子公司 G30：项目公司 G40：项目部
         /// G50：分公司 G80：虚拟分组下的 SPV公司 G99：虚拟机构 G120：直属机构 D80：直属机构 G85：非企业法人
         /// </summary>
-        public string TYPE { get; set; }
+        public string? TYPE { get; set; }
         /// <summary>
         /// 机构编码"
         /// </summary>
@@ -298,7 +298,7 @@
         /// <summary>
         /// 分组时的上级机构 ID
         /// </summary>
-        public string GPOID { get; set; }
+        public string? GPOID { get; set; }
         /// <summary>
         /// 项目管理类型
         /// </summary>
@@ -310,7 +310,7 @@
         /// <summary>
         /// 机构全称
         /// </summary>
-        public string NAME { get; set; }
+        public string? NAME { get; set; }
         /// <summary>
         /// 业务领域
         /// </summary>
@@ -318,7 +318,7 @@
         /// <summary>
         /// 层级
         /// </summary>
-        public string GRADE { get; set; }
+        public string? GRADE { get; set; }
         /// <summary>
         /// 操作员
         /// </summary>
@@ -344,7 +344,7 @@
         /// <summary>
         /// 机构规则码
         /// </summary>
-        public string ORULE { get; set; }
+        public string? ORULE { get; set; }
         /// <summary>
         /// 管理层级
         /// </summary>
@@ -372,15 +372,15 @@
         /// <summary>
         /// 主键（机构关联信息 id，非本表主键）
         /// </summary>
-        public string O2BID { get; set; }
+        public string? O2BID { get; set; }
         /// <summary>
         /// "组织子属性，类型编码
         /// </summary>
-        public string TYPEEXT { get; set; }
+        public string? TYPEEXT { get; set; }
         /// <summary>
         /// 机构简称
         /// </summary>
-        public string SHORTNAME { get; set; }
+        public string? SHORTNAME { get; set; }
         /// <summary>
         /// "独立授权",
         /// </summary>
@@ -392,7 +392,7 @@
         /// hr：人力资源组织
         /// money：疏浚业务组织
         /// </summary>
-        public string BIZTYPE { get; set; }
+        public string? BIZTYPE { get; set; }
         /// <summary>
         /// :"持股情况 3 全资 2 控股  1 参股  0 不持股
         /// </summary>

@@ -1,4 +1,5 @@
-﻿using GDCMasterDataReceiveApi.Application.Contracts.Dto._4A.User;
+﻿using GDCMasterDataReceiveApi.Application.Contracts.Dto._4A.Institution;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto._4A.User;
 using GDCMasterDataReceiveApi.Domain.Shared;
 using GDCMasterDataReceiveApi.Domain.Shared.Annotation;
 
@@ -166,12 +167,12 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.IService.IReceiveService
         /// 人员主数据
         /// </summary>
         /// <returns></returns>
-        Task<ResponseAjaxResult<bool>> PersonDataAsync(ReceiveUserRequestDto receiveUserRequestDto);
+        Task<MDMResponseResult> PersonDataAsync(ReceiveUserRequestDto receiveUserRequestDto);
         /// <summary>
         /// 机构主数据
         /// </summary>
         /// <returns></returns>
-        Task<ResponseAjaxResult<bool>> InstitutionDataAsync();
+        Task<MDMResponseResult> InstitutionDataAsync(ReceiveInstitutionRequestDto receiveInstitutionRequestDto);
         #endregion
     }
 }

@@ -1,10 +1,12 @@
 ﻿using AutoMapper;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto._4A.Institution;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto._4A.User;
 using GDCMasterDataReceiveApi.Application.Contracts.IService.IReceiveService;
 using GDCMasterDataReceiveApi.Domain.Models;
 using GDCMasterDataReceiveApi.Domain.Shared;
 using GDCMasterDataReceiveApi.Domain.Shared.Utils;
 using SqlSugar;
+using System.Collections.Generic;
 using UtilsSharp;
 
 namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
@@ -376,33 +378,58 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
         /// 人员主数据
         /// </summary>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<bool>> PersonDataAsync(ReceiveUserRequestDto receiveUserRequestDto)
+        public async Task<MDMResponseResult> PersonDataAsync(ReceiveUserRequestDto receiveUserRequestDto)
         {
-            var responseAjaxResult = new ResponseAjaxResult<bool>();
-            var isExistUser = await _dbContext.Queryable<User>().Where(x => x.IsDelete == 1 && x.EMP_CODE == receiveUserRequestDto.user.EMP_CODE).SingleAsync();
-            if (isExistUser != null)
+            var responseAjaxResult = new MDMResponseResult();
+            try
             {
-                await _dbContext.Updateable<User>(receiveUserRequestDto.user).Where(x=>x.EMP_CODE== isExistUser.EMP_CODE).IgnoreColumns(x=>x.EMP_CODE).ExecuteCommandAsync();
+                var isExistUser = await _dbContext.Queryable<User>().Where(x => x.IsDelete == 1 && x.EMP_CODE == receiveUserRequestDto.user.EMP_CODE).SingleAsync();
+                if (isExistUser != null)
+                {
+                    await _dbContext.Updateable<User>(receiveUserRequestDto.user).Where(x => x.EMP_CODE == isExistUser.EMP_CODE).IgnoreColumns(x => x.EMP_CODE).ExecuteCommandAsync();
+                }
+                else
+                {
+                    var user = mapper.Map<User>(receiveUserRequestDto.user);
+                    user.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
+                    await _dbContext.Insertable<User>(user).ExecuteCommandAsync();
+                }
+                responseAjaxResult.RETURN_CODE = "S0000001";
+                responseAjaxResult.RETURN_DESC = "处理成功";    
+
             }
-            else
+            catch (Exception ex)
             {
-                var user = mapper.Map<User>(receiveUserRequestDto.user);
-                user.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
-                await _dbContext.Insertable<User>(user).ExecuteCommandAsync();
+                responseAjaxResult.RETURN_CODE = "E0003008";
+                responseAjaxResult.RETURN_DESC = "未知的程序异常";
+
             }
-            responseAjaxResult.Data = true;
-            responseAjaxResult.Success();
             return responseAjaxResult;
         }
         /// <summary>
         /// 机构主数据
         /// </summary>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<bool>> InstitutionDataAsync()
+        public async Task<MDMResponseResult> InstitutionDataAsync(ReceiveInstitutionRequestDto receiveInstitutionRequestDto)
         {
+            var responseAjaxResult = new MDMResponseResult();
+            try
+            {
+                var institutions = mapper.Map<List<InstitutionItem>, List<Institution>>(receiveInstitutionRequestDto.OrganizeItem);
+                foreach (var item in institutions)
+                {
+                    item.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
+                }
+                await _dbContext.Storageable<Institution>(institutions).ExecuteCommandAsync();
+                responseAjaxResult.RETURN_CODE = "S0000001";
+                responseAjaxResult.RETURN_DESC = "处理成功";
 
-            var responseAjaxResult = new ResponseAjaxResult<bool>();
-            responseAjaxResult.SuccessResult(true);
+            }
+            catch (Exception ex)
+            {
+                responseAjaxResult.RETURN_CODE = "E0003008";
+                responseAjaxResult.RETURN_DESC = "未知的程序异常";
+            }
             return responseAjaxResult;
         }
     }
