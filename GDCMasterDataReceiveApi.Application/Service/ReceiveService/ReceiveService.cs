@@ -425,6 +425,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
                     if (isExistUser == null)
                     {
                         var user = _mapper.Map<User>(receiveUserRequestDto.user);
+                        user.Enable = 1;
                         user.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
                         await _dbContext.Insertable<User>(user).ExecuteCommandAsync();
                         responseAjaxResult.Success();
@@ -451,15 +452,26 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
                         responseAjaxResult.UserNoExist();
                         return responseAjaxResult;
                     }
-                    if (receiveUserRequestDto.OP_TYPE != null && receiveUserRequestDto.OP_TYPE.ToUpper() == "DISABLE")
+                    if (receiveUserRequestDto.OP_TYPE != null && receiveUserRequestDto.OP_TYPE.ToUpper() == "EDIT")
+                    {
+                        var user = _mapper.Map<User>(receiveUserRequestDto.user);
+                        await _dbContext.Updateable<User>(user).Where(x => x.EMP_CODE == isExistUser.EMP_CODE).IgnoreColumns(x => x.Id).ExecuteCommandAsync();
+                        responseAjaxResult.Success(); 
+                        return responseAjaxResult;
+                    }
+                    //禁用
+                    else if (receiveUserRequestDto.OP_TYPE != null && receiveUserRequestDto.OP_TYPE.ToUpper() == "DISABLE")
                     {
                         isExistUser.Enable = 0;
                     }
-                    else if (receiveUserRequestDto.OP_TYPE != null && receiveUserRequestDto.OP_TYPE.ToUpper() == "DISABLE")
+                    //启用
+                    else if (receiveUserRequestDto.OP_TYPE != null && receiveUserRequestDto.OP_TYPE.ToUpper() == "ENABLE")
                     {
                         isExistUser.Enable = 1;
-                    }
-                    await _dbContext.Updateable<User>(receiveUserRequestDto.user).Where(x => x.EMP_CODE == isExistUser.EMP_CODE).IgnoreColumns(x => x.EMP_CODE).ExecuteCommandAsync();
+                    } 
+
+                    await _dbContext.Updateable<User>(isExistUser).Where(x => x.EMP_CODE == isExistUser.EMP_CODE).IgnoreColumns(x => x.Id).ExecuteCommandAsync();
+                    responseAjaxResult.Success();
                 }
 
             }

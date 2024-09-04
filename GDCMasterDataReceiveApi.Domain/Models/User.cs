@@ -233,8 +233,9 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// </summary>
         public string? ATTRIBUTE5 { get; set; }
         /// <summary>
-        /// 是否启用   0 未启用  1 启用
+        /// 是否启用   0 禁用  1 启用
         /// </summary>
+        [SugarColumn(ColumnDataType = "int", DefaultValue = "1")]
         public int Enable { get; set; }
     }
 }
