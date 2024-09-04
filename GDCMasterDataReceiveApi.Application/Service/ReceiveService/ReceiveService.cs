@@ -383,25 +383,53 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
             var responseAjaxResult = new MDMResponseResult();
             try
             {
-                var isExistUser = await _dbContext.Queryable<User>().Where(x => x.IsDelete == 1 && x.EMP_CODE == receiveUserRequestDto.user.EMP_CODE).SingleAsync();
-                if (isExistUser != null)
+                //创建用户
+                if (receiveUserRequestDto.OP_TYPE != null && receiveUserRequestDto.OP_TYPE.ToUpper() == "CREATE")
                 {
+                    var isExistUser = await _dbContext.Queryable<User>().Where(x =>x.IsDelete==1&& x.EMP_CODE == receiveUserRequestDto.user.EMP_CODE).SingleAsync();
+                    if (isExistUser == null)
+                    {
+                        var user = mapper.Map<User>(receiveUserRequestDto.user);
+                        user.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
+                        await _dbContext.Insertable<User>(user).ExecuteCommandAsync();
+                        responseAjaxResult.Success();
+                    }
+                    else {
+                        if (isExistUser.Enable == 0) 
+                        {
+                            isExistUser.Enable = 1;
+                        }
+                        await _dbContext.Updateable<User>(isExistUser).ExecuteCommandAsync();
+                        responseAjaxResult.UpdateSuccess();
+                    }
+                }
+                //修改用户   禁用  启用用户
+                else if (receiveUserRequestDto.OP_TYPE != null && receiveUserRequestDto.OP_TYPE.ToUpper() == "EDIT"
+                    || receiveUserRequestDto.OP_TYPE != null && receiveUserRequestDto.OP_TYPE.ToUpper() == "DISABLE"
+                    || receiveUserRequestDto.OP_TYPE != null && receiveUserRequestDto.OP_TYPE.ToUpper() == "ENABLE")
+                {
+
+                    var isExistUser = await _dbContext.Queryable<User>().Where(x => x.IsDelete == 1 && x.EMP_CODE == receiveUserRequestDto.user.EMP_CODE).SingleAsync();
+                    if (isExistUser == null)
+                    {
+                        responseAjaxResult.UserNoExist();
+                        return responseAjaxResult;
+                    }
+                    if (receiveUserRequestDto.OP_TYPE != null && receiveUserRequestDto.OP_TYPE.ToUpper() == "DISABLE")
+                    {
+                        isExistUser.Enable = 0;
+                    }
+                    else if (receiveUserRequestDto.OP_TYPE != null && receiveUserRequestDto.OP_TYPE.ToUpper() == "DISABLE")
+                    {
+                        isExistUser.Enable = 1;
+                    } 
                     await _dbContext.Updateable<User>(receiveUserRequestDto.user).Where(x => x.EMP_CODE == isExistUser.EMP_CODE).IgnoreColumns(x => x.EMP_CODE).ExecuteCommandAsync();
                 }
-                else
-                {
-                    var user = mapper.Map<User>(receiveUserRequestDto.user);
-                    user.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
-                    await _dbContext.Insertable<User>(user).ExecuteCommandAsync();
-                }
-                responseAjaxResult.RETURN_CODE = "S0000001";
-                responseAjaxResult.RETURN_DESC = "处理成功";    
 
             }
             catch (Exception ex)
             {
-                responseAjaxResult.RETURN_CODE = "E0003008";
-                responseAjaxResult.RETURN_DESC = "未知的程序异常";
+                responseAjaxResult.Fail();
 
             }
             return responseAjaxResult;
@@ -420,15 +448,27 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
                 {
                     item.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
                 }
-                await _dbContext.Storageable<Institution>(institutions).ExecuteCommandAsync();
-                responseAjaxResult.RETURN_CODE = "S0000001";
-                responseAjaxResult.RETURN_DESC = "处理成功";
-
+                var institutiontOids= await _dbContext.Queryable<Institution>().Where(x => x.IsDelete == 1).Select(x=>x.OID).ToListAsync();
+                var oids= institutions.Select(x => x.OID).ToList();
+                var insertOids= institutiontOids.Where(x =>!oids.Contains(x)).ToList();
+                var updateOids= institutiontOids.Where(x =>oids.Contains(x)).ToList();
+                if (insertOids.Any())
+                {
+                    //插入操作
+                   var batchData= institutions.Where(x => insertOids.Contains(x.OID)).ToList();
+                   await _dbContext.Insertable<Institution>(batchData).ExecuteCommandAsync();
+                }
+                if (updateOids.Any())
+                {
+                    //插入操作
+                    var batchData = institutions.Where(x => updateOids.Contains(x.OID)).ToList();
+                    await _dbContext.Updateable<Institution>(batchData).ExecuteCommandAsync();
+                }
+                responseAjaxResult.Success();
             }
             catch (Exception ex)
             {
-                responseAjaxResult.RETURN_CODE = "E0003008";
-                responseAjaxResult.RETURN_DESC = "未知的程序异常";
+                responseAjaxResult.Fail();
             }
             return responseAjaxResult;
         }
