@@ -3,17 +3,15 @@ using GDCMasterDataReceiveApi.Application.Contracts.Dto._4A.User;
 using GDCMasterDataReceiveApi.Application.Contracts.IService.IReceiveService;
 using GDCMasterDataReceiveApi.Domain.Shared;
 using GDCMasterDataReceiveApi.Domain.Shared.Annotation;
-using GDCMasterDataReceiveApi.Domain.Shared.WebSecurity;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using UtilsSharp;
 
 namespace GDCMasterDataReceiveApi.Controller
 {
     /// <summary>
     /// 接收主数据推送接口控制器（此处控制器名称小写因接口规定）
     /// </summary>
-   
+
     [ApiController]
     public class ReceiveController : BaseController
     {
