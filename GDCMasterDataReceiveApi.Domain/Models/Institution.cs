@@ -349,7 +349,7 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// <summary>
         /// 机构编码
         /// </summary>  
-       [SugarColumn(Length = 128)]
+        [SugarColumn(Length = 128)]
         public string? OCODE { get; set; }
 
 
@@ -371,7 +371,7 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// <summary>
         /// 分组所属的实体机构ID
         /// </summary>
- [SugarColumn(Length = 128)]
+        [SugarColumn(Length = 128)]
         public string? GOID { get; set; }
 
 
