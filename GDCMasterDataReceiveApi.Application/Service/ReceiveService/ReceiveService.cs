@@ -8,8 +8,6 @@ using GDCMasterDataReceiveApi.Domain.Models;
 using GDCMasterDataReceiveApi.Domain.Shared;
 using GDCMasterDataReceiveApi.Domain.Shared.Utils;
 using SqlSugar;
-using System.Collections.Generic;
-using UtilsSharp;
 
 namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
 {
@@ -19,14 +17,14 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
     public class ReceiveService : IReceiveService
     {
         private readonly ISqlSugarClient _dbContext;
-        private readonly IMapper mapper;
+        private readonly IMapper _mapper;
         /// <summary>
         /// 注入上下文
         /// </summary>
         public ReceiveService(ISqlSugarClient dbContext, IMapper mapper)
         {
             this._dbContext = dbContext;
-            this.mapper = mapper;
+            this._mapper = mapper;
         }
         /// <summary>
         /// 获取通用字典数据
@@ -83,14 +81,6 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
             var getData = requestDto.IT_DATA;
             if (getData != null && getData.Any())
             {
-                await _dbContext.Insertable<CountryRegion>(getData).ExecuteCommandAsync();
-                var rtn = new RETURN
-                {
-                    ZINSTID = requestDto.IS_REQ_HEAD_ASYNC.ZINSTID,
-                    ZZRESTIME = DateTime.Now.ToString("yyyyMMddHHmmss"),
-                    ZZSTAT = "S",
-                    ZZMSG = "成功"
-                };
                 var rst = new List<RESULT>();
                 foreach (var item in getData)
                 {
@@ -101,6 +91,20 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
                         ZZSTAT = "S"
                     });
                 }
+                var mData = _mapper.Map<List<CountryRegionReceiveDto>, List<CountryRegion>>(getData);
+
+                foreach (var item in mData)
+                {
+                    item.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
+                }
+                await _dbContext.Insertable(mData).ExecuteCommandAsync();
+                var rtn = new RETURN
+                {
+                    ZINSTID = requestDto.IS_REQ_HEAD_ASYNC.ZINSTID,
+                    ZZRESTIME = DateTime.Now.ToString("yyyyMMddHHmmss"),
+                    ZZSTAT = "S",
+                    ZZMSG = "成功"
+                };
                 var res = new ResponseResult()
                 {
                     ES_RETURN = rtn,
@@ -416,16 +420,17 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
                 //创建用户
                 if (receiveUserRequestDto.OP_TYPE != null && receiveUserRequestDto.OP_TYPE.ToUpper() == "CREATE")
                 {
-                    var isExistUser = await _dbContext.Queryable<User>().Where(x =>x.IsDelete==1&& x.EMP_CODE == receiveUserRequestDto.user.EMP_CODE).SingleAsync();
+                    var isExistUser = await _dbContext.Queryable<User>().Where(x => x.IsDelete == 1 && x.EMP_CODE == receiveUserRequestDto.user.EMP_CODE).SingleAsync();
                     if (isExistUser == null)
                     {
-                        var user = mapper.Map<User>(receiveUserRequestDto.user);
+                        var user = _mapper.Map<User>(receiveUserRequestDto.user);
                         user.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
                         await _dbContext.Insertable<User>(user).ExecuteCommandAsync();
                         responseAjaxResult.Success();
                     }
-                    else {
-                        if (isExistUser.Enable == 0) 
+                    else
+                    {
+                        if (isExistUser.Enable == 0)
                         {
                             isExistUser.Enable = 1;
                         }
@@ -452,7 +457,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
                     else if (receiveUserRequestDto.OP_TYPE != null && receiveUserRequestDto.OP_TYPE.ToUpper() == "DISABLE")
                     {
                         isExistUser.Enable = 1;
-                    } 
+                    }
                     await _dbContext.Updateable<User>(receiveUserRequestDto.user).Where(x => x.EMP_CODE == isExistUser.EMP_CODE).IgnoreColumns(x => x.EMP_CODE).ExecuteCommandAsync();
                 }
 
@@ -473,20 +478,20 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
             var responseAjaxResult = new MDMResponseResult();
             try
             {
-                var institutions = mapper.Map<List<InstitutionItem>, List<Institution>>(receiveInstitutionRequestDto.OrganizeItem);
+                var institutions = _mapper.Map<List<InstitutionItem>, List<Institution>>(receiveInstitutionRequestDto.OrganizeItem);
                 foreach (var item in institutions)
                 {
                     item.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
                 }
-                var institutiontOids= await _dbContext.Queryable<Institution>().Where(x => x.IsDelete == 1).Select(x=>x.OID).ToListAsync();
-                var oids= institutions.Select(x => x.OID).ToList();
-                var insertOids= institutiontOids.Where(x =>!oids.Contains(x)).ToList();
-                var updateOids= institutiontOids.Where(x =>oids.Contains(x)).ToList();
+                var institutiontOids = await _dbContext.Queryable<Institution>().Where(x => x.IsDelete == 1).Select(x => x.OID).ToListAsync();
+                var oids = institutions.Select(x => x.OID).ToList();
+                var insertOids = institutiontOids.Where(x => !oids.Contains(x)).ToList();
+                var updateOids = institutiontOids.Where(x => oids.Contains(x)).ToList();
                 if (insertOids.Any())
                 {
                     //插入操作
-                   var batchData= institutions.Where(x => insertOids.Contains(x.OID)).ToList();
-                   await _dbContext.Insertable<Institution>(batchData).ExecuteCommandAsync();
+                    var batchData = institutions.Where(x => insertOids.Contains(x.OID)).ToList();
+                    await _dbContext.Insertable<Institution>(batchData).ExecuteCommandAsync();
                 }
                 if (updateOids.Any())
                 {
