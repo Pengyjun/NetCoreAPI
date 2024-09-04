@@ -693,6 +693,16 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             //result.TotalYearCollection = monthReportData.Sum(x => x.PartyAPayAmount) + historys.Item4;
             result.TotalYearCollection = historys.Item4;
 
+            #region 追加历史的外包支出、工程量
+            var his = monthReportData.FirstOrDefault(x => x.DateMonth == 202306);
+            if (his != null)
+            {
+                result.HOutValue = his.OutsourcingExpensesAmount;
+                result.HQuantity = his.CompletedQuantity;
+                result.HValue = his.CompleteProductionAmount;
+            }
+            #endregion
+
             if (monthReport != null)
             {
                 //月度应收账款(元)
