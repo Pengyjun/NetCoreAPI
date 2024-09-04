@@ -424,6 +424,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
                     if (isExistUser == null)
                     {
                         var user = _mapper.Map<User>(receiveUserRequestDto.user);
+                        user.Enable = 1;
                         user.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
                         await _dbContext.Insertable<User>(user).ExecuteCommandAsync();
                         responseAjaxResult.Success();
