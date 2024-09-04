@@ -6,6 +6,7 @@ using GDCMasterDataReceiveApi.Application.Contracts.Dto.CountryRegion;
 using GDCMasterDataReceiveApi.Application.Contracts.IService.IReceiveService;
 using GDCMasterDataReceiveApi.Domain.Models;
 using GDCMasterDataReceiveApi.Domain.Shared;
+using GDCMasterDataReceiveApi.Domain.Shared.Const;
 using GDCMasterDataReceiveApi.Domain.Shared.Utils;
 using SqlSugar;
 
@@ -87,8 +88,8 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
                     rst.Add(new RESULT
                     {
                         ZZSERIAL = item.ZZSERIAL,
-                        ZZMSG = "成功",
-                        ZZSTAT = "S"
+                        ZZMSG = ResponseMessage.OPERATION_SUCCESS,
+                        ZZSTAT = ResponseStatus.SUCCESS
                     });
                 }
                 var mData = _mapper.Map<List<CountryRegionReceiveDto>, List<CountryRegion>>(getData);
@@ -102,8 +103,8 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
                 {
                     ZINSTID = requestDto.IS_REQ_HEAD_ASYNC.ZINSTID,
                     ZZRESTIME = DateTime.Now.ToString("yyyyMMddHHmmss"),
-                    ZZSTAT = "S",
-                    ZZMSG = "成功"
+                    ZZMSG = ResponseMessage.OPERATION_SUCCESS,
+                    ZZSTAT = ResponseStatus.SUCCESS
                 };
                 var res = new ResponseResult()
                 {
