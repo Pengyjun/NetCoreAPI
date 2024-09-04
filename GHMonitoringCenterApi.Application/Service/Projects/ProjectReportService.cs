@@ -3555,9 +3555,13 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             {
                 #region 参数问题
                 var startTime = string.Empty;
-                if (model.DateMonth == null)
+                if (model.DateMonth == null&& nowDateMonth==0)
                 {
                     model.DateMonth = DateTime.Now.AddMonths(-1).Month;
+                }
+                else
+                {
+                    model.DateMonth = nowDateMonth;
                 }
                 //else if (model.DateMonth.HasValue)
                 //{

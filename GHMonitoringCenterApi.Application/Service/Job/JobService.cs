@@ -452,11 +452,11 @@ namespace GHMonitoringCenterApi.Application.Service.Job
                   .WhereIF(model.EndSubmitTime != null, (j, a, p) => j.SubmitTime < ((DateTime)model.EndSubmitTime).AddDays(1));
             if (model.JobStatus == JobStatus.Handled)
             {
-                query = query.OrderByDescending((j, a, p) => new { a.ApproveTime, j.SubmitTime });
+                query = query.Distinct().OrderByDescending((j, a, p) => new { a.ApproveTime, j.SubmitTime });
             }
             else
             {
-                query = query.OrderByDescending((j, a, p) => j.SubmitTime);
+                query = query.Distinct().OrderByDescending((j, a, p) => j.SubmitTime);
             }
             var resJobList = await query.Select(selectExpr).ToPageListAsync(model.PageIndex, model.PageSize, total);
             // 业务关联相关库，进行任务数据填充
