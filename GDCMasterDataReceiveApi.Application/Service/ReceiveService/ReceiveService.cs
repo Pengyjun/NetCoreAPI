@@ -464,7 +464,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
                         isExistUser.Enable = 0;
                     }
                     //启用
-                    else if (receiveUserRequestDto.OP_TYPE != null && receiveUserRequestDto.OP_TYPE.ToUpper() == "DISABLE")
+                    else if (receiveUserRequestDto.OP_TYPE != null && receiveUserRequestDto.OP_TYPE.ToUpper() == "ENABLE")
                     {
                         isExistUser.Enable = 1;
                     } 
