@@ -415,7 +415,14 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
                         responseAjaxResult.UserNoExist();
                         return responseAjaxResult;
                     }
-                    if (receiveUserRequestDto.OP_TYPE != null && receiveUserRequestDto.OP_TYPE.ToUpper() == "DISABLE")
+                    if (receiveUserRequestDto.OP_TYPE != null && receiveUserRequestDto.OP_TYPE.ToUpper() == "EDIT")
+                    {
+                        var user = mapper.Map<User>(receiveUserRequestDto.user);
+                        await _dbContext.Updateable<User>(user).Where(x => x.EMP_CODE == isExistUser.EMP_CODE).IgnoreColumns(x => x.Id).ExecuteCommandAsync();
+                        responseAjaxResult.Success(); 
+                        return responseAjaxResult;
+                    }
+                    else if (receiveUserRequestDto.OP_TYPE != null && receiveUserRequestDto.OP_TYPE.ToUpper() == "DISABLE")
                     {
                         isExistUser.Enable = 0;
                     }
@@ -423,7 +430,9 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
                     {
                         isExistUser.Enable = 1;
                     } 
-                    await _dbContext.Updateable<User>(receiveUserRequestDto.user).Where(x => x.EMP_CODE == isExistUser.EMP_CODE).IgnoreColumns(x => x.EMP_CODE).ExecuteCommandAsync();
+
+                    await _dbContext.Updateable<User>(isExistUser).Where(x => x.EMP_CODE == isExistUser.EMP_CODE).IgnoreColumns(x => x.Id).ExecuteCommandAsync();
+                    responseAjaxResult.Success();
                 }
 
             }
