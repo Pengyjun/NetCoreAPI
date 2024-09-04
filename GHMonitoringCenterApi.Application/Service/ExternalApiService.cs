@@ -190,7 +190,8 @@ namespace GHMonitoringCenterApi.Application.Service
                     Tag = x.Tag,
                     Tag2 = x.Tag2,
                     ProjectTypeId = x.TypeId,
-                    RegionId = x.RegionId
+                    RegionId = x.RegionId,
+                    MasterProjectId = x.MasterProjectId
                 })
                 .ToListAsync();
 
