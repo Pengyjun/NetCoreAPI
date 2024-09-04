@@ -1,5 +1,7 @@
-﻿using GDCMasterDataReceiveApi.Application.Contracts.Dto._4A.Institution;
+﻿using GDCMasterDataReceiveApi.Application.Contracts;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto._4A.Institution;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto._4A.User;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.CountryRegion;
 using GDCMasterDataReceiveApi.Application.Contracts.IService.IReceiveService;
 using GDCMasterDataReceiveApi.Domain.Shared;
 using GDCMasterDataReceiveApi.Domain.Shared.Annotation;
@@ -62,7 +64,7 @@ namespace GDCMasterDataReceiveApi.Controller
         /// <returns></returns>
         [UnitOfWork]
         [HttpPost("CountryRegion")]
-        public Task<ResponseAjaxResult<bool>> CountryRegionDataAsync() => _receiveService.CountryRegionDataAsync();
+        public Task<ResponseAjaxResult<ResponseResult>> CountryRegionDataAsync([FromBody] RequestResult<CountryRegionReceiveDto> requestDto) => _receiveService.CountryRegionDataAsync(requestDto);
         /// <summary>
         /// 大洲
         /// </summary>
@@ -239,7 +241,7 @@ namespace GDCMasterDataReceiveApi.Controller
         [UnitOfWork]
         [HttpPost("AccountingOrganization")]
         public Task<ResponseAjaxResult<bool>> AccountingOrganizationDataAsync() => _receiveService.AccountingOrganizationDataAsync();
-     
+
         ///// <summary>
         ///// 机构主数据
         ///// </summary>
@@ -252,14 +254,14 @@ namespace GDCMasterDataReceiveApi.Controller
         #region 拉取4A的人员和机构数据
         [Route("api/4A/Receive/Person")]
         [HttpPost]
-        public async Task<MDMResponseResult>  PersonAsync([FromBody] ReceiveUserRequestDto receiveUserRequestDto) 
+        public async Task<MDMResponseResult> PersonAsync([FromBody] ReceiveUserRequestDto receiveUserRequestDto)
         {
             return await _receiveService.PersonDataAsync(receiveUserRequestDto);
         }
 
         [Route("api/4A/Receive/Institution")]
         [HttpPost]
-        public async Task<MDMResponseResult> InstitutionAsync([FromBody] ReceiveInstitutionRequestDto  receiveInstitutionRequestDto)
+        public async Task<MDMResponseResult> InstitutionAsync([FromBody] ReceiveInstitutionRequestDto receiveInstitutionRequestDto)
         {
             return await _receiveService.InstitutionDataAsync(receiveInstitutionRequestDto);
         }

@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
+using GDCMasterDataReceiveApi.Application.Contracts;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto._4A.Institution;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto._4A.User;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.CountryRegion;
 using GDCMasterDataReceiveApi.Application.Contracts.IService.IReceiveService;
 using GDCMasterDataReceiveApi.Domain.Models;
 using GDCMasterDataReceiveApi.Domain.Shared;
@@ -74,11 +76,39 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
         /// 国家地区
         /// </summary>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<bool>> CountryRegionDataAsync()
+        public async Task<ResponseAjaxResult<ResponseResult>> CountryRegionDataAsync(RequestResult<CountryRegionReceiveDto> requestDto)
         {
+            var responseAjaxResult = new ResponseAjaxResult<ResponseResult>();
+            //获取数据
+            var getData = requestDto.IT_DATA;
+            if (getData != null && getData.Any())
+            {
+                await _dbContext.Insertable<CountryRegion>(getData).ExecuteCommandAsync();
+                var rtn = new RETURN
+                {
+                    ZINSTID = requestDto.IS_REQ_HEAD_ASYNC.ZINSTID,
+                    ZZRESTIME = DateTime.Now.ToString("yyyyMMddHHmmss"),
+                    ZZSTAT = "S",
+                    ZZMSG = "成功"
+                };
+                var rst = new List<RESULT>();
+                foreach (var item in getData)
+                {
+                    rst.Add(new RESULT
+                    {
+                        ZZSERIAL = item.ZZSERIAL,
+                        ZZMSG = "成功",
+                        ZZSTAT = "S"
+                    });
+                }
+                var res = new ResponseResult()
+                {
+                    ES_RETURN = rtn,
+                    ET_RESULT = rst
+                };
+                responseAjaxResult.SuccessResult(res);
+            }
 
-            var responseAjaxResult = new ResponseAjaxResult<bool>();
-            responseAjaxResult.SuccessResult(true);
             return responseAjaxResult;
         }
         /// <summary>
@@ -395,7 +425,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
                     await _dbContext.Insertable<User>(user).ExecuteCommandAsync();
                 }
                 responseAjaxResult.RETURN_CODE = "S0000001";
-                responseAjaxResult.RETURN_DESC = "处理成功";    
+                responseAjaxResult.RETURN_DESC = "处理成功";
 
             }
             catch (Exception ex)

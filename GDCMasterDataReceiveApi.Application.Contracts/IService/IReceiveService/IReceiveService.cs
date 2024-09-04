@@ -1,5 +1,6 @@
 ﻿using GDCMasterDataReceiveApi.Application.Contracts.Dto._4A.Institution;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto._4A.User;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.CountryRegion;
 using GDCMasterDataReceiveApi.Domain.Shared;
 using GDCMasterDataReceiveApi.Domain.Shared.Annotation;
 
@@ -35,7 +36,7 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.IService.IReceiveService
         /// 国家地区
         /// </summary>
         /// <returns></returns>
-        Task<ResponseAjaxResult<bool>> CountryRegionDataAsync();
+        Task<ResponseAjaxResult<ResponseResult>> CountryRegionDataAsync(RequestResult<CountryRegionReceiveDto> requestDto);
         /// <summary>
         /// 大洲
         /// </summary>
