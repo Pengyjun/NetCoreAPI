@@ -452,7 +452,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
                     }
                     if (receiveUserRequestDto.OP_TYPE != null && receiveUserRequestDto.OP_TYPE.ToUpper() == "EDIT")
                     {
-                        var user = mapper.Map<User>(receiveUserRequestDto.user);
+                        var user = _mapper.Map<User>(receiveUserRequestDto.user);
                         await _dbContext.Updateable<User>(user).Where(x => x.EMP_CODE == isExistUser.EMP_CODE).IgnoreColumns(x => x.Id).ExecuteCommandAsync();
                         responseAjaxResult.Success(); 
                         return responseAjaxResult;
