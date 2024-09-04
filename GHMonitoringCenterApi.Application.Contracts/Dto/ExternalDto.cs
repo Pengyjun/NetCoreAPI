@@ -304,6 +304,10 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto
         /// 区域id
         /// </summary>
         public Guid? RegionId { get; set; }
+        /// <summary>
+        /// 主数据项目id
+        /// </summary>
+        public Guid? MasterProjectId { get; set; }
     }
     /// <summary>
     /// 对外接口 项目区域信息
