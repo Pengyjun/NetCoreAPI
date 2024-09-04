@@ -28,7 +28,7 @@
         /// </summary>
         public object Value { get; set; }
         /// <summary>
-        /// 条件符号 > = 等
+        /// 条件符号 > = like < 等
         /// </summary>
         public string Condition { get; set; }
         /// <summary>
