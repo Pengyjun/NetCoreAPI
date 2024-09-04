@@ -26,6 +26,18 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project.MonthReportFor
         /// 开累甲方付款金额
         /// </summary>
         public decimal TotalYearCollection { get; set; }
+        /// <summary>
+        /// 历史外包支出（累计至今使用）
+        /// </summary>
+        public decimal HOutValue { get; set; }
+        /// <summary>
+        /// 历史工程量（累计至今使用）
+        /// </summary>
+        public decimal HQuantity { get; set; }
+        /// <summary>
+        /// 历史完成产值
+        /// </summary>
+        public decimal HValue { get; set; }
         #endregion
         /// <summary>
         /// 填报月份（例：202304，注解：上月的26-本月的25，例：2023.3.26-2023.04.25）
