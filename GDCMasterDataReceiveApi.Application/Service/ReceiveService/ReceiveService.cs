@@ -457,10 +457,12 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
                         responseAjaxResult.Success(); 
                         return responseAjaxResult;
                     }
+                    //禁用
                     else if (receiveUserRequestDto.OP_TYPE != null && receiveUserRequestDto.OP_TYPE.ToUpper() == "DISABLE")
                     {
                         isExistUser.Enable = 0;
                     }
+                    //启用
                     else if (receiveUserRequestDto.OP_TYPE != null && receiveUserRequestDto.OP_TYPE.ToUpper() == "DISABLE")
                     {
                         isExistUser.Enable = 1;
