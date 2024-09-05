@@ -388,6 +388,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                         Id = nowYear.Id,
                         KeyId = nowYear.KeyId,
                         Name = nowYear.Name,
+                        DetailId= nowYear.DetailId,
                         OutPutType = nowYear.OutPutType,
                         OutsourcingExpensesAmount = nowYear.OutsourcingExpensesAmount,
                         Pid = nowYear.Pid,
@@ -797,6 +798,31 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
 
                         if (resList != null && resList.Any())
                         {
+                            //历史记录
+                            var tIds = resList.Where(x => x.IsAllowDelete).Select(x => x.DetailId).ToList();
+                            foreach (var item in resList)
+                            {
+                                if (tIds.Contains(item.DetailId))
+                                {
+                                    var isExist = monthReportDetailsData.FirstOrDefault(x => x.Id == item.DetailId);
+                                    if (isExist != null)
+                                    {
+                                        item.ProjectId = isExist.ProjectId.ToString();
+                                    }
+                                }
+                                else
+                                {
+                                    var isExist = monthReportDetailsData.FirstOrDefault(x => x.Id == item.DetailId);
+                                    if (isExist != null)
+                                    {
+                                        item.ProjectId = isExist.ProjectId.ToString();
+                                        item.UnitPrice = isExist.UnitPrice;
+                                        item.CompletedQuantity = isExist.CompletedQuantity;
+                                        item.CompleteProductionAmount = isExist.CompleteProductionAmount;
+                                        item.OutsourcingExpensesAmount = isExist.OutsourcingExpensesAmount;
+                                    }
+                                }
+                            }
                             treeDetails = await WBSConvertTree(model.ProjectId, dateMonth, bData, result.IsFromStaging, resList);
                             //树组合
                             result.TreeDetails = treeDetails;

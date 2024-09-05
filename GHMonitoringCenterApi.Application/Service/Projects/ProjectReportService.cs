@@ -30,6 +30,7 @@ using Org.BouncyCastle.Asn1.Cmp;
 using SqlSugar;
 using SqlSugar.Extensions;
 using System.Data;
+using System.Security.Policy;
 using System.Text.RegularExpressions;
 using UtilsSharp;
 using Model = GHMonitoringCenterApi.Domain.Models;
@@ -2781,8 +2782,8 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
         /// <returns></returns>
         public async Task<ResponseAjaxResult<bool>> SaveProjectMonthReportAsync(SaveProjectMonthReportRequestDto model)
         {
-            model.ResetModelProperty();
             var result = new ResponseAjaxResult<bool>();
+            model.ResetModelProperty();
             if (model.DateMonth == 202306)
             {
                 return result.FailResult(HttpStatusCode.SaveFail, "由于历史数据的缘故，系统不允许修改6月份月报数据");
@@ -2802,6 +2803,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 return result.FailResult(HttpStatusCode.DataNotEXIST, ResponseMessage.DATA_NOTEXIST_PROJECT);
             }
             var monthReport = await GetMonthReportAsync(model.ProjectId, model.DateMonth);
+            var mpId = GuidUtil.Next();
             // 是否是非施工项目
             var isNonConstruction = project.TypeId == CommonData.NoConstrutionProjectType;
             // 币种/汇率
@@ -2809,29 +2811,89 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             var currencyExchangeRate = model.CurrencyExchangeRate;
             //var reqDetails = model.ResolveDetails();//原来代码
             #region 新 处理审批时重复月报明细数据
-            var reqDetailsList = model.ResolveDetails();
-            var reqDetails = new List<SaveProjectMonthReportRequestDto.ReqMonthReportDetail>();
+            var reqDetails = model.ResolveDetails();
+            //var reqDetails = new List<SaveProjectMonthReportRequestDto.ReqMonthReportDetail>();
             //获取原来的月报明细数据
-            var rDetailsIds = reqDetailsList.Where(x => x.DetailId != Guid.Empty && !string.IsNullOrEmpty(x.DetailId.ToString())).Select(x => x.DetailId).ToList();
-            var oldMDetails = await _dbContext.Queryable<MonthReportDetail>().Where(x => x.IsDelete == 1 && rDetailsIds.Contains(x.Id)).ToListAsync();
+            var oldMDetails = await _dbContext.Queryable<MonthReportDetail>().Where(x => x.IsDelete == 1 && x.ProjectId == model.ProjectId).ToListAsync();
+
+            var addDetails = new List<MonthReportDetail>();
+            var updateDetails = new List<MonthReportDetail>();
             //循环匹配原来的数据与传入参数值是否完全一致
-            foreach (var item in reqDetailsList)
+            foreach (var item in reqDetails)
             {
-                var existMReport = oldMDetails.FirstOrDefault(x => x.Id == item.DetailId);
-                if (existMReport != null)
+                if (item.Id != Guid.Empty && !string.IsNullOrEmpty(item.Id.ToString()))
                 {
-                    /***
-                     * 匹配数据是否完全一致 (施工性质、产值属性、资源、单价、工程量、外包支出、备注)
-                     * 如果完全一致默认是历史数据  那么不做处理  
-                     */
-                    if (item.ConstructionNature == existMReport.ConstructionNature && item.OutPutType == existMReport.OutPutType && item.ShipId == existMReport.ShipId && item.UnitPrice == existMReport.UnitPrice
-                        && item.CompletedQuantity == existMReport.CompletedQuantity && item.OutsourcingExpensesAmount == existMReport.OutsourcingExpensesAmount && item.Remark == existMReport.Remark)
-                    { }
-                    else reqDetails.Add(item);//否则追加数据做后续逻辑处理
+                    //先查本月的有没有数据
+                    var oCurMonthRp = oldMDetails.Where(x => x.DateMonth == model.DateMonth).ToList();
+                    if (oCurMonthRp != null && oCurMonthRp.Any())
+                    {
+                        //如果当月有数据 查询是否与之匹配  如果匹配为修改的数据
+                        var piPei = oCurMonthRp.FirstOrDefault(x => x.Id == item.Id);
+                        if (piPei != null)
+                        {
+                            piPei.OutsourcingExpensesAmount = item.OutsourcingExpensesAmount.Value;
+                            piPei.CompleteProductionAmount = item.CompleteProductionAmount.Value;
+                            piPei.CompletedQuantity = item.CompletedQuantity.Value;
+                            piPei.ShipId = item.ShipId.Value;
+                            piPei.ConstructionNature = item.ConstructionNature;
+                            piPei.OutPutType = item.OutPutType.Value;
+                            piPei.UnitPrice = item.UnitPrice.Value;
+                            piPei.Remark = item.Remark;
+                            updateDetails.Add(piPei);
+                        }
+                    }
+                    //是不是本月之外的数据需要追加到本月
+                    var outMonthRp = oldMDetails.Where(x => x.DateMonth != model.DateMonth).ToList();
+                    if (outMonthRp != null && outMonthRp.Any())
+                    {
+                        var piPei = outMonthRp.FirstOrDefault(x => item.Id == x.Id);
+                        if (piPei != null)
+                        {
+                            if (item.CompletedQuantity == 0 && item.CompleteProductionAmount == 0 && item.OutsourcingExpensesAmount == 0 && item.UnitPrice == 0 && string.IsNullOrWhiteSpace(item.Remark)) continue;
+                            else
+                            {
+                                //新增本月的数据
+                                addDetails.Add(new MonthReportDetail
+                                {
+                                    Id = GuidUtil.Next(),
+                                    ProjectId = model.ProjectId,
+                                    CompletedQuantity = item.CompletedQuantity.Value,
+                                    CompleteProductionAmount = item.CompleteProductionAmount.Value,
+                                    ConstructionNature = item.ConstructionNature,
+                                    DateMonth = model.DateMonth,
+                                    MonthReportId = monthReport == null ? mpId : monthReport.Id,
+                                    DateYear = Convert.ToInt32(model.DateMonth.ToString().Substring(0, 4)),
+                                    OutPutType = item.OutPutType.Value,
+                                    OutsourcingExpensesAmount = item.OutsourcingExpensesAmount.Value,
+                                    ProjectWBSId = item.ProjectWBSId,
+                                    Remark = item.Remark,
+                                    ShipId = item.ShipId.Value,
+                                    UnitPrice = item.UnitPrice.Value
+                                });
+                            }
+                        }
+                    }
                 }
                 else
                 {
-                    reqDetails.Add(item);//追加数据做后续逻辑处理
+                    //新增本月的数据
+                    addDetails.Add(new MonthReportDetail
+                    {
+                        Id = GuidUtil.Next(),
+                        ProjectId = model.ProjectId,
+                        CompletedQuantity = item.CompletedQuantity.Value,
+                        CompleteProductionAmount = item.CompleteProductionAmount.Value,
+                        ConstructionNature = item.ConstructionNature,
+                        DateMonth = model.DateMonth,
+                        MonthReportId = monthReport == null ? mpId : monthReport.Id,
+                        DateYear = Convert.ToInt32(model.DateMonth.ToString().Substring(0, 4)),
+                        OutPutType = item.OutPutType.Value,
+                        OutsourcingExpensesAmount = item.OutsourcingExpensesAmount.Value,
+                        ProjectWBSId = item.ProjectWBSId,
+                        Remark = item.Remark,
+                        ShipId = item.ShipId.Value,
+                        UnitPrice = item.UnitPrice.Value
+                    });
                 }
             }
             #endregion
@@ -2840,13 +2902,10 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 // 计算月报明细产值(元)
                 item.CompleteProductionAmount = item.CompletedQuantity * item.UnitPrice * currencyExchangeRate;
             });
-            var addDetails = new List<MonthReportDetail>();
-            var updateDetails = new List<MonthReportDetail>();
-            var removeDetails = new List<MonthReportDetail>();
             bool isAddMonthReport = false;
             if (monthReport == null)
             {
-                monthReport = new MonthReport() { Id = GuidUtil.Next(), CreateId = _currentUser.Id, DateYear = monthTime.ToDateYear() };
+                monthReport = new MonthReport() { Id = mpId, CreateId = _currentUser.Id, DateYear = monthTime.ToDateYear() };
                 var lastDateMonth = monthTime.AddMonths(-1).ToDateMonth();
                 var lastMonthReport = await GetMonthReportAsync(model.ProjectId, lastDateMonth);
                 // 上个项目月报的（下月预估成本）带到本月存储
@@ -2859,12 +2918,14 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             }
             else
             {
-                var oldDetails = await GetMonthReportDetailsAsync(monthReport.Id);
-                var exsitDetailIds = oldDetails.Where(t => reqDetails.Any(r => r.DetailId == t.Id)).Select(t => (Guid?)t.Id).ToArray();
-                var addReqDetails = reqDetails.Where(t => !exsitDetailIds.Contains(t.DetailId)).ToList();
-                addDetails = _mapper.Map(addReqDetails, addDetails);
-                removeDetails = oldDetails.Where(t => !exsitDetailIds.Contains(t.Id)).ToList();
-                updateDetails = oldDetails.Where(t => exsitDetailIds.Contains(t.Id)).ToList();
+                //var oldDetails = await GetMonthReportDetailsAsync(monthReport.Id);
+                //if (reqDetails.Any()) addDetails = _mapper.Map(reqDetails, addDetails);
+                //var exsitDetailIds = oldDetails.Where(t => reqDetails.Any(r => r.DetailId == t.Id)).Select(t => (Guid?)t.Id).ToList();
+                //var addReqDetails = reqDetails.Where(t => !exsitDetailIds.Contains(t.DetailId)).ToList();
+                //var addReqDetails = reqDetails.Where(t => string.IsNullOrWhiteSpace(t.DetailId.ToString()) || t.DetailId == Guid.Empty).ToList();
+                //addDetails = _mapper.Map(addReqDetails, addDetails);
+                //removeDetails = oldDetails.Where(t => !exsitDetailIds.Contains(t.Id)).ToList();
+                //updateDetails = oldDetails.Where(t => exsitDetailIds.Contains(t.Id)).ToList();
                 monthReport.UpdateId = _currentUser.Id;
             }
             monthReport = _mapper.Map(model, monthReport);
@@ -2882,26 +2943,26 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             monthReport.Status = isNonConstruction ? MonthReportStatus.Finish : model.Status;
             monthReport.StatusText = isNonConstruction ? "已完成" : model.StatusText;
             // 数据填充
-            addDetails.ForEach(item =>
-            {
-                item.Id = GuidUtil.Next();
-                item.CreateId = _currentUser.Id;
-                item.MonthReportId = monthReport.Id;
-                item.ProjectId = monthReport.ProjectId;
-                item.DateMonth = monthReport.DateMonth;
-                item.DateYear = monthReport.DateYear;
-            });
-            updateDetails.ForEach(item =>
-            {
-                var updateReqItem = reqDetails.Single(t => t.DetailId == item.Id);
-                _mapper.Map(updateReqItem, item);
-                item.UpdateId = _currentUser.Id;
-            });
-            removeDetails.ForEach(item =>
-            {
-                item.DeleteId = _currentUser.Id;
-                item.IsDelete = 0;
-            });
+            //addDetails.ForEach(item =>
+            //{
+            //    item.Id = GuidUtil.Next();
+            //    item.CreateId = _currentUser.Id;
+            //    item.MonthReportId = monthReport.Id;
+            //    item.ProjectId = monthReport.ProjectId;
+            //    item.DateMonth = monthReport.DateMonth;
+            //    item.DateYear = monthReport.DateYear;
+            //});
+            //updateDetails.ForEach(item =>
+            //{
+            //    var updateReqItem = reqDetails.FirstOrDefault(t => t.DetailId == item.Id);
+            //    _mapper.Map(updateReqItem, item);
+            //    item.UpdateId = _currentUser.Id;
+            //});
+            //removeDetails.ForEach(item =>
+            //{
+            //    item.DeleteId = _currentUser.Id;
+            //    item.IsDelete = 0;
+            //});
             var modelState = isAddMonthReport ? ModelState.Add : ModelState.Update;
             var newReportDetails = new List<MonthReportDetail>();
             newReportDetails.AddRange(addDetails);
@@ -2914,10 +2975,10 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             {
                 await _dbMonthReport.AsUpdateable(monthReport).EnableDiffLogEvent(NewLogInfo(EntityType.MonthReport, monthReport.Id, modelState)).ExecuteCommandAsync();
             }
-            if (removeDetails.Any())
-            {
-                await _dbMonthReportDetail.AsUpdateable(removeDetails).UpdateColumns(t => new { t.IsDelete, t.DeleteId, t.DeleteTime }).EnableDiffLogEvent(NewLogInfo(EntityType.MonthReport, monthReport.Id, modelState)).ExecuteCommandAsync();
-            }
+            //if (removeDetails.Any())
+            //{
+            //    //await _dbMonthReportDetail.AsUpdateable(removeDetails).UpdateColumns(t => new { t.IsDelete, t.DeleteId, t.DeleteTime }).EnableDiffLogEvent(NewLogInfo(EntityType.MonthReport, monthReport.Id, modelState)).ExecuteCommandAsync();
+            //}
             if (updateDetails.Any())
             {
                 await _dbMonthReportDetail.AsUpdateable(updateDetails).EnableDiffLogEvent(NewLogInfo(EntityType.MonthReport, monthReport.Id, modelState)).ExecuteCommandAsync();
@@ -3059,77 +3120,90 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
 
             //转换为list
             var resList = JsonConvert.DeserializeObject<List<ProjectWBSDto>>(jsonString);
-
-            //查询当月是否存在已经填过相同的月报六个值对比  月份对比
-            var mRp = await _dbContext.Queryable<MonthReport>()
-                .Where(x => x.IsDelete == 1 && x.ProjectId == model.ProjectId && x.DateMonth == model.DateMonth)
-                .FirstAsync();
-            if (mRp != null)
+            if (resList != null && resList.Any())
             {
-                var monthReps = await _dbContext.Queryable<MonthReportDetail>()
-                    .Where(x => mRp.Id == x.MonthReportId && x.IsDelete == 1)
-                    .ToListAsync();
-
-                //取本月的月报
-                var nMorthRepDetails = new List<ProjectWBSDto>();
-                if (resList != null && resList.Any())
+                //获取当月月报
+                var mReportList = await _dbContext.Queryable<MonthReportDetail>()
+                    .Where(x => x.IsDelete == 1 && x.ProjectId == model.ProjectId && x.DateMonth == model.DateMonth).ToListAsync();
+                if (mReportList != null && mReportList.Any())
                 {
-                    foreach (var eRL in resList)
+                    var detailIds = new List<string>();
+                    foreach (var rt in resList)
                     {
-                        if (string.IsNullOrWhiteSpace(eRL.DetailId.ToString()))
+                        if (rt.DetailId == Guid.Empty || string.IsNullOrWhiteSpace(rt.DetailId.ToString()))
                         {
-                            //追加本月新的
-                            eRL.IsAllowDelete = true;
-                            nMorthRepDetails.Add(eRL);
+                            //如果月报资源id是空 判断是否四个值都是空  过滤
+                            if (rt.UnitPrice == 0 && rt.CompletedQuantity == 0 && rt.OutsourcingExpensesAmount == 0 && string.IsNullOrWhiteSpace(rt.Remark))
+                            { continue; }
+                            else
+                            {
+                                //追加id 空的也追加
+                                detailIds.Add(rt.DetailId.ToString());
+                            }
                         }
                         else
                         {
-                            //判断是否已经填过一模一样的
-                            var value = monthReps.Where(x => x.ConstructionNature == eRL.ConstructionNature && x.OutPutType == eRL.OutPutType && x.ShipId == eRL.ShipId && x.UnitPrice == eRL.UnitPrice
-                                  && x.CompletedQuantity == eRL.CompletedQuantity && x.OutsourcingExpensesAmount == eRL.OutsourcingExpensesAmount && x.Remark == eRL.Remark);
-                            if (value == null)
+                            if (rt.UnitPrice == 0 && rt.CompletedQuantity == 0 && rt.OutsourcingExpensesAmount == 0 && string.IsNullOrWhiteSpace(rt.Remark))
+                            { continue; }//不需要处理的数据
+                            else
                             {
-                                //追加本月的
-                                eRL.IsAllowDelete = true;
-                                nMorthRepDetails.Add(eRL);
+                                //判断是否填过一模一样的数据
+                                var existMp = mReportList.FirstOrDefault(x => x.UnitPrice == rt.UnitPrice && x.CompletedQuantity == rt.CompletedQuantity && x.OutsourcingExpensesAmount == rt.OutsourcingExpensesAmount && x.Remark == rt.Remark && x.ShipId == rt.ShipId && x.OutPutType == rt.OutPutType && x.ConstructionNature == rt.ConstructionNature);
+                                if (existMp == null)
+                                {
+                                    //追加id 空的也追加
+                                    detailIds.Add(rt.DetailId.ToString());
+                                }
                             }
                         }
                     }
-                    //实际本月的月报Ids
-                    var mDIds = nMorthRepDetails.Select(x => x.DetailId).ToList();
-                    //需要移除的月报ids
-                    var rDetailsIds = new HashSet<string>();
-                    foreach (var item in mDIds)
+                    if (detailIds.Any())
                     {
-                        if (string.IsNullOrWhiteSpace(item.ToString()))
-                            continue;//为空跳过
-                        var isExist = resList.FirstOrDefault(x => x.DetailId == item);
-                        if (isExist != null)
+                        detailIds = detailIds.Distinct().ToList();
+                        var reportDetails = jsonObject
+                                        .SelectTokens("..ReportDetails")
+                                        .SelectMany(x => x.Children<JObject>());
+
+                        foreach (var detail in reportDetails)
                         {
-                            rDetailsIds.Add(isExist.DetailId.ToString());
+                            var detailId = detail["DetailId"]?.ToString();
+                            if (string.IsNullOrEmpty(detailId) || detailIds.Contains(detailId))
+                            {
+                                if (Convert.ToDecimal(detail["UnitPrice"]) == 0 && Convert.ToDecimal(detail["CompletedQuantity"]) == 0 && Convert.ToDecimal(detail["OutsourcingExpensesAmount"]) == 0 && string.IsNullOrWhiteSpace(detail["Remark"]?.ToString()))
+                                {
+                                    continue;
+                                }
+                                detail["IsAllowDelete"] = true;
+                            }
                         }
                     }
+                }
+                else
+                {
+                    //全都是新的
+                    //过滤掉没做任何更改的
+                    resList = resList.Where(x => !(x.UnitPrice == 0 && x.CompletedQuantity == 0 && x.OutsourcingExpensesAmount == 0 && string.IsNullOrWhiteSpace(x.Remark))).ToList();
+                    var detailIds = resList.Where(x => !string.IsNullOrWhiteSpace(x.DetailId.ToString())).Select(x => x.DetailId.ToString()).ToList();
+                    var reportDetails = jsonObject
+                                        .SelectTokens("..ReportDetails")
+                                        .SelectMany(x => x.Children<JObject>());
 
-                    //如果有需要移除的月报 
-                    if (rDetailsIds.Any())
+                    foreach (var detail in reportDetails)
                     {
-                        // 修改所有子节点中的 ReportDetails 数组
-                        UpdateReportDetails(jsonObject, rDetailsIds);
-                        // 将修改后的 JObject 转换回 JSON 字符串
-                        stagingData.BizData = jsonObject.ToString(Formatting.Indented);
+                        var detailId = detail["DetailId"]?.ToString();
+                        if (string.IsNullOrEmpty(detailId) || detailIds.Contains(detailId))
+                        {
+                            if (Convert.ToDecimal(detail["UnitPrice"]) == 0 && Convert.ToDecimal(detail["CompletedQuantity"]) == 0 && Convert.ToDecimal(detail["OutsourcingExpensesAmount"]) == 0 && string.IsNullOrWhiteSpace(detail["Remark"]?.ToString()))
+                            {
+                                continue;
+                            }
+                            detail["IsAllowDelete"] = true;
+                        }
                     }
                 }
-            }
-            else
-            {
-                if (resList != null && resList.Any())
-                {
-                    // 递归修改所有子节点的 IsAllowDelete 字段
-                    UpdateIsAllowDelete(jsonObject, true);
 
-                    // 将修改后的 JObject 转换回 JSON 字符串
-                    stagingData.BizData = jsonObject.ToString(Formatting.Indented);
-                }
+                // 将修改后的 JObject 转换回 JSON 字符串
+                stagingData.BizData = jsonObject.ToString(Formatting.Indented);
             }
 
             #endregion
@@ -3156,77 +3230,77 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             }
             return result.SuccessResult(true);
         }
-        /// <summary>
-        /// 修改值
-        /// </summary>
-        /// <param name="token"></param>
-        /// <param name="value"></param>
-        private void UpdateIsAllowDelete(JToken token, bool value)
-        {
-            if (token.Type == JTokenType.Object)
-            {
-                var jobject = (JObject)token;
+        ///// <summary>
+        ///// 修改值
+        ///// </summary>
+        ///// <param name="token"></param>
+        ///// <param name="value"></param>
+        //private void UpdateIsAllowDelete(JToken token, bool value)
+        //{
+        //    if (token.Type == JTokenType.Object)
+        //    {
+        //        var jobject = (JObject)token;
 
-                // 修改当前节点的 IsAllowDelete 字段
-                jobject["IsAllowDelete"] = value;
+        //        // 修改当前节点的 IsAllowDelete 字段
+        //        jobject["IsAllowDelete"] = value;
 
-                // 递归修改所有子节点
-                foreach (var property in jobject.Properties())
-                {
-                    UpdateIsAllowDelete(property.Value, value);
-                }
-            }
-            else if (token.Type == JTokenType.Array)
-            {
-                foreach (var item in (JArray)token)
-                {
-                    UpdateIsAllowDelete(item, value);
-                }
-            }
-        }
-        /// <summary>
-        /// // 递归函数，修改 ReportDetails 中的 IsAllowDelete 字段
-        /// </summary>
-        /// <param name="token"></param>
-        /// <param name="idsToRemove"></param>
-        private void UpdateReportDetails(JToken token, HashSet<string> idsToRemove)
-        {
-            if (token.Type == JTokenType.Object)
-            {
-                var jobject = (JObject)token;
+        //        // 递归修改所有子节点
+        //        foreach (var property in jobject.Properties())
+        //        {
+        //            UpdateIsAllowDelete(property.Value, value);
+        //        }
+        //    }
+        //    else if (token.Type == JTokenType.Array)
+        //    {
+        //        foreach (var item in (JArray)token)
+        //        {
+        //            UpdateIsAllowDelete(item, value);
+        //        }
+        //    }
+        //}
+        ///// <summary>
+        ///// // 递归函数，修改 ReportDetails 中的 IsAllowDelete 字段
+        ///// </summary>
+        ///// <param name="token"></param>
+        ///// <param name="idsToRemove"></param>
+        //private void UpdateReportDetails(JToken token, HashSet<string> idsToRemove)
+        //{
+        //    if (token.Type == JTokenType.Object)
+        //    {
+        //        var jobject = (JObject)token;
 
-                // 如果是 ReportDetails 数组，进行修改
-                if (jobject["ReportDetails"] != null)
-                {
-                    var reportDetailsArray = jobject["ReportDetails"] as JArray;
+        //        // 如果是 ReportDetails 数组，进行修改
+        //        if (jobject["ReportDetails"] != null)
+        //        {
+        //            var reportDetailsArray = jobject["ReportDetails"] as JArray;
 
-                    // 移除 idsToRemove 中包含的项
-                    reportDetailsArray = reportDetailsArray.Where(item => !idsToRemove.Contains(item["DetailId"]?.ToString())) as JArray;
+        //            // 移除 idsToRemove 中包含的项
+        //            reportDetailsArray = reportDetailsArray.Where(item => !idsToRemove.Contains(item["DetailId"]?.ToString())) as JArray;
 
-                    if (reportDetailsArray != null && reportDetailsArray.Any())
-                    {
-                        // 修改 IsAllowDelete 并移除 idsToRemove 中的项
-                        foreach (var item in reportDetailsArray.ToList())
-                        {
-                            item["IsAllowDelete"] = true;
-                        }
-                    }
-                }
+        //            if (reportDetailsArray != null && reportDetailsArray.Any())
+        //            {
+        //                // 修改 IsAllowDelete 并移除 idsToRemove 中的项
+        //                foreach (var item in reportDetailsArray.ToList())
+        //                {
+        //                    item["IsAllowDelete"] = true;
+        //                }
+        //            }
+        //        }
 
-                // 递归修改所有子节点
-                foreach (var property in jobject.Properties())
-                {
-                    UpdateReportDetails(property.Value, idsToRemove);
-                }
-            }
-            else if (token.Type == JTokenType.Array)
-            {
-                foreach (var item in (JArray)token)
-                {
-                    UpdateReportDetails(item, idsToRemove);
-                }
-            }
-        }
+        //        // 递归修改所有子节点
+        //        foreach (var property in jobject.Properties())
+        //        {
+        //            UpdateReportDetails(property.Value, idsToRemove);
+        //        }
+        //    }
+        //    else if (token.Type == JTokenType.Array)
+        //    {
+        //        foreach (var item in (JArray)token)
+        //        {
+        //            UpdateReportDetails(item, idsToRemove);
+        //        }
+        //    }
+        //}
         /// <summary>
         /// 获取所有ReportDetails
         /// </summary>
@@ -3243,6 +3317,11 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                       // 转换为 List<JToken> 并返回
                       .ToList();
         }
+
+
+
+
+
 
         /// <summary>
         ///失效项目月报暂存数据
@@ -3555,7 +3634,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             {
                 #region 参数问题
                 var startTime = string.Empty;
-                if (model.DateMonth == null&& nowDateMonth==0)
+                if (model.DateMonth == null && nowDateMonth == 0)
                 {
                     model.DateMonth = DateTime.Now.AddMonths(-1).Month;
                 }
