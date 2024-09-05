@@ -254,6 +254,7 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project.Report
     /// </summary>
     public abstract class MonthReportDetailDto<TDetail> where TDetail : MonthReportDetailDto<TDetail>
     {
+        public Guid Id { get; set; }
         /// <summary>
         /// 备注
         /// </summary>

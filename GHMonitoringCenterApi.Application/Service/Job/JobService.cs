@@ -817,18 +817,18 @@ namespace GHMonitoringCenterApi.Application.Service.Job
                  * 1、任务审批未完成，如果前端提交项目月报状态是完成状态不可入库
                  * 2、任务审批未完成，项目月报库表里的月报状态是完成状态不可入库(一般情况不会走这一层验证，除非前端提交状态与后端已存状态不一致)
                  */
-                if (!(job.IsFinish || saveModel.Status != MonthReportStatus.Finish))
-                {
-                    return result.SuccessResult(true);
-                }
-                if (!job.IsFinish)
-                {
-                    // 任务非完成情况下，再次验证已入库的项目月报是否完成
-                    if (await _projectReportService.IsFinishMonthReport(saveModel.ProjectId, saveModel.DateMonth))
-                    {
-                        return result.SuccessResult(true);
-                    }
-                }
+                //if (!(job.IsFinish || saveModel.Status != MonthReportStatus.Finish))
+                //{
+                //    return result.SuccessResult(true);
+                //}
+                //if (!job.IsFinish)
+                //{
+                //    // 任务非完成情况下，再次验证已入库的项目月报是否完成
+                //    if (await _projectReportService.IsFinishMonthReport(saveModel.ProjectId, saveModel.DateMonth))
+                //    {
+                //        return result.SuccessResult(true);
+                //    }
+                //}
                 saveModel.JobId = job.Id;
                 saveModel.RejectReason = job.RejectReason;
                 saveModel.Status = job.IsFinish ? MonthReportStatus.Finish : (job.ApproveStatus == JobApproveStatus.Reject ? MonthReportStatus.ApproveReject : MonthReportStatus.Approveling);

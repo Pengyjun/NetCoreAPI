@@ -2331,7 +2331,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             #endregion
 
             //分页
-            var pageData = list.Skip((model.PageIndex - 1) * model.PageSize).Take(model.PageSize).ToList();
+            var pageData = model.IsFullExport ? list: list.Skip((model.PageIndex - 1) * model.PageSize).Take(model.PageSize).ToList();
             total = list.Count;
 
             return result.SuccessResult(new MonthtReportsResponseDto() { Reports = pageData, Total = totalMonthtReport }, total);
@@ -2782,8 +2782,8 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
         /// <returns></returns>
         public async Task<ResponseAjaxResult<bool>> SaveProjectMonthReportAsync(SaveProjectMonthReportRequestDto model)
         {
-            model.ResetModelProperty();
             var result = new ResponseAjaxResult<bool>();
+            model.ResetModelProperty();
             if (model.DateMonth == 202306)
             {
                 return result.FailResult(HttpStatusCode.SaveFail, "由于历史数据的缘故，系统不允许修改6月份月报数据");
@@ -2803,6 +2803,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 return result.FailResult(HttpStatusCode.DataNotEXIST, ResponseMessage.DATA_NOTEXIST_PROJECT);
             }
             var monthReport = await GetMonthReportAsync(model.ProjectId, model.DateMonth);
+            var mpId = GuidUtil.Next();
             // 是否是非施工项目
             var isNonConstruction = project.TypeId == CommonData.NoConstrutionProjectType;
             // 币种/汇率
@@ -2810,33 +2811,89 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             var currencyExchangeRate = model.CurrencyExchangeRate;
             //var reqDetails = model.ResolveDetails();//原来代码
             #region 新 处理审批时重复月报明细数据
-            var reqDetailsList = model.ResolveDetails();
-            var reqDetails = new List<SaveProjectMonthReportRequestDto.ReqMonthReportDetail>();
+            var reqDetails = model.ResolveDetails();
+            //var reqDetails = new List<SaveProjectMonthReportRequestDto.ReqMonthReportDetail>();
             //获取原来的月报明细数据
-            var rDetailsIds = reqDetailsList.Where(x => x.DetailId != Guid.Empty && !string.IsNullOrEmpty(x.DetailId.ToString())).Select(x => x.DetailId).ToList();
-            var oldMDetails = await _dbContext.Queryable<MonthReportDetail>().Where(x => x.IsDelete == 1 && rDetailsIds.Contains(x.Id)).ToListAsync();
+            var oldMDetails = await _dbContext.Queryable<MonthReportDetail>().Where(x => x.IsDelete == 1 && x.ProjectId == model.ProjectId).ToListAsync();
+
+            var addDetails = new List<MonthReportDetail>();
+            var updateDetails = new List<MonthReportDetail>();
             //循环匹配原来的数据与传入参数值是否完全一致
-            foreach (var item in reqDetailsList)
+            foreach (var item in reqDetails)
             {
-                var existMReport = oldMDetails.FirstOrDefault(x => x.Id == item.DetailId);
-                if (existMReport != null)
+                if (item.Id != Guid.Empty && !string.IsNullOrEmpty(item.Id.ToString()))
                 {
-                    /***
-                     * 匹配数据是否完全一致 (施工性质、产值属性、资源、单价、工程量、外包支出、备注)
-                     * 如果完全一致默认是历史数据  那么不做处理  
-                     */
-                    if (item.ConstructionNature == existMReport.ConstructionNature && item.OutPutType == existMReport.OutPutType && item.ShipId == existMReport.ShipId && item.UnitPrice == existMReport.UnitPrice
-                        && item.CompletedQuantity == existMReport.CompletedQuantity && item.OutsourcingExpensesAmount == existMReport.OutsourcingExpensesAmount && item.Remark == existMReport.Remark)
-                    { continue; }
-                    else if (item.UnitPrice == 0 && item.CompletedQuantity == 0 && item.OutsourcingExpensesAmount == 0 && string.IsNullOrWhiteSpace(item.Remark))
-                    { continue; }
-                    else reqDetails.Add(item);//否则追加数据做后续逻辑处理
+                    //先查本月的有没有数据
+                    var oCurMonthRp = oldMDetails.Where(x => x.DateMonth == model.DateMonth).ToList();
+                    if (oCurMonthRp != null && oCurMonthRp.Any())
+                    {
+                        //如果当月有数据 查询是否与之匹配  如果匹配为修改的数据
+                        var piPei = oCurMonthRp.FirstOrDefault(x => x.Id == item.Id);
+                        if (piPei != null)
+                        {
+                            piPei.OutsourcingExpensesAmount = item.OutsourcingExpensesAmount.Value;
+                            piPei.CompleteProductionAmount = item.CompleteProductionAmount.Value;
+                            piPei.CompletedQuantity = item.CompletedQuantity.Value;
+                            piPei.ShipId = item.ShipId.Value;
+                            piPei.ConstructionNature = item.ConstructionNature;
+                            piPei.OutPutType = item.OutPutType.Value;
+                            piPei.UnitPrice = item.UnitPrice.Value;
+                            piPei.Remark = item.Remark;
+                            updateDetails.Add(piPei);
+                        }
+                    }
+                    //是不是本月之外的数据需要追加到本月
+                    var outMonthRp = oldMDetails.Where(x => x.DateMonth != model.DateMonth).ToList();
+                    if (outMonthRp != null && outMonthRp.Any())
+                    {
+                        var piPei = outMonthRp.FirstOrDefault(x => item.Id == x.Id);
+                        if (piPei != null)
+                        {
+                            if (item.CompletedQuantity == 0 && item.CompleteProductionAmount == 0 && item.OutsourcingExpensesAmount == 0 && item.UnitPrice == 0 && string.IsNullOrWhiteSpace(item.Remark)) continue;
+                            else
+                            {
+                                //新增本月的数据
+                                addDetails.Add(new MonthReportDetail
+                                {
+                                    Id = GuidUtil.Next(),
+                                    ProjectId = model.ProjectId,
+                                    CompletedQuantity = item.CompletedQuantity.Value,
+                                    CompleteProductionAmount = item.CompleteProductionAmount.Value,
+                                    ConstructionNature = item.ConstructionNature,
+                                    DateMonth = model.DateMonth,
+                                    MonthReportId = monthReport == null ? mpId : monthReport.Id,
+                                    DateYear = Convert.ToInt32(model.DateMonth.ToString().Substring(0, 4)),
+                                    OutPutType = item.OutPutType.Value,
+                                    OutsourcingExpensesAmount = item.OutsourcingExpensesAmount.Value,
+                                    ProjectWBSId = item.ProjectWBSId,
+                                    Remark = item.Remark,
+                                    ShipId = item.ShipId.Value,
+                                    UnitPrice = item.UnitPrice.Value
+                                });
+                            }
+                        }
+                    }
                 }
                 else
                 {
-                    if (item.UnitPrice == 0 && item.CompletedQuantity == 0 && item.OutsourcingExpensesAmount == 0 && string.IsNullOrWhiteSpace(item.Remark))
-                    { continue; }
-                    reqDetails.Add(item);//追加数据做后续逻辑处理
+                    //新增本月的数据
+                    addDetails.Add(new MonthReportDetail
+                    {
+                        Id = GuidUtil.Next(),
+                        ProjectId = model.ProjectId,
+                        CompletedQuantity = item.CompletedQuantity.Value,
+                        CompleteProductionAmount = item.CompleteProductionAmount.Value,
+                        ConstructionNature = item.ConstructionNature,
+                        DateMonth = model.DateMonth,
+                        MonthReportId = monthReport == null ? mpId : monthReport.Id,
+                        DateYear = Convert.ToInt32(model.DateMonth.ToString().Substring(0, 4)),
+                        OutPutType = item.OutPutType.Value,
+                        OutsourcingExpensesAmount = item.OutsourcingExpensesAmount.Value,
+                        ProjectWBSId = item.ProjectWBSId,
+                        Remark = item.Remark,
+                        ShipId = item.ShipId.Value,
+                        UnitPrice = item.UnitPrice.Value
+                    });
                 }
             }
             #endregion
@@ -2845,13 +2902,10 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 // 计算月报明细产值(元)
                 item.CompleteProductionAmount = item.CompletedQuantity * item.UnitPrice * currencyExchangeRate;
             });
-            var addDetails = new List<MonthReportDetail>();
-            var updateDetails = new List<MonthReportDetail>();
-            var removeDetails = new List<MonthReportDetail>();
             bool isAddMonthReport = false;
             if (monthReport == null)
             {
-                monthReport = new MonthReport() { Id = GuidUtil.Next(), CreateId = _currentUser.Id, DateYear = monthTime.ToDateYear() };
+                monthReport = new MonthReport() { Id = mpId, CreateId = _currentUser.Id, DateYear = monthTime.ToDateYear() };
                 var lastDateMonth = monthTime.AddMonths(-1).ToDateMonth();
                 var lastMonthReport = await GetMonthReportAsync(model.ProjectId, lastDateMonth);
                 // 上个项目月报的（下月预估成本）带到本月存储
@@ -2864,12 +2918,14 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             }
             else
             {
-                var oldDetails = await GetMonthReportDetailsAsync(monthReport.Id);
-                var exsitDetailIds = oldDetails.Where(t => reqDetails.Any(r => r.DetailId == t.Id)).Select(t => (Guid?)t.Id).ToArray();
-                var addReqDetails = reqDetails.Where(t => !exsitDetailIds.Contains(t.DetailId)).ToList();
-                addDetails = _mapper.Map(addReqDetails, addDetails);
-                removeDetails = oldDetails.Where(t => !exsitDetailIds.Contains(t.Id)).ToList();
-                updateDetails = oldDetails.Where(t => exsitDetailIds.Contains(t.Id)).ToList();
+                //var oldDetails = await GetMonthReportDetailsAsync(monthReport.Id);
+                //if (reqDetails.Any()) addDetails = _mapper.Map(reqDetails, addDetails);
+                //var exsitDetailIds = oldDetails.Where(t => reqDetails.Any(r => r.DetailId == t.Id)).Select(t => (Guid?)t.Id).ToList();
+                //var addReqDetails = reqDetails.Where(t => !exsitDetailIds.Contains(t.DetailId)).ToList();
+                //var addReqDetails = reqDetails.Where(t => string.IsNullOrWhiteSpace(t.DetailId.ToString()) || t.DetailId == Guid.Empty).ToList();
+                //addDetails = _mapper.Map(addReqDetails, addDetails);
+                //removeDetails = oldDetails.Where(t => !exsitDetailIds.Contains(t.Id)).ToList();
+                //updateDetails = oldDetails.Where(t => exsitDetailIds.Contains(t.Id)).ToList();
                 monthReport.UpdateId = _currentUser.Id;
             }
             monthReport = _mapper.Map(model, monthReport);
@@ -2887,26 +2943,26 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             monthReport.Status = isNonConstruction ? MonthReportStatus.Finish : model.Status;
             monthReport.StatusText = isNonConstruction ? "已完成" : model.StatusText;
             // 数据填充
-            addDetails.ForEach(item =>
-            {
-                item.Id = GuidUtil.Next();
-                item.CreateId = _currentUser.Id;
-                item.MonthReportId = monthReport.Id;
-                item.ProjectId = monthReport.ProjectId;
-                item.DateMonth = monthReport.DateMonth;
-                item.DateYear = monthReport.DateYear;
-            });
-            updateDetails.ForEach(item =>
-            {
-                var updateReqItem = reqDetails.Single(t => t.DetailId == item.Id);
-                _mapper.Map(updateReqItem, item);
-                item.UpdateId = _currentUser.Id;
-            });
-            removeDetails.ForEach(item =>
-            {
-                item.DeleteId = _currentUser.Id;
-                item.IsDelete = 0;
-            });
+            //addDetails.ForEach(item =>
+            //{
+            //    item.Id = GuidUtil.Next();
+            //    item.CreateId = _currentUser.Id;
+            //    item.MonthReportId = monthReport.Id;
+            //    item.ProjectId = monthReport.ProjectId;
+            //    item.DateMonth = monthReport.DateMonth;
+            //    item.DateYear = monthReport.DateYear;
+            //});
+            //updateDetails.ForEach(item =>
+            //{
+            //    var updateReqItem = reqDetails.FirstOrDefault(t => t.DetailId == item.Id);
+            //    _mapper.Map(updateReqItem, item);
+            //    item.UpdateId = _currentUser.Id;
+            //});
+            //removeDetails.ForEach(item =>
+            //{
+            //    item.DeleteId = _currentUser.Id;
+            //    item.IsDelete = 0;
+            //});
             var modelState = isAddMonthReport ? ModelState.Add : ModelState.Update;
             var newReportDetails = new List<MonthReportDetail>();
             newReportDetails.AddRange(addDetails);
@@ -2919,10 +2975,10 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             {
                 await _dbMonthReport.AsUpdateable(monthReport).EnableDiffLogEvent(NewLogInfo(EntityType.MonthReport, monthReport.Id, modelState)).ExecuteCommandAsync();
             }
-            if (removeDetails.Any())
-            {
-                await _dbMonthReportDetail.AsUpdateable(removeDetails).UpdateColumns(t => new { t.IsDelete, t.DeleteId, t.DeleteTime }).EnableDiffLogEvent(NewLogInfo(EntityType.MonthReport, monthReport.Id, modelState)).ExecuteCommandAsync();
-            }
+            //if (removeDetails.Any())
+            //{
+            //    //await _dbMonthReportDetail.AsUpdateable(removeDetails).UpdateColumns(t => new { t.IsDelete, t.DeleteId, t.DeleteTime }).EnableDiffLogEvent(NewLogInfo(EntityType.MonthReport, monthReport.Id, modelState)).ExecuteCommandAsync();
+            //}
             if (updateDetails.Any())
             {
                 await _dbMonthReportDetail.AsUpdateable(updateDetails).EnableDiffLogEvent(NewLogInfo(EntityType.MonthReport, monthReport.Id, modelState)).ExecuteCommandAsync();
