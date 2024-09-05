@@ -797,6 +797,17 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
 
                         if (resList != null && resList.Any())
                         {
+                            //历史记录
+                            foreach (var item in resList)
+                            {
+                                var isExist = monthReportDetailsData.FirstOrDefault(x => x.Id == item.DetailId);
+                                if (isExist != null)
+                                {
+                                    item.OutsourcingExpensesAmount = isExist.OutsourcingExpensesAmount;
+                                    item.CompleteProductionAmount = isExist.CompleteProductionAmount;
+                                    item.CompletedQuantity = isExist.CompletedQuantity;
+                                }
+                            }
                             treeDetails = await WBSConvertTree(model.ProjectId, dateMonth, bData, result.IsFromStaging, resList);
                             //树组合
                             result.TreeDetails = treeDetails;
