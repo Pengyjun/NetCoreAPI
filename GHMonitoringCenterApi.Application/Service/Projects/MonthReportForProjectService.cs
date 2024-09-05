@@ -806,6 +806,9 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                                     item.OutsourcingExpensesAmount = isExist.OutsourcingExpensesAmount;
                                     item.CompleteProductionAmount = isExist.CompleteProductionAmount;
                                     item.CompletedQuantity = isExist.CompletedQuantity;
+                                    item.DateMonth = isExist.DateMonth;
+                                    item.UnitPrice = isExist.UnitPrice;
+                                    item.ProjectId = isExist.ProjectId.ToString();
                                 }
                             }
                             treeDetails = await WBSConvertTree(model.ProjectId, dateMonth, bData, result.IsFromStaging, resList);
