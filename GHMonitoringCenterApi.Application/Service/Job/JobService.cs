@@ -569,7 +569,7 @@ namespace GHMonitoringCenterApi.Application.Service.Job
                 ProjectCategory = p.Category,
                 ProjectCompanyId = p.CompanyId,
                 ProjectTypeId = p.TypeId,
-                ProjectRate = p.Rate,
+                ProjectRate = p.Rate * 100,
                 ProjectCurrencyId = p.CurrencyId
             }).ToPageListAsync(model.PageIndex, model.PageSize, total);
             // 业务关联相关库，进行任务数据填充
