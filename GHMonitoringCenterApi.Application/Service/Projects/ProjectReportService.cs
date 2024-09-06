@@ -2331,7 +2331,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             #endregion
 
             //分页
-            var pageData = list.Skip((model.PageIndex - 1) * model.PageSize).Take(model.PageSize).ToList();
+            var pageData = model.IsFullExport ? list: list.Skip((model.PageIndex - 1) * model.PageSize).Take(model.PageSize).ToList();
             total = list.Count;
 
             return result.SuccessResult(new MonthtReportsResponseDto() { Reports = pageData, Total = totalMonthtReport }, total);
