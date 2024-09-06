@@ -770,11 +770,20 @@ namespace GHMonitoringCenterApi.Controllers.Project
         }
 
         #region  新的项目月报列表
-        [HttpGet("aa")]
+        [HttpPost("aa")]
         [AllowAnonymous]
-        public bool aa()
+        public bool aa([FromBody] string a)
         {
-            return projectService.aa();
+           
+            //var resList = JsonConvert.DeserializeObject<List<bb>>(jsonObject);
+            //var ss = resList.Sum(x => x.UnitPrice * x.CompletedQuantity);
+            return true;
+            //return projectService.aa();
+        }
+       public class bb
+        {
+            public decimal UnitPrice { get; set; }
+            public decimal CompletedQuantity { get; set; }
         }
 
         #endregion
