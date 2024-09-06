@@ -224,6 +224,10 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.File
 		/// 部门名称
 		/// </summary>
 		public string? DeptName { get; set; }
+        /// <summary>
+        /// 汇率
+        /// </summary>
+        public decimal? hv {  get; set; }
 
         /// <summary>
         /// 排序字段
