@@ -1,5 +1,6 @@
 ﻿using GDCMasterDataReceiveApi.Application.Contracts;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto._4A.User;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.Institution;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.LouDong;
 using GDCMasterDataReceiveApi.Application.Contracts.IService.ISearchService;
 using GDCMasterDataReceiveApi.Domain.Models;
@@ -85,7 +86,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                 institution.CompanyName = GetUserCompany(institution.OFFICE_DEPID, institutions);
             }
 
-            responseAjaxResult.Count = userInfos.Count;
+            responseAjaxResult.Count = total;
             responseAjaxResult.SuccessResult(userInfos);
             return responseAjaxResult;
         }
@@ -119,6 +120,16 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
             }
             return string.Empty;
         }
+        /// <summary>
+        /// 机构数列表
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        public async Task<ResponseAjaxResult<List<InstitutionDto>>> GetInstitutionAsync(InstitutionRequestDto requestDto)
+        {
+            var responseAjaxResult = new ResponseAjaxResult<List<InstitutionDto>>();
 
+            return responseAjaxResult;
+        }
     }
 }

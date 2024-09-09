@@ -25,7 +25,7 @@ namespace GDCMasterDataReceiveApi.Application.Contracts
         /// 默认加载获取条件参数
         /// </summary>
         /// <returns></returns>
-        List<FilterParams> GetFilterParams();
+        ResponseAjaxResult<List<FilterParams>> GetFilterParams();
         /// <summary>
         /// 获取所有属性名称
         /// </summary>

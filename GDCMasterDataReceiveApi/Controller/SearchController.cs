@@ -32,7 +32,7 @@ namespace GDCMasterDataReceiveApi.Controller
         /// </summary>
         /// <returns></returns>
         [HttpPost("GetFilterParams")]
-        public List<FilterParams> GetFilterParams()
+        public ResponseAjaxResult<List<FilterParams>> GetFilterParams()
         {
             return _baseService.GetFilterParams();
         }

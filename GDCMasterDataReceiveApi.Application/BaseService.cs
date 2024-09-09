@@ -98,8 +98,10 @@ namespace GDCMasterDataReceiveApi.Application
         /// 默认加载获取条件参数
         /// </summary>
         /// <returns></returns>
-        public List<FilterParams> GetFilterParams()
+        public ResponseAjaxResult<List<FilterParams>> GetFilterParams()
         {
+            var responseAjaxResult = new ResponseAjaxResult<List<FilterParams>>();
+
             var val = new List<FilterParams>();
             val.Add(new FilterParams { Key = "等于", Value = "=" });
             val.Add(new FilterParams { Key = "不等于", Value = "!=" });
@@ -119,7 +121,10 @@ namespace GDCMasterDataReceiveApi.Application
             val.Add(new FilterParams { Key = "非空字符串", Value = "!=''" });
             val.Add(new FilterParams { Key = "介于", Value = "BETWEEN AND" });
             val.Add(new FilterParams { Key = "不介于", Value = "NOT BETWEEN AND" });
-            return val;
+
+            responseAjaxResult.Count=val.Count;
+            responseAjaxResult.SuccessResult(val);
+            return responseAjaxResult;
         }
         /// <summary>
         /// 获取所有属性名称
