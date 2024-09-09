@@ -92,7 +92,7 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.AutoMapper
             //人员主数据
             mapperConfigurationExpression.CreateMap<Receive4AUser, User>();
             //项目类
-            mapperConfigurationExpression.CreateMap<ProjectReceiveDto, Project>();
+            mapperConfigurationExpression.CreateMap<ProjectItem,Project>();
             //中交项目行业分类产业分类、业务板块、十二大业务类型、江河湖海对照关系
             mapperConfigurationExpression.CreateMap<ProjectClassificationReceiveDto, ProjectClassification>();
             //中交区域总部

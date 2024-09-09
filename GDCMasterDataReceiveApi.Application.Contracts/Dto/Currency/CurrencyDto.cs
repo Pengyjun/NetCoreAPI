@@ -2,6 +2,8 @@
 
 namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.Currency
 {
+
+    #region 后台管理使用
     /// <summary>
     /// 币种 反显
     /// </summary>
@@ -44,6 +46,12 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.Currency
         /// </summary>
         public string DataIdentifier { get; set; }
     }
+    #endregion
+
+
+
+    #region 主数据接收币种请求DTO
+    
     /// <summary>
     /// 币种 接收
     /// </summary>
@@ -68,7 +76,7 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.Currency
         /// <summary>
         /// 货币标准名称:货币标准名称
         /// </summary>
-        public string STANDARDNAMEE { get; set; }
+        public string? STANDARDNAMEE { get; set; }
         /// <summary>
         /// 备注:说明备注
         /// </summary>
@@ -88,6 +96,14 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.Currency
         /// <summary>
         /// 多语言描述表类型
         /// </summary>
-        public List<ZMDGS_ZLANG5>? ZLANG_LIST { get; set; }
+        public List<ZMDGS_ZLANG5>? item { get; set; }
     }
+
+
+    public class ZMDGS_ZLANG5 {
+
+        public string? ZLANGCODE { get; set; }
+        public string? ZCODE_DESC { get; set; }
+    }
+    #endregion
 }

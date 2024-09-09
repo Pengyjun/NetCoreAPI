@@ -1,14 +1,18 @@
 ﻿using AutoMapper;
 using GDCMasterDataReceiveApi.Application.Contracts;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto._4A.Institution;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto._4A.User;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.CountryRegion;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.Currency;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.Project;
 using GDCMasterDataReceiveApi.Application.Contracts.IService.IReceiveService;
 using GDCMasterDataReceiveApi.Domain.Models;
 using GDCMasterDataReceiveApi.Domain.Shared;
 using GDCMasterDataReceiveApi.Domain.Shared.Const;
 using GDCMasterDataReceiveApi.Domain.Shared.Utils;
 using SqlSugar;
+using UtilsSharp;
 
 namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
 {
@@ -31,44 +35,44 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
         /// 获取通用字典数据
         /// </summary>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<bool>> CommonDataAsync()
+        public async Task<MDMResponseResult> CommonDataAsync()
         {
 
-            var responseAjaxResult = new ResponseAjaxResult<bool>();
-            responseAjaxResult.SuccessResult(true);
+            var responseAjaxResult = new MDMResponseResult();
+            responseAjaxResult.Success();
             return responseAjaxResult;
         }
         /// <summary>
         /// 往来单位主数据
         /// </summary>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<bool>> CorresUnitDataAsync()
+        public async Task<MDMResponseResult> CorresUnitDataAsync()
         {
 
-            var responseAjaxResult = new ResponseAjaxResult<bool>();
-            responseAjaxResult.SuccessResult(true);
+            var responseAjaxResult = new MDMResponseResult();
+            responseAjaxResult.Success();
             return responseAjaxResult;
         }
         /// <summary>
         /// 多组织-税务代管组织(行政)
         /// </summary>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<bool>> EscrowOrganizationDataAsync()
+        public async Task<MDMResponseResult> EscrowOrganizationDataAsync()
         {
 
-            var responseAjaxResult = new ResponseAjaxResult<bool>();
-            responseAjaxResult.SuccessResult(true);
+            var responseAjaxResult = new MDMResponseResult();
+            responseAjaxResult.Success();
             return responseAjaxResult;
         }
         /// <summary>
         /// 商机项目(含境外商机项目)
         /// </summary>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<bool>> BusinessProjectDataAsync()
+        public async Task<MDMResponseResult> BusinessProjectDataAsync()
         {
 
-            var responseAjaxResult = new ResponseAjaxResult<bool>();
-            responseAjaxResult.SuccessResult(true);
+            var responseAjaxResult = new MDMResponseResult();
+            responseAjaxResult.Success();
             return responseAjaxResult;
         }
         /// <summary>
@@ -111,7 +115,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
                     ES_RETURN = rtn,
                     ET_RESULT = rst
                 };
-                responseAjaxResult.SuccessResult(res);
+                responseAjaxResult.Success();
             }
 
             return responseAjaxResult;
@@ -120,216 +124,219 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
         /// 大洲
         /// </summary>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<bool>> CountryContinentDataAsync()
+        public async Task<MDMResponseResult> CountryContinentDataAsync()
         {
 
-            var responseAjaxResult = new ResponseAjaxResult<bool>();
-            responseAjaxResult.SuccessResult(true);
+            var responseAjaxResult = new MDMResponseResult();
+            responseAjaxResult.Success();
             return responseAjaxResult;
         }
         /// <summary>
         /// 中交区域总部
         /// </summary>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<bool>> RegionalDataAsync()
+        public async Task<MDMResponseResult> RegionalDataAsync()
         {
 
-            var responseAjaxResult = new ResponseAjaxResult<bool>();
-            responseAjaxResult.SuccessResult(true);
+            var responseAjaxResult = new MDMResponseResult();
+            responseAjaxResult.Success();
             return responseAjaxResult;
         }
         /// <summary>
         /// 常用计量单位
         /// </summary>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<bool>> UnitMeasurementDataAsync()
+        public async Task<MDMResponseResult> UnitMeasurementDataAsync()
         {
 
-            var responseAjaxResult = new ResponseAjaxResult<bool>();
-            responseAjaxResult.SuccessResult(true);
+            var responseAjaxResult = new MDMResponseResult();
+            responseAjaxResult.Success();
             return responseAjaxResult;
         }
         /// <summary>
         /// 中交项目行业分类产业分类、业务板块、十二大业务类型、江河湖海对照关系
         /// </summary>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<bool>> ProjectClassificationDataAsync()
+        public async Task<MDMResponseResult> ProjectClassificationDataAsync()
         {
 
-            var responseAjaxResult = new ResponseAjaxResult<bool>();
-            responseAjaxResult.SuccessResult(true);
+            var responseAjaxResult = new MDMResponseResult();
+            responseAjaxResult.Success();
             return responseAjaxResult;
         }
         /// <summary>
         /// 金融机构
         /// </summary>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<bool>> FinancialInstitutionDataAsync()
+        public async Task<MDMResponseResult> FinancialInstitutionDataAsync()
         {
 
-            var responseAjaxResult = new ResponseAjaxResult<bool>();
-            responseAjaxResult.SuccessResult(true);
+            var responseAjaxResult = new MDMResponseResult();
+            responseAjaxResult.Success();
             return responseAjaxResult;
         }
         /// <summary>
         /// 物资设备分类编码
         /// </summary>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<bool>> DeviceClassCodeDataAsync()
+        public async Task<MDMResponseResult> DeviceClassCodeDataAsync()
         {
 
-            var responseAjaxResult = new ResponseAjaxResult<bool>();
-            responseAjaxResult.SuccessResult(true);
+            var responseAjaxResult = new MDMResponseResult();
+            responseAjaxResult.Success();
             return responseAjaxResult;
         }
         /// <summary>
         /// 核算部门
         /// </summary>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<bool>> AccountingDepartmentDataAsync()
+        public async Task<MDMResponseResult> AccountingDepartmentDataAsync()
         {
 
-            var responseAjaxResult = new ResponseAjaxResult<bool>();
-            responseAjaxResult.SuccessResult(true);
+            var responseAjaxResult = new MDMResponseResult();
+            responseAjaxResult.Success();
             return responseAjaxResult;
         }
         /// <summary>
         /// 中交区域中心
         /// </summary>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<bool>> RegionalCenterDataAsync()
+        public async Task<MDMResponseResult> RegionalCenterDataAsync()
         {
 
-            var responseAjaxResult = new ResponseAjaxResult<bool>();
-            responseAjaxResult.SuccessResult(true);
+            var responseAjaxResult = new MDMResponseResult();
+            responseAjaxResult.Success();
             return responseAjaxResult;
         }
         /// <summary>
         /// 银行账号
         /// </summary>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<bool>> BankCardDataAsync()
+        public async Task<MDMResponseResult> BankCardDataAsync()
         {
 
-            var responseAjaxResult = new ResponseAjaxResult<bool>();
-            responseAjaxResult.SuccessResult(true);
+            var responseAjaxResult = new MDMResponseResult();
+            responseAjaxResult.Success();
             return responseAjaxResult;
         }
         /// <summary>
         /// 国民经济行业分类
         /// </summary>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<bool>> NationalEconomyDataAsync()
+        public async Task<MDMResponseResult> NationalEconomyDataAsync()
         {
 
-            var responseAjaxResult = new ResponseAjaxResult<bool>();
-            responseAjaxResult.SuccessResult(true);
+            var responseAjaxResult = new MDMResponseResult();
+            responseAjaxResult.Success();
             return responseAjaxResult;
         }
         /// <summary>
         /// 多组织-行政组织
         /// </summary>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<bool>> AdministrativeOrganizationDataAsync()
+        public async Task<MDMResponseResult> AdministrativeOrganizationDataAsync()
         {
 
-            var responseAjaxResult = new ResponseAjaxResult<bool>();
-            responseAjaxResult.SuccessResult(true);
+            var responseAjaxResult = new MDMResponseResult();
+            responseAjaxResult.Success();
             return responseAjaxResult;
         }
         /// <summary>
         /// 发票类型
         /// </summary>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<bool>> InvoiceTypeDataAsync()
+        public async Task<MDMResponseResult> InvoiceTypeDataAsync()
         {
 
-            var responseAjaxResult = new ResponseAjaxResult<bool>();
-            responseAjaxResult.SuccessResult(true);
+            var responseAjaxResult = new MDMResponseResult();
+            responseAjaxResult.Success();
             return responseAjaxResult;
         }
         /// <summary>
         /// 币种
         /// </summary>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<bool>> CurrencyDataAsync()
+        public async Task<MDMResponseResult> CurrencyDataAsync(BaseReceiveDataRequestDto<CurrencyReceiveDto> baseReceiveDataRequestDto)
         {
 
-            var responseAjaxResult = new ResponseAjaxResult<bool>();
-            responseAjaxResult.SuccessResult(true);
+            await Console.Out.WriteLineAsync("接收到的数据：" + baseReceiveDataRequestDto.IT_DATA.ToJson());
+            var responseAjaxResult = new MDMResponseResult();
+            responseAjaxResult.Success();
             return responseAjaxResult;
         }
         /// <summary>
         /// 行政机构和核算机构映射关系
         /// </summary>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<bool>> AdministrativeAccountingMapperDataAsync()
+        public async Task<MDMResponseResult> AdministrativeAccountingMapperDataAsync()
         {
 
-            var responseAjaxResult = new ResponseAjaxResult<bool>();
-            responseAjaxResult.SuccessResult(true);
+            var responseAjaxResult = new MDMResponseResult();
+            responseAjaxResult.Success();
             return responseAjaxResult;
         }
         /// <summary>
         /// 项目类
         /// </summary>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<bool>> ProjectDataAsync()
+        public async Task<MDMResponseResult> ProjectDataAsync(BaseReceiveDataRequestDto<ProjectItem> receiveDataMDMRequestDto)
         {
-
-            var responseAjaxResult = new ResponseAjaxResult<bool>();
-            responseAjaxResult.SuccessResult(true);
+            MDMResponseResult responseAjaxResult = new MDMResponseResult();
+            await Console.Out.WriteLineAsync("接收到的数据："+ receiveDataMDMRequestDto.IT_DATA.ToJson());
+            var projectList=_mapper.Map<List<ProjectItem>, List<Project>>(receiveDataMDMRequestDto.IT_DATA.item);
+            await _dbContext.Insertable<Project>(projectList).ExecuteCommandAsync();
+            responseAjaxResult.Success();
             return responseAjaxResult;
         }
         /// <summary>
         /// 科研项目
         /// </summary>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<bool>> ScientifiCNoProjectDataAsync()
+        public async Task<MDMResponseResult> ScientifiCNoProjectDataAsync()
         {
 
-            var responseAjaxResult = new ResponseAjaxResult<bool>();
-            responseAjaxResult.SuccessResult(true);
+            var responseAjaxResult = new MDMResponseResult();
+            responseAjaxResult.Success();
             return responseAjaxResult;
         }
         /// <summary>
         /// 商机项目(不含境外商机项目)
         /// </summary>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<bool>> BusinessNoCpportunityDataAsync()
+        public async Task<MDMResponseResult> BusinessNoCpportunityDataAsync()
         {
 
-            var responseAjaxResult = new ResponseAjaxResult<bool>();
-            responseAjaxResult.SuccessResult(true);
+            var responseAjaxResult = new MDMResponseResult();
+            responseAjaxResult.Success();
             return responseAjaxResult;
         }
         /// <summary>
         /// 委托关系
         /// </summary>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<bool>> RelationalContractsDataAsync()
+        public async Task<MDMResponseResult> RelationalContractsDataAsync()
         {
 
-            var responseAjaxResult = new ResponseAjaxResult<bool>();
-            responseAjaxResult.SuccessResult(true);
+            var responseAjaxResult = new MDMResponseResult();
+            responseAjaxResult.Success();
             return responseAjaxResult;
         }
         /// <summary>
         /// 生产经营管理组织
         /// </summary>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<bool>> ManagementOrganizationDataAsync()
+        public async Task<MDMResponseResult> ManagementOrganizationDataAsync()
         {
 
-            var responseAjaxResult = new ResponseAjaxResult<bool>();
-            responseAjaxResult.SuccessResult(true);
+            var responseAjaxResult = new MDMResponseResult();
+            responseAjaxResult.Success();
             return responseAjaxResult;
         }
         /// <summary>
         /// 楼栋
         /// </summary>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<bool>> LouDongDataAsync()
+        public async Task<MDMResponseResult> LouDongDataAsync()
         {
             ///***
             // * 测试写入数据
@@ -350,63 +357,63 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
             //var x = _dbContext.Storageable(tt).ToStorage();
             //await x.AsInsertable.ExecuteCommandAsync();//不存在插入
             //await x.AsUpdateable.ExecuteCommandAsync();//存在更新
-            var responseAjaxResult = new ResponseAjaxResult<bool>();
-            responseAjaxResult.SuccessResult(true);
+            var responseAjaxResult = new MDMResponseResult();
+            responseAjaxResult.Success();
             return responseAjaxResult;
         }
         /// <summary>
         /// 房号
         /// </summary>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<bool>> RoomNumberDataAsync()
+        public async Task<MDMResponseResult> RoomNumberDataAsync()
         {
 
-            var responseAjaxResult = new ResponseAjaxResult<bool>();
-            responseAjaxResult.SuccessResult(true);
+            var responseAjaxResult = new MDMResponseResult();
+            responseAjaxResult.Success();
             return responseAjaxResult;
         }
         /// <summary>
         /// 境内行政区划
         /// </summary>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<bool>> AdministrativeDivisionDataAsync()
+        public async Task<MDMResponseResult> AdministrativeDivisionDataAsync()
         {
 
-            var responseAjaxResult = new ResponseAjaxResult<bool>();
-            responseAjaxResult.SuccessResult(true);
+            var responseAjaxResult = new MDMResponseResult();
+            responseAjaxResult.Success();
             return responseAjaxResult;
         }
         /// <summary>
         /// 语言语种
         /// </summary>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<bool>> LanguageDataAsync()
+        public async Task<MDMResponseResult> LanguageDataAsync()
         {
 
-            var responseAjaxResult = new ResponseAjaxResult<bool>();
-            responseAjaxResult.SuccessResult(true);
+            var responseAjaxResult = new MDMResponseResult();
+            responseAjaxResult.Success();
             return responseAjaxResult;
         }
         /// <summary>
         /// 物资设备明细编码
         /// </summary>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<bool>> DeviceDetailCodeDataAsync()
+        public async Task<MDMResponseResult> DeviceDetailCodeDataAsync()
         {
 
-            var responseAjaxResult = new ResponseAjaxResult<bool>();
-            responseAjaxResult.SuccessResult(true);
+            var responseAjaxResult = new MDMResponseResult();
+            responseAjaxResult.Success();
             return responseAjaxResult;
         }
         /// <summary>
         /// 多组织-核算机构
         /// </summary>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<bool>> AccountingOrganizationDataAsync()
+        public async Task<MDMResponseResult> AccountingOrganizationDataAsync()
         {
 
-            var responseAjaxResult = new ResponseAjaxResult<bool>();
-            responseAjaxResult.SuccessResult(true);
+            var responseAjaxResult = new MDMResponseResult();
+            responseAjaxResult.Success();
             return responseAjaxResult;
         }
         /// <summary>
