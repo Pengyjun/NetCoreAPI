@@ -2331,7 +2331,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             #endregion
 
             //分页
-            var pageData = model.IsFullExport ? list: list.Skip((model.PageIndex - 1) * model.PageSize).Take(model.PageSize).ToList();
+            var pageData = model.IsFullExport ? list : list.Skip((model.PageIndex - 1) * model.PageSize).Take(model.PageSize).ToList();
             total = list.Count;
 
             return result.SuccessResult(new MonthtReportsResponseDto() { Reports = pageData, Total = totalMonthtReport }, total);
@@ -6496,6 +6496,8 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             var projectDeptIds = projects.Select(t => t.ProjectDept).Distinct().ToArray();
             var institutions = _dbContext.Queryable<Institution>().Where(t => t.IsDelete == 1 && projectDeptIds.Contains(t.PomId)).ToArray();
             var company = new List<baseProjectData>();
+
+            var hvs = await _dbContext.Queryable<CurrencyConverter>().Where(x => x.IsDelete == 1 && x.Year == DateTime.Now.Year).ToListAsync();
             projects.ForEach(item =>
             {
                 var sortCommany = totalCompanys.FirstOrDefault(t => t.ItemId == item.CompanyId);
@@ -6504,6 +6506,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 ba.DeptName = institutions.FirstOrDefault(t => t.PomId == item.ProjectDept)?.Name;
                 ba.Sort = sortCommany?.Sort;
                 ba.CompanyId = sortCommany?.ItemId;
+                ba.hv = hvs.FirstOrDefault(x => x.CurrencyId == item.CurrencyId.ToString())?.ExchangeRate;
                 company.Add(ba);
             });
             //////获取公司基础信息
@@ -6576,12 +6579,13 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 outPutInfo.SumProduction = outPutInfo.OwnProduction + outPutInfo.SubProduction;
                 outPutInfo.OwnOutPutValue = monthReportList.Where(x => x.ProjectId == item.ProjectId && x.OutPutType == ConstructionOutPutType.Self && x.DateMonth == endTime.ToDateMonth()).Sum(x => x.CompleteProductionAmount) / 10000;
                 outPutInfo.SubOutPutValue = monthReportList.Where(x => x.ProjectId == item.ProjectId && x.OutPutType == ConstructionOutPutType.SubPackage && x.DateMonth == endTime.ToDateMonth()).Sum(x => x.CompleteProductionAmount) / 10000;
-                outPutInfo.SumOutPutValue = outPutInfo.OwnOutPutValue + outPutInfo.SubOutPutValue;
+                var spv = outPutInfo.OwnOutPutValue + outPutInfo.SubOutPutValue;
+                outPutInfo.SumOutPutValue = spv * item.hv;
                 //判断这个项目当月是否填报
                 if (monthList.Where(t => t.ProjectId == item.ProjectId).Any())
                 {
                     outPutInfo.SubExpenditure = monthReportList.Where(x => x.ProjectId == item.ProjectId && x.OutPutType == ConstructionOutPutType.SubPackage && x.DateMonth == endTime.ToDateMonth()).Sum(x => x.OutsourcingExpensesAmount) / 10000;
-                    outPutInfo.SubDiffValue = outPutInfo.SumOutPutValue - outPutInfo.OwnOutPutValue - outPutInfo.SubExpenditure;
+                    outPutInfo.SubDiffValue = spv - outPutInfo.OwnOutPutValue - outPutInfo.SubExpenditure;
                 }
                 //年度
                 if (endTime.Year == 2023)
