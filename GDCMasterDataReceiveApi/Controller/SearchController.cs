@@ -46,16 +46,6 @@ namespace GDCMasterDataReceiveApi.Controller
         public async Task<ResponseAjaxResult<List<LouDongDto>>> GetSearchLouDongAsync([FromBody] LouDongRequestDto louDongDto)
             => await _searchService.GetSearchLouDongAsync(louDongDto);
         /// <summary>
-        /// 增改楼栋
-        /// </summary>
-        /// <param name="receiveDtos"></param>
-        /// <returns></returns>
-        [HttpPost("AddOrModifyLouDong")]
-        [AllowAnonymous]
-        public async Task<ResponseAjaxResult<bool>> AddOrModifyLouDongAsync([FromBody] List<LouDongReceiveDto> receiveDtos)
-            => await _searchService.AddOrModifyLouDongAsync(receiveDtos);
-
-        /// <summary>
         /// 用户列表
         /// </summary>
         /// <param name="requestDto"></param>
