@@ -6579,11 +6579,13 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 outPutInfo.SumProduction = outPutInfo.OwnProduction + outPutInfo.SubProduction;
                 outPutInfo.OwnOutPutValue = monthReportList.Where(x => x.ProjectId == item.ProjectId && x.OutPutType == ConstructionOutPutType.Self && x.DateMonth == endTime.ToDateMonth()).Sum(x => x.CompleteProductionAmount) / 10000;
                 outPutInfo.SubOutPutValue = monthReportList.Where(x => x.ProjectId == item.ProjectId && x.OutPutType == ConstructionOutPutType.SubPackage && x.DateMonth == endTime.ToDateMonth()).Sum(x => x.CompleteProductionAmount) / 10000;
+                var spv = outPutInfo.OwnOutPutValue + outPutInfo.SubOutPutValue;
+                outPutInfo.SumOutPutValue = spv * item.hv;
                 //判断这个项目当月是否填报
                 if (monthList.Where(t => t.ProjectId == item.ProjectId).Any())
                 {
                     outPutInfo.SubExpenditure = monthReportList.Where(x => x.ProjectId == item.ProjectId && x.OutPutType == ConstructionOutPutType.SubPackage && x.DateMonth == endTime.ToDateMonth()).Sum(x => x.OutsourcingExpensesAmount) / 10000;
-                    outPutInfo.SubDiffValue = outPutInfo.SumOutPutValue - outPutInfo.OwnOutPutValue - outPutInfo.SubExpenditure;
+                    outPutInfo.SubDiffValue = spv - outPutInfo.OwnOutPutValue - outPutInfo.SubExpenditure;
                 }
                 //年度
                 if (endTime.Year == 2023)
@@ -6627,7 +6629,6 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 {
                     outPutInfo.TotalOutPutValue = Math.Round(sumMonthReport.CompleteProductionAmount / 10000, 2);
                 }
-                outPutInfo.SumOutPutValue = (outPutInfo.OwnOutPutValue + outPutInfo.SubOutPutValue) * item.hv;
                 outPutInfos.Add(outPutInfo);
             }
 
