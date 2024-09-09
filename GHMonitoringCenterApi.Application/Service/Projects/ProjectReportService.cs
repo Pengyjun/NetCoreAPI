@@ -6577,8 +6577,20 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 outPutInfo.OwnProduction = monthReportList.Where(x => x.ProjectId == item.ProjectId && x.OutPutType == ConstructionOutPutType.Self && x.DateMonth == endTime.ToDateMonth()).Sum(x => x.CompletedQuantity) / 10000;
                 outPutInfo.SubProduction = monthReportList.Where(x => x.ProjectId == item.ProjectId && x.OutPutType == ConstructionOutPutType.SubPackage && x.DateMonth == endTime.ToDateMonth()).Sum(x => x.CompletedQuantity) / 10000;
                 outPutInfo.SumProduction = outPutInfo.OwnProduction + outPutInfo.SubProduction;
-                outPutInfo.OwnOutPutValue = monthReportList.Where(x => x.ProjectId == item.ProjectId && x.OutPutType == ConstructionOutPutType.Self && x.DateMonth == endTime.ToDateMonth()).Sum(x => x.CompleteProductionAmount) / 10000;
-                outPutInfo.SubOutPutValue = monthReportList.Where(x => x.ProjectId == item.ProjectId && x.OutPutType == ConstructionOutPutType.SubPackage && x.DateMonth == endTime.ToDateMonth()).Sum(x => x.CompleteProductionAmount) / 10000;
+
+                #region 原来的自行产值
+                //outPutInfo.OwnOutPutValue = monthReportList.Where(x => x.ProjectId == item.ProjectId && x.OutPutType == ConstructionOutPutType.Self && x.DateMonth == endTime.ToDateMonth()).Sum(x => x.CompleteProductionAmount) / 10000;
+                #endregion
+                #region 新的自行产值 从wbs取
+                outPutInfo.OwnOutPutValue = monthReportList.Where(x => x.ProjectId == item.ProjectId && x.OutPutType == ConstructionOutPutType.Self && x.DateMonth == endTime.ToDateMonth()).Sum(x => x.UnitPrice * x.CompletedQuantity) / 10000;
+                #endregion
+
+                #region MyRegion
+                //原来的
+                //outPutInfo.SubOutPutValue = monthReportList.Where(x => x.ProjectId == item.ProjectId && x.OutPutType == ConstructionOutPutType.SubPackage && x.DateMonth == endTime.ToDateMonth()).Sum(x => x.CompleteProductionAmount) / 10000;
+                //新的
+                outPutInfo.SubOutPutValue = monthReportList.Where(x => x.ProjectId == item.ProjectId && x.OutPutType == ConstructionOutPutType.SubPackage && x.DateMonth == endTime.ToDateMonth()).Sum(x => x.UnitPrice * x.CompletedQuantity) / 10000;
+                #endregion
                 var spv = outPutInfo.OwnOutPutValue + outPutInfo.SubOutPutValue;
                 outPutInfo.SumOutPutValue = spv * item.hv;
                 //判断这个项目当月是否填报
