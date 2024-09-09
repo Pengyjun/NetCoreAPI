@@ -42,7 +42,7 @@ namespace GDCMasterDataReceiveApi.Filters
 
                 ResponseAjaxResult<List<ErrorMessage>> responseAjaxResult = new();
                 //格式化请求参数错误提示0HMOVSRFRALDE:00000019
-                if (context.Result!=null && context.Result.ToString().IndexOf("FileContentResult") < 0 && context.Result.ToString().IndexOf("FileStreamResult")<0&& context.Result != null && context.Result.ToString().IndexOf("EmptyResult") < 0 && ((Microsoft.AspNetCore.Mvc.ObjectResult)context.Result).StatusCode == 400)
+                if (context.Result != null && context.Result.ToString().IndexOf("FileContentResult") < 0 && context.Result.ToString().IndexOf("FileStreamResult") < 0 && context.Result != null && context.Result.ToString().IndexOf("EmptyResult") < 0 && ((Microsoft.AspNetCore.Mvc.ObjectResult)context.Result).StatusCode == 400)
                 {
                     var errMsg = ((Microsoft.AspNetCore.Mvc.ValidationProblemDetails)((Microsoft.AspNetCore.Mvc.ObjectResult)context.Result).Value).Errors;
                     List<ErrorMessage> errors = new();
@@ -74,7 +74,7 @@ namespace GDCMasterDataReceiveApi.Filters
                             //首字母小写问题
                             ContractResolver = new CamelCasePropertyNamesContractResolver()
                         }),
-                      
+
                         //StatusCode = (int)HttpStatusCode.ParameterError,
                         StatusCode = (int)HttpStatusCode.Success,
                         ContentType = "application/json charset=utf-8"
@@ -91,7 +91,7 @@ namespace GDCMasterDataReceiveApi.Filters
             if (Convert.ToBoolean(AppsettingsHelper.GetValue("AuditLogs:IsOpen")))
             {
                 var redis = RedisUtil.Instance;
-                var res =await redis.GetAsync(context.HttpContext.TraceIdentifier.ToLower());
+                var res = await redis.GetAsync(context.HttpContext.TraceIdentifier.ToLower());
                 if (!string.IsNullOrWhiteSpace(res))
                 {
                     try
@@ -117,7 +117,7 @@ namespace GDCMasterDataReceiveApi.Filters
                                 recordRequestInfo.HttpStatusCode = context.HttpContext.Response.StatusCode;
                             }
                             var db = context.HttpContext.RequestServices.GetService<ISqlSugarClient>();
-                           // var userService = context.HttpContext.RequestServices.GetService<IUserService>();
+                            // var userService = context.HttpContext.RequestServices.GetService<IUserService>();
                             var sql = recordRequestInfo.SqlExecInfos.Select(x => x.Sql).ToList();
                             var sqlTotalTime = recordRequestInfo.SqlExecInfos.Select(x => x.SqlTotalTime).ToList();
                             AuditLogs auditLogs = new AuditLogs()
@@ -132,8 +132,8 @@ namespace GDCMasterDataReceiveApi.Filters
                                 Id = recordRequestInfo.Id,
                                 RequestParames = recordRequestInfo.RequestInfo.Input,
                                 RequestTime = recordRequestInfo.RequestTime,
-                                Sql = string.Join('|',sql.Select(x=>x)),
-                                SqlExecutionDuration = string.Join('|',sqlTotalTime.Select(x => x)),
+                                Sql = string.Join('|', sql.Select(x => x)),
+                                SqlExecutionDuration = string.Join('|', sqlTotalTime.Select(x => x)),
                                 Url = recordRequestInfo.Url,
                                 ActionMethodName = recordRequestInfo.ActionMethodName,
                             };
@@ -151,10 +151,10 @@ namespace GDCMasterDataReceiveApi.Filters
                             }
 
                             if (db != null)
-                            await db.Insertable<AuditLogs>(auditLogs).ExecuteCommandAsync();
+                                await db.Insertable<AuditLogs>(auditLogs).ExecuteCommandAsync();
 
                             #region 只有退出帐号后才会执行下面代码
-                            if (userInfo!=null&&auditLogs.Url.IndexOf("/OperationLog/LogoutLog") > 0)
+                            if (userInfo != null && auditLogs.Url.IndexOf("/OperationLog/LogoutLog") > 0)
                             {
                                 //删除当前用户在redis里面的缓存
                                 if (await redis.ExistsAsync(userInfo.Account))
@@ -169,7 +169,8 @@ namespace GDCMasterDataReceiveApi.Filters
                     {
                         logger.LogError(ex, "保存请求信息到数据库时出现错误");
                     }
-                    finally {
+                    finally
+                    {
                         try
                         {
                             await redis.DelAsync(context.HttpContext.TraceIdentifier.ToLower());
@@ -181,10 +182,10 @@ namespace GDCMasterDataReceiveApi.Filters
                     }
                 }
 
-               
+
             }
             #endregion
-
+            context.HttpContext.Response.Headers.Add("AesKey", AppsettingsHelper.GetValue("AesKey"));
             await next.Invoke();
         }
         #endregion
@@ -283,7 +284,7 @@ namespace GDCMasterDataReceiveApi.Filters
                             var head = context.HttpContext.Request.Headers["Authorization"].ToString();
                             if (!string.IsNullOrWhiteSpace(head))
                             {
-                               // var userService = context.HttpContext.RequestServices.GetService<IUserService>();
+                                // var userService = context.HttpContext.RequestServices.GetService<IUserService>();
                                 head = head.Replace("Bearer", "").Trim();
                                 //if (userService != null)
                                 //{
