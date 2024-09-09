@@ -1,4 +1,6 @@
-﻿using GDCMasterDataReceiveApi.Application.Contracts.Dto.LouDong;
+﻿using GDCMasterDataReceiveApi.Application.Contracts;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto._4A.User;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.LouDong;
 using GDCMasterDataReceiveApi.Application.Contracts.IService.ISearchService;
 using GDCMasterDataReceiveApi.Domain.Shared;
 using Microsoft.AspNetCore.Authorization;
@@ -14,13 +16,25 @@ namespace GDCMasterDataReceiveApi.Controller
     public class SearchController : BaseController
     {
         private readonly ISearchService _searchService;
+        private readonly IBaseService _baseService;
         /// <summary>
         /// 服务注入
         /// </summary>
         /// <param name="searchService"></param>
-        public SearchController(ISearchService searchService)
+        /// <param name="baseService"></param>
+        public SearchController(ISearchService searchService, IBaseService baseService)
         {
             this._searchService = searchService;
+            this._baseService = baseService;
+        }
+        /// <summary>
+        /// 默认加载获取条件参数
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost("GetFilterParams")]
+        public ResponseAjaxResult<List<FilterParams>> GetFilterParams()
+        {
+            return _baseService.GetFilterParams();
         }
         /// <summary>
         /// 楼栋列表
@@ -29,16 +43,19 @@ namespace GDCMasterDataReceiveApi.Controller
         /// <returns></returns>
         [HttpPost("GetSearchLouDong")]
         [AllowAnonymous]
-        public async Task<ResponseAjaxResult<List<LouDongDto>>> GetSearchLouDongAsync([FromBody] LouDongRequestDto louDongDto) 
+        public async Task<ResponseAjaxResult<List<LouDongDto>>> GetSearchLouDongAsync([FromBody] LouDongRequestDto louDongDto)
             => await _searchService.GetSearchLouDongAsync(louDongDto);
         /// <summary>
-        /// 增改楼栋
+        /// 用户列表
         /// </summary>
-        /// <param name="receiveDtos"></param>
+        /// <param name="requestDto"></param>
         /// <returns></returns>
-        [HttpPost("AddOrModifyLouDong")]
+        [HttpPost("GetUserSearch")]
         [AllowAnonymous]
-        public async Task<ResponseAjaxResult<bool>> AddOrModifyLouDongAsync([FromBody] List<LouDongReceiveDto> receiveDtos) 
-            => await _searchService.AddOrModifyLouDongAsync(receiveDtos);
+        public async Task<ResponseAjaxResult<List<UserSearchResponseDto>>> GetUserSearchAsync([FromBody] UserSearchRequestDto requestDto)
+        {
+            return await _searchService.GetUserSearchAsync(requestDto);
+        }
+
     }
 }

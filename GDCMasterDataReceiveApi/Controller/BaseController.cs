@@ -10,21 +10,23 @@ namespace GDCMasterDataReceiveApi.Controller
     /// </summary>
     public abstract class BaseController : ControllerBase
     {
-
         /// <summary>
         /// 全局对象
         /// </summary>
-        public GlobalCurrentUser GlobalCurrentUser {
-            get {
-                var currentUser=(ICurrentUser)Request.HttpContext.RequestServices.GetService(typeof(ICurrentUser));
+        public GlobalCurrentUser GlobalCurrentUser
+        {
+            get
+            {
+                var currentUser = (ICurrentUser)Request.HttpContext.RequestServices.GetService(typeof(ICurrentUser));
                 if (currentUser != null)
                 {
                     return currentUser.UserAuthenticatedAsync().GetAwaiter().GetResult();
                 }
-                else {
+                else
+                {
                     return new GlobalCurrentUser() { };
                 }
-                
+
             }
         }
 

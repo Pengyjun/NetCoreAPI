@@ -1,4 +1,5 @@
-﻿using GDCMasterDataReceiveApi.Application.Contracts.Dto.LouDong;
+﻿using GDCMasterDataReceiveApi.Application.Contracts.Dto._4A.User;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.LouDong;
 using GDCMasterDataReceiveApi.Domain.Shared;
 using GDCMasterDataReceiveApi.Domain.Shared.Annotation;
 
@@ -17,10 +18,10 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.IService.ISearchService
         /// <returns></returns>
         Task<ResponseAjaxResult<List<LouDongDto>>> GetSearchLouDongAsync(LouDongRequestDto louDongDto);
         /// <summary>
-        /// 增改楼栋
+        /// 用户列表
         /// </summary>
-        /// <param name="receiveDtos"></param>
+        /// <param name="requestDto"></param>
         /// <returns></returns>
-        Task<ResponseAjaxResult<bool>> AddOrModifyLouDongAsync(List<LouDongReceiveDto> receiveDtos);
+        Task<ResponseAjaxResult<List<UserSearchResponseDto>>> GetUserSearchAsync(UserSearchRequestDto requestDto);
     }
 }
