@@ -497,9 +497,9 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
                     item.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
                 }
                 var institutiontOids = await _dbContext.Queryable<Institution>().Where(x => x.IsDelete == 1).Select(x => x.OID).ToListAsync();
-                var oids = institutions.Select(x => x.OID).ToList();
-                var insertOids = institutiontOids.Where(x => !oids.Contains(x)).ToList();
-                var updateOids = institutiontOids.Where(x => oids.Contains(x)).ToList();
+                //var oids = institutiontOids.Select(x => x).ToList();
+                var insertOids = institutions.Where(x =>!institutiontOids.Contains(x.OID)).Select(x=>x.OID).ToList();
+                var updateOids = institutions.Where(x =>institutiontOids.Contains(x.OID)).Select(x => x.OID).ToList();
                 if (insertOids.Any())
                 {
                     //插入操作
