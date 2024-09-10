@@ -16,19 +16,16 @@ using GDCMasterDataReceiveApi.Application.Contracts.Dto.DeviceClassCode;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.DeviceDetailCode;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.EscrowOrganization;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.FinancialInstitution;
-using GDCMasterDataReceiveApi.Application.Contracts.Dto.Institution;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.InvoiceType;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.Language;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.LouDong;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.NationalEconomy;
-using GDCMasterDataReceiveApi.Application.Contracts.Dto.Person;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.Project;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.ProjectClassification;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.Regional;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.RegionalCenter;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.RelationalContracts;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.RoomNumber;
-using GDCMasterDataReceiveApi.Application.Contracts.Dto.ScientifiCNoProject;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.TypeOfBidDisclosureProjectTable;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.UnitMeasurement;
 using GDCMasterDataReceiveApi.Domain.Models;
@@ -110,6 +107,43 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.AutoMapper
             //常用计量单位
             mapperConfigurationExpression.CreateMap<UnitMeasurementReceiveDto, UnitMeasurement>();
 
+
+            #region 自行映射
+            mapperConfigurationExpression.CreateMap<User, UserSearchOtherColumns>()
+                  .ForMember(x => x.NameSpell, y => y.MapFrom(u => u.NAME_SPELL))
+                  .ForMember(x => x.EnName, y => y.MapFrom(u => u.EN_NAME))
+                  .ForMember(x => x.CertType, y => y.MapFrom(u => u.CERT_TYPE))
+                  .ForMember(x => x.Sex, y => y.MapFrom(u => u.SEX))
+                  .ForMember(x => x.Birthday, y => y.MapFrom(u => u.BIRTHDAY))
+                  .ForMember(x => x.Nationality, y => y.MapFrom(u => u.NATIONALITY))
+                  .ForMember(x => x.Nation, y => y.MapFrom(u => u.NATION))
+                  .ForMember(x => x.Positions, y => y.MapFrom(u => u.POSITIONS))
+                  .ForMember(x => x.PositionName, y => y.MapFrom(u => u.POSITION_NAME))
+                  .ForMember(x => x.PositionGrade, y => y.MapFrom(u => u.POSITION_GRADE))
+                  .ForMember(x => x.JobType, y => y.MapFrom(u => u.JOB_TYPE))
+                  .ForMember(x => x.JobName, y => y.MapFrom(u => u.JOB_NAME))
+                  .ForMember(x => x.Sno, y => y.MapFrom(u => u.SNO))
+                  .ForMember(x => x.SubDepts, y => y.MapFrom(u => u.SUB_DEPTS))
+                  .ForMember(x => x.EmpSort, y => y.MapFrom(u => u.EMP_SORT))
+                  .ForMember(x => x.UserLogin, y => y.MapFrom(u => u.USER_LOGIN))
+                  .ForMember(x => x.HrEmpCode, y => y.MapFrom(u => u.HR_EMP_CODE))
+                  .ForMember(x => x.EntryTime, y => y.MapFrom(u => u.ENTRY_TIME))
+                  .ForMember(x => x.Tel, y => y.MapFrom(u => u.TEL))
+                  .ForMember(x => x.Fax, y => y.MapFrom(u => u.FAX))
+                  .ForMember(x => x.OfficeNum, y => y.MapFrom(u => u.OFFICE_NUM))
+                  .ForMember(x => x.Attribute1, y => y.MapFrom(u => u.ATTRIBUTE1))
+                  .ForMember(x => x.Attribute2, y => y.MapFrom(u => u.ATTRIBUTE2))
+                  .ForMember(x => x.Attribute3, y => y.MapFrom(u => u.ATTRIBUTE3))
+                  .ForMember(x => x.PositionGradeNorm, y => y.MapFrom(u => u.POSITIONGRADENORM))
+                  .ForMember(x => x.HighEstGrade, y => y.MapFrom(u => u.HIGHESTGRADE))
+                  .ForMember(x => x.SameHighEstGrade, y => y.MapFrom(u => u.SAMEHIGHESTGRADE))
+                  .ForMember(x => x.PoliticsFace, y => y.MapFrom(u => u.POLITICSFACE))
+                  .ForMember(x => x.DispatchunitName, y => y.MapFrom(u => u.DISPATCHUNITNAME))
+                  .ForMember(x => x.DispatchunitShortName, y => y.MapFrom(u => u.DISPATCHUNITSHORTNAME))
+                  .ForMember(x => x.Externaluser, y => y.MapFrom(u => u.EXTERNALUSER))
+                  .ForMember(x => x.Attribute4, y => y.MapFrom(u => u.ATTRIBUTE4))
+                  .ForMember(x => x.Attribute5, y => y.MapFrom(u => u.ATTRIBUTE5));
+            #endregion
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using GDCMasterDataReceiveApi.Application.Contracts;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto._4A.User;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.Institution;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.LouDong;
 using GDCMasterDataReceiveApi.Application.Contracts.IService.ISearchService;
 using GDCMasterDataReceiveApi.Domain.Shared;
@@ -56,6 +57,27 @@ namespace GDCMasterDataReceiveApi.Controller
         {
             return await _searchService.GetUserSearchAsync(requestDto);
         }
-
+        /// <summary>
+        /// 用户详情
+        /// </summary>
+        /// <param name="uId"></param>
+        /// <returns></returns>
+        [HttpGet("GetUserDetails")]
+        [AllowAnonymous]
+        public async Task<ResponseAjaxResult<UserSearchOtherColumns>> GetUserDetailsAsync([FromQuery] string uId)
+        {
+            return await _searchService.GetUserDetailsAsync(uId);
+        }
+        /// <summary>
+        /// 获取机构数据
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        [HttpGet("GetInstitutions")]
+        [AllowAnonymous]
+        public async Task<ResponseAjaxResult<List<InstitutionDto>>> GetInstitutionsAsync([FromQuery] InstitutionRequestDto requestDto)
+        {
+            return await _searchService.GetInstitutionAsync(requestDto);
+        }
     }
 }
