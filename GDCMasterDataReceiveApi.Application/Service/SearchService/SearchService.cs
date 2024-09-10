@@ -1,6 +1,10 @@
 ﻿using AutoMapper;
 using GDCMasterDataReceiveApi.Application.Contracts;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto._4A.User;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.CorresUnit;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.CountryContinent;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.CountryRegion;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.FinancialInstitution;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.Institution;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.LouDong;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.Project;
@@ -171,7 +175,6 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
         /// <param name="oid"></param>
         /// <param name="uInstutionDtos"></param>
         /// <returns></returns>
-
         public string GetUserCompany(string oid, List<UInstutionDto> uInstutionDtos)
         {
             var uInsInfo = uInstutionDtos.FirstOrDefault(x => x.Oid == oid);
@@ -444,6 +447,212 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                 .FirstAsync();
 
             responseAjaxResult.SuccessResult(result);
+            return responseAjaxResult;
+        }
+        /// <summary>
+        /// 往来单位列表
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        public async Task<ResponseAjaxResult<List<CorresUnitSearchDto>>> GetCorresUnitSearchAsync(CorresUnitRequestDto requestDto)
+        {
+            var responseAjaxResult = new ResponseAjaxResult<List<CorresUnitSearchDto>>();
+            RefAsync<int> total = 0;
+
+            var corresUnitList = await _dbContext.Queryable<CorresUnit>()
+                .Where((cu) => cu.IsDelete == 1)
+                .Select((cu) => new CorresUnitSearchDto
+                {
+                    Id = cu.Id.ToString(),
+                    CategoryUnit = cu.ZBPTYPE,
+                    City = cu.ZCITY,
+                    Country = cu.ZZCOUNTRY,
+                    Name = cu.ZBPNAME_ZH,
+                    NameEnglish = cu.ZBPNAME_EN,
+                    NameInLLanguage = cu.ZBPNAME_LOC,
+                    County = cu.ZCOUNTY,
+                    NatureOfUnit = cu.ZBPNATURE,
+                    Province = cu.ZPROVINCE,
+                    TypeOfUnit = cu.ZBPKINDS,
+                    StatusOfUnit = cu.ZBPSTATE == "01" ? "启用" : "停用"
+                })
+                .ToPageListAsync(requestDto.PageIndex, requestDto.PageSize, total);
+
+            responseAjaxResult.Count = total;
+            responseAjaxResult.SuccessResult(corresUnitList);
+            return responseAjaxResult;
+        }
+        /// <summary>
+        /// 获取往来单位详情
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<ResponseAjaxResult<CorresUnitDetailsDto>> GetCorresUnitDetailAsync(string id)
+        {
+            var responseAjaxResult = new ResponseAjaxResult<CorresUnitDetailsDto>();
+
+            var result = await _dbContext.Queryable<CorresUnit>()
+                .Where((cu) => cu.IsDelete == 1 && cu.Id.ToString() == id)
+                .Select((cu) => new CorresUnitDetailsDto
+                {
+                    CategoryUnit = cu.ZBPTYPE,
+                    City = cu.ZCITY,
+                    Country = cu.ZZCOUNTRY,
+                    Name = cu.ZBPNAME_ZH,
+                    NameEnglish = cu.ZBPNAME_EN,
+                    NameInLLanguage = cu.ZBPNAME_LOC,
+                    County = cu.ZCOUNTY,
+                    NatureOfUnit = cu.ZBPNATURE,
+                    Province = cu.ZPROVINCE,
+                    TypeOfUnit = cu.ZBPKINDS,
+                    AbroadRegistrationNo = cu.ZOSRNO,
+                    AbroadSocialSecurityNo = cu.ZSSNO,
+                    AccUnitCode = cu.ZACORGNO,
+                    BRegistrationNo = cu.ZBRNO,
+                    ChangeTime = cu.ZCHAT,
+                    CreateBy = cu.ZCRBY,
+                    CreatTime = cu.ZCRAT,
+                    DealUnitMDCode = cu.ZBP,
+                    EnterpriseNature = cu.ZETPSPROPERTY,
+                    IdNo = cu.ZIDNO,
+                    IsGroupUnit = cu.ZINCLIENT,
+                    ModifiedBy = cu.ZCHBY,
+                    OrgCode = cu.ZOIBC,
+                    OrgMDCode = cu.ZORG,
+                    RegistrationNo = cu.ZUSCC,
+                    SourceSystem = cu.ZSYSTEM,
+                    SupLegalEntity = cu.ZCOMPYREL,
+                    TaxpayerIdentifyNo = cu.ZTRNO,
+                    UnitSec = cu.Z2NDORG,
+                    StatusOfUnit = cu.ZBPSTATE == "01" ? "启用" : "停用"
+                })
+                 .FirstAsync();
+
+            responseAjaxResult.SuccessResult(result);
+            return responseAjaxResult;
+        }
+        /// <summary>
+        /// 获取国家地区列表
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        public async Task<ResponseAjaxResult<List<CountryRegionSearchDto>>> GetCountryRegionSearchAsync(CountryRegionRequestDto requestDto)
+        {
+            var responseAjaxResult = new ResponseAjaxResult<List<CountryRegionSearchDto>>();
+            RefAsync<int> total = 0;
+
+            var corresUnitList = await _dbContext.Queryable<CountryRegion>()
+                .Where((cr) => cr.IsDelete == 1)
+                .Select((cr) => new CountryRegionSearchDto
+                {
+                    Id = cr.Id.ToString(),
+                    Country = cr.ZCOUNTRYCODE,
+                    DigitCode = cr.ZGBNUM,
+                    Name = cr.ZCOUNTRYNAME,
+                    NameEnglish = cr.ZCOUNTRYENAME,
+                    NationalCode = cr.ZGBCHAR,
+                    State = cr.ZSTATE
+                })
+                .ToPageListAsync(requestDto.PageIndex, requestDto.PageSize, total);
+
+            responseAjaxResult.Count = total;
+            responseAjaxResult.SuccessResult(corresUnitList);
+            return responseAjaxResult;
+        }
+        /// <summary>
+        /// 获取国家地区详情
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<ResponseAjaxResult<CountryRegionDetailsDto>> GetCountryRegionDetailsAsync(string id)
+        {
+            var responseAjaxResult = new ResponseAjaxResult<CountryRegionDetailsDto>();
+
+            var result = await _dbContext.Queryable<CountryRegion>()
+                .Where((cr) => cr.IsDelete == 1 && cr.Id.ToString() == id)
+                .Select((cr) => new CountryRegionDetailsDto
+                {
+                    Country = cr.ZCOUNTRYCODE,
+                    DigitCode = cr.ZGBNUM,
+                    Name = cr.ZCOUNTRYNAME,
+                    NameEnglish = cr.ZCOUNTRYENAME,
+                    NationalCode = cr.ZGBCHAR,
+                    State = cr.ZSTATE,
+                    AreaCode = cr.ZAREACODE,
+                    CCCCCenterCode = cr.ZCRCCODE,
+                    ContinentCode = cr.ZCONTINENTCODE,
+                    DataIdentifier = cr.ZDELETE,
+                    RoadGongJ = cr.ZBRGJ,
+                    RoadGuoZiW = cr.ZBRGZW,
+                    RoadHaiW = cr.ZBRHW,
+                    Version = cr.ZVERSION
+                })
+                .FirstAsync();
+
+            responseAjaxResult.SuccessResult(result);
+            return responseAjaxResult;
+        }
+        /// <summary>
+        /// 大洲列表
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        public async Task<ResponseAjaxResult<List<CountryContinentSearchDto>>> GetCountryContinentSearchAsync(CountryContinentRequestDto requestDto)
+        {
+            var responseAjaxResult = new ResponseAjaxResult<List<CountryContinentSearchDto>>();
+            RefAsync<int> total = 0;
+
+            var ccList = await _dbContext.Queryable<CountryContinent>()
+                .Where((cc) => cc.IsDelete == 1)
+                .Select((cc) => new CountryContinentSearchDto
+                {
+                    Id = cc.Id.ToString(),
+                    ContinentCode = cc.ZCONTINENTCODE,
+                    Name = cc.ZCONTINENTNAME,
+                    RegionalDescr = cc.ZAREANAME,
+                    State = cc.ZSTATE == "1" ? "有效" : "无效"
+                })
+                .ToPageListAsync(requestDto.PageIndex, requestDto.PageSize, total);
+
+            responseAjaxResult.Count = total;
+            responseAjaxResult.SuccessResult(ccList);
+            return responseAjaxResult;
+        }
+        /// <summary>
+        /// 获取大洲详情
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<ResponseAjaxResult<CountryContinentDetailsDto>> GetCountryContinentDetailsAsync(string id)
+        {
+            var responseAjaxResult = new ResponseAjaxResult<CountryContinentDetailsDto>();
+
+            var result = await _dbContext.Queryable<CountryContinent>()
+                .Where((cc) => cc.IsDelete == 1 && cc.Id.ToString() == id)
+                .Select((cc) => new CountryContinentDetailsDto
+                {
+                    ContinentCode = cc.ZCONTINENTCODE,
+                    Name = cc.ZCONTINENTNAME,
+                    RegionalDescr = cc.ZAREANAME,
+                    State = cc.ZSTATE == "1" ? "有效" : "无效",
+                    AreaCode = cc.ZAREACODE,
+                    DataIdentifier = cc.ZDELETE,
+                    Version = cc.ZVERSION
+                })
+                .FirstAsync();
+
+            responseAjaxResult.SuccessResult(result);
+            return responseAjaxResult;
+        }
+        /// <summary>
+        /// 获取金融机构列表
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        public async Task<ResponseAjaxResult<List<FinancialInstitutionSearchDto>>> GetFinancialInstitutionSearchAsync(FinancialInstitutionRequestDto requestDto)
+        {
+            var responseAjaxResult = new ResponseAjaxResult<List<FinancialInstitutionSearchDto>>();
+
             return responseAjaxResult;
         }
     }
