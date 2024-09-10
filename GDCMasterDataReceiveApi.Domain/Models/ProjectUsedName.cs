@@ -16,7 +16,7 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// <summary>
         /// 曾用名
         /// </summary>
-      [SugarColumn(Length = 64)]
+        [SugarColumn(Length = 64)]
         public string? ZOLDNAME { get; set; }
         /// <summary>
         /// 项目主数据编码

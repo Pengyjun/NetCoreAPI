@@ -3,8 +3,11 @@ using GDCMasterDataReceiveApi.Application.Contracts;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto._4A.Institution;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto._4A.User;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.CorresUnit;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.CountryContinent;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.CountryRegion;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.Currency;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.FinancialInstitution;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.Project;
 using GDCMasterDataReceiveApi.Application.Contracts.IService.IReceiveService;
 using GDCMasterDataReceiveApi.Domain.Models;
@@ -14,6 +17,7 @@ using GDCMasterDataReceiveApi.Domain.Shared.Enums;
 using GDCMasterDataReceiveApi.Domain.Shared.Utils;
 using Microsoft.Extensions.Logging;
 using SqlSugar;
+using System.Collections.Generic;
 using System.Drawing.Drawing2D;
 using UtilsSharp;
 
@@ -53,11 +57,56 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
         /// 往来单位主数据
         /// </summary>
         /// <returns></returns>
-        public async Task<MDMResponseResult> CorresUnitDataAsync()
+        public async Task<MDMResponseResult> CorresUnitDataAsync(BaseReceiveDataRequestDto<CorresUnitReceiveDto> baseReceiveDataRequestDto)
         {
 
-            var responseAjaxResult = new MDMResponseResult();
-            responseAjaxResult.Success();
+            MDMResponseResult responseAjaxResult = new MDMResponseResult();
+            #region 记录日志
+            var receiceRecordId = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
+            ReceiveRecordLog receiveRecordLog = new ReceiveRecordLog()
+            {
+                Id = receiceRecordId,
+                ReceiveType = ReceiveDataType.CrossUnit,
+                RequestParame = baseReceiveDataRequestDto.IT_DATA.item.ToJson(),
+                ReceiveNumber = baseReceiveDataRequestDto.IT_DATA.item.Count,
+            };
+            await baseService.ReceiveRecordLogAsync(receiveRecordLog, DataOperationType.Insert);
+            #endregion
+            try
+            {
+                var projectList = _mapper.Map<List<CorresUnitReceiveDto>, List<CorresUnit>>(baseReceiveDataRequestDto.IT_DATA.item);
+                foreach (var item in projectList)
+                {
+                    item.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
+                }
+                var projectCodeList = await _dbContext.Queryable<CorresUnit>().Where(x => x.IsDelete == 1).Select(x => x.ZBP).ToListAsync();
+                var insertOids = projectList.Where(x => !projectCodeList.Contains(x.ZBP)).Select(x => x.ZBP).ToList();
+                var updateOids = projectList.Where(x => projectCodeList.Contains(x.ZBP)).Select(x => x.ZBP).ToList();
+                if (insertOids.Any())
+                {
+                    //插入操作
+                    var batchData = projectList.Where(x => insertOids.Contains(x.ZBP)).ToList();
+                    await _dbContext.Fastest<CorresUnit>().BulkCopyAsync(batchData);
+                }
+                if (updateOids.Any())
+                {
+                    //更新操作
+                    var batchData = projectList.Where(x => updateOids.Contains(x.ZBP)).ToList();
+                    await _dbContext.Fastest<CorresUnit>().BulkUpdateAsync(batchData);
+                }
+                responseAjaxResult.Success();
+            }
+            catch (Exception ex)
+            {
+                responseAjaxResult.Fail();
+                #region 更新记录日志
+                receiveRecordLog.FailNumber = baseReceiveDataRequestDto.IT_DATA.item.Count;
+                receiveRecordLog.FailMessage = ex.ToString();
+                receiveRecordLog.FailData = baseReceiveDataRequestDto.IT_DATA.item.ToJson();
+                await baseService.ReceiveRecordLogAsync(receiveRecordLog, DataOperationType.Update);
+                #endregion
+            }
+
             return responseAjaxResult;
         }
         /// <summary>
@@ -86,56 +135,173 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
         /// 国家地区
         /// </summary>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<ResponseResult>> CountryRegionDataAsync(RequestResult<CountryRegionReceiveDto> requestDto)
+        public async Task<MDMResponseResult> CountryRegionDataAsync(BaseReceiveDataRequestDto<CountryRegionReceiveDto> baseReceiveDataRequest)
         {
-            var responseAjaxResult = new ResponseAjaxResult<ResponseResult>();
-            //获取数据
-            var getData = requestDto.IT_DATA;
-            if (getData != null && getData.Any())
+            var responseAjaxResult = new MDMResponseResult();
+            #region 记录日志
+            var receiceRecordId = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
+            ReceiveRecordLog receiveRecordLog = new ReceiveRecordLog()
             {
-                var rst = new List<RESULT>();
-                foreach (var item in getData)
-                {
-                    rst.Add(new RESULT
-                    {
-                        ZZSERIAL = item.ZZSERIAL,
-                        ZZMSG = ResponseMessage.OPERATION_SUCCESS,
-                        ZZSTAT = ResponseStatus.SUCCESS
-                    });
-                }
-                var mData = _mapper.Map<List<CountryRegionReceiveDto>, List<CountryRegion>>(getData);
-
-                foreach (var item in mData)
+                Id = receiceRecordId,
+                ReceiveType = ReceiveDataType.CountryRegion,
+                RequestParame = baseReceiveDataRequest.IT_DATA.item.ToJson(),
+                ReceiveNumber = baseReceiveDataRequest.IT_DATA.item.Count
+            };
+            await baseService.ReceiveRecordLogAsync(receiveRecordLog, DataOperationType.Insert);
+            #endregion
+            try
+            {
+                List<CountryLanguage> insertzMDGS_OLDNAMEs = new();
+                List<CountryLanguage> updatezMDGS_OLDNAMEs = new();
+                var countryList = _mapper.Map<List<CountryRegionReceiveDto>, List<CountryRegion>>(baseReceiveDataRequest.IT_DATA.item);
+                foreach (var item in countryList)
                 {
                     item.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
                 }
-                await _dbContext.Insertable(mData).ExecuteCommandAsync();
-                var rtn = new RETURN
+                var CountryRegionList= await _dbContext.Queryable<CountryRegion>().Where(x => x.IsDelete == 1).Select(x => x.ZCOUNTRYCODE).ToListAsync();
+                var insertData = countryList.Where(x => !CountryRegionList.Contains(x.ZCOUNTRYCODE)).Select(x => x.ZCOUNTRYCODE).ToList();
+                var updateOids = countryList.Where(x => CountryRegionList.Contains(x.ZCOUNTRYCODE)).Select(x => x.ZCOUNTRYCODE).ToList();
+                if (insertData.Any())
                 {
-                    ZINSTID = requestDto.IS_REQ_HEAD_ASYNC.ZINSTID,
-                    ZZRESTIME = DateTime.Now.ToString("yyyyMMddHHmmss"),
-                    ZZMSG = ResponseMessage.OPERATION_SUCCESS,
-                    ZZSTAT = ResponseStatus.SUCCESS
-                };
-                var res = new ResponseResult()
+                    //插入操作
+                    var batchData = countryList.Where(x => insertData.Contains(x.ZCOUNTRYCODE)).ToList();
+                    foreach (var item in batchData)
+                    {
+                        foreach (var items in item.ZLANG_LIST)
+                        {
+                            CountryLanguage projectUsedName = new CountryLanguage()
+                            {
+                                 ZLANGCODE=items.ZLANGCODE,
+                                  ZCODE_DESC=items.ZCODE_DESC, 
+                                  
+                            };
+                            insertzMDGS_OLDNAMEs.Add(projectUsedName);
+                        }
+                    }
+                    await _dbContext.Fastest<CountryRegion>().BulkCopyAsync(batchData);
+                    await _dbContext.Fastest<CountryRegion>().BulkUpdateAsync(batchData);
+                }
+                if (updateOids.Any())
                 {
-                    ES_RETURN = rtn,
-                    ET_RESULT = rst
-                };
+                    //更新操作
+                    var batchData = countryList.Where(x => updateOids.Contains(x.ZCOUNTRYCODE)).ToList();
+                    foreach (var item in batchData)
+                    {
+                        foreach (var items in item.ZLANG_LIST)
+                        {
+                            CountryLanguage projectUsedName = new CountryLanguage()
+                            {
+                                ZLANGCODE = items.ZLANGCODE,
+                                ZCODE_DESC = items.ZCODE_DESC,
+
+                            };
+                            insertzMDGS_OLDNAMEs.Add(projectUsedName);
+                        }
+                    }
+                    await _dbContext.Fastest<CountryRegion>().BulkUpdateAsync(batchData);
+                    await _dbContext.Fastest<CountryLanguage>().BulkUpdateAsync(updatezMDGS_OLDNAMEs);
+                }
                 responseAjaxResult.Success();
             }
-
+            catch (Exception ex)
+            {
+                responseAjaxResult.Fail();
+                #region 更新记录日志
+                receiveRecordLog.FailNumber = baseReceiveDataRequest.IT_DATA.item.Count;
+                receiveRecordLog.FailMessage = ex.ToString();
+                receiveRecordLog.FailData = baseReceiveDataRequest.IT_DATA.item.ToJson();
+                await baseService.ReceiveRecordLogAsync(receiveRecordLog, DataOperationType.Update);
+                #endregion
+            }
             return responseAjaxResult;
         }
         /// <summary>
         /// 大洲
         /// </summary>
         /// <returns></returns>
-        public async Task<MDMResponseResult> CountryContinentDataAsync()
+        public async Task<MDMResponseResult> CountryContinentDataAsync(BaseReceiveDataRequestDto<CountryContinentReceiveDto> baseReceiveDataRequestDto)
         {
 
-            var responseAjaxResult = new MDMResponseResult();
-            responseAjaxResult.Success();
+            MDMResponseResult responseAjaxResult = new MDMResponseResult();
+            #region 记录日志
+            var receiceRecordId = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
+            ReceiveRecordLog receiveRecordLog = new ReceiveRecordLog()
+            {
+                Id = receiceRecordId,
+                ReceiveType = ReceiveDataType.CountryContinent,
+                RequestParame = baseReceiveDataRequestDto.IT_DATA.item.ToJson(),
+                ReceiveNumber = baseReceiveDataRequestDto.IT_DATA.item.Count,
+            };
+            await baseService.ReceiveRecordLogAsync(receiveRecordLog, DataOperationType.Insert);
+            #endregion
+            try
+            {
+                //处理多语言描述表类型
+                List<CountryContinentLanguage> insertzMDGS_OLDNAMEs = new();
+                List<CountryContinentLanguage> updatezMDGS_OLDNAMEs = new();
+                var projectList = _mapper.Map<List<CountryContinentReceiveDto>, List<CountryContinent>>(baseReceiveDataRequestDto.IT_DATA.item);
+                foreach (var item in projectList)
+                {
+                    item.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
+                }
+                var dataList = await _dbContext.Queryable<CountryContinent>().Where(x => x.IsDelete == 1).Select(x => x.ZCONTINENTCODE).ToListAsync();
+                var insertOids = projectList.Where(x => !dataList.Contains(x.ZCONTINENTCODE)).Select(x => x.ZCONTINENTCODE).ToList();
+                var updateOids = projectList.Where(x => dataList.Contains(x.ZCONTINENTCODE)).Select(x => x.ZCONTINENTCODE).ToList();
+                if (insertOids.Any())
+                {
+                    //插入操作
+                    var batchData = projectList.Where(x => insertOids.Contains(x.ZCONTINENTCODE)).ToList();
+                    foreach (var item in batchData)
+                    {
+                        foreach (var items in item.ZLANG_LIST)
+                        {
+                            CountryContinentLanguage projectUsedName = new CountryContinentLanguage()
+                            {
+                                
+                                  ZAREA_DESC=items.ZAREA_DESC,
+                                   ZCODE_DESC=items.ZCODE_DESC,
+                                    ZLANGCODE=items.ZLANGCODE,
+                            };
+                            insertzMDGS_OLDNAMEs.Add(projectUsedName);
+                        }
+                    }
+                    await _dbContext.Fastest<CountryContinent>().BulkCopyAsync(batchData);
+                    await _dbContext.Fastest<CountryContinentLanguage>().BulkCopyAsync(insertzMDGS_OLDNAMEs);
+                }
+                if (updateOids.Any())
+                {
+                    //更新操作
+                    var batchData = projectList.Where(x => updateOids.Contains(x.ZCONTINENTCODE)).ToList();
+                    foreach (var item in batchData)
+                    {
+                        foreach (var items in item.ZLANG_LIST)
+                        {
+                            CountryContinentLanguage projectUsedName = new CountryContinentLanguage()
+                            {
+
+                                ZAREA_DESC = items.ZAREA_DESC,
+                                ZCODE_DESC = items.ZCODE_DESC,
+                                ZLANGCODE = items.ZLANGCODE,
+                            };
+                            insertzMDGS_OLDNAMEs.Add(projectUsedName);
+                        }
+                    }
+                    await _dbContext.Fastest<CountryContinent>().BulkUpdateAsync(batchData);
+                    await _dbContext.Fastest<CountryContinentLanguage>().BulkUpdateAsync(updatezMDGS_OLDNAMEs);
+                }
+                responseAjaxResult.Success();
+            }
+            catch (Exception ex)
+            {
+                responseAjaxResult.Fail();
+                #region 更新记录日志
+                receiveRecordLog.FailNumber = baseReceiveDataRequestDto.IT_DATA.item.Count;
+                receiveRecordLog.FailMessage = ex.ToString();
+                receiveRecordLog.FailData = baseReceiveDataRequestDto.IT_DATA.item.ToJson();
+                await baseService.ReceiveRecordLogAsync(receiveRecordLog, DataOperationType.Update);
+                #endregion
+            }
+
             return responseAjaxResult;
         }
         /// <summary>
@@ -175,11 +341,56 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
         /// 金融机构
         /// </summary>
         /// <returns></returns>
-        public async Task<MDMResponseResult> FinancialInstitutionDataAsync()
+        public async Task<MDMResponseResult> FinancialInstitutionDataAsync(BaseReceiveDataRequestDto<FinancialInstitutionReceiveDto> baseReceiveDataRequestDto)
         {
 
-            var responseAjaxResult = new MDMResponseResult();
-            responseAjaxResult.Success();
+            MDMResponseResult responseAjaxResult = new MDMResponseResult();
+            #region 记录日志
+            var receiceRecordId = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
+            ReceiveRecordLog receiveRecordLog = new ReceiveRecordLog()
+            {
+                Id = receiceRecordId,
+                ReceiveType = ReceiveDataType.FinancialInstitution,
+                RequestParame = baseReceiveDataRequestDto.IT_DATA.item.ToJson(),
+                ReceiveNumber = baseReceiveDataRequestDto.IT_DATA.item.Count,
+            };
+            await baseService.ReceiveRecordLogAsync(receiveRecordLog, DataOperationType.Insert);
+            #endregion
+            try
+            {
+                var projectList = _mapper.Map<List<FinancialInstitutionReceiveDto>, List<FinancialInstitution>>(baseReceiveDataRequestDto.IT_DATA.item);
+                foreach (var item in projectList)
+                {
+                    item.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
+                }
+                var projectCodeList = await _dbContext.Queryable<FinancialInstitution>().Where(x => x.IsDelete == 1).Select(x => x.ZFINC).ToListAsync();
+                var insertOids = projectList.Where(x => !projectCodeList.Contains(x.ZFINC)).Select(x => x.ZFINC).ToList();
+                var updateOids = projectList.Where(x => projectCodeList.Contains(x.ZFINC)).Select(x => x.ZFINC).ToList();
+                if (insertOids.Any())
+                {
+                    //插入操作
+                    var batchData = projectList.Where(x => insertOids.Contains(x.ZFINC)).ToList();
+                    await _dbContext.Fastest<FinancialInstitution>().BulkCopyAsync(batchData);
+                }
+                if (updateOids.Any())
+                {
+                    //更新操作
+                    var batchData = projectList.Where(x => updateOids.Contains(x.ZFINC)).ToList();
+                    await _dbContext.Fastest<FinancialInstitution>().BulkUpdateAsync(batchData);
+                }
+                responseAjaxResult.Success();
+            }
+            catch (Exception ex)
+            {
+                responseAjaxResult.Fail();
+                #region 更新记录日志
+                receiveRecordLog.FailNumber = baseReceiveDataRequestDto.IT_DATA.item.Count;
+                receiveRecordLog.FailMessage = ex.ToString();
+                receiveRecordLog.FailData = baseReceiveDataRequestDto.IT_DATA.item.ToJson();
+                await baseService.ReceiveRecordLogAsync(receiveRecordLog, DataOperationType.Update);
+                #endregion
+            }
+
             return responseAjaxResult;
         }
         /// <summary>
@@ -302,6 +513,9 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
             #endregion
             try
             {
+                //处理曾用名
+                List<ProjectUsedName> insertzMDGS_OLDNAMEs = new();
+                List<ProjectUsedName> updatezMDGS_OLDNAMEs = new();
                 var projectList = _mapper.Map<List<ProjectItem>, List<Project>>(receiveDataMDMRequestDto.IT_DATA.item);
                 foreach (var item in projectList)
                 {
@@ -314,14 +528,41 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
                 {
                     //插入操作
                     var batchData = projectList.Where(x => insertOids.Contains(x.ZPROJECT)).ToList();
+                    foreach (var item in batchData)
+                    {
+                        foreach (var items in item.ZOLDNAME_LIST)
+                        {
+                            ProjectUsedName projectUsedName = new ProjectUsedName()
+                            {
+                             ZOLDNAME=items.ZOLDNAME,
+                              ZPROJECT=items.ZPROJECT,
+                            };
+                            insertzMDGS_OLDNAMEs.Add(projectUsedName);
+                        }
+                    }
                     await _dbContext.Fastest<Project>().BulkCopyAsync(batchData);
+                    await _dbContext.Fastest<ProjectUsedName>().BulkCopyAsync(insertzMDGS_OLDNAMEs);
                 }
                 if (updateOids.Any())
                 {
                     //更新操作
                     var batchData = projectList.Where(x => updateOids.Contains(x.ZPROJECT)).ToList();
+                    foreach (var item in batchData)
+                    {
+                        foreach (var items in item.ZOLDNAME_LIST)
+                        {
+                            ProjectUsedName projectUsedName = new ProjectUsedName()
+                            {
+                                ZOLDNAME = items.ZOLDNAME,
+                                ZPROJECT = items.ZPROJECT,
+                            };
+                            insertzMDGS_OLDNAMEs.Add(projectUsedName);
+                        }
+                    }
                     await _dbContext.Fastest<Project>().BulkUpdateAsync(batchData);
+                    await _dbContext.Fastest<ProjectUsedName>().BulkUpdateAsync(updatezMDGS_OLDNAMEs);
                 }
+                
                 responseAjaxResult.Success();
             }
             catch (Exception ex)

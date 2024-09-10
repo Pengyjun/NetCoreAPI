@@ -48,38 +48,57 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.CountryContinent
         /// <summary>
         /// 发送记录ID 发送记录的ID，必须保证此ID在同一个发送批次中是唯一的。用于记录发送方对于此发送记录的唯一标识。
         /// </summary>
-        public string ZZSERIAL { get; set; }
+        public string? ZZSERIAL { get; set; }
         /// <summary>
         /// 大洲代码：大洲代码
         /// </summary>
-        public string ZCONTINENTCODE { get; set; }
+        public string? ZCONTINENTCODE { get; set; }
         /// <summary>
         /// 大洲名称：大洲名称
         /// </summary>
-        public string ZCONTINENTNAME { get; set; }
+        public string? ZCONTINENTNAME { get; set; }
         /// <summary>
         /// 区域代码：大洲所属区域代码
         /// </summary>
-        public string ZAREACODE { get; set; }
+        public string? ZAREACODE { get; set; }
         /// <summary>
         /// 区域描述：区域描述
         /// </summary>
-        public string ZAREANAME { get; set; }
+        public string? ZAREANAME { get; set; }
         /// <summary>
         /// 版本：数据的版本号。数据每次变更时，版本号自动加1。
         /// </summary>
-        public string ZVERSION { get; set; }
+        public string? ZVERSION { get; set; }
         /// <summary>
         /// 状态：数据是否有效的标识:有效：1无效：0
         /// </summary>
-        public string ZSTATE { get; set; }
+        public string? ZSTATE { get; set; }
         /// <summary>
         /// 是否删除 数据是否有效的标识:有效：1无效：0
         /// </summary>
-        public string ZDELETE { get; set; }
+        public string? ZDELETE { get; set; }
         /// <summary>
         /// 多语言描述表类型
         /// </summary>
-        public List<ZMDGS_ZLANG>? ZLANG_LIST { get; set; }
+        public List<ZMDGS_ZLANG>? item { get; set; }
     }
+    /// <summary>
+    /// 多语言描述表类型
+    /// </summary>
+    public class ZMDGS_ZLANG
+    {
+
+      /// <summary>
+      /// 语种代码
+      /// </summary>
+        public string? ZLANGCODE { get; set; }
+    /// <summary>
+    /// 大洲代码描述
+    /// </summary>
+    public string? ZCODE_DESC { get; set; }
+    /// <summary>
+    /// 区域代码描述
+    /// </summary>
+    public string? ZAREA_DESC { get; set; }
+}
 }

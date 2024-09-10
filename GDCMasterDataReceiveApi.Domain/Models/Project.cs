@@ -18,7 +18,7 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// 项目主数据编码
         /// </summary>
         [SugarColumn(Length = 64, ColumnName = "MDCode")]
-        public string ZPROJECT { get; set; }
+        public string? ZPROJECT { get; set; }
         /// <summary>
         /// 项目名称
         /// </summary>
@@ -228,17 +228,17 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// 到期日期
         /// </summary>
         [SugarColumn(Length = 64, ColumnName = "DueDate")]
-        public string ZLFINDATE { get; set; }
+        public string? ZLFINDATE { get; set; }
         /// <summary>
         /// 所属二级单位:二级单位组织机构编码OID
         /// </summary>
         [SugarColumn(Length = 64, ColumnName = "UnitSec")]
-        public string Z2NDORG { get; set; }
+        public string? Z2NDORG { get; set; }
         /// <summary>
         /// 状态：数据是否有效的标识:有效：1无效：0
         /// </summary>
         [SugarColumn(Length = 64, ColumnName = "State")]
-        public string ZSTATE { get; set; }
+        public string? ZSTATE { get; set; }
         /// <summary>
         /// 停用原因 1完工停用2错误停用
         /// </summary>
@@ -248,7 +248,7 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// 计税方式
         /// </summary>
         [SugarColumn(Length = 64, ColumnName = "TaxMethod")]
-        public string ZTAXMETHOD { get; set; }
+        public string? ZTAXMETHOD { get; set; }
         /// <summary>
         /// 项目组织形式
         /// </summary>
@@ -273,7 +273,7 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// 项目管理方式:该项目适用的管理方式
         /// </summary>
         [SugarColumn(Length = 64, ColumnName = "Management")]
-        public string ZMANAGE_MODE { get; set; }
+        public string? ZMANAGE_MODE { get; set; }
         /// <summary>
         /// 参与二级单位：该项目参与的其他二级单位，支持多值
         /// </summary>
@@ -283,22 +283,37 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// 是否联合体项目：是否联合体：1是，2否
         /// </summary>
         [SugarColumn(Length = 64, ColumnName = "IsJoint")]
-        public string ZWINNINGC { get; set; }
+        public string? ZWINNINGC { get; set; }
         /// <summary>
         /// 中标交底项目编号：传入多值时用逗号给开
         /// </summary>
         [SugarColumn(ColumnDataType = "text", ColumnName = "BidDisclosureNo")]
-        public string ZAWARDP { get; set; }
+        public string? ZAWARDP { get; set; }
         /// <summary>
         /// 创建时间：格式：YYYYMMDDHHMMSS
         /// </summary>
         [SugarColumn(Length = 64, ColumnName = "CreateDate")]
-        public string ZCREATE_AT { get; set; }
+        public string? ZCREATE_AT { get; set; }
         /// <summary>
         /// 曾用名列表
         /// </summary>
-       // [SugarColumn(IsIgnore = true)]
-       // public List<ZMDGS_OLDNAME>? ZOLDNAME_LIST { get; set; }
+        // [SugarColumn(IsIgnore = true)]
+         public List<ZMDGS_OLDNAME>? ZOLDNAME_LIST { get; set; }
     }
-   
+    /// <summary>
+    /// 曾用名列表
+    /// </summary>
+    public class ZMDGS_OLDNAME
+    {
+        /// <summary>
+        /// 项目主数据编码
+        /// 12
+        /// </summary>
+        public string? ZPROJECT { get; set; }
+        /// <summary>
+        /// 曾用名
+        /// 500
+        /// </summary>
+        public string? ZOLDNAME { get; set; }
+    }
 }

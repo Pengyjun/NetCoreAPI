@@ -49,9 +49,9 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// </summary>
         [SugarColumn(Length = 1, ColumnName = "DataIdentifier")]
         public string ZDELETE { get; set; }
-        /// <summary>
-        /// 多语言描述表类型
-        /// </summary>
+        ///// <summary>
+        ///// 多语言描述表类型
+        ///// </summary>
         [SugarColumn(IsIgnore = true)]
         public List<ZMDGS_ZLANG>? ZLANG_LIST { get; set; }
     }
@@ -60,6 +60,7 @@ namespace GDCMasterDataReceiveApi.Domain.Models
     /// </summary>
     public class ZMDGS_ZLANG
     {
+
         /// <summary>
         /// 语种代码
         /// </summary>

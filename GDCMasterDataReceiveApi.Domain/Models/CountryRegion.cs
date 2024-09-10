@@ -91,6 +91,7 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         public List<ZMDGTT_ZLANG>? ZLANG_LIST { get; set; }
 
     }
+   
     /// <summary>
     /// 多语言描述表类型
     /// </summary>
@@ -99,10 +100,11 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// <summary>
         /// 语种代码
         /// </summary>
-        public string ZLANGCODE { get; set; }
+        public string? ZLANGCODE { get; set; }
         /// <summary>
-        /// 编码描述:ZCOUNTRYCODE国家地区代码多语言描述
+        /// 编码描述
         /// </summary>
-        public string ZCODE_DESC { get; set; }
+        public string? ZCODE_DESC { get; set; }
+
     }
 }

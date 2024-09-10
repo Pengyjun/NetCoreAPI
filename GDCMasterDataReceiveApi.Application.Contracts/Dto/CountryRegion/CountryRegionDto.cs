@@ -2,6 +2,7 @@
 
 namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.CountryRegion
 {
+    #region 后台管理使用
     /// <summary>
     /// 国家地区 反显
     /// </summary>
@@ -68,6 +69,9 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.CountryRegion
         /// </summary>
         public string AreaCode { get; set; }
     }
+    #endregion
+
+    #region 数据接收 国家地区
     /// <summary>
     /// 国家地区 接收
     /// </summary>
@@ -112,31 +116,49 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.CountryRegion
         /// <summary>
         /// 状态:1是已启用，0是已停用
         /// </summary>
-        public string ZSTATE { get; set; }
+        public string? ZSTATE { get; set; }
         /// <summary>
         /// 是否删除数据是否有效的标识:    有效：1无效：0
         /// </summary>
-        public string ZDELETE { get; set; }
+        public string? ZDELETE { get; set; }
         /// <summary>
         /// 一带一路(国资委):0-否，1-是
         /// </summary>
-        public string ZBRGZW { get; set; }
+        public string? ZBRGZW { get; set; }
         /// <summary>
         /// 一带一路(海外):0-否，1-是
         /// </summary>
-        public string ZBRHW { get; set; }
+        public string? ZBRHW { get; set; }
         /// <summary>
         /// 一带一路(共建):0-否，1-是
         /// </summary>
-        public string ZBRGJ { get; set; }
+        public string? ZBRGJ { get; set; }
         /// <summary>
         /// 区域代码
         /// </summary>
-        public string ZAREACODE { get; set; }
+        public string? ZAREACODE { get; set; }
+
         /// <summary>
         /// 多语言描述表类型
         /// </summary>
-        public List<ZMDGTT_ZLANG>? ZLANG_LIST { get; set; }
-
+        public List<ZMDGTT_ZLANG>? item { get; set; }
     }
+
+
+    /// <summary>
+    /// 多语言描述表类型
+    /// </summary>
+    public class ZMDGTT_ZLANG 
+    {
+        /// <summary>
+        /// 语种代码
+        /// </summary>
+        public string? ZLANGCODE { get; set; }
+        /// <summary>
+        /// 编码描述
+        /// </summary>
+        public string? ZCODE_DESC { get; set; }
+
+    }                  
+    #endregion
 }
