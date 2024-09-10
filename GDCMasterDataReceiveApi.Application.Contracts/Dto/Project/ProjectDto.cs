@@ -2,6 +2,9 @@
 
 namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.Project
 {
+
+
+    #region 项目  反显   后台管理使用
     /// <summary>
     /// 项目  反显
     /// </summary>
@@ -236,10 +239,15 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.Project
         /// </summary>
         public string CreateDate { get; set; }
     }
+
+    #endregion
+
+
+    #region 项目 接收   
     /// <summary>
     /// 项目 接收
     /// </summary>
-    public class ProjectReceiveDto
+    public class ProjectItem
     {
         /// <summary>
         /// 发送记录ID 发送记录的ID，必须保证此ID在同一个发送批次中是唯一的。用于记录发送方对于此发送记录的唯一标识。
@@ -472,6 +480,24 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.Project
         /// <summary>
         /// 曾用名列表
         /// </summary>
-        public List<ZMDGS_OLDNAME>? ZOLDNAME_LIST { get; set; }
+        public List<ZMDGS_OLDNAME>? item { get; set; }
     }
+
+    /// <summary>
+    /// 曾用名列表
+    /// </summary>
+    public class ZMDGS_OLDNAME
+    {
+        /// <summary>
+        /// 项目主数据编码
+        /// 12
+        /// </summary>
+        public string? ZPROJECT { get; set; }
+        /// <summary>
+        /// 曾用名
+        /// 500
+        /// </summary>
+        public string? ZOLDNAME { get; set; }
+    }
+    #endregion
 }

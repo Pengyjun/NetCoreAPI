@@ -1,6 +1,9 @@
-﻿using GDCMasterDataReceiveApi.Application.Contracts.Dto._4A.Institution;
+﻿using GDCMasterDataReceiveApi.Application.Contracts.Dto;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto._4A.Institution;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto._4A.User;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.CountryRegion;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.Currency;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.Project;
 using GDCMasterDataReceiveApi.Domain.Shared;
 using GDCMasterDataReceiveApi.Domain.Shared.Annotation;
 
@@ -16,22 +19,22 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.IService.IReceiveService
         /// 获取通用字典数据
         /// </summary>
         /// <returns></returns>
-        Task<ResponseAjaxResult<bool>> CommonDataAsync();
+        Task<MDMResponseResult> CommonDataAsync();
         /// <summary>
         /// 往来单位主数据
         /// </summary>
         /// <returns></returns>
-        Task<ResponseAjaxResult<bool>> CorresUnitDataAsync();
+        Task<MDMResponseResult> CorresUnitDataAsync();
         /// <summary>
         /// 多组织-税务代管组织(行政)
         /// </summary>
         /// <returns></returns>
-        Task<ResponseAjaxResult<bool>> EscrowOrganizationDataAsync();
+        Task<MDMResponseResult> EscrowOrganizationDataAsync();
         /// <summary>
         /// 商机项目(含境外商机项目)
         /// </summary>
         /// <returns></returns>
-        Task<ResponseAjaxResult<bool>> BusinessProjectDataAsync();
+        Task<MDMResponseResult> BusinessProjectDataAsync();
         /// <summary>
         /// 国家地区
         /// </summary>
@@ -41,127 +44,127 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.IService.IReceiveService
         /// 大洲
         /// </summary>
         /// <returns></returns>
-        Task<ResponseAjaxResult<bool>> CountryContinentDataAsync();
+        Task<MDMResponseResult> CountryContinentDataAsync();
         /// <summary>
         /// 中交区域总部
         /// </summary>
         /// <returns></returns>
-        Task<ResponseAjaxResult<bool>> RegionalDataAsync();
+        Task<MDMResponseResult> RegionalDataAsync();
         /// <summary>
         /// 常用计量单位
         /// </summary>
         /// <returns></returns>
-        Task<ResponseAjaxResult<bool>> UnitMeasurementDataAsync();
+        Task<MDMResponseResult> UnitMeasurementDataAsync();
         /// <summary>
         /// 中交项目行业分类产业分类、业务板块、十二大业务类型、江河湖海对照关系
         /// </summary>
         /// <returns></returns>
-        Task<ResponseAjaxResult<bool>> ProjectClassificationDataAsync();
+        Task<MDMResponseResult> ProjectClassificationDataAsync();
         /// <summary>
         /// 金融机构
         /// </summary>
         /// <returns></returns>
-        Task<ResponseAjaxResult<bool>> FinancialInstitutionDataAsync();
+        Task<MDMResponseResult> FinancialInstitutionDataAsync();
         /// <summary>
         /// 物资设备分类编码
         /// </summary>
         /// <returns></returns>
-        Task<ResponseAjaxResult<bool>> DeviceClassCodeDataAsync();
+        Task<MDMResponseResult> DeviceClassCodeDataAsync();
         /// <summary>
         /// 核算部门
         /// </summary>
         /// <returns></returns>
-        Task<ResponseAjaxResult<bool>> AccountingDepartmentDataAsync();
+        Task<MDMResponseResult> AccountingDepartmentDataAsync();
         /// <summary>
         /// 中交区域中心
         /// </summary>
         /// <returns></returns>
-        Task<ResponseAjaxResult<bool>> RegionalCenterDataAsync();
+        Task<MDMResponseResult> RegionalCenterDataAsync();
         /// <summary>
         /// 银行账号
         /// </summary>
         /// <returns></returns>
-        Task<ResponseAjaxResult<bool>> BankCardDataAsync();
+        Task<MDMResponseResult> BankCardDataAsync();
         /// <summary>
         /// 国民经济行业分类
         /// </summary>
         /// <returns></returns>
-        Task<ResponseAjaxResult<bool>> NationalEconomyDataAsync();
+        Task<MDMResponseResult> NationalEconomyDataAsync();
         /// <summary>
         /// 多组织-行政组织
         /// </summary>
         /// <returns></returns>
-        Task<ResponseAjaxResult<bool>> AdministrativeOrganizationDataAsync();
+        Task<MDMResponseResult> AdministrativeOrganizationDataAsync();
         /// <summary>
         /// 发票类型
         /// </summary>
         /// <returns></returns>
-        Task<ResponseAjaxResult<bool>> InvoiceTypeDataAsync();
+        Task<MDMResponseResult> InvoiceTypeDataAsync();
         /// <summary>
         /// 币种
         /// </summary>
         /// <returns></returns>
-        Task<ResponseAjaxResult<bool>> CurrencyDataAsync();
+        Task<MDMResponseResult> CurrencyDataAsync(BaseReceiveDataRequestDto<CurrencyReceiveDto> baseReceiveDataRequestDto);
         /// <summary>
         /// 行政机构和核算机构映射关系
         /// </summary>
         /// <returns></returns>
-        Task<ResponseAjaxResult<bool>> AdministrativeAccountingMapperDataAsync();
+        Task<MDMResponseResult> AdministrativeAccountingMapperDataAsync();
         /// <summary>
         /// 项目类
         /// </summary>
         /// <returns></returns>
-        Task<ResponseAjaxResult<bool>> ProjectDataAsync();
+        Task<MDMResponseResult> ProjectDataAsync(BaseReceiveDataRequestDto<ProjectItem> receiveDataMDMRequestDto);
         /// <summary>
         /// 科研项目
         /// </summary>
         /// <returns></returns>
-        Task<ResponseAjaxResult<bool>> ScientifiCNoProjectDataAsync();
+        Task<MDMResponseResult> ScientifiCNoProjectDataAsync();
         /// <summary>
         /// 商机项目(不含境外商机项目)
         /// </summary>
         /// <returns></returns>
-        Task<ResponseAjaxResult<bool>> BusinessNoCpportunityDataAsync();
+        Task<MDMResponseResult> BusinessNoCpportunityDataAsync();
         /// <summary>
         /// 委托关系
         /// </summary>
         /// <returns></returns>
-        Task<ResponseAjaxResult<bool>> RelationalContractsDataAsync();
+        Task<MDMResponseResult> RelationalContractsDataAsync();
         /// <summary>
         /// 生产经营管理组织
         /// </summary>
         /// <returns></returns>
-        Task<ResponseAjaxResult<bool>> ManagementOrganizationDataAsync();
+        Task<MDMResponseResult> ManagementOrganizationDataAsync();
         /// <summary>
         /// 楼栋
         /// </summary>
         /// <returns></returns>
-        Task<ResponseAjaxResult<bool>> LouDongDataAsync();
+        Task<MDMResponseResult> LouDongDataAsync();
         /// <summary>
         /// 房号
         /// </summary>
         /// <returns></returns>
-        Task<ResponseAjaxResult<bool>> RoomNumberDataAsync();
+        Task<MDMResponseResult> RoomNumberDataAsync();
         /// <summary>
         /// 境内行政区划
         /// </summary>
         /// <returns></returns>
-        Task<ResponseAjaxResult<bool>> AdministrativeDivisionDataAsync();
+        Task<MDMResponseResult> AdministrativeDivisionDataAsync();
         /// <summary>
         /// 语言语种
         /// </summary>
         /// <returns></returns>
-        Task<ResponseAjaxResult<bool>> LanguageDataAsync();
+        Task<MDMResponseResult> LanguageDataAsync();
         /// <summary>
         /// 物资设备明细编码
         /// </summary>
         /// <returns></returns>
-        Task<ResponseAjaxResult<bool>> DeviceDetailCodeDataAsync();
+        Task<MDMResponseResult> DeviceDetailCodeDataAsync();
         /// <summary>
         /// 多组织-核算机构
         /// </summary>
         /// <returns></returns>
-        Task<ResponseAjaxResult<bool>> AccountingOrganizationDataAsync();
+        Task<MDMResponseResult> AccountingOrganizationDataAsync();
 
         #region 接收主数据人员和机构的数据
         /// <summary>
