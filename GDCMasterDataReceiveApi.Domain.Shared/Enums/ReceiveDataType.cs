@@ -28,8 +28,23 @@ namespace GDCMasterDataReceiveApi.Domain.Shared.Enums
         /// <summary>
         /// 币种
         /// </summary>
-        Currency = 3,
-
+        Currency = 4,
+        /// <summary>
+        /// 国家地区
+        /// </summary>
+        CountryRegion = 5,
+        /// <summary>
+        /// 往来单位
+        /// </summary>
+        CrossUnit = 6,
+        /// <summary>
+        /// 大洲
+        /// </summary>
+        CountryContinent = 7,
+        /// <summary>
+        /// 金融机构
+        /// </summary>
+        FinancialInstitution = 8,
         /// <summary>
         /// 物资设备分类编码
         /// </summary>
@@ -49,24 +64,7 @@ namespace GDCMasterDataReceiveApi.Domain.Shared.Enums
         /// <summary>
         /// 语言
         /// </summary>
-        Language = 14
-        Currency = 4,
+        Language = 14,
 
-        /// <summary>
-        /// 国家地区
-        /// </summary>
-        CountryRegion = 5,
-        /// <summary>
-        /// 往来单位
-        /// </summary>
-        CrossUnit= 6,
-        /// <summary>
-        /// 大洲
-        /// </summary>
-        CountryContinent= 7,
-        /// <summary>
-        /// 金融机构
-        /// </summary>
-        FinancialInstitution=8
     }
 }
