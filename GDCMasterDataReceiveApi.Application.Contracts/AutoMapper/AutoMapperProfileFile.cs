@@ -107,6 +107,11 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.AutoMapper
             //常用计量单位
             mapperConfigurationExpression.CreateMap<UnitMeasurementReceiveDto, UnitMeasurement>();
 
+
+
+            mapperConfigurationExpression.CreateMap<ZMDGS_PROPERTYChild, DeviceClassAttribute>();
+            mapperConfigurationExpression.CreateMap<ZMDGS_VALUEChild, DeviceClassAttributeValue>();
+
         }
     }
 }

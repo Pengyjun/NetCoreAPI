@@ -19,6 +19,7 @@ using GDCMasterDataReceiveApi.Domain.Shared.Enums;
 using GDCMasterDataReceiveApi.Domain.Shared.Utils;
 using Microsoft.Extensions.Logging;
 using SqlSugar;
+using System.Collections.Generic;
 using UtilsSharp;
 
 namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
@@ -44,8 +45,8 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
             this._dbContext = dbContext;
             this._mapper = mapper;
             this.logger = logger;
-           this.baseService = baseService;
-            
+            this.baseService = baseService;
+
         }
         /// <summary>
         /// 获取通用字典数据
@@ -212,23 +213,29 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
             try
             {
                 var dCList = _mapper.Map<List<DeviceClassCodeItem>, List<DeviceClassCode>>(receiveDataMDMRequestDto.IT_DATA.item);
-                foreach (var item in dCList)
+                var item = new List<ZMDGS_PROPERTYChild>();//分类属性
+                var item2 = new List<ZMDGS_VALUEChild>();//分类属性值
+                foreach (var dc in dCList)
                 {
-                    item.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
+                    dc.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
+                    item.AddRange(dc.ZPROPERTY_LIST.Item);
+                    item2.AddRange(dc.ZVALUE_LIST.Item);
                 }
                 var deviceCodes = await _dbContext.Queryable<DeviceClassCode>().Where(x => x.IsDelete == 1).Select(x => x.ZCLASS).ToListAsync();
                 var insertOids = dCList.Where(x => !deviceCodes.Contains(x.ZCLASS)).Select(x => x.ZCLASS).ToList();
                 var updateOids = dCList.Where(x => deviceCodes.Contains(x.ZCLASS)).Select(x => x.ZCLASS).ToList();
 
-                ////属性
-                //var dcIds = await _dbContext.Queryable<DeviceClassAttribute>().Where(x => x.IsDelete == 1).Select(x => x.DCId).ToListAsync();
-                //var insertDCIds = dCList.Where(x => !deviceCodes.Contains(x.ZCLASS)).Select(x => x.Id).Where(x => !dcIds.Contains(x)).Select(x => x).ToList();
-                //var updateDCIds = dCList.Where(x => deviceCodes.Contains(x.ZCLASS)).Select(x => x.Id).Where(x => dcIds.Contains(x)).Select(x => x).ToList();
+                //属性
+                var dcids = await _dbContext.Queryable<DeviceClassAttribute>().Where(x => x.IsDelete == 1).Select(x => x.ZCLASS).ToListAsync();
+                var insertDCIds = item.Where(x => !deviceCodes.Contains(x.ZCLASS)).Select(x => x.ZCLASS).Where(x => !dcids.Contains(x)).Select(x => x).ToList();
+                var updateDCIds = item.Where(x => deviceCodes.Contains(x.ZCLASS)).Select(x => x.ZCLASS).Where(x => dcids.Contains(x)).Select(x => x).ToList();
+                var itemValues = _mapper.Map<List<ZMDGS_PROPERTYChild>, List<DeviceClassAttribute>>(item);
 
-                ////属性值
-                //var dcVIds = await _dbContext.Queryable<DeviceClassAttributeValue>().Where(x => x.IsDelete == 1).Select(x => x.DCId).ToListAsync();
-                //var insertDCVIds = dCList.Where(x => !deviceCodes.Contains(x.ZCLASS)).Select(x => x.Id).Where(x => !dcIds.Contains(x)).Select(x => x).ToList();
-                //var updateDCVIds = dCList.Where(x => deviceCodes.Contains(x.ZCLASS)).Select(x => x.Id).Where(x => dcIds.Contains(x)).Select(x => x).ToList();
+                //属性值
+                var dcVIds = await _dbContext.Queryable<DeviceClassAttributeValue>().Where(x => x.IsDelete == 1).Select(x => x.ZCLASS).ToListAsync();
+                var insertDCVIds = dCList.Where(x => !deviceCodes.Contains(x.ZCLASS)).Select(x => x.ZCLASS).Where(x => !dcVIds.Contains(x)).Select(x => x).ToList();
+                var updateDCVIds = dCList.Where(x => deviceCodes.Contains(x.ZCLASS)).Select(x => x.ZCLASS).Where(x => dcVIds.Contains(x)).Select(x => x).ToList();
+                var item2Values = _mapper.Map<List<ZMDGS_VALUEChild>, List<DeviceClassAttributeValue>>(item2);
 
                 if (insertOids.Any())
                 {
@@ -242,23 +249,34 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
                     var batchData = dCList.Where(x => updateOids.Contains(x.ZCLASS)).ToList();
                     await _dbContext.Fastest<DeviceClassCode>().BulkUpdateAsync(batchData);
                 }
-                //if (insertDCIds.Any())
-                //{
-
-                //}
-                //if (updateDCIds.Any())
-                //{
-
-                //}
-
-                //if (insertDCVIds.Any())
-                //{
-
-                //}
-                //if (updateDCVIds.Any())
-                //{
-
-                //}
+                if (insertDCIds.Any())
+                {
+                    //插入操作
+                    var batchData = itemValues.Where(x => insertDCIds.Contains(x.ZCLASS)).ToList();
+                    foreach (var key in batchData)
+                    { key.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(); }
+                    await _dbContext.Fastest<DeviceClassAttribute>().BulkUpdateAsync(batchData);
+                }
+                if (updateDCIds.Any())
+                {
+                    //更新操作
+                    var batchData = itemValues.Where(x => updateDCIds.Contains(x.ZCLASS)).ToList();
+                    await _dbContext.Fastest<DeviceClassAttribute>().BulkUpdateAsync(batchData);
+                }
+                if (insertDCVIds.Any())
+                {
+                    //插入操作
+                    var batchData = item2Values.Where(x => insertDCVIds.Contains(x.ZCLASS)).ToList();
+                    foreach (var key in batchData)
+                    { key.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(); }
+                    await _dbContext.Fastest<DeviceClassAttributeValue>().BulkUpdateAsync(batchData);
+                }
+                if (updateDCVIds.Any())
+                {
+                    //更新操作
+                    var batchData = item2Values.Where(x => updateDCVIds.Contains(x.ZCLASS)).ToList();
+                    await _dbContext.Fastest<DeviceClassAttributeValue>().BulkUpdateAsync(batchData);
+                }
 
                 responseAjaxResult.Success();
             }

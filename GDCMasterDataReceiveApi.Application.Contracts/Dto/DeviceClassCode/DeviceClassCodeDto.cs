@@ -104,10 +104,10 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.DeviceClassCode
         /// <summary>
         /// 物资设备分类的属性列表
         /// </summary>
-        public List<ZMDGS_PROPERTY>? ZPROPERTY_LIST { get; set; }
+        public ZMDGS_PROPERTY? ZPROPERTY_LIST { get; set; }
         /// <summary>
         /// 物资设备分类属性值列表
         /// </summary>
-        public List<ZMDGS_VALUE>? ZVALUE_LIST { get; set; }
+        public ZMDGS_VALUE? ZVALUE_LIST { get; set; }
     }
 }
