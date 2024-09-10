@@ -65,4 +65,61 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         [SugarColumn(Length = 20, ColumnName = "SortRule")]
         public string? ZSORT { get; set; }
     }
+    /// <summary>
+    /// 物资设备分类的属性列表
+    /// </summary>
+    public class ZMDGS_PROPERTY
+    {
+        /// <summary>
+        /// 11
+        /// 分类编码:分类的唯一性编码
+        /// </summary>
+        public string ZCLASS { get; set; }
+        /// <summary>
+        /// 属性编码:属性唯一代码
+        /// 10
+        /// </summary>
+        public string ZATTRCODE { get; set; }
+        /// <summary>
+        /// 属性名称
+        /// 100
+        /// </summary>
+        public string ZATTRNAME { get; set; }
+        /// <summary>
+        /// 属性计量单位
+        /// 50
+        /// </summary>
+        public string ZATTRUNIT { get; set; }
+        /// <summary>
+        /// 备注
+        /// 300
+        /// </summary>
+        public string? ZREMARK { get; set; }
+    }
+    /// <summary>
+    /// 物资设备分类属性值列表
+    /// </summary>
+    public class ZMDGS_VALUE
+    {
+        /// <summary>
+        /// 分类编码: 分类的唯一性编码
+        /// 11
+        /// </summary>
+        public string ZCLASS { get; set; }
+        /// <summary>
+        /// 属性编码: 属性唯一代码
+        /// 10 
+        /// </summary>
+        public string ZATTRCODE { get; set; }
+        /// <summary>
+        /// 属性值编码: 属性值唯一代码
+        /// 10
+        /// </summary>
+        public string ZVALUECODE { get; set; }
+        /// <summary>
+        /// 属性值名称
+        /// 100
+        /// </summary>
+        public string ZVALUENAME { get; set; }
+    }
 }
