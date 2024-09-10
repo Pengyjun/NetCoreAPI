@@ -1,12 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace GDCMasterDataReceiveApi.Application.Contracts.Dto
+﻿namespace GDCMasterDataReceiveApi.Application.Contracts.Dto
 {
-
     /// <summary>
     /// 接收主数据数据 基本请求类
     /// </summary>
@@ -18,8 +11,8 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto
     /// <summary>
     /// 业务请求接收类
     /// </summary>
-    public class IT_DATA<T> where T :new(){
-
+    public class IT_DATA<T> where T : new()
+    {
         public List<T> item { get; set; }
     }
 }
