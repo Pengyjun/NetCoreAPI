@@ -1,6 +1,7 @@
 ﻿using GDCMasterDataReceiveApi.Application.Contracts;
 using GDCMasterDataReceiveApi.Domain.Models;
 using GDCMasterDataReceiveApi.Domain.Shared;
+using GDCMasterDataReceiveApi.Domain.Shared.Enums;
 using Newtonsoft.Json;
 using SqlSugar;
 using System.Data;
@@ -166,6 +167,30 @@ namespace GDCMasterDataReceiveApi.Application
             }
 
             return result;
+        }
+
+
+
+        /// <summary>
+        /// <summary>
+        /// 接收数据记录
+        /// </summary>
+        /// <param name="receiveRecordLog"></param>
+        /// <param name="dataOperationType">操作类型</param>
+        /// <returns></returns>
+        public async Task ReceiveRecordLogAsync(ReceiveRecordLog receiveRecordLog, DataOperationType dataOperationType)
+        {
+            if ((int)dataOperationType == 1)
+            {
+                //插入操作
+              await  _dbContext.Insertable<ReceiveRecordLog>(receiveRecordLog).ExecuteCommandAsync();
+            }
+
+            if ((int)dataOperationType ==3)
+            {
+                //修改操作
+                await _dbContext.Updateable<ReceiveRecordLog>(receiveRecordLog).ExecuteCommandAsync();
+            }
         }
     }
 }

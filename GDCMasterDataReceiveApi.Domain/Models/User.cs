@@ -127,10 +127,12 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// <summary>
         ///  扩展字段 1
         /// </summary>
+        [SugarColumn(Length =1024)]
         public string? ATTRIBUTE1 { get; set; }
         /// <summary>
         ///  扩展字段 2
         /// </summary>
+        
         public string? ATTRIBUTE2 { get; set; }
         /// <summary>
         ///  扩展字段3
