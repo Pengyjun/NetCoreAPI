@@ -297,7 +297,7 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// <summary>
         /// 曾用名列表
         /// </summary>
-        // [SugarColumn(IsIgnore = true)]
+        [SugarColumn(IsIgnore = true)]
          public List<ZMDGS_OLDNAME>? ZOLDNAME_LIST { get; set; }
     }
     /// <summary>
