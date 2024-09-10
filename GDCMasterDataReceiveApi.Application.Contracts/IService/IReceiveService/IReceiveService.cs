@@ -6,8 +6,13 @@ using GDCMasterDataReceiveApi.Application.Contracts.Dto.CountryContinent;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.CountryRegion;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.Currency;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.FinancialInstitution;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.DeviceClassCode;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.InvoiceType;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.Language;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.Project;
 using GDCMasterDataReceiveApi.Domain.Models;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.RoomNumber;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.ScientifiCNoProject;
 using GDCMasterDataReceiveApi.Domain.Shared;
 using GDCMasterDataReceiveApi.Domain.Shared.Annotation;
 
@@ -73,7 +78,7 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.IService.IReceiveService
         /// 物资设备分类编码
         /// </summary>
         /// <returns></returns>
-        Task<MDMResponseResult> DeviceClassCodeDataAsync();
+        Task<MDMResponseResult> DeviceClassCodeDataAsync(BaseReceiveDataRequestDto<DeviceClassCodeItem> receiveDataMDMRequestDto);
         /// <summary>
         /// 核算部门
         /// </summary>
@@ -103,7 +108,7 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.IService.IReceiveService
         /// 发票类型
         /// </summary>
         /// <returns></returns>
-        Task<MDMResponseResult> InvoiceTypeDataAsync();
+        Task<MDMResponseResult> InvoiceTypeDataAsync(BaseReceiveDataRequestDto<InvoiceTypeItem> receiveDataMDMRequestDto);
         /// <summary>
         /// 币种
         /// </summary>
@@ -123,7 +128,7 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.IService.IReceiveService
         /// 科研项目
         /// </summary>
         /// <returns></returns>
-        Task<MDMResponseResult> ScientifiCNoProjectDataAsync();
+        Task<MDMResponseResult> ScientifiCNoProjectDataAsync(BaseReceiveDataRequestDto<ScientifiCNoProjectItem> receiveDataMDMRequestDto);
         /// <summary>
         /// 商机项目(不含境外商机项目)
         /// </summary>
@@ -148,7 +153,7 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.IService.IReceiveService
         /// 房号
         /// </summary>
         /// <returns></returns>
-        Task<MDMResponseResult> RoomNumberDataAsync();
+        Task<MDMResponseResult> RoomNumberDataAsync(BaseReceiveDataRequestDto<RoomNumberItem> receiveDataMDMRequestDto);
         /// <summary>
         /// 境内行政区划
         /// </summary>
@@ -158,7 +163,7 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.IService.IReceiveService
         /// 语言语种
         /// </summary>
         /// <returns></returns>
-        Task<MDMResponseResult> LanguageDataAsync();
+        Task<MDMResponseResult> LanguageDataAsync(BaseReceiveDataRequestDto<LanguageItem> receiveDataMDMRequestDto);
         /// <summary>
         /// 物资设备明细编码
         /// </summary>

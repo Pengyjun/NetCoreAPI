@@ -4,14 +4,44 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.CountryRegion
 {
     #region 后台管理使用
     /// <summary>
-    /// 国家地区 反显
+    /// 国家地区列表 反显
     /// </summary>
-    public class CountryRegionDto
+    public class CountryRegionSearchDto
     {
         /// <summary>
         /// 主键id
         /// </summary>
-        public long Id { get; set; }
+        public string Id { get; set; }
+        /// <summary>
+        /// 国家地区代码
+        /// </summary>
+        public string Country { get; set; }
+        /// <summary>
+        /// 中文名称
+        /// </summary>
+        public string Name { get; set; }
+        /// <summary>
+        /// 英文名称
+        /// </summary>
+        public string? NameEnglish { get; set; }
+        /// <summary>
+        /// 国标三字符代码
+        /// </summary>
+        public string? NationalCode { get; set; }
+        /// <summary>
+        /// 国标数字代码
+        /// </summary>
+        public string? DigitCode { get; set; }
+        /// <summary>
+        /// 状态:1是已启用，0是已停用
+        /// </summary>
+        public string State { get; set; }
+    }
+    /// <summary>
+    /// 国家地区详情
+    /// </summary>
+    public class CountryRegionDetailsDto
+    {
         /// <summary>
         /// 国家地区代码
         /// </summary>

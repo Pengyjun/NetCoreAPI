@@ -3,12 +3,62 @@
     /// <summary>
     /// 往来单位主数据 反显
     /// </summary>
-    public class CorresUnitDto
+    public class CorresUnitSearchDto
     {
         /// <summary>
         /// 主键id
         /// </summary>
-        public long Id { get; set; }
+        public string Id { get; set; }
+        /// <summary>
+        /// 名称（中文）:往来单位中文名称，境内单位必填
+        /// </summary>
+        public string? Name { get; set; }
+        /// <summary>
+        /// 名称（英文）:往来单位英文名称，境外单位必填，
+        /// </summary>
+        public string? NameEnglish { get; set; }
+        /// <summary>
+        /// 名称（当地语言）:往来单位当地官方语言名称，当地语言为英文时，该属性与名称（英文）填写内容相同，境外单位必填
+        /// </summary>
+        public string? NameInLLanguage { get; set; }
+        /// <summary>
+        /// 往来单位类别:依据组织机构的功能和性质进行的分类
+        /// </summary>
+        public string? CategoryUnit { get; set; }
+        /// <summary>
+        /// 国家/地区:往来单位所在国家/地区
+        /// </summary>
+        public string? Country { get; set; }
+        /// <summary>
+        /// 省:境内单位注册地所在省/直辖市/自治区/特别行政区，境内单位必填
+        /// </summary>
+        public string? Province { get; set; }
+        /// <summary>
+        /// 市:境内单位注册地所在市/地区/自治州/盟，境内单位必填
+        /// </summary>
+        public string? City { get; set; }
+        /// <summary>
+        /// 县:境内单位注册地所在县（自治县、县级市、旗、自治旗、市辖区、林区、特区），境内单位必填
+        /// </summary>
+        public string? County { get; set; }
+        /// <summary>
+        /// 往来单位性质:国资监管维度
+        /// </summary>
+        public string? NatureOfUnit { get; set; }
+        /// <summary>
+        /// 往来单位状态:标记往来单位的启/停用状态01启用/02停用
+        /// </summary>
+        public string? StatusOfUnit { get; set; }
+        /// <summary>
+        /// 往来单位类型:01客户02供应商03分包商
+        /// </summary>
+        public string? TypeOfUnit { get; set; }
+    }
+    /// <summary>
+    /// 往来单位详情
+    /// </summary>
+    public class CorresUnitDetailsDto
+    {
         /// <summary>
         /// 往来单位主数据编码:公司往来单位的唯一编码
         /// </summary>
@@ -98,10 +148,6 @@
         /// </summary>
         public string? NatureOfUnit { get; set; }
         /// <summary>
-        /// 往来单位状态:标记往来单位的启/停用状态01启用/02停用
-        /// </summary>
-        public string? ZBPSTAStatusOfUnitTE { get; set; }
-        /// <summary>
         /// 来源系统:记录数据来源系统
         /// </summary>
         public string? SourceSystem { get; set; }
@@ -129,6 +175,10 @@
         /// 所属二级单位:记录数据最后修改人的所属二级单位
         /// </summary>
         public string? UnitSec { get; set; }
+        /// <summary>
+        /// 往来单位状态:标记往来单位的启/停用状态01启用/02停用
+        /// </summary>
+        public string? StatusOfUnit { get; set; }
     }
     /// <summary>
     /// 往来单位主数据 接收

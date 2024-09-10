@@ -55,24 +55,24 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.DeviceClassCode
     /// <summary>
     /// 物资设备分类编码 接收
     /// </summary>
-    public class DeviceClassCodeReceiveDto
+    public class DeviceClassCodeItem
     {
         /// <summary>
         /// 发送记录ID 发送记录的ID，必须保证此ID在同一个发送批次中是唯一的。用于记录发送方对于此发送记录的唯一标识。
         /// </summary>
-        public string ZZSERIAL { get; set; }
+        public string? ZZSERIAL { get; set; }
         /// <summary>
         /// 分类编码: 分类的唯一性编码
         /// </summary>
-        public string ZCLASS { get; set; }
+        public string? ZCLASS { get; set; }
         /// <summary>
         /// 分类层级: 该分类名称对应的层级。分为1至4级。
         /// </summary>
-        public string ZCLEVEL { get; set; }
+        public string? ZCLEVEL { get; set; }
         /// <summary>
         /// 分类名称: 分类的唯一性编码
         /// </summary>
-        public string ZCNAME { get; set; }
+        public string? ZCNAME { get; set; }
         /// <summary>
         /// 分类别名:
         /// </summary>

@@ -3,12 +3,58 @@
     /// <summary>
     /// 金融机构 反显
     /// </summary>
-    public class FinancialInstitutionDto
+    public class FinancialInstitutionSearchDto
     {
         /// <summary>
         /// 主键id
         /// </summary>
-        public long Id { get; set; }
+        public string Id { get; set; }
+        /// <summary>
+        /// 总行名称:开户行总行的名称，若金融机构类型为“银行业存款类金融机构”则该字段为必填项
+        /// </summary>
+        public string? Name { get; set; }
+        /// <summary>
+        /// 国家/地区:该金融机构所在的国家/地区
+        /// </summary>
+        public string Country { get; set; }
+        /// <summary>
+        /// 省:该金融机构所在的省份/直辖市/自治区/特别行政区，境内金融机构必
+        /// </summary>
+        public string? Province { get; set; }
+        /// <summary>
+        /// 市 :该金融机构所在的市/地区/自治州/盟，境内金融机构必填
+        /// </summary>
+        public string? City { get; set; }
+        /// <summary>
+        /// 县 :该金融机构所在的县（自治县、县级市、旗、自治旗、市辖区、林区、特区），境内金融机构必填
+        /// </summary>
+        public string? County { get; set; }
+        /// <summary>
+        /// 境内金融机构类型:该金融机构所属类型，境内金融机构必填
+        /// </summary>
+        public string? TypesOfOrg { get; set; }
+        /// <summary>
+        /// 金融机构名称:该金融机构的全称
+        /// </summary>
+        public string NameOfOrg { get; set; }
+        /// <summary>
+        /// 英文名称:该金融机构的英文名称
+        /// </summary>
+        public string? EnglishName { get; set; }
+        /// <summary>
+        /// 境外金融机构类型:该金融机构所属类型，境外金融机构必填
+        /// </summary>
+        public string? TypesOfAbroadOrg { get; set; }
+        /// <summary>
+        /// 状态:数据是否有效的标识:有效：1无效：0
+        /// </summary>
+        public string State { get; set; }
+    }
+    /// <summary>
+    /// 金融机构详情
+    /// </summary>
+    public class FinancialInstitutionDetailsDto
+    {
         /// <summary>
         /// 金融机构主数据编码:金融机构的唯一编码标识
         /// </summary>

@@ -75,7 +75,7 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.ScientifiCNoProject
     /// <summary>
     /// 科研项目信息 接收
     /// </summary>
-    public class ScientifiCNoProjectReceiveDto
+    public class ScientifiCNoProjectItem
     {
         /// <summary>
         /// 发送记录ID 发送记录的ID，必须保证此ID在同一个发送批次中是唯一的。用于记录发送方对于此发送记录的唯一标识。

@@ -49,11 +49,11 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// </summary>
         [SugarColumn(Length = 1, ColumnName = "DataIdentifier")]
         public string ZDELETE { get; set; }
-        /// <summary>
-        /// 多语言描述表类型
-        /// </summary>
-        [SugarColumn(IsIgnore = true)]
-        public List<ZMDGS_ZLANG5>? ZLANG_LIST { get; set; }
+        ///// <summary>
+        ///// 多语言描述表类型
+        ///// </summary>
+        //[SugarColumn(IsIgnore = true)]
+        //public List<ZMDGS_ZLANG5>? ZLANG_LIST { get; set; }
     }
     /// <summary>
     /// 多语言描述表类型

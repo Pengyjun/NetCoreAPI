@@ -5,12 +5,34 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.CountryContinent
     /// <summary>
     /// 大洲  反显
     /// </summary>
-    public class CountryContinentDto
+    public class CountryContinentSearchDto
     {
         /// <summary>
         /// 主键id
         /// </summary>
-        public long Id { get; set; }
+        public string Id { get; set; }
+        /// <summary>
+        /// 大洲代码：大洲代码
+        /// </summary>
+        public string ContinentCode { get; set; }
+        /// <summary>
+        /// 大洲名称：大洲名称
+        /// </summary>
+        public string Name { get; set; }
+        /// <summary>
+        /// 区域描述：区域描述
+        /// </summary>
+        public string RegionalDescr { get; set; }
+        /// <summary>
+        /// 状态：数据是否有效的标识:有效：1无效：0
+        /// </summary>
+        public string State { get; set; }
+    }
+    /// <summary>
+    /// 大洲详情
+    /// </summary>
+    public class CountryContinentDetailsDto
+    {
         /// <summary>
         /// 大洲代码：大洲代码
         /// </summary>
