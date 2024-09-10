@@ -35,7 +35,7 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.InvoiceType
     /// <summary>
     /// 发票类型 接收
     /// </summary>
-    public class InvoiceTypeReceiveDto
+    public class InvoiceTypeItem
     {
         /// <summary>
         /// 发送记录ID 发送记录的ID，必须保证此ID在同一个发送批次中是唯一的。用于记录发送方对于此发送记录的唯一标识。
@@ -61,9 +61,9 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.InvoiceType
         /// 是否删除 数据是否有效的标识:有效：1无效：0
         /// </summary>
         public string ZDELETE { get; set; }
-        /// <summary>
-        /// 多语言描述表类型
-        /// </summary>
-        public List<ZMDGS_ZLANG5>? ZLANG_LIST { get; set; }
+        ///// <summary>
+        ///// 多语言描述表类型
+        ///// </summary>
+        //public List<ZMDGS_ZLANG5>? ZLANG_LIST { get; set; }
     }
 }

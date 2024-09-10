@@ -5,7 +5,12 @@ using GDCMasterDataReceiveApi.Application.Contracts.Dto._4A.Institution;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto._4A.User;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.CountryRegion;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.Currency;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.DeviceClassCode;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.InvoiceType;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.Language;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.Project;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.RoomNumber;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.ScientifiCNoProject;
 using GDCMasterDataReceiveApi.Application.Contracts.IService.IReceiveService;
 using GDCMasterDataReceiveApi.Domain.Models;
 using GDCMasterDataReceiveApi.Domain.Shared;
@@ -14,7 +19,6 @@ using GDCMasterDataReceiveApi.Domain.Shared.Enums;
 using GDCMasterDataReceiveApi.Domain.Shared.Utils;
 using Microsoft.Extensions.Logging;
 using SqlSugar;
-using System.Drawing.Drawing2D;
 using UtilsSharp;
 
 namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
@@ -26,17 +30,22 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
     {
         private readonly ISqlSugarClient _dbContext;
         private readonly IMapper _mapper;
-        private readonly ILogger<ReceiveService>  logger;
-        private readonly IBaseService  baseService;
+        private readonly ILogger<ReceiveService> logger;
+        private readonly IBaseService baseService;
         /// <summary>
         /// 注入上下文
         /// </summary>
+        /// <param name="dbContext"></param>
+        /// <param name="mapper"></param>
+        /// <param name="logger"></param>
+        /// <param name="baseService"></param>
         public ReceiveService(ISqlSugarClient dbContext, IMapper mapper, ILogger<ReceiveService> logger, IBaseService baseService)
         {
             this._dbContext = dbContext;
             this._mapper = mapper;
             this.logger = logger;
-            this.baseService = baseService;
+           this.baseService = baseService;
+            
         }
         /// <summary>
         /// 获取通用字典数据
@@ -186,11 +195,84 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
         /// 物资设备分类编码
         /// </summary>
         /// <returns></returns>
-        public async Task<MDMResponseResult> DeviceClassCodeDataAsync()
+        public async Task<MDMResponseResult> DeviceClassCodeDataAsync(BaseReceiveDataRequestDto<DeviceClassCodeItem> receiveDataMDMRequestDto)
         {
+            MDMResponseResult responseAjaxResult = new MDMResponseResult();
+            #region 记录日志
+            var receiceRecordId = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
+            ReceiveRecordLog receiveRecordLog = new ReceiveRecordLog()
+            {
+                Id = receiceRecordId,
+                ReceiveType = ReceiveDataType.ClassDevice,
+                RequestParame = receiveDataMDMRequestDto.IT_DATA.item.ToJson(),
+                ReceiveNumber = receiveDataMDMRequestDto.IT_DATA.item.Count,
+            };
+            await baseService.ReceiveRecordLogAsync(receiveRecordLog, DataOperationType.Insert);
+            #endregion
+            try
+            {
+                var dCList = _mapper.Map<List<DeviceClassCodeItem>, List<DeviceClassCode>>(receiveDataMDMRequestDto.IT_DATA.item);
+                foreach (var item in dCList)
+                {
+                    item.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
+                }
+                var deviceCodes = await _dbContext.Queryable<DeviceClassCode>().Where(x => x.IsDelete == 1).Select(x => x.ZCLASS).ToListAsync();
+                var insertOids = dCList.Where(x => !deviceCodes.Contains(x.ZCLASS)).Select(x => x.ZCLASS).ToList();
+                var updateOids = dCList.Where(x => deviceCodes.Contains(x.ZCLASS)).Select(x => x.ZCLASS).ToList();
 
-            var responseAjaxResult = new MDMResponseResult();
-            responseAjaxResult.Success();
+                ////属性
+                //var dcIds = await _dbContext.Queryable<DeviceClassAttribute>().Where(x => x.IsDelete == 1).Select(x => x.DCId).ToListAsync();
+                //var insertDCIds = dCList.Where(x => !deviceCodes.Contains(x.ZCLASS)).Select(x => x.Id).Where(x => !dcIds.Contains(x)).Select(x => x).ToList();
+                //var updateDCIds = dCList.Where(x => deviceCodes.Contains(x.ZCLASS)).Select(x => x.Id).Where(x => dcIds.Contains(x)).Select(x => x).ToList();
+
+                ////属性值
+                //var dcVIds = await _dbContext.Queryable<DeviceClassAttributeValue>().Where(x => x.IsDelete == 1).Select(x => x.DCId).ToListAsync();
+                //var insertDCVIds = dCList.Where(x => !deviceCodes.Contains(x.ZCLASS)).Select(x => x.Id).Where(x => !dcIds.Contains(x)).Select(x => x).ToList();
+                //var updateDCVIds = dCList.Where(x => deviceCodes.Contains(x.ZCLASS)).Select(x => x.Id).Where(x => dcIds.Contains(x)).Select(x => x).ToList();
+
+                if (insertOids.Any())
+                {
+                    //插入操作
+                    var batchData = dCList.Where(x => insertOids.Contains(x.ZCLASS)).ToList();
+                    await _dbContext.Fastest<DeviceClassCode>().BulkCopyAsync(batchData);
+                }
+                if (updateOids.Any())
+                {
+                    //更新操作
+                    var batchData = dCList.Where(x => updateOids.Contains(x.ZCLASS)).ToList();
+                    await _dbContext.Fastest<DeviceClassCode>().BulkUpdateAsync(batchData);
+                }
+                //if (insertDCIds.Any())
+                //{
+
+                //}
+                //if (updateDCIds.Any())
+                //{
+
+                //}
+
+                //if (insertDCVIds.Any())
+                //{
+
+                //}
+                //if (updateDCVIds.Any())
+                //{
+
+                //}
+
+                responseAjaxResult.Success();
+            }
+            catch (Exception ex)
+            {
+                responseAjaxResult.Fail();
+                #region 更新记录日志
+                receiveRecordLog.FailNumber = receiveDataMDMRequestDto.IT_DATA.item.Count;
+                receiveRecordLog.FailMessage = ex.ToString();
+                receiveRecordLog.FailData = receiveDataMDMRequestDto.IT_DATA.item.ToJson();
+                await baseService.ReceiveRecordLogAsync(receiveRecordLog, DataOperationType.Update);
+                #endregion
+            }
+
             return responseAjaxResult;
         }
         /// <summary>
@@ -252,11 +334,55 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
         /// 发票类型
         /// </summary>
         /// <returns></returns>
-        public async Task<MDMResponseResult> InvoiceTypeDataAsync()
+        public async Task<MDMResponseResult> InvoiceTypeDataAsync(BaseReceiveDataRequestDto<InvoiceTypeItem> receiveDataMDMRequestDto)
         {
+            MDMResponseResult responseAjaxResult = new MDMResponseResult();
+            #region 记录日志
+            var receiceRecordId = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
+            ReceiveRecordLog receiveRecordLog = new ReceiveRecordLog()
+            {
+                Id = receiceRecordId,
+                ReceiveType = ReceiveDataType.Invoice,
+                RequestParame = receiveDataMDMRequestDto.IT_DATA.item.ToJson(),
+                ReceiveNumber = receiveDataMDMRequestDto.IT_DATA.item.Count,
+            };
+            await baseService.ReceiveRecordLogAsync(receiveRecordLog, DataOperationType.Insert);
+            #endregion
+            try
+            {
+                var invoiceList = _mapper.Map<List<InvoiceTypeItem>, List<InvoiceType>>(receiveDataMDMRequestDto.IT_DATA.item);
+                foreach (var item in invoiceList)
+                {
+                    item.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
+                }
+                var invoiceCodes = await _dbContext.Queryable<InvoiceType>().Where(x => x.IsDelete == 1).Select(x => x.ZINVTCODE).ToListAsync();
+                var insertOids = invoiceList.Where(x => !invoiceCodes.Contains(x.ZINVTCODE)).Select(x => x.ZINVTCODE).ToList();
+                var updateOids = invoiceList.Where(x => invoiceCodes.Contains(x.ZINVTCODE)).Select(x => x.ZINVTCODE).ToList();
 
-            var responseAjaxResult = new MDMResponseResult();
-            responseAjaxResult.Success();
+                if (insertOids.Any())
+                {
+                    //插入操作
+                    var batchData = invoiceList.Where(x => insertOids.Contains(x.ZINVTCODE)).ToList();
+                    await _dbContext.Fastest<InvoiceType>().BulkCopyAsync(batchData);
+                }
+                if (updateOids.Any())
+                {
+                    //更新操作
+                    var batchData = invoiceList.Where(x => updateOids.Contains(x.ZINVTCODE)).ToList();
+                    await _dbContext.Fastest<InvoiceType>().BulkUpdateAsync(batchData);
+                }
+                responseAjaxResult.Success();
+            }
+            catch (Exception ex)
+            {
+                responseAjaxResult.Fail();
+                #region 更新记录日志
+                receiveRecordLog.FailNumber = receiveDataMDMRequestDto.IT_DATA.item.Count;
+                receiveRecordLog.FailMessage = ex.ToString();
+                receiveRecordLog.FailData = receiveDataMDMRequestDto.IT_DATA.item.ToJson();
+                await baseService.ReceiveRecordLogAsync(receiveRecordLog, DataOperationType.Update);
+                #endregion
+            }
             return responseAjaxResult;
         }
         /// <summary>
@@ -294,7 +420,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
             ReceiveRecordLog receiveRecordLog = new ReceiveRecordLog()
             {
                 Id = receiceRecordId,
-                ReceiveType = ReceiveDataType.Person,
+                ReceiveType = ReceiveDataType.Project,
                 RequestParame = receiveDataMDMRequestDto.IT_DATA.item.ToJson(),
                 ReceiveNumber = receiveDataMDMRequestDto.IT_DATA.item.Count,
             };
@@ -341,11 +467,55 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
         /// 科研项目
         /// </summary>
         /// <returns></returns>
-        public async Task<MDMResponseResult> ScientifiCNoProjectDataAsync()
+        public async Task<MDMResponseResult> ScientifiCNoProjectDataAsync(BaseReceiveDataRequestDto<ScientifiCNoProjectItem> receiveDataMDMRequestDto)
         {
+            MDMResponseResult responseAjaxResult = new MDMResponseResult();
+            #region 记录日志
+            var receiceRecordId = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
+            ReceiveRecordLog receiveRecordLog = new ReceiveRecordLog()
+            {
+                Id = receiceRecordId,
+                ReceiveType = ReceiveDataType.Rcientific,
+                RequestParame = receiveDataMDMRequestDto.IT_DATA.item.ToJson(),
+                ReceiveNumber = receiveDataMDMRequestDto.IT_DATA.item.Count,
+            };
+            await baseService.ReceiveRecordLogAsync(receiveRecordLog, DataOperationType.Insert);
+            #endregion
+            try
+            {
+                var invoiceList = _mapper.Map<List<ScientifiCNoProjectItem>, List<ScientifiCNoProject>>(receiveDataMDMRequestDto.IT_DATA.item);
+                foreach (var item in invoiceList)
+                {
+                    item.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
+                }
+                var invoiceCodes = await _dbContext.Queryable<ScientifiCNoProject>().Where(x => x.IsDelete == 1).Select(x => x.ZSRP).ToListAsync();
+                var insertOids = invoiceList.Where(x => !invoiceCodes.Contains(x.ZSRP)).Select(x => x.ZSRP).ToList();
+                var updateOids = invoiceList.Where(x => invoiceCodes.Contains(x.ZSRP)).Select(x => x.ZSRP).ToList();
 
-            var responseAjaxResult = new MDMResponseResult();
-            responseAjaxResult.Success();
+                if (insertOids.Any())
+                {
+                    //插入操作
+                    var batchData = invoiceList.Where(x => insertOids.Contains(x.ZSRP)).ToList();
+                    await _dbContext.Fastest<ScientifiCNoProject>().BulkCopyAsync(batchData);
+                }
+                if (updateOids.Any())
+                {
+                    //更新操作
+                    var batchData = invoiceList.Where(x => updateOids.Contains(x.ZSRP)).ToList();
+                    await _dbContext.Fastest<ScientifiCNoProject>().BulkUpdateAsync(batchData);
+                }
+                responseAjaxResult.Success();
+            }
+            catch (Exception ex)
+            {
+                responseAjaxResult.Fail();
+                #region 更新记录日志
+                receiveRecordLog.FailNumber = receiveDataMDMRequestDto.IT_DATA.item.Count;
+                receiveRecordLog.FailMessage = ex.ToString();
+                receiveRecordLog.FailData = receiveDataMDMRequestDto.IT_DATA.item.ToJson();
+                await baseService.ReceiveRecordLogAsync(receiveRecordLog, DataOperationType.Update);
+                #endregion
+            }
             return responseAjaxResult;
         }
         /// <summary>
@@ -414,11 +584,55 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
         /// 房号
         /// </summary>
         /// <returns></returns>
-        public async Task<MDMResponseResult> RoomNumberDataAsync()
+        public async Task<MDMResponseResult> RoomNumberDataAsync(BaseReceiveDataRequestDto<RoomNumberItem> receiveDataMDMRequestDto)
         {
+            MDMResponseResult responseAjaxResult = new MDMResponseResult();
+            #region 记录日志
+            var receiceRecordId = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
+            ReceiveRecordLog receiveRecordLog = new ReceiveRecordLog()
+            {
+                Id = receiceRecordId,
+                ReceiveType = ReceiveDataType.Room,
+                RequestParame = receiveDataMDMRequestDto.IT_DATA.item.ToJson(),
+                ReceiveNumber = receiveDataMDMRequestDto.IT_DATA.item.Count,
+            };
+            await baseService.ReceiveRecordLogAsync(receiveRecordLog, DataOperationType.Insert);
+            #endregion
+            try
+            {
+                var invoiceList = _mapper.Map<List<RoomNumberItem>, List<RoomNumber>>(receiveDataMDMRequestDto.IT_DATA.item);
+                foreach (var item in invoiceList)
+                {
+                    item.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
+                }
+                var invoiceCodes = await _dbContext.Queryable<RoomNumber>().Where(x => x.IsDelete == 1).Select(x => x.ZROOM).ToListAsync();
+                var insertOids = invoiceList.Where(x => !invoiceCodes.Contains(x.ZROOM)).Select(x => x.ZROOM).ToList();
+                var updateOids = invoiceList.Where(x => invoiceCodes.Contains(x.ZROOM)).Select(x => x.ZROOM).ToList();
 
-            var responseAjaxResult = new MDMResponseResult();
-            responseAjaxResult.Success();
+                if (insertOids.Any())
+                {
+                    //插入操作
+                    var batchData = invoiceList.Where(x => insertOids.Contains(x.ZROOM)).ToList();
+                    await _dbContext.Fastest<RoomNumber>().BulkCopyAsync(batchData);
+                }
+                if (updateOids.Any())
+                {
+                    //更新操作
+                    var batchData = invoiceList.Where(x => updateOids.Contains(x.ZROOM)).ToList();
+                    await _dbContext.Fastest<RoomNumber>().BulkUpdateAsync(batchData);
+                }
+                responseAjaxResult.Success();
+            }
+            catch (Exception ex)
+            {
+                responseAjaxResult.Fail();
+                #region 更新记录日志
+                receiveRecordLog.FailNumber = receiveDataMDMRequestDto.IT_DATA.item.Count;
+                receiveRecordLog.FailMessage = ex.ToString();
+                receiveRecordLog.FailData = receiveDataMDMRequestDto.IT_DATA.item.ToJson();
+                await baseService.ReceiveRecordLogAsync(receiveRecordLog, DataOperationType.Update);
+                #endregion
+            }
             return responseAjaxResult;
         }
         /// <summary>
@@ -436,11 +650,55 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
         /// 语言语种
         /// </summary>
         /// <returns></returns>
-        public async Task<MDMResponseResult> LanguageDataAsync()
+        public async Task<MDMResponseResult> LanguageDataAsync(BaseReceiveDataRequestDto<LanguageItem> receiveDataMDMRequestDto)
         {
+            MDMResponseResult responseAjaxResult = new MDMResponseResult();
+            #region 记录日志
+            var receiceRecordId = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
+            ReceiveRecordLog receiveRecordLog = new ReceiveRecordLog()
+            {
+                Id = receiceRecordId,
+                ReceiveType = ReceiveDataType.Language,
+                RequestParame = receiveDataMDMRequestDto.IT_DATA.item.ToJson(),
+                ReceiveNumber = receiveDataMDMRequestDto.IT_DATA.item.Count,
+            };
+            await baseService.ReceiveRecordLogAsync(receiveRecordLog, DataOperationType.Insert);
+            #endregion
+            try
+            {
+                var invoiceList = _mapper.Map<List<LanguageItem>, List<Language>>(receiveDataMDMRequestDto.IT_DATA.item);
+                foreach (var item in invoiceList)
+                {
+                    item.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
+                }
+                var invoiceCodes = await _dbContext.Queryable<Language>().Where(x => x.IsDelete == 1).Select(x => x.ZLANG_TER).ToListAsync();
+                var insertOids = invoiceList.Where(x => !invoiceCodes.Contains(x.ZLANG_TER)).Select(x => x.ZLANG_TER).ToList();
+                var updateOids = invoiceList.Where(x => invoiceCodes.Contains(x.ZLANG_TER)).Select(x => x.ZLANG_TER).ToList();
 
-            var responseAjaxResult = new MDMResponseResult();
-            responseAjaxResult.Success();
+                if (insertOids.Any())
+                {
+                    //插入操作
+                    var batchData = invoiceList.Where(x => insertOids.Contains(x.ZLANG_TER)).ToList();
+                    await _dbContext.Fastest<Language>().BulkCopyAsync(batchData);
+                }
+                if (updateOids.Any())
+                {
+                    //更新操作
+                    var batchData = invoiceList.Where(x => updateOids.Contains(x.ZLANG_TER)).ToList();
+                    await _dbContext.Fastest<Language>().BulkUpdateAsync(batchData);
+                }
+                responseAjaxResult.Success();
+            }
+            catch (Exception ex)
+            {
+                responseAjaxResult.Fail();
+                #region 更新记录日志
+                receiveRecordLog.FailNumber = receiveDataMDMRequestDto.IT_DATA.item.Count;
+                receiveRecordLog.FailMessage = ex.ToString();
+                receiveRecordLog.FailData = receiveDataMDMRequestDto.IT_DATA.item.ToJson();
+                await baseService.ReceiveRecordLogAsync(receiveRecordLog, DataOperationType.Update);
+                #endregion
+            }
             return responseAjaxResult;
         }
         /// <summary>
@@ -485,8 +743,8 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
             #endregion
             try
             {
-              
-               await _dbContext.Insertable(receiveRecordLog).ExecuteCommandAsync();
+
+                await _dbContext.Insertable(receiveRecordLog).ExecuteCommandAsync();
                 //创建用户
                 if (receiveUserRequestDto.OP_TYPE != null && receiveUserRequestDto.OP_TYPE.ToUpper() == "CREATE")
                 {
@@ -497,7 +755,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
                         user.Enable = 1;
                         user.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
                         await _dbContext.Insertable<User>(user).ExecuteCommandAsync();
-                      
+
                         responseAjaxResult.Success();
                     }
                     else
@@ -526,7 +784,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
                     {
                         var user = _mapper.Map<User>(receiveUserRequestDto.user);
                         await _dbContext.Updateable<User>(user).Where(x => x.EMP_CODE == isExistUser.EMP_CODE).IgnoreColumns(x => x.Id).ExecuteCommandAsync();
-                        responseAjaxResult.Success(); 
+                        responseAjaxResult.Success();
                         return responseAjaxResult;
                     }
                     //禁用
@@ -538,7 +796,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
                     else if (receiveUserRequestDto.OP_TYPE != null && receiveUserRequestDto.OP_TYPE.ToUpper() == "ENABLE")
                     {
                         isExistUser.Enable = 1;
-                    } 
+                    }
 
                     await _dbContext.Updateable<User>(isExistUser).Where(x => x.EMP_CODE == isExistUser.EMP_CODE).IgnoreColumns(x => x.Id).ExecuteCommandAsync();
                     responseAjaxResult.Success();
@@ -563,7 +821,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
         /// <returns></returns>
         public async Task<MDMResponseResult> InstitutionDataAsync(ReceiveInstitutionRequestDto receiveInstitutionRequestDto)
         {
-            
+
             var responseAjaxResult = new MDMResponseResult();
             #region 记录日志
             var receiceRecordId = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
@@ -584,8 +842,8 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
                     item.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
                 }
                 var institutiontOids = await _dbContext.Queryable<Institution>().Where(x => x.IsDelete == 1).Select(x => x.OID).ToListAsync();
-                var insertOids = institutions.Where(x =>!institutiontOids.Contains(x.OID)).Select(x=>x.OID).ToList();
-                var updateOids = institutions.Where(x =>institutiontOids.Contains(x.OID)).Select(x => x.OID).ToList();
+                var insertOids = institutions.Where(x => !institutiontOids.Contains(x.OID)).Select(x => x.OID).ToList();
+                var updateOids = institutions.Where(x => institutiontOids.Contains(x.OID)).Select(x => x.OID).ToList();
                 if (insertOids.Any())
                 {
                     //插入操作
