@@ -1,12 +1,16 @@
 ﻿using GDCMasterDataReceiveApi.Application.Contracts.Dto;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto._4A.Institution;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto._4A.User;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.CorresUnit;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.CountryContinent;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.CountryRegion;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.Currency;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.FinancialInstitution;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.DeviceClassCode;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.InvoiceType;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.Language;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.Project;
+using GDCMasterDataReceiveApi.Domain.Models;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.RoomNumber;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.ScientifiCNoProject;
 using GDCMasterDataReceiveApi.Domain.Shared;
@@ -29,7 +33,7 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.IService.IReceiveService
         /// 往来单位主数据
         /// </summary>
         /// <returns></returns>
-        Task<MDMResponseResult> CorresUnitDataAsync();
+        Task<MDMResponseResult> CorresUnitDataAsync(BaseReceiveDataRequestDto<CorresUnitReceiveDto> baseReceiveDataRequestDto);
         /// <summary>
         /// 多组织-税务代管组织(行政)
         /// </summary>
@@ -44,12 +48,12 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.IService.IReceiveService
         /// 国家地区
         /// </summary>
         /// <returns></returns>
-        Task<ResponseAjaxResult<ResponseResult>> CountryRegionDataAsync(RequestResult<CountryRegionReceiveDto> requestDto);
+        Task<MDMResponseResult> CountryRegionDataAsync(BaseReceiveDataRequestDto<CountryRegionReceiveDto> baseReceiveDataRequestDto);
         /// <summary>
         /// 大洲
         /// </summary>
         /// <returns></returns>
-        Task<MDMResponseResult> CountryContinentDataAsync();
+        Task<MDMResponseResult> CountryContinentDataAsync(BaseReceiveDataRequestDto<CountryContinentReceiveDto> baseReceiveDataRequestDto);
         /// <summary>
         /// 中交区域总部
         /// </summary>
@@ -69,7 +73,7 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.IService.IReceiveService
         /// 金融机构
         /// </summary>
         /// <returns></returns>
-        Task<MDMResponseResult> FinancialInstitutionDataAsync();
+        Task<MDMResponseResult> FinancialInstitutionDataAsync(BaseReceiveDataRequestDto<FinancialInstitutionReceiveDto> baseReceiveDataRequestDto);
         /// <summary>
         /// 物资设备分类编码
         /// </summary>

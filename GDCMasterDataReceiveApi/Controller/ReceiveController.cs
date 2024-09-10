@@ -2,15 +2,19 @@
 using GDCMasterDataReceiveApi.Application.Contracts.Dto;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto._4A.Institution;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto._4A.User;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.CorresUnit;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.CountryContinent;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.CountryRegion;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.Currency;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.DeviceClassCode;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.InvoiceType;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.Language;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.FinancialInstitution;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.Project;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.RoomNumber;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.ScientifiCNoProject;
 using GDCMasterDataReceiveApi.Application.Contracts.IService.IReceiveService;
+using GDCMasterDataReceiveApi.Domain.Models;
 using GDCMasterDataReceiveApi.Domain.Shared;
 using GDCMasterDataReceiveApi.Domain.Shared.Annotation;
 using Microsoft.AspNetCore.Authorization;
@@ -44,14 +48,8 @@ namespace GDCMasterDataReceiveApi.Controller
         /// <returns></returns>
         [UnitOfWork]
         [HttpPost("Common")]
-        public async Task<MDMResponseResult> CommonDataAsync() => await _receiveService.CommonDataAsync();
-        /// <summary>
-        /// 往来单位主数据
-        /// </summary>
-        /// <returns></returns>
-        [UnitOfWork]
-        [HttpPost("CorresUnit")]
-        public async Task<MDMResponseResult> CorresUnitDataAsync() => await _receiveService.CorresUnitDataAsync();
+        public Task<MDMResponseResult> CommonDataAsync() => _receiveService.CommonDataAsync();
+       
         /// <summary>
         /// 多组织-税务代管组织(行政)
         /// </summary>
@@ -65,21 +63,9 @@ namespace GDCMasterDataReceiveApi.Controller
         /// <returns></returns>
         [UnitOfWork]
         [HttpPost("BusinessProject")]
-        public async Task<MDMResponseResult> BusinessProjectDataAsync() => await _receiveService.BusinessProjectDataAsync();
-        /// <summary>
-        /// 国家地区
-        /// </summary>
-        /// <returns></returns>
-        [UnitOfWork]
-        [HttpPost("CountryRegion")]
-        public async Task<ResponseAjaxResult<ResponseResult>> CountryRegionDataAsync([FromBody] RequestResult<CountryRegionReceiveDto> requestDto) => await _receiveService.CountryRegionDataAsync(requestDto);
-        /// <summary>
-        /// 大洲
-        /// </summary>
-        /// <returns></returns>
-        [UnitOfWork]
-        [HttpPost("CountryContinent")]
-        public async Task<MDMResponseResult> CountryContinentDataAsync() => await _receiveService.CountryContinentDataAsync();
+        public Task<MDMResponseResult> BusinessProjectDataAsync() => _receiveService.BusinessProjectDataAsync();
+
+
         /// <summary>
         /// 中交区域总部
         /// </summary>
@@ -101,13 +87,6 @@ namespace GDCMasterDataReceiveApi.Controller
         [UnitOfWork]
         [HttpPost("ProjectClassification")]
         public async Task<MDMResponseResult> ProjectClassificationDataAsync() => await _receiveService.ProjectClassificationDataAsync();
-        /// <summary>
-        /// 金融机构
-        /// </summary>
-        /// <returns></returns>
-        [UnitOfWork]
-        [HttpPost("FinancialInstitution")]
-        public async Task<MDMResponseResult> FinancialInstitutionDataAsync() => await _receiveService.FinancialInstitutionDataAsync();
         /// <summary>
         /// 物资设备分类编码
         /// </summary>
@@ -254,6 +233,8 @@ namespace GDCMasterDataReceiveApi.Controller
 
 
         #region 通用字典数据获取(币种  国家地区  大洲  语种   等)
+
+        #region 接收币种数据
         /// <summary>
         /// 接收币种数据
         /// </summary>
@@ -263,16 +244,64 @@ namespace GDCMasterDataReceiveApi.Controller
         public async Task<MDMResponseResult> CurrencyAsync([FromBody] BaseReceiveDataRequestDto<CurrencyReceiveDto> baseReceiveDataRequestDto) => await _receiveService.CurrencyDataAsync(baseReceiveDataRequestDto);
         #endregion
 
+        #region 国家地区
+
+        /// <summary>
+        /// 国家地区
+        /// </summary>
+        /// <returns></returns>
+
+        [HttpPost("CountryRegion")]
+        public async Task<MDMResponseResult> CountryRegionDataAsync([FromBody] BaseReceiveDataRequestDto<CountryRegionReceiveDto> baseReceiveDataRequest) => await _receiveService.CountryRegionDataAsync(baseReceiveDataRequest);
+        #endregion
+
+
+        #region 大洲
+        /// <summary>
+        /// 大洲
+        /// </summary>
+        /// <returns></returns>
+        [UnitOfWork]
+        [HttpPost("CountryContinent")]
+        public async Task<MDMResponseResult> CountryContinentDataAsync(BaseReceiveDataRequestDto<CountryContinentReceiveDto> baseReceiveDataRequestDto) => await _receiveService.CountryContinentDataAsync(baseReceiveDataRequestDto);
+            
+        #endregion
+
+        #endregion
+
         #region 项目主数据
         /// <summary>
         /// 接收项目主数据 
         /// </summary>
         /// <returns></returns>
         [HttpPost("/api/mdm/Receive/Project")]
-        public async Task<MDMResponseResult> ProjectDataAsync([FromBody] BaseReceiveDataRequestDto<ProjectItem> receiveDataMDMRequestDto) => await _receiveService.ProjectDataAsync(receiveDataMDMRequestDto);
+        [UnitOfWork]
+        public async Task<MDMResponseResult> ProjectDataAsync([FromBody] BaseReceiveDataRequestDto<ProjectItem>  receiveDataMDMRequestDto) => await _receiveService.ProjectDataAsync(receiveDataMDMRequestDto);
         #endregion
 
-        #region 接收4A的人员和机构数据
+        #region 金融机构主数据
+        /// <summary>
+        /// 金融机构
+        /// </summary>
+        /// <returns></returns>
+        [UnitOfWork]
+        [HttpPost("FinancialInstitution")]
+        public Task<MDMResponseResult> FinancialInstitutionDataAsync(BaseReceiveDataRequestDto<FinancialInstitutionReceiveDto> baseReceiveDataRequestDto) => _receiveService.FinancialInstitutionDataAsync(baseReceiveDataRequestDto);
+        #endregion
+
+        #region 往来单位主数据
+        /// <summary>
+        /// 往来单位主数据
+        /// </summary>
+        /// <returns></returns>
+        [UnitOfWork]
+        [HttpPost("CorresUnit")]
+        public Task<MDMResponseResult> CorresUnitDataAsync(BaseReceiveDataRequestDto<CorresUnitReceiveDto> baseReceiveDataRequestDto) => _receiveService.CorresUnitDataAsync(baseReceiveDataRequestDto);
+
+
+        #endregion
+
+        #region 接收4A的人员和机构主数据
         /// <summary>
         /// 人员
         /// </summary>
