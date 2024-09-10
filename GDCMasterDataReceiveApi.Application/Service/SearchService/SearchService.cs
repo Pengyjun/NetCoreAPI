@@ -3,6 +3,7 @@ using GDCMasterDataReceiveApi.Application.Contracts;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto._4A.User;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.Institution;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.LouDong;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.Project;
 using GDCMasterDataReceiveApi.Application.Contracts.IService.ISearchService;
 using GDCMasterDataReceiveApi.Domain.Models;
 using GDCMasterDataReceiveApi.Domain.Shared;
@@ -153,6 +154,13 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     UserLogin = u.USER_LOGIN
                 })
                 .FirstAsync();
+
+            //获取机构信息
+            var institutions = await _dbContext.Queryable<Institution>()
+                .Where(t => t.IsDelete == 1)
+                .Select(t => new UInstutionDto { Oid = t.OID, PoId = t.POID, Grule = t.GRULE, Name = t.NAME })
+                .ToListAsync();
+            uDetails.CompanyName = GetUserCompany(uDetails.OfficeDepId, institutions);
 
             responseAjaxResult.SuccessResult(uDetails);
             return responseAjaxResult;
@@ -319,6 +327,123 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                 .FirstAsync();
 
             responseAjaxResult.SuccessResult(insDetails);
+            return responseAjaxResult;
+        }
+        /// <summary>
+        /// 获取项目列表
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        public async Task<ResponseAjaxResult<List<ProjectSearchDto>>> GetProjectSearchAsync(ProjectRequestDto requestDto)
+        {
+            var responseAjaxResult = new ResponseAjaxResult<List<ProjectSearchDto>>();
+            RefAsync<int> total = 0;
+
+            var proList = await _dbContext.Queryable<Project>()
+                .LeftJoin<Institution>((pro, ins) => pro.ZPRO_ORG == ins.OID)
+                .Where((pro, ins) => pro.IsDelete == 1)
+                .Select((pro, ins) => new ProjectSearchDto
+                {
+                    Id = pro.Id.ToString(),
+                    Abbreviation = pro.ZHEREINAFTER,
+                    Country = pro.ZZCOUNTRY,
+                    Currency = pro.ZZCURRENCY,
+                    EngineeringName = pro.ZENG,
+                    ForeignName = pro.ZPROJENAME,
+                    Location = pro.ZPROJLOC,
+                    MDCode = pro.ZPROJECTUP,
+                    Name = pro.ZPROJNAME,
+                    PjectOrg = pro.ZPRO_ORG,
+                    PjectOrgBP = pro.ZPRO_BP,
+                    PlanCompletionDate = pro.ZFINDATE,
+                    PlanStartDate = pro.ZSTARTDATE,
+                    ResolutionTime = pro.ZAPVLDATE,
+                    ResolutionNo = pro.ZAPPROVAL,
+                    State = pro.ZSTATE == "1" ? "有效" : "无效",
+                    Type = pro.ZPROJTYPE,
+                    UnitSec = pro.Z2NDORG,
+                    Year = pro.ZPROJYEAR
+                })
+                .ToPageListAsync(requestDto.PageIndex, requestDto.PageSize, total);
+
+            responseAjaxResult.Count = total;
+            responseAjaxResult.SuccessResult(proList);
+            return responseAjaxResult;
+        }
+        /// <summary>
+        /// 获取项目详情
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<ResponseAjaxResult<ProjectDetailsDto>> GetProjectDetailsAsync(string id)
+        {
+            var responseAjaxResult = new ResponseAjaxResult<ProjectDetailsDto>();
+
+            var result = await _dbContext.Queryable<Project>()
+                .LeftJoin<Institution>((pro, ins) => pro.ZPRO_ORG == ins.OID)
+                .Where((pro, ins) => pro.IsDelete == 1 && pro.Id.ToString() == id)
+                .Select((pro, ins) => new ProjectDetailsDto
+                {
+                    Abbreviation = pro.ZHEREINAFTER,
+                    Country = pro.ZZCOUNTRY,
+                    Currency = pro.ZZCURRENCY,
+                    EngineeringName = pro.ZENG,
+                    ForeignName = pro.ZPROJENAME,
+                    Location = pro.ZPROJLOC,
+                    MDCode = pro.ZPROJECTUP,
+                    Name = pro.ZPROJNAME,
+                    PjectOrg = pro.ZPRO_ORG,
+                    PjectOrgBP = pro.ZPRO_BP,
+                    PlanCompletionDate = pro.ZFINDATE,
+                    PlanStartDate = pro.ZSTARTDATE,
+                    ResolutionTime = pro.ZAPVLDATE,
+                    ResolutionNo = pro.ZAPPROVAL,
+                    State = pro.ZSTATE == "1" ? "有效" : "无效",
+                    Type = pro.ZPROJTYPE,
+                    UnitSec = pro.Z2NDORG,
+                    Year = pro.ZPROJYEAR,
+                    AcquisitionTime = pro.ZLDLOCGT,
+                    Applicant = pro.ZINSURED,
+                    BChangeTime = pro.ZCBR,
+                    BDep = pro.ZBIZDEPT,
+                    BidDisclosureNo = pro.ZAWARDP,
+                    BTypeOfCCCC = pro.ZCPBC,
+                    ConsolidatedTable = pro.ZCS,
+                    CreateDate = pro.ZCREATE_AT,
+                    CustodianName = pro.ZCUSTODIAN,
+                    DueDate = pro.ZLFINDATE,
+                    EndDateOfInsure = pro.ZIFINDATE,
+                    FundEstablishmentDate = pro.ZFSTARTDATE,
+                    FundExpirationDate = pro.ZFFINDATE,
+                    FundManager = pro.ZFUNDMTYPE,
+                    FundMDCode = pro.ZFUND,
+                    FundName = pro.ZFUNDNAME,
+                    FundNo = pro.ZFUNDNO,
+                    FundOrgForm = pro.ZFUNDORGFORM,
+                    Invest = pro.ZINVERSTOR,
+                    IsJoint = pro.ZWINNINGC,
+                    LandTransactionNo = pro.ZLDLOC,
+                    LeaseStartDate = pro.ZLSTARTDATE,
+                    Management = pro.ZMANAGE_MODE,
+                    NameOfInsureOrg = pro.ZINSURANCE,
+                    NameOfLeased = pro.ZLEASESNAME,
+                    OrgMethod = pro.ZPOS,
+                    ParticipateInUnitSecs = pro.ZCY2NDORG,
+                    PolicyNo = pro.ZPOLICYNO,
+                    ReasonForDeactivate = pro.ZSTOPREASON,
+                    ResponsibleParty = pro.ZRESP,
+                    SourceOfIncome = pro.ZSI,
+                    StartDateOfInsure = pro.ZISTARTDATE,
+                    SupMDCode = pro.ZPROJECTUP,
+                    TaxMethod = pro.ZTAXMETHOD,
+                    TenantName = pro.ZLESSEE,
+                    TenantType = pro.ZLESSEETYPE,
+                    TradingSituation = pro.ZTRADER,
+                    WinningBidder = pro.ZAWARDMAI
+                })
+                .FirstAsync();
+
+            responseAjaxResult.SuccessResult(result);
             return responseAjaxResult;
         }
     }

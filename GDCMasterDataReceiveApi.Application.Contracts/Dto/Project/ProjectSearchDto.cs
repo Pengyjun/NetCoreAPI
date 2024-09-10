@@ -1,6 +1,4 @@
-﻿using GDCMasterDataReceiveApi.Domain.Models;
-
-namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.Project
+﻿namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.Project
 {
 
 
@@ -8,12 +6,90 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.Project
     /// <summary>
     /// 项目  反显
     /// </summary>
-    public class ProjectDto
+    public class ProjectSearchDto
     {
         /// <summary>
         /// 主键id
         /// </summary>
-        public long Id { get; set; }
+        public string Id { get; set; }
+        /// <summary>
+        /// 项目主数据编码
+        /// </summary>
+        public string MDCode { get; set; }
+        /// <summary>
+        /// 项目名称
+        /// </summary>
+        public string? Name { get; set; }
+        /// <summary>
+        /// 项目外文名称
+        /// </summary>
+        public string? ForeignName { get; set; }
+        /// <summary>
+        /// 项目类型
+        /// </summary>
+        public string? Type { get; set; }
+        /// <summary>
+        /// 国家/地区
+        /// </summary>
+        public string? Country { get; set; }
+        /// <summary>
+        /// 项目所在地
+        /// </summary>
+        public string? Location { get; set; }
+        /// <summary>
+        /// 项目批复/决议文号
+        /// </summary>
+        public string? ResolutionNo { get; set; }
+        /// <summary>
+        /// 项目批复/决议时间
+        /// </summary>
+        public string? ResolutionTime { get; set; }
+        /// <summary>
+        /// 项目机构
+        /// </summary>
+        public string PjectOrg { get; set; }
+        /// <summary>
+        /// 项目简称
+        /// </summary>
+        public string? Abbreviation { get; set; }
+        /// <summary>
+        /// 项目年份
+        /// </summary>
+        public string? Year { get; set; }
+        /// <summary>
+        /// 项目计划开始日期
+        /// </summary>
+        public string? PlanStartDate { get; set; }
+        /// <summary>
+        /// 项目计划完成日期
+        /// </summary>
+        public string? PlanCompletionDate { get; set; }
+        /// <summary>
+        /// 项目工程名称
+        /// </summary>
+        public string? EngineeringName { get; set; }
+        /// <summary>
+        /// 币种
+        /// </summary>
+        public string? Currency { get; set; }
+        /// <summary>
+        /// 项目机构
+        /// </summary>
+        public string? PjectOrgBP { get; set; }
+        /// <summary>
+        /// 所属二级单位:二级单位组织机构编码OID
+        /// </summary>
+        public string UnitSec { get; set; }
+        /// <summary>
+        /// 状态：数据是否有效的标识:有效：1无效：0
+        /// </summary>
+        public string State { get; set; }
+    }
+    /// <summary>
+    /// 项目详情dto
+    /// </summary>
+    public class ProjectDetailsDto
+    {
         /// <summary>
         /// 项目主数据编码
         /// </summary>
@@ -238,6 +314,7 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.Project
         /// 创建时间：格式：YYYYMMDDHHMMSS
         /// </summary>
         public string CreateDate { get; set; }
+
     }
 
     #endregion
