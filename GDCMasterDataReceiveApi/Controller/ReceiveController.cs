@@ -254,21 +254,18 @@ namespace GDCMasterDataReceiveApi.Controller
         /// </summary>
         /// <param name="baseReceiveDataRequestDto"></param>
         /// <returns></returns>
-        [HttpPost("Currency")]
+        [HttpPost("/api/mdm/Receive/Currency")]
         public async Task<MDMResponseResult> CurrencyAsync([FromBody] BaseReceiveDataRequestDto<CurrencyReceiveDto>  baseReceiveDataRequestDto) => await _receiveService.CurrencyDataAsync(baseReceiveDataRequestDto);
         #endregion
-
 
         #region 项目主数据
         /// <summary>
         /// 接收项目主数据 
         /// </summary>
         /// <returns></returns>
-        [UnitOfWork]
-        [HttpPost("Project")]
+        [HttpPost("/api/mdm/Receive/Project")]
         public async Task<MDMResponseResult> ProjectDataAsync([FromBody] BaseReceiveDataRequestDto<ProjectItem>  receiveDataMDMRequestDto) => await _receiveService.ProjectDataAsync(receiveDataMDMRequestDto);
         #endregion
-
 
         #region 接收4A的人员和机构数据
         /// <summary>
@@ -276,7 +273,7 @@ namespace GDCMasterDataReceiveApi.Controller
         /// </summary>
         /// <param name="receiveUserRequestDto"></param>
         /// <returns></returns>
-        [Route("api/4A/Receive/Person")]
+        [Route("/api/4A/Receive/Person")]
         [HttpPost]
         public async Task<MDMResponseResult> PersonAsync([FromBody] ReceiveUserRequestDto receiveUserRequestDto)
         {
@@ -288,7 +285,7 @@ namespace GDCMasterDataReceiveApi.Controller
         /// </summary>
         /// <param name="receiveInstitutionRequestDto"></param>
         /// <returns></returns>
-        [Route("api/4A/Receive/Institution")]
+        [Route("/api/4A/Receive/Institution")]
         [HttpPost]
         public async Task<MDMResponseResult> InstitutionAsync([FromBody] ReceiveInstitutionRequestDto receiveInstitutionRequestDto)
         {

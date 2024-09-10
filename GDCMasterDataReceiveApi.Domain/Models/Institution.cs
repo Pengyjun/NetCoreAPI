@@ -9,7 +9,7 @@ namespace GDCMasterDataReceiveApi.Domain.Models
     public class Institution : BaseEntity<long>
     {
         /// <summary>
-        /// 主键
+        /// oid
         /// </summary>
         [SugarColumn(Length = 128)]
         public string? OID { get; set; }
@@ -47,7 +47,7 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// <summary>
         /// 机构属性,见7.2.2 字典
         /// </summary>
-        [SugarColumn(Length = 128)]
+        [SugarColumn(Length = 256)]
         public string? TYPE { get; set; }
         /// <summary>
         /// 机构子属性,见7.2.2 字典
@@ -67,12 +67,12 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// <summary>
         /// 机构全称
         /// </summary>
-        [SugarColumn(Length = 128)]
+        [SugarColumn(Length = 256)]
         public string? NAME { get; set; }
         /// <summary>
         /// 机构简称
         /// </summary>
-        [SugarColumn(Length = 128)]
+        [SugarColumn(Length = 256)]
         public string? SHORTNAME { get; set; }
         /// <summary>
         /// 机构编码
@@ -112,7 +112,7 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// <summary>
         /// 备注
         /// </summary>
-        [SugarColumn(Length = 128)]
+        [SugarColumn(Length = 512)]
         public string? NOTE { get; set; }
         /// <summary>
         /// 临时机构名称

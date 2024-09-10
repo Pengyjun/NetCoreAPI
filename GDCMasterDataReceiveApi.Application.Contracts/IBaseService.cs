@@ -1,5 +1,7 @@
-﻿using GDCMasterDataReceiveApi.Domain.Shared;
+﻿using GDCMasterDataReceiveApi.Domain.Models;
+using GDCMasterDataReceiveApi.Domain.Shared;
 using GDCMasterDataReceiveApi.Domain.Shared.Annotation;
+using GDCMasterDataReceiveApi.Domain.Shared.Enums;
 
 namespace GDCMasterDataReceiveApi.Application.Contracts
 {
@@ -32,5 +34,18 @@ namespace GDCMasterDataReceiveApi.Application.Contracts
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
         string GetPropertyNames<T>();
+
+
+
+
+        #region 接收数据记录
+        /// <summary>
+        /// 接收数据记录
+        /// </summary>
+        /// <param name="receiveRecordLog"></param>
+        /// <param name="dataOperationType">操作类型</param>
+        /// <returns></returns>
+        Task ReceiveRecordLogAsync(ReceiveRecordLog receiveRecordLog, DataOperationType dataOperationType);
+        #endregion
     }
 }
