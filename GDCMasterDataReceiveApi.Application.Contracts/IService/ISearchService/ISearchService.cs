@@ -29,12 +29,18 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.IService.ISearchService
         /// </summary>
         /// <param name="uId"></param>
         /// <returns></returns>
-        Task<ResponseAjaxResult<UserSearchOtherColumns>> GetUserDetailsAsync(string uId);
+        Task<ResponseAjaxResult<UserSearchDetailsDto>> GetUserDetailsAsync(string uId);
         /// <summary>
         /// 机构树
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
         Task<ResponseAjaxResult<List<InstitutionDto>>> GetInstitutionAsync(InstitutionRequestDto requestDto);
+        /// <summary>
+        /// 机构详情
+        /// </summary>
+        /// <param name="Id"></param>
+        /// <returns></returns>
+        Task<ResponseAjaxResult<InstitutionDetatilsDto>> GetInstitutionDetailsAsync(string Id);
     }
 }

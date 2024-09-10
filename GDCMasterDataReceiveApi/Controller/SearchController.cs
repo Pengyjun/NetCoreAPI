@@ -64,7 +64,7 @@ namespace GDCMasterDataReceiveApi.Controller
         /// <returns></returns>
         [HttpGet("GetUserDetails")]
         [AllowAnonymous]
-        public async Task<ResponseAjaxResult<UserSearchOtherColumns>> GetUserDetailsAsync([FromQuery] string uId)
+        public async Task<ResponseAjaxResult<UserSearchDetailsDto>> GetUserDetailsAsync([FromQuery] string uId)
         {
             return await _searchService.GetUserDetailsAsync(uId);
         }
@@ -78,6 +78,17 @@ namespace GDCMasterDataReceiveApi.Controller
         public async Task<ResponseAjaxResult<List<InstitutionDto>>> GetInstitutionsAsync([FromQuery] InstitutionRequestDto requestDto)
         {
             return await _searchService.GetInstitutionAsync(requestDto);
+        }
+        /// <summary>
+        /// 获取机构详情
+        /// </summary>
+        /// <param name="Id"></param>
+        /// <returns></returns>
+        [HttpGet("GetInstitutionDetails")]
+        [AllowAnonymous]
+        public async Task<ResponseAjaxResult<InstitutionDetatilsDto>> GetInstitutionDetailsAsync([FromQuery] string Id)
+        {
+            return await _searchService.GetInstitutionDetailsAsync(Id);
         }
     }
 }

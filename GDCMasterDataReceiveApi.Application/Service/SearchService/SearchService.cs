@@ -6,7 +6,6 @@ using GDCMasterDataReceiveApi.Application.Contracts.Dto.LouDong;
 using GDCMasterDataReceiveApi.Application.Contracts.IService.ISearchService;
 using GDCMasterDataReceiveApi.Domain.Models;
 using GDCMasterDataReceiveApi.Domain.Shared;
-using GDCMasterDataReceiveApi.Domain.Shared.Enums;
 using SqlSugar;
 
 namespace GDCMasterDataReceiveApi.Application.Service.SearchService
@@ -100,24 +99,62 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
         /// </summary>
         /// <param name="uId"></param>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<UserSearchOtherColumns>> GetUserDetailsAsync(string uId)
+        public async Task<ResponseAjaxResult<UserSearchDetailsDto>> GetUserDetailsAsync(string uId)
         {
-            var responseAjaxResult = new ResponseAjaxResult<UserSearchOtherColumns>();
+            var responseAjaxResult = new ResponseAjaxResult<UserSearchDetailsDto>();
 
             var uDetails = await _dbContext.Queryable<User>()
-                .Where(t => t.IsDelete == 1 && t.Id.ToString() == uId)
+                .LeftJoin<UserStatus>((u, us) => u.EMP_STATUS == us.OneCode)
+                .LeftJoin<Institution>((u, us, ins) => u.OFFICE_DEPID == ins.OID)
+                .Where((u, us, ins) => !string.IsNullOrWhiteSpace(u.EMP_STATUS) && u.IsDelete == 1 && u.Id.ToString() == uId)
+                .Select((u, us, ins) => new UserSearchDetailsDto
+                {
+                    Name = u.NAME,
+                    CertNo = u.CERT_NO,
+                    OfficeDepId = u.OFFICE_DEPID,
+                    Email = u.EMAIL,
+                    EmpCode = u.EMP_CODE,
+                    Enable = u.Enable == 1 ? "启用" : "禁用",
+                    UserInfoStatus = us.OneName,
+                    Phone = u.PHONE,
+                    OfficeDepIdName = ins.NAME,
+                    Attribute1 = u.ATTRIBUTE1,
+                    Attribute2 = u.ATTRIBUTE2,
+                    Attribute3 = u.ATTRIBUTE3,
+                    Attribute4 = u.ATTRIBUTE4,
+                    Attribute5 = u.ATTRIBUTE5,
+                    Birthday = u.BIRTHDAY,
+                    CertType = u.CERT_TYPE,
+                    DispatchunitName = u.DISPATCHUNITNAME,
+                    DispatchunitShortName = u.DISPATCHUNITSHORTNAME,
+                    EmpSort = u.EMP_SORT,
+                    EnName = u.EN_NAME,
+                    EntryTime = u.ENTRY_TIME,
+                    Externaluser = u.EXTERNALUSER,
+                    Fax = u.FAX,
+                    HighEstGrade = u.HIGHESTGRADE,
+                    HrEmpCode = u.HR_EMP_CODE,
+                    JobName = u.JOB_NAME,
+                    JobType = u.JOB_TYPE,
+                    NameSpell = u.NAME_SPELL,
+                    Nation = u.NATION,
+                    Nationality = u.NATIONALITY,
+                    OfficeNum = u.OFFICE_NUM,
+                    PoliticsFace = u.POLITICSFACE,
+                    PositionGrade = u.POSITION_GRADE,
+                    PositionGradeNorm = u.POSITIONGRADENORM,
+                    PositionName = u.POSITION_NAME,
+                    Positions = u.POSITIONS,
+                    SameHighEstGrade = u.SAMEHIGHESTGRADE,
+                    Sex = u.SEX == "01" ? "男性" : "女性",
+                    Sno = u.SNO,
+                    SubDepts = u.SUB_DEPTS,
+                    Tel = u.TEL,
+                    UserLogin = u.USER_LOGIN
+                })
                 .FirstAsync();
 
-            if (uDetails != null)
-            {
-                var res = _mapper.Map<User, UserSearchOtherColumns>(uDetails);
-                responseAjaxResult.Count = 1;
-                responseAjaxResult.SuccessResult(res);
-            }
-            else
-            {
-                responseAjaxResult.FailResult(HttpStatusCode.DataNotEXIST, "无数据");
-            }
+            responseAjaxResult.SuccessResult(uDetails);
             return responseAjaxResult;
         }
         /// <summary>
@@ -219,8 +256,70 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
             {
                 child.Children = GetChildren(child.Oid, children);
             }
-
             return childs;
+        }
+        /// <summary>
+        /// 获取机构详情
+        /// </summary>
+        /// <param name="Id"></param>
+        /// <returns></returns>
+        public async Task<ResponseAjaxResult<InstitutionDetatilsDto>> GetInstitutionDetailsAsync(string Id)
+        {
+            var responseAjaxResult = new ResponseAjaxResult<InstitutionDetatilsDto>();
+
+            var insDetails = await _dbContext.Queryable<Institution>()
+                .Where((ins) => ins.IsDelete == 1 && ins.Id.ToString() == Id)
+                .Select((ins) => new InstitutionDetatilsDto
+                {
+                    BizDomain = ins.BIZDOMAIN,
+                    BizType = ins.BIZTYPE,
+                    Carea = ins.CAREA,
+                    Code = ins.OCODE,
+                    Coid = ins.COID,
+                    Crossorgan = ins.CROSSORGAN,
+                    EnglishName = ins.ENGLISHNAME,
+                    EnglishShortName = ins.ENGLISHSHORTNAME,
+                    EntClass = ins.ENTCLASS,
+                    GlobalSno = ins.GLOBAL_SNO,
+                    Goid = ins.GOID,
+                    Gpoid = ins.GPOID,
+                    Grade = ins.GRADE,
+                    IsIndependent = ins.IS_INDEPENDENT,
+                    MdmCode = ins.MDM_CODE,
+                    Mrut = ins.MRUT,
+                    Name = ins.NAME,
+                    Note = ins.NOTE,
+                    Oid = ins.OID,
+                    Oper = ins.OPER,
+                    Organemp = ins.ORGANEMP,
+                    OrganGrade = ins.ORGANGRADE,
+                    OrgGrade = ins.ORGGRADE,
+                    OrgProvince = ins.ORGPROVINCE,
+                    Orule = ins.ORULE,
+                    OSecBid = ins.O2BID,
+                    POid = ins.POID,
+                    ProjectManType = ins.PROJECTMANTYPE,
+                    ProjectScale = ins.PROJECTSCALE,
+                    ProjectType = ins.PROJECTTYPE,
+                    QyGrade = ins.QYGRADE,
+                    RegisterCode = ins.REGISTERCODE,
+                    RoId = ins.ROID,
+                    Rown = ins.ROWN,
+                    ShareHoldings = ins.SHAREHOLDINGS,
+                    ShortName = ins.SHORTNAME,
+                    Sno = ins.SNO,
+                    StartDate = ins.STARTDATE,
+                    Status = ins.STATUS,
+                    TemorganName = ins.TEMORGANNAME,
+                    TerritoryPro = ins.TERRITORYPRO,
+                    Type = ins.TYPE,
+                    TypeExt = ins.TYPEEXT,
+                    Version = ins.VERSION
+                })
+                .FirstAsync();
+
+            responseAjaxResult.SuccessResult(insDetails);
+            return responseAjaxResult;
         }
     }
 }

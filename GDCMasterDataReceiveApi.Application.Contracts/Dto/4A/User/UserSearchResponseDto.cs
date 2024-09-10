@@ -53,8 +53,48 @@
     /// <summary>
     /// 用户详情
     /// </summary>
-    public class UserSearchOtherColumns
+    public class UserSearchDetailsDto
     {
+        /// <summary>
+        /// 人员编码  必填,HR 系统中定义的人员唯  一编码，默认用户名
+        /// </summary>
+        public string? EmpCode { get; set; }
+        /// <summary>
+        /// 姓名
+        /// </summary>
+        public string? Name { get; set; }
+        /// <summary>
+        /// 手机号码
+        /// </summary>
+        public string? Phone { get; set; }
+        /// <summary>
+        /// 电子邮箱
+        /// </summary>
+        public string? Email { get; set; }
+        /// <summary>
+        /// 证件编号
+        /// </summary>
+        public string? CertNo { get; set; }
+        /// <summary>
+        /// 主职所在部门 ID
+        /// </summary>
+        public string? OfficeDepId { get; set; }
+        /// <summary>
+        /// 所属部门名称
+        /// </summary>
+        public string? OfficeDepIdName { get; set; }
+        /// <summary>
+        /// 人员状态信息
+        /// </summary>
+        public string? UserInfoStatus { get; set; }
+        /// <summary>
+        /// 公司名称
+        /// </summary>
+        public string? CompanyName { get; set; }
+        /// <summary>
+        /// 是否启用   0 禁用  1 启用
+        /// </summary>
+        public string? Enable { get; set; }
         /// <summary>
         /// 姓名全拼
         /// </summary>
