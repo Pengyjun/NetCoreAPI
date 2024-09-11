@@ -182,13 +182,13 @@ namespace GDCMasterDataReceiveApi.Application
             if ((int)dataOperationType == 1)
             {
                 //插入操作
-              await  _dbContext.Insertable<ReceiveRecordLog>(receiveRecordLog).ExecuteCommandAsync();
+              await  _dbContext.CopyNew().Insertable<ReceiveRecordLog>(receiveRecordLog).ExecuteCommandAsync();
             }
 
-            if ((int)dataOperationType ==3)
+            if ((int)dataOperationType ==2)
             {
                 //修改操作
-                await _dbContext.Updateable<ReceiveRecordLog>(receiveRecordLog).ExecuteCommandAsync();
+                await _dbContext.CopyNew().Updateable<ReceiveRecordLog>(receiveRecordLog).ExecuteCommandAsync();
             }
         }
     }

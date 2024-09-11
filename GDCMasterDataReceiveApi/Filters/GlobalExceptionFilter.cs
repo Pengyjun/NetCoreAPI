@@ -320,6 +320,23 @@ namespace GDCMasterDataReceiveApi.Filters
                     }
                 }
                 #endregion
+
+                #region 更新接收数据日志
+                if (context.HttpContext.Request.Path.Value.Contains("Receive"))
+                {
+                    var traceIdentifier = context.HttpContext.TraceIdentifier;
+                    var db = context.HttpContext.RequestServices.GetService<ISqlSugarClient>();
+                    var res = db.Queryable<ReceiveRecordLog>().Where(x => x.Traceidentifier == traceIdentifier).ToList();
+                    foreach (var item in res)
+                    {
+                        item.Id = item.Id;
+                        item.FailMessage = message + Environment.NewLine + exception;
+                        item.SuccessNumber = 0;
+                    }
+                    await db.Updateable<ReceiveRecordLog>(res).ExecuteCommandAsync();
+                }
+               
+                #endregion
             }
             catch (Exception ex)
             {

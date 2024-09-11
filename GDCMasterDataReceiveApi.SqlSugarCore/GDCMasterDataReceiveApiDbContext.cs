@@ -18,7 +18,7 @@ namespace GDCMasterDataReceiveApi.SqlSugarCore
         public static void AddSqlSugarContext(this IServiceCollection services, IConfiguration configuration, string dbCon)
         {
             //是否打开无参数化sql监视
-            bool isOpenSql = true;
+            bool isOpenSql = false;
             SqlSugarClient sqlSugarClient = new SqlSugarClient(new ConnectionConfig()
             {
                 ConnectionString = dbCon,
@@ -49,7 +49,10 @@ namespace GDCMasterDataReceiveApi.SqlSugarCore
                         }
                     }
                     //调试时打印sql语句 生产时注释掉
-                    Console.WriteLine($"{sqlParmae}");
+                    if (isOpenSql)
+                    {
+                        Console.WriteLine($"{sqlParmae}");
+                    }
                 };
                 db.Aop.OnLogExecuted = (sql, parames) =>
                 {

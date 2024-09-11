@@ -22,7 +22,7 @@ namespace GDCMasterDataReceiveApi.Domain
         /// <summary>
         /// 创建时间
         /// </summary>
-        [SugarColumn(ColumnDataType = "datetime")]
+        [SugarColumn(ColumnDataType = "datetime", IsOnlyIgnoreUpdate = true)]
         public DateTime? CreateTime { get; set; }
         /// <summary>
         /// 更新人Id

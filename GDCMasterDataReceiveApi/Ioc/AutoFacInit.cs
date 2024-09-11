@@ -1,7 +1,13 @@
 ﻿using Autofac;
+using Autofac.Extras.DynamicProxy;
+using GDCMasterDataReceiveApi.Application.Contracts;
+using GDCMasterDataReceiveApi.Application;
 using GDCMasterDataReceiveApi.Domain.IRepository;
 using GDCMasterDataReceiveApi.SqlSugarCore;
+using GHElectronicFileApi.AopInterceptor;
 using System.Reflection;
+using GDCMasterDataReceiveApi.Application.Service.ReceiveService;
+using GDCMasterDataReceiveApi.Application.Contracts.IService.IReceiveService;
 
 namespace GDCMasterDataReceiveApi.Ioc
 {
@@ -51,12 +57,24 @@ namespace GDCMasterDataReceiveApi.Ioc
                 {
                     foreach (var key in interfaceList)
                     {
-                        builder.RegisterTypes(key.Key).AsImplementedInterfaces().InstancePerLifetimeScope();
+                        if (key.Key.Name == "ReceiveService")
+                        {
+                            builder.RegisterType<ReceiveServiceInterceptor>();
+                            builder.RegisterType<ReceiveService>().As<IReceiveService>()
+                             .InstancePerLifetimeScope()
+                             .InterceptedBy(typeof(ReceiveServiceInterceptor))
+                             .EnableInterfaceInterceptors();
+                        }
+                        else
+                        {
+                            builder.RegisterTypes(key.Key).AsImplementedInterfaces().InstancePerLifetimeScope();
+                        }
+                    
                     }
                     //注入工作单元
                     builder.RegisterType<SqlSugarUnitOfWork>().As<IUnitOfWork>().InstancePerLifetimeScope();
                     //注入基本仓储
-                    builder.RegisterGeneric(typeof(BaseRepository<>)).As(typeof(IBaseRepository<>));
+                    builder.RegisterGeneric(typeof(BaseRepository<>)).As(typeof(Domain.IRepository.IBaseRepository<>));
                 }
             }
             catch (Exception ex)

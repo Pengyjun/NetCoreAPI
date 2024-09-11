@@ -34,19 +34,20 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         [SugarColumn(ColumnDataType = "int")]
         public  int? ReceiveNumber { get; set; }
         /// <summary>
-        /// 失败数量
+        /// 成功数量
         /// </summary>
         [SugarColumn(ColumnDataType = "int")]
-        public  int? FailNumber { get; set; }
-        /// <summary>
-        /// 失败的数据
-        /// </summary>
-        [SugarColumn(ColumnDataType = "longvarchar")]
-        public string?  FailData { get; set; }
+        public  int? SuccessNumber { get; set; }
         /// <summary>
         /// 失败消息
         /// </summary>
         [SugarColumn(Length = 2048)]
         public  string? FailMessage { get; set; }
+
+        /// <summary>
+        /// 每次请求唯一值
+        /// </summary>
+        [SugarColumn(Length = 2048)]
+        public string? Traceidentifier { get; set; }
     }
 }

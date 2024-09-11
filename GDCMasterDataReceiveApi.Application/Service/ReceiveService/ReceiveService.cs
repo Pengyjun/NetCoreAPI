@@ -27,6 +27,7 @@ using System.Drawing.Drawing2D;
 using UtilsSharp;
 using Newtonsoft.Json;
 using System.Collections;
+using GDCMasterDataReceiveApi.Domain.Shared.Annotation;
 
 namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
 {
@@ -110,13 +111,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
             }
             catch (Exception ex)
             {
-                responseAjaxResult.Fail();
-                #region 更新记录日志
-                receiveRecordLog.FailNumber = baseReceiveDataRequestDto.IT_DATA.item.Count;
-                receiveRecordLog.FailMessage = ex.ToString();
-                receiveRecordLog.FailData = baseReceiveDataRequestDto.IT_DATA.item.ToJson();
-                await baseService.ReceiveRecordLogAsync(receiveRecordLog, DataOperationType.Update);
-                #endregion
+                throw;
             }
 
             return responseAjaxResult;
@@ -217,13 +212,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
             }
             catch (Exception ex)
             {
-                responseAjaxResult.Fail();
-                #region 更新记录日志
-                receiveRecordLog.FailNumber = baseReceiveDataRequest.IT_DATA.item.Count;
-                receiveRecordLog.FailMessage = ex.ToString();
-                receiveRecordLog.FailData = baseReceiveDataRequest.IT_DATA.item.ToJson();
-                await baseService.ReceiveRecordLogAsync(receiveRecordLog, DataOperationType.Update);
-                #endregion
+               
                 throw;
             }
             return responseAjaxResult;
@@ -306,13 +295,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
             }
             catch (Exception ex)
             {
-                responseAjaxResult.Fail();
-                #region 更新记录日志
-                receiveRecordLog.FailNumber = baseReceiveDataRequestDto.IT_DATA.item.Count;
-                receiveRecordLog.FailMessage = ex.ToString();
-                receiveRecordLog.FailData = baseReceiveDataRequestDto.IT_DATA.item.ToJson();
-                await baseService.ReceiveRecordLogAsync(receiveRecordLog, DataOperationType.Update);
-                #endregion
+              
                 throw;
             }
 
@@ -396,13 +379,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
             }
             catch (Exception ex)
             {
-                responseAjaxResult.Fail();
-                #region 更新记录日志
-                receiveRecordLog.FailNumber = baseReceiveDataRequestDto.IT_DATA.item.Count;
-                receiveRecordLog.FailMessage = ex.ToString();
-                receiveRecordLog.FailData = baseReceiveDataRequestDto.IT_DATA.item.ToJson();
-                await baseService.ReceiveRecordLogAsync(receiveRecordLog, DataOperationType.Update);
-                #endregion
+               
                 throw;
             }
 
@@ -481,13 +458,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
             }
             catch (Exception ex)
             {
-                responseAjaxResult.Fail();
-                #region 更新记录日志
-                receiveRecordLog.FailNumber = receiveDataMDMRequestDto.IT_DATA.item.Count;
-                receiveRecordLog.FailMessage = ex.ToString();
-                receiveRecordLog.FailData = receiveDataMDMRequestDto.IT_DATA.item.ToJson();
-                await baseService.ReceiveRecordLogAsync(receiveRecordLog, DataOperationType.Update);
-                #endregion
+              
                 throw;
             }
 
@@ -593,13 +564,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
             }
             catch (Exception ex)
             {
-                responseAjaxResult.Fail();
-                #region 更新记录日志
-                receiveRecordLog.FailNumber = receiveDataMDMRequestDto.IT_DATA.item.Count;
-                receiveRecordLog.FailMessage = ex.ToString();
-                receiveRecordLog.FailData = receiveDataMDMRequestDto.IT_DATA.item.ToJson();
-                await baseService.ReceiveRecordLogAsync(receiveRecordLog, DataOperationType.Update);
-                #endregion
+                throw;
             }
             return responseAjaxResult;
         }
@@ -633,23 +598,12 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
         public async Task<MDMResponseResult> ProjectDataAsync(BaseReceiveDataRequestDto<ProjectItem> receiveDataMDMRequestDto)
         {
             MDMResponseResult responseAjaxResult = new MDMResponseResult();
-            #region 记录日志
-            var receiceRecordId = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
-            ReceiveRecordLog receiveRecordLog = new ReceiveRecordLog()
-            {
-                Id = receiceRecordId,
-                ReceiveType = ReceiveDataType.Project,
-                RequestParame = receiveDataMDMRequestDto.IT_DATA.item.ToJson(),
-                ReceiveNumber = receiveDataMDMRequestDto.IT_DATA.item.Count,
-            };
-            await baseService.ReceiveRecordLogAsync(receiveRecordLog, DataOperationType.Insert);
-            #endregion
+            
             try
             {
                 ////处理曾用名
                 List<ProjectUsedName> insertzMDGS_OLDNAMEs = new();
                 List<ProjectUsedName> updatezMDGS_OLDNAMEs = new();
-               
                 //查询项目表
                 var projectCodeList = await _dbContext.Queryable<Project>().Where(x => x.IsDelete == 1).ToListAsync();
                 //需要新增的数据
@@ -698,7 +652,6 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
                         }
                         deleteData.AddRange(projectUsedNameList.Where(x => x.ZPROJECT == itemItem.ZPROJECT).ToList());
                     }
-
                     var projectList = _mapper.Map<List<ProjectItem>, List<Project>>(updateOids);
                     await _dbContext.Updateable(projectList).ExecuteCommandAsync();
                     await _dbContext.Deleteable<ProjectUsedName>().WhereColumns(deleteData, it => new { it.Id }).ExecuteCommandAsync();
@@ -709,13 +662,6 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
             }
             catch (Exception ex)
             {
-                responseAjaxResult.Fail();
-                #region 更新记录日志
-                receiveRecordLog.FailNumber = receiveDataMDMRequestDto.IT_DATA.item.Count;
-                receiveRecordLog.FailMessage = ex.ToString();
-                receiveRecordLog.FailData = receiveDataMDMRequestDto.IT_DATA.item.ToJson();
-                await baseService.ReceiveRecordLogAsync(receiveRecordLog, DataOperationType.Update);
-                #endregion
                 throw;
             }
             return responseAjaxResult;
@@ -765,13 +711,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
             }
             catch (Exception ex)
             {
-                responseAjaxResult.Fail();
-                #region 更新记录日志
-                receiveRecordLog.FailNumber = receiveDataMDMRequestDto.IT_DATA.item.Count;
-                receiveRecordLog.FailMessage = ex.ToString();
-                receiveRecordLog.FailData = receiveDataMDMRequestDto.IT_DATA.item.ToJson();
-                await baseService.ReceiveRecordLogAsync(receiveRecordLog, DataOperationType.Update);
-                #endregion
+             
                 throw;
             }
             return responseAjaxResult;
@@ -883,13 +823,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
             }
             catch (Exception ex)
             {
-                responseAjaxResult.Fail();
-                #region 更新记录日志
-                receiveRecordLog.FailNumber = receiveDataMDMRequestDto.IT_DATA.item.Count;
-                receiveRecordLog.FailMessage = ex.ToString();
-                receiveRecordLog.FailData = receiveDataMDMRequestDto.IT_DATA.item.ToJson();
-                await baseService.ReceiveRecordLogAsync(receiveRecordLog, DataOperationType.Update);
-                #endregion
+                throw;
             }
             return responseAjaxResult;
         }
@@ -949,13 +883,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
             }
             catch (Exception ex)
             {
-                responseAjaxResult.Fail();
-                #region 更新记录日志
-                receiveRecordLog.FailNumber = receiveDataMDMRequestDto.IT_DATA.item.Count;
-                receiveRecordLog.FailMessage = ex.ToString();
-                receiveRecordLog.FailData = receiveDataMDMRequestDto.IT_DATA.item.ToJson();
-                await baseService.ReceiveRecordLogAsync(receiveRecordLog, DataOperationType.Update);
-                #endregion
+                throw;
             }
             return responseAjaxResult;
         }
@@ -1063,13 +991,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
             }
             catch (Exception ex)
             {
-                responseAjaxResult.Fail();
-                #region 更新记录日志
-                receiveRecordLog.FailNumber = 1;
-                receiveRecordLog.FailMessage = ex.ToString();
-                receiveRecordLog.FailData = receiveUserRequestDto.user.ToJson();
-                await baseService.ReceiveRecordLogAsync(receiveRecordLog, DataOperationType.Update);
-                #endregion
+                throw;
             }
             return responseAjaxResult;
         }
@@ -1118,13 +1040,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
             }
             catch (Exception ex)
             {
-                responseAjaxResult.Fail();
-                #region 更新记录日志
-                receiveRecordLog.FailNumber = receiveInstitutionRequestDto.OrganizeItem.Count;
-                receiveRecordLog.FailMessage = ex.ToString();
-                receiveRecordLog.FailData = receiveInstitutionRequestDto.OrganizeItem.ToJson();
-                await baseService.ReceiveRecordLogAsync(receiveRecordLog, DataOperationType.Update);
-                #endregion
+                throw;
             }
             return responseAjaxResult;
         }
