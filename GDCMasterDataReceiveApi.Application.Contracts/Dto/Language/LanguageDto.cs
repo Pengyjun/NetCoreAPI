@@ -5,40 +5,66 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.Language
     /// <summary>
     /// 语言语种 反显
     /// </summary>
-    public class LanguageDto
+    public class LanguageSearchDto
     {
         /// <summary>
         /// 主键id
         /// </summary>
-        public long Id { get; set; }
+        public string? Id { get; set; }
         /// <summary>
         /// GB/T 4880.2/B目录代码:GB/T 4880.2/B目录代码
         /// </summary>
-        public string DirCode { get; set; }
+        public string? DirCode { get; set; }
         /// <summary>
         /// GB/T 4880.2/T术语代码:GB/T 4880.2/T术语代码
         /// </summary>
-        public string TermCode { get; set; }
+        public string? TermCode { get; set; }
         /// <summary>
         /// 汉语名称
         /// </summary>
-        public string Name { get; set; }
+        public string? Name { get; set; }
         /// <summary>
         /// 英语名称
         /// </summary>
-        public string EnglishName { get; set; }
-        /// <summary>
-        /// 版本：数据的版本号。数据每次变更时，版本号自动加1。
-        /// </summary>
-        public string Version { get; set; }
+        public string? EnglishName { get; set; }
         /// <summary>
         /// 状态：数据是否有效的标识:有效：1无效：0
         /// </summary>
-        public string State { get; set; }
+        public string? State { get; set; }
+    }
+    /// <summary>
+    /// 语言语种详情
+    /// </summary>
+    public class LanguageDetailsDto
+    {
+        /// <summary>
+        /// GB/T 4880.2/B目录代码:GB/T 4880.2/B目录代码
+        /// </summary>
+        public string? DirCode { get; set; }
+        /// <summary>
+        /// GB/T 4880.2/T术语代码:GB/T 4880.2/T术语代码
+        /// </summary>
+        public string? TermCode { get; set; }
+        /// <summary>
+        /// 汉语名称
+        /// </summary>
+        public string? Name { get; set; }
+        /// <summary>
+        /// 英语名称
+        /// </summary>
+        public string? EnglishName { get; set; }
+        /// <summary>
+        /// 版本：数据的版本号。数据每次变更时，版本号自动加1。
+        /// </summary>
+        public string? Version { get; set; }
+        /// <summary>
+        /// 状态：数据是否有效的标识:有效：1无效：0
+        /// </summary>
+        public string? State { get; set; }
         /// <summary>
         /// 是否删除 数据是否有效的标识:有效：1无效：0
         /// </summary>
-        public string DataIdentifier { get; set; }
+        public string? DataIdentifier { get; set; }
     }
     /// <summary>
     /// 语言语种 接收

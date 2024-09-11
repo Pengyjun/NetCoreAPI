@@ -1,5 +1,4 @@
 ﻿using SqlSugar;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace GDCMasterDataReceiveApi.Domain.Models
 {
@@ -12,13 +11,13 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// <summary>
         /// 发送记录ID 发送记录的ID，必须保证此ID在同一个发送批次中是唯一的。用于记录发送方对于此发送记录的唯一标识。
         /// </summary>
-        [NotMapped]
-        public string ZZSERIAL { get; set; }
+        [SugarColumn(IsIgnore = true)]
+        public string? ZZSERIAL { get; set; }
         /// <summary>
         /// 金融机构主数据编码:金融机构的唯一编码标识
         /// </summary>
         [SugarColumn(Length = 10, ColumnName = "MDCode")]
-        public string ZFINC { get; set; }
+        public string? ZFINC { get; set; }
         /// <summary>
         /// 总行编号:开户行总行的唯一编码，若金融机构类型为“银行业存款类金融机构”则该字段为必填项
         /// </summary>
@@ -93,12 +92,12 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// 状态:数据是否有效的标识:有效：1无效：0
         /// </summary>
         [SugarColumn(Length = 18, ColumnName = "State")]
-        public string ZDATSTATE { get; set; }
+        public string? ZDATSTATE { get; set; }
         /// <summary>
         /// 是否删除 数据是否有效的标识:有效：1无效：0
         /// </summary>
         [SugarColumn(Length = 1, ColumnName = "DataIdentifier")]
-        public string ZDELETE { get; set; }
+        public string? ZDELETE { get; set; }
         /// <summary>
         /// 最后修改二级单位 :记录数据最后修改所属二级单位
         /// </summary>

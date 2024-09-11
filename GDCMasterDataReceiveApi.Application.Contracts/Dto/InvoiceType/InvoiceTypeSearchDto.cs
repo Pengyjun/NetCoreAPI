@@ -5,32 +5,50 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.InvoiceType
     /// <summary>
     /// 发票类型 反显
     /// </summary>
-    public class InvoiceTypeDto
+    public class InvoiceTypeSearchDto
     {
         /// <summary>
         /// 主键id
         /// </summary>
-        public long Id { get; set; }
+        public string? Id { get; set; }
         /// <summary>
         /// 发票类型代码
         /// </summary>
-        public string Code { get; set; }
+        public string? Code { get; set; }
         /// <summary>
         /// 发票类型名称
         /// </summary>
-        public string Name { get; set; }
-        /// <summary>
-        /// 版本：数据的版本号。数据每次变更时，版本号自动加1。
-        /// </summary>
-        public string Version { get; set; }
+        public string? Name { get; set; }
         /// <summary>
         /// 状态：数据是否有效的标识:有效：1无效：0
         /// </summary>
-        public string State { get; set; }
+        public string? State { get; set; }
+    }
+    /// <summary>
+    /// 发票类型明细
+    /// </summary>
+    public class InvoiceTypeDetailshDto
+    {
+        /// <summary>
+        /// 发票类型代码
+        /// </summary>
+        public string? Code { get; set; }
+        /// <summary>
+        /// 发票类型名称
+        /// </summary>
+        public string? Name { get; set; }
+        /// <summary>
+        /// 版本：数据的版本号。数据每次变更时，版本号自动加1。
+        /// </summary>
+        public string? Version { get; set; }
+        /// <summary>
+        /// 状态：数据是否有效的标识:有效：1无效：0
+        /// </summary>
+        public string? State { get; set; }
         /// <summary>
         /// 是否删除 数据是否有效的标识:有效：1无效：0
         /// </summary>
-        public string DataIdentifier { get; set; }
+        public string? DataIdentifier { get; set; }
     }
     /// <summary>
     /// 发票类型 接收

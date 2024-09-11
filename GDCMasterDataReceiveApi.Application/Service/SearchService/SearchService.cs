@@ -4,10 +4,15 @@ using GDCMasterDataReceiveApi.Application.Contracts.Dto._4A.User;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.CorresUnit;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.CountryContinent;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.CountryRegion;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.DeviceClassCode;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.FinancialInstitution;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.Institution;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.InvoiceType;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.Language;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.LouDong;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.Project;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.RoomNumber;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.ScientifiCNoProject;
 using GDCMasterDataReceiveApi.Application.Contracts.IService.ISearchService;
 using GDCMasterDataReceiveApi.Domain.Models;
 using GDCMasterDataReceiveApi.Domain.Shared;
@@ -652,7 +657,344 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
         public async Task<ResponseAjaxResult<List<FinancialInstitutionSearchDto>>> GetFinancialInstitutionSearchAsync(FinancialInstitutionRequestDto requestDto)
         {
             var responseAjaxResult = new ResponseAjaxResult<List<FinancialInstitutionSearchDto>>();
+            RefAsync<int> total = 0;
 
+            var ccList = await _dbContext.Queryable<FinancialInstitution>()
+                .Where((cc) => cc.IsDelete == 1)
+                .Select((cc) => new FinancialInstitutionSearchDto
+                {
+                    Id = cc.Id.ToString(),
+                    City = cc.ZCITY,
+                    Country = cc.ZZCOUNTRY,
+                    County = cc.ZCOUNTY,
+                    EnglishName = cc.ZFINAME_E,
+                    Name = cc.ZBANKNAME,
+                    NameOfOrg = cc.ZFINAME,
+                    Province = cc.ZPROVINCE,
+                    TypesOfAbroadOrg = cc.ZOFITYPE,
+                    TypesOfOrg = cc.ZDFITYPE,
+                    State = cc.ZDATSTATE == "1" ? "有效" : "无效"
+                })
+                .ToPageListAsync(requestDto.PageIndex, requestDto.PageSize, total);
+
+            responseAjaxResult.Count = total;
+            responseAjaxResult.SuccessResult(ccList);
+            return responseAjaxResult;
+        }
+        /// <summary>
+        /// 获取金融机构详情
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<ResponseAjaxResult<FinancialInstitutionDetailsDto>> GetFinancialInstitutionDetailsAsync(string id)
+        {
+            var responseAjaxResult = new ResponseAjaxResult<FinancialInstitutionDetailsDto>();
+
+            var result = await _dbContext.Queryable<FinancialInstitution>()
+                .Where((cc) => cc.IsDelete == 1 && cc.Id.ToString() == id)
+                .Select((cc) => new FinancialInstitutionDetailsDto
+                {
+                    City = cc.ZCITY,
+                    Country = cc.ZZCOUNTRY,
+                    County = cc.ZCOUNTY,
+                    EnglishName = cc.ZFINAME_E,
+                    Name = cc.ZBANKNAME,
+                    NameOfOrg = cc.ZFINAME,
+                    Province = cc.ZPROVINCE,
+                    TypesOfAbroadOrg = cc.ZOFITYPE,
+                    TypesOfOrg = cc.ZDFITYPE,
+                    State = cc.ZDATSTATE == "1" ? "有效" : "无效",
+                    BankNo = cc.ZBANKN,
+                    DataIdentifier = cc.ZDELETE,
+                    MDCode = cc.ZFINC,
+                    MDCodeofOrg = cc.ZORG,
+                    RegistrationNo = cc.ZUSCC,
+                    No = cc.ZBANK,
+                    SubmitBy = cc.ZFZCHBY,
+                    SubmitTime = cc.ZFZCHAT,
+                    SwiftCode = cc.ZSWIFTCOD,
+                    UnitSec = cc.ZFIN2NDORG
+                })
+                .FirstAsync();
+
+            responseAjaxResult.SuccessResult(result);
+            return responseAjaxResult;
+        }
+        /// <summary>
+        /// 物资设备分类编码列表
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        public async Task<ResponseAjaxResult<List<DeviceClassCodeSearchDto>>> GetDeviceClassCodeSearchAsync(DeviceClassCodeRequestDto requestDto)
+        {
+            var responseAjaxResult = new ResponseAjaxResult<List<DeviceClassCodeSearchDto>>();
+            RefAsync<int> total = 0;
+
+            var ccList = await _dbContext.Queryable<DeviceClassCode>()
+                .Where((cc) => cc.IsDelete == 1)
+                .Select((cc) => new DeviceClassCodeSearchDto
+                {
+                    Id = cc.Id.ToString(),
+                    AliasName = cc.ZCALIAS,
+                    Code = cc.ZCLASS,
+                    Description = cc.ZCDESC,
+                    Name = cc.ZCNAME,
+                    UnitOfMeasurement = cc.ZMSEHI,
+                    State = cc.ZUSSTATE == "1" ? "有效" : "无效"
+                })
+                .ToPageListAsync(requestDto.PageIndex, requestDto.PageSize, total);
+
+            responseAjaxResult.Count = total;
+            responseAjaxResult.SuccessResult(ccList);
+            return responseAjaxResult;
+        }
+        /// <summary>
+        /// 物资设备分类编码明细
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<ResponseAjaxResult<DeviceClassCodeDetailsDto>> GetDeviceClassCodeDetailsAsync(string id)
+        {
+            var responseAjaxResult = new ResponseAjaxResult<DeviceClassCodeDetailsDto>();
+
+            var result = await _dbContext.Queryable<DeviceClassCode>()
+                .Where((cc) => cc.IsDelete == 1 && cc.Id.ToString() == id)
+                .Select((cc) => new DeviceClassCodeDetailsDto
+                {
+                    AliasName = cc.ZCALIAS,
+                    Code = cc.ZCLASS,
+                    Description = cc.ZCDESC,
+                    Name = cc.ZCNAME,
+                    UnitOfMeasurement = cc.ZMSEHI,
+                    State = cc.ZUSSTATE == "1" ? "有效" : "无效",
+                    DataIdentifier = cc.ZDELETE,
+                    Level = cc.ZCLEVEL,
+                    SortRule = cc.ZSORT,
+                    SupCode = cc.ZCLASSUP
+                })
+                .FirstAsync();
+
+            responseAjaxResult.SuccessResult(result);
+            return responseAjaxResult;
+        }
+        /// <summary>
+        /// 发票类型列表
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        public async Task<ResponseAjaxResult<List<InvoiceTypeSearchDto>>> GetInvoiceTypeSearchAsync(InvoiceTypeRequestDto requestDto)
+        {
+            var responseAjaxResult = new ResponseAjaxResult<List<InvoiceTypeSearchDto>>();
+            RefAsync<int> total = 0;
+
+            var ccList = await _dbContext.Queryable<InvoiceType>()
+                .Where((cc) => cc.IsDelete == 1)
+                .Select((cc) => new InvoiceTypeSearchDto
+                {
+                    Id = cc.Id.ToString(),
+                    Code = cc.ZINVTCODE,
+                    Name = cc.ZINVTNAME,
+                    State = cc.ZSTATE == "1" ? "有效" : "无效"
+                })
+                .ToPageListAsync(requestDto.PageIndex, requestDto.PageSize, total);
+
+            responseAjaxResult.Count = total;
+            responseAjaxResult.SuccessResult(ccList);
+            return responseAjaxResult;
+        }
+        /// <summary>
+        /// 发票类型明细
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<ResponseAjaxResult<InvoiceTypeDetailshDto>> GetInvoiceTypeDetailsASync(string id)
+        {
+            var responseAjaxResult = new ResponseAjaxResult<InvoiceTypeDetailshDto>();
+
+            var result = await _dbContext.Queryable<InvoiceType>()
+                .Where((cc) => cc.IsDelete == 1 && cc.Id.ToString() == id)
+                .Select((cc) => new InvoiceTypeDetailshDto
+                {
+                    Code = cc.ZINVTCODE,
+                    Name = cc.ZINVTNAME,
+                    State = cc.ZSTATE == "1" ? "有效" : "无效",
+                    DataIdentifier = cc.ZDELETE,
+                    Version = cc.ZVERSION,
+                })
+                .FirstAsync();
+
+            responseAjaxResult.SuccessResult(result);
+            return responseAjaxResult;
+        }
+        /// <summary>
+        /// 科研项目列表
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        public async Task<ResponseAjaxResult<List<ScientifiCNoProjectSearchDto>>> GetScientifiCNoProjectSearchAsync(ScientifiCNoProjectRequestDto requestDto)
+        {
+            var responseAjaxResult = new ResponseAjaxResult<List<ScientifiCNoProjectSearchDto>>();
+            RefAsync<int> total = 0;
+
+            var ccList = await _dbContext.Queryable<ScientifiCNoProject>()
+                .Where((cc) => cc.IsDelete == 1)
+                .Select((cc) => new ScientifiCNoProjectSearchDto
+                {
+                    Id = cc.Id.ToString(),
+                    Name = cc.ZSRPN,
+                    CurrencyOfCost = cc.ZPROJCOSTCUR,
+                    ForeignName = cc.ZSRPN_FN,
+                    IsHighTech = cc.ZHITECH == "1" ? "是" : "否",
+                    MDCode = cc.ZSRP,
+                    PjectState = cc.ZKPSTATE,
+                    TotalCost = cc.ZPROJCOST,
+                    Year = cc.ZPROJYEA
+                })
+                .ToPageListAsync(requestDto.PageIndex, requestDto.PageSize, total);
+
+            responseAjaxResult.Count = total;
+            responseAjaxResult.SuccessResult(ccList);
+            return responseAjaxResult;
+        }
+        /// <summary>
+        /// 科研项目明细
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<ResponseAjaxResult<ScientifiCNoProjectDetailsDto>> GetScientifiCNoProjectDetailsAsync(string id)
+        {
+            var responseAjaxResult = new ResponseAjaxResult<ScientifiCNoProjectDetailsDto>();
+
+            var result = await _dbContext.Queryable<ScientifiCNoProject>()
+                .Where((cc) => cc.IsDelete == 1 && cc.Id.ToString() == id)
+                .Select((cc) => new ScientifiCNoProjectDetailsDto
+                {
+                    Name = cc.ZSRPN,
+                    CurrencyOfCost = cc.ZPROJCOSTCUR,
+                    ForeignName = cc.ZSRPN_FN,
+                    IsHighTech = cc.ZHITECH == "1" ? "是" : "否",
+                    MDCode = cc.ZSRP,
+                    PjectState = cc.ZKPSTATE,
+                    TotalCost = cc.ZPROJCOST,
+                    Year = cc.ZPROJYEA,
+                    IsOutsourced = cc.ZOUTSOURCING == "1" ? "是" : "否",
+                    PlanEndDate = cc.ZPFINDATE,
+                    PlanStartDate = cc.ZPSTARTDATE,
+                    ProfessionalType = cc.ZMAJORTYPE,
+                    State = cc.ZPSTATE,
+                    SupMDCode = cc.ZSRPUP,
+                    TypeCode = cc.ZSRPCLASS
+                })
+                .FirstAsync();
+
+            responseAjaxResult.SuccessResult(result);
+            return responseAjaxResult;
+        }
+        /// <summary>
+        /// 获取房号列表
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        public async Task<ResponseAjaxResult<List<RoomNumberSearchDto>>> GetRoomNumberSearchAsync(RoomNumberRequestDto requestDto)
+        {
+            var responseAjaxResult = new ResponseAjaxResult<List<RoomNumberSearchDto>>();
+            RefAsync<int> total = 0;
+
+            var ccList = await _dbContext.Queryable<RoomNumber>()
+                .Where((cc) => cc.IsDelete == 1)
+                .Select((cc) => new RoomNumberSearchDto
+                {
+                    Id = cc.Id.ToString(),
+                    Name = cc.ZROOM_NAME,
+                    BFormat = cc.ZFORMAT,
+                    BuildCode = cc.ZBLDG,
+                    Code = cc.ZROOM,
+                    State = cc.ZSTATE == "1" ? "有效" : "无效"
+                })
+                .ToPageListAsync(requestDto.PageIndex, requestDto.PageSize, total);
+
+            responseAjaxResult.Count = total;
+            responseAjaxResult.SuccessResult(ccList);
+            return responseAjaxResult;
+        }
+        /// <summary>
+        /// 获取房号详情
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<ResponseAjaxResult<RoomNumberDetailsDto>> GetRoomNumberDetailsAsync(string id)
+        {
+            var responseAjaxResult = new ResponseAjaxResult<RoomNumberDetailsDto>();
+
+            var result = await _dbContext.Queryable<RoomNumber>()
+                .Where((cc) => cc.IsDelete == 1 && cc.Id.ToString() == id)
+                .Select((cc) => new RoomNumberDetailsDto
+                {
+                    Name = cc.ZROOM_NAME,
+                    BFormat = cc.ZFORMAT,
+                    BuildCode = cc.ZBLDG,
+                    Code = cc.ZROOM,
+                    PjectMDCode = cc.ZPROJECT,
+                    SourceSystem = cc.ZSYSTEM,
+                    State = cc.ZSTATE == "1" ? "有效" : "无效",
+                    UnitOfBuild = cc.ZRE_UNIT,
+                })
+                .FirstAsync();
+
+            responseAjaxResult.SuccessResult(result);
+            return responseAjaxResult;
+        }
+        /// <summary>
+        /// 语言语种列表
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        public async Task<ResponseAjaxResult<List<LanguageSearchDto>>> GetLanguageSearchAsync(LanguageRequestDto requestDto)
+        {
+            var responseAjaxResult = new ResponseAjaxResult<List<LanguageSearchDto>>();
+            RefAsync<int> total = 0;
+
+            var ccList = await _dbContext.Queryable<Language>()
+                .Where((cc) => cc.IsDelete == 1)
+                .Select((cc) => new LanguageSearchDto
+                {
+                    Id = cc.Id.ToString(),
+                    Name = cc.ZLANG_ZH,
+                    DirCode = cc.ZLANG_BIB,
+                    EnglishName = cc.ZLANG_EN,
+                    TermCode = cc.ZLANG_TER,
+                    State = cc.ZSTATE == "1" ? "有效" : "无效"
+                })
+                .ToPageListAsync(requestDto.PageIndex, requestDto.PageSize, total);
+
+            responseAjaxResult.Count = total;
+            responseAjaxResult.SuccessResult(ccList);
+            return responseAjaxResult;
+        }
+        /// <summary>
+        /// 语言语种明细
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<ResponseAjaxResult<LanguageDetailsDto>> GetLanguageDetailsAsync(string id)
+        {
+            var responseAjaxResult = new ResponseAjaxResult<LanguageDetailsDto>();
+
+            var result = await _dbContext.Queryable<Language>()
+                .Where((cc) => cc.IsDelete == 1 && cc.Id.ToString() == id)
+                .Select((cc) => new LanguageDetailsDto
+                {
+                    Name = cc.ZLANG_ZH,
+                    DirCode = cc.ZLANG_BIB,
+                    EnglishName = cc.ZLANG_EN,
+                    TermCode = cc.ZLANG_TER,
+                    State = cc.ZSTATE == "1" ? "有效" : "无效",
+                    DataIdentifier = cc.ZDELETE,
+                    Version = cc.ZVERSION
+                })
+                .FirstAsync();
+
+            responseAjaxResult.SuccessResult(result);
             return responseAjaxResult;
         }
     }
