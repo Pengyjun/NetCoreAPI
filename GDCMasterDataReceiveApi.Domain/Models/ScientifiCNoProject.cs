@@ -1,5 +1,5 @@
-﻿using SqlSugar;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using GDCMasterDataReceiveApi.Domain.OtherModels;
+using SqlSugar;
 
 namespace GDCMasterDataReceiveApi.Domain.Models
 {
@@ -12,7 +12,7 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// <summary>
         /// 发送记录ID 发送记录的ID，必须保证此ID在同一个发送批次中是唯一的。用于记录发送方对于此发送记录的唯一标识。
         /// </summary>
-        [NotMapped]
+        [SugarColumn(IsIgnore = true)]
         public string ZZSERIAL { get; set; }
         /// <summary>
         /// 科研项目主数据编码:科研项目的唯一编码标识
@@ -53,35 +53,35 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// 所属二级单位:所属二级单位，按照承担单位、参与单位、委托单位的所属二级单位选择，属于集团内的应在符合Q/CCCC XX003—2021要求的机构主数据中选择。
         /// </summary>
         [SugarColumn(IsIgnore = true)]
-        public List<IT_AI>? IT_AI { get; set; }
+        public IT_AI? IT_AI { get; set; }
         /// <summary>
         /// 承担单位:按科研项目合同填写，内部承担单位属于集团内的应在符合Q/CCCC XX003—2021要求的机构主数据中选择。
         /// 按科研项目合同填写，外部承担单位属于集团外的应在符合Q/CCCC XX007—2021要求的往来单位主数据中选择
         /// </summary>
         [SugarColumn(IsIgnore = true)]
-        public List<IT_AG> IT_AG { get; set; }
+        public IT_AG? IT_AG { get; set; }
         /// <summary>
         /// 曾用名  
         /// </summary>
         [SugarColumn(IsIgnore = true)]
-        public List<IT_ONAME>? IT_ONAME { get; set; }
+        public IT_ONAME? IT_ONAME { get; set; }
         /// <summary>
         /// 参与单位:按科研项目合同填写，内部参与单位属于集团内的应在符合Q/CCCC XX003—2021要求的机构主数据中选择。
         /// 按科研项目合同填写，外部参与单位属于集团外的应在符合Q/CCCC XX007—2021要求的往来单位主数据中选择
         /// </summary>
         [SugarColumn(IsIgnore = true)]
-        public List<IT_AH> IT_AH { get; set; }
+        public IT_AH? IT_AH { get; set; }
         /// <summary>
         /// 委托单位:按科研项目合同填写，内部委托单位属于集团内的应在符合Q/CCCC XX003—2021要求的机构主数据中选择。
         /// 按科研项目合同填写，外部委托单位属于集团外的应在符合Q/CCCC XX007—2021要求的往来单位主数据中选择
         /// </summary>
         [SugarColumn(IsIgnore = true)]
-        public List<IT_AK> IT_AK { get; set; }
+        public IT_AK? IT_AK { get; set; }
         /// <summary>
         /// 项目负责人：项目负责人按科研项目合同填写
         /// </summary>
         [SugarColumn(IsIgnore = true)]
-        public List<IT_AJ> IT_AJ { get; set; }
+        public IT_AJ? IT_AJ { get; set; }
         /// <summary>
         /// 项目总费用（万元）：项目总费用按科研项目合同填写
         /// </summary>
@@ -126,115 +126,6 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// 参与部门:按照承担单位、参与单位、委托单位的参与部门选择，可选多值。2022年6月2日新增加字段
         /// </summary>
         [SugarColumn(IsIgnore = true)]
-        public List<IT_DE> IT_DE { get; set; }
-    }
-
-    /// <summary>
-    /// 所属二级单位
-    /// </summary>
-    public class IT_AI
-    {
-        /// <summary>
-        /// 所属二级单位
-        /// </summary>
-        public string Z2NDORG { get; set; }
-        /// <summary>
-        /// 所属二级单位名称
-        /// </summary>
-        public string? Z2NDORGN { get; set; }
-    }
-    /// <summary>
-    /// 承担单位
-    /// </summary>
-    public class IT_AG
-    {
-        /// <summary>
-        /// 承担单位
-        /// </summary>
-        public string ZUDTK { get; set; }
-        /// <summary>
-        /// 承担单位名称
-        /// </summary>
-        public string? ZUDTKN { get; set; }
-        /// <summary>
-        /// 内部/外部:1 内部/2 外部
-        /// </summary>
-        public string ZIOSIDE { get; set; }
-    }
-    /// <summary>
-    /// 曾用名  
-    /// </summary>
-    public class IT_ONAME
-    {
-        /// <summary>
-        /// 行项目编号
-        /// </summary>
-        public string ZITEM { get; set; }
-        /// <summary>
-        /// 曾用名
-        /// </summary>
-        public string ZOLDNAME { get; set; }
-    }
-    /// <summary>
-    ///  参与单位 
-    /// </summary>
-    public class IT_AH
-    {
-        /// <summary>
-        /// 参与单位
-        /// </summary>
-        public string ZPU { get; set; }
-        /// <summary>
-        /// 参与单位名称
-        /// </summary>
-        public string? ZPUN { get; set; }
-        /// <summary>
-        /// 内部/外部 :1 内部/2 外部
-        /// </summary>
-        public string ZIOSIDE { get; set; }
-    }
-    /// <summary>
-    ///  委托单位
-    /// </summary>
-    public class IT_AK
-    {
-        /// <summary>
-        /// 委托单位
-        /// </summary>
-        public string ZAUTHORISE { get; set; }
-        /// <summary>
-        /// 委托单位名称
-        /// </summary>
-        public string? ZAUTHORISEN { get; set; }
-        /// <summary>
-        /// 内部/外部:1 内部/2 外部
-        /// </summary>
-        public string ZIOSIDE { get; set; }
-    }
-    /// <summary>
-    ///  项目负责人
-    /// </summary>
-    public class IT_AJ
-    {
-        /// <summary>
-        /// 项目负责人
-        /// </summary>
-        public string ZPRINCIPAL { get; set; }
-        /// <summary>
-        /// 项目负责人名称
-        /// </summary>
-        public string? ZPRINCIPALN { get; set; }
-    }
-
-    public class IT_DE
-    {
-        /// <summary>
-        /// 参与部门编号
-        /// </summary>
-        public string ZKZDEPART { get; set; }
-        /// <summary>
-        /// 参与部门名称
-        /// </summary>
-        public string? ZKZDEPARTNM { get; set; }
+        public IT_DE? IT_DE { get; set; }
     }
 }

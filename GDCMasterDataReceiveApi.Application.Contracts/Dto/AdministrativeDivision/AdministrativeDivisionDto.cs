@@ -1,4 +1,4 @@
-﻿using GDCMasterDataReceiveApi.Domain.Models;
+﻿using GDCMasterDataReceiveApi.Application.Contracts.Dto.CountryRegion;
 
 namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.AdministrativeDivision
 {

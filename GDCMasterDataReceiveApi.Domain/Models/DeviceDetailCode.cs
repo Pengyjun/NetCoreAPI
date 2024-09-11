@@ -1,5 +1,5 @@
-﻿using SqlSugar;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using GDCMasterDataReceiveApi.Domain.OtherModels;
+using SqlSugar;
 
 namespace GDCMasterDataReceiveApi.Domain.Models
 {
@@ -12,7 +12,7 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// <summary>
         /// 发送记录ID 发送记录的ID，必须保证此ID在同一个发送批次中是唯一的。用于记录发送方对于此发送记录的唯一标识。
         /// </summary>
-        [NotMapped]
+        [SugarColumn(IsIgnore = true)]
         public string ZZSERIAL { get; set; }
         /// <summary>
         /// 物资设备主数据编码
@@ -54,41 +54,5 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// </summary>
         [SugarColumn(IsIgnore = true)]
         public List<ZMDGTT_MATATTR_DATA_IF>? ZMATTTR_LIST { get; set; }
-    }
-    /// <summary>
-    /// 物资设备属性列表
-    /// </summary>
-    public class ZMDGTT_MATATTR_DATA_IF
-    {
-        /// <summary>
-        /// 物资设备主数据编码
-        /// 11
-        /// </summary>
-        public string ZMATERIAL { set; get; }
-        /// <summary>
-        /// 属性编码
-        /// 10
-        /// </summary>
-        public string ZATTRCODE { set; get; }
-        /// <summary>
-        /// 属性名称
-        /// 100
-        /// </summary>
-        public string ZATTRNAME { set; get; }
-        /// <summary>
-        /// 属性值编码
-        /// 10
-        /// </summary>
-        public string ZVALUECODE { set; get; }
-        /// <summary>
-        /// 属性值名称
-        /// 100
-        /// </summary>
-        public string ZVALUENAME { set; get; }
-        /// <summary>
-        /// 属性计量单位
-        /// 50
-        /// </summary>
-        public string ZATTRUNIT { set; get; }
     }
 }

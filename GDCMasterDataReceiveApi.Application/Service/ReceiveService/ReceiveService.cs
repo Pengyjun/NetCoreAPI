@@ -16,6 +16,7 @@ using GDCMasterDataReceiveApi.Application.Contracts.Dto.RoomNumber;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.ScientifiCNoProject;
 using GDCMasterDataReceiveApi.Application.Contracts.IService.IReceiveService;
 using GDCMasterDataReceiveApi.Domain.Models;
+using GDCMasterDataReceiveApi.Domain.OtherModels;
 using GDCMasterDataReceiveApi.Domain.Shared;
 using GDCMasterDataReceiveApi.Domain.Shared.Enums;
 using GDCMasterDataReceiveApi.Domain.Shared.Utils;
@@ -421,8 +422,8 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
             try
             {
                 var dCList = _mapper.Map<List<DeviceClassCodeItem>, List<DeviceClassCode>>(receiveDataMDMRequestDto.IT_DATA.item);
-                var item = new List<ZMDGS_PROPERTYChild>();//分类属性
-                var item2 = new List<ZMDGS_VALUEChild>();//分类属性值
+                var item = new List<ClassDevice>();//分类属性
+                var item2 = new List<ClassDeviceValue>();//分类属性值
                 foreach (var dc in dCList)
                 {
                     dc.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
@@ -437,13 +438,13 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
                 var dcids = await _dbContext.Queryable<DeviceClassAttribute>().Where(x => x.IsDelete == 1).Select(x => x.ZCLASS).ToListAsync();
                 var insertDCIds = item.Where(x => !deviceCodes.Contains(x.ZCLASS)).Select(x => x.ZCLASS).Where(x => !dcids.Contains(x)).Select(x => x).ToList();
                 var updateDCIds = item.Where(x => deviceCodes.Contains(x.ZCLASS)).Select(x => x.ZCLASS).Where(x => dcids.Contains(x)).Select(x => x).ToList();
-                var itemValues = _mapper.Map<List<ZMDGS_PROPERTYChild>, List<DeviceClassAttribute>>(item);
+                var itemValues = _mapper.Map<List<ClassDevice>, List<DeviceClassAttribute>>(item);
 
                 //属性值
                 var dcVIds = await _dbContext.Queryable<DeviceClassAttributeValue>().Where(x => x.IsDelete == 1).Select(x => x.ZCLASS).ToListAsync();
                 var insertDCVIds = dCList.Where(x => !deviceCodes.Contains(x.ZCLASS)).Select(x => x.ZCLASS).Where(x => !dcVIds.Contains(x)).Select(x => x).ToList();
                 var updateDCVIds = dCList.Where(x => deviceCodes.Contains(x.ZCLASS)).Select(x => x.ZCLASS).Where(x => dcVIds.Contains(x)).Select(x => x).ToList();
-                var item2Values = _mapper.Map<List<ZMDGS_VALUEChild>, List<DeviceClassAttributeValue>>(item2);
+                var item2Values = _mapper.Map<List<ClassDeviceValue>, List<DeviceClassAttributeValue>>(item2);
 
                 if (insertOids.Any())
                 {
@@ -593,6 +594,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
                 var insertOids = invoiceList.Where(x => !invoiceCodes.Contains(x.ZINVTCODE)).Select(x => x.ZINVTCODE).ToList();
                 var updateOids = invoiceList.Where(x => invoiceCodes.Contains(x.ZINVTCODE)).Select(x => x.ZINVTCODE).ToList();
 
+                //发票语言语种
                 var ivList = _mapper.Map<List<InvoiceLanguageItem>, List<InvoiceLanguage>>(item);
                 var invoceLangCodes = await _dbContext.Queryable<InvoiceLanguage>().Where(t => t.IsDelete == 1).Select(t => t.InvoiceCode).ToListAsync();
                 var insertICodes = item.Where(x => !invoceLangCodes.Contains(x.InvoiceCode)).Select(x => x.InvoiceCode).ToList();
@@ -767,6 +769,15 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
             try
             {
                 var invoiceList = _mapper.Map<List<ScientifiCNoProjectItem>, List<ScientifiCNoProject>>(receiveDataMDMRequestDto.IT_DATA.item);
+                var secUnit = new List<SecUnit>();//二级单位
+                var cDUnit = new List<CDUnit>();//承担单位
+                var nameCeng = new List<NameCeng>();//曾用名
+                var canYUnit = new List<CanYUnit>();//参与单位
+                var weiTUnit = new List<WeiTUnit>();//委托单位
+                var pLeader = new List<PLeader>();//项目负责人
+                var canYDep = new List<CanYDep>();//参与部门
+
+
                 foreach (var item in invoiceList)
                 {
                     item.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();

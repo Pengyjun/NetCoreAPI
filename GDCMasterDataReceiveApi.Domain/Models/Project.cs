@@ -1,5 +1,5 @@
-﻿using SqlSugar;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using GDCMasterDataReceiveApi.Domain.OtherModels;
+using SqlSugar;
 
 namespace GDCMasterDataReceiveApi.Domain.Models
 {
@@ -12,7 +12,7 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// <summary>
         /// 发送记录ID 发送记录的ID，必须保证此ID在同一个发送批次中是唯一的。用于记录发送方对于此发送记录的唯一标识。
         /// </summary>
-        [NotMapped]
+        [SugarColumn(IsIgnore = true)]
         public string ZZSERIAL { get; set; }
         /// <summary>
         /// 项目主数据编码
@@ -299,21 +299,5 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// </summary>
         [SugarColumn(IsIgnore = true)]
          public List<ZMDGS_OLDNAME>? ZOLDNAME_LIST { get; set; }
-    }
-    /// <summary>
-    /// 曾用名列表
-    /// </summary>
-    public class ZMDGS_OLDNAME
-    {
-        /// <summary>
-        /// 项目主数据编码
-        /// 12
-        /// </summary>
-        public string? ZPROJECT { get; set; }
-        /// <summary>
-        /// 曾用名
-        /// 500
-        /// </summary>
-        public string? ZOLDNAME { get; set; }
     }
 }

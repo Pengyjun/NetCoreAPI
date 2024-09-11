@@ -1,4 +1,5 @@
-﻿using SqlSugar;
+﻿using GDCMasterDataReceiveApi.Domain.OtherModels;
+using SqlSugar;
 
 namespace GDCMasterDataReceiveApi.Domain.Models
 {

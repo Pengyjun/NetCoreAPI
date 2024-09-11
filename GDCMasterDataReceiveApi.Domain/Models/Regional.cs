@@ -1,5 +1,5 @@
-﻿using SqlSugar;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using GDCMasterDataReceiveApi.Domain.OtherModels;
+using SqlSugar;
 
 namespace GDCMasterDataReceiveApi.Domain.Models
 {
@@ -12,7 +12,7 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// <summary>
         /// 发送记录ID 发送记录的ID，必须保证此ID在同一个发送批次中是唯一的。用于记录发送方对于此发送记录的唯一标识。
         /// </summary>
-        [NotMapped]
+        [SugarColumn(IsIgnore = true)]
         public string ZZSERIAL { get; set; }
         /// <summary>
         /// 中交区域总部代码:中交区域中心编码
@@ -54,23 +54,5 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// </summary>
         [SugarColumn(IsIgnore = true)]
         public List<ZMDGTT_ZLANG3>? ZLANG_LIST { get; set; }
-    }
-    /// <summary>
-    /// 多语言描述表类型
-    /// </summary>
-    public class ZMDGTT_ZLANG3
-    {
-        /// <summary>
-        /// 语种代码
-        /// </summary>
-        public string? ZLANGCODE { get; set; }
-        /// <summary>
-        /// 编码描述:ZCRHCODE中交区域总部代码多语言描述
-        /// </summary>
-        public string? ZCODE_DESC { get; set; }
-        /// <summary>
-        /// 简称:ZCRHABBR简称
-        /// </summary>
-        public string? ZSCRTEXT_S { get; set; }
     }
 }

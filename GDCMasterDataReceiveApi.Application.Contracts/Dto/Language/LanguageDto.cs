@@ -1,4 +1,5 @@
 ﻿using GDCMasterDataReceiveApi.Domain.Models;
+using GDCMasterDataReceiveApi.Domain.OtherModels;
 
 namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.Language
 {

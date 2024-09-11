@@ -26,9 +26,11 @@ using GDCMasterDataReceiveApi.Application.Contracts.Dto.Regional;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.RegionalCenter;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.RelationalContracts;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.RoomNumber;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.ScientifiCNoProject;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.TypeOfBidDisclosureProjectTable;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.UnitMeasurement;
 using GDCMasterDataReceiveApi.Domain.Models;
+using GDCMasterDataReceiveApi.Domain.OtherModels;
 
 namespace GDCMasterDataReceiveApi.Application.Contracts.AutoMapper
 {
@@ -109,9 +111,10 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.AutoMapper
 
 
             #region 其他映射
-            mapperConfigurationExpression.CreateMap<ZMDGS_PROPERTYChild, DeviceClassAttribute>();
-            mapperConfigurationExpression.CreateMap<ZMDGS_VALUEChild, DeviceClassAttributeValue>();
+            mapperConfigurationExpression.CreateMap<ClassDevice, DeviceClassAttribute>();
+            mapperConfigurationExpression.CreateMap<ClassDeviceValue, DeviceClassAttributeValue>();
             mapperConfigurationExpression.CreateMap<InvoiceLanguageItem, InvoiceLanguage>();
+            mapperConfigurationExpression.CreateMap<ScientifiCNoProjectItem, ScientifiCNoProject>();
             #endregion
 
         }
