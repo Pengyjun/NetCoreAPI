@@ -52,19 +52,19 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// 多语言描述表类型
         /// </summary>
         [SugarColumn(IsIgnore = true)]
-        public ZMDGS_ZLANG5? ZLANG_LIST { get; set; }
+        public InvoiceLang? ZLANG_LIST { get; set; }
     }
     /// <summary>
     /// 多语言描述表类型
     /// </summary>
-    public class ZMDGS_ZLANG5
+    public class InvoiceLang
     {
-        public List<ZMDGS_ZLANG5Child>? Item { get; set; }
+        public List<InvoiceLanguageItem>? Item { get; set; }
     }
     /// <summary>
     /// 
     /// </summary>
-    public class ZMDGS_ZLANG5Child
+    public class InvoiceLanguageItem
     {
         /// <summary>
         /// 语种代码

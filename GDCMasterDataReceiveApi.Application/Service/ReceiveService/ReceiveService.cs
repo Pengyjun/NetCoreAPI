@@ -577,9 +577,11 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
             try
             {
                 var invoiceList = _mapper.Map<List<InvoiceTypeItem>, List<InvoiceType>>(receiveDataMDMRequestDto.IT_DATA.item);
-                foreach (var item in invoiceList)
+                var item = new List<InvoiceLanguageItem>();
+                foreach (var ic in invoiceList)
                 {
-                    item.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
+                    ic.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
+
                 }
                 var invoiceCodes = await _dbContext.Queryable<InvoiceType>().Where(x => x.IsDelete == 1).Select(x => x.ZINVTCODE).ToListAsync();
                 var insertOids = invoiceList.Where(x => !invoiceCodes.Contains(x.ZINVTCODE)).Select(x => x.ZINVTCODE).ToList();

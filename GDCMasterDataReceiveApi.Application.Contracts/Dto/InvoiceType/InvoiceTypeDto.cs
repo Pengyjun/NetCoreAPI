@@ -64,6 +64,6 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.InvoiceType
         /// <summary>
         /// 多语言描述表类型
         /// </summary>
-        public ZMDGS_ZLANG5? ZLANG_LIST { get; set; }
+        public InvoiceLang? ZLANG_LIST { get; set; }
     }
 }

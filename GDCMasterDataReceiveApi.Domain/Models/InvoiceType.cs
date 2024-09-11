@@ -1,5 +1,4 @@
 ﻿using SqlSugar;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace GDCMasterDataReceiveApi.Domain.Models
 {
@@ -43,6 +42,6 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// 多语言描述表类型
         /// </summary>
         [SugarColumn(IsIgnore = true)]
-        public ZMDGS_ZLANG5? ZLANG_LIST { get; set; }
+        public InvoiceLang? ZLANG_LIST { get; set; }
     }
 }

@@ -96,7 +96,7 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.Currency
         /// <summary>
         /// 多语言描述表类型
         /// </summary>
-        public ZMDGS_ZLANG5? item { get; set; }
+        public InvoiceLang? item { get; set; }
     }
     #endregion
 }
