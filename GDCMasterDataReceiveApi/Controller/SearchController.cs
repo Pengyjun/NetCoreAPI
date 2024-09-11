@@ -1,17 +1,27 @@
 ﻿using GDCMasterDataReceiveApi.Application.Contracts;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto._4A.User;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.AccountingDepartment;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.AdministrativeAccountingMapper;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.BankCard;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.CorresUnit;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.CountryContinent;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.CountryRegion;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.DeviceClassCode;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.DeviceDetailCode;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.FinancialInstitution;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.Institution;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.InvoiceType;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.Language;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.LouDong;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.NationalEconomy;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.Project;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.ProjectClassification;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.Regional;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.RegionalCenter;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.RelationalContracts;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.RoomNumber;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.ScientifiCNoProject;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.UnitMeasurement;
 using GDCMasterDataReceiveApi.Application.Contracts.IService.ISearchService;
 using GDCMasterDataReceiveApi.Domain.Shared;
 using Microsoft.AspNetCore.Mvc;
@@ -293,6 +303,206 @@ namespace GDCMasterDataReceiveApi.Controller
         public async Task<ResponseAjaxResult<LanguageDetailsDto>> GetLanguageDetailsAsync([FromQuery] string id)
         {
             return await _searchService.GetLanguageDetailsAsync(id);
+        }
+        /// <summary>
+        /// 获取银行账号列表
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        [HttpGet("GetBankCardSearch")]
+        public async Task<ResponseAjaxResult<List<BankCardSearchDto>>> GetBankCardSearchAsync([FromQuery] BankCardRequestDto requestDto)
+        {
+            return await _searchService.GetBankCardSearchAsync(requestDto);
+        }
+        /// <summary>
+        /// 获取银行账号详情
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet("GetBankCardDetails")]
+        public async Task<ResponseAjaxResult<BankCardDetailsDto>> GetBankCardDetailsAsync([FromQuery] string id)
+        {
+            return await _searchService.GetBankCardDetailsAsync(id);
+        }
+        /// <summary>
+        /// 获取物资设备明细编码
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        [HttpGet("GetDeviceDetailCodeSearch")]
+        public async Task<ResponseAjaxResult<List<DeviceDetailCodeSearchDto>>> GetDeviceDetailCodeSearchAsync([FromQuery] DeviceDetailCodeRequestDto requestDto)
+        {
+            return await _searchService.GetDeviceDetailCodeSearchAsync(requestDto);
+        }
+        /// <summary>
+        /// 获取物资设备明细编码 详细
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet("GetDeviceDetailCodeDetail")]
+        public async Task<ResponseAjaxResult<DeviceDetailCodeDetailsDto>> GetDeviceDetailCodeDetailsAsync([FromQuery] string id)
+        {
+            return await _searchService.GetDeviceDetailCodeDetailsAsync(id);
+        }
+        /// <summary>
+        /// 获取核算部门列表
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        [HttpGet("GetAccountingDepartmentSearch")]
+        public async Task<ResponseAjaxResult<List<AccountingDepartmentSearchDto>>> GetAccountingDepartmentSearchAsync([FromQuery] AccountingDepartmentRequestDto requestDto)
+        {
+            return await _searchService.GetAccountingDepartmentSearchAsync(requestDto);
+        }
+        /// <summary>
+        /// 获取核算部门详细
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet("GetAccountingDepartmentDetails")]
+        public async Task<ResponseAjaxResult<AccountingDepartmentDetailsDto>> GetAccountingDepartmentDetailsAsync([FromQuery] string id)
+        {
+            return await _searchService.GetAccountingDepartmentDetailsAsync(id);
+        }
+        /// <summary>
+        /// 获取委托关系列表
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        [HttpGet("GetRelationalContractsSearch")]
+        public async Task<ResponseAjaxResult<List<RelationalContractsSearchDto>>> GetRelationalContractsSearchAsync([FromQuery] RelationalContractsRequestDto requestDto)
+        {
+            return await _searchService.GetRelationalContractsSearchAsync(requestDto);
+        }
+        /// <summary>
+        /// 获取委托关系详情
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet("GetRelationalContractsDetails")]
+        public async Task<ResponseAjaxResult<RelationalContractsDetailsDto>> GetRelationalContractsDetailsAsync([FromQuery] string id)
+        {
+            return await _searchService.GetRelationalContractsDetailsAsync(id);
+        }
+        /// <summary>
+        /// 中交区域总部列表
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        [HttpGet("GetRegionalSearch")]
+        public async Task<ResponseAjaxResult<List<RegionalSearchDto>>> GetRegionalSearchAsync([FromQuery] RegionalRequestDto requestDto)
+        {
+            return await _searchService.GetRegionalSearchAsync(requestDto);
+        }
+        /// <summary>
+        /// 中交区域总部详情
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet("GetRegionalDetails")]
+        public async Task<ResponseAjaxResult<RegionalDetailsDto>> GetRegionalDetailsAsync([FromQuery] string id)
+        {
+            return await _searchService.GetRegionalDetailsAsync(id);
+        }
+        /// <summary>
+        /// 获取计量单位列表
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        [HttpGet("GetUnitMeasurementSearch")]
+        public async Task<ResponseAjaxResult<List<UnitMeasurementSearchDto>>> GetUnitMeasurementSearchAsync([FromQuery] UnitMeasurementRequestDto requestDto)
+        {
+            return await _searchService.GetUnitMeasurementSearchAsync(requestDto);
+        }
+        /// <summary>
+        /// 获取计量单位详情
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet("GetUnitMeasurementDetails")]
+        public async Task<ResponseAjaxResult<UnitMeasurementDetailsDto>> GetUnitMeasurementDetailsAsync([FromQuery] string id)
+        {
+            return await _searchService.GetUnitMeasurementDetailsAsync(id);
+        }
+        /// <summary>
+        /// 获取中交项目行业分类产业分类、业务板块、十二大业务类型、江河湖海对照关系 列表
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        [HttpGet("GetProjectClassificationSearch")]
+        public async Task<ResponseAjaxResult<List<ProjectClassificationSearchDto>>> GetProjectClassificationSearchAsync([FromQuery] ProjectClassificationRequestDto requestDto)
+        {
+            return await _searchService.GetProjectClassificationSearchAsync(requestDto);
+        }
+        /// <summary>
+        /// 获取中交项目行业分类产业分类、业务板块、十二大业务类型、江河湖海对照关系 详情
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet("GetProjectClassificationDetails")]
+        public async Task<ResponseAjaxResult<ProjectClassificationDetailsDto>> GetProjectClassificationDetailsAsync([FromQuery] string id)
+        {
+            return await _searchService.GetProjectClassificationDetailsAsync(id);
+        }
+        /// <summary>
+        /// 获取中交区域中心列表
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        [HttpGet("GetRegionalCenterSearch")]
+        public async Task<ResponseAjaxResult<List<RegionalCenterSearchDto>>> GetRegionalCenterSearchAsync([FromQuery] RegionalCenterRequestDto requestDto)
+        {
+            return await _searchService.GetRegionalCenterSearchAsync(requestDto);
+        }
+        /// <summary>
+        /// 获取中交区域中心详细
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet("GetRegionalCenterDetails")]
+        public async Task<ResponseAjaxResult<RegionalCenterDetailsDto>> GetRegionalCenterDetailsAsync([FromQuery] string id)
+        {
+            return await _searchService.GetRegionalCenterDetailsAsync(id);
+        }
+        /// <summary>
+        /// 获取国民经济行业分类列表
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        [HttpGet("GetNationalEconomySearch")]
+        public async Task<ResponseAjaxResult<List<NationalEconomySearchDto>>> GetNationalEconomySearchAsync([FromQuery] NationalEconomyRequestDto requestDto)
+        {
+            return await _searchService.GetNationalEconomySearchAsync(requestDto);
+        }
+        /// <summary>
+        /// 获取国民经济行业分类详细
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet("GetNationalEconomyDetails")]
+        public async Task<ResponseAjaxResult<NationalEconomyDetailsDto>> GetNationalEconomyDetailsAsync([FromQuery] string id)
+        {
+            return await _searchService.GetNationalEconomyDetailsAsync(id);
+        }
+        /// <summary>
+        /// 获取行政机构和核算机构映射关系 列表
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        [HttpGet("GetAdministrativeAccountingMapperSearch")]
+        public async Task<ResponseAjaxResult<List<AdministrativeAccountingMapperSearchDto>>> GetAdministrativeAccountingMapperSearchAsync([FromQuery] AdministrativeAccountingMapperRequestDto requestDto)
+        {
+            return await _searchService.GetAdministrativeAccountingMapperSearchAsync(requestDto);
+        }
+        /// <summary>
+        /// 获取行政机构和核算机构映射关系 明细
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet("GetAdministrativeAccountingMapperDetails")]
+        public async Task<ResponseAjaxResult<AdministrativeAccountingMapperDetailsDto>> GetAdministrativeAccountingMapperDetailsAsync([FromQuery] string id)
+        {
+            return await _searchService.GetAdministrativeAccountingMapperDetailsAsync(id);
         }
     }
 }
