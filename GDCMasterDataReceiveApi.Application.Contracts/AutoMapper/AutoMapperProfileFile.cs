@@ -108,9 +108,10 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.AutoMapper
             mapperConfigurationExpression.CreateMap<UnitMeasurementReceiveDto, UnitMeasurement>();
 
 
-
+            #region 其他映射
             mapperConfigurationExpression.CreateMap<ZMDGS_PROPERTYChild, DeviceClassAttribute>();
             mapperConfigurationExpression.CreateMap<ZMDGS_VALUEChild, DeviceClassAttributeValue>();
+            #endregion
 
         }
     }
