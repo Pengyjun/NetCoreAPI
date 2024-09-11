@@ -7,7 +7,7 @@ namespace GDCMasterDataReceiveApi.Domain.Models
     /// 二级单位
     /// </summary>
     [SugarTable("t_kysecunit", IsDisabledDelete = true)]
-    public class KySecUnit
+    public class KySecUnit : BaseEntity<long>
     {
         /// <summary>
         /// 科研编码
@@ -17,7 +17,7 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// <summary>
         /// 所属二级单位
         /// </summary>
-        [SugarColumn(Length =100, ColumnName = "SecUnit")]
+        [SugarColumn(Length = 100, ColumnName = "SecUnit")]
         public string Z2NDORG { get; set; }
         /// <summary>
         /// 所属二级单位名称
@@ -29,7 +29,7 @@ namespace GDCMasterDataReceiveApi.Domain.Models
     /// 承担单位
     /// </summary>
     [SugarTable("t_kycdunit", IsDisabledDelete = true)]
-    public class KyCDUnit
+    public class KyCDUnit : BaseEntity<long>
     {
         /// <summary>
         /// 科研编码
@@ -56,7 +56,7 @@ namespace GDCMasterDataReceiveApi.Domain.Models
     /// 曾用名
     /// </summary>
     [SugarTable("t_kynameceng", IsDisabledDelete = true)]
-    public class KyNameCeng
+    public class KyNameCeng : BaseEntity<long>
     {
         /// <summary>
         /// 科研编码
@@ -78,7 +78,7 @@ namespace GDCMasterDataReceiveApi.Domain.Models
     /// 参与单位
     /// </summary>
     [SugarTable("t_kycanyunit", IsDisabledDelete = true)]
-    public class KyCanYUnit
+    public class KyCanYUnit : BaseEntity<long>
     {
         /// <summary>
         /// 科研编码
@@ -105,7 +105,7 @@ namespace GDCMasterDataReceiveApi.Domain.Models
     /// 委托单位
     /// </summary>
     [SugarTable("t_kyweitunit", IsDisabledDelete = true)]
-    public class KyWeiTUnit
+    public class KyWeiTUnit : BaseEntity<long>
     {
         /// <summary>
         /// 科研编码
@@ -132,7 +132,7 @@ namespace GDCMasterDataReceiveApi.Domain.Models
     /// 项目负责人
     /// </summary>
     [SugarTable("t_kypleader", IsDisabledDelete = true)]
-    public class KyPLeader
+    public class KyPLeader : BaseEntity<long>
     {
         /// <summary>
         /// 科研编码
@@ -154,7 +154,7 @@ namespace GDCMasterDataReceiveApi.Domain.Models
     /// 参与部门
     /// </summary>
     [SugarTable("t_kycanydep", IsDisabledDelete = true)]
-    public class KyCanYDep
+    public class KyCanYDep : BaseEntity<long>
     {
         /// <summary>
         /// 参与部门编号

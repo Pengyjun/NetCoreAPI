@@ -18,7 +18,7 @@
         /// <summary>
         /// 所属二级单位
         /// </summary>
-        public string Z2NDORG { get; set; }
+        public string? Z2NDORG { get; set; }
         /// <summary>
         /// 所属二级单位名称
         /// </summary>
@@ -26,7 +26,7 @@
         /// <summary>
         /// 科研编码
         /// </summary>
-        public string Code { get; set; }
+        public string? Code { get; set; }
     }
     /// <summary>
     /// 承担单位
@@ -40,7 +40,7 @@
         /// <summary>
         /// 承担单位
         /// </summary>
-        public string ZUDTK { get; set; }
+        public string? ZUDTK { get; set; }
         /// <summary>
         /// 承担单位名称
         /// </summary>
@@ -48,11 +48,11 @@
         /// <summary>
         /// 内部/外部:1 内部/2 外部
         /// </summary>
-        public string ZIOSIDE { get; set; }
+        public string? ZIOSIDE { get; set; }
         /// <summary>
         /// 科研编码
         /// </summary>
-        public string Code { get; set; }
+        public string? Code { get; set; }
     }
     /// <summary>
     /// 曾用名  
@@ -67,15 +67,15 @@
         /// <summary>
         /// 行项目编号
         /// </summary>
-        public string ZITEM { get; set; }
+        public string? ZITEM { get; set; }
         /// <summary>
         /// 曾用名
         /// </summary>
-        public string ZOLDNAME { get; set; }
+        public string? ZOLDNAME { get; set; }
         /// <summary>
         /// 科研编码
         /// </summary>
-        public string Code { get; set; }
+        public string? Code { get; set; }
     }
     /// <summary>
     ///  参与单位 
@@ -89,7 +89,7 @@
         /// <summary>
         /// 参与单位
         /// </summary>
-        public string ZPU { get; set; }
+        public string? ZPU { get; set; }
         /// <summary>
         /// 参与单位名称
         /// </summary>
@@ -97,11 +97,11 @@
         /// <summary>
         /// 内部/外部 :1 内部/2 外部
         /// </summary>
-        public string ZIOSIDE { get; set; }
+        public string? ZIOSIDE { get; set; }
         /// <summary>
         /// 科研编码
         /// </summary>
-        public string Code { get; set; }
+        public string? Code { get; set; }
     }
     /// <summary>
     ///  委托单位
@@ -115,7 +115,7 @@
         /// <summary>
         /// 委托单位
         /// </summary>
-        public string ZAUTHORISE { get; set; }
+        public string? ZAUTHORISE { get; set; }
         /// <summary>
         /// 委托单位名称
         /// </summary>
@@ -123,11 +123,11 @@
         /// <summary>
         /// 内部/外部:1 内部/2 外部
         /// </summary>
-        public string ZIOSIDE { get; set; }
+        public string? ZIOSIDE { get; set; }
         /// <summary>
         /// 科研编码
         /// </summary>
-        public string Code { get; set; }
+        public string? Code { get; set; }
     }
     /// <summary>
     ///  项目负责人
@@ -149,21 +149,21 @@
         /// <summary>
         /// 科研编码
         /// </summary>
-        public string Code { get; set; }
+        public string? Code { get; set; }
     }
     /// <summary>
     /// 参与部门
     /// </summary>
     public class IT_DE
     {
-        public List<CanYDep>? item { get; set; }
+        public List<CanYDep>? Item { get; set; }
     }
     public class CanYDep
     {
         /// <summary>
         /// 参与部门编号
         /// </summary>
-        public string ZKZDEPART { get; set; }
+        public string? ZKZDEPART { get; set; }
         /// <summary>
         /// 参与部门名称
         /// </summary>
@@ -171,6 +171,6 @@
         /// <summary>
         /// 科研编码
         /// </summary>
-        public string Code { get; set; }
+        public string? Code { get; set; }
     }
 }

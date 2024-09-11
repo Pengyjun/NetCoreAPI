@@ -103,7 +103,7 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.AutoMapper
             //房号
             mapperConfigurationExpression.CreateMap<RoomNumberItem, RoomNumber>();
             //科研项目
-            //mapperConfigurationExpression.CreateMap<ScientifiCNoProjectReceiveDto, ScientifiCNoProject>();
+            mapperConfigurationExpression.CreateMap<ScientifiCNoProjectItem, ScientifiCNoProject>();
             //中标交底项目表类型
             mapperConfigurationExpression.CreateMap<TypeOfBidDisclosureProjectTableReceiveDto, TypeOfBidDisclosureProjectTable>();
             //常用计量单位
@@ -115,6 +115,13 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.AutoMapper
             mapperConfigurationExpression.CreateMap<ClassDeviceValue, DeviceClassAttributeValue>();
             mapperConfigurationExpression.CreateMap<InvoiceLanguageItem, InvoiceLanguage>();
             mapperConfigurationExpression.CreateMap<ScientifiCNoProjectItem, ScientifiCNoProject>();
+            mapperConfigurationExpression.CreateMap<SecUnit, KySecUnit>();
+            mapperConfigurationExpression.CreateMap<CDUnit, KyCDUnit>();
+            mapperConfigurationExpression.CreateMap<NameCeng, KyNameCeng>();
+            mapperConfigurationExpression.CreateMap<CanYUnit, KyCanYUnit>();
+            mapperConfigurationExpression.CreateMap<WeiTUnit, KyWeiTUnit>();
+            mapperConfigurationExpression.CreateMap<PLeader, KyPLeader>();
+            mapperConfigurationExpression.CreateMap<CanYDep, KyCanYDep>();
             #endregion
 
         }
