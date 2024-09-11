@@ -2,13 +2,17 @@
 using GDCMasterDataReceiveApi.Application.Contracts;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto._4A.User;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.AccountingDepartment;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.AccountingOrganization;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.AdministrativeAccountingMapper;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.AdministrativeDivision;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.BankCard;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.BusinessNoCpportunity;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.CorresUnit;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.CountryContinent;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.CountryRegion;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.DeviceClassCode;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.DeviceDetailCode;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.EscrowOrganization;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.FinancialInstitution;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.Institution;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.InvoiceType;
@@ -403,7 +407,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     EngineeringName = pro.ZENG,
                     ForeignName = pro.ZPROJENAME,
                     Location = pro.ZPROJLOC,
-                    MDCode = pro.ZPROJECTUP,
+                    MDCode = pro.ZPROJECT,
                     Name = pro.ZPROJNAME,
                     PjectOrg = pro.ZPRO_ORG,
                     PjectOrgBP = pro.ZPRO_BP,
@@ -442,7 +446,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     EngineeringName = pro.ZENG,
                     ForeignName = pro.ZPROJENAME,
                     Location = pro.ZPROJLOC,
-                    MDCode = pro.ZPROJECTUP,
+                    MDCode = pro.ZPROJECT,
                     Name = pro.ZPROJNAME,
                     PjectOrg = pro.ZPRO_ORG,
                     PjectOrgBP = pro.ZPRO_BP,
@@ -1592,6 +1596,286 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
             responseAjaxResult.SuccessResult(result);
             return responseAjaxResult;
 
+        }
+        /// <summary>
+        /// 多组织-税务代管组织(行政)列表
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        public async Task<ResponseAjaxResult<List<EscrowOrganizationSearchDto>>> GetEscrowOrganizationSearchAsync(EscrowOrganizationRequestDto requestDto)
+        {
+            var responseAjaxResult = new ResponseAjaxResult<List<EscrowOrganizationSearchDto>>();
+            RefAsync<int> total = 0;
+
+            var ccList = await _dbContext.Queryable<EscrowOrganization>()
+                .Where((cc) => cc.IsDelete == 1)
+                .Select((cc) => new EscrowOrganizationSearchDto
+                {
+                    Id = cc.Id.ToString(),
+                    Country = cc.CAREA,
+                    IsIndependenceAcc = cc.IS_INDEPENDENT,
+                    LocationOfOrg = cc.ORGPROVINCE,
+                    Name = cc.NAME,
+                    NameEnglish = cc.ENGLISHNAME,
+                    NameLLanguage = cc.ZZTNAME_LOC,
+                    NodeSequence = cc.SNO,
+                    OrgStatus = cc.STATUS,
+                    RegionalAttr = cc.TERRITORYPRO,
+                    Remark = cc.NOTE,
+                    Shareholding = cc.SHAREHOLDINGS,
+                    ShortNameChinese = cc.SHORTNAME,
+                    TelAddress = cc.ZADDRESS
+                })
+                .ToPageListAsync(requestDto.PageIndex, requestDto.PageSize, total);
+
+            responseAjaxResult.Count = total;
+            responseAjaxResult.SuccessResult(ccList);
+            return responseAjaxResult;
+        }
+        /// <summary>
+        /// 多组织-税务代管组织(行政) 详细
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<ResponseAjaxResult<EscrowOrganizationDetailsDto>> GetEscrowOrganizationDetailsAsync(string id)
+        {
+            var responseAjaxResult = new ResponseAjaxResult<EscrowOrganizationDetailsDto>();
+
+            var result = await _dbContext.Queryable<EscrowOrganization>()
+                .Where((cc) => cc.IsDelete == 1 && cc.Id.ToString() == id)
+                .Select((cc) => new EscrowOrganizationDetailsDto
+                {
+                    Country = cc.CAREA,
+                    IsIndependenceAcc = cc.IS_INDEPENDENT,
+                    LocationOfOrg = cc.ORGPROVINCE,
+                    Name = cc.NAME,
+                    NameEnglish = cc.ENGLISHNAME,
+                    NameLLanguage = cc.ZZTNAME_LOC,
+                    NodeSequence = cc.SNO,
+                    OrgStatus = cc.STATUS,
+                    RegionalAttr = cc.TERRITORYPRO,
+                    Remark = cc.NOTE,
+                    Shareholding = cc.SHAREHOLDINGS,
+                    ShortNameChinese = cc.SHORTNAME,
+                    TelAddress = cc.ZADDRESS,
+                    HROrgMDCode = cc.OID,
+                    OrgAttr = cc.TYPE,
+                    OrgChildAttr = cc.TYPEEXT,
+                    OrgCode = cc.OCODE,
+                    OrgGruleCode = cc.ORULE,
+                    OrgMDCode = cc.MDM_CODE,
+                    RegistrationNo = cc.REGISTERCODE,
+                    ShortNameEnglish = cc.ENGLISHSHORTNAME,
+                    ShortNameLLanguage = cc.ZZTSHNAME_LOC,
+                    SupHROrgMDCode = cc.POID,
+                    SupOrgMDCode = cc.ZORGUP,
+                    TreeLevel = cc.GRADE,
+                    UnitSec = cc.GPOID,
+                    ViewIdentification = cc.VIEW_FLAG,
+                    ZINSTID = cc.ZINSTID
+                })
+                .FirstAsync();
+
+            responseAjaxResult.SuccessResult(result);
+            return responseAjaxResult;
+        }
+        /// <summary>
+        /// 商机项目(不含境外商机项目) 列表
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        public async Task<ResponseAjaxResult<List<BusinessNoCpportunitySearchDto>>> GetBusinessNoCpportunitySearchAsync(BusinessNoCpportunityRequestDto requestDto)
+        {
+            var responseAjaxResult = new ResponseAjaxResult<List<BusinessNoCpportunitySearchDto>>();
+            RefAsync<int> total = 0;
+
+            var ccList = await _dbContext.Queryable<BusinessNoCpportunity>()
+                .Where((cc) => cc.IsDelete == 1)
+                .Select((cc) => new BusinessNoCpportunitySearchDto
+                {
+                    Id = cc.Id.ToString(),
+                    Country = cc.ZZCOUNTRY,
+                    BPjectForeignName = cc.ZBOPN_EN,
+                    BPjectMDCode = cc.ZBOP,
+                    Name = cc.ZBOPN,
+                    PjectType = cc.ZPROJTYPE,
+                    QualificationUnit = cc.ZORG_QUAL,
+                    State = cc.ZSTATE == "1" ? "有效" : "无效",
+                    TaxationMethod = cc.ZTAXMETHOD
+                })
+                .ToPageListAsync(requestDto.PageIndex, requestDto.PageSize, total);
+
+            responseAjaxResult.Count = total;
+            responseAjaxResult.SuccessResult(ccList);
+            return responseAjaxResult;
+        }
+        /// <summary>
+        /// 商机项目(不含境外商机项目) 详情
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<ResponseAjaxResult<BusinessNoCpportunityDetailsDto>> GetBusinessNoCpportunityDetailsAsync(string id)
+        {
+            var responseAjaxResult = new ResponseAjaxResult<BusinessNoCpportunityDetailsDto>();
+
+            var result = await _dbContext.Queryable<BusinessNoCpportunity>()
+                .Where((cc) => cc.IsDelete == 1 && cc.Id.ToString() == id)
+                .Select((cc) => new BusinessNoCpportunityDetailsDto
+                {
+                    Country = cc.ZZCOUNTRY,
+                    BPjectForeignName = cc.ZBOPN_EN,
+                    BPjectMDCode = cc.ZBOP,
+                    Name = cc.ZBOPN,
+                    PjectType = cc.ZPROJTYPE,
+                    QualificationUnit = cc.ZORG_QUAL,
+                    State = cc.ZSTATE == "1" ? "有效" : "无效",
+                    TaxationMethod = cc.ZTAXMETHOD,
+                    BTypeOfCCCCProjects = cc.ZCPBC,
+                    ParticipatingUnits = cc.ZCY2NDORG,
+                    PjectLocation = cc.ZPROJLOC,
+                    StartTrackingDate = cc.ZSFOLDATE,
+                    TrackingUnit = cc.ZORG,
+                    UnitSec = cc.Z2NDORG
+                })
+                .FirstAsync();
+
+            responseAjaxResult.SuccessResult(result);
+            return responseAjaxResult;
+        }
+        /// <summary>
+        /// 获取境内行政区划 列表
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        public async Task<ResponseAjaxResult<List<AdministrativeDivisionSearchDto>>> GetAdministrativeDivisionSearchAsync(AdministrativeDivisionRequestDto requestDto)
+        {
+            var responseAjaxResult = new ResponseAjaxResult<List<AdministrativeDivisionSearchDto>>();
+            RefAsync<int> total = 0;
+
+            var ccList = await _dbContext.Queryable<AdministrativeDivision>()
+                .Where((cc) => cc.IsDelete == 1)
+                .Select((cc) => new AdministrativeDivisionSearchDto
+                {
+                    Id = cc.Id.ToString(),
+                    CodeOfCCCCRegional = cc.ZCRHCODE,
+                    RegionalismCode = cc.ZADDVSCODE,
+                    RegionalismLevel = cc.ZADDVSLEVEL,
+                    Name = cc.ZADDVSNAME,
+                    State = cc.ZSTATE == "1" ? "有效" : "无效"
+                })
+                .ToPageListAsync(requestDto.PageIndex, requestDto.PageSize, total);
+
+            responseAjaxResult.Count = total;
+            responseAjaxResult.SuccessResult(ccList);
+            return responseAjaxResult;
+        }
+        /// <summary>
+        /// 获取境内行政区划 详情
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<ResponseAjaxResult<AdministrativeDivisionDetailsDto>> GetAdministrativeDivisionDetailsAsync(string id)
+        {
+            var responseAjaxResult = new ResponseAjaxResult<AdministrativeDivisionDetailsDto>();
+
+            var result = await _dbContext.Queryable<AdministrativeDivision>()
+                .Where((cc) => cc.IsDelete == 1 && cc.Id.ToString() == id)
+                .Select((cc) => new AdministrativeDivisionDetailsDto
+                {
+                    CodeOfCCCCRegional = cc.ZCRHCODE,
+                    RegionalismCode = cc.ZADDVSCODE,
+                    RegionalismLevel = cc.ZADDVSLEVEL,
+                    Name = cc.ZADDVSNAME,
+                    State = cc.ZSTATE == "1" ? "有效" : "无效",
+                    DataIdentifier = cc.ZDELETE == "1" ? "未删除" : "已删除",
+                    SupRegionalismCode = cc.ZADDVSUP,
+                    Version = cc.ZVERSION
+                })
+                .FirstAsync();
+
+            responseAjaxResult.SuccessResult(result);
+            return responseAjaxResult;
+        }
+        /// <summary>
+        /// 多组织-核算机构 列表
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        public async Task<ResponseAjaxResult<List<AccountingOrganizationSearchDto>>> GetAccountingOrganizationSearchAsync(AccountingOrganizationRequestDto requestDto)
+        {
+            var responseAjaxResult = new ResponseAjaxResult<List<AccountingOrganizationSearchDto>>();
+            RefAsync<int> total = 0;
+
+            var ccList = await _dbContext.Queryable<AccountingOrganization>()
+                .Where((cc) => cc.IsDelete == 1)
+                .Select((cc) => new AccountingOrganizationSearchDto
+                {
+                    Id = cc.Id.ToString(),
+                    CountryName = cc.ZCYNAME,
+                    Name = cc.ZZTNAME_ZH,
+                    State = cc.ZOSTATE == "1" ? "有效" : "无效",
+                    OrgELName = cc.ZZTNAME_EN,
+                    OrgGruleCode = cc.ZORULE,
+                    OrgLLanguage = cc.ZZTNAME_LOC,
+                    OrgLocation = cc.ZORGLOC,
+                    OrgShortName = cc.ZZTSHNAME_CHS,
+                    RegionalAttr = cc.ZREGIONAL,
+                    TelLocation = cc.ZADDRESS,
+                    UnitSecCode = cc.ZGPOID
+                })
+                .ToPageListAsync(requestDto.PageIndex, requestDto.PageSize, total);
+
+            responseAjaxResult.Count = total;
+            responseAjaxResult.SuccessResult(ccList);
+            return responseAjaxResult;
+        }
+        /// <summary>
+        /// 多组织-核算机构 详情
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<ResponseAjaxResult<AccountingOrganizationDetailsDto>> GetAccountingOrganizationDetailsAsync(string id)
+        {
+            var responseAjaxResult = new ResponseAjaxResult<AccountingOrganizationDetailsDto>();
+
+            var result = await _dbContext.Queryable<AccountingOrganization>()
+                .Where((cc) => cc.IsDelete == 1 && cc.Id.ToString() == id)
+                .Select((cc) => new AccountingOrganizationDetailsDto
+                {
+                    CountryName = cc.ZCYNAME,
+                    EnterpriseCode = cc.ZENTC,
+                    IsIndependenceAcc = cc.ZCHECKIND,
+                    Name = cc.ZZTNAME_ZH,
+                    LevelSequence = cc.ZSNO,
+                    MeanOrgCode = cc.ZORGNO,
+                    State = cc.ZOSTATE == "1" ? "有效" : "无效",
+                    OldOrgCode = cc.OID,
+                    OldSupOrgCode = cc.POID,
+                    OrgAttr = cc.ZOATTR,
+                    OrgChildAttr = cc.ZOCATTR,
+                    OrgCode = cc.MDM_CODE,
+                    OrgELName = cc.ZZTNAME_EN,
+                    OrgELShortName = cc.ZZTSHNAME_EN,
+                    OrgGruleCode = cc.ZORULE,
+                    OrgLLanguage = cc.ZZTNAME_LOC,
+                    OrgLocation = cc.ZORGLOC,
+                    OrgShortName = cc.ZZTSHNAME_CHS,
+                    OrgShortNameLLanguage = cc.ZZTSHNAME_LOC,
+                    OrgTreeCode = cc.ZTREEID1,
+                    OrgTreeVersion = cc.ZTREEVER,
+                    RegionalAttr = cc.ZREGIONAL,
+                    RegistrationNo = cc.ZCUSCC,
+                    Shareholding = cc.ZHOLDING,
+                    SupOrgCode = cc.ZORGUP,
+                    TelLocation = cc.ZADDRESS,
+                    TreeLevel = cc.ZO_LEVEL,
+                    UnitSecCode = cc.ZGPOID,
+                    ViewIdentifier = cc.VIEW_FLAG
+                })
+                .FirstAsync();
+
+            responseAjaxResult.SuccessResult(result);
+            return responseAjaxResult;
         }
     }
 }

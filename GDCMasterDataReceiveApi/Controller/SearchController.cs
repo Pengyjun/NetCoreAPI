@@ -1,13 +1,17 @@
 ﻿using GDCMasterDataReceiveApi.Application.Contracts;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto._4A.User;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.AccountingDepartment;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.AccountingOrganization;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.AdministrativeAccountingMapper;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.AdministrativeDivision;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.BankCard;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.BusinessNoCpportunity;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.CorresUnit;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.CountryContinent;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.CountryRegion;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.DeviceClassCode;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.DeviceDetailCode;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.EscrowOrganization;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.FinancialInstitution;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.Institution;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.InvoiceType;
@@ -503,6 +507,86 @@ namespace GDCMasterDataReceiveApi.Controller
         public async Task<ResponseAjaxResult<AdministrativeAccountingMapperDetailsDto>> GetAdministrativeAccountingMapperDetailsAsync([FromQuery] string id)
         {
             return await _searchService.GetAdministrativeAccountingMapperDetailsAsync(id);
+        }
+        /// <summary>
+        /// 多组织-税务代管组织(行政)列表
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        [HttpGet("GetEscrowOrganizationSearc")]
+        public async Task<ResponseAjaxResult<List<EscrowOrganizationSearchDto>>> GetEscrowOrganizationSearchAsync([FromQuery] EscrowOrganizationRequestDto requestDto)
+        {
+            return await _searchService.GetEscrowOrganizationSearchAsync(requestDto);
+        }
+        /// <summary>
+        /// 多组织-税务代管组织(行政) 详细
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet("GetEscrowOrganizationDetails")]
+        public async Task<ResponseAjaxResult<EscrowOrganizationDetailsDto>> GetEscrowOrganizationDetailsAsync([FromQuery] string id)
+        {
+            return await _searchService.GetEscrowOrganizationDetailsAsync(id);
+        }
+        /// <summary>
+        /// 商机项目(不含境外商机项目) 列表
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        [HttpGet("GetBusinessNoCpportunitySearch")]
+        public async Task<ResponseAjaxResult<List<BusinessNoCpportunitySearchDto>>> GetBusinessNoCpportunitySearchAsync([FromQuery] BusinessNoCpportunityRequestDto requestDto)
+        {
+            return await _searchService.GetBusinessNoCpportunitySearchAsync(requestDto);
+        }
+        /// <summary>
+        /// 商机项目(不含境外商机项目) 详情
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet("GetBusinessNoCpportunityDetails")]
+        public async Task<ResponseAjaxResult<BusinessNoCpportunityDetailsDto>> GetBusinessNoCpportunityDetailsAsync([FromQuery] string id)
+        {
+            return await _searchService.GetBusinessNoCpportunityDetailsAsync(id);
+        }
+        /// <summary>
+        /// 获取境内行政区划 列表
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        [HttpGet("GetAdministrativeDivisionSearch")]
+        public async Task<ResponseAjaxResult<List<AdministrativeDivisionSearchDto>>> GetAdministrativeDivisionSearchAsync([FromQuery] AdministrativeDivisionRequestDto requestDto)
+        {
+            return await _searchService.GetAdministrativeDivisionSearchAsync(requestDto);
+        }
+        /// <summary>
+        /// 获取境内行政区划 详情
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet("GetAdministrativeDivisionDetails")]
+        public async Task<ResponseAjaxResult<AdministrativeDivisionDetailsDto>> GetAdministrativeDivisionDetailsAsync([FromQuery] string id)
+        {
+            return await _searchService.GetAdministrativeDivisionDetailsAsync(id);
+        }
+        /// <summary>
+        /// 多组织-核算机构 列表
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        [HttpGet("GetAccountingOrganizationSearch")]
+        public async Task<ResponseAjaxResult<List<AccountingOrganizationSearchDto>>> GetAccountingOrganizationSearchAsync([FromQuery] AccountingOrganizationRequestDto requestDto)
+        {
+            return await _searchService.GetAccountingOrganizationSearchAsync(requestDto);
+        }
+        /// <summary>
+        /// 多组织-核算机构 详情
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet("GetAccountingOrganizationDetails")]
+        public async Task<ResponseAjaxResult<AccountingOrganizationDetailsDto>> GetAccountingOrganizationDetailsAsync([FromQuery] string id)
+        {
+            return await _searchService.GetAccountingOrganizationDetailsAsync(id);
         }
     }
 }

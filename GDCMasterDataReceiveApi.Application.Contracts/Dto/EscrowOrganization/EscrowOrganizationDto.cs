@@ -3,24 +3,82 @@
     /// <summary>
     /// 多组织-税务代管组织(行政) 反显
     /// </summary>
-    public class EscrowOrganizationDto
+    public class EscrowOrganizationSearchDto
     {
         /// <summary>
         /// 主键id
         /// </summary>
-        public long Id { get; set; }
+        public string? Id { get; set; }
+        /// <summary>
+        /// 节点排序号:序号
+        /// </summary>
+        public string? NodeSequence { get; set; }
+        /// <summary>
+        /// 名称（中文:Z0名称（中文）
+        /// </summary>
+        public string? Name { get; set; }
+        /// <summary>
+        /// 简称（中文:Z0简称（中文）
+        /// </summary>
+        public string? ShortNameChinese { get; set; }
+        /// <summary>
+        /// 机构状态:机构状态，值域校验
+        /// </summary>
+        public string? OrgStatus { get; set; }
+        /// <summary>
+        /// 备注:Z0备注
+        /// </summary>
+        public string? Remark { get; set; }
+        /// <summary>
+        /// 机构所在地:机构所在地，值域校验
+        /// </summary>
+        public string? LocationOfOrg { get; set; }
+        /// <summary>
+        /// 国家名称:国家代码，值域校验
+        /// </summary>
+        public string? Country { get; set; }
+        /// <summary>
+        /// 地域属性:地域属性，值域校验
+        /// </summary>
+        public string? RegionalAttr { get; set; }
+        /// <summary>
+        /// 通讯地址:机构的通讯地址
+        /// </summary>
+        public string? TelAddress { get; set; }
+        /// <summary>
+        /// 持股情况:持股情况
+        /// </summary>
+        public string? Shareholding { get; set; }
+        /// <summary>
+        /// 是否独立核算:是否独立核算
+        /// </summary>
+        public string? IsIndependenceAcc { get; set; }
+        /// <summary>
+        /// 名称（英文）:Z0名称（英文）
+        /// </summary>
+        public string? NameEnglish { get; set; }
+        /// <summary>
+        /// 名称（当地语言）:Z0名称（当地语言）
+        /// </summary>
+        public string? NameLLanguage { get; set; }
+    }
+    /// <summary>
+    /// 多组织-税务代管组织(行政)详情
+    /// </summary>
+    public class EscrowOrganizationDetailsDto
+    {
         /// <summary>
         /// 接口唯一ID  发送记录的ID，必须保证此ID在同一个发送批次中是唯一的。用于记录发送方对于此发送记录的唯一标识。
         /// </summary>
-        public string ZINSTID { get; set; }
+        public string? ZINSTID { get; set; }
         /// <summary>
         /// 机构主数据编码:机构主数据的唯一标识
         /// </summary>
-        public string OrgMDCode { get; set; }
+        public string? OrgMDCode { get; set; }
         /// <summary>
         /// 上级机构主数据编码 :20230627新增
         /// </summary>
-        public string SupOrgMDCode { get; set; }
+        public string? SupOrgMDCode { get; set; }
         /// <summary>
         /// HR机构主数据编码:机构与人力系统的机构唯一编号（OID，不可改变）
         /// </summary>
@@ -44,15 +102,15 @@
         /// <summary>
         /// 机构属性:机构属性，值域校验
         /// </summary>
-        public string OrgAttr { get; set; }
+        public string? OrgAttr { get; set; }
         /// <summary>
         /// 机构子属性:机构子属性，值域校验
         /// </summary>
-        public string OrgChildAttr { get; set; }
+        public string? OrgChildAttr { get; set; }
         /// <summary>
         /// 节点排序号:序号
         /// </summary>
-        public string NodeSequence { get; set; }
+        public string? NodeSequence { get; set; }
         /// <summary>
         /// 名称（中文:Z0名称（中文）
         /// </summary>
@@ -64,7 +122,7 @@
         /// <summary>
         /// 机构状态:机构状态，值域校验
         /// </summary>
-        public string OrgStatus { get; set; }
+        public string? OrgStatus { get; set; }
         /// <summary>
         /// 层级:机构树层级
         /// </summary>
@@ -102,10 +160,6 @@
         /// </summary>
         public string? IsIndependenceAcc { get; set; }
         /// <summary>
-        /// 来源系统:默认为MDM
-        /// </summary>
-        public string? ZSSourceSystemYSTEM { get; set; }
-        /// <summary>
         /// 名称（英文）:Z0名称（英文）
         /// </summary>
         public string? NameEnglish { get; set; }
@@ -134,19 +188,19 @@
         /// <summary>
         /// 发送记录ID 发送记录的ID，必须保证此ID在同一个发送批次中是唯一的。用于记录发送方对于此发送记录的唯一标识。
         /// </summary>
-        public string ZZSERIAL { get; set; }
+        public string? ZZSERIAL { get; set; }
         /// <summary>
         /// 接口唯一ID  发送记录的ID，必须保证此ID在同一个发送批次中是唯一的。用于记录发送方对于此发送记录的唯一标识。
         /// </summary>
-        public string ZINSTID { get; set; }
+        public string? ZINSTID { get; set; }
         /// <summary>
         /// 机构主数据编码:机构主数据的唯一标识
         /// </summary>
-        public string MDM_CODE { get; set; }
+        public string? MDM_CODE { get; set; }
         /// <summary>
         /// 上级机构主数据编码 :20230627新增
         /// </summary>
-        public string ZORGUP { get; set; }
+        public string? ZORGUP { get; set; }
         /// <summary>
         /// HR机构主数据编码:机构与人力系统的机构唯一编号（OID，不可改变）
         /// </summary>
@@ -170,15 +224,15 @@
         /// <summary>
         /// 机构属性:机构属性，值域校验
         /// </summary>
-        public string TYPE { get; set; }
+        public string? TYPE { get; set; }
         /// <summary>
         /// 机构子属性:机构子属性，值域校验
         /// </summary>
-        public string TYPEEXT { get; set; }
+        public string? TYPEEXT { get; set; }
         /// <summary>
         /// 节点排序号:序号
         /// </summary>
-        public string SNO { get; set; }
+        public string? SNO { get; set; }
         /// <summary>
         /// 名称（中文:Z0名称（中文）
         /// </summary>
@@ -190,7 +244,7 @@
         /// <summary>
         /// 机构状态:机构状态，值域校验
         /// </summary>
-        public string STATUS { get; set; }
+        public string? STATUS { get; set; }
         /// <summary>
         /// 层级:机构树层级
         /// </summary>

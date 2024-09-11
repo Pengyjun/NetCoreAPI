@@ -57,7 +57,7 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.AutoMapper
             //行政机构和核算机构映射关系
             mapperConfigurationExpression.CreateMap<AdministrativeAccountingMapperReceiveDto, AdministrativeAccountingMapper>();
             //境内行政区划
-            mapperConfigurationExpression.CreateMap<AdministrativeDivisionReceiveDto, AdministrativeDivision>();
+            mapperConfigurationExpression.CreateMap<AdministrativeDivisionItem, AdministrativeDivision>();
             //银行账号
             mapperConfigurationExpression.CreateMap<BankCardReceiveDto, BankCard>();
             //商机项目(不含境外商机项目)
