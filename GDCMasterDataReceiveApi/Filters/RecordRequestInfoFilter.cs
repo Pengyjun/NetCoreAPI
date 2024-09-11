@@ -64,7 +64,7 @@ namespace GDCMasterDataReceiveApi.Filters
             if (Convert.ToBoolean(AppsettingsHelper.GetValue("AuditLogs:IsOpen")))
             {
                 recordRequestInfo.Id = Guid.NewGuid();
-                recordRequestInfo.ClientIpAddress = IpHelper.GetClientIp();
+                //recordRequestInfo.ClientIpAddress = IpHelper.GetClientIp();
                 recordRequestInfo.HttpMethod = requestMethod;
                 recordRequestInfo.ApplicationName = "GDCMasterDataReceiveApi";
                 recordRequestInfo.Url = context.HttpContext.Request.Path;

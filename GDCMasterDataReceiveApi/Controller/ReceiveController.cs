@@ -252,6 +252,7 @@ namespace GDCMasterDataReceiveApi.Controller
         /// <returns></returns>
 
         [HttpPost("CountryRegion")]
+        [UnitOfWork]
         public async Task<MDMResponseResult> CountryRegionDataAsync([FromBody] BaseReceiveDataRequestDto<CountryRegionReceiveDto> baseReceiveDataRequest) => await _receiveService.CountryRegionDataAsync(baseReceiveDataRequest);
         #endregion
 
@@ -264,7 +265,7 @@ namespace GDCMasterDataReceiveApi.Controller
         [UnitOfWork]
         [HttpPost("CountryContinent")]
         public async Task<MDMResponseResult> CountryContinentDataAsync(BaseReceiveDataRequestDto<CountryContinentReceiveDto> baseReceiveDataRequestDto) => await _receiveService.CountryContinentDataAsync(baseReceiveDataRequestDto);
-            
+
         #endregion
 
         #endregion
@@ -276,7 +277,9 @@ namespace GDCMasterDataReceiveApi.Controller
         /// <returns></returns>
         [HttpPost("/api/mdm/Receive/Project")]
         [UnitOfWork]
-        public async Task<MDMResponseResult> ProjectDataAsync([FromBody] BaseReceiveDataRequestDto<ProjectItem>  receiveDataMDMRequestDto) => await _receiveService.ProjectDataAsync(receiveDataMDMRequestDto);
+        public async Task<MDMResponseResult> ProjectDataAsync([FromBody] BaseReceiveDataRequestDto<ProjectItem> receiveDataMDMRequestDto) {
+            return   await _receiveService.ProjectDataAsync(receiveDataMDMRequestDto);
+        } 
         #endregion
 
         #region 金融机构主数据

@@ -1,4 +1,6 @@
-﻿namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.Project
+﻿using GDCMasterDataReceiveApi.Domain.Models;
+
+namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.Project
 {
 
 
@@ -329,11 +331,11 @@
         /// <summary>
         /// 发送记录ID 发送记录的ID，必须保证此ID在同一个发送批次中是唯一的。用于记录发送方对于此发送记录的唯一标识。
         /// </summary>
-        public string ZZSERIAL { get; set; }
+        public long? Id { get; set; }
         /// <summary>
         /// 项目主数据编码
         /// </summary>
-        public string ZPROJECT { get; set; }
+        public string? ZPROJECT { get; set; }
         /// <summary>
         /// 项目名称
         /// </summary>
@@ -377,7 +379,7 @@
         /// <summary>
         /// 项目机构
         /// </summary>
-        public string ZPRO_ORG { get; set; }
+        public string? ZPRO_ORG { get; set; }
         /// <summary>
         /// 项目简称
         /// </summary>
@@ -501,15 +503,15 @@
         /// <summary>
         /// 到期日期
         /// </summary>
-        public string ZLFINDATE { get; set; }
+        public string? ZLFINDATE { get; set; }
         /// <summary>
         /// 所属二级单位:二级单位组织机构编码OID
         /// </summary>
-        public string Z2NDORG { get; set; }
+        public string? Z2NDORG { get; set; }
         /// <summary>
         /// 状态：数据是否有效的标识:有效：1无效：0
         /// </summary>
-        public string ZSTATE { get; set; }
+        public string? ZSTATE { get; set; }
         /// <summary>
         /// 停用原因 1完工停用2错误停用
         /// </summary>
@@ -517,7 +519,7 @@
         /// <summary>
         /// 计税方式
         /// </summary>
-        public string ZTAXMETHOD { get; set; }
+        public string? ZTAXMETHOD { get; set; }
         /// <summary>
         /// 项目组织形式
         /// </summary>
@@ -537,7 +539,7 @@
         /// <summary>
         /// 项目管理方式:该项目适用的管理方式
         /// </summary>
-        public string ZMANAGE_MODE { get; set; }
+        public string? ZMANAGE_MODE { get; set; }
         /// <summary>
         /// 参与二级单位：该项目参与的其他二级单位，支持多值
         /// </summary>
@@ -545,25 +547,36 @@
         /// <summary>
         /// 是否联合体项目：是否联合体：1是，2否
         /// </summary>
-        public string ZWINNINGC { get; set; }
+        public string? ZWINNINGC { get; set; }
         /// <summary>
         /// 中标交底项目编号：传入多值时用逗号给开
         /// </summary>
-        public string ZAWARDP { get; set; }
+        public string? ZAWARDP { get; set; }
         /// <summary>
         /// 创建时间：格式：YYYYMMDDHHMMSS
         /// </summary>
-        public string ZCREATE_AT { get; set; }
+        public string? ZCREATE_AT { get; set; }
         /// <summary>
         /// 曾用名列表
         /// </summary>
-        public List<ZMDGS_OLDNAME>? item { get; set; }
+        public ZOLDNAME_LIST? ZOLDNAME_LIST { get; set; } = new ZOLDNAME_LIST();
     }
 
     /// <summary>
     /// 曾用名列表
     /// </summary>
-    public class ZMDGS_OLDNAME
+    public class ZOLDNAME_LIST
+    {
+       
+        /// <summary>
+        /// 
+        /// </summary>
+        public List<ProjectUsedNameDto> item { get; set; } = new List<ProjectUsedNameDto>();
+    }
+    /// <summary>
+    /// 
+    /// </summary>
+    public class ProjectUsedNameDto
     {
         /// <summary>
         /// 项目主数据编码

@@ -18,7 +18,7 @@ namespace GDCMasterDataReceiveApi.SqlSugarCore
         public static void AddSqlSugarContext(this IServiceCollection services, IConfiguration configuration, string dbCon)
         {
             //是否打开无参数化sql监视
-            bool isOpenSql = false;
+            bool isOpenSql = true;
             SqlSugarClient sqlSugarClient = new SqlSugarClient(new ConnectionConfig()
             {
                 ConnectionString = dbCon,

@@ -3,16 +3,23 @@
     /// <summary>
     /// 接收主数据数据 基本请求类
     /// </summary>
-    public class BaseReceiveDataRequestDto<T> where T : new()
+    public class BaseReceiveDataRequestDto<T> 
     {
-        public IT_DATA<T> IT_DATA { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
+        public BusinessData<T>? IT_DATA { get; set; }
     }
 
     /// <summary>
     /// 业务请求接收类
     /// </summary>
-    public class IT_DATA<T> where T : new()
+    public class BusinessData<T>
     {
-        public List<T> item { get; set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public List<T>? item { get; set; }
     }
 }

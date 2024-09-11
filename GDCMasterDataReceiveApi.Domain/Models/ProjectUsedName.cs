@@ -11,8 +11,10 @@ namespace GDCMasterDataReceiveApi.Domain.Models
     /// 项目曾用名
     /// </summary>
     [SugarTable("t_projectusedname", IsDisabledDelete = true)]
-    public class ProjectUsedName:BaseEntity<long>
+    public class ProjectUsedName
     {
+
+        public long Id { get; set; }
         /// <summary>
         /// 曾用名
         /// </summary>

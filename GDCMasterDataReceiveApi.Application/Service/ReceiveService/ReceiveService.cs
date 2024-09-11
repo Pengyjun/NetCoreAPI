@@ -25,6 +25,8 @@ using SqlSugar;
 using System.Collections.Generic;
 using System.Drawing.Drawing2D;
 using UtilsSharp;
+using Newtonsoft.Json;
+using System.Collections;
 
 namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
 {
@@ -49,8 +51,8 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
             this._dbContext = dbContext;
             this._mapper = mapper;
             this.logger = logger;
-           this.baseService = baseService;
-            
+            this.baseService = baseService;
+
         }
         /// <summary>
         /// 获取通用字典数据
@@ -168,7 +170,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
                 {
                     item.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
                 }
-                var CountryRegionList= await _dbContext.Queryable<CountryRegion>().Where(x => x.IsDelete == 1).Select(x => x.ZCOUNTRYCODE).ToListAsync();
+                var CountryRegionList = await _dbContext.Queryable<CountryRegion>().Where(x => x.IsDelete == 1).Select(x => x.ZCOUNTRYCODE).ToListAsync();
                 var insertData = countryList.Where(x => !CountryRegionList.Contains(x.ZCOUNTRYCODE)).Select(x => x.ZCOUNTRYCODE).ToList();
                 var updateOids = countryList.Where(x => CountryRegionList.Contains(x.ZCOUNTRYCODE)).Select(x => x.ZCOUNTRYCODE).ToList();
                 if (insertData.Any())
@@ -181,9 +183,9 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
                         {
                             CountryLanguage projectUsedName = new CountryLanguage()
                             {
-                                 ZLANGCODE=items.ZLANGCODE,
-                                  ZCODE_DESC=items.ZCODE_DESC, 
-                                  
+                                ZLANGCODE = items.ZLANGCODE,
+                                ZCODE_DESC = items.ZCODE_DESC,
+
                             };
                             insertzMDGS_OLDNAMEs.Add(projectUsedName);
                         }
@@ -205,7 +207,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
                                 ZCODE_DESC = items.ZCODE_DESC,
 
                             };
-                            insertzMDGS_OLDNAMEs.Add(projectUsedName);
+                            updatezMDGS_OLDNAMEs.Add(projectUsedName);
                         }
                     }
                     await _dbContext.Fastest<CountryRegion>().BulkUpdateAsync(batchData);
@@ -222,6 +224,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
                 receiveRecordLog.FailData = baseReceiveDataRequest.IT_DATA.item.ToJson();
                 await baseService.ReceiveRecordLogAsync(receiveRecordLog, DataOperationType.Update);
                 #endregion
+                throw;
             }
             return responseAjaxResult;
         }
@@ -267,10 +270,10 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
                         {
                             CountryContinentLanguage projectUsedName = new CountryContinentLanguage()
                             {
-                                
-                                  ZAREA_DESC=items.ZAREA_DESC,
-                                   ZCODE_DESC=items.ZCODE_DESC,
-                                    ZLANGCODE=items.ZLANGCODE,
+
+                                ZAREA_DESC = items.ZAREA_DESC,
+                                ZCODE_DESC = items.ZCODE_DESC,
+                                ZLANGCODE = items.ZLANGCODE,
                             };
                             insertzMDGS_OLDNAMEs.Add(projectUsedName);
                         }
@@ -293,7 +296,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
                                 ZCODE_DESC = items.ZCODE_DESC,
                                 ZLANGCODE = items.ZLANGCODE,
                             };
-                            insertzMDGS_OLDNAMEs.Add(projectUsedName);
+                            updatezMDGS_OLDNAMEs.Add(projectUsedName);
                         }
                     }
                     await _dbContext.Fastest<CountryContinent>().BulkUpdateAsync(batchData);
@@ -310,6 +313,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
                 receiveRecordLog.FailData = baseReceiveDataRequestDto.IT_DATA.item.ToJson();
                 await baseService.ReceiveRecordLogAsync(receiveRecordLog, DataOperationType.Update);
                 #endregion
+                throw;
             }
 
             return responseAjaxResult;
@@ -399,6 +403,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
                 receiveRecordLog.FailData = baseReceiveDataRequestDto.IT_DATA.item.ToJson();
                 await baseService.ReceiveRecordLogAsync(receiveRecordLog, DataOperationType.Update);
                 #endregion
+                throw;
             }
 
             return responseAjaxResult;
@@ -483,6 +488,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
                 receiveRecordLog.FailData = receiveDataMDMRequestDto.IT_DATA.item.ToJson();
                 await baseService.ReceiveRecordLogAsync(receiveRecordLog, DataOperationType.Update);
                 #endregion
+                throw;
             }
 
             return responseAjaxResult;
@@ -640,56 +646,65 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
             #endregion
             try
             {
-                //处理曾用名
+                ////处理曾用名
                 List<ProjectUsedName> insertzMDGS_OLDNAMEs = new();
                 List<ProjectUsedName> updatezMDGS_OLDNAMEs = new();
-                var projectList = _mapper.Map<List<ProjectItem>, List<Project>>(receiveDataMDMRequestDto.IT_DATA.item);
-                foreach (var item in projectList)
-                {
-                    item.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
-                }
-                var projectCodeList = await _dbContext.Queryable<Project>().Where(x => x.IsDelete == 1).Select(x => x.ZPROJECT).ToListAsync();
-                var insertOids = projectList.Where(x => !projectCodeList.Contains(x.ZPROJECT)).Select(x => x.ZPROJECT).ToList();
-                var updateOids = projectList.Where(x => projectCodeList.Contains(x.ZPROJECT)).Select(x => x.ZPROJECT).ToList();
+               
+                //查询项目表
+                var projectCodeList = await _dbContext.Queryable<Project>().Where(x => x.IsDelete == 1).ToListAsync();
+                //需要新增的数据
+                var insertOids = receiveDataMDMRequestDto.IT_DATA.item.Where(x => !projectCodeList.Select(x => x.ZPROJECT).ToList().Contains(x.ZPROJECT)).ToList();
+                //需要更新的数据
+                var updateOids = receiveDataMDMRequestDto.IT_DATA.item.Where(x => projectCodeList.Select(x => x.ZPROJECT).ToList().Contains(x.ZPROJECT)).ToList();
+                //新增操作
                 if (insertOids.Any())
                 {
-                    //插入操作
-                    var batchData = projectList.Where(x => insertOids.Contains(x.ZPROJECT)).ToList();
-                    foreach (var item in batchData)
+                    foreach (var itemItem in insertOids)
                     {
-                        foreach (var items in item.ZOLDNAME_LIST)
+                        itemItem.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
+                        foreach (var items in itemItem.ZOLDNAME_LIST.item)
                         {
                             ProjectUsedName projectUsedName = new ProjectUsedName()
                             {
-                             ZOLDNAME=items.ZOLDNAME,
-                              ZPROJECT=items.ZPROJECT,
+                                Id = itemItem.Id.Value,
+                                ZOLDNAME = items.ZOLDNAME,
+                                ZPROJECT = items.ZPROJECT
                             };
                             insertzMDGS_OLDNAMEs.Add(projectUsedName);
                         }
                     }
-                    await _dbContext.Fastest<Project>().BulkCopyAsync(batchData);
+                    var projectList = _mapper.Map<List<ProjectItem>, List<Project>>(insertOids);
+                    await _dbContext.Fastest<Project>().BulkCopyAsync(projectList);
                     await _dbContext.Fastest<ProjectUsedName>().BulkCopyAsync(insertzMDGS_OLDNAMEs);
                 }
                 if (updateOids.Any())
                 {
-                    //更新操作
-                    var batchData = projectList.Where(x => updateOids.Contains(x.ZPROJECT)).ToList();
-                    foreach (var item in batchData)
+                    List<ProjectUsedName> deleteData = new List<ProjectUsedName>();
+                    //更新曾用名
+                    var projectUsedNameList = await _dbContext.Queryable<ProjectUsedName>().ToListAsync();
+                    foreach (var itemItem in updateOids)
                     {
-                        foreach (var items in item.ZOLDNAME_LIST)
+                        var id=  projectCodeList.Where(x => x.ZPROJECT == itemItem.ZPROJECT).Select(x=>x.Id).First();
+                        itemItem.Id = id;
+                        foreach (var items in itemItem.ZOLDNAME_LIST.item)
                         {
                             ProjectUsedName projectUsedName = new ProjectUsedName()
                             {
+                                Id= itemItem.Id.Value,
                                 ZOLDNAME = items.ZOLDNAME,
-                                ZPROJECT = items.ZPROJECT,
+                                ZPROJECT = items.ZPROJECT
                             };
-                            insertzMDGS_OLDNAMEs.Add(projectUsedName);
+                            updatezMDGS_OLDNAMEs.Add(projectUsedName);
                         }
+                        deleteData.AddRange(projectUsedNameList.Where(x => x.ZPROJECT == itemItem.ZPROJECT).ToList());
                     }
-                    await _dbContext.Fastest<Project>().BulkUpdateAsync(batchData);
-                    await _dbContext.Fastest<ProjectUsedName>().BulkUpdateAsync(updatezMDGS_OLDNAMEs);
+
+                    var projectList = _mapper.Map<List<ProjectItem>, List<Project>>(updateOids);
+                    await _dbContext.Updateable(projectList).ExecuteCommandAsync();
+                    await _dbContext.Deleteable<ProjectUsedName>().WhereColumns(deleteData, it => new { it.Id }).ExecuteCommandAsync();
+                    await _dbContext.Insertable(updatezMDGS_OLDNAMEs).ExecuteCommandAsync();
+
                 }
-                
                 responseAjaxResult.Success();
             }
             catch (Exception ex)
@@ -701,8 +716,8 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
                 receiveRecordLog.FailData = receiveDataMDMRequestDto.IT_DATA.item.ToJson();
                 await baseService.ReceiveRecordLogAsync(receiveRecordLog, DataOperationType.Update);
                 #endregion
+                throw;
             }
-
             return responseAjaxResult;
         }
         /// <summary>
@@ -757,6 +772,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
                 receiveRecordLog.FailData = receiveDataMDMRequestDto.IT_DATA.item.ToJson();
                 await baseService.ReceiveRecordLogAsync(receiveRecordLog, DataOperationType.Update);
                 #endregion
+                throw;
             }
             return responseAjaxResult;
         }

@@ -12,8 +12,8 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// <summary>
         /// 发送记录ID 发送记录的ID，必须保证此ID在同一个发送批次中是唯一的。用于记录发送方对于此发送记录的唯一标识。
         /// </summary>
-        [NotMapped]
-        public string ZZSERIAL { get; set; }
+        //[NotMapped]
+        //public string? ZZSERIAL { get; set; }
         /// <summary>
         /// 项目主数据编码
         /// </summary>
@@ -73,7 +73,7 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// 项目机构
         /// </summary>
         [SugarColumn(Length = 64, ColumnName = "PjectOrg")]
-        public string ZPRO_ORG { get; set; }
+        public string? ZPRO_ORG { get; set; }
         /// <summary>
         /// 项目简称
         /// </summary>
@@ -297,13 +297,20 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// <summary>
         /// 曾用名列表
         /// </summary>
-        [SugarColumn(IsIgnore = true)]
-         public List<ZMDGS_OLDNAME>? ZOLDNAME_LIST { get; set; }
+        //[SugarColumn(IsIgnore = true)]
+        // public ZOLDNAME_LISTItem? ZOLDNAME_LISTItem { get; set; }=new ZOLDNAME_LISTItem();
     }
     /// <summary>
     /// 曾用名列表
     /// </summary>
-    public class ZMDGS_OLDNAME
+    public class ZOLDNAME_LISTItem
+    {
+        /// <summary>
+        /// 
+        /// </summary>
+        public List<ProjectUsedNameItem>? ProjectUsedNameItems { get; set; } = new List<ProjectUsedNameItem>();
+    }
+    public class ProjectUsedNameItem
     {
         /// <summary>
         /// 项目主数据编码

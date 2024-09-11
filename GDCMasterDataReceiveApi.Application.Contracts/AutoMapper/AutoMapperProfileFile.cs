@@ -29,6 +29,7 @@ using GDCMasterDataReceiveApi.Application.Contracts.Dto.RoomNumber;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.TypeOfBidDisclosureProjectTable;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.UnitMeasurement;
 using GDCMasterDataReceiveApi.Domain.Models;
+using UtilsSharp;
 
 namespace GDCMasterDataReceiveApi.Application.Contracts.AutoMapper
 {
@@ -89,7 +90,11 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.AutoMapper
             //人员主数据
             mapperConfigurationExpression.CreateMap<Receive4AUser, User>();
             //项目类
-            mapperConfigurationExpression.CreateMap<ProjectItem, Project>();
+            mapperConfigurationExpression.CreateMap<ProjectItem, Project>()
+                //.ForMember(dest => dest.ZOLDNAME_LISTItem, opt => opt.MapFrom(src => src.ZOLDNAME_LIST))
+                ;
+            //mapperConfigurationExpression.CreateMap<ZOLDNAME_LIST, ZOLDNAME_LISTItem>()
+            //  .ForMember(dest => dest.ProjectUsedNameItems, opt => opt.MapFrom(src => src.item));
             //中交项目行业分类产业分类、业务板块、十二大业务类型、江河湖海对照关系
             mapperConfigurationExpression.CreateMap<ProjectClassificationReceiveDto, ProjectClassification>();
             //中交区域总部
