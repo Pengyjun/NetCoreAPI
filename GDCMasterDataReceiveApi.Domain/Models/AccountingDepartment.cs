@@ -1,5 +1,4 @@
 ﻿using SqlSugar;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace GDCMasterDataReceiveApi.Domain.Models
 {
@@ -12,33 +11,33 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// <summary>
         /// 发送记录ID 发送记录的ID，必须保证此ID在同一个发送批次中是唯一的。用于记录发送方对于此发送记录的唯一标识。
         /// </summary>
-        [NotMapped]
-        public string ZZSERIAL { get; set; }
+        [SugarColumn(IsIgnore = true)]
+        public string? ZZSERIAL { get; set; }
         /// <summary>
         /// 核算组织编号:9月18日新加
         /// </summary>
         [SugarColumn(Length = 50, ColumnName = "AccOrgCode")]
-        public string ZACORGNO { get; set; }
+        public string? ZACORGNO { get; set; }
         /// <summary>
         /// 核算部门编号
         /// </summary>
         [SugarColumn(Length = 50, ColumnName = "AccDepCode")]
-        public string ZDCODE { get; set; }
+        public string? ZDCODE { get; set; }
         /// <summary>
         /// 核算组织ID
         /// </summary>
         [SugarColumn(Length = 50, ColumnName = "AccOrgId")]
-        public string ZACID { get; set; }
+        public string? ZACID { get; set; }
         /// <summary>
         /// 核算部门ID
         /// </summary>
         [SugarColumn(Length = 36, ColumnName = "AccDepId")]
-        public string ZDID { get; set; }
+        public string? ZDID { get; set; }
         /// <summary>
         /// 核算部门中文简体名称
         /// </summary>
         [SugarColumn(Length = 100, ColumnName = "Name")]
-        public string ZDNAME_CHS { get; set; }
+        public string? ZDNAME_CHS { get; set; }
         /// <summary>
         /// 核算部门中文繁体名称
         /// </summary>

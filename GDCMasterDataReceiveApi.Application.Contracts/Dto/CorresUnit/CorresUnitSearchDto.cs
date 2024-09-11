@@ -8,7 +8,7 @@
         /// <summary>
         /// 主键id
         /// </summary>
-        public string Id { get; set; }
+        public string? Id { get; set; }
         /// <summary>
         /// 名称（中文）:往来单位中文名称，境内单位必填
         /// </summary>

@@ -5,32 +5,50 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.RegionalCenter
     /// <summary>
     /// 中交区域中心 反显
     /// </summary>
-    public class RegionalCenterDto
+    public class RegionalCenterSearchDto
     {
         /// <summary>
         /// 主键id
         /// </summary>
-        public long Id { get; set; }
+        public string? Id { get; set; }
         /// <summary>
         /// 中交区域中心代码:中交区域中心编码
         /// </summary>
-        public string Code { get; set; }
+        public string? Code { get; set; }
         /// <summary>
         /// 中交区域中心描述:编码描述
         /// </summary>
-        public string Description { get; set; }
-        /// <summary>
-        /// 版本
-        /// </summary>
-        public string Version { get; set; }
+        public string? Description { get; set; }
         /// <summary>
         /// 状态：数据是否有效的标识:有效：1无效：0
         /// </summary>
-        public string State { get; set; }
+        public string? State { get; set; }
+    }
+    /// <summary>
+    /// 中交区域中心 详细
+    /// </summary>
+    public class RegionalCenterDetailsDto
+    {
+        /// <summary>
+        /// 中交区域中心代码:中交区域中心编码
+        /// </summary>
+        public string? Code { get; set; }
+        /// <summary>
+        /// 中交区域中心描述:编码描述
+        /// </summary>
+        public string? Description { get; set; }
+        /// <summary>
+        /// 版本
+        /// </summary>
+        public string? Version { get; set; }
+        /// <summary>
+        /// 状态：数据是否有效的标识:有效：1无效：0
+        /// </summary>
+        public string? State { get; set; }
         /// <summary>
         /// 是否删除 数据是否有效的标识:有效：1无效：0
         /// </summary>
-        public string DataIdentifier { get; set; }
+        public string? DataIdentifier { get; set; }
     }
     /// <summary>
     /// 中交区域中心 接收

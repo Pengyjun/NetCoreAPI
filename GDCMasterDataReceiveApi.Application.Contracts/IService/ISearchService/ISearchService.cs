@@ -27,7 +27,7 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.IService.ISearchService
         /// </summary>
         /// <param name="louDongDto"></param>
         /// <returns></returns>
-        Task<ResponseAjaxResult<List<LouDongDto>>> GetSearchLouDongAsync(LouDongRequestDto louDongDto);
+        Task<ResponseAjaxResult<List<LouDongSearchDto>>> GetSearchLouDongAsync(LouDongRequestDto louDongDto);
         /// <summary>
         /// 用户列表
         /// </summary>

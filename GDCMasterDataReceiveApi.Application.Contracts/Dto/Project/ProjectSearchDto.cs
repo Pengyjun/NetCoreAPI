@@ -93,7 +93,7 @@
         /// <summary>
         /// 项目主数据编码
         /// </summary>
-        public string MDCode { get; set; }
+        public string? MDCode { get; set; }
         /// <summary>
         /// 项目名称
         /// </summary>
@@ -137,7 +137,7 @@
         /// <summary>
         /// 项目机构
         /// </summary>
-        public string PjectOrg { get; set; }
+        public string? PjectOrg { get; set; }
         /// <summary>
         /// 项目简称
         /// </summary>
@@ -265,11 +265,11 @@
         /// <summary>
         /// 所属二级单位:二级单位组织机构编码OID
         /// </summary>
-        public string UnitSec { get; set; }
+        public string? UnitSec { get; set; }
         /// <summary>
         /// 状态：数据是否有效的标识:有效：1无效：0
         /// </summary>
-        public string State { get; set; }
+        public string? State { get; set; }
         /// <summary>
         /// 停用原因 1完工停用2错误停用
         /// </summary>
@@ -277,7 +277,7 @@
         /// <summary>
         /// 计税方式
         /// </summary>
-        public string TaxMethod { get; set; }
+        public string? TaxMethod { get; set; }
         /// <summary>
         /// 项目组织形式
         /// </summary>
@@ -297,7 +297,7 @@
         /// <summary>
         /// 项目管理方式:该项目适用的管理方式
         /// </summary>
-        public string Management { get; set; }
+        public string? Management { get; set; }
         /// <summary>
         /// 参与二级单位：该项目参与的其他二级单位，支持多值
         /// </summary>
@@ -305,15 +305,15 @@
         /// <summary>
         /// 是否联合体项目：是否联合体：1是，2否
         /// </summary>
-        public string IsJoint { get; set; }
+        public string? IsJoint { get; set; }
         /// <summary>
         /// 中标交底项目编号：传入多值时用逗号给开
         /// </summary>
-        public string BidDisclosureNo { get; set; }
+        public string? BidDisclosureNo { get; set; }
         /// <summary>
         /// 创建时间：格式：YYYYMMDDHHMMSS
         /// </summary>
-        public string CreateDate { get; set; }
+        public string? CreateDate { get; set; }
 
     }
 

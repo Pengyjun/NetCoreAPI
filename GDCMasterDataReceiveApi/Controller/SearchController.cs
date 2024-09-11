@@ -41,7 +41,7 @@ namespace GDCMasterDataReceiveApi.Controller
         /// 默认加载获取条件参数
         /// </summary>
         /// <returns></returns>
-        [HttpPost("GetFilterParams")]
+        [HttpGet("GetFilterParams")]
         public ResponseAjaxResult<List<FilterParams>> GetFilterParams()
         {
             return _baseService.GetFilterParams();
@@ -51,16 +51,16 @@ namespace GDCMasterDataReceiveApi.Controller
         /// </summary>
         /// <param name="louDongDto"></param>
         /// <returns></returns>
-        [HttpPost("GetSearchLouDong")]
-        public async Task<ResponseAjaxResult<List<LouDongDto>>> GetSearchLouDongAsync([FromBody] LouDongRequestDto louDongDto)
+        [HttpGet("GetSearchLouDong")]
+        public async Task<ResponseAjaxResult<List<LouDongSearchDto>>> GetSearchLouDongAsync([FromQuery] LouDongRequestDto louDongDto)
             => await _searchService.GetSearchLouDongAsync(louDongDto);
         /// <summary>
         /// 用户列表
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
-        [HttpPost("GetUserSearch")]
-        public async Task<ResponseAjaxResult<List<UserSearchResponseDto>>> GetUserSearchAsync([FromBody] UserSearchRequestDto requestDto)
+        [HttpGet("GetUserSearch")]
+        public async Task<ResponseAjaxResult<List<UserSearchResponseDto>>> GetUserSearchAsync([FromQuery] UserSearchRequestDto requestDto)
         {
             return await _searchService.GetUserSearchAsync(requestDto);
         }

@@ -5,40 +5,66 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.Regional
     /// <summary>
     /// 中交区域总部 反显
     /// </summary>
-    public class RegionalDto
+    public class RegionalSearchDto
     {
         /// <summary>
         /// 主键id
         /// </summary>
-        public long Id { get; set; }
+        public string? Id { get; set; }
         /// <summary>
         /// 中交区域总部代码:中交区域中心编码
         /// </summary>
-        public string Code { get; set; }
+        public string? Code { get; set; }
         /// <summary>
         /// 中交区域总部描述:编码描述
         /// </summary>
-        public string Description { get; set; }
+        public string? Description { get; set; }
         /// <summary>
         /// 简称:编码描述简称
         /// </summary>
-        public string Name { get; set; }
+        public string? Name { get; set; }
         /// <summary>
         /// 区域范围:中交区域中心管辖范围
         /// </summary>
-        public string AreaRange { get; set; }
-        /// <summary>
-        /// 版本：数据的版本号。数据每次变更时，版本号自动加1。
-        /// </summary>
-        public string Version { get; set; }
+        public string? AreaRange { get; set; }
         /// <summary>
         /// 状态：数据是否有效的标识:有效：1无效：0
         /// </summary>
-        public string State { get; set; }
+        public string? State { get; set; }
+    }
+    /// <summary>
+    /// 中交区域总部详情
+    /// </summary>
+    public class RegionalDetailsDto
+    {
+        /// <summary>
+        /// 中交区域总部代码:中交区域中心编码
+        /// </summary>
+        public string? Code { get; set; }
+        /// <summary>
+        /// 中交区域总部描述:编码描述
+        /// </summary>
+        public string? Description { get; set; }
+        /// <summary>
+        /// 简称:编码描述简称
+        /// </summary>
+        public string? Name { get; set; }
+        /// <summary>
+        /// 区域范围:中交区域中心管辖范围
+        /// </summary>
+        public string? AreaRange { get; set; }
+        /// <summary>
+        /// 版本：数据的版本号。数据每次变更时，版本号自动加1。
+        /// </summary>
+        public string? Version { get; set; }
+        /// <summary>
+        /// 状态：数据是否有效的标识:有效：1无效：0
+        /// </summary>
+        public string? State { get; set; }
         /// <summary>
         /// 是否删除 数据是否有效的标识:有效：1无效：0
         /// </summary>
-        public string DataIdentifier { get; set; }
+        public string? DataIdentifier { get; set; }
     }
     /// <summary>
     /// 中交区域总部 接收

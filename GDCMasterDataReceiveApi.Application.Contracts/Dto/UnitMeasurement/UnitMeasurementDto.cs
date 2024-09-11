@@ -5,32 +5,54 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.UnitMeasurement
     /// <summary>
     /// 常用计量单位 反显
     /// </summary>
-    public class UnitMeasurementDto
+    public class UnitMeasurementSearchDto
     {
         /// <summary>
         /// 主键id
         /// </summary>
-        public long Id { get; set; }
+        public string? Id { get; set; }
         /// <summary>
         /// 计量单位代码:业务主键
         /// </summary>
-        public string Code { get; set; }
+        public string? Code { get; set; }
         /// <summary>
         /// 计量单位名称:计量单位的名称或说明，一般采用中文或常用符号。
         /// </summary>
-        public string Name { get; set; }
-        /// <summary>
-        /// 版本：数据的版本号。数据每次变更时，版本号自动加1。
-        /// </summary>
-        public string Version { get; set; }
+        public string? Name { get; set; }
         /// <summary>
         /// 状态：数据是否有效的标识:有效：1无效：0
         /// </summary>
-        public string State { get; set; }
+        public string? State { get; set; }
         /// <summary>
         /// 是否删除 数据是否有效的标识:有效：1无效：0
         /// </summary>
-        public string DataIdentifier { get; set; }
+        public string? DataIdentifier { get; set; }
+    }
+    /// <summary>
+    /// 计量单位详情
+    /// </summary>
+    public class UnitMeasurementDetailsDto
+    {
+        /// <summary>
+        /// 计量单位代码:业务主键
+        /// </summary>
+        public string? Code { get; set; }
+        /// <summary>
+        /// 计量单位名称:计量单位的名称或说明，一般采用中文或常用符号。
+        /// </summary>
+        public string? Name { get; set; }
+        /// <summary>
+        /// 版本：数据的版本号。数据每次变更时，版本号自动加1。
+        /// </summary>
+        public string? Version { get; set; }
+        /// <summary>
+        /// 状态：数据是否有效的标识:有效：1无效：0
+        /// </summary>
+        public string? State { get; set; }
+        /// <summary>
+        /// 是否删除 数据是否有效的标识:有效：1无效：0
+        /// </summary>
+        public string? DataIdentifier { get; set; }
     }
     /// <summary>
     /// 常用计量单位 接收
