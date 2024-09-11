@@ -80,6 +80,6 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.NationalEconomy
         /// <summary>
         /// 多语言描述表类型
         /// </summary>
-        public List<ZMDGS_ZLANG5>? ZLANG_LIST { get; set; }
+        public ZMDGS_ZLANG5? ZLANG_LIST { get; set; }
     }
 }

@@ -51,7 +51,7 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.Currency
 
 
     #region 主数据接收币种请求DTO
-    
+
     /// <summary>
     /// 币种 接收
     /// </summary>
@@ -96,14 +96,7 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.Currency
         /// <summary>
         /// 多语言描述表类型
         /// </summary>
-        public List<ZMDGS_ZLANG5>? item { get; set; }
-    }
-
-
-    public class ZMDGS_ZLANG5 {
-
-        public string? ZLANGCODE { get; set; }
-        public string? ZCODE_DESC { get; set; }
+        public ZMDGS_ZLANG5? item { get; set; }
     }
     #endregion
 }
