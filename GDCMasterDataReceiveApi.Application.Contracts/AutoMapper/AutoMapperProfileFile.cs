@@ -111,6 +111,7 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.AutoMapper
             #region 其他映射
             mapperConfigurationExpression.CreateMap<ZMDGS_PROPERTYChild, DeviceClassAttribute>();
             mapperConfigurationExpression.CreateMap<ZMDGS_VALUEChild, DeviceClassAttributeValue>();
+            mapperConfigurationExpression.CreateMap<InvoiceLanguageItem, InvoiceLanguage>();
             #endregion
 
         }

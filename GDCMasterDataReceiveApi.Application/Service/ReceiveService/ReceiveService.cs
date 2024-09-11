@@ -165,7 +165,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
                 {
                     item.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
                 }
-                var CountryRegionList= await _dbContext.Queryable<CountryRegion>().Where(x => x.IsDelete == 1).Select(x => x.ZCOUNTRYCODE).ToListAsync();
+                var CountryRegionList = await _dbContext.Queryable<CountryRegion>().Where(x => x.IsDelete == 1).Select(x => x.ZCOUNTRYCODE).ToListAsync();
                 var insertData = countryList.Where(x => !CountryRegionList.Contains(x.ZCOUNTRYCODE)).Select(x => x.ZCOUNTRYCODE).ToList();
                 var updateOids = countryList.Where(x => CountryRegionList.Contains(x.ZCOUNTRYCODE)).Select(x => x.ZCOUNTRYCODE).ToList();
                 if (insertData.Any())
@@ -178,9 +178,9 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
                         {
                             CountryLanguage projectUsedName = new CountryLanguage()
                             {
-                                 ZLANGCODE=items.ZLANGCODE,
-                                  ZCODE_DESC=items.ZCODE_DESC, 
-                                  
+                                ZLANGCODE = items.ZLANGCODE,
+                                ZCODE_DESC = items.ZCODE_DESC,
+
                             };
                             insertzMDGS_OLDNAMEs.Add(projectUsedName);
                         }
@@ -264,10 +264,10 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
                         {
                             CountryContinentLanguage projectUsedName = new CountryContinentLanguage()
                             {
-                                
-                                  ZAREA_DESC=items.ZAREA_DESC,
-                                   ZCODE_DESC=items.ZCODE_DESC,
-                                    ZLANGCODE=items.ZLANGCODE,
+
+                                ZAREA_DESC = items.ZAREA_DESC,
+                                ZCODE_DESC = items.ZCODE_DESC,
+                                ZLANGCODE = items.ZLANGCODE,
                             };
                             insertzMDGS_OLDNAMEs.Add(projectUsedName);
                         }
@@ -581,11 +581,22 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
                 foreach (var ic in invoiceList)
                 {
                     ic.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
-
+                    var val = new List<InvoiceLanguageItem>();
+                    val.AddRange(ic.ZLANG_LIST.Item);
+                    foreach (var v in val)
+                    {
+                        v.InvoiceCode = ic.ZINVTCODE;
+                    }
+                    item.AddRange(val);
                 }
                 var invoiceCodes = await _dbContext.Queryable<InvoiceType>().Where(x => x.IsDelete == 1).Select(x => x.ZINVTCODE).ToListAsync();
                 var insertOids = invoiceList.Where(x => !invoiceCodes.Contains(x.ZINVTCODE)).Select(x => x.ZINVTCODE).ToList();
                 var updateOids = invoiceList.Where(x => invoiceCodes.Contains(x.ZINVTCODE)).Select(x => x.ZINVTCODE).ToList();
+
+                var ivList = _mapper.Map<List<InvoiceLanguageItem>, List<InvoiceLanguage>>(item);
+                var invoceLangCodes = await _dbContext.Queryable<InvoiceLanguage>().Where(t => t.IsDelete == 1).Select(t => t.InvoiceCode).ToListAsync();
+                var insertICodes = item.Where(x => !invoceLangCodes.Contains(x.InvoiceCode)).Select(x => x.InvoiceCode).ToList();
+                var updateICodes = item.Where(x => invoceLangCodes.Contains(x.InvoiceCode)).Select(x => x.InvoiceCode).ToList();
 
                 if (insertOids.Any())
                 {
@@ -599,6 +610,20 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
                     var batchData = invoiceList.Where(x => updateOids.Contains(x.ZINVTCODE)).ToList();
                     await _dbContext.Fastest<InvoiceType>().BulkUpdateAsync(batchData);
                 }
+                if (insertICodes.Any())
+                {
+                    //插入操作
+                    var batchData = ivList.Where(x => insertICodes.Contains(x.InvoiceCode)).ToList();
+                    foreach (var i in batchData) { i.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(); }
+                    await _dbContext.Fastest<InvoiceLanguage>().BulkCopyAsync(batchData);
+                }
+                if (updateICodes.Any())
+                {
+                    //更新操作
+                    var batchData = ivList.Where(x => updateICodes.Contains(x.InvoiceCode)).ToList();
+                    await _dbContext.Fastest<InvoiceLanguage>().BulkUpdateAsync(batchData);
+                }
+
                 responseAjaxResult.Success();
             }
             catch (Exception ex)
@@ -677,8 +702,8 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
                         {
                             ProjectUsedName projectUsedName = new ProjectUsedName()
                             {
-                             ZOLDNAME=items.ZOLDNAME,
-                              ZPROJECT=items.ZPROJECT,
+                                ZOLDNAME = items.ZOLDNAME,
+                                ZPROJECT = items.ZPROJECT,
                             };
                             insertzMDGS_OLDNAMEs.Add(projectUsedName);
                         }
@@ -705,7 +730,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
                     await _dbContext.Fastest<Project>().BulkUpdateAsync(batchData);
                     await _dbContext.Fastest<ProjectUsedName>().BulkUpdateAsync(updatezMDGS_OLDNAMEs);
                 }
-                
+
                 responseAjaxResult.Success();
             }
             catch (Exception ex)

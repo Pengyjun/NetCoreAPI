@@ -93,10 +93,10 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.Currency
         /// 是否删除 数据是否有效的标识:有效：1无效：0
         /// </summary>
         public string ZDELETE { get; set; }
-        /// <summary>
-        /// 多语言描述表类型
-        /// </summary>
-        public InvoiceLang? item { get; set; }
+        ///// <summary>
+        ///// 多语言描述表类型
+        ///// </summary>
+        //public InvoiceLang? item { get; set; }
     }
     #endregion
 }

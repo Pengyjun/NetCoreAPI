@@ -48,33 +48,11 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// </summary>
         [SugarColumn(Length = 1, ColumnName = "DataIdentifier")]
         public string ZDELETE { get; set; }
-        /// <summary>
-        /// 多语言描述表类型
-        /// </summary>
-        [SugarColumn(IsIgnore = true)]
-        public InvoiceLang? ZLANG_LIST { get; set; }
+        ///// <summary>
+        ///// 多语言描述表类型
+        ///// </summary>
+        //[SugarColumn(IsIgnore = true)]
+        //public InvoiceLang? ZLANG_LIST { get; set; }
     }
-    /// <summary>
-    /// 多语言描述表类型
-    /// </summary>
-    public class InvoiceLang
-    {
-        public List<InvoiceLanguageItem>? Item { get; set; }
-    }
-    /// <summary>
-    /// 
-    /// </summary>
-    public class InvoiceLanguageItem
-    {
-        /// <summary>
-        /// 语种代码
-        /// 10
-        /// </summary>
-        public string? ZLANGCODE { get; set; }
-        /// <summary>
-        /// 编码描述
-        /// 255
-        /// </summary>
-        public string? ZCODE_DESC { get; set; }
-    }
+   
 }
