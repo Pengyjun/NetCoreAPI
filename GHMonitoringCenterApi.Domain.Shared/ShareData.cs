@@ -72,7 +72,7 @@ namespace GHMonitoringCenterApi.Domain.Shared
             dataInits.Add(new DataInit()
             {
                 CompanyId = "bd840460-1e3a-45c8-abed-6e66903eb465",
-                Production = 11.95M
+                Production = 13.95M
             });
             return dataInits;
         }
