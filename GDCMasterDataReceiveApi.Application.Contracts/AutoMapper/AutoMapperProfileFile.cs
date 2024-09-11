@@ -122,6 +122,7 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.AutoMapper
             mapperConfigurationExpression.CreateMap<WeiTUnit, KyWeiTUnit>();
             mapperConfigurationExpression.CreateMap<PLeader, KyPLeader>();
             mapperConfigurationExpression.CreateMap<CanYDep, KyCanYDep>();
+            mapperConfigurationExpression.CreateMap<LanguageC, LanguageDetails>();
             #endregion
 
         }

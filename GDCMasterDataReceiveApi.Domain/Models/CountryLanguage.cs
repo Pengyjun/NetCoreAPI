@@ -1,9 +1,4 @@
 ﻿using SqlSugar;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace GDCMasterDataReceiveApi.Domain.Models
 {
@@ -13,7 +8,6 @@ namespace GDCMasterDataReceiveApi.Domain.Models
     [SugarTable("t_countrylanguage", IsDisabledDelete = true)]
     public class CountryLanguage
     {
-
         /// <summary>
         /// 语种代码
         /// </summary>  
