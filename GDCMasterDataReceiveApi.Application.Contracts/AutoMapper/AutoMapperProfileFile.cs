@@ -101,7 +101,7 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.AutoMapper
             //中交区域总部
             mapperConfigurationExpression.CreateMap<RegionalItem, Regional>();
             //中交区域中心
-            mapperConfigurationExpression.CreateMap<RegionalCenterReceiveDto, RegionalCenter>();
+            mapperConfigurationExpression.CreateMap<RegionalCenterItem, RegionalCenter>();
             //委托关系
             mapperConfigurationExpression.CreateMap<RelationalContractsReceiveDto, RelationalContracts>();
             //房号

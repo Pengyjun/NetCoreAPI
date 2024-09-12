@@ -53,35 +53,39 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.RegionalCenter
     /// <summary>
     /// 中交区域中心 接收
     /// </summary>
-    public class RegionalCenterReceiveDto
+    public class RegionalCenterItem
     {
+        /// <summary>
+        /// 
+        /// </summary>
+        public long? Id { get; set; }
         /// <summary>
         /// 发送记录ID 发送记录的ID，必须保证此ID在同一个发送批次中是唯一的。用于记录发送方对于此发送记录的唯一标识。
         /// </summary>
-        public string ZZSERIAL { get; set; }
+        public string? ZZSERIAL { get; set; }
         /// <summary>
         /// 中交区域中心代码:中交区域中心编码
         /// </summary>
-        public string ZCRCCODE { get; set; }
+        public string? ZCRCCODE { get; set; }
         /// <summary>
         /// 中交区域中心描述:编码描述
         /// </summary>
-        public string ZCRCNAME { get; set; }
+        public string? ZCRCNAME { get; set; }
         /// <summary>
         /// 版本
         /// </summary>
-        public string ZVERSION { get; set; }
+        public string? ZVERSION { get; set; }
         /// <summary>
         /// 状态：数据是否有效的标识:有效：1无效：0
         /// </summary>
-        public string ZSTATE { get; set; }
+        public string? ZSTATE { get; set; }
         /// <summary>
         /// 是否删除 数据是否有效的标识:有效：1无效：0
         /// </summary>
-        public string ZDELETE { get; set; }
+        public string? ZDELETE { get; set; }
         /// <summary>
         /// 多语言描述表类型
         /// </summary>
-        public List<ZMDGS_ZLANG4>? ZMDGTT_ZLANG { get; set; }
+        public RegionalCenterModels? ZMDGTT_ZLANG { get; set; }
     }
 }
