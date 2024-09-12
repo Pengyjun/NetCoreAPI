@@ -80,9 +80,13 @@
         /// </summary>
         AccountingDepartment=24,
         /// <summary>
+        /// 多组织行政机构
+        /// </summary>
+        AdministrativeOrganization=25,
+        /// <summary>
         /// 国民经济行业分类
         /// </summary>
-        NationalEconomy= 19,
+        NationalEconomy = 19,
         /// <summary>
         /// 中交项目行业分类产业分类、业务板块、十二大业务类型、江河湖海对照关系
         /// </summary>

@@ -5,6 +5,7 @@ using GDCMasterDataReceiveApi.Application.Contracts.Dto.AccountingDepartment;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.AccountingOrganization;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.AdministrativeAccountingMapper;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.AdministrativeDivision;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.AdministrativeOrganization;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.BankCard;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.BusinessNoCpportunity;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.Common;
@@ -112,6 +113,8 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.AutoMapper
             mapperConfigurationExpression.CreateMap<TypeOfBidDisclosureProjectTableReceiveDto, TypeOfBidDisclosureProjectTable>();
             //常用计量单位
             mapperConfigurationExpression.CreateMap<UnitMeasurementItem, UnitMeasurement>();
+            //多组织行政机构
+            mapperConfigurationExpression.CreateMap<AdministrativeOrganizationReceiveRequestDto, AdministrativeOrganization>();
 
 
             #region 其他映射

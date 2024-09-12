@@ -2,6 +2,7 @@
 using GDCMasterDataReceiveApi.Application.Contracts;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.AccountingDepartment;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.AdministrativeOrganization;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.CorresUnit;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.CountryContinent;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.CountryRegion;
@@ -183,7 +184,13 @@ namespace GHElectronicFileApi.AopInterceptor
                 requestParame = receiveParame.item.ToJson();
                 receiveDataType = ReceiveDataType.AccountingDepartment;
             }
-
+            else if (methodName == "AdministrativeOrganizationDataAsync")
+            {
+                var receiveParame = ((BaseReceiveDataRequestDto<AdministrativeOrganizationReceiveRequestDto>)invocation.Arguments[0]).IT_DATA;
+                parameCount = receiveParame.item.Count;
+                requestParame = receiveParame.item.ToJson();
+                receiveDataType = ReceiveDataType.AdministrativeOrganization;
+            }
             #endregion
 
             #region 记录接收数据的请求日志
@@ -229,8 +236,6 @@ namespace GHElectronicFileApi.AopInterceptor
                 //这里不处理  会自动向上抛
 
             }
-
-
 
         }
     }

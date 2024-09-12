@@ -3,6 +3,7 @@ using GDCMasterDataReceiveApi.Application.Contracts.Dto._4A.Institution;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto._4A.User;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.AccountingDepartment;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.AdministrativeAccountingMapper;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.AdministrativeOrganization;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.CorresUnit;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.CountryContinent;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.CountryRegion;
@@ -106,7 +107,7 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.IService.IReceiveService
         /// 多组织-行政组织
         /// </summary>
         /// <returns></returns>
-        Task<MDMResponseResult> AdministrativeOrganizationDataAsync();
+        Task<MDMResponseResult> AdministrativeOrganizationDataAsync(BaseReceiveDataRequestDto<AdministrativeOrganizationReceiveRequestDto> baseReceiveDataRequestDto);
         /// <summary>
         /// 发票类型
         /// </summary>

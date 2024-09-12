@@ -2,6 +2,7 @@
 using GDCMasterDataReceiveApi.Application.Contracts.Dto._4A.Institution;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto._4A.User;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.AccountingDepartment;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.AdministrativeOrganization;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.CorresUnit;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.CountryContinent;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.CountryRegion;
@@ -114,13 +115,7 @@ namespace GDCMasterDataReceiveApi.Controller
         [UnitOfWork]
         [HttpPost("NationalEconomy")]
         public async Task<MDMResponseResult> NationalEconomyDataAsync([FromBody] BaseReceiveDataRequestDto<NationalEconomyItem> baseReceiveDataRequestDto) => await _receiveService.NationalEconomyDataAsync(baseReceiveDataRequestDto);
-        /// <summary>
-        /// 多组织-行政组织
-        /// </summary>
-        /// <returns></returns>
-        [UnitOfWork]
-        [HttpPost("AdministrativeOrganization")]
-        public async Task<MDMResponseResult> AdministrativeOrganizationDataAsync() => await _receiveService.AdministrativeOrganizationDataAsync();
+       
         /// <summary>
         /// 发票类型
         /// </summary>
@@ -230,6 +225,16 @@ namespace GDCMasterDataReceiveApi.Controller
         [UnitOfWork]
         [HttpPost("AccountingDepartment")]
         public async Task<MDMResponseResult> AccountingDepartmentDataAsync(BaseReceiveDataRequestDto<AccountingDepartmentReceiveDto> baseReceiveDataRequestDto) => await _receiveService.AccountingDepartmentDataAsync(baseReceiveDataRequestDto);
+        #endregion
+
+        #region 多组织-行政组织
+        /// <summary>
+        /// 多组织-行政组织
+        /// </summary>
+        /// <returns></returns>
+        [UnitOfWork]
+        [HttpPost("AdministrativeOrganization")]
+        public async Task<MDMResponseResult> AdministrativeOrganizationDataAsync(BaseReceiveDataRequestDto<AdministrativeOrganizationReceiveRequestDto> baseReceiveDataRequestDto) => await _receiveService.AdministrativeOrganizationDataAsync(baseReceiveDataRequestDto);
         #endregion
 
 
