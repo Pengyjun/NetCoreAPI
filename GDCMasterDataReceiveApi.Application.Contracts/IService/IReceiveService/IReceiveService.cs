@@ -90,11 +90,6 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.IService.IReceiveService
         /// <returns></returns>
         Task<MDMResponseResult> RegionalCenterDataAsync();
         /// <summary>
-        /// 银行账号
-        /// </summary>
-        /// <returns></returns>
-        Task<MDMResponseResult> BankCardDataAsync();
-        /// <summary>
         /// 国民经济行业分类
         /// </summary>
         /// <returns></returns>

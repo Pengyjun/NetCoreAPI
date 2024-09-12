@@ -128,13 +128,6 @@ namespace GHElectronicFileApi.AopInterceptor
                 requestParame = receiveParame.item.ToJson();
                 receiveDataType = ReceiveDataType.LouDong;
             }
-            else if (methodName == "BankCardDataAsync")
-            {
-                var receiveParame = ((BaseReceiveDataRequestDto<BankCardItem>)invocation.Arguments[0]).IT_DATA;
-                parameCount = receiveParame.item.Count;
-                requestParame = receiveParame.item.ToJson();
-                receiveDataType = ReceiveDataType.BankCard;
-            }
             #endregion
 
             #region 记录接收数据的请求日志

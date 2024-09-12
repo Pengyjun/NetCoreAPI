@@ -107,13 +107,6 @@ namespace GDCMasterDataReceiveApi.Controller
         [HttpPost("RegionalCenter")]
         public async Task<MDMResponseResult> RegionalCenterDataAsync() => await _receiveService.RegionalCenterDataAsync();
         /// <summary>
-        /// 银行账号
-        /// </summary>
-        /// <returns></returns>
-        [UnitOfWork]
-        [HttpPost("BankCard")]
-        public async Task<MDMResponseResult> BankCardDataAsync() => await _receiveService.BankCardDataAsync();
-        /// <summary>
         /// 国民经济行业分类
         /// </summary>
         /// <returns></returns>
