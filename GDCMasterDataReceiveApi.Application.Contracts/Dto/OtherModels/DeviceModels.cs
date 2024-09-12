@@ -18,10 +18,6 @@
     public class ClassDevice
     {
         /// <summary>
-        /// 
-        /// </summary>
-        public long Id {  get; set; }
-        /// <summary>
         /// 11
         /// 分类编码:分类的唯一性编码
         /// </summary>

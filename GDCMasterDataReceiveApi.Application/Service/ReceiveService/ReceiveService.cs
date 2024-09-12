@@ -11,6 +11,7 @@ using GDCMasterDataReceiveApi.Application.Contracts.Dto.DeviceClassCode;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.FinancialInstitution;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.InvoiceType;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.Language;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.OtherModels;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.Project;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.RoomNumber;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.ScientifiCNoProject;
@@ -21,6 +22,7 @@ using GDCMasterDataReceiveApi.Domain.Shared.Enums;
 using GDCMasterDataReceiveApi.Domain.Shared.Utils;
 using Microsoft.Extensions.Logging;
 using SqlSugar;
+using System.Collections.Generic;
 using UtilsSharp;
 
 namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
@@ -207,69 +209,69 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
         public async Task<MDMResponseResult> CountryContinentDataAsync(BaseReceiveDataRequestDto<CountryContinentReceiveDto> baseReceiveDataRequestDto)
         {
 
-                MDMResponseResult responseAjaxResult = new MDMResponseResult();
-                //处理多语言描述表类型
-                List<CountryContinentLanguage> insertzMDGS_OLDNAMEs = new();
-                List<CountryContinentLanguage> updatezMDGS_OLDNAMEs = new();
-                //查询项目表
-                var dataCodeList = await _dbContext.Queryable<CountryContinent>().Where(x => x.IsDelete == 1).ToListAsync();
-                //需要新增的数据
-                var insertOids = baseReceiveDataRequestDto.IT_DATA.item.Where(x => !dataCodeList.Select(x => x.ZCONTINENTCODE).ToList().Contains(x.ZCONTINENTCODE)).ToList();
-                //需要更新的数据
-                var updateOids = baseReceiveDataRequestDto.IT_DATA.item.Where(x => dataCodeList.Select(x => x.ZCONTINENTCODE).ToList().Contains(x.ZCONTINENTCODE)).ToList();
-                //新增操作
-                if (insertOids.Any())
+            MDMResponseResult responseAjaxResult = new MDMResponseResult();
+            //处理多语言描述表类型
+            List<CountryContinentLanguage> insertzMDGS_OLDNAMEs = new();
+            List<CountryContinentLanguage> updatezMDGS_OLDNAMEs = new();
+            //查询项目表
+            var dataCodeList = await _dbContext.Queryable<CountryContinent>().Where(x => x.IsDelete == 1).ToListAsync();
+            //需要新增的数据
+            var insertOids = baseReceiveDataRequestDto.IT_DATA.item.Where(x => !dataCodeList.Select(x => x.ZCONTINENTCODE).ToList().Contains(x.ZCONTINENTCODE)).ToList();
+            //需要更新的数据
+            var updateOids = baseReceiveDataRequestDto.IT_DATA.item.Where(x => dataCodeList.Select(x => x.ZCONTINENTCODE).ToList().Contains(x.ZCONTINENTCODE)).ToList();
+            //新增操作
+            if (insertOids.Any())
+            {
+                foreach (var itemItem in insertOids)
                 {
-                    foreach (var itemItem in insertOids)
+                    itemItem.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
+                    foreach (var lang in itemItem.ZLANG_LIST.item)
                     {
-                        itemItem.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
-                        foreach (var lang in itemItem.ZLANG_LIST.item)
-                        {
-                        
-                            CountryContinentLanguage dataItem = new CountryContinentLanguage()
-                            {
-                                Id = itemItem.Id.Value,
-                                ZLANGCODE = lang.ZLANGCODE,
-                                ZAREA_DESC = lang.ZAREA_DESC,
-                                ZCODE_DESC = lang.ZCODE_DESC,
-                            };
-                            insertzMDGS_OLDNAMEs.Add(dataItem);
-                        }
-                    }
-                    var projectList = _mapper.Map<List<CountryContinentReceiveDto>, List<CountryContinent>>(insertOids);
-                    await _dbContext.Fastest<CountryContinent>().BulkCopyAsync(projectList);
-                    await _dbContext.Fastest<CountryContinentLanguage>().BulkCopyAsync(insertzMDGS_OLDNAMEs);
-                }
-                if (updateOids.Any())
-                {
-                List<CountryContinentLanguage> deleteData = new List<CountryContinentLanguage>();
-                    var projectUsedNameList = await _dbContext.Queryable<CountryContinentLanguage>().ToListAsync();
-                    foreach (var itemItem in updateOids)
-                    {
-                        var id = dataCodeList.Where(x => x.ZCONTINENTCODE == itemItem.ZCONTINENTCODE).Select(x => x.Id).First();
-                        itemItem.Id = id;
-                        foreach (var items in itemItem.ZLANG_LIST.item)
-                        {
-                            CountryContinentLanguage dataItem = new CountryContinentLanguage()
-                            {
-                                Id = itemItem.Id.Value,
-                                ZLANGCODE = items.ZLANGCODE,
-                                ZAREA_DESC = items.ZAREA_DESC,
-                                ZCODE_DESC = items.ZCODE_DESC,
-                            };
-                            updatezMDGS_OLDNAMEs.Add(dataItem);
-                        }
-                        deleteData.AddRange(projectUsedNameList.Where(x => x.Id == itemItem.Id).ToList());
-                    }
-                    var projectList = _mapper.Map<List<CountryContinentReceiveDto>, List<CountryContinent>>(updateOids);
-                    await _dbContext.Updateable(projectList).ExecuteCommandAsync();
-                    await _dbContext.Deleteable<CountryContinentLanguage>().WhereColumns(deleteData, it => new { it.Id }).ExecuteCommandAsync();
-                    await _dbContext.Insertable(updatezMDGS_OLDNAMEs).ExecuteCommandAsync();
 
+                        CountryContinentLanguage dataItem = new CountryContinentLanguage()
+                        {
+                            Id = itemItem.Id.Value,
+                            ZLANGCODE = lang.ZLANGCODE,
+                            ZAREA_DESC = lang.ZAREA_DESC,
+                            ZCODE_DESC = lang.ZCODE_DESC,
+                        };
+                        insertzMDGS_OLDNAMEs.Add(dataItem);
+                    }
                 }
-                responseAjaxResult.Success();
-          
-                return responseAjaxResult;
+                var projectList = _mapper.Map<List<CountryContinentReceiveDto>, List<CountryContinent>>(insertOids);
+                await _dbContext.Fastest<CountryContinent>().BulkCopyAsync(projectList);
+                await _dbContext.Fastest<CountryContinentLanguage>().BulkCopyAsync(insertzMDGS_OLDNAMEs);
+            }
+            if (updateOids.Any())
+            {
+                List<CountryContinentLanguage> deleteData = new List<CountryContinentLanguage>();
+                var projectUsedNameList = await _dbContext.Queryable<CountryContinentLanguage>().ToListAsync();
+                foreach (var itemItem in updateOids)
+                {
+                    var id = dataCodeList.Where(x => x.ZCONTINENTCODE == itemItem.ZCONTINENTCODE).Select(x => x.Id).First();
+                    itemItem.Id = id;
+                    foreach (var items in itemItem.ZLANG_LIST.item)
+                    {
+                        CountryContinentLanguage dataItem = new CountryContinentLanguage()
+                        {
+                            Id = itemItem.Id.Value,
+                            ZLANGCODE = items.ZLANGCODE,
+                            ZAREA_DESC = items.ZAREA_DESC,
+                            ZCODE_DESC = items.ZCODE_DESC,
+                        };
+                        updatezMDGS_OLDNAMEs.Add(dataItem);
+                    }
+                    deleteData.AddRange(projectUsedNameList.Where(x => x.Id == itemItem.Id).ToList());
+                }
+                var projectList = _mapper.Map<List<CountryContinentReceiveDto>, List<CountryContinent>>(updateOids);
+                await _dbContext.Updateable(projectList).ExecuteCommandAsync();
+                await _dbContext.Deleteable<CountryContinentLanguage>().WhereColumns(deleteData, it => new { it.Id }).ExecuteCommandAsync();
+                await _dbContext.Insertable(updatezMDGS_OLDNAMEs).ExecuteCommandAsync();
+
+            }
+            responseAjaxResult.Success();
+
+            return responseAjaxResult;
         }
         /// <summary>
         /// 中交区域总部
@@ -1052,41 +1054,36 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
         public async Task<MDMResponseResult> RoomNumberDataAsync(BaseReceiveDataRequestDto<RoomNumberItem> receiveDataMDMRequestDto)
         {
             MDMResponseResult responseAjaxResult = new MDMResponseResult();
-            #region 记录日志
-            var receiceRecordId = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
-            ReceiveRecordLog receiveRecordLog = new ReceiveRecordLog()
-            {
-                Id = receiceRecordId,
-                ReceiveType = ReceiveDataType.Room,
-                RequestParame = receiveDataMDMRequestDto.IT_DATA.item.ToJson(),
-                ReceiveNumber = receiveDataMDMRequestDto.IT_DATA.item.Count,
-            };
-            await baseService.ReceiveRecordLogAsync(receiveRecordLog, DataOperationType.Insert);
-            #endregion
+
             try
             {
-                var invoiceList = _mapper.Map<List<RoomNumberItem>, List<RoomNumber>>(receiveDataMDMRequestDto.IT_DATA.item);
-                foreach (var item in invoiceList)
-                {
-                    item.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
-                }
-                var invoiceCodes = await _dbContext.Queryable<RoomNumber>().Where(x => x.IsDelete == 1).Select(x => x.ZROOM).ToListAsync();
-                var insertOids = invoiceList.Where(x => !invoiceCodes.Contains(x.ZROOM)).Select(x => x.ZROOM).ToList();
-                var updateOids = invoiceList.Where(x => invoiceCodes.Contains(x.ZROOM)).Select(x => x.ZROOM).ToList();
+                var rmList = await _dbContext.Queryable<RoomNumber>().Where(x => x.IsDelete == 1).ToListAsync();
+                var insertOids = receiveDataMDMRequestDto.IT_DATA.item.Where(x => !rmList.Select(x => x.ZROOM).ToList().Contains(x.ZROOM)).ToList();
+                var updateOids = receiveDataMDMRequestDto.IT_DATA.item.Where(x => rmList.Select(x => x.ZROOM).ToList().Contains(x.ZROOM)).ToList();
 
+                //新增操作
                 if (insertOids.Any())
                 {
-                    //插入操作
-                    var batchData = invoiceList.Where(x => insertOids.Contains(x.ZROOM)).ToList();
-                    foreach (var i in batchData) { i.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(); }
-                    await _dbContext.Fastest<RoomNumber>().BulkCopyAsync(batchData);
+                    foreach (var ic in insertOids)
+                    {
+                        ic.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
+                    }
+
+                    var mapRmList = _mapper.Map<List<RoomNumberItem>, List<RoomNumber>>(insertOids);
+                    await _dbContext.Fastest<RoomNumber>().BulkCopyAsync(mapRmList);
                 }
                 if (updateOids.Any())
                 {
-                    //更新操作
-                    var batchData = invoiceList.Where(x => updateOids.Contains(x.ZROOM)).ToList();
-                    await _dbContext.Fastest<RoomNumber>().BulkUpdateAsync(batchData);
+                    //更新
+                    foreach (var itemItem in updateOids)
+                    {
+                        var id = rmList.Where(x => x.ZROOM == itemItem.ZROOM).Select(x => x.Id).First();
+                        itemItem.Id = id;
+                    }
+                    var mapRmList = _mapper.Map<List<RoomNumberItem>, List<RoomNumber>>(updateOids);
+                    await _dbContext.Updateable(mapRmList).ExecuteCommandAsync();
                 }
+
                 responseAjaxResult.Success();
             }
             catch (Exception ex)
@@ -1113,65 +1110,69 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
         public async Task<MDMResponseResult> LanguageDataAsync(BaseReceiveDataRequestDto<LanguageItem> receiveDataMDMRequestDto)
         {
             MDMResponseResult responseAjaxResult = new MDMResponseResult();
-            #region 记录日志
-            var receiceRecordId = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
-            ReceiveRecordLog receiveRecordLog = new ReceiveRecordLog()
-            {
-                Id = receiceRecordId,
-                ReceiveType = ReceiveDataType.Language,
-                RequestParame = receiveDataMDMRequestDto.IT_DATA.item.ToJson(),
-                ReceiveNumber = receiveDataMDMRequestDto.IT_DATA.item.Count,
-            };
-            await baseService.ReceiveRecordLogAsync(receiveRecordLog, DataOperationType.Insert);
-            #endregion
+
             try
             {
-                //var invoiceList = _mapper.Map<List<LanguageItem>, List<Language>>(receiveDataMDMRequestDto.IT_DATA.item);
-                //var item = new List<LanguageC>();
-                //foreach (var ic in invoiceList)
-                //{
-                //    ic.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
-                //    var val = ic.ZLANG_LIST.Item;
-                //    foreach (var i in val) { i.Code = ic.ZLANG_TER; }
-                //    item.AddRange(val);
-                //}
-                //var invoiceCodes = await _dbContext.Queryable<Language>().Where(x => x.IsDelete == 1).Select(x => x.ZLANG_TER).ToListAsync();
-                //var insertOids = invoiceList.Where(x => !invoiceCodes.Contains(x.ZLANG_TER)).Select(x => x.ZLANG_TER).ToList();
-                //var updateOids = invoiceList.Where(x => invoiceCodes.Contains(x.ZLANG_TER)).Select(x => x.ZLANG_TER).ToList();
+                List<LanguageDetails> insertItem = new();
+                List<LanguageDetails> updateItem = new();
 
-                //#region  其他
-                //var laList = _mapper.Map<List<LanguageC>, List<LanguageDetails>>(item);
-                //var laCodes = await _dbContext.Queryable<LanguageDetails>().Where(t => t.IsDelete == 1).Select(t => t.Code).ToListAsync();
-                //var insertILaCodes = item.Where(x => !laCodes.Contains(x.Code)).Select(x => x.Code).ToList();
-                //var updateILaCodes = item.Where(x => laCodes.Contains(x.Code)).Select(x => x.Code).ToList();
-                //#endregion
+                var lgList = await _dbContext.Queryable<Language>().Where(x => x.IsDelete == 1).ToListAsync();
+                var insertOids = receiveDataMDMRequestDto.IT_DATA.item.Where(x => !lgList.Select(x => x.ZLANG_TER).ToList().Contains(x.ZLANG_TER)).ToList();
+                var updateOids = receiveDataMDMRequestDto.IT_DATA.item.Where(x => lgList.Select(x => x.ZLANG_TER).ToList().Contains(x.ZLANG_TER)).ToList();
 
-                //if (insertOids.Any())
-                //{
-                //    //插入操作
-                //    var batchData = invoiceList.Where(x => insertOids.Contains(x.ZLANG_TER)).ToList();
-                //    foreach (var i in batchData) { i.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(); }
-                //    await _dbContext.Fastest<Language>().BulkCopyAsync(batchData);
-                //}
-                //if (updateOids.Any())
-                //{
-                //    //更新操作
-                //    var batchData = invoiceList.Where(x => updateOids.Contains(x.ZLANG_TER)).ToList();
-                //    await _dbContext.Fastest<Language>().BulkUpdateAsync(batchData);
-                //}
-                //if (insertILaCodes.Any())
-                //{
-                //    //插入操作
-                //    var batchData = laList.Where(x => insertILaCodes.Contains(x.Code)).ToList();
-                //    foreach (var i in batchData) { i.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(); }
-                //    await _dbContext.Fastest<LanguageDetails>().BulkCopyAsync(batchData);
-                //}
-                //if (updateILaCodes.Any())
-                //{
-                //    //更新操作
-                //    var batchData = laList.Where(x => updateILaCodes.Contains(x.Code)).ToList();
-                //    await _dbContext.Fastest<LanguageDetails>().BulkUpdateAsync(batchData);
-                //}
+                //新增操作
+                if (insertOids.Any())
+                {
+                    foreach (var ic in insertOids)
+                    {
+                        ic.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
+                        foreach (var cc in ic.ZLANG_LIST.Item)
+                        {
+                            var lg = new LanguageDetails
+                            {
+                                Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                                Code = ic.ZLANG_TER,
+                                ZVALUE_DESC = cc.ZVALUE_DESC,
+                                ZCODE_DESC = cc.ZCODE_DESC,
+                                ZLANGCODE = cc.ZLANGCODE,
+                                CreateTime = DateTime.Now
+                            };
+                            insertItem.Add(lg);
+                        }
+                    }
+
+                    var mapList = _mapper.Map<List<LanguageItem>, List<Language>>(insertOids);
+                    await _dbContext.Fastest<Language>().BulkCopyAsync(mapList);
+                }
+                if (updateOids.Any())
+                {
+                    List<LanguageDetails> deleteData = new();
+                    //更新
+                    var lgeList = await _dbContext.Queryable<LanguageDetails>().ToListAsync();
+                    foreach (var itemItem in updateOids)
+                    {
+                        var id = lgList.Where(x => x.ZLANG_TER == itemItem.ZLANG_TER).Select(x => x.Id).First();
+                        itemItem.Id = id;
+                        foreach (var items in itemItem.ZLANG_LIST.Item)
+                        {
+                            LanguageDetails ldetails = new LanguageDetails()
+                            {
+                                Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                                ZCODE_DESC = items.ZCODE_DESC,
+                                ZLANGCODE = items.ZLANGCODE,
+                                Code = itemItem.ZLANG_TER,
+                                ZVALUE_DESC = items.ZVALUE_DESC,
+                                CreateTime = DateTime.Now
+                            };
+                            updateItem.Add(ldetails);
+                        }
+                        deleteData.AddRange(lgeList.Where(x => x.Code == itemItem.ZLANG_TER).ToList());
+                    }
+                    var mapList = _mapper.Map<List<LanguageItem>, List<Language>>(updateOids);
+                    await _dbContext.Updateable(mapList).ExecuteCommandAsync();
+                    await _dbContext.Deleteable<LanguageDetails>().WhereColumns(deleteData, it => new { it.Id }).ExecuteCommandAsync();
+                    await _dbContext.Insertable(updateItem).ExecuteCommandAsync();
+                }
 
                 responseAjaxResult.Success();
             }
