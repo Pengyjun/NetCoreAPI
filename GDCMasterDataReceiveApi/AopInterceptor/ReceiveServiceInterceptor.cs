@@ -1,6 +1,7 @@
 ﻿using Castle.DynamicProxy;
 using GDCMasterDataReceiveApi.Application.Contracts;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.AccountingDepartment;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.CorresUnit;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.CountryContinent;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.CountryRegion;
@@ -151,6 +152,14 @@ namespace GHElectronicFileApi.AopInterceptor
                 requestParame = receiveParame.item.ToJson();
                 receiveDataType = ReceiveDataType.Regional;
             }
+            else if (methodName == "AccountingDepartmentDataAsync")
+            {
+                var receiveParame = ((BaseReceiveDataRequestDto<AccountingDepartmentReceiveDto>)invocation.Arguments[0]).IT_DATA;
+                parameCount = receiveParame.item.Count;
+                requestParame = receiveParame.item.ToJson();
+                receiveDataType = ReceiveDataType.AccountingDepartment;
+            }
+
             #endregion
 
             #region 记录接收数据的请求日志

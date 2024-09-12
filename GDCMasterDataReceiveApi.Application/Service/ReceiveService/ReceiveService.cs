@@ -3,6 +3,7 @@ using GDCMasterDataReceiveApi.Application.Contracts;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto._4A.Institution;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto._4A.User;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.AccountingDepartment;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.CorresUnit;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.CountryContinent;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.CountryRegion;
@@ -665,10 +666,37 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
         /// 核算部门
         /// </summary>
         /// <returns></returns>
-        public async Task<MDMResponseResult> AccountingDepartmentDataAsync()
+        public async Task<MDMResponseResult> AccountingDepartmentDataAsync(BaseReceiveDataRequestDto<AccountingDepartmentReceiveDto>  baseReceiveDataRequestDto)
         {
 
             var responseAjaxResult = new MDMResponseResult();
+            //查询项目表
+            var projectCodeList = await _dbContext.Queryable<AccountingDepartment>().Where(x => x.IsDelete == 1).ToListAsync();
+            //需要新增的数据
+            var insertOids = baseReceiveDataRequestDto.IT_DATA.item.Where(x => !projectCodeList.Select(x => x.ZACID).ToList().Contains(x.ZACID)).ToList();
+            //需要更新的数据
+            var updateOids = baseReceiveDataRequestDto.IT_DATA.item.Where(x => projectCodeList.Select(x => x.ZACID).ToList().Contains(x.ZACID)).ToList();
+            //新增操作
+            if (insertOids.Any())
+            {
+                foreach (var itemItem in insertOids)
+                {
+                    itemItem.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
+                }
+                var projectList = _mapper.Map<List<AccountingDepartmentReceiveDto>, List<AccountingDepartment>>(insertOids);
+                projectList.ForEach(x=>x.CreateTime=DateTime.Now);
+                await _dbContext.Fastest<AccountingDepartment>().BulkCopyAsync(projectList);
+            }
+            if (updateOids.Any())
+            {
+                foreach (var itemItem in updateOids)
+                {
+                    var id = projectCodeList.Where(x => x.ZACID == itemItem.ZACID).Select(x => x.Id).First();
+                    itemItem.Id = id;
+                }
+                var projectList = _mapper.Map<List<AccountingDepartmentReceiveDto>, List<AccountingDepartment>>(updateOids);
+                await _dbContext.Updateable(projectList).ExecuteCommandAsync();
+            }
             responseAjaxResult.Success();
             return responseAjaxResult;
         }

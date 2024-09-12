@@ -75,6 +75,10 @@
         /// 中交区域中心
         /// </summary>
         RegionalCenter=18,
+        /// <summary>
+        /// 核算部门
+        /// </summary>
+        AccountingDepartment=24,
 
     }
 }

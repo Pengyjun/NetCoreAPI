@@ -1,6 +1,7 @@
 ﻿using GDCMasterDataReceiveApi.Application.Contracts.Dto;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto._4A.Institution;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto._4A.User;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.AccountingDepartment;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.CorresUnit;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.CountryContinent;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.CountryRegion;
@@ -95,13 +96,7 @@ namespace GDCMasterDataReceiveApi.Controller
         [UnitOfWork]
         [HttpPost("DeviceClassCode")]
         public async Task<MDMResponseResult> DeviceClassCodeDataAsync([FromBody] BaseReceiveDataRequestDto<DeviceClassCodeItem> receiveDataMDMRequestDto) => await _receiveService.DeviceClassCodeDataAsync(receiveDataMDMRequestDto);
-        /// <summary>
-        /// 核算部门
-        /// </summary>
-        /// <returns></returns>
-        [UnitOfWork]
-        [HttpPost("AccountingDepartment")]
-        public async Task<MDMResponseResult> AccountingDepartmentDataAsync() => await _receiveService.AccountingDepartmentDataAsync();
+    
         /// <summary>
         /// 中交区域中心
         /// </summary>
@@ -223,6 +218,16 @@ namespace GDCMasterDataReceiveApi.Controller
         #endregion
 
 
+
+        #region 核算部门
+        /// <summary>
+        /// 核算部门
+        /// </summary>
+        /// <returns></returns>
+        [UnitOfWork]
+        [HttpPost("AccountingDepartment")]
+        public async Task<MDMResponseResult> AccountingDepartmentDataAsync(BaseReceiveDataRequestDto<AccountingDepartmentReceiveDto> baseReceiveDataRequestDto) => await _receiveService.AccountingDepartmentDataAsync(baseReceiveDataRequestDto);
+        #endregion
 
 
         #region 通用字典数据获取(币种  国家地区  大洲  语种   等)
