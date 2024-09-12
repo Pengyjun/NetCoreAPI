@@ -22,6 +22,7 @@ using GDCMasterDataReceiveApi.Domain.Shared.Enums;
 using GDCMasterDataReceiveApi.Domain.Shared.Utils;
 using Microsoft.Extensions.Logging;
 using SqlSugar;
+using System.Collections.Generic;
 using UtilsSharp;
 
 namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
@@ -207,7 +208,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
             }
             catch (Exception ex)
             {
-               
+
                 throw;
             }
             return responseAjaxResult;
@@ -290,7 +291,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
             }
             catch (Exception ex)
             {
-              
+
                 throw;
             }
 
@@ -374,7 +375,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
             }
             catch (Exception ex)
             {
-               
+
                 throw;
             }
 
@@ -470,7 +471,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
             }
             catch (Exception ex)
             {
-              
+
                 throw;
             }
 
@@ -551,49 +552,64 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
             #endregion
             try
             {
-                var invoiceList = _mapper.Map<List<InvoiceTypeItem>, List<InvoiceType>>(receiveDataMDMRequestDto.IT_DATA.item);
-                var item = new List<InvoiceLanguageItem>();
-                foreach (var ic in invoiceList)
-                {
-                    ic.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
-                    var val = ic.ZLANG_LIST.Item;
-                    foreach (var v in val) { v.InvoiceCode = ic.ZINVTCODE; }
-                    item.AddRange(val);
-                }
-                var invoiceCodes = await _dbContext.Queryable<InvoiceType>().Where(x => x.IsDelete == 1).Select(x => x.ZINVTCODE).ToListAsync();
-                var insertOids = invoiceList.Where(x => !invoiceCodes.Contains(x.ZINVTCODE)).Select(x => x.ZINVTCODE).ToList();
-                var updateOids = invoiceList.Where(x => invoiceCodes.Contains(x.ZINVTCODE)).Select(x => x.ZINVTCODE).ToList();
+                List<InvoiceLanguage> insertItem = new();
+                List<InvoiceLanguage> updateItem = new();
 
-                //发票语言语种
-                var ivList = _mapper.Map<List<InvoiceLanguageItem>, List<InvoiceLanguage>>(item);
-                var invoceLangCodes = await _dbContext.Queryable<InvoiceLanguage>().Where(t => t.IsDelete == 1).Select(t => t.InvoiceCode).ToListAsync();
-                var insertICodes = item.Where(x => !invoceLangCodes.Contains(x.InvoiceCode)).Select(x => x.InvoiceCode).ToList();
-                var updateICodes = item.Where(x => invoceLangCodes.Contains(x.InvoiceCode)).Select(x => x.InvoiceCode).ToList();
+                var invoiceCodes = await _dbContext.Queryable<InvoiceType>().Where(x => x.IsDelete == 1).ToListAsync();
+                var insertOids = receiveDataMDMRequestDto.IT_DATA.item.Where(x => !invoiceCodes.Select(x => x.ZINVTCODE).ToList().Contains(x.ZINVTCODE)).ToList();
+                var updateOids = receiveDataMDMRequestDto.IT_DATA.item.Where(x => invoiceCodes.Select(x => x.ZINVTCODE).ToList().Contains(x.ZINVTCODE)).ToList();
 
+                //新增操作
                 if (insertOids.Any())
                 {
-                    //插入操作
-                    var batchData = invoiceList.Where(x => insertOids.Contains(x.ZINVTCODE)).ToList();
-                    await _dbContext.Fastest<InvoiceType>().BulkCopyAsync(batchData);
+                    foreach (var ic in insertOids)
+                    {
+                        ic.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
+                        foreach (var cc in ic.ZLANG_LIST.Item)
+                        {
+                            var invoiceLanguage = new InvoiceLanguage
+                            {
+                                Id = ic.Id.Value,
+                                InvoiceCode = ic.ZINVTCODE,
+                                ZCODE_DESC = cc.ZCODE_DESC,
+                                ZLANGCODE = cc.ZLANGCODE,
+                                CreateTime = DateTime.Now
+                            };
+                            insertItem.Add(invoiceLanguage);
+                        }
+                    }
+
+                    var invoiceList = _mapper.Map<List<InvoiceTypeItem>, List<InvoiceType>>(insertOids);
+                    await _dbContext.Fastest<InvoiceType>().BulkCopyAsync(invoiceList);
+                    await _dbContext.Fastest<InvoiceLanguage>().BulkCopyAsync(insertItem);
                 }
                 if (updateOids.Any())
                 {
-                    //更新操作
-                    var batchData = invoiceList.Where(x => updateOids.Contains(x.ZINVTCODE)).ToList();
-                    await _dbContext.Fastest<InvoiceType>().BulkUpdateAsync(batchData);
-                }
-                if (insertICodes.Any())
-                {
-                    //插入操作
-                    var batchData = ivList.Where(x => insertICodes.Contains(x.InvoiceCode)).ToList();
-                    foreach (var i in batchData) { i.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(); }
-                    await _dbContext.Fastest<InvoiceLanguage>().BulkCopyAsync(batchData);
-                }
-                if (updateICodes.Any())
-                {
-                    //更新操作
-                    var batchData = ivList.Where(x => updateICodes.Contains(x.InvoiceCode)).ToList();
-                    await _dbContext.Fastest<InvoiceLanguage>().BulkUpdateAsync(batchData);
+                    List<InvoiceLanguage> deleteData = new();
+                    //更新
+                    var invoiceLanguageList = await _dbContext.Queryable<InvoiceLanguage>().ToListAsync();
+                    foreach (var itemItem in updateOids)
+                    {
+                        var id = invoiceCodes.Where(x => x.ZINVTCODE == itemItem.ZINVTCODE).Select(x => x.Id).First();
+                        itemItem.Id = id;
+                        foreach (var items in itemItem.ZLANG_LIST.Item)
+                        {
+                            InvoiceLanguage invoiceLanguage = new InvoiceLanguage()
+                            {
+                                Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                                InvoiceCode = itemItem.ZINVTCODE,
+                                ZCODE_DESC = items.ZCODE_DESC,
+                                ZLANGCODE = items.ZLANGCODE,
+                                CreateTime = DateTime.Now
+                            };
+                            updateItem.Add(invoiceLanguage);
+                        }
+                        deleteData.AddRange(invoiceLanguageList.Where(x => x.InvoiceCode == itemItem.ZINVTCODE).ToList());
+                    }
+                    var invoiceTypeItemList = _mapper.Map<List<InvoiceTypeItem>, List<InvoiceType>>(updateOids);
+                    await _dbContext.Updateable(invoiceTypeItemList).ExecuteCommandAsync();
+                    await _dbContext.Deleteable<InvoiceLanguage>().WhereColumns(deleteData, it => new { it.Id }).ExecuteCommandAsync();
+                    await _dbContext.Insertable(updateItem).ExecuteCommandAsync();
                 }
 
                 responseAjaxResult.Success();
@@ -634,7 +650,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
         public async Task<MDMResponseResult> ProjectDataAsync(BaseReceiveDataRequestDto<ProjectItem> receiveDataMDMRequestDto)
         {
             MDMResponseResult responseAjaxResult = new MDMResponseResult();
-            
+
             try
             {
                 ////处理曾用名
@@ -674,13 +690,13 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
                     var projectUsedNameList = await _dbContext.Queryable<ProjectUsedName>().ToListAsync();
                     foreach (var itemItem in updateOids)
                     {
-                        var id=  projectCodeList.Where(x => x.ZPROJECT == itemItem.ZPROJECT).Select(x=>x.Id).First();
+                        var id = projectCodeList.Where(x => x.ZPROJECT == itemItem.ZPROJECT).Select(x => x.Id).First();
                         itemItem.Id = id;
                         foreach (var items in itemItem.ZOLDNAME_LIST.item)
                         {
                             ProjectUsedName projectUsedName = new ProjectUsedName()
                             {
-                                Id= itemItem.Id.Value,
+                                Id = itemItem.Id.Value,
                                 ZOLDNAME = items.ZOLDNAME,
                                 ZPROJECT = items.ZPROJECT
                             };
@@ -910,7 +926,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
             }
             catch (Exception ex)
             {
-             
+
                 throw;
             }
             return responseAjaxResult;
@@ -1010,7 +1026,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
                 {
                     //插入操作
                     var batchData = invoiceList.Where(x => insertOids.Contains(x.ZROOM)).ToList();
-                    foreach (var i in batchData) { i.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();}
+                    foreach (var i in batchData) { i.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(); }
                     await _dbContext.Fastest<RoomNumber>().BulkCopyAsync(batchData);
                 }
                 if (updateOids.Any())
@@ -1082,7 +1098,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
                 {
                     //插入操作
                     var batchData = invoiceList.Where(x => insertOids.Contains(x.ZLANG_TER)).ToList();
-                    foreach (var i in batchData) { i.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();}
+                    foreach (var i in batchData) { i.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(); }
                     await _dbContext.Fastest<Language>().BulkCopyAsync(batchData);
                 }
                 if (updateOids.Any())
