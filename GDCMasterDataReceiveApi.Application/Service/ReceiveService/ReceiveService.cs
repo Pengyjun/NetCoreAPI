@@ -70,32 +70,94 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
         {
 
             MDMResponseResult responseAjaxResult = new MDMResponseResult();
-            var projectList = _mapper.Map<List<CorresUnitReceiveDto>, List<CorresUnit>>(baseReceiveDataRequestDto.IT_DATA.item);
-            foreach (var item in projectList)
+            try
             {
-                item.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
-            }
-            var projectCodeList = await _dbContext.Queryable<CorresUnit>().Where(x => x.IsDelete == 1).Select(x => new { Id = x.Id, ZBP = x.ZBP }).ToListAsync();
-            var insertOids = projectList.Where(x => !projectCodeList.Select(x => x.ZBP).ToList().Contains(x.ZBP)).Select(x => x.ZBP).ToList();
-            var updateOids = projectList.Where(x => projectCodeList.Select(x => x.ZBP).ToList().Contains(x.ZBP)).Select(x => x.ZBP).ToList();
-            if (insertOids.Any())
-            {
-                //插入操作
-                var batchData = projectList.Where(x => insertOids.Contains(x.ZBP)).ToList();
-                await _dbContext.Fastest<CorresUnit>().BulkCopyAsync(batchData);
-            }
-            if (updateOids.Any())
-            {
-                //更新操作
-                var batchData = projectList.Where(x => updateOids.Contains(x.ZBP)).ToList();
-                foreach (var item in batchData)
+                ////处理曾用名
+                List<BankCard> insertzMDGS_OLDNAMEs = new();
+                List<BankCard> updatezMDGS_OLDNAMEs = new();
+                //查询项目表
+                var projectCodeList = await _dbContext.Queryable<CorresUnit>().Where(x => x.IsDelete == 1).ToListAsync();
+                //需要新增的数据
+                var insertOids = baseReceiveDataRequestDto.IT_DATA.item.Where(x => !projectCodeList.Select(x => x.ZBP).ToList().Contains(x.ZBP)).ToList();
+                //需要更新的数据
+                var updateOids = baseReceiveDataRequestDto.IT_DATA.item.Where(x => projectCodeList.Select(x => x.ZBP).ToList().Contains(x.ZBP)).ToList();
+                //新增操作
+                if (insertOids.Any())
                 {
-                    item.Id = projectCodeList.Where(x => x.ZBP == item.ZBP).Select(x => x.Id).First();
+                    foreach (var itemItem in insertOids)
+                    {
+                        itemItem.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
+                        foreach (var items in itemItem.ZBANK.Item)
+                        {
+                            BankCard projectUsedName = new BankCard()
+                            {
+                                Id = itemItem.Id.Value,
+                                ZBP = itemItem.ZBP,
+                                ZBANK = items.ZBANK,
+                                ZBANKN = items.ZBANKN,
+                                ZBANKSTA = items.ZBANKSTA,
+                                ZCITY2 = items.ZCITY2,
+                                ZCOUNTY2 = items.ZCOUNTY2,
+                                ZCURR = items.ZCURR,
+                                ZFINAME = items.ZFINAME,
+                                ZFINC = items.ZFINC,
+                                ZKOINH = items.ZKOINH,
+                                ZPROVINC2 = items.ZPROVINC2,
+                                ZZCOUNTR2 = items.ZZCOUNTR2,
+                                ZZSERIAL = items.ZZSERIAL
+                            };
+                            insertzMDGS_OLDNAMEs.Add(projectUsedName);
+                        }
+                    }
+                    var projectList = _mapper.Map<List<CorresUnitReceiveDto>, List<CorresUnit>>(insertOids);
+                    projectList.ForEach(x => x.CreateTime = DateTime.Now);
+                    await _dbContext.Fastest<CorresUnit>().BulkCopyAsync(projectList);
+                    await _dbContext.Fastest<BankCard>().BulkCopyAsync(insertzMDGS_OLDNAMEs);
                 }
+                if (updateOids.Any())
+                {
+                    List<BankCard> deleteData = new List<BankCard>();
+                    //更新曾用名
+                    var projectUsedNameList = await _dbContext.Queryable<BankCard>().ToListAsync();
+                    foreach (var itemItem in updateOids)
+                    {
+                        var id = projectCodeList.Where(x => x.ZBP == itemItem.ZBP).Select(x => x.Id).First();
+                        itemItem.Id = id;
+                        foreach (var items in itemItem.ZBANK.Item)
+                        {
+                            BankCard projectUsedName = new BankCard()
+                            {
+                                Id = itemItem.Id.Value,
+                                ZBP = itemItem.ZBP,
+                                ZBANK = items.ZBANK,
+                                ZBANKN = items.ZBANKN,
+                                ZBANKSTA = items.ZBANKSTA,
+                                ZCITY2 = items.ZCITY2,
+                                ZCOUNTY2 = items.ZCOUNTY2,
+                                ZCURR = items.ZCURR,
+                                ZFINAME = items.ZFINAME,
+                                ZFINC = items.ZFINC,
+                                ZKOINH = items.ZKOINH,
+                                ZPROVINC2 = items.ZPROVINC2,
+                                ZZCOUNTR2 = items.ZZCOUNTR2,
+                                ZZSERIAL = items.ZZSERIAL
+                            };
+                            updatezMDGS_OLDNAMEs.Add(projectUsedName);
+                        }
+                        deleteData.AddRange(projectUsedNameList.Where(x => x.ZBP == itemItem.ZBP).ToList());
+                    }
+                    var projectList = _mapper.Map<List<CorresUnitReceiveDto>, List<CorresUnit>>(updateOids);
+                    await _dbContext.Updateable(projectList).ExecuteCommandAsync();
+                    await _dbContext.Deleteable<BankCard>().WhereColumns(deleteData, it => new { it.Id }).ExecuteCommandAsync();
+                    await _dbContext.Insertable(updatezMDGS_OLDNAMEs).ExecuteCommandAsync();
 
-                await _dbContext.Updateable<CorresUnit>(batchData).ExecuteCommandAsync();
+                }
+                responseAjaxResult.Success();
             }
-            responseAjaxResult.Success();
+            catch (Exception ex)
+            {
+                throw;
+            }
             return responseAjaxResult;
         }
         /// <summary>
