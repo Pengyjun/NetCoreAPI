@@ -5,6 +5,7 @@
     /// </summary>
     public class RegionalCenterModels
     {
+        public List<ZMDGS_ZLANG4>? Item { get; set; }
     }
     /// <summary>
     /// 多语言描述表类型

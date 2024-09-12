@@ -11,6 +11,7 @@ using GDCMasterDataReceiveApi.Application.Contracts.Dto.Language;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.LouDong;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.Project;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.Regional;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.RegionalCenter;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.RoomNumber;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.ScientifiCNoProject;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.UnitMeasurement;
@@ -139,6 +140,13 @@ namespace GHElectronicFileApi.AopInterceptor
             else if (methodName == "RegionalDataAsync")
             {
                 var receiveParame = ((BaseReceiveDataRequestDto<RegionalItem>)invocation.Arguments[0]).IT_DATA;
+                parameCount = receiveParame.item.Count;
+                requestParame = receiveParame.item.ToJson();
+                receiveDataType = ReceiveDataType.Regional;
+            }
+            else if (methodName == "RegionalCenterDataAsync")
+            {
+                var receiveParame = ((BaseReceiveDataRequestDto<RegionalCenterItem>)invocation.Arguments[0]).IT_DATA;
                 parameCount = receiveParame.item.Count;
                 requestParame = receiveParame.item.ToJson();
                 receiveDataType = ReceiveDataType.Regional;

@@ -14,6 +14,7 @@ using GDCMasterDataReceiveApi.Application.Contracts.Dto.Language;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.LouDong;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.Project;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.Regional;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.RegionalCenter;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.RoomNumber;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.ScientifiCNoProject;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.UnitMeasurement;
@@ -24,6 +25,7 @@ using GDCMasterDataReceiveApi.Domain.Shared.Enums;
 using GDCMasterDataReceiveApi.Domain.Shared.Utils;
 using Microsoft.Extensions.Logging;
 using SqlSugar;
+using System.Collections.Generic;
 using UtilsSharp;
 
 namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
@@ -674,11 +676,79 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
         /// 中交区域中心
         /// </summary>
         /// <returns></returns>
-        public async Task<MDMResponseResult> RegionalCenterDataAsync()
+        public async Task<MDMResponseResult> RegionalCenterDataAsync(BaseReceiveDataRequestDto<RegionalCenterItem> baseReceiveDataRequestDto)
         {
-
             var responseAjaxResult = new MDMResponseResult();
-            responseAjaxResult.Success();
+
+            try
+            {
+                List<RegionalCenterLanguage> insertItem = new();
+                List<RegionalCenterLanguage> updateItem = new();
+
+                var rlList = await _dbContext.Queryable<RegionalCenter>().Where(x => x.IsDelete == 1).ToListAsync();
+                var insertOids = baseReceiveDataRequestDto.IT_DATA.item.Where(x => !rlList.Select(x => x.ZCRCCODE).ToList().Contains(x.ZCRCCODE)).ToList();
+                var updateOids = baseReceiveDataRequestDto.IT_DATA.item.Where(x => rlList.Select(x => x.ZCRCCODE).ToList().Contains(x.ZCRCCODE)).ToList();
+
+                //新增操作
+                if (insertOids.Any())
+                {
+                    foreach (var ic in insertOids)
+                    {
+                        ic.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
+                        foreach (var cc in ic.ZLANG_LIST.Item)
+                        {
+                            var ul = new RegionalCenterLanguage
+                            {
+                                Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                                ZCODE_DESC = cc.ZCODE_DESC,
+                                ZLANGCODE = cc.ZLANGCODE,
+                                Code = ic.ZCRCCODE,
+                                CreateTime = DateTime.Now
+                            };
+                            insertItem.Add(ul);
+                        }
+                    }
+
+                    var mapList = _mapper.Map<List<RegionalCenterItem>, List<RegionalCenter>>(insertOids);
+                    mapList.ForEach(x => x.CreateTime = DateTime.Now);
+                    await _dbContext.Fastest<RegionalCenter>().BulkCopyAsync(mapList);
+                }
+                if (updateOids.Any())
+                {
+                    List<RegionalCenterLanguage> deleteData = new();
+                    //更新
+                    var rcList = await _dbContext.Queryable<RegionalCenterLanguage>().ToListAsync();
+                    foreach (var itemItem in updateOids)
+                    {
+                        var id = rlList.Where(x => x.ZCRCCODE == itemItem.ZCRCCODE).Select(x => x.Id).First();
+                        itemItem.Id = id;
+                        foreach (var items in itemItem.ZLANG_LIST.Item)
+                        {
+                            RegionalCenterLanguage rcdetails = new RegionalCenterLanguage()
+                            {
+                                Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                                Code = itemItem.ZCRCCODE,
+                                ZLANGCODE = items.ZLANGCODE,
+                                ZCODE_DESC = items.ZCODE_DESC,
+                                CreateTime = DateTime.Now
+                            };
+                            updateItem.Add(rcdetails);
+                        }
+                        deleteData.AddRange(rcList.Where(x => x.Code == itemItem.ZCRCCODE).ToList());
+                    }
+                    var mapList = _mapper.Map<List<RegionalCenterItem>, List<RegionalCenter>>(updateOids);
+                    await _dbContext.Updateable(mapList).ExecuteCommandAsync();
+                    await _dbContext.Deleteable<RegionalCenterLanguage>().WhereColumns(deleteData, it => new { it.Id }).ExecuteCommandAsync();
+                    await _dbContext.Insertable(updateItem).ExecuteCommandAsync();
+                }
+
+                responseAjaxResult.Success();
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+
             return responseAjaxResult;
         }
         /// <summary>

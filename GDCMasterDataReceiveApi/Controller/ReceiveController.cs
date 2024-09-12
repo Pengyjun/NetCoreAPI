@@ -12,6 +12,7 @@ using GDCMasterDataReceiveApi.Application.Contracts.Dto.Language;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.LouDong;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.Project;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.Regional;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.RegionalCenter;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.RoomNumber;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.ScientifiCNoProject;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.UnitMeasurement;
@@ -107,7 +108,7 @@ namespace GDCMasterDataReceiveApi.Controller
         /// <returns></returns>
         [UnitOfWork]
         [HttpPost("RegionalCenter")]
-        public async Task<MDMResponseResult> RegionalCenterDataAsync() => await _receiveService.RegionalCenterDataAsync();
+        public async Task<MDMResponseResult> RegionalCenterDataAsync([FromBody] BaseReceiveDataRequestDto<RegionalCenterItem> baseReceiveDataRequestDto) => await _receiveService.RegionalCenterDataAsync(baseReceiveDataRequestDto);
         /// <summary>
         /// 国民经济行业分类
         /// </summary>
