@@ -8,6 +8,7 @@ using GDCMasterDataReceiveApi.Application.Contracts.Dto.BusinessNoCpportunity;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.CorresUnit;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.CountryContinent;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.CountryRegion;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.Currency;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.DeviceClassCode;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.DeviceDetailCode;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.EscrowOrganization;
@@ -354,5 +355,17 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.IService.ISearchService
         /// <param name="id"></param>
         /// <returns></returns>
         Task<ResponseAjaxResult<AccountingOrganizationDetailsDto>> GetAccountingOrganizationDetailsAsync(string id);
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        Task<ResponseAjaxResult<List<CurrencySearchDto>>> GetCurrencySearchAsync(CurrencyRequestDto requestDto);
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        Task<ResponseAjaxResult<CurrencyDetailsDto>> GetCurrencyDetailsAsync(string id);
     }
 }

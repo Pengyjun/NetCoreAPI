@@ -9,6 +9,7 @@ using GDCMasterDataReceiveApi.Application.Contracts.Dto.BusinessNoCpportunity;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.CorresUnit;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.CountryContinent;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.CountryRegion;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.Currency;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.DeviceClassCode;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.DeviceDetailCode;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.EscrowOrganization;
@@ -587,6 +588,26 @@ namespace GDCMasterDataReceiveApi.Controller
         public async Task<ResponseAjaxResult<AccountingOrganizationDetailsDto>> GetAccountingOrganizationDetailsAsync([FromQuery] string id)
         {
             return await _searchService.GetAccountingOrganizationDetailsAsync(id);
+        }
+        /// <summary>
+        /// 获取币种列表
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        [HttpGet("GetCurrencySearch")]
+        public async Task<ResponseAjaxResult<List<CurrencySearchDto>>> GetCurrencySearchAsync([FromQuery] CurrencyRequestDto requestDto)
+        {
+            return await _searchService.GetCurrencySearchAsync(requestDto);
+        }
+        /// <summary>
+        /// 获取币种详情
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet("GetCurrencyDetails")]
+        public async Task<ResponseAjaxResult<CurrencyDetailsDto>> GetCurrencyDetailsAsync([FromQuery] string id)
+        {
+            return await _searchService.GetCurrencyDetailsAsync(id);
         }
     }
 }
