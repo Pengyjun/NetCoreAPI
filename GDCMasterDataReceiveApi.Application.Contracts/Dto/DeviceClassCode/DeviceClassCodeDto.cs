@@ -88,6 +88,10 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.DeviceClassCode
     public class DeviceClassCodeItem
     {
         /// <summary>
+        /// 
+        /// </summary>
+        public long? Id { get; set; }
+        /// <summary>
         /// 发送记录ID 发送记录的ID，必须保证此ID在同一个发送批次中是唯一的。用于记录发送方对于此发送记录的唯一标识。
         /// </summary>
         public string? ZZSERIAL { get; set; }
@@ -122,7 +126,7 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.DeviceClassCode
         /// <summary>
         /// 使用状态: 该分类是否为正常使用状态，当分类正常使用时为“1”，分类停止使用时为“0”。
         /// </summary>
-        public string ZUSSTATE { get; set; }
+        public string? ZUSSTATE { get; set; }
         /// <summary>
         /// 是否删除：该分类是否被标记删除，通过上游失效时间进行判断
         /// </summary>

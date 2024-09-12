@@ -401,70 +401,100 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
             #endregion
             try
             {
-                var dCList = _mapper.Map<List<DeviceClassCodeItem>, List<DeviceClassCode>>(receiveDataMDMRequestDto.IT_DATA.item);
-                var item = new List<ClassDevice>();//分类属性
-                var item2 = new List<ClassDeviceValue>();//分类属性值
-                foreach (var dc in dCList)
-                {
-                    dc.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
-                    item.AddRange(dc.ZPROPERTY_LIST.Item);
-                    item2.AddRange(dc.ZVALUE_LIST.Item);
-                }
-                var deviceCodes = await _dbContext.Queryable<DeviceClassCode>().Where(x => x.IsDelete == 1).Select(x => x.ZCLASS).ToListAsync();
-                var insertOids = dCList.Where(x => !deviceCodes.Contains(x.ZCLASS)).Select(x => x.ZCLASS).ToList();
-                var updateOids = dCList.Where(x => deviceCodes.Contains(x.ZCLASS)).Select(x => x.ZCLASS).ToList();
+                List<DeviceClassAttribute> insertItem = new();//分类属性
+                List<DeviceClassAttribute> updateItem = new();//分类属性
+                List<DeviceClassAttributeValue> insertItem2 = new();//分类属性值
+                List<DeviceClassAttributeValue> updateItem2 = new();//分类属性值
 
-                //属性
-                var dcids = await _dbContext.Queryable<DeviceClassAttribute>().Where(x => x.IsDelete == 1).Select(x => x.ZCLASS).ToListAsync();
-                var insertDCIds = item.Where(x => !deviceCodes.Contains(x.ZCLASS)).Select(x => x.ZCLASS).Where(x => !dcids.Contains(x)).Select(x => x).ToList();
-                var updateDCIds = item.Where(x => deviceCodes.Contains(x.ZCLASS)).Select(x => x.ZCLASS).Where(x => dcids.Contains(x)).Select(x => x).ToList();
-                var itemValues = _mapper.Map<List<ClassDevice>, List<DeviceClassAttribute>>(item);
+                var dcCodes = await _dbContext.Queryable<DeviceClassCode>().Where(x => x.IsDelete == 1).ToListAsync();
+                var insertOids = receiveDataMDMRequestDto.IT_DATA.item.Where(x => !dcCodes.Select(x => x.ZCLASS).ToList().Contains(x.ZCLASS)).ToList();
+                var updateOids = receiveDataMDMRequestDto.IT_DATA.item.Where(x => dcCodes.Select(x => x.ZCLASS).ToList().Contains(x.ZCLASS)).ToList();
 
-                //属性值
-                var dcVIds = await _dbContext.Queryable<DeviceClassAttributeValue>().Where(x => x.IsDelete == 1).Select(x => x.ZCLASS).ToListAsync();
-                var insertDCVIds = dCList.Where(x => !deviceCodes.Contains(x.ZCLASS)).Select(x => x.ZCLASS).Where(x => !dcVIds.Contains(x)).Select(x => x).ToList();
-                var updateDCVIds = dCList.Where(x => deviceCodes.Contains(x.ZCLASS)).Select(x => x.ZCLASS).Where(x => dcVIds.Contains(x)).Select(x => x).ToList();
-                var item2Values = _mapper.Map<List<ClassDeviceValue>, List<DeviceClassAttributeValue>>(item2);
-
+                //新增操作
                 if (insertOids.Any())
                 {
-                    //插入操作
-                    var batchData = dCList.Where(x => insertOids.Contains(x.ZCLASS)).ToList();
-                    await _dbContext.Fastest<DeviceClassCode>().BulkCopyAsync(batchData);
+                    foreach (var ic in insertOids)
+                    {
+                        ic.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
+                        foreach (var cc in ic.ZPROPERTY_LIST.Item)
+                        {
+                            var invoiceLanguage = new DeviceClassAttribute
+                            {
+                                Id = ic.Id.Value,
+                                ZATTRCODE = cc.ZATTRCODE,
+                                ZATTRNAME = cc.ZATTRNAME,
+                                ZATTRUNIT = cc.ZATTRUNIT,
+                                ZCLASS = cc.ZCLASS,
+                                ZREMARK = cc.ZREMARK,
+                                CreateTime = DateTime.Now
+                            };
+                            insertItem.Add(invoiceLanguage);
+                        }
+                        foreach (var cc in ic.ZVALUE_LIST.Item)
+                        {
+                            var invoiceLanguage = new DeviceClassAttributeValue
+                            {
+                                Id = ic.Id.Value,
+                                ZATTRCODE = cc.ZATTRCODE,
+                                ZCLASS = cc.ZCLASS,
+                                ZVALUECODE = cc.ZVALUECODE,
+                                ZVALUENAME = cc.ZVALUENAME,
+                                CreateTime = DateTime.Now
+                            };
+                            insertItem2.Add(invoiceLanguage);
+                        }
+                    }
+
+                    var dCList = _mapper.Map<List<DeviceClassCodeItem>, List<DeviceClassCode>>(insertOids);
+                    await _dbContext.Fastest<DeviceClassAttribute>().BulkCopyAsync(insertItem);
+                    await _dbContext.Fastest<DeviceClassAttributeValue>().BulkCopyAsync(insertItem2);
                 }
                 if (updateOids.Any())
                 {
-                    //更新操作
-                    var batchData = dCList.Where(x => updateOids.Contains(x.ZCLASS)).ToList();
-                    await _dbContext.Fastest<DeviceClassCode>().BulkUpdateAsync(batchData);
-                }
-                if (insertDCIds.Any())
-                {
-                    //插入操作
-                    var batchData = itemValues.Where(x => insertDCIds.Contains(x.ZCLASS)).ToList();
-                    foreach (var key in batchData)
-                    { key.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(); key.CreateTime = DateTime.Now; }
-                    await _dbContext.Fastest<DeviceClassAttribute>().BulkUpdateAsync(batchData);
-                }
-                if (updateDCIds.Any())
-                {
-                    //更新操作
-                    var batchData = itemValues.Where(x => updateDCIds.Contains(x.ZCLASS)).ToList();
-                    await _dbContext.Fastest<DeviceClassAttribute>().BulkUpdateAsync(batchData);
-                }
-                if (insertDCVIds.Any())
-                {
-                    //插入操作
-                    var batchData = item2Values.Where(x => insertDCVIds.Contains(x.ZCLASS)).ToList();
-                    foreach (var key in batchData)
-                    { key.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(); }
-                    await _dbContext.Fastest<DeviceClassAttributeValue>().BulkUpdateAsync(batchData);
-                }
-                if (updateDCVIds.Any())
-                {
-                    //更新操作
-                    var batchData = item2Values.Where(x => updateDCVIds.Contains(x.ZCLASS)).ToList();
-                    await _dbContext.Fastest<DeviceClassAttributeValue>().BulkUpdateAsync(batchData);
+                    List<DeviceClassAttribute> deleteData = new();
+                    List<DeviceClassAttributeValue> deleteData2 = new();
+                    //更新
+                    var dcAList = await _dbContext.Queryable<DeviceClassAttribute>().ToListAsync();
+                    var dcAVlueList = await _dbContext.Queryable<DeviceClassAttributeValue>().ToListAsync();
+                    foreach (var itemItem in updateOids)
+                    {
+                        var id = dcCodes.Where(x => x.ZCLASS == itemItem.ZCLASS).Select(x => x.Id).First();
+                        itemItem.Id = id;
+                        foreach (var items in itemItem.ZPROPERTY_LIST.Item)
+                        {
+                            DeviceClassAttribute dca = new DeviceClassAttribute()
+                            {
+                                Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                                ZCLASS = itemItem.ZCLASS,
+                                ZREMARK = items.ZREMARK,
+                                ZATTRCODE = items.ZATTRCODE,
+                                ZATTRNAME = items.ZATTRNAME,
+                                ZATTRUNIT = items.ZATTRUNIT,
+                                CreateTime = DateTime.Now
+                            };
+                            updateItem.Add(dca);
+                        }
+                        foreach (var items in itemItem.ZVALUE_LIST.Item)
+                        {
+                            DeviceClassAttributeValue dcav = new DeviceClassAttributeValue()
+                            {
+                                Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                                ZCLASS = itemItem.ZCLASS,
+                                ZATTRCODE = items.ZATTRCODE,
+                                ZVALUECODE = items.ZVALUECODE,
+                                ZVALUENAME = items.ZVALUENAME,
+                                CreateTime = DateTime.Now
+                            };
+                            updateItem2.Add(dcav);
+                        }
+                        deleteData.AddRange(dcAList.Where(x => x.ZCLASS == itemItem.ZCLASS).ToList());
+                    }
+                    var dcCodeList = _mapper.Map<List<DeviceClassCodeItem>, List<DeviceClassCode>>(updateOids);
+                    await _dbContext.Updateable(dcCodeList).ExecuteCommandAsync();
+                    await _dbContext.Deleteable<DeviceClassAttribute>().WhereColumns(deleteData, it => new { it.Id }).ExecuteCommandAsync();
+                    await _dbContext.Deleteable<DeviceClassAttributeValue>().WhereColumns(deleteData2, it => new { it.Id }).ExecuteCommandAsync();
+                    await _dbContext.Insertable(updateItem).ExecuteCommandAsync();
+                    await _dbContext.Insertable(updateItem2).ExecuteCommandAsync();
                 }
 
                 responseAjaxResult.Success();
