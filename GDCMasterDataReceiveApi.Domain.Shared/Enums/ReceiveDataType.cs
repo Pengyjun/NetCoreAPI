@@ -64,9 +64,9 @@
         /// </summary>
         LouDong = 15,
         /// <summary>
-        /// 银行账号
+        /// 计量单位
         /// </summary>
-        BankCard = 16,
+        UnitMeasurement = 16,
 
     }
 }

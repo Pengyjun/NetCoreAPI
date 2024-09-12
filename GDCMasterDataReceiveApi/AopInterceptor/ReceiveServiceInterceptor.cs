@@ -13,6 +13,7 @@ using GDCMasterDataReceiveApi.Application.Contracts.Dto.LouDong;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.Project;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.RoomNumber;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.ScientifiCNoProject;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.UnitMeasurement;
 using GDCMasterDataReceiveApi.Domain.Models;
 using GDCMasterDataReceiveApi.Domain.Shared;
 using GDCMasterDataReceiveApi.Domain.Shared.Enums;
@@ -127,6 +128,13 @@ namespace GHElectronicFileApi.AopInterceptor
                 parameCount = receiveParame.item.Count;
                 requestParame = receiveParame.item.ToJson();
                 receiveDataType = ReceiveDataType.LouDong;
+            }
+            else if (methodName == "UnitMeasurementDataAsync")
+            {
+                var receiveParame = ((BaseReceiveDataRequestDto<UnitMeasurementItem>)invocation.Arguments[0]).IT_DATA;
+                parameCount = receiveParame.item.Count;
+                requestParame = receiveParame.item.ToJson();
+                receiveDataType = ReceiveDataType.UnitMeasurement;
             }
             #endregion
 

@@ -16,7 +16,7 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// <summary>
         /// 计量单位代码:业务主键
         /// </summary>
-        [SugarColumn(Length = 10, ColumnName = "Code")]
+        [SugarColumn(Length = 20, ColumnName = "Code")]
         public string? ZUNITCODE { get; set; }
         /// <summary>
         /// 计量单位名称:计量单位的名称或说明，一般采用中文或常用符号。
@@ -31,7 +31,7 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// <summary>
         /// 版本：数据的版本号。数据每次变更时，版本号自动加1。
         /// </summary>
-        [SugarColumn(ColumnDataType = "int", Length = 10, ColumnName = "Version")]
+        [SugarColumn(ColumnDataType = "int", Length = 15, ColumnName = "Version")]
         public string? ZVERSION { get; set; }
         /// <summary>
         /// 状态：数据是否有效的标识:有效：1无效：0

@@ -111,7 +111,7 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.AutoMapper
             //中标交底项目表类型
             mapperConfigurationExpression.CreateMap<TypeOfBidDisclosureProjectTableReceiveDto, TypeOfBidDisclosureProjectTable>();
             //常用计量单位
-            mapperConfigurationExpression.CreateMap<UnitMeasurementReceiveDto, UnitMeasurement>();
+            mapperConfigurationExpression.CreateMap<UnitMeasurementItem, UnitMeasurement>();
 
 
             #region 其他映射

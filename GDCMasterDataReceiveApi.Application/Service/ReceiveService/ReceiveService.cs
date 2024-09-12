@@ -15,6 +15,7 @@ using GDCMasterDataReceiveApi.Application.Contracts.Dto.LouDong;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.Project;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.RoomNumber;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.ScientifiCNoProject;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.UnitMeasurement;
 using GDCMasterDataReceiveApi.Application.Contracts.IService.IReceiveService;
 using GDCMasterDataReceiveApi.Domain.Models;
 using GDCMasterDataReceiveApi.Domain.Shared;
@@ -336,11 +337,81 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
         /// 常用计量单位
         /// </summary>
         /// <returns></returns>
-        public async Task<MDMResponseResult> UnitMeasurementDataAsync()
+        public async Task<MDMResponseResult> UnitMeasurementDataAsync(BaseReceiveDataRequestDto<UnitMeasurementItem> baseReceiveDataRequestDto)
         {
-
             var responseAjaxResult = new MDMResponseResult();
-            responseAjaxResult.Success();
+
+            try
+            {
+                List<UnitMeasurementLanguage> insertItem = new();
+                List<UnitMeasurementLanguage> updateItem = new();
+
+                var ulList = await _dbContext.Queryable<UnitMeasurement>().Where(x => x.IsDelete == 1).ToListAsync();
+                var insertOids = baseReceiveDataRequestDto.IT_DATA.item.Where(x => !ulList.Select(x => x.ZUNITCODE).ToList().Contains(x.ZUNITCODE)).ToList();
+                var updateOids = baseReceiveDataRequestDto.IT_DATA.item.Where(x => ulList.Select(x => x.ZUNITCODE).ToList().Contains(x.ZUNITCODE)).ToList();
+
+                //新增操作
+                if (insertOids.Any())
+                {
+                    foreach (var ic in insertOids)
+                    {
+                        ic.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
+                        foreach (var cc in ic.ZUNIT_LANG.Item)
+                        {
+                            var ul = new UnitMeasurementLanguage
+                            {
+                                Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                                ZSPRAS = cc.ZSPRAS,
+                                ZSPTXT = cc.ZSPTXT,
+                                ZUNITCODE = ic.ZUNITCODE,
+                                ZUNITDESCR = cc.ZUNITDESCR,
+                                CreateTime = DateTime.Now
+                            };
+                            insertItem.Add(ul);
+                        }
+                    }
+
+                    var mapList = _mapper.Map<List<UnitMeasurementItem>, List<UnitMeasurement>>(insertOids);
+                    mapList.ForEach(x => x.CreateTime = DateTime.Now);
+                    await _dbContext.Fastest<UnitMeasurement>().BulkCopyAsync(mapList);
+                }
+                if (updateOids.Any())
+                {
+                    List<UnitMeasurementLanguage> deleteData = new();
+                    //更新
+                    var lgeList = await _dbContext.Queryable<UnitMeasurementLanguage>().ToListAsync();
+                    foreach (var itemItem in updateOids)
+                    {
+                        var id = ulList.Where(x => x.ZUNITCODE == itemItem.ZUNITCODE).Select(x => x.Id).First();
+                        itemItem.Id = id;
+                        foreach (var items in itemItem.ZUNIT_LANG.Item)
+                        {
+                            UnitMeasurementLanguage ldetails = new UnitMeasurementLanguage()
+                            {
+                                Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                                ZUNITDESCR = items.ZUNITDESCR,
+                                ZUNITCODE = itemItem.ZUNITCODE,
+                                ZSPTXT = items.ZSPTXT,
+                                ZSPRAS = items.ZSPRAS,
+                                CreateTime = DateTime.Now
+                            };
+                            updateItem.Add(ldetails);
+                        }
+                        deleteData.AddRange(lgeList.Where(x => x.ZUNITCODE == itemItem.ZUNITCODE).ToList());
+                    }
+                    var mapList = _mapper.Map<List<UnitMeasurementItem>, List<UnitMeasurement>>(updateOids);
+                    await _dbContext.Updateable(mapList).ExecuteCommandAsync();
+                    await _dbContext.Deleteable<UnitMeasurementLanguage>().WhereColumns(deleteData, it => new { it.Id }).ExecuteCommandAsync();
+                    await _dbContext.Insertable(updateItem).ExecuteCommandAsync();
+                }
+
+                responseAjaxResult.Success();
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+
             return responseAjaxResult;
         }
         /// <summary>
@@ -409,7 +480,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
         /// 物资设备分类编码
         /// </summary>
         /// <returns></returns>
-        public async Task<MDMResponseResult> DeviceClassCodeDataAsync(BaseReceiveDataRequestDto<DeviceClassCodeItem> receiveDataMDMRequestDto)
+        public async Task<MDMResponseResult> DeviceClassCodeDataAsync(BaseReceiveDataRequestDto<DeviceClassCodeItem> baseReceiveDataRequestDto)
         {
             MDMResponseResult responseAjaxResult = new MDMResponseResult();
 
@@ -421,8 +492,8 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
                 List<DeviceClassAttributeValue> updateItem2 = new();//分类属性值
 
                 var dcCodes = await _dbContext.Queryable<DeviceClassCode>().Where(x => x.IsDelete == 1).ToListAsync();
-                var insertOids = receiveDataMDMRequestDto.IT_DATA.item.Where(x => !dcCodes.Select(x => x.ZCLASS).ToList().Contains(x.ZCLASS)).ToList();
-                var updateOids = receiveDataMDMRequestDto.IT_DATA.item.Where(x => dcCodes.Select(x => x.ZCLASS).ToList().Contains(x.ZCLASS)).ToList();
+                var insertOids = baseReceiveDataRequestDto.IT_DATA.item.Where(x => !dcCodes.Select(x => x.ZCLASS).ToList().Contains(x.ZCLASS)).ToList();
+                var updateOids = baseReceiveDataRequestDto.IT_DATA.item.Where(x => dcCodes.Select(x => x.ZCLASS).ToList().Contains(x.ZCLASS)).ToList();
 
                 //新增操作
                 if (insertOids.Any())
@@ -570,7 +641,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
         /// 发票类型
         /// </summary>
         /// <returns></returns>
-        public async Task<MDMResponseResult> InvoiceTypeDataAsync(BaseReceiveDataRequestDto<InvoiceTypeItem> receiveDataMDMRequestDto)
+        public async Task<MDMResponseResult> InvoiceTypeDataAsync(BaseReceiveDataRequestDto<InvoiceTypeItem> baseReceiveDataRequestDto)
         {
             MDMResponseResult responseAjaxResult = new MDMResponseResult();
 
@@ -580,8 +651,8 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
                 List<InvoiceLanguage> updateItem = new();
 
                 var invoiceCodes = await _dbContext.Queryable<InvoiceType>().Where(x => x.IsDelete == 1).ToListAsync();
-                var insertOids = receiveDataMDMRequestDto.IT_DATA.item.Where(x => !invoiceCodes.Select(x => x.ZINVTCODE).ToList().Contains(x.ZINVTCODE)).ToList();
-                var updateOids = receiveDataMDMRequestDto.IT_DATA.item.Where(x => invoiceCodes.Select(x => x.ZINVTCODE).ToList().Contains(x.ZINVTCODE)).ToList();
+                var insertOids = baseReceiveDataRequestDto.IT_DATA.item.Where(x => !invoiceCodes.Select(x => x.ZINVTCODE).ToList().Contains(x.ZINVTCODE)).ToList();
+                var updateOids = baseReceiveDataRequestDto.IT_DATA.item.Where(x => invoiceCodes.Select(x => x.ZINVTCODE).ToList().Contains(x.ZINVTCODE)).ToList();
 
                 //新增操作
                 if (insertOids.Any())
@@ -728,7 +799,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
         /// 项目类
         /// </summary>
         /// <returns></returns>
-        public async Task<MDMResponseResult> ProjectDataAsync(BaseReceiveDataRequestDto<ProjectItem> receiveDataMDMRequestDto)
+        public async Task<MDMResponseResult> ProjectDataAsync(BaseReceiveDataRequestDto<ProjectItem> baseReceiveDataRequestDto)
         {
             MDMResponseResult responseAjaxResult = new MDMResponseResult();
 
@@ -740,9 +811,9 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
                 //查询项目表
                 var projectCodeList = await _dbContext.Queryable<Project>().Where(x => x.IsDelete == 1).ToListAsync();
                 //需要新增的数据
-                var insertOids = receiveDataMDMRequestDto.IT_DATA.item.Where(x => !projectCodeList.Select(x => x.ZPROJECT).ToList().Contains(x.ZPROJECT)).ToList();
+                var insertOids = baseReceiveDataRequestDto.IT_DATA.item.Where(x => !projectCodeList.Select(x => x.ZPROJECT).ToList().Contains(x.ZPROJECT)).ToList();
                 //需要更新的数据
-                var updateOids = receiveDataMDMRequestDto.IT_DATA.item.Where(x => projectCodeList.Select(x => x.ZPROJECT).ToList().Contains(x.ZPROJECT)).ToList();
+                var updateOids = baseReceiveDataRequestDto.IT_DATA.item.Where(x => projectCodeList.Select(x => x.ZPROJECT).ToList().Contains(x.ZPROJECT)).ToList();
                 //新增操作
                 if (insertOids.Any())
                 {
@@ -804,7 +875,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
         /// 科研项目
         /// </summary>
         /// <returns></returns>
-        public async Task<MDMResponseResult> ScientifiCNoProjectDataAsync(BaseReceiveDataRequestDto<ScientifiCNoProjectItem> receiveDataMDMRequestDto)
+        public async Task<MDMResponseResult> ScientifiCNoProjectDataAsync(BaseReceiveDataRequestDto<ScientifiCNoProjectItem> baseReceiveDataRequestDto)
         {
             MDMResponseResult responseAjaxResult = new MDMResponseResult();
 
@@ -826,8 +897,8 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
                 List<KyCanYDep> updateCdItem = new();//参与部门
 
                 var sNpList = await _dbContext.Queryable<ScientifiCNoProject>().Where(x => x.IsDelete == 1).ToListAsync();
-                var insertOids = receiveDataMDMRequestDto.IT_DATA.item.Where(x => !sNpList.Select(x => x.ZSRP).ToList().Contains(x.ZSRP)).ToList();
-                var updateOids = receiveDataMDMRequestDto.IT_DATA.item.Where(x => sNpList.Select(x => x.ZSRP).ToList().Contains(x.ZSRP)).ToList();
+                var insertOids = baseReceiveDataRequestDto.IT_DATA.item.Where(x => !sNpList.Select(x => x.ZSRP).ToList().Contains(x.ZSRP)).ToList();
+                var updateOids = baseReceiveDataRequestDto.IT_DATA.item.Where(x => sNpList.Select(x => x.ZSRP).ToList().Contains(x.ZSRP)).ToList();
 
                 //新增操作
                 if (insertOids.Any())
@@ -1118,15 +1189,15 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
         /// 楼栋
         /// </summary>
         /// <returns></returns>
-        public async Task<MDMResponseResult> LouDongDataAsync(BaseReceiveDataRequestDto<LouDongItem> receiveDataMDMRequestDto)
+        public async Task<MDMResponseResult> LouDongDataAsync(BaseReceiveDataRequestDto<LouDongItem> baseReceiveDataRequestDto)
         {
             MDMResponseResult responseAjaxResult = new MDMResponseResult();
 
             try
             {
                 var louDongList = await _dbContext.Queryable<LouDong>().Where(x => x.IsDelete == 1).ToListAsync();
-                var insertOids = receiveDataMDMRequestDto.IT_DATA.item.Where(x => !louDongList.Select(x => x.ZBLDG).ToList().Contains(x.ZBLDG)).ToList();
-                var updateOids = receiveDataMDMRequestDto.IT_DATA.item.Where(x => louDongList.Select(x => x.ZBLDG).ToList().Contains(x.ZBLDG)).ToList();
+                var insertOids = baseReceiveDataRequestDto.IT_DATA.item.Where(x => !louDongList.Select(x => x.ZBLDG).ToList().Contains(x.ZBLDG)).ToList();
+                var updateOids = baseReceiveDataRequestDto.IT_DATA.item.Where(x => louDongList.Select(x => x.ZBLDG).ToList().Contains(x.ZBLDG)).ToList();
 
                 //新增操作
                 if (insertOids.Any())
@@ -1164,15 +1235,15 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
         /// 房号
         /// </summary>
         /// <returns></returns>
-        public async Task<MDMResponseResult> RoomNumberDataAsync(BaseReceiveDataRequestDto<RoomNumberItem> receiveDataMDMRequestDto)
+        public async Task<MDMResponseResult> RoomNumberDataAsync(BaseReceiveDataRequestDto<RoomNumberItem> baseReceiveDataRequestDto)
         {
             MDMResponseResult responseAjaxResult = new MDMResponseResult();
 
             try
             {
                 var rmList = await _dbContext.Queryable<RoomNumber>().Where(x => x.IsDelete == 1).ToListAsync();
-                var insertOids = receiveDataMDMRequestDto.IT_DATA.item.Where(x => !rmList.Select(x => x.ZROOM).ToList().Contains(x.ZROOM)).ToList();
-                var updateOids = receiveDataMDMRequestDto.IT_DATA.item.Where(x => rmList.Select(x => x.ZROOM).ToList().Contains(x.ZROOM)).ToList();
+                var insertOids = baseReceiveDataRequestDto.IT_DATA.item.Where(x => !rmList.Select(x => x.ZROOM).ToList().Contains(x.ZROOM)).ToList();
+                var updateOids = baseReceiveDataRequestDto.IT_DATA.item.Where(x => rmList.Select(x => x.ZROOM).ToList().Contains(x.ZROOM)).ToList();
 
                 //新增操作
                 if (insertOids.Any())
@@ -1221,7 +1292,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
         /// 语言语种
         /// </summary>
         /// <returns></returns>
-        public async Task<MDMResponseResult> LanguageDataAsync(BaseReceiveDataRequestDto<LanguageItem> receiveDataMDMRequestDto)
+        public async Task<MDMResponseResult> LanguageDataAsync(BaseReceiveDataRequestDto<LanguageItem> baseReceiveDataRequestDto)
         {
             MDMResponseResult responseAjaxResult = new MDMResponseResult();
 
@@ -1231,8 +1302,8 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
                 List<LanguageDetails> updateItem = new();
 
                 var lgList = await _dbContext.Queryable<Language>().Where(x => x.IsDelete == 1).ToListAsync();
-                var insertOids = receiveDataMDMRequestDto.IT_DATA.item.Where(x => !lgList.Select(x => x.ZLANG_TER).ToList().Contains(x.ZLANG_TER)).ToList();
-                var updateOids = receiveDataMDMRequestDto.IT_DATA.item.Where(x => lgList.Select(x => x.ZLANG_TER).ToList().Contains(x.ZLANG_TER)).ToList();
+                var insertOids = baseReceiveDataRequestDto.IT_DATA.item.Where(x => !lgList.Select(x => x.ZLANG_TER).ToList().Contains(x.ZLANG_TER)).ToList();
+                var updateOids = baseReceiveDataRequestDto.IT_DATA.item.Where(x => lgList.Select(x => x.ZLANG_TER).ToList().Contains(x.ZLANG_TER)).ToList();
 
                 //新增操作
                 if (insertOids.Any())
