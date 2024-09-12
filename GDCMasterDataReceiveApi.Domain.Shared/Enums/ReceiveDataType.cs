@@ -79,6 +79,18 @@
         /// 核算部门
         /// </summary>
         AccountingDepartment=24,
+        /// <summary>
+        /// 国民经济行业分类
+        /// </summary>
+        NationalEconomy= 19,
+        /// <summary>
+        /// 中交项目行业分类产业分类、业务板块、十二大业务类型、江河湖海对照关系
+        /// </summary>
+        ProjectClassification = 20,
+        /// <summary>
+        /// 委托关系
+        /// </summary>
+        RelationalContracts = 21,
 
     }
 }

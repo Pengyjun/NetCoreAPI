@@ -175,16 +175,20 @@
     /// <summary>
     /// 中交项目行业分类产业分类、业务板块、十二大业务类型、江河湖海对照关系  接收
     /// </summary>
-    public class ProjectClassificationReceiveDto
+    public class ProjectClassificationItem
     {
+        /// <summary>
+        /// 
+        /// </summary>
+        public long? Id { get; set; }
         /// <summary>
         /// 发送记录ID 发送记录的ID，必须保证此ID在同一个发送批次中是唯一的。用于记录发送方对于此发送记录的唯一标识。
         /// </summary>
-        public string ZZSERIAL { get; set; }
+        public string? ZZSERIAL { get; set; }
         /// <summary>
         /// 中交业务分类三级分类代码
         /// </summary>
-        public string ZCPBC3ID { get; set; }
+        public string? ZCPBC3ID { get; set; }
         /// <summary>
         /// 中交业务分类一级分类代码 
         /// </summary>

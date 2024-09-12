@@ -1,4 +1,6 @@
-﻿namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.NationalEconomy
+﻿using GDCMasterDataReceiveApi.Application.Contracts.Dto.OtherModels;
+
+namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.NationalEconomy
 {
     /// <summary>
     /// 国民经济行业分类 反显
@@ -59,24 +61,28 @@
     /// <summary>
     /// 国民经济行业分类 接收
     /// </summary>
-    public class NationalEconomyReceiveDto
+    public class NationalEconomyItem
     {
+        /// <summary>
+        /// 
+        /// </summary>
+        public long? Id { get; set; }
         /// <summary>
         /// 发送记录ID 发送记录的ID，必须保证此ID在同一个发送批次中是唯一的。用于记录发送方对于此发送记录的唯一标识。
         /// </summary>
-        public string ZZSERIAL { get; set; }
+        public string? ZZSERIAL { get; set; }
         /// <summary>
         /// 国民经济行业分类代码
         /// </summary>
-        public string ZNEQCODE { get; set; }
+        public string? ZNEQCODE { get; set; }
         /// <summary>
         /// 国民经济行业分类类别名称
         /// </summary>
-        public string ZNEQNAME { get; set; }
+        public string? ZNEQNAME { get; set; }
         /// <summary>
         /// 国民经济行业分类上级代码
         /// </summary>
-        public string ZNEQCODEUP { get; set; }
+        public string? ZNEQCODEUP { get; set; }
         /// <summary>
         /// 国民经济行业分类说明
         /// </summary>
@@ -84,18 +90,18 @@
         /// <summary>
         /// 版本：数据的版本号。数据每次变更时，版本号自动加1。
         /// </summary>
-        public string ZVERSION { get; set; }
+        public string? ZVERSION { get; set; }
         /// <summary>
         /// 状态：数据是否有效的标识:有效：1无效：0
         /// </summary>
-        public string ZSTATE { get; set; }
+        public string? ZSTATE { get; set; }
         /// <summary>
         /// 是否删除 数据是否有效的标识:有效：1无效：0
         /// </summary>
-        public string ZDELETE { get; set; }
+        public string? ZDELETE { get; set; }
         /// <summary>
         /// 多语言描述表类型
         /// </summary>
-        //public InvoiceLang? ZLANG_LIST { get; set; }
+        public NationalEconomyModels? ZLANG_LIST { get; set; }
     }
 }

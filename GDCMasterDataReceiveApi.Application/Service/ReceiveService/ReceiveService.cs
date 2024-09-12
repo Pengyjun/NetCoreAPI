@@ -13,9 +13,12 @@ using GDCMasterDataReceiveApi.Application.Contracts.Dto.FinancialInstitution;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.InvoiceType;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.Language;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.LouDong;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.NationalEconomy;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.Project;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.ProjectClassification;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.Regional;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.RegionalCenter;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.RelationalContracts;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.RoomNumber;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.ScientifiCNoProject;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.UnitMeasurement;
@@ -26,7 +29,6 @@ using GDCMasterDataReceiveApi.Domain.Shared.Enums;
 using GDCMasterDataReceiveApi.Domain.Shared.Utils;
 using Microsoft.Extensions.Logging;
 using SqlSugar;
-using System.Collections.Generic;
 using UtilsSharp;
 
 namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
@@ -493,11 +495,46 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
         /// 中交项目行业分类产业分类、业务板块、十二大业务类型、江河湖海对照关系
         /// </summary>
         /// <returns></returns>
-        public async Task<MDMResponseResult> ProjectClassificationDataAsync()
+        public async Task<MDMResponseResult> ProjectClassificationDataAsync(BaseReceiveDataRequestDto<ProjectClassificationItem> baseReceiveDataRequestDto)
         {
+            MDMResponseResult responseAjaxResult = new MDMResponseResult();
 
-            var responseAjaxResult = new MDMResponseResult();
-            responseAjaxResult.Success();
+            try
+            {
+                var aaMapperList = await _dbContext.Queryable<ProjectClassification>().Where(x => x.IsDelete == 1).ToListAsync();
+                //var insertOids = baseReceiveDataRequestDto.IT_DATA.item.Where(x => !aaMapperList.Select(x => x.ZID).ToList().Contains(x.ZID)).ToList();
+                //var updateOids = baseReceiveDataRequestDto.IT_DATA.item.Where(x => aaMapperList.Select(x => x.ZID).ToList().Contains(x.ZID)).ToList();
+
+                //新增操作
+                //if (insertOids.Any())
+                //{
+                //    foreach (var ic in insertOids)
+                //    {
+                //        ic.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
+                //    }
+
+                //    var mapRmList = _mapper.Map<List<ProjectClassificationItem>, List<ProjectClassification>>(insertOids);
+                //    mapRmList.ForEach(x => x.CreateTime = DateTime.Now);
+                //    await _dbContext.Fastest<ProjectClassification>().BulkCopyAsync(mapRmList);
+                //}
+                //if (updateOids.Any())
+                //{
+                //    ////更新
+                //    //foreach (var itemItem in updateOids)
+                //    //{
+                //    //    var id = aaMapperList.Where(x => x.ZID == itemItem.ZID).Select(x => x.Id).First();
+                //    //    itemItem.Id = id;
+                //    //}
+                //    //var mapRmList = _mapper.Map<List<ProjectClassificationItem>, List<ProjectClassification>>(updateOids);
+                //    //await _dbContext.Updateable(mapRmList).ExecuteCommandAsync();
+                //}
+
+                responseAjaxResult.Success();
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
             return responseAjaxResult;
         }
         /// <summary>
@@ -783,11 +820,79 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
         /// 国民经济行业分类
         /// </summary>
         /// <returns></returns>
-        public async Task<MDMResponseResult> NationalEconomyDataAsync()
+        public async Task<MDMResponseResult> NationalEconomyDataAsync(BaseReceiveDataRequestDto<NationalEconomyItem> baseReceiveDataRequestDto)
         {
-
             var responseAjaxResult = new MDMResponseResult();
-            responseAjaxResult.Success();
+
+            try
+            {
+                List<NationalEconomyLanguage> insertItem = new();
+                List<NationalEconomyLanguage> updateItem = new();
+
+                var rlList = await _dbContext.Queryable<NationalEconomy>().Where(x => x.IsDelete == 1).ToListAsync();
+                var insertOids = baseReceiveDataRequestDto.IT_DATA.item.Where(x => !rlList.Select(x => x.ZNEQCODE).ToList().Contains(x.ZNEQCODE)).ToList();
+                var updateOids = baseReceiveDataRequestDto.IT_DATA.item.Where(x => rlList.Select(x => x.ZNEQCODE).ToList().Contains(x.ZNEQCODE)).ToList();
+
+                //新增操作
+                if (insertOids.Any())
+                {
+                    foreach (var ic in insertOids)
+                    {
+                        ic.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
+                        foreach (var cc in ic.ZLANG_LIST.Item)
+                        {
+                            var ul = new NationalEconomyLanguage
+                            {
+                                Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                                ZCODE_DESC = cc.ZCODE_DESC,
+                                ZLANGCODE = cc.ZLANGCODE,
+                                ZNEQCODE = ic.ZNEQCODE,
+                                CreateTime = DateTime.Now
+                            };
+                            insertItem.Add(ul);
+                        }
+                    }
+
+                    var mapList = _mapper.Map<List<NationalEconomyItem>, List<NationalEconomy>>(insertOids);
+                    mapList.ForEach(x => x.CreateTime = DateTime.Now);
+                    await _dbContext.Fastest<NationalEconomy>().BulkCopyAsync(mapList);
+                }
+                if (updateOids.Any())
+                {
+                    List<NationalEconomyLanguage> deleteData = new();
+                    //更新
+                    var rcList = await _dbContext.Queryable<NationalEconomyLanguage>().ToListAsync();
+                    foreach (var itemItem in updateOids)
+                    {
+                        var id = rlList.Where(x => x.ZNEQCODE == itemItem.ZNEQCODE).Select(x => x.Id).First();
+                        itemItem.Id = id;
+                        foreach (var items in itemItem.ZLANG_LIST.Item)
+                        {
+                            NationalEconomyLanguage rcdetails = new NationalEconomyLanguage()
+                            {
+                                Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                                ZNEQCODE = itemItem.ZNEQCODE,
+                                ZLANGCODE = items.ZLANGCODE,
+                                ZCODE_DESC = items.ZCODE_DESC,
+                                CreateTime = DateTime.Now
+                            };
+                            updateItem.Add(rcdetails);
+                        }
+                        deleteData.AddRange(rcList.Where(x => x.ZNEQCODE == itemItem.ZNEQCODE).ToList());
+                    }
+                    var mapList = _mapper.Map<List<NationalEconomyItem>, List<NationalEconomy>>(updateOids);
+                    await _dbContext.Updateable(mapList).ExecuteCommandAsync();
+                    await _dbContext.Deleteable<NationalEconomyLanguage>().WhereColumns(deleteData, it => new { it.Id }).ExecuteCommandAsync();
+                    await _dbContext.Insertable(updateItem).ExecuteCommandAsync();
+                }
+
+                responseAjaxResult.Success();
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+
             return responseAjaxResult;
         }
         /// <summary>
@@ -1331,11 +1436,49 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
         /// 委托关系
         /// </summary>
         /// <returns></returns>
-        public async Task<MDMResponseResult> RelationalContractsDataAsync()
+        public async Task<MDMResponseResult> RelationalContractsDataAsync(BaseReceiveDataRequestDto<RelationalContractsItem> baseReceiveDataRequestDto)
         {
-
             var responseAjaxResult = new MDMResponseResult();
-            responseAjaxResult.Success();
+
+            try
+            {
+                var rlList = await _dbContext.Queryable<RelationalContracts>().Where(x => x.IsDelete == 1).ToListAsync();
+                var insertOids = baseReceiveDataRequestDto.IT_DATA.item.Where(x => !rlList.Select(x => x.ZDELEGATE_ORG).ToList().Contains(x.ZDELEGATE_ORG)).ToList();
+                var updateOids = baseReceiveDataRequestDto.IT_DATA.item.Where(x => rlList.Select(x => x.ZDELEGATE_ORG).ToList().Contains(x.ZDELEGATE_ORG)).ToList();
+
+                //新增操作
+                if (insertOids.Any())
+                {
+                    foreach (var ic in insertOids)
+                    {
+                        ic.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
+                       
+                    }
+
+                    var mapList = _mapper.Map<List<RelationalContractsItem>, List<RelationalContracts>>(insertOids);
+                    mapList.ForEach(x => x.CreateTime = DateTime.Now);
+                    await _dbContext.Fastest<RelationalContracts>().BulkCopyAsync(mapList);
+                }
+                if (updateOids.Any())
+                {
+                    //更新
+                    var rcList = await _dbContext.Queryable<RelationalContracts>().ToListAsync();
+                    foreach (var itemItem in updateOids)
+                    {
+                        var id = rlList.Where(x => x.ZDELEGATE_ORG == itemItem.ZDELEGATE_ORG).Select(x => x.Id).First();
+                        itemItem.Id = id;
+                    }
+                    var mapList = _mapper.Map<List<RelationalContractsItem>, List<RelationalContracts>>(updateOids);
+                    await _dbContext.Updateable(mapList).ExecuteCommandAsync();
+                }
+
+                responseAjaxResult.Success();
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+
             return responseAjaxResult;
         }
         /// <summary>

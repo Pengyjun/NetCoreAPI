@@ -55,7 +55,7 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.AutoMapper
             //多组织-核算机构
             mapperConfigurationExpression.CreateMap<AccountingOrganizationReceiveDto, AccountingOrganization>();
             //行政机构和核算机构映射关系
-            mapperConfigurationExpression.CreateMap<AdministrativeAccountingMapperReceiveDto, AdministrativeAccountingMapper>();
+            mapperConfigurationExpression.CreateMap<AdministrativeAccountingMapperItem, AdministrativeAccountingMapper>();
             //境内行政区划
             mapperConfigurationExpression.CreateMap<AdministrativeDivisionItem, AdministrativeDivision>();
             //银行账号
@@ -87,7 +87,7 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.AutoMapper
             //语言语种
             mapperConfigurationExpression.CreateMap<LanguageItem, Language>();
             //国民经济行业分类
-            mapperConfigurationExpression.CreateMap<NationalEconomyReceiveDto, NationalEconomy>();
+            mapperConfigurationExpression.CreateMap<NationalEconomyItem, NationalEconomy>();
             //人员主数据
             mapperConfigurationExpression.CreateMap<Receive4AUser, User>();
             //项目类
@@ -97,13 +97,13 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.AutoMapper
             //mapperConfigurationExpression.CreateMap<ZOLDNAME_LIST, ZOLDNAME_LISTItem>()
             //  .ForMember(dest => dest.ProjectUsedNameItems, opt => opt.MapFrom(src => src.item));
             //中交项目行业分类产业分类、业务板块、十二大业务类型、江河湖海对照关系
-            mapperConfigurationExpression.CreateMap<ProjectClassificationReceiveDto, ProjectClassification>();
+            mapperConfigurationExpression.CreateMap<ProjectClassificationItem, ProjectClassification>();
             //中交区域总部
             mapperConfigurationExpression.CreateMap<RegionalItem, Regional>();
             //中交区域中心
             mapperConfigurationExpression.CreateMap<RegionalCenterItem, RegionalCenter>();
             //委托关系
-            mapperConfigurationExpression.CreateMap<RelationalContractsReceiveDto, RelationalContracts>();
+            mapperConfigurationExpression.CreateMap<RelationalContractsItem, RelationalContracts>();
             //房号
             mapperConfigurationExpression.CreateMap<RoomNumberItem, RoomNumber>();
             //科研项目
