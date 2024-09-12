@@ -1,5 +1,4 @@
-﻿using GDCMasterDataReceiveApi.Domain.OtherModels;
-using SqlSugar;
+﻿using SqlSugar;
 
 namespace GDCMasterDataReceiveApi.Domain.Models
 {
@@ -64,15 +63,15 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// </summary>
         [SugarColumn(Length = 20, ColumnName = "SortRule")]
         public string? ZSORT { get; set; }
-        /// <summary>
-        /// 物资设备分类的属性列表
-        /// </summary>
-        [SugarColumn(IsIgnore = true)]
-        public ZMDGS_PROPERTY? ZPROPERTY_LIST { get; set; }
-        /// <summary>
-        /// 物资设备分类属性值列表
-        /// </summary>
-        [SugarColumn(IsIgnore = true)]
-        public ZMDGS_VALUE? ZVALUE_LIST { get; set; }
+        ///// <summary>
+        ///// 物资设备分类的属性列表
+        ///// </summary>
+        //[SugarColumn(IsIgnore = true)]
+        //public ZMDGS_PROPERTY? ZPROPERTY_LIST { get; set; }
+        ///// <summary>
+        ///// 物资设备分类属性值列表
+        ///// </summary>
+        //[SugarColumn(IsIgnore = true)]
+        //public ZMDGS_VALUE? ZVALUE_LIST { get; set; }
     }
 }

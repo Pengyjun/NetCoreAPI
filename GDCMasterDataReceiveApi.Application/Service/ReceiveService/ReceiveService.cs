@@ -11,18 +11,17 @@ using GDCMasterDataReceiveApi.Application.Contracts.Dto.DeviceClassCode;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.FinancialInstitution;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.InvoiceType;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.Language;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.OtherModels;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.Project;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.RoomNumber;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.ScientifiCNoProject;
 using GDCMasterDataReceiveApi.Application.Contracts.IService.IReceiveService;
 using GDCMasterDataReceiveApi.Domain.Models;
-using GDCMasterDataReceiveApi.Domain.OtherModels;
 using GDCMasterDataReceiveApi.Domain.Shared;
 using GDCMasterDataReceiveApi.Domain.Shared.Enums;
 using GDCMasterDataReceiveApi.Domain.Shared.Utils;
 using Microsoft.Extensions.Logging;
 using SqlSugar;
-using System.Collections.Generic;
 using UtilsSharp;
 
 namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
@@ -170,16 +169,16 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
                     var batchData = countryList.Where(x => insertData.Contains(x.ZCOUNTRYCODE)).ToList();
                     foreach (var item in batchData)
                     {
-                        foreach (var items in item.ZLANG_LIST)
-                        {
-                            CountryLanguage projectUsedName = new CountryLanguage()
-                            {
-                                ZLANGCODE = items.ZLANGCODE,
-                                ZCODE_DESC = items.ZCODE_DESC,
+                        //foreach (var items in item.ZLANG_LIST)
+                        //{
+                        //    CountryLanguage projectUsedName = new CountryLanguage()
+                        //    {
+                        //        ZLANGCODE = items.ZLANGCODE,
+                        //        ZCODE_DESC = items.ZCODE_DESC,
 
-                            };
-                            insertzMDGS_OLDNAMEs.Add(projectUsedName);
-                        }
+                        //    };
+                        //    insertzMDGS_OLDNAMEs.Add(projectUsedName);
+                        //}
                     }
                     await _dbContext.Fastest<CountryRegion>().BulkCopyAsync(batchData);
                     await _dbContext.Fastest<CountryRegion>().BulkUpdateAsync(batchData);
@@ -190,16 +189,16 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
                     var batchData = countryList.Where(x => updateOids.Contains(x.ZCOUNTRYCODE)).ToList();
                     foreach (var item in batchData)
                     {
-                        foreach (var items in item.ZLANG_LIST)
-                        {
-                            CountryLanguage projectUsedName = new CountryLanguage()
-                            {
-                                ZLANGCODE = items.ZLANGCODE,
-                                ZCODE_DESC = items.ZCODE_DESC,
+                        //foreach (var items in item.ZLANG_LIST)
+                        //{
+                        //    CountryLanguage projectUsedName = new CountryLanguage()
+                        //    {
+                        //        ZLANGCODE = items.ZLANGCODE,
+                        //        ZCODE_DESC = items.ZCODE_DESC,
 
-                            };
-                            updatezMDGS_OLDNAMEs.Add(projectUsedName);
-                        }
+                        //    };
+                        //    updatezMDGS_OLDNAMEs.Add(projectUsedName);
+                        //}
                     }
                     await _dbContext.Fastest<CountryRegion>().BulkUpdateAsync(batchData);
                     await _dbContext.Fastest<CountryLanguage>().BulkUpdateAsync(updatezMDGS_OLDNAMEs);
@@ -390,70 +389,100 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
             #endregion
             try
             {
-                var dCList = _mapper.Map<List<DeviceClassCodeItem>, List<DeviceClassCode>>(receiveDataMDMRequestDto.IT_DATA.item);
-                var item = new List<ClassDevice>();//分类属性
-                var item2 = new List<ClassDeviceValue>();//分类属性值
-                foreach (var dc in dCList)
-                {
-                    dc.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
-                    item.AddRange(dc.ZPROPERTY_LIST.Item);
-                    item2.AddRange(dc.ZVALUE_LIST.Item);
-                }
-                var deviceCodes = await _dbContext.Queryable<DeviceClassCode>().Where(x => x.IsDelete == 1).Select(x => x.ZCLASS).ToListAsync();
-                var insertOids = dCList.Where(x => !deviceCodes.Contains(x.ZCLASS)).Select(x => x.ZCLASS).ToList();
-                var updateOids = dCList.Where(x => deviceCodes.Contains(x.ZCLASS)).Select(x => x.ZCLASS).ToList();
+                List<DeviceClassAttribute> insertItem = new();//分类属性
+                List<DeviceClassAttribute> updateItem = new();//分类属性
+                List<DeviceClassAttributeValue> insertItem2 = new();//分类属性值
+                List<DeviceClassAttributeValue> updateItem2 = new();//分类属性值
 
-                //属性
-                var dcids = await _dbContext.Queryable<DeviceClassAttribute>().Where(x => x.IsDelete == 1).Select(x => x.ZCLASS).ToListAsync();
-                var insertDCIds = item.Where(x => !deviceCodes.Contains(x.ZCLASS)).Select(x => x.ZCLASS).Where(x => !dcids.Contains(x)).Select(x => x).ToList();
-                var updateDCIds = item.Where(x => deviceCodes.Contains(x.ZCLASS)).Select(x => x.ZCLASS).Where(x => dcids.Contains(x)).Select(x => x).ToList();
-                var itemValues = _mapper.Map<List<ClassDevice>, List<DeviceClassAttribute>>(item);
+                var dcCodes = await _dbContext.Queryable<DeviceClassCode>().Where(x => x.IsDelete == 1).ToListAsync();
+                var insertOids = receiveDataMDMRequestDto.IT_DATA.item.Where(x => !dcCodes.Select(x => x.ZCLASS).ToList().Contains(x.ZCLASS)).ToList();
+                var updateOids = receiveDataMDMRequestDto.IT_DATA.item.Where(x => dcCodes.Select(x => x.ZCLASS).ToList().Contains(x.ZCLASS)).ToList();
 
-                //属性值
-                var dcVIds = await _dbContext.Queryable<DeviceClassAttributeValue>().Where(x => x.IsDelete == 1).Select(x => x.ZCLASS).ToListAsync();
-                var insertDCVIds = dCList.Where(x => !deviceCodes.Contains(x.ZCLASS)).Select(x => x.ZCLASS).Where(x => !dcVIds.Contains(x)).Select(x => x).ToList();
-                var updateDCVIds = dCList.Where(x => deviceCodes.Contains(x.ZCLASS)).Select(x => x.ZCLASS).Where(x => dcVIds.Contains(x)).Select(x => x).ToList();
-                var item2Values = _mapper.Map<List<ClassDeviceValue>, List<DeviceClassAttributeValue>>(item2);
-
+                //新增操作
                 if (insertOids.Any())
                 {
-                    //插入操作
-                    var batchData = dCList.Where(x => insertOids.Contains(x.ZCLASS)).ToList();
-                    await _dbContext.Fastest<DeviceClassCode>().BulkCopyAsync(batchData);
+                    foreach (var ic in insertOids)
+                    {
+                        ic.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
+                        foreach (var cc in ic.ZPROPERTY_LIST.Item)
+                        {
+                            var invoiceLanguage = new DeviceClassAttribute
+                            {
+                                Id = ic.Id.Value,
+                                ZATTRCODE = cc.ZATTRCODE,
+                                ZATTRNAME = cc.ZATTRNAME,
+                                ZATTRUNIT = cc.ZATTRUNIT,
+                                ZCLASS = cc.ZCLASS,
+                                ZREMARK = cc.ZREMARK,
+                                CreateTime = DateTime.Now
+                            };
+                            insertItem.Add(invoiceLanguage);
+                        }
+                        foreach (var cc in ic.ZVALUE_LIST.Item)
+                        {
+                            var invoiceLanguage = new DeviceClassAttributeValue
+                            {
+                                Id = ic.Id.Value,
+                                ZATTRCODE = cc.ZATTRCODE,
+                                ZCLASS = cc.ZCLASS,
+                                ZVALUECODE = cc.ZVALUECODE,
+                                ZVALUENAME = cc.ZVALUENAME,
+                                CreateTime = DateTime.Now
+                            };
+                            insertItem2.Add(invoiceLanguage);
+                        }
+                    }
+
+                    var dCList = _mapper.Map<List<DeviceClassCodeItem>, List<DeviceClassCode>>(insertOids);
+                    await _dbContext.Fastest<DeviceClassAttribute>().BulkCopyAsync(insertItem);
+                    await _dbContext.Fastest<DeviceClassAttributeValue>().BulkCopyAsync(insertItem2);
                 }
                 if (updateOids.Any())
                 {
-                    //更新操作
-                    var batchData = dCList.Where(x => updateOids.Contains(x.ZCLASS)).ToList();
-                    await _dbContext.Fastest<DeviceClassCode>().BulkUpdateAsync(batchData);
-                }
-                if (insertDCIds.Any())
-                {
-                    //插入操作
-                    var batchData = itemValues.Where(x => insertDCIds.Contains(x.ZCLASS)).ToList();
-                    foreach (var key in batchData)
-                    { key.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(); key.CreateTime = DateTime.Now; }
-                    await _dbContext.Fastest<DeviceClassAttribute>().BulkUpdateAsync(batchData);
-                }
-                if (updateDCIds.Any())
-                {
-                    //更新操作
-                    var batchData = itemValues.Where(x => updateDCIds.Contains(x.ZCLASS)).ToList();
-                    await _dbContext.Fastest<DeviceClassAttribute>().BulkUpdateAsync(batchData);
-                }
-                if (insertDCVIds.Any())
-                {
-                    //插入操作
-                    var batchData = item2Values.Where(x => insertDCVIds.Contains(x.ZCLASS)).ToList();
-                    foreach (var key in batchData)
-                    { key.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(); }
-                    await _dbContext.Fastest<DeviceClassAttributeValue>().BulkUpdateAsync(batchData);
-                }
-                if (updateDCVIds.Any())
-                {
-                    //更新操作
-                    var batchData = item2Values.Where(x => updateDCVIds.Contains(x.ZCLASS)).ToList();
-                    await _dbContext.Fastest<DeviceClassAttributeValue>().BulkUpdateAsync(batchData);
+                    List<DeviceClassAttribute> deleteData = new();
+                    List<DeviceClassAttributeValue> deleteData2 = new();
+                    //更新
+                    var dcAList = await _dbContext.Queryable<DeviceClassAttribute>().ToListAsync();
+                    var dcAVlueList = await _dbContext.Queryable<DeviceClassAttributeValue>().ToListAsync();
+                    foreach (var itemItem in updateOids)
+                    {
+                        var id = dcCodes.Where(x => x.ZCLASS == itemItem.ZCLASS).Select(x => x.Id).First();
+                        itemItem.Id = id;
+                        foreach (var items in itemItem.ZPROPERTY_LIST.Item)
+                        {
+                            DeviceClassAttribute dca = new DeviceClassAttribute()
+                            {
+                                Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                                ZCLASS = itemItem.ZCLASS,
+                                ZREMARK = items.ZREMARK,
+                                ZATTRCODE = items.ZATTRCODE,
+                                ZATTRNAME = items.ZATTRNAME,
+                                ZATTRUNIT = items.ZATTRUNIT,
+                                CreateTime = DateTime.Now
+                            };
+                            updateItem.Add(dca);
+                        }
+                        foreach (var items in itemItem.ZVALUE_LIST.Item)
+                        {
+                            DeviceClassAttributeValue dcav = new DeviceClassAttributeValue()
+                            {
+                                Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                                ZCLASS = itemItem.ZCLASS,
+                                ZATTRCODE = items.ZATTRCODE,
+                                ZVALUECODE = items.ZVALUECODE,
+                                ZVALUENAME = items.ZVALUENAME,
+                                CreateTime = DateTime.Now
+                            };
+                            updateItem2.Add(dcav);
+                        }
+                        deleteData.AddRange(dcAList.Where(x => x.ZCLASS == itemItem.ZCLASS).ToList());
+                    }
+                    var dcCodeList = _mapper.Map<List<DeviceClassCodeItem>, List<DeviceClassCode>>(updateOids);
+                    await _dbContext.Updateable(dcCodeList).ExecuteCommandAsync();
+                    await _dbContext.Deleteable<DeviceClassAttribute>().WhereColumns(deleteData, it => new { it.Id }).ExecuteCommandAsync();
+                    await _dbContext.Deleteable<DeviceClassAttributeValue>().WhereColumns(deleteData2, it => new { it.Id }).ExecuteCommandAsync();
+                    await _dbContext.Insertable(updateItem).ExecuteCommandAsync();
+                    await _dbContext.Insertable(updateItem2).ExecuteCommandAsync();
                 }
 
                 responseAjaxResult.Success();
@@ -736,180 +765,180 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
                 var pLeader = new List<PLeader>();//项目负责人
                 var canYDep = new List<CanYDep>();//参与部门
 
-                foreach (var item in invoiceList)
-                {
-                    item.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
-                    var su = item.IT_AI.Item;
-                    var cu = item.IT_AG.Item;
-                    var nc = item.IT_ONAME.Item;
-                    var cy = item.IT_AH.Item;
-                    var wt = item.IT_AK.Item;
-                    var pl = item.IT_AJ.Item;
-                    var cd = item.IT_DE.Item;
-                    foreach (var s in su) { s.Code = item.ZSRP; }
-                    foreach (var s in cu) { s.Code = item.ZSRP; }
-                    foreach (var s in nc) { s.Code = item.ZSRP; }
-                    foreach (var s in cy) { s.Code = item.ZSRP; }
-                    foreach (var s in wt) { s.Code = item.ZSRP; }
-                    foreach (var s in pl) { s.Code = item.ZSRP; }
-                    foreach (var s in cd) { s.Code = item.ZSRP; }
-                    secUnit.AddRange(su);
-                    cDUnit.AddRange(cu);
-                    nameCeng.AddRange(nc);
-                    canYUnit.AddRange(cy);
-                    weiTUnit.AddRange(wt);
-                    pLeader.AddRange(pl);
-                    canYDep.AddRange(cd);
-                }
-                var invoiceCodes = await _dbContext.Queryable<ScientifiCNoProject>().Where(x => x.IsDelete == 1).Select(x => x.ZSRP).ToListAsync();
-                var insertOids = invoiceList.Where(x => !invoiceCodes.Contains(x.ZSRP)).Select(x => x.ZSRP).ToList();
-                var updateOids = invoiceList.Where(x => invoiceCodes.Contains(x.ZSRP)).Select(x => x.ZSRP).ToList();
+                //foreach (var item in invoiceList)
+                //{
+                //    item.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
+                //    var su = item.IT_AI.Item;
+                //    var cu = item.IT_AG.Item;
+                //    var nc = item.IT_ONAME.Item;
+                //    var cy = item.IT_AH.Item;
+                //    var wt = item.IT_AK.Item;
+                //    var pl = item.IT_AJ.Item;
+                //    var cd = item.IT_DE.Item;
+                //    foreach (var s in su) { s.Code = item.ZSRP; }
+                //    foreach (var s in cu) { s.Code = item.ZSRP; }
+                //    foreach (var s in nc) { s.Code = item.ZSRP; }
+                //    foreach (var s in cy) { s.Code = item.ZSRP; }
+                //    foreach (var s in wt) { s.Code = item.ZSRP; }
+                //    foreach (var s in pl) { s.Code = item.ZSRP; }
+                //    foreach (var s in cd) { s.Code = item.ZSRP; }
+                //    secUnit.AddRange(su);
+                //    cDUnit.AddRange(cu);
+                //    nameCeng.AddRange(nc);
+                //    canYUnit.AddRange(cy);
+                //    weiTUnit.AddRange(wt);
+                //    pLeader.AddRange(pl);
+                //    canYDep.AddRange(cd);
+                //}
+                //var invoiceCodes = await _dbContext.Queryable<ScientifiCNoProject>().Where(x => x.IsDelete == 1).Select(x => x.ZSRP).ToListAsync();
+                //var insertOids = invoiceList.Where(x => !invoiceCodes.Contains(x.ZSRP)).Select(x => x.ZSRP).ToList();
+                //var updateOids = invoiceList.Where(x => invoiceCodes.Contains(x.ZSRP)).Select(x => x.ZSRP).ToList();
 
-                #region 其他
-                var suList = _mapper.Map<List<SecUnit>, List<KySecUnit>>(secUnit);
-                var suCodes = await _dbContext.Queryable<KySecUnit>().Where(t => t.IsDelete == 1).Select(t => t.Code).ToListAsync();
-                var insertISuCodes = secUnit.Where(x => !suCodes.Contains(x.Code)).Select(x => x.Code).ToList();
-                var updateISuCodes = secUnit.Where(x => suCodes.Contains(x.Code)).Select(x => x.Code).ToList();
+                //#region 其他
+                //var suList = _mapper.Map<List<SecUnit>, List<KySecUnit>>(secUnit);
+                //var suCodes = await _dbContext.Queryable<KySecUnit>().Where(t => t.IsDelete == 1).Select(t => t.Code).ToListAsync();
+                //var insertISuCodes = secUnit.Where(x => !suCodes.Contains(x.Code)).Select(x => x.Code).ToList();
+                //var updateISuCodes = secUnit.Where(x => suCodes.Contains(x.Code)).Select(x => x.Code).ToList();
 
-                var cuList = _mapper.Map<List<CDUnit>, List<KyCDUnit>>(cDUnit);
-                var cuCodes = await _dbContext.Queryable<KyCDUnit>().Where(t => t.IsDelete == 1).Select(t => t.Code).ToListAsync();
-                var insertICuCodes = cDUnit.Where(x => !cuCodes.Contains(x.Code)).Select(x => x.Code).ToList();
-                var updateICuCodes = cDUnit.Where(x => cuCodes.Contains(x.Code)).Select(x => x.Code).ToList();
+                //var cuList = _mapper.Map<List<CDUnit>, List<KyCDUnit>>(cDUnit);
+                //var cuCodes = await _dbContext.Queryable<KyCDUnit>().Where(t => t.IsDelete == 1).Select(t => t.Code).ToListAsync();
+                //var insertICuCodes = cDUnit.Where(x => !cuCodes.Contains(x.Code)).Select(x => x.Code).ToList();
+                //var updateICuCodes = cDUnit.Where(x => cuCodes.Contains(x.Code)).Select(x => x.Code).ToList();
 
-                var ncList = _mapper.Map<List<NameCeng>, List<KyNameCeng>>(nameCeng);
-                var ncCodes = await _dbContext.Queryable<KyNameCeng>().Where(t => t.IsDelete == 1).Select(t => t.Code).ToListAsync();
-                var insertINcCodes = nameCeng.Where(x => !ncCodes.Contains(x.Code)).Select(x => x.Code).ToList();
-                var updateINcCodes = nameCeng.Where(x => ncCodes.Contains(x.Code)).Select(x => x.Code).ToList();
+                //var ncList = _mapper.Map<List<NameCeng>, List<KyNameCeng>>(nameCeng);
+                //var ncCodes = await _dbContext.Queryable<KyNameCeng>().Where(t => t.IsDelete == 1).Select(t => t.Code).ToListAsync();
+                //var insertINcCodes = nameCeng.Where(x => !ncCodes.Contains(x.Code)).Select(x => x.Code).ToList();
+                //var updateINcCodes = nameCeng.Where(x => ncCodes.Contains(x.Code)).Select(x => x.Code).ToList();
 
-                var cyList = _mapper.Map<List<CanYUnit>, List<KyCanYUnit>>(canYUnit);
-                var cyCodes = await _dbContext.Queryable<KyCanYUnit>().Where(t => t.IsDelete == 1).Select(t => t.Code).ToListAsync();
-                var insertICyCodes = canYUnit.Where(x => !cyCodes.Contains(x.Code)).Select(x => x.Code).ToList();
-                var updateICyCodes = canYUnit.Where(x => cyCodes.Contains(x.Code)).Select(x => x.Code).ToList();
+                //var cyList = _mapper.Map<List<CanYUnit>, List<KyCanYUnit>>(canYUnit);
+                //var cyCodes = await _dbContext.Queryable<KyCanYUnit>().Where(t => t.IsDelete == 1).Select(t => t.Code).ToListAsync();
+                //var insertICyCodes = canYUnit.Where(x => !cyCodes.Contains(x.Code)).Select(x => x.Code).ToList();
+                //var updateICyCodes = canYUnit.Where(x => cyCodes.Contains(x.Code)).Select(x => x.Code).ToList();
 
-                var wtList = _mapper.Map<List<WeiTUnit>, List<KyWeiTUnit>>(weiTUnit);
-                var wtCodes = await _dbContext.Queryable<KyWeiTUnit>().Where(t => t.IsDelete == 1).Select(t => t.Code).ToListAsync();
-                var insertIWtCodes = weiTUnit.Where(x => !wtCodes.Contains(x.Code)).Select(x => x.Code).ToList();
-                var updateIWtCodes = weiTUnit.Where(x => wtCodes.Contains(x.Code)).Select(x => x.Code).ToList();
+                //var wtList = _mapper.Map<List<WeiTUnit>, List<KyWeiTUnit>>(weiTUnit);
+                //var wtCodes = await _dbContext.Queryable<KyWeiTUnit>().Where(t => t.IsDelete == 1).Select(t => t.Code).ToListAsync();
+                //var insertIWtCodes = weiTUnit.Where(x => !wtCodes.Contains(x.Code)).Select(x => x.Code).ToList();
+                //var updateIWtCodes = weiTUnit.Where(x => wtCodes.Contains(x.Code)).Select(x => x.Code).ToList();
 
-                var plList = _mapper.Map<List<PLeader>, List<KyPLeader>>(pLeader);
-                var plCodes = await _dbContext.Queryable<KyPLeader>().Where(t => t.IsDelete == 1).Select(t => t.Code).ToListAsync();
-                var insertIPlCodes = pLeader.Where(x => !plCodes.Contains(x.Code)).Select(x => x.Code).ToList();
-                var updateIPlCodes = pLeader.Where(x => plCodes.Contains(x.Code)).Select(x => x.Code).ToList();
+                //var plList = _mapper.Map<List<PLeader>, List<KyPLeader>>(pLeader);
+                //var plCodes = await _dbContext.Queryable<KyPLeader>().Where(t => t.IsDelete == 1).Select(t => t.Code).ToListAsync();
+                //var insertIPlCodes = pLeader.Where(x => !plCodes.Contains(x.Code)).Select(x => x.Code).ToList();
+                //var updateIPlCodes = pLeader.Where(x => plCodes.Contains(x.Code)).Select(x => x.Code).ToList();
 
-                var cdList = _mapper.Map<List<CanYDep>, List<KyCanYDep>>(canYDep);
-                var cdCodes = await _dbContext.Queryable<KyCanYDep>().Where(t => t.IsDelete == 1).Select(t => t.Code).ToListAsync();
-                var insertICdCodes = canYDep.Where(x => !cdCodes.Contains(x.Code)).Select(x => x.Code).ToList();
-                var updateICdCodes = canYDep.Where(x => cdCodes.Contains(x.Code)).Select(x => x.Code).ToList();
-                #endregion
+                //var cdList = _mapper.Map<List<CanYDep>, List<KyCanYDep>>(canYDep);
+                //var cdCodes = await _dbContext.Queryable<KyCanYDep>().Where(t => t.IsDelete == 1).Select(t => t.Code).ToListAsync();
+                //var insertICdCodes = canYDep.Where(x => !cdCodes.Contains(x.Code)).Select(x => x.Code).ToList();
+                //var updateICdCodes = canYDep.Where(x => cdCodes.Contains(x.Code)).Select(x => x.Code).ToList();
+                //#endregion
 
-                if (insertOids.Any())
-                {
-                    //插入操作
-                    var batchData = invoiceList.Where(x => insertOids.Contains(x.ZSRP)).ToList();
-                    await _dbContext.Fastest<ScientifiCNoProject>().BulkCopyAsync(batchData);
-                }
-                if (updateOids.Any())
-                {
-                    //更新操作
-                    var batchData = invoiceList.Where(x => updateOids.Contains(x.ZSRP)).ToList();
-                    batchData.ForEach(x => x.UpdateTime = DateTime.Now);
-                    await _dbContext.Fastest<ScientifiCNoProject>().BulkUpdateAsync(batchData);
-                }
+                //if (insertOids.Any())
+                //{
+                //    //插入操作
+                //    var batchData = invoiceList.Where(x => insertOids.Contains(x.ZSRP)).ToList();
+                //    await _dbContext.Fastest<ScientifiCNoProject>().BulkCopyAsync(batchData);
+                //}
+                //if (updateOids.Any())
+                //{
+                //    //更新操作
+                //    var batchData = invoiceList.Where(x => updateOids.Contains(x.ZSRP)).ToList();
+                //    batchData.ForEach(x => x.UpdateTime = DateTime.Now);
+                //    await _dbContext.Fastest<ScientifiCNoProject>().BulkUpdateAsync(batchData);
+                //}
 
-                #region 其他
-                if (insertISuCodes.Any())
-                {
+                //#region 其他
+                //if (insertISuCodes.Any())
+                //{
 
-                    //插入操作
-                    var batchData = suList.Where(x => insertISuCodes.Contains(x.Code)).ToList();
-                    foreach (var i in batchData) { i.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(); }
-                    await _dbContext.Fastest<KySecUnit>().BulkCopyAsync(batchData);
-                }
-                if (updateISuCodes.Any())
-                {
-                    //更新操作
-                    var batchData = suList.Where(x => updateISuCodes.Contains(x.Code)).ToList();
-                    await _dbContext.Fastest<KySecUnit>().BulkUpdateAsync(batchData);
-                }
-                if (insertICuCodes.Any())
-                {
-                    //插入操作
-                    var batchData = cuList.Where(x => insertICuCodes.Contains(x.Code)).ToList();
-                    foreach (var i in batchData) { i.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(); }
-                    await _dbContext.Fastest<KyCDUnit>().BulkCopyAsync(batchData);
-                }
-                if (updateICuCodes.Any())
-                {
-                    //更新操作
-                    var batchData = cuList.Where(x => updateICuCodes.Contains(x.Code)).ToList();
-                    await _dbContext.Fastest<KyCDUnit>().BulkUpdateAsync(batchData);
-                }
-                if (insertINcCodes.Any())
-                {
-                    //插入操作
-                    var batchData = ncList.Where(x => insertINcCodes.Contains(x.Code)).ToList();
-                    foreach (var i in batchData) { i.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(); }
-                    await _dbContext.Fastest<KyNameCeng>().BulkCopyAsync(batchData);
-                }
-                if (updateINcCodes.Any())
-                {
-                    //更新操作
-                    var batchData = ncList.Where(x => updateINcCodes.Contains(x.Code)).ToList();
-                    await _dbContext.Fastest<KyNameCeng>().BulkUpdateAsync(batchData);
-                }
-                if (insertICyCodes.Any())
-                {
-                    //插入操作
-                    var batchData = cyList.Where(x => insertICyCodes.Contains(x.Code)).ToList();
-                    foreach (var i in batchData) { i.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(); }
-                    await _dbContext.Fastest<KyCanYUnit>().BulkCopyAsync(batchData);
-                }
-                if (updateICyCodes.Any())
-                {
-                    //更新操作
-                    var batchData = cyList.Where(x => updateICyCodes.Contains(x.Code)).ToList();
-                    await _dbContext.Fastest<KyCanYUnit>().BulkUpdateAsync(batchData);
-                }
-                if (insertIWtCodes.Any())
-                {
-                    //插入操作
-                    var batchData = wtList.Where(x => insertIWtCodes.Contains(x.Code)).ToList();
-                    foreach (var i in batchData) { i.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(); }
-                    await _dbContext.Fastest<KyWeiTUnit>().BulkCopyAsync(batchData);
-                }
-                if (updateIWtCodes.Any())
-                {
-                    //更新操作
-                    var batchData = wtList.Where(x => updateIWtCodes.Contains(x.Code)).ToList();
-                    await _dbContext.Fastest<KyWeiTUnit>().BulkUpdateAsync(batchData);
-                }
-                if (insertIPlCodes.Any())
-                {
-                    //插入操作
-                    var batchData = plList.Where(x => insertIPlCodes.Contains(x.Code)).ToList();
-                    foreach (var i in batchData) { i.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(); }
-                    await _dbContext.Fastest<KyPLeader>().BulkCopyAsync(batchData);
-                }
-                if (updateIPlCodes.Any())
-                {
-                    //更新操作
-                    var batchData = plList.Where(x => updateIPlCodes.Contains(x.Code)).ToList();
-                    await _dbContext.Fastest<KyPLeader>().BulkUpdateAsync(batchData);
-                }
-                if (insertICdCodes.Any())
-                {
-                    //插入操作
-                    var batchData = cdList.Where(x => insertICdCodes.Contains(x.Code)).ToList();
-                    foreach (var i in batchData) { i.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(); }
-                    await _dbContext.Fastest<KyCanYDep>().BulkCopyAsync(batchData);
-                }
-                if (updateICdCodes.Any())
-                {
-                    //更新操作
-                    var batchData = cdList.Where(x => updateICdCodes.Contains(x.Code)).ToList();
-                    await _dbContext.Fastest<KyCanYDep>().BulkUpdateAsync(batchData);
-                }
-                #endregion
+                //    //插入操作
+                //    var batchData = suList.Where(x => insertISuCodes.Contains(x.Code)).ToList();
+                //    foreach (var i in batchData) { i.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(); }
+                //    await _dbContext.Fastest<KySecUnit>().BulkCopyAsync(batchData);
+                //}
+                //if (updateISuCodes.Any())
+                //{
+                //    //更新操作
+                //    var batchData = suList.Where(x => updateISuCodes.Contains(x.Code)).ToList();
+                //    await _dbContext.Fastest<KySecUnit>().BulkUpdateAsync(batchData);
+                //}
+                //if (insertICuCodes.Any())
+                //{
+                //    //插入操作
+                //    var batchData = cuList.Where(x => insertICuCodes.Contains(x.Code)).ToList();
+                //    foreach (var i in batchData) { i.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(); }
+                //    await _dbContext.Fastest<KyCDUnit>().BulkCopyAsync(batchData);
+                //}
+                //if (updateICuCodes.Any())
+                //{
+                //    //更新操作
+                //    var batchData = cuList.Where(x => updateICuCodes.Contains(x.Code)).ToList();
+                //    await _dbContext.Fastest<KyCDUnit>().BulkUpdateAsync(batchData);
+                //}
+                //if (insertINcCodes.Any())
+                //{
+                //    //插入操作
+                //    var batchData = ncList.Where(x => insertINcCodes.Contains(x.Code)).ToList();
+                //    foreach (var i in batchData) { i.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(); }
+                //    await _dbContext.Fastest<KyNameCeng>().BulkCopyAsync(batchData);
+                //}
+                //if (updateINcCodes.Any())
+                //{
+                //    //更新操作
+                //    var batchData = ncList.Where(x => updateINcCodes.Contains(x.Code)).ToList();
+                //    await _dbContext.Fastest<KyNameCeng>().BulkUpdateAsync(batchData);
+                //}
+                //if (insertICyCodes.Any())
+                //{
+                //    //插入操作
+                //    var batchData = cyList.Where(x => insertICyCodes.Contains(x.Code)).ToList();
+                //    foreach (var i in batchData) { i.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(); }
+                //    await _dbContext.Fastest<KyCanYUnit>().BulkCopyAsync(batchData);
+                //}
+                //if (updateICyCodes.Any())
+                //{
+                //    //更新操作
+                //    var batchData = cyList.Where(x => updateICyCodes.Contains(x.Code)).ToList();
+                //    await _dbContext.Fastest<KyCanYUnit>().BulkUpdateAsync(batchData);
+                //}
+                //if (insertIWtCodes.Any())
+                //{
+                //    //插入操作
+                //    var batchData = wtList.Where(x => insertIWtCodes.Contains(x.Code)).ToList();
+                //    foreach (var i in batchData) { i.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(); }
+                //    await _dbContext.Fastest<KyWeiTUnit>().BulkCopyAsync(batchData);
+                //}
+                //if (updateIWtCodes.Any())
+                //{
+                //    //更新操作
+                //    var batchData = wtList.Where(x => updateIWtCodes.Contains(x.Code)).ToList();
+                //    await _dbContext.Fastest<KyWeiTUnit>().BulkUpdateAsync(batchData);
+                //}
+                //if (insertIPlCodes.Any())
+                //{
+                //    //插入操作
+                //    var batchData = plList.Where(x => insertIPlCodes.Contains(x.Code)).ToList();
+                //    foreach (var i in batchData) { i.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(); }
+                //    await _dbContext.Fastest<KyPLeader>().BulkCopyAsync(batchData);
+                //}
+                //if (updateIPlCodes.Any())
+                //{
+                //    //更新操作
+                //    var batchData = plList.Where(x => updateIPlCodes.Contains(x.Code)).ToList();
+                //    await _dbContext.Fastest<KyPLeader>().BulkUpdateAsync(batchData);
+                //}
+                //if (insertICdCodes.Any())
+                //{
+                //    //插入操作
+                //    var batchData = cdList.Where(x => insertICdCodes.Contains(x.Code)).ToList();
+                //    foreach (var i in batchData) { i.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(); }
+                //    await _dbContext.Fastest<KyCanYDep>().BulkCopyAsync(batchData);
+                //}
+                //if (updateICdCodes.Any())
+                //{
+                //    //更新操作
+                //    var batchData = cdList.Where(x => updateICdCodes.Contains(x.Code)).ToList();
+                //    await _dbContext.Fastest<KyCanYDep>().BulkUpdateAsync(batchData);
+                //}
+                //#endregion
 
                 responseAjaxResult.Success();
             }
@@ -1063,52 +1092,52 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
             #endregion
             try
             {
-                var invoiceList = _mapper.Map<List<LanguageItem>, List<Language>>(receiveDataMDMRequestDto.IT_DATA.item);
-                var item = new List<LanguageC>();
-                foreach (var ic in invoiceList)
-                {
-                    ic.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
-                    var val = ic.ZLANG_LIST.Item;
-                    foreach (var i in val) { i.Code = ic.ZLANG_TER; }
-                    item.AddRange(val);
-                }
-                var invoiceCodes = await _dbContext.Queryable<Language>().Where(x => x.IsDelete == 1).Select(x => x.ZLANG_TER).ToListAsync();
-                var insertOids = invoiceList.Where(x => !invoiceCodes.Contains(x.ZLANG_TER)).Select(x => x.ZLANG_TER).ToList();
-                var updateOids = invoiceList.Where(x => invoiceCodes.Contains(x.ZLANG_TER)).Select(x => x.ZLANG_TER).ToList();
+                //var invoiceList = _mapper.Map<List<LanguageItem>, List<Language>>(receiveDataMDMRequestDto.IT_DATA.item);
+                //var item = new List<LanguageC>();
+                //foreach (var ic in invoiceList)
+                //{
+                //    ic.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
+                //    var val = ic.ZLANG_LIST.Item;
+                //    foreach (var i in val) { i.Code = ic.ZLANG_TER; }
+                //    item.AddRange(val);
+                //}
+                //var invoiceCodes = await _dbContext.Queryable<Language>().Where(x => x.IsDelete == 1).Select(x => x.ZLANG_TER).ToListAsync();
+                //var insertOids = invoiceList.Where(x => !invoiceCodes.Contains(x.ZLANG_TER)).Select(x => x.ZLANG_TER).ToList();
+                //var updateOids = invoiceList.Where(x => invoiceCodes.Contains(x.ZLANG_TER)).Select(x => x.ZLANG_TER).ToList();
 
-                #region  其他
-                var laList = _mapper.Map<List<LanguageC>, List<LanguageDetails>>(item);
-                var laCodes = await _dbContext.Queryable<LanguageDetails>().Where(t => t.IsDelete == 1).Select(t => t.Code).ToListAsync();
-                var insertILaCodes = item.Where(x => !laCodes.Contains(x.Code)).Select(x => x.Code).ToList();
-                var updateILaCodes = item.Where(x => laCodes.Contains(x.Code)).Select(x => x.Code).ToList();
-                #endregion
+                //#region  其他
+                //var laList = _mapper.Map<List<LanguageC>, List<LanguageDetails>>(item);
+                //var laCodes = await _dbContext.Queryable<LanguageDetails>().Where(t => t.IsDelete == 1).Select(t => t.Code).ToListAsync();
+                //var insertILaCodes = item.Where(x => !laCodes.Contains(x.Code)).Select(x => x.Code).ToList();
+                //var updateILaCodes = item.Where(x => laCodes.Contains(x.Code)).Select(x => x.Code).ToList();
+                //#endregion
 
-                if (insertOids.Any())
-                {
-                    //插入操作
-                    var batchData = invoiceList.Where(x => insertOids.Contains(x.ZLANG_TER)).ToList();
-                    foreach (var i in batchData) { i.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(); }
-                    await _dbContext.Fastest<Language>().BulkCopyAsync(batchData);
-                }
-                if (updateOids.Any())
-                {
-                    //更新操作
-                    var batchData = invoiceList.Where(x => updateOids.Contains(x.ZLANG_TER)).ToList();
-                    await _dbContext.Fastest<Language>().BulkUpdateAsync(batchData);
-                }
-                if (insertILaCodes.Any())
-                {
-                    //插入操作
-                    var batchData = laList.Where(x => insertILaCodes.Contains(x.Code)).ToList();
-                    foreach (var i in batchData) { i.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(); }
-                    await _dbContext.Fastest<LanguageDetails>().BulkCopyAsync(batchData);
-                }
-                if (updateILaCodes.Any())
-                {
-                    //更新操作
-                    var batchData = laList.Where(x => updateILaCodes.Contains(x.Code)).ToList();
-                    await _dbContext.Fastest<LanguageDetails>().BulkUpdateAsync(batchData);
-                }
+                //if (insertOids.Any())
+                //{
+                //    //插入操作
+                //    var batchData = invoiceList.Where(x => insertOids.Contains(x.ZLANG_TER)).ToList();
+                //    foreach (var i in batchData) { i.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(); }
+                //    await _dbContext.Fastest<Language>().BulkCopyAsync(batchData);
+                //}
+                //if (updateOids.Any())
+                //{
+                //    //更新操作
+                //    var batchData = invoiceList.Where(x => updateOids.Contains(x.ZLANG_TER)).ToList();
+                //    await _dbContext.Fastest<Language>().BulkUpdateAsync(batchData);
+                //}
+                //if (insertILaCodes.Any())
+                //{
+                //    //插入操作
+                //    var batchData = laList.Where(x => insertILaCodes.Contains(x.Code)).ToList();
+                //    foreach (var i in batchData) { i.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(); }
+                //    await _dbContext.Fastest<LanguageDetails>().BulkCopyAsync(batchData);
+                //}
+                //if (updateILaCodes.Any())
+                //{
+                //    //更新操作
+                //    var batchData = laList.Where(x => updateILaCodes.Contains(x.Code)).ToList();
+                //    await _dbContext.Fastest<LanguageDetails>().BulkUpdateAsync(batchData);
+                //}
 
                 responseAjaxResult.Success();
             }

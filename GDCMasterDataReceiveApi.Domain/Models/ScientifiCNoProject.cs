@@ -1,5 +1,4 @@
-﻿using GDCMasterDataReceiveApi.Domain.OtherModels;
-using SqlSugar;
+﻿using SqlSugar;
 
 namespace GDCMasterDataReceiveApi.Domain.Models
 {
@@ -49,39 +48,39 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// </summary>
         [SugarColumn(Length = 4, ColumnName = "TypeCode")]
         public string? ZSRPCLASS { get; set; }
-        /// <summary>
-        /// 所属二级单位:所属二级单位，按照承担单位、参与单位、委托单位的所属二级单位选择，属于集团内的应在符合Q/CCCC XX003—2021要求的机构主数据中选择。
-        /// </summary>
-        [SugarColumn(IsIgnore = true)]
-        public IT_AI? IT_AI { get; set; }
-        /// <summary>
-        /// 承担单位:按科研项目合同填写，内部承担单位属于集团内的应在符合Q/CCCC XX003—2021要求的机构主数据中选择。
-        /// 按科研项目合同填写，外部承担单位属于集团外的应在符合Q/CCCC XX007—2021要求的往来单位主数据中选择
-        /// </summary>
-        [SugarColumn(IsIgnore = true)]
-        public IT_AG? IT_AG { get; set; }
-        /// <summary>
-        /// 曾用名  
-        /// </summary>
-        [SugarColumn(IsIgnore = true)]
-        public IT_ONAME? IT_ONAME { get; set; }
-        /// <summary>
-        /// 参与单位:按科研项目合同填写，内部参与单位属于集团内的应在符合Q/CCCC XX003—2021要求的机构主数据中选择。
-        /// 按科研项目合同填写，外部参与单位属于集团外的应在符合Q/CCCC XX007—2021要求的往来单位主数据中选择
-        /// </summary>
-        [SugarColumn(IsIgnore = true)]
-        public IT_AH? IT_AH { get; set; }
-        /// <summary>
-        /// 委托单位:按科研项目合同填写，内部委托单位属于集团内的应在符合Q/CCCC XX003—2021要求的机构主数据中选择。
-        /// 按科研项目合同填写，外部委托单位属于集团外的应在符合Q/CCCC XX007—2021要求的往来单位主数据中选择
-        /// </summary>
-        [SugarColumn(IsIgnore = true)]
-        public IT_AK? IT_AK { get; set; }
-        /// <summary>
-        /// 项目负责人：项目负责人按科研项目合同填写
-        /// </summary>
-        [SugarColumn(IsIgnore = true)]
-        public IT_AJ? IT_AJ { get; set; }
+        ///// <summary>
+        ///// 所属二级单位:所属二级单位，按照承担单位、参与单位、委托单位的所属二级单位选择，属于集团内的应在符合Q/CCCC XX003—2021要求的机构主数据中选择。
+        ///// </summary>
+        //[SugarColumn(IsIgnore = true)]
+        //public IT_AI? IT_AI { get; set; }
+        ///// <summary>
+        ///// 承担单位:按科研项目合同填写，内部承担单位属于集团内的应在符合Q/CCCC XX003—2021要求的机构主数据中选择。
+        ///// 按科研项目合同填写，外部承担单位属于集团外的应在符合Q/CCCC XX007—2021要求的往来单位主数据中选择
+        ///// </summary>
+        //[SugarColumn(IsIgnore = true)]
+        //public IT_AG? IT_AG { get; set; }
+        ///// <summary>
+        ///// 曾用名  
+        ///// </summary>
+        //[SugarColumn(IsIgnore = true)]
+        //public IT_ONAME? IT_ONAME { get; set; }
+        ///// <summary>
+        ///// 参与单位:按科研项目合同填写，内部参与单位属于集团内的应在符合Q/CCCC XX003—2021要求的机构主数据中选择。
+        ///// 按科研项目合同填写，外部参与单位属于集团外的应在符合Q/CCCC XX007—2021要求的往来单位主数据中选择
+        ///// </summary>
+        //[SugarColumn(IsIgnore = true)]
+        //public IT_AH? IT_AH { get; set; }
+        ///// <summary>
+        ///// 委托单位:按科研项目合同填写，内部委托单位属于集团内的应在符合Q/CCCC XX003—2021要求的机构主数据中选择。
+        ///// 按科研项目合同填写，外部委托单位属于集团外的应在符合Q/CCCC XX007—2021要求的往来单位主数据中选择
+        ///// </summary>
+        //[SugarColumn(IsIgnore = true)]
+        //public IT_AK? IT_AK { get; set; }
+        ///// <summary>
+        ///// 项目负责人：项目负责人按科研项目合同填写
+        ///// </summary>
+        //[SugarColumn(IsIgnore = true)]
+        //public IT_AJ? IT_AJ { get; set; }
         /// <summary>
         /// 项目总费用（万元）：项目总费用按科研项目合同填写
         /// </summary>
@@ -122,10 +121,10 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// </summary>
         [SugarColumn(Length = 12, ColumnName = "SupMDCode")]
         public string? ZSRPUP { get; set; }
-        /// <summary>
-        /// 参与部门:按照承担单位、参与单位、委托单位的参与部门选择，可选多值。2022年6月2日新增加字段
-        /// </summary>
-        [SugarColumn(IsIgnore = true)]
-        public IT_DE? IT_DE { get; set; }
+        ///// <summary>
+        ///// 参与部门:按照承担单位、参与单位、委托单位的参与部门选择，可选多值。2022年6月2日新增加字段
+        ///// </summary>
+        //[SugarColumn(IsIgnore = true)]
+        //public IT_DE? IT_DE { get; set; }
     }
 }

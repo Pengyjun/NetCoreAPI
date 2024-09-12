@@ -1,4 +1,4 @@
-﻿namespace GDCMasterDataReceiveApi.Domain.OtherModels
+﻿namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.OtherModels
 {
     /// <summary>
     /// 物资设备其他需要处理的models
@@ -17,6 +17,10 @@
     /// </summary>
     public class ClassDevice
     {
+        /// <summary>
+        /// 
+        /// </summary>
+        public long Id {  get; set; }
         /// <summary>
         /// 11
         /// 分类编码:分类的唯一性编码

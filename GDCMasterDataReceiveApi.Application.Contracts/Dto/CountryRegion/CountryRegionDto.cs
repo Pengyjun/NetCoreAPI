@@ -1,6 +1,4 @@
-﻿using GDCMasterDataReceiveApi.Domain.Models;
-
-namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.CountryRegion
+﻿namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.CountryRegion
 {
     #region 后台管理使用
     /// <summary>
