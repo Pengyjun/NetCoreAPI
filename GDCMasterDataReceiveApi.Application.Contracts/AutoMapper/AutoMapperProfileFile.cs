@@ -49,7 +49,7 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.AutoMapper
             //      .ForMember(x => x.PomId, y => y.MapFrom(u => u.Id));
 
             //楼栋
-            mapperConfigurationExpression.CreateMap<LouDongReceiveDto, LouDong>();
+            mapperConfigurationExpression.CreateMap<LouDongItem, LouDong>();
             //核算部门
             mapperConfigurationExpression.CreateMap<AccountingDepartmentReceiveDto, AccountingDepartment>();
             //多组织-核算机构

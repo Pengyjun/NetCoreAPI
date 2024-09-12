@@ -11,6 +11,7 @@ using GDCMasterDataReceiveApi.Application.Contracts.Dto.DeviceClassCode;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.FinancialInstitution;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.InvoiceType;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.Language;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.LouDong;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.Project;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.RoomNumber;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.ScientifiCNoProject;
@@ -167,6 +168,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
                     }
                 }
                 var projectList = _mapper.Map<List<CountryRegionReceiveDto>, List<CountryRegion>>(insertOids);
+                projectList.ForEach(x => x.CreateTime = DateTime.Now);
                 await _dbContext.Fastest<CountryRegion>().BulkCopyAsync(projectList);
                 await _dbContext.Fastest<CountryLanguage>().BulkCopyAsync(insertzMDGS_OLDNAMEs);
             }
@@ -410,6 +412,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
                     }
 
                     var dCList = _mapper.Map<List<DeviceClassCodeItem>, List<DeviceClassCode>>(insertOids);
+                    dCList.ForEach(x => x.CreateTime = DateTime.Now);
                     await _dbContext.Fastest<DeviceClassAttribute>().BulkCopyAsync(insertItem);
                     await _dbContext.Fastest<DeviceClassAttributeValue>().BulkCopyAsync(insertItem2);
                 }
@@ -564,6 +567,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
                     }
 
                     var invoiceList = _mapper.Map<List<InvoiceTypeItem>, List<InvoiceType>>(insertOids);
+                    invoiceList.ForEach(x => x.CreateTime = DateTime.Now);
                     await _dbContext.Fastest<InvoiceType>().BulkCopyAsync(invoiceList);
                     await _dbContext.Fastest<InvoiceLanguage>().BulkCopyAsync(insertItem);
                 }
@@ -664,6 +668,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
                         }
                     }
                     var projectList = _mapper.Map<List<ProjectItem>, List<Project>>(insertOids);
+                    projectList.ForEach(x => x.CreateTime = DateTime.Now);
                     await _dbContext.Fastest<Project>().BulkCopyAsync(projectList);
                     await _dbContext.Fastest<ProjectUsedName>().BulkCopyAsync(insertzMDGS_OLDNAMEs);
                 }
@@ -1020,29 +1025,46 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
         /// 楼栋
         /// </summary>
         /// <returns></returns>
-        public async Task<MDMResponseResult> LouDongDataAsync()
+        public async Task<MDMResponseResult> LouDongDataAsync(BaseReceiveDataRequestDto<LouDongItem> receiveDataMDMRequestDto)
         {
-            ///***
-            // * 测试写入数据
-            // */
-            //var tt = new List<LouDong>();
-            //var test = new LouDong()
-            //{
-            //    Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
-            //    ZZSERIAL = "1",
-            //    ZBLDG = "2",
-            //    ZBLDG_NAME = "3",
-            //    ZSTATE = "4",
-            //    ZFORMATINF = "5",
-            //    ZSYSTEM = "6",
-            //    ZPROJECT = "7"
-            //};
-            //tt.Add(test);
-            //var x = _dbContext.Storageable(tt).ToStorage();
-            //await x.AsInsertable.ExecuteCommandAsync();//不存在插入
-            //await x.AsUpdateable.ExecuteCommandAsync();//存在更新
-            var responseAjaxResult = new MDMResponseResult();
-            responseAjaxResult.Success();
+            MDMResponseResult responseAjaxResult = new MDMResponseResult();
+
+            try
+            {
+                var louDongList = await _dbContext.Queryable<LouDong>().Where(x => x.IsDelete == 1).ToListAsync();
+                var insertOids = receiveDataMDMRequestDto.IT_DATA.item.Where(x => !louDongList.Select(x => x.ZBLDG).ToList().Contains(x.ZBLDG)).ToList();
+                var updateOids = receiveDataMDMRequestDto.IT_DATA.item.Where(x => louDongList.Select(x => x.ZBLDG).ToList().Contains(x.ZBLDG)).ToList();
+
+                //新增操作
+                if (insertOids.Any())
+                {
+                    foreach (var ic in insertOids)
+                    {
+                        ic.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
+                    }
+
+                    var mapRmList = _mapper.Map<List<LouDongItem>, List<LouDong>>(insertOids);
+                    mapRmList.ForEach(x => x.CreateTime = DateTime.Now);
+                    await _dbContext.Fastest<LouDong>().BulkCopyAsync(mapRmList);
+                }
+                if (updateOids.Any())
+                {
+                    //更新
+                    foreach (var itemItem in updateOids)
+                    {
+                        var id = louDongList.Where(x => x.ZBLDG == itemItem.ZBLDG).Select(x => x.Id).First();
+                        itemItem.Id = id;
+                    }
+                    var mapRmList = _mapper.Map<List<LouDongItem>, List<LouDong>>(updateOids);
+                    await _dbContext.Updateable(mapRmList).ExecuteCommandAsync();
+                }
+
+                responseAjaxResult.Success();
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
             return responseAjaxResult;
         }
         /// <summary>
@@ -1068,6 +1090,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
                     }
 
                     var mapRmList = _mapper.Map<List<RoomNumberItem>, List<RoomNumber>>(insertOids);
+                    mapRmList.ForEach(x => x.CreateTime = DateTime.Now);
                     await _dbContext.Fastest<RoomNumber>().BulkCopyAsync(mapRmList);
                 }
                 if (updateOids.Any())
@@ -1140,6 +1163,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
                     }
 
                     var mapList = _mapper.Map<List<LanguageItem>, List<Language>>(insertOids);
+                    mapList.ForEach(x => x.CreateTime = DateTime.Now);
                     await _dbContext.Fastest<Language>().BulkCopyAsync(mapList);
                 }
                 if (updateOids.Any())

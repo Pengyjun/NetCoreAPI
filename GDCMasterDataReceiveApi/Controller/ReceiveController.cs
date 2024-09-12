@@ -9,6 +9,7 @@ using GDCMasterDataReceiveApi.Application.Contracts.Dto.DeviceClassCode;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.FinancialInstitution;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.InvoiceType;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.Language;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.LouDong;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.Project;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.RoomNumber;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.ScientifiCNoProject;
@@ -46,7 +47,7 @@ namespace GDCMasterDataReceiveApi.Controller
         [UnitOfWork]
         [HttpPost("Common")]
         public Task<MDMResponseResult> CommonDataAsync() => _receiveService.CommonDataAsync();
-       
+
         /// <summary>
         /// 多组织-税务代管组织(行政)
         /// </summary>
@@ -176,7 +177,7 @@ namespace GDCMasterDataReceiveApi.Controller
         /// <returns></returns>
         [UnitOfWork]
         [HttpPost("LouDong")]
-        public async Task<MDMResponseResult> LouDongDataAsync() => await _receiveService.LouDongDataAsync();
+        public async Task<MDMResponseResult> LouDongDataAsync([FromBody] BaseReceiveDataRequestDto<LouDongItem> receiveDataMDMRequestDto) => await _receiveService.LouDongDataAsync(receiveDataMDMRequestDto);
         /// <summary>
         /// 房号
         /// </summary>
@@ -272,9 +273,10 @@ namespace GDCMasterDataReceiveApi.Controller
         /// <returns></returns>
         [HttpPost("/api/mdm/Receive/Project")]
         [UnitOfWork]
-        public async Task<MDMResponseResult> ProjectDataAsync([FromBody] BaseReceiveDataRequestDto<ProjectItem> receiveDataMDMRequestDto) {
-            return   await _receiveService.ProjectDataAsync(receiveDataMDMRequestDto);
-        } 
+        public async Task<MDMResponseResult> ProjectDataAsync([FromBody] BaseReceiveDataRequestDto<ProjectItem> receiveDataMDMRequestDto)
+        {
+            return await _receiveService.ProjectDataAsync(receiveDataMDMRequestDto);
+        }
         #endregion
 
         #region 金融机构主数据

@@ -9,6 +9,7 @@ using GDCMasterDataReceiveApi.Application.Contracts.Dto.DeviceClassCode;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.FinancialInstitution;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.InvoiceType;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.Language;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.LouDong;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.Project;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.RoomNumber;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.ScientifiCNoProject;
@@ -147,7 +148,7 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.IService.IReceiveService
         /// 楼栋
         /// </summary>
         /// <returns></returns>
-        Task<MDMResponseResult> LouDongDataAsync();
+        Task<MDMResponseResult> LouDongDataAsync(BaseReceiveDataRequestDto<LouDongItem> receiveDataMDMRequestDto);
         /// <summary>
         /// 房号
         /// </summary>
