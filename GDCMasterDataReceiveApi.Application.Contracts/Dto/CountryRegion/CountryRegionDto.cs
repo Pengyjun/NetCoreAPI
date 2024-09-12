@@ -1,4 +1,6 @@
-﻿namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.CountryRegion
+﻿using GDCMasterDataReceiveApi.Application.Contracts.Dto.OtherModels;
+
+namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.CountryRegion
 {
     #region 后台管理使用
     /// <summary>
@@ -108,7 +110,7 @@
         /// <summary>
         /// 发送记录ID 发送记录的ID，必须保证此ID在同一个发送批次中是唯一的。用于记录发送方对于此发送记录的唯一标识。
         /// </summary>
-        public string ZZSERIAL { get; set; }
+        public long? Id { get; set; }
         /// <summary>
         /// 国家地区代码
         /// </summary>
@@ -169,24 +171,7 @@
         /// <summary>
         /// 多语言描述表类型
         /// </summary>
-        public List<ZMDGTT_ZLANG>? item { get; set; }
+        public CountryRegionModels? ZLANG_LIST { get; set; }
     }
-
-
-    /// <summary>
-    /// 多语言描述表类型
-    /// </summary>
-    public class ZMDGTT_ZLANG 
-    {
-        /// <summary>
-        /// 语种代码
-        /// </summary>
-        public string? ZLANGCODE { get; set; }
-        /// <summary>
-        /// 编码描述
-        /// </summary>
-        public string? ZCODE_DESC { get; set; }
-
-    }                  
     #endregion
 }

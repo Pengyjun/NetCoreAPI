@@ -8,6 +8,7 @@ namespace GDCMasterDataReceiveApi.Domain.Models
     [SugarTable("t_countrylanguage", IsDisabledDelete = true)]
     public class CountryLanguage
     {
+        public long? Id { get; set; }
         /// <summary>
         /// 语种代码
         /// </summary>  

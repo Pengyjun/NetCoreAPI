@@ -246,8 +246,7 @@ namespace GDCMasterDataReceiveApi.Controller
         /// 国家地区
         /// </summary>
         /// <returns></returns>
-
-        [HttpPost("CountryRegion")]
+        [HttpPost("/api/mdm/Receive/CountryRegion")]
         [UnitOfWork]
         public async Task<MDMResponseResult> CountryRegionDataAsync([FromBody] BaseReceiveDataRequestDto<CountryRegionReceiveDto> baseReceiveDataRequest) => await _receiveService.CountryRegionDataAsync(baseReceiveDataRequest);
         #endregion
