@@ -71,6 +71,10 @@
         /// 中交区域总部
         /// </summary>
         Regional = 17,
+        /// <summary>
+        /// 中交区域中心
+        /// </summary>
+        RegionalCenter=18,
 
     }
 }
