@@ -1,24 +1,22 @@
-﻿namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.OtherModels
+﻿using SqlSugar;
+
+namespace GDCMasterDataReceiveApi.Domain.Models
 {
     /// <summary>
-    /// 计量单位其他models
+    /// 计量单位语种
     /// </summary>
-    public class UnitMeasurementModels
-    {
-        public List<ZMDGTT_UNIT_LANG>? Item { get; set; }
-    }
-    /// <summary>
-    /// 计量单位名称（其它语言的集合）
-    /// </summary>
-    public class ZMDGTT_UNIT_LANG
+    [SugarTable("t_unitmeasurementlanguage", IsDisabledDelete = true)]
+    public class UnitMeasurementLanguage : BaseEntity<long>
     {
         /// <summary>
         /// 计量单位代码
         /// </summary>
+        [SugarColumn(Length = 100)]
         public string? ZUNITCODE { get; set; }
         /// <summary>
         /// 语言代码：EN、ES	
         /// </summary>
+        [SugarColumn(Length = 100)]
         public string? ZSPRAS { get; set; }
         /// <summary>
         /// 语言描述:
@@ -26,10 +24,12 @@
         /// 英语: EN
         /// 西班牙语：ES
         /// </summary>
+        [SugarColumn(Length = 500)]
         public string? ZSPTXT { get; set; }
         /// <summary>
         /// 单位描述:计量单位的名称或说明。
         /// </summary>
+        [SugarColumn(Length = 500)]
         public string? ZUNITDESCR { get; set; }
     }
 }

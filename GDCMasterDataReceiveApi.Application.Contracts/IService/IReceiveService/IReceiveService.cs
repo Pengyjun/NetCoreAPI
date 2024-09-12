@@ -11,8 +11,10 @@ using GDCMasterDataReceiveApi.Application.Contracts.Dto.InvoiceType;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.Language;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.LouDong;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.Project;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.Regional;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.RoomNumber;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.ScientifiCNoProject;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.UnitMeasurement;
 using GDCMasterDataReceiveApi.Domain.Shared;
 using GDCMasterDataReceiveApi.Domain.Shared.Annotation;
 
@@ -58,12 +60,12 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.IService.IReceiveService
         /// 中交区域总部
         /// </summary>
         /// <returns></returns>
-        Task<MDMResponseResult> RegionalDataAsync();
+        Task<MDMResponseResult> RegionalDataAsync(BaseReceiveDataRequestDto<RegionalItem> baseReceiveDataRequestDto);
         /// <summary>
         /// 常用计量单位
         /// </summary>
         /// <returns></returns>
-        Task<MDMResponseResult> UnitMeasurementDataAsync();
+        Task<MDMResponseResult> UnitMeasurementDataAsync(BaseReceiveDataRequestDto<UnitMeasurementItem> baseReceiveDataRequestDto);
         /// <summary>
         /// 中交项目行业分类产业分类、业务板块、十二大业务类型、江河湖海对照关系
         /// </summary>
@@ -89,11 +91,6 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.IService.IReceiveService
         /// </summary>
         /// <returns></returns>
         Task<MDMResponseResult> RegionalCenterDataAsync();
-        /// <summary>
-        /// 银行账号
-        /// </summary>
-        /// <returns></returns>
-        Task<MDMResponseResult> BankCardDataAsync();
         /// <summary>
         /// 国民经济行业分类
         /// </summary>

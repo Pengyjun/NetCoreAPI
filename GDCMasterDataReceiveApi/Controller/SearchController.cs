@@ -143,7 +143,7 @@ namespace GDCMasterDataReceiveApi.Controller
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [HttpGet("GetCorresUnitDetail")]
+        [HttpGet("GetCorresUnitDetails")]
         public async Task<ResponseAjaxResult<CorresUnitDetailsDto>> GetCorresUnitDetailAsync([FromQuery] string id)
         {
             return await _searchService.GetCorresUnitDetailAsync(id);
@@ -343,7 +343,7 @@ namespace GDCMasterDataReceiveApi.Controller
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [HttpGet("GetDeviceDetailCodeDetail")]
+        [HttpGet("GetDeviceDetailCodeDetails")]
         public async Task<ResponseAjaxResult<DeviceDetailCodeDetailsDto>> GetDeviceDetailCodeDetailsAsync([FromQuery] string id)
         {
             return await _searchService.GetDeviceDetailCodeDetailsAsync(id);

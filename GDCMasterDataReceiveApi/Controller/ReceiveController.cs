@@ -11,8 +11,10 @@ using GDCMasterDataReceiveApi.Application.Contracts.Dto.InvoiceType;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.Language;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.LouDong;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.Project;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.Regional;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.RoomNumber;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.ScientifiCNoProject;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.UnitMeasurement;
 using GDCMasterDataReceiveApi.Application.Contracts.IService.IReceiveService;
 using GDCMasterDataReceiveApi.Domain.Shared;
 using GDCMasterDataReceiveApi.Domain.Shared.Annotation;
@@ -70,14 +72,14 @@ namespace GDCMasterDataReceiveApi.Controller
         /// <returns></returns>
         [UnitOfWork]
         [HttpPost("Regional")]
-        public async Task<MDMResponseResult> RegionalDataAsync() => await _receiveService.RegionalDataAsync();
+        public async Task<MDMResponseResult> RegionalDataAsync([FromBody] BaseReceiveDataRequestDto<RegionalItem> baseReceiveDataRequestDto) => await _receiveService.RegionalDataAsync(baseReceiveDataRequestDto);
         /// <summary>
         /// 常用计量单位
         /// </summary>
         /// <returns></returns>
         [UnitOfWork]
         [HttpPost("UnitMeasurement")]
-        public async Task<MDMResponseResult> UnitMeasurementDataAsync() => await _receiveService.UnitMeasurementDataAsync();
+        public async Task<MDMResponseResult> UnitMeasurementDataAsync([FromBody] BaseReceiveDataRequestDto<UnitMeasurementItem> baseReceiveDataRequestDto) => await _receiveService.UnitMeasurementDataAsync(baseReceiveDataRequestDto);
         /// <summary>
         /// 中交项目行业分类产业分类、业务板块、十二大业务类型、江河湖海对照关系
         /// </summary>
@@ -106,13 +108,6 @@ namespace GDCMasterDataReceiveApi.Controller
         [UnitOfWork]
         [HttpPost("RegionalCenter")]
         public async Task<MDMResponseResult> RegionalCenterDataAsync() => await _receiveService.RegionalCenterDataAsync();
-        /// <summary>
-        /// 银行账号
-        /// </summary>
-        /// <returns></returns>
-        [UnitOfWork]
-        [HttpPost("BankCard")]
-        public async Task<MDMResponseResult> BankCardDataAsync() => await _receiveService.BankCardDataAsync();
         /// <summary>
         /// 国民经济行业分类
         /// </summary>
