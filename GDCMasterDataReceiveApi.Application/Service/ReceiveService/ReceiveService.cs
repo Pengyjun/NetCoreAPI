@@ -3,6 +3,7 @@ using GDCMasterDataReceiveApi.Application.Contracts;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto._4A.Institution;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto._4A.User;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.BankCard;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.CorresUnit;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.CountryContinent;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.CountryRegion;
@@ -68,34 +69,34 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
         public async Task<MDMResponseResult> CorresUnitDataAsync(BaseReceiveDataRequestDto<CorresUnitReceiveDto> baseReceiveDataRequestDto)
         {
 
-                MDMResponseResult responseAjaxResult = new MDMResponseResult();
-                var projectList = _mapper.Map<List<CorresUnitReceiveDto>, List<CorresUnit>>(baseReceiveDataRequestDto.IT_DATA.item);
-                foreach (var item in projectList)
+            MDMResponseResult responseAjaxResult = new MDMResponseResult();
+            var projectList = _mapper.Map<List<CorresUnitReceiveDto>, List<CorresUnit>>(baseReceiveDataRequestDto.IT_DATA.item);
+            foreach (var item in projectList)
+            {
+                item.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
+            }
+            var projectCodeList = await _dbContext.Queryable<CorresUnit>().Where(x => x.IsDelete == 1).Select(x => new { Id = x.Id, ZBP = x.ZBP }).ToListAsync();
+            var insertOids = projectList.Where(x => !projectCodeList.Select(x => x.ZBP).ToList().Contains(x.ZBP)).Select(x => x.ZBP).ToList();
+            var updateOids = projectList.Where(x => projectCodeList.Select(x => x.ZBP).ToList().Contains(x.ZBP)).Select(x => x.ZBP).ToList();
+            if (insertOids.Any())
+            {
+                //插入操作
+                var batchData = projectList.Where(x => insertOids.Contains(x.ZBP)).ToList();
+                await _dbContext.Fastest<CorresUnit>().BulkCopyAsync(batchData);
+            }
+            if (updateOids.Any())
+            {
+                //更新操作
+                var batchData = projectList.Where(x => updateOids.Contains(x.ZBP)).ToList();
+                foreach (var item in batchData)
                 {
-                    item.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
+                    item.Id = projectCodeList.Where(x => x.ZBP == item.ZBP).Select(x => x.Id).First();
                 }
-                var projectCodeList = await _dbContext.Queryable<CorresUnit>().Where(x => x.IsDelete == 1).Select(x =>new {Id=x.Id,ZBP=x.ZBP }).ToListAsync();
-                var insertOids = projectList.Where(x => !projectCodeList.Select(x=>x.ZBP).ToList().Contains(x.ZBP)).Select(x => x.ZBP).ToList();
-                var updateOids = projectList.Where(x => projectCodeList.Select(x => x.ZBP).ToList().Contains(x.ZBP)).Select(x => x.ZBP).ToList();
-                if (insertOids.Any())
-                {
-                    //插入操作
-                    var batchData = projectList.Where(x => insertOids.Contains(x.ZBP)).ToList();
-                    await _dbContext.Fastest<CorresUnit>().BulkCopyAsync(batchData);
-                }
-                if (updateOids.Any())
-                {
-                    //更新操作
-                    var batchData = projectList.Where(x => updateOids.Contains(x.ZBP)).ToList();
-                    foreach (var item in batchData)
-                    {
-                        item.Id=projectCodeList.Where(x => x.ZBP == item.ZBP).Select(x => x.Id).First();
-                    }
 
-                    await _dbContext.Updateable<CorresUnit>(batchData).ExecuteCommandAsync();
-                }
-                responseAjaxResult.Success();
-                 return responseAjaxResult;
+                await _dbContext.Updateable<CorresUnit>(batchData).ExecuteCommandAsync();
+            }
+            responseAjaxResult.Success();
+            return responseAjaxResult;
         }
         /// <summary>
         /// 多组织-税务代管组织(行政)
@@ -488,9 +489,77 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
         /// <returns></returns>
         public async Task<MDMResponseResult> BankCardDataAsync()
         {
+            MDMResponseResult responseAjaxResult = new MDMResponseResult();
 
-            var responseAjaxResult = new MDMResponseResult();
+            //try
+            //{
+            //    List<InvoiceLanguage> insertItem = new();
+            //    List<InvoiceLanguage> updateItem = new();
+
+            //    var invoiceCodes = await _dbContext.Queryable<BankCard>().Where(x => x.IsDelete == 1).ToListAsync();
+            //    var insertOids = receiveDataMDMRequestDto.IT_DATA.item.Where(x => !invoiceCodes.Select(x => x.ZINVTCODE).ToList().Contains(x.ZINVTCODE)).ToList();
+            //    var updateOids = receiveDataMDMRequestDto.IT_DATA.item.Where(x => invoiceCodes.Select(x => x.ZINVTCODE).ToList().Contains(x.ZINVTCODE)).ToList();
+
+            //    //新增操作
+            //    if (insertOids.Any())
+            //    {
+            //        foreach (var ic in insertOids)
+            //        {
+            //            ic.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
+            //            foreach (var cc in ic.ZLANG_LIST.Item)
+            //            {
+            //                var invoiceLanguage = new InvoiceLanguage
+            //                {
+            //                    Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+            //                    InvoiceCode = ic.ZINVTCODE,
+            //                    ZCODE_DESC = cc.ZCODE_DESC,
+            //                    ZLANGCODE = cc.ZLANGCODE,
+            //                    CreateTime = DateTime.Now
+            //                };
+            //                insertItem.Add(invoiceLanguage);
+            //            }
+            //        }
+
+            //        var invoiceList = _mapper.Map<List<InvoiceTypeItem>, List<InvoiceType>>(insertOids);
+            //        invoiceList.ForEach(x => x.CreateTime = DateTime.Now);
+            //        await _dbContext.Fastest<InvoiceType>().BulkCopyAsync(invoiceList);
+            //        await _dbContext.Fastest<InvoiceLanguage>().BulkCopyAsync(insertItem);
+            //    }
+            //    if (updateOids.Any())
+            //    {
+            //        List<InvoiceLanguage> deleteData = new();
+            //        //更新
+            //        var invoiceLanguageList = await _dbContext.Queryable<InvoiceLanguage>().ToListAsync();
+            //        foreach (var itemItem in updateOids)
+            //        {
+            //            var id = invoiceCodes.Where(x => x.ZINVTCODE == itemItem.ZINVTCODE).Select(x => x.Id).First();
+            //            itemItem.Id = id;
+            //            foreach (var items in itemItem.ZLANG_LIST.Item)
+            //            {
+            //                InvoiceLanguage invoiceLanguage = new InvoiceLanguage()
+            //                {
+            //                    Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+            //                    InvoiceCode = itemItem.ZINVTCODE,
+            //                    ZCODE_DESC = items.ZCODE_DESC,
+            //                    ZLANGCODE = items.ZLANGCODE,
+            //                    CreateTime = DateTime.Now
+            //                };
+            //                updateItem.Add(invoiceLanguage);
+            //            }
+            //            deleteData.AddRange(invoiceLanguageList.Where(x => x.InvoiceCode == itemItem.ZINVTCODE).ToList());
+            //        }
+            //        var invoiceTypeItemList = _mapper.Map<List<InvoiceTypeItem>, List<InvoiceType>>(updateOids);
+            //        await _dbContext.Updateable(invoiceTypeItemList).ExecuteCommandAsync();
+            //        await _dbContext.Deleteable<InvoiceLanguage>().WhereColumns(deleteData, it => new { it.Id }).ExecuteCommandAsync();
+            //        await _dbContext.Insertable(updateItem).ExecuteCommandAsync();
+            //    }
+
             responseAjaxResult.Success();
+            //}
+            //catch (Exception ex)
+            //{
+            //    throw;
+            //}
             return responseAjaxResult;
         }
         /// <summary>

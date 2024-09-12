@@ -1,4 +1,6 @@
-﻿namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.CorresUnit
+﻿using SqlSugar;
+
+namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.CorresUnit
 {
     /// <summary>
     /// 往来单位主数据 反显
@@ -309,5 +311,69 @@
         /// 所属二级单位:记录数据最后修改人的所属二级单位
         /// </summary>
         public string? Z2NDORG { get; set; }
+        /// <summary>
+        /// 银行账号
+        /// </summary>
+        public BankItem? ZBANK_LIST_T {  get; set; }
+    }
+
+    public class BankItem
+    {
+        public List<ZBANKLIST> Item { get; set; }
+    }
+    public class ZBANKLIST
+    {
+        /// <summary>
+        /// 发送记录ID 发送记录的ID，必须保证此ID在同一个发送批次中是唯一的。用于记录发送方对于此发送记录的唯一标识。
+        /// </summary>
+        public string? ZZSERIAL { get; set; }
+        /// <summary>
+        /// 往来单位主数据编码:公司往来单位的唯一编码
+        /// </summary>
+        public string? ZBP { get; set; }
+        /// <summary>
+        /// 银行账号主键：银行账号主键
+        /// </summary>
+        public string? ZBANK { get; set; }
+        /// <summary>
+        /// 账户名称：填报银行账户的全称
+        /// </summary>
+        public string? ZKOINH { get; set; }
+        /// <summary>
+        /// 银行账号/IBAN：填报银行账号/IBAN，该字段作为银行账户的唯一标识
+        /// </summary>
+        public string? ZBANKN { get; set; }
+        /// <summary>
+        /// 金融机构编码：填报具体开户网点，引用金融机构主数据
+        /// </summary>
+        public string? ZFINC { get; set; }
+        /// <summary>
+        /// 金融机构名称：填报具体开户网点，引用金融机构主数据
+        /// </summary>
+        public string? ZFINAME { get; set; }
+        /// <summary>
+        /// 账户状态：银行账户所处状态，包括正常、冻结、其他，默认正常。
+        /// </summary>
+        public string? ZBANKSTA { get; set; }
+        /// <summary>
+        /// 账户币种：按账户实际币种填报。默认人民币。可多值以英文逗号隔开。
+        /// </summary>
+        public string? ZCURR { get; set; }
+        /// <summary>
+        /// 国家/地区：金融机构对应的国家/地区
+        /// </summary>
+        public string? ZZCOUNTR2 { get; set; }
+        /// <summary>
+        /// 省：金融机构对应的省，条件必填，国家/地区为中国的必填
+        /// </summary>
+        public string? ZPROVINC2 { get; set; }
+        /// <summary>
+        /// 市：金融机构对应的市，条件必填，国家/地区为中国的必填
+        /// </summary>
+        public string? ZCITY2 { get; set; }
+        /// <summary>
+        /// 县：2023.2改为非必填
+        /// </summary>
+        public string? ZCOUNTY2 { get; set; }
     }
 }

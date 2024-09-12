@@ -59,7 +59,7 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.AutoMapper
             //境内行政区划
             mapperConfigurationExpression.CreateMap<AdministrativeDivisionItem, AdministrativeDivision>();
             //银行账号
-            mapperConfigurationExpression.CreateMap<BankCardReceiveDto, BankCard>();
+            mapperConfigurationExpression.CreateMap<BankCardItem, BankCard>();
             //商机项目(不含境外商机项目)
             mapperConfigurationExpression.CreateMap<BusinessNoCpportunityReceiveDto, BusinessNoCpportunity>();
             //通用类字典数据

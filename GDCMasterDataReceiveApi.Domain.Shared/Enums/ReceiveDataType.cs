@@ -59,6 +59,14 @@
         /// 语言
         /// </summary>
         Language = 14,
+        /// <summary>
+        /// 楼栋
+        /// </summary>
+        LouDong = 15,
+        /// <summary>
+        /// 银行账号
+        /// </summary>
+        BankCard = 16,
 
     }
 }
