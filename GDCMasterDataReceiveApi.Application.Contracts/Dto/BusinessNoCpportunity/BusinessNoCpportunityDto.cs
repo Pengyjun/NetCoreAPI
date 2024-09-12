@@ -3,64 +3,102 @@
     /// <summary>
     /// 商机项目(不含境外商机项目) 反显
     /// </summary>
-    public class BusinessNoCpportunityDto
+    public class BusinessNoCpportunitySearchDto
     {
         /// <summary>
         /// 主键id
         /// </summary>
-        public long Id { get; set; }
+        public string? Id { get; set; }
         /// <summary>
         /// 商机项目主数据编码:新增项目由主数据系统生成并返回主数据编码，修改时必填
         /// </summary>
-        public string BPjectMDCode { get; set; }
+        public string? BPjectMDCode { get; set; }
         /// <summary>
         /// 商机项目名称:商机项目的中文名称，该字段作为境内和港澳台商机项目的唯一标识
         /// </summary>
-        public string Name { get; set; }
+        public string? Name { get; set; }
         /// <summary>
         /// 商机项目外文名称:商机项目当地官方语言名称，该字段作为境外（不包括港澳台）商机项目的唯一标识
         /// </summary>
-        public string BPjectForeignName { get; set; }
+        public string? BPjectForeignName { get; set; }
         /// <summary>
         /// 项目类型:按照字典表进行选择
         /// </summary>
-        public string PjectType { get; set; }
-        /// <summary>
-        /// 中交项目业务分类:按照字典表进行选择，涉及多个业务分类的商机项目，其属性应优先归入合同额占比最大的业务分类，若合同额占比相同，应归入实施难度最大的业务分类
-        /// </summary>
-        public string BTypeOfCCCCProjects { get; set; }
+        public string? PjectType { get; set; }
         /// <summary>
         /// 国家/地区:商机项目所在的国家/地区
         /// </summary>
-        public string Country { get; set; }
-        /// <summary>
-        /// 项目所在地:参照项目主数据标准要求填写，明确到市级地点，境内项目必填
-        /// </summary>
-        public string PjectLocation { get; set; }
-        /// <summary>
-        /// 开始跟踪日期:填写首次跟踪的日期
-        /// </summary>
-        public string StartTrackingDate { get; set; }
-        /// <summary>
-        ///跟踪单位:填写跟踪单位的机构主数据编码
-        /// </summary>
-        public string TrackingUnit { get; set; }
-        /// <summary>
-        /// 所属二级单位
-        /// </summary>
-        public string UnitSec { get; set; }
+        public string? Country { get; set; }
         /// <summary>
         /// 状态: 数据是否有效的标识: 有效：1无效：0
         /// </summary>
-        public string State { get; set; }
+        public string? State { get; set; }
         /// <summary>
         /// 资质单位
         /// </summary>
-        public string QualificationUnit { get; set; }
+        public string? QualificationUnit { get; set; }
         /// <summary>
         /// 计税方式
         /// </summary>
-        public string TaxationMethod { get; set; }
+        public string? TaxationMethod { get; set; }
+    }
+    /// <summary>
+    /// 商机项目(不含境外商机项目) 详情
+    /// </summary>
+    public class BusinessNoCpportunityDetailsDto
+    {
+        /// <summary>
+        /// 商机项目主数据编码:新增项目由主数据系统生成并返回主数据编码，修改时必填
+        /// </summary>
+        public string? BPjectMDCode { get; set; }
+        /// <summary>
+        /// 商机项目名称:商机项目的中文名称，该字段作为境内和港澳台商机项目的唯一标识
+        /// </summary>
+        public string? Name { get; set; }
+        /// <summary>
+        /// 商机项目外文名称:商机项目当地官方语言名称，该字段作为境外（不包括港澳台）商机项目的唯一标识
+        /// </summary>
+        public string? BPjectForeignName { get; set; }
+        /// <summary>
+        /// 项目类型:按照字典表进行选择
+        /// </summary>
+        public string? PjectType { get; set; }
+        /// <summary>
+        /// 中交项目业务分类:按照字典表进行选择，涉及多个业务分类的商机项目，其属性应优先归入合同额占比最大的业务分类，若合同额占比相同，应归入实施难度最大的业务分类
+        /// </summary>
+        public string? BTypeOfCCCCProjects { get; set; }
+        /// <summary>
+        /// 国家/地区:商机项目所在的国家/地区
+        /// </summary>
+        public string? Country { get; set; }
+        /// <summary>
+        /// 项目所在地:参照项目主数据标准要求填写，明确到市级地点，境内项目必填
+        /// </summary>
+        public string? PjectLocation { get; set; }
+        /// <summary>
+        /// 开始跟踪日期:填写首次跟踪的日期
+        /// </summary>
+        public string? StartTrackingDate { get; set; }
+        /// <summary>
+        ///跟踪单位:填写跟踪单位的机构主数据编码
+        /// </summary>
+        public string? TrackingUnit { get; set; }
+        /// <summary>
+        /// 所属二级单位
+        /// </summary>
+        public string? UnitSec { get; set; }
+        /// <summary>
+        /// 状态: 数据是否有效的标识: 有效：1无效：0
+        /// </summary>
+        public string? State { get; set; }
+        /// <summary>
+        /// 资质单位
+        /// </summary>
+        public string? QualificationUnit { get; set; }
+        /// <summary>
+        /// 计税方式
+        /// </summary>
+        public string? TaxationMethod { get; set; }
         /// <summary>
         /// 参与单位:填写参与部门的行政机构主数据编码，可多值，用英文逗号隔开.
         /// </summary>
@@ -74,59 +112,59 @@
         /// <summary>
         /// 发送记录ID 发送记录的ID，必须保证此ID在同一个发送批次中是唯一的。用于记录发送方对于此发送记录的唯一标识。
         /// </summary>
-        public string ZZSERIAL { get; set; }
+        public string? ZZSERIAL { get; set; }
         /// <summary>
         /// 商机项目主数据编码:新增项目由主数据系统生成并返回主数据编码，修改时必填
         /// </summary>
-        public string ZBOP { get; set; }
+        public string? ZBOP { get; set; }
         /// <summary>
         /// 商机项目名称:商机项目的中文名称，该字段作为境内和港澳台商机项目的唯一标识
         /// </summary>
-        public string ZBOPN { get; set; }
+        public string? ZBOPN { get; set; }
         /// <summary>
         /// 商机项目外文名称:商机项目当地官方语言名称，该字段作为境外（不包括港澳台）商机项目的唯一标识
         /// </summary>
-        public string ZBOPN_EN { get; set; }
+        public string? ZBOPN_EN { get; set; }
         /// <summary>
         /// 项目类型:按照字典表进行选择
         /// </summary>
-        public string ZPROJTYPE { get; set; }
+        public string? ZPROJTYPE { get; set; }
         /// <summary>
         /// 中交项目业务分类:按照字典表进行选择，涉及多个业务分类的商机项目，其属性应优先归入合同额占比最大的业务分类，若合同额占比相同，应归入实施难度最大的业务分类
         /// </summary>
-        public string ZCPBC { get; set; }
+        public string? ZCPBC { get; set; }
         /// <summary>
         /// 国家/地区:商机项目所在的国家/地区
         /// </summary>
-        public string ZZCOUNTRY { get; set; }
+        public string? ZZCOUNTRY { get; set; }
         /// <summary>
         /// 项目所在地:参照项目主数据标准要求填写，明确到市级地点，境内项目必填
         /// </summary>
-        public string ZPROJLOC { get; set; }
+        public string? ZPROJLOC { get; set; }
         /// <summary>
         /// 开始跟踪日期:填写首次跟踪的日期
         /// </summary>
-        public string ZSFOLDATE { get; set; }
+        public string? ZSFOLDATE { get; set; }
         /// <summary>
         ///跟踪单位:填写跟踪单位的机构主数据编码
         /// </summary>
-        public string ZORG { get; set; }
+        public string? ZORG { get; set; }
         /// <summary>
         /// 所属二级单位
         /// </summary>
-        public string Z2NDORG { get; set; }
+        public string? Z2NDORG { get; set; }
         /// <summary>
         /// 状态: 数据是否有效的标识: 有效：1无效：0
         /// </summary>
-        public string ZSTATE { get; set; }
+        public string? ZSTATE { get; set; }
         /// <summary>
         /// 资质单位
         /// </summary>
-        public string ZORG_QUAL { get; set; }
+        public string? ZORG_QUAL { get; set; }
         /// <summary>
         /// 计税方式
         /// </summary>
-        public string ZTAXMETHOD { get; set; }
+        public string? ZTAXMETHOD { get; set; }
         /// <summary>
         /// 参与单位:填写参与部门的行政机构主数据编码，可多值，用英文逗号隔开.
         /// </summary>

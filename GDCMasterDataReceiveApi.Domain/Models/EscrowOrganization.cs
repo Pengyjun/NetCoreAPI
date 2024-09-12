@@ -1,5 +1,4 @@
 ﻿using SqlSugar;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace GDCMasterDataReceiveApi.Domain.Models
 {
@@ -12,23 +11,23 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// <summary>
         /// 发送记录ID 发送记录的ID，必须保证此ID在同一个发送批次中是唯一的。用于记录发送方对于此发送记录的唯一标识。
         /// </summary>
-        [NotMapped]
-        public string ZZSERIAL { get; set; }
+        [SugarColumn(IsIgnore = true)]
+        public string? ZZSERIAL { get; set; }
         /// <summary>
         /// 接口唯一ID  发送记录的ID，必须保证此ID在同一个发送批次中是唯一的。用于记录发送方对于此发送记录的唯一标识。
         /// </summary>
-        [NotMapped]
-        public string ZINSTID { get; set; }
+        [SugarColumn(IsIgnore = true)]
+        public string? ZINSTID { get; set; }
         /// <summary>
         /// 机构主数据编码:机构主数据的唯一标识
         /// </summary>
         [SugarColumn(Length = 9, ColumnName = "OrgMDCode")]
-        public string MDM_CODE { get; set; }
+        public string? MDM_CODE { get; set; }
         /// <summary>
         /// 上级机构主数据编码 :20230627新增
         /// </summary>
         [SugarColumn(Length = 9, ColumnName = "SupOrgMDCode")]
-        public string ZORGUP { get; set; }
+        public string? ZORGUP { get; set; }
         /// <summary>
         /// HR机构主数据编码:机构与人力系统的机构唯一编号（OID，不可改变）
         /// </summary>
@@ -58,17 +57,17 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// 机构属性:机构属性，值域校验
         /// </summary>
         [SugarColumn(Length = 3, ColumnName = "OrgAttr")]
-        public string TYPE { get; set; }
+        public string? TYPE { get; set; }
         /// <summary>
         /// 机构子属性:机构子属性，值域校验
         /// </summary>
         [SugarColumn(Length = 3, ColumnName = "OrgChildAttr")]
-        public string TYPEEXT { get; set; }
+        public string? TYPEEXT { get; set; }
         /// <summary>
         /// 节点排序号:序号
         /// </summary>
         [SugarColumn(Length = 6, ColumnName = "NodeSequence")]
-        public string SNO { get; set; }
+        public string? SNO { get; set; }
         /// <summary>
         /// 名称（中文:Z0名称（中文）
         /// </summary>
@@ -83,7 +82,7 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// 机构状态:机构状态，值域校验
         /// </summary>
         [SugarColumn(Length = 1, ColumnName = "OrgStatus")]
-        public string STATUS { get; set; }
+        public string? STATUS { get; set; }
         /// <summary>
         /// 层级:机构树层级
         /// </summary>

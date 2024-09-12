@@ -1,5 +1,5 @@
-﻿using SqlSugar;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using GDCMasterDataReceiveApi.Domain.OtherModels;
+using SqlSugar;
 
 namespace GDCMasterDataReceiveApi.Domain.Models
 {

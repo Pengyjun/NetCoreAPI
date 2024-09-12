@@ -1,10 +1,5 @@
 ﻿using GDCMasterDataReceiveApi.Domain.Shared.Enums;
 using SqlSugar;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace GDCMasterDataReceiveApi.Domain.Models
 {
@@ -14,7 +9,6 @@ namespace GDCMasterDataReceiveApi.Domain.Models
     [SugarTable("t_receiverecordlog", IsDisabledDelete = true)]
     public class ReceiveRecordLog:BaseEntity<long>
     {
-
         /// <summary>
         /// 1 人员
         /// 2  机构

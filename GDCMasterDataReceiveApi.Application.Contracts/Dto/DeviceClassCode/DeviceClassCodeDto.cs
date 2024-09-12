@@ -1,28 +1,58 @@
-﻿using GDCMasterDataReceiveApi.Domain.Models;
+﻿using GDCMasterDataReceiveApi.Domain.OtherModels;
 
 namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.DeviceClassCode
 {
     /// <summary>
     /// 物资设备分类编码 反显
     /// </summary>
-    public class DeviceClassCodeDto
+    public class DeviceClassCodeSearchDto
     {
         /// <summary>
         /// 主键id
         /// </summary>
-        public long Id { get; set; }
+        public string? Id { get; set; }
         /// <summary>
         /// 分类编码: 分类的唯一性编码
         /// </summary>
-        public string Code { get; set; }
-        /// <summary>
-        /// 分类层级: 该分类名称对应的层级。分为1至4级。
-        /// </summary>
-        public string Level { get; set; }
+        public string? Code { get; set; }
         /// <summary>
         /// 分类名称: 分类的唯一性编码
         /// </summary>
-        public string Name { get; set; }
+        public string? Name { get; set; }
+        /// <summary>
+        /// 分类别名:
+        /// </summary>
+        public string? AliasName { get; set; }
+        /// <summary>
+        /// 分类说明
+        /// </summary>
+        public string? Description { get; set; }
+        /// <summary>
+        /// 计量单位: 物资设备分类的计量单位代码。
+        /// </summary>
+        public string? UnitOfMeasurement { get; set; }
+        /// <summary>
+        /// 使用状态: 该分类是否为正常使用状态，当分类正常使用时为“1”，分类停止使用时为“0”。
+        /// </summary>
+        public string? State { get; set; }
+    }
+    /// <summary>
+    /// 物资设备分类明细
+    /// </summary>
+    public class DeviceClassCodeDetailsDto
+    {
+        /// <summary>
+        /// 分类编码: 分类的唯一性编码
+        /// </summary>
+        public string? Code { get; set; }
+        /// <summary>
+        /// 分类层级: 该分类名称对应的层级。分为1至4级。
+        /// </summary>
+        public string? Level { get; set; }
+        /// <summary>
+        /// 分类名称: 分类的唯一性编码
+        /// </summary>
+        public string? Name { get; set; }
         /// <summary>
         /// 分类别名:
         /// </summary>
@@ -42,7 +72,7 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.DeviceClassCode
         /// <summary>
         /// 使用状态: 该分类是否为正常使用状态，当分类正常使用时为“1”，分类停止使用时为“0”。
         /// </summary>
-        public string State { get; set; }
+        public string? State { get; set; }
         /// <summary>
         /// 是否删除：该分类是否被标记删除，通过上游失效时间进行判断
         /// </summary>
@@ -104,10 +134,10 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.DeviceClassCode
         /// <summary>
         /// 物资设备分类的属性列表
         /// </summary>
-        public List<ZMDGS_PROPERTY>? ZPROPERTY_LIST { get; set; }
+        public ZMDGS_PROPERTY? ZPROPERTY_LIST { get; set; }
         /// <summary>
         /// 物资设备分类属性值列表
         /// </summary>
-        public List<ZMDGS_VALUE>? ZVALUE_LIST { get; set; }
+        public ZMDGS_VALUE? ZVALUE_LIST { get; set; }
     }
 }

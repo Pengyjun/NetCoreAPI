@@ -1,5 +1,4 @@
-﻿using GDCMasterDataReceiveApi.Application.Contracts;
-using GDCMasterDataReceiveApi.Application.Contracts.Dto;
+﻿using GDCMasterDataReceiveApi.Application.Contracts.Dto;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto._4A.Institution;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto._4A.User;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.CorresUnit;
@@ -7,17 +6,15 @@ using GDCMasterDataReceiveApi.Application.Contracts.Dto.CountryContinent;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.CountryRegion;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.Currency;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.DeviceClassCode;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.FinancialInstitution;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.InvoiceType;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.Language;
-using GDCMasterDataReceiveApi.Application.Contracts.Dto.FinancialInstitution;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.Project;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.RoomNumber;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.ScientifiCNoProject;
 using GDCMasterDataReceiveApi.Application.Contracts.IService.IReceiveService;
-using GDCMasterDataReceiveApi.Domain.Models;
 using GDCMasterDataReceiveApi.Domain.Shared;
 using GDCMasterDataReceiveApi.Domain.Shared.Annotation;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GDCMasterDataReceiveApi.Controller
@@ -178,7 +175,6 @@ namespace GDCMasterDataReceiveApi.Controller
         /// </summary>
         /// <returns></returns>
         [UnitOfWork]
-        [AllowAnonymous]
         [HttpPost("LouDong")]
         public async Task<MDMResponseResult> LouDongDataAsync() => await _receiveService.LouDongDataAsync();
         /// <summary>

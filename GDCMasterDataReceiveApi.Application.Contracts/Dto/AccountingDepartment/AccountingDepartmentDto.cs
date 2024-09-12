@@ -3,32 +3,58 @@
     /// <summary>
     /// 核算部门返显响应Dto
     /// </summary>
-    public class AccountingDepartmentDto
+    public class AccountingDepartmentSearchDto
     {
         /// <summary>
         /// 主键id
         /// </summary>
-        public long Id { get; set; }
-        /// <summary>
-        /// 核算组织编号:9月18日新加
-        /// </summary>
-        public string AccOrgCode { get; set; }
+        public string? Id { get; set; }
         /// <summary>
         /// 核算部门编号
         /// </summary>
-        public string AccDepCode { get; set; }
-        /// <summary>
-        /// 核算组织ID
-        /// </summary>
-        public string AccOrgId { get; set; }
-        /// <summary>
-        /// 核算部门ID
-        /// </summary>
-        public string AccDepId { get; set; }
+        public string? AccDepCode { get; set; }
         /// <summary>
         /// 核算部门中文简体名称
         /// </summary>
-        public string Name { get; set; }
+        public string? Name { get; set; }
+        /// <summary>
+        /// 核算部门中文繁体名称
+        /// </summary>
+        public string? AccDepTCCName { get; set; }
+        /// <summary>
+        /// 核算部门英文名称
+        /// </summary>
+        public string? AccDepELName { get; set; }
+        /// <summary>
+        /// 核算部门停用标志：1:停用0:未停用
+        /// </summary>
+        public string? State { get; set; }
+    }
+    /// <summary>
+    /// 核算部门详细
+    /// </summary>
+    public class AccountingDepartmentDetailsDto
+    {
+        /// <summary>
+        /// 核算组织编号:9月18日新加
+        /// </summary>
+        public string? AccOrgCode { get; set; }
+        /// <summary>
+        /// 核算部门编号
+        /// </summary>
+        public string? AccDepCode { get; set; }
+        /// <summary>
+        /// 核算组织ID
+        /// </summary>
+        public string? AccOrgId { get; set; }
+        /// <summary>
+        /// 核算部门ID
+        /// </summary>
+        public string? AccDepId { get; set; }
+        /// <summary>
+        /// 核算部门中文简体名称
+        /// </summary>
+        public string? Name { get; set; }
         /// <summary>
         /// 核算部门中文繁体名称
         /// </summary>

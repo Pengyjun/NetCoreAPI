@@ -26,9 +26,11 @@ using GDCMasterDataReceiveApi.Application.Contracts.Dto.Regional;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.RegionalCenter;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.RelationalContracts;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.RoomNumber;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.ScientifiCNoProject;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.TypeOfBidDisclosureProjectTable;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.UnitMeasurement;
 using GDCMasterDataReceiveApi.Domain.Models;
+using GDCMasterDataReceiveApi.Domain.OtherModels;
 using UtilsSharp;
 
 namespace GDCMasterDataReceiveApi.Application.Contracts.AutoMapper
@@ -56,7 +58,7 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.AutoMapper
             //行政机构和核算机构映射关系
             mapperConfigurationExpression.CreateMap<AdministrativeAccountingMapperReceiveDto, AdministrativeAccountingMapper>();
             //境内行政区划
-            mapperConfigurationExpression.CreateMap<AdministrativeDivisionReceiveDto, AdministrativeDivision>();
+            mapperConfigurationExpression.CreateMap<AdministrativeDivisionItem, AdministrativeDivision>();
             //银行账号
             mapperConfigurationExpression.CreateMap<BankCardReceiveDto, BankCard>();
             //商机项目(不含境外商机项目)
@@ -106,11 +108,27 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.AutoMapper
             //房号
             mapperConfigurationExpression.CreateMap<RoomNumberItem, RoomNumber>();
             //科研项目
-            //mapperConfigurationExpression.CreateMap<ScientifiCNoProjectReceiveDto, ScientifiCNoProject>();
+            mapperConfigurationExpression.CreateMap<ScientifiCNoProjectItem, ScientifiCNoProject>();
             //中标交底项目表类型
             mapperConfigurationExpression.CreateMap<TypeOfBidDisclosureProjectTableReceiveDto, TypeOfBidDisclosureProjectTable>();
             //常用计量单位
             mapperConfigurationExpression.CreateMap<UnitMeasurementReceiveDto, UnitMeasurement>();
+
+
+            #region 其他映射
+            mapperConfigurationExpression.CreateMap<ClassDevice, DeviceClassAttribute>();
+            mapperConfigurationExpression.CreateMap<ClassDeviceValue, DeviceClassAttributeValue>();
+            mapperConfigurationExpression.CreateMap<InvoiceLanguageItem, InvoiceLanguage>();
+            mapperConfigurationExpression.CreateMap<ScientifiCNoProjectItem, ScientifiCNoProject>();
+            mapperConfigurationExpression.CreateMap<SecUnit, KySecUnit>();
+            mapperConfigurationExpression.CreateMap<CDUnit, KyCDUnit>();
+            mapperConfigurationExpression.CreateMap<NameCeng, KyNameCeng>();
+            mapperConfigurationExpression.CreateMap<CanYUnit, KyCanYUnit>();
+            mapperConfigurationExpression.CreateMap<WeiTUnit, KyWeiTUnit>();
+            mapperConfigurationExpression.CreateMap<PLeader, KyPLeader>();
+            mapperConfigurationExpression.CreateMap<CanYDep, KyCanYDep>();
+            mapperConfigurationExpression.CreateMap<LanguageC, LanguageDetails>();
+            #endregion
 
         }
     }

@@ -1,28 +1,44 @@
-﻿using GDCMasterDataReceiveApi.Domain.Models;
-
-namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.NationalEconomy
+﻿namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.NationalEconomy
 {
     /// <summary>
     /// 国民经济行业分类 反显
     /// </summary>
-    public class NationalEconomyDto
+    public class NationalEconomySearchDto
     {
         /// <summary>
         /// 主键id
         /// </summary>
-        public long Id { get; set; }
+        public string? Id { get; set; }
         /// <summary>
         /// 国民经济行业分类代码
         /// </summary>
-        public string Code { get; set; }
+        public string? Code { get; set; }
         /// <summary>
         /// 国民经济行业分类类别名称
         /// </summary>
-        public string Name { get; set; }
+        public string? Name { get; set; }
+        /// <summary>
+        /// 国民经济行业分类说明
+        /// </summary>
+        public string? Descption { get; set; }
+    }
+    /// <summary>
+    /// 国民经济行业分类详细
+    /// </summary>
+    public class NationalEconomyDetailsDto
+    {
+        /// <summary>
+        /// 国民经济行业分类代码
+        /// </summary>
+        public string? Code { get; set; }
+        /// <summary>
+        /// 国民经济行业分类类别名称
+        /// </summary>
+        public string? Name { get; set; }
         /// <summary>
         /// 国民经济行业分类上级代码
         /// </summary>
-        public string SupCode { get; set; }
+        public string? SupCode { get; set; }
         /// <summary>
         /// 国民经济行业分类说明
         /// </summary>
@@ -30,15 +46,15 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.NationalEconomy
         /// <summary>
         /// 版本：数据的版本号。数据每次变更时，版本号自动加1。
         /// </summary>
-        public string Version { get; set; }
+        public string? Version { get; set; }
         /// <summary>
         /// 状态：数据是否有效的标识:有效：1无效：0
         /// </summary>
-        public string State { get; set; }
+        public string? State { get; set; }
         /// <summary>
         /// 是否删除 数据是否有效的标识:有效：1无效：0
         /// </summary>
-        public string DataIdentifier { get; set; }
+        public string? DataIdentifier { get; set; }
     }
     /// <summary>
     /// 国民经济行业分类 接收
@@ -80,6 +96,6 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.NationalEconomy
         /// <summary>
         /// 多语言描述表类型
         /// </summary>
-        public List<ZMDGS_ZLANG5>? ZLANG_LIST { get; set; }
+        //public InvoiceLang? ZLANG_LIST { get; set; }
     }
 }

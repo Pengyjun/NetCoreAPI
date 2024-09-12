@@ -1,5 +1,4 @@
 ﻿using SqlSugar;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace GDCMasterDataReceiveApi.Domain.Models
 {
@@ -12,13 +11,13 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// <summary>
         /// 发送记录ID 发送记录的ID，必须保证此ID在同一个发送批次中是唯一的。用于记录发送方对于此发送记录的唯一标识。
         /// </summary>
-        [NotMapped]
-        public string ZZSERIAL { get; set; }
+        [SugarColumn(IsIgnore = true)]
+        public string ?ZZSERIAL { get; set; }
         /// <summary>
         /// 中交业务分类三级分类代码
         /// </summary>
         [SugarColumn(Length = 5, ColumnName = "CCCCBTypeThirdCode")]
-        public string ZCPBC3ID { get; set; }
+        public string? ZCPBC3ID { get; set; }
         /// <summary>
         /// 中交业务分类一级分类代码 
         /// </summary>
