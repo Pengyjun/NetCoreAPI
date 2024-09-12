@@ -10,6 +10,7 @@ using GDCMasterDataReceiveApi.Application.Contracts.Dto.BusinessNoCpportunity;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.CorresUnit;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.CountryContinent;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.CountryRegion;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.Currency;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.DeviceClassCode;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.DeviceDetailCode;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.EscrowOrganization;
@@ -1080,7 +1081,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
             var responseAjaxResult = new ResponseAjaxResult<BankCardDetailsDto>();
 
             var result = await _dbContext.Queryable<BankCard>()
-                .Where((cc) =>  cc.Id.ToString() == id)
+                .Where((cc) => cc.Id.ToString() == id)
                 .Select((cc) => new BankCardDetailsDto
                 {
                     Name = cc.ZKOINH,
@@ -1870,6 +1871,59 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     TreeLevel = cc.ZO_LEVEL,
                     UnitSecCode = cc.ZGPOID,
                     ViewIdentifier = cc.VIEW_FLAG
+                })
+                .FirstAsync();
+
+            responseAjaxResult.SuccessResult(result);
+            return responseAjaxResult;
+        }
+        /// <summary>
+        /// 获取币种列表
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        public async Task<ResponseAjaxResult<List<CurrencySearchDto>>> GetCurrencySearchAsync(CurrencyRequestDto requestDto)
+        {
+            var responseAjaxResult = new ResponseAjaxResult<List<CurrencySearchDto>>();
+            RefAsync<int> total = 0;
+
+            var ccList = await _dbContext.Queryable<Currency>()
+                .Where((cc) => cc.IsDelete == 1)
+                .Select((cc) => new CurrencySearchDto
+                {
+                    Id = cc.Id.ToString(),
+                    Name = cc.ZCURRENCYNAME,
+                    Code = cc.ZCURRENCYCODE,
+                    LetterCode = cc.ZCURRENCYALPHABET,
+                    StandardName = cc.STANDARDNAMEE
+                })
+                .ToPageListAsync(requestDto.PageIndex, requestDto.PageSize, total);
+
+            responseAjaxResult.Count = total;
+            responseAjaxResult.SuccessResult(ccList);
+            return responseAjaxResult;
+        }
+        /// <summary>
+        /// 获取币种详情
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<ResponseAjaxResult<CurrencyDetailsDto>> GetCurrencyDetailsAsync(string id)
+        {
+            var responseAjaxResult = new ResponseAjaxResult<CurrencyDetailsDto>();
+
+            var result = await _dbContext.Queryable<Currency>()
+                .Where((cc) => cc.IsDelete == 1 && cc.Id.ToString() == id)
+                .Select((cc) => new CurrencyDetailsDto
+                {
+                    State = cc.ZSTATE == "1" ? "有效" : "无效",
+                    Name = cc.ZCURRENCYNAME,
+                    Code = cc.ZCURRENCYCODE,
+                    LetterCode = cc.ZCURRENCYALPHABET,
+                    StandardName = cc.STANDARDNAMEE,
+                    DataIdentifier = cc.ZDELETE == "1" ? "未删除" : "已删除",
+                    Remark = cc.ZREMARKS,
+                    Version = cc.ZVERSION
                 })
                 .FirstAsync();
 

@@ -1,6 +1,7 @@
 ﻿using GDCMasterDataReceiveApi.Application.Contracts.Dto;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto._4A.Institution;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto._4A.User;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.AdministrativeAccountingMapper;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.CorresUnit;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.CountryContinent;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.CountryRegion;
@@ -11,6 +12,7 @@ using GDCMasterDataReceiveApi.Application.Contracts.Dto.InvoiceType;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.Language;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.LouDong;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.Project;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.ProjectClassification;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.Regional;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.RegionalCenter;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.RoomNumber;
@@ -71,7 +73,7 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.IService.IReceiveService
         /// 中交项目行业分类产业分类、业务板块、十二大业务类型、江河湖海对照关系
         /// </summary>
         /// <returns></returns>
-        Task<MDMResponseResult> ProjectClassificationDataAsync();
+        Task<MDMResponseResult> ProjectClassificationDataAsync(BaseReceiveDataRequestDto<ProjectClassificationItem> baseReceiveDataRequestDto);
         /// <summary>
         /// 金融机构
         /// </summary>

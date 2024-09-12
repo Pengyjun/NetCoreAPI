@@ -7,12 +7,34 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.Currency
     /// <summary>
     /// 币种 反显
     /// </summary>
-    public class CurrencyDto
+    public class CurrencySearchDto
     {
         /// <summary>
         /// 主键id
         /// </summary>
-        public long Id { get; set; }
+        public string? Id { get; set; }
+        /// <summary>
+        /// 数字代码:货币数字代码
+        /// </summary>
+        public string? Code { get; set; }
+        /// <summary>
+        /// 货币名称:货币的中文描述
+        /// </summary>
+        public string? Name { get; set; }
+        /// <summary>
+        /// 字母代码:货币字母代码
+        /// </summary>
+        public string? LetterCode { get; set; }
+        /// <summary>
+        /// 货币标准名称:货币标准名称
+        /// </summary>
+        public string? StandardName { get; set; }
+    }
+    /// <summary>
+    /// 币种详情
+    /// </summary>
+    public class CurrencyDetailsDto
+    {
         /// <summary>
         /// 数字代码:货币数字代码
         /// </summary>

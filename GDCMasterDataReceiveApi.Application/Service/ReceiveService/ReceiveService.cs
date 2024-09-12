@@ -3,6 +3,7 @@ using GDCMasterDataReceiveApi.Application.Contracts;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto._4A.Institution;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto._4A.User;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.AdministrativeAccountingMapper;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.CorresUnit;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.CountryContinent;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.CountryRegion;
@@ -13,6 +14,7 @@ using GDCMasterDataReceiveApi.Application.Contracts.Dto.InvoiceType;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.Language;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.LouDong;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.Project;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.ProjectClassification;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.Regional;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.RegionalCenter;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.RoomNumber;
@@ -25,7 +27,6 @@ using GDCMasterDataReceiveApi.Domain.Shared.Enums;
 using GDCMasterDataReceiveApi.Domain.Shared.Utils;
 using Microsoft.Extensions.Logging;
 using SqlSugar;
-using System.Collections.Generic;
 using UtilsSharp;
 
 namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
@@ -492,11 +493,46 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
         /// 中交项目行业分类产业分类、业务板块、十二大业务类型、江河湖海对照关系
         /// </summary>
         /// <returns></returns>
-        public async Task<MDMResponseResult> ProjectClassificationDataAsync()
+        public async Task<MDMResponseResult> ProjectClassificationDataAsync(BaseReceiveDataRequestDto<ProjectClassificationItem> baseReceiveDataRequestDto)
         {
+            MDMResponseResult responseAjaxResult = new MDMResponseResult();
 
-            var responseAjaxResult = new MDMResponseResult();
-            responseAjaxResult.Success();
+            try
+            {
+                var aaMapperList = await _dbContext.Queryable<ProjectClassification>().Where(x => x.IsDelete == 1).ToListAsync();
+                //var insertOids = baseReceiveDataRequestDto.IT_DATA.item.Where(x => !aaMapperList.Select(x => x.ZID).ToList().Contains(x.ZID)).ToList();
+                //var updateOids = baseReceiveDataRequestDto.IT_DATA.item.Where(x => aaMapperList.Select(x => x.ZID).ToList().Contains(x.ZID)).ToList();
+
+                //新增操作
+                //if (insertOids.Any())
+                //{
+                //    foreach (var ic in insertOids)
+                //    {
+                //        ic.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
+                //    }
+
+                //    var mapRmList = _mapper.Map<List<ProjectClassificationItem>, List<ProjectClassification>>(insertOids);
+                //    mapRmList.ForEach(x => x.CreateTime = DateTime.Now);
+                //    await _dbContext.Fastest<ProjectClassification>().BulkCopyAsync(mapRmList);
+                //}
+                //if (updateOids.Any())
+                //{
+                //    ////更新
+                //    //foreach (var itemItem in updateOids)
+                //    //{
+                //    //    var id = aaMapperList.Where(x => x.ZID == itemItem.ZID).Select(x => x.Id).First();
+                //    //    itemItem.Id = id;
+                //    //}
+                //    //var mapRmList = _mapper.Map<List<ProjectClassificationItem>, List<ProjectClassification>>(updateOids);
+                //    //await _dbContext.Updateable(mapRmList).ExecuteCommandAsync();
+                //}
+
+                responseAjaxResult.Success();
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
             return responseAjaxResult;
         }
         /// <summary>

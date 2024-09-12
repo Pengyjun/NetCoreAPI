@@ -1,6 +1,7 @@
 ﻿using GDCMasterDataReceiveApi.Application.Contracts.Dto;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto._4A.Institution;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto._4A.User;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.AdministrativeAccountingMapper;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.CorresUnit;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.CountryContinent;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.CountryRegion;
@@ -11,6 +12,7 @@ using GDCMasterDataReceiveApi.Application.Contracts.Dto.InvoiceType;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.Language;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.LouDong;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.Project;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.ProjectClassification;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.Regional;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.RegionalCenter;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.RoomNumber;
@@ -87,7 +89,7 @@ namespace GDCMasterDataReceiveApi.Controller
         /// <returns></returns>
         [UnitOfWork]
         [HttpPost("ProjectClassification")]
-        public async Task<MDMResponseResult> ProjectClassificationDataAsync() => await _receiveService.ProjectClassificationDataAsync();
+        public async Task<MDMResponseResult> ProjectClassificationDataAsync([FromBody] BaseReceiveDataRequestDto<ProjectClassificationItem> baseReceiveDataRequestDto) => await _receiveService.ProjectClassificationDataAsync(baseReceiveDataRequestDto);
         /// <summary>
         /// 物资设备分类编码
         /// </summary>
