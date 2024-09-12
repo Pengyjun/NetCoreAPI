@@ -86,6 +86,6 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.RegionalCenter
         /// <summary>
         /// 多语言描述表类型
         /// </summary>
-        public RegionalCenterModels? ZMDGTT_ZLANG { get; set; }
+        public RegionalCenterModels? ZLANG_LIST { get; set; }
     }
 }
