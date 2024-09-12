@@ -13,6 +13,7 @@ using GDCMasterDataReceiveApi.Application.Contracts.Dto.InvoiceType;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.Language;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.LouDong;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.Project;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.Regional;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.RoomNumber;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.ScientifiCNoProject;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.UnitMeasurement;
@@ -326,11 +327,81 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
         /// 中交区域总部
         /// </summary>
         /// <returns></returns>
-        public async Task<MDMResponseResult> RegionalDataAsync()
+        public async Task<MDMResponseResult> RegionalDataAsync(BaseReceiveDataRequestDto<RegionalItem> baseReceiveDataRequestDto)
         {
-
             var responseAjaxResult = new MDMResponseResult();
-            responseAjaxResult.Success();
+
+            try
+            {
+                List<RegionLanguage> insertItem = new();
+                List<RegionLanguage> updateItem = new();
+
+                var rlList = await _dbContext.Queryable<Regional>().Where(x => x.IsDelete == 1).ToListAsync();
+                var insertOids = baseReceiveDataRequestDto.IT_DATA.item.Where(x => !rlList.Select(x => x.ZCRHCODE).ToList().Contains(x.ZCRHCODE)).ToList();
+                var updateOids = baseReceiveDataRequestDto.IT_DATA.item.Where(x => rlList.Select(x => x.ZCRHCODE).ToList().Contains(x.ZCRHCODE)).ToList();
+
+                //新增操作
+                if (insertOids.Any())
+                {
+                    foreach (var ic in insertOids)
+                    {
+                        ic.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
+                        foreach (var cc in ic.ZLANG_LIST.Item)
+                        {
+                            var ul = new RegionLanguage
+                            {
+                                Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                                ZCODE_DESC = cc.ZCODE_DESC,
+                                ZLANGCODE = cc.ZLANGCODE,
+                                ZSCRTEXT_S = cc.ZSCRTEXT_S,
+                                Code = ic.ZCRHCODE,
+                                CreateTime = DateTime.Now
+                            };
+                            insertItem.Add(ul);
+                        }
+                    }
+
+                    var mapList = _mapper.Map<List<RegionalItem>, List<Regional>>(insertOids);
+                    mapList.ForEach(x => x.CreateTime = DateTime.Now);
+                    await _dbContext.Fastest<Regional>().BulkCopyAsync(mapList);
+                }
+                if (updateOids.Any())
+                {
+                    List<RegionLanguage> deleteData = new();
+                    //更新
+                    var lgeList = await _dbContext.Queryable<RegionLanguage>().ToListAsync();
+                    foreach (var itemItem in updateOids)
+                    {
+                        var id = rlList.Where(x => x.ZCRHCODE == itemItem.ZCRHCODE).Select(x => x.Id).First();
+                        itemItem.Id = id;
+                        foreach (var items in itemItem.ZLANG_LIST.Item)
+                        {
+                            RegionLanguage ldetails = new RegionLanguage()
+                            {
+                                Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                                Code = itemItem.ZCRHCODE,
+                                ZSCRTEXT_S = items.ZSCRTEXT_S,
+                                ZLANGCODE = items.ZLANGCODE,
+                                ZCODE_DESC = items.ZCODE_DESC,
+                                CreateTime = DateTime.Now
+                            };
+                            updateItem.Add(ldetails);
+                        }
+                        deleteData.AddRange(lgeList.Where(x => x.Code == itemItem.ZCRHCODE).ToList());
+                    }
+                    var mapList = _mapper.Map<List<RegionalItem>, List<Regional>>(updateOids);
+                    await _dbContext.Updateable(mapList).ExecuteCommandAsync();
+                    await _dbContext.Deleteable<RegionLanguage>().WhereColumns(deleteData, it => new { it.Id }).ExecuteCommandAsync();
+                    await _dbContext.Insertable(updateItem).ExecuteCommandAsync();
+                }
+
+                responseAjaxResult.Success();
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+
             return responseAjaxResult;
         }
         /// <summary>

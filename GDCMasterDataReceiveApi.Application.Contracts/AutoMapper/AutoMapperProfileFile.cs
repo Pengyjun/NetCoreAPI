@@ -99,7 +99,7 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.AutoMapper
             //中交项目行业分类产业分类、业务板块、十二大业务类型、江河湖海对照关系
             mapperConfigurationExpression.CreateMap<ProjectClassificationReceiveDto, ProjectClassification>();
             //中交区域总部
-            mapperConfigurationExpression.CreateMap<RegionalReceiveDto, Regional>();
+            mapperConfigurationExpression.CreateMap<RegionalItem, Regional>();
             //中交区域中心
             mapperConfigurationExpression.CreateMap<RegionalCenterReceiveDto, RegionalCenter>();
             //委托关系
@@ -115,18 +115,18 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.AutoMapper
 
 
             #region 其他映射
-            mapperConfigurationExpression.CreateMap<ClassDevice, DeviceClassAttribute>();
-            mapperConfigurationExpression.CreateMap<ClassDeviceValue, DeviceClassAttributeValue>();
-            mapperConfigurationExpression.CreateMap<InvoiceLanguageItem, InvoiceLanguage>();
-            mapperConfigurationExpression.CreateMap<ScientifiCNoProjectItem, ScientifiCNoProject>();
-            mapperConfigurationExpression.CreateMap<SecUnit, KySecUnit>();
-            mapperConfigurationExpression.CreateMap<CDUnit, KyCDUnit>();
-            mapperConfigurationExpression.CreateMap<NameCeng, KyNameCeng>();
-            mapperConfigurationExpression.CreateMap<CanYUnit, KyCanYUnit>();
-            mapperConfigurationExpression.CreateMap<WeiTUnit, KyWeiTUnit>();
-            mapperConfigurationExpression.CreateMap<PLeader, KyPLeader>();
-            mapperConfigurationExpression.CreateMap<CanYDep, KyCanYDep>();
-            mapperConfigurationExpression.CreateMap<LanguageC, LanguageDetails>();
+            //mapperConfigurationExpression.CreateMap<ClassDevice, DeviceClassAttribute>();
+            //mapperConfigurationExpression.CreateMap<ClassDeviceValue, DeviceClassAttributeValue>();
+            //mapperConfigurationExpression.CreateMap<InvoiceLanguageItem, InvoiceLanguage>();
+            //mapperConfigurationExpression.CreateMap<ScientifiCNoProjectItem, ScientifiCNoProject>();
+            //mapperConfigurationExpression.CreateMap<SecUnit, KySecUnit>();
+            //mapperConfigurationExpression.CreateMap<CDUnit, KyCDUnit>();
+            //mapperConfigurationExpression.CreateMap<NameCeng, KyNameCeng>();
+            //mapperConfigurationExpression.CreateMap<CanYUnit, KyCanYUnit>();
+            //mapperConfigurationExpression.CreateMap<WeiTUnit, KyWeiTUnit>();
+            //mapperConfigurationExpression.CreateMap<PLeader, KyPLeader>();
+            //mapperConfigurationExpression.CreateMap<CanYDep, KyCanYDep>();
+            //mapperConfigurationExpression.CreateMap<LanguageC, LanguageDetails>();
             #endregion
 
         }

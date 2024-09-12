@@ -67,6 +67,10 @@
         /// 计量单位
         /// </summary>
         UnitMeasurement = 16,
+        /// <summary>
+        /// 中交区域总部
+        /// </summary>
+        Regional = 17,
 
     }
 }

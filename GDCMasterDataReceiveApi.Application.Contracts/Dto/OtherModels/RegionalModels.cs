@@ -5,6 +5,7 @@
     /// </summary>
     public class RegionalModels
     {
+        public List<ZMDGTT_ZLANG3> Item {  get; set; }
     }
     /// <summary>
     /// 多语言描述表类型

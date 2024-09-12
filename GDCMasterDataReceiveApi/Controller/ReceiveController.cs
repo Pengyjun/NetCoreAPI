@@ -11,6 +11,7 @@ using GDCMasterDataReceiveApi.Application.Contracts.Dto.InvoiceType;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.Language;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.LouDong;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.Project;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.Regional;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.RoomNumber;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.ScientifiCNoProject;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.UnitMeasurement;
@@ -71,7 +72,7 @@ namespace GDCMasterDataReceiveApi.Controller
         /// <returns></returns>
         [UnitOfWork]
         [HttpPost("Regional")]
-        public async Task<MDMResponseResult> RegionalDataAsync() => await _receiveService.RegionalDataAsync();
+        public async Task<MDMResponseResult> RegionalDataAsync([FromBody] BaseReceiveDataRequestDto<RegionalItem> baseReceiveDataRequestDto) => await _receiveService.RegionalDataAsync(baseReceiveDataRequestDto);
         /// <summary>
         /// 常用计量单位
         /// </summary>
