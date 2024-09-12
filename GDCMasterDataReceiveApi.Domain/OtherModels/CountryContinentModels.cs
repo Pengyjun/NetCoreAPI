@@ -5,6 +5,7 @@
     /// </summary>
     public class CountryContinentModels
     {
+        public List<ZMDGS_ZLANG> item { get; set; }
     }
     /// <summary>
     /// 多语言描述表类型

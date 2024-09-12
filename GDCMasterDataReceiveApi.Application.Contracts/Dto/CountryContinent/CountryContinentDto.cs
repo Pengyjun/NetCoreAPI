@@ -1,4 +1,5 @@
 ﻿using GDCMasterDataReceiveApi.Domain.Models;
+using GDCMasterDataReceiveApi.Domain.OtherModels;
 
 namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.CountryContinent
 {
@@ -70,7 +71,7 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.CountryContinent
         /// <summary>
         /// 发送记录ID 发送记录的ID，必须保证此ID在同一个发送批次中是唯一的。用于记录发送方对于此发送记录的唯一标识。
         /// </summary>
-        public string? ZZSERIAL { get; set; }
+        public   long? Id { get; set; }
         /// <summary>
         /// 大洲代码：大洲代码
         /// </summary>
@@ -102,25 +103,6 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.CountryContinent
         /// <summary>
         /// 多语言描述表类型
         /// </summary>
-        public List<ZMDGS_ZLANG>? item { get; set; }
+        public CountryContinentModels? ZLANG_LIST { get; set; }
     }
-    /// <summary>
-    /// 多语言描述表类型
-    /// </summary>
-    public class ZMDGS_ZLANG
-    {
-
-      /// <summary>
-      /// 语种代码
-      /// </summary>
-        public string? ZLANGCODE { get; set; }
-    /// <summary>
-    /// 大洲代码描述
-    /// </summary>
-    public string? ZCODE_DESC { get; set; }
-    /// <summary>
-    /// 区域代码描述
-    /// </summary>
-    public string? ZAREA_DESC { get; set; }
-}
 }

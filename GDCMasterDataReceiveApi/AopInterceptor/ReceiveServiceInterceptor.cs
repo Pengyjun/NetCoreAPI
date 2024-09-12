@@ -1,6 +1,9 @@
 ﻿using Castle.DynamicProxy;
 using GDCMasterDataReceiveApi.Application;
 using GDCMasterDataReceiveApi.Application.Contracts;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.CountryContinent;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.Project;
 using GDCMasterDataReceiveApi.Application.Contracts.IService.IReceiveService;
 using GDCMasterDataReceiveApi.Application.Service.ReceiveService;
 using GDCMasterDataReceiveApi.Domain.Models;
@@ -22,7 +25,11 @@ namespace GHElectronicFileApi.AopInterceptor
     /// </summary>
     public class ReceiveServiceInterceptor : IInterceptor
     {
-        public async void Intercept(IInvocation invocation)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="invocation"></param>
+        public  async void Intercept(IInvocation invocation)
         {
             //请求唯一
             var traceIdentifier= HttpContentAccessFactory.Current.TraceIdentifier;
@@ -38,14 +45,22 @@ namespace GHElectronicFileApi.AopInterceptor
             var parameCount = 0;
             //请求的方法名称
             var methodName = invocation.Method.Name;
+            //接收数据类型
+            ReceiveDataType receiveDataType = 0;
 
             #region 接收类型数据判断
             if (methodName == "ProjectDataAsync")
             {
-
-               var receiveParame=  ((GDCMasterDataReceiveApi.Application.Contracts.Dto.BaseReceiveDataRequestDto<GDCMasterDataReceiveApi.Application.Contracts.Dto.Project.ProjectItem>)invocation.Arguments[0]).IT_DATA;
+                var receiveParame = ((BaseReceiveDataRequestDto<ProjectItem>)invocation.Arguments[0]).IT_DATA;
                 parameCount = receiveParame.item.Count;
                 requestParame = receiveParame.item.ToJson();
+                receiveDataType = ReceiveDataType.Person;
+            } else if (methodName == "CountryContinentDataAsync") 
+            {
+                var receiveParame = ((BaseReceiveDataRequestDto<CountryContinentReceiveDto>)invocation.Arguments[0]).IT_DATA;
+                parameCount = receiveParame.item.Count;
+                requestParame = receiveParame.item.ToJson();
+                receiveDataType = ReceiveDataType.CountryContinent;
             }
             #endregion
 
@@ -58,29 +73,42 @@ namespace GHElectronicFileApi.AopInterceptor
                     ReceiveNumber = parameCount,
                     RequestParame = requestParame,
                     Traceidentifier = traceIdentifier,
+                    ReceiveType= receiveDataType,
                 };
-               await baseService.ReceiveRecordLogAsync(receiveRecordLog, DataOperationType.Insert);
+                baseService.ReceiveRecordLogAsync(receiveRecordLog, DataOperationType.Insert);
             }
             #endregion
 
             //目标方法
-            invocation.Proceed();
-
-
-            #region 更新请求日志
-            if (!string.IsNullOrWhiteSpace(requestParame))
+            try
             {
-                receiveRecordLog = new ReceiveRecordLog()
+                invocation.Proceed();
+                var res=(Task)invocation.ReturnValue;
+                res.Wait();//如果任务有异常 直接报错
+                #region 更新请求日志
+
+                if (!string.IsNullOrWhiteSpace(requestParame))
                 {
-                    Id = receiceRecordId,
-                    ReceiveNumber = parameCount,
-                    RequestParame = requestParame,
-                    SuccessNumber = parameCount,
-                    Traceidentifier= traceIdentifier,
-                };
-                await baseService.ReceiveRecordLogAsync(receiveRecordLog, DataOperationType.Update);
+                    receiveRecordLog = new ReceiveRecordLog()
+                    {
+                        Id = receiceRecordId,
+                        ReceiveNumber = parameCount,
+                        RequestParame = requestParame,
+                        SuccessNumber = parameCount,
+                        Traceidentifier = traceIdentifier,
+                        ReceiveType = receiveDataType,
+                    };
+                     baseService.ReceiveRecordLogAsync(receiveRecordLog, DataOperationType.Update);
+                }
+                #endregion
             }
-            #endregion
+            catch (Exception ex)
+            {
+                //这里不处理  会自动向上抛
+
+            }
+
+
 
         }
     }

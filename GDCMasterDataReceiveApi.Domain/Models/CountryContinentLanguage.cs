@@ -14,6 +14,8 @@ namespace GDCMasterDataReceiveApi.Domain.Models
     [SugarTable("t_countrycontinentlanguage", IsDisabledDelete = true)]
     public class CountryContinentLanguage
     {
+     
+        public long? Id { get; set; }
         /// <summary>
         /// 语种代码
         /// </summary>  
