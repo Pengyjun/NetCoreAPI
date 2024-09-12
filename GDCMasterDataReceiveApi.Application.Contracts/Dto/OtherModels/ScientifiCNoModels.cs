@@ -16,6 +16,10 @@
     public class SecUnit
     {
         /// <summary>
+        /// 
+        /// </summary>
+        public long? Id {  get; set; }
+        /// <summary>
         /// 所属二级单位
         /// </summary>
         public string? Z2NDORG { get; set; }
@@ -37,6 +41,10 @@
     }
     public class CDUnit
     {
+        /// <summary>
+        /// 
+        /// </summary>
+        public long? Id { get; set; }
         /// <summary>
         /// 承担单位
         /// </summary>
@@ -65,6 +73,10 @@
     public class NameCeng
     {
         /// <summary>
+        /// 
+        /// </summary>
+        public long? Id { get; set; }
+        /// <summary>
         /// 行项目编号
         /// </summary>
         public string? ZITEM { get; set; }
@@ -86,6 +98,10 @@
     }
     public class CanYUnit
     {
+        /// <summary>
+        /// 
+        /// </summary>
+        public long? Id { get; set; }
         /// <summary>
         /// 参与单位
         /// </summary>
@@ -113,6 +129,10 @@
     public class WeiTUnit
     {
         /// <summary>
+        /// 
+        /// </summary>
+        public long? Id { get; set; }
+        /// <summary>
         /// 委托单位
         /// </summary>
         public string? ZAUTHORISE { get; set; }
@@ -139,6 +159,10 @@
     public class PLeader
     {
         /// <summary>
+        /// 
+        /// </summary>
+        public long? Id { get; set; }
+        /// <summary>
         /// 项目负责人
         /// </summary>
         public string ZPRINCIPAL { get; set; }
@@ -160,6 +184,10 @@
     }
     public class CanYDep
     {
+        /// <summary>
+        /// 
+        /// </summary>
+        public long? Id { get; set; }
         /// <summary>
         /// 参与部门编号
         /// </summary>

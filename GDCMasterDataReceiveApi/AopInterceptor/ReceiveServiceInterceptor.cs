@@ -2,7 +2,12 @@
 using GDCMasterDataReceiveApi.Application.Contracts;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.CountryContinent;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.DeviceClassCode;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.InvoiceType;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.Language;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.Project;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.RoomNumber;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.ScientifiCNoProject;
 using GDCMasterDataReceiveApi.Domain.Models;
 using GDCMasterDataReceiveApi.Domain.Shared;
 using GDCMasterDataReceiveApi.Domain.Shared.Enums;
@@ -21,16 +26,16 @@ namespace GHElectronicFileApi.AopInterceptor
         /// 
         /// </summary>
         /// <param name="invocation"></param>
-        public  async void Intercept(IInvocation invocation)
+        public async void Intercept(IInvocation invocation)
         {
             //请求唯一
-            var traceIdentifier= HttpContentAccessFactory.Current.TraceIdentifier;
+            var traceIdentifier = HttpContentAccessFactory.Current.TraceIdentifier;
             //日志实例
             ReceiveRecordLog receiveRecordLog = null;
             //雪花ID
             var receiceRecordId = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
-           //注入baseService  
-           var baseService=(IBaseService)HttpContentAccessFactory.Current.RequestServices.GetService<IBaseService>();
+            //注入baseService  
+            var baseService = (IBaseService)HttpContentAccessFactory.Current.RequestServices.GetService<IBaseService>();
             //接收参数
             var requestParame = string.Empty;
             //参数数量
@@ -47,12 +52,48 @@ namespace GHElectronicFileApi.AopInterceptor
                 parameCount = receiveParame.item.Count;
                 requestParame = receiveParame.item.ToJson();
                 receiveDataType = ReceiveDataType.Person;
-            } else if (methodName == "CountryContinentDataAsync") 
+            }
+            else if (methodName == "CountryContinentDataAsync")
             {
                 var receiveParame = ((BaseReceiveDataRequestDto<CountryContinentReceiveDto>)invocation.Arguments[0]).IT_DATA;
                 parameCount = receiveParame.item.Count;
                 requestParame = receiveParame.item.ToJson();
                 receiveDataType = ReceiveDataType.CountryContinent;
+            }
+            else if (methodName == "InvoiceTypeDataAsync")
+            {
+                var receiveParame = ((BaseReceiveDataRequestDto<InvoiceTypeItem>)invocation.Arguments[0]).IT_DATA;
+                parameCount = receiveParame.item.Count;
+                requestParame = receiveParame.item.ToJson();
+                receiveDataType = ReceiveDataType.Invoice;
+            }
+            else if (methodName == "DeviceClassCodeDataAsync")
+            {
+                var receiveParame = ((BaseReceiveDataRequestDto<DeviceClassCodeItem>)invocation.Arguments[0]).IT_DATA;
+                parameCount = receiveParame.item.Count;
+                requestParame = receiveParame.item.ToJson();
+                receiveDataType = ReceiveDataType.ClassDevice;
+            }
+            else if (methodName == "ScientifiCNoProjectDataAsync")
+            {
+                var receiveParame = ((BaseReceiveDataRequestDto<ScientifiCNoProjectItem>)invocation.Arguments[0]).IT_DATA;
+                parameCount = receiveParame.item.Count;
+                requestParame = receiveParame.item.ToJson();
+                receiveDataType = ReceiveDataType.Rcientific;
+            }
+            else if (methodName == "RoomNumberDataAsync")
+            {
+                var receiveParame = ((BaseReceiveDataRequestDto<RoomNumberItem>)invocation.Arguments[0]).IT_DATA;
+                parameCount = receiveParame.item.Count;
+                requestParame = receiveParame.item.ToJson();
+                receiveDataType = ReceiveDataType.Room;
+            }
+            else if (methodName == "LanguageDataAsync")
+            {
+                var receiveParame = ((BaseReceiveDataRequestDto<LanguageItem>)invocation.Arguments[0]).IT_DATA;
+                parameCount = receiveParame.item.Count;
+                requestParame = receiveParame.item.ToJson();
+                receiveDataType = ReceiveDataType.Language;
             }
             #endregion
 
@@ -65,7 +106,7 @@ namespace GHElectronicFileApi.AopInterceptor
                     ReceiveNumber = parameCount,
                     RequestParame = requestParame,
                     Traceidentifier = traceIdentifier,
-                    ReceiveType= receiveDataType,
+                    ReceiveType = receiveDataType,
                 };
                 baseService.ReceiveRecordLogAsync(receiveRecordLog, DataOperationType.Insert);
             }
@@ -75,7 +116,7 @@ namespace GHElectronicFileApi.AopInterceptor
             try
             {
                 invocation.Proceed();
-                var res=(Task)invocation.ReturnValue;
+                var res = (Task)invocation.ReturnValue;
                 res.Wait();//如果任务有异常 直接报错
                 #region 更新请求日志
 
@@ -90,7 +131,7 @@ namespace GHElectronicFileApi.AopInterceptor
                         Traceidentifier = traceIdentifier,
                         ReceiveType = receiveDataType,
                     };
-                     baseService.ReceiveRecordLogAsync(receiveRecordLog, DataOperationType.Update);
+                    baseService.ReceiveRecordLogAsync(receiveRecordLog, DataOperationType.Update);
                 }
                 #endregion
             }
