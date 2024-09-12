@@ -120,6 +120,6 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.AdministrativeDivisi
         /// <summary>
         /// 多语言描述表类型
         /// </summary>
-        public List<ZMDGTT_ZLANG>? ZLANG_LIST { get; set; }
+        //public List<ZMDGTT_ZLANG>? ZLANG_LIST { get; set; }
     }
 }

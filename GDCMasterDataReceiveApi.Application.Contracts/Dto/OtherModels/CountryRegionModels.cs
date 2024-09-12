@@ -5,12 +5,13 @@
     /// </summary>
     public class CountryRegionModels
     {
+        public List<ZLANG_LIST> Item { get; set; }
     }
 
     /// <summary>
     /// 多语言描述表类型
     /// </summary>
-    public class ZMDGTT_ZLANG
+    public class ZLANG_LIST
     {
         /// <summary>
         /// 语种代码

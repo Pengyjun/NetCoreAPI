@@ -60,6 +60,13 @@ namespace GHElectronicFileApi.AopInterceptor
                 requestParame = receiveParame.item.ToJson();
                 receiveDataType = ReceiveDataType.CountryContinent;
             }
+            else if (methodName == "CountryRegionDataAsync")
+            {
+                var receiveParame = ((BaseReceiveDataRequestDto<CountryRegionReceiveDto>)invocation.Arguments[0]).IT_DATA;
+                parameCount = receiveParame.item.Count;
+                requestParame = receiveParame.item.ToJson();
+                receiveDataType = ReceiveDataType.CountryRegion;
+            }
             else if (methodName == "InvoiceTypeDataAsync")
             {
                 var receiveParame = ((BaseReceiveDataRequestDto<InvoiceTypeItem>)invocation.Arguments[0]).IT_DATA;
