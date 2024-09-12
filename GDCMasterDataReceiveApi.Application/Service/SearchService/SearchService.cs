@@ -1056,7 +1056,6 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
             RefAsync<int> total = 0;
 
             var ccList = await _dbContext.Queryable<BankCard>()
-                .Where((cc) => cc.IsDelete == 1)
                 .Select((cc) => new BankCardSearchDto
                 {
                     Id = cc.Id.ToString(),
@@ -1081,7 +1080,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
             var responseAjaxResult = new ResponseAjaxResult<BankCardDetailsDto>();
 
             var result = await _dbContext.Queryable<BankCard>()
-                .Where((cc) => cc.IsDelete == 1 && cc.Id.ToString() == id)
+                .Where((cc) =>  cc.Id.ToString() == id)
                 .Select((cc) => new BankCardDetailsDto
                 {
                     Name = cc.ZKOINH,
