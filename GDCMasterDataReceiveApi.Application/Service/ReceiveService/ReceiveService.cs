@@ -221,80 +221,69 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
         {
 
             MDMResponseResult responseAjaxResult = new MDMResponseResult();
-            #region 记录日志
-            var receiceRecordId = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
-            ReceiveRecordLog receiveRecordLog = new ReceiveRecordLog()
-            {
-                Id = receiceRecordId,
-                ReceiveType = ReceiveDataType.CountryContinent,
-                RequestParame = baseReceiveDataRequestDto.IT_DATA.item.ToJson(),
-                ReceiveNumber = baseReceiveDataRequestDto.IT_DATA.item.Count,
-            };
-            await baseService.ReceiveRecordLogAsync(receiveRecordLog, DataOperationType.Insert);
-            #endregion
-            try
-            {
+           
                 //处理多语言描述表类型
                 List<CountryContinentLanguage> insertzMDGS_OLDNAMEs = new();
                 List<CountryContinentLanguage> updatezMDGS_OLDNAMEs = new();
-                var projectList = _mapper.Map<List<CountryContinentReceiveDto>, List<CountryContinent>>(baseReceiveDataRequestDto.IT_DATA.item);
-                foreach (var item in projectList)
-                {
-                    item.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
-                }
-                var dataList = await _dbContext.Queryable<CountryContinent>().Where(x => x.IsDelete == 1).Select(x => x.ZCONTINENTCODE).ToListAsync();
-                var insertOids = projectList.Where(x => !dataList.Contains(x.ZCONTINENTCODE)).Select(x => x.ZCONTINENTCODE).ToList();
-                var updateOids = projectList.Where(x => dataList.Contains(x.ZCONTINENTCODE)).Select(x => x.ZCONTINENTCODE).ToList();
+                //查询项目表
+                var dataCodeList = await _dbContext.Queryable<CountryContinent>().Where(x => x.IsDelete == 1).ToListAsync();
+                //需要新增的数据
+                var insertOids = baseReceiveDataRequestDto.IT_DATA.item.Where(x => !dataCodeList.Select(x => x.ZCONTINENTCODE).ToList().Contains(x.ZCONTINENTCODE)).ToList();
+                //需要更新的数据
+                var updateOids = baseReceiveDataRequestDto.IT_DATA.item.Where(x => dataCodeList.Select(x => x.ZCONTINENTCODE).ToList().Contains(x.ZCONTINENTCODE)).ToList();
+                //新增操作
                 if (insertOids.Any())
                 {
-                    //插入操作
-                    var batchData = projectList.Where(x => insertOids.Contains(x.ZCONTINENTCODE)).ToList();
-                    foreach (var item in batchData)
+                    foreach (var itemItem in insertOids)
                     {
-                        foreach (var items in item.ZLANG_LIST)
+                        itemItem.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
+                        foreach (var lang in itemItem.ZLANG_LIST.item)
                         {
-                            CountryContinentLanguage projectUsedName = new CountryContinentLanguage()
+                        
+                            CountryContinentLanguage dataItem = new CountryContinentLanguage()
                             {
-
-                                ZAREA_DESC = items.ZAREA_DESC,
-                                ZCODE_DESC = items.ZCODE_DESC,
-                                ZLANGCODE = items.ZLANGCODE,
+                                Id = itemItem.Id.Value,
+                                ZLANGCODE = lang.ZLANGCODE,
+                                ZAREA_DESC = lang.ZAREA_DESC,
+                                ZCODE_DESC = lang.ZCODE_DESC,
                             };
-                            insertzMDGS_OLDNAMEs.Add(projectUsedName);
+                            insertzMDGS_OLDNAMEs.Add(dataItem);
                         }
                     }
-                    await _dbContext.Fastest<CountryContinent>().BulkCopyAsync(batchData);
+                    var projectList = _mapper.Map<List<CountryContinentReceiveDto>, List<CountryContinent>>(insertOids);
+                    await _dbContext.Fastest<CountryContinent>().BulkCopyAsync(projectList);
                     await _dbContext.Fastest<CountryContinentLanguage>().BulkCopyAsync(insertzMDGS_OLDNAMEs);
                 }
                 if (updateOids.Any())
                 {
-                    //更新操作
-                    var batchData = projectList.Where(x => updateOids.Contains(x.ZCONTINENTCODE)).ToList();
-                    foreach (var item in batchData)
+                List<CountryContinentLanguage> deleteData = new List<CountryContinentLanguage>();
+                    //更新曾用名
+                    var projectUsedNameList = await _dbContext.Queryable<CountryContinentLanguage>().ToListAsync();
+                    foreach (var itemItem in updateOids)
                     {
-                        foreach (var items in item.ZLANG_LIST)
+                        var id = dataCodeList.Where(x => x.ZCONTINENTCODE == itemItem.ZCONTINENTCODE).Select(x => x.Id).First();
+                        itemItem.Id = id;
+                        foreach (var items in itemItem.ZLANG_LIST.item)
                         {
-                            CountryContinentLanguage projectUsedName = new CountryContinentLanguage()
+                            CountryContinentLanguage dataItem = new CountryContinentLanguage()
                             {
-
+                                Id = itemItem.Id.Value,
+                                ZLANGCODE = items.ZLANGCODE,
                                 ZAREA_DESC = items.ZAREA_DESC,
                                 ZCODE_DESC = items.ZCODE_DESC,
-                                ZLANGCODE = items.ZLANGCODE,
                             };
-                            updatezMDGS_OLDNAMEs.Add(projectUsedName);
+                            updatezMDGS_OLDNAMEs.Add(dataItem);
                         }
+                        deleteData.AddRange(projectUsedNameList.Where(x => x.Id == itemItem.Id).ToList());
                     }
-                    await _dbContext.Fastest<CountryContinent>().BulkUpdateAsync(batchData);
-                    await _dbContext.Fastest<CountryContinentLanguage>().BulkUpdateAsync(updatezMDGS_OLDNAMEs);
+                    var projectList = _mapper.Map<List<CountryContinentReceiveDto>, List<CountryContinent>>(updateOids);
+                    await _dbContext.Updateable(projectList).ExecuteCommandAsync();
+                    await _dbContext.Deleteable<CountryContinentLanguage>().WhereColumns(deleteData, it => new { it.Id }).ExecuteCommandAsync();
+                    await _dbContext.Insertable(updatezMDGS_OLDNAMEs).ExecuteCommandAsync();
+
                 }
                 responseAjaxResult.Success();
-            }
-            catch (Exception ex)
-            {
-
-                throw;
-            }
-
+          
             return responseAjaxResult;
         }
         /// <summary>

@@ -35,7 +35,7 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// <summary>
         /// 失败消息
         /// </summary>
-        [SugarColumn(Length = 2048)]
+        [SugarColumn(ColumnDataType = "longvarchar")]
         public  string? FailMessage { get; set; }
 
         /// <summary>

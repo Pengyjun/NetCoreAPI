@@ -322,7 +322,7 @@ namespace GDCMasterDataReceiveApi.Filters
                 #endregion
 
                 #region 更新接收数据日志
-                if (context.HttpContext.Request.Path.Value.Contains("Receive"))
+                if (context.HttpContext.Request.RouteValues.Where(x=> x.Value.Equals("Receive")).Any())
                 {
                     var traceIdentifier = context.HttpContext.TraceIdentifier;
                     var db = context.HttpContext.RequestServices.GetService<ISqlSugarClient>();
