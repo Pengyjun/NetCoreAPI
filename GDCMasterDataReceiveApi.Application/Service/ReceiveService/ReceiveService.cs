@@ -288,6 +288,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
                     }
                 }
                 var projectList = _mapper.Map<List<CountryContinentReceiveDto>, List<CountryContinent>>(insertOids);
+                projectList.ForEach(x => x.CreateTime = DateTime.Now);
                 await _dbContext.Fastest<CountryContinent>().BulkCopyAsync(projectList);
                 await _dbContext.Fastest<CountryContinentLanguage>().BulkCopyAsync(insertzMDGS_OLDNAMEs);
             }
@@ -363,27 +364,17 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
         {
 
             MDMResponseResult responseAjaxResult = new MDMResponseResult();
-            #region 记录日志
-            var receiceRecordId = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
-            ReceiveRecordLog receiveRecordLog = new ReceiveRecordLog()
-            {
-                Id = receiceRecordId,
-                ReceiveType = ReceiveDataType.FinancialInstitution,
-                RequestParame = baseReceiveDataRequestDto.IT_DATA.item.ToJson(),
-                ReceiveNumber = baseReceiveDataRequestDto.IT_DATA.item.Count,
-            };
-            await baseService.ReceiveRecordLogAsync(receiveRecordLog, DataOperationType.Insert);
-            #endregion
             try
             {
                 var projectList = _mapper.Map<List<FinancialInstitutionReceiveDto>, List<FinancialInstitution>>(baseReceiveDataRequestDto.IT_DATA.item);
                 foreach (var item in projectList)
                 {
+                    item.CreateTime= DateTime.Now;
                     item.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
                 }
-                var projectCodeList = await _dbContext.Queryable<FinancialInstitution>().Where(x => x.IsDelete == 1).Select(x => x.ZFINC).ToListAsync();
-                var insertOids = projectList.Where(x => !projectCodeList.Contains(x.ZFINC)).Select(x => x.ZFINC).ToList();
-                var updateOids = projectList.Where(x => projectCodeList.Contains(x.ZFINC)).Select(x => x.ZFINC).ToList();
+                var projectCodeList = await _dbContext.Queryable<FinancialInstitution>().Where(x => x.IsDelete == 1).Select(x => new {Id=x.Id, ZFINC=x.ZFINC } ).ToListAsync();
+                var insertOids = projectList.Where(x => !projectCodeList.Select(x=>x.ZFINC).ToList().Contains(x.ZFINC)).Select(x => x.ZFINC).ToList();
+                var updateOids = projectList.Where(x => projectCodeList.Select(x => x.ZFINC).ToList().Contains(x.ZFINC)).Select(x => x.ZFINC).ToList();
                 if (insertOids.Any())
                 {
                     //插入操作
@@ -394,13 +385,17 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
                 {
                     //更新操作
                     var batchData = projectList.Where(x => updateOids.Contains(x.ZFINC)).ToList();
-                    await _dbContext.Fastest<FinancialInstitution>().BulkUpdateAsync(batchData);
+                    foreach (var item in batchData)
+                    {
+                       var id= projectCodeList.Where(x => x.ZFINC == item.ZFINC).Select(x=>x.Id).First();
+                        item.Id = id;
+                    }
+                    await _dbContext.Updateable<FinancialInstitution>(batchData).ExecuteCommandAsync();
                 }
                 responseAjaxResult.Success();
             }
             catch (Exception ex)
             {
-
                 throw;
             }
 
