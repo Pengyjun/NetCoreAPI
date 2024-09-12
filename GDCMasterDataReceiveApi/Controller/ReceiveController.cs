@@ -11,10 +11,12 @@ using GDCMasterDataReceiveApi.Application.Contracts.Dto.FinancialInstitution;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.InvoiceType;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.Language;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.LouDong;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.NationalEconomy;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.Project;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.ProjectClassification;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.Regional;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.RegionalCenter;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.RelationalContracts;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.RoomNumber;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.ScientifiCNoProject;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.UnitMeasurement;
@@ -117,7 +119,7 @@ namespace GDCMasterDataReceiveApi.Controller
         /// <returns></returns>
         [UnitOfWork]
         [HttpPost("NationalEconomy")]
-        public async Task<MDMResponseResult> NationalEconomyDataAsync() => await _receiveService.NationalEconomyDataAsync();
+        public async Task<MDMResponseResult> NationalEconomyDataAsync([FromBody] BaseReceiveDataRequestDto<NationalEconomyItem> baseReceiveDataRequestDto) => await _receiveService.NationalEconomyDataAsync(baseReceiveDataRequestDto);
         /// <summary>
         /// 多组织-行政组织
         /// </summary>
@@ -161,7 +163,7 @@ namespace GDCMasterDataReceiveApi.Controller
         /// <returns></returns>
         [UnitOfWork]
         [HttpPost("RelationalContracts")]
-        public async Task<MDMResponseResult> RelationalContractsDataAsync() => await _receiveService.RelationalContractsDataAsync();
+        public async Task<MDMResponseResult> RelationalContractsDataAsync([FromBody] BaseReceiveDataRequestDto<RelationalContractsItem> baseReceiveDataRequestDto) => await _receiveService.RelationalContractsDataAsync(baseReceiveDataRequestDto);
         /// <summary>
         /// 生产经营管理组织
         /// </summary>

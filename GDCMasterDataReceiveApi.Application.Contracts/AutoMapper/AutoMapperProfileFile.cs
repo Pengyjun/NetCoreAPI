@@ -87,7 +87,7 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.AutoMapper
             //语言语种
             mapperConfigurationExpression.CreateMap<LanguageItem, Language>();
             //国民经济行业分类
-            mapperConfigurationExpression.CreateMap<NationalEconomyReceiveDto, NationalEconomy>();
+            mapperConfigurationExpression.CreateMap<NationalEconomyItem, NationalEconomy>();
             //人员主数据
             mapperConfigurationExpression.CreateMap<Receive4AUser, User>();
             //项目类
@@ -103,7 +103,7 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.AutoMapper
             //中交区域中心
             mapperConfigurationExpression.CreateMap<RegionalCenterItem, RegionalCenter>();
             //委托关系
-            mapperConfigurationExpression.CreateMap<RelationalContractsReceiveDto, RelationalContracts>();
+            mapperConfigurationExpression.CreateMap<RelationalContractsItem, RelationalContracts>();
             //房号
             mapperConfigurationExpression.CreateMap<RoomNumberItem, RoomNumber>();
             //科研项目
