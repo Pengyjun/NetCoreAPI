@@ -1,4 +1,4 @@
-﻿using GDCMasterDataReceiveApi.Domain.OtherModels;
+﻿using GDCMasterDataReceiveApi.Application.Contracts.Dto.OtherModels;
 
 namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.DeviceClassCode
 {

@@ -1,4 +1,4 @@
-﻿namespace GDCMasterDataReceiveApi.Domain.OtherModels
+﻿namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.OtherModels
 {
     /// <summary>
     /// 区域总部其他models

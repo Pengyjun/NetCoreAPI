@@ -1,4 +1,4 @@
-﻿namespace GDCMasterDataReceiveApi.Domain.OtherModels
+﻿namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.OtherModels
 {
     /// <summary>
     /// 项目类其他models

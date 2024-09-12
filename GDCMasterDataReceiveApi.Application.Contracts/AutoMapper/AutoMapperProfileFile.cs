@@ -20,6 +20,7 @@ using GDCMasterDataReceiveApi.Application.Contracts.Dto.InvoiceType;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.Language;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.LouDong;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.NationalEconomy;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.OtherModels;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.Project;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.ProjectClassification;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.Regional;
@@ -30,8 +31,6 @@ using GDCMasterDataReceiveApi.Application.Contracts.Dto.ScientifiCNoProject;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.TypeOfBidDisclosureProjectTable;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.UnitMeasurement;
 using GDCMasterDataReceiveApi.Domain.Models;
-using GDCMasterDataReceiveApi.Domain.OtherModels;
-using UtilsSharp;
 
 namespace GDCMasterDataReceiveApi.Application.Contracts.AutoMapper
 {

@@ -1,6 +1,4 @@
-﻿using GDCMasterDataReceiveApi.Domain.OtherModels;
-
-namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.UnitMeasurement
+﻿namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.UnitMeasurement
 {
     /// <summary>
     /// 常用计量单位 反显
@@ -71,10 +69,10 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.UnitMeasurement
         /// 计量单位名称:计量单位的名称或说明，一般采用中文或常用符号。
         /// </summary>
         public string ZUNITNAME { get; set; }
-        /// <summary>
-        /// 计量单位名称（其它语言的集合）
-        /// </summary>
-        public List<ZMDGTT_UNIT_LANG>? ZUNIT_LANG { get; set; }
+        ///// <summary>
+        ///// 计量单位名称（其它语言的集合）
+        ///// </summary>
+        //public List<ZMDGTT_UNIT_LANG>? ZUNIT_LANG { get; set; }
         /// <summary>
         /// 版本：数据的版本号。数据每次变更时，版本号自动加1。
         /// </summary>

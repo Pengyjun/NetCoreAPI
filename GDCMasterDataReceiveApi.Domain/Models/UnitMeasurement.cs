@@ -1,5 +1,4 @@
-﻿using GDCMasterDataReceiveApi.Domain.OtherModels;
-using SqlSugar;
+﻿using SqlSugar;
 
 namespace GDCMasterDataReceiveApi.Domain.Models
 {
@@ -24,11 +23,11 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// </summary>
         [SugarColumn(Length = 200, ColumnName = "Name")]
         public string? ZUNITNAME { get; set; }
-        /// <summary>
-        /// 计量单位名称（其它语言的集合）
-        /// </summary>
-        [SugarColumn(IsIgnore = true)]
-        public List<ZMDGTT_UNIT_LANG>? ZUNIT_LANG { get; set; }
+        ///// <summary>
+        ///// 计量单位名称（其它语言的集合）
+        ///// </summary>
+        //[SugarColumn(IsIgnore = true)]
+        //public List<ZMDGTT_UNIT_LANG>? ZUNIT_LANG { get; set; }
         /// <summary>
         /// 版本：数据的版本号。数据每次变更时，版本号自动加1。
         /// </summary>

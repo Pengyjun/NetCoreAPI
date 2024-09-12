@@ -1,6 +1,4 @@
-﻿using GDCMasterDataReceiveApi.Domain.Models;
-
-namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.Currency
+﻿namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.Currency
 {
 
     #region 后台管理使用

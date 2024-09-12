@@ -1,5 +1,4 @@
-﻿using GDCMasterDataReceiveApi.Domain.OtherModels;
-using SqlSugar;
+﻿using SqlSugar;
 
 namespace GDCMasterDataReceiveApi.Domain.Models
 {
@@ -49,10 +48,10 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// </summary>
         [SugarColumn(Length = 300, ColumnName = "Remark")]
         public string? ZREMARK { get; set; }
-        /// <summary>
-        /// 物资设备属性列表
-        /// </summary>
-        [SugarColumn(IsIgnore = true)]
-        public List<ZMDGTT_MATATTR_DATA_IF>? ZMATTTR_LIST { get; set; }
+        ///// <summary>
+        ///// 物资设备属性列表
+        ///// </summary>
+        //[SugarColumn(IsIgnore = true)]
+        //public List<ZMDGTT_MATATTR_DATA_IF>? ZMATTTR_LIST { get; set; }
     }
 }
