@@ -25,7 +25,7 @@ namespace GHElectronicFileApi.AopInterceptor
 {
 
     /// <summary>
-    /// 操作记录拦截器
+    /// 接收数据拦截器AOP
     /// </summary>
     public class ReceiveServiceInterceptor : IInterceptor
     {
