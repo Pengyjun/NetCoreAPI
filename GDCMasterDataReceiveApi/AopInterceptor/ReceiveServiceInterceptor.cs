@@ -1,8 +1,10 @@
 ﻿using Castle.DynamicProxy;
 using GDCMasterDataReceiveApi.Application.Contracts;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.CorresUnit;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.CountryContinent;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.CountryRegion;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.Currency;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.DeviceClassCode;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.InvoiceType;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.Language;
@@ -67,6 +69,20 @@ namespace GHElectronicFileApi.AopInterceptor
                 parameCount = receiveParame.item.Count;
                 requestParame = receiveParame.item.ToJson();
                 receiveDataType = ReceiveDataType.CountryRegion;
+            }
+            else if (methodName == "CorresUnitDataAsync")
+            {
+                var receiveParame = ((BaseReceiveDataRequestDto<CorresUnitReceiveDto>)invocation.Arguments[0]).IT_DATA;
+                parameCount = receiveParame.item.Count;
+                requestParame = receiveParame.item.ToJson();
+                receiveDataType = ReceiveDataType.CrossUnit;
+            }
+            else if (methodName == "CurrencyDataAsync")
+            {
+                var receiveParame = ((BaseReceiveDataRequestDto<CurrencyReceiveDto>)invocation.Arguments[0]).IT_DATA;
+                parameCount = receiveParame.item.Count;
+                requestParame = receiveParame.item.ToJson();
+                receiveDataType = ReceiveDataType.Currency;
             }
             else if (methodName == "InvoiceTypeDataAsync")
             {

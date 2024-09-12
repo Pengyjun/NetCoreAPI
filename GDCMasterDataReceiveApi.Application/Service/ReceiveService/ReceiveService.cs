@@ -68,28 +68,15 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
         public async Task<MDMResponseResult> CorresUnitDataAsync(BaseReceiveDataRequestDto<CorresUnitReceiveDto> baseReceiveDataRequestDto)
         {
 
-            MDMResponseResult responseAjaxResult = new MDMResponseResult();
-            #region 记录日志
-            var receiceRecordId = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
-            ReceiveRecordLog receiveRecordLog = new ReceiveRecordLog()
-            {
-                Id = receiceRecordId,
-                ReceiveType = ReceiveDataType.CrossUnit,
-                RequestParame = baseReceiveDataRequestDto.IT_DATA.item.ToJson(),
-                ReceiveNumber = baseReceiveDataRequestDto.IT_DATA.item.Count,
-            };
-            await baseService.ReceiveRecordLogAsync(receiveRecordLog, DataOperationType.Insert);
-            #endregion
-            try
-            {
+                MDMResponseResult responseAjaxResult = new MDMResponseResult();
                 var projectList = _mapper.Map<List<CorresUnitReceiveDto>, List<CorresUnit>>(baseReceiveDataRequestDto.IT_DATA.item);
                 foreach (var item in projectList)
                 {
                     item.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
                 }
-                var projectCodeList = await _dbContext.Queryable<CorresUnit>().Where(x => x.IsDelete == 1).Select(x => x.ZBP).ToListAsync();
-                var insertOids = projectList.Where(x => !projectCodeList.Contains(x.ZBP)).Select(x => x.ZBP).ToList();
-                var updateOids = projectList.Where(x => projectCodeList.Contains(x.ZBP)).Select(x => x.ZBP).ToList();
+                var projectCodeList = await _dbContext.Queryable<CorresUnit>().Where(x => x.IsDelete == 1).Select(x =>new {Id=x.Id,ZBP=x.ZBP }).ToListAsync();
+                var insertOids = projectList.Where(x => !projectCodeList.Select(x=>x.ZBP).ToList().Contains(x.ZBP)).Select(x => x.ZBP).ToList();
+                var updateOids = projectList.Where(x => projectCodeList.Select(x => x.ZBP).ToList().Contains(x.ZBP)).Select(x => x.ZBP).ToList();
                 if (insertOids.Any())
                 {
                     //插入操作
@@ -100,16 +87,15 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
                 {
                     //更新操作
                     var batchData = projectList.Where(x => updateOids.Contains(x.ZBP)).ToList();
-                    await _dbContext.Fastest<CorresUnit>().BulkUpdateAsync(batchData);
+                    foreach (var item in batchData)
+                    {
+                        item.Id=projectCodeList.Where(x => x.ZBP == item.ZBP).Select(x => x.Id).First();
+                    }
+
+                    await _dbContext.Updateable<CorresUnit>(batchData).ExecuteCommandAsync();
                 }
                 responseAjaxResult.Success();
-            }
-            catch (Exception ex)
-            {
-                throw;
-            }
-
-            return responseAjaxResult;
+                 return responseAjaxResult;
         }
         /// <summary>
         /// 多组织-税务代管组织(行政)
@@ -615,8 +601,64 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
         public async Task<MDMResponseResult> CurrencyDataAsync(BaseReceiveDataRequestDto<CurrencyReceiveDto> baseReceiveDataRequestDto)
         {
 
-            await Console.Out.WriteLineAsync("接收到的数据：" + baseReceiveDataRequestDto.IT_DATA.ToJson());
             var responseAjaxResult = new MDMResponseResult();
+            ////处理曾用名
+            List<Currencylanguage> insertzMDGS_OLDNAMEs = new();
+            List<Currencylanguage> updatezMDGS_OLDNAMEs = new();
+            //查询项目表
+            var projectCodeList = await _dbContext.Queryable<Currency>().Where(x => x.IsDelete == 1).ToListAsync();
+            //需要新增的数据
+            var insertOids = baseReceiveDataRequestDto.IT_DATA.item.Where(x => !projectCodeList.Select(x => x.ZCURRENCYCODE).ToList().Contains(x.ZCURRENCYCODE)).ToList();
+            //需要更新的数据
+            var updateOids = baseReceiveDataRequestDto.IT_DATA.item.Where(x => projectCodeList.Select(x => x.ZCURRENCYCODE).ToList().Contains(x.ZCURRENCYCODE)).ToList();
+            //新增操作
+            if (insertOids.Any())
+            {
+                foreach (var itemItem in insertOids)
+                {
+                    itemItem.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
+                    foreach (var items in itemItem.ZLANG_LIST.Item)
+                    {
+                        Currencylanguage projectUsedName = new Currencylanguage()
+                        {
+                            Id = itemItem.Id.Value,
+                            ZCODE_DESC = items.ZCODE_DESC,
+                            ZLANGCODE = items.ZLANGCODE
+                        };
+                        insertzMDGS_OLDNAMEs.Add(projectUsedName);
+                    }
+                }
+                var projectList = _mapper.Map<List<CurrencyReceiveDto>, List<Currency>>(insertOids);
+                await _dbContext.Fastest<Currency>().BulkCopyAsync(projectList);
+                await _dbContext.Fastest<Currencylanguage>().BulkCopyAsync(insertzMDGS_OLDNAMEs);
+            }
+            if (updateOids.Any())
+            {
+                List<Currencylanguage> deleteData = new List<Currencylanguage>();
+                //更新曾用名
+                var projectUsedNameList = await _dbContext.Queryable<Currencylanguage>().ToListAsync();
+                foreach (var itemItem in updateOids)
+                {
+                    var id = projectCodeList.Where(x => x.ZCURRENCYCODE == itemItem.ZCURRENCYCODE).Select(x => x.Id).First();
+                    itemItem.Id = id;
+                    foreach (var items in itemItem.ZLANG_LIST.Item)
+                    {
+                        Currencylanguage projectUsedName = new Currencylanguage()
+                        {
+                            Id = itemItem.Id.Value,
+                            ZLANGCODE = items.ZLANGCODE,
+                            ZCODE_DESC = items.ZCODE_DESC
+                        };
+                        updatezMDGS_OLDNAMEs.Add(projectUsedName);
+                    }
+                    deleteData.AddRange(projectUsedNameList.Where(x => x.Id == itemItem.Id).ToList());
+                }
+                var projectList = _mapper.Map<List<CurrencyReceiveDto>, List<Currency>>(updateOids);
+                await _dbContext.Updateable(projectList).ExecuteCommandAsync();
+                await _dbContext.Deleteable<Currencylanguage>().WhereColumns(deleteData, it => new { it.Id }).ExecuteCommandAsync();
+                await _dbContext.Insertable(updatezMDGS_OLDNAMEs).ExecuteCommandAsync();
+
+            }
             responseAjaxResult.Success();
             return responseAjaxResult;
         }
