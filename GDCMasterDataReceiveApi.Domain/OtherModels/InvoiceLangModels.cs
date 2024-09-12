@@ -19,6 +19,10 @@
     public class InvoiceLanguageItem
     {
         /// <summary>
+        /// 
+        /// </summary>
+        public long Id { get; set; }
+        /// <summary>
         /// 语种代码
         /// 10
         /// </summary>

@@ -1,5 +1,4 @@
 ﻿using Castle.DynamicProxy;
-using GDCMasterDataReceiveApi.Application;
 using GDCMasterDataReceiveApi.Application.Contracts;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.CountryContinent;
@@ -8,13 +7,8 @@ using GDCMasterDataReceiveApi.Application.Contracts.IService.IReceiveService;
 using GDCMasterDataReceiveApi.Application.Service.ReceiveService;
 using GDCMasterDataReceiveApi.Domain.Models;
 using GDCMasterDataReceiveApi.Domain.Shared;
-using GDCMasterDataReceiveApi.Domain.Shared.Annotation;
 using GDCMasterDataReceiveApi.Domain.Shared.Enums;
 using GDCMasterDataReceiveApi.Domain.Shared.Utils;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc.Abstractions;
-using SqlSugar;
-using System.Reflection;
 using UtilsSharp;
 
 namespace GHElectronicFileApi.AopInterceptor
