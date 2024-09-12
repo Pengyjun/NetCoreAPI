@@ -11,10 +11,12 @@ using GDCMasterDataReceiveApi.Application.Contracts.Dto.FinancialInstitution;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.InvoiceType;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.Language;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.LouDong;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.NationalEconomy;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.Project;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.ProjectClassification;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.Regional;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.RegionalCenter;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.RelationalContracts;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.RoomNumber;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.ScientifiCNoProject;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.UnitMeasurement;
@@ -98,7 +100,7 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.IService.IReceiveService
         /// 国民经济行业分类
         /// </summary>
         /// <returns></returns>
-        Task<MDMResponseResult> NationalEconomyDataAsync();
+        Task<MDMResponseResult> NationalEconomyDataAsync(BaseReceiveDataRequestDto<NationalEconomyItem> baseReceiveDataRequestDto);
         /// <summary>
         /// 多组织-行政组织
         /// </summary>
@@ -138,7 +140,7 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.IService.IReceiveService
         /// 委托关系
         /// </summary>
         /// <returns></returns>
-        Task<MDMResponseResult> RelationalContractsDataAsync();
+        Task<MDMResponseResult> RelationalContractsDataAsync(BaseReceiveDataRequestDto<RelationalContractsItem> baseReceiveDataRequestDto);
         /// <summary>
         /// 生产经营管理组织
         /// </summary>

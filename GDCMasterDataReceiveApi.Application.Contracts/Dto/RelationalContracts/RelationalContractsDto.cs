@@ -75,24 +75,28 @@
     /// <summary>
     /// 委托关系 接收
     /// </summary>
-    public class RelationalContractsReceiveDto
+    public class RelationalContractsItem
     {
+        /// <summary>
+        /// 
+        /// </summary>
+        public long? Id { get; set; }
         /// <summary>
         /// 发送记录ID 发送记录的ID，必须保证此ID在同一个发送批次中是唯一的。用于记录发送方对于此发送记录的唯一标识。
         /// </summary>
-        public string ZZSERIAL { get; set; }
+        public string? ZZSERIAL { get; set; }
         /// <summary>
         /// 机构主数据编码:2023年2月20日多机构新增
         /// </summary>
-        public string MDM_CODE { get; set; }
+        public string? MDM_CODE { get; set; }
         /// <summary>
         /// 委托单位明细行项目:2023年2月20日多机构新增主映射关系传值‘0’
         /// </summary>
-        public string ZNUMC4 { get; set; }
+        public string? ZNUMC4 { get; set; }
         /// <summary>
         /// 视图标识:目前仅传输单值:zx-机构视图、zy-核算组织视图、ZG-管理组织视图、Z4-税务代管组织（行政）视图。
         /// </summary>
-        public string ZMVIEW_FLAG { get; set; }
+        public string? ZMVIEW_FLAG { get; set; }
         /// <summary>
         /// 委托单位编码:2023年2月20日多机构新增
         /// </summary>
@@ -116,10 +120,10 @@
         /// <summary>
         /// 组织树编码:2023年2月20日多机构新增值域：1-组织机构树，2-核算组织树，3-管理组织树
         /// </summary>
-        public string ZTREEID { get; set; }
+        public string? ZTREEID { get; set; }
         /// <summary>
         /// 组织树版本号:2023年2月20日多机构新增
         /// </summary>
-        public string ZTREEVER { get; set; }
+        public string? ZTREEVER { get; set; }
     }
 }
