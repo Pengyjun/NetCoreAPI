@@ -13,12 +13,12 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// 科研编码
         /// </summary>
         [SugarColumn(Length = 100)]
-        public string Code { get; set; }
+        public string? Code { get; set; }
         /// <summary>
         /// 所属二级单位
         /// </summary>
         [SugarColumn(Length = 100, ColumnName = "SecUnit")]
-        public string Z2NDORG { get; set; }
+        public string? Z2NDORG { get; set; }
         /// <summary>
         /// 所属二级单位名称
         /// </summary>
@@ -35,12 +35,12 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// 科研编码
         /// </summary>
         [SugarColumn(Length = 100)]
-        public string Code { get; set; }
+        public string? Code { get; set; }
         /// <summary>
         /// 承担单位
         /// </summary>
         [SugarColumn(Length = 100, ColumnName = "CDUnit")]
-        public string ZUDTK { get; set; }
+        public string? ZUDTK { get; set; }
         /// <summary>
         /// 承担单位名称
         /// </summary>
@@ -50,7 +50,7 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// 内部/外部:1 内部/2 外部
         /// </summary>
         [SugarColumn(Length = 50, ColumnName = "Zioside")]
-        public string ZIOSIDE { get; set; }
+        public string? ZIOSIDE { get; set; }
     }
     /// <summary>
     /// 曾用名
@@ -62,17 +62,17 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// 科研编码
         /// </summary>
         [SugarColumn(Length = 100)]
-        public string Code { get; set; }
+        public string? Code { get; set; }
         /// <summary>
         /// 行项目编号
         /// </summary>
         [SugarColumn(Length = 100, ColumnName = "PNo")]
-        public string ZITEM { get; set; }
+        public string? ZITEM { get; set; }
         /// <summary>
         /// 曾用名
         /// </summary>
         [SugarColumn(Length = 200, ColumnName = "Name")]
-        public string ZOLDNAME { get; set; }
+        public string? ZOLDNAME { get; set; }
     }
     /// <summary>
     /// 参与单位
@@ -84,12 +84,12 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// 科研编码
         /// </summary>
         [SugarColumn(Length = 100)]
-        public string Code { get; set; }
+        public string? Code { get; set; }
         /// <summary>
         /// 参与单位
         /// </summary>
         [SugarColumn(Length = 100, ColumnName = "CyUnit")]
-        public string ZPU { get; set; }
+        public string? ZPU { get; set; }
         /// <summary>
         /// 参与单位名称
         /// </summary>
@@ -99,7 +99,7 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// 内部/外部 :1 内部/2 外部
         /// </summary>
         [SugarColumn(Length = 50, ColumnName = "Zioside")]
-        public string ZIOSIDE { get; set; }
+        public string? ZIOSIDE { get; set; }
     }
     /// <summary>
     /// 委托单位
@@ -111,12 +111,12 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// 科研编码
         /// </summary>
         [SugarColumn(Length = 100)]
-        public string Code { get; set; }
+        public string? Code { get; set; }
         /// <summary>
         /// 委托单位
         /// </summary>
         [SugarColumn(Length = 100, ColumnName = "WeiTUnit")]
-        public string ZAUTHORISE { get; set; }
+        public string? ZAUTHORISE { get; set; }
         /// <summary>
         /// 委托单位名称
         /// </summary>
@@ -126,7 +126,7 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// 内部/外部:1 内部/2 外部
         /// </summary>
         [SugarColumn(Length = 50, ColumnName = "Zioside")]
-        public string ZIOSIDE { get; set; }
+        public string? ZIOSIDE { get; set; }
     }
     /// <summary>
     /// 项目负责人
@@ -138,12 +138,12 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// 科研编码
         /// </summary>
         [SugarColumn(Length = 100)]
-        public string Code { get; set; }
+        public string? Code { get; set; }
         /// <summary>
         /// 项目负责人
         /// </summary>
         [SugarColumn(Length = 200, ColumnName = "Pleader")]
-        public string ZPRINCIPAL { get; set; }
+        public string? ZPRINCIPAL { get; set; }
         /// <summary>
         /// 项目负责人名称
         /// </summary>
@@ -160,7 +160,7 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// 参与部门编号
         /// </summary>
         [SugarColumn(Length = 100, ColumnName = "CanYDep")]
-        public string ZKZDEPART { get; set; }
+        public string? ZKZDEPART { get; set; }
         /// <summary>
         /// 参与部门名称
         /// </summary>
@@ -170,6 +170,6 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// 科研编码
         /// </summary>
         [SugarColumn(Length = 100)]
-        public string Code { get; set; }
+        public string? Code { get; set; }
     }
 }

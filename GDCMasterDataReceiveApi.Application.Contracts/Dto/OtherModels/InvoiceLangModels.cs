@@ -19,10 +19,6 @@
     public class InvoiceLanguageItem
     {
         /// <summary>
-        /// 
-        /// </summary>
-        public long Id { get; set; }
-        /// <summary>
         /// 语种代码
         /// 10
         /// </summary>
@@ -32,10 +28,5 @@
         /// 255
         /// </summary>
         public string? ZCODE_DESC { get; set; }
-
-        /// <summary>
-        /// 发票编码
-        /// </summary>
-        public string? InvoiceCode { get; set; }
     }
 }

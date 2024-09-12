@@ -15,10 +15,6 @@
     public class LanguageC
     {
         /// <summary>
-        /// 关联的编码
-        /// </summary>
-        public string? Code { get; set; }
-        /// <summary>
         /// 语种代码
         /// 10
         /// </summary>

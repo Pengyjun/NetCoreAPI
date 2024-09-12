@@ -3,7 +3,7 @@
     /// <summary>
     /// 科研项目其他相关models
     /// </summary>
-    public  class ScientifiCNoModels
+    public class ScientifiCNoModels
     {
     }
     /// <summary>
@@ -23,10 +23,6 @@
         /// 所属二级单位名称
         /// </summary>
         public string? Z2NDORGN { get; set; }
-        /// <summary>
-        /// 科研编码
-        /// </summary>
-        public string? Code { get; set; }
     }
     /// <summary>
     /// 承担单位
@@ -49,10 +45,6 @@
         /// 内部/外部:1 内部/2 外部
         /// </summary>
         public string? ZIOSIDE { get; set; }
-        /// <summary>
-        /// 科研编码
-        /// </summary>
-        public string? Code { get; set; }
     }
     /// <summary>
     /// 曾用名  
@@ -72,10 +64,6 @@
         /// 曾用名
         /// </summary>
         public string? ZOLDNAME { get; set; }
-        /// <summary>
-        /// 科研编码
-        /// </summary>
-        public string? Code { get; set; }
     }
     /// <summary>
     ///  参与单位 
@@ -98,10 +86,6 @@
         /// 内部/外部 :1 内部/2 外部
         /// </summary>
         public string? ZIOSIDE { get; set; }
-        /// <summary>
-        /// 科研编码
-        /// </summary>
-        public string? Code { get; set; }
     }
     /// <summary>
     ///  委托单位
@@ -124,10 +108,6 @@
         /// 内部/外部:1 内部/2 外部
         /// </summary>
         public string? ZIOSIDE { get; set; }
-        /// <summary>
-        /// 科研编码
-        /// </summary>
-        public string? Code { get; set; }
     }
     /// <summary>
     ///  项目负责人
@@ -146,10 +126,6 @@
         /// 项目负责人名称
         /// </summary>
         public string? ZPRINCIPALN { get; set; }
-        /// <summary>
-        /// 科研编码
-        /// </summary>
-        public string? Code { get; set; }
     }
     /// <summary>
     /// 参与部门
@@ -168,9 +144,5 @@
         /// 参与部门名称
         /// </summary>
         public string? ZKZDEPARTNM { get; set; }
-        /// <summary>
-        /// 科研编码
-        /// </summary>
-        public string? Code { get; set; }
     }
 }
