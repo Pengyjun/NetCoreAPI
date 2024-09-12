@@ -700,7 +700,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
                     foreach (var ic in insertOids)
                     {
                         ic.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
-                        foreach (var cc in ic.ZMDGTT_ZLANG.Item)
+                        foreach (var cc in ic.ZLANG_LIST.Item)
                         {
                             var ul = new RegionalCenterLanguage
                             {
@@ -727,7 +727,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
                     {
                         var id = rlList.Where(x => x.ZCRCCODE == itemItem.ZCRCCODE).Select(x => x.Id).First();
                         itemItem.Id = id;
-                        foreach (var items in itemItem.ZMDGTT_ZLANG.Item)
+                        foreach (var items in itemItem.ZLANG_LIST.Item)
                         {
                             RegionalCenterLanguage rcdetails = new RegionalCenterLanguage()
                             {
