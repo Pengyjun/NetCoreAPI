@@ -1,4 +1,7 @@
-﻿namespace GDCMasterDataReceiveApi.Application.Contracts.Dto._4A.User
+﻿using MiniExcelLibs.Attributes;
+using System.ComponentModel.DataAnnotations;
+
+namespace GDCMasterDataReceiveApi.Application.Contracts.Dto._4A.User
 {
     /// <summary>
     /// 用户响应dto
@@ -8,26 +11,33 @@
         /// <summary>
         /// 用户id
         /// </summary>
+        [ExcelIgnore]
         public string Id { get; set; }
         /// <summary>
         /// 人员编码  必填,HR 系统中定义的人员唯  一编码，默认用户名
         /// </summary>
+        /// 
+        [ExcelColumnName("人员编码")]
         public string? EmpCode { get; set; }
         /// <summary>
         /// 姓名
         /// </summary>
+        [ExcelColumnName("姓名")]
         public string? Name { get; set; }
         /// <summary>
         /// 手机号码
         /// </summary>
+        [ExcelColumnName("手机号")]
         public string? Phone { get; set; }
         /// <summary>
         /// 电子邮箱
         /// </summary>
+        [ExcelColumnName("电子邮箱")]
         public string? Email { get; set; }
         /// <summary>
         /// 证件编号
         /// </summary>
+        [ExcelColumnName("证件编号")]
         public string? CertNo { get; set; }
         /// <summary>
         /// 主职所在部门 ID
@@ -36,10 +46,12 @@
         /// <summary>
         /// 所属部门名称
         /// </summary>
+        [ExcelColumnName("所属部门名称")]
         public string? OfficeDepIdName { get; set; }
         /// <summary>
         /// 人员状态信息
         /// </summary>
+        [ExcelColumnName("人员状态信息")]
         public string? UserInfoStatus { get; set; }
         /// <summary>
         /// 公司名称
