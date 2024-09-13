@@ -15,6 +15,7 @@ using GHMonitoringCenterApi.Domain.Models;
 using GHMonitoringCenterApi.Domain.Shared;
 using GHMonitoringCenterApi.Domain.Shared.Const;
 using HNKC.OperationLogsAPI.Dto.ResponseDto;
+using NPOI.SS.Formula.Functions;
 using SqlSugar;
 using SqlSugar.Extensions;
 using static GHMonitoringCenterApi.Application.Contracts.Dto.Project.Report.MonthtReportsResponseDto;
@@ -829,7 +830,19 @@ namespace GHMonitoringCenterApi.Application.Service
                   x.CreateTime >= sTime && x.CreateTime <= eTime
                 : x.UpdateTime >= sTime && x.UpdateTime <= eTime)
                 .ToList();
+            var CurrencyConverter = await _dbContext.Queryable<CurrencyConverter>().Where(x => x.IsDelete == 1&&x.Year==DateTime.Now.Year).ToListAsync();
 
+            foreach (var item in projectData)
+            {
+                if (item.Category == 1)
+                {
+                    var isExist = CurrencyConverter.Where(x => x.CurrencyId == item.CurrencyId.Value.ToString()).FirstOrDefault();
+                    if (isExist != null)
+                    {
+                        item.Amount= item.Amount.Value * isExist.ExchangeRate;
+                    }
+                }
+            }
             responseAjaxResult.Count = projectData.Count;
             responseAjaxResult.SuccessResult(projectData);
             return responseAjaxResult;
