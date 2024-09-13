@@ -125,7 +125,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
             DeserializeObjectUser filterCondition = new();
             if (requestDto.FilterConditionJson != null)
             {
-                filterCondition= JsonConvert.DeserializeObject<DeserializeObjectUser>(requestDto.FilterConditionJson);
+                filterCondition = JsonConvert.DeserializeObject<DeserializeObjectUser>(requestDto.FilterConditionJson);
             }
 
             //获取人员信息
@@ -135,6 +135,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                 .WhereIF(!string.IsNullOrWhiteSpace(filterCondition.Name), (u, us, ins) => u.NAME.Contains(filterCondition.Name))
                 .WhereIF(!string.IsNullOrWhiteSpace(filterCondition.Phone), (u, us, ins) => u.PHONE.Contains(filterCondition.Phone))
                 .WhereIF(!string.IsNullOrWhiteSpace(filterCondition.EmpCode), (u, us, ins) => u.EMP_CODE.Contains(filterCondition.EmpCode))
+                .WhereIF(filterCondition.Ids != null && filterCondition.Ids.Any(), (u, us, ins) => filterCondition.Ids.Contains(u.Id.ToString()))
                 .Where((u, us, ins) => !string.IsNullOrWhiteSpace(u.EMP_STATUS) && u.IsDelete == 1)
                 .Select((u, us, ins) => new UserSearchResponseDto
                 {
