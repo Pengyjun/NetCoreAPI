@@ -12,6 +12,10 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto
         /// </summary>
         public bool IsFullExport { get; set; } = false;
         /// <summary>
+        /// 导出类型  如果不涉及导出   此字段可忽略
+        /// </summary>
+        public int? ImportType { get; set; } = 1;
+        /// <summary>
         /// 关键词搜索
         /// </summary>
         public string? KeyWords { get; set; }
