@@ -114,11 +114,11 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.CountryRegion
         /// <summary>
         /// 国家地区代码
         /// </summary>
-        public string ZCOUNTRYCODE { get; set; }
+        public string? ZCOUNTRYCODE { get; set; }
         /// <summary>
         /// 中文名称
         /// </summary>
-        public string ZCOUNTRYNAME { get; set; }
+        public string? ZCOUNTRYNAME { get; set; }
         /// <summary>
         /// 英文名称
         /// </summary>

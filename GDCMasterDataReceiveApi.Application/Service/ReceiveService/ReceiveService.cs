@@ -23,6 +23,7 @@ using GDCMasterDataReceiveApi.Application.Contracts.Dto.RelationalContracts;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.RoomNumber;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.ScientifiCNoProject;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.UnitMeasurement;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.ValueDomain;
 using GDCMasterDataReceiveApi.Application.Contracts.IService.IReceiveService;
 using GDCMasterDataReceiveApi.Domain.Models;
 using GDCMasterDataReceiveApi.Domain.Shared;
@@ -62,12 +63,73 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
         /// 获取通用字典数据
         /// </summary>
         /// <returns></returns>
-        public async Task<MDMResponseResult> CommonDataAsync()
+        public async Task<MDMResponseResult> CommonDataAsync(BaseReceiveDataRequestDto<ValueDomainReceiveRequestDto> baseReceiveDataRequestDto)
         {
-
             var responseAjaxResult = new MDMResponseResult();
+            //处理多语言描述表类型
+            List<ValueDomainLanguage> insertzMDGS_OLDNAMEs = new();
+            List<ValueDomainLanguage> updatezMDGS_OLDNAMEs = new();
+            //查询项目表
+            var dataCodeList = await _dbContext.Queryable<ValueDomain>().Where(x => x.IsDelete == 1).ToListAsync();
+            //需要新增的数据
+            var insertOids = baseReceiveDataRequestDto.IT_DATA.item.Where(x => !dataCodeList.Select(x => x.ZDOM_CODE).ToList().Contains(x.ZDOM_CODE)).ToList();
+            //需要更新的数据
+            var updateOids = baseReceiveDataRequestDto.IT_DATA.item.Where(x => dataCodeList.Select(x => x.ZDOM_CODE).ToList().Contains(x.ZDOM_CODE)).ToList();
+            //新增操作
+            if (insertOids.Any())
+            {
+                foreach (var itemItem in insertOids)
+                {
+                    itemItem.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
+                    foreach (var lang in itemItem.ZLANG_LIST.Item)
+                    {
+
+                        ValueDomainLanguage dataItem = new ValueDomainLanguage()
+                        {
+                            Id = itemItem.Id.Value,
+                            ZCODE_DESC = lang.ZCODE_DESC,
+                             ZLANGCODE=lang.ZLANGCODE,
+                              ZVALUE_DESC=lang.ZVALUE_DESC,
+                        };
+                        insertzMDGS_OLDNAMEs.Add(dataItem);
+                    }
+                }
+                var projectList = _mapper.Map<List<ValueDomainReceiveRequestDto>, List<ValueDomain>>(insertOids);
+                projectList.ForEach(x => x.CreateTime = DateTime.Now);
+                await _dbContext.Fastest<ValueDomain>().BulkCopyAsync(projectList);
+                await _dbContext.Fastest<ValueDomainLanguage>().BulkCopyAsync(insertzMDGS_OLDNAMEs);
+            }
+            if (updateOids.Any())
+            {
+                List<ValueDomainLanguage> deleteData = new List<ValueDomainLanguage>();
+                var projectUsedNameList = await _dbContext.Queryable<ValueDomainLanguage>().ToListAsync();
+                foreach (var itemItem in updateOids)
+                {
+                    var id = dataCodeList.Where(x => x.Id == itemItem.Id).Select(x => x.Id).First();
+                    itemItem.Id = id;
+                    foreach (var items in itemItem.ZLANG_LIST.Item)
+                    {
+                        ValueDomainLanguage dataItem = new ValueDomainLanguage()
+                        {
+                            Id = itemItem.Id.Value,
+                            ZCODE_DESC = items.ZCODE_DESC,
+                            ZLANGCODE = items.ZLANGCODE,
+                            ZVALUE_DESC = items.ZVALUE_DESC,
+                        };
+                        updatezMDGS_OLDNAMEs.Add(dataItem);
+                    }
+                    deleteData.AddRange(projectUsedNameList.Where(x => x.Id == itemItem.Id).ToList());
+                }
+                var projectList = _mapper.Map<List<ValueDomainReceiveRequestDto>, List<ValueDomain>>(updateOids);
+                await _dbContext.Updateable(projectList).ExecuteCommandAsync();
+                await _dbContext.Deleteable<ValueDomainLanguage>().WhereColumns(deleteData, it => new { it.Id }).ExecuteCommandAsync();
+                await _dbContext.Insertable(updatezMDGS_OLDNAMEs).ExecuteCommandAsync();
+
+            }
             responseAjaxResult.Success();
+
             return responseAjaxResult;
+
         }
         /// <summary>
         /// 往来单位主数据
