@@ -1,4 +1,5 @@
-﻿using GDCMasterDataReceiveApi.Application.Contracts.IService.ISearchService;
+﻿using GDCMasterDataReceiveApi.Application.Contracts.Dto;
+using GDCMasterDataReceiveApi.Application.Contracts.IService.ISearchService;
 using GDCMasterDataReceiveApi.Domain.Models;
 using GDCMasterDataReceiveApi.Domain.Shared;
 using GDCMasterDataReceiveApi.Domain.Shared.Utils;
@@ -99,7 +100,6 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
             responseAjaxResult.SuccessResult(true);
             return responseAjaxResult;
         }
-
         /// <summary>
         /// 统计表增量数据
         /// </summary>
@@ -151,5 +151,65 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
             public string TableName { get; set; } = string.Empty;
         }
 
+        #region 列表接口
+        /// <summary>
+        /// 获取每日增量数据
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        public async Task<ResponseAjaxResult<IncrementalDataDto>> GetIncrementalSearchAsync(IncrementalSearchRequestDto requestDto)
+        {
+            var responseAjaxResult = new ResponseAjaxResult<IncrementalDataDto>();
+            var result = new IncrementalDataDto();
+            var item = new List<IncrementalSearchResponse>();
+
+            requestDto.DateDay = requestDto.DateDay == 0 ? DateTime.Now.ToDateDay() : requestDto.DateDay;
+            var tableName = Utils.GetDescription(requestDto.TableName);
+            Utils.TryConvertDateTimeFromDateDay(requestDto.DateDay, out DateTime time);
+
+            //前六+当日  七天
+            var sevDay = time.AddDays(-6).ToDateDay();
+            Utils.TryConvertDateTimeFromDateDay(sevDay, out DateTime sevTime);
+
+            //获取主表数据
+            var incList = await _dbContext.Queryable<IncrementalData>().Where(t => t.IsDelete == 1 && t.DateDay >= sevDay && t.DateDay <= requestDto.DateDay && t.TableName == tableName).OrderBy(x => x.DateDay).ToListAsync();
+
+            //获取细表数据
+            var incDetailsList = await _dbContext.Queryable<IncrementalDetailsData>().Where(t => t.DateDay >= sevDay && t.DateDay <= requestDto.DateDay && t.TableName == tableName).OrderBy(x => x.DateDay).ToListAsync();
+
+            for (int i = 0; i < 7; i++)
+            {
+                //初始化数据
+                List<string> incDetails = new();
+                int changeNums = 0;
+                var tDaty = sevTime.ToDateDay();
+                var tabList = incList.Where(x => x.DateDay == tDaty).ToList();
+
+                //数据读取
+                foreach (var inc in tabList)
+                {
+                    incDetails = incDetailsList.Where(x => x.TableName == inc.TableName).Select(x => x.RelationTableId.ToString()).ToList();
+                    changeNums = inc.InsertNums + inc.UpdateNums;
+                }
+
+                //数据
+                item.Add(new IncrementalSearchResponse
+                {
+                    DetailsIds = incDetails,
+                    ChangeNums = changeNums,
+                    TimeValue = sevTime
+                });
+                sevTime = sevTime.AddDays(1);
+            }
+
+            result = new IncrementalDataDto
+            {
+                Item = item
+            };
+
+            responseAjaxResult.SuccessResult(result);
+            return responseAjaxResult;
+        }
+        #endregion
     }
 }

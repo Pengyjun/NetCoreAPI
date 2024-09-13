@@ -1,4 +1,5 @@
-﻿using GDCMasterDataReceiveApi.Domain.Shared;
+﻿using GDCMasterDataReceiveApi.Application.Contracts.Dto;
+using GDCMasterDataReceiveApi.Domain.Shared;
 using GDCMasterDataReceiveApi.Domain.Shared.Annotation;
 
 namespace GDCMasterDataReceiveApi.Application.Contracts.IService.ISearchService
@@ -14,5 +15,11 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.IService.ISearchService
         /// </summary>
         /// <returns></returns>
         Task<ResponseAjaxResult<bool>> OperateDataAsync(List<string>? tableNames);
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        Task<ResponseAjaxResult<IncrementalDataDto>> GetIncrementalSearchAsync(IncrementalSearchRequestDto requestDto);
     }
 }
