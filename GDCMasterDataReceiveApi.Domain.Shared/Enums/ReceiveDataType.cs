@@ -96,5 +96,11 @@
         /// </summary>
         RelationalContracts = 21,
 
+
+        /// <summary>
+        /// 委托关系
+        /// </summary>
+        ValueDomain = 26,
+
     }
 }

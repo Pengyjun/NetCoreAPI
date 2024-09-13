@@ -20,6 +20,7 @@ using GDCMasterDataReceiveApi.Application.Contracts.Dto.RelationalContracts;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.RoomNumber;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.ScientifiCNoProject;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.UnitMeasurement;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.ValueDomain;
 using GDCMasterDataReceiveApi.Domain.Models;
 using GDCMasterDataReceiveApi.Domain.Shared;
 using GDCMasterDataReceiveApi.Domain.Shared.Enums;
@@ -175,7 +176,7 @@ namespace GHElectronicFileApi.AopInterceptor
                 var receiveParame = ((BaseReceiveDataRequestDto<RelationalContractsItem>)invocation.Arguments[0]).IT_DATA;
                 parameCount = receiveParame.item.Count;
                 requestParame = receiveParame.item.ToJson();
-                receiveDataType = ReceiveDataType.Regional;
+                receiveDataType = ReceiveDataType.Regional; 
             }
             else if (methodName == "AccountingDepartmentDataAsync")
             {
@@ -187,6 +188,13 @@ namespace GHElectronicFileApi.AopInterceptor
             else if (methodName == "AdministrativeOrganizationDataAsync")
             {
                 var receiveParame = ((BaseReceiveDataRequestDto<AdministrativeOrganizationReceiveRequestDto>)invocation.Arguments[0]).IT_DATA;
+                parameCount = receiveParame.item.Count;
+                requestParame = receiveParame.item.ToJson();
+                receiveDataType = ReceiveDataType.AdministrativeOrganization;
+            }
+            else if (methodName == "CommonDataAsync")
+            {
+                var receiveParame = ((BaseReceiveDataRequestDto<ValueDomainReceiveRequestDto>)invocation.Arguments[0]).IT_DATA;
                 parameCount = receiveParame.item.Count;
                 requestParame = receiveParame.item.ToJson();
                 receiveDataType = ReceiveDataType.AdministrativeOrganization;

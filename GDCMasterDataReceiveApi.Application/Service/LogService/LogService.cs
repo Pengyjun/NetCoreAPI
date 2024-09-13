@@ -50,8 +50,8 @@ namespace GDCMasterDataReceiveApi.Application.Service.LogService
 
 
             responseAjaxResult.Data = await _dbContext.Queryable<AuditLogs>()
-                .WhereIF(auditLogRequestDto.StartTime.HasValue, x =>SqlFunc.ToDate(x.RequestTime) >=auditLogRequestDto.StartTime.Value)
-                .WhereIF(auditLogRequestDto.EndTime.HasValue, x => SqlFunc.ToDate(x.RequestTime) <= auditLogRequestDto.EndTime.Value)
+                .WhereIF(!string.IsNullOrWhiteSpace(auditLogRequestDto.StartTime), x =>SqlFunc.ToDate(x.RequestTime) >=auditLogRequestDto.StartTime.ObjToDate())
+                .WhereIF(!string.IsNullOrWhiteSpace(auditLogRequestDto.StartTime), x => SqlFunc.ToDate(x.RequestTime) <= auditLogRequestDto.EndTime.ObjToDate())
                 .WhereIF(!string.IsNullOrWhiteSpace(auditLogRequestDto.KeyWords),x=>x.Url.Contains(auditLogRequestDto.KeyWords))
                  .Select(x => new AuditLogResponseDto() {
                      Exceptions = x.Exceptions,
@@ -60,7 +60,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.LogService
                      RequestTime = x.RequestTime,
                      ResponseStatus = x.HttpStatusCode,
                      Url = x.Url
-                 })
+                 }).OrderByDescending(x => x.RequestTime)
                  .ToPageListAsync(auditLogRequestDto.PageIndex, auditLogRequestDto.PageSize,total);
             responseAjaxResult.Count= total;
             responseAjaxResult.Success();
@@ -78,8 +78,8 @@ namespace GDCMasterDataReceiveApi.Application.Service.LogService
             ResponseAjaxResult<List<ReceiveLogResponseDto>> responseAjaxResult = new();
             RefAsync<int> total = 0;
             responseAjaxResult.Data = await _dbContext.Queryable<ReceiveRecordLog>()
-                .WhereIF(receiveLogRequestDto.StartTime.HasValue, x => x.CreateTime >= receiveLogRequestDto.StartTime.Value)
-                .WhereIF(receiveLogRequestDto.EndTime.HasValue, x => x.CreateTime <= receiveLogRequestDto.EndTime.Value)
+                .WhereIF(!string.IsNullOrWhiteSpace(receiveLogRequestDto.StartTime), x => x.CreateTime >= receiveLogRequestDto.StartTime.ObjToDate())
+                .WhereIF(!string.IsNullOrWhiteSpace(receiveLogRequestDto.StartTime), x => x.CreateTime <= receiveLogRequestDto.EndTime.ObjToDate())
                 .WhereIF(receiveLogRequestDto.ReceiveDataType != 0, x => x.ReceiveType == receiveLogRequestDto.ReceiveDataType)
                  .Select(x => new ReceiveLogResponseDto()
                  {
@@ -91,7 +91,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.LogService
                      SuccessCount = x.SuccessNumber
 
                  })
-                 .ToPageListAsync(receiveLogRequestDto.PageIndex, receiveLogRequestDto.PageSize, total);
+                 .OrderByDescending(x=>x.RequestTime).ToPageListAsync(receiveLogRequestDto.PageIndex, receiveLogRequestDto.PageSize, total);
             responseAjaxResult.Count = total;
             responseAjaxResult.Success();
             return responseAjaxResult;
