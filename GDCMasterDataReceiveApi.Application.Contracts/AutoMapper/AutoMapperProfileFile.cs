@@ -21,7 +21,7 @@ using GDCMasterDataReceiveApi.Application.Contracts.Dto.InvoiceType;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.Language;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.LouDong;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.NationalEconomy;
-using GDCMasterDataReceiveApi.Application.Contracts.Dto.OtherModels;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.POPManagOrg;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.Project;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.ProjectClassification;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.Regional;
@@ -90,6 +90,8 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.AutoMapper
             mapperConfigurationExpression.CreateMap<LanguageItem, Language>();
             //国民经济行业分类
             mapperConfigurationExpression.CreateMap<NationalEconomyItem, NationalEconomy>();
+            //生产经营管理组织
+            mapperConfigurationExpression.CreateMap<POPMangOrgItem, POPManagOrg>();
             //人员主数据
             mapperConfigurationExpression.CreateMap<Receive4AUser, User>();
             //项目类

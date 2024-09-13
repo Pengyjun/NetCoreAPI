@@ -95,6 +95,10 @@
         /// 委托关系
         /// </summary>
         RelationalContracts = 21,
+        /// <summary>
+        /// 生产经营管理组织
+        /// </summary>
+        POPManger = 22,
 
 
         /// <summary>

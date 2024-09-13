@@ -12,6 +12,7 @@ using GDCMasterDataReceiveApi.Application.Contracts.Dto.InvoiceType;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.Language;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.LouDong;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.NationalEconomy;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.POPManagOrg;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.Project;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.ProjectClassification;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.Regional;
@@ -198,6 +199,13 @@ namespace GHElectronicFileApi.AopInterceptor
                 parameCount = receiveParame.item.Count;
                 requestParame = receiveParame.item.ToJson();
                 receiveDataType = ReceiveDataType.AdministrativeOrganization;
+            }
+            else if (methodName == "ManagementOrganizationDataAsync")
+            {
+                var receiveParame = ((BaseReceiveDataRequestDto<POPMangOrgItem>)invocation.Arguments[0]).IT_DATA;
+                parameCount = receiveParame.item.Count;
+                requestParame = receiveParame.item.ToJson();
+                receiveDataType = ReceiveDataType.POPManger;
             }
             #endregion
 

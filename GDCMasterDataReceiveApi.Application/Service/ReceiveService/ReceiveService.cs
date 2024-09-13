@@ -15,6 +15,7 @@ using GDCMasterDataReceiveApi.Application.Contracts.Dto.InvoiceType;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.Language;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.LouDong;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.NationalEconomy;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.POPManagOrg;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.Project;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.ProjectClassification;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.Regional;
@@ -565,32 +566,32 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
             try
             {
                 var aaMapperList = await _dbContext.Queryable<ProjectClassification>().Where(x => x.IsDelete == 1).ToListAsync();
-                //var insertOids = baseReceiveDataRequestDto.IT_DATA.item.Where(x => !aaMapperList.Select(x => x.ZID).ToList().Contains(x.ZID)).ToList();
-                //var updateOids = baseReceiveDataRequestDto.IT_DATA.item.Where(x => aaMapperList.Select(x => x.ZID).ToList().Contains(x.ZID)).ToList();
+                var insertOids = baseReceiveDataRequestDto.IT_DATA.item.Where(x => !aaMapperList.Select(x => x.ZCPBC3ID).ToList().Contains(x.ZCPBC3ID)).ToList();
+                var updateOids = baseReceiveDataRequestDto.IT_DATA.item.Where(x => aaMapperList.Select(x => x.ZCPBC3ID).ToList().Contains(x.ZCPBC3ID)).ToList();
 
                 //新增操作
-                //if (insertOids.Any())
-                //{
-                //    foreach (var ic in insertOids)
-                //    {
-                //        ic.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
-                //    }
+                if (insertOids.Any())
+                {
+                    foreach (var ic in insertOids)
+                    {
+                        ic.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
+                    }
 
-                //    var mapRmList = _mapper.Map<List<ProjectClassificationItem>, List<ProjectClassification>>(insertOids);
-                //    mapRmList.ForEach(x => x.CreateTime = DateTime.Now);
-                //    await _dbContext.Fastest<ProjectClassification>().BulkCopyAsync(mapRmList);
-                //}
-                //if (updateOids.Any())
-                //{
-                //    ////更新
-                //    //foreach (var itemItem in updateOids)
-                //    //{
-                //    //    var id = aaMapperList.Where(x => x.ZID == itemItem.ZID).Select(x => x.Id).First();
-                //    //    itemItem.Id = id;
-                //    //}
-                //    //var mapRmList = _mapper.Map<List<ProjectClassificationItem>, List<ProjectClassification>>(updateOids);
-                //    //await _dbContext.Updateable(mapRmList).ExecuteCommandAsync();
-                //}
+                    var mapRmList = _mapper.Map<List<ProjectClassificationItem>, List<ProjectClassification>>(insertOids);
+                    mapRmList.ForEach(x => x.CreateTime = DateTime.Now);
+                    await _dbContext.Fastest<ProjectClassification>().BulkCopyAsync(mapRmList);
+                }
+                if (updateOids.Any())
+                {
+                    //更新
+                    foreach (var itemItem in updateOids)
+                    {
+                        var id = aaMapperList.Where(x => x.ZCPBC3ID == itemItem.ZCPBC3ID).Select(x => x.Id).First();
+                        itemItem.Id = id;
+                    }
+                    var mapRmList = _mapper.Map<List<ProjectClassificationItem>, List<ProjectClassification>>(updateOids);
+                    await _dbContext.Updateable(mapRmList).ExecuteCommandAsync();
+                }
 
                 responseAjaxResult.Success();
             }
@@ -613,11 +614,11 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
                 var projectList = _mapper.Map<List<FinancialInstitutionReceiveDto>, List<FinancialInstitution>>(baseReceiveDataRequestDto.IT_DATA.item);
                 foreach (var item in projectList)
                 {
-                    item.CreateTime= DateTime.Now;
+                    item.CreateTime = DateTime.Now;
                     item.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
                 }
-                var projectCodeList = await _dbContext.Queryable<FinancialInstitution>().Where(x => x.IsDelete == 1).Select(x => new {Id=x.Id, ZFINC=x.ZFINC } ).ToListAsync();
-                var insertOids = projectList.Where(x => !projectCodeList.Select(x=>x.ZFINC).ToList().Contains(x.ZFINC)).Select(x => x.ZFINC).ToList();
+                var projectCodeList = await _dbContext.Queryable<FinancialInstitution>().Where(x => x.IsDelete == 1).Select(x => new { Id = x.Id, ZFINC = x.ZFINC }).ToListAsync();
+                var insertOids = projectList.Where(x => !projectCodeList.Select(x => x.ZFINC).ToList().Contains(x.ZFINC)).Select(x => x.ZFINC).ToList();
                 var updateOids = projectList.Where(x => projectCodeList.Select(x => x.ZFINC).ToList().Contains(x.ZFINC)).Select(x => x.ZFINC).ToList();
                 if (insertOids.Any())
                 {
@@ -631,7 +632,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
                     var batchData = projectList.Where(x => updateOids.Contains(x.ZFINC)).ToList();
                     foreach (var item in batchData)
                     {
-                       var id= projectCodeList.Where(x => x.ZFINC == item.ZFINC).Select(x=>x.Id).First();
+                        var id = projectCodeList.Where(x => x.ZFINC == item.ZFINC).Select(x => x.Id).First();
                         item.Id = id;
                     }
                     await _dbContext.Updateable<FinancialInstitution>(batchData).ExecuteCommandAsync();
@@ -670,37 +671,45 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
                     foreach (var ic in insertOids)
                     {
                         ic.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
-                        foreach (var cc in ic.ZPROPERTY_LIST.Item)
+                        if (ic.ZPROPERTY_LIST != null)
                         {
-                            var invoiceLanguage = new DeviceClassAttribute
+
+                            foreach (var cc in ic.ZPROPERTY_LIST.Item)
                             {
-                                Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
-                                ZATTRCODE = cc.ZATTRCODE,
-                                ZATTRNAME = cc.ZATTRNAME,
-                                ZATTRUNIT = cc.ZATTRUNIT,
-                                ZCLASS = cc.ZCLASS,
-                                ZREMARK = cc.ZREMARK,
-                                CreateTime = DateTime.Now
-                            };
-                            insertItem.Add(invoiceLanguage);
+                                var invoiceLanguage = new DeviceClassAttribute
+                                {
+                                    Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                                    ZATTRCODE = cc.ZATTRCODE,
+                                    ZATTRNAME = cc.ZATTRNAME,
+                                    ZATTRUNIT = cc.ZATTRUNIT,
+                                    ZCLASS = cc.ZCLASS,
+                                    ZREMARK = cc.ZREMARK,
+                                    CreateTime = DateTime.Now
+                                };
+                                insertItem.Add(invoiceLanguage);
+                            }
                         }
-                        foreach (var cc in ic.ZVALUE_LIST.Item)
+                        if (ic.ZVALUE_LIST != null)
                         {
-                            var invoiceLanguage = new DeviceClassAttributeValue
+                            foreach (var cc in ic.ZVALUE_LIST.Item)
                             {
-                                Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
-                                ZATTRCODE = cc.ZATTRCODE,
-                                ZCLASS = cc.ZCLASS,
-                                ZVALUECODE = cc.ZVALUECODE,
-                                ZVALUENAME = cc.ZVALUENAME,
-                                CreateTime = DateTime.Now
-                            };
-                            insertItem2.Add(invoiceLanguage);
+                                var invoiceLanguage = new DeviceClassAttributeValue
+                                {
+                                    Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                                    ZATTRCODE = cc.ZATTRCODE,
+                                    ZCLASS = cc.ZCLASS,
+                                    ZVALUECODE = cc.ZVALUECODE,
+                                    ZVALUENAME = cc.ZVALUENAME,
+                                    CreateTime = DateTime.Now
+                                };
+                                insertItem2.Add(invoiceLanguage);
+                            }
                         }
                     }
 
                     var dCList = _mapper.Map<List<DeviceClassCodeItem>, List<DeviceClassCode>>(insertOids);
                     dCList.ForEach(x => x.CreateTime = DateTime.Now);
+                    await _dbContext.Fastest<DeviceClassCode>().BulkCopyAsync(dCList);
                     await _dbContext.Fastest<DeviceClassAttribute>().BulkCopyAsync(insertItem);
                     await _dbContext.Fastest<DeviceClassAttributeValue>().BulkCopyAsync(insertItem2);
                 }
@@ -715,34 +724,42 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
                     {
                         var id = dcCodes.Where(x => x.ZCLASS == itemItem.ZCLASS).Select(x => x.Id).First();
                         itemItem.Id = id;
-                        foreach (var items in itemItem.ZPROPERTY_LIST.Item)
+                        if (itemItem.ZPROPERTY_LIST != null)
                         {
-                            DeviceClassAttribute dca = new DeviceClassAttribute()
+                            foreach (var items in itemItem.ZPROPERTY_LIST.Item)
                             {
-                                Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
-                                ZCLASS = itemItem.ZCLASS,
-                                ZREMARK = items.ZREMARK,
-                                ZATTRCODE = items.ZATTRCODE,
-                                ZATTRNAME = items.ZATTRNAME,
-                                ZATTRUNIT = items.ZATTRUNIT,
-                                CreateTime = DateTime.Now
-                            };
-                            updateItem.Add(dca);
+                                DeviceClassAttribute dca = new DeviceClassAttribute()
+                                {
+                                    Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                                    ZCLASS = itemItem.ZCLASS,
+                                    ZREMARK = items.ZREMARK,
+                                    ZATTRCODE = items.ZATTRCODE,
+                                    ZATTRNAME = items.ZATTRNAME,
+                                    ZATTRUNIT = items.ZATTRUNIT,
+                                    CreateTime = DateTime.Now
+                                };
+                                updateItem.Add(dca);
+                            }
+
                         }
-                        foreach (var items in itemItem.ZVALUE_LIST.Item)
+                        if (itemItem.ZVALUE_LIST != null)
                         {
-                            DeviceClassAttributeValue dcav = new DeviceClassAttributeValue()
+                            foreach (var items in itemItem.ZVALUE_LIST.Item)
                             {
-                                Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
-                                ZCLASS = itemItem.ZCLASS,
-                                ZATTRCODE = items.ZATTRCODE,
-                                ZVALUECODE = items.ZVALUECODE,
-                                ZVALUENAME = items.ZVALUENAME,
-                                CreateTime = DateTime.Now
-                            };
-                            updateItem2.Add(dcav);
+                                DeviceClassAttributeValue dcav = new DeviceClassAttributeValue()
+                                {
+                                    Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                                    ZCLASS = itemItem.ZCLASS,
+                                    ZATTRCODE = items.ZATTRCODE,
+                                    ZVALUECODE = items.ZVALUECODE,
+                                    ZVALUENAME = items.ZVALUENAME,
+                                    CreateTime = DateTime.Now
+                                };
+                                updateItem2.Add(dcav);
+                            }
                         }
                         deleteData.AddRange(dcAList.Where(x => x.ZCLASS == itemItem.ZCLASS).ToList());
+                        deleteData2.AddRange(dcAVlueList.Where(x => x.ZCLASS == itemItem.ZCLASS).ToList());
                     }
                     var dcCodeList = _mapper.Map<List<DeviceClassCodeItem>, List<DeviceClassCode>>(updateOids);
                     await _dbContext.Updateable(dcCodeList).ExecuteCommandAsync();
@@ -766,7 +783,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
         /// 核算部门
         /// </summary>
         /// <returns></returns>
-        public async Task<MDMResponseResult> AccountingDepartmentDataAsync(BaseReceiveDataRequestDto<AccountingDepartmentReceiveDto>  baseReceiveDataRequestDto)
+        public async Task<MDMResponseResult> AccountingDepartmentDataAsync(BaseReceiveDataRequestDto<AccountingDepartmentReceiveDto> baseReceiveDataRequestDto)
         {
 
             var responseAjaxResult = new MDMResponseResult();
@@ -784,7 +801,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
                     itemItem.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
                 }
                 var projectList = _mapper.Map<List<AccountingDepartmentReceiveDto>, List<AccountingDepartment>>(insertOids);
-                projectList.ForEach(x=>x.CreateTime=DateTime.Now);
+                projectList.ForEach(x => x.CreateTime = DateTime.Now);
                 await _dbContext.Fastest<AccountingDepartment>().BulkCopyAsync(projectList);
             }
             if (updateOids.Any())
@@ -1266,92 +1283,113 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
                     foreach (var ic in insertOids)
                     {
                         ic.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
-                        foreach (var cc in ic.IT_AI.Item)
+                        if (ic.IT_AI != null)
                         {
-                            var res = new KySecUnit
+                            foreach (var cc in ic.IT_AI.Item)
                             {
-                                Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
-                                Code = ic.ZSRP,
-                                Z2NDORG = cc.Z2NDORG,
-                                Z2NDORGN = cc.Z2NDORGN,
-                                CreateTime = DateTime.Now
-                            };
-                            insertSuItem.Add(res);
+                                var res = new KySecUnit
+                                {
+                                    Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                                    Code = ic.ZSRP,
+                                    Z2NDORG = cc.Z2NDORG,
+                                    Z2NDORGN = cc.Z2NDORGN,
+                                    CreateTime = DateTime.Now
+                                };
+                                insertSuItem.Add(res);
+                            }
                         }
-                        foreach (var cc in ic.IT_AG.Item)
+                        if (ic.IT_AG != null)
                         {
-                            var res = new KyCDUnit
+                            foreach (var cc in ic.IT_AG.Item)
                             {
-                                Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
-                                Code = ic.ZSRP,
-                                ZIOSIDE = cc.ZIOSIDE,
-                                ZUDTK = cc.ZUDTK,
-                                ZUDTKN = cc.ZUDTKN,
-                                CreateTime = DateTime.Now
-                            };
-                            insertCuItem.Add(res);
+                                var res = new KyCDUnit
+                                {
+                                    Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                                    Code = ic.ZSRP,
+                                    ZIOSIDE = cc.ZIOSIDE,
+                                    ZUDTK = cc.ZUDTK,
+                                    ZUDTKN = cc.ZUDTKN,
+                                    CreateTime = DateTime.Now
+                                };
+                                insertCuItem.Add(res);
+                            }
                         }
-                        foreach (var cc in ic.IT_ONAME.Item)
+                        if (ic.IT_ONAME != null)
                         {
-                            var res = new KyNameCeng
+                            foreach (var cc in ic.IT_ONAME.Item)
                             {
-                                Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
-                                Code = ic.ZSRP,
-                                ZITEM = cc.ZITEM,
-                                ZOLDNAME = cc.ZOLDNAME,
-                                CreateTime = DateTime.Now
-                            };
-                            insertNcItem.Add(res);
+                                var res = new KyNameCeng
+                                {
+                                    Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                                    Code = ic.ZSRP,
+                                    ZITEM = cc.ZITEM,
+                                    ZOLDNAME = cc.ZOLDNAME,
+                                    CreateTime = DateTime.Now
+                                };
+                                insertNcItem.Add(res);
+                            }
                         }
-                        foreach (var cc in ic.IT_AH.Item)
+                        if (ic.IT_AH != null)
                         {
-                            var res = new KyCanYUnit
+                            foreach (var cc in ic.IT_AH.Item)
                             {
-                                Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
-                                Code = ic.ZSRP,
-                                ZIOSIDE = cc.ZIOSIDE,
-                                ZPU = cc.ZPU,
-                                ZPUN = cc.ZPUN,
-                                CreateTime = DateTime.Now
-                            };
-                            insertCyItem.Add(res);
+                                var res = new KyCanYUnit
+                                {
+                                    Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                                    Code = ic.ZSRP,
+                                    ZIOSIDE = cc.ZIOSIDE,
+                                    ZPU = cc.ZPU,
+                                    ZPUN = cc.ZPUN,
+                                    CreateTime = DateTime.Now
+                                };
+                                insertCyItem.Add(res);
+                            }
                         }
-                        foreach (var cc in ic.IT_AK.Item)
+                        if (ic.IT_AK != null)
                         {
-                            var res = new KyWeiTUnit
+                            foreach (var cc in ic.IT_AK.Item)
                             {
-                                Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
-                                Code = ic.ZSRP,
-                                ZAUTHORISE = cc.ZAUTHORISE,
-                                ZAUTHORISEN = cc.ZAUTHORISEN,
-                                ZIOSIDE = cc.ZIOSIDE,
-                                CreateTime = DateTime.Now
-                            };
-                            insertWtItem.Add(res);
+                                var res = new KyWeiTUnit
+                                {
+                                    Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                                    Code = ic.ZSRP,
+                                    ZAUTHORISE = cc.ZAUTHORISE,
+                                    ZAUTHORISEN = cc.ZAUTHORISEN,
+                                    ZIOSIDE = cc.ZIOSIDE,
+                                    CreateTime = DateTime.Now
+                                };
+                                insertWtItem.Add(res);
+                            }
                         }
-                        foreach (var cc in ic.IT_AJ.Item)
+                        if (ic.IT_AJ != null)
                         {
-                            var res = new KyPLeader
+                            foreach (var cc in ic.IT_AJ.Item)
                             {
-                                Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
-                                Code = ic.ZSRP,
-                                ZPRINCIPAL = cc.ZPRINCIPAL,
-                                ZPRINCIPALN = cc.ZPRINCIPALN,
-                                CreateTime = DateTime.Now
-                            };
-                            insertPlItem.Add(res);
+                                var res = new KyPLeader
+                                {
+                                    Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                                    Code = ic.ZSRP,
+                                    ZPRINCIPAL = cc.ZPRINCIPAL,
+                                    ZPRINCIPALN = cc.ZPRINCIPALN,
+                                    CreateTime = DateTime.Now
+                                };
+                                insertPlItem.Add(res);
+                            }
                         }
-                        foreach (var cc in ic.IT_DE.Item)
+                        if (ic.IT_DE != null)
                         {
-                            var res = new KyCanYDep
+                            foreach (var cc in ic.IT_DE.Item)
                             {
-                                Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
-                                Code = ic.ZSRP,
-                                ZKZDEPART = cc.ZKZDEPART,
-                                ZKZDEPARTNM = cc.ZKZDEPARTNM,
-                                CreateTime = DateTime.Now
-                            };
-                            insertCdItem.Add(res);
+                                var res = new KyCanYDep
+                                {
+                                    Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                                    Code = ic.ZSRP,
+                                    ZKZDEPART = cc.ZKZDEPART,
+                                    ZKZDEPARTNM = cc.ZKZDEPARTNM,
+                                    CreateTime = DateTime.Now
+                                };
+                                insertCdItem.Add(res);
+                            }
                         }
                     }
 
@@ -1388,98 +1426,119 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
                     {
                         var id = sNpList.Where(x => x.ZSRP == itemItem.ZSRP).Select(x => x.Id).First();
                         itemItem.Id = id;
-                        foreach (var items in itemItem.IT_AI.Item)
+                        if (itemItem.IT_AI != null)
                         {
-                            KySecUnit res = new KySecUnit()
+                            foreach (var items in itemItem.IT_AI.Item)
                             {
-                                Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
-                                Code = itemItem.ZSRP,
-                                Z2NDORG = items.Z2NDORG,
-                                Z2NDORGN = items.Z2NDORGN,
-                                CreateTime = DateTime.Now
-                            };
-                            updateSuItem.Add(res);
+                                KySecUnit res = new KySecUnit()
+                                {
+                                    Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                                    Code = itemItem.ZSRP,
+                                    Z2NDORG = items.Z2NDORG,
+                                    Z2NDORGN = items.Z2NDORGN,
+                                    CreateTime = DateTime.Now
+                                };
+                                updateSuItem.Add(res);
+                            }
                         }
                         deleteSuData.AddRange(suList.Where(x => x.Code == itemItem.ZSRP).ToList());
-                        foreach (var items in itemItem.IT_AG.Item)
+                        if (itemItem.IT_AG != null)
                         {
-                            KyCDUnit res = new KyCDUnit()
+                            foreach (var items in itemItem.IT_AG.Item)
                             {
-                                Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
-                                Code = itemItem.ZSRP,
-                                ZIOSIDE = items.ZIOSIDE,
-                                ZUDTK = items.ZUDTK,
-                                ZUDTKN = items.ZUDTKN,
-                                CreateTime = DateTime.Now
-                            };
-                            updateCuItem.Add(res);
+                                KyCDUnit res = new KyCDUnit()
+                                {
+                                    Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                                    Code = itemItem.ZSRP,
+                                    ZIOSIDE = items.ZIOSIDE,
+                                    ZUDTK = items.ZUDTK,
+                                    ZUDTKN = items.ZUDTKN,
+                                    CreateTime = DateTime.Now
+                                };
+                                updateCuItem.Add(res);
+                            }
                         }
                         deleteCuData.AddRange(cuList.Where(x => x.Code == itemItem.ZSRP).ToList());
-                        foreach (var items in itemItem.IT_ONAME.Item)
+                        if (itemItem.IT_ONAME != null)
                         {
-                            KyNameCeng res = new KyNameCeng()
+                            foreach (var items in itemItem.IT_ONAME.Item)
                             {
-                                Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
-                                Code = itemItem.ZSRP,
-                                ZITEM = items.ZITEM,
-                                ZOLDNAME = items.ZOLDNAME,
-                                CreateTime = DateTime.Now
-                            };
-                            updateNCItem.Add(res);
+                                KyNameCeng res = new KyNameCeng()
+                                {
+                                    Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                                    Code = itemItem.ZSRP,
+                                    ZITEM = items.ZITEM,
+                                    ZOLDNAME = items.ZOLDNAME,
+                                    CreateTime = DateTime.Now
+                                };
+                                updateNCItem.Add(res);
+                            }
                         }
                         deleteNcData.AddRange(ncList.Where(x => x.Code == itemItem.ZSRP).ToList());
-                        foreach (var items in itemItem.IT_AH.Item)
+                        if (itemItem.IT_AH != null)
                         {
-                            KyCanYUnit res = new KyCanYUnit()
+                            foreach (var items in itemItem.IT_AH.Item)
                             {
-                                Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
-                                Code = itemItem.ZSRP,
-                                ZIOSIDE = items.ZIOSIDE,
-                                ZPU = items.ZPU,
-                                ZPUN = items.ZPUN,
-                                CreateTime = DateTime.Now
-                            };
-                            updateCyItem.Add(res);
+                                KyCanYUnit res = new KyCanYUnit()
+                                {
+                                    Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                                    Code = itemItem.ZSRP,
+                                    ZIOSIDE = items.ZIOSIDE,
+                                    ZPU = items.ZPU,
+                                    ZPUN = items.ZPUN,
+                                    CreateTime = DateTime.Now
+                                };
+                                updateCyItem.Add(res);
+                            }
                         }
                         deleteCyData.AddRange(cyList.Where(x => x.Code == itemItem.ZSRP).ToList());
-                        foreach (var items in itemItem.IT_AK.Item)
+                        if (itemItem.IT_AK != null)
                         {
-                            KyWeiTUnit res = new KyWeiTUnit()
+                            foreach (var items in itemItem.IT_AK.Item)
                             {
-                                Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
-                                Code = itemItem.ZSRP,
-                                ZAUTHORISE = items.ZAUTHORISE,
-                                ZAUTHORISEN = items.ZAUTHORISEN,
-                                ZIOSIDE = items.ZIOSIDE,
-                                CreateTime = DateTime.Now
-                            };
-                            updateWtItem.Add(res);
+                                KyWeiTUnit res = new KyWeiTUnit()
+                                {
+                                    Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                                    Code = itemItem.ZSRP,
+                                    ZAUTHORISE = items.ZAUTHORISE,
+                                    ZAUTHORISEN = items.ZAUTHORISEN,
+                                    ZIOSIDE = items.ZIOSIDE,
+                                    CreateTime = DateTime.Now
+                                };
+                                updateWtItem.Add(res);
+                            }
                         }
                         deleteWtData.AddRange(wtList.Where(x => x.Code == itemItem.ZSRP).ToList());
-                        foreach (var items in itemItem.IT_AJ.Item)
+                        if (itemItem.IT_AJ != null)
                         {
-                            KyPLeader res = new KyPLeader()
+                            foreach (var items in itemItem.IT_AJ.Item)
                             {
-                                Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
-                                Code = itemItem.ZSRP,
-                                ZPRINCIPAL = items.ZPRINCIPAL,
-                                ZPRINCIPALN = items.ZPRINCIPALN,
-                                CreateTime = DateTime.Now
-                            };
-                            updatePlItem.Add(res);
+                                KyPLeader res = new KyPLeader()
+                                {
+                                    Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                                    Code = itemItem.ZSRP,
+                                    ZPRINCIPAL = items.ZPRINCIPAL,
+                                    ZPRINCIPALN = items.ZPRINCIPALN,
+                                    CreateTime = DateTime.Now
+                                };
+                                updatePlItem.Add(res);
+                            }
                         }
                         deletePlData.AddRange(plList.Where(x => x.Code == itemItem.ZSRP).ToList());
-                        foreach (var items in itemItem.IT_DE.Item)
+                        if (itemItem.IT_DE != null)
                         {
-                            KyCanYDep res = new KyCanYDep()
+                            foreach (var items in itemItem.IT_DE.Item)
                             {
-                                Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
-                                Code = itemItem.ZSRP,
-                                ZKZDEPART = items.ZKZDEPART,
-                                ZKZDEPARTNM = items.ZKZDEPARTNM,
-                                CreateTime = DateTime.Now
-                            };
-                            updateCdItem.Add(res);
+                                KyCanYDep res = new KyCanYDep()
+                                {
+                                    Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                                    Code = itemItem.ZSRP,
+                                    ZKZDEPART = items.ZKZDEPART,
+                                    ZKZDEPARTNM = items.ZKZDEPARTNM,
+                                    CreateTime = DateTime.Now
+                                };
+                                updateCdItem.Add(res);
+                            }
                         }
                         deleteCdData.AddRange(cdList.Where(x => x.Code == itemItem.ZSRP).ToList());
                     }
@@ -1542,7 +1601,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
                     foreach (var ic in insertOids)
                     {
                         ic.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
-                       
+
                     }
 
                     var mapList = _mapper.Map<List<RelationalContractsItem>, List<RelationalContracts>>(insertOids);
@@ -1572,14 +1631,136 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
             return responseAjaxResult;
         }
         /// <summary>
-        /// 生产经营管理组织
+        /// 生产经营管理组织   / 行政机构管理组织
         /// </summary>
         /// <returns></returns>
-        public async Task<MDMResponseResult> ManagementOrganizationDataAsync()
+        public async Task<MDMResponseResult> ManagementOrganizationDataAsync(BaseReceiveDataRequestDto<POPMangOrgItem> baseReceiveDataRequestDto)
         {
+            MDMResponseResult responseAjaxResult = new MDMResponseResult();
 
-            var responseAjaxResult = new MDMResponseResult();
-            responseAjaxResult.Success();
+            try
+            {
+                List<POPTreeDetails> insertItem = new();
+                List<POPTreeDetails> updateItem = new();
+
+                var invoiceCodes = await _dbContext.Queryable<POPManagOrg>().Where(x => x.IsDelete == 1).ToListAsync();
+                var insertOids = baseReceiveDataRequestDto.IT_DATA.item.Where(x => !invoiceCodes.Select(x => x.ZTREEID).ToList().Contains(x.ZTREEID)).ToList();
+                var updateOids = baseReceiveDataRequestDto.IT_DATA.item.Where(x => invoiceCodes.Select(x => x.ZTREEID).ToList().Contains(x.ZTREEID)).ToList();
+
+                //新增操作
+                if (insertOids.Any())
+                {
+                    foreach (var ic in insertOids)
+                    {
+                        ic.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
+                        if (ic.ZACO_LIST != null)
+                        {
+                            foreach (var cc in ic.ZACO_LIST.Item)
+                            {
+                                var res = new POPTreeDetails
+                                {
+                                    Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                                    ZACJQCB = cc.ZACJQCB,
+                                    ZACJTHBFWN = cc.ZACJTHBFWN,
+                                    ZTREEID = ic.ZTREEID,
+                                    ZACO = cc.ZACO,
+                                    ZACONAME = cc.ZACONAME,
+                                    ZADDVSCODE = cc.ZADDVSCODE,
+                                    ZADDVSNAME = cc.ZADDVSNAME,
+                                    ZBTID = cc.ZBTID,
+                                    ZCOUNTRYCODE = cc.ZCOUNTRYCODE,
+                                    ZCOUNTRYNAME = cc.ZCOUNTRYNAME,
+                                    ZDCID = cc.ZDCID,
+                                    ZDCNAME = cc.ZDCNAME,
+                                    ZDELETE = cc.ZDELETE,
+                                    ZISORG = cc.ZISORG,
+                                    ZIVFLGID = cc.ZIVFLGID,
+                                    ZNODESTAT = cc.ZNODESTAT,
+                                    ZNODEUP = cc.ZNODEUP,
+                                    ZNODEUPNM = cc.ZNODEUPNM,
+                                    ZORG = cc.ZORG,
+                                    ZORG_PROP = cc.ZORG_PROP,
+                                    ZOWARID = cc.ZOWARID,
+                                    ZOWARNAME = cc.ZOWARNAME,
+                                    ZREASON = cc.ZREASON,
+                                    ZSORTOR = cc.ZSORTOR,
+                                    ZTREEVER = cc.ZTREEVER,
+                                    ZTREE_LEVEL = cc.ZTREE_LEVEL,
+                                    ZYORGSTATE = cc.ZYORGSTATE,
+                                    CreateTime = DateTime.Now
+                                };
+                                insertItem.Add(res);
+                            }
+                        }
+                    }
+
+                    var invoiceList = _mapper.Map<List<POPMangOrgItem>, List<POPManagOrg>>(insertOids);
+                    invoiceList.ForEach(x => x.CreateTime = DateTime.Now);
+                    await _dbContext.Fastest<POPManagOrg>().BulkCopyAsync(invoiceList);
+                    await _dbContext.Fastest<POPTreeDetails>().BulkCopyAsync(insertItem);
+                }
+                if (updateOids.Any())
+                {
+                    List<POPTreeDetails> deleteData = new();
+                    //更新
+                    var invoiceLanguageList = await _dbContext.Queryable<POPTreeDetails>().ToListAsync();
+                    foreach (var itemItem in updateOids)
+                    {
+                        var id = invoiceCodes.Where(x => x.ZTREEID == itemItem.ZTREEID).Select(x => x.Id).First();
+                        itemItem.Id = id;
+                        if (itemItem.ZACO_LIST != null)
+                        {
+                            foreach (var items in itemItem.ZACO_LIST.Item)
+                            {
+                                var res = new POPTreeDetails
+                                {
+                                    Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                                    ZACJQCB = items.ZACJQCB,
+                                    ZACJTHBFWN = items.ZACJTHBFWN,
+                                    ZTREEID = itemItem.ZTREEID,
+                                    ZACO = items.ZACO,
+                                    ZACONAME = items.ZACONAME,
+                                    ZADDVSCODE = items.ZADDVSCODE,
+                                    ZADDVSNAME = items.ZADDVSNAME,
+                                    ZBTID = items.ZBTID,
+                                    ZCOUNTRYCODE = items.ZCOUNTRYCODE,
+                                    ZCOUNTRYNAME = items.ZCOUNTRYNAME,
+                                    ZDCID = items.ZDCID,
+                                    ZDCNAME = items.ZDCNAME,
+                                    ZDELETE = items.ZDELETE,
+                                    ZISORG = items.ZISORG,
+                                    ZIVFLGID = items.ZIVFLGID,
+                                    ZNODESTAT = items.ZNODESTAT,
+                                    ZNODEUP = items.ZNODEUP,
+                                    ZNODEUPNM = items.ZNODEUPNM,
+                                    ZORG = items.ZORG,
+                                    ZORG_PROP = items.ZORG_PROP,
+                                    ZOWARID = items.ZOWARID,
+                                    ZOWARNAME = items.ZOWARNAME,
+                                    ZREASON = items.ZREASON,
+                                    ZSORTOR = items.ZSORTOR,
+                                    ZTREEVER = items.ZTREEVER,
+                                    ZTREE_LEVEL = items.ZTREE_LEVEL,
+                                    ZYORGSTATE = items.ZYORGSTATE,
+                                    CreateTime = DateTime.Now
+                                };
+                                updateItem.Add(res);
+                            }
+                        }
+                        deleteData.AddRange(invoiceLanguageList.Where(x => x.ZTREEID == itemItem.ZTREEID).ToList());
+                    }
+                    var invoiceTypeItemList = _mapper.Map<List<POPMangOrgItem>, List<POPManagOrg>>(updateOids);
+                    await _dbContext.Updateable(invoiceTypeItemList).ExecuteCommandAsync();
+                    await _dbContext.Deleteable<POPTreeDetails>().WhereColumns(deleteData, it => new { it.Id }).ExecuteCommandAsync();
+                    await _dbContext.Insertable(updateItem).ExecuteCommandAsync();
+                }
+
+                responseAjaxResult.Success();
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
             return responseAjaxResult;
         }
         /// <summary>
