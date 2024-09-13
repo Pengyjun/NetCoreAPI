@@ -119,7 +119,6 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
         public async Task<ResponseAjaxResult<List<UserSearchResponseDto>>> GetUserSearchAsync(UserSearchRequestDto requestDto)
         {
             var responseAjaxResult = new ResponseAjaxResult<List<UserSearchResponseDto>>();
-            RefAsync<int> total = 0;
 
             //过滤条件
             DeserializeObjectUser filterCondition = new DeserializeObjectUser();
@@ -135,7 +134,6 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                 .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Name), (u, us, ins) => u.NAME.Contains(filterCondition.Name))
                 .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Phone), (u, us, ins) => u.PHONE.Contains(filterCondition.Phone))
                 .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.EmpCode), (u, us, ins) => u.EMP_CODE.Contains(filterCondition.EmpCode))
-                .WhereIF(filterCondition != null && filterCondition.Ids != null && filterCondition.Ids.Any(), (u, us, ins) => filterCondition.Ids.Contains(u.Id.ToString()))
                 .Where((u, us, ins) => !string.IsNullOrWhiteSpace(u.EMP_STATUS) && u.IsDelete == 1)
                 .Select((u, us, ins) => new UserSearchResponseDto
                 {
@@ -149,7 +147,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     UserInfoStatus = us.OneName,
                     Phone = u.PHONE,
                     OfficeDepIdName = ins.NAME
-                }).ToPageListAsync(requestDto.PageIndex, requestDto.PageSize, total);
+                }).ToListAsync();
 
             //获取机构信息
             var institutions = await _dbContext.Queryable<Institution>()
@@ -162,8 +160,12 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                 institution.CompanyName = GetUserCompany(institution.OfficeDepId, institutions);
             }
 
-            responseAjaxResult.Count = total;
-            responseAjaxResult.SuccessResult(userInfos);
+            if (filterCondition != null && filterCondition.Ids != null && filterCondition.Ids.Any()) { userInfos = userInfos.Where(x => filterCondition.Ids.Contains(x.Id)).ToList(); }
+
+            var pageData = userInfos.Skip((requestDto.PageIndex - 1) * requestDto.PageSize).Take(requestDto.PageSize).ToList();
+
+            responseAjaxResult.Count = userInfos.Count;
+            responseAjaxResult.SuccessResult(pageData);
             return responseAjaxResult;
         }
         /// <summary>
