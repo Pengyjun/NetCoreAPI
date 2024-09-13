@@ -1,4 +1,5 @@
 ﻿using GDCMasterDataReceiveApi.Application.Contracts.Dto.CountryRegion;
+using SqlSugar;
 
 namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.AdministrativeDivision
 {
@@ -84,7 +85,7 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.AdministrativeDivisi
         /// <summary>
         /// 发送记录ID 发送记录的ID，必须保证此ID在同一个发送批次中是唯一的。用于记录发送方对于此发送记录的唯一标识。
         /// </summary>
-        public string? ZZSERIAL { get; set; }
+        public long? Id { get; set; }
         /// <summary>
         /// 行政区划代码:业务主键
         /// </summary>
@@ -120,6 +121,27 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.AdministrativeDivisi
         /// <summary>
         /// 多语言描述表类型
         /// </summary>
-        //public List<ZMDGTT_ZLANG>? ZLANG_LIST { get; set; }
+         public AdministrativeDivisionObj? ZLANG_LIST { get; set; }
+    }
+
+
+
+
+    public class AdministrativeDivisionObj
+    {
+        public List<AdministrativeDivisionLanguageItem> Item { get; set; }
+    }
+    public class AdministrativeDivisionLanguageItem
+    {
+        /// <summary>
+        /// 语种代码
+        /// </summary>
+        [SugarColumn(Length = 32)]
+        public string? ZLANGCODE { get; set; }
+        /// <summary>
+        /// 编码描述
+        /// </summary>
+        [SugarColumn(Length = 32)]
+        public string? ZCODE { get; set; }
     }
 }
