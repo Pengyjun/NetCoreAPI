@@ -61,14 +61,14 @@ namespace GDCMasterDataReceiveApi.Controller
         /// </summary>
         /// <returns></returns>
         [UnitOfWork]
-        [HttpPost("EscrowOrganization")]
+        [HttpPost("/api/mdm/Receive/EscrowOrganization")]
         public async Task<MDMResponseResult> EscrowOrganizationDataAsync() => await _receiveService.EscrowOrganizationDataAsync();
         /// <summary>
         /// 商机项目(含境外商机项目)
         /// </summary>
         /// <returns></returns>
         [UnitOfWork]
-        [HttpPost("BusinessProject")]
+        [HttpPost("/api/mdm/Receive/BusinessProject")]
         public Task<MDMResponseResult> BusinessProjectDataAsync() => _receiveService.BusinessProjectDataAsync();
 
 
@@ -77,28 +77,28 @@ namespace GDCMasterDataReceiveApi.Controller
         /// </summary>
         /// <returns></returns>
         [UnitOfWork]
-        [HttpPost("Regional")]
+        [HttpPost("/api/mdm/Receive/Regional")]
         public async Task<MDMResponseResult> RegionalDataAsync([FromBody] BaseReceiveDataRequestDto<RegionalItem> baseReceiveDataRequestDto) => await _receiveService.RegionalDataAsync(baseReceiveDataRequestDto);
         /// <summary>
         /// 常用计量单位
         /// </summary>
         /// <returns></returns>
         [UnitOfWork]
-        [HttpPost("UnitMeasurement")]
+        [HttpPost("/api/mdm/Receive/UnitMeasurement")]
         public async Task<MDMResponseResult> UnitMeasurementDataAsync([FromBody] BaseReceiveDataRequestDto<UnitMeasurementItem> baseReceiveDataRequestDto) => await _receiveService.UnitMeasurementDataAsync(baseReceiveDataRequestDto);
         /// <summary>
         /// 中交项目行业分类产业分类、业务板块、十二大业务类型、江河湖海对照关系
         /// </summary>
         /// <returns></returns>
         [UnitOfWork]
-        [HttpPost("ProjectClassification")]
+        [HttpPost("/api/mdm/Receive/ProjectClassification")]
         public async Task<MDMResponseResult> ProjectClassificationDataAsync([FromBody] BaseReceiveDataRequestDto<ProjectClassificationItem> baseReceiveDataRequestDto) => await _receiveService.ProjectClassificationDataAsync(baseReceiveDataRequestDto);
         /// <summary>
         /// 物资设备分类编码
         /// </summary>
         /// <returns></returns>
         [UnitOfWork]
-        [HttpPost("DeviceClassCode")]
+        [HttpPost("/api/mdm/Receive/DeviceClassCode")]
         public async Task<MDMResponseResult> DeviceClassCodeDataAsync([FromBody] BaseReceiveDataRequestDto<DeviceClassCodeItem> receiveDataMDMRequestDto) => await _receiveService.DeviceClassCodeDataAsync(receiveDataMDMRequestDto);
     
         /// <summary>
@@ -106,14 +106,14 @@ namespace GDCMasterDataReceiveApi.Controller
         /// </summary>
         /// <returns></returns>
         [UnitOfWork]
-        [HttpPost("RegionalCenter")]
+        [HttpPost("/api/mdm/Receive/RegionalCenter")]
         public async Task<MDMResponseResult> RegionalCenterDataAsync([FromBody] BaseReceiveDataRequestDto<RegionalCenterItem> baseReceiveDataRequestDto) => await _receiveService.RegionalCenterDataAsync(baseReceiveDataRequestDto);
         /// <summary>
         /// 国民经济行业分类
         /// </summary>
         /// <returns></returns>
         [UnitOfWork]
-        [HttpPost("NationalEconomy")]
+        [HttpPost("/api/mdm/Receive/NationalEconomy")]
         public async Task<MDMResponseResult> NationalEconomyDataAsync([FromBody] BaseReceiveDataRequestDto<NationalEconomyItem> baseReceiveDataRequestDto) => await _receiveService.NationalEconomyDataAsync(baseReceiveDataRequestDto);
        
         /// <summary>
@@ -121,7 +121,7 @@ namespace GDCMasterDataReceiveApi.Controller
         /// </summary>
         /// <returns></returns>
         [UnitOfWork]
-        [HttpPost("InvoiceType")]
+        [HttpPost("/api/mdm/Receive/InvoiceType")]
         public async Task<MDMResponseResult> InvoiceTypeDataAsync([FromBody] BaseReceiveDataRequestDto<InvoiceTypeItem> receiveDataMDMRequestDto) => await _receiveService.InvoiceTypeDataAsync(receiveDataMDMRequestDto);
 
         /// <summary>
@@ -129,7 +129,7 @@ namespace GDCMasterDataReceiveApi.Controller
         /// </summary>
         /// <returns></returns>
         [UnitOfWork]
-        [HttpPost("AdministrativeAccountingMapper")]
+        [HttpPost("/api/mdm/Receive/AdministrativeAccountingMapper")]
         public async Task<MDMResponseResult> AdministrativeAccountingMapperDataAsync() => await _receiveService.AdministrativeAccountingMapperDataAsync();
 
         /// <summary>
@@ -137,70 +137,70 @@ namespace GDCMasterDataReceiveApi.Controller
         /// </summary>
         /// <returns></returns>
         [UnitOfWork]
-        [HttpPost("ScientifiCNoProject")]
+        [HttpPost("/api/mdm/Receive/ScientifiCNoProject")]
         public async Task<MDMResponseResult> ScientifiCNoProjectDataAsync([FromBody] BaseReceiveDataRequestDto<ScientifiCNoProjectItem> receiveDataMDMRequestDto) => await _receiveService.ScientifiCNoProjectDataAsync(receiveDataMDMRequestDto);
         /// <summary>
         /// 商机项目(不含境外商机项目)
         /// </summary>
         /// <returns></returns>
         [UnitOfWork]
-        [HttpPost("BusinessNoCpportunity")]
+        [HttpPost("/api/mdm/Receive/BusinessNoCpportunity")]
         public async Task<MDMResponseResult> BusinessNoCpportunityDataAsync() => await _receiveService.BusinessNoCpportunityDataAsync();
         /// <summary>
         /// 委托关系
         /// </summary>
         /// <returns></returns>
         [UnitOfWork]
-        [HttpPost("RelationalContracts")]
+        [HttpPost("/api/mdm/Receive/RelationalContracts")]
         public async Task<MDMResponseResult> RelationalContractsDataAsync([FromBody] BaseReceiveDataRequestDto<RelationalContractsItem> baseReceiveDataRequestDto) => await _receiveService.RelationalContractsDataAsync(baseReceiveDataRequestDto);
         /// <summary>
         /// 生产经营管理组织
         /// </summary>
         /// <returns></returns>
         [UnitOfWork]
-        [HttpPost("ManagementOrganization")]
+        [HttpPost("/api/mdm/Receive/ManagementOrganization")]
         public async Task<MDMResponseResult> ManagementOrganizationDataAsync() => await _receiveService.ManagementOrganizationDataAsync();
         /// <summary>
         /// 楼栋
         /// </summary>
         /// <returns></returns>
         [UnitOfWork]
-        [HttpPost("LouDong")]
+        [HttpPost("/api/mdm/Receive/LouDong")]
         public async Task<MDMResponseResult> LouDongDataAsync([FromBody] BaseReceiveDataRequestDto<LouDongItem> receiveDataMDMRequestDto) => await _receiveService.LouDongDataAsync(receiveDataMDMRequestDto);
         /// <summary>
         /// 房号
         /// </summary>
         /// <returns></returns>
         [UnitOfWork]
-        [HttpPost("RoomNumber")]
+        [HttpPost("/api/mdm/Receive/RoomNumber")]
         public async Task<MDMResponseResult> RoomNumberDataAsync([FromBody] BaseReceiveDataRequestDto<RoomNumberItem> receiveDataMDMRequestDto) => await _receiveService.RoomNumberDataAsync(receiveDataMDMRequestDto);
         /// <summary>
         /// 境内行政区划
         /// </summary>
         /// <returns></returns>
         [UnitOfWork]
-        [HttpPost("AdministrativeDivision")]
+        [HttpPost("/api/mdm/Receive/AdministrativeDivision")]
         public async Task<MDMResponseResult> AdministrativeDivisionDataAsync() => await _receiveService.AdministrativeDivisionDataAsync();
         /// <summary>
         /// 语言语种
         /// </summary>
         /// <returns></returns>
         [UnitOfWork]
-        [HttpPost("Language")]
+        [HttpPost("/api/mdm/Receive/Language")]
         public async Task<MDMResponseResult> LanguageDataAsync([FromBody] BaseReceiveDataRequestDto<LanguageItem> receiveDataMDMRequestDto) => await _receiveService.LanguageDataAsync(receiveDataMDMRequestDto);
         /// <summary>
         /// 物资设备明细编码
         /// </summary>
         /// <returns></returns>
         [UnitOfWork]
-        [HttpPost("DeviceDetailCode")]
+        [HttpPost("/api/mdm/Receive/DeviceDetailCode")]
         public async Task<MDMResponseResult> DeviceDetailCodeDataAsync() => await _receiveService.DeviceDetailCodeDataAsync();
         /// <summary>
         /// 多组织-核算机构
         /// </summary>
         /// <returns></returns>
         [UnitOfWork]
-        [HttpPost("AccountingOrganization")]
+        [HttpPost("/api/mdm/Receive/AccountingOrganization")]
         public async Task<MDMResponseResult> AccountingOrganizationDataAsync() => await _receiveService.AccountingOrganizationDataAsync();
 
         ///// <summary>
