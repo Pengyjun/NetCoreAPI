@@ -22,6 +22,7 @@ using GDCMasterDataReceiveApi.Application.Contracts.Dto.RelationalContracts;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.RoomNumber;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.ScientifiCNoProject;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.UnitMeasurement;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.ValueDomain;
 using GDCMasterDataReceiveApi.Application.Contracts.IService.IReceiveService;
 using GDCMasterDataReceiveApi.Domain.Shared;
 using GDCMasterDataReceiveApi.Domain.Shared.Annotation;
@@ -49,13 +50,13 @@ namespace GDCMasterDataReceiveApi.Controller
         }
 
         #region 主数据各类数据获取
-        /// <summary>
-        /// 获取通用字典数据
-        /// </summary>
-        /// <returns></returns>
-        [UnitOfWork]
-        [HttpPost("Common")]
-        public Task<MDMResponseResult> CommonDataAsync() => _receiveService.CommonDataAsync();
+        ///// <summary>
+        ///// 获取通用字典数据
+        ///// </summary>
+        ///// <returns></returns>
+        //[UnitOfWork]
+        //[HttpPost("Common")]
+        //public Task<MDMResponseResult> CommonDataAsync() => _receiveService.CommonDataAsync();
 
         /// <summary>
         /// 多组织-税务代管组织(行政)
@@ -238,6 +239,20 @@ namespace GDCMasterDataReceiveApi.Controller
         public async Task<MDMResponseResult> AdministrativeOrganizationDataAsync(BaseReceiveDataRequestDto<AdministrativeOrganizationReceiveRequestDto> baseReceiveDataRequestDto) => await _receiveService.AdministrativeOrganizationDataAsync(baseReceiveDataRequestDto);
         #endregion
 
+
+        #region 获取值域信息
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="baseReceiveDataRequestDto"></param>
+        /// <returns></returns>
+        [HttpPost("/api/mdm/Receive/Common")]
+        [UnitOfWork]
+        public async Task<MDMResponseResult> ProjectDataAsync([FromBody] BaseReceiveDataRequestDto<ValueDomainReceiveRequestDto> baseReceiveDataRequestDto)
+        {
+            return await _receiveService.CommonDataAsync(baseReceiveDataRequestDto);
+        }
+        #endregion
 
         #region 通用字典数据获取(币种  国家地区  大洲  语种   等)
 

@@ -31,6 +31,7 @@ using GDCMasterDataReceiveApi.Application.Contracts.Dto.RoomNumber;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.ScientifiCNoProject;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.TypeOfBidDisclosureProjectTable;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.UnitMeasurement;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.ValueDomain;
 using GDCMasterDataReceiveApi.Domain.Models;
 
 namespace GDCMasterDataReceiveApi.Application.Contracts.AutoMapper
@@ -64,7 +65,7 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.AutoMapper
             //商机项目(不含境外商机项目)
             mapperConfigurationExpression.CreateMap<BusinessNoCpportunityReceiveDto, BusinessNoCpportunity>();
             //通用类字典数据
-            mapperConfigurationExpression.CreateMap<CommonReceiveDto, Commons>();
+            mapperConfigurationExpression.CreateMap<ValueDomainReceiveRequestDto, ValueDomain>();
             //往来单位主数据
             mapperConfigurationExpression.CreateMap<CorresUnitReceiveDto, CorresUnit>();
             //大洲

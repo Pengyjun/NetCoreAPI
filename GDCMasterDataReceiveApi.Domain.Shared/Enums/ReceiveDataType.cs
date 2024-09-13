@@ -100,5 +100,11 @@
         /// </summary>
         POPManger = 22,
 
+
+        /// <summary>
+        /// 委托关系
+        /// </summary>
+        ValueDomain = 26,
+
     }
 }
