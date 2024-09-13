@@ -90,7 +90,7 @@ namespace GDCMasterDataReceiveApi.SqlSugarCore
                 };
             });
             Type[] types = typeof(BaseEntity<long>).Assembly.GetTypes()
-            .Where(it => it.FullName.Contains("GDCMasterDataReceiveApi.Domain.Models.DeviceAttributeValue") 
+            .Where(it => it.FullName.Contains("GDCMasterDataReceiveApi.Domain.Models.POPTreeDetails") 
             )
             .ToArray();
             db.CodeFirst.InitTables(types);

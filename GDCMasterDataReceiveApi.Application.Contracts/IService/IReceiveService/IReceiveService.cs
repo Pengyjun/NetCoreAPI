@@ -14,6 +14,7 @@ using GDCMasterDataReceiveApi.Application.Contracts.Dto.InvoiceType;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.Language;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.LouDong;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.NationalEconomy;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.POPManagOrg;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.Project;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.ProjectClassification;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.Regional;
@@ -147,7 +148,7 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.IService.IReceiveService
         /// 生产经营管理组织
         /// </summary>
         /// <returns></returns>
-        Task<MDMResponseResult> ManagementOrganizationDataAsync();
+        Task<MDMResponseResult> ManagementOrganizationDataAsync(BaseReceiveDataRequestDto<POPMangOrgItem> baseReceiveDataRequestDto);
         /// <summary>
         /// 楼栋
         /// </summary>

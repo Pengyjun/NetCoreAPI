@@ -15,7 +15,7 @@ using GDCMasterDataReceiveApi.Application.Contracts.Dto.InvoiceType;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.Language;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.LouDong;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.NationalEconomy;
-using GDCMasterDataReceiveApi.Application.Contracts.Dto.OtherModels;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.POPManagOrg;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.Project;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.ProjectClassification;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.Regional;
@@ -504,32 +504,32 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
             try
             {
                 var aaMapperList = await _dbContext.Queryable<ProjectClassification>().Where(x => x.IsDelete == 1).ToListAsync();
-                //var insertOids = baseReceiveDataRequestDto.IT_DATA.item.Where(x => !aaMapperList.Select(x => x.ZID).ToList().Contains(x.ZID)).ToList();
-                //var updateOids = baseReceiveDataRequestDto.IT_DATA.item.Where(x => aaMapperList.Select(x => x.ZID).ToList().Contains(x.ZID)).ToList();
+                var insertOids = baseReceiveDataRequestDto.IT_DATA.item.Where(x => !aaMapperList.Select(x => x.ZCPBC3ID).ToList().Contains(x.ZCPBC3ID)).ToList();
+                var updateOids = baseReceiveDataRequestDto.IT_DATA.item.Where(x => aaMapperList.Select(x => x.ZCPBC3ID).ToList().Contains(x.ZCPBC3ID)).ToList();
 
                 //新增操作
-                //if (insertOids.Any())
-                //{
-                //    foreach (var ic in insertOids)
-                //    {
-                //        ic.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
-                //    }
+                if (insertOids.Any())
+                {
+                    foreach (var ic in insertOids)
+                    {
+                        ic.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
+                    }
 
-                //    var mapRmList = _mapper.Map<List<ProjectClassificationItem>, List<ProjectClassification>>(insertOids);
-                //    mapRmList.ForEach(x => x.CreateTime = DateTime.Now);
-                //    await _dbContext.Fastest<ProjectClassification>().BulkCopyAsync(mapRmList);
-                //}
-                //if (updateOids.Any())
-                //{
-                //    ////更新
-                //    //foreach (var itemItem in updateOids)
-                //    //{
-                //    //    var id = aaMapperList.Where(x => x.ZID == itemItem.ZID).Select(x => x.Id).First();
-                //    //    itemItem.Id = id;
-                //    //}
-                //    //var mapRmList = _mapper.Map<List<ProjectClassificationItem>, List<ProjectClassification>>(updateOids);
-                //    //await _dbContext.Updateable(mapRmList).ExecuteCommandAsync();
-                //}
+                    var mapRmList = _mapper.Map<List<ProjectClassificationItem>, List<ProjectClassification>>(insertOids);
+                    mapRmList.ForEach(x => x.CreateTime = DateTime.Now);
+                    await _dbContext.Fastest<ProjectClassification>().BulkCopyAsync(mapRmList);
+                }
+                if (updateOids.Any())
+                {
+                    //更新
+                    foreach (var itemItem in updateOids)
+                    {
+                        var id = aaMapperList.Where(x => x.ZCPBC3ID == itemItem.ZCPBC3ID).Select(x => x.Id).First();
+                        itemItem.Id = id;
+                    }
+                    var mapRmList = _mapper.Map<List<ProjectClassificationItem>, List<ProjectClassification>>(updateOids);
+                    await _dbContext.Updateable(mapRmList).ExecuteCommandAsync();
+                }
 
                 responseAjaxResult.Success();
             }
@@ -1569,14 +1569,136 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
             return responseAjaxResult;
         }
         /// <summary>
-        /// 生产经营管理组织
+        /// 生产经营管理组织   / 行政机构管理组织
         /// </summary>
         /// <returns></returns>
-        public async Task<MDMResponseResult> ManagementOrganizationDataAsync()
+        public async Task<MDMResponseResult> ManagementOrganizationDataAsync(BaseReceiveDataRequestDto<POPMangOrgItem> baseReceiveDataRequestDto)
         {
+            MDMResponseResult responseAjaxResult = new MDMResponseResult();
 
-            var responseAjaxResult = new MDMResponseResult();
-            responseAjaxResult.Success();
+            try
+            {
+                List<POPTreeDetails> insertItem = new();
+                List<POPTreeDetails> updateItem = new();
+
+                var invoiceCodes = await _dbContext.Queryable<POPManagOrg>().Where(x => x.IsDelete == 1).ToListAsync();
+                var insertOids = baseReceiveDataRequestDto.IT_DATA.item.Where(x => !invoiceCodes.Select(x => x.ZTREEID).ToList().Contains(x.ZTREEID)).ToList();
+                var updateOids = baseReceiveDataRequestDto.IT_DATA.item.Where(x => invoiceCodes.Select(x => x.ZTREEID).ToList().Contains(x.ZTREEID)).ToList();
+
+                //新增操作
+                if (insertOids.Any())
+                {
+                    foreach (var ic in insertOids)
+                    {
+                        ic.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
+                        if (ic.ZACO_LIST != null)
+                        {
+                            foreach (var cc in ic.ZACO_LIST.Item)
+                            {
+                                var res = new POPTreeDetails
+                                {
+                                    Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                                    ZACJQCB = cc.ZACJQCB,
+                                    ZACJTHBFWN = cc.ZACJTHBFWN,
+                                    ZTREEID = ic.ZTREEID,
+                                    ZACO = cc.ZACO,
+                                    ZACONAME = cc.ZACONAME,
+                                    ZADDVSCODE = cc.ZADDVSCODE,
+                                    ZADDVSNAME = cc.ZADDVSNAME,
+                                    ZBTID = cc.ZBTID,
+                                    ZCOUNTRYCODE = cc.ZCOUNTRYCODE,
+                                    ZCOUNTRYNAME = cc.ZCOUNTRYNAME,
+                                    ZDCID = cc.ZDCID,
+                                    ZDCNAME = cc.ZDCNAME,
+                                    ZDELETE = cc.ZDELETE,
+                                    ZISORG = cc.ZISORG,
+                                    ZIVFLGID = cc.ZIVFLGID,
+                                    ZNODESTAT = cc.ZNODESTAT,
+                                    ZNODEUP = cc.ZNODEUP,
+                                    ZNODEUPNM = cc.ZNODEUPNM,
+                                    ZORG = cc.ZORG,
+                                    ZORG_PROP = cc.ZORG_PROP,
+                                    ZOWARID = cc.ZOWARID,
+                                    ZOWARNAME = cc.ZOWARNAME,
+                                    ZREASON = cc.ZREASON,
+                                    ZSORTOR = cc.ZSORTOR,
+                                    ZTREEVER = cc.ZTREEVER,
+                                    ZTREE_LEVEL = cc.ZTREE_LEVEL,
+                                    ZYORGSTATE = cc.ZYORGSTATE,
+                                    CreateTime = DateTime.Now
+                                };
+                                insertItem.Add(res);
+                            }
+                        }
+                    }
+
+                    var invoiceList = _mapper.Map<List<POPMangOrgItem>, List<POPManagOrg>>(insertOids);
+                    invoiceList.ForEach(x => x.CreateTime = DateTime.Now);
+                    await _dbContext.Fastest<POPManagOrg>().BulkCopyAsync(invoiceList);
+                    await _dbContext.Fastest<POPTreeDetails>().BulkCopyAsync(insertItem);
+                }
+                if (updateOids.Any())
+                {
+                    List<POPTreeDetails> deleteData = new();
+                    //更新
+                    var invoiceLanguageList = await _dbContext.Queryable<POPTreeDetails>().ToListAsync();
+                    foreach (var itemItem in updateOids)
+                    {
+                        var id = invoiceCodes.Where(x => x.ZTREEID == itemItem.ZTREEID).Select(x => x.Id).First();
+                        itemItem.Id = id;
+                        if (itemItem.ZACO_LIST != null)
+                        {
+                            foreach (var items in itemItem.ZACO_LIST.Item)
+                            {
+                                var res = new POPTreeDetails
+                                {
+                                    Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                                    ZACJQCB = items.ZACJQCB,
+                                    ZACJTHBFWN = items.ZACJTHBFWN,
+                                    ZTREEID = itemItem.ZTREEID,
+                                    ZACO = items.ZACO,
+                                    ZACONAME = items.ZACONAME,
+                                    ZADDVSCODE = items.ZADDVSCODE,
+                                    ZADDVSNAME = items.ZADDVSNAME,
+                                    ZBTID = items.ZBTID,
+                                    ZCOUNTRYCODE = items.ZCOUNTRYCODE,
+                                    ZCOUNTRYNAME = items.ZCOUNTRYNAME,
+                                    ZDCID = items.ZDCID,
+                                    ZDCNAME = items.ZDCNAME,
+                                    ZDELETE = items.ZDELETE,
+                                    ZISORG = items.ZISORG,
+                                    ZIVFLGID = items.ZIVFLGID,
+                                    ZNODESTAT = items.ZNODESTAT,
+                                    ZNODEUP = items.ZNODEUP,
+                                    ZNODEUPNM = items.ZNODEUPNM,
+                                    ZORG = items.ZORG,
+                                    ZORG_PROP = items.ZORG_PROP,
+                                    ZOWARID = items.ZOWARID,
+                                    ZOWARNAME = items.ZOWARNAME,
+                                    ZREASON = items.ZREASON,
+                                    ZSORTOR = items.ZSORTOR,
+                                    ZTREEVER = items.ZTREEVER,
+                                    ZTREE_LEVEL = items.ZTREE_LEVEL,
+                                    ZYORGSTATE = items.ZYORGSTATE,
+                                    CreateTime = DateTime.Now
+                                };
+                                updateItem.Add(res);
+                            }
+                        }
+                        deleteData.AddRange(invoiceLanguageList.Where(x => x.ZTREEID == itemItem.ZTREEID).ToList());
+                    }
+                    var invoiceTypeItemList = _mapper.Map<List<POPMangOrgItem>, List<POPManagOrg>>(updateOids);
+                    await _dbContext.Updateable(invoiceTypeItemList).ExecuteCommandAsync();
+                    await _dbContext.Deleteable<POPTreeDetails>().WhereColumns(deleteData, it => new { it.Id }).ExecuteCommandAsync();
+                    await _dbContext.Insertable(updateItem).ExecuteCommandAsync();
+                }
+
+                responseAjaxResult.Success();
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
             return responseAjaxResult;
         }
         /// <summary>

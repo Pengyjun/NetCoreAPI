@@ -13,6 +13,7 @@ using GDCMasterDataReceiveApi.Application.Contracts.Dto.InvoiceType;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.Language;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.LouDong;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.NationalEconomy;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.POPManagOrg;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.Project;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.ProjectClassification;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.Regional;
@@ -100,7 +101,7 @@ namespace GDCMasterDataReceiveApi.Controller
         [UnitOfWork]
         [HttpPost("/api/mdm/Receive/DeviceClassCode")]
         public async Task<MDMResponseResult> DeviceClassCodeDataAsync([FromBody] BaseReceiveDataRequestDto<DeviceClassCodeItem> receiveDataMDMRequestDto) => await _receiveService.DeviceClassCodeDataAsync(receiveDataMDMRequestDto);
-    
+
         /// <summary>
         /// 中交区域中心
         /// </summary>
@@ -115,7 +116,7 @@ namespace GDCMasterDataReceiveApi.Controller
         [UnitOfWork]
         [HttpPost("/api/mdm/Receive/NationalEconomy")]
         public async Task<MDMResponseResult> NationalEconomyDataAsync([FromBody] BaseReceiveDataRequestDto<NationalEconomyItem> baseReceiveDataRequestDto) => await _receiveService.NationalEconomyDataAsync(baseReceiveDataRequestDto);
-       
+
         /// <summary>
         /// 发票类型
         /// </summary>
@@ -159,7 +160,7 @@ namespace GDCMasterDataReceiveApi.Controller
         /// <returns></returns>
         [UnitOfWork]
         [HttpPost("/api/mdm/Receive/ManagementOrganization")]
-        public async Task<MDMResponseResult> ManagementOrganizationDataAsync() => await _receiveService.ManagementOrganizationDataAsync();
+        public async Task<MDMResponseResult> ManagementOrganizationDataAsync([FromBody] BaseReceiveDataRequestDto<POPMangOrgItem> baseReceiveDataRequestDto) => await _receiveService.ManagementOrganizationDataAsync(baseReceiveDataRequestDto);
         /// <summary>
         /// 楼栋
         /// </summary>
