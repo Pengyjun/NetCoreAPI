@@ -171,25 +171,25 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
             var sevDay = time.AddDays(-6).ToDateDay();
             Utils.TryConvertDateTimeFromDateDay(sevDay, out DateTime sevTime);
 
-            //获取主表数据
-            var incList = await _dbContext.Queryable<IncrementalData>().Where(t => t.IsDelete == 1 && t.DateDay >= sevDay && t.DateDay <= requestDto.DateDay && t.TableName == tableName).OrderBy(x => x.DateDay).ToListAsync();
+            //获取新增的数据
+            var incInsertList = await _dbContext.Queryable<User>().Where(t => t.IsDelete == 1 && t.CreateTime >= sevTime && t.CreateTime <= time).Select(x => new { x.CreateTime, x.UpdateTime, x.Id }).ToListAsync();
 
-            //获取细表数据
-            var incDetailsList = await _dbContext.Queryable<IncrementalDetailsData>().Where(t => t.DateDay >= sevDay && t.DateDay <= requestDto.DateDay && t.TableName == tableName).OrderBy(x => x.DateDay).ToListAsync();
+            //获取修改的数据
+            var incUpdateList = await _dbContext.Queryable<User>().Where(t => t.IsDelete == 1 && t.CreateTime >= sevTime && t.CreateTime <= time).Select(x => new { x.CreateTime, x.UpdateTime, x.Id }).ToListAsync();
 
             for (int i = 0; i < 7; i++)
             {
                 //初始化数据
                 List<string> incDetails = new();
                 int changeNums = 0;
-                var tDaty = sevTime.ToDateDay();
-                var tabList = incList.Where(x => x.DateDay == tDaty).ToList();
+                var tabInsertList = incInsertList.Where(x => x.CreateTime == sevTime).ToList();
+                var tabUpdateList = incUpdateList.Where(x => x.UpdateTime == sevTime).ToList();
 
                 //数据读取
-                foreach (var inc in tabList)
+                foreach (var inc in tabInsertList)
                 {
-                    incDetails = incDetailsList.Where(x => x.TableName == inc.TableName).Select(x => x.RelationTableId.ToString()).ToList();
-                    changeNums = inc.InsertNums + inc.UpdateNums;
+                    //incDetails = incDetailsList.Where(x => x.TableName == inc.TableName).Select(x => x.RelationTableId.ToString()).ToList();
+                    //changeNums = inc.InsertNums + inc.UpdateNums;
                 }
 
                 //数据
