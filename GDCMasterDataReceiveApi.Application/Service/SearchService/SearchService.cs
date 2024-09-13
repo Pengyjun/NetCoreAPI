@@ -122,7 +122,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
             RefAsync<int> total = 0;
 
             //过滤条件
-            DeserializeObjectUser filterCondition = new();
+            DeserializeObjectUser filterCondition = new DeserializeObjectUser();
             if (requestDto.FilterConditionJson != null)
             {
                 filterCondition = JsonConvert.DeserializeObject<DeserializeObjectUser>(requestDto.FilterConditionJson);
@@ -132,10 +132,10 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
             var userInfos = await _dbContext.Queryable<User>()
                 .LeftJoin<UserStatus>((u, us) => u.EMP_STATUS == us.OneCode)
                 .LeftJoin<Institution>((u, us, ins) => u.OFFICE_DEPID == ins.OID)
-                .WhereIF(!string.IsNullOrWhiteSpace(filterCondition.Name), (u, us, ins) => u.NAME.Contains(filterCondition.Name))
-                .WhereIF(!string.IsNullOrWhiteSpace(filterCondition.Phone), (u, us, ins) => u.PHONE.Contains(filterCondition.Phone))
-                .WhereIF(!string.IsNullOrWhiteSpace(filterCondition.EmpCode), (u, us, ins) => u.EMP_CODE.Contains(filterCondition.EmpCode))
-                .WhereIF(filterCondition.Ids != null && filterCondition.Ids.Any(), (u, us, ins) => filterCondition.Ids.Contains(u.Id.ToString()))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Name), (u, us, ins) => u.NAME.Contains(filterCondition.Name))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Phone), (u, us, ins) => u.PHONE.Contains(filterCondition.Phone))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.EmpCode), (u, us, ins) => u.EMP_CODE.Contains(filterCondition.EmpCode))
+                .WhereIF(filterCondition != null && filterCondition.Ids != null && filterCondition.Ids.Any(), (u, us, ins) => filterCondition.Ids.Contains(u.Id.ToString()))
                 .Where((u, us, ins) => !string.IsNullOrWhiteSpace(u.EMP_STATUS) && u.IsDelete == 1)
                 .Select((u, us, ins) => new UserSearchResponseDto
                 {
