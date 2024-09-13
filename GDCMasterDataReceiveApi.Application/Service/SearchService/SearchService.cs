@@ -31,7 +31,9 @@ using GDCMasterDataReceiveApi.Application.Contracts.Dto.UnitMeasurement;
 using GDCMasterDataReceiveApi.Application.Contracts.IService.ISearchService;
 using GDCMasterDataReceiveApi.Domain.Models;
 using GDCMasterDataReceiveApi.Domain.Shared;
+using Newtonsoft.Json;
 using SqlSugar;
+using System.Net;
 
 namespace GDCMasterDataReceiveApi.Application.Service.SearchService
 {
@@ -119,11 +121,16 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
             var responseAjaxResult = new ResponseAjaxResult<List<UserSearchResponseDto>>();
             RefAsync<int> total = 0;
 
+            //过滤条件
+            var filterCondition = JsonConvert.DeserializeObject<DeserializeObjectUser>(requestDto.FilterConditionJson);
 
             //获取人员信息
             var userInfos = await _dbContext.Queryable<User>()
                 .LeftJoin<UserStatus>((u, us) => u.EMP_STATUS == us.OneCode)
                 .LeftJoin<Institution>((u, us, ins) => u.OFFICE_DEPID == ins.OID)
+                .WhereIF(!string.IsNullOrWhiteSpace(filterCondition.Name), (u, us, ins) =>u.NAME.Contains(filterCondition.Name))
+                .WhereIF(!string.IsNullOrWhiteSpace(filterCondition.Phone), (u, us, ins) =>u.PHONE.Contains(filterCondition.Phone))
+                .WhereIF(!string.IsNullOrWhiteSpace(filterCondition.EmpCode), (u, us, ins) =>u.NAME.Contains(filterCondition.EmpCode))
                 .Where((u, us, ins) => !string.IsNullOrWhiteSpace(u.EMP_STATUS) && u.IsDelete == 1)
                 .Select((u, us, ins) => new UserSearchResponseDto
                 {

@@ -74,8 +74,8 @@ namespace GDCMasterDataReceiveApi.Controller
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
-        [HttpGet("GetUserSearch")]
-        public async Task<ResponseAjaxResult<List<UserSearchResponseDto>>> GetUserSearchAsync([FromQuery] UserSearchRequestDto requestDto)
+        [HttpPost("GetUserSearch")]
+        public async Task<ResponseAjaxResult<List<UserSearchResponseDto>>> GetUserSearchAsync([FromBody] UserSearchRequestDto requestDto)
         {
             return await _searchService.GetUserSearchAsync(requestDto);
         }
@@ -94,8 +94,8 @@ namespace GDCMasterDataReceiveApi.Controller
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
-        [HttpGet("GetInstitutions")]
-        public async Task<ResponseAjaxResult<List<InstitutionDto>>> GetInstitutionsAsync([FromQuery] InstitutionRequestDto requestDto)
+        [HttpPost("GetInstitutions")]
+        public async Task<ResponseAjaxResult<List<InstitutionDto>>> GetInstitutionsAsync([FromBody] InstitutionRequestDto requestDto)
         {
             return await _searchService.GetInstitutionAsync(requestDto);
         }
@@ -613,6 +613,6 @@ namespace GDCMasterDataReceiveApi.Controller
 
 
 
-     
+
     }
 }
