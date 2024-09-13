@@ -63,7 +63,7 @@ namespace GHElectronicFileApi.AopInterceptor
                 var receiveParame = ((BaseReceiveDataRequestDto<ProjectItem>)invocation.Arguments[0]).IT_DATA;
                 parameCount = receiveParame.item.Count;
                 requestParame = receiveParame.item.ToJson();
-                receiveDataType = ReceiveDataType.Person;
+                receiveDataType = ReceiveDataType.Project;
             }
             else if (methodName == "CountryContinentDataAsync")
             {

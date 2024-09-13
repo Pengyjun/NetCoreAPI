@@ -170,7 +170,11 @@ builder.Services.AddAutoMapper(ConfigAutoMapper =>
 #endregion
 
 var app = builder.Build();
-
+app.Use(async (context, next) =>
+{
+    context.Request.EnableBuffering();
+    await next.Invoke(context);
+});
 #region SwaggrUI
 app.UseSwagger();
 app.UseSwaggerUI();

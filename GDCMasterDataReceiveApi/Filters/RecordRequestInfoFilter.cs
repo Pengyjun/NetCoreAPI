@@ -72,7 +72,7 @@ namespace GDCMasterDataReceiveApi.Filters
                 recordRequestInfo.ActionMethodName = ((Microsoft.AspNetCore.Mvc.Controllers.ControllerActionDescriptor)context.ActionDescriptor).ControllerName;
                 recordRequestInfo.BrowserInfo.Browser = context.HttpContext.Request.Headers["User-Agent"].ToString();
                 CacheHelper cache = new CacheHelper();
-                //cache.Set(context.HttpContext.TraceIdentifier.ToLower(), JsonConvert.SerializeObject(recordRequestInfo), 30);
+               cache.Set(context.HttpContext.TraceIdentifier.ToLower(), JsonConvert.SerializeObject(recordRequestInfo), 30);
                 int cacheSeconds = int.Parse(AppsettingsHelper.GetValue("Redis:DefaultKeyCacheSeconds"));
                 await RedisUtil.Instance.SetAsync(context.HttpContext.TraceIdentifier.ToLower(), JsonConvert.SerializeObject(recordRequestInfo), cacheSeconds);
             }
