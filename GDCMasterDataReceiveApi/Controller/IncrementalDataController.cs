@@ -21,16 +21,6 @@ namespace GDCMasterDataReceiveApi.Controller
             this._incrementalDataSearchService = incrementalDataSearchService;
         }
         /// <summary>
-        /// 操作增量数据（定时接口/手动调用）
-        /// </summary>
-        /// <param name="tableNames">表名</param>
-        /// <returns></returns>
-        [HttpPost("/api/OperateData")]
-        public async Task<ResponseAjaxResult<bool>> OperateDataAsync([FromBody] List<string>? tableNames)
-        {
-            return await _incrementalDataSearchService.OperateDataAsync(tableNames);
-        }
-        /// <summary>
         /// 获取每日增量数据
         /// </summary>
         /// <param name="requestDto"></param>

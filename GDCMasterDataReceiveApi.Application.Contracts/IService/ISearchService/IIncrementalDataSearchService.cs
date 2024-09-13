@@ -13,11 +13,6 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.IService.ISearchService
         /// <summary>
         /// 
         /// </summary>
-        /// <returns></returns>
-        Task<ResponseAjaxResult<bool>> OperateDataAsync(List<string>? tableNames);
-        /// <summary>
-        /// 
-        /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
         Task<ResponseAjaxResult<IncrementalDataDto>> GetIncrementalSearchAsync(IncrementalSearchRequestDto requestDto);
