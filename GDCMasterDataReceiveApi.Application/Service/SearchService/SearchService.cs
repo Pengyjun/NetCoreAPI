@@ -118,6 +118,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
         public async Task<ResponseAjaxResult<List<UserSearchResponseDto>>> GetUserSearchAsync(UserSearchRequestDto requestDto)
         {
             var responseAjaxResult = new ResponseAjaxResult<List<UserSearchResponseDto>>();
+            RefAsync<int> total = 0;
 
             //过滤条件
             DeserializeObjectUser filterCondition = new DeserializeObjectUser();
@@ -144,7 +145,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     Enable = u.Enable == 1 ? "启用" : "禁用",
                     UserInfoStatus = u.EMP_STATUS,
                     Phone = u.PHONE
-                }).ToListAsync();
+                }).ToPageListAsync(requestDto.PageIndex, requestDto.PageSize, total);
 
             //获取机构信息
             var institutions = await _dbContext.Queryable<Institution>()
@@ -162,10 +163,8 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                 uInfo.UserInfoStatus = uStatus.FirstOrDefault(x => x.OneCode == uInfo.EmpCode)?.OneName;
             }
 
-            var pageData = userInfos.Skip((requestDto.PageIndex - 1) * requestDto.PageSize).Take(requestDto.PageSize).ToList();
-
-            responseAjaxResult.Count = userInfos.Count;
-            responseAjaxResult.SuccessResult(pageData);
+            responseAjaxResult.Count = total;
+            responseAjaxResult.SuccessResult(userInfos);
             return responseAjaxResult;
         }
         /// <summary>
