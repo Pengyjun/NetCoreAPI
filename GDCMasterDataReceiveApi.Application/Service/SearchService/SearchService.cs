@@ -119,6 +119,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
             var responseAjaxResult = new ResponseAjaxResult<List<UserSearchResponseDto>>();
             RefAsync<int> total = 0;
 
+
             //获取人员信息
             var userInfos = await _dbContext.Queryable<User>()
                 .LeftJoin<UserStatus>((u, us) => u.EMP_STATUS == us.OneCode)

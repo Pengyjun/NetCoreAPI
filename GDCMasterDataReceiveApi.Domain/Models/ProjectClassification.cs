@@ -111,7 +111,7 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// <summary>
         /// 备注（业务板块）
         /// </summary>
-        [SugarColumn(Length = 5, ColumnName = "BSectorRemark")]
+        [SugarColumn(Length = 500, ColumnName = "BSectorRemark")]
         public string? ZBUSTDREMARKS { get; set; }
         /// <summary>
         /// 中交十二大业务类型编码 
