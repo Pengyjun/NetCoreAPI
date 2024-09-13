@@ -223,7 +223,7 @@ namespace GDCMasterDataReceiveApi.Controller
         /// </summary>
         /// <returns></returns>
         [UnitOfWork]
-        [HttpPost("AccountingDepartment")]
+        [HttpPost("/api/mdm/Receive/AccountingDepartment")]
         public async Task<MDMResponseResult> AccountingDepartmentDataAsync(BaseReceiveDataRequestDto<AccountingDepartmentReceiveDto> baseReceiveDataRequestDto) => await _receiveService.AccountingDepartmentDataAsync(baseReceiveDataRequestDto);
         #endregion
 
@@ -233,7 +233,7 @@ namespace GDCMasterDataReceiveApi.Controller
         /// </summary>
         /// <returns></returns>
         [UnitOfWork]
-        [HttpPost("AdministrativeOrganization")]
+        [HttpPost("/api/mdm/Receive/AdministrativeOrganization")]
         public async Task<MDMResponseResult> AdministrativeOrganizationDataAsync(BaseReceiveDataRequestDto<AdministrativeOrganizationReceiveRequestDto> baseReceiveDataRequestDto) => await _receiveService.AdministrativeOrganizationDataAsync(baseReceiveDataRequestDto);
         #endregion
 

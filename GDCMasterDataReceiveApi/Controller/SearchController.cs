@@ -609,5 +609,10 @@ namespace GDCMasterDataReceiveApi.Controller
         {
             return await _searchService.GetCurrencyDetailsAsync(id);
         }
+
+
+
+
+     
     }
 }
