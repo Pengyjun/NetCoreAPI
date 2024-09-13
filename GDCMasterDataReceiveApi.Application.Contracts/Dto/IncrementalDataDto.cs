@@ -1,4 +1,5 @@
 ﻿using GDCMasterDataReceiveApi.Domain.Shared.Enums;
+using GDCMasterDataReceiveApi.Domain.Shared.Utils;
 
 namespace GDCMasterDataReceiveApi.Application.Contracts.Dto
 {
@@ -24,7 +25,7 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto
         /// <summary>
         /// 日期
         /// </summary>
-        public DateTime TimeValue { get; set; }
+        public string? TimeValue { get; set; }
         /// <summary>
         /// 需要查询的ids
         /// </summary>
@@ -36,13 +37,25 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto
     public class IncrementalSearchRequestDto
     {
         /// <summary>
-        /// 查询的日期
-        /// </summary>
-        public int DateDay { get; set; }
-        /// <summary>
         /// 表名
         /// </summary>
         public TableNameType TableName { get; set; }
+        /// <summary>
+        /// 月份(例：202304 固定6位数)
+        /// </summary>
+        public int DateDay { get; set; }
+        /// <summary>
+        /// 月份(时间格式)
+        /// </summary>
+        public DateTime? TimeValue { get; set; }
+        /// <summary>
+        /// 重置属性
+        /// </summary>
+        public void ResetModelProperty()
+        {
+            if (TimeValue == null || DateTime.MinValue == TimeValue) DateDay = DateTime.Now.ToDateDay();
+            else DateDay = TimeValue.Value.ToDateDay();
+        }
 
     }
 }

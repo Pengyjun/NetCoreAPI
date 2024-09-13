@@ -163,7 +163,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
             var result = new IncrementalDataDto();
             var item = new List<IncrementalSearchResponse>();
 
-            requestDto.DateDay = requestDto.DateDay == 0 ? DateTime.Now.ToDateDay() : requestDto.DateDay;
+            requestDto.ResetModelProperty();
             var tableName = Utils.GetDescription(requestDto.TableName);
             Utils.TryConvertDateTimeFromDateDay(requestDto.DateDay, out DateTime time);
 
@@ -197,7 +197,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                 {
                     DetailsIds = incDetails,
                     ChangeNums = changeNums,
-                    TimeValue = sevTime
+                    TimeValue = sevTime.ToString("yyyy-MM-dd")
                 });
                 sevTime = sevTime.AddDays(1);
             }
