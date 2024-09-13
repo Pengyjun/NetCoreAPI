@@ -4,6 +4,7 @@ using GDCMasterDataReceiveApi.Application.Contracts.Dto;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto._4A.Institution;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto._4A.User;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.AccountingDepartment;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.AdministrativeDivision;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.AdministrativeOrganization;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.CorresUnit;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.CountryContinent;
@@ -1859,10 +1860,70 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
         /// 境内行政区划
         /// </summary>
         /// <returns></returns>
-        public async Task<MDMResponseResult> AdministrativeDivisionDataAsync()
+        public async Task<MDMResponseResult> AdministrativeDivisionDataAsync(BaseReceiveDataRequestDto<AdministrativeDivisionItem> baseReceiveDataRequestDto)
         {
+            MDMResponseResult responseAjaxResult = new MDMResponseResult();
 
-            var responseAjaxResult = new MDMResponseResult();
+            List<AdministrativeDivisionLanguage> insertItem = new();
+            List<AdministrativeDivisionLanguage> updateItem = new();
+
+            var lgList = await _dbContext.Queryable<AdministrativeDivision>().Where(x => x.IsDelete == 1).ToListAsync();
+            var insertOids = baseReceiveDataRequestDto.IT_DATA.item.Where(x => !lgList.Select(x => x.ZADDVSCODE).ToList().Contains(x.ZADDVSCODE)).ToList();
+            var updateOids = baseReceiveDataRequestDto.IT_DATA.item.Where(x => lgList.Select(x => x.ZADDVSCODE).ToList().Contains(x.ZADDVSCODE)).ToList();
+
+            //新增操作
+            if (insertOids.Any())
+            {
+                foreach (var ic in insertOids)
+                {
+                    ic.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
+                    foreach (var cc in ic.ZLANG_LIST.Item)
+                    {
+                        var lg = new AdministrativeDivisionLanguage
+                        {   Id = ic.Id,
+                            ZCODE =cc.ZCODE,
+                             ZLANGCODE=cc.ZLANGCODE,
+                        };
+                        insertItem.Add(lg);
+                    }
+                }
+
+                var mapList = _mapper.Map<List<AdministrativeDivisionItem>, List<AdministrativeDivision>>(insertOids);
+                mapList.ForEach(x => x.CreateTime = DateTime.Now);
+                await _dbContext.Fastest<AdministrativeDivision>().BulkCopyAsync(mapList);
+                await _dbContext.Fastest<AdministrativeDivisionLanguage>().BulkCopyAsync(insertItem);
+            }
+            if (updateOids.Any())
+            {
+                if (updateOids.Any())
+                {
+                    List<AdministrativeDivisionLanguage> deleteData = new List<AdministrativeDivisionLanguage>();
+                    //更新曾用名
+                    var projectUsedNameList = await _dbContext.Queryable<AdministrativeDivisionLanguage>().ToListAsync();
+                    foreach (var itemItem in updateOids)
+                    {
+                        var id = lgList.Where(x => x.ZADDVSCODE == itemItem.ZADDVSCODE).Select(x => x.Id).First();
+                        itemItem.Id = id;
+                        foreach (var items in itemItem.ZLANG_LIST.Item)
+                        {
+                            AdministrativeDivisionLanguage projectUsedName = new AdministrativeDivisionLanguage()
+                            {
+                                Id = itemItem.Id,
+                                ZCODE = items.ZCODE,
+                                ZLANGCODE = items.ZLANGCODE,
+                            };
+                            updateItem.Add(projectUsedName);
+                        }
+                        deleteData.AddRange(projectUsedNameList.Where(x => x.Id == itemItem.Id).ToList());
+                    }
+                    var projectList = _mapper.Map<List<AdministrativeDivisionItem>, List<AdministrativeDivision>>(updateOids);
+                    await _dbContext.Updateable(projectList).ExecuteCommandAsync();
+                    await _dbContext.Deleteable<AdministrativeDivisionLanguage>().WhereColumns(deleteData, it => new { it.Id }).ExecuteCommandAsync();
+                    await _dbContext.Insertable(updateItem).ExecuteCommandAsync();
+
+                }
+            }
+
             responseAjaxResult.Success();
             return responseAjaxResult;
         }

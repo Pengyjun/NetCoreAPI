@@ -2,6 +2,7 @@
 using GDCMasterDataReceiveApi.Application.Contracts.Dto._4A.Institution;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto._4A.User;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.AccountingDepartment;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.AdministrativeDivision;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.AdministrativeOrganization;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.CorresUnit;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.CountryContinent;
@@ -24,6 +25,7 @@ using GDCMasterDataReceiveApi.Application.Contracts.Dto.ScientifiCNoProject;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.UnitMeasurement;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.ValueDomain;
 using GDCMasterDataReceiveApi.Application.Contracts.IService.IReceiveService;
+using GDCMasterDataReceiveApi.Domain.Models;
 using GDCMasterDataReceiveApi.Domain.Shared;
 using GDCMasterDataReceiveApi.Domain.Shared.Annotation;
 using Microsoft.AspNetCore.Mvc;
@@ -176,13 +178,7 @@ namespace GDCMasterDataReceiveApi.Controller
         [UnitOfWork]
         [HttpPost("/api/mdm/Receive/RoomNumber")]
         public async Task<MDMResponseResult> RoomNumberDataAsync([FromBody] BaseReceiveDataRequestDto<RoomNumberItem> receiveDataMDMRequestDto) => await _receiveService.RoomNumberDataAsync(receiveDataMDMRequestDto);
-        /// <summary>
-        /// 境内行政区划
-        /// </summary>
-        /// <returns></returns>
-        [UnitOfWork]
-        [HttpPost("/api/mdm/Receive/AdministrativeDivision")]
-        public async Task<MDMResponseResult> AdministrativeDivisionDataAsync() => await _receiveService.AdministrativeDivisionDataAsync();
+        
         /// <summary>
         /// 语言语种
         /// </summary>
@@ -237,6 +233,17 @@ namespace GDCMasterDataReceiveApi.Controller
         [UnitOfWork]
         [HttpPost("/api/mdm/Receive/AdministrativeOrganization")]
         public async Task<MDMResponseResult> AdministrativeOrganizationDataAsync(BaseReceiveDataRequestDto<AdministrativeOrganizationReceiveRequestDto> baseReceiveDataRequestDto) => await _receiveService.AdministrativeOrganizationDataAsync(baseReceiveDataRequestDto);
+        #endregion
+
+
+        #region 境内行政区划
+        /// <summary>
+        /// 境内行政区划
+        /// </summary>
+        /// <returns></returns>
+        [UnitOfWork]
+        [HttpPost("/api/mdm/Receive/AdministrativeDivision")]
+        public async Task<MDMResponseResult> AdministrativeDivisionDataAsync(BaseReceiveDataRequestDto<AdministrativeDivisionItem> baseReceiveDataRequestDto) => await _receiveService.AdministrativeDivisionDataAsync(baseReceiveDataRequestDto);
         #endregion
 
 
