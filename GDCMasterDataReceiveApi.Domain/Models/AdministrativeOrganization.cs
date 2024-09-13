@@ -81,7 +81,7 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// <summary>
         /// 机构规则码
         /// </summary>
-        [SugarColumn(Length = 64)]
+        [SugarColumn(Length = 1024)]
         public string? ZORULE { get; set; }
 
         /// <summary>
