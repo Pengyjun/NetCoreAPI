@@ -2,6 +2,7 @@
 using GDCMasterDataReceiveApi.Application.Contracts;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.AccountingDepartment;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.AdministrativeDivision;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.AdministrativeOrganization;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.CorresUnit;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.CountryContinent;
@@ -58,9 +59,11 @@ namespace GHElectronicFileApi.AopInterceptor
             var methodName = invocation.Method.Name;
             //接收数据类型
             ReceiveDataType receiveDataType = 0;
-
-            #region 接收类型数据判断
-            if (methodName == "ProjectDataAsync")
+            //目标方法
+            try
+            {
+                #region 接收类型数据判断
+             if (methodName == "ProjectDataAsync")
             {
                 var receiveParame = ((BaseReceiveDataRequestDto<ProjectItem>)invocation.Arguments[0]).IT_DATA;
                 parameCount = receiveParame.item.Count;
@@ -209,14 +212,15 @@ namespace GHElectronicFileApi.AopInterceptor
             }
             else if (methodName == "AdministrativeDivisionDataAsync")
             {
-                var receiveParame = ((BaseReceiveDataRequestDto<POPMangOrgItem>)invocation.Arguments[0]).IT_DATA;
+                //AdministrativeDivisionItem
+                var receiveParame = ((BaseReceiveDataRequestDto<AdministrativeDivisionItem>)invocation.Arguments[0]).IT_DATA;
                 parameCount = receiveParame.item.Count;
                 requestParame = receiveParame.item.ToJson();
                 receiveDataType = ReceiveDataType.AdministrativeDivision;
             }
             #endregion
 
-            #region 记录接收数据的请求日志
+                #region 记录接收数据的请求日志
             if (!string.IsNullOrWhiteSpace(requestParame))
             {
                 receiveRecordLog = new ReceiveRecordLog()
@@ -230,10 +234,7 @@ namespace GHElectronicFileApi.AopInterceptor
                 baseService.ReceiveRecordLogAsync(receiveRecordLog, DataOperationType.Insert);
             }
             #endregion
-
-            //目标方法
-            try
-            {
+           
                 invocation.Proceed();
                 var res = (Task)invocation.ReturnValue;
                 res.Wait();//如果任务有异常 直接报错
