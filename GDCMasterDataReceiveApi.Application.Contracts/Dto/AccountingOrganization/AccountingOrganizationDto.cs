@@ -184,7 +184,7 @@
         /// <summary>
         /// 发送记录ID 发送记录的ID，必须保证此ID在同一个发送批次中是唯一的。用于记录发送方对于此发送记录的唯一标识。
         /// </summary>
-        public string? ZZSERIAL { get; set; }
+        public long? Id { get; set; }
         /// <summary>
         /// 机构主数据编码:机构主数据的唯一标识
         /// </summary>

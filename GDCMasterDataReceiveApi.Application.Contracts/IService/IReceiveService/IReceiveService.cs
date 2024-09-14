@@ -2,6 +2,7 @@
 using GDCMasterDataReceiveApi.Application.Contracts.Dto._4A.Institution;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto._4A.User;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.AccountingDepartment;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.AccountingOrganization;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.AdministrativeAccountingMapper;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.AdministrativeDivision;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.AdministrativeOrganization;
@@ -181,7 +182,7 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.IService.IReceiveService
         /// 多组织-核算机构
         /// </summary>
         /// <returns></returns>
-        Task<MDMResponseResult> AccountingOrganizationDataAsync();
+        Task<MDMResponseResult> AccountingOrganizationDataAsync(BaseReceiveDataRequestDto<AccountingOrganizationReceiveDto> baseReceive);
 
         #region 接收主数据人员和机构的数据
         /// <summary>

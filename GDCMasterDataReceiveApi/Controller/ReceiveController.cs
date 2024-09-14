@@ -2,6 +2,7 @@
 using GDCMasterDataReceiveApi.Application.Contracts.Dto._4A.Institution;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto._4A.User;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.AccountingDepartment;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.AccountingOrganization;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.AdministrativeDivision;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.AdministrativeOrganization;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.CorresUnit;
@@ -192,13 +193,7 @@ namespace GDCMasterDataReceiveApi.Controller
         [UnitOfWork]
         [HttpPost("/api/mdm/Receive/DeviceDetailCode")]
         public async Task<MDMResponseResult> DeviceDetailCodeDataAsync() => await _receiveService.DeviceDetailCodeDataAsync();
-        /// <summary>
-        /// 多组织-核算机构
-        /// </summary>
-        /// <returns></returns>
-        [UnitOfWork]
-        [HttpPost("/api/mdm/Receive/AccountingOrganization")]
-        public async Task<MDMResponseResult> AccountingOrganizationDataAsync() => await _receiveService.AccountingOrganizationDataAsync();
+     
 
         ///// <summary>
         ///// 机构主数据
@@ -223,6 +218,18 @@ namespace GDCMasterDataReceiveApi.Controller
         [HttpPost("/api/mdm/Receive/AccountingDepartment")]
         public async Task<MDMResponseResult> AccountingDepartmentDataAsync(BaseReceiveDataRequestDto<AccountingDepartmentReceiveDto> baseReceiveDataRequestDto) => await _receiveService.AccountingDepartmentDataAsync(baseReceiveDataRequestDto);
         #endregion
+
+
+        #region 核算机构
+        /// <summary>
+        /// 多组织-核算机构
+        /// </summary>
+        /// <returns></returns>
+        [UnitOfWork]
+        [HttpPost("/api/mdm/Receive/AccountingOrganization")]
+        public async Task<MDMResponseResult> AccountingOrganizationDataAsync(BaseReceiveDataRequestDto<AccountingOrganizationReceiveDto> baseReceive) => await _receiveService.AccountingOrganizationDataAsync(baseReceive);
+        #endregion
+
 
         #region 多组织-行政组织
         /// <summary>
