@@ -198,7 +198,7 @@ namespace GHElectronicFileApi.AopInterceptor
                 var receiveParame = ((BaseReceiveDataRequestDto<ValueDomainReceiveRequestDto>)invocation.Arguments[0]).IT_DATA;
                 parameCount = receiveParame.item.Count;
                 requestParame = receiveParame.item.ToJson();
-                receiveDataType = ReceiveDataType.AdministrativeOrganization;
+                receiveDataType = ReceiveDataType.Common;
             }
             else if (methodName == "ManagementOrganizationDataAsync")
             {
@@ -206,6 +206,13 @@ namespace GHElectronicFileApi.AopInterceptor
                 parameCount = receiveParame.item.Count;
                 requestParame = receiveParame.item.ToJson();
                 receiveDataType = ReceiveDataType.POPManger;
+            }
+            else if (methodName == "AdministrativeDivisionDataAsync")
+            {
+                var receiveParame = ((BaseReceiveDataRequestDto<POPMangOrgItem>)invocation.Arguments[0]).IT_DATA;
+                parameCount = receiveParame.item.Count;
+                requestParame = receiveParame.item.ToJson();
+                receiveDataType = ReceiveDataType.AdministrativeDivision;
             }
             #endregion
 

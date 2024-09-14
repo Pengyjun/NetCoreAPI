@@ -100,11 +100,18 @@
         /// </summary>
         POPManger = 22,
 
-
         /// <summary>
         /// 委托关系
         /// </summary>
         ValueDomain = 26,
+        /// <summary>
+        /// 境内行政区划
+        /// </summary>
+        AdministrativeDivision = 27,
+        /// <summary>
+        /// 通用数据
+        /// </summary>
+        Common = 28,
 
     }
 }

@@ -83,17 +83,20 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
                 foreach (var itemItem in insertOids)
                 {
                     itemItem.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
-                    foreach (var lang in itemItem.ZLANG_LIST.Item)
+                    if (itemItem.ZLANG_LIST != null)
                     {
-
-                        ValueDomainLanguage dataItem = new ValueDomainLanguage()
+                        foreach (var lang in itemItem.ZLANG_LIST.Item)
                         {
-                            Id = itemItem.Id.Value,
-                            ZCODE_DESC = lang.ZCODE_DESC,
-                             ZLANGCODE=lang.ZLANGCODE,
-                              ZVALUE_DESC=lang.ZVALUE_DESC,
-                        };
-                        insertzMDGS_OLDNAMEs.Add(dataItem);
+
+                            ValueDomainLanguage dataItem = new ValueDomainLanguage()
+                            {
+                                Id = itemItem.Id.Value,
+                                ZCODE_DESC = lang.ZCODE_DESC,
+                                ZLANGCODE = lang.ZLANGCODE,
+                                ZVALUE_DESC = lang.ZVALUE_DESC,
+                            };
+                            insertzMDGS_OLDNAMEs.Add(dataItem);
+                        }
                     }
                 }
                 var projectList = _mapper.Map<List<ValueDomainReceiveRequestDto>, List<ValueDomain>>(insertOids);
@@ -109,16 +112,19 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
                 {
                     var id = dataCodeList.Where(x => x.Id == itemItem.Id).Select(x => x.Id).First();
                     itemItem.Id = id;
-                    foreach (var items in itemItem.ZLANG_LIST.Item)
+                    if (itemItem.ZLANG_LIST != null)
                     {
-                        ValueDomainLanguage dataItem = new ValueDomainLanguage()
+                        foreach (var items in itemItem.ZLANG_LIST.Item)
                         {
-                            Id = itemItem.Id.Value,
-                            ZCODE_DESC = items.ZCODE_DESC,
-                            ZLANGCODE = items.ZLANGCODE,
-                            ZVALUE_DESC = items.ZVALUE_DESC,
-                        };
-                        updatezMDGS_OLDNAMEs.Add(dataItem);
+                            ValueDomainLanguage dataItem = new ValueDomainLanguage()
+                            {
+                                Id = itemItem.Id.Value,
+                                ZCODE_DESC = items.ZCODE_DESC,
+                                ZLANGCODE = items.ZLANGCODE,
+                                ZVALUE_DESC = items.ZVALUE_DESC,
+                            };
+                            updatezMDGS_OLDNAMEs.Add(dataItem);
+                        }
                     }
                     deleteData.AddRange(projectUsedNameList.Where(x => x.Id == itemItem.Id).ToList());
                 }
@@ -158,26 +164,29 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
                     foreach (var itemItem in insertOids)
                     {
                         itemItem.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
-                        foreach (var items in itemItem.ZBANK.Item)
+                        if (itemItem.ZBANK != null)
                         {
-                            BankCard projectUsedName = new BankCard()
+                            foreach (var items in itemItem.ZBANK.Item)
                             {
-                                Id = itemItem.Id.Value,
-                                ZBP = itemItem.ZBP,
-                                ZBANK = items.ZBANK,
-                                ZBANKN = items.ZBANKN,
-                                ZBANKSTA = items.ZBANKSTA,
-                                ZCITY2 = items.ZCITY2,
-                                ZCOUNTY2 = items.ZCOUNTY2,
-                                ZCURR = items.ZCURR,
-                                ZFINAME = items.ZFINAME,
-                                ZFINC = items.ZFINC,
-                                ZKOINH = items.ZKOINH,
-                                ZPROVINC2 = items.ZPROVINC2,
-                                ZZCOUNTR2 = items.ZZCOUNTR2,
-                                ZZSERIAL = items.ZZSERIAL
-                            };
-                            insertzMDGS_OLDNAMEs.Add(projectUsedName);
+                                BankCard projectUsedName = new BankCard()
+                                {
+                                    Id = itemItem.Id.Value,
+                                    ZBP = itemItem.ZBP,
+                                    ZBANK = items.ZBANK,
+                                    ZBANKN = items.ZBANKN,
+                                    ZBANKSTA = items.ZBANKSTA,
+                                    ZCITY2 = items.ZCITY2,
+                                    ZCOUNTY2 = items.ZCOUNTY2,
+                                    ZCURR = items.ZCURR,
+                                    ZFINAME = items.ZFINAME,
+                                    ZFINC = items.ZFINC,
+                                    ZKOINH = items.ZKOINH,
+                                    ZPROVINC2 = items.ZPROVINC2,
+                                    ZZCOUNTR2 = items.ZZCOUNTR2,
+                                    ZZSERIAL = items.ZZSERIAL
+                                };
+                                insertzMDGS_OLDNAMEs.Add(projectUsedName);
+                            }
                         }
                     }
                     var projectList = _mapper.Map<List<CorresUnitReceiveDto>, List<CorresUnit>>(insertOids);
@@ -194,25 +203,28 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
                     {
                         var id = projectCodeList.Where(x => x.ZBP == itemItem.ZBP).Select(x => x.Id).First();
                         itemItem.Id = id;
-                        foreach (var items in itemItem.ZBANK.Item)
+                        if (itemItem.ZBANK != null)
                         {
-                            BankCard projectUsedName = new BankCard()
+                            foreach (var items in itemItem.ZBANK.Item)
                             {
-                                Id = itemItem.Id.Value,
-                                ZBP = itemItem.ZBP,
-                                ZBANK = items.ZBANK,
-                                ZBANKN = items.ZBANKN,
-                                ZBANKSTA = items.ZBANKSTA,
-                                ZCITY2 = items.ZCITY2,
-                                ZCOUNTY2 = items.ZCOUNTY2,
-                                ZCURR = items.ZCURR,
-                                ZFINAME = items.ZFINAME,
-                                ZFINC = items.ZFINC,
-                                ZKOINH = items.ZKOINH,
-                                ZPROVINC2 = items.ZPROVINC2,
-                                ZZCOUNTR2 = items.ZZCOUNTR2,
-                                ZZSERIAL = items.ZZSERIAL
-                            };
+                                BankCard projectUsedName = new BankCard()
+                                {
+                                    Id = itemItem.Id.Value,
+                                    ZBP = itemItem.ZBP,
+                                    ZBANK = items.ZBANK,
+                                    ZBANKN = items.ZBANKN,
+                                    ZBANKSTA = items.ZBANKSTA,
+                                    ZCITY2 = items.ZCITY2,
+                                    ZCOUNTY2 = items.ZCOUNTY2,
+                                    ZCURR = items.ZCURR,
+                                    ZFINAME = items.ZFINAME,
+                                    ZFINC = items.ZFINC,
+                                    ZKOINH = items.ZKOINH,
+                                    ZPROVINC2 = items.ZPROVINC2,
+                                    ZZCOUNTR2 = items.ZZCOUNTR2,
+                                    ZZSERIAL = items.ZZSERIAL
+                                };
+                            }
                             updatezMDGS_OLDNAMEs.Add(projectUsedName);
                         }
                         deleteData.AddRange(projectUsedNameList.Where(x => x.ZBP == itemItem.ZBP).ToList());
@@ -275,16 +287,19 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
                 foreach (var itemItem in insertOids)
                 {
                     itemItem.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
-                    foreach (var lang in itemItem.ZLANG_LIST.Item)
+                    if (itemItem.ZLANG_LIST != null)
                     {
-
-                        CountryLanguage dataItem = new CountryLanguage()
+                        foreach (var lang in itemItem.ZLANG_LIST.Item)
                         {
-                            Id = itemItem.Id.Value,
-                            ZLANGCODE = lang.ZLANGCODE,
-                            ZCODE_DESC = lang.ZCODE_DESC,
-                        };
-                        insertzMDGS_OLDNAMEs.Add(dataItem);
+
+                            CountryLanguage dataItem = new CountryLanguage()
+                            {
+                                Id = itemItem.Id.Value,
+                                ZLANGCODE = lang.ZLANGCODE,
+                                ZCODE_DESC = lang.ZCODE_DESC,
+                            };
+                            insertzMDGS_OLDNAMEs.Add(dataItem);
+                        }
                     }
                 }
                 var projectList = _mapper.Map<List<CountryRegionReceiveDto>, List<CountryRegion>>(insertOids);
@@ -300,15 +315,18 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
                 {
                     var id = dataCodeList.Where(x => x.ZCOUNTRYCODE == itemItem.ZCOUNTRYCODE).Select(x => x.Id).First();
                     itemItem.Id = id;
-                    foreach (var items in itemItem.ZLANG_LIST.Item)
+                    if (itemItem.ZLANG_LIST != null)
                     {
-                        CountryLanguage dataItem = new CountryLanguage()
+                        foreach (var items in itemItem.ZLANG_LIST.Item)
                         {
-                            Id = itemItem.Id.Value,
-                            ZLANGCODE = items.ZLANGCODE,
-                            ZCODE_DESC = items.ZCODE_DESC,
-                        };
-                        updatezMDGS_OLDNAMEs.Add(dataItem);
+                            CountryLanguage dataItem = new CountryLanguage()
+                            {
+                                Id = itemItem.Id.Value,
+                                ZLANGCODE = items.ZLANGCODE,
+                                ZCODE_DESC = items.ZCODE_DESC,
+                            };
+                            updatezMDGS_OLDNAMEs.Add(dataItem);
+                        }
                     }
                     deleteData.AddRange(projectUsedNameList.Where(x => x.Id == itemItem.Id).ToList());
                 }
@@ -345,17 +363,20 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
                 foreach (var itemItem in insertOids)
                 {
                     itemItem.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
-                    foreach (var lang in itemItem.ZLANG_LIST.item)
+                    if (itemItem.ZLANG_LIST != null)
                     {
-
-                        CountryContinentLanguage dataItem = new CountryContinentLanguage()
+                        foreach (var lang in itemItem.ZLANG_LIST.item)
                         {
-                            Id = itemItem.Id.Value,
-                            ZLANGCODE = lang.ZLANGCODE,
-                            ZAREA_DESC = lang.ZAREA_DESC,
-                            ZCODE_DESC = lang.ZCODE_DESC,
-                        };
-                        insertzMDGS_OLDNAMEs.Add(dataItem);
+                            CountryContinentLanguage dataItem = new CountryContinentLanguage()
+                            {
+                                Id = itemItem.Id.Value,
+                                ZLANGCODE = lang.ZLANGCODE,
+                                ZAREA_DESC = lang.ZAREA_DESC,
+                                ZCODE_DESC = lang.ZCODE_DESC,
+                            };
+                            insertzMDGS_OLDNAMEs.Add(dataItem);
+                        }
+
                     }
                 }
                 var projectList = _mapper.Map<List<CountryContinentReceiveDto>, List<CountryContinent>>(insertOids);
@@ -371,16 +392,19 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
                 {
                     var id = dataCodeList.Where(x => x.ZCONTINENTCODE == itemItem.ZCONTINENTCODE).Select(x => x.Id).First();
                     itemItem.Id = id;
-                    foreach (var items in itemItem.ZLANG_LIST.item)
+                    if (itemItem.ZLANG_LIST != null)
                     {
-                        CountryContinentLanguage dataItem = new CountryContinentLanguage()
+                        foreach (var items in itemItem.ZLANG_LIST.item)
                         {
-                            Id = itemItem.Id.Value,
-                            ZLANGCODE = items.ZLANGCODE,
-                            ZAREA_DESC = items.ZAREA_DESC,
-                            ZCODE_DESC = items.ZCODE_DESC,
-                        };
-                        updatezMDGS_OLDNAMEs.Add(dataItem);
+                            CountryContinentLanguage dataItem = new CountryContinentLanguage()
+                            {
+                                Id = itemItem.Id.Value,
+                                ZLANGCODE = items.ZLANGCODE,
+                                ZAREA_DESC = items.ZAREA_DESC,
+                                ZCODE_DESC = items.ZCODE_DESC,
+                            };
+                            updatezMDGS_OLDNAMEs.Add(dataItem);
+                        }
                     }
                     deleteData.AddRange(projectUsedNameList.Where(x => x.Id == itemItem.Id).ToList());
                 }
@@ -417,18 +441,22 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
                     foreach (var ic in insertOids)
                     {
                         ic.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
-                        foreach (var cc in ic.ZLANG_LIST.Item)
+                        if (ic.ZLANG_LIST != null)
                         {
-                            var ul = new RegionLanguage
+
+                            foreach (var cc in ic.ZLANG_LIST.Item)
                             {
-                                Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
-                                ZCODE_DESC = cc.ZCODE_DESC,
-                                ZLANGCODE = cc.ZLANGCODE,
-                                ZSCRTEXT_S = cc.ZSCRTEXT_S,
-                                Code = ic.ZCRHCODE,
-                                CreateTime = DateTime.Now
-                            };
-                            insertItem.Add(ul);
+                                var ul = new RegionLanguage
+                                {
+                                    Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                                    ZCODE_DESC = cc.ZCODE_DESC,
+                                    ZLANGCODE = cc.ZLANGCODE,
+                                    ZSCRTEXT_S = cc.ZSCRTEXT_S,
+                                    Code = ic.ZCRHCODE,
+                                    CreateTime = DateTime.Now
+                                };
+                                insertItem.Add(ul);
+                            }
                         }
                     }
 
@@ -445,18 +473,21 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
                     {
                         var id = rlList.Where(x => x.ZCRHCODE == itemItem.ZCRHCODE).Select(x => x.Id).First();
                         itemItem.Id = id;
-                        foreach (var items in itemItem.ZLANG_LIST.Item)
+                        if (itemItem.ZLANG_LIST != null)
                         {
-                            RegionLanguage ldetails = new RegionLanguage()
+                            foreach (var items in itemItem.ZLANG_LIST.Item)
                             {
-                                Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
-                                Code = itemItem.ZCRHCODE,
-                                ZSCRTEXT_S = items.ZSCRTEXT_S,
-                                ZLANGCODE = items.ZLANGCODE,
-                                ZCODE_DESC = items.ZCODE_DESC,
-                                CreateTime = DateTime.Now
-                            };
-                            updateItem.Add(ldetails);
+                                RegionLanguage ldetails = new RegionLanguage()
+                                {
+                                    Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                                    Code = itemItem.ZCRHCODE,
+                                    ZSCRTEXT_S = items.ZSCRTEXT_S,
+                                    ZLANGCODE = items.ZLANGCODE,
+                                    ZCODE_DESC = items.ZCODE_DESC,
+                                    CreateTime = DateTime.Now
+                                };
+                                updateItem.Add(ldetails);
+                            }
                         }
                         deleteData.AddRange(lgeList.Where(x => x.Code == itemItem.ZCRHCODE).ToList());
                     }
@@ -498,18 +529,22 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
                     foreach (var ic in insertOids)
                     {
                         ic.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
-                        foreach (var cc in ic.ZUNIT_LANG.Item)
+                        if (ic.ZUNIT_LANG != null)
                         {
-                            var ul = new UnitMeasurementLanguage
+                            foreach (var cc in ic.ZUNIT_LANG.Item)
                             {
-                                Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
-                                ZSPRAS = cc.ZSPRAS,
-                                ZSPTXT = cc.ZSPTXT,
-                                ZUNITCODE = ic.ZUNITCODE,
-                                ZUNITDESCR = cc.ZUNITDESCR,
-                                CreateTime = DateTime.Now
-                            };
-                            insertItem.Add(ul);
+                                var ul = new UnitMeasurementLanguage
+                                {
+                                    Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                                    ZSPRAS = cc.ZSPRAS,
+                                    ZSPTXT = cc.ZSPTXT,
+                                    ZUNITCODE = ic.ZUNITCODE,
+                                    ZUNITDESCR = cc.ZUNITDESCR,
+                                    CreateTime = DateTime.Now
+                                };
+                                insertItem.Add(ul);
+                            }
+
                         }
                     }
 
@@ -526,18 +561,22 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
                     {
                         var id = ulList.Where(x => x.ZUNITCODE == itemItem.ZUNITCODE).Select(x => x.Id).First();
                         itemItem.Id = id;
-                        foreach (var items in itemItem.ZUNIT_LANG.Item)
+                        if (itemItem.ZUNIT_LANG != null)
                         {
-                            UnitMeasurementLanguage ldetails = new UnitMeasurementLanguage()
+                            foreach (var items in itemItem.ZUNIT_LANG.Item)
                             {
-                                Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
-                                ZUNITDESCR = items.ZUNITDESCR,
-                                ZUNITCODE = itemItem.ZUNITCODE,
-                                ZSPTXT = items.ZSPTXT,
-                                ZSPRAS = items.ZSPRAS,
-                                CreateTime = DateTime.Now
-                            };
-                            updateItem.Add(ldetails);
+                                UnitMeasurementLanguage ldetails = new UnitMeasurementLanguage()
+                                {
+                                    Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                                    ZUNITDESCR = items.ZUNITDESCR,
+                                    ZUNITCODE = itemItem.ZUNITCODE,
+                                    ZSPTXT = items.ZSPTXT,
+                                    ZSPRAS = items.ZSPRAS,
+                                    CreateTime = DateTime.Now
+                                };
+                                updateItem.Add(ldetails);
+                            }
+
                         }
                         deleteData.AddRange(lgeList.Where(x => x.ZUNITCODE == itemItem.ZUNITCODE).ToList());
                     }
@@ -841,17 +880,21 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
                     foreach (var ic in insertOids)
                     {
                         ic.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
-                        foreach (var cc in ic.ZLANG_LIST.Item)
+                        if (ic.ZLANG_LIST != null)
                         {
-                            var ul = new RegionalCenterLanguage
+                            foreach (var cc in ic.ZLANG_LIST.Item)
                             {
-                                Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
-                                ZCODE_DESC = cc.ZCODE_DESC,
-                                ZLANGCODE = cc.ZLANGCODE,
-                                Code = ic.ZCRCCODE,
-                                CreateTime = DateTime.Now
-                            };
-                            insertItem.Add(ul);
+                                var ul = new RegionalCenterLanguage
+                                {
+                                    Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                                    ZCODE_DESC = cc.ZCODE_DESC,
+                                    ZLANGCODE = cc.ZLANGCODE,
+                                    Code = ic.ZCRCCODE,
+                                    CreateTime = DateTime.Now
+                                };
+                                insertItem.Add(ul);
+                            }
+
                         }
                     }
 
@@ -868,6 +911,10 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
                     {
                         var id = rlList.Where(x => x.ZCRCCODE == itemItem.ZCRCCODE).Select(x => x.Id).First();
                         itemItem.Id = id;
+                        if (itemItem.ZLANG_LIST != null)
+                        {
+
+                        }
                         foreach (var items in itemItem.ZLANG_LIST.Item)
                         {
                             RegionalCenterLanguage rcdetails = new RegionalCenterLanguage()
@@ -920,17 +967,21 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
                     foreach (var ic in insertOids)
                     {
                         ic.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
-                        foreach (var cc in ic.ZLANG_LIST.Item)
+                        if (ic.ZLANG_LIST != null)
                         {
-                            var ul = new NationalEconomyLanguage
+                            foreach (var cc in ic.ZLANG_LIST.Item)
                             {
-                                Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
-                                ZCODE_DESC = cc.ZCODE_DESC,
-                                ZLANGCODE = cc.ZLANGCODE,
-                                ZNEQCODE = ic.ZNEQCODE,
-                                CreateTime = DateTime.Now
-                            };
-                            insertItem.Add(ul);
+                                var ul = new NationalEconomyLanguage
+                                {
+                                    Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                                    ZCODE_DESC = cc.ZCODE_DESC,
+                                    ZLANGCODE = cc.ZLANGCODE,
+                                    ZNEQCODE = ic.ZNEQCODE,
+                                    CreateTime = DateTime.Now
+                                };
+                                insertItem.Add(ul);
+                            }
+
                         }
                     }
 
@@ -947,17 +998,21 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
                     {
                         var id = rlList.Where(x => x.ZNEQCODE == itemItem.ZNEQCODE).Select(x => x.Id).First();
                         itemItem.Id = id;
-                        foreach (var items in itemItem.ZLANG_LIST.Item)
+                        if (itemItem.ZLANG_LIST != null)
                         {
-                            NationalEconomyLanguage rcdetails = new NationalEconomyLanguage()
+
+                            foreach (var items in itemItem.ZLANG_LIST.Item)
                             {
-                                Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
-                                ZNEQCODE = itemItem.ZNEQCODE,
-                                ZLANGCODE = items.ZLANGCODE,
-                                ZCODE_DESC = items.ZCODE_DESC,
-                                CreateTime = DateTime.Now
-                            };
-                            updateItem.Add(rcdetails);
+                                NationalEconomyLanguage rcdetails = new NationalEconomyLanguage()
+                                {
+                                    Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                                    ZNEQCODE = itemItem.ZNEQCODE,
+                                    ZLANGCODE = items.ZLANGCODE,
+                                    ZCODE_DESC = items.ZCODE_DESC,
+                                    CreateTime = DateTime.Now
+                                };
+                                updateItem.Add(rcdetails);
+                            }
                         }
                         deleteData.AddRange(rcList.Where(x => x.ZNEQCODE == itemItem.ZNEQCODE).ToList());
                     }
@@ -1037,17 +1092,21 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
                     foreach (var ic in insertOids)
                     {
                         ic.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
-                        foreach (var cc in ic.ZLANG_LIST.Item)
+                        if (ic.ZLANG_LIST != null)
                         {
-                            var invoiceLanguage = new InvoiceLanguage
+
+                            foreach (var cc in ic.ZLANG_LIST.Item)
                             {
-                                Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
-                                InvoiceCode = ic.ZINVTCODE,
-                                ZCODE_DESC = cc.ZCODE_DESC,
-                                ZLANGCODE = cc.ZLANGCODE,
-                                CreateTime = DateTime.Now
-                            };
-                            insertItem.Add(invoiceLanguage);
+                                var invoiceLanguage = new InvoiceLanguage
+                                {
+                                    Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                                    InvoiceCode = ic.ZINVTCODE,
+                                    ZCODE_DESC = cc.ZCODE_DESC,
+                                    ZLANGCODE = cc.ZLANGCODE,
+                                    CreateTime = DateTime.Now
+                                };
+                                insertItem.Add(invoiceLanguage);
+                            }
                         }
                     }
 
@@ -1065,17 +1124,21 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
                     {
                         var id = invoiceCodes.Where(x => x.ZINVTCODE == itemItem.ZINVTCODE).Select(x => x.Id).First();
                         itemItem.Id = id;
-                        foreach (var items in itemItem.ZLANG_LIST.Item)
+                        if (itemItem.ZLANG_LIST != null)
                         {
-                            InvoiceLanguage invoiceLanguage = new InvoiceLanguage()
+
+                            foreach (var items in itemItem.ZLANG_LIST.Item)
                             {
-                                Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
-                                InvoiceCode = itemItem.ZINVTCODE,
-                                ZCODE_DESC = items.ZCODE_DESC,
-                                ZLANGCODE = items.ZLANGCODE,
-                                CreateTime = DateTime.Now
-                            };
-                            updateItem.Add(invoiceLanguage);
+                                InvoiceLanguage invoiceLanguage = new InvoiceLanguage()
+                                {
+                                    Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                                    InvoiceCode = itemItem.ZINVTCODE,
+                                    ZCODE_DESC = items.ZCODE_DESC,
+                                    ZLANGCODE = items.ZLANGCODE,
+                                    CreateTime = DateTime.Now
+                                };
+                                updateItem.Add(invoiceLanguage);
+                            }
                         }
                         deleteData.AddRange(invoiceLanguageList.Where(x => x.InvoiceCode == itemItem.ZINVTCODE).ToList());
                     }
@@ -1116,15 +1179,19 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
                 foreach (var itemItem in insertOids)
                 {
                     itemItem.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
-                    foreach (var items in itemItem.ZLANG_LIST.Item)
+                    if (itemItem.ZLANG_LIST != null)
                     {
-                        Currencylanguage projectUsedName = new Currencylanguage()
+
+                        foreach (var items in itemItem.ZLANG_LIST.Item)
                         {
-                            Id = itemItem.Id.Value,
-                            ZCODE_DESC = items.ZCODE_DESC,
-                            ZLANGCODE = items.ZLANGCODE
-                        };
-                        insertzMDGS_OLDNAMEs.Add(projectUsedName);
+                            Currencylanguage projectUsedName = new Currencylanguage()
+                            {
+                                Id = itemItem.Id.Value,
+                                ZCODE_DESC = items.ZCODE_DESC,
+                                ZLANGCODE = items.ZLANGCODE
+                            };
+                            insertzMDGS_OLDNAMEs.Add(projectUsedName);
+                        }
                     }
                 }
                 var projectList = _mapper.Map<List<CurrencyReceiveDto>, List<Currency>>(insertOids);
@@ -1140,15 +1207,19 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
                 {
                     var id = projectCodeList.Where(x => x.ZCURRENCYCODE == itemItem.ZCURRENCYCODE).Select(x => x.Id).First();
                     itemItem.Id = id;
-                    foreach (var items in itemItem.ZLANG_LIST.Item)
+                    if (itemItem.ZLANG_LIST != null)
                     {
-                        Currencylanguage projectUsedName = new Currencylanguage()
+
+                        foreach (var items in itemItem.ZLANG_LIST.Item)
                         {
-                            Id = itemItem.Id.Value,
-                            ZLANGCODE = items.ZLANGCODE,
-                            ZCODE_DESC = items.ZCODE_DESC
-                        };
-                        updatezMDGS_OLDNAMEs.Add(projectUsedName);
+                            Currencylanguage projectUsedName = new Currencylanguage()
+                            {
+                                Id = itemItem.Id.Value,
+                                ZLANGCODE = items.ZLANGCODE,
+                                ZCODE_DESC = items.ZCODE_DESC
+                            };
+                            updatezMDGS_OLDNAMEs.Add(projectUsedName);
+                        }
                     }
                     deleteData.AddRange(projectUsedNameList.Where(x => x.Id == itemItem.Id).ToList());
                 }
@@ -1197,15 +1268,19 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
                     foreach (var itemItem in insertOids)
                     {
                         itemItem.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
-                        foreach (var items in itemItem.ZOLDNAME_LIST.item)
+                        if (itemItem.ZOLDNAME_LIST != null)
                         {
-                            ProjectUsedName projectUsedName = new ProjectUsedName()
+
+                            foreach (var items in itemItem.ZOLDNAME_LIST.item)
                             {
-                                Id = itemItem.Id.Value,
-                                ZOLDNAME = items.ZOLDNAME,
-                                ZPROJECT = items.ZPROJECT
-                            };
-                            insertzMDGS_OLDNAMEs.Add(projectUsedName);
+                                ProjectUsedName projectUsedName = new ProjectUsedName()
+                                {
+                                    Id = itemItem.Id.Value,
+                                    ZOLDNAME = items.ZOLDNAME,
+                                    ZPROJECT = items.ZPROJECT
+                                };
+                                insertzMDGS_OLDNAMEs.Add(projectUsedName);
+                            }
                         }
                     }
                     var projectList = _mapper.Map<List<ProjectItem>, List<Project>>(insertOids);
@@ -1222,15 +1297,19 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
                     {
                         var id = projectCodeList.Where(x => x.ZPROJECT == itemItem.ZPROJECT).Select(x => x.Id).First();
                         itemItem.Id = id;
-                        foreach (var items in itemItem.ZOLDNAME_LIST.item)
+                        if (itemItem.ZOLDNAME_LIST != null)
                         {
-                            ProjectUsedName projectUsedName = new ProjectUsedName()
+
+                            foreach (var items in itemItem.ZOLDNAME_LIST.item)
                             {
-                                Id = itemItem.Id.Value,
-                                ZOLDNAME = items.ZOLDNAME,
-                                ZPROJECT = items.ZPROJECT
-                            };
-                            updatezMDGS_OLDNAMEs.Add(projectUsedName);
+                                ProjectUsedName projectUsedName = new ProjectUsedName()
+                                {
+                                    Id = itemItem.Id.Value,
+                                    ZOLDNAME = items.ZOLDNAME,
+                                    ZPROJECT = items.ZPROJECT
+                                };
+                                updatezMDGS_OLDNAMEs.Add(projectUsedName);
+                            }
                         }
                         deleteData.AddRange(projectUsedNameList.Where(x => x.ZPROJECT == itemItem.ZPROJECT).ToList());
                     }
@@ -1877,14 +1956,18 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
                 foreach (var ic in insertOids)
                 {
                     ic.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
-                    foreach (var cc in ic.ZLANG_LIST.Item)
+                    if (ic.ZLANG_LIST != null)
                     {
-                        var lg = new AdministrativeDivisionLanguage
-                        {   Id = ic.Id,
-                            ZCODE =cc.ZCODE,
-                             ZLANGCODE=cc.ZLANGCODE,
-                        };
-                        insertItem.Add(lg);
+                        foreach (var cc in ic.ZLANG_LIST.Item)
+                        {
+                            var lg = new AdministrativeDivisionLanguage
+                            {
+                                Id = ic.Id,
+                                ZCODE = cc.ZCODE,
+                                ZLANGCODE = cc.ZLANGCODE,
+                            };
+                            insertItem.Add(lg);
+                        }
                     }
                 }
 
@@ -1904,15 +1987,18 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
                     {
                         var id = lgList.Where(x => x.ZADDVSCODE == itemItem.ZADDVSCODE).Select(x => x.Id).First();
                         itemItem.Id = id;
-                        foreach (var items in itemItem.ZLANG_LIST.Item)
+                        if (itemItem.ZLANG_LIST != null)
                         {
-                            AdministrativeDivisionLanguage projectUsedName = new AdministrativeDivisionLanguage()
+                            foreach (var items in itemItem.ZLANG_LIST.Item)
                             {
-                                Id = itemItem.Id,
-                                ZCODE = items.ZCODE,
-                                ZLANGCODE = items.ZLANGCODE,
-                            };
-                            updateItem.Add(projectUsedName);
+                                AdministrativeDivisionLanguage projectUsedName = new AdministrativeDivisionLanguage()
+                                {
+                                    Id = itemItem.Id,
+                                    ZCODE = items.ZCODE,
+                                    ZLANGCODE = items.ZLANGCODE,
+                                };
+                                updateItem.Add(projectUsedName);
+                            }
                         }
                         deleteData.AddRange(projectUsedNameList.Where(x => x.Id == itemItem.Id).ToList());
                     }
@@ -1950,18 +2036,22 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
                     foreach (var ic in insertOids)
                     {
                         ic.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
-                        foreach (var cc in ic.ZLANG_LIST.Item)
+                        if (ic.ZLANG_LIST != null)
                         {
-                            var lg = new LanguageDetails
+
+                            foreach (var cc in ic.ZLANG_LIST.Item)
                             {
-                                Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
-                                Code = ic.ZLANG_TER,
-                                ZVALUE_DESC = cc.ZVALUE_DESC,
-                                ZCODE_DESC = cc.ZCODE_DESC,
-                                ZLANGCODE = cc.ZLANGCODE,
-                                CreateTime = DateTime.Now
-                            };
-                            insertItem.Add(lg);
+                                var lg = new LanguageDetails
+                                {
+                                    Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                                    Code = ic.ZLANG_TER,
+                                    ZVALUE_DESC = cc.ZVALUE_DESC,
+                                    ZCODE_DESC = cc.ZCODE_DESC,
+                                    ZLANGCODE = cc.ZLANGCODE,
+                                    CreateTime = DateTime.Now
+                                };
+                                insertItem.Add(lg);
+                            }
                         }
                     }
 
@@ -1978,18 +2068,22 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
                     {
                         var id = lgList.Where(x => x.ZLANG_TER == itemItem.ZLANG_TER).Select(x => x.Id).First();
                         itemItem.Id = id;
-                        foreach (var items in itemItem.ZLANG_LIST.Item)
+                        if (itemItem.ZLANG_LIST != null)
                         {
-                            LanguageDetails ldetails = new LanguageDetails()
+                            foreach (var items in itemItem.ZLANG_LIST.Item)
                             {
-                                Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
-                                ZCODE_DESC = items.ZCODE_DESC,
-                                ZLANGCODE = items.ZLANGCODE,
-                                Code = itemItem.ZLANG_TER,
-                                ZVALUE_DESC = items.ZVALUE_DESC,
-                                CreateTime = DateTime.Now
-                            };
-                            updateItem.Add(ldetails);
+                                LanguageDetails ldetails = new LanguageDetails()
+                                {
+                                    Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                                    ZCODE_DESC = items.ZCODE_DESC,
+                                    ZLANGCODE = items.ZLANGCODE,
+                                    Code = itemItem.ZLANG_TER,
+                                    ZVALUE_DESC = items.ZVALUE_DESC,
+                                    CreateTime = DateTime.Now
+                                };
+                                updateItem.Add(ldetails);
+                            }
+
                         }
                         deleteData.AddRange(lgeList.Where(x => x.Code == itemItem.ZLANG_TER).ToList());
                     }
