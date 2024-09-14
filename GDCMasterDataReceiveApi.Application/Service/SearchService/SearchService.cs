@@ -294,7 +294,6 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     Id = x.Id.ToString(),
                     Name = x.NAME,
                     Oid = x.OID,
-                    Sno = Convert.ToInt32(x.SNO),
                     Orule = x.ORULE,
                     POid = x.POID,
                     GpOid = x.GPOID,
@@ -314,7 +313,6 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     Id = x.Id.ToString(),
                     Name = x.NAME,
                     Oid = x.OID,
-                    Sno = Convert.ToInt32(x.SNO),
                     Orule = x.ORULE,
                     POid = x.POID,
                     ShortName = x.SHORTNAME,
@@ -336,28 +334,14 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
         /// <returns></returns>
         public List<InstitutionDto> GetChildren(string gpOid, List<InstitutionDto> children)
         {
-            var childs = children.Where(x => x.GpOid == gpOid).OrderBy(x => x.Sno).ToList();
+            var childs = children.Where(x => x.GpOid == gpOid).ToList();
             foreach (var child in childs)
             {
-                child.Children = GetChildrenChilds(child.Oid, children);
+                child.Children = GetChildren(child.Oid, children);
             }
             return childs;
         }
-        /// <summary>
-        /// 最终节点
-        /// </summary>
-        /// <param name="pOid"></param>
-        /// <param name="childrenChilds"></param>
-        /// <returns></returns>
-        public List<InstitutionDto> GetChildrenChilds(string pOid, List<InstitutionDto> childrenChilds)
-        {
-            var childs = childrenChilds.Where(x => x.POid == pOid).OrderBy(x => x.Sno).ToList();
-            foreach (var child in childs)
-            {
-                child.Children = GetChildrenChilds(child.Oid, childrenChilds);
-            }
-            return childs;
-        }
+       
         /// <summary>
         /// 获取机构详情
         /// </summary>
