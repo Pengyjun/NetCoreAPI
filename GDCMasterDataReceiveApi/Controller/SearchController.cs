@@ -254,7 +254,7 @@ namespace GDCMasterDataReceiveApi.Controller
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
-        [HttpGet(" GetScientifiCNoProjectSearch")]
+        [HttpGet("GetScientifiCNoProjectSearch")]
         public async Task<ResponseAjaxResult<List<ScientifiCNoProjectSearchDto>>> GetScientifiCNoProjectSearchAsync([FromQuery] ScientifiCNoProjectRequestDto requestDto)
         {
             return await _searchService.GetScientifiCNoProjectSearchAsync(requestDto);
@@ -514,7 +514,7 @@ namespace GDCMasterDataReceiveApi.Controller
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
-        [HttpGet("GetEscrowOrganizationSearc")]
+        [HttpGet("GetEscrowOrganizationSearch")]
         public async Task<ResponseAjaxResult<List<EscrowOrganizationSearchDto>>> GetEscrowOrganizationSearchAsync([FromQuery] EscrowOrganizationRequestDto requestDto)
         {
             return await _searchService.GetEscrowOrganizationSearchAsync(requestDto);
