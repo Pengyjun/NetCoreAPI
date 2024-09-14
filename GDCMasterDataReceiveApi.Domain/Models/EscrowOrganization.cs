@@ -21,32 +21,32 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// <summary>
         /// 机构主数据编码:机构主数据的唯一标识
         /// </summary>
-        [SugarColumn(Length = 9, ColumnName = "OrgMDCode")]
+        [SugarColumn(Length = 50, ColumnName = "OrgMDCode")]
         public string? MDM_CODE { get; set; }
         /// <summary>
         /// 上级机构主数据编码 :20230627新增
         /// </summary>
-        [SugarColumn(Length = 9, ColumnName = "SupOrgMDCode")]
+        [SugarColumn(Length = 50, ColumnName = "SupOrgMDCode")]
         public string? ZORGUP { get; set; }
         /// <summary>
         /// HR机构主数据编码:机构与人力系统的机构唯一编号（OID，不可改变）
         /// </summary>
-        [SugarColumn(Length = 20, ColumnName = "HROrgMDCode")]
+        [SugarColumn(Length = 50, ColumnName = "HROrgMDCode")]
         public string? OID { get; set; }
         /// <summary>
         /// HR上级机构主数据编码 : 上级机构编码，关联机构主数据编码ZZOID（OID）。
         /// </summary>
-        [SugarColumn(Length = 20, ColumnName = "SupHROrgMDCode")]
+        [SugarColumn(Length = 50, ColumnName = "SupHROrgMDCode")]
         public string? POID { get; set; }
         /// <summary>
         /// 机构编码:机构编码
         /// </summary>
-        [SugarColumn(Length = 27, ColumnName = "OrgCode")]
+        [SugarColumn(Length = 50, ColumnName = "OrgCode")]
         public string? OCODE { get; set; }
         /// <summary>
         /// 所属二级单位编码 
         /// </summary>
-        [SugarColumn(Length = 10, ColumnName = "UnitSec")]
+        [SugarColumn(Length = 50, ColumnName = "UnitSec")]
         public string? GPOID { get; set; }
         /// <summary>
         /// 机构规则码
@@ -56,17 +56,17 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// <summary>
         /// 机构属性:机构属性，值域校验
         /// </summary>
-        [SugarColumn(Length = 3, ColumnName = "OrgAttr")]
+        [SugarColumn(Length = 50, ColumnName = "OrgAttr")]
         public string? TYPE { get; set; }
         /// <summary>
         /// 机构子属性:机构子属性，值域校验
         /// </summary>
-        [SugarColumn(Length = 3, ColumnName = "OrgChildAttr")]
+        [SugarColumn(Length = 50, ColumnName = "OrgChildAttr")]
         public string? TYPEEXT { get; set; }
         /// <summary>
         /// 节点排序号:序号
         /// </summary>
-        [SugarColumn(Length = 6, ColumnName = "NodeSequence")]
+        [SugarColumn(Length = 50, ColumnName = "NodeSequence")]
         public string? SNO { get; set; }
         /// <summary>
         /// 名称（中文:Z0名称（中文）
@@ -76,12 +76,12 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// <summary>
         /// 简称（中文:Z0简称（中文）
         /// </summary>
-        [SugarColumn(Length = 50, ColumnName = "ShortNameChinese")]
+        [SugarColumn(Length = 100, ColumnName = "ShortNameChinese")]
         public string? SHORTNAME { get; set; }
         /// <summary>
         /// 机构状态:机构状态，值域校验
         /// </summary>
-        [SugarColumn(Length = 1, ColumnName = "OrgStatus")]
+        [SugarColumn(Length = 10, ColumnName = "OrgStatus")]
         public string? STATUS { get; set; }
         /// <summary>
         /// 层级:机构树层级
@@ -96,22 +96,22 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// <summary>
         /// 机构所在地:机构所在地，值域校验
         /// </summary>
-        [SugarColumn(Length = 100, ColumnName = "LocationOfOrg")]
+        [SugarColumn(Length = 200, ColumnName = "LocationOfOrg")]
         public string? ORGPROVINCE { get; set; }
         /// <summary>
         /// 国家名称:国家代码，值域校验
         /// </summary>
-        [SugarColumn(Length = 3, ColumnName = "Country")]
+        [SugarColumn(Length = 20, ColumnName = "Country")]
         public string? CAREA { get; set; }
         /// <summary>
         /// 地域属性:地域属性，值域校验
         /// </summary>
-        [SugarColumn(Length = 5, ColumnName = "RegionalAttr")]
+        [SugarColumn(Length = 20, ColumnName = "RegionalAttr")]
         public string? TERRITORYPRO { get; set; }
         /// <summary>
         /// 注册号/统一社会信用:18位长度校验，类型为机构时必填。
         /// </summary>
-        [SugarColumn(Length = 64, ColumnName = "RegistrationNo")]
+        [SugarColumn(Length = 50, ColumnName = "RegistrationNo")]
         public string? REGISTERCODE { get; set; }
         /// <summary>
         /// 通讯地址:机构的通讯地址
@@ -121,17 +121,17 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// <summary>
         /// 持股情况:持股情况
         /// </summary>
-        [SugarColumn(Length = 2, ColumnName = "Shareholding")]
+        [SugarColumn(Length = 20, ColumnName = "Shareholding")]
         public string? SHAREHOLDINGS { get; set; }
         /// <summary>
         /// 是否独立核算:是否独立核算
         /// </summary>
-        [SugarColumn(Length = 2, ColumnName = "IsIndependenceAcc")]
+        [SugarColumn(Length = 20, ColumnName = "IsIndependenceAcc")]
         public string? IS_INDEPENDENT { get; set; }
         /// <summary>
         /// 来源系统:默认为MDM
         /// </summary>
-        [SugarColumn(Length = 10, ColumnName = "SourceSystem")]
+        [SugarColumn(Length = 20, ColumnName = "SourceSystem")]
         public string? ZSYSTEM { get; set; }
         /// <summary>
         /// 名称（英文）:Z0名称（英文）

@@ -13,6 +13,7 @@ using GDCMasterDataReceiveApi.Application.Contracts.Dto.CountryRegion;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.Currency;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.DeviceClassCode;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.DeviceDetailCode;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.EscrowOrganization;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.FinancialInstitution;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.InvoiceType;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.Language;
@@ -69,7 +70,7 @@ namespace GDCMasterDataReceiveApi.Controller
         /// <returns></returns>
         [UnitOfWork]
         [HttpPost("/api/mdm/Receive/EscrowOrganization")]
-        public async Task<MDMResponseResult> EscrowOrganizationDataAsync() => await _receiveService.EscrowOrganizationDataAsync();
+        public async Task<MDMResponseResult> EscrowOrganizationDataAsync([FromBody] BaseReceiveDataRequestDto<EscrowOrganizationItem> baseReceiveDataRequestDto) => await _receiveService.EscrowOrganizationDataAsync(baseReceiveDataRequestDto);
         /// <summary>
         /// 商机项目(含境外商机项目) 国家地区区分  142境内，142以为境外
         /// </summary>

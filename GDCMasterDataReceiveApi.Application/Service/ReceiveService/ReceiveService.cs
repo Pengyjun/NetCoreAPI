@@ -15,6 +15,7 @@ using GDCMasterDataReceiveApi.Application.Contracts.Dto.CountryRegion;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.Currency;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.DeviceClassCode;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.DeviceDetailCode;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.EscrowOrganization;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.FinancialInstitution;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.InvoiceType;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.Language;
@@ -249,10 +250,36 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
         /// 多组织-税务代管组织(行政)
         /// </summary>
         /// <returns></returns>
-        public async Task<MDMResponseResult> EscrowOrganizationDataAsync()
+        public async Task<MDMResponseResult> EscrowOrganizationDataAsync(BaseReceiveDataRequestDto<EscrowOrganizationItem> baseReceiveDataRequestDto)
         {
-
             var responseAjaxResult = new MDMResponseResult();
+            //查询项目表
+            var projectCodeList = await _dbContext.Queryable<EscrowOrganization>().Where(x => x.IsDelete == 1).ToListAsync();
+            //需要新增的数据
+            var insertOids = baseReceiveDataRequestDto.IT_DATA.item.Where(x => !projectCodeList.Select(x => x.MDM_CODE).ToList().Contains(x.MDM_CODE)).ToList();
+            //需要更新的数据
+            var updateOids = baseReceiveDataRequestDto.IT_DATA.item.Where(x => projectCodeList.Select(x => x.MDM_CODE).ToList().Contains(x.MDM_CODE)).ToList();
+            //新增操作
+            if (insertOids.Any())
+            {
+                foreach (var itemItem in insertOids)
+                {
+                    itemItem.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
+                }
+                var projectList = _mapper.Map<List<EscrowOrganizationItem>, List<EscrowOrganization>>(insertOids);
+                projectList.ForEach(x => x.CreateTime = DateTime.Now);
+                await _dbContext.Fastest<EscrowOrganization>().BulkCopyAsync(projectList);
+            }
+            if (updateOids.Any())
+            {
+                foreach (var itemItem in updateOids)
+                {
+                    var id = projectCodeList.Where(x => x.MDM_CODE == itemItem.MDM_CODE).Select(x => x.Id).First();
+                    itemItem.Id = id;
+                }
+                var projectList = _mapper.Map<List<EscrowOrganizationItem>, List<EscrowOrganization>>(updateOids);
+                await _dbContext.Updateable(projectList).ExecuteCommandAsync();
+            }
             responseAjaxResult.Success();
             return responseAjaxResult;
         }

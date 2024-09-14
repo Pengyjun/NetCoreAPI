@@ -124,6 +124,10 @@
         /// 多组织核算机构
         /// </summary>
         AccountingOrganization = 31,
+        /// <summary>
+        /// 多组织-税务代管组织(行政)
+        /// </summary>
+        EscrowOrganization = 32,
 
     }
 }
