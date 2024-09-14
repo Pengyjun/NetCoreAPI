@@ -280,6 +280,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
             //机构树初始化
             var institutions = await _dbContext.Queryable<Institution>()
                 .Where(t => t.IsDelete == 1)
+                .OrderByDescending(x => Convert.ToInt32(x.SNO))
                 .ToListAsync();
 
             //其他数据
