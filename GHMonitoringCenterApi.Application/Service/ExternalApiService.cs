@@ -840,6 +840,7 @@ namespace GHMonitoringCenterApi.Application.Service
                     if (isExist != null)
                     {
                         item.Amount= item.Amount.Value * isExist.ExchangeRate;
+                        item.ECAmount= item.ECAmount.Value * isExist.ExchangeRate;
                     }
                 }
             }
