@@ -12,6 +12,7 @@ using GDCMasterDataReceiveApi.Application.Contracts.Dto.CountryContinent;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.CountryRegion;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.Currency;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.DeviceClassCode;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.DeviceDetailCode;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.FinancialInstitution;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.InvoiceType;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.Language;
@@ -187,8 +188,8 @@ namespace GDCMasterDataReceiveApi.Controller
         /// <returns></returns>
         [UnitOfWork]
         [HttpPost("/api/mdm/Receive/DeviceDetailCode")]
-        public async Task<MDMResponseResult> DeviceDetailCodeDataAsync() => await _receiveService.DeviceDetailCodeDataAsync();
-     
+        public async Task<MDMResponseResult> DeviceDetailCodeDataAsync([FromBody] BaseReceiveDataRequestDto<DeviceDetailCodeItem> baseReceiveDataRequestDto) => await _receiveService.DeviceDetailCodeDataAsync(baseReceiveDataRequestDto);
+
 
 
         #endregion

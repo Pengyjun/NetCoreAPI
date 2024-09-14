@@ -75,7 +75,7 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.AutoMapper
             //物资设备分类编码
             mapperConfigurationExpression.CreateMap<DeviceClassCodeItem, DeviceClassCode>();
             //物资设备明细编码
-            mapperConfigurationExpression.CreateMap<DeviceDetailCodeReceiveDto, DeviceDetailCode>();
+            mapperConfigurationExpression.CreateMap<DeviceDetailCodeItem, DeviceDetailCode>();
             //多组织-税务代管组织(行政)
             mapperConfigurationExpression.CreateMap<EscrowOrganizationReceiveDto, EscrowOrganization>();
             //金融机构

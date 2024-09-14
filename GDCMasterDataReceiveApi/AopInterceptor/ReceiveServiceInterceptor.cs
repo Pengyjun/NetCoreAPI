@@ -12,6 +12,7 @@ using GDCMasterDataReceiveApi.Application.Contracts.Dto.CountryContinent;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.CountryRegion;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.Currency;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.DeviceClassCode;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.DeviceDetailCode;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.InvoiceType;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.Language;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.LouDong;
@@ -240,6 +241,13 @@ namespace GHElectronicFileApi.AopInterceptor
                     parameCount = receiveParame.item.Count;
                     requestParame = receiveParame.item.ToJson();
                     receiveDataType = ReceiveDataType.BusinessCpportunity;
+                }
+                else if (methodName == "DeviceDetailCodeDataAsync")
+                {
+                    var receiveParame = ((BaseReceiveDataRequestDto<DeviceDetailCodeItem>)invocation.Arguments[0]).IT_DATA;
+                    parameCount = receiveParame.item.Count;
+                    requestParame = receiveParame.item.ToJson();
+                    receiveDataType = ReceiveDataType.DeviceDetailCode;
                 }
                 #endregion
 

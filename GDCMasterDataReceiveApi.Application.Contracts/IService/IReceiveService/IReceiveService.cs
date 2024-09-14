@@ -12,6 +12,7 @@ using GDCMasterDataReceiveApi.Application.Contracts.Dto.CountryContinent;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.CountryRegion;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.Currency;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.DeviceClassCode;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.DeviceDetailCode;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.FinancialInstitution;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.InvoiceType;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.Language;
@@ -173,7 +174,7 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.IService.IReceiveService
         /// 物资设备明细编码
         /// </summary>
         /// <returns></returns>
-        Task<MDMResponseResult> DeviceDetailCodeDataAsync();
+        Task<MDMResponseResult> DeviceDetailCodeDataAsync(BaseReceiveDataRequestDto<DeviceDetailCodeItem> baseReceiveDataRequestDto);
         /// <summary>
         /// 多组织-核算机构
         /// </summary>

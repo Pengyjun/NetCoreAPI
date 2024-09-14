@@ -530,7 +530,7 @@ namespace GDCMasterDataReceiveApi.Controller
             return await _searchService.GetEscrowOrganizationDetailsAsync(id);
         }
         /// <summary>
-        /// 商机项目(不含境外商机项目) 列表
+        /// 商机项目(不含境外商机项目) 列表 国家地区区分  142境内，142以为境外
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
@@ -540,7 +540,7 @@ namespace GDCMasterDataReceiveApi.Controller
             return await _searchService.GetBusinessNoCpportunitySearchAsync(requestDto);
         }
         /// <summary>
-        /// 商机项目(不含境外商机项目) 详情
+        /// 商机项目(不含境外商机项目) 详情 国家地区区分  142境内，142以为境外
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>

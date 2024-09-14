@@ -116,6 +116,10 @@
         /// 境内或境外商机项目
         /// </summary>
         BusinessCpportunity = 29,
+        /// <summary>
+        /// 物资设备明细
+        /// </summary>
+        DeviceDetailCode=30,
 
     }
 }

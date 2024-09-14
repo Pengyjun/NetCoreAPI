@@ -16,12 +16,12 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// <summary>
         /// 物资设备主数据编码
         /// </summary>
-        [SugarColumn(Length = 11, ColumnName = "MDCode")]
+        [SugarColumn(Length = 50, ColumnName = "MDCode")]
         public string? ZMATERIAL { get; set; }
         /// <summary>
         /// 品名编码:物资设备的品名分类码
         /// </summary>
-        [SugarColumn(Length = 11, ColumnName = "ProductNameCode")]
+        [SugarColumn(Length = 100, ColumnName = "ProductNameCode")]
         public string? ZCLASS { get; set; }
         /// <summary>
         /// 物资设备全称:物资设备规范的名称
@@ -31,27 +31,22 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// <summary>
         /// 物资设备说明:物资设备的说明
         /// </summary>
-        [SugarColumn(Length = 100, ColumnName = "Descption")]
+        [SugarColumn(Length = 500, ColumnName = "Descption")]
         public string? ZMNAMES { get; set; }
         /// <summary>
         /// 物资设备主数据状态:物资设备主数据的使用状态
         /// </summary>
-        [SugarColumn(Length = 1, ColumnName = "State")]
+        [SugarColumn(Length = 50, ColumnName = "State")]
         public string? ZSTATE { get; set; }
         /// <summary>
         /// 是否常用编码:0否，1是
         /// </summary>
-        [SugarColumn(Length = 1, ColumnName = "IsCode")]
+        [SugarColumn(Length = 50, ColumnName = "IsCode")]
         public string? ZOFTENCODE { get; set; }
         /// <summary>
         /// 备注:备注说明
         /// </summary>
         [SugarColumn(Length = 300, ColumnName = "Remark")]
         public string? ZREMARK { get; set; }
-        ///// <summary>
-        ///// 物资设备属性列表
-        ///// </summary>
-        //[SugarColumn(IsIgnore = true)]
-        //public List<ZMDGTT_MATATTR_DATA_IF>? ZMATTTR_LIST { get; set; }
     }
 }
