@@ -33,7 +33,7 @@ using GDCMasterDataReceiveApi.Domain.Models;
 using GDCMasterDataReceiveApi.Domain.Shared;
 using Newtonsoft.Json;
 using SqlSugar;
-using UtilsSharp;
+using System.Linq;
 
 namespace GDCMasterDataReceiveApi.Application.Service.SearchService
 {
@@ -277,14 +277,40 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
             var responseAjaxResult = new ResponseAjaxResult<List<InstitutionDto>>();
             var result = new List<InstitutionDto>();
 
+            //过滤条件
+            DeserializeObjectUser filterCondition = new DeserializeObjectUser();
+            if (requestDto.FilterConditionJson != null)
+            {
+                filterCondition = JsonConvert.DeserializeObject<DeserializeObjectUser>(requestDto.FilterConditionJson);
+            }
+
             //机构树初始化
             var institutions = await _dbContext.Queryable<Institution>()
                 .Where(t => t.IsDelete == 1)
-                .OrderBy(x => Convert.ToInt32(x.SNO))
+                .OrderBy(t => Convert.ToInt32(t.SNO))
                 .ToListAsync();
 
+            //得到所有符合条件的机构ids
+            var ids = institutions.WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Name), t => t.NAME.Contains(filterCondition.Name))
+                .WhereIF(filterCondition != null && filterCondition.Ids != null && filterCondition.Ids.Any(), t => filterCondition.Ids.Contains(t.Id.ToString()))
+                .Where(t => t.IsDelete == 1)
+                .Select(x => x.Id)
+                .ToList();
+
+            //得到所有符合条件的机构rules
+            var rules = institutions.Where(x => ids.Contains(x.Id)).Select(x => x.GRULE).ToList();
+
+            //拆分rules得到所有符合条件的oids
+            List<string> oids = new();
+            foreach (var r in rules)
+            {
+                if (!string.IsNullOrWhiteSpace(r)) oids.AddRange(r.Split('-'));
+            }
+
             //其他数据
-            var otherNodes = institutions.Where(x => x.OID != "101162350")
+            var otherNodes = institutions
+                .WhereIF(oids != null && oids.Any(), x => oids.Contains(x.OID))
+                .Where(x => x.OID != "101162350")
                 .Select(x => new InstitutionDto
                 {
                     Code = x.OCODE,
@@ -303,7 +329,9 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                 .ToList();
 
             //根节点
-            var rootNode = institutions.Where(x => x.OID == "101162350")
+            var rootNode = institutions
+                .WhereIF(oids != null && oids.Any(), x => oids.Contains(x.OID))
+                .Where(x => x.OID == "101162350")
                 .Select(x => new InstitutionDto
                 {
                     Code = x.OCODE,
@@ -341,7 +369,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
             }
             return childs;
         }
-       
+
         /// <summary>
         /// 获取机构详情
         /// </summary>
