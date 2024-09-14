@@ -127,7 +127,7 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.IService.IReceiveService
         /// 行政机构和核算机构映射关系
         /// </summary>
         /// <returns></returns>
-        Task<MDMResponseResult> AdministrativeAccountingMapperDataAsync();
+        Task<MDMResponseResult> AdministrativeAccountingMapperDataAsync(BaseReceiveDataRequestDto<AdministrativeAccountingMapperItem> baseReceiveDataRequestDto);
         /// <summary>
         /// 项目类
         /// </summary>

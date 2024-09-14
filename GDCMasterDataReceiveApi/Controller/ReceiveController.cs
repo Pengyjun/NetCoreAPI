@@ -3,6 +3,7 @@ using GDCMasterDataReceiveApi.Application.Contracts.Dto._4A.Institution;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto._4A.User;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.AccountingDepartment;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.AccountingOrganization;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.AdministrativeAccountingMapper;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.AdministrativeDivision;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.AdministrativeOrganization;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.CorresUnit;
@@ -128,13 +129,6 @@ namespace GDCMasterDataReceiveApi.Controller
         [HttpPost("/api/mdm/Receive/InvoiceType")]
         public async Task<MDMResponseResult> InvoiceTypeDataAsync([FromBody] BaseReceiveDataRequestDto<InvoiceTypeItem> receiveDataMDMRequestDto) => await _receiveService.InvoiceTypeDataAsync(receiveDataMDMRequestDto);
 
-        /// <summary>
-        /// 行政机构和核算机构映射关系
-        /// </summary>
-        /// <returns></returns>
-        [UnitOfWork]
-        [HttpPost("/api/mdm/Receive/AdministrativeAccountingMapper")]
-        public async Task<MDMResponseResult> AdministrativeAccountingMapperDataAsync() => await _receiveService.AdministrativeAccountingMapperDataAsync();
 
         /// <summary>
         /// 科研项目
@@ -230,6 +224,16 @@ namespace GDCMasterDataReceiveApi.Controller
         public async Task<MDMResponseResult> AccountingOrganizationDataAsync(BaseReceiveDataRequestDto<AccountingOrganizationReceiveDto> baseReceive) => await _receiveService.AccountingOrganizationDataAsync(baseReceive);
         #endregion
 
+
+        #region 行政机构和核算机构映射关系
+        /// <summary>
+        /// 行政机构和核算机构映射关系
+        /// </summary>
+        /// <returns></returns>
+        [UnitOfWork]
+        [HttpPost("/api/mdm/Receive/AdministrativeAccountingMapper")]
+        public async Task<MDMResponseResult> AdministrativeAccountingMapperDataAsync(BaseReceiveDataRequestDto<AdministrativeAccountingMapperItem> baseReceiveDataRequestDto) => await _receiveService.AdministrativeAccountingMapperDataAsync(baseReceiveDataRequestDto);
+        #endregion
 
         #region 多组织-行政组织
         /// <summary>

@@ -5,6 +5,7 @@ using GDCMasterDataReceiveApi.Application.Contracts.Dto._4A.Institution;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto._4A.User;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.AccountingDepartment;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.AccountingOrganization;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.AdministrativeAccountingMapper;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.AdministrativeDivision;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.AdministrativeOrganization;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.CorresUnit;
@@ -1237,10 +1238,37 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
         /// 行政机构和核算机构映射关系
         /// </summary>
         /// <returns></returns>
-        public async Task<MDMResponseResult> AdministrativeAccountingMapperDataAsync()
+        public async Task<MDMResponseResult> AdministrativeAccountingMapperDataAsync(BaseReceiveDataRequestDto<AdministrativeAccountingMapperItem> baseReceiveDataRequestDto)
         {
 
             var responseAjaxResult = new MDMResponseResult();
+            //查询项目表
+            var projectCodeList = await _dbContext.Queryable<AdministrativeAccountingMapper>().Where(x => x.IsDelete == 1).ToListAsync();
+            //需要新增的数据
+            var insertOids = baseReceiveDataRequestDto.IT_DATA.item.Where(x => !projectCodeList.Select(x => x.ZID).ToList().Contains(x.ZID)).ToList();
+            //需要更新的数据
+            var updateOids = baseReceiveDataRequestDto.IT_DATA.item.Where(x => projectCodeList.Select(x => x.ZID).ToList().Contains(x.ZID)).ToList();
+            //新增操作
+            if (insertOids.Any())
+            {
+                foreach (var itemItem in insertOids)
+                {
+                    itemItem.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
+                }
+                var projectList = _mapper.Map<List<AdministrativeAccountingMapperItem>, List<AdministrativeAccountingMapper>>(insertOids);
+                projectList.ForEach(x => x.CreateTime = DateTime.Now);
+                await _dbContext.Fastest<AdministrativeAccountingMapper>().BulkCopyAsync(projectList);
+            }
+            if (updateOids.Any())
+            {
+                foreach (var itemItem in updateOids)
+                {
+                    var id = projectCodeList.Where(x => x.ZID == itemItem.ZID).Select(x => x.Id).First();
+                    itemItem.Id = id;
+                }
+                var projectList = _mapper.Map<List<AdministrativeAccountingMapperItem>, List<AdministrativeAccountingMapper>>(updateOids);
+                await _dbContext.Updateable(projectList).ExecuteCommandAsync();
+            }
             responseAjaxResult.Success();
             return responseAjaxResult;
         }
