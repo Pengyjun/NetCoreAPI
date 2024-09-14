@@ -1735,7 +1735,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
             var responseAjaxResult = new ResponseAjaxResult<List<BusinessNoCpportunitySearchDto>>();
             RefAsync<int> total = 0;
 
-            var ccList = await _dbContext.Queryable<BusinessNoCpportunity>()
+            var ccList = await _dbContext.Queryable<BusinessCpportunity>()
                 .Where((cc) => cc.IsDelete == 1)
                 .Select((cc) => new BusinessNoCpportunitySearchDto
                 {
@@ -1764,7 +1764,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
         {
             var responseAjaxResult = new ResponseAjaxResult<BusinessNoCpportunityDetailsDto>();
 
-            var result = await _dbContext.Queryable<BusinessNoCpportunity>()
+            var result = await _dbContext.Queryable<BusinessCpportunity>()
                 .Where((cc) => cc.IsDelete == 1 && cc.Id.ToString() == id)
                 .Select((cc) => new BusinessNoCpportunityDetailsDto
                 {

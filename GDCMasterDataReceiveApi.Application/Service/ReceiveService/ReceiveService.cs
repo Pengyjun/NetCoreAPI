@@ -6,6 +6,7 @@ using GDCMasterDataReceiveApi.Application.Contracts.Dto._4A.User;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.AccountingDepartment;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.AdministrativeDivision;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.AdministrativeOrganization;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.BusinessNoCpportunity;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.CorresUnit;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.CountryContinent;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.CountryRegion;
@@ -29,11 +30,9 @@ using GDCMasterDataReceiveApi.Application.Contracts.Dto.ValueDomain;
 using GDCMasterDataReceiveApi.Application.Contracts.IService.IReceiveService;
 using GDCMasterDataReceiveApi.Domain.Models;
 using GDCMasterDataReceiveApi.Domain.Shared;
-using GDCMasterDataReceiveApi.Domain.Shared.Enums;
 using GDCMasterDataReceiveApi.Domain.Shared.Utils;
 using Microsoft.Extensions.Logging;
 using SqlSugar;
-using UtilsSharp;
 
 namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
 {
@@ -255,14 +254,103 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
             return responseAjaxResult;
         }
         /// <summary>
-        /// 商机项目(含境外商机项目)
+        /// 商机项目(含境外商机项目) 142境内，142以为境外
         /// </summary>
         /// <returns></returns>
-        public async Task<MDMResponseResult> BusinessProjectDataAsync()
+        public async Task<MDMResponseResult> BusinessProjectDataAsync(BaseReceiveDataRequestDto<BusinessCpportunityItem> baseReceiveDataRequestDto)
         {
-
             var responseAjaxResult = new MDMResponseResult();
-            responseAjaxResult.Success();
+
+            try
+            {
+                var rlList = await _dbContext.Queryable<BusinessCpportunity>().Where(x => x.IsDelete == 1).ToListAsync();
+                var insertOids = baseReceiveDataRequestDto.IT_DATA.item.Where(x => !rlList.Select(x => x.ZBOP).ToList().Contains(x.ZBOP)).ToList();
+                var updateOids = baseReceiveDataRequestDto.IT_DATA.item.Where(x => rlList.Select(x => x.ZBOP).ToList().Contains(x.ZBOP)).ToList();
+
+                List<TypeOfBidDisclosureProjectTable> insertList = new();
+                List<TypeOfBidDisclosureProjectTable> updateList = new();
+
+                //新增操作
+                if (insertOids.Any())
+                {
+                    foreach (var ic in insertOids)
+                    {
+                        ic.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
+                        if (ic.ZAWARDP_LIST != null)
+                        {
+                            foreach (var lang in ic.ZAWARDP_LIST.Item)
+                            {
+                                TypeOfBidDisclosureProjectTable dataItem = new TypeOfBidDisclosureProjectTable()
+                                {
+                                    Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                                    ZAP2NDORG = lang.ZAP2NDORG,
+                                    ZAWARDORG = lang.ZAWARDORG,
+                                    ZBOP = ic.ZBOP,
+                                    ZAWARDPN = lang.ZAWARDPN,
+                                    ZAWARDP = lang.ZAWARDP,
+                                    ZAWPN_EN = lang.ZAWPN_EN,
+                                    ZSCPBC = lang.ZSCPBC,
+                                    ZSPROJLOC = lang.ZSPROJLOC,
+                                    ZSPROTYPE = lang.ZSPROTYPE,
+                                    ZSSTATE = lang.ZSSTATE,
+                                    ZSZCONTPRO = lang.ZSSTATE
+                                };
+                                insertList.Add(dataItem);
+                            }
+                        }
+                    }
+
+                    var mapList = _mapper.Map<List<BusinessCpportunityItem>, List<BusinessCpportunity>>(insertOids);
+                    mapList.ForEach(x => x.CreateTime = DateTime.Now);
+                    await _dbContext.Fastest<BusinessCpportunity>().BulkCopyAsync(mapList);
+                    await _dbContext.Fastest<TypeOfBidDisclosureProjectTable>().BulkCopyAsync(insertList);
+                }
+                if (updateOids.Any())
+                {
+                    List<TypeOfBidDisclosureProjectTable> deleteData = new();
+                    //更新
+                    var rcList = await _dbContext.Queryable<TypeOfBidDisclosureProjectTable>().ToListAsync();
+                    foreach (var itemItem in updateOids)
+                    {
+                        var id = rlList.Where(x => x.ZBOP == itemItem.ZBOP).Select(x => x.Id).First();
+                        itemItem.Id = id;
+                        if (itemItem.ZAWARDP_LIST != null)
+                        {
+                            foreach (var items in itemItem.ZAWARDP_LIST.Item)
+                            {
+                                TypeOfBidDisclosureProjectTable lang = new TypeOfBidDisclosureProjectTable()
+                                {
+                                    Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                                    ZAP2NDORG = items.ZAP2NDORG,
+                                    ZAWARDORG = items.ZAWARDORG,
+                                    ZBOP = itemItem.ZBOP,
+                                    ZAWARDPN = items.ZAWARDPN,
+                                    ZAWARDP = items.ZAWARDP,
+                                    ZAWPN_EN = items.ZAWPN_EN,
+                                    ZSCPBC = items.ZSCPBC,
+                                    ZSPROJLOC = items.ZSPROJLOC,
+                                    ZSPROTYPE = items.ZSPROTYPE,
+                                    ZSSTATE = items.ZSSTATE,
+                                    ZSZCONTPRO = items.ZSSTATE
+                                };
+                                updateList.Add(lang);
+                            }
+                        }
+                        deleteData.AddRange(rcList.Where(x => x.ZBOP == itemItem.ZBOP).ToList());
+                    }
+                    var mapList = _mapper.Map<List<BusinessCpportunityItem>, List<BusinessCpportunity>>(updateOids);
+                    await _dbContext.Updateable(mapList).ExecuteCommandAsync();
+                    await _dbContext.Deleteable<TypeOfBidDisclosureProjectTable>().WhereColumns(deleteData, it => new { it.Id }).ExecuteCommandAsync();
+                    await _dbContext.Insertable(updateList).ExecuteCommandAsync();
+                }
+
+                responseAjaxResult.Success();
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+
             return responseAjaxResult;
         }
         /// <summary>
@@ -2130,11 +2218,11 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
         public async Task<MDMResponseResult> PersonDataAsync(ReceiveUserRequestDto receiveUserRequestDto)
         {
             var responseAjaxResult = new MDMResponseResult();
-         
+
             try
             {
 
-              
+
                 //创建用户
                 if (receiveUserRequestDto.OP_TYPE != null && receiveUserRequestDto.OP_TYPE.ToUpper() == "CREATE")
                 {
@@ -2207,7 +2295,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
         {
 
             var responseAjaxResult = new MDMResponseResult();
-    
+
             try
             {
                 var institutions = _mapper.Map<List<InstitutionItem>, List<Institution>>(receiveInstitutionRequestDto.OrganizeItem);

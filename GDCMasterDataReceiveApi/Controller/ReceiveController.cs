@@ -4,6 +4,7 @@ using GDCMasterDataReceiveApi.Application.Contracts.Dto._4A.User;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.AccountingDepartment;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.AdministrativeDivision;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.AdministrativeOrganization;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.BusinessNoCpportunity;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.CorresUnit;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.CountryContinent;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.CountryRegion;
@@ -67,12 +68,12 @@ namespace GDCMasterDataReceiveApi.Controller
         [HttpPost("/api/mdm/Receive/EscrowOrganization")]
         public async Task<MDMResponseResult> EscrowOrganizationDataAsync() => await _receiveService.EscrowOrganizationDataAsync();
         /// <summary>
-        /// 商机项目(含境外商机项目)
+        /// 商机项目(含境外商机项目) 国家地区区分  142境内，142以为境外
         /// </summary>
         /// <returns></returns>
         [UnitOfWork]
         [HttpPost("/api/mdm/Receive/BusinessProject")]
-        public Task<MDMResponseResult> BusinessProjectDataAsync() => _receiveService.BusinessProjectDataAsync();
+        public async Task<MDMResponseResult> BusinessProjectDataAsync([FromBody] BaseReceiveDataRequestDto<BusinessCpportunityItem> baseReceiveDataRequestDto) => await _receiveService.BusinessProjectDataAsync(baseReceiveDataRequestDto);
 
 
         /// <summary>
@@ -143,12 +144,12 @@ namespace GDCMasterDataReceiveApi.Controller
         [HttpPost("/api/mdm/Receive/ScientifiCNoProject")]
         public async Task<MDMResponseResult> ScientifiCNoProjectDataAsync([FromBody] BaseReceiveDataRequestDto<ScientifiCNoProjectItem> receiveDataMDMRequestDto) => await _receiveService.ScientifiCNoProjectDataAsync(receiveDataMDMRequestDto);
         /// <summary>
-        /// 商机项目(不含境外商机项目)
+        /// 商机项目(不含境外商机项目)国家地区区分  142境内，142以为境外
         /// </summary>
         /// <returns></returns>
         [UnitOfWork]
         [HttpPost("/api/mdm/Receive/BusinessNoCpportunity")]
-        public async Task<MDMResponseResult> BusinessNoCpportunityDataAsync() => await _receiveService.BusinessNoCpportunityDataAsync();
+        public async Task<MDMResponseResult> BusinessNoCpportunityAsync([FromBody] BaseReceiveDataRequestDto<BusinessCpportunityItem> baseReceiveDataRequestDto) => await _receiveService.BusinessProjectDataAsync(baseReceiveDataRequestDto);
         /// <summary>
         /// 委托关系
         /// </summary>
@@ -177,7 +178,7 @@ namespace GDCMasterDataReceiveApi.Controller
         [UnitOfWork]
         [HttpPost("/api/mdm/Receive/RoomNumber")]
         public async Task<MDMResponseResult> RoomNumberDataAsync([FromBody] BaseReceiveDataRequestDto<RoomNumberItem> receiveDataMDMRequestDto) => await _receiveService.RoomNumberDataAsync(receiveDataMDMRequestDto);
-        
+
         /// <summary>
         /// 语言语种
         /// </summary>
@@ -199,15 +200,6 @@ namespace GDCMasterDataReceiveApi.Controller
         [UnitOfWork]
         [HttpPost("/api/mdm/Receive/AccountingOrganization")]
         public async Task<MDMResponseResult> AccountingOrganizationDataAsync() => await _receiveService.AccountingOrganizationDataAsync();
-
-        ///// <summary>
-        ///// 机构主数据
-        ///// </summary>
-        ///// <returns></returns>
-        //[UnitOfWork]
-        //[HttpPost("Institution")]
-        //public async Task<MDMResponseResult> InstitutionDataAsync() => await _receiveService.InstitutionDataAsync();
-
 
 
         #endregion

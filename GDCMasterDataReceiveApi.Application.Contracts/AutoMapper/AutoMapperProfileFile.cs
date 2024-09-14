@@ -8,7 +8,6 @@ using GDCMasterDataReceiveApi.Application.Contracts.Dto.AdministrativeDivision;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.AdministrativeOrganization;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.BankCard;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.BusinessNoCpportunity;
-using GDCMasterDataReceiveApi.Application.Contracts.Dto.Common;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.CorresUnit;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.CountryContinent;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.CountryRegion;
@@ -29,7 +28,6 @@ using GDCMasterDataReceiveApi.Application.Contracts.Dto.RegionalCenter;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.RelationalContracts;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.RoomNumber;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.ScientifiCNoProject;
-using GDCMasterDataReceiveApi.Application.Contracts.Dto.TypeOfBidDisclosureProjectTable;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.UnitMeasurement;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.ValueDomain;
 using GDCMasterDataReceiveApi.Domain.Models;
@@ -63,7 +61,7 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.AutoMapper
             //银行账号
             mapperConfigurationExpression.CreateMap<BankCardItem, BankCard>();
             //商机项目(不含境外商机项目)
-            mapperConfigurationExpression.CreateMap<BusinessNoCpportunityReceiveDto, BusinessNoCpportunity>();
+            mapperConfigurationExpression.CreateMap<BusinessCpportunityItem, BusinessCpportunity>();
             //通用类字典数据
             mapperConfigurationExpression.CreateMap<ValueDomainReceiveRequestDto, ValueDomain>();
             //往来单位主数据
@@ -113,7 +111,7 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.AutoMapper
             //科研项目
             mapperConfigurationExpression.CreateMap<ScientifiCNoProjectItem, ScientifiCNoProject>();
             //中标交底项目表类型
-            mapperConfigurationExpression.CreateMap<TypeOfBidDisclosureProjectTableReceiveDto, TypeOfBidDisclosureProjectTable>();
+            mapperConfigurationExpression.CreateMap<BusinessCpportunityItem, TypeOfBidDisclosureProjectTable>();
             //常用计量单位
             mapperConfigurationExpression.CreateMap<UnitMeasurementItem, UnitMeasurement>();
             //多组织行政机构

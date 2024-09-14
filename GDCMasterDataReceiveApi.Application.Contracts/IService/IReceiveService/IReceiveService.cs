@@ -5,6 +5,7 @@ using GDCMasterDataReceiveApi.Application.Contracts.Dto.AccountingDepartment;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.AdministrativeAccountingMapper;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.AdministrativeDivision;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.AdministrativeOrganization;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.BusinessNoCpportunity;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.CorresUnit;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.CountryContinent;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.CountryRegion;
@@ -53,10 +54,10 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.IService.IReceiveService
         /// <returns></returns>
         Task<MDMResponseResult> EscrowOrganizationDataAsync();
         /// <summary>
-        /// 商机项目(含境外商机项目)
+        /// 商机项目 国家地区区分  142境内，142以为境外
         /// </summary>
         /// <returns></returns>
-        Task<MDMResponseResult> BusinessProjectDataAsync();
+        Task<MDMResponseResult> BusinessProjectDataAsync(BaseReceiveDataRequestDto<BusinessCpportunityItem> baseReceiveDataRequestDto);
         /// <summary>
         /// 国家地区
         /// </summary>
@@ -137,11 +138,6 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.IService.IReceiveService
         /// </summary>
         /// <returns></returns>
         Task<MDMResponseResult> ScientifiCNoProjectDataAsync(BaseReceiveDataRequestDto<ScientifiCNoProjectItem> receiveDataMDMRequestDto);
-        /// <summary>
-        /// 商机项目(不含境外商机项目)
-        /// </summary>
-        /// <returns></returns>
-        Task<MDMResponseResult> BusinessNoCpportunityDataAsync();
         /// <summary>
         /// 委托关系
         /// </summary>
