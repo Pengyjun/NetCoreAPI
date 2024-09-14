@@ -6,6 +6,7 @@ using GDCMasterDataReceiveApi.Application.Contracts.Dto._4A.User;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.AccountingDepartment;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.AdministrativeDivision;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.AdministrativeOrganization;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.BusinessNoCpportunity;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.CorresUnit;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.CountryContinent;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.CountryRegion;
@@ -65,164 +66,162 @@ namespace GHElectronicFileApi.AopInterceptor
             try
             {
                 #region 接收类型数据判断
-             if (methodName == "ProjectDataAsync")
-            {
-                var receiveParame = ((BaseReceiveDataRequestDto<ProjectItem>)invocation.Arguments[0]).IT_DATA;
-                parameCount = receiveParame.item.Count;
-                requestParame = receiveParame.item.ToJson();
-                receiveDataType = ReceiveDataType.Project;
-            }
-            else if (methodName == "CountryContinentDataAsync")
-            {
-                var receiveParame = ((BaseReceiveDataRequestDto<CountryContinentReceiveDto>)invocation.Arguments[0]).IT_DATA;
-                parameCount = receiveParame.item.Count;
-                requestParame = receiveParame.item.ToJson();
-                receiveDataType = ReceiveDataType.CountryContinent;
-            }
-            else if (methodName == "CountryRegionDataAsync")
-            {
-                var receiveParame = ((BaseReceiveDataRequestDto<CountryRegionReceiveDto>)invocation.Arguments[0]).IT_DATA;
-                parameCount = receiveParame.item.Count;
-                requestParame = receiveParame.item.ToJson();
-                receiveDataType = ReceiveDataType.CountryRegion;
-            }
-            else if (methodName == "CorresUnitDataAsync")
-            {
-                var receiveParame = ((BaseReceiveDataRequestDto<CorresUnitReceiveDto>)invocation.Arguments[0]).IT_DATA;
-                parameCount = receiveParame.item.Count;
-                requestParame = receiveParame.item.ToJson();
-                receiveDataType = ReceiveDataType.CrossUnit;
-            }
-            else if (methodName == "CurrencyDataAsync")
-            {
-                var receiveParame = ((BaseReceiveDataRequestDto<CurrencyReceiveDto>)invocation.Arguments[0]).IT_DATA;
-                parameCount = receiveParame.item.Count;
-                requestParame = receiveParame.item.ToJson();
-                receiveDataType = ReceiveDataType.Currency;
-            }
-            else if (methodName == "InvoiceTypeDataAsync")
-            {
-                var receiveParame = ((BaseReceiveDataRequestDto<InvoiceTypeItem>)invocation.Arguments[0]).IT_DATA;
-                parameCount = receiveParame.item.Count;
-                requestParame = receiveParame.item.ToJson();
-                receiveDataType = ReceiveDataType.Invoice;
-            }
-            else if (methodName == "DeviceClassCodeDataAsync")
-            {
-                var receiveParame = ((BaseReceiveDataRequestDto<DeviceClassCodeItem>)invocation.Arguments[0]).IT_DATA;
-                parameCount = receiveParame.item.Count;
-                requestParame = receiveParame.item.ToJson();
-                receiveDataType = ReceiveDataType.ClassDevice;
-            }
-            else if (methodName == "ScientifiCNoProjectDataAsync")
-            {
-                var receiveParame = ((BaseReceiveDataRequestDto<ScientifiCNoProjectItem>)invocation.Arguments[0]).IT_DATA;
-                parameCount = receiveParame.item.Count;
-                requestParame = receiveParame.item.ToJson();
-                receiveDataType = ReceiveDataType.Rcientific;
-            }
-            else if (methodName == "RoomNumberDataAsync")
-            {
-                var receiveParame = ((BaseReceiveDataRequestDto<RoomNumberItem>)invocation.Arguments[0]).IT_DATA;
-                parameCount = receiveParame.item.Count;
-                requestParame = receiveParame.item.ToJson();
-                receiveDataType = ReceiveDataType.Room;
-            }
-            else if (methodName == "LanguageDataAsync")
-            {
-                var receiveParame = ((BaseReceiveDataRequestDto<LanguageItem>)invocation.Arguments[0]).IT_DATA;
-                parameCount = receiveParame.item.Count;
-                requestParame = receiveParame.item.ToJson();
-                receiveDataType = ReceiveDataType.Language;
-            }
-            else if (methodName == "LouDongDataAsync")
-            {
-                var receiveParame = ((BaseReceiveDataRequestDto<LouDongItem>)invocation.Arguments[0]).IT_DATA;
-                parameCount = receiveParame.item.Count;
-                requestParame = receiveParame.item.ToJson();
-                receiveDataType = ReceiveDataType.LouDong;
-            }
-            else if (methodName == "UnitMeasurementDataAsync")
-            {
-                var receiveParame = ((BaseReceiveDataRequestDto<UnitMeasurementItem>)invocation.Arguments[0]).IT_DATA;
-                parameCount = receiveParame.item.Count;
-                requestParame = receiveParame.item.ToJson();
-                receiveDataType = ReceiveDataType.UnitMeasurement;
-            }
-            else if (methodName == "RegionalDataAsync")
-            {
-                var receiveParame = ((BaseReceiveDataRequestDto<RegionalItem>)invocation.Arguments[0]).IT_DATA;
-                parameCount = receiveParame.item.Count;
-                requestParame = receiveParame.item.ToJson();
-                receiveDataType = ReceiveDataType.Regional;
-            }
-            else if (methodName == "RegionalCenterDataAsync")
-            {
-                var receiveParame = ((BaseReceiveDataRequestDto<RegionalCenterItem>)invocation.Arguments[0]).IT_DATA;
-                parameCount = receiveParame.item.Count;
-                requestParame = receiveParame.item.ToJson();
-                receiveDataType = ReceiveDataType.RegionalCenter;
-            }
-            else if (methodName == "NationalEconomyDataAsync")
-            {
-                var receiveParame = ((BaseReceiveDataRequestDto<NationalEconomyItem>)invocation.Arguments[0]).IT_DATA;
-                parameCount = receiveParame.item.Count;
-                requestParame = receiveParame.item.ToJson();
-                receiveDataType = ReceiveDataType.NationalEconomy;
-            }
-            else if (methodName == "ProjectClassificationDataAsync")
-            {
-                var receiveParame = ((BaseReceiveDataRequestDto<ProjectClassificationItem>)invocation.Arguments[0]).IT_DATA;
-                parameCount = receiveParame.item.Count;
-                requestParame = receiveParame.item.ToJson();
-                receiveDataType = ReceiveDataType.ProjectClassification;
-            }
-            else if (methodName == "RelationalContractsDataAsync")
-            {
-                var receiveParame = ((BaseReceiveDataRequestDto<RelationalContractsItem>)invocation.Arguments[0]).IT_DATA;
-                parameCount = receiveParame.item.Count;
-                requestParame = receiveParame.item.ToJson();
-                receiveDataType = ReceiveDataType.Regional; 
-            }
-            else if (methodName == "AccountingDepartmentDataAsync")
-            {
-                var receiveParame = ((BaseReceiveDataRequestDto<AccountingDepartmentReceiveDto>)invocation.Arguments[0]).IT_DATA;
-                parameCount = receiveParame.item.Count;
-                requestParame = receiveParame.item.ToJson();
-                receiveDataType = ReceiveDataType.AccountingDepartment;
-            }
-            else if (methodName == "AdministrativeOrganizationDataAsync")
-            {
-                var receiveParame = ((BaseReceiveDataRequestDto<AdministrativeOrganizationReceiveRequestDto>)invocation.Arguments[0]).IT_DATA;
-                parameCount = receiveParame.item.Count;
-                requestParame = receiveParame.item.ToJson();
-                receiveDataType = ReceiveDataType.AdministrativeOrganization;
-            }
-            else if (methodName == "CommonDataAsync")
-            {
-                var receiveParame = ((BaseReceiveDataRequestDto<ValueDomainReceiveRequestDto>)invocation.Arguments[0]).IT_DATA;
-                parameCount = receiveParame.item.Count;
-                requestParame = receiveParame.item.ToJson();
-                receiveDataType = ReceiveDataType.Common;
-            }
-            else if (methodName == "ManagementOrganizationDataAsync")
-            {
-                var receiveParame = ((BaseReceiveDataRequestDto<POPMangOrgItem>)invocation.Arguments[0]).IT_DATA;
-                parameCount = receiveParame.item.Count;
-                requestParame = receiveParame.item.ToJson();
-                receiveDataType = ReceiveDataType.POPManger;
-            }
-            else if (methodName == "AdministrativeDivisionDataAsync")
-            {
-                //AdministrativeDivisionItem
-                var receiveParame = ((BaseReceiveDataRequestDto<AdministrativeDivisionItem>)invocation.Arguments[0]).IT_DATA;
-                parameCount = receiveParame.item.Count;
-                requestParame = receiveParame.item.ToJson();
-                receiveDataType = ReceiveDataType.AdministrativeDivision;
-            }
+                if (methodName == "ProjectDataAsync")
+                {
+                    var receiveParame = ((BaseReceiveDataRequestDto<ProjectItem>)invocation.Arguments[0]).IT_DATA;
+                    parameCount = receiveParame.item.Count;
+                    requestParame = receiveParame.item.ToJson();
+                    receiveDataType = ReceiveDataType.Project;
+                }
+                else if (methodName == "CountryContinentDataAsync")
+                {
+                    var receiveParame = ((BaseReceiveDataRequestDto<CountryContinentReceiveDto>)invocation.Arguments[0]).IT_DATA;
+                    parameCount = receiveParame.item.Count;
+                    requestParame = receiveParame.item.ToJson();
+                    receiveDataType = ReceiveDataType.CountryContinent;
+                }
+                else if (methodName == "CountryRegionDataAsync")
+                {
+                    var receiveParame = ((BaseReceiveDataRequestDto<CountryRegionReceiveDto>)invocation.Arguments[0]).IT_DATA;
+                    parameCount = receiveParame.item.Count;
+                    requestParame = receiveParame.item.ToJson();
+                    receiveDataType = ReceiveDataType.CountryRegion;
+                }
+                else if (methodName == "CorresUnitDataAsync")
+                {
+                    var receiveParame = ((BaseReceiveDataRequestDto<CorresUnitReceiveDto>)invocation.Arguments[0]).IT_DATA;
+                    parameCount = receiveParame.item.Count;
+                    requestParame = receiveParame.item.ToJson();
+                    receiveDataType = ReceiveDataType.CrossUnit;
+                }
+                else if (methodName == "CurrencyDataAsync")
+                {
+                    var receiveParame = ((BaseReceiveDataRequestDto<CurrencyReceiveDto>)invocation.Arguments[0]).IT_DATA;
+                    parameCount = receiveParame.item.Count;
+                    requestParame = receiveParame.item.ToJson();
+                    receiveDataType = ReceiveDataType.Currency;
+                }
+                else if (methodName == "InvoiceTypeDataAsync")
+                {
+                    var receiveParame = ((BaseReceiveDataRequestDto<InvoiceTypeItem>)invocation.Arguments[0]).IT_DATA;
+                    parameCount = receiveParame.item.Count;
+                    requestParame = receiveParame.item.ToJson();
+                    receiveDataType = ReceiveDataType.Invoice;
+                }
+                else if (methodName == "DeviceClassCodeDataAsync")
+                {
+                    var receiveParame = ((BaseReceiveDataRequestDto<DeviceClassCodeItem>)invocation.Arguments[0]).IT_DATA;
+                    parameCount = receiveParame.item.Count;
+                    requestParame = receiveParame.item.ToJson();
+                    receiveDataType = ReceiveDataType.ClassDevice;
+                }
+                else if (methodName == "ScientifiCNoProjectDataAsync")
+                {
+                    var receiveParame = ((BaseReceiveDataRequestDto<ScientifiCNoProjectItem>)invocation.Arguments[0]).IT_DATA;
+                    parameCount = receiveParame.item.Count;
+                    requestParame = receiveParame.item.ToJson();
+                    receiveDataType = ReceiveDataType.Rcientific;
+                }
+                else if (methodName == "RoomNumberDataAsync")
+                {
+                    var receiveParame = ((BaseReceiveDataRequestDto<RoomNumberItem>)invocation.Arguments[0]).IT_DATA;
+                    parameCount = receiveParame.item.Count;
+                    requestParame = receiveParame.item.ToJson();
+                    receiveDataType = ReceiveDataType.Room;
+                }
+                else if (methodName == "LanguageDataAsync")
+                {
+                    var receiveParame = ((BaseReceiveDataRequestDto<LanguageItem>)invocation.Arguments[0]).IT_DATA;
+                    parameCount = receiveParame.item.Count;
+                    requestParame = receiveParame.item.ToJson();
+                    receiveDataType = ReceiveDataType.Language;
+                }
+                else if (methodName == "LouDongDataAsync")
+                {
+                    var receiveParame = ((BaseReceiveDataRequestDto<LouDongItem>)invocation.Arguments[0]).IT_DATA;
+                    parameCount = receiveParame.item.Count;
+                    requestParame = receiveParame.item.ToJson();
+                    receiveDataType = ReceiveDataType.LouDong;
+                }
+                else if (methodName == "UnitMeasurementDataAsync")
+                {
+                    var receiveParame = ((BaseReceiveDataRequestDto<UnitMeasurementItem>)invocation.Arguments[0]).IT_DATA;
+                    parameCount = receiveParame.item.Count;
+                    requestParame = receiveParame.item.ToJson();
+                    receiveDataType = ReceiveDataType.UnitMeasurement;
+                }
+                else if (methodName == "RegionalDataAsync")
+                {
+                    var receiveParame = ((BaseReceiveDataRequestDto<RegionalItem>)invocation.Arguments[0]).IT_DATA;
+                    parameCount = receiveParame.item.Count;
+                    requestParame = receiveParame.item.ToJson();
+                    receiveDataType = ReceiveDataType.Regional;
+                }
+                else if (methodName == "RegionalCenterDataAsync")
+                {
+                    var receiveParame = ((BaseReceiveDataRequestDto<RegionalCenterItem>)invocation.Arguments[0]).IT_DATA;
+                    parameCount = receiveParame.item.Count;
+                    requestParame = receiveParame.item.ToJson();
+                    receiveDataType = ReceiveDataType.RegionalCenter;
+                }
+                else if (methodName == "NationalEconomyDataAsync")
+                {
+                    var receiveParame = ((BaseReceiveDataRequestDto<NationalEconomyItem>)invocation.Arguments[0]).IT_DATA;
+                    parameCount = receiveParame.item.Count;
+                    requestParame = receiveParame.item.ToJson();
+                    receiveDataType = ReceiveDataType.NationalEconomy;
+                }
+                else if (methodName == "ProjectClassificationDataAsync")
+                {
+                    var receiveParame = ((BaseReceiveDataRequestDto<ProjectClassificationItem>)invocation.Arguments[0]).IT_DATA;
+                    parameCount = receiveParame.item.Count;
+                    requestParame = receiveParame.item.ToJson();
+                    receiveDataType = ReceiveDataType.ProjectClassification;
+                }
+                else if (methodName == "RelationalContractsDataAsync")
+                {
+                    var receiveParame = ((BaseReceiveDataRequestDto<RelationalContractsItem>)invocation.Arguments[0]).IT_DATA;
+                    parameCount = receiveParame.item.Count;
+                    requestParame = receiveParame.item.ToJson();
+                    receiveDataType = ReceiveDataType.Regional;
+                }
+                else if (methodName == "AccountingDepartmentDataAsync")
+                {
+                    var receiveParame = ((BaseReceiveDataRequestDto<AccountingDepartmentReceiveDto>)invocation.Arguments[0]).IT_DATA;
+                    parameCount = receiveParame.item.Count;
+                    requestParame = receiveParame.item.ToJson();
+                    receiveDataType = ReceiveDataType.AccountingDepartment;
+                }
+                else if (methodName == "AdministrativeOrganizationDataAsync")
+                {
+                    var receiveParame = ((BaseReceiveDataRequestDto<AdministrativeOrganizationReceiveRequestDto>)invocation.Arguments[0]).IT_DATA;
+                    parameCount = receiveParame.item.Count;
+                    requestParame = receiveParame.item.ToJson();
+                    receiveDataType = ReceiveDataType.AdministrativeOrganization;
+                }
+                else if (methodName == "CommonDataAsync")
+                {
+                    var receiveParame = ((BaseReceiveDataRequestDto<ValueDomainReceiveRequestDto>)invocation.Arguments[0]).IT_DATA;
+                    parameCount = receiveParame.item.Count;
+                    requestParame = receiveParame.item.ToJson();
+                    receiveDataType = ReceiveDataType.Common;
+                }
+                else if (methodName == "ManagementOrganizationDataAsync")
+                {
+                    var receiveParame = ((BaseReceiveDataRequestDto<POPMangOrgItem>)invocation.Arguments[0]).IT_DATA;
+                    parameCount = receiveParame.item.Count;
+                    requestParame = receiveParame.item.ToJson();
+                    receiveDataType = ReceiveDataType.POPManger;
+                }
+                else if (methodName == "AdministrativeDivisionDataAsync")
+                {
+                    var receiveParame = ((BaseReceiveDataRequestDto<AdministrativeDivisionItem>)invocation.Arguments[0]).IT_DATA;
+                    parameCount = receiveParame.item.Count;
+                    requestParame = receiveParame.item.ToJson();
+                    receiveDataType = ReceiveDataType.AdministrativeDivision;
+                }
                 else if (methodName == "PersonDataAsync")
                 {
-                    //AdministrativeDivisionItem
                     var receiveParame = ((BaseReceiveDataRequestDto<ReceiveUserRequestDto>)invocation.Arguments[0]).IT_DATA;
                     parameCount = receiveParame.item.Count;
                     requestParame = receiveParame.item.ToJson();
@@ -230,29 +229,35 @@ namespace GHElectronicFileApi.AopInterceptor
                 }
                 else if (methodName == "InstitutionDataAsync")
                 {
-                    //AdministrativeDivisionItem
                     var receiveParame = ((BaseReceiveDataRequestDto<ReceiveInstitutionRequestDto>)invocation.Arguments[0]).IT_DATA;
                     parameCount = receiveParame.item.Count;
                     requestParame = receiveParame.item.ToJson();
                     receiveDataType = ReceiveDataType.Institution;
                 }
+                else if (methodName == "BusinessProjectDataAsync")
+                {
+                    var receiveParame = ((BaseReceiveDataRequestDto<BusinessCpportunityItem>)invocation.Arguments[0]).IT_DATA;
+                    parameCount = receiveParame.item.Count;
+                    requestParame = receiveParame.item.ToJson();
+                    receiveDataType = ReceiveDataType.BusinessCpportunity;
+                }
                 #endregion
 
                 #region 记录接收数据的请求日志
                 if (!string.IsNullOrWhiteSpace(requestParame))
-            {
-                receiveRecordLog = new ReceiveRecordLog()
                 {
-                    Id = receiceRecordId,
-                    ReceiveNumber = parameCount,
-                    RequestParame = requestParame,
-                    Traceidentifier = traceIdentifier,
-                    ReceiveType = receiveDataType,
-                };
-                baseService.ReceiveRecordLogAsync(receiveRecordLog, DataOperationType.Insert);
-            }
-            #endregion
-           
+                    receiveRecordLog = new ReceiveRecordLog()
+                    {
+                        Id = receiceRecordId,
+                        ReceiveNumber = parameCount,
+                        RequestParame = requestParame,
+                        Traceidentifier = traceIdentifier,
+                        ReceiveType = receiveDataType,
+                    };
+                    baseService.ReceiveRecordLogAsync(receiveRecordLog, DataOperationType.Insert);
+                }
+                #endregion
+
                 invocation.Proceed();
                 var res = (Task)invocation.ReturnValue;
                 res.Wait();//如果任务有异常 直接报错

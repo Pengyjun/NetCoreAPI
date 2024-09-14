@@ -112,6 +112,10 @@
         /// 通用数据
         /// </summary>
         Common = 28,
+        /// <summary>
+        /// 境内或境外商机项目
+        /// </summary>
+        BusinessCpportunity = 29,
 
     }
 }
