@@ -4,6 +4,7 @@ using GDCMasterDataReceiveApi.Application.Contracts.Dto;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto._4A.Institution;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto._4A.User;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.AccountingDepartment;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.AccountingOrganization;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.AdministrativeDivision;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.AdministrativeOrganization;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.BusinessNoCpportunity;
@@ -248,6 +249,13 @@ namespace GHElectronicFileApi.AopInterceptor
                     parameCount = receiveParame.item.Count;
                     requestParame = receiveParame.item.ToJson();
                     receiveDataType = ReceiveDataType.DeviceDetailCode;
+                }
+                else if (methodName == "AccountingOrganizationDataAsync")
+                {
+                    var receiveParame = ((BaseReceiveDataRequestDto<AccountingOrganizationReceiveDto>)invocation.Arguments[0]).IT_DATA;
+                    parameCount = receiveParame.item.Count;
+                    requestParame = receiveParame.item.ToJson();
+                    receiveDataType = ReceiveDataType.AccountingOrganization;
                 }
                 #endregion
 

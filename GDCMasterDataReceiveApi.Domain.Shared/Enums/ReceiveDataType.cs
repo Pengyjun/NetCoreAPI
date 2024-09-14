@@ -74,15 +74,15 @@
         /// <summary>
         /// 中交区域中心
         /// </summary>
-        RegionalCenter=18,
+        RegionalCenter = 18,
         /// <summary>
         /// 核算部门
         /// </summary>
-        AccountingDepartment=24,
+        AccountingDepartment = 24,
         /// <summary>
-        /// 多组织行政机构
+        /// 多组织行政组织
         /// </summary>
-        AdministrativeOrganization=25,
+        AdministrativeOrganization = 25,
         /// <summary>
         /// 国民经济行业分类
         /// </summary>
@@ -119,7 +119,11 @@
         /// <summary>
         /// 物资设备明细
         /// </summary>
-        DeviceDetailCode=30,
+        DeviceDetailCode = 30,
+        /// <summary>
+        /// 多组织核算机构
+        /// </summary>
+        AccountingOrganization = 31,
 
     }
 }
