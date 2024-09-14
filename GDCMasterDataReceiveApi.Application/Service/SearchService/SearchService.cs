@@ -160,7 +160,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
             {
                 uInfo.CompanyName = GetUserCompany(uInfo.OfficeDepId, institutions);
                 uInfo.OfficeDepIdName = institutions.FirstOrDefault(x => x.Oid == uInfo.OfficeDepId)?.Name;
-                uInfo.UserInfoStatus = uStatus.FirstOrDefault(x => x.OneCode == uInfo.EmpCode)?.OneName;
+                uInfo.UserInfoStatus = uStatus.FirstOrDefault(x => x.OneCode == uInfo.UserInfoStatus)?.OneName;
             }
 
             responseAjaxResult.Count = total;
