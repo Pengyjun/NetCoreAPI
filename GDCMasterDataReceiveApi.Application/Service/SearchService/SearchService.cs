@@ -275,6 +275,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
         {
             var responseAjaxResult = new ResponseAjaxResult<List<InstitutionDto>>();
             var result = new List<InstitutionDto>();
+            List<string> oids = new();
 
             //过滤条件
             DeserializeObjectUser filterCondition = new DeserializeObjectUser();
@@ -289,21 +290,24 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                 .OrderBy(t => Convert.ToInt32(t.SNO))
                 .ToListAsync();
 
-            //得到所有符合条件的机构ids
-            var ids = institutions.WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Name), t => t.NAME.Contains(filterCondition.Name))
-                .WhereIF(filterCondition != null && filterCondition.Ids != null && filterCondition.Ids.Any(), t => filterCondition.Ids.Contains(t.Id.ToString()))
-                .Where(t => t.IsDelete == 1)
-                .Select(x => x.Id)
-                .ToList();
-
-            //得到所有符合条件的机构rules
-            var rules = institutions.Where(x => ids.Contains(x.Id)).Select(x => x.GRULE).ToList();
-
-            //拆分rules得到所有符合条件的oids
-            List<string> oids = new();
-            foreach (var r in rules)
+            //机构ids不为空
+            if (filterCondition != null && filterCondition.Ids != null && filterCondition.Ids.Any())
             {
-                if (!string.IsNullOrWhiteSpace(r)) oids.AddRange(r.Split('-'));
+                //得到所有符合条件的机构ids
+                var ids = institutions.WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Name), t => t.NAME.Contains(filterCondition.Name))
+                    .WhereIF(filterCondition != null && filterCondition.Ids != null && filterCondition.Ids.Any(), t => filterCondition.Ids.Contains(t.Id.ToString()))
+                    .Where(t => t.IsDelete == 1)
+                    .Select(x => x.Id)
+                    .ToList();
+
+                //得到所有符合条件的机构rules
+                var rules = institutions.Where(x => ids.Contains(x.Id)).Select(x => x.GRULE).ToList();
+
+                //拆分rules得到所有符合条件的oids
+                foreach (var r in rules)
+                {
+                    if (!string.IsNullOrWhiteSpace(r)) oids.AddRange(r.Split('-'));
+                }
             }
 
             //其他数据
