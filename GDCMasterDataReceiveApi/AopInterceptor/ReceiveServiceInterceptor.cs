@@ -263,7 +263,7 @@ namespace GHElectronicFileApi.AopInterceptor
                     var receiveParame = ((BaseReceiveDataRequestDto<EscrowOrganizationItem>)invocation.Arguments[0]).IT_DATA;
                     parameCount = receiveParame.item.Count;
                     requestParame = receiveParame.item.ToJson();
-                    receiveDataType = ReceiveDataType.AccountingOrganization;
+                    receiveDataType = ReceiveDataType.EscrowOrganization;
                 }
                 #endregion
 
