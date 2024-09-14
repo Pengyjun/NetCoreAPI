@@ -224,8 +224,8 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
                                     ZZCOUNTR2 = items.ZZCOUNTR2,
                                     ZZSERIAL = items.ZZSERIAL
                                 };
+                                updatezMDGS_OLDNAMEs.Add(projectUsedName);
                             }
-                            updatezMDGS_OLDNAMEs.Add(projectUsedName);
                         }
                         deleteData.AddRange(projectUsedNameList.Where(x => x.ZBP == itemItem.ZBP).ToList());
                     }
