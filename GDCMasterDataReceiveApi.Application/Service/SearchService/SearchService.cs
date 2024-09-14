@@ -294,6 +294,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     Id = x.Id.ToString(),
                     Name = x.NAME,
                     Oid = x.OID,
+                    Sno = Convert.ToInt32(x.SNO),
                     Orule = x.ORULE,
                     POid = x.POID,
                     GpOid = x.GPOID,
@@ -313,6 +314,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     Id = x.Id.ToString(),
                     Name = x.NAME,
                     Oid = x.OID,
+                    Sno = Convert.ToInt32(x.SNO),
                     Orule = x.ORULE,
                     POid = x.POID,
                     ShortName = x.SHORTNAME,
@@ -334,7 +336,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
         /// <returns></returns>
         public List<InstitutionDto> GetChildren(string gpOid, List<InstitutionDto> children)
         {
-            var childs = children.Where(x => x.GpOid == gpOid).ToList();
+            var childs = children.Where(x => x.GpOid == gpOid).OrderBy(x => x.Sno).ToList();
             foreach (var child in childs)
             {
                 child.Children = GetChildrenChilds(child.Oid, children);
@@ -349,7 +351,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
         /// <returns></returns>
         public List<InstitutionDto> GetChildrenChilds(string pOid, List<InstitutionDto> childrenChilds)
         {
-            var childs = childrenChilds.Where(x => x.POid == pOid).ToList();
+            var childs = childrenChilds.Where(x => x.POid == pOid).OrderBy(x => x.Sno).ToList();
             foreach (var child in childs)
             {
                 child.Children = GetChildrenChilds(child.Oid, childrenChilds);

@@ -46,6 +46,10 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.Institution
         /// </summary>
         public string? Orule { get; set; }
         /// <summary>
+        /// 排序
+        /// </summary>
+        public int Sno { get; set; }
+        /// <summary>
         /// 机构简称
         /// </summary>
         public string? ShortName { get; set; }
