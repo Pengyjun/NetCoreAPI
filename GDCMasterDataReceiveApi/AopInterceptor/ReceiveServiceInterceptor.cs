@@ -1,6 +1,8 @@
 ﻿using Castle.DynamicProxy;
 using GDCMasterDataReceiveApi.Application.Contracts;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto._4A.Institution;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto._4A.User;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.AccountingDepartment;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.AdministrativeDivision;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.AdministrativeOrganization;
@@ -218,10 +220,26 @@ namespace GHElectronicFileApi.AopInterceptor
                 requestParame = receiveParame.item.ToJson();
                 receiveDataType = ReceiveDataType.AdministrativeDivision;
             }
-            #endregion
+                else if (methodName == "PersonDataAsync")
+                {
+                    //AdministrativeDivisionItem
+                    var receiveParame = ((BaseReceiveDataRequestDto<ReceiveUserRequestDto>)invocation.Arguments[0]).IT_DATA;
+                    parameCount = receiveParame.item.Count;
+                    requestParame = receiveParame.item.ToJson();
+                    receiveDataType = ReceiveDataType.Person;
+                }
+                else if (methodName == "InstitutionDataAsync")
+                {
+                    //AdministrativeDivisionItem
+                    var receiveParame = ((BaseReceiveDataRequestDto<ReceiveInstitutionRequestDto>)invocation.Arguments[0]).IT_DATA;
+                    parameCount = receiveParame.item.Count;
+                    requestParame = receiveParame.item.ToJson();
+                    receiveDataType = ReceiveDataType.Institution;
+                }
+                #endregion
 
                 #region 记录接收数据的请求日志
-            if (!string.IsNullOrWhiteSpace(requestParame))
+                if (!string.IsNullOrWhiteSpace(requestParame))
             {
                 receiveRecordLog = new ReceiveRecordLog()
                 {

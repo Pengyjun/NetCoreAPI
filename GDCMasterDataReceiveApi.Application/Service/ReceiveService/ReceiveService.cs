@@ -2130,21 +2130,11 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
         public async Task<MDMResponseResult> PersonDataAsync(ReceiveUserRequestDto receiveUserRequestDto)
         {
             var responseAjaxResult = new MDMResponseResult();
-            #region 记录日志
-            var receiceRecordId = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
-            ReceiveRecordLog receiveRecordLog = new ReceiveRecordLog()
-            {
-                Id = receiceRecordId,
-                ReceiveType = ReceiveDataType.Person,
-                RequestParame = receiveUserRequestDto.user.ToJson(),
-                ReceiveNumber = 1,
-            };
-            await baseService.ReceiveRecordLogAsync(receiveRecordLog, DataOperationType.Insert);
-            #endregion
+         
             try
             {
 
-                await _dbContext.Insertable(receiveRecordLog).ExecuteCommandAsync();
+              
                 //创建用户
                 if (receiveUserRequestDto.OP_TYPE != null && receiveUserRequestDto.OP_TYPE.ToUpper() == "CREATE")
                 {
@@ -2217,17 +2207,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
         {
 
             var responseAjaxResult = new MDMResponseResult();
-            #region 记录日志
-            var receiceRecordId = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
-            ReceiveRecordLog receiveRecordLog = new ReceiveRecordLog()
-            {
-                Id = receiceRecordId,
-                ReceiveType = ReceiveDataType.Institution,
-                RequestParame = receiveInstitutionRequestDto.OrganizeItem.ToJson(),
-                ReceiveNumber = receiveInstitutionRequestDto.OrganizeItem.Count
-            };
-            await baseService.ReceiveRecordLogAsync(receiveRecordLog, DataOperationType.Insert);
-            #endregion
+    
             try
             {
                 var institutions = _mapper.Map<List<InstitutionItem>, List<Institution>>(receiveInstitutionRequestDto.OrganizeItem);
