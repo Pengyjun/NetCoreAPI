@@ -144,23 +144,41 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     EmpCode = u.EMP_CODE,
                     Enable = u.Enable == 1 ? "启用" : "禁用",
                     UserInfoStatus = u.EMP_STATUS,
-                    Phone = u.PHONE
+                    Phone = u.PHONE,
+                    CountryRegion = u.NATIONALITY
                 }).ToPageListAsync(requestDto.PageIndex, requestDto.PageSize, total);
 
-            //获取机构信息
-            var institutions = await _dbContext.Queryable<Institution>()
-                .Where(t => t.IsDelete == 1)
-                .Select(t => new UInstutionDto { Oid = t.OID, PoId = t.POID, Grule = t.GRULE, Name = t.NAME })
-                .ToListAsync();
-
-            //获取用户状态信息
-            var uStatus = await _dbContext.Queryable<UserStatus>().Where(t => t.IsDelete == 1).Select(x => new { x.OneCode, x.OneName }).ToListAsync();
-
-            foreach (var uInfo in userInfos)
+            if (userInfos != null && userInfos.Any())
             {
-                uInfo.CompanyName = GetUserCompany(uInfo.OfficeDepId, institutions);
-                uInfo.OfficeDepIdName = institutions.FirstOrDefault(x => x.Oid == uInfo.OfficeDepId)?.Name;
-                uInfo.UserInfoStatus = uStatus.FirstOrDefault(x => x.OneCode == uInfo.UserInfoStatus)?.OneName;
+                //机构信息
+                var institutions = await _dbContext.Queryable<Institution>()
+                    .Where(t => t.IsDelete == 1)
+                    .Select(t => new UInstutionDto { Oid = t.OID, PoId = t.POID, Grule = t.GRULE, Name = t.NAME })
+                    .ToListAsync();
+
+                #region 处理其他基本信息数据
+                //国籍
+                var cr = userInfos.Where(x => !string.IsNullOrWhiteSpace(x.CountryRegion)).Select(x => x.CountryRegion).ToList();
+                var contryRegion = await _dbContext.Queryable<CountryRegion>()
+                    .Where(t => t.IsDelete == 1 && cr.Contains(t.ZCOUNTRYCODE))
+                    .Select(t => new { t.ZCOUNTRYCODE, t.ZCOUNTRYNAME })
+                    .ToListAsync();
+
+                //用户状态
+                var us = userInfos.Where(x => !string.IsNullOrWhiteSpace(x.UserInfoStatus)).Select(x => x.UserInfoStatus).ToList();
+                var uStatus = await _dbContext.Queryable<UserStatus>().Where(t => t.IsDelete == 1 && us.Contains(t.OneCode)).Select(x => new { x.OneCode, x.OneName }).ToListAsync();
+
+                //民族
+
+                #endregion
+
+                foreach (var uInfo in userInfos)
+                {
+                    uInfo.CompanyName = GetUserCompany(uInfo.OfficeDepId, institutions);
+                    uInfo.OfficeDepIdName = institutions.FirstOrDefault(x => x.Oid == uInfo.OfficeDepId)?.Name;
+                    uInfo.UserInfoStatus = uStatus.FirstOrDefault(x => x.OneCode == uInfo.UserInfoStatus)?.OneName;
+                    uInfo.CountryRegion = contryRegion.FirstOrDefault(x => x.ZCOUNTRYCODE == uInfo.CountryRegion)?.ZCOUNTRYNAME;
+                }
             }
 
             responseAjaxResult.Count = total;
@@ -227,12 +245,19 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                 })
                 .FirstAsync();
 
+            #region 其他基本信息
             //获取机构信息
             var institutions = await _dbContext.Queryable<Institution>()
                 .Where(t => t.IsDelete == 1)
                 .Select(t => new UInstutionDto { Oid = t.OID, PoId = t.POID, Grule = t.GRULE, Name = t.NAME })
                 .ToListAsync();
             uDetails.CompanyName = GetUserCompany(uDetails.OfficeDepId, institutions);
+
+            //国籍
+            var name = await _dbContext.Queryable<CountryRegion>().FirstAsync(t => t.IsDelete == 1 && uDetails.Nationality == t.ZCOUNTRYCODE);
+            uDetails.Nationality = name == null ? null : name.ZCOUNTRYNAME;
+
+            #endregion
 
             responseAjaxResult.SuccessResult(uDetails);
             return responseAjaxResult;
@@ -286,30 +311,33 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
 
             //机构树初始化
             var institutions = await _dbContext.Queryable<Institution>()
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Name), t => t.NAME.Contains(filterCondition.Name))
                 .Where(t => t.IsDelete == 1)
                 .OrderBy(t => Convert.ToInt32(t.SNO))
                 .ToListAsync();
 
-            //机构ids不为空
-            if (filterCondition != null && filterCondition.Ids != null && filterCondition.Ids.Any())
+            if (filterCondition != null)
             {
-                //得到所有符合条件的机构ids
-                var ids = institutions.WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Name), t => t.NAME.Contains(filterCondition.Name))
-                    .WhereIF(filterCondition != null && filterCondition.Ids != null && filterCondition.Ids.Any(), t => filterCondition.Ids.Contains(t.Id.ToString()))
-                    .Where(t => t.IsDelete == 1)
-                    .Select(x => x.Id)
-                    .ToList();
-
-                //得到所有符合条件的机构rules
-                var rules = institutions.Where(x => ids.Contains(x.Id)).Select(x => x.GRULE).ToList();
-
-                //拆分rules得到所有符合条件的oids
-                foreach (var r in rules)
+                //机构ids不为空
+                if (filterCondition.Ids != null && filterCondition.Ids.Any())
                 {
-                    if (!string.IsNullOrWhiteSpace(r)) oids.AddRange(r.Split('-'));
+                    //得到所有符合条件的机构ids
+                    var ids = institutions
+                        .WhereIF(filterCondition != null && filterCondition.Ids != null && filterCondition.Ids.Any(), t => filterCondition.Ids.Contains(t.Id.ToString()))
+                        .Where(t => t.IsDelete == 1)
+                        .Select(x => x.Id)
+                        .ToList();
+
+                    //得到所有符合条件的机构rules
+                    var rules = institutions.Where(x => ids.Contains(x.Id)).Select(x => x.GRULE).ToList();
+
+                    //拆分rules得到所有符合条件的oids
+                    foreach (var r in rules)
+                    {
+                        if (!string.IsNullOrWhiteSpace(r)) oids.AddRange(r.Split('-'));
+                    }
                 }
             }
-
             //其他数据
             var otherNodes = institutions
                 .WhereIF(oids != null && oids.Any(), x => oids.Contains(x.OID))
@@ -432,6 +460,11 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     Version = ins.VERSION
                 })
                 .FirstAsync();
+
+            #region 处理其他基本信息数据
+
+            #endregion
+
 
             responseAjaxResult.SuccessResult(insDetails);
             return responseAjaxResult;

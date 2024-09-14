@@ -1,5 +1,4 @@
 ﻿using MiniExcelLibs.Attributes;
-using System.ComponentModel.DataAnnotations;
 
 namespace GDCMasterDataReceiveApi.Application.Contracts.Dto._4A.User
 {
@@ -57,6 +56,11 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto._4A.User
         /// 公司名称
         /// </summary>
         public string? CompanyName { get; set; }
+        /// <summary>
+        /// 国家地区
+        /// </summary>
+        [ExcelColumnName("国家地区")]
+        public string? CountryRegion { get; set; }
         /// <summary>
         /// 是否启用   0 禁用  1 启用
         /// </summary>
