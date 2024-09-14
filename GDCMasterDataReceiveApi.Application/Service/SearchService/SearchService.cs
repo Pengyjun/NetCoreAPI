@@ -146,7 +146,9 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     UserInfoStatus = u.EMP_STATUS,
                     Phone = u.PHONE,
                     CountryRegion = u.NATIONALITY
-                }).ToPageListAsync(requestDto.PageIndex, requestDto.PageSize, total);
+                })
+                .OrderBy(u => u.OfficeDepId)
+                .ToPageListAsync(requestDto.PageIndex, requestDto.PageSize, total);
 
             if (userInfos != null && userInfos.Any())
             {
