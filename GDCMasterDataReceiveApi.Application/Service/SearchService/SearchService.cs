@@ -33,6 +33,7 @@ using GDCMasterDataReceiveApi.Domain.Models;
 using GDCMasterDataReceiveApi.Domain.Shared;
 using Newtonsoft.Json;
 using SqlSugar;
+using UtilsSharp;
 
 namespace GDCMasterDataReceiveApi.Application.Service.SearchService
 {
@@ -294,6 +295,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     Oid = x.OID,
                     Orule = x.ORULE,
                     POid = x.POID,
+                    GpOid = x.GPOID,
                     ShortName = x.SHORTNAME,
                     Status = x.STATUS
                 })
@@ -314,6 +316,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     POid = x.POID,
                     ShortName = x.SHORTNAME,
                     Status = x.STATUS,
+                    GpOid = x.GPOID,
                     Children = GetChildren(x.OID, otherNodes)
                 }).FirstOrDefault();
             result.Add(rootNode);
@@ -325,15 +328,30 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
         /// <summary>
         /// 获取子节点
         /// </summary>
-        /// <param name="pOid"></param>
+        /// <param name="gpOid"></param>
         /// <param name="children"></param>
         /// <returns></returns>
-        public List<InstitutionDto> GetChildren(string pOid, List<InstitutionDto> children)
+        public List<InstitutionDto> GetChildren(string gpOid, List<InstitutionDto> children)
         {
-            var childs = children.Where(x => x.POid == pOid).ToList();
+            var childs = children.Where(x => x.GpOid == gpOid).ToList();
             foreach (var child in childs)
             {
-                child.Children = GetChildren(child.Oid, children);
+                child.Children = GetChildrenChilds(child.Oid, children);
+            }
+            return childs;
+        }
+        /// <summary>
+        /// 最终节点
+        /// </summary>
+        /// <param name="pOid"></param>
+        /// <param name="childrenChilds"></param>
+        /// <returns></returns>
+        public List<InstitutionDto> GetChildrenChilds(string pOid, List<InstitutionDto> childrenChilds)
+        {
+            var childs = childrenChilds.Where(x => x.POid == pOid).ToList();
+            foreach (var child in childs)
+            {
+                child.Children = GetChildrenChilds(child.Oid, childrenChilds);
             }
             return childs;
         }

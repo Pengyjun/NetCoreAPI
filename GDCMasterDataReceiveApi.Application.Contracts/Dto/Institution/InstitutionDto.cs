@@ -25,6 +25,10 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.Institution
         /// </summary>
         public string? POid { get; set; }
         /// <summary>
+        /// 分组oid
+        /// </summary>
+        public string? GpOid { get; set; }
+        /// <summary>
         /// "机构状态，类型编码"
         /// 1运营 2筹备 3停用 4撤销
         /// </summary>
