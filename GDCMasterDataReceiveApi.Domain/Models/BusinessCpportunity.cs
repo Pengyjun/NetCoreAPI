@@ -3,10 +3,10 @@
 namespace GDCMasterDataReceiveApi.Domain.Models
 {
     /// <summary>
-    /// 商机项目(不含境外商机项目)
+    /// 商机项目 国家地区区分 142境内，142以为境外
     /// </summary>
     [SugarTable("t_businessnocpportunity", IsDisabledDelete = true)]
-    public class BusinessNoCpportunity : BaseEntity<long>
+    public class BusinessCpportunity : BaseEntity<long>
     {
         /// <summary>
         /// 发送记录ID 发送记录的ID，必须保证此ID在同一个发送批次中是唯一的。用于记录发送方对于此发送记录的唯一标识。

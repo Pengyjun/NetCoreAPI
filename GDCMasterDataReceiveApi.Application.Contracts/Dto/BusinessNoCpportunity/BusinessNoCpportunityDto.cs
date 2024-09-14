@@ -1,4 +1,6 @@
-﻿namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.BusinessNoCpportunity
+﻿using GDCMasterDataReceiveApi.Application.Contracts.Dto.OtherModels;
+
+namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.BusinessNoCpportunity
 {
     /// <summary>
     /// 商机项目(不含境外商机项目) 反显
@@ -107,8 +109,12 @@
     /// <summary>
     /// 商机项目(不含境外商机项目) 接收
     /// </summary>
-    public class BusinessNoCpportunityReceiveDto
+    public class BusinessCpportunityItem
     {
+        /// <summary>
+        /// 
+        /// </summary>
+        public long? Id { get; set; }
         /// <summary>
         /// 发送记录ID 发送记录的ID，必须保证此ID在同一个发送批次中是唯一的。用于记录发送方对于此发送记录的唯一标识。
         /// </summary>
@@ -169,5 +175,10 @@
         /// 参与单位:填写参与部门的行政机构主数据编码，可多值，用英文逗号隔开.
         /// </summary>
         public string? ZCY2NDORG { get; set; }
+
+        /// <summary>
+        /// 中标交底项目表类型
+        /// </summary>
+        public TypeOfBidDisclosureProjectTableModels? ZAWARDP_LIST {  get; set; }
     }
 }
