@@ -16,7 +16,7 @@
     public class DeserializeObjectUser
     {
         /// <summary>
-        /// 用户ids（首页下钻）
+        /// ids（首页下钻）
         /// </summary>
         public List<string>? Ids { get; set; }
         /// <summary>
