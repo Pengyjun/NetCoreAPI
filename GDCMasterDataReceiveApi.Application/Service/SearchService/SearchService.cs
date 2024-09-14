@@ -133,7 +133,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                 .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Phone), u => u.PHONE.Contains(filterCondition.Phone))
                 .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.EmpCode), u => u.EMP_CODE.Contains(filterCondition.EmpCode))
                 .WhereIF(filterCondition != null && filterCondition.Ids != null && filterCondition.Ids.Any(), u => filterCondition.Ids.Contains(u.Id.ToString()))
-                .Where(u => !string.IsNullOrWhiteSpace(u.NAME) && u.IsDelete == 1)
+                .Where(u => u.IsDelete == 1)
                 .Select(u => new UserSearchResponseDto
                 {
                     Id = u.Id.ToString(),
@@ -151,11 +151,6 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
 
             if (userInfos != null && userInfos.Any())
             {
-                //排序
-                userInfos = userInfos
-                .OrderBy(u => string.IsNullOrWhiteSpace(u.OfficeDepId) ? 0 : Convert.ToInt32(u.OfficeDepId))
-                .ToList();
-
                 //机构信息
                 var institutions = await _dbContext.Queryable<Institution>()
                     .Where(t => t.IsDelete == 1)
