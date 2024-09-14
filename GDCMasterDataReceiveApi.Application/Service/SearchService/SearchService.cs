@@ -33,7 +33,6 @@ using GDCMasterDataReceiveApi.Domain.Models;
 using GDCMasterDataReceiveApi.Domain.Shared;
 using Newtonsoft.Json;
 using SqlSugar;
-using System.Linq;
 
 namespace GDCMasterDataReceiveApi.Application.Service.SearchService
 {
