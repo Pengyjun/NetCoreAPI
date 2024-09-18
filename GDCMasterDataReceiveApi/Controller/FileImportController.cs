@@ -34,7 +34,7 @@ namespace GDCMasterDataReceiveApi.Controller
             }
             if (request.ImportType == 1)
             {
-                var data = await searchService.GetUserSearchAsync(new UserSearchRequestDto() {   ImportType=1 });
+                var data = await searchService.GetUserSearchAsync(new FilterCondition() {   ImportType=1 });
                 return await ExcelImportAsync(data.Data, null, "人员信息");
             }
 
