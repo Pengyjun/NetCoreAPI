@@ -8,6 +8,7 @@ using GHMonitoringCenterApi.Domain.Enums;
 using GHMonitoringCenterApi.Domain.Models;
 using GHMonitoringCenterApi.Domain.Shared;
 using GHMonitoringCenterApi.Domain.Shared.Enums;
+using GHMonitoringCenterApi.Domain.Shared.Util;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NPOI.SS.Formula.Functions;
@@ -634,9 +635,12 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             #region 取项目月报字段信息
 
             //截止到当前月份的所有月报信息（目的：统计年累、开累）
-            var monthReportData = await _dbContext.Queryable<MonthReport>()
-                .Where(x => x.IsDelete == 1 && x.DateMonth <= dateMonth && x.ProjectId == model.ProjectId)
+            var mpData = await _dbContext.Queryable<MonthReport>()
+                .Where(x => x.IsDelete == 1 && x.ProjectId == model.ProjectId)
                 .ToListAsync();
+            var monthReportData = mpData
+                .Where(x => x.IsDelete == 1 && x.DateMonth != 202306 && x.DateMonth <= dateMonth && x.ProjectId == model.ProjectId)
+                .ToList();
 
             //获取当前月报基本信息
             var monthReport = monthReportData.FirstOrDefault(x => x.DateMonth == dateMonth);
@@ -693,7 +697,8 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             result.TotalYearCollection = historys.Item4;
 
             #region 追加历史的外包支出、工程量
-            var his = monthReportData.FirstOrDefault(x => x.DateMonth == 202306);
+            var his = mpData.FirstOrDefault(x => x.DateMonth == 202306);
+            
             if (his != null)
             {
                 result.HOutValue = his.OutsourcingExpensesAmount;

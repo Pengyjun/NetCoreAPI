@@ -2191,7 +2191,11 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
 
                 //读取202306的历史数据
                 var hisMonthRep = mReportData.FirstOrDefault(x => x.ProjectId == item.ProjectId && x.DateMonth == 202306 && x.IsDelete == 1);
-                if (model.IsConvert == false) hisMonthRep.CompleteProductionAmount = hisMonthRep.CompleteProductionAmount / taxRate.ExchangeRate.Value;
+                if (model.IsConvert == false)
+                {
+                    var h = pRates.FirstOrDefault(x => x.Year == 2023 && x.CurrencyId == item.CurrencyId.ToString());
+                    hisMonthRep.CompleteProductionAmount = hisMonthRep.CompleteProductionAmount / h.ExchangeRate.Value;
+                }
 
                 // 年度统计月报
                 if (sumYearMonthReport != null)
