@@ -22,8 +22,4 @@
     <ProjectReference Include="..\GDCMasterDataReceiveApi.SqlSugarCore\GDCMasterDataReceiveApi.SqlSugarCore.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Dto\新文件夹\" />
-  </ItemGroup>
-
 </Project>

@@ -8,7 +8,7 @@ namespace GDCMasterDataReceiveApi.Controller
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class LogServiceController : ControllerBase
+    public class LogServiceController : BaseController
     {
 
         public ILogService logService { get; set; }
