@@ -11,10 +11,12 @@ using GHMonitoringCenterApi.Application.Contracts.IService;
 using GHMonitoringCenterApi.Application.Contracts.IService.EquipmentManagement;
 using GHMonitoringCenterApi.Application.Contracts.IService.Project;
 using GHMonitoringCenterApi.Application.Contracts.IService.ProjectProductionReport;
+using GHMonitoringCenterApi.Application.Service.Projects;
 using GHMonitoringCenterApi.Domain.Models;
 using GHMonitoringCenterApi.Domain.Shared;
 using GHMonitoringCenterApi.Domain.Shared.Const;
 using HNKC.OperationLogsAPI.Dto.ResponseDto;
+using NPOI.SS.Formula.Functions;
 using SqlSugar;
 using SqlSugar.Extensions;
 using static GHMonitoringCenterApi.Application.Contracts.Dto.Project.Report.MonthtReportsResponseDto;
@@ -670,22 +672,24 @@ namespace GHMonitoringCenterApi.Application.Service
         {
 
             #region 旧版
-            //var responseAjaxResult = new ResponseAjaxResult<List<MonthtReportDto>>();
-            //var model = new MonthtReportsRequstDto
-            //{
-            //    ProjectName = requestDto.ProjectName,
-            //    StartTime = requestDto.StartTime,
-            //    EndTime = requestDto.EndTime,
-            //    IsConvert = requestDto.IsConvert,
-            //    PageIndex = requestDto.PageIndex,
-            //    PageSize = requestDto.PageSize,
-            //    IsDuiWai = true
-            //};
+            var responseAjaxResult = new ResponseAjaxResult<List<MonthtReportDto>>();
+            var model = new MonthtReportsRequstDto
+            {
+                ProjectName = requestDto.ProjectName,
+                StartTime = requestDto.StartTime,
+                EndTime = requestDto.EndTime,
+                IsConvert = requestDto.IsConvert,
+                PageIndex = requestDto.PageIndex,
+                PageSize = requestDto.PageSize,
+                IsDuiWai = true
+            };
 
-            //var responseData = await _projectReportService.SearchMonthReportsAsync(model);
-            //var resList = responseData.Data.Reports;
-
-            //responseAjaxResult.Count = responseData.Count;
+            var responseData = await _projectReportService.SearchMonthReportsAsync(model);
+            var resList = responseData.Data.Reports;
+            responseAjaxResult.Data= resList;
+            responseAjaxResult.Count = responseData.Count;
+            responseAjaxResult.Success();
+            return responseAjaxResult;
             #endregion
 
             #region 参数校验
@@ -727,63 +731,68 @@ namespace GHMonitoringCenterApi.Application.Service
 
             #endregion
 
-            var responseAjaxResult = new ResponseAjaxResult<List<MonthtReportDto>>();
-            List<MonthtReportDto> monthtReportDtos = new List<MonthtReportDto>();
-            var projectMonthList = await _dbContext.Queryable<MonthReport>().Where(x => x.IsDelete == 1)
-                .WhereIF(requestDto.StartTime != null && requestDto.EndTime != null, x => (x.CreateTime >= requestDto.StartTime.Value && x.CreateTime <= requestDto.EndTime.Value)
-                || (x.UpdateTime >= requestDto.StartTime.Value && x.UpdateTime <= requestDto.EndTime.Value)).ToListAsync();
-
-            var projectHistoryList = await _dbContext.Queryable<ProjectMonthReportHistory>().Where(x => x.IsDelete == 1).ToListAsync();
+            #region MyRegion
 
 
-            var projectValueHistoryList = await _dbContext.Queryable<ProjectHistoryData>().Where(x => x.IsDelete == 1).ToListAsync();
-            if (projectMonthList.Any())
-            {
-                foreach (var item in projectMonthList)
-                {
-                    //当月产值
-                    //var currentProjectMonthRepost = projectMonthList.Where(x =>x.ProjectId == item.ProjectId).FirstOrDefault();
-                    //当年完成产值
-                    var yearCompletProductionValue = projectMonthList.Where(x => x.ProjectId == item.ProjectId
-                    && x.DateMonth >= yearStartIime && x.DateMonth <= yearEndTime).ToList();
-                    //累计完成成本
-                    var yearTotalCompletProductionValue = projectMonthList.Where(x => x.ProjectId == item.ProjectId
-                   ).ToList();
-                    monthtReportDtos.Add(new MonthtReportDto()
-                    {
-                        Id = item.Id,
-                        DateMonth = item.DateMonth,
-                        ProjectId = item.ProjectId,
-                        AccomplishQuantities = item.CompletedQuantity,
-                        YearAccomplishQuantities = yearCompletProductionValue.Sum(x => x.CompletedQuantity),
-                        AccumulativeQuantities = yearTotalCompletProductionValue.Sum(x => x.CompletedQuantity) + projectValueHistoryList.Where(x => x.ProjectId == item.ProjectId && x.AccumulatedProduction != null).Sum(x => x.AccumulatedProduction.Value),
+            //var responseAjaxResult = new ResponseAjaxResult<List<MonthtReportDto>>();
+            //List<MonthtReportDto> monthtReportDtos = new List<MonthtReportDto>();
+            //var projectMonthList = await _dbContext.Queryable<MonthReport>().Where(x => x.IsDelete == 1)
+            //    .WhereIF(requestDto.StartTime != null && requestDto.EndTime != null, x => (x.CreateTime >= requestDto.StartTime.Value && x.CreateTime <= requestDto.EndTime.Value)
+            //    || (x.UpdateTime >= requestDto.StartTime.Value && x.UpdateTime <= requestDto.EndTime.Value)).ToListAsync();
 
-                        RecognizedValue = item.PartyAConfirmedProductionAmount,
-                        YearRecognizedValue = yearCompletProductionValue.Sum(x => x.PartyAConfirmedProductionAmount),
-                        CumulativeValue = yearTotalCompletProductionValue.Sum(x => x.PartyAConfirmedProductionAmount) + projectHistoryList.Where(x => x.ProjectId == item.ProjectId && x.KaileiOwnerConfirmation != null).Sum(x => x.KaileiOwnerConfirmation.Value),
-
-                        PaymentAmount = item.PartyAPayAmount,
-                        YearPaymentAmount = yearCompletProductionValue.Sum(x => x.PartyAPayAmount),
-                        CumulativePaymentAmount = yearTotalCompletProductionValue.Sum(x => x.PartyAPayAmount) + projectHistoryList.Where(x => x.ProjectId == item.ProjectId && x.KaileiProjectPayment != null).Sum(x => x.KaileiProjectPayment.Value),
+            //var projectHistoryList = await _dbContext.Queryable<ProjectMonthReportHistory>().Where(x => x.IsDelete == 1).ToListAsync();
 
 
-                        AccomplishValue = item.CompleteProductionAmount,// currentProjectMonthRepost.CompleteProductionAmount,
-                        YearAccomplishValue = yearCompletProductionValue.Sum(x => x.CompleteProductionAmount),
-                        //YearAccomplishCost = yearCompletProductionValue.Sum(x => x.CompleteProductionAmount),
-                        // CumulativeAccomplishCost = yearTotalCompletProductionValue.Sum(x => x.CompleteProductionAmount),
+            //var projectValueHistoryList = await _dbContext.Queryable<ProjectHistoryData>().Where(x => x.IsDelete == 1).ToListAsync();
+            //if (projectMonthList.Any())
+            //{
+            //    foreach (var item in projectMonthList)
+            //    {
+            //        //当月产值
+            //        //var currentProjectMonthRepost = projectMonthList.Where(x =>x.ProjectId == item.ProjectId).FirstOrDefault();
+            //        //当年完成产值
+            //        var yearCompletProductionValue = projectMonthList.Where(x => x.ProjectId == item.ProjectId
+            //        && x.DateMonth >= yearStartIime && x.DateMonth <= yearEndTime).ToList();
+            //        //累计完成成本
+            //        var yearTotalCompletProductionValue = projectMonthList.Where(x => x.ProjectId == item.ProjectId
+            //       ).ToList();
+            //        monthtReportDtos.Add(new MonthtReportDto()
+            //        {
+            //            Id = item.Id,
+            //            DateMonth = item.DateMonth,
+            //            ProjectId = item.ProjectId,
+            //            AccomplishQuantities = item.CompletedQuantity,
+            //            YearAccomplishQuantities = yearCompletProductionValue.Sum(x => x.CompletedQuantity),
+            //            AccumulativeQuantities = yearTotalCompletProductionValue.Sum(x => x.CompletedQuantity) + projectValueHistoryList.Where(x => x.ProjectId == item.ProjectId && x.AccumulatedProduction != null).Sum(x => x.AccumulatedProduction.Value),
 
-                        CumulativeCompleted = yearTotalCompletProductionValue.Sum(x => x.CompleteProductionAmount) + projectValueHistoryList.Where(x => x.ProjectId == item.ProjectId
-                        && x.AccumulatedOutputValue != null).Sum(x => x.AccumulatedOutputValue.Value),
-                        OutsourcingExpensesAmount = item.OutsourcingExpensesAmount,
-                    });
+            //            RecognizedValue = item.PartyAConfirmedProductionAmount,
+            //            YearRecognizedValue = yearCompletProductionValue.Sum(x => x.PartyAConfirmedProductionAmount),
+            //            CumulativeValue = yearTotalCompletProductionValue.Sum(x => x.PartyAConfirmedProductionAmount) + projectHistoryList.Where(x => x.ProjectId == item.ProjectId && x.KaileiOwnerConfirmation != null).Sum(x => x.KaileiOwnerConfirmation.Value),
 
-                }
-            }
+            //            PaymentAmount = item.PartyAPayAmount,
+            //            YearPaymentAmount = yearCompletProductionValue.Sum(x => x.PartyAPayAmount),
+            //            CumulativePaymentAmount = yearTotalCompletProductionValue.Sum(x => x.PartyAPayAmount) + projectHistoryList.Where(x => x.ProjectId == item.ProjectId && x.KaileiProjectPayment != null).Sum(x => x.KaileiProjectPayment.Value),
 
-            responseAjaxResult.Data = monthtReportDtos;
-            responseAjaxResult.Count = monthtReportDtos.Count;
-            responseAjaxResult.Success();
-            return responseAjaxResult;
+
+            //            AccomplishValue = item.CompleteProductionAmount,// currentProjectMonthRepost.CompleteProductionAmount,
+            //            YearAccomplishValue = yearCompletProductionValue.Sum(x => x.CompleteProductionAmount),
+            //            //YearAccomplishCost = yearCompletProductionValue.Sum(x => x.CompleteProductionAmount),
+            //            // CumulativeAccomplishCost = yearTotalCompletProductionValue.Sum(x => x.CompleteProductionAmount),
+
+            //            CumulativeCompleted = yearTotalCompletProductionValue.Sum(x => x.CompleteProductionAmount) + projectValueHistoryList.Where(x => x.ProjectId == item.ProjectId
+            //            && x.AccumulatedOutputValue != null).Sum(x => x.AccumulatedOutputValue.Value),
+            //            OutsourcingExpensesAmount = item.OutsourcingExpensesAmount,
+            //        });
+
+            //    }
+            //}
+
+            //responseAjaxResult.Data = monthtReportDtos;
+            //responseAjaxResult.Count = monthtReportDtos.Count;
+            //responseAjaxResult.Success();
+            //return responseAjaxResult;
+            #endregion
+
         }
         /// <summary>
         /// 获取船舶进退场
@@ -829,7 +838,20 @@ namespace GHMonitoringCenterApi.Application.Service
                   x.CreateTime >= sTime && x.CreateTime <= eTime
                 : x.UpdateTime >= sTime && x.UpdateTime <= eTime)
                 .ToList();
+            var CurrencyConverter = await _dbContext.Queryable<CurrencyConverter>().Where(x => x.IsDelete == 1&&x.Year==DateTime.Now.Year).ToListAsync();
 
+            foreach (var item in projectData)
+            {
+                if (item.Category == 1)
+                {
+                    var isExist = CurrencyConverter.Where(x => x.CurrencyId == item.CurrencyId.Value.ToString()).FirstOrDefault();
+                    if (isExist != null)
+                    {
+                        item.Amount= item.Amount.Value * isExist.ExchangeRate;
+                        item.ECAmount= item.ECAmount.Value * isExist.ExchangeRate;
+                    }
+                }
+            }
             responseAjaxResult.Count = projectData.Count;
             responseAjaxResult.SuccessResult(projectData);
             return responseAjaxResult;

@@ -313,7 +313,7 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.ProjectProductionRepor
         /// <summary>
         /// 是否切换人民币
         /// </summary>
-        public bool? IsConvert { get; set; }
+        public bool? IsConvert { get; set; } = true;
         /// <summary>
         /// 页码
         /// </summary>
