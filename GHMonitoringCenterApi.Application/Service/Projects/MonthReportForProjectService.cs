@@ -10,6 +10,7 @@ using GHMonitoringCenterApi.Domain.Shared;
 using GHMonitoringCenterApi.Domain.Shared.Enums;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using NPOI.SS.Formula.Functions;
 using SqlSugar;
 using UtilsSharp;
 using Models = GHMonitoringCenterApi.Domain.Models;
@@ -230,7 +231,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             if (dateMonth != 0 && dateMonth.ToString().Length == 6)
             {
                 var mPIds = await _dbContext.Queryable<MonthReport>()
-                    .Where(x => x.IsDelete == 1)
+                    .Where(x => x.IsDelete == 1 && x.DateMonth != 202306)
                     .Select(x => x.Id)
                     .ToListAsync();
                 //获取当月前需要计算的的所有填报数据(累计的所有数据/开累)
@@ -388,7 +389,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                         Id = nowYear.Id,
                         KeyId = nowYear.KeyId,
                         Name = nowYear.Name,
-                        DetailId= nowYear.DetailId,
+                        DetailId = nowYear.DetailId,
                         OutPutType = nowYear.OutPutType,
                         OutsourcingExpensesAmount = nowYear.OutsourcingExpensesAmount,
                         Pid = nowYear.Pid,
@@ -624,7 +625,8 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
 
             //获取当前项目汇率
             int year = Convert.ToInt32(dateMonth.ToString().Substring(0, 4));
-            var currencyConverter = await _dbContext.Queryable<CurrencyConverter>().Where(t => t.CurrencyId == project.CurrencyId.ToString() && t.Year == year && t.IsDelete == 1).SingleAsync();
+            var currencyConverterList = await _dbContext.Queryable<CurrencyConverter>().Where(t => t.CurrencyId == project.CurrencyId.ToString() && t.IsDelete == 1).ToListAsync();
+            var currencyConverter = currencyConverterList.FirstOrDefault(x => x.Year == year);
             if (currencyConverter == null || currencyConverter.ExchangeRate == null) { responseAjaxResult.FailResult(HttpStatusCode.ParameterError, "汇率数据不存在"); return responseAjaxResult; }
             result.CurrencyExchangeRate = (decimal)currencyConverter.ExchangeRate;
             #endregion
@@ -682,16 +684,12 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
 
             //本月&年&开累甲方确认产值(元)
             result.PartyAConfirmedProductionAmount = monthReport == null ? 0M : monthReport.PartyAConfirmedProductionAmount;
-            //result.CurrentYearOffirmProductionValue = yMonthReports.Sum(x => x.PartyAConfirmedProductionAmount);
             result.CurrentYearOffirmProductionValue = historys.Item1;
-            //result.TotalYearKaileaOffirmProductionValue = monthReportData.Sum(x => x.PartyAConfirmedProductionAmount) + historys.Item2;
             result.TotalYearKaileaOffirmProductionValue = historys.Item2;
 
             //本月&年&开累甲方付款金额(元)
             result.PartyAPayAmount = monthReport == null ? 0M : monthReport.PartyAPayAmount;
-            //result.CurrenYearCollection = yMonthReports.Sum(x => x.PartyAPayAmount);
             result.CurrenYearCollection = historys.Item3;
-            //result.TotalYearCollection = monthReportData.Sum(x => x.PartyAPayAmount) + historys.Item4;
             result.TotalYearCollection = historys.Item4;
 
             #region 追加历史的外包支出、工程量
@@ -700,7 +698,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             {
                 result.HOutValue = his.OutsourcingExpensesAmount;
                 result.HQuantity = his.CompletedQuantity;
-                result.HValue = his.CompleteProductionAmount;
+                result.HValue = his.CompleteProductionAmount / currencyConverterList.FirstOrDefault(x => x.Year == his.DateYear).ExchangeRate.Value;
             }
             #endregion
 

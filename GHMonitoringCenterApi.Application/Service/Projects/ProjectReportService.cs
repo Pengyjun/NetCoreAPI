@@ -581,7 +581,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 var currencyExchangeRate = 1m;
                 if (currencyId != CommonData.RMBCurrencyId)
                 {
-                    currencyExchangeRate = await GetCurrencyRateAsync(currencyId);
+                    currencyExchangeRate = await GetCurrencyRateAsync(currencyId, Convert.ToInt32(dateDay.ToString().Substring(0, 4)));
                 }
                 resDayReport.Construction.CurrencyId = currencyId;
                 resDayReport.Construction.CurrencyExchangeRate = currencyExchangeRate;
@@ -636,7 +636,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             {
                 if (resDayReport.Construction.CurrencyId != Guid.Empty && resDayReport.Construction.CurrencyId != CommonData.RMBCurrencyId)
                 {
-                    resDayReport.Construction.CurrencyExchangeRate = await GetCurrencyRateAsync(resDayReport.Construction.CurrencyId);
+                    resDayReport.Construction.CurrencyExchangeRate = await GetCurrencyRateAsync(resDayReport.Construction.CurrencyId, Convert.ToInt32(dateDay.ToString().Substring(0, 4)));
                 }
             }
             #endregion
@@ -2186,8 +2186,13 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 //汇率
                 int year = Convert.ToInt32(item.DateMonth.ToString().Substring(0, 4));
                 var taxRate = pRates.FirstOrDefault(x => x.Year == year && x.CurrencyId == item.CurrencyId.ToString());
-                var val = GetMonthReportValue(item.DateMonth, item.ProjectId, taxRate == null ? 0M : taxRate.ExchangeRate, mDetailsData, mReportData, model.IsConvert, wbsList);
+                var val = GetMonthReportValue(item.DateMonth, item.ProjectId, mDetailsData, mReportData, model.IsConvert, wbsList);
                 item.AccomplishValue2 = taxRate != null ? taxRate.ExchangeRate.Value * item.AccomplishValue2 : 0M;//转换人民币
+
+                //读取202306的历史数据
+                var hisMonthRep = mReportData.FirstOrDefault(x => x.ProjectId == item.ProjectId && x.DateMonth == 202306 && x.IsDelete == 1);
+                if (model.IsConvert == false) hisMonthRep.CompleteProductionAmount = hisMonthRep.CompleteProductionAmount / taxRate.ExchangeRate.Value;
+
                 // 年度统计月报
                 if (sumYearMonthReport != null)
                 {
@@ -2205,11 +2210,12 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 if (sumMonthReport != null)
                 {
                     #region 新的
-                    item.AccumulativeQuantities = val.AccumulativeQuantities;
-                    item.CumulativeAccomplishCost = val.CumulativeAccomplishCost;
-                    item.CumulativeCompleted = val.CumulativeCompleted;
-                    item.CumulativePaymentAmount = val.CumulativePaymentAmount;
-                    item.CumulativeValue = val.CumulativeValue;
+                    item.AccumulativeQuantities = hisMonthRep == null ? val.AccumulativeQuantities : hisMonthRep.CompletedQuantity + val.AccumulativeQuantities;
+                    item.CumulativeAccomplishCost = hisMonthRep == null ? val.CumulativeAccomplishCost : hisMonthRep.CostAmount + val.CumulativeAccomplishCost;
+                    item.CumulativeCompleted = model.IsConvert == true ? val.CumulativeCompleted : hisMonthRep.CompleteProductionAmount + val.CumulativeCompleted;
+
+                    item.CumulativePaymentAmount = hisMonthRep == null ? val.CumulativePaymentAmount : hisMonthRep.PartyAPayAmount + val.CumulativePaymentAmount;
+                    item.CumulativeValue = hisMonthRep == null ? val.CumulativeValue : hisMonthRep.PartyAConfirmedProductionAmount + val.CumulativeValue;
 
                     var itemHistotyMonth = sumHistoryMonthReports.Where(x => x.ProjectId == item.ProjectId).FirstOrDefault();
                     if (itemHistotyMonth != null)
@@ -2340,16 +2346,18 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
         /// 项目月报年度、累计值
         /// </summary>
         /// <returns></returns>
-        private MonthReportForProjectConvert GetMonthReportValue(int dateMonth, Guid projectId, decimal? taxRate, List<MonthReportDetail> mDetails, List<MonthReport> mReport, bool? isConvert, List<ProjectWBSDto> wbsList)
+        private MonthReportForProjectConvert GetMonthReportValue(int dateMonth, Guid projectId, List<MonthReportDetail> mDetails, List<MonthReport> mReport, bool? isConvert, List<ProjectWBSDto> wbsList)
         {
             /***
              * 1.截取开始年份
              * 2.获取存在的wbsids、
              * 3.获取月报主表 、获取年度、累计 明细
+             * 4.排除掉202306的数据  历史数据在最后计算
              */
+
             int initMonth = Convert.ToInt32(dateMonth.ToString().Substring(0, 4) + "01");
-            var mMonthReport = mReport.Where(x => x.ProjectId == projectId && x.DateMonth >= initMonth && x.DateMonth <= dateMonth);//年度
-            var cumMonthReport = mReport.Where(x => x.ProjectId == projectId && x.DateMonth <= dateMonth);//累计
+            var mMonthReport = mReport.Where(x => x.ProjectId == projectId && x.DateMonth != 202306 && x.DateMonth >= initMonth && x.DateMonth <= dateMonth).ToList();//年度
+            var cumMonthReport = mReport.Where(x => x.ProjectId == projectId && x.DateMonth != 202306 && x.DateMonth <= dateMonth).ToList();//累计
 
             var wbsIds = wbsList.Select(x => x.Id).ToList();
             var yearMonthReportList = mDetails.Where(x => x.DateMonth >= initMonth && x.DateMonth <= dateMonth && wbsIds.Contains(x.ProjectWBSId) && x.ProjectId == projectId).ToList();//年度
@@ -2358,21 +2366,21 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             return new MonthReportForProjectConvert
             {
                 //年度
-                YearAccomplishQuantities = Math.Round(yearMonthReportList.Sum(x => x.CompletedQuantity), 2),
-                YearAccomplishCost = Math.Round(mMonthReport.Sum(x => x.CostAmount), 2),
-                YearAccomplishValue = Math.Round(isConvert == true ? yearMonthReportList.Sum(x => x.UnitPrice * x.CompletedQuantity * taxRate.Value) : yearMonthReportList.Sum(x => x.UnitPrice * x.CompletedQuantity), 2),
-                YearPaymentAmount = Math.Round(mMonthReport.Sum(x => x.PartyAPayAmount), 2),
-                YearRecognizedValue = Math.Round(mMonthReport.Sum(x => x.PartyAConfirmedProductionAmount), 2),
-                YearProjectedCost = Math.Round(mMonthReport.Sum(x => x.MonthEstimateCostAmount), 2),
-                YearOutsourcingExpensesAmount = Math.Round(mMonthReport.Sum(x => x.OutsourcingExpensesAmount), 2),
+                YearAccomplishQuantities = Math.Round(yearMonthReportList.Sum(x => x.CompletedQuantity)),
+                YearAccomplishCost = Math.Round(mMonthReport.Sum(x => x.CostAmount)),
+                YearAccomplishValue = Math.Round(isConvert == true ? yearMonthReportList.Sum(x => x.CompleteProductionAmount) : yearMonthReportList.Sum(x => x.UnitPrice * x.CompletedQuantity)),
+                YearPaymentAmount = Math.Round(mMonthReport.Sum(x => x.PartyAPayAmount)),
+                YearRecognizedValue = Math.Round(mMonthReport.Sum(x => x.PartyAConfirmedProductionAmount)),
+                YearProjectedCost = Math.Round(mMonthReport.Sum(x => x.MonthEstimateCostAmount)),
+                YearOutsourcingExpensesAmount = Math.Round(mMonthReport.Sum(x => x.OutsourcingExpensesAmount)),
 
                 //累计
-                AccumulativeQuantities = Math.Round(cumMonthReportList.Sum(x => x.CompletedQuantity), 2),
-                CumulativeAccomplishCost = Math.Round(cumMonthReport.Sum(x => x.CostAmount), 2),
-                CumulativeCompleted = Math.Round(isConvert == true ? cumMonthReportList.Sum(x => x.UnitPrice * x.CompletedQuantity * taxRate.Value) : cumMonthReportList.Sum(x => x.UnitPrice * x.CompletedQuantity), 2),
-                CumulativeOutsourcingExpensesAmount = Math.Round(cumMonthReport.Sum(x => x.OutsourcingExpensesAmount), 2),
-                CumulativePaymentAmount = Math.Round(cumMonthReport.Sum(x => x.PartyAPayAmount), 2),
-                CumulativeValue = Math.Round(cumMonthReport.Sum(x => x.PartyAConfirmedProductionAmount), 2)
+                AccumulativeQuantities = Math.Round(cumMonthReportList.Sum(x => x.CompletedQuantity)),
+                CumulativeAccomplishCost = Math.Round(cumMonthReport.Sum(x => x.CostAmount)),
+                CumulativeCompleted = Math.Round(isConvert == true ? cumMonthReportList.Sum(x => x.CompleteProductionAmount) : cumMonthReportList.Sum(x => x.UnitPrice * x.CompletedQuantity)),
+                CumulativeOutsourcingExpensesAmount = Math.Round(cumMonthReport.Sum(x => x.OutsourcingExpensesAmount)),
+                CumulativePaymentAmount = Math.Round(cumMonthReport.Sum(x => x.PartyAPayAmount)),
+                CumulativeValue = Math.Round(cumMonthReport.Sum(x => x.PartyAConfirmedProductionAmount))
             };
         }
         /// <summary>
@@ -2792,11 +2800,6 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             {
                 return result.FailResult(HttpStatusCode.SaveFail, "月份时间格式不正确");
             }
-            //var allowSaveDateMonth = GetDefaultReportDateMonth();
-            //if (model.DateMonth != allowSaveDateMonth)
-            //{
-            //    return result.FailResult(HttpStatusCode.SaveFail, $"{monthTime.ToString("yyyy年MM月")}项目月报已超过允许的填报时间");
-            //}
             var project = await GetProjectPartAsync(model.ProjectId);
             if (project == null)
             {
@@ -2813,6 +2816,11 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             #region 新 处理审批时重复月报明细数据
             var reqDetails = model.ResolveDetails();
             //var reqDetails = new List<SaveProjectMonthReportRequestDto.ReqMonthReportDetail>();
+            reqDetails.ForEach(item =>
+            {
+                // 计算月报明细产值(元)
+                item.CompleteProductionAmount = item.CompletedQuantity * item.UnitPrice * currencyExchangeRate;
+            });
             //获取原来的月报明细数据
             var oldMDetails = await _dbContext.Queryable<MonthReportDetail>().Where(x => x.IsDelete == 1 && x.ProjectId == model.ProjectId).ToListAsync();
 
@@ -2839,6 +2847,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                             piPei.OutPutType = item.OutPutType.Value;
                             piPei.UnitPrice = item.UnitPrice.Value;
                             piPei.Remark = item.Remark;
+                            piPei.Id = item.Id;
                             updateDetails.Add(piPei);
                         }
                     }
@@ -2897,11 +2906,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 }
             }
             #endregion
-            reqDetails.ForEach(item =>
-            {
-                // 计算月报明细产值(元)
-                item.CompleteProductionAmount = item.CompletedQuantity * item.UnitPrice * currencyExchangeRate;
-            });
+
             bool isAddMonthReport = false;
             if (monthReport == null)
             {
@@ -2918,14 +2923,6 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             }
             else
             {
-                //var oldDetails = await GetMonthReportDetailsAsync(monthReport.Id);
-                //if (reqDetails.Any()) addDetails = _mapper.Map(reqDetails, addDetails);
-                //var exsitDetailIds = oldDetails.Where(t => reqDetails.Any(r => r.DetailId == t.Id)).Select(t => (Guid?)t.Id).ToList();
-                //var addReqDetails = reqDetails.Where(t => !exsitDetailIds.Contains(t.DetailId)).ToList();
-                //var addReqDetails = reqDetails.Where(t => string.IsNullOrWhiteSpace(t.DetailId.ToString()) || t.DetailId == Guid.Empty).ToList();
-                //addDetails = _mapper.Map(addReqDetails, addDetails);
-                //removeDetails = oldDetails.Where(t => !exsitDetailIds.Contains(t.Id)).ToList();
-                //updateDetails = oldDetails.Where(t => exsitDetailIds.Contains(t.Id)).ToList();
                 monthReport.UpdateId = _currentUser.Id;
             }
             monthReport = _mapper.Map(model, monthReport);
@@ -2942,27 +2939,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             monthReport.CurrencyExchangeRate = currencyExchangeRate;
             monthReport.Status = isNonConstruction ? MonthReportStatus.Finish : model.Status;
             monthReport.StatusText = isNonConstruction ? "已完成" : model.StatusText;
-            // 数据填充
-            //addDetails.ForEach(item =>
-            //{
-            //    item.Id = GuidUtil.Next();
-            //    item.CreateId = _currentUser.Id;
-            //    item.MonthReportId = monthReport.Id;
-            //    item.ProjectId = monthReport.ProjectId;
-            //    item.DateMonth = monthReport.DateMonth;
-            //    item.DateYear = monthReport.DateYear;
-            //});
-            //updateDetails.ForEach(item =>
-            //{
-            //    var updateReqItem = reqDetails.FirstOrDefault(t => t.DetailId == item.Id);
-            //    _mapper.Map(updateReqItem, item);
-            //    item.UpdateId = _currentUser.Id;
-            //});
-            //removeDetails.ForEach(item =>
-            //{
-            //    item.DeleteId = _currentUser.Id;
-            //    item.IsDelete = 0;
-            //});
+
             var modelState = isAddMonthReport ? ModelState.Add : ModelState.Update;
             var newReportDetails = new List<MonthReportDetail>();
             newReportDetails.AddRange(addDetails);
@@ -2975,10 +2952,6 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             {
                 await _dbMonthReport.AsUpdateable(monthReport).EnableDiffLogEvent(NewLogInfo(EntityType.MonthReport, monthReport.Id, modelState)).ExecuteCommandAsync();
             }
-            //if (removeDetails.Any())
-            //{
-            //    //await _dbMonthReportDetail.AsUpdateable(removeDetails).UpdateColumns(t => new { t.IsDelete, t.DeleteId, t.DeleteTime }).EnableDiffLogEvent(NewLogInfo(EntityType.MonthReport, monthReport.Id, modelState)).ExecuteCommandAsync();
-            //}
             if (updateDetails.Any())
             {
                 await _dbMonthReportDetail.AsUpdateable(updateDetails).EnableDiffLogEvent(NewLogInfo(EntityType.MonthReport, monthReport.Id, modelState)).ExecuteCommandAsync();
@@ -3623,7 +3596,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 var currencyExchangeRate = 1m;
                 if (currencyId != CommonData.RMBCurrencyId)
                 {
-                    currencyExchangeRate = await GetCurrencyRateAsync(currencyId);
+                    currencyExchangeRate = await GetCurrencyRateAsync(currencyId, Convert.ToInt32(dateMonth.ToString().Substring(0, 4)));
                 }
                 resMonthReport.CurrencyId = currencyId;
                 resMonthReport.CurrencyExchangeRate = currencyExchangeRate;
@@ -3670,7 +3643,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             #region 修改汇率
             if (resMonthReport.CurrencyId != Guid.Empty && resMonthReport.CurrencyId != CommonData.RMBCurrencyId)
             {
-                resMonthReport.CurrencyExchangeRate = await GetCurrencyRateAsync(resMonthReport.CurrencyId);
+                resMonthReport.CurrencyExchangeRate = await GetCurrencyRateAsync(resMonthReport.CurrencyId, Convert.ToInt32(dateMonth.ToString().Substring(0, 4)));
             }
 
             #endregion
@@ -5672,9 +5645,9 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
         /// 获取最新年份的一条税率转换
         /// </summary>
         /// <returns></returns>
-        private async Task<decimal> GetCurrencyRateAsync(Guid currencyId)
+        private async Task<decimal> GetCurrencyRateAsync(Guid currencyId, int year)
         {
-            var currencyConverter = await _dbCurrencyConverter.AsQueryable().Where(t => t.CurrencyId == currencyId.ToString() && t.Year == DateTime.Now.Year && t.IsDelete == 1).SingleAsync();
+            var currencyConverter = await _dbCurrencyConverter.AsQueryable().Where(t => t.CurrencyId == currencyId.ToString() && t.Year == year && t.IsDelete == 1).SingleAsync();
             if (currencyConverter == null || currencyConverter.ExchangeRate == null)
             {
                 throw new InvalidDataException("汇率数据不存在");
