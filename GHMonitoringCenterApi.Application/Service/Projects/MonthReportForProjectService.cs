@@ -698,12 +698,12 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
 
             #region 追加历史的外包支出、工程量
             var his = mpData.FirstOrDefault(x => x.DateMonth == 202306);
-            
+
             if (his != null)
             {
                 result.HOutValue = his.OutsourcingExpensesAmount;
                 result.HQuantity = his.CompletedQuantity;
-                result.HValue = his.CompleteProductionAmount / currencyConverterList.FirstOrDefault(x => x.Year == his.DateYear).ExchangeRate.Value;
+                result.HValue = currencyConverterList.FirstOrDefault(x => x.Year == his.DateYear) != null ? his.CompleteProductionAmount / currencyConverterList.FirstOrDefault(x => x.Year == his.DateYear).ExchangeRate.Value : 0M;
             }
             #endregion
 
