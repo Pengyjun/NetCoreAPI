@@ -27,9 +27,9 @@ namespace GDCMasterDataReceiveApi.Application.Service.RuleService
         {
             ResponseAjaxResult<List<InterfaceNamesResponseDto>> responseAjaxReslut = new();
             var interfaceNames = new List<InterfaceNamesResponseDto>();
+           
 
-        
-            return responseAjaxReslut; 
+            return responseAjaxReslut;
         }
 
     }
