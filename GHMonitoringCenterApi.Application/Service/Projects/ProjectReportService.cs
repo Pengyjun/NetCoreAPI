@@ -2216,7 +2216,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     #region 新的
                     item.AccumulativeQuantities = hisMonthRep == null ? val.AccumulativeQuantities : hisMonthRep.CompletedQuantity + val.AccumulativeQuantities;
                     item.CumulativeAccomplishCost = hisMonthRep == null ? val.CumulativeAccomplishCost : hisMonthRep.CostAmount + val.CumulativeAccomplishCost;
-                    item.CumulativeCompleted = model.IsConvert == true ? val.CumulativeCompleted : hisMonthRep.CompleteProductionAmount + val.CumulativeCompleted;
+                    item.CumulativeCompleted =val.CumulativeCompleted + hisMonthRep.CompleteProductionAmount;
 
                     item.CumulativePaymentAmount = hisMonthRep == null ? val.CumulativePaymentAmount : hisMonthRep.PartyAPayAmount + val.CumulativePaymentAmount;
                     item.CumulativeValue = hisMonthRep == null ? val.CumulativeValue : hisMonthRep.PartyAConfirmedProductionAmount + val.CumulativeValue;
