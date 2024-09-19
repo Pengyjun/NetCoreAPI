@@ -3,7 +3,8 @@
     /// <summary>
     /// 
     /// </summary>
-    public class ProjectRequestDto : BaseRequestDto
+    public class ProjectRequestDto
     {
+
     }
 }

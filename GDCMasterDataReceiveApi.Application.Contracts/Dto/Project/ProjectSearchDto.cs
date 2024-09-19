@@ -1,6 +1,4 @@
-﻿using GDCMasterDataReceiveApi.Domain.Models;
-
-namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.Project
+﻿namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.Project
 {
 
 

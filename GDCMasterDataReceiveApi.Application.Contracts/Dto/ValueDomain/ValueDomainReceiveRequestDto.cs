@@ -99,4 +99,11 @@
         /// </summary>
         public string? ZVALUE_DESC { get; set; }
     }
+    /// <summary>
+    /// 
+    /// </summary>
+    public class ValueDomainRequestDto
+    {
+
+    }
 }

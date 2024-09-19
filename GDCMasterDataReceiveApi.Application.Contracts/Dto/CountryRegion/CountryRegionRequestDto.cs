@@ -3,7 +3,7 @@
     /// <summary>
     /// 
     /// </summary>
-    public class CountryRegionRequestDto : BaseRequestDto
+    public class CountryRegionRequestDto
     {
 
     }

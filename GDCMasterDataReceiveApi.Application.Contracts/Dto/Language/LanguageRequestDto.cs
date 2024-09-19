@@ -3,7 +3,7 @@
     /// <summary>
     /// 
     /// </summary>
-    public class LanguageRequestDto : BaseRequestDto
+    public class LanguageRequestDto
     {
     }
 }

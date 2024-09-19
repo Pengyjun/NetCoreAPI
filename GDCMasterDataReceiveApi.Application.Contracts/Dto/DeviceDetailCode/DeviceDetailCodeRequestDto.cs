@@ -3,7 +3,7 @@
     /// <summary>
     /// 
     /// </summary>
-    public class DeviceDetailCodeRequestDto : BaseRequestDto
+    public class DeviceDetailCodeRequestDto 
     {
     }
 }

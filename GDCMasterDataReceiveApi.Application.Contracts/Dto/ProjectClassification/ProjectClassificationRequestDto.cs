@@ -3,7 +3,7 @@
     /// <summary>
     /// 
     /// </summary>
-    public class ProjectClassificationRequestDto : BaseRequestDto
+    public class ProjectClassificationRequestDto
     {
 
     }

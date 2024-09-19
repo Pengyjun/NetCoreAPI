@@ -3,7 +3,7 @@
     /// <summary>
     /// 
     /// </summary>
-    public class CurrencyRequestDto : BaseRequestDto
+    public class CurrencyRequestDto
     {
     }
 }

@@ -123,8 +123,8 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
             RefAsync<int> total = 0;
 
             //过滤条件
-            DeserializeObjectUser filterCondition = new DeserializeObjectUser();
-            if (requestDto.FilterConditionJson != null)
+            DeserializeObjectUser filterCondition = new();
+            if (!string.IsNullOrWhiteSpace(requestDto.FilterConditionJson))
             {
                 filterCondition = JsonConvert.DeserializeObject<DeserializeObjectUser>(requestDto.FilterConditionJson);
             }
@@ -337,8 +337,8 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
             List<string> oids = new();
 
             //过滤条件
-            DeserializeObjectUser filterCondition = new DeserializeObjectUser();
-            if (requestDto.FilterConditionJson != null)
+            DeserializeObjectUser filterCondition = new();
+            if (!string.IsNullOrWhiteSpace(requestDto.FilterConditionJson))
             {
                 filterCondition = JsonConvert.DeserializeObject<DeserializeObjectUser>(requestDto.FilterConditionJson);
             }
@@ -579,6 +579,13 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
             var responseAjaxResult = new ResponseAjaxResult<List<ProjectDetailsDto>>();
             RefAsync<int> total = 0;
 
+            //过滤条件
+            ProjectRequestDto filterCondition = new();
+            if (!string.IsNullOrWhiteSpace(requestDto.FilterConditionJson))
+            {
+                filterCondition = JsonConvert.DeserializeObject<ProjectRequestDto>(requestDto.FilterConditionJson);
+            }
+
             var proList = await _dbContext.Queryable<Project>()
                 .Where((pro) => pro.IsDelete == 1)
                 .Select((pro) => new ProjectDetailsDto
@@ -733,6 +740,13 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
             var responseAjaxResult = new ResponseAjaxResult<List<CorresUnitDetailsDto>>();
             RefAsync<int> total = 0;
 
+            //过滤条件
+            CountryContinentRequestDto filterCondition = new();
+            if (!string.IsNullOrWhiteSpace(requestDto.FilterConditionJson))
+            {
+                filterCondition = JsonConvert.DeserializeObject<CountryContinentRequestDto>(requestDto.FilterConditionJson);
+            }
+
             var corresUnitList = await _dbContext.Queryable<CorresUnit>()
                 .Where((cu) => cu.IsDelete == 1)
                 .Select((cu) => new CorresUnitDetailsDto
@@ -838,6 +852,12 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
             var responseAjaxResult = new ResponseAjaxResult<List<CountryRegionDetailsDto>>();
             RefAsync<int> total = 0;
 
+            //过滤条件
+            CountryRegionRequestDto filterCondition = new();
+            if (!string.IsNullOrWhiteSpace(requestDto.FilterConditionJson))
+            {
+                filterCondition = JsonConvert.DeserializeObject<CountryRegionRequestDto>(requestDto.FilterConditionJson);
+            }
             var corresUnitList = await _dbContext.Queryable<CountryRegion>()
                 .Where((cr) => cr.IsDelete == 1)
                 .Select((cr) => new CountryRegionDetailsDto
@@ -907,6 +927,13 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
             var responseAjaxResult = new ResponseAjaxResult<List<CountryContinentDetailsDto>>();
             RefAsync<int> total = 0;
 
+            //过滤条件
+            CountryContinentRequestDto filterCondition = new();
+            if (!string.IsNullOrWhiteSpace(requestDto.FilterConditionJson))
+            {
+                filterCondition = JsonConvert.DeserializeObject<CountryContinentRequestDto>(requestDto.FilterConditionJson);
+            }
+
             var ccList = await _dbContext.Queryable<CountryContinent>()
                 .Where((cc) => cc.IsDelete == 1)
                 .Select((cc) => new CountryContinentDetailsDto
@@ -961,6 +988,13 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
         {
             var responseAjaxResult = new ResponseAjaxResult<List<FinancialInstitutionDetailsDto>>();
             RefAsync<int> total = 0;
+
+            //过滤条件
+            FinancialInstitutionRequestDto filterCondition = new();
+            if (!string.IsNullOrWhiteSpace(requestDto.FilterConditionJson))
+            {
+                filterCondition = JsonConvert.DeserializeObject<FinancialInstitutionRequestDto>(requestDto.FilterConditionJson);
+            }
 
             var ccList = await _dbContext.Queryable<FinancialInstitution>()
                 .Where((cc) => cc.IsDelete == 1)
@@ -1043,6 +1077,13 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
             var responseAjaxResult = new ResponseAjaxResult<List<DeviceClassCodeDetailsDto>>();
             RefAsync<int> total = 0;
 
+            //过滤条件
+            DeviceClassCodeRequestDto filterCondition = new();
+            if (!string.IsNullOrWhiteSpace(requestDto.FilterConditionJson))
+            {
+                filterCondition = JsonConvert.DeserializeObject<DeviceClassCodeRequestDto>(requestDto.FilterConditionJson);
+            }
+
             var ccList = await _dbContext.Queryable<DeviceClassCode>()
                 .Where((cc) => cc.IsDelete == 1)
                 .Select((cc) => new DeviceClassCodeDetailsDto
@@ -1104,6 +1145,13 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
             var responseAjaxResult = new ResponseAjaxResult<List<InvoiceTypeDetailshDto>>();
             RefAsync<int> total = 0;
 
+            //过滤条件
+            DeviceDetailCodeRequestDto filterCondition = new();
+            if (!string.IsNullOrWhiteSpace(requestDto.FilterConditionJson))
+            {
+                filterCondition = JsonConvert.DeserializeObject<DeviceDetailCodeRequestDto>(requestDto.FilterConditionJson);
+            }
+
             var ccList = await _dbContext.Queryable<InvoiceType>()
                 .Where((cc) => cc.IsDelete == 1)
                 .Select((cc) => new InvoiceTypeDetailshDto
@@ -1154,6 +1202,13 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
         {
             var responseAjaxResult = new ResponseAjaxResult<List<ScientifiCNoProjectDetailsDto>>();
             RefAsync<int> total = 0;
+
+            //过滤条件
+            ScientifiCNoProjectRequestDto filterCondition = new();
+            if (!string.IsNullOrWhiteSpace(requestDto.FilterConditionJson))
+            {
+                filterCondition = JsonConvert.DeserializeObject<ScientifiCNoProjectRequestDto>(requestDto.FilterConditionJson);
+            }
 
             var ccList = await _dbContext.Queryable<ScientifiCNoProject>()
                 .Where((cc) => cc.IsDelete == 1)
@@ -1283,6 +1338,13 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
             var responseAjaxResult = new ResponseAjaxResult<List<LanguageDetailsDto>>();
             RefAsync<int> total = 0;
 
+            //过滤条件
+            LanguageRequestDto filterCondition = new();
+            if (!string.IsNullOrWhiteSpace(requestDto.FilterConditionJson))
+            {
+                filterCondition = JsonConvert.DeserializeObject<LanguageRequestDto>(requestDto.FilterConditionJson);
+            }
+
             var ccList = await _dbContext.Queryable<Language>()
                 .Where((cc) => cc.IsDelete == 1)
                 .Select((cc) => new LanguageDetailsDto
@@ -1402,6 +1464,13 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
             var responseAjaxResult = new ResponseAjaxResult<List<DeviceDetailCodeDetailsDto>>();
             RefAsync<int> total = 0;
 
+            //过滤条件
+            DeviceDetailCodeRequestDto filterCondition = new();
+            if (!string.IsNullOrWhiteSpace(requestDto.FilterConditionJson))
+            {
+                filterCondition = JsonConvert.DeserializeObject<DeviceDetailCodeRequestDto>(requestDto.FilterConditionJson);
+            }
+
             var ccList = await _dbContext.Queryable<DeviceDetailCode>()
                 .Where((cc) => cc.IsDelete == 1)
                 .Select((cc) => new DeviceDetailCodeDetailsDto
@@ -1456,6 +1525,13 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
         {
             var responseAjaxResult = new ResponseAjaxResult<List<AccountingDepartmentDetailsDto>>();
             RefAsync<int> total = 0;
+
+            //过滤条件
+            AccountingDepartmentRequestDto filterCondition = new();
+            if (!string.IsNullOrWhiteSpace(requestDto.FilterConditionJson))
+            {
+                filterCondition = JsonConvert.DeserializeObject<AccountingDepartmentRequestDto>(requestDto.FilterConditionJson);
+            }
 
             var ccList = await _dbContext.Queryable<AccountingDepartment>()
                 .Where((cc) => cc.IsDelete == 1)
@@ -1518,6 +1594,13 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
             var responseAjaxResult = new ResponseAjaxResult<List<RelationalContractsDetailsDto>>();
             RefAsync<int> total = 0;
 
+            //过滤条件
+            RelationalContractsRequestDto filterCondition = new();
+            if (!string.IsNullOrWhiteSpace(requestDto.FilterConditionJson))
+            {
+                filterCondition = JsonConvert.DeserializeObject<RelationalContractsRequestDto>(requestDto.FilterConditionJson);
+            }
+
             var ccList = await _dbContext.Queryable<RelationalContracts>()
                 .Where((cc) => cc.IsDelete == 1)
                 .Select((cc) => new RelationalContractsDetailsDto
@@ -1577,6 +1660,14 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
             var responseAjaxResult = new ResponseAjaxResult<List<RegionalDetailsDto>>();
             RefAsync<int> total = 0;
 
+            //过滤条件
+            RegionalRequestDto filterCondition = new();
+            if (!string.IsNullOrWhiteSpace(requestDto.FilterConditionJson))
+            {
+                filterCondition = JsonConvert.DeserializeObject<RegionalRequestDto>(requestDto.FilterConditionJson);
+            }
+
+
             var ccList = await _dbContext.Queryable<Regional>()
                 .Where((cc) => cc.IsDelete == 1)
                 .Select((cc) => new RegionalDetailsDto
@@ -1632,6 +1723,13 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
             var responseAjaxResult = new ResponseAjaxResult<List<UnitMeasurementDetailsDto>>();
             RefAsync<int> total = 0;
 
+            //过滤条件
+            UnitMeasurementRequestDto filterCondition = new();
+            if (!string.IsNullOrWhiteSpace(requestDto.FilterConditionJson))
+            {
+                filterCondition = JsonConvert.DeserializeObject<UnitMeasurementRequestDto>(requestDto.FilterConditionJson);
+            }
+
             var ccList = await _dbContext.Queryable<UnitMeasurement>()
                 .Where((cc) => cc.IsDelete == 1)
                 .Select((cc) => new UnitMeasurementDetailsDto
@@ -1682,6 +1780,13 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
         {
             var responseAjaxResult = new ResponseAjaxResult<List<ProjectClassificationDetailsDto>>();
             RefAsync<int> total = 0;
+
+            //过滤条件
+            ProjectClassificationRequestDto filterCondition = new();
+            if (!string.IsNullOrWhiteSpace(requestDto.FilterConditionJson))
+            {
+                filterCondition = JsonConvert.DeserializeObject<ProjectClassificationRequestDto>(requestDto.FilterConditionJson);
+            }
 
             var ccList = await _dbContext.Queryable<ProjectClassification>()
                 .Where((cc) => cc.IsDelete == 1)
@@ -1774,6 +1879,13 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
             var responseAjaxResult = new ResponseAjaxResult<List<RegionalCenterDetailsDto>>();
             RefAsync<int> total = 0;
 
+            //过滤条件
+            RegionalCenterRequestDto filterCondition = new();
+            if (!string.IsNullOrWhiteSpace(requestDto.FilterConditionJson))
+            {
+                filterCondition = JsonConvert.DeserializeObject<RegionalCenterRequestDto>(requestDto.FilterConditionJson);
+            }
+
             var ccList = await _dbContext.Queryable<RegionalCenter>()
                 .Where((cc) => cc.IsDelete == 1)
                 .Select((cc) => new RegionalCenterDetailsDto
@@ -1824,6 +1936,13 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
         {
             var responseAjaxResult = new ResponseAjaxResult<List<NationalEconomyDetailsDto>>();
             RefAsync<int> total = 0;
+
+            //过滤条件
+            NationalEconomyRequestDto filterCondition = new();
+            if (!string.IsNullOrWhiteSpace(requestDto.FilterConditionJson))
+            {
+                filterCondition = JsonConvert.DeserializeObject<NationalEconomyRequestDto>(requestDto.FilterConditionJson);
+            }
 
             var ccList = await _dbContext.Queryable<NationalEconomy>()
                 .Where((cc) => cc.IsDelete == 1)
@@ -1880,6 +1999,13 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
             var responseAjaxResult = new ResponseAjaxResult<List<AdministrativeAccountingMapperDetailsDto>>();
             RefAsync<int> total = 0;
 
+            //过滤条件
+            AdministrativeAccountingMapperRequestDto filterCondition = new();
+            if (!string.IsNullOrWhiteSpace(requestDto.FilterConditionJson))
+            {
+                filterCondition = JsonConvert.DeserializeObject<AdministrativeAccountingMapperRequestDto>(requestDto.FilterConditionJson);
+            }
+
             var ccList = await _dbContext.Queryable<AdministrativeAccountingMapper>()
                 .Where((cc) => cc.IsDelete == 1)
                 .Select((cc) => new AdministrativeAccountingMapperDetailsDto
@@ -1933,6 +2059,13 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
         {
             var responseAjaxResult = new ResponseAjaxResult<List<EscrowOrganizationDetailsDto>>();
             RefAsync<int> total = 0;
+
+            //过滤条件
+            EscrowOrganizationRequestDto filterCondition = new();
+            if (!string.IsNullOrWhiteSpace(requestDto.FilterConditionJson))
+            {
+                filterCondition = JsonConvert.DeserializeObject<EscrowOrganizationRequestDto>(requestDto.FilterConditionJson);
+            }
 
             var ccList = await _dbContext.Queryable<EscrowOrganization>()
                 .Where((cc) => cc.IsDelete == 1)
@@ -2032,6 +2165,13 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
             var responseAjaxResult = new ResponseAjaxResult<List<BusinessNoCpportunityDetailsDto>>();
             RefAsync<int> total = 0;
 
+            //过滤条件
+            BusinessNoCpportunityRequestDto filterCondition = new();
+            if (!string.IsNullOrWhiteSpace(requestDto.FilterConditionJson))
+            {
+                filterCondition = JsonConvert.DeserializeObject<BusinessNoCpportunityRequestDto>(requestDto.FilterConditionJson);
+            }
+
             var ccList = await _dbContext.Queryable<BusinessCpportunity>()
                 .WhereIF((isJingWai), (cc) => cc.ZZCOUNTRY == "142")
                 .WhereIF((!isJingWai), (cc) => cc.ZZCOUNTRY != "142")
@@ -2103,6 +2243,13 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
             var responseAjaxResult = new ResponseAjaxResult<List<AdministrativeDivisionDetailsDto>>();
             RefAsync<int> total = 0;
 
+            //过滤条件
+            AdministrativeDivisionRequestDto filterCondition = new();
+            if (!string.IsNullOrWhiteSpace(requestDto.FilterConditionJson))
+            {
+                filterCondition = JsonConvert.DeserializeObject<AdministrativeDivisionRequestDto>(requestDto.FilterConditionJson);
+            }
+
             var ccList = await _dbContext.Queryable<AdministrativeDivision>()
                 .Where((cc) => cc.IsDelete == 1)
                 .Select((cc) => new AdministrativeDivisionDetailsDto
@@ -2159,6 +2306,13 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
         {
             var responseAjaxResult = new ResponseAjaxResult<List<AccountingOrganizationDetailsDto>>();
             RefAsync<int> total = 0;
+
+            //过滤条件
+            AccountingOrganizationRequestDto filterCondition = new();
+            if (!string.IsNullOrWhiteSpace(requestDto.FilterConditionJson))
+            {
+                filterCondition = JsonConvert.DeserializeObject<AccountingOrganizationRequestDto>(requestDto.FilterConditionJson);
+            }
 
             var ccList = await _dbContext.Queryable<AccountingOrganization>()
                 .Where((cc) => cc.IsDelete == 1)
@@ -2341,6 +2495,13 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
             var responseAjaxResult = new ResponseAjaxResult<List<CurrencyDetailsDto>>();
             RefAsync<int> total = 0;
 
+            //过滤条件
+            CurrencyRequestDto filterCondition = new();
+            if (!string.IsNullOrWhiteSpace(requestDto.FilterConditionJson))
+            {
+                filterCondition = JsonConvert.DeserializeObject<CurrencyRequestDto>(requestDto.FilterConditionJson);
+            }
+
             var ccList = await _dbContext.Queryable<Currency>()
                 .Where((cc) => cc.IsDelete == 1)
                 .Select((cc) => new CurrencyDetailsDto
@@ -2397,6 +2558,13 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
         {
             var responseAjaxResult = new ResponseAjaxResult<List<ValueDomainReceiveResponseDto>>();
             RefAsync<int> total = 0;
+
+            //过滤条件
+            ValueDomainRequestDto filterCondition = new();
+            if (!string.IsNullOrWhiteSpace(requestDto.FilterConditionJson))
+            {
+                filterCondition = JsonConvert.DeserializeObject<ValueDomainRequestDto>(requestDto.FilterConditionJson);
+            }
 
             var ccList = await _dbContext.Queryable<ValueDomain>()
                 .Where((cc) => cc.IsDelete == 1)
