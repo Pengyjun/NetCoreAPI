@@ -28,6 +28,7 @@ using GDCMasterDataReceiveApi.Application.Contracts.Dto.RelationalContracts;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.RoomNumber;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.ScientifiCNoProject;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.UnitMeasurement;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.ValueDomain;
 using GDCMasterDataReceiveApi.Application.Contracts.IService.ISearchService;
 using GDCMasterDataReceiveApi.Domain.Shared;
 using Microsoft.AspNetCore.Mvc;
@@ -610,8 +611,16 @@ namespace GDCMasterDataReceiveApi.Controller
         {
             return await _searchService.GetCurrencyDetailsAsync(id);
         }
-
-
+        /// <summary>
+        /// 获取值域列表
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        [HttpGet("GetValueDomainReceive")]
+        public async Task<ResponseAjaxResult<List<ValueDomainReceiveResponseDto>>> GetValueDomainReceiveAsync(FilterCondition requestDto)
+        {
+            return await _searchService.GetValueDomainReceiveAsync(requestDto);
+        }
 
 
 
