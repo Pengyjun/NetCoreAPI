@@ -29,6 +29,7 @@ using GDCMasterDataReceiveApi.Application.Contracts.Dto.RelationalContracts;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.RoomNumber;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.ScientifiCNoProject;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.UnitMeasurement;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.ValueDomain;
 using GDCMasterDataReceiveApi.Application.Contracts.IService.ISearchService;
 using GDCMasterDataReceiveApi.Domain.Models;
 using GDCMasterDataReceiveApi.Domain.Shared;
@@ -2068,6 +2069,35 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                 .FirstAsync();
 
             responseAjaxResult.SuccessResult(result);
+            return responseAjaxResult;
+        }
+        /// <summary>
+        /// 获取值域列表
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        public async Task<ResponseAjaxResult<List<ValueDomainReceiveResponseDto>>> GetValueDomainReceiveAsync(FilterCondition requestDto)
+        {
+            var responseAjaxResult = new ResponseAjaxResult<List<ValueDomainReceiveResponseDto>>();
+            RefAsync<int> total = 0;
+
+            var ccList = await _dbContext.Queryable<ValueDomain>()
+                .Where((cc) => cc.IsDelete == 1)
+                .Select((cc) => new ValueDomainReceiveResponseDto
+                {
+                    Id = cc.Id.ToString(),
+                    ZDOM_CODE = cc.ZDOM_CODE,
+                    ZDOM_DESC = cc.ZDOM_DESC,
+                    ZDOM_NAME = cc.ZDOM_NAME,
+                    ZDOM_SUP = cc.ZDOM_SUP,
+                    ZDOM_VALUE = cc.ZDOM_VALUE,
+                    ZREMARKS = cc.ZREMARKS,
+                    ZVERSION = cc.ZVERSION
+                })
+                .ToPageListAsync(requestDto.PageIndex, requestDto.PageSize, total);
+
+            responseAjaxResult.Count = total;
+            responseAjaxResult.SuccessResult(ccList);
             return responseAjaxResult;
         }
     }

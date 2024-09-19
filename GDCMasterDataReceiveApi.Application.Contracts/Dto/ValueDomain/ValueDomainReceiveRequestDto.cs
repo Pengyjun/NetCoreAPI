@@ -1,11 +1,4 @@
-﻿using GDCMasterDataReceiveApi.Application.Contracts.Dto.OtherModels;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.ValueDomain
+﻿namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.ValueDomain
 {
 
     /// <summary>
