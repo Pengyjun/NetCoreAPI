@@ -618,6 +618,10 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                 })
                 .ToPageListAsync(requestDto.PageIndex, requestDto.PageSize, total);
 
+            #region 其他基本
+
+            #endregion
+
             responseAjaxResult.Count = total;
             responseAjaxResult.SuccessResult(corresUnitList);
             return responseAjaxResult;
