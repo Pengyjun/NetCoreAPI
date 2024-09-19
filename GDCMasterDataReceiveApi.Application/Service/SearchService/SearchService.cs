@@ -330,7 +330,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<List<InstitutionDetatilsDto>>> GetInstitutionAsync(InstitutionRequestDto requestDto)
+        public async Task<ResponseAjaxResult<List<InstitutionDetatilsDto>>> GetInstitutionAsync(FilterCondition requestDto)
         {
             var responseAjaxResult = new ResponseAjaxResult<List<InstitutionDetatilsDto>>();
             var result = new List<InstitutionDetatilsDto>();
@@ -574,7 +574,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<List<ProjectDetailsDto>>> GetProjectSearchAsync(ProjectRequestDto requestDto)
+        public async Task<ResponseAjaxResult<List<ProjectDetailsDto>>> GetProjectSearchAsync(FilterCondition requestDto)
         {
             var responseAjaxResult = new ResponseAjaxResult<List<ProjectDetailsDto>>();
             RefAsync<int> total = 0;
@@ -728,7 +728,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<List<CorresUnitDetailsDto>>> GetCorresUnitSearchAsync(CorresUnitRequestDto requestDto)
+        public async Task<ResponseAjaxResult<List<CorresUnitDetailsDto>>> GetCorresUnitSearchAsync(FilterCondition requestDto)
         {
             var responseAjaxResult = new ResponseAjaxResult<List<CorresUnitDetailsDto>>();
             RefAsync<int> total = 0;
@@ -833,7 +833,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<List<CountryRegionDetailsDto>>> GetCountryRegionSearchAsync(CountryRegionRequestDto requestDto)
+        public async Task<ResponseAjaxResult<List<CountryRegionDetailsDto>>> GetCountryRegionSearchAsync(FilterCondition requestDto)
         {
             var responseAjaxResult = new ResponseAjaxResult<List<CountryRegionDetailsDto>>();
             RefAsync<int> total = 0;
@@ -902,7 +902,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<List<CountryContinentDetailsDto>>> GetCountryContinentSearchAsync(CountryContinentRequestDto requestDto)
+        public async Task<ResponseAjaxResult<List<CountryContinentDetailsDto>>> GetCountryContinentSearchAsync(FilterCondition requestDto)
         {
             var responseAjaxResult = new ResponseAjaxResult<List<CountryContinentDetailsDto>>();
             RefAsync<int> total = 0;
@@ -957,7 +957,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<List<FinancialInstitutionDetailsDto>>> GetFinancialInstitutionSearchAsync(FinancialInstitutionRequestDto requestDto)
+        public async Task<ResponseAjaxResult<List<FinancialInstitutionDetailsDto>>> GetFinancialInstitutionSearchAsync(FilterCondition requestDto)
         {
             var responseAjaxResult = new ResponseAjaxResult<List<FinancialInstitutionDetailsDto>>();
             RefAsync<int> total = 0;
@@ -1038,7 +1038,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<List<DeviceClassCodeDetailsDto>>> GetDeviceClassCodeSearchAsync(DeviceClassCodeRequestDto requestDto)
+        public async Task<ResponseAjaxResult<List<DeviceClassCodeDetailsDto>>> GetDeviceClassCodeSearchAsync(FilterCondition requestDto)
         {
             var responseAjaxResult = new ResponseAjaxResult<List<DeviceClassCodeDetailsDto>>();
             RefAsync<int> total = 0;
@@ -1099,7 +1099,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<List<InvoiceTypeDetailshDto>>> GetInvoiceTypeSearchAsync(InvoiceTypeRequestDto requestDto)
+        public async Task<ResponseAjaxResult<List<InvoiceTypeDetailshDto>>> GetInvoiceTypeSearchAsync(FilterCondition requestDto)
         {
             var responseAjaxResult = new ResponseAjaxResult<List<InvoiceTypeDetailshDto>>();
             RefAsync<int> total = 0;
@@ -1150,7 +1150,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<List<ScientifiCNoProjectDetailsDto>>> GetScientifiCNoProjectSearchAsync(ScientifiCNoProjectRequestDto requestDto)
+        public async Task<ResponseAjaxResult<List<ScientifiCNoProjectDetailsDto>>> GetScientifiCNoProjectSearchAsync(FilterCondition requestDto)
         {
             var responseAjaxResult = new ResponseAjaxResult<List<ScientifiCNoProjectDetailsDto>>();
             RefAsync<int> total = 0;
@@ -1221,7 +1221,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<List<RoomNumberDetailsDto>>> GetRoomNumberSearchAsync(RoomNumberRequestDto requestDto)
+        public async Task<ResponseAjaxResult<List<RoomNumberDetailsDto>>> GetRoomNumberSearchAsync(FilterCondition requestDto)
         {
             var responseAjaxResult = new ResponseAjaxResult<List<RoomNumberDetailsDto>>();
             RefAsync<int> total = 0;
@@ -1278,7 +1278,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<List<LanguageDetailsDto>>> GetLanguageSearchAsync(LanguageRequestDto requestDto)
+        public async Task<ResponseAjaxResult<List<LanguageDetailsDto>>> GetLanguageSearchAsync(FilterCondition requestDto)
         {
             var responseAjaxResult = new ResponseAjaxResult<List<LanguageDetailsDto>>();
             RefAsync<int> total = 0;
@@ -1333,7 +1333,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<List<BankCardDetailsDto>>> GetBankCardSearchAsync(BankCardRequestDto requestDto)
+        public async Task<ResponseAjaxResult<List<BankCardDetailsDto>>> GetBankCardSearchAsync(FilterCondition requestDto)
         {
             var responseAjaxResult = new ResponseAjaxResult<List<BankCardDetailsDto>>();
             RefAsync<int> total = 0;
@@ -1397,7 +1397,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<List<DeviceDetailCodeDetailsDto>>> GetDeviceDetailCodeSearchAsync(DeviceDetailCodeRequestDto requestDto)
+        public async Task<ResponseAjaxResult<List<DeviceDetailCodeDetailsDto>>> GetDeviceDetailCodeSearchAsync(FilterCondition requestDto)
         {
             var responseAjaxResult = new ResponseAjaxResult<List<DeviceDetailCodeDetailsDto>>();
             RefAsync<int> total = 0;
@@ -1452,7 +1452,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<List<AccountingDepartmentDetailsDto>>> GetAccountingDepartmentSearchAsync(AccountingDepartmentRequestDto requestDto)
+        public async Task<ResponseAjaxResult<List<AccountingDepartmentDetailsDto>>> GetAccountingDepartmentSearchAsync(FilterCondition requestDto)
         {
             var responseAjaxResult = new ResponseAjaxResult<List<AccountingDepartmentDetailsDto>>();
             RefAsync<int> total = 0;
@@ -1513,7 +1513,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<List<RelationalContractsDetailsDto>>> GetRelationalContractsSearchAsync(RelationalContractsRequestDto requestDto)
+        public async Task<ResponseAjaxResult<List<RelationalContractsDetailsDto>>> GetRelationalContractsSearchAsync(FilterCondition requestDto)
         {
             var responseAjaxResult = new ResponseAjaxResult<List<RelationalContractsDetailsDto>>();
             RefAsync<int> total = 0;
@@ -1572,7 +1572,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<List<RegionalDetailsDto>>> GetRegionalSearchAsync(RegionalRequestDto requestDto)
+        public async Task<ResponseAjaxResult<List<RegionalDetailsDto>>> GetRegionalSearchAsync(FilterCondition requestDto)
         {
             var responseAjaxResult = new ResponseAjaxResult<List<RegionalDetailsDto>>();
             RefAsync<int> total = 0;
@@ -1627,7 +1627,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<List<UnitMeasurementDetailsDto>>> GetUnitMeasurementSearchAsync(UnitMeasurementRequestDto requestDto)
+        public async Task<ResponseAjaxResult<List<UnitMeasurementDetailsDto>>> GetUnitMeasurementSearchAsync(FilterCondition requestDto)
         {
             var responseAjaxResult = new ResponseAjaxResult<List<UnitMeasurementDetailsDto>>();
             RefAsync<int> total = 0;
@@ -1678,7 +1678,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<List<ProjectClassificationDetailsDto>>> GetProjectClassificationSearchAsync(ProjectClassificationRequestDto requestDto)
+        public async Task<ResponseAjaxResult<List<ProjectClassificationDetailsDto>>> GetProjectClassificationSearchAsync(FilterCondition requestDto)
         {
             var responseAjaxResult = new ResponseAjaxResult<List<ProjectClassificationDetailsDto>>();
             RefAsync<int> total = 0;
@@ -1769,7 +1769,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<List<RegionalCenterDetailsDto>>> GetRegionalCenterSearchAsync(RegionalCenterRequestDto requestDto)
+        public async Task<ResponseAjaxResult<List<RegionalCenterDetailsDto>>> GetRegionalCenterSearchAsync(FilterCondition requestDto)
         {
             var responseAjaxResult = new ResponseAjaxResult<List<RegionalCenterDetailsDto>>();
             RefAsync<int> total = 0;
@@ -1820,7 +1820,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<List<NationalEconomyDetailsDto>>> GetNationalEconomySearchAsync(NationalEconomyRequestDto requestDto)
+        public async Task<ResponseAjaxResult<List<NationalEconomyDetailsDto>>> GetNationalEconomySearchAsync(FilterCondition requestDto)
         {
             var responseAjaxResult = new ResponseAjaxResult<List<NationalEconomyDetailsDto>>();
             RefAsync<int> total = 0;
@@ -1875,7 +1875,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<List<AdministrativeAccountingMapperDetailsDto>>> GetAdministrativeAccountingMapperSearchAsync(AdministrativeAccountingMapperRequestDto requestDto)
+        public async Task<ResponseAjaxResult<List<AdministrativeAccountingMapperDetailsDto>>> GetAdministrativeAccountingMapperSearchAsync(FilterCondition requestDto)
         {
             var responseAjaxResult = new ResponseAjaxResult<List<AdministrativeAccountingMapperDetailsDto>>();
             RefAsync<int> total = 0;
@@ -1929,7 +1929,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<List<EscrowOrganizationDetailsDto>>> GetEscrowOrganizationSearchAsync(EscrowOrganizationRequestDto requestDto)
+        public async Task<ResponseAjaxResult<List<EscrowOrganizationDetailsDto>>> GetEscrowOrganizationSearchAsync(FilterCondition requestDto)
         {
             var responseAjaxResult = new ResponseAjaxResult<List<EscrowOrganizationDetailsDto>>();
             RefAsync<int> total = 0;
@@ -2098,7 +2098,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<List<AdministrativeDivisionDetailsDto>>> GetAdministrativeDivisionSearchAsync(AdministrativeDivisionRequestDto requestDto)
+        public async Task<ResponseAjaxResult<List<AdministrativeDivisionDetailsDto>>> GetAdministrativeDivisionSearchAsync(FilterCondition requestDto)
         {
             var responseAjaxResult = new ResponseAjaxResult<List<AdministrativeDivisionDetailsDto>>();
             RefAsync<int> total = 0;
@@ -2155,7 +2155,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<List<AccountingOrganizationDetailsDto>>> GetAccountingOrganizationSearchAsync(AccountingOrganizationRequestDto requestDto)
+        public async Task<ResponseAjaxResult<List<AccountingOrganizationDetailsDto>>> GetAccountingOrganizationSearchAsync(FilterCondition requestDto)
         {
             var responseAjaxResult = new ResponseAjaxResult<List<AccountingOrganizationDetailsDto>>();
             RefAsync<int> total = 0;

@@ -62,7 +62,7 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.IService.ISearchService
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
-        Task<ResponseAjaxResult<List<InstitutionDetatilsDto>>> GetInstitutionAsync(InstitutionRequestDto requestDto);
+        Task<ResponseAjaxResult<List<InstitutionDetatilsDto>>> GetInstitutionAsync(FilterCondition requestDto);
         /// <summary>
         /// 机构详情
         /// </summary>
@@ -74,7 +74,7 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.IService.ISearchService
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
-        Task<ResponseAjaxResult<List<ProjectDetailsDto>>> GetProjectSearchAsync(ProjectRequestDto requestDto);
+        Task<ResponseAjaxResult<List<ProjectDetailsDto>>> GetProjectSearchAsync(FilterCondition requestDto);
         /// <summary>
         /// 项目详情
         /// </summary>
@@ -86,7 +86,7 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.IService.ISearchService
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
-        Task<ResponseAjaxResult<List<CorresUnitDetailsDto>>> GetCorresUnitSearchAsync(CorresUnitRequestDto requestDto);
+        Task<ResponseAjaxResult<List<CorresUnitDetailsDto>>> GetCorresUnitSearchAsync(FilterCondition requestDto);
         /// <summary>
         /// 往来单位详情
         /// </summary>
@@ -98,7 +98,7 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.IService.ISearchService
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
-        Task<ResponseAjaxResult<List<CountryRegionDetailsDto>>> GetCountryRegionSearchAsync(CountryRegionRequestDto requestDto);
+        Task<ResponseAjaxResult<List<CountryRegionDetailsDto>>> GetCountryRegionSearchAsync(FilterCondition requestDto);
         /// <summary>
         /// 获取国家地区详情
         /// </summary>
@@ -110,7 +110,7 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.IService.ISearchService
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
-        Task<ResponseAjaxResult<List<CountryContinentDetailsDto>>> GetCountryContinentSearchAsync(CountryContinentRequestDto requestDto);
+        Task<ResponseAjaxResult<List<CountryContinentDetailsDto>>> GetCountryContinentSearchAsync(FilterCondition requestDto);
         /// <summary>
         /// 获取大洲详情
         /// </summary>
@@ -122,7 +122,7 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.IService.ISearchService
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
-        Task<ResponseAjaxResult<List<FinancialInstitutionDetailsDto>>> GetFinancialInstitutionSearchAsync(FinancialInstitutionRequestDto requestDto);
+        Task<ResponseAjaxResult<List<FinancialInstitutionDetailsDto>>> GetFinancialInstitutionSearchAsync(FilterCondition requestDto);
         /// <summary>
         /// 获取金融机构详情
         /// </summary>
@@ -134,7 +134,7 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.IService.ISearchService
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
-        Task<ResponseAjaxResult<List<DeviceClassCodeDetailsDto>>> GetDeviceClassCodeSearchAsync(DeviceClassCodeRequestDto requestDto);
+        Task<ResponseAjaxResult<List<DeviceClassCodeDetailsDto>>> GetDeviceClassCodeSearchAsync(FilterCondition requestDto);
         /// <summary>
         /// 物资设备分类编码明细
         /// </summary>
@@ -146,7 +146,7 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.IService.ISearchService
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
-        Task<ResponseAjaxResult<List<InvoiceTypeDetailshDto>>> GetInvoiceTypeSearchAsync(InvoiceTypeRequestDto requestDto);
+        Task<ResponseAjaxResult<List<InvoiceTypeDetailshDto>>> GetInvoiceTypeSearchAsync(FilterCondition requestDto);
         /// <summary>
         /// 发票类型明细
         /// </summary>
@@ -158,7 +158,7 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.IService.ISearchService
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
-        Task<ResponseAjaxResult<List<ScientifiCNoProjectDetailsDto>>> GetScientifiCNoProjectSearchAsync(ScientifiCNoProjectRequestDto requestDto);
+        Task<ResponseAjaxResult<List<ScientifiCNoProjectDetailsDto>>> GetScientifiCNoProjectSearchAsync(FilterCondition requestDto);
         /// <summary>
         /// 科研项目明细
         /// </summary>
@@ -170,7 +170,7 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.IService.ISearchService
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
-        Task<ResponseAjaxResult<List<RoomNumberDetailsDto>>> GetRoomNumberSearchAsync(RoomNumberRequestDto requestDto);
+        Task<ResponseAjaxResult<List<RoomNumberDetailsDto>>> GetRoomNumberSearchAsync(FilterCondition requestDto);
         /// <summary>
         /// 获取房号详情
         /// </summary>
@@ -182,7 +182,7 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.IService.ISearchService
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
-        Task<ResponseAjaxResult<List<LanguageDetailsDto>>> GetLanguageSearchAsync(LanguageRequestDto requestDto);
+        Task<ResponseAjaxResult<List<LanguageDetailsDto>>> GetLanguageSearchAsync(FilterCondition requestDto);
         /// <summary>
         /// 语言语种明细
         /// </summary>
@@ -194,7 +194,7 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.IService.ISearchService
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
-        Task<ResponseAjaxResult<List<BankCardDetailsDto>>> GetBankCardSearchAsync(BankCardRequestDto requestDto);
+        Task<ResponseAjaxResult<List<BankCardDetailsDto>>> GetBankCardSearchAsync(FilterCondition requestDto);
         /// <summary>
         /// 
         /// </summary>
@@ -206,7 +206,7 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.IService.ISearchService
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
-        Task<ResponseAjaxResult<List<DeviceDetailCodeDetailsDto>>> GetDeviceDetailCodeSearchAsync(DeviceDetailCodeRequestDto requestDto);
+        Task<ResponseAjaxResult<List<DeviceDetailCodeDetailsDto>>> GetDeviceDetailCodeSearchAsync(FilterCondition requestDto);
         /// <summary>
         /// 
         /// </summary>
@@ -218,7 +218,7 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.IService.ISearchService
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
-        Task<ResponseAjaxResult<List<AccountingDepartmentDetailsDto>>> GetAccountingDepartmentSearchAsync(AccountingDepartmentRequestDto requestDto);
+        Task<ResponseAjaxResult<List<AccountingDepartmentDetailsDto>>> GetAccountingDepartmentSearchAsync(FilterCondition requestDto);
         /// <summary>
         /// 
         /// </summary>
@@ -230,7 +230,7 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.IService.ISearchService
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
-        Task<ResponseAjaxResult<List<RelationalContractsDetailsDto>>> GetRelationalContractsSearchAsync(RelationalContractsRequestDto requestDto);
+        Task<ResponseAjaxResult<List<RelationalContractsDetailsDto>>> GetRelationalContractsSearchAsync(FilterCondition requestDto);
         /// <summary>
         /// 
         /// </summary>
@@ -242,7 +242,7 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.IService.ISearchService
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
-        Task<ResponseAjaxResult<List<RegionalDetailsDto>>> GetRegionalSearchAsync(RegionalRequestDto requestDto);
+        Task<ResponseAjaxResult<List<RegionalDetailsDto>>> GetRegionalSearchAsync(FilterCondition requestDto);
         /// <summary>
         /// 
         /// </summary>
@@ -254,7 +254,7 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.IService.ISearchService
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
-        Task<ResponseAjaxResult<List<UnitMeasurementDetailsDto>>> GetUnitMeasurementSearchAsync(UnitMeasurementRequestDto requestDto);
+        Task<ResponseAjaxResult<List<UnitMeasurementDetailsDto>>> GetUnitMeasurementSearchAsync(FilterCondition requestDto);
         /// <summary>
         /// 
         /// </summary>
@@ -266,7 +266,7 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.IService.ISearchService
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
-        Task<ResponseAjaxResult<List<ProjectClassificationDetailsDto>>> GetProjectClassificationSearchAsync(ProjectClassificationRequestDto requestDto);
+        Task<ResponseAjaxResult<List<ProjectClassificationDetailsDto>>> GetProjectClassificationSearchAsync(FilterCondition requestDto);
         /// <summary>
         /// 
         /// </summary>
@@ -278,7 +278,7 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.IService.ISearchService
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
-        Task<ResponseAjaxResult<List<RegionalCenterDetailsDto>>> GetRegionalCenterSearchAsync(RegionalCenterRequestDto requestDto);
+        Task<ResponseAjaxResult<List<RegionalCenterDetailsDto>>> GetRegionalCenterSearchAsync(FilterCondition requestDto);
         /// <summary>
         /// 
         /// </summary>
@@ -290,7 +290,7 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.IService.ISearchService
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
-        Task<ResponseAjaxResult<List<NationalEconomyDetailsDto>>> GetNationalEconomySearchAsync(NationalEconomyRequestDto requestDto);
+        Task<ResponseAjaxResult<List<NationalEconomyDetailsDto>>> GetNationalEconomySearchAsync(FilterCondition requestDto);
         /// <summary>
         /// 
         /// </summary>
@@ -302,7 +302,7 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.IService.ISearchService
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
-        Task<ResponseAjaxResult<List<AdministrativeAccountingMapperDetailsDto>>> GetAdministrativeAccountingMapperSearchAsync(AdministrativeAccountingMapperRequestDto requestDto);
+        Task<ResponseAjaxResult<List<AdministrativeAccountingMapperDetailsDto>>> GetAdministrativeAccountingMapperSearchAsync(FilterCondition requestDto);
         /// <summary>
         /// 
         /// </summary>
@@ -314,7 +314,7 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.IService.ISearchService
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
-        Task<ResponseAjaxResult<List<EscrowOrganizationDetailsDto>>> GetEscrowOrganizationSearchAsync(EscrowOrganizationRequestDto requestDto);
+        Task<ResponseAjaxResult<List<EscrowOrganizationDetailsDto>>> GetEscrowOrganizationSearchAsync(FilterCondition requestDto);
         /// <summary>
         /// 
         /// </summary>
@@ -339,7 +339,7 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.IService.ISearchService
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
-        Task<ResponseAjaxResult<List<AdministrativeDivisionDetailsDto>>> GetAdministrativeDivisionSearchAsync(AdministrativeDivisionRequestDto requestDto);
+        Task<ResponseAjaxResult<List<AdministrativeDivisionDetailsDto>>> GetAdministrativeDivisionSearchAsync(FilterCondition requestDto);
         /// <summary>
         /// 
         /// </summary>
@@ -351,7 +351,7 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.IService.ISearchService
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
-        Task<ResponseAjaxResult<List<AccountingOrganizationDetailsDto>>> GetAccountingOrganizationSearchAsync(AccountingOrganizationRequestDto requestDto);
+        Task<ResponseAjaxResult<List<AccountingOrganizationDetailsDto>>> GetAccountingOrganizationSearchAsync(FilterCondition requestDto);
         /// <summary>
         /// 
         /// </summary>
@@ -363,7 +363,7 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.IService.ISearchService
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
-        Task<ResponseAjaxResult<List<CurrencyDetailsDto>>> GetCurrencySearchAsync(CurrencyRequestDto requestDto);
+        Task<ResponseAjaxResult<List<CurrencyDetailsDto>>> GetCurrencySearchAsync(FilterCondition requestDto);
         /// <summary>
         /// 
         /// </summary>
