@@ -2336,7 +2336,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<List<CurrencyDetailsDto>>> GetCurrencySearchAsync(CurrencyRequestDto requestDto)
+        public async Task<ResponseAjaxResult<List<CurrencyDetailsDto>>> GetCurrencySearchAsync(FilterCondition requestDto)
         {
             var responseAjaxResult = new ResponseAjaxResult<List<CurrencyDetailsDto>>();
             RefAsync<int> total = 0;
