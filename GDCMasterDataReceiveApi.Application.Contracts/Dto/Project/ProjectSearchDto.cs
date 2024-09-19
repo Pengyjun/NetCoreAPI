@@ -92,6 +92,7 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.Project
     /// </summary>
     public class ProjectDetailsDto
     {
+        public string Id { get; set;}
         /// <summary>
         /// 项目主数据编码
         /// </summary>

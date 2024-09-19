@@ -62,6 +62,10 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.CorresUnit
     public class CorresUnitDetailsDto
     {
         /// <summary>
+        /// 主键id
+        /// </summary>
+        public string? Id { get; set; }
+        /// <summary>
         /// 往来单位主数据编码:公司往来单位的唯一编码
         /// </summary>
         public string? DealUnitMDCode { get; set; }

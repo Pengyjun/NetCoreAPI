@@ -29,6 +29,7 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.RegionalCenter
     /// </summary>
     public class RegionalCenterDetailsDto
     {
+        public string? Id { get; set; }
         /// <summary>
         /// 中交区域中心代码:中交区域中心编码
         /// </summary>

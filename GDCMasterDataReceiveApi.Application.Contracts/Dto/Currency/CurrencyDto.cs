@@ -35,6 +35,7 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.Currency
     /// </summary>
     public class CurrencyDetailsDto
     {
+        public string? Id { get; set; }
         /// <summary>
         /// 数字代码:货币数字代码
         /// </summary>

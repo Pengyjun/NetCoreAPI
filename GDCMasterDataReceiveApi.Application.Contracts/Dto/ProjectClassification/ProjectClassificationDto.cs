@@ -71,6 +71,7 @@
     /// </summary>
     public class ProjectClassificationDetailsDto
     {
+        public string? Id { get; set; }
         /// <summary>
         /// 中交业务分类三级分类代码
         /// </summary>

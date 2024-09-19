@@ -72,6 +72,10 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.Institution
     public class InstitutionDetatilsDto
     {
         /// <summary>
+        /// 主键id
+        /// </summary>
+        public string Id { get; set; }
+        /// <summary>
         /// 机构 ID
         /// </summary>
         public string? Oid { get; set; }
@@ -249,6 +253,10 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.Institution
         /// 机构主数据编码
         /// </summary>
         public string? MdmCode { get; set; }
+        /// <summary>
+        /// 机构子集
+        /// </summary>
+        public List<InstitutionDetatilsDto>? Children { get; set; }
     }
 
 }

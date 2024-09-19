@@ -31,6 +31,7 @@
     /// </summary>
     public class BankCardDetailsDto
     {
+        public string? Id { get; set; }
         /// <summary>
         /// 往来单位主数据编码:公司往来单位的唯一编码
         /// </summary>

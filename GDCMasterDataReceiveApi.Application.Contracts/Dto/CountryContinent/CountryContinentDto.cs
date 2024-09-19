@@ -33,6 +33,7 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.CountryContinent
     /// </summary>
     public class CountryContinentDetailsDto
     {
+        public string Id { get; set; }
         /// <summary>
         /// 大洲代码：大洲代码
         /// </summary>

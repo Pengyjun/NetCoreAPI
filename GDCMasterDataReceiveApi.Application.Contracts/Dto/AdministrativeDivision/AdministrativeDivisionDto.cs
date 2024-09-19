@@ -1,5 +1,4 @@
-﻿using GDCMasterDataReceiveApi.Application.Contracts.Dto.CountryRegion;
-using SqlSugar;
+﻿using SqlSugar;
 
 namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.AdministrativeDivision
 {
@@ -42,6 +41,7 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.AdministrativeDivisi
     /// </summary>
     public class AdministrativeDivisionDetailsDto
     {
+        public string? Id { get; set; }
         /// <summary>
         /// 行政区划代码:业务主键
         /// </summary>

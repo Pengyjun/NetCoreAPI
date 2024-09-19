@@ -77,7 +77,7 @@ namespace GDCMasterDataReceiveApi.Controller
         /// <param name="requestDto"></param>
         /// <returns></returns>
         [HttpPost("GetUserSearch")]
-        public async Task<ResponseAjaxResult<List<UserSearchResponseDto>>> GetUserSearchAsync([FromBody] FilterCondition requestDto)
+        public async Task<ResponseAjaxResult<List<UserSearchDetailsDto>>> GetUserSearchAsync([FromBody] FilterCondition requestDto)
         {
             return await _searchService.GetUserSearchAsync(requestDto);
         }
@@ -97,7 +97,7 @@ namespace GDCMasterDataReceiveApi.Controller
         /// <param name="requestDto"></param>
         /// <returns></returns>
         [HttpPost("GetInstitutions")]
-        public async Task<ResponseAjaxResult<List<InstitutionDto>>> GetInstitutionsAsync([FromBody] InstitutionRequestDto requestDto)
+        public async Task<ResponseAjaxResult<List<InstitutionDetatilsDto>>> GetInstitutionsAsync([FromBody] InstitutionRequestDto requestDto)
         {
             return await _searchService.GetInstitutionAsync(requestDto);
         }
@@ -117,7 +117,7 @@ namespace GDCMasterDataReceiveApi.Controller
         /// <param name="requestDto"></param>
         /// <returns></returns>
         [HttpGet("GetProjectSearch")]
-        public async Task<ResponseAjaxResult<List<ProjectSearchDto>>> GetProjectSearchAsync([FromQuery] ProjectRequestDto requestDto)
+        public async Task<ResponseAjaxResult<List<ProjectDetailsDto>>> GetProjectSearchAsync([FromQuery] ProjectRequestDto requestDto)
         {
             return await _searchService.GetProjectSearchAsync(requestDto);
         }
@@ -137,7 +137,7 @@ namespace GDCMasterDataReceiveApi.Controller
         /// <param name="requestDto"></param>
         /// <returns></returns>
         [HttpGet("GetCorresUnitSearch")]
-        public async Task<ResponseAjaxResult<List<CorresUnitSearchDto>>> GetCorresUnitSearchAsync([FromQuery] CorresUnitRequestDto requestDto)
+        public async Task<ResponseAjaxResult<List<CorresUnitDetailsDto>>> GetCorresUnitSearchAsync([FromQuery] CorresUnitRequestDto requestDto)
         {
             return await _searchService.GetCorresUnitSearchAsync(requestDto);
         }
@@ -157,7 +157,7 @@ namespace GDCMasterDataReceiveApi.Controller
         /// <param name="requestDto"></param>
         /// <returns></returns>
         [HttpGet("GetCountryRegionSearch")]
-        public async Task<ResponseAjaxResult<List<CountryRegionSearchDto>>> GetCountryRegionSearchAsync([FromQuery] CountryRegionRequestDto requestDto)
+        public async Task<ResponseAjaxResult<List<CountryRegionDetailsDto>>> GetCountryRegionSearchAsync([FromQuery] CountryRegionRequestDto requestDto)
         {
             return await _searchService.GetCountryRegionSearchAsync(requestDto);
         }
@@ -177,7 +177,7 @@ namespace GDCMasterDataReceiveApi.Controller
         /// <param name="requestDto"></param>
         /// <returns></returns>
         [HttpGet("GetCountryContinentSearch")]
-        public async Task<ResponseAjaxResult<List<CountryContinentSearchDto>>> GetCountryContinentSearchAsync([FromQuery] CountryContinentRequestDto requestDto)
+        public async Task<ResponseAjaxResult<List<CountryContinentDetailsDto>>> GetCountryContinentSearchAsync([FromQuery] CountryContinentRequestDto requestDto)
         {
             return await _searchService.GetCountryContinentSearchAsync(requestDto);
         }
@@ -197,7 +197,7 @@ namespace GDCMasterDataReceiveApi.Controller
         /// <param name="requestDto"></param>
         /// <returns></returns>
         [HttpGet("GetFinancialInstitutionSearch")]
-        public async Task<ResponseAjaxResult<List<FinancialInstitutionSearchDto>>> GetFinancialInstitutionSearchAsync([FromQuery] FinancialInstitutionRequestDto requestDto)
+        public async Task<ResponseAjaxResult<List<FinancialInstitutionDetailsDto>>> GetFinancialInstitutionSearchAsync([FromQuery] FinancialInstitutionRequestDto requestDto)
         {
             return await _searchService.GetFinancialInstitutionSearchAsync(requestDto);
         }
@@ -217,7 +217,7 @@ namespace GDCMasterDataReceiveApi.Controller
         /// <param name="requestDto"></param>
         /// <returns></returns>
         [HttpGet("GetDeviceClassCodeSearch")]
-        public async Task<ResponseAjaxResult<List<DeviceClassCodeSearchDto>>> GetDeviceClassCodeSearchAsync([FromQuery] DeviceClassCodeRequestDto requestDto)
+        public async Task<ResponseAjaxResult<List<DeviceClassCodeDetailsDto>>> GetDeviceClassCodeSearchAsync([FromQuery] DeviceClassCodeRequestDto requestDto)
         {
             return await _searchService.GetDeviceClassCodeSearchAsync(requestDto);
         }
@@ -237,7 +237,7 @@ namespace GDCMasterDataReceiveApi.Controller
         /// <param name="requestDto"></param>
         /// <returns></returns>
         [HttpGet("GetInvoiceTypeSearch")]
-        public async Task<ResponseAjaxResult<List<InvoiceTypeSearchDto>>> GetInvoiceTypeSearchAsync([FromQuery] InvoiceTypeRequestDto requestDto)
+        public async Task<ResponseAjaxResult<List<InvoiceTypeDetailshDto>>> GetInvoiceTypeSearchAsync([FromQuery] InvoiceTypeRequestDto requestDto)
         {
             return await _searchService.GetInvoiceTypeSearchAsync(requestDto);
         }
@@ -257,7 +257,7 @@ namespace GDCMasterDataReceiveApi.Controller
         /// <param name="requestDto"></param>
         /// <returns></returns>
         [HttpGet("GetScientifiCNoProjectSearch")]
-        public async Task<ResponseAjaxResult<List<ScientifiCNoProjectSearchDto>>> GetScientifiCNoProjectSearchAsync([FromQuery] ScientifiCNoProjectRequestDto requestDto)
+        public async Task<ResponseAjaxResult<List<ScientifiCNoProjectDetailsDto>>> GetScientifiCNoProjectSearchAsync([FromQuery] ScientifiCNoProjectRequestDto requestDto)
         {
             return await _searchService.GetScientifiCNoProjectSearchAsync(requestDto);
         }
@@ -277,7 +277,7 @@ namespace GDCMasterDataReceiveApi.Controller
         /// <param name="requestDto"></param>
         /// <returns></returns>
         [HttpGet("GetRoomNumberSearch")]
-        public async Task<ResponseAjaxResult<List<RoomNumberSearchDto>>> GetRoomNumberSearchAsync([FromQuery] RoomNumberRequestDto requestDto)
+        public async Task<ResponseAjaxResult<List<RoomNumberDetailsDto>>> GetRoomNumberSearchAsync([FromQuery] RoomNumberRequestDto requestDto)
         {
             return await _searchService.GetRoomNumberSearchAsync(requestDto);
         }
@@ -297,7 +297,7 @@ namespace GDCMasterDataReceiveApi.Controller
         /// <param name="requestDto"></param>
         /// <returns></returns>
         [HttpGet("GetLanguageSearch")]
-        public async Task<ResponseAjaxResult<List<LanguageSearchDto>>> GetLanguageSearchAsync([FromQuery] LanguageRequestDto requestDto)
+        public async Task<ResponseAjaxResult<List<LanguageDetailsDto>>> GetLanguageSearchAsync([FromQuery] LanguageRequestDto requestDto)
         {
             return await _searchService.GetLanguageSearchAsync(requestDto);
         }
@@ -317,7 +317,7 @@ namespace GDCMasterDataReceiveApi.Controller
         /// <param name="requestDto"></param>
         /// <returns></returns>
         [HttpGet("GetBankCardSearch")]
-        public async Task<ResponseAjaxResult<List<BankCardSearchDto>>> GetBankCardSearchAsync([FromQuery] BankCardRequestDto requestDto)
+        public async Task<ResponseAjaxResult<List<BankCardDetailsDto>>> GetBankCardSearchAsync([FromQuery] BankCardRequestDto requestDto)
         {
             return await _searchService.GetBankCardSearchAsync(requestDto);
         }
@@ -337,7 +337,7 @@ namespace GDCMasterDataReceiveApi.Controller
         /// <param name="requestDto"></param>
         /// <returns></returns>
         [HttpGet("GetDeviceDetailCodeSearch")]
-        public async Task<ResponseAjaxResult<List<DeviceDetailCodeSearchDto>>> GetDeviceDetailCodeSearchAsync([FromQuery] DeviceDetailCodeRequestDto requestDto)
+        public async Task<ResponseAjaxResult<List<DeviceDetailCodeDetailsDto>>> GetDeviceDetailCodeSearchAsync([FromQuery] DeviceDetailCodeRequestDto requestDto)
         {
             return await _searchService.GetDeviceDetailCodeSearchAsync(requestDto);
         }
@@ -357,7 +357,7 @@ namespace GDCMasterDataReceiveApi.Controller
         /// <param name="requestDto"></param>
         /// <returns></returns>
         [HttpGet("GetAccountingDepartmentSearch")]
-        public async Task<ResponseAjaxResult<List<AccountingDepartmentSearchDto>>> GetAccountingDepartmentSearchAsync([FromQuery] AccountingDepartmentRequestDto requestDto)
+        public async Task<ResponseAjaxResult<List<AccountingDepartmentDetailsDto>>> GetAccountingDepartmentSearchAsync([FromQuery] AccountingDepartmentRequestDto requestDto)
         {
             return await _searchService.GetAccountingDepartmentSearchAsync(requestDto);
         }
@@ -377,7 +377,7 @@ namespace GDCMasterDataReceiveApi.Controller
         /// <param name="requestDto"></param>
         /// <returns></returns>
         [HttpGet("GetRelationalContractsSearch")]
-        public async Task<ResponseAjaxResult<List<RelationalContractsSearchDto>>> GetRelationalContractsSearchAsync([FromQuery] RelationalContractsRequestDto requestDto)
+        public async Task<ResponseAjaxResult<List<RelationalContractsDetailsDto>>> GetRelationalContractsSearchAsync([FromQuery] RelationalContractsRequestDto requestDto)
         {
             return await _searchService.GetRelationalContractsSearchAsync(requestDto);
         }
@@ -397,7 +397,7 @@ namespace GDCMasterDataReceiveApi.Controller
         /// <param name="requestDto"></param>
         /// <returns></returns>
         [HttpGet("GetRegionalSearch")]
-        public async Task<ResponseAjaxResult<List<RegionalSearchDto>>> GetRegionalSearchAsync([FromQuery] RegionalRequestDto requestDto)
+        public async Task<ResponseAjaxResult<List<RegionalDetailsDto>>> GetRegionalSearchAsync([FromQuery] RegionalRequestDto requestDto)
         {
             return await _searchService.GetRegionalSearchAsync(requestDto);
         }
@@ -417,7 +417,7 @@ namespace GDCMasterDataReceiveApi.Controller
         /// <param name="requestDto"></param>
         /// <returns></returns>
         [HttpGet("GetUnitMeasurementSearch")]
-        public async Task<ResponseAjaxResult<List<UnitMeasurementSearchDto>>> GetUnitMeasurementSearchAsync([FromQuery] UnitMeasurementRequestDto requestDto)
+        public async Task<ResponseAjaxResult<List<UnitMeasurementDetailsDto>>> GetUnitMeasurementSearchAsync([FromQuery] UnitMeasurementRequestDto requestDto)
         {
             return await _searchService.GetUnitMeasurementSearchAsync(requestDto);
         }
@@ -437,7 +437,7 @@ namespace GDCMasterDataReceiveApi.Controller
         /// <param name="requestDto"></param>
         /// <returns></returns>
         [HttpGet("GetProjectClassificationSearch")]
-        public async Task<ResponseAjaxResult<List<ProjectClassificationSearchDto>>> GetProjectClassificationSearchAsync([FromQuery] ProjectClassificationRequestDto requestDto)
+        public async Task<ResponseAjaxResult<List<ProjectClassificationDetailsDto>>> GetProjectClassificationSearchAsync([FromQuery] ProjectClassificationRequestDto requestDto)
         {
             return await _searchService.GetProjectClassificationSearchAsync(requestDto);
         }
@@ -457,7 +457,7 @@ namespace GDCMasterDataReceiveApi.Controller
         /// <param name="requestDto"></param>
         /// <returns></returns>
         [HttpGet("GetRegionalCenterSearch")]
-        public async Task<ResponseAjaxResult<List<RegionalCenterSearchDto>>> GetRegionalCenterSearchAsync([FromQuery] RegionalCenterRequestDto requestDto)
+        public async Task<ResponseAjaxResult<List<RegionalCenterDetailsDto>>> GetRegionalCenterSearchAsync([FromQuery] RegionalCenterRequestDto requestDto)
         {
             return await _searchService.GetRegionalCenterSearchAsync(requestDto);
         }
@@ -477,7 +477,7 @@ namespace GDCMasterDataReceiveApi.Controller
         /// <param name="requestDto"></param>
         /// <returns></returns>
         [HttpGet("GetNationalEconomySearch")]
-        public async Task<ResponseAjaxResult<List<NationalEconomySearchDto>>> GetNationalEconomySearchAsync([FromQuery] NationalEconomyRequestDto requestDto)
+        public async Task<ResponseAjaxResult<List<NationalEconomyDetailsDto>>> GetNationalEconomySearchAsync([FromQuery] NationalEconomyRequestDto requestDto)
         {
             return await _searchService.GetNationalEconomySearchAsync(requestDto);
         }
@@ -497,7 +497,7 @@ namespace GDCMasterDataReceiveApi.Controller
         /// <param name="requestDto"></param>
         /// <returns></returns>
         [HttpGet("GetAdministrativeAccountingMapperSearch")]
-        public async Task<ResponseAjaxResult<List<AdministrativeAccountingMapperSearchDto>>> GetAdministrativeAccountingMapperSearchAsync([FromQuery] AdministrativeAccountingMapperRequestDto requestDto)
+        public async Task<ResponseAjaxResult<List<AdministrativeAccountingMapperDetailsDto>>> GetAdministrativeAccountingMapperSearchAsync([FromQuery] AdministrativeAccountingMapperRequestDto requestDto)
         {
             return await _searchService.GetAdministrativeAccountingMapperSearchAsync(requestDto);
         }
@@ -517,7 +517,7 @@ namespace GDCMasterDataReceiveApi.Controller
         /// <param name="requestDto"></param>
         /// <returns></returns>
         [HttpGet("GetEscrowOrganizationSearch")]
-        public async Task<ResponseAjaxResult<List<EscrowOrganizationSearchDto>>> GetEscrowOrganizationSearchAsync([FromQuery] EscrowOrganizationRequestDto requestDto)
+        public async Task<ResponseAjaxResult<List<EscrowOrganizationDetailsDto>>> GetEscrowOrganizationSearchAsync([FromQuery] EscrowOrganizationRequestDto requestDto)
         {
             return await _searchService.GetEscrowOrganizationSearchAsync(requestDto);
         }
@@ -536,10 +536,20 @@ namespace GDCMasterDataReceiveApi.Controller
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
-        [HttpGet("GetBusinessNoCpportunitySearch")]
-        public async Task<ResponseAjaxResult<List<BusinessNoCpportunitySearchDto>>> GetBusinessNoCpportunitySearchAsync([FromQuery] BusinessNoCpportunityRequestDto requestDto)
+        [HttpPost("GetBusinessNoCpportunitySearch")]
+        public async Task<ResponseAjaxResult<List<BusinessNoCpportunityDetailsDto>>> GetBusinessNoCpportunitySearchAsync([FromBody] FilterCondition requestDto)
         {
-            return await _searchService.GetBusinessNoCpportunitySearchAsync(requestDto);
+            return await _searchService.GetBusinessNoCpportunitySearchAsync(requestDto, false);
+        }
+        /// <summary>
+        /// 商机项目(含境外商机项目) 列表 国家地区区分  142境内，142以为境外
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        [HttpPost("GetBusinessCpportunitySearch")]
+        public async Task<ResponseAjaxResult<List<BusinessNoCpportunityDetailsDto>>> GetBusinessCpportunitySearchAsync([FromBody] FilterCondition requestDto)
+        {
+            return await _searchService.GetBusinessNoCpportunitySearchAsync(requestDto, true);
         }
         /// <summary>
         /// 商机项目(不含境外商机项目) 详情 国家地区区分  142境内，142以为境外
@@ -557,7 +567,7 @@ namespace GDCMasterDataReceiveApi.Controller
         /// <param name="requestDto"></param>
         /// <returns></returns>
         [HttpGet("GetAdministrativeDivisionSearch")]
-        public async Task<ResponseAjaxResult<List<AdministrativeDivisionSearchDto>>> GetAdministrativeDivisionSearchAsync([FromQuery] AdministrativeDivisionRequestDto requestDto)
+        public async Task<ResponseAjaxResult<List<AdministrativeDivisionDetailsDto>>> GetAdministrativeDivisionSearchAsync([FromQuery] AdministrativeDivisionRequestDto requestDto)
         {
             return await _searchService.GetAdministrativeDivisionSearchAsync(requestDto);
         }
@@ -577,7 +587,7 @@ namespace GDCMasterDataReceiveApi.Controller
         /// <param name="requestDto"></param>
         /// <returns></returns>
         [HttpGet("GetAccountingOrganizationSearch")]
-        public async Task<ResponseAjaxResult<List<AccountingOrganizationSearchDto>>> GetAccountingOrganizationSearchAsync([FromQuery] AccountingOrganizationRequestDto requestDto)
+        public async Task<ResponseAjaxResult<List<AccountingOrganizationDetailsDto>>> GetAccountingOrganizationSearchAsync([FromQuery] AccountingOrganizationRequestDto requestDto)
         {
             return await _searchService.GetAccountingOrganizationSearchAsync(requestDto);
         }
@@ -597,7 +607,7 @@ namespace GDCMasterDataReceiveApi.Controller
         /// <param name="requestDto"></param>
         /// <returns></returns>
         [HttpGet("GetCurrencySearch")]
-        public async Task<ResponseAjaxResult<List<CurrencySearchDto>>> GetCurrencySearchAsync([FromQuery] CurrencyRequestDto requestDto)
+        public async Task<ResponseAjaxResult<List<CurrencyDetailsDto>>> GetCurrencySearchAsync([FromQuery] CurrencyRequestDto requestDto)
         {
             return await _searchService.GetCurrencySearchAsync(requestDto);
         }
@@ -617,7 +627,7 @@ namespace GDCMasterDataReceiveApi.Controller
         /// <param name="requestDto"></param>
         /// <returns></returns>
         [HttpPost("GetValueDomainReceive")]
-        public async Task<ResponseAjaxResult<List<ValueDomainReceiveResponseDto>>> GetValueDomainReceiveAsync([FromBody]FilterCondition requestDto)
+        public async Task<ResponseAjaxResult<List<ValueDomainReceiveResponseDto>>> GetValueDomainReceiveAsync([FromBody] FilterCondition requestDto)
         {
             return await _searchService.GetValueDomainReceiveAsync(requestDto);
         }

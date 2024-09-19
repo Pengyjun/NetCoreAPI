@@ -29,6 +29,7 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.NationalEconomy
     /// </summary>
     public class NationalEconomyDetailsDto
     {
+        public string? Id { get; set; }
         /// <summary>
         /// 国民经济行业分类代码
         /// </summary>

@@ -117,9 +117,9 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<List<UserSearchResponseDto>>> GetUserSearchAsync(FilterCondition requestDto)
+        public async Task<ResponseAjaxResult<List<UserSearchDetailsDto>>> GetUserSearchAsync(FilterCondition requestDto)
         {
-            var responseAjaxResult = new ResponseAjaxResult<List<UserSearchResponseDto>>();
+            var responseAjaxResult = new ResponseAjaxResult<List<UserSearchDetailsDto>>();
             RefAsync<int> total = 0;
 
             //过滤条件
@@ -136,7 +136,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                 .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.EmpCode), u => u.EMP_CODE.Contains(filterCondition.EmpCode))
                 .WhereIF(filterCondition != null && filterCondition.Ids != null && filterCondition.Ids.Any(), u => filterCondition.Ids.Contains(u.Id.ToString()))
                 .Where(u => u.IsDelete == 1)
-                .Select(u => new UserSearchResponseDto
+                .Select(u => new UserSearchDetailsDto
                 {
                     Id = u.Id.ToString(),
                     Name = u.NAME,
@@ -145,9 +145,40 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     Email = u.EMAIL,
                     EmpCode = u.EMP_CODE,
                     Enable = u.Enable == 1 ? "启用" : "禁用",
-                    UserInfoStatus = u.EMP_STATUS,
                     Phone = u.PHONE,
-                    CountryRegion = u.NATIONALITY
+                    Attribute1 = u.ATTRIBUTE1,
+                    Attribute2 = u.ATTRIBUTE2,
+                    Attribute3 = u.ATTRIBUTE3,
+                    Attribute4 = u.ATTRIBUTE4,
+                    Attribute5 = u.ATTRIBUTE5,
+                    Birthday = u.BIRTHDAY,
+                    CertType = u.CERT_TYPE,
+                    DispatchunitName = u.DISPATCHUNITNAME,
+                    DispatchunitShortName = u.DISPATCHUNITSHORTNAME,
+                    EmpSort = u.EMP_SORT,
+                    EnName = u.EN_NAME,
+                    EntryTime = u.ENTRY_TIME,
+                    Externaluser = u.EXTERNALUSER,
+                    Fax = u.FAX,
+                    HighEstGrade = u.HIGHESTGRADE,
+                    HrEmpCode = u.HR_EMP_CODE,
+                    JobName = u.JOB_NAME,
+                    JobType = u.JOB_TYPE,
+                    NameSpell = u.NAME_SPELL,
+                    Nation = u.NATION,
+                    Nationality = u.NATIONALITY,
+                    OfficeNum = u.OFFICE_NUM,
+                    PoliticsFace = u.POLITICSFACE,
+                    PositionGrade = u.POSITION_GRADE,
+                    PositionGradeNorm = u.POSITIONGRADENORM,
+                    PositionName = u.POSITION_NAME,
+                    Positions = u.POSITIONS,
+                    SameHighEstGrade = u.SAMEHIGHESTGRADE,
+                    Sex = u.SEX == "01" ? "男性" : "女性",
+                    Sno = u.SNO,
+                    SubDepts = u.SUB_DEPTS,
+                    Tel = u.TEL,
+                    UserLogin = u.USER_LOGIN
                 })
                 .ToPageListAsync(requestDto.PageIndex, requestDto.PageSize, total);
 
@@ -299,10 +330,10 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<List<InstitutionDto>>> GetInstitutionAsync(InstitutionRequestDto requestDto)
+        public async Task<ResponseAjaxResult<List<InstitutionDetatilsDto>>> GetInstitutionAsync(InstitutionRequestDto requestDto)
         {
-            var responseAjaxResult = new ResponseAjaxResult<List<InstitutionDto>>();
-            var result = new List<InstitutionDto>();
+            var responseAjaxResult = new ResponseAjaxResult<List<InstitutionDetatilsDto>>();
+            var result = new List<InstitutionDetatilsDto>();
             List<string> oids = new();
 
             //过滤条件
@@ -343,44 +374,110 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
             }
             //其他数据
             var otherNodes = institutions
-                .WhereIF(oids != null && oids.Any(), x => oids.Contains(x.OID))
-                .Where(x => x.OID != "101162350")
-                .Select(x => new InstitutionDto
+                .WhereIF(oids != null && oids.Any(), ins => oids.Contains(ins.OID))
+                .Where(ins => ins.OID != "101162350")
+                .Select(ins => new InstitutionDetatilsDto
                 {
-                    Code = x.OCODE,
-                    EnglishName = x.ENGLISHNAME,
-                    EnglishShortName = x.ENGLISHSHORTNAME,
-                    EntClass = x.ENTCLASS,
-                    Id = x.Id.ToString(),
-                    Name = x.NAME,
-                    Oid = x.OID,
-                    Orule = x.ORULE,
-                    POid = x.POID,
-                    GpOid = x.GPOID,
-                    ShortName = x.SHORTNAME,
-                    Status = x.STATUS
+                    Id = ins.Id.ToString(),
+                    BizDomain = ins.BIZDOMAIN,
+                    BizType = ins.BIZTYPE,
+                    Carea = ins.CAREA,
+                    Code = ins.OCODE,
+                    Coid = ins.COID,
+                    Crossorgan = ins.CROSSORGAN,
+                    EnglishName = ins.ENGLISHNAME,
+                    EnglishShortName = ins.ENGLISHSHORTNAME,
+                    EntClass = ins.ENTCLASS,
+                    GlobalSno = ins.GLOBAL_SNO,
+                    Goid = ins.GOID,
+                    Gpoid = ins.GPOID,
+                    Grade = ins.GRADE,
+                    IsIndependent = ins.IS_INDEPENDENT,
+                    MdmCode = ins.MDM_CODE,
+                    Mrut = ins.MRUT,
+                    Name = ins.NAME,
+                    Note = ins.NOTE,
+                    Oid = ins.OID,
+                    Oper = ins.OPER,
+                    Organemp = ins.ORGANEMP,
+                    OrganGrade = ins.ORGANGRADE,
+                    OrgGrade = ins.ORGGRADE,
+                    OrgProvince = ins.ORGPROVINCE,
+                    Orule = ins.ORULE,
+                    OSecBid = ins.O2BID,
+                    POid = ins.POID,
+                    ProjectManType = ins.PROJECTMANTYPE,
+                    ProjectScale = ins.PROJECTSCALE,
+                    ProjectType = ins.PROJECTTYPE,
+                    QyGrade = ins.QYGRADE,
+                    RegisterCode = ins.REGISTERCODE,
+                    RoId = ins.ROID,
+                    Rown = ins.ROWN,
+                    ShareHoldings = ins.SHAREHOLDINGS,
+                    ShortName = ins.SHORTNAME,
+                    Sno = ins.SNO,
+                    StartDate = ins.STARTDATE,
+                    Status = ins.STATUS,
+                    TemorganName = ins.TEMORGANNAME,
+                    TerritoryPro = ins.TERRITORYPRO,
+                    Type = ins.TYPE,
+                    TypeExt = ins.TYPEEXT,
+                    Version = ins.VERSION
                 })
                 .ToList();
 
             //根节点
             var rootNode = institutions
-                .WhereIF(oids != null && oids.Any(), x => oids.Contains(x.OID))
-                .Where(x => x.OID == "101162350")
-                .Select(x => new InstitutionDto
+                .WhereIF(oids != null && oids.Any(), ins => oids.Contains(ins.OID))
+                .Where(ins => ins.OID == "101162350")
+                .Select(ins => new InstitutionDetatilsDto
                 {
-                    Code = x.OCODE,
-                    EnglishName = x.ENGLISHNAME,
-                    EnglishShortName = x.ENGLISHSHORTNAME,
-                    EntClass = x.ENTCLASS,
-                    Id = x.Id.ToString(),
-                    Name = x.NAME,
-                    Oid = x.OID,
-                    Orule = x.ORULE,
-                    POid = x.POID,
-                    ShortName = x.SHORTNAME,
-                    Status = x.STATUS,
-                    GpOid = x.GPOID,
-                    Children = GetChildren(x.OID, otherNodes)
+                    Id = ins.Id.ToString(),
+                    BizDomain = ins.BIZDOMAIN,
+                    BizType = ins.BIZTYPE,
+                    Carea = ins.CAREA,
+                    Code = ins.OCODE,
+                    Coid = ins.COID,
+                    Crossorgan = ins.CROSSORGAN,
+                    EnglishName = ins.ENGLISHNAME,
+                    EnglishShortName = ins.ENGLISHSHORTNAME,
+                    EntClass = ins.ENTCLASS,
+                    GlobalSno = ins.GLOBAL_SNO,
+                    Goid = ins.GOID,
+                    Gpoid = ins.GPOID,
+                    Grade = ins.GRADE,
+                    IsIndependent = ins.IS_INDEPENDENT,
+                    MdmCode = ins.MDM_CODE,
+                    Mrut = ins.MRUT,
+                    Name = ins.NAME,
+                    Note = ins.NOTE,
+                    Oid = ins.OID,
+                    Oper = ins.OPER,
+                    Organemp = ins.ORGANEMP,
+                    OrganGrade = ins.ORGANGRADE,
+                    OrgGrade = ins.ORGGRADE,
+                    OrgProvince = ins.ORGPROVINCE,
+                    Orule = ins.ORULE,
+                    OSecBid = ins.O2BID,
+                    POid = ins.POID,
+                    ProjectManType = ins.PROJECTMANTYPE,
+                    ProjectScale = ins.PROJECTSCALE,
+                    ProjectType = ins.PROJECTTYPE,
+                    QyGrade = ins.QYGRADE,
+                    RegisterCode = ins.REGISTERCODE,
+                    RoId = ins.ROID,
+                    Rown = ins.ROWN,
+                    ShareHoldings = ins.SHAREHOLDINGS,
+                    ShortName = ins.SHORTNAME,
+                    Sno = ins.SNO,
+                    StartDate = ins.STARTDATE,
+                    Status = ins.STATUS,
+                    TemorganName = ins.TEMORGANNAME,
+                    TerritoryPro = ins.TERRITORYPRO,
+                    Type = ins.TYPE,
+                    TypeExt = ins.TYPEEXT,
+                    Version = ins.VERSION,
+                    Children = GetChildren(ins.OID, otherNodes)
                 }).FirstOrDefault();
             result.Add(rootNode);
 
@@ -394,9 +491,9 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
         /// <param name="gpOid"></param>
         /// <param name="children"></param>
         /// <returns></returns>
-        public List<InstitutionDto> GetChildren(string gpOid, List<InstitutionDto> children)
+        public List<InstitutionDetatilsDto> GetChildren(string gpOid, List<InstitutionDetatilsDto> children)
         {
-            var childs = children.Where(x => x.GpOid == gpOid).ToList();
+            var childs = children.Where(x => x.Gpoid == gpOid).ToList();
             foreach (var child in childs)
             {
                 child.Children = GetChildren(child.Oid, children);
@@ -477,15 +574,14 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<List<ProjectSearchDto>>> GetProjectSearchAsync(ProjectRequestDto requestDto)
+        public async Task<ResponseAjaxResult<List<ProjectDetailsDto>>> GetProjectSearchAsync(ProjectRequestDto requestDto)
         {
-            var responseAjaxResult = new ResponseAjaxResult<List<ProjectSearchDto>>();
+            var responseAjaxResult = new ResponseAjaxResult<List<ProjectDetailsDto>>();
             RefAsync<int> total = 0;
 
             var proList = await _dbContext.Queryable<Project>()
-                .LeftJoin<Institution>((pro, ins) => pro.ZPRO_ORG == ins.OID)
-                .Where((pro, ins) => pro.IsDelete == 1)
-                .Select((pro, ins) => new ProjectSearchDto
+                .Where((pro) => pro.IsDelete == 1)
+                .Select((pro) => new ProjectDetailsDto
                 {
                     Id = pro.Id.ToString(),
                     Abbreviation = pro.ZHEREINAFTER,
@@ -505,7 +601,45 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     State = pro.ZSTATE == "1" ? "有效" : "无效",
                     Type = pro.ZPROJTYPE,
                     UnitSec = pro.Z2NDORG,
-                    Year = pro.ZPROJYEAR
+                    Year = pro.ZPROJYEAR,
+                    AcquisitionTime = pro.ZLDLOCGT,
+                    Applicant = pro.ZINSURED,
+                    BChangeTime = pro.ZCBR,
+                    BDep = pro.ZBIZDEPT,
+                    BidDisclosureNo = pro.ZAWARDP,
+                    BTypeOfCCCC = pro.ZCPBC,
+                    ConsolidatedTable = pro.ZCS,
+                    CreateDate = pro.ZCREATE_AT,
+                    CustodianName = pro.ZCUSTODIAN,
+                    DueDate = pro.ZLFINDATE,
+                    EndDateOfInsure = pro.ZIFINDATE,
+                    FundEstablishmentDate = pro.ZFSTARTDATE,
+                    FundExpirationDate = pro.ZFFINDATE,
+                    FundManager = pro.ZFUNDMTYPE,
+                    FundMDCode = pro.ZFUND,
+                    FundName = pro.ZFUNDNAME,
+                    FundNo = pro.ZFUNDNO,
+                    FundOrgForm = pro.ZFUNDORGFORM,
+                    Invest = pro.ZINVERSTOR,
+                    IsJoint = pro.ZWINNINGC,
+                    LandTransactionNo = pro.ZLDLOC,
+                    LeaseStartDate = pro.ZLSTARTDATE,
+                    Management = pro.ZMANAGE_MODE,
+                    NameOfInsureOrg = pro.ZINSURANCE,
+                    NameOfLeased = pro.ZLEASESNAME,
+                    OrgMethod = pro.ZPOS,
+                    ParticipateInUnitSecs = pro.ZCY2NDORG,
+                    PolicyNo = pro.ZPOLICYNO,
+                    ReasonForDeactivate = pro.ZSTOPREASON,
+                    ResponsibleParty = pro.ZRESP,
+                    SourceOfIncome = pro.ZSI,
+                    StartDateOfInsure = pro.ZISTARTDATE,
+                    SupMDCode = pro.ZPROJECTUP,
+                    TaxMethod = pro.ZTAXMETHOD,
+                    TenantName = pro.ZLESSEE,
+                    TenantType = pro.ZLESSEETYPE,
+                    TradingSituation = pro.ZTRADER,
+                    WinningBidder = pro.ZAWARDMAI
                 })
                 .ToPageListAsync(requestDto.PageIndex, requestDto.PageSize, total);
 
@@ -594,14 +728,14 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<List<CorresUnitSearchDto>>> GetCorresUnitSearchAsync(CorresUnitRequestDto requestDto)
+        public async Task<ResponseAjaxResult<List<CorresUnitDetailsDto>>> GetCorresUnitSearchAsync(CorresUnitRequestDto requestDto)
         {
-            var responseAjaxResult = new ResponseAjaxResult<List<CorresUnitSearchDto>>();
+            var responseAjaxResult = new ResponseAjaxResult<List<CorresUnitDetailsDto>>();
             RefAsync<int> total = 0;
 
             var corresUnitList = await _dbContext.Queryable<CorresUnit>()
                 .Where((cu) => cu.IsDelete == 1)
-                .Select((cu) => new CorresUnitSearchDto
+                .Select((cu) => new CorresUnitDetailsDto
                 {
                     Id = cu.Id.ToString(),
                     CategoryUnit = cu.ZBPTYPE,
@@ -614,6 +748,25 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     NatureOfUnit = cu.ZBPNATURE,
                     Province = cu.ZPROVINCE,
                     TypeOfUnit = cu.ZBPKINDS,
+                    AbroadRegistrationNo = cu.ZOSRNO,
+                    AbroadSocialSecurityNo = cu.ZSSNO,
+                    AccUnitCode = cu.ZACORGNO,
+                    BRegistrationNo = cu.ZBRNO,
+                    ChangeTime = cu.ZCHAT,
+                    CreateBy = cu.ZCRBY,
+                    CreatTime = cu.ZCRAT,
+                    DealUnitMDCode = cu.ZBP,
+                    EnterpriseNature = cu.ZETPSPROPERTY,
+                    IdNo = cu.ZIDNO,
+                    IsGroupUnit = cu.ZINCLIENT,
+                    ModifiedBy = cu.ZCHBY,
+                    OrgCode = cu.ZOIBC,
+                    OrgMDCode = cu.ZORG,
+                    RegistrationNo = cu.ZUSCC,
+                    SourceSystem = cu.ZSYSTEM,
+                    SupLegalEntity = cu.ZCOMPYREL,
+                    TaxpayerIdentifyNo = cu.ZTRNO,
+                    UnitSec = cu.Z2NDORG,
                     StatusOfUnit = cu.ZBPSTATE == "01" ? "启用" : "停用"
                 })
                 .ToPageListAsync(requestDto.PageIndex, requestDto.PageSize, total);
@@ -680,14 +833,14 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<List<CountryRegionSearchDto>>> GetCountryRegionSearchAsync(CountryRegionRequestDto requestDto)
+        public async Task<ResponseAjaxResult<List<CountryRegionDetailsDto>>> GetCountryRegionSearchAsync(CountryRegionRequestDto requestDto)
         {
-            var responseAjaxResult = new ResponseAjaxResult<List<CountryRegionSearchDto>>();
+            var responseAjaxResult = new ResponseAjaxResult<List<CountryRegionDetailsDto>>();
             RefAsync<int> total = 0;
 
             var corresUnitList = await _dbContext.Queryable<CountryRegion>()
                 .Where((cr) => cr.IsDelete == 1)
-                .Select((cr) => new CountryRegionSearchDto
+                .Select((cr) => new CountryRegionDetailsDto
                 {
                     Id = cr.Id.ToString(),
                     Country = cr.ZCOUNTRYCODE,
@@ -695,7 +848,15 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     Name = cr.ZCOUNTRYNAME,
                     NameEnglish = cr.ZCOUNTRYENAME,
                     NationalCode = cr.ZGBCHAR,
-                    State = cr.ZSTATE
+                    State = cr.ZSTATE,
+                    AreaCode = cr.ZAREACODE,
+                    CCCCCenterCode = cr.ZCRCCODE,
+                    ContinentCode = cr.ZCONTINENTCODE,
+                    DataIdentifier = cr.ZDELETE,
+                    RoadGongJ = cr.ZBRGJ,
+                    RoadGuoZiW = cr.ZBRGZW,
+                    RoadHaiW = cr.ZBRHW,
+                    Version = cr.ZVERSION
                 })
                 .ToPageListAsync(requestDto.PageIndex, requestDto.PageSize, total);
 
@@ -741,20 +902,23 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<List<CountryContinentSearchDto>>> GetCountryContinentSearchAsync(CountryContinentRequestDto requestDto)
+        public async Task<ResponseAjaxResult<List<CountryContinentDetailsDto>>> GetCountryContinentSearchAsync(CountryContinentRequestDto requestDto)
         {
-            var responseAjaxResult = new ResponseAjaxResult<List<CountryContinentSearchDto>>();
+            var responseAjaxResult = new ResponseAjaxResult<List<CountryContinentDetailsDto>>();
             RefAsync<int> total = 0;
 
             var ccList = await _dbContext.Queryable<CountryContinent>()
                 .Where((cc) => cc.IsDelete == 1)
-                .Select((cc) => new CountryContinentSearchDto
+                .Select((cc) => new CountryContinentDetailsDto
                 {
                     Id = cc.Id.ToString(),
                     ContinentCode = cc.ZCONTINENTCODE,
                     Name = cc.ZCONTINENTNAME,
                     RegionalDescr = cc.ZAREANAME,
-                    State = cc.ZSTATE == "1" ? "有效" : "无效"
+                    State = cc.ZSTATE == "1" ? "有效" : "无效",
+                    AreaCode = cc.ZAREACODE,
+                    DataIdentifier = cc.ZDELETE,
+                    Version = cc.ZVERSION
                 })
                 .ToPageListAsync(requestDto.PageIndex, requestDto.PageSize, total);
 
@@ -793,14 +957,14 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<List<FinancialInstitutionSearchDto>>> GetFinancialInstitutionSearchAsync(FinancialInstitutionRequestDto requestDto)
+        public async Task<ResponseAjaxResult<List<FinancialInstitutionDetailsDto>>> GetFinancialInstitutionSearchAsync(FinancialInstitutionRequestDto requestDto)
         {
-            var responseAjaxResult = new ResponseAjaxResult<List<FinancialInstitutionSearchDto>>();
+            var responseAjaxResult = new ResponseAjaxResult<List<FinancialInstitutionDetailsDto>>();
             RefAsync<int> total = 0;
 
             var ccList = await _dbContext.Queryable<FinancialInstitution>()
                 .Where((cc) => cc.IsDelete == 1)
-                .Select((cc) => new FinancialInstitutionSearchDto
+                .Select((cc) => new FinancialInstitutionDetailsDto
                 {
                     Id = cc.Id.ToString(),
                     City = cc.ZCITY,
@@ -812,7 +976,17 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     Province = cc.ZPROVINCE,
                     TypesOfAbroadOrg = cc.ZOFITYPE,
                     TypesOfOrg = cc.ZDFITYPE,
-                    State = cc.ZDATSTATE == "1" ? "有效" : "无效"
+                    State = cc.ZDATSTATE == "1" ? "有效" : "无效",
+                    BankNo = cc.ZBANKN,
+                    DataIdentifier = cc.ZDELETE,
+                    MDCode = cc.ZFINC,
+                    MDCodeofOrg = cc.ZORG,
+                    RegistrationNo = cc.ZUSCC,
+                    No = cc.ZBANK,
+                    SubmitBy = cc.ZFZCHBY,
+                    SubmitTime = cc.ZFZCHAT,
+                    SwiftCode = cc.ZSWIFTCOD,
+                    UnitSec = cc.ZFIN2NDORG
                 })
                 .ToPageListAsync(requestDto.PageIndex, requestDto.PageSize, total);
 
@@ -864,14 +1038,14 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<List<DeviceClassCodeSearchDto>>> GetDeviceClassCodeSearchAsync(DeviceClassCodeRequestDto requestDto)
+        public async Task<ResponseAjaxResult<List<DeviceClassCodeDetailsDto>>> GetDeviceClassCodeSearchAsync(DeviceClassCodeRequestDto requestDto)
         {
-            var responseAjaxResult = new ResponseAjaxResult<List<DeviceClassCodeSearchDto>>();
+            var responseAjaxResult = new ResponseAjaxResult<List<DeviceClassCodeDetailsDto>>();
             RefAsync<int> total = 0;
 
             var ccList = await _dbContext.Queryable<DeviceClassCode>()
                 .Where((cc) => cc.IsDelete == 1)
-                .Select((cc) => new DeviceClassCodeSearchDto
+                .Select((cc) => new DeviceClassCodeDetailsDto
                 {
                     Id = cc.Id.ToString(),
                     AliasName = cc.ZCALIAS,
@@ -879,7 +1053,11 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     Description = cc.ZCDESC,
                     Name = cc.ZCNAME,
                     UnitOfMeasurement = cc.ZMSEHI,
-                    State = cc.ZUSSTATE == "1" ? "有效" : "无效"
+                    State = cc.ZUSSTATE == "1" ? "有效" : "无效",
+                    DataIdentifier = cc.ZDELETE,
+                    Level = cc.ZCLEVEL,
+                    SortRule = cc.ZSORT,
+                    SupCode = cc.ZCLASSUP
                 })
                 .ToPageListAsync(requestDto.PageIndex, requestDto.PageSize, total);
 
@@ -921,19 +1099,21 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<List<InvoiceTypeSearchDto>>> GetInvoiceTypeSearchAsync(InvoiceTypeRequestDto requestDto)
+        public async Task<ResponseAjaxResult<List<InvoiceTypeDetailshDto>>> GetInvoiceTypeSearchAsync(InvoiceTypeRequestDto requestDto)
         {
-            var responseAjaxResult = new ResponseAjaxResult<List<InvoiceTypeSearchDto>>();
+            var responseAjaxResult = new ResponseAjaxResult<List<InvoiceTypeDetailshDto>>();
             RefAsync<int> total = 0;
 
             var ccList = await _dbContext.Queryable<InvoiceType>()
                 .Where((cc) => cc.IsDelete == 1)
-                .Select((cc) => new InvoiceTypeSearchDto
+                .Select((cc) => new InvoiceTypeDetailshDto
                 {
                     Id = cc.Id.ToString(),
                     Code = cc.ZINVTCODE,
                     Name = cc.ZINVTNAME,
-                    State = cc.ZSTATE == "1" ? "有效" : "无效"
+                    State = cc.ZSTATE == "1" ? "有效" : "无效",
+                    DataIdentifier = cc.ZDELETE,
+                    Version = cc.ZVERSION,
                 })
                 .ToPageListAsync(requestDto.PageIndex, requestDto.PageSize, total);
 
@@ -970,14 +1150,14 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<List<ScientifiCNoProjectSearchDto>>> GetScientifiCNoProjectSearchAsync(ScientifiCNoProjectRequestDto requestDto)
+        public async Task<ResponseAjaxResult<List<ScientifiCNoProjectDetailsDto>>> GetScientifiCNoProjectSearchAsync(ScientifiCNoProjectRequestDto requestDto)
         {
-            var responseAjaxResult = new ResponseAjaxResult<List<ScientifiCNoProjectSearchDto>>();
+            var responseAjaxResult = new ResponseAjaxResult<List<ScientifiCNoProjectDetailsDto>>();
             RefAsync<int> total = 0;
 
             var ccList = await _dbContext.Queryable<ScientifiCNoProject>()
                 .Where((cc) => cc.IsDelete == 1)
-                .Select((cc) => new ScientifiCNoProjectSearchDto
+                .Select((cc) => new ScientifiCNoProjectDetailsDto
                 {
                     Id = cc.Id.ToString(),
                     Name = cc.ZSRPN,
@@ -987,7 +1167,14 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     MDCode = cc.ZSRP,
                     PjectState = cc.ZKPSTATE,
                     TotalCost = cc.ZPROJCOST,
-                    Year = cc.ZPROJYEA
+                    Year = cc.ZPROJYEA,
+                    IsOutsourced = cc.ZOUTSOURCING == "1" ? "是" : "否",
+                    PlanEndDate = cc.ZPFINDATE,
+                    PlanStartDate = cc.ZPSTARTDATE,
+                    ProfessionalType = cc.ZMAJORTYPE,
+                    State = cc.ZPSTATE,
+                    SupMDCode = cc.ZSRPUP,
+                    TypeCode = cc.ZSRPCLASS
                 })
                 .ToPageListAsync(requestDto.PageIndex, requestDto.PageSize, total);
 
@@ -1034,21 +1221,24 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<List<RoomNumberSearchDto>>> GetRoomNumberSearchAsync(RoomNumberRequestDto requestDto)
+        public async Task<ResponseAjaxResult<List<RoomNumberDetailsDto>>> GetRoomNumberSearchAsync(RoomNumberRequestDto requestDto)
         {
-            var responseAjaxResult = new ResponseAjaxResult<List<RoomNumberSearchDto>>();
+            var responseAjaxResult = new ResponseAjaxResult<List<RoomNumberDetailsDto>>();
             RefAsync<int> total = 0;
 
             var ccList = await _dbContext.Queryable<RoomNumber>()
                 .Where((cc) => cc.IsDelete == 1)
-                .Select((cc) => new RoomNumberSearchDto
+                .Select((cc) => new RoomNumberDetailsDto
                 {
                     Id = cc.Id.ToString(),
                     Name = cc.ZROOM_NAME,
                     BFormat = cc.ZFORMAT,
                     BuildCode = cc.ZBLDG,
                     Code = cc.ZROOM,
-                    State = cc.ZSTATE == "1" ? "有效" : "无效"
+                    PjectMDCode = cc.ZPROJECT,
+                    SourceSystem = cc.ZSYSTEM,
+                    State = cc.ZSTATE == "1" ? "有效" : "无效",
+                    UnitOfBuild = cc.ZRE_UNIT,
                 })
                 .ToPageListAsync(requestDto.PageIndex, requestDto.PageSize, total);
 
@@ -1088,21 +1278,23 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<List<LanguageSearchDto>>> GetLanguageSearchAsync(LanguageRequestDto requestDto)
+        public async Task<ResponseAjaxResult<List<LanguageDetailsDto>>> GetLanguageSearchAsync(LanguageRequestDto requestDto)
         {
-            var responseAjaxResult = new ResponseAjaxResult<List<LanguageSearchDto>>();
+            var responseAjaxResult = new ResponseAjaxResult<List<LanguageDetailsDto>>();
             RefAsync<int> total = 0;
 
             var ccList = await _dbContext.Queryable<Language>()
                 .Where((cc) => cc.IsDelete == 1)
-                .Select((cc) => new LanguageSearchDto
+                .Select((cc) => new LanguageDetailsDto
                 {
                     Id = cc.Id.ToString(),
                     Name = cc.ZLANG_ZH,
                     DirCode = cc.ZLANG_BIB,
                     EnglishName = cc.ZLANG_EN,
                     TermCode = cc.ZLANG_TER,
-                    State = cc.ZSTATE == "1" ? "有效" : "无效"
+                    State = cc.ZSTATE == "1" ? "有效" : "无效",
+                    DataIdentifier = cc.ZDELETE,
+                    Version = cc.ZVERSION
                 })
                 .ToPageListAsync(requestDto.PageIndex, requestDto.PageSize, total);
 
@@ -1141,19 +1333,27 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<List<BankCardSearchDto>>> GetBankCardSearchAsync(BankCardRequestDto requestDto)
+        public async Task<ResponseAjaxResult<List<BankCardDetailsDto>>> GetBankCardSearchAsync(BankCardRequestDto requestDto)
         {
-            var responseAjaxResult = new ResponseAjaxResult<List<BankCardSearchDto>>();
+            var responseAjaxResult = new ResponseAjaxResult<List<BankCardDetailsDto>>();
             RefAsync<int> total = 0;
 
             var ccList = await _dbContext.Queryable<BankCard>()
-                .Select((cc) => new BankCardSearchDto
+                .Select((cc) => new BankCardDetailsDto
                 {
                     Id = cc.Id.ToString(),
                     Name = cc.ZKOINH,
                     AccountCurrency = cc.ZCURR,
                     AccountStatus = cc.ZBANKSTA,
-                    BankAccount = cc.ZBANKN
+                    BankAccount = cc.ZBANKN,
+                    BankNoPK = cc.ZBANK,
+                    City = cc.ZCITY2,
+                    Country = cc.ZZCOUNTR2,
+                    County = cc.ZCOUNTY2,
+                    DealUnitCode = cc.ZBP,
+                    FinancialOrgCode = cc.ZFINC,
+                    FinancialOrgName = cc.ZFINAME,
+                    Province = cc.ZPROVINC2
                 })
                 .ToPageListAsync(requestDto.PageIndex, requestDto.PageSize, total);
 
@@ -1197,20 +1397,23 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<List<DeviceDetailCodeSearchDto>>> GetDeviceDetailCodeSearchAsync(DeviceDetailCodeRequestDto requestDto)
+        public async Task<ResponseAjaxResult<List<DeviceDetailCodeDetailsDto>>> GetDeviceDetailCodeSearchAsync(DeviceDetailCodeRequestDto requestDto)
         {
-            var responseAjaxResult = new ResponseAjaxResult<List<DeviceDetailCodeSearchDto>>();
+            var responseAjaxResult = new ResponseAjaxResult<List<DeviceDetailCodeDetailsDto>>();
             RefAsync<int> total = 0;
 
             var ccList = await _dbContext.Queryable<DeviceDetailCode>()
                 .Where((cc) => cc.IsDelete == 1)
-                .Select((cc) => new DeviceDetailCodeSearchDto
+                .Select((cc) => new DeviceDetailCodeDetailsDto
                 {
                     Id = cc.Id.ToString(),
                     Name = cc.ZMNAME,
                     Descption = cc.ZMNAMES,
                     MDCode = cc.ZMATERIAL,
-                    ProductNameCode = cc.ZCLASS
+                    ProductNameCode = cc.ZCLASS,
+                    IsCode = cc.ZOFTENCODE == "1" ? "是" : "否",
+                    Remark = cc.ZREMARK,
+                    State = cc.ZSTATE == "1" ? "有效" : "无效"
                 })
                 .ToPageListAsync(requestDto.PageIndex, requestDto.PageSize, total);
 
@@ -1249,21 +1452,26 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<List<AccountingDepartmentSearchDto>>> GetAccountingDepartmentSearchAsync(AccountingDepartmentRequestDto requestDto)
+        public async Task<ResponseAjaxResult<List<AccountingDepartmentDetailsDto>>> GetAccountingDepartmentSearchAsync(AccountingDepartmentRequestDto requestDto)
         {
-            var responseAjaxResult = new ResponseAjaxResult<List<AccountingDepartmentSearchDto>>();
+            var responseAjaxResult = new ResponseAjaxResult<List<AccountingDepartmentDetailsDto>>();
             RefAsync<int> total = 0;
 
             var ccList = await _dbContext.Queryable<AccountingDepartment>()
                 .Where((cc) => cc.IsDelete == 1)
-                .Select((cc) => new AccountingDepartmentSearchDto
+                .Select((cc) => new AccountingDepartmentDetailsDto
                 {
                     Id = cc.Id.ToString(),
                     Name = cc.ZDNAME_CHS,
                     AccDepCode = cc.ZDCODE,
                     AccDepELName = cc.ZDNAME_EN,
                     AccDepTCCName = cc.ZDNAME_CHT,
-                    State = cc.ZDATSTATE == "1" ? "停用" : "未停用"
+                    State = cc.ZDATSTATE == "1" ? "停用" : "未停用",
+                    AccDepId = cc.ZDID,
+                    AccOrgCode = cc.ZACORGNO,
+                    AccOrgId = cc.ZACID,
+                    DataIdentifier = cc.ZDELETE == "1" ? "删除" : "正常",
+                    SupAccDepId = cc.ZDPARENTID
                 })
                 .ToPageListAsync(requestDto.PageIndex, requestDto.PageSize, total);
 
@@ -1305,20 +1513,25 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<List<RelationalContractsSearchDto>>> GetRelationalContractsSearchAsync(RelationalContractsRequestDto requestDto)
+        public async Task<ResponseAjaxResult<List<RelationalContractsDetailsDto>>> GetRelationalContractsSearchAsync(RelationalContractsRequestDto requestDto)
         {
-            var responseAjaxResult = new ResponseAjaxResult<List<RelationalContractsSearchDto>>();
+            var responseAjaxResult = new ResponseAjaxResult<List<RelationalContractsDetailsDto>>();
             RefAsync<int> total = 0;
 
             var ccList = await _dbContext.Queryable<RelationalContracts>()
                 .Where((cc) => cc.IsDelete == 1)
-                .Select((cc) => new RelationalContractsSearchDto
+                .Select((cc) => new RelationalContractsDetailsDto
                 {
                     Id = cc.Id.ToString(),
                     Code = cc.ZDELEGATE_ORG,
                     DetailedLine = cc.ZNUMC4,
                     MDCode = cc.MDM_CODE,
-                    Status = cc.ZDELEGATE_STATE
+                    Status = cc.ZDELEGATE_STATE,
+                    OrgCode = cc.OID,
+                    AccOrgCode = cc.ZACO,
+                    TreeCode = cc.ZTREEID,
+                    Version = cc.ZTREEVER,
+                    ViewIdentification = cc.ZMVIEW_FLAG
                 })
                 .ToPageListAsync(requestDto.PageIndex, requestDto.PageSize, total);
 
@@ -1359,21 +1572,23 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<List<RegionalSearchDto>>> GetRegionalSearchAsync(RegionalRequestDto requestDto)
+        public async Task<ResponseAjaxResult<List<RegionalDetailsDto>>> GetRegionalSearchAsync(RegionalRequestDto requestDto)
         {
-            var responseAjaxResult = new ResponseAjaxResult<List<RegionalSearchDto>>();
+            var responseAjaxResult = new ResponseAjaxResult<List<RegionalDetailsDto>>();
             RefAsync<int> total = 0;
 
             var ccList = await _dbContext.Queryable<Regional>()
                 .Where((cc) => cc.IsDelete == 1)
-                .Select((cc) => new RegionalSearchDto
+                .Select((cc) => new RegionalDetailsDto
                 {
                     Id = cc.Id.ToString(),
                     Code = cc.ZCRHCODE,
                     AreaRange = cc.ZCRHSCOPE,
                     Description = cc.ZCRHNAME,
                     Name = cc.ZCRHABBR,
-                    State = cc.ZSTATE == "1" ? "有效" : "无效"
+                    State = cc.ZSTATE == "1" ? "有效" : "无效",
+                    Version = cc.ZVERSION,
+                    DataIdentifier = cc.ZDELETE == "1" ? "未删除" : "已删除"
                 })
                 .ToPageListAsync(requestDto.PageIndex, requestDto.PageSize, total);
 
@@ -1412,20 +1627,21 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<List<UnitMeasurementSearchDto>>> GetUnitMeasurementSearchAsync(UnitMeasurementRequestDto requestDto)
+        public async Task<ResponseAjaxResult<List<UnitMeasurementDetailsDto>>> GetUnitMeasurementSearchAsync(UnitMeasurementRequestDto requestDto)
         {
-            var responseAjaxResult = new ResponseAjaxResult<List<UnitMeasurementSearchDto>>();
+            var responseAjaxResult = new ResponseAjaxResult<List<UnitMeasurementDetailsDto>>();
             RefAsync<int> total = 0;
 
             var ccList = await _dbContext.Queryable<UnitMeasurement>()
                 .Where((cc) => cc.IsDelete == 1)
-                .Select((cc) => new UnitMeasurementSearchDto
+                .Select((cc) => new UnitMeasurementDetailsDto
                 {
                     Id = cc.Id.ToString(),
                     Code = cc.ZUNITCODE,
-                    DataIdentifier = cc.ZDELETE,
                     Name = cc.ZUNITNAME,
-                    State = cc.ZSTATE == "1" ? "有效" : "无效"
+                    State = cc.ZSTATE == "1" ? "有效" : "无效",
+                    Version = cc.ZVERSION,
+                    DataIdentifier = cc.ZDELETE == "1" ? "未删除" : "已删除"
                 })
                 .ToPageListAsync(requestDto.PageIndex, requestDto.PageSize, total);
 
@@ -1462,14 +1678,14 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<List<ProjectClassificationSearchDto>>> GetProjectClassificationSearchAsync(ProjectClassificationRequestDto requestDto)
+        public async Task<ResponseAjaxResult<List<ProjectClassificationDetailsDto>>> GetProjectClassificationSearchAsync(ProjectClassificationRequestDto requestDto)
         {
-            var responseAjaxResult = new ResponseAjaxResult<List<ProjectClassificationSearchDto>>();
+            var responseAjaxResult = new ResponseAjaxResult<List<ProjectClassificationDetailsDto>>();
             RefAsync<int> total = 0;
 
             var ccList = await _dbContext.Queryable<ProjectClassification>()
                 .Where((cc) => cc.IsDelete == 1)
-                .Select((cc) => new ProjectClassificationSearchDto
+                .Select((cc) => new ProjectClassificationDetailsDto
                 {
                     Id = cc.Id.ToString(),
                     BSectorSecName = cc.ZBUSTD2NAME,
@@ -1484,7 +1700,19 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     ChanYeOneName = cc.ZICSTD1NAME,
                     ChanYeRemark = cc.ZICSTDREMARKS,
                     ChanYeSecName = cc.ZICSTD2NAME,
-                    ChanYeThirdName = cc.ZICSTD3NAME
+                    ChanYeThirdName = cc.ZICSTD3NAME,
+                    BSectorOneCode = cc.ZBUSTD1ID,
+                    BSectorSecCode = cc.ZBUSTD2ID,
+                    BSectorThirdCode = cc.ZBUSTD3ID,
+                    CCCCBTypeCode = cc.Z12TOPBID,
+                    CCCCBTypeOneCode = cc.ZCPBC1ID,
+                    CCCCBTypeSecCode = cc.ZCPBC2ID,
+                    CCCCBTypeThirdCode = cc.ZCPBC3ID,
+                    CCCCRiverLakeAndSeaCode = cc.ZRRLSID,
+                    ChanYeOneCode = cc.ZICSTD1ID,
+                    ChanYeSecCode = cc.ZICSTD2ID,
+                    Name = cc.ZCPBC1NAME,
+                    ThirdNewBType = cc.ZNEW3TOB == "1" ? "是" : "否"
                 })
                 .ToPageListAsync(requestDto.PageIndex, requestDto.PageSize, total);
 
@@ -1541,19 +1769,21 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<List<RegionalCenterSearchDto>>> GetRegionalCenterSearchAsync(RegionalCenterRequestDto requestDto)
+        public async Task<ResponseAjaxResult<List<RegionalCenterDetailsDto>>> GetRegionalCenterSearchAsync(RegionalCenterRequestDto requestDto)
         {
-            var responseAjaxResult = new ResponseAjaxResult<List<RegionalCenterSearchDto>>();
+            var responseAjaxResult = new ResponseAjaxResult<List<RegionalCenterDetailsDto>>();
             RefAsync<int> total = 0;
 
             var ccList = await _dbContext.Queryable<RegionalCenter>()
                 .Where((cc) => cc.IsDelete == 1)
-                .Select((cc) => new RegionalCenterSearchDto
+                .Select((cc) => new RegionalCenterDetailsDto
                 {
                     Id = cc.Id.ToString(),
                     Code = cc.ZCRCCODE,
                     Description = cc.ZCRCNAME,
-                    State = cc.ZSTATE == "1" ? "有效" : "无效"
+                    State = cc.ZSTATE == "1" ? "有效" : "无效",
+                    DataIdentifier = cc.ZDELETE == "1" ? "未删除" : "已删除",
+                    Version = cc.ZVERSION
                 })
                 .ToPageListAsync(requestDto.PageIndex, requestDto.PageSize, total);
 
@@ -1590,19 +1820,23 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<List<NationalEconomySearchDto>>> GetNationalEconomySearchAsync(NationalEconomyRequestDto requestDto)
+        public async Task<ResponseAjaxResult<List<NationalEconomyDetailsDto>>> GetNationalEconomySearchAsync(NationalEconomyRequestDto requestDto)
         {
-            var responseAjaxResult = new ResponseAjaxResult<List<NationalEconomySearchDto>>();
+            var responseAjaxResult = new ResponseAjaxResult<List<NationalEconomyDetailsDto>>();
             RefAsync<int> total = 0;
 
             var ccList = await _dbContext.Queryable<NationalEconomy>()
                 .Where((cc) => cc.IsDelete == 1)
-                .Select((cc) => new NationalEconomySearchDto
+                .Select((cc) => new NationalEconomyDetailsDto
                 {
                     Id = cc.Id.ToString(),
                     Code = cc.ZNEQCODE,
                     Descption = cc.ZNEQDESC,
-                    Name = cc.ZNEQNAME
+                    Name = cc.ZNEQNAME,
+                    State = cc.ZSTATE == "1" ? "有效" : "无效",
+                    SupCode = cc.ZNEQCODEUP,
+                    DataIdentifier = cc.ZDELETE == "1" ? "未删除" : "已删除",
+                    Version = cc.ZVERSION
                 })
                 .ToPageListAsync(requestDto.PageIndex, requestDto.PageSize, total);
 
@@ -1641,19 +1875,22 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<List<AdministrativeAccountingMapperSearchDto>>> GetAdministrativeAccountingMapperSearchAsync(AdministrativeAccountingMapperRequestDto requestDto)
+        public async Task<ResponseAjaxResult<List<AdministrativeAccountingMapperDetailsDto>>> GetAdministrativeAccountingMapperSearchAsync(AdministrativeAccountingMapperRequestDto requestDto)
         {
-            var responseAjaxResult = new ResponseAjaxResult<List<AdministrativeAccountingMapperSearchDto>>();
+            var responseAjaxResult = new ResponseAjaxResult<List<AdministrativeAccountingMapperDetailsDto>>();
             RefAsync<int> total = 0;
 
             var ccList = await _dbContext.Queryable<AdministrativeAccountingMapper>()
                 .Where((cc) => cc.IsDelete == 1)
-                .Select((cc) => new AdministrativeAccountingMapperSearchDto
+                .Select((cc) => new AdministrativeAccountingMapperDetailsDto
                 {
                     Id = cc.Id.ToString(),
                     AccOrgCode = cc.ZAORGNO,
                     AccOrgId = cc.ZAID,
-                    AdministrativeOrgCode = cc.ZORGCODE
+                    AdministrativeOrgCode = cc.ZORGCODE,
+                    AdministrativeOrgId = cc.ZORGID,
+                    DataIdentifier = cc.ZDELETE,
+                    KeyId = cc.ZID
                 })
                 .ToPageListAsync(requestDto.PageIndex, requestDto.PageSize, total);
 
@@ -1692,14 +1929,14 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<List<EscrowOrganizationSearchDto>>> GetEscrowOrganizationSearchAsync(EscrowOrganizationRequestDto requestDto)
+        public async Task<ResponseAjaxResult<List<EscrowOrganizationDetailsDto>>> GetEscrowOrganizationSearchAsync(EscrowOrganizationRequestDto requestDto)
         {
-            var responseAjaxResult = new ResponseAjaxResult<List<EscrowOrganizationSearchDto>>();
+            var responseAjaxResult = new ResponseAjaxResult<List<EscrowOrganizationDetailsDto>>();
             RefAsync<int> total = 0;
 
             var ccList = await _dbContext.Queryable<EscrowOrganization>()
                 .Where((cc) => cc.IsDelete == 1)
-                .Select((cc) => new EscrowOrganizationSearchDto
+                .Select((cc) => new EscrowOrganizationDetailsDto
                 {
                     Id = cc.Id.ToString(),
                     Country = cc.CAREA,
@@ -1714,7 +1951,22 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     Remark = cc.NOTE,
                     Shareholding = cc.SHAREHOLDINGS,
                     ShortNameChinese = cc.SHORTNAME,
-                    TelAddress = cc.ZADDRESS
+                    TelAddress = cc.ZADDRESS,
+                    HROrgMDCode = cc.OID,
+                    OrgAttr = cc.TYPE,
+                    OrgChildAttr = cc.TYPEEXT,
+                    OrgCode = cc.OCODE,
+                    OrgGruleCode = cc.ORULE,
+                    OrgMDCode = cc.MDM_CODE,
+                    RegistrationNo = cc.REGISTERCODE,
+                    ShortNameEnglish = cc.ENGLISHSHORTNAME,
+                    ShortNameLLanguage = cc.ZZTSHNAME_LOC,
+                    SupHROrgMDCode = cc.POID,
+                    SupOrgMDCode = cc.ZORGUP,
+                    TreeLevel = cc.GRADE,
+                    UnitSec = cc.GPOID,
+                    ViewIdentification = cc.VIEW_FLAG,
+                    ZINSTID = cc.ZINSTID
                 })
                 .ToPageListAsync(requestDto.PageIndex, requestDto.PageSize, total);
 
@@ -1773,15 +2025,18 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
         /// 商机项目(不含境外商机项目) 列表  国家地区区分  142境内，142以为境外
         /// </summary>
         /// <param name="requestDto"></param>
+        /// <param name="isJingWai"></param>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<List<BusinessNoCpportunitySearchDto>>> GetBusinessNoCpportunitySearchAsync(BusinessNoCpportunityRequestDto requestDto)
+        public async Task<ResponseAjaxResult<List<BusinessNoCpportunityDetailsDto>>> GetBusinessNoCpportunitySearchAsync(FilterCondition requestDto, bool isJingWai)
         {
-            var responseAjaxResult = new ResponseAjaxResult<List<BusinessNoCpportunitySearchDto>>();
+            var responseAjaxResult = new ResponseAjaxResult<List<BusinessNoCpportunityDetailsDto>>();
             RefAsync<int> total = 0;
 
             var ccList = await _dbContext.Queryable<BusinessCpportunity>()
+                .WhereIF((isJingWai), (cc) => cc.ZZCOUNTRY == "142")
+                .WhereIF((!isJingWai), (cc) => cc.ZZCOUNTRY != "142")
                 .Where((cc) => cc.IsDelete == 1)
-                .Select((cc) => new BusinessNoCpportunitySearchDto
+                .Select((cc) => new BusinessNoCpportunityDetailsDto
                 {
                     Id = cc.Id.ToString(),
                     Country = cc.ZZCOUNTRY,
@@ -1791,7 +2046,13 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     PjectType = cc.ZPROJTYPE,
                     QualificationUnit = cc.ZORG_QUAL,
                     State = cc.ZSTATE == "1" ? "有效" : "无效",
-                    TaxationMethod = cc.ZTAXMETHOD
+                    TaxationMethod = cc.ZTAXMETHOD,
+                    BTypeOfCCCCProjects = cc.ZCPBC,
+                    ParticipatingUnits = cc.ZCY2NDORG,
+                    PjectLocation = cc.ZPROJLOC,
+                    StartTrackingDate = cc.ZSFOLDATE,
+                    TrackingUnit = cc.ZORG,
+                    UnitSec = cc.Z2NDORG
                 })
                 .ToPageListAsync(requestDto.PageIndex, requestDto.PageSize, total);
 
@@ -1800,7 +2061,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
             return responseAjaxResult;
         }
         /// <summary>
-        /// 商机项目(不含境外商机项目) 详情  
+        /// 商机项目(含/不含 境外商机项目) 详情  
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
@@ -1837,21 +2098,24 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<List<AdministrativeDivisionSearchDto>>> GetAdministrativeDivisionSearchAsync(AdministrativeDivisionRequestDto requestDto)
+        public async Task<ResponseAjaxResult<List<AdministrativeDivisionDetailsDto>>> GetAdministrativeDivisionSearchAsync(AdministrativeDivisionRequestDto requestDto)
         {
-            var responseAjaxResult = new ResponseAjaxResult<List<AdministrativeDivisionSearchDto>>();
+            var responseAjaxResult = new ResponseAjaxResult<List<AdministrativeDivisionDetailsDto>>();
             RefAsync<int> total = 0;
 
             var ccList = await _dbContext.Queryable<AdministrativeDivision>()
                 .Where((cc) => cc.IsDelete == 1)
-                .Select((cc) => new AdministrativeDivisionSearchDto
+                .Select((cc) => new AdministrativeDivisionDetailsDto
                 {
                     Id = cc.Id.ToString(),
                     CodeOfCCCCRegional = cc.ZCRHCODE,
                     RegionalismCode = cc.ZADDVSCODE,
                     RegionalismLevel = cc.ZADDVSLEVEL,
                     Name = cc.ZADDVSNAME,
-                    State = cc.ZSTATE == "1" ? "有效" : "无效"
+                    State = cc.ZSTATE == "1" ? "有效" : "无效",
+                    DataIdentifier = cc.ZDELETE == "1" ? "未删除" : "已删除",
+                    SupRegionalismCode = cc.ZADDVSUP,
+                    Version = cc.ZVERSION
                 })
                 .ToPageListAsync(requestDto.PageIndex, requestDto.PageSize, total);
 
@@ -1891,14 +2155,14 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<List<AccountingOrganizationSearchDto>>> GetAccountingOrganizationSearchAsync(AccountingOrganizationRequestDto requestDto)
+        public async Task<ResponseAjaxResult<List<AccountingOrganizationDetailsDto>>> GetAccountingOrganizationSearchAsync(AccountingOrganizationRequestDto requestDto)
         {
-            var responseAjaxResult = new ResponseAjaxResult<List<AccountingOrganizationSearchDto>>();
+            var responseAjaxResult = new ResponseAjaxResult<List<AccountingOrganizationDetailsDto>>();
             RefAsync<int> total = 0;
 
             var ccList = await _dbContext.Queryable<AccountingOrganization>()
                 .Where((cc) => cc.IsDelete == 1)
-                .Select((cc) => new AccountingOrganizationSearchDto
+                .Select((cc) => new AccountingOrganizationDetailsDto
                 {
                     Id = cc.Id.ToString(),
                     MDM_CODE = cc.MDM_CODE,
@@ -1925,7 +2189,52 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     ZZTNAME_ZH = cc.ZZTNAME_ZH,
                     ZZTSHNAME_CHS = cc.ZZTSHNAME_CHS,
                     ZZTSHNAME_EN = cc.ZZTSHNAME_EN,
-                    ZZTSHNAME_LOC = cc.ZZTSHNAME_LOC
+                    ZZTSHNAME_LOC = cc.ZZTSHNAME_LOC,
+                    VIEW_FLAG = cc.VIEW_FLAG,
+                    ZACCOUNT_DATE = cc.ZACCOUNT_DATE,
+                    ZACDISABLEYEAR = cc.ZACDISABLEYEAR,
+                    ZACID = cc.ZACID,
+                    ZACISDETAIL = cc.ZACISDETAIL,
+                    ZACJTHBFWN = cc.ZACJTHBFWN,
+                    ZACLAYER = cc.ZACLAYER,
+                    ZACORGNO = cc.ZACORGNO,
+                    ZACPARENTCODE = cc.ZACPARENTCODE,
+                    ZACPARENTID = cc.ZACPARENTID,
+                    ZACPATH = cc.ZACPATH,
+                    ZACSORTORDER = cc.ZACSORTORDER,
+                    ZAORGSTATE = cc.ZAORGSTATE,
+                    ZAPPROVAL_ORG = cc.ZAPPROVAL_ORG,
+                    ZBBID = cc.ZBBID,
+                    ZBTID = cc.ZBTID,
+                    ZBUSINESS_RECOCATION = cc.ZBUSINESS_RECOCATION,
+                    ZTREEID = cc.ZTREEID,
+                    ZBUSINESS_UNIT = cc.ZBUSINESS_UNIT,
+                    ZCWYGL = cc.ZCWYGL,
+                    ZCWYGL_REA = cc.ZCWYGL_REA,
+                    ZDCID = cc.ZDCID,
+                    ZDEL_MAP = cc.ZDEL_MAP,
+                    ZDEL_REA = cc.ZDEL_REA,
+                    ZIVFLGID = cc.ZIVFLGID,
+                    ZNBFYL = cc.ZNBFYL,
+                    ZORGATTR = cc.ZORGATTR,
+                    ZORGCHILDATTR = cc.ZORGCHILDATTR,
+                    ZORGLOC = cc.ZORGLOC,
+                    ZQYBBDAT = cc.ZQYBBDAT,
+                    ZREGIONAL = cc.ZREGIONAL,
+                    ZREPORT_FLAG = cc.ZREPORT_FLAG,
+                    ZREPORT_NODE = cc.ZREPORT_NODE,
+                    ZREPORT_TIME = cc.ZREPORT_TIME,
+                    ZRULE = cc.ZRULE,
+                    ZSCENTER = cc.ZSCENTER,
+                    ZSNO = cc.ZSNO,
+                    ZTAXMETHOD = cc.ZTAXMETHOD,
+                    ZTAXPAYER_CATEGORY = cc.ZTAXPAYER_CATEGORY,
+                    ZTAX_ORGANIZATION = cc.ZTAX_ORGANIZATION,
+                    ZTORG = cc.ZTORG,
+                    ZTREEVER = cc.ZTREEVER,
+                    ZTRNO = cc.ZTRNO,
+                    ZUNAME = cc.ZUNAME,
+                    ZZCURRENCY = cc.ZZCURRENCY
                 })
                 .ToPageListAsync(requestDto.PageIndex, requestDto.PageSize, total);
 
@@ -2027,20 +2336,24 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<List<CurrencySearchDto>>> GetCurrencySearchAsync(CurrencyRequestDto requestDto)
+        public async Task<ResponseAjaxResult<List<CurrencyDetailsDto>>> GetCurrencySearchAsync(CurrencyRequestDto requestDto)
         {
-            var responseAjaxResult = new ResponseAjaxResult<List<CurrencySearchDto>>();
+            var responseAjaxResult = new ResponseAjaxResult<List<CurrencyDetailsDto>>();
             RefAsync<int> total = 0;
 
             var ccList = await _dbContext.Queryable<Currency>()
                 .Where((cc) => cc.IsDelete == 1)
-                .Select((cc) => new CurrencySearchDto
+                .Select((cc) => new CurrencyDetailsDto
                 {
                     Id = cc.Id.ToString(),
+                    State = cc.ZSTATE == "1" ? "有效" : "无效",
                     Name = cc.ZCURRENCYNAME,
                     Code = cc.ZCURRENCYCODE,
                     LetterCode = cc.ZCURRENCYALPHABET,
-                    StandardName = cc.STANDARDNAMEE
+                    StandardName = cc.STANDARDNAMEE,
+                    DataIdentifier = cc.ZDELETE == "1" ? "未删除" : "已删除",
+                    Remark = cc.ZREMARKS,
+                    Version = cc.ZVERSION
                 })
                 .ToPageListAsync(requestDto.PageIndex, requestDto.PageSize, total);
 

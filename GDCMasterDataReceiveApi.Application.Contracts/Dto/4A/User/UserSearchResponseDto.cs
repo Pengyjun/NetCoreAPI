@@ -16,8 +16,58 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto._4A.User
         /// 人员编码  必填,HR 系统中定义的人员唯  一编码，默认用户名
         /// </summary>
         /// 
+        public string? EmpCode { get; set; }
+        /// <summary>
+        /// 姓名
+        /// </summary>
+        public string? Name { get; set; }
+        /// <summary>
+        /// 手机号码
+        /// </summary>
+        public string? Phone { get; set; }
+        /// <summary>
+        /// 电子邮箱
+        /// </summary>
+        public string? Email { get; set; }
+        /// <summary>
+        /// 证件编号
+        /// </summary>
+        public string? CertNo { get; set; }
+        /// <summary>
+        /// 主职所在部门 ID
+        /// </summary>
+        public string? OfficeDepId { get; set; }
+        /// <summary>
+        /// 人员状态信息
+        /// </summary>
+        [ExcelColumnName("人员状态信息")]
+        public string? UserInfoStatus { get; set; }
+        /// <summary>
+        /// 公司名称
+        /// </summary>
+        public string? CompanyName { get; set; }
+        /// <summary>
+        /// 是否启用   0 禁用  1 启用
+        /// </summary>
+        public string? Enable { get; set; }
+    }
+    /// <summary>
+    /// 用户详情
+    /// </summary>
+    public class UserSearchDetailsDto
+    {
+        [ExcelIgnore]
+        public string Id { get; set; }
+        /// <summary>
+        /// 人员编码  必填,HR 系统中定义的人员唯  一编码，默认用户名
+        /// </summary>
         [ExcelColumnName("人员编码")]
         public string? EmpCode { get; set; }
+        /// <summary>
+        /// 国家地区
+        /// </summary>
+        [ExcelColumnName("国家地区")]
+        public string? CountryRegion { get; set; }
         /// <summary>
         /// 姓名
         /// </summary>
@@ -51,57 +101,6 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto._4A.User
         /// 人员状态信息
         /// </summary>
         [ExcelColumnName("人员状态信息")]
-        public string? UserInfoStatus { get; set; }
-        /// <summary>
-        /// 公司名称
-        /// </summary>
-        public string? CompanyName { get; set; }
-        /// <summary>
-        /// 国家地区
-        /// </summary>
-        [ExcelColumnName("国家地区")]
-        public string? CountryRegion { get; set; }
-        /// <summary>
-        /// 是否启用   0 禁用  1 启用
-        /// </summary>
-        public string? Enable { get; set; }
-    }
-    /// <summary>
-    /// 用户详情
-    /// </summary>
-    public class UserSearchDetailsDto
-    {
-        /// <summary>
-        /// 人员编码  必填,HR 系统中定义的人员唯  一编码，默认用户名
-        /// </summary>
-        public string? EmpCode { get; set; }
-        /// <summary>
-        /// 姓名
-        /// </summary>
-        public string? Name { get; set; }
-        /// <summary>
-        /// 手机号码
-        /// </summary>
-        public string? Phone { get; set; }
-        /// <summary>
-        /// 电子邮箱
-        /// </summary>
-        public string? Email { get; set; }
-        /// <summary>
-        /// 证件编号
-        /// </summary>
-        public string? CertNo { get; set; }
-        /// <summary>
-        /// 主职所在部门 ID
-        /// </summary>
-        public string? OfficeDepId { get; set; }
-        /// <summary>
-        /// 所属部门名称
-        /// </summary>
-        public string? OfficeDepIdName { get; set; }
-        /// <summary>
-        /// 人员状态信息
-        /// </summary>
         public string? UserInfoStatus { get; set; }
         /// <summary>
         /// 公司名称

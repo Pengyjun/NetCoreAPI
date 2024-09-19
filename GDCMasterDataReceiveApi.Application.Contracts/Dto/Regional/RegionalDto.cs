@@ -37,6 +37,7 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.Regional
     /// </summary>
     public class RegionalDetailsDto
     {
+        public string? Id { get; set; }
         /// <summary>
         /// 中交区域总部代码:中交区域中心编码
         /// </summary>

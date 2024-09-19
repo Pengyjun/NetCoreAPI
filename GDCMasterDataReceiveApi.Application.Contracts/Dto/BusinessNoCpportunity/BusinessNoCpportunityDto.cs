@@ -50,6 +50,10 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.BusinessNoCpportunit
     public class BusinessNoCpportunityDetailsDto
     {
         /// <summary>
+        /// 主键id
+        /// </summary>
+        public string? Id { get; set; }
+        /// <summary>
         /// 商机项目主数据编码:新增项目由主数据系统生成并返回主数据编码，修改时必填
         /// </summary>
         public string? BPjectMDCode { get; set; }

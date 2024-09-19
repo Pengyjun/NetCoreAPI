@@ -33,6 +33,7 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.DeviceDetailCode
     /// </summary>
     public class DeviceDetailCodeDetailsDto
     {
+        public string? Id { get; set; }
         /// <summary>
         /// 物资设备主数据编码
         /// </summary>

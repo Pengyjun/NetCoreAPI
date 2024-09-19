@@ -42,6 +42,7 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.CountryRegion
     /// </summary>
     public class CountryRegionDetailsDto
     {
+        public string Id { get; set; }
         /// <summary>
         /// 国家地区代码
         /// </summary>

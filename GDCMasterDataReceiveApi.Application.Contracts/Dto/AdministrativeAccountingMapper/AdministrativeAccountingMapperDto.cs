@@ -27,6 +27,7 @@
     /// </summary>
     public class AdministrativeAccountingMapperDetailsDto
     {
+        public string? Id { get; set; }
         /// <summary>
         /// 必须唯一
         /// </summary>

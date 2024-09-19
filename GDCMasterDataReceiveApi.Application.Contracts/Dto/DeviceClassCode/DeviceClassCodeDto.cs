@@ -41,6 +41,7 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.DeviceClassCode
     /// </summary>
     public class DeviceClassCodeDetailsDto
     {
+        public string? Id { get; set; }
         /// <summary>
         /// 分类编码: 分类的唯一性编码
         /// </summary>

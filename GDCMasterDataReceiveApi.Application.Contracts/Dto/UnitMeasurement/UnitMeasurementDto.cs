@@ -33,6 +33,7 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.UnitMeasurement
     /// </summary>
     public class UnitMeasurementDetailsDto
     {
+        public string? Id { get; set; }
         /// <summary>
         /// 计量单位代码:业务主键
         /// </summary>

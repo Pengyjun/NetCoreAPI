@@ -49,6 +49,7 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.ScientifiCNoProject
     /// </summary>
     public class ScientifiCNoProjectDetailsDto
     {
+        public string? Id { get; set; }
         /// <summary>
         /// 科研项目主数据编码:科研项目的唯一编码标识
         /// </summary>

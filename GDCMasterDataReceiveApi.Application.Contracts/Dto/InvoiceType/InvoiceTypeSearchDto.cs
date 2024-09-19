@@ -29,6 +29,7 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.InvoiceType
     /// </summary>
     public class InvoiceTypeDetailshDto
     {
+        public string? Id { get; set; }
         /// <summary>
         /// 发票类型代码
         /// </summary>

@@ -35,6 +35,7 @@
     /// </summary>
     public class AccountingDepartmentDetailsDto
     {
+        public string? Id { get; set; }
         /// <summary>
         /// 核算组织编号:9月18日新加
         /// </summary>
