@@ -616,8 +616,8 @@ namespace GDCMasterDataReceiveApi.Controller
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
-        [HttpGet("GetValueDomainReceive")]
-        public async Task<ResponseAjaxResult<List<ValueDomainReceiveResponseDto>>> GetValueDomainReceiveAsync(FilterCondition requestDto)
+        [HttpPost("GetValueDomainReceive")]
+        public async Task<ResponseAjaxResult<List<ValueDomainReceiveResponseDto>>> GetValueDomainReceiveAsync([FromBody]FilterCondition requestDto)
         {
             return await _searchService.GetValueDomainReceiveAsync(requestDto);
         }
