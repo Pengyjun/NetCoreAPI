@@ -18,14 +18,12 @@ using GDCMasterDataReceiveApi.Application.Contracts.Dto.FinancialInstitution;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.Institution;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.InvoiceType;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.Language;
-using GDCMasterDataReceiveApi.Application.Contracts.Dto.LouDong;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.NationalEconomy;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.Project;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.ProjectClassification;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.Regional;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.RegionalCenter;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.RelationalContracts;
-using GDCMasterDataReceiveApi.Application.Contracts.Dto.RoomNumber;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.ScientifiCNoProject;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.UnitMeasurement;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.ValueDomain;
@@ -63,14 +61,6 @@ namespace GDCMasterDataReceiveApi.Controller
         {
             return _baseService.GetFilterParams();
         }
-        /// <summary>
-        /// 楼栋列表
-        /// </summary>
-        /// <param name="louDongDto"></param>
-        /// <returns></returns>
-        [HttpGet("GetSearchLouDong")]
-        public async Task<ResponseAjaxResult<List<LouDongSearchDto>>> GetSearchLouDongAsync([FromQuery] LouDongRequestDto louDongDto)
-            => await _searchService.GetSearchLouDongAsync(louDongDto);
         /// <summary>
         /// 用户列表
         /// </summary>
@@ -270,26 +260,6 @@ namespace GDCMasterDataReceiveApi.Controller
         public async Task<ResponseAjaxResult<ScientifiCNoProjectDetailsDto>> GetScientifiCNoProjectDetailsAsync([FromQuery] string id)
         {
             return await _searchService.GetScientifiCNoProjectDetailsAsync(id);
-        }
-        /// <summary>
-        /// 获取房号列表
-        /// </summary>
-        /// <param name="requestDto"></param>
-        /// <returns></returns>
-        [HttpPost("GetRoomNumberSearch")]
-        public async Task<ResponseAjaxResult<List<RoomNumberDetailsDto>>> GetRoomNumberSearchAsync([FromBody] FilterCondition requestDto)
-        {
-            return await _searchService.GetRoomNumberSearchAsync(requestDto);
-        }
-        /// <summary>
-        /// 获取房号详情
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        [HttpGet("GetRoomNumberDetails")]
-        public async Task<ResponseAjaxResult<RoomNumberDetailsDto>> GetRoomNumberDetailsAsync([FromQuery] string id)
-        {
-            return await _searchService.GetRoomNumberDetailsAsync(id);
         }
         /// <summary>
         /// 语言语种列表

@@ -19,14 +19,12 @@ using GDCMasterDataReceiveApi.Application.Contracts.Dto.FinancialInstitution;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.Institution;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.InvoiceType;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.Language;
-using GDCMasterDataReceiveApi.Application.Contracts.Dto.LouDong;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.NationalEconomy;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.Project;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.ProjectClassification;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.Regional;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.RegionalCenter;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.RelationalContracts;
-using GDCMasterDataReceiveApi.Application.Contracts.Dto.RoomNumber;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.ScientifiCNoProject;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.UnitMeasurement;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.ValueDomain;
@@ -60,57 +58,6 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
             this._mapper = mapper;
             this._baseService = baseService;
             this._dataAuthorityService = dataAuthorityService;
-        }
-        /// <summary>
-        /// 楼栋列表
-        /// </summary>
-        /// <param name="requestDto"></param>
-        /// <returns></returns>
-        public async Task<ResponseAjaxResult<List<LouDongSearchDto>>> GetSearchLouDongAsync(LouDongRequestDto requestDto)
-        {
-            var responseAjaxResult = new ResponseAjaxResult<List<LouDongSearchDto>>();
-            RefAsync<int> total = 0;
-
-            var ccList = await _dbContext.Queryable<LouDong>()
-                .Where((cc) => cc.IsDelete == 1)
-                .Select((cc) => new LouDongSearchDto
-                {
-                    Id = cc.Id.ToString(),
-                    BFormat = cc.ZFORMATINF,
-                    Code = cc.ZBLDG,
-                    Name = cc.ZBLDG_NAME,
-                    State = cc.ZSTATE == "1" ? "有效" : "无效"
-                })
-                .ToPageListAsync(requestDto.PageIndex, requestDto.PageSize, total);
-
-            responseAjaxResult.Count = total;
-            responseAjaxResult.SuccessResult(ccList);
-            return responseAjaxResult;
-        }
-        /// <summary>
-        /// 获取楼栋详情
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        public async Task<ResponseAjaxResult<LouDongDetailsDto>> GetLouDongDetailsAsync(string id)
-        {
-            var responseAjaxResult = new ResponseAjaxResult<LouDongDetailsDto>();
-
-            var result = await _dbContext.Queryable<LouDong>()
-                .Where((cc) => cc.IsDelete == 1 && cc.Id.ToString() == id)
-                .Select((cc) => new LouDongDetailsDto
-                {
-                    BFormat = cc.ZFORMATINF,
-                    Code = cc.ZBLDG,
-                    Name = cc.ZBLDG_NAME,
-                    State = cc.ZSTATE == "1" ? "有效" : "无效",
-                    PjectMDCode = cc.ZPROJECT,
-                    SourceSystem = cc.ZSYSTEM
-                })
-                .FirstAsync();
-
-            responseAjaxResult.SuccessResult(result);
-            return responseAjaxResult;
         }
         /// <summary>
         /// 用户列表
@@ -1265,63 +1212,6 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     State = cc.ZPSTATE,
                     SupMDCode = cc.ZSRPUP,
                     TypeCode = cc.ZSRPCLASS
-                })
-                .FirstAsync();
-
-            responseAjaxResult.SuccessResult(result);
-            return responseAjaxResult;
-        }
-        /// <summary>
-        /// 获取房号列表
-        /// </summary>
-        /// <param name="requestDto"></param>
-        /// <returns></returns>
-        public async Task<ResponseAjaxResult<List<RoomNumberDetailsDto>>> GetRoomNumberSearchAsync(FilterCondition requestDto)
-        {
-            var responseAjaxResult = new ResponseAjaxResult<List<RoomNumberDetailsDto>>();
-            RefAsync<int> total = 0;
-
-            var ccList = await _dbContext.Queryable<RoomNumber>()
-                .Where((cc) => cc.IsDelete == 1)
-                .Select((cc) => new RoomNumberDetailsDto
-                {
-                    Id = cc.Id.ToString(),
-                    Name = cc.ZROOM_NAME,
-                    BFormat = cc.ZFORMAT,
-                    BuildCode = cc.ZBLDG,
-                    Code = cc.ZROOM,
-                    PjectMDCode = cc.ZPROJECT,
-                    SourceSystem = cc.ZSYSTEM,
-                    State = cc.ZSTATE == "1" ? "有效" : "无效",
-                    UnitOfBuild = cc.ZRE_UNIT,
-                })
-                .ToPageListAsync(requestDto.PageIndex, requestDto.PageSize, total);
-
-            responseAjaxResult.Count = total;
-            responseAjaxResult.SuccessResult(ccList);
-            return responseAjaxResult;
-        }
-        /// <summary>
-        /// 获取房号详情
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        public async Task<ResponseAjaxResult<RoomNumberDetailsDto>> GetRoomNumberDetailsAsync(string id)
-        {
-            var responseAjaxResult = new ResponseAjaxResult<RoomNumberDetailsDto>();
-
-            var result = await _dbContext.Queryable<RoomNumber>()
-                .Where((cc) => cc.IsDelete == 1 && cc.Id.ToString() == id)
-                .Select((cc) => new RoomNumberDetailsDto
-                {
-                    Name = cc.ZROOM_NAME,
-                    BFormat = cc.ZFORMAT,
-                    BuildCode = cc.ZBLDG,
-                    Code = cc.ZROOM,
-                    PjectMDCode = cc.ZPROJECT,
-                    SourceSystem = cc.ZSYSTEM,
-                    State = cc.ZSTATE == "1" ? "有效" : "无效",
-                    UnitOfBuild = cc.ZRE_UNIT,
                 })
                 .FirstAsync();
 
