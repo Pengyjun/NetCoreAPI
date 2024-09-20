@@ -2098,8 +2098,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     SupOrgMDCode = cc.ZORGUP,
                     TreeLevel = cc.GRADE,
                     UnitSec = cc.GPOID,
-                    ViewIdentification = cc.VIEW_FLAG,
-                    ZINSTID = cc.ZINSTID
+                    ViewIdentification = cc.VIEW_FLAG
                 })
                 .ToPageListAsync(requestDto.PageIndex, requestDto.PageSize, total);
 
