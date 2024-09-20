@@ -113,6 +113,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     JobType = u.JOB_TYPE,
                     NameSpell = u.NAME_SPELL,
                     Nation = u.NATION,
+                    CountryRegion = u.NATIONALITY,
                     Nationality = u.NATIONALITY,
                     OfficeNum = u.OFFICE_NUM,
                     PoliticsFace = u.POLITICSFACE,
@@ -123,6 +124,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     SameHighEstGrade = u.SAMEHIGHESTGRADE,
                     Sex = u.SEX == "01" ? "男性" : "女性",
                     Sno = u.SNO,
+                    UserInfoStatus = u.EMP_STATUS,
                     SubDepts = u.SUB_DEPTS,
                     Tel = u.TEL,
                     UserLogin = u.USER_LOGIN
@@ -158,6 +160,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     uInfo.CompanyName = GetUserCompany(uInfo.OfficeDepId, institutions);
                     uInfo.OfficeDepIdName = institutions.FirstOrDefault(x => x.Oid == uInfo.OfficeDepId)?.Name;
                     uInfo.UserInfoStatus = uStatus.FirstOrDefault(x => x.OneCode == uInfo.UserInfoStatus)?.OneName;
+                    uInfo.Nationality = contryRegion.FirstOrDefault(x => x.ZCOUNTRYCODE == uInfo.CountryRegion)?.ZCOUNTRYNAME;
                     uInfo.CountryRegion = contryRegion.FirstOrDefault(x => x.ZCOUNTRYCODE == uInfo.CountryRegion)?.ZCOUNTRYNAME;
                 }
             }
@@ -187,9 +190,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     Email = u.EMAIL,
                     EmpCode = u.EMP_CODE,
                     Enable = u.Enable == 1 ? "有效" : "禁用",
-                    UserInfoStatus = us.OneName,
                     Phone = u.PHONE,
-                    OfficeDepIdName = ins.NAME,
                     Attribute1 = u.ATTRIBUTE1,
                     Attribute2 = u.ATTRIBUTE2,
                     Attribute3 = u.ATTRIBUTE3,
@@ -220,6 +221,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     SameHighEstGrade = u.SAMEHIGHESTGRADE,
                     Sex = u.SEX == "01" ? "男性" : "女性",
                     Sno = u.SNO,
+                    UserInfoStatus = u.EMP_STATUS,
                     SubDepts = u.SUB_DEPTS,
                     Tel = u.TEL,
                     UserLogin = u.USER_LOGIN
