@@ -1,4 +1,4 @@
-﻿using SqlSugar;
+﻿using MiniExcelLibs.Attributes;
 
 namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.Institution
 {
@@ -74,6 +74,7 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.Institution
         /// <summary>
         /// 主键id
         /// </summary>
+        [ExcelIgnore]
         public string Id { get; set; }
         /// <summary>
         /// 机构 ID
@@ -83,6 +84,7 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.Institution
         /// 企业分类
         /// 0 外经企业 1 基建企业 2 疏浚企业 3 设计企业 4 装备制造企业 5 投资企业 6 房地产企业 7 贸易企业 8 金融企业 9 其他
         /// </summary>
+        [ExcelColumnName("企业分类")]
         public string? EntClass { get; set; }
         /// <summary>
         /// 上级机构 id
@@ -96,10 +98,12 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.Institution
         /// <summary>
         /// 机构编码"
         /// </summary>
+        [ExcelColumnName("机构编码")]
         public string? Code { get; set; }
         /// <summary>
         /// 机构全称
         /// </summary>
+        [ExcelColumnName("机构全称")]
         public string? Name { get; set; }
         /// <summary>
         /// 机构规则码
@@ -108,14 +112,17 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.Institution
         /// <summary>
         /// 机构简称
         /// </summary>
+        [ExcelColumnName("机构简称")]
         public string? ShortName { get; set; }
         /// <summary>
         /// 英文全称
         /// </summary>
+        [ExcelColumnName("英文全称")]
         public string? EnglishName { get; set; }
         /// <summary>
         /// 英文简称
         /// </summary>
+        [ExcelColumnName("英文简称")]
         public string? EnglishShortName { get; set; }
         /// <summary>
         /// 机构业务类型 见7.2.3 字典
@@ -168,10 +175,12 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.Institution
         /// <summary>
         /// 备注
         /// </summary>
+        [ExcelColumnName("备注")]
         public string? Note { get; set; }
         /// <summary>
         /// 临时机构名称
         /// </summary>
+        [ExcelColumnName("临时机构名称")]
         public string? TemorganName { get; set; }
         /// <summary>
         /// 机构所在地, 见7.2.7 字典
@@ -180,10 +189,12 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.Institution
         /// <summary>
         /// 国家名称, 见7.2.6 字典
         /// </summary>
+        [ExcelColumnName("国家名称")]
         public string? Carea { get; set; }
         /// <summary>
         ///   地域属性, 见7.2.5 字典
         /// </summary>
+        [ExcelColumnName("地域属性")]
         public string? TerritoryPro { get; set; }
         /// <summary>
         /// 业务领域

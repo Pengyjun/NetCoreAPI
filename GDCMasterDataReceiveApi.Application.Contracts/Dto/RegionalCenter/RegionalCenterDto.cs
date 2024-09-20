@@ -1,4 +1,5 @@
 ﻿using GDCMasterDataReceiveApi.Application.Contracts.Dto.OtherModels;
+using MiniExcelLibs.Attributes;
 
 namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.RegionalCenter
 {
@@ -29,14 +30,17 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.RegionalCenter
     /// </summary>
     public class RegionalCenterDetailsDto
     {
+        [ExcelIgnore]
         public string? Id { get; set; }
         /// <summary>
         /// 中交区域中心代码:中交区域中心编码
         /// </summary>
+        [ExcelColumnName("中交区域中心代码")]
         public string? Code { get; set; }
         /// <summary>
         /// 中交区域中心描述:编码描述
         /// </summary>
+        [ExcelColumnName("中交区域中心描述")]
         public string? Description { get; set; }
         /// <summary>
         /// 版本

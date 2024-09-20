@@ -1,4 +1,6 @@
-﻿namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.Project
+﻿using MiniExcelLibs.Attributes;
+
+namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.Project
 {
 
 
@@ -90,30 +92,37 @@
     /// </summary>
     public class ProjectDetailsDto
     {
+        [ExcelIgnore]
         public string Id { get; set;}
         /// <summary>
         /// 项目主数据编码
         /// </summary>
+        [ExcelColumnName("项目主数据编码")]
         public string? MDCode { get; set; }
         /// <summary>
         /// 项目名称
         /// </summary>
+        [ExcelColumnName("项目名称")]
         public string? Name { get; set; }
         /// <summary>
         /// 项目外文名称
         /// </summary>
+        [ExcelColumnName("项目外文名称")]
         public string? ForeignName { get; set; }
         /// <summary>
         /// 项目类型
         /// </summary>
+        [ExcelColumnName("项目类型")]
         public string? Type { get; set; }
         /// <summary>
         /// 国家/地区
         /// </summary>
+        [ExcelColumnName("国家/地区")]
         public string? Country { get; set; }
         /// <summary>
         /// 项目所在地
         /// </summary>
+        [ExcelColumnName("项目所在地")]
         public string? Location { get; set; }
         /// <summary>
         /// 中交项目业务分类
@@ -126,10 +135,12 @@
         /// <summary>
         /// 项目批复/决议文号
         /// </summary>
+        [ExcelColumnName("项目批复/决议文号")]
         public string? ResolutionNo { get; set; }
         /// <summary>
         /// 项目批复/决议时间
         /// </summary>
+        [ExcelColumnName("项目批复/决议时间")]
         public string? ResolutionTime { get; set; }
         /// <summary>
         /// 收入来源
@@ -142,10 +153,12 @@
         /// <summary>
         /// 项目简称
         /// </summary>
+        [ExcelColumnName("项目简称")]
         public string? Abbreviation { get; set; }
         /// <summary>
         /// 上级项目主数据编码
         /// </summary>
+        [ExcelColumnName("上级项目主数据编码")]
         public string? SupMDCode { get; set; }
         /// <summary>
         /// 项目年份
@@ -154,14 +167,17 @@
         /// <summary>
         /// 项目计划开始日期
         /// </summary>
+        [ExcelColumnName("项目计划开始日期")]
         public string? PlanStartDate { get; set; }
         /// <summary>
         /// 项目计划完成日期
         /// </summary>
+        [ExcelColumnName("项目计划完成日期")]
         public string? PlanCompletionDate { get; set; }
         /// <summary>
         /// 项目工程名称
         /// </summary>
+        [ExcelColumnName("项目工程名称")]
         public string? EngineeringName { get; set; }
         /// <summary>
         /// 责任主体
@@ -174,6 +190,7 @@
         /// <summary>
         /// 项目获取时间
         /// </summary>
+        [ExcelColumnName("项目获取时间")]
         public string? AcquisitionTime { get; set; }
         /// <summary>
         /// 工商变更时间

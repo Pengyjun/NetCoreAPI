@@ -1,4 +1,6 @@
-﻿namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.AccountingOrganization
+﻿using MiniExcelLibs.Attributes;
+
+namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.AccountingOrganization
 {
     /// <summary>
     /// 多组织-核算机构反显响应dto
@@ -115,14 +117,17 @@
     /// </summary>
     public class AccountingOrganizationDetailsDto
     {
+        [ExcelIgnore]
         public string? Id { get; set; }
         /// <summary>
         /// 机构主数据编码:机构主数据的唯一标识
         /// </summary>
+        [ExcelColumnName("机构主数据编码")]
         public string? MDM_CODE { get; set; }
         /// <summary>
         /// 财务核算机构主数据编码
         /// </summary>
+        [ExcelColumnName("财务核算机构主数据编码")]
         public string? ZACO { get; set; }
         /// <summary>
         /// 机构状态“0-停用”、“1-启用”
@@ -131,10 +136,12 @@
         /// <summary>
         /// 备注
         /// </summary>
+        [ExcelColumnName("备注")]
         public string? ZREMARK { get; set; }
         /// <summary>
         /// 组织树编码
         /// </summary>
+        [ExcelColumnName("组织树编码")]
         public string? ZTREEID { get; set; }
         /// <summary>
         /// 上级机构主数据编码
@@ -155,26 +162,32 @@
         /// <summary>
         /// 核算机构中文名称
         /// </summary>
+        [ExcelColumnName("核算机构中文名称")]
         public string? ZACNAME_CHS { get; set; }
         /// <summary>
         /// 核算机构英文名称
         /// </summary>
+        [ExcelColumnName("核算机构英文名称")]
         public string? ZACNAME_EN { get; set; }
         /// <summary>
         /// 核算机构当地语言名称
         /// </summary>
+        [ExcelColumnName("核算机构当地语言名称")]
         public string? ZACNAME_LOC { get; set; }
         /// <summary>
         /// 核算机构简称-中文
         /// </summary>
+        [ExcelColumnName("核算机构简称-中文")]
         public string? ZACSHORTNAME_CHS { get; set; }
         /// <summary>
         /// 核算机构简称-英文
         /// </summary>
+        [ExcelColumnName("核算机构简称-英文")]
         public string? ZACSHORTNAME_EN { get; set; }
         /// <summary>
         /// 核算机构简称-当地语言
         /// </summary>
+        [ExcelColumnName("核算机构简称-当地语言")]
         public string? ZACSHORTNAME_LOC { get; set; }
         /// <summary>
         /// 上级核算组织编号
@@ -203,6 +216,7 @@
         /// <summary>
         /// 组织节点性质
         /// </summary>
+        [ExcelColumnName("组织节点性质")]
         public string? ZREPORT_NODE { get; set; }
         /// <summary>
         /// 核算机构状态 值域：0-停用、1-启用、2-休眠、3-删除
@@ -219,38 +233,47 @@
         /// <summary>
         /// 停用日期  当核算机构状态=休眠或停用时，0-否，1-是
         /// </summary>
+        [ExcelColumnName("停用日期")]
         public string? ZACDISABLEYEAR { get; set; }
         /// <summary>
         /// 建账时间 存在初始化数据为空的情况
         /// </summary>
+        [ExcelColumnName("建账时间")]
         public string? ZACCOUNT_DATE { get; set; }
         /// <summary>
         /// 决算业务板块
         /// </summary>
+        [ExcelColumnName("决算业务板块")]
         public string? ZDCID { get; set; }
         /// <summary>
         /// 业务分类
         /// </summary>
+        [ExcelColumnName("业务分类")]
         public string? ZBTID { get; set; }
         /// <summary>
         /// 记账本位币 ，当“组织节点性质”为“单户单位”时必填
         /// </summary>
+        [ExcelColumnName("记账本位币")]
         public string? ZZCURRENCY { get; set; }
         /// <summary>
         /// 计税方式 当“组织节点性质”为“单户单位”时必填
         /// </summary>
+        [ExcelColumnName("计税方式")]
         public string? ZTAXMETHOD { get; set; }
         /// <summary>
         /// 所属税务组织 当“组织节点性质”为“单户单位”时必填
         /// </summary>
+        [ExcelColumnName("所属税务组织")]
         public string? ZTAX_ORGANIZATION { get; set; }
         /// <summary>
         /// 税组织纳税人类别 当“组织节点性质”为“单户单位”时必填
         /// </summary>
+        [ExcelColumnName("税组织纳税人类别")]
         public string? ZTAXPAYER_CATEGORY { get; set; }
         /// <summary>
         /// 税组织纳税人识别号 ，当“组织节点性质”为“单户单位”时必填；
         /// </summary>
+        [ExcelColumnName("税组织纳税人识别号")]
         public string? ZTRNO { get; set; }
         /// <summary>
         /// 所属事业部 当“组织节点性质”为“单户单位”时必
@@ -259,10 +282,12 @@
         /// <summary>
         /// 申请人
         /// </summary>
+        [ExcelColumnName("申请人")]
         public string? ZUNAME { get; set; }
         /// <summary>
         /// 审批单位
         /// </summary>
+        [ExcelColumnName("审批单位")]
         public string? ZAPPROVAL_ORG { get; set; }
         /// <summary>
         /// 是否明细 1、是；0、否
@@ -299,6 +324,7 @@
         /// <summary>
         /// 业务板块
         /// </summary>
+        [ExcelColumnName("业务板块")]
         public string? ZBBID { get; set; }
         /// <summary>
         /// 是否内部非盈利
@@ -331,14 +357,17 @@
         /// <summary>
         /// 州别名称
         /// </summary>
+        [ExcelColumnName("州别名称")]
         public string? ZCONTINENTCODE { get; set; }
         /// <summary>
         /// 报表节点性质
         /// </summary>
+        [ExcelColumnName("报表节点性质")]
         public string? ZRPNATURE { get; set; }
         /// <summary>
         /// 境内/境外 根据所属国家自动生成；值域为“境内”“境外”
         /// </summary>
+        [ExcelColumnName("境内/境外")]
         public string? ZH_IN_OUT { get; set; }
         /// <summary>
         /// 来源系统
@@ -347,26 +376,32 @@
         /// <summary>
         /// 机构名称（中文）:机构的规范全称
         /// </summary>
+        [ExcelColumnName("机构名称（中文）")]
         public string? ZZTNAME_ZH { get; set; }
         /// <summary>
         /// 机构简称（中文）:机构的规范简称
         /// </summary>
+        [ExcelColumnName("机构简称（中文）")]
         public string? ZZTSHNAME_CHS { get; set; }
         /// <summary>
         /// 机构名称（英文）
         /// </summary>
+        [ExcelColumnName("机构名称（英文）")]
         public string? ZZTNAME_EN { get; set; }
         /// <summary>
         /// 机构简称（英文）
         /// </summary>
+        [ExcelColumnName("机构简称（英文）")]
         public string? ZZTSHNAME_EN { get; set; }
         /// <summary>
         /// 机构名称（当地语言）
         /// </summary>
+        [ExcelColumnName("机构名称（当地语言）")]
         public string? ZZTNAME_LOC { get; set; }
         /// <summary>
         /// 机构简称（当地语言）
         /// </summary>
+        [ExcelColumnName("机构简称（当地语言）")]
         public string? ZZTSHNAME_LOC { get; set; }
         /// <summary>
         /// 机构状态:值域：1-运营、2-筹备、3-停用、4-撤销
@@ -379,14 +414,17 @@
         /// <summary>
         /// 国家名称:机构所处的国家/地区
         /// </summary>
+        [ExcelColumnName("国家名称")]
         public string? ZCYNAME { get; set; }
         /// <summary>
         /// 机构所在地:当国家名称为142中国时必填
         /// </summary>
+        [ExcelColumnName("机构所在地")]
         public string? ZORGLOC { get; set; }
         /// <summary>
         /// 地域属性:机构所处的位置对应的中交的区域划分
         /// </summary>
+        [ExcelColumnName("地域属性")]
         public string? ZREGIONAL { get; set; }
         /// <summary>
         /// 组织树版本号

@@ -1,4 +1,5 @@
 ﻿using GDCMasterDataReceiveApi.Application.Contracts.Dto.OtherModels;
+using MiniExcelLibs.Attributes;
 
 namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.CountryRegion
 {
@@ -42,34 +43,42 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.CountryRegion
     /// </summary>
     public class CountryRegionDetailsDto
     {
+        [ExcelIgnore]
         public string Id { get; set; }
         /// <summary>
         /// 国家地区代码
         /// </summary>
+        [ExcelColumnName("国家地区代码")]
         public string Country { get; set; }
         /// <summary>
         /// 中文名称
         /// </summary>
+        [ExcelColumnName("中文名称")]
         public string Name { get; set; }
         /// <summary>
         /// 英文名称
         /// </summary>
+        [ExcelColumnName("英文名称")]
         public string? NameEnglish { get; set; }
         /// <summary>
         /// 国标三字符代码
         /// </summary>
+        [ExcelColumnName("国标三字符代码")]
         public string? NationalCode { get; set; }
         /// <summary>
         /// 国标数字代码
         /// </summary>
+        [ExcelColumnName("国标数字代码")]
         public string? DigitCode { get; set; }
         /// <summary>
         /// 大洲代码
         /// </summary>
+        [ExcelColumnName("大洲代码")]
         public string? ContinentCode { get; set; }
         /// <summary>
         /// 中交区域中心代码
         /// </summary>
+        [ExcelColumnName("中交区域中心代码")]
         public string? CCCCCenterCode { get; set; }
         /// <summary>
         /// 版本号:数据的版本号。数据每次变更时，版本号自动加1。
@@ -98,6 +107,7 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.CountryRegion
         /// <summary>
         /// 区域代码
         /// </summary>
+        [ExcelColumnName("区域代码")]
         public string AreaCode { get; set; }
     }
     #endregion

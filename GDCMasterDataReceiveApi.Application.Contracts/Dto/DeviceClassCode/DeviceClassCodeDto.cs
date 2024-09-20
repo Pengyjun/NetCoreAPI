@@ -1,4 +1,5 @@
 ﻿using GDCMasterDataReceiveApi.Application.Contracts.Dto.OtherModels;
+using MiniExcelLibs.Attributes;
 
 namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.DeviceClassCode
 {
@@ -41,10 +42,12 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.DeviceClassCode
     /// </summary>
     public class DeviceClassCodeDetailsDto
     {
+        [ExcelIgnore]
         public string? Id { get; set; }
         /// <summary>
         /// 分类编码: 分类的唯一性编码
         /// </summary>
+        [ExcelColumnName("分类编码")]
         public string? Code { get; set; }
         /// <summary>
         /// 分类层级: 该分类名称对应的层级。分为1至4级。
@@ -53,14 +56,17 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.DeviceClassCode
         /// <summary>
         /// 分类名称: 分类的唯一性编码
         /// </summary>
+        [ExcelColumnName("分类名称")]
         public string? Name { get; set; }
         /// <summary>
         /// 分类别名:
         /// </summary>
+        [ExcelColumnName("分类别名")]
         public string? AliasName { get; set; }
         /// <summary>
         /// 分类说明
         /// </summary>
+        [ExcelColumnName("分类说明")]
         public string? Description { get; set; }
         /// <summary>
         /// 上级分类编码: 该分类的上级分类的编码，体现分类的层级结构。
@@ -69,6 +75,7 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.DeviceClassCode
         /// <summary>
         /// 计量单位: 物资设备分类的计量单位代码。
         /// </summary>
+        [ExcelColumnName("计量单位")]
         public string? UnitOfMeasurement { get; set; }
         /// <summary>
         /// 使用状态: 该分类是否为正常使用状态，当分类正常使用时为“1”，分类停止使用时为“0”。

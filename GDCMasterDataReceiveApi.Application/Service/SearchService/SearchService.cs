@@ -144,7 +144,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     OfficeDepId = u.OFFICE_DEPID,
                     Email = u.EMAIL,
                     EmpCode = u.EMP_CODE,
-                    Enable = u.Enable == 1 ? "启用" : "禁用",
+                    Enable = u.Enable == 1 ? "有效" : "禁用",
                     Phone = u.PHONE,
                     Attribute1 = u.ATTRIBUTE1,
                     Attribute2 = u.ATTRIBUTE2,
@@ -239,7 +239,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     OfficeDepId = u.OFFICE_DEPID,
                     Email = u.EMAIL,
                     EmpCode = u.EMP_CODE,
-                    Enable = u.Enable == 1 ? "启用" : "禁用",
+                    Enable = u.Enable == 1 ? "有效" : "禁用",
                     UserInfoStatus = us.OneName,
                     Phone = u.PHONE,
                     OfficeDepIdName = ins.NAME,
@@ -781,7 +781,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     SupLegalEntity = cu.ZCOMPYREL,
                     TaxpayerIdentifyNo = cu.ZTRNO,
                     UnitSec = cu.Z2NDORG,
-                    StatusOfUnit = cu.ZBPSTATE == "01" ? "启用" : "停用"
+                    StatusOfUnit = cu.ZBPSTATE == "01" ? "有效" : "无效"
                 })
                 .ToPageListAsync(requestDto.PageIndex, requestDto.PageSize, total);
 
@@ -835,7 +835,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     SupLegalEntity = cu.ZCOMPYREL,
                     TaxpayerIdentifyNo = cu.ZTRNO,
                     UnitSec = cu.Z2NDORG,
-                    StatusOfUnit = cu.ZBPSTATE == "01" ? "启用" : "停用"
+                    StatusOfUnit = cu.ZBPSTATE == "01" ? "有效" : "无效"
                 })
                  .FirstAsync();
 
@@ -1542,7 +1542,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     AccDepCode = cc.ZDCODE,
                     AccDepELName = cc.ZDNAME_EN,
                     AccDepTCCName = cc.ZDNAME_CHT,
-                    State = cc.ZDATSTATE == "1" ? "停用" : "未停用",
+                    State = cc.ZDATSTATE == "1" ? "无效" : "未无效",
                     AccDepId = cc.ZDID,
                     AccOrgCode = cc.ZACORGNO,
                     AccOrgId = cc.ZACID,
@@ -1572,7 +1572,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     AccDepCode = cc.ZDCODE,
                     AccDepELName = cc.ZDNAME_EN,
                     AccDepTCCName = cc.ZDNAME_CHT,
-                    State = cc.ZDATSTATE == "1" ? "停用" : "未停用",
+                    State = cc.ZDATSTATE == "1" ? "无效" : "未无效",
                     AccDepId = cc.ZDID,
                     AccOrgCode = cc.ZACORGNO,
                     AccOrgId = cc.ZACID,

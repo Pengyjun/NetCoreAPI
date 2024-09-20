@@ -1,4 +1,5 @@
 ﻿using GDCMasterDataReceiveApi.Application.Contracts.Dto.OtherModels;
+using MiniExcelLibs.Attributes;
 
 namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.InvoiceType
 {
@@ -29,14 +30,17 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.InvoiceType
     /// </summary>
     public class InvoiceTypeDetailshDto
     {
+        [ExcelIgnore]
         public string? Id { get; set; }
         /// <summary>
         /// 发票类型代码
         /// </summary>
+        [ExcelColumnName("发票类型代码")]
         public string? Code { get; set; }
         /// <summary>
         /// 发票类型名称
         /// </summary>
+        [ExcelColumnName("发票类型名称")]
         public string? Name { get; set; }
         /// <summary>
         /// 版本：数据的版本号。数据每次变更时，版本号自动加1。

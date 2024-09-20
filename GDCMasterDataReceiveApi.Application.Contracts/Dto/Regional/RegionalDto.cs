@@ -1,4 +1,5 @@
 ﻿using GDCMasterDataReceiveApi.Application.Contracts.Dto.OtherModels;
+using MiniExcelLibs.Attributes;
 
 namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.Regional
 {
@@ -37,22 +38,27 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.Regional
     /// </summary>
     public class RegionalDetailsDto
     {
+        [ExcelIgnore]
         public string? Id { get; set; }
         /// <summary>
         /// 中交区域总部代码:中交区域中心编码
         /// </summary>
+        [ExcelColumnName("中交区域总部代码")]
         public string? Code { get; set; }
         /// <summary>
         /// 中交区域总部描述:编码描述
         /// </summary>
+        [ExcelColumnName("中交区域总部描述")]
         public string? Description { get; set; }
         /// <summary>
         /// 简称:编码描述简称
         /// </summary>
+        [ExcelColumnName("简称")]
         public string? Name { get; set; }
         /// <summary>
         /// 区域范围:中交区域中心管辖范围
         /// </summary>
+        [ExcelColumnName("区域范围")]
         public string? AreaRange { get; set; }
         /// <summary>
         /// 版本：数据的版本号。数据每次变更时，版本号自动加1。

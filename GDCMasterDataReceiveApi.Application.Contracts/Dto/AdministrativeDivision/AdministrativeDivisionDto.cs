@@ -1,4 +1,5 @@
-﻿using SqlSugar;
+﻿using MiniExcelLibs.Attributes;
+using SqlSugar;
 
 namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.AdministrativeDivision
 {
@@ -41,26 +42,32 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.AdministrativeDivisi
     /// </summary>
     public class AdministrativeDivisionDetailsDto
     {
+        [ExcelIgnore]
         public string? Id { get; set; }
         /// <summary>
         /// 行政区划代码:业务主键
         /// </summary>
+        [ExcelColumnName("行政区划代码")]
         public string? RegionalismCode { get; set; }
         /// <summary>
         /// 行政区划名称
         /// </summary>
+        [ExcelColumnName("行政区划名称")]
         public string? Name { get; set; }
         /// <summary>
         /// 上级行政区划代码:第1级行政区划无上级代码。
         /// </summary>
+        [ExcelColumnName("上级行政区划代码")]
         public string? SupRegionalismCode { get; set; }
         /// <summary>
         /// 行政区域级别:总共3级，省、直辖市、自治区是第1级。
         /// </summary>
+        [ExcelColumnName("行政区域级别")]
         public string? RegionalismLevel { get; set; }
         /// <summary>
         /// 中交区域总部代码
         /// </summary>
+        [ExcelColumnName("中交区域总部代码")]
         public string? CodeOfCCCCRegional { get; set; }
         /// <summary>
         /// 版本：数据的版本号。数据每次变更时，版本号自动加1。

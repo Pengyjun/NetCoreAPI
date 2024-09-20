@@ -1,4 +1,6 @@
-﻿namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.AccountingDepartment
+﻿using MiniExcelLibs.Attributes;
+
+namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.AccountingDepartment
 {
     /// <summary>
     /// 核算部门返显响应Dto
@@ -35,14 +37,17 @@
     /// </summary>
     public class AccountingDepartmentDetailsDto
     {
+        [ExcelIgnore]
         public string? Id { get; set; }
         /// <summary>
         /// 核算组织编号:9月18日新加
         /// </summary>
+        [ExcelColumnName("核算组织编号")]
         public string? AccOrgCode { get; set; }
         /// <summary>
         /// 核算部门编号
         /// </summary>
+        [ExcelColumnName("核算部门编号")]
         public string? AccDepCode { get; set; }
         /// <summary>
         /// 核算组织ID
@@ -55,14 +60,17 @@
         /// <summary>
         /// 核算部门中文简体名称
         /// </summary>
+        [ExcelColumnName("核算部门中文简体名称")]
         public string? Name { get; set; }
         /// <summary>
         /// 核算部门中文繁体名称
         /// </summary>
+        [ExcelColumnName("核算部门中文繁体名称")]
         public string? AccDepTCCName { get; set; }
         /// <summary>
         /// 核算部门英文名称
         /// </summary>
+        [ExcelColumnName("核算部门英文名称")]
         public string? AccDepELName { get; set; }
         /// <summary>
         /// 上级核算部门ID

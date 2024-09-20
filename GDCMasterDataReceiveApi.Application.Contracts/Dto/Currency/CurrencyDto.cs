@@ -1,4 +1,5 @@
 ﻿using GDCMasterDataReceiveApi.Application.Contracts.Dto.OtherModels;
+using MiniExcelLibs.Attributes;
 
 namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.Currency
 {
@@ -35,26 +36,32 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.Currency
     /// </summary>
     public class CurrencyDetailsDto
     {
+        [ExcelIgnore]
         public string? Id { get; set; }
         /// <summary>
         /// 数字代码:货币数字代码
         /// </summary>
+        [ExcelColumnName("数字代码")]
         public string? Code { get; set; }
         /// <summary>
         /// 货币名称:货币的中文描述
         /// </summary>
+        [ExcelColumnName("货币名称")]
         public string? Name { get; set; }
         /// <summary>
         /// 字母代码:货币字母代码
         /// </summary>
+        [ExcelColumnName("字母代码")]
         public string? LetterCode { get; set; }
         /// <summary>
         /// 货币标准名称:货币标准名称
         /// </summary>
+        [ExcelColumnName("货币标准名称")]
         public string? StandardName { get; set; }
         /// <summary>
         /// 备注:说明备注
         /// </summary>
+        [ExcelColumnName("备注")]
         public string? Remark { get; set; }
         /// <summary>
         /// 版本：数据的版本号。数据每次变更时，版本号自动加1。
