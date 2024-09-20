@@ -70,14 +70,17 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.ScientifiCNoProject
         /// <summary>
         /// 是否高新项目:0 否 1 是
         /// </summary>
+        [ExcelIgnore]
         public string? IsHighTech { get; set; }
         /// <summary>
         /// 项目状态
         /// </summary>
+        [ExcelIgnore]
         public string? PjectState { get; set; }
         /// <summary>
         /// 是否委外项目:0 否 1 是
         /// </summary>
+        [ExcelIgnore]
         public string? IsOutsourced { get; set; }
         /// <summary>
         /// 科研项目分类:代码
@@ -112,14 +115,17 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.ScientifiCNoProject
         /// <summary>
         /// 专业类型：科研项目所属的专业类型，引用Q/CCCC GL005—2021要求的公司产业分类
         /// </summary>
+        [ExcelIgnore]
         public string? ProfessionalType { get; set; }
         /// <summary>
         /// 状态：0停用 1启用
         /// </summary>
+        [ExcelIgnore]
         public string? State { get; set; }
         /// <summary>
         /// 上级科研项目主数据编码
         /// </summary>
+        [ExcelIgnore]
         public string? SupMDCode { get; set; }
     }
     /// <summary>

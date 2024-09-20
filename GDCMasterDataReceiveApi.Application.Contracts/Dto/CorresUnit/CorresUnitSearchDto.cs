@@ -75,10 +75,12 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.CorresUnit
         /// <summary>
         /// 是否集团内单位:是否为中交集团内部单位0:否1:是
         /// </summary>
+        [ExcelIgnore]
         public string? IsGroupUnit { get; set; }
         /// <summary>
         /// 核算单位编码:财务核算组织的编码，内部核算单位必填
         /// </summary>
+        [ExcelIgnore]
         public string? AccUnitCode { get; set; }
         /// <summary>
         /// 机构主数据编码:行政组织的编码，内部行政组织必填
@@ -133,10 +135,12 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.CorresUnit
         /// <summary>
         /// 身份证号码:境内个人必填且为唯一性校验标准
         /// </summary>
+        [ExcelIgnore]
         public string? IdNo { get; set; }
         /// <summary>
         /// 境外社保号/ID:境外个人社保号或境外个人ID（ID针对不同国家可填写为身份证号或护照号），境外个人必填且为唯一性校验标准
         /// </summary>
+        [ExcelIgnore]
         public string? AbroadSocialSecurityNo { get; set; }
         /// <summary>
         /// 国家/地区:往来单位所在国家/地区
@@ -168,6 +172,7 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.CorresUnit
         /// </summary>
         public string? SupLegalEntity { get; set; }
         /// <summary>
+        [ExcelIgnore]
         /// 往来单位性质:国资监管维度
         /// </summary>
         [ExcelColumnName("往来单位性质")]
@@ -175,34 +180,42 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.CorresUnit
         /// <summary>
         /// 来源系统:记录数据来源系统
         /// </summary>
+        [ExcelIgnore]
         public string? SourceSystem { get; set; }
         /// <summary>
         /// 往来单位类型:01客户02供应商03分包商
         /// </summary>
+        [ExcelIgnore]
         public string? TypeOfUnit { get; set; }
         /// <summary>
         /// 创建时间:格式：20230324121212
         /// </summary>
+        [ExcelIgnore]
         public decimal CreatTime { get; set; }
         /// <summary>
         /// 创建人:4A人员编码
         /// </summary>
+        [ExcelIgnore]
         public string? CreateBy { get; set; }
         /// <summary>
         /// 修改时间:格式：20230324121212
         /// </summary>
+        [ExcelIgnore]
         public decimal ChangeTime { get; set; }
         /// <summary>
         /// 修改人:4A人员编码
         /// </summary>
+        [ExcelIgnore]
         public string? ModifiedBy { get; set; }
         /// <summary>
         /// 所属二级单位:记录数据最后修改人的所属二级单位
         /// </summary>
+        [ExcelIgnore]
         public string? UnitSec { get; set; }
         /// <summary>
         /// 往来单位状态:标记往来单位的启/停用状态01启用/02停用
         /// </summary>
+        [ExcelIgnore]
         public string? StatusOfUnit { get; set; }
     }
     /// <summary>

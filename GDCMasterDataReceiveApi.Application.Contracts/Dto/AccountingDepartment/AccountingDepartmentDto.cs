@@ -52,10 +52,12 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.AccountingDepartment
         /// <summary>
         /// 核算组织ID
         /// </summary>
+        [ExcelIgnore]
         public string? AccOrgId { get; set; }
         /// <summary>
         /// 核算部门ID
         /// </summary>
+        [ExcelIgnore]
         public string? AccDepId { get; set; }
         /// <summary>
         /// 核算部门中文简体名称
@@ -75,14 +77,17 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.AccountingDepartment
         /// <summary>
         /// 上级核算部门ID
         /// </summary>
+        [ExcelIgnore]
         public string? SupAccDepId { get; set; }
         /// <summary>
         /// 核算部门停用标志：1:停用0:未停用
         /// </summary>
+        [ExcelIgnore]
         public string? State { get; set; }
         /// <summary>
         /// 数据删除标识：1:删除0：正常
         /// </summary>
+        [ExcelIgnore]
         public string? DataIdentifier { get; set; }
     }
     /// <summary>

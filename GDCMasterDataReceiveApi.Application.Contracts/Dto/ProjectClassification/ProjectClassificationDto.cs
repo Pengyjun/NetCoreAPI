@@ -198,6 +198,7 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.ProjectClassificatio
         /// <summary>
         /// 三新业务类型：取值：0：否、1：是
         /// </summary>
+        [ExcelIgnore]
         public string? ThirdNewBType { get; set; }
     }
     /// <summary>

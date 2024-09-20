@@ -132,6 +132,7 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.AccountingOrganizati
         /// <summary>
         /// 机构状态“0-停用”、“1-启用”
         /// </summary>
+        [ExcelIgnore]
         public string? ZYORGSTATE { get; set; }
         /// <summary>
         /// 备注
@@ -146,18 +147,22 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.AccountingOrganizati
         /// <summary>
         /// 上级机构主数据编码
         /// </summary>
+        [ExcelIgnore]
         public string? ZTORG { get; set; }
         /// <summary>
         /// 机构规则码
         /// </summary>
+        [ExcelIgnore]
         public string? ZRULE { get; set; }
         /// <summary>
         /// 层级
         /// </summary>
+        [ExcelIgnore]
         public string? ZACLAYER { get; set; }
         /// <summary>
         /// 节点排序号
         /// </summary>
+        [ExcelIgnore]
         public string? ZACSORTORDER { get; set; }
         /// <summary>
         /// 核算机构中文名称
@@ -192,26 +197,32 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.AccountingOrganizati
         /// <summary>
         /// 上级核算组织编号
         /// </summary>
+        [ExcelIgnore]
         public string? ZACPARENTCODE { get; set; }
         /// <summary>
         /// 是否投资项目/公司  ，当“组织节点性质”为“单户单位”时必填。0-否，1-是
         /// </summary>
+        [ExcelIgnore]
         public string? ZIVFLGID { get; set; }
         /// <summary>
         /// 是否集团合并范围内单位
         /// </summary>
+        [ExcelIgnore]
         public string? ZACJTHBFWN { get; set; }
         /// <summary>
         /// 是否启用财务云报表  多机构修改，是否集团合并范围内单位为“是”
         /// </summary>
+        [ExcelIgnore]
         public string? ZREPORT_FLAG { get; set; }
         /// <summary>
         /// 启用报表时间  2024年6月12日新增，当“是否启用财务云报表”字段为是 或 核算机构状态为启用或休眠且“是否启用财务云报表”为“是”，必填
         /// </summary>
+        [ExcelIgnore]
         public string? ZQYBBDAT { get; set; }
         /// <summary>
         /// 转入不启用报表时间 ，是否启用报表由“是”变更为“否”时，必填；时间采用yyyymmdd格式
         /// </summary>
+        [ExcelIgnore]
         public string? ZREPORT_TIME { get; set; }
         /// <summary>
         /// 组织节点性质
@@ -221,14 +232,17 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.AccountingOrganizati
         /// <summary>
         /// 核算机构状态 值域：0-停用、1-启用、2-休眠、3-删除
         /// </summary>
+        [ExcelIgnore]
         public string? ZAORGSTATE { get; set; }
         /// <summary>
         /// 删除原因 当核算机构状态=删除时，输入删除原因。01-错误录入;02-财务云历史数据映射错误
         /// </summary>
+        [ExcelIgnore]
         public string? ZDEL_REA { get; set; }
         /// <summary>
         /// 是否删除主映射关系
         /// </summary>
+        [ExcelIgnore]
         public string? ZDEL_MAP { get; set; }
         /// <summary>
         /// 停用日期  当核算机构状态=休眠或停用时，0-否，1-是
@@ -278,6 +292,7 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.AccountingOrganizati
         /// <summary>
         /// 所属事业部 当“组织节点性质”为“单户单位”时必
         /// </summary>
+        [ExcelIgnore]
         public string? ZBUSINESS_UNIT { get; set; }
         /// <summary>
         /// 申请人
@@ -292,34 +307,42 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.AccountingOrganizati
         /// <summary>
         /// 是否明细 1、是；0、否
         /// </summary>
+        [ExcelIgnore]
         public string? ZACISDETAIL { get; set; }
         /// <summary>
         /// 分级码
         /// </summary>
+        [ExcelIgnore]
         public string? ZACPATH { get; set; }
         /// <summary>
         /// 是否为工商撤销机构 当组织机构视图状态为“撤销”时，自动填充为“是”
         /// </summary>
+        [ExcelIgnore]
         public string? ZBUSINESS_RECOCATION { get; set; }
         /// <summary>
         /// 核算组织编号 与ZACO值一致
         /// </summary>
+        [ExcelIgnore]
         public string? ZACORGNO { get; set; }
         /// <summary>
         /// 核算组织ID
         /// </summary>
+        [ExcelIgnore]
         public string? ZACID { get; set; }
         /// <summary>
         /// 上级核算组织ID
         /// </summary>
+        [ExcelIgnore]
         public string? ZACPARENTID { get; set; }
         /// <summary>
         /// 机构属性
         /// </summary>
+        [ExcelIgnore]
         public string? ZORGATTR { get; set; }
         /// <summary>
         /// 机构子属性
         /// </summary>
+        [ExcelIgnore]
         public string? ZORGCHILDATTR { get; set; }
         /// <summary>
         /// 业务板块
@@ -329,30 +352,37 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.AccountingOrganizati
         /// <summary>
         /// 是否内部非盈利
         /// </summary>
+        [ExcelIgnore]
         public string? ZNBFYL { get; set; }
         /// <summary>
         /// 所属区域共享中心
         /// </summary>
+        [ExcelIgnore]
         public string? ZSCENTER { get; set; }
         /// <summary>
         /// 是否“一带一路”机构（国资委）
         /// </summary>
+        [ExcelIgnore]
         public string? ZBRGZW { get; set; }
         /// <summary>
         /// 是否“一带一路”机构（商务部）
         /// </summary>
+        [ExcelIgnore]
         public string? ZBRHW { get; set; }
         /// <summary>
         /// 是否启用财务云财务管理
         /// </summary>
+        [ExcelIgnore]
         public string? ZCWYGL { get; set; }
         /// <summary>
         /// 不启用财务云财务管理原因说明  值域：01-大型合作单位（如绿城、碧水源、CCCI-John Holland等公司）；02-海外敏感项目；03-收尾完工账套无业务；04-RH项目业主要求不允许上线；05-联营项目；06-	其他（中国港湾境外业务专用）。
         /// </summary>
+        [ExcelIgnore]
         public string? ZCWYGL_REA { get; set; }
         /// <summary>
         /// 是否高新企业 当“组织节点性质”为“单户单位”时必填。0-否，1-是
         /// </summary>
+        [ExcelIgnore]
         public string? ZHTE { get; set; }
         /// <summary>
         /// 州别名称
@@ -372,6 +402,7 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.AccountingOrganizati
         /// <summary>
         /// 来源系统
         /// </summary>
+        [ExcelIgnore]
         public string? ZSYSTEM { get; set; }
         /// <summary>
         /// 机构名称（中文）:机构的规范全称
@@ -406,10 +437,12 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.AccountingOrganizati
         /// <summary>
         /// 机构状态:值域：1-运营、2-筹备、3-停用、4-撤销
         /// </summary>
+        [ExcelIgnore]
         public string? ZOSTATE { get; set; }
         /// <summary>
         /// 节点排序号:当前节点下机构的排序号
         /// </summary>
+        [ExcelIgnore]
         public string? ZSNO { get; set; }
         /// <summary>
         /// 国家名称:机构所处的国家/地区
@@ -429,10 +462,12 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.AccountingOrganizati
         /// <summary>
         /// 组织树版本号
         /// </summary>
+        [ExcelIgnore]
         public string? ZTREEVER { get; set; }
         /// <summary>
         /// 视图标识:多值按,隔开，值域:zx-机构视图、zy-核算组织视图、ZG-管理组织视图、Z4-税务代管组织（行政）视图。
         /// </summary>
+        [ExcelIgnore]
         public string? VIEW_FLAG { get; set; }
     }
     /// <summary>

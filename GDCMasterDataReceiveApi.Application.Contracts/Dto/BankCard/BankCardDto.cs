@@ -38,10 +38,12 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.BankCard
         /// <summary>
         /// 往来单位主数据编码:公司往来单位的唯一编码
         /// </summary>
+        [ExcelIgnore]
         public string? DealUnitCode { get; set; }
         /// <summary>
         /// 银行账号主键：银行账号主键
         /// </summary>
+        [ExcelIgnore]
         public string? BankNoPK { get; set; }
         /// <summary>
         /// 账户名称：填报银行账户的全称
@@ -66,6 +68,7 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.BankCard
         /// <summary>
         /// 账户状态：银行账户所处状态，包括正常、冻结、其他，默认正常。
         /// </summary>
+        [ExcelIgnore]
         public string? AccountStatus { get; set; }
         /// <summary>
         /// 账户币种：按账户实际币种填报。默认人民币。可多值以英文逗号隔开。

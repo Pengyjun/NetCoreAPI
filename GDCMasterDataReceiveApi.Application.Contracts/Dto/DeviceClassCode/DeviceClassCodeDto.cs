@@ -52,6 +52,7 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.DeviceClassCode
         /// <summary>
         /// 分类层级: 该分类名称对应的层级。分为1至4级。
         /// </summary>
+        [ExcelIgnore]
         public string? Level { get; set; }
         /// <summary>
         /// 分类名称: 分类的唯一性编码
@@ -71,6 +72,7 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.DeviceClassCode
         /// <summary>
         /// 上级分类编码: 该分类的上级分类的编码，体现分类的层级结构。
         /// </summary>
+        [ExcelIgnore]
         public string? SupCode { get; set; }
         /// <summary>
         /// 计量单位: 物资设备分类的计量单位代码。
@@ -80,14 +82,17 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.DeviceClassCode
         /// <summary>
         /// 使用状态: 该分类是否为正常使用状态，当分类正常使用时为“1”，分类停止使用时为“0”。
         /// </summary>
+        [ExcelIgnore]
         public string? State { get; set; }
         /// <summary>
         /// 是否删除：该分类是否被标记删除，通过上游失效时间进行判断
         /// </summary>
+        [ExcelIgnore]
         public string? DataIdentifier { get; set; }
         /// <summary>
         /// 排序规则: 系统排序规则用于前台数据排序使用
         /// </summary>
+        [ExcelIgnore]
         public string? SortRule { get; set; }
     }
     /// <summary>

@@ -38,6 +38,7 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.RelationalContracts
         /// <summary>
         /// 机构主数据编码:2023年2月20日多机构新增
         /// </summary>
+        [ExcelIgnore]
         public string? MDCode { get; set; }
         /// <summary>
         /// 委托单位明细行项目:2023年2月20日多机构新增主映射关系传值‘0’
@@ -47,6 +48,7 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.RelationalContracts
         /// <summary>
         /// 视图标识:目前仅传输单值:zx-机构视图、zy-核算组织视图、ZG-管理组织视图、Z4-税务代管组织（行政）视图。
         /// </summary>
+        [ExcelIgnore]
         public string? ViewIdentification { get; set; }
         /// <summary>
         /// 委托单位编码:2023年2月20日多机构新增
@@ -56,6 +58,7 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.RelationalContracts
         /// <summary>
         /// 委托状态:2023年2月20日多机构新增值域；1-启用0-停用
         /// </summary>
+        [ExcelIgnore]
         public string? Status { get; set; }
         /// <summary>
         /// 机构编码（无含义码）
@@ -74,10 +77,12 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.RelationalContracts
         /// <summary>
         /// 组织树编码:2023年2月20日多机构新增值域：1-组织机构树，2-核算组织树，3-管理组织树
         /// </summary>
+        [ExcelIgnore]
         public string? TreeCode { get; set; }
         /// <summary>
         /// 组织树版本号:2023年2月20日多机构新增
         /// </summary>
+        [ExcelIgnore]
         public string? Version { get; set; }
     }
     /// <summary>

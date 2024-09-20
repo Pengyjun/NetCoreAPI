@@ -40,6 +40,7 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.ValueDomain
         /// 上级域值编码 
         /// </summary>
 
+        [ExcelIgnore]
         public string? ZDOM_SUP { get; set; }
         /// <summary>
         /// 备注
@@ -50,6 +51,7 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.ValueDomain
         /// <summary>
         /// 版本
         /// </summary>
+        [ExcelIgnore]
 
         public string? ZVERSION { get; set; }
 

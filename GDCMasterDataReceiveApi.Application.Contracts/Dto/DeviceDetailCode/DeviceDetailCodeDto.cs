@@ -59,14 +59,17 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.DeviceDetailCode
         /// <summary>
         /// 物资设备主数据状态:物资设备主数据的使用状态
         /// </summary>
+        [ExcelIgnore]
         public string? State { get; set; }
         /// <summary>
         /// 是否常用编码:0否，1是
         /// </summary>
+        [ExcelIgnore]
         public string? IsCode { get; set; }
         /// <summary>
         /// 备注:备注说明
         /// </summary>
+        [ExcelIgnore]
         public string? Remark { get; set; }
     }
     /// <summary>

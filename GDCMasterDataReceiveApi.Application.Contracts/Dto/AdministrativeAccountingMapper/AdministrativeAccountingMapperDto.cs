@@ -34,10 +34,12 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.AdministrativeAccoun
         /// <summary>
         /// 必须唯一
         /// </summary>
+        [ExcelIgnore]
         public string? KeyId { get; set; }
         /// <summary>
         /// 核算组织ID
         /// </summary>
+        [ExcelIgnore]
         public string? AccOrgId { get; set; }
         /// <summary>
         /// 核算组织编码
@@ -47,6 +49,7 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.AdministrativeAccoun
         /// <summary>
         /// 行政组织ID
         /// </summary>
+        [ExcelIgnore]
         public string? AdministrativeOrgId { get; set; }
         /// <summary>
         /// 行政组织编码
@@ -56,6 +59,7 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.AdministrativeAccoun
         /// <summary>
         /// 是否删除: 数据是否有效的标识:   有效：1无效：0
         /// </summary>
+        [ExcelIgnore]
         public string? DataIdentifier { get; set; }
     }
     /// <summary>

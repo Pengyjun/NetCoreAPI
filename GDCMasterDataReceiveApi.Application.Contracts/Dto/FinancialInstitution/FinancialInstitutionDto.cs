@@ -102,6 +102,7 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.FinancialInstitution
         /// <summary>
         /// 境内金融机构类型:该金融机构所属类型，境内金融机构必填
         /// </summary>
+        [ExcelIgnore]
         public string? TypesOfOrg { get; set; }
         /// <summary>
         /// 金融机构名称:该金融机构的全称
@@ -116,14 +117,17 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.FinancialInstitution
         /// <summary>
         /// 境外金融机构类型:该金融机构所属类型，境外金融机构必填
         /// </summary>
+        [ExcelIgnore]
         public string? TypesOfAbroadOrg { get; set; }
         /// <summary>
         /// 机构主数据编码:行政组织编码，集团内的金融机构必填
         /// </summary>
+        [ExcelIgnore]
         public string? MDCodeofOrg { get; set; }
         /// <summary>
         /// swift code:银行国际代码，境外金融机构必填
         /// </summary>
+        [ExcelIgnore]
         public string? SwiftCode { get; set; }
         /// <summary>
         /// 统一社会信用代码:该金融机构的统一社会信用代码
@@ -133,22 +137,27 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.FinancialInstitution
         /// <summary>
         /// 状态:数据是否有效的标识:有效：1无效：0
         /// </summary>
+        [ExcelIgnore]
         public string? State { get; set; }
         /// <summary>
         /// 是否删除 数据是否有效的标识:有效：1无效：0
         /// </summary>
+        [ExcelIgnore]
         public string? DataIdentifier { get; set; }
         /// <summary>
         /// 最后修改二级单位 :记录数据最后修改所属二级单位
         /// </summary>
+        [ExcelIgnore]
         public string? UnitSec { get; set; }
         /// <summary>
         /// 提交时间：该金融机构最后一次修时间
         /// </summary>
+        [ExcelIgnore]
         public decimal? SubmitTime { get; set; }
         /// <summary>
         /// 提交人：该金融机构最后一次修改人
         /// </summary>
+        [ExcelIgnore]
         public string? SubmitBy { get; set; }
     }
     /// <summary>

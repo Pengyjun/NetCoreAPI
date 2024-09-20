@@ -83,26 +83,32 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.CountryRegion
         /// <summary>
         /// 版本号:数据的版本号。数据每次变更时，版本号自动加1。
         /// </summary>
+        [ExcelIgnore]
         public int Version { get; set; }
         /// <summary>
         /// 状态:1是已启用，0是已停用
         /// </summary>
+        [ExcelIgnore]
         public string State { get; set; }
         /// <summary>
         /// 是否删除数据是否有效的标识:    有效：1无效：0
         /// </summary>
+        [ExcelIgnore]
         public string DataIdentifier { get; set; }
         /// <summary>
         /// 一带一路(国资委):0-否，1-是
         /// </summary>
+        [ExcelIgnore]
         public string RoadGuoZiW { get; set; }
         /// <summary>
         /// 一带一路(海外):0-否，1-是
         /// </summary>
+        [ExcelIgnore]
         public string RoadHaiW { get; set; }
         /// <summary>
         /// 一带一路(共建):0-否，1-是
         /// </summary>
+        [ExcelIgnore]
         public string RoadGongJ { get; set; }
         /// <summary>
         /// 区域代码

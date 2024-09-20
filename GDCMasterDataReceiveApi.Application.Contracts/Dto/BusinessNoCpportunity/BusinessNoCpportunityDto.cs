@@ -103,10 +103,12 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.BusinessNoCpportunit
         /// <summary>
         /// 所属二级单位
         /// </summary>
+        [ExcelIgnore]
         public string? UnitSec { get; set; }
         /// <summary>
         /// 状态: 数据是否有效的标识: 有效：1无效：0
         /// </summary>
+        [ExcelIgnore]
         public string? State { get; set; }
         /// <summary>
         /// 资质单位
@@ -121,6 +123,7 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.BusinessNoCpportunit
         /// <summary>
         /// 参与单位:填写参与部门的行政机构主数据编码，可多值，用英文逗号隔开.
         /// </summary>
+        [ExcelIgnore]
         public string? ParticipatingUnits { get; set; }
     }
     /// <summary>
