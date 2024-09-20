@@ -1,4 +1,5 @@
 ﻿using GDCMasterDataReceiveApi.Application.Contracts;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto;
 using GDCMasterDataReceiveApi.Domain.Models;
 using GDCMasterDataReceiveApi.Domain.Shared;
 using GDCMasterDataReceiveApi.Domain.Shared.Enums;
@@ -122,7 +123,7 @@ namespace GDCMasterDataReceiveApi.Application
             val.Add(new FilterParams { Key = "介于", Value = "BETWEEN AND" });
             val.Add(new FilterParams { Key = "不介于", Value = "NOT BETWEEN AND" });
 
-            responseAjaxResult.Count=val.Count;
+            responseAjaxResult.Count = val.Count;
             responseAjaxResult.SuccessResult(val);
             return responseAjaxResult;
         }
@@ -182,14 +183,101 @@ namespace GDCMasterDataReceiveApi.Application
             if ((int)dataOperationType == 1)
             {
                 //插入操作
-              await  _dbContext.CopyNew().Insertable<ReceiveRecordLog>(receiveRecordLog).ExecuteCommandAsync();
+                await _dbContext.CopyNew().Insertable<ReceiveRecordLog>(receiveRecordLog).ExecuteCommandAsync();
             }
 
-            if ((int)dataOperationType ==2)
+            if ((int)dataOperationType == 2)
             {
                 //修改操作
                 await _dbContext.CopyNew().Updateable<ReceiveRecordLog>(receiveRecordLog).ExecuteCommandAsync();
             }
+        }
+        /// <summary>
+        /// 获取用户登录信息
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        public async Task<ResponseAjaxResult<bool>> GetUserLoginInfoAsync(LoginDto requestDto)
+        {
+            var responseAjaxResult = new ResponseAjaxResult<bool>();
+
+            if (string.IsNullOrWhiteSpace(requestDto.LoginAccount))
+            {
+                responseAjaxResult.FailResult(HttpStatusCode.NoLogin, "登录账号不能为空");
+                return responseAjaxResult;
+            }
+            if (string.IsNullOrWhiteSpace(requestDto.Password))
+            {
+                responseAjaxResult.FailResult(HttpStatusCode.NoLogin, "登录密码不能为空");
+                return responseAjaxResult;
+            }
+
+            var userInfo = await _dbContext.Queryable<User>()
+                .Where(x => x.HR_EMP_CODE == requestDto.LoginAccount && x.IsDelete == 1)
+                .FirstAsync();
+
+            if (userInfo != null)
+            {
+                if (!string.IsNullOrWhiteSpace(userInfo.PASSWORD))
+                {
+                    if (userInfo.PASSWORD == requestDto.Password)
+                    {
+                        responseAjaxResult.SuccessResult(true, "登录成功");
+                    }
+                    else
+                    {
+                        responseAjaxResult.SuccessResult(false, "密码错误，登录失败");
+                    }
+                }
+                else
+                {
+                    responseAjaxResult.FailResult(HttpStatusCode.SetPassword, "无密码，请设置密码");
+                }
+            }
+            else
+            {
+                responseAjaxResult.FailResult(HttpStatusCode.AccountNotEXIST, "账号信息不存在");
+            }
+
+            return responseAjaxResult;
+        }
+        /// <summary>
+        /// 设置密码/修改密码
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        public async Task<ResponseAjaxResult<bool>> SetPasswordAsync(LoginDto requestDto)
+        {
+            var responseAjaxResult = new ResponseAjaxResult<bool>();
+            if (string.IsNullOrWhiteSpace(requestDto.LoginAccount))
+            {
+                responseAjaxResult.FailResult(HttpStatusCode.NoLogin, "登录账号不能为空");
+                return responseAjaxResult;
+            }
+            if (string.IsNullOrWhiteSpace(requestDto.Password))
+            {
+                responseAjaxResult.FailResult(HttpStatusCode.NoLogin, "登录密码不能为空");
+                return responseAjaxResult;
+            }
+            //密码正则校验 复杂密码 此处省略
+            var userInfo = await _dbContext.Queryable<User>()
+                .Where(x => x.HR_EMP_CODE == requestDto.LoginAccount && x.IsDelete == 1)
+                .FirstAsync();
+
+            if (userInfo != null)
+            {
+                var tag = 0;//1:修改  2：初始设置
+                tag = string.IsNullOrWhiteSpace(userInfo.PASSWORD) ? 2 : 1;
+                userInfo.PASSWORD = requestDto.Password;
+                await _dbContext.Updateable(userInfo).ExecuteCommandAsync();
+                responseAjaxResult.SuccessResult(true, tag == 1 ? "密码修改成功" : "密码设置成功");
+            }
+            else
+            {
+                responseAjaxResult.FailResult(HttpStatusCode.AccountNotEXIST, "账号信息不存在");
+            }
+
+            return responseAjaxResult;
         }
     }
 }

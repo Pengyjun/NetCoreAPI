@@ -116,14 +116,22 @@
         /// <summary>
         /// 授权失败
         /// </summary>
-        AuthoryFail= 100037,
+        AuthoryFail = 100037,
         /// <summary>
         /// 链接失败
         /// </summary>
-        LinkFail= 100038,
+        LinkFail = 100038,
         /// <summary>
         /// 查询失败
         /// </summary>
-        SelectFail= 100040,
+        SelectFail = 100040,
+        /// <summary>
+        /// 请设置密码
+        /// </summary>
+        SetPassword = 100041,
+        /// <summary>
+        /// 账号信息不存在
+        /// </summary>
+        AccountNotEXIST = 100042,
     }
 }
