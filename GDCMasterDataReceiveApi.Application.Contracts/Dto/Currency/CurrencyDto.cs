@@ -78,6 +78,10 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.Currency
         /// </summary>
         [ExcelIgnore]
         public string? DataIdentifier { get; set; }
+        [ExcelIgnore]
+        public DateTime? CreateTime { get; set; }
+        [ExcelIgnore]
+        public DateTime? UpdateTime { get; set; }
     }
     #endregion
 

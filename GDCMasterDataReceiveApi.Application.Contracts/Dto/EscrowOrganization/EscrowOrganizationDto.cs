@@ -70,6 +70,10 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.EscrowOrganization
     public class EscrowOrganizationDetailsDto
     {
         [ExcelIgnore]
+        public DateTime? CreateTime { get; set; }
+        [ExcelIgnore]
+        public DateTime? UpdateTime { get; set; }
+        [ExcelIgnore]
         public string? Id { get; set; }
         /// <summary>
         /// 机构主数据编码:机构主数据的唯一标识

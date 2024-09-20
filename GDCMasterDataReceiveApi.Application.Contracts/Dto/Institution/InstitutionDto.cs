@@ -71,6 +71,15 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.Institution
     /// </summary>
     public class InstitutionDetatilsDto
     {
+        [ExcelIgnore]
+        public DateTime? CreateTime { get; set; }
+        [ExcelIgnore]
+        public DateTime? UpdateTime { get; set; }
+        /// <summary>
+        /// ids（首页下钻）
+        /// </summary>
+        [ExcelIgnore]
+        public List<string>? Ids { get; set; }
         /// <summary>
         /// 主键id
         /// </summary>

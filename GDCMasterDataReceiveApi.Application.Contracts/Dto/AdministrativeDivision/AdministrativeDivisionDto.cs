@@ -43,6 +43,10 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.AdministrativeDivisi
     public class AdministrativeDivisionDetailsDto
     {
         [ExcelIgnore]
+        public DateTime? CreateTime { get; set; }
+        [ExcelIgnore]
+        public DateTime? UpdateTime { get; set; }
+        [ExcelIgnore]
         public string? Id { get; set; }
         /// <summary>
         /// 行政区划代码:业务主键

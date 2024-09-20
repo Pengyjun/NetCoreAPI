@@ -62,6 +62,10 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.CorresUnit
     /// </summary>
     public class CorresUnitDetailsDto
     {
+        [ExcelIgnore]
+        public DateTime? CreateTime { get; set; }
+        [ExcelIgnore]
+        public DateTime? UpdateTime { get; set; }
         /// <summary>
         /// 主键id
         /// </summary>
@@ -170,9 +174,9 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.CorresUnit
         /// <summary>
         /// 上级法人单位:往来单位的上级法人单位
         /// </summary>
+        [ExcelIgnore]
         public string? SupLegalEntity { get; set; }
         /// <summary>
-        [ExcelIgnore]
         /// 往来单位性质:国资监管维度
         /// </summary>
         [ExcelColumnName("往来单位性质")]

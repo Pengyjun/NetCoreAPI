@@ -50,6 +50,10 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.BusinessNoCpportunit
     /// </summary>
     public class BusinessNoCpportunityDetailsDto
     {
+        [ExcelIgnore]
+        public DateTime? CreateTime { get; set; }
+        [ExcelIgnore]
+        public DateTime? UpdateTime { get; set; }
         /// <summary>
         /// 主键id
         /// </summary>

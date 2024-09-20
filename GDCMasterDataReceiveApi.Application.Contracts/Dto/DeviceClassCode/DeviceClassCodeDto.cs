@@ -43,6 +43,10 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.DeviceClassCode
     public class DeviceClassCodeDetailsDto
     {
         [ExcelIgnore]
+        public DateTime? CreateTime { get; set; }
+        [ExcelIgnore]
+        public DateTime? UpdateTime { get; set; }
+        [ExcelIgnore]
         public string? Id { get; set; }
         /// <summary>
         /// 分类编码: 分类的唯一性编码

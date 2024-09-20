@@ -55,5 +55,10 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.ValueDomain
 
         public string? ZVERSION { get; set; }
 
+        [ExcelIgnore]
+        public DateTime? CreateTime { get; set; }
+        [ExcelIgnore]
+        public DateTime? UpdateTime { get; set; }
+
     }
 }

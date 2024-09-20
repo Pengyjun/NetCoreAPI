@@ -33,6 +33,7 @@ using GDCMasterDataReceiveApi.Domain.Models;
 using GDCMasterDataReceiveApi.Domain.Shared;
 using Newtonsoft.Json;
 using SqlSugar;
+using System.Reflection;
 
 namespace GDCMasterDataReceiveApi.Application.Service.SearchService
 {
@@ -70,10 +71,21 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
             RefAsync<int> total = 0;
 
             //过滤条件
-            DeserializeObjectUser filterCondition = new();
+            UserSearchDetailsDto filterCondition = new();
+            List<string?> oids = new();
             if (!string.IsNullOrWhiteSpace(requestDto.FilterConditionJson))
             {
-                filterCondition = JsonConvert.DeserializeObject<DeserializeObjectUser>(requestDto.FilterConditionJson);
+                filterCondition = JsonConvert.DeserializeObject<UserSearchDetailsDto>(requestDto.FilterConditionJson);
+                if (filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.CompanyName))
+                {
+                    oids = await _dbContext.Queryable<Institution>()
+                    .Where(t => t.IsDelete == 1 && t.NAME.Contains(filterCondition.CompanyName))
+                    .Select(t => t.OID)
+                    .ToListAsync();
+
+                }
+                if (filterCondition != null && filterCondition.Enable == "启用") filterCondition.Enable = "1";
+                if (filterCondition != null && filterCondition.Sex == "男性") filterCondition.Sex = "01";
             }
 
             //获取人员信息
@@ -81,7 +93,43 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                 .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Name), u => u.NAME.Contains(filterCondition.Name))
                 .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Phone), u => u.PHONE.Contains(filterCondition.Phone))
                 .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.EmpCode), u => u.EMP_CODE.Contains(filterCondition.EmpCode))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Nationality), u => u.NATIONALITY.Contains(filterCondition.Nationality))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Email), u => u.EMAIL.Contains(filterCondition.Email))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.CertNo), u => u.CERT_NO.Contains(filterCondition.CertNo))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.OfficeDepId), u => u.OFFICE_DEPID.Contains(filterCondition.OfficeDepId))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.UserInfoStatus), u => u.EMP_STATUS.Contains(filterCondition.UserInfoStatus))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Enable), u => u.Enable == Convert.ToInt32(filterCondition.Enable))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.CompanyName), u => oids.Contains(filterCondition.OfficeDepId))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.NameSpell), u => u.NAME_SPELL.Contains(filterCondition.NameSpell))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.EnName), u => u.EN_NAME.Contains(filterCondition.EnName))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.EmpCode), u => u.EMP_CODE.Contains(filterCondition.EmpCode))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.CertType), u => u.CERT_TYPE.Contains(filterCondition.CertType))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Sex), u => u.SEX.Contains(filterCondition.Sex))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Nation), u => u.NATION.Contains(filterCondition.Nation))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.PositionName), u => u.POSITION_NAME.Contains(filterCondition.PositionName))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.JobName), u => u.JOB_NAME.Contains(filterCondition.JobName))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.EmpSort), u => u.EMP_SORT.Contains(filterCondition.EmpSort))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.UserLogin), u => u.USER_LOGIN.Contains(filterCondition.UserLogin))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.HrEmpCode), u => u.HR_EMP_CODE.Contains(filterCondition.HrEmpCode))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.EntryTime), u => u.ENTRY_TIME.Contains(filterCondition.EntryTime))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Tel), u => u.TEL.Contains(filterCondition.Tel))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Fax), u => u.FAX.Contains(filterCondition.Fax))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.OfficeNum), u => u.OFFICE_NUM.Contains(filterCondition.OfficeNum))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Attribute1), u => u.ATTRIBUTE1.Contains(filterCondition.Attribute1))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Attribute2), u => u.ATTRIBUTE2.Contains(filterCondition.Attribute2))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Attribute3), u => u.ATTRIBUTE3.Contains(filterCondition.Attribute3))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.PositionGradeNorm), u => u.POSITIONGRADENORM.Contains(filterCondition.PositionGradeNorm))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.HighEstGrade), u => u.HIGHESTGRADE.Contains(filterCondition.HighEstGrade))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.SameHighEstGrade), u => u.SAMEHIGHESTGRADE.Contains(filterCondition.SameHighEstGrade))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.PoliticsFace), u => u.POLITICSFACE.Contains(filterCondition.PoliticsFace))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.DispatchunitName), u => u.DISPATCHUNITNAME.Contains(filterCondition.DispatchunitName))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.DispatchunitShortName), u => u.DISPATCHUNITSHORTNAME.Contains(filterCondition.DispatchunitShortName))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Externaluser), u => u.EXTERNALUSER.Contains(filterCondition.Externaluser))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Attribute4), u => u.ATTRIBUTE4.Contains(filterCondition.Attribute4))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Attribute5), u => u.ATTRIBUTE5.Contains(filterCondition.Attribute5))
                 .WhereIF(filterCondition != null && filterCondition.Ids != null && filterCondition.Ids.Any(), u => filterCondition.Ids.Contains(u.Id.ToString()))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.CreateTime.ToString()), (pro) => Convert.ToDateTime(pro.CreateTime).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.CreateTime).ToString("yyyy-MM-dd"))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.UpdateTime.ToString()), (pro) => Convert.ToDateTime(pro.UpdateTime).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.UpdateTime).ToString("yyyy-MM-dd"))
                 .Where(u => u.IsDelete == 1)
                 .Select(u => new UserSearchDetailsDto
                 {
@@ -286,15 +334,57 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
             List<string> oids = new();
 
             //过滤条件
-            DeserializeObjectUser filterCondition = new();
+            InstitutionDetatilsDto filterCondition = new();
             if (!string.IsNullOrWhiteSpace(requestDto.FilterConditionJson))
             {
-                filterCondition = JsonConvert.DeserializeObject<DeserializeObjectUser>(requestDto.FilterConditionJson);
+                filterCondition = JsonConvert.DeserializeObject<InstitutionDetatilsDto>(requestDto.FilterConditionJson);
             }
 
             //机构树初始化
             var institutions = await _dbContext.Queryable<Institution>()
                 .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Name), t => t.NAME.Contains(filterCondition.Name))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Oid), t => t.OID.Contains(filterCondition.Oid))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.EntClass), t => t.ENTCLASS.Contains(filterCondition.EntClass))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.POid), t => t.POID.Contains(filterCondition.POid))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Status), t => t.STATUS.Contains(filterCondition.Status))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Code), t => t.OCODE.Contains(filterCondition.Code))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Orule), t => t.ORULE.Contains(filterCondition.Orule))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ShortName), t => t.SHORTNAME.Contains(filterCondition.ShortName))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.EnglishName), t => t.ENGLISHNAME.Contains(filterCondition.EnglishName))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.EnglishShortName), t => t.ENGLISHSHORTNAME.Contains(filterCondition.EnglishShortName))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.BizType), t => t.BIZTYPE.Contains(filterCondition.BizType))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Gpoid), t => t.GPOID.Contains(filterCondition.Gpoid))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Type), t => t.TYPE.Contains(filterCondition.Type))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.TypeExt), t => t.TYPEEXT.Contains(filterCondition.TypeExt))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Mrut), t => t.MRUT.Contains(filterCondition.Mrut))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Sno), t => t.SNO.Contains(filterCondition.Sno))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Coid), t => t.COID.Contains(filterCondition.Coid))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Crossorgan), t => t.CROSSORGAN.Contains(filterCondition.Crossorgan))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Goid), t => t.GOID.Contains(filterCondition.Goid))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Grade), t => t.GRADE.Contains(filterCondition.Grade))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Oper), t => t.OPER.Contains(filterCondition.Oper))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Note), t => t.NOTE.Contains(filterCondition.Note))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.TemorganName), t => t.TEMORGANNAME.Contains(filterCondition.TemorganName))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.OrgProvince), t => t.ORGPROVINCE.Contains(filterCondition.OrgProvince))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Carea), t => t.CAREA.Contains(filterCondition.Carea))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.TerritoryPro), t => t.TERRITORYPRO.Contains(filterCondition.TerritoryPro))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.BizDomain), t => t.BIZDOMAIN.Contains(filterCondition.BizDomain))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.OrgGrade), t => t.ORGGRADE.Contains(filterCondition.OrgGrade))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ProjectScale), t => t.PROJECTSCALE.Contains(filterCondition.ProjectScale))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ProjectManType), t => t.PROJECTMANTYPE.Contains(filterCondition.ProjectManType))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ProjectType), t => t.PROJECTTYPE.Contains(filterCondition.ProjectType))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.StartDate), t => t.STARTDATE.Contains(filterCondition.StartDate))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Organemp), t => t.ORGANEMP.Contains(filterCondition.Organemp))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.OrganGrade), t => t.ORGANGRADE.Contains(filterCondition.OrganGrade))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Rown), t => t.ROWN.Contains(filterCondition.Rown))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.RoId), t => t.ROID.Contains(filterCondition.RoId))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.GlobalSno), t => t.GLOBAL_SNO.Contains(filterCondition.GlobalSno))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.QyGrade), t => t.QYGRADE.Contains(filterCondition.QyGrade))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.RegisterCode), t => t.REGISTERCODE.Contains(filterCondition.RegisterCode))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ShareHoldings), t => t.SHAREHOLDINGS.Contains(filterCondition.ShareHoldings))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.MdmCode), t => t.MDM_CODE.Contains(filterCondition.MdmCode))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.CreateTime.ToString()), (pro) => Convert.ToDateTime(pro.CreateTime).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.CreateTime).ToString("yyyy-MM-dd"))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.UpdateTime.ToString()), (pro) => Convert.ToDateTime(pro.UpdateTime).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.UpdateTime).ToString("yyyy-MM-dd"))
                 .Where(t => t.IsDelete == 1)
                 .OrderBy(t => Convert.ToInt32(t.SNO))
                 .ToListAsync();
@@ -529,13 +619,68 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
             RefAsync<int> total = 0;
 
             //过滤条件
-            ProjectRequestDto filterCondition = new();
+            ProjectDetailsDto filterCondition = new();
             if (!string.IsNullOrWhiteSpace(requestDto.FilterConditionJson))
             {
-                filterCondition = JsonConvert.DeserializeObject<ProjectRequestDto>(requestDto.FilterConditionJson);
+                filterCondition = JsonConvert.DeserializeObject<ProjectDetailsDto>(requestDto.FilterConditionJson);
             }
 
             var proList = await _dbContext.Queryable<Project>()
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Name), (pro) => pro.ZPROJNAME.Contains(filterCondition.Name))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.MDCode), (pro) => pro.ZPROJECT.Contains(filterCondition.MDCode))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ForeignName), (pro) => pro.ZPROJENAME.Contains(filterCondition.ForeignName))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Type), (pro) => pro.ZPROJTYPE.Contains(filterCondition.Type))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Country), (pro) => pro.ZZCOUNTRY.Contains(filterCondition.Country))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Location), (pro) => pro.ZPROJLOC.Contains(filterCondition.Location))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.BTypeOfCCCC), (pro) => pro.ZCPBC.Contains(filterCondition.BTypeOfCCCC))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Invest), (pro) => pro.ZINVERSTOR.Contains(filterCondition.Invest))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ResolutionNo), (pro) => pro.ZAPPROVAL.Contains(filterCondition.ResolutionNo))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ResolutionTime), (pro) => pro.ZAPVLDATE.Contains(filterCondition.ResolutionTime))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.SourceOfIncome), (pro) => pro.ZSI.Contains(filterCondition.SourceOfIncome))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.PjectOrg), (pro) => pro.ZPRO_ORG.Contains(filterCondition.PjectOrg))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Abbreviation), (pro) => pro.ZHEREINAFTER.Contains(filterCondition.Abbreviation))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.SupMDCode), (pro) => pro.ZPROJECTUP.Contains(filterCondition.SupMDCode))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Year), (pro) => pro.ZPROJYEAR.Contains(filterCondition.Year))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.PlanStartDate), (pro) => pro.ZSTARTDATE.Contains(filterCondition.PlanStartDate))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.PlanCompletionDate), (pro) => pro.ZFINDATE.Contains(filterCondition.PlanCompletionDate))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.EngineeringName), (pro) => pro.ZENG.Contains(filterCondition.EngineeringName))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ResponsibleParty), (pro) => pro.ZRESP.Contains(filterCondition.ResponsibleParty))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.LandTransactionNo), (pro) => pro.ZLDLOC.Contains(filterCondition.LandTransactionNo))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.AcquisitionTime), (pro) => pro.ZLDLOCGT.Contains(filterCondition.AcquisitionTime))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.BChangeTime), (pro) => pro.ZCBR.Contains(filterCondition.BChangeTime))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.TradingSituation), (pro) => pro.ZTRADER.Contains(filterCondition.TradingSituation))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.NameOfInsureOrg), (pro) => pro.ZINSURANCE.Contains(filterCondition.NameOfInsureOrg))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.PolicyNo), (pro) => pro.ZPOLICYNO.Contains(filterCondition.PolicyNo))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Applicant), (pro) => pro.ZINSURED.Contains(filterCondition.Applicant))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.StartDateOfInsure), (pro) => pro.ZISTARTDATE.Contains(filterCondition.StartDateOfInsure))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.EndDateOfInsure), (pro) => pro.ZIFINDATE.Contains(filterCondition.EndDateOfInsure))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.FundMDCode), (pro) => pro.ZFUND.Contains(filterCondition.FundMDCode))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.FundName), (pro) => pro.ZFUNDNAME.Contains(filterCondition.FundName))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.FundNo), (pro) => pro.ZFUNDNO.Contains(filterCondition.FundNo))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Currency), (pro) => pro.ZZCURRENCY.Contains(filterCondition.Currency))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.FundOrgForm), (pro) => pro.ZFUNDORGFORM.Contains(filterCondition.FundOrgForm))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.PjectOrgBP), (pro) => pro.ZPRO_BP.Contains(filterCondition.PjectOrgBP))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.FundManager), (pro) => pro.ZFUNDMTYPE.Contains(filterCondition.FundManager))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.FundEstablishmentDate), (pro) => pro.ZFSTARTDATE.Contains(filterCondition.FundEstablishmentDate))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.FundExpirationDate), (pro) => pro.ZFFINDATE.Contains(filterCondition.FundExpirationDate))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.CustodianName), (pro) => pro.ZCUSTODIAN.Contains(filterCondition.CustodianName))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.TenantName), (pro) => pro.ZLESSEE.Contains(filterCondition.TenantName))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.TenantType), (pro) => pro.ZLESSEETYPE.Contains(filterCondition.TenantType))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.NameOfLeased), (pro) => pro.ZLEASESNAME.Contains(filterCondition.NameOfLeased))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.LeaseStartDate), (pro) => pro.ZLSTARTDATE.Contains(filterCondition.LeaseStartDate))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.DueDate), (pro) => pro.ZLFINDATE.Contains(filterCondition.DueDate))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.UnitSec), (pro) => pro.Z2NDORG.Contains(filterCondition.UnitSec))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.State), (pro) => pro.ZSTATE.Contains(filterCondition.State))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ReasonForDeactivate), (pro) => pro.ZSTOPREASON.Contains(filterCondition.ReasonForDeactivate))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.TaxMethod), (pro) => pro.ZTAXMETHOD.Contains(filterCondition.TaxMethod))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.OrgMethod), (pro) => pro.ZPOS.Contains(filterCondition.OrgMethod))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.WinningBidder), (pro) => pro.ZAWARDMAI.Contains(filterCondition.WinningBidder))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ConsolidatedTable), (pro) => pro.ZCS.Contains(filterCondition.ConsolidatedTable))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Management), (pro) => pro.ZMANAGE_MODE.Contains(filterCondition.Management))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.BDep), (pro) => pro.ZBIZDEPT.Contains(filterCondition.BDep))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.IsJoint), (pro) => pro.ZWINNINGC.Contains(filterCondition.IsJoint))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.CreateTime.ToString()), (pro) => Convert.ToDateTime(pro.CreateTime).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.CreateTime).ToString("yyyy-MM-dd"))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.UpdateTime.ToString()), (pro) => Convert.ToDateTime(pro.UpdateTime).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.UpdateTime).ToString("yyyy-MM-dd"))
                 .Where((pro) => pro.IsDelete == 1)
                 .Select((pro) => new ProjectDetailsDto
                 {
@@ -690,13 +835,38 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
             RefAsync<int> total = 0;
 
             //过滤条件
-            CountryContinentRequestDto filterCondition = new();
+            CorresUnitDetailsDto filterCondition = new();
             if (!string.IsNullOrWhiteSpace(requestDto.FilterConditionJson))
             {
-                filterCondition = JsonConvert.DeserializeObject<CountryContinentRequestDto>(requestDto.FilterConditionJson);
+                filterCondition = JsonConvert.DeserializeObject<CorresUnitDetailsDto>(requestDto.FilterConditionJson);
             }
 
             var corresUnitList = await _dbContext.Queryable<CorresUnit>()
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.DealUnitMDCode), (pro) => pro.ZBP.Contains(filterCondition.DealUnitMDCode))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.IsGroupUnit), (pro) => pro.ZINCLIENT.Contains(filterCondition.IsGroupUnit))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.AccUnitCode), (pro) => pro.ZACORGNO.Contains(filterCondition.AccUnitCode))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.OrgMDCode), (pro) => pro.ZORG.Contains(filterCondition.OrgMDCode))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Name), (pro) => pro.ZBPNAME_ZH.Contains(filterCondition.Name))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.NameEnglish), (pro) => pro.ZBPNAME_EN.Contains(filterCondition.NameEnglish))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.NameInLLanguage), (pro) => pro.ZBPNAME_LOC.Contains(filterCondition.NameInLLanguage))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.CategoryUnit), (pro) => pro.ZBPTYPE.Contains(filterCondition.CategoryUnit))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.RegistrationNo), (pro) => pro.ZUSCC.Contains(filterCondition.RegistrationNo))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.OrgCode), (pro) => pro.ZOIBC.Contains(filterCondition.OrgCode))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.BRegistrationNo), (pro) => pro.ZBRNO.Contains(filterCondition.BRegistrationNo))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.TaxpayerIdentifyNo), (pro) => pro.ZTRNO.Contains(filterCondition.TaxpayerIdentifyNo))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.AbroadRegistrationNo), (pro) => pro.ZOSRNO.Contains(filterCondition.AbroadRegistrationNo))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.IdNo), (pro) => pro.ZIDNO.Contains(filterCondition.IdNo))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.AbroadSocialSecurityNo), (pro) => pro.ZSSNO.Contains(filterCondition.AbroadSocialSecurityNo))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Country), (pro) => pro.ZZCOUNTRY.Contains(filterCondition.Country))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Province), (pro) => pro.ZPROVINCE.Contains(filterCondition.Province))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.City), (pro) => pro.ZCITY.Contains(filterCondition.City))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.County), (pro) => pro.ZCOUNTY.Contains(filterCondition.County))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.EnterpriseNature), (pro) => pro.ZETPSPROPERTY.Contains(filterCondition.EnterpriseNature))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.SupLegalEntity), (pro) => pro.ZCOMPYREL.Contains(filterCondition.SupLegalEntity))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.NatureOfUnit), (pro) => pro.ZBPNATURE.Contains(filterCondition.NatureOfUnit))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.TypeOfUnit), (pro) => pro.ZBPKINDS.Contains(filterCondition.TypeOfUnit))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.CreateTime.ToString()), (pro) => Convert.ToDateTime(pro.CreateTime).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.CreateTime).ToString("yyyy-MM-dd"))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.UpdateTime.ToString()), (pro) => Convert.ToDateTime(pro.UpdateTime).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.UpdateTime).ToString("yyyy-MM-dd"))
                 .Where((cu) => cu.IsDelete == 1)
                 .Select((cu) => new CorresUnitDetailsDto
                 {
@@ -802,12 +972,21 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
             RefAsync<int> total = 0;
 
             //过滤条件
-            CountryRegionRequestDto filterCondition = new();
+            CountryRegionDetailsDto filterCondition = new();
             if (!string.IsNullOrWhiteSpace(requestDto.FilterConditionJson))
             {
-                filterCondition = JsonConvert.DeserializeObject<CountryRegionRequestDto>(requestDto.FilterConditionJson);
+                filterCondition = JsonConvert.DeserializeObject<CountryRegionDetailsDto>(requestDto.FilterConditionJson);
             }
             var corresUnitList = await _dbContext.Queryable<CountryRegion>()
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Country), (pro) => pro.ZCOUNTRYCODE.Contains(filterCondition.Country))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Name), (pro) => pro.ZCOUNTRYNAME.Contains(filterCondition.Name))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.NameEnglish), (pro) => pro.ZCOUNTRYENAME.Contains(filterCondition.NameEnglish))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.NationalCode), (pro) => pro.ZGBCHAR.Contains(filterCondition.NationalCode))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.DigitCode), (pro) => pro.ZGBNUM.Contains(filterCondition.DigitCode))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ContinentCode), (pro) => pro.ZCONTINENTCODE.Contains(filterCondition.ContinentCode))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.CCCCCenterCode), (pro) => pro.ZCRCCODE.Contains(filterCondition.CCCCCenterCode))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.CreateTime.ToString()), (pro) => Convert.ToDateTime(pro.CreateTime).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.CreateTime).ToString("yyyy-MM-dd"))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.UpdateTime.ToString()), (pro) => Convert.ToDateTime(pro.UpdateTime).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.UpdateTime).ToString("yyyy-MM-dd"))
                 .Where((cr) => cr.IsDelete == 1)
                 .Select((cr) => new CountryRegionDetailsDto
                 {
@@ -877,13 +1056,19 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
             RefAsync<int> total = 0;
 
             //过滤条件
-            CountryContinentRequestDto filterCondition = new();
+            CountryContinentDetailsDto filterCondition = new();
             if (!string.IsNullOrWhiteSpace(requestDto.FilterConditionJson))
             {
-                filterCondition = JsonConvert.DeserializeObject<CountryContinentRequestDto>(requestDto.FilterConditionJson);
+                filterCondition = JsonConvert.DeserializeObject<CountryContinentDetailsDto>(requestDto.FilterConditionJson);
             }
 
             var ccList = await _dbContext.Queryable<CountryContinent>()
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ContinentCode), (pro) => pro.ZCONTINENTCODE.Contains(filterCondition.ContinentCode))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Name), (pro) => pro.ZCONTINENTNAME.Contains(filterCondition.Name))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.AreaCode), (pro) => pro.ZAREACODE.Contains(filterCondition.AreaCode))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.RegionalDescr), (pro) => pro.ZAREANAME.Contains(filterCondition.RegionalDescr))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.CreateTime.ToString()), (pro) => Convert.ToDateTime(pro.CreateTime).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.CreateTime).ToString("yyyy-MM-dd"))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.UpdateTime.ToString()), (pro) => Convert.ToDateTime(pro.UpdateTime).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.UpdateTime).ToString("yyyy-MM-dd"))
                 .Where((cc) => cc.IsDelete == 1)
                 .Select((cc) => new CountryContinentDetailsDto
                 {
@@ -939,13 +1124,30 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
             RefAsync<int> total = 0;
 
             //过滤条件
-            FinancialInstitutionRequestDto filterCondition = new();
+            FinancialInstitutionDetailsDto filterCondition = new();
             if (!string.IsNullOrWhiteSpace(requestDto.FilterConditionJson))
             {
-                filterCondition = JsonConvert.DeserializeObject<FinancialInstitutionRequestDto>(requestDto.FilterConditionJson);
+                filterCondition = JsonConvert.DeserializeObject<FinancialInstitutionDetailsDto>(requestDto.FilterConditionJson);
             }
 
             var ccList = await _dbContext.Queryable<FinancialInstitution>()
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.City), (pro) => pro.ZCITY.Contains(filterCondition.City))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Country), (pro) => pro.ZZCOUNTRY.Contains(filterCondition.Country))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.County), (pro) => pro.ZCOUNTY.Contains(filterCondition.County))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.EnglishName), (pro) => pro.ZFINAME_E.Contains(filterCondition.EnglishName))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Name), (pro) => pro.ZBANKNAME.Contains(filterCondition.Name))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.NameOfOrg), (pro) => pro.ZFINAME.Contains(filterCondition.NameOfOrg))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Province), (pro) => pro.ZPROVINCE.Contains(filterCondition.Province))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.TypesOfAbroadOrg), (pro) => pro.ZOFITYPE.Contains(filterCondition.TypesOfAbroadOrg))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.TypesOfOrg), (pro) => pro.ZDFITYPE.Contains(filterCondition.TypesOfOrg))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.BankNo), (pro) => pro.ZBANKN.Contains(filterCondition.BankNo))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.MDCode), (pro) => pro.ZFINC.Contains(filterCondition.MDCode))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.MDCodeofOrg), (pro) => pro.ZORG.Contains(filterCondition.MDCodeofOrg))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.RegistrationNo), (pro) => pro.ZUSCC.Contains(filterCondition.RegistrationNo))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.No), (pro) => pro.ZBANK.Contains(filterCondition.No))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.SwiftCode), (pro) => pro.ZSWIFTCOD.Contains(filterCondition.SwiftCode))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.CreateTime.ToString()), (pro) => Convert.ToDateTime(pro.CreateTime).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.CreateTime).ToString("yyyy-MM-dd"))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.UpdateTime.ToString()), (pro) => Convert.ToDateTime(pro.UpdateTime).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.UpdateTime).ToString("yyyy-MM-dd"))
                 .Where((cc) => cc.IsDelete == 1)
                 .Select((cc) => new FinancialInstitutionDetailsDto
                 {
@@ -1027,13 +1229,22 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
             RefAsync<int> total = 0;
 
             //过滤条件
-            DeviceClassCodeRequestDto filterCondition = new();
+            DeviceClassCodeDetailsDto filterCondition = new();
             if (!string.IsNullOrWhiteSpace(requestDto.FilterConditionJson))
             {
-                filterCondition = JsonConvert.DeserializeObject<DeviceClassCodeRequestDto>(requestDto.FilterConditionJson);
+                filterCondition = JsonConvert.DeserializeObject<DeviceClassCodeDetailsDto>(requestDto.FilterConditionJson);
             }
 
             var ccList = await _dbContext.Queryable<DeviceClassCode>()
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.AliasName), (pro) => pro.ZCALIAS.Contains(filterCondition.AliasName))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Code), (pro) => pro.ZCLASS.Contains(filterCondition.Code))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Description), (pro) => pro.ZCDESC.Contains(filterCondition.Description))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Name), (pro) => pro.ZCNAME.Contains(filterCondition.Name))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.UnitOfMeasurement), (pro) => pro.ZMSEHI.Contains(filterCondition.UnitOfMeasurement))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.SortRule), (pro) => pro.ZSORT.Contains(filterCondition.SortRule))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.SupCode), (pro) => pro.ZCLASSUP.Contains(filterCondition.SupCode))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.CreateTime.ToString()), (pro) => Convert.ToDateTime(pro.CreateTime).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.CreateTime).ToString("yyyy-MM-dd"))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.UpdateTime.ToString()), (pro) => Convert.ToDateTime(pro.UpdateTime).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.UpdateTime).ToString("yyyy-MM-dd"))
                 .Where((cc) => cc.IsDelete == 1)
                 .Select((cc) => new DeviceClassCodeDetailsDto
                 {
@@ -1095,13 +1306,17 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
             RefAsync<int> total = 0;
 
             //过滤条件
-            DeviceDetailCodeRequestDto filterCondition = new();
+            InvoiceTypeDetailshDto filterCondition = new();
             if (!string.IsNullOrWhiteSpace(requestDto.FilterConditionJson))
             {
-                filterCondition = JsonConvert.DeserializeObject<DeviceDetailCodeRequestDto>(requestDto.FilterConditionJson);
+                filterCondition = JsonConvert.DeserializeObject<InvoiceTypeDetailshDto>(requestDto.FilterConditionJson);
             }
 
             var ccList = await _dbContext.Queryable<InvoiceType>()
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Code), (pro) => pro.ZINVTCODE.Contains(filterCondition.Code))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Name), (pro) => pro.ZINVTNAME.Contains(filterCondition.Name))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.CreateTime.ToString()), (pro) => Convert.ToDateTime(pro.CreateTime).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.CreateTime).ToString("yyyy-MM-dd"))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.UpdateTime.ToString()), (pro) => Convert.ToDateTime(pro.UpdateTime).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.UpdateTime).ToString("yyyy-MM-dd"))
                 .Where((cc) => cc.IsDelete == 1)
                 .Select((cc) => new InvoiceTypeDetailshDto
                 {
@@ -1153,13 +1368,27 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
             RefAsync<int> total = 0;
 
             //过滤条件
-            ScientifiCNoProjectRequestDto filterCondition = new();
+            ScientifiCNoProjectDetailsDto filterCondition = new();
             if (!string.IsNullOrWhiteSpace(requestDto.FilterConditionJson))
             {
-                filterCondition = JsonConvert.DeserializeObject<ScientifiCNoProjectRequestDto>(requestDto.FilterConditionJson);
+                filterCondition = JsonConvert.DeserializeObject<ScientifiCNoProjectDetailsDto>(requestDto.FilterConditionJson);
             }
 
             var ccList = await _dbContext.Queryable<ScientifiCNoProject>()
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Name), (pro) => pro.ZSRPN.Contains(filterCondition.Name))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.CurrencyOfCost), (pro) => pro.ZPROJCOSTCUR.Contains(filterCondition.CurrencyOfCost))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ForeignName), (pro) => pro.ZSRPN_FN.Contains(filterCondition.ForeignName))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.MDCode), (pro) => pro.ZSRP.Contains(filterCondition.MDCode))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.PjectState), (pro) => pro.ZKPSTATE.Contains(filterCondition.PjectState))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.TotalCost), (pro) => pro.ZPROJCOST.Contains(filterCondition.TotalCost))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Year), (pro) => pro.ZPROJYEA.Contains(filterCondition.Year))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.PlanEndDate), (pro) => pro.ZPFINDATE.Contains(filterCondition.PlanEndDate))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.PlanStartDate), (pro) => pro.ZPSTARTDATE.Contains(filterCondition.PlanStartDate))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ProfessionalType), (pro) => pro.ZMAJORTYPE.Contains(filterCondition.ProfessionalType))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.SupMDCode), (pro) => pro.ZSRPUP.Contains(filterCondition.SupMDCode))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ProfessionalType), (pro) => pro.ZSRPCLASS.Contains(filterCondition.ProfessionalType))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.CreateTime.ToString()), (pro) => Convert.ToDateTime(pro.CreateTime).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.CreateTime).ToString("yyyy-MM-dd"))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.UpdateTime.ToString()), (pro) => Convert.ToDateTime(pro.UpdateTime).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.UpdateTime).ToString("yyyy-MM-dd"))
                 .Where((cc) => cc.IsDelete == 1)
                 .Select((cc) => new ScientifiCNoProjectDetailsDto
                 {
@@ -1231,13 +1460,19 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
             RefAsync<int> total = 0;
 
             //过滤条件
-            LanguageRequestDto filterCondition = new();
+            LanguageDetailsDto filterCondition = new();
             if (!string.IsNullOrWhiteSpace(requestDto.FilterConditionJson))
             {
-                filterCondition = JsonConvert.DeserializeObject<LanguageRequestDto>(requestDto.FilterConditionJson);
+                filterCondition = JsonConvert.DeserializeObject<LanguageDetailsDto>(requestDto.FilterConditionJson);
             }
 
             var ccList = await _dbContext.Queryable<Language>()
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Name), (pro) => pro.ZLANG_ZH.Contains(filterCondition.Name))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.DirCode), (pro) => pro.ZLANG_BIB.Contains(filterCondition.DirCode))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.EnglishName), (pro) => pro.ZLANG_EN.Contains(filterCondition.EnglishName))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.TermCode), (pro) => pro.ZLANG_TER.Contains(filterCondition.TermCode))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.CreateTime.ToString()), (pro) => Convert.ToDateTime(pro.CreateTime).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.CreateTime).ToString("yyyy-MM-dd"))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.UpdateTime.ToString()), (pro) => Convert.ToDateTime(pro.UpdateTime).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.UpdateTime).ToString("yyyy-MM-dd"))
                 .Where((cc) => cc.IsDelete == 1)
                 .Select((cc) => new LanguageDetailsDto
                 {
@@ -1292,7 +1527,25 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
             var responseAjaxResult = new ResponseAjaxResult<List<BankCardDetailsDto>>();
             RefAsync<int> total = 0;
 
+            //过滤条件
+            BankCardDetailsDto filterCondition = new();
+            if (!string.IsNullOrWhiteSpace(requestDto.FilterConditionJson))
+            {
+                filterCondition = JsonConvert.DeserializeObject<BankCardDetailsDto>(requestDto.FilterConditionJson);
+            }
             var ccList = await _dbContext.Queryable<BankCard>()
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Name), (pro) => pro.ZKOINH.Contains(filterCondition.Name))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.AccountCurrency), (pro) => pro.ZCURR.Contains(filterCondition.AccountCurrency))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.AccountStatus), (pro) => pro.ZBANKSTA.Contains(filterCondition.AccountStatus))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.BankAccount), (pro) => pro.ZBANKN.Contains(filterCondition.BankAccount))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.BankNoPK), (pro) => pro.ZBANK.Contains(filterCondition.BankNoPK))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.City), (pro) => pro.ZCITY2.Contains(filterCondition.City))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Country), (pro) => pro.ZZCOUNTR2.Contains(filterCondition.Country))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.County), (pro) => pro.ZCOUNTY2.Contains(filterCondition.County))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.DealUnitCode), (pro) => pro.ZBP.Contains(filterCondition.DealUnitCode))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.FinancialOrgCode), (pro) => pro.ZFINC.Contains(filterCondition.FinancialOrgCode))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.FinancialOrgName), (pro) => pro.ZFINAME.Contains(filterCondition.FinancialOrgName))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Province), (pro) => pro.ZPROVINC2.Contains(filterCondition.Province))
                 .Select((cc) => new BankCardDetailsDto
                 {
                     Id = cc.Id.ToString(),
@@ -1357,13 +1610,20 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
             RefAsync<int> total = 0;
 
             //过滤条件
-            DeviceDetailCodeRequestDto filterCondition = new();
+            DeviceDetailCodeDetailsDto filterCondition = new();
             if (!string.IsNullOrWhiteSpace(requestDto.FilterConditionJson))
             {
-                filterCondition = JsonConvert.DeserializeObject<DeviceDetailCodeRequestDto>(requestDto.FilterConditionJson);
+                filterCondition = JsonConvert.DeserializeObject<DeviceDetailCodeDetailsDto>(requestDto.FilterConditionJson);
             }
 
             var ccList = await _dbContext.Queryable<DeviceDetailCode>()
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Name), (pro) => pro.ZMNAME.Contains(filterCondition.Name))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Descption), (pro) => pro.ZMNAMES.Contains(filterCondition.Descption))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.MDCode), (pro) => pro.ZMATERIAL.Contains(filterCondition.MDCode))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ProductNameCode), (pro) => pro.ZCLASS.Contains(filterCondition.ProductNameCode))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Remark), (pro) => pro.ZREMARK.Contains(filterCondition.Remark))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.CreateTime.ToString()), (pro) => Convert.ToDateTime(pro.CreateTime).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.CreateTime).ToString("yyyy-MM-dd"))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.UpdateTime.ToString()), (pro) => Convert.ToDateTime(pro.UpdateTime).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.UpdateTime).ToString("yyyy-MM-dd"))
                 .Where((cc) => cc.IsDelete == 1)
                 .Select((cc) => new DeviceDetailCodeDetailsDto
                 {
@@ -1419,13 +1679,23 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
             RefAsync<int> total = 0;
 
             //过滤条件
-            AccountingDepartmentRequestDto filterCondition = new();
+            AccountingDepartmentDetailsDto filterCondition = new();
             if (!string.IsNullOrWhiteSpace(requestDto.FilterConditionJson))
             {
-                filterCondition = JsonConvert.DeserializeObject<AccountingDepartmentRequestDto>(requestDto.FilterConditionJson);
+                filterCondition = JsonConvert.DeserializeObject<AccountingDepartmentDetailsDto>(requestDto.FilterConditionJson);
             }
 
             var ccList = await _dbContext.Queryable<AccountingDepartment>()
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Name), (pro) => pro.ZDNAME_CHS.Contains(filterCondition.Name))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.AccDepCode), (pro) => pro.ZDCODE.Contains(filterCondition.AccDepCode))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.AccDepELName), (pro) => pro.ZDNAME_EN.Contains(filterCondition.AccDepELName))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.AccDepTCCName), (pro) => pro.ZDNAME_CHT.Contains(filterCondition.AccDepTCCName))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.AccDepId), (pro) => pro.ZDID.Contains(filterCondition.AccDepId))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.AccOrgId), (pro) => pro.ZACID.Contains(filterCondition.AccOrgId))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.AccOrgCode), (pro) => pro.ZACORGNO.Contains(filterCondition.AccOrgCode))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.SupAccDepId), (pro) => pro.ZDPARENTID.Contains(filterCondition.SupAccDepId))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.CreateTime.ToString()), (pro) => Convert.ToDateTime(pro.CreateTime).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.CreateTime).ToString("yyyy-MM-dd"))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.UpdateTime.ToString()), (pro) => Convert.ToDateTime(pro.UpdateTime).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.UpdateTime).ToString("yyyy-MM-dd"))
                 .Where((cc) => cc.IsDelete == 1)
                 .Select((cc) => new AccountingDepartmentDetailsDto
                 {
@@ -1487,13 +1757,21 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
             RefAsync<int> total = 0;
 
             //过滤条件
-            RelationalContractsRequestDto filterCondition = new();
+            RelationalContractsDetailsDto filterCondition = new();
             if (!string.IsNullOrWhiteSpace(requestDto.FilterConditionJson))
             {
-                filterCondition = JsonConvert.DeserializeObject<RelationalContractsRequestDto>(requestDto.FilterConditionJson);
+                filterCondition = JsonConvert.DeserializeObject<RelationalContractsDetailsDto>(requestDto.FilterConditionJson);
             }
 
             var ccList = await _dbContext.Queryable<RelationalContracts>()
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Code), (pro) => pro.ZDELEGATE_ORG.Contains(filterCondition.Code))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.DetailedLine), (pro) => pro.ZNUMC4.Contains(filterCondition.DetailedLine))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.MDCode), (pro) => pro.MDM_CODE.Contains(filterCondition.MDCode))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.OrgCode), (pro) => pro.OID.Contains(filterCondition.OrgCode))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.AccOrgCode), (pro) => pro.ZACO.Contains(filterCondition.AccOrgCode))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.TreeCode), (pro) => pro.ZTREEID.Contains(filterCondition.TreeCode))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.CreateTime.ToString()), (pro) => Convert.ToDateTime(pro.CreateTime).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.CreateTime).ToString("yyyy-MM-dd"))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.UpdateTime.ToString()), (pro) => Convert.ToDateTime(pro.UpdateTime).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.UpdateTime).ToString("yyyy-MM-dd"))
                 .Where((cc) => cc.IsDelete == 1)
                 .Select((cc) => new RelationalContractsDetailsDto
                 {
@@ -1553,14 +1831,19 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
             RefAsync<int> total = 0;
 
             //过滤条件
-            RegionalRequestDto filterCondition = new();
+            RegionalDetailsDto filterCondition = new();
             if (!string.IsNullOrWhiteSpace(requestDto.FilterConditionJson))
             {
-                filterCondition = JsonConvert.DeserializeObject<RegionalRequestDto>(requestDto.FilterConditionJson);
+                filterCondition = JsonConvert.DeserializeObject<RegionalDetailsDto>(requestDto.FilterConditionJson);
             }
 
-
             var ccList = await _dbContext.Queryable<Regional>()
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Code), (pro) => pro.ZCRHCODE.Contains(filterCondition.Code))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.AreaRange), (pro) => pro.ZCRHSCOPE.Contains(filterCondition.AreaRange))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Description), (pro) => pro.ZCRHNAME.Contains(filterCondition.Description))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Name), (pro) => pro.ZCRHABBR.Contains(filterCondition.Name))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.CreateTime.ToString()), (pro) => Convert.ToDateTime(pro.CreateTime).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.CreateTime).ToString("yyyy-MM-dd"))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.UpdateTime.ToString()), (pro) => Convert.ToDateTime(pro.UpdateTime).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.UpdateTime).ToString("yyyy-MM-dd"))
                 .Where((cc) => cc.IsDelete == 1)
                 .Select((cc) => new RegionalDetailsDto
                 {
@@ -1616,13 +1899,17 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
             RefAsync<int> total = 0;
 
             //过滤条件
-            UnitMeasurementRequestDto filterCondition = new();
+            UnitMeasurementDetailsDto filterCondition = new();
             if (!string.IsNullOrWhiteSpace(requestDto.FilterConditionJson))
             {
-                filterCondition = JsonConvert.DeserializeObject<UnitMeasurementRequestDto>(requestDto.FilterConditionJson);
+                filterCondition = JsonConvert.DeserializeObject<UnitMeasurementDetailsDto>(requestDto.FilterConditionJson);
             }
 
             var ccList = await _dbContext.Queryable<UnitMeasurement>()
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Code), (pro) => pro.ZUNITCODE.Contains(filterCondition.Code))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Name), (pro) => pro.ZUNITNAME.Contains(filterCondition.Name))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.CreateTime.ToString()), (pro) => Convert.ToDateTime(pro.CreateTime).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.CreateTime).ToString("yyyy-MM-dd"))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.UpdateTime.ToString()), (pro) => Convert.ToDateTime(pro.UpdateTime).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.UpdateTime).ToString("yyyy-MM-dd"))
                 .Where((cc) => cc.IsDelete == 1)
                 .Select((cc) => new UnitMeasurementDetailsDto
                 {
@@ -1674,13 +1961,39 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
             RefAsync<int> total = 0;
 
             //过滤条件
-            ProjectClassificationRequestDto filterCondition = new();
+            ProjectClassificationDetailsDto filterCondition = new();
             if (!string.IsNullOrWhiteSpace(requestDto.FilterConditionJson))
             {
-                filterCondition = JsonConvert.DeserializeObject<ProjectClassificationRequestDto>(requestDto.FilterConditionJson);
+                filterCondition = JsonConvert.DeserializeObject<ProjectClassificationDetailsDto>(requestDto.FilterConditionJson);
             }
 
             var ccList = await _dbContext.Queryable<ProjectClassification>()
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.BSectorSecName), (pro) => pro.ZBUSTD2NAME.Contains(filterCondition.BSectorSecName))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.BSectorRemark), (pro) => pro.ZBUSTDREMARKS.Contains(filterCondition.BSectorRemark))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.BSectorOneName), (pro) => pro.ZBUSTD1NAME.Contains(filterCondition.BSectorOneName))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.BSectorThirdName), (pro) => pro.ZBUSTD3NAME.Contains(filterCondition.BSectorThirdName))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.BusinessRemark), (pro) => pro.ZZCPBREMARKS.Contains(filterCondition.BusinessRemark))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.CCCCBTypeName), (pro) => pro.Z12TOPBNAME.Contains(filterCondition.CCCCBTypeName))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.CCCCBTypeSecName), (pro) => pro.ZCPBC2NAME.Contains(filterCondition.CCCCBTypeSecName))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.CCCCBTypeThirdName), (pro) => pro.ZCPBC3NAME.Contains(filterCondition.CCCCBTypeThirdName))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.CCCCRiverLakeAndSeaName), (pro) => pro.ZRRLSNAME.Contains(filterCondition.CCCCRiverLakeAndSeaName))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ChanYeOneName), (pro) => pro.ZICSTD1NAME.Contains(filterCondition.ChanYeOneName))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ChanYeRemark), (pro) => pro.ZICSTDREMARKS.Contains(filterCondition.ChanYeRemark))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ChanYeSecName), (pro) => pro.ZICSTD2NAME.Contains(filterCondition.ChanYeSecName))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ChanYeThirdName), (pro) => pro.ZICSTD3NAME.Contains(filterCondition.ChanYeThirdName))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.BSectorOneCode), (pro) => pro.ZBUSTD1ID.Contains(filterCondition.BSectorOneCode))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.BSectorSecCode), (pro) => pro.ZBUSTD2ID.Contains(filterCondition.BSectorSecCode))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.BSectorThirdCode), (pro) => pro.ZBUSTD3ID.Contains(filterCondition.BSectorThirdCode))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.CCCCBTypeCode), (pro) => pro.Z12TOPBID.Contains(filterCondition.CCCCBTypeCode))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.CCCCBTypeOneCode), (pro) => pro.ZCPBC1ID.Contains(filterCondition.CCCCBTypeOneCode))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.CCCCBTypeSecCode), (pro) => pro.ZCPBC2ID.Contains(filterCondition.CCCCBTypeSecCode))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.CCCCBTypeThirdCode), (pro) => pro.ZCPBC3ID.Contains(filterCondition.CCCCBTypeThirdCode))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.CCCCRiverLakeAndSeaCode), (pro) => pro.ZRRLSID.Contains(filterCondition.CCCCRiverLakeAndSeaCode))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ChanYeOneCode), (pro) => pro.ZICSTD1ID.Contains(filterCondition.ChanYeOneCode))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ChanYeSecCode), (pro) => pro.ZICSTD2ID.Contains(filterCondition.ChanYeSecCode))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Name), (pro) => pro.ZCPBC1NAME.Contains(filterCondition.Name))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.CreateTime.ToString()), (pro) => Convert.ToDateTime(pro.CreateTime).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.CreateTime).ToString("yyyy-MM-dd"))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.UpdateTime.ToString()), (pro) => Convert.ToDateTime(pro.UpdateTime).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.UpdateTime).ToString("yyyy-MM-dd"))
                 .Where((cc) => cc.IsDelete == 1)
                 .Select((cc) => new ProjectClassificationDetailsDto
                 {
@@ -1772,13 +2085,17 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
             RefAsync<int> total = 0;
 
             //过滤条件
-            RegionalCenterRequestDto filterCondition = new();
+            RegionalCenterDetailsDto filterCondition = new();
             if (!string.IsNullOrWhiteSpace(requestDto.FilterConditionJson))
             {
-                filterCondition = JsonConvert.DeserializeObject<RegionalCenterRequestDto>(requestDto.FilterConditionJson);
+                filterCondition = JsonConvert.DeserializeObject<RegionalCenterDetailsDto>(requestDto.FilterConditionJson);
             }
 
             var ccList = await _dbContext.Queryable<RegionalCenter>()
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Code), (pro) => pro.ZCRCCODE.Contains(filterCondition.Code))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Description), (pro) => pro.ZCRCNAME.Contains(filterCondition.Description))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.CreateTime.ToString()), (pro) => Convert.ToDateTime(pro.CreateTime).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.CreateTime).ToString("yyyy-MM-dd"))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.UpdateTime.ToString()), (pro) => Convert.ToDateTime(pro.UpdateTime).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.UpdateTime).ToString("yyyy-MM-dd"))
                 .Where((cc) => cc.IsDelete == 1)
                 .Select((cc) => new RegionalCenterDetailsDto
                 {
@@ -1830,13 +2147,19 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
             RefAsync<int> total = 0;
 
             //过滤条件
-            NationalEconomyRequestDto filterCondition = new();
+            NationalEconomyDetailsDto filterCondition = new();
             if (!string.IsNullOrWhiteSpace(requestDto.FilterConditionJson))
             {
-                filterCondition = JsonConvert.DeserializeObject<NationalEconomyRequestDto>(requestDto.FilterConditionJson);
+                filterCondition = JsonConvert.DeserializeObject<NationalEconomyDetailsDto>(requestDto.FilterConditionJson);
             }
 
             var ccList = await _dbContext.Queryable<NationalEconomy>()
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Code), (pro) => pro.ZNEQCODE.Contains(filterCondition.Code))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Descption), (pro) => pro.ZNEQDESC.Contains(filterCondition.Descption))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Name), (pro) => pro.ZNEQNAME.Contains(filterCondition.Name))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.SupCode), (pro) => pro.ZNEQCODEUP.Contains(filterCondition.SupCode))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.CreateTime.ToString()), (pro) => Convert.ToDateTime(pro.CreateTime).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.CreateTime).ToString("yyyy-MM-dd"))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.UpdateTime.ToString()), (pro) => Convert.ToDateTime(pro.UpdateTime).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.UpdateTime).ToString("yyyy-MM-dd"))
                 .Where((cc) => cc.IsDelete == 1)
                 .Select((cc) => new NationalEconomyDetailsDto
                 {
@@ -1892,13 +2215,18 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
             RefAsync<int> total = 0;
 
             //过滤条件
-            AdministrativeAccountingMapperRequestDto filterCondition = new();
+            AdministrativeAccountingMapperDetailsDto filterCondition = new();
             if (!string.IsNullOrWhiteSpace(requestDto.FilterConditionJson))
             {
-                filterCondition = JsonConvert.DeserializeObject<AdministrativeAccountingMapperRequestDto>(requestDto.FilterConditionJson);
+                filterCondition = JsonConvert.DeserializeObject<AdministrativeAccountingMapperDetailsDto>(requestDto.FilterConditionJson);
             }
 
             var ccList = await _dbContext.Queryable<AdministrativeAccountingMapper>()
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.AccOrgCode), (pro) => pro.ZAORGNO.Contains(filterCondition.AccOrgCode))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.AccOrgId), (pro) => pro.ZAID.Contains(filterCondition.AccOrgId))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.AdministrativeOrgCode), (pro) => pro.ZORGCODE.Contains(filterCondition.AdministrativeOrgCode))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.CreateTime.ToString()), (pro) => Convert.ToDateTime(pro.CreateTime).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.CreateTime).ToString("yyyy-MM-dd"))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.UpdateTime.ToString()), (pro) => Convert.ToDateTime(pro.UpdateTime).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.UpdateTime).ToString("yyyy-MM-dd"))
                 .Where((cc) => cc.IsDelete == 1)
                 .Select((cc) => new AdministrativeAccountingMapperDetailsDto
                 {
@@ -1953,13 +2281,40 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
             RefAsync<int> total = 0;
 
             //过滤条件
-            EscrowOrganizationRequestDto filterCondition = new();
+            EscrowOrganizationDetailsDto filterCondition = new();
             if (!string.IsNullOrWhiteSpace(requestDto.FilterConditionJson))
             {
-                filterCondition = JsonConvert.DeserializeObject<EscrowOrganizationRequestDto>(requestDto.FilterConditionJson);
+                filterCondition = JsonConvert.DeserializeObject<EscrowOrganizationDetailsDto>(requestDto.FilterConditionJson);
             }
 
             var ccList = await _dbContext.Queryable<EscrowOrganization>()
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Country), (pro) => pro.CAREA.Contains(filterCondition.Country))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.IsIndependenceAcc), (pro) => pro.IS_INDEPENDENT.Contains(filterCondition.IsIndependenceAcc))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.LocationOfOrg), (pro) => pro.ORGPROVINCE.Contains(filterCondition.LocationOfOrg))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Name), (pro) => pro.NAME.Contains(filterCondition.Name))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.NameEnglish), (pro) => pro.ENGLISHNAME.Contains(filterCondition.NameEnglish))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.NameLLanguage), (pro) => pro.ZZTNAME_LOC.Contains(filterCondition.NameLLanguage))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.OrgStatus), (pro) => pro.STATUS.Contains(filterCondition.OrgStatus))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.RegionalAttr), (pro) => pro.TERRITORYPRO.Contains(filterCondition.RegionalAttr))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Remark), (pro) => pro.NOTE.Contains(filterCondition.Remark))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Shareholding), (pro) => pro.SHAREHOLDINGS.Contains(filterCondition.Shareholding))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ShortNameChinese), (pro) => pro.SHORTNAME.Contains(filterCondition.ShortNameChinese))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.TelAddress), (pro) => pro.ZADDRESS.Contains(filterCondition.TelAddress))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.HROrgMDCode), (pro) => pro.OID.Contains(filterCondition.HROrgMDCode))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.OrgAttr), (pro) => pro.TYPE.Contains(filterCondition.OrgAttr))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.OrgChildAttr), (pro) => pro.TYPEEXT.Contains(filterCondition.OrgChildAttr))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.OrgCode), (pro) => pro.OCODE.Contains(filterCondition.OrgCode))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.OrgGruleCode), (pro) => pro.ORULE.Contains(filterCondition.OrgGruleCode))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.OrgMDCode), (pro) => pro.MDM_CODE.Contains(filterCondition.OrgMDCode))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.RegistrationNo), (pro) => pro.REGISTERCODE.Contains(filterCondition.RegistrationNo))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ShortNameEnglish), (pro) => pro.ENGLISHSHORTNAME.Contains(filterCondition.ShortNameEnglish))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ShortNameLLanguage), (pro) => pro.ZZTSHNAME_LOC.Contains(filterCondition.ShortNameLLanguage))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.SupHROrgMDCode), (pro) => pro.POID.Contains(filterCondition.SupHROrgMDCode))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.SupOrgMDCode), (pro) => pro.ZORGUP.Contains(filterCondition.SupOrgMDCode))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.TreeLevel), (pro) => pro.GRADE.Contains(filterCondition.TreeLevel))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.UnitSec), (pro) => pro.GPOID.Contains(filterCondition.UnitSec))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.CreateTime.ToString()), (pro) => Convert.ToDateTime(pro.CreateTime).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.CreateTime).ToString("yyyy-MM-dd"))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.UpdateTime.ToString()), (pro) => Convert.ToDateTime(pro.UpdateTime).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.UpdateTime).ToString("yyyy-MM-dd"))
                 .Where((cc) => cc.IsDelete == 1)
                 .Select((cc) => new EscrowOrganizationDetailsDto
                 {
@@ -2056,13 +2411,29 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
             RefAsync<int> total = 0;
 
             //过滤条件
-            BusinessNoCpportunityRequestDto filterCondition = new();
+            BusinessNoCpportunityDetailsDto filterCondition = new();
             if (!string.IsNullOrWhiteSpace(requestDto.FilterConditionJson))
             {
-                filterCondition = JsonConvert.DeserializeObject<BusinessNoCpportunityRequestDto>(requestDto.FilterConditionJson);
+                filterCondition = JsonConvert.DeserializeObject<BusinessNoCpportunityDetailsDto>(requestDto.FilterConditionJson);
             }
 
             var ccList = await _dbContext.Queryable<BusinessCpportunity>()
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Country), (pro) => pro.ZZCOUNTRY.Contains(filterCondition.Country))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.BPjectForeignName), (pro) => pro.ZBOPN_EN.Contains(filterCondition.BPjectForeignName))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.BPjectMDCode), (pro) => pro.ZBOP.Contains(filterCondition.BPjectMDCode))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Name), (pro) => pro.ZBOPN.Contains(filterCondition.Name))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.PjectType), (pro) => pro.ZPROJTYPE.Contains(filterCondition.PjectType))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.QualificationUnit), (pro) => pro.ZORG_QUAL.Contains(filterCondition.QualificationUnit))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.State), (pro) => pro.ZSTATE.Contains(filterCondition.State))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.TaxationMethod), (pro) => pro.ZTAXMETHOD.Contains(filterCondition.TaxationMethod))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.BTypeOfCCCCProjects), (pro) => pro.ZCPBC.Contains(filterCondition.BTypeOfCCCCProjects))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ParticipatingUnits), (pro) => pro.ZCY2NDORG.Contains(filterCondition.ParticipatingUnits))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.PjectLocation), (pro) => pro.ZPROJLOC.Contains(filterCondition.PjectLocation))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.StartTrackingDate), (pro) => pro.ZSFOLDATE.Contains(filterCondition.StartTrackingDate))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.TrackingUnit), (pro) => pro.ZORG.Contains(filterCondition.TrackingUnit))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.UnitSec), (pro) => pro.Z2NDORG.Contains(filterCondition.UnitSec))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.CreateTime.ToString()), (pro) => Convert.ToDateTime(pro.CreateTime).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.CreateTime).ToString("yyyy-MM-dd"))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.UpdateTime.ToString()), (pro) => Convert.ToDateTime(pro.UpdateTime).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.UpdateTime).ToString("yyyy-MM-dd"))
                 .WhereIF((isJingWai), (cc) => cc.ZZCOUNTRY == "142")
                 .WhereIF((!isJingWai), (cc) => cc.ZZCOUNTRY != "142")
                 .Where((cc) => cc.IsDelete == 1)
@@ -2134,13 +2505,21 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
             RefAsync<int> total = 0;
 
             //过滤条件
-            AdministrativeDivisionRequestDto filterCondition = new();
+            AdministrativeDivisionDetailsDto filterCondition = new();
             if (!string.IsNullOrWhiteSpace(requestDto.FilterConditionJson))
             {
-                filterCondition = JsonConvert.DeserializeObject<AdministrativeDivisionRequestDto>(requestDto.FilterConditionJson);
+                filterCondition = JsonConvert.DeserializeObject<AdministrativeDivisionDetailsDto>(requestDto.FilterConditionJson);
             }
 
             var ccList = await _dbContext.Queryable<AdministrativeDivision>()
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.CodeOfCCCCRegional), (pro) => pro.ZCRHCODE.Contains(filterCondition.CodeOfCCCCRegional))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.RegionalismCode), (pro) => pro.ZADDVSCODE.Contains(filterCondition.RegionalismCode))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.RegionalismLevel), (pro) => pro.ZADDVSLEVEL.Contains(filterCondition.RegionalismLevel))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Name), (pro) => pro.ZADDVSNAME.Contains(filterCondition.Name))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.State), (pro) => pro.ZSTATE.Contains(filterCondition.State))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.SupRegionalismCode), (pro) => pro.ZADDVSUP.Contains(filterCondition.SupRegionalismCode))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.CreateTime.ToString()), (pro) => Convert.ToDateTime(pro.CreateTime).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.CreateTime).ToString("yyyy-MM-dd"))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.UpdateTime.ToString()), (pro) => Convert.ToDateTime(pro.UpdateTime).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.UpdateTime).ToString("yyyy-MM-dd"))
                 .Where((cc) => cc.IsDelete == 1)
                 .Select((cc) => new AdministrativeDivisionDetailsDto
                 {
@@ -2198,13 +2577,83 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
             RefAsync<int> total = 0;
 
             //过滤条件
-            AccountingOrganizationRequestDto filterCondition = new();
+            AccountingOrganizationDetailsDto filterCondition = new();
             if (!string.IsNullOrWhiteSpace(requestDto.FilterConditionJson))
             {
-                filterCondition = JsonConvert.DeserializeObject<AccountingOrganizationRequestDto>(requestDto.FilterConditionJson);
+                filterCondition = JsonConvert.DeserializeObject<AccountingOrganizationDetailsDto>(requestDto.FilterConditionJson);
             }
 
             var ccList = await _dbContext.Queryable<AccountingOrganization>()
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.MDM_CODE), (pro) => pro.MDM_CODE.Contains(filterCondition.MDM_CODE))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZACNAME_CHS), (pro) => pro.ZACNAME_CHS.Contains(filterCondition.ZACNAME_CHS))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZACNAME_EN), (pro) => pro.ZACNAME_EN.Contains(filterCondition.ZACNAME_EN))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZACNAME_LOC), (pro) => pro.ZACNAME_LOC.Contains(filterCondition.ZACNAME_LOC))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZACO), (pro) => pro.ZACO.Contains(filterCondition.ZACO))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZACSHORTNAME_CHS), (pro) => pro.ZACSHORTNAME_CHS.Contains(filterCondition.ZACSHORTNAME_CHS))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZACSHORTNAME_EN), (pro) => pro.ZACSHORTNAME_EN.Contains(filterCondition.ZACSHORTNAME_EN))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZACSHORTNAME_LOC), (pro) => pro.ZACSHORTNAME_LOC.Contains(filterCondition.ZACSHORTNAME_LOC))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZBRGZW), (pro) => pro.ZBRGZW.Contains(filterCondition.ZBRGZW))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZBRHW), (pro) => pro.ZBRHW.Contains(filterCondition.ZBRHW))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZCONTINENTCODE), (pro) => pro.ZCONTINENTCODE.Contains(filterCondition.ZCONTINENTCODE))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZCYNAME), (pro) => pro.ZCYNAME.Contains(filterCondition.ZCYNAME))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZHTE), (pro) => pro.ZHTE.Contains(filterCondition.ZHTE))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZH_IN_OUT), (pro) => pro.ZH_IN_OUT.Contains(filterCondition.ZH_IN_OUT))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZOSTATE), (pro) => pro.ZOSTATE.Contains(filterCondition.ZOSTATE))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZREMARK), (pro) => pro.ZREMARK.Contains(filterCondition.ZREMARK))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZRPNATURE), (pro) => pro.ZRPNATURE.Contains(filterCondition.ZRPNATURE))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZYORGSTATE), (pro) => pro.ZYORGSTATE.Contains(filterCondition.ZYORGSTATE))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZZTNAME_EN), (pro) => pro.ZZTNAME_EN.Contains(filterCondition.ZZTNAME_EN))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZZTNAME_LOC), (pro) => pro.ZZTNAME_LOC.Contains(filterCondition.ZZTNAME_LOC))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZZTNAME_ZH), (pro) => pro.ZZTNAME_ZH.Contains(filterCondition.ZZTNAME_ZH))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZZTSHNAME_CHS), (pro) => pro.ZZTSHNAME_CHS.Contains(filterCondition.ZZTSHNAME_CHS))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZZTSHNAME_EN), (pro) => pro.ZZTSHNAME_EN.Contains(filterCondition.ZZTSHNAME_EN))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZZTSHNAME_LOC), (pro) => pro.ZZTSHNAME_LOC.Contains(filterCondition.ZZTSHNAME_LOC))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZACCOUNT_DATE), (pro) => pro.ZACCOUNT_DATE.Contains(filterCondition.ZACCOUNT_DATE))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZACDISABLEYEAR), (pro) => pro.ZACDISABLEYEAR.Contains(filterCondition.ZACDISABLEYEAR))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZACID), (pro) => pro.ZACID.Contains(filterCondition.ZACID))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZACISDETAIL), (pro) => pro.ZACISDETAIL.Contains(filterCondition.ZACISDETAIL))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZACJTHBFWN), (pro) => pro.ZACJTHBFWN.Contains(filterCondition.ZACJTHBFWN))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZACLAYER), (pro) => pro.ZACLAYER.Contains(filterCondition.ZACLAYER))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZACORGNO), (pro) => pro.ZACORGNO.Contains(filterCondition.ZACORGNO))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZACPARENTCODE), (pro) => pro.ZACPARENTCODE.Contains(filterCondition.ZACPARENTCODE))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZACPARENTID), (pro) => pro.ZACPARENTID.Contains(filterCondition.ZACPARENTID))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZACPATH), (pro) => pro.ZACPATH.Contains(filterCondition.ZACPATH))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZACSORTORDER), (pro) => pro.ZACSORTORDER.Contains(filterCondition.ZACSORTORDER))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZAORGSTATE), (pro) => pro.ZAORGSTATE.Contains(filterCondition.ZAORGSTATE))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZAPPROVAL_ORG), (pro) => pro.ZAPPROVAL_ORG.Contains(filterCondition.ZAPPROVAL_ORG))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZBBID), (pro) => pro.ZBBID.Contains(filterCondition.ZBBID))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZBTID), (pro) => pro.ZBTID.Contains(filterCondition.ZBTID))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZBUSINESS_RECOCATION), (pro) => pro.ZBUSINESS_RECOCATION.Contains(filterCondition.ZBUSINESS_RECOCATION))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZTREEID), (pro) => pro.ZTREEID.Contains(filterCondition.ZTREEID))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZBUSINESS_UNIT), (pro) => pro.ZBUSINESS_UNIT.Contains(filterCondition.ZBUSINESS_UNIT))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZCWYGL), (pro) => pro.ZCWYGL.Contains(filterCondition.ZCWYGL))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZCWYGL_REA), (pro) => pro.ZCWYGL_REA.Contains(filterCondition.ZCWYGL_REA))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZDCID), (pro) => pro.ZDCID.Contains(filterCondition.ZDCID))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZDEL_MAP), (pro) => pro.ZDEL_MAP.Contains(filterCondition.ZDEL_MAP))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZDEL_REA), (pro) => pro.ZDEL_REA.Contains(filterCondition.ZDEL_REA))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZIVFLGID), (pro) => pro.ZIVFLGID.Contains(filterCondition.ZIVFLGID))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZNBFYL), (pro) => pro.ZNBFYL.Contains(filterCondition.ZNBFYL))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZORGATTR), (pro) => pro.ZORGATTR.Contains(filterCondition.ZORGATTR))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZORGCHILDATTR), (pro) => pro.ZORGCHILDATTR.Contains(filterCondition.ZORGCHILDATTR))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZORGLOC), (pro) => pro.ZORGLOC.Contains(filterCondition.ZORGLOC))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZQYBBDAT), (pro) => pro.ZQYBBDAT.Contains(filterCondition.ZQYBBDAT))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZREGIONAL), (pro) => pro.ZREGIONAL.Contains(filterCondition.ZREGIONAL))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZREPORT_FLAG), (pro) => pro.ZREPORT_FLAG.Contains(filterCondition.ZREPORT_FLAG))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZREPORT_NODE), (pro) => pro.ZREPORT_NODE.Contains(filterCondition.ZREPORT_NODE))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZREPORT_TIME), (pro) => pro.ZREPORT_TIME.Contains(filterCondition.ZREPORT_TIME))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZRULE), (pro) => pro.ZRULE.Contains(filterCondition.ZRULE))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZSCENTER), (pro) => pro.ZSCENTER.Contains(filterCondition.ZSCENTER))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZSNO), (pro) => pro.ZSNO.Contains(filterCondition.ZSNO))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZTAXMETHOD), (pro) => pro.ZTAXMETHOD.Contains(filterCondition.ZTAXMETHOD))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZTAXPAYER_CATEGORY), (pro) => pro.ZTAXPAYER_CATEGORY.Contains(filterCondition.ZTAXPAYER_CATEGORY))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZTAX_ORGANIZATION), (pro) => pro.ZTAX_ORGANIZATION.Contains(filterCondition.ZTAX_ORGANIZATION))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZTORG), (pro) => pro.ZTORG.Contains(filterCondition.ZTORG))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZTREEVER), (pro) => pro.ZTREEVER.Contains(filterCondition.ZTREEVER))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZTRNO), (pro) => pro.ZTRNO.Contains(filterCondition.ZTRNO))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZUNAME), (pro) => pro.ZUNAME.Contains(filterCondition.ZUNAME))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZZCURRENCY), (pro) => pro.ZZCURRENCY.Contains(filterCondition.ZZCURRENCY))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.CreateTime.ToString()), (pro) => Convert.ToDateTime(pro.CreateTime).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.CreateTime).ToString("yyyy-MM-dd"))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.UpdateTime.ToString()), (pro) => Convert.ToDateTime(pro.UpdateTime).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.UpdateTime).ToString("yyyy-MM-dd"))
                 .Where((cc) => cc.IsDelete == 1)
                 .Select((cc) => new AccountingOrganizationDetailsDto
                 {
@@ -2386,13 +2835,21 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
             RefAsync<int> total = 0;
 
             //过滤条件
-            CurrencyRequestDto filterCondition = new();
+            CurrencyDetailsDto filterCondition = new();
             if (!string.IsNullOrWhiteSpace(requestDto.FilterConditionJson))
             {
-                filterCondition = JsonConvert.DeserializeObject<CurrencyRequestDto>(requestDto.FilterConditionJson);
+                filterCondition = JsonConvert.DeserializeObject<CurrencyDetailsDto>(requestDto.FilterConditionJson);
             }
 
             var ccList = await _dbContext.Queryable<Currency>()
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.State), (pro) => pro.ZSTATE.Contains(filterCondition.State))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Name), (pro) => pro.ZCURRENCYNAME.Contains(filterCondition.Name))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Code), (pro) => pro.ZCURRENCYCODE.Contains(filterCondition.Code))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.LetterCode), (pro) => pro.ZCURRENCYALPHABET.Contains(filterCondition.LetterCode))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.StandardName), (pro) => pro.STANDARDNAMEE.Contains(filterCondition.StandardName))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Remark), (pro) => pro.ZREMARKS.Contains(filterCondition.Remark))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.CreateTime.ToString()), (pro) => Convert.ToDateTime(pro.CreateTime).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.CreateTime).ToString("yyyy-MM-dd"))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.UpdateTime.ToString()), (pro) => Convert.ToDateTime(pro.UpdateTime).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.UpdateTime).ToString("yyyy-MM-dd"))
                 .Where((cc) => cc.IsDelete == 1)
                 .Select((cc) => new CurrencyDetailsDto
                 {
@@ -2450,13 +2907,21 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
             RefAsync<int> total = 0;
 
             //过滤条件
-            ValueDomainRequestDto filterCondition = new();
+            ValueDomainReceiveResponseDto filterCondition = new();
             if (!string.IsNullOrWhiteSpace(requestDto.FilterConditionJson))
             {
-                filterCondition = JsonConvert.DeserializeObject<ValueDomainRequestDto>(requestDto.FilterConditionJson);
+                filterCondition = JsonConvert.DeserializeObject<ValueDomainReceiveResponseDto>(requestDto.FilterConditionJson);
             }
 
             var ccList = await _dbContext.Queryable<ValueDomain>()
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZDOM_CODE), (pro) => pro.ZDOM_CODE.Contains(filterCondition.ZDOM_CODE))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZDOM_DESC), (pro) => pro.ZDOM_DESC.Contains(filterCondition.ZDOM_DESC))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZDOM_NAME), (pro) => pro.ZDOM_NAME.Contains(filterCondition.ZDOM_NAME))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZDOM_SUP), (pro) => pro.ZDOM_SUP.Contains(filterCondition.ZDOM_SUP))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZDOM_VALUE), (pro) => pro.ZDOM_VALUE.Contains(filterCondition.ZDOM_VALUE))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZREMARKS), (pro) => pro.ZREMARKS.Contains(filterCondition.ZREMARKS))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.CreateTime.ToString()), (pro) => Convert.ToDateTime(pro.CreateTime).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.CreateTime).ToString("yyyy-MM-dd"))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.UpdateTime.ToString()), (pro) => Convert.ToDateTime(pro.UpdateTime).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.UpdateTime).ToString("yyyy-MM-dd"))
                 .Where((cc) => cc.IsDelete == 1)
                 .Select((cc) => new ValueDomainReceiveResponseDto
                 {
@@ -2467,7 +2932,9 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     ZDOM_SUP = cc.ZDOM_SUP,
                     ZDOM_VALUE = cc.ZDOM_VALUE,
                     ZREMARKS = cc.ZREMARKS,
-                    ZVERSION = cc.ZVERSION
+                    ZVERSION = cc.ZVERSION,
+                    CreateTime = cc.CreateTime,
+                    UpdateTime = cc.UpdateTime
                 })
                 .ToPageListAsync(requestDto.PageIndex, requestDto.PageSize, total);
 
@@ -2475,5 +2942,1089 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
             responseAjaxResult.SuccessResult(ccList);
             return responseAjaxResult;
         }
+
+        #region 条件筛选格式数据
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="table">表</param>
+        /// <returns></returns>
+        public async Task<ResponseAjaxResult<List<FilterConditionDto>>> GetUserFilterColumnsAsync(int table)
+        {
+            ResponseAjaxResult<List<FilterConditionDto>> responseAjaxResult = new();
+            List<FilterConditionDto> options = new();
+
+            //获取表所有列
+            List<string> tableColumns = new();
+            //整合所有需要筛选的列
+            List<string> allColumns = new();
+
+            //值域数据
+            var valDomain = await _dbContext.Queryable<ValueDomain>()
+                .Where(t => t.IsDelete == 1)
+                .Select(t => new FilterChildData
+                {
+                    Code = t.ZDOM_CODE,
+                    Desc = t.ZDOM_DESC,
+                    Key = t.ZDOM_VALUE,
+                    Val = t.ZDOM_NAME
+                }).ToListAsync();
+
+            //国家
+            var countrys = await _dbContext.Queryable<CountryRegion>()
+                .Where(t => t.IsDelete == 1)
+                .Select(t => new FilterChildData
+                {
+                    Key = t.ZCOUNTRYCODE,
+                    Val = t.ZCOUNTRYNAME
+                })
+                .ToListAsync();
+
+            #region 查询初始化
+
+            switch (table)
+            {
+                case 1:
+                    allColumns = new List<string> { "CreateTime", "UpdateTime", "CountryRegion", "SEX", "Enable", "Nationality", "Nation", "EmpSort" };
+                    var properties = GetProperties<UserSearchDetailsDto>();
+                    foreach (var property in properties) { tableColumns.Add(property.Name); }
+                    foreach (var item in tableColumns)
+                    {
+                        if (allColumns.Contains(item))
+                        {
+                            List<FilterChildData> optionsChild = new();
+                            string type = string.Empty;
+                            string columnName = string.Empty;
+                            if (item.Contains("CreateTime") || item.Contains("UpdateTime"))
+                            {
+                                columnName = item == "CreateTime" ? "创建时间" : "修改时间";
+                                type = "Time";//时间
+                            }
+                            else if (item.Contains("CountryRegion") || item.Contains("Nationality"))
+                            {
+                                type = "Check";//复选
+                                columnName = "国家/地区";
+                                optionsChild = countrys;
+                            }
+                            else if (item.Contains("SEX"))
+                            {
+                                columnName = "性别";
+                                type = "Single";//单选
+                                optionsChild = valDomain.Where(x => x.Code == "ZGENDER").ToList();
+                            }
+                            else if (item.Contains("Enable"))
+                            {
+                                columnName = "启用状态";
+                                type = "Single";//单选
+                                optionsChild = valDomain.Where(x => x.Code == "ZPSTATE").ToList();
+                            }
+                            else if (item.Contains("Nation"))
+                            {
+                                columnName = "民族";
+                                type = "Check";//复选
+                                optionsChild = valDomain.Where(x => x.Code == "ZNATION").ToList();
+                            }
+                            else if (item.Contains("EmpSort"))
+                            {
+                                columnName = "用工类型";
+                                type = "Check";//复选
+                                optionsChild = valDomain.Where(x => x.Code == "ZEMPTYPE").ToList();
+                            }
+                            options.Add(new FilterConditionDto { CoulmnKey = item, Options = optionsChild, Type = type });
+                        }
+                    }
+                    break;
+                case 2:
+                    allColumns = new List<string> { "CreateTime", "UpdateTime", "EntClass", "Status", "BizType", "Type", "TypeExt", "OrgProvince", "Carea", "TerritoryPro", "ShareHoldings", "IsIndependent" };
+                    var properties2 = GetProperties<InstitutionDetatilsDto>();
+                    foreach (var property in properties2) { tableColumns.Add(property.Name); }
+                    foreach (var item in tableColumns)
+                    {
+                        if (allColumns.Contains(item))
+                        {
+                            List<FilterChildData> optionsChild = new();
+                            string type = string.Empty;
+                            string columnName = string.Empty;
+                            if (item.Contains("CreateTime") || item.Contains("UpdateTime"))
+                            {
+                                columnName = item == "CreateTime" ? "创建时间" : "修改时间";
+                                type = "Time";//时间
+                            }
+                            else if (item.Contains("EntClass"))
+                            {
+                                type = "Check";
+                                columnName = "企业分类";
+                                optionsChild = valDomain.Where(x => x.Code == "ZENTC").ToList();
+                            }
+                            else if (item.Contains("Status"))
+                            {
+                                columnName = "机构状态";
+                                type = "Check";
+                                optionsChild = valDomain.Where(x => x.Code == "ZORGSTATE").ToList();
+                            }
+                            else if (item.Contains("BizType"))
+                            {
+                                columnName = "机构业务类型";
+                                type = "Check";
+                                //optionsChild = valDomain.Where(x => x.Code == "ZPSTATE").ToList();
+                            }
+                            else if (item.Contains("Type"))
+                            {
+                                columnName = "机构属性";
+                                type = "Check";
+                                optionsChild = valDomain.Where(x => x.Code == "ZORGATTR").ToList();
+                            }
+                            else if (item.Contains("TypeExt"))
+                            {
+                                columnName = "机构子属性";
+                                type = "Check";
+                                optionsChild = valDomain.Where(x => x.Code == "ZORGCHILDATTR").ToList();
+                            }
+                            else if (item.Contains("OrgProvince"))
+                            {
+                                columnName = "机构所在地";
+                                type = "Check";
+                            }
+                            else if (item.Contains("Carea"))
+                            {
+                                columnName = "国家名称";
+                                type = "Check";
+                                optionsChild = countrys;
+                            }
+                            else if (item.Contains("TerritoryPro"))
+                            {
+                                columnName = "地域属性";
+                                type = "Check";
+                            }
+                            else if (item.Contains("ShareHoldings"))
+                            {
+                                columnName = "持股情况";
+                                type = "Check";
+                                optionsChild = valDomain.Where(x => x.Code == "ZHOLDING").ToList();
+                            }
+                            else if (item.Contains("IsIndependent"))
+                            {
+                                columnName = "是否独立核算";
+                                type = "Single";
+                                optionsChild = valDomain.Where(x => x.Code == "ZCHECKIND").ToList();
+                            }
+                            options.Add(new FilterConditionDto { CoulmnKey = item, Options = optionsChild, Type = type });
+                        }
+                    }
+                    break;
+                case 3:
+                    allColumns = new List<string> { "CreateTime", "UpdateTime", "PlanStartDate", "PlanCompletionDate", "TradingSituation", "StartDateOfInsure", "EndDateOfInsure", "Country", "FundEstablishmentDate", "FundExpirationDate", "LeaseStartDate", "DueDate", "TaxMethod", "OrgMethod", "ConsolidatedTable" };
+                    var properties3 = GetProperties<ProjectDetailsDto>();
+                    foreach (var property in properties3) { tableColumns.Add(property.Name); }
+                    foreach (var item in tableColumns)
+                    {
+                        if (allColumns.Contains(item))
+                        {
+                            List<FilterChildData> optionsChild = new();
+                            string type = string.Empty;
+                            string columnName = string.Empty;
+                            if (item.Contains("CreateTime") || item.Contains("UpdateTime"))
+                            {
+                                columnName = item == "CreateTime" ? "创建时间" : "修改时间";
+                                type = "Time";//时间
+                            }
+                            else if (item.Contains("PlanStartDate"))
+                            {
+                                type = "NumberTime";
+                                columnName = "项目计划开始日期";
+                            }
+                            else if (item.Contains("PlanCompletionDate"))
+                            {
+                                columnName = "项目计划完成日期";
+                                type = "NumberTime";
+                            }
+                            else if (item.Contains("TradingSituation"))
+                            {
+                                columnName = "操盘情况";
+                                type = "Check";
+                                optionsChild = valDomain.Where(x => x.Code == "ZTRADER").ToList();
+                            }
+                            else if (item.Contains("StartDateOfInsure"))
+                            {
+                                columnName = "保险起始日期";
+                                type = "NumberTime";
+                            }
+                            else if (item.Contains("EndDateOfInsure"))
+                            {
+                                columnName = "保险终止日期";
+                                type = "NumberTime";
+                            }
+                            else if (item.Contains("Country"))
+                            {
+                                columnName = "国家/地区";
+                                type = "Check";
+                                optionsChild = countrys;
+                            }
+                            else if (item.Contains("FundEstablishmentDate"))
+                            {
+                                columnName = "基金成立日期";
+                                type = "NumberTime";
+                            }
+                            else if (item.Contains("FundExpirationDate"))
+                            {
+                                columnName = "基金到期日期";
+                                type = "NumberTime";
+                            }
+                            else if (item.Contains("LeaseStartDate"))
+                            {
+                                columnName = "起租日期";
+                                type = "NumberTime";
+                            }
+                            else if (item.Contains("DueDate"))
+                            {
+                                columnName = "到期日期";
+                                type = "NumberTime";
+                            }
+                            else if (item.Contains("TaxMethod"))
+                            {
+                                columnName = "计税方式";
+                                type = "Check";
+                                optionsChild = valDomain.Where(x => x.Code == "ZTAXMETHOD").ToList();
+                            }
+                            else if (item.Contains("OrgMethod"))
+                            {
+                                columnName = "项目组织形式";
+                                type = "Check";
+                            }
+                            else if (item.Contains("ConsolidatedTable"))
+                            {
+                                columnName = "并表情况";
+                                type = "Check";
+                                optionsChild = valDomain.Where(x => x.Code == "ZCS").ToList();
+                            }
+                            options.Add(new FilterConditionDto { CoulmnKey = item, Options = optionsChild, Type = type });
+                        }
+                    }
+                    break;
+                case 4:
+                    allColumns = new List<string> { "CreateTime", "UpdateTime", "CategoryUnit", "Country", "Province", "City", "County", "EnterpriseNature", "TypeOfUnit", "ChangeTime", "StatusOfUnit" };
+                    var properties4 = GetProperties<CorresUnitDetailsDto>();
+                    foreach (var property in properties4) { tableColumns.Add(property.Name); }
+                    foreach (var item in tableColumns)
+                    {
+                        if (allColumns.Contains(item))
+                        {
+                            List<FilterChildData> optionsChild = new();
+                            string type = string.Empty;
+                            string columnName = string.Empty;
+                            if (item.Contains("CreateTime") || item.Contains("UpdateTime"))
+                            {
+                                columnName = item == "CreateTime" ? "创建时间" : "修改时间";
+                                type = "Time";//时间
+                            }
+                            else if (item.Contains("CategoryUnit"))
+                            {
+                                type = "Check";
+                                columnName = "往来单位类别";
+                                optionsChild = valDomain.Where(x => x.Code == "ZBPNATURE").ToList();
+                            }
+                            else if (item.Contains("Province"))
+                            {
+                                columnName = "省";
+                                type = "Check";
+                            }
+                            else if (item.Contains("Country"))
+                            {
+                                columnName = "国家/地区";
+                                type = "Check";
+                                optionsChild = countrys;
+                            }
+                            else if (item.Contains("City"))
+                            {
+                                columnName = "市";
+                                type = "Check";
+                            }
+                            else if (item.Contains("County"))
+                            {
+                                columnName = "县";
+                                type = "Check";
+                            }
+                            else if (item.Contains("EnterpriseNature"))
+                            {
+                                columnName = "企业性质";
+                                type = "Check";
+                            }
+                            else if (item.Contains("TypeOfUnit"))
+                            {
+                                columnName = "往来单位类型";
+                                type = "Check";
+                            }
+                            else if (item.Contains("ChangeTime"))
+                            {
+                                columnName = "修改时间";
+                                type = "NumberTime";
+                            }
+                            else if (item.Contains("StatusOfUnit"))
+                            {
+                                columnName = "往来单位状态";
+                                type = "Check";
+                            }
+                            options.Add(new FilterConditionDto { CoulmnKey = item, Options = optionsChild, Type = type });
+                        }
+                    }
+                    break;
+                case 5:
+                    allColumns = new List<string> { "CreateTime", "UpdateTime", "RoadGuoZiW", "RoadHaiW", "RoadGongJ" };
+                    var properties5 = GetProperties<CountryRegionDetailsDto>();
+                    foreach (var property in properties5) { tableColumns.Add(property.Name); }
+                    foreach (var item in tableColumns)
+                    {
+                        if (allColumns.Contains(item))
+                        {
+                            List<FilterChildData> optionsChild = new();
+                            string type = string.Empty;
+                            string columnName = string.Empty;
+                            if (item.Contains("CreateTime") || item.Contains("UpdateTime"))
+                            {
+                                columnName = item == "CreateTime" ? "创建时间" : "修改时间";
+                                type = "Time";//时间
+                            }
+                            else if (item.Contains("RoadGuoZiW"))
+                            {
+                                type = "Single";//复选
+                                columnName = " 一带一路(国资委)";
+                                optionsChild.Add(new FilterChildData { Key = "0", Val = "否" });
+                                optionsChild.Add(new FilterChildData { Key = "1", Val = "是" });
+                            }
+                            else if (item.Contains("RoadHaiW"))
+                            {
+                                columnName = "一带一路(海外)";
+                                type = "Single";//单选
+                                optionsChild.Add(new FilterChildData { Key = "0", Val = "否" });
+                                optionsChild.Add(new FilterChildData { Key = "1", Val = "是" });
+                            }
+                            else if (item.Contains("RoadGongJ"))
+                            {
+                                columnName = "一带一路(共建)";
+                                type = "Single";//单选
+                                optionsChild.Add(new FilterChildData { Key = "0", Val = "否" });
+                                optionsChild.Add(new FilterChildData { Key = "1", Val = "是" });
+                            }
+                            options.Add(new FilterConditionDto { CoulmnKey = item, Options = optionsChild, Type = type });
+                        }
+                    }
+                    break;
+                case 6:
+                    allColumns = new List<string> { "CreateTime", "UpdateTime" };
+                    var properties6 = GetProperties<CountryContinentDetailsDto>();
+                    foreach (var property in properties6) { tableColumns.Add(property.Name); }
+                    foreach (var item in tableColumns)
+                    {
+                        if (allColumns.Contains(item))
+                        {
+                            List<FilterChildData> optionsChild = new();
+                            string type = string.Empty;
+                            string columnName = string.Empty;
+                            if (item.Contains("CreateTime") || item.Contains("UpdateTime"))
+                            {
+                                columnName = item == "CreateTime" ? "创建时间" : "修改时间";
+                                type = "Time";//时间
+                            }
+                            options.Add(new FilterConditionDto { CoulmnKey = item, Options = optionsChild, Type = type });
+                        }
+                    }
+                    break;
+                case 7:
+                    allColumns = new List<string> { "CreateTime", "UpdateTime", "Country", "Province", "City", "County" };
+                    var properties7 = GetProperties<FinancialInstitutionDetailsDto>();
+                    foreach (var property in properties7) { tableColumns.Add(property.Name); }
+                    foreach (var item in tableColumns)
+                    {
+                        if (allColumns.Contains(item))
+                        {
+                            List<FilterChildData> optionsChild = new();
+                            string type = string.Empty;
+                            string columnName = string.Empty;
+                            if (item.Contains("CreateTime") || item.Contains("UpdateTime"))
+                            {
+                                columnName = item == "CreateTime" ? "创建时间" : "修改时间";
+                                type = "Time";//时间
+                            }
+                            else if (item.Contains("Country"))
+                            {
+                                columnName = "国家/地区";
+                                type = "Check";
+                                optionsChild = countrys;
+                            }
+                            else if (item.Contains("Province"))
+                            {
+                                columnName = "省";
+                                type = "Check";
+                            }
+                            else if (item.Contains("City"))
+                            {
+                                columnName = "市";
+                                type = "Check";
+                            }
+                            else if (item.Contains("County"))
+                            {
+                                columnName = "县";
+                                type = "Check";
+                            }
+                            options.Add(new FilterConditionDto { CoulmnKey = item, Options = optionsChild, Type = type });
+                        }
+                    }
+                    break;
+                case 8:
+                    allColumns = new List<string> { "CreateTime", "UpdateTime", "Level" };
+                    var properties8 = GetProperties<DeviceClassCodeDetailsDto>();
+                    foreach (var property in properties8) { tableColumns.Add(property.Name); }
+                    foreach (var item in tableColumns)
+                    {
+                        if (allColumns.Contains(item))
+                        {
+                            List<FilterChildData> optionsChild = new();
+                            string type = string.Empty;
+                            string columnName = string.Empty;
+                            if (item.Contains("CreateTime") || item.Contains("UpdateTime"))
+                            {
+                                columnName = item == "CreateTime" ? "创建时间" : "修改时间";
+                                type = "Time";//时间
+                            }
+                            else if (item.Contains("Level"))
+                            {
+                                type = "Check";//复选
+                                columnName = "分类层级";
+                                optionsChild = valDomain.Where(x => x.Code == "ZCLEVEL").ToList();
+                            }
+                            options.Add(new FilterConditionDto { CoulmnKey = item, Options = optionsChild, Type = type });
+                        }
+                    }
+                    break;
+                case 9:
+                    allColumns = new List<string> { "CreateTime", "UpdateTime" };
+                    var properties9 = GetProperties<InvoiceTypeDetailshDto>();
+                    foreach (var property in properties9) { tableColumns.Add(property.Name); }
+                    foreach (var item in tableColumns)
+                    {
+                        if (allColumns.Contains(item))
+                        {
+                            List<FilterChildData> optionsChild = new();
+                            string type = string.Empty;
+                            string columnName = string.Empty;
+                            if (item.Contains("CreateTime") || item.Contains("UpdateTime"))
+                            {
+                                columnName = item == "CreateTime" ? "创建时间" : "修改时间";
+                                type = "Time";//时间
+                            }
+                            options.Add(new FilterConditionDto { CoulmnKey = item, Options = optionsChild, Type = type });
+                        }
+                    }
+                    break;
+                case 10:
+                    allColumns = new List<string> { "CreateTime", "UpdateTime", "IsHighTech", "PjectState", "IsOutsourced", "TypeCode", "PlanStartDate", "PlanEndDate", "State" };
+                    var properties10 = GetProperties<ScientifiCNoProjectDetailsDto>();
+                    foreach (var property in properties10) { tableColumns.Add(property.Name); }
+                    foreach (var item in tableColumns)
+                    {
+                        if (allColumns.Contains(item))
+                        {
+                            List<FilterChildData> optionsChild = new();
+                            string type = string.Empty;
+                            string columnName = string.Empty;
+                            if (item.Contains("CreateTime") || item.Contains("UpdateTime"))
+                            {
+                                columnName = item == "CreateTime" ? "创建时间" : "修改时间";
+                                type = "Time";//时间
+                            }
+                            else if (item.Contains("IsHighTech"))
+                            {
+                                type = "Single";
+                                columnName = "是否高新项目";
+                                optionsChild.Add(new FilterChildData { Key = "0", Val = "否" });
+                                optionsChild.Add(new FilterChildData { Key = "1", Val = "是" });
+                            }
+                            else if (item.Contains("PjectState"))
+                            {
+                                columnName = "项目状态";
+                                type = "Check";//单选
+                                optionsChild = valDomain.Where(x => x.Code == "ZPSTATE").ToList();
+                            }
+                            else if (item.Contains("IsOutsourced"))
+                            {
+                                columnName = "是否委外项目";
+                                type = "Single";//单选
+                                optionsChild.Add(new FilterChildData { Key = "0", Val = "否" });
+                                optionsChild.Add(new FilterChildData { Key = "1", Val = "是" });
+                            }
+                            else if (item.Contains("TypeCode"))
+                            {
+                                columnName = "科研项目分类";
+                                type = "Single";//单选
+                                optionsChild = valDomain.Where(x => x.Code == "ZPROJTYPE").ToList();
+                            }
+                            else if (item.Contains("PlanStartDate"))
+                            {
+                                columnName = "计划开始日期";
+                                type = "NumberTime";
+                            }
+                            else if (item.Contains("PlanEndDate"))
+                            {
+                                columnName = "计划结束日期";
+                                type = "NumberTime";
+                            }
+                            else if (item.Contains("State"))
+                            {
+                                columnName = "状态";
+                                type = "Single";
+                                optionsChild.Add(new FilterChildData { Key = "0", Val = "停用" });
+                                optionsChild.Add(new FilterChildData { Key = "1", Val = "启用" });
+                            }
+                            options.Add(new FilterConditionDto { CoulmnKey = item, Options = optionsChild, Type = type });
+                        }
+                    }
+                    break;
+                case 11:
+                    allColumns = new List<string> { "CreateTime", "UpdateTime" };
+                    var properties11 = GetProperties<LanguageDetailsDto>();
+                    foreach (var property in properties11) { tableColumns.Add(property.Name); }
+                    foreach (var item in tableColumns)
+                    {
+                        if (allColumns.Contains(item))
+                        {
+                            List<FilterChildData> optionsChild = new();
+                            string type = string.Empty;
+                            string columnName = string.Empty;
+                            if (item.Contains("CreateTime") || item.Contains("UpdateTime"))
+                            {
+                                columnName = item == "CreateTime" ? "创建时间" : "修改时间";
+                                type = "Time";//时间
+                            }
+                            options.Add(new FilterConditionDto { CoulmnKey = item, Options = optionsChild, Type = type });
+                        }
+                    }
+                    break;
+                case 12:
+                    allColumns = new List<string> { "CreateTime", "UpdateTime", "Country", "Province", "City", "County" };
+                    var properties12 = GetProperties<BankCardDetailsDto>();
+                    foreach (var property in properties12) { tableColumns.Add(property.Name); }
+                    foreach (var item in tableColumns)
+                    {
+                        if (allColumns.Contains(item))
+                        {
+                            List<FilterChildData> optionsChild = new();
+                            string type = string.Empty;
+                            string columnName = string.Empty;
+                            if (item.Contains("CreateTime") || item.Contains("UpdateTime"))
+                            {
+                                columnName = item == "CreateTime" ? "创建时间" : "修改时间";
+                                type = "Time";//时间
+                            }
+                            else if (item.Contains("Country"))
+                            {
+                                columnName = "国家/地区";
+                                type = "Check";
+                                optionsChild = countrys;
+                            }
+                            else if (item.Contains("Province"))
+                            {
+                                columnName = "省";
+                                type = "Check";
+                            }
+                            else if (item.Contains("City"))
+                            {
+                                columnName = "市";
+                                type = "Check";
+                            }
+                            else if (item.Contains("County"))
+                            {
+                                columnName = "县";
+                                type = "Check";
+                            }
+                            options.Add(new FilterConditionDto { CoulmnKey = item, Options = optionsChild, Type = type });
+                        }
+                    }
+                    break;
+                case 13:
+                    allColumns = new List<string> { "CreateTime", "UpdateTime", "IsCode" };
+                    var properties13 = GetProperties<DeviceDetailCodeDetailsDto>();
+                    foreach (var property in properties13) { tableColumns.Add(property.Name); }
+                    foreach (var item in tableColumns)
+                    {
+                        if (allColumns.Contains(item))
+                        {
+                            List<FilterChildData> optionsChild = new();
+                            string type = string.Empty;
+                            string columnName = string.Empty;
+                            if (item.Contains("CreateTime") || item.Contains("UpdateTime"))
+                            {
+                                columnName = item == "CreateTime" ? "创建时间" : "修改时间";
+                                type = "Time";//时间
+                            }
+                            else if (item.Contains("IsCode"))
+                            {
+                                columnName = "是否常用编码";
+                                type = "Single";
+                                optionsChild.Add(new FilterChildData { Key = "0", Val = "否" });
+                                optionsChild.Add(new FilterChildData { Key = "1", Val = "是" });
+                            }
+                            options.Add(new FilterConditionDto { CoulmnKey = item, Options = optionsChild, Type = type });
+                        }
+                    }
+                    break;
+                case 14:
+                    allColumns = new List<string> { "CreateTime", "UpdateTime", "State" };
+                    var properties14 = GetProperties<AccountingDepartmentDetailsDto>();
+                    foreach (var property in properties14) { tableColumns.Add(property.Name); }
+                    foreach (var item in tableColumns)
+                    {
+                        if (allColumns.Contains(item))
+                        {
+                            List<FilterChildData> optionsChild = new();
+                            string type = string.Empty;
+                            string columnName = string.Empty;
+                            if (item.Contains("CreateTime") || item.Contains("UpdateTime"))
+                            {
+                                columnName = item == "CreateTime" ? "创建时间" : "修改时间";
+                                type = "Time";//时间
+                            }
+                            else if (item.Contains("State"))
+                            {
+                                columnName = "核算部门停用标志";
+                                type = "Single";
+                                optionsChild.Add(new FilterChildData { Key = "0", Val = "未停用" });
+                                optionsChild.Add(new FilterChildData { Key = "1", Val = "停用" });
+                            }
+                            options.Add(new FilterConditionDto { CoulmnKey = item, Options = optionsChild, Type = type });
+                        }
+                    }
+                    break;
+                case 15:
+                    allColumns = new List<string> { "CreateTime", "UpdateTime" };
+                    var properties15 = GetProperties<RelationalContractsDetailsDto>();
+                    foreach (var property in properties15) { tableColumns.Add(property.Name); }
+                    foreach (var item in tableColumns)
+                    {
+                        if (allColumns.Contains(item))
+                        {
+                            List<FilterChildData> optionsChild = new();
+                            string type = string.Empty;
+                            string columnName = string.Empty;
+                            if (item.Contains("CreateTime") || item.Contains("UpdateTime"))
+                            {
+                                columnName = item == "CreateTime" ? "创建时间" : "修改时间";
+                                type = "Time";//时间
+                            }
+                            options.Add(new FilterConditionDto { CoulmnKey = item, Options = optionsChild, Type = type });
+                        }
+                    }
+                    break;
+                case 16:
+                    allColumns = new List<string> { "CreateTime", "UpdateTime", "State" };
+                    var properties16 = GetProperties<RegionalDetailsDto>();
+                    foreach (var property in properties16) { tableColumns.Add(property.Name); }
+                    foreach (var item in tableColumns)
+                    {
+                        if (allColumns.Contains(item))
+                        {
+                            List<FilterChildData> optionsChild = new();
+                            string type = string.Empty;
+                            string columnName = string.Empty;
+                            if (item.Contains("CreateTime") || item.Contains("UpdateTime"))
+                            {
+                                columnName = item == "CreateTime" ? "创建时间" : "修改时间";
+                                type = "Time";//时间
+                            }
+                            else if (item.Contains("State"))
+                            {
+                                columnName = "状态";
+                                type = "Single";
+                                optionsChild.Add(new FilterChildData { Key = "0", Val = "无效" });
+                                optionsChild.Add(new FilterChildData { Key = "1", Val = "有效" });
+                            }
+                            options.Add(new FilterConditionDto { CoulmnKey = item, Options = optionsChild, Type = type });
+                        }
+                    }
+                    break;
+                case 17:
+                    allColumns = new List<string> { "CreateTime", "UpdateTime", "State" };
+                    var properties17 = GetProperties<UnitMeasurementDetailsDto>();
+                    foreach (var property in properties17) { tableColumns.Add(property.Name); }
+                    foreach (var item in tableColumns)
+                    {
+                        if (allColumns.Contains(item))
+                        {
+                            List<FilterChildData> optionsChild = new();
+                            string type = string.Empty;
+                            string columnName = string.Empty;
+                            if (item.Contains("CreateTime") || item.Contains("UpdateTime"))
+                            {
+                                columnName = item == "CreateTime" ? "创建时间" : "修改时间";
+                                type = "Time";//时间
+                            }
+                            else if (item.Contains("State"))
+                            {
+                                columnName = "状态";
+                                type = "Single";
+                                optionsChild.Add(new FilterChildData { Key = "0", Val = "无效" });
+                                optionsChild.Add(new FilterChildData { Key = "1", Val = "有效" });
+                            }
+                            options.Add(new FilterConditionDto { CoulmnKey = item, Options = optionsChild, Type = type });
+                        }
+                    }
+                    break;
+                case 18:
+                    allColumns = new List<string> { "CreateTime", "UpdateTime", "ThirdNewBType" };
+                    var properties18 = GetProperties<ProjectClassificationDetailsDto>();
+                    foreach (var property in properties18) { tableColumns.Add(property.Name); }
+                    foreach (var item in tableColumns)
+                    {
+                        if (allColumns.Contains(item))
+                        {
+                            List<FilterChildData> optionsChild = new();
+                            string type = string.Empty;
+                            string columnName = string.Empty;
+                            if (item.Contains("CreateTime") || item.Contains("UpdateTime"))
+                            {
+                                columnName = item == "CreateTime" ? "创建时间" : "修改时间";
+                                type = "Time";//时间
+                            }
+                            else if (item.Contains("State"))
+                            {
+                                columnName = "三新业务类型";
+                                type = "Single";
+                                optionsChild.Add(new FilterChildData { Key = "0", Val = "否" });
+                                optionsChild.Add(new FilterChildData { Key = "1", Val = "是" });
+                            }
+                            options.Add(new FilterConditionDto { CoulmnKey = item, Options = optionsChild, Type = type });
+                        }
+                    }
+                    break;
+                case 19:
+                    allColumns = new List<string> { "CreateTime", "UpdateTime", "State" };
+                    var properties19 = GetProperties<RegionalCenterDetailsDto>();
+                    foreach (var property in properties19) { tableColumns.Add(property.Name); }
+                    foreach (var item in tableColumns)
+                    {
+                        if (allColumns.Contains(item))
+                        {
+                            List<FilterChildData> optionsChild = new();
+                            string type = string.Empty;
+                            string columnName = string.Empty;
+                            if (item.Contains("CreateTime") || item.Contains("UpdateTime"))
+                            {
+                                columnName = item == "CreateTime" ? "创建时间" : "修改时间";
+                                type = "Time";//时间
+                            }
+                            else if (item.Contains("State"))
+                            {
+                                columnName = "状态";
+                                type = "Single";
+                                optionsChild.Add(new FilterChildData { Key = "0", Val = "无效" });
+                                optionsChild.Add(new FilterChildData { Key = "1", Val = "有效" });
+                            }
+                            options.Add(new FilterConditionDto { CoulmnKey = item, Options = optionsChild, Type = type });
+                        }
+                    }
+                    break;
+                case 20:
+                    allColumns = new List<string> { "CreateTime", "UpdateTime", "State" };
+                    var properties20 = GetProperties<NationalEconomyDetailsDto>();
+                    foreach (var property in properties20) { tableColumns.Add(property.Name); }
+                    foreach (var item in tableColumns)
+                    {
+                        if (allColumns.Contains(item))
+                        {
+                            List<FilterChildData> optionsChild = new();
+                            string type = string.Empty;
+                            string columnName = string.Empty;
+                            if (item.Contains("CreateTime") || item.Contains("UpdateTime"))
+                            {
+                                columnName = item == "CreateTime" ? "创建时间" : "修改时间";
+                                type = "Time";//时间
+                            }
+                            else if (item.Contains("State"))
+                            {
+                                columnName = "状态";
+                                type = "Single";
+                                optionsChild.Add(new FilterChildData { Key = "0", Val = "无效" });
+                                optionsChild.Add(new FilterChildData { Key = "1", Val = "有效" });
+                            }
+                            options.Add(new FilterConditionDto { CoulmnKey = item, Options = optionsChild, Type = type });
+                        }
+                    }
+                    break;
+                case 21:
+                    allColumns = new List<string> { "CreateTime", "UpdateTime" };
+                    var properties21 = GetProperties<AdministrativeAccountingMapperDetailsDto>();
+                    foreach (var property in properties21) { tableColumns.Add(property.Name); }
+                    foreach (var item in tableColumns)
+                    {
+                        if (allColumns.Contains(item))
+                        {
+                            List<FilterChildData> optionsChild = new();
+                            string type = string.Empty;
+                            string columnName = string.Empty;
+                            if (item.Contains("CreateTime") || item.Contains("UpdateTime"))
+                            {
+                                columnName = item == "CreateTime" ? "创建时间" : "修改时间";
+                                type = "Time";//时间
+                            }
+                            options.Add(new FilterConditionDto { CoulmnKey = item, Options = optionsChild, Type = type });
+                        }
+                    }
+                    break;
+                case 22:
+                    allColumns = new List<string> { "CreateTime", "UpdateTime", "OrgAttr", "OrgChildAttr", "OrgStatus", "LocationOfOrg", "Country", "RegionalAttr", "Shareholding" };
+                    var properties22 = GetProperties<EscrowOrganizationDetailsDto>();
+                    foreach (var property in properties22) { tableColumns.Add(property.Name); }
+                    foreach (var item in tableColumns)
+                    {
+                        if (allColumns.Contains(item))
+                        {
+                            List<FilterChildData> optionsChild = new();
+                            string type = string.Empty;
+                            string columnName = string.Empty;
+                            if (item.Contains("CreateTime") || item.Contains("UpdateTime"))
+                            {
+                                columnName = item == "CreateTime" ? "创建时间" : "修改时间";
+                                type = "Time";//时间
+                            }
+                            else if (item.Contains("Country"))
+                            {
+                                columnName = "国家/地区";
+                                type = "Check";
+                                optionsChild = countrys;
+                            }
+                            else if (item.Contains("OrgAttr"))
+                            {
+                                columnName = "机构属性";
+                                type = "Check";
+                                optionsChild = valDomain.Where(x => x.Code == "ZORGATTR").ToList();
+                            }
+                            else if (item.Contains("OrgChildAttr"))
+                            {
+                                columnName = "机构子属性";
+                                type = "Check";
+                                optionsChild = valDomain.Where(x => x.Code == "ZORGCHILDATTR").ToList();
+                            }
+                            else if (item.Contains("OrgStatus"))
+                            {
+                                columnName = "机构状态";
+                                type = "Check";
+                                optionsChild = valDomain.Where(x => x.Code == "ZORGSTATE").ToList();
+                            }
+                            else if (item.Contains("LocationOfOrg"))
+                            {
+                                columnName = "机构状态";
+                                type = "Check";
+                                optionsChild = valDomain.Where(x => x.Code == "ZORGATTR").ToList(); ;
+                            }
+                            else if (item.Contains("RegionalAttr"))
+                            {
+                                columnName = "地域属性";
+                                type = "Check";
+                            }
+                            else if (item.Contains("Shareholding"))
+                            {
+                                columnName = "持股情况";
+                                type = "Check";
+                                optionsChild = valDomain.Where(x => x.Code == "ZHOLDING").ToList();
+                            }
+                            options.Add(new FilterConditionDto { CoulmnKey = item, Options = optionsChild, Type = type });
+                        }
+                    }
+                    break;
+                case 23:
+                case 24:
+                    allColumns = new List<string> { "CreateTime", "UpdateTime", "Country" };
+                    var properties24 = GetProperties<BusinessNoCpportunityDetailsDto>();
+                    foreach (var property in properties24) { tableColumns.Add(property.Name); }
+                    foreach (var item in tableColumns)
+                    {
+                        if (allColumns.Contains(item))
+                        {
+                            List<FilterChildData> optionsChild = new();
+                            string type = string.Empty;
+                            string columnName = string.Empty;
+                            if (item.Contains("CreateTime") || item.Contains("UpdateTime"))
+                            {
+                                columnName = item == "CreateTime" ? "创建时间" : "修改时间";
+                                type = "Time";//时间
+                            }
+                            else if (item.Contains("Country"))
+                            {
+                                columnName = "国家/地区";
+                                type = "Check";
+                                optionsChild = countrys;
+                            }
+                            options.Add(new FilterConditionDto { CoulmnKey = item, Options = optionsChild, Type = type });
+                        }
+                    }
+                    break;
+                case 25:
+                    allColumns = new List<string> { "CreateTime", "UpdateTime", "State" };
+                    var properties25 = GetProperties<AdministrativeDivisionDetailsDto>();
+                    foreach (var property in properties25) { tableColumns.Add(property.Name); }
+                    foreach (var item in tableColumns)
+                    {
+                        if (allColumns.Contains(item))
+                        {
+                            List<FilterChildData> optionsChild = new();
+                            string type = string.Empty;
+                            string columnName = string.Empty;
+                            if (item.Contains("CreateTime") || item.Contains("UpdateTime"))
+                            {
+                                columnName = item == "CreateTime" ? "创建时间" : "修改时间";
+                                type = "Time";//时间
+                            }
+                            else if (item.Contains("Country"))
+                            {
+                                columnName = "国家/地区";
+                                type = "Check";
+                                optionsChild = countrys;
+                            }
+                            else if (item.Contains("State"))
+                            {
+                                columnName = "状态";
+                                type = "Single";
+                                optionsChild.Add(new FilterChildData { Key = "0", Val = "停用" });
+                                optionsChild.Add(new FilterChildData { Key = "1", Val = "启用" });
+                            }
+                            options.Add(new FilterConditionDto { CoulmnKey = item, Options = optionsChild, Type = type });
+                        }
+                    }
+                    break;
+                case 26:
+                    allColumns = new List<string> { "CreateTime", "UpdateTime", "ZIVFLGID", "ZREPORT_TIME", "ZAORGSTATE", "ZACDISABLEYEAR", "ZACISDETAIL", "ZCWYGL_REA", "ZHTE", "ZH_IN_OUT", "ZOSTATE", "ZCYNAME", "ZREGIONAL" };
+                    var properties26 = GetProperties<AccountingOrganizationDetailsDto>();
+                    foreach (var property in properties26) { tableColumns.Add(property.Name); }
+                    foreach (var item in tableColumns)
+                    {
+                        if (allColumns.Contains(item))
+                        {
+                            List<FilterChildData> optionsChild = new();
+                            string type = string.Empty;
+                            string columnName = string.Empty;
+                            if (item.Contains("CreateTime") || item.Contains("UpdateTime"))
+                            {
+                                columnName = item == "CreateTime" ? "创建时间" : "修改时间";
+                                type = "Time";//时间
+                            }
+                            else if (item.Contains("ZCYNAME"))
+                            {
+                                columnName = "国家/地区";
+                                type = "Check";
+                                optionsChild = countrys;
+                            }
+                            else if (item.Contains("ZIVFLGID"))
+                            {
+                                columnName = "是否投资项目";
+                                type = "Single";
+                                optionsChild.Add(new FilterChildData { Key = "0", Val = "否" });
+                                optionsChild.Add(new FilterChildData { Key = "1", Val = "是" });
+                            }
+                            else if (item.Contains("ZREPORT_TIME"))
+                            {
+                                columnName = "转入不启用报表时间";
+                                type = "NumberTime";
+                            }
+                            else if (item.Contains("ZAORGSTATE"))
+                            {
+                                columnName = "核算机构状态";
+                                type = "NumberTime";
+                                optionsChild = valDomain.Where(x => x.Code == "ZORGSTATE").ToList();
+                            }
+                            else if (item.Contains("ZACDISABLEYEAR"))
+                            {
+                                columnName = "停用日期";
+                                type = "Single";
+                                optionsChild.Add(new FilterChildData { Key = "0", Val = "否" });
+                                optionsChild.Add(new FilterChildData { Key = "1", Val = "是" });
+                            }
+                            else if (item.Contains("ZACISDETAIL"))
+                            {
+                                columnName = "是否明细";
+                                type = "Single";
+                                optionsChild.Add(new FilterChildData { Key = "0", Val = "否" });
+                                optionsChild.Add(new FilterChildData { Key = "1", Val = "是" });
+                            }
+                            else if (item.Contains("ZCWYGL_REA"))
+                            {
+                                columnName = "不启用财务云财务管理原因说明";
+                                type = "NumberTime";
+                                //optionsChild = valDomain.Where(x => x.Code == "ZORGSTATE").ToList();
+                            }
+                            else if (item.Contains("ZHTE"))
+                            {
+                                columnName = "是否高新企业";
+                                type = "Single";
+                                optionsChild.Add(new FilterChildData { Key = "0", Val = "否" });
+                                optionsChild.Add(new FilterChildData { Key = "1", Val = "是" });
+                            }
+                            else if (item.Contains("ZH_IN_OUT"))
+                            {
+                                columnName = "境内/境外";
+                                type = "Single";
+                                optionsChild.Add(new FilterChildData { Key = "0", Val = "境内" });
+                                optionsChild.Add(new FilterChildData { Key = "1", Val = "境外" });
+                            }
+                            else if (item.Contains("ZOSTATE"))
+                            {
+                                columnName = "核算机构状态";
+                                type = "NumberTime";
+                                optionsChild = valDomain.Where(x => x.Code == "ZORGSTATE").ToList();
+                            }
+                            else if (item.Contains("ZCYNAME"))
+                            {
+                                columnName = "国家/地区";
+                                type = "Check";
+                                optionsChild = countrys;
+                            }
+                            else if (item.Contains("ZREGIONAL"))
+                            {
+                                columnName = "地域属性";
+                                type = "Check";
+                            }
+                            options.Add(new FilterConditionDto { CoulmnKey = item, Options = optionsChild, Type = type });
+                        }
+                    }
+                    break;
+                case 27:
+                    allColumns = new List<string> { "State" };
+                    var properties27 = GetProperties<CurrencyDetailsDto>();
+                    foreach (var property in properties27) { tableColumns.Add(property.Name); }
+                    foreach (var item in tableColumns)
+                    {
+                        if (allColumns.Contains(item))
+                        {
+                            List<FilterChildData> optionsChild = new();
+                            string type = string.Empty;
+                            string columnName = string.Empty;
+                            if (item.Contains("State"))
+                            {
+                                columnName = "状态";
+                                type = "Single";
+                                optionsChild.Add(new FilterChildData { Key = "0", Val = "无效" });
+                                optionsChild.Add(new FilterChildData { Key = "1", Val = "有效" });
+                            }
+                            options.Add(new FilterConditionDto { CoulmnKey = item, Options = optionsChild, Type = type });
+                        }
+                    }
+                    break;
+                case 28:
+                    break;
+            }
+            #endregion
+
+            responseAjaxResult.SuccessResult(options);
+            return responseAjaxResult;
+        }
+
+        /// <summary>
+        /// 获取属性
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public static PropertyInfo[] GetProperties<T>()
+        {
+            return typeof(T).GetProperties(BindingFlags.Public | BindingFlags.Instance);
+        }
+        #endregion
     }
 }

@@ -74,6 +74,10 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.ProjectClassificatio
     public class ProjectClassificationDetailsDto
     {
         [ExcelIgnore]
+        public DateTime? CreateTime { get; set; }
+        [ExcelIgnore]
+        public DateTime? UpdateTime { get; set; }
+        [ExcelIgnore]
         public string? Id { get; set; }
         /// <summary>
         /// 中交业务分类三级分类代码

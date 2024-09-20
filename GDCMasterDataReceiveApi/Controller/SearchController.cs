@@ -601,8 +601,16 @@ namespace GDCMasterDataReceiveApi.Controller
         {
             return await _searchService.GetValueDomainReceiveAsync(requestDto);
         }
-
-
+        /// <summary>
+        /// 条件筛选列
+        /// </summary>
+        /// <param name="table"></param>
+        /// <returns></returns>
+        [HttpGet("GetUserFilterColumns")]
+        public async Task<ResponseAjaxResult<List<FilterConditionDto>>> GetUserFilterColumnsAsync([FromQuery] int table)
+        {
+            return await _searchService.GetUserFilterColumnsAsync(table);
+        }
 
     }
 }

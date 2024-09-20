@@ -30,6 +30,11 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.RegionalCenter
     /// </summary>
     public class RegionalCenterDetailsDto
     {
+
+        [ExcelIgnore]
+        public DateTime? CreateTime { get; set; }
+        [ExcelIgnore]
+        public DateTime? UpdateTime { get; set; }
         [ExcelIgnore]
         public string? Id { get; set; }
         /// <summary>

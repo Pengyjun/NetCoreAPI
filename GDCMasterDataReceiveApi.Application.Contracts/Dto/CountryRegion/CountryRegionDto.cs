@@ -44,6 +44,10 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.CountryRegion
     public class CountryRegionDetailsDto
     {
         [ExcelIgnore]
+        public DateTime? CreateTime { get; set; }
+        [ExcelIgnore]
+        public DateTime? UpdateTime { get; set; }
+        [ExcelIgnore]
         public string Id { get; set; }
         /// <summary>
         /// 国家地区代码

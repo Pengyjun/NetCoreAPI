@@ -34,6 +34,10 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.BankCard
     public class BankCardDetailsDto
     {
         [ExcelIgnore]
+        public DateTime? CreateTime { get; set; }
+        [ExcelIgnore]
+        public DateTime? UpdateTime { get; set; }
+        [ExcelIgnore]
         public string? Id { get; set; }
         /// <summary>
         /// 往来单位主数据编码:公司往来单位的唯一编码

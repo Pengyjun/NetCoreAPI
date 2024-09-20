@@ -35,6 +35,10 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.UnitMeasurement
     public class UnitMeasurementDetailsDto
     {
         [ExcelIgnore]
+        public DateTime? CreateTime { get; set; }
+        [ExcelIgnore]
+        public DateTime? UpdateTime { get; set; }
+        [ExcelIgnore]
         public string? Id { get; set; }
         /// <summary>
         /// 计量单位代码:业务主键

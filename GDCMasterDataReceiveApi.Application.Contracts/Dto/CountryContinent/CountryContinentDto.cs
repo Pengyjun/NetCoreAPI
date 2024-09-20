@@ -35,6 +35,10 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.CountryContinent
     public class CountryContinentDetailsDto
     {
         [ExcelIgnore]
+        public DateTime? CreateTime { get; set; }
+        [ExcelIgnore]
+        public DateTime? UpdateTime { get; set; }
+        [ExcelIgnore]
         public string Id { get; set; }
         /// <summary>
         /// 大洲代码：大洲代码

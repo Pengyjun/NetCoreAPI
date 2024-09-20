@@ -93,6 +93,10 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.Project
     public class ProjectDetailsDto
     {
         [ExcelIgnore]
+        public DateTime? CreateTime { get; set; }
+        [ExcelIgnore]
+        public DateTime? UpdateTime { get; set; }
+        [ExcelIgnore]
         public string Id { get; set;}
         /// <summary>
         /// 项目主数据编码
@@ -170,12 +174,12 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.Project
         [ExcelIgnore]
         public string? Year { get; set; }
         /// <summary>
-        /// 项目计划开始日期
+        /// 项目计划开始日期yyyymmdd
         /// </summary>
         [ExcelColumnName("项目计划开始日期")]
         public string? PlanStartDate { get; set; }
         /// <summary>
-        /// 项目计划完成日期
+        /// 项目计划完成日期yyyymmdd
         /// </summary>
         [ExcelColumnName("项目计划完成日期")]
         public string? PlanCompletionDate { get; set; }
@@ -200,7 +204,7 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.Project
         [ExcelColumnName("项目获取时间")]
         public string? AcquisitionTime { get; set; }
         /// <summary>
-        /// 工商变更时间
+        /// 工商变更时间yyyymmdd
         /// </summary>
         [ExcelIgnore]
         public string? BChangeTime { get; set; }
@@ -225,12 +229,12 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.Project
         [ExcelIgnore]
         public string? Applicant { get; set; }
         /// <summary>
-        /// 保险起始日期
+        /// 保险起始日期yyyymmdd
         /// </summary>
         [ExcelIgnore]
         public string? StartDateOfInsure { get; set; }
         /// <summary>
-        /// 保险终止日期
+        /// 保险终止日期yyyymmdd
         /// </summary>
         [ExcelIgnore]
         public string? EndDateOfInsure { get; set; }
@@ -270,12 +274,12 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.Project
         [ExcelIgnore]
         public string? FundManager { get; set; }
         /// <summary>
-        /// 基金成立日期
+        /// 基金成立日期yyyymmdd
         /// </summary>
         [ExcelIgnore]
         public string? FundEstablishmentDate { get; set; }
         /// <summary>
-        /// 基金到期日期
+        /// 基金到期日期yyyymmdd
         /// </summary>
         [ExcelIgnore]
         public string? FundExpirationDate { get; set; }
@@ -300,12 +304,12 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.Project
         [ExcelIgnore]
         public string? NameOfLeased { get; set; }
         /// <summary>
-        /// 起租日期
+        /// 起租日期yyyymmdd
         /// </summary>
         [ExcelIgnore]
         public string? LeaseStartDate { get; set; }
         /// <summary>
-        /// 到期日期
+        /// 到期日期yyyymmdd
         /// </summary>
         [ExcelIgnore]
         public string DueDate { get; set; }

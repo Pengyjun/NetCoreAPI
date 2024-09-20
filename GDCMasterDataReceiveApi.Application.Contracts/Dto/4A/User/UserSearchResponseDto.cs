@@ -57,6 +57,16 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto._4A.User
     public class UserSearchDetailsDto
     {
         [ExcelIgnore]
+        public DateTime? CreateTime { get; set; }
+        [ExcelIgnore]
+        public DateTime? UpdateTime { get; set; }
+        /// <summary>
+        /// ids（首页下钻）
+        /// </summary>
+        [ExcelIgnore]
+        public List<string>? Ids { get; set; }
+
+        [ExcelIgnore]
         public string Id { get; set; }
         /// <summary>
         /// 人员编码  必填,HR 系统中定义的人员唯  一编码，默认用户名
