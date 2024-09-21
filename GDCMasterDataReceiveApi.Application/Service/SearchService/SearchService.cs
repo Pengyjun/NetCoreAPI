@@ -185,6 +185,12 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     .Select(t => new UInstutionDto { Oid = t.OID, PoId = t.POID, Grule = t.GRULE, Name = t.NAME })
                     .ToListAsync();
 
+                //值域信息
+                var valDomain = await _dbContext.Queryable<ValueDomain>()
+                    .Where(t => !string.IsNullOrWhiteSpace(t.ZDOM_CODE))
+                    .Select(t => new { t.ZDOM_CODE, t.ZDOM_DESC, t.ZDOM_VALUE, t.ZDOM_NAME })
+                    .ToListAsync();
+
                 #region 处理其他基本信息数据
                 //国籍
                 var cr = userInfos.Where(x => !string.IsNullOrWhiteSpace(x.CountryRegion)).Select(x => x.CountryRegion).ToList();
@@ -198,6 +204,32 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                 var uStatus = await _dbContext.Queryable<UserStatus>().Where(t => t.IsDelete == 1 && us.Contains(t.OneCode)).Select(x => new { x.OneCode, x.OneName }).ToListAsync();
 
                 //民族
+                var nationKeys = userInfos.Select(x => x.Nation).ToList();
+                var nation = valDomain.Where(x => nationKeys.Contains(x.ZDOM_VALUE) && x.ZDOM_CODE == "ZNATION").ToList();
+
+                //用工类型
+                var empSortKeys = userInfos.Select(x => x.EmpSort).ToList();
+                var empSort = valDomain.Where(x => empSortKeys.Contains(x.ZDOM_VALUE) && x.ZDOM_CODE == "ZEMPTYPE").ToList();
+
+                //主职岗位类别
+                var jobTypeKeys = userInfos.Select(x => x.JobType).ToList();
+                var jobType = valDomain.Where(x => jobTypeKeys.Contains(x.ZDOM_VALUE) && x.ZDOM_CODE == "ZJOBTYPE").ToList();
+
+                //最高职级
+                var positionGradeKeys = userInfos.Select(x => x.PositionGrade).ToList();
+                var positionGrade = valDomain.Where(x => positionGradeKeys.Contains(x.ZDOM_VALUE) && x.ZDOM_CODE == "ZEGRADE").ToList();
+
+                //职级（新版）
+                var positionGradeNormKeys = userInfos.Select(x => x.PositionGradeNorm).ToList();
+                var positionGradeNorm = valDomain.Where(x => positionGradeNormKeys.Contains(x.ZDOM_VALUE) && x.ZDOM_CODE == "ZEGRADE").ToList();
+
+                //新版最高职级
+                var highEstGradeKeys = userInfos.Select(x => x.HighEstGrade).ToList();
+                var highEstGrade = valDomain.Where(x => highEstGradeKeys.Contains(x.ZDOM_VALUE) && x.ZDOM_CODE == "ZEGRADE").ToList();
+
+                //统一的最高职级
+                var sameHighEstGradeKeys = userInfos.Select(x => x.SameHighEstGrade).ToList();
+                var sameHighEstGrade = valDomain.Where(x => sameHighEstGradeKeys.Contains(x.ZDOM_VALUE) && x.ZDOM_CODE == "ZEGRADE").ToList();
 
                 #endregion
 
@@ -208,6 +240,12 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     uInfo.UserInfoStatus = uStatus.FirstOrDefault(x => x.OneCode == uInfo.UserInfoStatus)?.OneName;
                     uInfo.Nationality = contryRegion.FirstOrDefault(x => x.ZCOUNTRYCODE == uInfo.CountryRegion)?.ZCOUNTRYNAME;
                     uInfo.CountryRegion = contryRegion.FirstOrDefault(x => x.ZCOUNTRYCODE == uInfo.CountryRegion)?.ZCOUNTRYNAME;
+                    uInfo.Nation = nation.FirstOrDefault(x => x.ZDOM_VALUE == uInfo.Nation)?.ZDOM_NAME;
+                    uInfo.EmpSort = empSort.FirstOrDefault(x => x.ZDOM_VALUE == uInfo.EmpSort)?.ZDOM_NAME;
+                    uInfo.PositionGrade = jobType.FirstOrDefault(x => x.ZDOM_VALUE == uInfo.PositionGrade)?.ZDOM_NAME;
+                    uInfo.PositionGradeNorm = positionGradeNorm.FirstOrDefault(x => x.ZDOM_VALUE == uInfo.PositionGradeNorm)?.ZDOM_NAME;
+                    uInfo.HighEstGrade = positionGradeNorm.FirstOrDefault(x => x.ZDOM_VALUE == uInfo.HighEstGrade)?.ZDOM_NAME;
+                    uInfo.SameHighEstGrade = positionGradeNorm.FirstOrDefault(x => x.ZDOM_VALUE == uInfo.SameHighEstGrade)?.ZDOM_NAME;
                 }
             }
 
@@ -280,11 +318,29 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                 .Where(t => t.IsDelete == 1)
                 .Select(t => new UInstutionDto { Oid = t.OID, PoId = t.POID, Grule = t.GRULE, Name = t.NAME })
                 .ToListAsync();
+
+            //值域信息
+            var valDomain = await _dbContext.Queryable<ValueDomain>()
+                .Where(t => !string.IsNullOrWhiteSpace(t.ZDOM_CODE))
+                .Select(t => new { t.ZDOM_CODE, t.ZDOM_DESC, t.ZDOM_VALUE, t.ZDOM_NAME })
+                .ToListAsync();
+
+            //公司
             uDetails.CompanyName = GetUserCompany(uDetails.OfficeDepId, institutions);
 
             //国籍
             var name = await _dbContext.Queryable<CountryRegion>().FirstAsync(t => t.IsDelete == 1 && uDetails.Nationality == t.ZCOUNTRYCODE);
             uDetails.Nationality = name == null ? null : name.ZCOUNTRYNAME;
+
+            //用户状态
+            var uStatus = await _dbContext.Queryable<UserStatus>().Where(t => t.IsDelete == 1 && uDetails.UserInfoStatus == t.OneCode).Select(x => new { x.OneCode, x.OneName }).FirstAsync();
+            uDetails.UserInfoStatus = uStatus == null ? null : uStatus.OneName;
+
+            //民族
+            uDetails.Nation = valDomain.FirstOrDefault(x => uDetails.Nation == x.ZDOM_VALUE && x.ZDOM_CODE == "ZNATION")?.ZDOM_NAME;
+
+            //用工类型
+            uDetails.EmpSort = valDomain.FirstOrDefault(x => uDetails.EmpSort == x.ZDOM_VALUE && x.ZDOM_CODE == "ZEMPTYPE")?.ZDOM_NAME;
 
             #endregion
 
@@ -3028,7 +3084,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                                 type = "Check";//复选
                                 optionsChild = valDomain.Where(x => x.Code == "ZEMPTYPE").ToList();
                             }
-                            options.Add(new FilterConditionDto { CoulmnKey = item, Options = optionsChild, Type = type });
+                            options.Add(new FilterConditionDto { CoulmnName = columnName, CoulmnKey = item, Options = optionsChild, Type = type });
                         }
                     }
                     break;
@@ -3106,7 +3162,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                                 type = "Single";
                                 optionsChild = valDomain.Where(x => x.Code == "ZCHECKIND").ToList();
                             }
-                            options.Add(new FilterConditionDto { CoulmnKey = item, Options = optionsChild, Type = type });
+                            options.Add(new FilterConditionDto { CoulmnName = columnName, CoulmnKey = item, Options = optionsChild, Type = type });
                         }
                     }
                     break;
@@ -3195,7 +3251,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                                 type = "Check";
                                 optionsChild = valDomain.Where(x => x.Code == "ZCS").ToList();
                             }
-                            options.Add(new FilterConditionDto { CoulmnKey = item, Options = optionsChild, Type = type });
+                            options.Add(new FilterConditionDto { CoulmnName = columnName, CoulmnKey = item, Options = optionsChild, Type = type });
                         }
                     }
                     break;
@@ -3262,7 +3318,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                                 columnName = "往来单位状态";
                                 type = "Check";
                             }
-                            options.Add(new FilterConditionDto { CoulmnKey = item, Options = optionsChild, Type = type });
+                            options.Add(new FilterConditionDto { CoulmnName = columnName, CoulmnKey = item, Options = optionsChild, Type = type });
                         }
                     }
                     break;
@@ -3303,7 +3359,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                                 optionsChild.Add(new FilterChildData { Key = "0", Val = "否" });
                                 optionsChild.Add(new FilterChildData { Key = "1", Val = "是" });
                             }
-                            options.Add(new FilterConditionDto { CoulmnKey = item, Options = optionsChild, Type = type });
+                            options.Add(new FilterConditionDto { CoulmnName = columnName, CoulmnKey = item, Options = optionsChild, Type = type });
                         }
                     }
                     break;
@@ -3323,7 +3379,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                                 columnName = item == "CreateTime" ? "创建时间" : "修改时间";
                                 type = "Time";//时间
                             }
-                            options.Add(new FilterConditionDto { CoulmnKey = item, Options = optionsChild, Type = type });
+                            options.Add(new FilterConditionDto { CoulmnName = columnName, CoulmnKey = item, Options = optionsChild, Type = type });
                         }
                     }
                     break;
@@ -3364,7 +3420,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                                 columnName = "县";
                                 type = "Check";
                             }
-                            options.Add(new FilterConditionDto { CoulmnKey = item, Options = optionsChild, Type = type });
+                            options.Add(new FilterConditionDto { CoulmnName = columnName, CoulmnKey = item, Options = optionsChild, Type = type });
                         }
                     }
                     break;
@@ -3390,7 +3446,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                                 columnName = "分类层级";
                                 optionsChild = valDomain.Where(x => x.Code == "ZCLEVEL").ToList();
                             }
-                            options.Add(new FilterConditionDto { CoulmnKey = item, Options = optionsChild, Type = type });
+                            options.Add(new FilterConditionDto { CoulmnName = columnName, CoulmnKey = item, Options = optionsChild, Type = type });
                         }
                     }
                     break;
@@ -3410,7 +3466,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                                 columnName = item == "CreateTime" ? "创建时间" : "修改时间";
                                 type = "Time";//时间
                             }
-                            options.Add(new FilterConditionDto { CoulmnKey = item, Options = optionsChild, Type = type });
+                            options.Add(new FilterConditionDto { CoulmnName = columnName, CoulmnKey = item, Options = optionsChild, Type = type });
                         }
                     }
                     break;
@@ -3473,7 +3529,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                                 optionsChild.Add(new FilterChildData { Key = "0", Val = "停用" });
                                 optionsChild.Add(new FilterChildData { Key = "1", Val = "启用" });
                             }
-                            options.Add(new FilterConditionDto { CoulmnKey = item, Options = optionsChild, Type = type });
+                            options.Add(new FilterConditionDto { CoulmnName = columnName, CoulmnKey = item, Options = optionsChild, Type = type });
                         }
                     }
                     break;
@@ -3493,7 +3549,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                                 columnName = item == "CreateTime" ? "创建时间" : "修改时间";
                                 type = "Time";//时间
                             }
-                            options.Add(new FilterConditionDto { CoulmnKey = item, Options = optionsChild, Type = type });
+                            options.Add(new FilterConditionDto { CoulmnName = columnName, CoulmnKey = item, Options = optionsChild, Type = type });
                         }
                     }
                     break;
@@ -3534,7 +3590,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                                 columnName = "县";
                                 type = "Check";
                             }
-                            options.Add(new FilterConditionDto { CoulmnKey = item, Options = optionsChild, Type = type });
+                            options.Add(new FilterConditionDto { CoulmnName = columnName, CoulmnKey = item, Options = optionsChild, Type = type });
                         }
                     }
                     break;
@@ -3561,7 +3617,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                                 optionsChild.Add(new FilterChildData { Key = "0", Val = "否" });
                                 optionsChild.Add(new FilterChildData { Key = "1", Val = "是" });
                             }
-                            options.Add(new FilterConditionDto { CoulmnKey = item, Options = optionsChild, Type = type });
+                            options.Add(new FilterConditionDto { CoulmnName = columnName, CoulmnKey = item, Options = optionsChild, Type = type });
                         }
                     }
                     break;
@@ -3588,7 +3644,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                                 optionsChild.Add(new FilterChildData { Key = "0", Val = "未停用" });
                                 optionsChild.Add(new FilterChildData { Key = "1", Val = "停用" });
                             }
-                            options.Add(new FilterConditionDto { CoulmnKey = item, Options = optionsChild, Type = type });
+                            options.Add(new FilterConditionDto { CoulmnName = columnName, CoulmnKey = item, Options = optionsChild, Type = type });
                         }
                     }
                     break;
@@ -3608,7 +3664,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                                 columnName = item == "CreateTime" ? "创建时间" : "修改时间";
                                 type = "Time";//时间
                             }
-                            options.Add(new FilterConditionDto { CoulmnKey = item, Options = optionsChild, Type = type });
+                            options.Add(new FilterConditionDto { CoulmnName = columnName, CoulmnKey = item, Options = optionsChild, Type = type });
                         }
                     }
                     break;
@@ -3635,7 +3691,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                                 optionsChild.Add(new FilterChildData { Key = "0", Val = "无效" });
                                 optionsChild.Add(new FilterChildData { Key = "1", Val = "有效" });
                             }
-                            options.Add(new FilterConditionDto { CoulmnKey = item, Options = optionsChild, Type = type });
+                            options.Add(new FilterConditionDto { CoulmnName = columnName, CoulmnKey = item, Options = optionsChild, Type = type });
                         }
                     }
                     break;
@@ -3662,7 +3718,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                                 optionsChild.Add(new FilterChildData { Key = "0", Val = "无效" });
                                 optionsChild.Add(new FilterChildData { Key = "1", Val = "有效" });
                             }
-                            options.Add(new FilterConditionDto { CoulmnKey = item, Options = optionsChild, Type = type });
+                            options.Add(new FilterConditionDto { CoulmnName = columnName, CoulmnKey = item, Options = optionsChild, Type = type });
                         }
                     }
                     break;
@@ -3689,7 +3745,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                                 optionsChild.Add(new FilterChildData { Key = "0", Val = "否" });
                                 optionsChild.Add(new FilterChildData { Key = "1", Val = "是" });
                             }
-                            options.Add(new FilterConditionDto { CoulmnKey = item, Options = optionsChild, Type = type });
+                            options.Add(new FilterConditionDto { CoulmnName = columnName, CoulmnKey = item, Options = optionsChild, Type = type });
                         }
                     }
                     break;
@@ -3716,7 +3772,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                                 optionsChild.Add(new FilterChildData { Key = "0", Val = "无效" });
                                 optionsChild.Add(new FilterChildData { Key = "1", Val = "有效" });
                             }
-                            options.Add(new FilterConditionDto { CoulmnKey = item, Options = optionsChild, Type = type });
+                            options.Add(new FilterConditionDto { CoulmnName = columnName, CoulmnKey = item, Options = optionsChild, Type = type });
                         }
                     }
                     break;
@@ -3743,7 +3799,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                                 optionsChild.Add(new FilterChildData { Key = "0", Val = "无效" });
                                 optionsChild.Add(new FilterChildData { Key = "1", Val = "有效" });
                             }
-                            options.Add(new FilterConditionDto { CoulmnKey = item, Options = optionsChild, Type = type });
+                            options.Add(new FilterConditionDto { CoulmnName = columnName, CoulmnKey = item, Options = optionsChild, Type = type });
                         }
                     }
                     break;
@@ -3763,7 +3819,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                                 columnName = item == "CreateTime" ? "创建时间" : "修改时间";
                                 type = "Time";//时间
                             }
-                            options.Add(new FilterConditionDto { CoulmnKey = item, Options = optionsChild, Type = type });
+                            options.Add(new FilterConditionDto { CoulmnName = columnName, CoulmnKey = item, Options = optionsChild, Type = type });
                         }
                     }
                     break;
@@ -3824,7 +3880,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                                 type = "Check";
                                 optionsChild = valDomain.Where(x => x.Code == "ZHOLDING").ToList();
                             }
-                            options.Add(new FilterConditionDto { CoulmnKey = item, Options = optionsChild, Type = type });
+                            options.Add(new FilterConditionDto { CoulmnName = columnName, CoulmnKey = item, Options = optionsChild, Type = type });
                         }
                     }
                     break;
@@ -3851,7 +3907,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                                 type = "Check";
                                 optionsChild = countrys;
                             }
-                            options.Add(new FilterConditionDto { CoulmnKey = item, Options = optionsChild, Type = type });
+                            options.Add(new FilterConditionDto { CoulmnName = columnName, CoulmnKey = item, Options = optionsChild, Type = type });
                         }
                     }
                     break;
@@ -3884,7 +3940,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                                 optionsChild.Add(new FilterChildData { Key = "0", Val = "停用" });
                                 optionsChild.Add(new FilterChildData { Key = "1", Val = "启用" });
                             }
-                            options.Add(new FilterConditionDto { CoulmnKey = item, Options = optionsChild, Type = type });
+                            options.Add(new FilterConditionDto { CoulmnName = columnName, CoulmnKey = item, Options = optionsChild, Type = type });
                         }
                     }
                     break;
@@ -3979,7 +4035,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                                 columnName = "地域属性";
                                 type = "Check";
                             }
-                            options.Add(new FilterConditionDto { CoulmnKey = item, Options = optionsChild, Type = type });
+                            options.Add(new FilterConditionDto { CoulmnName = columnName, CoulmnKey = item, Options = optionsChild, Type = type });
                         }
                     }
                     break;
@@ -4001,7 +4057,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                                 optionsChild.Add(new FilterChildData { Key = "0", Val = "无效" });
                                 optionsChild.Add(new FilterChildData { Key = "1", Val = "有效" });
                             }
-                            options.Add(new FilterConditionDto { CoulmnKey = item, Options = optionsChild, Type = type });
+                            options.Add(new FilterConditionDto { CoulmnName = columnName, CoulmnKey = item, Options = optionsChild, Type = type });
                         }
                     }
                     break;
