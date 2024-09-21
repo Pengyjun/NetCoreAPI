@@ -84,8 +84,6 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     .ToListAsync();
 
                 }
-                if (filterCondition != null && filterCondition.Enable == "启用") filterCondition.Enable = "1";
-                if (filterCondition != null && filterCondition.Sex == "男性") filterCondition.Sex = "01";
             }
 
             //获取人员信息
