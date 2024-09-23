@@ -1,4 +1,5 @@
-﻿using GDCMasterDataReceiveApi.Domain.Models;
+﻿using GDCMasterDataReceiveApi.Application.Contracts.Dto.DataInterface;
+using GDCMasterDataReceiveApi.Domain.Models;
 using GDCMasterDataReceiveApi.Domain.Shared;
 using GDCMasterDataReceiveApi.Domain.Shared.Const;
 using GDCMasterDataReceiveApi.Domain.Shared.Enums;
@@ -37,6 +38,7 @@ namespace GDCMasterDataReceiveApi.Filters
 
             RecordRequestInfo recordRequestInfo = new RecordRequestInfo();
             var currentTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.ffffff");
+            #region 400的错误
             try
             {
 
@@ -86,6 +88,40 @@ namespace GDCMasterDataReceiveApi.Filters
                 recordRequestInfo.Exceptions.ExceptionInfo = ex.Message + Environment.NewLine + ex.StackTrace;
                 logger.LogError(ex, "自定义接口入参格式化错误信息出现错误");
             }
+            #endregion
+
+            #region 过滤接口返回值
+            var IsEncrypt = 1;
+                CacheHelper cacheHelper = new CacheHelper();
+                var cacheResult=cacheHelper.Get< DataInterfaceResponseDto>("InterfaceInfo");
+            if (cacheResult != null && cacheResult.IsEncrypt == 1)
+            {
+                var res = ((Microsoft.AspNetCore.Mvc.ObjectResult)context.Result).Value;
+
+                if (res != null)
+                {
+                    var interfaceEncryptApi = AppsettingsHelper.GetValue("API:InterfaceEncryptApi");
+                    WebHelper webHelper = new WebHelper();
+                    webHelper.Headers.Add("appKey", AppsettingsHelper.GetValue("API:Token:appKey"));
+                    webHelper.Headers.Add("appinterfaceCode", AppsettingsHelper.GetValue("API:Token:appinterfaceCode"));
+                    Dictionary<string, object> parame = new Dictionary<string, object>();
+                    parame.Add("item", res.ToJson());
+                    var dateEncrypt = await webHelper.DoPostAsync(interfaceEncryptApi, parame);
+                    ResponseAjaxResult<object> responseAjaxResult = new ResponseAjaxResult<object>()
+                    {
+                    };
+
+                    responseAjaxResult.Data = dateEncrypt.Result;
+                    responseAjaxResult.Success();
+                    context.Result = new JsonResult(responseAjaxResult);
+                }
+            }
+            else {
+                IsEncrypt = 0;
+            }
+            context.HttpContext.Response.Headers.Append("IsEncryption", IsEncrypt.ToString());
+
+            #endregion
 
             #region 是否开启审计日志
             if (Convert.ToBoolean(AppsettingsHelper.GetValue("AuditLogs:IsOpen")))
@@ -185,7 +221,6 @@ namespace GDCMasterDataReceiveApi.Filters
 
             }
             #endregion
-            context.HttpContext.Response.Headers.Add("AesKey", AppsettingsHelper.GetValue("AesKey"));
             await next.Invoke();
         }
         #endregion

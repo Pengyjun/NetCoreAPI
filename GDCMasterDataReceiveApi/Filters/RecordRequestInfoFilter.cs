@@ -1,8 +1,13 @@
-﻿using GDCMasterDataReceiveApi.Domain.Shared;
+﻿using GDCMasterDataReceiveApi.Application.Contracts.Dto.DataInterface;
+using GDCMasterDataReceiveApi.Domain.Shared;
+using GDCMasterDataReceiveApi.Domain.Shared.Const;
+using GDCMasterDataReceiveApi.Domain.Shared.Enums;
 using GDCMasterDataReceiveApi.Domain.Shared.Utils;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 using System.Text;
 using UtilsSharp;
 
@@ -20,6 +25,75 @@ namespace GDCMasterDataReceiveApi.Filters
             var actionDescriptor = context.ActionDescriptor as ControllerActionDescriptor;
             var method = actionDescriptor.MethodInfo;
             var httpContext = context.HttpContext;
+
+            #region 拦截验证查看接口基本信息是否允许
+            try
+            {
+                var actionName = ((Microsoft.AspNetCore.Mvc.Controllers.ControllerActionDescriptor)context.ActionDescriptor).ActionName;
+                if (!string.IsNullOrWhiteSpace(actionName))
+                {
+                    actionName = actionName + "Async";
+                }
+                var systemInterfaceInfoApi = AppsettingsHelper.GetValue("API:SystemInterfaceInfoApi");
+                WebHelper webHelper = new WebHelper();
+                webHelper.Headers.Add("appKey", AppsettingsHelper.GetValue("API:Token:appKey"));
+                webHelper.Headers.Add("appinterfaceCode", AppsettingsHelper.GetValue("API:Token:appinterfaceCode"));
+                var interfaceInfoList = await webHelper.DoGetAsync<ResponseAjaxResult<List<DataInterfaceResponseDto>>>(systemInterfaceInfoApi);
+                //如果返回空
+                if (interfaceInfoList.Code == 200 &&interfaceInfoList.Result==null&&!interfaceInfoList.Result.Data.Any())
+                {
+                    ResponseAjaxResult<object> responseAjaxResult = new ResponseAjaxResult<object>()
+                    {
+                    };
+
+                    responseAjaxResult.Fail(message: ResponseMessage.ACCESSINTERFACE_ERROR, httpStatusCode: HttpStatusCode.InterfaceAuth);
+                    context.HttpContext.Response.Clear();
+                    context.HttpContext.Response.StatusCode = 1000043;
+                    var obj = new ContentResult()
+                    {
+                        StatusCode = 200,
+                        Content = JsonConvert.SerializeObject(responseAjaxResult, new JsonSerializerSettings()
+                        {
+                            //首字母小写问题
+                            ContractResolver = new CamelCasePropertyNamesContractResolver()
+                        }),
+                    };
+                    context.Result = obj;
+                    return;
+                }
+                var intefaceInfo= interfaceInfoList.Result.Data.Where(x => x.InterfaceName == actionName&&x.IsEnable==1).First();
+                //验证接口是否存在
+                if (intefaceInfo == null)
+                {
+                    ResponseAjaxResult<object> responseAjaxResult = new ResponseAjaxResult<object>()
+                    {
+                    };
+
+                    responseAjaxResult.Fail(message: ResponseMessage.ACCESSINTERFACE_ERROR, httpStatusCode: HttpStatusCode.InterfaceAuth);
+                    context.HttpContext.Response.Clear();
+                    context.HttpContext.Response.StatusCode = 1000043;
+                    var obj = new ContentResult()
+                    {
+                        StatusCode = 200,
+                        Content = JsonConvert.SerializeObject(responseAjaxResult, new JsonSerializerSettings()
+                        {
+                            //首字母小写问题
+                            ContractResolver = new CamelCasePropertyNamesContractResolver()
+                        }),
+                    };
+                    context.Result = obj;
+                    return;
+                }
+                //验证访问IP
+                CacheHelper cacheHelper = new CacheHelper();
+                cacheHelper.Set("InterfaceInfo", intefaceInfo,60);
+            }
+            catch (Exception ex)
+            {
+                return;
+            }
+           
+            #endregion
 
             //获取请求参数
             #region 请求参数

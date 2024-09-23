@@ -133,5 +133,9 @@
         /// 账号信息不存在
         /// </summary>
         AccountNotEXIST = 100042,
+        /// <summary>
+        /// 接口未开通权限，请联系管理员
+        /// </summary>
+        InterfaceAuth = 100043,
     }
 }
