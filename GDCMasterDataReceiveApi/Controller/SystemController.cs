@@ -36,9 +36,9 @@ namespace GDCMasterDataReceiveApi.Controller
         /// </summary>
         /// <returns></returns>
         [HttpGet("SearchInterfaceMethods")]
-        public async Task<ResponseAjaxResult<List<SystemAllInterfaceResponseDto>>> SearchInterfaceMethodsAsync()
+        public async Task<ResponseAjaxResult<List<SystemAllInterfaceResponseDto>>> SearchInterfaceMethodsAsync([FromQuery] SystemInterfaceRequestDto  systemInterfaceRequestDto)
         {
-            return await systemService.SearchInterfaceMethodsAsync();
+            return await systemService.SearchInterfaceMethodsAsync(systemInterfaceRequestDto.SystemIdentity);
         }
 
         /// <summary>

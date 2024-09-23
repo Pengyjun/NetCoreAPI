@@ -21,7 +21,7 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.IService.ISystemService
         /// 获取所有接口方法
         /// </summary>
         /// <returns></returns>
-        Task<ResponseAjaxResult<List<SystemAllInterfaceResponseDto>>> SearchInterfaceMethodsAsync();
+        Task<ResponseAjaxResult<List<SystemAllInterfaceResponseDto>>> SearchInterfaceMethodsAsync(string systemIdentity);
 
 
         /// <summary>

@@ -33,56 +33,72 @@ namespace GDCMasterDataReceiveApi.Application.Service.SystemService
         /// 获取所有接口方法
         /// </summary>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<List<SystemAllInterfaceResponseDto>>> SearchInterfaceMethodsAsync()
+        public async Task<ResponseAjaxResult<List<SystemAllInterfaceResponseDto>>> SearchInterfaceMethodsAsync(string systemIdentity)
         {
             ResponseAjaxResult<List<SystemAllInterfaceResponseDto>> responseAjaxResult = new ResponseAjaxResult<List<SystemAllInterfaceResponseDto>>();
             List<SystemAllInterfaceResponseDto> systemAllInterfaceResponseDtos = new List<SystemAllInterfaceResponseDto>();
             List<SystemAllInterfaceResponseDto> actionRemark = new List<SystemAllInterfaceResponseDto>();
-            //只需要筛选集合的控制器即可
-            List<string> controllers = new List<string>();
-            controllers.Add("GDCMasterDataReceiveApi.Controller.SearchController");
-            //获取bin目录
-            var rootPath = AppContext.BaseDirectory;
-            var controllerApis = Assembly.LoadFile($"{rootPath}{Path.DirectorySeparatorChar}GDCMasterDataReceiveApi.dll").GetTypes()
-                .Where(x => controllers.Contains(x.FullName)).ToList();
+            //主数据后台接口
+            if (systemIdentity == "mdmbackstage")
+            {
+                //只需要筛选集合的控制器即可
+                List<string> controllers = new List<string>();
+                controllers.Add("GDCMasterDataReceiveApi.Controller.SearchController");
+                //获取bin目录
+                var rootPath = AppContext.BaseDirectory;
+                var controllerApis = Assembly.LoadFile($"{rootPath}{Path.DirectorySeparatorChar}GDCMasterDataReceiveApi.dll").GetTypes()
+                    .Where(x => controllers.Contains(x.FullName)).ToList();
 
-            #region 解析swagger xml  GDCMasterDataReceiveApi.xml
-            //解析swagger xml  GDCMasterDataReceiveApi.xml
-            var fileContent = string.Empty;
-            var stream = FileHelper.ReadFileToStream(rootPath + "GDCMasterDataReceiveApi.xml");
-            using (StreamReader readSteam = new StreamReader(stream))
-            {
-                fileContent = await readSteam.ReadToEndAsync();
-            }
-            XmlDocument xmlDocument = new XmlDocument();
-            xmlDocument.LoadXml(fileContent);
-            var membersList = xmlDocument.SelectNodes("//member");
-            foreach (XmlNode member in membersList)
-            {
-                var attValue = member.Attributes["name"];
-                if (attValue != null)
+                #region 解析swagger xml  GDCMasterDataReceiveApi.xml
+                //解析swagger xml  GDCMasterDataReceiveApi.xml
+                var fileContent = string.Empty;
+                var stream = FileHelper.ReadFileToStream(rootPath + "GDCMasterDataReceiveApi.xml");
+                using (StreamReader readSteam = new StreamReader(stream))
                 {
-                    var value = attValue.Value;
-                    if (value != null || !string.IsNullOrWhiteSpace(value))
+                    fileContent = await readSteam.ReadToEndAsync();
+                }
+                XmlDocument xmlDocument = new XmlDocument();
+                xmlDocument.LoadXml(fileContent);
+                var membersList = xmlDocument.SelectNodes("//member");
+                foreach (XmlNode member in membersList)
+                {
+                    var attValue = member.Attributes["name"];
+                    if (attValue != null)
                     {
-                        actionRemark.Add(new SystemAllInterfaceResponseDto() { Key = value, Value = member.InnerText.TrimAll() });
+                        var value = attValue.Value;
+                        if (value != null || !string.IsNullOrWhiteSpace(value))
+                        {
+                            actionRemark.Add(new SystemAllInterfaceResponseDto() { Key = value, Value = member.InnerText.TrimAll() });
+                        }
+                    }
+
+                }
+                #endregion
+                foreach (var item in controllerApis)
+                {
+                    var currentControllerMethods = ((System.Reflection.TypeInfo)((item))).DeclaredMethods;
+                    foreach (var method in currentControllerMethods)
+                    {
+                        var methodRemark = actionRemark.Where(x => x.Key.Contains(method.Name)).FirstOrDefault();
+                        systemAllInterfaceResponseDtos.Add(new SystemAllInterfaceResponseDto()
+                        {
+                            Key = method.Name,
+                            Value = methodRemark.Value,
+                        });
                     }
                 }
+            }
+            else if (systemIdentity == "financedistribute")
+            { 
+            
+            }
+            else if (systemIdentity == "contractdistribute")
+            {
 
             }
-            #endregion
-            foreach (var item in controllerApis)
+            else if (systemIdentity == "mdmdistribute")
             {
-                var currentControllerMethods = ((System.Reflection.TypeInfo)((item))).DeclaredMethods;
-                foreach (var method in currentControllerMethods)
-                {
-                    var methodRemark = actionRemark.Where(x => x.Key.Contains(method.Name)).FirstOrDefault();
-                    systemAllInterfaceResponseDtos.Add(new SystemAllInterfaceResponseDto()
-                    {
-                        Key = method.Name,
-                        Value = methodRemark.Value,
-                    });
-                }
+
             }
             responseAjaxResult.Count = systemAllInterfaceResponseDtos.Count;
             responseAjaxResult.Data = systemAllInterfaceResponseDtos;
