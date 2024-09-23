@@ -609,6 +609,7 @@ namespace GDCMasterDataReceiveApi.Controller
         [HttpGet("GetUserFilterColumns")]
         public async Task<ResponseAjaxResult<List<FilterConditionDto>>> GetUserFilterColumnsAsync([FromQuery] int table)
         {
+            
             return await _searchService.GetUserFilterColumnsAsync(table);
         }
 

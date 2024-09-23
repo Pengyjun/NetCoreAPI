@@ -44,7 +44,7 @@ namespace GDCMasterDataReceiveApi.Filters
 
                 ResponseAjaxResult<List<ErrorMessage>> responseAjaxResult = new();
                 //格式化请求参数错误提示0HMOVSRFRALDE:00000019
-                if (context.Result != null && context.Result.ToString().IndexOf("FileContentResult") < 0 && context.Result.ToString().IndexOf("FileStreamResult") < 0 && context.Result != null && context.Result.ToString().IndexOf("EmptyResult") < 0 && ((Microsoft.AspNetCore.Mvc.ObjectResult)context.Result).StatusCode == 400)
+                if (context.Result != null && context.Result.ToString().IndexOf("FileContentResult") < 0 && context.Result.ToString().IndexOf("FileStreamResult") < 0 && context.Result != null && context.Result.ToString().IndexOf("EmptyResult") < 0 && context.Result.ToString().IndexOf("ContentResult") < 0 && ((Microsoft.AspNetCore.Mvc.ObjectResult)context.Result).StatusCode == 400)
                 {
                     var errMsg = ((Microsoft.AspNetCore.Mvc.ValidationProblemDetails)((Microsoft.AspNetCore.Mvc.ObjectResult)context.Result).Value).Errors;
                     List<ErrorMessage> errors = new();
@@ -92,8 +92,8 @@ namespace GDCMasterDataReceiveApi.Filters
 
             #region 过滤接口返回值
             var IsEncrypt = 1;
-                CacheHelper cacheHelper = new CacheHelper();
-                var cacheResult=cacheHelper.Get< DataInterfaceResponseDto>("InterfaceInfo");
+            CacheHelper cacheHelper = new CacheHelper();
+            var cacheResult = cacheHelper.Get<DataInterfaceResponseDto>("InterfaceInfo");
             if (cacheResult != null && cacheResult.IsEncrypt == 1)
             {
                 var res = ((Microsoft.AspNetCore.Mvc.ObjectResult)context.Result).Value;
@@ -113,10 +113,15 @@ namespace GDCMasterDataReceiveApi.Filters
 
                     responseAjaxResult.Data = dateEncrypt.Result;
                     responseAjaxResult.Success();
-                    context.Result = new JsonResult(responseAjaxResult);
+                    var settings = new JsonSerializerSettings
+                    {
+                        ContractResolver = new CamelCasePropertyNamesContractResolver() 
+                    };
+                    context.Result = new JsonResult(responseAjaxResult, settings);
                 }
             }
-            else {
+            else
+            {
                 IsEncrypt = 0;
             }
             context.HttpContext.Response.Headers.Append("IsEncryption", IsEncrypt.ToString());
@@ -357,7 +362,7 @@ namespace GDCMasterDataReceiveApi.Filters
                 #endregion
 
                 #region 更新接收数据日志
-                if (context.HttpContext.Request.RouteValues.Where(x=> x.Value.Equals("Receive")).Any())
+                if (context.HttpContext.Request.RouteValues.Where(x => x.Value.Equals("Receive")).Any())
                 {
                     var traceIdentifier = context.HttpContext.TraceIdentifier;
                     var db = context.HttpContext.RequestServices.GetService<ISqlSugarClient>();
@@ -370,7 +375,7 @@ namespace GDCMasterDataReceiveApi.Filters
                     }
                     await db.Updateable<ReceiveRecordLog>(res).ExecuteCommandAsync();
                 }
-               
+
                 #endregion
             }
             catch (Exception ex)
