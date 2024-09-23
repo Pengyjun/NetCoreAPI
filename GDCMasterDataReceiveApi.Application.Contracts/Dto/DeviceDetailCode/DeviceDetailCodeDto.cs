@@ -1,4 +1,5 @@
 ﻿using GDCMasterDataReceiveApi.Application.Contracts.Dto.OtherModels;
+using MiniExcelLibs.Attributes;
 
 namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.DeviceDetailCode
 {
@@ -33,33 +34,46 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.DeviceDetailCode
     /// </summary>
     public class DeviceDetailCodeDetailsDto
     {
+        [ExcelIgnore]
+        public DateTime? CreateTime { get; set; }
+        [ExcelIgnore]
+        public DateTime? UpdateTime { get; set; }
+        [ExcelIgnore]
+        public string? Id { get; set; }
         /// <summary>
         /// 物资设备主数据编码
         /// </summary>
+        [ExcelColumnName("物资设备主数据编码")]
         public string? MDCode { get; set; }
         /// <summary>
         /// 品名编码:物资设备的品名分类码
         /// </summary>
+        [ExcelColumnName("品名编码")]
         public string? ProductNameCode { get; set; }
         /// <summary>
         /// 物资设备全称:物资设备规范的名称
         /// </summary>
+        [ExcelColumnName("物资设备全称")]
         public string? Name { get; set; }
         /// <summary>
         /// 物资设备说明:物资设备的说明
         /// </summary>
+        [ExcelColumnName("物资设备说明")]
         public string? Descption { get; set; }
         /// <summary>
         /// 物资设备主数据状态:物资设备主数据的使用状态
         /// </summary>
+        [ExcelIgnore]
         public string? State { get; set; }
         /// <summary>
         /// 是否常用编码:0否，1是
         /// </summary>
+        [ExcelIgnore]
         public string? IsCode { get; set; }
         /// <summary>
         /// 备注:备注说明
         /// </summary>
+        [ExcelIgnore]
         public string? Remark { get; set; }
     }
     /// <summary>

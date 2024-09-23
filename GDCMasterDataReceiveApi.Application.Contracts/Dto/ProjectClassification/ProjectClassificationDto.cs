@@ -1,4 +1,6 @@
-﻿namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.ProjectClassification
+﻿using MiniExcelLibs.Attributes;
+
+namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.ProjectClassification
 {
     /// <summary>
     /// 中交项目行业分类产业分类、业务板块、十二大业务类型、江河湖海对照关系 反显
@@ -71,105 +73,136 @@
     /// </summary>
     public class ProjectClassificationDetailsDto
     {
+        [ExcelIgnore]
+        public DateTime? CreateTime { get; set; }
+        [ExcelIgnore]
+        public DateTime? UpdateTime { get; set; }
+        [ExcelIgnore]
+        public string? Id { get; set; }
         /// <summary>
         /// 中交业务分类三级分类代码
         /// </summary>
+        [ExcelColumnName("中交业务分类三级分类代码")]
         public string? CCCCBTypeThirdCode { get; set; }
         /// <summary>
         /// 中交业务分类一级分类代码 
         /// </summary>
+        [ExcelColumnName("中交业务分类一级分类代码")]
         public string? CCCCBTypeOneCode { get; set; }
         /// <summary>
         /// 中交业务分类一级分类名称 
         /// </summary>
+        [ExcelColumnName("中交业务分类一级分类名称")]
         public string? Name { get; set; }
         /// <summary>
         /// 中交业务分类二级分类代码
         /// </summary>
+        [ExcelColumnName("中交业务分类二级分类代码")]
         public string? CCCCBTypeSecCode { get; set; }
         /// <summary>
         /// 中交业务分类二级分类名称
         /// </summary>
+        [ExcelColumnName("中交业务分类二级分类名称")]
         public string? CCCCBTypeSecName { get; set; }
         /// <summary>
         /// 中交业务分类三级分类名称
         /// </summary>
+        [ExcelColumnName("中交业务分类三级分类名称")]
         public string? CCCCBTypeThirdName { get; set; }
         /// <summary>
         /// 备注（业务分类）
         /// </summary>
+        [ExcelColumnName("备注（业务分类）")]
         public string? BusinessRemark { get; set; }
         /// <summary>
         /// 产业分类一级分类代码
         /// </summary>
+        [ExcelColumnName("产业分类一级分类代码")]
         public string? ChanYeOneCode { get; set; }
         /// <summary>
         /// 产业分类一级分类名称 
         /// </summary>
+        [ExcelColumnName("产业分类一级分类名称")]
         public string? ChanYeOneName { get; set; }
         /// <summary>
         /// 产业分类二级分类代码
         /// </summary>
+        [ExcelColumnName("产业分类二级分类代码")]
         public string? ChanYeSecCode { get; set; }
         /// <summary>
         /// 产业分类二级分类名称
         /// </summary>
+        [ExcelColumnName("产业分类二级分类名称")]
         public string? ChanYeSecName { get; set; }
         /// <summary>
         /// 产业分类三级分类名称
         /// </summary>
+        [ExcelColumnName("产业分类三级分类名称")]
         public string? ChanYeThirdName { get; set; }
         /// <summary>
         /// 备注（产业分类）
         /// </summary>
+        [ExcelColumnName("备注（产业分类）")]
         public string? ChanYeRemark { get; set; }
         /// <summary>
         /// 业务板块一级分类代码
         /// </summary>
+        [ExcelColumnName("业务板块一级分类代码")]
         public string? BSectorOneCode { get; set; }
         /// <summary>
         /// 业务板块一级分类名称
         /// </summary>
+        [ExcelColumnName("业务板块一级分类名称")]
         public string? BSectorOneName { get; set; }
         /// <summary>
         /// 业务板块二级分类代码
         /// </summary>
+        [ExcelColumnName("业务板块二级分类代码")]
         public string? BSectorSecCode { get; set; }
         /// <summary>
         /// 业务板块二级分类名称
         /// </summary>
+        [ExcelColumnName("业务板块二级分类名称")]
         public string? BSectorSecName { get; set; }
         /// <summary>
         /// 业务板块三级分类代码
         /// </summary>
+        [ExcelColumnName("业务板块三级分类代码")]
         public string? BSectorThirdCode { get; set; }
         /// <summary>
         /// 业务板块三级分类名称
         /// </summary>
+        [ExcelColumnName("业务板块三级分类名称")]
         public string? BSectorThirdName { get; set; }
         /// <summary>
         /// 备注（业务板块）
         /// </summary>
+        [ExcelColumnName("备注（业务板块）")]
         public string? BSectorRemark { get; set; }
         /// <summary>
         /// 中交十二大业务类型编码 
         /// </summary>
+        [ExcelColumnName("中交十二大业务类型编码")]
         public string? CCCCBTypeCode { get; set; }
         /// <summary>
         /// 中交十二大业务类型名称
         /// </summary>
+        [ExcelColumnName("中交十二大业务类型名称")]
         public string? CCCCBTypeName { get; set; }
         /// <summary>
         /// 中交江河湖海分类编码
         /// </summary>
+        [ExcelColumnName("中交江河湖海分类编码")]
         public string? CCCCRiverLakeAndSeaCode { get; set; }
         /// <summary>
         /// 中交江河湖海分类名称
         /// </summary>
+        [ExcelColumnName("中交江河湖海分类名称")]
         public string? CCCCRiverLakeAndSeaName { get; set; }
         /// <summary>
         /// 三新业务类型：取值：0：否、1：是
         /// </summary>
+        [ExcelIgnore]
         public string? ThirdNewBType { get; set; }
     }
     /// <summary>

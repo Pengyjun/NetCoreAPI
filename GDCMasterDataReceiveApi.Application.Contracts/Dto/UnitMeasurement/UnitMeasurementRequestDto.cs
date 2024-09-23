@@ -3,7 +3,7 @@
     /// <summary>
     /// 
     /// </summary>
-    public class UnitMeasurementRequestDto : BaseRequestDto
+    public class UnitMeasurementRequestDto
     {
 
     }

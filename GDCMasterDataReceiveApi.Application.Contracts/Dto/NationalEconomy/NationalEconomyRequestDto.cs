@@ -3,7 +3,7 @@
     /// <summary>
     /// 
     /// </summary>
-    public class NationalEconomyRequestDto : BaseRequestDto
+    public class NationalEconomyRequestDto
     {
 
     }

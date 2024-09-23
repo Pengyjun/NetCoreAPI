@@ -3,7 +3,7 @@
     /// <summary>
     /// 
     /// </summary>
-    public class AdministrativeAccountingMapperRequestDto : BaseRequestDto
+    public class AdministrativeAccountingMapperRequestDto
     {
 
     }

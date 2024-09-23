@@ -3,7 +3,7 @@
     /// <summary>
     /// 
     /// </summary>
-    public class RegionalCenterRequestDto : BaseRequestDto
+    public class RegionalCenterRequestDto
     {
     }
 }

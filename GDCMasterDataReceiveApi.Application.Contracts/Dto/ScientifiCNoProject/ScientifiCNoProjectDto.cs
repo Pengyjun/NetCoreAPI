@@ -1,4 +1,5 @@
 ﻿using GDCMasterDataReceiveApi.Application.Contracts.Dto.OtherModels;
+using MiniExcelLibs.Attributes;
 
 namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.ScientifiCNoProject
 {
@@ -49,65 +50,86 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.ScientifiCNoProject
     /// </summary>
     public class ScientifiCNoProjectDetailsDto
     {
+        [ExcelIgnore]
+        public DateTime? CreateTime { get; set; }
+        [ExcelIgnore]
+        public DateTime? UpdateTime { get; set; }
+        [ExcelIgnore]
+        public string? Id { get; set; }
         /// <summary>
         /// 科研项目主数据编码:科研项目的唯一编码标识
         /// </summary>
+        [ExcelColumnName("科研项目主数据编码")]
         public string? MDCode { get; set; }
         /// <summary>
         /// 科研项目名称:科研项目名称适用于各类型科技研发项目，应写项目中文名称的全称，应按照有效法律文书（科研项目研发合同）中的名称为准详细填写。原则上同一分类中不可重复。
         /// </summary>
+        [ExcelColumnName("科研项目名称")]
         public string? Name { get; set; }
         /// <summary>
         /// 科研项目外文名称
         /// </summary>
+        [ExcelColumnName("科研项目外文名称")]
         public string? ForeignName { get; set; }
         /// <summary>
         /// 是否高新项目:0 否 1 是
         /// </summary>
+        [ExcelIgnore]
         public string? IsHighTech { get; set; }
         /// <summary>
         /// 项目状态
         /// </summary>
+        [ExcelIgnore]
         public string? PjectState { get; set; }
         /// <summary>
         /// 是否委外项目:0 否 1 是
         /// </summary>
+        [ExcelIgnore]
         public string? IsOutsourced { get; set; }
         /// <summary>
         /// 科研项目分类:代码
         /// </summary>
+        [ExcelColumnName("科研项目分类")]
         public string? TypeCode { get; set; }
         /// <summary>
         /// 项目总费用（万元）：项目总费用按科研项目合同填写
         /// </summary>
+        [ExcelColumnName("项目总费用（万元）")]
         public string? TotalCost { get; set; }
         /// <summary>
         /// 项目总费用币种
         /// </summary>
+        [ExcelColumnName("项目总费用币种")]
         public string? CurrencyOfCost { get; set; }
         /// <summary>
         /// 立项年份：立项年份应根据科研项目管理单位发布立项通知年份确定。若无立项通知，则与科研项目合同签订的年份一致
         /// </summary>
+        [ExcelColumnName("立项年份")]
         public string? Year { get; set; }
         /// <summary>
         /// 计划开始日期：项目计划开始/完成日期适用于所有类型科研项目，应与科研项目合同保持一致，日期格式为：YYYYMMDD
         /// </summary>
+        [ExcelColumnName("计划开始日期")]
         public string? PlanStartDate { get; set; }
         /// <summary>
         /// 计划结束日期：项目计划开始/完成日期适用于所有类型科研项目，应与科研项目合同保持一致，日期格式为：YYYYMMDD
         /// </summary>
+        [ExcelColumnName("计划结束日期")]
         public string? PlanEndDate { get; set; }
         /// <summary>
         /// 专业类型：科研项目所属的专业类型，引用Q/CCCC GL005—2021要求的公司产业分类
         /// </summary>
+        [ExcelIgnore]
         public string? ProfessionalType { get; set; }
         /// <summary>
         /// 状态：0停用 1启用
         /// </summary>
+        [ExcelIgnore]
         public string? State { get; set; }
         /// <summary>
         /// 上级科研项目主数据编码
         /// </summary>
+        [ExcelIgnore]
         public string? SupMDCode { get; set; }
     }
     /// <summary>

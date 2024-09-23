@@ -1,4 +1,6 @@
-﻿namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.AccountingDepartment
+﻿using MiniExcelLibs.Attributes;
+
+namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.AccountingDepartment
 {
     /// <summary>
     /// 核算部门返显响应Dto
@@ -35,45 +37,61 @@
     /// </summary>
     public class AccountingDepartmentDetailsDto
     {
+        [ExcelIgnore]
+        public DateTime? CreateTime { get; set; }
+        [ExcelIgnore]
+        public DateTime? UpdateTime { get; set; }
+        [ExcelIgnore]
+        public string? Id { get; set; }
         /// <summary>
         /// 核算组织编号:9月18日新加
         /// </summary>
+        [ExcelColumnName("核算组织编号")]
         public string? AccOrgCode { get; set; }
         /// <summary>
         /// 核算部门编号
         /// </summary>
+        [ExcelColumnName("核算部门编号")]
         public string? AccDepCode { get; set; }
         /// <summary>
         /// 核算组织ID
         /// </summary>
+        [ExcelIgnore]
         public string? AccOrgId { get; set; }
         /// <summary>
         /// 核算部门ID
         /// </summary>
+        [ExcelIgnore]
         public string? AccDepId { get; set; }
         /// <summary>
         /// 核算部门中文简体名称
         /// </summary>
+        [ExcelColumnName("核算部门中文简体名称")]
         public string? Name { get; set; }
         /// <summary>
         /// 核算部门中文繁体名称
         /// </summary>
+        [ExcelColumnName("核算部门中文繁体名称")]
         public string? AccDepTCCName { get; set; }
         /// <summary>
         /// 核算部门英文名称
         /// </summary>
+        [ExcelColumnName("核算部门英文名称")]
         public string? AccDepELName { get; set; }
         /// <summary>
         /// 上级核算部门ID
         /// </summary>
+        [ExcelIgnore]
         public string? SupAccDepId { get; set; }
         /// <summary>
         /// 核算部门停用标志：1:停用0:未停用
         /// </summary>
+        [ExcelIgnore]
         public string? State { get; set; }
         /// <summary>
         /// 数据删除标识：1:删除0：正常
         /// </summary>
+        [ExcelIgnore]
         public string? DataIdentifier { get; set; }
     }
     /// <summary>

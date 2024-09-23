@@ -3,7 +3,7 @@
     /// <summary>
     /// 
     /// </summary>
-    public class AdministrativeDivisionRequestDto : BaseRequestDto
+    public class AdministrativeDivisionRequestDto
     {
 
     }

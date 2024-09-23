@@ -3,7 +3,7 @@
     /// <summary>
     /// 
     /// </summary>
-    public class AccountingDepartmentRequestDto : BaseRequestDto
+    public class AccountingDepartmentRequestDto
     {
 
     }

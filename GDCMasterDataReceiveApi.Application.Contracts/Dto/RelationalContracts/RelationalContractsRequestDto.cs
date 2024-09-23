@@ -3,7 +3,7 @@
     /// <summary>
     /// 
     /// </summary>
-    public class RelationalContractsRequestDto : BaseRequestDto
+    public class RelationalContractsRequestDto
     {
     }
 }

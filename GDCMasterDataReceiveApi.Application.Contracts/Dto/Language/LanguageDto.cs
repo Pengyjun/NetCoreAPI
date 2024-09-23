@@ -1,4 +1,5 @@
 ﻿using GDCMasterDataReceiveApi.Application.Contracts.Dto.OtherModels;
+using MiniExcelLibs.Attributes;
 
 namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.Language
 {
@@ -37,33 +38,46 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.Language
     /// </summary>
     public class LanguageDetailsDto
     {
+        [ExcelIgnore]
+        public DateTime? CreateTime { get; set; }
+        [ExcelIgnore]
+        public DateTime? UpdateTime { get; set; }
+        [ExcelIgnore]
+        public string? Id { get; set; }
         /// <summary>
         /// GB/T 4880.2/B目录代码:GB/T 4880.2/B目录代码
         /// </summary>
+        [ExcelColumnName("GB/T 4880.2/B目录代码:GB/T 4880.2/B目录代码")]
         public string? DirCode { get; set; }
         /// <summary>
         /// GB/T 4880.2/T术语代码:GB/T 4880.2/T术语代码
         /// </summary>
+        [ExcelColumnName("GB/T 4880.2/T术语代码:GB/T 4880.2/T术语代码")]
         public string? TermCode { get; set; }
         /// <summary>
         /// 汉语名称
         /// </summary>
+        [ExcelColumnName("汉语名称")]
         public string? Name { get; set; }
         /// <summary>
         /// 英语名称
         /// </summary>
+        [ExcelColumnName("英语名称")]
         public string? EnglishName { get; set; }
         /// <summary>
         /// 版本：数据的版本号。数据每次变更时，版本号自动加1。
         /// </summary>
+        [ExcelIgnore]
         public string? Version { get; set; }
         /// <summary>
         /// 状态：数据是否有效的标识:有效：1无效：0
         /// </summary>
+        [ExcelIgnore]
         public string? State { get; set; }
         /// <summary>
         /// 是否删除 数据是否有效的标识:有效：1无效：0
         /// </summary>
+        [ExcelIgnore]
         public string? DataIdentifier { get; set; }
     }
     /// <summary>

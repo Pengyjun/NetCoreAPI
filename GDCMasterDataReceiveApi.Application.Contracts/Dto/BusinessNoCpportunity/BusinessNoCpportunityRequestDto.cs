@@ -3,7 +3,7 @@
     /// <summary>
     /// 
     /// </summary>
-    public class BusinessNoCpportunityRequestDto : BaseRequestDto
+    public class BusinessNoCpportunityRequestDto
     {
 
     }

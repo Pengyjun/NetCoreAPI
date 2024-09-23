@@ -35,6 +35,7 @@
     /// </summary>
     public class RoomNumberDetailsDto
     {
+        public string? Id { get; set; }
         /// <summary>
         /// 楼栋编码:该房号所属的楼栋编码
         /// </summary>

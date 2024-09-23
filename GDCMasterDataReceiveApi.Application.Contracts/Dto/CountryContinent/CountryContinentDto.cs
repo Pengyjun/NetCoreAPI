@@ -1,4 +1,5 @@
 ﻿using GDCMasterDataReceiveApi.Application.Contracts.Dto.OtherModels;
+using MiniExcelLibs.Attributes;
 
 namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.CountryContinent
 {
@@ -33,33 +34,46 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.CountryContinent
     /// </summary>
     public class CountryContinentDetailsDto
     {
+        [ExcelIgnore]
+        public DateTime? CreateTime { get; set; }
+        [ExcelIgnore]
+        public DateTime? UpdateTime { get; set; }
+        [ExcelIgnore]
+        public string Id { get; set; }
         /// <summary>
         /// 大洲代码：大洲代码
         /// </summary>
+        [ExcelColumnName("大洲代码")]
         public string ContinentCode { get; set; }
         /// <summary>
         /// 大洲名称：大洲名称
         /// </summary>
+        [ExcelColumnName("大洲名称")]
         public string Name { get; set; }
         /// <summary>
         /// 区域代码：大洲所属区域代码
         /// </summary>
+        [ExcelColumnName("区域代码")]
         public string AreaCode { get; set; }
         /// <summary>
         /// 区域描述：区域描述
         /// </summary>
+        [ExcelColumnName("区域描述")]
         public string RegionalDescr { get; set; }
         /// <summary>
         /// 版本：数据的版本号。数据每次变更时，版本号自动加1。
         /// </summary>
+        [ExcelIgnore]
         public string Version { get; set; }
         /// <summary>
         /// 状态：数据是否有效的标识:有效：1无效：0
         /// </summary>
+        [ExcelIgnore]
         public string State { get; set; }
         /// <summary>
         /// 是否删除 数据是否有效的标识:有效：1无效：0
         /// </summary>
+        [ExcelIgnore]
         public string DataIdentifier { get; set; }
     }
     /// <summary>

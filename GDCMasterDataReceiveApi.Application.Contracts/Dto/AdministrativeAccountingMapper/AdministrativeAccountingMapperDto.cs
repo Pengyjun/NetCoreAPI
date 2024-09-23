@@ -1,4 +1,6 @@
-﻿namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.AdministrativeAccountingMapper
+﻿using MiniExcelLibs.Attributes;
+
+namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.AdministrativeAccountingMapper
 {
     /// <summary>
     /// 行政机构和核算机构映射关系 反显响应dto
@@ -27,29 +29,41 @@
     /// </summary>
     public class AdministrativeAccountingMapperDetailsDto
     {
+        [ExcelIgnore]
+        public DateTime? CreateTime { get; set; }
+        [ExcelIgnore]
+        public DateTime? UpdateTime { get; set; }
+        [ExcelIgnore]
+        public string? Id { get; set; }
         /// <summary>
         /// 必须唯一
         /// </summary>
+        [ExcelIgnore]
         public string? KeyId { get; set; }
         /// <summary>
         /// 核算组织ID
         /// </summary>
+        [ExcelIgnore]
         public string? AccOrgId { get; set; }
         /// <summary>
         /// 核算组织编码
         /// </summary>
+        [ExcelColumnName("核算组织编码")]
         public string? AccOrgCode { get; set; }
         /// <summary>
         /// 行政组织ID
         /// </summary>
+        [ExcelIgnore]
         public string? AdministrativeOrgId { get; set; }
         /// <summary>
         /// 行政组织编码
         /// </summary>
+        [ExcelColumnName("行政组织编码")]
         public string? AdministrativeOrgCode { get; set; }
         /// <summary>
         /// 是否删除: 数据是否有效的标识:   有效：1无效：0
         /// </summary>
+        [ExcelIgnore]
         public string? DataIdentifier { get; set; }
     }
     /// <summary>

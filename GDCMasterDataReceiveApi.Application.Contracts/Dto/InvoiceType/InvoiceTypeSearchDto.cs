@@ -1,4 +1,5 @@
 ﻿using GDCMasterDataReceiveApi.Application.Contracts.Dto.OtherModels;
+using MiniExcelLibs.Attributes;
 
 namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.InvoiceType
 {
@@ -29,25 +30,36 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.InvoiceType
     /// </summary>
     public class InvoiceTypeDetailshDto
     {
+        [ExcelIgnore]
+        public DateTime? CreateTime { get; set; }
+        [ExcelIgnore]
+        public DateTime? UpdateTime { get; set; }
+        [ExcelIgnore]
+        public string? Id { get; set; }
         /// <summary>
         /// 发票类型代码
         /// </summary>
+        [ExcelColumnName("发票类型代码")]
         public string? Code { get; set; }
         /// <summary>
         /// 发票类型名称
         /// </summary>
+        [ExcelColumnName("发票类型名称")]
         public string? Name { get; set; }
         /// <summary>
         /// 版本：数据的版本号。数据每次变更时，版本号自动加1。
         /// </summary>
+        [ExcelIgnore]
         public string? Version { get; set; }
         /// <summary>
         /// 状态：数据是否有效的标识:有效：1无效：0
         /// </summary>
+        [ExcelIgnore]
         public string? State { get; set; }
         /// <summary>
         /// 是否删除 数据是否有效的标识:有效：1无效：0
         /// </summary>
+        [ExcelIgnore]
         public string? DataIdentifier { get; set; }
     }
     /// <summary>

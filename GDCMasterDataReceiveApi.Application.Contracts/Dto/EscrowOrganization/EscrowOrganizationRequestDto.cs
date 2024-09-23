@@ -3,7 +3,7 @@
     /// <summary>
     /// 
     /// </summary>
-    public class EscrowOrganizationRequestDto : BaseRequestDto
+    public class EscrowOrganizationRequestDto 
     {
 
     }

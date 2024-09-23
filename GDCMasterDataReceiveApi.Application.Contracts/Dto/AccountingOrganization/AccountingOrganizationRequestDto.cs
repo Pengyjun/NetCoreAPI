@@ -3,7 +3,7 @@
     /// <summary>
     /// 
     /// </summary>
-    public class AccountingOrganizationRequestDto : BaseRequestDto
+    public class AccountingOrganizationRequestDto
     {
 
     }
