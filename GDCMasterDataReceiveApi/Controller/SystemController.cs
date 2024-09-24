@@ -32,20 +32,22 @@ namespace GDCMasterDataReceiveApi.Controller
         #endregion
 
         /// <summary>
-        /// 获取所有接口方法
+        /// 获取所有接口方法 
         /// </summary>
         /// <returns></returns>
         [HttpGet("SearchInterfaceMethods")]
+        [Obsolete]
         public async Task<ResponseAjaxResult<List<SystemAllInterfaceResponseDto>>> SearchInterfaceMethodsAsync([FromQuery] SystemInterfaceRequestDto  systemInterfaceRequestDto)
         {
             return await systemService.SearchInterfaceMethodsAsync(systemInterfaceRequestDto.SystemIdentity);
         }
 
         /// <summary>
-        /// 获取所有接口响应字段
+        /// 获取所有接口响应字段  暂时不用
         /// </summary>
         /// <returns></returns>
         [HttpGet("SearchInterfaceFields")]
+        [Obsolete]
         public async Task<ResponseAjaxResult<List<SystemAllInterfaceResponseDto>>> SearchInterfaceFieldsAsync([FromQuery] SystemMethodFieldRequestDto systemMethodFieldRequestDto)
         {
           // var a= new OpenApiDocument();
