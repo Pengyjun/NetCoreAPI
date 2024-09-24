@@ -34,9 +34,7 @@ using GDCMasterDataReceiveApi.Domain.Shared;
 using GDCMasterDataReceiveApi.Domain.Shared.Utils;
 using Newtonsoft.Json;
 using SqlSugar;
-using System.Diagnostics.Metrics;
 using System.Reflection;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace GDCMasterDataReceiveApi.Application.Service.SearchService
 {
