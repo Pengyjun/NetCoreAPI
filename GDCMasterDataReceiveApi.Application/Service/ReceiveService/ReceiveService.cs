@@ -75,7 +75,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
             List<ValueDomainLanguage> insertzMDGS_OLDNAMEs = new();
             List<ValueDomainLanguage> updatezMDGS_OLDNAMEs = new();
             //查询项目表
-            var dataCodeList = await _dbContext.Queryable<ValueDomain>().Where(x => x.IsDelete == 1).ToListAsync();
+            var dataCodeList = await _dbContext.Queryable<ValueDomain>().Where(x => x.IsDelete == 1 ).ToListAsync();
             //需要新增的数据
             var insertOids = baseReceiveDataRequestDto.IT_DATA.item.Where(x => !dataCodeList.Select(x => x.ZDOM_CODE).ToList().Contains(x.ZDOM_CODE)).ToList();
             //需要更新的数据
@@ -113,7 +113,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
                 var projectUsedNameList = await _dbContext.Queryable<ValueDomainLanguage>().ToListAsync();
                 foreach (var itemItem in updateOids)
                 {
-                    var id = dataCodeList.Where(x => x.Id == itemItem.Id).Select(x => x.Id).First();
+                    var id = dataCodeList.Where(x => x.ZDOM_CODE == itemItem.ZDOM_CODE).Select(x => x.Id).First();
                     itemItem.Id = id;
                     if (itemItem.ZLANG_LIST != null)
                     {
