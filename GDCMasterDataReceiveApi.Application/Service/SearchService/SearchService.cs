@@ -85,6 +85,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
 
                 }
             }
+            #region 基本查询
 
             //获取人员信息
             var userInfos = await _dbContext.Queryable<User>()
@@ -177,6 +178,8 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                 })
                 .ToPageListAsync(requestDto.PageIndex, requestDto.PageSize, total);
 
+            #endregion
+
             if (userInfos != null && userInfos.Any())
             {
                 //机构信息
@@ -206,6 +209,10 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                 //民族
                 var nationKeys = userInfos.Select(x => x.Nation).ToList();
                 var nation = valDomain.Where(x => nationKeys.Contains(x.ZDOM_VALUE) && x.ZDOM_CODE == "ZNATION").ToList();
+
+                //有效证件类型
+                var certTypeKeys = userInfos.Select(x => x.CertType).ToList();
+                var certType = valDomain.Where(x => certTypeKeys.Contains(x.ZDOM_VALUE) && x.ZDOM_CODE == "ZIDTYPE").ToList();
 
                 //用工类型
                 var empSortKeys = userInfos.Select(x => x.EmpSort).ToList();
@@ -246,6 +253,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     uInfo.PositionGradeNorm = positionGradeNorm.FirstOrDefault(x => x.ZDOM_VALUE == uInfo.PositionGradeNorm)?.ZDOM_NAME;
                     uInfo.HighEstGrade = positionGradeNorm.FirstOrDefault(x => x.ZDOM_VALUE == uInfo.HighEstGrade)?.ZDOM_NAME;
                     uInfo.SameHighEstGrade = positionGradeNorm.FirstOrDefault(x => x.ZDOM_VALUE == uInfo.SameHighEstGrade)?.ZDOM_NAME;
+                    uInfo.CertType = certType.FirstOrDefault(x => x.ZDOM_VALUE == uInfo.SameHighEstGrade)?.ZDOM_NAME;
                 }
             }
 
