@@ -31,10 +31,12 @@ using GDCMasterDataReceiveApi.Application.Contracts.Dto.ValueDomain;
 using GDCMasterDataReceiveApi.Application.Contracts.IService.ISearchService;
 using GDCMasterDataReceiveApi.Domain.Models;
 using GDCMasterDataReceiveApi.Domain.Shared;
+using GDCMasterDataReceiveApi.Domain.Shared.Utils;
 using Newtonsoft.Json;
 using SqlSugar;
-using System.Net;
+using System.Diagnostics.Metrics;
 using System.Reflection;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace GDCMasterDataReceiveApi.Application.Service.SearchService
 {
@@ -489,6 +491,62 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
             return vDomainName;
         }
         /// <summary>
+        /// 获取国家地区名称
+        /// </summary>
+        /// <param name="country"></param>
+        /// <param name="countryRegionOrAdminDivisionDtos"></param>
+        /// <returns></returns>
+        private string? GetCountryRegion(string? country, List<CountryRegionOrAdminDivisionDto> countryRegionOrAdminDivisionDtos)
+        {
+            var countryName = countryRegionOrAdminDivisionDtos.FirstOrDefault(x => x.Code == country)?.Name;
+            return countryName;
+        }
+        /// <summary>
+        /// 获取省、市、县（行政区划）
+        /// </summary>
+        /// <param name="regionalismCode"></param>
+        /// <param name="countryRegionOrAdminDivisionDtos"></param>
+        /// <returns></returns>
+        private string? GetAdministrativeDivision(string? regionalismCode, List<CountryRegionOrAdminDivisionDto> countryRegionOrAdminDivisionDtos)
+        {
+            var name = countryRegionOrAdminDivisionDtos.FirstOrDefault(x => x.Code == regionalismCode)?.Name;
+            return name;
+        }
+        /// <summary>
+        /// 处理日期 yyyymmdd --  yyyy年mm月dd日
+        /// </summary>
+        /// <param name="date"></param>
+        /// <returns></returns>
+        private string? GetDate(string? date)
+        {
+            if (!string.IsNullOrWhiteSpace(date))
+            {
+                Utils.TryConvertDateTimeFromDateDay(Convert.ToInt32(date), out DateTime time);
+                return time.ToString("yyyy年MM月dd日");
+            }
+            return null;
+        }
+        /// <summary>
+        /// 处理日期 yyyymmddhhmmss -- yyyy年mm月dd日hh时mm分ss秒
+        /// </summary>
+        /// <param name="dayTime"></param>
+        /// <returns></returns>
+        private string? GetDateDay(string? dayTime)
+        {
+            if (!string.IsNullOrWhiteSpace(dayTime) && dayTime.Length == 14)
+            {
+                var year = dayTime.Substring(0, 4);
+                var month = dayTime.Substring(4, 2);
+                var day = dayTime.Substring(6, 2);
+                var hh = dayTime.Substring(8, 2);
+                var mm = dayTime.Substring(10, 2);
+                var ss = dayTime.Substring(12, 2);
+                DateTime.TryParse($"{year}-{month}-{day} {hh}:{mm}:{ss}", out DateTime time);
+                return time.ToString("yyyy年MM月dd日 HH:mm:ss");
+            }
+            return null;
+        }
+        /// <summary>
         /// 机构树列表
         /// </summary>
         /// <param name="requestDto"></param>
@@ -926,6 +984,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                 filterCondition = JsonConvert.DeserializeObject<ProjectDetailsDto>(requestDto.FilterConditionJson);
             }
 
+            #region 项目初始查询
             var proList = await _dbContext.Queryable<Project>()
                 .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Name), (pro) => pro.ZPROJNAME.Contains(filterCondition.Name))
                 .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.MDCode), (pro) => pro.ZPROJECT.Contains(filterCondition.MDCode))
@@ -1044,6 +1103,91 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     WinningBidder = pro.ZAWARDMAI
                 })
                 .ToPageListAsync(requestDto.PageIndex, requestDto.PageSize, total);
+            #endregion
+
+            #region 详细查询
+            //值域信息
+            var valDomain = await _dbContext.Queryable<ValueDomain>()
+                .Where(t => !string.IsNullOrWhiteSpace(t.ZDOM_CODE))
+                .Select(t => new VDomainRespDto { ZDOM_CODE = t.ZDOM_CODE, ZDOM_DESC = t.ZDOM_DESC, ZDOM_VALUE = t.ZDOM_VALUE, ZDOM_NAME = t.ZDOM_NAME, ZDOM_LEVEL = t.ZDOM_LEVEL })
+                .ToListAsync();
+
+            //国家地区
+            var countrysKey = proList.Select(x => x.Country).ToList();
+            var country = await _dbContext.Queryable<CountryRegion>()
+                .Where(t => t.IsDelete == 1 && countrysKey.Contains(t.ZCOUNTRYCODE))
+                .Select(t => new CountryRegionOrAdminDivisionDto { Code = t.ZCOUNTRYCODE, Name = t.ZCOUNTRYNAME })
+                .ToListAsync();
+
+            //行政区划
+            var locationKey = proList.Select(x => x.Location).ToList();
+            var location = await _dbContext.Queryable<AdministrativeDivision>()
+                .Where(t => t.IsDelete == 1 && locationKey.Contains(t.ZADDVSCODE))
+                .Select(t => new CountryRegionOrAdminDivisionDto { Code = t.ZADDVSCODE, Name = t.ZADDVSNAME })
+                .ToListAsync();
+
+            //项目机构
+            var pjectOrgKey = proList.Select(x => x.PjectOrg).ToList();
+            var pjectOrg2Key = proList.Select(x => x.PjectOrgBP).ToList();
+            var pjectOrg = await _dbContext.Queryable<Institution>()
+                .Where(t => t.IsDelete == 1 && (pjectOrgKey.Contains(t.OID) || pjectOrg2Key.Contains(t.OID)))
+                .Select(t => new InstutionRespDto { Oid = t.OID, PoId = t.POID, Grule = t.GRULE, Name = t.NAME })
+                .ToListAsync();
+
+            foreach (var item in proList)
+            {
+                //项目类型
+                item.Type = GetValueDomain(item.Type, valDomain, "ZPROJTYPE");
+
+                //国家地区
+                item.Country = GetCountryRegion(item.Country, country);
+
+                //项目所在地
+                item.Location = GetAdministrativeDivision(item.Location, location);
+
+                //项目机构
+                item.PjectOrg = GetInstitutionName(item.PjectOrg, pjectOrg);
+                item.PjectOrgBP = GetInstitutionName(item.PjectOrgBP, pjectOrg);
+
+                //日期
+                item.PlanStartDate = GetDate(item.PlanStartDate);
+                item.PlanCompletionDate = GetDate(item.PlanCompletionDate);
+                item.AcquisitionTime = GetDate(item.AcquisitionTime);
+                item.BChangeTime = GetDate(item.BChangeTime);
+                item.StartDateOfInsure = GetDate(item.StartDateOfInsure);
+                item.EndDateOfInsure = GetDate(item.EndDateOfInsure);
+                item.FundEstablishmentDate = GetDate(item.FundEstablishmentDate);
+                item.FundExpirationDate = GetDate(item.FundExpirationDate);
+                item.LeaseStartDate = GetDate(item.LeaseStartDate);
+                item.DueDate = GetDate(item.DueDate);
+                item.CreateDate = GetDateDay(item.CreateDate);
+                item.ResolutionTime = GetDate(item.ResolutionTime);
+
+                //收入来源
+                item.SourceOfIncome = GetValueDomain(item.SourceOfIncome, valDomain, "ZSI");
+
+                //操盘情况
+                item.TradingSituation = GetValueDomain(item.TradingSituation, valDomain, "ZTRADER");
+
+                //承租人类型
+                item.TenantType = GetValueDomain(item.TenantType, valDomain, "ZLESSEETYPE");
+
+                //参与二级单位
+                item.ParticipateInUnitSecs = GetValueDomain(item.ParticipateInUnitSecs, valDomain, "ZCY2NDORG");
+
+                //计税方式
+                item.TaxMethod = GetValueDomain(item.TaxMethod, valDomain, "ZTAXMETHOD");
+
+                //并表情况
+                item.ConsolidatedTable = GetValueDomain(item.ConsolidatedTable, valDomain, "ZCS");
+
+                //是否联合体项目
+                item.IsJoint = item.IsJoint == "1" ? "是" : "否";
+
+
+
+            }
+            #endregion
 
             responseAjaxResult.Count = total;
             responseAjaxResult.SuccessResult(proList);
@@ -1121,6 +1265,91 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     WinningBidder = pro.ZAWARDMAI
                 })
                 .FirstAsync();
+
+            #region 其他详情
+            //值域信息
+            var valDomain = await _dbContext.Queryable<ValueDomain>()
+                .Where(t => !string.IsNullOrWhiteSpace(t.ZDOM_CODE))
+                .Select(t => new VDomainRespDto { ZDOM_CODE = t.ZDOM_CODE, ZDOM_DESC = t.ZDOM_DESC, ZDOM_VALUE = t.ZDOM_VALUE, ZDOM_NAME = t.ZDOM_NAME, ZDOM_LEVEL = t.ZDOM_LEVEL })
+                .ToListAsync();
+
+            //国家地区
+            var country = await _dbContext.Queryable<CountryRegion>()
+                .Where(t => t.IsDelete == 1 && result.Country == t.ZCOUNTRYCODE)
+                .Select(t => new CountryRegionOrAdminDivisionDto { Code = t.ZCOUNTRYCODE, Name = t.ZCOUNTRYNAME })
+                .ToListAsync();
+            result.Country = country.Count == 0 ? null : country.FirstOrDefault()?.Name;
+
+            //行政区划
+            var location = await _dbContext.Queryable<AdministrativeDivision>()
+                .WhereIF(!string.IsNullOrWhiteSpace(result.Location), t => t.ZADDVSCODE == result.Location)
+                .Where(t => t.IsDelete == 1)
+                .Select(t => new CountryRegionOrAdminDivisionDto { Code = t.ZADDVSCODE, Name = t.ZADDVSNAME })
+                .ToListAsync();
+            result.Location = location.Count == 0 ? null : location.FirstOrDefault()?.Name;
+
+            //项目机构
+            var pjectOrg = await _dbContext.Queryable<Institution>()
+                .WhereIF(!string.IsNullOrWhiteSpace(result.PjectOrg), t => t.OID == result.PjectOrg)
+                .Where(t => t.IsDelete == 1)
+                .Select(t => new InstutionRespDto { Oid = t.OID, PoId = t.POID, Grule = t.GRULE, Name = t.NAME })
+                .ToListAsync();
+
+            var pjectOrgBp = await _dbContext.Queryable<Institution>()
+                .WhereIF(!string.IsNullOrWhiteSpace(result.PjectOrgBP), t => t.OID == result.PjectOrgBP)
+             .Where(t => t.IsDelete == 1)
+             .Select(t => new InstutionRespDto { Oid = t.OID, PoId = t.POID, Grule = t.GRULE, Name = t.NAME })
+             .ToListAsync();
+            //项目类型
+            result.Type = GetValueDomain(result.Type, valDomain, "ZPROJTYPE");
+
+            //国家地区
+            result.Country = GetCountryRegion(result.Country, country);
+
+            //项目所在地
+            result.Location = GetAdministrativeDivision(result.Location, location);
+
+            //项目机构
+            result.PjectOrg = GetInstitutionName(result.PjectOrg, pjectOrg);
+            result.PjectOrgBP = GetInstitutionName(result.PjectOrgBP, pjectOrgBp);
+
+            //日期
+            result.PlanStartDate = GetDate(result.PlanStartDate);
+            result.PlanCompletionDate = GetDate(result.PlanCompletionDate);
+            result.AcquisitionTime = GetDate(result.AcquisitionTime);
+            result.BChangeTime = GetDate(result.BChangeTime);
+            result.StartDateOfInsure = GetDate(result.StartDateOfInsure);
+            result.EndDateOfInsure = GetDate(result.EndDateOfInsure);
+            result.FundEstablishmentDate = GetDate(result.FundEstablishmentDate);
+            result.FundExpirationDate = GetDate(result.FundExpirationDate);
+            result.LeaseStartDate = GetDate(result.LeaseStartDate);
+            result.DueDate = GetDate(result.DueDate);
+            result.CreateDate = GetDateDay(result.CreateDate);
+            result.ResolutionTime = GetDate(result.ResolutionTime);
+
+            //收入来源
+            result.SourceOfIncome = GetValueDomain(result.SourceOfIncome, valDomain, "ZSI");
+
+            //操盘情况
+            result.TradingSituation = GetValueDomain(result.TradingSituation, valDomain, "ZTRADER");
+
+            //承租人类型
+            result.TenantType = GetValueDomain(result.TenantType, valDomain, "ZLESSEETYPE");
+
+            //参与二级单位
+            result.ParticipateInUnitSecs = GetValueDomain(result.ParticipateInUnitSecs, valDomain, "ZCY2NDORG");
+
+            //计税方式
+            result.TaxMethod = GetValueDomain(result.TaxMethod, valDomain, "ZTAXMETHOD");
+
+            //并表情况
+            result.ConsolidatedTable = GetValueDomain(result.ConsolidatedTable, valDomain, "ZCS");
+
+            //是否联合体项目
+            result.IsJoint = result.IsJoint == "1" ? "是" : "否";
+
+            #endregion
+
 
             responseAjaxResult.SuccessResult(result);
             return responseAjaxResult;

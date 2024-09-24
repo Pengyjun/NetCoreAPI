@@ -91,12 +91,12 @@ namespace GDCMasterDataReceiveApi.Filters
             #endregion
 
             #region 过滤接口返回值
-            CacheHelper cacheHelper = new CacheHelper();
-            var cacheResult = cacheHelper.Get<DataInterfaceResponseDto>(context.HttpContext.TraceIdentifier);
-            var IsEncrypt = 1;
-            if (cacheResult != null && cacheResult.IsEncrypt == 1)
-            {
-                var res = ((Microsoft.AspNetCore.Mvc.ObjectResult)context.Result).Value;
+            //CacheHelper cacheHelper = new CacheHelper();
+            //var cacheResult = cacheHelper.Get<DataInterfaceResponseDto>(context.HttpContext.TraceIdentifier);
+            //var IsEncrypt = 1;
+            //if (cacheResult != null && cacheResult.IsEncrypt == 1)
+            //{
+            //    var res = ((Microsoft.AspNetCore.Mvc.ObjectResult)context.Result).Value;
 
                 if (res != null)
                 {
