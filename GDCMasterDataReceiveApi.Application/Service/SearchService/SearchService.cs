@@ -253,7 +253,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     uInfo.PositionGradeNorm = positionGradeNorm.FirstOrDefault(x => x.ZDOM_VALUE == uInfo.PositionGradeNorm)?.ZDOM_NAME;
                     uInfo.HighEstGrade = positionGradeNorm.FirstOrDefault(x => x.ZDOM_VALUE == uInfo.HighEstGrade)?.ZDOM_NAME;
                     uInfo.SameHighEstGrade = positionGradeNorm.FirstOrDefault(x => x.ZDOM_VALUE == uInfo.SameHighEstGrade)?.ZDOM_NAME;
-                    uInfo.CertType = certType.FirstOrDefault(x => x.ZDOM_VALUE == uInfo.SameHighEstGrade)?.ZDOM_NAME;
+                    uInfo.CertType = certType.FirstOrDefault(x => x.ZDOM_VALUE == uInfo.CertType)?.ZDOM_NAME;
                 }
             }
 
@@ -350,6 +350,23 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
             //用工类型
             uDetails.EmpSort = valDomain.FirstOrDefault(x => uDetails.EmpSort == x.ZDOM_VALUE && x.ZDOM_CODE == "ZEMPTYPE")?.ZDOM_NAME;
 
+            //有效证件类型
+            uDetails.CertType = valDomain.FirstOrDefault(x => uDetails.CertType == x.ZDOM_VALUE && x.ZDOM_CODE == "ZIDTYPE")?.ZDOM_NAME;
+
+            //主职岗位类别
+            uDetails.JobType = valDomain.FirstOrDefault(x => uDetails.JobType == x.ZDOM_VALUE && x.ZDOM_CODE == "ZJOBTYPE")?.ZDOM_NAME;
+
+            //最高职级
+            uDetails.PositionGrade = valDomain.FirstOrDefault(x => uDetails.PositionGrade == x.ZDOM_VALUE && x.ZDOM_CODE == "ZEGRADE")?.ZDOM_NAME;
+
+            //职级（新版）
+            uDetails.PositionGradeNorm = valDomain.FirstOrDefault(x => uDetails.PositionGradeNorm == x.ZDOM_VALUE && x.ZDOM_CODE == "ZEGRADE")?.ZDOM_NAME;
+
+            //新版最高职级
+            uDetails.HighEstGrade = valDomain.FirstOrDefault(x => uDetails.HighEstGrade == x.ZDOM_VALUE && x.ZDOM_CODE == "ZEGRADE")?.ZDOM_NAME;
+
+            //统一的最高职级
+            uDetails.SameHighEstGrade = valDomain.FirstOrDefault(x => uDetails.SameHighEstGrade == x.ZDOM_VALUE && x.ZDOM_CODE == "ZEGRADE")?.ZDOM_NAME;
             #endregion
 
             responseAjaxResult.SuccessResult(uDetails);
