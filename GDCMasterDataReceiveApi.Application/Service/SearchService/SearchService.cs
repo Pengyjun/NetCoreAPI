@@ -33,6 +33,7 @@ using GDCMasterDataReceiveApi.Domain.Models;
 using GDCMasterDataReceiveApi.Domain.Shared;
 using Newtonsoft.Json;
 using SqlSugar;
+using System.Net;
 using System.Reflection;
 
 namespace GDCMasterDataReceiveApi.Application.Service.SearchService
@@ -185,7 +186,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                 //机构信息
                 var institutions = await _dbContext.Queryable<Institution>()
                     .Where(t => t.IsDelete == 1)
-                    .Select(t => new InstutionRespDto { Oid = t.OID, PoId = t.POID, Grule = t.GRULE, Name = t.NAME})
+                    .Select(t => new InstutionRespDto { Oid = t.OID, PoId = t.POID, Grule = t.GRULE, Name = t.NAME })
                     .ToListAsync();
 
                 //值域信息
@@ -465,7 +466,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
             return rd;
         }
         /// <summary>
-        /// 机构数列表
+        /// 机构树列表
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
@@ -482,6 +483,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                 filterCondition = JsonConvert.DeserializeObject<InstitutionDetatilsDto>(requestDto.FilterConditionJson);
             }
 
+            #region 初始查询
             //机构树初始化
             var institutions = await _dbContext.Queryable<Institution>()
                 .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Name), t => t.NAME.Contains(filterCondition.Name))
@@ -531,6 +533,13 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                 .OrderBy(t => Convert.ToInt32(t.SNO))
                 .ToListAsync();
 
+            //再次读取
+            var againInstutions = await _dbContext.Queryable<Institution>()
+                .Where(t => t.IsDelete == 1)
+                .Select(t => new { t.OID, t.NAME })
+                .ToListAsync();
+            #endregion
+
             if (filterCondition != null)
             {
                 //机构ids不为空
@@ -553,6 +562,74 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     }
                 }
             }
+
+            #region 数据详细查询
+            //值域信息
+            var valDomain = await _dbContext.Queryable<ValueDomain>()
+                .Where(t => !string.IsNullOrWhiteSpace(t.ZDOM_CODE))
+                .Select(t => new VDomainRespDto { ZDOM_CODE = t.ZDOM_CODE, ZDOM_DESC = t.ZDOM_DESC, ZDOM_VALUE = t.ZDOM_VALUE, ZDOM_NAME = t.ZDOM_NAME, ZDOM_LEVEL = t.ZDOM_LEVEL })
+                .ToListAsync();
+
+            //行政区划（省、市、县）
+            var advisionsKey = institutions.Select(x => x.ORGPROVINCE).ToList();
+            var advisions = await _dbContext.Queryable<AdministrativeDivision>()
+                .Where(t => t.IsDelete == 1 && advisionsKey.Contains(t.ZADDVSCODE))
+                .Select(t => new { t.ZADDVSCODE, t.ZADDVSNAME })
+                .ToListAsync();
+
+            //国家
+            var careasKey = institutions.Select(x => x.CAREA).ToList();
+            var carea = await _dbContext.Queryable<CountryRegion>()
+                .Where(t => t.IsDelete == 1 && careasKey.Contains(t.ZCOUNTRYCODE))
+                .Select(t => new { t.ZCOUNTRYCODE, t.ZCOUNTRYNAME })
+                .ToListAsync();
+
+            foreach (var ins in institutions)
+            {
+                //企业分类
+                ins.ENTCLASS = valDomain.FirstOrDefault(x => ins.ENTCLASS == x.ZDOM_VALUE && x.ZDOM_CODE == "ZENTC")?.ZDOM_NAME;
+
+                //机构状态
+                ins.STATUS = valDomain.FirstOrDefault(x => ins.STATUS == x.ZDOM_VALUE && x.ZDOM_CODE == "ZORGSTATE")?.ZDOM_NAME;
+
+                //机构属性
+                ins.TYPE = valDomain.FirstOrDefault(x => ins.TYPE == x.ZDOM_VALUE && x.ZDOM_CODE == "ZORGATTR")?.ZDOM_NAME;
+
+                //机构子属性
+                ins.TYPEEXT = valDomain.FirstOrDefault(x => ins.TYPEEXT == x.ZDOM_VALUE && x.ZDOM_CODE == "ZORGCHILDATTR")?.ZDOM_NAME;
+
+                //拥有兼管职能
+                ins.CROSSORGAN = ins.CROSSORGAN == "0" ? "否" : "是";
+
+                //机构所在地（省）
+                ins.ORGPROVINCE = advisions.FirstOrDefault(x => x.ZADDVSCODE == ins.ORGPROVINCE)?.ZADDVSNAME;
+
+                //国家
+                ins.CAREA = carea.FirstOrDefault(x => x.ZCOUNTRYCODE == ins.CAREA)?.ZCOUNTRYNAME;
+
+                //独立授权
+                ins.ROWN = ins.ROWN == "1" ? "是" : "否";
+
+                //授权机构
+                ins.ROID = againInstutions.FirstOrDefault(x => x.OID == ins.ROID)?.NAME;
+
+                //隶属单位
+                ins.COID = againInstutions.FirstOrDefault(x => x.OID == ins.COID)?.NAME;
+
+                //是否独立核算
+                ins.IS_INDEPENDENT = valDomain.FirstOrDefault(x => ins.IS_INDEPENDENT == x.ZDOM_VALUE && x.ZDOM_CODE == "ZCHECKIND")?.ZDOM_NAME;
+
+                //持股情况
+                ins.SHAREHOLDINGS = valDomain.FirstOrDefault(x => ins.SHAREHOLDINGS == x.ZDOM_VALUE && x.ZDOM_CODE == "ZHOLDING")?.ZDOM_NAME;
+
+                //项目类型
+                ins.PROJECTTYPE = valDomain.FirstOrDefault(x => ins.PROJECTTYPE == x.ZDOM_VALUE && x.ZDOM_CODE == "ZPROJTYPE")?.ZDOM_NAME;
+
+
+            }
+
+            #endregion
+
             //其他数据
             var otherNodes = institutions
                 .WhereIF(oids != null && oids.Any(), ins => oids.Contains(ins.OID))
@@ -681,7 +758,6 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
             }
             return childs;
         }
-
         /// <summary>
         /// 获取机构详情
         /// </summary>
@@ -742,7 +818,67 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                 })
                 .FirstAsync();
 
+            var againInstutions = await _dbContext.Queryable<Institution>()
+              .Where(t => t.IsDelete == 1)
+              .Select(t => new { t.OID, t.NAME })
+              .ToListAsync();
+
             #region 处理其他基本信息数据
+            //值域信息
+            var valDomain = await _dbContext.Queryable<ValueDomain>()
+                .Where(t => !string.IsNullOrWhiteSpace(t.ZDOM_CODE))
+                .Select(t => new VDomainRespDto { ZDOM_CODE = t.ZDOM_CODE, ZDOM_DESC = t.ZDOM_DESC, ZDOM_VALUE = t.ZDOM_VALUE, ZDOM_NAME = t.ZDOM_NAME, ZDOM_LEVEL = t.ZDOM_LEVEL })
+                .ToListAsync();
+
+            //行政区划（省、市、县）
+            var advisions = await _dbContext.Queryable<AdministrativeDivision>()
+                .Where(t => t.IsDelete == 1 && insDetails.OrgProvince == t.ZADDVSCODE)
+                .FirstAsync();
+            insDetails.OrgProvince = advisions == null ? null : advisions.ZADDVSNAME;
+
+            //国家
+            var carea = await _dbContext.Queryable<CountryRegion>()
+                .Where(t => t.IsDelete == 1 && insDetails.Carea == t.ZCOUNTRYCODE)
+                .FirstAsync();
+            insDetails.Carea = carea == null ? null : carea.ZCOUNTRYNAME;
+
+            //企业分类
+            insDetails.EntClass = valDomain.FirstOrDefault(x => insDetails.EntClass == x.ZDOM_VALUE && x.ZDOM_CODE == "ZENTC")?.ZDOM_NAME;
+
+            //机构状态
+            insDetails.Status = valDomain.FirstOrDefault(x => insDetails.Status == x.ZDOM_VALUE && x.ZDOM_CODE == "ZORGSTATE")?.ZDOM_NAME;
+
+            //机构属性
+            insDetails.Type = valDomain.FirstOrDefault(x => insDetails.Type == x.ZDOM_VALUE && x.ZDOM_CODE == "ZORGATTR")?.ZDOM_NAME;
+
+            //机构子属性
+            insDetails.TypeExt = valDomain.FirstOrDefault(x => insDetails.TypeExt == x.ZDOM_VALUE && x.ZDOM_CODE == "ZORGCHILDATTR")?.ZDOM_NAME;
+
+            //拥有兼管职能
+            insDetails.Crossorgan = insDetails.Crossorgan == "0" ? "否" : "是";
+
+            //独立授权
+            insDetails.Rown = insDetails.Rown == "1" ? "是" : "否";
+
+            //隶属单位
+            insDetails.Coid= againInstutions.FirstOrDefault(x => x.OID == insDetails.Coid)?.NAME;
+
+            //分组机构id
+            insDetails.Gpoid = againInstutions.FirstOrDefault(x => x.OID == insDetails.Gpoid)?.NAME;
+
+            //授权机构
+            insDetails.RoId = againInstutions.FirstOrDefault(x => x.OID == insDetails.RoId)?.NAME;
+
+            //是否独立核算
+            insDetails.IsIndependent = valDomain.FirstOrDefault(x => insDetails.IsIndependent == x.ZDOM_VALUE && x.ZDOM_CODE == "ZCHECKIND")?.ZDOM_NAME;
+
+            //持股情况
+            insDetails.ShareHoldings = valDomain.FirstOrDefault(x => insDetails.ShareHoldings == x.ZDOM_VALUE && x.ZDOM_CODE == "ZHOLDING")?.ZDOM_NAME;
+
+            //项目类型
+            insDetails.ProjectType = valDomain.FirstOrDefault(x => insDetails.ProjectType == x.ZDOM_VALUE && x.ZDOM_CODE == "ZPROJTYPE")?.ZDOM_NAME;
+
+
 
             #endregion
 
