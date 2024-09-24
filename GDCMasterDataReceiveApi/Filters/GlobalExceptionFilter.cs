@@ -7,8 +7,10 @@ using GDCMasterDataReceiveApi.Domain.Shared.Utils;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Serialization;
 using SqlSugar;
+using SqlSugar.Extensions;
 using UtilsSharp;
 
 namespace GDCMasterDataReceiveApi.Filters
@@ -94,28 +96,49 @@ namespace GDCMasterDataReceiveApi.Filters
             CacheHelper cacheHelper = new CacheHelper();
             var cacheResult = cacheHelper.Get<DataInterfaceResponseDto>(context.HttpContext.TraceIdentifier);
             var IsEncrypt = 1;
+         
+            #region  接口返回值字段规则设置
+            WebHelper webHelper = new WebHelper();
+            var systemInterfaceFiledRuleApi = AppsettingsHelper.GetValue("API:SystemInterfaceFiledRuleApi");
+            Dictionary<string, object> parames = new Dictionary<string, object>();
+            string setupResult = string.Empty;
+            int returnCount = 0;
+            if (cacheResult != null)
+            {
+                //接口返回值
+                var returnRes = ((Microsoft.AspNetCore.Mvc.ObjectResult)context.Result).Value;
+                webHelper.Headers.Add("appKey", cacheResult.AppKey);
+                webHelper.Headers.Add("appinterfaceCode", cacheResult.AppinterfaceCode);
+                var parseToken=JObject.Parse(returnRes.ToJson(true));
+                if (parseToken["count"] != null)
+                {
+                    returnCount = parseToken["count"].ToString().ObjToInt();
+                }
+                parames.Add("jsonObj", returnRes.ToJson(true));
+                var   responseResult = await webHelper.DoPostAsync(systemInterfaceFiledRuleApi, parames);
+                setupResult = responseResult.Result;
+            }
+            
+            #endregion
+
+            #region 过滤接口加密设置
             if (cacheResult != null && cacheResult.IsEncrypt == 1)
             {
-                var res = ((Microsoft.AspNetCore.Mvc.ObjectResult)context.Result).Value;
-
-                if (res != null)
+                //接口返回值
+                //var returnRes = ((Microsoft.AspNetCore.Mvc.ObjectResult)context.Result).Value;
+                if (!string.IsNullOrWhiteSpace(setupResult))
                 {
                     var interfaceEncryptApi = AppsettingsHelper.GetValue("API:InterfaceEncryptApi");
-                    WebHelper webHelper = new WebHelper();
-                    webHelper.Headers.Add("appKey", cacheResult.AppKey);
-                    webHelper.Headers.Add("appinterfaceCode", cacheResult.AppinterfaceCode);
+
                     Dictionary<string, object> parame = new Dictionary<string, object>();
-                    parame.Add("item", res.ToJson(true));
+                    parame.Add("item", setupResult.ToJson(true));
                     var dateEncrypt = await webHelper.DoPostAsync(interfaceEncryptApi, parame);
                     ResponseAjaxResult<object> responseAjaxResult = new ResponseAjaxResult<object>()
                     {
+                        Count=returnCount,
                         Data = dateEncrypt.Result
                     };
                     responseAjaxResult.Success();
-                    //var settings = new System.Text.Json.JsonSerializerOptions
-                    //{
-                    //    PropertyNamingPolicy = new LowerCasePropertyNamingPolicy()
-                    //};
                     context.Result = new JsonResult(responseAjaxResult);
                 }
             }
@@ -123,6 +146,8 @@ namespace GDCMasterDataReceiveApi.Filters
             {
                 IsEncrypt = 0;
             }
+            #endregion
+
             context.HttpContext.Response.Headers.Append("IsEncryption", IsEncrypt.ToString());
 
             #endregion
