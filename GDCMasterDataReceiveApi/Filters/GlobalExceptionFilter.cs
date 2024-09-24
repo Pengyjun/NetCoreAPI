@@ -4,6 +4,7 @@ using GDCMasterDataReceiveApi.Domain.Shared;
 using GDCMasterDataReceiveApi.Domain.Shared.Const;
 using GDCMasterDataReceiveApi.Domain.Shared.Enums;
 using GDCMasterDataReceiveApi.Domain.Shared.Utils;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Newtonsoft.Json;
@@ -91,9 +92,9 @@ namespace GDCMasterDataReceiveApi.Filters
             #endregion
 
             #region 过滤接口返回值
-            var IsEncrypt = 1;
             CacheHelper cacheHelper = new CacheHelper();
-            var cacheResult = cacheHelper.Get<DataInterfaceResponseDto>("InterfaceInfo");
+            var cacheResult = cacheHelper.Get<DataInterfaceResponseDto>(context.HttpContext.TraceIdentifier);
+            var IsEncrypt = 1;
             if (cacheResult != null && cacheResult.IsEncrypt == 1)
             {
                 var res = ((Microsoft.AspNetCore.Mvc.ObjectResult)context.Result).Value;
@@ -117,7 +118,7 @@ namespace GDCMasterDataReceiveApi.Filters
                     {
                         ContractResolver = new CamelCasePropertyNamesContractResolver() 
                     };
-                    context.Result = new JsonResult(responseAjaxResult, settings);
+                    context.Result = new JsonResult(responseAjaxResult);
                 }
             }
             else
@@ -193,17 +194,6 @@ namespace GDCMasterDataReceiveApi.Filters
 
                             if (db != null)
                                 await db.Insertable<AuditLogs>(auditLogs).ExecuteCommandAsync();
-
-                            #region 只有退出帐号后才会执行下面代码
-                            if (userInfo != null && auditLogs.Url.IndexOf("/OperationLog/LogoutLog") > 0)
-                            {
-                                //删除当前用户在redis里面的缓存
-                                if (await redis.ExistsAsync(userInfo.Account))
-                                {
-                                    await redis.DelAsync(userInfo.Account);
-                                }
-                            }
-                            #endregion
                         }
                     }
                     catch (Exception ex)
