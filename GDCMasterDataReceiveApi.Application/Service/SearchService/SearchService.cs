@@ -338,6 +338,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
 
             //国籍
             var name = await _dbContext.Queryable<CountryRegion>().FirstAsync(t => t.IsDelete == 1 && uDetails.Nationality == t.ZCOUNTRYCODE);
+            uDetails.CountryRegion = name == null ? null : name.ZCOUNTRYNAME;
             uDetails.Nationality = name == null ? null : name.ZCOUNTRYNAME;
 
             //用户状态
