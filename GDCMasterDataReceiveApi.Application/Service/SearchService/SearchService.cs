@@ -466,6 +466,29 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
             return rd;
         }
         /// <summary>
+        /// 获取机构名称
+        /// </summary>
+        /// <param name="oid"></param>
+        /// <param name="instutionDtos"></param>
+        /// <returns></returns>
+        private string? GetInstitutionName(string? oid, List<InstutionRespDto> instutionDtos)
+        {
+            var instutionName = instutionDtos.FirstOrDefault(x => x.Oid == oid)?.Name;
+            return instutionName;
+        }
+        /// <summary>
+        /// 根据值域获取名称
+        /// </summary>
+        /// <param name="zDomValue"></param>
+        /// <param name="vDomainList"></param>
+        /// <param name="zDomCode"></param>
+        /// <returns></returns>
+        private string? GetValueDomain(string? zDomValue, List<VDomainRespDto> vDomainList, string? zDomCode)
+        {
+            var vDomainName = vDomainList.FirstOrDefault(x => x.ZDOM_VALUE == zDomValue && x.ZDOM_CODE == zDomCode)?.ZDOM_NAME;
+            return vDomainName;
+        }
+        /// <summary>
         /// 机构树列表
         /// </summary>
         /// <param name="requestDto"></param>
@@ -861,7 +884,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
             insDetails.Rown = insDetails.Rown == "1" ? "是" : "否";
 
             //隶属单位
-            insDetails.Coid= againInstutions.FirstOrDefault(x => x.OID == insDetails.Coid)?.NAME;
+            insDetails.Coid = againInstutions.FirstOrDefault(x => x.OID == insDetails.Coid)?.NAME;
 
             //分组机构id
             insDetails.Gpoid = againInstutions.FirstOrDefault(x => x.OID == insDetails.Gpoid)?.NAME;
