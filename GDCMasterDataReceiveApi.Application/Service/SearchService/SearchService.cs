@@ -185,13 +185,13 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                 //机构信息
                 var institutions = await _dbContext.Queryable<Institution>()
                     .Where(t => t.IsDelete == 1)
-                    .Select(t => new UInstutionDto { Oid = t.OID, PoId = t.POID, Grule = t.GRULE, Name = t.NAME })
+                    .Select(t => new InstutionRespDto { Oid = t.OID, PoId = t.POID, Grule = t.GRULE, Name = t.NAME})
                     .ToListAsync();
 
                 //值域信息
                 var valDomain = await _dbContext.Queryable<ValueDomain>()
                     .Where(t => !string.IsNullOrWhiteSpace(t.ZDOM_CODE))
-                    .Select(t => new { t.ZDOM_CODE, t.ZDOM_DESC, t.ZDOM_VALUE, t.ZDOM_NAME })
+                    .Select(t => new VDomainRespDto { ZDOM_CODE = t.ZDOM_CODE, ZDOM_DESC = t.ZDOM_DESC, ZDOM_VALUE = t.ZDOM_VALUE, ZDOM_NAME = t.ZDOM_NAME, ZDOM_LEVEL = t.ZDOM_LEVEL })
                     .ToListAsync();
 
                 #region 处理其他基本信息数据
@@ -254,6 +254,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     uInfo.HighEstGrade = positionGradeNorm.FirstOrDefault(x => x.ZDOM_VALUE == uInfo.HighEstGrade)?.ZDOM_NAME;
                     uInfo.SameHighEstGrade = positionGradeNorm.FirstOrDefault(x => x.ZDOM_VALUE == uInfo.SameHighEstGrade)?.ZDOM_NAME;
                     uInfo.CertType = certType.FirstOrDefault(x => x.ZDOM_VALUE == uInfo.CertType)?.ZDOM_NAME;
+                    uInfo.SubDepts = GetSubDepts(uInfo.SubDepts, institutions, valDomain, uInfo.JobName);
                 }
             }
 
@@ -324,13 +325,13 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
             //获取机构信息
             var institutions = await _dbContext.Queryable<Institution>()
                 .Where(t => t.IsDelete == 1)
-                .Select(t => new UInstutionDto { Oid = t.OID, PoId = t.POID, Grule = t.GRULE, Name = t.NAME })
+                .Select(t => new InstutionRespDto { Oid = t.OID, PoId = t.POID, Grule = t.GRULE, Name = t.NAME })
                 .ToListAsync();
 
             //值域信息
             var valDomain = await _dbContext.Queryable<ValueDomain>()
                 .Where(t => !string.IsNullOrWhiteSpace(t.ZDOM_CODE))
-                .Select(t => new { t.ZDOM_CODE, t.ZDOM_DESC, t.ZDOM_VALUE, t.ZDOM_NAME })
+                .Select(t => new VDomainRespDto { ZDOM_CODE = t.ZDOM_CODE, ZDOM_DESC = t.ZDOM_DESC, ZDOM_VALUE = t.ZDOM_VALUE, ZDOM_NAME = t.ZDOM_NAME, ZDOM_LEVEL = t.ZDOM_LEVEL })
                 .ToListAsync();
 
             //公司
@@ -368,6 +369,13 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
 
             //统一的最高职级
             uDetails.SameHighEstGrade = valDomain.FirstOrDefault(x => uDetails.SameHighEstGrade == x.ZDOM_VALUE && x.ZDOM_CODE == "ZEGRADE")?.ZDOM_NAME;
+
+            //所属部门
+            uDetails.OfficeDepIdName = institutions.FirstOrDefault(x => x.Oid == uDetails.OfficeDepId)?.Name;
+
+            //兼职所在部门、岗位类别、职级、岗位名称及排序
+            uDetails.SubDepts = GetSubDepts(uDetails.SubDepts, institutions, valDomain, uDetails.JobName);
+
             #endregion
 
             responseAjaxResult.SuccessResult(uDetails);
@@ -379,7 +387,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
         /// <param name="oid"></param>
         /// <param name="uInstutionDtos"></param>
         /// <returns></returns>
-        public string GetUserCompany(string oid, List<UInstutionDto> uInstutionDtos)
+        private string GetUserCompany(string oid, List<InstutionRespDto> uInstutionDtos)
         {
             var uInsInfo = uInstutionDtos.FirstOrDefault(x => x.Oid == oid);
             if (uInsInfo != null)
@@ -401,6 +409,60 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                 }
             }
             return string.Empty;
+        }
+        /// <summary>
+        /// 获取兼职所在部门、岗位类别、职级、岗位名称及排序
+        /// </summary>
+        /// <returns></returns>
+        private string GetSubDepts(string? subDepts, List<InstutionRespDto> instutionDtos, List<VDomainRespDto> vDomainList, string? jobName)
+        {
+            string rd = string.Empty;
+            if (!string.IsNullOrWhiteSpace(subDepts))
+            {
+                //先根据,拆
+                var dSubDepts = subDepts.Split(',').ToList();
+                if (dSubDepts != null && dSubDepts.Any())
+                {
+                    string val = string.Empty;
+                    foreach (var ot in dSubDepts)
+                    {
+                        var values = ot.Split('|').ToList();
+                        //根据|拆
+                        for (int i = 0; i < values.Count; i++)
+                        {
+                            switch (i)
+                            {
+                                case 0:
+                                    //所在部门
+                                    if (values[i].Length > 0) val += instutionDtos.FirstOrDefault(x => x.Oid == values[i])?.Name;
+                                    break;
+                                case 1:
+                                    //岗位类别
+                                    if (values[i].Length > 0) val += vDomainList.FirstOrDefault(x => x.ZDOM_CODE == "ZJOBTYPE" && x.ZDOM_VALUE == values[i])?.ZDOM_NAME;
+                                    break;
+                                case 2:
+                                    //职级
+                                    if (values[i].Length > 0) val += vDomainList.FirstOrDefault(x => x.ZDOM_CODE == "ZEGRADE" && x.ZDOM_VALUE == values[i])?.ZDOM_NAME;
+                                    break;
+                                case 3:
+                                    //岗位名称
+                                    if (values[i].Length > 0) val += jobName;
+                                    break;
+                                case 4:
+                                    //排序
+                                    if (values[i].Length > 0) val += values[i];
+                                    break;
+                            }
+                            val += "|";
+                        }
+                        val = !string.IsNullOrWhiteSpace(val) ? val.Substring(0, val.Length - 1) : val;
+                        val += ",";
+                    }
+                    rd = !string.IsNullOrWhiteSpace(val) ? val.Substring(0, val.Length - 1) : val;
+                }
+            }
+
+            return rd;
         }
         /// <summary>
         /// 机构数列表

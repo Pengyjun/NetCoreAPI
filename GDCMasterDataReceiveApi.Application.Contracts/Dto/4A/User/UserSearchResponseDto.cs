@@ -290,9 +290,9 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto._4A.User
         public string? Attribute5 { get; set; }
     }
     /// <summary>
-    /// 用户机构dto
+    /// 机构dto
     /// </summary>
-    public class UInstutionDto
+    public class InstutionRespDto
     {
         /// <summary>
         /// oid
@@ -310,5 +310,16 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto._4A.User
         /// 名称
         /// </summary>
         public string? Name { get; set; }
+    }
+    /// <summary>
+    /// 值域
+    /// </summary>
+    public class VDomainRespDto
+    {
+        public string? ZDOM_CODE { get; set; }
+        public string? ZDOM_DESC { get; set; }
+        public string? ZDOM_VALUE { get; set; }
+        public string? ZDOM_NAME { get; set; }
+        public string? ZDOM_LEVEL { get; set; }
     }
 }
