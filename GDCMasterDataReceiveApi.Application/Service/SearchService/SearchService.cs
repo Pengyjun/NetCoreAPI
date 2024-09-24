@@ -390,7 +390,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
         /// <param name="oid"></param>
         /// <param name="uInstutionDtos"></param>
         /// <returns></returns>
-        private string GetUserCompany(string oid, List<InstutionRespDto> uInstutionDtos)
+        private string GetUserCompany(string? oid, List<InstutionRespDto> uInstutionDtos)
         {
             var uInsInfo = uInstutionDtos.FirstOrDefault(x => x.Oid == oid);
             if (uInsInfo != null)
