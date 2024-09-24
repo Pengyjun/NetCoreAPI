@@ -29,6 +29,7 @@ using GDCMasterDataReceiveApi.Application.Contracts.Dto.UnitMeasurement;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.ValueDomain;
 using GDCMasterDataReceiveApi.Application.Contracts.IService.ISearchService;
 using GDCMasterDataReceiveApi.Domain.Shared;
+using GDCMasterDataReceiveApi.Domain.Shared.Annotation;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GDCMasterDataReceiveApi.Controller
@@ -38,6 +39,7 @@ namespace GDCMasterDataReceiveApi.Controller
     /// </summary>
     [Route("api/[controller]")]
     [ApiController]
+    [InterfaceIntercept]
     public class SearchController : BaseController
     {
         private readonly ISearchService _searchService;
