@@ -39,9 +39,10 @@ namespace GDCMasterDataReceiveApi.Filters
                 {
                     var sKey = context.HttpContext.Request.Headers[appKey].ToString();
                     var iKey = context.HttpContext.Request.Headers[appinterfaceCode].ToString();
-                    webHelper.Headers.Add("appKey", AppsettingsHelper.GetValue("API:Token:appKey"));
-                    webHelper.Headers.Add("appinterfaceCode", AppsettingsHelper.GetValue("API:Token:appinterfaceCode"));
-                    var interfaceAuth = await webHelper.DoGetAsync<string>(interfaceAuthApi);
+                    Dictionary<string,object> keyValuePairs = new Dictionary<string, object>();
+                    keyValuePairs.Add("appKey", sKey);
+                    keyValuePairs.Add("appinterfaceCode", iKey);
+                    var interfaceAuth = await webHelper.DoGetAsync<string>(interfaceAuthApi, keyValuePairs);
                     if (interfaceAuth.Code == 200 && interfaceAuth.Result == "true")
                     {
                         var actionName = ((Microsoft.AspNetCore.Mvc.Controllers.ControllerActionDescriptor)context.ActionDescriptor).ActionName;
@@ -50,7 +51,7 @@ namespace GDCMasterDataReceiveApi.Filters
                             actionName = actionName + "Async";
                         }
                         var systemInterfaceInfoApi = AppsettingsHelper.GetValue("API:SystemInterfaceInfoApi");
-                        var interfaceInfoList = await webHelper.DoGetAsync<ResponseAjaxResult<List<DataInterfaceResponseDto>>>(systemInterfaceInfoApi);
+                        var interfaceInfoList = await webHelper.DoGetAsync<ResponseAjaxResult<List<DataInterfaceResponseDto>>>(systemInterfaceInfoApi, keyValuePairs);
                         //如果返回空
                         if (interfaceInfoList.Code == 200 && interfaceInfoList.Result == null && !interfaceInfoList.Result.Data.Any())
                         {

@@ -102,8 +102,8 @@ namespace GDCMasterDataReceiveApi.Filters
                 {
                     var interfaceEncryptApi = AppsettingsHelper.GetValue("API:InterfaceEncryptApi");
                     WebHelper webHelper = new WebHelper();
-                    webHelper.Headers.Add("appKey", AppsettingsHelper.GetValue("API:Token:appKey"));
-                    webHelper.Headers.Add("appinterfaceCode", AppsettingsHelper.GetValue("API:Token:appinterfaceCode"));
+                    webHelper.Headers.Add("appKey", cacheResult.AppKey);
+                    webHelper.Headers.Add("appinterfaceCode", cacheResult.AppinterfaceCode);
                     Dictionary<string, object> parame = new Dictionary<string, object>();
                     parame.Add("item", res.ToJson(true));
                     var dateEncrypt = await webHelper.DoPostAsync(interfaceEncryptApi, parame);

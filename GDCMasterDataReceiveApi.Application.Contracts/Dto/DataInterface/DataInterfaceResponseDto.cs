@@ -9,6 +9,10 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.DataInterface
     public class DataInterfaceResponseDto
     {
         /// <summary>
+        /// appKey
+        /// </summary>
+        public string? AppKey { get; set; }
+        /// <summary>
         /// 系统标识
         /// </summary>
         public string? SystemIdentity { get; set; }
@@ -16,6 +20,10 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.DataInterface
         /// 接口名称
         /// </summary>
         public string? InterfaceName { get; set; }
+        /// <summary>
+        /// 接口授权码
+        /// </summary>
+        public string? AppinterfaceCode { get; set; }
         /// <summary>
         /// 接口是否启用
         /// </summary>
