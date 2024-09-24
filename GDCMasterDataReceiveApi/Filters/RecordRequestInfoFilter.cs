@@ -99,7 +99,7 @@ namespace GDCMasterDataReceiveApi.Filters
                         }
                         //验证访问IP
                         CacheHelper cacheHelper = new CacheHelper();
-                        cacheHelper.Set(httpContext.TraceIdentifier, intefaceInfo, 60);
+                        cacheHelper.Set(httpContext.TraceIdentifier, intefaceInfo, 30);
                     }
                     else
                     {
