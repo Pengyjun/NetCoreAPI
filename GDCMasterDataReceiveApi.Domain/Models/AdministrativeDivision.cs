@@ -8,8 +8,6 @@ namespace GDCMasterDataReceiveApi.Domain.Models
     [SugarTable("t_administrativedivision", IsDisabledDelete = true)]
     public class AdministrativeDivision : BaseEntity<long>
     {
-       
-     
         /// <summary>
         /// 行政区划代码:业务主键
         /// </summary>

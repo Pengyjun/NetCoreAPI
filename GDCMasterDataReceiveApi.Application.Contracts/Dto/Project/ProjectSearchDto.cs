@@ -312,7 +312,7 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.Project
         /// 到期日期yyyymmdd
         /// </summary>
         [ExcelIgnore]
-        public string DueDate { get; set; }
+        public string? DueDate { get; set; }
         /// <summary>
         /// 所属二级单位:二级单位组织机构编码OID
         /// </summary>

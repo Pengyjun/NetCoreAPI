@@ -316,10 +316,39 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto._4A.User
     /// </summary>
     public class VDomainRespDto
     {
+        /// <summary>
+        /// 值域编码
+        /// </summary>
         public string? ZDOM_CODE { get; set; }
+        /// <summary>
+        /// 值域编码描述
+        /// </summary>
         public string? ZDOM_DESC { get; set; }
+        /// <summary>
+        /// 域值
+        /// </summary>
         public string? ZDOM_VALUE { get; set; }
+        /// <summary>
+        /// 域值描述
+        /// </summary>
         public string? ZDOM_NAME { get; set; }
+        /// <summary>
+        /// 层级
+        /// </summary>
         public string? ZDOM_LEVEL { get; set; }
+    }
+    /// <summary>
+    /// 国家地区/行政区划（省、市、区）
+    /// </summary>
+    public class CountryRegionOrAdminDivisionDto
+    {
+        /// <summary>
+        /// 国家地区代码
+        /// </summary>
+        public string? Code { get; set; }
+        /// <summary>
+        /// 国家地区名称
+        /// </summary>
+        public string? Name { get; set; }
     }
 }

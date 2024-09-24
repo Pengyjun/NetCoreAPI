@@ -617,6 +617,28 @@ namespace GDCMasterDataReceiveApi.Domain.Shared.Utils
             var day = 1;
             return DateTime.TryParse($"{year}-{month}-{day}", out monthTime);
         }
+        /// <summary>
+        /// 年月日 时分秒
+        /// </summary>
+        /// <param name="dateDay"></param>
+        /// <param name="dayTime"></param>
+        /// <returns></returns>
+        public static bool TryConvertDateTimeFromDateDayH(int dateDay, out DateTime dayTime)
+        {
+            var dateDayStr = dateDay.ToString();
+            if (dateDayStr.Length != 14)
+            {
+                dayTime = DateTime.MinValue;
+                return false;
+            }
+            var year = dateDayStr.Substring(0, 4);
+            var month = dateDayStr.Substring(4, 2);
+            var day = dateDayStr.Substring(6, 2);
+            var hh = dateDayStr.Substring(8, 2);
+            var mm = dateDayStr.Substring(10, 2);
+            var ss = dateDayStr.Substring(12, 2);
+            return DateTime.TryParse($"{year}-{month}-{day} {hh} {mm} {ss}", out dayTime);
+        }
 
         /// <summary>
         /// 转换成年份份格式时间（例：202304，转换成2023-01-01 00:00:00）
