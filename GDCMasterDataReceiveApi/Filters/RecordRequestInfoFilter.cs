@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Serialization;
 using System.Text;
 using UtilsSharp;
@@ -39,10 +40,9 @@ namespace GDCMasterDataReceiveApi.Filters
                 {
                     var sKey = context.HttpContext.Request.Headers[appKey].ToString();
                     var iKey = context.HttpContext.Request.Headers[appinterfaceCode].ToString();
-                    Dictionary<string,object> keyValuePairs = new Dictionary<string, object>();
-                    keyValuePairs.Add("appKey", sKey);
-                    keyValuePairs.Add("appinterfaceCode", iKey);
-                    var interfaceAuth = await webHelper.DoGetAsync<string>(interfaceAuthApi, keyValuePairs);
+                    webHelper.Headers.Add("appKey", sKey);
+                    webHelper.Headers.Add("appinterfaceCode", iKey);
+                    var interfaceAuth = await webHelper.DoGetAsync<string>(interfaceAuthApi);
                     if (interfaceAuth.Code == 200 && interfaceAuth.Result == "true")
                     {
                         var actionName = ((Microsoft.AspNetCore.Mvc.Controllers.ControllerActionDescriptor)context.ActionDescriptor).ActionName;
@@ -51,7 +51,7 @@ namespace GDCMasterDataReceiveApi.Filters
                             actionName = actionName + "Async";
                         }
                         var systemInterfaceInfoApi = AppsettingsHelper.GetValue("API:SystemInterfaceInfoApi");
-                        var interfaceInfoList = await webHelper.DoGetAsync<ResponseAjaxResult<List<DataInterfaceResponseDto>>>(systemInterfaceInfoApi, keyValuePairs);
+                        var interfaceInfoList = await webHelper.DoGetAsync<ResponseAjaxResult<List<DataInterfaceResponseDto>>>(systemInterfaceInfoApi);
                         //如果返回空
                         if (interfaceInfoList.Code == 200 && interfaceInfoList.Result == null && !interfaceInfoList.Result.Data.Any())
                         {
@@ -104,8 +104,8 @@ namespace GDCMasterDataReceiveApi.Filters
                         ResponseAjaxResult<object> responseAjaxResult = new ResponseAjaxResult<object>()
                         {
                         };
-
-                        responseAjaxResult.Fail(message: ResponseMessage.ACCESSINTERFACE_ERROR, httpStatusCode: HttpStatusCode.InterfaceAuth);
+                        var value=JObject.Parse(interfaceAuth.Result)["message"];
+                        responseAjaxResult.Fail(message: value.ToString(), httpStatusCode: HttpStatusCode.InterfaceAuth);
                         context.HttpContext.Response.Clear();
                         var obj = new ContentResult()
                         {
@@ -126,7 +126,7 @@ namespace GDCMasterDataReceiveApi.Filters
                     {
                     };
 
-                    responseAjaxResult.Fail(message: ResponseMessage.ACCESSINTERFACE_ERROR, httpStatusCode: HttpStatusCode.InterfaceAuth);
+                    responseAjaxResult.Fail(message: ResponseMessage.APPKEY_ERROR, httpStatusCode: HttpStatusCode.InterfaceAuth);
                     context.HttpContext.Response.Clear();
                     var obj = new ContentResult()
                     {

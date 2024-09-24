@@ -24,6 +24,7 @@
         public const string OPERATION_NOLOGIN_FAIL = "您还没有登录请先登录";
         public const string OPERATION_LOGINOUT_SUCCESS = "您已在其他终端退出，请重新登录";
         public const string ACCESSINTERFACE_ERROR = "接口未开通权限，请联系管理员";
+        public const string APPKEY_ERROR = "AppKey或AppinterfaceCode不能为空";
     }
     /// <summary>
     /// 响应信息状态
