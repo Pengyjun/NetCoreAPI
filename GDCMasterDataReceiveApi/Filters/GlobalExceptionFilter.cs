@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using SqlSugar;
+using System.Text.Json;
 using UtilsSharp;
 
 namespace GDCMasterDataReceiveApi.Filters
@@ -106,18 +107,17 @@ namespace GDCMasterDataReceiveApi.Filters
                     webHelper.Headers.Add("appKey", AppsettingsHelper.GetValue("API:Token:appKey"));
                     webHelper.Headers.Add("appinterfaceCode", AppsettingsHelper.GetValue("API:Token:appinterfaceCode"));
                     Dictionary<string, object> parame = new Dictionary<string, object>();
-                    parame.Add("item", res.ToJson());
+                    parame.Add("item", res.ToJson(true));
                     var dateEncrypt = await webHelper.DoPostAsync(interfaceEncryptApi, parame);
                     ResponseAjaxResult<object> responseAjaxResult = new ResponseAjaxResult<object>()
                     {
+                        Data = dateEncrypt.Result
                     };
-
-                    responseAjaxResult.Data = dateEncrypt.Result;
                     responseAjaxResult.Success();
-                    var settings = new JsonSerializerSettings
-                    {
-                        ContractResolver = new CamelCasePropertyNamesContractResolver() 
-                    };
+                    //var settings = new System.Text.Json.JsonSerializerOptions
+                    //{
+                    //    PropertyNamingPolicy = new LowerCasePropertyNamingPolicy()
+                    //};
                     context.Result = new JsonResult(responseAjaxResult);
                 }
             }
