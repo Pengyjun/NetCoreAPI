@@ -91,39 +91,39 @@ namespace GDCMasterDataReceiveApi.Filters
             #endregion
 
             #region 过滤接口返回值
-            CacheHelper cacheHelper = new CacheHelper();
-            var cacheResult = cacheHelper.Get<DataInterfaceResponseDto>(context.HttpContext.TraceIdentifier);
-            var IsEncrypt = 1;
-            if (cacheResult != null && cacheResult.IsEncrypt == 1)
-            {
-                var res = ((Microsoft.AspNetCore.Mvc.ObjectResult)context.Result).Value;
+            //CacheHelper cacheHelper = new CacheHelper();
+            //var cacheResult = cacheHelper.Get<DataInterfaceResponseDto>(context.HttpContext.TraceIdentifier);
+            //var IsEncrypt = 1;
+            //if (cacheResult != null && cacheResult.IsEncrypt == 1)
+            //{
+            //    var res = ((Microsoft.AspNetCore.Mvc.ObjectResult)context.Result).Value;
 
-                if (res != null)
-                {
-                    var interfaceEncryptApi = AppsettingsHelper.GetValue("API:InterfaceEncryptApi");
-                    WebHelper webHelper = new WebHelper();
-                    webHelper.Headers.Add("appKey", AppsettingsHelper.GetValue("API:Token:appKey"));
-                    webHelper.Headers.Add("appinterfaceCode", AppsettingsHelper.GetValue("API:Token:appinterfaceCode"));
-                    Dictionary<string, object> parame = new Dictionary<string, object>();
-                    parame.Add("item", res.ToJson(true));
-                    var dateEncrypt = await webHelper.DoPostAsync(interfaceEncryptApi, parame);
-                    ResponseAjaxResult<object> responseAjaxResult = new ResponseAjaxResult<object>()
-                    {
-                        Data = dateEncrypt.Result
-                    };
-                    responseAjaxResult.Success();
-                    //var settings = new System.Text.Json.JsonSerializerOptions
-                    //{
-                    //    PropertyNamingPolicy = new LowerCasePropertyNamingPolicy()
-                    //};
-                    context.Result = new JsonResult(responseAjaxResult);
-                }
-            }
-            else
-            {
-                IsEncrypt = 0;
-            }
-            context.HttpContext.Response.Headers.Append("IsEncryption", IsEncrypt.ToString());
+            //    if (res != null)
+            //    {
+            //        var interfaceEncryptApi = AppsettingsHelper.GetValue("API:InterfaceEncryptApi");
+            //        WebHelper webHelper = new WebHelper();
+            //        webHelper.Headers.Add("appKey", AppsettingsHelper.GetValue("API:Token:appKey"));
+            //        webHelper.Headers.Add("appinterfaceCode", AppsettingsHelper.GetValue("API:Token:appinterfaceCode"));
+            //        Dictionary<string, object> parame = new Dictionary<string, object>();
+            //        parame.Add("item", res.ToJson(true));
+            //        var dateEncrypt = await webHelper.DoPostAsync(interfaceEncryptApi, parame);
+            //        ResponseAjaxResult<object> responseAjaxResult = new ResponseAjaxResult<object>()
+            //        {
+            //            Data = dateEncrypt.Result
+            //        };
+            //        responseAjaxResult.Success();
+            //        //var settings = new System.Text.Json.JsonSerializerOptions
+            //        //{
+            //        //    PropertyNamingPolicy = new LowerCasePropertyNamingPolicy()
+            //        //};
+            //        context.Result = new JsonResult(responseAjaxResult);
+            //    }
+            //}
+            //else
+            //{
+            //    IsEncrypt = 0;
+            //}
+            //context.HttpContext.Response.Headers.Append("IsEncryption", IsEncrypt.ToString());
 
             #endregion
 

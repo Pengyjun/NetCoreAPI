@@ -28,118 +28,118 @@ namespace GDCMasterDataReceiveApi.Filters
             var httpContext = context.HttpContext;
             #region 拦截验证查看接口基本信息是否允许
             var isAllowInterfaceIntercept = context.ActionDescriptor.EndpointMetadata.OfType<InterfaceInterceptAttribute>().Any();
-            if (isAllowInterfaceIntercept)
-            {
-                WebHelper webHelper = new WebHelper();
-                var interfaceAuthApi = AppsettingsHelper.GetValue("API:InterfaceAuthApi");
-                var appKey = "appKey";
-                var appinterfaceCode = "appinterfaceCode";
-                var headers = context.HttpContext.Request.Headers;
-                if (headers.ContainsKey(appKey) && headers.ContainsKey(appinterfaceCode))
-                {
-                    var sKey = context.HttpContext.Request.Headers[appKey].ToString();
-                    var iKey = context.HttpContext.Request.Headers[appinterfaceCode].ToString();
-                    webHelper.Headers.Add("appKey", AppsettingsHelper.GetValue("API:Token:appKey"));
-                    webHelper.Headers.Add("appinterfaceCode", AppsettingsHelper.GetValue("API:Token:appinterfaceCode"));
-                    var interfaceAuth = await webHelper.DoGetAsync<string>(interfaceAuthApi);
-                    if (interfaceAuth.Code == 200 && interfaceAuth.Result == "true")
-                    {
-                        var actionName = ((Microsoft.AspNetCore.Mvc.Controllers.ControllerActionDescriptor)context.ActionDescriptor).ActionName;
-                        if (!string.IsNullOrWhiteSpace(actionName))
-                        {
-                            actionName = actionName + "Async";
-                        }
-                        var systemInterfaceInfoApi = AppsettingsHelper.GetValue("API:SystemInterfaceInfoApi");
-                        var interfaceInfoList = await webHelper.DoGetAsync<ResponseAjaxResult<List<DataInterfaceResponseDto>>>(systemInterfaceInfoApi);
-                        //如果返回空
-                        if (interfaceInfoList.Code == 200 && interfaceInfoList.Result == null && !interfaceInfoList.Result.Data.Any())
-                        {
-                            ResponseAjaxResult<object> responseAjaxResult = new ResponseAjaxResult<object>()
-                            {
-                            };
+            //if (isAllowInterfaceIntercept)
+            //{
+            //    WebHelper webHelper = new WebHelper();
+            //    var interfaceAuthApi = AppsettingsHelper.GetValue("API:InterfaceAuthApi");
+            //    var appKey = "appKey";
+            //    var appinterfaceCode = "appinterfaceCode";
+            //    var headers = context.HttpContext.Request.Headers;
+            //    if (headers.ContainsKey(appKey) && headers.ContainsKey(appinterfaceCode))
+            //    {
+            //        var sKey = context.HttpContext.Request.Headers[appKey].ToString();
+            //        var iKey = context.HttpContext.Request.Headers[appinterfaceCode].ToString();
+            //        webHelper.Headers.Add("appKey", AppsettingsHelper.GetValue("API:Token:appKey"));
+            //        webHelper.Headers.Add("appinterfaceCode", AppsettingsHelper.GetValue("API:Token:appinterfaceCode"));
+            //        var interfaceAuth = await webHelper.DoGetAsync<string>(interfaceAuthApi);
+            //        if (interfaceAuth.Code == 200 && interfaceAuth.Result == "true")
+            //        {
+            //            var actionName = ((Microsoft.AspNetCore.Mvc.Controllers.ControllerActionDescriptor)context.ActionDescriptor).ActionName;
+            //            if (!string.IsNullOrWhiteSpace(actionName))
+            //            {
+            //                actionName = actionName + "Async";
+            //            }
+            //            var systemInterfaceInfoApi = AppsettingsHelper.GetValue("API:SystemInterfaceInfoApi");
+            //            var interfaceInfoList = await webHelper.DoGetAsync<ResponseAjaxResult<List<DataInterfaceResponseDto>>>(systemInterfaceInfoApi);
+            //            //如果返回空
+            //            if (interfaceInfoList.Code == 200 && interfaceInfoList.Result == null && !interfaceInfoList.Result.Data.Any())
+            //            {
+            //                ResponseAjaxResult<object> responseAjaxResult = new ResponseAjaxResult<object>()
+            //                {
+            //                };
 
-                            responseAjaxResult.Fail(message: ResponseMessage.ACCESSINTERFACE_ERROR, httpStatusCode: HttpStatusCode.InterfaceAuth);
-                            context.HttpContext.Response.Clear();
-                            var obj = new ContentResult()
-                            {
-                                StatusCode = 200,
-                                Content = JsonConvert.SerializeObject(responseAjaxResult, new JsonSerializerSettings()
-                                {
-                                    //首字母小写问题
-                                    ContractResolver = new CamelCasePropertyNamesContractResolver()
-                                }),
-                            };
-                            context.Result = obj;
-                            return;
-                        }
-                        var intefaceInfo = interfaceInfoList.Result.Data.Where(x => x.InterfaceName == actionName && x.IsEnable == 1).FirstOrDefault();
-                        //验证接口是否存在
-                        if (intefaceInfo == null)
-                        {
-                            ResponseAjaxResult<object> responseAjaxResult = new ResponseAjaxResult<object>()
-                            {
-                            };
+            //                responseAjaxResult.Fail(message: ResponseMessage.ACCESSINTERFACE_ERROR, httpStatusCode: HttpStatusCode.InterfaceAuth);
+            //                context.HttpContext.Response.Clear();
+            //                var obj = new ContentResult()
+            //                {
+            //                    StatusCode = 200,
+            //                    Content = JsonConvert.SerializeObject(responseAjaxResult, new JsonSerializerSettings()
+            //                    {
+            //                        //首字母小写问题
+            //                        ContractResolver = new CamelCasePropertyNamesContractResolver()
+            //                    }),
+            //                };
+            //                context.Result = obj;
+            //                return;
+            //            }
+            //            var intefaceInfo = interfaceInfoList.Result.Data.Where(x => x.InterfaceName == actionName && x.IsEnable == 1).FirstOrDefault();
+            //            //验证接口是否存在
+            //            if (intefaceInfo == null)
+            //            {
+            //                ResponseAjaxResult<object> responseAjaxResult = new ResponseAjaxResult<object>()
+            //                {
+            //                };
 
-                            responseAjaxResult.Fail(message: ResponseMessage.ACCESSINTERFACE_ERROR, httpStatusCode: HttpStatusCode.InterfaceAuth);
-                            context.HttpContext.Response.Clear();
-                            var obj = new ContentResult()
-                            {
-                                StatusCode = 200,
-                                Content = JsonConvert.SerializeObject(responseAjaxResult, new JsonSerializerSettings()
-                                {
-                                    //首字母小写问题
-                                    ContractResolver = new CamelCasePropertyNamesContractResolver()
-                                }),
-                            };
-                            context.Result = obj;
-                            return;
-                        }
-                        //验证访问IP
-                        CacheHelper cacheHelper = new CacheHelper();
-                        cacheHelper.Set(httpContext.TraceIdentifier, intefaceInfo, 60);
-                    }
-                    else
-                    {
-                        ResponseAjaxResult<object> responseAjaxResult = new ResponseAjaxResult<object>()
-                        {
-                        };
+            //                responseAjaxResult.Fail(message: ResponseMessage.ACCESSINTERFACE_ERROR, httpStatusCode: HttpStatusCode.InterfaceAuth);
+            //                context.HttpContext.Response.Clear();
+            //                var obj = new ContentResult()
+            //                {
+            //                    StatusCode = 200,
+            //                    Content = JsonConvert.SerializeObject(responseAjaxResult, new JsonSerializerSettings()
+            //                    {
+            //                        //首字母小写问题
+            //                        ContractResolver = new CamelCasePropertyNamesContractResolver()
+            //                    }),
+            //                };
+            //                context.Result = obj;
+            //                return;
+            //            }
+            //            //验证访问IP
+            //            CacheHelper cacheHelper = new CacheHelper();
+            //            cacheHelper.Set(httpContext.TraceIdentifier, intefaceInfo, 60);
+            //        }
+            //        else
+            //        {
+            //            ResponseAjaxResult<object> responseAjaxResult = new ResponseAjaxResult<object>()
+            //            {
+            //            };
 
-                        responseAjaxResult.Fail(message: ResponseMessage.ACCESSINTERFACE_ERROR, httpStatusCode: HttpStatusCode.InterfaceAuth);
-                        context.HttpContext.Response.Clear();
-                        var obj = new ContentResult()
-                        {
-                            StatusCode = 200,
-                            Content = JsonConvert.SerializeObject(responseAjaxResult, new JsonSerializerSettings()
-                            {
-                                //首字母小写问题
-                                ContractResolver = new CamelCasePropertyNamesContractResolver()
-                            }),
-                        };
-                        context.Result = obj;
-                        return;
-                    }
-                }
-                else
-                {
-                    ResponseAjaxResult<object> responseAjaxResult = new ResponseAjaxResult<object>()
-                    {
-                    };
+            //            responseAjaxResult.Fail(message: ResponseMessage.ACCESSINTERFACE_ERROR, httpStatusCode: HttpStatusCode.InterfaceAuth);
+            //            context.HttpContext.Response.Clear();
+            //            var obj = new ContentResult()
+            //            {
+            //                StatusCode = 200,
+            //                Content = JsonConvert.SerializeObject(responseAjaxResult, new JsonSerializerSettings()
+            //                {
+            //                    //首字母小写问题
+            //                    ContractResolver = new CamelCasePropertyNamesContractResolver()
+            //                }),
+            //            };
+            //            context.Result = obj;
+            //            return;
+            //        }
+            //    }
+            //    else
+            //    {
+            //        ResponseAjaxResult<object> responseAjaxResult = new ResponseAjaxResult<object>()
+            //        {
+            //        };
 
-                    responseAjaxResult.Fail(message: ResponseMessage.ACCESSINTERFACE_ERROR, httpStatusCode: HttpStatusCode.InterfaceAuth);
-                    context.HttpContext.Response.Clear();
-                    var obj = new ContentResult()
-                    {
-                        StatusCode = 200,
-                        Content = JsonConvert.SerializeObject(responseAjaxResult, new JsonSerializerSettings()
-                        {
-                            //首字母小写问题
-                            ContractResolver = new CamelCasePropertyNamesContractResolver()
-                        }),
-                    };
-                    context.Result = obj;
-                    return;
-                }
-            }
+            //        responseAjaxResult.Fail(message: ResponseMessage.ACCESSINTERFACE_ERROR, httpStatusCode: HttpStatusCode.InterfaceAuth);
+            //        context.HttpContext.Response.Clear();
+            //        var obj = new ContentResult()
+            //        {
+            //            StatusCode = 200,
+            //            Content = JsonConvert.SerializeObject(responseAjaxResult, new JsonSerializerSettings()
+            //            {
+            //                //首字母小写问题
+            //                ContractResolver = new CamelCasePropertyNamesContractResolver()
+            //            }),
+            //        };
+            //        context.Result = obj;
+            //        return;
+            //    }
+            //}
 
             #endregion
 

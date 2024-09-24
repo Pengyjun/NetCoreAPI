@@ -337,4 +337,18 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto._4A.User
         /// </summary>
         public string? ZDOM_LEVEL { get; set; }
     }
+    /// <summary>
+    /// 国家地区/行政区划（省、市、区）
+    /// </summary>
+    public class CountryRegionOrAdminDivisionDto
+    {
+        /// <summary>
+        /// 国家地区代码
+        /// </summary>
+        public string? Code { get; set; }
+        /// <summary>
+        /// 国家地区名称
+        /// </summary>
+        public string? Name { get; set; }
+    }
 }
