@@ -10,8 +10,11 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Serialization;
+using System.Net;
+using System.Net.Sockets;
 using System.Text;
 using UtilsSharp;
+using HttpStatusCode = GDCMasterDataReceiveApi.Domain.Shared.Enums.HttpStatusCode;
 
 namespace GDCMasterDataReceiveApi.Filters
 {
@@ -96,6 +99,37 @@ namespace GDCMasterDataReceiveApi.Filters
                             return;
                         }
                         //验证访问IP
+                        #region 限制IP
+                        var splitStr = ";";
+                        var accessIp=Utils.GetIP();
+                       // await Console.Out.WriteLineAsync($"接口访问IP地址是:{accessIp}");
+                        if (!string.IsNullOrWhiteSpace(intefaceInfo.AccessRestrictedIP) && intefaceInfo.AccessRestrictedIP.IndexOf("splitStr") > 0)
+                        {
+                            var ipList = intefaceInfo.AccessRestrictedIP.Split(splitStr, StringSplitOptions.RemoveEmptyEntries).ToList();
+                            var isExist = ipList.Where(x => x == "*").ToList();
+                            if (!isExist.Any() && ipList.Where(x => x == accessIp).Count() < 0)
+                            {
+                                ResponseAjaxResult<object> responseAjaxResult = new ResponseAjaxResult<object>()
+                                {
+                                };
+
+                                responseAjaxResult.Fail(message: ResponseMessage.IPACCESS_ERROR, httpStatusCode: HttpStatusCode.InterfaceAuth);
+                                context.HttpContext.Response.Clear();
+                                var obj = new ContentResult()
+                                {
+                                    StatusCode = 200,
+                                    Content = JsonConvert.SerializeObject(responseAjaxResult, new JsonSerializerSettings()
+                                    {
+                                        //首字母小写问题
+                                        ContractResolver = new CamelCasePropertyNamesContractResolver()
+                                    }),
+                                };
+                                context.Result = obj;
+                                return;
+                            }
+
+                        }
+                        #endregion
                         CacheHelper cacheHelper = new CacheHelper();
                         cacheHelper.Set(httpContext.TraceIdentifier, intefaceInfo, 30);
                     }
@@ -104,7 +138,7 @@ namespace GDCMasterDataReceiveApi.Filters
                         ResponseAjaxResult<object> responseAjaxResult = new ResponseAjaxResult<object>()
                         {
                         };
-                        var value=JObject.Parse(interfaceAuth.Result)["message"];
+                        var value = JObject.Parse(interfaceAuth.Result)["message"];
                         responseAjaxResult.Fail(message: value.ToString(), httpStatusCode: HttpStatusCode.InterfaceAuth);
                         context.HttpContext.Response.Clear();
                         var obj = new ContentResult()

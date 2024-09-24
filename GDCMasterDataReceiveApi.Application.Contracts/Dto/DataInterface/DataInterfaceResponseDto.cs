@@ -33,7 +33,7 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.DataInterface
         /// </summary>
         public int? IsEncrypt { get; set; }
         /// <summary>
-        /// 接口访问AP限制
+        /// 接口访问API限制
         /// </summary>
         public string? AccessRestrictedIP { get; set; }
     }

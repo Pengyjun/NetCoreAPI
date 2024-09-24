@@ -25,6 +25,7 @@
         public const string OPERATION_LOGINOUT_SUCCESS = "您已在其他终端退出，请重新登录";
         public const string ACCESSINTERFACE_ERROR = "接口未开通权限，请联系管理员";
         public const string APPKEY_ERROR = "AppKey或AppinterfaceCode不能为空";
+        public const string IPACCESS_ERROR = "该IP禁止访问";
     }
     /// <summary>
     /// 响应信息状态

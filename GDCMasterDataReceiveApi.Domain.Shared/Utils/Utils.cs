@@ -2,6 +2,8 @@
 using System.Data;
 using System.Globalization;
 using System.IO.Compression;
+using System.Net.Sockets;
+using System.Net;
 using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
@@ -678,5 +680,22 @@ namespace GDCMasterDataReceiveApi.Domain.Shared.Utils
 
             return new DateTime(year, month, day);
         }
+
+
+        #region 获取IP地址
+      public  static string GetIP()
+        {
+            var ip4 = HttpContentAccessFactory.Current.Request.Headers["X-Forwarded-For"].FirstOrDefault();
+            if (string.IsNullOrEmpty(ip4))
+            {
+                ip4=HttpContentAccessFactory.Current.Request.Headers["X-Forwarded-Proto"].FirstOrDefault();
+            }
+            if (string.IsNullOrEmpty(ip4))
+            {
+                ip4 = HttpContentAccessFactory.Current.Request.HttpContext.Connection.RemoteIpAddress.MapToIPv4().ToString();
+            }
+            return ip4;
+        }
+        #endregion
     }
 }
