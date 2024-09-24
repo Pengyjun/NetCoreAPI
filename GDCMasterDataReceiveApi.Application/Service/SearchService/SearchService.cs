@@ -3490,23 +3490,27 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
             //值域数据
             var valDomain = await _dbContext.Queryable<ValueDomain>()
                 .Where(t => t.IsDelete == 1)
-                .Select(t => new FilterChildData
-                {
-                    Code = t.ZDOM_CODE,
-                    Desc = t.ZDOM_DESC,
-                    Key = t.ZDOM_VALUE,
-                    Val = t.ZDOM_NAME
-                }).ToListAsync();
+                .Select(t => new FilterChildData { Code = t.ZDOM_CODE, Desc = t.ZDOM_DESC, Key = t.ZDOM_VALUE, Val = t.ZDOM_NAME })
+                .ToListAsync();
 
             //国家
             var countrys = await _dbContext.Queryable<CountryRegion>()
                 .Where(t => t.IsDelete == 1)
-                .Select(t => new FilterChildData
-                {
-                    Key = t.ZCOUNTRYCODE,
-                    Val = t.ZCOUNTRYNAME
-                })
+                .Select(t => new FilterChildData { Key = t.ZCOUNTRYCODE, Val = t.ZCOUNTRYNAME })
                 .ToListAsync();
+
+            //省、市、县
+            var adisision = await _dbContext.Queryable<AdministrativeDivision>()
+                .Where(t => t.IsDelete == 1)
+                .Select(t => new FilterChildData { Key = t.ZADDVSCODE, Val = t.ZADDVSNAME, Code = t.ZADDVSLEVEL })
+                .ToListAsync();
+
+            //机构业务类型
+            var institutionBusType = await _dbContext.Queryable<InstitutionBusinessType>()
+                .Where(t => t.IsDelete == 1)
+                .Select(t => new FilterChildData { Key = t.Code, Val = t.Name })
+                .ToListAsync();
+
 
             #region 查询初始化
 
@@ -3594,7 +3598,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                             {
                                 columnName = "机构业务类型";
                                 type = "Check";
-                                //optionsChild = valDomain.Where(x => x.Code == "ZPSTATE").ToList();
+                                optionsChild = institutionBusType;
                             }
                             else if (item.Contains("Type"))
                             {
@@ -3612,6 +3616,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                             {
                                 columnName = "机构所在地";
                                 type = "Check";
+                                optionsChild = adisision;
                             }
                             else if (item.Contains("Carea"))
                             {
@@ -3623,6 +3628,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                             {
                                 columnName = "地域属性";
                                 type = "Check";
+                                //optionsChild = valDomain.Where(x => x.Code == "ZCHECKIND").ToList();
                             }
                             else if (item.Contains("ShareHoldings"))
                             {
@@ -3718,6 +3724,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                             {
                                 columnName = "项目组织形式";
                                 type = "Check";
+                                //optionsChild = valDomain;
                             }
                             else if (item.Contains("ConsolidatedTable"))
                             {
@@ -3755,6 +3762,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                             {
                                 columnName = "省";
                                 type = "Check";
+                                optionsChild = adisision.Where(x => x.Code == "1").ToList();
                             }
                             else if (item.Contains("Country"))
                             {
@@ -3766,11 +3774,13 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                             {
                                 columnName = "市";
                                 type = "Check";
+                                optionsChild = adisision.Where(x => x.Code == "2").ToList();
                             }
                             else if (item.Contains("County"))
                             {
                                 columnName = "县";
                                 type = "Check";
+                                optionsChild = adisision.Where(x => x.Code == "3" || x.Code == "4").ToList();
                             }
                             else if (item.Contains("EnterpriseNature"))
                             {
@@ -3781,6 +3791,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                             {
                                 columnName = "往来单位类型";
                                 type = "Check";
+                                //optionsChild = valDomain.Where(x => x.Code == "1").ToList();
                             }
                             else if (item.Contains("ChangeTime"))
                             {
@@ -3791,6 +3802,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                             {
                                 columnName = "往来单位状态";
                                 type = "Check";
+                                //optionsChild = valDomain.Where(x => x.Code == "1").ToList();
                             }
                             options.Add(new FilterConditionDto { CoulmnName = columnName, CoulmnKey = item, Options = optionsChild, Type = type });
                         }
@@ -3883,16 +3895,19 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                             {
                                 columnName = "省";
                                 type = "Check";
+                                optionsChild = adisision.Where(x => x.Code == "1").ToList();
                             }
                             else if (item.Contains("City"))
                             {
                                 columnName = "市";
                                 type = "Check";
+                                optionsChild = adisision.Where(x => x.Code == "2").ToList();
                             }
                             else if (item.Contains("County"))
                             {
                                 columnName = "县";
                                 type = "Check";
+                                optionsChild = adisision.Where(x => x.Code == "3" || x.Code == "4").ToList();
                             }
                             options.Add(new FilterConditionDto { CoulmnName = columnName, CoulmnKey = item, Options = optionsChild, Type = type });
                         }
@@ -3984,7 +3999,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                             {
                                 columnName = "科研项目分类";
                                 type = "Single";//单选
-                                optionsChild = valDomain.Where(x => x.Code == "ZPROJTYPE").ToList();
+                                //optionsChild = valDomain.Where(x => x.Code == "ZPROJTYPE").ToList();
                             }
                             else if (item.Contains("PlanStartDate"))
                             {
@@ -4053,16 +4068,19 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                             {
                                 columnName = "省";
                                 type = "Check";
+                                optionsChild = adisision.Where(x => x.Code == "1").ToList();
                             }
                             else if (item.Contains("City"))
                             {
                                 columnName = "市";
                                 type = "Check";
+                                optionsChild = adisision.Where(x => x.Code == "2").ToList();
                             }
                             else if (item.Contains("County"))
                             {
                                 columnName = "县";
                                 type = "Check";
+                                optionsChild = adisision.Where(x => x.Code == "3" || x.Code == "4").ToList();
                             }
                             options.Add(new FilterConditionDto { CoulmnName = columnName, CoulmnKey = item, Options = optionsChild, Type = type });
                         }
@@ -4347,6 +4365,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                             {
                                 columnName = "地域属性";
                                 type = "Check";
+                                //optionsChild = valDomain.Where(x => x.Code == "1").ToList();
                             }
                             else if (item.Contains("Shareholding"))
                             {
@@ -4508,6 +4527,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                             {
                                 columnName = "地域属性";
                                 type = "Check";
+                                //optionsChild = valDomain.Where(x => x.Code == "1").ToList();
                             }
                             options.Add(new FilterConditionDto { CoulmnName = columnName, CoulmnKey = item, Options = optionsChild, Type = type });
                         }
