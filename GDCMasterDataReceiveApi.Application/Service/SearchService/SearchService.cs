@@ -3587,7 +3587,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     }
                     break;
                 case 2:
-                    allColumns = new List<string> { "CreateTime", "UpdateTime", "EntClass", "Status", "BizType", "Type", "TypeExt", "OrgProvince", "Carea", "TerritoryPro", "ShareHoldings", "IsIndependent" };
+                    allColumns = new List<string> { "CreateTime", "UpdateTime", "EntClass", "Status", "BizType", "Type", "TypeExt", "OrgProvince", "Carea", "TerritoryPro", "ShareHoldings", "IsIndependent", "Mrut", "ProjectScale", "ProjectManType", "ProjectType", "StartDate" };
                     var properties2 = GetProperties<InstitutionDetatilsDto>();
                     foreach (var property in properties2) { tableColumns.Add(property.Name); }
                     foreach (var item in tableColumns)
@@ -3597,9 +3597,9 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                             List<FilterChildData> optionsChild = new();
                             string type = string.Empty;
                             string columnName = string.Empty;
-                            if (item.Contains("CreateTime") || item.Contains("UpdateTime"))
+                            if (item.Contains("CreateTime") || item.Contains("UpdateTime") || item.Contains("Mrut") || item.Contains("StartDate"))
                             {
-                                columnName = item == "CreateTime" ? "创建时间" : "修改时间";
+                                columnName = item == "Mrut" ? "最近更新时间" : item == "CreateTime" ? "创建时间" : item == "StartDate" ? "开始时间" : "修改时间";
                                 type = "Time";//时间
                             }
                             else if (item.Contains("EntClass"))
@@ -3613,6 +3613,24 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                                 columnName = "机构状态";
                                 type = "Check";
                                 optionsChild = valDomain.Where(x => x.Code == "ZORGSTATE").ToList();
+                            }
+                            else if (item.Contains("ProjectScale"))
+                            {
+                                columnName = "项目规模";
+                                type = "Check";
+                                //optionsChild = valDomain.Where(x => x.Code == "ZORGSTATE").ToList();
+                            }
+                            else if (item.Contains("ProjectManType"))
+                            {
+                                columnName = "项目管理类型";
+                                type = "Check";
+                                //optionsChild = valDomain.Where(x => x.Code == "ZORGSTATE").ToList();
+                            }
+                            else if (item.Contains("ProjectType"))
+                            {
+                                columnName = "项目类型";
+                                type = "Check";
+                                //optionsChild = valDomain.Where(x => x.Code == "ZORGSTATE").ToList();
                             }
                             else if (item.Contains("BizType"))
                             {
