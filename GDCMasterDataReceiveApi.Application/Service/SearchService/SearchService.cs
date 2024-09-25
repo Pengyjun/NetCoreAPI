@@ -3770,7 +3770,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                             {
                                 columnName = "基金组织形式";
                                 type = "Check";
-                                //optionsChild = adisision.Where(x => x.Code == "3" || x.Code == "4").ToList();
+                                //optionsChild = valDomain.Where(x => x.Code == "ZLESSEETYPE").ToList();
                             }
                             else if (item.Contains("FundManager"))
                             {
@@ -3782,13 +3782,13 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                             {
                                 columnName = "承租人类型";
                                 type = "Check";
-                                //optionsChild = adisision.Where(x => x.Code == "3" || x.Code == "4").ToList();
+                                optionsChild = valDomain.Where(x => x.Code == "ZLESSEETYPE").ToList();
                             }
                             else if (item.Contains("ReasonForDeactivate"))
                             {
                                 columnName = "停用原因";
                                 type = "Check";
-                                //optionsChild = adisision.Where(x => x.Code == "3" || x.Code == "4").ToList();
+                                optionsChild = valDomain.Where(x => x.Code == "ZSTOPREASON").ToList();
                             }
                             else if (item.Contains("ParticipateInUnitSecs"))
                             {
@@ -3867,7 +3867,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                             {
                                 columnName = "项目组织形式";
                                 type = "Check";
-                                //optionsChild = valDomain;
+                                optionsChild = valDomain.Where(x => x.Code == "ZPOS").ToList();
                             }
                             else if (item.Contains("ConsolidatedTable"))
                             {
