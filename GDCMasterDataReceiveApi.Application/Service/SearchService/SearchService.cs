@@ -4376,7 +4376,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                             {
                                 columnName = "机构状态";
                                 type = "Check";
-                                optionsChild = valDomain.Where(x => x.Code == "ZORGATTR").ToList(); ;
+                                optionsChild = valDomain.Where(x => x.Code == "ZORGSTATE").ToList(); ;
                             }
                             else if (item.Contains("RegionalAttr"))
                             {
@@ -4491,7 +4491,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                             else if (item.Contains("ZAORGSTATE"))
                             {
                                 columnName = "核算机构状态";
-                                type = "NumberTime";
+                                type = "Check";
                                 optionsChild = valDomain.Where(x => x.Code == "ZORGSTATE").ToList();
                             }
                             else if (item.Contains("ZACDISABLEYEAR"))
@@ -4511,7 +4511,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                             else if (item.Contains("ZCWYGL_REA"))
                             {
                                 columnName = "不启用财务云财务管理原因说明";
-                                type = "NumberTime";
+                                type = "Check";
                                 //optionsChild = valDomain.Where(x => x.Code == "ZORGSTATE").ToList();
                             }
                             else if (item.Contains("ZHTE"))
@@ -4531,7 +4531,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                             else if (item.Contains("ZOSTATE"))
                             {
                                 columnName = "核算机构状态";
-                                type = "NumberTime";
+                                type = "Check";
                                 optionsChild = valDomain.Where(x => x.Code == "ZORGSTATE").ToList();
                             }
                             else if (item.Contains("ZCYNAME"))
@@ -4573,6 +4573,24 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     }
                     break;
                 case 28:
+                    allColumns = new List<string> { "CreateTime", "UpdateTime" };
+                    var properties28 = GetProperties<CurrencyDetailsDto>();
+                    foreach (var property in properties28) { tableColumns.Add(property.Name); }
+                    foreach (var item in tableColumns)
+                    {
+                        if (allColumns.Contains(item))
+                        {
+                            List<FilterChildData> optionsChild = new();
+                            string type = string.Empty;
+                            string columnName = string.Empty;
+                            if (item.Contains("CreateTime") || item.Contains("UpdateTime"))
+                            {
+                                columnName = item == "CreateTime" ? "创建时间" : "修改时间";
+                                type = "Time";//时间
+                            }
+                            options.Add(new FilterConditionDto { CoulmnName = columnName, CoulmnKey = item, Options = optionsChild, Type = type });
+                        }
+                    }
                     break;
             }
             #endregion
