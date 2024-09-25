@@ -3517,7 +3517,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
             switch (table)
             {
                 case 1:
-                    allColumns = new List<string> { "CreateTime", "UpdateTime", "CountryRegion", "SEX", "Enable", "Nationality", "Nation", "EmpSort" };
+                    allColumns = new List<string> { "CreateTime", "UpdateTime", "CountryRegion", "SEX", "Enable", "Nationality", "Nation", "EmpSort", "Birthday", "EntryTime", "EmpSort", "PositionGradeNorm", "HighEstGrade", "SameHighEstGrade", "PoliticsFace" };
                     var properties = GetProperties<UserSearchDetailsDto>();
                     foreach (var property in properties) { tableColumns.Add(property.Name); }
                     foreach (var item in tableColumns)
@@ -3530,6 +3530,11 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                             if (item.Contains("CreateTime") || item.Contains("UpdateTime"))
                             {
                                 columnName = item == "CreateTime" ? "创建时间" : "修改时间";
+                                type = "Time";//时间
+                            }
+                            else if (item.Contains("Birthday") || item.Contains("EntryTime"))
+                            {
+                                columnName = item == "Birthday" ? "出生日期" : "本企业入职时间";
                                 type = "Time";//时间
                             }
                             else if (item.Contains("CountryRegion") || item.Contains("Nationality"))
@@ -3550,17 +3555,29 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                                 type = "Single";//单选
                                 optionsChild = valDomain.Where(x => x.Code == "ZPSTATE").ToList();
                             }
+                            else if (item.Contains("EmpSort"))
+                            {
+                                columnName = "用工类型";
+                                type = "Check";//单选
+                                optionsChild = valDomain.Where(x => x.Code == "ZEMPTYPE").ToList();
+                            }
                             else if (item.Contains("Nation"))
                             {
                                 columnName = "民族";
                                 type = "Check";//复选
                                 optionsChild = valDomain.Where(x => x.Code == "ZNATION").ToList();
                             }
-                            else if (item.Contains("EmpSort"))
+                            else if (item.Contains("PoliticsFace"))
                             {
-                                columnName = "用工类型";
+                                columnName = "政治面貌（新版）";
                                 type = "Check";//复选
-                                optionsChild = valDomain.Where(x => x.Code == "ZEMPTYPE").ToList();
+                                //optionsChild = valDomain.Where(x => x.Code == "ZNATION").ToList();
+                            }
+                            else if (item.Contains("PositionGradeNorm") || item.Contains("HighEstGrade") || item.Contains("SameHighEstGrade"))
+                            {
+                                columnName = item == "PositionGradeNorm" ? "职级（新版）" : item == "HighEstGrade" ? "新版最高职级（新版）" : "统一的最高职级（新版）";
+                                type = "Check";//复选
+                                optionsChild = valDomain.Where(x => x.Code == "ZJOBTYPE").ToList();
                             }
                             options.Add(new FilterConditionDto { CoulmnName = columnName, CoulmnKey = item, Options = optionsChild, Type = type });
                         }
