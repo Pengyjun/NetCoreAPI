@@ -704,7 +704,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                 ins.COID = againInstutions.FirstOrDefault(x => x.OID == ins.COID)?.NAME;
 
                 //是否独立核算
-                ins.IS_INDEPENDENT = valDomain.FirstOrDefault(x => ins.IS_INDEPENDENT == x.ZDOM_VALUE && x.ZDOM_CODE == "ZCHECKIND")?.ZDOM_NAME;
+                ins.IS_INDEPENDENT = valDomain.FirstOrDefault(x => ins.IS_INDEPENDENT == x.ZDOM_VALUE && x.ZDOM_CODE == "ZSingleIND")?.ZDOM_NAME;
 
                 //持股情况
                 ins.SHAREHOLDINGS = valDomain.FirstOrDefault(x => ins.SHAREHOLDINGS == x.ZDOM_VALUE && x.ZDOM_CODE == "ZHOLDING")?.ZDOM_NAME;
@@ -971,7 +971,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
             insDetails.RoId = againInstutions.FirstOrDefault(x => x.OID == insDetails.RoId)?.NAME;
 
             //是否独立核算
-            insDetails.IsIndependent = valDomain.FirstOrDefault(x => insDetails.IsIndependent == x.ZDOM_VALUE && x.ZDOM_CODE == "ZCHECKIND")?.ZDOM_NAME;
+            insDetails.IsIndependent = valDomain.FirstOrDefault(x => insDetails.IsIndependent == x.ZDOM_VALUE && x.ZDOM_CODE == "ZSingleIND")?.ZDOM_NAME;
 
             //持股情况
             insDetails.ShareHoldings = valDomain.FirstOrDefault(x => insDetails.ShareHoldings == x.ZDOM_VALUE && x.ZDOM_CODE == "ZHOLDING")?.ZDOM_NAME;
@@ -3654,7 +3654,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                             }
                             else if (item.Contains("CountryRegion") || item.Contains("Nationality"))
                             {
-                                type = "Check";//复选
+                                type = "Single";
                                 columnName = "国家/地区";
                                 optionsChild = countrys;
                             }
@@ -3673,31 +3673,31 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                             else if (item.Contains("EmpSort"))
                             {
                                 columnName = "用工类型";
-                                type = "Check";//单选
+                                type = "Single";//单选
                                 optionsChild = valDomain.Where(x => x.Code == "ZEMPTYPE").ToList();
                             }
                             else if (item.Contains("UserInfoStatus"))
                             {
                                 columnName = "员工状态";
-                                type = "Check";//单选
+                                type = "Single";//单选
                                 optionsChild = valDomain.Where(x => x.Code == "ZEMPSTATE").ToList();
                             }
                             else if (item.Contains("Nation"))
                             {
                                 columnName = "民族";
-                                type = "Check";//复选
+                                type = "Single";//复选
                                 optionsChild = valDomain.Where(x => x.Code == "ZNATION").ToList();
                             }
                             else if (item.Contains("PoliticsFace"))
                             {
                                 columnName = "政治面貌（新版）";
-                                type = "Check";//复选
+                                type = "Single";//复选
                                 //optionsChild = valDomain.Where(x => x.Code == "ZNATION").ToList();
                             }
                             else if (item.Contains("PositionGradeNorm") || item.Contains("HighEstGrade") || item.Contains("SameHighEstGrade"))
                             {
                                 columnName = item == "PositionGradeNorm" ? "职级（新版）" : item == "HighEstGrade" ? "新版最高职级（新版）" : "统一的最高职级（新版）";
-                                type = "Check";//复选
+                                type = "Single";//复选
                                 optionsChild = valDomain.Where(x => x.Code == "ZJOBTYPE").ToList();
                             }
                             options.Add(new FilterConditionDto { CoulmnName = columnName, CoulmnKey = char.ToLower(item[0]) + item.Substring(1), Options = optionsChild, Type = type });
@@ -3722,81 +3722,81 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                             }
                             else if (item.Contains("EntClass"))
                             {
-                                type = "Check";
+                                type = "Single";
                                 columnName = "企业分类";
                                 optionsChild = valDomain.Where(x => x.Code == "ZENTC").ToList();
                             }
                             else if (item.Contains("Status"))
                             {
                                 columnName = "机构状态";
-                                type = "Check";
+                                type = "Single";
                                 optionsChild = valDomain.Where(x => x.Code == "ZORGSTATE").ToList();
                             }
                             else if (item.Contains("ProjectScale"))
                             {
                                 columnName = "项目规模";
-                                type = "Check";
+                                type = "Single";
                                 //optionsChild = valDomain.Where(x => x.Code == "ZORGSTATE").ToList();
                             }
                             else if (item.Contains("ProjectManType"))
                             {
                                 columnName = "项目管理类型";
-                                type = "Check";
+                                type = "Single";
                                 //optionsChild = valDomain.Where(x => x.Code == "ZORGSTATE").ToList();
                             }
                             else if (item.Contains("ProjectType"))
                             {
                                 columnName = "项目类型";
-                                type = "Check";
+                                type = "Single";
                                 //optionsChild = valDomain.Where(x => x.Code == "ZORGSTATE").ToList();
                             }
                             else if (item.Contains("BizType"))
                             {
                                 columnName = "机构业务类型";
-                                type = "Check";
+                                type = "Single";
                                 optionsChild = institutionBusType;
                             }
                             else if (item.Contains("Type"))
                             {
                                 columnName = "机构属性";
-                                type = "Check";
+                                type = "Single";
                                 optionsChild = valDomain.Where(x => x.Code == "ZORGATTR").ToList();
                             }
                             else if (item.Contains("TypeExt"))
                             {
                                 columnName = "机构子属性";
-                                type = "Check";
+                                type = "Single";
                                 optionsChild = valDomain.Where(x => x.Code == "ZORGCHILDATTR").ToList();
                             }
                             else if (item.Contains("OrgProvince"))
                             {
                                 columnName = "机构所在地";
-                                type = "Check";
+                                type = "Single";
                                 optionsChild = adisision;
                             }
                             else if (item.Contains("Carea"))
                             {
                                 columnName = "国家名称";
-                                type = "Check";
+                                type = "Single";
                                 optionsChild = countrys;
                             }
                             else if (item.Contains("TerritoryPro"))
                             {
                                 columnName = "地域属性";
-                                type = "Check";
-                                //optionsChild = valDomain.Where(x => x.Code == "ZCHECKIND").ToList();
+                                type = "Single";
+                                //optionsChild = valDomain.Where(x => x.Code == "ZSingleIND").ToList();
                             }
                             else if (item.Contains("ShareHoldings"))
                             {
                                 columnName = "持股情况";
-                                type = "Check";
+                                type = "Single";
                                 optionsChild = valDomain.Where(x => x.Code == "ZHOLDING").ToList();
                             }
                             else if (item.Contains("IsIndependent"))
                             {
                                 columnName = "是否独立核算";
                                 type = "Single";
-                                optionsChild = valDomain.Where(x => x.Code == "ZCHECKIND").ToList();
+                                optionsChild = valDomain.Where(x => x.Code == "ZSingleIND").ToList();
                             }
                             options.Add(new FilterConditionDto { CoulmnName = columnName, CoulmnKey = char.ToLower(item[0]) + item.Substring(1), Options = optionsChild, Type = type });
                         }
@@ -3851,85 +3851,85 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                             else if (item.Contains("Type"))
                             {
                                 columnName = "项目类型";
-                                type = "Check";
+                                type = "Single";
                                 //optionsChild = valDomain.Where(x => x.Code == "ZTRADER").ToList();
                             }
                             else if (item.Contains("Location"))
                             {
                                 columnName = "项目所在地";
-                                type = "Check";
+                                type = "Single";
                                 optionsChild = adisision.Where(x => x.Code == "3" || x.Code == "4").ToList();
                             }
                             else if (item.Contains("Invest"))
                             {
                                 columnName = "投资主体";
-                                type = "Check";
+                                type = "Single";
                                 //optionsChild = adisision.Where(x => x.Code == "3" || x.Code == "4").ToList();
                             }
                             else if (item.Contains("PjectOrg") || item.Contains("PjectOrgBP"))
                             {
                                 columnName = "项目机构";
-                                type = "Check";
+                                type = "Single";
                                 //optionsChild = adisision.Where(x => x.Code == "3" || x.Code == "4").ToList();
                             }
                             else if (item.Contains("ResponsibleParty"))
                             {
                                 columnName = "责任主体";
-                                type = "Check";
+                                type = "Single";
                                 //optionsChild = adisision.Where(x => x.Code == "3" || x.Code == "4").ToList();
                             }
                             else if (item.Contains("Management"))
                             {
                                 columnName = "项目管理方式";
-                                type = "Check";
+                                type = "Single";
                                 //optionsChild = adisision.Where(x => x.Code == "3" || x.Code == "4").ToList();
                             }
                             else if (item.Contains("WinningBidder"))
                             {
                                 columnName = "中标主体";
-                                type = "Check";
+                                type = "Single";
                                 //optionsChild = adisision.Where(x => x.Code == "3" || x.Code == "4").ToList();
                             }
                             else if (item.Contains("FundOrgForm"))
                             {
                                 columnName = "基金组织形式";
-                                type = "Check";
+                                type = "Single";
                                 //optionsChild = valDomain.Where(x => x.Code == "ZLESSEETYPE").ToList();
                             }
                             else if (item.Contains("FundManager"))
                             {
                                 columnName = "基金管理人类型";
-                                type = "Check";
+                                type = "Single";
                                 //optionsChild = adisision.Where(x => x.Code == "3" || x.Code == "4").ToList();
                             }
                             else if (item.Contains("TenantType"))
                             {
                                 columnName = "承租人类型";
-                                type = "Check";
+                                type = "Single";
                                 optionsChild = valDomain.Where(x => x.Code == "ZLESSEETYPE").ToList();
                             }
                             else if (item.Contains("ReasonForDeactivate"))
                             {
                                 columnName = "停用原因";
-                                type = "Check";
+                                type = "Single";
                                 optionsChild = valDomain.Where(x => x.Code == "ZSTOPREASON").ToList();
                             }
                             else if (item.Contains("ParticipateInUnitSecs"))
                             {
                                 columnName = "参与二级单位";
-                                type = "Check";
+                                type = "Single";
                                 optionsChild = valDomain.Where(x => x.Code == "ZCY2NDORG").ToList();
                             }
                             else if (item.Contains("UnitSec"))
                             {
                                 columnName = "所属二级单位";
-                                type = "Check";
+                                type = "Single";
                                 optionsChild = institutions;
                             }
                             else if (item.Contains("Currency"))
                             {
                                 columnName = "币种";
-                                type = "Check";
+                                type = "Single";
                                 optionsChild = currency;
                             }
                             else if (item.Contains("IsJoint"))
@@ -3942,7 +3942,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                             else if (item.Contains("TradingSituation"))
                             {
                                 columnName = "操盘情况";
-                                type = "Check";
+                                type = "Single";
                                 optionsChild = valDomain.Where(x => x.Code == "ZTRADER").ToList();
                             }
                             else if (item.Contains("StartDateOfInsure"))
@@ -3958,7 +3958,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                             else if (item.Contains("Country"))
                             {
                                 columnName = "国家/地区";
-                                type = "Check";
+                                type = "Single";
                                 optionsChild = countrys;
                             }
                             else if (item.Contains("FundEstablishmentDate"))
@@ -3984,19 +3984,19 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                             else if (item.Contains("TaxMethod"))
                             {
                                 columnName = "计税方式";
-                                type = "Check";
+                                type = "Single";
                                 optionsChild = valDomain.Where(x => x.Code == "ZTAXMETHOD").ToList();
                             }
                             else if (item.Contains("OrgMethod"))
                             {
                                 columnName = "项目组织形式";
-                                type = "Check";
+                                type = "Single";
                                 optionsChild = valDomain.Where(x => x.Code == "ZPOS").ToList();
                             }
                             else if (item.Contains("ConsolidatedTable"))
                             {
                                 columnName = "并表情况";
-                                type = "Check";
+                                type = "Single";
                                 optionsChild = valDomain.Where(x => x.Code == "ZCS").ToList();
                             }
                             options.Add(new FilterConditionDto { CoulmnName = columnName, CoulmnKey = char.ToLower(item[0]) + item.Substring(1), Options = optionsChild, Type = type });
@@ -4021,43 +4021,43 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                             }
                             else if (item.Contains("CategoryUnit"))
                             {
-                                type = "Check";
+                                type = "Single";
                                 columnName = "往来单位类别";
                                 optionsChild = valDomain.Where(x => x.Code == "ZBPNATURE").ToList();
                             }
                             else if (item.Contains("Province"))
                             {
                                 columnName = "省";
-                                type = "Check";
+                                type = "Single";
                                 optionsChild = adisision.Where(x => x.Code == "1").ToList();
                             }
                             else if (item.Contains("Country"))
                             {
                                 columnName = "国家/地区";
-                                type = "Check";
+                                type = "Single";
                                 optionsChild = countrys;
                             }
                             else if (item.Contains("City"))
                             {
                                 columnName = "市";
-                                type = "Check";
+                                type = "Single";
                                 optionsChild = adisision.Where(x => x.Code == "2").ToList();
                             }
                             else if (item.Contains("County"))
                             {
                                 columnName = "县/区";
-                                type = "Check";
+                                type = "Single";
                                 optionsChild = adisision.Where(x => x.Code == "3" || x.Code == "4").ToList();
                             }
                             else if (item.Contains("EnterpriseNature"))
                             {
                                 columnName = "企业性质";
-                                type = "Check";
+                                type = "Single";
                             }
                             else if (item.Contains("TypeOfUnit"))
                             {
                                 columnName = "往来单位类型";
-                                type = "Check";
+                                type = "Single";
                                 //optionsChild = valDomain.Where(x => x.Code == "1").ToList();
                             }
                             else if (item.Contains("ChangeTime"))
@@ -4068,7 +4068,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                             else if (item.Contains("StatusOfUnit"))
                             {
                                 columnName = "往来单位状态";
-                                type = "Check";
+                                type = "Single";
                                 //optionsChild = valDomain.Where(x => x.Code == "1").ToList();
                             }
                             options.Add(new FilterConditionDto { CoulmnName = columnName, CoulmnKey = char.ToLower(item[0]) + item.Substring(1), Options = optionsChild, Type = type });
@@ -4155,25 +4155,25 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                             else if (item.Contains("Country"))
                             {
                                 columnName = "国家/地区";
-                                type = "Check";
+                                type = "Single";
                                 optionsChild = countrys;
                             }
                             else if (item.Contains("Province"))
                             {
                                 columnName = "省";
-                                type = "Check";
+                                type = "Single";
                                 optionsChild = adisision.Where(x => x.Code == "1").ToList();
                             }
                             else if (item.Contains("City"))
                             {
                                 columnName = "市";
-                                type = "Check";
+                                type = "Single";
                                 optionsChild = adisision.Where(x => x.Code == "2").ToList();
                             }
                             else if (item.Contains("County"))
                             {
                                 columnName = "县/区";
-                                type = "Check";
+                                type = "Single";
                                 optionsChild = adisision.Where(x => x.Code == "3" || x.Code == "4").ToList();
                             }
                             options.Add(new FilterConditionDto { CoulmnName = columnName, CoulmnKey = char.ToLower(item[0]) + item.Substring(1), Options = optionsChild, Type = type });
@@ -4198,7 +4198,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                             }
                             else if (item.Contains("Level"))
                             {
-                                type = "Check";//复选
+                                type = "Single";//复选
                                 columnName = "分类层级";
                                 optionsChild = valDomain.Where(x => x.Code == "ZCLEVEL").ToList();
                             }
@@ -4252,7 +4252,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                             else if (item.Contains("PjectState"))
                             {
                                 columnName = "项目状态";
-                                type = "Check";//单选
+                                type = "Single";//单选
                                 optionsChild = valDomain.Where(x => x.Code == "ZPSTATE").ToList();
                             }
                             else if (item.Contains("IsOutsourced"))
@@ -4328,25 +4328,25 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                             else if (item.Contains("Country"))
                             {
                                 columnName = "国家/地区";
-                                type = "Check";
+                                type = "Single";
                                 optionsChild = countrys;
                             }
                             else if (item.Contains("Province"))
                             {
                                 columnName = "省";
-                                type = "Check";
+                                type = "Single";
                                 optionsChild = adisision.Where(x => x.Code == "1").ToList();
                             }
                             else if (item.Contains("City"))
                             {
                                 columnName = "市";
-                                type = "Check";
+                                type = "Single";
                                 optionsChild = adisision.Where(x => x.Code == "2").ToList();
                             }
                             else if (item.Contains("County"))
                             {
                                 columnName = "县/区";
-                                type = "Check";
+                                type = "Single";
                                 optionsChild = adisision.Where(x => x.Code == "3" || x.Code == "4").ToList();
                             }
                             options.Add(new FilterConditionDto { CoulmnName = columnName, CoulmnKey = char.ToLower(item[0]) + item.Substring(1), Options = optionsChild, Type = type });
@@ -4601,43 +4601,43 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                             else if (item.Contains("Country"))
                             {
                                 columnName = "国家/地区";
-                                type = "Check";
+                                type = "Single";
                                 optionsChild = countrys;
                             }
                             else if (item.Contains("OrgAttr"))
                             {
                                 columnName = "机构属性";
-                                type = "Check";
+                                type = "Single";
                                 optionsChild = valDomain.Where(x => x.Code == "ZORGATTR").ToList();
                             }
                             else if (item.Contains("OrgChildAttr"))
                             {
                                 columnName = "机构子属性";
-                                type = "Check";
+                                type = "Single";
                                 optionsChild = valDomain.Where(x => x.Code == "ZORGCHILDATTR").ToList();
                             }
                             else if (item.Contains("OrgStatus"))
                             {
                                 columnName = "机构状态";
-                                type = "Check";
+                                type = "Single";
                                 optionsChild = valDomain.Where(x => x.Code == "ZORGSTATE").ToList();
                             }
                             else if (item.Contains("LocationOfOrg"))
                             {
                                 columnName = "机构状态";
-                                type = "Check";
+                                type = "Single";
                                 optionsChild = valDomain.Where(x => x.Code == "ZORGSTATE").ToList(); ;
                             }
                             else if (item.Contains("RegionalAttr"))
                             {
                                 columnName = "地域属性";
-                                type = "Check";
+                                type = "Single";
                                 //optionsChild = valDomain.Where(x => x.Code == "1").ToList();
                             }
                             else if (item.Contains("Shareholding"))
                             {
                                 columnName = "持股情况";
-                                type = "Check";
+                                type = "Single";
                                 optionsChild = valDomain.Where(x => x.Code == "ZHOLDING").ToList();
                             }
                             options.Add(new FilterConditionDto { CoulmnName = columnName, CoulmnKey = char.ToLower(item[0]) + item.Substring(1), Options = optionsChild, Type = type });
@@ -4664,7 +4664,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                             else if (item.Contains("Country"))
                             {
                                 columnName = "国家/地区";
-                                type = "Check";
+                                type = "Single";
                                 optionsChild = countrys;
                             }
                             options.Add(new FilterConditionDto { CoulmnName = columnName, CoulmnKey = char.ToLower(item[0]) + item.Substring(1), Options = optionsChild, Type = type });
@@ -4690,7 +4690,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                             else if (item.Contains("Country"))
                             {
                                 columnName = "国家/地区";
-                                type = "Check";
+                                type = "Single";
                                 optionsChild = countrys;
                             }
                             else if (item.Contains("State"))
@@ -4723,7 +4723,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                             else if (item.Contains("ZCYNAME"))
                             {
                                 columnName = "国家/地区";
-                                type = "Check";
+                                type = "Single";
                                 optionsChild = countrys;
                             }
                             else if (item.Contains("ZIVFLGID"))
@@ -4741,7 +4741,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                             else if (item.Contains("ZAORGSTATE"))
                             {
                                 columnName = "核算机构状态";
-                                type = "Check";
+                                type = "Single";
                                 optionsChild = valDomain.Where(x => x.Code == "ZORGSTATE").ToList();
                             }
                             else if (item.Contains("ZACDISABLEYEAR"))
@@ -4761,7 +4761,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                             else if (item.Contains("ZCWYGL_REA"))
                             {
                                 columnName = "不启用财务云财务管理原因说明";
-                                type = "Check";
+                                type = "Single";
                                 //optionsChild = valDomain.Where(x => x.Code == "ZORGSTATE").ToList();
                             }
                             else if (item.Contains("ZHTE"))
@@ -4781,19 +4781,19 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                             else if (item.Contains("ZOSTATE"))
                             {
                                 columnName = "核算机构状态";
-                                type = "Check";
+                                type = "Single";
                                 optionsChild = valDomain.Where(x => x.Code == "ZORGSTATE").ToList();
                             }
                             else if (item.Contains("ZCYNAME"))
                             {
                                 columnName = "国家/地区";
-                                type = "Check";
+                                type = "Single";
                                 optionsChild = countrys;
                             }
                             else if (item.Contains("ZREGIONAL"))
                             {
                                 columnName = "地域属性";
-                                type = "Check";
+                                type = "Single";
                                 //optionsChild = valDomain.Where(x => x.Code == "1").ToList();
                             }
                             options.Add(new FilterConditionDto { CoulmnName = columnName, CoulmnKey = char.ToLower(item[0]) + item.Substring(1), Options = optionsChild, Type = type });
