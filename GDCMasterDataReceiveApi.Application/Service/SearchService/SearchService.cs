@@ -611,6 +611,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                 .Where(t => t.IsDelete == 1)
                 .OrderBy(t => Convert.ToInt32(t.SNO))
                 .ToListAsync();
+            #endregion
 
             //再次读取
             var roid = institutions.Select(x => x.ROID).ToList();
@@ -619,7 +620,6 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                 .Where(t => t.IsDelete == 1 && (roid.Contains(t.ROID) || coid.Contains(t.COID)))
                 .Select(t => new { t.OID, t.NAME })
                 .ToListAsync();
-            #endregion
 
             if (filterCondition != null)
             {
@@ -671,50 +671,158 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                 .Select(t => new FilterChildData { Key = t.Code, Val = t.Name })
                 .ToListAsync();
 
+            #region 转换赋值
+            // 将 valDomain 和其他相关集合转换为字典，避免重复键
+            var entClassDict = valDomain
+                .Where(x => x.ZDOM_CODE == "ZENTC")
+                .GroupBy(x => x.ZDOM_VALUE)
+                .Select(g => g.First()) // 只保留第一个
+                .ToDictionary(x => x.ZDOM_VALUE, x => x.ZDOM_NAME);
+
+            var statusDict = valDomain
+                .Where(x => x.ZDOM_CODE == "ZORGSTATE")
+                .GroupBy(x => x.ZDOM_VALUE)
+                .Select(g => g.First()) // 只保留第一个
+                .ToDictionary(x => x.ZDOM_VALUE, x => x.ZDOM_NAME);
+
+            var typeDict = valDomain
+                .Where(x => x.ZDOM_CODE == "ZORGATTR")
+                .GroupBy(x => x.ZDOM_VALUE)
+                .Select(g => g.First()) // 只保留第一个
+                .ToDictionary(x => x.ZDOM_VALUE, x => x.ZDOM_NAME);
+
+            var typeExtDict = valDomain
+                .Where(x => x.ZDOM_CODE == "ZORGCHILDATTR")
+                .GroupBy(x => x.ZDOM_VALUE)
+                .Select(g => g.First()) // 只保留第一个
+                .ToDictionary(x => x.ZDOM_VALUE, x => x.ZDOM_NAME);
+
+            var isIndependentDict = valDomain
+                .Where(x => x.ZDOM_CODE == "ZCHECKIND")
+                .GroupBy(x => x.ZDOM_VALUE)
+                .Select(g => g.First()) // 只保留第一个
+                .ToDictionary(x => x.ZDOM_VALUE, x => x.ZDOM_NAME);
+
+            var shareholdingsDict = valDomain
+                .Where(x => x.ZDOM_CODE == "ZHOLDING")
+                .GroupBy(x => x.ZDOM_VALUE)
+                .Select(g => g.First()) // 只保留第一个
+                .ToDictionary(x => x.ZDOM_VALUE, x => x.ZDOM_NAME);
+
+            var projectTypeDict = valDomain
+                .Where(x => x.ZDOM_CODE == "ZPROJTYPE")
+                .GroupBy(x => x.ZDOM_VALUE)
+                .Select(g => g.First()) // 只保留第一个
+                .ToDictionary(x => x.ZDOM_VALUE, x => x.ZDOM_NAME);
+
+            var bizTypeDict = institutionBusType
+                .GroupBy(x => x.Key)
+                .Select(g => g.First()) // 只保留第一个
+                .ToDictionary(x => x.Key, x => x.Val);
+
+            var provinceDict = advisions
+                .GroupBy(x => x.ZADDVSCODE)
+                .Select(g => g.First()) // 只保留第一个
+                .ToDictionary(x => x.ZADDVSCODE, x => x.ZADDVSNAME);
+
+            var countryDict = carea
+                .GroupBy(x => x.ZCOUNTRYCODE)
+                .Select(g => g.First()) // 只保留第一个
+                .ToDictionary(x => x.ZCOUNTRYCODE, x => x.ZCOUNTRYNAME);
+
+            var againInstitutionDict = againInstutions
+                .GroupBy(x => x.OID)
+                .Select(g => g.First()) // 只保留第一个
+                .ToDictionary(x => x.OID, x => x.NAME);
+            #endregion
+
             foreach (var ins in institutions)
             {
-                //企业分类
-                ins.ENTCLASS = valDomain.FirstOrDefault(x => ins.ENTCLASS == x.ZDOM_VALUE && x.ZDOM_CODE == "ZENTC")?.ZDOM_NAME;
+                // 企业分类
+                ins.ENTCLASS = entClassDict.TryGetValue(ins.ENTCLASS, out var entClassName) ? entClassName : null;
+                // 机构状态
+                ins.STATUS = statusDict.TryGetValue(ins.STATUS, out var statusName) ? statusName : null;
 
-                //机构状态
-                ins.STATUS = valDomain.FirstOrDefault(x => ins.STATUS == x.ZDOM_VALUE && x.ZDOM_CODE == "ZORGSTATE")?.ZDOM_NAME;
+                // 机构属性
+                ins.TYPE = typeDict.TryGetValue(ins.TYPE, out var typeName) ? typeName : null;
 
-                //机构属性
-                ins.TYPE = valDomain.FirstOrDefault(x => ins.TYPE == x.ZDOM_VALUE && x.ZDOM_CODE == "ZORGATTR")?.ZDOM_NAME;
+                // 机构子属性
+                ins.TYPEEXT = typeExtDict.TryGetValue(ins.TYPEEXT, out var typeExtName) ? typeExtName : null;
 
-                //机构子属性
-                ins.TYPEEXT = valDomain.FirstOrDefault(x => ins.TYPEEXT == x.ZDOM_VALUE && x.ZDOM_CODE == "ZORGCHILDATTR")?.ZDOM_NAME;
-
-                //拥有兼管职能
+                // 拥有兼管职能
                 ins.CROSSORGAN = ins.CROSSORGAN == "0" ? "否" : "是";
 
-                //机构所在地（省）
-                ins.ORGPROVINCE = advisions.FirstOrDefault(x => x.ZADDVSCODE == ins.ORGPROVINCE)?.ZADDVSNAME;
+                // 机构所在地（省）
+                ins.ORGPROVINCE = provinceDict.TryGetValue(ins.ORGPROVINCE, out var provinceName) ? provinceName : null;
 
-                //国家
-                ins.CAREA = carea.FirstOrDefault(x => x.ZCOUNTRYCODE == ins.CAREA)?.ZCOUNTRYNAME;
+                // 国家
+                ins.CAREA = countryDict.TryGetValue(ins.CAREA, out var countryName) ? countryName : null;
 
-                //独立授权
+                // 独立授权
                 ins.ROWN = ins.ROWN == "1" ? "是" : "否";
 
-                //授权机构
-                ins.ROID = againInstutions.FirstOrDefault(x => x.OID == ins.ROID)?.NAME;
+                // 授权机构
+                ins.ROID = againInstitutionDict.TryGetValue(ins.ROID, out var roidName) ? roidName : null;
 
-                //隶属单位
-                ins.COID = againInstutions.FirstOrDefault(x => x.OID == ins.COID)?.NAME;
+                // 隶属单位
+                ins.COID = againInstitutionDict.TryGetValue(ins.COID, out var coidName) ? coidName : null;
 
-                //是否独立核算
-                ins.IS_INDEPENDENT = valDomain.FirstOrDefault(x => ins.IS_INDEPENDENT == x.ZDOM_VALUE && x.ZDOM_CODE == "ZSingleIND")?.ZDOM_NAME;
+                // 是否独立核算
+                ins.IS_INDEPENDENT = isIndependentDict.TryGetValue(ins.IS_INDEPENDENT, out var independentName) ? independentName : null;
 
-                //持股情况
-                ins.SHAREHOLDINGS = valDomain.FirstOrDefault(x => ins.SHAREHOLDINGS == x.ZDOM_VALUE && x.ZDOM_CODE == "ZHOLDING")?.ZDOM_NAME;
+                // 持股情况
+                ins.SHAREHOLDINGS = shareholdingsDict.TryGetValue(ins.SHAREHOLDINGS, out var holdingsName) ? holdingsName : null;
 
-                //项目类型
-                ins.PROJECTTYPE = valDomain.FirstOrDefault(x => ins.PROJECTTYPE == x.ZDOM_VALUE && x.ZDOM_CODE == "ZPROJTYPE")?.ZDOM_NAME;
+                // 项目类型
+                ins.PROJECTTYPE = projectTypeDict.TryGetValue(ins.PROJECTTYPE, out var projectTypeName) ? projectTypeName : null;
 
-                //机构业务类型
-                ins.BIZTYPE = institutionBusType.FirstOrDefault(x => ins.BIZTYPE == x.Key)?.Val;
+                // 机构业务类型
+                ins.BIZTYPE = bizTypeDict.TryGetValue(ins.BIZTYPE, out var bizTypeName) ? bizTypeName : null;
+                #region MyRegion
 
+                ////企业分类
+                //ins.ENTCLASS = valDomain.FirstOrDefault(x => ins.ENTCLASS == x.ZDOM_VALUE && x.ZDOM_CODE == "ZENTC")?.ZDOM_NAME;
+
+                ////机构状态
+                //ins.STATUS = valDomain.FirstOrDefault(x => ins.STATUS == x.ZDOM_VALUE && x.ZDOM_CODE == "ZORGSTATE")?.ZDOM_NAME;
+
+                ////机构属性
+                //ins.TYPE = valDomain.FirstOrDefault(x => ins.TYPE == x.ZDOM_VALUE && x.ZDOM_CODE == "ZORGATTR")?.ZDOM_NAME;
+
+                ////机构子属性
+                //ins.TYPEEXT = valDomain.FirstOrDefault(x => ins.TYPEEXT == x.ZDOM_VALUE && x.ZDOM_CODE == "ZORGCHILDATTR")?.ZDOM_NAME;
+
+                ////拥有兼管职能
+                //ins.CROSSORGAN = ins.CROSSORGAN == "0" ? "否" : "是";
+
+                ////机构所在地（省）
+                //ins.ORGPROVINCE = advisions.FirstOrDefault(x => x.ZADDVSCODE == ins.ORGPROVINCE)?.ZADDVSNAME;
+
+                ////国家
+                //ins.CAREA = carea.FirstOrDefault(x => x.ZCOUNTRYCODE == ins.CAREA)?.ZCOUNTRYNAME;
+
+                ////独立授权
+                //ins.ROWN = ins.ROWN == "1" ? "是" : "否";
+
+                ////授权机构
+                //ins.ROID = againInstutions.FirstOrDefault(x => x.OID == ins.ROID)?.NAME;
+
+                ////隶属单位
+                //ins.COID = againInstutions.FirstOrDefault(x => x.OID == ins.COID)?.NAME;
+
+                ////是否独立核算
+                //ins.IS_INDEPENDENT = valDomain.FirstOrDefault(x => ins.IS_INDEPENDENT == x.ZDOM_VALUE && x.ZDOM_CODE == "ZCHECKIND")?.ZDOM_NAME;
+
+                ////持股情况
+                //ins.SHAREHOLDINGS = valDomain.FirstOrDefault(x => ins.SHAREHOLDINGS == x.ZDOM_VALUE && x.ZDOM_CODE == "ZHOLDING")?.ZDOM_NAME;
+
+                ////项目类型
+                //ins.PROJECTTYPE = valDomain.FirstOrDefault(x => ins.PROJECTTYPE == x.ZDOM_VALUE && x.ZDOM_CODE == "ZPROJTYPE")?.ZDOM_NAME;
+
+                ////机构业务类型
+                //ins.BIZTYPE = institutionBusType.FirstOrDefault(x => ins.BIZTYPE == x.Key)?.Val;
+
+                #endregion
             }
 
             #endregion
@@ -829,7 +937,8 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     CreateTime = ins.CreateTime,
                     UpdateTime = ins.UpdateTime,
                     Children = GetChildren(ins.OID, otherNodes)
-                }).FirstOrDefault();
+                })
+                .FirstOrDefault();
             result.Add(rootNode);
 
             responseAjaxResult.SuccessResult(result);
