@@ -1,4 +1,5 @@
 ﻿using Castle.DynamicProxy;
+using Dm;
 using GDCMasterDataReceiveApi.Application.Contracts;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto._4A.Institution;
@@ -328,7 +329,13 @@ namespace GHElectronicFileApi.AopInterceptor
                             //ZZSRC_SYS = parseParame["IS_REQ_HEAD_ASYNC"]["ZZSRC_SYS"].ToString(),
                             ZZSRC_SYS = "GHJ-MDG",
                         };
-                       
+                        var time = DateTime.Now;
+                        var isTime=DateTime.TryParse(parseParame["IS_REQ_HEAD_ASYNC"]["ZZATTR1"].ToString(),out time);
+                        if (isTime)
+                        {
+                            iS_REQ_HEAD_ASYNC.ZZATTR1= time.ToString("yyyy-MM-ddTHH:mm:ss");
+                         
+                        }
                         if (parseParame["IT_DATA"] != null && parseParame["IT_DATA"]["item"] != null)
                         {
                             XmlSerializer serializer = null;
@@ -336,7 +343,7 @@ namespace GHElectronicFileApi.AopInterceptor
                             for (int i = 0; i < count; i++)
                             {
 
-                                Item item = new Item() {
+                                item item = new item() {
                                     ZZMSG = "成功",
                                   ZZSTAT=GDCMasterDataReceiveApi.Domain.Shared.Const.ResponseStatus.SUCCESS,
                                 };
@@ -345,7 +352,7 @@ namespace GHElectronicFileApi.AopInterceptor
                                     item.ZZSERIAL = parseParame["IT_DATA"]["item"][i]["ZZSERIAL"].ToString();
                                 }
 
-                               businessParame+=FormortXml(typeof(Item), null, item);
+                               businessParame+=FormortXml(typeof(item), null, item);
                                  
                             }
                          headParame+= FormortXml(typeof(IS_REQ_HEAD_ASYNC), iS_REQ_HEAD_ASYNC, null);
@@ -409,7 +416,7 @@ namespace GHElectronicFileApi.AopInterceptor
         /// <param name="item"></param>
         /// <returns></returns>
 
-        public static string FormortXml(Type t, IS_REQ_HEAD_ASYNC iS_REQ_HEAD_ASYNC,Item item)
+        public static string FormortXml(Type t, IS_REQ_HEAD_ASYNC iS_REQ_HEAD_ASYNC,item item)
         {
             XmlSerializer serializer = new XmlSerializer(t);
             using (MemoryStream memoryStream = new MemoryStream())
