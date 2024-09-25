@@ -129,17 +129,20 @@ namespace GDCMasterDataReceiveApi.Filters
                 if (!string.IsNullOrWhiteSpace(setupResult))
                 {
                     var interfaceEncryptApi = AppsettingsHelper.GetValue("API:InterfaceEncryptApi");
-
                     Dictionary<string, object> parame = new Dictionary<string, object>();
                     parame.Add("item", setupResult.ToJson(true));
                     var dateEncrypt = await webHelper.DoPostAsync(interfaceEncryptApi, parame);
-                    ResponseAjaxResult<object> responseAjaxResult = new ResponseAjaxResult<object>()
+                    var obj = new ContentResult()
                     {
-                        Count=returnCount,
-                        Data = dateEncrypt.Result
+                        StatusCode = 200,
+                        Content = JsonConvert.SerializeObject(dateEncrypt.Result, new JsonSerializerSettings()
+                        {
+                            //首字母小写问题
+                            ContractResolver = new CamelCasePropertyNamesContractResolver()
+                        }),
                     };
-                    responseAjaxResult.Success();
-                    context.Result = new JsonResult(responseAjaxResult);
+                    context.Result = obj;
+
                 }
             }
             else
