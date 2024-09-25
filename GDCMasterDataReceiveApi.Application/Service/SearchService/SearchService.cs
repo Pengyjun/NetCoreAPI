@@ -205,7 +205,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
 
                 //用户状态
                 var us = userInfos.Where(x => !string.IsNullOrWhiteSpace(x.UserInfoStatus)).Select(x => x.UserInfoStatus).ToList();
-                var uStatus = await _dbContext.Queryable<UserStatus>().Where(t => t.IsDelete == 1 && us.Contains(t.OneCode)).Select(x => new { x.OneCode, x.OneName }).ToListAsync();
+                var uStatus = valDomain.Where(x => us.Contains(x.ZDOM_VALUE) && x.ZDOM_CODE == "ZEMPSTATE").ToList();
 
                 //民族
                 var nationKeys = userInfos.Select(x => x.Nation).ToList();
@@ -245,7 +245,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                 {
                     uInfo.CompanyName = GetUserCompany(uInfo.OfficeDepId, institutions);
                     uInfo.OfficeDepIdName = institutions.FirstOrDefault(x => x.Oid == uInfo.OfficeDepId)?.Name;
-                    uInfo.UserInfoStatus = uStatus.FirstOrDefault(x => x.OneCode == uInfo.UserInfoStatus)?.OneName;
+                    uInfo.UserInfoStatus = uStatus.FirstOrDefault(x => x.ZDOM_VALUE == uInfo.UserInfoStatus)?.ZDOM_NAME;
                     uInfo.Nationality = contryRegion.FirstOrDefault(x => x.ZCOUNTRYCODE == uInfo.CountryRegion)?.ZCOUNTRYNAME;
                     uInfo.CountryRegion = contryRegion.FirstOrDefault(x => x.ZCOUNTRYCODE == uInfo.CountryRegion)?.ZCOUNTRYNAME;
                     uInfo.Nation = nation.FirstOrDefault(x => x.ZDOM_VALUE == uInfo.Nation)?.ZDOM_NAME;
@@ -273,10 +273,8 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
             var responseAjaxResult = new ResponseAjaxResult<UserSearchDetailsDto>();
 
             var uDetails = await _dbContext.Queryable<User>()
-                .LeftJoin<UserStatus>((u, us) => u.EMP_STATUS == us.OneCode)
-                .LeftJoin<Institution>((u, us, ins) => u.OFFICE_DEPID == ins.OID)
-                .Where((u, us, ins) => !string.IsNullOrWhiteSpace(u.EMP_STATUS) && u.IsDelete == 1 && u.Id.ToString() == uId)
-                .Select((u, us, ins) => new UserSearchDetailsDto
+                .Where(u => !string.IsNullOrWhiteSpace(u.EMP_STATUS) && u.IsDelete == 1 && u.Id.ToString() == uId)
+                .Select(u => new UserSearchDetailsDto
                 {
                     Name = u.NAME,
                     CertNo = u.CERT_NO,
@@ -344,8 +342,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
             uDetails.Nationality = name == null ? null : name.ZCOUNTRYNAME;
 
             //用户状态
-            var uStatus = await _dbContext.Queryable<UserStatus>().Where(t => t.IsDelete == 1 && uDetails.UserInfoStatus == t.OneCode).Select(x => new { x.OneCode, x.OneName }).FirstAsync();
-            uDetails.UserInfoStatus = uStatus == null ? null : uStatus.OneName;
+            uDetails.UserInfoStatus = valDomain.FirstOrDefault(x => uDetails.UserInfoStatus == x.ZDOM_VALUE && x.ZDOM_CODE == "ZEMPSTATE")?.ZDOM_NAME;
 
             //民族
             uDetails.Nation = valDomain.FirstOrDefault(x => uDetails.Nation == x.ZDOM_VALUE && x.ZDOM_CODE == "ZNATION")?.ZDOM_NAME;
@@ -3517,7 +3514,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
             switch (table)
             {
                 case 1:
-                    allColumns = new List<string> { "CreateTime", "UpdateTime", "CountryRegion", "SEX", "Enable", "Nationality", "Nation", "EmpSort", "Birthday", "EntryTime", "EmpSort", "PositionGradeNorm", "HighEstGrade", "SameHighEstGrade", "PoliticsFace" };
+                    allColumns = new List<string> { "CreateTime", "UpdateTime", "CountryRegion", "SEX", "Enable", "Nationality", "Nation", "EmpSort", "Birthday", "EntryTime", "EmpSort", "PositionGradeNorm", "HighEstGrade", "SameHighEstGrade", "PoliticsFace", "UserInfoStatus", "" };
                     var properties = GetProperties<UserSearchDetailsDto>();
                     foreach (var property in properties) { tableColumns.Add(property.Name); }
                     foreach (var item in tableColumns)
@@ -3560,6 +3557,12 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                                 columnName = "用工类型";
                                 type = "Check";//单选
                                 optionsChild = valDomain.Where(x => x.Code == "ZEMPTYPE").ToList();
+                            }
+                            else if (item.Contains("UserInfoStatus"))
+                            {
+                                columnName = "员工状态";
+                                type = "Check";//单选
+                                optionsChild = valDomain.Where(x => x.Code == "ZEMPSTATE").ToList();
                             }
                             else if (item.Contains("Nation"))
                             {
