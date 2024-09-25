@@ -709,7 +709,7 @@ namespace GDCMasterDataReceiveApi.Domain.Shared.Utils
         /// <returns></returns>
         public static string SoapFormat(string str1,string str2)
         {
-            string xmlString = "<soapenv:Envelopexmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\"xmlns:urn=\"urn:sap-com:document:sap:rfc:functions\"><soapenv:Header/><soapenv:Body><urn:Z_ASYNC_RESULT_IN><!--输入参数：IS_REQ_HEAD_ASYNC-->$<!--输入参数(集合)：IT_RESULT_ASNYC--><IT_RESULT_ASYNC>**</IT_RESULT_ASYNC></urn:Z_ASYNC_RESULT_IN></soapenv:Body></soapenv:Envelope>";
+            string xmlString = "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:urn=\"urn:sap-com:document:sap:rfc:functions\"><soapenv:Header/><soapenv:Body><urn:Z_ASYNC_RESULT_IN><!--输入参数：IS_REQ_HEAD_ASYNC-->$<!--输入参数(集合)：IT_RESULT_ASNYC--><IT_RESULT_ASYNC>**</IT_RESULT_ASYNC></urn:Z_ASYNC_RESULT_IN></soapenv:Body></soapenv:Envelope>";
 
             if (!string.IsNullOrWhiteSpace(str1))
             {

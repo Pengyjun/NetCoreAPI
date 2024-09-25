@@ -364,20 +364,25 @@ namespace GHElectronicFileApi.AopInterceptor
                     }
                     #endregion
 
-                    var requestBody = Utils.SoapFormat(headParame, businessParame).TrimAll();
-
+                    var requestBody = Utils.SoapFormat(headParame, businessParame);
+                   
                     #region 异步通知
                     var url = AppsettingsHelper.GetValue("MDMAsyncResultApi");
-                    using (var client = new RestClient(url))
+                    RestClientOptions restClientOptions = new RestClientOptions()
                     {
-                        ServicePointManager.ServerCertificateValidationCallback += ValidateCertificate;
+                        BaseUrl = new Uri(url),
+                        
+                        RemoteCertificateValidationCallback = (object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors) => { return true; }
+                    };
+                    using (var client = new RestClient(restClientOptions))
+                    {
                         var resultRequest = new RestRequest("",Method.Post);
                         resultRequest.AddHeader("Content-Type", "application/xml");
                         resultRequest.AddParameter("application/xml", requestBody, ParameterType.RequestBody);
-                        var apiResponse = await client.ExecuteAsync(resultRequest);
-                        ServicePointManager.ServerCertificateValidationCallback -= ValidateCertificate;
-                        await Console.Out.WriteLineAsync($"返回结果1:{apiResponse.ResponseStatus.ToJson()}");
-                        await Console.Out.WriteLineAsync($"返回结果2:{apiResponse.Content.ToJson()}");
+                        //var apiResponse = await client.ExecuteAsync(resultRequest);
+                          client.ExecuteAsync(resultRequest);
+                        //await Console.Out.WriteLineAsync($"返回结果1:{apiResponse.ResponseStatus.ToJson()}");
+                        //await Console.Out.WriteLineAsync($"返回结果2:{apiResponse.Content.ToJson()}");
                     }
                     #endregion
                 }
@@ -409,7 +414,6 @@ namespace GHElectronicFileApi.AopInterceptor
             }
 
         }
-
 
 
         /// <summary>
