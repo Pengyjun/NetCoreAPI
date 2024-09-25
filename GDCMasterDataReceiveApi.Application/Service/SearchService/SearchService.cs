@@ -660,6 +660,12 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                 .Select(t => new { t.ZCOUNTRYCODE, t.ZCOUNTRYNAME })
                 .ToListAsync();
 
+            //机构业务类型
+            var institutionBusType = await _dbContext.Queryable<InstitutionBusinessType>()
+                .Where(t => t.IsDelete == 1)
+                .Select(t => new FilterChildData { Key = t.Code, Val = t.Name })
+                .ToListAsync();
+
             foreach (var ins in institutions)
             {
                 //企业分类
@@ -701,6 +707,8 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                 //项目类型
                 ins.PROJECTTYPE = valDomain.FirstOrDefault(x => ins.PROJECTTYPE == x.ZDOM_VALUE && x.ZDOM_CODE == "ZPROJTYPE")?.ZDOM_NAME;
 
+                //机构业务类型
+                ins.BIZTYPE = institutionBusType.FirstOrDefault(x => ins.BIZTYPE == x.Key)?.Val;
 
             }
 
@@ -905,6 +913,12 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                 .Where(t => !string.IsNullOrWhiteSpace(t.ZDOM_CODE))
                 .Select(t => new VDomainRespDto { ZDOM_CODE = t.ZDOM_CODE, ZDOM_DESC = t.ZDOM_DESC, ZDOM_VALUE = t.ZDOM_VALUE, ZDOM_NAME = t.ZDOM_NAME, ZDOM_LEVEL = t.ZDOM_LEVEL })
                 .ToListAsync();
+
+            //机构业务类型
+            var bizType = await _dbContext.Queryable<InstitutionBusinessType>()
+                .Where(t => t.IsDelete == 1 && insDetails.BizType == t.Code)
+                .FirstAsync();
+            insDetails.BizType = bizType == null ? null : bizType.Name;
 
             //行政区划（省、市、县）
             var advisions = await _dbContext.Queryable<AdministrativeDivision>()
