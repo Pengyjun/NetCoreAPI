@@ -58,13 +58,13 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto
 
     public class IT_RESULT_ASYNC
     {
-        public List<Item> Item { get; set; }
+        public List<item> Item { get; set; }
     }
 
     /// <summary>
     /// 业务记录
     /// </summary>
-    public class Item {
+    public class item {
         /// <summary>
         /// 发送记录ID
         /// </summary>
