@@ -613,8 +613,10 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                 .ToListAsync();
 
             //再次读取
+            var roid = institutions.Select(x => x.ROID).ToList();
+            var coid = institutions.Select(x => x.COID).ToList();
             var againInstutions = await _dbContext.Queryable<Institution>()
-                .Where(t => t.IsDelete == 1)
+                .Where(t => t.IsDelete == 1 && (roid.Contains(t.ROID) || coid.Contains(t.COID)))
                 .Select(t => new { t.OID, t.NAME })
                 .ToListAsync();
             #endregion
@@ -912,7 +914,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                 .FirstAsync();
 
             var againInstutions = await _dbContext.Queryable<Institution>()
-              .Where(t => t.IsDelete == 1)
+              .Where(t => t.IsDelete == 1 && (t.COID == insDetails.Coid || t.ROID == insDetails.RoId || t.GPOID == insDetails.Gpoid))
               .Select(t => new { t.OID, t.NAME })
               .ToListAsync();
 
