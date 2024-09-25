@@ -41,6 +41,9 @@ using RestSharp;
 using RestSharp.Serializers;
 using SqlSugar;
 using System;
+using System.Net;
+using System.Net.Security;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Xml.Serialization;
 using UtilsSharp;
@@ -367,11 +370,12 @@ namespace GHElectronicFileApi.AopInterceptor
                     var url = AppsettingsHelper.GetValue("MDMAsyncResultApi");
                     using (var client = new RestClient(url))
                     {
+                        ServicePointManager.ServerCertificateValidationCallback += ValidateCertificate;
                         var resultRequest = new RestRequest("",Method.Post);
                         resultRequest.AddHeader("Content-Type", "application/xml");
                         resultRequest.AddParameter("application/xml", requestBody, ParameterType.RequestBody);
                         var apiResponse = await client.ExecuteAsync(resultRequest);
-                        await Console.Out.WriteLineAsync($"请求参数:{requestBody}");
+                        ServicePointManager.ServerCertificateValidationCallback -= ValidateCertificate;
                         await Console.Out.WriteLineAsync($"返回结果1:{apiResponse.ResponseStatus.ToJson()}");
                         await Console.Out.WriteLineAsync($"返回结果2:{apiResponse.Content.ToJson()}");
                     }
@@ -444,6 +448,20 @@ namespace GHElectronicFileApi.AopInterceptor
                     return xml.Replace("xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\"","");
                 }
             }
+        }
+
+        /// <summary>
+        /// 模拟证书验证
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="certificate"></param>
+        /// <param name="chain"></param>
+        /// <param name="sslPolicyErrors"></param>
+        /// <returns></returns>
+        private static bool ValidateCertificate(object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors)
+        {
+            // 永远返回true以允许所有证书
+            return true;
         }
     }
 }
