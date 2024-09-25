@@ -9,6 +9,9 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
 using UtilsSharp;
+using System.Xml.Serialization;
+using System.Xml;
+using System;
 
 namespace GDCMasterDataReceiveApi.Domain.Shared.Utils
 {
@@ -697,5 +700,30 @@ namespace GDCMasterDataReceiveApi.Domain.Shared.Utils
             return ip4;
         }
         #endregion
+
+        #region xml请求参数格式
+        /// <summary>
+        /// xml请求参数格式
+        /// </summary>
+        /// <param name="urn"></param>
+        /// <returns></returns>
+        public static string SoapFormat(string str1,string str2)
+        {
+            string xmlString = "<soapenv:Envelopexmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\"xmlns:urn=\"urn:sap-com:document:sap:rfc:functions\"><soapenv:Header/><soapenv:Body><urn:Z_ASYNC_RESULT_IN><!--输入参数：IS_REQ_HEAD_ASYNC-->$<!--输入参数(集合)：IT_RESULT_ASNYC--><IT_RESULT_ASYNC>**</IT_RESULT_ASYNC></urn:Z_ASYNC_RESULT_IN></soapenv:Body></soapenv:Envelope>";
+
+            if (!string.IsNullOrWhiteSpace(str1))
+            {
+                xmlString= xmlString.Replace("$", str1);
+            }
+            if (!string.IsNullOrWhiteSpace(str2))
+            {
+                xmlString = xmlString.Replace("**", str2);
+            }
+
+            return xmlString;
+         
+        }
+        #endregion
+
     }
 }
