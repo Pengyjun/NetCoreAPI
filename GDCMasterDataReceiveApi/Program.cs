@@ -1,4 +1,5 @@
 using Autofac;
+using Autofac.Core;
 using Autofac.Extensions.DependencyInjection;
 using GDCMasterDataReceiveApi;
 using GDCMasterDataReceiveApi.Application.Contracts.AutoMapper;
@@ -9,6 +10,7 @@ using GDCMasterDataReceiveApi.SqlSugarCore;
 using GHElectronicFileApi.Middleware;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Serilog;
@@ -24,6 +26,16 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddScoped<IAuthorizationMiddlewareResultHandler, CustomAuthorizationMiddleware>();
 #endregion
 
+#region 配置访问IP
+//builder.Services.Configure<ForwardedHeadersOptions>(options =>
+//{
+//    options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+//    // 仅当你知道信任你的代理时才设置为true  
+//    options.KnownNetworks.Clear();
+//    options.KnownProxies.Clear();
+//});
+
+#endregion
 
 #region 配置过滤器 配置json格式化时间
 //配置json格式化时间
@@ -179,6 +191,8 @@ app.Use(async (context, next) =>
 app.UseSwagger();
 app.UseSwaggerUI();
 #endregion
+
+//app.UseForwardedHeaders();
 
 app.UseCors("Cors");
 app.UseHttpsRedirection();
