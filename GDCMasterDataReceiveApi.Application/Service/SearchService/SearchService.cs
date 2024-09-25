@@ -87,7 +87,6 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                 }
             }
             #region 基本查询
-
             //获取人员信息
             var userInfos = await _dbContext.Queryable<User>()
                 .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Name), u => u.NAME.Contains(filterCondition.Name))
@@ -175,7 +174,9 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     UserInfoStatus = u.EMP_STATUS,
                     SubDepts = u.SUB_DEPTS,
                     Tel = u.TEL,
-                    UserLogin = u.USER_LOGIN
+                    UserLogin = u.USER_LOGIN,
+                    CreateTime = u.CreateTime,
+                    UpdateTime = u.UpdateTime
                 })
                 .ToPageListAsync(requestDto.PageIndex, requestDto.PageSize, total);
 
@@ -316,7 +317,9 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     UserInfoStatus = u.EMP_STATUS,
                     SubDepts = u.SUB_DEPTS,
                     Tel = u.TEL,
-                    UserLogin = u.USER_LOGIN
+                    UserLogin = u.USER_LOGIN,
+                    CreateTime = u.CreateTime,
+                    UpdateTime = u.UpdateTime
                 })
                 .FirstAsync();
 
@@ -764,7 +767,9 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     TerritoryPro = ins.TERRITORYPRO,
                     Type = ins.TYPE,
                     TypeExt = ins.TYPEEXT,
-                    Version = ins.VERSION
+                    Version = ins.VERSION,
+                    CreateTime = ins.CreateTime,
+                    UpdateTime = ins.UpdateTime
                 })
                 .ToList();
 
@@ -819,6 +824,8 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     Type = ins.TYPE,
                     TypeExt = ins.TYPEEXT,
                     Version = ins.VERSION,
+                    CreateTime = ins.CreateTime,
+                    UpdateTime = ins.UpdateTime,
                     Children = GetChildren(ins.OID, otherNodes)
                 }).FirstOrDefault();
             result.Add(rootNode);
@@ -898,7 +905,9 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     TerritoryPro = ins.TERRITORYPRO,
                     Type = ins.TYPE,
                     TypeExt = ins.TYPEEXT,
-                    Version = ins.VERSION
+                    Version = ins.VERSION,
+                    CreateTime = ins.CreateTime,
+                    UpdateTime = ins.UpdateTime
                 })
                 .FirstAsync();
 
@@ -1109,7 +1118,9 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     TenantName = pro.ZLESSEE,
                     TenantType = pro.ZLESSEETYPE,
                     TradingSituation = pro.ZTRADER,
-                    WinningBidder = pro.ZAWARDMAI
+                    WinningBidder = pro.ZAWARDMAI,
+                    CreateTime = pro.CreateTime,
+                    UpdateTime = pro.UpdateTime
                 })
                 .ToPageListAsync(requestDto.PageIndex, requestDto.PageSize, total);
             #endregion
@@ -1271,7 +1282,9 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     TenantName = pro.ZLESSEE,
                     TenantType = pro.ZLESSEETYPE,
                     TradingSituation = pro.ZTRADER,
-                    WinningBidder = pro.ZAWARDMAI
+                    WinningBidder = pro.ZAWARDMAI,
+                    CreateTime = pro.CreateTime,
+                    UpdateTime = pro.UpdateTime
                 })
                 .FirstAsync();
 
@@ -1439,7 +1452,9 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     SupLegalEntity = cu.ZCOMPYREL,
                     TaxpayerIdentifyNo = cu.ZTRNO,
                     UnitSec = cu.Z2NDORG,
-                    StatusOfUnit = cu.ZBPSTATE == "01" ? "有效" : "无效"
+                    StatusOfUnit = cu.ZBPSTATE == "01" ? "有效" : "无效",
+                    CreateTime = cu.CreateTime,
+                    UpdateTime = cu.UpdateTime
                 })
                 .ToPageListAsync(requestDto.PageIndex, requestDto.PageSize, total);
 
@@ -1493,7 +1508,9 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     SupLegalEntity = cu.ZCOMPYREL,
                     TaxpayerIdentifyNo = cu.ZTRNO,
                     UnitSec = cu.Z2NDORG,
-                    StatusOfUnit = cu.ZBPSTATE == "01" ? "有效" : "无效"
+                    StatusOfUnit = cu.ZBPSTATE == "01" ? "有效" : "无效",
+                    CreateTime = cu.CreateTime,
+                    UpdateTime = cu.UpdateTime
                 })
                  .FirstAsync();
 
@@ -1543,7 +1560,9 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     RoadGongJ = cr.ZBRGJ,
                     RoadGuoZiW = cr.ZBRGZW,
                     RoadHaiW = cr.ZBRHW,
-                    Version = cr.ZVERSION
+                    Version = cr.ZVERSION,
+                    CreateTime = cr.CreateTime,
+                    UpdateTime = cr.UpdateTime
                 })
                 .ToPageListAsync(requestDto.PageIndex, requestDto.PageSize, total);
 
@@ -1577,7 +1596,9 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     RoadGongJ = cr.ZBRGJ,
                     RoadGuoZiW = cr.ZBRGZW,
                     RoadHaiW = cr.ZBRHW,
-                    Version = cr.ZVERSION
+                    Version = cr.ZVERSION,
+                    CreateTime = cr.CreateTime,
+                    UpdateTime = cr.UpdateTime
                 })
                 .FirstAsync();
 
@@ -1618,7 +1639,9 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     State = cc.ZSTATE == "1" ? "有效" : "无效",
                     AreaCode = cc.ZAREACODE,
                     DataIdentifier = cc.ZDELETE,
-                    Version = cc.ZVERSION
+                    Version = cc.ZVERSION,
+                    CreateTime = cc.CreateTime,
+                    UpdateTime = cc.UpdateTime
                 })
                 .ToPageListAsync(requestDto.PageIndex, requestDto.PageSize, total);
 
@@ -1645,7 +1668,9 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     State = cc.ZSTATE == "1" ? "有效" : "无效",
                     AreaCode = cc.ZAREACODE,
                     DataIdentifier = cc.ZDELETE,
-                    Version = cc.ZVERSION
+                    Version = cc.ZVERSION,
+                    CreateTime = cc.CreateTime,
+                    UpdateTime = cc.UpdateTime
                 })
                 .FirstAsync();
 
@@ -1710,7 +1735,9 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     SubmitBy = cc.ZFZCHBY,
                     SubmitTime = cc.ZFZCHAT,
                     SwiftCode = cc.ZSWIFTCOD,
-                    UnitSec = cc.ZFIN2NDORG
+                    UnitSec = cc.ZFIN2NDORG,
+                    CreateTime = cc.CreateTime,
+                    UpdateTime = cc.UpdateTime
                 })
                 .ToPageListAsync(requestDto.PageIndex, requestDto.PageSize, total);
 
@@ -1750,7 +1777,9 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     SubmitBy = cc.ZFZCHBY,
                     SubmitTime = cc.ZFZCHAT,
                     SwiftCode = cc.ZSWIFTCOD,
-                    UnitSec = cc.ZFIN2NDORG
+                    UnitSec = cc.ZFIN2NDORG,
+                    CreateTime = cc.CreateTime,
+                    UpdateTime = cc.UpdateTime
                 })
                 .FirstAsync();
 
@@ -1797,7 +1826,9 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     DataIdentifier = cc.ZDELETE,
                     Level = cc.ZCLEVEL,
                     SortRule = cc.ZSORT,
-                    SupCode = cc.ZCLASSUP
+                    SupCode = cc.ZCLASSUP,
+                    CreateTime = cc.CreateTime,
+                    UpdateTime = cc.UpdateTime
                 })
                 .ToPageListAsync(requestDto.PageIndex, requestDto.PageSize, total);
 
@@ -1827,7 +1858,9 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     DataIdentifier = cc.ZDELETE,
                     Level = cc.ZCLEVEL,
                     SortRule = cc.ZSORT,
-                    SupCode = cc.ZCLASSUP
+                    SupCode = cc.ZCLASSUP,
+                    CreateTime = cc.CreateTime,
+                    UpdateTime = cc.UpdateTime
                 })
                 .FirstAsync();
 
@@ -1865,6 +1898,8 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     State = cc.ZSTATE == "1" ? "有效" : "无效",
                     DataIdentifier = cc.ZDELETE,
                     Version = cc.ZVERSION,
+                    CreateTime = cc.CreateTime,
+                    UpdateTime = cc.UpdateTime
                 })
                 .ToPageListAsync(requestDto.PageIndex, requestDto.PageSize, total);
 
@@ -1890,6 +1925,8 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     State = cc.ZSTATE == "1" ? "有效" : "无效",
                     DataIdentifier = cc.ZDELETE,
                     Version = cc.ZVERSION,
+                    CreateTime = cc.CreateTime,
+                    UpdateTime = cc.UpdateTime
                 })
                 .FirstAsync();
 
@@ -1946,7 +1983,9 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     ProfessionalType = cc.ZMAJORTYPE,
                     State = cc.ZPSTATE,
                     SupMDCode = cc.ZSRPUP,
-                    TypeCode = cc.ZSRPCLASS
+                    TypeCode = cc.ZSRPCLASS,
+                    CreateTime = cc.CreateTime,
+                    UpdateTime = cc.UpdateTime
                 })
                 .ToPageListAsync(requestDto.PageIndex, requestDto.PageSize, total);
 
@@ -1981,7 +2020,9 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     ProfessionalType = cc.ZMAJORTYPE,
                     State = cc.ZPSTATE,
                     SupMDCode = cc.ZSRPUP,
-                    TypeCode = cc.ZSRPCLASS
+                    TypeCode = cc.ZSRPCLASS,
+                    CreateTime = cc.CreateTime,
+                    UpdateTime = cc.UpdateTime
                 })
                 .FirstAsync();
 
@@ -2022,7 +2063,9 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     TermCode = cc.ZLANG_TER,
                     State = cc.ZSTATE == "1" ? "有效" : "无效",
                     DataIdentifier = cc.ZDELETE,
-                    Version = cc.ZVERSION
+                    Version = cc.ZVERSION,
+                    CreateTime = cc.CreateTime,
+                    UpdateTime = cc.UpdateTime
                 })
                 .ToPageListAsync(requestDto.PageIndex, requestDto.PageSize, total);
 
@@ -2049,7 +2092,9 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     TermCode = cc.ZLANG_TER,
                     State = cc.ZSTATE == "1" ? "有效" : "无效",
                     DataIdentifier = cc.ZDELETE,
-                    Version = cc.ZVERSION
+                    Version = cc.ZVERSION,
+                    CreateTime = cc.CreateTime,
+                    UpdateTime = cc.UpdateTime
                 })
                 .FirstAsync();
 
@@ -2173,7 +2218,9 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     ProductNameCode = cc.ZCLASS,
                     IsCode = cc.ZOFTENCODE == "1" ? "是" : "否",
                     Remark = cc.ZREMARK,
-                    State = cc.ZSTATE == "1" ? "有效" : "无效"
+                    State = cc.ZSTATE == "1" ? "有效" : "无效",
+                    CreateTime = cc.CreateTime,
+                    UpdateTime = cc.UpdateTime
                 })
                 .ToPageListAsync(requestDto.PageIndex, requestDto.PageSize, total);
 
@@ -2200,7 +2247,9 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     ProductNameCode = cc.ZCLASS,
                     IsCode = cc.ZOFTENCODE == "1" ? "是" : "否",
                     Remark = cc.ZREMARK,
-                    State = cc.ZSTATE == "1" ? "有效" : "无效"
+                    State = cc.ZSTATE == "1" ? "有效" : "无效",
+                    CreateTime = cc.CreateTime,
+                    UpdateTime = cc.UpdateTime
                 })
                 .FirstAsync();
 
@@ -2248,7 +2297,9 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     AccOrgCode = cc.ZACORGNO,
                     AccOrgId = cc.ZACID,
                     DataIdentifier = cc.ZDELETE == "1" ? "删除" : "正常",
-                    SupAccDepId = cc.ZDPARENTID
+                    SupAccDepId = cc.ZDPARENTID,
+                    CreateTime = cc.CreateTime,
+                    UpdateTime = cc.UpdateTime
                 })
                 .ToPageListAsync(requestDto.PageIndex, requestDto.PageSize, total);
 
@@ -2278,7 +2329,9 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     AccOrgCode = cc.ZACORGNO,
                     AccOrgId = cc.ZACID,
                     DataIdentifier = cc.ZDELETE == "1" ? "删除" : "正常",
-                    SupAccDepId = cc.ZDPARENTID
+                    SupAccDepId = cc.ZDPARENTID,
+                    CreateTime = cc.CreateTime,
+                    UpdateTime = cc.UpdateTime
                 })
                 .FirstAsync();
 
@@ -2323,7 +2376,9 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     AccOrgCode = cc.ZACO,
                     TreeCode = cc.ZTREEID,
                     Version = cc.ZTREEVER,
-                    ViewIdentification = cc.ZMVIEW_FLAG
+                    ViewIdentification = cc.ZMVIEW_FLAG,
+                    CreateTime = cc.CreateTime,
+                    UpdateTime = cc.UpdateTime
                 })
                 .ToPageListAsync(requestDto.PageIndex, requestDto.PageSize, total);
 
@@ -2352,7 +2407,9 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     AccOrgCode = cc.ZACO,
                     TreeCode = cc.ZTREEID,
                     Version = cc.ZTREEVER,
-                    ViewIdentification = cc.ZMVIEW_FLAG
+                    ViewIdentification = cc.ZMVIEW_FLAG,
+                    CreateTime = cc.CreateTime,
+                    UpdateTime = cc.UpdateTime
                 })
                 .FirstAsync();
 
@@ -2393,7 +2450,9 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     Name = cc.ZCRHABBR,
                     State = cc.ZSTATE == "1" ? "有效" : "无效",
                     Version = cc.ZVERSION,
-                    DataIdentifier = cc.ZDELETE == "1" ? "未删除" : "已删除"
+                    DataIdentifier = cc.ZDELETE == "1" ? "未删除" : "已删除",
+                    CreateTime = cc.CreateTime,
+                    UpdateTime = cc.UpdateTime
                 })
                 .ToPageListAsync(requestDto.PageIndex, requestDto.PageSize, total);
 
@@ -2420,7 +2479,9 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     Name = cc.ZCRHABBR,
                     State = cc.ZSTATE == "1" ? "有效" : "无效",
                     Version = cc.ZVERSION,
-                    DataIdentifier = cc.ZDELETE == "1" ? "未删除" : "已删除"
+                    DataIdentifier = cc.ZDELETE == "1" ? "未删除" : "已删除",
+                    CreateTime = cc.CreateTime,
+                    UpdateTime = cc.UpdateTime
                 })
                 .FirstAsync();
 
@@ -2457,7 +2518,9 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     Name = cc.ZUNITNAME,
                     State = cc.ZSTATE == "1" ? "有效" : "无效",
                     Version = cc.ZVERSION,
-                    DataIdentifier = cc.ZDELETE == "1" ? "未删除" : "已删除"
+                    DataIdentifier = cc.ZDELETE == "1" ? "未删除" : "已删除",
+                    CreateTime = cc.CreateTime,
+                    UpdateTime = cc.UpdateTime
                 })
                 .ToPageListAsync(requestDto.PageIndex, requestDto.PageSize, total);
 
@@ -2482,7 +2545,9 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     Name = cc.ZUNITNAME,
                     State = cc.ZSTATE == "1" ? "有效" : "无效",
                     Version = cc.ZVERSION,
-                    DataIdentifier = cc.ZDELETE == "1" ? "未删除" : "已删除"
+                    DataIdentifier = cc.ZDELETE == "1" ? "未删除" : "已删除",
+                    CreateTime = cc.CreateTime,
+                    UpdateTime = cc.UpdateTime
                 })
                 .FirstAsync();
 
@@ -2561,7 +2626,9 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     ChanYeOneCode = cc.ZICSTD1ID,
                     ChanYeSecCode = cc.ZICSTD2ID,
                     Name = cc.ZCPBC1NAME,
-                    ThirdNewBType = cc.ZNEW3TOB == "1" ? "是" : "否"
+                    ThirdNewBType = cc.ZNEW3TOB == "1" ? "是" : "否",
+                    CreateTime = cc.CreateTime,
+                    UpdateTime = cc.UpdateTime
                 })
                 .ToPageListAsync(requestDto.PageIndex, requestDto.PageSize, total);
 
@@ -2606,7 +2673,9 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     ChanYeOneCode = cc.ZICSTD1ID,
                     ChanYeSecCode = cc.ZICSTD2ID,
                     Name = cc.ZCPBC1NAME,
-                    ThirdNewBType = cc.ZNEW3TOB == "1" ? "是" : "否"
+                    ThirdNewBType = cc.ZNEW3TOB == "1" ? "是" : "否",
+                    CreateTime = cc.CreateTime,
+                    UpdateTime = cc.UpdateTime
                 })
                 .FirstAsync();
 
@@ -2643,7 +2712,9 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     Description = cc.ZCRCNAME,
                     State = cc.ZSTATE == "1" ? "有效" : "无效",
                     DataIdentifier = cc.ZDELETE == "1" ? "未删除" : "已删除",
-                    Version = cc.ZVERSION
+                    Version = cc.ZVERSION,
+                    CreateTime = cc.CreateTime,
+                    UpdateTime = cc.UpdateTime
                 })
                 .ToPageListAsync(requestDto.PageIndex, requestDto.PageSize, total);
 
@@ -2668,7 +2739,9 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     Description = cc.ZCRCNAME,
                     State = cc.ZSTATE == "1" ? "有效" : "无效",
                     DataIdentifier = cc.ZDELETE == "1" ? "未删除" : "已删除",
-                    Version = cc.ZVERSION
+                    Version = cc.ZVERSION,
+                    CreateTime = cc.CreateTime,
+                    UpdateTime = cc.UpdateTime
                 })
                 .FirstAsync();
 
@@ -2709,7 +2782,9 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     State = cc.ZSTATE == "1" ? "有效" : "无效",
                     SupCode = cc.ZNEQCODEUP,
                     DataIdentifier = cc.ZDELETE == "1" ? "未删除" : "已删除",
-                    Version = cc.ZVERSION
+                    Version = cc.ZVERSION,
+                    CreateTime = cc.CreateTime,
+                    UpdateTime = cc.UpdateTime
                 })
                 .ToPageListAsync(requestDto.PageIndex, requestDto.PageSize, total);
 
@@ -2736,7 +2811,9 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     State = cc.ZSTATE == "1" ? "有效" : "无效",
                     SupCode = cc.ZNEQCODEUP,
                     DataIdentifier = cc.ZDELETE == "1" ? "未删除" : "已删除",
-                    Version = cc.ZVERSION
+                    Version = cc.ZVERSION,
+                    CreateTime = cc.CreateTime,
+                    UpdateTime = cc.UpdateTime
                 })
                 .FirstAsync();
 
@@ -2775,7 +2852,9 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     AdministrativeOrgCode = cc.ZORGCODE,
                     AdministrativeOrgId = cc.ZORGID,
                     DataIdentifier = cc.ZDELETE,
-                    KeyId = cc.ZID
+                    KeyId = cc.ZID,
+                    CreateTime = cc.CreateTime,
+                    UpdateTime = cc.UpdateTime
                 })
                 .ToPageListAsync(requestDto.PageIndex, requestDto.PageSize, total);
 
@@ -2801,7 +2880,9 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     AdministrativeOrgCode = cc.ZORGCODE,
                     AdministrativeOrgId = cc.ZORGID,
                     DataIdentifier = cc.ZDELETE,
-                    KeyId = cc.ZID
+                    KeyId = cc.ZID,
+                    CreateTime = cc.CreateTime,
+                    UpdateTime = cc.UpdateTime
                 })
                 .FirstAsync();
 
@@ -2884,7 +2965,9 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     SupOrgMDCode = cc.ZORGUP,
                     TreeLevel = cc.GRADE,
                     UnitSec = cc.GPOID,
-                    ViewIdentification = cc.VIEW_FLAG
+                    ViewIdentification = cc.VIEW_FLAG,
+                    CreateTime = cc.CreateTime,
+                    UpdateTime = cc.UpdateTime
                 })
                 .ToPageListAsync(requestDto.PageIndex, requestDto.PageSize, total);
 
@@ -2931,7 +3014,9 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     SupOrgMDCode = cc.ZORGUP,
                     TreeLevel = cc.GRADE,
                     UnitSec = cc.GPOID,
-                    ViewIdentification = cc.VIEW_FLAG
+                    ViewIdentification = cc.VIEW_FLAG,
+                    CreateTime = cc.CreateTime,
+                    UpdateTime = cc.UpdateTime
                 })
                 .FirstAsync();
 
@@ -2992,7 +3077,9 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     PjectLocation = cc.ZPROJLOC,
                     StartTrackingDate = cc.ZSFOLDATE,
                     TrackingUnit = cc.ZORG,
-                    UnitSec = cc.Z2NDORG
+                    UnitSec = cc.Z2NDORG,
+                    CreateTime = cc.CreateTime,
+                    UpdateTime = cc.UpdateTime
                 })
                 .ToPageListAsync(requestDto.PageIndex, requestDto.PageSize, total);
 
@@ -3026,7 +3113,9 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     PjectLocation = cc.ZPROJLOC,
                     StartTrackingDate = cc.ZSFOLDATE,
                     TrackingUnit = cc.ZORG,
-                    UnitSec = cc.Z2NDORG
+                    UnitSec = cc.Z2NDORG,
+                    CreateTime = cc.CreateTime,
+                    UpdateTime = cc.UpdateTime
                 })
                 .FirstAsync();
 
@@ -3070,7 +3159,9 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     State = cc.ZSTATE == "1" ? "有效" : "无效",
                     DataIdentifier = cc.ZDELETE == "1" ? "未删除" : "已删除",
                     SupRegionalismCode = cc.ZADDVSUP,
-                    Version = cc.ZVERSION
+                    Version = cc.ZVERSION,
+                    CreateTime = cc.CreateTime,
+                    UpdateTime = cc.UpdateTime
                 })
                 .ToPageListAsync(requestDto.PageIndex, requestDto.PageSize, total);
 
@@ -3098,7 +3189,9 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     State = cc.ZSTATE == "1" ? "有效" : "无效",
                     DataIdentifier = cc.ZDELETE == "1" ? "未删除" : "已删除",
                     SupRegionalismCode = cc.ZADDVSUP,
-                    Version = cc.ZVERSION
+                    Version = cc.ZVERSION,
+                    CreateTime = cc.CreateTime,
+                    UpdateTime = cc.UpdateTime
                 })
                 .FirstAsync();
 
@@ -3266,7 +3359,9 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     ZTREEVER = cc.ZTREEVER,
                     ZTRNO = cc.ZTRNO,
                     ZUNAME = cc.ZUNAME,
-                    ZZCURRENCY = cc.ZZCURRENCY
+                    ZZCURRENCY = cc.ZZCURRENCY,
+                    CreateTime = cc.CreateTime,
+                    UpdateTime = cc.UpdateTime
                 })
                 .ToPageListAsync(requestDto.PageIndex, requestDto.PageSize, total);
 
@@ -3356,7 +3451,9 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     ZTREEVER = cc.ZTREEVER,
                     ZTRNO = cc.ZTRNO,
                     ZUNAME = cc.ZUNAME,
-                    ZZCURRENCY = cc.ZZCURRENCY
+                    ZZCURRENCY = cc.ZZCURRENCY,
+                    CreateTime = cc.CreateTime,
+                    UpdateTime = cc.UpdateTime
                 })
                 .FirstAsync();
 
@@ -3400,7 +3497,9 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     StandardName = cc.STANDARDNAMEE,
                     DataIdentifier = cc.ZDELETE == "1" ? "未删除" : "已删除",
                     Remark = cc.ZREMARKS,
-                    Version = cc.ZVERSION
+                    Version = cc.ZVERSION,
+                    CreateTime = cc.CreateTime,
+                    UpdateTime = cc.UpdateTime
                 })
                 .ToPageListAsync(requestDto.PageIndex, requestDto.PageSize, total);
 
@@ -3428,7 +3527,9 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     StandardName = cc.STANDARDNAMEE,
                     DataIdentifier = cc.ZDELETE == "1" ? "未删除" : "已删除",
                     Remark = cc.ZREMARKS,
-                    Version = cc.ZVERSION
+                    Version = cc.ZVERSION,
+                    CreateTime = cc.CreateTime,
+                    UpdateTime = cc.UpdateTime
                 })
                 .FirstAsync();
 

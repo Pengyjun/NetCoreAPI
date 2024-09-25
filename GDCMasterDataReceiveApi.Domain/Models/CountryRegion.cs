@@ -83,10 +83,5 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// </summary>
         [SugarColumn(Length = 6, ColumnName = "AreaCode")]
         public string ZAREACODE { get; set; }
-        ///// <summary>
-        ///// 多语言描述表类型
-        ///// </summary>
-        //[SugarColumn(IsIgnore = true)]
-        //public List<ZMDGTT_ZLANG>? ZLANG_LIST { get; set; }
     }
 }
