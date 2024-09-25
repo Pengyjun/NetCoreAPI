@@ -354,7 +354,7 @@ namespace GHElectronicFileApi.AopInterceptor
                     }
                     #endregion
 
-                    var requestBody = Utils.SoapFormat(headParame, businessParame);
+                    var requestBody = Utils.SoapFormat(headParame, businessParame).TrimAll();
 
                     #region 异步通知
                     var url = AppsettingsHelper.GetValue("MDMAsyncResultApi");
@@ -434,7 +434,7 @@ namespace GHElectronicFileApi.AopInterceptor
                         int endIndex = xml.IndexOf("?>") + 2;   
                         xml = xml.Substring(endIndex).Trim(); 
                     }
-                    return xml.Replace("xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema","");
+                    return xml.Replace("xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\"","");
                 }
             }
         }
