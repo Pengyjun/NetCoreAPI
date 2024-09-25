@@ -3803,7 +3803,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     }
                     break;
                 case 3:
-                    allColumns = new List<string> { "CreateTime", "UpdateTime", "PlanStartDate", "PlanCompletionDate", "TradingSituation", "StartDateOfInsure", "EndDateOfInsure", "Country", "FundEstablishmentDate", "FundExpirationDate", "LeaseStartDate", "DueDate", "TaxMethod", "OrgMethod", "ConsolidatedTable", "Type", "Location", "Invest", "PjectOrg", "ResponsibleParty", "Currency", "FundOrgForm", "FundManager", "TenantType", "UnitSec", "ReasonForDeactivate", "WinningBidder", "Management", "ParticipateInUnitSecs", "IsJoint" };
+                    allColumns = new List<string> { "CreateTime", "UpdateTime", "PlanStartDate", "PlanCompletionDate", "TradingSituation", "StartDateOfInsure", "EndDateOfInsure", "Country", "FundEstablishmentDate", "FundExpirationDate", "LeaseStartDate", "DueDate", "TaxMethod", "OrgMethod", "ConsolidatedTable", "Type", "Location", "Invest", "PjectOrg", "ResponsibleParty", "Currency", "FundOrgForm", "FundManager", "TenantType", "UnitSec", "ReasonForDeactivate", "WinningBidder", "Management", "ParticipateInUnitSecs", "IsJoint", "State" };
 
                     //币种
                     var currency = await _dbContext.Queryable<Currency>()
@@ -3835,6 +3835,13 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                             {
                                 type = "NumberTime";
                                 columnName = "项目计划开始日期";
+                            }
+                            else if (item.Contains("State"))
+                            {
+                                columnName = "状态";
+                                type = "Single";//单选
+                                optionsChild.Add(new FilterChildData { Key = "0", Val = "无效" });
+                                optionsChild.Add(new FilterChildData { Key = "1", Val = "有效" });
                             }
                             else if (item.Contains("PlanCompletionDate"))
                             {
