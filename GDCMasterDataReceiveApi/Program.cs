@@ -50,6 +50,7 @@ builder.Services.AddControllers(options =>
 {
     options.JsonSerializerOptions.Converters.Add(new DateTimeJsonConverter("yyyy-MM-dd HH:mm:ss"));
 });
+builder.Services.AddHttpClient();
 #endregion
 
 #region ≈‰÷√httpcontent∑√Œ π§≥ß

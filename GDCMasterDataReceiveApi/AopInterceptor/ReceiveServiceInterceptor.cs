@@ -33,6 +33,15 @@ using GDCMasterDataReceiveApi.Domain.Models;
 using GDCMasterDataReceiveApi.Domain.Shared;
 using GDCMasterDataReceiveApi.Domain.Shared.Enums;
 using GDCMasterDataReceiveApi.Domain.Shared.Utils;
+using Microsoft.OpenApi.Models;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using RestSharp;
+using RestSharp.Serializers;
+using SqlSugar;
+using System;
+using System.Text;
+using System.Xml.Serialization;
 using UtilsSharp;
 
 namespace GHElectronicFileApi.AopInterceptor
@@ -285,6 +294,82 @@ namespace GHElectronicFileApi.AopInterceptor
                 invocation.Proceed();
                 var res = (Task)invocation.ReturnValue;
                 res.Wait();//如果任务有异常 直接报错
+
+                #region 异步通知主数据  
+                RecordRequestInfo recordRequestInfo = new RecordRequestInfo();
+                var redis = RedisUtil.Instance;
+                var result = redis.Get(traceIdentifier.ToLower());
+                recordRequestInfo =JsonConvert.DeserializeObject<RecordRequestInfo>(result);
+                if (recordRequestInfo != null && recordRequestInfo.RequestInfo != null && !string.IsNullOrWhiteSpace(recordRequestInfo.RequestInfo.Input))
+                {
+                    var parseParame = JObject.Parse(recordRequestInfo.RequestInfo.Input);
+
+                    #region 拼接参数
+                    var headParame = string.Empty;
+                    var businessParame = string.Empty;
+                    if (
+                        parseParame["IS_REQ_HEAD_ASYNC"]!=null&&(
+                        parseParame["IS_REQ_HEAD_ASYNC"]["ZZREQTIME"] != null ||
+                        parseParame["IS_REQ_HEAD_ASYNC"]["ZINSTID"] != null ||
+                        parseParame["IS_REQ_HEAD_ASYNC"]["ZZOBJECT"] != null ||
+                        parseParame["IS_REQ_HEAD_ASYNC"]["ZZATTR1"] != null ||
+                        parseParame["IS_REQ_HEAD_ASYNC"]["ZZATTR3"] != null)    
+                        )
+                    {
+                        IS_REQ_HEAD_ASYNC  iS_REQ_HEAD_ASYNC = new IS_REQ_HEAD_ASYNC()
+                        {
+                            ZINSTID = parseParame["IS_REQ_HEAD_ASYNC"]["ZINSTID"].ToString(),
+                            ZZATTR1 = parseParame["IS_REQ_HEAD_ASYNC"]["ZZATTR1"].ToString(),
+                            //ZZATTR2 = parseParame["IS_REQ_HEAD_ASYNC"]["ZZATTR2"].ToString(),
+                            ZZATTR2 = "MDM",
+                            ZZATTR3 = parseParame["IS_REQ_HEAD_ASYNC"]["ZZATTR3"].ToString(),
+                            ZZOBJECT = parseParame["IS_REQ_HEAD_ASYNC"]["ZZOBJECT"].ToString(),
+                            ZZREQTIME = parseParame["IS_REQ_HEAD_ASYNC"]["ZZREQTIME"].ToString(),
+                            //ZZSRC_SYS = parseParame["IS_REQ_HEAD_ASYNC"]["ZZSRC_SYS"].ToString(),
+                            ZZSRC_SYS = "GHJ-MDG",
+                        };
+                       
+                        if (parseParame["IT_DATA"] != null && parseParame["IT_DATA"]["item"] != null)
+                        {
+                            XmlSerializer serializer = null;
+                            var count = parseParame["IT_DATA"]["item"].Count();
+                            for (int i = 0; i < count; i++)
+                            {
+
+                                Item item = new Item() {
+                                    ZZMSG = "成功",
+                                  ZZSTAT=GDCMasterDataReceiveApi.Domain.Shared.Const.ResponseStatus.SUCCESS,
+                                };
+                                if (parseParame["IT_DATA"]["item"][i]["ZZSERIAL"] != null)
+                                {
+                                    item.ZZSERIAL = parseParame["IT_DATA"]["item"][i]["ZZSERIAL"].ToString();
+                                }
+
+                               businessParame+=FormortXml(typeof(Item), null, item);
+                                 
+                            }
+                         headParame+= FormortXml(typeof(IS_REQ_HEAD_ASYNC), iS_REQ_HEAD_ASYNC, null);
+                        }
+                      
+                    }
+                    #endregion
+
+                    var requestBody = Utils.SoapFormat(headParame, businessParame);
+
+                    #region 异步通知
+                    var url = AppsettingsHelper.GetValue("MDMAsyncResultApi");
+                    using (var client = new RestClient(url))
+                    {
+                        var resultRequest = new RestRequest("",Method.Post);
+                        resultRequest.AddHeader("Content-Type", "application/xml");
+                        resultRequest.AddParameter("application/xml", requestBody, ParameterType.RequestBody);
+                        var apiResponse = await client.ExecuteAsync(resultRequest);
+                        await Console.Out.WriteLineAsync(apiResponse.ToJson());
+                    }
+                    #endregion
+                }
+                #endregion
+
                 #region 更新请求日志
 
                 if (!string.IsNullOrWhiteSpace(requestParame))
@@ -301,13 +386,55 @@ namespace GHElectronicFileApi.AopInterceptor
                     baseService.ReceiveRecordLogAsync(receiveRecordLog, DataOperationType.Update);
                 }
                 #endregion
+
+
             }
-            catch (Exception ex)
+                catch (Exception ex)
             {
                 //这里不处理  会自动向上抛
 
             }
 
+        }
+
+
+
+        /// <summary>
+        /// 处理json
+        /// </summary>
+        /// <param name="t"></param>
+        /// <param name="iS_REQ_HEAD_ASYNC"></param>
+        /// <param name="item"></param>
+        /// <returns></returns>
+
+        public static string FormortXml(Type t, IS_REQ_HEAD_ASYNC iS_REQ_HEAD_ASYNC,Item item)
+        {
+            XmlSerializer serializer = new XmlSerializer(t);
+            using (MemoryStream memoryStream = new MemoryStream())
+            {
+                if (iS_REQ_HEAD_ASYNC != null)
+                {
+                    serializer.Serialize(memoryStream, iS_REQ_HEAD_ASYNC);
+                }
+
+                if (item != null)
+                {
+                    serializer.Serialize(memoryStream, item);
+                }
+
+                // 将MemoryStream的指针重置到开头  
+                memoryStream.Position = 0;
+                using (StreamReader reader = new StreamReader(memoryStream, Encoding.UTF8))
+                {
+                    string xml = reader.ReadToEnd();
+                    if (xml.StartsWith("<?xml"))
+                    {
+                        int endIndex = xml.IndexOf("?>") + 2;   
+                        xml = xml.Substring(endIndex).Trim(); 
+                    }
+                    return xml.Replace("xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema","");
+                }
+            }
         }
     }
 }
