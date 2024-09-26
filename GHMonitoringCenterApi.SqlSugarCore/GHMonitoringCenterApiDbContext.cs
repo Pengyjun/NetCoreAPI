@@ -73,7 +73,8 @@ namespace GHMonitoringCenterApi.SqlSugarCore
                                             var recordRequestInfo = JsonConvert.DeserializeObject<RecordRequestInfo>(cacheResult);
                                             if (recordRequestInfo != null && recordRequestInfo.SqlExecInfos != null)
                                             {
-                                                recordRequestInfo.SqlExecInfos.Add(new SqlExecInfo() { Sql = sqlParmae + Environment.NewLine, SqlTotalTime = db.Ado.SqlExecutionTime.TotalSeconds.ToString() });
+                                                //recordRequestInfo.SqlExecInfos.Add(new SqlExecInfo() { Sql = sqlParmae + Environment.NewLine, SqlTotalTime = db.Ado.SqlExecutionTime.TotalSeconds.ToString() });
+                                                recordRequestInfo.SqlExecInfos.Add(new SqlExecInfo() {  SqlTotalTime = db.Ado.SqlExecutionTime.TotalSeconds.ToString() });
                                                 int cacheSeconds = int.Parse(AppsettingsHelper.GetValue("Redis:DefaultKeyCacheSeconds"));
                                                 redis.Set(httpContent.TraceIdentifier.ToLower(), recordRequestInfo.ToJson(), cacheSeconds);
                                             }

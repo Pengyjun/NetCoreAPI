@@ -97,7 +97,7 @@ namespace GHMonitoringCenterApi.Domain.Shared
         /// <summary>
         /// sql语句
         /// </summary>
-        public string? Sql { get; set; }
+        //public string? Sql { get; set; }
 
         /// <summary>
         /// sql语句总耗时
