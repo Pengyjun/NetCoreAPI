@@ -8,10 +8,8 @@ using GHMonitoringCenterApi.Domain.Enums;
 using GHMonitoringCenterApi.Domain.Models;
 using GHMonitoringCenterApi.Domain.Shared;
 using GHMonitoringCenterApi.Domain.Shared.Enums;
-using GHMonitoringCenterApi.Domain.Shared.Util;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using NPOI.SS.Formula.Functions;
 using SqlSugar;
 using UtilsSharp;
 using Models = GHMonitoringCenterApi.Domain.Models;
@@ -359,7 +357,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 var gList = handleList.GroupBy(x => new { x.ProjectId, x.ShipId, x.UnitPrice, x.ProjectWBSId }).ToList();
                 foreach (var item in gList)
                 {
-                    var model = handleList.Where(t => t.ProjectId == item.Key.ProjectId && t.ShipId == item.Key.ShipId && t.UnitPrice == item.Key.UnitPrice && t.ProjectWBSId == item.Key.ProjectWBSId).FirstOrDefault();
+                    var model = handleList.Where(t => t.ProjectId == item.Key.ProjectId && t.ShipId == item.Key.ShipId  && t.ProjectWBSId == item.Key.ProjectWBSId).FirstOrDefault();
                     if (model != null) endHandleList.Add(model);
                 }
 
