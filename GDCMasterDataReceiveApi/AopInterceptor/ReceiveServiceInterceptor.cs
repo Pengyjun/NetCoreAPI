@@ -238,16 +238,16 @@ namespace GHElectronicFileApi.AopInterceptor
                 }
                 else if (methodName == "PersonDataAsync")
                 {
-                    var receiveParame = ((BaseReceiveDataRequestDto<ReceiveUserRequestDto>)invocation.Arguments[0]).IT_DATA;
-                    parameCount = receiveParame.item.Count;
-                    requestParame = receiveParame.item.ToJson();
+                    var receiveParame = ((ReceiveUserRequestDto)invocation.Arguments[0]).user;
+                    parameCount = 1;
+                    requestParame = receiveParame.ToJson();
                     receiveDataType = ReceiveDataType.Person;
                 }
                 else if (methodName == "InstitutionDataAsync")
                 {
-                    var receiveParame = ((BaseReceiveDataRequestDto<ReceiveInstitutionRequestDto>)invocation.Arguments[0]).IT_DATA;
-                    parameCount = receiveParame.item.Count;
-                    requestParame = receiveParame.item.ToJson();
+                    var receiveParame = ((ReceiveInstitutionRequestDto)invocation.Arguments[0]).OrganizeItem;
+                    parameCount = receiveParame.Count;
+                    requestParame = receiveParame.ToJson();
                     receiveDataType = ReceiveDataType.Institution;
                 }
                 else if (methodName == "BusinessProjectDataAsync")
