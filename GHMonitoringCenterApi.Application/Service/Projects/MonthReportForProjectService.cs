@@ -354,10 +354,10 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 handleList.AddRange(nowMonthReport);
                 handleList.AddRange(historyMonthReport);
 
-                var gList = handleList.GroupBy(x => new { x.ProjectId, x.ShipId, x.UnitPrice, x.ProjectWBSId }).ToList();
+                var gList = handleList.GroupBy(x => new { x.ProjectId, x.ShipId,  x.ProjectWBSId }).ToList();
                 foreach (var item in gList)
                 {
-                    var model = handleList.Where(t => t.ProjectId == item.Key.ProjectId && t.ShipId == item.Key.ShipId && t.UnitPrice == item.Key.UnitPrice && t.ProjectWBSId == item.Key.ProjectWBSId).FirstOrDefault();
+                    var model = handleList.Where(t => t.ProjectId == item.Key.ProjectId && t.ShipId == item.Key.ShipId  && t.ProjectWBSId == item.Key.ProjectWBSId).FirstOrDefault();
                     if (model != null) endHandleList.Add(model);
                 }
 
