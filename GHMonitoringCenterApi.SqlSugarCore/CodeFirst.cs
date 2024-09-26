@@ -1,5 +1,4 @@
 ﻿using GHMonitoringCenterApi.Domain.Models;
-using GHMonitoringCenterApi.Domain.Models;
 using SqlSugar;
 using System.Reflection;
 
@@ -91,7 +90,7 @@ namespace GHMonitoringCenterApi.SqlSugarCore
                 };
             });
             Type[] types = typeof(StartWorkRecord).Assembly.GetTypes()
-            .Where(it => it.FullName.Contains("GHMonitoringCenterApi.Domain.Models.ProjectWbsHistoryMonth"))
+            .Where(it => it.FullName.Contains("GHMonitoringCenterApi.Domain.Models.AuditLogs"))
             .ToArray();
             db.CodeFirst.InitTables(types);
         }
