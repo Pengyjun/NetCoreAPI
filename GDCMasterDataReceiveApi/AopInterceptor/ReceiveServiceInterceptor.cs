@@ -392,9 +392,9 @@ namespace GHElectronicFileApi.AopInterceptor
                         resultRequest.AddHeader("Content-Type", "application/xml");
                         resultRequest.AddParameter("application/xml", requestBody, ParameterType.RequestBody);
                         // var apiResponse = await client.ExecuteAsync(resultRequest);
-                        client.ExecuteAsync(resultRequest);
-                        //await Console.Out.WriteLineAsync($"返回结果1:{apiResponse.ResponseStatus.ToJson()}");
-                        // await Console.Out.WriteLineAsync($"返回结果2:{apiResponse.Content.ToJson()}");
+                          await client.ExecuteAsync(resultRequest);
+                       // await Console.Out.WriteLineAsync($"返回结果1:{apiResponse.ResponseStatus.ToJson()}");
+                        //await Console.Out.WriteLineAsync($"返回结果2:{apiResponse.Content.ToJson()}");
                     }
                     #endregion
                 }
