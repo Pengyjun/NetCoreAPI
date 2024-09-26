@@ -124,7 +124,7 @@ namespace GHMonitoringCenterApi.Filters
                             }
                             var db = context.HttpContext.RequestServices.GetService<ISqlSugarClient>();
                             var userService = context.HttpContext.RequestServices.GetService<IUserService>();
-                            var sql = recordRequestInfo.SqlExecInfos.Select(x => x.Sql).ToList();
+                            var sql = string.Empty; //recordRequestInfo.SqlExecInfos.Select(x => x.Sql).ToList();
                             var sqlTotalTime = recordRequestInfo.SqlExecInfos.Select(x => x.SqlTotalTime).ToList();
                             AuditLogs auditLogs = new AuditLogs()
                             {
@@ -263,7 +263,7 @@ namespace GHMonitoringCenterApi.Filters
                         }
 
                         var db = context.HttpContext.RequestServices.GetService<ISqlSugarClient>();
-                        var sql = recordRequestInfo.SqlExecInfos.Select(x => x.Sql).ToList();
+                        var sql = string.Empty; //recordRequestInfo.SqlExecInfos.Select(x => x.Sql).ToList();
                         var sqlTotalTime = recordRequestInfo.SqlExecInfos.Select(x => x.SqlTotalTime).ToList();
                         AuditLogs auditLogs = new AuditLogs()
                         {
