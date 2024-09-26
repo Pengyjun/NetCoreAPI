@@ -2923,8 +2923,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 {
                     monthReport.MonthEstimateCostAmount = lastMonthReport.NextMonthEstimateCostAmount;
                 }
-                addDetails = _mapper.Map(reqDetails, addDetails);
-                addDetails.ForEach(x => x.Id = Guid.NewGuid());
+                //addDetails = _mapper.Map(reqDetails, addDetails);
                 isAddMonthReport = true;
             }
             else
