@@ -2216,8 +2216,8 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     #region 新的
                     item.AccumulativeQuantities = hisMonthRep == null ? val.AccumulativeQuantities : hisMonthRep.CompletedQuantity + val.AccumulativeQuantities;
                     item.CumulativeAccomplishCost = hisMonthRep == null ? val.CumulativeAccomplishCost : hisMonthRep.CostAmount + val.CumulativeAccomplishCost;
-                    
-                    item.CumulativeCompleted =val.CumulativeCompleted + (hisMonthRep==null?0:hisMonthRep.CompleteProductionAmount);
+
+                    item.CumulativeCompleted = val.CumulativeCompleted + (hisMonthRep == null ? 0 : hisMonthRep.CompleteProductionAmount);
 
                     item.CumulativePaymentAmount = hisMonthRep == null ? val.CumulativePaymentAmount : hisMonthRep.PartyAPayAmount + val.CumulativePaymentAmount;
                     item.CumulativeValue = hisMonthRep == null ? val.CumulativeValue : hisMonthRep.PartyAConfirmedProductionAmount + val.CumulativeValue;
@@ -2863,7 +2863,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                         var piPei = outMonthRp.FirstOrDefault(x => item.Id == x.Id);
                         if (piPei != null)
                         {
-                            if (item.CompletedQuantity == 0 && item.CompleteProductionAmount == 0 && item.OutsourcingExpensesAmount == 0 && item.UnitPrice == 0 && string.IsNullOrWhiteSpace(item.Remark)) continue;
+                            if (item.CompletedQuantity == 0 && item.CompleteProductionAmount == 0 && item.OutsourcingExpensesAmount == 0 && string.IsNullOrWhiteSpace(item.Remark)) continue;
                             else
                             {
                                 //新增本月的数据
