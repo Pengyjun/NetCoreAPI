@@ -219,7 +219,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
         /// <returns></returns>
         private async Task<List<ProjectWBSDto>> GetWBSDataAsync(Guid pId, int? dateMonth, bool dayRep)
         {
-            //dateMonth = 202409;dayRep = true
+            //dateMonth = 202409; dayRep = false;
             var pWBS = new List<ProjectWBSDto>();
             var calculatePWBS = new List<ProjectWBSDto>();
 
@@ -345,7 +345,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 int yy = Convert.ToInt32(monthTime.Year + "0101");
 
                 List<ProjectWBSDto> dayRepList = new();
-                if (dayRep)
+                if (!dayRep)
                 {
                     //所有施工数据 (年 、日 、累计)
                     var allDayReportList = await _dbContext.Queryable<DayReportConstruction>()
