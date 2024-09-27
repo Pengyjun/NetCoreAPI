@@ -1341,7 +1341,9 @@ namespace GHMonitoringCenterApi.Application.Service.Job
                 if (projectFirst.CompanyId == "c0d51e81-03dd-4ef8-bd83-6eb1355879e1".ToGuid())
                 {
                     //孟浩
-                    userIds = new List<string>() { "2017005354" };
+                   // userIds = new List<string>() { "2017005354" };
+                   //朱晴
+                    userIds = new List<string>() { "2016027005" };
                 }
                 if (projectFirst.CompanyId == "65052a94-6ea7-44ba-96b4-cf648de0d28a".ToGuid())
                 {
@@ -1398,7 +1400,14 @@ namespace GHMonitoringCenterApi.Application.Service.Job
                 {
                     return result.FailResult(HttpStatusCode.DataNotEXIST, ResponseMessage.DATA_NOTEXIST_JOB);
                 }
-                nextLevel = job.ApproveLevel + 2;
+                if (job.ApproveStatus == JobApproveStatus.Pass)
+                {
+                    nextLevel = job.ApproveLevel + 1;
+                }
+                else {
+                    nextLevel = job.ApproveLevel + 2;
+                }
+             
                 projectId = job.ProjectId;
                 bizModule = job.BizModule;
             }
