@@ -237,6 +237,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     .Where(x => x.IsDelete == 1 && x.DateMonth != 202306)
                     .Select(x => x.Id)
                     .ToListAsync();
+
                 //获取当月前需要计算的的所有填报数据(累计的所有数据/开累)
                 calculatePWBS = await _dbContext.Queryable<MonthReportDetail>()
                    .Where(p => mPIds.Contains(p.MonthReportId) && !string.IsNullOrEmpty(p.ProjectId.ToString()) && p.ProjectId != Guid.Empty && p.IsDelete == 1 && SqlFunc.ToGuid(p.ProjectId) == pId && p.DateMonth <= dateMonth)
@@ -256,7 +257,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                        ValueType = ValueEnumType.AccumulatedCommencement,
                        Remark = p.Remark,
                        DetailId = p.Id,
-                       CompleteProductionAmount = p.UnitPrice * p.CompletedQuantity
+                       CompleteProductionAmount = p.CompleteProductionAmount// p.UnitPrice * p.CompletedQuantity
                    })
                    .ToListAsync();
 
@@ -561,8 +562,10 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                             k.TotalCompleteProductionAmount += kvp.TotalCompleteProductionAmount;
                             k.TotalOutsourcingExpensesAmount += kvp.TotalOutsourcingExpensesAmount;
                         }
+
                     }
                 }
+
                 pWBS.AddRange(calculatePWBS);
             }
 
