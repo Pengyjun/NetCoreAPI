@@ -1400,7 +1400,14 @@ namespace GHMonitoringCenterApi.Application.Service.Job
                 {
                     return result.FailResult(HttpStatusCode.DataNotEXIST, ResponseMessage.DATA_NOTEXIST_JOB);
                 }
-                nextLevel = job.ApproveLevel + 2;
+                if (job.ApproveStatus == JobApproveStatus.Pass)
+                {
+                    nextLevel = job.ApproveLevel + 1;
+                }
+                else {
+                    nextLevel = job.ApproveLevel + 2;
+                }
+             
                 projectId = job.ProjectId;
                 bizModule = job.BizModule;
             }
