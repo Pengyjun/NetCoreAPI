@@ -455,27 +455,25 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 handleList.AddRange(nowMonthReport);
                 handleList.AddRange(historyMonthReport);
 
+                var gList = handleList.GroupBy(x => new { x.ProjectId, x.ShipId, x.UnitPrice, x.ProjectWBSId }).ToList();
+                foreach (var item in gList)
+                {
+                    var model = handleList.Where(t => t.ProjectId == item.Key.ProjectId && t.ShipId == item.Key.ShipId && t.UnitPrice == item.Key.UnitPrice && t.ProjectWBSId == item.Key.ProjectWBSId).FirstOrDefault();
+                    if (model != null) endHandleList.Add(model);
+                }
+
                 //如果是获取的日报数据作为估算值 
                 if (dayRep)
                 {
                     List<ProjectWBSDto> addMport = new();
                     //筛选不要重复的
-                    foreach (var rep in handleList)
+                    foreach (var rep in endHandleList)
                     {
                         var repRes = dayRepList.FirstOrDefault(t => t.ProjectId == rep.ProjectId && t.ShipId == rep.ShipId && t.UnitPrice == rep.UnitPrice && t.ProjectWBSId == rep.ProjectWBSId);
                         if (repRes == null) addMport.Add(rep);//追加当前月月报内容
                     }
                     addMport.AddRange(dayRepList);
                     endHandleList = addMport;
-                }
-                else
-                {
-                    var gList = handleList.GroupBy(x => new { x.ProjectId, x.ShipId, x.UnitPrice, x.ProjectWBSId }).ToList();
-                    foreach (var item in gList)
-                    {
-                        var model = handleList.Where(t => t.ProjectId == item.Key.ProjectId && t.ShipId == item.Key.ShipId && t.UnitPrice == item.Key.UnitPrice && t.ProjectWBSId == item.Key.ProjectWBSId).FirstOrDefault();
-                        if (model != null) endHandleList.Add(model);
-                    }
                 }
 
                 //WBS树追加月报明细树 追加历史的月报详细数据
