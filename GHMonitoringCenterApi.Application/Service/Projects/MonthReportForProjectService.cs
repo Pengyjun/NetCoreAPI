@@ -466,7 +466,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                         if (repRes == null) addMport.Add(rep);//追加当前月月报内容
                     }
                     addMport.AddRange(dayRepList);
-                    handleList = addMport;
+                    endHandleList = addMport;
                 }
                 else
                 {
