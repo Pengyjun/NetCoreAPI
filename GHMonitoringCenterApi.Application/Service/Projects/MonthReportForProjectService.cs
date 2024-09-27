@@ -399,6 +399,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                             ProjectId = ownRep.Key.ProjectId.ToString(),
                             ProjectWBSId = ownRep.Key.ProjectWBSId,
                             DateMonth = dateMonth.Value,
+                            IsAllowDelete = true,
                             DateYear = Convert.ToInt32(dateMonth.ToString().Substring(0, 4)),
                             ValueType = ValueEnumType.NowMonth,
                             YearCompletedQuantity = gYearOwnList.Sum(x => x.ActualDailyProduction),
@@ -434,6 +435,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                             ProjectId = othRep.Key.ProjectId.ToString(),
                             ProjectWBSId = othRep.Key.ProjectWBSId,
                             DateMonth = dateMonth.Value,
+                            IsAllowDelete = true,
                             DateYear = Convert.ToInt32(dateMonth.ToString().Substring(0, 4)),
                             ValueType = ValueEnumType.NowMonth,
                             YearCompletedQuantity = gYearSubList.Sum(x => x.ActualDailyProduction),
@@ -458,11 +460,12 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 {
                     List<ProjectWBSDto> addMport = new();
                     //筛选不要重复的
-                    foreach (var rep in dayRepList)
+                    foreach (var rep in handleList)
                     {
-                        var repRes = handleList.Where(t => t.ProjectId == rep.ProjectId && t.ShipId == rep.ShipId && t.UnitPrice == rep.UnitPrice && t.ProjectWBSId == rep.ProjectWBSId).ToList();
-                        if (!repRes.Any()) addMport.Add(rep);
+                        var repRes = dayRepList.FirstOrDefault(t => t.ProjectId == rep.ProjectId && t.ShipId == rep.ShipId && t.UnitPrice == rep.UnitPrice && t.ProjectWBSId == rep.ProjectWBSId);
+                        if (repRes == null) addMport.Add(rep);//追加当前月月报内容
                     }
+                    addMport.AddRange(dayRepList);
                     handleList = addMport;
                 }
                 else
