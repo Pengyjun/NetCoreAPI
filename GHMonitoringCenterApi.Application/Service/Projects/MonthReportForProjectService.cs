@@ -523,18 +523,18 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 //如果是日报累加作为估算值  还需要加上估算值 作为本年预算值
                 if (dayRep)
                 {
-                    foreach (var yyyy in nowYearMonthReport)
+                    foreach (var yyyy in dayRepList)
                     {
-                        var y = dayRepList.FirstOrDefault(x => x.UnitPrice == yyyy.UnitPrice && x.ProjectId == yyyy.ProjectId && x.ProjectWBSId == yyyy.ProjectWBSId && x.ShipId == yyyy.ShipId);
+                        var y = nowYearMonthReport.FirstOrDefault(x => x.UnitPrice == yyyy.UnitPrice && x.ProjectId == yyyy.ProjectId && x.ProjectWBSId == yyyy.ProjectWBSId && x.ShipId == yyyy.ShipId);
                         if (y != null)
                         {
-                            yyyy.CompletedQuantity += y.CompletedQuantity;
-                            yyyy.CompleteProductionAmount += y.CompleteProductionAmount;
-                            yyyy.OutsourcingExpensesAmount += y.OutsourcingExpensesAmount;
+                            y.CompletedQuantity += yyyy.CompletedQuantity;
+                            y.CompleteProductionAmount += yyyy.CompleteProductionAmount;
+                            y.OutsourcingExpensesAmount += yyyy.OutsourcingExpensesAmount;
 
-                            yyyy.TotalCompletedQuantity += y.TotalCompletedQuantity;
-                            yyyy.TotalCompleteProductionAmount += y.TotalCompleteProductionAmount;
-                            yyyy.TotalOutsourcingExpensesAmount += y.TotalOutsourcingExpensesAmount;
+                            y.TotalCompletedQuantity += yyyy.TotalCompletedQuantity;
+                            y.TotalCompleteProductionAmount += yyyy.TotalCompleteProductionAmount;
+                            y.TotalOutsourcingExpensesAmount += yyyy.TotalOutsourcingExpensesAmount;
                         }
                     }
                 }
@@ -548,18 +548,18 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 if (dayRep)
                 {
                     //如果是日报累加作为估算值  还需要加上估算值 作为开累预算值
-                    foreach (var kvp in calculatePWBS)
+                    foreach (var kvp in dayRepList)
                     {
-                        var k = dayRepList.FirstOrDefault(x => x.UnitPrice == kvp.UnitPrice && x.ProjectId == kvp.ProjectId && x.ProjectWBSId == kvp.ProjectWBSId && x.ShipId == kvp.ShipId);
+                        var k = calculatePWBS.FirstOrDefault(x => x.UnitPrice == kvp.UnitPrice && x.ProjectId == kvp.ProjectId && x.ProjectWBSId == kvp.ProjectWBSId && x.ShipId == kvp.ShipId);
                         if (k != null)
                         {
-                            kvp.CompletedQuantity += k.CompletedQuantity;
-                            kvp.CompleteProductionAmount += k.CompleteProductionAmount;
-                            kvp.OutsourcingExpensesAmount += k.OutsourcingExpensesAmount;
+                            k.CompletedQuantity += kvp.CompletedQuantity;
+                            k.CompleteProductionAmount += kvp.CompleteProductionAmount;
+                            k.OutsourcingExpensesAmount += kvp.OutsourcingExpensesAmount;
 
-                            kvp.TotalCompletedQuantity += k.TotalCompletedQuantity;
-                            kvp.TotalCompleteProductionAmount += k.TotalCompleteProductionAmount;
-                            kvp.TotalOutsourcingExpensesAmount += k.TotalOutsourcingExpensesAmount;
+                            k.TotalCompletedQuantity += kvp.TotalCompletedQuantity;
+                            k.TotalCompleteProductionAmount += kvp.TotalCompleteProductionAmount;
+                            k.TotalOutsourcingExpensesAmount += kvp.TotalOutsourcingExpensesAmount;
                         }
                     }
                 }

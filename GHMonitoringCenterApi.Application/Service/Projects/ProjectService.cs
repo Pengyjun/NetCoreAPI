@@ -3310,7 +3310,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 //如果日期>=26  小于等于下月一号
                 if (nowDateTime.Day >= 26 || (nowDateTime.Day >= 26 && nowDateTime <= Convert.ToDateTime(nowDateTime.AddMonths(1).ToString("yyyy-MM-01"))))
                 {
-                    monthDay = nowDateTime.ToDateDay();
+                    monthDay = nowDateTime.ToDateMonth();
                 }
             }
             #endregion
