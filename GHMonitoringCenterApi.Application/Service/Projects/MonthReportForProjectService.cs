@@ -12,6 +12,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NPOI.SS.Formula.Functions;
 using SqlSugar;
+using System.Collections.Generic;
 using UtilsSharp;
 using Models = GHMonitoringCenterApi.Domain.Models;
 
@@ -452,10 +453,17 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 handleList.AddRange(nowMonthReport);
                 handleList.AddRange(historyMonthReport);
 
-                //如果是获取的日报数据作为估算值  月报历史数据直接不取  （本月根本没数据）
+                //如果是获取的日报数据作为估算值 
                 if (dayRep)
                 {
-                    handleList = dayRepList;
+                    List<ProjectWBSDto> addMport = new();
+                    //筛选不要重复的
+                    foreach (var rep in dayRepList)
+                    {
+                        var repRes = handleList.Where(t => t.ProjectId == rep.ProjectId && t.ShipId == rep.ShipId && t.UnitPrice == rep.UnitPrice && t.ProjectWBSId == rep.ProjectWBSId).ToList();
+                        if (!repRes.Any()) addMport.Add(rep);
+                    }
+                    handleList = addMport;
                 }
                 else
                 {
