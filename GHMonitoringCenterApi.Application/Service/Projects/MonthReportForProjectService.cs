@@ -219,7 +219,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
         /// <returns></returns>
         private async Task<List<ProjectWBSDto>> GetWBSDataAsync(Guid pId, int? dateMonth, bool dayRep)
         {
-            //dateMonth = 202409;dayRep = true;
+            //dateMonth = 202409;dayRep = true
             var pWBS = new List<ProjectWBSDto>();
             var calculatePWBS = new List<ProjectWBSDto>();
 
@@ -344,7 +344,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 int endDay = Convert.ToInt32(dateMonth + "25");
                 int yy = Convert.ToInt32(monthTime.Year + "0101");
 
-                List<ProjectWBSDto> dayRepList = new(); 
+                List<ProjectWBSDto> dayRepList = new();
                 if (dayRep)
                 {
                     //所有施工数据 (年 、日 、累计)
@@ -428,8 +428,8 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 var handleList = new List<ProjectWBSDto>();
                 var endHandleList = new List<ProjectWBSDto>();
                 handleList.AddRange(nowMonthReport);
-                handleList.AddRange(historyMonthReport);
-                if (dayRep) handleList.AddRange(dayRepList);
+                handleList.AddRange(historyMonthReport); 
+                if (!dayRep) handleList.AddRange(dayRepList);
 
                 var gList = handleList.GroupBy(x => new { x.ProjectId, x.ShipId, x.UnitPrice, x.ProjectWBSId }).ToList();
                 foreach (var item in gList)
@@ -492,7 +492,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 {
                     var model = nowYearMonthReport.Where(t => t.ProjectId == item.Key.ProjectId && t.ShipId == item.Key.ShipId && t.UnitPrice == item.Key.UnitPrice && t.ProjectWBSId == item.Key.ProjectWBSId).FirstOrDefault();
                     if (model != null)
-                    { 
+                    {
                         //合并计算 每条资源的年产值、累计值、外包支出 
                         model.CompleteProductionAmount = nowYearMonthReport.Where(t => t.ProjectId == item.Key.ProjectId && t.ShipId == item.Key.ShipId && t.UnitPrice == item.Key.UnitPrice && t.ProjectWBSId == item.Key.ProjectWBSId).Sum(x => x.CompleteProductionAmount);
 
@@ -819,12 +819,12 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             #endregion
 
             //是否获取项目日报数据统计作为当月月报估算值  如果当月月报没有填的情况下 系统计算上月26（含）至传入月25日产值日报
-            bool dayRep = true;
+            bool dayRep = false;
 
             if (monthReport != null)
             {
                 //填过月报   不进行统计
-                dayRep = false;
+                dayRep = true;
 
                 //月度应收账款(元)
                 result.ReceivableAmount = monthReport.ReceivableAmount;
@@ -943,6 +943,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                                     }
                                 }
                             }
+                            dayRep = true;
                             treeDetails = await WBSConvertTree(model.ProjectId, dateMonth, bData, result.IsFromStaging, resList, dayRep);
                             //树组合
                             result.TreeDetails = treeDetails;
