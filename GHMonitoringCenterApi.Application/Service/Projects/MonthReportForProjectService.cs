@@ -242,7 +242,6 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
         /// <returns></returns>
         private async Task<List<ProjectWBSDto>> GetWBSDataAsync(Guid pId, int? dateMonth, bool dayRep)
         {
-            dateMonth = 202409; dayRep = false;
             var pWBS = new List<ProjectWBSDto>();
             var calculatePWBS = new List<ProjectWBSDto>();
 
@@ -765,7 +764,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             //当前时间月份
             var nowDateMonth = GetDefaultReportDateMonth();
             var dateMonth = model.DateMonth ?? nowDateMonth;
-            //dateMonth = 202409;
+            dateMonth = 202409;
 
             /***
              * 1.获取项目字段信息
@@ -1015,10 +1014,10 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
         /// <returns></returns>
         private List<JToken> GetAllReportDetails(JObject obj)
         {
-            // 使用 LINQ 查询 JObject 的所有子节点
+            // 使用 LINQ 查询 JObject 的所有子节点 reportDetails
             return obj.Descendants()
                       // 筛选出所有类型为 JProperty 且名称为 "ReportDetails" 的节点
-                      .Where(t => t.Type == JTokenType.Property && ((JProperty)t).Name == "ReportDetails")
+                      .Where(t => t.Type == JTokenType.Property && (((JProperty)t).Name == "ReportDetails"|| ((JProperty)t).Name == "reportDetails"))
                       // 对于每个匹配的 JProperty，获取其值中的所有子节点
                       .SelectMany(t => ((JProperty)t).Value.Children())
                       // 转换为 List<JToken> 并返回
