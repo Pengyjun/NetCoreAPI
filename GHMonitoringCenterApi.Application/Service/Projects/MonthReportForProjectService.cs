@@ -124,12 +124,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 klReportList.AddRange(stagingList);
             }
 
-            List<ProjectWBSDto> pWbsTree = new();
-            foreach (var item in wbsList.Where(x => x.Pid == "0"))
-            {
-                var pt = await GetChildren(projectId, item.KeyId, item.ShipId, item.ProjectId, item.ProjectWBSId, item.UnitPrice, dateMonth, wbsList, mReportList, yReportList, klReportList, bData);
-                pWbsTree.AddRange(pt);
-            }
+            var pWbsTree = await GetChildren(projectId, "0", dateMonth, wbsList, mReportList, yReportList, klReportList, bData);
 
             //转换wbs树
             return pWbsTree;
@@ -146,7 +141,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
         /// <param name="klReportList">开累（历史）月报详细响应体</param>
         /// <param name="bData">施工性质、产值属性</param>
         /// <returns></returns>
-        private async Task<List<ProjectWBSDto>> GetChildren(Guid projectId, string? nodePId, Guid? shipid, string? projectid, Guid? wbsid, decimal? price, int? dateMonth, List<ProjectWBSDto> wbsList, List<ProjectWBSDto> mReportList, List<ProjectWBSDto> yReportList, List<ProjectWBSDto> klReportList, List<MonthReportForProjectBaseDataResponseDto> bData)
+        private async Task<List<ProjectWBSDto>> GetChildren(Guid projectId, string? nodePId, int? dateMonth, List<ProjectWBSDto> wbsList, List<ProjectWBSDto> mReportList, List<ProjectWBSDto> yReportList, List<ProjectWBSDto> klReportList, List<MonthReportForProjectBaseDataResponseDto> bData)
         {
             var mainNodes = wbsList.Where(x => x.Pid == nodePId).ToList();
             var otherNodes = wbsList.Where(x => x.Pid != nodePId).ToList();
@@ -154,7 +149,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             foreach (ProjectWBSDto node in mainNodes)
             {
                 if (!node.Children.Any())
-                    node.Children = await GetChildren(projectId, node.KeyId, node.ShipId, node.ProjectId, node.ProjectWBSId, node.UnitPrice, dateMonth, otherNodes, mReportList, yReportList, klReportList, bData);
+                    node.Children = await GetChildren(projectId, node.KeyId, dateMonth, otherNodes, mReportList, yReportList, klReportList, bData);
                 else
                 {
                     /***
@@ -782,7 +777,6 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             //当前时间月份
             var nowDateMonth = GetDefaultReportDateMonth();
             var dateMonth = model.DateMonth ?? nowDateMonth;
-            dateMonth = 202409;
 
             /***
              * 1.获取项目字段信息
