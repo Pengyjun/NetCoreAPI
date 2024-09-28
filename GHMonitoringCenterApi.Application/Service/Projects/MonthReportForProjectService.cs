@@ -98,9 +98,9 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     }
                     else
                     {
-                        item.CompleteProductionAmount = 0;
-                        item.CompletedQuantity = 0;
-                        item.OutsourcingExpensesAmount = 0;
+                        mRep.CompleteProductionAmount = item.CompleteProductionAmount;
+                        mRep.CompletedQuantity = item.CompletedQuantity;
+                        mRep.OutsourcingExpensesAmount = item.OutsourcingExpensesAmount;
                     }
                 }
                 mReportList.AddRange(newMRep);
@@ -242,7 +242,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
         /// <returns></returns>
         private async Task<List<ProjectWBSDto>> GetWBSDataAsync(Guid pId, int? dateMonth, bool dayRep)
         {
-            //dateMonth = 202409; dayRep = false;
+            dateMonth = 202409; dayRep = false;
             var pWBS = new List<ProjectWBSDto>();
             var calculatePWBS = new List<ProjectWBSDto>();
 
@@ -256,7 +256,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             if (dateMonth != 0 && dateMonth.ToString().Length == 6)
             {
                 var mPIds = await _dbContext.Queryable<MonthReport>()
-                    .Where(x => x.IsDelete == 1)//&& x.DateMonth != 202306
+                    .Where(x => x.IsDelete == 1 && x.DateMonth != 202306)//&& x.DateMonth != 202306
                     .Select(x => x.Id)
                     .ToListAsync();
 
