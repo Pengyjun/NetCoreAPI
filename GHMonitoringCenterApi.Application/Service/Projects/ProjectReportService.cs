@@ -3089,100 +3089,101 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             stagingData.BizData = JsonConvert.SerializeObject(model);
 
             #region 新的逻辑
-            //只要本月的月报数据
-            // 解析 JSON 字符串为 JObject
-            var jsonObject = JObject.Parse(stagingData.BizData);
+            //////只要本月的月报数据
+            //// 解析 JSON 字符串为 JObject
+            //var jsonObject = JObject.Parse(stagingData.BizData);
 
-            // 获取所有的 ReportDetails 数据
-            var jsonString = GetAllReportDetails(jsonObject).ToJson();
+            //// 获取所有的 ReportDetails 数据
+            //var jsonString = GetAllReportDetails(jsonObject).ToJson();
 
-            //转换为list
-            var resList = JsonConvert.DeserializeObject<List<ProjectWBSDto>>(jsonString);
-            if (resList != null && resList.Any())
-            {
-                //获取当月月报
-                var mReportList = await _dbContext.Queryable<MonthReportDetail>()
-                    .Where(x => x.IsDelete == 1 && x.ProjectId == model.ProjectId && x.DateMonth == model.DateMonth).ToListAsync();
-                if (mReportList != null && mReportList.Any())
-                {
-                    var detailIds = new List<string>();
-                    foreach (var rt in resList)
-                    {
-                        if (rt.DetailId == Guid.Empty || string.IsNullOrWhiteSpace(rt.DetailId.ToString()))
-                        {
-                            //如果月报资源id是空 判断是否四个值都是空  过滤
-                            if (rt.UnitPrice == 0 && rt.CompletedQuantity == 0 && rt.OutsourcingExpensesAmount == 0 && string.IsNullOrWhiteSpace(rt.Remark))
-                            { continue; }
-                            else
-                            {
-                                //追加id 空的也追加
-                                detailIds.Add(rt.DetailId.ToString());
-                            }
-                        }
-                        else
-                        {
-                            if (rt.UnitPrice == 0 && rt.CompletedQuantity == 0 && rt.OutsourcingExpensesAmount == 0 && string.IsNullOrWhiteSpace(rt.Remark))
-                            { continue; }//不需要处理的数据
-                            else
-                            {
-                                //判断是否填过一模一样的数据
-                                var existMp = mReportList.FirstOrDefault(x => x.UnitPrice == rt.UnitPrice && x.CompletedQuantity == rt.CompletedQuantity && x.OutsourcingExpensesAmount == rt.OutsourcingExpensesAmount && x.Remark == rt.Remark && x.ShipId == rt.ShipId && x.OutPutType == rt.OutPutType && x.ConstructionNature == rt.ConstructionNature);
-                                if (existMp == null)
-                                {
-                                    //追加id 空的也追加
-                                    detailIds.Add(rt.DetailId.ToString());
-                                }
-                            }
-                        }
-                    }
-                    if (detailIds.Any())
-                    {
-                        detailIds = detailIds.Distinct().ToList();
-                        var reportDetails = jsonObject
-                                        .SelectTokens("..ReportDetails")
-                                        .SelectMany(x => x.Children<JObject>());
+            //stagingData.BizData = jsonString;
+            ////转换为list
+            //var resList = JsonConvert.DeserializeObject<List<ProjectWBSDto>>(jsonString);
+            //if (resList != null && resList.Any())
+            //{
+            //    //获取当月月报
+            //    var mReportList = await _dbContext.Queryable<MonthReportDetail>()
+            //        .Where(x => x.IsDelete == 1 && x.ProjectId == model.ProjectId && x.DateMonth == model.DateMonth).ToListAsync();
+            //    if (mReportList != null && mReportList.Any())
+            //    {
+            //        var detailIds = new List<string>();
+            //        foreach (var rt in resList)
+            //        {
+            //            if (rt.DetailId == Guid.Empty || string.IsNullOrWhiteSpace(rt.DetailId.ToString()))
+            //            {
+            //                //如果月报资源id是空 判断是否四个值都是空  过滤
+            //                if (rt.UnitPrice == 0 && rt.CompletedQuantity == 0 && rt.OutsourcingExpensesAmount == 0 && string.IsNullOrWhiteSpace(rt.Remark))
+            //                { continue; }
+            //                else
+            //                {
+            //                    //追加id 空的也追加
+            //                    detailIds.Add(rt.DetailId.ToString());
+            //                }
+            //            }
+            //            else
+            //            {
+            //                if (rt.UnitPrice == 0 && rt.CompletedQuantity == 0 && rt.OutsourcingExpensesAmount == 0 && string.IsNullOrWhiteSpace(rt.Remark))
+            //                { continue; }//不需要处理的数据
+            //                else
+            //                {
+            //                    //判断是否填过一模一样的数据
+            //                    var existMp = mReportList.FirstOrDefault(x => x.UnitPrice == rt.UnitPrice && x.CompletedQuantity == rt.CompletedQuantity && x.OutsourcingExpensesAmount == rt.OutsourcingExpensesAmount && x.Remark == rt.Remark && x.ShipId == rt.ShipId && x.OutPutType == rt.OutPutType && x.ConstructionNature == rt.ConstructionNature);
+            //                    if (existMp == null)
+            //                    {
+            //                        //追加id 空的也追加
+            //                        detailIds.Add(rt.DetailId.ToString());
+            //                    }
+            //                }
+            //            }
+            //        }
+            //        if (detailIds.Any())
+            //        {
+            //            detailIds = detailIds.Distinct().ToList();
+            //            var reportDetails = jsonObject
+            //                            .SelectTokens("..ReportDetails")
+            //                            .SelectMany(x => x.Children<JObject>());
 
-                        foreach (var detail in reportDetails)
-                        {
-                            var detailId = detail["DetailId"]?.ToString();
-                            if (string.IsNullOrEmpty(detailId) || detailIds.Contains(detailId))
-                            {
-                                if (Convert.ToDecimal(detail["UnitPrice"]) == 0 && Convert.ToDecimal(detail["CompletedQuantity"]) == 0 && Convert.ToDecimal(detail["OutsourcingExpensesAmount"]) == 0 && string.IsNullOrWhiteSpace(detail["Remark"]?.ToString()))
-                                {
-                                    continue;
-                                }
-                                detail["IsAllowDelete"] = true;
-                            }
-                        }
-                    }
-                }
-                else
-                {
-                    //全都是新的
-                    //过滤掉没做任何更改的
-                    resList = resList.Where(x => !(x.UnitPrice == 0 && x.CompletedQuantity == 0 && x.OutsourcingExpensesAmount == 0 && string.IsNullOrWhiteSpace(x.Remark))).ToList();
-                    var detailIds = resList.Where(x => !string.IsNullOrWhiteSpace(x.DetailId.ToString())).Select(x => x.DetailId.ToString()).ToList();
-                    var reportDetails = jsonObject
-                                        .SelectTokens("..ReportDetails")
-                                        .SelectMany(x => x.Children<JObject>());
+            //            foreach (var detail in reportDetails)
+            //            {
+            //                var detailId = detail["DetailId"]?.ToString();
+            //                if (string.IsNullOrEmpty(detailId) || detailIds.Contains(detailId))
+            //                {
+            //                    if (Convert.ToDecimal(detail["UnitPrice"]) == 0 && Convert.ToDecimal(detail["CompletedQuantity"]) == 0 && Convert.ToDecimal(detail["OutsourcingExpensesAmount"]) == 0 && string.IsNullOrWhiteSpace(detail["Remark"]?.ToString()))
+            //                    {
+            //                        continue;
+            //                    }
+            //                    detail["IsAllowDelete"] = true;
+            //                }
+            //            }
+            //        }
+            //    }
+            //    else
+            //    {
+            //        //全都是新的
+            //        //过滤掉没做任何更改的
+            //        resList = resList.Where(x => !(x.UnitPrice == 0 && x.CompletedQuantity == 0 && x.OutsourcingExpensesAmount == 0 && string.IsNullOrWhiteSpace(x.Remark))).ToList();
+            //        var detailIds = resList.Where(x => !string.IsNullOrWhiteSpace(x.DetailId.ToString())).Select(x => x.DetailId.ToString()).ToList();
+            //        var reportDetails = jsonObject
+            //                            .SelectTokens("..ReportDetails")
+            //                            .SelectMany(x => x.Children<JObject>());
 
-                    foreach (var detail in reportDetails)
-                    {
-                        var detailId = detail["DetailId"]?.ToString();
-                        if (string.IsNullOrEmpty(detailId) || detailIds.Contains(detailId))
-                        {
-                            if (Convert.ToDecimal(detail["UnitPrice"]) == 0 && Convert.ToDecimal(detail["CompletedQuantity"]) == 0 && Convert.ToDecimal(detail["OutsourcingExpensesAmount"]) == 0 && string.IsNullOrWhiteSpace(detail["Remark"]?.ToString()))
-                            {
-                                continue;
-                            }
-                            detail["IsAllowDelete"] = true;
-                        }
-                    }
-                }
+            //        foreach (var detail in reportDetails)
+            //        {
+            //            var detailId = detail["DetailId"]?.ToString();
+            //            if (string.IsNullOrEmpty(detailId) || detailIds.Contains(detailId))
+            //            {
+            //                if (Convert.ToDecimal(detail["UnitPrice"]) == 0 && Convert.ToDecimal(detail["CompletedQuantity"]) == 0 && Convert.ToDecimal(detail["OutsourcingExpensesAmount"]) == 0 && string.IsNullOrWhiteSpace(detail["Remark"]?.ToString()))
+            //                {
+            //                    continue;
+            //                }
+            //                detail["IsAllowDelete"] = true;
+            //            }
+            //        }
+            //    }
 
-                // 将修改后的 JObject 转换回 JSON 字符串
-                stagingData.BizData = jsonObject.ToString(Formatting.Indented);
-            }
+            //    // 将修改后的 JObject 转换回 JSON 字符串
+            //    stagingData.BizData = jsonObject.ToString(Formatting.Indented);
+            //}
 
             #endregion
 
@@ -3289,7 +3290,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             // 使用 LINQ 查询 JObject 的所有子节点
             return obj.Descendants()
                       // 筛选出所有类型为 JProperty 且名称为 "ReportDetails" 的节点
-                      .Where(t => t.Type == JTokenType.Property && ((JProperty)t).Name == "ReportDetails")
+                      .Where(t => t.Type == JTokenType.Property && (((JProperty)t).Name == "ReportDetails" || ((JProperty)t).Name == "reportDetails"))
                       // 对于每个匹配的 JProperty，获取其值中的所有子节点
                       .SelectMany(t => ((JProperty)t).Value.Children())
                       // 转换为 List<JToken> 并返回
