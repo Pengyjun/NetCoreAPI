@@ -89,15 +89,9 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             if (isStaging)
             {
                 //本月的数据为暂存的数据  清零是为了不做重复计算
-                List<ProjectWBSDto> newWbs = new(); //为了合并当月暂存的分组
                 List<ProjectWBSDto> newMRep = new(); //为了合并当月月报暂存的分组
                 foreach (var item in stagingList)
                 {
-                    //wbs
-                    var wbs = wbsList.FirstOrDefault(t => t.ProjectId == item.ProjectId && t.ShipId == item.ShipId && t.UnitPrice == item.UnitPrice && t.ProjectWBSId == item.ProjectWBSId);
-                    if (wbs == null) newWbs.Add(item);
-
-                    //月报
                     var mRep = mReportList.FirstOrDefault(t => t.ProjectId == item.ProjectId && t.ShipId == item.ShipId && t.UnitPrice == item.UnitPrice && t.ProjectWBSId == item.ProjectWBSId);
                     if (mRep == null)
                     {
@@ -120,7 +114,6 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                         mRep.TotalOutsourcingExpensesAmount = item.TotalOutsourcingExpensesAmount;
                     }
                 }
-                wbsList.AddRange(newWbs);
                 mReportList.AddRange(newMRep);
                 yReportList.AddRange(stagingList);
                 klReportList.AddRange(stagingList);
