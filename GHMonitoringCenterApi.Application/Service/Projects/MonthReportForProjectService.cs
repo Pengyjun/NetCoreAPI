@@ -105,6 +105,8 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     }
                     else
                     {
+                        mRep.IsAllowDelete = true;
+
                         mRep.CompleteProductionAmount = item.CompleteProductionAmount;
                         mRep.CompletedQuantity = item.CompletedQuantity;
                         mRep.OutsourcingExpensesAmount = item.OutsourcingExpensesAmount;
@@ -983,11 +985,15 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
 
                         if (resList != null && resList.Any())
                         {
+                            var wbss = await _dbContext.Queryable<ProjectWBS>().Where(x => x.ProjectId == model.ProjectId.ToString()).ToListAsync();
                             //历史记录
                             var tIds = resList.Where(x => x.IsAllowDelete).Select(x => x.DetailId).ToList();
                             foreach (var item in resList)
                             {
                                 item.ProjectId = model.ProjectId.ToString();
+
+                                item.KeyId = wbss.FirstOrDefault(x => x.Id == item.ProjectWBSId)?.KeyId;
+
                                 item.YearCompleteProductionAmount = item.CompleteProductionAmount;
                                 item.YearCompletedQuantity = item.CompletedQuantity;
                                 item.YearOutsourcingExpensesAmount = item.OutsourcingExpensesAmount;
