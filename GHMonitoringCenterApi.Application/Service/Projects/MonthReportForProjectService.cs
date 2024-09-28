@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using Aspose.Words;
+using AutoMapper;
 using GHMonitoringCenterApi.Application.Contracts.Dto.Enums;
 using GHMonitoringCenterApi.Application.Contracts.Dto.Project;
 using GHMonitoringCenterApi.Application.Contracts.Dto.Project.MonthReportForProject;
@@ -88,9 +89,15 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             if (isStaging)
             {
                 //本月的数据为暂存的数据  清零是为了不做重复计算
-                List<ProjectWBSDto> newMRep = new(); //为了合并当月暂存的分组
+                List<ProjectWBSDto> newWbs = new(); //为了合并当月暂存的分组
+                List<ProjectWBSDto> newMRep = new(); //为了合并当月月报暂存的分组
                 foreach (var item in stagingList)
                 {
+                    //wbs
+                    var wbs = wbsList.FirstOrDefault(t => t.ProjectId == item.ProjectId && t.ShipId == item.ShipId && t.UnitPrice == item.UnitPrice && t.ProjectWBSId == item.ProjectWBSId);
+                    if (wbs == null) newWbs.Add(item);
+
+                    //月报
                     var mRep = mReportList.FirstOrDefault(t => t.ProjectId == item.ProjectId && t.ShipId == item.ShipId && t.UnitPrice == item.UnitPrice && t.ProjectWBSId == item.ProjectWBSId);
                     if (mRep == null)
                     {
@@ -101,14 +108,28 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                         mRep.CompleteProductionAmount = item.CompleteProductionAmount;
                         mRep.CompletedQuantity = item.CompletedQuantity;
                         mRep.OutsourcingExpensesAmount = item.OutsourcingExpensesAmount;
+
+                        mRep.YearCompletedQuantity = item.YearCompletedQuantity;
+                        mRep.YearCompleteProductionAmount = item.YearCompleteProductionAmount;
+                        mRep.YearOutsourcingExpensesAmount = item.YearOutsourcingExpensesAmount;
+
+                        mRep.TotalCompleteProductionAmount = item.TotalCompleteProductionAmount;
+                        mRep.TotalCompletedQuantity = item.TotalCompletedQuantity;
+                        mRep.TotalOutsourcingExpensesAmount = item.TotalOutsourcingExpensesAmount;
                     }
                 }
+                wbsList.AddRange(newWbs);
                 mReportList.AddRange(newMRep);
                 yReportList.AddRange(stagingList);
                 klReportList.AddRange(stagingList);
             }
 
-            var pWbsTree = await GetChildren(projectId, dateMonth, "0", wbsList, mReportList, yReportList, klReportList, bData);
+            List<ProjectWBSDto> pWbsTree = new();
+            foreach (var item in wbsList.Where(x => x.Pid == "0"))
+            {
+                var pt = await GetChildren(projectId, item.KeyId, item.ShipId, item.ProjectId, item.ProjectWBSId, item.UnitPrice, dateMonth, wbsList, mReportList, yReportList, klReportList, bData);
+                pWbsTree.AddRange(pt);
+            }
 
             //转换wbs树
             return pWbsTree;
@@ -125,7 +146,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
         /// <param name="klReportList">开累（历史）月报详细响应体</param>
         /// <param name="bData">施工性质、产值属性</param>
         /// <returns></returns>
-        private async Task<List<ProjectWBSDto>> GetChildren(Guid projectId, int? dateMonth, string? nodePId, List<ProjectWBSDto> wbsList, List<ProjectWBSDto> mReportList, List<ProjectWBSDto> yReportList, List<ProjectWBSDto> klReportList, List<MonthReportForProjectBaseDataResponseDto> bData)
+        private async Task<List<ProjectWBSDto>> GetChildren(Guid projectId, string? nodePId, Guid? shipid, string? projectid, Guid? wbsid, decimal? price, int? dateMonth, List<ProjectWBSDto> wbsList, List<ProjectWBSDto> mReportList, List<ProjectWBSDto> yReportList, List<ProjectWBSDto> klReportList, List<MonthReportForProjectBaseDataResponseDto> bData)
         {
             var mainNodes = wbsList.Where(x => x.Pid == nodePId).ToList();
             var otherNodes = wbsList.Where(x => x.Pid != nodePId).ToList();
@@ -133,7 +154,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             foreach (ProjectWBSDto node in mainNodes)
             {
                 if (!node.Children.Any())
-                    node.Children = await GetChildren(projectId, dateMonth, node.KeyId, otherNodes, mReportList, yReportList, klReportList, bData);
+                    node.Children = await GetChildren(projectId, node.KeyId, node.ShipId, node.ProjectId, node.ProjectWBSId, node.UnitPrice, dateMonth, otherNodes, mReportList, yReportList, klReportList, bData);
                 else
                 {
                     /***
@@ -185,7 +206,6 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 {
                     GetFinallyChildren(dateMonth, children.ProjectWBSId, children.Children, mReportList, yReportList, klReportList, bData);
                 }
-
             }
 
             return childs;
@@ -206,7 +226,6 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
              * 1.根据(当前施工分类)wbsid获取所有资源（船舶）信息
              * 2.统计资源（每条船）年度、开累值
              */
-
             var mReport = mReportList.OrderBy(x => x.ShipId).ThenBy(x => x.DateMonth).Where(x => x.ProjectWBSId == wbsId).ToList();
             foreach (var report in mReport)
             {
@@ -219,7 +238,6 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 report.TotalCompleteProductionAmount = klReportList.Where(x => x.ProjectId == report.ProjectId && report.ShipId == x.ShipId && x.ProjectWBSId == wbsId && x.UnitPrice == report.UnitPrice).Sum(x => x.TotalCompleteProductionAmount);
                 report.TotalCompletedQuantity = klReportList.Where(x => x.ProjectId == report.ProjectId && report.ShipId == x.ShipId && x.ProjectWBSId == wbsId && x.UnitPrice == report.UnitPrice).Sum(x => x.TotalCompletedQuantity);
                 report.TotalOutsourcingExpensesAmount = klReportList.Where(x => x.ProjectId == report.ProjectId && report.ShipId == x.ShipId && x.ProjectWBSId == wbsId && x.UnitPrice == report.UnitPrice).Sum(x => x.TotalOutsourcingExpensesAmount);
-
                 /***
                  * 基本信息处理
                  */
@@ -636,7 +654,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
 
                     //追加最新的wbs数据
                     var nPWBSList = await _dbContext.Queryable<ProjectWBS>()
-                                 .Where(p => !string.IsNullOrEmpty(p.ProjectId) && p.IsDelete == 1 && SqlFunc.ToGuid(p.ProjectId) == pId && !pIds.Contains(p.Id))
+                                 .Where(p => !string.IsNullOrEmpty(p.ProjectId) && SqlFunc.ToGuid(p.ProjectId) == pId && !pIds.Contains(p.Id))
                                  .Select(p => new ProjectWBSDto
                                  {
                                      EngQuantity = p.EngQuantity,//wbs初始的工程量
@@ -670,7 +688,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
 
                         //追加最新的wbs数据
                         var nPWBSList = await _dbContext.Queryable<ProjectWBS>()
-                                     .Where(p => !string.IsNullOrEmpty(p.ProjectId) && p.IsDelete == 1 && SqlFunc.ToGuid(p.ProjectId) == pId && !pIds.Contains(p.Id))
+                                     .Where(p => !string.IsNullOrEmpty(p.ProjectId) && SqlFunc.ToGuid(p.ProjectId) == pId && !pIds.Contains(p.Id))
                                      .Select(p => new ProjectWBSDto
                                      {
                                          EngQuantity = p.EngQuantity,//wbs初始的工程量
@@ -705,7 +723,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
 
                         //追加最新的wbs数据
                         var nPWBSList = await _dbContext.Queryable<ProjectWBS>()
-                                     .Where(p => !string.IsNullOrEmpty(p.ProjectId) && p.IsDelete == 1 && SqlFunc.ToGuid(p.ProjectId) == pId && !pIds.Contains(p.Id))
+                                     .Where(p => !string.IsNullOrEmpty(p.ProjectId) && SqlFunc.ToGuid(p.ProjectId) == pId && !pIds.Contains(p.Id))
                                      .Select(p => new ProjectWBSDto
                                      {
                                          EngQuantity = p.EngQuantity,//wbs初始的工程量
@@ -731,7 +749,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             }
 
             pWBSList = await _dbContext.Queryable<ProjectWBS>()
-               .Where(p => !string.IsNullOrEmpty(p.ProjectId) && p.IsDelete == 1 && SqlFunc.ToGuid(p.ProjectId) == pId)
+               .Where(p => !string.IsNullOrEmpty(p.ProjectId) && SqlFunc.ToGuid(p.ProjectId) == pId)
                .Select(p => new ProjectWBSDto
                {
                    EngQuantity = p.EngQuantity,//wbs初始的工程量
@@ -975,6 +993,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                             var tIds = resList.Where(x => x.IsAllowDelete).Select(x => x.DetailId).ToList();
                             foreach (var item in resList)
                             {
+                                item.ProjectId = model.ProjectId.ToString();
                                 item.YearCompleteProductionAmount = item.CompleteProductionAmount;
                                 item.YearCompletedQuantity = item.CompletedQuantity;
                                 item.YearOutsourcingExpensesAmount = item.OutsourcingExpensesAmount;
@@ -1017,7 +1036,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             // 使用 LINQ 查询 JObject 的所有子节点 reportDetails
             return obj.Descendants()
                       // 筛选出所有类型为 JProperty 且名称为 "ReportDetails" 的节点
-                      .Where(t => t.Type == JTokenType.Property && (((JProperty)t).Name == "ReportDetails"|| ((JProperty)t).Name == "reportDetails"))
+                      .Where(t => t.Type == JTokenType.Property && (((JProperty)t).Name == "ReportDetails" || ((JProperty)t).Name == "reportDetails"))
                       // 对于每个匹配的 JProperty，获取其值中的所有子节点
                       .SelectMany(t => ((JProperty)t).Value.Children())
                       // 转换为 List<JToken> 并返回
