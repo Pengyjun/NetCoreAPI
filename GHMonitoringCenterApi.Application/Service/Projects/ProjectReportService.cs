@@ -2194,7 +2194,10 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 if (model.IsConvert == false)
                 {
                     var h = pRates.FirstOrDefault(x => x.Year == 2023 && x.CurrencyId == item.CurrencyId.ToString());
-                    hisMonthRep.CompleteProductionAmount = hisMonthRep.CompleteProductionAmount / h.ExchangeRate.Value;
+                    if (hisMonthRep != null)
+                    {
+                        hisMonthRep.CompleteProductionAmount = h == null ? 0M : h.ExchangeRate == null ? 0M : hisMonthRep.CompleteProductionAmount / h.ExchangeRate.Value;
+                    }
                 }
 
                 // 年度统计月报
