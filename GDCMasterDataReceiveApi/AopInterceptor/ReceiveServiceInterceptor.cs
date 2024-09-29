@@ -238,16 +238,16 @@ namespace GHElectronicFileApi.AopInterceptor
                 }
                 else if (methodName == "PersonDataAsync")
                 {
-                    var receiveParame = ((BaseReceiveDataRequestDto<ReceiveUserRequestDto>)invocation.Arguments[0]).IT_DATA;
-                    parameCount = receiveParame.item.Count;
-                    requestParame = receiveParame.item.ToJson();
+                    var receiveParame = ((ReceiveUserRequestDto)invocation.Arguments[0]).user;
+                    parameCount = 1;
+                    requestParame = receiveParame.ToJson();
                     receiveDataType = ReceiveDataType.Person;
                 }
                 else if (methodName == "InstitutionDataAsync")
                 {
-                    var receiveParame = ((BaseReceiveDataRequestDto<ReceiveInstitutionRequestDto>)invocation.Arguments[0]).IT_DATA;
-                    parameCount = receiveParame.item.Count;
-                    requestParame = receiveParame.item.ToJson();
+                    var receiveParame = ((ReceiveInstitutionRequestDto)invocation.Arguments[0]).OrganizeItem;
+                    parameCount = receiveParame.Count;
+                    requestParame = receiveParame.ToJson();
                     receiveDataType = ReceiveDataType.Institution;
                 }
                 else if (methodName == "BusinessProjectDataAsync")
@@ -324,14 +324,26 @@ namespace GHElectronicFileApi.AopInterceptor
                         {
                             ZINSTID = parseParame["IS_REQ_HEAD_ASYNC"]["ZINSTID"].ToString(),
                             ZZATTR1 = parseParame["IS_REQ_HEAD_ASYNC"]["ZZATTR1"].ToString(),
-                            //ZZATTR2 = parseParame["IS_REQ_HEAD_ASYNC"]["ZZATTR2"].ToString(),
                             ZZATTR2 = "MDM",
                             ZZATTR3 = parseParame["IS_REQ_HEAD_ASYNC"]["ZZATTR3"].ToString(),
                             ZZOBJECT = parseParame["IS_REQ_HEAD_ASYNC"]["ZZOBJECT"].ToString(),
-                            ZZREQTIME = parseParame["IS_REQ_HEAD_ASYNC"]["ZZREQTIME"].ToString(),
-                            //ZZSRC_SYS = parseParame["IS_REQ_HEAD_ASYNC"]["ZZSRC_SYS"].ToString(),
                             ZZSRC_SYS = "GHJ-MDG",
                         };
+
+                        if (parseParame["IS_REQ_HEAD_ASYNC"]["ZZREQTIME"] != null)
+                        {
+                           var timeRes= parseParame["IS_REQ_HEAD_ASYNC"]["ZZREQTIME"].ToString();
+                            if (timeRes.IndexOf(".") >= 0)
+                            {
+                                iS_REQ_HEAD_ASYNC.ZZREQTIME = timeRes.Split(".")[0];
+                            }
+                            else {
+                                iS_REQ_HEAD_ASYNC.ZZREQTIME = parseParame["IS_REQ_HEAD_ASYNC"]["ZZREQTIME"].ToString();
+
+                            }
+
+                        }
+
                         var time = DateTime.Now;
                         var isTime=DateTime.TryParse(parseParame["IS_REQ_HEAD_ASYNC"]["ZZATTR1"].ToString(),out time);
                         if (isTime)
@@ -379,9 +391,9 @@ namespace GHElectronicFileApi.AopInterceptor
                         var resultRequest = new RestRequest("",Method.Post);
                         resultRequest.AddHeader("Content-Type", "application/xml");
                         resultRequest.AddParameter("application/xml", requestBody, ParameterType.RequestBody);
-                        //var apiResponse = await client.ExecuteAsync(resultRequest);
-                          client.ExecuteAsync(resultRequest);
-                        //await Console.Out.WriteLineAsync($"返回结果1:{apiResponse.ResponseStatus.ToJson()}");
+                        // var apiResponse = await client.ExecuteAsync(resultRequest);
+                          await client.ExecuteAsync(resultRequest);
+                       // await Console.Out.WriteLineAsync($"返回结果1:{apiResponse.ResponseStatus.ToJson()}");
                         //await Console.Out.WriteLineAsync($"返回结果2:{apiResponse.Content.ToJson()}");
                     }
                     #endregion
