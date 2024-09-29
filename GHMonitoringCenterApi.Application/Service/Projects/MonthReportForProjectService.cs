@@ -9,6 +9,7 @@ using GHMonitoringCenterApi.Domain.Enums;
 using GHMonitoringCenterApi.Domain.Models;
 using GHMonitoringCenterApi.Domain.Shared;
 using GHMonitoringCenterApi.Domain.Shared.Enums;
+using GHMonitoringCenterApi.Domain.Shared.Util;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NPOI.SS.Formula.Functions;
@@ -119,86 +120,53 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 klReportList.AddRange(stagingList);
             }
 
-            var pWbsTree = await GetChildren(projectId, "0", dateMonth, wbsList, mReportList, yReportList, klReportList, bData);
+            //获取当前项目所有的月报存在的wbsid  不包含的wbsid 全部去掉
+            var mpWbsIds = await _dbContext.Queryable<MonthReportDetail>().Where(x => x.IsDelete == 1 && x.ProjectId == projectId).Select(x => x.ProjectWBSId).ToListAsync();
 
             //转换wbs树
+
+            var pWbsTree = BuildTree("0", wbsList, mpWbsIds, mReportList, yReportList, klReportList, bData);
+
             return pWbsTree;
         }
         /// <summary>
-        /// 获取子集数据，处理月报详细数据逻辑
+        /// 树节点
         /// </summary>
-        /// <param name="projectId"></param>
-        /// <param name="dateMonth"></param>
-        /// <param name="nodePId"></param>
-        /// <param name="wbsList">wbs响应体</param>
-        /// <param name="mReportList">当月月报详细响应体</param>
-        /// <param name="yReportList">当年月报详细响应体</param>
-        /// <param name="klReportList">开累（历史）月报详细响应体</param>
-        /// <param name="bData">施工性质、产值属性</param>
-        /// <returns></returns>
-        private async Task<List<ProjectWBSDto>> GetChildren(Guid projectId, string? nodePId, int? dateMonth, List<ProjectWBSDto> wbsList, List<ProjectWBSDto> mReportList, List<ProjectWBSDto> yReportList, List<ProjectWBSDto> klReportList, List<MonthReportForProjectBaseDataResponseDto> bData)
-        {
-            var mainNodes = wbsList.Where(x => x.Pid == nodePId).ToList();
-            var otherNodes = wbsList.Where(x => x.Pid != nodePId).ToList();
-
-            foreach (ProjectWBSDto node in mainNodes)
-            {
-                if (!node.Children.Any())
-                    node.Children = await GetChildren(projectId, node.KeyId, dateMonth, otherNodes, mReportList, yReportList, klReportList, bData);
-                else
-                {
-                    /***
-                     * 最后一层节点处理月报详细数据
-                     * 1.最后一层节点重新赋值项目月报详细数据
-                     */
-
-                    foreach (ProjectWBSDto finallyNode in node.Children)
-                    {
-                        finallyNode.ReportDetails = GetFinallyChildren(dateMonth, finallyNode.ProjectWBSId, node.Children, mReportList, yReportList, klReportList, bData).ToList();
-                    }
-                }
-
-                if (!node.Children.Any())
-                    //当前节点是最终子节点
-                    node.ReportDetails = MReportForProjectList(dateMonth, node.ProjectWBSId, mReportList, yReportList, klReportList, bData).ToList();
-            }
-
-            return mainNodes;
-        }
-        /// <summary>
-        /// 获取最终子节点（资源/船舶数据）
-        /// </summary>
-        /// <param name="childrens"></param>
+        /// <param name="rootPid"></param>
+        /// <param name="wbsList"></param>
+        /// <param name="mpWbsIds"></param>
         /// <param name="mReportList"></param>
         /// <param name="yReportList"></param>
         /// <param name="klReportList"></param>
         /// <param name="bData"></param>
-        /// <param name="wbsId"></param>
-        /// <param name="dateMonth"></param>
         /// <returns></returns>
-        private List<ProjectWBSDto> GetFinallyChildren(int? dateMonth, Guid wbsId, List<ProjectWBSDto> childrens, List<ProjectWBSDto> mReportList, List<ProjectWBSDto> yReportList, List<ProjectWBSDto> klReportList, List<MonthReportForProjectBaseDataResponseDto> bData)
+        public List<ProjectWBSDto> BuildTree(string? rootPid, List<ProjectWBSDto> wbsList, List<Guid>? mpWbsIds, List<ProjectWBSDto> mReportList, List<ProjectWBSDto> yReportList, List<ProjectWBSDto> klReportList, List<MonthReportForProjectBaseDataResponseDto> bData)
         {
-            List<ProjectWBSDto> childs = new List<ProjectWBSDto>();
+            var tree = new List<ProjectWBSDto>();
+            // 获取所有主节点
+            var mainNodes = wbsList.Where(x => x.Pid == rootPid).ToList();
 
-            var children = childrens.FirstOrDefault(x => x.ProjectWBSId == wbsId);
-
-            if (children != null)
+            foreach (var node in mainNodes)
             {
-                if (children.Children == null || !children.Children.Any())
+                // 递归获取子节点
+                var children = BuildTree(node.KeyId, wbsList, mpWbsIds, mReportList, yReportList, klReportList, bData);
+                // 判断当前节点是否是最后节点
+                if (!children.Any()) // 如果没有子节点
                 {
-                    /***
-                     * 当前节点是最终子节点
-                     */
+                    if (!mpWbsIds.Contains(node.ProjectWBSId))
+                    {
+                        continue; // 跳过这个节点，不添加到树中
+                    }
+                }
+                node.Children.AddRange(children);
+                tree.Add(node);
 
-                    childs = MReportForProjectList(dateMonth, children.ProjectWBSId, mReportList, yReportList, klReportList, bData);
-                }
-                else
-                {
-                    GetFinallyChildren(dateMonth, children.ProjectWBSId, children.Children, mReportList, yReportList, klReportList, bData);
-                }
+                var values = mReportList.Where(x => x.ProjectWBSId == node.ProjectWBSId).ToList();
+                var finallyList = MReportForProjectList(node.ProjectWBSId, values, yReportList, klReportList, bData);
+                node.ReportDetails.AddRange(finallyList);
             }
 
-            return childs;
+            return tree;
         }
         /// <summary>
         /// 最后一层节点处理月报详细数据
@@ -210,7 +178,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
         /// <param name="bData">施工性质、产值属性</param>
         /// <param name="dateMonth"></param>
         /// <returns></returns>
-        private List<ProjectWBSDto> MReportForProjectList(int? dateMonth, Guid wbsId, List<ProjectWBSDto> mReportList, List<ProjectWBSDto> yReportList, List<ProjectWBSDto> klReportList, List<MonthReportForProjectBaseDataResponseDto> bData)
+        private List<ProjectWBSDto> MReportForProjectList(Guid wbsId, List<ProjectWBSDto> mReportList, List<ProjectWBSDto> yReportList, List<ProjectWBSDto> klReportList, List<MonthReportForProjectBaseDataResponseDto> bData)
         {
             /***
              * 1.根据(当前施工分类)wbsid获取所有资源（船舶）信息
@@ -310,6 +278,8 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 foreach (var item in calculatePWBS)
                 {
                     item.EngQuantity = pWBS.FirstOrDefault(x => x.ProjectWBSId == item.ProjectWBSId)?.EngQuantity;
+                    item.Pid = pWBS.FirstOrDefault(x => x.ProjectWBSId == item.ProjectWBSId)?.Pid;
+                    item.KeyId = pWBS.FirstOrDefault(x => x.ProjectWBSId == item.ProjectWBSId)?.KeyId;
                 }
 
                 /***
