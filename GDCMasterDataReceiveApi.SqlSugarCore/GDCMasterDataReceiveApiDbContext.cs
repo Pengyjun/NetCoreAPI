@@ -18,19 +18,14 @@ namespace GDCMasterDataReceiveApi.SqlSugarCore
         public static void AddSqlSugarContext(this IServiceCollection services, IConfiguration configuration, string dbCon)
         {
             //是否打开无参数化sql监视
+            var gdcmasterdatareceiveapi = "Server=10.10.74.3;PORT=5088; User Id=GDCMDM; PWD=GDCMDMdb123; DATABASE=HNKC_MDM";
+            var gdcdatasecurityapi = "Server=10.10.74.3;PORT=5088; User Id=DATASECURITY; PWD=datasecurity@sql; DATABASE=DATASECURITY";
+
             bool isOpenSql = false;
-            SqlSugarClient sqlSugarClient = new SqlSugarClient(new ConnectionConfig()
+            SqlSugarClient sqlSugarClient = new SqlSugarClient(new List<ConnectionConfig>()
             {
-                ConnectionString = dbCon,
-                //DbType = DbType.MySql,
-                DbType = DbType.Dm,
-                IsAutoCloseConnection = true, //不设成true要手动close
-                MoreSettings = new ConnMoreSettings()
-                {
-                    //SqlSugarCore 5.1.4.157-preview09+版本支持
-                    DatabaseModel = SqlSugar.DbType.MySql, //启用达梦mysql模式分页的兼容
-                    IsAutoToUpper = false, //禁用自动转成大写表 5.1.3.41-preview04
-                }
+                new ConnectionConfig(){ConfigId="gdcmasterdatareceiveapi",ConnectionString = gdcmasterdatareceiveapi, DbType = DbType.Dm,IsAutoCloseConnection = true},
+                new ConnectionConfig(){ConfigId="gdcdatasecurityapi",ConnectionString = gdcdatasecurityapi,DbType = DbType.Dm,IsAutoCloseConnection = true}
             }, db =>
             {
                 var sqlParmae = string.Empty;
