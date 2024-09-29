@@ -18,14 +18,14 @@ namespace GDCMasterDataReceiveApi.SqlSugarCore
         public static void AddSqlSugarContext(this IServiceCollection services, IConfiguration configuration, string dbCon)
         {
             //是否打开无参数化sql监视
-            var gdcmasterdatareceiveapi = "Server=10.10.74.3;PORT=5088; User Id=GDCMDM; PWD=GDCMDMdb123; DATABASE=HNKC_MDM";
-            var gdcdatasecurityapi = "Server=10.10.74.3;PORT=5088; User Id=DATASECURITY; PWD=datasecurity@sql; DATABASE=DATASECURITY";
+            var gdcmasterdatareceiveapi = "Server=10.10.54.3;PORT=8011; User Id=GDCMDM; PWD=GDCMDMdb123;DATABASE=HNKC_MDM";
+           // var gdcdatasecurityapi = "Server=10.10.74.3;PORT=5088; User Id=DATASECURITY; PWD=datasecurity@sql; DATABASE=DATASECURITY";
 
             bool isOpenSql = false;
             SqlSugarClient sqlSugarClient = new SqlSugarClient(new List<ConnectionConfig>()
             {
                 new ConnectionConfig(){ConfigId="gdcmasterdatareceiveapi",ConnectionString = gdcmasterdatareceiveapi, DbType = DbType.Dm,IsAutoCloseConnection = true},
-                new ConnectionConfig(){ConfigId="gdcdatasecurityapi",ConnectionString = gdcdatasecurityapi,DbType = DbType.Dm,IsAutoCloseConnection = true}
+                //new ConnectionConfig(){ConfigId="gdcdatasecurityapi",ConnectionString = gdcdatasecurityapi,DbType = DbType.Dm,IsAutoCloseConnection = true}
             }, db =>
             {
                 var sqlParmae = string.Empty;
