@@ -4933,7 +4933,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     break;
                 case 28:
                     allColumns = new List<string> { "CreateTime", "UpdateTime" };
-                    var properties28 = GetProperties<CurrencyDetailsDto>();
+                    var properties28 = GetProperties<ValueDomainReceiveResponseDto>();
                     foreach (var property in properties28) { tableColumns.Add(property.Name); }
                     foreach (var item in tableColumns)
                     {
@@ -4968,5 +4968,662 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
             return typeof(T).GetProperties(BindingFlags.Public | BindingFlags.Instance);
         }
         #endregion
+        #region 数据脱敏规则  字段静态写入
+        /// <summary>
+        /// 数据脱敏规则  字段静态写入
+        /// </summary>
+        /// <param name="interfaceId">应用系统接口id</param>
+        /// <returns></returns>
+        public async Task<ResponseAjaxResult<bool>> SetFiledAsync()
+        {
+            ResponseAjaxResult<bool> responseAjaxResult = new();
+            List<DataDesensitizationRule> ddd = new();
+            var excludedProperties = new HashSet<string> { "CreateTime", "UpdateTime", "Id", "Ids" };
+
+            var resList = await _dbContext.AsTenant().QueryableWithAttr<AppInterfaceAuthorization>()
+                .Select(t => new { t.Id, t.InterfaceName, t.Name })
+              .ToListAsync();
+
+            foreach (var r in resList)
+            {
+                List<string> filds = new();
+                switch (r.InterfaceName)
+                {
+                    case "GetUserSearchAsync":
+                    case "GetUserDetailsAsync":
+                        var properties = GetProperties<UserSearchDetailsDto>();
+                        foreach (var property in properties)
+                        {
+                            if (!excludedProperties.Contains(property.Name))
+                            {
+                                ddd.Add(new DataDesensitizationRule
+                                {
+                                    Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                                    AppInterfaceId = r.Id,
+                                    Field = property.Name,
+                                    FieldName = null,
+                                    DesensitizationType = 1,
+                                    Enable = 0,
+                                    IsRefObject = 0,
+                                    StartIndex = 0,
+                                    EndIndex = 0
+                                });
+                            }
+                        }
+                        break;
+                    case "GetInstitutionsAsync":
+                    case "GetInstitutionDetailsAsync":
+                        var properties2 = GetProperties<InstitutionDetatilsDto>();
+                        foreach (var property in properties2)
+                        {
+                            if (!excludedProperties.Contains(property.Name))
+                            {
+                                ddd.Add(new DataDesensitizationRule
+                                {
+                                    Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                                    AppInterfaceId = r.Id,
+                                    Field = property.Name,
+                                    FieldName = null,
+                                    DesensitizationType = 1,
+                                    Enable = 0,
+                                    IsRefObject = 0,
+                                    StartIndex = 0,
+                                    EndIndex = 0
+                                });
+                            }
+                        }
+                        break;
+                    case "GetProjectSearchAsync":
+                    case "GetProjectDetailsAsync":
+                        var properties3 = GetProperties<ProjectDetailsDto>();
+                        foreach (var property in properties3)
+                        {
+                            if (!excludedProperties.Contains(property.Name))
+                            {
+                                ddd.Add(new DataDesensitizationRule
+                                {
+                                    Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                                    AppInterfaceId = r.Id,
+                                    Field = property.Name,
+                                    FieldName = null,
+                                    DesensitizationType = 1,
+                                    Enable = 0,
+                                    IsRefObject = 0,
+                                    StartIndex = 0,
+                                    EndIndex = 0
+                                });
+                            }
+                        }
+                        break;
+                    case "GetCorresUnitSearchAsync":
+                    case "GetCorresUnitDetailAsync":
+                        var properties4 = GetProperties<CorresUnitDetailsDto>();
+                        foreach (var property in properties4)
+                        {
+                            if (!excludedProperties.Contains(property.Name))
+                            {
+                                ddd.Add(new DataDesensitizationRule
+                                {
+                                    Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                                    AppInterfaceId = r.Id,
+                                    Field = property.Name,
+                                    FieldName = null,
+                                    DesensitizationType = 1,
+                                    Enable = 0,
+                                    IsRefObject = 0,
+                                    StartIndex = 0,
+                                    EndIndex = 0
+                                });
+                            }
+                        }
+                        break;
+                    case "GetCountryRegionSearchAsync":
+                    case "GetCountryRegionDetailsAsync":
+                        var properties5 = GetProperties<CountryRegionDetailsDto>();
+                        foreach (var property in properties5)
+                        {
+                            if (!excludedProperties.Contains(property.Name))
+                            {
+                                ddd.Add(new DataDesensitizationRule
+                                {
+                                    Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                                    AppInterfaceId = r.Id,
+                                    Field = property.Name,
+                                    FieldName = null,
+                                    DesensitizationType = 1,
+                                    Enable = 0,
+                                    IsRefObject = 0,
+                                    StartIndex = 0,
+                                    EndIndex = 0
+                                });
+                            }
+                        }
+                        break;
+                    case "GetCountryContinentSearchAsync":
+                    case "GetCountryContinentDetailsAsync":
+                        var properties6 = GetProperties<CountryContinentDetailsDto>();
+                        foreach (var property in properties6)
+                        {
+                            if (!excludedProperties.Contains(property.Name))
+                            {
+                                ddd.Add(new DataDesensitizationRule
+                                {
+                                    Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                                    AppInterfaceId = r.Id,
+                                    Field = property.Name,
+                                    FieldName = null,
+                                    DesensitizationType = 1,
+                                    Enable = 0,
+                                    IsRefObject = 0,
+                                    StartIndex = 0,
+                                    EndIndex = 0
+                                });
+                            }
+                        }
+                        break;
+                    case "GetFinancialInstitutionSearch":
+                    case "GetFinancialInstitutionDetails":
+                        var properties7 = GetProperties<FinancialInstitutionDetailsDto>();
+                        foreach (var property in properties7)
+                        {
+                            if (!excludedProperties.Contains(property.Name))
+                            {
+                                ddd.Add(new DataDesensitizationRule
+                                {
+                                    Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                                    AppInterfaceId = r.Id,
+                                    Field = property.Name,
+                                    FieldName = null,
+                                    DesensitizationType = 1,
+                                    Enable = 0,
+                                    IsRefObject = 0,
+                                    StartIndex = 0,
+                                    EndIndex = 0
+                                });
+                            }
+                        }
+                        break;
+                    case "GetDeviceClassCodeSearchAsync":
+                    case "GetDeviceClassCodeDetailsAsync":
+                        var properties8 = GetProperties<DeviceClassCodeDetailsDto>();
+                        foreach (var property in properties8)
+                        {
+                            if (!excludedProperties.Contains(property.Name))
+                            {
+                                ddd.Add(new DataDesensitizationRule
+                                {
+                                    Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                                    AppInterfaceId = r.Id,
+                                    Field = property.Name,
+                                    FieldName = null,
+                                    DesensitizationType = 1,
+                                    Enable = 0,
+                                    IsRefObject = 0,
+                                    StartIndex = 0,
+                                    EndIndex = 0
+                                });
+                            }
+                        }
+                        break;
+                    case "GetInvoiceTypeSearchAsync":
+                    case "GetInvoiceTypeDetailsASync":
+                        var properties9 = GetProperties<InvoiceTypeDetailshDto>();
+                        foreach (var property in properties9)
+                        {
+                            if (!excludedProperties.Contains(property.Name))
+                            {
+                                ddd.Add(new DataDesensitizationRule
+                                {
+                                    Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                                    AppInterfaceId = r.Id,
+                                    Field = property.Name,
+                                    FieldName = null,
+                                    DesensitizationType = 1,
+                                    Enable = 0,
+                                    IsRefObject = 0,
+                                    StartIndex = 0,
+                                    EndIndex = 0
+                                });
+                            }
+                        }
+                        break;
+                    case "GetScientifiCNoProjectSearchAsync":
+                    case "GetScientifiCNoProjectDetailsAsync":
+                        var properties10 = GetProperties<ScientifiCNoProjectDetailsDto>();
+                        foreach (var property in properties10)
+                        {
+                            if (!excludedProperties.Contains(property.Name))
+                            {
+                                ddd.Add(new DataDesensitizationRule
+                                {
+                                    Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                                    AppInterfaceId = r.Id,
+                                    Field = property.Name,
+                                    FieldName = null,
+                                    DesensitizationType = 1,
+                                    Enable = 0,
+                                    IsRefObject = 0,
+                                    StartIndex = 0,
+                                    EndIndex = 0
+                                });
+                            }
+                        }
+                        break;
+                    case "GetLanguageSearchAsync":
+                    case "GetLanguageDetailsAsync":
+                        var properties11 = GetProperties<LanguageDetailsDto>();
+                        foreach (var property in properties11)
+                        {
+                            if (!excludedProperties.Contains(property.Name))
+                            {
+                                ddd.Add(new DataDesensitizationRule
+                                {
+                                    Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                                    AppInterfaceId = r.Id,
+                                    Field = property.Name,
+                                    FieldName = null,
+                                    DesensitizationType = 1,
+                                    Enable = 0,
+                                    IsRefObject = 0,
+                                    StartIndex = 0,
+                                    EndIndex = 0
+                                });
+                            }
+                        }
+                        break;
+                    case "GetBankCardSearchAsync":
+                    case "GetBankCardDetailsAsync":
+                        var properties12 = GetProperties<BankCardDetailsDto>();
+                        foreach (var property in properties12)
+                        {
+                            if (!excludedProperties.Contains(property.Name))
+                            {
+                                ddd.Add(new DataDesensitizationRule
+                                {
+                                    Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                                    AppInterfaceId = r.Id,
+                                    Field = property.Name,
+                                    FieldName = null,
+                                    DesensitizationType = 1,
+                                    Enable = 0,
+                                    IsRefObject = 0,
+                                    StartIndex = 0,
+                                    EndIndex = 0
+                                });
+                            }
+                        }
+                        break;
+                    case "GetDeviceDetailCodeSearchAsync":
+                    case "GetDeviceDetailCodeDetailsAsync":
+                        var properties13 = GetProperties<DeviceDetailCodeDetailsDto>();
+                        foreach (var property in properties13)
+                        {
+                            if (!excludedProperties.Contains(property.Name))
+                            {
+                                ddd.Add(new DataDesensitizationRule
+                                {
+                                    Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                                    AppInterfaceId = r.Id,
+                                    Field = property.Name,
+                                    FieldName = null,
+                                    DesensitizationType = 1,
+                                    Enable = 0,
+                                    IsRefObject = 0,
+                                    StartIndex = 0,
+                                    EndIndex = 0
+                                });
+                            }
+                        }
+                        break;
+                    case "GetAccountingDepartmentSearchAsync":
+                    case "GetAccountingDepartmentDetailsAsync":
+                        var properties14 = GetProperties<AccountingDepartmentDetailsDto>();
+                        foreach (var property in properties14)
+                        {
+                            if (!excludedProperties.Contains(property.Name))
+                            {
+                                ddd.Add(new DataDesensitizationRule
+                                {
+                                    Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                                    AppInterfaceId = r.Id,
+                                    Field = property.Name,
+                                    FieldName = null,
+                                    DesensitizationType = 1,
+                                    Enable = 0,
+                                    IsRefObject = 0,
+                                    StartIndex = 0,
+                                    EndIndex = 0
+                                });
+                            }
+                        }
+                        break;
+                    case "GetRelationalContractsSearchAsync":
+                    case "GetRelationalContractsDetailsAsync":
+                        var properties15 = GetProperties<RelationalContractsDetailsDto>();
+                        foreach (var property in properties15)
+                        {
+                            if (!excludedProperties.Contains(property.Name))
+                            {
+                                ddd.Add(new DataDesensitizationRule
+                                {
+                                    Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                                    AppInterfaceId = r.Id,
+                                    Field = property.Name,
+                                    FieldName = null,
+                                    DesensitizationType = 1,
+                                    Enable = 0,
+                                    IsRefObject = 0,
+                                    StartIndex = 0,
+                                    EndIndex = 0
+                                });
+                            }
+                        }
+                        break;
+                    case "GetRegionalDetailsAsync":
+                    case "GetRegionalSearchAsync":
+                        var properties16 = GetProperties<RegionalDetailsDto>();
+                        foreach (var property in properties16)
+                        {
+                            if (!excludedProperties.Contains(property.Name))
+                            {
+                                ddd.Add(new DataDesensitizationRule
+                                {
+                                    Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                                    AppInterfaceId = r.Id,
+                                    Field = property.Name,
+                                    FieldName = null,
+                                    DesensitizationType = 1,
+                                    Enable = 0,
+                                    IsRefObject = 0,
+                                    StartIndex = 0,
+                                    EndIndex = 0
+                                });
+                            }
+                        }
+                        break;
+                    case "GetUnitMeasurementSearchAsync":
+                    case "GetUnitMeasurementDetailsAsync":
+                        var properties17 = GetProperties<UnitMeasurementDetailsDto>();
+                        foreach (var property in properties17)
+                        {
+                            if (!excludedProperties.Contains(property.Name))
+                            {
+                                ddd.Add(new DataDesensitizationRule
+                                {
+                                    Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                                    AppInterfaceId = r.Id,
+                                    Field = property.Name,
+                                    FieldName = null,
+                                    DesensitizationType = 1,
+                                    Enable = 0,
+                                    IsRefObject = 0,
+                                    StartIndex = 0,
+                                    EndIndex = 0
+                                });
+                            }
+                        }
+                        break;
+                    case "GetProjectClassificationSearchAsync":
+                    case "GetProjectClassificationDetailsAsync":
+                        var properties18 = GetProperties<ProjectClassificationDetailsDto>();
+                        foreach (var property in properties18)
+                        {
+                            if (!excludedProperties.Contains(property.Name))
+                            {
+                                ddd.Add(new DataDesensitizationRule
+                                {
+                                    Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                                    AppInterfaceId = r.Id,
+                                    Field = property.Name,
+                                    FieldName = null,
+                                    DesensitizationType = 1,
+                                    Enable = 0,
+                                    IsRefObject = 0,
+                                    StartIndex = 0,
+                                    EndIndex = 0
+                                });
+                            }
+                        }
+                        break;
+                    case "GetRegionalCenterSearchAsync":
+                    case "GetRegionalCenterDetailsAsync":
+                        var properties19 = GetProperties<RegionalCenterDetailsDto>();
+                        foreach (var property in properties19)
+                        {
+                            if (!excludedProperties.Contains(property.Name))
+                            {
+                                ddd.Add(new DataDesensitizationRule
+                                {
+                                    Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                                    AppInterfaceId = r.Id,
+                                    Field = property.Name,
+                                    FieldName = null,
+                                    DesensitizationType = 1,
+                                    Enable = 0,
+                                    IsRefObject = 0,
+                                    StartIndex = 0,
+                                    EndIndex = 0
+                                });
+                            }
+                        }
+                        break;
+                    case "GetNationalEconomySearchAsync":
+                    case "GetNationalEconomyDetailsAsync":
+                        var properties20 = GetProperties<NationalEconomyDetailsDto>();
+                        foreach (var property in properties20)
+                        {
+                            if (!excludedProperties.Contains(property.Name))
+                            {
+                                ddd.Add(new DataDesensitizationRule
+                                {
+                                    Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                                    AppInterfaceId = r.Id,
+                                    Field = property.Name,
+                                    FieldName = null,
+                                    DesensitizationType = 1,
+                                    Enable = 0,
+                                    IsRefObject = 0,
+                                    StartIndex = 0,
+                                    EndIndex = 0
+                                });
+                            }
+                        }
+                        break;
+                    case "GetAdministrativeAccountingMapperSearchAsync":
+                    case "GetAdministrativeAccountingMapperDetailsAsync":
+                        var properties21 = GetProperties<AdministrativeAccountingMapperDetailsDto>();
+                        foreach (var property in properties21)
+                        {
+                            if (!excludedProperties.Contains(property.Name))
+                            {
+                                ddd.Add(new DataDesensitizationRule
+                                {
+                                    Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                                    AppInterfaceId = r.Id,
+                                    Field = property.Name,
+                                    FieldName = null,
+                                    DesensitizationType = 1,
+                                    Enable = 0,
+                                    IsRefObject = 0,
+                                    StartIndex = 0,
+                                    EndIndex = 0
+                                });
+                            }
+                        }
+                        break;
+                    case "GetEscrowOrganizationSearchAsync":
+                    case "GetEscrowOrganizationDetailsAsync":
+                        var properties23 = GetProperties<EscrowOrganizationDetailsDto>();
+                        foreach (var property in properties23)
+                        {
+                            if (!excludedProperties.Contains(property.Name))
+                            {
+                                ddd.Add(new DataDesensitizationRule
+                                {
+                                    Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                                    AppInterfaceId = r.Id,
+                                    Field = property.Name,
+                                    FieldName = null,
+                                    DesensitizationType = 1,
+                                    Enable = 0,
+                                    IsRefObject = 0,
+                                    StartIndex = 0,
+                                    EndIndex = 0
+                                });
+                            }
+                        }
+                        break;
+                    case "GetBusinessNoCpportunitySearchAsync":
+                    case "GetBusinessCpportunitySearchAsync":
+                    case "GetBusinessNoCpportunityDetailsAsync":
+                        var properties24 = GetProperties<BusinessNoCpportunityDetailsDto>();
+                        foreach (var property in properties24)
+                        {
+                            if (!excludedProperties.Contains(property.Name))
+                            {
+                                ddd.Add(new DataDesensitizationRule
+                                {
+                                    Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                                    AppInterfaceId = r.Id,
+                                    Field = property.Name,
+                                    FieldName = null,
+                                    DesensitizationType = 1,
+                                    Enable = 0,
+                                    IsRefObject = 0,
+                                    StartIndex = 0,
+                                    EndIndex = 0
+                                });
+                            }
+                        }
+                        break;
+                    case "GetAdministrativeDivisionSearchAsync":
+                    case "GetAdministrativeDivisionDetailsAsync":
+                        var properties25 = GetProperties<AdministrativeDivisionDetailsDto>();
+                        foreach (var property in properties25)
+                        {
+                            if (!excludedProperties.Contains(property.Name))
+                            {
+                                ddd.Add(new DataDesensitizationRule
+                                {
+                                    Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                                    AppInterfaceId = r.Id,
+                                    Field = property.Name,
+                                    FieldName = null,
+                                    DesensitizationType = 1,
+                                    Enable = 0,
+                                    IsRefObject = 0,
+                                    StartIndex = 0,
+                                    EndIndex = 0
+                                });
+                            }
+                        }
+                        break;
+                    case "GetAccountingOrganizationSearchAsync":
+                    case "GetAccountingOrganizationDetailsAsync":
+                        var properties26 = GetProperties<AccountingOrganizationDetailsDto>();
+                        foreach (var property in properties26)
+                        {
+                            if (!excludedProperties.Contains(property.Name))
+                            {
+                                ddd.Add(new DataDesensitizationRule
+                                {
+                                    Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                                    AppInterfaceId = r.Id,
+                                    Field = property.Name,
+                                    FieldName = null,
+                                    DesensitizationType = 1,
+                                    Enable = 0,
+                                    IsRefObject = 0,
+                                    StartIndex = 0,
+                                    EndIndex = 0
+                                });
+                            }
+                        }
+                        break;
+                    case "GetCurrencySearchAsync":
+                    case "GetCurrencyDetailsAsync":
+                        var properties27 = GetProperties<CurrencyDetailsDto>();
+                        foreach (var property in properties27)
+                        {
+                            if (!excludedProperties.Contains(property.Name))
+                            {
+                                ddd.Add(new DataDesensitizationRule
+                                {
+                                    Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                                    AppInterfaceId = r.Id,
+                                    Field = property.Name,
+                                    FieldName = null,
+                                    DesensitizationType = 1,
+                                    Enable = 0,
+                                    IsRefObject = 0,
+                                    StartIndex = 0,
+                                    EndIndex = 0
+                                });
+                            }
+                        }
+                        break;
+                    case "GetValueDomainReceiveAsync":
+                        var properties28 = GetProperties<ValueDomainReceiveResponseDto>();
+                        foreach (var property in properties28)
+                        {
+                            if (!excludedProperties.Contains(property.Name))
+                            {
+                                ddd.Add(new DataDesensitizationRule
+                                {
+                                    Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                                    AppInterfaceId = r.Id,
+                                    Field = property.Name,
+                                    FieldName = null,
+                                    DesensitizationType = 1,
+                                    Enable = 0,
+                                    IsRefObject = 0,
+                                    StartIndex = 0,
+                                    EndIndex = 0
+                                });
+                            }
+                        }
+                        break;
+                }
+            }
+
+            await _dbContext.AsTenant().InsertableWithAttr(ddd).ExecuteCommandAsync();
+            responseAjaxResult.SuccessResult(true);
+            return responseAjaxResult;
+
+        }
+        public async Task<ResponseAjaxResult<bool>> ModifyNameAsync(List<DataDesensitizationRule> modify)
+        {
+            ResponseAjaxResult<bool> responseAjaxResult = new();
+
+            await _dbContext.AsTenant().UpdateableWithAttr(modify).WhereColumns(x => x.Id).ExecuteCommandAsync();
+            responseAjaxResult.SuccessResult(true);
+            return responseAjaxResult;
+        }
+
+        public async Task<ResponseAjaxResult<List<SearchDataDesensitizationRule>>> GetSearchDataDesensitizationRuleAsync(string interfaceId)
+        {
+            ResponseAjaxResult<List<SearchDataDesensitizationRule>> responseAjaxResult = new();
+
+            var dList = await _dbContext.AsTenant().QueryableWithAttr<DataDesensitizationRule>()
+              .Where(t => t.AppInterfaceId.ToString() == interfaceId)
+              .Select(t => new SearchDataDesensitizationRule
+              {
+                  AppInterfaceId = t.AppInterfaceId.ToString(),
+                  DesensitizationType = t.DesensitizationType,
+                  Enable = t.Enable,
+                  EndIndex = t.EndIndex,
+                  Field = t.Field,
+                  FieldName = t.FieldName,
+                  Id = t.Id.ToString(),
+                  IsRefObject = t.IsRefObject,
+                  StartIndex = t.StartIndex
+              })
+              .ToListAsync();
+
+            responseAjaxResult.SuccessResult(dList);
+            return responseAjaxResult;
+        }
+        #endregion
     }
 }
+

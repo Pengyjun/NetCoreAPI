@@ -611,9 +611,24 @@ namespace GDCMasterDataReceiveApi.Controller
         [HttpGet("GetUserFilterColumns")]
         public async Task<ResponseAjaxResult<List<FilterConditionDto>>> GetUserFilterColumnsAsync([FromQuery] int table)
         {
-            
+
             return await _searchService.GetUserFilterColumnsAsync(table);
         }
+        [HttpPost("SetFiled")]
+        public async Task<ResponseAjaxResult<bool>> SetFiledAsync()
+        {
+            return await _searchService.SetFiledAsync();
+        }
+        [HttpPost("ModifyName")]
+        public async Task<ResponseAjaxResult<bool>> ModifyNameAsync([FromBody] List<DataDesensitizationRule> modify)
+        {
+            return await _searchService.ModifyNameAsync(modify);
 
+        }
+        [HttpGet("GetSearchDataDesensitizationRule")]
+        public async Task<ResponseAjaxResult<List<SearchDataDesensitizationRule>>> GetSearchDataDesensitizationRuleAsync([FromQuery] string interfaceId)
+        {
+            return await _searchService.GetSearchDataDesensitizationRuleAsync(interfaceId);
+        }
     }
 }

@@ -103,7 +103,7 @@ namespace GDCMasterDataReceiveApi.Filters
             CacheHelper cacheHelper = new CacheHelper();
             var cacheResult = cacheHelper.Get<DataInterfaceResponseDto>(context.HttpContext.TraceIdentifier);
             var IsEncrypt = 1;
-         
+
             #region  接口返回值字段规则设置
             WebHelper webHelper = new WebHelper();
             var systemInterfaceFiledRuleApi = AppsettingsHelper.GetValue("API:SystemInterfaceFiledRuleApi");
@@ -117,7 +117,7 @@ namespace GDCMasterDataReceiveApi.Filters
                 var returnRes = ((Microsoft.AspNetCore.Mvc.ObjectResult)context.Result).Value;
                 webHelper.Headers.Add("appKey", cacheResult.AppKey);
                 webHelper.Headers.Add("appinterfaceCode", cacheResult.AppinterfaceCode);
-                var parseToken=JObject.Parse(returnRes.ToJson(true));
+                var parseToken = JObject.Parse(returnRes.ToJson(true));
                 if (parseToken["count"] != null)
                 {
                     returnCount = parseToken["count"].ToString().ObjToInt();
@@ -152,7 +152,7 @@ namespace GDCMasterDataReceiveApi.Filters
                 }
                 context.Result =new JsonResult(response) ;
             }
-            
+
             #endregion
 
             #region 过滤接口加密设置

@@ -101,8 +101,8 @@ namespace GDCMasterDataReceiveApi.Filters
                         //验证访问IP
                         #region 限制IP
                         var splitStr = ";";
-                        var accessIp=Utils.GetIP();
-                       // await Console.Out.WriteLineAsync($"接口访问IP地址是:{accessIp}");
+                        var accessIp = Utils.GetIP();
+                        // await Console.Out.WriteLineAsync($"接口访问IP地址是:{accessIp}");
                         if (!string.IsNullOrWhiteSpace(intefaceInfo.AccessRestrictedIP) && intefaceInfo.AccessRestrictedIP.IndexOf("splitStr") > 0)
                         {
                             var ipList = intefaceInfo.AccessRestrictedIP.Split(splitStr, StringSplitOptions.RemoveEmptyEntries).ToList();
