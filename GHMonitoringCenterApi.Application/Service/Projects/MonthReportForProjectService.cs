@@ -496,6 +496,9 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     var model = handleList.Where(t => t.ProjectId == item.Key.ProjectId && t.ShipId == item.Key.ShipId && t.UnitPrice == item.Key.UnitPrice && t.ProjectWBSId == item.Key.ProjectWBSId).FirstOrDefault();
                     if (model != null)
                     {
+                        var isAllowDelete = nowMonthReport.FirstOrDefault(t => t.ProjectId == model.ProjectId && t.ShipId == model.ShipId && t.UnitPrice == model.UnitPrice && t.ProjectWBSId == model.ProjectWBSId);
+                        if (isAllowDelete != null) isAllowDelete.IsAllowDelete = true;
+
                         model.CompleteProductionAmount = model.CompleteProductionAmount / pRate;
 
                         //合并计算 每条资源的年产值、累计值、外包支出 
