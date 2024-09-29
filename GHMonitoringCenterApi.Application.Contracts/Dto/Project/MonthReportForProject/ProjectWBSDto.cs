@@ -114,7 +114,7 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project.MonthReportFor
         /// <summary>
         /// 资源：船舶Id(PomId)
         /// </summary>
-        public Guid ShipId { get; set; }
+        public Guid? ShipId { get; set; }
         /// <summary>
         /// 船舶名称
         /// </summary>
