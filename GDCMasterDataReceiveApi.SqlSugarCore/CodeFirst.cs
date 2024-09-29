@@ -90,7 +90,11 @@ namespace GDCMasterDataReceiveApi.SqlSugarCore
                 };
             });
             Type[] types = typeof(BaseEntity<long>).Assembly.GetTypes()
-            .Where(it => it.FullName.Contains("GDCMasterDataReceiveApi.Domain.Models.InstitutionBusinessType") 
+            .Where(it =>it.FullName.Contains("CorresUnit")
+            && !it.FullName.Contains("CountryRegion")
+            && !it.FullName.Contains("EscrowOrganization")
+            && !it.FullName.Contains("ZOLDNAME_LISTItem")
+            && !it.FullName.Contains("ProjectUsedNameItem")
             )
             .ToArray();
             db.CodeFirst.InitTables(types);

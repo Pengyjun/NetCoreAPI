@@ -38,12 +38,12 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// <summary>
         /// 名称（英文）:往来单位英文名称，境外单位必填，
         /// </summary>
-        [SugarColumn(Length = 512, ColumnName = "NameEnglish")]
+        [SugarColumn(Length = 256, ColumnName = "NameEnglish")]
         public string? ZBPNAME_EN { get; set; }
         /// <summary>
         /// 名称（当地语言）:往来单位当地官方语言名称，当地语言为英文时，该属性与名称（英文）填写内容相同，境外单位必填
         /// </summary>
-        [SugarColumn(Length = 512, ColumnName = "NameInLLanguage")]
+        [SugarColumn(Length = 256, ColumnName = "NameInLLanguage")]
         public string? ZBPNAME_LOC { get; set; }
         /// <summary>
         /// 往来单位类别:依据组织机构的功能和性质进行的分类

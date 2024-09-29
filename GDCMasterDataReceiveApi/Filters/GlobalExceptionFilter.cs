@@ -1,11 +1,16 @@
-﻿using GDCMasterDataReceiveApi.Application.Contracts.Dto.DataInterface;
+﻿using AutoMapper;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto._4A.User;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.DataInterface;
 using GDCMasterDataReceiveApi.Domain.Models;
 using GDCMasterDataReceiveApi.Domain.Shared;
 using GDCMasterDataReceiveApi.Domain.Shared.Const;
 using GDCMasterDataReceiveApi.Domain.Shared.Enums;
 using GDCMasterDataReceiveApi.Domain.Shared.Utils;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.Data.SqlClient.Server;
+using NetTaste;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Serialization;
@@ -22,9 +27,11 @@ namespace GDCMasterDataReceiveApi.Filters
         /// 注入日志
         /// </summary>
         private readonly ILogger<GlobalExceptionFilter> logger;
-        public GlobalExceptionFilter(ILogger<GlobalExceptionFilter> logger)
+        private readonly IMapper mapper;
+        public GlobalExceptionFilter(ILogger<GlobalExceptionFilter> logger, IMapper mapper)
         {
             this.logger = logger;
+            this.mapper = mapper;
         }
         #endregion
 
@@ -102,6 +109,7 @@ namespace GDCMasterDataReceiveApi.Filters
             var systemInterfaceFiledRuleApi = AppsettingsHelper.GetValue("API:SystemInterfaceFiledRuleApi");
             Dictionary<string, object> parames = new Dictionary<string, object>();
             string setupResult = string.Empty;
+            ResponseAjaxResult<List<object>> response = new ResponseAjaxResult<List<object>>();
             int returnCount = 0;
             if (cacheResult != null)
             {
@@ -115,8 +123,34 @@ namespace GDCMasterDataReceiveApi.Filters
                     returnCount = parseToken["count"].ToString().ObjToInt();
                 }
                 parames.Add("jsonObj", returnRes.ToJson(true));
-                var   responseResult = await webHelper.DoPostAsync(systemInterfaceFiledRuleApi, parames);
+                var   responseResult = await webHelper.DoPostAsync<string>(systemInterfaceFiledRuleApi, parames);
                 setupResult = responseResult.Result;
+                if (!string.IsNullOrWhiteSpace(setupResult) && cacheResult.IsEncrypt != 1)
+                {
+                    List<dynamic> list = new List<dynamic>();
+                    var parseJson = JObject.Parse(setupResult);
+                    var parseCount = 0;
+                    response.Code = HttpStatusCode.Success;
+                    if (parseJson["count"] != null)
+                    {
+                        response.Count =int.Parse(parseJson["count"].ToString());
+                    }
+                    if (parseJson["message"] != null)
+                    {
+                        response.Message = parseJson["message"].ToString();
+                    }
+                    if (parseJson["data"] != null)
+                    {
+                        parseCount = parseJson["data"].Count();
+                    }
+                    
+                    for (int i = 0; i < parseCount; i++)
+                    {
+                        list.Add(parseJson["data"][i]);
+                    }
+                    response.Data=list;
+                }
+                context.Result =new JsonResult(response) ;
             }
             
             #endregion
@@ -126,7 +160,7 @@ namespace GDCMasterDataReceiveApi.Filters
             {
                 //接口返回值
                 //var returnRes = ((Microsoft.AspNetCore.Mvc.ObjectResult)context.Result).Value;
-                if (!string.IsNullOrWhiteSpace(setupResult))
+                if (setupResult!=null)
                 {
                     var interfaceEncryptApi = AppsettingsHelper.GetValue("API:InterfaceEncryptApi");
                     Dictionary<string, object> parame = new Dictionary<string, object>();

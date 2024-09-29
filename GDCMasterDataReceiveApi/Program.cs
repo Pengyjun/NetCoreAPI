@@ -83,7 +83,7 @@ builder.Host.UseSerilog((host, logger) =>
     var outputTemplate = "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj}{NewLine}{Exception}" + new string('-', 100) + "{NewLine}";
     //¶ÁÈ¡ÅäÖÃÎÄ¼ş
     logger.ReadFrom.Configuration(serilog)
-     .WriteTo.Console(LogEventLevel.Verbose, outputTemplate: outputTemplate);
+     .WriteTo.Console(LogEventLevel.Debug, outputTemplate: outputTemplate);
 });
 #endregion
 
