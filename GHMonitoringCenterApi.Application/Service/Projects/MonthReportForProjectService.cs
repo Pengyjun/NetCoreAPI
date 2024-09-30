@@ -153,7 +153,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 // 判断当前节点是否是最后节点
                 if (!children.Any()) // 如果没有子节点
                 {
-                    if (!mpWbsIds.Contains(node.ProjectWBSId))
+                    if (!mpWbsIds.Contains(node.ProjectWBSId) && node.IsDelete == 0)
                     {
                         continue; // 跳过这个节点，不添加到树中
                     }
@@ -651,6 +651,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                                      ValueType = ValueEnumType.None,
                                      ProjectId = p.ProjectId,
                                      ProjectWBSId = p.Id,
+                                     IsDelete=p.IsDelete,
                                      ProjectWBSName = p.Name,
                                      UnitPrice = p.UnitPrice,//wbs初始的单价
                                      ContractAmount = p.EngQuantity * p.UnitPrice//WBS的初始合同产值=工程量*单价
@@ -686,6 +687,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                                          ProjectId = p.ProjectId,
                                          ProjectWBSId = p.Id,
                                          ProjectWBSName = p.Name,
+                                         IsDelete = p.IsDelete,
                                          UnitPrice = p.UnitPrice,//wbs初始的单价
                                          ContractAmount = p.EngQuantity * p.UnitPrice//WBS的初始合同产值=工程量*单价
                                      })
@@ -721,6 +723,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                                          ProjectId = p.ProjectId,
                                          ProjectWBSId = p.Id,
                                          ProjectWBSName = p.Name,
+                                         IsDelete = p.IsDelete,
                                          UnitPrice = p.UnitPrice,//wbs初始的单价
                                          ContractAmount = p.EngQuantity * p.UnitPrice//WBS的初始合同产值=工程量*单价
                                      })
@@ -747,6 +750,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                    ProjectId = p.ProjectId,
                    ProjectWBSId = p.Id,
                    ProjectWBSName = p.Name,
+                   IsDelete = p.IsDelete,
                    UnitPrice = p.UnitPrice,//wbs初始的单价
                    ContractAmount = p.EngQuantity * p.UnitPrice//WBS的初始合同产值=工程量*单价
                })
@@ -982,6 +986,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                                 item.ProjectId = model.ProjectId.ToString();
 
                                 item.KeyId = wbss.FirstOrDefault(x => x.Id == item.ProjectWBSId)?.KeyId;
+                                item.IsDelete = wbss.FirstOrDefault(x => x.Id == item.ProjectWBSId).IsDelete;
 
                                 item.YearCompleteProductionAmount = item.CompleteProductionAmount;
                                 item.YearCompletedQuantity = item.CompletedQuantity;
