@@ -280,7 +280,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     item.EngQuantity = pWBS.FirstOrDefault(x => x.ProjectWBSId == item.ProjectWBSId)?.EngQuantity;
                     item.Pid = pWBS.FirstOrDefault(x => x.ProjectWBSId == item.ProjectWBSId)?.Pid;
                     item.KeyId = pWBS.FirstOrDefault(x => x.ProjectWBSId == item.ProjectWBSId)?.KeyId;
-                    item.IsDelete = pWBS.FirstOrDefault(x => x.ProjectWBSId == item.ProjectWBSId).IsDelete;
+                    item.IsDelete = item.ProjectWBSId == Guid.Empty ? 1 : pWBS.FirstOrDefault(x => x.ProjectWBSId == item.ProjectWBSId).IsDelete;
                 }
 
                 /***
@@ -1232,7 +1232,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 }
 
                 var currenTotalYearCollection = await _dbContext.Queryable<MonthReport>()
-                    .Where(x => x.IsDelete == 1 && x.ProjectId == projectId && x.DateYear <= currentYear&&x.DateMonth<= dateMonth).ToListAsync();
+                    .Where(x => x.IsDelete == 1 && x.ProjectId == projectId && x.DateYear <= currentYear && x.DateMonth <= dateMonth).ToListAsync();
 
                 //本年甲方付款金额
                 currenYearCollection = currenTotalYearCollection.Where(x => x.DateYear == currentYear).Sum(x => x.PartyAPayAmount);
