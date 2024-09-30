@@ -807,10 +807,10 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
 
             //截止到当前月份的所有月报信息（目的：统计年累、开累）
             var mpData = await _dbContext.Queryable<MonthReport>()
-                .Where(x => x.IsDelete == 1 && x.ProjectId == model.ProjectId)
+                .Where(x => x.IsDelete == 1 && x.ProjectId == result.ProjectId)
                 .ToListAsync();
             var monthReportData = mpData
-                .Where(x => x.IsDelete == 1 && x.DateMonth != 202306 && x.DateMonth <= dateMonth && x.ProjectId == model.ProjectId)
+                .Where(x => x.IsDelete == 1 && x.DateMonth != 202306 && x.DateMonth <= dateMonth && x.ProjectId == result.ProjectId)
                 .ToList();
 
             //获取当前月报基本信息
@@ -983,7 +983,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                             var tIds = resList.Where(x => x.IsAllowDelete).Select(x => x.DetailId).ToList();
                             foreach (var item in resList)
                             {
-                                item.ProjectId = model.ProjectId.ToString();
+                                item.ProjectId = result.ProjectId.ToString();
 
                                 item.KeyId = wbss.FirstOrDefault(x => x.Id == item.ProjectWBSId)?.KeyId;
                                 item.IsDelete = wbss.FirstOrDefault(x => x.Id == item.ProjectWBSId).IsDelete;
@@ -1011,7 +1011,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             #endregion
 
             //取树
-            treeDetails = await WBSConvertTree(model.ProjectId, dateMonth, bData, result.IsFromStaging, new List<ProjectWBSDto>(), dayRep);
+            treeDetails = await WBSConvertTree(result.ProjectId, dateMonth, bData, result.IsFromStaging, new List<ProjectWBSDto>(), dayRep);
 
             //树组合
             result.TreeDetails = treeDetails;
