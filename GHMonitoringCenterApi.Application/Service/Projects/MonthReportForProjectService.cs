@@ -393,7 +393,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
 
                         dayRepList.Add(new ProjectWBSDto
                         {
-                            CompleteProductionAmount = gOwnList.Sum(x => x.ActualDailyProductionAmount) / pRate,
+                            CompleteProductionAmount = gOwnList.Sum(x => x.ActualDailyProductionAmount),
                             OutPutType = ConstructionOutPutType.Self,
                             CompletedQuantity = gOwnList.Sum(x => x.ActualDailyProduction),
                             UnitPrice = ownRep.Key.UnitPrice,
@@ -406,10 +406,10 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                             IsAllowDelete = true,
                             DateYear = Convert.ToInt32(dateMonth.ToString().Substring(0, 4)),
                             ValueType = ValueEnumType.NowMonth,
-                            YearCompleteProductionAmount = gYearOwnList.Sum(x => x.ActualDailyProductionAmount) / pRate,
+                            YearCompleteProductionAmount = gYearOwnList.Sum(x => x.ActualDailyProductionAmount),
                             YearCompletedQuantity = gYearOwnList.Sum(x => x.ActualDailyProduction),
                             YearOutsourcingExpensesAmount = gYearOwnList.Sum(x => x.OutsourcingExpensesAmount),
-                            TotalCompleteProductionAmount = gTotalOwnList.Sum(x => x.ActualDailyProductionAmount) / pRate,
+                            TotalCompleteProductionAmount = gTotalOwnList.Sum(x => x.ActualDailyProductionAmount),
                             TotalCompletedQuantity = gTotalOwnList.Sum(x => x.ActualDailyProduction),
                             TotalOutsourcingExpensesAmount = gTotalOwnList.Sum(x => x.OutsourcingExpensesAmount),
                         });
@@ -469,16 +469,16 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                         var isAllowDelete = nowMonthReport.FirstOrDefault(t => t.ProjectId == model.ProjectId && t.ShipId == model.ShipId && t.UnitPrice == model.UnitPrice && t.ProjectWBSId == model.ProjectWBSId);
                         if (isAllowDelete != null) isAllowDelete.IsAllowDelete = true;
 
-                        model.CompleteProductionAmount = model.CompleteProductionAmount / pRate;
+                        model.CompleteProductionAmount = model.CompleteProductionAmount;
 
                         //合并计算 每条资源的年产值、累计值、外包支出 
-                        model.YearCompleteProductionAmount = handleList.Where(t => t.ProjectId == item.Key.ProjectId && t.ShipId == item.Key.ShipId && t.UnitPrice == item.Key.UnitPrice && t.ProjectWBSId == item.Key.ProjectWBSId).Sum(x => x.CompleteProductionAmount) / pRate;
+                        model.YearCompleteProductionAmount = handleList.Where(t => t.ProjectId == item.Key.ProjectId && t.ShipId == item.Key.ShipId && t.UnitPrice == item.Key.UnitPrice && t.ProjectWBSId == item.Key.ProjectWBSId).Sum(x => x.CompleteProductionAmount);
 
                         model.YearCompletedQuantity = handleList.Where(t => t.ProjectId == item.Key.ProjectId && t.ShipId == item.Key.ShipId && t.UnitPrice == item.Key.UnitPrice && t.ProjectWBSId == item.Key.ProjectWBSId).Sum(x => x.CompletedQuantity);
 
                         model.YearOutsourcingExpensesAmount = handleList.Where(t => t.ProjectId == item.Key.ProjectId && t.ShipId == item.Key.ShipId && t.UnitPrice == item.Key.UnitPrice && t.ProjectWBSId == item.Key.ProjectWBSId).Sum(x => x.OutsourcingExpensesAmount);
 
-                        model.TotalCompleteProductionAmount = handleList.Where(t => t.ProjectId == item.Key.ProjectId && t.ShipId == item.Key.ShipId && t.UnitPrice == item.Key.UnitPrice && t.ProjectWBSId == item.Key.ProjectWBSId).Sum(x => x.CompleteProductionAmount) / pRate;
+                        model.TotalCompleteProductionAmount = handleList.Where(t => t.ProjectId == item.Key.ProjectId && t.ShipId == item.Key.ShipId && t.UnitPrice == item.Key.UnitPrice && t.ProjectWBSId == item.Key.ProjectWBSId).Sum(x => x.CompleteProductionAmount);
 
                         model.TotalCompletedQuantity = handleList.Where(t => t.ProjectId == item.Key.ProjectId && t.ShipId == item.Key.ShipId && t.UnitPrice == item.Key.UnitPrice && t.ProjectWBSId == item.Key.ProjectWBSId).Sum(x => x.CompletedQuantity);
 
@@ -533,16 +533,16 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     var model = nowYearMonthReport.Where(t => t.ProjectId == item.Key.ProjectId && t.ShipId == item.Key.ShipId && t.UnitPrice == item.Key.UnitPrice && t.ProjectWBSId == item.Key.ProjectWBSId).FirstOrDefault();
                     if (model != null)
                     {
-                        model.CompleteProductionAmount = model.CompleteProductionAmount / pRate;
+                        model.CompleteProductionAmount = model.CompleteProductionAmount;
 
                         //合并计算 每条资源的年产值、累计值、外包支出 
-                        model.YearCompleteProductionAmount = nowYearMonthReport.Where(t => t.ProjectId == item.Key.ProjectId && t.ShipId == item.Key.ShipId && t.UnitPrice == item.Key.UnitPrice && t.ProjectWBSId == item.Key.ProjectWBSId).Sum(x => x.CompleteProductionAmount) / pRate;
+                        model.YearCompleteProductionAmount = nowYearMonthReport.Where(t => t.ProjectId == item.Key.ProjectId && t.ShipId == item.Key.ShipId && t.UnitPrice == item.Key.UnitPrice && t.ProjectWBSId == item.Key.ProjectWBSId).Sum(x => x.CompleteProductionAmount);
 
                         model.YearCompletedQuantity = nowYearMonthReport.Where(t => t.ProjectId == item.Key.ProjectId && t.ShipId == item.Key.ShipId && t.UnitPrice == item.Key.UnitPrice && t.ProjectWBSId == item.Key.ProjectWBSId).Sum(x => x.CompletedQuantity);
 
                         model.YearOutsourcingExpensesAmount = nowYearMonthReport.Where(t => t.ProjectId == item.Key.ProjectId && t.ShipId == item.Key.ShipId && t.UnitPrice == item.Key.UnitPrice && t.ProjectWBSId == item.Key.ProjectWBSId).Sum(x => x.OutsourcingExpensesAmount);
 
-                        model.TotalCompleteProductionAmount = handleList.Where(t => t.ProjectId == item.Key.ProjectId && t.ShipId == item.Key.ShipId && t.UnitPrice == item.Key.UnitPrice && t.ProjectWBSId == item.Key.ProjectWBSId).Sum(x => x.CompleteProductionAmount) / pRate;
+                        model.TotalCompleteProductionAmount = handleList.Where(t => t.ProjectId == item.Key.ProjectId && t.ShipId == item.Key.ShipId && t.UnitPrice == item.Key.UnitPrice && t.ProjectWBSId == item.Key.ProjectWBSId).Sum(x => x.CompleteProductionAmount);
 
                         model.TotalCompletedQuantity = handleList.Where(t => t.ProjectId == item.Key.ProjectId && t.ShipId == item.Key.ShipId && t.UnitPrice == item.Key.UnitPrice && t.ProjectWBSId == item.Key.ProjectWBSId).Sum(x => x.CompletedQuantity);
 
@@ -563,16 +563,16 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     var model = calculatePWBS.Where(t => t.ProjectId == item.Key.ProjectId && t.ShipId == item.Key.ShipId && t.UnitPrice == item.Key.UnitPrice && t.ProjectWBSId == item.Key.ProjectWBSId).FirstOrDefault();
                     if (model != null)
                     {
-                        model.CompleteProductionAmount = model.CompleteProductionAmount / pRate;
+                        model.CompleteProductionAmount = model.CompleteProductionAmount;
 
                         //合并计算 每条资源的年产值、累计值、外包支出 
-                        model.YearCompleteProductionAmount = calculatePWBS.Where(t => t.ProjectId == item.Key.ProjectId && t.ShipId == item.Key.ShipId && t.UnitPrice == item.Key.UnitPrice && t.ProjectWBSId == item.Key.ProjectWBSId).Sum(x => x.CompleteProductionAmount) / pRate;
+                        model.YearCompleteProductionAmount = calculatePWBS.Where(t => t.ProjectId == item.Key.ProjectId && t.ShipId == item.Key.ShipId && t.UnitPrice == item.Key.UnitPrice && t.ProjectWBSId == item.Key.ProjectWBSId).Sum(x => x.CompleteProductionAmount);
 
                         model.YearCompletedQuantity = calculatePWBS.Where(t => t.ProjectId == item.Key.ProjectId && t.ShipId == item.Key.ShipId && t.UnitPrice == item.Key.UnitPrice && t.ProjectWBSId == item.Key.ProjectWBSId).Sum(x => x.CompletedQuantity);
 
                         model.YearOutsourcingExpensesAmount = calculatePWBS.Where(t => t.ProjectId == item.Key.ProjectId && t.ShipId == item.Key.ShipId && t.UnitPrice == item.Key.UnitPrice && t.ProjectWBSId == item.Key.ProjectWBSId).Sum(x => x.OutsourcingExpensesAmount);
 
-                        model.TotalCompleteProductionAmount = handleList.Where(t => t.ProjectId == item.Key.ProjectId && t.ShipId == item.Key.ShipId && t.UnitPrice == item.Key.UnitPrice && t.ProjectWBSId == item.Key.ProjectWBSId).Sum(x => x.CompleteProductionAmount) / pRate;
+                        model.TotalCompleteProductionAmount = handleList.Where(t => t.ProjectId == item.Key.ProjectId && t.ShipId == item.Key.ShipId && t.UnitPrice == item.Key.UnitPrice && t.ProjectWBSId == item.Key.ProjectWBSId).Sum(x => x.CompleteProductionAmount);
 
                         model.TotalCompletedQuantity = handleList.Where(t => t.ProjectId == item.Key.ProjectId && t.ShipId == item.Key.ShipId && t.UnitPrice == item.Key.UnitPrice && t.ProjectWBSId == item.Key.ProjectWBSId).Sum(x => x.CompletedQuantity);
 
@@ -651,7 +651,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                                      ValueType = ValueEnumType.None,
                                      ProjectId = p.ProjectId,
                                      ProjectWBSId = p.Id,
-                                     IsDelete=p.IsDelete,
+                                     IsDelete = p.IsDelete,
                                      ProjectWBSName = p.Name,
                                      UnitPrice = p.UnitPrice,//wbs初始的单价
                                      ContractAmount = p.EngQuantity * p.UnitPrice//WBS的初始合同产值=工程量*单价
