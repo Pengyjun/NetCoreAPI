@@ -230,27 +230,28 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             //获取项目当年的汇率
             int yearParam = Convert.ToInt32(dateMonth.ToString().Substring(0, 4));
             var project = await _dbContext.Queryable<Project>().Where(t => t.Id == pId && t.IsDelete == 1).FirstAsync();
-            var pRate = 1M;
-            if (project != null)
-            {
-                var val = await _dbContext.Queryable<CurrencyConverter>().Where(t => t.IsDelete == 1 && t.Year == yearParam && t.CurrencyId == project.CurrencyId.ToString()).FirstAsync();
-                if (val != null)
-                {
-                    pRate = val.ExchangeRate.Value;
-                }
-                else
-                {
-                    throw new Exception("未查到汇率");
-                }
-            }
+            //var pRate = 1M;
+            //if (project != null)
+            //{
+            //    var val = await _dbContext.Queryable<CurrencyConverter>().Where(t => t.IsDelete == 1 && t.Year == yearParam && t.CurrencyId == project.CurrencyId.ToString()).FirstAsync();
+            //    if (val != null)
+            //    {
+            //        pRate = val.ExchangeRate.Value;
+            //    }
+            //    else
+            //    {
+            //        throw new Exception("未查到汇率");
+            //    }
+            //}
 
             //获取需要计算的月报填报数据 
             if (dateMonth != 0 && dateMonth.ToString().Length == 6)
             {
-                var mPIds = await _dbContext.Queryable<MonthReport>()
+                var mPList = await _dbContext.Queryable<MonthReport>()
                     .Where(x => x.IsDelete == 1 && x.DateMonth != 202306)//&& x.DateMonth != 202306
-                    .Select(x => x.Id)
                     .ToListAsync();
+
+                var mPIds = mPList.Select(x => x.Id).ToList();
 
                 //获取当月前需要计算的的所有填报数据(累计的所有数据/开累)
                 calculatePWBS = await _dbContext.Queryable<MonthReportDetail>()
@@ -271,7 +272,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                        ValueType = ValueEnumType.AccumulatedCommencement,
                        Remark = p.Remark,
                        DetailId = p.Id,
-                       CompleteProductionAmount = p.CompleteProductionAmount// p.UnitPrice * p.CompletedQuantity
+                       CompleteProductionAmount = p.UnitPrice * p.CompletedQuantity //p.CompleteProductionAmount  外币|人民币
                    })
                    .ToListAsync();
 
@@ -430,7 +431,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
 
                         dayRepList.Add(new ProjectWBSDto
                         {
-                            CompleteProductionAmount = othList.Sum(x => x.ActualDailyProductionAmount) / pRate,
+                            CompleteProductionAmount = othList.Sum(x => x.ActualDailyProductionAmount),
                             OutPutType = ConstructionOutPutType.SubPackage,
                             CompletedQuantity = othList.Sum(x => x.ActualDailyProduction),
                             UnitPrice = othRep.Key.UnitPrice,
@@ -443,10 +444,10 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                             IsAllowDelete = true,
                             DateYear = Convert.ToInt32(dateMonth.ToString().Substring(0, 4)),
                             ValueType = ValueEnumType.NowMonth,
-                            YearCompleteProductionAmount = gYearSubList.Sum(x => x.ActualDailyProductionAmount) / pRate,
+                            YearCompleteProductionAmount = gYearSubList.Sum(x => x.ActualDailyProductionAmount),
                             YearCompletedQuantity = gYearSubList.Sum(x => x.ActualDailyProduction),
                             YearOutsourcingExpensesAmount = gYearSubList.Sum(x => x.OutsourcingExpensesAmount),
-                            TotalCompleteProductionAmount = gTotalSubList.Sum(x => x.ActualDailyProductionAmount) / pRate,
+                            TotalCompleteProductionAmount = gTotalSubList.Sum(x => x.ActualDailyProductionAmount),
                             TotalCompletedQuantity = gTotalSubList.Sum(x => x.ActualDailyProduction),
                             TotalOutsourcingExpensesAmount = gTotalSubList.Sum(x => x.OutsourcingExpensesAmount),
                         });
@@ -875,7 +876,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             {
                 result.HOutValue = his.OutsourcingExpensesAmount;
                 result.HQuantity = his.CompletedQuantity;
-                result.HValue = currencyConverterList.FirstOrDefault(x => x.Year == his.DateYear) != null ? his.CompleteProductionAmount / currencyConverterList.FirstOrDefault(x => x.Year == his.DateYear).ExchangeRate.Value : 0M;
+                result.HValue = his.CurrencyCompleteProductionAmount;
             }
             #endregion
 
