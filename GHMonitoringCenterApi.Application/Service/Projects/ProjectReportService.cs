@@ -2219,6 +2219,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     #region 新的
                     item.AccumulativeQuantities = hisMonthRep == null ? val.AccumulativeQuantities : hisMonthRep.CompletedQuantity + val.AccumulativeQuantities;
                     item.CumulativeAccomplishCost = hisMonthRep == null ? val.CumulativeAccomplishCost : hisMonthRep.CostAmount + val.CumulativeAccomplishCost;
+                    item.CumulativeOutsourcingExpensesAmount = hisMonthRep == null ? val.CumulativeOutsourcingExpensesAmount : hisMonthRep.OutsourcingExpensesAmount + val.CumulativeOutsourcingExpensesAmount;
 
                     item.CumulativeCompleted = val.CumulativeCompleted + (hisMonthRep == null ? 0 : hisMonthRep.CompleteProductionAmount);
 
@@ -2324,6 +2325,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 item.YearRecognizedValue = Math.Round(item.YearRecognizedValue, 2);
                 item.YearProjectedCost = Math.Round(item.YearProjectedCost, 2);
                 item.YearOutsourcingExpensesAmount = Math.Round(item.YearOutsourcingExpensesAmount, 2);
+                item.CumulativeOutsourcingExpensesAmount = Math.Round(item.CumulativeOutsourcingExpensesAmount, 2);
                 item.AccumulativeQuantities = Math.Round(item.AccumulativeQuantities, 2);
                 item.CumulativeAccomplishCost = Math.Round(item.CumulativeAccomplishCost, 2);
                 item.CumulativeCompleted = Math.Round(item.CumulativeCompleted, 2);
