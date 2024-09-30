@@ -395,7 +395,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
 
                         dayRepList.Add(new ProjectWBSDto
                         {
-                            CompleteProductionAmount = gOwnList.Sum(x => x.ActualDailyProductionAmount),
+                            CompleteProductionAmount = gOwnList.Sum(x => x.UnitPrice*x.ActualDailyProduction),
                             OutPutType = ConstructionOutPutType.Self,
                             CompletedQuantity = gOwnList.Sum(x => x.ActualDailyProduction),
                             UnitPrice = ownRep.Key.UnitPrice,
@@ -408,10 +408,10 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                             IsAllowDelete = true,
                             DateYear = Convert.ToInt32(dateMonth.ToString().Substring(0, 4)),
                             ValueType = ValueEnumType.NowMonth,
-                            YearCompleteProductionAmount = gYearOwnList.Sum(x => x.ActualDailyProductionAmount),
+                            YearCompleteProductionAmount = gYearOwnList.Sum(x => x.UnitPrice * x.ActualDailyProduction),
                             YearCompletedQuantity = gYearOwnList.Sum(x => x.ActualDailyProduction),
                             YearOutsourcingExpensesAmount = gYearOwnList.Sum(x => x.OutsourcingExpensesAmount),
-                            TotalCompleteProductionAmount = gTotalOwnList.Sum(x => x.ActualDailyProductionAmount),
+                            TotalCompleteProductionAmount = gTotalOwnList.Sum(x => x.UnitPrice * x.ActualDailyProduction),
                             TotalCompletedQuantity = gTotalOwnList.Sum(x => x.ActualDailyProduction),
                             TotalOutsourcingExpensesAmount = gTotalOwnList.Sum(x => x.OutsourcingExpensesAmount),
                         });
@@ -431,7 +431,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
 
                         dayRepList.Add(new ProjectWBSDto
                         {
-                            CompleteProductionAmount = othList.Sum(x => x.ActualDailyProductionAmount),
+                            CompleteProductionAmount = othList.Sum(x => x.UnitPrice * x.ActualDailyProduction),
                             OutPutType = ConstructionOutPutType.SubPackage,
                             CompletedQuantity = othList.Sum(x => x.ActualDailyProduction),
                             UnitPrice = othRep.Key.UnitPrice,
@@ -444,10 +444,10 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                             IsAllowDelete = true,
                             DateYear = Convert.ToInt32(dateMonth.ToString().Substring(0, 4)),
                             ValueType = ValueEnumType.NowMonth,
-                            YearCompleteProductionAmount = gYearSubList.Sum(x => x.ActualDailyProductionAmount),
+                            YearCompleteProductionAmount = gYearSubList.Sum(x => x.UnitPrice * x.ActualDailyProduction),
                             YearCompletedQuantity = gYearSubList.Sum(x => x.ActualDailyProduction),
                             YearOutsourcingExpensesAmount = gYearSubList.Sum(x => x.OutsourcingExpensesAmount),
-                            TotalCompleteProductionAmount = gTotalSubList.Sum(x => x.ActualDailyProductionAmount),
+                            TotalCompleteProductionAmount = gTotalSubList.Sum(x => x.UnitPrice * x.ActualDailyProduction),
                             TotalCompletedQuantity = gTotalSubList.Sum(x => x.ActualDailyProduction),
                             TotalOutsourcingExpensesAmount = gTotalSubList.Sum(x => x.OutsourcingExpensesAmount),
                         });
