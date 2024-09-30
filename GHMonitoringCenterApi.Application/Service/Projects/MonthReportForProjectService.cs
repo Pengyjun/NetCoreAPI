@@ -280,6 +280,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     item.EngQuantity = pWBS.FirstOrDefault(x => x.ProjectWBSId == item.ProjectWBSId)?.EngQuantity;
                     item.Pid = pWBS.FirstOrDefault(x => x.ProjectWBSId == item.ProjectWBSId)?.Pid;
                     item.KeyId = pWBS.FirstOrDefault(x => x.ProjectWBSId == item.ProjectWBSId)?.KeyId;
+                    item.IsDelete = pWBS.FirstOrDefault(x => x.ProjectWBSId == item.ProjectWBSId).IsDelete;
                 }
 
                 /***
