@@ -2187,16 +2187,16 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 int year = Convert.ToInt32(item.DateMonth.ToString().Substring(0, 4));
                 var taxRate = pRates.FirstOrDefault(x => x.Year == year && x.CurrencyId == item.CurrencyId.ToString());
                 var val = GetMonthReportValue(item.DateMonth, item.ProjectId, mDetailsData, mReportData, model.IsConvert, wbsList);
-                //item.AccomplishValue2 = taxRate != null ? taxRate.ExchangeRate.Value * item.AccomplishValue2 : 0M;//转换人民币
+                item.AccomplishValue2 = taxRate != null ? taxRate.ExchangeRate.Value * item.AccomplishValue2 : 0M;//转换人民币
 
                 //读取202306的历史数据
                 var hisMonthRep = mReportData.FirstOrDefault(x => x.ProjectId == item.ProjectId && x.DateMonth == 202306 && x.IsDelete == 1);
                 if (model.IsConvert == false)
                 {
-                    //var h = pRates.FirstOrDefault(x => x.Year == 2023 && x.CurrencyId == item.CurrencyId.ToString());
+                    var h = pRates.FirstOrDefault(x => x.Year == 2023 && x.CurrencyId == item.CurrencyId.ToString());
                     if (hisMonthRep != null)
                     {
-                        hisMonthRep.CompleteProductionAmount = hisMonthRep.CurrencyCompleteProductionAmount;// h == null ? 0M : h.ExchangeRate == null ? 0M : hisMonthRep.CompleteProductionAmount / h.ExchangeRate.Value;
+                        hisMonthRep.CompleteProductionAmount = h == null ? 0M : h.ExchangeRate == null ? 0M : hisMonthRep.CurrencyCompleteProductionAmount / h.ExchangeRate.Value;
                     }
                 }
 
