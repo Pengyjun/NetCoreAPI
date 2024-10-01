@@ -153,5 +153,74 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project.MonthReportFor
         /// wbs使用
         /// </summary>
         public int IsDelete {  get; set; }
+
+        #region 下一步详细字段
+
+        /// <summary>
+        /// 本月甲方确认产值（元）
+        /// </summary>
+        public decimal? PartyAConfirmedProductionAmount { get; set; }
+
+        /// <summary>
+        /// 本月甲方确认产值（元）
+        /// </summary>
+        public decimal? PartyAPayAmount { get; set; }
+
+        /// <summary>
+        /// 本月应收金额（元）
+        /// </summary>
+        public decimal? ReceivableAmount { get; set; }
+
+        /// <summary>
+        /// 进度偏差主因
+        /// </summary>
+        public DeviationReason? ProgressDeviationReason { get; set; }
+
+        /// <summary>
+        /// 主要形象进度描述
+        /// </summary>
+        public string? ProgressDescription { get; set; }
+
+        /// <summary>
+        /// 本月实际成本（元）
+        /// </summary>
+        public decimal? CostAmount { get; set; }
+
+        /// <summary>
+        /// 成本偏差主因
+        /// </summary>
+        public DeviationReason? CostDeviationReason { get; set; }
+
+        /// <summary>
+        /// 下月估算成本（元）
+        /// </summary>
+        public decimal? NextMonthEstimateCostAmount { get; set; }
+
+        /// <summary>
+        /// 进度偏差原因简述
+        /// </summary>
+        public string? ProgressDeviationDescription { get; set; }
+
+        /// <summary>
+        /// 成本偏差原因简述
+        /// </summary>
+        public string? CostDeviationDescription { get; set; }
+
+        /// <summary>
+        /// 需公司协调事项 
+        /// </summary>
+        public string? CoordinationMatters { get; set; }
+
+        /// <summary>
+        ///存在问题简述
+        /// </summary>
+        public string? ProblemDescription { get; set; }
+
+        /// <summary>
+        /// 解决措施简述 
+        /// </summary>
+        public string? SolveProblemDescription { get; set; }
+
+        #endregion
     }
 }

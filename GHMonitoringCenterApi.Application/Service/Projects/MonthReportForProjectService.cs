@@ -3,6 +3,7 @@ using AutoMapper;
 using GHMonitoringCenterApi.Application.Contracts.Dto.Enums;
 using GHMonitoringCenterApi.Application.Contracts.Dto.Project;
 using GHMonitoringCenterApi.Application.Contracts.Dto.Project.MonthReportForProject;
+using GHMonitoringCenterApi.Application.Contracts.Dto.Project.Report;
 using GHMonitoringCenterApi.Application.Contracts.IService.BizAuthorize;
 using GHMonitoringCenterApi.Application.Contracts.IService.Project;
 using GHMonitoringCenterApi.Domain.Enums;
@@ -100,8 +101,27 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     }
                     else
                     {
-                        mRep.IsAllowDelete = true;
+                        #region 下一步  字段
+                        mRep.OutPutType = item.OutPutType;
+                        mRep.Remark = item.Remark;
+                        mRep.ShipId = item.ShipId;
+                        mRep.PartyAConfirmedProductionAmount = item.PartyAConfirmedProductionAmount;
+                        mRep.PartyAPayAmount = item.PartyAPayAmount;
+                        mRep.ReceivableAmount = item.ReceivableAmount;
+                        mRep.ProgressDeviationReason = item.ProgressDeviationReason;
+                        mRep.ProgressDescription = item.ProgressDescription;
+                        mRep.CostAmount = item.CostAmount;
+                        mRep.CostDeviationReason = item.CostDeviationReason;
+                        mRep.NextMonthEstimateCostAmount = item.NextMonthEstimateCostAmount;
+                        mRep.ProgressDeviationDescription = item.ProgressDeviationDescription;
+                        mRep.CostDeviationDescription = item.CostDeviationDescription;
+                        mRep.CoordinationMatters = item.CoordinationMatters;
+                        mRep.ProblemDescription = item.ProblemDescription;
+                        mRep.SolveProblemDescription = item.SolveProblemDescription;
+                        #endregion
 
+
+                        mRep.IsAllowDelete = true;
                         mRep.CompleteProductionAmount = item.CompleteProductionAmount;
                         mRep.CompletedQuantity = item.CompletedQuantity;
                         mRep.OutsourcingExpensesAmount = item.OutsourcingExpensesAmount;
@@ -978,6 +998,9 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
 
                         var resList = JsonConvert.DeserializeObject<List<ProjectWBSDto>>(jsonString);
 
+                        //其他暂存的字段
+                        var otherJson = JsonConvert.DeserializeObject<StagingMonthReportRequestDto>(stagingData.BizData);
+
                         if (resList != null && resList.Any())
                         {
                             var wbss = await _dbContext.Queryable<ProjectWBS>().Where(x => x.ProjectId == model.ProjectId.ToString()).ToListAsync();
@@ -985,6 +1008,23 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                             var tIds = resList.Where(x => x.IsAllowDelete).Select(x => x.DetailId).ToList();
                             foreach (var item in resList)
                             {
+                                #region 下一步 字段 
+                                item.PartyAConfirmedProductionAmount = otherJson.PartyAConfirmedProductionAmount;
+                                item.PartyAPayAmount = otherJson.PartyAPayAmount;
+                                item.ReceivableAmount = otherJson.ReceivableAmount;
+                                item.ProgressDeviationReason = otherJson.ProgressDeviationReason;
+                                item.ProgressDescription = otherJson.ProgressDescription;
+                                item.CostAmount = otherJson.CostAmount;
+                                item.CostDeviationReason = otherJson.CostDeviationReason;
+                                item.NextMonthEstimateCostAmount = otherJson.NextMonthEstimateCostAmount;
+                                item.ProgressDeviationDescription = otherJson.ProgressDeviationDescription;
+                                item.CostDeviationDescription = otherJson.CostDeviationDescription;
+                                item.CoordinationMatters = otherJson.CoordinationMatters;
+                                item.ProblemDescription = otherJson.ProblemDescription;
+                                item.SolveProblemDescription = otherJson.SolveProblemDescription;
+                                #endregion
+
+
                                 item.ProjectId = result.ProjectId.ToString();
 
                                 item.KeyId = wbss.FirstOrDefault(x => x.Id == item.ProjectWBSId)?.KeyId;
