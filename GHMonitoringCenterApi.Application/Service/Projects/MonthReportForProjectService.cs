@@ -93,9 +93,9 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 //本月的数据为暂存的数据  清零是为了不做重复计算
                 List<ProjectWBSDto> newMRep = new(); //为了合并当月月报暂存的分组
 
-                //获取当月的暂存数据
-                var stagingData = await _dbContext.Queryable<StagingData>().Where(x => x.IsDelete == 1 && x.ProjectId == projectId && x.DateMonth == dateMonth).FirstAsync();
-                var otherJson = JsonConvert.DeserializeObject<StagingMonthReportRequestDto>(stagingData.BizData);
+                ////获取当月的暂存数据
+                //var stagingData = await _dbContext.Queryable<StagingData>().Where(x => x.IsDelete == 1 && x.ProjectId == projectId && x.DateMonth == dateMonth).FirstAsync();
+                //var otherJson = JsonConvert.DeserializeObject<StagingMonthReportRequestDto>(stagingData.BizData);
                 //其他暂存的字段
 
                 foreach (var item in stagingList)
@@ -111,19 +111,19 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                         //mRep.OutPutType = otherJson.OutPutType;
                         //mRep.Remark = otherJson.Remark;
                         //mRep.ShipId = otherJson.ShipId;
-                        mRep.PartyAConfirmedProductionAmount = otherJson.PartyAConfirmedProductionAmount;
-                        mRep.PartyAPayAmount = otherJson.PartyAPayAmount;
-                        mRep.ReceivableAmount = otherJson.ReceivableAmount;
-                        mRep.ProgressDeviationReason = otherJson.ProgressDeviationReason;
-                        mRep.ProgressDescription = otherJson.ProgressDescription;
-                        mRep.CostAmount = otherJson.CostAmount;
-                        mRep.CostDeviationReason = otherJson.CostDeviationReason;
-                        mRep.NextMonthEstimateCostAmount = otherJson.NextMonthEstimateCostAmount;
-                        mRep.ProgressDeviationDescription = otherJson.ProgressDeviationDescription;
-                        mRep.CostDeviationDescription = otherJson.CostDeviationDescription;
-                        mRep.CoordinationMatters = otherJson.CoordinationMatters;
-                        mRep.ProblemDescription = otherJson.ProblemDescription;
-                        mRep.SolveProblemDescription = otherJson.SolveProblemDescription;
+                        //mRep.PartyAConfirmedProductionAmount = otherJson.PartyAConfirmedProductionAmount;
+                        //mRep.PartyAPayAmount = otherJson.PartyAPayAmount;
+                        //mRep.ReceivableAmount = otherJson.ReceivableAmount;
+                        //mRep.ProgressDeviationReason = otherJson.ProgressDeviationReason;
+                        //mRep.ProgressDescription = otherJson.ProgressDescription;
+                        //mRep.CostAmount = otherJson.CostAmount;
+                        //mRep.CostDeviationReason = otherJson.CostDeviationReason;
+                        //mRep.NextMonthEstimateCostAmount = otherJson.NextMonthEstimateCostAmount;
+                        //mRep.ProgressDeviationDescription = otherJson.ProgressDeviationDescription;
+                        //mRep.CostDeviationDescription = otherJson.CostDeviationDescription;
+                        //mRep.CoordinationMatters = otherJson.CoordinationMatters;
+                        //mRep.ProblemDescription = otherJson.ProblemDescription;
+                        //mRep.SolveProblemDescription = otherJson.SolveProblemDescription;
                         #endregion
 
 
