@@ -179,7 +179,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 // 判断当前节点是否是最后节点
                 if (!children.Any()) // 如果没有子节点
                 {
-                    if (node.CompletedQuantity == 0)//过滤
+                    if (Convert.ToInt32(node.CompletedQuantity) == 0)//过滤
                     {
                         node.IsAllowDelete = false;
                     }
