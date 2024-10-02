@@ -93,9 +93,9 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 //本月的数据为暂存的数据  清零是为了不做重复计算
                 List<ProjectWBSDto> newMRep = new(); //为了合并当月月报暂存的分组
 
-                //获取当月的暂存数据
-                var stagingData = await _dbContext.Queryable<StagingData>().Where(x => x.IsDelete == 1 && x.ProjectId == projectId && x.DateMonth == dateMonth).FirstAsync();
-                var otherJson = JsonConvert.DeserializeObject<StagingMonthReportRequestDto>(stagingData.BizData);
+                ////获取当月的暂存数据
+                //var stagingData = await _dbContext.Queryable<StagingData>().Where(x => x.IsDelete == 1 && x.ProjectId == projectId && x.DateMonth == dateMonth).FirstAsync();
+                //var otherJson = JsonConvert.DeserializeObject<StagingMonthReportRequestDto>(stagingData.BizData);
                 //其他暂存的字段
 
                 foreach (var item in stagingList)
@@ -111,19 +111,19 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                         //mRep.OutPutType = otherJson.OutPutType;
                         //mRep.Remark = otherJson.Remark;
                         //mRep.ShipId = otherJson.ShipId;
-                        mRep.PartyAConfirmedProductionAmount = otherJson.PartyAConfirmedProductionAmount;
-                        mRep.PartyAPayAmount = otherJson.PartyAPayAmount;
-                        mRep.ReceivableAmount = otherJson.ReceivableAmount;
-                        mRep.ProgressDeviationReason = otherJson.ProgressDeviationReason;
-                        mRep.ProgressDescription = otherJson.ProgressDescription;
-                        mRep.CostAmount = otherJson.CostAmount;
-                        mRep.CostDeviationReason = otherJson.CostDeviationReason;
-                        mRep.NextMonthEstimateCostAmount = otherJson.NextMonthEstimateCostAmount;
-                        mRep.ProgressDeviationDescription = otherJson.ProgressDeviationDescription;
-                        mRep.CostDeviationDescription = otherJson.CostDeviationDescription;
-                        mRep.CoordinationMatters = otherJson.CoordinationMatters;
-                        mRep.ProblemDescription = otherJson.ProblemDescription;
-                        mRep.SolveProblemDescription = otherJson.SolveProblemDescription;
+                        //mRep.PartyAConfirmedProductionAmount = otherJson.PartyAConfirmedProductionAmount;
+                        //mRep.PartyAPayAmount = otherJson.PartyAPayAmount;
+                        //mRep.ReceivableAmount = otherJson.ReceivableAmount;
+                        //mRep.ProgressDeviationReason = otherJson.ProgressDeviationReason;
+                        //mRep.ProgressDescription = otherJson.ProgressDescription;
+                        //mRep.CostAmount = otherJson.CostAmount;
+                        //mRep.CostDeviationReason = otherJson.CostDeviationReason;
+                        //mRep.NextMonthEstimateCostAmount = otherJson.NextMonthEstimateCostAmount;
+                        //mRep.ProgressDeviationDescription = otherJson.ProgressDeviationDescription;
+                        //mRep.CostDeviationDescription = otherJson.CostDeviationDescription;
+                        //mRep.CoordinationMatters = otherJson.CoordinationMatters;
+                        //mRep.ProblemDescription = otherJson.ProblemDescription;
+                        //mRep.SolveProblemDescription = otherJson.SolveProblemDescription;
                         #endregion
 
 
@@ -179,6 +179,10 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 // 判断当前节点是否是最后节点
                 if (!children.Any()) // 如果没有子节点
                 {
+                    if (node.CompletedQuantity == 0)//过滤
+                    {
+                        node.IsAllowDelete = false;
+                    }
                     if (!mpWbsIds.Contains(node.ProjectWBSId) && node.IsDelete == 0)
                     {
                         continue; // 跳过这个节点，不添加到树中
@@ -213,6 +217,11 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             var mReport = mReportList.OrderBy(x => x.ShipId).ThenBy(x => x.DateMonth).Where(x => x.ProjectWBSId == wbsId).ToList();
             foreach (var report in mReport)
             {
+                //当月统计
+                report.CompleteProductionAmount = yReportList.Where(x => x.ProjectId == report.ProjectId && report.ShipId == x.ShipId && x.ProjectWBSId == wbsId && x.UnitPrice == report.UnitPrice).Sum(x => x.CompleteProductionAmount);
+                report.CompletedQuantity = yReportList.Where(x => x.ProjectId == report.ProjectId && report.ShipId == x.ShipId && x.ProjectWBSId == wbsId && x.UnitPrice == report.UnitPrice).Sum(x => x.CompletedQuantity);
+                report.OutsourcingExpensesAmount = yReportList.Where(x => x.ProjectId == report.ProjectId && report.ShipId == x.ShipId && x.ProjectWBSId == wbsId && x.UnitPrice == report.UnitPrice).Sum(x => x.OutsourcingExpensesAmount);
+
                 //年度统计
                 report.YearCompleteProductionAmount = yReportList.Where(x => x.ProjectId == report.ProjectId && report.ShipId == x.ShipId && x.ProjectWBSId == wbsId && x.UnitPrice == report.UnitPrice).Sum(x => x.YearCompleteProductionAmount);
                 report.YearCompletedQuantity = yReportList.Where(x => x.ProjectId == report.ProjectId && report.ShipId == x.ShipId && x.ProjectWBSId == wbsId && x.UnitPrice == report.UnitPrice).Sum(x => x.YearCompletedQuantity);
@@ -421,7 +430,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
 
                         dayRepList.Add(new ProjectWBSDto
                         {
-                            CompleteProductionAmount = gOwnList.Sum(x => x.UnitPrice*x.ActualDailyProduction),
+                            CompleteProductionAmount = gOwnList.Sum(x => x.UnitPrice * x.ActualDailyProduction),
                             OutPutType = ConstructionOutPutType.Self,
                             CompletedQuantity = gOwnList.Sum(x => x.ActualDailyProduction),
                             UnitPrice = ownRep.Key.UnitPrice,
