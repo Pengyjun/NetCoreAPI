@@ -102,22 +102,22 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     else
                     {
                         #region 下一步  字段
-                        mRep.OutPutType = item.OutPutType;
-                        mRep.Remark = item.Remark;
-                        mRep.ShipId = item.ShipId;
-                        mRep.PartyAConfirmedProductionAmount = item.PartyAConfirmedProductionAmount;
-                        mRep.PartyAPayAmount = item.PartyAPayAmount;
-                        mRep.ReceivableAmount = item.ReceivableAmount;
-                        mRep.ProgressDeviationReason = item.ProgressDeviationReason;
-                        mRep.ProgressDescription = item.ProgressDescription;
-                        mRep.CostAmount = item.CostAmount;
-                        mRep.CostDeviationReason = item.CostDeviationReason;
-                        mRep.NextMonthEstimateCostAmount = item.NextMonthEstimateCostAmount;
-                        mRep.ProgressDeviationDescription = item.ProgressDeviationDescription;
-                        mRep.CostDeviationDescription = item.CostDeviationDescription;
-                        mRep.CoordinationMatters = item.CoordinationMatters;
-                        mRep.ProblemDescription = item.ProblemDescription;
-                        mRep.SolveProblemDescription = item.SolveProblemDescription;
+                        //mRep.OutPutType = item.OutPutType;
+                        //mRep.Remark = item.Remark;
+                        //mRep.ShipId = item.ShipId;
+                        //mRep.PartyAConfirmedProductionAmount = item.PartyAConfirmedProductionAmount;
+                        //mRep.PartyAPayAmount = item.PartyAPayAmount;
+                        //mRep.ReceivableAmount = item.ReceivableAmount;
+                        //mRep.ProgressDeviationReason = item.ProgressDeviationReason;
+                        //mRep.ProgressDescription = item.ProgressDescription;
+                        //mRep.CostAmount = item.CostAmount;
+                        //mRep.CostDeviationReason = item.CostDeviationReason;
+                        //mRep.NextMonthEstimateCostAmount = item.NextMonthEstimateCostAmount;
+                        //mRep.ProgressDeviationDescription = item.ProgressDeviationDescription;
+                        //mRep.CostDeviationDescription = item.CostDeviationDescription;
+                        //mRep.CoordinationMatters = item.CoordinationMatters;
+                        //mRep.ProblemDescription = item.ProblemDescription;
+                        //mRep.SolveProblemDescription = item.SolveProblemDescription;
                         #endregion
 
 
@@ -1009,19 +1009,19 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                             foreach (var item in resList)
                             {
                                 #region 下一步 字段 
-                                item.PartyAConfirmedProductionAmount = otherJson.PartyAConfirmedProductionAmount;
-                                item.PartyAPayAmount = otherJson.PartyAPayAmount;
-                                item.ReceivableAmount = otherJson.ReceivableAmount;
-                                item.ProgressDeviationReason = otherJson.ProgressDeviationReason;
-                                item.ProgressDescription = otherJson.ProgressDescription;
-                                item.CostAmount = otherJson.CostAmount;
-                                item.CostDeviationReason = otherJson.CostDeviationReason;
-                                item.NextMonthEstimateCostAmount = otherJson.NextMonthEstimateCostAmount;
-                                item.ProgressDeviationDescription = otherJson.ProgressDeviationDescription;
-                                item.CostDeviationDescription = otherJson.CostDeviationDescription;
-                                item.CoordinationMatters = otherJson.CoordinationMatters;
-                                item.ProblemDescription = otherJson.ProblemDescription;
-                                item.SolveProblemDescription = otherJson.SolveProblemDescription;
+                                //item.PartyAConfirmedProductionAmount = otherJson.PartyAConfirmedProductionAmount;
+                                //item.PartyAPayAmount = otherJson.PartyAPayAmount;
+                                //item.ReceivableAmount = otherJson.ReceivableAmount;
+                                //item.ProgressDeviationReason = otherJson.ProgressDeviationReason;
+                                //item.ProgressDescription = otherJson.ProgressDescription;
+                                //item.CostAmount = otherJson.CostAmount;
+                                //item.CostDeviationReason = otherJson.CostDeviationReason;
+                                //item.NextMonthEstimateCostAmount = otherJson.NextMonthEstimateCostAmount;
+                                //item.ProgressDeviationDescription = otherJson.ProgressDeviationDescription;
+                                //item.CostDeviationDescription = otherJson.CostDeviationDescription;
+                                //item.CoordinationMatters = otherJson.CoordinationMatters;
+                                //item.ProblemDescription = otherJson.ProblemDescription;
+                                //item.SolveProblemDescription = otherJson.SolveProblemDescription;
                                 #endregion
 
 
