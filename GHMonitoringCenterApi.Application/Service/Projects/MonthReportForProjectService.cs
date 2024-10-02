@@ -92,6 +92,12 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             {
                 //本月的数据为暂存的数据  清零是为了不做重复计算
                 List<ProjectWBSDto> newMRep = new(); //为了合并当月月报暂存的分组
+
+                //获取当月的暂存数据
+                var stagingData = await _dbContext.Queryable<StagingData>().Where(x => x.IsDelete == 1 && x.ProjectId == projectId && x.DateMonth == dateMonth).FirstAsync();
+                var otherJson = JsonConvert.DeserializeObject<StagingMonthReportRequestDto>(stagingData.BizData);
+                //其他暂存的字段
+
                 foreach (var item in stagingList)
                 {
                     var mRep = mReportList.FirstOrDefault(t => t.ProjectId == item.ProjectId && t.ShipId == item.ShipId && t.UnitPrice == item.UnitPrice && t.ProjectWBSId == item.ProjectWBSId);
@@ -102,22 +108,22 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     else
                     {
                         #region 下一步  字段
-                        //mRep.OutPutType = item.OutPutType;
-                        //mRep.Remark = item.Remark;
-                        //mRep.ShipId = item.ShipId;
-                        //mRep.PartyAConfirmedProductionAmount = item.PartyAConfirmedProductionAmount;
-                        //mRep.PartyAPayAmount = item.PartyAPayAmount;
-                        //mRep.ReceivableAmount = item.ReceivableAmount;
-                        //mRep.ProgressDeviationReason = item.ProgressDeviationReason;
-                        //mRep.ProgressDescription = item.ProgressDescription;
-                        //mRep.CostAmount = item.CostAmount;
-                        //mRep.CostDeviationReason = item.CostDeviationReason;
-                        //mRep.NextMonthEstimateCostAmount = item.NextMonthEstimateCostAmount;
-                        //mRep.ProgressDeviationDescription = item.ProgressDeviationDescription;
-                        //mRep.CostDeviationDescription = item.CostDeviationDescription;
-                        //mRep.CoordinationMatters = item.CoordinationMatters;
-                        //mRep.ProblemDescription = item.ProblemDescription;
-                        //mRep.SolveProblemDescription = item.SolveProblemDescription;
+                        //mRep.OutPutType = otherJson.OutPutType;
+                        //mRep.Remark = otherJson.Remark;
+                        //mRep.ShipId = otherJson.ShipId;
+                        mRep.PartyAConfirmedProductionAmount = otherJson.PartyAConfirmedProductionAmount;
+                        mRep.PartyAPayAmount = otherJson.PartyAPayAmount;
+                        mRep.ReceivableAmount = otherJson.ReceivableAmount;
+                        mRep.ProgressDeviationReason = otherJson.ProgressDeviationReason;
+                        mRep.ProgressDescription = otherJson.ProgressDescription;
+                        mRep.CostAmount = otherJson.CostAmount;
+                        mRep.CostDeviationReason = otherJson.CostDeviationReason;
+                        mRep.NextMonthEstimateCostAmount = otherJson.NextMonthEstimateCostAmount;
+                        mRep.ProgressDeviationDescription = otherJson.ProgressDeviationDescription;
+                        mRep.CostDeviationDescription = otherJson.CostDeviationDescription;
+                        mRep.CoordinationMatters = otherJson.CoordinationMatters;
+                        mRep.ProblemDescription = otherJson.ProblemDescription;
+                        mRep.SolveProblemDescription = otherJson.SolveProblemDescription;
                         #endregion
 
 
@@ -997,9 +1003,6 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                         var jsonString = GetAllReportDetails(jsonObject).ToJson();
 
                         var resList = JsonConvert.DeserializeObject<List<ProjectWBSDto>>(jsonString);
-
-                        //其他暂存的字段
-                        var otherJson = JsonConvert.DeserializeObject<StagingMonthReportRequestDto>(stagingData.BizData);
 
                         if (resList != null && resList.Any())
                         {
