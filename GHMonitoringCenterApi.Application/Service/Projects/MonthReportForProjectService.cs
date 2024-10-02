@@ -103,6 +103,10 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     var mRep = mReportList.FirstOrDefault(t => t.ProjectId == item.ProjectId && t.ShipId == item.ShipId && t.UnitPrice == item.UnitPrice && t.ProjectWBSId == item.ProjectWBSId);
                     if (mRep == null)
                     {
+                        if (Convert.ToInt32(item.CompletedQuantity) == 0)//过滤
+                        {
+                            item.IsAllowDelete = false;
+                        }
                         newMRep.Add(item);
                     }
                     else
@@ -179,10 +183,6 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 // 判断当前节点是否是最后节点
                 if (!children.Any()) // 如果没有子节点
                 {
-                    if (Convert.ToInt32(node.CompletedQuantity) == 0)//过滤
-                    {
-                        node.IsAllowDelete = false;
-                    }
                     if (!mpWbsIds.Contains(node.ProjectWBSId) && node.IsDelete == 0)
                     {
                         continue; // 跳过这个节点，不添加到树中
