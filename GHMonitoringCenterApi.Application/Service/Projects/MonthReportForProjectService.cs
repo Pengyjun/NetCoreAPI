@@ -213,6 +213,11 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             var mReport = mReportList.OrderBy(x => x.ShipId).ThenBy(x => x.DateMonth).Where(x => x.ProjectWBSId == wbsId).ToList();
             foreach (var report in mReport)
             {
+                //当月统计
+                report.CompleteProductionAmount = mReportList.Where(x => x.ProjectId == report.ProjectId && report.ShipId == x.ShipId && x.ProjectWBSId == wbsId && x.UnitPrice == report.UnitPrice).Sum(x => x.CompleteProductionAmount);
+                report.CompletedQuantity = mReportList.Where(x => x.ProjectId == report.ProjectId && report.ShipId == x.ShipId && x.ProjectWBSId == wbsId && x.UnitPrice == report.UnitPrice).Sum(x => x.CompletedQuantity);
+                report.OutsourcingExpensesAmount = mReportList.Where(x => x.ProjectId == report.ProjectId && report.ShipId == x.ShipId && x.ProjectWBSId == wbsId && x.UnitPrice == report.UnitPrice).Sum(x => x.OutsourcingExpensesAmount);
+
                 //年度统计
                 report.YearCompleteProductionAmount = yReportList.Where(x => x.ProjectId == report.ProjectId && report.ShipId == x.ShipId && x.ProjectWBSId == wbsId && x.UnitPrice == report.UnitPrice).Sum(x => x.YearCompleteProductionAmount);
                 report.YearCompletedQuantity = yReportList.Where(x => x.ProjectId == report.ProjectId && report.ShipId == x.ShipId && x.ProjectWBSId == wbsId && x.UnitPrice == report.UnitPrice).Sum(x => x.YearCompletedQuantity);
@@ -497,8 +502,6 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                         var isAllowDelete = nowMonthReport.FirstOrDefault(t => t.ProjectId == model.ProjectId && t.ShipId == model.ShipId && t.UnitPrice == model.UnitPrice && t.ProjectWBSId == model.ProjectWBSId);
                         if (isAllowDelete != null) isAllowDelete.IsAllowDelete = true;
 
-                        model.CompleteProductionAmount = model.CompleteProductionAmount;
-
                         //合并计算 每条资源的年产值、累计值、外包支出 
                         model.YearCompleteProductionAmount = handleList.Where(t => t.ProjectId == item.Key.ProjectId && t.ShipId == item.Key.ShipId && t.UnitPrice == item.Key.UnitPrice && t.ProjectWBSId == item.Key.ProjectWBSId).Sum(x => x.CompleteProductionAmount);
 
@@ -515,6 +518,13 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                         endHandleList.Add(model);
                     }
                 }
+                #region 本月是否有填写数据
+                foreach (var item in endHandleList)
+                {
+                    var model = nowMonthReport.Where(t => t.DateMonth == dateMonth && t.ProjectId == item.ProjectId && t.ShipId == item.ShipId && t.UnitPrice == item.UnitPrice && t.ProjectWBSId == item.ProjectWBSId).FirstOrDefault();
+                    if (model == null) { item.CompletedQuantity = 0M; item.CompleteProductionAmount = 0M; item.OutsourcingExpensesAmount = 0M; }
+                }
+                #endregion
 
                 //WBS树追加月报明细树 追加历史的月报详细数据
                 if (endHandleList != null && endHandleList.Any()) pWBS.AddRange(endHandleList);
