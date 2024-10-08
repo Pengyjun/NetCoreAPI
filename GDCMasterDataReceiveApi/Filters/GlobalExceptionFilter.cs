@@ -119,7 +119,7 @@ namespace GDCMasterDataReceiveApi.Filters
                 var   responseResult = await webHelper.DoPostAsync<string>(systemInterfaceFiledRuleApi, parames);
                 setupResult = responseResult.Result;
                 context.Result =new JsonResult(responseResult.Result);
-                IsEncrypt = 3;
+                IsEncrypt = 2;
             }
 
             #endregion
