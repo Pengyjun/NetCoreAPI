@@ -2325,5 +2325,42 @@ namespace GHMonitoringCenterApi.Application.Service.Timing
                 return (ex.Message + Environment.NewLine + ex.StackTrace).ToString();
             }
         }
+
+
+        /// <summary>
+        /// 临时代码   
+        /// </summary>
+        /// <returns></returns>
+
+        public async Task<string> SynchronizationDealUnitNewsync()
+        {
+            try
+            {
+                //中间表
+                var baseDealCache = await baseDealingUnitCacheRepository.AsQueryable().Where(x => x.IsDelete == 1&&(x.ZBPTYPE=="02" || x.ZBPTYPE == "03")).ToListAsync();
+                //目标表   
+               var aa= baseDealCache.Select(x => x.ZBP).ToList();
+               var baseDeal = await baseDealingUnitRepository.AsQueryable().Where(x => x.IsDelete == 1&&aa.Contains(x.ZBP)).ToListAsync();
+                List<DealingUnit> dealingUnits = new List<DealingUnit>();
+                var a =0;
+                foreach (var item in baseDeal)
+                {
+                    var sing = baseDealCache.Where(x => x.ZBP == item.ZBP).SingleOrDefault();
+                    if (sing != null)
+                    {
+                        item.ZBPTYPE = sing.ZBPTYPE;
+                        dealingUnits.Add(item);
+                    }
+                    a += 1;
+                }
+                // var flag= await dbContext.Insertable<DealingUnit>(dealingUnits).ExecuteCommandAsync();
+                var flag = await dbContext.Updateable<DealingUnit>(dealingUnits).ExecuteCommandAsync();
+                return flag > 0 ? "成功" : "失败";
+            }
+            catch (Exception ex)
+            {
+                return (ex.Message + Environment.NewLine + ex.StackTrace).ToString();
+            }
+        }
     }
 }
