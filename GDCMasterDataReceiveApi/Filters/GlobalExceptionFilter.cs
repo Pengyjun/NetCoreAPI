@@ -102,55 +102,24 @@ namespace GDCMasterDataReceiveApi.Filters
             #region 过滤接口返回值
             CacheHelper cacheHelper = new CacheHelper();
             var cacheResult = cacheHelper.Get<DataInterfaceResponseDto>(context.HttpContext.TraceIdentifier);
-            var IsEncrypt = 1;
+            var IsEncrypt = 1;//是否加密   0  不是加密 
 
             #region  接口返回值字段规则设置
             WebHelper webHelper = new WebHelper();
             var systemInterfaceFiledRuleApi = AppsettingsHelper.GetValue("API:SystemInterfaceFiledRuleApi");
             Dictionary<string, object> parames = new Dictionary<string, object>();
             string setupResult = string.Empty;
-            ResponseAjaxResult<List<object>> response = new ResponseAjaxResult<List<object>>();
-            int returnCount = 0;
             if (cacheResult != null)
             {
                 //接口返回值
                 var returnRes = ((Microsoft.AspNetCore.Mvc.ObjectResult)context.Result).Value;
                 webHelper.Headers.Add("appKey", cacheResult.AppKey);
                 webHelper.Headers.Add("appinterfaceCode", cacheResult.AppinterfaceCode);
-                var parseToken = JObject.Parse(returnRes.ToJson(true));
-                if (parseToken["count"] != null)
-                {
-                    returnCount = parseToken["count"].ToString().ObjToInt();
-                }
                 parames.Add("jsonObj", returnRes.ToJson(true));
                 var   responseResult = await webHelper.DoPostAsync<string>(systemInterfaceFiledRuleApi, parames);
                 setupResult = responseResult.Result;
-                if (!string.IsNullOrWhiteSpace(setupResult) && cacheResult.IsEncrypt != 1)
-                {
-                    List<dynamic> list = new List<dynamic>();
-                    var parseJson = JObject.Parse(setupResult);
-                    var parseCount = 0;
-                    response.Code = HttpStatusCode.Success;
-                    if (parseJson["count"] != null)
-                    {
-                        response.Count =int.Parse(parseJson["count"].ToString());
-                    }
-                    if (parseJson["message"] != null)
-                    {
-                        response.Message = parseJson["message"].ToString();
-                    }
-                    if (parseJson["data"] != null)
-                    {
-                        parseCount = parseJson["data"].Count();
-                    }
-                    
-                    for (int i = 0; i < parseCount; i++)
-                    {
-                        list.Add(parseJson["data"][i]);
-                    }
-                    response.Data=list;
-                }
-                context.Result =new JsonResult(response) ;
+                context.Result =new JsonResult(responseResult.Result);
+                IsEncrypt = 3;
             }
 
             #endregion
