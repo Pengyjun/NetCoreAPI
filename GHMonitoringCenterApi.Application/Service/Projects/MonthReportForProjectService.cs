@@ -93,11 +93,6 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 //本月的数据为暂存的数据  清零是为了不做重复计算
                 List<ProjectWBSDto> newMRep = new(); //为了合并当月月报暂存的分组
 
-                ////获取当月的暂存数据
-                //var stagingData = await _dbContext.Queryable<StagingData>().Where(x => x.IsDelete == 1 && x.ProjectId == projectId && x.DateMonth == dateMonth).FirstAsync();
-                //var otherJson = JsonConvert.DeserializeObject<StagingMonthReportRequestDto>(stagingData.BizData);
-                //其他暂存的字段
-
                 foreach (var item in stagingList)
                 {
                     var mRep = mReportList.FirstOrDefault(t => t.ProjectId == item.ProjectId && t.ShipId == item.ShipId && t.UnitPrice == item.UnitPrice && t.ProjectWBSId == item.ProjectWBSId);
@@ -111,25 +106,6 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     }
                     else
                     {
-                        #region 下一步  字段
-                        //mRep.OutPutType = otherJson.OutPutType;
-                        //mRep.Remark = otherJson.Remark;
-                        //mRep.ShipId = otherJson.ShipId;
-                        //mRep.PartyAConfirmedProductionAmount = otherJson.PartyAConfirmedProductionAmount;
-                        //mRep.PartyAPayAmount = otherJson.PartyAPayAmount;
-                        //mRep.ReceivableAmount = otherJson.ReceivableAmount;
-                        //mRep.ProgressDeviationReason = otherJson.ProgressDeviationReason;
-                        //mRep.ProgressDescription = otherJson.ProgressDescription;
-                        //mRep.CostAmount = otherJson.CostAmount;
-                        //mRep.CostDeviationReason = otherJson.CostDeviationReason;
-                        //mRep.NextMonthEstimateCostAmount = otherJson.NextMonthEstimateCostAmount;
-                        //mRep.ProgressDeviationDescription = otherJson.ProgressDeviationDescription;
-                        //mRep.CostDeviationDescription = otherJson.CostDeviationDescription;
-                        //mRep.CoordinationMatters = otherJson.CoordinationMatters;
-                        //mRep.ProblemDescription = otherJson.ProblemDescription;
-                        //mRep.SolveProblemDescription = otherJson.SolveProblemDescription;
-                        #endregion
-
 
                         mRep.IsAllowDelete = true;
                         mRep.CompleteProductionAmount = item.CompleteProductionAmount;
@@ -206,7 +182,6 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
         /// <param name="yReportList">当年月报详细数据(做统计数据使用)</param>
         /// <param name="klReportList">开累月报详细数据(做统计数据使用)</param>
         /// <param name="bData">施工性质、产值属性</param>
-        /// <param name="dateMonth"></param>
         /// <returns></returns>
         private List<ProjectWBSDto> MReportForProjectList(Guid wbsId, List<ProjectWBSDto> mReportList, List<ProjectWBSDto> yReportList, List<ProjectWBSDto> klReportList, List<MonthReportForProjectBaseDataResponseDto> bData)
         {
@@ -505,19 +480,6 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     {
                         var isAllowDelete = nowMonthReport.FirstOrDefault(t => t.ProjectId == model.ProjectId && t.ShipId == model.ShipId && t.UnitPrice == model.UnitPrice && t.ProjectWBSId == model.ProjectWBSId);
                         if (isAllowDelete != null) isAllowDelete.IsAllowDelete = true;
-
-                        //合并计算 每条资源的年产值、累计值、外包支出 
-                        //model.YearCompleteProductionAmount = handleList.Where(t => t.ProjectId == item.Key.ProjectId && t.ShipId == item.Key.ShipId && t.UnitPrice == item.Key.UnitPrice && t.ProjectWBSId == item.Key.ProjectWBSId).Sum(x => x.CompleteProductionAmount);
-
-                        //model.YearCompletedQuantity = handleList.Where(t => t.ProjectId == item.Key.ProjectId && t.ShipId == item.Key.ShipId && t.UnitPrice == item.Key.UnitPrice && t.ProjectWBSId == item.Key.ProjectWBSId).Sum(x => x.CompletedQuantity);
-
-                        //model.YearOutsourcingExpensesAmount = handleList.Where(t => t.ProjectId == item.Key.ProjectId && t.ShipId == item.Key.ShipId && t.UnitPrice == item.Key.UnitPrice && t.ProjectWBSId == item.Key.ProjectWBSId).Sum(x => x.OutsourcingExpensesAmount);
-
-                        //model.TotalCompleteProductionAmount = handleList.Where(t => t.ProjectId == item.Key.ProjectId && t.ShipId == item.Key.ShipId && t.UnitPrice == item.Key.UnitPrice && t.ProjectWBSId == item.Key.ProjectWBSId).Sum(x => x.CompleteProductionAmount);
-
-                        //model.TotalCompletedQuantity = handleList.Where(t => t.ProjectId == item.Key.ProjectId && t.ShipId == item.Key.ShipId && t.UnitPrice == item.Key.UnitPrice && t.ProjectWBSId == item.Key.ProjectWBSId).Sum(x => x.CompletedQuantity);
-
-                        //model.TotalOutsourcingExpensesAmount = handleList.Where(t => t.ProjectId == item.Key.ProjectId && t.ShipId == item.Key.ShipId && t.UnitPrice == item.Key.UnitPrice && t.ProjectWBSId == item.Key.ProjectWBSId).Sum(x => x.OutsourcingExpensesAmount);
 
                         endHandleList.Add(model);
                     }
@@ -1010,23 +972,6 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                             var tIds = resList.Where(x => x.IsAllowDelete).Select(x => x.DetailId).ToList();
                             foreach (var item in resList)
                             {
-                                #region 下一步 字段 
-                                //item.PartyAConfirmedProductionAmount = otherJson.PartyAConfirmedProductionAmount;
-                                //item.PartyAPayAmount = otherJson.PartyAPayAmount;
-                                //item.ReceivableAmount = otherJson.ReceivableAmount;
-                                //item.ProgressDeviationReason = otherJson.ProgressDeviationReason;
-                                //item.ProgressDescription = otherJson.ProgressDescription;
-                                //item.CostAmount = otherJson.CostAmount;
-                                //item.CostDeviationReason = otherJson.CostDeviationReason;
-                                //item.NextMonthEstimateCostAmount = otherJson.NextMonthEstimateCostAmount;
-                                //item.ProgressDeviationDescription = otherJson.ProgressDeviationDescription;
-                                //item.CostDeviationDescription = otherJson.CostDeviationDescription;
-                                //item.CoordinationMatters = otherJson.CoordinationMatters;
-                                //item.ProblemDescription = otherJson.ProblemDescription;
-                                //item.SolveProblemDescription = otherJson.SolveProblemDescription;
-                                #endregion
-
-
                                 item.ProjectId = result.ProjectId.ToString();
 
                                 item.KeyId = wbss.FirstOrDefault(x => x.Id == item.ProjectWBSId)?.KeyId;
@@ -1044,6 +989,23 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                             treeDetails = await WBSConvertTree(model.ProjectId, dateMonth, bData, result.IsFromStaging, resList, dayRep);
                             //树组合
                             result.TreeDetails = treeDetails;
+
+                            #region 下一步 字段 
+                            var saveModel = CastDeserializeObject<SaveProjectMonthReportRequestDto>(stagingData.BizData);
+                            result.PartyAConfirmedProductionAmount = saveModel.PartyAConfirmedProductionAmount;
+                            result.PartyAPayAmount = saveModel.PartyAPayAmount;
+                            result.ReceivableAmount = saveModel.ReceivableAmount;
+                            result.ProgressDeviationReason = saveModel.ProgressDeviationReason;
+                            result.ProgressDescription = saveModel.ProgressDescription;
+                            result.CostAmount = saveModel.CostAmount;
+                            result.CostDeviationReason = saveModel.CostDeviationReason;
+                            result.NextMonthEstimateCostAmount = saveModel.NextMonthEstimateCostAmount;
+                            result.ProgressDeviationDescription = saveModel.ProgressDeviationDescription;
+                            result.CostDeviationDescription = saveModel.CostDeviationDescription;
+                            result.CoordinationMatters = saveModel.CoordinationMatters;
+                            result.ProblemDescription = saveModel.ProblemDescription;
+                            result.SolveProblemDescription = saveModel.SolveProblemDescription;
+                            #endregion
 
                             //数据回显
                             responseAjaxResult.SuccessResult(result);
@@ -1063,6 +1025,23 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             //数据回显
             responseAjaxResult.SuccessResult(result);
             return responseAjaxResult;
+        }
+        /// <summary>
+        /// 强制转换
+        /// </summary>
+        /// <exception cref="Exception">强制转换异常</exception>
+        private T CastDeserializeObject<T>(string? bizData) where T : class
+        {
+            if (string.IsNullOrWhiteSpace(bizData))
+            {
+                throw new Exception("bizData不能为空");
+            }
+            var model = JsonConvert.DeserializeObject<T>(bizData);
+            if (model == null)
+            {
+                throw new Exception("bizData反序列化失败");
+            }
+            return model;
         }
         /// <summary>
         /// 获取所有ReportDetails
