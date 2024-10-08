@@ -1,16 +1,8 @@
 ﻿using GHMonitoringCenterApi.Application.Contracts.Dto;
-using GHMonitoringCenterApi.Application.Contracts.Dto.Job;
 using GHMonitoringCenterApi.Application.Contracts.Dto.Project;
 using GHMonitoringCenterApi.Application.Contracts.Dto.Project.ExcelImport;
 using GHMonitoringCenterApi.Application.Contracts.Dto.ProjectPlanProduction;
-using GHMonitoringCenterApi.Application.Contracts.Dto.Upload;
-using GHMonitoringCenterApi.Domain.Models;
 using GHMonitoringCenterApi.Domain.Shared;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace GHMonitoringCenterApi.Application.Contracts.IService.Project
 {
@@ -96,6 +88,12 @@ namespace GHMonitoringCenterApi.Application.Contracts.IService.Project
         /// <param name=""></param>
         /// <returns></returns>
         Task<ResponseAjaxResult<bool>> DeleteProjectWBSTreeAsync(Guid Id);
+        /// <summary>
+        /// 删除ProjectWBS树 校验是否写过项目月报
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        Task<ResponseAjaxResult<bool>> DeleteProjectWBSTreeValidatableAsync(DeleteProjectWBSValidatableDto requestDto);
         #endregion
         #region 根据经纬度获取地点区域
         /// <summary>
@@ -135,7 +133,7 @@ namespace GHMonitoringCenterApi.Application.Contracts.IService.Project
         /// </summary>
         /// <param name="IsConvert"></param>
         /// <returns></returns>
-        decimal GetAmount(bool IsConvert,Guid? currencyId,decimal? amount,decimal? exchangeRate);
+        decimal GetAmount(bool IsConvert, Guid? currencyId, decimal? amount, decimal? exchangeRate);
         /// <summary>
         /// 项目与报表负责人列表
         /// </summary>
@@ -214,11 +212,11 @@ namespace GHMonitoringCenterApi.Application.Contracts.IService.Project
         /// <returns></returns>
         Task<ResponseAjaxResult<List<BasePullDownResponseDto>>> SearchCompanyProjectPullDownAsync();
 
-       /// <summary>
-       /// 获取开停工记录时间
-       /// </summary>
-       /// <returns></returns>
-        Task<ResponseAjaxResult<List<StartWorkResponseDto>>> SearchStartListAsync(Guid projectid,int pageIndex,int pageSize);
+        /// <summary>
+        /// 获取开停工记录时间
+        /// </summary>
+        /// <returns></returns>
+        Task<ResponseAjaxResult<List<StartWorkResponseDto>>> SearchStartListAsync(Guid projectid, int pageIndex, int pageSize);
 
 
 

@@ -183,6 +183,17 @@ namespace GHMonitoringCenterApi.Controllers.Project
             return await projectService.SaveProjectWBSTreeAsync(addOrUpdateProjectWBSRequestDto, logDto);
         }
         /// <summary>
+        /// 删除ProjectWBS树  校验是否曾经填写过
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        [HttpPost("DeleteProjectWBSTreeValidatable")]
+        [UnitOfWork]
+        public async Task<ResponseAjaxResult<bool>> DeleteProjectWBSTreeValidatableAsync([FromBody] DeleteProjectWBSValidatableDto requestDto)
+        {
+            return await projectService.DeleteProjectWBSTreeValidatableAsync(requestDto);
+        }
+        /// <summary>
         /// 删除ProjectWBS树
         /// </summary>
         /// <returns></returns>
@@ -774,13 +785,13 @@ namespace GHMonitoringCenterApi.Controllers.Project
         [AllowAnonymous]
         public bool aa([FromBody] string a)
         {
-           
+
             //var resList = JsonConvert.DeserializeObject<List<bb>>(jsonObject);
             //var ss = resList.Sum(x => x.UnitPrice * x.CompletedQuantity);
             return true;
             //return projectService.aa();
         }
-       public class bb
+        public class bb
         {
             public decimal UnitPrice { get; set; }
             public decimal CompletedQuantity { get; set; }

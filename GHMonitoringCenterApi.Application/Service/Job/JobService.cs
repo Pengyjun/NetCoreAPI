@@ -452,7 +452,7 @@ namespace GHMonitoringCenterApi.Application.Service.Job
                   .WhereIF(model.EndSubmitTime != null, (j, a, p) => j.SubmitTime < ((DateTime)model.EndSubmitTime).AddDays(1));
             if (model.JobStatus == JobStatus.Handled)
             {
-                query = query.Distinct().OrderByDescending((j, a, p) => new { a.ApproveTime, j.SubmitTime });
+                query = query.Distinct().OrderByDescending((j, a, p) => new { j.ApproveTime, j.SubmitTime });
             }
             else
             {
