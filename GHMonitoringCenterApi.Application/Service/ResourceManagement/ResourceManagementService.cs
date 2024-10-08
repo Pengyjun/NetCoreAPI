@@ -75,6 +75,7 @@ namespace GHMonitoringCenterApi.Application.Service.ResourceManagement
                    .LeftJoin<DealingUnit>((x, z) => x.DealingUnitsId == z.PomId)
                    .LeftJoin<DictionaryTable>((x, z, t) => x.DictionaryTableNameId == t.Id)
                    .LeftJoin<OwnerShip>((x, z, t, y) => x.ShipPingId == y.Id)
+                   .Where((x,z)=>z.ZBPSTATE=="02"|| z.ZBPSTATE == "03")
                    .Where(x => x.IsDelete == 1 && (x.Type == ConstructionOutPutType.SubPackage || x.Type == ConstructionOutPutType.SubOwner))
                     .WhereIF(!string.IsNullOrWhiteSpace(searchShipTabulationResponseDto.KeyWords), (x, z, t) => t.Name.Contains(searchShipTabulationResponseDto.KeyWords))
                    .Select((x, z, t, y) => new SearchShipTabulationRequestDto
@@ -115,7 +116,7 @@ namespace GHMonitoringCenterApi.Application.Service.ResourceManagement
                     shippingList.Add(a);
                 }
                 //往来单位数据
-                dealingUnit = await dbContext.Queryable<DealingUnit>().Where(x => x.IsDelete == 1)
+                dealingUnit = await dbContext.Queryable<DealingUnit>().Where(x => x.IsDelete == 1&&x.ZBPSTATE == "02" || x.ZBPSTATE == "03")
                     .WhereIF(!string.IsNullOrWhiteSpace(searchShipTabulationResponseDto.KeyWords), x => x.ZBPNAME_ZH.Contains(searchShipTabulationResponseDto.KeyWords))
                     .Select(x => new SearchShipTabulationRequestDto { Id = x.PomId.Value, Name = x.ZBPNAME_ZH, TypeName = "往来单位", RequestType = false })
                     .ToListAsync();

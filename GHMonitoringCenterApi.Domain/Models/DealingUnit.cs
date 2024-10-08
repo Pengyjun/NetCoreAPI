@@ -68,5 +68,11 @@ namespace GHMonitoringCenterApi.Domain.Models
         /// </summary>
         [SugarColumn(ColumnDataType ="text")]
         public string? Remark { get; set; }
+
+        /// <summary>
+        /// 往来单位类别
+        /// </summary>
+        [SugarColumn(Length = 20)]
+        public string? ZBPTYPE { get; set; }
     }
 }
