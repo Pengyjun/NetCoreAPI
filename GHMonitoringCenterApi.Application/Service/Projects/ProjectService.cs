@@ -3396,5 +3396,47 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             baseProjects.InsertOrUpdateAsync(projes);
             return true;
         }
+        /// <summary>
+        /// 删除wbs   校验 是否填写过 月报
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        public async Task<ResponseAjaxResult<bool>> DeleteProjectWBSTreeValidatableAsync(DeleteProjectWBSValidatableDto requestDto)
+        {
+            ResponseAjaxResult<bool> responseAjaxResult = new();
+
+            if (requestDto.Ids != null && requestDto.Ids.Any())
+            {
+                if (!string.IsNullOrWhiteSpace(requestDto.ProjectId))
+                {
+                    var pId = requestDto.ProjectId.ToGuid();
+
+                    //查询月报
+                    var mRep = await dbContext.Queryable<MonthReportDetail>()
+                        .Where(x => x.IsDelete == 1 && x.ProjectId == pId && requestDto.Ids.Contains(x.ProjectWBSId.ToString()))
+                        .ToListAsync();
+
+                    if (mRep != null && mRep.Any())
+                    {
+                        //存在月报 不允许删除
+                        //查询wbs树
+                        var pwbsTree = await dbContext.Queryable<ProjectWBS>()
+                            .Where(x => x.IsDelete == 1 && x.ProjectId == requestDto.ProjectId && mRep.Select(m => m.ProjectWBSId).Distinct().Contains(x.Id))
+                            .ToListAsync();
+
+                        string msg = string.Empty;
+                        foreach (var item in pwbsTree)
+                        {
+                            msg += item.Name + "</br>";
+                        }
+                        responseAjaxResult.FailResult(HttpStatusCode.DeleteFail, "wbs：</br>" + msg + "</br>曾经填过月报，不可删除！！！");
+                        return responseAjaxResult;
+                    }
+                }
+            }
+
+            responseAjaxResult.SuccessResult(true);
+            return responseAjaxResult;
+        }
     }
 }

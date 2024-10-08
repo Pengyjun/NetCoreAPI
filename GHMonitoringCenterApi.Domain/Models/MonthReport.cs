@@ -8,7 +8,6 @@ namespace GHMonitoringCenterApi.Domain.Models
     /// 项目月报表
     /// </summary>
     [SugarTable("t_monthreport", IsDisabledDelete = true)]
-    //[SugarIndex("INDEX_UQMR_KEY", nameof(ProjectId), OrderByType.Asc, nameof(DateMonth), OrderByType.Asc, true)]
     public class MonthReport : BaseEntity<Guid>
     {
         /// <summary>
