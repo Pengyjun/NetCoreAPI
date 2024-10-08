@@ -553,7 +553,9 @@ namespace GHMonitoringCenterApi.Application.Service.Timing
                                 ZBPSTATE = item.ZBPSTATE,
                                 ZIDNO = item.ZIDNO,
                                 ZUSCC = item.ZUSCC,
-                                CreateTime = DateTime.Now
+                                CreateTime = DateTime.Now,
+                                ZBPTYPE= item.Fzbpkinds,
+                                
                             });
                         }
                     }
@@ -2310,7 +2312,8 @@ namespace GHMonitoringCenterApi.Application.Service.Timing
                         ZBPSTATE = item.ZBPSTATE,
                         ZIDNO = item.ZIDNO,
                         ZUSCC = item.ZUSCC,
-                        CreateTime = DateTime.Now
+                        CreateTime = DateTime.Now,
+                        ZBPTYPE = item.ZBPTYPE,
                     });
                 }
                 // var flag= await dbContext.Insertable<DealingUnit>(dealingUnits).ExecuteCommandAsync();

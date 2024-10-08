@@ -75,7 +75,7 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Timing
         /// 往来单位类型
         /// </summary>
 
-        public string? ZBPTYPE { get; set; }
+        public string? Fzbpkinds { get; set; }
 
     }
 }
