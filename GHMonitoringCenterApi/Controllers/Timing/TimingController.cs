@@ -121,5 +121,15 @@ namespace GHMonitoringCenterApi.Controllers.Timing
         {
             return await timeService.SynchronizationDealUnitsync();
         }
+
+        /// <summary>
+        /// 定时同步往来单位2
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("SynchronizationDealUnitNew")]
+        public async Task<string> SynchronizationDealUnitNewAsync()
+        {
+            return await timeService.SynchronizationDealUnitNewsync();
+        }
     }
 }
