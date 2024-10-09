@@ -6597,7 +6597,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     CompanyName = companyList.FirstOrDefault(x => x.ItemId == item.CompanyId)?.Name ?? "",
                     DeptName = institutionList.FirstOrDefault(t => t.PomId == item.ProjectDept)?.Name ?? "",
                     CompanySort = companyList.FirstOrDefault(x => x.ItemId == item.CompanyId)?.Sort,
-                    ProjectName = item.Name,
+                    ProjectName = item.Name ?? "",
                     OwnOutPutValue = ownOutPutValue / 10000,
                     State = state,
                     OwnProduction = ownProduction / 10000,
