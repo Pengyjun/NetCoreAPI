@@ -6516,7 +6516,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
 
             //历史 项目开累产值
             var historyList = await _dbContext.Queryable<MonthReport>()
-                .Where(t => t.IsDelete == 1 && t.DateMonth == 202306)
+                .Where(t => t.IsDelete == 1 && (t.DateMonth == 202306 || t.DateMonth == nowMonth))
                 .ToListAsync();
 
             //项目产值产量处理
@@ -6576,8 +6576,14 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
 
                 //开累产值
                 var hiss = 0M;
-                var his = historyList.FirstOrDefault(x => x.ProjectId == item.Id)?.CompleteProductionAmount ?? hiss;
+                var his = historyList.FirstOrDefault(x => x.DateMonth == 202306 && x.ProjectId == item.Id)?.CompleteProductionAmount ?? hiss;
                 var totalOutPutValue = mRepList.Where(x => x.ProjectId == item.Id).Sum(x => x.UnitPrice * x.CompletedQuantity * hv) + hiss;
+
+                var state = "";
+                if (historyList.Where(t => t.DateMonth == nowMonth && t.ProjectId == item.Id && t.Status != MonthReportStatus.Finish).Any())
+                {
+                    state = "审批中";
+                }
 
                 //若本年自行产量和本年分包产量和本年外包支出都为空 则跳过不展示
                 if (yearOwnOutPutValue == 0 && yearSubDiffValue == 0 && yearSubExpenditure == 0)
@@ -6593,6 +6599,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     CompanySort = companyList.FirstOrDefault(x => x.ItemId == item.CompanyId)?.Sort,
                     ProjectName = item.Name,
                     OwnOutPutValue = ownOutPutValue / 10000,
+                    State = state,
                     OwnProduction = ownProduction / 10000,
                     SubDiffValue = subDiffValue / 10000,
                     SubExpenditure = subExpenditure / 10000,
@@ -6724,13 +6731,18 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 .Where(t => t.IsDelete == 1)
                 .ToListAsync();
 
+            //项目月报
+            var mRepList = await _dbContext.Queryable<MonthReport>()
+               .Where(t => t.IsDelete == 1 && t.DateMonth == nowMonth)
+               .ToListAsync();
+
             foreach (var item in gShips)
             {
                 //var thisSumHistoryShipReport = juneShipList.FirstOrDefault(x => x.ShipId == item.Key.ShipId && x.ProjectId == item.Key.ProjectId.ToString());
 
                 //重点船舶
                 var ship = ownShipsList.FirstOrDefault(x => x.PomId == item.Key.ShipId)?.TypeId;
-                var shipType = sortOptions.FirstOrDefault(x => x.Type == 2 && x.ItemId == ship)?.Name ?? shipping.FirstOrDefault(x => x.PomId == ship)?.Name;
+                var shipType = sortOptions.FirstOrDefault(x => x.Type == 2 && x.ItemId == ship)?.Name ?? shipping.FirstOrDefault(x => x.PomId == ship)?.Name ?? "";
 
                 //船舶名称
                 var shipName = ownShipsList.FirstOrDefault(x => x.PomId == item.Key.ShipId)?.Name ?? "";
@@ -6770,6 +6782,12 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 //产量*10000除运转时间 年累计 暂时不知道列名叫什么
                 var myPropertyRate2 = yearWorkingHours == 0 ? 0 : yearProductionValue / yearWorkingHours * 10000;
 
+                var state = "";
+                if (mRepList.Where(t => t.ProjectId == item.Key.ProjectId && t.Status != MonthReportStatus.Finish).Any())
+                {
+                    state = "审批中";
+                }
+
                 //重点类型排序字段
                 var shipTypeSort = sortOptions.FirstOrDefault(x => x.Type == 2 && x.ItemId == ship)?.Sort ?? 1000;
 
@@ -6786,6 +6804,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     ProductionValue = productionValue,
                     ProjectName = projectName,
                     ShipSort = shipSort,
+                    State = state,
                     ShipType = shipType,
                     ShipTypeSort = shipTypeSort,
                     WorkingHours = workingHours,
