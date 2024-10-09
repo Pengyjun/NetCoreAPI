@@ -119,7 +119,6 @@ namespace GDCMasterDataReceiveApi.Filters
                 var   responseResult = await webHelper.DoPostAsync<string>(systemInterfaceFiledRuleApi, parames);
                 setupResult = responseResult.Result;
                 context.Result =new JsonResult(responseResult.Result);
-                IsEncrypt = 2;
             }
 
             #endregion
@@ -127,6 +126,7 @@ namespace GDCMasterDataReceiveApi.Filters
             #region 过滤接口加密设置
             if (cacheResult != null && cacheResult.IsEncrypt == 1)
             {
+                IsEncrypt = 1;//加密
                 //接口返回值
                 //var returnRes = ((Microsoft.AspNetCore.Mvc.ObjectResult)context.Result).Value;
                 if (setupResult!=null)
@@ -148,9 +148,13 @@ namespace GDCMasterDataReceiveApi.Filters
 
                 }
             }
-            else
+            else  if(cacheResult != null && cacheResult.IsEncrypt == 0)//不加密  且返回的是json字符串
             {
-                IsEncrypt = 0;
+                IsEncrypt = 2;
+            }
+            else if (cacheResult == null) //不加密  返回json对象
+            {
+                IsEncrypt = 3;
             }
             #endregion
 
@@ -195,7 +199,7 @@ namespace GDCMasterDataReceiveApi.Filters
                             {
                                 ApplicationName = recordRequestInfo.ApplicationName,
                                 BrowserInfo = recordRequestInfo.BrowserInfo.Browser,
-                                ClientIpAddress = recordRequestInfo.ClientIpAddress,
+                                ClientIpAddress = Utils.GetIP(),
                                 Exceptions = recordRequestInfo.Exceptions.ExceptionInfo,
                                 ExecutionDuration = recordRequestInfo.ExecutionDuration,
                                 HttpMethod = recordRequestInfo.HttpMethod,
@@ -323,7 +327,7 @@ namespace GDCMasterDataReceiveApi.Filters
                         {
                             ApplicationName = recordRequestInfo.ApplicationName,
                             BrowserInfo = recordRequestInfo.BrowserInfo.Browser,
-                            ClientIpAddress = recordRequestInfo.ClientIpAddress,
+                            ClientIpAddress = Utils.GetIP(),
                             Exceptions = message + Environment.NewLine + exception,
                             ExecutionDuration = recordRequestInfo.ExecutionDuration,
                             HttpMethod = recordRequestInfo.HttpMethod,

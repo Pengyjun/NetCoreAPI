@@ -299,6 +299,7 @@ namespace GHElectronicFileApi.AopInterceptor
                 var res = (Task)invocation.ReturnValue;
                 res.Wait();//如果任务有异常 直接报错
 
+
                 #region 异步通知主数据  
                 RecordRequestInfo recordRequestInfo = new RecordRequestInfo();
                 var redis = RedisUtil.Instance;
@@ -392,9 +393,12 @@ namespace GHElectronicFileApi.AopInterceptor
                         resultRequest.AddHeader("Content-Type", "application/xml");
                         resultRequest.AddParameter("application/xml", requestBody, ParameterType.RequestBody);
                         // var apiResponse = await client.ExecuteAsync(resultRequest);
-                          await client.ExecuteAsync(resultRequest);
-                       // await Console.Out.WriteLineAsync($"返回结果1:{apiResponse.ResponseStatus.ToJson()}");
-                        //await Console.Out.WriteLineAsync($"返回结果2:{apiResponse.Content.ToJson()}");
+                        await Console.Out.WriteLineAsync($"异步接口请求时间：{requestBody}");
+                        var apiResponse = await client.ExecuteAsync(resultRequest);
+                        await Console.Out.WriteLineAsync($"返回结果0:{apiResponse.ToJson()}");
+                        await Console.Out.WriteLineAsync($"返回结果0:{apiResponse.ErrorException}");
+                        await Console.Out.WriteLineAsync($"返回结果1:{apiResponse.ResponseStatus.ToJson()}");
+                        await Console.Out.WriteLineAsync($"返回结果2:{apiResponse.Content.ToJson()}");
                     }
                     #endregion
                 }

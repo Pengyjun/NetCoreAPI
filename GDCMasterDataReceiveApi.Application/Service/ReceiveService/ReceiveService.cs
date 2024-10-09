@@ -37,6 +37,7 @@ using GDCMasterDataReceiveApi.Domain.Shared;
 using GDCMasterDataReceiveApi.Domain.Shared.Utils;
 using Microsoft.Extensions.Logging;
 using SqlSugar;
+using UtilsSharp;
 
 namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
 {
@@ -71,6 +72,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
         public async Task<MDMResponseResult> CommonDataAsync(BaseReceiveDataRequestDto<ValueDomainReceiveRequestDto> baseReceiveDataRequestDto)
         {
             var responseAjaxResult = new MDMResponseResult();
+         
             //处理多语言描述表类型
             List<ValueDomainLanguage> insertzMDGS_OLDNAMEs = new();
             List<ValueDomainLanguage> updatezMDGS_OLDNAMEs = new();
@@ -2489,6 +2491,24 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
                 throw;
             }
             return responseAjaxResult;
+        }
+
+        /// <summary>
+        /// 测试数据库查询性能
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        public async Task<string> TestAsync(BaseReceiveDataRequestDto<ValueDomainReceiveRequestDto> baseReceiveDataRequestDto)
+        {
+            await Console.Out.WriteLineAsync(DateTime.Now.ToString());
+            var dataCodeList = await _dbContext.Queryable<ValueDomain>().Where(x => x.IsDelete == 1).ToListAsync();
+            await Console.Out.WriteLineAsync(DateTime.Now.ToString());
+            var a=  await _dbContext.Updateable(dataCodeList).ExecuteCommandAsync();
+            await Console.Out.WriteLineAsync(DateTime.Now.ToString());
+            //return dataCodeList.ToJson();
+            await Console.Out.WriteLineAsync(a.ToString());
+            await Console.Out.WriteLineAsync(DateTime.Now.ToString());
+            return dataCodeList.ToJson(true);
         }
     }
 }

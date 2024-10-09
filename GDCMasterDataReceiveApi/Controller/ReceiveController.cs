@@ -362,5 +362,15 @@ namespace GDCMasterDataReceiveApi.Controller
             return await _receiveService.InstitutionDataAsync(receiveInstitutionRequestDto);
         }
         #endregion
+
+
+        #region 测试数据库查询
+        [HttpPost("/api/mdm/Receive/TestDb")]
+        [UnitOfWork]
+        public async Task<string> TestDb(BaseReceiveDataRequestDto<ValueDomainReceiveRequestDto> baseReceiveDataRequestDto) { 
+        
+           return await _receiveService.TestAsync(baseReceiveDataRequestDto);
+        }
+        #endregion
     }
 }

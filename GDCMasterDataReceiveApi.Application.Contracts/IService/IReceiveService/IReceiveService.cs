@@ -193,5 +193,8 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.IService.IReceiveService
         /// <returns></returns>
         Task<MDMResponseResult> InstitutionDataAsync(ReceiveInstitutionRequestDto receiveInstitutionRequestDto);
         #endregion
+
+
+        Task<string> TestAsync(BaseReceiveDataRequestDto<ValueDomainReceiveRequestDto> baseReceiveDataRequestDto);
     }
 }

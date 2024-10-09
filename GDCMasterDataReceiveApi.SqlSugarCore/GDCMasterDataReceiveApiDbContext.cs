@@ -18,13 +18,13 @@ namespace GDCMasterDataReceiveApi.SqlSugarCore
         public static void AddSqlSugarContext(this IServiceCollection services, IConfiguration configuration, string dbCon)
         {
             //是否打开无参数化sql监视
-            var gdcmasterdatareceiveapi = "Server=10.10.54.3;PORT=8011; User Id=GDCMDM; PWD=GDCMDMdb123;DATABASE=HNKC_MDM";
+           // var gdcmasterdatareceiveapi = "Server=10.10.54.3;PORT=8011; User Id=GDCMDM; PWD=GDCMDMdb123;DATABASE=HNKC_MDM";
            // var gdcdatasecurityapi = "Server=10.10.74.3;PORT=5088; User Id=DATASECURITY; PWD=datasecurity@sql; DATABASE=DATASECURITY";
 
             bool isOpenSql = false;
             SqlSugarClient sqlSugarClient = new SqlSugarClient(new List<ConnectionConfig>()
             {
-                new ConnectionConfig(){ConfigId="gdcmasterdatareceiveapi",ConnectionString = gdcmasterdatareceiveapi, DbType = DbType.Dm,IsAutoCloseConnection = true},
+                new ConnectionConfig(){ConfigId="gdcmasterdatareceiveapi",ConnectionString = dbCon, DbType = DbType.Dm,IsAutoCloseConnection = true},
                 //new ConnectionConfig(){ConfigId="gdcdatasecurityapi",ConnectionString = gdcdatasecurityapi,DbType = DbType.Dm,IsAutoCloseConnection = true}
             }, db =>
             {
@@ -104,32 +104,32 @@ namespace GDCMasterDataReceiveApi.SqlSugarCore
                                 var token = httpContent.Request.Headers["Authorization"];
                                 token = token.ToString().Replace("Bearer", "").Trim();
                                 #region 获取当前用户信息
-                                var tokenUrl = AppsettingsHelper.GetValue("ParseTokenUrl") + token;
-                                WebHelper webHelper = new WebHelper();
-                                var tokenResult = webHelper.DoGetAsync(tokenUrl).GetAwaiter().GetResult();
-                                var account = string.Empty;
-                                if (tokenResult.Code == 200)
-                                {
-                                    var code = JObject.Parse(tokenResult.Result);
-                                    account = ((Newtonsoft.Json.Linq.JValue)code["account"]).Value.ToString();
-                                }
+                                //var tokenUrl = AppsettingsHelper.GetValue("ParseTokenUrl") + token;
+                                //WebHelper webHelper = new WebHelper();
+                                //var tokenResult = webHelper.DoGetAsync(tokenUrl).GetAwaiter().GetResult();
+                                //var account = string.Empty;
+                                //if (tokenResult.Code == 200)
+                                //{
+                                //    var code = JObject.Parse(tokenResult.Result);
+                                //    account = ((Newtonsoft.Json.Linq.JValue)code["account"]).Value.ToString();
+                                //}
                                 #endregion
-                                var redis = RedisUtil.Instance;
+                                //var redis = RedisUtil.Instance;
 
-                                bool existKey = redis.Exists(account);
-                                if (existKey)
-                                {
+                                //bool existKey = redis.Exists(account);
+                                //if (existKey)
+                                //{
 
-                                    var userValue = redis.Get(account);
-                                    if (!string.IsNullOrWhiteSpace(userValue))
-                                    {
-                                        var userInfo = JsonConvert.DeserializeObject<GlobalCurrentUser>(userValue);
-                                        if (userInfo != null)
-                                        {
-                                            entityInfo.SetValue(userInfo.Id);
-                                        }
-                                    }
-                                }
+                                //    var userValue = redis.Get(account);
+                                //    if (!string.IsNullOrWhiteSpace(userValue))
+                                //    {
+                                //        var userInfo = JsonConvert.DeserializeObject<GlobalCurrentUser>(userValue);
+                                //        if (userInfo != null)
+                                //        {
+                                //            entityInfo.SetValue(userInfo.Id);
+                                //        }
+                                //    }
+                                //}
                             }
 
                         }
@@ -160,32 +160,32 @@ namespace GDCMasterDataReceiveApi.SqlSugarCore
                                 var token = httpContent.Request.Headers["Authorization"];
                                 token = token.ToString().Replace("Bearer", "").Trim();
                                 #region 获取当前用户信息
-                                var tokenUrl = AppsettingsHelper.GetValue("ParseTokenUrl") + token;
-                                WebHelper webHelper = new WebHelper();
-                                var tokenResult = webHelper.DoGetAsync(tokenUrl).GetAwaiter().GetResult();
-                                var account = string.Empty;
-                                if (tokenResult.Code == 200)
-                                {
-                                    var code = JObject.Parse(tokenResult.Result);
-                                    account = ((Newtonsoft.Json.Linq.JValue)code["account"]).Value.ToString();
-                                }
+                                //var tokenUrl = AppsettingsHelper.GetValue("ParseTokenUrl") + token;
+                                //WebHelper webHelper = new WebHelper();
+                                //var tokenResult = webHelper.DoGetAsync(tokenUrl).GetAwaiter().GetResult();
+                                //var account = string.Empty;
+                                //if (tokenResult.Code == 200)
+                                //{
+                                //    var code = JObject.Parse(tokenResult.Result);
+                                //    account = ((Newtonsoft.Json.Linq.JValue)code["account"]).Value.ToString();
+                                //}
                                 #endregion
-                                var redis = RedisUtil.Instance;
+                                //var redis = RedisUtil.Instance;
 
-                                bool existKey = redis.Exists(account);
-                                if (existKey)
-                                {
+                                //bool existKey = redis.Exists(account);
+                                //if (existKey)
+                                //{
 
-                                    var userValue = redis.Get(account);
-                                    if (!string.IsNullOrWhiteSpace(userValue))
-                                    {
-                                        var userInfo = JsonConvert.DeserializeObject<GlobalCurrentUser>(userValue);
-                                        if (userInfo != null)
-                                        {
-                                            entityInfo.SetValue(userInfo.Id);
-                                        }
-                                    }
-                                }
+                                //    var userValue = redis.Get(account);
+                                //    if (!string.IsNullOrWhiteSpace(userValue))
+                                //    {
+                                //        var userInfo = JsonConvert.DeserializeObject<GlobalCurrentUser>(userValue);
+                                //        if (userInfo != null)
+                                //        {
+                                //            entityInfo.SetValue(userInfo.Id);
+                                //        }
+                                //    }
+                                //}
                             }
                         }
                         if (isDelete == 0 && entityInfo.PropertyName == "DeleteTime")
@@ -200,33 +200,33 @@ namespace GDCMasterDataReceiveApi.SqlSugarCore
                                 var token = httpContent.Request.Headers["Authorization"];
                                 token = token.ToString().Replace("Bearer", "").Trim();
                                 #region 获取当前用户信息
-                                var tokenUrl = AppsettingsHelper.GetValue("ParseTokenUrl") + token;
-                                WebHelper webHelper = new WebHelper();
-                                var tokenResult = webHelper.DoGetAsync(tokenUrl).GetAwaiter().GetResult();
-                                var account = string.Empty;
-                                if (tokenResult.Code == 200)
-                                {
-                                    var code = JObject.Parse(tokenResult.Result);
-                                    account = ((Newtonsoft.Json.Linq.JValue)code["account"]).Value.ToString();
-                                }
+                                //var tokenUrl = AppsettingsHelper.GetValue("ParseTokenUrl") + token;
+                                //WebHelper webHelper = new WebHelper();
+                                //var tokenResult = webHelper.DoGetAsync(tokenUrl).GetAwaiter().GetResult();
+                                //var account = string.Empty;
+                                //if (tokenResult.Code == 200)
+                                //{
+                                //    var code = JObject.Parse(tokenResult.Result);
+                                //    account = ((Newtonsoft.Json.Linq.JValue)code["account"]).Value.ToString();
+                                //}
                                 #endregion
-                                var redis = RedisUtil.Instance;
+                                //var redis = RedisUtil.Instance;
 
-                                bool existKey = redis.Exists(account);
-                                if (existKey)
-                                {
+                                //bool existKey = redis.Exists(account);
+                                //if (existKey)
+                                //{
 
-                                    var userValue = redis.Get(account);
-                                    //Console.WriteLine("2222:" + userValue);
-                                    if (!string.IsNullOrWhiteSpace(userValue))
-                                    {
-                                        var userInfo = JsonConvert.DeserializeObject<GlobalCurrentUser>(userValue);
-                                        if (userInfo != null)
-                                        {
-                                            entityInfo.SetValue(userInfo.Id);
-                                        }
-                                    }
-                                }
+                                //    var userValue = redis.Get(account);
+                                //    //Console.WriteLine("2222:" + userValue);
+                                //    if (!string.IsNullOrWhiteSpace(userValue))
+                                //    {
+                                //        var userInfo = JsonConvert.DeserializeObject<GlobalCurrentUser>(userValue);
+                                //        if (userInfo != null)
+                                //        {
+                                //            entityInfo.SetValue(userInfo.Id);
+                                //        }
+                                //    }
+                                //}
                             }
                         }
 
