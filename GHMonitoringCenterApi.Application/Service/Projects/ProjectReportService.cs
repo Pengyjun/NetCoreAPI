@@ -6594,8 +6594,8 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 var outPutInfo = new OutPutInfo
                 {
                     CompanyId = item.CompanyId,
-                    CompanyName = companyList.FirstOrDefault(x => x.ItemId == item.CompanyId)?.Name,
-                    DeptName = institutionList.FirstOrDefault(t => t.PomId == item.ProjectDept)?.Name,
+                    CompanyName = companyList.FirstOrDefault(x => x.ItemId == item.CompanyId)?.Name ?? "",
+                    DeptName = institutionList.FirstOrDefault(t => t.PomId == item.ProjectDept)?.Name ?? "",
                     CompanySort = companyList.FirstOrDefault(x => x.ItemId == item.CompanyId)?.Sort,
                     ProjectName = item.Name,
                     OwnOutPutValue = ownOutPutValue / 10000,
