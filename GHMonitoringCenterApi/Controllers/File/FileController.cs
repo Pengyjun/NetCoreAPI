@@ -679,9 +679,9 @@ namespace GHMonitoringCenterApi.Controllers.File
             };
             await logService.WriteLogAsync(logObj);
             #endregion
-            ////模板位置
+            //模板位置
             //var templatePath = $"Template/Excel/ProjectMonthOutPutTemplate.xlsx";
-            //var templatePath = "D:\SZGH\wom.api\GHMonitoringCenterApi.Domain.Shared\Template\Excel\ProjectMonthOutPutTemplate.xlsx";
+            //var templatePath = $@"E:\project\HNKC.SZGHAPI\szgh\ghmonitoringcenterapi\GHMonitoringCenterApi.Domain.Shared\Template\Excel\ProjectMonthOutPutTemplate.xlsx";
             ////获取数据
             //var data = await projectReportService.SearchProjectOutPutExcelAsync(putExcelRequestDto);
             //var importData = new
@@ -695,7 +695,6 @@ namespace GHMonitoringCenterApi.Controllers.File
             var bytes = await projectReportService.SearchProjectOutPutNpoiExcelAsync(putExcelRequestDto);
             HttpContext.Response.Headers.Add("Content-Disposition", $"attachment;filename={HttpUtility.UrlEncode($"产值产报汇总.xlsx", System.Text.Encoding.UTF8)}");
             return new FileStreamResult(new MemoryStream(bytes), Domain.Shared.Const.ContentType.APPLICATIONSTREAM);
-            //return File(new MemoryStream(bytes), FileType.ExcelExport_ContentType, "产值产报汇总.xlsx");
         }
         #endregion
 
