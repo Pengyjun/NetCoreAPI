@@ -6714,9 +6714,9 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
         {
             List<KeynoteShipInfo> keynoteList = new();
 
-            //取已填月报船舶月报
+            //取已填月报船舶月报   只要当年
             var mRepShipsList = await _dbContext.Queryable<OwnerShipMonthReport>()
-                .Where(t => t.IsDelete == 1 && t.DateMonth <= nowMonth)
+                .Where(t => t.IsDelete == 1 && t.DateMonth >= startMonth && t.DateMonth <= nowMonth)
                 .ToListAsync();
 
             //取所有自有船舶
@@ -6805,6 +6805,8 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
 
                 //船舶排序字段
                 var shipSort = sortOptions.FirstOrDefault(x => x.Type == 3 && x.ItemId == ship)?.Sort ?? 1000;
+
+                if (productionValue == 0 && outputValue == 0 && onSiteDays == 0 && workingHours == 0 && myPropertyRate1 == 0 && yearProductionValue == 0 && yearOutputValue == 0 && yearOnSiteDays == 0 && yearWorkingHours == 0 && myPropertyRate2 == 0) { continue; }//整行数据是0  过滤不要
 
                 keynoteList.Add(new KeynoteShipInfo
                 {
