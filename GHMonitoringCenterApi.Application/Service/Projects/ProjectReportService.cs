@@ -6516,7 +6516,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
 
             //历史 项目开累产值
             var historyList = await _dbContext.Queryable<MonthReport>()
-                .Where(t => t.IsDelete == 1 && t.DateMonth == 202306)
+                .Where(t => t.IsDelete == 1 && (t.DateMonth == 202306 || t.DateMonth == nowMonth))
                 .ToListAsync();
 
             //项目产值产量处理
@@ -6576,8 +6576,14 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
 
                 //开累产值
                 var hiss = 0M;
-                var his = historyList.FirstOrDefault(x => x.ProjectId == item.Id)?.CompleteProductionAmount ?? hiss;
-                var totalOutPutValue = mRepList.Where(x => x.ProjectId == item.Id).Sum(x => x.UnitPrice * x.CompletedQuantity * hv) + hiss;
+                var his = historyList.FirstOrDefault(x => x.DateMonth == 202306 && x.ProjectId == item.Id)?.CompleteProductionAmount ?? hiss;
+                var totalOutPutValue = mRepList.Where(x => x.ProjectId == item.Id).Sum(x => x.UnitPrice * x.CompletedQuantity * hv) + his;
+
+                var state = "";
+                if (historyList.Where(t => t.DateMonth == nowMonth && t.ProjectId == item.Id && t.Status != MonthReportStatus.Finish).Any())
+                {
+                    state = "审批中";
+                }
 
                 //若本年自行产量和本年分包产量和本年外包支出都为空 则跳过不展示
                 if (yearOwnOutPutValue == 0 && yearSubDiffValue == 0 && yearSubExpenditure == 0)
@@ -6588,11 +6594,12 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 var outPutInfo = new OutPutInfo
                 {
                     CompanyId = item.CompanyId,
-                    CompanyName = companyList.FirstOrDefault(x => x.ItemId == item.CompanyId)?.Name,
-                    DeptName = institutionList.FirstOrDefault(t => t.PomId == item.ProjectDept)?.Name,
+                    CompanyName = companyList.FirstOrDefault(x => x.ItemId == item.CompanyId)?.Name ?? "",
+                    DeptName = institutionList.FirstOrDefault(t => t.PomId == item.ProjectDept)?.Name ?? "",
                     CompanySort = companyList.FirstOrDefault(x => x.ItemId == item.CompanyId)?.Sort,
-                    ProjectName = item.Name,
+                    ProjectName = item.Name ?? "",
                     OwnOutPutValue = ownOutPutValue / 10000,
+                    State = state,
                     OwnProduction = ownProduction / 10000,
                     SubDiffValue = subDiffValue / 10000,
                     SubExpenditure = subExpenditure / 10000,
@@ -6672,9 +6679,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 AllList.AddRange(ComList);
             }
 
-            var ownShipList = await _dbOwnerShipMonthReport.AsQueryable().Where(x => x.IsDelete == 1).ToListAsync();
-            var ownList = await _dbOwnerShip.AsQueryable().Where(x => x.IsDelete == 1).ToListAsync();
-            var keyNoteList = await SearchKeynoteShipExcelAsync(putExcelRequestDto, ownShipList, pjectInfos, ownList);
+            var keyNoteList = await SearchKeynoteShipExcelAsync(putExcelRequestDto, startMonth, endMonth, nowMonth);
 
             putValueExcelResponseDto.TimeValue = nowMonth.ToString().Substring(0, 4) + "年" + Convert.ToInt32(nowMonth.ToString().Substring(4, 2)) + "月";
             putValueExcelResponseDto.sumOutPutInfos = sumOutPutInfos;
@@ -6689,142 +6694,133 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
         /// 重点船舶产值产量
         /// </summary>
         /// <param name="putExcelRequestDto"></param>
-        /// <param name="ownerShips"></param>
-        /// <param name="projects"></param>
-        /// <param name="ships"></param>
+        /// <param name="startMonth"></param>
+        /// <param name="endMonth"></param>
+        /// <param name="nowMonth"></param>
         /// <returns></returns>
-        public async Task<List<KeynoteShipInfo>> SearchKeynoteShipExcelAsync(ProjectOutPutExcelRequestDto putExcelRequestDto, List<OwnerShipMonthReport> ownerShips, List<Project> projects, List<OwnerShip> ships)
+        public async Task<List<KeynoteShipInfo>> SearchKeynoteShipExcelAsync(ProjectOutPutExcelRequestDto putExcelRequestDto, int startMonth, int endMonth, int nowMonth)
         {
-            List<KeynoteShipInfo> keynoteList = new List<KeynoteShipInfo>();
+            List<KeynoteShipInfo> keynoteList = new();
 
+            //取已填月报船舶月报
+            var mRepShipsList = await _dbContext.Queryable<OwnerShipMonthReport>()
+                .Where(t => t.IsDelete == 1 && t.DateMonth <= nowMonth)
+                .ToListAsync();
 
+            //取所有自有船舶
+            var oShipIds = mRepShipsList.Select(x => x.ShipId).Distinct().ToList();
+            var ownShipsList = await _dbContext.Queryable<OwnerShip>()
+                .Where(t => t.IsDelete == 1 && oShipIds.Contains(t.PomId))
+                .ToListAsync();
 
-            #region 原来的
-            //获取月份时间段
-            Utils.GetDatePeriod(putExcelRequestDto.SearchTime, Convert.ToInt32(TimeType.lastMonth), out DateTime startTime, out DateTime endTime);
-            //获取所有自有船舶月报
-            var ownerShipMonthReportList = await _dbContext.Queryable<OwnerShipMonthReport>().ToListAsync();
-            var ownShipDay = await _dbContext.Queryable<ShipDayReport>().Where(x => x.DateDay >= startTime.ToDateDay() && x.DateDay <= endTime.ToDateDay()).ToListAsync();
-            var shipMovementList = await _dbContext.Queryable<ShipMovement>().ToListAsync();
+            //所有项目
+            var pIds = mRepShipsList.Select(x => x.ProjectId).Distinct().ToList();
+            var projects = await _dbContext.Queryable<Project>()
+                .Where(t => t.IsDelete == 1 && pIds.Contains(t.Id))
+                .ToListAsync();
 
-            #region 新逻辑
-            //新逻辑
-            var primaryIds = ownShipDay.Where(t => t.ProjectId == Guid.Empty).Select(t => new { id = t.Id, shipId = t.ShipId, DateDay = t.DateDay, ProjectId = t.ProjectId }).ToList();
-            foreach (var item in primaryIds)
-            {
-                var isExistProject = shipMovementList.Where(x => x.IsDelete == 1 && x.ShipId == item.shipId && x.EnterTime.HasValue == true && (x.EnterTime.Value.ToDateDay() <= item.DateDay || x.QuitTime.HasValue == true && x.QuitTime.Value.ToDateDay() >= item.DateDay)).OrderByDescending(x => x.EnterTime).ToList();
-                foreach (var project in isExistProject)
-                {
-
-                    if (project.QuitTime.HasValue && project.QuitTime.Value.ToDateDay() >= item.DateDay)
-                    {
-
-                        var oldValue = ownShipDay.Where(t => t.ShipId == project.ShipId && t.DateDay == item.DateDay).FirstOrDefault();
-                        if (oldValue != null)
-                        {
-                            oldValue.ProjectId = project.ProjectId;
-                        }
-                    }
-                    if (project.EnterTime.HasValue && project.QuitTime.HasValue == false && project.EnterTime.Value.ToDateDay() <= item.DateDay)
-                    {
-                        var oldValue = ownShipDay.Where(t => t.ShipId == project.ShipId && t.DateDay == item.DateDay).FirstOrDefault();
-                        if (oldValue != null)
-                        {
-                            oldValue.ProjectId = project.ProjectId;
-                        }
-                    }
-                    if (project.EnterTime.HasValue && project.QuitTime.HasValue && project.QuitTime.Value.ToDateDay() >= item.DateDay)
-                    {
-
-                        var oldValue = ownShipDay.Where(t => t.ShipId == project.ShipId && t.DateDay == item.DateDay).FirstOrDefault();
-                        if (oldValue != null)
-                        {
-                            oldValue.ProjectId = project.ProjectId;
-                        }
-                    }
-                }
-
-            }
-
-            #endregion
-            var ownerMonthList = ownerShips.Where(x => x.DateMonth == endTime.ToDateMonth()).OrderBy(x => x.ShipId).ToList();
-            var projectIds = ownerMonthList.Select(x => x.ProjectId).ToList();
-            var shipIds = ownerMonthList.Select(x => x.ShipId).ToList();
-
-            // 获取排序配置
-            var selTypes = new int?[] { 2, 3 };
-            var sortOptions = await _dbContext.Queryable<ProductionMonitoringOperationDayReport>().Where(t => selTypes.Contains(t.Type) && t.IsDelete == 1).ToListAsync();
-            // 历史船舶数据
-            var sumHistoryShipReports = await SumHistoryPojectShipReportAsync(endTime.Year);
-            //获取项目信息
-            var projectList = projects.Where(x => x.IsDelete == 1 && projectIds.Contains(x.Id)).ToList();
-            //获取船舶信息
-            var shipList = ships.Where(x => x.IsDelete == 1 && shipIds.Contains(x.PomId)).ToList();
-            //获取本月的月报数据 
-            var monthList = await _dbMonthReport.AsQueryable().Where(t => t.IsDelete == 1 && t.DateMonth == endTime.ToDateMonth())
-                .Select(t => new
-                {
-                    DateMonth = t.DateMonth,
-                    ProjectId = t.ProjectId,
-                    Status = t.Status
-                }).ToListAsync();
-            var JuneShipList = new List<JuneKeyNote>();
             //获取重点船舶23年6月份的数据
-            JuneShipList = await _dbContext.Queryable<JuneKeyNote>().Where(t => t.IsDelete == 1).ToListAsync();
-            foreach (var item in ownerMonthList)
+            //var juneShipList = await _dbContext.Queryable<JuneKeyNote>().Where(t => t.IsDelete == 1).ToListAsync();
+
+            //项目  船舶  分组
+            var sortOptions = await _dbContext.Queryable<ProductionMonitoringOperationDayReport>().Where(t => (t.Type == 2 || t.Type == 3) && t.Name != "合计" && t.IsDelete == 1).ToListAsync();
+            var gShips = mRepShipsList.GroupBy(x => new { x.ShipId, x.ProjectId }).ToList();
+
+            //船舶类型
+            var shipping = await _dbContext.Queryable<ShipPingType>()
+                .Where(t => t.IsDelete == 1)
+                .ToListAsync();
+
+            //项目月报
+            var mRepList = await _dbContext.Queryable<MonthReport>()
+               .Where(t => t.IsDelete == 1 && t.DateMonth == nowMonth)
+               .ToListAsync();
+
+            foreach (var item in gShips)
             {
-                KeynoteShipInfo keynote = new KeynoteShipInfo();
-                keynote.ShipType = shipList.Where(x => x.PomId == item.ShipId).FirstOrDefault() == null ? "" : shipList.Where(x => x.PomId == item.ShipId).FirstOrDefault().TypeClass;
-                keynote.ShipId = item.ShipId;
-                keynote.ShipName = shipList.Where(x => x.PomId == item.ShipId).FirstOrDefault() == null ? "" : shipList.Where(x => x.PomId == item.ShipId).FirstOrDefault().Name;
-                keynote.ProjectId = item.ProjectId;
-                keynote.ProjectName = projectList.Where(x => x.Id == item.ProjectId).FirstOrDefault() == null ? "" : projectList.Where(x => x.Id == item.ProjectId).FirstOrDefault().ShortName;
-                keynote.ProductionValue = item.Production / 10000;
-                keynote.OutputValue = item.ProductionAmount / 10000;
-                var shipMovement = ownerShips.Where(x => x.ShipId == item.ShipId && x.ProjectId == item.ProjectId && x.DateMonth == item.DateMonth).FirstOrDefault();
-                keynote.OnSiteDays = ownShipDay.Where(x => x.ProjectId == item.ProjectId && x.ShipId == item.ShipId).ToList().Count();
-                keynote.WorkingHours = item.WorkingHours;
-                keynote.MyPropertyRate1 = item.WorkingHours == 0 ? 0 : Convert.ToInt32(Math.Round(keynote.ProductionValue.Value, 1) * 10000 / Math.Round(item.WorkingHours, 2));
-                keynote.YearProductionValue = ownerShips.Where(x => x.ShipId == item.ShipId && x.ProjectId == item.ProjectId && x.DateYear == endTime.Year && x.DateMonth <= endTime.ToDateMonth()).Sum(x => x.Production) / 10000;
-                keynote.YearOutputValue = ownerShips.Where(x => x.ShipId == item.ShipId && x.ProjectId == item.ProjectId && x.DateYear == endTime.Year && x.DateMonth <= endTime.ToDateMonth()).Sum(x => x.ProductionAmount) / 10000;
-                keynote.YearWorkingHours = ownerShips.Where(x => x.ShipId == item.ShipId && x.ProjectId == item.ProjectId && x.DateYear == endTime.Year && x.DateMonth <= endTime.ToDateMonth()).Sum(x => x.WorkingHours);
-                keynote.MyPropertyRate2 = keynote.YearWorkingHours == 0 ? 0 : Convert.ToInt32(Math.Round(keynote.YearProductionValue.Value, 1) * 10000 / Math.Round(keynote.YearWorkingHours.Value, 2));
-                keynote.YearOnSiteDays = Convert.ToInt32(ownerShipMonthReportList.Where(x => x.ProjectId == item.ProjectId && x.ShipId == item.ShipId).Sum(t => t.ConstructionDays));
-                if (JuneShipList.Where(t => t.ProjectId == item.ProjectId.ToString() && t.ShipId == item.ShipId).Any())
+                //var thisSumHistoryShipReport = juneShipList.FirstOrDefault(x => x.ShipId == item.Key.ShipId && x.ProjectId == item.Key.ProjectId.ToString());
+
+                //重点船舶
+                var ship = ownShipsList.FirstOrDefault(x => x.PomId == item.Key.ShipId)?.TypeId;
+                var shipType = sortOptions.FirstOrDefault(x => x.Type == 2 && x.ItemId == ship)?.Name ?? shipping.FirstOrDefault(x => x.PomId == ship)?.Name ?? "";
+
+                //船舶名称
+                var shipName = ownShipsList.FirstOrDefault(x => x.PomId == item.Key.ShipId)?.Name ?? "";
+                var shipId = item.Key.ShipId;
+
+                //项目名称
+                var projectName = projects.FirstOrDefault(x => x.Id == item.Key.ProjectId)?.ShortName ?? "";
+                var projectId = item.Key.ProjectId;
+
+                //当月产量
+                var productionValue = mRepShipsList.Where(x => x.ProjectId == item.Key.ProjectId && x.ShipId == item.Key.ShipId && x.DateMonth == nowMonth).Sum(x => x.Production) / 10000;
+
+                //产值
+                var outputValue = mRepShipsList.Where(x => x.ProjectId == item.Key.ProjectId && x.ShipId == item.Key.ShipId && x.DateMonth == nowMonth).Sum(x => x.ProductionAmount) / 10000;
+
+                //在场天
+                var onSiteDays = mRepShipsList.Where(x => x.ProjectId == item.Key.ProjectId && x.ShipId == item.Key.ShipId && x.DateMonth == nowMonth).Sum(x => x.ConstructionDays);
+
+                //运转时间
+                var workingHours = mRepShipsList.Where(x => x.ProjectId == item.Key.ProjectId && x.ShipId == item.Key.ShipId && x.DateMonth == nowMonth).Sum(x => x.WorkingHours);
+
+                //产量*10000除运转时间 暂时不知道列名叫什么
+                var myPropertyRate1 = workingHours == 0 ? 0 : productionValue / workingHours * 10000;
+
+                //产量 年累计
+                var yearProductionValue = mRepShipsList.Where(x => x.ProjectId == item.Key.ProjectId && x.ShipId == item.Key.ShipId && x.DateMonth >= startMonth && x.DateMonth <= endMonth).Sum(x => x.Production) / 10000;
+
+                //产值 年累计
+                var yearOutputValue = mRepShipsList.Where(x => x.ProjectId == item.Key.ProjectId && x.ShipId == item.Key.ShipId && x.DateMonth >= startMonth && x.DateMonth <= endMonth).Sum(x => x.ProductionAmount) / 10000;
+
+                //在场天 年累计
+                var yearOnSiteDays = mRepShipsList.Where(x => x.ProjectId == item.Key.ProjectId && x.ShipId == item.Key.ShipId && x.DateMonth >= startMonth && x.DateMonth <= endMonth).Sum(x => x.ConstructionDays);
+
+                //运转时间 年累计
+                var yearWorkingHours = mRepShipsList.Where(x => x.ProjectId == item.Key.ProjectId && x.ShipId == item.Key.ShipId && x.DateMonth >= startMonth && x.DateMonth <= endMonth).Sum(x => x.WorkingHours);
+
+                //产量*10000除运转时间 年累计 暂时不知道列名叫什么
+                var myPropertyRate2 = yearWorkingHours == 0 ? 0 : yearProductionValue / yearWorkingHours * 10000;
+
+                var state = "";
+                if (mRepList.Where(t => t.ProjectId == item.Key.ProjectId && t.Status != MonthReportStatus.Finish).Any())
                 {
-                    var value = JuneShipList.Where(t => t.ProjectId == item.ProjectId.ToString() && t.ShipId == item.ShipId).Single().YearOnSiteDays;
-                    keynote.YearOnSiteDays = keynote.YearOnSiteDays + value;
-                    var value2 = JuneShipList.Where(t => t.ProjectId == item.ProjectId.ToString() && t.ShipId == item.ShipId).Single().YearWorkingHours;
-                    keynote.YearWorkingHours = keynote.YearWorkingHours + value2;
+                    state = "审批中";
                 }
-                if (monthList.Where(t => t.ProjectId == item.ProjectId && t.Status != MonthReportStatus.Finish).Any())
+
+                //重点类型排序字段
+                var shipTypeSort = sortOptions.FirstOrDefault(x => x.Type == 2 && x.ItemId == ship)?.Sort ?? 1000;
+
+                //船舶排序字段
+                var shipSort = sortOptions.FirstOrDefault(x => x.Type == 3 && x.ItemId == ship)?.Sort ?? 1000;
+
+                keynoteList.Add(new KeynoteShipInfo
                 {
-                    keynote.State = "审批中";
-                }
-                // 加入排序
-                var thisOwnerShip = shipList.FirstOrDefault(t => t.PomId == item.ShipId);
-                if (thisOwnerShip != null)
-                {
-                    var shipTypeSortOption = sortOptions.FirstOrDefault(t => t.Type == 2 && t.ItemId == thisOwnerShip.TypeId);
-                    var shipSortOption = sortOptions.FirstOrDefault(t => t.Type == 3 && t.ItemId == thisOwnerShip.PomId);
-                    keynote.ShipTypeSort = shipTypeSortOption?.Sort;
-                    keynote.ShipSort = shipSortOption?.Sort;
-                }
-                // 加入历史差值
-                var thisSumHistoryShipReport = sumHistoryShipReports.FirstOrDefault(t => t.ProjectId == item.ProjectId && t.ShipId == item.ShipId);
-                if (thisSumHistoryShipReport != null)
-                {
-                    keynote.YearProductionValue += (thisSumHistoryShipReport.HistoryDiffProduction / 10000);
-                    keynote.YearOutputValue += (thisSumHistoryShipReport.HistoryDiffProductionAmount / 10000);
-                }
-                keynoteList.Add(keynote);
+                    ShipName = shipName,
+                    MyPropertyRate1 = Convert.ToInt32(myPropertyRate1),
+                    MyPropertyRate2 = Convert.ToInt32(myPropertyRate2),
+                    OnSiteDays = Convert.ToInt32(onSiteDays),
+                    OutputValue = outputValue,
+                    ProductionValue = productionValue,
+                    ProjectName = projectName,
+                    ShipSort = shipSort,
+                    State = state,
+                    ShipType = shipType,
+                    ShipTypeSort = shipTypeSort,
+                    WorkingHours = workingHours,
+                    YearOnSiteDays = Convert.ToInt32(yearOnSiteDays),
+                    YearOutputValue = yearOutputValue,
+                    YearProductionValue = yearProductionValue,
+                    YearWorkingHours = yearWorkingHours,
+                    ShipId = shipId,
+                    ProjectId = projectId
+                });
             }
 
             List<KeynoteShipInfo> sumShipInfos = new List<KeynoteShipInfo>();
             var groupList = keynoteList.GroupBy(x => new { x.ShipId, x.ShipName, x.ShipTypeSort, x.ShipSort }).ToList();
             foreach (var item in groupList)
             {
-
                 //计算汇总值
                 KeynoteShipInfo sumKeynoteShipInfo = new KeynoteShipInfo();
                 sumKeynoteShipInfo.ShipName = item.Key.ShipName + " 汇总";
@@ -6832,18 +6828,18 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 sumKeynoteShipInfo.OutputValue = item.Sum(x => x.OutputValue);
                 sumKeynoteShipInfo.OnSiteDays = item.Sum(x => x.OnSiteDays);
                 sumKeynoteShipInfo.WorkingHours = item.Sum(x => x.WorkingHours);
-                sumKeynoteShipInfo.MyPropertyRate1 = item.Sum(x => x.WorkingHours) == 0 ? 0 : Convert.ToInt32(Math.Round(item.Sum(x => x.ProductionValue.Value), 1) * 10000 / Math.Round(item.Sum(x => x.WorkingHours.Value), 2));
+                sumKeynoteShipInfo.MyPropertyRate1 = item.Sum(x => x.MyPropertyRate1);
                 sumKeynoteShipInfo.YearProductionValue = item.Sum(x => x.YearProductionValue);
                 sumKeynoteShipInfo.YearOutputValue = item.Sum(x => x.YearOutputValue);
                 sumKeynoteShipInfo.YearWorkingHours = item.Sum(x => x.YearWorkingHours);
-                sumKeynoteShipInfo.MyPropertyRate2 = item.Sum(x => x.YearWorkingHours) == 0 ? 0 : Convert.ToInt32(Math.Round(item.Sum(x => x.YearProductionValue.Value), 1) * 10000 / Math.Round(item.Sum(x => x.YearWorkingHours.Value), 2));
+                sumKeynoteShipInfo.MyPropertyRate2 = item.Sum(x => x.MyPropertyRate2);
                 sumKeynoteShipInfo.ShipId = item.Key.ShipId;
                 sumKeynoteShipInfo.ShipTypeSort = item.Key.ShipTypeSort;
                 sumKeynoteShipInfo.ShipSort = item.Key.ShipSort;
                 sumShipInfos.Add(sumKeynoteShipInfo);
             }
             sumShipInfos = sumShipInfos.OrderBy(t => t.ShipTypeSort).ThenBy(t => t.ShipSort).ToList();
-            List<KeynoteShipInfo> allKeynoteList = new List<KeynoteShipInfo>();
+            List<KeynoteShipInfo> allKeynoteList = new();
             foreach (var item in sumShipInfos)
             {
                 var model = keynoteList.Where(x => item.ShipId == x.ShipId).ToList();
@@ -6853,8 +6849,8 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     allKeynoteList.Add(item);
                 }
             }
+
             return allKeynoteList;
-            #endregion
         }
         ///// <summary>
         ///// 产值产量汇总excel数据导出
@@ -7115,7 +7111,9 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             //模板位置
             //var templatePath = @"D:\GHJCode\wom.api\GHMonitoringCenterApi.Domain.Shared\Template\Excel\ProjectMonthOutPutTemplate.xlsx";
             //var templatePath = "D:\\projectconllection\\dotnet\\szgh\\GHMonitoringCenterApi.Domain.Shared\\Template\\Excel\\ProjectMonthOutPutTemplate.xlsx";
+
             var templatePath = $"Template/Excel/ProjectMonthOutPutTemplate.xlsx";
+            //var templatePath = $@"E:\project\HNKC.SZGHAPI\szgh\ghmonitoringcenterapi\GHMonitoringCenterApi.Domain.Shared\Template\Excel/ProjectMonthOutPutTemplate.xlsx";
             XSSFWorkbook workbook = null;
             using (var fs = new FileStream(templatePath, FileMode.Open, FileAccess.Read))
             {
