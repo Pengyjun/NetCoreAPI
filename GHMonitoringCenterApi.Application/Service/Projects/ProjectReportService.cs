@@ -2832,10 +2832,13 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 item.CompleteProductionAmount = item.CompletedQuantity * item.UnitPrice * currencyExchangeRate;
             });
             //获取原来的月报明细数据
-            var oldMDetails = await _dbContext.Queryable<MonthReportDetail>().Where(x => x.IsDelete == 1 && x.ProjectId == model.ProjectId).ToListAsync();
+            var oldMDetails = await _dbContext.Queryable<MonthReportDetail>()
+                .Where(x => x.IsDelete == 1 && x.ProjectId == model.ProjectId)
+                .ToListAsync();
 
             var addDetails = new List<MonthReportDetail>();
             var updateDetails = new List<MonthReportDetail>();
+            var deleteDetails = new List<MonthReportDetail>();
             //循环匹配原来的数据与传入参数值是否完全一致
             foreach (var item in reqDetails)
             {
@@ -2917,6 +2920,12 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             }
             #endregion
 
+            #region 当月除掉修改跟新增外的其他数据 都要删除
+            var upIds = updateDetails.Select(x => x.Id).ToList();
+            deleteDetails = oldMDetails.Where(x => x.DateMonth == model.DateMonth && !upIds.Contains(x.Id)).ToList();
+            deleteDetails.ForEach(x => x.IsDelete = 0);
+            #endregion
+
             bool isAddMonthReport = false;
             if (monthReport == null)
             {
@@ -2928,7 +2937,6 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 {
                     monthReport.MonthEstimateCostAmount = lastMonthReport.NextMonthEstimateCostAmount;
                 }
-                //addDetails = _mapper.Map(reqDetails, addDetails);
                 isAddMonthReport = true;
             }
             else
@@ -2961,6 +2969,10 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             else
             {
                 await _dbMonthReport.AsUpdateable(monthReport).EnableDiffLogEvent(NewLogInfo(EntityType.MonthReport, monthReport.Id, modelState)).ExecuteCommandAsync();
+            }
+            if (deleteDetails.Any())
+            {
+                await _dbMonthReportDetail.AsUpdateable(deleteDetails).EnableDiffLogEvent(NewLogInfo(EntityType.MonthReport, monthReport.Id, modelState)).ExecuteCommandAsync();
             }
             if (updateDetails.Any())
             {
