@@ -1,17 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection.Metadata.Ecma335;
-using System.Text;
-using System.Threading.Tasks;
-using SqlSugar;
+﻿using SqlSugar;
 
 namespace GHMonitoringCenterApi.Domain.Models
 {
-	/// <summary>
-	/// 汇率换算表
-	/// </summary>
-	[SugarTable("t_currencyconverter",IsDisabledDelete =true)]
+    /// <summary>
+    /// 汇率换算表
+    /// </summary>
+    [SugarTable("t_currencyconverter",IsDisabledDelete =true)]
 	public class CurrencyConverter : BaseEntity<Guid>
 	{
 		/// <summary>
