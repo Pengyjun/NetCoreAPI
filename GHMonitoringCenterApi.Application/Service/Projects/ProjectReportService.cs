@@ -6577,7 +6577,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 //开累产值
                 var hiss = 0M;
                 var his = historyList.FirstOrDefault(x => x.DateMonth == 202306 && x.ProjectId == item.Id)?.CompleteProductionAmount ?? hiss;
-                var totalOutPutValue = mRepList.Where(x => x.ProjectId == item.Id).Sum(x => x.UnitPrice * x.CompletedQuantity * hv) + hiss;
+                var totalOutPutValue = mRepList.Where(x => x.ProjectId == item.Id).Sum(x => x.UnitPrice * x.CompletedQuantity * hv) + his;
 
                 var state = "";
                 if (historyList.Where(t => t.DateMonth == nowMonth && t.ProjectId == item.Id && t.Status != MonthReportStatus.Finish).Any())
