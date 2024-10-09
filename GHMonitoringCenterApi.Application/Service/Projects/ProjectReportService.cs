@@ -6809,11 +6809,11 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 sumKeynoteShipInfo.OutputValue = item.Sum(x => x.OutputValue);
                 sumKeynoteShipInfo.OnSiteDays = item.Sum(x => x.OnSiteDays);
                 sumKeynoteShipInfo.WorkingHours = item.Sum(x => x.WorkingHours);
-                sumKeynoteShipInfo.MyPropertyRate1 = item.Sum(x => x.WorkingHours) == 0 ? 0 : Convert.ToInt32(Math.Round(item.Sum(x => x.ProductionValue.Value), 1) * 10000 / Math.Round(item.Sum(x => x.WorkingHours.Value), 2));
+                sumKeynoteShipInfo.MyPropertyRate1 = item.Sum(x => x.MyPropertyRate1);
                 sumKeynoteShipInfo.YearProductionValue = item.Sum(x => x.YearProductionValue);
                 sumKeynoteShipInfo.YearOutputValue = item.Sum(x => x.YearOutputValue);
                 sumKeynoteShipInfo.YearWorkingHours = item.Sum(x => x.YearWorkingHours);
-                sumKeynoteShipInfo.MyPropertyRate2 = item.Sum(x => x.YearWorkingHours) == 0 ? 0 : Convert.ToInt32(Math.Round(item.Sum(x => x.YearProductionValue.Value), 1) * 10000 / Math.Round(item.Sum(x => x.YearWorkingHours.Value), 2));
+                sumKeynoteShipInfo.MyPropertyRate2 = item.Sum(x => x.MyPropertyRate2);
                 sumKeynoteShipInfo.ShipId = item.Key.ShipId;
                 sumKeynoteShipInfo.ShipTypeSort = item.Key.ShipTypeSort;
                 sumKeynoteShipInfo.ShipSort = item.Key.ShipSort;
