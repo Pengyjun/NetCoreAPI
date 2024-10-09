@@ -188,7 +188,8 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
                                     ZKOINH = items.ZKOINH,
                                     ZPROVINC2 = items.ZPROVINC2,
                                     ZZCOUNTR2 = items.ZZCOUNTR2,
-                                    ZZSERIAL = items.ZZSERIAL
+                                    ZZSERIAL = items.ZZSERIAL,
+                                    CreateTime = DateTime.Now
                                 };
                                 insertzMDGS_OLDNAMEs.Add(projectUsedName);
                             }
@@ -227,7 +228,8 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
                                     ZKOINH = items.ZKOINH,
                                     ZPROVINC2 = items.ZPROVINC2,
                                     ZZCOUNTR2 = items.ZZCOUNTR2,
-                                    ZZSERIAL = items.ZZSERIAL
+                                    ZZSERIAL = items.ZZSERIAL,
+                                    UpdateTime  = DateTime.Now
                                 };
                                 updatezMDGS_OLDNAMEs.Add(projectUsedName);
                             }
