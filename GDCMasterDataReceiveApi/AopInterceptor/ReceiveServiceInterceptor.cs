@@ -70,6 +70,7 @@ namespace GHElectronicFileApi.AopInterceptor
             var receiceRecordId = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
             //注入baseService  
             var baseService = (IBaseService)HttpContentAccessFactory.Current.RequestServices.GetService<IBaseService>();
+            var logger = (ILogger<ReceiveServiceInterceptor>)HttpContentAccessFactory.Current.RequestServices.GetService<ILogger<ReceiveServiceInterceptor>>();
             //接收参数
             var requestParame = string.Empty;
             //参数数量
@@ -392,11 +393,11 @@ namespace GHElectronicFileApi.AopInterceptor
                         var resultRequest = new RestRequest("",Method.Post);
                         resultRequest.AddHeader("Content-Type", "application/xml");
                         resultRequest.AddParameter("application/xml", requestBody, ParameterType.RequestBody);
-                        // var apiResponse = await client.ExecuteAsync(resultRequest);
-                        await Console.Out.WriteLineAsync($"异步接口请求时间：{requestBody}");
                         var apiResponse = await client.ExecuteAsync(resultRequest);
-                        await Console.Out.WriteLineAsync($"返回结果0:{apiResponse.ToJson()}");
-                        await Console.Out.WriteLineAsync($"返回结果0:{apiResponse.ErrorException}");
+                        if (logger != null)
+                        {
+                            logger.LogInformation($"接口异步通知回调结果:{apiResponse.Content.ToJson()}");
+                        }
                         await Console.Out.WriteLineAsync($"返回结果1:{apiResponse.ResponseStatus.ToJson()}");
                         await Console.Out.WriteLineAsync($"返回结果2:{apiResponse.Content.ToJson()}");
                     }
