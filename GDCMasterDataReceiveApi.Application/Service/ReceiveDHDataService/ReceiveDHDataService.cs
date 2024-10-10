@@ -48,22 +48,16 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveDHDataService
             }
         }
         /// <summary>
-        /// Dh机构数据写入
+        /// 获取接收数据
         /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="requestDto"></param>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<bool>> ReceiveOrganzationAsync()
+        private async Task<List<T>> GetDataAsync<T>(KeyVerificationRequestDto requestDto) where T : class
         {
-            ResponseAjaxResult<bool> responseAjaxResult = new();
-
-            var requestDto = new KeyVerificationRequestDto
-            {
-                FCode = "68AEA3249B7C43F79234B7618620C683",
-                InterfaceUrl = "Department/GetOrganzationPageList",
-                PageIndex = 1//从第一页开始拉取
-            };
-
             //装所有页的数据
-            List<DHOrganzation> data = new();
+            List<T> data = new();
+
             // 解析 JSON
             var jsonObject = JObject.Parse(await JData(requestDto));
             int count = Convert.ToInt32(jsonObject["Count"]);//需要循环的总页数
@@ -75,15 +69,35 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveDHDataService
                     requestDto.PageIndex = i;
                     var jsonObject2 = JObject.Parse(await JData(requestDto));
                     var jData = jsonObject2["Data"].ToJson();
-                    var nData = JsonConvert.DeserializeObject<List<DHOrganzation>>(jData);
+                    var nData = JsonConvert.DeserializeObject<List<T>>(jData);
                     data.AddRange(nData);
                 }
             }
             else
             {
                 var jData = jsonObject["Data"].ToJson();
-                data = JsonConvert.DeserializeObject<List<DHOrganzation>>(jData);
+                data = JsonConvert.DeserializeObject<List<T>>(jData);
             }
+            return data;
+        }
+        /// <summary>
+        /// Dh机构数据写入
+        /// </summary>
+        /// <returns></returns>
+        public async Task<ResponseAjaxResult<bool>> ReceiveOrganzationAsync()
+        {
+            ResponseAjaxResult<bool> responseAjaxResult = new();
+
+            var requestDto = new KeyVerificationRequestDto
+            {
+                FCode = "68AEA3249B7C43F79234B7618620C683",
+                InterfaceUrl = "Department/GetOrganzationPageList",
+                //UpdateTime = DateTime.Now,
+                PageIndex = 1//从第一页开始拉取
+            };
+
+            //获取接收数据
+            var data = await GetDataAsync<DHOrganzation>(requestDto);
 
             if (data != null && data.Any())
             {
@@ -104,6 +118,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveDHDataService
                 if (updateCondition.Any())
                 {
                     updateTable = data.Where(x => updateCondition.Contains(x.OID)).ToList();
+                    updateTable.ForEach(x => x.UpdateTime = DateTime.Now);
                     await _dbContext.Updateable(updateTable).WhereColumns(x => x.OID).ExecuteCommandAsync();
                 }
 
