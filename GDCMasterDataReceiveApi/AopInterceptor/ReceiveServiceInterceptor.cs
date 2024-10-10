@@ -398,8 +398,8 @@ namespace GHElectronicFileApi.AopInterceptor
                         {
                             logger.LogInformation($"接口异步通知回调结果:{apiResponse.Content.ToJson()}");
                         }
-                        await Console.Out.WriteLineAsync($"返回结果1:{apiResponse.ResponseStatus.ToJson()}");
-                        await Console.Out.WriteLineAsync($"返回结果2:{apiResponse.Content.ToJson()}");
+                        //await Console.Out.WriteLineAsync($"返回结果1:{apiResponse.ResponseStatus.ToJson()}");
+                        //await Console.Out.WriteLineAsync($"返回结果2:{apiResponse.Content.ToJson()}");
                     }
                     #endregion
                 }
