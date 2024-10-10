@@ -87,7 +87,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveDHDataService
             {
                 FCode = "68AEA3249B7C43F79234B7618620C683",
                 InterfaceUrl = "Department/GetOrganzationPageList",
-                //UpdateTime = DateTime.Now,
+                UpdateTime = DateTime.Now,
                 PageIndex = 1//从第一页开始拉取
             };
 

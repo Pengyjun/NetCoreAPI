@@ -20,7 +20,7 @@ namespace GDCMasterDataReceiveApi.Controller
             this._receiveDHDataService = receiveDHDataService;
         }
         /// <summary>
-        /// 
+        /// DH机构写入（后续定时跑）
         /// </summary>
         /// <returns></returns>
         [HttpGet("ReceiveDHOrganzation")]
