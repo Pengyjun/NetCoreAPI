@@ -54,9 +54,10 @@ namespace GDCMasterDataReceiveApi.Filters
                             actionName = actionName + "Async";
                         }
                         var systemInterfaceInfoApi = AppsettingsHelper.GetValue("API:SystemInterfaceInfoApi");
+                        systemInterfaceInfoApi= systemInterfaceInfoApi.Replace("$systemApi", sKey).Replace("$interfaceApi", iKey);
                         var interfaceInfoList = await webHelper.DoGetAsync<ResponseAjaxResult<List<DataInterfaceResponseDto>>>(systemInterfaceInfoApi);
                         //如果返回空
-                        if (interfaceInfoList.Code == 200 && interfaceInfoList.Result == null && !interfaceInfoList.Result.Data.Any())
+                        if (interfaceInfoList.Code==500||(interfaceInfoList.Code == 200 && interfaceInfoList.Result == null && !interfaceInfoList.Result.Data.Any()))
                         {
                             ResponseAjaxResult<object> responseAjaxResult = new ResponseAjaxResult<object>()
                             {
@@ -76,7 +77,7 @@ namespace GDCMasterDataReceiveApi.Filters
                             context.Result = obj;
                             return;
                         }
-                        var intefaceInfo = interfaceInfoList.Result.Data.Where(x => x.InterfaceName == actionName && x.IsEnable == 1).FirstOrDefault();
+                        var intefaceInfo = interfaceInfoList.Result.Data!=null?interfaceInfoList.Result.Data.Where(x => x.InterfaceName == actionName && x.IsEnable == 1).FirstOrDefault():null;
                         //验证接口是否存在
                         if (intefaceInfo == null)
                         {
@@ -103,7 +104,7 @@ namespace GDCMasterDataReceiveApi.Filters
                         var splitStr = ";";
                         var accessIp = Utils.GetIP();
                         // await Console.Out.WriteLineAsync($"接口访问IP地址是:{accessIp}");
-                        if (!string.IsNullOrWhiteSpace(intefaceInfo.AccessRestrictedIP) && intefaceInfo.AccessRestrictedIP.IndexOf("splitStr") > 0)
+                        if (!string.IsNullOrWhiteSpace(intefaceInfo.AccessRestrictedIP) && intefaceInfo.AccessRestrictedIP.IndexOf("splitStr") >=-1)
                         {
                             var ipList = intefaceInfo.AccessRestrictedIP.Split(splitStr, StringSplitOptions.RemoveEmptyEntries).ToList();
                             var isExist = ipList.Where(x => x == "*").ToList();
@@ -138,7 +139,7 @@ namespace GDCMasterDataReceiveApi.Filters
                         ResponseAjaxResult<object> responseAjaxResult = new ResponseAjaxResult<object>()
                         {
                         };
-                        var value = JObject.Parse(interfaceAuth.Result)["message"];
+                        var value = interfaceAuth.Result!= null?JObject.Parse(interfaceAuth.Result)["message"]: interfaceAuth.Msg;
                         responseAjaxResult.Fail(message: value.ToString(), httpStatusCode: HttpStatusCode.InterfaceAuth);
                         context.HttpContext.Response.Clear();
                         var obj = new ContentResult()
