@@ -31,13 +31,15 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveDHDataService
         /// <returns></returns>
         private async Task<string>? JData(KeyVerificationRequestDto requestDto)
         {
-            var url = AppsettingsHelper.GetValue("DHData:Url") + $"{requestDto.InterfaceUrl}?{AppsettingsHelper.GetValue("DHData:SysCode")}&updatetime=1900-01-01&functionAuthorizationCode={requestDto.FCode}&pageindex={requestDto.PageIndex}";
-            if (requestDto.UpdateTime != DateTime.MinValue)
-            {
-                url = AppsettingsHelper.GetValue("DHData:Url") + $"{requestDto.InterfaceUrl}?{AppsettingsHelper.GetValue("DHData:SysCode")}&updatetime={requestDto.UpdateTime}&functionAuthorizationCode={requestDto.FCode}&pageindex={requestDto.PageIndex}";
-            }
+            var url = $"{AppsettingsHelper.GetValue("DHData:Url")}{requestDto.InterfaceUrl}?" +
+                      $"{AppsettingsHelper.GetValue("DHData:SysCode")}&" +
+                      $"updatetime={(requestDto.UpdateTime != DateTime.MinValue ? requestDto.UpdateTime : "1900-01-01")}&" +
+                      $"functionAuthorizationCode={requestDto.FCode}&" +
+                      $"pageindex={requestDto.PageIndex}";
+
             WebHelper web = new WebHelper();
             var response = await web.DoGetAsync(url);
+
             if (response.Code == 200)
             {
                 return response.Result;
@@ -55,29 +57,22 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveDHDataService
         /// <returns></returns>
         private async Task<List<T>> GetDataAsync<T>(KeyVerificationRequestDto requestDto) where T : class
         {
-            //装所有页的数据
+            // 装所有页的数据
             List<T> data = new();
 
             // 解析 JSON
             var jsonObject = JObject.Parse(await JData(requestDto));
-            int count = Convert.ToInt32(jsonObject["Count"]);//需要循环的总页数
+            int count = Convert.ToInt32(jsonObject["Count"]); // 需要循环的总页数
 
-            if (count > 1)
+            for (int i = 1; i <= count; i++)
             {
-                for (int i = 1; i <= count; i++)
-                {
-                    requestDto.PageIndex = i;
-                    var jsonObject2 = JObject.Parse(await JData(requestDto));
-                    var jData = jsonObject2["Data"].ToJson();
-                    var nData = JsonConvert.DeserializeObject<List<T>>(jData);
-                    data.AddRange(nData);
-                }
+                requestDto.PageIndex = i;
+                var jsonObject2 = JObject.Parse(await JData(requestDto));
+                var jData = jsonObject2["Data"].ToString();
+                var nData = JsonConvert.DeserializeObject<List<T>>(jData);
+                data.AddRange(nData);
             }
-            else
-            {
-                var jData = jsonObject["Data"].ToJson();
-                data = JsonConvert.DeserializeObject<List<T>>(jData);
-            }
+
             return data;
         }
         /// <summary>
