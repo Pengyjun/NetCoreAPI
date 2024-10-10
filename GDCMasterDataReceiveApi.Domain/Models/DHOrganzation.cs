@@ -95,7 +95,7 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// <summary>
         /// 机构层级
         /// </summary>
-        public int ORGGRADE { get; set; }
+        public string? ORGGRADE { get; set; }
         /// <summary>
         /// 机构规则码
         /// </summary>
@@ -107,7 +107,7 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// <summary>
         /// 序号
         /// </summary>
-        public int SNO { get; set; }
+        public string? SNO { get; set; }
         /// <summary>
         /// 拥有兼管职能
         /// </summary>
@@ -187,6 +187,7 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// <summary>
         /// 是否删除 0:已删除;1:未删除
         /// </summary>
+        [SugarColumn(IsIgnore = true)]
         public string? DELETE { get; set; }
         /// <summary>
         /// 创建时间

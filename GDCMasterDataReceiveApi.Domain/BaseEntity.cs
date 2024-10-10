@@ -1,5 +1,4 @@
-﻿using GDCMasterDataReceiveApi.Domain.Shared.Utils;
-using SqlSugar;
+﻿using SqlSugar;
 
 namespace GDCMasterDataReceiveApi.Domain
 {

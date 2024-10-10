@@ -1,4 +1,5 @@
 ﻿using GDCMasterDataReceiveApi.Application.Contracts.IService.IReceiveDHDataService;
+using GDCMasterDataReceiveApi.Domain.Shared;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GDCMasterDataReceiveApi.Controller
@@ -18,7 +19,14 @@ namespace GDCMasterDataReceiveApi.Controller
         {
             this._receiveDHDataService = receiveDHDataService;
         }
-
-
+        /// <summary>
+        /// DH机构写入（后续定时跑）
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("ReceiveDHOrganzation")]
+        public async Task<ResponseAjaxResult<bool>> ReceiveOrganzationAsync()
+        {
+            return await _receiveDHDataService.ReceiveOrganzationAsync();
+        }
     }
 }
