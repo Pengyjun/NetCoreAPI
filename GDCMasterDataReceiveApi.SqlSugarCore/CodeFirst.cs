@@ -90,7 +90,7 @@ namespace GDCMasterDataReceiveApi.SqlSugarCore
                 };
             });
             Type[] types = typeof(BaseEntity<long>).Assembly.GetTypes()
-            .Where(it =>it.FullName.Contains("BankCard")
+            .Where(it =>it.FullName.Contains("DHAccountingDept")
             )
             .ToArray();
             db.CodeFirst.InitTables(types);
