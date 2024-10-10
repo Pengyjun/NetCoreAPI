@@ -170,7 +170,7 @@ builder.Services.AddSqlSugarContext(builder.Configuration, AppsettingsHelper.Get
 
 #region 表初始化不需要初始化的表结构数据则注释此方法
 #if DEBUG
- //CodeFirst.InitTable(AppsettingsHelper.GetValue("ConnectionStrings:ConnectionString"));
+//CodeFirst.InitTable(AppsettingsHelper.GetValue("ConnectionStrings:ConnectionString"));
 #endif
 #endregion
 
