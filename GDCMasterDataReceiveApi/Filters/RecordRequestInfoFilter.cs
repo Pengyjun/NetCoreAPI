@@ -4,6 +4,7 @@ using GDCMasterDataReceiveApi.Domain.Shared.Annotation;
 using GDCMasterDataReceiveApi.Domain.Shared.Const;
 using GDCMasterDataReceiveApi.Domain.Shared.Enums;
 using GDCMasterDataReceiveApi.Domain.Shared.Utils;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.Filters;
@@ -31,8 +32,8 @@ namespace GDCMasterDataReceiveApi.Filters
             var method = actionDescriptor.MethodInfo;
             var httpContext = context.HttpContext;
             #region 拦截验证查看接口基本信息是否允许
-            var isAllowInterfaceIntercept = context.ActionDescriptor.EndpointMetadata.OfType<InterfaceInterceptAttribute>().Any();
-            if (isAllowInterfaceIntercept)
+            var isAllowInterfaceIntercept = context.ActionDescriptor.EndpointMetadata.OfType<AllowAnonymousAttribute>().Any();
+            if (!isAllowInterfaceIntercept)
             {
                 WebHelper webHelper = new WebHelper();
                 var interfaceAuthApi = AppsettingsHelper.GetValue("API:InterfaceAuthApi");

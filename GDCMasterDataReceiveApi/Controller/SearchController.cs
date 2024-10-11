@@ -30,6 +30,7 @@ using GDCMasterDataReceiveApi.Application.Contracts.Dto.ValueDomain;
 using GDCMasterDataReceiveApi.Application.Contracts.IService.ISearchService;
 using GDCMasterDataReceiveApi.Domain.Shared;
 using GDCMasterDataReceiveApi.Domain.Shared.Annotation;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GDCMasterDataReceiveApi.Controller
@@ -609,6 +610,7 @@ namespace GDCMasterDataReceiveApi.Controller
         /// <param name="table"></param>
         /// <returns></returns>
         [HttpGet("GetUserFilterColumns")]
+        [AllowAnonymous]
         public async Task<ResponseAjaxResult<List<FilterConditionDto>>> GetUserFilterColumnsAsync([FromQuery] int table)
         {
 
