@@ -3,17 +3,17 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.8.34330.188
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GDCMasterDataReceiveApi", "GDCMasterDataReceiveApi\GDCMasterDataReceiveApi.csproj", "{4EC746F6-8409-43DE-AB22-A5C7CC2F3A50}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GDCMasterDataReceiveApi", "GDCMasterDataReceiveApi\GDCMasterDataReceiveApi.csproj", "{4EC746F6-8409-43DE-AB22-A5C7CC2F3A50}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GDCMasterDataReceiveApi.Application", "GDCMasterDataReceiveApi.Application\GDCMasterDataReceiveApi.Application.csproj", "{069181CF-79AE-4AB1-8828-05520CBCAAFB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GDCMasterDataReceiveApi.Application", "GDCMasterDataReceiveApi.Application\GDCMasterDataReceiveApi.Application.csproj", "{069181CF-79AE-4AB1-8828-05520CBCAAFB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GDCMasterDataReceiveApi.Application.Contracts", "GDCMasterDataReceiveApi.Application.Contracts\GDCMasterDataReceiveApi.Application.Contracts.csproj", "{DDB71028-1CB1-4CE0-8051-EB9C93A6F0A3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GDCMasterDataReceiveApi.Application.Contracts", "GDCMasterDataReceiveApi.Application.Contracts\GDCMasterDataReceiveApi.Application.Contracts.csproj", "{DDB71028-1CB1-4CE0-8051-EB9C93A6F0A3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GDCMasterDataReceiveApi.Domain", "GDCMasterDataReceiveApi.Domain\GDCMasterDataReceiveApi.Domain.csproj", "{B2DB302C-BCC0-45D1-BC0D-CCFC8A60A21C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GDCMasterDataReceiveApi.Domain", "GDCMasterDataReceiveApi.Domain\GDCMasterDataReceiveApi.Domain.csproj", "{B2DB302C-BCC0-45D1-BC0D-CCFC8A60A21C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GDCMasterDataReceiveApi.Domain.Shared", "GDCMasterDataReceiveApi.Domain.Shared\GDCMasterDataReceiveApi.Domain.Shared.csproj", "{BE20089C-271B-433C-8FDA-D91FC14398F1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GDCMasterDataReceiveApi.Domain.Shared", "GDCMasterDataReceiveApi.Domain.Shared\GDCMasterDataReceiveApi.Domain.Shared.csproj", "{BE20089C-271B-433C-8FDA-D91FC14398F1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GDCMasterDataReceiveApi.SqlSugarCore", "GDCMasterDataReceiveApi.SqlSugarCore\GDCMasterDataReceiveApi.SqlSugarCore.csproj", "{8E35FA89-1714-4397-8C96-7B3F2A60DA58}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GDCMasterDataReceiveApi.SqlSugarCore", "GDCMasterDataReceiveApi.SqlSugarCore\GDCMasterDataReceiveApi.SqlSugarCore.csproj", "{8E35FA89-1714-4397-8C96-7B3F2A60DA58}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

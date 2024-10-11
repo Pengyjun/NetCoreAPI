@@ -292,14 +292,13 @@ namespace GHElectronicFileApi.AopInterceptor
                         Traceidentifier = traceIdentifier,
                         ReceiveType = receiveDataType,
                     };
-                    baseService.ReceiveRecordLogAsync(receiveRecordLog, DataOperationType.Insert);
+                   await baseService.ReceiveRecordLogAsync(receiveRecordLog, DataOperationType.Insert);
                 }
                 #endregion
 
                 invocation.Proceed();
                 var res = (Task)invocation.ReturnValue;
                 res.Wait();//如果任务有异常 直接报错
-
 
                 #region 异步通知主数据  
                 RecordRequestInfo recordRequestInfo = new RecordRequestInfo();
@@ -378,31 +377,10 @@ namespace GHElectronicFileApi.AopInterceptor
                     }
                     #endregion
 
-                    var requestBody = Utils.SoapFormat(headParame, businessParame);
-                   
                     #region 异步通知
-                    var url = AppsettingsHelper.GetValue("MDMAsyncResultApi");
-                    RestClientOptions restClientOptions = new RestClientOptions()
-                    {
-                        BaseUrl = new Uri(url),
-                        
-                        RemoteCertificateValidationCallback = (object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors) => { return true; }
-                    };
-                    using (var client = new RestClient(restClientOptions))
-                    {
-                        var resultRequest = new RestRequest("",Method.Post);
-                        resultRequest.AddHeader("Content-Type", "application/xml");
-                        resultRequest.AddParameter("application/xml", requestBody, ParameterType.RequestBody);
-                        var apiResponse = await client.ExecuteAsync(resultRequest);
-                        if (logger != null)
-                        {
-                            logger.LogInformation($"接口异步通知回调结果:{apiResponse.Content.ToJson()}");
-                        }
-                        //await Console.Out.WriteLineAsync($"返回结果1:{apiResponse.ResponseStatus.ToJson()}");
-                        //await Console.Out.WriteLineAsync($"返回结果2:{apiResponse.Content.ToJson()}");
-                    }
+                    NotifyAsync(headParame, businessParame, logger);
                     #endregion
-                }
+            }
                 #endregion
 
                 #region 更新请求日志
@@ -418,10 +396,9 @@ namespace GHElectronicFileApi.AopInterceptor
                         Traceidentifier = traceIdentifier,
                         ReceiveType = receiveDataType,
                     };
-                    baseService.ReceiveRecordLogAsync(receiveRecordLog, DataOperationType.Update);
+                   await baseService.ReceiveRecordLogAsync(receiveRecordLog, DataOperationType.Update);
                 }
                 #endregion
-
 
             }
                 catch (Exception ex)
@@ -483,6 +460,72 @@ namespace GHElectronicFileApi.AopInterceptor
         {
             // 永远返回true以允许所有证书
             return true;
+        }
+
+
+        /// <summary>
+        /// 异步通知
+        /// </summary>
+        /// <param name="headParame"></param>
+        /// <param name="businessParame"></param>
+        /// <param name="logger"></param>
+        /// <returns></returns>
+
+        private async Task NotifyAsync(string headParame,string businessParame, ILogger<ReceiveServiceInterceptor> logger)
+        {
+            var requestBody = Utils.SoapFormat(headParame, businessParame);
+            //请求地址
+            var url = AppsettingsHelper.GetValue("MDMAsyncResultApi");
+            #region RestClient写法  有问题
+            RestClientOptions restClientOptions = new RestClientOptions()
+            {
+                BaseUrl = new Uri(url),
+
+                RemoteCertificateValidationCallback = (object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors) => { return true; }
+            };
+            using (var client = new RestClient(restClientOptions))
+            {
+                var resultRequest = new RestRequest("", Method.Post);
+                resultRequest.AddHeader("Content-Type", "application/xml");
+                resultRequest.AddParameter("application/xml", requestBody, ParameterType.RequestBody);
+                var apiResponse= await client.ExecuteGetAsync(resultRequest);
+                Task.Factory.StartNew(async () =>
+                {
+                    await client.ExecuteGetAsync(resultRequest);
+                });
+                //if (logger != null)
+                //{
+                //    logger.LogInformation($"接口异步通知回调结果:{apiResponse.Content.ToJson()}");
+                //}
+            }
+            #endregion
+
+            #region WebHelper写法
+
+            //   WebHelper webHelper = new WebHelper();
+            //   webHelper.Headers.Add("Content-Type", "application/xml");
+            //   webHelper.UseDefaultCredentials= true;
+            //   //webHelper.Credentials = true;
+            //   var a= await webHelper.DoPostAsync(url);
+            //// var a= await webHelper.DoPostAsync("https://localhost:8040/api/DataSecurity/AuthSystemInterface");
+            #endregion
+
+
+            #region HttpClient
+            //using (var client = new HttpClient())
+            //{
+            //    //// 你的XML内容
+            //    //string xmlContent = "<note><to>Tove</to><from>Jani</from><heading>Reminder</heading><body>Don't forget me this weekend!</body></note>";
+
+            //    //// 创建StringContent实例，并设置MediaType
+            //    //var content = new StringContent(xmlContent, Encoding.UTF8, "application/xml");
+
+            //    // 发送POST请求
+            //    client.GetAsync("https://localhost:8040/api/DataSecurity/AuthSystemInterface");
+
+
+            //}
+            #endregion
         }
     }
 }
