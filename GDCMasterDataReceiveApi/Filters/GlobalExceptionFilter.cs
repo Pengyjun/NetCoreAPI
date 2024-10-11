@@ -117,6 +117,7 @@ namespace GDCMasterDataReceiveApi.Filters
                 webHelper.Headers.Add("appinterfaceCode", cacheResult.AppinterfaceCode);
                 parames.Add("JsonObj", returnRes.ToJson(true));
                 parames.Add("InterfaceApiId", cacheResult.Id);
+                parames.Add("AppSystemId", cacheResult.AppSystemId);
                 var   responseResult = await webHelper.DoPostAsync<string>(systemInterfaceFiledRuleApi, parames);
                 setupResult = responseResult.Result;
                 context.Result =new JsonResult(responseResult.Result);
