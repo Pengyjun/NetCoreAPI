@@ -364,7 +364,8 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.IService.ISearchService
         Task<ResponseAjaxResult<List<FilterConditionDto>>> GetUserFilterColumnsAsync(int table);
 
         Task<ResponseAjaxResult<bool>> SetFiledAsync();
-        Task<ResponseAjaxResult<bool>> ModifyNameAsync(List<DataDesensitizationRule> modify);
+        Task<ResponseAjaxResult<bool>> ModifyNameAsync(List<SystemInterfaceField> modify);
         Task<ResponseAjaxResult<List<SearchDataDesensitizationRule>>> GetSearchDataDesensitizationRuleAsync(string interfaceId);
+        Task<ResponseAjaxResult<bool>> ModifyAsync();
     }
 }
