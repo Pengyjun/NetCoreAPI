@@ -518,11 +518,11 @@ namespace GDCMasterDataReceiveApi.Controller
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
-        [HttpPost("GetBusinessCpportunitySearch")]
-        public async Task<ResponseAjaxResult<List<BusinessNoCpportunityDetailsDto>>> GetBusinessCpportunitySearchAsync([FromBody] FilterCondition requestDto)
-        {
-            return await _searchService.GetBusinessNoCpportunitySearchAsync(requestDto, true);
-        }
+        //[HttpPost("GetBusinessCpportunitySearch")]
+        //public async Task<ResponseAjaxResult<List<BusinessNoCpportunityDetailsDto>>> GetBusinessCpportunitySearchAsync([FromBody] FilterCondition requestDto)
+        //{
+        //    return await _searchService.GetBusinessNoCpportunitySearchAsync(requestDto, true);
+        //}
         /// <summary>
         /// 商机项目(不含境外商机项目) 详情 国家地区区分  142境内，142以为境外
         /// </summary>
@@ -620,7 +620,7 @@ namespace GDCMasterDataReceiveApi.Controller
             return await _searchService.SetFiledAsync();
         }
         [HttpPost("ModifyName")]
-        public async Task<ResponseAjaxResult<bool>> ModifyNameAsync([FromBody] List<DataDesensitizationRule> modify)
+        public async Task<ResponseAjaxResult<bool>> ModifyNameAsync([FromBody] List<SystemInterfaceField> modify)
         {
             return await _searchService.ModifyNameAsync(modify);
 
@@ -629,6 +629,12 @@ namespace GDCMasterDataReceiveApi.Controller
         public async Task<ResponseAjaxResult<List<SearchDataDesensitizationRule>>> GetSearchDataDesensitizationRuleAsync([FromQuery] string interfaceId)
         {
             return await _searchService.GetSearchDataDesensitizationRuleAsync(interfaceId);
+        }
+
+        [HttpGet("Modify")]
+        public async Task<ResponseAjaxResult<bool>> ModifyAsync()
+        {
+            return await _searchService.ModifyAsync();
         }
     }
 }

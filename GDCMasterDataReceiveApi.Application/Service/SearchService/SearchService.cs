@@ -4977,11 +4977,11 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
         public async Task<ResponseAjaxResult<bool>> SetFiledAsync()
         {
             ResponseAjaxResult<bool> responseAjaxResult = new();
-            List<DataDesensitizationRule> ddd = new();
+            List<SystemInterfaceField> ddd = new();
             var excludedProperties = new HashSet<string> { "CreateTime", "UpdateTime", "Id", "Ids" };
 
-            var resList = await _dbContext.AsTenant().QueryableWithAttr<AppInterfaceAuthorization>()
-                .Select(t => new { t.Id, t.InterfaceName, t.Name })
+            var resList = await _dbContext.AsTenant().QueryableWithAttr<SystemInterface>()
+                .Select(t => new { t.Id, t.InterfaceName, t.Remark })
               .ToListAsync();
 
             foreach (var r in resList)
@@ -4996,17 +4996,11 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                         {
                             if (!excludedProperties.Contains(property.Name))
                             {
-                                ddd.Add(new DataDesensitizationRule
+                                ddd.Add(new SystemInterfaceField
                                 {
                                     Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
-                                    AppInterfaceId = r.Id,
-                                    Field = property.Name,
-                                    FieldName = null,
-                                    DesensitizationType = 1,
-                                    Enable = 0,
-                                    IsRefObject = 0,
-                                    StartIndex = 0,
-                                    EndIndex = 0
+                                    AppSystemInterfaceId = r.Id,
+                                    FieidName = property.Name
                                 });
                             }
                         }
@@ -5018,17 +5012,11 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                         {
                             if (!excludedProperties.Contains(property.Name))
                             {
-                                ddd.Add(new DataDesensitizationRule
+                                ddd.Add(new SystemInterfaceField
                                 {
                                     Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
-                                    AppInterfaceId = r.Id,
-                                    Field = property.Name,
-                                    FieldName = null,
-                                    DesensitizationType = 1,
-                                    Enable = 0,
-                                    IsRefObject = 0,
-                                    StartIndex = 0,
-                                    EndIndex = 0
+                                    AppSystemInterfaceId = r.Id,
+                                    FieidName = property.Name
                                 });
                             }
                         }
@@ -5040,17 +5028,11 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                         {
                             if (!excludedProperties.Contains(property.Name))
                             {
-                                ddd.Add(new DataDesensitizationRule
+                                ddd.Add(new SystemInterfaceField
                                 {
                                     Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
-                                    AppInterfaceId = r.Id,
-                                    Field = property.Name,
-                                    FieldName = null,
-                                    DesensitizationType = 1,
-                                    Enable = 0,
-                                    IsRefObject = 0,
-                                    StartIndex = 0,
-                                    EndIndex = 0
+                                    AppSystemInterfaceId = r.Id,
+                                    FieidName = property.Name
                                 });
                             }
                         }
@@ -5062,17 +5044,11 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                         {
                             if (!excludedProperties.Contains(property.Name))
                             {
-                                ddd.Add(new DataDesensitizationRule
+                                ddd.Add(new SystemInterfaceField
                                 {
                                     Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
-                                    AppInterfaceId = r.Id,
-                                    Field = property.Name,
-                                    FieldName = null,
-                                    DesensitizationType = 1,
-                                    Enable = 0,
-                                    IsRefObject = 0,
-                                    StartIndex = 0,
-                                    EndIndex = 0
+                                    AppSystemInterfaceId = r.Id,
+                                    FieidName = property.Name
                                 });
                             }
                         }
@@ -5084,17 +5060,11 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                         {
                             if (!excludedProperties.Contains(property.Name))
                             {
-                                ddd.Add(new DataDesensitizationRule
+                                ddd.Add(new SystemInterfaceField
                                 {
                                     Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
-                                    AppInterfaceId = r.Id,
-                                    Field = property.Name,
-                                    FieldName = null,
-                                    DesensitizationType = 1,
-                                    Enable = 0,
-                                    IsRefObject = 0,
-                                    StartIndex = 0,
-                                    EndIndex = 0
+                                    AppSystemInterfaceId = r.Id,
+                                    FieidName = property.Name
                                 });
                             }
                         }
@@ -5106,39 +5076,27 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                         {
                             if (!excludedProperties.Contains(property.Name))
                             {
-                                ddd.Add(new DataDesensitizationRule
+                                ddd.Add(new SystemInterfaceField
                                 {
                                     Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
-                                    AppInterfaceId = r.Id,
-                                    Field = property.Name,
-                                    FieldName = null,
-                                    DesensitizationType = 1,
-                                    Enable = 0,
-                                    IsRefObject = 0,
-                                    StartIndex = 0,
-                                    EndIndex = 0
+                                    AppSystemInterfaceId = r.Id,
+                                    FieidName = property.Name
                                 });
                             }
                         }
                         break;
-                    case "GetFinancialInstitutionSearch":
-                    case "GetFinancialInstitutionDetails":
+                    case "GetFinancialInstitutionSearchAsync":
+                    case "GetFinancialInstitutionDetailsAsync":
                         var properties7 = GetProperties<FinancialInstitutionDetailsDto>();
                         foreach (var property in properties7)
                         {
                             if (!excludedProperties.Contains(property.Name))
                             {
-                                ddd.Add(new DataDesensitizationRule
+                                ddd.Add(new SystemInterfaceField
                                 {
                                     Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
-                                    AppInterfaceId = r.Id,
-                                    Field = property.Name,
-                                    FieldName = null,
-                                    DesensitizationType = 1,
-                                    Enable = 0,
-                                    IsRefObject = 0,
-                                    StartIndex = 0,
-                                    EndIndex = 0
+                                    AppSystemInterfaceId = r.Id,
+                                    FieidName = property.Name
                                 });
                             }
                         }
@@ -5150,17 +5108,11 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                         {
                             if (!excludedProperties.Contains(property.Name))
                             {
-                                ddd.Add(new DataDesensitizationRule
+                                ddd.Add(new SystemInterfaceField
                                 {
                                     Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
-                                    AppInterfaceId = r.Id,
-                                    Field = property.Name,
-                                    FieldName = null,
-                                    DesensitizationType = 1,
-                                    Enable = 0,
-                                    IsRefObject = 0,
-                                    StartIndex = 0,
-                                    EndIndex = 0
+                                    AppSystemInterfaceId = r.Id,
+                                    FieidName = property.Name
                                 });
                             }
                         }
@@ -5172,17 +5124,11 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                         {
                             if (!excludedProperties.Contains(property.Name))
                             {
-                                ddd.Add(new DataDesensitizationRule
+                                ddd.Add(new SystemInterfaceField
                                 {
                                     Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
-                                    AppInterfaceId = r.Id,
-                                    Field = property.Name,
-                                    FieldName = null,
-                                    DesensitizationType = 1,
-                                    Enable = 0,
-                                    IsRefObject = 0,
-                                    StartIndex = 0,
-                                    EndIndex = 0
+                                    AppSystemInterfaceId = r.Id,
+                                    FieidName = property.Name
                                 });
                             }
                         }
@@ -5194,17 +5140,11 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                         {
                             if (!excludedProperties.Contains(property.Name))
                             {
-                                ddd.Add(new DataDesensitizationRule
+                                ddd.Add(new SystemInterfaceField
                                 {
                                     Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
-                                    AppInterfaceId = r.Id,
-                                    Field = property.Name,
-                                    FieldName = null,
-                                    DesensitizationType = 1,
-                                    Enable = 0,
-                                    IsRefObject = 0,
-                                    StartIndex = 0,
-                                    EndIndex = 0
+                                    AppSystemInterfaceId = r.Id,
+                                    FieidName = property.Name
                                 });
                             }
                         }
@@ -5216,17 +5156,11 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                         {
                             if (!excludedProperties.Contains(property.Name))
                             {
-                                ddd.Add(new DataDesensitizationRule
+                                ddd.Add(new SystemInterfaceField
                                 {
                                     Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
-                                    AppInterfaceId = r.Id,
-                                    Field = property.Name,
-                                    FieldName = null,
-                                    DesensitizationType = 1,
-                                    Enable = 0,
-                                    IsRefObject = 0,
-                                    StartIndex = 0,
-                                    EndIndex = 0
+                                    AppSystemInterfaceId = r.Id,
+                                    FieidName = property.Name
                                 });
                             }
                         }
@@ -5238,17 +5172,11 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                         {
                             if (!excludedProperties.Contains(property.Name))
                             {
-                                ddd.Add(new DataDesensitizationRule
+                                ddd.Add(new SystemInterfaceField
                                 {
                                     Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
-                                    AppInterfaceId = r.Id,
-                                    Field = property.Name,
-                                    FieldName = null,
-                                    DesensitizationType = 1,
-                                    Enable = 0,
-                                    IsRefObject = 0,
-                                    StartIndex = 0,
-                                    EndIndex = 0
+                                    AppSystemInterfaceId = r.Id,
+                                    FieidName = property.Name
                                 });
                             }
                         }
@@ -5260,17 +5188,11 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                         {
                             if (!excludedProperties.Contains(property.Name))
                             {
-                                ddd.Add(new DataDesensitizationRule
+                                ddd.Add(new SystemInterfaceField
                                 {
                                     Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
-                                    AppInterfaceId = r.Id,
-                                    Field = property.Name,
-                                    FieldName = null,
-                                    DesensitizationType = 1,
-                                    Enable = 0,
-                                    IsRefObject = 0,
-                                    StartIndex = 0,
-                                    EndIndex = 0
+                                    AppSystemInterfaceId = r.Id,
+                                    FieidName = property.Name
                                 });
                             }
                         }
@@ -5282,17 +5204,11 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                         {
                             if (!excludedProperties.Contains(property.Name))
                             {
-                                ddd.Add(new DataDesensitizationRule
+                                ddd.Add(new SystemInterfaceField
                                 {
                                     Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
-                                    AppInterfaceId = r.Id,
-                                    Field = property.Name,
-                                    FieldName = null,
-                                    DesensitizationType = 1,
-                                    Enable = 0,
-                                    IsRefObject = 0,
-                                    StartIndex = 0,
-                                    EndIndex = 0
+                                    AppSystemInterfaceId = r.Id,
+                                    FieidName = property.Name
                                 });
                             }
                         }
@@ -5304,17 +5220,11 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                         {
                             if (!excludedProperties.Contains(property.Name))
                             {
-                                ddd.Add(new DataDesensitizationRule
+                                ddd.Add(new SystemInterfaceField
                                 {
                                     Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
-                                    AppInterfaceId = r.Id,
-                                    Field = property.Name,
-                                    FieldName = null,
-                                    DesensitizationType = 1,
-                                    Enable = 0,
-                                    IsRefObject = 0,
-                                    StartIndex = 0,
-                                    EndIndex = 0
+                                    AppSystemInterfaceId = r.Id,
+                                    FieidName = property.Name
                                 });
                             }
                         }
@@ -5326,17 +5236,11 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                         {
                             if (!excludedProperties.Contains(property.Name))
                             {
-                                ddd.Add(new DataDesensitizationRule
+                                ddd.Add(new SystemInterfaceField
                                 {
                                     Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
-                                    AppInterfaceId = r.Id,
-                                    Field = property.Name,
-                                    FieldName = null,
-                                    DesensitizationType = 1,
-                                    Enable = 0,
-                                    IsRefObject = 0,
-                                    StartIndex = 0,
-                                    EndIndex = 0
+                                    AppSystemInterfaceId = r.Id,
+                                    FieidName = property.Name
                                 });
                             }
                         }
@@ -5348,17 +5252,11 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                         {
                             if (!excludedProperties.Contains(property.Name))
                             {
-                                ddd.Add(new DataDesensitizationRule
+                                ddd.Add(new SystemInterfaceField
                                 {
                                     Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
-                                    AppInterfaceId = r.Id,
-                                    Field = property.Name,
-                                    FieldName = null,
-                                    DesensitizationType = 1,
-                                    Enable = 0,
-                                    IsRefObject = 0,
-                                    StartIndex = 0,
-                                    EndIndex = 0
+                                    AppSystemInterfaceId = r.Id,
+                                    FieidName = property.Name
                                 });
                             }
                         }
@@ -5370,17 +5268,11 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                         {
                             if (!excludedProperties.Contains(property.Name))
                             {
-                                ddd.Add(new DataDesensitizationRule
+                                ddd.Add(new SystemInterfaceField
                                 {
                                     Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
-                                    AppInterfaceId = r.Id,
-                                    Field = property.Name,
-                                    FieldName = null,
-                                    DesensitizationType = 1,
-                                    Enable = 0,
-                                    IsRefObject = 0,
-                                    StartIndex = 0,
-                                    EndIndex = 0
+                                    AppSystemInterfaceId = r.Id,
+                                    FieidName = property.Name
                                 });
                             }
                         }
@@ -5392,17 +5284,11 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                         {
                             if (!excludedProperties.Contains(property.Name))
                             {
-                                ddd.Add(new DataDesensitizationRule
+                                ddd.Add(new SystemInterfaceField
                                 {
                                     Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
-                                    AppInterfaceId = r.Id,
-                                    Field = property.Name,
-                                    FieldName = null,
-                                    DesensitizationType = 1,
-                                    Enable = 0,
-                                    IsRefObject = 0,
-                                    StartIndex = 0,
-                                    EndIndex = 0
+                                    AppSystemInterfaceId = r.Id,
+                                    FieidName = property.Name
                                 });
                             }
                         }
@@ -5414,17 +5300,11 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                         {
                             if (!excludedProperties.Contains(property.Name))
                             {
-                                ddd.Add(new DataDesensitizationRule
+                                ddd.Add(new SystemInterfaceField
                                 {
                                     Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
-                                    AppInterfaceId = r.Id,
-                                    Field = property.Name,
-                                    FieldName = null,
-                                    DesensitizationType = 1,
-                                    Enable = 0,
-                                    IsRefObject = 0,
-                                    StartIndex = 0,
-                                    EndIndex = 0
+                                    AppSystemInterfaceId = r.Id,
+                                    FieidName = property.Name
                                 });
                             }
                         }
@@ -5436,17 +5316,11 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                         {
                             if (!excludedProperties.Contains(property.Name))
                             {
-                                ddd.Add(new DataDesensitizationRule
+                                ddd.Add(new SystemInterfaceField
                                 {
                                     Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
-                                    AppInterfaceId = r.Id,
-                                    Field = property.Name,
-                                    FieldName = null,
-                                    DesensitizationType = 1,
-                                    Enable = 0,
-                                    IsRefObject = 0,
-                                    StartIndex = 0,
-                                    EndIndex = 0
+                                    AppSystemInterfaceId = r.Id,
+                                    FieidName = property.Name
                                 });
                             }
                         }
@@ -5458,17 +5332,11 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                         {
                             if (!excludedProperties.Contains(property.Name))
                             {
-                                ddd.Add(new DataDesensitizationRule
+                                ddd.Add(new SystemInterfaceField
                                 {
                                     Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
-                                    AppInterfaceId = r.Id,
-                                    Field = property.Name,
-                                    FieldName = null,
-                                    DesensitizationType = 1,
-                                    Enable = 0,
-                                    IsRefObject = 0,
-                                    StartIndex = 0,
-                                    EndIndex = 0
+                                    AppSystemInterfaceId = r.Id,
+                                    FieidName = property.Name
                                 });
                             }
                         }
@@ -5481,17 +5349,11 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                         {
                             if (!excludedProperties.Contains(property.Name))
                             {
-                                ddd.Add(new DataDesensitizationRule
+                                ddd.Add(new SystemInterfaceField
                                 {
                                     Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
-                                    AppInterfaceId = r.Id,
-                                    Field = property.Name,
-                                    FieldName = null,
-                                    DesensitizationType = 1,
-                                    Enable = 0,
-                                    IsRefObject = 0,
-                                    StartIndex = 0,
-                                    EndIndex = 0
+                                    AppSystemInterfaceId = r.Id,
+                                    FieidName = property.Name
                                 });
                             }
                         }
@@ -5503,17 +5365,11 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                         {
                             if (!excludedProperties.Contains(property.Name))
                             {
-                                ddd.Add(new DataDesensitizationRule
+                                ddd.Add(new SystemInterfaceField
                                 {
                                     Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
-                                    AppInterfaceId = r.Id,
-                                    Field = property.Name,
-                                    FieldName = null,
-                                    DesensitizationType = 1,
-                                    Enable = 0,
-                                    IsRefObject = 0,
-                                    StartIndex = 0,
-                                    EndIndex = 0
+                                    AppSystemInterfaceId = r.Id,
+                                    FieidName = property.Name
                                 });
                             }
                         }
@@ -5525,17 +5381,11 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                         {
                             if (!excludedProperties.Contains(property.Name))
                             {
-                                ddd.Add(new DataDesensitizationRule
+                                ddd.Add(new SystemInterfaceField
                                 {
                                     Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
-                                    AppInterfaceId = r.Id,
-                                    Field = property.Name,
-                                    FieldName = null,
-                                    DesensitizationType = 1,
-                                    Enable = 0,
-                                    IsRefObject = 0,
-                                    StartIndex = 0,
-                                    EndIndex = 0
+                                    AppSystemInterfaceId = r.Id,
+                                    FieidName = property.Name
                                 });
                             }
                         }
@@ -5547,17 +5397,11 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                         {
                             if (!excludedProperties.Contains(property.Name))
                             {
-                                ddd.Add(new DataDesensitizationRule
+                                ddd.Add(new SystemInterfaceField
                                 {
                                     Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
-                                    AppInterfaceId = r.Id,
-                                    Field = property.Name,
-                                    FieldName = null,
-                                    DesensitizationType = 1,
-                                    Enable = 0,
-                                    IsRefObject = 0,
-                                    StartIndex = 0,
-                                    EndIndex = 0
+                                    AppSystemInterfaceId = r.Id,
+                                    FieidName = property.Name
                                 });
                             }
                         }
@@ -5568,17 +5412,11 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                         {
                             if (!excludedProperties.Contains(property.Name))
                             {
-                                ddd.Add(new DataDesensitizationRule
+                                ddd.Add(new SystemInterfaceField
                                 {
                                     Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
-                                    AppInterfaceId = r.Id,
-                                    Field = property.Name,
-                                    FieldName = null,
-                                    DesensitizationType = 1,
-                                    Enable = 0,
-                                    IsRefObject = 0,
-                                    StartIndex = 0,
-                                    EndIndex = 0
+                                    AppSystemInterfaceId = r.Id,
+                                    FieidName = property.Name
                                 });
                             }
                         }
@@ -5591,11 +5429,16 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
             return responseAjaxResult;
 
         }
-        public async Task<ResponseAjaxResult<bool>> ModifyNameAsync(List<DataDesensitizationRule> modify)
+        /// <summary>
+        /// 修改静态字段名字
+        /// </summary>
+        /// <param name="modify"></param>
+        /// <returns></returns>
+        public async Task<ResponseAjaxResult<bool>> ModifyNameAsync(List<SystemInterfaceField> modify)
         {
             ResponseAjaxResult<bool> responseAjaxResult = new();
 
-            await _dbContext.AsTenant().UpdateableWithAttr(modify).WhereColumns(x => x.Id).ExecuteCommandAsync();
+            await _dbContext.AsTenant().UpdateableWithAttr(modify).WhereColumns(x => x.Id).UpdateColumns(x => x.FieidZHName).ExecuteCommandAsync();
             responseAjaxResult.SuccessResult(true);
             return responseAjaxResult;
         }
@@ -5604,23 +5447,49 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
         {
             ResponseAjaxResult<List<SearchDataDesensitizationRule>> responseAjaxResult = new();
 
-            var dList = await _dbContext.AsTenant().QueryableWithAttr<DataDesensitizationRule>()
-              .Where(t => t.AppInterfaceId.ToString() == interfaceId)
+            var dList = await _dbContext.AsTenant().QueryableWithAttr<SystemInterfaceField>()
+              .Where(t => t.AppSystemInterfaceId.ToString() == interfaceId)
               .Select(t => new SearchDataDesensitizationRule
               {
-                  AppInterfaceId = t.AppInterfaceId.ToString(),
-                  DesensitizationType = t.DesensitizationType,
-                  Enable = t.Enable,
-                  EndIndex = t.EndIndex,
-                  Field = t.Field,
-                  FieldName = t.FieldName,
                   Id = t.Id.ToString(),
-                  IsRefObject = t.IsRefObject,
-                  StartIndex = t.StartIndex
+                  AppSystemInterfaceId = t.AppSystemInterfaceId.ToString(),
+                  FieidName = t.FieidName,
+                  FieidZHName = t.FieidZHName
               })
               .ToListAsync();
 
             responseAjaxResult.SuccessResult(dList);
+            return responseAjaxResult;
+        }
+        /// <summary>
+        /// 写字段规则
+        /// </summary>
+        /// <returns></returns>
+        public async Task<ResponseAjaxResult<bool>> ModifyAsync()
+        {
+            ResponseAjaxResult<bool> responseAjaxResult = new();
+
+            var mainRes = await _dbContext.AsTenant().QueryableWithAttr<AppInterfaceAuthorization>().ToListAsync();
+
+            var detailsRes = await _dbContext.AsTenant().QueryableWithAttr<SystemInterfaceField>().ToListAsync();
+
+            List<DataDesensitizationRule> add = new();
+            foreach (var item in mainRes)
+            {
+                var res = detailsRes.Where(x => x.AppSystemInterfaceId == item.Id).ToList();
+                foreach (var item2 in res)
+                {
+                    add.Add(new DataDesensitizationRule
+                    {
+                        Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                        AppSystemApiId = item.AppSystemId,
+                        AppSystemInterfaceFieIdId = item2.Id,
+                        DesensitizationType = 0
+                    });
+                }
+            }
+            await _dbContext.AsTenant().InsertableWithAttr(add).ExecuteCommandAsync();
+            responseAjaxResult.Success();
             return responseAjaxResult;
         }
         #endregion
