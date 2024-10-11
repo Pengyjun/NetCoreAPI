@@ -108,7 +108,7 @@ namespace GDCMasterDataReceiveApi.Filters
                         {
                             var ipList = intefaceInfo.AccessRestrictedIP.Split(splitStr, StringSplitOptions.RemoveEmptyEntries).ToList();
                             var isExist = ipList.Where(x => x == "*").ToList();
-                            if (!isExist.Any() && ipList.Where(x => x == accessIp).Count() < 0)
+                            if (!isExist.Any() && ipList.Where(x => x == accessIp).Count() <=0)
                             {
                                 ResponseAjaxResult<object> responseAjaxResult = new ResponseAjaxResult<object>()
                                 {
