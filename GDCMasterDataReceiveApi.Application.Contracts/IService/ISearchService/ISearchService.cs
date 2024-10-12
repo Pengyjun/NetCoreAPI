@@ -12,6 +12,7 @@ using GDCMasterDataReceiveApi.Application.Contracts.Dto.CountryRegion;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.Currency;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.DeviceClassCode;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.DeviceDetailCode;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.DHData;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.EscrowOrganization;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.FinancialInstitution;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.Institution;
@@ -282,7 +283,8 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.IService.ISearchService
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
-        Task<ResponseAjaxResult<List<AdministrativeAccountingMapperDetailsDto>>> GetAdministrativeAccountingMapperSearchAsync(FilterCondition requestDto);
+        //Task<ResponseAjaxResult<List<AdministrativeAccountingMapperDetailsDto>>> GetAdministrativeAccountingMapperSearchAsync(FilterCondition requestDto);
+        Task<ResponseAjaxResult<List<DHAdministrativeDto>>> GetAdministrativeAccountingMapperSearchAsync(FilterCondition requestDto);
         /// <summary>
         /// 
         /// </summary>

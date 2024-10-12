@@ -14,6 +14,7 @@ using GDCMasterDataReceiveApi.Application.Contracts.Dto.CountryRegion;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.Currency;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.DeviceClassCode;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.DeviceDetailCode;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.DHData;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.EscrowOrganization;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.FinancialInstitution;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.Institution;
@@ -2931,41 +2932,87 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
             responseAjaxResult.SuccessResult(result);
             return responseAjaxResult;
         }
+        ///// <summary>
+        ///// 获取行政机构和核算机构映射关系 列表
+        ///// </summary>
+        ///// <param name="requestDto"></param>
+        ///// <returns></returns>
+        //public async Task<ResponseAjaxResult<List<AdministrativeAccountingMapperDetailsDto>>> GetAdministrativeAccountingMapperSearchAsync(FilterCondition requestDto)
+        //{
+        //    var responseAjaxResult = new ResponseAjaxResult<List<AdministrativeAccountingMapperDetailsDto>>();
+        //    RefAsync<int> total = 0;
+
+        //    //过滤条件
+        //    AdministrativeAccountingMapperDetailsDto filterCondition = new();
+        //    if (!string.IsNullOrWhiteSpace(requestDto.FilterConditionJson))
+        //    {
+        //        filterCondition = JsonConvert.DeserializeObject<AdministrativeAccountingMapperDetailsDto>(requestDto.FilterConditionJson);
+        //    }
+
+        //    var ccList = await _dbContext.Queryable<AdministrativeAccountingMapper>()
+        //        .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.AccOrgCode), (pro) => pro.ZAORGNO.Contains(filterCondition.AccOrgCode))
+        //        .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.AccOrgId), (pro) => pro.ZAID.Contains(filterCondition.AccOrgId))
+        //        .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.AdministrativeOrgCode), (pro) => pro.ZORGCODE.Contains(filterCondition.AdministrativeOrgCode))
+        //        .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.CreateTime.ToString()), (pro) => Convert.ToDateTime(pro.CreateTime).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.CreateTime).ToString("yyyy-MM-dd"))
+        //        .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.UpdateTime.ToString()), (pro) => Convert.ToDateTime(pro.UpdateTime).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.UpdateTime).ToString("yyyy-MM-dd"))
+        //        .Where((cc) => cc.IsDelete == 1)
+        //        .Select((cc) => new AdministrativeAccountingMapperDetailsDto
+        //        {
+        //            Id = cc.Id.ToString(),
+        //            AccOrgCode = cc.ZAORGNO,
+        //            AccOrgId = cc.ZAID,
+        //            AdministrativeOrgCode = cc.ZORGCODE,
+        //            AdministrativeOrgId = cc.ZORGID,
+        //            DataIdentifier = cc.ZDELETE,
+        //            KeyId = cc.ZID,
+        //            CreateTime = cc.CreateTime,
+        //            UpdateTime = cc.UpdateTime
+        //        })
+        //        .ToPageListAsync(requestDto.PageIndex, requestDto.PageSize, total);
+
+        //    responseAjaxResult.Count = total;
+        //    responseAjaxResult.SuccessResult(ccList);
+        //    return responseAjaxResult;
+        //}
         /// <summary>
-        /// 获取行政机构和核算机构映射关系 列表
+        /// DH行政和核算机构映射 列表
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<List<AdministrativeAccountingMapperDetailsDto>>> GetAdministrativeAccountingMapperSearchAsync(FilterCondition requestDto)
+        public async Task<ResponseAjaxResult<List<DHAdministrativeDto>>> GetAdministrativeAccountingMapperSearchAsync(FilterCondition requestDto)
         {
-            var responseAjaxResult = new ResponseAjaxResult<List<AdministrativeAccountingMapperDetailsDto>>();
+            var responseAjaxResult = new ResponseAjaxResult<List<DHAdministrativeDto>>();
             RefAsync<int> total = 0;
 
             //过滤条件
-            AdministrativeAccountingMapperDetailsDto filterCondition = new();
+            DHAdministrativeDto filterCondition = new();
             if (!string.IsNullOrWhiteSpace(requestDto.FilterConditionJson))
             {
-                filterCondition = JsonConvert.DeserializeObject<AdministrativeAccountingMapperDetailsDto>(requestDto.FilterConditionJson);
+                filterCondition = JsonConvert.DeserializeObject<DHAdministrativeDto>(requestDto.FilterConditionJson);
             }
 
-            var ccList = await _dbContext.Queryable<AdministrativeAccountingMapper>()
-                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.AccOrgCode), (pro) => pro.ZAORGNO.Contains(filterCondition.AccOrgCode))
-                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.AccOrgId), (pro) => pro.ZAID.Contains(filterCondition.AccOrgId))
-                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.AdministrativeOrgCode), (pro) => pro.ZORGCODE.Contains(filterCondition.AdministrativeOrgCode))
-                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.CreateTime.ToString()), (pro) => Convert.ToDateTime(pro.CreateTime).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.CreateTime).ToString("yyyy-MM-dd"))
-                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.UpdateTime.ToString()), (pro) => Convert.ToDateTime(pro.UpdateTime).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.UpdateTime).ToString("yyyy-MM-dd"))
-                .Where((cc) => cc.IsDelete == 1)
-                .Select((cc) => new AdministrativeAccountingMapperDetailsDto
+            var ccList = await _dbContext.Queryable<DHAdministrative>()
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Fzaorgno), (pro) => pro.Fzaorgno.Contains(filterCondition.Fzaorgno))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Fzstate), (pro) => pro.Fzstate.Contains(filterCondition.Fzstate))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Fzorgid), (pro) => pro.Fzorgid.Contains(filterCondition.Fzorgid))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Fzorgcode), (pro) => pro.Fzorgcode.Contains(filterCondition.Fzorgcode))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Fzaid), (pro) => pro.Fzaid.Contains(filterCondition.Fzaid))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.CreatedAt.ToString()), (pro) => Convert.ToDateTime(pro.CreatedAt).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.CreatedAt).ToString("yyyy-MM-dd"))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.UpdatedAt.ToString()), (pro) => Convert.ToDateTime(pro.UpdatedAt).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.UpdatedAt).ToString("yyyy-MM-dd"))
+                .Where((cc) => cc.Fzdelete == "1")
+                .Select((cc) => new DHAdministrativeDto
                 {
                     Id = cc.Id.ToString(),
-                    AccOrgCode = cc.ZAORGNO,
-                    AccOrgId = cc.ZAID,
-                    AdministrativeOrgCode = cc.ZORGCODE,
-                    AdministrativeOrgId = cc.ZORGID,
-                    DataIdentifier = cc.ZDELETE,
-                    KeyId = cc.ZID,
-                    CreateTime = cc.CreateTime,
-                    UpdateTime = cc.UpdateTime
+                    CreatedAt = cc.CreatedAt,
+                    Fzaid = cc.Fzaid,
+                    Fzaorgno = cc.Fzaorgno,
+                    Fzdelete = cc.IsDelete.ToString(),
+                    Fzid = cc.Fzid,
+                    Fzorgcode = cc.Fzorgcode,
+                    Fzorgid = cc.Fzorgid,
+                    Fzstate = cc.Fzstate,
+                    Fzversion = cc.Fzversion,
+                    UpdatedAt = cc.UpdatedAt
                 })
                 .ToPageListAsync(requestDto.PageIndex, requestDto.PageSize, total);
 
@@ -5112,7 +5159,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                                 {
                                     Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
                                     AppSystemInterfaceId = r.Id,
-                                    FieidName = property.Name
+                                    FieidName = property.Name.ToLower()
                                 });
                             }
                         }
@@ -5144,7 +5191,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                                 {
                                     Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
                                     AppSystemInterfaceId = r.Id,
-                                    FieidName = property.Name
+                                    FieidName = property.Name.ToLower()
                                 });
                             }
                         }
@@ -5423,6 +5470,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                         break;
                 }
             }
+            ddd.ForEach(x => x.FieidName = char.ToLower(x.FieidName[0]) + x.FieidName.Substring(1));
 
             await _dbContext.AsTenant().InsertableWithAttr(ddd).ExecuteCommandAsync();
             responseAjaxResult.SuccessResult(true);

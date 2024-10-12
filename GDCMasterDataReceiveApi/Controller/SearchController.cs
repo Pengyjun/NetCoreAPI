@@ -13,6 +13,7 @@ using GDCMasterDataReceiveApi.Application.Contracts.Dto.CountryRegion;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.Currency;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.DeviceClassCode;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.DeviceDetailCode;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.DHData;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.EscrowOrganization;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.FinancialInstitution;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.Institution;
@@ -470,7 +471,11 @@ namespace GDCMasterDataReceiveApi.Controller
         /// <param name="requestDto"></param>
         /// <returns></returns>
         [HttpPost("GetAdministrativeAccountingMapperSearch")]
-        public async Task<ResponseAjaxResult<List<AdministrativeAccountingMapperDetailsDto>>> GetAdministrativeAccountingMapperSearchAsync([FromBody] FilterCondition requestDto)
+        //public async Task<ResponseAjaxResult<List<AdministrativeAccountingMapperDetailsDto>>> GetAdministrativeAccountingMapperSearchAsync([FromBody] FilterCondition requestDto)
+        //{
+        //    return await _searchService.GetAdministrativeAccountingMapperSearchAsync(requestDto);
+        //} 
+        public async Task<ResponseAjaxResult<List<DHAdministrativeDto>>> GetAdministrativeAccountingMapperSearchAsync([FromBody] FilterCondition requestDto)
         {
             return await _searchService.GetAdministrativeAccountingMapperSearchAsync(requestDto);
         }
