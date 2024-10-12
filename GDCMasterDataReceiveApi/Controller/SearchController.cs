@@ -267,7 +267,6 @@ namespace GDCMasterDataReceiveApi.Controller
         /// <param name="requestDto"></param>
         /// <returns></returns>
         [HttpPost("GetScientifiCNoProjectSearch")]
-        [AllowAnonymous]
         public async Task<ResponseAjaxResult<List<DHResearchDto>>> GetScientifiCNoProjectSearchAsync([FromBody] FilterCondition requestDto)
         {
             return await _searchService.GetScientifiCNoProjectSearchAsync(requestDto);
