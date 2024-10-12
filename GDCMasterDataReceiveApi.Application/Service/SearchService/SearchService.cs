@@ -3496,7 +3496,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
         //}
         public async Task<ResponseAjaxResult<List<DHOrganzationDep>>> GetEscrowOrganizationSearchAsync(FilterCondition requestDto)
         {
-            var responseAjaxResult = new ResponseAjaxResult<List<DHOrganzationDepDto>>();
+            var responseAjaxResult = new ResponseAjaxResult<List<DHOrganzationDep>>();
             RefAsync<int> total = 0;
 
             //过滤条件
