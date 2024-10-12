@@ -1,6 +1,7 @@
 ﻿using GDCMasterDataReceiveApi.Application.Contracts;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto;
 using GDCMasterDataReceiveApi.Domain.Shared;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GDCMasterDataReceiveApi.Controller
@@ -27,6 +28,7 @@ namespace GDCMasterDataReceiveApi.Controller
         /// <param name="requestDto"></param>
         /// <returns></returns>
         [HttpPost("GetUserLoginInfo")]
+        [AllowAnonymous]
         public async Task<ResponseAjaxResult<bool>> GetUserLoginInfoAsync([FromBody] LoginDto requestDto)
         {
             return await _baseService.GetUserLoginInfoAsync(requestDto);
@@ -37,6 +39,7 @@ namespace GDCMasterDataReceiveApi.Controller
         /// <param name="requestDto"></param>
         /// <returns></returns>
         [HttpPost("SetPassword")]
+        [AllowAnonymous]
         public async Task<ResponseAjaxResult<bool>> SetPasswordAsync([FromBody] LoginDto requestDto)
         {
             return await _baseService.SetPasswordAsync(requestDto);

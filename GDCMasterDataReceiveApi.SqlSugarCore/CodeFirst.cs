@@ -90,7 +90,7 @@ namespace GDCMasterDataReceiveApi.SqlSugarCore
                 };
             });
             Type[] types = typeof(BaseEntity<long>).Assembly.GetTypes()
-            .Where(it =>it.FullName.Contains("DHOrganzation")
+            .Where(it =>it.FullName.Contains("DictionaryTable")
             )
             .ToArray();
             db.CodeFirst.InitTables(types);

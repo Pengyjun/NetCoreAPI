@@ -1,6 +1,7 @@
 ﻿using GDCMasterDataReceiveApi.Application.Contracts.Dto;
 using GDCMasterDataReceiveApi.Application.Contracts.IService.ISearchService;
 using GDCMasterDataReceiveApi.Domain.Shared;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GDCMasterDataReceiveApi.Controller
@@ -26,6 +27,7 @@ namespace GDCMasterDataReceiveApi.Controller
         /// <param name="requestDto"></param>
         /// <returns></returns>
         [HttpGet("/api/GetIncrementalSearch")]
+        [AllowAnonymous]
         public async Task<ResponseAjaxResult<IncrementalDataDto>> GetIncrementalSearchAsync([FromQuery] IncrementalSearchRequestDto requestDto)
         {
             return await _incrementalDataSearchService.GetIncrementalSearchAsync(requestDto);
