@@ -294,7 +294,7 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.IService.ISearchService
         /// <param name="requestDto"></param>
         /// <returns></returns>
         //Task<ResponseAjaxResult<List<AdministrativeAccountingMapperDetailsDto>>> GetAdministrativeAccountingMapperSearchAsync(FilterCondition requestDto);
-        Task<ResponseAjaxResult<List<DHAdministrativeDto>>> GetAdministrativeAccountingMapperSearchAsync(FilterCondition requestDto);
+        Task<ResponseAjaxResult<List<DHAdministrative>>> GetAdministrativeAccountingMapperSearchAsync(FilterCondition requestDto);
         /// <summary>
         /// 
         /// </summary>
@@ -307,7 +307,7 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.IService.ISearchService
         /// <param name="requestDto"></param>
         /// <returns></returns>
         //Task<ResponseAjaxResult<List<EscrowOrganizationDetailsDto>>> GetEscrowOrganizationSearchAsync(FilterCondition requestDto);
-        Task<ResponseAjaxResult<List<DHOrganzationDepDto>>> GetEscrowOrganizationSearchAsync(FilterCondition requestDto);
+        Task<ResponseAjaxResult<List<DHOrganzationDep>>> GetEscrowOrganizationSearchAsync(FilterCondition requestDto);
         /// <summary>
         /// 
         /// </summary>
@@ -346,7 +346,7 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.IService.ISearchService
         /// <param name="requestDto"></param>
         /// <returns></returns>
         //Task<ResponseAjaxResult<List<AccountingOrganizationDetailsDto>>> GetAccountingOrganizationSearchAsync(FilterCondition requestDto);
-        Task<ResponseAjaxResult<List<DHAdjustAccountsMultipleOrgDto>>> GetAccountingOrganizationSearchAsync(FilterCondition requestDto);
+        Task<ResponseAjaxResult<List<DHAdjustAccountsMultipleOrg>>> GetAccountingOrganizationSearchAsync(FilterCondition requestDto);
         /// <summary>
         /// 
         /// </summary>

@@ -3340,16 +3340,16 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<List<DHAdministrativeDto>>> GetAdministrativeAccountingMapperSearchAsync(FilterCondition requestDto)
+        public async Task<ResponseAjaxResult<List<DHAdministrative>>> GetAdministrativeAccountingMapperSearchAsync(FilterCondition requestDto)
         {
-            var responseAjaxResult = new ResponseAjaxResult<List<DHAdministrativeDto>>();
+            var responseAjaxResult = new ResponseAjaxResult<List<DHAdministrative>>();
             RefAsync<int> total = 0;
 
             //过滤条件
-            DHAdministrativeDto filterCondition = new();
+            DHAdministrative filterCondition = new();
             if (!string.IsNullOrWhiteSpace(requestDto.FilterConditionJson))
             {
-                filterCondition = JsonConvert.DeserializeObject<DHAdministrativeDto>(requestDto.FilterConditionJson);
+                filterCondition = JsonConvert.DeserializeObject<DHAdministrative>(requestDto.FilterConditionJson);
             }
 
             var ccList = await _dbContext.Queryable<DHAdministrative>()
@@ -3361,9 +3361,9 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                 .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.CreatedAt.ToString()), (pro) => Convert.ToDateTime(pro.CreatedAt).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.CreatedAt).ToString("yyyy-MM-dd"))
                 .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.UpdatedAt.ToString()), (pro) => Convert.ToDateTime(pro.UpdatedAt).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.UpdatedAt).ToString("yyyy-MM-dd"))
                 .Where((cc) => cc.Fzdelete == "1")
-                .Select((cc) => new DHAdministrativeDto
+                .Select((cc) => new DHAdministrative
                 {
-                    Id = cc.Id.ToString(),
+                    Id = cc.Id,
                     CreatedAt = cc.CreatedAt,
                     Fzaid = cc.Fzaid,
                     Fzaorgno = cc.Fzaorgno,
@@ -3494,16 +3494,16 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
         //    responseAjaxResult.SuccessResult(ccList);
         //    return responseAjaxResult;
         //}
-        public async Task<ResponseAjaxResult<List<DHOrganzationDepDto>>> GetEscrowOrganizationSearchAsync(FilterCondition requestDto)
+        public async Task<ResponseAjaxResult<List<DHOrganzationDep>>> GetEscrowOrganizationSearchAsync(FilterCondition requestDto)
         {
             var responseAjaxResult = new ResponseAjaxResult<List<DHOrganzationDepDto>>();
             RefAsync<int> total = 0;
 
             //过滤条件
-            DHOrganzationDepDto filterCondition = new();
+            DHOrganzationDep filterCondition = new();
             if (!string.IsNullOrWhiteSpace(requestDto.FilterConditionJson))
             {
-                filterCondition = JsonConvert.DeserializeObject<DHOrganzationDepDto>(requestDto.FilterConditionJson);
+                filterCondition = JsonConvert.DeserializeObject<DHOrganzationDep>(requestDto.FilterConditionJson);
             }
 
             var ccList = await _dbContext.Queryable<DHOrganzationDep>()
@@ -3538,9 +3538,9 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                 //.WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.CreateTime.ToString()), (pro) => Convert.ToDateTime(pro.CreateTime).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.CreateTime).ToString("yyyy-MM-dd"))
                 //.WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.UpdateTime.ToString()), (pro) => Convert.ToDateTime(pro.UpdateTime).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.UpdateTime).ToString("yyyy-MM-dd"))
                 //.Where((cc) => cc.IsDelete == 1)
-                .Select((cc) => new DHOrganzationDepDto
+                .Select((cc) => new DHOrganzationDep
                 {
-                    Id = cc.Id.ToString(),
+                    Id = cc.Id,
                     MdmCode = cc.MdmCode,
                     Oid = cc.Oid,
                     Poid = cc.Poid,
@@ -4037,16 +4037,16 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
         //    responseAjaxResult.SuccessResult(ccList);
         //    return responseAjaxResult;
         //}
-        public async Task<ResponseAjaxResult<List<DHAdjustAccountsMultipleOrgDto>>> GetAccountingOrganizationSearchAsync(FilterCondition requestDto)
+        public async Task<ResponseAjaxResult<List<DHAdjustAccountsMultipleOrg>>> GetAccountingOrganizationSearchAsync(FilterCondition requestDto)
         {
-            var responseAjaxResult = new ResponseAjaxResult<List<DHAdjustAccountsMultipleOrgDto>>();
+            var responseAjaxResult = new ResponseAjaxResult<List<DHAdjustAccountsMultipleOrg>>();
             RefAsync<int> total = 0;
 
             //过滤条件
-            DHAdjustAccountsMultipleOrgDto filterCondition = new();
+            DHAdjustAccountsMultipleOrg filterCondition = new();
             if (!string.IsNullOrWhiteSpace(requestDto.FilterConditionJson))
             {
-                filterCondition = JsonConvert.DeserializeObject<DHAdjustAccountsMultipleOrgDto>(requestDto.FilterConditionJson);
+                filterCondition = JsonConvert.DeserializeObject<DHAdjustAccountsMultipleOrg>(requestDto.FilterConditionJson);
             }
 
             var ccList = await _dbContext.Queryable<DHAdjustAccountsMultipleOrg>()
@@ -4122,9 +4122,9 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                 //.WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.CreateTime.ToString()), (pro) => Convert.ToDateTime(pro.CreateTime).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.CreateTime).ToString("yyyy-MM-dd"))
                 //.WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.UpdateTime.ToString()), (pro) => Convert.ToDateTime(pro.UpdateTime).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.UpdateTime).ToString("yyyy-MM-dd"))
                 //.Where((cc) => cc.IsDelete == 1)
-                .Select((cc) => new DHAdjustAccountsMultipleOrgDto
+                .Select((cc) => new DHAdjustAccountsMultipleOrg
                 {
-                    Id = cc.Id.ToString(),
+                    Id = cc.Id,
                     MdmCode = cc.MdmCode,
                     ZztshnameLoc = cc.ZztshnameLoc,
                     ZztshnameEn = cc.ZztshnameEn,

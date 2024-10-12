@@ -499,7 +499,7 @@ namespace GDCMasterDataReceiveApi.Controller
         //{
         //    return await _searchService.GetAdministrativeAccountingMapperSearchAsync(requestDto);
         //} 
-        public async Task<ResponseAjaxResult<List<DHAdministrativeDto>>> GetAdministrativeAccountingMapperSearchAsync([FromBody] FilterCondition requestDto)
+        public async Task<ResponseAjaxResult<List<DHAdministrative>>> GetAdministrativeAccountingMapperSearchAsync([FromBody] FilterCondition requestDto)
         {
             return await _searchService.GetAdministrativeAccountingMapperSearchAsync(requestDto);
         }
@@ -523,7 +523,7 @@ namespace GDCMasterDataReceiveApi.Controller
         //{
         //    return await _searchService.GetEscrowOrganizationSearchAsync(requestDto);
         //}
-        public async Task<ResponseAjaxResult<List<DHOrganzationDepDto>>> GetEscrowOrganizationSearchAsync([FromBody] FilterCondition requestDto)
+        public async Task<ResponseAjaxResult<List<DHOrganzationDep>>> GetEscrowOrganizationSearchAsync([FromBody] FilterCondition requestDto)
         {
             return await _searchService.GetEscrowOrganizationSearchAsync(requestDto);
         }
@@ -601,7 +601,7 @@ namespace GDCMasterDataReceiveApi.Controller
         //{
         //    return await _searchService.GetAccountingOrganizationSearchAsync(requestDto);
         //}
-        public async Task<ResponseAjaxResult<List<DHAdjustAccountsMultipleOrgDto>>> GetAccountingOrganizationSearchAsync([FromBody] FilterCondition requestDto)
+        public async Task<ResponseAjaxResult<List<DHAdjustAccountsMultipleOrg>>> GetAccountingOrganizationSearchAsync([FromBody] FilterCondition requestDto)
         {
             return await _searchService.GetAccountingOrganizationSearchAsync(requestDto);
         }
