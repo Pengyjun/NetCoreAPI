@@ -118,10 +118,6 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.AccountingOrganizati
     public class AccountingOrganizationDetailsDto
     {
         [ExcelIgnore]
-        public DateTime? CreateTime { get; set; }
-        [ExcelIgnore]
-        public DateTime? UpdateTime { get; set; }
-        [ExcelIgnore]
         public string? Id { get; set; }
         /// <summary>
         /// 机构主数据编码:机构主数据的唯一标识
@@ -473,6 +469,10 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.AccountingOrganizati
         /// </summary>
         [ExcelIgnore]
         public string? VIEW_FLAG { get; set; }
+        [ExcelIgnore]
+        public DateTime? CreateTime { get; set; }
+        [ExcelIgnore]
+        public DateTime? UpdateTime { get; set; }
     }
     /// <summary>
     /// 多组织-核算机构接收响应dto

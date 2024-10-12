@@ -38,10 +38,6 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.AccountingDepartment
     public class AccountingDepartmentDetailsDto
     {
         [ExcelIgnore]
-        public DateTime? CreateTime { get; set; }
-        [ExcelIgnore]
-        public DateTime? UpdateTime { get; set; }
-        [ExcelIgnore]
         public string? Id { get; set; }
         /// <summary>
         /// 核算组织编号:9月18日新加
@@ -93,6 +89,10 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.AccountingDepartment
         /// </summary>
         [ExcelIgnore]
         public string? DataIdentifier { get; set; }
+        [ExcelIgnore]
+        public DateTime? CreateTime { get; set; }
+        [ExcelIgnore]
+        public DateTime? UpdateTime { get; set; }
     }
     /// <summary>
     /// 核算部门接收响应Dto

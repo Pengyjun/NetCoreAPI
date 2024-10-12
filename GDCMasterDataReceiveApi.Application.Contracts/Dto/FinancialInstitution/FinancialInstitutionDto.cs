@@ -58,10 +58,6 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.FinancialInstitution
     public class FinancialInstitutionDetailsDto
     {
         [ExcelIgnore]
-        public DateTime? CreateTime { get; set; }
-        [ExcelIgnore]
-        public DateTime? UpdateTime { get; set; }
-        [ExcelIgnore]
         public string Id { get; set; }
         /// <summary>
         /// 金融机构主数据编码:金融机构的唯一编码标识
@@ -163,6 +159,10 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.FinancialInstitution
         /// </summary>
         [ExcelIgnore]
         public string? SubmitBy { get; set; }
+        [ExcelIgnore]
+        public DateTime? CreateTime { get; set; }
+        [ExcelIgnore]
+        public DateTime? UpdateTime { get; set; }
     }
     /// <summary>
     /// 金融机构 接收

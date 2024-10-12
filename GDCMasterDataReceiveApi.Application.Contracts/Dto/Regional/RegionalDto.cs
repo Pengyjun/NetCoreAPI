@@ -39,10 +39,6 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.Regional
     public class RegionalDetailsDto
     {
         [ExcelIgnore]
-        public DateTime? CreateTime { get; set; }
-        [ExcelIgnore]
-        public DateTime? UpdateTime { get; set; }
-        [ExcelIgnore]
         public string? Id { get; set; }
         /// <summary>
         /// 中交区域总部代码:中交区域中心编码
@@ -79,6 +75,10 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.Regional
         /// </summary>
         [ExcelIgnore]
         public string? DataIdentifier { get; set; }
+        [ExcelIgnore]
+        public DateTime? CreateTime { get; set; }
+        [ExcelIgnore]
+        public DateTime? UpdateTime { get; set; }
     }
     /// <summary>
     /// 中交区域总部 接收

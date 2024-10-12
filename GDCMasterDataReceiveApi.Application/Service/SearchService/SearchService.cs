@@ -1261,6 +1261,8 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                 .Select(t => new VDomainRespDto { ZDOM_CODE = t.ZDOM_CODE, ZDOM_DESC = t.ZDOM_DESC, ZDOM_VALUE = t.ZDOM_VALUE, ZDOM_NAME = t.ZDOM_NAME, ZDOM_LEVEL = t.ZDOM_LEVEL })
                 .ToListAsync();
 
+            #region 原来的
+
             ////国家地区
             //var countrysKey = proList.Select(x => x.Country).ToList();
             //var country = await _dbContext.Queryable<CountryRegion>()
@@ -1336,6 +1338,71 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
 
 
             //}
+            #endregion
+
+            #region DH
+            //国家地区
+            var countrysKey = proList.Select(x => x.ZZCOUNTRY).ToList();
+            var country = await _dbContext.Queryable<CountryRegion>()
+                .Where(t => t.IsDelete == 1 && countrysKey.Contains(t.ZCOUNTRYCODE))
+                .Select(t => new CountryRegionOrAdminDivisionDto { Code = t.ZCOUNTRYCODE, Name = t.ZCOUNTRYNAME })
+                .ToListAsync();
+
+            //行政区划
+            var locationKey = proList.Select(x => x.ZPROJLOC).ToList();
+            var location = await _dbContext.Queryable<AdministrativeDivision>()
+                .Where(t => t.IsDelete == 1 && locationKey.Contains(t.ZADDVSCODE))
+                .Select(t => new CountryRegionOrAdminDivisionDto { Code = t.ZADDVSCODE, Name = t.ZADDVSNAME })
+                .ToListAsync();
+
+            //项目机构 //商机项目机构
+            var pjectOrgKey = proList.Select(x => x.ZPRO_ORG).ToList();
+            var pjectOrg2Key = proList.Select(x => x.ZPRO_BP).ToList();
+            var pjectOrg = await _dbContext.Queryable<Institution>()
+                .Where(t => t.IsDelete == 1 && (pjectOrgKey.Contains(t.OID) || pjectOrg2Key.Contains(t.OID)))
+                .Select(t => new InstutionRespDto { Oid = t.OID, PoId = t.POID, Grule = t.GRULE, Name = t.NAME })
+                .ToListAsync();
+
+            foreach (var item in proList)
+            {
+                //项目类型
+                item.ZPROJTYPE = GetValueDomain(item.ZPROJTYPE, valDomain, "ZPROJTYPE");
+
+                //国家地区
+                item.ZZCOUNTRY = GetCountryRegion(item.ZZCOUNTRY, country);
+
+                //项目所在地
+                item.ZPROJLOC = GetAdministrativeDivision(item.ZPROJLOC, location);
+
+                //项目机构 //商机项目机构
+                item.ZPRO_ORG = GetInstitutionName(item.ZPRO_ORG, pjectOrg);
+                item.ZPRO_BP = GetInstitutionName(item.ZPRO_BP, pjectOrg);
+
+                //收入来源
+                item.ZSI = GetValueDomain(item.ZSI, valDomain, "ZSI");
+
+                //操盘情况
+                item.ZTRADER = GetValueDomain(item.ZTRADER, valDomain, "ZTRADER");
+
+                //承租人类型
+                item.ZLESSEETYPE = GetValueDomain(item.ZLESSEETYPE, valDomain, "ZLESSEETYPE");
+
+                //参与二级单位
+                //item.FZcy2ndorg = GetValueDomain(item.FZcy2ndorg, valDomain, "ZCY2NDORG");
+
+                //计税方式
+                item.ZTAXMETHOD = GetValueDomain(item.ZTAXMETHOD, valDomain, "ZTAXMETHOD");
+
+                //并表情况
+                item.ZCS = GetValueDomain(item.ZCS, valDomain, "ZCS");
+
+                //是否联合体项目
+                item.FZwinningc = item.FZwinningc == "1" ? "是" : "否";
+
+
+
+            }
+            #endregion
             #endregion
 
             responseAjaxResult.Count = total;
@@ -2356,14 +2423,40 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                 })
                 .ToPageListAsync(requestDto.PageIndex, requestDto.PageSize, total);
 
+            #region 
+
+            //值域信息
+            var valDomain = await _dbContext.Queryable<ValueDomain>()
+                .Where(t => !string.IsNullOrWhiteSpace(t.ZDOM_CODE))
+                .Select(t => new VDomainRespDto { ZDOM_CODE = t.ZDOM_CODE, ZDOM_DESC = t.ZDOM_DESC, ZDOM_VALUE = t.ZDOM_VALUE, ZDOM_NAME = t.ZDOM_NAME, ZDOM_LEVEL = t.ZDOM_LEVEL })
+                .ToListAsync();
+
+            //币种
+            var cIds = ccList.Select(t => t.Fzprojcostcur).ToList();
+            var currency = await _dbContext.Queryable<Currency>()
+                .Where(t => t.IsDelete == 1 && cIds.Contains(t.ZCURRENCYCODE))
+                .Select(t => new { t.ZCURRENCYCODE, t.ZCURRENCYNAME })
+                .ToListAsync();
+
+            #endregion
+
             foreach (var item in ccList)
             {
+                #region 子集
                 if (!string.IsNullOrWhiteSpace(item.FzitAi))
                 {
                     var jsonObject = JObject.Parse(item.FzitAi);
                     if (!string.IsNullOrWhiteSpace(jsonObject["item"].ToString()))
                     {
                         item.FzitAiList = JsonConvert.DeserializeObject<List<FzitAi>>(jsonObject["item"].ToString());
+                    }
+                }
+                if (!string.IsNullOrWhiteSpace(item.FzitOname))
+                {
+                    var jsonObject = JObject.Parse(item.FzitOname);
+                    if (!string.IsNullOrWhiteSpace(jsonObject["item"].ToString()))
+                    {
+                        item.FzitOnameList = JsonConvert.DeserializeObject<List<FzitOname>>(jsonObject["item"].ToString());
                     }
                 }
                 if (!string.IsNullOrWhiteSpace(item.FzitAg))
@@ -2406,6 +2499,24 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                         item.FzitAjList = JsonConvert.DeserializeObject<List<FzitAj>>(jsonObject["item"].ToString());
                     }
                 }
+                #endregion
+
+                //项目状态
+                item.Fzkpstate = valDomain.FirstOrDefault(x => x.ZDOM_CODE == "ZPSTATE" && x.ZDOM_VALUE == item.Fzkpstate)?.ZDOM_NAME;
+
+                //科研项目分类
+                item.Fzsrpclass = valDomain.FirstOrDefault(x => x.ZDOM_CODE == "ZPROJTYPE" && x.ZDOM_VALUE == item.Fzsrpclass)?.ZDOM_NAME;
+
+                //专业类型
+                item.Fzmajortype = valDomain.FirstOrDefault(x => x.ZDOM_CODE == "ZPROJTYPE" && x.ZDOM_VALUE == item.Fzmajortype)?.ZDOM_NAME;
+
+                //币种
+                item.Fzprojcostcur = currency.FirstOrDefault(x => x.ZCURRENCYCODE == item.Fzprojcostcur)?.ZCURRENCYNAME;
+
+                ////日期
+                //item.Fzpstartdate = item.Fzpstartdate.Value.Date;
+                //item.Fzpfindate = item.Fzpfindate.Value.Date;
+
             }
 
             responseAjaxResult.Count = total;
@@ -4570,7 +4681,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
             switch (table)
             {
                 case 1:
-                    allColumns = new List<string> { "CreateTime", "UpdateTime", "CountryRegion", "SEX", "Enable", "Nationality", "Nation", "EmpSort", "Birthday", "EntryTime", "EmpSort", "PositionGradeNorm", "HighEstGrade", "SameHighEstGrade", "PoliticsFace", "UserInfoStatus", "" };
+                    allColumns = new List<string> { "CountryRegion", "SEX", "Enable", "Nationality", "Nation", "EmpSort", "Birthday", "EntryTime", "EmpSort", "PositionGradeNorm", "HighEstGrade", "SameHighEstGrade", "PoliticsFace", "UserInfoStatus", "CreateTime", "UpdateTime", "" };
                     var properties = GetProperties<UserSearchDetailsDto>();
                     foreach (var property in properties) { tableColumns.Add(property.Name); }
                     foreach (var item in tableColumns)
@@ -4580,12 +4691,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                             List<FilterChildData> optionsChild = new();
                             string type = string.Empty;
                             string columnName = string.Empty;
-                            if (item.Contains("CreateTime") || item.Contains("UpdateTime"))
-                            {
-                                columnName = item == "CreateTime" ? "创建时间" : "修改时间";
-                                type = "Time";//时间
-                            }
-                            else if (item.Contains("Birthday") || item.Contains("EntryTime"))
+                            if (item.Contains("Birthday") || item.Contains("EntryTime"))
                             {
                                 columnName = item == "Birthday" ? "出生日期" : "本企业入职时间";
                                 type = "Time";//时间
@@ -4638,12 +4744,17 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                                 type = "Single";//复选
                                 optionsChild = valDomain.Where(x => x.Code == "ZJOBTYPE").ToList();
                             }
+                            else if (item.Contains("CreateTime") || item.Contains("UpdateTime"))
+                            {
+                                columnName = item == "CreateTime" ? "创建时间" : "修改时间";
+                                type = "Time";//时间
+                            }
                             options.Add(new FilterConditionDto { CoulmnName = columnName, CoulmnKey = char.ToLower(item[0]) + item.Substring(1), Options = optionsChild, Type = type });
                         }
                     }
                     break;
                 case 2:
-                    allColumns = new List<string> { "CreateTime", "UpdateTime", "EntClass", "Status", "BizType", "Type", "TypeExt", "OrgProvince", "Carea", "TerritoryPro", "ShareHoldings", "IsIndependent", "Mrut", "ProjectScale", "ProjectManType", "ProjectType", "StartDate" };
+                    allColumns = new List<string> { "EntClass", "Status", "BizType", "Type", "TypeExt", "OrgProvince", "Carea", "TerritoryPro", "ShareHoldings", "IsIndependent", "Mrut", "ProjectScale", "ProjectManType", "ProjectType", "CreateTime", "UpdateTime", "StartDate" };
                     var properties2 = GetProperties<InstitutionDetatilsDto>();
                     foreach (var property in properties2) { tableColumns.Add(property.Name); }
                     foreach (var item in tableColumns)
@@ -4653,12 +4764,8 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                             List<FilterChildData> optionsChild = new();
                             string type = string.Empty;
                             string columnName = string.Empty;
-                            if (item.Contains("CreateTime") || item.Contains("UpdateTime") || item.Contains("Mrut") || item.Contains("StartDate"))
-                            {
-                                columnName = item == "Mrut" ? "最近更新时间" : item == "CreateTime" ? "创建时间" : item == "StartDate" ? "开始时间" : "修改时间";
-                                type = "Time";//时间
-                            }
-                            else if (item.Contains("EntClass"))
+
+                            if (item.Contains("EntClass"))
                             {
                                 type = "Single";
                                 columnName = "企业分类";
@@ -4736,12 +4843,17 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                                 type = "Single";
                                 optionsChild = valDomain.Where(x => x.Code == "ZSingleIND").ToList();
                             }
+                            else if (item.Contains("CreateTime") || item.Contains("UpdateTime") || item.Contains("Mrut") || item.Contains("StartDate"))
+                            {
+                                columnName = item == "Mrut" ? "最近更新时间" : item == "CreateTime" ? "创建时间" : item == "StartDate" ? "开始时间" : "修改时间";
+                                type = "Time";//时间
+                            }
                             options.Add(new FilterConditionDto { CoulmnName = columnName, CoulmnKey = char.ToLower(item[0]) + item.Substring(1), Options = optionsChild, Type = type });
                         }
                     }
                     break;
                 case 3:
-                    allColumns = new List<string> { "CreateTime", "UpdateTime", "PlanStartDate", "PlanCompletionDate", "TradingSituation", "StartDateOfInsure", "EndDateOfInsure", "Country", "FundEstablishmentDate", "FundExpirationDate", "LeaseStartDate", "DueDate", "TaxMethod", "OrgMethod", "ConsolidatedTable", "Type", "Location", "Invest", "PjectOrg", "ResponsibleParty", "Currency", "FundOrgForm", "FundManager", "TenantType", "UnitSec", "ReasonForDeactivate", "WinningBidder", "Management", "ParticipateInUnitSecs", "IsJoint", "State" };
+                    allColumns = new List<string> { "PlanStartDate", "PlanCompletionDate", "TradingSituation", "StartDateOfInsure", "EndDateOfInsure", "Country", "FundEstablishmentDate", "FundExpirationDate", "LeaseStartDate", "DueDate", "TaxMethod", "OrgMethod", "ConsolidatedTable", "Type", "Location", "Invest", "PjectOrg", "ResponsibleParty", "Currency", "FundOrgForm", "FundManager", "TenantType", "UnitSec", "ReasonForDeactivate", "WinningBidder", "Management", "ParticipateInUnitSecs", "IsJoint", "CreateTime", "UpdateTime", "State" };
 
                     //币种
                     var currency = await _dbContext.Queryable<Currency>()
@@ -4764,12 +4876,8 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                             List<FilterChildData> optionsChild = new();
                             string type = string.Empty;
                             string columnName = string.Empty;
-                            if (item.Contains("CreateTime") || item.Contains("UpdateTime"))
-                            {
-                                columnName = item == "CreateTime" ? "创建时间" : "修改时间";
-                                type = "Time";//时间
-                            }
-                            else if (item.Contains("PlanStartDate"))
+
+                            if (item.Contains("PlanStartDate"))
                             {
                                 type = "NumberTime";
                                 columnName = "项目计划开始日期";
@@ -4937,12 +5045,17 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                                 type = "Single";
                                 optionsChild = valDomain.Where(x => x.Code == "ZCS").ToList();
                             }
+                            else if (item.Contains("CreateTime") || item.Contains("UpdateTime"))
+                            {
+                                columnName = item == "CreateTime" ? "创建时间" : "修改时间";
+                                type = "Time";//时间
+                            }
                             options.Add(new FilterConditionDto { CoulmnName = columnName, CoulmnKey = char.ToLower(item[0]) + item.Substring(1), Options = optionsChild, Type = type });
                         }
                     }
                     break;
                 case 4:
-                    allColumns = new List<string> { "CreateTime", "UpdateTime", "CategoryUnit", "Country", "Province", "City", "County", "EnterpriseNature", "TypeOfUnit", "ChangeTime", "StatusOfUnit" };
+                    allColumns = new List<string> { "CategoryUnit", "Country", "Province", "City", "County", "EnterpriseNature", "TypeOfUnit", "ChangeTime", "CreateTime", "UpdateTime", "StatusOfUnit" };
                     var properties4 = GetProperties<CorresUnitDetailsDto>();
                     foreach (var property in properties4) { tableColumns.Add(property.Name); }
                     foreach (var item in tableColumns)
@@ -4952,12 +5065,8 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                             List<FilterChildData> optionsChild = new();
                             string type = string.Empty;
                             string columnName = string.Empty;
-                            if (item.Contains("CreateTime") || item.Contains("UpdateTime"))
-                            {
-                                columnName = item == "CreateTime" ? "创建时间" : "修改时间";
-                                type = "Time";//时间
-                            }
-                            else if (item.Contains("CategoryUnit"))
+
+                            if (item.Contains("CategoryUnit"))
                             {
                                 type = "Single";
                                 columnName = "往来单位类别";
@@ -5009,12 +5118,17 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                                 type = "Single";
                                 //optionsChild = valDomain.Where(x => x.Code == "1").ToList();
                             }
+                            else if (item.Contains("CreateTime") || item.Contains("UpdateTime"))
+                            {
+                                columnName = item == "CreateTime" ? "创建时间" : "修改时间";
+                                type = "Time";//时间
+                            }
                             options.Add(new FilterConditionDto { CoulmnName = columnName, CoulmnKey = char.ToLower(item[0]) + item.Substring(1), Options = optionsChild, Type = type });
                         }
                     }
                     break;
                 case 5:
-                    allColumns = new List<string> { "CreateTime", "UpdateTime", "RoadGuoZiW", "RoadHaiW", "RoadGongJ" };
+                    allColumns = new List<string> { "RoadGuoZiW", "RoadHaiW", "RoadGongJ", "CreateTime", "UpdateTime", };
                     var properties5 = GetProperties<CountryRegionDetailsDto>();
                     foreach (var property in properties5) { tableColumns.Add(property.Name); }
                     foreach (var item in tableColumns)
@@ -5024,12 +5138,8 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                             List<FilterChildData> optionsChild = new();
                             string type = string.Empty;
                             string columnName = string.Empty;
-                            if (item.Contains("CreateTime") || item.Contains("UpdateTime"))
-                            {
-                                columnName = item == "CreateTime" ? "创建时间" : "修改时间";
-                                type = "Time";//时间
-                            }
-                            else if (item.Contains("RoadGuoZiW"))
+
+                            if (item.Contains("RoadGuoZiW"))
                             {
                                 type = "Single";//复选
                                 columnName = " 一带一路(国资委)";
@@ -5049,6 +5159,11 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                                 type = "Single";//单选
                                 optionsChild.Add(new FilterChildData { Key = "0", Val = "否" });
                                 optionsChild.Add(new FilterChildData { Key = "1", Val = "是" });
+                            }
+                            else if (item.Contains("CreateTime") || item.Contains("UpdateTime"))
+                            {
+                                columnName = item == "CreateTime" ? "创建时间" : "修改时间";
+                                type = "Time";//时间
                             }
                             options.Add(new FilterConditionDto { CoulmnName = columnName, CoulmnKey = char.ToLower(item[0]) + item.Substring(1), Options = optionsChild, Type = type });
                         }
@@ -5075,7 +5190,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     }
                     break;
                 case 7:
-                    allColumns = new List<string> { "CreateTime", "UpdateTime", "Country", "Province", "City", "County" };
+                    allColumns = new List<string> { "Country", "Province", "City", "County", "CreateTime", "UpdateTime", };
                     var properties7 = GetProperties<FinancialInstitutionDetailsDto>();
                     foreach (var property in properties7) { tableColumns.Add(property.Name); }
                     foreach (var item in tableColumns)
@@ -5085,12 +5200,8 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                             List<FilterChildData> optionsChild = new();
                             string type = string.Empty;
                             string columnName = string.Empty;
-                            if (item.Contains("CreateTime") || item.Contains("UpdateTime"))
-                            {
-                                columnName = item == "CreateTime" ? "创建时间" : "修改时间";
-                                type = "Time";//时间
-                            }
-                            else if (item.Contains("Country"))
+
+                            if (item.Contains("Country"))
                             {
                                 columnName = "国家/地区";
                                 type = "Single";
@@ -5114,12 +5225,17 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                                 type = "Single";
                                 optionsChild = adisision.Where(x => x.Code == "3" || x.Code == "4").ToList();
                             }
+                            else if (item.Contains("CreateTime") || item.Contains("UpdateTime"))
+                            {
+                                columnName = item == "CreateTime" ? "创建时间" : "修改时间";
+                                type = "Time";//时间
+                            }
                             options.Add(new FilterConditionDto { CoulmnName = columnName, CoulmnKey = char.ToLower(item[0]) + item.Substring(1), Options = optionsChild, Type = type });
                         }
                     }
                     break;
                 case 8:
-                    allColumns = new List<string> { "CreateTime", "UpdateTime", "Level" };
+                    allColumns = new List<string> { "Level", "CreateTime", "UpdateTime", };
                     var properties8 = GetProperties<DeviceClassCodeDetailsDto>();
                     foreach (var property in properties8) { tableColumns.Add(property.Name); }
                     foreach (var item in tableColumns)
@@ -5129,16 +5245,17 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                             List<FilterChildData> optionsChild = new();
                             string type = string.Empty;
                             string columnName = string.Empty;
-                            if (item.Contains("CreateTime") || item.Contains("UpdateTime"))
-                            {
-                                columnName = item == "CreateTime" ? "创建时间" : "修改时间";
-                                type = "Time";//时间
-                            }
-                            else if (item.Contains("Level"))
+
+                            if (item.Contains("Level"))
                             {
                                 type = "Single";//复选
                                 columnName = "分类层级";
                                 optionsChild = valDomain.Where(x => x.Code == "ZCLEVEL").ToList();
+                            }
+                            else if (item.Contains("CreateTime") || item.Contains("UpdateTime"))
+                            {
+                                columnName = item == "CreateTime" ? "创建时间" : "修改时间";
+                                type = "Time";//时间
                             }
                             options.Add(new FilterConditionDto { CoulmnName = columnName, CoulmnKey = char.ToLower(item[0]) + item.Substring(1), Options = optionsChild, Type = type });
                         }
@@ -5165,7 +5282,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     }
                     break;
                 case 10:
-                    allColumns = new List<string> { "CreateTime", "UpdateTime", "IsHighTech", "PjectState", "IsOutsourced", "TypeCode", "PlanStartDate", "PlanEndDate", "State" };
+                    allColumns = new List<string> { "IsHighTech", "PjectState", "IsOutsourced", "TypeCode", "PlanStartDate", "PlanEndDate", "State", "CreateTime", "UpdateTime", };
                     var properties10 = GetProperties<ScientifiCNoProjectDetailsDto>();
                     foreach (var property in properties10) { tableColumns.Add(property.Name); }
                     foreach (var item in tableColumns)
@@ -5175,12 +5292,8 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                             List<FilterChildData> optionsChild = new();
                             string type = string.Empty;
                             string columnName = string.Empty;
-                            if (item.Contains("CreateTime") || item.Contains("UpdateTime"))
-                            {
-                                columnName = item == "CreateTime" ? "创建时间" : "修改时间";
-                                type = "Time";//时间
-                            }
-                            else if (item.Contains("IsHighTech"))
+
+                            if (item.Contains("IsHighTech"))
                             {
                                 type = "Single";
                                 columnName = "是否高新项目";
@@ -5223,6 +5336,11 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                                 optionsChild.Add(new FilterChildData { Key = "0", Val = "停用" });
                                 optionsChild.Add(new FilterChildData { Key = "1", Val = "启用" });
                             }
+                            else if (item.Contains("CreateTime") || item.Contains("UpdateTime"))
+                            {
+                                columnName = item == "CreateTime" ? "创建时间" : "修改时间";
+                                type = "Time";//时间
+                            }
                             options.Add(new FilterConditionDto { CoulmnName = columnName, CoulmnKey = char.ToLower(item[0]) + item.Substring(1), Options = optionsChild, Type = type });
                         }
                     }
@@ -5248,7 +5366,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     }
                     break;
                 case 12:
-                    allColumns = new List<string> { "CreateTime", "UpdateTime", "Country", "Province", "City", "County" };
+                    allColumns = new List<string> { "Country", "Province", "City", "County", "CreateTime", "UpdateTime", };
                     var properties12 = GetProperties<BankCardDetailsDto>();
                     foreach (var property in properties12) { tableColumns.Add(property.Name); }
                     foreach (var item in tableColumns)
@@ -5258,12 +5376,8 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                             List<FilterChildData> optionsChild = new();
                             string type = string.Empty;
                             string columnName = string.Empty;
-                            if (item.Contains("CreateTime") || item.Contains("UpdateTime"))
-                            {
-                                columnName = item == "CreateTime" ? "创建时间" : "修改时间";
-                                type = "Time";//时间
-                            }
-                            else if (item.Contains("Country"))
+
+                            if (item.Contains("Country"))
                             {
                                 columnName = "国家/地区";
                                 type = "Single";
@@ -5287,12 +5401,17 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                                 type = "Single";
                                 optionsChild = adisision.Where(x => x.Code == "3" || x.Code == "4").ToList();
                             }
+                            else if (item.Contains("CreateTime") || item.Contains("UpdateTime"))
+                            {
+                                columnName = item == "CreateTime" ? "创建时间" : "修改时间";
+                                type = "Time";//时间
+                            }
                             options.Add(new FilterConditionDto { CoulmnName = columnName, CoulmnKey = char.ToLower(item[0]) + item.Substring(1), Options = optionsChild, Type = type });
                         }
                     }
                     break;
                 case 13:
-                    allColumns = new List<string> { "CreateTime", "UpdateTime", "IsCode" };
+                    allColumns = new List<string> { "IsCode", "CreateTime", "UpdateTime", };
                     var properties13 = GetProperties<DeviceDetailCodeDetailsDto>();
                     foreach (var property in properties13) { tableColumns.Add(property.Name); }
                     foreach (var item in tableColumns)
@@ -5302,24 +5421,25 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                             List<FilterChildData> optionsChild = new();
                             string type = string.Empty;
                             string columnName = string.Empty;
-                            if (item.Contains("CreateTime") || item.Contains("UpdateTime"))
-                            {
-                                columnName = item == "CreateTime" ? "创建时间" : "修改时间";
-                                type = "Time";//时间
-                            }
-                            else if (item.Contains("IsCode"))
+
+                            if (item.Contains("IsCode"))
                             {
                                 columnName = "是否常用编码";
                                 type = "Single";
                                 optionsChild.Add(new FilterChildData { Key = "0", Val = "否" });
                                 optionsChild.Add(new FilterChildData { Key = "1", Val = "是" });
                             }
+                            else if (item.Contains("CreateTime") || item.Contains("UpdateTime"))
+                            {
+                                columnName = item == "CreateTime" ? "创建时间" : "修改时间";
+                                type = "Time";//时间
+                            }
                             options.Add(new FilterConditionDto { CoulmnName = columnName, CoulmnKey = char.ToLower(item[0]) + item.Substring(1), Options = optionsChild, Type = type });
                         }
                     }
                     break;
                 case 14:
-                    allColumns = new List<string> { "CreateTime", "UpdateTime", "State" };
+                    allColumns = new List<string> { "State", "CreateTime", "UpdateTime", };
                     var properties14 = GetProperties<AccountingDepartmentDetailsDto>();
                     foreach (var property in properties14) { tableColumns.Add(property.Name); }
                     foreach (var item in tableColumns)
@@ -5329,17 +5449,18 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                             List<FilterChildData> optionsChild = new();
                             string type = string.Empty;
                             string columnName = string.Empty;
-                            if (item.Contains("CreateTime") || item.Contains("UpdateTime"))
-                            {
-                                columnName = item == "CreateTime" ? "创建时间" : "修改时间";
-                                type = "Time";//时间
-                            }
-                            else if (item.Contains("State"))
+
+                            if (item.Contains("State"))
                             {
                                 columnName = "核算部门停用标志";
                                 type = "Single";
                                 optionsChild.Add(new FilterChildData { Key = "0", Val = "未停用" });
                                 optionsChild.Add(new FilterChildData { Key = "1", Val = "停用" });
+                            }
+                            else if (item.Contains("CreateTime") || item.Contains("UpdateTime"))
+                            {
+                                columnName = item == "CreateTime" ? "创建时间" : "修改时间";
+                                type = "Time";//时间
                             }
                             options.Add(new FilterConditionDto { CoulmnName = columnName, CoulmnKey = char.ToLower(item[0]) + item.Substring(1), Options = optionsChild, Type = type });
                         }
@@ -5366,7 +5487,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     }
                     break;
                 case 16:
-                    allColumns = new List<string> { "CreateTime", "UpdateTime", "State" };
+                    allColumns = new List<string> { "State", "CreateTime", "UpdateTime", };
                     var properties16 = GetProperties<RegionalDetailsDto>();
                     foreach (var property in properties16) { tableColumns.Add(property.Name); }
                     foreach (var item in tableColumns)
@@ -5376,24 +5497,25 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                             List<FilterChildData> optionsChild = new();
                             string type = string.Empty;
                             string columnName = string.Empty;
-                            if (item.Contains("CreateTime") || item.Contains("UpdateTime"))
-                            {
-                                columnName = item == "CreateTime" ? "创建时间" : "修改时间";
-                                type = "Time";//时间
-                            }
-                            else if (item.Contains("State"))
+
+                            if (item.Contains("State"))
                             {
                                 columnName = "状态";
                                 type = "Single";
                                 optionsChild.Add(new FilterChildData { Key = "0", Val = "无效" });
                                 optionsChild.Add(new FilterChildData { Key = "1", Val = "有效" });
                             }
+                            else if (item.Contains("CreateTime") || item.Contains("UpdateTime"))
+                            {
+                                columnName = item == "CreateTime" ? "创建时间" : "修改时间";
+                                type = "Time";//时间
+                            }
                             options.Add(new FilterConditionDto { CoulmnName = columnName, CoulmnKey = char.ToLower(item[0]) + item.Substring(1), Options = optionsChild, Type = type });
                         }
                     }
                     break;
                 case 17:
-                    allColumns = new List<string> { "CreateTime", "UpdateTime", "State" };
+                    allColumns = new List<string> { "State", "CreateTime", "UpdateTime", };
                     var properties17 = GetProperties<UnitMeasurementDetailsDto>();
                     foreach (var property in properties17) { tableColumns.Add(property.Name); }
                     foreach (var item in tableColumns)
@@ -5403,24 +5525,25 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                             List<FilterChildData> optionsChild = new();
                             string type = string.Empty;
                             string columnName = string.Empty;
-                            if (item.Contains("CreateTime") || item.Contains("UpdateTime"))
-                            {
-                                columnName = item == "CreateTime" ? "创建时间" : "修改时间";
-                                type = "Time";//时间
-                            }
-                            else if (item.Contains("State"))
+
+                            if (item.Contains("State"))
                             {
                                 columnName = "状态";
                                 type = "Single";
                                 optionsChild.Add(new FilterChildData { Key = "0", Val = "无效" });
                                 optionsChild.Add(new FilterChildData { Key = "1", Val = "有效" });
                             }
+                            else if (item.Contains("CreateTime") || item.Contains("UpdateTime"))
+                            {
+                                columnName = item == "CreateTime" ? "创建时间" : "修改时间";
+                                type = "Time";//时间
+                            }
                             options.Add(new FilterConditionDto { CoulmnName = columnName, CoulmnKey = char.ToLower(item[0]) + item.Substring(1), Options = optionsChild, Type = type });
                         }
                     }
                     break;
                 case 18:
-                    allColumns = new List<string> { "CreateTime", "UpdateTime", "ThirdNewBType" };
+                    allColumns = new List<string> { "ThirdNewBType", "CreateTime", "UpdateTime" };
                     var properties18 = GetProperties<ProjectClassificationDetailsDto>();
                     foreach (var property in properties18) { tableColumns.Add(property.Name); }
                     foreach (var item in tableColumns)
@@ -5430,24 +5553,25 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                             List<FilterChildData> optionsChild = new();
                             string type = string.Empty;
                             string columnName = string.Empty;
-                            if (item.Contains("CreateTime") || item.Contains("UpdateTime"))
-                            {
-                                columnName = item == "CreateTime" ? "创建时间" : "修改时间";
-                                type = "Time";//时间
-                            }
-                            else if (item.Contains("State"))
+
+                            if (item.Contains("State"))
                             {
                                 columnName = "三新业务类型";
                                 type = "Single";
                                 optionsChild.Add(new FilterChildData { Key = "0", Val = "否" });
                                 optionsChild.Add(new FilterChildData { Key = "1", Val = "是" });
                             }
+                            else if (item.Contains("CreateTime") || item.Contains("UpdateTime"))
+                            {
+                                columnName = item == "CreateTime" ? "创建时间" : "修改时间";
+                                type = "Time";//时间
+                            }
                             options.Add(new FilterConditionDto { CoulmnName = columnName, CoulmnKey = char.ToLower(item[0]) + item.Substring(1), Options = optionsChild, Type = type });
                         }
                     }
                     break;
                 case 19:
-                    allColumns = new List<string> { "CreateTime", "UpdateTime", "State" };
+                    allColumns = new List<string> { "State", "CreateTime", "UpdateTime", };
                     var properties19 = GetProperties<RegionalCenterDetailsDto>();
                     foreach (var property in properties19) { tableColumns.Add(property.Name); }
                     foreach (var item in tableColumns)
@@ -5457,24 +5581,25 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                             List<FilterChildData> optionsChild = new();
                             string type = string.Empty;
                             string columnName = string.Empty;
-                            if (item.Contains("CreateTime") || item.Contains("UpdateTime"))
-                            {
-                                columnName = item == "CreateTime" ? "创建时间" : "修改时间";
-                                type = "Time";//时间
-                            }
-                            else if (item.Contains("State"))
+
+                            if (item.Contains("State"))
                             {
                                 columnName = "状态";
                                 type = "Single";
                                 optionsChild.Add(new FilterChildData { Key = "0", Val = "无效" });
                                 optionsChild.Add(new FilterChildData { Key = "1", Val = "有效" });
                             }
+                            else if (item.Contains("CreateTime") || item.Contains("UpdateTime"))
+                            {
+                                columnName = item == "CreateTime" ? "创建时间" : "修改时间";
+                                type = "Time";//时间
+                            }
                             options.Add(new FilterConditionDto { CoulmnName = columnName, CoulmnKey = char.ToLower(item[0]) + item.Substring(1), Options = optionsChild, Type = type });
                         }
                     }
                     break;
                 case 20:
-                    allColumns = new List<string> { "CreateTime", "UpdateTime", "State" };
+                    allColumns = new List<string> { "State", "CreateTime", "UpdateTime", };
                     var properties20 = GetProperties<NationalEconomyDetailsDto>();
                     foreach (var property in properties20) { tableColumns.Add(property.Name); }
                     foreach (var item in tableColumns)
@@ -5484,17 +5609,18 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                             List<FilterChildData> optionsChild = new();
                             string type = string.Empty;
                             string columnName = string.Empty;
-                            if (item.Contains("CreateTime") || item.Contains("UpdateTime"))
-                            {
-                                columnName = item == "CreateTime" ? "创建时间" : "修改时间";
-                                type = "Time";//时间
-                            }
-                            else if (item.Contains("State"))
+
+                            if (item.Contains("State"))
                             {
                                 columnName = "状态";
                                 type = "Single";
                                 optionsChild.Add(new FilterChildData { Key = "0", Val = "无效" });
                                 optionsChild.Add(new FilterChildData { Key = "1", Val = "有效" });
+                            }
+                            else if (item.Contains("CreateTime") || item.Contains("UpdateTime"))
+                            {
+                                columnName = item == "CreateTime" ? "创建时间" : "修改时间";
+                                type = "Time";//时间
                             }
                             options.Add(new FilterConditionDto { CoulmnName = columnName, CoulmnKey = char.ToLower(item[0]) + item.Substring(1), Options = optionsChild, Type = type });
                         }
@@ -5521,7 +5647,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     }
                     break;
                 case 22:
-                    allColumns = new List<string> { "CreateTime", "UpdateTime", "OrgAttr", "OrgChildAttr", "OrgStatus", "LocationOfOrg", "Country", "RegionalAttr", "Shareholding" };
+                    allColumns = new List<string> { "OrgAttr", "OrgChildAttr", "OrgStatus", "LocationOfOrg", "Country", "RegionalAttr", "Shareholding", "CreateTime", "UpdateTime", };
                     var properties22 = GetProperties<EscrowOrganizationDetailsDto>();
                     foreach (var property in properties22) { tableColumns.Add(property.Name); }
                     foreach (var item in tableColumns)
@@ -5531,12 +5657,8 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                             List<FilterChildData> optionsChild = new();
                             string type = string.Empty;
                             string columnName = string.Empty;
-                            if (item.Contains("CreateTime") || item.Contains("UpdateTime"))
-                            {
-                                columnName = item == "CreateTime" ? "创建时间" : "修改时间";
-                                type = "Time";//时间
-                            }
-                            else if (item.Contains("Country"))
+
+                            if (item.Contains("Country"))
                             {
                                 columnName = "国家/地区";
                                 type = "Single";
@@ -5578,13 +5700,18 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                                 type = "Single";
                                 optionsChild = valDomain.Where(x => x.Code == "ZHOLDING").ToList();
                             }
+                            else if (item.Contains("CreateTime") || item.Contains("UpdateTime"))
+                            {
+                                columnName = item == "CreateTime" ? "创建时间" : "修改时间";
+                                type = "Time";//时间
+                            }
                             options.Add(new FilterConditionDto { CoulmnName = columnName, CoulmnKey = char.ToLower(item[0]) + item.Substring(1), Options = optionsChild, Type = type });
                         }
                     }
                     break;
                 case 23:
                 case 24:
-                    allColumns = new List<string> { "CreateTime", "UpdateTime", "Country" };
+                    allColumns = new List<string> { "Country", "CreateTime", "UpdateTime", };
                     var properties24 = GetProperties<BusinessNoCpportunityDetailsDto>();
                     foreach (var property in properties24) { tableColumns.Add(property.Name); }
                     foreach (var item in tableColumns)
@@ -5594,23 +5721,24 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                             List<FilterChildData> optionsChild = new();
                             string type = string.Empty;
                             string columnName = string.Empty;
-                            if (item.Contains("CreateTime") || item.Contains("UpdateTime"))
-                            {
-                                columnName = item == "CreateTime" ? "创建时间" : "修改时间";
-                                type = "Time";//时间
-                            }
-                            else if (item.Contains("Country"))
+
+                            if (item.Contains("Country"))
                             {
                                 columnName = "国家/地区";
                                 type = "Single";
                                 optionsChild = countrys;
+                            }
+                            else if (item.Contains("CreateTime") || item.Contains("UpdateTime"))
+                            {
+                                columnName = item == "CreateTime" ? "创建时间" : "修改时间";
+                                type = "Time";//时间
                             }
                             options.Add(new FilterConditionDto { CoulmnName = columnName, CoulmnKey = char.ToLower(item[0]) + item.Substring(1), Options = optionsChild, Type = type });
                         }
                     }
                     break;
                 case 25:
-                    allColumns = new List<string> { "CreateTime", "UpdateTime", "State" };
+                    allColumns = new List<string> { "State", "CreateTime", "UpdateTime", };
                     var properties25 = GetProperties<AdministrativeDivisionDetailsDto>();
                     foreach (var property in properties25) { tableColumns.Add(property.Name); }
                     foreach (var item in tableColumns)
@@ -5620,12 +5748,8 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                             List<FilterChildData> optionsChild = new();
                             string type = string.Empty;
                             string columnName = string.Empty;
-                            if (item.Contains("CreateTime") || item.Contains("UpdateTime"))
-                            {
-                                columnName = item == "CreateTime" ? "创建时间" : "修改时间";
-                                type = "Time";//时间
-                            }
-                            else if (item.Contains("Country"))
+
+                            if (item.Contains("Country"))
                             {
                                 columnName = "国家/地区";
                                 type = "Single";
@@ -5638,12 +5762,17 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                                 optionsChild.Add(new FilterChildData { Key = "0", Val = "停用" });
                                 optionsChild.Add(new FilterChildData { Key = "1", Val = "启用" });
                             }
+                            else if (item.Contains("CreateTime") || item.Contains("UpdateTime"))
+                            {
+                                columnName = item == "CreateTime" ? "创建时间" : "修改时间";
+                                type = "Time";//时间
+                            }
                             options.Add(new FilterConditionDto { CoulmnName = columnName, CoulmnKey = char.ToLower(item[0]) + item.Substring(1), Options = optionsChild, Type = type });
                         }
                     }
                     break;
                 case 26:
-                    allColumns = new List<string> { "CreateTime", "UpdateTime", "ZIVFLGID", "ZREPORT_TIME", "ZAORGSTATE", "ZACDISABLEYEAR", "ZACISDETAIL", "ZCWYGL_REA", "ZHTE", "ZH_IN_OUT", "ZOSTATE", "ZCYNAME", "ZREGIONAL" };
+                    allColumns = new List<string> { "ZIVFLGID", "ZREPORT_TIME", "ZAORGSTATE", "ZACDISABLEYEAR", "ZACISDETAIL", "ZCWYGL_REA", "ZHTE", "ZH_IN_OUT", "ZOSTATE", "ZCYNAME", "ZREGIONAL", "CreateTime", "UpdateTime", };
                     var properties26 = GetProperties<AccountingOrganizationDetailsDto>();
                     foreach (var property in properties26) { tableColumns.Add(property.Name); }
                     foreach (var item in tableColumns)
@@ -5653,12 +5782,8 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                             List<FilterChildData> optionsChild = new();
                             string type = string.Empty;
                             string columnName = string.Empty;
-                            if (item.Contains("CreateTime") || item.Contains("UpdateTime"))
-                            {
-                                columnName = item == "CreateTime" ? "创建时间" : "修改时间";
-                                type = "Time";//时间
-                            }
-                            else if (item.Contains("ZCYNAME"))
+
+                            if (item.Contains("ZCYNAME"))
                             {
                                 columnName = "国家/地区";
                                 type = "Single";
@@ -5733,6 +5858,11 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                                 columnName = "地域属性";
                                 type = "Single";
                                 //optionsChild = valDomain.Where(x => x.Code == "1").ToList();
+                            }
+                            else if (item.Contains("CreateTime") || item.Contains("UpdateTime"))
+                            {
+                                columnName = item == "CreateTime" ? "创建时间" : "修改时间";
+                                type = "Time";//时间
                             }
                             options.Add(new FilterConditionDto { CoulmnName = columnName, CoulmnKey = char.ToLower(item[0]) + item.Substring(1), Options = optionsChild, Type = type });
                         }

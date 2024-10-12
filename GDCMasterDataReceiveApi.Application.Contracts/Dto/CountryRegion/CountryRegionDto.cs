@@ -44,10 +44,6 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.CountryRegion
     public class CountryRegionDetailsDto
     {
         [ExcelIgnore]
-        public DateTime? CreateTime { get; set; }
-        [ExcelIgnore]
-        public DateTime? UpdateTime { get; set; }
-        [ExcelIgnore]
         public string Id { get; set; }
         /// <summary>
         /// 国家地区代码
@@ -119,6 +115,10 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.CountryRegion
         /// </summary>
         [ExcelColumnName("区域代码")]
         public string AreaCode { get; set; }
+        [ExcelIgnore]
+        public DateTime? CreateTime { get; set; }
+        [ExcelIgnore]
+        public DateTime? UpdateTime { get; set; }
     }
     #endregion
 

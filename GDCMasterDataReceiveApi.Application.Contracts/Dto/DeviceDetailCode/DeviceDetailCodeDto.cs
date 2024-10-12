@@ -35,10 +35,6 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.DeviceDetailCode
     public class DeviceDetailCodeDetailsDto
     {
         [ExcelIgnore]
-        public DateTime? CreateTime { get; set; }
-        [ExcelIgnore]
-        public DateTime? UpdateTime { get; set; }
-        [ExcelIgnore]
         public string? Id { get; set; }
         /// <summary>
         /// 物资设备主数据编码
@@ -75,6 +71,10 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.DeviceDetailCode
         /// </summary>
         [ExcelIgnore]
         public string? Remark { get; set; }
+        [ExcelIgnore]
+        public DateTime? CreateTime { get; set; }
+        [ExcelIgnore]
+        public DateTime? UpdateTime { get; set; }
     }
     /// <summary>
     /// 物资设备明细编码 接收

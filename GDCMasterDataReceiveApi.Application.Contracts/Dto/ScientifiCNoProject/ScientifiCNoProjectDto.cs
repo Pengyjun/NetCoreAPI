@@ -51,10 +51,6 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.ScientifiCNoProject
     public class ScientifiCNoProjectDetailsDto
     {
         [ExcelIgnore]
-        public DateTime? CreateTime { get; set; }
-        [ExcelIgnore]
-        public DateTime? UpdateTime { get; set; }
-        [ExcelIgnore]
         public string? Id { get; set; }
         /// <summary>
         /// 科研项目主数据编码:科研项目的唯一编码标识
@@ -131,6 +127,10 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.ScientifiCNoProject
         /// </summary>
         [ExcelIgnore]
         public string? SupMDCode { get; set; }
+        [ExcelIgnore]
+        public DateTime? CreateTime { get; set; }
+        [ExcelIgnore]
+        public DateTime? UpdateTime { get; set; }
     }
     /// <summary>
     /// 科研项目信息 接收

@@ -39,10 +39,6 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.Language
     public class LanguageDetailsDto
     {
         [ExcelIgnore]
-        public DateTime? CreateTime { get; set; }
-        [ExcelIgnore]
-        public DateTime? UpdateTime { get; set; }
-        [ExcelIgnore]
         public string? Id { get; set; }
         /// <summary>
         /// GB/T 4880.2/B目录代码:GB/T 4880.2/B目录代码
@@ -79,6 +75,10 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.Language
         /// </summary>
         [ExcelIgnore]
         public string? DataIdentifier { get; set; }
+        [ExcelIgnore]
+        public DateTime? CreateTime { get; set; }
+        [ExcelIgnore]
+        public DateTime? UpdateTime { get; set; }
     }
     /// <summary>
     /// 语言语种 接收

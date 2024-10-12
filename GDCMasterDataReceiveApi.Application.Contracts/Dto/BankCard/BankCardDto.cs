@@ -34,10 +34,6 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.BankCard
     public class BankCardDetailsDto
     {
         [ExcelIgnore]
-        public DateTime? CreateTime { get; set; }
-        [ExcelIgnore]
-        public DateTime? UpdateTime { get; set; }
-        [ExcelIgnore]
         public string? Id { get; set; }
         /// <summary>
         /// 往来单位主数据编码:公司往来单位的唯一编码
@@ -99,6 +95,10 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.BankCard
         /// </summary>
         [ExcelColumnName("县")]
         public string? County { get; set; }
+        [ExcelIgnore]
+        public DateTime? CreateTime { get; set; }
+        [ExcelIgnore]
+        public DateTime? UpdateTime { get; set; }
     }
     /// <summary>
     /// 银行账号 接收dto

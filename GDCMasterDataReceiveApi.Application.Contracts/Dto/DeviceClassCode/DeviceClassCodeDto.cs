@@ -43,10 +43,6 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.DeviceClassCode
     public class DeviceClassCodeDetailsDto
     {
         [ExcelIgnore]
-        public DateTime? CreateTime { get; set; }
-        [ExcelIgnore]
-        public DateTime? UpdateTime { get; set; }
-        [ExcelIgnore]
         public string? Id { get; set; }
         /// <summary>
         /// 分类编码: 分类的唯一性编码
@@ -98,6 +94,10 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.DeviceClassCode
         /// </summary>
         [ExcelIgnore]
         public string? SortRule { get; set; }
+        [ExcelIgnore]
+        public DateTime? CreateTime { get; set; }
+        [ExcelIgnore]
+        public DateTime? UpdateTime { get; set; }
     }
     /// <summary>
     /// 物资设备分类编码 接收
