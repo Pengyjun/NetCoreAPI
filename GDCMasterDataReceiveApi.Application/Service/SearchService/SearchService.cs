@@ -34,6 +34,7 @@ using GDCMasterDataReceiveApi.Domain.Models;
 using GDCMasterDataReceiveApi.Domain.Shared;
 using GDCMasterDataReceiveApi.Domain.Shared.Utils;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using SqlSugar;
 using System.Reflection;
 
@@ -3631,21 +3632,20 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
         /// <param name="requestDto"></param>
         /// <param name="isJingWai"></param>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<List<DHOpportunity>>> GetBusinessNoCpportunitySearchAsync(FilterCondition requestDto, bool isJingWai)
+        public async Task<ResponseAjaxResult<List<DHOpportunityDto>>> GetBusinessNoCpportunitySearchAsync(FilterCondition requestDto, bool isJingWai)
         {
-            var responseAjaxResult = new ResponseAjaxResult<List<DHOpportunity>>();
+            var responseAjaxResult = new ResponseAjaxResult<List<DHOpportunityDto>>();
             RefAsync<int> total = 0;
 
             //过滤条件
-            DHOpportunity filterCondition = new();
+            DHOpportunityDto filterCondition = new();
             if (!string.IsNullOrWhiteSpace(requestDto.FilterConditionJson))
             {
-                filterCondition = JsonConvert.DeserializeObject<DHOpportunity>(requestDto.FilterConditionJson);
+                filterCondition = JsonConvert.DeserializeObject<DHOpportunityDto>(requestDto.FilterConditionJson);
             }
 
             var ccList = await _dbContext.Queryable<DHOpportunity>()
                 .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.CreatedAt.ToString()), (pro) => pro.CreatedAt.ToString().Contains(filterCondition.CreatedAt.ToString()))
-                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.IsDelete.ToString()), (pro) => pro.IsDelete.ToString().Contains(filterCondition.IsDelete.ToString()))
                 .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.UpdatedAt.ToString()), (pro) => pro.UpdatedAt.ToString().Contains(filterCondition.UpdatedAt.ToString()))
                 .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Z2NDORG), (pro) => pro.Z2NDORG.Contains(filterCondition.Z2NDORG))
                 .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZBOP), (pro) => pro.ZPROJTYPE.Contains(filterCondition.ZBOP))
@@ -3661,17 +3661,15 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                 .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZSTATE), (pro) => pro.ZSTATE.Contains(filterCondition.ZSTATE))
                 .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZTAXMETHOD), (pro) => pro.ZTAXMETHOD.Contains(filterCondition.ZTAXMETHOD))
                 .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZZCOUNTRY), (pro) => pro.ZZCOUNTRY.Contains(filterCondition.ZZCOUNTRY))
-                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.CreateTime.ToString()), (pro) => Convert.ToDateTime(pro.CreateTime).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.CreateTime).ToString("yyyy-MM-dd"))
-                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.UpdateTime.ToString()), (pro) => Convert.ToDateTime(pro.UpdateTime).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.UpdateTime).ToString("yyyy-MM-dd"))
+                //.WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.CreateTime.ToString()), (pro) => Convert.ToDateTime(pro.CreateTime).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.CreateTime).ToString("yyyy-MM-dd"))
+                //.WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.UpdateTime.ToString()), (pro) => Convert.ToDateTime(pro.UpdateTime).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.UpdateTime).ToString("yyyy-MM-dd"))
                 .WhereIF((isJingWai), (cc) => cc.ZZCOUNTRY == "142")
                 .WhereIF((!isJingWai), (cc) => cc.ZZCOUNTRY != "142")
                 .Where((cc) => cc.IsDelete == 1)
-                .Select((cc) => new DHOpportunity
+                .Select((cc) => new DHOpportunityDto
                 {
-                    Zdelete = cc.Zdelete,
+                    Zdelete = cc.IsDelete.ToString(),
                     CreatedAt = cc.CreatedAt,
-                    Id = cc.Id,
-                    IsDelete = cc.IsDelete,
                     UpdatedAt = cc.UpdatedAt,
                     Z2NDORG = cc.Z2NDORG,
                     ZAWARDP_LIST = cc.ZAWARDP_LIST,
@@ -3688,10 +3686,20 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     ZSTATE = cc.ZSTATE,
                     ZTAXMETHOD = cc.ZTAXMETHOD,
                     ZZCOUNTRY = cc.ZZCOUNTRY,
-                    CreateTime = cc.CreateTime,
-                    UpdateTime = cc.UpdateTime
                 })
                 .ToPageListAsync(requestDto.PageIndex, requestDto.PageSize, total);
+
+            foreach (var item in ccList)
+            {
+                if (!string.IsNullOrWhiteSpace(item.ZAWARDP_LIST))
+                {
+                    var jsonObject = JObject.Parse(item.ZAWARDP_LIST);
+                    if (!string.IsNullOrWhiteSpace(jsonObject["item"].ToString()))
+                    {
+                        item.DHAwardpList = JsonConvert.DeserializeObject<List<DHAwardpList>>(jsonObject["item"].ToString());
+                    }
+                }
+            }
 
             responseAjaxResult.Count = total;
             responseAjaxResult.SuccessResult(ccList);

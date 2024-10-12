@@ -543,7 +543,8 @@ namespace GDCMasterDataReceiveApi.Controller
         /// <param name="requestDto"></param>
         /// <returns></returns>
         [HttpPost("GetBusinessNoCpportunitySearch")]
-        public async Task<ResponseAjaxResult<List<DHOpportunity>>> GetBusinessNoCpportunitySearchAsync([FromBody] FilterCondition requestDto)
+        [AllowAnonymous]
+        public async Task<ResponseAjaxResult<List<DHOpportunityDto>>> GetBusinessNoCpportunitySearchAsync([FromBody] FilterCondition requestDto)
         {
             return await _searchService.GetBusinessNoCpportunitySearchAsync(requestDto, false);
         }
@@ -556,6 +557,12 @@ namespace GDCMasterDataReceiveApi.Controller
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
+        [HttpPost("GetBusinessCpportunitySearch")]
+        [AllowAnonymous]
+        public async Task<ResponseAjaxResult<List<DHOpportunityDto>>> GetBusinessCpportunitySearchAsync([FromBody] FilterCondition requestDto)
+        {
+            return await _searchService.GetBusinessNoCpportunitySearchAsync(requestDto, true);
+        }
         //[HttpPost("GetBusinessCpportunitySearch")]
         //public async Task<ResponseAjaxResult<List<BusinessNoCpportunityDetailsDto>>> GetBusinessCpportunitySearchAsync([FromBody] FilterCondition requestDto)
         //{

@@ -321,7 +321,7 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.IService.ISearchService
         /// <param name="isJingWai"></param>
         /// <returns></returns>
         //Task<ResponseAjaxResult<List<BusinessNoCpportunityDetailsDto>>> GetBusinessNoCpportunitySearchAsync(FilterCondition requestDto,bool isJingWai);
-        Task<ResponseAjaxResult<List<DHOpportunity>>> GetBusinessNoCpportunitySearchAsync(FilterCondition requestDto,bool isJingWai);
+        Task<ResponseAjaxResult<List<DHOpportunityDto>>> GetBusinessNoCpportunitySearchAsync(FilterCondition requestDto,bool isJingWai);
         /// <summary>
         /// 
         /// </summary>
