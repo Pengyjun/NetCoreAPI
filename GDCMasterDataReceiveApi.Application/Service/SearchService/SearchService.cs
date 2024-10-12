@@ -2290,20 +2290,20 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<List<DHResearch>>> GetScientifiCNoProjectSearchAsync(FilterCondition requestDto)
+        public async Task<ResponseAjaxResult<List<DHResearchDto>>> GetScientifiCNoProjectSearchAsync(FilterCondition requestDto)
         {
-            var responseAjaxResult = new ResponseAjaxResult<List<DHResearch>>();
+            var responseAjaxResult = new ResponseAjaxResult<List<DHResearchDto>>();
             RefAsync<int> total = 0;
 
             //过滤条件
-            DHResearch filterCondition = new();
+            DHResearchDto filterCondition = new();
             if (!string.IsNullOrWhiteSpace(requestDto.FilterConditionJson))
             {
-                filterCondition = JsonConvert.DeserializeObject<DHResearch>(requestDto.FilterConditionJson);
+                filterCondition = JsonConvert.DeserializeObject<DHResearchDto>(requestDto.FilterConditionJson);
             }
 
             var ccList = await _dbContext.Queryable<DHResearch>()
-                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Fzdelete), (pro) => pro.Fzdelete.Contains(filterCondition.IsDelete.ToString()))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Fzdelete), (pro) => pro.Fzdelete.Contains(filterCondition.Fzdelete.ToString()))
                 .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Fzversion), (pro) => pro.Fzversion.Contains(filterCondition.Fzversion))
                 .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Fzhitech), (pro) => pro.Fzhitech.Contains(filterCondition.Fzhitech))
                 .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Fzstate), (pro) => pro.Fzstate.Contains(filterCondition.Fzstate))
@@ -2322,10 +2322,10 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                 .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.FzsrpupCode), (pro) => pro.FzsrpupCode.Contains(filterCondition.FzsrpupCode))
                 .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.UpdatedAt.ToString()), (pro) => pro.UpdatedAt.ToString().Contains(filterCondition.UpdatedAt.ToString()))
                 .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.CreatedAt.ToString()), (pro) => pro.CreatedAt.ToString().Contains(filterCondition.CreatedAt.ToString()))
-                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.CreateTime.ToString()), (pro) => Convert.ToDateTime(pro.CreateTime).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.CreateTime).ToString("yyyy-MM-dd"))
-                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.UpdateTime.ToString()), (pro) => Convert.ToDateTime(pro.UpdateTime).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.UpdateTime).ToString("yyyy-MM-dd"))
+                //.WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.CreateTime.ToString()), (pro) => Convert.ToDateTime(pro.CreateTime).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.CreateTime).ToString("yyyy-MM-dd"))
+                //.WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.UpdateTime.ToString()), (pro) => Convert.ToDateTime(pro.UpdateTime).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.UpdateTime).ToString("yyyy-MM-dd"))
                 .Where((cc) => cc.IsDelete == 1)
-                .Select((cc) => new DHResearch
+                .Select((cc) => new DHResearchDto
                 {
                     CreatedAt = cc.CreatedAt,
                     Fzdelete = cc.Fzdelete,
@@ -2352,13 +2352,61 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     Fzsrpn = cc.Fzsrpn,
                     FzsrpnFn = cc.FzsrpnFn,
                     FzsrpupCode = cc.FzsrpupCode,
-                    Id = cc.Id,
-                    IsDelete = cc.IsDelete,
                     UpdatedAt = cc.UpdatedAt,
-                    CreateTime = cc.CreateTime,
-                    UpdateTime = cc.UpdateTime
                 })
                 .ToPageListAsync(requestDto.PageIndex, requestDto.PageSize, total);
+
+            foreach (var item in ccList)
+            {
+                if (!string.IsNullOrWhiteSpace(item.FzitAi))
+                {
+                    var jsonObject = JObject.Parse(item.FzitAi);
+                    if (!string.IsNullOrWhiteSpace(jsonObject["item"].ToString()))
+                    {
+                        item.FzitAiList = JsonConvert.DeserializeObject<List<FzitAi>>(jsonObject["item"].ToString());
+                    }
+                }
+                if (!string.IsNullOrWhiteSpace(item.FzitAg))
+                {
+                    var jsonObject = JObject.Parse(item.FzitAg);
+                    if (!string.IsNullOrWhiteSpace(jsonObject["item"].ToString()))
+                    {
+                        item.FzitAgList = JsonConvert.DeserializeObject<List<FzitAg>>(jsonObject["item"].ToString());
+                    }
+                }
+                if (!string.IsNullOrWhiteSpace(item.FzitAk))
+                {
+                    var jsonObject = JObject.Parse(item.FzitAk);
+                    if (!string.IsNullOrWhiteSpace(jsonObject["item"].ToString()))
+                    {
+                        item.FzitAkList = JsonConvert.DeserializeObject<List<FzitAk>>(jsonObject["item"].ToString());
+                    }
+                }
+                if (!string.IsNullOrWhiteSpace(item.FzitAh))
+                {
+                    var jsonObject = JObject.Parse(item.FzitAh);
+                    if (!string.IsNullOrWhiteSpace(jsonObject["item"].ToString()))
+                    {
+                        item.FzitAhList = JsonConvert.DeserializeObject<List<FzitAh>>(jsonObject["item"].ToString());
+                    }
+                }
+                if (!string.IsNullOrWhiteSpace(item.FzitDe))
+                {
+                    var jsonObject = JObject.Parse(item.FzitDe);
+                    if (!string.IsNullOrWhiteSpace(jsonObject["item"].ToString()))
+                    {
+                        item.FzitDeList = JsonConvert.DeserializeObject<List<FzitDe>>(jsonObject["item"].ToString());
+                    }
+                }
+                if (!string.IsNullOrWhiteSpace(item.FzitAj))
+                {
+                    var jsonObject = JObject.Parse(item.FzitAj);
+                    if (!string.IsNullOrWhiteSpace(jsonObject["item"].ToString()))
+                    {
+                        item.FzitAjList = JsonConvert.DeserializeObject<List<FzitAj>>(jsonObject["item"].ToString());
+                    }
+                }
+            }
 
             responseAjaxResult.Count = total;
             responseAjaxResult.SuccessResult(ccList);

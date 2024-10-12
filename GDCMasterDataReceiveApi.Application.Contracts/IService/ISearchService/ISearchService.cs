@@ -160,7 +160,7 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.IService.ISearchService
         /// <param name="requestDto"></param>
         /// <returns></returns>
         //Task<ResponseAjaxResult<List<ScientifiCNoProjectDetailsDto>>> GetScientifiCNoProjectSearchAsync(FilterCondition requestDto);
-        Task<ResponseAjaxResult<List<DHResearch>>> GetScientifiCNoProjectSearchAsync(FilterCondition requestDto);
+        Task<ResponseAjaxResult<List<DHResearchDto>>> GetScientifiCNoProjectSearchAsync(FilterCondition requestDto);
         /// <summary>
         /// 科研项目明细
         /// </summary>
