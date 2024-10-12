@@ -29,6 +29,7 @@ using GDCMasterDataReceiveApi.Application.Contracts.Dto.ScientifiCNoProject;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.UnitMeasurement;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.ValueDomain;
 using GDCMasterDataReceiveApi.Application.Contracts.IService.ISearchService;
+using GDCMasterDataReceiveApi.Domain.Models;
 using GDCMasterDataReceiveApi.Domain.Shared;
 using GDCMasterDataReceiveApi.Domain.Shared.Annotation;
 using Microsoft.AspNetCore.Authorization;
@@ -111,10 +112,14 @@ namespace GDCMasterDataReceiveApi.Controller
         /// <param name="requestDto"></param>
         /// <returns></returns>
         [HttpPost("GetProjectSearch")]
-        public async Task<ResponseAjaxResult<List<ProjectDetailsDto>>> GetProjectSearchAsync([FromBody] FilterCondition requestDto)
+        public async Task<ResponseAjaxResult<List<DHtProjects>>> GetProjectSearchAsync([FromBody] FilterCondition requestDto)
         {
             return await _searchService.GetProjectSearchAsync(requestDto);
         }
+        //public async Task<ResponseAjaxResult<List<ProjectDetailsDto>>> GetProjectSearchAsync([FromBody] FilterCondition requestDto)
+        //{
+        //    return await _searchService.GetProjectSearchAsync(requestDto);
+        //}
         /// <summary>
         /// 获取项目详情
         /// </summary>
@@ -124,6 +129,17 @@ namespace GDCMasterDataReceiveApi.Controller
         public async Task<ResponseAjaxResult<ProjectDetailsDto>> GetProjectDetailsAsync([FromQuery] string id)
         {
             return await _searchService.GetProjectDetailsAsync(id);
+        }
+        /// <summary>
+        /// 虚拟项目DH
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        [HttpGet("GetDHVirtualProject")]
+        public async Task<ResponseAjaxResult<List<DHVirtualProject>>> GetDHVirtualProjectAsync([FromBody]FilterCondition requestDto)
+        {
+
+            return await _searchService.GetDHVirtualProjectAsync(requestDto);
         }
         /// <summary>
         /// 获取往来单位列表
@@ -251,10 +267,14 @@ namespace GDCMasterDataReceiveApi.Controller
         /// <param name="requestDto"></param>
         /// <returns></returns>
         [HttpPost("GetScientifiCNoProjectSearch")]
-        public async Task<ResponseAjaxResult<List<ScientifiCNoProjectDetailsDto>>> GetScientifiCNoProjectSearchAsync([FromBody] FilterCondition requestDto)
+        public async Task<ResponseAjaxResult<List<DHResearch>>> GetScientifiCNoProjectSearchAsync([FromBody] FilterCondition requestDto)
         {
             return await _searchService.GetScientifiCNoProjectSearchAsync(requestDto);
         }
+        //public async Task<ResponseAjaxResult<List<ScientifiCNoProjectDetailsDto>>> GetScientifiCNoProjectSearchAsync([FromBody] FilterCondition requestDto)
+        //{
+        //    return await _searchService.GetScientifiCNoProjectSearchAsync(requestDto);
+        //}
         /// <summary>
         /// 科研项目明细
         /// </summary>
@@ -331,10 +351,14 @@ namespace GDCMasterDataReceiveApi.Controller
         /// <param name="requestDto"></param>
         /// <returns></returns>
         [HttpPost("GetAccountingDepartmentSearch")]
-        public async Task<ResponseAjaxResult<List<AccountingDepartmentDetailsDto>>> GetAccountingDepartmentSearchAsync([FromBody] FilterCondition requestDto)
+        public async Task<ResponseAjaxResult<List<DHAccountingDept>>> GetAccountingDepartmentSearchAsync([FromBody] FilterCondition requestDto)
         {
             return await _searchService.GetAccountingDepartmentSearchAsync(requestDto);
         }
+        //public async Task<ResponseAjaxResult<List<AccountingDepartmentDetailsDto>>> GetAccountingDepartmentSearchAsync([FromBody] FilterCondition requestDto)
+        //{
+        //    return await _searchService.GetAccountingDepartmentSearchAsync(requestDto);
+        //}
         /// <summary>
         /// 获取核算部门详细
         /// </summary>
@@ -495,7 +519,11 @@ namespace GDCMasterDataReceiveApi.Controller
         /// <param name="requestDto"></param>
         /// <returns></returns>
         [HttpPost("GetEscrowOrganizationSearch")]
-        public async Task<ResponseAjaxResult<List<EscrowOrganizationDetailsDto>>> GetEscrowOrganizationSearchAsync([FromBody] FilterCondition requestDto)
+        //public async Task<ResponseAjaxResult<List<EscrowOrganizationDetailsDto>>> GetEscrowOrganizationSearchAsync([FromBody] FilterCondition requestDto)
+        //{
+        //    return await _searchService.GetEscrowOrganizationSearchAsync(requestDto);
+        //}
+        public async Task<ResponseAjaxResult<List<DHOrganzationDepDto>>> GetEscrowOrganizationSearchAsync([FromBody] FilterCondition requestDto)
         {
             return await _searchService.GetEscrowOrganizationSearchAsync(requestDto);
         }
@@ -515,10 +543,14 @@ namespace GDCMasterDataReceiveApi.Controller
         /// <param name="requestDto"></param>
         /// <returns></returns>
         [HttpPost("GetBusinessNoCpportunitySearch")]
-        public async Task<ResponseAjaxResult<List<BusinessNoCpportunityDetailsDto>>> GetBusinessNoCpportunitySearchAsync([FromBody] FilterCondition requestDto)
+        public async Task<ResponseAjaxResult<List<DHOpportunity>>> GetBusinessNoCpportunitySearchAsync([FromBody] FilterCondition requestDto)
         {
             return await _searchService.GetBusinessNoCpportunitySearchAsync(requestDto, false);
         }
+        //public async Task<ResponseAjaxResult<List<BusinessNoCpportunityDetailsDto>>> GetBusinessNoCpportunitySearchAsync([FromBody] FilterCondition requestDto)
+        //{
+        //    return await _searchService.GetBusinessNoCpportunitySearchAsync(requestDto, false);
+        //}
         /// <summary>
         /// 商机项目(含境外商机项目) 列表 国家地区区分  142境内，142以为境外
         /// </summary>
@@ -565,7 +597,11 @@ namespace GDCMasterDataReceiveApi.Controller
         /// <param name="requestDto"></param>
         /// <returns></returns>
         [HttpPost("GetAccountingOrganizationSearch")]
-        public async Task<ResponseAjaxResult<List<AccountingOrganizationDetailsDto>>> GetAccountingOrganizationSearchAsync([FromBody] FilterCondition requestDto)
+        //public async Task<ResponseAjaxResult<List<AccountingOrganizationDetailsDto>>> GetAccountingOrganizationSearchAsync([FromBody] FilterCondition requestDto)
+        //{
+        //    return await _searchService.GetAccountingOrganizationSearchAsync(requestDto);
+        //}
+        public async Task<ResponseAjaxResult<List<DHAdjustAccountsMultipleOrgDto>>> GetAccountingOrganizationSearchAsync([FromBody] FilterCondition requestDto)
         {
             return await _searchService.GetAccountingOrganizationSearchAsync(requestDto);
         }

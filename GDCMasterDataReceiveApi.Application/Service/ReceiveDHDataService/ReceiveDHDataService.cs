@@ -119,11 +119,12 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveDHDataService
 
                 if (insertTable.Any())
                 {
-                    foreach (var item in insertTable) { item.IsDelete = Convert.ToInt32(item.DELETE); item.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(); }
+                    foreach (var item in insertTable) { item.IsDelete = Convert.ToInt32(item.DELETE); item.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(); item.CreateTime = DateTime.Now; }
                     await _dbContext.Fastest<DHOrganzation>().BulkCopyAsync(insertTable);
                 }
                 if (updateTable.Any())
                 {
+                    foreach (var item in updateTable) { item.UpdateTime = DateTime.Now; }
                     await _dbContext.Updateable(updateTable).WhereColumns(x => x.OID).ExecuteCommandAsync();
                 }
 
@@ -167,12 +168,14 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveDHDataService
                     foreach (var item in insertTable)
                     {
                         item.IsDelete = Convert.ToInt32(item.Fzdelete);
-                        item.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
+                        item.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(); 
+                        item.CreateTime = DateTime.Now;
                     }
                     await _dbContext.Fastest<DHAdministrative>().BulkCopyAsync(insertTable);
                 }
                 if (updateTable.Any())
                 {
+                    foreach (var item in updateTable) { item.UpdateTime = DateTime.Now; }
                     await _dbContext.Updateable(updateTable).WhereColumns(x => x.Fzid).ExecuteCommandAsync();
                 }
 
@@ -213,11 +216,12 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveDHDataService
 
                 if (insertTable.Any())
                 {
-                    foreach (var item in insertTable) { item.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(); }
+                    foreach (var item in insertTable) { item.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(); item.CreateTime = DateTime.Now; }
                     await _dbContext.Fastest<DHOrganzationDep>().BulkCopyAsync(insertTable);
                 }
                 if (updateTable.Any())
                 {
+                    foreach (var item in updateTable) { item.UpdateTime = DateTime.Now; }
                     await _dbContext.Updateable(updateTable).WhereColumns(x => x.MdmCode).ExecuteCommandAsync();
                 }
 
@@ -258,11 +262,12 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveDHDataService
 
                 if (insertTable.Any())
                 {
-                    foreach (var item in insertTable) { item.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(); }
+                    foreach (var item in insertTable) { item.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(); item.CreateTime = DateTime.Now; }
                     await _dbContext.Fastest<DHAdjustAccountsMultipleOrg>().BulkCopyAsync(insertTable);
                 }
                 if (updateTable.Any())
                 {
+                    foreach (var item in updateTable) { item.UpdateTime = DateTime.Now; }
                     await _dbContext.Updateable(updateTable).WhereColumns(x => x.Zaco).ExecuteCommandAsync();
                 }
 
@@ -303,11 +308,12 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveDHDataService
 
                 if (insertTable.Any())
                 {
-                    foreach (var item in insertTable) { item.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(); item.IsDelete = item.Zdatstate == "0" ? 1 : item.Zdatstate == "1" ? 0 : 1; }
+                    foreach (var item in insertTable) { item.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(); item.CreateTime = DateTime.Now; item.IsDelete = item.Zdatstate == "0" ? 1 : item.Zdatstate == "1" ? 0 : 1; }
                     await _dbContext.Fastest<DHAccountingDept>().BulkCopyAsync(insertTable);
                 }
                 if (updateTable.Any())
                 {
+                    foreach (var item in updateTable) { item.UpdateTime = DateTime.Now; }
                     await _dbContext.Updateable(updateTable).WhereColumns(x => x.Zdid).ExecuteCommandAsync();
                 }
 
@@ -348,11 +354,12 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveDHDataService
 
                 if (insertTable.Any())
                 {
-                    foreach (var item in insertTable) { item.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(); item.IsDelete = Convert.ToInt32(item.Zdelete); }
+                    foreach (var item in insertTable) { item.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(); item.IsDelete = Convert.ToInt32(item.Zdelete); item.CreateTime = DateTime.Now; }
                     await _dbContext.Fastest<DHtProjects>().BulkCopyAsync(insertTable);
                 }
                 if (updateTable.Any())
                 {
+                    foreach (var item in updateTable) { item.UpdateTime = DateTime.Now; }
                     await _dbContext.Updateable(updateTable).WhereColumns(x => x.ZPROJECT).ExecuteCommandAsync();
                 }
 
@@ -393,11 +400,12 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveDHDataService
 
                 if (insertTable.Any())
                 {
-                    foreach (var item in insertTable) { item.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(); item.IsDelete = Convert.ToInt32(item.Zdelete); }
+                    foreach (var item in insertTable) { item.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(); item.IsDelete = Convert.ToInt32(item.Zdelete); item.CreateTime = DateTime.Now; }
                     await _dbContext.Fastest<DHVirtualProject>().BulkCopyAsync(insertTable);
                 }
                 if (updateTable.Any())
                 {
+                    foreach (var item in updateTable) { item.UpdateTime = DateTime.Now; }
                     await _dbContext.Updateable(updateTable).WhereColumns(x => x.ZVTPROJ).ExecuteCommandAsync();
                 }
 
@@ -438,11 +446,12 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveDHDataService
 
                 if (insertTable.Any())
                 {
-                    foreach (var item in insertTable) { item.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(); item.IsDelete = Convert.ToInt32(item.Zdelete); }
+                    foreach (var item in insertTable) { item.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(); item.IsDelete = Convert.ToInt32(item.Zdelete); item.CreateTime = DateTime.Now; }
                     await _dbContext.Fastest<DHOpportunity>().BulkMergeAsync(insertTable);
                 }
                 if (updateTable.Any())
                 {
+                    foreach (var item in updateTable) { item.UpdateTime = DateTime.Now; }
                     await _dbContext.Updateable(updateTable).WhereColumns(x => x.ZBOP).ExecuteCommandAsync();
                 }
 
@@ -483,11 +492,12 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveDHDataService
 
                 if (insertTable.Any())
                 {
-                    foreach (var item in insertTable) { item.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(); item.IsDelete = Convert.ToInt32(item.Fzdelete); }
+                    foreach (var item in insertTable) { item.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(); item.IsDelete = Convert.ToInt32(item.Fzdelete); item.CreateTime = DateTime.Now; }
                     await _dbContext.Fastest<DHResearch>().BulkMergeAsync(insertTable);
                 }
                 if (updateTable.Any())
                 {
+                    foreach (var item in updateTable) { item.UpdateTime = DateTime.Now; }
                     await _dbContext.Updateable(updateTable).WhereColumns(x => x.FzsrpCode).ExecuteCommandAsync();
                 }
 
