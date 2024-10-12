@@ -16,6 +16,7 @@ using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Serialization;
 using SqlSugar;
 using SqlSugar.Extensions;
+using System.Text;
 using UtilsSharp;
 
 namespace GDCMasterDataReceiveApi.Filters
@@ -50,7 +51,7 @@ namespace GDCMasterDataReceiveApi.Filters
             #region 400的错误
             try
             {
-
+                var db = context.HttpContext.RequestServices.GetService<ISqlSugarClient>();
                 ResponseAjaxResult<List<ErrorMessage>> responseAjaxResult = new();
                 //格式化请求参数错误提示0HMOVSRFRALDE:00000019
                 if (context.Result != null && context.Result.ToString().IndexOf("FileContentResult") < 0 && context.Result.ToString().IndexOf("FileStreamResult") < 0 && context.Result != null && context.Result.ToString().IndexOf("EmptyResult") < 0 && context.Result.ToString().IndexOf("ContentResult") < 0 && ((Microsoft.AspNetCore.Mvc.ObjectResult)context.Result).StatusCode == 400)
@@ -77,7 +78,62 @@ namespace GDCMasterDataReceiveApi.Filters
                     responseAjaxResult.Data = errors;
                     responseAjaxResult.Fail(ResponseMessage.OPERATION_PARAMETER_ERROR, HttpStatusCode.ParameterError);
                     //把400的状态吗记录到日志文件
-                    logger.LogWarning($"用户请求{context.HttpContext.Request.Path}方法出现400的错误信息:{responseAjaxResult.ToJson()}");
+                    #region 请求参数400记录审计日志  只记录接收集团主数据请求的错误  
+                    var routeData = ((Microsoft.AspNetCore.Mvc.ControllerBase)context.Controller).ControllerContext.RouteData.Values.ToArray();
+                    if (routeData.Count()>0&&routeData[1].ToString().IndexOf("Receive")>=0)
+                    {
+                        RecordRequestInfo recordRequestInfos = new RecordRequestInfo()
+                        {
+                            RequestInfo = new RequestInfo(),
+                        };
+                        var requestMethod = context.HttpContext.Request.Method.ToUpper();
+                        if (requestMethod == "GET")
+                        {
+                            if (context.HttpContext.Request.QueryString.HasValue && !string.IsNullOrWhiteSpace(context.HttpContext.Request.QueryString.Value))
+                            {
+                                recordRequestInfo.RequestInfo.Input = context.HttpContext.Request.QueryString.Value.Replace("?", "").TrimAll();
+
+                            }
+                        }
+                        else if (requestMethod == "POST")
+                        {
+                            try
+                            {
+                                if (context.HttpContext.Request.ContentType != null && context.HttpContext.Request.ContentType.IndexOf("multipart/form-data") < 0)
+                                {
+                                    context.HttpContext.Request.Body.Seek(0, SeekOrigin.Begin);
+                                    using (var reader = new StreamReader(context.HttpContext.Request.Body, Encoding.UTF8))
+                                    {
+                                        var parame = await reader.ReadToEndAsync();
+                                        recordRequestInfo.RequestInfo = new RequestInfo() { Input = parame != null ? parame : "" };
+                                    }
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+
+                            }
+                        }
+
+                        AuditLogs auditLogs = new AuditLogs()
+                        {
+                            ApplicationName = "GDCMasterDataReceiveApi",
+                            BrowserInfo = context.HttpContext.Request.Headers["User-Agent"].ToString(),
+                            ClientIpAddress = Utils.GetIP(),
+                            Exceptions = errors.ToJson(),
+                            HttpMethod = requestMethod,
+                            HttpStatusCode = 400,
+                            Id = recordRequestInfo.Id,
+                            RequestParames = recordRequestInfo.RequestInfo.Input,
+                            RequestTime = currentTime,
+                            Url = context.HttpContext.Request.Path,
+                            ActionMethodName = ((Microsoft.AspNetCore.Mvc.Controllers.ControllerActionDescriptor)context.ActionDescriptor).ControllerName
+                        };
+                        if (db != null)
+                            await db.Insertable<AuditLogs>(auditLogs).ExecuteCommandAsync();
+                        logger.LogWarning($"用户请求{context.HttpContext.Request.Path}方法出现400的错误信息:{responseAjaxResult.ToJson()}\r\n 请求参数:{recordRequestInfo.RequestInfo.Input}");
+                    }
+                    #endregion
                     context.Result = new ContentResult()
                     {
                         Content = JsonConvert.SerializeObject(responseAjaxResult, new JsonSerializerSettings()
