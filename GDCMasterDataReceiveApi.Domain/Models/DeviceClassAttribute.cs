@@ -24,7 +24,7 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// 属性名称
         /// 100
         /// </summary>
-        [SugarColumn(Length = 200, ColumnName = "Name")]
+        [SugarColumn(Length = 512, ColumnName = "Name")]
         public string? ZATTRNAME { get; set; }
         /// <summary>
         /// 属性计量单位
