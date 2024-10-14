@@ -37,6 +37,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using SqlSugar;
 using System.Reflection;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace GDCMasterDataReceiveApi.Application.Service.SearchService
 {
@@ -545,6 +546,74 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                 return time.ToString("yyyy年MM月dd日 HH:mm:ss");
             }
             return null;
+        }
+        /// <summary>
+        /// 中交项目业务分类
+        /// </summary>
+        /// <param name="zCPBC"></param>
+        /// <param name="gradeType">等级 1、2、3</param>
+        /// <param name="ywOrcyType">业务分类 / 产业分类 1/2</param>
+        /// <param name="pjectClassFi"></param>
+        /// <returns></returns>
+        private ProjectClassification? GetZCPBC(string? zCPBC, List<ProjectClassification>? pjectClassFi, int gradeType, int ywOrcyType)
+        {
+            if (zCPBC == null || !pjectClassFi.Any()) { return null; }
+            ProjectClassification projectClassification = new();
+            if (ywOrcyType == 1)//中交业务分类
+            {
+                switch (gradeType)
+                {
+                    case 1:
+                        //一级中交业务分类编码
+                        projectClassification = pjectClassFi.FirstOrDefault(x => x.ZCPBC1ID == zCPBC);
+                        break;
+                    case 2:
+                        //二级中交业务分类分类编码
+                        projectClassification = pjectClassFi.FirstOrDefault(x => x.ZCPBC2ID == zCPBC);
+                        break;
+                    case 3:
+                        //三级中交业务分类分类编码
+                        projectClassification = pjectClassFi.FirstOrDefault(x => x.ZCPBC3ID == zCPBC);
+                        break;
+                }
+            }
+            else if (ywOrcyType == 2)//产业分类
+            {
+                switch (gradeType)
+                {
+                    case 1:
+                        //一级产业分类编码
+                        projectClassification = pjectClassFi.FirstOrDefault(x => x.ZICSTD1ID == zCPBC);
+                        break;
+                    case 2:
+                        //二级产业分类编码
+                        projectClassification = pjectClassFi.FirstOrDefault(x => x.ZICSTD2ID == zCPBC);
+                        break;
+                    case 3:
+                        //三级产业分类编码
+                        projectClassification = pjectClassFi.FirstOrDefault(x => x.ZICSTD3ID == zCPBC);
+                        break;
+                }
+            }
+            else//业务板块
+            {
+                switch (gradeType)
+                {
+                    case 1:
+                        //一级业务板块编码
+                        projectClassification = pjectClassFi.FirstOrDefault(x => x.ZBUSTD1ID == zCPBC);
+                        break;
+                    case 2:
+                        //二级业务板块编码
+                        projectClassification = pjectClassFi.FirstOrDefault(x => x.ZBUSTD2ID == zCPBC);
+                        break;
+                    case 3:
+                        //三级业务板块编码
+                        projectClassification = pjectClassFi.FirstOrDefault(x => x.ZBUSTD3ID == zCPBC);
+                        break;
+                }
+            }
+            return projectClassification;
         }
         /// <summary>
         /// 机构树列表
@@ -3844,9 +3913,42 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     ZSFOLDATE = cc.ZSFOLDATE,
                     ZSTATE = cc.ZSTATE,
                     ZTAXMETHOD = cc.ZTAXMETHOD,
-                    ZZCOUNTRY = cc.ZZCOUNTRY,
+                    ZZCOUNTRY = cc.ZZCOUNTRY
                 })
                 .ToPageListAsync(requestDto.PageIndex, requestDto.PageSize, total);
+
+            //值域信息
+            var valDomain = await _dbContext.Queryable<ValueDomain>()
+                .Where(t => !string.IsNullOrWhiteSpace(t.ZDOM_CODE))
+                .Select(t => new VDomainRespDto { ZDOM_CODE = t.ZDOM_CODE, ZDOM_DESC = t.ZDOM_DESC, ZDOM_VALUE = t.ZDOM_VALUE, ZDOM_NAME = t.ZDOM_NAME, ZDOM_LEVEL = t.ZDOM_LEVEL })
+                .ToListAsync();
+
+            //行政区划
+            var locationKey = ccList.Select(x => x.ZPROJLOC).ToList();
+            var location = await _dbContext.Queryable<AdministrativeDivision>()
+                .Where(t => t.IsDelete == 1 && locationKey.Contains(t.ZADDVSCODE))
+                .Select(t => new CountryRegionOrAdminDivisionDto { Code = t.ZADDVSCODE, Name = t.ZADDVSNAME })
+                .ToListAsync();
+
+            //项目机构 
+            var pjectOrgKey = ccList.Select(x => x.ZORG_QUAL).ToList();
+            var pjectOrg = await _dbContext.Queryable<Institution>()
+                .Where(t => t.IsDelete == 1 && pjectOrgKey.Contains(t.OID))
+                .Select(t => new InstutionRespDto { Oid = t.OID, PoId = t.POID, Grule = t.GRULE, Name = t.NAME })
+                .ToListAsync();
+
+            //中交项目
+            var zjProject = ccList.Select(x => x.ZCPBC).ToList();
+            var zjProjectClassFil = await _dbContext.Queryable<ProjectClassification>()
+                .Where(t => t.IsDelete == 1)
+                .ToListAsync();
+
+            //国家地区
+            var countrysKey = ccList.Select(x => x.ZZCOUNTRY).ToList();
+            var country = await _dbContext.Queryable<CountryRegion>()
+                .Where(t => t.IsDelete == 1 && countrysKey.Contains(t.ZCOUNTRYCODE))
+                .Select(t => new CountryRegionOrAdminDivisionDto { Code = t.ZCOUNTRYCODE, Name = t.ZCOUNTRYNAME })
+                .ToListAsync();
 
             foreach (var item in ccList)
             {
@@ -3858,6 +3960,32 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                         item.DHAwardpList = JsonConvert.DeserializeObject<List<DHAwardpList>>(jsonObject["item"].ToString());
                     }
                 }
+
+                //项目类型
+                item.ZPROJTYPE = GetValueDomain(item.ZPROJTYPE, valDomain, "ZPROJTYPE");
+
+                //项目所在地
+                item.ZPROJLOC = GetAdministrativeDivision(item.ZPROJLOC, location);
+
+                //计税方式
+                item.ZTAXMETHOD = GetValueDomain(item.ZTAXMETHOD, valDomain, "ZTAXMETHOD");
+
+                //参与单位
+                item.ZCY2NDORG = GetValueDomain(item.ZCY2NDORG, valDomain, "ZTAXMETHOD");
+
+                //资质单位
+                item.ZORG_QUAL = GetInstitutionName(item.ZORG_QUAL, pjectOrg);
+
+                //跟踪单位
+                item.ZORG = GetInstitutionName(item.ZORG, pjectOrg);
+
+                //国家地区
+                item.ZZCOUNTRY = GetCountryRegion(item.ZZCOUNTRY, country);
+
+                //中交项目业务分类
+                item.ZCPBC = GetZCPBC(item.ZCPBC, zjProjectClassFil, 3, 1)?.ZCPBC3NAME;
+
+
             }
 
             responseAjaxResult.Count = total;
