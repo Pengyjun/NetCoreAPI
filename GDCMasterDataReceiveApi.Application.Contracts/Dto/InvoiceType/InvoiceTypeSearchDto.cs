@@ -31,10 +31,6 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.InvoiceType
     public class InvoiceTypeDetailshDto
     {
         [ExcelIgnore]
-        public DateTime? CreateTime { get; set; }
-        [ExcelIgnore]
-        public DateTime? UpdateTime { get; set; }
-        [ExcelIgnore]
         public string? Id { get; set; }
         /// <summary>
         /// 发票类型代码
@@ -61,6 +57,10 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.InvoiceType
         /// </summary>
         [ExcelIgnore]
         public string? DataIdentifier { get; set; }
+        [ExcelIgnore]
+        public DateTime? CreateTime { get; set; }
+        [ExcelIgnore]
+        public DateTime? UpdateTime { get; set; }
     }
     /// <summary>
     /// 发票类型 接收

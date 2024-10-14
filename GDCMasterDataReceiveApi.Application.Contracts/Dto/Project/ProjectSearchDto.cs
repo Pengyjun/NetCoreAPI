@@ -93,10 +93,6 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.Project
     public class ProjectDetailsDto
     {
         [ExcelIgnore]
-        public DateTime? CreateTime { get; set; }
-        [ExcelIgnore]
-        public DateTime? UpdateTime { get; set; }
-        [ExcelIgnore]
         public string Id { get; set;}
         /// <summary>
         /// 项目主数据编码
@@ -378,6 +374,10 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.Project
         /// </summary>
         [ExcelIgnore]
         public string? CreateDate { get; set; }
+        [ExcelIgnore]
+        public DateTime? CreateTime { get; set; }
+        [ExcelIgnore]
+        public DateTime? UpdateTime { get; set; }
 
     }
 

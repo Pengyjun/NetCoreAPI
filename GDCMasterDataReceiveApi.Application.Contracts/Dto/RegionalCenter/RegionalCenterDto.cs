@@ -32,10 +32,6 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.RegionalCenter
     {
 
         [ExcelIgnore]
-        public DateTime? CreateTime { get; set; }
-        [ExcelIgnore]
-        public DateTime? UpdateTime { get; set; }
-        [ExcelIgnore]
         public string? Id { get; set; }
         /// <summary>
         /// 中交区域中心代码:中交区域中心编码
@@ -62,6 +58,10 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.RegionalCenter
         /// </summary>
         [ExcelIgnore]
         public string? DataIdentifier { get; set; }
+        [ExcelIgnore]
+        public DateTime? CreateTime { get; set; }
+        [ExcelIgnore]
+        public DateTime? UpdateTime { get; set; }
     }
     /// <summary>
     /// 中交区域中心 接收

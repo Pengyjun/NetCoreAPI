@@ -26,6 +26,10 @@
         /// </summary>
         public string? FzitOname { get; set; }
         /// <summary>
+        /// 曾用名
+        /// </summary>
+        public List<FzitOname>? FzitOnameList { get; set; }
+        /// <summary>
         /// 科研项目分类
         /// </summary>
         public string? Fzsrpclass { get; set; }
@@ -233,5 +237,19 @@
         /// 项目负责人名称
         /// </summary>
         public string? ZPRINCIPALN { get; set; }
+    }
+    /// <summary>
+    /// 曾用名
+    /// </summary>
+    public class FzitOname
+    {
+        /// <summary>
+        /// 行项目编号
+        /// </summary>
+        public string? ZITEM { get; set; }
+        /// <summary>
+        /// 曾用名
+        /// </summary>
+        public string? ZOLDNAME { get; set; }
     }
 }

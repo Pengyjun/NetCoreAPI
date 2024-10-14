@@ -62,10 +62,6 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.CorresUnit
     /// </summary>
     public class CorresUnitDetailsDto
     {
-        [ExcelIgnore]
-        public DateTime? CreateTime { get; set; }
-        [ExcelIgnore]
-        public DateTime? UpdateTime { get; set; }
         /// <summary>
         /// 主键id
         /// </summary>
@@ -221,6 +217,10 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.CorresUnit
         /// </summary>
         [ExcelIgnore]
         public string? StatusOfUnit { get; set; }
+        [ExcelIgnore]
+        public DateTime? CreateTime { get; set; }
+        [ExcelIgnore]
+        public DateTime? UpdateTime { get; set; }
     }
     /// <summary>
     /// 往来单位主数据 接收

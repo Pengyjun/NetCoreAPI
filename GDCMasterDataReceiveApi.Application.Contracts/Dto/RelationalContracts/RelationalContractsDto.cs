@@ -34,10 +34,6 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.RelationalContracts
     public class RelationalContractsDetailsDto
     {
         [ExcelIgnore]
-        public DateTime? CreateTime { get; set; }
-        [ExcelIgnore]
-        public DateTime? UpdateTime { get; set; }
-        [ExcelIgnore]
         public string? Id { get; set; }
         /// <summary>
         /// 机构主数据编码:2023年2月20日多机构新增
@@ -88,6 +84,10 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.RelationalContracts
         /// </summary>
         [ExcelIgnore]
         public string? Version { get; set; }
+        [ExcelIgnore]
+        public DateTime? CreateTime { get; set; }
+        [ExcelIgnore]
+        public DateTime? UpdateTime { get; set; }
     }
     /// <summary>
     /// 委托关系 接收

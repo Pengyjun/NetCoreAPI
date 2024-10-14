@@ -74,10 +74,6 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.ProjectClassificatio
     public class ProjectClassificationDetailsDto
     {
         [ExcelIgnore]
-        public DateTime? CreateTime { get; set; }
-        [ExcelIgnore]
-        public DateTime? UpdateTime { get; set; }
-        [ExcelIgnore]
         public string? Id { get; set; }
         /// <summary>
         /// 中交业务分类三级分类代码
@@ -204,6 +200,10 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.ProjectClassificatio
         /// </summary>
         [ExcelIgnore]
         public string? ThirdNewBType { get; set; }
+        [ExcelIgnore]
+        public DateTime? CreateTime { get; set; }
+        [ExcelIgnore]
+        public DateTime? UpdateTime { get; set; }
     }
     /// <summary>
     /// 中交项目行业分类产业分类、业务板块、十二大业务类型、江河湖海对照关系  接收

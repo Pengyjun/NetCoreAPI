@@ -56,10 +56,6 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto._4A.User
     /// </summary>
     public class UserSearchDetailsDto
     {
-        [ExcelIgnore]
-        public DateTime? CreateTime { get; set; }
-        [ExcelIgnore]
-        public DateTime? UpdateTime { get; set; }
         /// <summary>
         /// ids（首页下钻）
         /// </summary>
@@ -288,6 +284,10 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto._4A.User
         /// </summary>v
         [ExcelIgnore]
         public string? Attribute5 { get; set; }
+        [ExcelIgnore]
+        public DateTime? CreateTime { get; set; }
+        [ExcelIgnore]
+        public DateTime? UpdateTime { get; set; }
     }
     /// <summary>
     /// 机构dto

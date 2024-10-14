@@ -50,10 +50,6 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.BusinessNoCpportunit
     /// </summary>
     public class BusinessNoCpportunityDetailsDto
     {
-        [ExcelIgnore]
-        public DateTime? CreateTime { get; set; }
-        [ExcelIgnore]
-        public DateTime? UpdateTime { get; set; }
         /// <summary>
         /// 主键id
         /// </summary>
@@ -129,6 +125,10 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.BusinessNoCpportunit
         /// </summary>
         [ExcelIgnore]
         public string? ParticipatingUnits { get; set; }
+        [ExcelIgnore]
+        public DateTime? CreateTime { get; set; }
+        [ExcelIgnore]
+        public DateTime? UpdateTime { get; set; }
     }
     /// <summary>
     /// 商机项目(不含境外商机项目) 接收

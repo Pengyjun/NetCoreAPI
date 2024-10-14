@@ -12,7 +12,7 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// 发送记录ID 发送记录的ID，必须保证此ID在同一个发送批次中是唯一的。用于记录发送方对于此发送记录的唯一标识。
         /// </summary>
         [SugarColumn(IsIgnore = true)]
-        public string ?ZZSERIAL { get; set; }
+        public string? ZZSERIAL { get; set; }
         /// <summary>
         /// 中交业务分类三级分类代码
         /// </summary>
@@ -70,6 +70,11 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         public string? ZICSTD2NAME { get; set; }
         /// <summary>
         /// 产业分类三级分类名称
+        /// </summary>
+        [SugarColumn(Length = 200, ColumnName = "ChanYeThirdCode")]
+        public string? ZICSTD3ID { get; set; }
+        /// <summary>
+        /// 产业分类三级分类代码
         /// </summary>
         [SugarColumn(Length = 200, ColumnName = "ChanYeThirdName")]
         public string? ZICSTD3NAME { get; set; }

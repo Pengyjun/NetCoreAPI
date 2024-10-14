@@ -30,10 +30,6 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.AdministrativeAccoun
     public class AdministrativeAccountingMapperDetailsDto
     {
         [ExcelIgnore]
-        public DateTime? CreateTime { get; set; }
-        [ExcelIgnore]
-        public DateTime? UpdateTime { get; set; }
-        [ExcelIgnore]
         public string? Id { get; set; }
         /// <summary>
         /// 必须唯一
@@ -65,6 +61,10 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.AdministrativeAccoun
         /// </summary>
         [ExcelIgnore]
         public string? DataIdentifier { get; set; }
+        [ExcelIgnore]
+        public DateTime? CreateTime { get; set; }
+        [ExcelIgnore]
+        public DateTime? UpdateTime { get; set; }
     }
     /// <summary>
     /// 行政机构和核算机构映射关系接收

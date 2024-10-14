@@ -71,10 +71,6 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.Institution
     /// </summary>
     public class InstitutionDetatilsDto
     {
-        [ExcelIgnore]
-        public DateTime? CreateTime { get; set; }
-        [ExcelIgnore]
-        public DateTime? UpdateTime { get; set; }
         /// <summary>
         /// ids（首页下钻）
         /// </summary>
@@ -307,6 +303,10 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.Institution
         /// </summary>
         [ExcelIgnore]
         public string? MdmCode { get; set; }
+        [ExcelIgnore]
+        public DateTime? CreateTime { get; set; }
+        [ExcelIgnore]
+        public DateTime? UpdateTime { get; set; }
         /// <summary>
         /// 机构子集
         /// </summary>

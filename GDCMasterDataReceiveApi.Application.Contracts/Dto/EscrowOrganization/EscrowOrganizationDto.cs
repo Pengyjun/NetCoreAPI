@@ -70,10 +70,6 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.EscrowOrganization
     public class EscrowOrganizationDetailsDto
     {
         [ExcelIgnore]
-        public DateTime? CreateTime { get; set; }
-        [ExcelIgnore]
-        public DateTime? UpdateTime { get; set; }
-        [ExcelIgnore]
         public string? Id { get; set; }
         /// <summary>
         /// 机构主数据编码:机构主数据的唯一标识
@@ -210,6 +206,10 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.EscrowOrganization
         /// </summary>
         [ExcelIgnore]
         public string? ViewIdentification { get; set; }
+        [ExcelIgnore]
+        public DateTime? CreateTime { get; set; }
+        [ExcelIgnore]
+        public DateTime? UpdateTime { get; set; }
     }
     /// <summary>
     /// 多组织-税务代管组织(行政)  接收
