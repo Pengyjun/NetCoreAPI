@@ -13,24 +13,24 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// 11
         /// </summary>
         [SugarColumn(Length = 50, ColumnName = "ClassCode")]
-        public string ZCLASS { get; set; }
+        public string? ZCLASS { get; set; }
         /// <summary>
         /// 属性编码: 属性唯一代码
         /// 10 
         /// </summary>
         [SugarColumn(Length = 50, ColumnName = "Code")]
-        public string ZATTRCODE { get; set; }
+        public string? ZATTRCODE { get; set; }
         /// <summary>
         /// 属性值编码: 属性值唯一代码
         /// 10
         /// </summary>
         [SugarColumn(Length = 50, ColumnName = "ValueCode")]
-        public string ZVALUECODE { get; set; }
+        public string? ZVALUECODE { get; set; }
         /// <summary>
         /// 属性值名称
         /// 100
         /// </summary>
         [SugarColumn(Length = 512, ColumnName = "Name")]
-        public string ZVALUENAME { get; set; }
+        public string? ZVALUENAME { get; set; }
     }
 }
