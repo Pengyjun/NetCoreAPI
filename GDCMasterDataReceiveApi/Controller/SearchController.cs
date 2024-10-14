@@ -662,6 +662,7 @@ namespace GDCMasterDataReceiveApi.Controller
             return await _searchService.GetUserFilterColumnsAsync(table);
         }
         [HttpPost("SetFiled")]
+        [AllowAnonymous]
         public async Task<ResponseAjaxResult<bool>> SetFiledAsync()
         {
             return await _searchService.SetFiledAsync();
@@ -681,6 +682,7 @@ namespace GDCMasterDataReceiveApi.Controller
         }
 
         [HttpGet("Modify")]
+        [AllowAnonymous]
         public async Task<ResponseAjaxResult<bool>> ModifyAsync()
         {
             return await _searchService.ModifyAsync();

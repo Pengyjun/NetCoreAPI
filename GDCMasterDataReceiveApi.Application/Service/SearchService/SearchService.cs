@@ -4916,14 +4916,18 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                 .Select(t => new FilterChildData { Key = t.Code, Val = t.Name })
                 .ToListAsync();
 
-
+            //z中交业务分类
+            var zjProjectClassFil = await _dbContext.Queryable<ProjectClassification>()
+                       .Where(t => t.IsDelete == 1)
+                       .Select(t => new FilterChildData { Key = t.ZCPBC3ID, Val = t.ZCPBC3NAME })
+                       .ToListAsync();
 
             #region 查询初始化
 
             switch (table)
             {
                 case 1:
-                    allColumns = new List<string> { "CountryRegion", "SEX", "Enable", "Nationality", "Nation", "EmpSort", "Birthday", "EntryTime", "EmpSort", "PositionGradeNorm", "HighEstGrade", "SameHighEstGrade", "PoliticsFace", "UserInfoStatus", "CreateTime", "UpdateTime", "" };
+                    allColumns = new List<string> { "SEX", "Enable", "Nationality", "Nation", "EmpSort", "Birthday", "EntryTime", "EmpSort", "PositionGradeNorm", "HighEstGrade", "SameHighEstGrade", "PoliticsFace", "UserInfoStatus", "CreateTime", "UpdateTime", "" };
                     var properties = GetProperties<UserSearchDetailsDto>();
                     foreach (var property in properties) { tableColumns.Add(property.Name); }
                     foreach (var item in tableColumns)
@@ -4971,19 +4975,19 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                             else if (item.Contains("Nation"))
                             {
                                 columnName = "民族";
-                                type = "Single";//复选
+                                type = "Single";//
                                 optionsChild = valDomain.Where(x => x.Code == "ZNATION").ToList();
                             }
                             else if (item.Contains("PoliticsFace"))
                             {
                                 columnName = "政治面貌（新版）";
-                                type = "Single";//复选
+                                type = "Single";//
                                 //optionsChild = valDomain.Where(x => x.Code == "ZNATION").ToList();
                             }
                             else if (item.Contains("PositionGradeNorm") || item.Contains("HighEstGrade") || item.Contains("SameHighEstGrade"))
                             {
                                 columnName = item == "PositionGradeNorm" ? "职级（新版）" : item == "HighEstGrade" ? "新版最高职级（新版）" : "统一的最高职级（新版）";
-                                type = "Single";//复选
+                                type = "Single";//
                                 optionsChild = valDomain.Where(x => x.Code == "ZJOBTYPE").ToList();
                             }
                             else if (item.Contains("CreateTime") || item.Contains("UpdateTime"))
@@ -5095,8 +5099,8 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     }
                     break;
                 case 3:
-                    allColumns = new List<string> { "PlanStartDate", "PlanCompletionDate", "TradingSituation", "StartDateOfInsure", "EndDateOfInsure", "Country", "FundEstablishmentDate", "FundExpirationDate", "LeaseStartDate", "DueDate", "TaxMethod", "OrgMethod", "ConsolidatedTable", "Type", "Location", "Invest", "PjectOrg", "ResponsibleParty", "Currency", "FundOrgForm", "FundManager", "TenantType", "UnitSec", "ReasonForDeactivate", "WinningBidder", "Management", "ParticipateInUnitSecs", "IsJoint", "CreateTime", "UpdateTime", "State" };
-
+                    //allColumns = new List<string> { "PlanStartDate", "PlanCompletionDate", "TradingSituation", "StartDateOfInsure", "EndDateOfInsure", "Country", "FundEstablishmentDate", "FundExpirationDate", "LeaseStartDate", "DueDate", "TaxMethod", "OrgMethod", "ConsolidatedTable", "Type", "Location", "Invest", "PjectOrg", "ResponsibleParty", "Currency", "FundOrgForm", "FundManager", "TenantType", "UnitSec", "ReasonForDeactivate", "WinningBidder", "Management", "ParticipateInUnitSecs", "IsJoint", "CreateTime", "UpdateTime", "State" };
+                    allColumns = new List<string> { "ZPROJTYPE", "ZZCOUNTRY", "ZPROJLOC", "ZCPBC", "ZINVERSTOR", "ZAPVLDATE", "ZSI", "FundExpirationDate", "ZPRO_ORG", "ZSTARTDATE", "ZFINDATE", "ZRESP", "ZLDLOCGT", "ZCBR", "ZTRADER", "ZISTARTDATE", "ZIFINDATE", "ZZCURRENCY", "ZFUNDORGFORM", "ZPRO_BP", "ZFUNDMTYPE", "ZFSTARTDATE", "ZFFINDATE", "ZLESSEETYPE", "ZLSTARTDATE", "ZLFINDATE", "Z2NDORG", "ZTAXMETHOD", "ZPOS", "ZAWARDMAI", "ZCS", "ZSTATE", "Zdelete", "CreatedAt", "UpdatedAt", "FZmanagemode", "FZwinningc", "", "", "", "", "" };
                     //币种
                     var currency = await _dbContext.Queryable<Currency>()
                         .Where(t => t.IsDelete == 1)
@@ -5109,7 +5113,8 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                         .Select(t => new FilterChildData { Key = t.OID, Val = t.NAME })
                         .ToListAsync();
 
-                    var properties3 = GetProperties<ProjectDetailsDto>();
+                    //var properties3 = GetProperties<ProjectDetailsDto>();
+                    var properties3 = GetProperties<DHtProjects>();
                     foreach (var property in properties3) { tableColumns.Add(property.Name); }
                     foreach (var item in tableColumns)
                     {
@@ -5119,7 +5124,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                             string type = string.Empty;
                             string columnName = string.Empty;
 
-                            if (item.Contains("PlanStartDate"))
+                            if (item.Contains("ZSTARTDATE"))
                             {
                                 type = "NumberTime";
                                 columnName = "项目计划开始日期";
@@ -5128,160 +5133,160 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                             {
                                 columnName = "状态";
                                 type = "Single";//单选
-                                optionsChild.Add(new FilterChildData { Key = "0", Val = "无效" });
-                                optionsChild.Add(new FilterChildData { Key = "1", Val = "有效" });
+                                optionsChild.Add(new FilterChildData { Key = "0", Val = "停用" });
+                                optionsChild.Add(new FilterChildData { Key = "1", Val = "启用" });
                             }
-                            else if (item.Contains("PlanCompletionDate"))
+                            else if (item.Contains("ZFINDATE"))
                             {
                                 columnName = "项目计划完成日期";
                                 type = "NumberTime";
                             }
-                            else if (item.Contains("Type"))
+                            else if (item.Contains("ZPROJTYPE"))
                             {
                                 columnName = "项目类型";
                                 type = "Single";
-                                //optionsChild = valDomain.Where(x => x.Code == "ZTRADER").ToList();
+                                optionsChild = valDomain.Where(x => x.Code == "ZPROJTYPE").ToList();
                             }
-                            else if (item.Contains("Location"))
+                            else if (item.Contains("ZPROJLOC"))
                             {
                                 columnName = "项目所在地";
                                 type = "Single";
                                 optionsChild = adisision.Where(x => x.Code == "3" || x.Code == "4").ToList();
                             }
-                            else if (item.Contains("Invest"))
-                            {
-                                columnName = "投资主体";
-                                type = "Single";
-                                //optionsChild = adisision.Where(x => x.Code == "3" || x.Code == "4").ToList();
-                            }
-                            else if (item.Contains("PjectOrg") || item.Contains("PjectOrgBP"))
+                            else if (item.Contains("ZPRO_ORG"))
                             {
                                 columnName = "项目机构";
                                 type = "Single";
-                                //optionsChild = adisision.Where(x => x.Code == "3" || x.Code == "4").ToList();
+                                optionsChild = institutions.ToList();
                             }
-                            else if (item.Contains("ResponsibleParty"))
+                            else if (item.Contains("ZPRO_BP"))
+                            {
+                                columnName = "商机项目机构";
+                                type = "Single";
+                                optionsChild = institutions.ToList();
+                            }
+                            else if (item.Contains("ZRESP"))
                             {
                                 columnName = "责任主体";
                                 type = "Single";
                                 //optionsChild = adisision.Where(x => x.Code == "3" || x.Code == "4").ToList();
                             }
-                            else if (item.Contains("Management"))
+                            else if (item.Contains("FZmanagemode"))
                             {
                                 columnName = "项目管理方式";
                                 type = "Single";
                                 //optionsChild = adisision.Where(x => x.Code == "3" || x.Code == "4").ToList();
                             }
-                            else if (item.Contains("WinningBidder"))
+                            else if (item.Contains("ZAWARDMAI"))
                             {
                                 columnName = "中标主体";
                                 type = "Single";
                                 //optionsChild = adisision.Where(x => x.Code == "3" || x.Code == "4").ToList();
                             }
-                            else if (item.Contains("FundOrgForm"))
+                            else if (item.Contains("ZFUNDORGFORM"))
                             {
                                 columnName = "基金组织形式";
                                 type = "Single";
                                 //optionsChild = valDomain.Where(x => x.Code == "ZLESSEETYPE").ToList();
                             }
-                            else if (item.Contains("FundManager"))
+                            else if (item.Contains("ZFUNDMTYPE"))
                             {
                                 columnName = "基金管理人类型";
                                 type = "Single";
                                 //optionsChild = adisision.Where(x => x.Code == "3" || x.Code == "4").ToList();
                             }
-                            else if (item.Contains("TenantType"))
+                            else if (item.Contains("ZLESSEETYPE"))
                             {
                                 columnName = "承租人类型";
                                 type = "Single";
                                 optionsChild = valDomain.Where(x => x.Code == "ZLESSEETYPE").ToList();
                             }
-                            else if (item.Contains("ReasonForDeactivate"))
+                            else if (item.Contains("ZSTOPREASON"))
                             {
                                 columnName = "停用原因";
                                 type = "Single";
                                 optionsChild = valDomain.Where(x => x.Code == "ZSTOPREASON").ToList();
                             }
-                            else if (item.Contains("ParticipateInUnitSecs"))
+                            else if (item.Contains("FZcy2ndorg"))
                             {
                                 columnName = "参与二级单位";
                                 type = "Single";
                                 optionsChild = valDomain.Where(x => x.Code == "ZCY2NDORG").ToList();
                             }
-                            else if (item.Contains("UnitSec"))
+                            else if (item.Contains("Z2NDORG"))
                             {
                                 columnName = "所属二级单位";
                                 type = "Single";
                                 optionsChild = institutions;
                             }
-                            else if (item.Contains("Currency"))
+                            else if (item.Contains("ZZCURRENCY"))
                             {
                                 columnName = "币种";
                                 type = "Single";
                                 optionsChild = currency;
                             }
-                            else if (item.Contains("IsJoint"))
+                            else if (item.Contains("FZwinningc"))
                             {
                                 columnName = "是否联合体项目";
                                 type = "Single";//单选
                                 optionsChild.Add(new FilterChildData { Key = "0", Val = "否" });
                                 optionsChild.Add(new FilterChildData { Key = "1", Val = "是" });
                             }
-                            else if (item.Contains("TradingSituation"))
+                            else if (item.Contains("ZTRADER"))
                             {
                                 columnName = "操盘情况";
                                 type = "Single";
                                 optionsChild = valDomain.Where(x => x.Code == "ZTRADER").ToList();
                             }
-                            else if (item.Contains("StartDateOfInsure"))
+                            else if (item.Contains("ZISTARTDATE"))
                             {
                                 columnName = "保险起始日期";
                                 type = "NumberTime";
                             }
-                            else if (item.Contains("EndDateOfInsure"))
+                            else if (item.Contains("ZIFINDATE"))
                             {
                                 columnName = "保险终止日期";
                                 type = "NumberTime";
                             }
-                            else if (item.Contains("Country"))
+                            else if (item.Contains("ZZCOUNTRY"))
                             {
                                 columnName = "国家/地区";
                                 type = "Single";
                                 optionsChild = countrys;
                             }
-                            else if (item.Contains("FundEstablishmentDate"))
+                            else if (item.Contains("ZFSTARTDATE"))
                             {
                                 columnName = "基金成立日期";
                                 type = "NumberTime";
                             }
-                            else if (item.Contains("FundExpirationDate"))
+                            else if (item.Contains("ZFFINDATE"))
                             {
                                 columnName = "基金到期日期";
                                 type = "NumberTime";
                             }
-                            else if (item.Contains("LeaseStartDate"))
+                            else if (item.Contains("ZLSTARTDATE"))
                             {
                                 columnName = "起租日期";
                                 type = "NumberTime";
                             }
-                            else if (item.Contains("DueDate"))
+                            else if (item.Contains("ZLFINDATE"))
                             {
                                 columnName = "到期日期";
                                 type = "NumberTime";
                             }
-                            else if (item.Contains("TaxMethod"))
+                            else if (item.Contains("ZTAXMETHOD"))
                             {
                                 columnName = "计税方式";
                                 type = "Single";
                                 optionsChild = valDomain.Where(x => x.Code == "ZTAXMETHOD").ToList();
                             }
-                            else if (item.Contains("OrgMethod"))
+                            else if (item.Contains("ZPOS"))
                             {
                                 columnName = "项目组织形式";
                                 type = "Single";
                                 optionsChild = valDomain.Where(x => x.Code == "ZPOS").ToList();
                             }
-                            else if (item.Contains("ConsolidatedTable"))
+                            else if (item.Contains("ZCS"))
                             {
                                 columnName = "并表情况";
                                 type = "Single";
@@ -5786,6 +5791,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     break;
                 case 18:
                     allColumns = new List<string> { "ThirdNewBType", "CreateTime", "UpdateTime" };
+                    //var properties18 = GetProperties<ProjectClassificationDetailsDto>();
                     var properties18 = GetProperties<ProjectClassificationDetailsDto>();
                     foreach (var property in properties18) { tableColumns.Add(property.Name); }
                     foreach (var item in tableColumns)
@@ -5796,7 +5802,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                             string type = string.Empty;
                             string columnName = string.Empty;
 
-                            if (item.Contains("State"))
+                            if (item.Contains("ThirdNewBType"))
                             {
                                 columnName = "三新业务类型";
                                 type = "Single";
@@ -5870,7 +5876,8 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     break;
                 case 21:
                     allColumns = new List<string> { "CreateTime", "UpdateTime" };
-                    var properties21 = GetProperties<AdministrativeAccountingMapperDetailsDto>();
+                    //var properties21 = GetProperties<AdministrativeAccountingMapperDetailsDto>();
+                    var properties21 = GetProperties<DHAdministrative>();
                     foreach (var property in properties21) { tableColumns.Add(property.Name); }
                     foreach (var item in tableColumns)
                     {
@@ -5953,8 +5960,14 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     break;
                 case 23:
                 case 24:
-                    allColumns = new List<string> { "Country", "CreateTime", "UpdateTime", };
-                    var properties24 = GetProperties<BusinessNoCpportunityDetailsDto>();
+                    allColumns = new List<string> { "ZZCOUNTRY", "ZPROJLOC", "ZCPBC", "ZSFOLDATE", "ZORG", "Z2NDORG", "ZSTATE", "ZORG_QUAL", "ZTAXMETHOD", "Zdelete", "CreatedAt", "UpdatedAt", };
+                    //var properties24 = GetProperties<BusinessNoCpportunityDetailsDto>();
+                    //机构
+                    var institutionss = await _dbContext.Queryable<Institution>()
+                        .Where(t => t.IsDelete == 1)
+                        .Select(t => new FilterChildData { Key = t.OID, Val = t.NAME })
+                        .ToListAsync();
+                    var properties24 = GetProperties<DHOpportunity>();
                     foreach (var property in properties24) { tableColumns.Add(property.Name); }
                     foreach (var item in tableColumns)
                     {
@@ -5964,13 +5977,62 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                             string type = string.Empty;
                             string columnName = string.Empty;
 
-                            if (item.Contains("Country"))
+                            if (item.Contains("ZZCOUNTRY"))
                             {
                                 columnName = "国家/地区";
                                 type = "Single";
                                 optionsChild = countrys;
                             }
-                            else if (item.Contains("CreateTime") || item.Contains("UpdateTime"))
+                            if (item.Contains("ZPROJLOC"))
+                            {
+                                columnName = "项目所在地";
+                                type = "Single";
+                                optionsChild = countrys;
+                            }
+                            if (item.Contains("ZCPBC"))
+                            {
+                                columnName = "中交项目业务分类";
+                                type = "Single";
+                                optionsChild = zjProjectClassFil;
+                            }
+                            if (item.Contains("ZORG"))
+                            {
+                                columnName = "跟踪单位";
+                                type = "Single";
+                                optionsChild = institutionss;
+                            }
+                            if (item.Contains("Z2NDORG"))
+                            {
+                                columnName = "所属二级单位";
+                                type = "Single";
+                                optionsChild = institutionss;
+                            }
+                            if (item.Contains("ZORG_QUAL"))
+                            {
+                                columnName = "资质单位";
+                                type = "Single";
+                                optionsChild = institutionss;
+                            }
+                            if (item.Contains("ZTAXMETHOD"))
+                            {
+                                columnName = "计税方式";
+                                type = "Single";
+                                optionsChild = valDomain.Where(x => x.Code == "ZTAXMETHOD").ToList();
+                            }
+                            if (item.Contains("ZSFOLDATE"))
+                            {
+                                columnName = "开始跟踪日期";
+                                type = "Time";
+                                optionsChild = zjProjectClassFil;
+                            }
+                            else if (item.Contains("Zdelete"))
+                            {
+                                columnName = "是否删除";
+                                type = "Single";
+                                optionsChild.Add(new FilterChildData { Key = "0", Val = "已删除" });
+                                optionsChild.Add(new FilterChildData { Key = "1", Val = "未删除" });
+                            }
+                            else if (item.Contains("CreatedAt") || item.Contains("UpdatedAt"))
                             {
                                 columnName = item == "CreateTime" ? "创建时间" : "修改时间";
                                 type = "Time";//时间
@@ -6015,7 +6077,8 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     break;
                 case 26:
                     allColumns = new List<string> { "ZIVFLGID", "ZREPORT_TIME", "ZAORGSTATE", "ZACDISABLEYEAR", "ZACISDETAIL", "ZCWYGL_REA", "ZHTE", "ZH_IN_OUT", "ZOSTATE", "ZCYNAME", "ZREGIONAL", "CreateTime", "UpdateTime", };
-                    var properties26 = GetProperties<AccountingOrganizationDetailsDto>();
+                    //var properties26 = GetProperties<AccountingOrganizationDetailsDto>();
+                    var properties26 = GetProperties<DHAdjustAccountsMultipleOrg>();
                     foreach (var property in properties26) { tableColumns.Add(property.Name); }
                     foreach (var item in tableColumns)
                     {
@@ -6179,7 +6242,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
         {
             ResponseAjaxResult<bool> responseAjaxResult = new();
             List<SystemInterfaceField> ddd = new();
-            var excludedProperties = new HashSet<string> { "CreateTime", "UpdateTime", "Id", "Ids" };
+            var excludedProperties = new HashSet<string> { "CreatedAt", "CreateTime", "CreateId", "UpdateId", "DeleteTime", "Timestamp", "IsDelete", "UpdatedAt", "ZAWARDP_LIST", "DeleteId", "Zdelete", "Fzstate", "Fzversion", "Id", "Version", "DataIdentifier", "Ids", "TreeCode", "StatusOfUnit", "Fzdelete", "CreateBy", "CreatTime", "ChangeTime", "Children", "ModifiedBy", "SourceSystem","UpdateBy", "UpdateTime", "State", "FzitAi", "FzitAg", "FzitAk", "FzitAh", "FzitDe", "FzitAj", "ViewIdentification", "" };
 
             var resList = await _dbContext.AsTenant().QueryableWithAttr<SystemInterface>()
                 .Select(t => new { t.Id, t.InterfaceName, t.Remark })
@@ -6224,7 +6287,8 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                         break;
                     case "GetProjectSearchAsync":
                     case "GetProjectDetailsAsync":
-                        var properties3 = GetProperties<ProjectDetailsDto>();
+                        //var properties3 = GetProperties<ProjectDetailsDto>();
+                        var properties3 = GetProperties<DHtProjects>();
                         foreach (var property in properties3)
                         {
                             if (!excludedProperties.Contains(property.Name))
@@ -6336,7 +6400,8 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                         break;
                     case "GetScientifiCNoProjectSearchAsync":
                     case "GetScientifiCNoProjectDetailsAsync":
-                        var properties10 = GetProperties<ScientifiCNoProjectDetailsDto>();
+                        //var properties10 = GetProperties<ScientifiCNoProjectDetailsDto>();
+                        var properties10 = GetProperties<DHResearch>();
                         foreach (var property in properties10)
                         {
                             if (!excludedProperties.Contains(property.Name))
@@ -6400,7 +6465,8 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                         break;
                     case "GetAccountingDepartmentSearchAsync":
                     case "GetAccountingDepartmentDetailsAsync":
-                        var properties14 = GetProperties<AccountingDepartmentDetailsDto>();
+                        //var properties14 = GetProperties<AccountingDepartmentDetailsDto>();
+                        var properties14 = GetProperties<DHAccountingDept>();
                         foreach (var property in properties14)
                         {
                             if (!excludedProperties.Contains(property.Name))
@@ -6512,7 +6578,8 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                         break;
                     case "GetAdministrativeAccountingMapperSearchAsync":
                     case "GetAdministrativeAccountingMapperDetailsAsync":
-                        var properties21 = GetProperties<AdministrativeAccountingMapperDetailsDto>();
+                        //var properties21 = GetProperties<AdministrativeAccountingMapperDetailsDto>();
+                        var properties21 = GetProperties<DHAdministrative>();
                         foreach (var property in properties21)
                         {
                             if (!excludedProperties.Contains(property.Name))
@@ -6545,7 +6612,8 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     case "GetBusinessNoCpportunitySearchAsync":
                     case "GetBusinessCpportunitySearchAsync":
                     case "GetBusinessNoCpportunityDetailsAsync":
-                        var properties24 = GetProperties<BusinessNoCpportunityDetailsDto>();
+                        //var properties24 = GetProperties<BusinessNoCpportunityDetailsDto>();
+                        var properties24 = GetProperties<DHOpportunity>();
                         foreach (var property in properties24)
                         {
                             if (!excludedProperties.Contains(property.Name))
@@ -6577,7 +6645,8 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                         break;
                     case "GetAccountingOrganizationSearchAsync":
                     case "GetAccountingOrganizationDetailsAsync":
-                        var properties26 = GetProperties<AccountingOrganizationDetailsDto>();
+                        //var properties26 = GetProperties<AccountingOrganizationDetailsDto>();
+                        var properties26 = GetProperties<DHAdjustAccountsMultipleOrg>();
                         foreach (var property in properties26)
                         {
                             if (!excludedProperties.Contains(property.Name))
@@ -6610,6 +6679,21 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     case "GetValueDomainReceiveAsync":
                         var properties28 = GetProperties<ValueDomainReceiveResponseDto>();
                         foreach (var property in properties28)
+                        {
+                            if (!excludedProperties.Contains(property.Name))
+                            {
+                                ddd.Add(new SystemInterfaceField
+                                {
+                                    Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                                    AppSystemInterfaceId = r.Id,
+                                    FieidName = property.Name
+                                });
+                            }
+                        }
+                        break;
+                    case "GetDHVirtualProjectAsync":
+                        var properties29 = GetProperties<DHVirtualProject>();
+                        foreach (var property in properties29)
                         {
                             if (!excludedProperties.Contains(property.Name))
                             {
