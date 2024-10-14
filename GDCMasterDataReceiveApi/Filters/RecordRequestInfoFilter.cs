@@ -33,7 +33,8 @@ namespace GDCMasterDataReceiveApi.Filters
             var httpContext = context.HttpContext;
             #region 拦截验证查看接口基本信息是否允许
             var isAllowInterfaceIntercept = context.ActionDescriptor.EndpointMetadata.OfType<AllowAnonymousAttribute>().Any();
-            if (!isAllowInterfaceIntercept)
+            var routeData = ((Microsoft.AspNetCore.Mvc.ControllerBase)context.Controller).ControllerContext.RouteData.Values.ToArray();
+            if (!isAllowInterfaceIntercept&& routeData[1].ToString().IndexOf("Receive")<= 0)
             {
                 WebHelper webHelper = new WebHelper();
                 var interfaceAuthApi = AppsettingsHelper.GetValue("API:InterfaceAuthApi");
