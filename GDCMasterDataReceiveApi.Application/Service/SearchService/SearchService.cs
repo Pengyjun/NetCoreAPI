@@ -3672,92 +3672,97 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
             return responseAjaxResult;
 
         }
-        ///// <summary>
-        ///// 多组织-税务代管组织(行政)列表
-        ///// </summary>
-        ///// <param name="requestDto"></param>
-        ///// <returns></returns>
-        //public async Task<ResponseAjaxResult<List<EscrowOrganizationDetailsDto>>> GetEscrowOrganizationSearchAsync(FilterCondition requestDto)
-        //{
-        //    var responseAjaxResult = new ResponseAjaxResult<List<EscrowOrganizationDetailsDto>>();
-        //    RefAsync<int> total = 0;
+        /// <summary>
+        ///  多组织-税务代管组织(行政)列表
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        public async Task<ResponseAjaxResult<List<EscrowOrganizationDetailsDto>>> GetEscrowOrganizationSearchAsync(FilterCondition requestDto)
+        {
+            var responseAjaxResult = new ResponseAjaxResult<List<EscrowOrganizationDetailsDto>>();
+            RefAsync<int> total = 0;
 
-        //    //过滤条件
-        //    EscrowOrganizationDetailsDto filterCondition = new();
-        //    if (!string.IsNullOrWhiteSpace(requestDto.FilterConditionJson))
-        //    {
-        //        filterCondition = JsonConvert.DeserializeObject<EscrowOrganizationDetailsDto>(requestDto.FilterConditionJson);
-        //    }
+            //过滤条件
+            EscrowOrganizationDetailsDto filterCondition = new();
+            if (!string.IsNullOrWhiteSpace(requestDto.FilterConditionJson))
+            {
+                filterCondition = JsonConvert.DeserializeObject<EscrowOrganizationDetailsDto>(requestDto.FilterConditionJson);
+            }
 
-        //    var ccList = await _dbContext.Queryable<EscrowOrganization>()
-        //        .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Country), (pro) => pro.CAREA.Contains(filterCondition.Country))
-        //        .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.IsIndependenceAcc), (pro) => pro.IS_INDEPENDENT.Contains(filterCondition.IsIndependenceAcc))
-        //        .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.LocationOfOrg), (pro) => pro.ORGPROVINCE.Contains(filterCondition.LocationOfOrg))
-        //        .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Name), (pro) => pro.NAME.Contains(filterCondition.Name))
-        //        .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.NameEnglish), (pro) => pro.ENGLISHNAME.Contains(filterCondition.NameEnglish))
-        //        .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.NameLLanguage), (pro) => pro.ZZTNAME_LOC.Contains(filterCondition.NameLLanguage))
-        //        .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.OrgStatus), (pro) => pro.STATUS.Contains(filterCondition.OrgStatus))
-        //        .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.RegionalAttr), (pro) => pro.TERRITORYPRO.Contains(filterCondition.RegionalAttr))
-        //        .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Remark), (pro) => pro.NOTE.Contains(filterCondition.Remark))
-        //        .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Shareholding), (pro) => pro.SHAREHOLDINGS.Contains(filterCondition.Shareholding))
-        //        .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ShortNameChinese), (pro) => pro.SHORTNAME.Contains(filterCondition.ShortNameChinese))
-        //        .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.TelAddress), (pro) => pro.ZADDRESS.Contains(filterCondition.TelAddress))
-        //        .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.HROrgMDCode), (pro) => pro.OID.Contains(filterCondition.HROrgMDCode))
-        //        .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.OrgAttr), (pro) => pro.TYPE.Contains(filterCondition.OrgAttr))
-        //        .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.OrgChildAttr), (pro) => pro.TYPEEXT.Contains(filterCondition.OrgChildAttr))
-        //        .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.OrgCode), (pro) => pro.OCODE.Contains(filterCondition.OrgCode))
-        //        .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.OrgGruleCode), (pro) => pro.ORULE.Contains(filterCondition.OrgGruleCode))
-        //        .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.OrgMDCode), (pro) => pro.MDM_CODE.Contains(filterCondition.OrgMDCode))
-        //        .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.RegistrationNo), (pro) => pro.REGISTERCODE.Contains(filterCondition.RegistrationNo))
-        //        .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ShortNameEnglish), (pro) => pro.ENGLISHSHORTNAME.Contains(filterCondition.ShortNameEnglish))
-        //        .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ShortNameLLanguage), (pro) => pro.ZZTSHNAME_LOC.Contains(filterCondition.ShortNameLLanguage))
-        //        .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.SupHROrgMDCode), (pro) => pro.POID.Contains(filterCondition.SupHROrgMDCode))
-        //        .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.SupOrgMDCode), (pro) => pro.ZORGUP.Contains(filterCondition.SupOrgMDCode))
-        //        .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.TreeLevel), (pro) => pro.GRADE.Contains(filterCondition.TreeLevel))
-        //        .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.UnitSec), (pro) => pro.GPOID.Contains(filterCondition.UnitSec))
-        //        .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.CreateTime.ToString()), (pro) => Convert.ToDateTime(pro.CreateTime).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.CreateTime).ToString("yyyy-MM-dd"))
-        //        .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.UpdateTime.ToString()), (pro) => Convert.ToDateTime(pro.UpdateTime).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.UpdateTime).ToString("yyyy-MM-dd"))
-        //        .Where((cc) => cc.IsDelete == 1)
-        //        .Select((cc) => new EscrowOrganizationDetailsDto
-        //        {
-        //            Id = cc.Id.ToString(),
-        //            Country = cc.CAREA,
-        //            IsIndependenceAcc = cc.IS_INDEPENDENT,
-        //            LocationOfOrg = cc.ORGPROVINCE,
-        //            Name = cc.NAME,
-        //            NameEnglish = cc.ENGLISHNAME,
-        //            NameLLanguage = cc.ZZTNAME_LOC,
-        //            NodeSequence = cc.SNO,
-        //            OrgStatus = cc.STATUS,
-        //            RegionalAttr = cc.TERRITORYPRO,
-        //            Remark = cc.NOTE,
-        //            Shareholding = cc.SHAREHOLDINGS,
-        //            ShortNameChinese = cc.SHORTNAME,
-        //            TelAddress = cc.ZADDRESS,
-        //            HROrgMDCode = cc.OID,
-        //            OrgAttr = cc.TYPE,
-        //            OrgChildAttr = cc.TYPEEXT,
-        //            OrgCode = cc.OCODE,
-        //            OrgGruleCode = cc.ORULE,
-        //            OrgMDCode = cc.MDM_CODE,
-        //            RegistrationNo = cc.REGISTERCODE,
-        //            ShortNameEnglish = cc.ENGLISHSHORTNAME,
-        //            ShortNameLLanguage = cc.ZZTSHNAME_LOC,
-        //            SupHROrgMDCode = cc.POID,
-        //            SupOrgMDCode = cc.ZORGUP,
-        //            TreeLevel = cc.GRADE,
-        //            UnitSec = cc.GPOID,
-        //            ViewIdentification = cc.VIEW_FLAG,
-        //            CreateTime = cc.CreateTime,
-        //            UpdateTime = cc.UpdateTime
-        //        })
-        //        .ToPageListAsync(requestDto.PageIndex, requestDto.PageSize, total);
+            var ccList = await _dbContext.Queryable<EscrowOrganization>()
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Country), (pro) => pro.CAREA.Contains(filterCondition.Country))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.IsIndependenceAcc), (pro) => pro.IS_INDEPENDENT.Contains(filterCondition.IsIndependenceAcc))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.LocationOfOrg), (pro) => pro.ORGPROVINCE.Contains(filterCondition.LocationOfOrg))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Name), (pro) => pro.NAME.Contains(filterCondition.Name))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.NameEnglish), (pro) => pro.ENGLISHNAME.Contains(filterCondition.NameEnglish))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.NameLLanguage), (pro) => pro.ZZTNAME_LOC.Contains(filterCondition.NameLLanguage))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.OrgStatus), (pro) => pro.STATUS.Contains(filterCondition.OrgStatus))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.RegionalAttr), (pro) => pro.TERRITORYPRO.Contains(filterCondition.RegionalAttr))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Remark), (pro) => pro.NOTE.Contains(filterCondition.Remark))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Shareholding), (pro) => pro.SHAREHOLDINGS.Contains(filterCondition.Shareholding))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ShortNameChinese), (pro) => pro.SHORTNAME.Contains(filterCondition.ShortNameChinese))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.TelAddress), (pro) => pro.ZADDRESS.Contains(filterCondition.TelAddress))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.HROrgMDCode), (pro) => pro.OID.Contains(filterCondition.HROrgMDCode))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.OrgAttr), (pro) => pro.TYPE.Contains(filterCondition.OrgAttr))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.OrgChildAttr), (pro) => pro.TYPEEXT.Contains(filterCondition.OrgChildAttr))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.OrgCode), (pro) => pro.OCODE.Contains(filterCondition.OrgCode))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.OrgGruleCode), (pro) => pro.ORULE.Contains(filterCondition.OrgGruleCode))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.OrgMDCode), (pro) => pro.MDM_CODE.Contains(filterCondition.OrgMDCode))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.RegistrationNo), (pro) => pro.REGISTERCODE.Contains(filterCondition.RegistrationNo))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ShortNameEnglish), (pro) => pro.ENGLISHSHORTNAME.Contains(filterCondition.ShortNameEnglish))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ShortNameLLanguage), (pro) => pro.ZZTSHNAME_LOC.Contains(filterCondition.ShortNameLLanguage))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.SupHROrgMDCode), (pro) => pro.POID.Contains(filterCondition.SupHROrgMDCode))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.SupOrgMDCode), (pro) => pro.ZORGUP.Contains(filterCondition.SupOrgMDCode))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.TreeLevel), (pro) => pro.GRADE.Contains(filterCondition.TreeLevel))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.UnitSec), (pro) => pro.GPOID.Contains(filterCondition.UnitSec))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.CreateTime.ToString()), (pro) => Convert.ToDateTime(pro.CreateTime).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.CreateTime).ToString("yyyy-MM-dd"))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.UpdateTime.ToString()), (pro) => Convert.ToDateTime(pro.UpdateTime).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.UpdateTime).ToString("yyyy-MM-dd"))
+                .Where((cc) => cc.IsDelete == 1)
+                .Select((cc) => new EscrowOrganizationDetailsDto
+                {
+                    Id = cc.Id.ToString(),
+                    Country = cc.CAREA,
+                    IsIndependenceAcc = cc.IS_INDEPENDENT,
+                    LocationOfOrg = cc.ORGPROVINCE,
+                    Name = cc.NAME,
+                    NameEnglish = cc.ENGLISHNAME,
+                    NameLLanguage = cc.ZZTNAME_LOC,
+                    NodeSequence = cc.SNO,
+                    OrgStatus = cc.STATUS,
+                    RegionalAttr = cc.TERRITORYPRO,
+                    Remark = cc.NOTE,
+                    Shareholding = cc.SHAREHOLDINGS,
+                    ShortNameChinese = cc.SHORTNAME,
+                    TelAddress = cc.ZADDRESS,
+                    HROrgMDCode = cc.OID,
+                    OrgAttr = cc.TYPE,
+                    OrgChildAttr = cc.TYPEEXT,
+                    OrgCode = cc.OCODE,
+                    OrgGruleCode = cc.ORULE,
+                    OrgMDCode = cc.MDM_CODE,
+                    RegistrationNo = cc.REGISTERCODE,
+                    ShortNameEnglish = cc.ENGLISHSHORTNAME,
+                    ShortNameLLanguage = cc.ZZTSHNAME_LOC,
+                    SupHROrgMDCode = cc.POID,
+                    SupOrgMDCode = cc.ZORGUP,
+                    TreeLevel = cc.GRADE,
+                    UnitSec = cc.GPOID,
+                    ViewIdentification = cc.VIEW_FLAG,
+                    CreateTime = cc.CreateTime,
+                    UpdateTime = cc.UpdateTime
+                })
+                .ToPageListAsync(requestDto.PageIndex, requestDto.PageSize, total);
 
-        //    responseAjaxResult.Count = total;
-        //    responseAjaxResult.SuccessResult(ccList);
-        //    return responseAjaxResult;
-        //}
-        public async Task<ResponseAjaxResult<List<DHOrganzationDep>>> GetEscrowOrganizationSearchAsync(FilterCondition requestDto)
+            responseAjaxResult.Count = total;
+            responseAjaxResult.SuccessResult(ccList);
+            return responseAjaxResult;
+        }
+        /// <summary>
+        /// DH行政组织-多组织
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        public async Task<ResponseAjaxResult<List<DHOrganzationDep>>> GetEscrowOrganzationSearchAsync(FilterCondition requestDto)
         {
             var responseAjaxResult = new ResponseAjaxResult<List<DHOrganzationDep>>();
             RefAsync<int> total = 0;
