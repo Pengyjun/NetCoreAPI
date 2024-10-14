@@ -1,5 +1,6 @@
 ﻿using GDCMasterDataReceiveApi.Application.Contracts.Dto;
 using GDCMasterDataReceiveApi.Application.Contracts.IService.ISearchService;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GDCMasterDataReceiveApi.Controller

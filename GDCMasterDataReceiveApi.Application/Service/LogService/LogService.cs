@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using GDCMasterDataReceiveApi.Application.Contracts;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.LogService;
 using GDCMasterDataReceiveApi.Application.Contracts.IService.ILogService;
 using GDCMasterDataReceiveApi.Domain.Models;
@@ -7,12 +6,6 @@ using GDCMasterDataReceiveApi.Domain.Shared;
 using Microsoft.Extensions.Logging;
 using SqlSugar;
 using SqlSugar.Extensions;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using UtilsSharp;
 
 namespace GDCMasterDataReceiveApi.Application.Service.LogService
 {
