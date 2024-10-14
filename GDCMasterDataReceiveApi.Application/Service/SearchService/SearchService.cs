@@ -6247,7 +6247,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
         {
             ResponseAjaxResult<bool> responseAjaxResult = new();
             List<SystemInterfaceField> ddd = new();
-            var excludedProperties = new HashSet<string> { "CreatedAt", "CreateTime", "CreateId", "UpdateId", "DeleteTime", "Timestamp", "IsDelete", "UpdatedAt", "ZAWARDP_LIST", "DeleteId", "Zdelete", "Fzstate", "Fzversion", "Id", "Version", "DataIdentifier", "Ids", "TreeCode", "StatusOfUnit", "Fzdelete", "CreateBy", "CreatTime", "ChangeTime", "Children", "ModifiedBy", "SourceSystem","UpdateBy", "UpdateTime", "State", "FzitAi", "FzitAg", "FzitAk", "FzitAh", "FzitDe", "FzitAj", "ViewIdentification", "" };
+            var excludedProperties = new HashSet<string> { "CreatedAt", "CreateTime", "CreateId", "UpdateId", "DeleteTime", "Timestamp", "IsDelete", "UpdatedAt", "ZAWARDP_LIST", "DeleteId", "Zdelete", "Fzstate", "Fzversion", "Id", "Version", "DataIdentifier", "Ids", "TreeCode", "StatusOfUnit", "Fzdelete", "CreateBy", "CreatTime", "ChangeTime", "Children", "ModifiedBy", "SourceSystem", "UpdateBy", "UpdateTime", "State", "FzitAi", "FzitAg", "FzitAk", "FzitAh", "FzitDe", "FzitAj", "ViewIdentification", "ViewFlag", "Ztreeid1" };
 
             var resList = await _dbContext.AsTenant().QueryableWithAttr<SystemInterface>()
                 .Select(t => new { t.Id, t.InterfaceName, t.Remark })
@@ -6699,6 +6699,21 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     case "GetDHVirtualProjectAsync":
                         var properties29 = GetProperties<DHVirtualProject>();
                         foreach (var property in properties29)
+                        {
+                            if (!excludedProperties.Contains(property.Name))
+                            {
+                                ddd.Add(new SystemInterfaceField
+                                {
+                                    Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                                    AppSystemInterfaceId = r.Id,
+                                    FieidName = property.Name
+                                });
+                            }
+                        }
+                        break;
+                    case "GetXZOrganzationSearchAsync":
+                        var properties30 = GetProperties<DHOrganzationDep>();
+                        foreach (var property in properties30)
                         {
                             if (!excludedProperties.Contains(property.Name))
                             {
