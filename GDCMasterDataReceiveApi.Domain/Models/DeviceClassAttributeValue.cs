@@ -30,7 +30,7 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// 属性值名称
         /// 100
         /// </summary>
-        [SugarColumn(Length = 50, ColumnName = "Name")]
+        [SugarColumn(Length = 512, ColumnName = "Name")]
         public string ZVALUENAME { get; set; }
     }
 }

@@ -26,7 +26,7 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// <summary>
         /// 分类名称: 分类的唯一性编码
         /// </summary>
-        [SugarColumn(Length = 100, ColumnName = "Name")]
+        [SugarColumn(Length = 512, ColumnName = "Name")]
         public string? ZCNAME { get; set; }
         /// <summary>
         /// 分类别名:
