@@ -3932,8 +3932,9 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
 
             //项目机构 
             var pjectOrgKey = ccList.Select(x => x.ZORG_QUAL).ToList();
+            var pjectOrgKey2 = ccList.Select(x => x.ZORG).ToList();
             var pjectOrg = await _dbContext.Queryable<Institution>()
-                .Where(t => t.IsDelete == 1 && pjectOrgKey.Contains(t.OID))
+                .Where(t => t.IsDelete == 1 && (pjectOrgKey.Contains(t.OID) || pjectOrgKey2.Contains(t.OID)))
                 .Select(t => new InstutionRespDto { Oid = t.OID, PoId = t.POID, Grule = t.GRULE, Name = t.NAME })
                 .ToListAsync();
 
