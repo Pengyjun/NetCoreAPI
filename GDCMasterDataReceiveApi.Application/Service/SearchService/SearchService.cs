@@ -6220,6 +6220,79 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                         }
                     }
                     break;
+                case 29:
+                    allColumns = new List<string> { "CreatedAt", "UpdatedAt", "Z2NDORG", "Zdelete", "", "", "" };
+                    //机构
+                    var institutionsss = await _dbContext.Queryable<Institution>()
+                        .Where(t => t.IsDelete == 1)
+                        .Select(t => new FilterChildData { Key = t.OID, Val = t.NAME })
+                        .ToListAsync();
+
+                    var properties29 = GetProperties<DHVirtualProject>();
+                    foreach (var property in properties29) { tableColumns.Add(property.Name); }
+                    foreach (var item in tableColumns)
+                    {
+                        if (allColumns.Contains(item))
+                        {
+                            List<FilterChildData> optionsChild = new();
+                            string type = string.Empty;
+                            string columnName = string.Empty;
+                            if (item.Contains("CreateTime") || item.Contains("UpdateTime"))
+                            {
+                                columnName = item == "CreateTime" ? "创建时间" : "修改时间";
+                                type = "Time";//时间
+                            }
+                            if (item.Contains("Z2NDORG"))
+                            {
+                                columnName = "所属二级单位";
+                                type = "Time";//时间
+                                optionsChild = institutionsss;
+                            }
+                            if (item.Contains("Zdelete"))
+                            {
+                                columnName = "是否删除";
+                                type = "Single";
+                                optionsChild.Add(new FilterChildData { Key = "0", Val = "已删除" });
+                                optionsChild.Add(new FilterChildData { Key = "1", Val = "未删除" });
+                            }
+                            options.Add(new FilterConditionDto { CoulmnName = columnName, CoulmnKey = char.ToLower(item[0]) + item.Substring(1), Options = optionsChild, Type = type });
+                        }
+                    }
+                    break;
+                case 30:
+                    allColumns = new List<string> { "Zcyname", "Zorgloc", "Zregional", "Zostate", "", "", "" };
+
+                    var properties30 = GetProperties<DHOrganzationDep>();
+                    foreach (var property in properties30) { tableColumns.Add(property.Name); }
+                    foreach (var item in tableColumns)
+                    {
+                        if (allColumns.Contains(item))
+                        {
+                            List<FilterChildData> optionsChild = new();
+                            string type = string.Empty;
+                            string columnName = string.Empty;
+                            if (item.Contains("Zcyname"))
+                            {
+                                columnName = "国家名称";
+                                type = "Single";
+                                optionsChild = countrys;
+                            }
+                            if (item.Contains("Zorgloc"))
+                            {
+                                columnName = "机构所在地";
+                                type = "Single";
+                                optionsChild = countrys;
+                            }
+                            if (item.Contains("Zostate"))
+                            {
+                                columnName = "机构状态";
+                                type = "Single";
+                                optionsChild = valDomain.Where(x => x.Code == "ZORGSTATE").ToList();
+                            }
+                            options.Add(new FilterConditionDto { CoulmnName = columnName, CoulmnKey = char.ToLower(item[0]) + item.Substring(1), Options = optionsChild, Type = type });
+                        }
+                    }
+                    break;
             }
             #endregion
 
