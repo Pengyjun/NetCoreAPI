@@ -1432,6 +1432,12 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                 .Select(t => new InstutionRespDto { Oid = t.OID, PoId = t.POID, Grule = t.GRULE, Name = t.NAME })
                 .ToListAsync();
 
+            //中交项目
+            var zjProject = proList.Select(x => x.ZCPBC).ToList();
+            var zjProjectClassFil = await _dbContext.Queryable<ProjectClassification>()
+                .Where(t => t.IsDelete == 1)
+                .ToListAsync();
+
             foreach (var item in proList)
             {
                 //项目类型
@@ -1468,7 +1474,35 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                 //是否联合体项目
                 item.FZwinningc = item.FZwinningc == "1" ? "是" : "否";
 
+                //中交项目业务分类
+                item.ZCPBC = GetZCPBC(item.ZCPBC, zjProjectClassFil, 3, 1)?.ZCPBC3NAME;
 
+                //所属二级单位
+                item.Z2NDORG = GetInstitutionName(item.ZCPBC, pjectOrg);
+
+                //项目组织形式
+                item.ZPOS = GetValueDomain(item.ZPOS, valDomain, "ZPOS");
+
+                //所属事业部
+                item.ZBIZDEPT = GetValueDomain(item.ZBIZDEPT, valDomain, "ZBIZDEPT");
+
+                //参与二级单位
+                item.FZcy2ndorg = GetValueDomain(item.FZcy2ndorg, valDomain, "ZCY2NDORG");
+
+                //基金组织形式
+                item.ZFUNDORGFORM = GetValueDomain(item.ZFUNDORGFORM, valDomain, "ZCY2NDORG");
+
+                ////承租人类型
+                //item.ZLESSEETYPE = GetValueDomain(item.ZLESSEETYPE, valDomain, "ZCY2NDORG");
+
+
+                //项目管理方式
+                //item.FZmanagemode = GetValueDomain(item.FZmanagemode, valDomain, "ZBIZDEPT");
+
+                //中标主体
+                //item.ZAWARDMAI = GetValueDomain(item.ZAWARDMAI, valDomain, "ZPOS");
+
+                //
 
             }
             #endregion
