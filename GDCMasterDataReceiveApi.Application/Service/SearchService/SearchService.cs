@@ -2993,7 +2993,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     Zacorgno = cc.Zacorgno,
                     Zdatstate = cc.Zdatstate,
                     Zdcode = cc.Zdcode,
-                    Zdelete = cc.Zdelete,
+                    Zdelete = cc.IsDelete.ToString(),
                     IsDelete = cc.IsDelete,
                     Zdid = cc.Zdid,
                     ZdnameChs = cc.ZdnameChs,
@@ -3801,6 +3801,27 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                 })
                 .ToPageListAsync(requestDto.PageIndex, requestDto.PageSize, total);
 
+            //值域信息
+            var valDomain = await _dbContext.Queryable<ValueDomain>()
+                .Where(t => !string.IsNullOrWhiteSpace(t.ZDOM_CODE))
+                .Select(t => new VDomainRespDto { ZDOM_CODE = t.ZDOM_CODE, ZDOM_DESC = t.ZDOM_DESC, ZDOM_VALUE = t.ZDOM_VALUE, ZDOM_NAME = t.ZDOM_NAME, ZDOM_LEVEL = t.ZDOM_LEVEL })
+                .ToListAsync();
+
+            foreach (var item in ccList)
+            {
+                //机构属性
+                item.Zoattr = valDomain.FirstOrDefault(x => item.Zoattr == x.ZDOM_VALUE && x.ZDOM_CODE == "ZORGATTR")?.ZDOM_NAME;
+
+                //机构子属性
+                item.Zocattr = valDomain.FirstOrDefault(x => item.Zocattr == x.ZDOM_VALUE && x.ZDOM_CODE == "ZORGCHILDATTR")?.ZDOM_NAME;
+
+                //是否独立核算
+                item.Zcheckind = valDomain.FirstOrDefault(x => item.Zcheckind == x.ZDOM_VALUE && x.ZDOM_CODE == "ZCHECKIND")?.ZDOM_NAME;
+
+                //机构状态
+                item.Zostate = valDomain.FirstOrDefault(x => item.Zostate == x.ZDOM_VALUE && x.ZDOM_CODE == "ZORGSTATE")?.ZDOM_NAME;
+            }
+
             responseAjaxResult.Count = total;
             responseAjaxResult.SuccessResult(ccList);
             return responseAjaxResult;
@@ -3933,8 +3954,10 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
             //项目机构 
             var pjectOrgKey = ccList.Select(x => x.ZORG_QUAL).ToList();
             var pjectOrgKey2 = ccList.Select(x => x.ZORG).ToList();
+            var pjectOrgKey3 = ccList.Select(x => x.ZCY2NDORG).ToList();
+            var pjectOrgKey4 = ccList.Select(x => x.Z2NDORG).ToList();
             var pjectOrg = await _dbContext.Queryable<Institution>()
-                .Where(t => t.IsDelete == 1 && (pjectOrgKey.Contains(t.OID) || pjectOrgKey2.Contains(t.OID)))
+                .Where(t => t.IsDelete == 1 && (pjectOrgKey.Contains(t.OID) || pjectOrgKey2.Contains(t.OID) || pjectOrgKey3.Contains(t.OID) || pjectOrgKey4.Contains(t.OID)))
                 .Select(t => new InstutionRespDto { Oid = t.OID, PoId = t.POID, Grule = t.GRULE, Name = t.NAME })
                 .ToListAsync();
 
@@ -3972,7 +3995,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                 item.ZTAXMETHOD = GetValueDomain(item.ZTAXMETHOD, valDomain, "ZTAXMETHOD");
 
                 //参与单位
-                item.ZCY2NDORG = GetValueDomain(item.ZCY2NDORG, valDomain, "ZTAXMETHOD");
+                item.ZCY2NDORG = GetInstitutionName(item.ZCY2NDORG, pjectOrg);
 
                 //资质单位
                 item.ZORG_QUAL = GetInstitutionName(item.ZORG_QUAL, pjectOrg);
@@ -3980,12 +4003,14 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                 //跟踪单位
                 item.ZORG = GetInstitutionName(item.ZORG, pjectOrg);
 
+                //所属二级单位
+                item.Z2NDORG = GetInstitutionName(item.Z2NDORG, pjectOrg);
+
                 //国家地区
                 item.ZZCOUNTRY = GetCountryRegion(item.ZZCOUNTRY, country);
 
                 //中交项目业务分类
                 item.ZCPBC = GetZCPBC(item.ZCPBC, zjProjectClassFil, 3, 1)?.ZCPBC3NAME;
-
 
             }
 
@@ -4491,6 +4516,60 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     ZztnameEn = cc.ZztnameEn
                 })
                 .ToPageListAsync(requestDto.PageIndex, requestDto.PageSize, total);
+
+            //值域
+            var valDomain = await _dbContext.Queryable<ValueDomain>()
+                .Where(t => !string.IsNullOrWhiteSpace(t.ZDOM_CODE))
+                .Select(t => new VDomainRespDto { ZDOM_CODE = t.ZDOM_CODE, ZDOM_DESC = t.ZDOM_DESC, ZDOM_VALUE = t.ZDOM_VALUE, ZDOM_NAME = t.ZDOM_NAME, ZDOM_LEVEL = t.ZDOM_LEVEL })
+                .ToListAsync();
+
+            //国家地区
+            var countrysKey = ccList.Select(x => x.Zcyname).ToList();
+            var country = await _dbContext.Queryable<CountryRegion>()
+                .Where(t => t.IsDelete == 1 && countrysKey.Contains(t.ZCOUNTRYCODE))
+                .Select(t => new CountryRegionOrAdminDivisionDto { Code = t.ZCOUNTRYCODE, Name = t.ZCOUNTRYNAME })
+                .ToListAsync();
+
+            //行政区划
+            var locationKey = ccList.Select(x => x.Zorgloc).ToList();
+            var location = await _dbContext.Queryable<AdministrativeDivision>()
+                .Where(t => t.IsDelete == 1 && locationKey.Contains(t.ZADDVSCODE))
+                .Select(t => new CountryRegionOrAdminDivisionDto { Code = t.ZADDVSCODE, Name = t.ZADDVSNAME })
+                .ToListAsync();
+
+            //币种
+            var cIds = ccList.Select(t => t.Zzcurrency).ToList();
+            var currency = await _dbContext.Queryable<Currency>()
+                .Where(t => t.IsDelete == 1 && cIds.Contains(t.ZCURRENCYCODE))
+                .Select(t => new { t.ZCURRENCYCODE, t.ZCURRENCYNAME })
+                .ToListAsync();
+
+            foreach (var item in ccList)
+            {
+                //机构状态
+                item.Zaorgstate = valDomain.FirstOrDefault(x => item.Zaorgstate == x.ZDOM_VALUE && x.ZDOM_CODE == "ZORGSTATE")?.ZDOM_NAME;
+
+                //国家地区
+                item.Zcyname = GetCountryRegion(item.Zcyname, country);
+
+                //项目所在地
+                item.Zorgloc = GetAdministrativeDivision(item.Zorgloc, location);
+
+                //地域属性
+                item.Zorgloc = valDomain.FirstOrDefault(x => item.Zorgloc == x.ZDOM_VALUE && x.ZDOM_CODE == "RegionalAttr")?.ZDOM_NAME;
+
+                //币种
+                item.Zzcurrency = currency.FirstOrDefault(x => x.ZCURRENCYCODE == item.Zzcurrency)?.ZCURRENCYNAME;
+
+                //计税方式
+                item.Ztaxmethod = GetValueDomain(item.Ztaxmethod, valDomain, "ZTAXMETHOD");
+
+                //所属税务组织
+                //item.ZtaxOrganization = GetValueDomain(item.ZtaxOrganization, valDomain, "ZTAXMETHOD");
+
+
+
+            }
 
             responseAjaxResult.Count = total;
             responseAjaxResult.SuccessResult(ccList);
