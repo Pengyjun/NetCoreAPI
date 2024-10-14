@@ -86,7 +86,7 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// <summary>
         /// 统一社会信用代码:该金融机构的统一社会信用代码
         /// </summary>
-        [SugarColumn(Length = 18, ColumnName = "RegistrationNo")]
+        [SugarColumn(Length = 128, ColumnName = "RegistrationNo")]
         public string? ZUSCC { get; set; }
         /// <summary>
         /// 状态:数据是否有效的标识:有效：1无效：0
