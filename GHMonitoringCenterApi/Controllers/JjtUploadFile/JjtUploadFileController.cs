@@ -61,6 +61,34 @@ namespace GHMonitoringCenterApi.Controllers.JjtUploadFile
             }
            
 		}
+
+
+        /// <summary>
+		/// 交建通上传图片并推送消息 （交建公司）
+		/// </summary>
+		/// <param name="formFile"></param>
+		/// <returns></returns>
+		/// <exception cref="NotImplementedException"></exception>
+		[HttpPost("UploadImageJJByJJT")]
+        [AllowAnonymous]
+        public async Task<ResponseAjaxResult<bool>> UploadImageJJByJJT(IFormFile formFile, [FromQuery] int isSystemSend = 0)
+        {
+            if (isSystemSend == 1)
+            {
+                return await fileService.UploadImageJJByJJT(formFile);
+            }
+            else
+            {
+                logger.LogWarning($"人为触发消息推送机制,浏览器版本信息:{Request.Headers["User-Agent"].ToString()}");
+                return new ResponseAjaxResult<bool>()
+                {
+                    Code = GHMonitoringCenterApi.Domain.Shared.Enums.HttpStatusCode.Success,
+                    Message = "发送生产推送日报人为触发",
+                };
+            }
+
+        }
+
         /// <summary>
         /// 船舶日报图片
         /// </summary>

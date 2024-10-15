@@ -44,6 +44,13 @@ namespace GHMonitoringCenterApi.Application.Contracts.IService.File
         /// </summary>
         /// <returns></returns>
         Task<ResponseAjaxResult<bool>> UploadImageJJT(IFormFile formFile);
+
+
+        /// <summary>
+        /// 交建通上传图片交建公司
+        /// </summary>
+        /// <returns></returns>
+        Task<ResponseAjaxResult<bool>> UploadImageJJByJJT(IFormFile formFile);
         /// <summary>
         /// 船舶日报图片
         /// </summary>

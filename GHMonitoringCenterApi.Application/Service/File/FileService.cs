@@ -451,6 +451,261 @@ namespace GHMonitoringCenterApi.Application.Service.File
             return responseAjaxResult;
         }
         #endregion
+
+
+
+
+        #region 交建通上传临时素材图片交建公司
+        /// <summary>
+        /// 交建通上传临时素材图片交建公司
+        /// </summary>
+        /// <param name="formFile"></param>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        public async Task<ResponseAjaxResult<bool>> UploadImageJJByJJT(IFormFile formFile)
+        {
+            ResponseAjaxResult<bool> responseAjaxResult = new ResponseAjaxResult<bool>();
+            #region 不使用交建通代理方式的情况
+            //获取token
+            //var accessToken = JjtUtils.GetJjtToken();
+            //if (!string.IsNullOrWhiteSpace(accessToken))
+            //{
+            //    //上传临时图片到交建通服务器
+            //    var uploadResult = HttpFromDataUploadUtils.UploadTempFileJjt(accessToken, formFile);
+            //    if (uploadResult)
+            //    {
+            //        #region 从redis取值
+            //        var redisKey = "mediaId";
+            //        var mediaId = string.Empty;
+            //        var redis = RedisUtil.Instance;
+            //        if (await redis.ExistsAsync(redisKey))
+            //        {
+            //            mediaId = await redis.GetAsync(redisKey);
+            //        }
+            //        else
+            //        {
+            //            //如果redis失效了  在执行一次
+            //            uploadResult = HttpFromDataUploadUtils.UploadTempFileJjt(accessToken, formFile);
+            //            if (uploadResult)
+            //            {
+            //                mediaId = await redis.GetAsync(redisKey);
+            //            }
+            //        }
+            //        #endregion
+            //        //获取推送人员信息
+            //        var pushJjtUserList = await dbContext.Queryable<DayReportJjtPushConfi>().Where(x => x.IsDelete == 1)
+            //   .ToListAsync();
+            //        //上传成功   开始发送消息
+            //        #region 交建通发送消息
+            //        var currentTimeDay = DateTime.Now.Hour;
+            //        if (currentTimeDay == 9)
+            //        {
+            //            //九点第一批人员发送
+            //            var pushUsers = pushJjtUserList.Where(x => x.Type == 0).Select(x => x.PushAccount).ToList();
+            //            var obj = new SingleMessageTemplateRequestDto()
+            //            {
+            //                IsAll = false,
+            //                Mediaid = mediaId,
+            //                MessageType = JjtMessageType.IMAGE,
+            //                UserIds = pushUsers
+            //            };
+            //            var pushResult = JjtUtils.SinglePushMessage(obj);
+            //            responseAjaxResult.Data = pushResult;
+            //            logger.LogWarning($"九点第一批推送人员结果:{pushResult}");
+
+            //        }
+            //        else if (currentTimeDay == 10)
+            //        {
+            //            #region 第二批人员推送 个项目部管理人员
+            //            //10 第二批人员推送 个项目部管理人员
+            //            var pushUsers = pushJjtUserList.Where(x => x.Type.Value == 1).Select(x => x.PushAccount).ToList();
+            //            var obj = new SingleMessageTemplateRequestDto()
+            //            {
+            //                IsAll = false,
+            //                Mediaid = mediaId,
+            //                MessageType = JjtMessageType.IMAGE,
+            //                UserIds = pushUsers
+            //            };
+            //            var pushResult = JjtUtils.SinglePushMessage(obj);
+            //            logger.LogWarning($"10点第二批推送公司管理人员结果:{pushResult}");
+            //            #endregion
+
+            //            #region 部门相关人员发送消息
+            //            //部门相关人员发送消息
+            //            var specialOne = pushJjtUserList.Where(x => x.Type.Value == 2).SingleOrDefault();
+            //            obj = new SingleMessageTemplateRequestDto()
+            //            {
+            //                IsAll = false,
+            //                Mediaid = mediaId,
+            //                MessageType = JjtMessageType.Topartys,
+            //                Topartys = new List<string>() { specialOne.PushAccount }
+            //            };
+            //            pushResult = JjtUtils.SinglePushMessage(obj);
+            //            logger.LogWarning($"10点第二批推送相关部门人员结果:{pushResult}");
+            //            #endregion
+
+            //            #region 相关群组人员发消息
+            //            //相关群组人员发消息
+            //            var specialTwo = pushJjtUserList.Where(x => x.Type.Value == 3).SingleOrDefault();
+            //            obj = new SingleMessageTemplateRequestDto()
+            //            {
+            //                IsAll = false,
+            //                Mediaid = mediaId,
+            //                MessageType = JjtMessageType.CHATID,
+            //                ChatId = specialTwo.GroupNumber
+            //            };
+            //            pushResult = JjtUtils.SinglePushMessage(obj);
+            //            responseAjaxResult.Data = pushResult;
+            //            logger.LogWarning($"10点第二批推送群组人员结果:{pushResult}");
+            //            #endregion
+            //        }
+            //        else if (currentTimeDay >= 18 && currentTimeDay <= 23)
+            //        {
+            //            //测试使用 
+            //            //测试人员陈翠
+            //            var pushUsers = pushJjtUserList.Where(x => x.Type == 0 && x.PushAccount == "2016146340").Select(x => x.PushAccount).ToList();
+            //            var obj = new SingleMessageTemplateRequestDto()
+            //            {
+            //                IsAll = false,
+            //                Mediaid = mediaId,
+            //                MessageType = JjtMessageType.IMAGE,
+            //                UserIds = pushUsers
+            //            };
+            //            var pushResult = JjtUtils.SinglePushMessage(obj);
+            //            responseAjaxResult.Data = pushResult;
+            //            logger.LogWarning($"测试第一批推送人员结果:{pushResult}");
+            //        }
+            //        #endregion
+            //    }
+            //}
+            //else
+            //{
+            //    logger.LogWarning("交建通发送图片获取token为空");
+            //}
+            #endregion
+
+            #region 使用交建通代理方式的情况
+            var url = AppsettingsHelper.GetValue("JjtPushMesssage:UploadTempJjt");
+            var name = "formFile";
+            var fileName = formFile.FileName;
+            var file = formFile.OpenReadStream();
+            var formData = new MultipartFormDataContent();
+            formData.Add(new StreamContent(file, (int)file.Length), name, fileName);
+            var _httpclient = new HttpClient();
+            HttpResponseMessage response = new HttpResponseMessage();
+            try
+            {
+                response = await _httpclient.PostAsync(url, formData);
+            }
+            catch (Exception ex)
+            {
+
+                logger.LogError($"生产日报推送消息发送失败:{ex}");
+            }
+
+            if (response != null && response.IsSuccessStatusCode)
+            {
+                var media = response.Content.ReadAsStringAsync().Result;
+                #region 重试机制
+                media = await RetryAsync(_httpclient, media, url, formData);
+                if (string.IsNullOrWhiteSpace(media.TrimAll()))
+                {
+                    responseAjaxResult.Fail();
+                    return responseAjaxResult;
+                }
+                //if (string.IsNullOrWhiteSpace(media.TrimAll()))
+                //{
+                //    //重试三次
+                //    try
+                //    {
+                //        int retry = 0;
+                //        while (retry<3) 
+                //        {
+
+                //            response = await _httpclient.PostAsync(url, formData);
+                //            media = response.Content.ReadAsStringAsync().Result;
+                //            if (!string.IsNullOrWhiteSpace(media.TrimAll()))
+                //            {
+                //                retry = 4; break;
+                //            }
+                //            else {
+                //                if (retry == 2)
+                //                {
+                //                    //说明重试三次依然失败
+                //                    logger.LogWarning("上传交建通临时素材重试三次依然失败了"); 
+                //                }
+                //                retry += 1;
+                //            }
+                //        }
+                //    }
+                //    catch (Exception ex)
+                //    {
+
+                //        logger.LogError($"生产日报推送消息发送失败:{ex}");
+                //    }
+                //}
+                #endregion
+                responseAjaxResult.Data = true;
+                #region 交建通发送消息
+                //获取推送人员信息
+                var pushJjtUserList = await dbContext.Queryable<DayReportJjtPushConfi>().Where(x => x.IsDelete == 1)
+           .ToListAsync();
+                var currentTimeDay = DateTime.Now.Hour;
+                if (currentTimeDay == 10)
+                {
+                    #region 第二批人员推送 个项目部管理人员
+                    //10 第二批人员推送 个项目部管理人员
+                    var pushUsers = pushJjtUserList.Where(x => x.Type.Value == 1).Select(x => x.PushAccount).ToList();
+                    var obj = new SingleMessageTemplateRequestDto()
+                    {
+                        IsAll = false,
+                        Mediaid = media,
+                        MessageType = JjtMessageType.IMAGE,
+                        UserIds = pushUsers
+                    };
+                    var pushResult = JjtUtils.SinglePushMessage(obj, true, "jjDayReport");
+                    logger.LogWarning($"10点第二批推送交建公司管理人员结果:{pushResult}");
+                    #endregion
+                }
+                else if (currentTimeDay >= 12 && currentTimeDay <= 23)
+                {
+                    #region 测试使用
+                    ////测试使用 
+                    ////测试人员陈翠
+                    //var pushUsers = pushJjtUserList.Where(x => x.Type == 0 && x.PushAccount == "2016146340").Select(x => x.PushAccount).ToList();
+                    //var obj = new SingleMessageTemplateRequestDto()
+                    //{
+                    //    IsAll = false,
+                    //    Mediaid = media,
+                    //    MessageType = JjtMessageType.IMAGE,
+                    //    UserIds = pushUsers
+                    //};
+                    //var pushResult = JjtUtils.SinglePushMessage(obj, true, "five");
+                    //responseAjaxResult.Data = pushResult;
+                    //logger.LogWarning($"测试第一批推送人员结果:{pushResult}");
+                    #endregion
+                    //测试使用 
+                    //测试人员群
+                    var pushUsers = pushJjtUserList.Where(x => x.Type == 4).SingleOrDefault();
+                    var obj = new SingleMessageTemplateRequestDto()
+                    {
+                        IsAll = false,
+                        Mediaid = media,
+                        MessageType = JjtMessageType.CHATID,
+                        ChatId = pushUsers.GroupNumber
+                    };
+                    var pushResult = JjtUtils.SinglePushMessage(obj);
+                    responseAjaxResult.Data = pushResult;
+                    logger.LogWarning($"测试第一批推送人员结果:{pushResult}");
+                }
+                #endregion
+            }
+            #endregion
+            responseAjaxResult.Success();
+            return responseAjaxResult;
+        }
+        #endregion
+
         /// <summary>
         /// 船舶日报图片
         /// </summary>
