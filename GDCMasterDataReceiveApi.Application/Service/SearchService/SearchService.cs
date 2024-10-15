@@ -5211,6 +5211,39 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                                 type = "Single";
                                 optionsChild = valDomain.Where(x => x.Code == "ZMANAGE_MODE").ToList();
                             }
+                            else if (item.Contains("ZCPBC"))
+                            {
+                                columnName = "中交项目业务分类";
+                                type = "Single";
+                                optionsChild = valDomain.Where(x => x.Code == "ZCPBC").ToList(); 
+                            }
+                            else if (item.Contains("ZAPVLDATE"))
+                            {
+                                columnName = "项目批复/决议时间";
+                                type = "NumberTime";
+                            }
+                            else if (item.Contains("ZCPBC"))
+                            {
+                                columnName = "ZINVERSTOR";
+                                type = "Single";
+                                optionsChild = valDomain.Where(x => x.Code == "ZINVERSTOR").ToList(); 
+                            }
+                            else if (item.Contains("ZSI"))
+                            {
+                                columnName = "收入来源";
+                                type = "Single";
+                                optionsChild = valDomain.Where(x => x.Code == "ZSI").ToList(); 
+                            }
+                            else if (item.Contains("ZLDLOCGT"))
+                            {
+                                columnName = "土地成交确认书获取时间";
+                                type = "Time";
+                            }
+                            else if (item.Contains("ZCBR"))
+                            {
+                                columnName = "工商变更时间";
+                                type = "Time";
+                            }
                             else if (item.Contains("ZAWARDMAI"))
                             {
                                 columnName = "中标主体";
@@ -5265,6 +5298,13 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                                 type = "Single";//单选
                                 optionsChild.Add(new FilterChildData { Key = "0", Val = "否" });
                                 optionsChild.Add(new FilterChildData { Key = "1", Val = "是" });
+                            }
+                            else if (item.Contains("ZSTATE"))
+                            {
+                                columnName = "状态";
+                                type = "Single";//单选
+                                optionsChild.Add(new FilterChildData { Key = "0", Val = "停用" });
+                                optionsChild.Add(new FilterChildData { Key = "1", Val = "启用" });
                             }
                             else if (item.Contains("ZTRADER"))
                             {
@@ -5563,7 +5603,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     }
                     break;
                 case 10:
-                    allColumns = new List<string> { "Fzkpstate", "Fzmajortype", "ZMAJORTYPE", "Fzstate", "Fzpstartdate", "Fzpfindate", "CreatedAt", "UpdatedAt", "Fzoutsourcing", "Fzsrpclass" };
+                    allColumns = new List<string> { "Fzkpstate", "Fzmajortype", "", "Fzstate", "Fzpstartdate", "Fzpfindate", "CreatedAt", "UpdatedAt", "Fzoutsourcing", "Fzsrpclass" };
                     //allColumns = new List<string> { "IsHighTech", "PjectState", "IsOutsourced", "TypeCode", "PlanStartDate", "PlanEndDate", "State", "CreateTime", "UpdateTime", };
                     //var properties10 = GetProperties<ScientifiCNoProjectDetailsDto>();
                     var properties10 = GetProperties<DHResearch>();
@@ -5572,7 +5612,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     {
                         if (allColumns.Contains(item))
                         {
-                            List<FilterChildData> optionsChild = new();
+                            List<FilterChildData> optionsChild = new(); 
                             string type = string.Empty;
                             string columnName = string.Empty;
 
@@ -5583,13 +5623,13 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                                 optionsChild.Add(new FilterChildData { Key = "0", Val = "否" });
                                 optionsChild.Add(new FilterChildData { Key = "1", Val = "是" });
                             }
-                            else if (item.Contains("Fzkpstate"))
+                            else if (item.Contains("Fzkpstate")) 
                             {
                                 columnName = "项目状态";
                                 type = "Single";//单选
                                 optionsChild = valDomain.Where(x => x.Code == "ZKPSTATE").ToList();
                             }
-                            else if (item.Contains("ZMAJORTYPE"))
+                            else if (item.Contains("Fzmajortype"))
                             {
                                 columnName = "专业类型";
                                 type = "Single";//单选
@@ -6046,7 +6086,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                             {
                                 columnName = "中交项目业务分类";
                                 type = "Single";
-                                optionsChild = valDomain.Where(x => x.Code == "ZCPBC").ToList(); ;
+                                optionsChild = valDomain.Where(x => x.Code == "ZCPBC").ToList(); 
                             }
                             if (item.Contains("ZORG"))
                             {
@@ -6083,6 +6123,13 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                                 type = "Single";
                                 optionsChild.Add(new FilterChildData { Key = "0", Val = "已删除" });
                                 optionsChild.Add(new FilterChildData { Key = "1", Val = "未删除" });
+                            }
+                            else if (item.Contains("ZSTATE"))
+                            {
+                                columnName = "状态";
+                                type = "Single";
+                                optionsChild.Add(new FilterChildData { Key = "0", Val = "停用" });
+                                optionsChild.Add(new FilterChildData { Key = "1", Val = "启用" });
                             }
                             else if (item.Contains("CreatedAt") || item.Contains("UpdatedAt"))
                             {
