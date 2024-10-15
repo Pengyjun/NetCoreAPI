@@ -1140,8 +1140,8 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
 
             #region 项目初始查询
             var proList = await _dbContext.Queryable<DHtProjects>()
-                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZPROJECT), (pro) => pro.ZPROJNAME.Contains(filterCondition.ZPROJECT))
-                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZPROJNAME), (pro) => pro.ZPROJECT.Contains(filterCondition.ZPROJNAME))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZPROJECT), (pro) => pro.ZPROJECT.Contains(filterCondition.ZPROJECT))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZPROJNAME), (pro) => pro.ZPROJNAME.Contains(filterCondition.ZPROJNAME))
                 .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZPROJENAME), (pro) => pro.ZPROJENAME.Contains(filterCondition.ZPROJENAME))
                 .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZPROJECTID), (pro) => pro.ZPROJECTID.Contains(filterCondition.ZPROJECTID))
                 .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZPROJTYPE), (pro) => pro.ZPROJTYPE.Contains(filterCondition.ZPROJTYPE))
@@ -1198,8 +1198,8 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                 .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.FZcy2ndorg), (pro) => pro.FZcy2ndorg.Contains(filterCondition.FZcy2ndorg))
                 .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.FZwinningc), (pro) => pro.FZwinningc.Contains(filterCondition.FZwinningc))
                 .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.FZawardp), (pro) => pro.FZawardp.Contains(filterCondition.FZawardp))
-                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.CreateTime.ToString()), (pro) => Convert.ToDateTime(pro.CreateTime).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.CreateTime).ToString("yyyy-MM-dd"))
-                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.UpdateTime.ToString()), (pro) => Convert.ToDateTime(pro.UpdateTime).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.UpdateTime).ToString("yyyy-MM-dd"))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.CreatedAt.ToString()), (pro) => Convert.ToDateTime(pro.CreatedAt).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.CreatedAt).ToString("yyyy-MM-dd"))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.UpdatedAt.ToString()), (pro) => Convert.ToDateTime(pro.UpdatedAt).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.UpdatedAt).ToString("yyyy-MM-dd"))
                 .Where((pro) => pro.IsDelete == 1)
                 .Select((pro) => new DHtProjects
                 {
@@ -5264,6 +5264,13 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                                 optionsChild.Add(new FilterChildData { Key = "0", Val = "停用" });
                                 optionsChild.Add(new FilterChildData { Key = "1", Val = "启用" });
                             }
+                            else if (item.Contains("Zdelete"))
+                            {
+                                columnName = "是否删除";
+                                type = "Single";//单选
+                                optionsChild.Add(new FilterChildData { Key = "0", Val = "已删除" });
+                                optionsChild.Add(new FilterChildData { Key = "1", Val = "未删除" });
+                            }
                             else if (item.Contains("ZTRADER"))
                             {
                                 columnName = "操盘情况";
@@ -5324,9 +5331,9 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                                 type = "Single";
                                 optionsChild = valDomain.Where(x => x.Code == "ZCS").ToList();
                             }
-                            else if (item.Contains("CreateTime") || item.Contains("UpdateTime"))
+                            else if (item.Contains("CreatedAt") || item.Contains("UpdatedAt"))
                             {
-                                columnName = item == "CreateTime" ? "创建时间" : "修改时间";
+                                columnName = item == "CreatedAt" ? "创建时间" : "修改时间";
                                 type = "Time";//时间
                             }
                             options.Add(new FilterConditionDto { CoulmnName = columnName, CoulmnKey = char.ToLower(item[0]) + item.Substring(1), Options = optionsChild, Type = type });
