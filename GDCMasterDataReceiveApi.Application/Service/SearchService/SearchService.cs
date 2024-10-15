@@ -1185,7 +1185,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                 .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZLSTARTDATE.ToString()), (pro) => pro.ZLSTARTDATE.ToString().Contains(filterCondition.ZLSTARTDATE.ToString()))
                 .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZLFINDATE.ToString()), (pro) => pro.ZLFINDATE.ToString().Contains(filterCondition.ZLFINDATE.ToString()))
                 .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZOLDNAME), (pro) => pro.ZOLDNAME.Contains(filterCondition.ZOLDNAME))
-                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Z2NDORG), (pro) => pro.Z2NDORG.Contains(filterCondition.Z2NDORG))
+                //.WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Z2NDORG), (pro) => pro.Z2NDORG.Contains(filterCondition.Z2NDORG))
                 .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZSTOPREASON), (pro) => pro.ZSTOPREASON.Contains(filterCondition.ZSTOPREASON))
                 .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZTAXMETHOD), (pro) => pro.ZTAXMETHOD.Contains(filterCondition.ZTAXMETHOD))
                 .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZPOS), (pro) => pro.ZPOS.Contains(filterCondition.ZPOS))
@@ -1214,7 +1214,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     FZmanagemode = pro.FZmanagemode,
                     FZwinningc = pro.FZwinningc,
                     UpdatedAt = pro.UpdatedAt,
-                    Z2NDORG = pro.Z2NDORG,
+                    //Z2NDORG = pro.Z2NDORG,
                     Id = pro.Id,
                     ZAPPROVAL = pro.ZAPPROVAL,
                     ZAPVLDATE = pro.ZAPVLDATE,
@@ -1274,6 +1274,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     CreateTime = pro.CreateTime,
                     UpdateTime = pro.UpdateTime
                 })
+                .OrderByDescending(x => x.UpdatedAt)
                 .ToPageListAsync(requestDto.PageIndex, requestDto.PageSize, total);
             #endregion
 
@@ -1381,9 +1382,9 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
             //项目机构 //商机项目机构
             var pjectOrgKey = proList.Select(x => x.ZPRO_ORG).ToList();
             var pjectOrg2Key = proList.Select(x => x.ZPRO_BP).ToList();
-            var pjectOrg3Key = proList.Select(x => x.Z2NDORG).ToList();
+            //var pjectOrg3Key = proList.Select(x => x.Z2NDORG).ToList();
             var pjectOrg = await _dbContext.Queryable<Institution>()
-                .Where(t => t.IsDelete == 1 && (pjectOrgKey.Contains(t.OID) || pjectOrg2Key.Contains(t.OID) || pjectOrg3Key.Contains(t.OID)))
+                .Where(t => t.IsDelete == 1 && (pjectOrgKey.Contains(t.OID) || pjectOrg2Key.Contains(t.OID)))
                 .Select(t => new InstutionRespDto { Oid = t.OID, PoId = t.POID, Grule = t.GRULE, Name = t.NAME })
                 .ToListAsync();
 
@@ -1395,9 +1396,10 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
 
             foreach (var item in proList)
             {
-                if (!string.IsNullOrWhiteSpace(item.FzitOname))
+                //曾用名
+                if (!string.IsNullOrWhiteSpace(item.ZOLDNAME))
                 {
-                    var jsonObject = JObject.Parse(item.FzitOname);
+                    var jsonObject = JObject.Parse(item.ZOLDNAME);
                     if (!string.IsNullOrWhiteSpace(jsonObject["item"].ToString()))
                     {
                         item.FzitOnameList = JsonConvert.DeserializeObject<List<FzitOnames>>(jsonObject["item"].ToString());
@@ -1440,9 +1442,6 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
 
                 //中交项目业务分类
                 item.ZCPBC = GetValueDomain(item.ZCPBC, valDomain, "ZCPBC");
-
-                //所属二级单位
-                item.Z2NDORG = GetInstitutionName(item.Z2NDORG, pjectOrg);
 
                 //项目组织形式
                 item.ZPOS = GetValueDomain(item.ZPOS, valDomain, "ZPOS");
@@ -2224,6 +2223,47 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                 })
                 .ToPageListAsync(requestDto.PageIndex, requestDto.PageSize, total);
 
+
+            //国家地区
+            var countrysKey = ccList.Select(x => x.Country).ToList();
+            var country = await _dbContext.Queryable<CountryRegion>()
+                .Where(t => t.IsDelete == 1 && countrysKey.Contains(t.ZCOUNTRYCODE))
+                .Select(t => new CountryRegionOrAdminDivisionDto { Code = t.ZCOUNTRYCODE, Name = t.ZCOUNTRYNAME })
+                .ToListAsync();
+
+            //省、市、县
+            var p = ccList.Select(x => x.Province).ToList();
+            var city = ccList.Select(x => x.City).ToList();
+            var c = ccList.Select(x => x.County).ToList();
+            var adisision = await _dbContext.Queryable<AdministrativeDivision>()
+                .Where(t => t.IsDelete == 1 && (p.Contains(t.ZADDVSCODE) || city.Contains(t.ZADDVSCODE) || c.Contains(t.ZADDVSCODE)))
+                .Select(t => new FilterChildData { Key = t.ZADDVSCODE, Val = t.ZADDVSNAME, Code = t.ZADDVSLEVEL })
+                .ToListAsync();
+
+
+            //值域信息
+            var valDomain = await _dbContext.Queryable<ValueDomain>()
+                .Where(t => !string.IsNullOrWhiteSpace(t.ZDOM_CODE))
+                .Select(t => new VDomainRespDto { ZDOM_CODE = t.ZDOM_CODE, ZDOM_DESC = t.ZDOM_DESC, ZDOM_VALUE = t.ZDOM_VALUE, ZDOM_NAME = t.ZDOM_NAME, ZDOM_LEVEL = t.ZDOM_LEVEL })
+                .ToListAsync();
+
+            foreach (var item in ccList)
+            {
+                //国家地区
+                item.Country = GetCountryRegion(item.Country, country);
+
+                //省、市、县
+                item.Province = adisision.FirstOrDefault(x => x.Key == item.Province)?.Val;
+                item.City = adisision.FirstOrDefault(x => x.Key == item.City)?.Val;
+                item.County = adisision.FirstOrDefault(x => x.Key == item.County)?.Val;
+
+                //境内金融机构类型
+                item.TypesOfOrg = GetValueDomain(item.TypesOfOrg, valDomain, "ZDFITYPE");
+
+                //境内金融机构类型
+                item.TypesOfAbroadOrg = GetValueDomain(item.TypesOfAbroadOrg, valDomain, "ZDFITYPE");
+            }
+
             responseAjaxResult.Count = total;
             responseAjaxResult.SuccessResult(ccList);
             return responseAjaxResult;
@@ -2485,6 +2525,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     FzsrpupCode = cc.FzsrpupCode,
                     UpdatedAt = cc.UpdatedAt,
                 })
+                .OrderByDescending(x => x.UpdatedAt)
                 .ToPageListAsync(requestDto.PageIndex, requestDto.PageSize, total);
 
             #region 
@@ -2572,7 +2613,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                 item.Fzsrpclass = valDomain.FirstOrDefault(x => x.ZDOM_CODE == "ZPROJTYPE" && x.ZDOM_VALUE == item.Fzsrpclass)?.ZDOM_NAME;
 
                 //专业类型
-                item.Fzmajortype = valDomain.FirstOrDefault(x => x.ZDOM_CODE == "ZPROJTYPE" && x.ZDOM_VALUE == item.Fzmajortype)?.ZDOM_NAME;
+                item.Fzmajortype = valDomain.FirstOrDefault(x => x.ZDOM_CODE == "ZMAJORTYPE" && x.ZDOM_VALUE == item.Fzmajortype)?.ZDOM_NAME;
 
                 //币种
                 item.Fzprojcostcur = currency.FirstOrDefault(x => x.ZCURRENCYCODE == item.Fzprojcostcur)?.ZCURRENCYNAME;

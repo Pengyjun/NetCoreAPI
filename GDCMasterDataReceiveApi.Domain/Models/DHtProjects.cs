@@ -47,10 +47,6 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// <summary>
         /// 曾用名
         /// </summary>
-        public string? FzitOname { get; set; }
-        /// <summary>
-        /// 曾用名
-        /// </summary>
         [SugarColumn(IsIgnore = true)]
         public List<FzitOnames>? FzitOnameList { get; set; }
         /// <summary>
@@ -201,10 +197,10 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// 曾用名列表
         /// </summary>
         public string? ZOLDNAME { get; set; }
-        /// <summary>
-        /// 所属二级单位
-        /// </summary>
-        public string? Z2NDORG { get; set; }
+        ///// <summary>
+        ///// 所属二级单位
+        ///// </summary>
+        //public string? Z2NDORG { get; set; }
         /// <summary>
         /// 停用原因
         /// </summary>
