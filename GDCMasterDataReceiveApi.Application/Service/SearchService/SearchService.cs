@@ -36,6 +36,7 @@ using GDCMasterDataReceiveApi.Domain.Shared.Utils;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using SqlSugar;
+using System.Diagnostics.Metrics;
 using System.Reflection;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
@@ -3757,6 +3758,50 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     UpdateTime = cc.UpdateTime
                 })
                 .ToPageListAsync(requestDto.PageIndex, requestDto.PageSize, total);
+
+            //行政区划
+            var locationKey = ccList.Select(x => x.LocationOfOrg).ToList();
+            var location = await _dbContext.Queryable<AdministrativeDivision>()
+                .Where(t => t.IsDelete == 1 && locationKey.Contains(t.ZADDVSCODE))
+                .Select(t => new CountryRegionOrAdminDivisionDto { Code = t.ZADDVSCODE, Name = t.ZADDVSNAME })
+                .ToListAsync();
+
+            //国家地区
+            var countrysKey = ccList.Select(x => x.Country).ToList();
+            var country = await _dbContext.Queryable<CountryRegion>()
+                .Where(t => t.IsDelete == 1 && countrysKey.Contains(t.ZCOUNTRYCODE))
+                .Select(t => new CountryRegionOrAdminDivisionDto { Code = t.ZCOUNTRYCODE, Name = t.ZCOUNTRYNAME })
+                .ToListAsync();
+
+            //值域信息
+            var valDomain = await _dbContext.Queryable<ValueDomain>()
+                .Where(t => !string.IsNullOrWhiteSpace(t.ZDOM_CODE))
+                .Select(t => new VDomainRespDto { ZDOM_CODE = t.ZDOM_CODE, ZDOM_DESC = t.ZDOM_DESC, ZDOM_VALUE = t.ZDOM_VALUE, ZDOM_NAME = t.ZDOM_NAME, ZDOM_LEVEL = t.ZDOM_LEVEL })
+                .ToListAsync();
+
+            foreach (var item in ccList)
+            {
+                //机构所在地
+                item.LocationOfOrg = GetAdministrativeDivision(item.LocationOfOrg, location);
+
+                //国家地区
+                item.Country = GetCountryRegion(item.Country, country);
+
+                //持股情况
+                item.Shareholding = valDomain.FirstOrDefault(x => item.Shareholding == x.ZDOM_VALUE && x.ZDOM_CODE == "ZHOLDING")?.ZDOM_NAME;
+
+                //是否独立核算
+                item.IsIndependenceAcc = valDomain.FirstOrDefault(x => item.IsIndependenceAcc == x.ZDOM_VALUE && x.ZDOM_CODE == "ZCHECKIND")?.ZDOM_NAME;
+
+                //机构状态
+                item.OrgStatus = valDomain.FirstOrDefault(x => item.OrgStatus == x.ZDOM_VALUE && x.ZDOM_CODE == "ZORGSTATE")?.ZDOM_NAME;
+
+                //机构属性
+                item.OrgAttr = valDomain.FirstOrDefault(x => item.OrgAttr == x.ZDOM_VALUE && x.ZDOM_CODE == "ZORGATTR")?.ZDOM_NAME;
+
+                //机构子属性
+                item.OrgChildAttr = valDomain.FirstOrDefault(x => item.OrgChildAttr == x.ZDOM_VALUE && x.ZDOM_CODE == "ZORGCHILDATTR")?.ZDOM_NAME;
+            }
 
             responseAjaxResult.Count = total;
             responseAjaxResult.SuccessResult(ccList);
