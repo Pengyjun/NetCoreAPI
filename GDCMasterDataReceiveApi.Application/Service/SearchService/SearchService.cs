@@ -2201,11 +2201,11 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     City = cc.ZCITY,
                     Country = cc.ZZCOUNTRY,
                     County = cc.ZCOUNTY,
+                    TypesOfAbroadOrg=cc.ZOFITYPE,
                     EnglishName = cc.ZFINAME_E,
                     Name = cc.ZBANKNAME,
                     NameOfOrg = cc.ZFINAME,
                     Province = cc.ZPROVINCE,
-                    TypesOfAbroadOrg = cc.ZOFITYPE,
                     TypesOfOrg = cc.ZDFITYPE,
                     State = cc.ZDATSTATE == "1" ? "有效" : "无效",
                     BankNo = cc.ZBANKN,
@@ -2260,7 +2260,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                 //境内金融机构类型
                 item.TypesOfOrg = GetValueDomain(item.TypesOfOrg, valDomain, "ZDFITYPE");
 
-                //境内金融机构类型
+                //境外金融机构类型
                 item.TypesOfAbroadOrg = GetValueDomain(item.TypesOfAbroadOrg, valDomain, "ZDFITYPE");
             }
 
