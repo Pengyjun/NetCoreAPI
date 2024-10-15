@@ -514,6 +514,28 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
             return name;
         }
         /// <summary>
+        /// 往来单位  中标主体
+        /// </summary>
+        /// <param name="zbp"></param>
+        /// <param name="corresUnits"></param>
+        /// <returns></returns>
+        private string? GetCorresunit(string? zbp, List<CorresUnit> corresUnits)
+        {
+            var name = corresUnits.FirstOrDefault(x => x.ZBP == zbp)?.ZBPNAME_ZH;
+            return name;
+        }
+        /// <summary>
+        /// 责任主体 行政组织
+        /// </summary>
+        /// <param name="mdmCode"></param>
+        /// <param name="administrativeOrganizations"></param>
+        /// <returns></returns>
+        private string? GetXZZZ(string? mdmCode, List<AdministrativeOrganization> administrativeOrganizations)
+        {
+            var name = administrativeOrganizations.FirstOrDefault(x => x.MDM_CODE == mdmCode)?.ZZTNAME_ZH;
+            return name;
+        }
+        /// <summary>
         /// 处理日期 yyyymmdd --  yyyy年mm月dd日
         /// </summary>
         /// <param name="date"></param>
@@ -546,74 +568,6 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                 return time.ToString("yyyy年MM月dd日 HH:mm:ss");
             }
             return null;
-        }
-        /// <summary>
-        /// 中交项目业务分类
-        /// </summary>
-        /// <param name="zCPBC"></param>
-        /// <param name="gradeType">等级 1、2、3</param>
-        /// <param name="ywOrcyType">业务分类 / 产业分类 1/2</param>
-        /// <param name="pjectClassFi"></param>
-        /// <returns></returns>
-        private ProjectClassification? GetZCPBC(string? zCPBC, List<ProjectClassification>? pjectClassFi, int gradeType, int ywOrcyType)
-        {
-            if (zCPBC == null || !pjectClassFi.Any()) { return null; }
-            ProjectClassification projectClassification = new();
-            if (ywOrcyType == 1)//中交业务分类
-            {
-                switch (gradeType)
-                {
-                    case 1:
-                        //一级中交业务分类编码
-                        projectClassification = pjectClassFi.FirstOrDefault(x => x.ZCPBC1ID == zCPBC);
-                        break;
-                    case 2:
-                        //二级中交业务分类分类编码
-                        projectClassification = pjectClassFi.FirstOrDefault(x => x.ZCPBC2ID == zCPBC);
-                        break;
-                    case 3:
-                        //三级中交业务分类分类编码
-                        projectClassification = pjectClassFi.FirstOrDefault(x => x.ZCPBC3ID == zCPBC);
-                        break;
-                }
-            }
-            else if (ywOrcyType == 2)//产业分类
-            {
-                switch (gradeType)
-                {
-                    case 1:
-                        //一级产业分类编码
-                        projectClassification = pjectClassFi.FirstOrDefault(x => x.ZICSTD1ID == zCPBC);
-                        break;
-                    case 2:
-                        //二级产业分类编码
-                        projectClassification = pjectClassFi.FirstOrDefault(x => x.ZICSTD2ID == zCPBC);
-                        break;
-                    case 3:
-                        //三级产业分类编码
-                        projectClassification = pjectClassFi.FirstOrDefault(x => x.ZICSTD3ID == zCPBC);
-                        break;
-                }
-            }
-            else//业务板块
-            {
-                switch (gradeType)
-                {
-                    case 1:
-                        //一级业务板块编码
-                        projectClassification = pjectClassFi.FirstOrDefault(x => x.ZBUSTD1ID == zCPBC);
-                        break;
-                    case 2:
-                        //二级业务板块编码
-                        projectClassification = pjectClassFi.FirstOrDefault(x => x.ZBUSTD2ID == zCPBC);
-                        break;
-                    case 3:
-                        //三级业务板块编码
-                        projectClassification = pjectClassFi.FirstOrDefault(x => x.ZBUSTD3ID == zCPBC);
-                        break;
-                }
-            }
-            return projectClassification;
         }
         /// <summary>
         /// 机构树列表
@@ -1427,9 +1381,16 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
             //项目机构 //商机项目机构
             var pjectOrgKey = proList.Select(x => x.ZPRO_ORG).ToList();
             var pjectOrg2Key = proList.Select(x => x.ZPRO_BP).ToList();
+            var pjectOrg3Key = proList.Select(x => x.Z2NDORG).ToList();
             var pjectOrg = await _dbContext.Queryable<Institution>()
-                .Where(t => t.IsDelete == 1 && (pjectOrgKey.Contains(t.OID) || pjectOrg2Key.Contains(t.OID)))
+                .Where(t => t.IsDelete == 1 && (pjectOrgKey.Contains(t.OID) || pjectOrg2Key.Contains(t.OID) || pjectOrg3Key.Contains(t.OID)))
                 .Select(t => new InstutionRespDto { Oid = t.OID, PoId = t.POID, Grule = t.GRULE, Name = t.NAME })
+                .ToListAsync();
+
+            //中标主体 往来单位
+            var ZAWARDMAIIds = proList.Select(x => x.ZAWARDMAI).ToList();
+            var zbzt = await _dbContext.Queryable<CorresUnit>()
+                .Where(t => t.IsDelete == 1 && ZAWARDMAIIds.Contains(t.ZBP))
                 .ToListAsync();
 
             foreach (var item in proList)
@@ -1457,7 +1418,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                 item.ZLESSEETYPE = GetValueDomain(item.ZLESSEETYPE, valDomain, "ZLESSEETYPE");
 
                 //参与二级单位
-                //item.FZcy2ndorg = GetValueDomain(item.FZcy2ndorg, valDomain, "ZCY2NDORG");
+                item.FZcy2ndorg = GetValueDomain(item.FZcy2ndorg, valDomain, "ZCY2NDORG");
 
                 //计税方式
                 item.ZTAXMETHOD = GetValueDomain(item.ZTAXMETHOD, valDomain, "ZTAXMETHOD");
@@ -1472,7 +1433,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                 item.ZCPBC = GetValueDomain(item.ZCPBC, valDomain, "ZCPBC");
 
                 //所属二级单位
-                item.Z2NDORG = GetInstitutionName(item.ZCPBC, pjectOrg);
+                item.Z2NDORG = GetInstitutionName(item.Z2NDORG, pjectOrg);
 
                 //项目组织形式
                 item.ZPOS = GetValueDomain(item.ZPOS, valDomain, "ZPOS");
@@ -1487,16 +1448,13 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                 item.ZFUNDORGFORM = GetValueDomain(item.ZFUNDORGFORM, valDomain, "ZCY2NDORG");
 
                 ////承租人类型
-                //item.ZLESSEETYPE = GetValueDomain(item.ZLESSEETYPE, valDomain, "ZCY2NDORG");
-
+                item.ZLESSEETYPE = GetValueDomain(item.ZLESSEETYPE, valDomain, "ZLESSEETYPE");
 
                 //项目管理方式
-                //item.FZmanagemode = GetValueDomain(item.FZmanagemode, valDomain, "ZBIZDEPT");
+                item.FZmanagemode = GetValueDomain(item.FZmanagemode, valDomain, "ZMANAGE_MODE");
 
                 //中标主体
-                //item.ZAWARDMAI = GetValueDomain(item.ZAWARDMAI, valDomain, "ZPOS");
-
-                //
+                item.ZAWARDMAI = GetCorresunit(item.ZAWARDMAI, zbzt);
 
             }
             #endregion
@@ -5215,24 +5173,24 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                             {
                                 columnName = "中交项目业务分类";
                                 type = "Single";
-                                optionsChild = valDomain.Where(x => x.Code == "ZCPBC").ToList(); 
+                                optionsChild = valDomain.Where(x => x.Code == "ZCPBC").ToList();
                             }
                             else if (item.Contains("ZAPVLDATE"))
                             {
                                 columnName = "项目批复/决议时间";
                                 type = "NumberTime";
                             }
-                            else if (item.Contains("ZCPBC"))
+                            else if (item.Contains("ZINVERSTOR"))
                             {
-                                columnName = "ZINVERSTOR";
+                                columnName = "投资主体";
                                 type = "Single";
-                                optionsChild = valDomain.Where(x => x.Code == "ZINVERSTOR").ToList(); 
+                                optionsChild = valDomain.Where(x => x.Code == "ZINVERSTOR").ToList();
                             }
                             else if (item.Contains("ZSI"))
                             {
                                 columnName = "收入来源";
                                 type = "Single";
-                                optionsChild = valDomain.Where(x => x.Code == "ZSI").ToList(); 
+                                optionsChild = valDomain.Where(x => x.Code == "ZSI").ToList();
                             }
                             else if (item.Contains("ZLDLOCGT"))
                             {
@@ -5612,7 +5570,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     {
                         if (allColumns.Contains(item))
                         {
-                            List<FilterChildData> optionsChild = new(); 
+                            List<FilterChildData> optionsChild = new();
                             string type = string.Empty;
                             string columnName = string.Empty;
 
@@ -5623,7 +5581,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                                 optionsChild.Add(new FilterChildData { Key = "0", Val = "否" });
                                 optionsChild.Add(new FilterChildData { Key = "1", Val = "是" });
                             }
-                            else if (item.Contains("Fzkpstate")) 
+                            else if (item.Contains("Fzkpstate"))
                             {
                                 columnName = "项目状态";
                                 type = "Single";//单选
@@ -6086,7 +6044,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                             {
                                 columnName = "中交项目业务分类";
                                 type = "Single";
-                                optionsChild = valDomain.Where(x => x.Code == "ZCPBC").ToList(); 
+                                optionsChild = valDomain.Where(x => x.Code == "ZCPBC").ToList();
                             }
                             if (item.Contains("ZORG"))
                             {

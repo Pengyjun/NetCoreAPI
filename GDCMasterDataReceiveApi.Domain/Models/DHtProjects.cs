@@ -41,7 +41,7 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// </summary>
         public string? ZCPBC { get; set; }
         /// <summary>
-        /// 资主体
+        /// 投资主体
         /// </summary>
         public string? ZINVERSTOR { get; set; }
         /// <summary>
