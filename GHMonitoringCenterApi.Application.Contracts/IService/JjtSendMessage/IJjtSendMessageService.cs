@@ -91,6 +91,14 @@ namespace GHMonitoringCenterApi.Application.Contracts.IService.JjtSendMessage
         /// </summary>
         /// <returns></returns>
         Task<ResponseAjaxResult<JjtSendMessageMonitoringDayReportResponseDto>> JjtTextCardMsgDetailsAsync(int dateDay = 0);
+
+        /// <summary>
+        /// 交建公司生产日报推送
+        /// </summary>
+        /// <param name="dateDay"></param>
+        /// <returns></returns>
+        Task<ResponseAjaxResult<JjtSendMessageMonitoringDayReportResponseDto>> JjtDayReportPushAsync(int dateDay = 0);
+
         Task<ResponseAjaxResult<JjtSendMessageMonitoringDayReportResponseDto>> JjtTextCardMsgDetailsAsync(DateTime dateDay);
         /// <summary>
         /// 获取自有船舶日报卡片消息详情

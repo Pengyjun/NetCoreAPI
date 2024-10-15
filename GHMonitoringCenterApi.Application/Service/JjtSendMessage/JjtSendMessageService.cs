@@ -4128,7 +4128,6 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
 
                 if (month == 1)
                 {
-
                     companyPlanCompleteProductionDtos = companyProductionList.Select(x => new CompanyPlanCompleteProductionDto()
                     {
                         Id = x.CompanyId,
@@ -4254,6 +4253,168 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
                         CompleteProductionValue = x.TwelveCompleteProductionValue.Value,
                         PlanProductionValue = x.TwelvePlaProductionValue.Value
                     }).ToList();
+                }
+                #endregion
+            }
+            return companyPlanCompleteProductionDtos;
+        }
+
+
+
+
+        /// <summary>
+        /// 根据不同月份获取交建公司计划产值和完成产值
+        /// </summary>
+        /// <param name="month"></param>
+        /// <param name="companyProductionList"></param>
+        /// <returns></returns>
+        private List<CompanyPlanCompleteProductionDto> GetJJCompanyProductionValueInfo(int month, List<ProjectPlanProduction> companyProductionList,List<JjtProjectDayReport> jjtDayReport)
+        {
+            var year = DateTime.Now.Year;
+            var dataDayStr = int.Parse(DateTime.Now.AddMonths(-1).ToString("yyyyMM26"));
+            var dataDayEnd = int.Parse(DateTime.Now.ToString("yyyyMM25"));
+            List <CompanyPlanCompleteProductionDto> companyPlanCompleteProductionDtos = new List<CompanyPlanCompleteProductionDto>();
+            if (companyProductionList.Any())
+            {
+                var dayProjectValue = 0M;
+
+                #region 获取每月计划和完成产值
+                if (month == 1)
+                {
+                    
+                    companyPlanCompleteProductionDtos = companyProductionList.Select(x => new CompanyPlanCompleteProductionDto()
+                    {
+                        Id = x.ProjectId,
+                        CompleteProductionValue = dayProjectValue,
+                        PlanProductionValue = x.OnePlanProductionValue.Value
+                    }).ToList();
+                    
+                }
+
+                if (month == 2)
+                {
+
+                    companyPlanCompleteProductionDtos = companyProductionList.Select(x => new CompanyPlanCompleteProductionDto()
+                    {
+                        Id = x.ProjectId,
+                        CompleteProductionValue = dayProjectValue,
+                        PlanProductionValue = x.TwoPlanProductionValue.Value
+                    }).ToList();
+                }
+
+                if (month == 3)
+                {
+
+                    companyPlanCompleteProductionDtos = companyProductionList.Select(x => new CompanyPlanCompleteProductionDto()
+                    {
+                        Id = x.ProjectId,
+                        CompleteProductionValue = dayProjectValue,
+                        PlanProductionValue = x.ThreePlanProductionValue.Value
+                    }).ToList();
+                }
+
+                if (month == 4)
+                {
+
+                    companyPlanCompleteProductionDtos = companyProductionList.Select(x => new CompanyPlanCompleteProductionDto()
+                    {
+                        Id = x.ProjectId,
+                        CompleteProductionValue = dayProjectValue,
+                        PlanProductionValue = x.FourPlanProductionValue.Value
+                    }).ToList();
+                }
+
+                if (month == 5)
+                {
+
+                    companyPlanCompleteProductionDtos = companyProductionList.Select(x => new CompanyPlanCompleteProductionDto()
+                    {
+                        Id = x.ProjectId,
+                        CompleteProductionValue = dayProjectValue,
+                        PlanProductionValue = x.FivePlanProductionValue.Value
+                    }).ToList();
+                }
+
+                if (month == 6)
+                {
+
+                    companyPlanCompleteProductionDtos = companyProductionList.Select(x => new CompanyPlanCompleteProductionDto()
+                    {
+                        Id = x.ProjectId,
+                        CompleteProductionValue = dayProjectValue,
+                        PlanProductionValue = x.SixPlanProductionValue.Value
+                    }).ToList();
+                }
+
+                if (month == 7)
+                {
+
+                    companyPlanCompleteProductionDtos = companyProductionList.Select(x => new CompanyPlanCompleteProductionDto()
+                    {
+                        Id = x.ProjectId,
+                        CompleteProductionValue = dayProjectValue,
+                        PlanProductionValue = x.SevenPlanProductionValue.Value
+                    }).ToList();
+                }
+
+                if (month == 8)
+                {
+
+                    companyPlanCompleteProductionDtos = companyProductionList.Select(x => new CompanyPlanCompleteProductionDto()
+                    {
+                        Id = x.ProjectId,
+                        CompleteProductionValue = dayProjectValue,
+                        PlanProductionValue = x.EigPlannedQuantities.Value
+                    }).ToList();
+                }
+
+                if (month == 9)
+                {
+
+                    companyPlanCompleteProductionDtos = companyProductionList.Select(x => new CompanyPlanCompleteProductionDto()
+                    {
+                        Id = x.ProjectId,
+                        CompleteProductionValue = dayProjectValue,
+                        PlanProductionValue = x.NinePlanProductionValue.Value
+                    }).ToList();
+                }
+
+                if (month == 10)
+                {
+
+                    companyPlanCompleteProductionDtos = companyProductionList.Select(x => new CompanyPlanCompleteProductionDto()
+                    {
+                        Id = x.ProjectId,
+                        CompleteProductionValue = dayProjectValue,
+                        PlanProductionValue = x.TenPlanProductionValue.Value
+                    }).ToList();
+                }
+
+                if (month == 11)
+                {
+                    companyPlanCompleteProductionDtos = companyProductionList.Select(x => new CompanyPlanCompleteProductionDto()
+                    {
+                        Id = x.ProjectId,
+                        CompleteProductionValue =dayProjectValue,
+                        PlanProductionValue = x.ElevenPlanProductionValue.Value
+                    }).ToList();
+                }
+
+                if (month == 12)
+                {
+                    companyPlanCompleteProductionDtos = companyProductionList.Select(x => new CompanyPlanCompleteProductionDto()
+                    {
+                        Id = x.ProjectId,
+                        CompleteProductionValue = dayProjectValue,
+                        PlanProductionValue = x.TwelvePlanProductionValue.Value
+                    }).ToList();
+                }
+
+                foreach (var item in companyPlanCompleteProductionDtos)
+                {
+                    dayProjectValue = jjtDayReport.Where(x => x.DateDay >= dataDayStr && x.DateDay <= dataDayEnd
+                    && x.ProjectId == item.Id).Sum(x => x.DayActualProductionAmount);
+                    item.CompleteProductionValue = dayProjectValue;
                 }
                 #endregion
             }
@@ -4841,5 +5002,651 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
            // }
            
         }
+
+
+
+
+
+
+
+        #region 交建公司生产日报推送
+
+        /// <summary>
+        /// 新版交建通发消息 监控运营中心图片消息
+        /// </summary>
+        /// <returns></returns>
+        public async Task<ResponseAjaxResult<JjtSendMessageMonitoringDayReportResponseDto>> JjtDayReportPushAsync(int dateDay = 0)
+        {
+
+
+            #region 初始化基本业务参数
+            var responseAjaxResult = new ResponseAjaxResult<JjtSendMessageMonitoringDayReportResponseDto>();
+            var result = await dbContext.Queryable<TempTable>().FirstAsync();
+            if (result != null && !string.IsNullOrWhiteSpace(result.Value))
+            {
+                return JsonConvert.DeserializeObject<ResponseAjaxResult<JjtSendMessageMonitoringDayReportResponseDto>>(result.Value);
+            }
+            //在建项目的IDs
+            List<Guid> onBuildProjectIds = new List<Guid>();
+            var jjtSendMessageMonitoringDayReportResponseDto = new JjtSendMessageMonitoringDayReportResponseDto()
+            {
+                DayTime = DateTime.Now.AddDays(-1).ToString("MM月dd日")
+            };
+            #region 查询条件相关
+
+            //周期开始时间
+            var startTime = string.Empty;
+            if (DateTime.Now.Day >= 27)
+            {
+                startTime = DateTime.Now.ToString("yyyy-MM-26 00:00:00");
+            }
+            else
+            {
+                startTime = DateTime.Now.AddMonths(-1).ToString("yyyy-MM-26 00:00:00");
+            }
+            //周期结束时间
+            var endTime = Convert.ToDateTime(startTime).AddMonths(1).ToString("yyyy-MM-25 23:59:59");
+            //统计周期 上个月的26号到本月的25号之间为一个周期
+            //当前时间上限int类型
+            var currentTimeIntUp = int.Parse(Convert.ToDateTime(startTime).ToString("yyyyMM26"));
+            //当前时间下限int类型
+            var currentTimeInt = DateTime.Now.AddDays(-1).ToDateDay();
+            //本年的月份
+            var month = Convert.ToDateTime(startTime).AddMonths(1).Month;
+            //本年的年份 
+            var yearStartTime = DateTime.Now.Year.ToString();
+            //年累计开始时间（每年的开始时间）
+            var startYearTimeInt = int.Parse(DateTime.Now.AddYears(-1).ToString("yyyy") + "1226");//int.Parse(DateTime.Now.AddYears(-1).ToString("yyyy1226"));
+            //年累计结束时间
+            var endYearTimeInt = int.Parse(DateTime.Now.ToString("yyyyMMdd")) > 1226 && int.Parse(DateTime.Now.ToString("yyyyMMdd")) <= 31 ? int.Parse(DateTime.Now.AddYears(1).ToString("yyyy1225")) : int.Parse(DateTime.Now.ToString("yyyy1225")); //int.Parse(DateTime.Now.ToString("yyyy1225"));
+                                                                                                                                                                                                                                                      //每月多少天
+                                                                                                                                                                                                                                                      // int days = DateTime.DaysInMonth(int.Parse(endYearTimeInt.ToString().Substring(0, 4)), month);  //DateTime.DaysInMonth(DateTime.Now.Year, DateTime.Now.AddMonths(-1).Month);
+            int days = TimeHelper.GetTimeSpan(Convert.ToDateTime(startTime), Convert.ToDateTime(endTime)).Days + 1;
+            //已过多少天
+            var ofdays = DateTime.Now.Day <= 26 ? (DateTime.Now.Day + ((days - 26))) : DateTime.Now.Day - 26;
+            //今年已过多少天
+            var dayOfYear = 0;
+            //if (int.Parse(DateTime.Now.ToString("yyyyMMdd")) > startYearTimeInt && int.Parse(DateTime.Now.ToString("yyyyMMdd")) < int.Parse(DateTime.Now.AddYears(-1).ToString("yyyy1231")))
+            //if (int.Parse(DateTime.Now.ToString("yyyyMMdd")) > startYearTimeInt && int.Parse(DateTime.Now.ToString("yyyyMMdd")) < int.Parse(yearStartTime + "1231"))
+            //{
+            //    dayOfYear = ofdays+ DateTime.Now.DayOfYear;
+            //}
+            //else
+            //{
+            //    //这个6天是上一年1226-1231之间的天数
+            //    dayOfYear = DateTime.Now.DayOfYear + 5;
+            //}
+
+            if (int.Parse(DateTime.Now.ToString("yyyyMMdd")) > int.Parse(DateTime.Now.Year + "1231"))
+            {
+                var diffDay = TimeHelper.GetTimeSpan(DateTime.Now.ToString("yyyy-12-26").ObjToDate(), DateTime.Now);
+                dayOfYear = diffDay.Days;
+            }
+            else
+            {
+                //这个6天是上一年1226-1231之间的天数
+                dayOfYear = DateTime.Now.DayOfYear - 1 + 5;
+            }
+            #endregion
+
+            #region 共用数据
+            var companyId = "a8db9bb0-4667-4320-b03d-b0b7f8728b61".ToGuid();//交建公司
+            var commonDataList = await dbContext.Queryable<ProductionMonitoringOperationDayReport>().Where(x => x.IsDelete == 1
+            &&x.ItemId== companyId).ToListAsync();
+            var comonDataProductionList = await dbContext.Queryable<CompanyProductionValueInfo>()
+                .Where(x => x.IsDelete == 1 && x.DateDay == DateTime.Now.Year&&x.CompanyId== companyId).ToListAsync();
+            var monthDiffProductionValue = await dbContext.Queryable<MonthDiffProductionValue>().Where(x => x.IsDelete == 1).ToListAsync();
+            #endregion
+
+            #endregion
+
+            #region 项目总体生产情况
+            #region 交建公司合同项目基本信息
+            ProjectBasePoduction projectBasePoduction = null;
+            List<CompanyProjectBasePoduction> companyProjectBasePoductions = new List<CompanyProjectBasePoduction>();
+            //合同项目状态ids集合
+            var contractProjectStatusIds = CommonData.BuildIds.SplitStr(",").Select(x => x.ToGuid()).ToList();
+            //项目类型为其他非施工类业务 排除
+            var noConstrutionProject = CommonData.NoConstrutionProjectType;
+            //在建项目状态ID
+            var buildProjectId = CommonData.PConstruc.ToGuid();
+            //停缓建Ids
+            var stopProjectIds = CommonData.PSuspend.Split(",").Select(x => x.ToGuid()).ToList();
+            //未开工状态
+            var notWorkIds = CommonData.NotWorkStatusIds.Split(",").Select(x => x.ToGuid()).ToList();
+            //各个公司的项目信息
+            var companyProjectList = await dbContext.Queryable<Project>().Where(x => x.IsDelete == 1
+            && contractProjectStatusIds.Contains(x.StatusId.Value)
+            && x.TypeId != noConstrutionProject).ToListAsync(); 
+            //取出相关日报信息(当天项目日报)
+            var currentDayProjectList = await dbContext.Queryable<DayReport>().Where(x => x.IsDelete == 1 && x.DateDay == currentTimeInt && x.ProcessStatus == DayReportProcessStatus.Submited)
+                  .ToListAsync();
+            //公共数据取出项目相关信息
+            var companyList = commonDataList.Where(x => x.Type == 1).OrderBy(x => x.Sort).ToList();
+            foreach (var item in companyList)
+            {
+                //在建项目IDS
+                var currentCompanyIds = companyProjectList.Where(x => x.CompanyId == item.ItemId && x.StatusId == buildProjectId)
+                    .Select(x => x.Id).ToList();
+                if (item.Collect == 0)
+                {
+                    onBuildProjectIds.AddRange(currentCompanyIds);
+                }
+                //合同项目数
+                var currentCompanyCount = companyProjectList.Count(x => x.CompanyId == item.ItemId);
+                //当前公司在建合同项数
+                var currentCompany = companyProjectList.Count(x => x.CompanyId == item.ItemId && x.StatusId == buildProjectId);
+                //停缓建项目数
+                var stopProjectCount = companyProjectList.Count(x => x.CompanyId == item.ItemId && stopProjectIds.Contains(x.StatusId.Value));
+                //未开工的项目数量
+                var notWorkCount = companyProjectList.Count(x => x.CompanyId == item.ItemId && notWorkIds.Contains(x.StatusId.Value));
+                //当前合同项目的所有ids
+                var dayIds = companyProjectList.Where(x => x.CompanyId == item.ItemId).Select(x => x.Id).ToList();
+                //设备数量
+                var facilityCount = currentDayProjectList.Where(x => dayIds.Contains(x.ProjectId)).Select(x => x.ConstructionDeviceNum).Sum();
+                //线程施工人数量
+                var workerCount = currentDayProjectList.Where(x => dayIds.Contains(x.ProjectId)).Select(x => x.SiteConstructionPersonNum).Sum();
+                //危大工程项数量
+                var riskWorkCountCount = currentDayProjectList.Where(x => dayIds.Contains(x.ProjectId)).Select(x => x.HazardousConstructionNum).Sum();
+
+                if (item.Collect == 0)
+                {
+
+                    companyProjectBasePoductions.Add(new CompanyProjectBasePoduction()
+                    {
+                        Name = item.Name,
+                        OnContractProjectCount = currentCompanyCount,
+                        OnBuildProjectCount = currentCompany,
+                        StopBuildProjectCount = stopProjectCount,
+                        BuildCountPercent = currentCompanyCount == 0M ? 0M : Math.Round((((decimal)(currentCompany)) / currentCompanyCount) * 100, 2),
+                        FacilityCount = facilityCount,
+                        WorkerCount = workerCount,
+                        RiskWorkCount = riskWorkCountCount,
+                        NotWorkCount = notWorkCount,
+                    });
+                    projectBasePoduction = new ProjectBasePoduction()
+                    {  
+                        TotalOnContractProjectCount = currentCompanyCount,
+                        TotalStopBuildProjectCount = stopProjectCount,
+                        TotalOnBuildProjectCount = currentCompany,
+                        TotalFacilityCount = facilityCount,
+                        TotalRiskWorkCount = workerCount,
+                        TotalWorkerCount = riskWorkCountCount,
+                        CompanyProjectBasePoductions = companyProjectBasePoductions,
+                        TotalBuildCountPercent= Math.Round(((currentCompany.ObjToDecimal()/ currentCompanyCount) *100),2),
+                        CompanyBasePoductionValues = new List<CompanyBasePoductionValue>()
+                    };
+                    jjtSendMessageMonitoringDayReportResponseDto.projectBasePoduction = projectBasePoduction;
+                }
+            }
+
+
+
+            #endregion
+
+            #region 交建公司在建项目产值信息
+            List<CompanyBasePoductionValue> companyBasePoductionValues = new List<CompanyBasePoductionValue>();
+            //统计当年所有的项目日报信息
+            var dayProductionValueList = await dbContext.Queryable<DayReport>()
+                .LeftJoin<Project>((x, y) => x.ProjectId == y.Id)
+                .Where((x,y) => x.IsDelete == 1&&y.CompanyId==companyId
+             && (x.DateDay >= startYearTimeInt && x.DateDay <= endYearTimeInt))
+                .Select((x, y) => new JjtProjectDayReport
+                {
+                    CompanyId = y.CompanyId.Value,
+                    ProjectId = x.ProjectId,
+                    DateDay = x.DateDay,
+                    CreateTime = x.CreateTime.Value,
+                    UpdateTime = x.UpdateTime.Value,
+                    DayActualProductionAmount = x.DayActualProductionAmount
+                }).ToListAsync();
+            //广航局年累计产值(基础数据累加+几个公司的所有日产值)
+            var companyValue = new ShareData().Init().Where(x => x.CompanyId == companyId.ToString()).FirstOrDefault();//历史数据
+            var yearTotalProductionValue = Math.Round((companyValue.Production * 100000000 + dayProductionValueList
+                 .Where(x => x.DateDay >= 20240426 && x.DateDay <= currentTimeInt)
+                    .Sum(x => x.DayActualProductionAmount))/100000000M,2);
+            //项目
+            var projectList = await dbContext.Queryable<Project>().Where(x => x.IsDelete == 1&&x.CompanyId==companyId&&x.StatusId.Value== buildProjectId).ToListAsync();
+            //项目月报数据
+            var projectIds = projectList.Select(x => x.Id).ToList();
+            var monthReport = await dbContext.Queryable<MonthReport>().Where(x => x.IsDelete == 1 && x.DateMonth >= 202401
+            && projectIds.Contains(x.ProjectId)).ToListAsync();
+            //计算总体:
+            var totalJJProdutionValue = dayProductionValueList.Where(x => x.DateDay >= startYearTimeInt && x.DateDay <= endYearTimeInt).Sum(x => x.DayActualProductionAmount);//年累计总产值
+            foreach (var item in projectList)
+            {
+                //当日产值
+                var dayProductionValue= dayProductionValueList.Where(x=>x.ProjectId==item.Id&&x.DateDay== currentTimeInt).Sum(x=>x.DayActualProductionAmount);
+                //当年产值
+                var yearProductionValue = dayProductionValueList.Where(x => x.DateDay >= startYearTimeInt&&x.DateDay<= endYearTimeInt&&x.ProjectId==item.Id).Sum(x => x.DayActualProductionAmount);
+                companyBasePoductionValues.Add(new CompanyBasePoductionValue()
+                {
+                    Name = item.ShortName,
+                    DayProductionValue = Math.Round((dayProductionValue/ 10000M ), 2),
+                    TotalYearProductionValue = Math.Round((yearProductionValue / 100000000M), 2) ,
+                    YearProductionValueProgressPercent = Math.Round((yearProductionValue / totalJJProdutionValue) * 100, 2),
+                });
+            }
+            #region 计算总体
+            var jjTotalDayProductionValue =dayProductionValueList.Where(x => x.DateDay == currentTimeInt).Sum(x => x.DayActualProductionAmount);
+            var totalDayProductionValue = Math.Round((companyBasePoductionValues.Sum(x => x.DayProductionValue)), 2);
+            //var totalYearProductionValue = Math.Round(companyBasePoductionValues.Sum(x => x.TotalYearProductionValue), 2);
+
+            companyBasePoductionValues.Add(new CompanyBasePoductionValue()
+            {
+                Name = "交建公司总体",
+                DayProductionValue = totalDayProductionValue,
+                TotalYearProductionValue = yearTotalProductionValue,
+                YearProductionValueProgressPercent = Math.Round(((totalDayProductionValue/10000M / yearTotalProductionValue) * 100), 2),
+
+            });
+
+            #endregion
+            jjtSendMessageMonitoringDayReportResponseDto.projectBasePoduction.DayProductionValue = totalDayProductionValue;
+            jjtSendMessageMonitoringDayReportResponseDto.projectBasePoduction.TotalYearProductionValue = yearTotalProductionValue;
+            jjtSendMessageMonitoringDayReportResponseDto.projectBasePoduction.CompanyBasePoductionValues = companyBasePoductionValues;
+
+            #endregion
+
+            #region 柱形图
+            //重点项目
+            var jjProjectIds=CommonData.jjCompanyProjectids.Split(",").Select(x=>x.ToGuid()).ToList();
+
+            var  jjProjectList = projectList.Where(x => jjProjectIds.Contains(x.Id)).ToList();
+            var companyProductionList = dbContext.Queryable<ProjectPlanProduction>()
+                .Where(x => x.IsDelete == 1).ToList();
+            var companyMonthProductionValue = GetJJCompanyProductionValueInfo(month, companyProductionList, dayProductionValueList);
+            CompanyProductionCompare companyProductionCompares = new CompanyProductionCompare()
+            {
+                PlanCompleteRate = new List<decimal>(),
+                TimeSchedule = new List<decimal>(),
+                XAxisData = new List<string>(),
+                CompleteProductuin = new List<decimal>(),
+                PlanProductuin = new List<decimal>()
+            };
+
+            foreach (var item in jjProjectList)
+            {
+                if (string.IsNullOrWhiteSpace(item.Name) || item.Name.Contains("广航局"))
+                {
+                    continue;
+                }
+
+                companyProductionCompares.XAxisData.Add(item.ShortName);
+                //获取各个公司本月的完成和计划产值
+                var currentMonthCompanyProductionValue = companyMonthProductionValue.Where(x => x.Id == item.Id).FirstOrDefault();
+                if (currentMonthCompanyProductionValue != null)
+                {
+                    var completeProductionValue = Math.Round(currentMonthCompanyProductionValue.CompleteProductionValue / 100000000M, 2);
+                    var planProductionValue = Math.Round(currentMonthCompanyProductionValue.PlanProductionValue / 100000000M, 2);
+                    companyProductionCompares.CompleteProductuin.Add(completeProductionValue);
+                    companyProductionCompares.PlanProductuin.Add(planProductionValue);
+                }
+
+                //计划完成率
+                if (currentMonthCompanyProductionValue != null && currentMonthCompanyProductionValue.PlanProductionValue != 0)
+                {
+                    var completeRate = Math.Round((((decimal)currentMonthCompanyProductionValue.CompleteProductionValue) / currentMonthCompanyProductionValue.PlanProductionValue) * 100, 0);
+                    companyProductionCompares.PlanCompleteRate.Add(completeRate);
+                }
+                else
+                {
+                    companyProductionCompares.PlanCompleteRate.Add(0);
+                }
+                //时间进度
+                var timeSchedult = Math.Round((ofdays / 31M) * 100, 0);
+                companyProductionCompares.TimeSchedule.Add(timeSchedult);
+                projectBasePoduction.CompanyProductionCompares = companyProductionCompares;
+            }
+
+            companyProductionCompares.YMax = companyProductionCompares.PlanProductuin.Count == 0 ? 0 : companyProductionCompares.PlanProductuin.Max();
+            #endregion
+
+
+
+            #region 项目年度产值完成排名新版
+            List<ProjectRank> projectRankList = new List<ProjectRank>();
+            var projectLists = await dbContext.Queryable<Project>().Where(x => x.IsDelete == 1&&x.CompanyId==companyId)
+                .Select(x => new { x.Id, x.ShortName, x.CompanyId }).ToListAsync();
+            //当年完成产值
+            var eachProjectProductionValue = await dbContext.Queryable<DayReport>().Where(x => x.IsDelete == 1 && x.DateDay >= startYearTimeInt && x.DateDay <= endYearTimeInt).ToListAsync();
+            //当年各个项目计划产值
+            var projectYearPlanProductionData = await dbContext.Queryable<ProjectPlanProduction>().Where(x => x.IsDelete == 1 && x.Year == DateTime.Now.Year).ToListAsync();
+            //查询历史数据
+            var projectPlanProductionData = await dbContext.Queryable<ProjectHistoryData>().Where(x => x.IsDelete == 1).ToListAsync();
+            //项目月报数据
+            var year = int.Parse(DateTime.Now.ToString("yyyy01"));
+            var projectMonthData = await dbContext.Queryable<MonthReport>().Where(x => x.IsDelete == 1 && x.DateMonth >= year).ToListAsync();
+            foreach (var item in projectLists)
+            {
+                //if (item.Id != "08db3b35-fb38-4bd7-8c32-5423575bad59".ToGuid())
+                //{
+                //    continue;
+                //}
+                //当年项目完成产值
+                var projectYearTotalProductionValue = eachProjectProductionValue.Where(x => x.ProjectId == item.Id && x.DateDay >= currentTimeIntUp && x.DateDay <= currentTimeInt).Sum(x => x.DayActualProductionAmount);
+                //当年项目计划产值
+                var projectPalnProduction = Math.Round(GetRrojectProductionValue(projectYearPlanProductionData, item.Id).Value, 2);
+                //今日完成产值
+                var day = DateTime.Now.AddDays(-1).ToDateDay();
+                var dayProductionValue = eachProjectProductionValue.Where(x => x.ProjectId == item.Id && x.DateDay == day).SingleOrDefault();
+                //计算历史计划产值
+                //var projectHistoryProduciton= projectYearPlanProductionData.Where(x => x.ProjectId == item.Id).SingleOrDefault();
+                //计算2023-06月之前的数据
+                var proejctHistoty = projectPlanProductionData.Where(x => x.ProjectId == item.Id && x.OutputValue.HasValue == true).Select(x => x.OutputValue.Value).SingleOrDefault();
+                //月份相加产值
+                var monthValue = projectMonthData.Where(x => x.ProjectId == item.Id).Sum(x => x.CompleteProductionAmount);
+
+                var dayValue = 0M;
+                if (dayProductionValue != null)
+                {
+                    dayValue = Math.Round(dayProductionValue.DayActualProductionAmount / 10000, 2);
+                }
+                ProjectRank projectRank = new ProjectRank()
+                {
+                    ProjectName = item.ShortName,
+                    //CurrentYearCompleteProductionValue = (Math.Round(projectYearTotalProductionValue / 100000000, 2) ),
+                    CurrentYearCompleteProductionValue = Math.Round(monthValue / 100000000, 2) + Math.Round(projectYearTotalProductionValue / 100000000, 2),
+                    CurrentYearPlanProductionValue = projectPalnProduction,
+                    DayActualValue = dayValue,
+                };
+                if (projectPalnProduction != 0)
+                {
+                    projectRank.CompleteRate = Math.Round((projectRank.CurrentYearCompleteProductionValue / projectRank.CurrentYearPlanProductionValue) * 100, 2);
+                }
+                projectRankList.Add(projectRank);
+            }
+             projectBasePoduction.ProjectRanks = projectRankList.OrderByDescending(x => x.CurrentYearCompleteProductionValue).Take(10).ToList();
+            //总计
+             projectBasePoduction.TotalCurrentYearPlanProductionValue = projectBasePoduction.ProjectRanks.Sum(x => x.CurrentYearPlanProductionValue);
+            projectBasePoduction.TotalCurrentYearCompleteProductionValue = projectBasePoduction.ProjectRanks.Sum(x => x.CurrentYearCompleteProductionValue);
+            if (projectBasePoduction.TotalCurrentYearPlanProductionValue != 0)
+                projectBasePoduction.SumCompleteRate = Math.Round((projectBasePoduction.TotalCurrentYearCompleteProductionValue / projectBasePoduction.TotalCurrentYearPlanProductionValue) * 100, 2);
+            var totalYearCompletRate = 0M;
+            if (projectBasePoduction.TotalYearProductionValue != 0)
+            {
+                totalYearCompletRate = Math.Round((projectBasePoduction.TotalCurrentYearCompleteProductionValue / projectBasePoduction.TotalYearProductionValue) * 100, 2);
+            }
+            projectBasePoduction.TotalCompleteRate = totalYearCompletRate;
+            projectBasePoduction.SumProjectRanksTen = projectBasePoduction.ProjectRanks.Sum(x => x.DayActualValue.Value);
+            #endregion
+
+            #region 项目产值强度表格
+            List<ProjectIntensity> projectIntensities = new List<ProjectIntensity>();
+            //获取只需要在建的项目
+            var onBuildProjectList = companyProjectList.Where(x => onBuildProjectIds.Contains(x.Id)&&x.CompanyId==companyId).ToList();
+            var onBuildIds = onBuildProjectList.Select(x => x.Id).ToList();
+            var planValueList = await dbContext.Queryable<ProjectPlanProduction>().Where(x => x.IsDelete == 1 && onBuildIds.Contains(x.ProjectId)).ToListAsync();
+            if (onBuildProjectList.Any())
+            {
+                foreach (var item in onBuildProjectList)
+                {
+                    //项目当日实际产值
+                    var currentDayProjectPrduction = currentDayProjectList.Where(x => x.ProjectId == item.Id).FirstOrDefault();
+                    //项目当日计划
+                    var planValueFirst = planValueList.Where(x => x.ProjectId == item.Id && x.Year == Convert.ToInt32(yearStartTime)).FirstOrDefault();
+                    var planValue = GetProjectPlanValue(month, planValueFirst);
+                    var rate = currentDayProjectPrduction == null || planValue == 0 ? 0 : Math.Round(((currentDayProjectPrduction.DayActualProductionAmount / 10000) / (planValue / 10000) * 100), 0);
+                    if (rate < 80)
+                    {
+                        projectIntensities.Add(new ProjectIntensity()
+                        {
+                            Id = item.Id,
+                            Name = item.ShortName,
+                            PlanDayProduciton = Math.Round(planValue / 10000, 0),
+                            DayProduciton = currentDayProjectPrduction == null ? 0 : Math.Round(currentDayProjectPrduction.DayActualProductionAmount / 10000, 0),
+                            CompleteDayProducitonRate = rate,
+                            DayProductionIntensityDesc = currentDayProjectPrduction == null ? null : currentDayProjectPrduction.LowProductionReason
+                        });
+                    }
+                }
+            }
+            //projectBasePoduction.ProjectIntensities = projectIntensities.Where(x => x.PlanDayProduciton > 0).OrderBy(x => x.CompleteDayProducitonRate).ToList();
+            #endregion
+
+            #endregion
+
+            #region 特殊情况
+            var specialProjectList = new List<SpecialProjectInfo>();
+            var dayRepNoticeData = await dbContext.Queryable<DayReport>().Where(x => x.IsDelete == 1 && x.DateDay == currentTimeInt && (x.IsHaveProductionWarning == 1 || x.IsHaveProductionWarning == 2 || x.IsHaveProductionWarning == 3))
+                .Select(x => new { x.IsHaveProductionWarning, x.ProductionWarningContent, x.ProjectId }).OrderByDescending(x => x.IsHaveProductionWarning).ToListAsync();
+            dayRepNoticeData.ForEach(x => specialProjectList.Add(new SpecialProjectInfo
+            {
+                ProjectId = x.ProjectId,
+                Type = x.IsHaveProductionWarning,
+                Description = x.ProductionWarningContent
+            }));
+            var pIds = dayRepNoticeData.Select(x => x.ProjectId).ToList();
+            var sourceProjectList = companyProjectList.Where(x => pIds.Contains(x.Id)).ToList();
+            foreach (var item in specialProjectList)
+            {
+                var projectInfo = sourceProjectList.Where(x => x.Id == item.ProjectId&&x.CompanyId==companyId).FirstOrDefault();
+                item.SourceMatter = projectInfo?.ShortName;
+            }
+            jjtSendMessageMonitoringDayReportResponseDto.SpecialProjectInfo = specialProjectList;
+            #endregion
+
+            #region 各单位填报情况(数据质量)
+            ////未填报项目的IDS
+            //List<Guid> unWriteReportIds = new List<Guid>();
+            //#region 各单位产值日报填报率情况
+            //List<CompanyWriteReportInfo> companyWriteReportInfos = new List<CompanyWriteReportInfo>();
+            ////所有已填报的项目
+            //var writeReportList = await dbContext.Queryable<DayReport>()
+            //    .LeftJoin<Project>((x, y) => x.ProjectId == y.Id&&y.CompanyId==companyId)
+            //    .Where((x, y) => x.IsDelete == 1 && onBuildProjectIds.Contains(x.ProjectId) && x.DateDay == currentTimeInt)
+            //    .Select((x, y) => new JjtProjectDayReport() { ProjectId = x.Id, CompanyId = y.CompanyId.Value, DateDay = x.DateDay })
+            //    .ToListAsync();
+
+            //companyWriteReportInfos.Add(new CompanyWriteReportInfo()
+            //{
+            //    Name = "交建公司",
+            //    OnBulidCount = companyProjectBasePoductions[0].OnBuildProjectCount,
+            //    UnReportCount = companyProjectBasePoductions[0].OnBuildProjectCount - writeReportList.Count,
+            //     WritePercent=Math.Round((writeReportList.Count)/Convert.ToDecimal(companyProjectBasePoductions[0].OnBuildProjectCount)*100,2)
+
+            //}) ;
+            ////#endregion
+
+
+            //if (jjtSendMessageMonitoringDayReportResponseDto != null)
+            //{
+            //    jjtSendMessageMonitoringDayReportResponseDto.CompanyWriteReportInfos = companyWriteReportInfos;
+            //}
+            #endregion
+
+
+            //未填报项目的IDS
+            List<Guid> unWriteReportIds = new List<Guid>();
+
+            #region 各单位产值日报填报率情况
+            List<CompanyWriteReportInfo> companyWriteReportInfos = new List<CompanyWriteReportInfo>();
+            //所有已填报的项目
+            var writeReportList = await dbContext.Queryable<DayReport>()
+                .LeftJoin<Project>((x, y) => x.ProjectId == y.Id)
+                .Where((x, y) => x.IsDelete == 1 && onBuildProjectIds.Contains(x.ProjectId) && x.DateDay == currentTimeInt)
+                .Select((x, y) => new JjtProjectDayReport() { ProjectId = x.Id, CompanyId = y.CompanyId.Value, DateDay = x.DateDay })
+                .ToListAsync();
+            companyList = commonDataList.Where(x => x.Type == 1).OrderBy(x => x.Sort).ToList();
+            foreach (var item in companyList)
+            {
+                //当前公司在建合同项数
+                var currentCompany = companyProjectList.Count(x => x.CompanyId == item.ItemId && x.StatusId == buildProjectId);
+                //当前公司已填报的数量
+                var currentDayUnReportCount = writeReportList.Where(x => x.CompanyId == item.ItemId).Count();
+
+                //填报率
+                var writeReportPercent = 0M;
+                if (currentCompany != 0)
+                {
+                    writeReportPercent = Math.Round(((decimal)currentDayUnReportCount / currentCompany) * 100, 2);
+                }
+
+                if (item.Collect == 0)
+                {
+                    companyWriteReportInfos.Add(new CompanyWriteReportInfo()
+                    {
+                        Name = item.Name,
+                        OnBulidCount = currentCompany,
+                        UnReportCount = currentCompany - currentDayUnReportCount,
+                        WritePercent = writeReportPercent,
+                        QualityLevel = 0,
+                        ProjectId = item.Id
+                    });
+                    //在建项目合计
+                    var totalBuildCount = companyWriteReportInfos.Sum(x => x.OnBulidCount);
+                    var totalUnReportCount = companyWriteReportInfos.Sum(x => x.UnReportCount);
+                    var totalWritePercent = 0M;
+                    if (totalBuildCount != 0)
+                    {
+                        totalWritePercent = Math.Round(((decimal)(totalBuildCount - totalUnReportCount)) / totalBuildCount * 100, 2);
+                    }
+
+                    //companyWriteReportInfos.Add(new CompanyWriteReportInfo()
+                    //{
+                    //    Name = item.Name,
+                    //    OnBulidCount = totalBuildCount,
+                    //    UnReportCount = totalUnReportCount,
+                    //    WritePercent = totalWritePercent,
+                    //});
+                }
+                
+            }
+            //数据质量程度 几颗星（//船舶填报率 待命填报率+调遣填报率+修理填报率+施工填报率）
+            //评分 1：一颗星[0 - 30) 2:两颗星[30 - 60) 3:三颗星[60 - 80) 4:四颗星[80 - 90) 5:五颗星[90 - 100)
+            /// 计算公式：（项目当日产值/3300*50%+船舶当日产值/490*25%+项目填报率*20%+船舶填报率*5%）*100
+            /// 计算船舶填报率
+            var shipPercent = 0M;
+            //var tatalShipCount = jjtSendMessageMonitoringDayReportResponseDto.OwnerShipBuildInfo.TotalCount;
+            //if (tatalShipCount != 0)
+            //{
+            //    shipPercent = ((decimal)reportShipCount) / tatalShipCount;
+            //}
+            //计算星星的数据质量程度
+            var qualityLevel = ((jjtSendMessageMonitoringDayReportResponseDto.projectBasePoduction.DayProductionValue / 3300M) * 50 / 100 +
+            (companyWriteReportInfos[0].WritePercent / 100M * 20 / 100) +
+            shipPercent * 5 / 100M) * 100;
+
+            var star = 0;
+            if (qualityLevel <= 30)
+            {
+                star = 1;
+            }
+            else if (qualityLevel > 30 && qualityLevel <= 60)
+            {
+                star = 2;
+            }
+            else if (qualityLevel > 60 && qualityLevel <= 80)
+            {
+                star = 3;
+            }
+            else if (qualityLevel > 80 && qualityLevel <= 90)
+            {
+                star = 4;
+            }
+            else if (qualityLevel > 90)
+            {
+                star = 5;
+            }
+            jjtSendMessageMonitoringDayReportResponseDto.QualityLevel = star;
+            companyWriteReportInfos = companyWriteReportInfos.Where(x => !string.IsNullOrWhiteSpace(x.Name)).ToList();
+            jjtSendMessageMonitoringDayReportResponseDto.CompanyWriteReportInfos = companyWriteReportInfos;
+
+            #endregion
+
+            #region 说明：项目生产数据存在不完整部分主要是以下项目未填报
+            List<CompanyUnWriteReportInfo> companyUnWriteReportInfos = new List<CompanyUnWriteReportInfo>();
+            //统计本周期内已填报的日报
+            var writeCompanyReportList = await dbContext.Queryable<DayReport>()
+             .Where(x => x.IsDelete == 1
+              && x.CreateTime >= SqlFunc.ToDate(startTime) && x.CreateTime <= SqlFunc.ToDate(endTime)
+              && x.DateDay >= currentTimeIntUp && x.DateDay <= currentTimeInt
+              && (x.UpdateTime == null || x.UpdateTime >= SqlFunc.ToDate(startTime) && x.UpdateTime <= SqlFunc.ToDate(endTime)))
+             .ToListAsync();
+            //查询项目信息
+            var jJProjectList = await dbContext.Queryable<Project>().Where(x => x.IsDelete == 1 && onBuildProjectIds.Contains(x.Id)).ToListAsync();
+            companyList = commonDataList.Where(x => x.Type == 1).OrderBy(x => x.Sort).ToList();
+            var distinctOnBuildProjects = onBuildProjectIds.Distinct();
+            //查询符合范围内的数据
+            var projectStatusChangeRecordList = await dbContext.Queryable<ProjectStatusChangeRecord>()
+                .Where(x => x.NewStatus == buildProjectId && (x.ChangeTime >= SqlFunc.ToDate(startTime) && x.ChangeTime <= SqlFunc.ToDate(endTime)))
+                .ToListAsync();
+            //特殊项
+            //var sIds = projectStatusChangeRecordList.Where(x => x.IsValid == 0).Select(x => x.Id).Distinct().ToList();
+            //排除掉不满足的条件 得到满足的条件
+            var satisfyIds = projectStatusChangeRecordList.Where(x => x.IsValid == 1).Select(x => x.Id).ToList();
+            onBuildProjectIds = onBuildProjectIds.Where(x => satisfyIds.Contains(x)).ToList();
+            foreach (var item in onBuildProjectIds)
+            {
+                //if (item != "08db3b35-fb38-4be0-8ad8-5a0a29a2d73f".ToGuid())
+                //    continue;
+
+                //查询当前项目什么时间变更状态的(变更时间就是当前填写日报的时间)
+                var currentProjectStatusChangeTime = projectStatusChangeRecordList.Where(x => x.Id == item && x.IsValid == 1)
+                     .Select(x => x.ChangeTime)
+                     .FirstOrDefault();
+                //当前项目在本周期范围内停了多少天
+                var projectStopDay = projectStatusChangeRecordList.Where(x => x.Id == item && x.IsValid == 1)
+                .Select(x => x.StopDay)
+                .FirstOrDefault();
+                //当前项目本周期需要填写的数量
+                var changeTimeInt = int.Parse(currentProjectStatusChangeTime.ToString("dd"));
+                //计算当前项目需要填写的日报的数量
+                var currentWriteReportCount = 0;
+                if (changeTimeInt >= 26)
+                {
+                    currentWriteReportCount = days - changeTimeInt + 26;
+                }
+                else
+                {
+                    currentWriteReportCount = days - (((days - 26)) + changeTimeInt - 1);
+                }
+                //未过天数
+                var unDays = days - ofdays;
+                //已填报数量
+                var dayReportCount = writeCompanyReportList.Where(x => x.ProjectId == item).Count();
+                //未填报数量
+                var unReportCount = (days - projectStopDay.Value - unDays) - dayReportCount;
+                if (unReportCount <= 0)
+                {
+                    unReportCount = 0;
+                }
+                //ofdays - dayReportCount<= 0 ? 0 : ofdays - dayReportCount- passedTime;
+                //当前项目信息
+                var currentProjectInfo = jJProjectList.SingleOrDefault(x => x.Id == item);
+                //业主单位
+                var companyInfo = companyList.SingleOrDefault(x => x.ItemId == currentProjectInfo.CompanyId && x.Collect == 0);
+
+                if (unReportCount != 0)
+                {
+                    companyUnWriteReportInfos.Add(new CompanyUnWriteReportInfo()
+                    {
+                        ProjectName = currentProjectInfo.Name,
+                        Name = companyInfo.Name,
+                        Count = unReportCount
+                    });
+                }
+            }
+            if (jjtSendMessageMonitoringDayReportResponseDto != null)
+            {
+
+                jjtSendMessageMonitoringDayReportResponseDto.CompanyUnWriteReportInfos = companyUnWriteReportInfos
+                    .OrderByDescending(x => x.Count).ToList();
+            }
+            #endregion
+      
+
+            jjtSendMessageMonitoringDayReportResponseDto.Month = month;
+            jjtSendMessageMonitoringDayReportResponseDto.Year = int.Parse(yearStartTime);
+            responseAjaxResult.Data = jjtSendMessageMonitoringDayReportResponseDto;
+            responseAjaxResult.Success();
+            return responseAjaxResult;
+            #endregion
+
+
+
+
+        }
+
     }
 }

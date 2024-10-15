@@ -123,5 +123,10 @@ namespace GHMonitoringCenterApi.Domain.Shared.Const
 
         public static string NoStatus = "28bc58dc-41ed-4135-8628-a4e6a571032b,2a30d69d-ad3a-4a51-a1d7-7b363150437d,62986752-9b40-4d02-8887-b014a6ee7a9d,51b3cf5e-5148-422e-a8ad-4480bee435b6";
 
+
+
+        //交建公司重点项目
+        public static string jjCompanyProjectids = "08db3b35-fb38-4beb-8f31-7a1654ce60d2,08db3b35-fb38-4be9-8815-483744dec8e4,08dc31b3-f7f2-440f-8fe0-7ce613f79537,08db8665-81e2-4fdf-8099-e57bdde04e90";
+
     }
 }

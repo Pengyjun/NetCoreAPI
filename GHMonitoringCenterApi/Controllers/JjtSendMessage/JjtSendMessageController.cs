@@ -181,6 +181,19 @@ namespace GHMonitoringCenterApi.Controllers.JjtSendMessage
         {
             return await jjtSendMessageService.JjtTextCardMsgDetailsAsync(dateDay);
         }
+
+        /// <summary>
+        /// 交建公司日报推送
+        /// </summary>
+        /// <param name="dateDay"></param>
+        /// <returns></returns>
+
+        [HttpGet("JjtDayReportPush")]
+        [AllowAnonymous]
+        public async Task<ResponseAjaxResult<JjtSendMessageMonitoringDayReportResponseDto>> JjtDayReportPushAsync(int dateDay = 0)
+        {
+            return await jjtSendMessageService.JjtDayReportPushAsync(dateDay);
+        }
         /// <summary>
         /// 获取自有船舶日报卡片消息详情
         /// </summary>
