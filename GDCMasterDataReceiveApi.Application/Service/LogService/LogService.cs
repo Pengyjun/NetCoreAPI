@@ -70,7 +70,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.LogService
         {
             ResponseAjaxResult<List<ReceiveLogResponseDto>> responseAjaxResult = new();
             RefAsync<int> total = 0;
-            responseAjaxResult.Data = await _dbContext.Queryable<ReceiveRecordLog>()
+            var data = await _dbContext.Queryable<ReceiveRecordLog>()
                 .WhereIF(!string.IsNullOrWhiteSpace(receiveLogRequestDto.StartTime), x => x.CreateTime >= receiveLogRequestDto.StartTime.ObjToDate())
                 .WhereIF(!string.IsNullOrWhiteSpace(receiveLogRequestDto.StartTime), x => x.CreateTime <= receiveLogRequestDto.EndTime.ObjToDate())
                 .WhereIF(receiveLogRequestDto.ReceiveDataType != 0, x => x.ReceiveType == receiveLogRequestDto.ReceiveDataType)
@@ -84,9 +84,10 @@ namespace GDCMasterDataReceiveApi.Application.Service.LogService
                      SuccessCount = x.SuccessNumber
 
                  })
-                 .OrderByDescending(x=>x.RequestTime).ToPageListAsync(receiveLogRequestDto.PageIndex, receiveLogRequestDto.PageSize, total);
+                 .ToPageListAsync(receiveLogRequestDto.PageIndex, receiveLogRequestDto.PageSize, total);
+
             responseAjaxResult.Count = total;
-            responseAjaxResult.Success();
+            responseAjaxResult.SuccessResult(data.OrderByDescending(x=>x.RequestTime).ToList());
             return responseAjaxResult;
         }
     }
