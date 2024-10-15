@@ -4946,1374 +4946,1374 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
 
             switch (table)
             {
-                //case 1:
-                //    allColumns = new List<string> { "SEX", "Enable", "Nationality", "Nation", "EmpSort", "Birthday", "EntryTime", "EmpSort", "PositionGradeNorm", "HighEstGrade", "SameHighEstGrade", "PoliticsFace", "UserInfoStatus", "CreateTime", "UpdateTime", "" };
-                //    var properties = GetProperties<UserSearchDetailsDto>();
-                //    foreach (var property in properties) { tableColumns.Add(property.Name); }
-                //    foreach (var item in tableColumns)
-                //    {
-                //        if (allColumns.Contains(item))
-                //        {
-                //            List<FilterChildData> optionsChild = new();
-                //            string type = string.Empty;
-                //            string columnName = string.Empty;
-                //            if (item.Contains("Birthday") || item.Contains("EntryTime"))
-                //            {
-                //                columnName = item == "Birthday" ? "出生日期" : "本企业入职时间";
-                //                type = "Time";//时间
-                //            }
-                //            else if (item.Contains("CountryRegion") || item.Contains("Nationality"))
-                //            {
-                //                type = "Single";
-                //                columnName = "国家/地区";
-                //                optionsChild = countrys;
-                //            }
-                //            else if (item.Contains("SEX"))
-                //            {
-                //                columnName = "性别";
-                //                type = "Single";//单选
-                //                optionsChild = valDomain.Where(x => x.Code == "ZGENDER").ToList();
-                //            }
-                //            else if (item.Contains("Enable"))
-                //            {
-                //                columnName = "启用状态";
-                //                type = "Single";//单选
-                //                optionsChild = valDomain.Where(x => x.Code == "ZPSTATE").ToList();
-                //            }
-                //            else if (item.Contains("EmpSort"))
-                //            {
-                //                columnName = "用工类型";
-                //                type = "Single";//单选
-                //                optionsChild = valDomain.Where(x => x.Code == "ZEMPTYPE").ToList();
-                //            }
-                //            else if (item.Contains("UserInfoStatus"))
-                //            {
-                //                columnName = "员工状态";
-                //                type = "Single";//单选
-                //                optionsChild = valDomain.Where(x => x.Code == "ZEMPSTATE").ToList();
-                //            }
-                //            else if (item.Contains("Nation"))
-                //            {
-                //                columnName = "民族";
-                //                type = "Single";//
-                //                optionsChild = valDomain.Where(x => x.Code == "ZNATION").ToList();
-                //            }
-                //            else if (item.Contains("PoliticsFace"))
-                //            {
-                //                columnName = "政治面貌（新版）";
-                //                type = "Single";//
-                //                //optionsChild = valDomain.Where(x => x.Code == "ZNATION").ToList();
-                //            }
-                //            else if (item.Contains("PositionGradeNorm") || item.Contains("HighEstGrade") || item.Contains("SameHighEstGrade"))
-                //            {
-                //                columnName = item == "PositionGradeNorm" ? "职级（新版）" : item == "HighEstGrade" ? "新版最高职级（新版）" : "统一的最高职级（新版）";
-                //                type = "Single";//
-                //                optionsChild = valDomain.Where(x => x.Code == "ZJOBTYPE").ToList();
-                //            }
-                //            else if (item.Contains("CreateTime") || item.Contains("UpdateTime"))
-                //            {
-                //                columnName = item == "CreateTime" ? "创建时间" : "修改时间";
-                //                type = "Time";//时间
-                //            }
-                //            options.Add(new FilterConditionDto { CoulmnName = columnName, CoulmnKey = char.ToLower(item[0]) + item.Substring(1), Options = optionsChild, Type = type });
-                //        }
-                //    }
-                //    break;
-                //case 2:
-                //    allColumns = new List<string> { "EntClass", "Status", "BizType", "Type", "TypeExt", "OrgProvince", "Carea", "TerritoryPro", "ShareHoldings", "IsIndependent", "Mrut", "ProjectScale", "ProjectManType", "ProjectType", "CreateTime", "UpdateTime", "StartDate" };
-                //    var properties2 = GetProperties<InstitutionDetatilsDto>();
-                //    foreach (var property in properties2) { tableColumns.Add(property.Name); }
-                //    foreach (var item in tableColumns)
-                //    {
-                //        if (allColumns.Contains(item))
-                //        {
-                //            List<FilterChildData> optionsChild = new();
-                //            string type = string.Empty;
-                //            string columnName = string.Empty;
+                case 1:
+                    allColumns = new List<string> { "SEX", "Enable", "Nationality", "Nation", "EmpSort", "Birthday", "EntryTime", "EmpSort", "PositionGradeNorm", "HighEstGrade", "SameHighEstGrade", "PoliticsFace", "UserInfoStatus", "CreateTime", "UpdateTime", "" };
+                    var properties = GetProperties<UserSearchDetailsDto>();
+                    foreach (var property in properties) { tableColumns.Add(property.Name); }
+                    foreach (var item in tableColumns)
+                    {
+                        if (allColumns.Contains(item))
+                        {
+                            List<FilterChildData> optionsChild = new();
+                            string type = string.Empty;
+                            string columnName = string.Empty;
+                            if (item.Contains("Birthday") || item.Contains("EntryTime"))
+                            {
+                                columnName = item == "Birthday" ? "出生日期" : "本企业入职时间";
+                                type = "Time";//时间
+                            }
+                            else if (item.Contains("CountryRegion") || item.Contains("Nationality"))
+                            {
+                                type = "Single";
+                                columnName = "国家/地区";
+                                optionsChild = countrys;
+                            }
+                            else if (item.Contains("SEX"))
+                            {
+                                columnName = "性别";
+                                type = "Single";//单选
+                                optionsChild = valDomain.Where(x => x.Code == "ZGENDER").ToList();
+                            }
+                            else if (item.Contains("Enable"))
+                            {
+                                columnName = "启用状态";
+                                type = "Single";//单选
+                                optionsChild = valDomain.Where(x => x.Code == "ZPSTATE").ToList();
+                            }
+                            else if (item.Contains("EmpSort"))
+                            {
+                                columnName = "用工类型";
+                                type = "Single";//单选
+                                optionsChild = valDomain.Where(x => x.Code == "ZEMPTYPE").ToList();
+                            }
+                            else if (item.Contains("UserInfoStatus"))
+                            {
+                                columnName = "员工状态";
+                                type = "Single";//单选
+                                optionsChild = valDomain.Where(x => x.Code == "ZEMPSTATE").ToList();
+                            }
+                            else if (item.Contains("Nation"))
+                            {
+                                columnName = "民族";
+                                type = "Single";//
+                                optionsChild = valDomain.Where(x => x.Code == "ZNATION").ToList();
+                            }
+                            else if (item.Contains("PoliticsFace"))
+                            {
+                                columnName = "政治面貌（新版）";
+                                type = "Single";//
+                                //optionsChild = valDomain.Where(x => x.Code == "ZNATION").ToList();
+                            }
+                            else if (item.Contains("PositionGradeNorm") || item.Contains("HighEstGrade") || item.Contains("SameHighEstGrade"))
+                            {
+                                columnName = item == "PositionGradeNorm" ? "职级（新版）" : item == "HighEstGrade" ? "新版最高职级（新版）" : "统一的最高职级（新版）";
+                                type = "Single";//
+                                optionsChild = valDomain.Where(x => x.Code == "ZJOBTYPE").ToList();
+                            }
+                            else if (item.Contains("CreateTime") || item.Contains("UpdateTime"))
+                            {
+                                columnName = item == "CreateTime" ? "创建时间" : "修改时间";
+                                type = "Time";//时间
+                            }
+                            options.Add(new FilterConditionDto { CoulmnName = columnName, CoulmnKey = char.ToLower(item[0]) + item.Substring(1), Options = optionsChild, Type = type });
+                        }
+                    }
+                    break;
+                case 2:
+                    allColumns = new List<string> { "EntClass", "Status", "BizType", "Type", "TypeExt", "OrgProvince", "Carea", "TerritoryPro", "ShareHoldings", "IsIndependent", "Mrut", "ProjectScale", "ProjectManType", "ProjectType", "CreateTime", "UpdateTime", "StartDate" };
+                    var properties2 = GetProperties<InstitutionDetatilsDto>();
+                    foreach (var property in properties2) { tableColumns.Add(property.Name); }
+                    foreach (var item in tableColumns)
+                    {
+                        if (allColumns.Contains(item))
+                        {
+                            List<FilterChildData> optionsChild = new();
+                            string type = string.Empty;
+                            string columnName = string.Empty;
 
-                //            if (item.Contains("EntClass"))
-                //            {
-                //                type = "Single";
-                //                columnName = "企业分类";
-                //                optionsChild = valDomain.Where(x => x.Code == "ZENTC").ToList();
-                //            }
-                //            else if (item.Contains("Status"))
-                //            {
-                //                columnName = "机构状态";
-                //                type = "Single";
-                //                optionsChild = valDomain.Where(x => x.Code == "ZORGSTATE").ToList();
-                //            }
-                //            else if (item.Contains("ProjectScale"))
-                //            {
-                //                columnName = "项目规模";
-                //                type = "Single";
-                //                //optionsChild = valDomain.Where(x => x.Code == "ZORGSTATE").ToList();
-                //            }
-                //            else if (item.Contains("ProjectManType"))
-                //            {
-                //                columnName = "项目管理类型";
-                //                type = "Single";
-                //                optionsChild = valDomain.Where(x => x.Code == "ZMANAGE_MODE").ToList();
-                //            }
-                //            else if (item.Contains("ProjectType"))
-                //            {
-                //                columnName = "项目类型";
-                //                type = "Single";
-                //                optionsChild = valDomain.Where(x => x.Code == "ZPROJTYPE").ToList();
-                //            }
-                //            else if (item.Contains("BizType"))
-                //            {
-                //                columnName = "机构业务类型";
-                //                type = "Single";
-                //                optionsChild = institutionBusType;
-                //            }
-                //            else if (item.Contains("Type"))
-                //            {
-                //                columnName = "机构属性";
-                //                type = "Single";
-                //                optionsChild = valDomain.Where(x => x.Code == "ZORGATTR").ToList();
-                //            }
-                //            else if (item.Contains("TypeExt"))
-                //            {
-                //                columnName = "机构子属性";
-                //                type = "Single";
-                //                optionsChild = valDomain.Where(x => x.Code == "ZORGCHILDATTR").ToList();
-                //            }
-                //            else if (item.Contains("OrgProvince"))
-                //            {
-                //                columnName = "机构所在地";
-                //                type = "Single";
-                //                optionsChild = adisision;
-                //            }
-                //            else if (item.Contains("Carea"))
-                //            {
-                //                columnName = "国家名称";
-                //                type = "Single";
-                //                optionsChild = countrys;
-                //            }
-                //            //else if (item.Contains("TerritoryPro"))
-                //            //{
-                //            //    columnName = "地域属性";
-                //            //    type = "Single";
-                //            //    //optionsChild = valDomain.Where(x => x.Code == "ZSingleIND").ToList();
-                //            //}
-                //            else if (item.Contains("ShareHoldings"))
-                //            {
-                //                columnName = "持股情况";
-                //                type = "Single";
-                //                optionsChild = valDomain.Where(x => x.Code == "ZHOLDING").ToList();
-                //            }
-                //            else if (item.Contains("IsIndependent"))
-                //            {
-                //                columnName = "是否独立核算";
-                //                type = "Single";
-                //                optionsChild = valDomain.Where(x => x.Code == "ZCHECKIND").ToList();
-                //            }
-                //            else if (item.Contains("CreateTime") || item.Contains("UpdateTime") || item.Contains("Mrut") || item.Contains("StartDate"))
-                //            {
-                //                columnName = item == "Mrut" ? "最近更新时间" : item == "CreateTime" ? "创建时间" : item == "StartDate" ? "开始时间" : "修改时间";
-                //                type = "Time";//时间
-                //            }
-                //            options.Add(new FilterConditionDto { CoulmnName = columnName, CoulmnKey = char.ToLower(item[0]) + item.Substring(1), Options = optionsChild, Type = type });
-                //        }
-                //    }
-                //    break;
-                //case 3:
-                //    //allColumns = new List<string> { "PlanStartDate", "PlanCompletionDate", "TradingSituation", "StartDateOfInsure", "EndDateOfInsure", "Country", "FundEstablishmentDate", "FundExpirationDate", "LeaseStartDate", "DueDate", "TaxMethod", "OrgMethod", "ConsolidatedTable", "Type", "Location", "Invest", "PjectOrg", "ResponsibleParty", "Currency", "FundOrgForm", "FundManager", "TenantType", "UnitSec", "ReasonForDeactivate", "WinningBidder", "Management", "ParticipateInUnitSecs", "IsJoint", "CreateTime", "UpdateTime", "State" };
-                //    allColumns = new List<string> { "ZPROJTYPE", "ZZCOUNTRY", "ZPROJLOC", "ZCPBC", "ZINVERSTOR", "ZAPVLDATE", "ZSI", "FundExpirationDate", "ZPRO_ORG", "ZSTARTDATE", "ZFINDATE", "ZRESP", "ZLDLOCGT", "ZCBR", "ZTRADER", "ZISTARTDATE", "ZIFINDATE", "ZZCURRENCY", "ZFUNDORGFORM", "ZPRO_BP", "ZFUNDMTYPE", "ZFSTARTDATE", "ZFFINDATE", "ZLESSEETYPE", "ZLSTARTDATE", "ZLFINDATE", "Z2NDORG", "ZTAXMETHOD", "ZPOS", "ZAWARDMAI", "ZCS", "ZSTATE", "Zdelete", "CreatedAt", "UpdatedAt", "FZmanagemode", "FZwinningc", "", "", "", "", "" };
-                //    //币种
-                //    var currency = await _dbContext.Queryable<Currency>()
-                //        .Where(t => t.IsDelete == 1)
-                //        .Select(t => new FilterChildData { Key = t.ZCURRENCYCODE, Val = t.ZCURRENCYNAME })
-                //        .ToListAsync();
+                            if (item.Contains("EntClass"))
+                            {
+                                type = "Single";
+                                columnName = "企业分类";
+                                optionsChild = valDomain.Where(x => x.Code == "ZENTC").ToList();
+                            }
+                            else if (item.Contains("Status"))
+                            {
+                                columnName = "机构状态";
+                                type = "Single";
+                                optionsChild = valDomain.Where(x => x.Code == "ZORGSTATE").ToList();
+                            }
+                            else if (item.Contains("ProjectScale"))
+                            {
+                                columnName = "项目规模";
+                                type = "Single";
+                                //optionsChild = valDomain.Where(x => x.Code == "ZORGSTATE").ToList();
+                            }
+                            else if (item.Contains("ProjectManType"))
+                            {
+                                columnName = "项目管理类型";
+                                type = "Single";
+                                optionsChild = valDomain.Where(x => x.Code == "ZMANAGE_MODE").ToList();
+                            }
+                            else if (item.Contains("ProjectType"))
+                            {
+                                columnName = "项目类型";
+                                type = "Single";
+                                optionsChild = valDomain.Where(x => x.Code == "ZPROJTYPE").ToList();
+                            }
+                            else if (item.Contains("BizType"))
+                            {
+                                columnName = "机构业务类型";
+                                type = "Single";
+                                optionsChild = institutionBusType;
+                            }
+                            else if (item.Contains("Type"))
+                            {
+                                columnName = "机构属性";
+                                type = "Single";
+                                optionsChild = valDomain.Where(x => x.Code == "ZORGATTR").ToList();
+                            }
+                            else if (item.Contains("TypeExt"))
+                            {
+                                columnName = "机构子属性";
+                                type = "Single";
+                                optionsChild = valDomain.Where(x => x.Code == "ZORGCHILDATTR").ToList();
+                            }
+                            else if (item.Contains("OrgProvince"))
+                            {
+                                columnName = "机构所在地";
+                                type = "Single";
+                                optionsChild = adisision;
+                            }
+                            else if (item.Contains("Carea"))
+                            {
+                                columnName = "国家名称";
+                                type = "Single";
+                                optionsChild = countrys;
+                            }
+                            //else if (item.Contains("TerritoryPro"))
+                            //{
+                            //    columnName = "地域属性";
+                            //    type = "Single";
+                            //    //optionsChild = valDomain.Where(x => x.Code == "ZSingleIND").ToList();
+                            //}
+                            else if (item.Contains("ShareHoldings"))
+                            {
+                                columnName = "持股情况";
+                                type = "Single";
+                                optionsChild = valDomain.Where(x => x.Code == "ZHOLDING").ToList();
+                            }
+                            else if (item.Contains("IsIndependent"))
+                            {
+                                columnName = "是否独立核算";
+                                type = "Single";
+                                optionsChild = valDomain.Where(x => x.Code == "ZCHECKIND").ToList();
+                            }
+                            else if (item.Contains("CreateTime") || item.Contains("UpdateTime") || item.Contains("Mrut") || item.Contains("StartDate"))
+                            {
+                                columnName = item == "Mrut" ? "最近更新时间" : item == "CreateTime" ? "创建时间" : item == "StartDate" ? "开始时间" : "修改时间";
+                                type = "Time";//时间
+                            }
+                            options.Add(new FilterConditionDto { CoulmnName = columnName, CoulmnKey = char.ToLower(item[0]) + item.Substring(1), Options = optionsChild, Type = type });
+                        }
+                    }
+                    break;
+                case 3:
+                    //allColumns = new List<string> { "PlanStartDate", "PlanCompletionDate", "TradingSituation", "StartDateOfInsure", "EndDateOfInsure", "Country", "FundEstablishmentDate", "FundExpirationDate", "LeaseStartDate", "DueDate", "TaxMethod", "OrgMethod", "ConsolidatedTable", "Type", "Location", "Invest", "PjectOrg", "ResponsibleParty", "Currency", "FundOrgForm", "FundManager", "TenantType", "UnitSec", "ReasonForDeactivate", "WinningBidder", "Management", "ParticipateInUnitSecs", "IsJoint", "CreateTime", "UpdateTime", "State" };
+                    allColumns = new List<string> { "ZPROJTYPE", "ZZCOUNTRY", "ZPROJLOC", "ZCPBC", "ZINVERSTOR", "ZAPVLDATE", "ZSI", "FundExpirationDate", "ZPRO_ORG", "ZSTARTDATE", "ZFINDATE", "ZRESP", "ZLDLOCGT", "ZCBR", "ZTRADER", "ZISTARTDATE", "ZIFINDATE", "ZZCURRENCY", "ZFUNDORGFORM", "ZPRO_BP", "ZFUNDMTYPE", "ZFSTARTDATE", "ZFFINDATE", "ZLESSEETYPE", "ZLSTARTDATE", "ZLFINDATE", "Z2NDORG", "ZTAXMETHOD", "ZPOS", "ZAWARDMAI", "ZCS", "ZSTATE", "Zdelete", "CreatedAt", "UpdatedAt", "FZmanagemode", "FZwinningc", "", "", "", "", "" };
+                    //币种
+                    var currency = await _dbContext.Queryable<Currency>()
+                        .Where(t => t.IsDelete == 1)
+                        .Select(t => new FilterChildData { Key = t.ZCURRENCYCODE, Val = t.ZCURRENCYNAME })
+                        .ToListAsync();
 
-                //    //机构
-                //    var institutions = await _dbContext.Queryable<Institution>()
-                //        .Where(t => t.IsDelete == 1)
-                //        .Select(t => new FilterChildData { Key = t.OID, Val = t.NAME })
-                //        .ToListAsync();
+                    //机构
+                    var institutions = await _dbContext.Queryable<Institution>()
+                        .Where(t => t.IsDelete == 1)
+                        .Select(t => new FilterChildData { Key = t.OID, Val = t.NAME })
+                        .ToListAsync();
 
-                //    //行政组织-多组织   责任主体
-                //    var zrzt = await _dbContext.Queryable<AdministrativeOrganization>()
-                //        .Where(t => t.IsDelete == 1)
-                //        .Select(t => new FilterChildData { Key = t.MDM_CODE, Val = t.ZZTNAME_ZH })
-                //        .ToListAsync();
+                    //行政组织-多组织   责任主体
+                    var zrzt = await _dbContext.Queryable<AdministrativeOrganization>()
+                        .Where(t => t.IsDelete == 1)
+                        .Select(t => new FilterChildData { Key = t.MDM_CODE, Val = t.ZZTNAME_ZH })
+                        .ToListAsync();
 
-                //    //中标主体  往来单位
-                //    //只要局的
-                //    var oids = await _dbContext.Queryable<Institution>().Select(t => t.OID).ToListAsync();
-                //    var zbzt = await _dbContext.Queryable<CorresUnit>()
-                //        .Where(t => oids.Contains(t.Z2NDORG))
-                //        .Select(t => new FilterChildData { Key = t.ZBP, Val = t.ZBPNAME_ZH })
-                //        .ToListAsync();
+                    //中标主体  往来单位
+                    //只要局的
+                    var oids = await _dbContext.Queryable<Institution>().Select(t => t.OID).ToListAsync();
+                    var zbzt = await _dbContext.Queryable<CorresUnit>()
+                        .Where(t => oids.Contains(t.Z2NDORG))
+                        .Select(t => new FilterChildData { Key = t.ZBP, Val = t.ZBPNAME_ZH })
+                        .ToListAsync();
 
-                //    //var properties3 = GetProperties<ProjectDetailsDto>();
-                //    var properties3 = GetProperties<DHtProjects>();
-                //    foreach (var property in properties3) { tableColumns.Add(property.Name); }
-                //    foreach (var item in tableColumns)
-                //    {
-                //        if (allColumns.Contains(item))
-                //        {
-                //            List<FilterChildData> optionsChild = new();
-                //            string type = string.Empty;
-                //            string columnName = string.Empty;
+                    //var properties3 = GetProperties<ProjectDetailsDto>();
+                    var properties3 = GetProperties<DHtProjects>();
+                    foreach (var property in properties3) { tableColumns.Add(property.Name); }
+                    foreach (var item in tableColumns)
+                    {
+                        if (allColumns.Contains(item))
+                        {
+                            List<FilterChildData> optionsChild = new();
+                            string type = string.Empty;
+                            string columnName = string.Empty;
 
-                //            if (item.Contains("ZSTARTDATE"))
-                //            {
-                //                type = "NumberTime";
-                //                columnName = "项目计划开始日期";
-                //            }
-                //            else if (item.Contains("State"))
-                //            {
-                //                columnName = "状态";
-                //                type = "Single";//单选
-                //                optionsChild.Add(new FilterChildData { Key = "0", Val = "停用" });
-                //                optionsChild.Add(new FilterChildData { Key = "1", Val = "启用" });
-                //            }
-                //            else if (item.Contains("ZFINDATE"))
-                //            {
-                //                columnName = "项目计划完成日期";
-                //                type = "NumberTime";
-                //            }
-                //            else if (item.Contains("ZPROJTYPE"))
-                //            {
-                //                columnName = "项目类型";
-                //                type = "Single";
-                //                optionsChild = valDomain.Where(x => x.Code == "ZPROJTYPE").ToList();
-                //            }
-                //            else if (item.Contains("ZPROJLOC"))
-                //            {
-                //                columnName = "项目所在地";
-                //                type = "Single";
-                //                optionsChild = adisision.Where(x => x.Code == "3" || x.Code == "4").ToList();
-                //            }
-                //            else if (item.Contains("ZPRO_ORG"))
-                //            {
-                //                columnName = "项目机构";
-                //                type = "Single";
-                //                optionsChild = institutions.ToList();
-                //            }
-                //            else if (item.Contains("ZPRO_BP"))
-                //            {
-                //                columnName = "商机项目机构";
-                //                type = "Single";
-                //                optionsChild = institutions.ToList();
-                //            }
-                //            else if (item.Contains("ZRESP"))
-                //            {
-                //                columnName = "责任主体";
-                //                type = "Single";
-                //                optionsChild = zrzt;
-                //            }
-                //            else if (item.Contains("FZmanagemode"))
-                //            {
-                //                columnName = "项目管理方式";
-                //                type = "Single";
-                //                optionsChild = valDomain.Where(x => x.Code == "ZMANAGE_MODE").ToList();
-                //            }
-                //            else if (item.Contains("ZAWARDMAI"))
-                //            {
-                //                columnName = "中标主体";
-                //                type = "Single";
-                //                optionsChild = zbzt;
-                //            }
-                //            else if (item.Contains("ZFUNDORGFORM"))
-                //            {
-                //                columnName = "基金组织形式";
-                //                type = "Single";
-                //                optionsChild = valDomain.Where(x => x.Code == "ZFUNDORGFORM").ToList();
-                //            }
-                //            else if (item.Contains("ZFUNDMTYPE"))
-                //            {
-                //                columnName = "基金管理人类型";
-                //                type = "Single";
-                //                optionsChild = valDomain.Where(x => x.Code == "ZFUNDMTYPE").ToList();
-                //            }
-                //            else if (item.Contains("ZLESSEETYPE"))
-                //            {
-                //                columnName = "承租人类型";
-                //                type = "Single";
-                //                optionsChild = valDomain.Where(x => x.Code == "ZLESSEETYPE").ToList();
-                //            }
-                //            else if (item.Contains("ZSTOPREASON"))
-                //            {
-                //                columnName = "停用原因";
-                //                type = "Single";
-                //                optionsChild = valDomain.Where(x => x.Code == "ZSTOPREASON").ToList();
-                //            }
-                //            else if (item.Contains("FZcy2ndorg"))
-                //            {
-                //                columnName = "参与二级单位";
-                //                type = "Single";
-                //                optionsChild = valDomain.Where(x => x.Code == "ZCY2NDORG").ToList();
-                //            }
-                //            else if (item.Contains("Z2NDORG"))
-                //            {
-                //                columnName = "所属二级单位";
-                //                type = "Single";
-                //                optionsChild = institutions;
-                //            }
-                //            else if (item.Contains("ZZCURRENCY"))
-                //            {
-                //                columnName = "币种";
-                //                type = "Single";
-                //                optionsChild = currency;
-                //            }
-                //            else if (item.Contains("FZwinningc"))
-                //            {
-                //                columnName = "是否联合体项目";
-                //                type = "Single";//单选
-                //                optionsChild.Add(new FilterChildData { Key = "0", Val = "否" });
-                //                optionsChild.Add(new FilterChildData { Key = "1", Val = "是" });
-                //            }
-                //            else if (item.Contains("ZTRADER"))
-                //            {
-                //                columnName = "操盘情况";
-                //                type = "Single";
-                //                optionsChild = valDomain.Where(x => x.Code == "ZTRADER").ToList();
-                //            }
-                //            else if (item.Contains("ZISTARTDATE"))
-                //            {
-                //                columnName = "保险起始日期";
-                //                type = "NumberTime";
-                //            }
-                //            else if (item.Contains("ZIFINDATE"))
-                //            {
-                //                columnName = "保险终止日期";
-                //                type = "NumberTime";
-                //            }
-                //            else if (item.Contains("ZZCOUNTRY"))
-                //            {
-                //                columnName = "国家/地区";
-                //                type = "Single";
-                //                optionsChild = countrys;
-                //            }
-                //            else if (item.Contains("ZFSTARTDATE"))
-                //            {
-                //                columnName = "基金成立日期";
-                //                type = "NumberTime";
-                //            }
-                //            else if (item.Contains("ZFFINDATE"))
-                //            {
-                //                columnName = "基金到期日期";
-                //                type = "NumberTime";
-                //            }
-                //            else if (item.Contains("ZLSTARTDATE"))
-                //            {
-                //                columnName = "起租日期";
-                //                type = "NumberTime";
-                //            }
-                //            else if (item.Contains("ZLFINDATE"))
-                //            {
-                //                columnName = "到期日期";
-                //                type = "NumberTime";
-                //            }
-                //            else if (item.Contains("ZTAXMETHOD"))
-                //            {
-                //                columnName = "计税方式";
-                //                type = "Single";
-                //                optionsChild = valDomain.Where(x => x.Code == "ZTAXMETHOD").ToList();
-                //            }
-                //            else if (item.Contains("ZPOS"))
-                //            {
-                //                columnName = "项目组织形式";
-                //                type = "Single";
-                //                optionsChild = valDomain.Where(x => x.Code == "ZPOS").ToList();
-                //            }
-                //            else if (item.Contains("ZCS"))
-                //            {
-                //                columnName = "并表情况";
-                //                type = "Single";
-                //                optionsChild = valDomain.Where(x => x.Code == "ZCS").ToList();
-                //            }
-                //            else if (item.Contains("CreateTime") || item.Contains("UpdateTime"))
-                //            {
-                //                columnName = item == "CreateTime" ? "创建时间" : "修改时间";
-                //                type = "Time";//时间
-                //            }
-                //            options.Add(new FilterConditionDto { CoulmnName = columnName, CoulmnKey = char.ToLower(item[0]) + item.Substring(1), Options = optionsChild, Type = type });
-                //        }
-                //    }
-                //    break;
-                //case 4:
-                //    allColumns = new List<string> { "CategoryUnit", "Country", "Province", "City", "County", "EnterpriseNature", "TypeOfUnit", "ChangeTime", "CreateTime", "UpdateTime", "StatusOfUnit" };
-                //    var properties4 = GetProperties<CorresUnitDetailsDto>();
-                //    foreach (var property in properties4) { tableColumns.Add(property.Name); }
-                //    foreach (var item in tableColumns)
-                //    {
-                //        if (allColumns.Contains(item))
-                //        {
-                //            List<FilterChildData> optionsChild = new();
-                //            string type = string.Empty;
-                //            string columnName = string.Empty;
+                            if (item.Contains("ZSTARTDATE"))
+                            {
+                                type = "NumberTime";
+                                columnName = "项目计划开始日期";
+                            }
+                            else if (item.Contains("State"))
+                            {
+                                columnName = "状态";
+                                type = "Single";//单选
+                                optionsChild.Add(new FilterChildData { Key = "0", Val = "停用" });
+                                optionsChild.Add(new FilterChildData { Key = "1", Val = "启用" });
+                            }
+                            else if (item.Contains("ZFINDATE"))
+                            {
+                                columnName = "项目计划完成日期";
+                                type = "NumberTime";
+                            }
+                            else if (item.Contains("ZPROJTYPE"))
+                            {
+                                columnName = "项目类型";
+                                type = "Single";
+                                optionsChild = valDomain.Where(x => x.Code == "ZPROJTYPE").ToList();
+                            }
+                            else if (item.Contains("ZPROJLOC"))
+                            {
+                                columnName = "项目所在地";
+                                type = "Single";
+                                optionsChild = adisision.Where(x => x.Code == "3" || x.Code == "4").ToList();
+                            }
+                            else if (item.Contains("ZPRO_ORG"))
+                            {
+                                columnName = "项目机构";
+                                type = "Single";
+                                optionsChild = institutions.ToList();
+                            }
+                            else if (item.Contains("ZPRO_BP"))
+                            {
+                                columnName = "商机项目机构";
+                                type = "Single";
+                                optionsChild = institutions.ToList();
+                            }
+                            else if (item.Contains("ZRESP"))
+                            {
+                                columnName = "责任主体";
+                                type = "Single";
+                                optionsChild = zrzt;
+                            }
+                            else if (item.Contains("FZmanagemode"))
+                            {
+                                columnName = "项目管理方式";
+                                type = "Single";
+                                optionsChild = valDomain.Where(x => x.Code == "ZMANAGE_MODE").ToList();
+                            }
+                            else if (item.Contains("ZAWARDMAI"))
+                            {
+                                columnName = "中标主体";
+                                type = "Single";
+                                optionsChild = zbzt;
+                            }
+                            else if (item.Contains("ZFUNDORGFORM"))
+                            {
+                                columnName = "基金组织形式";
+                                type = "Single";
+                                optionsChild = valDomain.Where(x => x.Code == "ZFUNDORGFORM").ToList();
+                            }
+                            else if (item.Contains("ZFUNDMTYPE"))
+                            {
+                                columnName = "基金管理人类型";
+                                type = "Single";
+                                optionsChild = valDomain.Where(x => x.Code == "ZFUNDMTYPE").ToList();
+                            }
+                            else if (item.Contains("ZLESSEETYPE"))
+                            {
+                                columnName = "承租人类型";
+                                type = "Single";
+                                optionsChild = valDomain.Where(x => x.Code == "ZLESSEETYPE").ToList();
+                            }
+                            else if (item.Contains("ZSTOPREASON"))
+                            {
+                                columnName = "停用原因";
+                                type = "Single";
+                                optionsChild = valDomain.Where(x => x.Code == "ZSTOPREASON").ToList();
+                            }
+                            else if (item.Contains("FZcy2ndorg"))
+                            {
+                                columnName = "参与二级单位";
+                                type = "Single";
+                                optionsChild = valDomain.Where(x => x.Code == "ZCY2NDORG").ToList();
+                            }
+                            else if (item.Contains("Z2NDORG"))
+                            {
+                                columnName = "所属二级单位";
+                                type = "Single";
+                                optionsChild = institutions;
+                            }
+                            else if (item.Contains("ZZCURRENCY"))
+                            {
+                                columnName = "币种";
+                                type = "Single";
+                                optionsChild = currency;
+                            }
+                            else if (item.Contains("FZwinningc"))
+                            {
+                                columnName = "是否联合体项目";
+                                type = "Single";//单选
+                                optionsChild.Add(new FilterChildData { Key = "0", Val = "否" });
+                                optionsChild.Add(new FilterChildData { Key = "1", Val = "是" });
+                            }
+                            else if (item.Contains("ZTRADER"))
+                            {
+                                columnName = "操盘情况";
+                                type = "Single";
+                                optionsChild = valDomain.Where(x => x.Code == "ZTRADER").ToList();
+                            }
+                            else if (item.Contains("ZISTARTDATE"))
+                            {
+                                columnName = "保险起始日期";
+                                type = "NumberTime";
+                            }
+                            else if (item.Contains("ZIFINDATE"))
+                            {
+                                columnName = "保险终止日期";
+                                type = "NumberTime";
+                            }
+                            else if (item.Contains("ZZCOUNTRY"))
+                            {
+                                columnName = "国家/地区";
+                                type = "Single";
+                                optionsChild = countrys;
+                            }
+                            else if (item.Contains("ZFSTARTDATE"))
+                            {
+                                columnName = "基金成立日期";
+                                type = "NumberTime";
+                            }
+                            else if (item.Contains("ZFFINDATE"))
+                            {
+                                columnName = "基金到期日期";
+                                type = "NumberTime";
+                            }
+                            else if (item.Contains("ZLSTARTDATE"))
+                            {
+                                columnName = "起租日期";
+                                type = "NumberTime";
+                            }
+                            else if (item.Contains("ZLFINDATE"))
+                            {
+                                columnName = "到期日期";
+                                type = "NumberTime";
+                            }
+                            else if (item.Contains("ZTAXMETHOD"))
+                            {
+                                columnName = "计税方式";
+                                type = "Single";
+                                optionsChild = valDomain.Where(x => x.Code == "ZTAXMETHOD").ToList();
+                            }
+                            else if (item.Contains("ZPOS"))
+                            {
+                                columnName = "项目组织形式";
+                                type = "Single";
+                                optionsChild = valDomain.Where(x => x.Code == "ZPOS").ToList();
+                            }
+                            else if (item.Contains("ZCS"))
+                            {
+                                columnName = "并表情况";
+                                type = "Single";
+                                optionsChild = valDomain.Where(x => x.Code == "ZCS").ToList();
+                            }
+                            else if (item.Contains("CreateTime") || item.Contains("UpdateTime"))
+                            {
+                                columnName = item == "CreateTime" ? "创建时间" : "修改时间";
+                                type = "Time";//时间
+                            }
+                            options.Add(new FilterConditionDto { CoulmnName = columnName, CoulmnKey = char.ToLower(item[0]) + item.Substring(1), Options = optionsChild, Type = type });
+                        }
+                    }
+                    break;
+                case 4:
+                    allColumns = new List<string> { "CategoryUnit", "Country", "Province", "City", "County", "EnterpriseNature", "TypeOfUnit", "ChangeTime", "CreateTime", "UpdateTime", "StatusOfUnit" };
+                    var properties4 = GetProperties<CorresUnitDetailsDto>();
+                    foreach (var property in properties4) { tableColumns.Add(property.Name); }
+                    foreach (var item in tableColumns)
+                    {
+                        if (allColumns.Contains(item))
+                        {
+                            List<FilterChildData> optionsChild = new();
+                            string type = string.Empty;
+                            string columnName = string.Empty;
 
-                //            if (item.Contains("CategoryUnit"))
-                //            {
-                //                type = "Single";
-                //                columnName = "往来单位类别";
-                //                optionsChild = valDomain.Where(x => x.Code == "ZBPTYPE").ToList();
-                //            }
-                //            else if (item.Contains("Province"))
-                //            {
-                //                columnName = "省";
-                //                type = "Single";
-                //                optionsChild = adisision.Where(x => x.Code == "1").ToList();
-                //            }
-                //            else if (item.Contains("Country"))
-                //            {
-                //                columnName = "国家/地区";
-                //                type = "Single";
-                //                optionsChild = countrys;
-                //            }
-                //            else if (item.Contains("City"))
-                //            {
-                //                columnName = "市";
-                //                type = "Single";
-                //                optionsChild = adisision.Where(x => x.Code == "2").ToList();
-                //            }
-                //            else if (item.Contains("County"))
-                //            {
-                //                columnName = "县/区";
-                //                type = "Single";
-                //                optionsChild = adisision.Where(x => x.Code == "3" || x.Code == "4").ToList();
-                //            }
-                //            else if (item.Contains("EnterpriseNature"))
-                //            {
-                //                columnName = "企业性质";
-                //                type = "Single";
-                //            }
-                //            else if (item.Contains("TypeOfUnit"))
-                //            {
-                //                columnName = "往来单位类型";
-                //                type = "Single";
-                //                optionsChild = valDomain.Where(x => x.Code == "ZBPKINDS").ToList();
-                //            }
-                //            else if (item.Contains("ChangeTime"))
-                //            {
-                //                columnName = "修改时间";
-                //                type = "NumberTime";
-                //            }
-                //            else if (item.Contains("StatusOfUnit"))
-                //            {
-                //                columnName = "往来单位状态";
-                //                type = "Single";
-                //                optionsChild = valDomain.Where(x => x.Code == "ZBPSTATE").ToList();
-                //            }
-                //            else if (item.Contains("CreateTime") || item.Contains("UpdateTime"))
-                //            {
-                //                columnName = item == "CreateTime" ? "创建时间" : "修改时间";
-                //                type = "Time";//时间
-                //            }
-                //            options.Add(new FilterConditionDto { CoulmnName = columnName, CoulmnKey = char.ToLower(item[0]) + item.Substring(1), Options = optionsChild, Type = type });
-                //        }
-                //    }
-                //    break;
-                //case 5:
-                //    allColumns = new List<string> { "RoadGuoZiW", "RoadHaiW", "RoadGongJ", "CreateTime", "UpdateTime", };
-                //    var properties5 = GetProperties<CountryRegionDetailsDto>();
-                //    foreach (var property in properties5) { tableColumns.Add(property.Name); }
-                //    foreach (var item in tableColumns)
-                //    {
-                //        if (allColumns.Contains(item))
-                //        {
-                //            List<FilterChildData> optionsChild = new();
-                //            string type = string.Empty;
-                //            string columnName = string.Empty;
+                            if (item.Contains("CategoryUnit"))
+                            {
+                                type = "Single";
+                                columnName = "往来单位类别";
+                                optionsChild = valDomain.Where(x => x.Code == "ZBPTYPE").ToList();
+                            }
+                            else if (item.Contains("Province"))
+                            {
+                                columnName = "省";
+                                type = "Single";
+                                optionsChild = adisision.Where(x => x.Code == "1").ToList();
+                            }
+                            else if (item.Contains("Country"))
+                            {
+                                columnName = "国家/地区";
+                                type = "Single";
+                                optionsChild = countrys;
+                            }
+                            else if (item.Contains("City"))
+                            {
+                                columnName = "市";
+                                type = "Single";
+                                optionsChild = adisision.Where(x => x.Code == "2").ToList();
+                            }
+                            else if (item.Contains("County"))
+                            {
+                                columnName = "县/区";
+                                type = "Single";
+                                optionsChild = adisision.Where(x => x.Code == "3" || x.Code == "4").ToList();
+                            }
+                            else if (item.Contains("EnterpriseNature"))
+                            {
+                                columnName = "企业性质";
+                                type = "Single";
+                            }
+                            else if (item.Contains("TypeOfUnit"))
+                            {
+                                columnName = "往来单位类型";
+                                type = "Single";
+                                optionsChild = valDomain.Where(x => x.Code == "ZBPKINDS").ToList();
+                            }
+                            else if (item.Contains("ChangeTime"))
+                            {
+                                columnName = "修改时间";
+                                type = "NumberTime";
+                            }
+                            else if (item.Contains("StatusOfUnit"))
+                            {
+                                columnName = "往来单位状态";
+                                type = "Single";
+                                optionsChild = valDomain.Where(x => x.Code == "ZBPSTATE").ToList();
+                            }
+                            else if (item.Contains("CreateTime") || item.Contains("UpdateTime"))
+                            {
+                                columnName = item == "CreateTime" ? "创建时间" : "修改时间";
+                                type = "Time";//时间
+                            }
+                            options.Add(new FilterConditionDto { CoulmnName = columnName, CoulmnKey = char.ToLower(item[0]) + item.Substring(1), Options = optionsChild, Type = type });
+                        }
+                    }
+                    break;
+                case 5:
+                    allColumns = new List<string> { "RoadGuoZiW", "RoadHaiW", "RoadGongJ", "CreateTime", "UpdateTime", };
+                    var properties5 = GetProperties<CountryRegionDetailsDto>();
+                    foreach (var property in properties5) { tableColumns.Add(property.Name); }
+                    foreach (var item in tableColumns)
+                    {
+                        if (allColumns.Contains(item))
+                        {
+                            List<FilterChildData> optionsChild = new();
+                            string type = string.Empty;
+                            string columnName = string.Empty;
 
-                //            if (item.Contains("RoadGuoZiW"))
-                //            {
-                //                type = "Single";//复选
-                //                columnName = " 一带一路(国资委)";
-                //                optionsChild.Add(new FilterChildData { Key = "0", Val = "否" });
-                //                optionsChild.Add(new FilterChildData { Key = "1", Val = "是" });
-                //            }
-                //            else if (item.Contains("RoadHaiW"))
-                //            {
-                //                columnName = "一带一路(海外)";
-                //                type = "Single";//单选
-                //                optionsChild.Add(new FilterChildData { Key = "0", Val = "否" });
-                //                optionsChild.Add(new FilterChildData { Key = "1", Val = "是" });
-                //            }
-                //            else if (item.Contains("RoadGongJ"))
-                //            {
-                //                columnName = "一带一路(共建)";
-                //                type = "Single";//单选
-                //                optionsChild.Add(new FilterChildData { Key = "0", Val = "否" });
-                //                optionsChild.Add(new FilterChildData { Key = "1", Val = "是" });
-                //            }
-                //            else if (item.Contains("CreateTime") || item.Contains("UpdateTime"))
-                //            {
-                //                columnName = item == "CreateTime" ? "创建时间" : "修改时间";
-                //                type = "Time";//时间
-                //            }
-                //            options.Add(new FilterConditionDto { CoulmnName = columnName, CoulmnKey = char.ToLower(item[0]) + item.Substring(1), Options = optionsChild, Type = type });
-                //        }
-                //    }
-                //    break;
-                //case 6:
-                //    allColumns = new List<string> { "CreateTime", "UpdateTime" };
-                //    var properties6 = GetProperties<CountryContinentDetailsDto>();
-                //    foreach (var property in properties6) { tableColumns.Add(property.Name); }
-                //    foreach (var item in tableColumns)
-                //    {
-                //        if (allColumns.Contains(item))
-                //        {
-                //            List<FilterChildData> optionsChild = new();
-                //            string type = string.Empty;
-                //            string columnName = string.Empty;
-                //            if (item.Contains("CreateTime") || item.Contains("UpdateTime"))
-                //            {
-                //                columnName = item == "CreateTime" ? "创建时间" : "修改时间";
-                //                type = "Time";//时间
-                //            }
-                //            options.Add(new FilterConditionDto { CoulmnName = columnName, CoulmnKey = char.ToLower(item[0]) + item.Substring(1), Options = optionsChild, Type = type });
-                //        }
-                //    }
-                //    break;
-                //case 7:
-                //    allColumns = new List<string> { "Country", "Province", "City", "County", "CreateTime", "UpdateTime", };
-                //    var properties7 = GetProperties<FinancialInstitutionDetailsDto>();
-                //    foreach (var property in properties7) { tableColumns.Add(property.Name); }
-                //    foreach (var item in tableColumns)
-                //    {
-                //        if (allColumns.Contains(item))
-                //        {
-                //            List<FilterChildData> optionsChild = new();
-                //            string type = string.Empty;
-                //            string columnName = string.Empty;
+                            if (item.Contains("RoadGuoZiW"))
+                            {
+                                type = "Single";//复选
+                                columnName = " 一带一路(国资委)";
+                                optionsChild.Add(new FilterChildData { Key = "0", Val = "否" });
+                                optionsChild.Add(new FilterChildData { Key = "1", Val = "是" });
+                            }
+                            else if (item.Contains("RoadHaiW"))
+                            {
+                                columnName = "一带一路(海外)";
+                                type = "Single";//单选
+                                optionsChild.Add(new FilterChildData { Key = "0", Val = "否" });
+                                optionsChild.Add(new FilterChildData { Key = "1", Val = "是" });
+                            }
+                            else if (item.Contains("RoadGongJ"))
+                            {
+                                columnName = "一带一路(共建)";
+                                type = "Single";//单选
+                                optionsChild.Add(new FilterChildData { Key = "0", Val = "否" });
+                                optionsChild.Add(new FilterChildData { Key = "1", Val = "是" });
+                            }
+                            else if (item.Contains("CreateTime") || item.Contains("UpdateTime"))
+                            {
+                                columnName = item == "CreateTime" ? "创建时间" : "修改时间";
+                                type = "Time";//时间
+                            }
+                            options.Add(new FilterConditionDto { CoulmnName = columnName, CoulmnKey = char.ToLower(item[0]) + item.Substring(1), Options = optionsChild, Type = type });
+                        }
+                    }
+                    break;
+                case 6:
+                    allColumns = new List<string> { "CreateTime", "UpdateTime" };
+                    var properties6 = GetProperties<CountryContinentDetailsDto>();
+                    foreach (var property in properties6) { tableColumns.Add(property.Name); }
+                    foreach (var item in tableColumns)
+                    {
+                        if (allColumns.Contains(item))
+                        {
+                            List<FilterChildData> optionsChild = new();
+                            string type = string.Empty;
+                            string columnName = string.Empty;
+                            if (item.Contains("CreateTime") || item.Contains("UpdateTime"))
+                            {
+                                columnName = item == "CreateTime" ? "创建时间" : "修改时间";
+                                type = "Time";//时间
+                            }
+                            options.Add(new FilterConditionDto { CoulmnName = columnName, CoulmnKey = char.ToLower(item[0]) + item.Substring(1), Options = optionsChild, Type = type });
+                        }
+                    }
+                    break;
+                case 7:
+                    allColumns = new List<string> { "Country", "Province", "City", "County", "CreateTime", "UpdateTime", };
+                    var properties7 = GetProperties<FinancialInstitutionDetailsDto>();
+                    foreach (var property in properties7) { tableColumns.Add(property.Name); }
+                    foreach (var item in tableColumns)
+                    {
+                        if (allColumns.Contains(item))
+                        {
+                            List<FilterChildData> optionsChild = new();
+                            string type = string.Empty;
+                            string columnName = string.Empty;
 
-                //            if (item.Contains("Country"))
-                //            {
-                //                columnName = "国家/地区";
-                //                type = "Single";
-                //                optionsChild = countrys;
-                //            }
-                //            else if (item.Contains("Province"))
-                //            {
-                //                columnName = "省";
-                //                type = "Single";
-                //                optionsChild = adisision.Where(x => x.Code == "1").ToList();
-                //            }
-                //            else if (item.Contains("City"))
-                //            {
-                //                columnName = "市";
-                //                type = "Single";
-                //                optionsChild = adisision.Where(x => x.Code == "2").ToList();
-                //            }
-                //            else if (item.Contains("County"))
-                //            {
-                //                columnName = "县/区";
-                //                type = "Single";
-                //                optionsChild = adisision.Where(x => x.Code == "3" || x.Code == "4").ToList();
-                //            }
-                //            else if (item.Contains("CreateTime") || item.Contains("UpdateTime"))
-                //            {
-                //                columnName = item == "CreateTime" ? "创建时间" : "修改时间";
-                //                type = "Time";//时间
-                //            }
-                //            options.Add(new FilterConditionDto { CoulmnName = columnName, CoulmnKey = char.ToLower(item[0]) + item.Substring(1), Options = optionsChild, Type = type });
-                //        }
-                //    }
-                //    break;
-                //case 8:
-                //    allColumns = new List<string> { "Level", "CreateTime", "UpdateTime", };
-                //    var properties8 = GetProperties<DeviceClassCodeDetailsDto>();
-                //    foreach (var property in properties8) { tableColumns.Add(property.Name); }
-                //    foreach (var item in tableColumns)
-                //    {
-                //        if (allColumns.Contains(item))
-                //        {
-                //            List<FilterChildData> optionsChild = new();
-                //            string type = string.Empty;
-                //            string columnName = string.Empty;
+                            if (item.Contains("Country"))
+                            {
+                                columnName = "国家/地区";
+                                type = "Single";
+                                optionsChild = countrys;
+                            }
+                            else if (item.Contains("Province"))
+                            {
+                                columnName = "省";
+                                type = "Single";
+                                optionsChild = adisision.Where(x => x.Code == "1").ToList();
+                            }
+                            else if (item.Contains("City"))
+                            {
+                                columnName = "市";
+                                type = "Single";
+                                optionsChild = adisision.Where(x => x.Code == "2").ToList();
+                            }
+                            else if (item.Contains("County"))
+                            {
+                                columnName = "县/区";
+                                type = "Single";
+                                optionsChild = adisision.Where(x => x.Code == "3" || x.Code == "4").ToList();
+                            }
+                            else if (item.Contains("CreateTime") || item.Contains("UpdateTime"))
+                            {
+                                columnName = item == "CreateTime" ? "创建时间" : "修改时间";
+                                type = "Time";//时间
+                            }
+                            options.Add(new FilterConditionDto { CoulmnName = columnName, CoulmnKey = char.ToLower(item[0]) + item.Substring(1), Options = optionsChild, Type = type });
+                        }
+                    }
+                    break;
+                case 8:
+                    allColumns = new List<string> { "Level", "CreateTime", "UpdateTime", };
+                    var properties8 = GetProperties<DeviceClassCodeDetailsDto>();
+                    foreach (var property in properties8) { tableColumns.Add(property.Name); }
+                    foreach (var item in tableColumns)
+                    {
+                        if (allColumns.Contains(item))
+                        {
+                            List<FilterChildData> optionsChild = new();
+                            string type = string.Empty;
+                            string columnName = string.Empty;
 
-                //            if (item.Contains("Level"))
-                //            {
-                //                type = "Single";//复选
-                //                columnName = "分类层级";
-                //                optionsChild = valDomain.Where(x => x.Code == "ZCLEVEL").ToList();
-                //            }
-                //            else if (item.Contains("CreateTime") || item.Contains("UpdateTime"))
-                //            {
-                //                columnName = item == "CreateTime" ? "创建时间" : "修改时间";
-                //                type = "Time";//时间
-                //            }
-                //            options.Add(new FilterConditionDto { CoulmnName = columnName, CoulmnKey = char.ToLower(item[0]) + item.Substring(1), Options = optionsChild, Type = type });
-                //        }
-                //    }
-                //    break;
-                //case 9:
-                //    allColumns = new List<string> { "CreateTime", "UpdateTime" };
-                //    var properties9 = GetProperties<InvoiceTypeDetailshDto>();
-                //    foreach (var property in properties9) { tableColumns.Add(property.Name); }
-                //    foreach (var item in tableColumns)
-                //    {
-                //        if (allColumns.Contains(item))
-                //        {
-                //            List<FilterChildData> optionsChild = new();
-                //            string type = string.Empty;
-                //            string columnName = string.Empty;
-                //            if (item.Contains("CreateTime") || item.Contains("UpdateTime"))
-                //            {
-                //                columnName = item == "CreateTime" ? "创建时间" : "修改时间";
-                //                type = "Time";//时间
-                //            }
-                //            options.Add(new FilterConditionDto { CoulmnName = columnName, CoulmnKey = char.ToLower(item[0]) + item.Substring(1), Options = optionsChild, Type = type });
-                //        }
-                //    }
-                //    break;
-                //case 10:
-                //    allColumns = new List<string> { "Fzkpstate", "Fzmajortype", "ZMAJORTYPE", "Fzstate", "Fzpstartdate", "Fzpfindate", "CreatedAt", "UpdatedAt", "Fzoutsourcing", "Fzsrpclass" };
-                //    //allColumns = new List<string> { "IsHighTech", "PjectState", "IsOutsourced", "TypeCode", "PlanStartDate", "PlanEndDate", "State", "CreateTime", "UpdateTime", };
-                //    //var properties10 = GetProperties<ScientifiCNoProjectDetailsDto>();
-                //    var properties10 = GetProperties<DHResearch>();
-                //    foreach (var property in properties10) { tableColumns.Add(property.Name); }
-                //    foreach (var item in tableColumns)
-                //    {
-                //        if (allColumns.Contains(item))
-                //        {
-                //            List<FilterChildData> optionsChild = new();
-                //            string type = string.Empty;
-                //            string columnName = string.Empty;
+                            if (item.Contains("Level"))
+                            {
+                                type = "Single";//复选
+                                columnName = "分类层级";
+                                optionsChild = valDomain.Where(x => x.Code == "ZCLEVEL").ToList();
+                            }
+                            else if (item.Contains("CreateTime") || item.Contains("UpdateTime"))
+                            {
+                                columnName = item == "CreateTime" ? "创建时间" : "修改时间";
+                                type = "Time";//时间
+                            }
+                            options.Add(new FilterConditionDto { CoulmnName = columnName, CoulmnKey = char.ToLower(item[0]) + item.Substring(1), Options = optionsChild, Type = type });
+                        }
+                    }
+                    break;
+                case 9:
+                    allColumns = new List<string> { "CreateTime", "UpdateTime" };
+                    var properties9 = GetProperties<InvoiceTypeDetailshDto>();
+                    foreach (var property in properties9) { tableColumns.Add(property.Name); }
+                    foreach (var item in tableColumns)
+                    {
+                        if (allColumns.Contains(item))
+                        {
+                            List<FilterChildData> optionsChild = new();
+                            string type = string.Empty;
+                            string columnName = string.Empty;
+                            if (item.Contains("CreateTime") || item.Contains("UpdateTime"))
+                            {
+                                columnName = item == "CreateTime" ? "创建时间" : "修改时间";
+                                type = "Time";//时间
+                            }
+                            options.Add(new FilterConditionDto { CoulmnName = columnName, CoulmnKey = char.ToLower(item[0]) + item.Substring(1), Options = optionsChild, Type = type });
+                        }
+                    }
+                    break;
+                case 10:
+                    allColumns = new List<string> { "Fzkpstate", "Fzmajortype", "ZMAJORTYPE", "Fzstate", "Fzpstartdate", "Fzpfindate", "CreatedAt", "UpdatedAt", "Fzoutsourcing", "Fzsrpclass" };
+                    //allColumns = new List<string> { "IsHighTech", "PjectState", "IsOutsourced", "TypeCode", "PlanStartDate", "PlanEndDate", "State", "CreateTime", "UpdateTime", };
+                    //var properties10 = GetProperties<ScientifiCNoProjectDetailsDto>();
+                    var properties10 = GetProperties<DHResearch>();
+                    foreach (var property in properties10) { tableColumns.Add(property.Name); }
+                    foreach (var item in tableColumns)
+                    {
+                        if (allColumns.Contains(item))
+                        {
+                            List<FilterChildData> optionsChild = new();
+                            string type = string.Empty;
+                            string columnName = string.Empty;
 
-                //            if (item.Contains("Fzhitech"))
-                //            {
-                //                type = "Single";
-                //                columnName = "是否高新项目";
-                //                optionsChild.Add(new FilterChildData { Key = "0", Val = "否" });
-                //                optionsChild.Add(new FilterChildData { Key = "1", Val = "是" });
-                //            }
-                //            else if (item.Contains("Fzkpstate"))
-                //            {
-                //                columnName = "项目状态";
-                //                type = "Single";//单选
-                //                optionsChild = valDomain.Where(x => x.Code == "ZKPSTATE").ToList();
-                //            }
-                //            else if (item.Contains("ZMAJORTYPE"))
-                //            {
-                //                columnName = "专业类型";
-                //                type = "Single";//单选
-                //                optionsChild = valDomain.Where(x => x.Code == "ZMAJORTYPE").ToList();
-                //            }
-                //            else if (item.Contains("Fzoutsourcing"))
-                //            {
-                //                columnName = "是否委外项目";
-                //                type = "Single";//单选
-                //                optionsChild.Add(new FilterChildData { Key = "0", Val = "否" });
-                //                optionsChild.Add(new FilterChildData { Key = "1", Val = "是" });
-                //            }
-                //            else if (item.Contains("Fzsrpclass"))
-                //            {
-                //                columnName = "科研项目分类";
-                //                type = "Single";//单选
-                //                optionsChild = valDomain.Where(x => x.Code == "ZSRPCLASS").ToList();
-                //            }
-                //            else if (item.Contains("Fzpstartdate"))
-                //            {
-                //                columnName = "计划开始日期";
-                //                type = "NumberTime";
-                //            }
-                //            else if (item.Contains("Fzpfindate"))
-                //            {
-                //                columnName = "计划结束日期";
-                //                type = "NumberTime";
-                //            }
-                //            else if (item.Contains("Fzstate"))
-                //            {
-                //                columnName = "状态";
-                //                type = "Single";
-                //                optionsChild.Add(new FilterChildData { Key = "0", Val = "停用" });
-                //                optionsChild.Add(new FilterChildData { Key = "1", Val = "启用" });
-                //            }
-                //            else if (item.Contains("CreatedAt") || item.Contains("UpdatedAt"))
-                //            {
-                //                columnName = item == "CreatedAt" ? "创建时间" : "修改时间";
-                //                type = "Time";//时间
-                //            }
-                //            options.Add(new FilterConditionDto { CoulmnName = columnName, CoulmnKey = char.ToLower(item[0]) + item.Substring(1), Options = optionsChild, Type = type });
-                //        }
-                //    }
-                //    break;
-                //case 11:
-                //    allColumns = new List<string> { "CreateTime", "UpdateTime" };
-                //    var properties11 = GetProperties<LanguageDetailsDto>();
-                //    foreach (var property in properties11) { tableColumns.Add(property.Name); }
-                //    foreach (var item in tableColumns)
-                //    {
-                //        if (allColumns.Contains(item))
-                //        {
-                //            List<FilterChildData> optionsChild = new();
-                //            string type = string.Empty;
-                //            string columnName = string.Empty;
-                //            if (item.Contains("CreateTime") || item.Contains("UpdateTime"))
-                //            {
-                //                columnName = item == "CreateTime" ? "创建时间" : "修改时间";
-                //                type = "Time";//时间
-                //            }
-                //            options.Add(new FilterConditionDto { CoulmnName = columnName, CoulmnKey = char.ToLower(item[0]) + item.Substring(1), Options = optionsChild, Type = type });
-                //        }
-                //    }
-                //    break;
-                //case 12:
-                //    allColumns = new List<string> { "Country", "Province", "City", "County", "CreateTime", "UpdateTime", };
-                //    var properties12 = GetProperties<BankCardDetailsDto>();
-                //    foreach (var property in properties12) { tableColumns.Add(property.Name); }
-                //    foreach (var item in tableColumns)
-                //    {
-                //        if (allColumns.Contains(item))
-                //        {
-                //            List<FilterChildData> optionsChild = new();
-                //            string type = string.Empty;
-                //            string columnName = string.Empty;
+                            if (item.Contains("Fzhitech"))
+                            {
+                                type = "Single";
+                                columnName = "是否高新项目";
+                                optionsChild.Add(new FilterChildData { Key = "0", Val = "否" });
+                                optionsChild.Add(new FilterChildData { Key = "1", Val = "是" });
+                            }
+                            else if (item.Contains("Fzkpstate"))
+                            {
+                                columnName = "项目状态";
+                                type = "Single";//单选
+                                optionsChild = valDomain.Where(x => x.Code == "ZKPSTATE").ToList();
+                            }
+                            else if (item.Contains("ZMAJORTYPE"))
+                            {
+                                columnName = "专业类型";
+                                type = "Single";//单选
+                                optionsChild = valDomain.Where(x => x.Code == "ZMAJORTYPE").ToList();
+                            }
+                            else if (item.Contains("Fzoutsourcing"))
+                            {
+                                columnName = "是否委外项目";
+                                type = "Single";//单选
+                                optionsChild.Add(new FilterChildData { Key = "0", Val = "否" });
+                                optionsChild.Add(new FilterChildData { Key = "1", Val = "是" });
+                            }
+                            else if (item.Contains("Fzsrpclass"))
+                            {
+                                columnName = "科研项目分类";
+                                type = "Single";//单选
+                                optionsChild = valDomain.Where(x => x.Code == "ZSRPCLASS").ToList();
+                            }
+                            else if (item.Contains("Fzpstartdate"))
+                            {
+                                columnName = "计划开始日期";
+                                type = "NumberTime";
+                            }
+                            else if (item.Contains("Fzpfindate"))
+                            {
+                                columnName = "计划结束日期";
+                                type = "NumberTime";
+                            }
+                            else if (item.Contains("Fzstate"))
+                            {
+                                columnName = "状态";
+                                type = "Single";
+                                optionsChild.Add(new FilterChildData { Key = "0", Val = "停用" });
+                                optionsChild.Add(new FilterChildData { Key = "1", Val = "启用" });
+                            }
+                            else if (item.Contains("CreatedAt") || item.Contains("UpdatedAt"))
+                            {
+                                columnName = item == "CreatedAt" ? "创建时间" : "修改时间";
+                                type = "Time";//时间
+                            }
+                            options.Add(new FilterConditionDto { CoulmnName = columnName, CoulmnKey = char.ToLower(item[0]) + item.Substring(1), Options = optionsChild, Type = type });
+                        }
+                    }
+                    break;
+                case 11:
+                    allColumns = new List<string> { "CreateTime", "UpdateTime" };
+                    var properties11 = GetProperties<LanguageDetailsDto>();
+                    foreach (var property in properties11) { tableColumns.Add(property.Name); }
+                    foreach (var item in tableColumns)
+                    {
+                        if (allColumns.Contains(item))
+                        {
+                            List<FilterChildData> optionsChild = new();
+                            string type = string.Empty;
+                            string columnName = string.Empty;
+                            if (item.Contains("CreateTime") || item.Contains("UpdateTime"))
+                            {
+                                columnName = item == "CreateTime" ? "创建时间" : "修改时间";
+                                type = "Time";//时间
+                            }
+                            options.Add(new FilterConditionDto { CoulmnName = columnName, CoulmnKey = char.ToLower(item[0]) + item.Substring(1), Options = optionsChild, Type = type });
+                        }
+                    }
+                    break;
+                case 12:
+                    allColumns = new List<string> { "Country", "Province", "City", "County", "CreateTime", "UpdateTime", };
+                    var properties12 = GetProperties<BankCardDetailsDto>();
+                    foreach (var property in properties12) { tableColumns.Add(property.Name); }
+                    foreach (var item in tableColumns)
+                    {
+                        if (allColumns.Contains(item))
+                        {
+                            List<FilterChildData> optionsChild = new();
+                            string type = string.Empty;
+                            string columnName = string.Empty;
 
-                //            if (item.Contains("Country"))
-                //            {
-                //                columnName = "国家/地区";
-                //                type = "Single";
-                //                optionsChild = countrys;
-                //            }
-                //            else if (item.Contains("Province"))
-                //            {
-                //                columnName = "省";
-                //                type = "Single";
-                //                optionsChild = adisision.Where(x => x.Code == "1").ToList();
-                //            }
-                //            else if (item.Contains("City"))
-                //            {
-                //                columnName = "市";
-                //                type = "Single";
-                //                optionsChild = adisision.Where(x => x.Code == "2").ToList();
-                //            }
-                //            else if (item.Contains("County"))
-                //            {
-                //                columnName = "县/区";
-                //                type = "Single";
-                //                optionsChild = adisision.Where(x => x.Code == "3" || x.Code == "4").ToList();
-                //            }
-                //            else if (item.Contains("CreateTime") || item.Contains("UpdateTime"))
-                //            {
-                //                columnName = item == "CreateTime" ? "创建时间" : "修改时间";
-                //                type = "Time";//时间
-                //            }
-                //            options.Add(new FilterConditionDto { CoulmnName = columnName, CoulmnKey = char.ToLower(item[0]) + item.Substring(1), Options = optionsChild, Type = type });
-                //        }
-                //    }
-                //    break;
-                //case 13:
-                //    allColumns = new List<string> { "IsCode", "CreateTime", "UpdateTime", };
-                //    var properties13 = GetProperties<DeviceDetailCodeDetailsDto>();
-                //    foreach (var property in properties13) { tableColumns.Add(property.Name); }
-                //    foreach (var item in tableColumns)
-                //    {
-                //        if (allColumns.Contains(item))
-                //        {
-                //            List<FilterChildData> optionsChild = new();
-                //            string type = string.Empty;
-                //            string columnName = string.Empty;
+                            if (item.Contains("Country"))
+                            {
+                                columnName = "国家/地区";
+                                type = "Single";
+                                optionsChild = countrys;
+                            }
+                            else if (item.Contains("Province"))
+                            {
+                                columnName = "省";
+                                type = "Single";
+                                optionsChild = adisision.Where(x => x.Code == "1").ToList();
+                            }
+                            else if (item.Contains("City"))
+                            {
+                                columnName = "市";
+                                type = "Single";
+                                optionsChild = adisision.Where(x => x.Code == "2").ToList();
+                            }
+                            else if (item.Contains("County"))
+                            {
+                                columnName = "县/区";
+                                type = "Single";
+                                optionsChild = adisision.Where(x => x.Code == "3" || x.Code == "4").ToList();
+                            }
+                            else if (item.Contains("CreateTime") || item.Contains("UpdateTime"))
+                            {
+                                columnName = item == "CreateTime" ? "创建时间" : "修改时间";
+                                type = "Time";//时间
+                            }
+                            options.Add(new FilterConditionDto { CoulmnName = columnName, CoulmnKey = char.ToLower(item[0]) + item.Substring(1), Options = optionsChild, Type = type });
+                        }
+                    }
+                    break;
+                case 13:
+                    allColumns = new List<string> { "IsCode", "CreateTime", "UpdateTime", };
+                    var properties13 = GetProperties<DeviceDetailCodeDetailsDto>();
+                    foreach (var property in properties13) { tableColumns.Add(property.Name); }
+                    foreach (var item in tableColumns)
+                    {
+                        if (allColumns.Contains(item))
+                        {
+                            List<FilterChildData> optionsChild = new();
+                            string type = string.Empty;
+                            string columnName = string.Empty;
 
-                //            if (item.Contains("IsCode"))
-                //            {
-                //                columnName = "是否常用编码";
-                //                type = "Single";
-                //                optionsChild.Add(new FilterChildData { Key = "0", Val = "否" });
-                //                optionsChild.Add(new FilterChildData { Key = "1", Val = "是" });
-                //            }
-                //            else if (item.Contains("CreateTime") || item.Contains("UpdateTime"))
-                //            {
-                //                columnName = item == "CreateTime" ? "创建时间" : "修改时间";
-                //                type = "Time";//时间
-                //            }
-                //            options.Add(new FilterConditionDto { CoulmnName = columnName, CoulmnKey = char.ToLower(item[0]) + item.Substring(1), Options = optionsChild, Type = type });
-                //        }
-                //    }
-                //    break;
-                //case 14:
-                //    allColumns = new List<string> { "Zdatstate", "", "", };
-                //    //allColumns = new List<string> { "State", "CreateTime", "UpdateTime", };
-                //    //var properties14 = GetProperties<AccountingDepartmentDetailsDto>();
-                //    var properties14 = GetProperties<DHAccountingDept>();
-                //    foreach (var property in properties14) { tableColumns.Add(property.Name); }
-                //    foreach (var item in tableColumns)
-                //    {
-                //        if (allColumns.Contains(item))
-                //        {
-                //            List<FilterChildData> optionsChild = new();
-                //            string type = string.Empty;
-                //            string columnName = string.Empty;
+                            if (item.Contains("IsCode"))
+                            {
+                                columnName = "是否常用编码";
+                                type = "Single";
+                                optionsChild.Add(new FilterChildData { Key = "0", Val = "否" });
+                                optionsChild.Add(new FilterChildData { Key = "1", Val = "是" });
+                            }
+                            else if (item.Contains("CreateTime") || item.Contains("UpdateTime"))
+                            {
+                                columnName = item == "CreateTime" ? "创建时间" : "修改时间";
+                                type = "Time";//时间
+                            }
+                            options.Add(new FilterConditionDto { CoulmnName = columnName, CoulmnKey = char.ToLower(item[0]) + item.Substring(1), Options = optionsChild, Type = type });
+                        }
+                    }
+                    break;
+                case 14:
+                    allColumns = new List<string> { "Zdatstate", "", "", };
+                    //allColumns = new List<string> { "State", "CreateTime", "UpdateTime", };
+                    //var properties14 = GetProperties<AccountingDepartmentDetailsDto>();
+                    var properties14 = GetProperties<DHAccountingDept>();
+                    foreach (var property in properties14) { tableColumns.Add(property.Name); }
+                    foreach (var item in tableColumns)
+                    {
+                        if (allColumns.Contains(item))
+                        {
+                            List<FilterChildData> optionsChild = new();
+                            string type = string.Empty;
+                            string columnName = string.Empty;
 
-                //            if (item.Contains("Zdatstate"))
-                //            {
-                //                columnName = "核算部门停用标志";
-                //                type = "Single";
-                //                optionsChild.Add(new FilterChildData { Key = "0", Val = "未停用" });
-                //                optionsChild.Add(new FilterChildData { Key = "1", Val = "停用" });
-                //            }
-                //            else if (item.Contains("CreateTime") || item.Contains("UpdateTime"))
-                //            {
-                //                columnName = item == "CreateTime" ? "创建时间" : "修改时间";
-                //                type = "Time";//时间
-                //            }
-                //            options.Add(new FilterConditionDto { CoulmnName = columnName, CoulmnKey = char.ToLower(item[0]) + item.Substring(1), Options = optionsChild, Type = type });
-                //        }
-                //    }
-                //    break;
-                //case 15:
-                //    allColumns = new List<string> { "CreateTime", "UpdateTime" };
-                //    var properties15 = GetProperties<RelationalContractsDetailsDto>();
-                //    foreach (var property in properties15) { tableColumns.Add(property.Name); }
-                //    foreach (var item in tableColumns)
-                //    {
-                //        if (allColumns.Contains(item))
-                //        {
-                //            List<FilterChildData> optionsChild = new();
-                //            string type = string.Empty;
-                //            string columnName = string.Empty;
-                //            if (item.Contains("CreateTime") || item.Contains("UpdateTime"))
-                //            {
-                //                columnName = item == "CreateTime" ? "创建时间" : "修改时间";
-                //                type = "Time";//时间
-                //            }
-                //            options.Add(new FilterConditionDto { CoulmnName = columnName, CoulmnKey = char.ToLower(item[0]) + item.Substring(1), Options = optionsChild, Type = type });
-                //        }
-                //    }
-                //    break;
-                //case 16:
-                //    allColumns = new List<string> { "State", "CreateTime", "UpdateTime", };
-                //    var properties16 = GetProperties<RegionalDetailsDto>();
-                //    foreach (var property in properties16) { tableColumns.Add(property.Name); }
-                //    foreach (var item in tableColumns)
-                //    {
-                //        if (allColumns.Contains(item))
-                //        {
-                //            List<FilterChildData> optionsChild = new();
-                //            string type = string.Empty;
-                //            string columnName = string.Empty;
+                            if (item.Contains("Zdatstate"))
+                            {
+                                columnName = "核算部门停用标志";
+                                type = "Single";
+                                optionsChild.Add(new FilterChildData { Key = "0", Val = "未停用" });
+                                optionsChild.Add(new FilterChildData { Key = "1", Val = "停用" });
+                            }
+                            else if (item.Contains("CreateTime") || item.Contains("UpdateTime"))
+                            {
+                                columnName = item == "CreateTime" ? "创建时间" : "修改时间";
+                                type = "Time";//时间
+                            }
+                            options.Add(new FilterConditionDto { CoulmnName = columnName, CoulmnKey = char.ToLower(item[0]) + item.Substring(1), Options = optionsChild, Type = type });
+                        }
+                    }
+                    break;
+                case 15:
+                    allColumns = new List<string> { "CreateTime", "UpdateTime" };
+                    var properties15 = GetProperties<RelationalContractsDetailsDto>();
+                    foreach (var property in properties15) { tableColumns.Add(property.Name); }
+                    foreach (var item in tableColumns)
+                    {
+                        if (allColumns.Contains(item))
+                        {
+                            List<FilterChildData> optionsChild = new();
+                            string type = string.Empty;
+                            string columnName = string.Empty;
+                            if (item.Contains("CreateTime") || item.Contains("UpdateTime"))
+                            {
+                                columnName = item == "CreateTime" ? "创建时间" : "修改时间";
+                                type = "Time";//时间
+                            }
+                            options.Add(new FilterConditionDto { CoulmnName = columnName, CoulmnKey = char.ToLower(item[0]) + item.Substring(1), Options = optionsChild, Type = type });
+                        }
+                    }
+                    break;
+                case 16:
+                    allColumns = new List<string> { "State", "CreateTime", "UpdateTime", };
+                    var properties16 = GetProperties<RegionalDetailsDto>();
+                    foreach (var property in properties16) { tableColumns.Add(property.Name); }
+                    foreach (var item in tableColumns)
+                    {
+                        if (allColumns.Contains(item))
+                        {
+                            List<FilterChildData> optionsChild = new();
+                            string type = string.Empty;
+                            string columnName = string.Empty;
 
-                //            if (item.Contains("State"))
-                //            {
-                //                columnName = "状态";
-                //                type = "Single";
-                //                optionsChild.Add(new FilterChildData { Key = "0", Val = "无效" });
-                //                optionsChild.Add(new FilterChildData { Key = "1", Val = "有效" });
-                //            }
-                //            else if (item.Contains("CreateTime") || item.Contains("UpdateTime"))
-                //            {
-                //                columnName = item == "CreateTime" ? "创建时间" : "修改时间";
-                //                type = "Time";//时间
-                //            }
-                //            options.Add(new FilterConditionDto { CoulmnName = columnName, CoulmnKey = char.ToLower(item[0]) + item.Substring(1), Options = optionsChild, Type = type });
-                //        }
-                //    }
-                //    break;
-                //case 17:
-                //    allColumns = new List<string> { "State", "CreateTime", "UpdateTime", };
-                //    var properties17 = GetProperties<UnitMeasurementDetailsDto>();
-                //    foreach (var property in properties17) { tableColumns.Add(property.Name); }
-                //    foreach (var item in tableColumns)
-                //    {
-                //        if (allColumns.Contains(item))
-                //        {
-                //            List<FilterChildData> optionsChild = new();
-                //            string type = string.Empty;
-                //            string columnName = string.Empty;
+                            if (item.Contains("State"))
+                            {
+                                columnName = "状态";
+                                type = "Single";
+                                optionsChild.Add(new FilterChildData { Key = "0", Val = "无效" });
+                                optionsChild.Add(new FilterChildData { Key = "1", Val = "有效" });
+                            }
+                            else if (item.Contains("CreateTime") || item.Contains("UpdateTime"))
+                            {
+                                columnName = item == "CreateTime" ? "创建时间" : "修改时间";
+                                type = "Time";//时间
+                            }
+                            options.Add(new FilterConditionDto { CoulmnName = columnName, CoulmnKey = char.ToLower(item[0]) + item.Substring(1), Options = optionsChild, Type = type });
+                        }
+                    }
+                    break;
+                case 17:
+                    allColumns = new List<string> { "State", "CreateTime", "UpdateTime", };
+                    var properties17 = GetProperties<UnitMeasurementDetailsDto>();
+                    foreach (var property in properties17) { tableColumns.Add(property.Name); }
+                    foreach (var item in tableColumns)
+                    {
+                        if (allColumns.Contains(item))
+                        {
+                            List<FilterChildData> optionsChild = new();
+                            string type = string.Empty;
+                            string columnName = string.Empty;
 
-                //            if (item.Contains("State"))
-                //            {
-                //                columnName = "状态";
-                //                type = "Single";
-                //                optionsChild.Add(new FilterChildData { Key = "0", Val = "无效" });
-                //                optionsChild.Add(new FilterChildData { Key = "1", Val = "有效" });
-                //            }
-                //            else if (item.Contains("CreateTime") || item.Contains("UpdateTime"))
-                //            {
-                //                columnName = item == "CreateTime" ? "创建时间" : "修改时间";
-                //                type = "Time";//时间
-                //            }
-                //            options.Add(new FilterConditionDto { CoulmnName = columnName, CoulmnKey = char.ToLower(item[0]) + item.Substring(1), Options = optionsChild, Type = type });
-                //        }
-                //    }
-                //    break;
-                //case 18:
-                //    allColumns = new List<string> { "ThirdNewBType", "CreateTime", "UpdateTime" };
-                //    //var properties18 = GetProperties<ProjectClassificationDetailsDto>();
-                //    var properties18 = GetProperties<ProjectClassificationDetailsDto>();
-                //    foreach (var property in properties18) { tableColumns.Add(property.Name); }
-                //    foreach (var item in tableColumns)
-                //    {
-                //        if (allColumns.Contains(item))
-                //        {
-                //            List<FilterChildData> optionsChild = new();
-                //            string type = string.Empty;
-                //            string columnName = string.Empty;
+                            if (item.Contains("State"))
+                            {
+                                columnName = "状态";
+                                type = "Single";
+                                optionsChild.Add(new FilterChildData { Key = "0", Val = "无效" });
+                                optionsChild.Add(new FilterChildData { Key = "1", Val = "有效" });
+                            }
+                            else if (item.Contains("CreateTime") || item.Contains("UpdateTime"))
+                            {
+                                columnName = item == "CreateTime" ? "创建时间" : "修改时间";
+                                type = "Time";//时间
+                            }
+                            options.Add(new FilterConditionDto { CoulmnName = columnName, CoulmnKey = char.ToLower(item[0]) + item.Substring(1), Options = optionsChild, Type = type });
+                        }
+                    }
+                    break;
+                case 18:
+                    allColumns = new List<string> { "ThirdNewBType", "CreateTime", "UpdateTime" };
+                    //var properties18 = GetProperties<ProjectClassificationDetailsDto>();
+                    var properties18 = GetProperties<ProjectClassificationDetailsDto>();
+                    foreach (var property in properties18) { tableColumns.Add(property.Name); }
+                    foreach (var item in tableColumns)
+                    {
+                        if (allColumns.Contains(item))
+                        {
+                            List<FilterChildData> optionsChild = new();
+                            string type = string.Empty;
+                            string columnName = string.Empty;
 
-                //            if (item.Contains("ThirdNewBType"))
-                //            {
-                //                columnName = "三新业务类型";
-                //                type = "Single";
-                //                optionsChild.Add(new FilterChildData { Key = "0", Val = "否" });
-                //                optionsChild.Add(new FilterChildData { Key = "1", Val = "是" });
-                //            }
-                //            else if (item.Contains("CreateTime") || item.Contains("UpdateTime"))
-                //            {
-                //                columnName = item == "CreateTime" ? "创建时间" : "修改时间";
-                //                type = "Time";//时间
-                //            }
-                //            options.Add(new FilterConditionDto { CoulmnName = columnName, CoulmnKey = char.ToLower(item[0]) + item.Substring(1), Options = optionsChild, Type = type });
-                //        }
-                //    }
-                //    break;
-                //case 19:
-                //    allColumns = new List<string> { "State", "CreateTime", "UpdateTime", };
-                //    var properties19 = GetProperties<RegionalCenterDetailsDto>();
-                //    foreach (var property in properties19) { tableColumns.Add(property.Name); }
-                //    foreach (var item in tableColumns)
-                //    {
-                //        if (allColumns.Contains(item))
-                //        {
-                //            List<FilterChildData> optionsChild = new();
-                //            string type = string.Empty;
-                //            string columnName = string.Empty;
+                            if (item.Contains("ThirdNewBType"))
+                            {
+                                columnName = "三新业务类型";
+                                type = "Single";
+                                optionsChild.Add(new FilterChildData { Key = "0", Val = "否" });
+                                optionsChild.Add(new FilterChildData { Key = "1", Val = "是" });
+                            }
+                            else if (item.Contains("CreateTime") || item.Contains("UpdateTime"))
+                            {
+                                columnName = item == "CreateTime" ? "创建时间" : "修改时间";
+                                type = "Time";//时间
+                            }
+                            options.Add(new FilterConditionDto { CoulmnName = columnName, CoulmnKey = char.ToLower(item[0]) + item.Substring(1), Options = optionsChild, Type = type });
+                        }
+                    }
+                    break;
+                case 19:
+                    allColumns = new List<string> { "State", "CreateTime", "UpdateTime", };
+                    var properties19 = GetProperties<RegionalCenterDetailsDto>();
+                    foreach (var property in properties19) { tableColumns.Add(property.Name); }
+                    foreach (var item in tableColumns)
+                    {
+                        if (allColumns.Contains(item))
+                        {
+                            List<FilterChildData> optionsChild = new();
+                            string type = string.Empty;
+                            string columnName = string.Empty;
 
-                //            if (item.Contains("State"))
-                //            {
-                //                columnName = "状态";
-                //                type = "Single";
-                //                optionsChild.Add(new FilterChildData { Key = "0", Val = "无效" });
-                //                optionsChild.Add(new FilterChildData { Key = "1", Val = "有效" });
-                //            }
-                //            else if (item.Contains("CreateTime") || item.Contains("UpdateTime"))
-                //            {
-                //                columnName = item == "CreateTime" ? "创建时间" : "修改时间";
-                //                type = "Time";//时间
-                //            }
-                //            options.Add(new FilterConditionDto { CoulmnName = columnName, CoulmnKey = char.ToLower(item[0]) + item.Substring(1), Options = optionsChild, Type = type });
-                //        }
-                //    }
-                //    break;
-                //case 20:
-                //    allColumns = new List<string> { "State", "CreateTime", "UpdateTime", };
-                //    var properties20 = GetProperties<NationalEconomyDetailsDto>();
-                //    foreach (var property in properties20) { tableColumns.Add(property.Name); }
-                //    foreach (var item in tableColumns)
-                //    {
-                //        if (allColumns.Contains(item))
-                //        {
-                //            List<FilterChildData> optionsChild = new();
-                //            string type = string.Empty;
-                //            string columnName = string.Empty;
+                            if (item.Contains("State"))
+                            {
+                                columnName = "状态";
+                                type = "Single";
+                                optionsChild.Add(new FilterChildData { Key = "0", Val = "无效" });
+                                optionsChild.Add(new FilterChildData { Key = "1", Val = "有效" });
+                            }
+                            else if (item.Contains("CreateTime") || item.Contains("UpdateTime"))
+                            {
+                                columnName = item == "CreateTime" ? "创建时间" : "修改时间";
+                                type = "Time";//时间
+                            }
+                            options.Add(new FilterConditionDto { CoulmnName = columnName, CoulmnKey = char.ToLower(item[0]) + item.Substring(1), Options = optionsChild, Type = type });
+                        }
+                    }
+                    break;
+                case 20:
+                    allColumns = new List<string> { "State", "CreateTime", "UpdateTime", };
+                    var properties20 = GetProperties<NationalEconomyDetailsDto>();
+                    foreach (var property in properties20) { tableColumns.Add(property.Name); }
+                    foreach (var item in tableColumns)
+                    {
+                        if (allColumns.Contains(item))
+                        {
+                            List<FilterChildData> optionsChild = new();
+                            string type = string.Empty;
+                            string columnName = string.Empty;
 
-                //            if (item.Contains("State"))
-                //            {
-                //                columnName = "状态";
-                //                type = "Single";
-                //                optionsChild.Add(new FilterChildData { Key = "0", Val = "无效" });
-                //                optionsChild.Add(new FilterChildData { Key = "1", Val = "有效" });
-                //            }
-                //            else if (item.Contains("CreateTime") || item.Contains("UpdateTime"))
-                //            {
-                //                columnName = item == "CreateTime" ? "创建时间" : "修改时间";
-                //                type = "Time";//时间
-                //            }
-                //            options.Add(new FilterConditionDto { CoulmnName = columnName, CoulmnKey = char.ToLower(item[0]) + item.Substring(1), Options = optionsChild, Type = type });
-                //        }
-                //    }
-                //    break;
-                //case 21:
-                //    //allColumns = new List<string> { "CreateTime", "UpdateTime" };
-                //    allColumns = new List<string> { "CreatedAt", "UpdatedAt", "Fzstate" };
-                //    //var properties21 = GetProperties<AdministrativeAccountingMapperDetailsDto>();
-                //    var properties21 = GetProperties<DHAdministrative>();
-                //    foreach (var property in properties21) { tableColumns.Add(property.Name); }
-                //    foreach (var item in tableColumns)
-                //    {
-                //        if (allColumns.Contains(item))
-                //        {
-                //            List<FilterChildData> optionsChild = new();
-                //            string type = string.Empty;
-                //            string columnName = string.Empty;
-                //            if (item.Contains("CreatedAt") || item.Contains("UpdatedAt"))
-                //            {
-                //                columnName = item == "CreatedAt" ? "创建时间" : "修改时间";
-                //                type = "Time";//时间
-                //            }
-                //            if (item.Contains("Zdatstate"))
-                //            {
-                //                columnName = "停用标志";
-                //                type = "Single";
-                //                optionsChild.Add(new FilterChildData { Key = "0", Val = "未停用" });
-                //                optionsChild.Add(new FilterChildData { Key = "1", Val = "停用" });
-                //            }
-                //            options.Add(new FilterConditionDto { CoulmnName = columnName, CoulmnKey = char.ToLower(item[0]) + item.Substring(1), Options = optionsChild, Type = type });
-                //        }
-                //    }
-                //    break;
-                //case 22:
-                //    allColumns = new List<string> { "OrgAttr", "OrgChildAttr", "OrgStatus", "LocationOfOrg", "Country", "RegionalAttr", "Shareholding", "CreateTime", "UpdateTime", };
-                //    var properties22 = GetProperties<EscrowOrganizationDetailsDto>();
-                //    foreach (var property in properties22) { tableColumns.Add(property.Name); }
-                //    foreach (var item in tableColumns)
-                //    {
-                //        if (allColumns.Contains(item))
-                //        {
-                //            List<FilterChildData> optionsChild = new();
-                //            string type = string.Empty;
-                //            string columnName = string.Empty;
+                            if (item.Contains("State"))
+                            {
+                                columnName = "状态";
+                                type = "Single";
+                                optionsChild.Add(new FilterChildData { Key = "0", Val = "无效" });
+                                optionsChild.Add(new FilterChildData { Key = "1", Val = "有效" });
+                            }
+                            else if (item.Contains("CreateTime") || item.Contains("UpdateTime"))
+                            {
+                                columnName = item == "CreateTime" ? "创建时间" : "修改时间";
+                                type = "Time";//时间
+                            }
+                            options.Add(new FilterConditionDto { CoulmnName = columnName, CoulmnKey = char.ToLower(item[0]) + item.Substring(1), Options = optionsChild, Type = type });
+                        }
+                    }
+                    break;
+                case 21:
+                    //allColumns = new List<string> { "CreateTime", "UpdateTime" };
+                    allColumns = new List<string> { "CreatedAt", "UpdatedAt", "Fzstate" };
+                    //var properties21 = GetProperties<AdministrativeAccountingMapperDetailsDto>();
+                    var properties21 = GetProperties<DHAdministrative>();
+                    foreach (var property in properties21) { tableColumns.Add(property.Name); }
+                    foreach (var item in tableColumns)
+                    {
+                        if (allColumns.Contains(item))
+                        {
+                            List<FilterChildData> optionsChild = new();
+                            string type = string.Empty;
+                            string columnName = string.Empty;
+                            if (item.Contains("CreatedAt") || item.Contains("UpdatedAt"))
+                            {
+                                columnName = item == "CreatedAt" ? "创建时间" : "修改时间";
+                                type = "Time";//时间
+                            }
+                            if (item.Contains("Zdatstate"))
+                            {
+                                columnName = "停用标志";
+                                type = "Single";
+                                optionsChild.Add(new FilterChildData { Key = "0", Val = "未停用" });
+                                optionsChild.Add(new FilterChildData { Key = "1", Val = "停用" });
+                            }
+                            options.Add(new FilterConditionDto { CoulmnName = columnName, CoulmnKey = char.ToLower(item[0]) + item.Substring(1), Options = optionsChild, Type = type });
+                        }
+                    }
+                    break;
+                case 22:
+                    allColumns = new List<string> { "OrgAttr", "OrgChildAttr", "OrgStatus", "LocationOfOrg", "Country", "RegionalAttr", "Shareholding", "CreateTime", "UpdateTime", };
+                    var properties22 = GetProperties<EscrowOrganizationDetailsDto>();
+                    foreach (var property in properties22) { tableColumns.Add(property.Name); }
+                    foreach (var item in tableColumns)
+                    {
+                        if (allColumns.Contains(item))
+                        {
+                            List<FilterChildData> optionsChild = new();
+                            string type = string.Empty;
+                            string columnName = string.Empty;
 
-                //            if (item.Contains("Country"))
-                //            {
-                //                columnName = "国家/地区";
-                //                type = "Single";
-                //                optionsChild = countrys;
-                //            }
-                //            else if (item.Contains("OrgAttr"))
-                //            {
-                //                columnName = "机构属性";
-                //                type = "Single";
-                //                optionsChild = valDomain.Where(x => x.Code == "ZORGATTR").ToList();
-                //            }
-                //            else if (item.Contains("OrgChildAttr"))
-                //            {
-                //                columnName = "机构子属性";
-                //                type = "Single";
-                //                optionsChild = valDomain.Where(x => x.Code == "ZORGCHILDATTR").ToList();
-                //            }
-                //            else if (item.Contains("OrgStatus"))
-                //            {
-                //                columnName = "机构状态";
-                //                type = "Single";
-                //                optionsChild = valDomain.Where(x => x.Code == "ZORGSTATE").ToList();
-                //            }
-                //            else if (item.Contains("LocationOfOrg"))
-                //            {
-                //                columnName = "机构状态";
-                //                type = "Single";
-                //                optionsChild = valDomain.Where(x => x.Code == "ZORGSTATE").ToList(); ;
-                //            }
-                //            else if (item.Contains("RegionalAttr"))
-                //            {
-                //                columnName = "地域属性";
-                //                type = "Single";
-                //                //optionsChild = valDomain.Where(x => x.Code == "1").ToList();
-                //            }
-                //            else if (item.Contains("Shareholding"))
-                //            {
-                //                columnName = "持股情况";
-                //                type = "Single";
-                //                optionsChild = valDomain.Where(x => x.Code == "ZHOLDING").ToList();
-                //            }
-                //            else if (item.Contains("CreateTime") || item.Contains("UpdateTime"))
-                //            {
-                //                columnName = item == "CreateTime" ? "创建时间" : "修改时间";
-                //                type = "Time";//时间
-                //            }
-                //            options.Add(new FilterConditionDto { CoulmnName = columnName, CoulmnKey = char.ToLower(item[0]) + item.Substring(1), Options = optionsChild, Type = type });
-                //        }
-                //    }
-                //    break;
-                //case 23:
-                //case 24:
-                //    //allColumns = new List<string> { "ZZCOUNTRY", "ZPROJLOC", "ZCPBC", "ZSFOLDATE", "ZORG", "Z2NDORG", "ZSTATE", "ZORG_QUAL", "ZTAXMETHOD", "Zdelete", "CreatedAt", "UpdatedAt", };
-                //    allColumns = new List<string> { "ZZCOUNTRY", "ZPROJLOC", "ZCPBC", "ZSFOLDATE", "ZORG", "Z2NDORG", "ZSTATE", "ZORG_QUAL", "ZTAXMETHOD", "Zdelete", "CreatedAt", "UpdatedAt", };
-                //    //var properties24 = GetProperties<BusinessNoCpportunityDetailsDto>();
-                //    //机构
-                //    var institutionss = await _dbContext.Queryable<Institution>()
-                //        .Where(t => t.IsDelete == 1)
-                //        .Select(t => new FilterChildData { Key = t.OID, Val = t.NAME })
-                //        .ToListAsync();
-                //    var properties24 = GetProperties<DHOpportunity>();
-                //    foreach (var property in properties24) { tableColumns.Add(property.Name); }
-                //    foreach (var item in tableColumns)
-                //    {
-                //        if (allColumns.Contains(item))
-                //        {
-                //            List<FilterChildData> optionsChild = new();
-                //            string type = string.Empty;
-                //            string columnName = string.Empty;
+                            if (item.Contains("Country"))
+                            {
+                                columnName = "国家/地区";
+                                type = "Single";
+                                optionsChild = countrys;
+                            }
+                            else if (item.Contains("OrgAttr"))
+                            {
+                                columnName = "机构属性";
+                                type = "Single";
+                                optionsChild = valDomain.Where(x => x.Code == "ZORGATTR").ToList();
+                            }
+                            else if (item.Contains("OrgChildAttr"))
+                            {
+                                columnName = "机构子属性";
+                                type = "Single";
+                                optionsChild = valDomain.Where(x => x.Code == "ZORGCHILDATTR").ToList();
+                            }
+                            else if (item.Contains("OrgStatus"))
+                            {
+                                columnName = "机构状态";
+                                type = "Single";
+                                optionsChild = valDomain.Where(x => x.Code == "ZORGSTATE").ToList();
+                            }
+                            else if (item.Contains("LocationOfOrg"))
+                            {
+                                columnName = "机构状态";
+                                type = "Single";
+                                optionsChild = valDomain.Where(x => x.Code == "ZORGSTATE").ToList(); ;
+                            }
+                            else if (item.Contains("RegionalAttr"))
+                            {
+                                columnName = "地域属性";
+                                type = "Single";
+                                //optionsChild = valDomain.Where(x => x.Code == "1").ToList();
+                            }
+                            else if (item.Contains("Shareholding"))
+                            {
+                                columnName = "持股情况";
+                                type = "Single";
+                                optionsChild = valDomain.Where(x => x.Code == "ZHOLDING").ToList();
+                            }
+                            else if (item.Contains("CreateTime") || item.Contains("UpdateTime"))
+                            {
+                                columnName = item == "CreateTime" ? "创建时间" : "修改时间";
+                                type = "Time";//时间
+                            }
+                            options.Add(new FilterConditionDto { CoulmnName = columnName, CoulmnKey = char.ToLower(item[0]) + item.Substring(1), Options = optionsChild, Type = type });
+                        }
+                    }
+                    break;
+                case 23:
+                case 24:
+                    //allColumns = new List<string> { "ZZCOUNTRY", "ZPROJLOC", "ZCPBC", "ZSFOLDATE", "ZORG", "Z2NDORG", "ZSTATE", "ZORG_QUAL", "ZTAXMETHOD", "Zdelete", "CreatedAt", "UpdatedAt", };
+                    allColumns = new List<string> { "ZZCOUNTRY", "ZPROJLOC", "ZCPBC", "ZSFOLDATE", "ZORG", "Z2NDORG", "ZSTATE", "ZORG_QUAL", "ZTAXMETHOD", "Zdelete", "CreatedAt", "UpdatedAt", };
+                    //var properties24 = GetProperties<BusinessNoCpportunityDetailsDto>();
+                    //机构
+                    var institutionss = await _dbContext.Queryable<Institution>()
+                        .Where(t => t.IsDelete == 1)
+                        .Select(t => new FilterChildData { Key = t.OID, Val = t.NAME })
+                        .ToListAsync();
+                    var properties24 = GetProperties<DHOpportunity>();
+                    foreach (var property in properties24) { tableColumns.Add(property.Name); }
+                    foreach (var item in tableColumns)
+                    {
+                        if (allColumns.Contains(item))
+                        {
+                            List<FilterChildData> optionsChild = new();
+                            string type = string.Empty;
+                            string columnName = string.Empty;
 
-                //            if (item.Contains("ZZCOUNTRY"))
-                //            {
-                //                columnName = "国家/地区";
-                //                type = "Single";
-                //                optionsChild = countrys;
-                //            }
-                //            if (item.Contains("ZPROJLOC"))
-                //            {
-                //                columnName = "项目所在地";
-                //                type = "Single";
-                //                optionsChild = countrys;
-                //            }
-                //            if (item.Contains("ZCPBC"))
-                //            {
-                //                columnName = "中交项目业务分类";
-                //                type = "Single";
-                //                optionsChild = valDomain.Where(x => x.Code == "ZCPBC").ToList(); ;
-                //            }
-                //            if (item.Contains("ZORG"))
-                //            {
-                //                columnName = "跟踪单位";
-                //                type = "Single";
-                //                optionsChild = institutionss;
-                //            }
-                //            if (item.Contains("Z2NDORG"))
-                //            {
-                //                columnName = "所属二级单位";
-                //                type = "Single";
-                //                optionsChild = institutionss;
-                //            }
-                //            if (item.Contains("ZORG_QUAL"))
-                //            {
-                //                columnName = "资质单位";
-                //                type = "Single";
-                //                optionsChild = institutionss;
-                //            }
-                //            if (item.Contains("ZTAXMETHOD"))
-                //            {
-                //                columnName = "计税方式";
-                //                type = "Single";
-                //                optionsChild = valDomain.Where(x => x.Code == "ZTAXMETHOD").ToList();
-                //            }
-                //            if (item.Contains("ZSFOLDATE"))
-                //            {
-                //                columnName = "开始跟踪日期";
-                //                type = "Time";
-                //            }
-                //            else if (item.Contains("Zdelete"))
-                //            {
-                //                columnName = "是否删除";
-                //                type = "Single";
-                //                optionsChild.Add(new FilterChildData { Key = "0", Val = "已删除" });
-                //                optionsChild.Add(new FilterChildData { Key = "1", Val = "未删除" });
-                //            }
-                //            else if (item.Contains("CreatedAt") || item.Contains("UpdatedAt"))
-                //            {
-                //                columnName = item == "CreateTime" ? "创建时间" : "修改时间";
-                //                type = "Time";//时间
-                //            }
-                //            options.Add(new FilterConditionDto { CoulmnName = columnName, CoulmnKey = char.ToLower(item[0]) + item.Substring(1), Options = optionsChild, Type = type });
-                //        }
-                //    }
-                //    break;
-                //case 25:
-                //    allColumns = new List<string> { "State", "CreateTime", "UpdateTime", };
-                //    var properties25 = GetProperties<AdministrativeDivisionDetailsDto>();
-                //    foreach (var property in properties25) { tableColumns.Add(property.Name); }
-                //    foreach (var item in tableColumns)
-                //    {
-                //        if (allColumns.Contains(item))
-                //        {
-                //            List<FilterChildData> optionsChild = new();
-                //            string type = string.Empty;
-                //            string columnName = string.Empty;
+                            if (item.Contains("ZZCOUNTRY"))
+                            {
+                                columnName = "国家/地区";
+                                type = "Single";
+                                optionsChild = countrys;
+                            }
+                            if (item.Contains("ZPROJLOC"))
+                            {
+                                columnName = "项目所在地";
+                                type = "Single";
+                                optionsChild = countrys;
+                            }
+                            if (item.Contains("ZCPBC"))
+                            {
+                                columnName = "中交项目业务分类";
+                                type = "Single";
+                                optionsChild = valDomain.Where(x => x.Code == "ZCPBC").ToList(); ;
+                            }
+                            if (item.Contains("ZORG"))
+                            {
+                                columnName = "跟踪单位";
+                                type = "Single";
+                                optionsChild = institutionss;
+                            }
+                            if (item.Contains("Z2NDORG"))
+                            {
+                                columnName = "所属二级单位";
+                                type = "Single";
+                                optionsChild = institutionss;
+                            }
+                            if (item.Contains("ZORG_QUAL"))
+                            {
+                                columnName = "资质单位";
+                                type = "Single";
+                                optionsChild = institutionss;
+                            }
+                            if (item.Contains("ZTAXMETHOD"))
+                            {
+                                columnName = "计税方式";
+                                type = "Single";
+                                optionsChild = valDomain.Where(x => x.Code == "ZTAXMETHOD").ToList();
+                            }
+                            if (item.Contains("ZSFOLDATE"))
+                            {
+                                columnName = "开始跟踪日期";
+                                type = "Time";
+                            }
+                            else if (item.Contains("Zdelete"))
+                            {
+                                columnName = "是否删除";
+                                type = "Single";
+                                optionsChild.Add(new FilterChildData { Key = "0", Val = "已删除" });
+                                optionsChild.Add(new FilterChildData { Key = "1", Val = "未删除" });
+                            }
+                            else if (item.Contains("CreatedAt") || item.Contains("UpdatedAt"))
+                            {
+                                columnName = item == "CreateTime" ? "创建时间" : "修改时间";
+                                type = "Time";//时间
+                            }
+                            options.Add(new FilterConditionDto { CoulmnName = columnName, CoulmnKey = char.ToLower(item[0]) + item.Substring(1), Options = optionsChild, Type = type });
+                        }
+                    }
+                    break;
+                case 25:
+                    allColumns = new List<string> { "State", "CreateTime", "UpdateTime", };
+                    var properties25 = GetProperties<AdministrativeDivisionDetailsDto>();
+                    foreach (var property in properties25) { tableColumns.Add(property.Name); }
+                    foreach (var item in tableColumns)
+                    {
+                        if (allColumns.Contains(item))
+                        {
+                            List<FilterChildData> optionsChild = new();
+                            string type = string.Empty;
+                            string columnName = string.Empty;
 
-                //            if (item.Contains("Country"))
-                //            {
-                //                columnName = "国家/地区";
-                //                type = "Single";
-                //                optionsChild = countrys;
-                //            }
-                //            else if (item.Contains("State"))
-                //            {
-                //                columnName = "状态";
-                //                type = "Single";
-                //                optionsChild.Add(new FilterChildData { Key = "0", Val = "停用" });
-                //                optionsChild.Add(new FilterChildData { Key = "1", Val = "启用" });
-                //            }
-                //            else if (item.Contains("CreateTime") || item.Contains("UpdateTime"))
-                //            {
-                //                columnName = item == "CreateTime" ? "创建时间" : "修改时间";
-                //                type = "Time";//时间
-                //            }
-                //            options.Add(new FilterConditionDto { CoulmnName = columnName, CoulmnKey = char.ToLower(item[0]) + item.Substring(1), Options = optionsChild, Type = type });
-                //        }
-                //    }
-                //    break;
-                //case 26:
-                //    //    allColumns = new List<string> { "ZIVFLGID", "ZREPORT_TIME", "ZAORGSTATE", "ZACDISABLEYEAR", "ZACISDETAIL", "ZCWYGL_REA", "ZHTE", "ZH_IN_OUT", "ZOSTATE", "ZCYNAME", "ZREGIONAL", "CreateTime", "UpdateTime", };
-                //    allColumns = new List<string> { "Zivflgid", "Zyorgstate", "Zaorgstate", "ZreportTime", "Zacdisableyear", "ZcwyglRea", "Zacisdetail", "", "Zhte", "ZhInOut", "Zcyname", "", "", "", };
-                //    //var properties26 = GetProperties<AccountingOrganizationDetailsDto>();
-                //    var properties26 = GetProperties<DHAdjustAccountsMultipleOrg>();
-                //    foreach (var property in properties26) { tableColumns.Add(property.Name); }
-                //    foreach (var item in tableColumns)
-                //    {
-                //        if (allColumns.Contains(item))
-                //        {
-                //            List<FilterChildData> optionsChild = new();
-                //            string type = string.Empty;
-                //            string columnName = string.Empty;
+                            if (item.Contains("Country"))
+                            {
+                                columnName = "国家/地区";
+                                type = "Single";
+                                optionsChild = countrys;
+                            }
+                            else if (item.Contains("State"))
+                            {
+                                columnName = "状态";
+                                type = "Single";
+                                optionsChild.Add(new FilterChildData { Key = "0", Val = "停用" });
+                                optionsChild.Add(new FilterChildData { Key = "1", Val = "启用" });
+                            }
+                            else if (item.Contains("CreateTime") || item.Contains("UpdateTime"))
+                            {
+                                columnName = item == "CreateTime" ? "创建时间" : "修改时间";
+                                type = "Time";//时间
+                            }
+                            options.Add(new FilterConditionDto { CoulmnName = columnName, CoulmnKey = char.ToLower(item[0]) + item.Substring(1), Options = optionsChild, Type = type });
+                        }
+                    }
+                    break;
+                case 26:
+                    //    allColumns = new List<string> { "ZIVFLGID", "ZREPORT_TIME", "ZAORGSTATE", "ZACDISABLEYEAR", "ZACISDETAIL", "ZCWYGL_REA", "ZHTE", "ZH_IN_OUT", "ZOSTATE", "ZCYNAME", "ZREGIONAL", "CreateTime", "UpdateTime", };
+                    allColumns = new List<string> { "Zivflgid", "Zyorgstate", "Zaorgstate", "ZreportTime", "Zacdisableyear", "ZcwyglRea", "Zacisdetail", "", "Zhte", "ZhInOut", "Zcyname", "", "", "", };
+                    //var properties26 = GetProperties<AccountingOrganizationDetailsDto>();
+                    var properties26 = GetProperties<DHAdjustAccountsMultipleOrg>();
+                    foreach (var property in properties26) { tableColumns.Add(property.Name); }
+                    foreach (var item in tableColumns)
+                    {
+                        if (allColumns.Contains(item))
+                        {
+                            List<FilterChildData> optionsChild = new();
+                            string type = string.Empty;
+                            string columnName = string.Empty;
 
-                //            if (item.Contains("ZCYNAME"))
-                //            {
-                //                columnName = "国家/地区";
-                //                type = "Single";
-                //                optionsChild = countrys;
-                //            }
-                //            else if (item.Contains("Zivflgid"))
-                //            {
-                //                columnName = "是否投资项目/公司";
-                //                type = "Single";
-                //                optionsChild.Add(new FilterChildData { Key = "0", Val = "否" });
-                //                optionsChild.Add(new FilterChildData { Key = "1", Val = "是" });
-                //            }
-                //            else if (item.Contains("ZreportTime"))
-                //            {
-                //                columnName = "转入不启用报表时间";
-                //                type = "NumberTime";
-                //            }
-                //            else if (item.Contains("Zyorgstate"))
-                //            {
-                //                columnName = "机构状态";
-                //                type = "Single";
-                //                optionsChild = valDomain.Where(x => x.Code == "ZORGSTATE").ToList();
-                //            }
-                //            else if (item.Contains("Zacdisableyear"))
-                //            {
-                //                columnName = "停用日期";
-                //                type = "Single";
-                //                optionsChild.Add(new FilterChildData { Key = "0", Val = "否" });
-                //                optionsChild.Add(new FilterChildData { Key = "1", Val = "是" });
-                //            }
-                //            else if (item.Contains("Zacisdetail"))
-                //            {
-                //                columnName = "是否明细";
-                //                type = "Single";
-                //                optionsChild.Add(new FilterChildData { Key = "0", Val = "否" });
-                //                optionsChild.Add(new FilterChildData { Key = "1", Val = "是" });
-                //            }
-                //            else if (item.Contains("ZcwyglRea"))
-                //            {
-                //                columnName = "不启用财务云财务管理原因说明";
-                //                type = "Single";
-                //                optionsChild = valDomain.Where(x => x.Code == "ZD_DIS_CWY_REACODE").ToList();
-                //            }
-                //            else if (item.Contains("Zhte"))
-                //            {
-                //                columnName = "是否高新企业";
-                //                type = "Single";
-                //                optionsChild.Add(new FilterChildData { Key = "0", Val = "否" });
-                //                optionsChild.Add(new FilterChildData { Key = "1", Val = "是" });
-                //            }
-                //            else if (item.Contains("ZhInOut"))
-                //            {
-                //                columnName = "境内/境外";
-                //                type = "Single";
-                //                optionsChild.Add(new FilterChildData { Key = "0", Val = "境内" });
-                //                optionsChild.Add(new FilterChildData { Key = "1", Val = "境外" });
-                //            }
-                //            else if (item.Contains("Zaorgstate"))
-                //            {
-                //                columnName = "核算机构状态";
-                //                type = "Single";
-                //                optionsChild = valDomain.Where(x => x.Code == "ZD_MVIEW_ZY_ORGSTATE").ToList();
-                //            }
-                //            else if (item.Contains("Zcyname"))
-                //            {
-                //                columnName = "国家/地区";
-                //                type = "Single";
-                //                optionsChild = countrys;
-                //            }
-                //            //else if (item.Contains("ZREGIONAL"))
-                //            //{
-                //            //    columnName = "地域属性";
-                //            //    type = "Single";
-                //            //    //optionsChild = valDomain.Where(x => x.Code == "1").ToList();
-                //            //}
-                //            //else if (item.Contains("CreateTime") || item.Contains("UpdateTime"))
-                //            //{
-                //            //    columnName = item == "CreateTime" ? "创建时间" : "修改时间";
-                //            //    type = "Time";//时间
-                //            //}
-                //            options.Add(new FilterConditionDto { CoulmnName = columnName, CoulmnKey = char.ToLower(item[0]) + item.Substring(1), Options = optionsChild, Type = type });
-                //        }
-                //    }
-                //    break;
-                //case 27:
-                //    allColumns = new List<string> { "State" };
-                //    var properties27 = GetProperties<CurrencyDetailsDto>();
-                //    foreach (var property in properties27) { tableColumns.Add(property.Name); }
-                //    foreach (var item in tableColumns)
-                //    {
-                //        if (allColumns.Contains(item))
-                //        {
-                //            List<FilterChildData> optionsChild = new();
-                //            string type = string.Empty;
-                //            string columnName = string.Empty;
-                //            if (item.Contains("State"))
-                //            {
-                //                columnName = "状态";
-                //                type = "Single";
-                //                optionsChild.Add(new FilterChildData { Key = "0", Val = "无效" });
-                //                optionsChild.Add(new FilterChildData { Key = "1", Val = "有效" });
-                //            }
-                //            options.Add(new FilterConditionDto { CoulmnName = columnName, CoulmnKey = char.ToLower(item[0]) + item.Substring(1), Options = optionsChild, Type = type });
-                //        }
-                //    }
-                //    break;
-                //case 28:
-                //    allColumns = new List<string> { "CreateTime", "UpdateTime" };
-                //    var properties28 = GetProperties<ValueDomainReceiveResponseDto>();
-                //    foreach (var property in properties28) { tableColumns.Add(property.Name); }
-                //    foreach (var item in tableColumns)
-                //    {
-                //        if (allColumns.Contains(item))
-                //        {
-                //            List<FilterChildData> optionsChild = new();
-                //            string type = string.Empty;
-                //            string columnName = string.Empty;
-                //            if (item.Contains("CreateTime") || item.Contains("UpdateTime"))
-                //            {
-                //                columnName = item == "CreateTime" ? "创建时间" : "修改时间";
-                //                type = "Time";//时间
-                //            }
-                //            options.Add(new FilterConditionDto { CoulmnName = columnName, CoulmnKey = char.ToLower(item[0]) + item.Substring(1), Options = optionsChild, Type = type });
-                //        }
-                //    }
-                //    break;
-                //case 29:
-                //    allColumns = new List<string> { "CreatedAt", "UpdatedAt", "Z2NDORG", "Zdelete", "ZPSTATE", "", "" };
-                //    //机构
-                //    var institutionsss = await _dbContext.Queryable<Institution>()
-                //        .Where(t => t.IsDelete == 1)
-                //        .Select(t => new FilterChildData { Key = t.OID, Val = t.NAME })
-                //        .ToListAsync();
+                            if (item.Contains("ZCYNAME"))
+                            {
+                                columnName = "国家/地区";
+                                type = "Single";
+                                optionsChild = countrys;
+                            }
+                            else if (item.Contains("Zivflgid"))
+                            {
+                                columnName = "是否投资项目/公司";
+                                type = "Single";
+                                optionsChild.Add(new FilterChildData { Key = "0", Val = "否" });
+                                optionsChild.Add(new FilterChildData { Key = "1", Val = "是" });
+                            }
+                            else if (item.Contains("ZreportTime"))
+                            {
+                                columnName = "转入不启用报表时间";
+                                type = "NumberTime";
+                            }
+                            else if (item.Contains("Zyorgstate"))
+                            {
+                                columnName = "机构状态";
+                                type = "Single";
+                                optionsChild = valDomain.Where(x => x.Code == "ZORGSTATE").ToList();
+                            }
+                            else if (item.Contains("Zacdisableyear"))
+                            {
+                                columnName = "停用日期";
+                                type = "Single";
+                                optionsChild.Add(new FilterChildData { Key = "0", Val = "否" });
+                                optionsChild.Add(new FilterChildData { Key = "1", Val = "是" });
+                            }
+                            else if (item.Contains("Zacisdetail"))
+                            {
+                                columnName = "是否明细";
+                                type = "Single";
+                                optionsChild.Add(new FilterChildData { Key = "0", Val = "否" });
+                                optionsChild.Add(new FilterChildData { Key = "1", Val = "是" });
+                            }
+                            else if (item.Contains("ZcwyglRea"))
+                            {
+                                columnName = "不启用财务云财务管理原因说明";
+                                type = "Single";
+                                optionsChild = valDomain.Where(x => x.Code == "ZD_DIS_CWY_REACODE").ToList();
+                            }
+                            else if (item.Contains("Zhte"))
+                            {
+                                columnName = "是否高新企业";
+                                type = "Single";
+                                optionsChild.Add(new FilterChildData { Key = "0", Val = "否" });
+                                optionsChild.Add(new FilterChildData { Key = "1", Val = "是" });
+                            }
+                            else if (item.Contains("ZhInOut"))
+                            {
+                                columnName = "境内/境外";
+                                type = "Single";
+                                optionsChild.Add(new FilterChildData { Key = "0", Val = "境内" });
+                                optionsChild.Add(new FilterChildData { Key = "1", Val = "境外" });
+                            }
+                            else if (item.Contains("Zaorgstate"))
+                            {
+                                columnName = "核算机构状态";
+                                type = "Single";
+                                optionsChild = valDomain.Where(x => x.Code == "ZD_MVIEW_ZY_ORGSTATE").ToList();
+                            }
+                            else if (item.Contains("Zcyname"))
+                            {
+                                columnName = "国家/地区";
+                                type = "Single";
+                                optionsChild = countrys;
+                            }
+                            //else if (item.Contains("ZREGIONAL"))
+                            //{
+                            //    columnName = "地域属性";
+                            //    type = "Single";
+                            //    //optionsChild = valDomain.Where(x => x.Code == "1").ToList();
+                            //}
+                            //else if (item.Contains("CreateTime") || item.Contains("UpdateTime"))
+                            //{
+                            //    columnName = item == "CreateTime" ? "创建时间" : "修改时间";
+                            //    type = "Time";//时间
+                            //}
+                            options.Add(new FilterConditionDto { CoulmnName = columnName, CoulmnKey = char.ToLower(item[0]) + item.Substring(1), Options = optionsChild, Type = type });
+                        }
+                    }
+                    break;
+                case 27:
+                    allColumns = new List<string> { "State" };
+                    var properties27 = GetProperties<CurrencyDetailsDto>();
+                    foreach (var property in properties27) { tableColumns.Add(property.Name); }
+                    foreach (var item in tableColumns)
+                    {
+                        if (allColumns.Contains(item))
+                        {
+                            List<FilterChildData> optionsChild = new();
+                            string type = string.Empty;
+                            string columnName = string.Empty;
+                            if (item.Contains("State"))
+                            {
+                                columnName = "状态";
+                                type = "Single";
+                                optionsChild.Add(new FilterChildData { Key = "0", Val = "无效" });
+                                optionsChild.Add(new FilterChildData { Key = "1", Val = "有效" });
+                            }
+                            options.Add(new FilterConditionDto { CoulmnName = columnName, CoulmnKey = char.ToLower(item[0]) + item.Substring(1), Options = optionsChild, Type = type });
+                        }
+                    }
+                    break;
+                case 28:
+                    allColumns = new List<string> { "CreateTime", "UpdateTime" };
+                    var properties28 = GetProperties<ValueDomainReceiveResponseDto>();
+                    foreach (var property in properties28) { tableColumns.Add(property.Name); }
+                    foreach (var item in tableColumns)
+                    {
+                        if (allColumns.Contains(item))
+                        {
+                            List<FilterChildData> optionsChild = new();
+                            string type = string.Empty;
+                            string columnName = string.Empty;
+                            if (item.Contains("CreateTime") || item.Contains("UpdateTime"))
+                            {
+                                columnName = item == "CreateTime" ? "创建时间" : "修改时间";
+                                type = "Time";//时间
+                            }
+                            options.Add(new FilterConditionDto { CoulmnName = columnName, CoulmnKey = char.ToLower(item[0]) + item.Substring(1), Options = optionsChild, Type = type });
+                        }
+                    }
+                    break;
+                case 29:
+                    allColumns = new List<string> { "CreatedAt", "UpdatedAt", "Z2NDORG", "Zdelete", "ZPSTATE", "", "" };
+                    //机构
+                    var institutionsss = await _dbContext.Queryable<Institution>()
+                        .Where(t => t.IsDelete == 1)
+                        .Select(t => new FilterChildData { Key = t.OID, Val = t.NAME })
+                        .ToListAsync();
 
-                //    var properties29 = GetProperties<DHVirtualProject>();
-                //    foreach (var property in properties29) { tableColumns.Add(property.Name); }
-                //    foreach (var item in tableColumns)
-                //    {
-                //        if (allColumns.Contains(item))
-                //        {
-                //            List<FilterChildData> optionsChild = new();
-                //            string type = string.Empty;
-                //            string columnName = string.Empty;
-                //            if (item.Contains("CreatedAt") || item.Contains("UpdatedAt"))
-                //            {
-                //                columnName = item == "CreatedAt" ? "创建时间" : "修改时间";
-                //                type = "Time";//时间
-                //            }
-                //            else if (item.Contains("Z2NDORG"))
-                //            {
-                //                columnName = "所属二级单位";
-                //                type = "Time";//时间
-                //                optionsChild = institutionsss;
-                //            }
-                //            else if (item.Contains("Zdelete"))
-                //            {
-                //                columnName = "是否删除";
-                //                type = "Single";
-                //                optionsChild.Add(new FilterChildData { Key = "0", Val = "已删除" });
-                //                optionsChild.Add(new FilterChildData { Key = "1", Val = "未删除" });
-                //            }
-                //            else if (item.Contains("ZPSTATE"))
-                //            {
-                //                columnName = "状态";
-                //                type = "Single";
-                //                optionsChild.Add(new FilterChildData { Key = "0", Val = "停用" });
-                //                optionsChild.Add(new FilterChildData { Key = "1", Val = "启用" });
-                //            }
-                //            options.Add(new FilterConditionDto { CoulmnName = columnName, CoulmnKey = char.ToLower(item[0]) + item.Substring(1), Options = optionsChild, Type = type });
-                //        }
-                //    }
-                //    break;
+                    var properties29 = GetProperties<DHVirtualProject>();
+                    foreach (var property in properties29) { tableColumns.Add(property.Name); }
+                    foreach (var item in tableColumns)
+                    {
+                        if (allColumns.Contains(item))
+                        {
+                            List<FilterChildData> optionsChild = new();
+                            string type = string.Empty;
+                            string columnName = string.Empty;
+                            if (item.Contains("CreatedAt") || item.Contains("UpdatedAt"))
+                            {
+                                columnName = item == "CreatedAt" ? "创建时间" : "修改时间";
+                                type = "Time";//时间
+                            }
+                            else if (item.Contains("Z2NDORG"))
+                            {
+                                columnName = "所属二级单位";
+                                type = "Time";//时间
+                                optionsChild = institutionsss;
+                            }
+                            else if (item.Contains("Zdelete"))
+                            {
+                                columnName = "是否删除";
+                                type = "Single";
+                                optionsChild.Add(new FilterChildData { Key = "0", Val = "已删除" });
+                                optionsChild.Add(new FilterChildData { Key = "1", Val = "未删除" });
+                            }
+                            else if (item.Contains("ZPSTATE"))
+                            {
+                                columnName = "状态";
+                                type = "Single";
+                                optionsChild.Add(new FilterChildData { Key = "0", Val = "停用" });
+                                optionsChild.Add(new FilterChildData { Key = "1", Val = "启用" });
+                            }
+                            options.Add(new FilterConditionDto { CoulmnName = columnName, CoulmnKey = char.ToLower(item[0]) + item.Substring(1), Options = optionsChild, Type = type });
+                        }
+                    }
+                    break;
                 case 30:
                     allColumns = new List<string> { "ZOSTATE", "", "ZOATTR", "ZOCATTR", "ZCYNAME", "ZORGLOC", "ZHOLDING", "ZCHECKIND", "ZENTC", "", "" };
                     //allColumns = new List<string> { "Zcyname", "Zorgloc", "Zregional", "Zostate", "", "", "" };
@@ -6872,7 +6872,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                         }
                         break;
                     case "GetXZOrganzationSearchAsync":
-                        var properties30 = GetProperties<DHOrganzationDep>();
+                        var properties30 = GetProperties<AdministrativeOrganization>();
                         foreach (var property in properties30)
                         {
                             if (!excludedProperties.Contains(property.Name))
