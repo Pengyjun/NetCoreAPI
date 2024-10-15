@@ -6420,7 +6420,8 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     }
                     break;
                 case 30:
-                    allColumns = new List<string> { "ZOSTATE", "", "ZOATTR", "ZOCATTR", "ZCYNAME", "ZORGLOC", "ZHOLDING", "ZCHECKIND", "ZENTC", "", "" };
+                    //allColumns = new List<string> { "ZOSTATE", "", "ZOATTR", "ZOCATTR", "ZCYNAME", "ZORGLOC", "ZHOLDING", "ZCHECKIND", "ZENTC", "", "" };
+                    allColumns = new List<string> { "Zoattr", "", "Zocattr", "Zcyname", "Zorgloc", "Zholding", "Zcheckind", "Zostate", "Zentc", "", "" };
                     //allColumns = new List<string> { "Zcyname", "Zorgloc", "Zregional", "Zostate", "", "", "" };
 
                     //var properties30 = GetProperties<AdministrativeOrganization>();
@@ -6433,54 +6434,102 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                             List<FilterChildData> optionsChild = new();
                             string type = string.Empty;
                             string columnName = string.Empty;
-                            if (item.Contains("ZCYNAME"))
+                            if (item.Contains("Zcyname"))
                             {
                                 columnName = "国家名称";
                                 type = "Single";
                                 optionsChild = countrys;
                             }
-                            else if (item.Contains("ZORGLOC"))
+                            else if (item.Contains("Zorgloc"))
                             {
                                 columnName = "机构所在地";
                                 type = "Single";
                                 optionsChild = countrys;
                             }
-                            else if (item.Contains("ZOSTATE"))
+                            else if (item.Contains("Zostate"))
                             {
                                 columnName = "机构状态";
                                 type = "Single";
                                 optionsChild = valDomain.Where(x => x.Code == "ZOSTATE").ToList();
                             }
-                            else if (item.Contains("ZOATTR"))
+                            else if (item.Contains("Zoattr"))
                             {
                                 columnName = "机构属性";
                                 type = "Single";
                                 optionsChild = valDomain.Where(x => x.Code == "ZOATTR").ToList();
                             }
-                            else if (item.Contains("ZOCATTR"))
+                            else if (item.Contains("Zocattr"))
                             {
                                 columnName = "机构子属性";
                                 type = "Single";
                                 optionsChild = valDomain.Where(x => x.Code == "ZOCATTR").ToList();
                             }
-                            else if (item.Contains("ZHOLDING"))
+                            else if (item.Contains("Zholding"))
                             {
                                 columnName = "持股情况";
                                 type = "Single";
                                 optionsChild = valDomain.Where(x => x.Code == "ZHOLDING").ToList();
                             }
-                            else if (item.Contains("ZCHECKIND"))
+                            else if (item.Contains("Zcheckind"))
                             {
                                 columnName = "是否独立核算";
                                 type = "Single";
                                 optionsChild = valDomain.Where(x => x.Code == "ZCHECKIND").ToList();
                             }
-                            else if (item.Contains("ZENTC"))
+                            else if (item.Contains("Zentc"))
                             {
                                 columnName = "企业分类代码";
                                 type = "Single";
                                 optionsChild = valDomain.Where(x => x.Code == "ZENTC").ToList();
                             }
+                            //if (item.Contains("ZCYNAME"))
+                            //{
+                            //    columnName = "国家名称";
+                            //    type = "Single";
+                            //    optionsChild = countrys;
+                            //}
+                            //else if (item.Contains("ZORGLOC"))
+                            //{
+                            //    columnName = "机构所在地";
+                            //    type = "Single";
+                            //    optionsChild = countrys;
+                            //}
+                            //else if (item.Contains("ZOSTATE"))
+                            //{
+                            //    columnName = "机构状态";
+                            //    type = "Single";
+                            //    optionsChild = valDomain.Where(x => x.Code == "ZOSTATE").ToList();
+                            //}
+                            //else if (item.Contains("ZOATTR"))
+                            //{
+                            //    columnName = "机构属性";
+                            //    type = "Single";
+                            //    optionsChild = valDomain.Where(x => x.Code == "ZOATTR").ToList();
+                            //}
+                            //else if (item.Contains("ZOCATTR"))
+                            //{
+                            //    columnName = "机构子属性";
+                            //    type = "Single";
+                            //    optionsChild = valDomain.Where(x => x.Code == "ZOCATTR").ToList();
+                            //}
+                            //else if (item.Contains("ZHOLDING"))
+                            //{
+                            //    columnName = "持股情况";
+                            //    type = "Single";
+                            //    optionsChild = valDomain.Where(x => x.Code == "ZHOLDING").ToList();
+                            //}
+                            //else if (item.Contains("ZCHECKIND"))
+                            //{
+                            //    columnName = "是否独立核算";
+                            //    type = "Single";
+                            //    optionsChild = valDomain.Where(x => x.Code == "ZCHECKIND").ToList();
+                            //}
+                            //else if (item.Contains("ZENTC"))
+                            //{
+                            //    columnName = "企业分类代码";
+                            //    type = "Single";
+                            //    optionsChild = valDomain.Where(x => x.Code == "ZENTC").ToList();
+                            //}
                             options.Add(new FilterConditionDto { CoulmnName = columnName, CoulmnKey = char.ToLower(item[0]) + item.Substring(1), Options = optionsChild, Type = type });
                         }
                     }
