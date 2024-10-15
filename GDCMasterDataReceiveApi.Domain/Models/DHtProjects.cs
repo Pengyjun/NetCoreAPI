@@ -45,6 +45,15 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// </summary>
         public string? ZINVERSTOR { get; set; }
         /// <summary>
+        /// 曾用名
+        /// </summary>
+        public string? FzitOname { get; set; }
+        /// <summary>
+        /// 曾用名
+        /// </summary>
+        [SugarColumn(IsIgnore = true)]
+        public List<FzitOnames>? FzitOnameList { get; set; }
+        /// <summary>
         /// 项目批复/决议文号
         /// </summary>
         public string? ZAPPROVAL { get; set; }
@@ -257,5 +266,19 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// </summary>
         public string? FZawardp { get; set; }
 
+    }
+    /// <summary>
+    /// 曾用名
+    /// </summary>
+    public class FzitOnames
+    {
+        /// <summary>
+        /// 项目主数据编码
+        /// </summary>
+        public string? ZPROJECT { get; set; }
+        /// <summary>
+        /// 曾用名
+        /// </summary>
+        public string? ZOLDNAME { get; set; }
     }
 }

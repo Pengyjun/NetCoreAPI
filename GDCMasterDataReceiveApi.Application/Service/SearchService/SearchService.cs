@@ -1395,6 +1395,15 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
 
             foreach (var item in proList)
             {
+                if (!string.IsNullOrWhiteSpace(item.FzitOname))
+                {
+                    var jsonObject = JObject.Parse(item.FzitOname);
+                    if (!string.IsNullOrWhiteSpace(jsonObject["item"].ToString()))
+                    {
+                        item.FzitOnameList = JsonConvert.DeserializeObject<List<FzitOnames>>(jsonObject["item"].ToString());
+                    }
+                }
+
                 //项目类型
                 item.ZPROJTYPE = GetValueDomain(item.ZPROJTYPE, valDomain, "ZPROJTYPE");
 
