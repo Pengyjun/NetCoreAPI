@@ -16,6 +16,7 @@ using GDCMasterDataReceiveApi.Application.Contracts.Dto.Currency;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.DeviceClassCode;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.DeviceDetailCode;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.EscrowOrganization;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.FinancialInstitution;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.InvoiceType;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.Language;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.LouDong;
@@ -278,6 +279,14 @@ namespace GHElectronicFileApi.AopInterceptor
                     parameCount = receiveParame.item.Count;
                     requestParame = receiveParame.item.ToJson();
                     receiveDataType = ReceiveDataType.EscrowOrganization;
+                }
+
+                else if (methodName == "FinancialInstitution")
+                {
+                    var receiveParame = ((BaseReceiveDataRequestDto<FinancialInstitutionReceiveDto>)invocation.Arguments[0]).IT_DATA;
+                    parameCount = receiveParame.item.Count;
+                    requestParame = receiveParame.item.ToJson();
+                    receiveDataType = ReceiveDataType.FinancialInstitution;
                 }
                 #endregion
 
