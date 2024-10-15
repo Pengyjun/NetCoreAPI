@@ -313,7 +313,7 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.IService.ISearchService
         /// <param name="requestDto"></param>
         /// <returns></returns>
         //Task<ResponseAjaxResult<List<EscrowOrganizationDetailsDto>>> GetEscrowOrganizationSearchAsync(FilterCondition requestDto);
-        Task<ResponseAjaxResult<List<DHOrganzationDep>>> GetEscrowOrganzationSearchAsync(FilterCondition requestDto);
+        Task<ResponseAjaxResult<List<AdministrativeOrganization>>> GetEscrowOrganzationSearchAsync(FilterCondition requestDto);
         /// <summary>
         /// 
         /// </summary>

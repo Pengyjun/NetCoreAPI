@@ -136,6 +136,11 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.ProjectClassificatio
         [ExcelColumnName("产业分类三级分类名称")]
         public string? ChanYeThirdName { get; set; }
         /// <summary>
+        /// 产业分类三级分类代码
+        /// </summary>
+        [ExcelColumnName("产业分类三级分类代码")]
+        public string? ChanYeThirdCode { get; set; }
+        /// <summary>
         /// 备注（产业分类）
         /// </summary>
         [ExcelColumnName("备注（产业分类）")]

@@ -523,12 +523,17 @@ namespace GDCMasterDataReceiveApi.Controller
             return await _searchService.GetEscrowOrganizationSearchAsync(requestDto);
         }
         /// <summary>
-        /// DH行政组织-多组织
+        /// 行政组织-多组织
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
+        //[HttpPost("GetXZOrganzationSearch")]
+        //public async Task<ResponseAjaxResult<List<DHOrganzationDep>>> GetXZOrganzationSearchAsync([FromBody] FilterCondition requestDto)
+        //{
+        //    return await _searchService.GetEscrowOrganzationSearchAsync(requestDto);
+        //} 
         [HttpPost("GetXZOrganzationSearch")]
-        public async Task<ResponseAjaxResult<List<DHOrganzationDep>>> GetXZOrganzationSearchAsync([FromBody] FilterCondition requestDto)
+        public async Task<ResponseAjaxResult<List<AdministrativeOrganization>>> GetXZOrganzationSearchAsync([FromBody] FilterCondition requestDto)
         {
             return await _searchService.GetEscrowOrganzationSearchAsync(requestDto);
         }
