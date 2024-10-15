@@ -2221,8 +2221,8 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     CreateTime = cc.CreateTime,
                     UpdateTime = cc.UpdateTime
                 })
+                .OrderByDescending((cc) => cc.Name)
                 .ToPageListAsync(requestDto.PageIndex, requestDto.PageSize, total);
-
 
             //国家地区
             var countrysKey = ccList.Select(x => x.Country).ToList();
