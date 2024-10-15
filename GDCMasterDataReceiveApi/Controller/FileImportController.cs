@@ -178,7 +178,7 @@ namespace GDCMasterDataReceiveApi.Controller
             }
             else if (request.ImportType == 30)
             {
-                var data = await searchService.GetEscrowOrganzationSearchAsync(new FilterCondition() { PageSize = 1000000, IsFullExport = true, ImportType = 28 });
+                var data = await searchService.GetXZOrganzationSearchAsync(new FilterCondition() { PageSize = 1000000, IsFullExport = true, ImportType = 28 });
                 if (data.Data != null && data.Data.Any()) return await ExcelImportAsync(data.Data, null, "值域信息"); else return Ok("无数据");
             }
 

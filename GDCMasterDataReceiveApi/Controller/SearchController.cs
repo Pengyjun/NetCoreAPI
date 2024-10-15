@@ -523,20 +523,20 @@ namespace GDCMasterDataReceiveApi.Controller
             return await _searchService.GetEscrowOrganizationSearchAsync(requestDto);
         }
         /// <summary>
-        /// 行政组织-多组织
+        /// 行政机构-多组织
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
+        [HttpPost("GetXZOrganzationSearch")]
+        public async Task<ResponseAjaxResult<List<DHOrganzationDep>>> GetXZOrganzationSearchAsync([FromBody] FilterCondition requestDto)
+        {
+            return await _searchService.GetXZOrganzationSearchAsync(requestDto);
+        }
         //[HttpPost("GetXZOrganzationSearch")]
-        //public async Task<ResponseAjaxResult<List<DHOrganzationDep>>> GetXZOrganzationSearchAsync([FromBody] FilterCondition requestDto)
+        //public async Task<ResponseAjaxResult<List<AdministrativeOrganization>>> GetXZOrganzationSearchAsync([FromBody] FilterCondition requestDto)
         //{
         //    return await _searchService.GetEscrowOrganzationSearchAsync(requestDto);
-        //} 
-        [HttpPost("GetXZOrganzationSearch")]
-        public async Task<ResponseAjaxResult<List<AdministrativeOrganization>>> GetXZOrganzationSearchAsync([FromBody] FilterCondition requestDto)
-        {
-            return await _searchService.GetEscrowOrganzationSearchAsync(requestDto);
-        }
+        //}
         /// <summary>
         /// 多组织-税务代管组织(行政) 详细
         /// </summary>

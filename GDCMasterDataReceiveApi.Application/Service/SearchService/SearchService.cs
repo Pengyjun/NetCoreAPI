@@ -3812,82 +3812,80 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<List<AdministrativeOrganization>>> GetEscrowOrganzationSearchAsync(FilterCondition requestDto)
+        public async Task<ResponseAjaxResult<List<DHOrganzationDep>>> GetXZOrganzationSearchAsync(FilterCondition requestDto)
         {
-            var responseAjaxResult = new ResponseAjaxResult<List<AdministrativeOrganization>>();
+            var responseAjaxResult = new ResponseAjaxResult<List<DHOrganzationDep>>();
             RefAsync<int> total = 0;
 
             //过滤条件
-            AdministrativeOrganization filterCondition = new();
+            DHOrganzationDep filterCondition = new();
             if (!string.IsNullOrWhiteSpace(requestDto.FilterConditionJson))
             {
-                filterCondition = JsonConvert.DeserializeObject<AdministrativeOrganization>(requestDto.FilterConditionJson);
+                filterCondition = JsonConvert.DeserializeObject<DHOrganzationDep>(requestDto.FilterConditionJson);
             }
 
-            var ccList = await _dbContext.Queryable<AdministrativeOrganization>()
-                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.MDM_CODE), (pro) => pro.MDM_CODE.Contains(filterCondition.MDM_CODE))
-                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.OID), (pro) => pro.OID.Contains(filterCondition.OID))
-                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZZTNAME_ZH), (pro) => pro.ZZTNAME_ZH.Contains(filterCondition.ZZTNAME_ZH))
-                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZZTSHNAME_CHS), (pro) => pro.ZZTSHNAME_CHS.Contains(filterCondition.ZZTSHNAME_CHS))
-                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZZTNAME_EN), (pro) => pro.ZZTNAME_EN.Contains(filterCondition.ZZTNAME_EN))
-                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZZTSHNAME_EN), (pro) => pro.ZZTSHNAME_EN.Contains(filterCondition.ZZTSHNAME_EN))
-                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZZTNAME_LOC), (pro) => pro.ZZTNAME_LOC.Contains(filterCondition.ZZTNAME_LOC))
-                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZZTSHNAME_LOC), (pro) => pro.ZZTSHNAME_LOC.Contains(filterCondition.ZZTSHNAME_LOC))
-                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZOSTATE), (pro) => pro.ZOSTATE.Contains(filterCondition.ZOSTATE))
-                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZORGUP), (pro) => pro.ZORGUP.Contains(filterCondition.ZORGUP))
-                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.POID), (pro) => pro.POID.Contains(filterCondition.POID))
-                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZORULE), (pro) => pro.ZORULE.Contains(filterCondition.ZORULE))
-                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZGPOID), (pro) => pro.ZGPOID.Contains(filterCondition.ZGPOID))
-                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZO_LEVEL), (pro) => pro.ZO_LEVEL.Contains(filterCondition.ZO_LEVEL))
-                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZSNO), (pro) => pro.ZSNO.Contains(filterCondition.ZSNO))
-                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZORGNO), (pro) => pro.ZORGNO.Contains(filterCondition.ZORGNO))
-                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZOATTR), (pro) => pro.ZOATTR.Contains(filterCondition.ZOATTR))
-                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZOCATTR), (pro) => pro.ZOCATTR.Contains(filterCondition.ZOCATTR))
-                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZCYNAME), (pro) => pro.ZCYNAME.Contains(filterCondition.ZCYNAME))
-                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZORGLOC), (pro) => pro.ZORGLOC.Contains(filterCondition.ZREGIONAL))
-                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZCUSCC), (pro) => pro.ZCUSCC.Contains(filterCondition.ZCUSCC))
-                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZADDRESS), (pro) => pro.ZADDRESS.Contains(filterCondition.ZADDRESS))
-                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZHOLDING), (pro) => pro.ZHOLDING.Contains(filterCondition.ZHOLDING))
-                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZCHECKIND), (pro) => pro.ZCHECKIND.Contains(filterCondition.ZCHECKIND))
-                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZTREEID1), (pro) => pro.ZTREEID1.Contains(filterCondition.ZTREEID1))
-                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZTREEVER), (pro) => pro.ZTREEVER.Contains(filterCondition.ZTREEVER))
-                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.VIEW_FLAG), (pro) => pro.VIEW_FLAG.Contains(filterCondition.VIEW_FLAG))
-                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZENTC), (pro) => pro.ZENTC.Contains(filterCondition.ZENTC))
+            var ccList = await _dbContext.Queryable<DHOrganzationDep>()
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.MdmCode), (pro) => pro.MdmCode.Contains(filterCondition.MdmCode))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Oid), (pro) => pro.Oid.Contains(filterCondition.Oid))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZztnameZh), (pro) => pro.ZztnameZh.Contains(filterCondition.ZztnameZh))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZztshnameChs), (pro) => pro.ZztshnameChs.Contains(filterCondition.ZztshnameChs))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZztshnameEn), (pro) => pro.ZztshnameEn.Contains(filterCondition.ZztshnameEn))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZztnameLoc), (pro) => pro.ZztnameLoc.Contains(filterCondition.ZztnameLoc))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZztshnameLoc), (pro) => pro.ZztshnameLoc.Contains(filterCondition.ZztshnameLoc))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Zostate), (pro) => pro.Zostate.Contains(filterCondition.Zostate))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Zorgup), (pro) => pro.Zorgup.Contains(filterCondition.Zorgup))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Poid), (pro) => pro.Poid.Contains(filterCondition.Poid))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Zorule), (pro) => pro.Zorule.Contains(filterCondition.Zorule))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Zgpoid), (pro) => pro.Zgpoid.Contains(filterCondition.Zgpoid))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZoLevel), (pro) => pro.ZoLevel.Contains(filterCondition.ZoLevel))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Zsno), (pro) => pro.Zsno.Contains(filterCondition.Zsno))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Zorgno), (pro) => pro.Zorgno.Contains(filterCondition.Zorgno))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Zoattr), (pro) => pro.Zoattr.Contains(filterCondition.Zoattr))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Zocattr), (pro) => pro.Zocattr.Contains(filterCondition.Zocattr))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Zcyname), (pro) => pro.Zcyname.Contains(filterCondition.Zcyname))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Zorgloc), (pro) => pro.Zorgloc.Contains(filterCondition.Zorgloc))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Zcuscc), (pro) => pro.Zcuscc.Contains(filterCondition.Zcuscc))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Zaddress), (pro) => pro.Zaddress.Contains(filterCondition.Zaddress))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Zholding), (pro) => pro.Zholding.Contains(filterCondition.Zholding))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Zcheckind), (pro) => pro.Zcheckind.Contains(filterCondition.Zcheckind))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Ztreeid1), (pro) => pro.Ztreeid1.Contains(filterCondition.Ztreeid1))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Ztreever), (pro) => pro.Ztreever.Contains(filterCondition.Ztreever))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ViewFlag), (pro) => pro.ViewFlag.Contains(filterCondition.ViewFlag))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Zentc), (pro) => pro.Zentc.Contains(filterCondition.Zentc))
                 //.WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.CreateTime.ToString()), (pro) => Convert.ToDateTime(pro.CreateTime).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.CreateTime).ToString("yyyy-MM-dd"))
                 //.WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.UpdateTime.ToString()), (pro) => Convert.ToDateTime(pro.UpdateTime).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.UpdateTime).ToString("yyyy-MM-dd"))
                 //.Where((cc) => cc.IsDelete == 1)
-                .Select((cc) => new AdministrativeOrganization
+                .Select((cc) => new DHOrganzationDep
                 {
                     Id = cc.Id,
-                    MDM_CODE = cc.MDM_CODE,
-                    OID = cc.OID,
-                    POID = cc.POID,
-                    VIEW_FLAG = cc.VIEW_FLAG,
-                    ZADDRESS = cc.ZADDRESS,
-                    ZCHECKIND = cc.ZCHECKIND,
-                    ZCUSCC = cc.ZCUSCC,
-                    ZCYNAME = cc.ZCYNAME,
-                    ZENTC = cc.ZENTC,
-                    ZGPOID = cc.ZGPOID,
-                    ZHOLDING = cc.ZHOLDING,
-                    ZOATTR = cc.ZOATTR,
-                    ZOCATTR = cc.ZOCATTR,
-                    ZORGLOC = cc.ZORGLOC,
-                    ZORGNO = cc.ZORGNO,
-                    ZORGUP = cc.ZORGUP,
-                    ZORULE = cc.ZORULE,
-                    ZOSTATE = cc.ZOSTATE,
-                    ZO_LEVEL = cc.ZO_LEVEL,
-                    ZREGIONAL = cc.ZREGIONAL,
-                    ZSNO = cc.ZSNO,
-                    ZTREEID1 = cc.ZTREEID1,
-                    ZTREEVER = cc.ZTREEVER,
-                    ZZTNAME_EN = cc.ZZTNAME_EN,
-                    ZZTNAME_LOC = cc.ZZTNAME_LOC,
-                    ZZTNAME_ZH = cc.ZZTNAME_ZH,
-                    ZZTSHNAME_CHS = cc.ZZTSHNAME_CHS,
-                    ZZTSHNAME_EN = cc.ZZTSHNAME_EN,
-                    ZZTSHNAME_LOC = cc.ZZTSHNAME_LOC
+                    MdmCode = cc.MdmCode,
+                    Oid = cc.Oid,
+                    Poid = cc.Poid,
+                    ViewFlag = cc.ViewFlag,
+                    Zaddress = cc.Zaddress,
+                    Zcheckind = cc.Zcuscc,
+                    Zcuscc = cc.Zcuscc,
+                    Zcyname = cc.Zcyname,
+                    Zentc = cc.Zentc,
+                    Zgpoid = cc.Zgpoid,
+                    Zholding = cc.Zholding,
+                    Zoattr = cc.Zoattr,
+                    Zocattr = cc.Zocattr,
+                    ZoLevel = cc.ZoLevel,
+                    Zorgloc = cc.Zorgloc,
+                    Zorgno = cc.Zorgno,
+                    Zorgup = cc.Zorgup,
+                    Zorule = cc.Zorule,
+                    Zregional = cc.Zregional,
+                    Zostate = cc.Zostate,
+                    Ztreeid1 = cc.Ztreeid1,
+                    Zsno = cc.Zsno,
+                    Ztreever = cc.Ztreever,
+                    ZztnameLoc = cc.ZztnameLoc,
+                    ZztnameZh = cc.ZztnameZh,
+                    ZztshnameEn = cc.ZztshnameEn,
+                    ZztshnameLoc = cc.ZztshnameLoc,
+                    ZztshnameChs = cc.ZztshnameChs
                 })
                 .ToPageListAsync(requestDto.PageIndex, requestDto.PageSize, total);
 
@@ -3898,14 +3896,14 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                 .ToListAsync();
 
             //国家地区
-            var countrysKey = ccList.Select(x => x.ZCYNAME).ToList();
+            var countrysKey = ccList.Select(x => x.Zcyname).ToList();
             var country = await _dbContext.Queryable<CountryRegion>()
                 .Where(t => t.IsDelete == 1 && countrysKey.Contains(t.ZCOUNTRYCODE))
                 .Select(t => new CountryRegionOrAdminDivisionDto { Code = t.ZCOUNTRYCODE, Name = t.ZCOUNTRYNAME })
                 .ToListAsync();
 
             //行政区划
-            var locationKey = ccList.Select(x => x.ZORGLOC).ToList();
+            var locationKey = ccList.Select(x => x.Zorgloc).ToList();
             var location = await _dbContext.Queryable<AdministrativeDivision>()
                 .Where(t => t.IsDelete == 1 && locationKey.Contains(t.ZADDVSCODE))
                 .Select(t => new CountryRegionOrAdminDivisionDto { Code = t.ZADDVSCODE, Name = t.ZADDVSNAME })
@@ -3914,28 +3912,28 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
             foreach (var item in ccList)
             {
                 //机构属性
-                item.ZOATTR = valDomain.FirstOrDefault(x => item.ZOATTR == x.ZDOM_VALUE && x.ZDOM_CODE == "ZORGATTR")?.ZDOM_NAME;
+                item.Zoattr = valDomain.FirstOrDefault(x => item.Zoattr == x.ZDOM_VALUE && x.ZDOM_CODE == "ZORGATTR")?.ZDOM_NAME;
 
                 //机构子属性
-                item.ZOCATTR = valDomain.FirstOrDefault(x => item.ZOCATTR == x.ZDOM_VALUE && x.ZDOM_CODE == "ZORGCHILDATTR")?.ZDOM_NAME;
+                item.Zocattr = valDomain.FirstOrDefault(x => item.Zocattr == x.ZDOM_VALUE && x.ZDOM_CODE == "ZORGCHILDATTR")?.ZDOM_NAME;
 
                 //是否独立核算
-                item.ZCHECKIND = valDomain.FirstOrDefault(x => item.ZCHECKIND == x.ZDOM_VALUE && x.ZDOM_CODE == "ZCHECKIND")?.ZDOM_NAME;
+                item.Zcheckind = valDomain.FirstOrDefault(x => item.Zcheckind == x.ZDOM_VALUE && x.ZDOM_CODE == "ZCHECKIND")?.ZDOM_NAME;
 
                 //机构状态
-                item.ZOSTATE = valDomain.FirstOrDefault(x => item.ZOSTATE == x.ZDOM_VALUE && x.ZDOM_CODE == "ZORGSTATE")?.ZDOM_NAME;
+                item.Zostate = valDomain.FirstOrDefault(x => item.Zostate == x.ZDOM_VALUE && x.ZDOM_CODE == "ZORGSTATE")?.ZDOM_NAME;
 
                 //持股情况
-                item.ZHOLDING = valDomain.FirstOrDefault(x => item.ZHOLDING == x.ZDOM_VALUE && x.ZDOM_CODE == "ZHOLDING")?.ZDOM_NAME;
+                item.Zholding = valDomain.FirstOrDefault(x => item.Zholding == x.ZDOM_VALUE && x.ZDOM_CODE == "ZHOLDING")?.ZDOM_NAME;
 
                 //企业分类代码
-                item.ZENTC = valDomain.FirstOrDefault(x => item.ZENTC == x.ZDOM_VALUE && x.ZDOM_CODE == "ZENTC")?.ZDOM_NAME;
+                item.Zentc = valDomain.FirstOrDefault(x => item.Zentc == x.ZDOM_VALUE && x.ZDOM_CODE == "ZENTC")?.ZDOM_NAME;
 
                 //国家地区
-                item.ZCYNAME = GetCountryRegion(item.ZCYNAME, country);
+                item.Zcyname = GetCountryRegion(item.Zcyname, country);
 
                 //机构所在地
-                item.ZORGLOC = GetAdministrativeDivision(item.ZORGLOC, location);
+                item.Zorgloc = GetAdministrativeDivision(item.Zorgloc, location);
             }
 
             responseAjaxResult.Count = total;
@@ -6425,8 +6423,8 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     allColumns = new List<string> { "ZOSTATE", "", "ZOATTR", "ZOCATTR", "ZCYNAME", "ZORGLOC", "ZHOLDING", "ZCHECKIND", "ZENTC", "", "" };
                     //allColumns = new List<string> { "Zcyname", "Zorgloc", "Zregional", "Zostate", "", "", "" };
 
-                    var properties30 = GetProperties<AdministrativeOrganization>();
-                    //var properties30 = GetProperties<DHOrganzationDep>();
+                    //var properties30 = GetProperties<AdministrativeOrganization>();
+                    var properties30 = GetProperties<DHOrganzationDep>();
                     foreach (var property in properties30) { tableColumns.Add(property.Name); }
                     foreach (var item in tableColumns)
                     {
@@ -6525,461 +6523,462 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                 List<string> filds = new();
                 switch (r.InterfaceName)
                 {
-                    case "GetUserSearchAsync":
-                    case "GetUserDetailsAsync":
-                        var properties = GetProperties<UserSearchDetailsDto>();
-                        foreach (var property in properties)
-                        {
-                            if (!excludedProperties.Contains(property.Name))
-                            {
-                                ddd.Add(new SystemInterfaceField
-                                {
-                                    Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
-                                    AppSystemInterfaceId = r.Id,
-                                    FieidName = property.Name
-                                });
-                            }
-                        }
-                        break;
-                    case "GetInstitutionsAsync":
-                    case "GetInstitutionDetailsAsync":
-                        var properties2 = GetProperties<InstitutionDetatilsDto>();
-                        foreach (var property in properties2)
-                        {
-                            if (!excludedProperties.Contains(property.Name))
-                            {
-                                ddd.Add(new SystemInterfaceField
-                                {
-                                    Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
-                                    AppSystemInterfaceId = r.Id,
-                                    FieidName = property.Name
-                                });
-                            }
-                        }
-                        break;
-                    case "GetProjectSearchAsync":
-                    case "GetProjectDetailsAsync":
-                        //var properties3 = GetProperties<ProjectDetailsDto>();
-                        var properties3 = GetProperties<DHProjects>();
-                        foreach (var property in properties3)
-                        {
-                            if (!excludedProperties.Contains(property.Name))
-                            {
-                                ddd.Add(new SystemInterfaceField
-                                {
-                                    Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
-                                    AppSystemInterfaceId = r.Id,
-                                    FieidName = property.Name
-                                });
-                            }
-                        }
-                        break;
-                    case "GetCorresUnitSearchAsync":
-                    case "GetCorresUnitDetailAsync":
-                        var properties4 = GetProperties<CorresUnitDetailsDto>();
-                        foreach (var property in properties4)
-                        {
-                            if (!excludedProperties.Contains(property.Name))
-                            {
-                                ddd.Add(new SystemInterfaceField
-                                {
-                                    Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
-                                    AppSystemInterfaceId = r.Id,
-                                    FieidName = property.Name
-                                });
-                            }
-                        }
-                        break;
-                    case "GetCountryRegionSearchAsync":
-                    case "GetCountryRegionDetailsAsync":
-                        var properties5 = GetProperties<CountryRegionDetailsDto>();
-                        foreach (var property in properties5)
-                        {
-                            if (!excludedProperties.Contains(property.Name))
-                            {
-                                ddd.Add(new SystemInterfaceField
-                                {
-                                    Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
-                                    AppSystemInterfaceId = r.Id,
-                                    FieidName = property.Name
-                                });
-                            }
-                        }
-                        break;
-                    case "GetCountryContinentSearchAsync":
-                    case "GetCountryContinentDetailsAsync":
-                        var properties6 = GetProperties<CountryContinentDetailsDto>();
-                        foreach (var property in properties6)
-                        {
-                            if (!excludedProperties.Contains(property.Name))
-                            {
-                                ddd.Add(new SystemInterfaceField
-                                {
-                                    Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
-                                    AppSystemInterfaceId = r.Id,
-                                    FieidName = property.Name
-                                });
-                            }
-                        }
-                        break;
-                    case "GetFinancialInstitutionSearchAsync":
-                    case "GetFinancialInstitutionDetailsAsync":
-                        var properties7 = GetProperties<FinancialInstitutionDetailsDto>();
-                        foreach (var property in properties7)
-                        {
-                            if (!excludedProperties.Contains(property.Name))
-                            {
-                                ddd.Add(new SystemInterfaceField
-                                {
-                                    Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
-                                    AppSystemInterfaceId = r.Id,
-                                    FieidName = property.Name
-                                });
-                            }
-                        }
-                        break;
-                    case "GetDeviceClassCodeSearchAsync":
-                    case "GetDeviceClassCodeDetailsAsync":
-                        var properties8 = GetProperties<DeviceClassCodeDetailsDto>();
-                        foreach (var property in properties8)
-                        {
-                            if (!excludedProperties.Contains(property.Name))
-                            {
-                                ddd.Add(new SystemInterfaceField
-                                {
-                                    Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
-                                    AppSystemInterfaceId = r.Id,
-                                    FieidName = property.Name.ToLower()
-                                });
-                            }
-                        }
-                        break;
-                    case "GetInvoiceTypeSearchAsync":
-                    case "GetInvoiceTypeDetailsASync":
-                        var properties9 = GetProperties<InvoiceTypeDetailshDto>();
-                        foreach (var property in properties9)
-                        {
-                            if (!excludedProperties.Contains(property.Name))
-                            {
-                                ddd.Add(new SystemInterfaceField
-                                {
-                                    Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
-                                    AppSystemInterfaceId = r.Id,
-                                    FieidName = property.Name
-                                });
-                            }
-                        }
-                        break;
-                    case "GetScientifiCNoProjectSearchAsync":
-                    case "GetScientifiCNoProjectDetailsAsync":
-                        //var properties10 = GetProperties<ScientifiCNoProjectDetailsDto>();
-                        var properties10 = GetProperties<DHResearch>();
-                        foreach (var property in properties10)
-                        {
-                            if (!excludedProperties.Contains(property.Name))
-                            {
-                                ddd.Add(new SystemInterfaceField
-                                {
-                                    Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
-                                    AppSystemInterfaceId = r.Id,
-                                    FieidName = property.Name.ToLower()
-                                });
-                            }
-                        }
-                        break;
-                    case "GetLanguageSearchAsync":
-                    case "GetLanguageDetailsAsync":
-                        var properties11 = GetProperties<LanguageDetailsDto>();
-                        foreach (var property in properties11)
-                        {
-                            if (!excludedProperties.Contains(property.Name))
-                            {
-                                ddd.Add(new SystemInterfaceField
-                                {
-                                    Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
-                                    AppSystemInterfaceId = r.Id,
-                                    FieidName = property.Name
-                                });
-                            }
-                        }
-                        break;
-                    case "GetBankCardSearchAsync":
-                    case "GetBankCardDetailsAsync":
-                        var properties12 = GetProperties<BankCardDetailsDto>();
-                        foreach (var property in properties12)
-                        {
-                            if (!excludedProperties.Contains(property.Name))
-                            {
-                                ddd.Add(new SystemInterfaceField
-                                {
-                                    Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
-                                    AppSystemInterfaceId = r.Id,
-                                    FieidName = property.Name
-                                });
-                            }
-                        }
-                        break;
-                    case "GetDeviceDetailCodeSearchAsync":
-                    case "GetDeviceDetailCodeDetailsAsync":
-                        var properties13 = GetProperties<DeviceDetailCodeDetailsDto>();
-                        foreach (var property in properties13)
-                        {
-                            if (!excludedProperties.Contains(property.Name))
-                            {
-                                ddd.Add(new SystemInterfaceField
-                                {
-                                    Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
-                                    AppSystemInterfaceId = r.Id,
-                                    FieidName = property.Name
-                                });
-                            }
-                        }
-                        break;
-                    case "GetAccountingDepartmentSearchAsync":
-                    case "GetAccountingDepartmentDetailsAsync":
-                        //var properties14 = GetProperties<AccountingDepartmentDetailsDto>();
-                        var properties14 = GetProperties<DHAccountingDept>();
-                        foreach (var property in properties14)
-                        {
-                            if (!excludedProperties.Contains(property.Name))
-                            {
-                                ddd.Add(new SystemInterfaceField
-                                {
-                                    Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
-                                    AppSystemInterfaceId = r.Id,
-                                    FieidName = property.Name
-                                });
-                            }
-                        }
-                        break;
-                    case "GetRelationalContractsSearchAsync":
-                    case "GetRelationalContractsDetailsAsync":
-                        var properties15 = GetProperties<RelationalContractsDetailsDto>();
-                        foreach (var property in properties15)
-                        {
-                            if (!excludedProperties.Contains(property.Name))
-                            {
-                                ddd.Add(new SystemInterfaceField
-                                {
-                                    Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
-                                    AppSystemInterfaceId = r.Id,
-                                    FieidName = property.Name
-                                });
-                            }
-                        }
-                        break;
-                    case "GetRegionalDetailsAsync":
-                    case "GetRegionalSearchAsync":
-                        var properties16 = GetProperties<RegionalDetailsDto>();
-                        foreach (var property in properties16)
-                        {
-                            if (!excludedProperties.Contains(property.Name))
-                            {
-                                ddd.Add(new SystemInterfaceField
-                                {
-                                    Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
-                                    AppSystemInterfaceId = r.Id,
-                                    FieidName = property.Name
-                                });
-                            }
-                        }
-                        break;
-                    case "GetUnitMeasurementSearchAsync":
-                    case "GetUnitMeasurementDetailsAsync":
-                        var properties17 = GetProperties<UnitMeasurementDetailsDto>();
-                        foreach (var property in properties17)
-                        {
-                            if (!excludedProperties.Contains(property.Name))
-                            {
-                                ddd.Add(new SystemInterfaceField
-                                {
-                                    Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
-                                    AppSystemInterfaceId = r.Id,
-                                    FieidName = property.Name
-                                });
-                            }
-                        }
-                        break;
-                    case "GetProjectClassificationSearchAsync":
-                    case "GetProjectClassificationDetailsAsync":
-                        var properties18 = GetProperties<ProjectClassificationDetailsDto>();
-                        foreach (var property in properties18)
-                        {
-                            if (!excludedProperties.Contains(property.Name))
-                            {
-                                ddd.Add(new SystemInterfaceField
-                                {
-                                    Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
-                                    AppSystemInterfaceId = r.Id,
-                                    FieidName = property.Name
-                                });
-                            }
-                        }
-                        break;
-                    case "GetRegionalCenterSearchAsync":
-                    case "GetRegionalCenterDetailsAsync":
-                        var properties19 = GetProperties<RegionalCenterDetailsDto>();
-                        foreach (var property in properties19)
-                        {
-                            if (!excludedProperties.Contains(property.Name))
-                            {
-                                ddd.Add(new SystemInterfaceField
-                                {
-                                    Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
-                                    AppSystemInterfaceId = r.Id,
-                                    FieidName = property.Name
-                                });
-                            }
-                        }
-                        break;
-                    case "GetNationalEconomySearchAsync":
-                    case "GetNationalEconomyDetailsAsync":
-                        var properties20 = GetProperties<NationalEconomyDetailsDto>();
-                        foreach (var property in properties20)
-                        {
-                            if (!excludedProperties.Contains(property.Name))
-                            {
-                                ddd.Add(new SystemInterfaceField
-                                {
-                                    Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
-                                    AppSystemInterfaceId = r.Id,
-                                    FieidName = property.Name
-                                });
-                            }
-                        }
-                        break;
-                    case "GetAdministrativeAccountingMapperSearchAsync":
-                    case "GetAdministrativeAccountingMapperDetailsAsync":
-                        //var properties21 = GetProperties<AdministrativeAccountingMapperDetailsDto>();
-                        var properties21 = GetProperties<DHAdministrative>();
-                        foreach (var property in properties21)
-                        {
-                            if (!excludedProperties.Contains(property.Name))
-                            {
-                                ddd.Add(new SystemInterfaceField
-                                {
-                                    Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
-                                    AppSystemInterfaceId = r.Id,
-                                    FieidName = property.Name
-                                });
-                            }
-                        }
-                        break;
-                    case "GetEscrowOrganizationSearchAsync":
-                    case "GetEscrowOrganizationDetailsAsync":
-                        var properties23 = GetProperties<EscrowOrganizationDetailsDto>();
-                        foreach (var property in properties23)
-                        {
-                            if (!excludedProperties.Contains(property.Name))
-                            {
-                                ddd.Add(new SystemInterfaceField
-                                {
-                                    Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
-                                    AppSystemInterfaceId = r.Id,
-                                    FieidName = property.Name
-                                });
-                            }
-                        }
-                        break;
-                    case "GetBusinessNoCpportunitySearchAsync":
-                    case "GetBusinessCpportunitySearchAsync":
-                    case "GetBusinessNoCpportunityDetailsAsync":
-                        //var properties24 = GetProperties<BusinessNoCpportunityDetailsDto>();
-                        var properties24 = GetProperties<DHOpportunity>();
-                        foreach (var property in properties24)
-                        {
-                            if (!excludedProperties.Contains(property.Name))
-                            {
-                                ddd.Add(new SystemInterfaceField
-                                {
-                                    Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
-                                    AppSystemInterfaceId = r.Id,
-                                    FieidName = property.Name
-                                });
-                            }
-                        }
-                        break;
-                    case "GetAdministrativeDivisionSearchAsync":
-                    case "GetAdministrativeDivisionDetailsAsync":
-                        var properties25 = GetProperties<AdministrativeDivisionDetailsDto>();
-                        foreach (var property in properties25)
-                        {
-                            if (!excludedProperties.Contains(property.Name))
-                            {
-                                ddd.Add(new SystemInterfaceField
-                                {
-                                    Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
-                                    AppSystemInterfaceId = r.Id,
-                                    FieidName = property.Name
-                                });
-                            }
-                        }
-                        break;
-                    case "GetAccountingOrganizationSearchAsync":
-                    case "GetAccountingOrganizationDetailsAsync":
-                        //var properties26 = GetProperties<AccountingOrganizationDetailsDto>();
-                        var properties26 = GetProperties<DHAdjustAccountsMultipleOrg>();
-                        foreach (var property in properties26)
-                        {
-                            if (!excludedProperties.Contains(property.Name))
-                            {
-                                ddd.Add(new SystemInterfaceField
-                                {
-                                    Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
-                                    AppSystemInterfaceId = r.Id,
-                                    FieidName = property.Name
-                                });
-                            }
-                        }
-                        break;
-                    case "GetCurrencySearchAsync":
-                    case "GetCurrencyDetailsAsync":
-                        var properties27 = GetProperties<CurrencyDetailsDto>();
-                        foreach (var property in properties27)
-                        {
-                            if (!excludedProperties.Contains(property.Name))
-                            {
-                                ddd.Add(new SystemInterfaceField
-                                {
-                                    Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
-                                    AppSystemInterfaceId = r.Id,
-                                    FieidName = property.Name
-                                });
-                            }
-                        }
-                        break;
-                    case "GetValueDomainReceiveAsync":
-                        var properties28 = GetProperties<ValueDomainReceiveResponseDto>();
-                        foreach (var property in properties28)
-                        {
-                            if (!excludedProperties.Contains(property.Name))
-                            {
-                                ddd.Add(new SystemInterfaceField
-                                {
-                                    Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
-                                    AppSystemInterfaceId = r.Id,
-                                    FieidName = property.Name
-                                });
-                            }
-                        }
-                        break;
-                    case "GetDHVirtualProjectAsync":
-                        var properties29 = GetProperties<DHVirtualProject>();
-                        foreach (var property in properties29)
-                        {
-                            if (!excludedProperties.Contains(property.Name))
-                            {
-                                ddd.Add(new SystemInterfaceField
-                                {
-                                    Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
-                                    AppSystemInterfaceId = r.Id,
-                                    FieidName = property.Name
-                                });
-                            }
-                        }
-                        break;
+                    //case "GetUserSearchAsync":
+                    //case "GetUserDetailsAsync":
+                    //    var properties = GetProperties<UserSearchDetailsDto>();
+                    //    foreach (var property in properties)
+                    //    {
+                    //        if (!excludedProperties.Contains(property.Name))
+                    //        {
+                    //            ddd.Add(new SystemInterfaceField
+                    //            {
+                    //                Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                    //                AppSystemInterfaceId = r.Id,
+                    //                FieidName = property.Name
+                    //            });
+                    //        }
+                    //    }
+                    //    break;
+                    //case "GetInstitutionsAsync":
+                    //case "GetInstitutionDetailsAsync":
+                    //    var properties2 = GetProperties<InstitutionDetatilsDto>();
+                    //    foreach (var property in properties2)
+                    //    {
+                    //        if (!excludedProperties.Contains(property.Name))
+                    //        {
+                    //            ddd.Add(new SystemInterfaceField
+                    //            {
+                    //                Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                    //                AppSystemInterfaceId = r.Id,
+                    //                FieidName = property.Name
+                    //            });
+                    //        }
+                    //    }
+                    //    break;
+                    //case "GetProjectSearchAsync":
+                    //case "GetProjectDetailsAsync":
+                    //    //var properties3 = GetProperties<ProjectDetailsDto>();
+                    //    var properties3 = GetProperties<DHProjects>();
+                    //    foreach (var property in properties3)
+                    //    {
+                    //        if (!excludedProperties.Contains(property.Name))
+                    //        {
+                    //            ddd.Add(new SystemInterfaceField
+                    //            {
+                    //                Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                    //                AppSystemInterfaceId = r.Id,
+                    //                FieidName = property.Name
+                    //            });
+                    //        }
+                    //    }
+                    //    break;
+                    //case "GetCorresUnitSearchAsync":
+                    //case "GetCorresUnitDetailAsync":
+                    //    var properties4 = GetProperties<CorresUnitDetailsDto>();
+                    //    foreach (var property in properties4)
+                    //    {
+                    //        if (!excludedProperties.Contains(property.Name))
+                    //        {
+                    //            ddd.Add(new SystemInterfaceField
+                    //            {
+                    //                Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                    //                AppSystemInterfaceId = r.Id,
+                    //                FieidName = property.Name
+                    //            });
+                    //        }
+                    //    }
+                    //    break;
+                    //case "GetCountryRegionSearchAsync":
+                    //case "GetCountryRegionDetailsAsync":
+                    //    var properties5 = GetProperties<CountryRegionDetailsDto>();
+                    //    foreach (var property in properties5)
+                    //    {
+                    //        if (!excludedProperties.Contains(property.Name))
+                    //        {
+                    //            ddd.Add(new SystemInterfaceField
+                    //            {
+                    //                Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                    //                AppSystemInterfaceId = r.Id,
+                    //                FieidName = property.Name
+                    //            });
+                    //        }
+                    //    }
+                    //    break;
+                    //case "GetCountryContinentSearchAsync":
+                    //case "GetCountryContinentDetailsAsync":
+                    //    var properties6 = GetProperties<CountryContinentDetailsDto>();
+                    //    foreach (var property in properties6)
+                    //    {
+                    //        if (!excludedProperties.Contains(property.Name))
+                    //        {
+                    //            ddd.Add(new SystemInterfaceField
+                    //            {
+                    //                Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                    //                AppSystemInterfaceId = r.Id,
+                    //                FieidName = property.Name
+                    //            });
+                    //        }
+                    //    }
+                    //    break;
+                    //case "GetFinancialInstitutionSearchAsync":
+                    //case "GetFinancialInstitutionDetailsAsync":
+                    //    var properties7 = GetProperties<FinancialInstitutionDetailsDto>();
+                    //    foreach (var property in properties7)
+                    //    {
+                    //        if (!excludedProperties.Contains(property.Name))
+                    //        {
+                    //            ddd.Add(new SystemInterfaceField
+                    //            {
+                    //                Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                    //                AppSystemInterfaceId = r.Id,
+                    //                FieidName = property.Name
+                    //            });
+                    //        }
+                    //    }
+                    //    break;
+                    //case "GetDeviceClassCodeSearchAsync":
+                    //case "GetDeviceClassCodeDetailsAsync":
+                    //    var properties8 = GetProperties<DeviceClassCodeDetailsDto>();
+                    //    foreach (var property in properties8)
+                    //    {
+                    //        if (!excludedProperties.Contains(property.Name))
+                    //        {
+                    //            ddd.Add(new SystemInterfaceField
+                    //            {
+                    //                Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                    //                AppSystemInterfaceId = r.Id,
+                    //                FieidName = property.Name.ToLower()
+                    //            });
+                    //        }
+                    //    }
+                    //    break;
+                    //case "GetInvoiceTypeSearchAsync":
+                    //case "GetInvoiceTypeDetailsASync":
+                    //    var properties9 = GetProperties<InvoiceTypeDetailshDto>();
+                    //    foreach (var property in properties9)
+                    //    {
+                    //        if (!excludedProperties.Contains(property.Name))
+                    //        {
+                    //            ddd.Add(new SystemInterfaceField
+                    //            {
+                    //                Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                    //                AppSystemInterfaceId = r.Id,
+                    //                FieidName = property.Name
+                    //            });
+                    //        }
+                    //    }
+                    //    break;
+                    //case "GetScientifiCNoProjectSearchAsync":
+                    //case "GetScientifiCNoProjectDetailsAsync":
+                    //    //var properties10 = GetProperties<ScientifiCNoProjectDetailsDto>();
+                    //    var properties10 = GetProperties<DHResearch>();
+                    //    foreach (var property in properties10)
+                    //    {
+                    //        if (!excludedProperties.Contains(property.Name))
+                    //        {
+                    //            ddd.Add(new SystemInterfaceField
+                    //            {
+                    //                Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                    //                AppSystemInterfaceId = r.Id,
+                    //                FieidName = property.Name.ToLower()
+                    //            });
+                    //        }
+                    //    }
+                    //    break;
+                    //case "GetLanguageSearchAsync":
+                    //case "GetLanguageDetailsAsync":
+                    //    var properties11 = GetProperties<LanguageDetailsDto>();
+                    //    foreach (var property in properties11)
+                    //    {
+                    //        if (!excludedProperties.Contains(property.Name))
+                    //        {
+                    //            ddd.Add(new SystemInterfaceField
+                    //            {
+                    //                Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                    //                AppSystemInterfaceId = r.Id,
+                    //                FieidName = property.Name
+                    //            });
+                    //        }
+                    //    }
+                    //    break;
+                    //case "GetBankCardSearchAsync":
+                    //case "GetBankCardDetailsAsync":
+                    //    var properties12 = GetProperties<BankCardDetailsDto>();
+                    //    foreach (var property in properties12)
+                    //    {
+                    //        if (!excludedProperties.Contains(property.Name))
+                    //        {
+                    //            ddd.Add(new SystemInterfaceField
+                    //            {
+                    //                Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                    //                AppSystemInterfaceId = r.Id,
+                    //                FieidName = property.Name
+                    //            });
+                    //        }
+                    //    }
+                    //    break;
+                    //case "GetDeviceDetailCodeSearchAsync":
+                    //case "GetDeviceDetailCodeDetailsAsync":
+                    //    var properties13 = GetProperties<DeviceDetailCodeDetailsDto>();
+                    //    foreach (var property in properties13)
+                    //    {
+                    //        if (!excludedProperties.Contains(property.Name))
+                    //        {
+                    //            ddd.Add(new SystemInterfaceField
+                    //            {
+                    //                Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                    //                AppSystemInterfaceId = r.Id,
+                    //                FieidName = property.Name
+                    //            });
+                    //        }
+                    //    }
+                    //    break;
+                    //case "GetAccountingDepartmentSearchAsync":
+                    //case "GetAccountingDepartmentDetailsAsync":
+                    //    //var properties14 = GetProperties<AccountingDepartmentDetailsDto>();
+                    //    var properties14 = GetProperties<DHAccountingDept>();
+                    //    foreach (var property in properties14)
+                    //    {
+                    //        if (!excludedProperties.Contains(property.Name))
+                    //        {
+                    //            ddd.Add(new SystemInterfaceField
+                    //            {
+                    //                Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                    //                AppSystemInterfaceId = r.Id,
+                    //                FieidName = property.Name
+                    //            });
+                    //        }
+                    //    }
+                    //    break;
+                    //case "GetRelationalContractsSearchAsync":
+                    //case "GetRelationalContractsDetailsAsync":
+                    //    var properties15 = GetProperties<RelationalContractsDetailsDto>();
+                    //    foreach (var property in properties15)
+                    //    {
+                    //        if (!excludedProperties.Contains(property.Name))
+                    //        {
+                    //            ddd.Add(new SystemInterfaceField
+                    //            {
+                    //                Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                    //                AppSystemInterfaceId = r.Id,
+                    //                FieidName = property.Name
+                    //            });
+                    //        }
+                    //    }
+                    //    break;
+                    //case "GetRegionalDetailsAsync":
+                    //case "GetRegionalSearchAsync":
+                    //    var properties16 = GetProperties<RegionalDetailsDto>();
+                    //    foreach (var property in properties16)
+                    //    {
+                    //        if (!excludedProperties.Contains(property.Name))
+                    //        {
+                    //            ddd.Add(new SystemInterfaceField
+                    //            {
+                    //                Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                    //                AppSystemInterfaceId = r.Id,
+                    //                FieidName = property.Name
+                    //            });
+                    //        }
+                    //    }
+                    //    break;
+                    //case "GetUnitMeasurementSearchAsync":
+                    //case "GetUnitMeasurementDetailsAsync":
+                    //    var properties17 = GetProperties<UnitMeasurementDetailsDto>();
+                    //    foreach (var property in properties17)
+                    //    {
+                    //        if (!excludedProperties.Contains(property.Name))
+                    //        {
+                    //            ddd.Add(new SystemInterfaceField
+                    //            {
+                    //                Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                    //                AppSystemInterfaceId = r.Id,
+                    //                FieidName = property.Name
+                    //            });
+                    //        }
+                    //    }
+                    //    break;
+                    //case "GetProjectClassificationSearchAsync":
+                    //case "GetProjectClassificationDetailsAsync":
+                    //    var properties18 = GetProperties<ProjectClassificationDetailsDto>();
+                    //    foreach (var property in properties18)
+                    //    {
+                    //        if (!excludedProperties.Contains(property.Name))
+                    //        {
+                    //            ddd.Add(new SystemInterfaceField
+                    //            {
+                    //                Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                    //                AppSystemInterfaceId = r.Id,
+                    //                FieidName = property.Name
+                    //            });
+                    //        }
+                    //    }
+                    //    break;
+                    //case "GetRegionalCenterSearchAsync":
+                    //case "GetRegionalCenterDetailsAsync":
+                    //    var properties19 = GetProperties<RegionalCenterDetailsDto>();
+                    //    foreach (var property in properties19)
+                    //    {
+                    //        if (!excludedProperties.Contains(property.Name))
+                    //        {
+                    //            ddd.Add(new SystemInterfaceField
+                    //            {
+                    //                Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                    //                AppSystemInterfaceId = r.Id,
+                    //                FieidName = property.Name
+                    //            });
+                    //        }
+                    //    }
+                    //    break;
+                    //case "GetNationalEconomySearchAsync":
+                    //case "GetNationalEconomyDetailsAsync":
+                    //    var properties20 = GetProperties<NationalEconomyDetailsDto>();
+                    //    foreach (var property in properties20)
+                    //    {
+                    //        if (!excludedProperties.Contains(property.Name))
+                    //        {
+                    //            ddd.Add(new SystemInterfaceField
+                    //            {
+                    //                Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                    //                AppSystemInterfaceId = r.Id,
+                    //                FieidName = property.Name
+                    //            });
+                    //        }
+                    //    }
+                    //    break;
+                    //case "GetAdministrativeAccountingMapperSearchAsync":
+                    //case "GetAdministrativeAccountingMapperDetailsAsync":
+                    //    //var properties21 = GetProperties<AdministrativeAccountingMapperDetailsDto>();
+                    //    var properties21 = GetProperties<DHAdministrative>();
+                    //    foreach (var property in properties21)
+                    //    {
+                    //        if (!excludedProperties.Contains(property.Name))
+                    //        {
+                    //            ddd.Add(new SystemInterfaceField
+                    //            {
+                    //                Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                    //                AppSystemInterfaceId = r.Id,
+                    //                FieidName = property.Name
+                    //            });
+                    //        }
+                    //    }
+                    //    break;
+                    //case "GetEscrowOrganizationSearchAsync":
+                    //case "GetEscrowOrganizationDetailsAsync":
+                    //    var properties23 = GetProperties<EscrowOrganizationDetailsDto>();
+                    //    foreach (var property in properties23)
+                    //    {
+                    //        if (!excludedProperties.Contains(property.Name))
+                    //        {
+                    //            ddd.Add(new SystemInterfaceField
+                    //            {
+                    //                Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                    //                AppSystemInterfaceId = r.Id,
+                    //                FieidName = property.Name
+                    //            });
+                    //        }
+                    //    }
+                    //    break;
+                    //case "GetBusinessNoCpportunitySearchAsync":
+                    //case "GetBusinessCpportunitySearchAsync":
+                    //case "GetBusinessNoCpportunityDetailsAsync":
+                    //    //var properties24 = GetProperties<BusinessNoCpportunityDetailsDto>();
+                    //    var properties24 = GetProperties<DHOpportunity>();
+                    //    foreach (var property in properties24)
+                    //    {
+                    //        if (!excludedProperties.Contains(property.Name))
+                    //        {
+                    //            ddd.Add(new SystemInterfaceField
+                    //            {
+                    //                Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                    //                AppSystemInterfaceId = r.Id,
+                    //                FieidName = property.Name
+                    //            });
+                    //        }
+                    //    }
+                    //    break;
+                    //case "GetAdministrativeDivisionSearchAsync":
+                    //case "GetAdministrativeDivisionDetailsAsync":
+                    //    var properties25 = GetProperties<AdministrativeDivisionDetailsDto>();
+                    //    foreach (var property in properties25)
+                    //    {
+                    //        if (!excludedProperties.Contains(property.Name))
+                    //        {
+                    //            ddd.Add(new SystemInterfaceField
+                    //            {
+                    //                Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                    //                AppSystemInterfaceId = r.Id,
+                    //                FieidName = property.Name
+                    //            });
+                    //        }
+                    //    }
+                    //    break;
+                    //case "GetAccountingOrganizationSearchAsync":
+                    //case "GetAccountingOrganizationDetailsAsync":
+                    //    //var properties26 = GetProperties<AccountingOrganizationDetailsDto>();
+                    //    var properties26 = GetProperties<DHAdjustAccountsMultipleOrg>();
+                    //    foreach (var property in properties26)
+                    //    {
+                    //        if (!excludedProperties.Contains(property.Name))
+                    //        {
+                    //            ddd.Add(new SystemInterfaceField
+                    //            {
+                    //                Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                    //                AppSystemInterfaceId = r.Id,
+                    //                FieidName = property.Name
+                    //            });
+                    //        }
+                    //    }
+                    //    break;
+                    //case "GetCurrencySearchAsync":
+                    //case "GetCurrencyDetailsAsync":
+                    //    var properties27 = GetProperties<CurrencyDetailsDto>();
+                    //    foreach (var property in properties27)
+                    //    {
+                    //        if (!excludedProperties.Contains(property.Name))
+                    //        {
+                    //            ddd.Add(new SystemInterfaceField
+                    //            {
+                    //                Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                    //                AppSystemInterfaceId = r.Id,
+                    //                FieidName = property.Name
+                    //            });
+                    //        }
+                    //    }
+                    //    break;
+                    //case "GetValueDomainReceiveAsync":
+                    //    var properties28 = GetProperties<ValueDomainReceiveResponseDto>();
+                    //    foreach (var property in properties28)
+                    //    {
+                    //        if (!excludedProperties.Contains(property.Name))
+                    //        {
+                    //            ddd.Add(new SystemInterfaceField
+                    //            {
+                    //                Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                    //                AppSystemInterfaceId = r.Id,
+                    //                FieidName = property.Name
+                    //            });
+                    //        }
+                    //    }
+                    //    break;
+                    //case "GetDHVirtualProjectAsync":
+                    //    var properties29 = GetProperties<DHVirtualProject>();
+                    //    foreach (var property in properties29)
+                    //    {
+                    //        if (!excludedProperties.Contains(property.Name))
+                    //        {
+                    //            ddd.Add(new SystemInterfaceField
+                    //            {
+                    //                Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                    //                AppSystemInterfaceId = r.Id,
+                    //                FieidName = property.Name
+                    //            });
+                    //        }
+                    //    }
+                    //    break;
                     case "GetXZOrganzationSearchAsync":
-                        var properties30 = GetProperties<AdministrativeOrganization>();
+                        //var properties30 = GetProperties<AdministrativeOrganization>();
+                        var properties30 = GetProperties<DHOrganzationDep>();
                         foreach (var property in properties30)
                         {
                             if (!excludedProperties.Contains(property.Name))
