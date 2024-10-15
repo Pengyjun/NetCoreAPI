@@ -342,11 +342,11 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveDHDataService
             };
 
             //获取接收数据
-            var data = await GetDataAsync<DHtProjects>(requestDto);
+            var data = await GetDataAsync<DHProjects>(requestDto);
 
             if (data != null && data.Any())
             {
-                var tData = await _dbContext.Queryable<DHtProjects>().Where(x => x.IsDelete == 1).ToListAsync();
+                var tData = await _dbContext.Queryable<DHProjects>().Where(x => x.IsDelete == 1).ToListAsync();
 
                 var keyIds = new HashSet<string>(tData.Select(t => t.ZPROJECT));
                 var insertTable = data.Where(x => !keyIds.Contains(x.ZPROJECT)).ToList();
@@ -355,7 +355,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveDHDataService
                 if (insertTable.Any())
                 {
                     foreach (var item in insertTable) { item.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(); item.IsDelete = Convert.ToInt32(item.Zdelete); item.CreateTime = DateTime.Now; }
-                    await _dbContext.Fastest<DHtProjects>().BulkCopyAsync(insertTable);
+                    await _dbContext.Fastest<DHProjects>().BulkCopyAsync(insertTable);
                 }
                 if (updateTable.Any())
                 {

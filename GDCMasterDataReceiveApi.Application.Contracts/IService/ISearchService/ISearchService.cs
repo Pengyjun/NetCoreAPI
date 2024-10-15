@@ -69,7 +69,7 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.IService.ISearchService
         /// <param name="requestDto"></param>
         /// <returns></returns>
         //Task<ResponseAjaxResult<List<ProjectDetailsDto>>> GetProjectSearchAsync(FilterCondition requestDto);
-        Task<ResponseAjaxResult<List<DHtProjects>>> GetProjectSearchAsync(FilterCondition requestDto);
+        Task<ResponseAjaxResult<List<DHProjects>>> GetProjectSearchAsync(FilterCondition requestDto);
         /// <summary>
         /// 虚拟项目DH
         /// </summary>

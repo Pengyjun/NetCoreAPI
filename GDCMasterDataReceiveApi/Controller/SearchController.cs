@@ -112,7 +112,7 @@ namespace GDCMasterDataReceiveApi.Controller
         /// <param name="requestDto"></param>
         /// <returns></returns>
         [HttpPost("GetProjectSearch")]
-        public async Task<ResponseAjaxResult<List<DHtProjects>>> GetProjectSearchAsync([FromBody] FilterCondition requestDto)
+        public async Task<ResponseAjaxResult<List<DHProjects>>> GetProjectSearchAsync([FromBody] FilterCondition requestDto)
         {
             return await _searchService.GetProjectSearchAsync(requestDto);
         }

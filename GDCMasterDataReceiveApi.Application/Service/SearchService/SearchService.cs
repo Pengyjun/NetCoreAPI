@@ -1126,20 +1126,20 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<List<DHtProjects>>> GetProjectSearchAsync(FilterCondition requestDto)
+        public async Task<ResponseAjaxResult<List<DHProjects>>> GetProjectSearchAsync(FilterCondition requestDto)
         {
-            var responseAjaxResult = new ResponseAjaxResult<List<DHtProjects>>();
+            var responseAjaxResult = new ResponseAjaxResult<List<DHProjects>>();
             RefAsync<int> total = 0;
 
             //过滤条件
-            DHtProjects filterCondition = new();
+            DHProjects filterCondition = new();
             if (!string.IsNullOrWhiteSpace(requestDto.FilterConditionJson))
             {
-                filterCondition = JsonConvert.DeserializeObject<DHtProjects>(requestDto.FilterConditionJson);
+                filterCondition = JsonConvert.DeserializeObject<DHProjects>(requestDto.FilterConditionJson);
             }
 
             #region 项目初始查询
-            var proList = await _dbContext.Queryable<DHtProjects>()
+            var proList = await _dbContext.Queryable<DHProjects>()
                 .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZPROJECT), (pro) => pro.ZPROJECT.Contains(filterCondition.ZPROJECT))
                 .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZPROJNAME), (pro) => pro.ZPROJNAME.Contains(filterCondition.ZPROJNAME))
                 .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZPROJENAME), (pro) => pro.ZPROJENAME.Contains(filterCondition.ZPROJENAME))
@@ -1201,7 +1201,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                 .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.CreatedAt.ToString()), (pro) => Convert.ToDateTime(pro.CreatedAt).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.CreatedAt).ToString("yyyy-MM-dd"))
                 .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.UpdatedAt.ToString()), (pro) => Convert.ToDateTime(pro.UpdatedAt).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.UpdatedAt).ToString("yyyy-MM-dd"))
                 .Where((pro) => pro.IsDelete == 1)
-                .Select((pro) => new DHtProjects
+                .Select((pro) => new DHProjects
                 {
                     IsDelete = pro.IsDelete,
                     Zdelete = pro.Zdelete,
@@ -2201,7 +2201,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     City = cc.ZCITY,
                     Country = cc.ZZCOUNTRY,
                     County = cc.ZCOUNTY,
-                    TypesOfAbroadOrg=cc.ZOFITYPE,
+                    TypesOfAbroadOrg = cc.ZOFITYPE,
                     EnglishName = cc.ZFINAME_E,
                     Name = cc.ZBANKNAME,
                     NameOfOrg = cc.ZFINAME,
@@ -2261,7 +2261,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                 item.TypesOfOrg = GetValueDomain(item.TypesOfOrg, valDomain, "ZDFITYPE");
 
                 //境外金融机构类型
-                item.TypesOfAbroadOrg = GetValueDomain(item.TypesOfAbroadOrg, valDomain, "ZDFITYPE");
+                item.TypesOfAbroadOrg = GetValueDomain(item.TypesOfAbroadOrg, valDomain, "ZOFITYPE");
             }
 
             responseAjaxResult.Count = total;
@@ -5156,7 +5156,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                         .ToListAsync();
 
                     //var properties3 = GetProperties<ProjectDetailsDto>();
-                    var properties3 = GetProperties<DHtProjects>();
+                    var properties3 = GetProperties<DHProjects>();
                     foreach (var property in properties3) { tableColumns.Add(property.Name); }
                     foreach (var item in tableColumns)
                     {
@@ -6515,7 +6515,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     case "GetProjectSearchAsync":
                     case "GetProjectDetailsAsync":
                         //var properties3 = GetProperties<ProjectDetailsDto>();
-                        var properties3 = GetProperties<DHtProjects>();
+                        var properties3 = GetProperties<DHProjects>();
                         foreach (var property in properties3)
                         {
                             if (!excludedProperties.Contains(property.Name))

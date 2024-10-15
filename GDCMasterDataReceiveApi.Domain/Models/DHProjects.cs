@@ -6,7 +6,7 @@ namespace GDCMasterDataReceiveApi.Domain.Models
     /// DH项目信息
     /// </summary>
     [SugarTable("t_dh_projects", IsDisabledDelete = true)]
-    public class DHtProjects : BaseEntity<long>
+    public class DHProjects : BaseEntity<long>
     {
         /// <summary>
         /// 项目主数据编码 主键
