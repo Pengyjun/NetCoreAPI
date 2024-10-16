@@ -591,7 +591,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
             #region 初始查询
             var tableList = await _dbContext.Queryable<Institution>().ToListAsync();
             //机构树初始化
-            var institutions =  tableList
+            var institutions = tableList
                 .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Name), t => t.NAME.Contains(filterCondition.Name))
                 .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Oid), t => t.OID.Contains(filterCondition.Oid))
                 .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.EntClass), t => t.ENTCLASS.Contains(filterCondition.EntClass))
@@ -3920,6 +3920,12 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                 .Select(t => new CountryRegionOrAdminDivisionDto { Code = t.ZADDVSCODE, Name = t.ZADDVSNAME })
                 .ToListAsync();
 
+            //中交区域总部
+            var zbKey = ccList.Select(t => t.Zregional).ToList();
+            var qyzb = await _dbContext.Queryable<Regional>()
+                .Where(t => t.IsDelete == 1 && zbKey.Contains(t.ZCRHCODE))
+                .ToListAsync();
+
             foreach (var item in ccList)
             {
                 //机构属性
@@ -3939,6 +3945,9 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
 
                 //企业分类代码
                 item.Zentc = valDomain.FirstOrDefault(x => item.Zentc == x.ZDOM_VALUE && x.ZDOM_CODE == "ZENTC")?.ZDOM_NAME;
+
+                //地域属性 （中交区域总部）
+                item.Zregional = qyzb.FirstOrDefault(x => item.Zregional == x.ZCRHCODE)?.ZCRHNAME;
 
                 //国家地区
                 item.Zcyname = GetCountryRegion(item.Zcyname, country);
@@ -4663,10 +4672,38 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                 .Select(t => new { t.ZCURRENCYCODE, t.ZCURRENCYNAME })
                 .ToListAsync();
 
+            //中交区域总部
+            var zbKey = ccList.Select(t => t.Zregional).ToList();
+            var qyzb = await _dbContext.Queryable<Regional>()
+                .Where(t => t.IsDelete == 1 && zbKey.Contains(t.ZCRHCODE))
+                .ToListAsync();
+
+            //项目机构 //商机项目机构
+            var pjectOrgKey = ccList.Select(x => x.ZapprovalOrg).ToList();
+            var pjectOrg = await _dbContext.Queryable<Institution>()
+                .Where(t => t.IsDelete == 1 && (pjectOrgKey.Contains(t.OID)))
+                .Select(t => new InstutionRespDto { Oid = t.OID, PoId = t.POID, Grule = t.GRULE, Name = t.NAME })
+                .ToListAsync();
+
+            //大洲
+            var dzKey = ccList.Select(x => x.Zcontinentcode).ToList();
+            var dz = await _dbContext.Queryable<CountryContinent>()
+                .Where(t => dzKey.Contains(t.ZCONTINENTCODE))
+                .ToListAsync();
+
             foreach (var item in ccList)
             {
+                //核算机构状态
+                item.Zaorgstate = valDomain.FirstOrDefault(x => item.Zaorgstate == x.ZDOM_VALUE && x.ZDOM_CODE == "ZD_MVIEW_ZY_ORGSTATE")?.ZDOM_NAME;
+
                 //机构状态
-                item.Zaorgstate = valDomain.FirstOrDefault(x => item.Zaorgstate == x.ZDOM_VALUE && x.ZDOM_CODE == "ZORGSTATE")?.ZDOM_NAME;
+                item.Zyorgstate = valDomain.FirstOrDefault(x => item.Zyorgstate == x.ZDOM_VALUE && x.ZDOM_CODE == "ZORGSTATE")?.ZDOM_NAME;
+
+                //机构属性
+                item.Zorgattr = valDomain.FirstOrDefault(x => item.Zorgattr == x.ZDOM_VALUE && x.ZDOM_CODE == "ZORGATTR")?.ZDOM_NAME;
+
+                //地域属性 （中交区域总部）
+                item.Zregional = qyzb.FirstOrDefault(x => item.Zregional == x.ZCRHCODE)?.ZCRHNAME;
 
                 //国家地区
                 item.Zcyname = GetCountryRegion(item.Zcyname, country);
@@ -4674,19 +4711,23 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                 //项目所在地
                 item.Zorgloc = GetAdministrativeDivision(item.Zorgloc, location);
 
-                //地域属性
-                item.Zorgloc = valDomain.FirstOrDefault(x => item.Zorgloc == x.ZDOM_VALUE && x.ZDOM_CODE == "RegionalAttr")?.ZDOM_NAME;
-
                 //币种
                 item.Zzcurrency = currency.FirstOrDefault(x => x.ZCURRENCYCODE == item.Zzcurrency)?.ZCURRENCYNAME;
 
                 //计税方式
                 item.Ztaxmethod = GetValueDomain(item.Ztaxmethod, valDomain, "ZTAXMETHOD");
 
-                //所属税务组织
-                //item.ZtaxOrganization = GetValueDomain(item.ZtaxOrganization, valDomain, "ZTAXMETHOD");
+                //所属事业部
+                item.ZbusinessUnit = GetValueDomain(item.ZbusinessUnit, valDomain, "ZD_MVIEW_BUSINESS_UNIT");
 
+                //报表节点性质
+                item.Zrpnature = GetValueDomain(item.Zrpnature, valDomain, "ZD_NODE_PROP");
 
+                //审批单位
+                item.ZapprovalOrg = GetInstitutionName(item.ZapprovalOrg, pjectOrg);
+
+                //州别名称
+                item.Zcontinentcode = dz.FirstOrDefault(x=>x.ZCONTINENTCODE==item.Zcontinentcode)?.ZCONTINENTNAME;
 
             }
 
