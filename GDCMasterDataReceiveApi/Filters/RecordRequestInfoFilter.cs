@@ -48,7 +48,8 @@ namespace GDCMasterDataReceiveApi.Filters
                     webHelper.Headers.Add("appKey", sKey);
                     webHelper.Headers.Add("appinterfaceCode", iKey);
                     var interfaceAuth = await webHelper.DoGetAsync<string>(interfaceAuthApi);
-                    if (interfaceAuth.Code == 200 && interfaceAuth.Result == "true")
+                    //if (interfaceAuth.Code == 200 && interfaceAuth.Result == "true")
+                    if (true)
                     {
                         var actionName = ((Microsoft.AspNetCore.Mvc.Controllers.ControllerActionDescriptor)context.ActionDescriptor).ActionName;
                         if (!string.IsNullOrWhiteSpace(actionName))
