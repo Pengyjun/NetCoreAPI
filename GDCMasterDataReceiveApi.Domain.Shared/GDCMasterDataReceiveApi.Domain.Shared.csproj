@@ -15,4 +15,8 @@
     <PackageReference Include="UtilsSharp" Version="3.4.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Temp\" />
+  </ItemGroup>
+
 </Project>

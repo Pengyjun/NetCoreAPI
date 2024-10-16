@@ -4,7 +4,50 @@ using SqlSugar;
 namespace GDCMasterDataReceiveApi.Application.Contracts.Dto
 {
     /// <summary>
-    /// 数据脱敏规则表
+    /// 系统授权表
+    /// </summary>
+    [Tenant("gdcdatasecurityapi")]
+    [SugarTable("t_appsystemauthorization", IsDisabledDelete = true)]
+    public class AppSystemAuthorization 
+    {
+        /// <summary>
+        /// 
+        /// </summary>
+        public long Id { get; set; }
+        /// <summary>
+        /// 系统简称标识
+        /// </summary>
+        [SugarColumn(Length = 128)]
+        public string? SystemIdentity { get; set; }
+        /// <summary>
+        /// 公司名称
+        /// </summary>
+        [SugarColumn(Length = 128)]
+        public string? CompanyName { get; set; }
+        /// <summary>
+        /// 系统标识名称
+        /// </summary>
+        [SugarColumn(Length = 128)]
+        public string? SystemIdentityName { get; set; }
+
+        /// <summary>
+        /// 系统授权码
+        /// </summary>
+        [SugarColumn(Length = 64)]
+        public string? AppKey { get; set; }
+
+        /// <summary>
+        /// 从哪个系统调用接口关联ID
+        /// </summary>
+        public long? SystemApiId { get; set; }
+        /// <summary>
+        /// 备注
+        /// </summary>
+        [SugarColumn(Length = 512)]
+        public string? Remark { get; set; }
+    }
+    /// <summary>
+    /// 接口授权表
     /// </summary>
     [Tenant("gdcdatasecurityapi")]
     [SugarTable("t_appinterfaceauthorization")]
@@ -101,6 +144,11 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto
         /// </summary>
         [SugarColumn(Length = 512)]
         public string? Remark { get; set; }
+        /// <summary>
+        /// 是否启用   0 未启用  1 启用
+        /// </summary>
+        [SugarColumn(ColumnDataType = "int", DefaultValue = "1")]
+        public int? Enable { get; set; }
 
     }
 
@@ -136,6 +184,11 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto
         public int? EndIndex { get; set; }
 
         /// <summary>
+        /// 是否启用   0 未启用  1 启用
+        /// </summary>
+        [SugarColumn(ColumnDataType = "int", DefaultValue = "1")]
+        public int? Enable { get; set; }
+        /// <summary>
         /// 数据脱敏类型   input  是截取    replace是替换
         /// </summary>
         [SugarColumn(ColumnDataType = "int")]
@@ -170,6 +223,11 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto
         /// </summary>
         [SugarColumn(Length = 512)]
         public string? Remark { get; set; }
+        /// <summary>
+        /// 是否启用   0 未启用  1 启用
+        /// </summary>
+        [SugarColumn(ColumnDataType = "int", DefaultValue = "1")]
+        public int? Enable { get; set; }
     }
     /// <summary>
     /// 

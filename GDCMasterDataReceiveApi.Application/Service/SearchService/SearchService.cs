@@ -865,9 +865,10 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
             }
 
             #endregion
-
-            //其他数据
-            var otherNodes = tableList
+            if (institutions != null && institutions.Any())
+            {
+                //其他数据
+                var otherNodes = tableList
                 .WhereIF(oids != null && oids.Any(), ins => oids.Contains(ins.OID))
                 .Where(ins => ins.OID != "101162350")
                 .Select(ins => new InstitutionDetatilsDto
@@ -922,62 +923,63 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                 })
                 .ToList();
 
-            //根节点
-            var rootNode = tableList
-                .Where(ins => ins.OID == "101162350")
-                .Select(ins => new InstitutionDetatilsDto
-                {
-                    Id = ins.Id.ToString(),
-                    BizDomain = ins.BIZDOMAIN,
-                    BizType = ins.BIZTYPE,
-                    Carea = ins.CAREA,
-                    Code = ins.OCODE,
-                    Coid = ins.COID,
-                    Crossorgan = ins.CROSSORGAN,
-                    EnglishName = ins.ENGLISHNAME,
-                    EnglishShortName = ins.ENGLISHSHORTNAME,
-                    EntClass = ins.ENTCLASS,
-                    GlobalSno = ins.GLOBAL_SNO,
-                    Goid = ins.GOID,
-                    Gpoid = ins.GPOID,
-                    Grade = ins.GRADE,
-                    IsIndependent = ins.IS_INDEPENDENT,
-                    MdmCode = ins.MDM_CODE,
-                    Mrut = ins.MRUT,
-                    Name = ins.NAME,
-                    Note = ins.NOTE,
-                    Oid = ins.OID,
-                    Oper = ins.OPER,
-                    Organemp = ins.ORGANEMP,
-                    OrganGrade = ins.ORGANGRADE,
-                    OrgGrade = ins.ORGGRADE,
-                    OrgProvince = ins.ORGPROVINCE,
-                    Orule = ins.ORULE,
-                    OSecBid = ins.O2BID,
-                    POid = ins.POID,
-                    ProjectManType = ins.PROJECTMANTYPE,
-                    ProjectScale = ins.PROJECTSCALE,
-                    ProjectType = ins.PROJECTTYPE,
-                    QyGrade = ins.QYGRADE,
-                    RegisterCode = ins.REGISTERCODE,
-                    RoId = ins.ROID,
-                    Rown = ins.ROWN,
-                    ShareHoldings = ins.SHAREHOLDINGS,
-                    ShortName = ins.SHORTNAME,
-                    Sno = ins.SNO,
-                    StartDate = ins.STARTDATE,
-                    Status = ins.STATUS,
-                    TemorganName = ins.TEMORGANNAME,
-                    TerritoryPro = ins.TERRITORYPRO,
-                    Type = ins.TYPE,
-                    TypeExt = ins.TYPEEXT,
-                    Version = ins.VERSION,
-                    CreateTime = ins.CreateTime,
-                    UpdateTime = ins.UpdateTime,
-                    Children = GetChildren(ins.OID, otherNodes)
-                })
-                .FirstOrDefault();
-            if (rootNode != null) result.Add(rootNode);
+                //根节点
+                var rootNode = tableList
+                    .Where(ins => ins.OID == "101162350")
+                    .Select(ins => new InstitutionDetatilsDto
+                    {
+                        Id = ins.Id.ToString(),
+                        BizDomain = ins.BIZDOMAIN,
+                        BizType = ins.BIZTYPE,
+                        Carea = ins.CAREA,
+                        Code = ins.OCODE,
+                        Coid = ins.COID,
+                        Crossorgan = ins.CROSSORGAN,
+                        EnglishName = ins.ENGLISHNAME,
+                        EnglishShortName = ins.ENGLISHSHORTNAME,
+                        EntClass = ins.ENTCLASS,
+                        GlobalSno = ins.GLOBAL_SNO,
+                        Goid = ins.GOID,
+                        Gpoid = ins.GPOID,
+                        Grade = ins.GRADE,
+                        IsIndependent = ins.IS_INDEPENDENT,
+                        MdmCode = ins.MDM_CODE,
+                        Mrut = ins.MRUT,
+                        Name = ins.NAME,
+                        Note = ins.NOTE,
+                        Oid = ins.OID,
+                        Oper = ins.OPER,
+                        Organemp = ins.ORGANEMP,
+                        OrganGrade = ins.ORGANGRADE,
+                        OrgGrade = ins.ORGGRADE,
+                        OrgProvince = ins.ORGPROVINCE,
+                        Orule = ins.ORULE,
+                        OSecBid = ins.O2BID,
+                        POid = ins.POID,
+                        ProjectManType = ins.PROJECTMANTYPE,
+                        ProjectScale = ins.PROJECTSCALE,
+                        ProjectType = ins.PROJECTTYPE,
+                        QyGrade = ins.QYGRADE,
+                        RegisterCode = ins.REGISTERCODE,
+                        RoId = ins.ROID,
+                        Rown = ins.ROWN,
+                        ShareHoldings = ins.SHAREHOLDINGS,
+                        ShortName = ins.SHORTNAME,
+                        Sno = ins.SNO,
+                        StartDate = ins.STARTDATE,
+                        Status = ins.STATUS,
+                        TemorganName = ins.TEMORGANNAME,
+                        TerritoryPro = ins.TERRITORYPRO,
+                        Type = ins.TYPE,
+                        TypeExt = ins.TYPEEXT,
+                        Version = ins.VERSION,
+                        CreateTime = ins.CreateTime,
+                        UpdateTime = ins.UpdateTime,
+                        Children = GetChildren(ins.OID, otherNodes)
+                    })
+                    .FirstOrDefault();
+                if (rootNode != null) result.Add(rootNode);
+            }
 
             responseAjaxResult.SuccessResult(result);
             responseAjaxResult.Count = result.Count;
