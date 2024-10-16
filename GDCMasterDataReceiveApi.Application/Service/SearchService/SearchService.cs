@@ -6686,6 +6686,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                 .Select(t => new { t.Id, t.InterfaceName, t.Remark })
               .ToListAsync();
 
+            #region MyRegion
             foreach (var r in resList)
             {
                 List<string> filds = new();
@@ -7144,24 +7145,59 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     //        }
                     //    }
                     //    break;
-                    case "GetXZOrganzationSearchAsync":
-                        //var properties30 = GetProperties<AdministrativeOrganization>();
-                        var properties30 = GetProperties<DHOrganzationDep>();
-                        foreach (var property in properties30)
-                        {
-                            if (!excludedProperties.Contains(property.Name))
-                            {
-                                ddd.Add(new SystemInterfaceField
-                                {
-                                    Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
-                                    AppSystemInterfaceId = r.Id,
-                                    FieidName = property.Name
-                                });
-                            }
-                        }
-                        break;
+                    //case "GetXZOrganzationSearchAsync":
+                    //    //var properties30 = GetProperties<AdministrativeOrganization>();
+                    //    var properties30 = GetProperties<DHOrganzationDep>();
+                    //    foreach (var property in properties30)
+                    //    {
+                    //        if (!excludedProperties.Contains(property.Name))
+                    //        {
+                    //            ddd.Add(new SystemInterfaceField
+                    //            {
+                    //                Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                    //                AppSystemInterfaceId = r.Id,
+                    //                FieidName = property.Name
+                    //            });
+                    //        }
+                    //    }
+                    //    break;
+                    //case "SearchNotesReceiveAsync":
+                    //    var properties30 = GetProperties<AdministrativeOrganization>();
+                    //    var properties31 = GetProperties<dwd_ffm_ap_bill_d>();
+                    //    foreach (var property in properties31)
+                    //    {
+                    //        if (!excludedProperties.Contains(property.Name))
+                    //        {
+                    //            ddd.Add(new SystemInterfaceField
+                    //            {
+                    //                Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                    //                AppSystemInterfaceId = r.Id,
+                    //                FieidName = property.Name
+                    //            });
+                    //        }
+                    //    }
+                    //    break;
+                    //case "SearchNotesPayableAsync":
+                    //    var properties30 = GetProperties<AdministrativeOrganization>();
+                    //    var properties32 = GetProperties<dwd_ffm_receive_new_d>();
+                    //    foreach (var property in properties32)
+                    //    {
+                    //        if (!excludedProperties.Contains(property.Name))
+                    //        {
+                    //            ddd.Add(new SystemInterfaceField
+                    //            {
+                    //                Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                    //                AppSystemInterfaceId = r.Id,
+                    //                FieidName = property.Name
+                    //            });
+                    //        }
+                    //    }
+                    //    break;
                 }
             }
+            #endregion
+
+
             ddd.ForEach(x => x.FieidName = char.ToLower(x.FieidName[0]) + x.FieidName.Substring(1));
 
             await _dbContext.AsTenant().InsertableWithAttr(ddd).ExecuteCommandAsync();
