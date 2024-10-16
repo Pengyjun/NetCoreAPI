@@ -589,8 +589,9 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
             }
 
             #region 初始查询
+            var tableList = await _dbContext.Queryable<Institution>().ToListAsync();
             //机构树初始化
-            var institutions = await _dbContext.Queryable<Institution>()
+            var institutions =  tableList
                 .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Name), t => t.NAME.Contains(filterCondition.Name))
                 .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Oid), t => t.OID.Contains(filterCondition.Oid))
                 .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.EntClass), t => t.ENTCLASS.Contains(filterCondition.EntClass))
@@ -636,16 +637,16 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                 .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.UpdateTime.ToString()), (pro) => Convert.ToDateTime(pro.UpdateTime).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.UpdateTime).ToString("yyyy-MM-dd"))
                 .Where(t => t.IsDelete == 1)
                 .OrderBy(t => Convert.ToInt32(t.SNO))
-                .ToListAsync();
+                .ToList();
             #endregion
 
             //再次读取
             var roid = institutions.Select(x => x.ROID).ToList();
             var coid = institutions.Select(x => x.COID).ToList();
-            var againInstutions = await _dbContext.Queryable<Institution>()
+            var againInstutions = tableList
                 .Where(t => t.IsDelete == 1 && (roid.Contains(t.ROID) || coid.Contains(t.COID)))
                 .Select(t => new { t.OID, t.NAME })
-                .ToListAsync();
+                .ToList();
 
             if (filterCondition != null)
             {
@@ -661,6 +662,17 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
 
                     //得到所有符合条件的机构rules
                     var rules = institutions.Where(x => ids.Contains(x.Id)).Select(x => x.GRULE).ToList();
+
+                    //拆分rules得到所有符合条件的oids
+                    foreach (var r in rules)
+                    {
+                        if (!string.IsNullOrWhiteSpace(r)) oids.AddRange(r.Split('-'));
+                    }
+                }
+                else
+                {
+                    //得到所有符合条件的机构rules
+                    var rules = institutions.Select(x => x.GRULE).ToList();
 
                     //拆分rules得到所有符合条件的oids
                     foreach (var r in rules)
@@ -854,7 +866,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
             #endregion
 
             //其他数据
-            var otherNodes = institutions
+            var otherNodes = tableList
                 .WhereIF(oids != null && oids.Any(), ins => oids.Contains(ins.OID))
                 .Where(ins => ins.OID != "101162350")
                 .Select(ins => new InstitutionDetatilsDto
@@ -910,8 +922,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                 .ToList();
 
             //根节点
-            var rootNode = institutions
-                .WhereIF(oids != null && oids.Any(), ins => oids.Contains(ins.OID))
+            var rootNode = tableList
                 .Where(ins => ins.OID == "101162350")
                 .Select(ins => new InstitutionDetatilsDto
                 {
