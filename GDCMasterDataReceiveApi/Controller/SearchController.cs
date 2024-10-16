@@ -667,7 +667,7 @@ namespace GDCMasterDataReceiveApi.Controller
         /// <returns></returns>
         [HttpGet("GetDicTableList")]
         [AllowAnonymous]
-        public async Task<ResponseAjaxResult<List<BasePullDownResponseDto>>> GetDicTableAsync([FromBody] int type)
+        public async Task<ResponseAjaxResult<List<BasePullDownResponseDto>>> GetDicTableAsync([FromQuery] int type)
         {
             return await _searchService.GetDicTableAsync(type);
         }
