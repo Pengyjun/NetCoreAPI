@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using GDCDataSecurityApi.Domain.Models;
 using GDCMasterDataReceiveApi.Application.Contracts;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto._4A.User;
@@ -5046,7 +5047,27 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
             responseAjaxResult.SuccessResult(ccList);
             return responseAjaxResult;
         }
+        /// <summary>
+        /// 获取通用字典数据
+        /// </summary>
+        /// <param name="type">字典类型</param>
+        /// <returns></returns>
+        public async Task<ResponseAjaxResult<List<BasePullDownResponseDto>>> GetDicTableAsync(int type)
+        {
+            ResponseAjaxResult<List<BasePullDownResponseDto>> responseAjaxResult = new();
+            var resList = await _dbContext.Queryable<DictionaryTable>()
+                .Where(t => t.IsDelete == 1 && Convert.ToInt32(t.Type) == type)
+                .Select(t => new BasePullDownResponseDto
+                {
+                    Key = t.TypeNo,
+                    Name = t.Name
+                }).ToListAsync();
 
+            responseAjaxResult.SuccessResult(resList);
+            responseAjaxResult.Count = resList.Count;
+
+            return responseAjaxResult;
+        }
         #region 条件筛选格式数据
         /// <summary>
         /// 
@@ -6637,7 +6658,6 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
             responseAjaxResult.SuccessResult(options);
             return responseAjaxResult;
         }
-
         /// <summary>
         /// 获取属性
         /// </summary>
@@ -7160,7 +7180,6 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
             responseAjaxResult.SuccessResult(true);
             return responseAjaxResult;
         }
-
         public async Task<ResponseAjaxResult<List<SearchDataDesensitizationRule>>> GetSearchDataDesensitizationRuleAsync(string interfaceId)
         {
             ResponseAjaxResult<List<SearchDataDesensitizationRule>> responseAjaxResult = new();

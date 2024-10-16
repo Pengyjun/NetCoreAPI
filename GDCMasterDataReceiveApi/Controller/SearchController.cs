@@ -136,7 +136,7 @@ namespace GDCMasterDataReceiveApi.Controller
         /// <param name="requestDto"></param>
         /// <returns></returns>
         [HttpPost("GetDHVirtualProject")]
-        public async Task<ResponseAjaxResult<List<DHVirtualProject>>> GetDHVirtualProjectAsync([FromBody]FilterCondition requestDto)
+        public async Task<ResponseAjaxResult<List<DHVirtualProject>>> GetDHVirtualProjectAsync([FromBody] FilterCondition requestDto)
         {
             return await _searchService.GetDHVirtualProjectAsync(requestDto);
         }
@@ -659,6 +659,16 @@ namespace GDCMasterDataReceiveApi.Controller
         public async Task<ResponseAjaxResult<List<ValueDomainReceiveResponseDto>>> GetValueDomainReceiveAsync([FromBody] FilterCondition requestDto)
         {
             return await _searchService.GetValueDomainReceiveAsync(requestDto);
+        }
+        /// <summary>
+        /// 获取通用字典数据
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        [HttpGet("GetDicTableList")]
+        public async Task<ResponseAjaxResult<List<BasePullDownResponseDto>>> GetDicTableAsync([FromBody] int type)
+        {
+            return await _searchService.GetDicTableAsync(type);
         }
         /// <summary>
         /// 条件筛选列

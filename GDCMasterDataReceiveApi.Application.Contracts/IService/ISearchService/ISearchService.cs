@@ -383,6 +383,12 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.IService.ISearchService
         /// <param name="table"></param>
         /// <returns></returns>
         Task<ResponseAjaxResult<List<FilterConditionDto>>> GetUserFilterColumnsAsync(int table);
+        /// <summary>
+        /// 通用字典数据
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        Task<ResponseAjaxResult<List<BasePullDownResponseDto>>> GetDicTableAsync(int type);
 
         Task<ResponseAjaxResult<bool>> SetFiledAsync();
         Task<ResponseAjaxResult<bool>> ModifyNameAsync(List<SystemInterfaceField> modify);
