@@ -778,7 +778,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
             #endregion
             if (institutions != null && institutions.Any())
             {
-                foreach (var ins in institutions)
+                foreach (var ins in tableList)
                 {
                     // 企业分类
                     ins.ENTCLASS = entClassDict.TryGetValue(ins.ENTCLASS, out var entClassName) ? entClassName : null;
