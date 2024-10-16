@@ -965,7 +965,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     Children = GetChildren(ins.OID, otherNodes)
                 })
                 .FirstOrDefault();
-            result.Add(rootNode);
+            if (rootNode != null) result.Add(rootNode);
 
             responseAjaxResult.SuccessResult(result);
             responseAjaxResult.Count = result.Count;
