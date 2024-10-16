@@ -2850,6 +2850,52 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                 })
                 .ToPageListAsync(requestDto.PageIndex, requestDto.PageSize, total);
 
+            //币种
+            var cIds = ccList.Select(t => t.AccountCurrency).ToList();
+            var currency = await _dbContext.Queryable<Currency>()
+                .Where(t => t.IsDelete == 1 && cIds.Contains(t.ZCURRENCYCODE))
+                .Select(t => new { t.ZCURRENCYCODE, t.ZCURRENCYNAME })
+                .ToListAsync();
+
+            //国家地区
+            var countrysKey = ccList.Select(x => x.Country).ToList();
+            var country = await _dbContext.Queryable<CountryRegion>()
+                .Where(t => t.IsDelete == 1 && countrysKey.Contains(t.ZCOUNTRYCODE))
+                .Select(t => new CountryRegionOrAdminDivisionDto { Code = t.ZCOUNTRYCODE, Name = t.ZCOUNTRYNAME })
+                .ToListAsync();
+
+            //省、市、县
+            var p = ccList.Select(x => x.Province).ToList();
+            var city = ccList.Select(x => x.City).ToList();
+            var c = ccList.Select(x => x.County).ToList();
+            var adisision = await _dbContext.Queryable<AdministrativeDivision>()
+                .Where(t => t.IsDelete == 1 && (p.Contains(t.ZADDVSCODE) || city.Contains(t.ZADDVSCODE) || c.Contains(t.ZADDVSCODE)))
+                .Select(t => new FilterChildData { Key = t.ZADDVSCODE, Val = t.ZADDVSNAME, Code = t.ZADDVSLEVEL })
+                .ToListAsync();
+
+            //值域信息
+            var valDomain = await _dbContext.Queryable<ValueDomain>()
+                .Where(t => !string.IsNullOrWhiteSpace(t.ZDOM_CODE))
+                .Select(t => new VDomainRespDto { ZDOM_CODE = t.ZDOM_CODE, ZDOM_DESC = t.ZDOM_DESC, ZDOM_VALUE = t.ZDOM_VALUE, ZDOM_NAME = t.ZDOM_NAME, ZDOM_LEVEL = t.ZDOM_LEVEL })
+                .ToListAsync();
+
+            foreach (var item in ccList)
+            {
+                //币种
+                item.AccountCurrency = currency.FirstOrDefault(x => x.ZCURRENCYCODE == item.AccountCurrency)?.ZCURRENCYNAME;
+
+                //国家地区
+                item.Country = country.FirstOrDefault(x => x.Code == item.Country)?.Name;
+
+                //省、市、县
+                item.City = adisision.FirstOrDefault(x => x.Key == item.City)?.Val;
+                item.County = adisision.FirstOrDefault(x => x.Key == item.County)?.Val;
+                item.Province = adisision.FirstOrDefault(x => x.Key == item.Province)?.Val;
+
+                //账户状态
+                item.AccountStatus = GetValueDomain(item.AccountStatus, valDomain, "ZBANKSTA");
+            }
+
             responseAjaxResult.Count = total;
             responseAjaxResult.SuccessResult(ccList);
             return responseAjaxResult;
@@ -3960,7 +4006,6 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
             responseAjaxResult.SuccessResult(ccList);
             return responseAjaxResult;
         }
-
         /// <summary>
         /// 多组织-税务代管组织(行政) 详细
         /// </summary>
@@ -4727,7 +4772,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                 item.ZapprovalOrg = GetInstitutionName(item.ZapprovalOrg, pjectOrg);
 
                 //州别名称
-                item.Zcontinentcode = dz.FirstOrDefault(x=>x.ZCONTINENTCODE==item.Zcontinentcode)?.ZCONTINENTNAME;
+                item.Zcontinentcode = dz.FirstOrDefault(x => x.ZCONTINENTCODE == item.Zcontinentcode)?.ZCONTINENTNAME;
 
             }
 
