@@ -5,8 +5,8 @@ namespace GDCMasterDataReceiveApi.Domain.Models
     /// <summary>
     /// DH项目信息
     /// </summary>
-    [SugarTable("t_dh_tprojects", IsDisabledDelete = true)]
-    public class DHtProjects : BaseEntity<long>
+    [SugarTable("t_dh_projects", IsDisabledDelete = true)]
+    public class DHProjects : BaseEntity<long>
     {
         /// <summary>
         /// 项目主数据编码 主键
@@ -41,9 +41,14 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// </summary>
         public string? ZCPBC { get; set; }
         /// <summary>
-        /// 资主体
+        /// 投资主体
         /// </summary>
         public string? ZINVERSTOR { get; set; }
+        /// <summary>
+        /// 曾用名
+        /// </summary>
+        [SugarColumn(IsIgnore = true)]
+        public List<FzitOnames>? FzitOnameList { get; set; }
         /// <summary>
         /// 项目批复/决议文号
         /// </summary>
@@ -192,10 +197,10 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// 曾用名列表
         /// </summary>
         public string? ZOLDNAME { get; set; }
-        /// <summary>
-        /// 所属二级单位
-        /// </summary>
-        public string? Z2NDORG { get; set; }
+        ///// <summary>
+        ///// 所属二级单位
+        ///// </summary>
+        //public string? Z2NDORG { get; set; }
         /// <summary>
         /// 停用原因
         /// </summary>
@@ -257,5 +262,19 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// </summary>
         public string? FZawardp { get; set; }
 
+    }
+    /// <summary>
+    /// 曾用名
+    /// </summary>
+    public class FzitOnames
+    {
+        /// <summary>
+        /// 项目主数据编码
+        /// </summary>
+        public string? ZPROJECT { get; set; }
+        /// <summary>
+        /// 曾用名
+        /// </summary>
+        public string? ZOLDNAME { get; set; }
     }
 }

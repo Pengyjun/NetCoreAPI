@@ -112,7 +112,7 @@ namespace GDCMasterDataReceiveApi.Controller
         /// <param name="requestDto"></param>
         /// <returns></returns>
         [HttpPost("GetProjectSearch")]
-        public async Task<ResponseAjaxResult<List<DHtProjects>>> GetProjectSearchAsync([FromBody] FilterCondition requestDto)
+        public async Task<ResponseAjaxResult<List<DHProjects>>> GetProjectSearchAsync([FromBody] FilterCondition requestDto)
         {
             return await _searchService.GetProjectSearchAsync(requestDto);
         }
@@ -136,7 +136,7 @@ namespace GDCMasterDataReceiveApi.Controller
         /// <param name="requestDto"></param>
         /// <returns></returns>
         [HttpPost("GetDHVirtualProject")]
-        public async Task<ResponseAjaxResult<List<DHVirtualProject>>> GetDHVirtualProjectAsync([FromBody]FilterCondition requestDto)
+        public async Task<ResponseAjaxResult<List<DHVirtualProject>>> GetDHVirtualProjectAsync([FromBody] FilterCondition requestDto)
         {
             return await _searchService.GetDHVirtualProjectAsync(requestDto);
         }
@@ -523,15 +523,20 @@ namespace GDCMasterDataReceiveApi.Controller
             return await _searchService.GetEscrowOrganizationSearchAsync(requestDto);
         }
         /// <summary>
-        /// DH行政组织-多组织
+        /// 行政机构-多组织
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
         [HttpPost("GetXZOrganzationSearch")]
         public async Task<ResponseAjaxResult<List<DHOrganzationDep>>> GetXZOrganzationSearchAsync([FromBody] FilterCondition requestDto)
         {
-            return await _searchService.GetEscrowOrganzationSearchAsync(requestDto);
+            return await _searchService.GetXZOrganzationSearchAsync(requestDto);
         }
+        //[HttpPost("GetXZOrganzationSearch")]
+        //public async Task<ResponseAjaxResult<List<AdministrativeOrganization>>> GetXZOrganzationSearchAsync([FromBody] FilterCondition requestDto)
+        //{
+        //    return await _searchService.GetEscrowOrganzationSearchAsync(requestDto);
+        //}
         /// <summary>
         /// 多组织-税务代管组织(行政) 详细
         /// </summary>
@@ -654,6 +659,17 @@ namespace GDCMasterDataReceiveApi.Controller
         public async Task<ResponseAjaxResult<List<ValueDomainReceiveResponseDto>>> GetValueDomainReceiveAsync([FromBody] FilterCondition requestDto)
         {
             return await _searchService.GetValueDomainReceiveAsync(requestDto);
+        }
+        /// <summary>
+        /// 获取通用字典数据
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        [HttpGet("GetDicTableList")]
+        [AllowAnonymous]
+        public async Task<ResponseAjaxResult<List<BasePullDownResponseDto>>> GetDicTableAsync([FromQuery] int type)
+        {
+            return await _searchService.GetDicTableAsync(type);
         }
         /// <summary>
         /// 条件筛选列

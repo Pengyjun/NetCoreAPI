@@ -69,7 +69,7 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.IService.ISearchService
         /// <param name="requestDto"></param>
         /// <returns></returns>
         //Task<ResponseAjaxResult<List<ProjectDetailsDto>>> GetProjectSearchAsync(FilterCondition requestDto);
-        Task<ResponseAjaxResult<List<DHtProjects>>> GetProjectSearchAsync(FilterCondition requestDto);
+        Task<ResponseAjaxResult<List<DHProjects>>> GetProjectSearchAsync(FilterCondition requestDto);
         /// <summary>
         /// 虚拟项目DH
         /// </summary>
@@ -313,7 +313,7 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.IService.ISearchService
         /// <param name="requestDto"></param>
         /// <returns></returns>
         //Task<ResponseAjaxResult<List<EscrowOrganizationDetailsDto>>> GetEscrowOrganizationSearchAsync(FilterCondition requestDto);
-        Task<ResponseAjaxResult<List<DHOrganzationDep>>> GetEscrowOrganzationSearchAsync(FilterCondition requestDto);
+        Task<ResponseAjaxResult<List<DHOrganzationDep>>> GetXZOrganzationSearchAsync(FilterCondition requestDto);
         /// <summary>
         /// 
         /// </summary>
@@ -383,6 +383,12 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.IService.ISearchService
         /// <param name="table"></param>
         /// <returns></returns>
         Task<ResponseAjaxResult<List<FilterConditionDto>>> GetUserFilterColumnsAsync(int table);
+        /// <summary>
+        /// 通用字典数据
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        Task<ResponseAjaxResult<List<BasePullDownResponseDto>>> GetDicTableAsync(int type);
 
         Task<ResponseAjaxResult<bool>> SetFiledAsync();
         Task<ResponseAjaxResult<bool>> ModifyNameAsync(List<SystemInterfaceField> modify);
