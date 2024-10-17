@@ -775,99 +775,100 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                 .ToDictionary(x => x.OID, x => x.NAME);
             #endregion
 
-            foreach (var ins in institutions)
-            {
-                // 企业分类
-                ins.ENTCLASS = entClassDict.TryGetValue(ins.ENTCLASS, out var entClassName) ? entClassName : null;
-                // 机构状态
-                ins.STATUS = statusDict.TryGetValue(ins.STATUS, out var statusName) ? statusName : null;
-
-                // 机构属性
-                ins.TYPE = typeDict.TryGetValue(ins.TYPE, out var typeName) ? typeName : null;
-
-                // 机构子属性
-                ins.TYPEEXT = typeExtDict.TryGetValue(ins.TYPEEXT, out var typeExtName) ? typeExtName : null;
-
-                // 拥有兼管职能
-                ins.CROSSORGAN = ins.CROSSORGAN == "0" ? "否" : "是";
-
-                // 机构所在地（省）
-                ins.ORGPROVINCE = provinceDict.TryGetValue(ins.ORGPROVINCE, out var provinceName) ? provinceName : null;
-
-                // 国家
-                ins.CAREA = countryDict.TryGetValue(ins.CAREA, out var countryName) ? countryName : null;
-
-                // 独立授权
-                ins.ROWN = ins.ROWN == "1" ? "是" : "否";
-
-                // 授权机构
-                ins.ROID = againInstitutionDict.TryGetValue(ins.ROID, out var roidName) ? roidName : null;
-
-                // 隶属单位
-                ins.COID = againInstitutionDict.TryGetValue(ins.COID, out var coidName) ? coidName : null;
-
-                // 是否独立核算
-                ins.IS_INDEPENDENT = isIndependentDict.TryGetValue(ins.IS_INDEPENDENT, out var independentName) ? independentName : null;
-
-                // 持股情况
-                ins.SHAREHOLDINGS = shareholdingsDict.TryGetValue(ins.SHAREHOLDINGS, out var holdingsName) ? holdingsName : null;
-
-                // 项目类型
-                ins.PROJECTTYPE = projectTypeDict.TryGetValue(ins.PROJECTTYPE, out var projectTypeName) ? projectTypeName : null;
-
-                // 机构业务类型
-                ins.BIZTYPE = bizTypeDict.TryGetValue(ins.BIZTYPE, out var bizTypeName) ? bizTypeName : null;
-                #region MyRegion
-
-                ////企业分类
-                //ins.ENTCLASS = valDomain.FirstOrDefault(x => ins.ENTCLASS == x.ZDOM_VALUE && x.ZDOM_CODE == "ZENTC")?.ZDOM_NAME;
-
-                ////机构状态
-                //ins.STATUS = valDomain.FirstOrDefault(x => ins.STATUS == x.ZDOM_VALUE && x.ZDOM_CODE == "ZORGSTATE")?.ZDOM_NAME;
-
-                ////机构属性
-                //ins.TYPE = valDomain.FirstOrDefault(x => ins.TYPE == x.ZDOM_VALUE && x.ZDOM_CODE == "ZORGATTR")?.ZDOM_NAME;
-
-                ////机构子属性
-                //ins.TYPEEXT = valDomain.FirstOrDefault(x => ins.TYPEEXT == x.ZDOM_VALUE && x.ZDOM_CODE == "ZORGCHILDATTR")?.ZDOM_NAME;
-
-                ////拥有兼管职能
-                //ins.CROSSORGAN = ins.CROSSORGAN == "0" ? "否" : "是";
-
-                ////机构所在地（省）
-                //ins.ORGPROVINCE = advisions.FirstOrDefault(x => x.ZADDVSCODE == ins.ORGPROVINCE)?.ZADDVSNAME;
-
-                ////国家
-                //ins.CAREA = carea.FirstOrDefault(x => x.ZCOUNTRYCODE == ins.CAREA)?.ZCOUNTRYNAME;
-
-                ////独立授权
-                //ins.ROWN = ins.ROWN == "1" ? "是" : "否";
-
-                ////授权机构
-                //ins.ROID = againInstutions.FirstOrDefault(x => x.OID == ins.ROID)?.NAME;
-
-                ////隶属单位
-                //ins.COID = againInstutions.FirstOrDefault(x => x.OID == ins.COID)?.NAME;
-
-                ////是否独立核算
-                //ins.IS_INDEPENDENT = valDomain.FirstOrDefault(x => ins.IS_INDEPENDENT == x.ZDOM_VALUE && x.ZDOM_CODE == "ZCHECKIND")?.ZDOM_NAME;
-
-                ////持股情况
-                //ins.SHAREHOLDINGS = valDomain.FirstOrDefault(x => ins.SHAREHOLDINGS == x.ZDOM_VALUE && x.ZDOM_CODE == "ZHOLDING")?.ZDOM_NAME;
-
-                ////项目类型
-                //ins.PROJECTTYPE = valDomain.FirstOrDefault(x => ins.PROJECTTYPE == x.ZDOM_VALUE && x.ZDOM_CODE == "ZPROJTYPE")?.ZDOM_NAME;
-
-                ////机构业务类型
-                //ins.BIZTYPE = institutionBusType.FirstOrDefault(x => ins.BIZTYPE == x.Key)?.Val;
-
-                #endregion
-            }
-
             #endregion
+            if (institutions != null && institutions.Any())
+            {
+                foreach (var ins in tableList)
+                {
+                    // 企业分类
+                    ins.ENTCLASS = entClassDict.TryGetValue(ins.ENTCLASS, out var entClassName) ? entClassName : null;
+                    // 机构状态
+                    ins.STATUS = statusDict.TryGetValue(ins.STATUS, out var statusName) ? statusName : null;
 
-            //其他数据
-            var otherNodes = tableList
+                    // 机构属性
+                    ins.TYPE = typeDict.TryGetValue(ins.TYPE, out var typeName) ? typeName : null;
+
+                    // 机构子属性
+                    ins.TYPEEXT = typeExtDict.TryGetValue(ins.TYPEEXT, out var typeExtName) ? typeExtName : null;
+
+                    // 拥有兼管职能
+                    ins.CROSSORGAN = ins.CROSSORGAN == "0" ? "否" : "是";
+
+                    // 机构所在地（省）
+                    ins.ORGPROVINCE = provinceDict.TryGetValue(ins.ORGPROVINCE, out var provinceName) ? provinceName : null;
+
+                    // 国家
+                    ins.CAREA = countryDict.TryGetValue(ins.CAREA, out var countryName) ? countryName : null;
+
+                    // 独立授权
+                    ins.ROWN = ins.ROWN == "1" ? "是" : "否";
+
+                    // 授权机构
+                    ins.ROID = againInstitutionDict.TryGetValue(ins.ROID, out var roidName) ? roidName : null;
+
+                    // 隶属单位
+                    ins.COID = againInstitutionDict.TryGetValue(ins.COID, out var coidName) ? coidName : null;
+
+                    // 是否独立核算
+                    ins.IS_INDEPENDENT = isIndependentDict.TryGetValue(ins.IS_INDEPENDENT, out var independentName) ? independentName : null;
+
+                    // 持股情况
+                    ins.SHAREHOLDINGS = shareholdingsDict.TryGetValue(ins.SHAREHOLDINGS, out var holdingsName) ? holdingsName : null;
+
+                    // 项目类型
+                    ins.PROJECTTYPE = projectTypeDict.TryGetValue(ins.PROJECTTYPE, out var projectTypeName) ? projectTypeName : null;
+
+                    // 机构业务类型
+                    ins.BIZTYPE = bizTypeDict.TryGetValue(ins.BIZTYPE, out var bizTypeName) ? bizTypeName : null;
+                    #region MyRegion
+
+                    ////企业分类
+                    //ins.ENTCLASS = valDomain.FirstOrDefault(x => ins.ENTCLASS == x.ZDOM_VALUE && x.ZDOM_CODE == "ZENTC")?.ZDOM_NAME;
+
+                    ////机构状态
+                    //ins.STATUS = valDomain.FirstOrDefault(x => ins.STATUS == x.ZDOM_VALUE && x.ZDOM_CODE == "ZORGSTATE")?.ZDOM_NAME;
+
+                    ////机构属性
+                    //ins.TYPE = valDomain.FirstOrDefault(x => ins.TYPE == x.ZDOM_VALUE && x.ZDOM_CODE == "ZORGATTR")?.ZDOM_NAME;
+
+                    ////机构子属性
+                    //ins.TYPEEXT = valDomain.FirstOrDefault(x => ins.TYPEEXT == x.ZDOM_VALUE && x.ZDOM_CODE == "ZORGCHILDATTR")?.ZDOM_NAME;
+
+                    ////拥有兼管职能
+                    //ins.CROSSORGAN = ins.CROSSORGAN == "0" ? "否" : "是";
+
+                    ////机构所在地（省）
+                    //ins.ORGPROVINCE = advisions.FirstOrDefault(x => x.ZADDVSCODE == ins.ORGPROVINCE)?.ZADDVSNAME;
+
+                    ////国家
+                    //ins.CAREA = carea.FirstOrDefault(x => x.ZCOUNTRYCODE == ins.CAREA)?.ZCOUNTRYNAME;
+
+                    ////独立授权
+                    //ins.ROWN = ins.ROWN == "1" ? "是" : "否";
+
+                    ////授权机构
+                    //ins.ROID = againInstutions.FirstOrDefault(x => x.OID == ins.ROID)?.NAME;
+
+                    ////隶属单位
+                    //ins.COID = againInstutions.FirstOrDefault(x => x.OID == ins.COID)?.NAME;
+
+                    ////是否独立核算
+                    //ins.IS_INDEPENDENT = valDomain.FirstOrDefault(x => ins.IS_INDEPENDENT == x.ZDOM_VALUE && x.ZDOM_CODE == "ZCHECKIND")?.ZDOM_NAME;
+
+                    ////持股情况
+                    //ins.SHAREHOLDINGS = valDomain.FirstOrDefault(x => ins.SHAREHOLDINGS == x.ZDOM_VALUE && x.ZDOM_CODE == "ZHOLDING")?.ZDOM_NAME;
+
+                    ////项目类型
+                    //ins.PROJECTTYPE = valDomain.FirstOrDefault(x => ins.PROJECTTYPE == x.ZDOM_VALUE && x.ZDOM_CODE == "ZPROJTYPE")?.ZDOM_NAME;
+
+                    ////机构业务类型
+                    //ins.BIZTYPE = institutionBusType.FirstOrDefault(x => ins.BIZTYPE == x.Key)?.Val;
+
+                    #endregion
+                }
+
+                //其他数据
+                var otherNodes = tableList
                 .WhereIF(oids != null && oids.Any(), ins => oids.Contains(ins.OID))
                 .Where(ins => ins.OID != "101162350")
                 .Select(ins => new InstitutionDetatilsDto
@@ -922,62 +923,63 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                 })
                 .ToList();
 
-            //根节点
-            var rootNode = tableList
-                .Where(ins => ins.OID == "101162350")
-                .Select(ins => new InstitutionDetatilsDto
-                {
-                    Id = ins.Id.ToString(),
-                    BizDomain = ins.BIZDOMAIN,
-                    BizType = ins.BIZTYPE,
-                    Carea = ins.CAREA,
-                    Code = ins.OCODE,
-                    Coid = ins.COID,
-                    Crossorgan = ins.CROSSORGAN,
-                    EnglishName = ins.ENGLISHNAME,
-                    EnglishShortName = ins.ENGLISHSHORTNAME,
-                    EntClass = ins.ENTCLASS,
-                    GlobalSno = ins.GLOBAL_SNO,
-                    Goid = ins.GOID,
-                    Gpoid = ins.GPOID,
-                    Grade = ins.GRADE,
-                    IsIndependent = ins.IS_INDEPENDENT,
-                    MdmCode = ins.MDM_CODE,
-                    Mrut = ins.MRUT,
-                    Name = ins.NAME,
-                    Note = ins.NOTE,
-                    Oid = ins.OID,
-                    Oper = ins.OPER,
-                    Organemp = ins.ORGANEMP,
-                    OrganGrade = ins.ORGANGRADE,
-                    OrgGrade = ins.ORGGRADE,
-                    OrgProvince = ins.ORGPROVINCE,
-                    Orule = ins.ORULE,
-                    OSecBid = ins.O2BID,
-                    POid = ins.POID,
-                    ProjectManType = ins.PROJECTMANTYPE,
-                    ProjectScale = ins.PROJECTSCALE,
-                    ProjectType = ins.PROJECTTYPE,
-                    QyGrade = ins.QYGRADE,
-                    RegisterCode = ins.REGISTERCODE,
-                    RoId = ins.ROID,
-                    Rown = ins.ROWN,
-                    ShareHoldings = ins.SHAREHOLDINGS,
-                    ShortName = ins.SHORTNAME,
-                    Sno = ins.SNO,
-                    StartDate = ins.STARTDATE,
-                    Status = ins.STATUS,
-                    TemorganName = ins.TEMORGANNAME,
-                    TerritoryPro = ins.TERRITORYPRO,
-                    Type = ins.TYPE,
-                    TypeExt = ins.TYPEEXT,
-                    Version = ins.VERSION,
-                    CreateTime = ins.CreateTime,
-                    UpdateTime = ins.UpdateTime,
-                    Children = GetChildren(ins.OID, otherNodes)
-                })
-                .FirstOrDefault();
-            if (rootNode != null) result.Add(rootNode);
+                //根节点
+                var rootNode = tableList
+                    .Where(ins => ins.OID == "101162350")
+                    .Select(ins => new InstitutionDetatilsDto
+                    {
+                        Id = ins.Id.ToString(),
+                        BizDomain = ins.BIZDOMAIN,
+                        BizType = ins.BIZTYPE,
+                        Carea = ins.CAREA,
+                        Code = ins.OCODE,
+                        Coid = ins.COID,
+                        Crossorgan = ins.CROSSORGAN,
+                        EnglishName = ins.ENGLISHNAME,
+                        EnglishShortName = ins.ENGLISHSHORTNAME,
+                        EntClass = ins.ENTCLASS,
+                        GlobalSno = ins.GLOBAL_SNO,
+                        Goid = ins.GOID,
+                        Gpoid = ins.GPOID,
+                        Grade = ins.GRADE,
+                        IsIndependent = ins.IS_INDEPENDENT,
+                        MdmCode = ins.MDM_CODE,
+                        Mrut = ins.MRUT,
+                        Name = ins.NAME,
+                        Note = ins.NOTE,
+                        Oid = ins.OID,
+                        Oper = ins.OPER,
+                        Organemp = ins.ORGANEMP,
+                        OrganGrade = ins.ORGANGRADE,
+                        OrgGrade = ins.ORGGRADE,
+                        OrgProvince = ins.ORGPROVINCE,
+                        Orule = ins.ORULE,
+                        OSecBid = ins.O2BID,
+                        POid = ins.POID,
+                        ProjectManType = ins.PROJECTMANTYPE,
+                        ProjectScale = ins.PROJECTSCALE,
+                        ProjectType = ins.PROJECTTYPE,
+                        QyGrade = ins.QYGRADE,
+                        RegisterCode = ins.REGISTERCODE,
+                        RoId = ins.ROID,
+                        Rown = ins.ROWN,
+                        ShareHoldings = ins.SHAREHOLDINGS,
+                        ShortName = ins.SHORTNAME,
+                        Sno = ins.SNO,
+                        StartDate = ins.STARTDATE,
+                        Status = ins.STATUS,
+                        TemorganName = ins.TEMORGANNAME,
+                        TerritoryPro = ins.TERRITORYPRO,
+                        Type = ins.TYPE,
+                        TypeExt = ins.TYPEEXT,
+                        Version = ins.VERSION,
+                        CreateTime = ins.CreateTime,
+                        UpdateTime = ins.UpdateTime,
+                        Children = GetChildren(ins.OID, otherNodes)
+                    })
+                    .FirstOrDefault();
+                if (rootNode != null) result.Add(rootNode);
+            }
 
             responseAjaxResult.SuccessResult(result);
             responseAjaxResult.Count = result.Count;
@@ -6684,6 +6686,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                 .Select(t => new { t.Id, t.InterfaceName, t.Remark })
               .ToListAsync();
 
+            #region MyRegion
             foreach (var r in resList)
             {
                 List<string> filds = new();
@@ -7142,24 +7145,59 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     //        }
                     //    }
                     //    break;
-                    case "GetXZOrganzationSearchAsync":
-                        //var properties30 = GetProperties<AdministrativeOrganization>();
-                        var properties30 = GetProperties<DHOrganzationDep>();
-                        foreach (var property in properties30)
-                        {
-                            if (!excludedProperties.Contains(property.Name))
-                            {
-                                ddd.Add(new SystemInterfaceField
-                                {
-                                    Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
-                                    AppSystemInterfaceId = r.Id,
-                                    FieidName = property.Name
-                                });
-                            }
-                        }
-                        break;
+                    //case "GetXZOrganzationSearchAsync":
+                    //    //var properties30 = GetProperties<AdministrativeOrganization>();
+                    //    var properties30 = GetProperties<DHOrganzationDep>();
+                    //    foreach (var property in properties30)
+                    //    {
+                    //        if (!excludedProperties.Contains(property.Name))
+                    //        {
+                    //            ddd.Add(new SystemInterfaceField
+                    //            {
+                    //                Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                    //                AppSystemInterfaceId = r.Id,
+                    //                FieidName = property.Name
+                    //            });
+                    //        }
+                    //    }
+                    //    break;
+                    //case "SearchNotesReceiveAsync":
+                    //    var properties30 = GetProperties<AdministrativeOrganization>();
+                    //    var properties31 = GetProperties<dwd_ffm_ap_bill_d>();
+                    //    foreach (var property in properties31)
+                    //    {
+                    //        if (!excludedProperties.Contains(property.Name))
+                    //        {
+                    //            ddd.Add(new SystemInterfaceField
+                    //            {
+                    //                Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                    //                AppSystemInterfaceId = r.Id,
+                    //                FieidName = property.Name
+                    //            });
+                    //        }
+                    //    }
+                    //    break;
+                    //case "SearchNotesPayableAsync":
+                    //    var properties30 = GetProperties<AdministrativeOrganization>();
+                    //    var properties32 = GetProperties<dwd_ffm_receive_new_d>();
+                    //    foreach (var property in properties32)
+                    //    {
+                    //        if (!excludedProperties.Contains(property.Name))
+                    //        {
+                    //            ddd.Add(new SystemInterfaceField
+                    //            {
+                    //                Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                    //                AppSystemInterfaceId = r.Id,
+                    //                FieidName = property.Name
+                    //            });
+                    //        }
+                    //    }
+                    //    break;
                 }
             }
+            #endregion
+
+
             ddd.ForEach(x => x.FieidName = char.ToLower(x.FieidName[0]) + x.FieidName.Substring(1));
 
             await _dbContext.AsTenant().InsertableWithAttr(ddd).ExecuteCommandAsync();

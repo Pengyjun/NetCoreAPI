@@ -24,7 +24,8 @@ namespace GDCMasterDataReceiveApi.SqlSugarCore
             SqlSugarClient sqlSugarClient = new SqlSugarClient(new List<ConnectionConfig>()
             {
                 new ConnectionConfig(){ConfigId="gdcmasterdatareceiveapi",ConnectionString = dbCon, DbType = DbType.Dm,IsAutoCloseConnection = true},
-                new ConnectionConfig(){ConfigId="gdcdatasecurityapi",ConnectionString = gdcdatasecurityapi,DbType = DbType.Dm,IsAutoCloseConnection = true}
+                new ConnectionConfig(){ConfigId="gdcdatasecurityapi",ConnectionString = gdcdatasecurityapi,DbType = DbType.Dm,IsAutoCloseConnection = true},
+                new ConnectionConfig(){ConfigId="finance",ConnectionString = finance,DbType = DbType.Dm,IsAutoCloseConnection = true}
             }, db =>
             {
                 var sqlParmae = string.Empty;
