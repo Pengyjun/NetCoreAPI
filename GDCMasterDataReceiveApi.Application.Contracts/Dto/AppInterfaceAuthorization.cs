@@ -858,4 +858,606 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto
         public string batch_date { get; set; }
 
     }
+
+    /// <summary>
+    /// 合同基本信息表
+    /// </summary>
+    [Tenant("finance")]
+    [SugarTable("dwd_ffm_receive_new_d", IsDisabledDelete = true)]
+    public partial class dwd_cdm_con_bas_i_d
+    {
+        public dwd_cdm_con_bas_i_d()
+        {
+
+
+        }
+        /// <summary>
+        /// Desc:合同自增主键id
+        /// Default:
+        /// Nullable:False
+        /// </summary>           
+        public int my_id { get; set; }
+
+        /// <summary>
+        /// Desc:合同主数据编码
+        /// Default:
+        /// Nullable:True
+        /// </summary>           
+        public string con_main_code { get; set; }
+
+        /// <summary>
+        /// Desc:合同名称
+        /// Default:
+        /// Nullable:True
+        /// </summary>           
+        public string con_name { get; set; }
+
+        /// <summary>
+        /// Desc:合同名称中文
+        /// Default:
+        /// Nullable:True
+        /// </summary>           
+        public string con_name_cn { get; set; }
+
+        /// <summary>
+        /// Desc:原系统合同编码
+        /// Default:
+        /// Nullable:True
+        /// </summary>           
+        public string con_code { get; set; }
+
+        /// <summary>
+        /// Desc:是否补充合同
+        /// Default:
+        /// Nullable:True
+        /// </summary>           
+        public string is_supply_contract { get; set; }
+
+        /// <summary>
+        /// Desc:补充合同所属原合同主数据编码
+        /// Default:
+        /// Nullable:True
+        /// </summary>           
+        public string sup_con_main_code { get; set; }
+
+        /// <summary>
+        /// Desc:对方合同主数据编码
+        /// Default:
+        /// Nullable:True
+        /// </summary>           
+        public string opposite_con_main_code { get; set; }
+
+        /// <summary>
+        /// Desc:项目主数据编码
+        /// Default:
+        /// Nullable:True
+        /// </summary>           
+        public string proj_number { get; set; }
+
+        /// <summary>
+        /// Desc:项目名称
+        /// Default:
+        /// Nullable:True
+        /// </summary>           
+        public string proj_name { get; set; }
+
+        /// <summary>
+        /// Desc:收支类型
+        /// Default:
+        /// Nullable:True
+        /// </summary>           
+        public string income_expend_type { get; set; }
+
+        /// <summary>
+        /// Desc:合同业务类型
+        /// Default:
+        /// Nullable:True
+        /// </summary>           
+        public string business_type { get; set; }
+
+        /// <summary>
+        /// Desc:合同履行地（国家）
+        /// Default:
+        /// Nullable:True
+        /// </summary>           
+        public string con_perform_country { get; set; }
+
+        /// <summary>
+        /// Desc:合同履行地（省）
+        /// Default:
+        /// Nullable:True
+        /// </summary>           
+        public string con_perform_provinces { get; set; }
+
+        /// <summary>
+        /// Desc:合同履行地（市）
+        /// Default:
+        /// Nullable:True
+        /// </summary>           
+        public string con_perform_city { get; set; }
+
+        /// <summary>
+        /// Desc:合同履行地（县）
+        /// Default:
+        /// Nullable:True
+        /// </summary>           
+        public string con_perform_xian { get; set; }
+
+        /// <summary>
+        /// Desc:合同承办人ID
+        /// Default:
+        /// Nullable:True
+        /// </summary>           
+        public string con_undertaker_id { get; set; }
+
+        /// <summary>
+        /// Desc:合同承办人
+        /// Default:
+        /// Nullable:True
+        /// </summary>           
+        public string con_undertaker { get; set; }
+
+        /// <summary>
+        /// Desc:合同承办人联系方式
+        /// Default:
+        /// Nullable:True
+        /// </summary>           
+        public string con_undertaker_contact { get; set; }
+
+        /// <summary>
+        /// Desc:合同语言
+        /// Default:
+        /// Nullable:True
+        /// </summary>           
+        public string con_language { get; set; }
+
+        /// <summary>
+        /// Desc:合同语言编码
+        /// Default:
+        /// Nullable:True
+        /// </summary>           
+        public string conc_language_code { get; set; }
+
+        /// <summary>
+        /// Desc:签约日期
+        /// Default:
+        /// Nullable:True
+        /// </summary>           
+        public DateTime? sign_date { get; set; }
+
+        /// <summary>
+        /// Desc:履约进度
+        /// Default:
+        /// Nullable:True
+        /// </summary>           
+        public string perform_schedule { get; set; }
+
+        /// <summary>
+        /// Desc:履约阶段
+        /// Default:
+        /// Nullable:True
+        /// </summary>           
+        public string perform_stage { get; set; }
+
+        /// <summary>
+        /// Desc:合同概述
+        /// Default:
+        /// Nullable:True
+        /// </summary>           
+        public string con_summary { get; set; }
+
+        /// <summary>
+        /// Desc:合同税率
+        /// Default:
+        /// Nullable:True
+        /// </summary>           
+        public decimal? tax_rate { get; set; }
+
+        /// <summary>
+        /// Desc:合同税额
+        /// Default:
+        /// Nullable:True
+        /// </summary>           
+        public decimal? tax_amt { get; set; }
+
+        /// <summary>
+        /// Desc:合同总金额币种
+        /// Default:
+        /// Nullable:True
+        /// </summary>           
+        public string currency { get; set; }
+
+        /// <summary>
+        /// Desc:合同总价
+        /// Default:
+        /// Nullable:True
+        /// </summary>           
+        public decimal? tol_con_price_exd_tax { get; set; }
+
+        /// <summary>
+        /// Desc:合同总金额（含税）
+        /// Default:
+        /// Nullable:True
+        /// </summary>           
+        public decimal? hs_amt { get; set; }
+
+        /// <summary>
+        /// Desc:不适用说明(合同总金额(含税))
+        /// Default:
+        /// Nullable:True
+        /// </summary>           
+        public string not_desc { get; set; }
+
+        /// <summary>
+        /// Desc:变更后合同总价
+        /// Default:
+        /// Nullable:True
+        /// </summary>           
+        public decimal? now_tol_con_price_exd_tax { get; set; }
+
+        /// <summary>
+        /// Desc:合同变更后总金额（含税）
+        /// Default:
+        /// Nullable:True
+        /// </summary>           
+        public decimal? hs_bgamt { get; set; }
+
+        /// <summary>
+        /// Desc:合同签约方类型
+        /// Default:
+        /// Nullable:True
+        /// </summary>           
+        public string qyf_type { get; set; }
+
+        /// <summary>
+        /// Desc:我方签约单位ID
+        /// Default:
+        /// Nullable:True
+        /// </summary>           
+        public string parties_unit_id { get; set; }
+
+        /// <summary>
+        /// Desc:我方签约单位
+        /// Default:
+        /// Nullable:True
+        /// </summary>           
+        public string parties_unit_name { get; set; }
+
+        /// <summary>
+        /// Desc:我方签约单位所属二级
+        /// Default:
+        /// Nullable:True
+        /// </summary>           
+        public string report_own_partyid { get; set; }
+
+        /// <summary>
+        /// Desc:我方签约授权人信息（姓名
+        /// Default:
+        /// Nullable:True
+        /// </summary>           
+        public string parties_authorized { get; set; }
+
+        /// <summary>
+        /// Desc:合同实际履约主体ID
+        /// Default:
+        /// Nullable:True
+        /// </summary>           
+        public string sjlydw_id { get; set; }
+
+        /// <summary>
+        /// Desc:合同实际履约主体
+        /// Default:
+        /// Nullable:True
+        /// </summary>           
+        public string sjlydw_name { get; set; }
+
+        /// <summary>
+        /// Desc:实际履约主体所属法人单位OID
+        /// Default:
+        /// Nullable:True
+        /// </summary>           
+        public string sjlydw_ejdwoid { get; set; }
+
+        /// <summary>
+        /// Desc:关联状态
+        /// Default:
+        /// Nullable:True
+        /// </summary>           
+        public int? relation_state { get; set; }
+
+        /// <summary>
+        /// Desc:合同状态
+        /// Default:
+        /// Nullable:True
+        /// </summary>           
+        public string con_status { get; set; }
+
+        /// <summary>
+        /// Desc:停用
+        /// Default:
+        /// Nullable:True
+        /// </summary>           
+        public string enable_status { get; set; }
+
+        /// <summary>
+        /// Desc:停用说明
+        /// Default:
+        /// Nullable:True
+        /// </summary>           
+        public string deactivate_desc { get; set; }
+
+        /// <summary>
+        /// Desc:数据来源
+        /// Default:
+        /// Nullable:True
+        /// </summary>           
+        public string from_sys_code { get; set; }
+
+        /// <summary>
+        /// Desc:原系统合同主键ID
+        /// Default:
+        /// Nullable:True
+        /// </summary>           
+        public string from_id { get; set; }
+
+        /// <summary>
+        /// Desc:版本号（自增）
+        /// Default:
+        /// Nullable:True
+        /// </summary>           
+        public int? version_no { get; set; }
+
+        /// <summary>
+        /// Desc:是否虚拟合同
+        /// Default:
+        /// Nullable:True
+        /// </summary>           
+        public string is_invented { get; set; }
+
+        /// <summary>
+        /// Desc:变更次数
+        /// Default:
+        /// Nullable:True
+        /// </summary>           
+        public string change_num { get; set; }
+
+        /// <summary>
+        /// Desc:是否最新版本
+        /// Default:
+        /// Nullable:True
+        /// </summary>           
+        public string is_newest { get; set; }
+
+        /// <summary>
+        /// Desc:是否删除
+        /// Default:
+        /// Nullable:True
+        /// </summary>           
+        public string is_delete { get; set; }
+
+        /// <summary>
+        /// Desc:是否有保证金
+        /// Default:
+        /// Nullable:True
+        /// </summary>           
+        public string is_sfybzj { get; set; }
+
+        /// <summary>
+        /// Desc:是否有担保
+        /// Default:
+        /// Nullable:True
+        /// </summary>           
+        public string is_sfydb { get; set; }
+
+        /// <summary>
+        /// Desc:创建机构
+        /// Default:
+        /// Nullable:True
+        /// </summary>           
+        public string create_org { get; set; }
+
+        /// <summary>
+        /// Desc:管理部门名称id
+        /// Default:
+        /// Nullable:True
+        /// </summary>           
+        public string oid { get; set; }
+
+        /// <summary>
+        /// Desc:管理部门名称
+        /// Default:
+        /// Nullable:True
+        /// </summary>           
+        public string oname { get; set; }
+
+        /// <summary>
+        /// Desc:财务云入库执行状态
+        /// Default:
+        /// Nullable:True
+        /// </summary>           
+        public string change_status { get; set; }
+
+        /// <summary>
+        /// Desc:数据类型
+        /// Default:
+        /// Nullable:True
+        /// </summary>           
+        public string data_type { get; set; }
+
+        /// <summary>
+        /// Desc:关联补充协议合同ID
+        /// Default:
+        /// Nullable:True
+        /// </summary>           
+        public string supply_number { get; set; }
+
+        /// <summary>
+        /// Desc:核算组织单位名称
+        /// Default:
+        /// Nullable:True
+        /// </summary>           
+        public string account_unit_name { get; set; }
+
+        /// <summary>
+        /// Desc:核算组织单位编码
+        /// Default:
+        /// Nullable:True
+        /// </summary>           
+        public string account_unit_code { get; set; }
+
+        /// <summary>
+        /// Desc:是否审批中
+        /// Default:
+        /// Nullable:True
+        /// </summary>           
+        public string is_approving { get; set; }
+
+        /// <summary>
+        /// Desc:审批状态
+        /// Default:
+        /// Nullable:True
+        /// </summary>           
+        public string examin_state { get; set; }
+
+        /// <summary>
+        /// Desc:审批类型
+        /// Default:
+        /// Nullable:True
+        /// </summary>           
+        public string examin_type { get; set; }
+
+        /// <summary>
+        /// Desc:流程状态
+        /// Default:
+        /// Nullable:True
+        /// </summary>           
+        public string process_status { get; set; }
+
+        /// <summary>
+        /// Desc:审批表单id
+        /// Default:
+        /// Nullable:True
+        /// </summary>           
+        public string business_bill_id { get; set; }
+
+        /// <summary>
+        /// Desc:争议解决方式
+        /// Default:
+        /// Nullable:True
+        /// </summary>           
+        public string dispute_solution_way { get; set; }
+
+        /// <summary>
+        /// Desc:合同范本使用情况
+        /// Default:
+        /// Nullable:True
+        /// </summary>           
+        public string con_model_use_condition { get; set; }
+
+        /// <summary>
+        /// Desc:录入人ID
+        /// Default:
+        /// Nullable:True
+        /// </summary>           
+        public string create_user_id { get; set; }
+
+        /// <summary>
+        /// Desc:创建人姓名
+        /// Default:
+        /// Nullable:True
+        /// </summary>           
+        public string create_user { get; set; }
+
+        /// <summary>
+        /// Desc:创建时间
+        /// Default:
+        /// Nullable:True
+        /// </summary>           
+        public DateTime? create_time { get; set; }
+
+        /// <summary>
+        /// Desc:修改人ID
+        /// Default:
+        /// Nullable:True
+        /// </summary>           
+        public string update_user_id { get; set; }
+
+        /// <summary>
+        /// Desc:修改人姓名
+        /// Default:
+        /// Nullable:True
+        /// </summary>           
+        public string update_user { get; set; }
+
+        /// <summary>
+        /// Desc:修改时间
+        /// Default:
+        /// Nullable:True
+        /// </summary>           
+        public DateTime? update_time { get; set; }
+
+        /// <summary>
+        /// Desc:入库赋码时间
+        /// Default:
+        /// Nullable:True
+        /// </summary>           
+        public DateTime? create_maincode_time { get; set; }
+
+        /// <summary>
+        /// Desc:合同入库时间
+        /// Default:
+        /// Nullable:True
+        /// </summary>           
+        public DateTime? contract_warehousing_time { get; set; }
+
+        /// <summary>
+        /// Desc:数据来源（接口推送或者页面录入）
+        /// Default:
+        /// Nullable:True
+        /// </summary>           
+        public string data_from { get; set; }
+
+        /// <summary>
+        /// Desc:加载时间
+        /// Default:
+        /// Nullable:True
+        /// </summary>           
+        public DateTime? load_time { get; set; }
+
+        /// <summary>
+        /// Desc:所属二级单位编码（4A）
+        /// Default:
+        /// Nullable:True
+        /// </summary>           
+        public string sec_org { get; set; }
+
+        /// <summary>
+        /// Desc:所属二级单位名称（4A）
+        /// Default:
+        /// Nullable:True
+        /// </summary>           
+        public string sec_org_name { get; set; }
+
+        /// <summary>
+        /// Desc:中标交底项目名称
+        /// Default:
+        /// Nullable:True
+        /// </summary>           
+        public string zbjd_proj_name { get; set; }
+
+        /// <summary>
+        /// Desc:中标交底项目编码
+        /// Default:
+        /// Nullable:True
+        /// </summary>           
+        public string zbjd_proj_code { get; set; }
+
+        /// <summary>
+        /// Desc:所属三级单位编码（4A）
+        /// Default:
+        /// Nullable:True
+        /// </summary>           
+        public string third_org { get; set; }
+
+    }
 }

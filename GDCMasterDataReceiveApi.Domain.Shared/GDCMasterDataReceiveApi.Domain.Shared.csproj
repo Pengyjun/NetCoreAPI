@@ -16,7 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Temp\" />
+    <Folder Include="Template\" />
   </ItemGroup>
 
 </Project>

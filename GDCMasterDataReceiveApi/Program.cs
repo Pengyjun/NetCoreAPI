@@ -181,6 +181,8 @@ builder.Services.AddAutoMapper(ConfigAutoMapper =>
 });
 #endregion
 
+ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+
 var app = builder.Build();
 app.Use(async (context, next) =>
 {

@@ -4739,6 +4739,13 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                 .Where(t => dzKey.Contains(t.ZCONTINENTCODE))
                 .ToListAsync();
 
+            //业务板块 业务分类、
+            var ywbkKey = ccList.Select(x => x.Zbbid).ToList();
+            var ywflKey = ccList.Select(x => x.Zbtid).ToList();
+            var ywbk = await _dbContext.Queryable<ProjectClassification>()
+                .Where(t => t.IsDelete == 1 && ywbkKey.Contains(t.ZBUSTD1ID) || ywflKey.Contains(t.ZCPBC1ID))
+                .ToListAsync();
+
             foreach (var item in ccList)
             {
                 //核算机构状态
@@ -4776,6 +4783,12 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
 
                 //州别名称
                 item.Zcontinentcode = dz.FirstOrDefault(x => x.ZCONTINENTCODE == item.Zcontinentcode)?.ZCONTINENTNAME;
+
+                //业务板块
+                item.Zbbid = ywbk.FirstOrDefault(x => x.ZBUSTD1ID == item.Zbbid)?.ZICSTD1NAME;
+
+                //业务分类
+                item.Zbtid = ywbk.FirstOrDefault(x => x.ZCPBC1ID == item.Zbtid)?.ZCPBC1NAME;
 
             }
 
@@ -7178,8 +7191,22 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     //    }
                     //    break;
                     //case "SearchNotesPayableAsync":
-                    //    var properties30 = GetProperties<AdministrativeOrganization>();
                     //    var properties32 = GetProperties<dwd_ffm_receive_new_d>();
+                    //    foreach (var property in properties32)
+                    //    {
+                    //        if (!excludedProperties.Contains(property.Name))
+                    //        {
+                    //            ddd.Add(new SystemInterfaceField
+                    //            {
+                    //                Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                    //                AppSystemInterfaceId = r.Id,
+                    //                FieidName = property.Name
+                    //            });
+                    //        }
+                    //    }
+                    //    break;  
+                    //case "SearchNotesReceiveAsync":
+                    //    var properties32 = GetProperties<dwd_cdm_con_bas_i_d>();
                     //    foreach (var property in properties32)
                     //    {
                     //        if (!excludedProperties.Contains(property.Name))
@@ -7196,7 +7223,6 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                 }
             }
             #endregion
-
 
             ddd.ForEach(x => x.FieidName = char.ToLower(x.FieidName[0]) + x.FieidName.Substring(1));
 

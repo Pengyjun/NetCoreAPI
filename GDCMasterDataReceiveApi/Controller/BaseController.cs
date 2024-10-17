@@ -53,5 +53,25 @@ namespace GDCMasterDataReceiveApi.Controller
             return new FileStreamResult(memoryStream, Domain.Shared.Const.ContentType.APPLICATIONSTREAM);
         }
         #endregion
+        #region 流式下载（excel导出 模版导出）
+        /// <summary>
+        /// 流式下载（excel导出 模版导出）
+        /// </summary>
+        /// <param name="data">数据源</param>
+        /// <param name="templatePath">模版路径</param>
+        /// <param name="fileName">文件名称 不包含后缀名</param>
+        /// <param name="fileSuffixName">文件后缀名 默认xlsx</param>
+        /// <returns></returns>
+        //[ApiExplorerSettings(IgnoreApi = true)]
+        //public async Task<IActionResult> ExcelTemplateImportAsync(string templatePath, object data, string fileName, string fileSuffixName = "xlsx")
+        //{
+        //    MemoryStream memoryStream = new MemoryStream();
+        //    await memoryStream.SaveAsByTemplateAsync(templatePath, data);
+        //    memoryStream.Seek(0, SeekOrigin.Begin);
+        //    await memoryStream.FlushAsync();
+        //    HttpContext.Response.Headers.Add("Content-Disposition", $"attachment;filename={HttpUtility.UrlEncode($"{fileName}.{fileSuffixName}", System.Text.Encoding.UTF8)}");
+        //    return new FileStreamResult(memoryStream, Domain.Shared.Const.ContentType.APPLICATIONSTREAM);
+        //}
+        #endregion
     }
 }
