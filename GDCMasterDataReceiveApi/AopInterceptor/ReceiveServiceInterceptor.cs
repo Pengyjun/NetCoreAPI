@@ -281,7 +281,7 @@ namespace GHElectronicFileApi.AopInterceptor
                     receiveDataType = ReceiveDataType.EscrowOrganization;
                 }
 
-                else if (methodName == "FinancialInstitution")
+                else if (methodName == "FinancialInstitutionAsync")
                 {
                     var receiveParame = ((BaseReceiveDataRequestDto<FinancialInstitutionReceiveDto>)invocation.Arguments[0]).IT_DATA;
                     parameCount = receiveParame.item.Count;
