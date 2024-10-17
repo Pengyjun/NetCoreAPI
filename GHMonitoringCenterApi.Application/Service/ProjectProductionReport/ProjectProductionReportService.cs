@@ -10,6 +10,7 @@ using GHMonitoringCenterApi.Domain.Models;
 using GHMonitoringCenterApi.Domain.Shared;
 using GHMonitoringCenterApi.Domain.Shared.Const;
 using GHMonitoringCenterApi.Domain.Shared.Util;
+using NPOI.SS.Formula.Functions;
 using SqlSugar;
 using System.Linq.Expressions;
 using UtilsSharp;
@@ -849,51 +850,63 @@ namespace GHMonitoringCenterApi.Application.Service.ProjectProductionReport
             {
                 //var isExistProject = shiMovenmentList.Where(x => x.IsDelete == 1 && x.ShipId == item.shipId && x.EnterTime.HasValue == true && (x.EnterTime.Value.ToDateDay() <= item.DateDay || x.QuitTime.HasValue == true && x.QuitTime.Value.ToDateDay() >= item.DateDay)).OrderByDescending(x => x.EnterTime).ToList();
                 var isExistProject = shiMovenmentList.Where(x => x.IsDelete == 1 && x.ShipId == item.shipId).OrderByDescending(x => x.EnterTime).ToList();
-                foreach (var project in isExistProject)
+                if (isExistProject.Count > 0)
                 {
-
-                    if (project.QuitTime.HasValue && project.QuitTime.Value.ToDateDay() >= item.DateDay)
+                    foreach (var project in isExistProject)
                     {
 
-                        var oldValue = list.Where(t => t.ShipId == project.ShipId && t.DateDay == item.DateDay).FirstOrDefault();
-                        if (oldValue != null)
+                        if (project.QuitTime.HasValue && project.QuitTime.Value.ToDateDay() >= item.DateDay)
                         {
-                            oldValue.ProjectId = project.ProjectId;
-                            oldValue.ProjectName = projectList.Where(x => x.Id == project.ProjectId).FirstOrDefault()?.Name;
-                            oldValue.shipDayReportType = 1;
+
+                            var oldValue = list.Where(t => t.ShipId == project.ShipId && t.DateDay == item.DateDay).FirstOrDefault();
+                            if (oldValue != null)
+                            {
+                                oldValue.ProjectId = project.ProjectId;
+                                oldValue.ProjectName = projectList.Where(x => x.Id == project.ProjectId).FirstOrDefault()?.Name;
+                                oldValue.shipDayReportType = 1;
+                            }
                         }
+                        if (project.EnterTime.HasValue && project.QuitTime.HasValue == false && project.EnterTime.Value.ToDateDay() <= item.DateDay)
+                        {
+
+                            var oldValue = list.Where(t => t.ShipId == project.ShipId && t.DateDay == item.DateDay).FirstOrDefault();
+                            if (oldValue != null)
+                            {
+                                oldValue.ProjectId = project.ProjectId;
+                                oldValue.ProjectName = projectList.Where(x => x.Id == project.ProjectId).FirstOrDefault()?.Name;
+                                oldValue.shipDayReportType = 1;
+                            }
+                        }
+                        if (project.EnterTime.HasValue && project.QuitTime.HasValue && project.QuitTime.Value.ToDateDay() >= item.DateDay)
+                        {
+
+                            var oldValue = list.Where(t => t.ShipId == project.ShipId && t.DateDay == item.DateDay).FirstOrDefault();
+                            if (oldValue != null)
+                            {
+                                oldValue.ProjectId = project.ProjectId;
+                                oldValue.ProjectName = projectList.Where(x => x.Id == project.ProjectId).FirstOrDefault()?.Name;
+                                oldValue.shipDayReportType = 1;
+                            }
+                        }
+                        if (project.Status == ShipMovementStatus.Enter && project.EnterTime == null && project.QuitTime == null)
+                        {
+                            var oldValue = list.Where(t => t.ShipId == project.ShipId && t.DateDay == item.DateDay).FirstOrDefault();
+                            if (oldValue != null)
+                            {
+                                oldValue.ProjectId = project.ProjectId;
+                                oldValue.ProjectName = projectList.Where(x => x.Id == project.ProjectId).FirstOrDefault()?.Name;
+                                oldValue.shipDayReportType = 1;
+                            }
+                        }
+
                     }
-                    if (project.EnterTime.HasValue && project.QuitTime.HasValue == false && project.EnterTime.Value.ToDateDay() <= item.DateDay)
+                }
+                else {
+                    var oldValue = list.Where(t => t.ShipId == item.shipId && t.DateDay == item.DateDay).FirstOrDefault();
+                    if (oldValue != null)
                     {
-
-                        var oldValue = list.Where(t => t.ShipId == project.ShipId && t.DateDay == item.DateDay).FirstOrDefault();
-                        if (oldValue != null)
-                        {
-                            oldValue.ProjectId = project.ProjectId;
-                            oldValue.ProjectName = projectList.Where(x => x.Id == project.ProjectId).FirstOrDefault()?.Name;
-                            oldValue.shipDayReportType = 1;
-                        }
-                    }
-                    if (project.EnterTime.HasValue && project.QuitTime.HasValue && project.QuitTime.Value.ToDateDay() >= item.DateDay)
-                    {
-
-                        var oldValue = list.Where(t => t.ShipId == project.ShipId && t.DateDay == item.DateDay).FirstOrDefault();
-                        if (oldValue != null)
-                        {
-                            oldValue.ProjectId = project.ProjectId;
-                            oldValue.ProjectName = projectList.Where(x => x.Id == project.ProjectId).FirstOrDefault()?.Name;
-                            oldValue.shipDayReportType = 1;
-                        }
-                    }
-                    if (project.Status == ShipMovementStatus.Enter && project.EnterTime == null && project.QuitTime == null)
-                    {
-                        var oldValue = list.Where(t => t.ShipId == project.ShipId && t.DateDay == item.DateDay).FirstOrDefault();
-                        if (oldValue != null)
-                        {
-                            oldValue.ProjectId = project.ProjectId;
-                            oldValue.ProjectName = projectList.Where(x => x.Id == project.ProjectId).FirstOrDefault()?.Name;
-                            oldValue.shipDayReportType = 1;
-                        }
+                        
+                        oldValue.shipDayReportType = 2;
                     }
                 }
 

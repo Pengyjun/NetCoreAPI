@@ -720,7 +720,13 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     };
                     //进场时间
                     var currentEnterShipInfo = shipMovementList.Where(x => x.ShipId == item.PomId && x.Status == ShipMovementStatus.Enter).FirstOrDefault();
-                    if (currentEnterShipInfo != null)
+                    int startTime=0, endTime = 0;
+                    if (currentEnterShipInfo != null&& currentEnterShipInfo.EnterTime!=null)
+                    {
+                         startTime=int.Parse(currentEnterShipInfo.EnterTime.Value.ToString("yyyyMMdd"));
+                         endTime=int.Parse(model.DateDayTime.Value.ToString("yyyyMMdd"));
+                    }
+                    if (currentEnterShipInfo != null&& startTime < endTime)
                     {
                         res.EnterTime = currentEnterShipInfo.EnterTime;
                         res.ProjectId = currentEnterShipInfo.ProjectId;
