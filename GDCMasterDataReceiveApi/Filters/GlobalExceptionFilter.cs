@@ -318,8 +318,6 @@ namespace GDCMasterDataReceiveApi.Filters
             #endregion
 
             await next.Invoke();
-            await Console.Out.WriteLineAsync($"整个方法结束:{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.ffff")}");
-            await Console.Out.WriteLineAsync("---------------------------------------------------------------------------------------------");
         }
         #endregion
 

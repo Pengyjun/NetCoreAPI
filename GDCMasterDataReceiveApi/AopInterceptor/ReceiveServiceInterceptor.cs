@@ -42,6 +42,7 @@ using RestSharp;
 using RestSharp.Serializers;
 using SqlSugar;
 using System;
+using System.DirectoryServices.Protocols;
 using System.Net;
 using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
@@ -484,11 +485,11 @@ namespace GHElectronicFileApi.AopInterceptor
             var requestBody = Utils.SoapFormat(headParame, businessParame);
             //请求地址
             var url = AppsettingsHelper.GetValue("MDMAsyncResultApi");
+
             #region RestClient写法  有问题
             RestClientOptions restClientOptions = new RestClientOptions()
             {
                 BaseUrl = new Uri(url),
-
                 RemoteCertificateValidationCallback = (object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors) => { return true; }
             };
             using (var client = new RestClient(restClientOptions))
@@ -496,15 +497,11 @@ namespace GHElectronicFileApi.AopInterceptor
                 var resultRequest = new RestRequest("", Method.Post);
                 resultRequest.AddHeader("Content-Type", "application/xml");
                 resultRequest.AddParameter("application/xml", requestBody, ParameterType.RequestBody);
-                var apiResponse= await client.ExecuteGetAsync(resultRequest);
-                Task.Factory.StartNew(async () =>
+                var apiResponse = await client.ExecutePostAsync(resultRequest);
+                if (logger != null)
                 {
-                    await client.ExecuteGetAsync(resultRequest);
-                });
-                //if (logger != null)
-                //{
-                //    logger.LogInformation($"接口异步通知回调结果:{apiResponse.Content.ToJson()}");
-                //}
+                    logger.LogInformation($"接口异步通知回调结果:{apiResponse.Content.ToJson()}");
+                }
             }
             #endregion
 
