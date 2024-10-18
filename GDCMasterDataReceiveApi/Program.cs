@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using NPOI.SS.Formula.Atp;
 using OfficeOpenXml;
 using Serilog;
 using Serilog.Events;
@@ -194,7 +195,6 @@ app.UseSwagger();
 app.UseSwaggerUI();
 #endregion
 
-//app.UseForwardedHeaders();
 
 app.UseCors("Cors");
 app.UseHttpsRedirection();
@@ -204,5 +204,12 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 //下面这行是因为没有显示启动日志
+#region 设置线程数  麒麟系统优化
+int workThread = 0, miPortThreads = 0;
+ThreadPool.GetMinThreads(out workThread, out miPortThreads);
+var isSuccess=ThreadPool.SetMinThreads(250, miPortThreads);
+Console.WriteLine($"程序启动设置线程最小线程数:{isSuccess}");
+#endregion
+
 Console.WriteLine("-----------------------------------程序启动成功--------------------------------------");
 app.Run();

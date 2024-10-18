@@ -12,18 +12,19 @@ namespace GDCMasterDataReceiveApi.SqlSugarCore
     /// <summary>
     /// Sqlsugar上下文
     /// </summary>
-    public static class GDCMasterDataReceiveApiDbContext
+    public static class GDCMasterDataReceiveApiDbContext  
     {
         public static void AddSqlSugarContext(this IServiceCollection services, IConfiguration configuration, string dbCon)
         {
             //是否打开无参数化sql监视
-             var gdcmasterdatareceiveapi = "Server=10.10.74.3;PORT=5088; User Id=datasecurity; PWD=datasecurity@sql;connPooling=true;";
-            var gdcdatasecurityapi = "Server=10.10.74.3;PORT=5088; User Id=GDCMDM; PWD=GDCMDMdb123; connPooling=true;";
+             //var gdcmasterdatareceiveapi = "Server=10.10.74.3;PORT=5088; User Id=datasecurity; PWD=datasecurity@sql;SCHEMA=DATASECURITY";
+            var gdcdatasecurityapi = "Server=10.10.54.3;PORT=8011; User Id=GDCMDM; PWD=GDCMDMdb123;SCHEMA=GDCMDM";//正式环境
+            //var gdcdatasecurityapi = "Server=10.10.74.3;PORT=5088; User Id=GDCMDM; PWD=GDCMDMdb123;SCHEMA=GDCMDM";//测试环境
 
             bool isOpenSql = false;
             SqlSugarClient sqlSugarClient = new SqlSugarClient(new List<ConnectionConfig>()
             {
-                 new ConnectionConfig(){ConfigId="gdcmasterdatareceiveapi",ConnectionString = gdcmasterdatareceiveapi, DbType = DbType.Dm,IsAutoCloseConnection = true},
+                // new ConnectionConfig(){ConfigId="gdcmasterdatareceiveapi",ConnectionString = gdcmasterdatareceiveapi, DbType = DbType.Dm,IsAutoCloseConnection = true},
                 new ConnectionConfig(){ConfigId="gdcdatasecurityapi",ConnectionString = gdcdatasecurityapi,DbType = DbType.Dm,IsAutoCloseConnection = true},
                // new ConnectionConfig(){ConfigId="finance",ConnectionString = finance,DbType = DbType.Dm,IsAutoCloseConnection = true}
             }, db =>

@@ -80,7 +80,12 @@ namespace GDCMasterDataReceiveApi.Filters
                             context.Result = obj;
                             return;
                         }
-                        var intefaceInfo = interfaceInfoList.Result.Data!=null?interfaceInfoList.Result.Data.Where(x => x.InterfaceName == actionName && x.IsEnable == 1).FirstOrDefault():null;
+                        DataInterfaceResponseDto intefaceInfo = null;
+                        if (interfaceInfoList.Result != null)
+                        {
+                             intefaceInfo = interfaceInfoList.Result.Data != null ? interfaceInfoList.Result.Data.Where(x => x.InterfaceName == actionName && x.IsEnable == 1).FirstOrDefault() : null;
+                        }
+                     
                         //验证接口是否存在
                         if (intefaceInfo == null)
                         {
@@ -134,8 +139,12 @@ namespace GDCMasterDataReceiveApi.Filters
 
                         }
                         #endregion
-                        CacheHelper cacheHelper = new CacheHelper();
-                        cacheHelper.Set(httpContext.TraceIdentifier, intefaceInfo, 30);
+                        if (intefaceInfo != null)
+                        {
+                            CacheHelper cacheHelper = new CacheHelper();
+                            cacheHelper.Set(httpContext.TraceIdentifier, intefaceInfo, 30);
+                        }
+                      
                     }
                     else
                     {
