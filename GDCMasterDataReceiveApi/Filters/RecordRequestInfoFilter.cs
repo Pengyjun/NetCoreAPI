@@ -27,7 +27,6 @@ namespace GDCMasterDataReceiveApi.Filters
     {
         public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
         {
-
             var actionDescriptor = context.ActionDescriptor as ControllerActionDescriptor;
             var method = actionDescriptor.MethodInfo;
             var httpContext = context.HttpContext;

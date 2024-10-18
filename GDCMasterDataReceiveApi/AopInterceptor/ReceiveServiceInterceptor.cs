@@ -308,7 +308,6 @@ namespace GHElectronicFileApi.AopInterceptor
                 invocation.Proceed();
                 var res = (Task)invocation.ReturnValue;
                 res.Wait();//如果任务有异常 直接报错
-
                 #region 异步通知主数据  
                 RecordRequestInfo recordRequestInfo = new RecordRequestInfo();
                 var redis = RedisUtil.Instance;

@@ -48,6 +48,7 @@ namespace GDCMasterDataReceiveApi.Filters
 
             RecordRequestInfo recordRequestInfo = new RecordRequestInfo();
             var currentTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.ffffff");
+            var routeData = ((Microsoft.AspNetCore.Mvc.ControllerBase)context.Controller).ControllerContext.RouteData.Values.ToArray();
             #region 400的错误
             try
             {
@@ -79,7 +80,6 @@ namespace GDCMasterDataReceiveApi.Filters
                     responseAjaxResult.Fail(ResponseMessage.OPERATION_PARAMETER_ERROR, HttpStatusCode.ParameterError);
                     //把400的状态吗记录到日志文件
                     #region 请求参数400记录审计日志  只记录接收集团主数据请求的错误  
-                    var routeData = ((Microsoft.AspNetCore.Mvc.ControllerBase)context.Controller).ControllerContext.RouteData.Values.ToArray();
                     if (routeData.Count()>0&&routeData[1].ToString().IndexOf("Receive")>=0)
                     {
                         RecordRequestInfo recordRequestInfos = new RecordRequestInfo()
@@ -155,8 +155,11 @@ namespace GDCMasterDataReceiveApi.Filters
             }
             #endregion
 
-            #region 过滤接口返回值
-            CacheHelper cacheHelper = new CacheHelper();
+            #region 判断接口是否做拦截
+            if (routeData[1].ToString().IndexOf("Receive") >= 0)
+            { 
+                #region 过滤接口返回值
+                CacheHelper cacheHelper = new CacheHelper();
             var cacheResult = cacheHelper.Get<DataInterfaceResponseDto>(context.HttpContext.TraceIdentifier);
             var IsEncrypt = 1;//是否加密   0  不是加密 
 
@@ -217,6 +220,9 @@ namespace GDCMasterDataReceiveApi.Filters
             #endregion
 
             context.HttpContext.Response.Headers.Append("IsEncryption", IsEncrypt.ToString());
+
+                #endregion
+            }
 
             #endregion
 
@@ -284,7 +290,10 @@ namespace GDCMasterDataReceiveApi.Filters
                             }
 
                             if (db != null)
-                                await db.Insertable<AuditLogs>(auditLogs).ExecuteCommandAsync();
+                            {
+                                 await db.Insertable<AuditLogs>(auditLogs).ExecuteCommandAsync();
+                            }
+                             
                         }
                     }
                     catch (Exception ex)
@@ -307,7 +316,10 @@ namespace GDCMasterDataReceiveApi.Filters
 
             }
             #endregion
+
             await next.Invoke();
+            await Console.Out.WriteLineAsync($"整个方法结束:{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.ffff")}");
+            await Console.Out.WriteLineAsync("---------------------------------------------------------------------------------------------");
         }
         #endregion
 
