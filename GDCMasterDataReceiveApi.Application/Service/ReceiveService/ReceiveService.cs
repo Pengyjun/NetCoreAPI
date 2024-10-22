@@ -2334,8 +2334,96 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
         /// <returns></returns>
         public async Task<MDMResponseResult> DeviceDetailCodeDataAsync(BaseReceiveDataRequestDto<DeviceDetailCodeItem> baseReceiveDataRequestDto)
         {
-            MDMResponseResult responseAjaxResult = new MDMResponseResult();
 
+            #region 旧版本
+            //MDMResponseResult responseAjaxResult = new MDMResponseResult();
+            //try
+            //{
+            //    List<DeviceDetailAttribute> insertItem = new();
+            //    List<DeviceDetailAttribute> updateItem = new();
+
+            //    var lgList = await _dbContext.Queryable<DeviceDetailCode>().Where(x => x.IsDelete == 1).ToListAsync();
+            //    var insertOids = baseReceiveDataRequestDto.IT_DATA.item.Where(x => !lgList.Select(x => x.ZMATERIAL).ToList().Contains(x.ZMATERIAL)).ToList();
+            //    var updateOids = baseReceiveDataRequestDto.IT_DATA.item.Where(x => lgList.Select(x => x.ZMATERIAL).ToList().Contains(x.ZMATERIAL)).ToList();
+
+            //    //新增操作
+            //    if (insertOids.Any())
+            //    {
+            //        foreach (var ic in insertOids)
+            //        {
+            //            ic.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
+            //            if (ic.ZMATTTR_LIST != null)
+            //            {
+
+            //                foreach (var cc in ic.ZMATTTR_LIST.Item)
+            //                {
+            //                    var lg = new DeviceDetailAttribute
+            //                    {
+            //                        Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+            //                        ZMATERIAL = ic.ZMATERIAL,
+            //                        ZATTRCODE = cc.ZATTRCODE,
+            //                        ZATTRNAME = cc.ZATTRNAME,
+            //                        ZATTRUNIT = cc.ZATTRUNIT,
+            //                        ZVALUECODE = cc.ZVALUECODE,
+            //                        ZVALUENAME = cc.ZVALUENAME,
+            //                        CreateTime = DateTime.Now
+            //                    };
+            //                    insertItem.Add(lg);
+            //                }
+            //            }
+            //        }
+
+            //        var mapList = _mapper.Map<List<DeviceDetailCodeItem>, List<DeviceDetailCode>>(insertOids);
+            //        mapList.ForEach(x => x.CreateTime = DateTime.Now);
+            //        await _dbContext.Fastest<DeviceDetailCode>().BulkCopyAsync(mapList);
+            //    }
+            //    if (updateOids.Any())
+            //    {
+            //        List<DeviceDetailAttribute> deleteData = new();
+            //        //更新
+            //        var lgeList = await _dbContext.Queryable<DeviceDetailAttribute>().ToListAsync();
+            //        foreach (var itemItem in updateOids)
+            //        {
+            //            var id = lgList.Where(x => x.ZMATERIAL == itemItem.ZMATERIAL).Select(x => x.Id).First();
+            //            itemItem.Id = id;
+            //            if (itemItem.ZMATTTR_LIST != null)
+            //            {
+            //                foreach (var items in itemItem.ZMATTTR_LIST.Item)
+            //                {
+            //                    DeviceDetailAttribute ldetails = new DeviceDetailAttribute()
+            //                    {
+            //                        Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+            //                        ZATTRCODE = items.ZATTRCODE,
+            //                        ZATTRNAME = items.ZATTRNAME,
+            //                        ZATTRUNIT = items.ZATTRUNIT,
+            //                        ZVALUECODE = items.ZVALUECODE,
+            //                        ZVALUENAME = items.ZVALUENAME,
+            //                        ZMATERIAL = itemItem.ZMATERIAL,
+            //                        CreateTime = DateTime.Now
+            //                    };
+            //                    updateItem.Add(ldetails);
+            //                }
+
+            //            }
+            //            deleteData.AddRange(lgeList.Where(x => x.ZMATERIAL == itemItem.ZMATERIAL).ToList());
+            //        }
+            //        var mapList = _mapper.Map<List<DeviceDetailCodeItem>, List<DeviceDetailCode>>(updateOids);
+            //        await _dbContext.Updateable(mapList).ExecuteCommandAsync();
+            //        await _dbContext.Deleteable<DeviceDetailAttribute>().WhereColumns(deleteData, it => new { it.Id }).ExecuteCommandAsync();
+            //        await _dbContext.Insertable(updateItem).ExecuteCommandAsync();
+            //    }
+
+            //    responseAjaxResult.Success();
+            //}
+            //catch (Exception ex)
+            //{
+            //    throw;
+            //}
+            //return responseAjaxResult;
+            #endregion
+
+            #region 新版本
+            MDMResponseResult responseAjaxResult = new MDMResponseResult();
             try
             {
                 List<DeviceDetailAttribute> insertItem = new();
@@ -2379,6 +2467,8 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
                 throw;
             }
             return responseAjaxResult;
+            #endregion
+
         }
         /// <summary>
         /// 多组织-核算机构
