@@ -150,7 +150,7 @@ namespace GDCMasterDataReceiveApi.Filters
             #endregion
 
             #region 判断接口是否做拦截
-            if (routeData[1].ToString().IndexOf("Receive") >= 0)
+            if (routeData[1].ToString().IndexOf("Receive") <=0)
             { 
                 #region 过滤接口返回值
                 CacheHelper cacheHelper = new CacheHelper();

@@ -37,7 +37,7 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// 国家/地区:该金融机构所在的国家/地区
         /// </summary>
         [SugarColumn(Length = 3, ColumnName = "Country")]
-        public string ZZCOUNTRY { get; set; }
+        public string? ZZCOUNTRY { get; set; }
         /// <summary>
         /// 省:该金融机构所在的省份/直辖市/自治区/特别行政区，境内金融机构必
         /// </summary>
