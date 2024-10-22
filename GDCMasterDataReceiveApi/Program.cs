@@ -11,8 +11,6 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using NPOI.SS.Formula.Atp;
-using OfficeOpenXml;
 using Serilog;
 using Serilog.Events;
 using System.Text;
@@ -181,8 +179,6 @@ builder.Services.AddAutoMapper(ConfigAutoMapper =>
     AutoMapperProfileFile.AutoMapperProfileInit(ConfigAutoMapper);
 });
 #endregion
-
-ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
 
 var app = builder.Build();
 app.Use(async (context, next) =>

@@ -209,6 +209,13 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     .Select(t => new { t.ZCOUNTRYCODE, t.ZCOUNTRYNAME })
                     .ToListAsync();
 
+                //政治面貌
+                var politicsFaceKeys = userInfos.Select(x => x.PoliticsFace).ToList();
+                var politicsFace = await _dbContext.Queryable<DictionaryTable>()
+                    .Where(t => t.IsDelete == 1 && t.Type == "3" && politicsFaceKeys.Contains(t.TypeNo))
+                    .Select(t => new { t.TypeNo, t.Name })
+                    .ToListAsync();
+
                 //用户状态
                 var us = userInfos.Where(x => !string.IsNullOrWhiteSpace(x.UserInfoStatus)).Select(x => x.UserInfoStatus).ToList();
                 var uStatus = valDomain.Where(x => us.Contains(x.ZDOM_VALUE) && x.ZDOM_CODE == "ZEMPSTATE").ToList();
@@ -258,10 +265,11 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     uInfo.EmpSort = empSort.FirstOrDefault(x => x.ZDOM_VALUE == uInfo.EmpSort)?.ZDOM_NAME;
                     uInfo.PositionGrade = jobType.FirstOrDefault(x => x.ZDOM_VALUE == uInfo.PositionGrade)?.ZDOM_NAME;
                     uInfo.PositionGradeNorm = positionGradeNorm.FirstOrDefault(x => x.ZDOM_VALUE == uInfo.PositionGradeNorm)?.ZDOM_NAME;
-                    uInfo.HighEstGrade = positionGradeNorm.FirstOrDefault(x => x.ZDOM_VALUE == uInfo.HighEstGrade)?.ZDOM_NAME;
-                    uInfo.SameHighEstGrade = positionGradeNorm.FirstOrDefault(x => x.ZDOM_VALUE == uInfo.SameHighEstGrade)?.ZDOM_NAME;
+                    uInfo.HighEstGrade = highEstGrade.FirstOrDefault(x => x.ZDOM_VALUE == uInfo.HighEstGrade)?.ZDOM_NAME;
+                    uInfo.SameHighEstGrade = sameHighEstGrade.FirstOrDefault(x => x.ZDOM_VALUE == uInfo.SameHighEstGrade)?.ZDOM_NAME;
                     uInfo.CertType = certType.FirstOrDefault(x => x.ZDOM_VALUE == uInfo.CertType)?.ZDOM_NAME;
                     uInfo.SubDepts = GetSubDepts(uInfo.SubDepts, institutions, valDomain, uInfo.JobName);
+                    uInfo.PoliticsFace = politicsFace.FirstOrDefault(x => x.TypeNo == uInfo.PoliticsFace)?.Name;
                 }
             }
 
