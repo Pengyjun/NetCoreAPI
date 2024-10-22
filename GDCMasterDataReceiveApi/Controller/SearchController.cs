@@ -374,7 +374,11 @@ namespace GDCMasterDataReceiveApi.Controller
         /// <param name="requestDto"></param>
         /// <returns></returns>
         [HttpPost("GetRelationalContractsSearch")]
-        public async Task<ResponseAjaxResult<List<RelationalContractsDetailsDto>>> GetRelationalContractsSearchAsync([FromBody] FilterCondition requestDto)
+        //public async Task<ResponseAjaxResult<List<RelationalContractsDetailsDto>>> GetRelationalContractsSearchAsync([FromBody] FilterCondition requestDto)
+        //{
+        //    return await _searchService.GetRelationalContractsSearchAsync(requestDto);
+        //}
+        public async Task<ResponseAjaxResult<List<DHMdmMultOrgAgencyRelPage>>> GetRelationalContractsSearchAsync([FromBody] FilterCondition requestDto)
         {
             return await _searchService.GetRelationalContractsSearchAsync(requestDto);
         }
@@ -671,6 +675,17 @@ namespace GDCMasterDataReceiveApi.Controller
         {
             return await _searchService.GetDicTableAsync(type);
         }
+        /// <summary>
+        /// DH生产经营管理组织
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        [HttpPost("GetDHMdmMultOrgAgencyRelPage")]
+        public async Task<ResponseAjaxResult<List<DHMdmManagementOrgage>>> GetDHMdmMultOrgAgencyRelPageAsync([FromBody] FilterCondition requestDto)
+        {
+            return await _searchService.GetDHMdmMultOrgAgencyRelPageAsync(requestDto);
+        }
+
         /// <summary>
         /// 条件筛选列
         /// </summary>

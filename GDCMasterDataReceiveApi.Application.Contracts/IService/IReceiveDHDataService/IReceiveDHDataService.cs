@@ -54,5 +54,15 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.IService.IReceiveDHDataS
         /// </summary>
         /// <returns></returns>
         Task<ResponseAjaxResult<bool>> ReceiveResearchListAsync();
+        /// <summary>
+        /// DH生产经营管理组织
+        /// </summary>
+        /// <returns></returns>
+        Task<ResponseAjaxResult<bool>> ReceiveGetMdmManagementOrgageListAsync();
+        /// <summary>
+        /// DH委托关系
+        /// </summary>
+        /// <returns></returns>
+        Task<ResponseAjaxResult<bool>> ReceiveGetDHMdmMultOrgAgencyRelPageListAsync();
     }
 }

@@ -37,9 +37,7 @@ using GDCMasterDataReceiveApi.Domain.Shared.Utils;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using SqlSugar;
-using System.Diagnostics.Metrics;
 using System.Reflection;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace GDCMasterDataReceiveApi.Application.Service.SearchService
 {
@@ -3150,44 +3148,74 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<List<RelationalContractsDetailsDto>>> GetRelationalContractsSearchAsync(FilterCondition requestDto)
+        public async Task<ResponseAjaxResult<List<DHMdmMultOrgAgencyRelPage>>> GetRelationalContractsSearchAsync(FilterCondition requestDto)
         {
-            var responseAjaxResult = new ResponseAjaxResult<List<RelationalContractsDetailsDto>>();
+            var responseAjaxResult = new ResponseAjaxResult<List<DHMdmMultOrgAgencyRelPage>>();
             RefAsync<int> total = 0;
 
             //过滤条件
-            RelationalContractsDetailsDto filterCondition = new();
+            DHMdmMultOrgAgencyRelPage filterCondition = new();
             if (!string.IsNullOrWhiteSpace(requestDto.FilterConditionJson))
             {
-                filterCondition = JsonConvert.DeserializeObject<RelationalContractsDetailsDto>(requestDto.FilterConditionJson);
+                filterCondition = JsonConvert.DeserializeObject<DHMdmMultOrgAgencyRelPage>(requestDto.FilterConditionJson);
             }
-
-            var ccList = await _dbContext.Queryable<RelationalContracts>()
-                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Code), (pro) => pro.ZDELEGATE_ORG.Contains(filterCondition.Code))
-                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.DetailedLine), (pro) => pro.ZNUMC4.Contains(filterCondition.DetailedLine))
-                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.MDCode), (pro) => pro.MDM_CODE.Contains(filterCondition.MDCode))
-                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.OrgCode), (pro) => pro.OID.Contains(filterCondition.OrgCode))
-                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.AccOrgCode), (pro) => pro.ZACO.Contains(filterCondition.AccOrgCode))
-                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.TreeCode), (pro) => pro.ZTREEID.Contains(filterCondition.TreeCode))
-                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.CreateTime.ToString()), (pro) => Convert.ToDateTime(pro.CreateTime).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.CreateTime).ToString("yyyy-MM-dd"))
-                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.UpdateTime.ToString()), (pro) => Convert.ToDateTime(pro.UpdateTime).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.UpdateTime).ToString("yyyy-MM-dd"))
-                .Where((cc) => cc.IsDelete == 1)
-                .Select((cc) => new RelationalContractsDetailsDto
-                {
-                    Id = cc.Id.ToString(),
-                    Code = cc.ZDELEGATE_ORG,
-                    DetailedLine = cc.ZNUMC4,
-                    MDCode = cc.MDM_CODE,
-                    Status = cc.ZDELEGATE_STATE,
-                    OrgCode = cc.OID,
-                    AccOrgCode = cc.ZACO,
-                    TreeCode = cc.ZTREEID,
-                    Version = cc.ZTREEVER,
-                    ViewIdentification = cc.ZMVIEW_FLAG,
-                    CreateTime = cc.CreateTime,
-                    UpdateTime = cc.UpdateTime
-                })
-                .ToPageListAsync(requestDto.PageIndex, requestDto.PageSize, total);
+            var ccList = await _dbContext.Queryable<DHMdmMultOrgAgencyRelPage>()
+               //.WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Code), (pro) => pro.ZDELEGATE_ORG.Contains(filterCondition.Code))
+               //.WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.DetailedLine), (pro) => pro.ZNUMC4.Contains(filterCondition.DetailedLine))
+               //.WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.MDCode), (pro) => pro.MDM_CODE.Contains(filterCondition.MDCode))
+               //.WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.OrgCode), (pro) => pro.OID.Contains(filterCondition.OrgCode))
+               //.WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.AccOrgCode), (pro) => pro.ZACO.Contains(filterCondition.AccOrgCode))
+               //.WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.TreeCode), (pro) => pro.ZTREEID.Contains(filterCondition.TreeCode))
+               .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Ztreeid), (pro) => pro.Ztreeid.Contains(filterCondition.Ztreeid))
+               .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.MdmCode), (pro) => pro.MdmCode.Contains(filterCondition.MdmCode))
+               .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Ztreever), (pro) => pro.Ztreever.Contains(filterCondition.Ztreever))
+               .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZdelegateState), (pro) => pro.ZdelegateState.Contains(filterCondition.ZdelegateState))
+               .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Znumc4x), (pro) => pro.Znumc4x.Contains(filterCondition.Znumc4x))
+               .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZmviewFlag), (pro) => pro.ZmviewFlag.Contains(filterCondition.ZmviewFlag))
+               .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZdelegateOrg), (pro) => pro.ZdelegateOrg.Contains(filterCondition.ZdelegateOrg))
+               .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.CreateTime.ToString()), (pro) => Convert.ToDateTime(pro.CreateTime).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.CreateTime).ToString("yyyy-MM-dd"))
+               .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.UpdateTime.ToString()), (pro) => Convert.ToDateTime(pro.UpdateTime).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.UpdateTime).ToString("yyyy-MM-dd"))
+               .Where((cc) => cc.IsDelete == 1)
+               .Select((cc) => new DHMdmMultOrgAgencyRelPage
+               {
+                   Ztreeid = cc.Ztreeid,
+                   MdmCode = cc.MdmCode,
+                   Ztreever = cc.Ztreever,
+                   ZdelegateState = cc.ZdelegateState,
+                   Znumc4x = cc.Znumc4x,
+                   ZmviewFlag = cc.ZmviewFlag,
+                   ZdelegateOrg = cc.ZdelegateOrg,
+                   Id = cc.Id,
+                   CreateTime = cc.CreateTime,
+                   UpdateTime = cc.UpdateTime
+               })
+               .ToPageListAsync(requestDto.PageIndex, requestDto.PageSize, total);
+            //var ccList = await _dbContext.Queryable<RelationalContracts>()
+            //    .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Code), (pro) => pro.ZDELEGATE_ORG.Contains(filterCondition.Code))
+            //    .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.DetailedLine), (pro) => pro.ZNUMC4.Contains(filterCondition.DetailedLine))
+            //    .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.MDCode), (pro) => pro.MDM_CODE.Contains(filterCondition.MDCode))
+            //    .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.OrgCode), (pro) => pro.OID.Contains(filterCondition.OrgCode))
+            //    .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.AccOrgCode), (pro) => pro.ZACO.Contains(filterCondition.AccOrgCode))
+            //    .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.TreeCode), (pro) => pro.ZTREEID.Contains(filterCondition.TreeCode))
+            //    .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.CreateTime.ToString()), (pro) => Convert.ToDateTime(pro.CreateTime).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.CreateTime).ToString("yyyy-MM-dd"))
+            //    .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.UpdateTime.ToString()), (pro) => Convert.ToDateTime(pro.UpdateTime).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.UpdateTime).ToString("yyyy-MM-dd"))
+            //    .Where((cc) => cc.IsDelete == 1)
+            //    .Select((cc) => new RelationalContractsDetailsDto
+            //    {
+            //        Id = cc.Id.ToString(),
+            //        Code = cc.ZDELEGATE_ORG,
+            //        DetailedLine = cc.ZNUMC4,
+            //        MDCode = cc.MDM_CODE,
+            //        Status = cc.ZDELEGATE_STATE,
+            //        OrgCode = cc.OID,
+            //        AccOrgCode = cc.ZACO,
+            //        TreeCode = cc.ZTREEID,
+            //        Version = cc.ZTREEVER,
+            //        ViewIdentification = cc.ZMVIEW_FLAG,
+            //        CreateTime = cc.CreateTime,
+            //        UpdateTime = cc.UpdateTime
+            //    })
+            //    .ToPageListAsync(requestDto.PageIndex, requestDto.PageSize, total);
 
             responseAjaxResult.Count = total;
             responseAjaxResult.SuccessResult(ccList);
@@ -5071,6 +5099,160 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
             return responseAjaxResult;
         }
         /// <summary>
+        /// DH生产经营管理组织
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        public async Task<ResponseAjaxResult<List<DHMdmManagementOrgage>>> GetDHMdmMultOrgAgencyRelPageAsync(FilterCondition requestDto)
+        {
+            var responseAjaxResult = new ResponseAjaxResult<List<DHMdmManagementOrgage>>();
+            RefAsync<int> total = 0;
+
+            //过滤条件
+            DHMdmManagementOrgage filterCondition = new();
+            if (!string.IsNullOrWhiteSpace(requestDto.FilterConditionJson))
+            {
+                filterCondition = JsonConvert.DeserializeObject<DHMdmManagementOrgage>(requestDto.FilterConditionJson);
+            }
+
+            var ccList = await _dbContext.Queryable<DHMdmManagementOrgage>()
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.IsDelete.ToString()), (pro) => pro.IsDelete.ToString().Contains(filterCondition.IsDelete.ToString()))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.MdmCode), (pro) => pro.MdmCode.Contains(filterCondition.MdmCode))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.BusinessRecocation), (pro) => pro.BusinessRecocation.Contains(filterCondition.BusinessRecocation))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ViewFlag), (pro) => pro.ViewFlag.Contains(filterCondition.ViewFlag))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZaccountD), (pro) => pro.ZaccountD.Contains(filterCondition.ZaccountD))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Ztreeid), (pro) => pro.Ztreeid.Contains(filterCondition.Ztreeid))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Zacjthbfwn), (pro) => pro.Zacjthbfwn.Contains(filterCondition.Zacjthbfwn))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Ztreever), (pro) => pro.Ztreever.Contains(filterCondition.Ztreever))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Zshottver), (pro) => pro.Zshottver.Contains(filterCondition.Zshottver))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Ztreename), (pro) => pro.Ztreename.Contains(filterCondition.Ztreename))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Ztreestat), (pro) => pro.Ztreestat.Contains(filterCondition.Ztreestat))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZactiveDate), (pro) => pro.ZactiveDate.Contains(filterCondition.ZactiveDate))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Zdelete), (pro) => pro.Zdelete.Contains(filterCondition.Zdelete))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Zfixed), (pro) => pro.Zfixed.Contains(filterCondition.Zfixed))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZfixedBy), (pro) => pro.ZfixedBy.Contains(filterCondition.ZfixedBy))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZfixedDate), (pro) => pro.ZfixedDate.Contains(filterCondition.ZfixedDate))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Zremark), (pro) => pro.Zremark.Contains(filterCondition.Zremark))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Zaco), (pro) => pro.Zaco.Contains(filterCondition.Zaco))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Zyorgstate), (pro) => pro.Zyorgstate.Contains(filterCondition.Zyorgstate))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZztnameEn), (pro) => pro.ZztnameEn.Contains(filterCondition.ZztnameEn))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZztnameLoc), (pro) => pro.ZztnameLoc.Contains(filterCondition.ZztnameLoc))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZztnameZh), (pro) => pro.ZztnameZh.Contains(filterCondition.ZztnameZh))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZztshnameEn), (pro) => pro.ZztshnameEn.Contains(filterCondition.ZztshnameEn))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZztshnameChs), (pro) => pro.ZztshnameChs.Contains(filterCondition.ZztshnameChs))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZztshnameLoc), (pro) => pro.ZztshnameLoc.Contains(filterCondition.ZztshnameLoc))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZacshortnameChs), (pro) => pro.ZacshortnameChs.Contains(filterCondition.ZacshortnameChs))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZacshortnameEn), (pro) => pro.ZacshortnameEn.Contains(filterCondition.ZacshortnameEn))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZacshortnameLoc), (pro) => pro.ZacshortnameLoc.Contains(filterCondition.ZacshortnameLoc))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Zivflgid), (pro) => pro.Zivflgid.Contains(filterCondition.Zivflgid))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZreportTi), (pro) => pro.ZreportTi.Contains(filterCondition.ZreportTi))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZreportFl), (pro) => pro.ZreportFl.Contains(filterCondition.ZreportFl))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZaccountD), (pro) => pro.ZaccountD.Contains(filterCondition.ZaccountD))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZdeaYear), (pro) => pro.ZdeaYear.Contains(filterCondition.ZdeaYear))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Zcountrycode), (pro) => pro.Zcountrycode.Contains(filterCondition.Zcountrycode))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Zaddvscode), (pro) => pro.Zaddvscode.Contains(filterCondition.Zaddvscode))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Zowarid), (pro) => pro.Zowarid.Contains(filterCondition.Zowarid))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Zdcid), (pro) => pro.Zdcid.Contains(filterCondition.Zdcid))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Zbtid), (pro) => pro.Zbtid.Contains(filterCondition.Zbtid))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Zzcurrency), (pro) => pro.Zzcurrency.Contains(filterCondition.Zzcurrency))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Ztaxmetho), (pro) => pro.Ztaxmetho.Contains(filterCondition.Ztaxmetho))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZaxpayerC), (pro) => pro.ZaxpayerC.Contains(filterCondition.ZaxpayerC))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZtaxOrgan), (pro) => pro.ZtaxOrgan.Contains(filterCondition.ZtaxOrgan))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Zbusiness), (pro) => pro.Zbusiness.Contains(filterCondition.Zbusiness))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Zmgorgstat), (pro) => pro.Zmgorgstat.Contains(filterCondition.Zmgorgstat))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZtreeLevel), (pro) => pro.ZtreeLevel.Contains(filterCondition.ZtreeLevel))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZorgProp), (pro) => pro.ZorgProp.Contains(filterCondition.ZorgProp))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.BusinessRecocation), (pro) => pro.BusinessRecocation.Contains(filterCondition.BusinessRecocation))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ViewFlag), (pro) => pro.ViewFlag.Contains(filterCondition.ViewFlag))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Znodeup), (pro) => pro.Znodeup.Contains(filterCondition.Znodeup))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Znodestat), (pro) => pro.Znodestat.Contains(filterCondition.Znodestat))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Zisorg), (pro) => pro.Zisorg.Contains(filterCondition.Zisorg))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Zorg), (pro) => pro.Zorg.Contains(filterCondition.Zorg))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Zreason), (pro) => pro.Zreason.Contains(filterCondition.Zreason))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Zorgup1), (pro) => pro.Zorgup1.Contains(filterCondition.Zorgup1))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Zorule), (pro) => pro.Zorule.Contains(filterCondition.Zorule))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Zgpoid), (pro) => pro.Zgpoid.Contains(filterCondition.Zgpoid))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Zaclayer), (pro) => pro.Zaclayer.Contains(filterCondition.Zaclayer))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Zsortor), (pro) => pro.Zsortor.Contains(filterCondition.Zsortor))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Zaconame), (pro) => pro.Zaconame.Contains(filterCondition.Zaconame))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZacnameLoc), (pro) => pro.ZacnameLoc.Contains(filterCondition.ZacnameLoc))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.CreateTime.ToString()), (pro) => Convert.ToDateTime(pro.CreateTime).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.CreateTime).ToString("yyyy-MM-dd"))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.UpdateTime.ToString()), (pro) => Convert.ToDateTime(pro.UpdateTime).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.UpdateTime).ToString("yyyy-MM-dd"))
+                .Where((cc) => cc.IsDelete == 1)
+                .Select((cc) => new DHMdmManagementOrgage
+                {
+                    Id = cc.Id,
+                    IsDelete = cc.IsDelete,
+                    MdmCode = cc.MdmCode,
+                    Ztreeid = cc.Ztreeid,
+                    Ztreever = cc.Ztreever,
+                    BusinessRecocation = cc.BusinessRecocation,
+                    ViewFlag = cc.ViewFlag,
+                    ZaccountD = cc.ZaccountD,
+                    Zacjthbfwn = cc.Zacjthbfwn,
+                    Zaclayer = cc.Zaclayer,
+                    ZacnameEn = cc.ZacnameEn,
+                    ZacnameLoc = cc.ZacnameLoc,
+                    Zaco = cc.Zaco,
+                    Zaconame = cc.Zaconame,
+                    ZacshortnameChs = cc.ZacshortnameChs,
+                    ZacshortnameEn = cc.ZacshortnameEn,
+                    ZacshortnameLoc = cc.ZacshortnameLoc,
+                    ZactiveDate = cc.ZactiveDate,
+                    Zaddvscode = cc.Zaddvscode,
+                    ZaxpayerC = cc.ZaxpayerC,
+                    Zbtid = cc.Zbtid,
+                    Zgpoid = cc.Zgpoid,
+                    ZfixedBy = cc.ZfixedBy,
+                    Zdcid = cc.Zdcid,
+                    Zbusiness = cc.Zbusiness,
+                    Zcountrycode = cc.Zcountrycode,
+                    ZdeaYear = cc.ZdeaYear,
+                    Zfixed = cc.Zfixed,
+                    ZfixedDate = cc.ZfixedDate,
+                    Zmgorgstat = cc.Zmgorgstat,
+                    Zivflgid = cc.Zivflgid,
+                    Zdelete = cc.Zdelete,
+                    Zorule = cc.Zorule,
+                    Zisorg = cc.Zisorg,
+                    Zreason = cc.Zreason,
+                    Znodestat = cc.Znodestat,
+                    Zorg = cc.Zorg,
+                    Zorgup1 = cc.Zorgup1,
+                    ZorgProp = cc.ZorgProp,
+                    Zowarid = cc.Zowarid,
+                    Znodeup = cc.Znodeup,
+                    Zremark = cc.Zremark,
+                    ZreportFl = cc.ZreportFl,
+                    ZreportNo = cc.ZreportNo,
+                    Zsortor = cc.Zsortor,
+                    ZreportTi = cc.ZreportTi,
+                    Ztaxmetho = cc.Ztaxmetho,
+                    Zshottver = cc.Zshottver,
+                    Zyorgstat = cc.Zyorgstat,
+                    ZtaxOrgan = cc.ZtaxOrgan,
+                    ZtreeLevel = cc.ZtreeLevel,
+                    Ztreestat = cc.Ztreestat,
+                    Ztreename = cc.Ztreename,
+                    Zzcurrency = cc.Zzcurrency,
+                    ZztnameLoc = cc.ZztnameLoc,
+                    ZztnameEn = cc.ZztnameEn,
+                    ZztshnameChs = cc.ZztshnameChs,
+                    Zyorgstate = cc.Zyorgstate,
+                    ZztshnameEn = cc.ZztshnameEn,
+                    ZztshnameLoc = cc.ZztshnameLoc,
+                    ZztnameZh = cc.ZztnameZh,
+                    CreateTime = cc.CreateTime,
+                    UpdateTime = cc.UpdateTime
+                })
+                .ToPageListAsync(requestDto.PageIndex, requestDto.PageSize, total);
+
+            responseAjaxResult.Count = total;
+            responseAjaxResult.SuccessResult(ccList);
+            return responseAjaxResult;
+        }
+        /// <summary>
         /// 获取通用字典数据
         /// </summary>
         /// <param name="type">字典类型</param>
@@ -6675,6 +6857,55 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                         }
                     }
                     break;
+                case 31:
+                    allColumns = new List<string> { "Ztreestat", "Zdelete", "Zyorgstate", "ZacshortnameLoc" };
+                    var properties31 = GetProperties<DHOpportunity>();
+                    foreach (var property in properties31) { tableColumns.Add(property.Name); }
+                    foreach (var item in tableColumns)
+                    {
+                        if (allColumns.Contains(item))
+                        {
+                            List<FilterChildData> optionsChild = new();
+                            string type = string.Empty;
+                            string columnName = string.Empty;
+                          
+                            if (item.Contains("Ztreestat"))
+                            {
+                                columnName = "组织树状态";
+                                type = "Single";
+                                optionsChild.Add(new FilterChildData { Key = "0", Val = "审批中" });
+                                optionsChild.Add(new FilterChildData { Key = "1", Val = "审批通过" });
+                                optionsChild.Add(new FilterChildData { Key = "6", Val = "删除" });
+                            }
+                            else if (item.Contains("Zdelete"))
+                            {
+                                columnName = "是否删除";
+                                type = "Single";
+                                optionsChild.Add(new FilterChildData { Key = "1", Val = "已删除" });
+                                optionsChild.Add(new FilterChildData { Key = "0", Val = "未删除" });
+                            }
+                            else if (item.Contains("Zyorgstate"))
+                            {
+                                columnName = "核算机构状态";
+                                type = "Single";
+                                optionsChild = valDomain.Where(x => x.Code == "ZD_MVIEW_ZY_ORGSTATE").ToList();
+                            }  
+                            else if (item.Contains("Zyorgstate"))
+                            {
+                                columnName = "是否投资项目/公司";
+                                type = "Single";
+                                optionsChild.Add(new FilterChildData { Key = "0", Val = "否" });
+                                optionsChild.Add(new FilterChildData { Key = "1", Val = "是" });
+                            }
+                            else if (item.Contains("CreatedAt") || item.Contains("UpdatedAt"))
+                            {
+                                columnName = item == "CreateTime" ? "创建时间" : "修改时间";
+                                type = "Time";//时间
+                            }
+                            options.Add(new FilterConditionDto { CoulmnName = columnName, CoulmnKey = char.ToLower(item[0]) + item.Substring(1), Options = optionsChild, Type = type });
+                        }
+                    }
+                    break;
             }
             #endregion
 
@@ -7228,6 +7459,22 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     //        }
                     //    }
                     //    break;
+
+                    case "GetDHMdmMultOrgAgencyRelPageAsync":
+                        var properties32 = GetProperties<DHMdmManagementOrgage>();
+                        foreach (var property in properties32)
+                        {
+                            if (!excludedProperties.Contains(property.Name))
+                            {
+                                ddd.Add(new SystemInterfaceField
+                                {
+                                    Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                                    AppSystemInterfaceId = r.Id,
+                                    FieidName = property.Name
+                                });
+                            }
+                        }
+                        break;
                 }
             }
             #endregion

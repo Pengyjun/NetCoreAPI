@@ -168,7 +168,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveDHDataService
                     foreach (var item in insertTable)
                     {
                         item.IsDelete = Convert.ToInt32(item.Fzdelete);
-                        item.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(); 
+                        item.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
                         item.CreateTime = DateTime.Now;
                     }
                     await _dbContext.Fastest<DHAdministrative>().BulkCopyAsync(insertTable);
@@ -499,6 +499,101 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveDHDataService
                 {
                     foreach (var item in updateTable) { item.UpdateTime = DateTime.Now; }
                     await _dbContext.Updateable(updateTable).WhereColumns(x => x.FzsrpCode).ExecuteCommandAsync();
+                }
+
+                responseAjaxResult.SuccessResult(true);
+            }
+            else
+            {
+                responseAjaxResult.Fail();
+            }
+            return responseAjaxResult;
+        }
+        /// <summary>
+        /// DH生产经营管理组织
+        /// </summary>
+        /// <returns></returns>
+
+        public async Task<ResponseAjaxResult<bool>> ReceiveGetMdmManagementOrgageListAsync()
+        {
+            ResponseAjaxResult<bool> responseAjaxResult = new();
+
+            var requestDto = new KeyVerificationRequestDto
+            {
+                FCode = "68AEA32679C7C43F96587C7613652A18",
+                InterfaceUrl = "Department/GetMdmManagementOrgageList",
+                //UpdateTime = DateTime.Now, 没有项目更新时间 全量拉
+                PageIndex = 1//从第一页开始拉取
+            };
+
+            //获取接收数据
+            var data = await GetDataAsync<DHMdmManagementOrgage>(requestDto);
+
+            if (data != null && data.Any())
+            {
+                var tData = await _dbContext.Queryable<DHMdmManagementOrgage>().Where(x => x.IsDelete == 1).ToListAsync();
+
+                var keyIds = new HashSet<string>(tData.Select(t => t.Ztreeid));
+                var insertTable = data.Where(x => !keyIds.Contains(x.Ztreeid)).ToList();
+                var updateTable = data.Where(x => keyIds.Contains(x.Ztreeid)).ToList();
+
+                if (insertTable.Any())
+                {
+                    foreach (var item in insertTable) { item.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(); item.IsDelete = Convert.ToInt32(item.Zdelete); item.CreateTime = DateTime.Now; }
+                    await _dbContext.Fastest<DHMdmManagementOrgage>().BulkMergeAsync(insertTable);
+                }
+                if (updateTable.Any())
+                {
+                    foreach (var item in updateTable) { item.UpdateTime = DateTime.Now; }
+                    await _dbContext.Updateable(updateTable).WhereColumns(x => x.Ztreeid).ExecuteCommandAsync();
+                }
+
+                responseAjaxResult.SuccessResult(true);
+            }
+            else
+            {
+                responseAjaxResult.Fail();
+            }
+            return responseAjaxResult;
+        }
+        /// <summary>
+        /// DH委托关系
+        /// </summary>
+        /// <returns></returns>
+        public async Task<ResponseAjaxResult<bool>> ReceiveGetDHMdmMultOrgAgencyRelPageListAsync()
+        {
+            ResponseAjaxResult<bool> responseAjaxResult = new();
+
+            var requestDto = new KeyVerificationRequestDto
+            {
+                FCode = "68AEA3249C7C43F65932C7613CB2A365",
+                InterfaceUrl = "Department/GetMdmMultOrgAgencyRelPageList",
+                //UpdateTime = DateTime.Now, 没有项目更新时间 全量拉
+                PageIndex = 1//从第一页开始拉取
+            };
+
+            //获取接收数据
+            var data = await GetDataAsync<DHMdmMultOrgAgencyRelPage>(requestDto);
+
+            if (data != null && data.Any())
+            {
+                var tData = await _dbContext.Queryable<DHMdmMultOrgAgencyRelPage>().Where(x => x.IsDelete == 1).ToListAsync();
+
+                var keyIds = new HashSet<string>(tData.Select(t => t.Ztreeid));
+                var key2Ids = new HashSet<string>(tData.Select(t => t.Znumc4x));
+                var key3Ids = new HashSet<string>(tData.Select(t => t.ZmviewFlag));
+                var insertTable = data.Where(x => !keyIds.Contains(x.Ztreeid) && !key2Ids.Contains(x.Znumc4x) && !key3Ids.Contains(x.ZmviewFlag)).ToList();
+                var updateTable = data.Where(x => keyIds.Contains(x.Ztreeid) && key2Ids.Contains(x.Znumc4x) && key3Ids.Contains(x.ZmviewFlag)).ToList();
+
+                if (insertTable.Any())
+                {
+                    foreach (var item in insertTable) { item.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(); item.CreateTime = DateTime.Now; }
+                    await _dbContext.Fastest<DHMdmMultOrgAgencyRelPage>().BulkMergeAsync(insertTable);
+                }
+                if (updateTable.Any())
+                {
+                    foreach (var item in updateTable) { item.UpdateTime = DateTime.Now; }
+                    await _dbContext.Updateable(updateTable).WhereColumns(x => new { x.Ztreeid, x.Znumc4x, x.ZmviewFlag }).ExecuteCommandAsync();
                 }
 
                 responseAjaxResult.SuccessResult(true);
