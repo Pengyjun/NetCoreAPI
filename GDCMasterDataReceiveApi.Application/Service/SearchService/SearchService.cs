@@ -37,6 +37,7 @@ using GDCMasterDataReceiveApi.Domain.Shared.Utils;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using SqlSugar;
+using System.Diagnostics.Metrics;
 using System.Reflection;
 
 namespace GDCMasterDataReceiveApi.Application.Service.SearchService
@@ -1961,7 +1962,49 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                 })
                 .ToPageListAsync(requestDto.PageIndex, requestDto.PageSize, total);
 
-            #region 其他基本
+            #region 
+            //值域信息
+            var valDomain = await _dbContext.Queryable<ValueDomain>()
+                .Where(t => !string.IsNullOrWhiteSpace(t.ZDOM_CODE))
+                .Select(t => new VDomainRespDto { ZDOM_CODE = t.ZDOM_CODE, ZDOM_DESC = t.ZDOM_DESC, ZDOM_VALUE = t.ZDOM_VALUE, ZDOM_NAME = t.ZDOM_NAME, ZDOM_LEVEL = t.ZDOM_LEVEL })
+                .ToListAsync();
+
+            //国家地区
+            var countrysKey = corresUnitList.Select(x => x.Country).ToList();
+            var country = await _dbContext.Queryable<CountryRegion>()
+                .Where(t => t.IsDelete == 1 && countrysKey.Contains(t.ZCOUNTRYCODE))
+                .Select(t => new CountryRegionOrAdminDivisionDto { Code = t.ZCOUNTRYCODE, Name = t.ZCOUNTRYNAME })
+                .ToListAsync();
+
+            //省、市、县
+            var p = corresUnitList.Select(x => x.Province).ToList();
+            var city = corresUnitList.Select(x => x.City).ToList();
+            var c = corresUnitList.Select(x => x.County).ToList();
+            var adisision = await _dbContext.Queryable<AdministrativeDivision>()
+                .Where(t => t.IsDelete == 1 && (p.Contains(t.ZADDVSCODE) || city.Contains(t.ZADDVSCODE) || c.Contains(t.ZADDVSCODE)))
+                .Select(t => new FilterChildData { Key = t.ZADDVSCODE, Val = t.ZADDVSNAME, Code = t.ZADDVSLEVEL })
+                .ToListAsync();
+
+            foreach (var item in corresUnitList)
+            {
+                //往来单位类别
+                item.CategoryUnit = GetValueDomain(item.CategoryUnit, valDomain, "ZBPTYPE");
+
+                //国家地区
+                item.Country = GetCountryRegion(item.Country, country);
+
+                //省、市、县
+                item.Province = adisision.FirstOrDefault(x => x.Key == item.Province)?.Val;
+                item.City = adisision.FirstOrDefault(x => x.Key == item.City)?.Val;
+                item.County = adisision.FirstOrDefault(x => x.Key == item.County)?.Val;
+
+                //往来单位性质
+                item.CategoryUnit = GetValueDomain(item.CategoryUnit, valDomain, "ZBPNATURE");
+
+                //往来单位类型
+                item.CategoryUnit = GetValueDomain(item.CategoryUnit, valDomain, "ZBPKINDS");
+
+            }
 
             #endregion
 
@@ -6868,7 +6911,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                             List<FilterChildData> optionsChild = new();
                             string type = string.Empty;
                             string columnName = string.Empty;
-                          
+
                             if (item.Contains("Ztreestat"))
                             {
                                 columnName = "组织树状态";
@@ -6889,7 +6932,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                                 columnName = "核算机构状态";
                                 type = "Single";
                                 optionsChild = valDomain.Where(x => x.Code == "ZD_MVIEW_ZY_ORGSTATE").ToList();
-                            }  
+                            }
                             else if (item.Contains("Zyorgstate"))
                             {
                                 columnName = "是否投资项目/公司";
