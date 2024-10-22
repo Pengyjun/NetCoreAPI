@@ -3,7 +3,8 @@ using GDCMasterDataReceiveApi.Application.Contracts.Dto._4A.User;
 using GDCMasterDataReceiveApi.Application.Contracts.IService.ISearchService;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using OfficeOpenXml;
+using NPOI.SS.UserModel;
+using NPOI.XSSF.UserModel;
 using SqlSugar;
 using System.ComponentModel;
 using System.Reflection;
@@ -314,6 +315,85 @@ namespace GDCMasterDataReceiveApi.Controller
             }
         }
         #endregion
+        private byte[] ExportToExcel<T>(List<T> data, List<string> columns, string? sheetName)
+        {
+            // 创建工作簿
+            using var memoryStream = new MemoryStream();
+            IWorkbook workbook = new XSSFWorkbook();
+            ISheet worksheet = workbook.CreateSheet(sheetName);
+
+            // 创建标题行
+            var headerRow = worksheet.CreateRow(0);
+
+            for (int i = 0; i < columns.Count; i++)
+            {
+                // 使用反射获取属性
+                string columnName = columns[i];
+                var property = typeof(T).GetProperty(columnName, BindingFlags.Public | BindingFlags.Instance);
+                string title;
+
+                // 获取 DisplayNameAttribute 中的中文标题
+                if (property != null)
+                {
+                    var displayNameAttribute = property.GetCustomAttributes(typeof(DisplayNameAttribute), false)
+                        .FirstOrDefault() as DisplayNameAttribute;
+
+                    title = displayNameAttribute != null ? displayNameAttribute.DisplayName : columnName; // 如果没有对应的中文标题，使用属性名
+                }
+                else
+                {
+                    title = columnName; // 如果找不到属性，使用原列名
+                }
+
+                // 设置标题单元格
+                var cell = headerRow.CreateCell(i);
+                cell.SetCellValue(title);
+
+                // 设置标题样式
+                var headerCellStyle = workbook.CreateCellStyle();
+                var headerFont = workbook.CreateFont();
+                headerFont.FontHeightInPoints = 13;
+                headerFont.FontName = "微软雅黑";
+                headerCellStyle.SetFont(headerFont);
+                cell.CellStyle = headerCellStyle;
+            }
+
+            // 添加数据行
+            for (int rowIndex = 0; rowIndex < data.Count; rowIndex++)
+            {
+                var rowData = data[rowIndex];
+                var dataRow = worksheet.CreateRow(rowIndex + 1);
+
+                for (int colIndex = 0; colIndex < columns.Count; colIndex++)
+                {
+                    var columnName = columns[colIndex];
+                    var value = GetValueByColumnName(rowData, columnName);
+                    dataRow.CreateCell(colIndex).SetCellValue(value?.ToString());
+                }
+            }
+
+            // 设置数据行样式
+            var dataCellStyle = workbook.CreateCellStyle();
+            dataCellStyle.BorderTop = NPOI.SS.UserModel.BorderStyle.Thin;
+            dataCellStyle.BorderBottom = NPOI.SS.UserModel.BorderStyle.Thin;
+
+            for (int rowIndex = 1; rowIndex <= data.Count; rowIndex++)
+            {
+                for (int colIndex = 0; colIndex < columns.Count; colIndex++)
+                {
+                    worksheet.GetRow(rowIndex).GetCell(colIndex).CellStyle = dataCellStyle;
+                }
+            }
+
+            // 写入到内存流并返回字节数组
+            workbook.Write(memoryStream);
+            return memoryStream.ToArray();
+        }
+        private object? GetValueByColumnName<T>(T rowData, string columnName)
+        {
+            var property = typeof(T).GetProperty(columnName, BindingFlags.Public | BindingFlags.Instance);
+            return property?.GetValue(rowData, null);
+        }
         /// <summary>
         /// 跨库读取导出字段列
         /// </summary>
@@ -349,66 +429,6 @@ namespace GDCMasterDataReceiveApi.Controller
             else { throw new Exception("接口不存在"); }
 
             return columns;
-        }
-        private byte[] ExportToExcel<T>(List<T> data, List<string> columns, string? sheetName)
-        {
-            using var package = new ExcelPackage();
-            var worksheet = package.Workbook.Worksheets.Add(sheetName);
-
-            worksheet.Cells.Style.Font.Name = "微软雅黑";// 设置全局字体为微软雅黑
-
-            // 添加标题行
-            for (int i = 0; i < columns.Count; i++)
-            {
-                // 使用反射获取属性
-                string columnName = columns[i];
-                var property = typeof(T).GetProperty(columnName, BindingFlags.Public | BindingFlags.Instance);
-                string title;
-
-                // 获取 DisplayNameAttribute 中的中文标题
-                if (property != null)
-                {
-                    var displayNameAttribute = property.GetCustomAttributes(typeof(DisplayNameAttribute), false)
-                        .FirstOrDefault() as DisplayNameAttribute;
-
-                    title = displayNameAttribute != null ? displayNameAttribute.DisplayName : columnName; // 如果没有对应的中文标题，使用属性名
-                }
-                else
-                {
-                    title = columnName; // 如果找不到属性，使用原列名
-                }
-
-                worksheet.Cells[1, i + 1].Value = title;
-
-                // 设置标题行的样式
-                worksheet.Cells[1, i + 1].Style.Font.Size = 13; // 字体放大
-                worksheet.View.FreezePanes(2, 1); // 冻结标题行
-            }
-
-            // 添加数据行
-            for (int rowIndex = 0; rowIndex < data.Count; rowIndex++)
-            {
-                var rowData = data[rowIndex];
-
-                for (int colIndex = 0; colIndex < columns.Count; colIndex++)
-                {
-                    var columnName = columns[colIndex];
-                    var value = GetValueByColumnName(rowData, columnName);
-                    worksheet.Cells[rowIndex + 2, colIndex + 1].Value = value;
-                }
-            }
-
-            // 设置数据行样式
-            worksheet.Cells[2, 1, data.Count + 1, columns.Count].Style.Border.Top.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
-            worksheet.Cells[2, 1, data.Count + 1, columns.Count].Style.Border.Bottom.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
-
-            // 返回 Excel 文件的字节数组
-            return package.GetAsByteArray();
-        }
-        private object? GetValueByColumnName<T>(T rowData, string columnName)
-        {
-            var property = typeof(T).GetProperty(columnName, BindingFlags.Public | BindingFlags.Instance);
-            return property?.GetValue(rowData, null);
         }
     }
 }
