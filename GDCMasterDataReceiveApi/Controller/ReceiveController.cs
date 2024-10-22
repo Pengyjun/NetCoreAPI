@@ -320,9 +320,11 @@ namespace GDCMasterDataReceiveApi.Controller
         /// 金融机构
         /// </summary>
         /// <returns></returns>
-        [UnitOfWork]
         [HttpPost("/api/mdm/Receive/FinancialInstitution")]
-        public Task<MDMResponseResult> FinancialInstitutionDataAsync(BaseReceiveDataRequestDto<FinancialInstitutionReceiveDto> baseReceiveDataRequestDto) => _receiveService.FinancialInstitutionDataAsync(baseReceiveDataRequestDto);
+        public async Task<MDMResponseResult> FinancialInstitutionDataAsync(BaseReceiveDataRequestDto<FinancialInstitutionReceiveDto> baseReceiveDataRequestDto)
+        {
+          return await _receiveService.FinancialInstitutionDataAsync(baseReceiveDataRequestDto);
+        }
         #endregion
 
         #region 往来单位主数据
