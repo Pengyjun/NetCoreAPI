@@ -58,47 +58,47 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.BusinessNoCpportunit
         /// <summary>
         /// 商机项目主数据编码:新增项目由主数据系统生成并返回主数据编码，修改时必填
         /// </summary>
-        [ExcelColumnName("商机项目主数据编码")]
+        [DisplayName("商机项目主数据编码")]
         public string? BPjectMDCode { get; set; }
         /// <summary>
         /// 商机项目名称:商机项目的中文名称，该字段作为境内和港澳台商机项目的唯一标识
         /// </summary>
-        [ExcelColumnName("商机项目名称")]
+        [DisplayName("商机项目名称")]
         public string? Name { get; set; }
         /// <summary>
         /// 商机项目外文名称:商机项目当地官方语言名称，该字段作为境外（不包括港澳台）商机项目的唯一标识
         /// </summary>
-        [ExcelColumnName("商机项目外文名称")]
+        [DisplayName("商机项目外文名称")]
         public string? BPjectForeignName { get; set; }
         /// <summary>
         /// 项目类型:按照字典表进行选择
         /// </summary>
-        [ExcelColumnName("项目类型")]
+        [DisplayName("项目类型")]
         public string? PjectType { get; set; }
         /// <summary>
         /// 中交项目业务分类:按照字典表进行选择，涉及多个业务分类的商机项目，其属性应优先归入合同额占比最大的业务分类，若合同额占比相同，应归入实施难度最大的业务分类
         /// </summary>
-        [ExcelColumnName("中交项目业务分类")]
+        [DisplayName("中交项目业务分类")]
         public string? BTypeOfCCCCProjects { get; set; }
         /// <summary>
         /// 国家/地区:商机项目所在的国家/地区
         /// </summary>
-        [ExcelColumnName("国家/地区")]
+        [DisplayName("国家/地区")]
         public string? Country { get; set; }
         /// <summary>
         /// 项目所在地:参照项目主数据标准要求填写，明确到市级地点，境内项目必填
         /// </summary>
-        [ExcelColumnName("项目所在地")]
+        [DisplayName("项目所在地")]
         public string? PjectLocation { get; set; }
         /// <summary>
         /// 开始跟踪日期:填写首次跟踪的日期
         /// </summary>
-        [ExcelColumnName("开始跟踪日期")]
+        [DisplayName("开始跟踪日期")]
         public string? StartTrackingDate { get; set; }
         /// <summary>
         ///跟踪单位:填写跟踪单位的机构主数据编码
         /// </summary>
-        [ExcelColumnName("跟踪单位")]
+        [DisplayName("跟踪单位")]
         public string? TrackingUnit { get; set; }
         /// <summary>
         /// 所属二级单位
@@ -113,12 +113,12 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.BusinessNoCpportunit
         /// <summary>
         /// 资质单位
         /// </summary>
-        [ExcelColumnName("资质单位")]
+        [DisplayName("资质单位")]
         public string? QualificationUnit { get; set; }
         /// <summary>
         /// 计税方式
         /// </summary>
-        [ExcelColumnName("计税方式")]
+        [DisplayName("计税方式")]
         public string? TaxationMethod { get; set; }
         /// <summary>
         /// 参与单位:填写参与部门的行政机构主数据编码，可多值，用英文逗号隔开.

@@ -1,5 +1,5 @@
-﻿using MiniExcelLibs.Attributes;
-using SqlSugar;
+﻿using SqlSugar;
+using System.ComponentModel;
 
 namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.AdministrativeDivision
 {
@@ -42,51 +42,48 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.AdministrativeDivisi
     /// </summary>
     public class AdministrativeDivisionDetailsDto
     {
-        [ExcelIgnore]
         public string? Id { get; set; }
         /// <summary>
         /// 行政区划代码:业务主键
         /// </summary>
-        [ExcelColumnName("行政区划代码")]
+        [DisplayName("行政区划代码")]
         public string? RegionalismCode { get; set; }
         /// <summary>
         /// 行政区划名称
         /// </summary>
-        [ExcelColumnName("行政区划名称")]
+        [DisplayName("行政区划名称")]
         public string? Name { get; set; }
         /// <summary>
         /// 上级行政区划代码:第1级行政区划无上级代码。
         /// </summary>
-        [ExcelColumnName("上级行政区划代码")]
+        [DisplayName("上级行政区划代码")]
         public string? SupRegionalismCode { get; set; }
         /// <summary>
         /// 行政区域级别:总共3级，省、直辖市、自治区是第1级。
         /// </summary>
-        [ExcelColumnName("行政区域级别")]
+        [DisplayName("行政区域级别")]
         public string? RegionalismLevel { get; set; }
         /// <summary>
         /// 中交区域总部代码
         /// </summary>
-        [ExcelColumnName("中交区域总部代码")]
+        [DisplayName("中交区域总部代码")]
         public string? CodeOfCCCCRegional { get; set; }
         /// <summary>
         /// 版本：数据的版本号。数据每次变更时，版本号自动加1。
         /// </summary>
-        [ExcelIgnore]
+        [DisplayName("版本")]
         public string? Version { get; set; }
         /// <summary>
         /// 状态：1是已启用，0是已停用
         /// </summary>
-        [ExcelIgnore]
+        [DisplayName("状态")]
         public string? State { get; set; }
         /// <summary>
         /// 是否删除 数据是否有效的标识:有效：1无效：0
         /// </summary>
-        [ExcelIgnore]
+        [DisplayName("是否删除")]
         public string? DataIdentifier { get; set; }
-        [ExcelIgnore]
         public DateTime? CreateTime { get; set; }
-        [ExcelIgnore]
         public DateTime? UpdateTime { get; set; }
         ///// <summary>
         ///// 多语言描述表类型

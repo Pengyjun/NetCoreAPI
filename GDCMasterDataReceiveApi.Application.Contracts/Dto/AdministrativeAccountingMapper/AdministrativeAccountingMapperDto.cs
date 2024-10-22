@@ -44,7 +44,7 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.AdministrativeAccoun
         /// <summary>
         /// 核算组织编码
         /// </summary>
-        [ExcelColumnName("核算组织编码")]
+        [DisplayName("核算组织编码")]
         public string? AccOrgCode { get; set; }
         /// <summary>
         /// 行政组织ID
@@ -54,7 +54,7 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.AdministrativeAccoun
         /// <summary>
         /// 行政组织编码
         /// </summary>
-        [ExcelColumnName("行政组织编码")]
+        [DisplayName("行政组织编码")]
         public string? AdministrativeOrgCode { get; set; }
         /// <summary>
         /// 是否删除: 数据是否有效的标识:   有效：1无效：0

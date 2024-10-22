@@ -1,4 +1,4 @@
-﻿using MiniExcelLibs.Attributes;
+﻿using System.ComponentModel;
 
 namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.Institution
 {
@@ -74,238 +74,234 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.Institution
         /// <summary>
         /// ids（首页下钻）
         /// </summary>
-        [ExcelIgnore]
         public List<string>? Ids { get; set; }
         /// <summary>
         /// 主键id
         /// </summary>
-        [ExcelIgnore]
         public string Id { get; set; }
         /// <summary>
         /// 机构 ID
         /// </summary>
-        [ExcelIgnore]
+        [DisplayName("国家地区")]
         public string? Oid { get; set; }
         /// <summary>
         /// 企业分类
         /// 0 外经企业 1 基建企业 2 疏浚企业 3 设计企业 4 装备制造企业 5 投资企业 6 房地产企业 7 贸易企业 8 金融企业 9 其他
         /// </summary>
-        [ExcelColumnName("企业分类")]
+        [DisplayName("国家地区")]
         public string? EntClass { get; set; }
         /// <summary>
         /// 上级机构 id
         /// </summary>
-        [ExcelIgnore]
+        [DisplayName("上级机构id")]
         public string? POid { get; set; }
         /// <summary>
         /// "机构状态，类型编码"
         /// 1运营 2筹备 3停用 4撤销
         /// </summary>
-        [ExcelIgnore]
+        [DisplayName("机构状态,类型编码")]
         public string? Status { get; set; }
         /// <summary>
         /// 机构编码"
         /// </summary>
-        [ExcelColumnName("机构编码")]
+        [DisplayName("机构编码")]
         public string? Code { get; set; }
         /// <summary>
         /// 机构全称
         /// </summary>
-        [ExcelColumnName("机构全称")]
+        [DisplayName("机构全称")]
         public string? Name { get; set; }
         /// <summary>
         /// 机构规则码
         /// </summary>
-        [ExcelIgnore]
+        [DisplayName("机构规则码")]
         public string? Orule { get; set; }
         /// <summary>
         /// 机构简称
         /// </summary>
-        [ExcelColumnName("机构简称")]
+        [DisplayName("机构简称")]
         public string? ShortName { get; set; }
         /// <summary>
         /// 英文全称
         /// </summary>
-        [ExcelColumnName("英文全称")]
+        [DisplayName("英文全称")]
         public string? EnglishName { get; set; }
         /// <summary>
         /// 英文简称
         /// </summary>
-        [ExcelColumnName("英文简称")]
+        [DisplayName("英文简称")]
         public string? EnglishShortName { get; set; }
         /// <summary>
         /// 机构业务类型 见7.2.3 字典
         /// </summary>
-        [ExcelIgnore]
+        [DisplayName("机构业务类型")]
         public string? BizType { get; set; }
         /// <summary>
         /// 关联机构id
         /// </summary>
-        [ExcelIgnore]
+        [DisplayName("关联机构id")]
         public string? OSecBid { get; set; }
         /// <summary>
         /// 分组时的上级机构ID
         /// </summary>
-        [ExcelIgnore]
+        [DisplayName("分组时的上级机构ID")]
         public string? Gpoid { get; set; }
         /// <summary>
         /// 机构属性,见7.2.2 字典
         /// </summary>
-        [ExcelIgnore]
+        [DisplayName("机构属性")]
         public string? Type { get; set; }
         /// <summary>
         /// 机构子属性,见7.2.2 字典
         /// </summary>
-        [ExcelIgnore]
+        [DisplayName("机构子属性")]
         public string? TypeExt { get; set; }
         /// <summary>
         /// 最近更新时间
         /// </summary>
-        [ExcelIgnore]
+        [DisplayName("最近更新时间")]
         public string? Mrut { get; set; }
         /// <summary>
         /// 序号
         /// </summary>
-        [ExcelIgnore]
+        [DisplayName("序号")]
         public string? Sno { get; set; }
         /// <summary>
         /// 隶属单位
         /// </summary>
-        [ExcelIgnore]
+        [DisplayName("隶属单位")]
         public string? Coid { get; set; }
         /// <summary>
         /// 拥有兼管职能
         /// </summary>
-        [ExcelIgnore]
+        [DisplayName("拥有兼管职能")]
         public string? Crossorgan { get; set; }
         /// <summary>
         /// 分组所属的实体机构ID
         /// </summary>
-        [ExcelIgnore]
+        [DisplayName("分组所属的实体机构ID")]
         public string? Goid { get; set; }
         /// <summary>
         /// 层级
         /// </summary>
-        [ExcelIgnore]
+        [DisplayName("层级")]
         public string? Grade { get; set; }
         /// <summary>
         /// 操作员
         /// </summary>
-        [ExcelIgnore]
+        [DisplayName("操作员")]
         public string? Oper { get; set; }
         /// <summary>
         /// 备注
         /// </summary>
-        [ExcelColumnName("备注")]
+        [DisplayName("备注")]
         public string? Note { get; set; }
         /// <summary>
         /// 临时机构名称
         /// </summary>
-        [ExcelColumnName("临时机构名称")]
+        [DisplayName("临时机构名称")]
         public string? TemorganName { get; set; }
         /// <summary>
         /// 机构所在地, 见7.2.7 字典
         /// </summary>
-        [ExcelIgnore]
+        [DisplayName("机构所在地")]
         public string? OrgProvince { get; set; }
         /// <summary>
         /// 国家名称, 见7.2.6 字典
         /// </summary>
-        [ExcelColumnName("国家名称")]
+        [DisplayName("国家名称")]
         public string? Carea { get; set; }
         /// <summary>
         ///   地域属性, 见7.2.5 字典
         /// </summary>
-        [ExcelColumnName("地域属性")]
+        [DisplayName("地域属性")]
         public string? TerritoryPro { get; set; }
         /// <summary>
         /// 业务领域
         /// </summary>
-        [ExcelIgnore]
+        [DisplayName("业务领域")]
         public string? BizDomain { get; set; }
         /// <summary>
         /// 机构层级(没有用过)
         /// </summary>
-        [ExcelIgnore]
+        [DisplayName("机构层级(没有用过)")]
         public string? OrgGrade { get; set; }
         /// <summary>
         /// 项目规模
         /// </summary>
-        [ExcelIgnore]
+        [DisplayName("项目规模")]
         public string? ProjectScale { get; set; }
         /// <summary>
         /// 项目管理类型
         /// </summary>
-        [ExcelIgnore]
+        [DisplayName("项目管理类型")]
         public string? ProjectManType { get; set; }
         /// <summary>
         /// 项目类型
         /// </summary>
-        [ExcelIgnore]
+        [DisplayName("项目类型")]
         public string? ProjectType { get; set; }
         /// <summary>
         /// 开始时间
         /// </summary>
-        [ExcelIgnore]
+        [DisplayName("开始时间")]
         public string? StartDate { get; set; }
         /// <summary>
         /// 负责人
         /// </summary>
-        [ExcelIgnore]
+        [DisplayName("负责人")]
         public string? Organemp { get; set; }
         /// <summary>
         /// 管理层级
         /// </summary>
-        [ExcelIgnore]
+        [DisplayName("管理层级")]
         public string? OrganGrade { get; set; }
         /// <summary>
         /// 独立授权
         /// </summary>
-        [ExcelIgnore]
+        [DisplayName("独立授权")]
         public string? Rown { get; set; }
         /// <summary>
         /// 授权机构
         /// </summary>
-        [ExcelIgnore]
+        [DisplayName("授权机构")]
         public string? RoId { get; set; }
         /// <summary>
         /// 全部机构的大流水号
         /// </summary>
-        [ExcelIgnore]
+        [DisplayName("DisplayName")]
         public string? GlobalSno { get; set; }
         /// <summary>
         /// 股权层级
         /// </summary>
-        [ExcelIgnore]
+        [DisplayName("股权层级")]
         public string? QyGrade { get; set; }
         /// <summary>
         /// 注册号/统一社会信用代码
         /// </summary>
-        [ExcelIgnore]
+        [DisplayName("注册号/统一社会信用代码")]
         public string? RegisterCode { get; set; }
         /// <summary>
         ///版本号
         /// </summary>
-        [ExcelIgnore]
+        [DisplayName("版本号")]
         public string? Version { get; set; }
         /// <summary>
         /// 持股情况，见7.2.9 字典
         /// </summary>
-        [ExcelIgnore]
+        [DisplayName("持股情况")]
         public string? ShareHoldings { get; set; }
         /// <summary>
         /// 是否独立核算，见7.2.8 字典
         /// </summary>
-        [ExcelIgnore]
+        [DisplayName("是否独立核算")]
         public string? IsIndependent { get; set; }
         /// <summary>
         /// 机构主数据编码
         /// </summary>
-        [ExcelIgnore]
+        [DisplayName("机构主数据编码")]
         public string? MdmCode { get; set; }
-        [ExcelIgnore]
         public DateTime? CreateTime { get; set; }
-        [ExcelIgnore]
         public DateTime? UpdateTime { get; set; }
         /// <summary>
         /// 机构子集

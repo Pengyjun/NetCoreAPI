@@ -18,7 +18,6 @@ using GDCMasterDataReceiveApi.Application.Contracts.Dto.NationalEconomy;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.ProjectClassification;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.Regional;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.RegionalCenter;
-using GDCMasterDataReceiveApi.Application.Contracts.Dto.ScientifiCNoProject;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.UnitMeasurement;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.ValueDomain;
 using GDCMasterDataReceiveApi.Application.Contracts.IService.ISearchService;

@@ -43,7 +43,7 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.RelationalContracts
         /// <summary>
         /// 委托单位明细行项目:2023年2月20日多机构新增主映射关系传值‘0’
         /// </summary>
-        [ExcelColumnName("委托单位明细行项目")]
+        [DisplayName("委托单位明细行项目")]
         public string? DetailedLine { get; set; }
         /// <summary>
         /// 视图标识:目前仅传输单值:zx-机构视图、zy-核算组织视图、ZG-管理组织视图、Z4-税务代管组织（行政）视图。
@@ -53,7 +53,7 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.RelationalContracts
         /// <summary>
         /// 委托单位编码:2023年2月20日多机构新增
         /// </summary>
-        [ExcelColumnName("委托单位编码")]
+        [DisplayName("委托单位编码")]
         public string? Code { get; set; }
         /// <summary>
         /// 委托状态:2023年2月20日多机构新增值域；1-启用0-停用
@@ -65,14 +65,14 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.RelationalContracts
         /// 1、如果视图标识=ZX，OID字段：取机构主数据编码MDM_CODE在Z1模型中的OID编码。
         /// 2、如果视图标识=ZY，OID字段：取委托单位编码ZDELEGATE_ORG在Z1模型中的OID编码。
         /// </summary>
-        [ExcelColumnName("机构编码（无含义码）")]
+        [DisplayName("机构编码（无含义码）")]
         public string? OrgCode { get; set; }
         /// <summary>
         /// 核算机构编码:
         /// 1、如果视图标识=ZX，ZACO字段：取委托单位编码ZDELEGATE_ORG在Z2模型中的ZACO编码；
         /// 2、如果视图标识=ZY，ZACO字段：取机构主数据编码MDM_CODE在Z2模型中的ZACO编码。
         /// </summary>
-        [ExcelColumnName("核算机构编码")]
+        [DisplayName("核算机构编码")]
         public string? AccOrgCode { get; set; }
         /// <summary>
         /// 组织树编码:2023年2月20日多机构新增值域：1-组织机构树，2-核算组织树，3-管理组织树
