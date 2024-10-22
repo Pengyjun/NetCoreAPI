@@ -104,11 +104,31 @@ namespace GDCMasterDataReceiveApi.Controller
         /// DH科研项目
         /// </summary>
         /// <returns></returns>
-        [HttpGet("ReveiveDHResearchList")]
+        [HttpGet("ReveiveDHResearch")]
         [UnitOfWork]
         public async Task<ResponseAjaxResult<bool>> ReceiveResearchListAsync()
         {
             return await _receiveDHDataService.ReceiveResearchListAsync();
+        }
+        /// <summary>
+        /// DH生产经营管理组织
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("ReceiveGetMdmManagementOrgage")]
+        [UnitOfWork]
+        public async Task<ResponseAjaxResult<bool>> ReceiveGetMdmManagementOrgageListAsync()
+        {
+            return await _receiveDHDataService.ReceiveGetMdmManagementOrgageListAsync();
+        }
+        /// <summary>
+        /// DH委托关系
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("ReceiveGetDHMdmMultOrgAgencyRelPage")]
+        [UnitOfWork]
+        public async Task<ResponseAjaxResult<bool>> ReceiveGetDHMdmMultOrgAgencyRelPageListAsync()
+        {
+            return await _receiveDHDataService.ReceiveGetDHMdmMultOrgAgencyRelPageListAsync();
         }
     }
 }

@@ -221,7 +221,7 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.IService.ISearchService
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
-        Task<ResponseAjaxResult<List<RelationalContractsDetailsDto>>> GetRelationalContractsSearchAsync(FilterCondition requestDto);
+        Task<ResponseAjaxResult<List<DHMdmMultOrgAgencyRelPage>>> GetRelationalContractsSearchAsync(FilterCondition requestDto);
         /// <summary>
         /// 
         /// </summary>
@@ -383,6 +383,12 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.IService.ISearchService
         /// <param name="table"></param>
         /// <returns></returns>
         Task<ResponseAjaxResult<List<FilterConditionDto>>> GetUserFilterColumnsAsync(int table);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        Task<ResponseAjaxResult<List<DHMdmManagementOrgage>>> GetDHMdmMultOrgAgencyRelPageAsync(FilterCondition requestDto);
         /// <summary>
         /// 通用字典数据
         /// </summary>
