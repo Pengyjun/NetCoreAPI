@@ -37,6 +37,7 @@ using GDCMasterDataReceiveApi.Domain.Shared;
 using GDCMasterDataReceiveApi.Domain.Shared.Utils;
 using Microsoft.Extensions.Logging;
 using SqlSugar;
+using System.Drawing.Drawing2D;
 using UtilsSharp;
 
 namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
@@ -151,18 +152,116 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
         public async Task<MDMResponseResult> CorresUnitDataAsync(BaseReceiveDataRequestDto<CorresUnitReceiveDto> baseReceiveDataRequestDto)
         {
 
+            #region 旧版本
+            //MDMResponseResult responseAjaxResult = new MDMResponseResult();
+            //try
+            //{
+            //    ////处理曾用名
+            //    List<BankCard> insertzMDGS_OLDNAMEs = new();
+            //    List<BankCard> updatezMDGS_OLDNAMEs = new();
+            //    //查询项目表
+            //    var projectCodeList = await _dbContext.Queryable<CorresUnit>().Where(x => x.IsDelete == 1).ToListAsync();
+            //    //需要新增的数据
+            //    var insertOids = baseReceiveDataRequestDto.IT_DATA.item.Where(x => !projectCodeList.Select(x => x.ZBP).ToList().Contains(x.ZBP)).ToList();
+            //    //需要更新的数据
+            //    var updateOids = baseReceiveDataRequestDto.IT_DATA.item.Where(x => projectCodeList.Select(x => x.ZBP).ToList().Contains(x.ZBP)).ToList();
+            //    //新增操作
+            //    if (insertOids.Any())
+            //    {
+            //        foreach (var itemItem in insertOids)
+            //        {
+            //            itemItem.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
+            //            if (itemItem.ZBANK != null)
+            //            {
+            //                foreach (var items in itemItem.ZBANK.Item)
+            //                {
+            //                    BankCard projectUsedName = new BankCard()
+            //                    {
+            //                        Id = itemItem.Id.Value,
+            //                        ZBP = itemItem.ZBP,
+            //                        ZBANK = items.ZBANK,
+            //                        ZBANKN = items.ZBANKN,
+            //                        ZBANKSTA = items.ZBANKSTA,
+            //                        ZCITY2 = items.ZCITY2,
+            //                        ZCOUNTY2 = items.ZCOUNTY2,
+            //                        ZCURR = items.ZCURR,
+            //                        ZFINAME = items.ZFINAME,
+            //                        ZFINC = items.ZFINC,
+            //                        ZKOINH = items.ZKOINH,
+            //                        ZPROVINC2 = items.ZPROVINC2,
+            //                        ZZCOUNTR2 = items.ZZCOUNTR2,
+            //                        ZZSERIAL = items.ZZSERIAL,
+            //                        CreateTime = DateTime.Now
+            //                    };
+            //                    insertzMDGS_OLDNAMEs.Add(projectUsedName);
+            //                }
+            //            }
+            //        }
+            //        var projectList = _mapper.Map<List<CorresUnitReceiveDto>, List<CorresUnit>>(insertOids);
+            //        projectList.ForEach(x => x.CreateTime = DateTime.Now);
+            //        await _dbContext.Fastest<CorresUnit>().BulkCopyAsync(projectList);
+            //        await _dbContext.Fastest<BankCard>().BulkCopyAsync(insertzMDGS_OLDNAMEs);
+            //    }
+            //    if (updateOids.Any())
+            //    {
+            //        List<BankCard> deleteData = new List<BankCard>();
+            //        //更新曾用名
+            //        var projectUsedNameList = await _dbContext.Queryable<BankCard>().ToListAsync();
+            //        foreach (var itemItem in updateOids)
+            //        {
+            //            var id = projectCodeList.Where(x => x.ZBP == itemItem.ZBP).Select(x => x.Id).First();
+            //            itemItem.Id = id;
+            //            if (itemItem.ZBANK != null)
+            //            {
+            //                foreach (var items in itemItem.ZBANK.Item)
+            //                {
+            //                    BankCard projectUsedName = new BankCard()
+            //                    {
+            //                        Id = itemItem.Id.Value,
+            //                        ZBP = itemItem.ZBP,
+            //                        ZBANK = items.ZBANK,
+            //                        ZBANKN = items.ZBANKN,
+            //                        ZBANKSTA = items.ZBANKSTA,
+            //                        ZCITY2 = items.ZCITY2,
+            //                        ZCOUNTY2 = items.ZCOUNTY2,
+            //                        ZCURR = items.ZCURR,
+            //                        ZFINAME = items.ZFINAME,
+            //                        ZFINC = items.ZFINC,
+            //                        ZKOINH = items.ZKOINH,
+            //                        ZPROVINC2 = items.ZPROVINC2,
+            //                        ZZCOUNTR2 = items.ZZCOUNTR2,
+            //                        ZZSERIAL = items.ZZSERIAL,
+            //                        UpdateTime  = DateTime.Now
+            //                    };
+            //                    updatezMDGS_OLDNAMEs.Add(projectUsedName);
+            //                }
+            //            }
+            //            deleteData.AddRange(projectUsedNameList.Where(x => x.ZBP == itemItem.ZBP).ToList());
+            //        }
+            //        var projectList = _mapper.Map<List<CorresUnitReceiveDto>, List<CorresUnit>>(updateOids);
+            //        await _dbContext.Updateable(projectList).ExecuteCommandAsync();
+            //        await _dbContext.Deleteable<BankCard>().WhereColumns(deleteData, it => new { it.Id }).ExecuteCommandAsync();
+            //        await _dbContext.Insertable(updatezMDGS_OLDNAMEs).ExecuteCommandAsync();
+
+            //    }
+            //    responseAjaxResult.Success();
+            //}
+            //catch (Exception ex)
+            //{
+            //    throw;
+            //}
+            //return responseAjaxResult;
+            #endregion
+
+            #region 新版本
             MDMResponseResult responseAjaxResult = new MDMResponseResult();
             try
             {
                 ////处理曾用名
                 List<BankCard> insertzMDGS_OLDNAMEs = new();
                 List<BankCard> updatezMDGS_OLDNAMEs = new();
-                //查询项目表
-                var projectCodeList = await _dbContext.Queryable<CorresUnit>().Where(x => x.IsDelete == 1).ToListAsync();
                 //需要新增的数据
-                var insertOids = baseReceiveDataRequestDto.IT_DATA.item.Where(x => !projectCodeList.Select(x => x.ZBP).ToList().Contains(x.ZBP)).ToList();
-                //需要更新的数据
-                var updateOids = baseReceiveDataRequestDto.IT_DATA.item.Where(x => projectCodeList.Select(x => x.ZBP).ToList().Contains(x.ZBP)).ToList();
+                var insertOids = baseReceiveDataRequestDto.IT_DATA.item.ToList();
                 //新增操作
                 if (insertOids.Any())
                 {
@@ -200,48 +299,6 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
                     await _dbContext.Fastest<CorresUnit>().BulkCopyAsync(projectList);
                     await _dbContext.Fastest<BankCard>().BulkCopyAsync(insertzMDGS_OLDNAMEs);
                 }
-                if (updateOids.Any())
-                {
-                    List<BankCard> deleteData = new List<BankCard>();
-                    //更新曾用名
-                    var projectUsedNameList = await _dbContext.Queryable<BankCard>().ToListAsync();
-                    foreach (var itemItem in updateOids)
-                    {
-                        var id = projectCodeList.Where(x => x.ZBP == itemItem.ZBP).Select(x => x.Id).First();
-                        itemItem.Id = id;
-                        if (itemItem.ZBANK != null)
-                        {
-                            foreach (var items in itemItem.ZBANK.Item)
-                            {
-                                BankCard projectUsedName = new BankCard()
-                                {
-                                    Id = itemItem.Id.Value,
-                                    ZBP = itemItem.ZBP,
-                                    ZBANK = items.ZBANK,
-                                    ZBANKN = items.ZBANKN,
-                                    ZBANKSTA = items.ZBANKSTA,
-                                    ZCITY2 = items.ZCITY2,
-                                    ZCOUNTY2 = items.ZCOUNTY2,
-                                    ZCURR = items.ZCURR,
-                                    ZFINAME = items.ZFINAME,
-                                    ZFINC = items.ZFINC,
-                                    ZKOINH = items.ZKOINH,
-                                    ZPROVINC2 = items.ZPROVINC2,
-                                    ZZCOUNTR2 = items.ZZCOUNTR2,
-                                    ZZSERIAL = items.ZZSERIAL,
-                                    UpdateTime  = DateTime.Now
-                                };
-                                updatezMDGS_OLDNAMEs.Add(projectUsedName);
-                            }
-                        }
-                        deleteData.AddRange(projectUsedNameList.Where(x => x.ZBP == itemItem.ZBP).ToList());
-                    }
-                    var projectList = _mapper.Map<List<CorresUnitReceiveDto>, List<CorresUnit>>(updateOids);
-                    await _dbContext.Updateable(projectList).ExecuteCommandAsync();
-                    await _dbContext.Deleteable<BankCard>().WhereColumns(deleteData, it => new { it.Id }).ExecuteCommandAsync();
-                    await _dbContext.Insertable(updatezMDGS_OLDNAMEs).ExecuteCommandAsync();
-
-                }
                 responseAjaxResult.Success();
             }
             catch (Exception ex)
@@ -249,6 +306,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
                 throw;
             }
             return responseAjaxResult;
+            #endregion
         }
         /// <summary>
         /// 多组织-税务代管组织(行政)
@@ -769,7 +827,46 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
         /// <returns></returns>
         public async Task<MDMResponseResult> FinancialInstitutionDataAsync(BaseReceiveDataRequestDto<FinancialInstitutionReceiveDto> baseReceiveDataRequestDto)
         {
+            #region 旧版本
+            //MDMResponseResult responseAjaxResult = new MDMResponseResult();
+            //try
+            //{
+            //    var projectList = _mapper.Map<List<FinancialInstitutionReceiveDto>, List<FinancialInstitution>>(baseReceiveDataRequestDto.IT_DATA.item);
+            //    foreach (var item in projectList)
+            //    {
+            //        item.CreateTime = DateTime.Now;
+            //        item.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
+            //    }
+            //    var projectCodeList = await _dbContext.Queryable<FinancialInstitution>().Where(x => x.IsDelete == 1).Select(x => new { Id = x.Id, ZFINC = x.ZFINC }).ToListAsync();
+            //    var insertOids = projectList.Where(x => !projectCodeList.Select(x => x.ZFINC).ToList().Contains(x.ZFINC)).Select(x => x.ZFINC).ToList();
+            //    var updateOids = projectList.Where(x => projectCodeList.Select(x => x.ZFINC).ToList().Contains(x.ZFINC)).Select(x => x.ZFINC).ToList();
+            //    if (insertOids.Any())
+            //    {
+            //        //插入操作
+            //        var batchData = projectList.Where(x => insertOids.Contains(x.ZFINC)).ToList();
+            //        await _dbContext.Fastest<FinancialInstitution>().BulkCopyAsync(batchData);
+            //    }
+            //    if (updateOids.Any())
+            //    {
+            //        //更新操作
+            //        var batchData = projectList.Where(x => updateOids.Contains(x.ZFINC)).ToList();
+            //        foreach (var item in batchData)
+            //        {
+            //            var id = projectCodeList.Where(x => x.ZFINC == item.ZFINC).Select(x => x.Id).First();
+            //            item.Id = id;
+            //        }
+            //        await _dbContext.Updateable<FinancialInstitution>(batchData).ExecuteCommandAsync();
+            //    }
+            //    responseAjaxResult.Success();
+            //}
+            //catch (Exception ex)
+            //{
+            //    throw;
+            //}
+            //return responseAjaxResult;
+            #endregion
 
+            #region 新版本
             MDMResponseResult responseAjaxResult = new MDMResponseResult();
             try
             {
@@ -779,34 +876,15 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
                     item.CreateTime = DateTime.Now;
                     item.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
                 }
-                var projectCodeList = await _dbContext.Queryable<FinancialInstitution>().Where(x => x.IsDelete == 1).Select(x => new { Id = x.Id, ZFINC = x.ZFINC }).ToListAsync();
-                var insertOids = projectList.Where(x => !projectCodeList.Select(x => x.ZFINC).ToList().Contains(x.ZFINC)).Select(x => x.ZFINC).ToList();
-                var updateOids = projectList.Where(x => projectCodeList.Select(x => x.ZFINC).ToList().Contains(x.ZFINC)).Select(x => x.ZFINC).ToList();
-                if (insertOids.Any())
-                {
-                    //插入操作
-                    var batchData = projectList.Where(x => insertOids.Contains(x.ZFINC)).ToList();
-                    await _dbContext.Fastest<FinancialInstitution>().BulkCopyAsync(batchData);
-                }
-                if (updateOids.Any())
-                {
-                    //更新操作
-                    var batchData = projectList.Where(x => updateOids.Contains(x.ZFINC)).ToList();
-                    foreach (var item in batchData)
-                    {
-                        var id = projectCodeList.Where(x => x.ZFINC == item.ZFINC).Select(x => x.Id).First();
-                        item.Id = id;
-                    }
-                    await _dbContext.Updateable<FinancialInstitution>(batchData).ExecuteCommandAsync();
-                }
+                await _dbContext.Fastest<FinancialInstitution>().BulkCopyAsync(projectList);
                 responseAjaxResult.Success();
             }
             catch (Exception ex)
             {
                 throw;
             }
-
             return responseAjaxResult;
+            #endregion
         }
         /// <summary>
         /// 物资设备分类编码
@@ -2262,11 +2340,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
             {
                 List<DeviceDetailAttribute> insertItem = new();
                 List<DeviceDetailAttribute> updateItem = new();
-
-                var lgList = await _dbContext.Queryable<DeviceDetailCode>().Where(x => x.IsDelete == 1).ToListAsync();
-                var insertOids = baseReceiveDataRequestDto.IT_DATA.item.Where(x => !lgList.Select(x => x.ZMATERIAL).ToList().Contains(x.ZMATERIAL)).ToList();
-                var updateOids = baseReceiveDataRequestDto.IT_DATA.item.Where(x => lgList.Select(x => x.ZMATERIAL).ToList().Contains(x.ZMATERIAL)).ToList();
-
+                var insertOids = baseReceiveDataRequestDto.IT_DATA.item.ToList();
                 //新增操作
                 if (insertOids.Any())
                 {
@@ -2298,42 +2372,6 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
                     mapList.ForEach(x => x.CreateTime = DateTime.Now);
                     await _dbContext.Fastest<DeviceDetailCode>().BulkCopyAsync(mapList);
                 }
-                if (updateOids.Any())
-                {
-                    List<DeviceDetailAttribute> deleteData = new();
-                    //更新
-                    var lgeList = await _dbContext.Queryable<DeviceDetailAttribute>().ToListAsync();
-                    foreach (var itemItem in updateOids)
-                    {
-                        var id = lgList.Where(x => x.ZMATERIAL == itemItem.ZMATERIAL).Select(x => x.Id).First();
-                        itemItem.Id = id;
-                        if (itemItem.ZMATTTR_LIST != null)
-                        {
-                            foreach (var items in itemItem.ZMATTTR_LIST.Item)
-                            {
-                                DeviceDetailAttribute ldetails = new DeviceDetailAttribute()
-                                {
-                                    Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
-                                    ZATTRCODE = items.ZATTRCODE,
-                                    ZATTRNAME = items.ZATTRNAME,
-                                    ZATTRUNIT = items.ZATTRUNIT,
-                                    ZVALUECODE = items.ZVALUECODE,
-                                    ZVALUENAME = items.ZVALUENAME,
-                                    ZMATERIAL = itemItem.ZMATERIAL,
-                                    CreateTime = DateTime.Now
-                                };
-                                updateItem.Add(ldetails);
-                            }
-
-                        }
-                        deleteData.AddRange(lgeList.Where(x => x.ZMATERIAL == itemItem.ZMATERIAL).ToList());
-                    }
-                    var mapList = _mapper.Map<List<DeviceDetailCodeItem>, List<DeviceDetailCode>>(updateOids);
-                    await _dbContext.Updateable(mapList).ExecuteCommandAsync();
-                    await _dbContext.Deleteable<DeviceDetailAttribute>().WhereColumns(deleteData, it => new { it.Id }).ExecuteCommandAsync();
-                    await _dbContext.Insertable(updateItem).ExecuteCommandAsync();
-                }
-
                 responseAjaxResult.Success();
             }
             catch (Exception ex)
