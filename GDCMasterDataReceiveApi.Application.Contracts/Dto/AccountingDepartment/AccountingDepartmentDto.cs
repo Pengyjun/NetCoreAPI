@@ -1,4 +1,4 @@
-﻿using MiniExcelLibs.Attributes;
+﻿using System.ComponentModel;
 
 namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.AccountingDepartment
 {
@@ -37,7 +37,6 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.AccountingDepartment
     /// </summary>
     public class AccountingDepartmentDetailsDto
     {
-        [ExcelIgnore]
         public string? Id { get; set; }
         /// <summary>
         /// 核算组织编号:9月18日新加
@@ -52,12 +51,12 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.AccountingDepartment
         /// <summary>
         /// 核算组织ID
         /// </summary>
-        [ExcelIgnore]
+        [DisplayName("核算组织ID")]
         public string? AccOrgId { get; set; }
         /// <summary>
         /// 核算部门ID
         /// </summary>
-        [ExcelIgnore]
+        [DisplayName("核算部门ID")]
         public string? AccDepId { get; set; }
         /// <summary>
         /// 核算部门中文简体名称
@@ -77,21 +76,19 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.AccountingDepartment
         /// <summary>
         /// 上级核算部门ID
         /// </summary>
-        [ExcelIgnore]
+        [DisplayName("上级核算部门ID")]
         public string? SupAccDepId { get; set; }
         /// <summary>
         /// 核算部门停用标志：1:停用0:未停用
         /// </summary>
-        [ExcelIgnore]
+        [DisplayName("核算部门停用标志")]
         public string? State { get; set; }
         /// <summary>
         /// 数据删除标识：1:删除0：正常
         /// </summary>
-        [ExcelIgnore]
+        [DisplayName("数据删除标识")]
         public string? DataIdentifier { get; set; }
-        [ExcelIgnore]
         public DateTime? CreateTime { get; set; }
-        [ExcelIgnore]
         public DateTime? UpdateTime { get; set; }
     }
     /// <summary>

@@ -1,5 +1,5 @@
 ﻿using GDCMasterDataReceiveApi.Application.Contracts.Dto.OtherModels;
-using MiniExcelLibs.Attributes;
+using System.ComponentModel;
 
 namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.ScientifiCNoProject
 {
@@ -50,7 +50,6 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.ScientifiCNoProject
     /// </summary>
     public class ScientifiCNoProjectDetailsDto
     {
-        [ExcelIgnore]
         public string? Id { get; set; }
         /// <summary>
         /// 科研项目主数据编码:科研项目的唯一编码标识
@@ -70,17 +69,17 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.ScientifiCNoProject
         /// <summary>
         /// 是否高新项目:0 否 1 是
         /// </summary>
-        [ExcelIgnore]
+        [DisplayName("是否高新项目")]
         public string? IsHighTech { get; set; }
         /// <summary>
         /// 项目状态
         /// </summary>
-        [ExcelIgnore]
+        [DisplayName("项目状态")]
         public string? PjectState { get; set; }
         /// <summary>
         /// 是否委外项目:0 否 1 是
         /// </summary>
-        [ExcelIgnore]
+        [DisplayName("是否委外项目")]
         public string? IsOutsourced { get; set; }
         /// <summary>
         /// 科研项目分类:代码
@@ -115,21 +114,19 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.ScientifiCNoProject
         /// <summary>
         /// 专业类型：科研项目所属的专业类型，引用Q/CCCC GL005—2021要求的公司产业分类
         /// </summary>
-        [ExcelIgnore]
+        [DisplayName("专业类型")]
         public string? ProfessionalType { get; set; }
         /// <summary>
         /// 状态：0停用 1启用
         /// </summary>
-        [ExcelIgnore]
+        [DisplayName("状态")]
         public string? State { get; set; }
         /// <summary>
         /// 上级科研项目主数据编码
         /// </summary>
-        [ExcelIgnore]
+        [DisplayName("上级科研项目主数据编码")]
         public string? SupMDCode { get; set; }
-        [ExcelIgnore]
         public DateTime? CreateTime { get; set; }
-        [ExcelIgnore]
         public DateTime? UpdateTime { get; set; }
     }
     /// <summary>

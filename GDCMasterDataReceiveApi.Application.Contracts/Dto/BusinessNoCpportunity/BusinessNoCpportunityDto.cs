@@ -1,5 +1,5 @@
 ﻿using GDCMasterDataReceiveApi.Application.Contracts.Dto.OtherModels;
-using MiniExcelLibs.Attributes;
+using System.ComponentModel;
 
 namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.BusinessNoCpportunity
 {
@@ -53,7 +53,6 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.BusinessNoCpportunit
         /// <summary>
         /// 主键id
         /// </summary>
-        [ExcelIgnore]
         public string? Id { get; set; }
         /// <summary>
         /// 商机项目主数据编码:新增项目由主数据系统生成并返回主数据编码，修改时必填
@@ -103,12 +102,12 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.BusinessNoCpportunit
         /// <summary>
         /// 所属二级单位
         /// </summary>
-        [ExcelIgnore]
+        [DisplayName("所属二级单位")]
         public string? UnitSec { get; set; }
         /// <summary>
         /// 状态: 数据是否有效的标识: 有效：1无效：0
         /// </summary>
-        [ExcelIgnore]
+        [DisplayName("状态")]
         public string? State { get; set; }
         /// <summary>
         /// 资质单位
@@ -123,11 +122,9 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.BusinessNoCpportunit
         /// <summary>
         /// 参与单位:填写参与部门的行政机构主数据编码，可多值，用英文逗号隔开.
         /// </summary>
-        [ExcelIgnore]
+        [DisplayName("参与单位")]
         public string? ParticipatingUnits { get; set; }
-        [ExcelIgnore]
         public DateTime? CreateTime { get; set; }
-        [ExcelIgnore]
         public DateTime? UpdateTime { get; set; }
     }
     /// <summary>
