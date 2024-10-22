@@ -1999,10 +1999,10 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                 item.County = adisision.FirstOrDefault(x => x.Key == item.County)?.Val;
 
                 //往来单位性质
-                item.CategoryUnit = GetValueDomain(item.CategoryUnit, valDomain, "ZBPNATURE");
+                item.NatureOfUnit = GetValueDomain(item.NatureOfUnit, valDomain, "ZBPNATURE");
 
                 //往来单位类型
-                item.CategoryUnit = GetValueDomain(item.CategoryUnit, valDomain, "ZBPKINDS");
+                item.TypeOfUnit = GetValueDomain(item.TypeOfUnit, valDomain, "ZBPKINDS");
 
             }
 
