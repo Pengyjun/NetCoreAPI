@@ -6989,6 +6989,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                 {
                     //case "GetUserSearchAsync":
                     //case "GetUserDetailsAsync":
+                    //case "IssuedUserAsync":
                     //    var properties = GetProperties<UserSearchDetailsDto>();
                     //    foreach (var property in properties)
                     //    {
@@ -7003,8 +7004,9 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     //        }
                     //    }
                     //    break;
-                    //case "GetInstitutionsAsync":
-                    //case "GetInstitutionDetailsAsync":
+                    ////case "GetInstitutionsAsync":
+                    ////case "GetInstitutionDetailsAsync":
+                    //case "IssuedInstitutionDetailsAsync":
                     //    var properties2 = GetProperties<InstitutionDetatilsDto>();
                     //    foreach (var property in properties2)
                     //    {
@@ -7019,8 +7021,9 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     //        }
                     //    }
                     //    break;
-                    //case "GetProjectSearchAsync":
-                    //case "GetProjectDetailsAsync":
+                    ////case "GetProjectSearchAsync":
+                    ////case "GetProjectDetailsAsync":
+                    //case "IssuedProjectDetailsAsync":
                     //    //var properties3 = GetProperties<ProjectDetailsDto>();
                     //    var properties3 = GetProperties<DHProjects>();
                     //    foreach (var property in properties3)
@@ -7036,8 +7039,9 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     //        }
                     //    }
                     //    break;
-                    //case "GetCorresUnitSearchAsync":
-                    //case "GetCorresUnitDetailAsync":
+                    ////case "GetCorresUnitSearchAsync":
+                    ////case "GetCorresUnitDetailAsync":
+                    //case "IssuedCorresUnitDetailAsync":
                     //    var properties4 = GetProperties<CorresUnitDetailsDto>();
                     //    foreach (var property in properties4)
                     //    {
@@ -7052,8 +7056,9 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     //        }
                     //    }
                     //    break;
-                    //case "GetCountryRegionSearchAsync":
-                    //case "GetCountryRegionDetailsAsync":
+                    ////case "GetCountryRegionSearchAsync":
+                    ////case "GetCountryRegionDetailsAsync":
+                    //case "IssuedCountryRegionDetailsAsync":
                     //    var properties5 = GetProperties<CountryRegionDetailsDto>();
                     //    foreach (var property in properties5)
                     //    {
@@ -7068,8 +7073,9 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     //        }
                     //    }
                     //    break;
-                    //case "GetCountryContinentSearchAsync":
-                    //case "GetCountryContinentDetailsAsync":
+                    ////case "GetCountryContinentSearchAsync":
+                    ////case "GetCountryContinentDetailsAsync":
+                    //case "IssuedCountryContinentDetailsAsync":
                     //    var properties6 = GetProperties<CountryContinentDetailsDto>();
                     //    foreach (var property in properties6)
                     //    {
@@ -7084,8 +7090,9 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     //        }
                     //    }
                     //    break;
-                    //case "GetFinancialInstitutionSearchAsync":
-                    //case "GetFinancialInstitutionDetailsAsync":
+                    ////case "GetFinancialInstitutionSearchAsync":
+                    ////case "GetFinancialInstitutionDetailsAsync":
+                    //case "IssuedFinancialInstitutionDetailsAsync":
                     //    var properties7 = GetProperties<FinancialInstitutionDetailsDto>();
                     //    foreach (var property in properties7)
                     //    {
@@ -7100,8 +7107,9 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     //        }
                     //    }
                     //    break;
-                    //case "GetDeviceClassCodeSearchAsync":
-                    //case "GetDeviceClassCodeDetailsAsync":
+                    ////case "GetDeviceClassCodeSearchAsync":
+                    ////case "GetDeviceClassCodeDetailsAsync":
+                    //case "IssuedDeviceClassCodeDetailsAsync":
                     //    var properties8 = GetProperties<DeviceClassCodeDetailsDto>();
                     //    foreach (var property in properties8)
                     //    {
@@ -7116,8 +7124,9 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     //        }
                     //    }
                     //    break;
-                    //case "GetInvoiceTypeSearchAsync":
-                    //case "GetInvoiceTypeDetailsASync":
+                    ////case "GetInvoiceTypeSearchAsync":
+                    ////case "GetInvoiceTypeDetailsASync":
+                    //case "IssuedInvoiceTypeDetailsASync":
                     //    var properties9 = GetProperties<InvoiceTypeDetailshDto>();
                     //    foreach (var property in properties9)
                     //    {
@@ -7132,8 +7141,9 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     //        }
                     //    }
                     //    break;
-                    //case "GetScientifiCNoProjectSearchAsync":
-                    //case "GetScientifiCNoProjectDetailsAsync":
+                    ////case "GetScientifiCNoProjectSearchAsync":
+                    ////case "GetScientifiCNoProjectDetailsAsync":
+                    //case "IssuedScientifiCNoProjectDetailsAsync":
                     //    //var properties10 = GetProperties<ScientifiCNoProjectDetailsDto>();
                     //    var properties10 = GetProperties<DHResearch>();
                     //    foreach (var property in properties10)
@@ -7149,8 +7159,9 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     //        }
                     //    }
                     //    break;
-                    //case "GetLanguageSearchAsync":
-                    //case "GetLanguageDetailsAsync":
+                    ////case "GetLanguageSearchAsync":
+                    ////case "GetLanguageDetailsAsync":
+                    //case "IssuedLanguageDetailsAsync":
                     //    var properties11 = GetProperties<LanguageDetailsDto>();
                     //    foreach (var property in properties11)
                     //    {
@@ -7165,8 +7176,9 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     //        }
                     //    }
                     //    break;
-                    //case "GetBankCardSearchAsync":
-                    //case "GetBankCardDetailsAsync":
+                    ////case "GetBankCardSearchAsync":
+                    ////case "GetBankCardDetailsAsync":
+                    //case "IssuedBankCardDetailsAsync":
                     //    var properties12 = GetProperties<BankCardDetailsDto>();
                     //    foreach (var property in properties12)
                     //    {
@@ -7181,8 +7193,9 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     //        }
                     //    }
                     //    break;
-                    //case "GetDeviceDetailCodeSearchAsync":
-                    //case "GetDeviceDetailCodeDetailsAsync":
+                    ////case "GetDeviceDetailCodeSearchAsync":
+                    ////case "GetDeviceDetailCodeDetailsAsync":
+                    //case "IssuedDeviceDetailCodeDetailsAsync":
                     //    var properties13 = GetProperties<DeviceDetailCodeDetailsDto>();
                     //    foreach (var property in properties13)
                     //    {
@@ -7197,8 +7210,9 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     //        }
                     //    }
                     //    break;
-                    //case "GetAccountingDepartmentSearchAsync":
-                    //case "GetAccountingDepartmentDetailsAsync":
+                    ////case "GetAccountingDepartmentSearchAsync":
+                    ////case "GetAccountingDepartmentDetailsAsync":
+                    //case "IssuedAccountingDepartmentDetailsAsync":
                     //    //var properties14 = GetProperties<AccountingDepartmentDetailsDto>();
                     //    var properties14 = GetProperties<DHAccountingDept>();
                     //    foreach (var property in properties14)
@@ -7214,8 +7228,9 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     //        }
                     //    }
                     //    break;
-                    //case "GetRelationalContractsSearchAsync":
-                    //case "GetRelationalContractsDetailsAsync":
+                    ////case "GetRelationalContractsSearchAsync":
+                    ////case "GetRelationalContractsDetailsAsync":
+                    //case "IssuedRelationalContractsDetailsAsync":
                     //    var properties15 = GetProperties<RelationalContractsDetailsDto>();
                     //    foreach (var property in properties15)
                     //    {
@@ -7230,8 +7245,9 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     //        }
                     //    }
                     //    break;
-                    //case "GetRegionalDetailsAsync":
-                    //case "GetRegionalSearchAsync":
+                    ////case "GetRegionalDetailsAsync":
+                    ////case "GetRegionalSearchAsync":
+                    //case "IssuedRegionalSearchAsync":
                     //    var properties16 = GetProperties<RegionalDetailsDto>();
                     //    foreach (var property in properties16)
                     //    {
@@ -7246,8 +7262,9 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     //        }
                     //    }
                     //    break;
-                    //case "GetUnitMeasurementSearchAsync":
-                    //case "GetUnitMeasurementDetailsAsync":
+                    ////case "GetUnitMeasurementSearchAsync":
+                    ////case "GetUnitMeasurementDetailsAsync":
+                    //case "IssuedUnitMeasurementDetailsAsync":
                     //    var properties17 = GetProperties<UnitMeasurementDetailsDto>();
                     //    foreach (var property in properties17)
                     //    {
@@ -7262,8 +7279,9 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     //        }
                     //    }
                     //    break;
-                    //case "GetProjectClassificationSearchAsync":
-                    //case "GetProjectClassificationDetailsAsync":
+                    ////case "GetProjectClassificationSearchAsync":
+                    ////case "GetProjectClassificationDetailsAsync":
+                    //case "IssuedProjectClassificationDetailsAsync":
                     //    var properties18 = GetProperties<ProjectClassificationDetailsDto>();
                     //    foreach (var property in properties18)
                     //    {
@@ -7278,8 +7296,9 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     //        }
                     //    }
                     //    break;
-                    //case "GetRegionalCenterSearchAsync":
-                    //case "GetRegionalCenterDetailsAsync":
+                    ////case "GetRegionalCenterSearchAsync":
+                    ////case "GetRegionalCenterDetailsAsync":
+                    //case "IssuedRegionalCenterDetailsAsync":
                     //    var properties19 = GetProperties<RegionalCenterDetailsDto>();
                     //    foreach (var property in properties19)
                     //    {
@@ -7294,8 +7313,9 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     //        }
                     //    }
                     //    break;
-                    //case "GetNationalEconomySearchAsync":
-                    //case "GetNationalEconomyDetailsAsync":
+                    ////case "GetNationalEconomySearchAsync":
+                    ////case "GetNationalEconomyDetailsAsync":
+                    //case "IssuedNationalEconomyDetailsAsync":
                     //    var properties20 = GetProperties<NationalEconomyDetailsDto>();
                     //    foreach (var property in properties20)
                     //    {
@@ -7310,8 +7330,9 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     //        }
                     //    }
                     //    break;
-                    //case "GetAdministrativeAccountingMapperSearchAsync":
-                    //case "GetAdministrativeAccountingMapperDetailsAsync":
+                    ////case "GetAdministrativeAccountingMapperSearchAsync":
+                    ////case "GetAdministrativeAccountingMapperDetailsAsync":
+                    //case "IssuedAdministrativeAccountingMapperDetailsAsync":
                     //    //var properties21 = GetProperties<AdministrativeAccountingMapperDetailsDto>();
                     //    var properties21 = GetProperties<DHAdministrative>();
                     //    foreach (var property in properties21)
@@ -7327,8 +7348,9 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     //        }
                     //    }
                     //    break;
-                    //case "GetEscrowOrganizationSearchAsync":
-                    //case "GetEscrowOrganizationDetailsAsync":
+                    ////case "GetEscrowOrganizationSearchAsync":
+                    ////case "GetEscrowOrganizationDetailsAsync":
+                    //case "IssuedEscrowOrganizationDetailsAsync":
                     //    var properties23 = GetProperties<EscrowOrganizationDetailsDto>();
                     //    foreach (var property in properties23)
                     //    {
@@ -7343,9 +7365,10 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     //        }
                     //    }
                     //    break;
-                    //case "GetBusinessNoCpportunitySearchAsync":
-                    //case "GetBusinessCpportunitySearchAsync":
-                    //case "GetBusinessNoCpportunityDetailsAsync":
+                    ////case "GetBusinessNoCpportunitySearchAsync":
+                    ////case "GetBusinessCpportunitySearchAsync":
+                    ////case "GetBusinessNoCpportunityDetailsAsync":
+                    //case "IssuedBusinessNoCpportunityDetailsAsync":
                     //    //var properties24 = GetProperties<BusinessNoCpportunityDetailsDto>();
                     //    var properties24 = GetProperties<DHOpportunity>();
                     //    foreach (var property in properties24)
@@ -7361,8 +7384,9 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     //        }
                     //    }
                     //    break;
-                    //case "GetAdministrativeDivisionSearchAsync":
-                    //case "GetAdministrativeDivisionDetailsAsync":
+                    ////case "GetAdministrativeDivisionSearchAsync":
+                    ////case "GetAdministrativeDivisionDetailsAsync":
+                    //case "IssuedAdministrativeDivisionDetailsAsync":
                     //    var properties25 = GetProperties<AdministrativeDivisionDetailsDto>();
                     //    foreach (var property in properties25)
                     //    {
@@ -7377,8 +7401,9 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     //        }
                     //    }
                     //    break;
-                    //case "GetAccountingOrganizationSearchAsync":
-                    //case "GetAccountingOrganizationDetailsAsync":
+                    ////case "GetAccountingOrganizationSearchAsync":
+                    ////case "GetAccountingOrganizationDetailsAsync":
+                    //case "IssuedAccountingOrganizationDetailsAsync":
                     //    //var properties26 = GetProperties<AccountingOrganizationDetailsDto>();
                     //    var properties26 = GetProperties<DHAdjustAccountsMultipleOrg>();
                     //    foreach (var property in properties26)
@@ -7394,8 +7419,9 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     //        }
                     //    }
                     //    break;
-                    //case "GetCurrencySearchAsync":
-                    //case "GetCurrencyDetailsAsync":
+                    ////case "GetCurrencySearchAsync":
+                    ////case "GetCurrencyDetailsAsync":
+                    //case "IssuedCurrencyDetailsAsync":
                     //    var properties27 = GetProperties<CurrencyDetailsDto>();
                     //    foreach (var property in properties27)
                     //    {
@@ -7410,7 +7436,8 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     //        }
                     //    }
                     //    break;
-                    //case "GetValueDomainReceiveAsync":
+                    //    //case "GetValueDomainReceiveAsync":
+                    //    case "IssuedValueDomainReceiveAsync":
                     //    var properties28 = GetProperties<ValueDomainReceiveResponseDto>();
                     //    foreach (var property in properties28)
                     //    {
@@ -7426,6 +7453,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     //    }
                     //    break;
                     //case "GetDHVirtualProjectAsync":
+                    //case "IssuedDHVirtualProjectAsync":
                     //    var properties29 = GetProperties<DHVirtualProject>();
                     //    foreach (var property in properties29)
                     //    {
@@ -7441,6 +7469,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     //    }
                     //    break;
                     //case "GetXZOrganzationSearchAsync":
+                    //case "IssuedXZOrganzationSearchAsync":
                     //    //var properties30 = GetProperties<AdministrativeOrganization>();
                     //    var properties30 = GetProperties<DHOrganzationDep>();
                     //    foreach (var property in properties30)
@@ -7456,68 +7485,69 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     //        }
                     //    }
                     //    break;
-                    //case "SearchNotesReceiveAsync":
-                    //    var properties30 = GetProperties<AdministrativeOrganization>();
-                    //    var properties31 = GetProperties<dwd_ffm_ap_bill_d>();
-                    //    foreach (var property in properties31)
-                    //    {
-                    //        if (!excludedProperties.Contains(property.Name))
-                    //        {
-                    //            ddd.Add(new SystemInterfaceField
-                    //            {
-                    //                Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
-                    //                AppSystemInterfaceId = r.Id,
-                    //                FieidName = property.Name
-                    //            });
-                    //        }
-                    //    }
-                    //    break;
-                    //case "SearchNotesPayableAsync":
-                    //    var properties32 = GetProperties<dwd_ffm_receive_new_d>();
-                    //    foreach (var property in properties32)
-                    //    {
-                    //        if (!excludedProperties.Contains(property.Name))
-                    //        {
-                    //            ddd.Add(new SystemInterfaceField
-                    //            {
-                    //                Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
-                    //                AppSystemInterfaceId = r.Id,
-                    //                FieidName = property.Name
-                    //            });
-                    //        }
-                    //    }
-                    //    break;  
-                    //case "SearchNotesReceiveAsync":
-                    //    var properties32 = GetProperties<dwd_cdm_con_bas_i_d>();
-                    //    foreach (var property in properties32)
-                    //    {
-                    //        if (!excludedProperties.Contains(property.Name))
-                    //        {
-                    //            ddd.Add(new SystemInterfaceField
-                    //            {
-                    //                Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
-                    //                AppSystemInterfaceId = r.Id,
-                    //                FieidName = property.Name
-                    //            });
-                    //        }
-                    //    }
-                    //    break;
+                        //case "SearchNotesReceiveAsync":
+                        //    var properties30 = GetProperties<AdministrativeOrganization>();
+                        //    var properties31 = GetProperties<dwd_ffm_ap_bill_d>();
+                        //    foreach (var property in properties31)
+                        //    {
+                        //        if (!excludedProperties.Contains(property.Name))
+                        //        {
+                        //            ddd.Add(new SystemInterfaceField
+                        //            {
+                        //                Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                        //                AppSystemInterfaceId = r.Id,
+                        //                FieidName = property.Name
+                        //            });
+                        //        }
+                        //    }
+                        //    break;
+                        //case "SearchNotesPayableAsync":
+                        //    var properties32 = GetProperties<dwd_ffm_receive_new_d>();
+                        //    foreach (var property in properties32)
+                        //    {
+                        //        if (!excludedProperties.Contains(property.Name))
+                        //        {
+                        //            ddd.Add(new SystemInterfaceField
+                        //            {
+                        //                Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                        //                AppSystemInterfaceId = r.Id,
+                        //                FieidName = property.Name
+                        //            });
+                        //        }
+                        //    }
+                        //    break;  
+                        //case "SearchNotesReceiveAsync":
+                        //    var properties32 = GetProperties<dwd_cdm_con_bas_i_d>();
+                        //    foreach (var property in properties32)
+                        //    {
+                        //        if (!excludedProperties.Contains(property.Name))
+                        //        {
+                        //            ddd.Add(new SystemInterfaceField
+                        //            {
+                        //                Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                        //                AppSystemInterfaceId = r.Id,
+                        //                FieidName = property.Name
+                        //            });
+                        //        }
+                        //    }
+                        //    break;
 
-                    case "GetDHMdmMultOrgAgencyRelPageAsync":
-                        var properties32 = GetProperties<DHMdmManagementOrgage>();
-                        foreach (var property in properties32)
-                        {
-                            if (!excludedProperties.Contains(property.Name))
-                            {
-                                ddd.Add(new SystemInterfaceField
-                                {
-                                    Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
-                                    AppSystemInterfaceId = r.Id,
-                                    FieidName = property.Name
-                                });
-                            }
-                        }
-                        break;
+                        //case "GetDHMdmMultOrgAgencyRelPageAsync":
+                        //case "IssuedDHMdmMultOrgAgencyRelPageAsync":
+                        //var properties32 = GetProperties<DHMdmManagementOrgage>();
+                        //foreach (var property in properties32)
+                        //{
+                        //    if (!excludedProperties.Contains(property.Name))
+                        //    {
+                        //        ddd.Add(new SystemInterfaceField
+                        //        {
+                        //            Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                        //            AppSystemInterfaceId = r.Id,
+                        //            FieidName = property.Name
+                        //        });
+                        //    }
+                        //}
+                        //break;
                 }
             }
             #endregion
