@@ -86,15 +86,36 @@ namespace GDCMasterDataReceiveApi.Controller
         {
             return await _searchService.GetUserDetailsAsync(uId);
         }
+        ///// <summary>
+        ///// 获取机构数据
+        ///// </summary>
+        ///// <param name="requestDto"></param>
+        ///// <returns></returns>
+        //[HttpPost("GetInstitutions")]
+        //public async Task<ResponseAjaxResult<List<InstitutionDetatilsDto>>> GetInstitutionsAsync([FromBody] FilterCondition requestDto)
+        //{
+        //    return await _searchService.GetInstitutionAsync(requestDto);
+        //}
         /// <summary>
-        /// 获取机构数据
+        /// 新版左侧获取机构树
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
-        [HttpPost("GetInstitutions")]
-        public async Task<ResponseAjaxResult<List<InstitutionDetatilsDto>>> GetInstitutionsAsync([FromBody] FilterCondition requestDto)
+        [HttpPost("GetInstitutionTree")]
+        [AllowAnonymous]
+        public async Task<ResponseAjaxResult<InstitutionResponseDto>> GetInstitutionTreeAsync(FilterCondition requestDto)
         {
-            return await _searchService.GetInstitutionAsync(requestDto);
+            return await _searchService.GetInstitutionTreeAsync(requestDto);
+        }
+        /// <summary>
+        /// 新版左侧获取机构树 对应详情
+        /// </summary>
+        /// <param name="oId"></param>
+        /// <returns></returns>
+        [HttpPost("GetInstitutions")]
+        public async Task<ResponseAjaxResult<List<InstitutionDetatilsDto>>> GetInstitutionsAsync([FromQuery]string? oId)
+        {
+            return await _searchService.GetInstitutionTreeDetailsAsync(oId);
         }
         /// <summary>
         /// 获取机构详情

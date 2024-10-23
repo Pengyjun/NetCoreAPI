@@ -82,7 +82,7 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.Institution
         /// <summary>
         /// 机构 ID
         /// </summary>
-        [DisplayName("国家地区")]
+        [DisplayName("机构Oid")]
         public string? Oid { get; set; }
         /// <summary>
         /// 企业分类
@@ -303,10 +303,34 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.Institution
         public string? MdmCode { get; set; }
         public DateTime? CreateTime { get; set; }
         public DateTime? UpdateTime { get; set; }
-        /// <summary>
-        /// 机构子集
-        /// </summary>
-        public List<InstitutionDetatilsDto>? Children { get; set; }
+        ///// <summary>
+        ///// 机构子集
+        ///// </summary>
+        //public List<InstitutionDetatilsDto>? Children { get; set; }
     }
+
+    /// <summary>
+    /// 机构  新版
+    /// </summary>
+    public class InstitutionResponseDto
+    {
+        /// <summary>
+        /// 机构oid
+        /// </summary>
+        public string? Oid { get; set; }
+        /// <summary>
+        /// 机构上级id
+        /// </summary>
+        public string? Gpoid { get; set; }
+        /// <summary>
+        /// 机构简称
+        /// </summary>
+        public string? ShortName { get; set; }
+        /// <summary>
+        /// 子集
+        /// </summary>
+        public List<InstitutionResponseDto>? Children { get; set; }
+    }
+
 
 }
