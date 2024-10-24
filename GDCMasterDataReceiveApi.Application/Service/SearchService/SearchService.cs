@@ -1371,12 +1371,25 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
         /// <returns></returns>
         public List<InstitutionResponseDto> GetInstitutionTreeChild(string gpOid, List<InstitutionResponseDto> children)
         {
-            var childs = children.Where(x => x.Gpoid == gpOid).ToList();
+            // 使用字典存储孩子节点以提高性能
+            var childrenDict = children.ToLookup(x => x.Gpoid);
+
+            // 查找与 gpOid 匹配的所有子节点
+            var childs = childrenDict[gpOid].ToList();
+
+            // 递归获取每个子节点的子节点
             foreach (var child in childs)
             {
                 child.Children = GetInstitutionTreeChild(child.Oid, children);
             }
+
             return childs;
+            //var childs = children.Where(x => x.Gpoid == gpOid).ToList();
+            //foreach (var child in childs)
+            //{
+            //    child.Children = GetInstitutionTreeChild(child.Oid, children);
+            //}
+            //return childs;
         }
         /// <summary>
         /// 获取机构详情
