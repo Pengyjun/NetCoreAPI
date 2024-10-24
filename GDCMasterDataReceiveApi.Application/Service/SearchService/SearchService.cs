@@ -37,7 +37,10 @@ using GDCMasterDataReceiveApi.Domain.Shared.Utils;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using SqlSugar;
+using System.Data;
 using System.Reflection;
+using System.Security.Cryptography;
+using System.Security.Cryptography.X509Certificates;
 
 namespace GDCMasterDataReceiveApi.Application.Service.SearchService
 {
@@ -1025,7 +1028,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
             }
 
             var tableList = await _dbContext.Queryable<Institution>()
-                .Select(t => new { t.GPOID, t.OID, t.SHORTNAME, t.IsDelete, t.SNO, t.Id, t.GRULE, t.NAME })
+                .Select(t => new InstitutionConvertDto { GPOID = t.GPOID, OID = t.OID, SHORTNAME = t.SHORTNAME, IsDelete = t.IsDelete, SNO = t.SNO, Id = t.Id, GRULE = t.GRULE, NAME = t.NAME })
                 .ToListAsync();
 
             #region 初始查询
@@ -1108,6 +1111,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
         public async Task<ResponseAjaxResult<List<InstitutionDetatilsDto>>> GetInstitutionTreeDetailsAsync(FilterCondition requestDto)
         {
             ResponseAjaxResult<List<InstitutionDetatilsDto>> responseAjaxResult = new();
+            RefAsync<int> total = 0;
 
             //过滤条件
             InstitutionDetatilsDto filterCondition = new();
@@ -1210,7 +1214,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     CreateTime = ins.CreateTime,
                     UpdateTime = ins.UpdateTime,
                 })
-                .ToListAsync();
+                .ToPageListAsync(requestDto.PageIndex, requestDto.PageSize, total);
 
             if (institutions != null && institutions.Any())
             {
