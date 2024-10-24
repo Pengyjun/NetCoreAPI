@@ -1104,6 +1104,28 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
             return responseAjaxResult;
         }
         /// <summary>
+        /// 子集 新版
+        /// </summary>
+        /// <param name="gpOid"></param>
+        /// <param name="children"></param>
+        /// <returns></returns>
+        public List<InstitutionResponseDto> GetInstitutionTreeChild(string gpOid, List<InstitutionResponseDto> children)
+        {
+            // 查找当前节点的所有子节点
+            var childs = children
+                .Where(x => x.Gpoid == gpOid)
+                .Select(child => new InstitutionResponseDto
+                {
+                    Gpoid = child.Gpoid,
+                    Oid = child.Oid,
+                    ShortName = child.ShortName,
+                    Children = GetInstitutionTreeChild(child.Oid, children)
+                })
+                .ToList();
+
+            return childs; // 返回子节点列表
+        }
+        /// <summary>
         /// 右侧机构详情
         /// </summary>
         /// <param name="requestDto"></param>
@@ -1360,30 +1382,9 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                 #endregion
             }
 
+            responseAjaxResult.Count = total;
             responseAjaxResult.SuccessResult(institutions);
             return responseAjaxResult;
-        }
-        /// <summary>
-        /// 子集 新版
-        /// </summary>
-        /// <param name="gpOid"></param>
-        /// <param name="children"></param>
-        /// <returns></returns>
-        public List<InstitutionResponseDto> GetInstitutionTreeChild(string gpOid, List<InstitutionResponseDto> children)
-        {
-            // 查找当前节点的所有子节点
-            var childs = children
-                .Where(x => x.Gpoid == gpOid)
-                .Select(child => new InstitutionResponseDto
-                {
-                    Gpoid = child.Gpoid,
-                    Oid = child.Oid,
-                    ShortName = child.ShortName,
-                    Children = GetInstitutionTreeChild(child.Oid, children) 
-                })
-                .ToList();
-
-            return childs; // 返回子节点列表
         }
         /// <summary>
         /// 获取机构详情
