@@ -66,9 +66,9 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.IService.ISearchService
         /// <summary>
         /// 新版 左侧机构树对应详情
         /// </summary>
-        /// <param name="oId"></param>
+        /// <param name="requestDto"></param>
         /// <returns></returns>
-        Task<ResponseAjaxResult<List<InstitutionDetatilsDto>>> GetInstitutionTreeDetailsAsync(string? oId);
+        Task<ResponseAjaxResult<List<InstitutionDetatilsDto>>> GetInstitutionTreeDetailsAsync(FilterCondition requestDto);
         /// <summary>
         /// 机构详情
         /// </summary>

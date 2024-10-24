@@ -37,8 +37,10 @@ using GDCMasterDataReceiveApi.Domain.Shared.Utils;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using SqlSugar;
+using System.Data;
 using System.Reflection;
 using System.Security.Cryptography;
+using System.Security.Cryptography.X509Certificates;
 
 namespace GDCMasterDataReceiveApi.Application.Service.SearchService
 {
@@ -1025,54 +1027,16 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                 filterCondition = JsonConvert.DeserializeObject<InstitutionDetatilsDto>(requestDto.FilterConditionJson);
             }
 
-            var tableList = await _dbContext.Queryable<Institution>().ToListAsync();
+            var tableList = await _dbContext.Queryable<Institution>()
+                .Select(t => new InstitutionConvertDto { GPOID = t.GPOID, OID = t.OID, SHORTNAME = t.SHORTNAME, IsDelete = t.IsDelete, SNO = t.SNO, Id = t.Id, GRULE = t.GRULE, NAME = t.NAME })
+                .ToListAsync();
 
             #region 初始查询
             //机构树初始化
             var institutions = tableList
-                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Name), t => t.NAME.Contains(filterCondition.Name))
                 .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Oid), t => t.OID.Contains(filterCondition.Oid))
-                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.EntClass), t => t.ENTCLASS.Contains(filterCondition.EntClass))
-                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.POid), t => t.POID.Contains(filterCondition.POid))
-                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Status), t => t.STATUS.Contains(filterCondition.Status))
-                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Code), t => t.OCODE.Contains(filterCondition.Code))
-                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Orule), t => t.ORULE.Contains(filterCondition.Orule))
                 .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ShortName), t => t.SHORTNAME.Contains(filterCondition.ShortName))
-                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.EnglishName), t => t.ENGLISHNAME.Contains(filterCondition.EnglishName))
-                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.EnglishShortName), t => t.ENGLISHSHORTNAME.Contains(filterCondition.EnglishShortName))
-                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.BizType), t => t.BIZTYPE.Contains(filterCondition.BizType))
-                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Gpoid), t => t.GPOID.Contains(filterCondition.Gpoid))
-                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Type), t => t.TYPE.Contains(filterCondition.Type))
-                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.TypeExt), t => t.TYPEEXT.Contains(filterCondition.TypeExt))
-                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Mrut), t => t.MRUT.Contains(filterCondition.Mrut))
-                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Sno), t => t.SNO.Contains(filterCondition.Sno))
-                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Coid), t => t.COID.Contains(filterCondition.Coid))
-                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Crossorgan), t => t.CROSSORGAN.Contains(filterCondition.Crossorgan))
-                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Goid), t => t.GOID.Contains(filterCondition.Goid))
-                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Grade), t => t.GRADE.Contains(filterCondition.Grade))
-                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Oper), t => t.OPER.Contains(filterCondition.Oper))
-                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Note), t => t.NOTE.Contains(filterCondition.Note))
-                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.TemorganName), t => t.TEMORGANNAME.Contains(filterCondition.TemorganName))
-                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.OrgProvince), t => t.ORGPROVINCE.Contains(filterCondition.OrgProvince))
-                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Carea), t => t.CAREA.Contains(filterCondition.Carea))
-                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.TerritoryPro), t => t.TERRITORYPRO.Contains(filterCondition.TerritoryPro))
-                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.BizDomain), t => t.BIZDOMAIN.Contains(filterCondition.BizDomain))
-                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.OrgGrade), t => t.ORGGRADE.Contains(filterCondition.OrgGrade))
-                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ProjectScale), t => t.PROJECTSCALE.Contains(filterCondition.ProjectScale))
-                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ProjectManType), t => t.PROJECTMANTYPE.Contains(filterCondition.ProjectManType))
-                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ProjectType), t => t.PROJECTTYPE.Contains(filterCondition.ProjectType))
-                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.StartDate), t => t.STARTDATE.Contains(filterCondition.StartDate))
-                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Organemp), t => t.ORGANEMP.Contains(filterCondition.Organemp))
-                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.OrganGrade), t => t.ORGANGRADE.Contains(filterCondition.OrganGrade))
-                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Rown), t => t.ROWN.Contains(filterCondition.Rown))
-                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.RoId), t => t.ROID.Contains(filterCondition.RoId))
-                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.GlobalSno), t => t.GLOBAL_SNO.Contains(filterCondition.GlobalSno))
-                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.QyGrade), t => t.QYGRADE.Contains(filterCondition.QyGrade))
-                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.RegisterCode), t => t.REGISTERCODE.Contains(filterCondition.RegisterCode))
-                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ShareHoldings), t => t.SHAREHOLDINGS.Contains(filterCondition.ShareHoldings))
-                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.MdmCode), t => t.MDM_CODE.Contains(filterCondition.MdmCode))
-                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.CreateTime.ToString()), (pro) => Convert.ToDateTime(pro.CreateTime).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.CreateTime).ToString("yyyy-MM-dd"))
-                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.UpdateTime.ToString()), (pro) => Convert.ToDateTime(pro.UpdateTime).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.UpdateTime).ToString("yyyy-MM-dd"))
+                .WhereIF(!string.IsNullOrWhiteSpace(requestDto.KeyWords), t => t.OID.Contains(requestDto.KeyWords) || t.NAME.Contains(requestDto.KeyWords))
                 .Where(t => t.IsDelete == 1)
                 .OrderBy(t => Convert.ToInt32(t.SNO))
                 .ToList();
@@ -1140,16 +1104,89 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
             return responseAjaxResult;
         }
         /// <summary>
+        /// 子集 新版
+        /// </summary>
+        /// <param name="gpOid"></param>
+        /// <param name="children"></param>
+        /// <returns></returns>
+        public List<InstitutionResponseDto> GetInstitutionTreeChild(string gpOid, List<InstitutionResponseDto> children)
+        {
+            // 查找当前节点的所有子节点
+            var childs = children
+                .Where(x => x.Gpoid == gpOid)
+                .Select(child => new InstitutionResponseDto
+                {
+                    Gpoid = child.Gpoid,
+                    Oid = child.Oid,
+                    ShortName = child.ShortName,
+                    Children = GetInstitutionTreeChild(child.Oid, children)
+                })
+                .ToList();
+
+            return childs; // 返回子节点列表
+        }
+        /// <summary>
         /// 右侧机构详情
         /// </summary>
-        /// <param name="oId"></param>
+        /// <param name="requestDto"></param>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<List<InstitutionDetatilsDto>>> GetInstitutionTreeDetailsAsync(string? oId)
+        public async Task<ResponseAjaxResult<List<InstitutionDetatilsDto>>> GetInstitutionTreeDetailsAsync(FilterCondition requestDto)
         {
             ResponseAjaxResult<List<InstitutionDetatilsDto>> responseAjaxResult = new();
+            RefAsync<int> total = 0;
+
+            //过滤条件
+            InstitutionDetatilsDto filterCondition = new();
+            if (!string.IsNullOrWhiteSpace(requestDto.FilterConditionJson))
+            {
+                filterCondition = JsonConvert.DeserializeObject<InstitutionDetatilsDto>(requestDto.FilterConditionJson);
+            }
 
             var institutions = await _dbContext.Queryable<Institution>()
-                .Where(t => t.IsDelete == 1 && t.OID == oId || t.POID == oId)
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Name), t => t.NAME.Contains(filterCondition.Name))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.EntClass), t => t.ENTCLASS.Contains(filterCondition.EntClass))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.POid), t => t.POID.Contains(filterCondition.POid))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Status), t => t.STATUS.Contains(filterCondition.Status))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Code), t => t.OCODE.Contains(filterCondition.Code))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Orule), t => t.ORULE.Contains(filterCondition.Orule))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ShortName), t => t.SHORTNAME.Contains(filterCondition.ShortName))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.EnglishName), t => t.ENGLISHNAME.Contains(filterCondition.EnglishName))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.EnglishShortName), t => t.ENGLISHSHORTNAME.Contains(filterCondition.EnglishShortName))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.BizType), t => t.BIZTYPE.Contains(filterCondition.BizType))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Gpoid), t => t.GPOID.Contains(filterCondition.Gpoid))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Type), t => t.TYPE.Contains(filterCondition.Type))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.TypeExt), t => t.TYPEEXT.Contains(filterCondition.TypeExt))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Mrut), t => t.MRUT.Contains(filterCondition.Mrut))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Sno), t => t.SNO.Contains(filterCondition.Sno))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Coid), t => t.COID.Contains(filterCondition.Coid))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Crossorgan), t => t.CROSSORGAN.Contains(filterCondition.Crossorgan))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Goid), t => t.GOID.Contains(filterCondition.Goid))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Grade), t => t.GRADE.Contains(filterCondition.Grade))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Oper), t => t.OPER.Contains(filterCondition.Oper))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Note), t => t.NOTE.Contains(filterCondition.Note))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.TemorganName), t => t.TEMORGANNAME.Contains(filterCondition.TemorganName))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.OrgProvince), t => t.ORGPROVINCE.Contains(filterCondition.OrgProvince))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Carea), t => t.CAREA.Contains(filterCondition.Carea))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.TerritoryPro), t => t.TERRITORYPRO.Contains(filterCondition.TerritoryPro))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.BizDomain), t => t.BIZDOMAIN.Contains(filterCondition.BizDomain))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.OrgGrade), t => t.ORGGRADE.Contains(filterCondition.OrgGrade))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ProjectScale), t => t.PROJECTSCALE.Contains(filterCondition.ProjectScale))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ProjectManType), t => t.PROJECTMANTYPE.Contains(filterCondition.ProjectManType))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ProjectType), t => t.PROJECTTYPE.Contains(filterCondition.ProjectType))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.StartDate), t => t.STARTDATE.Contains(filterCondition.StartDate))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Organemp), t => t.ORGANEMP.Contains(filterCondition.Organemp))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.OrganGrade), t => t.ORGANGRADE.Contains(filterCondition.OrganGrade))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Rown), t => t.ROWN.Contains(filterCondition.Rown))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.RoId), t => t.ROID.Contains(filterCondition.RoId))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.GlobalSno), t => t.GLOBAL_SNO.Contains(filterCondition.GlobalSno))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.QyGrade), t => t.QYGRADE.Contains(filterCondition.QyGrade))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.RegisterCode), t => t.REGISTERCODE.Contains(filterCondition.RegisterCode))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ShareHoldings), t => t.SHAREHOLDINGS.Contains(filterCondition.ShareHoldings))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.MdmCode), t => t.MDM_CODE.Contains(filterCondition.MdmCode))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.CreateTime.ToString()), (pro) => Convert.ToDateTime(pro.CreateTime).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.CreateTime).ToString("yyyy-MM-dd"))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.UpdateTime.ToString()), (pro) => Convert.ToDateTime(pro.UpdateTime).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.UpdateTime).ToString("yyyy-MM-dd"))
+                .Where(t => t.IsDelete == 1 && (t.OID == filterCondition.Oid || t.POID == filterCondition.Oid))
+                .WhereIF(!string.IsNullOrWhiteSpace(requestDto.KeyWords), t => t.OID.Contains(requestDto.KeyWords) || t.NAME.Contains(requestDto.KeyWords))
                 .Select(ins => new InstitutionDetatilsDto
                 {
                     BizDomain = ins.BIZDOMAIN,
@@ -1199,7 +1236,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     CreateTime = ins.CreateTime,
                     UpdateTime = ins.UpdateTime,
                 })
-                .ToListAsync();
+                .ToPageListAsync(requestDto.PageIndex, requestDto.PageSize, total);
 
             if (institutions != null && institutions.Any())
             {
@@ -1345,23 +1382,9 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                 #endregion
             }
 
+            responseAjaxResult.Count = total;
             responseAjaxResult.SuccessResult(institutions);
             return responseAjaxResult;
-        }
-        /// <summary>
-        /// 子集 新版
-        /// </summary>
-        /// <param name="gpOid"></param>
-        /// <param name="children"></param>
-        /// <returns></returns>
-        public List<InstitutionResponseDto> GetInstitutionTreeChild(string gpOid, List<InstitutionResponseDto> children)
-        {
-            var childs = children.Where(x => x.Gpoid == gpOid).ToList();
-            foreach (var child in childs)
-            {
-                child.Children = GetInstitutionTreeChild(child.Oid, children);
-            }
-            return childs;
         }
         /// <summary>
         /// 获取机构详情
@@ -1578,6 +1601,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                 .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.FZawardp), (pro) => pro.FZawardp.Contains(filterCondition.FZawardp))
                 .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.CreatedAt.ToString()), (pro) => Convert.ToDateTime(pro.CreatedAt).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.CreatedAt).ToString("yyyy-MM-dd"))
                 .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.UpdatedAt.ToString()), (pro) => Convert.ToDateTime(pro.UpdatedAt).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.UpdatedAt).ToString("yyyy-MM-dd"))
+                .WhereIF(!string.IsNullOrWhiteSpace(requestDto.KeyWords), t => t.ZPROJECT.Contains(requestDto.KeyWords) || t.ZPROJNAME.Contains(requestDto.KeyWords))
                 .Where((pro) => pro.IsDelete == 1)
                 .Select((pro) => new DHProjects
                 {
@@ -2279,6 +2303,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                 .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.TypeOfUnit), (pro) => pro.ZBPKINDS.Contains(filterCondition.TypeOfUnit))
                 .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.CreateTime.ToString()), (pro) => Convert.ToDateTime(pro.CreateTime).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.CreateTime).ToString("yyyy-MM-dd"))
                 .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.UpdateTime.ToString()), (pro) => Convert.ToDateTime(pro.UpdateTime).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.UpdateTime).ToString("yyyy-MM-dd"))
+                .WhereIF(!string.IsNullOrWhiteSpace(requestDto.KeyWords), t => t.ZBP.Contains(requestDto.KeyWords) || t.ZBPNAME_ZH.Contains(requestDto.KeyWords))
                 .Where((cu) => cu.IsDelete == 1)
                 .Select((cu) => new CorresUnitDetailsDto
                 {
@@ -2445,6 +2470,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                 .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.CCCCCenterCode), (pro) => pro.ZCRCCODE.Contains(filterCondition.CCCCCenterCode))
                 .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.CreateTime.ToString()), (pro) => Convert.ToDateTime(pro.CreateTime).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.CreateTime).ToString("yyyy-MM-dd"))
                 .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.UpdateTime.ToString()), (pro) => Convert.ToDateTime(pro.UpdateTime).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.UpdateTime).ToString("yyyy-MM-dd"))
+                .WhereIF(!string.IsNullOrWhiteSpace(requestDto.KeyWords), t => t.ZCOUNTRYCODE.Contains(requestDto.KeyWords) || t.ZCOUNTRYNAME.Contains(requestDto.KeyWords))
                 .Where((cr) => cr.IsDelete == 1)
                 .Select((cr) => new CountryRegionDetailsDto
                 {
@@ -2531,6 +2557,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                 .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.RegionalDescr), (pro) => pro.ZAREANAME.Contains(filterCondition.RegionalDescr))
                 .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.CreateTime.ToString()), (pro) => Convert.ToDateTime(pro.CreateTime).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.CreateTime).ToString("yyyy-MM-dd"))
                 .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.UpdateTime.ToString()), (pro) => Convert.ToDateTime(pro.UpdateTime).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.UpdateTime).ToString("yyyy-MM-dd"))
+                .WhereIF(!string.IsNullOrWhiteSpace(requestDto.KeyWords), t => t.ZCONTINENTCODE.Contains(requestDto.KeyWords) || t.ZCONTINENTNAME.Contains(requestDto.KeyWords))
                 .Where((cc) => cc.IsDelete == 1)
                 .Select((cc) => new CountryContinentDetailsDto
                 {
@@ -2614,6 +2641,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                 .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.SwiftCode), (pro) => pro.ZSWIFTCOD.Contains(filterCondition.SwiftCode))
                 .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.CreateTime.ToString()), (pro) => Convert.ToDateTime(pro.CreateTime).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.CreateTime).ToString("yyyy-MM-dd"))
                 .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.UpdateTime.ToString()), (pro) => Convert.ToDateTime(pro.UpdateTime).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.UpdateTime).ToString("yyyy-MM-dd"))
+                .WhereIF(!string.IsNullOrWhiteSpace(requestDto.KeyWords), t => t.ZFINC.Contains(requestDto.KeyWords) || t.ZFINAME.Contains(requestDto.KeyWords))
                 .Where((cc) => cc.IsDelete == 1)
                 .Select((cc) => new FinancialInstitutionDetailsDto
                 {
@@ -2756,6 +2784,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                 .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.SupCode), (pro) => pro.ZCLASSUP.Contains(filterCondition.SupCode))
                 .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.CreateTime.ToString()), (pro) => Convert.ToDateTime(pro.CreateTime).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.CreateTime).ToString("yyyy-MM-dd"))
                 .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.UpdateTime.ToString()), (pro) => Convert.ToDateTime(pro.UpdateTime).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.UpdateTime).ToString("yyyy-MM-dd"))
+                .WhereIF(!string.IsNullOrWhiteSpace(requestDto.KeyWords), t => t.ZCLASS.Contains(requestDto.KeyWords) || t.ZCNAME.Contains(requestDto.KeyWords))
                 .Where((cc) => cc.IsDelete == 1)
                 .Select((cc) => new DeviceClassCodeDetailsDto
                 {
@@ -2832,6 +2861,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                 .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Name), (pro) => pro.ZINVTNAME.Contains(filterCondition.Name))
                 .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.CreateTime.ToString()), (pro) => Convert.ToDateTime(pro.CreateTime).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.CreateTime).ToString("yyyy-MM-dd"))
                 .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.UpdateTime.ToString()), (pro) => Convert.ToDateTime(pro.UpdateTime).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.UpdateTime).ToString("yyyy-MM-dd"))
+                .WhereIF(!string.IsNullOrWhiteSpace(requestDto.KeyWords), t => t.ZINVTCODE.Contains(requestDto.KeyWords) || t.ZINVTNAME.Contains(requestDto.KeyWords))
                 .Where((cc) => cc.IsDelete == 1)
                 .Select((cc) => new InvoiceTypeDetailshDto
                 {
@@ -2915,6 +2945,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                 .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.CreatedAt.ToString()), (pro) => pro.CreatedAt.ToString().Contains(filterCondition.CreatedAt.ToString()))
                 //.WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.CreateTime.ToString()), (pro) => Convert.ToDateTime(pro.CreateTime).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.CreateTime).ToString("yyyy-MM-dd"))
                 //.WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.UpdateTime.ToString()), (pro) => Convert.ToDateTime(pro.UpdateTime).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.UpdateTime).ToString("yyyy-MM-dd"))
+                .WhereIF(!string.IsNullOrWhiteSpace(requestDto.KeyWords), t => t.FzsrpCode.Contains(requestDto.KeyWords) || t.Fzsrpn.Contains(requestDto.KeyWords))
                 .Where((cc) => cc.IsDelete == 1)
                 .Select((cc) => new DHResearchDto
                 {
@@ -3163,6 +3194,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                 .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.TermCode), (pro) => pro.ZLANG_TER.Contains(filterCondition.TermCode))
                 .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.CreateTime.ToString()), (pro) => Convert.ToDateTime(pro.CreateTime).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.CreateTime).ToString("yyyy-MM-dd"))
                 .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.UpdateTime.ToString()), (pro) => Convert.ToDateTime(pro.UpdateTime).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.UpdateTime).ToString("yyyy-MM-dd"))
+                .WhereIF(!string.IsNullOrWhiteSpace(requestDto.KeyWords), t => t.ZLANG_BIB.Contains(requestDto.KeyWords) || t.ZLANG_ZH.Contains(requestDto.KeyWords))
                 .Where((cc) => cc.IsDelete == 1)
                 .Select((cc) => new LanguageDetailsDto
                 {
@@ -3240,6 +3272,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                 .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.FinancialOrgCode), (pro) => pro.ZFINC.Contains(filterCondition.FinancialOrgCode))
                 .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.FinancialOrgName), (pro) => pro.ZFINAME.Contains(filterCondition.FinancialOrgName))
                 .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Province), (pro) => pro.ZPROVINC2.Contains(filterCondition.Province))
+                .WhereIF(!string.IsNullOrWhiteSpace(requestDto.KeyWords), t => t.ZBANKN.Contains(requestDto.KeyWords) || t.ZKOINH.Contains(requestDto.KeyWords))
                 .Select((cc) => new BankCardDetailsDto
                 {
                     Id = cc.Id.ToString(),
@@ -3364,6 +3397,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                 .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Remark), (pro) => pro.ZREMARK.Contains(filterCondition.Remark))
                 .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.CreateTime.ToString()), (pro) => Convert.ToDateTime(pro.CreateTime).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.CreateTime).ToString("yyyy-MM-dd"))
                 .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.UpdateTime.ToString()), (pro) => Convert.ToDateTime(pro.UpdateTime).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.UpdateTime).ToString("yyyy-MM-dd"))
+                .WhereIF(!string.IsNullOrWhiteSpace(requestDto.KeyWords), t => t.ZMATERIAL.Contains(requestDto.KeyWords) || t.ZMNAME.Contains(requestDto.KeyWords))
                 .Where((cc) => cc.IsDelete == 1)
                 .Select((cc) => new DeviceDetailCodeDetailsDto
                 {
@@ -3488,6 +3522,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                 .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Zdparentid), (pro) => pro.Zdparentid.Contains(filterCondition.Zdparentid))
                 .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.CreateTime.ToString()), (pro) => Convert.ToDateTime(pro.CreateTime).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.CreateTime).ToString("yyyy-MM-dd"))
                 .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.UpdateTime.ToString()), (pro) => Convert.ToDateTime(pro.UpdateTime).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.UpdateTime).ToString("yyyy-MM-dd"))
+                .WhereIF(!string.IsNullOrWhiteSpace(requestDto.KeyWords), t => t.Zdcode.Contains(requestDto.KeyWords) || t.ZdnameChs.Contains(requestDto.KeyWords))
                 .Where((cc) => cc.IsDelete == 1)
                 .Select((cc) => new DHAccountingDept
                 {
@@ -3574,6 +3609,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZdelegateOrg), (pro) => pro.ZdelegateOrg.Contains(filterCondition.ZdelegateOrg))
                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.CreateTime.ToString()), (pro) => Convert.ToDateTime(pro.CreateTime).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.CreateTime).ToString("yyyy-MM-dd"))
                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.UpdateTime.ToString()), (pro) => Convert.ToDateTime(pro.UpdateTime).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.UpdateTime).ToString("yyyy-MM-dd"))
+                .WhereIF(!string.IsNullOrWhiteSpace(requestDto.KeyWords), t => t.ZdelegateOrg.Contains(requestDto.KeyWords) || t.Znumc4x.Contains(requestDto.KeyWords))
                .Where((cc) => cc.IsDelete == 1)
                .Select((cc) => new DHMdmMultOrgAgencyRelPage
                {
@@ -3674,6 +3710,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                 .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Name), (pro) => pro.ZCRHABBR.Contains(filterCondition.Name))
                 .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.CreateTime.ToString()), (pro) => Convert.ToDateTime(pro.CreateTime).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.CreateTime).ToString("yyyy-MM-dd"))
                 .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.UpdateTime.ToString()), (pro) => Convert.ToDateTime(pro.UpdateTime).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.UpdateTime).ToString("yyyy-MM-dd"))
+                .WhereIF(!string.IsNullOrWhiteSpace(requestDto.KeyWords), t => t.ZCRHCODE.Contains(requestDto.KeyWords) || t.ZCRHABBR.Contains(requestDto.KeyWords))
                 .Where((cc) => cc.IsDelete == 1)
                 .Select((cc) => new RegionalDetailsDto
                 {
@@ -3744,6 +3781,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                 .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Name), (pro) => pro.ZUNITNAME.Contains(filterCondition.Name))
                 .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.CreateTime.ToString()), (pro) => Convert.ToDateTime(pro.CreateTime).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.CreateTime).ToString("yyyy-MM-dd"))
                 .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.UpdateTime.ToString()), (pro) => Convert.ToDateTime(pro.UpdateTime).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.UpdateTime).ToString("yyyy-MM-dd"))
+                .WhereIF(!string.IsNullOrWhiteSpace(requestDto.KeyWords), t => t.ZUNITCODE.Contains(requestDto.KeyWords) || t.ZUNITNAME.Contains(requestDto.KeyWords))
                 .Where((cc) => cc.IsDelete == 1)
                 .Select((cc) => new UnitMeasurementDetailsDto
                 {
@@ -3833,6 +3871,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                 .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Name), (pro) => pro.ZCPBC1NAME.Contains(filterCondition.Name))
                 .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.CreateTime.ToString()), (pro) => Convert.ToDateTime(pro.CreateTime).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.CreateTime).ToString("yyyy-MM-dd"))
                 .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.UpdateTime.ToString()), (pro) => Convert.ToDateTime(pro.UpdateTime).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.UpdateTime).ToString("yyyy-MM-dd"))
+                .WhereIF(!string.IsNullOrWhiteSpace(requestDto.KeyWords), t => t.ZBUSTD1NAME.Contains(requestDto.KeyWords) || t.ZBUSTD2NAME.Contains(requestDto.KeyWords) || t.ZBUSTD3NAME.Contains(requestDto.KeyWords) || t.Z12TOPBNAME.Contains(requestDto.KeyWords) || t.ZCPBC3NAME.Contains(requestDto.KeyWords) || t.ZICSTD2NAME.Contains(requestDto.KeyWords) || t.ZICSTD3NAME.Contains(requestDto.KeyWords) || t.ZBUSTD2ID.Contains(requestDto.KeyWords) || t.ZCPBC2NAME.Contains(requestDto.KeyWords) || t.ZRRLSNAME.Contains(requestDto.KeyWords) || t.ZICSTD1NAME.Contains(requestDto.KeyWords) || t.ZBUSTD1ID.Contains(requestDto.KeyWords) || t.ZBUSTD3ID.Contains(requestDto.KeyWords) || t.Z12TOPBID.Contains(requestDto.KeyWords) || t.ZCPBC1ID.Contains(requestDto.KeyWords) || t.ZCPBC2ID.Contains(requestDto.KeyWords) || t.ZCPBC3ID.Contains(requestDto.KeyWords) || t.ZRRLSID.Contains(requestDto.KeyWords) || t.ZICSTD1ID.Contains(requestDto.KeyWords) || t.ZICSTD2ID.Contains(requestDto.KeyWords) || t.ZCPBC1NAME.Contains(requestDto.KeyWords))
                 .Where((cc) => cc.IsDelete == 1)
                 .Select((cc) => new ProjectClassificationDetailsDto
                 {
@@ -3941,6 +3980,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                 .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Description), (pro) => pro.ZCRCNAME.Contains(filterCondition.Description))
                 .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.CreateTime.ToString()), (pro) => Convert.ToDateTime(pro.CreateTime).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.CreateTime).ToString("yyyy-MM-dd"))
                 .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.UpdateTime.ToString()), (pro) => Convert.ToDateTime(pro.UpdateTime).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.UpdateTime).ToString("yyyy-MM-dd"))
+                .WhereIF(!string.IsNullOrWhiteSpace(requestDto.KeyWords), t => t.ZCRCCODE.Contains(requestDto.KeyWords) || t.ZCRCNAME.Contains(requestDto.KeyWords))
                 .Where((cc) => cc.IsDelete == 1)
                 .Select((cc) => new RegionalCenterDetailsDto
                 {
@@ -4009,6 +4049,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                 .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.SupCode), (pro) => pro.ZNEQCODEUP.Contains(filterCondition.SupCode))
                 .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.CreateTime.ToString()), (pro) => Convert.ToDateTime(pro.CreateTime).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.CreateTime).ToString("yyyy-MM-dd"))
                 .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.UpdateTime.ToString()), (pro) => Convert.ToDateTime(pro.UpdateTime).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.UpdateTime).ToString("yyyy-MM-dd"))
+                .WhereIF(!string.IsNullOrWhiteSpace(requestDto.KeyWords), t => t.ZNEQCODE.Contains(requestDto.KeyWords) || t.ZNEQNAME.Contains(requestDto.KeyWords))
                 .Where((cc) => cc.IsDelete == 1)
                 .Select((cc) => new NationalEconomyDetailsDto
                 {
@@ -4124,6 +4165,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                 .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Fzaid), (pro) => pro.Fzaid.Contains(filterCondition.Fzaid))
                 .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.CreatedAt.ToString()), (pro) => Convert.ToDateTime(pro.CreatedAt).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.CreatedAt).ToString("yyyy-MM-dd"))
                 .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.UpdatedAt.ToString()), (pro) => Convert.ToDateTime(pro.UpdatedAt).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.UpdatedAt).ToString("yyyy-MM-dd"))
+                .WhereIF(!string.IsNullOrWhiteSpace(requestDto.KeyWords), t => t.Fzaid.Contains(requestDto.KeyWords) || t.Fzorgcode.Contains(requestDto.KeyWords))
                 .Where((cc) => cc.Fzdelete == "1")
                 .Select((cc) => new DHAdministrative
                 {
@@ -4218,6 +4260,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                 .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.UnitSec), (pro) => pro.GPOID.Contains(filterCondition.UnitSec))
                 .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.CreateTime.ToString()), (pro) => Convert.ToDateTime(pro.CreateTime).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.CreateTime).ToString("yyyy-MM-dd"))
                 .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.UpdateTime.ToString()), (pro) => Convert.ToDateTime(pro.UpdateTime).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.UpdateTime).ToString("yyyy-MM-dd"))
+                .WhereIF(!string.IsNullOrWhiteSpace(requestDto.KeyWords), t => t.MDM_CODE.Contains(requestDto.KeyWords) || t.NAME.Contains(requestDto.KeyWords))
                 .Where((cc) => cc.IsDelete == 1)
                 .Select((cc) => new EscrowOrganizationDetailsDto
                 {
@@ -4350,6 +4393,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                 //.WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.CreateTime.ToString()), (pro) => Convert.ToDateTime(pro.CreateTime).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.CreateTime).ToString("yyyy-MM-dd"))
                 //.WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.UpdateTime.ToString()), (pro) => Convert.ToDateTime(pro.UpdateTime).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.UpdateTime).ToString("yyyy-MM-dd"))
                 //.Where((cc) => cc.IsDelete == 1)
+                .WhereIF(!string.IsNullOrWhiteSpace(requestDto.KeyWords), t => t.MdmCode.Contains(requestDto.KeyWords) || t.ZztnameZh.Contains(requestDto.KeyWords))
                 .Select((cc) => new DHOrganzationDep
                 {
                     Id = cc.Id,
@@ -4514,7 +4558,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                 .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.CreatedAt.ToString()), (pro) => pro.CreatedAt.ToString().Contains(filterCondition.CreatedAt.ToString()))
                 .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.UpdatedAt.ToString()), (pro) => pro.UpdatedAt.ToString().Contains(filterCondition.UpdatedAt.ToString()))
                 .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Z2NDORG), (pro) => pro.Z2NDORG.Contains(filterCondition.Z2NDORG))
-                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZBOP), (pro) => pro.ZPROJTYPE.Contains(filterCondition.ZBOP))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZBOP), (pro) => pro.ZBOP.Contains(filterCondition.ZBOP))
                 .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZBOPN), (pro) => pro.ZBOPN.Contains(filterCondition.ZBOPN))
                 .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZBOPN_EN), (pro) => pro.ZBOPN_EN.Contains(filterCondition.ZBOPN_EN))
                 .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZCPBC), (pro) => pro.ZCPBC.Contains(filterCondition.ZCPBC))
@@ -4529,6 +4573,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                 .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZZCOUNTRY), (pro) => pro.ZZCOUNTRY.Contains(filterCondition.ZZCOUNTRY))
                 //.WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.CreateTime.ToString()), (pro) => Convert.ToDateTime(pro.CreateTime).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.CreateTime).ToString("yyyy-MM-dd"))
                 //.WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.UpdateTime.ToString()), (pro) => Convert.ToDateTime(pro.UpdateTime).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.UpdateTime).ToString("yyyy-MM-dd"))
+                .WhereIF(!string.IsNullOrWhiteSpace(requestDto.KeyWords), t => t.ZBOP.Contains(requestDto.KeyWords) || t.ZBOPN.Contains(requestDto.KeyWords))
                 .WhereIF((isJingWai), (cc) => cc.ZZCOUNTRY == "142")
                 .WhereIF((!isJingWai), (cc) => cc.ZZCOUNTRY != "142")
                 .Where((cc) => cc.IsDelete == 1)
@@ -4748,6 +4793,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                 .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.SupRegionalismCode), (pro) => pro.ZADDVSUP.Contains(filterCondition.SupRegionalismCode))
                 .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.CreateTime.ToString()), (pro) => Convert.ToDateTime(pro.CreateTime).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.CreateTime).ToString("yyyy-MM-dd"))
                 .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.UpdateTime.ToString()), (pro) => Convert.ToDateTime(pro.UpdateTime).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.UpdateTime).ToString("yyyy-MM-dd"))
+                .WhereIF(!string.IsNullOrWhiteSpace(requestDto.KeyWords), t => t.ZADDVSCODE.Contains(requestDto.KeyWords) || t.ZADDVSNAME.Contains(requestDto.KeyWords))
                 .Where((cc) => cc.IsDelete == 1)
                 .Select((cc) => new AdministrativeDivisionDetailsDto
                 {
@@ -5054,6 +5100,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                 //.WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.CreateTime.ToString()), (pro) => Convert.ToDateTime(pro.CreateTime).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.CreateTime).ToString("yyyy-MM-dd"))
                 //.WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.UpdateTime.ToString()), (pro) => Convert.ToDateTime(pro.UpdateTime).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.UpdateTime).ToString("yyyy-MM-dd"))
                 //.Where((cc) => cc.IsDelete == 1)
+                .WhereIF(!string.IsNullOrWhiteSpace(requestDto.KeyWords), t => t.MdmCode.Contains(requestDto.KeyWords) || t.ZztnameZh.Contains(requestDto.KeyWords))
                 .Select((cc) => new DHAdjustAccountsMultipleOrg
                 {
                     Id = cc.Id,
@@ -5348,6 +5395,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                 .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Remark), (pro) => pro.ZREMARKS.Contains(filterCondition.Remark))
                 .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.CreateTime.ToString()), (pro) => Convert.ToDateTime(pro.CreateTime).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.CreateTime).ToString("yyyy-MM-dd"))
                 .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.UpdateTime.ToString()), (pro) => Convert.ToDateTime(pro.UpdateTime).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.UpdateTime).ToString("yyyy-MM-dd"))
+                .WhereIF(!string.IsNullOrWhiteSpace(requestDto.KeyWords), t => t.ZCURRENCYCODE.Contains(requestDto.KeyWords) || t.ZCURRENCYNAME.Contains(requestDto.KeyWords))
                 .Where((cc) => cc.IsDelete == 1)
                 .Select((cc) => new CurrencyDetailsDto
                 {
@@ -5424,6 +5472,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                 .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZREMARKS), (pro) => pro.ZREMARKS.Contains(filterCondition.ZREMARKS))
                 .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.CreateTime.ToString()), (pro) => Convert.ToDateTime(pro.CreateTime).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.CreateTime).ToString("yyyy-MM-dd"))
                 .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.UpdateTime.ToString()), (pro) => Convert.ToDateTime(pro.UpdateTime).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.UpdateTime).ToString("yyyy-MM-dd"))
+                .WhereIF(!string.IsNullOrWhiteSpace(requestDto.KeyWords), t => t.ZDOM_CODE.Contains(requestDto.KeyWords) || t.ZDOM_NAME.Contains(requestDto.KeyWords))
                 .Where((cc) => cc.IsDelete == 1)
                 .Select((cc) => new ValueDomainReceiveResponseDto
                 {
@@ -5474,6 +5523,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                 .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZVTPROJ), (pro) => pro.ZVTPROJ.Contains(filterCondition.ZVTPROJ))
                 .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.CreateTime.ToString()), (pro) => Convert.ToDateTime(pro.CreateTime).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.CreateTime).ToString("yyyy-MM-dd"))
                 .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.UpdateTime.ToString()), (pro) => Convert.ToDateTime(pro.UpdateTime).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.UpdateTime).ToString("yyyy-MM-dd"))
+                .WhereIF(!string.IsNullOrWhiteSpace(requestDto.KeyWords), t => t.ZVTPROJ.Contains(requestDto.KeyWords) || t.ZVTPROJN.Contains(requestDto.KeyWords))
                 .Where((cc) => cc.IsDelete == 1)
                 .Select((cc) => new DHVirtualProject
                 {
@@ -5519,8 +5569,6 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                 .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.IsDelete.ToString()), (pro) => pro.IsDelete.ToString().Contains(filterCondition.IsDelete.ToString()))
                 .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.MdmCode), (pro) => pro.MdmCode.Contains(filterCondition.MdmCode))
                 .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.BusinessRecocation), (pro) => pro.BusinessRecocation.Contains(filterCondition.BusinessRecocation))
-                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ViewFlag), (pro) => pro.ViewFlag.Contains(filterCondition.ViewFlag))
-                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZaccountD), (pro) => pro.ZaccountD.Contains(filterCondition.ZaccountD))
                 .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Ztreeid), (pro) => pro.Ztreeid.Contains(filterCondition.Ztreeid))
                 .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Zacjthbfwn), (pro) => pro.Zacjthbfwn.Contains(filterCondition.Zacjthbfwn))
                 .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Ztreever), (pro) => pro.Ztreever.Contains(filterCondition.Ztreever))
@@ -5578,6 +5626,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                 .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ZacnameLoc), (pro) => pro.ZacnameLoc.Contains(filterCondition.ZacnameLoc))
                 .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.CreateTime.ToString()), (pro) => Convert.ToDateTime(pro.CreateTime).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.CreateTime).ToString("yyyy-MM-dd"))
                 .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.UpdateTime.ToString()), (pro) => Convert.ToDateTime(pro.UpdateTime).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.UpdateTime).ToString("yyyy-MM-dd"))
+                .WhereIF(!string.IsNullOrWhiteSpace(requestDto.KeyWords), t => t.Ztreename.Contains(requestDto.KeyWords) || t.Ztreeid.Contains(requestDto.KeyWords))
                 .Where((cc) => cc.IsDelete == 1)
                 .Select((cc) => new DHMdmManagementOrgage
                 {

@@ -1,5 +1,4 @@
 ﻿using SqlSugar;
-using System.ComponentModel;
 
 namespace GDCMasterDataReceiveApi.Domain.Models
 {
@@ -12,17 +11,14 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// <summary>
         /// 组织树编码 主键
         /// </summary>
-        [DisplayName("")]
         public string? Ztreeid { get; set; }
         /// <summary>
         /// 组织树月度版本
         /// </summary>
-        [DisplayName("")]
         public string? Ztreever { get; set; }
         /// <summary>
         /// 快照组织树版本
         /// </summary>
-        [DisplayName("")]
         public string? Zshottver { get; set; }
         /// <summary>
         /// 组织树名称

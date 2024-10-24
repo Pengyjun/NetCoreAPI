@@ -337,6 +337,17 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.Institution
         public List<InstitutionResponseDto>? Children { get; set; }
     }
 
+    public class InstitutionConvertDto
+    {
+        public string? OID { get; set; }
+        public string? GPOID { get; set; }
+        public string? SHORTNAME { get; set; }
+        public int? IsDelete { get; set; }
+        public string? SNO { get; set; }
+        public long Id { get; set; }
+        public string? GRULE { get; set; }
+        public string? NAME { get; set; }
+    }
 
     ///// <summary>
     ///// 外部系统添加选择机构时  使用 
