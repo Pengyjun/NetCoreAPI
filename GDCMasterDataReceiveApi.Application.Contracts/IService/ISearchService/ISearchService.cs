@@ -412,5 +412,9 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.IService.ISearchService
         Task<ResponseAjaxResult<bool>> ModifyNameAsync(List<SystemInterfaceField> modify);
         Task<ResponseAjaxResult<List<SearchDataDesensitizationRule>>> GetSearchDataDesensitizationRuleAsync(string interfaceId);
         Task<ResponseAjaxResult<bool>> ModifyAsync();
+
+
+
+        Task<ResponseAjaxResult<List<InstitutionResponseDto>>> SearchInstitutionTreeAsync();
     }
 }

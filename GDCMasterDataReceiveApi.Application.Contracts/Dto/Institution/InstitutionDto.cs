@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using GDCMasterDataReceiveApi.Domain.Shared.Utils;
+using System.ComponentModel;
 
 namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.Institution
 {
@@ -327,10 +328,23 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.Institution
         /// </summary>
         public string? ShortName { get; set; }
         /// <summary>
+        /// 排序字段
+        /// </summary>
+        public string? Sno { get; set; }
+        /// <summary>
         /// 子集
         /// </summary>
         public List<InstitutionResponseDto>? Children { get; set; }
     }
 
 
+    ///// <summary>
+    ///// 外部系统添加选择机构时  使用 
+    ///// </summary>
+    //public class InstitutionTreeResponseDto:TreeNode<InstitutionTreeResponseDto>{
+
+      
+
+
+    //}
 }

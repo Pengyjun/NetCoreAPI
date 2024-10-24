@@ -5,7 +5,7 @@
     /// </summary>
     public class ListToTreeUtil
     {
-        public static List<Guid> allNodes = new List<Guid>();
+        public static List<string> allNodes = new List<string>();
 
         public static object obj = new object();
 
@@ -40,7 +40,7 @@
         /// <param name="grule"></param>
         /// <param name="level"></param>
         /// <returns></returns>
-        public static  Tuple<List<T>,List<Guid>> GetTree<T>( string parentId, List<T> node,int length,string grule,int level=0) where T : TreeNode<T>
+        public static  Tuple<List<T>,List<string>> GetTree<T>( string parentId, List<T> node,int length,string grule,int level=0) where T : TreeNode<T>
         {
             lock (obj)
             {
@@ -93,7 +93,7 @@
            
         }
 
-        public Guid Id { get; set; }
+        public string Id { get; set; }
         /// <summary>
         /// 编号
         /// </summary>

@@ -745,5 +745,19 @@ namespace GDCMasterDataReceiveApi.Controller
         {
             return await _searchService.ModifyAsync();
         }
+
+
+
+        /// <summary>
+        /// 搜索机构树
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        [HttpGet("SearchInstitutionTree")]
+        [AllowAnonymous]
+        public async Task<ResponseAjaxResult<List<InstitutionResponseDto>>> SearchInstitutionTreeAsync()
+        {
+            return await _searchService.SearchInstitutionTreeAsync();
+        }
     }
 }

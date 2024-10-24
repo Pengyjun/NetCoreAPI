@@ -7977,6 +7977,35 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
             responseAjaxResult.Success();
             return responseAjaxResult;
         }
+
+
+
+        /// <summary>
+        /// 搜索机构树
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        public async Task<ResponseAjaxResult< List<InstitutionResponseDto>>> SearchInstitutionTreeAsync()
+        {
+            ResponseAjaxResult<List<InstitutionResponseDto>> responseAjaxResult = new ResponseAjaxResult<List<InstitutionResponseDto>>();
+            var institutionList =await _dbContext.Queryable<Institution>().Where(x => x.IsDelete == 1
+             && x.STATUS == "1"
+             && (x.OCODE.Contains("00000A")
+             || x.OCODE.Contains("00000B")
+             || x.OCODE.Contains("00000C")
+             || x.OCODE.Contains("00000E")))
+             .Select(x => new InstitutionResponseDto() {
+                 Oid=x.OID,
+                 ShortName=x.SHORTNAME=="北方分公司"?"四公司":x.SHORTNAME,
+                  Sno=x.SNO
+             }).OrderBy(x=>x.Oid).OrderBy(x=>x.Sno).ToListAsync();
+           //var instItem= institutionList.Where(x => x.Pid == "101114066").FirstOrDefault();
+           //var len=instItem.Grule.Split("-", StringSplitOptions.RemoveEmptyEntries).Length + 1;
+           // var res= ListToTreeUtil.GetTree<InstitutionTreeResponseDto>(instItem.Pid, institutionList, len, instItem.Grule,0);
+            responseAjaxResult.Data = institutionList;
+           responseAjaxResult.Success();
+            return responseAjaxResult;
+        }
         #endregion
     }
 }
