@@ -124,7 +124,9 @@ namespace GDCMasterDataReceiveApi.Filters
                             ActionMethodName = ((Microsoft.AspNetCore.Mvc.Controllers.ControllerActionDescriptor)context.ActionDescriptor).ControllerName
                         };
                         if (db != null)
+                        {
                             await db.Insertable<AuditLogs>(auditLogs).ExecuteCommandAsync();
+                        }
                         logger.LogWarning($"用户请求{context.HttpContext.Request.Path}方法出现400的错误信息:{responseAjaxResult.ToJson()}\r\n 请求参数:{recordRequestInfo.RequestInfo.Input}");
                     }
                     #endregion
