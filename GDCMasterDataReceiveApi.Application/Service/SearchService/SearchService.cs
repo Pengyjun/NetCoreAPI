@@ -38,6 +38,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using SqlSugar;
 using System.Reflection;
+using System.Security.Cryptography;
 
 namespace GDCMasterDataReceiveApi.Application.Service.SearchService
 {
@@ -261,7 +262,8 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     uInfo.CountryRegion = contryRegion.FirstOrDefault(x => x.ZCOUNTRYCODE == uInfo.CountryRegion)?.ZCOUNTRYNAME;
                     uInfo.Nation = nation.FirstOrDefault(x => x.ZDOM_VALUE == uInfo.Nation)?.ZDOM_NAME;
                     uInfo.EmpSort = empSort.FirstOrDefault(x => x.ZDOM_VALUE == uInfo.EmpSort)?.ZDOM_NAME;
-                    uInfo.PositionGrade = jobType.FirstOrDefault(x => x.ZDOM_VALUE == uInfo.PositionGrade)?.ZDOM_NAME;
+                    uInfo.JobType = jobType.FirstOrDefault(x => x.ZDOM_VALUE == uInfo.JobType)?.ZDOM_NAME;
+                    uInfo.PositionGrade = positionGrade.FirstOrDefault(x => x.ZDOM_VALUE == uInfo.PositionGrade)?.ZDOM_NAME;
                     uInfo.PositionGradeNorm = positionGradeNorm.FirstOrDefault(x => x.ZDOM_VALUE == uInfo.PositionGradeNorm)?.ZDOM_NAME;
                     uInfo.HighEstGrade = highEstGrade.FirstOrDefault(x => x.ZDOM_VALUE == uInfo.HighEstGrade)?.ZDOM_NAME;
                     uInfo.SameHighEstGrade = sameHighEstGrade.FirstOrDefault(x => x.ZDOM_VALUE == uInfo.SameHighEstGrade)?.ZDOM_NAME;
@@ -981,7 +983,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                         Version = ins.VERSION,
                         CreateTime = ins.CreateTime,
                         UpdateTime = ins.UpdateTime,
-                        Children = GetChildren(ins.OID, otherNodes)
+                        //Children = GetChildren(ins.OID, otherNodes)
                     })
                     .FirstOrDefault();
                 if (rootNode != null) result.Add(rootNode);
@@ -1002,7 +1004,362 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
             var childs = children.Where(x => x.Gpoid == gpOid).ToList();
             foreach (var child in childs)
             {
-                child.Children = GetChildren(child.Oid, children);
+                //child.Children = GetChildren(child.Oid, children);
+            }
+            return childs;
+        }
+        /// <summary>
+        /// 新版机构 左侧树
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        public async Task<ResponseAjaxResult<InstitutionResponseDto>> GetInstitutionTreeAsync(FilterCondition requestDto)
+        {
+            ResponseAjaxResult<InstitutionResponseDto> responseAjaxResult = new();
+            List<string> oids = new();
+
+            //过滤条件
+            InstitutionDetatilsDto filterCondition = new();
+            if (!string.IsNullOrWhiteSpace(requestDto.FilterConditionJson))
+            {
+                filterCondition = JsonConvert.DeserializeObject<InstitutionDetatilsDto>(requestDto.FilterConditionJson);
+            }
+
+            var tableList = await _dbContext.Queryable<Institution>().ToListAsync();
+
+            #region 初始查询
+            //机构树初始化
+            var institutions = tableList
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Name), t => t.NAME.Contains(filterCondition.Name))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Oid), t => t.OID.Contains(filterCondition.Oid))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.EntClass), t => t.ENTCLASS.Contains(filterCondition.EntClass))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.POid), t => t.POID.Contains(filterCondition.POid))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Status), t => t.STATUS.Contains(filterCondition.Status))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Code), t => t.OCODE.Contains(filterCondition.Code))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Orule), t => t.ORULE.Contains(filterCondition.Orule))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ShortName), t => t.SHORTNAME.Contains(filterCondition.ShortName))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.EnglishName), t => t.ENGLISHNAME.Contains(filterCondition.EnglishName))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.EnglishShortName), t => t.ENGLISHSHORTNAME.Contains(filterCondition.EnglishShortName))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.BizType), t => t.BIZTYPE.Contains(filterCondition.BizType))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Gpoid), t => t.GPOID.Contains(filterCondition.Gpoid))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Type), t => t.TYPE.Contains(filterCondition.Type))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.TypeExt), t => t.TYPEEXT.Contains(filterCondition.TypeExt))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Mrut), t => t.MRUT.Contains(filterCondition.Mrut))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Sno), t => t.SNO.Contains(filterCondition.Sno))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Coid), t => t.COID.Contains(filterCondition.Coid))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Crossorgan), t => t.CROSSORGAN.Contains(filterCondition.Crossorgan))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Goid), t => t.GOID.Contains(filterCondition.Goid))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Grade), t => t.GRADE.Contains(filterCondition.Grade))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Oper), t => t.OPER.Contains(filterCondition.Oper))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Note), t => t.NOTE.Contains(filterCondition.Note))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.TemorganName), t => t.TEMORGANNAME.Contains(filterCondition.TemorganName))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.OrgProvince), t => t.ORGPROVINCE.Contains(filterCondition.OrgProvince))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Carea), t => t.CAREA.Contains(filterCondition.Carea))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.TerritoryPro), t => t.TERRITORYPRO.Contains(filterCondition.TerritoryPro))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.BizDomain), t => t.BIZDOMAIN.Contains(filterCondition.BizDomain))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.OrgGrade), t => t.ORGGRADE.Contains(filterCondition.OrgGrade))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ProjectScale), t => t.PROJECTSCALE.Contains(filterCondition.ProjectScale))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ProjectManType), t => t.PROJECTMANTYPE.Contains(filterCondition.ProjectManType))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ProjectType), t => t.PROJECTTYPE.Contains(filterCondition.ProjectType))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.StartDate), t => t.STARTDATE.Contains(filterCondition.StartDate))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Organemp), t => t.ORGANEMP.Contains(filterCondition.Organemp))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.OrganGrade), t => t.ORGANGRADE.Contains(filterCondition.OrganGrade))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Rown), t => t.ROWN.Contains(filterCondition.Rown))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.RoId), t => t.ROID.Contains(filterCondition.RoId))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.GlobalSno), t => t.GLOBAL_SNO.Contains(filterCondition.GlobalSno))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.QyGrade), t => t.QYGRADE.Contains(filterCondition.QyGrade))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.RegisterCode), t => t.REGISTERCODE.Contains(filterCondition.RegisterCode))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ShareHoldings), t => t.SHAREHOLDINGS.Contains(filterCondition.ShareHoldings))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.MdmCode), t => t.MDM_CODE.Contains(filterCondition.MdmCode))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.CreateTime.ToString()), (pro) => Convert.ToDateTime(pro.CreateTime).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.CreateTime).ToString("yyyy-MM-dd"))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.UpdateTime.ToString()), (pro) => Convert.ToDateTime(pro.UpdateTime).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.UpdateTime).ToString("yyyy-MM-dd"))
+                .Where(t => t.IsDelete == 1)
+                .OrderBy(t => Convert.ToInt32(t.SNO))
+                .ToList();
+            #endregion
+
+            if (filterCondition != null)
+            {
+                //机构ids不为空
+                if (filterCondition.Ids != null && filterCondition.Ids.Any())
+                {
+                    //得到所有符合条件的机构ids
+                    var ids = institutions
+                        .WhereIF(filterCondition != null && filterCondition.Ids != null && filterCondition.Ids.Any(), t => filterCondition.Ids.Contains(t.Id.ToString()))
+                        .Where(t => t.IsDelete == 1)
+                        .Select(x => x.Id)
+                        .ToList();
+
+                    //得到所有符合条件的机构rules
+                    var rules = institutions.Where(x => ids.Contains(x.Id)).Select(x => x.GRULE).ToList();
+
+                    //拆分rules得到所有符合条件的oids
+                    foreach (var r in rules)
+                    {
+                        if (!string.IsNullOrWhiteSpace(r)) oids.AddRange(r.Split('-'));
+                    }
+                }
+                else
+                {
+                    //得到所有符合条件的机构rules
+                    var rules = institutions.Select(x => x.GRULE).ToList();
+
+                    //拆分rules得到所有符合条件的oids
+                    foreach (var r in rules)
+                    {
+                        if (!string.IsNullOrWhiteSpace(r)) oids.AddRange(r.Split('-'));
+                    }
+                }
+            }
+
+            //其他数据
+            var otherNodes = tableList
+                .WhereIF(oids != null && oids.Any(), ins => oids.Contains(ins.OID))
+                .Where(ins => ins.OID != "101162350")
+                .Select(ins => new InstitutionResponseDto
+                {
+                    Gpoid = ins.GPOID,
+                    Oid = ins.OID,
+                    ShortName = ins.SHORTNAME
+                })
+            .ToList();
+
+            //根节点
+            var rootNode = tableList
+                .Where(ins => ins.OID == "101162350")
+                .Select(ins => new InstitutionResponseDto
+                {
+                    Gpoid = ins.GPOID,
+                    Oid = ins.OID,
+                    ShortName = ins.SHORTNAME,
+                    Children = GetInstitutionTreeChild(ins.OID, otherNodes)
+                })
+                .FirstOrDefault();
+
+            responseAjaxResult.SuccessResult(rootNode);
+            return responseAjaxResult;
+        }
+        /// <summary>
+        /// 右侧机构详情
+        /// </summary>
+        /// <param name="oId"></param>
+        /// <returns></returns>
+        public async Task<ResponseAjaxResult<List<InstitutionDetatilsDto>>> GetInstitutionTreeDetailsAsync(string? oId)
+        {
+            ResponseAjaxResult<List<InstitutionDetatilsDto>> responseAjaxResult = new();
+
+            var institutions = await _dbContext.Queryable<Institution>()
+                .Where(t => t.IsDelete == 1 && t.OID == oId || t.POID == oId)
+                .Select(ins => new InstitutionDetatilsDto
+                {
+                    BizDomain = ins.BIZDOMAIN,
+                    BizType = ins.BIZTYPE,
+                    Carea = ins.CAREA,
+                    Code = ins.OCODE,
+                    Coid = ins.COID,
+                    Crossorgan = ins.CROSSORGAN,
+                    EnglishName = ins.ENGLISHNAME,
+                    EnglishShortName = ins.ENGLISHSHORTNAME,
+                    EntClass = ins.ENTCLASS,
+                    GlobalSno = ins.GLOBAL_SNO,
+                    Goid = ins.GOID,
+                    Gpoid = ins.GPOID,
+                    Grade = ins.GRADE,
+                    IsIndependent = ins.IS_INDEPENDENT,
+                    MdmCode = ins.MDM_CODE,
+                    Mrut = ins.MRUT,
+                    Name = ins.NAME,
+                    Note = ins.NOTE,
+                    Oid = ins.OID,
+                    Oper = ins.OPER,
+                    Organemp = ins.ORGANEMP,
+                    OrganGrade = ins.ORGANGRADE,
+                    OrgGrade = ins.ORGGRADE,
+                    OrgProvince = ins.ORGPROVINCE,
+                    Orule = ins.ORULE,
+                    OSecBid = ins.O2BID,
+                    POid = ins.POID,
+                    ProjectManType = ins.PROJECTMANTYPE,
+                    ProjectScale = ins.PROJECTSCALE,
+                    ProjectType = ins.PROJECTTYPE,
+                    QyGrade = ins.QYGRADE,
+                    RegisterCode = ins.REGISTERCODE,
+                    RoId = ins.ROID,
+                    Rown = ins.ROWN,
+                    ShareHoldings = ins.SHAREHOLDINGS,
+                    ShortName = ins.SHORTNAME,
+                    Sno = ins.SNO,
+                    StartDate = ins.STARTDATE,
+                    Status = ins.STATUS,
+                    TemorganName = ins.TEMORGANNAME,
+                    TerritoryPro = ins.TERRITORYPRO,
+                    Type = ins.TYPE,
+                    TypeExt = ins.TYPEEXT,
+                    Version = ins.VERSION,
+                    CreateTime = ins.CreateTime,
+                    UpdateTime = ins.UpdateTime,
+                })
+                .ToListAsync();
+
+            if (institutions != null && institutions.Any())
+            {
+                #region 数据详细查询
+                //隶属单位  授权机构
+                var roid = institutions.Select(x => x.RoId).ToList();
+                var coid = institutions.Select(x => x.Coid).ToList();
+                var againInstutions = await _dbContext.Queryable<Institution>()
+                                       .Where(t => t.IsDelete == 1 && (roid.Contains(t.ROID) || coid.Contains(t.COID)))
+                                       .Select(t => new { t.OID, t.NAME })
+                                       .ToListAsync();
+
+                //值域信息
+                var valDomain = await _dbContext.Queryable<ValueDomain>()
+                    .Where(t => !string.IsNullOrWhiteSpace(t.ZDOM_CODE))
+                    .Select(t => new VDomainRespDto { ZDOM_CODE = t.ZDOM_CODE, ZDOM_DESC = t.ZDOM_DESC, ZDOM_VALUE = t.ZDOM_VALUE, ZDOM_NAME = t.ZDOM_NAME, ZDOM_LEVEL = t.ZDOM_LEVEL })
+                    .ToListAsync();
+
+                //行政区划（省、市、县）
+                var advisionsKey = institutions.Select(x => x.OrgProvince).ToList();
+                var advisions = await _dbContext.Queryable<AdministrativeDivision>()
+                    .Where(t => t.IsDelete == 1 && advisionsKey.Contains(t.ZADDVSCODE))
+                    .Select(t => new { t.ZADDVSCODE, t.ZADDVSNAME })
+                    .ToListAsync();
+
+                //国家
+                var careasKey = institutions.Select(x => x.Carea).ToList();
+                var carea = await _dbContext.Queryable<CountryRegion>()
+                    .Where(t => t.IsDelete == 1 && careasKey.Contains(t.ZCOUNTRYCODE))
+                    .Select(t => new { t.ZCOUNTRYCODE, t.ZCOUNTRYNAME })
+                    .ToListAsync();
+
+                //机构业务类型
+                var institutionBusType = await _dbContext.Queryable<InstitutionBusinessType>()
+                    .Where(t => t.IsDelete == 1)
+                    .Select(t => new FilterChildData { Key = t.Code, Val = t.Name })
+                    .ToListAsync();
+
+                #region 转换赋值
+                // 将 valDomain 和其他相关集合转换为字典，避免重复键
+                var entClassDict = valDomain
+                    .Where(x => x.ZDOM_CODE == "ZENTC")
+                    .GroupBy(x => x.ZDOM_VALUE)
+                    .Select(g => g.First()) // 只保留第一个
+                    .ToDictionary(x => x.ZDOM_VALUE, x => x.ZDOM_NAME);
+
+                var statusDict = valDomain
+                    .Where(x => x.ZDOM_CODE == "ZORGSTATE")
+                    .GroupBy(x => x.ZDOM_VALUE)
+                    .Select(g => g.First()) // 只保留第一个
+                    .ToDictionary(x => x.ZDOM_VALUE, x => x.ZDOM_NAME);
+
+                var typeDict = valDomain
+                    .Where(x => x.ZDOM_CODE == "ZORGATTR")
+                    .GroupBy(x => x.ZDOM_VALUE)
+                    .Select(g => g.First()) // 只保留第一个
+                    .ToDictionary(x => x.ZDOM_VALUE, x => x.ZDOM_NAME);
+
+                var typeExtDict = valDomain
+                    .Where(x => x.ZDOM_CODE == "ZORGCHILDATTR")
+                    .GroupBy(x => x.ZDOM_VALUE)
+                    .Select(g => g.First()) // 只保留第一个
+                    .ToDictionary(x => x.ZDOM_VALUE, x => x.ZDOM_NAME);
+
+                var isIndependentDict = valDomain
+                    .Where(x => x.ZDOM_CODE == "ZCHECKIND")
+                    .GroupBy(x => x.ZDOM_VALUE)
+                    .Select(g => g.First()) // 只保留第一个
+                    .ToDictionary(x => x.ZDOM_VALUE, x => x.ZDOM_NAME);
+
+                var shareholdingsDict = valDomain
+                    .Where(x => x.ZDOM_CODE == "ZHOLDING")
+                    .GroupBy(x => x.ZDOM_VALUE)
+                    .Select(g => g.First()) // 只保留第一个
+                    .ToDictionary(x => x.ZDOM_VALUE, x => x.ZDOM_NAME);
+
+                var projectTypeDict = valDomain
+                    .Where(x => x.ZDOM_CODE == "ZPROJTYPE")
+                    .GroupBy(x => x.ZDOM_VALUE)
+                    .Select(g => g.First()) // 只保留第一个
+                    .ToDictionary(x => x.ZDOM_VALUE, x => x.ZDOM_NAME);
+
+                var bizTypeDict = institutionBusType
+                    .GroupBy(x => x.Key)
+                    .Select(g => g.First()) // 只保留第一个
+                    .ToDictionary(x => x.Key, x => x.Val);
+
+                var provinceDict = advisions
+                    .GroupBy(x => x.ZADDVSCODE)
+                    .Select(g => g.First()) // 只保留第一个
+                    .ToDictionary(x => x.ZADDVSCODE, x => x.ZADDVSNAME);
+
+                var countryDict = carea
+                    .GroupBy(x => x.ZCOUNTRYCODE)
+                    .Select(g => g.First()) // 只保留第一个
+                    .ToDictionary(x => x.ZCOUNTRYCODE, x => x.ZCOUNTRYNAME);
+
+                #endregion
+
+                foreach (var ins in institutions)
+                {
+                    // 企业分类
+                    ins.EntClass = entClassDict.TryGetValue(ins.EntClass, out var entClassName) ? entClassName : null;
+                    // 机构状态
+                    ins.Status = statusDict.TryGetValue(ins.Status, out var statusName) ? statusName : null;
+
+                    // 机构属性
+                    ins.Type = typeDict.TryGetValue(ins.Type, out var typeName) ? typeName : null;
+
+                    // 机构子属性
+                    ins.TypeExt = typeExtDict.TryGetValue(ins.TypeExt, out var typeExtName) ? typeExtName : null;
+
+                    // 拥有兼管职能
+                    ins.Crossorgan = ins.Crossorgan == "0" ? "否" : "是";
+
+                    // 机构所在地（省）
+                    ins.OrgProvince = provinceDict.TryGetValue(ins.OrgProvince, out var provinceName) ? provinceName : null;
+
+                    // 国家
+                    ins.Carea = countryDict.TryGetValue(ins.Carea, out var countryName) ? countryName : null;
+
+                    // 独立授权
+                    ins.Rown = ins.Rown == "1" ? "是" : "否";
+
+                    // 授权机构
+                    ins.RoId = againInstutions.FirstOrDefault(x => x.OID == ins.RoId)?.NAME;
+
+                    // 隶属单位
+                    ins.Coid = againInstutions.FirstOrDefault(x => x.OID == ins.Coid)?.NAME;
+
+                    // 是否独立核算
+                    ins.IsIndependent = isIndependentDict.TryGetValue(ins.IsIndependent, out var independentName) ? independentName : null;
+
+                    // 持股情况
+                    ins.ShareHoldings = shareholdingsDict.TryGetValue(ins.ShareHoldings, out var holdingsName) ? holdingsName : null;
+
+                    // 项目类型
+                    ins.ProjectType = projectTypeDict.TryGetValue(ins.ProjectType, out var projectTypeName) ? projectTypeName : null;
+
+                    // 机构业务类型
+                    ins.BizType = bizTypeDict.TryGetValue(ins.BizType, out var bizTypeName) ? bizTypeName : null;
+                }
+                #endregion
+            }
+
+            responseAjaxResult.SuccessResult(institutions);
+            return responseAjaxResult;
+        }
+        /// <summary>
+        /// 子集 新版
+        /// </summary>
+        /// <param name="gpOid"></param>
+        /// <param name="children"></param>
+        /// <returns></returns>
+        public List<InstitutionResponseDto> GetInstitutionTreeChild(string gpOid, List<InstitutionResponseDto> children)
+        {
+            var childs = children.Where(x => x.Gpoid == gpOid).ToList();
+            foreach (var child in childs)
+            {
+                child.Children = GetInstitutionTreeChild(child.Oid, children);
             }
             return childs;
         }
@@ -1961,7 +2318,49 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                 })
                 .ToPageListAsync(requestDto.PageIndex, requestDto.PageSize, total);
 
-            #region 其他基本
+            #region 
+            //值域信息
+            var valDomain = await _dbContext.Queryable<ValueDomain>()
+                .Where(t => !string.IsNullOrWhiteSpace(t.ZDOM_CODE))
+                .Select(t => new VDomainRespDto { ZDOM_CODE = t.ZDOM_CODE, ZDOM_DESC = t.ZDOM_DESC, ZDOM_VALUE = t.ZDOM_VALUE, ZDOM_NAME = t.ZDOM_NAME, ZDOM_LEVEL = t.ZDOM_LEVEL })
+                .ToListAsync();
+
+            //国家地区
+            var countrysKey = corresUnitList.Select(x => x.Country).ToList();
+            var country = await _dbContext.Queryable<CountryRegion>()
+                .Where(t => t.IsDelete == 1 && countrysKey.Contains(t.ZCOUNTRYCODE))
+                .Select(t => new CountryRegionOrAdminDivisionDto { Code = t.ZCOUNTRYCODE, Name = t.ZCOUNTRYNAME })
+                .ToListAsync();
+
+            //省、市、县
+            var p = corresUnitList.Select(x => x.Province).ToList();
+            var city = corresUnitList.Select(x => x.City).ToList();
+            var c = corresUnitList.Select(x => x.County).ToList();
+            var adisision = await _dbContext.Queryable<AdministrativeDivision>()
+                .Where(t => t.IsDelete == 1 && (p.Contains(t.ZADDVSCODE) || city.Contains(t.ZADDVSCODE) || c.Contains(t.ZADDVSCODE)))
+                .Select(t => new FilterChildData { Key = t.ZADDVSCODE, Val = t.ZADDVSNAME, Code = t.ZADDVSLEVEL })
+                .ToListAsync();
+
+            foreach (var item in corresUnitList)
+            {
+                //往来单位类别
+                item.CategoryUnit = GetValueDomain(item.CategoryUnit, valDomain, "ZBPTYPE");
+
+                //国家地区
+                item.Country = GetCountryRegion(item.Country, country);
+
+                //省、市、县
+                item.Province = adisision.FirstOrDefault(x => x.Key == item.Province)?.Val;
+                item.City = adisision.FirstOrDefault(x => x.Key == item.City)?.Val;
+                item.County = adisision.FirstOrDefault(x => x.Key == item.County)?.Val;
+
+                //往来单位性质
+                item.NatureOfUnit = GetValueDomain(item.NatureOfUnit, valDomain, "ZBPNATURE");
+
+                //往来单位类型
+                item.TypeOfUnit = GetValueDomain(item.TypeOfUnit, valDomain, "ZBPKINDS");
+
+            }
 
             #endregion
 
@@ -6868,7 +7267,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                             List<FilterChildData> optionsChild = new();
                             string type = string.Empty;
                             string columnName = string.Empty;
-                          
+
                             if (item.Contains("Ztreestat"))
                             {
                                 columnName = "组织树状态";
@@ -6889,7 +7288,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                                 columnName = "核算机构状态";
                                 type = "Single";
                                 optionsChild = valDomain.Where(x => x.Code == "ZD_MVIEW_ZY_ORGSTATE").ToList();
-                            }  
+                            }
                             else if (item.Contains("Zyorgstate"))
                             {
                                 columnName = "是否投资项目/公司";
@@ -6946,6 +7345,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                 {
                     //case "GetUserSearchAsync":
                     //case "GetUserDetailsAsync":
+                    //case "IssuedUserAsync":
                     //    var properties = GetProperties<UserSearchDetailsDto>();
                     //    foreach (var property in properties)
                     //    {
@@ -6960,8 +7360,9 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     //        }
                     //    }
                     //    break;
-                    //case "GetInstitutionsAsync":
-                    //case "GetInstitutionDetailsAsync":
+                    ////case "GetInstitutionsAsync":
+                    ////case "GetInstitutionDetailsAsync":
+                    //case "IssuedInstitutionDetailsAsync":
                     //    var properties2 = GetProperties<InstitutionDetatilsDto>();
                     //    foreach (var property in properties2)
                     //    {
@@ -6976,8 +7377,9 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     //        }
                     //    }
                     //    break;
-                    //case "GetProjectSearchAsync":
-                    //case "GetProjectDetailsAsync":
+                    ////case "GetProjectSearchAsync":
+                    ////case "GetProjectDetailsAsync":
+                    //case "IssuedProjectDetailsAsync":
                     //    //var properties3 = GetProperties<ProjectDetailsDto>();
                     //    var properties3 = GetProperties<DHProjects>();
                     //    foreach (var property in properties3)
@@ -6993,8 +7395,9 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     //        }
                     //    }
                     //    break;
-                    //case "GetCorresUnitSearchAsync":
-                    //case "GetCorresUnitDetailAsync":
+                    ////case "GetCorresUnitSearchAsync":
+                    ////case "GetCorresUnitDetailAsync":
+                    //case "IssuedCorresUnitDetailAsync":
                     //    var properties4 = GetProperties<CorresUnitDetailsDto>();
                     //    foreach (var property in properties4)
                     //    {
@@ -7009,8 +7412,9 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     //        }
                     //    }
                     //    break;
-                    //case "GetCountryRegionSearchAsync":
-                    //case "GetCountryRegionDetailsAsync":
+                    ////case "GetCountryRegionSearchAsync":
+                    ////case "GetCountryRegionDetailsAsync":
+                    //case "IssuedCountryRegionDetailsAsync":
                     //    var properties5 = GetProperties<CountryRegionDetailsDto>();
                     //    foreach (var property in properties5)
                     //    {
@@ -7025,8 +7429,9 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     //        }
                     //    }
                     //    break;
-                    //case "GetCountryContinentSearchAsync":
-                    //case "GetCountryContinentDetailsAsync":
+                    ////case "GetCountryContinentSearchAsync":
+                    ////case "GetCountryContinentDetailsAsync":
+                    //case "IssuedCountryContinentDetailsAsync":
                     //    var properties6 = GetProperties<CountryContinentDetailsDto>();
                     //    foreach (var property in properties6)
                     //    {
@@ -7041,8 +7446,9 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     //        }
                     //    }
                     //    break;
-                    //case "GetFinancialInstitutionSearchAsync":
-                    //case "GetFinancialInstitutionDetailsAsync":
+                    ////case "GetFinancialInstitutionSearchAsync":
+                    ////case "GetFinancialInstitutionDetailsAsync":
+                    //case "IssuedFinancialInstitutionDetailsAsync":
                     //    var properties7 = GetProperties<FinancialInstitutionDetailsDto>();
                     //    foreach (var property in properties7)
                     //    {
@@ -7057,8 +7463,9 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     //        }
                     //    }
                     //    break;
-                    //case "GetDeviceClassCodeSearchAsync":
-                    //case "GetDeviceClassCodeDetailsAsync":
+                    ////case "GetDeviceClassCodeSearchAsync":
+                    ////case "GetDeviceClassCodeDetailsAsync":
+                    //case "IssuedDeviceClassCodeDetailsAsync":
                     //    var properties8 = GetProperties<DeviceClassCodeDetailsDto>();
                     //    foreach (var property in properties8)
                     //    {
@@ -7073,8 +7480,9 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     //        }
                     //    }
                     //    break;
-                    //case "GetInvoiceTypeSearchAsync":
-                    //case "GetInvoiceTypeDetailsASync":
+                    ////case "GetInvoiceTypeSearchAsync":
+                    ////case "GetInvoiceTypeDetailsASync":
+                    //case "IssuedInvoiceTypeDetailsASync":
                     //    var properties9 = GetProperties<InvoiceTypeDetailshDto>();
                     //    foreach (var property in properties9)
                     //    {
@@ -7089,8 +7497,9 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     //        }
                     //    }
                     //    break;
-                    //case "GetScientifiCNoProjectSearchAsync":
-                    //case "GetScientifiCNoProjectDetailsAsync":
+                    ////case "GetScientifiCNoProjectSearchAsync":
+                    ////case "GetScientifiCNoProjectDetailsAsync":
+                    //case "IssuedScientifiCNoProjectDetailsAsync":
                     //    //var properties10 = GetProperties<ScientifiCNoProjectDetailsDto>();
                     //    var properties10 = GetProperties<DHResearch>();
                     //    foreach (var property in properties10)
@@ -7106,8 +7515,9 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     //        }
                     //    }
                     //    break;
-                    //case "GetLanguageSearchAsync":
-                    //case "GetLanguageDetailsAsync":
+                    ////case "GetLanguageSearchAsync":
+                    ////case "GetLanguageDetailsAsync":
+                    //case "IssuedLanguageDetailsAsync":
                     //    var properties11 = GetProperties<LanguageDetailsDto>();
                     //    foreach (var property in properties11)
                     //    {
@@ -7122,8 +7532,9 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     //        }
                     //    }
                     //    break;
-                    //case "GetBankCardSearchAsync":
-                    //case "GetBankCardDetailsAsync":
+                    ////case "GetBankCardSearchAsync":
+                    ////case "GetBankCardDetailsAsync":
+                    //case "IssuedBankCardDetailsAsync":
                     //    var properties12 = GetProperties<BankCardDetailsDto>();
                     //    foreach (var property in properties12)
                     //    {
@@ -7138,8 +7549,9 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     //        }
                     //    }
                     //    break;
-                    //case "GetDeviceDetailCodeSearchAsync":
-                    //case "GetDeviceDetailCodeDetailsAsync":
+                    ////case "GetDeviceDetailCodeSearchAsync":
+                    ////case "GetDeviceDetailCodeDetailsAsync":
+                    //case "IssuedDeviceDetailCodeDetailsAsync":
                     //    var properties13 = GetProperties<DeviceDetailCodeDetailsDto>();
                     //    foreach (var property in properties13)
                     //    {
@@ -7154,8 +7566,9 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     //        }
                     //    }
                     //    break;
-                    //case "GetAccountingDepartmentSearchAsync":
-                    //case "GetAccountingDepartmentDetailsAsync":
+                    ////case "GetAccountingDepartmentSearchAsync":
+                    ////case "GetAccountingDepartmentDetailsAsync":
+                    //case "IssuedAccountingDepartmentDetailsAsync":
                     //    //var properties14 = GetProperties<AccountingDepartmentDetailsDto>();
                     //    var properties14 = GetProperties<DHAccountingDept>();
                     //    foreach (var property in properties14)
@@ -7171,8 +7584,9 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     //        }
                     //    }
                     //    break;
-                    //case "GetRelationalContractsSearchAsync":
-                    //case "GetRelationalContractsDetailsAsync":
+                    ////case "GetRelationalContractsSearchAsync":
+                    ////case "GetRelationalContractsDetailsAsync":
+                    //case "IssuedRelationalContractsDetailsAsync":
                     //    var properties15 = GetProperties<RelationalContractsDetailsDto>();
                     //    foreach (var property in properties15)
                     //    {
@@ -7187,8 +7601,9 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     //        }
                     //    }
                     //    break;
-                    //case "GetRegionalDetailsAsync":
-                    //case "GetRegionalSearchAsync":
+                    ////case "GetRegionalDetailsAsync":
+                    ////case "GetRegionalSearchAsync":
+                    //case "IssuedRegionalSearchAsync":
                     //    var properties16 = GetProperties<RegionalDetailsDto>();
                     //    foreach (var property in properties16)
                     //    {
@@ -7203,8 +7618,9 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     //        }
                     //    }
                     //    break;
-                    //case "GetUnitMeasurementSearchAsync":
-                    //case "GetUnitMeasurementDetailsAsync":
+                    ////case "GetUnitMeasurementSearchAsync":
+                    ////case "GetUnitMeasurementDetailsAsync":
+                    //case "IssuedUnitMeasurementDetailsAsync":
                     //    var properties17 = GetProperties<UnitMeasurementDetailsDto>();
                     //    foreach (var property in properties17)
                     //    {
@@ -7219,8 +7635,9 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     //        }
                     //    }
                     //    break;
-                    //case "GetProjectClassificationSearchAsync":
-                    //case "GetProjectClassificationDetailsAsync":
+                    ////case "GetProjectClassificationSearchAsync":
+                    ////case "GetProjectClassificationDetailsAsync":
+                    //case "IssuedProjectClassificationDetailsAsync":
                     //    var properties18 = GetProperties<ProjectClassificationDetailsDto>();
                     //    foreach (var property in properties18)
                     //    {
@@ -7235,8 +7652,9 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     //        }
                     //    }
                     //    break;
-                    //case "GetRegionalCenterSearchAsync":
-                    //case "GetRegionalCenterDetailsAsync":
+                    ////case "GetRegionalCenterSearchAsync":
+                    ////case "GetRegionalCenterDetailsAsync":
+                    //case "IssuedRegionalCenterDetailsAsync":
                     //    var properties19 = GetProperties<RegionalCenterDetailsDto>();
                     //    foreach (var property in properties19)
                     //    {
@@ -7251,8 +7669,9 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     //        }
                     //    }
                     //    break;
-                    //case "GetNationalEconomySearchAsync":
-                    //case "GetNationalEconomyDetailsAsync":
+                    ////case "GetNationalEconomySearchAsync":
+                    ////case "GetNationalEconomyDetailsAsync":
+                    //case "IssuedNationalEconomyDetailsAsync":
                     //    var properties20 = GetProperties<NationalEconomyDetailsDto>();
                     //    foreach (var property in properties20)
                     //    {
@@ -7267,8 +7686,9 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     //        }
                     //    }
                     //    break;
-                    //case "GetAdministrativeAccountingMapperSearchAsync":
-                    //case "GetAdministrativeAccountingMapperDetailsAsync":
+                    ////case "GetAdministrativeAccountingMapperSearchAsync":
+                    ////case "GetAdministrativeAccountingMapperDetailsAsync":
+                    //case "IssuedAdministrativeAccountingMapperDetailsAsync":
                     //    //var properties21 = GetProperties<AdministrativeAccountingMapperDetailsDto>();
                     //    var properties21 = GetProperties<DHAdministrative>();
                     //    foreach (var property in properties21)
@@ -7284,8 +7704,9 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     //        }
                     //    }
                     //    break;
-                    //case "GetEscrowOrganizationSearchAsync":
-                    //case "GetEscrowOrganizationDetailsAsync":
+                    ////case "GetEscrowOrganizationSearchAsync":
+                    ////case "GetEscrowOrganizationDetailsAsync":
+                    //case "IssuedEscrowOrganizationDetailsAsync":
                     //    var properties23 = GetProperties<EscrowOrganizationDetailsDto>();
                     //    foreach (var property in properties23)
                     //    {
@@ -7300,9 +7721,10 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     //        }
                     //    }
                     //    break;
-                    //case "GetBusinessNoCpportunitySearchAsync":
-                    //case "GetBusinessCpportunitySearchAsync":
-                    //case "GetBusinessNoCpportunityDetailsAsync":
+                    ////case "GetBusinessNoCpportunitySearchAsync":
+                    ////case "GetBusinessCpportunitySearchAsync":
+                    ////case "GetBusinessNoCpportunityDetailsAsync":
+                    //case "IssuedBusinessNoCpportunityDetailsAsync":
                     //    //var properties24 = GetProperties<BusinessNoCpportunityDetailsDto>();
                     //    var properties24 = GetProperties<DHOpportunity>();
                     //    foreach (var property in properties24)
@@ -7318,8 +7740,9 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     //        }
                     //    }
                     //    break;
-                    //case "GetAdministrativeDivisionSearchAsync":
-                    //case "GetAdministrativeDivisionDetailsAsync":
+                    ////case "GetAdministrativeDivisionSearchAsync":
+                    ////case "GetAdministrativeDivisionDetailsAsync":
+                    //case "IssuedAdministrativeDivisionDetailsAsync":
                     //    var properties25 = GetProperties<AdministrativeDivisionDetailsDto>();
                     //    foreach (var property in properties25)
                     //    {
@@ -7334,8 +7757,9 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     //        }
                     //    }
                     //    break;
-                    //case "GetAccountingOrganizationSearchAsync":
-                    //case "GetAccountingOrganizationDetailsAsync":
+                    ////case "GetAccountingOrganizationSearchAsync":
+                    ////case "GetAccountingOrganizationDetailsAsync":
+                    //case "IssuedAccountingOrganizationDetailsAsync":
                     //    //var properties26 = GetProperties<AccountingOrganizationDetailsDto>();
                     //    var properties26 = GetProperties<DHAdjustAccountsMultipleOrg>();
                     //    foreach (var property in properties26)
@@ -7351,8 +7775,9 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     //        }
                     //    }
                     //    break;
-                    //case "GetCurrencySearchAsync":
-                    //case "GetCurrencyDetailsAsync":
+                    ////case "GetCurrencySearchAsync":
+                    ////case "GetCurrencyDetailsAsync":
+                    //case "IssuedCurrencyDetailsAsync":
                     //    var properties27 = GetProperties<CurrencyDetailsDto>();
                     //    foreach (var property in properties27)
                     //    {
@@ -7367,7 +7792,8 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     //        }
                     //    }
                     //    break;
-                    //case "GetValueDomainReceiveAsync":
+                    //    //case "GetValueDomainReceiveAsync":
+                    //    case "IssuedValueDomainReceiveAsync":
                     //    var properties28 = GetProperties<ValueDomainReceiveResponseDto>();
                     //    foreach (var property in properties28)
                     //    {
@@ -7383,6 +7809,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     //    }
                     //    break;
                     //case "GetDHVirtualProjectAsync":
+                    //case "IssuedDHVirtualProjectAsync":
                     //    var properties29 = GetProperties<DHVirtualProject>();
                     //    foreach (var property in properties29)
                     //    {
@@ -7398,6 +7825,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     //    }
                     //    break;
                     //case "GetXZOrganzationSearchAsync":
+                    //case "IssuedXZOrganzationSearchAsync":
                     //    //var properties30 = GetProperties<AdministrativeOrganization>();
                     //    var properties30 = GetProperties<DHOrganzationDep>();
                     //    foreach (var property in properties30)
@@ -7460,21 +7888,22 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     //    }
                     //    break;
 
-                    case "GetDHMdmMultOrgAgencyRelPageAsync":
-                        var properties32 = GetProperties<DHMdmManagementOrgage>();
-                        foreach (var property in properties32)
-                        {
-                            if (!excludedProperties.Contains(property.Name))
-                            {
-                                ddd.Add(new SystemInterfaceField
-                                {
-                                    Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
-                                    AppSystemInterfaceId = r.Id,
-                                    FieidName = property.Name
-                                });
-                            }
-                        }
-                        break;
+                    //case "GetDHMdmMultOrgAgencyRelPageAsync":
+                    //case "IssuedDHMdmMultOrgAgencyRelPageAsync":
+                    //var properties32 = GetProperties<DHMdmManagementOrgage>();
+                    //foreach (var property in properties32)
+                    //{
+                    //    if (!excludedProperties.Contains(property.Name))
+                    //    {
+                    //        ddd.Add(new SystemInterfaceField
+                    //        {
+                    //            Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                    //            AppSystemInterfaceId = r.Id,
+                    //            FieidName = property.Name
+                    //        });
+                    //    }
+                    //}
+                    //break;
                 }
             }
             #endregion

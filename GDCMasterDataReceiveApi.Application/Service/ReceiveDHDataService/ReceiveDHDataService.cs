@@ -513,7 +513,6 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveDHDataService
         /// DH生产经营管理组织
         /// </summary>
         /// <returns></returns>
-
         public async Task<ResponseAjaxResult<bool>> ReceiveGetMdmManagementOrgageListAsync()
         {
             ResponseAjaxResult<bool> responseAjaxResult = new();

@@ -1,5 +1,5 @@
 ﻿using GDCMasterDataReceiveApi.Application.Contracts.Dto.OtherModels;
-using MiniExcelLibs.Attributes;
+using System.ComponentModel;
 
 namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.RegionalCenter
 {
@@ -30,37 +30,33 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.RegionalCenter
     /// </summary>
     public class RegionalCenterDetailsDto
     {
-
-        [ExcelIgnore]
         public string? Id { get; set; }
         /// <summary>
         /// 中交区域中心代码:中交区域中心编码
         /// </summary>
-        [ExcelColumnName("中交区域中心代码")]
+        [DisplayName("中交区域中心代码")]
         public string? Code { get; set; }
         /// <summary>
         /// 中交区域中心描述:编码描述
         /// </summary>
-        [ExcelColumnName("中交区域中心描述")]
+        [DisplayName("中交区域中心描述")]
         public string? Description { get; set; }
         /// <summary>
         /// 版本
         /// </summary>
-        [ExcelIgnore]
+        [DisplayName("版本")]
         public string? Version { get; set; }
         /// <summary>
         /// 状态：数据是否有效的标识:有效：1无效：0
         /// </summary>
-        [ExcelIgnore]
+        [DisplayName("状态")]
         public string? State { get; set; }
         /// <summary>
         /// 是否删除 数据是否有效的标识:有效：1无效：0
         /// </summary>
-        [ExcelIgnore]
+        [DisplayName("是否删除")]
         public string? DataIdentifier { get; set; }
-        [ExcelIgnore]
         public DateTime? CreateTime { get; set; }
-        [ExcelIgnore]
         public DateTime? UpdateTime { get; set; }
     }
     /// <summary>

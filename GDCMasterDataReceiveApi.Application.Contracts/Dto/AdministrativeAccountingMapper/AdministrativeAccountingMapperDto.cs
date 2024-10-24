@@ -1,4 +1,4 @@
-﻿using MiniExcelLibs.Attributes;
+﻿using System.ComponentModel;
 
 namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.AdministrativeAccountingMapper
 {
@@ -29,41 +29,37 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.AdministrativeAccoun
     /// </summary>
     public class AdministrativeAccountingMapperDetailsDto
     {
-        [ExcelIgnore]
         public string? Id { get; set; }
         /// <summary>
         /// 必须唯一
         /// </summary>
-        [ExcelIgnore]
         public string? KeyId { get; set; }
         /// <summary>
         /// 核算组织ID
         /// </summary>
-        [ExcelIgnore]
+        [DisplayName("核算组织ID")]
         public string? AccOrgId { get; set; }
         /// <summary>
         /// 核算组织编码
         /// </summary>
-        [ExcelColumnName("核算组织编码")]
+        [DisplayName("核算组织编码")]
         public string? AccOrgCode { get; set; }
         /// <summary>
         /// 行政组织ID
         /// </summary>
-        [ExcelIgnore]
+        [DisplayName("行政组织ID")]
         public string? AdministrativeOrgId { get; set; }
         /// <summary>
         /// 行政组织编码
         /// </summary>
-        [ExcelColumnName("行政组织编码")]
+        [DisplayName("行政组织编码")]
         public string? AdministrativeOrgCode { get; set; }
         /// <summary>
         /// 是否删除: 数据是否有效的标识:   有效：1无效：0
         /// </summary>
-        [ExcelIgnore]
+        [DisplayName("是否删除")]
         public string? DataIdentifier { get; set; }
-        [ExcelIgnore]
         public DateTime? CreateTime { get; set; }
-        [ExcelIgnore]
         public DateTime? UpdateTime { get; set; }
     }
     /// <summary>

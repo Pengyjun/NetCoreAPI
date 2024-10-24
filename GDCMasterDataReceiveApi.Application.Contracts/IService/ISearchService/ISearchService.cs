@@ -58,6 +58,18 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.IService.ISearchService
         /// <returns></returns>
         Task<ResponseAjaxResult<List<InstitutionDetatilsDto>>> GetInstitutionAsync(FilterCondition requestDto);
         /// <summary>
+        /// 新版 左侧机构树
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        Task<ResponseAjaxResult<InstitutionResponseDto>> GetInstitutionTreeAsync(FilterCondition requestDto);
+        /// <summary>
+        /// 新版 左侧机构树对应详情
+        /// </summary>
+        /// <param name="oId"></param>
+        /// <returns></returns>
+        Task<ResponseAjaxResult<List<InstitutionDetatilsDto>>> GetInstitutionTreeDetailsAsync(string? oId);
+        /// <summary>
         /// 机构详情
         /// </summary>
         /// <param name="Id"></param>

@@ -41,7 +41,7 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto._4A.User
         /// <summary>
         /// 人员状态信息
         /// </summary>
-        [ExcelColumnName("人员状态信息")]
+        [DisplayName("人员状态信息")]
         public string? UserInfoStatus { get; set; }
         /// <summary>
         /// 公司名称

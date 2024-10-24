@@ -1,4 +1,4 @@
-﻿using MiniExcelLibs.Attributes;
+﻿using System.ComponentModel;
 
 namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.Project
 {
@@ -92,291 +92,288 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.Project
     /// </summary>
     public class ProjectDetailsDto
     {
-        [ExcelIgnore]
         public string Id { get; set;}
         /// <summary>
         /// 项目主数据编码
         /// </summary>
-        [ExcelColumnName("项目主数据编码")]
+        [DisplayName("项目主数据编码")]
         public string? MDCode { get; set; }
         /// <summary>
         /// 项目名称
         /// </summary>
-        [ExcelColumnName("项目名称")]
+        [DisplayName("项目名称")]
         public string? Name { get; set; }
         /// <summary>
         /// 项目外文名称
         /// </summary>
-        [ExcelColumnName("项目外文名称")]
+        [DisplayName("项目外文名称")]
         public string? ForeignName { get; set; }
         /// <summary>
         /// 项目类型
         /// </summary>
-        [ExcelColumnName("项目类型")]
+        [DisplayName("项目类型")]
         public string? Type { get; set; }
         /// <summary>
         /// 国家/地区
         /// </summary>
-        [ExcelColumnName("国家/地区")]
+        [DisplayName("国家/地区")]
         public string? Country { get; set; }
         /// <summary>
         /// 项目所在地
         /// </summary>
-        [ExcelColumnName("项目所在地")]
+        [DisplayName("项目所在地")]
         public string? Location { get; set; }
         /// <summary>
         /// 中交项目业务分类
         /// </summary>
-        [ExcelIgnore]
+        [DisplayName("中交项目业务分类")]
         public string? BTypeOfCCCC { get; set; }
         /// <summary>
         /// 投资主体
         /// </summary>
-        [ExcelIgnore]
+        [DisplayName("投资主体")]
         public string? Invest { get; set; }
         /// <summary>
         /// 项目批复/决议文号
         /// </summary>
-        [ExcelColumnName("项目批复/决议文号")]
+        [DisplayName("项目批复/决议文号")]
         public string? ResolutionNo { get; set; }
         /// <summary>
         /// 项目批复/决议时间
         /// </summary>
-        [ExcelColumnName("项目批复/决议时间")]
+        [DisplayName("项目批复/决议时间")]
         public string? ResolutionTime { get; set; }
         /// <summary>
         /// 收入来源
         /// </summary>
-        [ExcelIgnore]
+        [DisplayName("收入来源")]
         public string? SourceOfIncome { get; set; }
         /// <summary>
         /// 项目机构
         /// </summary>
-        [ExcelIgnore]
+        [DisplayName("项目机构")]
         public string? PjectOrg { get; set; }
         /// <summary>
         /// 项目简称
         /// </summary>
-        [ExcelColumnName("项目简称")]
+        [DisplayName("项目简称")]
         public string? Abbreviation { get; set; }
         /// <summary>
         /// 上级项目主数据编码
         /// </summary>
-        [ExcelColumnName("上级项目主数据编码")]
+        [DisplayName("上级项目主数据编码")]
         public string? SupMDCode { get; set; }
         /// <summary>
         /// 项目年份
         /// </summary>
-        [ExcelIgnore]
+        [DisplayName("项目年份")]
         public string? Year { get; set; }
         /// <summary>
         /// 项目计划开始日期yyyymmdd
         /// </summary>
-        [ExcelColumnName("项目计划开始日期")]
+        [DisplayName("项目计划开始日期")]
         public string? PlanStartDate { get; set; }
         /// <summary>
         /// 项目计划完成日期yyyymmdd
         /// </summary>
-        [ExcelColumnName("项目计划完成日期")]
+        [DisplayName("项目计划完成日期")]
         public string? PlanCompletionDate { get; set; }
         /// <summary>
         /// 项目工程名称
         /// </summary>
-        [ExcelColumnName("项目工程名称")]
+        [DisplayName("项目工程名称")]
         public string? EngineeringName { get; set; }
         /// <summary>
         /// 责任主体
         /// </summary>
-        [ExcelIgnore]
+        [DisplayName("责任主体")]
         public string? ResponsibleParty { get; set; }
         /// <summary>
         /// 土地成交确认书编号/收并购协议编号
         /// </summary>
-        [ExcelIgnore]
+        [DisplayName("土地成交确认书编号/收并购协议编号")]
         public string? LandTransactionNo { get; set; }
         /// <summary>
         /// 项目获取时间
         /// </summary>
-        [ExcelColumnName("项目获取时间")]
+        [DisplayName("项目获取时间")]
         public string? AcquisitionTime { get; set; }
         /// <summary>
         /// 工商变更时间yyyymmdd
         /// </summary>
-        [ExcelIgnore]
+        [DisplayName("工商变更时间yyyymmdd")]
         public string? BChangeTime { get; set; }
         /// <summary>
         /// 操盘情况
         /// </summary>
-        [ExcelIgnore]
+        [DisplayName("操盘情况")]
         public string? TradingSituation { get; set; }
         /// <summary>
         /// 保险机构名称
         /// </summary>
-        [ExcelIgnore]
+        [DisplayName("保险机构名称")]
         public string? NameOfInsureOrg { get; set; }
         /// <summary>
         /// 保单号 
         /// </summary>
-        [ExcelIgnore]
+        [DisplayName("保单号")]
         public string? PolicyNo { get; set; }
         /// <summary>
         /// 投保人 
         /// </summary>
-        [ExcelIgnore]
+        [DisplayName("投保人")]
         public string? Applicant { get; set; }
         /// <summary>
         /// 保险起始日期yyyymmdd
         /// </summary>
-        [ExcelIgnore]
+        [DisplayName("保险起始日期yyyymmdd")]
         public string? StartDateOfInsure { get; set; }
         /// <summary>
         /// 保险终止日期yyyymmdd
         /// </summary>
-        [ExcelIgnore]
+        [DisplayName("保险终止日期yyyymmdd")]
         public string? EndDateOfInsure { get; set; }
         /// <summary>
         /// 基金主数据编码 
         /// </summary>
-        [ExcelIgnore]
+        [DisplayName("基金主数据编码")]
         public string? FundMDCode { get; set; }
         /// <summary>
         /// 基金名称
         /// </summary>
-        [ExcelIgnore]
+        [DisplayName("基金名称")]
         public string? FundName { get; set; }
         /// <summary>
         /// 基金编号
         /// </summary>
-        [ExcelIgnore]
+        [DisplayName("基金编号")]
         public string? FundNo { get; set; }
         /// <summary>
         /// 币种
         /// </summary>
-        [ExcelIgnore]
+        [DisplayName("币种")]
         public string? Currency { get; set; }
         /// <summary>
         /// 基金组织形式
         /// </summary>
-        [ExcelIgnore]
+        [DisplayName("基金组织形式")]
         public string? FundOrgForm { get; set; }
         /// <summary>
         /// 项目机构
         /// </summary>
-        [ExcelIgnore]
+        [DisplayName("项目机构")]
         public string? PjectOrgBP { get; set; }
         /// <summary>
         /// 基金管理人类型
         /// </summary>
-        [ExcelIgnore]
+        [DisplayName("基金管理人类型")]
         public string? FundManager { get; set; }
         /// <summary>
         /// 基金成立日期yyyymmdd
         /// </summary>
-        [ExcelIgnore]
+        [DisplayName("基金成立日期yyyymmdd")]
         public string? FundEstablishmentDate { get; set; }
         /// <summary>
         /// 基金到期日期yyyymmdd
         /// </summary>
-        [ExcelIgnore]
+        [DisplayName("基金到期日期yyyymmdd")]
         public string? FundExpirationDate { get; set; }
         /// <summary>
         /// 托管人名称 
         /// </summary>
-        [ExcelIgnore]
+        [DisplayName("托管人名称")]
         public string? CustodianName { get; set; }
         /// <summary>
         /// 承租人名称 
         /// </summary>
-        [ExcelIgnore]
+        [DisplayName("承租人名称")]
         public string? TenantName { get; set; }
         /// <summary>
         /// 承租人类型
         /// </summary>
-        [ExcelIgnore]
+        [DisplayName("承租人类型")]
         public string? TenantType { get; set; }
         /// <summary>
         /// 租赁物名称 
         /// </summary>
-        [ExcelIgnore]
+        [DisplayName("租赁物名称")]
         public string? NameOfLeased { get; set; }
         /// <summary>
         /// 起租日期yyyymmdd
         /// </summary>
-        [ExcelIgnore]
+        [DisplayName("起租日期yyyymmdd")]
         public string? LeaseStartDate { get; set; }
         /// <summary>
         /// 到期日期yyyymmdd
         /// </summary>
-        [ExcelIgnore]
+        [DisplayName("到期日期yyyymmdd")]
         public string? DueDate { get; set; }
         /// <summary>
         /// 所属二级单位:二级单位组织机构编码OID
         /// </summary>
-        [ExcelIgnore]
+        [DisplayName("所属二级单位")]
         public string? UnitSec { get; set; }
         /// <summary>
         /// 状态：数据是否有效的标识:有效：1无效：0
         /// </summary>
-        [ExcelIgnore]
+        [DisplayName("状态")]
         public string? State { get; set; }
         /// <summary>
         /// 停用原因 1完工停用2错误停用
         /// </summary>
-        [ExcelIgnore]
+        [DisplayName("停用原因")]
         public string? ReasonForDeactivate { get; set; }
         /// <summary>
         /// 计税方式
         /// </summary>
-        [ExcelIgnore]
+        [DisplayName("计税方式")]
         public string? TaxMethod { get; set; }
         /// <summary>
         /// 项目组织形式
         /// </summary>
-        [ExcelIgnore]
+        [DisplayName("项目组织形式")]
         public string? OrgMethod { get; set; }
         /// <summary>
         /// 中标主体
         /// </summary>
-        [ExcelIgnore]
+        [DisplayName("中标主体")]
         public string? WinningBidder { get; set; }
         /// <summary>
         /// 并表情况
         /// </summary>
-        [ExcelIgnore]
+        [DisplayName("并表情况")]
         public string? ConsolidatedTable { get; set; }
         /// <summary>
         /// 所属事业部
         /// </summary>
-        [ExcelIgnore]
+        [DisplayName("所属事业部")]
         public string? BDep { get; set; }
         /// <summary>
         /// 项目管理方式:该项目适用的管理方式
         /// </summary>
-        [ExcelIgnore]
+        [DisplayName("项目管理方式")]
         public string? Management { get; set; }
         /// <summary>
         /// 参与二级单位：该项目参与的其他二级单位，支持多值
         /// </summary>
-        [ExcelIgnore]
+        [DisplayName("参与二级单位")]
         public string? ParticipateInUnitSecs { get; set; }
         /// <summary>
         /// 是否联合体项目：是否联合体：1是，2否
         /// </summary>
-        [ExcelIgnore]
+        [DisplayName("是否联合体项目")]
         public string? IsJoint { get; set; }
         /// <summary>
         /// 中标交底项目编号：传入多值时用逗号给开
         /// </summary>
-        [ExcelIgnore]
+        [DisplayName("中标交底项目编号")]
         public string? BidDisclosureNo { get; set; }
         /// <summary>
         /// 创建时间：格式：YYYYMMDDHHMMSS
         /// </summary>
-        [ExcelIgnore]
+        [DisplayName("创建时间")]
         public string? CreateDate { get; set; }
-        [ExcelIgnore]
         public DateTime? CreateTime { get; set; }
-        [ExcelIgnore]
         public DateTime? UpdateTime { get; set; }
 
     }
