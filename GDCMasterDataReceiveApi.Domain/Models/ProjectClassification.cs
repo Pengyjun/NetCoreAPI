@@ -69,7 +69,7 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         [SugarColumn(Length = 200, ColumnName = "ChanYeSecName")]
         public string? ZICSTD2NAME { get; set; }
         /// <summary>
-        /// 产业分类三级分类名称
+        /// 产业分类三级分类
         /// </summary>
         [SugarColumn(Length = 200, ColumnName = "ChanYeThirdCode")]
         public string? ZICSTD3ID { get; set; }

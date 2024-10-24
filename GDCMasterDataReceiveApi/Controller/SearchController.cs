@@ -110,12 +110,12 @@ namespace GDCMasterDataReceiveApi.Controller
         /// <summary>
         /// 新版左侧获取机构树 对应详情
         /// </summary>
-        /// <param name="oId"></param>
+        /// <param name="requestDto"></param>
         /// <returns></returns>
         [HttpPost("GetInstitutions")]
-        public async Task<ResponseAjaxResult<List<InstitutionDetatilsDto>>> GetInstitutionsAsync([FromQuery]string? oId)
+        public async Task<ResponseAjaxResult<List<InstitutionDetatilsDto>>> GetInstitutionsAsync([FromBody] FilterCondition requestDto)
         {
-            return await _searchService.GetInstitutionTreeDetailsAsync(oId);
+            return await _searchService.GetInstitutionTreeDetailsAsync(requestDto);
         }
         /// <summary>
         /// 获取机构详情
