@@ -13,10 +13,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\CH.Simple.EntityFrameworkCore\CH.Simple.EntityFrameworkCore.csproj" />
-    <ProjectReference Include="..\CH.Simple.Exceptions\CH.Simple.Exceptions.csproj" />
-    <ProjectReference Include="..\CH.Simple.SqlSugar\CH.Simple.SqlSugar.csproj" />
-    <ProjectReference Include="..\CH.Simple.Web\CH.Simple.Web.csproj" />
+    <ProjectReference Include="..\..\BuildingBlocks\CH.Simple.Exceptions\CH.Simple.Exceptions.csproj" />
+    <ProjectReference Include="..\..\BuildingBlocks\CH.Simple.Service\CH.Simple.Service.csproj" />
+    <ProjectReference Include="..\..\BuildingBlocks\CH.Simple.Web\CH.Simple.Web.csproj" />
   </ItemGroup>
 
 </Project>

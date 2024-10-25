@@ -1,0 +1,18 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\CH.Simple.Entities\CH.Simple.Entities.csproj" />
+    <ProjectReference Include="..\CH.Simple.EntityFrameworkCore\CH.Simple.EntityFrameworkCore.csproj" />
+    <ProjectReference Include="..\CH.Simple.Enums\CH.Simple.Enums.csproj" />
+    <ProjectReference Include="..\CH.Simple.Models\CH.Simple.Models.csproj" />
+    <ProjectReference Include="..\CH.Simple.SqlSugar\CH.Simple.SqlSugar.csproj" />
+    <ProjectReference Include="..\CH.Simple.Utils\CH.Simple.Utils.csproj" />
+  </ItemGroup>
+
+</Project>
