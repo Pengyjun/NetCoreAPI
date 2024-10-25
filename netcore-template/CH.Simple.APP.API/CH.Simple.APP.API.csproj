@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
@@ -15,7 +15,7 @@
   <ItemGroup>
     <ProjectReference Include="..\CH.Simple.EntityFrameworkCore\CH.Simple.EntityFrameworkCore.csproj" />
     <ProjectReference Include="..\CH.Simple.Exceptions\CH.Simple.Exceptions.csproj" />
-    <ProjectReference Include="..\CH.Simple.SqlSuger\CH.Simple.SqlSuger.csproj" />
+    <ProjectReference Include="..\CH.Simple.SqlSugar\CH.Simple.SqlSugar.csproj" />
     <ProjectReference Include="..\CH.Simple.Web\CH.Simple.Web.csproj" />
   </ItemGroup>
 

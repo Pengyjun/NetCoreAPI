@@ -5,7 +5,7 @@ using CH.Simple.Exceptions;
 using Microsoft.AspNetCore.Mvc;
 using SqlSugar;
 using CH.Simple.Utils;
-using CH.Simple.SqlSuger;
+using CH.Simple.SqlSugar;
 using CH.Simple.Web.Controllers;
 using CH.Simple.Web.Extensions;
 
