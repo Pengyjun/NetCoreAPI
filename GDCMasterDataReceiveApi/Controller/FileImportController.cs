@@ -82,7 +82,7 @@ namespace GDCMasterDataReceiveApi.Controller
         public async Task<IActionResult> ImportExeclAsync([FromQuery] BaseRequestDto request)
         {
             FilterCondition condition = new();
-            condition.PageSize = 1000000;
+            condition.PageSize = 10000000;
             condition.IsFullExport = true;
             condition.ImportType = request.ImportType;
             string contentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
@@ -96,7 +96,7 @@ namespace GDCMasterDataReceiveApi.Controller
                 fields = GetFields<UserSearchDetailsDto>(columns);
                 var data = await searchService.GetUserSearchAsync(condition);
                 var excelData = ExportToExcel(data.Data, fields, "用户");
-                return File(excelData, contentType, "用户.xlsx");
+                return File(excelData, contentType, $"用户.xlsx_{DateTime.Now:yyyyMMdd}");
             }
             else if (request.ImportType == 2)
             {
@@ -104,7 +104,7 @@ namespace GDCMasterDataReceiveApi.Controller
                 fields = GetFields<InstitutionDetatilsDto>(columns);
                 var data = await searchService.GetInstitutionAsync(condition);
                 var excelData = ExportToExcel(data.Data, fields, "机构");
-                return File(excelData, contentType, "机构.xlsx");
+                return File(excelData, contentType, $"机构.xlsx_{DateTime.Now:yyyyMMdd}");
             }
             else if (request.ImportType == 3)
             {
@@ -112,7 +112,7 @@ namespace GDCMasterDataReceiveApi.Controller
                 fields = GetFields<DHProjects>(columns);
                 var data = await searchService.GetProjectSearchAsync(condition);
                 var excelData = ExportToExcel(data.Data, fields, "项目");
-                return File(excelData, contentType, "项目.xlsx");
+                return File(excelData, contentType, $"项目.xlsx_{DateTime.Now:yyyyMMdd}");
             }
             else if (request.ImportType == 4)
             {
@@ -120,7 +120,7 @@ namespace GDCMasterDataReceiveApi.Controller
                 fields = GetFields<CorresUnitDetailsDto>(columns);
                 var data = await searchService.GetCorresUnitSearchAsync(condition);
                 var excelData = ExportToExcel(data.Data, fields, "往来单位");
-                return File(excelData, contentType, "往来单位.xlsx");
+                return File(excelData, contentType, $"往来单位.xlsx_{DateTime.Now:yyyyMMdd}");
             }
             else if (request.ImportType == 5)
             {
@@ -128,7 +128,7 @@ namespace GDCMasterDataReceiveApi.Controller
                 fields = GetFields<CountryRegionDetailsDto>(columns);
                 var data = await searchService.GetCountryRegionSearchAsync(condition);
                 var excelData = ExportToExcel(data.Data, fields, "国家地区");
-                return File(excelData, contentType, "国家地区.xlsx");
+                return File(excelData, contentType, $"国家地区.xlsx_{DateTime.Now:yyyyMMdd}");
             }
             else if (request.ImportType == 6)
             {
@@ -136,7 +136,7 @@ namespace GDCMasterDataReceiveApi.Controller
                 fields = GetFields<CountryContinentDetailsDto>(columns);
                 var data = await searchService.GetCountryContinentSearchAsync(condition);
                 var excelData = ExportToExcel(data.Data, fields, "大洲");
-                return File(excelData, contentType, "大洲.xlsx");
+                return File(excelData, contentType, $"大洲.xlsx_{DateTime.Now:yyyyMMdd}");
             }
             else if (request.ImportType == 7)
             {
@@ -144,7 +144,7 @@ namespace GDCMasterDataReceiveApi.Controller
                 fields = GetFields<FinancialInstitutionDetailsDto>(columns);
                 var data = await searchService.GetFinancialInstitutionSearchAsync(condition);
                 var excelData = ExportToExcel(data.Data, fields, "金融机构");
-                return File(excelData, contentType, "金融机构.xlsx");
+                return File(excelData, contentType, $"金融机构.xlsx_{DateTime.Now:yyyyMMdd}");
             }
             else if (request.ImportType == 8)
             {
@@ -152,7 +152,7 @@ namespace GDCMasterDataReceiveApi.Controller
                 fields = GetFields<DeviceClassCodeDetailsDto>(columns);
                 var data = await searchService.GetDeviceClassCodeSearchAsync(condition);
                 var excelData = ExportToExcel(data.Data, fields, "物资设备分类编码");
-                return File(excelData, contentType, "物资设备分类编码.xlsx");
+                return File(excelData, contentType, $"物资设备分类编码.xlsx_{DateTime.Now:yyyyMMdd}");
             }
             else if (request.ImportType == 9)
             {
@@ -160,7 +160,7 @@ namespace GDCMasterDataReceiveApi.Controller
                 fields = GetFields<InvoiceTypeDetailshDto>(columns);
                 var data = await searchService.GetInvoiceTypeSearchAsync(condition);
                 var excelData = ExportToExcel(data.Data, fields, "发票类型");
-                return File(excelData, contentType, "发票类型.xlsx");
+                return File(excelData, contentType, $"发票类型.xlsx_{DateTime.Now:yyyyMMdd}");
             }
             else if (request.ImportType == 10)
             {
@@ -168,7 +168,7 @@ namespace GDCMasterDataReceiveApi.Controller
                 fields = GetFields<DHResearchDto>(columns);
                 var data = await searchService.GetScientifiCNoProjectSearchAsync(condition);
                 var excelData = ExportToExcel(data.Data, fields, "科研项目");
-                return File(excelData, contentType, "科研项目.xlsx");
+                return File(excelData, contentType, $"科研项目.xlsx_{DateTime.Now:yyyyMMdd}");
             }
             else if (request.ImportType == 11)
             {
@@ -176,7 +176,7 @@ namespace GDCMasterDataReceiveApi.Controller
                 fields = GetFields<LanguageDetailsDto>(columns);
                 var data = await searchService.GetLanguageSearchAsync(condition);
                 var excelData = ExportToExcel(data.Data, fields, "语言语种");
-                return File(excelData, contentType, "语言语种.xlsx");
+                return File(excelData, contentType, $"语言语种.xlsx_{DateTime.Now:yyyyMMdd}");
             }
             else if (request.ImportType == 12)
             {
@@ -184,7 +184,7 @@ namespace GDCMasterDataReceiveApi.Controller
                 fields = GetFields<BankCardDetailsDto>(columns);
                 var data = await searchService.GetBankCardSearchAsync(condition);
                 var excelData = ExportToExcel(data.Data, fields, "银行账号");
-                return File(excelData, contentType, "银行账号.xlsx");
+                return File(excelData, contentType, $"银行账号.xlsx_{DateTime.Now:yyyyMMdd}");
             }
             else if (request.ImportType == 13)
             {
@@ -192,7 +192,7 @@ namespace GDCMasterDataReceiveApi.Controller
                 fields = GetFields<DeviceDetailCodeDetailsDto>(columns);
                 var data = await searchService.GetDeviceDetailCodeSearchAsync(condition);
                 var excelData = ExportToExcel(data.Data, fields, "设备物资编码明细");
-                return File(excelData, contentType, "设备物资编码明细.xlsx");
+                return File(excelData, contentType, $"设备物资编码明细.xlsx_{DateTime.Now:yyyyMMdd}");
             }
             else if (request.ImportType == 14)
             {
@@ -200,7 +200,7 @@ namespace GDCMasterDataReceiveApi.Controller
                 fields = GetFields<DHAccountingDept>(columns);
                 var data = await searchService.GetAccountingDepartmentSearchAsync(condition);
                 var excelData = ExportToExcel(data.Data, fields, "核算部门");
-                return File(excelData, contentType, "核算部门.xlsx");
+                return File(excelData, contentType, $"核算部门.xlsx_{DateTime.Now:yyyyMMdd}");
             }
             else if (request.ImportType == 15)
             {
@@ -208,7 +208,7 @@ namespace GDCMasterDataReceiveApi.Controller
                 fields = GetFields<DHMdmMultOrgAgencyRelPage>(columns);
                 var data = await searchService.GetRelationalContractsSearchAsync(condition);
                 var excelData = ExportToExcel(data.Data, fields, "委托关系");
-                return File(excelData, contentType, "委托关系.xlsx");
+                return File(excelData, contentType, $"委托关系.xlsx_{DateTime.Now:yyyyMMdd}");
             }
             else if (request.ImportType == 16)
             {
@@ -216,7 +216,7 @@ namespace GDCMasterDataReceiveApi.Controller
                 fields = GetFields<RegionalDetailsDto>(columns);
                 var data = await searchService.GetRegionalSearchAsync(condition);
                 var excelData = ExportToExcel(data.Data, fields, "中交区域总部");
-                return File(excelData, contentType, "中交区域总部.xlsx");
+                return File(excelData, contentType, $"中交区域总部.xlsx_{DateTime.Now:yyyyMMdd}");
             }
             else if (request.ImportType == 17)
             {
@@ -224,7 +224,7 @@ namespace GDCMasterDataReceiveApi.Controller
                 fields = GetFields<UnitMeasurementDetailsDto>(columns);
                 var data = await searchService.GetUnitMeasurementSearchAsync(condition);
                 var excelData = ExportToExcel(data.Data, fields, "计量单位");
-                return File(excelData, contentType, "计量单位.xlsx");
+                return File(excelData, contentType, $"计量单位.xlsx_{DateTime.Now:yyyyMMdd}");
             }
             else if (request.ImportType == 18)
             {
@@ -232,7 +232,7 @@ namespace GDCMasterDataReceiveApi.Controller
                 fields = GetFields<ProjectClassificationDetailsDto>(columns);
                 var data = await searchService.GetProjectClassificationSearchAsync(condition);
                 var excelData = ExportToExcel(data.Data, fields, "中交项目行业分类产业分类、业务板块、十二大业务类型、江河湖海对照关系");
-                return File(excelData, contentType, "中交项目行业分类产业分类、业务板块、十二大业务类型、江河湖海对照关系.xlsx");
+                return File(excelData, contentType, $"中交项目行业分类产业分类、业务板块、十二大业务类型、江河湖海对照关系.xlsx_{DateTime.Now:yyyyMMdd}");
             }
             else if (request.ImportType == 19)
             {
@@ -240,7 +240,7 @@ namespace GDCMasterDataReceiveApi.Controller
                 fields = GetFields<RegionalCenterDetailsDto>(columns);
                 var data = await searchService.GetRegionalCenterSearchAsync(condition);
                 var excelData = ExportToExcel(data.Data, fields, "中交区域中心");
-                return File(excelData, contentType, "中交区域中心.xlsx");
+                return File(excelData, contentType, $"中交区域中心.xlsx_{DateTime.Now:yyyyMMdd}");
             }
             else if (request.ImportType == 20)
             {
@@ -248,7 +248,7 @@ namespace GDCMasterDataReceiveApi.Controller
                 fields = GetFields<NationalEconomyDetailsDto>(columns);
                 var data = await searchService.GetNationalEconomySearchAsync(condition);
                 var excelData = ExportToExcel(data.Data, fields, "国民经济行业分类");
-                return File(excelData, contentType, "国民经济行业分类.xlsx");
+                return File(excelData, contentType, $"国民经济行业分类.xlsx_{DateTime.Now:yyyyMMdd}");
             }
             else if (request.ImportType == 21)
             {
@@ -256,7 +256,7 @@ namespace GDCMasterDataReceiveApi.Controller
                 fields = GetFields<DHAdministrative>(columns);
                 var data = await searchService.GetAdministrativeAccountingMapperSearchAsync(condition);
                 var excelData = ExportToExcel(data.Data, fields, "行政机构和核算机构映射关系");
-                return File(excelData, contentType, "行政机构和核算机构映射关系.xlsx");
+                return File(excelData, contentType, $"行政机构和核算机构映射关系.xlsx_{DateTime.Now:yyyyMMdd}");
             }
             else if (request.ImportType == 22)
             {
@@ -264,23 +264,23 @@ namespace GDCMasterDataReceiveApi.Controller
                 fields = GetFields<EscrowOrganizationDetailsDto>(columns);
                 var data = await searchService.GetEscrowOrganizationSearchAsync(condition);
                 var excelData = ExportToExcel(data.Data, fields, "多组织-税务代管组织(行政)");
-                return File(excelData, contentType, "多组织-税务代管组织(行政).xlsx");
+                return File(excelData, contentType, $"多组织-税务代管组织(行政).xlsx_{DateTime.Now:yyyyMMdd}");
             }
             else if (request.ImportType == 23)
             {
                 columns = await GetExpColumns("GetBusinessNoCpportunitySearchAsync");
                 fields = GetFields<DHOpportunityDto>(columns);
-                var data = await searchService.GetBusinessNoCpportunitySearchAsync(condition, false);
+                var data = await searchService.GetBusinessNoCpportunitySearchAsync(condition, true);
                 var excelData = ExportToExcel(data.Data, fields, "商机项目(境内)");
-                return File(excelData, contentType, "商机项目(境内).xlsx");
+                return File(excelData, contentType, $"商机项目(境内).xlsx_{DateTime.Now:yyyyMMdd}");
             }
             else if (request.ImportType == 24)
             {
                 columns = await GetExpColumns("GetBusinessNoCpportunitySearchAsync");
                 fields = GetFields<DHOpportunityDto>(columns);
-                var data = await searchService.GetBusinessNoCpportunitySearchAsync(condition, true);
+                var data = await searchService.GetBusinessNoCpportunitySearchAsync(condition, false);
                 var excelData = ExportToExcel(data.Data, fields, "商机项目(境外)");
-                return File(excelData, contentType, "商机项目(境外).xlsx");
+                return File(excelData, contentType, $"商机项目(境外).xlsx_{DateTime.Now:yyyyMMdd}");
             }
             else if (request.ImportType == 25)
             {
@@ -288,7 +288,7 @@ namespace GDCMasterDataReceiveApi.Controller
                 fields = GetFields<AdministrativeDivisionDetailsDto>(columns);
                 var data = await searchService.GetAdministrativeDivisionSearchAsync(condition);
                 var excelData = ExportToExcel(data.Data, fields, "境内行政区划");
-                return File(excelData, contentType, "境内行政区划.xlsx");
+                return File(excelData, contentType, $"境内行政区划.xlsx_{DateTime.Now:yyyyMMdd}");
             }
             else if (request.ImportType == 26)
             {
@@ -296,7 +296,7 @@ namespace GDCMasterDataReceiveApi.Controller
                 fields = GetFields<DHAdjustAccountsMultipleOrg>(columns);
                 var data = await searchService.GetAccountingOrganizationSearchAsync(condition);
                 var excelData = ExportToExcel(data.Data, fields, "多组织-核算机构");
-                return File(excelData, contentType, "多组织-核算机构.xlsx");
+                return File(excelData, contentType, $"多组织-核算机构.xlsx_{DateTime.Now:yyyyMMdd}");
             }
             else if (request.ImportType == 27)
             {
@@ -304,7 +304,7 @@ namespace GDCMasterDataReceiveApi.Controller
                 fields = GetFields<CurrencyDetailsDto>(columns);
                 var data = await searchService.GetCurrencySearchAsync(condition);
                 var excelData = ExportToExcel(data.Data, fields, "币种");
-                return File(excelData, contentType, "币种.xlsx");
+                return File(excelData, contentType, $"币种.xlsx_{DateTime.Now:yyyyMMdd}");
             }
             else if (request.ImportType == 28)
             {
@@ -312,7 +312,7 @@ namespace GDCMasterDataReceiveApi.Controller
                 fields = GetFields<ValueDomainReceiveResponseDto>(columns);
                 var data = await searchService.GetValueDomainReceiveAsync(condition);
                 var excelData = ExportToExcel(data.Data, fields, "值域");
-                return File(excelData, contentType, "值域.xlsx");
+                return File(excelData, contentType, $"值域.xlsx_{DateTime.Now:yyyyMMdd}");
             }
             else if (request.ImportType == 29)
             {
@@ -320,7 +320,7 @@ namespace GDCMasterDataReceiveApi.Controller
                 fields = GetFields<DHVirtualProject>(columns);
                 var data = await searchService.GetDHVirtualProjectAsync(condition);
                 var excelData = ExportToExcel(data.Data, fields, "虚拟项目");
-                return File(excelData, contentType, "虚拟项目.xlsx");
+                return File(excelData, contentType, $"虚拟项目.xlsx_{DateTime.Now:yyyyMMdd}");
             }
             else if (request.ImportType == 30)
             {
@@ -328,7 +328,7 @@ namespace GDCMasterDataReceiveApi.Controller
                 fields = GetFields<DHOrganzationDep>(columns);
                 var data = await searchService.GetXZOrganzationSearchAsync(condition);
                 var excelData = ExportToExcel(data.Data, fields, "多组织-行政组织");
-                return File(excelData, contentType, "多组织-行政组织.xlsx");
+                return File(excelData, contentType, $"多组织-行政组织.xlsx_{DateTime.Now:yyyyMMdd}");
             }
             else if (request.ImportType == 31)
             {
@@ -336,7 +336,7 @@ namespace GDCMasterDataReceiveApi.Controller
                 fields = GetFields<DHMdmManagementOrgage>(columns);
                 var data = await searchService.GetDHMdmMultOrgAgencyRelPageAsync(condition);
                 var excelData = ExportToExcel(data.Data, fields, "生产经营管理组织");
-                return File(excelData, contentType, "生产经营管理组织.xlsx");
+                return File(excelData, contentType, $"生产经营管理组织.xlsx_{DateTime.Now:yyyyMMdd}");
             }
             else
             {
