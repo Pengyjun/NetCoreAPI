@@ -1140,8 +1140,17 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 .Select(x => x.ShipId)
                 .Distinct()
                 .ToListAsync();
+
+            var dealList=await _dbContext.Queryable<DealingUnit>().Where(x => x.IsDelete == 1 && (x.ZBPTYPE == "02" || x.ZBPTYPE == "03"))
+                 .Select(x => new MonthReportForProjectBaseDataResponseDto
+                 {
+                     Id = x.PomId,
+                     Name = x.ZBPNAME_ZH,
+                     RouseType = RouseType.Rouse
+                 }).ToListAsync();
+
             var dealingUnits = await _dbContext.Queryable<DealingUnit>()
-                .Where(x => x.IsDelete == 1 && dIds.Contains(x.PomId.Value))
+                .Where(x => x.IsDelete == 1&& dIds.Contains(x.PomId.Value))
                 .Select(x => new MonthReportForProjectBaseDataResponseDto
                 {
                     Id = x.PomId,
@@ -1149,7 +1158,11 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     RouseType = RouseType.Rouse
                 })
                 .ToListAsync();
-            if (dealingUnits != null && dealingUnits.Any()) bData.AddRange(dealingUnits);
+            if (dealingUnits != null && dealingUnits.Any()) {
+                bData.AddRange(dealingUnits);
+                bData.AddRange(dealList);
+                bData=bData.Distinct().ToList();
+            } 
 
             //资源：客户自定义
             var customResource = diData.Where(t => t.TypeNo == (int)DictionaryTypeNo.CustomShip)
