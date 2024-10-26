@@ -379,6 +379,14 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 List<DayReportConstruction> yearList = new();
                 List<DayReportConstruction> dayReportList = new();
 
+                decimal dayRepYearAmount = 0M;
+                decimal dayRepYearQuantity = 0M;
+                decimal dayRepYearOut = 0M;
+
+                decimal dayRepTotalAmount = 0M;
+                decimal dayRepTotalQuantity = 0M;
+                decimal dayRepTotalOut = 0M;
+
                 if (!dayRep)
                 {
                     //所有施工数据 (年 、日 、累计)
@@ -509,6 +517,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                         if (model != null)
                         {
                             item.IsDayRep = true;
+                            item.IsAllowDelete = true;
 
                             item.CompleteProductionAmount = dayReportList.Where(x => x.ProjectId.ToString() == item.ProjectId && (x.OwnerShipId == item.ShipId || x.SubShipId == item.ShipId) && x.UnitPrice == item.UnitPrice && x.ProjectWBSId == item.ProjectWBSId).Sum(x => x.UnitPrice * x.ActualDailyProduction);
 
@@ -517,16 +526,22 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                             item.OutsourcingExpensesAmount = dayReportList.Where(x => x.ProjectId.ToString() == item.ProjectId && (x.OwnerShipId == item.ShipId || x.SubShipId == item.ShipId) && x.UnitPrice == item.UnitPrice && x.ProjectWBSId == item.ProjectWBSId).Sum(x => x.OutsourcingExpensesAmount);
 
                             item.YearCompleteProductionAmount = yearList.Where(x => x.ProjectId.ToString() == item.ProjectId && (x.OwnerShipId == item.ShipId || x.SubShipId == item.ShipId) && x.UnitPrice == item.UnitPrice && x.ProjectWBSId == item.ProjectWBSId).Sum(x => x.UnitPrice * x.ActualDailyProduction);
+                            dayRepYearAmount = item.YearCompleteProductionAmount;
 
                             item.YearCompletedQuantity = yearList.Where(x => x.ProjectId.ToString() == item.ProjectId && (x.OwnerShipId == item.ShipId || x.SubShipId == item.ShipId) && x.UnitPrice == item.UnitPrice && x.ProjectWBSId == item.ProjectWBSId).Sum(x => x.ActualDailyProduction);
+                            dayRepYearQuantity = item.YearCompletedQuantity;
 
                             item.YearOutsourcingExpensesAmount = yearList.Where(x => x.ProjectId.ToString() == item.ProjectId && (x.OwnerShipId == item.ShipId || x.SubShipId == item.ShipId) && x.UnitPrice == item.UnitPrice && x.ProjectWBSId == item.ProjectWBSId).Sum(x => x.OutsourcingExpensesAmount);
+                            dayRepYearOut = item.YearOutsourcingExpensesAmount;
 
                             item.TotalCompleteProductionAmount = allDayReportList.Where(x => x.ProjectId.ToString() == item.ProjectId && (x.OwnerShipId == item.ShipId || x.SubShipId == item.ShipId) && x.UnitPrice == item.UnitPrice && x.ProjectWBSId == item.ProjectWBSId).Sum(x => x.UnitPrice * x.ActualDailyProduction);
+                            dayRepTotalAmount = item.TotalCompleteProductionAmount;
 
                             item.TotalCompletedQuantity = allDayReportList.Where(x => x.ProjectId.ToString() == item.ProjectId && (x.OwnerShipId == item.ShipId || x.SubShipId == item.ShipId) && x.UnitPrice == item.UnitPrice && x.ProjectWBSId == item.ProjectWBSId).Sum(x => x.ActualDailyProduction);
+                            dayRepTotalQuantity = item.TotalCompletedQuantity;
 
                             item.TotalOutsourcingExpensesAmount = allDayReportList.Where(x => x.ProjectId.ToString() == item.ProjectId && (x.OwnerShipId == item.ShipId || x.SubShipId == item.ShipId) && x.UnitPrice == item.UnitPrice && x.ProjectWBSId == item.ProjectWBSId).Sum(x => x.OutsourcingExpensesAmount);
+                            dayRepTotalOut = item.TotalOutsourcingExpensesAmount;
                         }
                     }
                 }
@@ -586,11 +601,11 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     if (model != null)
                     {
                         //合并计算 每条资源的年产值
-                        model.YearCompleteProductionAmount = nowYearMonthReport.Where(t => t.ProjectId == item.Key.ProjectId && t.ShipId == item.Key.ShipId && t.UnitPrice == item.Key.UnitPrice && t.ProjectWBSId == item.Key.ProjectWBSId).Sum(x => x.CompleteProductionAmount);
+                        model.YearCompleteProductionAmount = nowYearMonthReport.Where(t => t.ProjectId == item.Key.ProjectId && t.ShipId == item.Key.ShipId && t.UnitPrice == item.Key.UnitPrice && t.ProjectWBSId == item.Key.ProjectWBSId).Sum(x => x.CompleteProductionAmount) + dayRepYearAmount;
 
-                        model.YearCompletedQuantity = nowYearMonthReport.Where(t => t.ProjectId == item.Key.ProjectId && t.ShipId == item.Key.ShipId && t.UnitPrice == item.Key.UnitPrice && t.ProjectWBSId == item.Key.ProjectWBSId).Sum(x => x.CompletedQuantity);
+                        model.YearCompletedQuantity = nowYearMonthReport.Where(t => t.ProjectId == item.Key.ProjectId && t.ShipId == item.Key.ShipId && t.UnitPrice == item.Key.UnitPrice && t.ProjectWBSId == item.Key.ProjectWBSId).Sum(x => x.CompletedQuantity) + dayRepYearQuantity;
 
-                        model.YearOutsourcingExpensesAmount = nowYearMonthReport.Where(t => t.ProjectId == item.Key.ProjectId && t.ShipId == item.Key.ShipId && t.UnitPrice == item.Key.UnitPrice && t.ProjectWBSId == item.Key.ProjectWBSId).Sum(x => x.OutsourcingExpensesAmount);
+                        model.YearOutsourcingExpensesAmount = nowYearMonthReport.Where(t => t.ProjectId == item.Key.ProjectId && t.ShipId == item.Key.ShipId && t.UnitPrice == item.Key.UnitPrice && t.ProjectWBSId == item.Key.ProjectWBSId).Sum(x => x.OutsourcingExpensesAmount) + dayRepYearOut;
 
                         yReport.Add(model);
                     }
@@ -609,11 +624,11 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     {
                         //合并计算 每条资源的累计值
 
-                        model.TotalCompleteProductionAmount = calculatePWBS.Where(t => t.ProjectId == item.Key.ProjectId && t.ShipId == item.Key.ShipId && t.UnitPrice == item.Key.UnitPrice && t.ProjectWBSId == item.Key.ProjectWBSId).Sum(x => x.CompleteProductionAmount);
+                        model.TotalCompleteProductionAmount = calculatePWBS.Where(t => t.ProjectId == item.Key.ProjectId && t.ShipId == item.Key.ShipId && t.UnitPrice == item.Key.UnitPrice && t.ProjectWBSId == item.Key.ProjectWBSId).Sum(x => x.CompleteProductionAmount) + dayRepTotalAmount;
 
-                        model.TotalCompletedQuantity = calculatePWBS.Where(t => t.ProjectId == item.Key.ProjectId && t.ShipId == item.Key.ShipId && t.UnitPrice == item.Key.UnitPrice && t.ProjectWBSId == item.Key.ProjectWBSId).Sum(x => x.CompletedQuantity);
+                        model.TotalCompletedQuantity = calculatePWBS.Where(t => t.ProjectId == item.Key.ProjectId && t.ShipId == item.Key.ShipId && t.UnitPrice == item.Key.UnitPrice && t.ProjectWBSId == item.Key.ProjectWBSId).Sum(x => x.CompletedQuantity) + dayRepTotalQuantity;
 
-                        model.TotalOutsourcingExpensesAmount = calculatePWBS.Where(t => t.ProjectId == item.Key.ProjectId && t.ShipId == item.Key.ShipId && t.UnitPrice == item.Key.UnitPrice && t.ProjectWBSId == item.Key.ProjectWBSId).Sum(x => x.OutsourcingExpensesAmount);
+                        model.TotalOutsourcingExpensesAmount = calculatePWBS.Where(t => t.ProjectId == item.Key.ProjectId && t.ShipId == item.Key.ShipId && t.UnitPrice == item.Key.UnitPrice && t.ProjectWBSId == item.Key.ProjectWBSId).Sum(x => x.OutsourcingExpensesAmount) + dayRepTotalOut;
 
                         calPwbs.Add(model);
                     }
