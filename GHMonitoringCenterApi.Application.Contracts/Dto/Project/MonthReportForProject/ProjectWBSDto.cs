@@ -45,6 +45,10 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project.MonthReportFor
         /// </summary>
         public bool IsAllowDelete { get; set; }
         /// <summary>
+        /// 是否是日报数据 是的话 不清0
+        /// </summary>
+        public bool IsDayRep { get; set; } = false;
+        /// <summary>
         /// 填报月份
         /// </summary>
         public int DateMonth { get; set; }
@@ -152,7 +156,7 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project.MonthReportFor
         /// <summary>
         /// wbs使用
         /// </summary>
-        public int IsDelete {  get; set; }
+        public int IsDelete { get; set; }
 
         #region 下一步详细字段
 
