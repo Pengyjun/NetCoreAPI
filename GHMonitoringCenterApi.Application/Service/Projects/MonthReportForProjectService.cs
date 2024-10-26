@@ -438,6 +438,11 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                         var gYearSubList = yearList.Where(x => x.ProjectId == othRep.Key.ProjectId && x.SubShipId == othRep.Key.SubShipId && x.UnitPrice == othRep.Key.UnitPrice && x.ProjectWBSId == othRep.Key.ProjectWBSId).ToList();
 
                         var gTotalSubList = allDayReportList.Where(x => x.ProjectId == othRep.Key.ProjectId && x.SubShipId == othRep.Key.SubShipId && x.UnitPrice == othRep.Key.UnitPrice && x.ProjectWBSId == othRep.Key.ProjectWBSId).ToList();
+                        var ShipId = Guid.Empty;
+                        if (othRep != null && othRep.Key != null && othRep.Key.SubShipId != null)
+                        {
+                            ShipId = othRep.Key.SubShipId.Value;
+                        }
 
                         dayRepList.Add(new ProjectWBSDto
                         {
@@ -446,7 +451,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                             CompletedQuantity = othList.Sum(x => x.ActualDailyProduction),
                             UnitPrice = othRep.Key.UnitPrice,
                             OutsourcingExpensesAmount = othList.Sum(x => x.OutsourcingExpensesAmount),
-                            ShipId = othRep.Key.SubShipId.Value,
+                             ShipId = ShipId,
                             ConstructionNature = othList.FirstOrDefault()?.ConstructionNature,
                             ProjectId = othRep.Key.ProjectId.ToString(),
                             ProjectWBSId = othRep.Key.ProjectWBSId,
