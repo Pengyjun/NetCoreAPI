@@ -511,9 +511,9 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 #region 如果是需要取日报的数据 如果月报中包含日报的资源数据 本月月报即使没有填 也要放开进行累加
                 if (!dayRep)
                 {
-                    foreach (var item in dayRepList)
+                    foreach (var item in endHandleList) 
                     {
-                        var model = endHandleList.Where(t => t.DateMonth == dateMonth && t.ProjectId == item.ProjectId && t.ShipId == item.ShipId && t.UnitPrice == item.UnitPrice && t.ProjectWBSId == item.ProjectWBSId).FirstOrDefault();
+                        var model = dayRepList.Where(t => t.DateMonth == dateMonth && t.ProjectId == item.ProjectId && t.ShipId == item.ShipId && t.UnitPrice == item.UnitPrice && t.ProjectWBSId == item.ProjectWBSId).FirstOrDefault();
                         if (model != null)
                         {
                             item.IsDayRep = true;
