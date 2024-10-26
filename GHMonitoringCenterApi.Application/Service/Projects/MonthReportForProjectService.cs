@@ -1152,7 +1152,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                  }).ToListAsync();
 
             var dealingUnits = await _dbContext.Queryable<DealingUnit>()
-                .Where(x => x.IsDelete == 1 && dIds.Contains(x.PomId.Value))
+                .Where(x => x.IsDelete == 1&& dIds.Contains(x.PomId.Value))
                 .Select(x => new MonthReportForProjectBaseDataResponseDto
                 {
                     Id = x.PomId,
