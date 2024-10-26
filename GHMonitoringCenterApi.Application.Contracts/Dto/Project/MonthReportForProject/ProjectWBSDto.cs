@@ -1,4 +1,8 @@
 ﻿using GHMonitoringCenterApi.Domain.Enums;
+using GHMonitoringCenterApi.Domain.Shared;
+using Newtonsoft.Json;
+using System.ComponentModel;
+using System.Text.Json.Serialization;
 
 namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project.MonthReportForProject
 {
@@ -70,6 +74,7 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project.MonthReportFor
         /// <summary>
         /// 本月完成产值
         /// </summary>
+        [Newtonsoft.Json.JsonConverter(typeof(NullToDefaultConverter<decimal>))]
         public decimal CompleteProductionAmount { get; set; }
         /// <summary>
         /// 本月完成工程量(方)

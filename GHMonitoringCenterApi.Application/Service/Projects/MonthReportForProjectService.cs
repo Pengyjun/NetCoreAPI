@@ -1025,7 +1025,10 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
 
                         // 获取所有的 ReportDetails 数据
                         var jsonString = GetAllReportDetails(jsonObject).ToJson();
-
+                        //var settings = new JsonSerializerSettings
+                        //{
+                        //    DefaultValueHandling = DefaultValueHandling.Populate
+                        //};
                         var resList = JsonConvert.DeserializeObject<List<ProjectWBSDto>>(jsonString);
 
                         if (resList != null && resList.Any())
