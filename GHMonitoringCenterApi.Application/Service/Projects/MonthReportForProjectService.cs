@@ -16,6 +16,7 @@ using Newtonsoft.Json.Linq;
 using NPOI.SS.Formula.Functions;
 using SqlSugar;
 using System.Collections.Generic;
+using System.Linq;
 using UtilsSharp;
 using Models = GHMonitoringCenterApi.Domain.Models;
 
@@ -374,23 +375,30 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 int yy = Convert.ToInt32(monthTime.Year + "0101");
 
                 List<ProjectWBSDto> dayRepList = new();
+                List<DayReportConstruction> allDayReportList = new();
+                List<DayReportConstruction> yearList = new();
+                List<DayReportConstruction> dayReportList = new();
+
                 if (!dayRep)
                 {
                     //所有施工数据 (年 、日 、累计)
-                    var allDayReportList = await _dbContext.Queryable<DayReportConstruction>()
-                       .Where(t => t.IsDelete == 1 && t.DateDay <= endDay && pId == t.ProjectId)
-                       .ToListAsync();
+                    allDayReportList = await _dbContext.Queryable<DayReportConstruction>()
+                      .Where(t => t.IsDelete == 1 && t.DateDay <= endDay && pId == t.ProjectId)
+                      .ToListAsync();
 
                     //年
-                    var yearList = allDayReportList
-                       .Where(t => t.IsDelete == 1 && t.DateDay >= yy && t.DateDay <= endDay && pId == t.ProjectId)
-                       .ToList();
+                    yearList = allDayReportList
+                      .Where(t => t.IsDelete == 1 && t.DateDay >= yy && t.DateDay <= endDay && pId == t.ProjectId)
+                      .ToList();
 
                     //获取月施工日报数据
-                    var dayReportList = allDayReportList
-                         .Where(t => t.IsDelete == 1 && t.DateDay >= startDay && t.DateDay <= endDay && pId == t.ProjectId)
-                         .ToList();
+                    dayReportList = allDayReportList
+                        .Where(t => t.IsDelete == 1 && t.DateDay >= startDay && t.DateDay <= endDay && pId == t.ProjectId)
+                        .ToList();
+                }
 
+                if (!dayRep)
+                {
                     //自有
                     var ownDReportList = dayReportList.Where(x => x.OutPutType == ConstructionOutPutType.Self)
                         .GroupBy(x => new { x.ProjectId, x.OwnerShipId, x.UnitPrice, x.ProjectWBSId })
@@ -491,6 +499,39 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                         endHandleList.Add(model);
                     }
                 }
+
+                #region 如果是需要取日报的数据 如果月报中包含日报的资源数据 本月月报即使没有填 也要放开进行累加
+                if (!dayRep)
+                {
+                    foreach (var item in dayRepList)
+                    {
+                        var model = endHandleList.Where(t => t.DateMonth == dateMonth && t.ProjectId == item.ProjectId && t.ShipId == item.ShipId && t.UnitPrice == item.UnitPrice && t.ProjectWBSId == item.ProjectWBSId).FirstOrDefault();
+                        if (model != null)
+                        {
+                            item.IsDayRep = true;
+
+                            item.CompleteProductionAmount = dayReportList.Where(x => x.ProjectId.ToString() == item.ProjectId && (x.OwnerShipId == item.ShipId || x.SubShipId == item.ShipId) && x.UnitPrice == item.UnitPrice && x.ProjectWBSId == item.ProjectWBSId).Sum(x => x.UnitPrice * x.ActualDailyProduction);
+
+                            item.CompletedQuantity = dayReportList.Where(x => x.ProjectId.ToString() == item.ProjectId && (x.OwnerShipId == item.ShipId || x.SubShipId == item.ShipId) && x.UnitPrice == item.UnitPrice && x.ProjectWBSId == item.ProjectWBSId).Sum(x => x.ActualDailyProduction);
+
+                            item.OutsourcingExpensesAmount = dayReportList.Where(x => x.ProjectId.ToString() == item.ProjectId && (x.OwnerShipId == item.ShipId || x.SubShipId == item.ShipId) && x.UnitPrice == item.UnitPrice && x.ProjectWBSId == item.ProjectWBSId).Sum(x => x.OutsourcingExpensesAmount);
+
+                            item.YearCompleteProductionAmount = yearList.Where(x => x.ProjectId.ToString() == item.ProjectId && (x.OwnerShipId == item.ShipId || x.SubShipId == item.ShipId) && x.UnitPrice == item.UnitPrice && x.ProjectWBSId == item.ProjectWBSId).Sum(x => x.UnitPrice * x.ActualDailyProduction);
+
+                            item.YearCompletedQuantity = yearList.Where(x => x.ProjectId.ToString() == item.ProjectId && (x.OwnerShipId == item.ShipId || x.SubShipId == item.ShipId) && x.UnitPrice == item.UnitPrice && x.ProjectWBSId == item.ProjectWBSId).Sum(x => x.ActualDailyProduction);
+
+                            item.YearOutsourcingExpensesAmount = yearList.Where(x => x.ProjectId.ToString() == item.ProjectId && (x.OwnerShipId == item.ShipId || x.SubShipId == item.ShipId) && x.UnitPrice == item.UnitPrice && x.ProjectWBSId == item.ProjectWBSId).Sum(x => x.OutsourcingExpensesAmount);
+
+                            item.TotalCompleteProductionAmount = allDayReportList.Where(x => x.ProjectId.ToString() == item.ProjectId && (x.OwnerShipId == item.ShipId || x.SubShipId == item.ShipId) && x.UnitPrice == item.UnitPrice && x.ProjectWBSId == item.ProjectWBSId).Sum(x => x.UnitPrice * x.ActualDailyProduction);
+
+                            item.TotalCompletedQuantity = allDayReportList.Where(x => x.ProjectId.ToString() == item.ProjectId && (x.OwnerShipId == item.ShipId || x.SubShipId == item.ShipId) && x.UnitPrice == item.UnitPrice && x.ProjectWBSId == item.ProjectWBSId).Sum(x => x.ActualDailyProduction);
+
+                            item.TotalOutsourcingExpensesAmount = allDayReportList.Where(x => x.ProjectId.ToString() == item.ProjectId && (x.OwnerShipId == item.ShipId || x.SubShipId == item.ShipId) && x.UnitPrice == item.UnitPrice && x.ProjectWBSId == item.ProjectWBSId).Sum(x => x.OutsourcingExpensesAmount);
+                        }
+                    }
+                }
+                #endregion
+
                 #region 本月是否有填写数据
                 foreach (var item in endHandleList)
                 {
