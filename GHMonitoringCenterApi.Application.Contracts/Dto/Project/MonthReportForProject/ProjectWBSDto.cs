@@ -103,6 +103,7 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project.MonthReportFor
         /// <summary>
         /// 产值属性
         /// </summary>
+        [Newtonsoft.Json.JsonConverter(typeof(NullToDefaultConverter<int>))]
         public ConstructionOutPutType OutPutType { get; set; }
         /// <summary>
         /// 产值属性名称
