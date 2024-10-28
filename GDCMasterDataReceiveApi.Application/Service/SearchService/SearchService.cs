@@ -271,7 +271,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     uInfo.HighEstGrade = highEstGrade.FirstOrDefault(x => x.ZDOM_VALUE == uInfo.HighEstGrade)?.ZDOM_NAME;
                     uInfo.SameHighEstGrade = sameHighEstGrade.FirstOrDefault(x => x.ZDOM_VALUE == uInfo.SameHighEstGrade)?.ZDOM_NAME;
                     uInfo.CertType = certType.FirstOrDefault(x => x.ZDOM_VALUE == uInfo.CertType)?.ZDOM_NAME;
-                    uInfo.SubDepts = GetSubDepts(uInfo.SubDepts, institutions, valDomain, uInfo.JobName);
+                    uInfo.SubDepts = string.IsNullOrWhiteSpace(uInfo.SubDepts) ? GetSubDepts(uInfo.Attribute1, institutions, valDomain, uInfo.JobName) : GetSubDepts(uInfo.SubDepts, institutions, valDomain, uInfo.JobName);
                     uInfo.PoliticsFace = politicsFace.FirstOrDefault(x => x.TypeNo == uInfo.PoliticsFace)?.Name;
                 }
             }
