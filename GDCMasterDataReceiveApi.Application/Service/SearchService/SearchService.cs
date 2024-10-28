@@ -2379,10 +2379,13 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
 
             //省、市、县
             var p = corresUnitList.Select(x => x.Province).ToList();
+            var bp = bankList.Select(x => x.Province).ToList();
             var city = corresUnitList.Select(x => x.City).ToList();
+            var bcity = bankList.Select(x => x.City).ToList();
             var c = corresUnitList.Select(x => x.County).ToList();
+            var bc = bankList.Select(x => x.County).ToList();
             var adisision = await _dbContext.Queryable<AdministrativeDivision>()
-                .Where(t => t.IsDelete == 1 && (p.Contains(t.ZADDVSCODE) || city.Contains(t.ZADDVSCODE) || c.Contains(t.ZADDVSCODE)))
+                .Where(t => t.IsDelete == 1 && (p.Contains(t.ZADDVSCODE) || city.Contains(t.ZADDVSCODE) || c.Contains(t.ZADDVSCODE) || bp.Contains(t.ZADDVSCODE) || bcity.Contains(t.ZADDVSCODE) || bc.Contains(t.ZADDVSCODE)))
                 .Select(t => new FilterChildData { Key = t.ZADDVSCODE, Val = t.ZADDVSNAME, Code = t.ZADDVSLEVEL })
                 .ToListAsync();
 
