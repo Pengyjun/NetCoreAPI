@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using GDCMasterDataReceiveApi.Application.Contracts.Dto.BankCard;
+using System.ComponentModel;
 
 namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.CorresUnit
 {
@@ -140,6 +141,11 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.CorresUnit
         /// </summary>
         [DisplayName("境外社保号/ID")]
         public string? AbroadSocialSecurityNo { get; set; }
+        /// <summary>
+        /// 银行账号列表
+        /// </summary>
+        [DisplayName("银行账号列表")]
+        public List<BankCardDetailsDto>?BankList { get; set; }
         /// <summary>
         /// 国家/地区:往来单位所在国家/地区
         /// </summary>
