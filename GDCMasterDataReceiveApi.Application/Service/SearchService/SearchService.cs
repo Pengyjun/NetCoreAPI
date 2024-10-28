@@ -1063,7 +1063,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                         if (!string.IsNullOrWhiteSpace(r)) oids.AddRange(r.Split('-'));
                     }
                 }
-                else
+                else if (!string.IsNullOrWhiteSpace(filterCondition.Name) || !string.IsNullOrWhiteSpace(filterCondition.Oid) || !string.IsNullOrWhiteSpace(requestDto.KeyWords))
                 {
                     //得到所有符合条件的机构rules
                     var rules = institutions.Select(x => x.GRULE).ToList();
@@ -1106,14 +1106,14 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
         /// <summary>
         /// 子集 新版
         /// </summary>
-        /// <param name="gpOid"></param>
+        /// <param name="oid"></param>
         /// <param name="children"></param>
         /// <returns></returns>
-        public List<InstitutionResponseDto> GetInstitutionTreeChild(string gpOid, List<InstitutionResponseDto> children)
+        public List<InstitutionResponseDto> GetInstitutionTreeChild(string oid, List<InstitutionResponseDto> children)
         {
             // 查找当前节点的所有子节点
             var childs = children
-                .Where(x => x.Gpoid == gpOid)
+                .Where(x => x.Gpoid == oid)
                 .Select(child => new InstitutionResponseDto
                 {
                     Gpoid = child.Gpoid,
@@ -1185,7 +1185,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                 .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.MdmCode), t => t.MDM_CODE.Contains(filterCondition.MdmCode))
                 .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.CreateTime.ToString()), (pro) => Convert.ToDateTime(pro.CreateTime).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.CreateTime).ToString("yyyy-MM-dd"))
                 .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.UpdateTime.ToString()), (pro) => Convert.ToDateTime(pro.UpdateTime).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.UpdateTime).ToString("yyyy-MM-dd"))
-                .Where(t => t.IsDelete == 1 && (t.OID == filterCondition.Oid || t.POID == filterCondition.Oid))
+                .Where(t => t.IsDelete == 1 && t.GPOID == filterCondition.Oid)
                 .WhereIF(!string.IsNullOrWhiteSpace(requestDto.KeyWords), t => t.OID.Contains(requestDto.KeyWords) || t.NAME.Contains(requestDto.KeyWords))
                 .Select(ins => new InstitutionDetatilsDto
                 {
@@ -8034,25 +8034,26 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
         /// </summary>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
-        public async Task<ResponseAjaxResult< List<InstitutionResponseDto>>> SearchInstitutionTreeAsync()
+        public async Task<ResponseAjaxResult<List<InstitutionResponseDto>>> SearchInstitutionTreeAsync()
         {
             ResponseAjaxResult<List<InstitutionResponseDto>> responseAjaxResult = new ResponseAjaxResult<List<InstitutionResponseDto>>();
-            var institutionList =await _dbContext.Queryable<Institution>().Where(x => x.IsDelete == 1
+            var institutionList = await _dbContext.Queryable<Institution>().Where(x => x.IsDelete == 1
              && x.STATUS == "1"
              && (x.OCODE.Contains("00000A")
              || x.OCODE.Contains("00000B")
              || x.OCODE.Contains("00000C")
              || x.OCODE.Contains("00000E")))
-             .Select(x => new InstitutionResponseDto() {
-                 Oid=x.OID,
-                 ShortName=x.SHORTNAME=="北方分公司"?"四公司":x.SHORTNAME,
-                  Sno=x.SNO
-             }).OrderBy(x=>x.Oid).OrderBy(x=>x.Sno).ToListAsync();
-           //var instItem= institutionList.Where(x => x.Pid == "101114066").FirstOrDefault();
-           //var len=instItem.Grule.Split("-", StringSplitOptions.RemoveEmptyEntries).Length + 1;
-           // var res= ListToTreeUtil.GetTree<InstitutionTreeResponseDto>(instItem.Pid, institutionList, len, instItem.Grule,0);
+             .Select(x => new InstitutionResponseDto()
+             {
+                 Oid = x.OID,
+                 ShortName = x.SHORTNAME == "北方分公司" ? "四公司" : x.SHORTNAME,
+                 Sno = x.SNO
+             }).OrderBy(x => x.Oid).OrderBy(x => x.Sno).ToListAsync();
+            //var instItem= institutionList.Where(x => x.Pid == "101114066").FirstOrDefault();
+            //var len=instItem.Grule.Split("-", StringSplitOptions.RemoveEmptyEntries).Length + 1;
+            // var res= ListToTreeUtil.GetTree<InstitutionTreeResponseDto>(instItem.Pid, institutionList, len, instItem.Grule,0);
             responseAjaxResult.Data = institutionList;
-           responseAjaxResult.Success();
+            responseAjaxResult.Success();
             return responseAjaxResult;
         }
         #endregion
