@@ -2346,7 +2346,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
 
             var zbps = corresUnitList.Select(x => x.DealUnitMDCode).ToList();
             var bankList = await _dbContext.Queryable<BankCard>()
-                .Where(cc => cc.IsDelete == 1 && zbps.Contains(cc.ZBP))
+                .Where(cc => zbps.Contains(cc.ZBP))
                 .Select((cc) => new BankCardDetailsDto
                 {
                     Id = cc.Id.ToString(),
