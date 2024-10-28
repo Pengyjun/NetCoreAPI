@@ -2344,6 +2344,25 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                 })
                 .ToPageListAsync(requestDto.PageIndex, requestDto.PageSize, total);
 
+            var zbps = corresUnitList.Select(x => x.DealUnitMDCode).ToList();
+            var bankList = await _dbContext.Queryable<BankCard>()
+                .Where(cc => cc.IsDelete == 1 && zbps.Contains(cc.ZBP))
+                .Select((cc) => new BankCardDetailsDto
+                {
+                    Id = cc.Id.ToString(),
+                    Name = cc.ZKOINH,
+                    AccountCurrency = cc.ZCURR,
+                    AccountStatus = cc.ZBANKSTA,
+                    BankAccount = cc.ZBANKN,
+                    BankNoPK = cc.ZBANK,
+                    City = cc.ZCITY2,
+                    Country = cc.ZZCOUNTR2,
+                    County = cc.ZCOUNTY2,
+                    DealUnitCode = cc.ZBP,
+                    FinancialOrgCode = cc.ZFINC,
+                    FinancialOrgName = cc.ZFINAME,
+                    Province = cc.ZPROVINC2
+                }).ToListAsync();//银行账号
             #region 
             //值域信息
             var valDomain = await _dbContext.Queryable<ValueDomain>()
@@ -2367,6 +2386,29 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                 .Select(t => new FilterChildData { Key = t.ZADDVSCODE, Val = t.ZADDVSNAME, Code = t.ZADDVSLEVEL })
                 .ToListAsync();
 
+            //币种
+            var currency = await _dbContext.Queryable<Currency>()
+                .Where(t => t.IsDelete == 1)
+                .Select(t => new { t.ZCURRENCYCODE, t.ZCURRENCYNAME })
+                .ToListAsync();
+
+            foreach (var item in bankList)
+            {
+                //币种
+                item.AccountCurrency = currency.FirstOrDefault(x => x.ZCURRENCYCODE == item.AccountCurrency)?.ZCURRENCYNAME;
+
+                //国家地区
+                item.Country = country.FirstOrDefault(x => x.Code == item.Country)?.Name;
+
+                //省、市、县
+                item.City = adisision.FirstOrDefault(x => x.Key == item.City)?.Val;
+                item.County = adisision.FirstOrDefault(x => x.Key == item.County)?.Val;
+                item.Province = adisision.FirstOrDefault(x => x.Key == item.Province)?.Val;
+
+                //账户状态
+                item.AccountStatus = GetValueDomain(item.AccountStatus, valDomain, "ZBANKSTA");
+            }
+
             foreach (var item in corresUnitList)
             {
                 //往来单位类别
@@ -2386,6 +2428,8 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                 //往来单位类型
                 item.TypeOfUnit = GetValueDomain(item.TypeOfUnit, valDomain, "ZBPKINDS");
 
+                //银行账号
+                item.BankList = bankList.Where(x => x.DealUnitCode == item.DealUnitMDCode).ToList();
             }
 
             #endregion
