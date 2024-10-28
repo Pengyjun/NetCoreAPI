@@ -463,7 +463,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                                     break;
                                 case 3:
                                     //岗位名称
-                                    if (values[i].Length > 0) val += jobName;
+                                    if (values[i].Length > 0) val += values[i];
                                     break;
                                 case 4:
                                     //排序
