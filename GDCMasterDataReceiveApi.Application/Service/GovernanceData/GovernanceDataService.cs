@@ -107,7 +107,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.GovernanceData
                 else if (type == 3)
                 {
                     //金融机构
-                    sql = "SELECT  Id,PId FROM ( select dealunitmdcode  Id ,COUNT(1) PId from GDCMDM.t_financialinstitution GROUP BY dealunitmdcode  ) WHERE PId>1";
+                    sql = "SELECT  Id,PId FROM ( select dealunitmdcode  Id ,COUNT(1) PId from GDCMDM.t_corresunit GROUP BY dealunitmdcode  ) WHERE PId>1";
                     var res = _dbContext.Ado.SqlQuery<DbQueryResponseDto>(sql);
                     //查询所有ID
                     var ids = res.Select(x => x.Id).ToList();
