@@ -11,7 +11,7 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// <summary>
         /// 字段列 字符串json
         /// </summary>
-        [SugarColumn(Length = 5000)]
+        [SugarColumn(Length = 3000)]
         public string? FiledColumns { get; set; }
         /// <summary>
         /// 租户  / 后续根据登录用户保存  目前暂不处理
@@ -21,6 +21,7 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// <summary>
         /// 接口列表id
         /// </summary>
-        public string InterfaceId { get; set; }
+        [SugarColumn(Length = 100)]
+        public string? InterfaceId { get; set; }
     }
 }
