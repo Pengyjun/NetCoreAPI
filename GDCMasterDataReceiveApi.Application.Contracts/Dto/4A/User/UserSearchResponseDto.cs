@@ -191,6 +191,10 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto._4A.User
         [DisplayName("兼职所在部门、 岗位类别、职级、岗位名称及排序 HR 兼职，“兼职所在部门 ID| 岗位类别 ID|兼职职级 |岗位名称|排序号，”")]
         public string? SubDepts { get; set; }
         /// <summary>
+        /// 兼职所在部门、 岗位类别、职级、岗位名称及排序 HR 兼职，“兼职所在部门 ID| 岗位类别 ID|兼职职级 |岗位名称|排序号，”多条兼职循环拼串
+        /// </summary>
+        public List<UserSubDepts>? SubDeptsList { get; set; }
+        /// <summary>
         /// 用工类型
         /// </summary>
         [DisplayName("用工类型")]
@@ -289,6 +293,20 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto._4A.User
         public DateTime? CreateTime { get; set; }
         [DisplayName("修改时间")]
         public DateTime? UpdateTime { get; set; }
+    }
+    /// <summary>
+    /// 用户所在兼职
+    /// </summary>
+    public class UserSubDepts
+    {
+        /// <summary>
+        /// 兼职相关键
+        /// </summary>
+        public string? Key { get; set; }
+        /// <summary>
+        /// 值
+        /// </summary>
+        public string? Value { get; set; }
     }
     /// <summary>
     /// 机构dto

@@ -1,5 +1,4 @@
 ﻿using SqlSugar;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace GDCMasterDataReceiveApi.Domain.Models
 {
@@ -9,7 +8,6 @@ namespace GDCMasterDataReceiveApi.Domain.Models
     [SugarTable("t_corresunit", IsDisabledDelete = true)]
     public class CorresUnit : BaseEntity<long>
     {
-
         /// <summary>
         /// 往来单位主数据编码:公司往来单位的唯一编码
         /// </summary>

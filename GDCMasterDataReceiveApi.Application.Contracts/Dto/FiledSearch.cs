@@ -16,7 +16,7 @@
         /// <summary>
         /// 主键id
         /// </summary>
-        public string Id { get; set; }
+        public string? Id { get; set; }
         /// <summary>
         /// 接口id
         /// </summary>
