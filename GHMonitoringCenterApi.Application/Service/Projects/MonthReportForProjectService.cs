@@ -1024,6 +1024,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                             var tIds = resList.Where(x => x.IsAllowDelete).Select(x => x.DetailId).ToList();
                             foreach (var item in resList)
                             {
+                                item.IsAllowDelete = true;
                                 item.ProjectId = result.ProjectId.ToString();
 
                                 item.KeyId = wbss.FirstOrDefault(x => x.Id == item.ProjectWBSId)?.KeyId;
