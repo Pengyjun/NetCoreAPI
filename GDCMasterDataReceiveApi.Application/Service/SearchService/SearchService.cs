@@ -39,8 +39,6 @@ using Newtonsoft.Json.Linq;
 using SqlSugar;
 using System.Data;
 using System.Reflection;
-using System.Security.Cryptography;
-using System.Security.Cryptography.X509Certificates;
 
 namespace GDCMasterDataReceiveApi.Application.Service.SearchService
 {
@@ -271,8 +269,10 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     uInfo.HighEstGrade = highEstGrade.FirstOrDefault(x => x.ZDOM_VALUE == uInfo.HighEstGrade)?.ZDOM_NAME;
                     uInfo.SameHighEstGrade = sameHighEstGrade.FirstOrDefault(x => x.ZDOM_VALUE == uInfo.SameHighEstGrade)?.ZDOM_NAME;
                     uInfo.CertType = certType.FirstOrDefault(x => x.ZDOM_VALUE == uInfo.CertType)?.ZDOM_NAME;
-                    uInfo.SubDepts = string.IsNullOrWhiteSpace(uInfo.SubDepts) ? GetSubDepts(uInfo.Attribute1, institutions, valDomain, uInfo.JobName) : GetSubDepts(uInfo.SubDepts, institutions, valDomain, uInfo.JobName);
                     uInfo.PoliticsFace = politicsFace.FirstOrDefault(x => x.TypeNo == uInfo.PoliticsFace)?.Name;
+                    //uInfo.SubDepts = string.IsNullOrWhiteSpace(uInfo.SubDepts) ? GetSubDepts(uInfo.Attribute1, institutions, valDomain, uInfo.JobName) : GetSubDepts(uInfo.SubDepts, institutions, valDomain, uInfo.JobName);
+                    uInfo.SubDeptsList = string.IsNullOrWhiteSpace(uInfo.SubDepts) ? GetSubDepts(uInfo.Attribute1, institutions, valDomain, uInfo.JobName) : GetSubDepts(uInfo.SubDepts, institutions, valDomain, uInfo.JobName);
+
                 }
             }
 
@@ -391,7 +391,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
             uDetails.OfficeDepIdName = institutions.FirstOrDefault(x => x.Oid == uDetails.OfficeDepId)?.Name;
 
             //兼职所在部门、岗位类别、职级、岗位名称及排序
-            uDetails.SubDepts = GetSubDepts(uDetails.SubDepts, institutions, valDomain, uDetails.JobName);
+            //uDetails.SubDepts = GetSubDepts(uDetails.SubDepts, institutions, valDomain, uDetails.JobName);
 
             #endregion
 
@@ -431,9 +431,10 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
         /// 获取兼职所在部门、岗位类别、职级、岗位名称及排序
         /// </summary>
         /// <returns></returns>
-        private string GetSubDepts(string? subDepts, List<InstutionRespDto> instutionDtos, List<VDomainRespDto> vDomainList, string? jobName)
+        private List<UserSubDepts> GetSubDepts(string? subDepts, List<InstutionRespDto> instutionDtos, List<VDomainRespDto> vDomainList, string? jobName)
         {
-            string rd = string.Empty;
+            //string rd = string.Empty;
+            List<UserSubDepts> uSubDep = new();
             if (!string.IsNullOrWhiteSpace(subDepts))
             {
                 //先根据,拆
@@ -452,22 +453,47 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                                 case 0:
                                     //所在部门
                                     if (values[i].Length > 0) val += instutionDtos.FirstOrDefault(x => x.Oid == values[i])?.Name;
+                                    uSubDep.Add(new UserSubDepts
+                                    {
+                                        Key = "所在部门",
+                                        Value = instutionDtos.FirstOrDefault(x => x.Oid == values[i])?.Name
+                                    });
                                     break;
                                 case 1:
                                     //岗位类别
                                     if (values[i].Length > 0) val += vDomainList.FirstOrDefault(x => x.ZDOM_CODE == "ZJOBTYPE" && x.ZDOM_VALUE == values[i])?.ZDOM_NAME;
+                                    uSubDep.Add(new UserSubDepts
+                                    {
+                                        Key = "岗位类别",
+                                        Value = vDomainList.FirstOrDefault(x => x.ZDOM_CODE == "ZJOBTYPE" && x.ZDOM_VALUE == values[i])?.ZDOM_NAME
+                                    });
                                     break;
                                 case 2:
                                     //职级
                                     if (values[i].Length > 0) val += vDomainList.FirstOrDefault(x => x.ZDOM_CODE == "ZEGRADE" && x.ZDOM_VALUE == values[i])?.ZDOM_NAME;
+                                    uSubDep.Add(new UserSubDepts
+                                    {
+                                        Key = "职级",
+                                        Value = vDomainList.FirstOrDefault(x => x.ZDOM_CODE == "ZEGRADE" && x.ZDOM_VALUE == values[i])?.ZDOM_NAME
+                                    });
                                     break;
                                 case 3:
                                     //岗位名称
                                     if (values[i].Length > 0) val += values[i];
+                                    uSubDep.Add(new UserSubDepts
+                                    {
+                                        Key = "岗位名称",
+                                        Value = values[i]
+                                    });
                                     break;
                                 case 4:
                                     //排序
                                     if (values[i].Length > 0) val += values[i];
+                                    uSubDep.Add(new UserSubDepts
+                                    {
+                                        Key = "排序",
+                                        Value = values[i]
+                                    });
                                     break;
                             }
                             val += "|";
@@ -475,11 +501,12 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                         val = !string.IsNullOrWhiteSpace(val) ? val.Substring(0, val.Length - 1) : val;
                         val += ",";
                     }
-                    rd = !string.IsNullOrWhiteSpace(val) ? val.Substring(0, val.Length - 1) : val;
+                    //rd = !string.IsNullOrWhiteSpace(val) ? val.Substring(0, val.Length - 1) : val;
                 }
             }
 
-            return rd;
+            //return rd;
+            return uSubDep;
         }
         /// <summary>
         /// 获取机构名称
@@ -2279,32 +2306,32 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
             }
 
             var corresUnitList = await _dbContext.Queryable<CorresUnit>()
-                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.DealUnitMDCode), (pro) => pro.ZBP.Contains(filterCondition.DealUnitMDCode))
-                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.IsGroupUnit), (pro) => pro.ZINCLIENT.Contains(filterCondition.IsGroupUnit))
-                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.AccUnitCode), (pro) => pro.ZACORGNO.Contains(filterCondition.AccUnitCode))
-                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.OrgMDCode), (pro) => pro.ZORG.Contains(filterCondition.OrgMDCode))
-                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Name), (pro) => pro.ZBPNAME_ZH.Contains(filterCondition.Name))
-                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.NameEnglish), (pro) => pro.ZBPNAME_EN.Contains(filterCondition.NameEnglish))
-                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.NameInLLanguage), (pro) => pro.ZBPNAME_LOC.Contains(filterCondition.NameInLLanguage))
-                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.CategoryUnit), (pro) => pro.ZBPTYPE.Contains(filterCondition.CategoryUnit))
-                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.RegistrationNo), (pro) => pro.ZUSCC.Contains(filterCondition.RegistrationNo))
-                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.OrgCode), (pro) => pro.ZOIBC.Contains(filterCondition.OrgCode))
-                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.BRegistrationNo), (pro) => pro.ZBRNO.Contains(filterCondition.BRegistrationNo))
-                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.TaxpayerIdentifyNo), (pro) => pro.ZTRNO.Contains(filterCondition.TaxpayerIdentifyNo))
-                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.AbroadRegistrationNo), (pro) => pro.ZOSRNO.Contains(filterCondition.AbroadRegistrationNo))
-                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.IdNo), (pro) => pro.ZIDNO.Contains(filterCondition.IdNo))
-                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.AbroadSocialSecurityNo), (pro) => pro.ZSSNO.Contains(filterCondition.AbroadSocialSecurityNo))
-                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Country), (pro) => pro.ZZCOUNTRY.Contains(filterCondition.Country))
-                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Province), (pro) => pro.ZPROVINCE.Contains(filterCondition.Province))
-                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.City), (pro) => pro.ZCITY.Contains(filterCondition.City))
-                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.County), (pro) => pro.ZCOUNTY.Contains(filterCondition.County))
-                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.EnterpriseNature), (pro) => pro.ZETPSPROPERTY.Contains(filterCondition.EnterpriseNature))
-                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.SupLegalEntity), (pro) => pro.ZCOMPYREL.Contains(filterCondition.SupLegalEntity))
-                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.NatureOfUnit), (pro) => pro.ZBPNATURE.Contains(filterCondition.NatureOfUnit))
-                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.TypeOfUnit), (pro) => pro.ZBPKINDS.Contains(filterCondition.TypeOfUnit))
-                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.CreateTime.ToString()), (pro) => Convert.ToDateTime(pro.CreateTime).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.CreateTime).ToString("yyyy-MM-dd"))
-                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.UpdateTime.ToString()), (pro) => Convert.ToDateTime(pro.UpdateTime).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.UpdateTime).ToString("yyyy-MM-dd"))
-                .WhereIF(!string.IsNullOrWhiteSpace(requestDto.KeyWords), t => t.ZBP.Contains(requestDto.KeyWords) || t.ZBPNAME_ZH.Contains(requestDto.KeyWords))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.DealUnitMDCode), (cu) => cu.ZBP.Contains(filterCondition.DealUnitMDCode))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.IsGroupUnit), (cu) => cu.ZINCLIENT.Contains(filterCondition.IsGroupUnit))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.AccUnitCode), (cu) => cu.ZACORGNO.Contains(filterCondition.AccUnitCode))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.OrgMDCode), (cu) => cu.ZORG.Contains(filterCondition.OrgMDCode))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Name), (cu) => cu.ZBPNAME_ZH.Contains(filterCondition.Name))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.NameEnglish), (cu) => cu.ZBPNAME_EN.Contains(filterCondition.NameEnglish))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.NameInLLanguage), (cu) => cu.ZBPNAME_LOC.Contains(filterCondition.NameInLLanguage))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.CategoryUnit), (cu) => cu.ZBPTYPE.Contains(filterCondition.CategoryUnit))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.RegistrationNo), (cu) => cu.ZUSCC.Contains(filterCondition.RegistrationNo))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.OrgCode), (cu) => cu.ZOIBC.Contains(filterCondition.OrgCode))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.BRegistrationNo), (cu) => cu.ZBRNO.Contains(filterCondition.BRegistrationNo))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.TaxpayerIdentifyNo), (cu) => cu.ZTRNO.Contains(filterCondition.TaxpayerIdentifyNo))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.AbroadRegistrationNo), (cu) => cu.ZOSRNO.Contains(filterCondition.AbroadRegistrationNo))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.IdNo), (cu) => cu.ZIDNO.Contains(filterCondition.IdNo))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.AbroadSocialSecurityNo), (cu) => cu.ZSSNO.Contains(filterCondition.AbroadSocialSecurityNo))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Country), (cu) => cu.ZZCOUNTRY.Contains(filterCondition.Country))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Province), (cu) => cu.ZPROVINCE.Contains(filterCondition.Province))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.City), (cu) => cu.ZCITY.Contains(filterCondition.City))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.County), (cu) => cu.ZCOUNTY.Contains(filterCondition.County))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.EnterpriseNature), (cu) => cu.ZETPSPROPERTY.Contains(filterCondition.EnterpriseNature))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.SupLegalEntity), (cu) => cu.ZCOMPYREL.Contains(filterCondition.SupLegalEntity))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.NatureOfUnit), (cu) => cu.ZBPNATURE.Contains(filterCondition.NatureOfUnit))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.TypeOfUnit), (cu) => cu.ZBPKINDS.Contains(filterCondition.TypeOfUnit))
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.CreateTime.ToString()), (cu) => Convert.ToDateTime(cu.CreateTime).Date == Convert.ToDateTime(filterCondition.CreateTime).Date)
+                .WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.UpdateTime.ToString()), (cu) => Convert.ToDateTime(cu.UpdateTime).Date == Convert.ToDateTime(filterCondition.UpdateTime).Date)
+                .WhereIF(!string.IsNullOrWhiteSpace(requestDto.KeyWords), cu => cu.ZBP.Contains(requestDto.KeyWords) || cu.ZBPNAME_ZH.Contains(requestDto.KeyWords))
                 .Where((cu) => cu.IsDelete == 1)
                 .Select((cu) => new CorresUnitDetailsDto
                 {
@@ -2323,9 +2350,9 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     AbroadSocialSecurityNo = cu.ZSSNO,
                     AccUnitCode = cu.ZACORGNO,
                     BRegistrationNo = cu.ZBRNO,
-                    ChangeTime = cu.ZCHAT,
+                    ChangeTime = cu.ZCHAT.ToString(),
                     CreateBy = cu.ZCRBY,
-                    CreatTime = cu.ZCRAT,
+                    CreatTime = cu.ZCRAT.ToString(),
                     DealUnitMDCode = cu.ZBP,
                     EnterpriseNature = cu.ZETPSPROPERTY,
                     IdNo = cu.ZIDNO,
@@ -2395,6 +2422,12 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                 .Select(t => new { t.ZCURRENCYCODE, t.ZCURRENCYNAME })
                 .ToListAsync();
 
+            var pjectOrgKey = corresUnitList.Select(x => x.UnitSec).ToList();
+            var pjectOrg = await _dbContext.Queryable<Institution>()
+                .Where(t => t.IsDelete == 1 && pjectOrgKey.Contains(t.OID))
+                .Select(t => new InstutionRespDto { Oid = t.OID, PoId = t.POID, Grule = t.GRULE, Name = t.NAME })
+                .ToListAsync();
+
             foreach (var item in bankList)
             {
                 //币种
@@ -2433,6 +2466,15 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
 
                 //银行账号
                 item.BankList = bankList.Where(x => x.DealUnitCode == item.DealUnitMDCode).ToList();
+
+                //所属二级单位
+                item.UnitSec = GetInstitutionName(item.UnitSec, pjectOrg);
+
+                item.CreatTime = GetDateDay(item.CreatTime);
+                item.ChangeTime = GetDateDay(item.ChangeTime);
+
+                //企业性质
+                item.EnterpriseNature = GetValueDomain(item.EnterpriseNature, valDomain, "ZETPSPROPERTY");
             }
 
             #endregion
@@ -2450,46 +2492,46 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
         {
             var responseAjaxResult = new ResponseAjaxResult<CorresUnitDetailsDto>();
 
-            var result = await _dbContext.Queryable<CorresUnit>()
-                .Where((cu) => cu.IsDelete == 1 && cu.Id.ToString() == id)
-                .Select((cu) => new CorresUnitDetailsDto
-                {
-                    CategoryUnit = cu.ZBPTYPE,
-                    City = cu.ZCITY,
-                    Country = cu.ZZCOUNTRY,
-                    Name = cu.ZBPNAME_ZH,
-                    NameEnglish = cu.ZBPNAME_EN,
-                    NameInLLanguage = cu.ZBPNAME_LOC,
-                    County = cu.ZCOUNTY,
-                    NatureOfUnit = cu.ZBPNATURE,
-                    Province = cu.ZPROVINCE,
-                    TypeOfUnit = cu.ZBPKINDS,
-                    AbroadRegistrationNo = cu.ZOSRNO,
-                    AbroadSocialSecurityNo = cu.ZSSNO,
-                    AccUnitCode = cu.ZACORGNO,
-                    BRegistrationNo = cu.ZBRNO,
-                    ChangeTime = cu.ZCHAT,
-                    CreateBy = cu.ZCRBY,
-                    CreatTime = cu.ZCRAT,
-                    DealUnitMDCode = cu.ZBP,
-                    EnterpriseNature = cu.ZETPSPROPERTY,
-                    IdNo = cu.ZIDNO,
-                    IsGroupUnit = cu.ZINCLIENT,
-                    ModifiedBy = cu.ZCHBY,
-                    OrgCode = cu.ZOIBC,
-                    OrgMDCode = cu.ZORG,
-                    RegistrationNo = cu.ZUSCC,
-                    SourceSystem = cu.ZSYSTEM,
-                    SupLegalEntity = cu.ZCOMPYREL,
-                    TaxpayerIdentifyNo = cu.ZTRNO,
-                    UnitSec = cu.Z2NDORG,
-                    StatusOfUnit = cu.ZBPSTATE == "01" ? "有效" : "无效",
-                    CreateTime = cu.CreateTime,
-                    UpdateTime = cu.UpdateTime
-                })
-                 .FirstAsync();
+            //var result = await _dbContext.Queryable<CorresUnit>()
+            //    .Where((cu) => cu.IsDelete == 1 && cu.Id.ToString() == id)
+            //    .Select((cu) => new CorresUnitDetailsDto
+            //    {
+            //        CategoryUnit = cu.ZBPTYPE,
+            //        City = cu.ZCITY,
+            //        Country = cu.ZZCOUNTRY,
+            //        Name = cu.ZBPNAME_ZH,
+            //        NameEnglish = cu.ZBPNAME_EN,
+            //        NameInLLanguage = cu.ZBPNAME_LOC,
+            //        County = cu.ZCOUNTY,
+            //        NatureOfUnit = cu.ZBPNATURE,
+            //        Province = cu.ZPROVINCE,
+            //        TypeOfUnit = cu.ZBPKINDS,
+            //        AbroadRegistrationNo = cu.ZOSRNO,
+            //        AbroadSocialSecurityNo = cu.ZSSNO,
+            //        AccUnitCode = cu.ZACORGNO,
+            //        BRegistrationNo = cu.ZBRNO,
+            //        ChangeTime = cu.ZCHAT,
+            //        CreateBy = cu.ZCRBY,
+            //        CreatTime = cu.ZCRAT,
+            //        DealUnitMDCode = cu.ZBP,
+            //        EnterpriseNature = cu.ZETPSPROPERTY,
+            //        IdNo = cu.ZIDNO,
+            //        IsGroupUnit = cu.ZINCLIENT,
+            //        ModifiedBy = cu.ZCHBY,
+            //        OrgCode = cu.ZOIBC,
+            //        OrgMDCode = cu.ZORG,
+            //        RegistrationNo = cu.ZUSCC,
+            //        SourceSystem = cu.ZSYSTEM,
+            //        SupLegalEntity = cu.ZCOMPYREL,
+            //        TaxpayerIdentifyNo = cu.ZTRNO,
+            //        UnitSec = cu.Z2NDORG,
+            //        StatusOfUnit = cu.ZBPSTATE == "01" ? "有效" : "无效",
+            //        CreateTime = cu.CreateTime,
+            //        UpdateTime = cu.UpdateTime
+            //    })
+            //     .FirstAsync();
 
-            responseAjaxResult.SuccessResult(result);
+            //responseAjaxResult.SuccessResult(result);
             return responseAjaxResult;
         }
         /// <summary>
@@ -5780,7 +5822,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
             FiledColumnsPermissionDto filedColumns = new();
 
             var result = await _dbContext.Queryable<SearchFiledColumnsPermission>()
-                  .Where(t => t.IsDelete == 1 && t.Id.ToString() == id)
+                  .Where(t => t.IsDelete == 1 && t.InterfaceId.ToString() == id)//后续扩展 租户id
                   .Select(t => new
                   {
                       t.FiledColumns,
