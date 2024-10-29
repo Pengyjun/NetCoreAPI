@@ -1,0 +1,6 @@
+@HNKC.Services.Admin.Api_HostAddress = http://localhost:5124
+
+GET {{HNKC.Services.Admin.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
