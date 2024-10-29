@@ -5769,6 +5769,82 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
 
             return responseAjaxResult;
         }
+        /// <summary>
+        /// 获取接口展示字段列
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<ResponseAjaxResult<FiledColumnsPermissionDto>> GetSearchFiledColumnsAsync(string id)
+        {
+            ResponseAjaxResult<FiledColumnsPermissionDto> responseAjaxResult = new();
+            FiledColumnsPermissionDto filedColumns = new();
+
+            var result = await _dbContext.Queryable<SearchFiledColumnsPermission>()
+                  .Where(t => t.IsDelete == 1 && t.Id.ToString() == id)
+                  .Select(t => new
+                  {
+                      t.FiledColumns,
+                      t.Id,
+                      t.InterfaceId
+                  })
+                  .FirstAsync();
+
+            if (result != null)
+            {
+                filedColumns.FiledColumns = result.FiledColumns;
+                filedColumns.Id = result.Id.ToString();
+                filedColumns.InterfaceId = result.InterfaceId.ToString();
+            }
+
+            responseAjaxResult.SuccessResult(filedColumns);
+            return responseAjaxResult;
+        }
+        /// <summary>
+        /// 增改接口字段展示列
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        public async Task<ResponseAjaxResult<bool>> AddOrModifyPeermissionAsync(FiledColumnsPermissionDto requestDto)
+        {
+            ResponseAjaxResult<bool> responseAjaxResult = new();
+
+            if (requestDto != null)
+            {
+                if (string.IsNullOrWhiteSpace(requestDto.Id))//新增
+                {
+                    SearchFiledColumnsPermission result = new();
+                    result.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
+                    result.InterfaceId = requestDto.InterfaceId;
+                    result.FiledColumns = requestDto.FiledColumns;
+                    //result.Tenant = ;//租户
+
+                    await _dbContext.Insertable(result).ExecuteCommandAsync();
+                    responseAjaxResult.SuccessResult(true);
+                }
+                else
+                {
+                    SearchFiledColumnsPermission result = await _dbContext.Queryable<SearchFiledColumnsPermission>()
+                       .Where(t => t.IsDelete == 1 && t.Id.ToString() == requestDto.Id)
+                       .FirstAsync();
+                    if (result != null)
+                    {
+                        result.FiledColumns = requestDto.FiledColumns;
+
+                        await _dbContext.Updateable(result).ExecuteCommandAsync();
+                        responseAjaxResult.SuccessResult(true);
+                    }
+                    else
+                    {
+                        responseAjaxResult.Fail();
+                    }
+                }
+            }
+            else
+            {
+                responseAjaxResult.Fail();
+            }
+            return responseAjaxResult;
+        }
         #region 条件筛选格式数据
         /// <summary>
         /// 
