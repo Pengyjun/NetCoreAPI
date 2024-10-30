@@ -17,6 +17,7 @@ using NPOI.SS.Formula.Functions;
 using SqlSugar;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
 using UtilsSharp;
 using Models = GHMonitoringCenterApi.Domain.Models;
 
@@ -130,8 +131,15 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             //获取当前项目所有的月报存在的wbsid  不包含的wbsid 全部去掉
             var mpWbsIds = await _dbContext.Queryable<MonthReportDetail>().Where(x => x.IsDelete == 1 && x.ProjectId == projectId).Select(x => x.ProjectWBSId).ToListAsync();
 
-            //转换wbs树
+            if (!dayRep)
+            {
+                //如果是日报作为累计数  还要加上日报中的wbs
+                var dWbsIds = mReportList.Where(x => x.IsDayRep == true).Select(x => x.ProjectWBSId).Distinct().ToList();
+                mpWbsIds.AddRange(dWbsIds);
+                mpWbsIds = mpWbsIds.Distinct().ToList();
+            }
 
+            //转换wbs树
             var pWbsTree = BuildTree("0", wbsList, mpWbsIds, mReportList, yReportList, klReportList, bData);
 
             return pWbsTree;
@@ -505,7 +513,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 #region 如果是需要取日报的数据 如果月报中包含日报的资源数据 本月月报即使没有填 也要放开进行累加
                 if (!dayRep)
                 {
-                    foreach (var item in endHandleList) 
+                    foreach (var item in endHandleList)
                     {
                         var model = dayRepList.Where(t => t.DateMonth == dateMonth && t.ProjectId == item.ProjectId && t.ShipId == item.ShipId && t.UnitPrice == item.UnitPrice && t.ProjectWBSId == item.ProjectWBSId).FirstOrDefault();
                         if (model != null)
