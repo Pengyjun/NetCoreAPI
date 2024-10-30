@@ -402,6 +402,18 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.IService.ISearchService
         /// <returns></returns>
         Task<ResponseAjaxResult<List<DHMdmManagementOrgage>>> GetDHMdmMultOrgAgencyRelPageAsync(FilterCondition requestDto);
         /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="Id"></param>
+        /// <returns></returns>
+        Task<ResponseAjaxResult<FiledColumnsPermissionDto>> GetSearchFiledColumnsAsync(string Id);
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        Task<ResponseAjaxResult<bool>> AddOrModifyPeermissionAsync(FiledColumnsPermissionDto requestDto);
+        /// <summary>
         /// 通用字典数据
         /// </summary>
         /// <param name="type"></param>

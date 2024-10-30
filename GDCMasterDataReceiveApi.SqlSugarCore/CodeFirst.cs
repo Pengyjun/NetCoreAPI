@@ -90,7 +90,7 @@ namespace GDCMasterDataReceiveApi.SqlSugarCore
                 };
             });
             Type[] types = typeof(BaseEntity<long>).Assembly.GetTypes()
-            .Where(it =>it.FullName.Contains("DHMdmMultOrgAgencyRelPage")
+            .Where(it =>it.FullName.Contains("SearchFiledColumnsPermission")
             )
             .ToArray();
             db.CodeFirst.InitTables(types);

@@ -706,7 +706,28 @@ namespace GDCMasterDataReceiveApi.Controller
         {
             return await _searchService.GetDHMdmMultOrgAgencyRelPageAsync(requestDto);
         }
-
+        /// <summary>
+        /// 获取接口展示字段列
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet("GetSearchFiledColumns")]
+        [AllowAnonymous]
+        public async Task<ResponseAjaxResult<FiledColumnsPermissionDto>> GetSearchFiledColumnsAsync([FromQuery] string id)
+        {
+            return await _searchService.GetSearchFiledColumnsAsync(id);
+        }
+        /// <summary>
+        /// 增改接口字段展示列
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        [HttpPost("AddOrModifyPeermission")]
+        [AllowAnonymous]
+        public async Task<ResponseAjaxResult<bool>> AddOrModifyPeermissionAsync([FromBody] FiledColumnsPermissionDto requestDto)
+        {
+            return await _searchService.AddOrModifyPeermissionAsync(requestDto);
+        }
         /// <summary>
         /// 条件筛选列
         /// </summary>

@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using GDCMasterDataReceiveApi.Application.Contracts.Dto.BankCard;
+using System.ComponentModel;
 
 namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.CorresUnit
 {
@@ -141,6 +142,11 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.CorresUnit
         [DisplayName("境外社保号/ID")]
         public string? AbroadSocialSecurityNo { get; set; }
         /// <summary>
+        /// 银行账号列表
+        /// </summary>
+        [DisplayName("银行账号列表")]
+        public List<BankCardDetailsDto>? BankList { get; set; }
+        /// <summary>
         /// 国家/地区:往来单位所在国家/地区
         /// </summary>
         [DisplayName("国家/地区")]
@@ -189,7 +195,7 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.CorresUnit
         /// 创建时间:格式：20230324121212
         /// </summary>
         [DisplayName("创建时间")]
-        public decimal CreatTime { get; set; }
+        public string? CreatTime { get; set; }
         /// <summary>
         /// 创建人:4A人员编码
         /// </summary>
@@ -199,7 +205,7 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.CorresUnit
         /// 修改时间:格式：20230324121212
         /// </summary>
         [DisplayName("修改时间")]
-        public decimal ChangeTime { get; set; }
+        public string? ChangeTime { get; set; }
         /// <summary>
         /// 修改人:4A人员编码
         /// </summary>
@@ -226,7 +232,7 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.CorresUnit
         /// <summary>
         /// 发送记录ID 发送记录的ID，必须保证此ID在同一个发送批次中是唯一的。用于记录发送方对于此发送记录的唯一标识。
         /// </summary>
-        public  long? Id { get; set; }
+        public long? Id { get; set; }
         /// <summary>
         /// 往来单位主数据编码:公司往来单位的唯一编码
         /// </summary>
@@ -350,7 +356,7 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.CorresUnit
         /// <summary>
         /// 银行账号
         /// </summary>
-        public BankItem? ZBANK {  get; set; }
+        public BankItem? ZBANK { get; set; }
     }
 
     public class BankItem
