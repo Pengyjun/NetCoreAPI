@@ -331,6 +331,15 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.Institution
         /// 排序字段
         /// </summary>
         public string? Sno { get; set; }
+
+        /// <summary>
+        /// 编码
+        /// </summary>
+        public string OCode { get; set; }
+        /// <summary>
+        /// 状态
+        /// </summary>
+        public string Status { get; set; }
         /// <summary>
         /// 子集
         /// </summary>
@@ -347,6 +356,14 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.Institution
         public long Id { get; set; }
         public string? GRULE { get; set; }
         public string? NAME { get; set; }
+        /// <summary>
+        /// 编码
+        /// </summary>
+        public string OCode { get; set; }
+        /// <summary>
+        /// 状态
+        /// </summary>
+        public string Status { get; set; }
     }
 
     ///// <summary>

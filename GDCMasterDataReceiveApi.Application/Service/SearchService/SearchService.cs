@@ -38,6 +38,8 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using SqlSugar;
 using System.Data;
+using System.Linq;
+using System.Net;
 using System.Reflection;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
@@ -1028,7 +1030,11 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
             }
 
             var tableList = await _dbContext.Queryable<Institution>()
-                .Select(t => new InstitutionConvertDto { GPOID = t.GPOID, OID = t.OID, SHORTNAME = t.SHORTNAME, IsDelete = t.IsDelete, SNO = t.SNO, Id = t.Id, GRULE = t.GRULE, NAME = t.NAME })
+                .Where(x=>x.IsDelete==1&&x.STATUS=="1")
+                .Select(t => new InstitutionConvertDto { GPOID = t.GPOID, OID = t.OID, SHORTNAME = t.SHORTNAME, IsDelete = t.IsDelete,
+                     OCode=t.OCODE,
+                      Status=t.STATUS,
+                    SNO = t.SNO, Id = t.Id, GRULE = t.GRULE, NAME = t.NAME })
                 .ToListAsync();
 
             #region 初始查询
@@ -1084,7 +1090,10 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                 {
                     Gpoid = ins.GPOID,
                     Oid = ins.OID,
-                    ShortName = ins.SHORTNAME
+                    ShortName = ins.SHORTNAME,
+                     Status=ins.Status,
+                      OCode=ins.OCode,
+                     Sno=ins.SNO,
                 })
             .ToList();
 
@@ -1096,6 +1105,9 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     Gpoid = ins.GPOID,
                     Oid = ins.OID,
                     ShortName = ins.SHORTNAME,
+                    Status = ins.Status,
+                    OCode = ins.OCode,
+                    Sno = ins.SNO,
                     Children = GetInstitutionTreeChild(ins.OID, otherNodes)
                 })
                 .FirstOrDefault();
@@ -1114,11 +1126,15 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
             // 查找当前节点的所有子节点
             var childs = children
                 .Where(x => x.Gpoid == oid)
+                .OrderBy(x=>x.Sno)
                 .Select(child => new InstitutionResponseDto
                 {
                     Gpoid = child.Gpoid,
                     Oid = child.Oid,
                     ShortName = child.ShortName,
+                    Status = child.Status,
+                    OCode = child.OCode,
+                     Sno=child.Sno,
                     Children = GetInstitutionTreeChild(child.Oid, children)
                 })
                 .ToList();
