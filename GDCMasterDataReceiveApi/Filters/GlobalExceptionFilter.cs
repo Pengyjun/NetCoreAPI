@@ -153,7 +153,7 @@ namespace GDCMasterDataReceiveApi.Filters
                     {
                         if (context.HttpContext.Request.QueryString.HasValue && !string.IsNullOrWhiteSpace(context.HttpContext.Request.QueryString.Value))
                         {
-                            recordRequestInfo.RequestInfo.Input = context.HttpContext.Request.QueryString.Value.Replace("?", "").TrimAll();
+                            recordRequestInfo.RequestInfo = new RequestInfo() { Input = context.HttpContext.Request.QueryString.Value.Replace("?", "").TrimAll() };
 
                         }
                     }
