@@ -8276,15 +8276,15 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                         {
                             userSubs.Add(new UserSubDepts()
                             {
-                                Key = CompanyFullPath(sItem, institutions),
-                                Value = depts[index],
+                                Key = depts[index],
+                                Value = CompanyFullPath(sItem, institutions),
                             });
                         }
                         else {
                             userSubs.Add(new UserSubDepts()
                             {
-                                Key = sItem,
-                                Value = depts[index],
+                                Key = depts[index],
+                                Value = sItem,
                             });
                         }
                        index += 1;
