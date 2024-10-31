@@ -329,6 +329,11 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto._4A.User
         /// 名称
         /// </summary>
         public string? Name { get; set; }
+        /// <summary>
+        /// 名称
+        /// </summary>
+        public string? OCode { get; set; }
+
     }
     /// <summary>
     /// 值域

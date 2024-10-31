@@ -194,7 +194,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                 //机构信息
                 var institutions = await _dbContext.Queryable<Institution>()
                     .Where(t => t.IsDelete == 1)
-                    .Select(t => new InstutionRespDto { Oid = t.OID, PoId = t.POID, Grule = t.GRULE, Name = t.NAME })
+                    .Select(t => new InstutionRespDto { Oid = t.OID, PoId = t.POID, Grule = t.GRULE, Name = t.NAME,OCode=t.OCODE })
                     .ToListAsync();
 
                 //值域信息
@@ -273,8 +273,9 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     uInfo.CertType = certType.FirstOrDefault(x => x.ZDOM_VALUE == uInfo.CertType)?.ZDOM_NAME;
                     uInfo.PoliticsFace = politicsFace.FirstOrDefault(x => x.TypeNo == uInfo.PoliticsFace)?.Name;
                     //uInfo.SubDepts = string.IsNullOrWhiteSpace(uInfo.SubDepts) ? GetSubDepts(uInfo.Attribute1, institutions, valDomain, uInfo.JobName) : GetSubDepts(uInfo.SubDepts, institutions, valDomain, uInfo.JobName);
-                    uInfo.SubDeptsList = string.IsNullOrWhiteSpace(uInfo.SubDepts) ? GetSubDepts(uInfo.Attribute1, institutions, valDomain, uInfo.JobName) : GetSubDepts(uInfo.SubDepts, institutions, valDomain, uInfo.JobName);
+                    //uInfo.SubDeptsList = string.IsNullOrWhiteSpace(uInfo.SubDepts) ? GetSubDepts(uInfo.Attribute1, institutions, valDomain, uInfo.JobName) : GetSubDepts(uInfo.SubDepts, institutions, valDomain, uInfo.JobName);
 
+                    uInfo.SubDeptsList = FindUserSubDepts(uInfo.SubDepts, uInfo.Attribute1, institutions);
                 }
             }
 
@@ -8239,6 +8240,89 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
             return responseAjaxResult;
         }
         #endregion
+
+
+
+        /// <summary>
+        /// 获取用户兼职   两个参数的优先级最高的是subdepts
+        /// </summary>
+        /// <param name="subDepts"></param>
+        /// <param name="attr"></param>
+        /// <returns></returns>
+
+        private static List<UserSubDepts> FindUserSubDepts(string subDepts,string  attr,List<InstutionRespDto> institutions)
+        {
+            string[] depts = new string[] { "所在部门", "岗位类别", "职级", "岗位名称", "排序" };
+            List<UserSubDepts> userSubs = new List<UserSubDepts>();
+            List<string> mainItem = new List<string>();
+            if (!string.IsNullOrWhiteSpace(subDepts))
+            {
+                mainItem= subDepts.Split(",").ToList();
+            }
+            else if (string.IsNullOrWhiteSpace(subDepts) && !string.IsNullOrWhiteSpace(attr))
+            {
+                mainItem = attr.Split(",").ToList();
+            
+            }
+            if (mainItem.Count > 0)
+            {
+                var index = 0;
+                foreach (var mItem in mainItem)
+                {
+                    var subItem = mItem.Split("|").ToList();
+                    foreach (var sItem in subItem)
+                    {
+                        if (index == 0)
+                        {
+                            userSubs.Add(new UserSubDepts()
+                            {
+                                Key = CompanyFullPath(sItem, institutions),
+                                Value = depts[index],
+                            });
+                        }
+                        else {
+                            userSubs.Add(new UserSubDepts()
+                            {
+                                Key = sItem,
+                                Value = depts[index],
+                            });
+                        }
+                       index += 1;
+                    }
+                    index = 0;
+                }
+            }
+            return userSubs;
+        }
+        /// <summary>
+        /// 获取公司全路径
+        /// </summary>
+        /// <param name="oid"></param>
+        /// <param name="institutions"></param>
+        /// <returns></returns>
+        private static string CompanyFullPath(string oid,List<InstutionRespDto> institutions)
+        {
+           var inst= institutions.Where(x => x.Oid == oid).FirstOrDefault();
+            if (inst != null)
+            {
+                var oruleList = inst?.Grule?.SplitStr("-").ToList();
+                if (oruleList.Count > 0)
+                {
+                    var company = institutions.Where(x =>  oruleList.Contains(x.Oid) && (
+                    (x.OCode.Contains("00000A")
+                     || x.OCode.Contains("00000B")
+                     || x.OCode.Contains("00000C")
+                     || x.OCode.Contains("00000E"))
+                    )).OrderByDescending(x => x.Oid).FirstOrDefault();
+                    if (company != null)
+                    {
+                      var res=  institutions.Where(x => oruleList.Contains(x.Oid)).OrderBy(x => x.Oid).Select(x =>x.Name).ToList();
+                      return  string.Join("/", res.Select(x=>x));
+                    }
+                }
+            }
+            return string.Empty;
+        }
     }
 }
 
