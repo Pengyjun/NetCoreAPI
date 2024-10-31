@@ -279,5 +279,8 @@ namespace GDCMasterDataReceiveApi.Application
 
             return responseAjaxResult;
         }
+
+
+
     }
 }

@@ -65,6 +65,10 @@
         /// 请求参数
         /// </summary>
         public RequestInfo  RequestInfo { get; set; }
+        /// <summary>
+        /// 请求头
+        /// </summary>
+        public RequestHeads  RequestHeads { get; set; }
 
         /// <summary>
         /// 请求路由
@@ -105,10 +109,28 @@
     /// </summary>
     public class RequestInfo 
     {
+        
         /// <summary>
         /// 请求接口入参
         /// </summary>
         public string? Input { get; set; }
+    }
+    #endregion
+
+    #region 请求头参数
+    /// <summary>
+    /// 请求头参数
+    /// </summary>
+    public class RequestHeads {
+
+        /// <summary>
+        /// 请求头AppKey
+        /// </summary>
+        public string? AppKey { get; set; }
+        /// <summary>
+        /// 请求头AppinterfaceCode
+        /// </summary>
+        public string? AppinterfaceCode { get; set; }
     }
     #endregion
 

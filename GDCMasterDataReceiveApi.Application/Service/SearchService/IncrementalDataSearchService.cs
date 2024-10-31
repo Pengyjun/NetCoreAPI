@@ -1,9 +1,19 @@
-﻿using GDCMasterDataReceiveApi.Application.Contracts.Dto;
+﻿using GDCDataSecurityApi.Application.Contracts.Dto.IncrementalData;
+using GDCInterfaceApi.Application.Contracts.Dto.IncrementalData;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.CorresUnit;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.IncrementalData;
 using GDCMasterDataReceiveApi.Application.Contracts.IService.ISearchService;
 using GDCMasterDataReceiveApi.Domain.Models;
 using GDCMasterDataReceiveApi.Domain.Shared;
 using GDCMasterDataReceiveApi.Domain.Shared.Utils;
+using Newtonsoft.Json;
 using SqlSugar;
+using SqlSugar.Extensions;
+using System.Collections.Generic;
+using System.Linq.Expressions;
+using System.Security.Cryptography;
+using UtilsSharp;
 
 namespace GDCMasterDataReceiveApi.Application.Service.SearchService
 {
@@ -12,6 +22,8 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
     /// </summary>
     public class IncrementalDataSearchService : IIncrementalDataSearchService
     {
+
+        #region 依赖注入
         private readonly ISqlSugarClient _dbContext;
         /// <summary>
         /// 
@@ -21,6 +33,8 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
         {
             this._dbContext = dbContext;
         }
+        #endregion
+
         /// <summary>
         /// 公用值
         /// </summary>
@@ -107,6 +121,373 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
             };
 
             responseAjaxResult.SuccessResult(result);
+            return responseAjaxResult;
+        }
+
+
+        #endregion
+
+        #region 首页统计主数据数量
+        /// <summary>
+        /// 首页统计主数据数量
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        public async Task<ResponseAjaxResult<EachMainDataCountResponseDto>> SearchEachMainDataCountAsync()
+        {
+            ResponseAjaxResult<EachMainDataCountResponseDto> responseAjaxResult = new ResponseAjaxResult<EachMainDataCountResponseDto>();
+            var personCount = await _dbContext.Queryable<User>().Where(x => x.IsDelete == 1).CountAsync();
+            var institutionCount = await _dbContext.Queryable<Institution>().Where(x => x.IsDelete == 1).CountAsync();
+            var corresUnitCount = await _dbContext.Queryable<CorresUnit>().Where(x => x.IsDelete == 1).CountAsync();
+            var projectCount = await _dbContext.Queryable<Project>().Where(x => x.IsDelete == 1).CountAsync();
+            var financialInstitutionCount = await _dbContext.Queryable<FinancialInstitution>().Where(x => x.IsDelete == 1).CountAsync();
+            var deviceClassCodeCount = await _dbContext.Queryable<DeviceClassCode>().Where(x => x.IsDelete == 1).CountAsync();
+            var scientifiCNoProjectCount = await _dbContext.Queryable<ScientifiCNoProject>().Where(x => x.IsDelete == 1).CountAsync();
+            var businessNoCpportunityCount = await _dbContext.Queryable<BusinessCpportunity>().Where(x => x.IsDelete == 1).CountAsync();
+            EachMainDataCountResponseDto eachMainDataCountResponseDto = new EachMainDataCountResponseDto()
+            {
+                MainBusinessNoCpportunityCount = businessNoCpportunityCount,
+                MainCorresUnitCount = corresUnitCount,
+                MainDeviceClassCodeCount = deviceClassCodeCount,
+                MainFinancialInstitutionCount = financialInstitutionCount,
+                MainInstitutionCount = institutionCount,
+                MainPersonCount = personCount,
+                MainProjectCount = projectCount,
+                MainScientifiCNoProjectCount = scientifiCNoProjectCount
+            };
+            responseAjaxResult.Count = 1;
+            responseAjaxResult.Data = eachMainDataCountResponseDto;
+            responseAjaxResult.Success();
+            return responseAjaxResult;
+        }
+        #endregion
+
+
+        #region  首页各个公司主数据统计数量
+        /// <summary>
+        /// 首页各个公司主数据统计数量
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        public async Task<ResponseAjaxResult<List<EachCompanyMainDataCountResponseDto>>> SearchEachCompanyMainDataCountAsync(int type)
+        {
+            ResponseAjaxResult<List<EachCompanyMainDataCountResponseDto>> responseAjaxResult = new ResponseAjaxResult<List<EachCompanyMainDataCountResponseDto>>();
+            List<EachCompanyMainDataCountResponseDto> eachCompanyMainDataCountResponseDtos = new List<EachCompanyMainDataCountResponseDto>();
+            var companyList = new CommonData().InitCompany();
+            //获取机构数据
+            var institutionList = await _dbContext.Queryable<Institution>().Where(x => x.IsDelete == 1 && x.STATUS == "1")
+                .Select(x => new InstitutionTree()
+                {
+                    Oid = x.OID,
+                    POid = x.POID,
+                    ShortName = x.SHORTNAME,
+                    Name = x.NAME,
+                    Sno = x.SNO,
+                    GPoid = x.GPOID
+                }).ToListAsync();
+            #region 人员数量
+            if (type == 1)
+            {
+                //获取人员数据
+                var userList = await _dbContext.Queryable<User>().Where(x => x.IsDelete == 1).ToListAsync();
+                foreach (var item in companyList)
+                {
+                    var oids = new ListToTreeUtil().GetAllNodes(item.Key, institutionList);
+                    var userCount = userList.Where(x => oids.Contains(x.OFFICE_DEPID)).Count();
+                    EachCompanyMainDataCountResponseDto eachCompanyMainDataCountResponseDto = new EachCompanyMainDataCountResponseDto()
+                    {
+                        Type = type,
+                        ConpanyName = item.Value,
+                        XAxis = item.Value,
+                        YAxis = userCount
+                    };
+                    eachCompanyMainDataCountResponseDtos.Add(eachCompanyMainDataCountResponseDto);
+                }
+
+            }
+            #endregion
+
+            #region 机构数量
+            if (type == 2)
+            {
+                foreach (var item in companyList)
+                {
+                    var oids = new ListToTreeUtil().GetAllNodes(item.Key, institutionList);
+                    EachCompanyMainDataCountResponseDto eachCompanyMainDataCountResponseDto = new EachCompanyMainDataCountResponseDto()
+                    {
+                        Type = type,
+                        ConpanyName = item.Value,
+                        XAxis = item.Value,
+                        YAxis = oids.Count
+                    };
+                    eachCompanyMainDataCountResponseDtos.Add(eachCompanyMainDataCountResponseDto);
+                }
+
+            }
+            #endregion
+
+            #region 项目数量
+            if (type == 3)
+            {
+                //获取机构数据
+                var projectList = await _dbContext.Queryable<Project>().Where(x => x.IsDelete == 1)
+                    .ToListAsync();
+                foreach (var item in companyList)
+                {
+                    var oids = new ListToTreeUtil().GetAllNodes(item.Key, institutionList);
+                    var userCount = projectList.Where(x => oids.Contains(x.ZPRO_ORG)).Count();
+                    EachCompanyMainDataCountResponseDto eachCompanyMainDataCountResponseDto = new EachCompanyMainDataCountResponseDto()
+                    {
+                        Type = type,
+                        ConpanyName = item.Value,
+                        XAxis = item.Value,
+                        YAxis = userCount
+                    };
+                    eachCompanyMainDataCountResponseDtos.Add(eachCompanyMainDataCountResponseDto);
+                }
+
+            }
+            #endregion
+
+            responseAjaxResult.Data = eachCompanyMainDataCountResponseDtos.OrderBy(x => x.Type).ToList();
+            responseAjaxResult.Count = eachCompanyMainDataCountResponseDtos.Count;
+            responseAjaxResult.Success();
+            return responseAjaxResult;
+        }
+
+
+        #endregion
+
+
+        #region 首页各个主数据增长数量
+        /// <summary>
+        /// 首页各个主数据增长数量
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        public async Task<ResponseAjaxResult<List<EachMainDataCountResponseDto>>> SearchEachDayMainDataCountAsync(string timeStr, string timeEnd)
+        {
+            ResponseAjaxResult<List<EachMainDataCountResponseDto>> responseAjaxResult = new ResponseAjaxResult<List<EachMainDataCountResponseDto>>();
+            List<EachMainDataCountResponseDto> eachMainDataCountResponseDtos = new List<EachMainDataCountResponseDto>();
+            DateTime startTime = default(DateTime);
+            DateTime endTime = default(DateTime);
+
+            if (string.IsNullOrWhiteSpace(timeStr) || string.IsNullOrWhiteSpace(timeEnd))
+            {
+                startTime = DateTime.Now.AddDays(-6);
+                endTime = DateTime.Now;
+            }
+            else
+            {
+                startTime = Convert.ToDateTime(timeStr);
+                endTime = Convert.ToDateTime(timeStr);
+            }
+            var personCount = await _dbContext.Queryable<User>().Where(x => x.IsDelete == 1
+            && SqlFunc.ToDate(x.CreateTime) >= startTime && SqlFunc.ToDate(x.CreateTime) <= endTime).ToListAsync();
+
+
+            var institutionCount = await _dbContext.Queryable<Institution>().Where(x => x.IsDelete == 1
+            && SqlFunc.ToDate(x.CreateTime) >= startTime && SqlFunc.ToDate(x.CreateTime) <= endTime).ToListAsync();
+
+            List<CorresUnitDetailsDto> corresUnitCount = new List<CorresUnitDetailsDto>();
+            var redis = RedisUtil.Instance;
+            var res = redis.Get("corresUnitCount");
+            if (!string.IsNullOrWhiteSpace(res))
+            {
+                corresUnitCount = JsonConvert.DeserializeObject<List<CorresUnitDetailsDto>>(res);
+            }
+            else
+            {
+                corresUnitCount = await _dbContext.Queryable<CorresUnit>().Where(x => x.IsDelete == 1
+              && SqlFunc.ToDate(x.CreateTime) >= startTime && SqlFunc.ToDate(x.CreateTime) <= endTime).Select(x => new CorresUnitDetailsDto { CreateTime = x.CreateTime }).ToListAsync();
+                try
+                {
+                    redis.Set("corresUnitCount", corresUnitCount, 60 * 30);
+                }
+                catch (Exception ex)
+                {
+                    await Console.Out.WriteLineAsync($"出现异常:{ex}");
+
+                }
+
+            }
+
+
+            var projectCount = await _dbContext.Queryable<Project>().Where(x => x.IsDelete == 1
+            && SqlFunc.ToDate(x.CreateTime) >= startTime && SqlFunc.ToDate(x.CreateTime) <= endTime).ToListAsync();
+
+            var financialInstitutionCount = await _dbContext.Queryable<FinancialInstitution>().Where(x => x.IsDelete == 1
+            && SqlFunc.ToDate(x.CreateTime) >= startTime && SqlFunc.ToDate(x.CreateTime) <= endTime).ToListAsync();
+
+            var deviceClassCodeCount = await _dbContext.Queryable<DeviceClassCode>().Where(x => x.IsDelete == 1
+            && SqlFunc.ToDate(x.CreateTime) >= startTime && SqlFunc.ToDate(x.CreateTime) <= endTime).ToListAsync();
+
+            var scientifiCNoProjectCount = await _dbContext.Queryable<ScientifiCNoProject>().Where(x => x.IsDelete == 1
+            && SqlFunc.ToDate(x.CreateTime) >= startTime && SqlFunc.ToDate(x.CreateTime) <= endTime).ToListAsync();
+
+            var businessNoCpportunityCount = await _dbContext.Queryable<BusinessCpportunity>().Where(x => x.IsDelete == 1
+            && SqlFunc.ToDate(x.CreateTime) >= startTime && SqlFunc.ToDate(x.CreateTime) <= endTime).ToListAsync();
+
+            for (int i = 0; i < 7; i++)
+            {
+                var startTimeStr = Convert.ToDateTime(endTime.ObjToDate().AddDays(-i).ToString("yyyy-MM-dd 00:00:00.000001"));
+                var endTimeStr = Convert.ToDateTime(endTime.AddDays(-i).ToString("yyyy-MM-dd 23:59:59.999999"));
+
+                EachMainDataCountResponseDto eachMainDataCountResponseDto = new EachMainDataCountResponseDto()
+                {
+                    Day = startTimeStr.ToString("yyyy-MM-dd"),
+                    MainBusinessNoCpportunityCount = businessNoCpportunityCount.Where(x => SqlFunc.ToDate(x.CreateTime) >= startTimeStr && SqlFunc.ToDate(x.CreateTime) <= endTimeStr).Count(),
+                    MainCorresUnitCount = corresUnitCount.Where(x => SqlFunc.ToDate(x.CreateTime) >= startTimeStr && SqlFunc.ToDate(x.CreateTime) <= endTimeStr).Count(),
+                    MainDeviceClassCodeCount = deviceClassCodeCount.Where(x => SqlFunc.ToDate(x.CreateTime) >= startTimeStr && SqlFunc.ToDate(x.CreateTime) <= endTimeStr).Count(),
+                    MainFinancialInstitutionCount = financialInstitutionCount.Where(x => SqlFunc.ToDate(x.CreateTime) >= startTimeStr && SqlFunc.ToDate(x.CreateTime) <= endTimeStr).Count(),
+                    MainInstitutionCount = institutionCount.Where(x => SqlFunc.ToDate(x.CreateTime) >= startTimeStr && SqlFunc.ToDate(x.CreateTime) <= endTimeStr).Count(),
+                    MainPersonCount = personCount.Where(x => SqlFunc.ToDate(x.CreateTime) >= startTimeStr && SqlFunc.ToDate(x.CreateTime) <= endTimeStr).Count(),
+                    MainProjectCount = projectCount.Where(x => SqlFunc.ToDate(x.CreateTime) >= startTimeStr && SqlFunc.ToDate(x.CreateTime) <= endTimeStr).Count(),
+                    MainScientifiCNoProjectCount = scientifiCNoProjectCount.Where(x => SqlFunc.ToDate(x.CreateTime) >= startTimeStr && SqlFunc.ToDate(x.CreateTime) <= endTimeStr).Count(),
+                };
+                eachMainDataCountResponseDtos.Add(eachMainDataCountResponseDto);
+            }
+            responseAjaxResult.Count = eachMainDataCountResponseDtos.Count();
+            responseAjaxResult.Data = eachMainDataCountResponseDtos;
+            responseAjaxResult.Success();
+            return responseAjaxResult;
+        }
+        #endregion
+
+
+        #region 首页API统计
+        /// <summary>
+        /// 首页API统计
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        public async Task<ResponseAjaxResult<List<EachAPIInterdaceCountResponseDto>>> SearchCallInterfaceCountAsync(string timeStr, string timeEnd, int type)
+        {
+            ResponseAjaxResult<List<EachAPIInterdaceCountResponseDto>> responseAjaxResult = new ResponseAjaxResult<List<EachAPIInterdaceCountResponseDto>>();
+            List<EachAPIInterdaceCountResponseDto> eachMainDataCountResponseDtos = new List<EachAPIInterdaceCountResponseDto>();
+
+            #region 基本参数
+            DateTime startTime = default(DateTime);
+            DateTime endTime = default(DateTime);
+            if (string.IsNullOrWhiteSpace(timeStr) || string.IsNullOrWhiteSpace(timeEnd))
+            {
+                startTime = DateTime.Now.AddDays(-6);
+                endTime = DateTime.Now;
+            }
+            else
+            {
+                startTime = Convert.ToDateTime(timeStr);
+                endTime = Convert.ToDateTime(timeStr);
+            }
+            #endregion
+
+            //按接口
+            var auditLogList = await _dbContext.Queryable<AuditLogs>()
+                .Where(x => x.AppKey!=null
+                 && SqlFunc.ToDate(x.RequestTime) >= startTime && SqlFunc.ToDate(x.RequestTime) <= endTime)
+                .ToListAsync();
+            if (auditLogList.Count > 0)
+            {
+                int max = 0;
+                if (type ==1)
+                {
+                    max = 7;
+                }
+                else {
+                    max = auditLogList.Select(x => x.AppKey).Distinct().Count();
+                }
+                for (var i = 0; i < max; i++)
+                {
+                    var startTimeStr = Convert.ToDateTime(endTime.ObjToDate().AddDays(-i).ToString("yyyy-MM-dd 00:00:00.000001"));
+                    var endTimeStr = Convert.ToDateTime(endTime.AddDays(-i).ToString("yyyy-MM-dd 23:59:59.999999"));
+
+                    #region http请求获取接口信息数据
+                    var systemUrl = AppsettingsHelper.GetValue("API:SystemInfo");
+                    var interfaceUrl = AppsettingsHelper.GetValue("API:SystemInterfaceInfo");
+                    WebHelper webHelper = new WebHelper();
+                    var responseSystem = await webHelper.DoGetAsync<ResponseAjaxResult<List<SystemResponseDto>>>(systemUrl);
+                    Dictionary<string, object> parames = new Dictionary<string, object>();
+                    parames.Add("keyWords", "B1C548CD-EFB0-4BC3-9224-877CA5A2715C");
+                    var responseInterface = await webHelper.DoGetAsync<ResponseAjaxResult<List<DataInterfaceResponseDto>>>(interfaceUrl, parames);
+                    var systemApiList = new List<SystemResponseDto>();
+                    var systemINterfaceApiList = new List<DataInterfaceResponseDto>();
+                    try
+                    {
+                        systemApiList = responseSystem.Result.Data;
+                        systemINterfaceApiList = responseInterface.Result.Data;
+                    }
+                    catch (Exception ex)
+                    {
+
+
+                    }
+                    #endregion
+
+                    List<EachAPIInterdaceItem> eachMainDataCountResponseDto = new List<EachAPIInterdaceItem>(); ;
+                    var systemName = string.Empty;
+                    foreach (var item in auditLogList)
+                    {
+
+                        var count = auditLogList.Where(x => SqlFunc.ToDate(x.RequestTime) >= startTimeStr
+                        && SqlFunc.ToDate(x.RequestTime) <= endTimeStr
+                        && x.AppKey == item.AppKey
+                        && x.AppinterfaceCode == item.AppinterfaceCode)
+                        .Count();
+
+                         systemName = systemApiList.Where(x => x.AppKey == item.AppKey).Select(x => x.SystemName).FirstOrDefault();
+                        var interfaceName = systemINterfaceApiList.Where(x => x.AppinterfaceCode == item.AppinterfaceCode).Select(x => x.InterfaceName).FirstOrDefault();
+                        if (type == 1)
+                        {
+                            var key = $"{systemName}---{interfaceName}";
+                            if (eachMainDataCountResponseDto.Where(x => x.Name == key).Count() == 0)
+                            {
+                                eachMainDataCountResponseDto.Add(new EachAPIInterdaceItem()
+                                {
+                                    Name = key,
+                                    Value = count,
+                                });
+                            }
+                           
+                        }
+                        else if (type == 2)
+                        {
+                            var key = $"{interfaceName}";
+                            if (eachMainDataCountResponseDto.Where(x => x.Name == key).Count() == 0)
+                            {
+                                eachMainDataCountResponseDto.Add(new EachAPIInterdaceItem()
+                                {
+                                    Name = key,
+                                    Value = count,
+                                });
+                            }
+
+                        }
+                    }
+                    if (type == 1)
+                    {
+                        EachAPIInterdaceCountResponseDto eachInterdaceCountResponseDto = new EachAPIInterdaceCountResponseDto()
+                        {
+                            XAxis = startTimeStr.ToString("yyyy-MM-dd"),
+                            YAxis = eachMainDataCountResponseDto,
+
+                        };
+                        eachMainDataCountResponseDtos.Add(eachInterdaceCountResponseDto);
+                    }
+                    else if (type == 2)
+                    {
+                        EachAPIInterdaceCountResponseDto eachInterdaceCountResponseDto = new EachAPIInterdaceCountResponseDto()
+                        {
+                            XAxis = systemName,
+                            YAxis = eachMainDataCountResponseDto,
+
+                        };
+                        eachMainDataCountResponseDtos.Add(eachInterdaceCountResponseDto);
+                    }
+                }
+            }
+            responseAjaxResult.Count = eachMainDataCountResponseDtos.Count;
+            responseAjaxResult.Data = eachMainDataCountResponseDtos;
+            responseAjaxResult.Success();
             return responseAjaxResult;
         }
         #endregion

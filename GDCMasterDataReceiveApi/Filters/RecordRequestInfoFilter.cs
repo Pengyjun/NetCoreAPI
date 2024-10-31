@@ -30,6 +30,7 @@ namespace GDCMasterDataReceiveApi.Filters
             var actionDescriptor = context.ActionDescriptor as ControllerActionDescriptor;
             var method = actionDescriptor.MethodInfo;
             var httpContext = context.HttpContext;
+            RequestHeads requestHeads = new RequestHeads();
             #region 拦截验证查看接口基本信息是否允许
             var isAllowInterfaceIntercept = context.ActionDescriptor.EndpointMetadata.OfType<AllowAnonymousAttribute>().Any();
             var routeData = ((Microsoft.AspNetCore.Mvc.ControllerBase)context.Controller).ControllerContext.RouteData.Values.ToArray();
@@ -44,6 +45,8 @@ namespace GDCMasterDataReceiveApi.Filters
                 {
                     var sKey = context.HttpContext.Request.Headers[appKey].ToString();
                     var iKey = context.HttpContext.Request.Headers[appinterfaceCode].ToString();
+                    requestHeads.AppKey = sKey;
+                    requestHeads.AppinterfaceCode = iKey;
                     webHelper.Headers.Add("appKey", sKey);
                     webHelper.Headers.Add("appinterfaceCode", iKey);
                     var interfaceAuth = await webHelper.DoGetAsync<string>(interfaceAuthApi);
@@ -197,7 +200,8 @@ namespace GDCMasterDataReceiveApi.Filters
                 RequestInfo = new RequestInfo(),
                 SqlExecInfos = new List<SqlExecInfo>(),
                 BrowserInfo = new BrowserInfo(),
-                Exceptions = new Exceptions()
+                Exceptions = new Exceptions(),
+                RequestHeads = requestHeads,
             };
             var currentTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.ffffff");
             var requestMethod = context.HttpContext.Request.Method.ToUpper();

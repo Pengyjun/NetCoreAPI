@@ -43,10 +43,11 @@ namespace GDCMasterDataReceiveApi.Filters
             RecordRequestInfo recordRequestInfo = new RecordRequestInfo();
             var currentTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.ffffff");
             var routeData = ((Microsoft.AspNetCore.Mvc.ControllerBase)context.Controller).ControllerContext.RouteData.Values.ToArray();
+            var db = context.HttpContext.RequestServices.GetService<ISqlSugarClient>();
             #region 400的错误
             try
             {
-                var db = context.HttpContext.RequestServices.GetService<ISqlSugarClient>();
+                
                 ResponseAjaxResult<List<ErrorMessage>> responseAjaxResult = new();
                 //格式化请求参数错误提示0HMOVSRFRALDE:00000019
                 if (context.Result != null && context.Result.ToString().IndexOf("FileContentResult") < 0 && context.Result.ToString().IndexOf("FileStreamResult") < 0 && context.Result != null && context.Result.ToString().IndexOf("EmptyResult") < 0 && context.Result.ToString().IndexOf("ContentResult") < 0 && ((Microsoft.AspNetCore.Mvc.ObjectResult)context.Result).StatusCode == 400)
@@ -74,7 +75,7 @@ namespace GDCMasterDataReceiveApi.Filters
                     responseAjaxResult.Fail(ResponseMessage.OPERATION_PARAMETER_ERROR, HttpStatusCode.ParameterError);
                     //把400的状态吗记录到日志文件
                     #region 请求参数400记录审计日志  只记录接收集团主数据请求的错误  
-                    if (routeData.Count()>0&&routeData[1].ToString().IndexOf("Receive")>=0)
+                    if (routeData.Count() > 0 && routeData[1].ToString().IndexOf("Receive") >= 0)
                     {
                         RecordRequestInfo recordRequestInfos = new RecordRequestInfo()
                         {
@@ -123,6 +124,8 @@ namespace GDCMasterDataReceiveApi.Filters
                             Url = context.HttpContext.Request.Path,
                             ActionMethodName = ((Microsoft.AspNetCore.Mvc.Controllers.ControllerActionDescriptor)context.ActionDescriptor).ControllerName
                         };
+
+
                         if (db != null)
                         {
                             await db.Insertable<AuditLogs>(auditLogs).ExecuteCommandAsync();
@@ -143,6 +146,37 @@ namespace GDCMasterDataReceiveApi.Filters
                         ContentType = "application/json charset=utf-8"
                     };
                 }
+                else {
+
+                    var requestMethod = context.HttpContext.Request.Method.ToUpper();
+                    if (requestMethod == "GET")
+                    {
+                        if (context.HttpContext.Request.QueryString.HasValue && !string.IsNullOrWhiteSpace(context.HttpContext.Request.QueryString.Value))
+                        {
+                            recordRequestInfo.RequestInfo.Input = context.HttpContext.Request.QueryString.Value.Replace("?", "").TrimAll();
+
+                        }
+                    }
+                    else if (requestMethod == "POST")
+                    {
+                        try
+                        {
+                            if (context.HttpContext.Request.ContentType != null && context.HttpContext.Request.ContentType.IndexOf("multipart/form-data") < 0)
+                            {
+                                context.HttpContext.Request.Body.Seek(0, SeekOrigin.Begin);
+                                using (var reader = new StreamReader(context.HttpContext.Request.Body, Encoding.UTF8))
+                                {
+                                    var parame = await reader.ReadToEndAsync();
+                                    recordRequestInfo.RequestInfo = new RequestInfo() { Input = parame != null ? parame : "" };
+                                }
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+
+                        }
+                    }
+                }
             }
             catch (Exception ex)
             {
@@ -152,6 +186,9 @@ namespace GDCMasterDataReceiveApi.Filters
             #endregion
 
             #region 判断接口是否做拦截
+            
+            //接口返回值
+            
             if (routeData[1].ToString().IndexOf("Receive") <=0)
             { 
                 #region 过滤接口返回值
@@ -166,7 +203,6 @@ namespace GDCMasterDataReceiveApi.Filters
             string setupResult = string.Empty;
             if (cacheResult != null)
             {
-                //接口返回值
                 var returnRes = ((Microsoft.AspNetCore.Mvc.ObjectResult)context.Result).Value;
                 webHelper.Headers.Add("appKey", cacheResult.AppKey);
                 webHelper.Headers.Add("appinterfaceCode", cacheResult.AppinterfaceCode);
@@ -251,7 +287,7 @@ namespace GDCMasterDataReceiveApi.Filters
                             {
                                 recordRequestInfo.HttpStatusCode = context.HttpContext.Response.StatusCode;
                             }
-                            var db = context.HttpContext.RequestServices.GetService<ISqlSugarClient>();
+                           
                             // var userService = context.HttpContext.RequestServices.GetService<IUserService>();
                             var sql = recordRequestInfo.SqlExecInfos.Select(x => x.Sql).ToList();
                             var sqlTotalTime = recordRequestInfo.SqlExecInfos.Select(x => x.SqlTotalTime).ToList();
@@ -271,6 +307,8 @@ namespace GDCMasterDataReceiveApi.Filters
                                 SqlExecutionDuration = string.Join('|', sqlTotalTime.Select(x => x)),
                                 Url = recordRequestInfo.Url,
                                 ActionMethodName = recordRequestInfo.ActionMethodName,
+                                AppKey = recordRequestInfo.RequestHeads.AppKey,
+                                AppinterfaceCode = recordRequestInfo.RequestHeads.AppinterfaceCode,
                             };
                             var head = context.HttpContext.Request.Headers["Authorization"].ToString();
                             GlobalCurrentUser userInfo = null;
@@ -287,9 +325,9 @@ namespace GDCMasterDataReceiveApi.Filters
 
                             if (db != null)
                             {
-                                 await db.Insertable<AuditLogs>(auditLogs).ExecuteCommandAsync();
+                                await db.Insertable<AuditLogs>(auditLogs).ExecuteCommandAsync();
                             }
-                             
+
                         }
                     }
                     catch (Exception ex)
@@ -307,6 +345,37 @@ namespace GDCMasterDataReceiveApi.Filters
                             logger.LogError("删除redis缓存出现错误", ex);
                         }
                     }
+                }
+                else {
+                    
+                    var returnRes = ((Microsoft.AspNetCore.Mvc.ContentResult)context.Result);
+                    recordRequestInfo.Exceptions= new Exceptions();
+                    recordRequestInfo.Exceptions.ExceptionInfo = returnRes?.Content.ToJson();
+                    recordRequestInfo.BrowserInfo = new BrowserInfo();
+                    AuditLogs auditLogs = new AuditLogs()
+                    {
+                        ApplicationName = recordRequestInfo.ApplicationName,
+                        BrowserInfo = recordRequestInfo.BrowserInfo.Browser= context.HttpContext.Request.Headers["User-Agent"].ToString(),
+                        ClientIpAddress = Utils.GetIP(),
+                        Exceptions = recordRequestInfo.Exceptions.ExceptionInfo,
+                        ExecutionDuration =string.Empty,
+                        HttpMethod = context.HttpContext.Request.Method,
+                        HttpStatusCode = 10000,//非法请求
+                        RequestParames = recordRequestInfo.RequestInfo.Input,
+                        RequestTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.ffff"),
+                        Sql = string.Empty,
+                        SqlExecutionDuration = string.Empty,
+                        Url = context.HttpContext.Request.Path,
+                        ActionMethodName = ((Microsoft.AspNetCore.Mvc.Controllers.ControllerActionDescriptor)context.ActionDescriptor).ActionName,
+                        AppKey = context.HttpContext.Request.Headers["AppKey"].ToString(),
+                        AppinterfaceCode = context.HttpContext.Request.Headers["AppinterfaceCode"].ToString(),
+                    };
+                  
+                    if (db != null)
+                    {
+                        await db.Insertable<AuditLogs>(auditLogs).ExecuteCommandAsync();
+                    }
+
                 }
 
 
@@ -404,7 +473,9 @@ namespace GDCMasterDataReceiveApi.Filters
                             Url = recordRequestInfo.Url,
                             UserId = Guid.NewGuid(),
                             ActionMethodName = recordRequestInfo.ActionMethodName,
-                            UserName = recordRequestInfo.UserName
+                            UserName = recordRequestInfo.UserName,
+                            AppKey = recordRequestInfo.RequestHeads.AppKey,
+                            AppinterfaceCode = recordRequestInfo.RequestHeads.AppinterfaceCode,
                         };
                         try
                         {

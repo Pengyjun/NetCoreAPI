@@ -76,6 +76,17 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// </summary>
         [SugarColumn(ColumnDataType = "text")]
         public string? RequestParames { get; set; }
+
+        /// <summary>
+        /// 请求头参数
+        /// </summary>
+        [SugarColumn(Length = 128)]
+        public string? AppKey { get; set; }
+        /// <summary>
+        /// 请求头参数
+        /// </summary>
+        [SugarColumn(Length = 128)]
+        public string? AppinterfaceCode { get; set; }
         /// <summary>
         /// 请求路由
         /// </summary>

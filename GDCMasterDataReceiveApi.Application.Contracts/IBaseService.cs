@@ -1,4 +1,5 @@
 ﻿using GDCMasterDataReceiveApi.Application.Contracts.Dto;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.Institution;
 using GDCMasterDataReceiveApi.Domain.Models;
 using GDCMasterDataReceiveApi.Domain.Shared;
 using GDCMasterDataReceiveApi.Domain.Shared.Annotation;
@@ -39,7 +40,6 @@ namespace GDCMasterDataReceiveApi.Application.Contracts
         Task<ResponseAjaxResult<bool>> GetUserLoginInfoAsync(LoginDto requestDto);
 
         Task<ResponseAjaxResult<bool>> SetPasswordAsync(LoginDto requestDto);
-
 
         #region 接收数据记录
         /// <summary>

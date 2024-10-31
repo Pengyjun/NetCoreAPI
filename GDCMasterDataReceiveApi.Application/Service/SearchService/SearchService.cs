@@ -1163,7 +1163,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     ShortName = child.ShortName,
                     Status = child.Status,
                     OCode = child.OCode,
-                     Sno=child.Sno,
+                    Sno=child.Sno,
                     Children = GetInstitutionTreeChild(child.Oid, children)
                 })
                 .ToList();
