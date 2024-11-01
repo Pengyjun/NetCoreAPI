@@ -4,6 +4,8 @@ using GDCMasterDataReceiveApi.Domain.Models;
 using GDCMasterDataReceiveApi.Domain.Shared;
 using GDCMasterDataReceiveApi.Domain.Shared.Annotation;
 using GDCMasterDataReceiveApi.Domain.Shared.Enums;
+using SqlSugar;
+using System.Collections.Generic;
 
 namespace GDCMasterDataReceiveApi.Application.Contracts
 {
@@ -50,5 +52,13 @@ namespace GDCMasterDataReceiveApi.Application.Contracts
         /// <returns></returns>
         Task ReceiveRecordLogAsync(ReceiveRecordLog receiveRecordLog, DataOperationType dataOperationType);
         #endregion
+
+
+        /// <summary>
+        /// json转sql
+        /// </summary>
+        /// <param name="conditionalModels"></param>
+        /// <returns></returns>
+        Task<List<IConditionalModel>> JsonToConventSqlAsync(List<JsonToSqlRequestDto> jsonToSqlRequestDtos);
     }
 }

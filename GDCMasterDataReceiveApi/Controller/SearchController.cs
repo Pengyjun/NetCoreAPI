@@ -34,6 +34,7 @@ using GDCMasterDataReceiveApi.Domain.Shared;
 using GDCMasterDataReceiveApi.Domain.Shared.Annotation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using SqlSugar;
 
 namespace GDCMasterDataReceiveApi.Controller
 {
@@ -62,6 +63,7 @@ namespace GDCMasterDataReceiveApi.Controller
         /// </summary>
         /// <returns></returns>
         [HttpGet("GetFilterParams")]
+        [AllowAnonymous]
         public ResponseAjaxResult<List<FilterParams>> GetFilterParams()
         {
             return _baseService.GetFilterParams();
@@ -779,6 +781,18 @@ namespace GDCMasterDataReceiveApi.Controller
         public async Task<ResponseAjaxResult<List<InstitutionResponseDto>>> SearchInstitutionTreeAsync()
         {
             return await _searchService.SearchInstitutionTreeAsync();
+        }
+
+        /// <summary>
+        /// 111111
+        /// </summary>
+        /// <param name="jsonToSqlRequestDto"></param>
+        /// <returns></returns>
+        [HttpPost("Test")]
+        [AllowAnonymous]
+        public async Task<List<IConditionalModel>> TestAsync([FromBody] List<JsonToSqlRequestDto> jsonToSqlRequestDto)
+        {
+            return await _baseService.JsonToConventSqlAsync(jsonToSqlRequestDto);
         }
     }
 }

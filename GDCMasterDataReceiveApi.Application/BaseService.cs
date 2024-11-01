@@ -104,24 +104,57 @@ namespace GDCMasterDataReceiveApi.Application
             var responseAjaxResult = new ResponseAjaxResult<List<FilterParams>>();
 
             var val = new List<FilterParams>();
-            val.Add(new FilterParams { Key = "等于", Value = "=" });
-            val.Add(new FilterParams { Key = "不等于", Value = "!=" });
-            val.Add(new FilterParams { Key = "小于", Value = "<" });
-            val.Add(new FilterParams { Key = "小于等于", Value = "<=" });
-            val.Add(new FilterParams { Key = "大于", Value = ">" });
-            val.Add(new FilterParams { Key = "大于等于", Value = ">=" });
-            val.Add(new FilterParams { Key = "包含", Value = "LIKE %param%" });
-            val.Add(new FilterParams { Key = "不包含", Value = "NOT LIKE %param%" });
-            val.Add(new FilterParams { Key = "开头为", Value = "LIKE param%" });
-            val.Add(new FilterParams { Key = "开头不为", Value = "NOT LIKE param%" });
-            val.Add(new FilterParams { Key = "结尾为", Value = "LIKE %param" });
-            val.Add(new FilterParams { Key = "结尾不为", Value = "NOT LIKE %param" });
-            val.Add(new FilterParams { Key = "为空", Value = "IS NULL" });
-            val.Add(new FilterParams { Key = "非空", Value = "IS NOT NULL" });
-            val.Add(new FilterParams { Key = "空字符", Value = "=''" });
-            val.Add(new FilterParams { Key = "非空字符串", Value = "!=''" });
-            val.Add(new FilterParams { Key = "介于", Value = "BETWEEN AND" });
-            val.Add(new FilterParams { Key = "不介于", Value = "NOT BETWEEN AND" });
+
+            #region 旧版本
+            //val.Add(new FilterParams { Key = "等于", Value = "=" });
+            //val.Add(new FilterParams { Key = "不等于", Value = "!=" });
+            //val.Add(new FilterParams { Key = "小于", Value = "<" });
+            //val.Add(new FilterParams { Key = "小于等于", Value = "<=" });
+            //val.Add(new FilterParams { Key = "大于", Value = ">" });
+            //val.Add(new FilterParams { Key = "大于等于", Value = ">=" });
+            //val.Add(new FilterParams { Key = "包含", Value = "LIKE %param%" });
+            //val.Add(new FilterParams { Key = "不包含", Value = "NOT LIKE %param%" });
+            //val.Add(new FilterParams { Key = "开头为", Value = "LIKE param%" });
+            //val.Add(new FilterParams { Key = "开头不为", Value = "NOT LIKE param%" });
+            //val.Add(new FilterParams { Key = "结尾为", Value = "LIKE %param" });
+            //val.Add(new FilterParams { Key = "结尾不为", Value = "NOT LIKE %param" });
+            //val.Add(new FilterParams { Key = "为空", Value = "IS NULL" });
+            //val.Add(new FilterParams { Key = "非空", Value = "IS NOT NULL" });
+            //val.Add(new FilterParams { Key = "空字符", Value = "=''" });
+            //val.Add(new FilterParams { Key = "非空字符串", Value = "!=''" });
+            //val.Add(new FilterParams { Key = "介于", Value = "BETWEEN AND" });
+            //val.Add(new FilterParams { Key = "不介于", Value = "NOT BETWEEN AND" });
+            #endregion
+            //val.Add(new FilterParams() { Key= "Equal",Value="=" });
+            //val.Add(new FilterParams() { Key= "Like", Value= "模糊查询" });
+            //val.Add(new FilterParams() { Key= "GreaterThan", Value= "大于" });
+            //val.Add(new FilterParams() { Key= "GreaterThanOrEqual", Value= "大于等于" });
+            //val.Add(new FilterParams() { Key= "LessThan", Value="小于" });
+            //val.Add(new FilterParams() { Key= "LessThanOrEqual", Value= "小于等于" });
+            //val.Add(new FilterParams() { Key= "In", Value= "In操作" });
+            //val.Add(new FilterParams() { Key= "NotIn", Value= "Not in操作" });
+            //val.Add(new FilterParams() { Key= "LikeLeft", Value= "左模糊" });
+            //val.Add(new FilterParams() { Key= "LikeRight", Value= "右模糊" });
+            //val.Add(new FilterParams() { Key= "NoEqual", Value= "不等于" });
+            //val.Add(new FilterParams() { Key= "IsNullOrEmpty", Value= "是null或者''" });
+            //val.Add(new FilterParams() { Key= "IsNot", Value= "不等于" });
+            //val.Add(new FilterParams() { Key= "NoLike", Value= "模糊查询取反" });
+            //val.Add(new FilterParams() { Key= "EqualNull", Value= "不等于" });
+            //val.Add(new FilterParams() { Key= "InLike", Value= "不等于" });
+
+            val.Add(new FilterParams() { Key = "0", Value = "=" });
+            val.Add(new FilterParams() { Key = "1", Value = "模糊查询" });
+            val.Add(new FilterParams() { Key = "2", Value = "大于" });
+            val.Add(new FilterParams() { Key = "3", Value = "大于等于" });
+            val.Add(new FilterParams() { Key = "4", Value = "小于" });
+            val.Add(new FilterParams() { Key = "5", Value = "小于等于" });
+            val.Add(new FilterParams() { Key = "6", Value = "In操作" });
+            val.Add(new FilterParams() { Key = "7", Value = "Not in操作" });
+            val.Add(new FilterParams() { Key = "8", Value = "左模糊" });
+            val.Add(new FilterParams() { Key = "9", Value = "右模糊" });
+            val.Add(new FilterParams() { Key = "10", Value = "不等于" });
+            val.Add(new FilterParams() { Key = "11", Value = "是null或者''" });
+
 
             responseAjaxResult.Count = val.Count;
             responseAjaxResult.SuccessResult(val);
@@ -281,6 +314,32 @@ namespace GDCMasterDataReceiveApi.Application
         }
 
 
-
+        /// <summary>
+        /// json转sql
+        /// </summary>
+        /// <param name="conditionalModels"></param>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        public async Task<List<IConditionalModel>> JsonToConventSqlAsync(List<JsonToSqlRequestDto> jsonToSqlRequestDtos)
+        {
+            var conditionalModel = new List<IConditionalModel>();
+            if (jsonToSqlRequestDtos.Count > 0)
+            {
+                foreach (var item in jsonToSqlRequestDtos)
+                {
+                    conditionalModel.Add(new ConditionalCollections()
+                    {
+                        ConditionalList = new List<KeyValuePair<WhereType, ConditionalModel>>()
+                        {
+                            new KeyValuePair<WhereType, ConditionalModel>(
+                             (WhereType)item.Type,
+                            new ConditionalModel(){FieldName =item.FieldName,ConditionalType=item.ConditionalType,FieldValue=item.FieldValue}),
+                        }
+                    });
+                   
+                }
+            }
+            return conditionalModel;
+        }
     }
 }

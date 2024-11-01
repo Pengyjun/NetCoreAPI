@@ -40,10 +40,45 @@ namespace GDCMasterDataReceiveApi.Filters
         public async Task OnResultExecutionAsync(ResultExecutingContext context, ResultExecutionDelegate next)
         {
 
-            RecordRequestInfo recordRequestInfo = new RecordRequestInfo();
             var currentTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.ffffff");
             var routeData = ((Microsoft.AspNetCore.Mvc.ControllerBase)context.Controller).ControllerContext.RouteData.Values.ToArray();
             var db = context.HttpContext.RequestServices.GetService<ISqlSugarClient>();
+            var isRecord = true;
+            #region 获取请求参数
+            RecordRequestInfo recordRequestInfo = new RecordRequestInfo()
+            {
+                RequestInfo = new RequestInfo() {},
+            };
+            var requestMethod = context.HttpContext.Request.Method.ToUpper();
+            if (requestMethod == "GET")
+            {
+                if (context.HttpContext.Request.QueryString.HasValue && !string.IsNullOrWhiteSpace(context.HttpContext.Request.QueryString.Value))
+                {
+                    recordRequestInfo.RequestInfo.Input = context.HttpContext.Request.QueryString.Value.Replace("?", "").TrimAll();
+
+                }
+            }
+            else if (requestMethod == "POST")
+            {
+                try
+                {
+                    if (context.HttpContext.Request.ContentType != null && context.HttpContext.Request.ContentType.IndexOf("multipart/form-data") < 0)
+                    {
+                        context.HttpContext.Request.Body.Seek(0, SeekOrigin.Begin);
+                        using (var reader = new StreamReader(context.HttpContext.Request.Body, Encoding.UTF8))
+                        {
+                            var parame = await reader.ReadToEndAsync();
+                            recordRequestInfo.RequestInfo = new RequestInfo() { Input = parame != null ? parame : "" };
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+
+                }
+            }
+            #endregion
+
             #region 400的错误
             try
             {
@@ -52,6 +87,7 @@ namespace GDCMasterDataReceiveApi.Filters
                 //格式化请求参数错误提示0HMOVSRFRALDE:00000019
                 if (context.Result != null && context.Result.ToString().IndexOf("FileContentResult") < 0 && context.Result.ToString().IndexOf("FileStreamResult") < 0 && context.Result != null && context.Result.ToString().IndexOf("EmptyResult") < 0 && context.Result.ToString().IndexOf("ContentResult") < 0 && ((Microsoft.AspNetCore.Mvc.ObjectResult)context.Result).StatusCode == 400)
                 {
+                    isRecord = false;
                     var errMsg = ((Microsoft.AspNetCore.Mvc.ValidationProblemDetails)((Microsoft.AspNetCore.Mvc.ObjectResult)context.Result).Value).Errors;
                     List<ErrorMessage> errors = new();
                     foreach (var msg in errMsg)
@@ -75,40 +111,42 @@ namespace GDCMasterDataReceiveApi.Filters
                     responseAjaxResult.Fail(ResponseMessage.OPERATION_PARAMETER_ERROR, HttpStatusCode.ParameterError);
                     //把400的状态吗记录到日志文件
                     #region 请求参数400记录审计日志  只记录接收集团主数据请求的错误  
-                    if (routeData.Count() > 0 && routeData[1].ToString().IndexOf("Receive") >= 0)
-                    {
-                        RecordRequestInfo recordRequestInfos = new RecordRequestInfo()
-                        {
-                            RequestInfo = new RequestInfo(),
-                        };
-                        var requestMethod = context.HttpContext.Request.Method.ToUpper();
-                        if (requestMethod == "GET")
-                        {
-                            if (context.HttpContext.Request.QueryString.HasValue && !string.IsNullOrWhiteSpace(context.HttpContext.Request.QueryString.Value))
-                            {
-                                recordRequestInfo.RequestInfo.Input = context.HttpContext.Request.QueryString.Value.Replace("?", "").TrimAll();
+                    //if (routeData.Count() > 0 && routeData[1].ToString().IndexOf("Receive") >= 0)
+                    //{
+                        #region 暂时不用
+                        //RecordRequestInfo recordRequestInfos = new RecordRequestInfo()
+                        //{
+                        //    RequestInfo = new RequestInfo(),
+                        //};
+                        //var requestMethod = context.HttpContext.Request.Method.ToUpper();
+                        //if (requestMethod == "GET")
+                        //{
+                        //    if (context.HttpContext.Request.QueryString.HasValue && !string.IsNullOrWhiteSpace(context.HttpContext.Request.QueryString.Value))
+                        //    {
+                        //        recordRequestInfo.RequestInfo.Input = context.HttpContext.Request.QueryString.Value.Replace("?", "").TrimAll();
 
-                            }
-                        }
-                        else if (requestMethod == "POST")
-                        {
-                            try
-                            {
-                                if (context.HttpContext.Request.ContentType != null && context.HttpContext.Request.ContentType.IndexOf("multipart/form-data") < 0)
-                                {
-                                    context.HttpContext.Request.Body.Seek(0, SeekOrigin.Begin);
-                                    using (var reader = new StreamReader(context.HttpContext.Request.Body, Encoding.UTF8))
-                                    {
-                                        var parame = await reader.ReadToEndAsync();
-                                        recordRequestInfo.RequestInfo = new RequestInfo() { Input = parame != null ? parame : "" };
-                                    }
-                                }
-                            }
-                            catch (Exception ex)
-                            {
+                        //    }
+                        //}
+                        //else if (requestMethod == "POST")
+                        //{
+                        //    try
+                        //    {
+                        //        if (context.HttpContext.Request.ContentType != null && context.HttpContext.Request.ContentType.IndexOf("multipart/form-data") < 0)
+                        //        {
+                        //            context.HttpContext.Request.Body.Seek(0, SeekOrigin.Begin);
+                        //            using (var reader = new StreamReader(context.HttpContext.Request.Body, Encoding.UTF8))
+                        //            {
+                        //                var parame = await reader.ReadToEndAsync();
+                        //                recordRequestInfo.RequestInfo = new RequestInfo() { Input = parame != null ? parame : "" };
+                        //            }
+                        //        }
+                        //    }
+                        //    catch (Exception ex)
+                        //    {
 
-                            }
-                        }
+                        //    }
+                        //}
+                        #endregion
 
                         AuditLogs auditLogs = new AuditLogs()
                         {
@@ -125,13 +163,12 @@ namespace GDCMasterDataReceiveApi.Filters
                             ActionMethodName = ((Microsoft.AspNetCore.Mvc.Controllers.ControllerActionDescriptor)context.ActionDescriptor).ControllerName
                         };
 
-
                         if (db != null)
                         {
                             await db.Insertable<AuditLogs>(auditLogs).ExecuteCommandAsync();
                         }
                         logger.LogWarning($"用户请求{context.HttpContext.Request.Path}方法出现400的错误信息:{responseAjaxResult.ToJson()}\r\n 请求参数:{recordRequestInfo.RequestInfo.Input}");
-                    }
+                   // }
                     #endregion
                     context.Result = new ContentResult()
                     {
@@ -148,34 +185,36 @@ namespace GDCMasterDataReceiveApi.Filters
                 }
                 else {
 
-                    var requestMethod = context.HttpContext.Request.Method.ToUpper();
-                    if (requestMethod == "GET")
-                    {
-                        if (context.HttpContext.Request.QueryString.HasValue && !string.IsNullOrWhiteSpace(context.HttpContext.Request.QueryString.Value))
-                        {
-                            recordRequestInfo.RequestInfo = new RequestInfo() { Input = context.HttpContext.Request.QueryString.Value.Replace("?", "").TrimAll() };
+                    #region 暂时不用
+                    //var requestMethod = context.HttpContext.Request.Method.ToUpper();
+                    //if (requestMethod == "GET")
+                    //{
+                    //    if (context.HttpContext.Request.QueryString.HasValue && !string.IsNullOrWhiteSpace(context.HttpContext.Request.QueryString.Value))
+                    //    {
+                    //        recordRequestInfo.RequestInfo = new RequestInfo() { Input = context.HttpContext.Request.QueryString.Value.Replace("?", "").TrimAll() };
 
-                        }
-                    }
-                    else if (requestMethod == "POST")
-                    {
-                        try
-                        {
-                            if (context.HttpContext.Request.ContentType != null && context.HttpContext.Request.ContentType.IndexOf("multipart/form-data") < 0)
-                            {
-                                context.HttpContext.Request.Body.Seek(0, SeekOrigin.Begin);
-                                using (var reader = new StreamReader(context.HttpContext.Request.Body, Encoding.UTF8))
-                                {
-                                    var parame = await reader.ReadToEndAsync();
-                                    recordRequestInfo.RequestInfo = new RequestInfo() { Input = parame != null ? parame : "" };
-                                }
-                            }
-                        }
-                        catch (Exception ex)
-                        {
+                    //    }
+                    //}
+                    //else if (requestMethod == "POST")
+                    //{
+                    //    try
+                    //    {
+                    //        if (context.HttpContext.Request.ContentType != null && context.HttpContext.Request.ContentType.IndexOf("multipart/form-data") < 0)
+                    //        {
+                    //            context.HttpContext.Request.Body.Seek(0, SeekOrigin.Begin);
+                    //            using (var reader = new StreamReader(context.HttpContext.Request.Body, Encoding.UTF8))
+                    //            {
+                    //                var parame = await reader.ReadToEndAsync();
+                    //                recordRequestInfo.RequestInfo = new RequestInfo() { Input = parame != null ? parame : "" };
+                    //            }
+                    //        }
+                    //    }
+                    //    catch (Exception ex)
+                    //    {
 
-                        }
-                    }
+                    //    }
+                    //}
+                    #endregion
                 }
             }
             catch (Exception ex)
@@ -193,65 +232,65 @@ namespace GDCMasterDataReceiveApi.Filters
             { 
                 #region 过滤接口返回值
                 CacheHelper cacheHelper = new CacheHelper();
-            var cacheResult = cacheHelper.Get<DataInterfaceResponseDto>(context.HttpContext.TraceIdentifier);
-            var IsEncrypt = 1;//是否加密   0  不是加密 
+                var cacheResult = cacheHelper.Get<DataInterfaceResponseDto>(context.HttpContext.TraceIdentifier);
+                var IsEncrypt = 1;//是否加密   0  不是加密 
 
-            #region  接口返回值字段规则设置
-            WebHelper webHelper = new WebHelper();
-            var systemInterfaceFiledRuleApi = AppsettingsHelper.GetValue("API:SystemInterfaceFiledRuleApi");
-            Dictionary<string, object> parames = new Dictionary<string, object>();
-            string setupResult = string.Empty;
-            if (cacheResult != null)
-            {
-                var returnRes = ((Microsoft.AspNetCore.Mvc.ObjectResult)context.Result).Value;
-                webHelper.Headers.Add("appKey", cacheResult.AppKey);
-                webHelper.Headers.Add("appinterfaceCode", cacheResult.AppinterfaceCode);
-                parames.Add("JsonObj", returnRes.ToJson(true));
-                parames.Add("InterfaceApiId", cacheResult.Id);
-                parames.Add("AppSystemId", cacheResult.AppSystemId);
-                var   responseResult = await webHelper.DoPostAsync<string>(systemInterfaceFiledRuleApi, parames);
-                setupResult = responseResult.Result;
-                context.Result =new JsonResult(responseResult.Result);
-            }
-
-            #endregion
-
-            #region 过滤接口加密设置
-            if (cacheResult != null && cacheResult.IsEncrypt == 1)
-            {
-                IsEncrypt = 1;//加密
-                //接口返回值
-                //var returnRes = ((Microsoft.AspNetCore.Mvc.ObjectResult)context.Result).Value;
-                if (setupResult!=null)
+                #region  接口返回值字段规则设置
+                WebHelper webHelper = new WebHelper();
+                var systemInterfaceFiledRuleApi = AppsettingsHelper.GetValue("API:SystemInterfaceFiledRuleApi");
+                Dictionary<string, object> parames = new Dictionary<string, object>();
+                string setupResult = string.Empty;
+                if (cacheResult != null)
                 {
-                    var interfaceEncryptApi = AppsettingsHelper.GetValue("API:InterfaceEncryptApi");
-                    Dictionary<string, object> parame = new Dictionary<string, object>();
-                    parame.Add("item", setupResult.ToJson(true));
-                    var dateEncrypt = await webHelper.DoPostAsync(interfaceEncryptApi, parame);
-                    var obj = new ContentResult()
-                    {
-                        StatusCode = 200,
-                        Content = JsonConvert.SerializeObject(dateEncrypt.Result, new JsonSerializerSettings()
-                        {
-                            //首字母小写问题
-                            ContractResolver = new CamelCasePropertyNamesContractResolver()
-                        }),
-                    };
-                    context.Result = obj;
-
+                    var returnRes = ((Microsoft.AspNetCore.Mvc.ObjectResult)context.Result).Value;
+                    webHelper.Headers.Add("appKey", cacheResult.AppKey);
+                    webHelper.Headers.Add("appinterfaceCode", cacheResult.AppinterfaceCode);
+                    parames.Add("JsonObj", returnRes.ToJson(true));
+                    parames.Add("InterfaceApiId", cacheResult.Id);
+                    parames.Add("AppSystemId", cacheResult.AppSystemId);
+                    var   responseResult = await webHelper.DoPostAsync<string>(systemInterfaceFiledRuleApi, parames);
+                    setupResult = responseResult.Result;
+                    context.Result =new JsonResult(responseResult.Result);
                 }
-            }
-            else  if(cacheResult != null && cacheResult.IsEncrypt == 0)//不加密  且返回的是json字符串
-            {
-                IsEncrypt = 2;
-            }
-            else if (cacheResult == null) //不加密  返回json对象
-            {
-                IsEncrypt = 3;
-            }
-            #endregion
 
-            context.HttpContext.Response.Headers.Append("IsEncryption", IsEncrypt.ToString());
+                #endregion
+
+                #region 过滤接口加密设置
+                if (cacheResult != null && cacheResult.IsEncrypt == 1)
+                {
+                    IsEncrypt = 1;//加密
+                    //接口返回值
+                    //var returnRes = ((Microsoft.AspNetCore.Mvc.ObjectResult)context.Result).Value;
+                    if (setupResult!=null)
+                    {
+                        var interfaceEncryptApi = AppsettingsHelper.GetValue("API:InterfaceEncryptApi");
+                        Dictionary<string, object> parame = new Dictionary<string, object>();
+                        parame.Add("item", setupResult.ToJson(true));
+                        var dateEncrypt = await webHelper.DoPostAsync(interfaceEncryptApi, parame);
+                        var obj = new ContentResult()
+                        {
+                            StatusCode = 200,
+                            Content = JsonConvert.SerializeObject(dateEncrypt.Result, new JsonSerializerSettings()
+                            {
+                                //首字母小写问题
+                                ContractResolver = new CamelCasePropertyNamesContractResolver()
+                            }),
+                        };
+                        context.Result = obj;
+
+                    }
+                }
+                else  if(cacheResult != null && cacheResult.IsEncrypt == 0)//不加密  且返回的是json字符串
+                {
+                    IsEncrypt = 2;
+                }
+                else if (cacheResult == null) //不加密  返回json对象
+                {
+                    IsEncrypt = 3;
+                }
+                #endregion
+
+                context.HttpContext.Response.Headers.Append("IsEncryption", IsEncrypt.ToString());
 
                 #endregion
             }
@@ -346,7 +385,7 @@ namespace GDCMasterDataReceiveApi.Filters
                         }
                     }
                 }
-                else {
+                else if(isRecord) {
                     
                     var returnRes = ((Microsoft.AspNetCore.Mvc.ContentResult)context.Result);
                     recordRequestInfo.Exceptions= new Exceptions();
@@ -377,7 +416,6 @@ namespace GDCMasterDataReceiveApi.Filters
                     }
 
                 }
-
 
             }
             #endregion

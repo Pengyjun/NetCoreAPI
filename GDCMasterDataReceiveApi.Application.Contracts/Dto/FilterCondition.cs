@@ -8,6 +8,9 @@
         /// <summary>
         /// 筛选条件json
         /// </summary>
-        public string? FilterConditionJson { get; set; }
+         public string? FilterConditionJson { get; set; }
+
+        public List<JsonToSqlRequestDto>  JsonToSqlRequestDtos { get; set; }
+
     }
 }
