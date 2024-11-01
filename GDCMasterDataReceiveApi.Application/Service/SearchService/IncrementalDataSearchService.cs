@@ -543,7 +543,17 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                                 InterfaceName = interfaceName[0],
                                 RequestTime = string.IsNullOrWhiteSpace(timeStr) == true ? DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") : timeStr,
                             };
-                            eachMainDataCountResponseDtos.Add(eachAPIInterdaceItem);
+                            if (eachMainDataCountResponseDtos.Where(x => x.AppName == item.SystemName&&x.InterfaceName== interfaceName[0]).Count() > 0)
+                            {
+
+                                eachMainDataCountResponseDtos.Where(x => x.AppName == item.SystemName && x.InterfaceName == interfaceName[0]).FirstOrDefault().Count += interfaceName.Count;
+                            }
+                            else
+                            {
+                                eachMainDataCountResponseDtos.Add(eachAPIInterdaceItem);
+                            }
+                           
+
                         }
                     }
 
@@ -565,6 +575,17 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                             InterfaceName = interfaceName[0],
                             RequestTime = string.IsNullOrWhiteSpace(timeStr) == true ? DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") : timeStr,
                         };
+
+
+                        if (eachMainDataCountResponseDtos.Where(x => x.AppName == systemName.SystemName && x.InterfaceName == interfaceName[0]).Count() > 0)
+                        {
+
+                            eachMainDataCountResponseDtos.Where(x => x.AppName == systemName.SystemName && x.InterfaceName == interfaceName[0]).FirstOrDefault().Count += interfaceName.Count;
+                        }
+                        else
+                        {
+                            eachMainDataCountResponseDtos.Add(eachAPIInterdaceItem);
+                        }
                         eachMainDataCountResponseDtos.Add(eachAPIInterdaceItem);
                     }
                 }
