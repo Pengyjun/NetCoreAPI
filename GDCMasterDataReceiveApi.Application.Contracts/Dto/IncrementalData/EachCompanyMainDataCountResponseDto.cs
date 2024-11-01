@@ -6,8 +6,6 @@ using System.Threading.Tasks;
 
 namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.IncrementalData
 {
-
-
     /// <summary>
     /// 各个公司主数据数量
     /// </summary>
@@ -31,8 +29,6 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.IncrementalData
         public decimal? YAxis { get; set; }
     }
 
-
-
     /// <summary>
     /// 统计下游请求API统计
     /// </summary>
@@ -43,17 +39,39 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.IncrementalData
         /// </summary>
         public string XAxis { get; set; }
         /// <summary>
-        /// Y轴数据
+        /// Y轴数据 总数量
         /// </summary>
-        public List<EachAPIInterdaceItem>? YAxis { get; set; }
+        public decimal YAxis { get; set; }
+        /// <summary>
+        /// 下钻列表
+        /// </summary>
+        //public List<EachAPIInterdaceItem>? EachAPIInterdaceItems { get; set; }
+        /// <summary>
+        /// 系统APPkey
+        /// </summary>
+        public string? AppKey { get; set; }
 
     }
     /// <summary>
-    /// 
+    /// 下钻列表
     /// </summary>
     public class EachAPIInterdaceItem
     {
-        public string? Name { get; set; }
-        public decimal Value { get; set; }
+        /// <summary>
+        /// 系统名称
+        /// </summary>
+        public string? AppName { get; set; }
+        /// <summary>
+        /// 接口名称
+        /// </summary>
+        public string? InterfaceName { get; set; }
+        /// <summary>
+        /// 数量
+        /// </summary>
+        public int Count { get; set; }
+        /// <summary>
+        /// 请求时间
+        /// </summary>
+        public string? RequestTime { get; set; }
     }
 }

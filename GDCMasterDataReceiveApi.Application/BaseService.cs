@@ -142,7 +142,7 @@ namespace GDCMasterDataReceiveApi.Application
             //val.Add(new FilterParams() { Key= "EqualNull", Value= "不等于" });
             //val.Add(new FilterParams() { Key= "InLike", Value= "不等于" });
 
-            val.Add(new FilterParams() { Key = "0", Value = "=" });
+            val.Add(new FilterParams() { Key = "0", Value = "等于" });
             val.Add(new FilterParams() { Key = "1", Value = "模糊查询" });
             val.Add(new FilterParams() { Key = "2", Value = "大于" });
             val.Add(new FilterParams() { Key = "3", Value = "大于等于" });
@@ -323,6 +323,8 @@ namespace GDCMasterDataReceiveApi.Application
         public async Task<List<IConditionalModel>> JsonToConventSqlAsync(List<JsonToSqlRequestDto> jsonToSqlRequestDtos)
         {
             var conditionalModel = new List<IConditionalModel>();
+            //conditionalModel.Add(new ConditionalModel { FieldName = "name", ConditionalType = ConditionalType.Equal, FieldValue = "1=1" });
+
             if (jsonToSqlRequestDtos.Count > 0)
             {
                 foreach (var item in jsonToSqlRequestDtos)
@@ -333,7 +335,7 @@ namespace GDCMasterDataReceiveApi.Application
                         {
                             new KeyValuePair<WhereType, ConditionalModel>(
                              (WhereType)item.Type,
-                            new ConditionalModel(){FieldName =item.FieldName,ConditionalType=item.ConditionalType,FieldValue=item.FieldValue}),
+                            new ConditionalModel(){FieldName =item.FieldName,ConditionalType=item.ConditionalType,FieldValue=item.FieldValue,CSharpTypeName="int"}),
                         }
                     });
                    

@@ -47,5 +47,13 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.IService.ISearchService
         /// </summary>
         /// <returns></returns>
         Task<ResponseAjaxResult<List<EachAPIInterdaceCountResponseDto>>> SearchCallInterfaceCountAsync(string timeStr, string timeEnd,int type);
+        /// <summary>
+        /// API统计下钻
+        /// </summary>
+        /// <param name="timeStr"></param>
+        /// <param name="timeEnd"></param>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        Task<ResponseAjaxResult<List<EachAPIInterdaceItem>>> SearchRunHoleAsync(string timeStr, int type,string appKey);
     }
 }

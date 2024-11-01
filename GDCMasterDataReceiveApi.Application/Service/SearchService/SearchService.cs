@@ -6018,7 +6018,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
             switch (table)
             {
                 case 1:
-                    allColumns = new List<string> { "SEX", "Enable", "Nationality", "Nation", "EmpSort", "Birthday", "EntryTime", "EmpSort", "PositionGradeNorm", "HighEstGrade", "SameHighEstGrade", "PoliticsFace", "UserInfoStatus", "CreateTime", "UpdateTime", "" };
+                    allColumns = new List<string> { "SEX", "Enable", "Nationality", "Nation", "EmpSort", "Birthday", "EntryTime", "EmpSort", "PositionGradeNorm", "HighEstGrade", "SameHighEstGrade", "PoliticsFace", "Emp_status", "CreateTime", "UpdateTime", "" };
                     var properties = GetProperties<UserSearchDetailsDto>();
                     foreach (var property in properties) { tableColumns.Add(property.Name); }
                     foreach (var item in tableColumns)
@@ -6057,7 +6057,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                                 type = "Single";//单选
                                 optionsChild = valDomain.Where(x => x.Code == "ZEMPTYPE").ToList();
                             }
-                            else if (item.Contains("UserInfoStatus"))
+                            else if (item.Contains("Emp_status"))
                             {
                                 columnName = "员工状态";
                                 type = "Single";//单选

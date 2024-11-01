@@ -82,5 +82,18 @@ namespace GDCMasterDataReceiveApi.Controller
         {
             return await _incrementalDataSearchService.SearchCallInterfaceCountAsync(timeStr, timeEnd,type);
         }
+
+        /// <summary>
+        ///  API统计下钻  type=1 是按时间    2是系统名称
+        /// </summary>
+        /// <param name="timeStr"></param>
+        /// <param name="type"></param>
+        /// <param name="appKey"></param>
+        /// <returns></returns>
+        [HttpGet("SearchRunHole")]
+        public async Task<ResponseAjaxResult<List<EachAPIInterdaceItem>>> SearchRunHoleAsync(string timeStr, int type, string appKey)
+        {
+            return await _incrementalDataSearchService.SearchRunHoleAsync(timeStr,type, appKey);
+        }
     }
 }

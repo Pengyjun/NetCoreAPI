@@ -9,8 +9,10 @@
         /// 筛选条件json
         /// </summary>
          public string? FilterConditionJson { get; set; }
-
-        public List<JsonToSqlRequestDto>  JsonToSqlRequestDtos { get; set; }
+        /// <summary>
+        /// 动态搜索条件
+        /// </summary>
+        public List<JsonToSqlRequestDto>?  JsonToSqlRequestDtos { get; set; }
 
     }
 }

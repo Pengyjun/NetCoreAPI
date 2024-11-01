@@ -230,7 +230,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
             if (type == 3)
             {
                 //获取机构数据
-                var projectList = await _dbContext.Queryable<Project>().Where(x => x.IsDelete == 1)
+                var projectList = await _dbContext.Queryable<DHProjects>().Where(x => x.IsDelete == 1)
                     .ToListAsync();
                 foreach (var item in companyList)
                 {
@@ -330,8 +330,8 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
 
             for (int i = 0; i < 7; i++)
             {
-                var startTimeStr = Convert.ToDateTime(endTime.ObjToDate().AddDays(-i).ToString("yyyy-MM-dd 00:00:00.000001"));
-                var endTimeStr = Convert.ToDateTime(endTime.AddDays(-i).ToString("yyyy-MM-dd 23:59:59.999999"));
+                var startTimeStr = Convert.ToDateTime(startTime.ObjToDate().AddDays(i).ToString("yyyy-MM-dd 00:00:00.000001"));
+                var endTimeStr = Convert.ToDateTime(startTime.AddDays(i).ToString("yyyy-MM-dd 23:59:59.999999"));
 
                 EachMainDataCountResponseDto eachMainDataCountResponseDto = new EachMainDataCountResponseDto()
                 {
@@ -398,8 +398,8 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                 }
                 for (var i = 0; i < max; i++)
                 {
-                    var startTimeStr = Convert.ToDateTime(endTime.ObjToDate().AddDays(-i).ToString("yyyy-MM-dd 00:00:00.000001"));
-                    var endTimeStr = Convert.ToDateTime(endTime.AddDays(-i).ToString("yyyy-MM-dd 23:59:59.999999"));
+                    var startTimeStr = Convert.ToDateTime(startTime.ObjToDate().AddDays(i).ToString("yyyy-MM-dd 00:00:00.000001"));
+                    var endTimeStr = Convert.ToDateTime(startTime.AddDays(i).ToString("yyyy-MM-dd 23:59:59.999999"));
 
                     #region http请求获取接口信息数据
                     var systemUrl = AppsettingsHelper.GetValue("API:SystemInfo");
@@ -424,64 +424,148 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     #endregion
 
                     List<EachAPIInterdaceItem> eachMainDataCountResponseDto = new List<EachAPIInterdaceItem>(); ;
-                    var systemName = string.Empty;
-                    foreach (var item in auditLogList)
-                    {
-
-                        var count = auditLogList.Where(x => SqlFunc.ToDate(x.RequestTime) >= startTimeStr
-                        && SqlFunc.ToDate(x.RequestTime) <= endTimeStr
-                        && x.AppKey == item.AppKey
-                        && x.AppinterfaceCode == item.AppinterfaceCode)
-                        .Count();
-
-                         systemName = systemApiList.Where(x => x.AppKey == item.AppKey).Select(x => x.SystemName).FirstOrDefault();
-                        var interfaceName = systemINterfaceApiList.Where(x => x.AppinterfaceCode == item.AppinterfaceCode).Select(x => x.InterfaceName).FirstOrDefault();
-                        if (type == 1)
-                        {
-                            var key = $"{systemName}---{interfaceName}";
-                            if (eachMainDataCountResponseDto.Where(x => x.Name == key).Count() == 0)
-                            {
-                                eachMainDataCountResponseDto.Add(new EachAPIInterdaceItem()
-                                {
-                                    Name = key,
-                                    Value = count,
-                                });
-                            }
-                           
-                        }
-                        else if (type == 2)
-                        {
-                            var key = $"{interfaceName}";
-                            if (eachMainDataCountResponseDto.Where(x => x.Name == key).Count() == 0)
-                            {
-                                eachMainDataCountResponseDto.Add(new EachAPIInterdaceItem()
-                                {
-                                    Name = key,
-                                    Value = count,
-                                });
-                            }
-
-                        }
-                    }
+                    var exp = auditLogList.Where(x => SqlFunc.ToDate(x.RequestTime) >= startTimeStr
+                       && SqlFunc.ToDate(x.RequestTime) <= endTimeStr);
                     if (type == 1)
                     {
                         EachAPIInterdaceCountResponseDto eachInterdaceCountResponseDto = new EachAPIInterdaceCountResponseDto()
                         {
                             XAxis = startTimeStr.ToString("yyyy-MM-dd"),
-                            YAxis = eachMainDataCountResponseDto,
-
+                            YAxis = exp.Count(),
                         };
                         eachMainDataCountResponseDtos.Add(eachInterdaceCountResponseDto);
                     }
                     else if (type == 2)
                     {
-                        EachAPIInterdaceCountResponseDto eachInterdaceCountResponseDto = new EachAPIInterdaceCountResponseDto()
+                        foreach (var item in systemApiList)
                         {
-                            XAxis = systemName,
-                            YAxis = eachMainDataCountResponseDto,
+                            EachAPIInterdaceCountResponseDto eachInterdaceCountResponseDto = new EachAPIInterdaceCountResponseDto()
+                            {
+                                AppKey = item.AppKey,
+                                XAxis = item.SystemName,
+                                YAxis = exp.Where(x=>x.AppKey==item.AppKey).Count(),
 
+                            };
+                            if (eachMainDataCountResponseDtos.Where(x => x.AppKey == item.AppKey).Count() > 0)
+                            {
+                                eachMainDataCountResponseDtos.Where(x => x.AppKey == item.AppKey).FirstOrDefault().YAxis += eachInterdaceCountResponseDto.YAxis;
+                            }
+                            else {
+                                eachMainDataCountResponseDtos.Add(eachInterdaceCountResponseDto);
+                            }
+                        
+                        }
+                        
+                    }
+                }
+            }
+            responseAjaxResult.Count = eachMainDataCountResponseDtos.Count;
+            responseAjaxResult.Data = eachMainDataCountResponseDtos;
+            responseAjaxResult.Success();
+            return responseAjaxResult;
+        }
+
+
+        #endregion
+
+
+        #region 首页API统计下钻
+        /// <summary>
+        /// 首页API统计下钻
+        /// </summary>
+        /// <param name="timeStr"></param>
+        /// <param name="timeEnd"></param>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        public async Task<ResponseAjaxResult<List<EachAPIInterdaceItem>>> SearchRunHoleAsync(string timeStr, int type, string appKey)
+        {
+            ResponseAjaxResult<List<EachAPIInterdaceItem>> responseAjaxResult = new ResponseAjaxResult<List<EachAPIInterdaceItem>>();
+            List<EachAPIInterdaceItem> eachMainDataCountResponseDtos = new List<EachAPIInterdaceItem>();
+            var strtimeStr = Convert.ToDateTime(DateTime.Now.ToString("yyyy-MM-dd 00:00:00.000001"));
+            var endTimeStr = Convert.ToDateTime(DateTime.Now.ToString("yyyy-MM-dd 23:59:59.999999"));
+            #region 基本参数
+            if (!string.IsNullOrWhiteSpace(timeStr))
+            {
+                 strtimeStr = Convert.ToDateTime(timeStr.ObjToDate().ToString("yyyy-MM-dd 00:00:00.000001"));
+                 endTimeStr = Convert.ToDateTime(timeStr.ObjToDate().ToString("yyyy-MM-dd 23:59:59.999999"));
+            }
+            #endregion
+
+            //按接口
+            var auditLogList = await _dbContext.Queryable<AuditLogs>()
+                .Where(x => x.AppKey != null
+                 && SqlFunc.ToDate(x.RequestTime) >= strtimeStr
+                 && SqlFunc.ToDate(x.RequestTime)<= endTimeStr)
+                .WhereIF(type==2,x=>x.AppKey == appKey)
+                .ToListAsync();
+            if (auditLogList.Count > 0)
+            {
+                #region http请求获取接口信息数据
+                var systemUrl = AppsettingsHelper.GetValue("API:SystemInfo");
+                var interfaceUrl = AppsettingsHelper.GetValue("API:SystemInterfaceInfo");
+                WebHelper webHelper = new WebHelper();
+                var responseSystem = await webHelper.DoGetAsync<ResponseAjaxResult<List<SystemResponseDto>>>(systemUrl);
+                Dictionary<string, object> parames = new Dictionary<string, object>();
+                parames.Add("keyWords", "B1C548CD-EFB0-4BC3-9224-877CA5A2715C");
+                var responseInterface = await webHelper.DoGetAsync<ResponseAjaxResult<List<DataInterfaceResponseDto>>>(interfaceUrl, parames);
+                var systemApiList = new List<SystemResponseDto>();
+                var systemINterfaceApiList = new List<DataInterfaceResponseDto>();
+                try
+                {
+                    systemApiList = responseSystem.Result.Data;
+                    systemINterfaceApiList = responseInterface.Result.Data;
+                }
+                catch (Exception ex)
+                {
+
+
+                }
+                #endregion
+
+                if (type == 1)
+                {
+                    foreach (var item in systemApiList)
+                    {
+
+                        var systemList = auditLogList.Where(x => x.AppKey == item.AppKey).ToList();
+                        foreach (var interfaces in systemList)
+                        {
+                            var interfaceName = systemINterfaceApiList.Where(x => x.AppinterfaceCode == interfaces.AppinterfaceCode).Select(x => x.InterfaceName).ToList();
+                            if (interfaceName.Count== 0)
+                            {
+                                continue;
+                            }
+                            EachAPIInterdaceItem eachAPIInterdaceItem = new EachAPIInterdaceItem()
+                            {
+                                AppName = item.SystemName,
+                                Count = interfaceName.Count,
+                                InterfaceName = interfaceName[0],
+                                RequestTime = string.IsNullOrWhiteSpace(timeStr) == true ? DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") : timeStr,
+                            };
+                            eachMainDataCountResponseDtos.Add(eachAPIInterdaceItem);
+                        }
+                    }
+
+                }
+                else if (type == 2)
+                {
+                   var systemName= systemApiList.Where(x => x.AppKey == appKey).FirstOrDefault();
+                    foreach (var interfaces in systemINterfaceApiList)
+                    {
+                        var interfaceName = systemINterfaceApiList.Where(x => x.AppinterfaceCode == interfaces.AppinterfaceCode).Select(x => x.InterfaceName).ToList();
+                        if (interfaceName.Count == 0)
+                        {
+                            continue;
+                        }
+                        EachAPIInterdaceItem eachAPIInterdaceItem = new EachAPIInterdaceItem()
+                        {
+                            AppName = systemName?.SystemName,
+                            Count = interfaceName.Count,
+                            InterfaceName = interfaceName[0],
+                            RequestTime = string.IsNullOrWhiteSpace(timeStr) == true ? DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") : timeStr,
                         };
-                        eachMainDataCountResponseDtos.Add(eachInterdaceCountResponseDto);
+                        eachMainDataCountResponseDtos.Add(eachAPIInterdaceItem);
                     }
                 }
             }
