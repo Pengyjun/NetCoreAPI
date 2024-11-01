@@ -280,7 +280,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
             else
             {
                 startTime = Convert.ToDateTime(timeStr);
-                endTime = Convert.ToDateTime(timeStr);
+                endTime = Convert.ToDateTime(timeEnd);
             }
             var personCount = await _dbContext.Queryable<User>().Where(x => x.IsDelete == 1
             && SqlFunc.ToDate(x.CreateTime) >= startTime && SqlFunc.ToDate(x.CreateTime) <= endTime).ToListAsync();
@@ -377,7 +377,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
             else
             {
                 startTime = Convert.ToDateTime(timeStr);
-                endTime = Convert.ToDateTime(timeStr);
+                endTime = Convert.ToDateTime(timeEnd);
             }
             #endregion
 
