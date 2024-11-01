@@ -3883,10 +3883,12 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
         /// 项目月报-船舶-月份-统计
         /// </summary>
         /// <returns></returns>
-        private async Task<SumMonthReportDetailDto> SumMonthReportDetailAsync(Guid projectId, Guid shipId, ConstructionOutPutType outPutType, int dateMonth)
+        private async Task<SumMonthReportDetailDto> SumMonthReportDetailAsync(Guid projectId, Guid shipId, ConstructionOutPutType outPutType, int dateMonth,bool  flag=false)
         {
             var sumReport = await _dbMonthReportDetail.AsQueryable()
-                .Where(t => t.ProjectId == projectId && t.DateMonth == dateMonth && t.IsDelete == 1 && t.ShipId == shipId && t.OutPutType == outPutType)
+                .Where(t => t.ProjectId == projectId && t.DateMonth == dateMonth && t.IsDelete == 1 && t.ShipId == shipId)
+                .WhereIF(!flag,t =>t.OutPutType == outPutType)
+                .WhereIF(flag,t =>t.OutPutType == outPutType|| t.OutPutType == ConstructionOutPutType.SubOwner)
                  .GroupBy(t => new { t.ProjectId, t.ShipId, t.OutPutType, t.DateMonth })
                  .Select(t => new SumMonthReportDetailDto
                  {
@@ -4715,7 +4717,13 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 var lastDateMonthTime = dateMonthTime.AddMonths(-1);
                 var startDateDay = new DateTime(lastDateMonthTime.Year, lastDateMonthTime.Month, 26).ToDateDay();
                 var endDateDay = new DateTime(dateMonthTime.Year, dateMonthTime.Month, 25).ToDateDay();
-                var sumMonthReport = await SumMonthReportDetailAsync(model.ProjectId, model.ShipId, ConstructionOutPutType.Self, dateMonth);
+                var count=await _dbContext.Queryable<OwnerShip>().Where(x => x.IsDelete == 1 && x.PomId == model.ShipId).CountAsync();
+                var flag = false;//如果是true  自由船舶月报统计自有   也包含分包-自有  但是船必须在自有表里面
+                if (count > 0)
+                {
+                    flag = true;
+                }
+                var sumMonthReport = await SumMonthReportDetailAsync(model.ProjectId, model.ShipId, ConstructionOutPutType.Self, dateMonth, flag);
                 var sumShipDayReport = await SumShipDayReportAsync(model.ProjectId, model.ShipId, startDateDay, endDateDay, projectList, sipMovementList);
                 //获取船舶进出场
                 var shipMovement = await GetShipMovementAsync(model.ProjectId, model.ShipId, ShipType.OwnerShip);
