@@ -4613,7 +4613,13 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             var startDateDay = new DateTime(lastDateMonthTime.Year, lastDateMonthTime.Month, 26).ToDateDay();
             var endDateDay = new DateTime(dateMonthTime.Year, dateMonthTime.Month, 25).ToDateDay();
             var monthReport = await GetOwnerShipMonthReportAsync(model.ProjectId, model.ShipId, model.DateMonth);
-            var sumMonthReport = await SumMonthReportDetailAsync(model.ProjectId, model.ShipId, ConstructionOutPutType.Self, model.DateMonth);
+            var count = await _dbContext.Queryable<OwnerShip>().Where(x => x.IsDelete == 1 && x.PomId == model.ShipId).CountAsync();
+            var flag = false;//如果是true  自由船舶月报统计自有   也包含分包-自有  但是船必须在自有表里面
+            if (count > 0)
+            {
+                flag = true;
+            }
+            var sumMonthReport = await SumMonthReportDetailAsync(model.ProjectId, model.ShipId, ConstructionOutPutType.Self, model.DateMonth, flag);
             //项目信息
             var projectList = await _dbContext.Queryable<Project>().Where(x => x.IsDelete == 1).ToListAsync();
             var sipMovementList = await _dbContext.Queryable<ShipMovement>().Where(x => x.IsDelete == 1).ToListAsync();
@@ -4757,8 +4763,8 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
         private async Task<OwnerShipMonthReport?> GetOwnerShipMonthReportAsync(Guid projectId, Guid shipId, int dateMonth
             )
         {
-            return await _dbOwnerShipMonthReport.GetFirstAsync(t => t.ProjectId == projectId && t.ShipId == shipId && t.DateMonth == dateMonth && t.IsDelete == 1);
-
+          return  await _dbOwnerShipMonthReport.GetFirstAsync(t => t.ProjectId == projectId && t.ShipId == shipId && t.DateMonth == dateMonth && t.IsDelete == 1);
+            
         }
 
         /// <summary>
