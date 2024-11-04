@@ -189,8 +189,8 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
 
             #endregion
 
-            var jsonWhere =await _baseService.JsonToConventSqlAsync(requestDto.JsonToSqlRequestDtos);
-            var userInfos=await _dbContext.Queryable<User>()
+            var jsonWhere = await _baseService.JsonToConventSqlAsync(requestDto.JsonToSqlRequestDtos);
+            var userInfos = await _dbContext.Queryable<User>()
                 .Where(jsonWhere)
                 .Select(u => new UserSearchDetailsDto
                 {
@@ -249,7 +249,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                 //机构信息
                 var institutions = await _dbContext.Queryable<Institution>()
                     .Where(t => t.IsDelete == 1)
-                    .Select(t => new InstutionRespDto { Oid = t.OID, PoId = t.POID, Grule = t.GRULE, Name = t.NAME,OCode=t.OCODE })
+                    .Select(t => new InstutionRespDto { Oid = t.OID, PoId = t.POID, Grule = t.GRULE, Name = t.NAME, OCode = t.OCODE })
                     .ToListAsync();
 
                 //值域信息
@@ -1114,11 +1114,20 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
             }
 
             var tableList = await _dbContext.Queryable<Institution>()
-                .Where(x=>x.IsDelete==1&&x.STATUS=="1")
-                .Select(t => new InstitutionConvertDto { GPOID = t.GPOID, OID = t.OID, SHORTNAME = t.SHORTNAME, IsDelete = t.IsDelete,
-                     OCode=t.OCODE,
-                      Status=t.STATUS,
-                    SNO = t.SNO, Id = t.Id, GRULE = t.GRULE, NAME = t.NAME })
+                .Where(x => x.IsDelete == 1 && x.STATUS == "1")
+                .Select(t => new InstitutionConvertDto
+                {
+                    GPOID = t.GPOID,
+                    OID = t.OID,
+                    SHORTNAME = t.SHORTNAME,
+                    IsDelete = t.IsDelete,
+                    OCode = t.OCODE,
+                    Status = t.STATUS,
+                    SNO = t.SNO,
+                    Id = t.Id,
+                    GRULE = t.GRULE,
+                    NAME = t.NAME
+                })
                 .ToListAsync();
 
             #region 初始查询
@@ -1175,9 +1184,9 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     Gpoid = ins.GPOID,
                     Oid = ins.OID,
                     ShortName = ins.SHORTNAME,
-                     Status=ins.Status,
-                      OCode=ins.OCode,
-                     Sno=ins.SNO,
+                    Status = ins.Status,
+                    OCode = ins.OCode,
+                    Sno = ins.SNO,
                 })
             .ToList();
 
@@ -1210,7 +1219,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
             // 查找当前节点的所有子节点
             var childs = children
                 .Where(x => x.Gpoid == oid)
-                .OrderBy(x=>x.Sno)
+                .OrderBy(x => x.Sno)
                 .Select(child => new InstitutionResponseDto
                 {
                     Gpoid = child.Gpoid,
@@ -1218,7 +1227,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     ShortName = child.ShortName,
                     Status = child.Status,
                     OCode = child.OCode,
-                    Sno=child.Sno,
+                    Sno = child.Sno,
                     Children = GetInstitutionTreeChild(child.Oid, children)
                 })
                 .ToList();
@@ -4485,6 +4494,11 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                 .Select(t => new VDomainRespDto { ZDOM_CODE = t.ZDOM_CODE, ZDOM_DESC = t.ZDOM_DESC, ZDOM_VALUE = t.ZDOM_VALUE, ZDOM_NAME = t.ZDOM_NAME, ZDOM_LEVEL = t.ZDOM_LEVEL })
                 .ToListAsync();
 
+            //中交区域总部
+            var zbKey = ccList.Select(t => t.RegionalAttr).ToList();
+            var qyzb = await _dbContext.Queryable<Regional>()
+                .Where(t => t.IsDelete == 1 && zbKey.Contains(t.ZCRHCODE))
+                .ToListAsync();
             foreach (var item in ccList)
             {
                 //机构所在地
@@ -4504,6 +4518,9 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
 
                 //机构属性
                 item.OrgAttr = valDomain.FirstOrDefault(x => item.OrgAttr == x.ZDOM_VALUE && x.ZDOM_CODE == "ZORGATTR")?.ZDOM_NAME;
+
+                //地域属性 （中交区域总部）
+                item.RegionalAttr = qyzb.FirstOrDefault(x => item.RegionalAttr == x.ZCRHCODE)?.ZCRHNAME;
 
                 //机构子属性
                 item.OrgChildAttr = valDomain.FirstOrDefault(x => item.OrgChildAttr == x.ZDOM_VALUE && x.ZDOM_CODE == "ZORGCHILDATTR")?.ZDOM_NAME;
@@ -5398,6 +5415,12 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                 .Where(t => t.IsDelete == 1 && ywbkKey.Contains(t.ZBUSTD1ID) || ywflKey.Contains(t.ZCPBC1ID))
                 .ToListAsync();
 
+            //决算业务板块
+            var jsyw = await _dbContext.Queryable<ZdecideCode>()
+                .Where(t => t.IsDelete == 1)
+                .Select(t => new { t.ZDCID, t.ZDCNAME })
+                .ToListAsync();
+
             foreach (var item in ccList)
             {
                 //核算机构状态
@@ -5421,6 +5444,9 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                 //币种
                 item.Zzcurrency = currency.FirstOrDefault(x => x.ZCURRENCYCODE == item.Zzcurrency)?.ZCURRENCYNAME;
 
+                //决算业务板块
+                item.Zdcid = jsyw.FirstOrDefault(x => x.ZDCID == item.Zdcid)?.ZDCNAME;
+
                 //计税方式
                 item.Ztaxmethod = GetValueDomain(item.Ztaxmethod, valDomain, "ZTAXMETHOD");
 
@@ -5429,6 +5455,15 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
 
                 //报表节点性质
                 item.Zrpnature = GetValueDomain(item.Zrpnature, valDomain, "ZD_NODE_PROP");
+
+                //组织节点性质
+                item.ZreportNode = GetValueDomain(item.ZreportNode, valDomain, "ZD_NODE_PROP");
+
+                //所属区域共享中心
+                item.Zscenter = GetValueDomain(item.Zscenter, valDomain, "ZD_SCENTER");
+
+                //税组织纳税人类别
+                item.ZtaxpayerCategory = GetValueDomain(item.ZtaxpayerCategory, valDomain, "ZD_MVIEW_TAXPAYER_CATEGORY");
 
                 //审批单位
                 item.ZapprovalOrg = GetInstitutionName(item.ZapprovalOrg, pjectOrg);
@@ -5869,6 +5904,53 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                 })
                 .ToPageListAsync(requestDto.PageIndex, requestDto.PageSize, total);
 
+            //国家地区
+            var countrysKey = ccList.Select(x => x.Zcountrycode).ToList();
+            var country = await _dbContext.Queryable<CountryRegion>()
+                .Where(t => t.IsDelete == 1 && countrysKey.Contains(t.ZCOUNTRYCODE))
+                .Select(t => new CountryRegionOrAdminDivisionDto { Code = t.ZCOUNTRYCODE, Name = t.ZCOUNTRYNAME })
+                .ToListAsync();
+
+            //行政区划
+            var locationKey = ccList.Select(x => x.Zaddvscode).ToList();
+            var location = await _dbContext.Queryable<AdministrativeDivision>()
+                .Where(t => t.IsDelete == 1 && locationKey.Contains(t.ZADDVSCODE))
+                .Select(t => new CountryRegionOrAdminDivisionDto { Code = t.ZADDVSCODE, Name = t.ZADDVSNAME })
+                .ToListAsync();
+
+            var ywflKey = ccList.Select(x => x.Zbtid).ToList();
+            var ywfl = await _dbContext.Queryable<ProjectClassification>()
+                .Where(t => t.IsDelete == 1 && ywflKey.Contains(t.ZCPBC1ID))
+                .ToListAsync();
+
+            //值域信息
+            var valDomain = await _dbContext.Queryable<ValueDomain>()
+                .Where(t => !string.IsNullOrWhiteSpace(t.ZDOM_CODE))
+                .Select(t => new VDomainRespDto { ZDOM_CODE = t.ZDOM_CODE, ZDOM_DESC = t.ZDOM_DESC, ZDOM_VALUE = t.ZDOM_VALUE, ZDOM_NAME = t.ZDOM_NAME, ZDOM_LEVEL = t.ZDOM_LEVEL })
+                .ToListAsync();
+
+            //中交区域总部
+            var zbKey = ccList.Select(t => t.Zowarid).ToList();
+            var qyzb = await _dbContext.Queryable<Regional>()
+                .Where(t => t.IsDelete == 1 && zbKey.Contains(t.ZCRHCODE))
+                .ToListAsync();
+
+            foreach (var item in ccList)
+            {
+                //机构所在地
+                item.Zaddvscode = GetAdministrativeDivision(item.Zaddvscode, location);
+                //国家地区
+                item.Zcountrycode = GetCountryRegion(item.Zcountrycode, country);
+                //计税方式
+                item.Ztaxmetho = GetValueDomain(item.Ztaxmetho, valDomain, "ZTAXMETHOD");
+                //机构性质
+                item.ZorgProp = GetValueDomain(item.ZorgProp, valDomain, "ZTREE_ORG_PROPERTY");
+                //地域属性 （中交区域总部）
+                item.Zowarid = qyzb.FirstOrDefault(x => item.Zowarid == x.ZCRHCODE)?.ZCRHNAME;
+                //业务分类
+                item.Zbtid = ywfl.FirstOrDefault(x => x.ZCPBC1ID == item.Zbtid)?.ZCPBC1NAME;
+            }
+
             responseAjaxResult.Count = total;
             responseAjaxResult.SuccessResult(ccList);
             return responseAjaxResult;
@@ -6011,6 +6093,11 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                 .Select(t => new FilterChildData { Key = t.Code, Val = t.Name })
                 .ToListAsync();
 
+            //地域属性
+            var qyzb = await _dbContext.Queryable<Regional>()
+                       .Where(t => t.IsDelete == 1)
+                       .Select(t => new FilterChildData { Key = t.ZCRHCODE, Val = t.ZCRHABBR })
+                       .ToListAsync();
             #endregion
 
             #region 查询初始化
@@ -6091,7 +6178,8 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     }
                     break;
                 case 2:
-                    allColumns = new List<string> { "EntClass", "Status", "BizType", "Type", "TypeExt", "OrgProvince", "Carea", "TerritoryPro", "ShareHoldings", "IsIndependent", "Mrut", "ProjectScale", "ProjectManType", "ProjectType", "CreateTime", "UpdateTime", "StartDate" };
+                    allColumns = new List<string> { "EntClass", "Status", "BizType", "Type", "TypeExt", "OrgProvince", "Carea", "TerritoryPro", "ShareHoldings", "IsIndependent", "Mrut", "", "ProjectManType", "ProjectType", "CreateTime", "UpdateTime", "StartDate" };
+                   
                     var properties2 = GetProperties<InstitutionDetatilsDto>();
                     foreach (var property in properties2) { tableColumns.Add(property.Name); }
                     foreach (var item in tableColumns)
@@ -6114,12 +6202,12 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                                 type = "Single";
                                 optionsChild = valDomain.Where(x => x.Code == "ZORGSTATE").ToList();
                             }
-                            else if (item.Contains("ProjectScale"))
-                            {
-                                columnName = "项目规模";
-                                type = "Single";
-                                //optionsChild = valDomain.Where(x => x.Code == "ZORGSTATE").ToList();
-                            }
+                            //else if (item.Contains("ProjectScale"))
+                            //{
+                            //    columnName = "项目规模";
+                            //    type = "Single";
+                            //    //optionsChild = valDomain.Where(x => x.Code == "ZORGSTATE").ToList();
+                            //}
                             else if (item.Contains("ProjectManType"))
                             {
                                 columnName = "项目管理类型";
@@ -6162,12 +6250,12 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                                 type = "Single";
                                 optionsChild = countrys;
                             }
-                            //else if (item.Contains("TerritoryPro"))
-                            //{
-                            //    columnName = "地域属性";
-                            //    type = "Single";
-                            //    //optionsChild = valDomain.Where(x => x.Code == "ZSingleIND").ToList();
-                            //}
+                            else if (item.Contains("TerritoryPro"))
+                            {
+                                columnName = "地域属性";
+                                type = "Single"; 
+                                optionsChild = qyzb;
+                            }
                             else if (item.Contains("ShareHoldings"))
                             {
                                 columnName = "持股情况";
@@ -7111,7 +7199,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                             {
                                 columnName = "地域属性";
                                 type = "Single";
-                                //optionsChild = valDomain.Where(x => x.Code == "1").ToList();
+                                optionsChild = qyzb;
                             }
                             else if (item.Contains("Shareholding"))
                             {
@@ -7336,12 +7424,12 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                                 type = "Single";
                                 optionsChild = countrys;
                             }
-                            //else if (item.Contains("ZREGIONAL"))
-                            //{
-                            //    columnName = "地域属性";
-                            //    type = "Single";
-                            //    //optionsChild = valDomain.Where(x => x.Code == "1").ToList();
-                            //}
+                            else if (item.Contains("ZREGIONAL"))
+                            {
+                                columnName = "地域属性";
+                                type = "Single";
+                                optionsChild = qyzb;
+                            }
                             //else if (item.Contains("CreateTime") || item.Contains("UpdateTime"))
                             //{
                             //    columnName = item == "CreateTime" ? "创建时间" : "修改时间";
@@ -8316,19 +8404,19 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
         /// <param name="attr"></param>
         /// <returns></returns>
 
-        private static List<UserSubDepts> FindUserSubDepts(string subDepts,string  attr,List<InstutionRespDto> institutions)
+        private static List<UserSubDepts> FindUserSubDepts(string subDepts, string attr, List<InstutionRespDto> institutions)
         {
             string[] depts = new string[] { "所在部门", "岗位类别", "职级", "岗位名称", "排序" };
             List<UserSubDepts> userSubs = new List<UserSubDepts>();
             List<string> mainItem = new List<string>();
             if (!string.IsNullOrWhiteSpace(subDepts))
             {
-                mainItem= subDepts.Split(",").ToList();
+                mainItem = subDepts.Split(",").ToList();
             }
             else if (string.IsNullOrWhiteSpace(subDepts) && !string.IsNullOrWhiteSpace(attr))
             {
                 mainItem = attr.Split(",").ToList();
-            
+
             }
             if (mainItem.Count > 0)
             {
@@ -8346,14 +8434,15 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                                 Value = CompanyFullPath(sItem, institutions),
                             });
                         }
-                        else {
+                        else
+                        {
                             userSubs.Add(new UserSubDepts()
                             {
                                 Key = depts[index],
                                 Value = sItem,
                             });
                         }
-                       index += 1;
+                        index += 1;
                     }
                     index = 0;
                 }
@@ -8366,15 +8455,15 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
         /// <param name="oid"></param>
         /// <param name="institutions"></param>
         /// <returns></returns>
-        private static string CompanyFullPath(string oid,List<InstutionRespDto> institutions)
+        private static string CompanyFullPath(string oid, List<InstutionRespDto> institutions)
         {
-           var inst= institutions.Where(x => x.Oid == oid).FirstOrDefault();
+            var inst = institutions.Where(x => x.Oid == oid).FirstOrDefault();
             if (inst != null)
             {
                 var oruleList = inst?.Grule?.SplitStr("-").ToList();
                 if (oruleList.Count > 0)
                 {
-                    var company = institutions.Where(x =>  oruleList.Contains(x.Oid) && (
+                    var company = institutions.Where(x => oruleList.Contains(x.Oid) && (
                     (x.OCode.Contains("00000A")
                      || x.OCode.Contains("00000B")
                      || x.OCode.Contains("00000C")
@@ -8382,8 +8471,8 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     )).OrderByDescending(x => x.Oid).FirstOrDefault();
                     if (company != null)
                     {
-                      var res=  institutions.Where(x => oruleList.Contains(x.Oid)).OrderBy(x => x.Oid).Select(x =>x.Name).ToList();
-                      return  string.Join("/", res.Select(x=>x));
+                        var res = institutions.Where(x => oruleList.Contains(x.Oid)).OrderBy(x => x.Oid).Select(x => x.Name).ToList();
+                        return string.Join("/", res.Select(x => x));
                     }
                 }
             }
