@@ -1790,193 +1790,195 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                 .OrderByDescending(x => x.UpdatedAt)
                 .ToPageListAsync(requestDto.PageIndex, requestDto.PageSize, total);
             #endregion
-
-            #region 详细查询
-            //值域信息
-            var valDomain = await _dbContext.Queryable<ValueDomain>()
-                .Where(t => !string.IsNullOrWhiteSpace(t.ZDOM_CODE))
-                .Select(t => new VDomainRespDto { ZDOM_CODE = t.ZDOM_CODE, ZDOM_DESC = t.ZDOM_DESC, ZDOM_VALUE = t.ZDOM_VALUE, ZDOM_NAME = t.ZDOM_NAME, ZDOM_LEVEL = t.ZDOM_LEVEL })
-                .ToListAsync();
-
-            #region 原来的
-
-            ////国家地区
-            //var countrysKey = proList.Select(x => x.Country).ToList();
-            //var country = await _dbContext.Queryable<CountryRegion>()
-            //    .Where(t => t.IsDelete == 1 && countrysKey.Contains(t.ZCOUNTRYCODE))
-            //    .Select(t => new CountryRegionOrAdminDivisionDto { Code = t.ZCOUNTRYCODE, Name = t.ZCOUNTRYNAME })
-            //    .ToListAsync();
-
-            ////行政区划
-            //var locationKey = proList.Select(x => x.Location).ToList();
-            //var location = await _dbContext.Queryable<AdministrativeDivision>()
-            //    .Where(t => t.IsDelete == 1 && locationKey.Contains(t.ZADDVSCODE))
-            //    .Select(t => new CountryRegionOrAdminDivisionDto { Code = t.ZADDVSCODE, Name = t.ZADDVSNAME })
-            //    .ToListAsync();
-
-            ////项目机构
-            //var pjectOrgKey = proList.Select(x => x.PjectOrg).ToList();
-            //var pjectOrg2Key = proList.Select(x => x.PjectOrgBP).ToList();
-            //var pjectOrg = await _dbContext.Queryable<Institution>()
-            //    .Where(t => t.IsDelete == 1 && (pjectOrgKey.Contains(t.OID) || pjectOrg2Key.Contains(t.OID)))
-            //    .Select(t => new InstutionRespDto { Oid = t.OID, PoId = t.POID, Grule = t.GRULE, Name = t.NAME })
-            //    .ToListAsync();
-
-            //foreach (var item in proList)
-            //{
-            //    //项目类型
-            //    item.Type = GetValueDomain(item.Type, valDomain, "ZPROJTYPE");
-
-            //    //国家地区
-            //    item.Country = GetCountryRegion(item.Country, country);
-
-            //    //项目所在地
-            //    item.Location = GetAdministrativeDivision(item.Location, location);
-
-            //    //项目机构
-            //    item.PjectOrg = GetInstitutionName(item.PjectOrg, pjectOrg);
-            //    item.PjectOrgBP = GetInstitutionName(item.PjectOrgBP, pjectOrg);
-
-            //    //日期
-            //    item.PlanStartDate = GetDate(item.PlanStartDate);
-            //    item.PlanCompletionDate = GetDate(item.PlanCompletionDate);
-            //    item.AcquisitionTime = GetDate(item.AcquisitionTime);
-            //    item.BChangeTime = GetDate(item.BChangeTime);
-            //    item.StartDateOfInsure = GetDate(item.StartDateOfInsure);
-            //    item.EndDateOfInsure = GetDate(item.EndDateOfInsure);
-            //    item.FundEstablishmentDate = GetDate(item.FundEstablishmentDate);
-            //    item.FundExpirationDate = GetDate(item.FundExpirationDate);
-            //    item.LeaseStartDate = GetDate(item.LeaseStartDate);
-            //    item.DueDate = GetDate(item.DueDate);
-            //    item.CreateDate = GetDateDay(item.CreateDate);
-            //    item.ResolutionTime = GetDate(item.ResolutionTime);
-
-            //    //收入来源
-            //    item.SourceOfIncome = GetValueDomain(item.SourceOfIncome, valDomain, "ZSI");
-
-            //    //操盘情况
-            //    item.TradingSituation = GetValueDomain(item.TradingSituation, valDomain, "ZTRADER");
-
-            //    //承租人类型
-            //    item.TenantType = GetValueDomain(item.TenantType, valDomain, "ZLESSEETYPE");
-
-            //    //参与二级单位
-            //    item.ParticipateInUnitSecs = GetValueDomain(item.ParticipateInUnitSecs, valDomain, "ZCY2NDORG");
-
-            //    //计税方式
-            //    item.TaxMethod = GetValueDomain(item.TaxMethod, valDomain, "ZTAXMETHOD");
-
-            //    //并表情况
-            //    item.ConsolidatedTable = GetValueDomain(item.ConsolidatedTable, valDomain, "ZCS");
-
-            //    //是否联合体项目
-            //    item.IsJoint = item.IsJoint == "1" ? "是" : "否";
-
-
-
-            //}
-            #endregion
-
-            #region DH
-            //国家地区
-            var countrysKey = proList.Select(x => x.ZZCOUNTRY).ToList();
-            var country = await _dbContext.Queryable<CountryRegion>()
-                .Where(t => t.IsDelete == 1 && countrysKey.Contains(t.ZCOUNTRYCODE))
-                .Select(t => new CountryRegionOrAdminDivisionDto { Code = t.ZCOUNTRYCODE, Name = t.ZCOUNTRYNAME })
-                .ToListAsync();
-
-            //行政区划
-            var locationKey = proList.Select(x => x.ZPROJLOC).ToList();
-            var location = await _dbContext.Queryable<AdministrativeDivision>()
-                .Where(t => t.IsDelete == 1 && locationKey.Contains(t.ZADDVSCODE))
-                .Select(t => new CountryRegionOrAdminDivisionDto { Code = t.ZADDVSCODE, Name = t.ZADDVSNAME })
-                .ToListAsync();
-
-            //项目机构 //商机项目机构
-            var pjectOrgKey = proList.Select(x => x.ZPRO_ORG).ToList();
-            var pjectOrg2Key = proList.Select(x => x.ZPRO_BP).ToList();
-            //var pjectOrg3Key = proList.Select(x => x.Z2NDORG).ToList();
-            var pjectOrg = await _dbContext.Queryable<Institution>()
-                .Where(t => t.IsDelete == 1 && (pjectOrgKey.Contains(t.OID) || pjectOrg2Key.Contains(t.OID)))
-                .Select(t => new InstutionRespDto { Oid = t.OID, PoId = t.POID, Grule = t.GRULE, Name = t.NAME })
-                .ToListAsync();
-
-            //中标主体 往来单位
-            var ZAWARDMAIIds = proList.Select(x => x.ZAWARDMAI).ToList();
-            var zbzt = await _dbContext.Queryable<CorresUnit>()
-                .Where(t => t.IsDelete == 1 && ZAWARDMAIIds.Contains(t.ZBP))
-                .ToListAsync();
-
-            foreach (var item in proList)
+            if (proList.Any())
             {
-                //曾用名
-                if (!string.IsNullOrWhiteSpace(item.ZOLDNAME))
-                {
-                    var jsonObject = JObject.Parse(item.ZOLDNAME);
-                    if (!string.IsNullOrWhiteSpace(jsonObject["item"].ToString()))
-                    {
-                        item.FzitOnameList = JsonConvert.DeserializeObject<List<FzitOnames>>(jsonObject["item"].ToString());
-                    }
-                }
+                #region 详细查询
+                //值域信息
+                var valDomain = await _dbContext.Queryable<ValueDomain>()
+                    .Where(t => !string.IsNullOrWhiteSpace(t.ZDOM_CODE))
+                    .Select(t => new VDomainRespDto { ZDOM_CODE = t.ZDOM_CODE, ZDOM_DESC = t.ZDOM_DESC, ZDOM_VALUE = t.ZDOM_VALUE, ZDOM_NAME = t.ZDOM_NAME, ZDOM_LEVEL = t.ZDOM_LEVEL })
+                    .ToListAsync();
 
-                //项目类型
-                item.ZPROJTYPE = GetValueDomain(item.ZPROJTYPE, valDomain, "ZPROJTYPE");
+                #region 原来的
 
+                ////国家地区
+                //var countrysKey = proList.Select(x => x.Country).ToList();
+                //var country = await _dbContext.Queryable<CountryRegion>()
+                //    .Where(t => t.IsDelete == 1 && countrysKey.Contains(t.ZCOUNTRYCODE))
+                //    .Select(t => new CountryRegionOrAdminDivisionDto { Code = t.ZCOUNTRYCODE, Name = t.ZCOUNTRYNAME })
+                //    .ToListAsync();
+
+                ////行政区划
+                //var locationKey = proList.Select(x => x.Location).ToList();
+                //var location = await _dbContext.Queryable<AdministrativeDivision>()
+                //    .Where(t => t.IsDelete == 1 && locationKey.Contains(t.ZADDVSCODE))
+                //    .Select(t => new CountryRegionOrAdminDivisionDto { Code = t.ZADDVSCODE, Name = t.ZADDVSNAME })
+                //    .ToListAsync();
+
+                ////项目机构
+                //var pjectOrgKey = proList.Select(x => x.PjectOrg).ToList();
+                //var pjectOrg2Key = proList.Select(x => x.PjectOrgBP).ToList();
+                //var pjectOrg = await _dbContext.Queryable<Institution>()
+                //    .Where(t => t.IsDelete == 1 && (pjectOrgKey.Contains(t.OID) || pjectOrg2Key.Contains(t.OID)))
+                //    .Select(t => new InstutionRespDto { Oid = t.OID, PoId = t.POID, Grule = t.GRULE, Name = t.NAME })
+                //    .ToListAsync();
+
+                //foreach (var item in proList)
+                //{
+                //    //项目类型
+                //    item.Type = GetValueDomain(item.Type, valDomain, "ZPROJTYPE");
+
+                //    //国家地区
+                //    item.Country = GetCountryRegion(item.Country, country);
+
+                //    //项目所在地
+                //    item.Location = GetAdministrativeDivision(item.Location, location);
+
+                //    //项目机构
+                //    item.PjectOrg = GetInstitutionName(item.PjectOrg, pjectOrg);
+                //    item.PjectOrgBP = GetInstitutionName(item.PjectOrgBP, pjectOrg);
+
+                //    //日期
+                //    item.PlanStartDate = GetDate(item.PlanStartDate);
+                //    item.PlanCompletionDate = GetDate(item.PlanCompletionDate);
+                //    item.AcquisitionTime = GetDate(item.AcquisitionTime);
+                //    item.BChangeTime = GetDate(item.BChangeTime);
+                //    item.StartDateOfInsure = GetDate(item.StartDateOfInsure);
+                //    item.EndDateOfInsure = GetDate(item.EndDateOfInsure);
+                //    item.FundEstablishmentDate = GetDate(item.FundEstablishmentDate);
+                //    item.FundExpirationDate = GetDate(item.FundExpirationDate);
+                //    item.LeaseStartDate = GetDate(item.LeaseStartDate);
+                //    item.DueDate = GetDate(item.DueDate);
+                //    item.CreateDate = GetDateDay(item.CreateDate);
+                //    item.ResolutionTime = GetDate(item.ResolutionTime);
+
+                //    //收入来源
+                //    item.SourceOfIncome = GetValueDomain(item.SourceOfIncome, valDomain, "ZSI");
+
+                //    //操盘情况
+                //    item.TradingSituation = GetValueDomain(item.TradingSituation, valDomain, "ZTRADER");
+
+                //    //承租人类型
+                //    item.TenantType = GetValueDomain(item.TenantType, valDomain, "ZLESSEETYPE");
+
+                //    //参与二级单位
+                //    item.ParticipateInUnitSecs = GetValueDomain(item.ParticipateInUnitSecs, valDomain, "ZCY2NDORG");
+
+                //    //计税方式
+                //    item.TaxMethod = GetValueDomain(item.TaxMethod, valDomain, "ZTAXMETHOD");
+
+                //    //并表情况
+                //    item.ConsolidatedTable = GetValueDomain(item.ConsolidatedTable, valDomain, "ZCS");
+
+                //    //是否联合体项目
+                //    item.IsJoint = item.IsJoint == "1" ? "是" : "否";
+
+
+
+                //}
+                #endregion
+
+                #region DH
                 //国家地区
-                item.ZZCOUNTRY = GetCountryRegion(item.ZZCOUNTRY, country);
+                var countrysKey = proList.Select(x => x.ZZCOUNTRY).ToList();
+                var country = await _dbContext.Queryable<CountryRegion>()
+                    .Where(t => t.IsDelete == 1 && countrysKey.Contains(t.ZCOUNTRYCODE))
+                    .Select(t => new CountryRegionOrAdminDivisionDto { Code = t.ZCOUNTRYCODE, Name = t.ZCOUNTRYNAME })
+                    .ToListAsync();
 
-                //项目所在地
-                item.ZPROJLOC = GetAdministrativeDivision(item.ZPROJLOC, location);
+                //行政区划
+                var locationKey = proList.Select(x => x.ZPROJLOC).ToList();
+                var location = await _dbContext.Queryable<AdministrativeDivision>()
+                    .Where(t => t.IsDelete == 1 && locationKey.Contains(t.ZADDVSCODE))
+                    .Select(t => new CountryRegionOrAdminDivisionDto { Code = t.ZADDVSCODE, Name = t.ZADDVSNAME })
+                    .ToListAsync();
 
                 //项目机构 //商机项目机构
-                item.ZPRO_ORG = GetInstitutionName(item.ZPRO_ORG, pjectOrg);
-                item.ZPRO_BP = GetInstitutionName(item.ZPRO_BP, pjectOrg);
+                var pjectOrgKey = proList.Select(x => x.ZPRO_ORG).ToList();
+                var pjectOrg2Key = proList.Select(x => x.ZPRO_BP).ToList();
+                //var pjectOrg3Key = proList.Select(x => x.Z2NDORG).ToList();
+                var pjectOrg = await _dbContext.Queryable<Institution>()
+                    .Where(t => t.IsDelete == 1 && (pjectOrgKey.Contains(t.OID) || pjectOrg2Key.Contains(t.OID)))
+                    .Select(t => new InstutionRespDto { Oid = t.OID, PoId = t.POID, Grule = t.GRULE, Name = t.NAME })
+                    .ToListAsync();
 
-                //收入来源
-                item.ZSI = GetValueDomain(item.ZSI, valDomain, "ZSI");
+                //中标主体 往来单位
+                var ZAWARDMAIIds = proList.Select(x => x.ZAWARDMAI).ToList();
+                var zbzt = await _dbContext.Queryable<CorresUnit>()
+                    .Where(t => t.IsDelete == 1 && ZAWARDMAIIds.Contains(t.ZBP))
+                    .ToListAsync();
 
-                //操盘情况
-                item.ZTRADER = GetValueDomain(item.ZTRADER, valDomain, "ZTRADER");
+                foreach (var item in proList)
+                {
+                    //曾用名
+                    if (!string.IsNullOrWhiteSpace(item.ZOLDNAME))
+                    {
+                        var jsonObject = JObject.Parse(item.ZOLDNAME);
+                        if (!string.IsNullOrWhiteSpace(jsonObject["item"].ToString()))
+                        {
+                            item.FzitOnameList = JsonConvert.DeserializeObject<List<FzitOnames>>(jsonObject["item"].ToString());
+                        }
+                    }
 
-                //承租人类型
-                item.ZLESSEETYPE = GetValueDomain(item.ZLESSEETYPE, valDomain, "ZLESSEETYPE");
+                    //项目类型
+                    item.ZPROJTYPE = GetValueDomain(item.ZPROJTYPE, valDomain, "ZPROJTYPE");
 
-                //参与二级单位
-                item.FZcy2ndorg = GetValueDomain(item.FZcy2ndorg, valDomain, "ZCY2NDORG");
+                    //国家地区
+                    item.ZZCOUNTRY = GetCountryRegion(item.ZZCOUNTRY, country);
 
-                //计税方式
-                item.ZTAXMETHOD = GetValueDomain(item.ZTAXMETHOD, valDomain, "ZTAXMETHOD");
+                    //项目所在地
+                    item.ZPROJLOC = GetAdministrativeDivision(item.ZPROJLOC, location);
 
-                //并表情况
-                item.ZCS = GetValueDomain(item.ZCS, valDomain, "ZCS");
+                    //项目机构 //商机项目机构
+                    item.ZPRO_ORG = GetInstitutionName(item.ZPRO_ORG, pjectOrg);
+                    item.ZPRO_BP = GetInstitutionName(item.ZPRO_BP, pjectOrg);
 
-                //是否联合体项目
-                item.FZwinningc = item.FZwinningc == "1" ? "是" : "否";
+                    //收入来源
+                    item.ZSI = GetValueDomain(item.ZSI, valDomain, "ZSI");
 
-                //中交项目业务分类
-                item.ZCPBC = GetValueDomain(item.ZCPBC, valDomain, "ZCPBC");
+                    //操盘情况
+                    item.ZTRADER = GetValueDomain(item.ZTRADER, valDomain, "ZTRADER");
 
-                //项目组织形式
-                item.ZPOS = GetValueDomain(item.ZPOS, valDomain, "ZPOS");
+                    //承租人类型
+                    item.ZLESSEETYPE = GetValueDomain(item.ZLESSEETYPE, valDomain, "ZLESSEETYPE");
 
-                //所属事业部
-                item.ZBIZDEPT = GetValueDomain(item.ZBIZDEPT, valDomain, "ZBIZDEPT");
+                    //参与二级单位
+                    item.FZcy2ndorg = GetValueDomain(item.FZcy2ndorg, valDomain, "ZCY2NDORG");
 
-                //参与二级单位
-                item.FZcy2ndorg = GetValueDomain(item.FZcy2ndorg, valDomain, "ZCY2NDORG");
+                    //计税方式
+                    item.ZTAXMETHOD = GetValueDomain(item.ZTAXMETHOD, valDomain, "ZTAXMETHOD");
 
-                //基金组织形式
-                item.ZFUNDORGFORM = GetValueDomain(item.ZFUNDORGFORM, valDomain, "ZCY2NDORG");
+                    //并表情况
+                    item.ZCS = GetValueDomain(item.ZCS, valDomain, "ZCS");
 
-                ////承租人类型
-                item.ZLESSEETYPE = GetValueDomain(item.ZLESSEETYPE, valDomain, "ZLESSEETYPE");
+                    //是否联合体项目
+                    item.FZwinningc = item.FZwinningc == "1" ? "是" : "否";
 
-                //项目管理方式
-                item.FZmanagemode = GetValueDomain(item.FZmanagemode, valDomain, "ZMANAGE_MODE");
+                    //中交项目业务分类
+                    item.ZCPBC = GetValueDomain(item.ZCPBC, valDomain, "ZCPBC");
 
-                //中标主体
-                item.ZAWARDMAI = GetCorresunit(item.ZAWARDMAI, zbzt);
+                    //项目组织形式
+                    item.ZPOS = GetValueDomain(item.ZPOS, valDomain, "ZPOS");
 
+                    //所属事业部
+                    item.ZBIZDEPT = GetValueDomain(item.ZBIZDEPT, valDomain, "ZBIZDEPT");
+
+                    //参与二级单位
+                    item.FZcy2ndorg = GetValueDomain(item.FZcy2ndorg, valDomain, "ZCY2NDORG");
+
+                    //基金组织形式
+                    item.ZFUNDORGFORM = GetValueDomain(item.ZFUNDORGFORM, valDomain, "ZCY2NDORG");
+
+                    ////承租人类型
+                    item.ZLESSEETYPE = GetValueDomain(item.ZLESSEETYPE, valDomain, "ZLESSEETYPE");
+
+                    //项目管理方式
+                    item.FZmanagemode = GetValueDomain(item.FZmanagemode, valDomain, "ZMANAGE_MODE");
+
+                    //中标主体
+                    item.ZAWARDMAI = GetCorresunit(item.ZAWARDMAI, zbzt);
+
+                }
             }
             #endregion
             #endregion
