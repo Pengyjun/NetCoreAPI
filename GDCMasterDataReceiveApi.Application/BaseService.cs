@@ -335,7 +335,7 @@ namespace GDCMasterDataReceiveApi.Application
                         {
                             new KeyValuePair<WhereType, ConditionalModel>(
                              (WhereType)item.Type,
-                            new ConditionalModel(){FieldName =item.FieldName,ConditionalType=item.ConditionalType,FieldValue=item.FieldValue,CSharpTypeName="int"}),
+                            new ConditionalModel(){FieldName =item.FieldName,ConditionalType=item.ConditionalType,FieldValue=item.FieldValue}),
                         }
                     });
                    
