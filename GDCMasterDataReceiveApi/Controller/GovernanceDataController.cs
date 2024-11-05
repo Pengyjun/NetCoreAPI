@@ -27,7 +27,7 @@ namespace GDCMasterDataReceiveApi.Controller
         }
         #endregion
         /// <summary>
-        /// 治理数据  1是金融机构  2是物资明细编码  3 是往来单位数据  4DH生产经营管理组织
+        /// 治理数据  1是金融机构  2是物资明细编码  3 是往来单位数据  4DH生产经营管理组织 5DH核算部门
         /// </summary>
         /// <param name="type"></param>
         /// <returns></returns>

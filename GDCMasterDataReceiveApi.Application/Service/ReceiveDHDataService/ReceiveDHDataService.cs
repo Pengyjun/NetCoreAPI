@@ -4,7 +4,6 @@ using GDCMasterDataReceiveApi.Domain.Models;
 using GDCMasterDataReceiveApi.Domain.Shared;
 using GDCMasterDataReceiveApi.Domain.Shared.Utils;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using SqlSugar;
 using UtilsSharp;
 
@@ -23,6 +22,17 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveDHDataService
         public ReceiveDHDataService(ISqlSugarClient dbContext)
         {
             this._dbContext = dbContext;
+        }
+        /// <summary>
+        /// 通用接收响应体
+        /// </summary>
+        public class Root
+        {
+            public string? Code { get; set; }
+            public string? Msg { get; set; }
+            public string? Count { get; set; }
+            public string? TotalCount { get; set; }
+            public object? Data { get; set; }
         }
         /// <summary>
         /// 获取DH数据
@@ -75,17 +85,23 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveDHDataService
             // 装所有页的数据
             List<T> data = new();
 
-            // 解析 JSON
-            var jsonObject = JObject.Parse(await JData(requestDto));
-            int count = Convert.ToInt32(jsonObject["Count"]);// 需要循环的总页数
+            var respData = JsonConvert.DeserializeObject<Root>(await JData(requestDto));
+            int count = Convert.ToInt32(respData.Count);// 需要循环的总页数
 
-            for (int i = 1; i <= count; i++)
+            if (count == 1)
             {
-                requestDto.PageIndex = i;
-                var jsonObject2 = JObject.Parse(await JData(requestDto));
-                var jData = jsonObject2["Data"].ToString();
-                var nData = JsonConvert.DeserializeObject<List<T>>(jData);
-                data.AddRange(nData);
+                data = JsonConvert.DeserializeObject<List<T>>(respData.Data.ToString());
+            }
+            else
+            {
+                data.AddRange(JsonConvert.DeserializeObject<List<T>>(respData.Data.ToString()));//第一页的数据
+                for (int i = 2; i <= count; i++)
+                {
+                    requestDto.PageIndex = i;
+                    var respData2 = JsonConvert.DeserializeObject<Root>(await JData(requestDto));
+                    var dt = JsonConvert.DeserializeObject<List<T>>(respData2.Data.ToString());
+                    data.AddRange(dt);
+                }
             }
 
             return data;
@@ -107,32 +123,19 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveDHDataService
             };
 
             //获取接收数据
-            var data = await GetDataAsync<DHOrganzation>(requestDto);
+            var insertTable = await GetDataAsync<DHOrganzation>(requestDto);
 
-            if (data != null && data.Any())
+            if (insertTable != null && insertTable.Any())
             {
-                var tData = await _dbContext.Queryable<DHOrganzation>().Where(x => x.IsDelete == 1).ToListAsync();
-
-                var keyIds = new HashSet<string>(tData.Select(t => t.OID));
-                var insertTable = data.Where(x => !keyIds.Contains(x.OID)).ToList();
-                var updateTable = data.Where(x => keyIds.Contains(x.OID)).ToList();
-
                 if (insertTable.Any())
                 {
                     foreach (var item in insertTable)
                     {
-                        //item.IsDelete = Convert.ToInt32(item.DELETE);
                         item.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
                         item.CreateTime = DateTime.Now;
                     }
                     await _dbContext.Fastest<DHOrganzation>().BulkCopyAsync(insertTable);
                 }
-                if (updateTable.Any())
-                {
-                    foreach (var item in updateTable) { item.UpdateTime = DateTime.Now; }
-                    await _dbContext.Updateable(updateTable).WhereColumns(x => x.OID).ExecuteCommandAsync();
-                }
-
                 responseAjaxResult.SuccessResult(true);
             }
             else
@@ -158,30 +161,18 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveDHDataService
             };
 
             //获取接收数据
-            var data = await GetDataAsync<DHAdministrative>(requestDto);
+            var insertTable = await GetDataAsync<DHAdministrative>(requestDto);
 
-            if (data != null && data.Any())
+            if (insertTable != null && insertTable.Any())
             {
-                var tData = await _dbContext.Queryable<DHAdministrative>().Where(x => x.IsDelete == 1).ToListAsync();
-
-                var keyIds = new HashSet<string>(tData.Select(t => t.Fzid));
-                var insertTable = data.Where(x => !keyIds.Contains(x.Fzid)).ToList();
-                var updateTable = data.Where(x => keyIds.Contains(x.Fzid)).ToList();
-
                 if (insertTable.Any())
                 {
                     foreach (var item in insertTable)
                     {
-                        //item.IsDelete = Convert.ToInt32(item.Fzdelete);
                         item.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
                         item.CreateTime = DateTime.Now;
                     }
                     await _dbContext.Fastest<DHAdministrative>().BulkCopyAsync(insertTable);
-                }
-                if (updateTable.Any())
-                {
-                    foreach (var item in updateTable) { item.UpdateTime = DateTime.Now; }
-                    await _dbContext.Updateable(updateTable).WhereColumns(x => x.Fzid).ExecuteCommandAsync();
                 }
 
                 responseAjaxResult.SuccessResult(true);
@@ -209,15 +200,10 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveDHDataService
             };
 
             //获取接收数据
-            var data = await GetDataAsync<DHOrganzationDep>(requestDto);
+            var insertTable = await GetDataAsync<DHOrganzationDep>(requestDto);
 
-            if (data != null && data.Any())
+            if (insertTable != null && insertTable.Any())
             {
-                var tData = await _dbContext.Queryable<DHOrganzationDep>().Where(x => x.IsDelete == 1).ToListAsync();
-
-                var keyIds = new HashSet<string>(tData.Select(t => t.MdmCode));
-                var insertTable = data.Where(x => !keyIds.Contains(x.MdmCode)).ToList();
-                var updateTable = data.Where(x => keyIds.Contains(x.MdmCode)).ToList();
 
                 if (insertTable.Any())
                 {
@@ -226,11 +212,6 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveDHDataService
                         item.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(); item.CreateTime = DateTime.Now;
                     }
                     await _dbContext.Fastest<DHOrganzationDep>().BulkCopyAsync(insertTable);
-                }
-                if (updateTable.Any())
-                {
-                    foreach (var item in updateTable) { item.UpdateTime = DateTime.Now; }
-                    await _dbContext.Updateable(updateTable).WhereColumns(x => x.MdmCode).ExecuteCommandAsync();
                 }
 
                 responseAjaxResult.SuccessResult(true);
@@ -258,15 +239,10 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveDHDataService
             };
 
             //获取接收数据
-            var data = await GetDataAsync<DHAdjustAccountsMultipleOrg>(requestDto);
+            var insertTable = await GetDataAsync<DHAdjustAccountsMultipleOrg>(requestDto);
 
-            if (data != null && data.Any())
+            if (insertTable != null && insertTable.Any())
             {
-                var tData = await _dbContext.Queryable<DHAdjustAccountsMultipleOrg>().Where(x => x.IsDelete == 1).ToListAsync();
-
-                var keyIds = new HashSet<string>(tData.Select(t => t.Zaco));
-                var insertTable = data.Where(x => !keyIds.Contains(x.Zaco)).ToList();
-                var updateTable = data.Where(x => keyIds.Contains(x.Zaco)).ToList();
 
                 if (insertTable.Any())
                 {
@@ -276,11 +252,6 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveDHDataService
                         item.CreateTime = DateTime.Now;
                     }
                     await _dbContext.Fastest<DHAdjustAccountsMultipleOrg>().BulkCopyAsync(insertTable);
-                }
-                if (updateTable.Any())
-                {
-                    foreach (var item in updateTable) { item.UpdateTime = DateTime.Now; }
-                    await _dbContext.Updateable(updateTable).WhereColumns(x => x.Zaco).ExecuteCommandAsync();
                 }
 
                 responseAjaxResult.SuccessResult(true);
@@ -308,16 +279,10 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveDHDataService
             };
 
             //获取接收数据
-            var data = await GetDataAsync<DHAccountingDept>(requestDto);
+            var insertTable = await GetDataAsync<DHAccountingDept>(requestDto);
 
-            if (data != null && data.Any())
+            if (insertTable != null && insertTable.Any())
             {
-                var tData = await _dbContext.Queryable<DHAccountingDept>().Where(x => x.IsDelete == 1).ToListAsync();
-
-                var keyIds = new HashSet<string>(tData.Select(t => t.Zdid));
-                var insertTable = data.Where(x => !keyIds.Contains(x.Zdid)).ToList();
-                var updateTable = data.Where(x => keyIds.Contains(x.Zdid)).ToList();
-
                 if (insertTable.Any())
                 {
                     foreach (var item in insertTable)
@@ -327,11 +292,6 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveDHDataService
                         item.IsDelete = item.Zdatstate == "0" ? 1 : item.Zdatstate == "1" ? 0 : 1;
                     }
                     await _dbContext.Fastest<DHAccountingDept>().BulkCopyAsync(insertTable);
-                }
-                if (updateTable.Any())
-                {
-                    foreach (var item in updateTable) { item.UpdateTime = DateTime.Now; }
-                    await _dbContext.Updateable(updateTable).WhereColumns(x => x.Zdid).ExecuteCommandAsync();
                 }
 
                 responseAjaxResult.SuccessResult(true);
@@ -359,30 +319,19 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveDHDataService
             };
 
             //获取接收数据
-            var data = await GetDataAsync<DHProjects>(requestDto);
+            var insertTable = await GetDataAsync<DHProjects>(requestDto);
 
-            if (data != null && data.Any())
+            if (insertTable != null && insertTable.Any())
             {
-                var tData = await _dbContext.Queryable<DHProjects>().Where(x => x.IsDelete == 1).ToListAsync();
-
-                var keyIds = new HashSet<string>(tData.Select(t => t.ZPROJECT));
-                var insertTable = data.Where(x => !keyIds.Contains(x.ZPROJECT)).ToList();
-                var updateTable = data.Where(x => keyIds.Contains(x.ZPROJECT)).ToList();
 
                 if (insertTable.Any())
                 {
                     foreach (var item in insertTable)
                     {
                         item.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
-                        //item.IsDelete = Convert.ToInt32(item.Zdelete);
                         item.CreateTime = DateTime.Now;
                     }
                     await _dbContext.Fastest<DHProjects>().BulkCopyAsync(insertTable);
-                }
-                if (updateTable.Any())
-                {
-                    foreach (var item in updateTable) { item.UpdateTime = DateTime.Now; }
-                    await _dbContext.Updateable(updateTable).WhereColumns(x => x.ZPROJECT).ExecuteCommandAsync();
                 }
 
                 responseAjaxResult.SuccessResult(true);
@@ -461,30 +410,17 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveDHDataService
             };
 
             //获取接收数据
-            var data = await GetDataAsync<DHOpportunity>(requestDto);
-
-            if (data != null && data.Any())
+            var insertTable = await GetDataAsync<DHOpportunity>(requestDto);
+            if (insertTable != null && insertTable.Any())
             {
-                var tData = await _dbContext.Queryable<DHOpportunity>().Where(x => x.IsDelete == 1).ToListAsync();
-
-                var keyIds = new HashSet<string>(tData.Select(t => t.ZBOP));
-                var insertTable = data.Where(x => !keyIds.Contains(x.ZBOP)).ToList();
-                var updateTable = data.Where(x => keyIds.Contains(x.ZBOP)).ToList();
-
                 if (insertTable.Any())
                 {
                     foreach (var item in insertTable)
                     {
                         item.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
-                        //item.IsDelete = Convert.ToInt32(item.Zdelete);
                         item.CreateTime = DateTime.Now;
                     }
                     await _dbContext.Fastest<DHOpportunity>().BulkMergeAsync(insertTable);
-                }
-                if (updateTable.Any())
-                {
-                    foreach (var item in updateTable) { item.UpdateTime = DateTime.Now; }
-                    await _dbContext.Updateable(updateTable).WhereColumns(x => x.ZBOP).ExecuteCommandAsync();
                 }
 
                 responseAjaxResult.SuccessResult(true);
@@ -512,30 +448,18 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveDHDataService
             };
 
             //获取接收数据
-            var data = await GetDataAsync<DHResearch>(requestDto);
+            var insertTable = await GetDataAsync<DHResearch>(requestDto);
 
-            if (data != null && data.Any())
+            if (insertTable != null && insertTable.Any())
             {
-                var tData = await _dbContext.Queryable<DHResearch>().Where(x => x.IsDelete == 1).ToListAsync();
-
-                var keyIds = new HashSet<string>(tData.Select(t => t.FzsrpCode));
-                var insertTable = data.Where(x => !keyIds.Contains(x.FzsrpCode)).ToList();
-                var updateTable = data.Where(x => keyIds.Contains(x.FzsrpCode)).ToList();
-
                 if (insertTable.Any())
                 {
                     foreach (var item in insertTable)
                     {
                         item.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
-                        //item.IsDelete = Convert.ToInt32(item.Fzdelete);
                         item.CreateTime = DateTime.Now;
                     }
                     await _dbContext.Fastest<DHResearch>().BulkMergeAsync(insertTable);
-                }
-                if (updateTable.Any())
-                {
-                    foreach (var item in updateTable) { item.UpdateTime = DateTime.Now; }
-                    await _dbContext.Updateable(updateTable).WhereColumns(x => x.FzsrpCode).ExecuteCommandAsync();
                 }
 
                 responseAjaxResult.SuccessResult(true);
@@ -563,30 +487,18 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveDHDataService
             };
 
             //获取接收数据
-            var data = await GetDataAsync<DHMdmManagementOrgage>(requestDto);
+            var insertTable = await GetDataAsync<DHMdmManagementOrgage>(requestDto);
 
-            if (data != null && data.Any())
+            if (insertTable != null && insertTable.Any())
             {
-                var tData = await _dbContext.Queryable<DHMdmManagementOrgage>().Where(x => x.IsDelete == 1).ToListAsync();
-
-                var keyIds = new HashSet<string>(tData.Select(t => t.Ztreeid));
-                var insertTable = data.Where(x => !keyIds.Contains(x.Ztreeid)).ToList();
-                var updateTable = data.Where(x => keyIds.Contains(x.Ztreeid)).ToList();
-
                 if (insertTable.Any())
                 {
                     foreach (var item in insertTable)
                     {
                         item.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
-                        //item.IsDelete = Convert.ToInt32(item.Zdelete);
                         item.CreateTime = DateTime.Now;
                     }
-                    await _dbContext.Fastest<DHMdmManagementOrgage>().BulkMergeAsync(insertTable);
-                }
-                if (updateTable.Any())
-                {
-                    foreach (var item in updateTable) { item.UpdateTime = DateTime.Now; }
-                    await _dbContext.Updateable(updateTable).WhereColumns(x => x.Ztreeid).ExecuteCommandAsync();
+                    await _dbContext.Fastest<DHMdmManagementOrgage>().BulkCopyAsync(insertTable);
                 }
 
                 responseAjaxResult.SuccessResult(true);
@@ -614,27 +526,16 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveDHDataService
             };
 
             //获取接收数据
-            var data = await GetDataAsync<DHMdmMultOrgAgencyRelPage>(requestDto);
+            var insertTable = await GetDataAsync<DHMdmMultOrgAgencyRelPage>(requestDto);
 
-            if (data != null && data.Any())
+            if (insertTable != null && insertTable.Any())
             {
                 var tData = await _dbContext.Queryable<DHMdmMultOrgAgencyRelPage>().Where(x => x.IsDelete == 1).ToListAsync();
-
-                var keyIds = new HashSet<string>(tData.Select(t => t.Ztreeid));
-                var key2Ids = new HashSet<string>(tData.Select(t => t.Znumc4x));
-                var key3Ids = new HashSet<string>(tData.Select(t => t.ZmviewFlag));
-                var insertTable = data.Where(x => !keyIds.Contains(x.Ztreeid) && !key2Ids.Contains(x.Znumc4x) && !key3Ids.Contains(x.ZmviewFlag)).ToList();
-                var updateTable = data.Where(x => keyIds.Contains(x.Ztreeid) && key2Ids.Contains(x.Znumc4x) && key3Ids.Contains(x.ZmviewFlag)).ToList();
 
                 if (insertTable.Any())
                 {
                     foreach (var item in insertTable) { item.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(); item.CreateTime = DateTime.Now; }
                     await _dbContext.Fastest<DHMdmMultOrgAgencyRelPage>().BulkMergeAsync(insertTable);
-                }
-                if (updateTable.Any())
-                {
-                    foreach (var item in updateTable) { item.UpdateTime = DateTime.Now; }
-                    await _dbContext.Updateable(updateTable).WhereColumns(x => new { x.Ztreeid, x.Znumc4x, x.ZmviewFlag }).ExecuteCommandAsync();
                 }
 
                 responseAjaxResult.SuccessResult(true);
