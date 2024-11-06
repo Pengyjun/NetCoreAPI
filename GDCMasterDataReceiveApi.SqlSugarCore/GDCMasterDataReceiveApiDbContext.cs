@@ -23,7 +23,7 @@ namespace GDCMasterDataReceiveApi.SqlSugarCore
             var gdcmasterdatareceiveapi = "Server=10.10.74.3;PORT=5088; User Id=datasecurity; PWD=datasecurity@sql;SCHEMA=GDCMDM";
             var gdcdatasecurityapi = "Server=10.10.74.3;PORT=5088; User Id=GDCMDM; PWD=GDCMDMdb123;SCHEMA=DATASECURITY";//测试环境
             //是否打开无参数化sql监视
-            bool isOpenSql = true;
+            bool isOpenSql = false;
             SqlSugarClient sqlSugarClient = new SqlSugarClient(new List<ConnectionConfig>()
             {
                  new ConnectionConfig(){ConfigId="gdcmasterdatareceiveapi",ConnectionString = gdcmasterdatareceiveapi, DbType = DbType.Dm,IsAutoCloseConnection = true},
