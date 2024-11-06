@@ -377,7 +377,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
             else
             {
                 startTime = Convert.ToDateTime(timeStr);
-                endTime = Convert.ToDateTime(timeEnd);
+                endTime = Convert.ToDateTime(timeEnd).AddDays(1);
             }
            new CacheHelper().Set("time1", startTime.ToString("yyyy-MM-dd HH:mm:ss"), int.MaxValue);
            new CacheHelper().Set("time2", endTime.ToString("yyyy-MM-dd HH:mm:ss"), int.MaxValue);
@@ -386,7 +386,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
             //按接口
             var auditLogList = await _dbContext.Queryable<AuditLogs>()
                 .Where(x => x.AppKey!=null
-                 && SqlFunc.ToDate(x.RequestTime) >= startTime && SqlFunc.ToDate(x.RequestTime) <= endTime && x.HttpStatusCode == 200)
+                 && SqlFunc.ToDate(x.RequestTime) >= startTime && SqlFunc.ToDate(x.RequestTime) < endTime && x.HttpStatusCode == 200)
                 .ToListAsync();
             if (auditLogList.Count > 0)
             {
