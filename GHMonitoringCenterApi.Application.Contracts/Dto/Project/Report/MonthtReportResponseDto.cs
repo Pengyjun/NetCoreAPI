@@ -147,6 +147,10 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project.Report
             /// </summary>
             public Guid? CompanyId { get; set; }
             /// <summary>
+            /// 项目主数据编码
+            /// </summary>
+            public string? MdmCode { get; set; }
+            /// <summary>
             /// 项目名称
             /// </summary>
             public string? Name { get; set; }

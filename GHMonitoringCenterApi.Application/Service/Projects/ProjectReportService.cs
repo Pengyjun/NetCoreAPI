@@ -2003,6 +2003,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                         .OrderBy((m, p) => new { m.ProjectId, m.DateMonth });
             }
 
+
             var selQuery = query.Select((m, p) => new MonthtReportsResponseDto.MonthtReportDto()
             {
                 Id = m.Id,
@@ -2116,6 +2117,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             //汇率
             var pRates = await _dbContext.Queryable<CurrencyConverter>().Where(x => x.IsDelete == 1).ToListAsync();
             // 年度计划
+            var pjects = await _dbProject.AsQueryable().Where(x => x.IsDelete == 1 && pIds.Contains(x.Id.ToString())).Select(x => new { x.Id, x.MasterCode }).ToListAsync();
             list.ForEach(item =>
             {
                 #region 新 时间判断
@@ -2167,6 +2169,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 item.PhoneAdministration = projectLeader?.Phone;
                 item.TweUnit = "中交广州航道局有限公司";
                 item.ThreeUnit = companys.FirstOrDefault(t => t.PomId == item.CompanyId)?.Name;
+                item.MdmCode = pjects.FirstOrDefault(x => x.Id == item.ProjectId)?.MasterCode;
                 // 计划产值/工程量
                 item.PlanQuantities = Math.Round(sumProjectMonthPlanned.PlannedQuantities);
                 item.PlanOutPutValue = Math.Round(sumProjectMonthPlanned.PlannedOutputValue);
@@ -3883,12 +3886,12 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
         /// 项目月报-船舶-月份-统计
         /// </summary>
         /// <returns></returns>
-        private async Task<SumMonthReportDetailDto> SumMonthReportDetailAsync(Guid projectId, Guid shipId, ConstructionOutPutType outPutType, int dateMonth,bool  flag=false)
+        private async Task<SumMonthReportDetailDto> SumMonthReportDetailAsync(Guid projectId, Guid shipId, ConstructionOutPutType outPutType, int dateMonth, bool flag = false)
         {
             var sumReport = await _dbMonthReportDetail.AsQueryable()
                 .Where(t => t.ProjectId == projectId && t.DateMonth == dateMonth && t.IsDelete == 1 && t.ShipId == shipId)
-                .WhereIF(!flag,t =>t.OutPutType == outPutType)
-                .WhereIF(flag,t =>t.OutPutType == outPutType|| t.OutPutType == ConstructionOutPutType.SubOwner)
+                .WhereIF(!flag, t => t.OutPutType == outPutType)
+                .WhereIF(flag, t => t.OutPutType == outPutType || t.OutPutType == ConstructionOutPutType.SubOwner)
                  .GroupBy(t => new { t.ProjectId, t.ShipId, t.OutPutType, t.DateMonth })
                  .Select(t => new SumMonthReportDetailDto
                  {
@@ -4723,7 +4726,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 var lastDateMonthTime = dateMonthTime.AddMonths(-1);
                 var startDateDay = new DateTime(lastDateMonthTime.Year, lastDateMonthTime.Month, 26).ToDateDay();
                 var endDateDay = new DateTime(dateMonthTime.Year, dateMonthTime.Month, 25).ToDateDay();
-                var count=await _dbContext.Queryable<OwnerShip>().Where(x => x.IsDelete == 1 && x.PomId == model.ShipId).CountAsync();
+                var count = await _dbContext.Queryable<OwnerShip>().Where(x => x.IsDelete == 1 && x.PomId == model.ShipId).CountAsync();
                 var flag = false;//如果是true  自由船舶月报统计自有   也包含分包-自有  但是船必须在自有表里面
                 if (count > 0)
                 {
