@@ -1296,7 +1296,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                 //.WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.MdmCode), t => t.MDM_CODE.Contains(filterCondition.MdmCode))
                 //.WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.CreateTime.ToString()), (pro) => Convert.ToDateTime(pro.CreateTime).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.CreateTime).ToString("yyyy-MM-dd"))
                 //.WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.UpdateTime.ToString()), (pro) => Convert.ToDateTime(pro.UpdateTime).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.UpdateTime).ToString("yyyy-MM-dd"))
-                //.Where(t => t.IsDelete == 1 && t.GPOID == filterCondition.Oid)
+                .Where(t => t.IsDelete == 1 && t.GPOID == requestDto.Oid)
 
                 .Select(ins => new InstitutionDetatilsDto
                 {
