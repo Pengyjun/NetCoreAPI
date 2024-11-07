@@ -2613,7 +2613,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 item.CumulativeAccomplishCost = hisMonthRep == null ? val.CumulativeAccomplishCost : hisMonthRep.CostAmount + val.CumulativeAccomplishCost;
                 item.CumulativeOutsourcingExpensesAmount = hisMonthRep == null ? val.CumulativeOutsourcingExpensesAmount : hisMonthRep.OutsourcingExpensesAmount + val.CumulativeOutsourcingExpensesAmount;
 
-                item.CumulativeCompleted = val.CumulativeCompleted + (hisMonthRep == null ? 0 : hisMonthRep.CompleteProductionAmount);
+                item.CumulativeCompleted = val.CumulativeCompleted + (hisMonthRep == null ? 0 : (model.IsConvert == true ? hisMonthRep.CompleteProductionAmount : hisMonthRep.CurrencyCompleteProductionAmount));
 
                 item.CumulativePaymentAmount = hisMonthRep == null ? val.CumulativePaymentAmount : hisMonthRep.PartyAPayAmount + val.CumulativePaymentAmount;
                 item.CumulativeValue = hisMonthRep == null ? val.CumulativeValue : hisMonthRep.PartyAConfirmedProductionAmount + val.CumulativeValue;
@@ -3006,7 +3006,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 item.CumulativeAccomplishCost = hisMonthRep == null ? val.CumulativeAccomplishCost : hisMonthRep.CostAmount + val.CumulativeAccomplishCost;
                 item.CumulativeOutsourcingExpensesAmount = hisMonthRep == null ? val.CumulativeOutsourcingExpensesAmount : hisMonthRep.OutsourcingExpensesAmount + val.CumulativeOutsourcingExpensesAmount;
 
-                item.CumulativeCompleted = val.CumulativeCompleted + (hisMonthRep == null ? 0 : hisMonthRep.CompleteProductionAmount);
+                item.CumulativeCompleted = val.CumulativeCompleted + (hisMonthRep == null ? 0 : (model.IsConvert == true ? hisMonthRep.CompleteProductionAmount : hisMonthRep.CurrencyCompleteProductionAmount));
 
                 item.CumulativePaymentAmount = hisMonthRep == null ? val.CumulativePaymentAmount : hisMonthRep.PartyAPayAmount + val.CumulativePaymentAmount;
                 item.CumulativeValue = hisMonthRep == null ? val.CumulativeValue : hisMonthRep.PartyAConfirmedProductionAmount + val.CumulativeValue;
