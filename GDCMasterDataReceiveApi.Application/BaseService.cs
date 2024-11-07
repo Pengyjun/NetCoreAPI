@@ -216,7 +216,7 @@ namespace GDCMasterDataReceiveApi.Application
             if ((int)dataOperationType == 1)
             {
                 //插入操作
-               await _dbContext.Insertable<ReceiveRecordLog>(receiveRecordLog).ExecuteCommandAsync();
+                await _dbContext.Insertable<ReceiveRecordLog>(receiveRecordLog).ExecuteCommandAsync();
             }
 
             if ((int)dataOperationType == 2)
@@ -325,7 +325,7 @@ namespace GDCMasterDataReceiveApi.Application
             var conditionalModel = new List<IConditionalModel>();
             //conditionalModel.Add(new ConditionalModel { FieldName = "name", ConditionalType = ConditionalType.Equal, FieldValue = "1=1" });
 
-            if (jsonToSqlRequestDtos.Count > 0)
+            if (jsonToSqlRequestDtos != null && jsonToSqlRequestDtos.Count > 0)
             {
                 foreach (var item in jsonToSqlRequestDtos)
                 {
@@ -338,7 +338,7 @@ namespace GDCMasterDataReceiveApi.Application
                             new ConditionalModel(){FieldName =item.FieldName,ConditionalType=item.ConditionalType,FieldValue=item.FieldValue}),
                         }
                     });
-                   
+
                 }
             }
             return conditionalModel;
