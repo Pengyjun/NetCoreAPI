@@ -102,7 +102,7 @@ namespace GDCMasterDataReceiveApi.Controller
             {
                 columns = await GetExpColumns("GetInstitutionsAsync");
                 fields = GetFields<InstitutionDetatilsDto>(columns);
-                var data = await searchService.GetInstitutionAsync(condition);
+                var data = await searchService.GetInstitutionTreeDetailsAsync(condition);
                 var excelData = ExportToExcel(data.Data, fields, "机构");
                 return File(excelData, contentType, $"机构_{DateTime.Now:yyyyMMdd}.xlsx");
             }

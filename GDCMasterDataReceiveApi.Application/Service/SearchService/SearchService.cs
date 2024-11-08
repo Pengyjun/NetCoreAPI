@@ -1244,58 +1244,69 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
             ResponseAjaxResult<List<InstitutionDetatilsDto>> responseAjaxResult = new();
             RefAsync<int> total = 0;
 
-
-            //过滤条件
-            //InstitutionDetatilsDto filterCondition = new();
-            //if (!string.IsNullOrWhiteSpace(requestDto.FilterConditionJson))
-            //{
-            //    filterCondition = JsonConvert.DeserializeObject<InstitutionDetatilsDto>(requestDto.FilterConditionJson);
-            //}
             var jsonWhere = await _baseService.JsonToConventSqlAsync(requestDto.JsonToSqlRequestDtos);
-            var institutions = await _dbContext.Queryable<Institution>()
+
+            List<InstitutionDetatilsDto> institutions = new();
+            if (requestDto.IsFullExport)
+            {
+                institutions = await _dbContext.Queryable<Institution>()
+                .Where(t => t.IsDelete == 1)
+                .Select(ins => new InstitutionDetatilsDto
+                {
+                    BizDomain = ins.BIZDOMAIN,
+                    BizType = ins.BIZTYPE,
+                    Carea = ins.CAREA,
+                    Code = ins.OCODE,
+                    Coid = ins.COID,
+                    Crossorgan = ins.CROSSORGAN,
+                    EnglishName = ins.ENGLISHNAME,
+                    EnglishShortName = ins.ENGLISHSHORTNAME,
+                    EntClass = ins.ENTCLASS,
+                    GlobalSno = ins.GLOBAL_SNO,
+                    Goid = ins.GOID,
+                    Gpoid = ins.GPOID,
+                    Grade = ins.GRADE,
+                    IsIndependent = ins.IS_INDEPENDENT,
+                    MdmCode = ins.MDM_CODE,
+                    Mrut = ins.MRUT,
+                    Name = ins.NAME,
+                    Note = ins.NOTE,
+                    Oid = ins.OID,
+                    Oper = ins.OPER,
+                    Organemp = ins.ORGANEMP,
+                    OrganGrade = ins.ORGANGRADE,
+                    OrgGrade = ins.ORGGRADE,
+                    OrgProvince = ins.ORGPROVINCE,
+                    Orule = ins.ORULE,
+                    OSecBid = ins.O2BID,
+                    POid = ins.POID,
+                    ProjectManType = ins.PROJECTMANTYPE,
+                    ProjectScale = ins.PROJECTSCALE,
+                    ProjectType = ins.PROJECTTYPE,
+                    QyGrade = ins.QYGRADE,
+                    RegisterCode = ins.REGISTERCODE,
+                    RoId = ins.ROID,
+                    Rown = ins.ROWN,
+                    ShareHoldings = ins.SHAREHOLDINGS,
+                    ShortName = ins.SHORTNAME,
+                    Sno = ins.SNO,
+                    StartDate = ins.STARTDATE,
+                    Status = ins.STATUS,
+                    TemorganName = ins.TEMORGANNAME,
+                    TerritoryPro = ins.TERRITORYPRO,
+                    Type = ins.TYPE,
+                    TypeExt = ins.TYPEEXT,
+                    Version = ins.VERSION,
+                    CreateTime = ins.CreateTime,
+                    UpdateTime = ins.UpdateTime,
+                })
+                .ToListAsync();
+            }
+            else
+            {
+                institutions = await _dbContext.Queryable<Institution>()
                 .WhereIF(!string.IsNullOrWhiteSpace(requestDto.KeyWords), t => t.OID.Contains(requestDto.KeyWords) || t.NAME.Contains(requestDto.KeyWords))
                 .Where(jsonWhere)
-                //.WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.EntClass), t => t.ENTCLASS.Contains(filterCondition.EntClass))
-                //.WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.POid), t => t.POID.Contains(filterCondition.POid))
-                //.WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Status), t => t.STATUS.Contains(filterCondition.Status))
-                //.WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Code), t => t.OCODE.Contains(filterCondition.Code))
-                //.WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Orule), t => t.ORULE.Contains(filterCondition.Orule))
-                //.WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ShortName), t => t.SHORTNAME.Contains(filterCondition.ShortName))
-                //.WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.EnglishName), t => t.ENGLISHNAME.Contains(filterCondition.EnglishName))
-                //.WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.EnglishShortName), t => t.ENGLISHSHORTNAME.Contains(filterCondition.EnglishShortName))
-                //.WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.BizType), t => t.BIZTYPE.Contains(filterCondition.BizType))
-                //.WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Gpoid), t => t.GPOID.Contains(filterCondition.Gpoid))
-                //.WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Type), t => t.TYPE.Contains(filterCondition.Type))
-                //.WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.TypeExt), t => t.TYPEEXT.Contains(filterCondition.TypeExt))
-                //.WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Mrut), t => t.MRUT.Contains(filterCondition.Mrut))
-                //.WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Sno), t => t.SNO.Contains(filterCondition.Sno))
-                //.WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Coid), t => t.COID.Contains(filterCondition.Coid))
-                //.WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Crossorgan), t => t.CROSSORGAN.Contains(filterCondition.Crossorgan))
-                //.WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Goid), t => t.GOID.Contains(filterCondition.Goid))
-                //.WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Grade), t => t.GRADE.Contains(filterCondition.Grade))
-                //.WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Oper), t => t.OPER.Contains(filterCondition.Oper))
-                //.WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Note), t => t.NOTE.Contains(filterCondition.Note))
-                //.WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.TemorganName), t => t.TEMORGANNAME.Contains(filterCondition.TemorganName))
-                //.WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.OrgProvince), t => t.ORGPROVINCE.Contains(filterCondition.OrgProvince))
-                //.WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Carea), t => t.CAREA.Contains(filterCondition.Carea))
-                //.WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.TerritoryPro), t => t.TERRITORYPRO.Contains(filterCondition.TerritoryPro))
-                //.WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.BizDomain), t => t.BIZDOMAIN.Contains(filterCondition.BizDomain))
-                //.WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.OrgGrade), t => t.ORGGRADE.Contains(filterCondition.OrgGrade))
-                //.WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ProjectScale), t => t.PROJECTSCALE.Contains(filterCondition.ProjectScale))
-                //.WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ProjectManType), t => t.PROJECTMANTYPE.Contains(filterCondition.ProjectManType))
-                //.WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ProjectType), t => t.PROJECTTYPE.Contains(filterCondition.ProjectType))
-                //.WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.StartDate), t => t.STARTDATE.Contains(filterCondition.StartDate))
-                //.WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Organemp), t => t.ORGANEMP.Contains(filterCondition.Organemp))
-                //.WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.OrganGrade), t => t.ORGANGRADE.Contains(filterCondition.OrganGrade))
-                //.WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.Rown), t => t.ROWN.Contains(filterCondition.Rown))
-                //.WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.RoId), t => t.ROID.Contains(filterCondition.RoId))
-                //.WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.GlobalSno), t => t.GLOBAL_SNO.Contains(filterCondition.GlobalSno))
-                //.WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.QyGrade), t => t.QYGRADE.Contains(filterCondition.QyGrade))
-                //.WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.RegisterCode), t => t.REGISTERCODE.Contains(filterCondition.RegisterCode))
-                //.WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.ShareHoldings), t => t.SHAREHOLDINGS.Contains(filterCondition.ShareHoldings))
-                //.WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.MdmCode), t => t.MDM_CODE.Contains(filterCondition.MdmCode))
-                //.WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.CreateTime.ToString()), (pro) => Convert.ToDateTime(pro.CreateTime).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.CreateTime).ToString("yyyy-MM-dd"))
-                //.WhereIF(filterCondition != null && !string.IsNullOrWhiteSpace(filterCondition.UpdateTime.ToString()), (pro) => Convert.ToDateTime(pro.UpdateTime).ToString("yyyy-MM-dd") == Convert.ToDateTime(filterCondition.UpdateTime).ToString("yyyy-MM-dd"))
                 .Where(t => t.IsDelete == 1 && t.GPOID == requestDto.Oid)
 
                 .Select(ins => new InstitutionDetatilsDto
@@ -1349,6 +1360,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                 })
                 .ToPageListAsync(requestDto.PageIndex, requestDto.PageSize, total);
 
+            }
             if (institutions != null && institutions.Any())
             {
                 #region 数据详细查询
