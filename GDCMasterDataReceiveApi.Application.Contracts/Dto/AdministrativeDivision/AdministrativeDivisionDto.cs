@@ -46,49 +46,41 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.AdministrativeDivisi
         /// <summary>
         /// 行政区划代码:业务主键
         /// </summary>
-        [Description("ZADDVSCODE")]
         [DisplayName("行政区划代码")]
         public string? RegionalismCode { get; set; }
         /// <summary>
         /// 行政区划名称
         /// </summary>
-        [Description("ZADDVSNAME")]
         [DisplayName("行政区划名称")]
         public string? Name { get; set; }
         /// <summary>
         /// 上级行政区划代码:第1级行政区划无上级代码。
         /// </summary>
-        [Description("ZADDVSUP")]
         [DisplayName("上级行政区划代码")]
         public string? SupRegionalismCode { get; set; }
         /// <summary>
         /// 行政区域级别:总共3级，省、直辖市、自治区是第1级。
         /// </summary>
-        [Description("ZADDVSLEVEL")]
         [DisplayName("行政区域级别")]
         public string? RegionalismLevel { get; set; }
         /// <summary>
         /// 中交区域总部代码
         /// </summary>
-        [Description("ZCRHCODE")]
         [DisplayName("中交区域总部代码")]
         public string? CodeOfCCCCRegional { get; set; }
         /// <summary>
         /// 版本：数据的版本号。数据每次变更时，版本号自动加1。
         /// </summary>
-        [Description("ZVERSION")]
         [DisplayName("版本")]
         public string? Version { get; set; }
         /// <summary>
         /// 状态：1是已启用，0是已停用
         /// </summary>
-        [Description("ZSTATE")]
         [DisplayName("状态")]
         public string? State { get; set; }
         /// <summary>
         /// 是否删除 数据是否有效的标识:有效：1无效：0
         /// </summary>
-        [Description("ZDELETE")]
         [DisplayName("是否删除")]
         public string? DataIdentifier { get; set; }
         public DateTime? CreateTime { get; set; }

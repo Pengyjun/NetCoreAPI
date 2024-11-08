@@ -37,73 +37,61 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.BankCard
         /// <summary>
         /// 往来单位主数据编码:公司往来单位的唯一编码
         /// </summary>
-        [Description("ZBP")]
         [DisplayName("往来单位主数据编码")]
         public string? DealUnitCode { get; set; }
         /// <summary>
         /// 银行账号主键：银行账号主键
         /// </summary>
-        [Description("ZBANK")]
         [DisplayName("银行账号主键")]
         public string? BankNoPK { get; set; }
         /// <summary>
         /// 账户名称：填报银行账户的全称
         /// </summary>
-        [Description("ZKOINH")]
         [DisplayName("账户名称")]
         public string? Name { get; set; }
         /// <summary>
         /// 银行账号/IBAN：填报银行账号/IBAN，该字段作为银行账户的唯一标识
         /// </summary>
-        [Description("ZBANKN")]
         [DisplayName("银行账号/IBAN")]
         public string? BankAccount { get; set; }
         /// <summary>
         /// 金融机构编码：填报具体开户网点，引用金融机构主数据
         /// </summary>
-        [Description("ZFINC")]
         [DisplayName("金融机构编码")]
         public string? FinancialOrgCode { get; set; }
         /// <summary>
         /// 金融机构名称：填报具体开户网点，引用金融机构主数据
         /// </summary>
-        [Description("ZFINAME")]
         [DisplayName("金融机构名称")]
         public string? FinancialOrgName { get; set; }
         /// <summary>
         /// 账户状态：银行账户所处状态，包括正常、冻结、其他，默认正常。
         /// </summary>
-        [Description("ZBANKSTA")]
         [DisplayName("账户状态")]
         public string? AccountStatus { get; set; }
         /// <summary>
         /// 账户币种：按账户实际币种填报。默认人民币。可多值以英文逗号隔开。
         /// </summary>
-        [Description("ZCURR")]
         [DisplayName("账户币种")]
         public string? AccountCurrency { get; set; }
         /// <summary>
         /// 国家/地区：金融机构对应的国家/地区
         /// </summary>
-        [Description("ZZCOUNTR2")]
         [DisplayName("国家/地区")]
         public string? Country { get; set; }
         /// <summary>
         /// 省：金融机构对应的省，条件必填，国家/地区为中国的必填
         /// </summary>
-        [Description("ZPROVINC2")]
         [DisplayName("省")]
         public string? Province { get; set; }
         /// <summary>
         /// 市：金融机构对应的市，条件必填，国家/地区为中国的必填
         /// </summary>
-        [Description("ZCITY2")]
         [DisplayName("市")]
         public string? City { get; set; }
         /// <summary>
         /// 县：2023.2改为非必填
         /// </summary>
-        [Description("ZCOUNTY2")]
         [DisplayName("县")]
         public string? County { get; set; }
         public DateTime? CreateTime { get; set; }

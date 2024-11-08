@@ -77,157 +77,131 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.ProjectClassificatio
         /// <summary>
         /// 中交业务分类三级分类代码
         /// </summary>
-        [Description("ZCPBC3ID")]
         [DisplayName("中交业务分类三级分类代码")]
         public string? CCCCBTypeThirdCode { get; set; }
         /// <summary>
         /// 中交业务分类一级分类代码 
         /// </summary>
-        [Description("ZCPBC1ID")]
         [DisplayName("中交业务分类一级分类代码")]
         public string? CCCCBTypeOneCode { get; set; }
         /// <summary>
         /// 中交业务分类一级分类名称 
         /// </summary>
-        [Description("ZCPBC1NAME")]
         [DisplayName("中交业务分类一级分类名称")]
         public string? Name { get; set; }
         /// <summary>
         /// 中交业务分类二级分类代码
         /// </summary>
-        [Description("ZCPBC2ID")]
         [DisplayName("中交业务分类二级分类代码")]
         public string? CCCCBTypeSecCode { get; set; }
         /// <summary>
         /// 中交业务分类二级分类名称
         /// </summary>
-        [Description("ZCPBC2NAME")]
         [DisplayName("中交业务分类二级分类名称")]
         public string? CCCCBTypeSecName { get; set; }
         /// <summary>
         /// 中交业务分类三级分类名称
         /// </summary>
-        [Description("ZCPBC3NAME")]
         [DisplayName("中交业务分类三级分类名称")]
         public string? CCCCBTypeThirdName { get; set; }
         /// <summary>
         /// 备注（业务分类）
         /// </summary>
-        [Description("ZZCPBREMARKS")]
         [DisplayName("备注（业务分类）")]
         public string? BusinessRemark { get; set; }
         /// <summary>
         /// 产业分类一级分类代码
         /// </summary>
-        [Description("ZICSTD1ID")]
         [DisplayName("产业分类一级分类代码")]
         public string? ChanYeOneCode { get; set; }
         /// <summary>
         /// 产业分类一级分类名称 
         /// </summary>
-        [Description("ZICSTD1NAME")]
         [DisplayName("产业分类一级分类名称")]
         public string? ChanYeOneName { get; set; }
         /// <summary>
         /// 产业分类二级分类代码
         /// </summary>
-        [Description("ZICSTD2ID")]
         [DisplayName("产业分类二级分类代码")]
         public string? ChanYeSecCode { get; set; }
         /// <summary>
         /// 产业分类二级分类名称
         /// </summary>
-        [Description("ZICSTD2NAME")]
         [DisplayName("产业分类二级分类名称")]
         public string? ChanYeSecName { get; set; }
         /// <summary>
         /// 产业分类三级分类名称
         /// </summary>
-        [Description("ZICSTD3NAME")]
         [DisplayName("产业分类三级分类名称")]
         public string? ChanYeThirdName { get; set; }
         /// <summary>
         /// 产业分类三级分类代码
         /// </summary>
-        [Description("ZICSTD3ID")]
         [DisplayName("产业分类三级分类代码")]
         public string? ChanYeThirdCode { get; set; }
         /// <summary>
         /// 备注（产业分类）
         /// </summary>
-        [Description("ZICSTDREMARKS")]
         [DisplayName("备注（产业分类）")]
         public string? ChanYeRemark { get; set; }
         /// <summary>
         /// 业务板块一级分类代码
         /// </summary>
-        [Description("ZBUSTD1ID")]
         [DisplayName("业务板块一级分类代码")]
         public string? BSectorOneCode { get; set; }
         /// <summary>
         /// 业务板块一级分类名称
         /// </summary>
-        [Description("ZBUSTD1NAME")]
         [DisplayName("业务板块一级分类名称")]
         public string? BSectorOneName { get; set; }
         /// <summary>
         /// 业务板块二级分类代码
         /// </summary>
-        [Description("ZBUSTD2ID")]
         [DisplayName("业务板块二级分类代码")]
         public string? BSectorSecCode { get; set; }
         /// <summary>
         /// 业务板块二级分类名称
         /// </summary>
-        [Description("ZBUSTD2NAME")]
         [DisplayName("业务板块二级分类名称")]
         public string? BSectorSecName { get; set; }
         /// <summary>
         /// 业务板块三级分类代码
         /// </summary>
-        [Description("ZBUSTD3ID")]
         [DisplayName("业务板块三级分类代码")]
         public string? BSectorThirdCode { get; set; }
         /// <summary>
         /// 业务板块三级分类名称
         /// </summary>
-        [Description("ZBUSTD3NAME")]
         [DisplayName("业务板块三级分类名称")]
         public string? BSectorThirdName { get; set; }
         /// <summary>
         /// 备注（业务板块）
         /// </summary>
-        [Description("ZBUSTDREMARKS")]
         [DisplayName("备注（业务板块）")]
         public string? BSectorRemark { get; set; }
         /// <summary>
         /// 中交十二大业务类型编码 
         /// </summary>
-        [Description("Z12TOPBID")]
         [DisplayName("中交十二大业务类型编码")]
         public string? CCCCBTypeCode { get; set; }
         /// <summary>
         /// 中交十二大业务类型名称
         /// </summary>
-        [Description("Z12TOPBNAME")]
         [DisplayName("中交十二大业务类型名称")]
         public string? CCCCBTypeName { get; set; }
         /// <summary>
         /// 中交江河湖海分类编码
         /// </summary>
-        [Description("ZRRLSID")]
         [DisplayName("中交江河湖海分类编码")]
         public string? CCCCRiverLakeAndSeaCode { get; set; }
         /// <summary>
         /// 中交江河湖海分类名称
         /// </summary>
-        [Description("ZRRLSNAME")]
         [DisplayName("中交江河湖海分类名称")]
         public string? CCCCRiverLakeAndSeaName { get; set; }
         /// <summary>
         /// 三新业务类型：取值：0：否、1：是
         /// </summary>
-        [Description("ZNEW3TOB")]
         [DisplayName("三新业务类型")]
         public string? ThirdNewBType { get; set; }
         public DateTime? CreateTime { get; set; }

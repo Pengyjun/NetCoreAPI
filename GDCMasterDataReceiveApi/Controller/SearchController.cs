@@ -74,7 +74,6 @@ namespace GDCMasterDataReceiveApi.Controller
         /// <param name="requestDto"></param>
         /// <returns></returns>
         [HttpPost("GetUserSearch")]
-        [AllowAnonymous]
         public async Task<ResponseAjaxResult<List<UserSearchDetailsDto>>> GetUserSearchAsync([FromBody] FilterCondition requestDto)
         {
             return await _searchService.GetUserSearchAsync(requestDto);

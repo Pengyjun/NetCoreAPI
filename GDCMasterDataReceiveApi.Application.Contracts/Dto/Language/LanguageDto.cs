@@ -42,43 +42,36 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.Language
         /// <summary>
         /// GB/T 4880.2/B目录代码:GB/T 4880.2/B目录代码
         /// </summary>
-        [Description("ZLANG_BIB")]
         [DisplayName("GB/T 4880.2/B目录代码:GB/T 4880.2/B目录代码")]
         public string? DirCode { get; set; }
         /// <summary>
         /// GB/T 4880.2/T术语代码:GB/T 4880.2/T术语代码
         /// </summary>
-        [Description("ZLANG_TER")]
         [DisplayName("GB/T 4880.2/T术语代码:GB/T 4880.2/T术语代码")]
         public string? TermCode { get; set; }
         /// <summary>
         /// 汉语名称
         /// </summary>
-        [Description("ZLANG_ZH")]
         [DisplayName("汉语名称")]
         public string? Name { get; set; }
         /// <summary>
         /// 英语名称
         /// </summary>
-        [Description("ZLANG_EN")]
         [DisplayName("英语名称")]
         public string? EnglishName { get; set; }
         /// <summary>
         /// 版本：数据的版本号。数据每次变更时，版本号自动加1。
         /// </summary>
-        [Description("ZVERSION")]
         [DisplayName("版本")]
         public string? Version { get; set; }
         /// <summary>
         /// 状态：数据是否有效的标识:有效：1无效：0
         /// </summary>
-        [Description("ZSTATE")]
         [DisplayName("状态")]
         public string? State { get; set; }
         /// <summary>
         /// 是否删除 数据是否有效的标识:有效：1无效：0
         /// </summary>
-        [Description("ZDELETE")]
         [DisplayName("是否删除")]
         public string? DataIdentifier { get; set; }
         public DateTime? CreateTime { get; set; }
