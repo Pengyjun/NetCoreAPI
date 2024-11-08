@@ -790,11 +790,11 @@ namespace GDCMasterDataReceiveApi.Controller
         /// </summary>
         /// <param name="jsonToSqlRequestDto"></param>
         /// <returns></returns>
-        [HttpPost("Test")]
-        [AllowAnonymous]
-        public async Task<List<IConditionalModel>> TestAsync([FromBody] List<JsonToSqlRequestDto> jsonToSqlRequestDto)
-        {
-            return await _baseService.JsonToConventSqlAsync(jsonToSqlRequestDto);
-        }
+        //[HttpPost("Test")]
+        //[AllowAnonymous]
+        //public async Task<List<IConditionalModel>> TestAsync([FromBody] List<JsonToSqlRequestDto> jsonToSqlRequestDto)
+        //{
+        //    return await _baseService.JsonToConventSqlAsync(jsonToSqlRequestDto);
+        //}
     }
 }
