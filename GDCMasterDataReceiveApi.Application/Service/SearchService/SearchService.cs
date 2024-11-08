@@ -7669,9 +7669,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
             responseAjaxResult.Success();
             return responseAjaxResult;
         }
-
-
-
+        #endregion
         /// <summary>
         /// 搜索机构树
         /// </summary>
@@ -7699,9 +7697,6 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
             responseAjaxResult.Success();
             return responseAjaxResult;
         }
-        #endregion
-
-
 
         /// <summary>
         /// 获取用户兼职   两个参数的优先级最高的是subdepts

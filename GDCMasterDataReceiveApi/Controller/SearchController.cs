@@ -743,32 +743,32 @@ namespace GDCMasterDataReceiveApi.Controller
 
             return await _searchService.GetUserFilterColumnsAsync(table);
         }
-        [HttpPost("SetFiled")]
-        [AllowAnonymous]
-        public async Task<ResponseAjaxResult<bool>> SetFiledAsync()
-        {
-            return await _searchService.SetFiledAsync();
-        }
-        [HttpPost("ModifyName")]
-        [AllowAnonymous]
-        public async Task<ResponseAjaxResult<bool>> ModifyNameAsync([FromBody] List<SystemInterfaceField> modify)
-        {
-            return await _searchService.ModifyNameAsync(modify);
+        //[HttpPost("SetFiled")]
+        //[AllowAnonymous]
+        //public async Task<ResponseAjaxResult<bool>> SetFiledAsync()
+        //{
+        //    return await _searchService.SetFiledAsync();
+        //}
+        //[HttpPost("ModifyName")]
+        //[AllowAnonymous]
+        //public async Task<ResponseAjaxResult<bool>> ModifyNameAsync([FromBody] List<SystemInterfaceField> modify)
+        //{
+        //    return await _searchService.ModifyNameAsync(modify);
 
-        }
-        [HttpGet("GetSearchDataDesensitizationRule")]
-        [AllowAnonymous]
-        public async Task<ResponseAjaxResult<List<SearchDataDesensitizationRule>>> GetSearchDataDesensitizationRuleAsync([FromQuery] string interfaceId)
-        {
-            return await _searchService.GetSearchDataDesensitizationRuleAsync(interfaceId);
-        }
+        //}
+        //[HttpGet("GetSearchDataDesensitizationRule")]
+        //[AllowAnonymous]
+        //public async Task<ResponseAjaxResult<List<SearchDataDesensitizationRule>>> GetSearchDataDesensitizationRuleAsync([FromQuery] string interfaceId)
+        //{
+        //    return await _searchService.GetSearchDataDesensitizationRuleAsync(interfaceId);
+        //}
 
-        [HttpGet("Modify")]
-        [AllowAnonymous]
-        public async Task<ResponseAjaxResult<bool>> ModifyAsync()
-        {
-            return await _searchService.ModifyAsync();
-        }
+        //[HttpGet("Modify")]
+        //[AllowAnonymous]
+        //public async Task<ResponseAjaxResult<bool>> ModifyAsync()
+        //{
+        //    return await _searchService.ModifyAsync();
+        //}
 
 
 
