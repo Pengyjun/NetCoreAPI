@@ -42,36 +42,43 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.Regional
         /// <summary>
         /// 中交区域总部代码:中交区域中心编码
         /// </summary>
+        [Description("ZCRHCODE")]
         [DisplayName("中交区域总部代码")]
         public string? Code { get; set; }
         /// <summary>
         /// 中交区域总部描述:编码描述
         /// </summary>
+        [Description("ZCRHNAME")]
         [DisplayName("中交区域总部描述")]
         public string? Description { get; set; }
         /// <summary>
         /// 简称:编码描述简称
         /// </summary>
+        [Description("ZCRHABBR")]
         [DisplayName("简称")]
         public string? Name { get; set; }
         /// <summary>
         /// 区域范围:中交区域中心管辖范围
         /// </summary>
+        [Description("ZCRHSCOPE")]
         [DisplayName("区域范围")]
         public string? AreaRange { get; set; }
         /// <summary>
         /// 版本：数据的版本号。数据每次变更时，版本号自动加1。
         /// </summary>
+        [Description("ZVERSION")]
         [DisplayName("版本")]
         public string? Version { get; set; }
         /// <summary>
         /// 状态：数据是否有效的标识:有效：1无效：0
         /// </summary>
+        [Description("ZSTATE")]
         [DisplayName("状态")]
         public string? State { get; set; }
         /// <summary>
         /// 是否删除 数据是否有效的标识:有效：1无效：0
         /// </summary>
+        [Description("ZDELETE")]
         [DisplayName("是否删除")]
         public string? DataIdentifier { get; set; }
         public DateTime? CreateTime { get; set; }

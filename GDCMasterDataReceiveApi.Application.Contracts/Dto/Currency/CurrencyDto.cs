@@ -40,41 +40,49 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.Currency
         /// <summary>
         /// 数字代码:货币数字代码
         /// </summary>
+        [Description("ZCURRENCYCODE")]
         [DisplayName("数字代码")]
         public string? Code { get; set; }
         /// <summary>
         /// 货币名称:货币的中文描述
         /// </summary>
+        [Description("ZCURRENCYNAME")]
         [DisplayName("货币名称")]
         public string? Name { get; set; }
         /// <summary>
         /// 字母代码:货币字母代码
         /// </summary>
+        [Description("ZCURRENCYALPHABET")]
         [DisplayName("字母代码")]
         public string? LetterCode { get; set; }
         /// <summary>
         /// 货币标准名称:货币标准名称
         /// </summary>
+        [Description("STANDARDNAMEE")]
         [DisplayName("货币标准名称")]
         public string? StandardName { get; set; }
         /// <summary>
         /// 备注:说明备注
         /// </summary>
+        [Description("ZREMARKS")]
         [DisplayName("备注")]
         public string? Remark { get; set; }
         /// <summary>
         /// 版本：数据的版本号。数据每次变更时，版本号自动加1。
         /// </summary>
+        [Description("ZVERSION")]
         [DisplayName("版本")]
         public string? Version { get; set; }
         /// <summary>
         /// 状态：数据是否有效的标识:有效：1无效：0
         /// </summary>
+        [Description("ZSTATE")]
         [DisplayName("状态")]
         public string? State { get; set; }
         /// <summary>
         /// 是否删除 数据是否有效的标识:有效：1无效：0
         /// </summary>
+        [Description("ZDELETE")]
         [DisplayName("是否删除")]
         public string? DataIdentifier { get; set; }
         public DateTime? CreateTime { get; set; }

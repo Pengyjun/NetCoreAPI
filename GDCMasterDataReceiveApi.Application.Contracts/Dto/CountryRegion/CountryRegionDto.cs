@@ -1,5 +1,4 @@
 ﻿using GDCMasterDataReceiveApi.Application.Contracts.Dto.OtherModels;
-using MiniExcelLibs.Attributes;
 using System.ComponentModel;
 
 namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.CountryRegion
@@ -48,71 +47,85 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.CountryRegion
         /// <summary>
         /// 国家地区代码
         /// </summary>
+        [Description("ZCOUNTRYCODE")]
         [DisplayName("国家地区代码")]
         public string Country { get; set; }
         /// <summary>
         /// 中文名称
         /// </summary>
+        [Description("ZCOUNTRYNAME")]
         [DisplayName("中文名称")]
         public string Name { get; set; }
         /// <summary>
         /// 英文名称
         /// </summary>
+        [Description("ZCOUNTRYENAME")]
         [DisplayName("英文名称")]
         public string? NameEnglish { get; set; }
         /// <summary>
         /// 国标三字符代码
         /// </summary>
+        [Description("ZGBCHAR")]
         [DisplayName("国标三字符代码")]
         public string? NationalCode { get; set; }
         /// <summary>
         /// 国标数字代码
         /// </summary>
+        [Description("ZGBNUM")]
         [DisplayName("国标数字代码")]
         public string? DigitCode { get; set; }
         /// <summary>
         /// 大洲代码
         /// </summary>
+        [Description("ZCONTINENTCODE")]
         [DisplayName("大洲代码")]
         public string? ContinentCode { get; set; }
         /// <summary>
         /// 中交区域中心代码
         /// </summary>
+        [Description("ZCRCCODE")]
         [DisplayName("中交区域中心代码")]
         public string? CCCCCenterCode { get; set; }
         /// <summary>
         /// 版本号:数据的版本号。数据每次变更时，版本号自动加1。
         /// </summary>
+        [Description("ZVERSION")]
         [DisplayName("版本号")]
         public int Version { get; set; }
         /// <summary>
         /// 状态:1是已启用，0是已停用
         /// </summary>
+        [Description("ZSTATE")]
         [DisplayName("状态")]
         public string State { get; set; }
         /// <summary>
         /// 是否删除数据是否有效的标识:    有效：1无效：0
         /// </summary>
+        [Description("ZDELETE")]
         [DisplayName("是否删除")]
         public string DataIdentifier { get; set; }
         /// <summary>
         /// 一带一路(国资委):0-否，1-是
         /// </summary>
+        [Description("ZBRGZW")]
         [DisplayName("一带一路(国资委)")]
         public string RoadGuoZiW { get; set; }
         /// <summary>
         /// 一带一路(海外):0-否，1-是
         /// </summary>
+        [Description("ZBRHW")]
         [DisplayName("一带一路(海外)")]
         public string RoadHaiW { get; set; }
         /// <summary>
         /// 一带一路(共建):0-否，1-是
         /// </summary>
+        [Description("ZBRGJ")]
         [DisplayName("一带一路(共建)")]
         public string RoadGongJ { get; set; }
         /// <summary>
         /// 区域代码
         /// </summary>
+        [Description("ZAREACODE")]
         [DisplayName("区域代码")]
         public string AreaCode { get; set; }
         public DateTime? CreateTime { get; set; }

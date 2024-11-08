@@ -38,36 +38,43 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.CountryContinent
         /// <summary>
         /// 大洲代码：大洲代码
         /// </summary>
+        [Description("ZCONTINENTCODE")]
         [DisplayName("大洲代码")]
         public string ContinentCode { get; set; }
         /// <summary>
         /// 大洲名称：大洲名称
         /// </summary>
+        [Description("ZCONTINENTNAME")]
         [DisplayName("大洲名称")]
         public string Name { get; set; }
         /// <summary>
         /// 区域代码：大洲所属区域代码
         /// </summary>
+        [Description("ZAREACODE")]
         [DisplayName("区域代码")]
         public string AreaCode { get; set; }
         /// <summary>
         /// 区域描述：区域描述
         /// </summary>
+        [Description("ZAREANAME")]
         [DisplayName("区域描述")]
         public string RegionalDescr { get; set; }
         /// <summary>
         /// 版本：数据的版本号。数据每次变更时，版本号自动加1。
         /// </summary>
+        [Description("ZVERSION")]
         [DisplayName("版本")]
         public string Version { get; set; }
         /// <summary>
         /// 状态：数据是否有效的标识:有效：1无效：0
         /// </summary>
+        [Description("ZSTATE")]
         [DisplayName("状态")]
         public string State { get; set; }
         /// <summary>
         /// 是否删除 数据是否有效的标识:有效：1无效：0
         /// </summary>
+        [Description("ZDELETE")]
         [DisplayName("是否删除")]
         public string DataIdentifier { get; set; }
         public DateTime? CreateTime { get; set; }

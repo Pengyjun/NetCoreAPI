@@ -5,6 +5,7 @@ using GDCMasterDataReceiveApi.Domain.Shared;
 using GDCMasterDataReceiveApi.Domain.Shared.Enums;
 using Newtonsoft.Json;
 using SqlSugar;
+using System.ComponentModel;
 using System.Data;
 using System.Reflection;
 using UtilsSharp;
@@ -320,28 +321,82 @@ namespace GDCMasterDataReceiveApi.Application
         /// <param name="conditionalModels"></param>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
-        public async Task<List<IConditionalModel>> JsonToConventSqlAsync(List<JsonToSqlRequestDto> jsonToSqlRequestDtos)
+        //public async Task<List<IConditionalModel>> JsonToConventSqlAsync(List<JsonToSqlRequestDto> jsonToSqlRequestDtos)
+        //{
+        //    var conditionalModel = new List<IConditionalModel>();
+        //    //conditionalModel.Add(new ConditionalModel { FieldName = "name", ConditionalType = ConditionalType.Equal, FieldValue = "1=1" });
+
+        //    if (jsonToSqlRequestDtos != null && jsonToSqlRequestDtos.Count > 0)
+        //    {
+        //        foreach (var item in jsonToSqlRequestDtos)
+        //        {
+        //            conditionalModel.Add(new ConditionalCollections()
+        //            {
+        //                ConditionalList = new List<KeyValuePair<WhereType, ConditionalModel>>()
+        //                {
+        //                    new KeyValuePair<WhereType, ConditionalModel>(
+        //                     (WhereType)item.Type,
+        //                    new ConditionalModel(){FieldName =item.FieldName,ConditionalType=item.ConditionalType,FieldValue=item.FieldValue}),
+        //                }
+        //            });
+
+        //        }
+        //    }
+        //    return conditionalModel;
+        //}
+
+        public async Task<List<IConditionalModel>> JsonToConventSqlAsync(List<JsonToSqlRequestDto> jsonToSqlRequestDtos, object dto)
         {
             var conditionalModel = new List<IConditionalModel>();
-            //conditionalModel.Add(new ConditionalModel { FieldName = "name", ConditionalType = ConditionalType.Equal, FieldValue = "1=1" });
 
             if (jsonToSqlRequestDtos != null && jsonToSqlRequestDtos.Count > 0)
             {
                 foreach (var item in jsonToSqlRequestDtos)
                 {
-                    conditionalModel.Add(new ConditionalCollections()
+                    // 获取 FieldName 属性的 Description 特性值
+                    var fileName = item.FieldName[0].ToString().ToUpper() + item.FieldName.Substring(1);
+                    string fieldNameDescription = GetDescriptionFromProperty(dto, fileName);
+
+                    var conditionalModelItem = new ConditionalCollections
                     {
                         ConditionalList = new List<KeyValuePair<WhereType, ConditionalModel>>()
                         {
-                            new KeyValuePair<WhereType, ConditionalModel>(
-                             (WhereType)item.Type,
-                            new ConditionalModel(){FieldName =item.FieldName,ConditionalType=item.ConditionalType,FieldValue=item.FieldValue}),
+                        new KeyValuePair<WhereType, ConditionalModel>(
+                            (WhereType)item.Type,
+                            new ConditionalModel()
+                            {
+                                FieldName =string.IsNullOrEmpty(fieldNameDescription)? item.FieldName:fieldNameDescription,
+                                ConditionalType = item.ConditionalType,
+                                FieldValue = item.FieldValue
+                            })
                         }
-                    });
+                    };
 
+                    conditionalModel.Add(conditionalModelItem);
                 }
             }
             return conditionalModel;
+        }
+        // 获取指定属性的 Description 特性值
+        private string GetDescriptionFromProperty(object obj, string propertyName)
+        {
+            // 获取对象的类型信息
+            var type = obj.GetType();
+
+            // 获取属性信息
+            var propertyInfo = type.GetProperty(propertyName);
+            if (propertyInfo != null)
+            {
+                // 获取属性上的 Description 特性
+                var attribute = propertyInfo.GetCustomAttribute<DescriptionAttribute>();
+                if (attribute != null)
+                {
+                    return attribute.Description;
+                }
+            }
+
+            // 如果没有找到 Description 特性，返回 null 或空字符串
+            return null;
         }
     }
 }
