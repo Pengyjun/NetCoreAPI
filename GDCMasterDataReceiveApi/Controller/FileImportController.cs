@@ -100,7 +100,7 @@ namespace GDCMasterDataReceiveApi.Controller
             }
             else if (request.ImportType == 2)
             {
-                columns = await GetExpColumns("GetInstitutionAsync");
+                columns = await GetExpColumns("GetInstitutionsAsync");
                 fields = GetFields<InstitutionDetatilsDto>(columns);
                 var data = await searchService.GetInstitutionAsync(condition);
                 var excelData = ExportToExcel(data.Data, fields, "机构");
