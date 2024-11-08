@@ -110,6 +110,7 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto._4A.User
         /// <summary>
         /// 所属部门名称
         /// </summary>
+        [Description("OFFICE_DEPID")]
         [DisplayName("所属部门名称")]
         public string? OfficeDepIdName { get; set; }
         /// <summary>

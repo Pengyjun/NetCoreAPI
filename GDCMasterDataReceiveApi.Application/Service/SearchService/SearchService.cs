@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Dm.util.geoUtil;
 using GDCDataSecurityApi.Domain.Models;
 using GDCMasterDataReceiveApi.Application.Contracts;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto;
@@ -75,7 +76,70 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
             var responseAjaxResult = new ResponseAjaxResult<List<UserSearchDetailsDto>>();
             RefAsync<int> total = 0;
             UserSearchDetailsDto dto = new();
-            var jsonWhere = await _baseService.JsonToConventSqlAsync(requestDto.JsonToSqlRequestDtos, dto);
+            List<IConditionalModel> jsonWhere = new();
+
+            if (requestDto.JsonToSqlRequestDtos != null && requestDto.JsonToSqlRequestDtos.Any())
+            {
+                var institution = await _dbContext.Queryable<Institution>()
+                    .Where(t => t.IsDelete == 1)
+                    .Select(t => new InstitutionTree { GPoid = t.GPOID, Name = t.NAME, Oid = t.OID, POid = t.POID, ShortName = t.SHORTNAME, Sno = t.SNO })
+                    .ToListAsync();
+                var fileNames = requestDto.JsonToSqlRequestDtos.Select(x => x.FieldName).ToList();
+                if (fileNames.Contains("officeDepId") || fileNames.Contains("officeDepIdName"))
+                {
+                    ListToTreeUtil lt = new ListToTreeUtil();
+                    List<JsonToSqlRequestDto> sr = new();
+                    foreach (var item in requestDto.JsonToSqlRequestDtos)
+                    {
+                        if (item.FieldName == "officeDepId")
+                        {
+                            string filedVals = "";
+                            var oids = lt.GetTree(item.FieldValue, institution).Select(x => x.Oid).ToList();
+                            if (!oids.Any())
+                            {
+                                filedVals = item.FieldValue;
+                            }
+                            else
+                            {
+                                //全部子集
+                                filedVals = string.Join(",", lt.GetTree(item.FieldValue, institution).Select(x => x.Oid));
+                            }
+                            sr.Add(new JsonToSqlRequestDto
+                            {
+                                ConditionalType = ConditionalType.In,
+                                FieldName = item.FieldName,
+                                FieldValue = filedVals,
+                                Type = item.Type
+                            });
+                        }
+                        else if (item.FieldName == "officeDepIdName")
+                        {
+                            //平级
+                            var filedVals = string.Join(",", lt.GetAllNodes(item.FieldValue, institution));
+                            sr.Add(new JsonToSqlRequestDto
+                            {
+                                ConditionalType = ConditionalType.In,
+                                FieldName = item.FieldName,
+                                FieldValue = filedVals,
+                                Type = item.Type
+                            });
+                        }
+                    }
+                    if (sr != null && sr.Any())
+                    {
+                        jsonWhere = await _baseService.JsonToConventSqlAsync(sr, dto);
+                    }
+                    else
+                    {
+                        jsonWhere = await _baseService.JsonToConventSqlAsync(requestDto.JsonToSqlRequestDtos, dto);
+                    }
+                }
+                else
+                {
+                    jsonWhere = await _baseService.JsonToConventSqlAsync(requestDto.JsonToSqlRequestDtos, dto);
+                }
+            }
+
             var userInfos = await _dbContext.Queryable<User>()
                 .WhereIF(!string.IsNullOrWhiteSpace(requestDto.KeyWords), t => t.NAME.Contains(requestDto.KeyWords) || t.EMP_CODE.Contains(requestDto.KeyWords))
                 .Where(jsonWhere)
@@ -1524,10 +1588,59 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
         {
             var responseAjaxResult = new ResponseAjaxResult<List<DHProjects>>();
             RefAsync<int> total = 0;
-
-            #region 项目初始查询
             DHProjects dto = new();
-            var jsonWhere = await _baseService.JsonToConventSqlAsync(requestDto.JsonToSqlRequestDtos, dto);
+            List<IConditionalModel> jsonWhere = new();
+
+            if (requestDto.JsonToSqlRequestDtos != null && requestDto.JsonToSqlRequestDtos.Any())
+            {
+                var institution = await _dbContext.Queryable<Institution>()
+                    .Where(t => t.IsDelete == 1)
+                    .Select(t => new InstitutionTree { GPoid = t.GPOID, Name = t.NAME, Oid = t.OID, POid = t.POID, ShortName = t.SHORTNAME, Sno = t.SNO })
+                    .ToListAsync();
+                var fileNames = requestDto.JsonToSqlRequestDtos.Select(x => x.FieldName).ToList();
+                if (fileNames.Contains("zPRO_ORG") || fileNames.Contains("zPRO_BP"))
+                {
+                    ListToTreeUtil lt = new ListToTreeUtil();
+                    List<JsonToSqlRequestDto> sr = new();
+                    foreach (var item in requestDto.JsonToSqlRequestDtos)
+                    {
+                        if (item.FieldName == "zPRO_BP" || item.FieldName == "zPRO_ORG")
+                        {
+                            string filedVals = "";
+                            var oids = lt.GetTree(item.FieldValue, institution).Select(x => x.Oid).ToList();
+                            if (!oids.Any())
+                            {
+                                filedVals = item.FieldValue;
+                            }
+                            else
+                            {
+                                //全部子集
+                                filedVals = string.Join(",", lt.GetTree(item.FieldValue, institution).Select(x => x.Oid));
+                            }
+                            sr.Add(new JsonToSqlRequestDto
+                            {
+                                ConditionalType = ConditionalType.In,
+                                FieldName = item.FieldName,
+                                FieldValue = filedVals,
+                                Type = item.Type
+                            });
+                        }
+                    }
+                    if (sr != null && sr.Any())
+                    {
+                        jsonWhere = await _baseService.JsonToConventSqlAsync(sr, dto);
+                    }
+                    else
+                    {
+                        jsonWhere = await _baseService.JsonToConventSqlAsync(requestDto.JsonToSqlRequestDtos, dto);
+                    }
+                }
+                else
+                {
+                    jsonWhere = await _baseService.JsonToConventSqlAsync(requestDto.JsonToSqlRequestDtos, dto);
+                }
+            }
+            #region 项目初始查询
             var proList = await _dbContext.Queryable<DHProjects>()
                 .WhereIF(!string.IsNullOrWhiteSpace(requestDto.KeyWords), t => t.ZPROJECT.Contains(requestDto.KeyWords) || t.ZPROJNAME.Contains(requestDto.KeyWords))
                 .Where(jsonWhere)
