@@ -26,12 +26,9 @@ using NPOI.SS.Formula.Functions;
 using NPOI.SS.UserModel;
 using NPOI.SS.Util;
 using NPOI.XSSF.UserModel;
-using Org.BouncyCastle.Asn1.Cmp;
 using SqlSugar;
 using SqlSugar.Extensions;
 using System.Data;
-using System.Security.Policy;
-using System.Text.RegularExpressions;
 using UtilsSharp;
 using static GHMonitoringCenterApi.Application.Contracts.Dto.Project.Report.MonthtReportsResponseDto;
 using Model = GHMonitoringCenterApi.Domain.Models;
@@ -5901,10 +5898,19 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             }
             //年度产值 、 产量、运转时间、施工天数
             //取最新年份的数据
-            int year = startMonth > endMonth ? Convert.ToInt32(startMonth.ToString().Substring(0, 4)) : Convert.ToInt32(endMonth.ToString().Substring(0, 4));
-            var ownShipYearData = await _dbContext.Queryable<OwnerShipMonthReport>().Where(x => x.IsDelete == 1 && x.DateYear == year).GroupBy(x => new { x.ShipId, x.ProjectId }).Select(x => new { x.ShipId, x.ProjectId, YearWorkHours = SqlFunc.AggregateSum(x.WorkingHours), YearWorkDays = SqlFunc.AggregateSum(x.ConstructionDays), YearQuantity = SqlFunc.AggregateSum(x.Production), YearOutputVal = SqlFunc.AggregateSum(x.ProductionAmount) }).ToListAsync();
+            //int year = startMonth > endMonth ? Convert.ToInt32(startMonth.ToString().Substring(0, 4)) : Convert.ToInt32(endMonth.ToString().Substring(0, 4));
+            var ownShipYearData = await _dbContext.Queryable<OwnerShipMonthReport>().Where(x => x.IsDelete == 1 && x.DateMonth >= startMonth && x.DateMonth <= endMonth)
+                .GroupBy(x => new { x.ShipId, x.ProjectId })
+                .Select(x => new { x.ShipId, x.ProjectId, YearWorkHours = SqlFunc.AggregateSum(x.WorkingHours), YearWorkDays = SqlFunc.AggregateSum(x.ConstructionDays), YearQuantity = SqlFunc.AggregateSum(x.Production), YearOutputVal = SqlFunc.AggregateSum(x.ProductionAmount) })
+                .ToListAsync();
             sumInfo.SumYearOutputVal = Math.Round(ownShipYearData.Where(t => shipId.Contains(t.ShipId)).Sum(t => t.YearOutputVal), 2);
             sumInfo.SumYearQuantity = Math.Round(ownShipYearData.Where(t => shipId.Contains(t.ShipId)).Sum(t => t.YearQuantity), 2);
+
+            int stMonth = Convert.ToInt32(startMonth.ToString().Substring(0, 4) + "01");
+            var osYearData = await _dbContext.Queryable<OwnerShipMonthReport>()
+                .Where(x => x.IsDelete == 1)
+                .Select(x => new { x.ShipId, x.ProjectId, YearWorkHours = x.WorkingHours, YearWorkDays = x.ConstructionDays, YearQuantity = x.Production, YearOutputVal = x.ProductionAmount, x.DateMonth })
+                .ToListAsync();
 
             //获取项目ids、所属公司
             var proIds = ownShipMonthRepData.Select(x => x.ProjectId).ToList();
@@ -5962,10 +5968,14 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 MonthWorkDays = x.ConstructionDays,
                 MonthQuantity = Math.Round(x.Production, 2),
                 MonthOutputVal = Math.Round(x.ProductionAmount, 2),
-                YearOutputVal = ownShipYearData.Any() && ownShipYearData.FirstOrDefault(y => y.ShipId == x.ShipId && y.ProjectId == x.ProjectId) != null ? Math.Round(ownShipYearData.FirstOrDefault(y => y.ShipId == x.ShipId && y.ProjectId == x.ProjectId).YearOutputVal, 2) : 0,
-                YearQuantity = ownShipYearData.Any() && ownShipYearData.FirstOrDefault(y => y.ShipId == x.ShipId && y.ProjectId == x.ProjectId) != null ? Math.Round(ownShipYearData.FirstOrDefault(y => y.ShipId == x.ShipId && y.ProjectId == x.ProjectId).YearQuantity, 2) : 0,
-                YearWorkDays = ownShipYearData.Any() && ownShipYearData.FirstOrDefault(y => y.ShipId == x.ShipId && y.ProjectId == x.ProjectId) != null ? ownShipYearData.FirstOrDefault(y => y.ShipId == x.ShipId && y.ProjectId == x.ProjectId).YearWorkDays : 0,
-                YearWorkHours = ownShipYearData.Any() && ownShipYearData.FirstOrDefault(y => y.ShipId == x.ShipId && y.ProjectId == x.ProjectId) != null ? Math.Round(ownShipYearData.FirstOrDefault(y => y.ShipId == x.ShipId && y.ProjectId == x.ProjectId).YearWorkHours, 2) : 0,
+                //YearOutputVal = ownShipYearData.Any() && ownShipYearData.FirstOrDefault(y => y.ShipId == x.ShipId && y.ProjectId == x.ProjectId) != null ? Math.Round(ownShipYearData.FirstOrDefault(y => y.ShipId == x.ShipId && y.ProjectId == x.ProjectId).YearOutputVal, 2) : 0,
+                //YearQuantity = ownShipYearData.Any() && ownShipYearData.FirstOrDefault(y => y.ShipId == x.ShipId && y.ProjectId == x.ProjectId) != null ? Math.Round(ownShipYearData.FirstOrDefault(y => y.ShipId == x.ShipId && y.ProjectId == x.ProjectId).YearQuantity, 2) : 0,
+                //YearWorkDays = ownShipYearData.Any() && ownShipYearData.FirstOrDefault(y => y.ShipId == x.ShipId && y.ProjectId == x.ProjectId) != null ? ownShipYearData.FirstOrDefault(y => y.ShipId == x.ShipId && y.ProjectId == x.ProjectId).YearWorkDays : 0,
+                //YearWorkHours = ownShipYearData.Any() && ownShipYearData.FirstOrDefault(y => y.ShipId == x.ShipId && y.ProjectId == x.ProjectId) != null ? Math.Round(ownShipYearData.FirstOrDefault(y => y.ShipId == x.ShipId && y.ProjectId == x.ProjectId).YearWorkHours, 2) : 0,
+                YearOutputVal = Math.Round(osYearData.Where(y => y.ShipId == x.ShipId && y.ProjectId == x.ProjectId && y.DateMonth >= stMonth && y.DateMonth <= x.DateMonth).Sum(s => s.YearOutputVal), 2),
+                YearQuantity = Math.Round(osYearData.Where(y => y.ShipId == x.ShipId && y.ProjectId == x.ProjectId && y.DateMonth >= stMonth && y.DateMonth <= x.DateMonth).Sum(s => s.YearQuantity), 2),
+                YearWorkDays = Math.Round(osYearData.Where(y => y.ShipId == x.ShipId && y.ProjectId == x.ProjectId && y.DateMonth >= stMonth && y.DateMonth <= x.DateMonth).Sum(s => s.YearWorkDays), 2),
+                YearWorkHours = Math.Round(osYearData.Where(y => y.ShipId == x.ShipId && y.ProjectId == x.ProjectId && y.DateMonth >= stMonth && y.DateMonth <= x.DateMonth).Sum(s => s.YearWorkHours), 2),
                 SecUnitName = "广航局",
                 ThiUnitName = instinData.FirstOrDefault(y => y.Id == x.ProjectId)?.Name,
                 HeadUserName = usersData.FirstOrDefault(y => y.Id == x.ProjectId)?.Name,
@@ -7547,6 +7557,34 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 .Where(t => t.IsDelete == 1 && pIds.Contains(t.Id))
                 .ToListAsync();
 
+            //获取船舶日报数据  只要当年
+            ConvertHelper.TryParseFromDateMonth(nowMonth, out DateTime dayTime);
+            int dayst = 0;//开始日期
+            int dayet = 0;//结束日期
+            int dayyearst = 0;//开始年
+            int dayyearet = 0;//结束年
+                              //跨年情况
+            if (dayTime.Month == 1)
+            {
+                //当月
+                dayst = Convert.ToInt32($"{dayTime.AddMonths(-1).Year}{dayTime.AddMonths(-1).Month:D2}26");
+                dayet = Convert.ToInt32($"{dayTime.Year}{dayTime.Month:D2}25");
+                //当年
+                dayyearst = Convert.ToInt32($"{dayTime.AddMonths(-1).Year}{dayTime.AddMonths(-1).Month:D2}26");
+                dayyearet = Convert.ToInt32($"{nowMonth}25");
+            }
+            else
+            {
+                //当月
+                dayst = Convert.ToInt32($"{dayTime.Year}{dayTime.AddMonths(-1).Month:D2}26");
+                dayet = Convert.ToInt32($"{dayTime.Year}{dayTime.Month:D2}25");
+                //当年
+                dayyearst = Convert.ToInt32($"{dayTime.AddYears(-1).Year}1226");
+                dayyearet = Convert.ToInt32($"{nowMonth}25");
+            }
+            //当年所有的船舶日报
+            var dayRepList = await _dbShipDayReport.AsQueryable().Where(t => t.IsDelete == 1 && pIds.Contains(t.ProjectId) && t.DateDay >= dayyearst && t.DateDay <= dayyearet).ToListAsync();
+
             //获取重点船舶23年6月份的数据
             //var juneShipList = await _dbContext.Queryable<JuneKeyNote>().Where(t => t.IsDelete == 1).ToListAsync();
 
@@ -7566,8 +7604,6 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
 
             foreach (var item in gShips)
             {
-                //var thisSumHistoryShipReport = juneShipList.FirstOrDefault(x => x.ShipId == item.Key.ShipId && x.ProjectId == item.Key.ProjectId.ToString());
-
                 //重点船舶
                 var ship = ownShipsList.FirstOrDefault(x => x.PomId == item.Key.ShipId)?.TypeId;
                 var shipType = sortOptions.FirstOrDefault(x => x.Type == 2 && x.ItemId == ship)?.Name ?? shipping.FirstOrDefault(x => x.PomId == ship)?.Name ?? "";
@@ -7586,8 +7622,9 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 //产值
                 var outputValue = mRepShipsList.Where(x => x.ProjectId == item.Key.ProjectId && x.ShipId == item.Key.ShipId && x.DateMonth == nowMonth).Sum(x => x.ProductionAmount) / 10000;
 
-                //在场天
-                var onSiteDays = mRepShipsList.Where(x => x.ProjectId == item.Key.ProjectId && x.ShipId == item.Key.ShipId && x.DateMonth == nowMonth).Sum(x => x.ConstructionDays);
+                //在场天 (船舶日报挂在项目上的天数)
+                //var onSiteDays = mRepShipsList.Where(x => x.ProjectId == item.Key.ProjectId && x.ShipId == item.Key.ShipId && x.DateMonth == nowMonth).Sum(x => x.ConstructionDays);
+                var onSiteDays = dayRepList.Where(x => x.ProjectId == item.Key.ProjectId && x.ShipId == item.Key.ShipId && x.DateDay >= dayst && x.DateDay <= dayet).Count();
 
                 //运转时间
                 var workingHours = mRepShipsList.Where(x => x.ProjectId == item.Key.ProjectId && x.ShipId == item.Key.ShipId && x.DateMonth == nowMonth).Sum(x => x.WorkingHours);
@@ -7602,7 +7639,8 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 var yearOutputValue = mRepShipsList.Where(x => x.ProjectId == item.Key.ProjectId && x.ShipId == item.Key.ShipId && x.DateMonth >= startMonth && x.DateMonth <= endMonth).Sum(x => x.ProductionAmount) / 10000;
 
                 //在场天 年累计
-                var yearOnSiteDays = mRepShipsList.Where(x => x.ProjectId == item.Key.ProjectId && x.ShipId == item.Key.ShipId && x.DateMonth >= startMonth && x.DateMonth <= endMonth).Sum(x => x.ConstructionDays);
+                //var yearOnSiteDays = mRepShipsList.Where(x => x.ProjectId == item.Key.ProjectId && x.ShipId == item.Key.ShipId && x.DateMonth >= startMonth && x.DateMonth <= endMonth).Sum(x => x.ConstructionDays);
+                var yearOnSiteDays = dayRepList.Where(x => x.ProjectId == item.Key.ProjectId && x.ShipId == item.Key.ShipId).Count();
 
                 //运转时间 年累计
                 var yearWorkingHours = mRepShipsList.Where(x => x.ProjectId == item.Key.ProjectId && x.ShipId == item.Key.ShipId && x.DateMonth >= startMonth && x.DateMonth <= endMonth).Sum(x => x.WorkingHours);
@@ -7662,6 +7700,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 sumKeynoteShipInfo.YearProductionValue = item.Sum(x => x.YearProductionValue);
                 sumKeynoteShipInfo.YearOutputValue = item.Sum(x => x.YearOutputValue);
                 sumKeynoteShipInfo.YearWorkingHours = item.Sum(x => x.YearWorkingHours);
+                sumKeynoteShipInfo.YearOnSiteDays = item.Sum(x => x.YearOnSiteDays);
                 sumKeynoteShipInfo.MyPropertyRate2 = item.Sum(x => x.MyPropertyRate2);
                 sumKeynoteShipInfo.ShipId = item.Key.ShipId;
                 sumKeynoteShipInfo.ShipTypeSort = item.Key.ShipTypeSort;
@@ -7943,7 +7982,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             //var templatePath = "D:\\projectconllection\\dotnet\\szgh\\GHMonitoringCenterApi.Domain.Shared\\Template\\Excel\\ProjectMonthOutPutTemplate.xlsx";
 
             var templatePath = $"Template/Excel/ProjectMonthOutPutTemplate.xlsx";
-            //var templatePath = $@"E:\project\HNKC.SZGHAPI\szgh\ghmonitoringcenterapi\GHMonitoringCenterApi.Domain.Shared\Template\Excel/ProjectMonthOutPutTemplate.xlsx";
+            //var templatePath = $@"E:\project\HNKC.SZGHAPI\szgh\ghmonitoringcenterapi\GHMonitoringCenterApi.Domain.Shared\Template\Excel\ProjectMonthOutPutTemplate.xlsx";
             XSSFWorkbook workbook = null;
             using (var fs = new FileStream(templatePath, FileMode.Open, FileAccess.Read))
             {
@@ -7963,6 +8002,20 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 font.FontHeightInPoints = 11;
                 font.FontName = "微软雅黑";
                 cellStyle.SetFont(font);
+
+                //设置汇总行
+                ICellStyle cellStyleHZ = workbook.CreateCellStyle();
+                // 水平对齐
+                cellStyleHZ.Alignment = NPOI.SS.UserModel.HorizontalAlignment.Center;
+                //垂直对齐
+                cellStyleHZ.VerticalAlignment = NPOI.SS.UserModel.VerticalAlignment.Center;
+                cellStyleHZ.DataFormat = workbook.CreateDataFormat().GetFormat("[$-10804]#,##0.0;-#,##0.0;\"\"");
+                //设置汇总行数据字体加粗
+                IFont fontBold = workbook.CreateFont();
+                fontBold.FontHeightInPoints = 11;
+                fontBold.FontName = "微软雅黑";
+                fontBold.IsBold = true;
+                cellStyleHZ.SetFont(fontBold);
 
                 ICellStyle cellStyle1 = workbook.CreateCellStyle();
                 // 水平对齐
@@ -8049,11 +8102,12 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     row.CreateCell(14).SetCellValue(Convert.ToDouble(item.YearSubDiffValue));
                     row.CreateCell(15).SetCellValue(Convert.ToDouble(item.YearSubExpenditure));
                     row.CreateCell(16).SetCellValue(Convert.ToDouble(item.YearSumOutPutValue));
-                    row.CreateCell(17).SetCellValue(Convert.ToDouble(item.TotalSumOutPutValue));
+                    //row.CreateCell(17).SetCellValue(Convert.ToDouble(item.TotalSumOutPutValue));//
                 }
                 for (int i = 3; i < 18; i++)
                 {
-                    row.GetCell(i).CellStyle = cellStyle;
+                    //row.GetCell(i).CellStyle = cellStyle;
+                    row.GetCell(i).CellStyle = cellStyleHZ;
                 }
 
                 var rowIndex = 4;
@@ -8078,7 +8132,12 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     datarow.CreateCell(14).SetCellValue(Convert.ToDouble(item.YearSubDiffValue));
                     datarow.CreateCell(15).SetCellValue(Convert.ToDouble(item.YearSubExpenditure));
                     datarow.CreateCell(16).SetCellValue(Convert.ToDouble(item.YearSumOutPutValue));
-                    datarow.CreateCell(17).SetCellValue(Convert.ToDouble(item.TotalOutPutValue));
+                    if (item.DeptName.Contains("汇总"))//不写数据
+                    { }
+                    else
+                    {
+                        datarow.CreateCell(17).SetCellValue(Convert.ToDouble(item.TotalOutPutValue));
+                    }
 
                     datarow.GetCell(0).CellStyle = cellStyle;
                     datarow.GetCell(1).CellStyle = cellStyle;
@@ -8099,7 +8158,12 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                         datarow.GetCell(14).CellStyle = cellStyleBG1;
                         datarow.GetCell(15).CellStyle = cellStyleBG1;
                         datarow.GetCell(16).CellStyle = cellStyleBG1;
-                        datarow.GetCell(17).CellStyle = cellStyleBG1;
+                        if (item.DeptName.Contains("汇总"))
+                        { }
+                        else
+                        {
+                            datarow.GetCell(17).CellStyle = cellStyleBG1;
+                        }
                     }
                     else
                     {
@@ -8118,12 +8182,32 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                         datarow.GetCell(14).CellStyle = cellStyle;
                         datarow.GetCell(15).CellStyle = cellStyle;
                         datarow.GetCell(16).CellStyle = cellStyle;
-                        datarow.GetCell(17).CellStyle = cellStyle;
+                        if (item.DeptName.Contains("汇总"))
+                        { }
+                        else
+                        {
+                            datarow.GetCell(17).CellStyle = cellStyle;
+                        }
                     }
                     if (item.DeptName.Contains("汇总"))
                     {
                         sheet.AddMergedRegion(new CellRangeAddress(rowIndex, rowIndex, 1, 2));
                         datarow.GetCell(1).CellStyle = cellStyle1;
+                        datarow.GetCell(2).CellStyle = cellStyleHZ;
+                        datarow.GetCell(3).CellStyle = cellStyleHZ;
+                        datarow.GetCell(4).CellStyle = cellStyleHZ;
+                        datarow.GetCell(5).CellStyle = cellStyleHZ;
+                        datarow.GetCell(6).CellStyle = cellStyleHZ;
+                        datarow.GetCell(7).CellStyle = cellStyleHZ;
+                        datarow.GetCell(8).CellStyle = cellStyleHZ;
+                        datarow.GetCell(9).CellStyle = cellStyleHZ;
+                        datarow.GetCell(10).CellStyle = cellStyleHZ;
+                        datarow.GetCell(11).CellStyle = cellStyleHZ;
+                        datarow.GetCell(12).CellStyle = cellStyleHZ;
+                        datarow.GetCell(13).CellStyle = cellStyleHZ;
+                        datarow.GetCell(14).CellStyle = cellStyleHZ;
+                        datarow.GetCell(15).CellStyle = cellStyleHZ;
+                        datarow.GetCell(16).CellStyle = cellStyleHZ;
                     }
                 }
 
@@ -8146,10 +8230,8 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 #endregion
 
                 #region 重点船舶
-
-
                 // 获取工作表
-                ISheet sheet2 = workbook.GetSheetAt(2);
+                ISheet sheet2 = workbook.GetSheetAt(1);
                 ICellStyle sheetTwoCellStyle = workbook.CreateCellStyle();
                 // 水平对齐
                 sheetTwoCellStyle.Alignment = NPOI.SS.UserModel.HorizontalAlignment.Center;
