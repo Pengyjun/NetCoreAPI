@@ -8685,7 +8685,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     //ChangeAmount = SqlFunc.Round((y.ECAmount - y.Amount) / 10000, 2),
                     ActualContractAmount = y.ECAmount,
                     //ContractChangeInformation = 
-                    DurationInformation = y.DurationInformation,
+                    DurationInformation = string.IsNullOrWhiteSpace(y.DurationInformation) ? string.IsNullOrWhiteSpace(y.CommencementTime.ToString()) ? null : "开工日期：" + y.CommencementTime.Value.ToString("yyyy年MM月dd日") : y.DurationInformation,
                     ContractChangeInformation = y.ContractChangeInfo,
                     // MonthProjectDebriefing =
                     //工程产值
