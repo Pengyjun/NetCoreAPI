@@ -280,7 +280,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
             else
             {
                 startTime = Convert.ToDateTime(timeStr);
-                endTime = Convert.ToDateTime(Convert.ToDateTime(timeEnd).ToString("yyyy-MM-dd HH:mm:ss.fff"));
+                endTime = Convert.ToDateTime(Convert.ToDateTime(timeEnd).ToString("yyyy-MM-dd 23:59:59.9999"));
             }
             var personCount = await _dbContext.Queryable<User>().Where(x => x.IsDelete == 1
             && SqlFunc.ToDate(x.CreateTime) >= startTime && SqlFunc.ToDate(x.CreateTime) <= endTime).ToListAsync();
@@ -331,7 +331,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
             for (int i = 0; i <7; i++)
             {
                 var startTimeStr = Convert.ToDateTime(startTime.ObjToDate().AddDays(i).ToString("yyyy-MM-dd 00:00:00.000001"));
-                var endTimeStr = Convert.ToDateTime(startTime.AddDays(i).ToString("yyyy-MM-dd 23:59:59.999999"));
+                var endTimeStr = Convert.ToDateTime(startTime.AddDays(i).ToString("yyyy-MM-dd 23:59:59.999"));
 
                 EachMainDataCountResponseDto eachMainDataCountResponseDto = new EachMainDataCountResponseDto()
                 {
