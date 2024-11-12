@@ -262,7 +262,7 @@ namespace GDCMasterDataReceiveApi.Controller
             }
             List<string> ignoreColumns = new List<string>();
             //默认忽略的字段
-            var excludedProperties = new List<string> { "CreatedAt", "CreateTime", "CreateId", "UpdateId", "DeleteTime", "Timestamp", "IsDelete", "UpdatedAt", "ZAWARDP_LIST", "DeleteId", "Zdelete", "Fzstate", "Fzversion", "Id", "Version", "DataIdentifier", "Ids", "TreeCode", "StatusOfUnit", "Fzdelete", "CreateBy", "CreatTime", "ChangeTime", "Children", "ModifiedBy", "SourceSystem", "UpdateBy", "UpdateTime", "State", "FzitAi", "FzitAg", "FzitAk", "FzitAh", "FzitDe", "FzitAj", "ViewIdentification", "ViewFlag", "Ztreeid1", "SubDepts", "CountryRegion" };
+            var excludedProperties = new List<string> { "CreatedAt",  "CreateId", "UpdateId", "DeleteTime", "Timestamp", "IsDelete", "UpdatedAt", "ZAWARDP_LIST", "DeleteId", "Zdelete", "Fzstate", "Fzversion", "Id", "Version", "DataIdentifier", "Ids", "TreeCode", "StatusOfUnit", "Fzdelete", "CreateBy", "CreatTime", "ChangeTime", "Children", "ModifiedBy", "SourceSystem", "UpdateBy", "UpdateTime", "State", "FzitAi", "FzitAg", "FzitAk", "FzitAh", "FzitDe", "FzitAj", "ViewIdentification", "ViewFlag", "Ztreeid1", "SubDepts", "CountryRegion" };
             if (request.IgoreColumns != null)
             {
                 ignoreColumns = request.IgoreColumns.Split(",", StringSplitOptions.RemoveEmptyEntries).ToList();
@@ -373,7 +373,7 @@ namespace GDCMasterDataReceiveApi.Controller
                 }
 
                 // 在这里统一执行导入操作
-
+                ignoreColumns= ignoreColumns.Distinct().ToList();
                 return await ExcelImportAsync(data, ignoreColumns, $"{DateTime.Now:yyyyMMdd}");
             }
             return Ok("");
