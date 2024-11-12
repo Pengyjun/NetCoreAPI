@@ -93,17 +93,17 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     {
                         if (item.FieldName == "officeDepId" && item.ConditionalType == ConditionalType.In)
                         {
-                            string filedVals = "";
-                            var oids = lt.GetAllNodes(item.FieldValue, institution).ToList();
-                            if (!oids.Any())
-                            {
-                                filedVals = item.FieldValue;
-                            }
-                            else
-                            {
-                                //全部子集
-                                filedVals = string.Join(",", lt.GetTree(item.FieldValue, institution).Select(x => x.Oid));
-                            }
+                            //var oids = lt.GetAllNodes(item.FieldValue, institution).ToList();
+                            var filedVals = string.Join(",", lt.GetAllNodes(item.FieldValue, institution));
+                            //if (!oids.Any())
+                            //{
+                            //filedVals = item.FieldValue;
+                            //}
+                            //else
+                            //{
+                            //    //全部子集
+                            //    filedVals = string.Join(",", lt.GetTree(item.FieldValue, institution).Select(x => x.Oid));
+                            //}
                             sr.Add(new JsonToSqlRequestDto
                             {
                                 ConditionalType = ConditionalType.In,
