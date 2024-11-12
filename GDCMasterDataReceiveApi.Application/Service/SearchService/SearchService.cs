@@ -91,7 +91,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     List<JsonToSqlRequestDto> sr = new();
                     foreach (var item in requestDto.JsonToSqlRequestDtos)
                     {
-                        if (item.FieldName == "officeDepId")
+                        if (item.FieldName == "officeDepId" && item.ConditionalType == ConditionalType.In)
                         {
                             string filedVals = "";
                             var oids = lt.GetTree(item.FieldValue, institution).Select(x => x.Oid).ToList();
@@ -112,7 +112,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                                 Type = item.Type
                             });
                         }
-                        else if (item.FieldName == "officeDepIdName")
+                        else if (item.FieldName == "officeDepIdName" && item.ConditionalType == ConditionalType.In)
                         {
                             //平级
                             var filedVals = string.Join(",", lt.GetAllNodes(item.FieldValue, institution));
@@ -1604,7 +1604,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     List<JsonToSqlRequestDto> sr = new();
                     foreach (var item in requestDto.JsonToSqlRequestDtos)
                     {
-                        if (item.FieldName == "zPRO_BP" || item.FieldName == "zPRO_ORG")
+                        if ((item.FieldName == "zPRO_BP" || item.FieldName == "zPRO_ORG") && item.ConditionalType == ConditionalType.In)
                         {
                             string filedVals = "";
                             var oids = lt.GetTree(item.FieldValue, institution).Select(x => x.Oid).ToList();
