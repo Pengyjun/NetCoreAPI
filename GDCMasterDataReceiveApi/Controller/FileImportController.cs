@@ -1,4 +1,5 @@
-﻿using GDCMasterDataReceiveApi.Application.Contracts.Dto;
+﻿using GDCDataSecurityApi.Application.Contracts.Dto.IncrementalData;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto._4A.User;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.AdministrativeDivision;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.BankCard;
@@ -12,7 +13,6 @@ using GDCMasterDataReceiveApi.Application.Contracts.Dto.DHData;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.EscrowOrganization;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.FinancialInstitution;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.Institution;
-using GDCMasterDataReceiveApi.Application.Contracts.Dto.InvoiceType;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.Language;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.NationalEconomy;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.ProjectClassification;
@@ -22,14 +22,16 @@ using GDCMasterDataReceiveApi.Application.Contracts.Dto.UnitMeasurement;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.ValueDomain;
 using GDCMasterDataReceiveApi.Application.Contracts.IService.ISearchService;
 using GDCMasterDataReceiveApi.Domain.Models;
+using GDCMasterDataReceiveApi.Domain.Shared;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
 using SqlSugar;
 using System.ComponentModel;
 using System.Reflection;
-
+using UtilsSharp;
 namespace GDCMasterDataReceiveApi.Controller
 {
     /// <summary>
@@ -54,23 +56,25 @@ namespace GDCMasterDataReceiveApi.Controller
         /// <typeparam name="T"></typeparam>
         /// <param name="coulumns"></param>
         /// <returns></returns>
-        private List<string> GetFields<T>(List<string>? coulumns)
-        {
-            var result = new List<string>();
-            coulumns = coulumns.Select(x => x.ToLower()).ToList();
-            var fields = new Dictionary<string, object>();
+        //private List<string> GetFields<T>(List<string>? coulumns)
+        //{
+        //    var result = new List<string>();
+        //    coulumns = coulumns.Select(x => x.ToLower()).ToList();
+        //    var fields = new Dictionary<string, object>();
 
-            var properties = typeof(T).GetProperties();
-            foreach (var property in properties)
-            {
-                if (coulumns != null && coulumns.Any() && coulumns.Contains(property.Name.ToLower()))
-                {
-                    result.Add(property.Name);
-                }
-            }
+        //    var properties = typeof(T).GetProperties();
+        //    foreach (var property in properties)
+        //    {
+        //        if (coulumns != null && coulumns.Any() && coulumns.Contains(property.Name.ToLower()))
+        //        {
+        //            result.Add(property.Name);
+        //        }
+        //    }
 
-            return result;
-        }
+        //    return result;
+        //}
+
+
         #region 数据导出
         /// <summary>
         /// 业务导出
@@ -81,236 +85,322 @@ namespace GDCMasterDataReceiveApi.Controller
         [AllowAnonymous]
         public async Task<IActionResult> ImportExeclAsync([FromBody] BaseRequestDto request)
         {
+            var systemInterfaceInfoApi = AppsettingsHelper.GetValue("API:SystemInterfaceFiledRuleApi");
+            var appKey = GlobalCurrentUser.AppKey;
+            var appinterfaceCode = GlobalCurrentUser.AppinterfaceCode;
+
             FilterCondition condition = new();
-            condition.PageSize = 10000000;
-            condition.IsFullExport = true;
+            condition.PageIndex = request.PageIndex;
+            condition.PageSize = request.IsFullExport ? int.MaxValue : request.PageSize;
+            condition.IsFullExport = request.IsFullExport;
             condition.ImportType = request.ImportType;
-            string contentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
 
-            List<string>? columns = request.ExpColumns.Split(',').ToList();
-            List<string>? fields = new();//需要导出的字段
+            Dictionary<string, object> parames = new Dictionary<string, object>();//请求参数
+            WebHelper webHelper = new WebHelper();
+            var interfaceInfo = AppsettingsHelper.GetValue("API:SystemInterfaceInfoApi");
+            interfaceInfo = interfaceInfo.Replace("$systemApi", appKey).Replace("$interfaceApi", appinterfaceCode);
+            var responseInterfaceInfo = await webHelper.DoGetAsync<ResponseAjaxResult<List<DataInterfaceResponseDto>>>(interfaceInfo);
+            parames.Add("InterfaceApiId", responseInterfaceInfo.Result.Data[0].Id);
+            parames.Add("AppSystemId", responseInterfaceInfo.Result.Data[0].AppSystemId);
 
+            string expName = string.Empty;
             if (request.ImportType == 1)
             {
-                fields = GetFields<UserSearchDetailsDto>(columns);
-                var data = await searchService.GetUserSearchAsync(condition);
-                var excelData = ExportToExcel(data.Data, fields, "用户");
-                return File(excelData, contentType, $"用户{DateTime.Now:yyyyMMdd}.xlsx");
+                var responseResult = await searchService.GetUserSearchAsync(condition);
+                parames.Add("JsonObj", responseResult.ToJson(true));
             }
             else if (request.ImportType == 2)
             {
-                fields = GetFields<InstitutionDetatilsDto>(columns);
-                var data = await searchService.GetInstitutionTreeDetailsAsync(condition);
-                var excelData = ExportToExcel(data.Data, fields, "机构");
-                return File(excelData, contentType, $"机构{DateTime.Now:yyyyMMdd}.xlsx");
+                expName = "机构";
+                var responseResult = await searchService.GetInstitutionTreeDetailsAsync(condition);
+                parames.Add("JsonObj", responseResult.ToJson(true));
             }
             else if (request.ImportType == 3)
             {
-                fields = GetFields<DHProjects>(columns);
-                var data = await searchService.GetProjectSearchAsync(condition);
-                var excelData = ExportToExcel(data.Data, fields, "项目");
-                return File(excelData, contentType, $"项目{DateTime.Now:yyyyMMdd}.xlsx");
+                expName = "项目";
+                var responseResult = await searchService.GetProjectSearchAsync(condition);
+                parames.Add("JsonObj", responseResult.ToJson(true));
             }
             else if (request.ImportType == 4)
             {
-                fields = GetFields<CorresUnitDetailsDto>(columns);
-                var data = await searchService.GetCorresUnitSearchAsync(condition);
-                var excelData = ExportToExcel(data.Data, fields, "往来单位");
-                return File(excelData, contentType, $"往来单位{DateTime.Now:yyyyMMdd}.xlsx");
+                expName = "往来单位";
+                var responseResult = await searchService.GetCorresUnitSearchAsync(condition);
+                parames.Add("JsonObj", responseResult.ToJson(true));
             }
             else if (request.ImportType == 5)
             {
-                fields = GetFields<CountryRegionDetailsDto>(columns);
-                var data = await searchService.GetCountryRegionSearchAsync(condition);
-                var excelData = ExportToExcel(data.Data, fields, "国家地区");
-                return File(excelData, contentType, $"国家地区{DateTime.Now:yyyyMMdd}.xlsx");
+                expName = "国家地区";
+                var responseResult = await searchService.GetCountryRegionSearchAsync(condition);
+                parames.Add("JsonObj", responseResult.ToJson(true));
             }
             else if (request.ImportType == 6)
             {
-                fields = GetFields<CountryContinentDetailsDto>(columns);
-                var data = await searchService.GetCountryContinentSearchAsync(condition);
-                var excelData = ExportToExcel(data.Data, fields, "大洲");
-                return File(excelData, contentType, $"大洲{DateTime.Now:yyyyMMdd}.xlsx");
+                expName = "大洲";
+                var responseResult = await searchService.GetCountryContinentSearchAsync(condition);
+                parames.Add("JsonObj", responseResult.ToJson(true));
             }
             else if (request.ImportType == 7)
             {
-                fields = GetFields<FinancialInstitutionDetailsDto>(columns);
-                var data = await searchService.GetFinancialInstitutionSearchAsync(condition);
-                var excelData = ExportToExcel(data.Data, fields, "金融机构");
-                return File(excelData, contentType, $"金融机构{DateTime.Now:yyyyMMdd}.xlsx");
+                expName = "金融机构";
+                var responseResult = await searchService.GetFinancialInstitutionSearchAsync(condition);
+                parames.Add("JsonObj", responseResult.ToJson(true));
             }
             else if (request.ImportType == 8)
             {
-                fields = GetFields<DeviceClassCodeDetailsDto>(columns);
-                var data = await searchService.GetDeviceClassCodeSearchAsync(condition);
-                var excelData = ExportToExcel(data.Data, fields, "物资设备分类编码");
-                return File(excelData, contentType, $"物资设备分类编码{DateTime.Now:yyyyMMdd}.xlsx");
+                expName = "物资设备分类编码";
+                var responseResult = await searchService.GetDeviceClassCodeSearchAsync(condition);
+                parames.Add("JsonObj", responseResult.ToJson(true));
             }
             else if (request.ImportType == 9)
             {
-                fields = GetFields<InvoiceTypeDetailshDto>(columns);
-                var data = await searchService.GetInvoiceTypeSearchAsync(condition);
-                var excelData = ExportToExcel(data.Data, fields, "发票类型");
-                return File(excelData, contentType, $"发票类型{DateTime.Now:yyyyMMdd}.xlsx");
+                expName = "发票类型";
+                var responseResult = await searchService.GetDeviceClassCodeSearchAsync(condition);
+                parames.Add("JsonObj", responseResult.ToJson(true));
             }
             else if (request.ImportType == 10)
             {
-                fields = GetFields<DHResearchDto>(columns);
-                var data = await searchService.GetScientifiCNoProjectSearchAsync(condition);
-                var excelData = ExportToExcel(data.Data, fields, "科研项目");
-                return File(excelData, contentType, $"科研项目{DateTime.Now:yyyyMMdd}.xlsx");
+                expName = "科研项目";
+                var responseResult = await searchService.GetScientifiCNoProjectSearchAsync(condition);
+                parames.Add("JsonObj", responseResult.ToJson(true));
             }
             else if (request.ImportType == 11)
             {
-                fields = GetFields<LanguageDetailsDto>(columns);
-                var data = await searchService.GetLanguageSearchAsync(condition);
-                var excelData = ExportToExcel(data.Data, fields, "语言语种");
-                return File(excelData, contentType, $"语言语种{DateTime.Now:yyyyMMdd}.xlsx");
+                expName = "语言语种";
+                var responseResult = await searchService.GetLanguageSearchAsync(condition);
+                parames.Add("JsonObj", responseResult.ToJson(true));
             }
             else if (request.ImportType == 12)
             {
-                fields = GetFields<BankCardDetailsDto>(columns);
-                var data = await searchService.GetBankCardSearchAsync(condition);
-                var excelData = ExportToExcel(data.Data, fields, "银行账号");
-                return File(excelData, contentType, $"银行账号{DateTime.Now:yyyyMMdd}.xlsx");
+                expName = "银行账号";
+                var responseResult = await searchService.GetBankCardSearchAsync(condition);
+                parames.Add("JsonObj", responseResult.ToJson(true));
             }
             else if (request.ImportType == 13)
             {
-                fields = GetFields<DeviceDetailCodeDetailsDto>(columns);
-                var data = await searchService.GetDeviceDetailCodeSearchAsync(condition);
-                var excelData = ExportToExcel(data.Data, fields, "设备物资编码明细");
-                return File(excelData, contentType, $"设备物资编码明细{DateTime.Now:yyyyMMdd}.xlsx");
+                expName = "设备物资编码明细";
+                var responseResult = await searchService.GetDeviceDetailCodeSearchAsync(condition);
+                parames.Add("JsonObj", responseResult.ToJson(true));
             }
             else if (request.ImportType == 14)
             {
-                fields = GetFields<DHAccountingDept>(columns);
-                var data = await searchService.GetAccountingDepartmentSearchAsync(condition);
-                var excelData = ExportToExcel(data.Data, fields, "核算部门");
-                return File(excelData, contentType, $"核算部门{DateTime.Now:yyyyMMdd}.xlsx");
+                expName = "核算部门";
+                var responseResult = await searchService.GetAccountingDepartmentSearchAsync(condition);
+                parames.Add("JsonObj", responseResult.ToJson(true));
             }
             else if (request.ImportType == 15)
             {
-                fields = GetFields<DHMdmMultOrgAgencyRelPage>(columns);
-                var data = await searchService.GetRelationalContractsSearchAsync(condition);
-                var excelData = ExportToExcel(data.Data, fields, "委托关系");
-                return File(excelData, contentType, $"委托关系{DateTime.Now:yyyyMMdd}.xlsx");
+                expName = "委托关系";
+                var responseResult = await searchService.GetRelationalContractsSearchAsync(condition);
+                parames.Add("JsonObj", responseResult.ToJson(true));
             }
             else if (request.ImportType == 16)
             {
-                fields = GetFields<RegionalDetailsDto>(columns);
-                var data = await searchService.GetRegionalSearchAsync(condition);
-                var excelData = ExportToExcel(data.Data, fields, "中交区域总部");
-                return File(excelData, contentType, $"中交区域总部{DateTime.Now:yyyyMMdd}.xlsx");
+                expName = "中交区域总部";
+                var responseResult = await searchService.GetRegionalSearchAsync(condition);
+                parames.Add("JsonObj", responseResult.ToJson(true));
             }
             else if (request.ImportType == 17)
             {
-                fields = GetFields<UnitMeasurementDetailsDto>(columns);
-                var data = await searchService.GetUnitMeasurementSearchAsync(condition);
-                var excelData = ExportToExcel(data.Data, fields, "计量单位");
-                return File(excelData, contentType, $"计量单位{DateTime.Now:yyyyMMdd}.xlsx");
+                expName = "计量单位";
+                var responseResult = await searchService.GetUnitMeasurementSearchAsync(condition);
+                parames.Add("JsonObj", responseResult.ToJson(true));
             }
             else if (request.ImportType == 18)
             {
-                fields = GetFields<ProjectClassificationDetailsDto>(columns);
-                var data = await searchService.GetProjectClassificationSearchAsync(condition);
-                var excelData = ExportToExcel(data.Data, fields, "中交项目行业分类产业分类、业务板块、十二大业务类型、江河湖海对照关系");
-                return File(excelData, contentType, $"中交项目行业分类产业分类、业务板块、十二大业务类型、江河湖海对照关系{DateTime.Now:yyyyMMdd}.xlsx");
+                expName = "中交项目行业分类产业分类、业务板块、十二大业务类型、江河湖海对照关系";
+                var responseResult = await searchService.GetProjectClassificationSearchAsync(condition);
+                parames.Add("JsonObj", responseResult.ToJson(true));
             }
             else if (request.ImportType == 19)
             {
-                fields = GetFields<RegionalCenterDetailsDto>(columns);
-                var data = await searchService.GetRegionalCenterSearchAsync(condition);
-                var excelData = ExportToExcel(data.Data, fields, "中交区域中心");
-                return File(excelData, contentType, $"中交区域中心{DateTime.Now:yyyyMMdd}.xlsx");
+                expName = "中交区域中心";
+                var responseResult = await searchService.GetRegionalCenterSearchAsync(condition);
+                parames.Add("JsonObj", responseResult.ToJson(true));
             }
             else if (request.ImportType == 20)
             {
-                fields = GetFields<NationalEconomyDetailsDto>(columns);
-                var data = await searchService.GetNationalEconomySearchAsync(condition);
-                var excelData = ExportToExcel(data.Data, fields, "国民经济行业分类");
-                return File(excelData, contentType, $"国民经济行业分类{DateTime.Now:yyyyMMdd}.xlsx");
+                expName = "国民经济行业分类";
+                var responseResult = await searchService.GetNationalEconomySearchAsync(condition);
+                parames.Add("JsonObj", responseResult.ToJson(true));
             }
             else if (request.ImportType == 21)
             {
-                fields = GetFields<DHAdministrative>(columns);
-                var data = await searchService.GetAdministrativeAccountingMapperSearchAsync(condition);
-                var excelData = ExportToExcel(data.Data, fields, "行政机构和核算机构映射关系");
-                return File(excelData, contentType, $"行政机构和核算机构映射关系{DateTime.Now:yyyyMMdd}.xlsx");
+                expName = "行政机构和核算机构映射关系";
+                var responseResult = await searchService.GetAdministrativeAccountingMapperSearchAsync(condition);
+                parames.Add("JsonObj", responseResult.ToJson(true));
             }
             else if (request.ImportType == 22)
             {
-                fields = GetFields<EscrowOrganizationDetailsDto>(columns);
-                var data = await searchService.GetEscrowOrganizationSearchAsync(condition);
-                var excelData = ExportToExcel(data.Data, fields, "多组织-税务代管组织(行政)");
-                return File(excelData, contentType, $"多组织-税务代管组织(行政){DateTime.Now:yyyyMMdd}.xlsx");
+                expName = "多组织-税务代管组织(行政)";
+                var responseResult = await searchService.GetEscrowOrganizationSearchAsync(condition);
+                parames.Add("JsonObj", responseResult.ToJson(true));
             }
             else if (request.ImportType == 23)
             {
-                fields = GetFields<DHOpportunityDto>(columns);
-                var data = await searchService.GetBusinessNoCpportunitySearchAsync(condition, true);
-                var excelData = ExportToExcel(data.Data, fields, "商机项目(境内)");
-                return File(excelData, contentType, $"商机项目(境内){DateTime.Now:yyyyMMdd}.xlsx");
+                expName = "商机项目(境内)";
+                var responseResult = await searchService.GetBusinessNoCpportunitySearchAsync(condition, true);
+                parames.Add("JsonObj", responseResult.ToJson(true));
             }
             else if (request.ImportType == 24)
             {
-                fields = GetFields<DHOpportunityDto>(columns);
-                var data = await searchService.GetBusinessNoCpportunitySearchAsync(condition, false);
-                var excelData = ExportToExcel(data.Data, fields, "商机项目(境外)");
-                return File(excelData, contentType, $"商机项目(境外){DateTime.Now:yyyyMMdd}.xlsx");
+                expName = "商机项目(境外)";
+                var responseResult = await searchService.GetBusinessNoCpportunitySearchAsync(condition, false);
+                parames.Add("JsonObj", responseResult.ToJson(true));
             }
             else if (request.ImportType == 25)
             {
-                fields = GetFields<AdministrativeDivisionDetailsDto>(columns);
-                var data = await searchService.GetAdministrativeDivisionSearchAsync(condition);
-                var excelData = ExportToExcel(data.Data, fields, "境内行政区划");
-                return File(excelData, contentType, $"境内行政区划{DateTime.Now:yyyyMMdd}.xlsx");
+                expName = "境内行政区划";
+                var responseResult = await searchService.GetAdministrativeDivisionSearchAsync(condition);
+                parames.Add("JsonObj", responseResult.ToJson(true));
             }
             else if (request.ImportType == 26)
             {
-                fields = GetFields<DHAdjustAccountsMultipleOrg>(columns);
-                var data = await searchService.GetAccountingOrganizationSearchAsync(condition);
-                var excelData = ExportToExcel(data.Data, fields, "多组织-核算机构");
-                return File(excelData, contentType, $"多组织-核算机构{DateTime.Now:yyyyMMdd}.xlsx");
+                expName = "多组织-核算机构";
+                var responseResult = await searchService.GetAccountingOrganizationSearchAsync(condition);
+                parames.Add("JsonObj", responseResult.ToJson(true));
             }
             else if (request.ImportType == 27)
             {
-                fields = GetFields<CurrencyDetailsDto>(columns);
-                var data = await searchService.GetCurrencySearchAsync(condition);
-                var excelData = ExportToExcel(data.Data, fields, "币种");
-                return File(excelData, contentType, $"币种{DateTime.Now:yyyyMMdd}.xlsx");
+                expName = "币种";
+                var responseResult = await searchService.GetCurrencySearchAsync(condition);
+                parames.Add("JsonObj", responseResult.ToJson(true));
             }
             else if (request.ImportType == 28)
             {
-                fields = GetFields<ValueDomainReceiveResponseDto>(columns);
-                var data = await searchService.GetValueDomainReceiveAsync(condition);
-                var excelData = ExportToExcel(data.Data, fields, "值域");
-                return File(excelData, contentType, $"值域{DateTime.Now:yyyyMMdd}.xlsx");
+                expName = "值域";
+                var responseResult = await searchService.GetValueDomainReceiveAsync(condition);
+                parames.Add("JsonObj", responseResult.ToJson(true));
             }
             else if (request.ImportType == 29)
             {
-                fields = GetFields<DHVirtualProject>(columns);
-                var data = await searchService.GetDHVirtualProjectAsync(condition);
-                var excelData = ExportToExcel(data.Data, fields, "虚拟项目");
-                return File(excelData, contentType, $"虚拟项目{DateTime.Now:yyyyMMdd}.xlsx");
+                expName = "虚拟项目";
+                var responseResult = await searchService.GetDHVirtualProjectAsync(condition);
+                parames.Add("JsonObj", responseResult.ToJson(true));
             }
             else if (request.ImportType == 30)
             {
-                fields = GetFields<DHOrganzationDep>(columns);
-                var data = await searchService.GetXZOrganzationSearchAsync(condition);
-                var excelData = ExportToExcel(data.Data, fields, "多组织-行政组织");
-                return File(excelData, contentType, $"多组织-行政组织{DateTime.Now:yyyyMMdd}.xlsx");
+                expName = "多组织-行政组织";
+                var responseResult = await searchService.GetXZOrganzationSearchAsync(condition);
+                parames.Add("JsonObj", responseResult.ToJson(true));
             }
             else if (request.ImportType == 31)
             {
-                fields = GetFields<DHMdmManagementOrgage>(columns);
-                var data = await searchService.GetDHMdmMultOrgAgencyRelPageAsync(condition);
-                var excelData = ExportToExcel(data.Data, fields, "生产经营管理组织");
-                return File(excelData, contentType, $"生产经营管理组织{DateTime.Now:yyyyMMdd}.xlsx");
+                expName = "生产经营管理组织";
+                var responseResult = await searchService.GetDHMdmMultOrgAgencyRelPageAsync(condition);
+                parames.Add("JsonObj", responseResult.ToJson(true));
             }
-            else
+            List<string> ignoreColumns = new List<string>();
+            if (request.IgoreColumns != null)
             {
-                return Ok("导出失败");
+                ignoreColumns = request.IgoreColumns.Split(",", StringSplitOptions.RemoveEmptyEntries).ToList();
             }
+            var interfaceInfoList = await webHelper.DoPostAsync(systemInterfaceInfoApi, parames);
+            if (interfaceInfoList.Code == 200 && !string.IsNullOrWhiteSpace(interfaceInfoList.Result))
+            {
+                object data = null;
+
+                switch (request.ImportType)
+                {
+                    case 1:
+                        data = JsonConvert.DeserializeObject<ResponseAjaxResult<List<UserSearchDetailsDto>>>(interfaceInfoList.Result).Data;
+                        break;
+                    case 2:
+                        data = JsonConvert.DeserializeObject<ResponseAjaxResult<List<InstitutionDetatilsDto>>>(interfaceInfoList.Result).Data;
+                        break;
+                    case 3:
+                        data = JsonConvert.DeserializeObject<ResponseAjaxResult<List<DHProjects>>>(interfaceInfoList.Result).Data;
+                        break;
+                    case 4:
+                        data = JsonConvert.DeserializeObject<ResponseAjaxResult<List<CorresUnitDetailsDto>>>(interfaceInfoList.Result).Data;
+                        break;
+                    case 5:
+                        data = JsonConvert.DeserializeObject<ResponseAjaxResult<List<CountryRegionDetailsDto>>>(interfaceInfoList.Result).Data;
+                        break;
+                    case 6:
+                        data = JsonConvert.DeserializeObject<ResponseAjaxResult<List<CountryContinentDetailsDto>>>(interfaceInfoList.Result).Data;
+                        break;
+                    case 7:
+                        data = JsonConvert.DeserializeObject<ResponseAjaxResult<List<FinancialInstitutionDetailsDto>>>(interfaceInfoList.Result).Data;
+                        break;
+                    case 8:
+                        data = JsonConvert.DeserializeObject<ResponseAjaxResult<List<DeviceClassCodeDetailsDto>>>(interfaceInfoList.Result).Data;
+                        break;
+                    case 9:
+                        data = JsonConvert.DeserializeObject<ResponseAjaxResult<List<DeviceClassCodeDetailsDto>>>(interfaceInfoList.Result).Data;
+                        break;
+                    case 10:
+                        data = JsonConvert.DeserializeObject<ResponseAjaxResult<List<DHResearchDto>>>(interfaceInfoList.Result).Data;
+                        break;
+                    case 11:
+                        data = JsonConvert.DeserializeObject<ResponseAjaxResult<List<LanguageDetailsDto>>>(interfaceInfoList.Result).Data;
+                        break;
+                    case 12:
+                        data = JsonConvert.DeserializeObject<ResponseAjaxResult<List<BankCardDetailsDto>>>(interfaceInfoList.Result).Data;
+                        break;
+                    case 13:
+                        data = JsonConvert.DeserializeObject<ResponseAjaxResult<List<DeviceDetailCodeDetailsDto>>>(interfaceInfoList.Result).Data;
+                        break;
+                    case 14:
+                        data = JsonConvert.DeserializeObject<ResponseAjaxResult<List<DHAccountingDept>>>(interfaceInfoList.Result).Data;
+                        break;
+                    case 15:
+                        data = JsonConvert.DeserializeObject<ResponseAjaxResult<List<DHMdmMultOrgAgencyRelPage>>>(interfaceInfoList.Result).Data;
+                        break;
+                    case 16:
+                        data = JsonConvert.DeserializeObject<ResponseAjaxResult<List<RegionalDetailsDto>>>(interfaceInfoList.Result).Data;
+                        break;
+                    case 17:
+                        data = JsonConvert.DeserializeObject<ResponseAjaxResult<List<UnitMeasurementDetailsDto>>>(interfaceInfoList.Result).Data;
+                        break;
+                    case 18:
+                        data = JsonConvert.DeserializeObject<ResponseAjaxResult<List<ProjectClassificationDetailsDto>>>(interfaceInfoList.Result).Data;
+                        break;
+                    case 19:
+                        data = JsonConvert.DeserializeObject<ResponseAjaxResult<List<RegionalCenterDetailsDto>>>(interfaceInfoList.Result).Data;
+                        break;
+                    case 20:
+                        data = JsonConvert.DeserializeObject<ResponseAjaxResult<List<NationalEconomyDetailsDto>>>(interfaceInfoList.Result).Data;
+                        break;
+                    case 21:
+                        data = JsonConvert.DeserializeObject<ResponseAjaxResult<List<DHAdministrative>>>(interfaceInfoList.Result).Data;
+                        break;
+                    case 22:
+                        data = JsonConvert.DeserializeObject<ResponseAjaxResult<List<EscrowOrganizationDetailsDto>>>(interfaceInfoList.Result).Data;
+                        break;
+                    case 23:
+                        data = JsonConvert.DeserializeObject<ResponseAjaxResult<List<DHOpportunityDto>>>(interfaceInfoList.Result).Data;
+                        break;
+                    case 24:
+                        data = JsonConvert.DeserializeObject<ResponseAjaxResult<List<DHOpportunityDto>>>(interfaceInfoList.Result).Data;
+                        break;
+                    case 25:
+                        data = JsonConvert.DeserializeObject<ResponseAjaxResult<List<AdministrativeDivisionDetailsDto>>>(interfaceInfoList.Result).Data;
+                        break;
+                    case 26:
+                        data = JsonConvert.DeserializeObject<ResponseAjaxResult<List<DHAdjustAccountsMultipleOrg>>>(interfaceInfoList.Result).Data;
+                        break;
+                    case 27:
+                        data = JsonConvert.DeserializeObject<ResponseAjaxResult<List<CurrencyDetailsDto>>>(interfaceInfoList.Result).Data;
+                        break;
+                    case 28:
+                        data = JsonConvert.DeserializeObject<ResponseAjaxResult<List<ValueDomainReceiveResponseDto>>>(interfaceInfoList.Result).Data;
+                        break;
+                    case 29:
+                        data = JsonConvert.DeserializeObject<ResponseAjaxResult<List<DHVirtualProject>>>(interfaceInfoList.Result).Data;
+                        break;
+                    case 30:
+                        data = JsonConvert.DeserializeObject<ResponseAjaxResult<List<DHOrganzationDep>>>(interfaceInfoList.Result).Data;
+                        break;
+                    case 31:
+                        data = JsonConvert.DeserializeObject<ResponseAjaxResult<List<DHMdmManagementOrgage>>>(interfaceInfoList.Result).Data;
+                        break;
+
+                }
+
+                // 在这里统一执行导入操作
+                return await ExcelImportAsync(data, ignoreColumns, $"{expName}{DateTime.Now:yyyyMMdd}.xlsx");
+            }
+            return Ok("");
         }
         #endregion
         private byte[] ExportToExcel<T>(List<T> data, List<string> columns, string? sheetName)
