@@ -20,6 +20,14 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto
         /// </summary>
         public string? KeyWords { get; set; }
         /// <summary>
+        /// 导出的列 ,拼出
+        /// </summary>
+        public string? ExpColumns { get; set; }
+        /// <summary>
+        /// Oid
+        /// </summary>
+        public string? Oid { get; set; }
+        /// <summary>
         /// 页码
         /// </summary>
         public int PageIndex { get; set; } = 1;

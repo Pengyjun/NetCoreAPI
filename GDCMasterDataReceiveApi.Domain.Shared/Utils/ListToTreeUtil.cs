@@ -1,4 +1,6 @@
-﻿namespace GDCMasterDataReceiveApi.Domain.Shared.Utils
+﻿using System.Runtime.Intrinsics.Arm;
+
+namespace GDCMasterDataReceiveApi.Domain.Shared.Utils
 {
     /// <summary>
     /// list 转树帮助类
@@ -8,7 +10,7 @@
         /// <summary>
         /// 当前节点下的所有节点（平级关系）
         /// </summary>
-        private List<string> AllNodes =new List<string>();
+        private List<string> AllNodes = new List<string>();
 
         /// <summary>
         /// 获取当前机构下的所有子节点数据 （平级关系）
@@ -16,7 +18,8 @@
         /// <param name="printId"></param>
         /// <param name="node"></param>
         /// <returns></returns>
-        public List<string> GetAllNodes(string printId, List<InstitutionTree> node) {
+        public List<string> GetAllNodes(string printId, List<InstitutionTree> node)
+        {
             GetTree(printId, node);
             return AllNodes;
         }
@@ -44,7 +47,7 @@
     /// <summary>
     /// 机构树类
     /// </summary>
-    public class InstitutionTree 
+    public class InstitutionTree
     {
         public string Oid { get; set; }
         public string POid { get; set; }

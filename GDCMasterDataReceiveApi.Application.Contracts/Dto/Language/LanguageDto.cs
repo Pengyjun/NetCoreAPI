@@ -1,5 +1,4 @@
 ﻿using GDCMasterDataReceiveApi.Application.Contracts.Dto.OtherModels;
-using MiniExcelLibs.Attributes;
 using System.ComponentModel;
 
 namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.Language

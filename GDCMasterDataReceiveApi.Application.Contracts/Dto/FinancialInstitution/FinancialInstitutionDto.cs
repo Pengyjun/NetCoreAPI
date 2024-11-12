@@ -101,6 +101,7 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.FinancialInstitution
         /// <summary>
         /// 境内金融机构类型:该金融机构所属类型，境内金融机构必填
         /// </summary>
+        public string? ZDFITYPE { get; set; }
         [DisplayName("境内金融机构类型")]
         public string? TypesOfOrg { get; set; }
         /// <summary>

@@ -135,6 +135,7 @@ namespace GDCMasterDataReceiveApi.Controller
         /// <param name="requestDto"></param>
         /// <returns></returns>
         [HttpPost("GetProjectSearch")]
+        //[AllowAnonymous]
         public async Task<ResponseAjaxResult<List<DHProjects>>> GetProjectSearchAsync([FromBody] FilterCondition requestDto)
         {
             return await _searchService.GetProjectSearchAsync(requestDto);
@@ -742,32 +743,32 @@ namespace GDCMasterDataReceiveApi.Controller
 
             return await _searchService.GetUserFilterColumnsAsync(table);
         }
-        [HttpPost("SetFiled")]
-        [AllowAnonymous]
-        public async Task<ResponseAjaxResult<bool>> SetFiledAsync()
-        {
-            return await _searchService.SetFiledAsync();
-        }
-        [HttpPost("ModifyName")]
-        [AllowAnonymous]
-        public async Task<ResponseAjaxResult<bool>> ModifyNameAsync([FromBody] List<SystemInterfaceField> modify)
-        {
-            return await _searchService.ModifyNameAsync(modify);
+        //[HttpPost("SetFiled")]
+        //[AllowAnonymous]
+        //public async Task<ResponseAjaxResult<bool>> SetFiledAsync()
+        //{
+        //    return await _searchService.SetFiledAsync();
+        //}
+        //[HttpPost("ModifyName")]
+        //[AllowAnonymous]
+        //public async Task<ResponseAjaxResult<bool>> ModifyNameAsync([FromBody] List<SystemInterfaceField> modify)
+        //{
+        //    return await _searchService.ModifyNameAsync(modify);
 
-        }
-        [HttpGet("GetSearchDataDesensitizationRule")]
-        [AllowAnonymous]
-        public async Task<ResponseAjaxResult<List<SearchDataDesensitizationRule>>> GetSearchDataDesensitizationRuleAsync([FromQuery] string interfaceId)
-        {
-            return await _searchService.GetSearchDataDesensitizationRuleAsync(interfaceId);
-        }
+        //}
+        //[HttpGet("GetSearchDataDesensitizationRule")]
+        //[AllowAnonymous]
+        //public async Task<ResponseAjaxResult<List<SearchDataDesensitizationRule>>> GetSearchDataDesensitizationRuleAsync([FromQuery] string interfaceId)
+        //{
+        //    return await _searchService.GetSearchDataDesensitizationRuleAsync(interfaceId);
+        //}
 
-        [HttpGet("Modify")]
-        [AllowAnonymous]
-        public async Task<ResponseAjaxResult<bool>> ModifyAsync()
-        {
-            return await _searchService.ModifyAsync();
-        }
+        //[HttpGet("Modify")]
+        //[AllowAnonymous]
+        //public async Task<ResponseAjaxResult<bool>> ModifyAsync()
+        //{
+        //    return await _searchService.ModifyAsync();
+        //}
 
 
 
@@ -788,11 +789,11 @@ namespace GDCMasterDataReceiveApi.Controller
         /// </summary>
         /// <param name="jsonToSqlRequestDto"></param>
         /// <returns></returns>
-        [HttpPost("Test")]
-        [AllowAnonymous]
-        public async Task<List<IConditionalModel>> TestAsync([FromBody] List<JsonToSqlRequestDto> jsonToSqlRequestDto)
-        {
-            return await _baseService.JsonToConventSqlAsync(jsonToSqlRequestDto);
-        }
+        //[HttpPost("Test")]
+        //[AllowAnonymous]
+        //public async Task<List<IConditionalModel>> TestAsync([FromBody] List<JsonToSqlRequestDto> jsonToSqlRequestDto)
+        //{
+        //    return await _baseService.JsonToConventSqlAsync(jsonToSqlRequestDto);
+        //}
     }
 }

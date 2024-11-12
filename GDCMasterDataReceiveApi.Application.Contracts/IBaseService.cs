@@ -59,6 +59,7 @@ namespace GDCMasterDataReceiveApi.Application.Contracts
         /// </summary>
         /// <param name="conditionalModels"></param>
         /// <returns></returns>
-        Task<List<IConditionalModel>> JsonToConventSqlAsync(List<JsonToSqlRequestDto> jsonToSqlRequestDtos);
+        Task<List<IConditionalModel>> JsonToConventSqlAsync(List<JsonToSqlRequestDto> jsonToSqlRequestDtos, object dto);
+        //Task<List<IConditionalModel>> JsonToConventSqlAsync(List<JsonToSqlRequestDto> jsonToSqlRequestDtos);
     }
 }

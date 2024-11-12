@@ -420,10 +420,10 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.IService.ISearchService
         /// <returns></returns>
         Task<ResponseAjaxResult<List<BasePullDownResponseDto>>> GetDicTableAsync(int type);
 
-        Task<ResponseAjaxResult<bool>> SetFiledAsync();
-        Task<ResponseAjaxResult<bool>> ModifyNameAsync(List<SystemInterfaceField> modify);
-        Task<ResponseAjaxResult<List<SearchDataDesensitizationRule>>> GetSearchDataDesensitizationRuleAsync(string interfaceId);
-        Task<ResponseAjaxResult<bool>> ModifyAsync();
+        //Task<ResponseAjaxResult<bool>> SetFiledAsync();
+        //Task<ResponseAjaxResult<bool>> ModifyNameAsync(List<SystemInterfaceField> modify);
+        //Task<ResponseAjaxResult<List<SearchDataDesensitizationRule>>> GetSearchDataDesensitizationRuleAsync(string interfaceId);
+        //Task<ResponseAjaxResult<bool>> ModifyAsync();
 
 
 

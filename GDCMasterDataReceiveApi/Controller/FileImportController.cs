@@ -57,10 +57,10 @@ namespace GDCMasterDataReceiveApi.Controller
         private List<string> GetFields<T>(List<string>? coulumns)
         {
             var result = new List<string>();
-
+            coulumns = coulumns.Select(x => x.ToLower()).ToList();
             var fields = new Dictionary<string, object>();
-            var properties = typeof(T).GetProperties();
 
+            var properties = typeof(T).GetProperties();
             foreach (var property in properties)
             {
                 if (coulumns != null && coulumns.Any() && coulumns.Contains(property.Name.ToLower()))
@@ -77,9 +77,9 @@ namespace GDCMasterDataReceiveApi.Controller
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        [HttpGet("ImportExecl")]
+        [HttpPost("ImportExecl")]
         [AllowAnonymous]
-        public async Task<IActionResult> ImportExeclAsync([FromQuery] BaseRequestDto request)
+        public async Task<IActionResult> ImportExeclAsync([FromBody] BaseRequestDto request)
         {
             FilterCondition condition = new();
             condition.PageSize = 10000000;
@@ -87,256 +87,225 @@ namespace GDCMasterDataReceiveApi.Controller
             condition.ImportType = request.ImportType;
             string contentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
 
-            List<string>? columns = new();//dto反射出的字段
+            List<string>? columns = request.ExpColumns.Split(',').ToList();
             List<string>? fields = new();//需要导出的字段
 
             if (request.ImportType == 1)
             {
-                columns = await GetExpColumns("GetUserSearchAsync");
                 fields = GetFields<UserSearchDetailsDto>(columns);
                 var data = await searchService.GetUserSearchAsync(condition);
                 var excelData = ExportToExcel(data.Data, fields, "用户");
-                return File(excelData, contentType, $"用户_{DateTime.Now:yyyyMMdd}.xlsx");
+                return File(excelData, contentType, $"用户{DateTime.Now:yyyyMMdd}.xlsx");
             }
             else if (request.ImportType == 2)
             {
-                columns = await GetExpColumns("GetInstitutionAsync");
                 fields = GetFields<InstitutionDetatilsDto>(columns);
-                var data = await searchService.GetInstitutionAsync(condition);
+                var data = await searchService.GetInstitutionTreeDetailsAsync(condition);
                 var excelData = ExportToExcel(data.Data, fields, "机构");
-                return File(excelData, contentType, $"机构_{DateTime.Now:yyyyMMdd}.xlsx");
+                return File(excelData, contentType, $"机构{DateTime.Now:yyyyMMdd}.xlsx");
             }
             else if (request.ImportType == 3)
             {
-                columns = await GetExpColumns("GetProjectSearchAsync");
                 fields = GetFields<DHProjects>(columns);
                 var data = await searchService.GetProjectSearchAsync(condition);
                 var excelData = ExportToExcel(data.Data, fields, "项目");
-                return File(excelData, contentType, $"项目_{DateTime.Now:yyyyMMdd}.xlsx");
+                return File(excelData, contentType, $"项目{DateTime.Now:yyyyMMdd}.xlsx");
             }
             else if (request.ImportType == 4)
             {
-                columns = await GetExpColumns("GetCorresUnitSearchAsync");
                 fields = GetFields<CorresUnitDetailsDto>(columns);
                 var data = await searchService.GetCorresUnitSearchAsync(condition);
                 var excelData = ExportToExcel(data.Data, fields, "往来单位");
-                return File(excelData, contentType, $"往来单位_{DateTime.Now:yyyyMMdd}.xlsx");
+                return File(excelData, contentType, $"往来单位{DateTime.Now:yyyyMMdd}.xlsx");
             }
             else if (request.ImportType == 5)
             {
-                columns = await GetExpColumns("GetCountryRegionSearchAsync");
                 fields = GetFields<CountryRegionDetailsDto>(columns);
                 var data = await searchService.GetCountryRegionSearchAsync(condition);
                 var excelData = ExportToExcel(data.Data, fields, "国家地区");
-                return File(excelData, contentType, $"国家地区_{DateTime.Now:yyyyMMdd}.xlsx");
+                return File(excelData, contentType, $"国家地区{DateTime.Now:yyyyMMdd}.xlsx");
             }
             else if (request.ImportType == 6)
             {
-                columns = await GetExpColumns("GetCountryContinentSearchAsync");
                 fields = GetFields<CountryContinentDetailsDto>(columns);
                 var data = await searchService.GetCountryContinentSearchAsync(condition);
                 var excelData = ExportToExcel(data.Data, fields, "大洲");
-                return File(excelData, contentType, $"大洲_{DateTime.Now:yyyyMMdd}.xlsx");
+                return File(excelData, contentType, $"大洲{DateTime.Now:yyyyMMdd}.xlsx");
             }
             else if (request.ImportType == 7)
             {
-                columns = await GetExpColumns("GetFinancialInstitutionSearchAsync");
                 fields = GetFields<FinancialInstitutionDetailsDto>(columns);
                 var data = await searchService.GetFinancialInstitutionSearchAsync(condition);
                 var excelData = ExportToExcel(data.Data, fields, "金融机构");
-                return File(excelData, contentType, $"金融机构_{DateTime.Now:yyyyMMdd}.xlsx");
+                return File(excelData, contentType, $"金融机构{DateTime.Now:yyyyMMdd}.xlsx");
             }
             else if (request.ImportType == 8)
             {
-                columns = await GetExpColumns("GetDeviceClassCodeSearchAsync");
                 fields = GetFields<DeviceClassCodeDetailsDto>(columns);
                 var data = await searchService.GetDeviceClassCodeSearchAsync(condition);
                 var excelData = ExportToExcel(data.Data, fields, "物资设备分类编码");
-                return File(excelData, contentType, $"物资设备分类编码_{DateTime.Now:yyyyMMdd}.xlsx");
+                return File(excelData, contentType, $"物资设备分类编码{DateTime.Now:yyyyMMdd}.xlsx");
             }
             else if (request.ImportType == 9)
             {
-                columns = await GetExpColumns("GetInvoiceTypeSearchAsync");
                 fields = GetFields<InvoiceTypeDetailshDto>(columns);
                 var data = await searchService.GetInvoiceTypeSearchAsync(condition);
                 var excelData = ExportToExcel(data.Data, fields, "发票类型");
-                return File(excelData, contentType, $"发票类型_{DateTime.Now:yyyyMMdd}.xlsx");
+                return File(excelData, contentType, $"发票类型{DateTime.Now:yyyyMMdd}.xlsx");
             }
             else if (request.ImportType == 10)
             {
-                columns = await GetExpColumns("GetScientifiCNoProjectSearchAsync");
                 fields = GetFields<DHResearchDto>(columns);
                 var data = await searchService.GetScientifiCNoProjectSearchAsync(condition);
                 var excelData = ExportToExcel(data.Data, fields, "科研项目");
-                return File(excelData, contentType, $"科研项目_{DateTime.Now:yyyyMMdd}.xlsx");
+                return File(excelData, contentType, $"科研项目{DateTime.Now:yyyyMMdd}.xlsx");
             }
             else if (request.ImportType == 11)
             {
-                columns = await GetExpColumns("GetLanguageSearchAsync");
                 fields = GetFields<LanguageDetailsDto>(columns);
                 var data = await searchService.GetLanguageSearchAsync(condition);
                 var excelData = ExportToExcel(data.Data, fields, "语言语种");
-                return File(excelData, contentType, $"语言语种_{DateTime.Now:yyyyMMdd}.xlsx");
+                return File(excelData, contentType, $"语言语种{DateTime.Now:yyyyMMdd}.xlsx");
             }
             else if (request.ImportType == 12)
             {
-                columns = await GetExpColumns("GetBankCardSearchAsync");
                 fields = GetFields<BankCardDetailsDto>(columns);
                 var data = await searchService.GetBankCardSearchAsync(condition);
                 var excelData = ExportToExcel(data.Data, fields, "银行账号");
-                return File(excelData, contentType, $"银行账号_{DateTime.Now:yyyyMMdd}.xlsx");
+                return File(excelData, contentType, $"银行账号{DateTime.Now:yyyyMMdd}.xlsx");
             }
             else if (request.ImportType == 13)
             {
-                columns = await GetExpColumns("GetDeviceDetailCodeSearchAsync");
                 fields = GetFields<DeviceDetailCodeDetailsDto>(columns);
                 var data = await searchService.GetDeviceDetailCodeSearchAsync(condition);
                 var excelData = ExportToExcel(data.Data, fields, "设备物资编码明细");
-                return File(excelData, contentType, $"设备物资编码明细_{DateTime.Now:yyyyMMdd}.xlsx");
+                return File(excelData, contentType, $"设备物资编码明细{DateTime.Now:yyyyMMdd}.xlsx");
             }
             else if (request.ImportType == 14)
             {
-                columns = await GetExpColumns("GetAccountingDepartmentSearchAsync");
                 fields = GetFields<DHAccountingDept>(columns);
                 var data = await searchService.GetAccountingDepartmentSearchAsync(condition);
                 var excelData = ExportToExcel(data.Data, fields, "核算部门");
-                return File(excelData, contentType, $"核算部门_{DateTime.Now:yyyyMMdd}.xlsx");
+                return File(excelData, contentType, $"核算部门{DateTime.Now:yyyyMMdd}.xlsx");
             }
             else if (request.ImportType == 15)
             {
-                columns = await GetExpColumns("GetRelationalContractsSearchAsync");
                 fields = GetFields<DHMdmMultOrgAgencyRelPage>(columns);
                 var data = await searchService.GetRelationalContractsSearchAsync(condition);
                 var excelData = ExportToExcel(data.Data, fields, "委托关系");
-                return File(excelData, contentType, $"委托关系_{DateTime.Now:yyyyMMdd}.xlsx");
+                return File(excelData, contentType, $"委托关系{DateTime.Now:yyyyMMdd}.xlsx");
             }
             else if (request.ImportType == 16)
             {
-                columns = await GetExpColumns("GetRegionalSearchAsync");
                 fields = GetFields<RegionalDetailsDto>(columns);
                 var data = await searchService.GetRegionalSearchAsync(condition);
                 var excelData = ExportToExcel(data.Data, fields, "中交区域总部");
-                return File(excelData, contentType, $"中交区域总部_{DateTime.Now:yyyyMMdd}.xlsx");
+                return File(excelData, contentType, $"中交区域总部{DateTime.Now:yyyyMMdd}.xlsx");
             }
             else if (request.ImportType == 17)
             {
-                columns = await GetExpColumns("GetUnitMeasurementSearchAsync");
                 fields = GetFields<UnitMeasurementDetailsDto>(columns);
                 var data = await searchService.GetUnitMeasurementSearchAsync(condition);
                 var excelData = ExportToExcel(data.Data, fields, "计量单位");
-                return File(excelData, contentType, $"计量单位_{DateTime.Now:yyyyMMdd}.xlsx");
+                return File(excelData, contentType, $"计量单位{DateTime.Now:yyyyMMdd}.xlsx");
             }
             else if (request.ImportType == 18)
             {
-                columns = await GetExpColumns("GetProjectClassificationSearchAsync");
                 fields = GetFields<ProjectClassificationDetailsDto>(columns);
                 var data = await searchService.GetProjectClassificationSearchAsync(condition);
                 var excelData = ExportToExcel(data.Data, fields, "中交项目行业分类产业分类、业务板块、十二大业务类型、江河湖海对照关系");
-                return File(excelData, contentType, $"中交项目行业分类产业分类、业务板块、十二大业务类型、江河湖海对照关系_{DateTime.Now:yyyyMMdd}.xlsx");
+                return File(excelData, contentType, $"中交项目行业分类产业分类、业务板块、十二大业务类型、江河湖海对照关系{DateTime.Now:yyyyMMdd}.xlsx");
             }
             else if (request.ImportType == 19)
             {
-                columns = await GetExpColumns("GetRegionalCenterSearchAsync");
                 fields = GetFields<RegionalCenterDetailsDto>(columns);
                 var data = await searchService.GetRegionalCenterSearchAsync(condition);
                 var excelData = ExportToExcel(data.Data, fields, "中交区域中心");
-                return File(excelData, contentType, $"中交区域中心_{DateTime.Now:yyyyMMdd}.xlsx");
+                return File(excelData, contentType, $"中交区域中心{DateTime.Now:yyyyMMdd}.xlsx");
             }
             else if (request.ImportType == 20)
             {
-                columns = await GetExpColumns("GetNationalEconomySearchAsync");
                 fields = GetFields<NationalEconomyDetailsDto>(columns);
                 var data = await searchService.GetNationalEconomySearchAsync(condition);
                 var excelData = ExportToExcel(data.Data, fields, "国民经济行业分类");
-                return File(excelData, contentType, $"国民经济行业分类_{DateTime.Now:yyyyMMdd}.xlsx");
+                return File(excelData, contentType, $"国民经济行业分类{DateTime.Now:yyyyMMdd}.xlsx");
             }
             else if (request.ImportType == 21)
             {
-                columns = await GetExpColumns("GetAdministrativeAccountingMapperSearchAsync");
                 fields = GetFields<DHAdministrative>(columns);
                 var data = await searchService.GetAdministrativeAccountingMapperSearchAsync(condition);
                 var excelData = ExportToExcel(data.Data, fields, "行政机构和核算机构映射关系");
-                return File(excelData, contentType, $"行政机构和核算机构映射关系_{DateTime.Now:yyyyMMdd}.xlsx");
+                return File(excelData, contentType, $"行政机构和核算机构映射关系{DateTime.Now:yyyyMMdd}.xlsx");
             }
             else if (request.ImportType == 22)
             {
-                columns = await GetExpColumns("GetEscrowOrganizationSearchAsync");
                 fields = GetFields<EscrowOrganizationDetailsDto>(columns);
                 var data = await searchService.GetEscrowOrganizationSearchAsync(condition);
                 var excelData = ExportToExcel(data.Data, fields, "多组织-税务代管组织(行政)");
-                return File(excelData, contentType, $"多组织-税务代管组织(行政)_{DateTime.Now:yyyyMMdd}.xlsx");
+                return File(excelData, contentType, $"多组织-税务代管组织(行政){DateTime.Now:yyyyMMdd}.xlsx");
             }
             else if (request.ImportType == 23)
             {
-                columns = await GetExpColumns("GetBusinessNoCpportunitySearchAsync");
                 fields = GetFields<DHOpportunityDto>(columns);
                 var data = await searchService.GetBusinessNoCpportunitySearchAsync(condition, true);
                 var excelData = ExportToExcel(data.Data, fields, "商机项目(境内)");
-                return File(excelData, contentType, $"商机项目(境内)_{DateTime.Now:yyyyMMdd}.xlsx");
+                return File(excelData, contentType, $"商机项目(境内){DateTime.Now:yyyyMMdd}.xlsx");
             }
             else if (request.ImportType == 24)
             {
-                columns = await GetExpColumns("GetBusinessNoCpportunitySearchAsync");
                 fields = GetFields<DHOpportunityDto>(columns);
                 var data = await searchService.GetBusinessNoCpportunitySearchAsync(condition, false);
                 var excelData = ExportToExcel(data.Data, fields, "商机项目(境外)");
-                return File(excelData, contentType, $"商机项目(境外)_{DateTime.Now:yyyyMMdd}.xlsx");
+                return File(excelData, contentType, $"商机项目(境外){DateTime.Now:yyyyMMdd}.xlsx");
             }
             else if (request.ImportType == 25)
             {
-                columns = await GetExpColumns("GetAdministrativeDivisionSearchAsync");
                 fields = GetFields<AdministrativeDivisionDetailsDto>(columns);
                 var data = await searchService.GetAdministrativeDivisionSearchAsync(condition);
                 var excelData = ExportToExcel(data.Data, fields, "境内行政区划");
-                return File(excelData, contentType, $"境内行政区划_{DateTime.Now:yyyyMMdd}.xlsx");
+                return File(excelData, contentType, $"境内行政区划{DateTime.Now:yyyyMMdd}.xlsx");
             }
             else if (request.ImportType == 26)
             {
-                columns = await GetExpColumns("GetAccountingOrganizationSearchAsync");
                 fields = GetFields<DHAdjustAccountsMultipleOrg>(columns);
                 var data = await searchService.GetAccountingOrganizationSearchAsync(condition);
                 var excelData = ExportToExcel(data.Data, fields, "多组织-核算机构");
-                return File(excelData, contentType, $"多组织-核算机构_{DateTime.Now:yyyyMMdd}.xlsx");
+                return File(excelData, contentType, $"多组织-核算机构{DateTime.Now:yyyyMMdd}.xlsx");
             }
             else if (request.ImportType == 27)
             {
-                columns = await GetExpColumns("GetCurrencySearchAsync");
                 fields = GetFields<CurrencyDetailsDto>(columns);
                 var data = await searchService.GetCurrencySearchAsync(condition);
                 var excelData = ExportToExcel(data.Data, fields, "币种");
-                return File(excelData, contentType, $"币种_{DateTime.Now:yyyyMMdd}.xlsx");
+                return File(excelData, contentType, $"币种{DateTime.Now:yyyyMMdd}.xlsx");
             }
             else if (request.ImportType == 28)
             {
-                columns = await GetExpColumns("GetValueDomainReceiveAsync");
                 fields = GetFields<ValueDomainReceiveResponseDto>(columns);
                 var data = await searchService.GetValueDomainReceiveAsync(condition);
                 var excelData = ExportToExcel(data.Data, fields, "值域");
-                return File(excelData, contentType, $"值域_{DateTime.Now:yyyyMMdd}.xlsx");
+                return File(excelData, contentType, $"值域{DateTime.Now:yyyyMMdd}.xlsx");
             }
             else if (request.ImportType == 29)
             {
-                columns = await GetExpColumns("GetDHVirtualProjectAsync");
                 fields = GetFields<DHVirtualProject>(columns);
                 var data = await searchService.GetDHVirtualProjectAsync(condition);
                 var excelData = ExportToExcel(data.Data, fields, "虚拟项目");
-                return File(excelData, contentType, $"虚拟项目_{DateTime.Now:yyyyMMdd}.xlsx");
+                return File(excelData, contentType, $"虚拟项目{DateTime.Now:yyyyMMdd}.xlsx");
             }
             else if (request.ImportType == 30)
             {
-                columns = await GetExpColumns("GetXZOrganzationSearchAsync");
                 fields = GetFields<DHOrganzationDep>(columns);
                 var data = await searchService.GetXZOrganzationSearchAsync(condition);
                 var excelData = ExportToExcel(data.Data, fields, "多组织-行政组织");
-                return File(excelData, contentType, $"多组织-行政组织_{DateTime.Now:yyyyMMdd}.xlsx");
+                return File(excelData, contentType, $"多组织-行政组织{DateTime.Now:yyyyMMdd}.xlsx");
             }
             else if (request.ImportType == 31)
             {
-                columns = await GetExpColumns("GetDHMdmMultOrgAgencyRelPageAsync");
                 fields = GetFields<DHMdmManagementOrgage>(columns);
                 var data = await searchService.GetDHMdmMultOrgAgencyRelPageAsync(condition);
                 var excelData = ExportToExcel(data.Data, fields, "生产经营管理组织");
-                return File(excelData, contentType, $"生产经营管理组织_{DateTime.Now:yyyyMMdd}.xlsx");
+                return File(excelData, contentType, $"生产经营管理组织{DateTime.Now:yyyyMMdd}.xlsx");
             }
             else
             {
@@ -422,42 +391,6 @@ namespace GDCMasterDataReceiveApi.Controller
         {
             var property = typeof(T).GetProperty(columnName, BindingFlags.Public | BindingFlags.Instance);
             return property?.GetValue(rowData, null);
-        }
-        /// <summary>
-        /// 跨库读取导出字段列
-        /// </summary>
-        /// <param name="interfaceName"></param>
-        /// <returns></returns>
-        private async Task<List<string>> GetExpColumns(string? interfaceName)
-        {
-            List<string> columns = new();
-
-            //跨库获取系统接口
-            var interfaceFirst = await _dbContext.AsTenant().QueryableWithAttr<SystemInterface>()
-                .Where(t => t.IsDelete == 1 && interfaceName == t.InterfaceName && t.Enable == 1)
-                .FirstAsync();
-
-            if (interfaceFirst != null)
-            {
-                //获取接口dto字段
-                var interfaceData = await _dbContext.AsTenant().QueryableWithAttr<SystemInterfaceField>()
-                    .Where(t => t.AppSystemInterfaceId == interfaceFirst.Id && t.Enable == 1)
-                    .Select(t => new { t.FieidName, t.Id })
-                    .ToListAsync();
-
-                //获取当前接口已脱敏字段
-                var interfaceIds = interfaceData.Select(x => x.Id).ToList();
-                var desentIds = await _dbContext.AsTenant().QueryableWithAttr<DataDesensitizationRule>()
-                    .Where(t => interfaceIds.Contains(t.AppSystemInterfaceFieIdId) && !string.IsNullOrWhiteSpace(t.StartIndex.ToString()) && !string.IsNullOrWhiteSpace(t.EndIndex.ToString()) && t.Enable == 1 && t.AppSystemApiId == 1844293323817357312)//广航局主数据
-                    .Select(t => t.AppSystemInterfaceFieIdId)
-                    .ToListAsync();
-
-                //获取需要返回的字段
-                columns = interfaceData.Where(t => !desentIds.Contains(t.Id)).Select(x => x.FieidName.ToLower()).ToList();
-            }
-            else { throw new Exception("接口不存在"); }
-
-            return columns;
         }
     }
 }
