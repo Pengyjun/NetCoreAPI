@@ -85,7 +85,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     .Select(t => new InstitutionTree { GPoid = t.GPOID, Name = t.NAME, Oid = t.OID, POid = t.POID, ShortName = t.SHORTNAME, Sno = t.SNO })
                     .ToListAsync();
                 var fileNames = requestDto.JsonToSqlRequestDtos.Select(x => x.FieldName).ToList();
-                if (fileNames.Contains("officeDepId") || fileNames.Contains("officeDepIdName"))
+                if (fileNames.Contains("officeDepId"))
                 {
                     ListToTreeUtil lt = new ListToTreeUtil();
                     List<JsonToSqlRequestDto> sr = new();
@@ -112,18 +112,18 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                                 Type = item.Type
                             });
                         }
-                        else if (item.FieldName == "officeDepIdName" && item.ConditionalType == ConditionalType.In)
-                        {
-                            //平级
-                            var filedVals = string.Join(",", lt.GetAllNodes(item.FieldValue, institution));
-                            sr.Add(new JsonToSqlRequestDto
-                            {
-                                ConditionalType = ConditionalType.In,
-                                FieldName = item.FieldName,
-                                FieldValue = filedVals,
-                                Type = item.Type
-                            });
-                        }
+                        //else if (item.FieldName == "officeDepIdName" && item.ConditionalType == ConditionalType.In)
+                        //{
+                        //    //平级
+                        //    var filedVals = string.Join(",", lt.GetAllNodes(item.FieldValue, institution));
+                        //    sr.Add(new JsonToSqlRequestDto
+                        //    {
+                        //        ConditionalType = ConditionalType.In,
+                        //        FieldName = item.FieldName,
+                        //        FieldValue = filedVals,
+                        //        Type = item.Type
+                        //    });
+                        //}
                     }
                     if (sr != null && sr.Any())
                     {
