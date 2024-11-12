@@ -29,6 +29,7 @@ using Newtonsoft.Json;
 using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
 using SqlSugar;
+using SqlSugar.Extensions;
 using System.ComponentModel;
 using System.Reflection;
 using UtilsSharp;
@@ -106,6 +107,7 @@ namespace GDCMasterDataReceiveApi.Controller
             string expName = string.Empty;
             if (request.ImportType == 1)
             {
+                expName = "人员";
                 var responseResult = await searchService.GetUserSearchAsync(condition);
                 parames.Add("JsonObj", responseResult.ToJson(true));
             }
@@ -305,99 +307,100 @@ namespace GDCMasterDataReceiveApi.Controller
                         data = JsonConvert.DeserializeObject<ResponseAjaxResult<List<UserSearchDetailsDto>>>(interfaceInfoList.Result).Data;
                         break;
                     case 2:
-                        data = JsonConvert.DeserializeObject<ResponseAjaxResult<List<InstitutionDetatilsDto>>>(interfaceInfoList.Result).Data;
+                        data = JsonConvert.DeserializeObject<ResponseAjaxResult<List<InstitutionDetatilsDto>>>(interfaceInfoList.Result);
                         break;
                     case 3:
-                        data = JsonConvert.DeserializeObject<ResponseAjaxResult<List<DHProjects>>>(interfaceInfoList.Result).Data;
+                        data = JsonConvert.DeserializeObject<ResponseAjaxResult<List<DHProjects>>>(interfaceInfoList.Result);
                         break;
                     case 4:
-                        data = JsonConvert.DeserializeObject<ResponseAjaxResult<List<CorresUnitDetailsDto>>>(interfaceInfoList.Result).Data;
+                        data = JsonConvert.DeserializeObject<ResponseAjaxResult<List<CorresUnitDetailsDto>>>(interfaceInfoList.Result);
                         break;
                     case 5:
-                        data = JsonConvert.DeserializeObject<ResponseAjaxResult<List<CountryRegionDetailsDto>>>(interfaceInfoList.Result).Data;
+                        data = JsonConvert.DeserializeObject<ResponseAjaxResult<List<CountryRegionDetailsDto>>>(interfaceInfoList.Result);
                         break;
                     case 6:
-                        data = JsonConvert.DeserializeObject<ResponseAjaxResult<List<CountryContinentDetailsDto>>>(interfaceInfoList.Result).Data;
+                        data = JsonConvert.DeserializeObject<ResponseAjaxResult<List<CountryContinentDetailsDto>>>(interfaceInfoList.Result);
                         break;
                     case 7:
-                        data = JsonConvert.DeserializeObject<ResponseAjaxResult<List<FinancialInstitutionDetailsDto>>>(interfaceInfoList.Result).Data;
+                        data = JsonConvert.DeserializeObject<ResponseAjaxResult<List<FinancialInstitutionDetailsDto>>>(interfaceInfoList.Result);
                         break;
                     case 8:
-                        data = JsonConvert.DeserializeObject<ResponseAjaxResult<List<DeviceClassCodeDetailsDto>>>(interfaceInfoList.Result).Data;
+                        data = JsonConvert.DeserializeObject<ResponseAjaxResult<List<DeviceClassCodeDetailsDto>>>(interfaceInfoList.Result);
                         break;
                     case 9:
-                        data = JsonConvert.DeserializeObject<ResponseAjaxResult<List<DeviceClassCodeDetailsDto>>>(interfaceInfoList.Result).Data;
+                        data = JsonConvert.DeserializeObject<ResponseAjaxResult<List<DeviceClassCodeDetailsDto>>>(interfaceInfoList.Result);
                         break;
                     case 10:
-                        data = JsonConvert.DeserializeObject<ResponseAjaxResult<List<DHResearchDto>>>(interfaceInfoList.Result).Data;
+                        data = JsonConvert.DeserializeObject<ResponseAjaxResult<List<DHResearchDto>>>(interfaceInfoList.Result);
                         break;
                     case 11:
-                        data = JsonConvert.DeserializeObject<ResponseAjaxResult<List<LanguageDetailsDto>>>(interfaceInfoList.Result).Data;
+                        data = JsonConvert.DeserializeObject<ResponseAjaxResult<List<LanguageDetailsDto>>>(interfaceInfoList.Result);
                         break;
                     case 12:
-                        data = JsonConvert.DeserializeObject<ResponseAjaxResult<List<BankCardDetailsDto>>>(interfaceInfoList.Result).Data;
+                        data = JsonConvert.DeserializeObject<ResponseAjaxResult<List<BankCardDetailsDto>>>(interfaceInfoList.Result);
                         break;
                     case 13:
-                        data = JsonConvert.DeserializeObject<ResponseAjaxResult<List<DeviceDetailCodeDetailsDto>>>(interfaceInfoList.Result).Data;
+                        data = JsonConvert.DeserializeObject<ResponseAjaxResult<List<DeviceDetailCodeDetailsDto>>>(interfaceInfoList.Result);
                         break;
                     case 14:
-                        data = JsonConvert.DeserializeObject<ResponseAjaxResult<List<DHAccountingDept>>>(interfaceInfoList.Result).Data;
+                        data = JsonConvert.DeserializeObject<ResponseAjaxResult<List<DHAccountingDept>>>(interfaceInfoList.Result);
                         break;
                     case 15:
-                        data = JsonConvert.DeserializeObject<ResponseAjaxResult<List<DHMdmMultOrgAgencyRelPage>>>(interfaceInfoList.Result).Data;
+                        data = JsonConvert.DeserializeObject<ResponseAjaxResult<List<DHMdmMultOrgAgencyRelPage>>>(interfaceInfoList.Result);
                         break;
                     case 16:
-                        data = JsonConvert.DeserializeObject<ResponseAjaxResult<List<RegionalDetailsDto>>>(interfaceInfoList.Result).Data;
+                        data = JsonConvert.DeserializeObject<ResponseAjaxResult<List<RegionalDetailsDto>>>(interfaceInfoList.Result);
                         break;
                     case 17:
-                        data = JsonConvert.DeserializeObject<ResponseAjaxResult<List<UnitMeasurementDetailsDto>>>(interfaceInfoList.Result).Data;
+                        data = JsonConvert.DeserializeObject<ResponseAjaxResult<List<UnitMeasurementDetailsDto>>>(interfaceInfoList.Result);
                         break;
                     case 18:
-                        data = JsonConvert.DeserializeObject<ResponseAjaxResult<List<ProjectClassificationDetailsDto>>>(interfaceInfoList.Result).Data;
+                        data = JsonConvert.DeserializeObject<ResponseAjaxResult<List<ProjectClassificationDetailsDto>>>(interfaceInfoList.Result);
                         break;
                     case 19:
-                        data = JsonConvert.DeserializeObject<ResponseAjaxResult<List<RegionalCenterDetailsDto>>>(interfaceInfoList.Result).Data;
+                        data = JsonConvert.DeserializeObject<ResponseAjaxResult<List<RegionalCenterDetailsDto>>>(interfaceInfoList.Result);
                         break;
                     case 20:
-                        data = JsonConvert.DeserializeObject<ResponseAjaxResult<List<NationalEconomyDetailsDto>>>(interfaceInfoList.Result).Data;
+                        data = JsonConvert.DeserializeObject<ResponseAjaxResult<List<NationalEconomyDetailsDto>>>(interfaceInfoList.Result);
                         break;
                     case 21:
-                        data = JsonConvert.DeserializeObject<ResponseAjaxResult<List<DHAdministrative>>>(interfaceInfoList.Result).Data;
+                        data = JsonConvert.DeserializeObject<ResponseAjaxResult<List<DHAdministrative>>>(interfaceInfoList.Result);
                         break;
                     case 22:
-                        data = JsonConvert.DeserializeObject<ResponseAjaxResult<List<EscrowOrganizationDetailsDto>>>(interfaceInfoList.Result).Data;
+                        data = JsonConvert.DeserializeObject<ResponseAjaxResult<List<EscrowOrganizationDetailsDto>>>(interfaceInfoList.Result);
                         break;
                     case 23:
-                        data = JsonConvert.DeserializeObject<ResponseAjaxResult<List<DHOpportunityDto>>>(interfaceInfoList.Result).Data;
+                        data = JsonConvert.DeserializeObject<ResponseAjaxResult<List<DHOpportunityDto>>>(interfaceInfoList.Result);
                         break;
                     case 24:
-                        data = JsonConvert.DeserializeObject<ResponseAjaxResult<List<DHOpportunityDto>>>(interfaceInfoList.Result).Data;
+                        data = JsonConvert.DeserializeObject<ResponseAjaxResult<List<DHOpportunityDto>>>(interfaceInfoList.Result);
                         break;
                     case 25:
-                        data = JsonConvert.DeserializeObject<ResponseAjaxResult<List<AdministrativeDivisionDetailsDto>>>(interfaceInfoList.Result).Data;
+                        data = JsonConvert.DeserializeObject<ResponseAjaxResult<List<AdministrativeDivisionDetailsDto>>>(interfaceInfoList.Result);
                         break;
                     case 26:
-                        data = JsonConvert.DeserializeObject<ResponseAjaxResult<List<DHAdjustAccountsMultipleOrg>>>(interfaceInfoList.Result).Data;
+                        data = JsonConvert.DeserializeObject<ResponseAjaxResult<List<DHAdjustAccountsMultipleOrg>>>(interfaceInfoList.Result);
                         break;
                     case 27:
-                        data = JsonConvert.DeserializeObject<ResponseAjaxResult<List<CurrencyDetailsDto>>>(interfaceInfoList.Result).Data;
+                        data = JsonConvert.DeserializeObject<ResponseAjaxResult<List<CurrencyDetailsDto>>>(interfaceInfoList.Result);
                         break;
                     case 28:
-                        data = JsonConvert.DeserializeObject<ResponseAjaxResult<List<ValueDomainReceiveResponseDto>>>(interfaceInfoList.Result).Data;
+                        data = JsonConvert.DeserializeObject<ResponseAjaxResult<List<ValueDomainReceiveResponseDto>>>(interfaceInfoList.Result);
                         break;
                     case 29:
-                        data = JsonConvert.DeserializeObject<ResponseAjaxResult<List<DHVirtualProject>>>(interfaceInfoList.Result).Data;
+                        data = JsonConvert.DeserializeObject<ResponseAjaxResult<List<DHVirtualProject>>>(interfaceInfoList.Result);
                         break;
                     case 30:
-                        data = JsonConvert.DeserializeObject<ResponseAjaxResult<List<DHOrganzationDep>>>(interfaceInfoList.Result).Data;
+                        data = JsonConvert.DeserializeObject<ResponseAjaxResult<List<DHOrganzationDep>>>(interfaceInfoList.Result);
                         break;
                     case 31:
-                        data = JsonConvert.DeserializeObject<ResponseAjaxResult<List<DHMdmManagementOrgage>>>(interfaceInfoList.Result).Data;
+                        data = JsonConvert.DeserializeObject<ResponseAjaxResult<List<DHMdmManagementOrgage>>>(interfaceInfoList.Result);
                         break;
 
                 }
 
                 // 在这里统一执行导入操作
+
                 return await ExcelImportAsync(data, ignoreColumns, $"{expName}{DateTime.Now:yyyyMMdd}");
             }
             return Ok("");
