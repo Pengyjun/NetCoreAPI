@@ -31,5 +31,14 @@
         /// 机构Poid
         /// </summary>
         public string? InstitutionPOid { get; set; }
+        /// <summary>
+        /// 系统APPkey
+        /// </summary>
+
+        public string? AppKey { get; set; }
+        /// <summary>
+        /// 接口授权码
+        /// </summary>
+        public string? AppinterfaceCode { get; set; }
     }
 }
