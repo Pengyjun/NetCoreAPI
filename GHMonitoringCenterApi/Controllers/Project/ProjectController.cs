@@ -11,11 +11,14 @@ using GHMonitoringCenterApi.Application.Contracts.Dto.Ship;
 using GHMonitoringCenterApi.Application.Contracts.Dto.Upload;
 using GHMonitoringCenterApi.Application.Contracts.IService.Project;
 using GHMonitoringCenterApi.CustomAttribute;
+using GHMonitoringCenterApi.Domain.Models;
 using GHMonitoringCenterApi.Domain.Shared;
 using GHMonitoringCenterApi.Domain.Shared.Const;
 using GHMonitoringCenterApi.Domain.Shared.Util;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using MiniExcelLibs;
+using SqlSugar;
 
 namespace GHMonitoringCenterApi.Controllers.Project
 {
@@ -29,6 +32,7 @@ namespace GHMonitoringCenterApi.Controllers.Project
     {
 
         #region 依赖注入
+        public ISqlSugarClient _db { get; set; }
         public IProjectService projectService { get; set; }
 
         public IProjectReportService projectReportService { get; set; }
@@ -40,7 +44,7 @@ namespace GHMonitoringCenterApi.Controllers.Project
         public IMonthReportForProjectService _monthReportForProjectService { get; set; }
 
 
-        public ProjectController(IProjectService projectService, IProjectReportService projectReportService, IProjectDepartMentService projectDepartMentService, IProjectShipMovementsService projectShipMovementsService, IProjectApproverService projectApproverService, IMonthReportForProjectService monthReportForProjectService)
+        public ProjectController(ISqlSugarClient db, IProjectService projectService, IProjectReportService projectReportService, IProjectDepartMentService projectDepartMentService, IProjectShipMovementsService projectShipMovementsService, IProjectApproverService projectApproverService, IMonthReportForProjectService monthReportForProjectService)
         {
             this.projectService = projectService;
             this.projectReportService = projectReportService;
@@ -48,6 +52,7 @@ namespace GHMonitoringCenterApi.Controllers.Project
             this.projectShipMovementsService = projectShipMovementsService;
             this.projectApproverService = projectApproverService;
             this._monthReportForProjectService = monthReportForProjectService;
+            this._db = db;
         }
         #endregion
 
@@ -785,16 +790,150 @@ namespace GHMonitoringCenterApi.Controllers.Project
         [AllowAnonymous]
         public bool aa([FromBody] string a)
         {
+            // Excel 文件路径
+            string filePath = @"C:\Users\pyej0\Desktop\2019年度产值完成情况与计划对比表（公布）改).xlsx";
+            string filePath2 = @"C:\Users\pyej0\Desktop\2020年12月份产值完成情况与计划对比分析表（含排序后）改.xlsx";
+            string filePath3 = @"C:\Users\pyej0\Desktop\2021年12月份产值完成情况与计划对比分析表2.xlsx";
+            string filePath4 = @"C:\Users\pyej0\Desktop\2023年12月份产值完成情况与计划对比分析表（公布）改后(1).xlsx";
+            string filePath5 = @"C:\Users\pyej0\Desktop\2022年12月份产值完成情况与计划对比分析表（公布）改后(1).xlsx";
 
+            //数据写入中间表 
+            List<ExcelConvertTable> excelVal = new();
+            #region 2019年度在建项目产值完成情况与计划对比表                   
+            var rows = MiniExcel
+                        .Query(filePath)                      // 读取 Excel 文件
+                        .Skip(6)                               // 跳过前6行，从第7行开始
+                        .Select(row => new
+                        {
+                            ColumnA = row.A,   // A 列
+                            ColumnB = row.B,   // B 列
+                            ColumnG = row.G,   // G 列
+                            ColumnBL = row.BL  // BL 列
+                        })
+                        .ToList();
+            rows = rows.Where(x => !string.IsNullOrWhiteSpace(x.ColumnBL)).ToList();
+            foreach (var row in rows)
+            {
+                excelVal.Add(new ExcelConvertTable
+                {
+                    Id = GuidUtil.Next().ToString(),
+                    Name = row.ColumnB,
+                    ProjectId = row.ColumnBL,
+                    Val = (decimal)row.ColumnG,
+                    Year = 2019
+                });
+            }
+            #endregion
+
+            #region 2020年年度在建项目产值完成情况与计划对比分析表                   
+            var rows2 = MiniExcel
+                        .Query(filePath2)                      // 读取 Excel 文件
+                        .Skip(7)                               // 跳过前7行，从第8行开始
+                        .Select(row => new
+                        {
+                            ColumnA = row.A,   // A 列
+                            ColumnB = row.B,   // B 列
+                            ColumnG = row.G,   // G 列
+                            ColumnBK = row.BK  // Bk 列
+                        })
+                        .ToList();
+            rows2 = rows2.Where(x => !string.IsNullOrWhiteSpace(x.ColumnBK)).ToList();
+            foreach (var row in rows2)
+            {
+                excelVal.Add(new ExcelConvertTable
+                {
+                    Id = GuidUtil.Next().ToString(),
+                    Name = row.ColumnB,
+                    ProjectId = row.ColumnBK,
+                    Val = (decimal)row.ColumnG,
+                    Year = 2020
+                });
+            }
+            #endregion
+
+            #region 2021年12月份在建项目产值完成情况与计划对比分析表                   
+            var rows3 = MiniExcel
+                        .Query(filePath3)                      // 读取 Excel 文件
+                        .Skip(9)                               // 跳过前9行，从第10行开始
+                        .Select(row => new
+                        {
+                            ColumnB = row.B,   // B 列
+                            ColumnC = row.C,   // C 列
+                            ColumnH = row.H,   // H 列
+                            ColumnAM = row.AM  // AM 列
+                        })
+                        .ToList();
+            rows3 = rows3.Where(x => !string.IsNullOrWhiteSpace(x.ColumnAM)).ToList();
+            foreach (var row in rows3)
+            {
+                excelVal.Add(new ExcelConvertTable
+                {
+                    Id = GuidUtil.Next().ToString(),
+                    Name = row.ColumnC,
+                    ProjectId = row.ColumnAM,
+                    Val = (decimal)row.ColumnH,
+                    Year = 2021
+                });
+            }
+            #endregion
+
+            #region 2023年12月份在建项目产值完成情况与计划对比分析表                                      
+            var rows4 = MiniExcel
+                        .Query(filePath4)                      // 读取 Excel 文件
+                        .Skip(10)                               // 跳过前10行，从第11行开始
+                        .Select(row => new
+                        {
+                            ColumnB = row.B,   // B 列
+                            ColumnC = row.C,   // C 列
+                            ColumnI = row.I,   // I 列
+                            ColumnAX = row.AX  // AM 列
+                        })
+                        .ToList();
+            rows4 = rows4.Where(x => !string.IsNullOrWhiteSpace(x.ColumnAX)).ToList();
+            foreach (var row in rows4)
+            {
+                excelVal.Add(new ExcelConvertTable
+                {
+                    Id = GuidUtil.Next().ToString(),
+                    Name = row.ColumnC,
+                    ProjectId = row.ColumnAX,
+                    Val = (decimal)row.ColumnI,
+                    Year = 2023
+                });
+            }
+            #endregion
+
+            #region 2022年12月份在建项目产值完成情况与计划对比分析表                                      
+            var rows5 = MiniExcel
+                        .Query(filePath5)                      // 读取 Excel 文件
+                        .Skip(10)                               // 跳过前10行，从第11行开始
+                        .Select(row => new
+                        {
+                            ColumnB = row.B,   // B 列
+                            ColumnC = row.C,   // C 列
+                            ColumnJ = row.J,   // J 列
+                            ColumnAP = row.AP  // AP 列
+                        })
+                        .ToList();
+            rows5 = rows5.Where(x => !string.IsNullOrWhiteSpace(x.ColumnAP)).ToList();
+            foreach (var row in rows5)
+            {
+                excelVal.Add(new ExcelConvertTable
+                {
+                    Id = GuidUtil.Next().ToString(),
+                    Name = row.ColumnC,
+                    ProjectId = row.ColumnAP,
+                    Val = (decimal)row.ColumnJ,
+                    Year = 2022
+                });
+            }
+            #endregion
+
+            _db.Insertable(excelVal).ExecuteCommand();
             //var resList = JsonConvert.DeserializeObject<List<bb>>(jsonObject);
             //var ss = resList.Sum(x => x.UnitPrice * x.CompletedQuantity);
-            return true;
             //return projectService.aa();
-        }
-        public class bb
-        {
-            public decimal UnitPrice { get; set; }
-            public decimal CompletedQuantity { get; set; }
+            return true;
         }
 
         #endregion
