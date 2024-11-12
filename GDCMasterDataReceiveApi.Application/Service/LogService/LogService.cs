@@ -74,6 +74,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.LogService
                 .WhereIF(!string.IsNullOrWhiteSpace(receiveLogRequestDto.StartTime), x => x.CreateTime >= receiveLogRequestDto.StartTime.ObjToDate())
                 .WhereIF(!string.IsNullOrWhiteSpace(receiveLogRequestDto.StartTime), x => x.CreateTime <= receiveLogRequestDto.EndTime.ObjToDate())
                 .WhereIF(receiveLogRequestDto.ReceiveDataType != 0, x => x.ReceiveType == receiveLogRequestDto.ReceiveDataType)
+                .OrderBy(x => x.CreateTime, OrderByType.Desc)
                  .Select(x => new ReceiveLogResponseDto()
                  {
                      FailMessage = x.FailMessage,
