@@ -398,7 +398,7 @@ namespace GDCMasterDataReceiveApi.Controller
                 }
 
                 // 在这里统一执行导入操作
-                return await ExcelImportAsync(data, ignoreColumns, $"{expName}{DateTime.Now:yyyyMMdd}.xlsx");
+                return await ExcelImportAsync(data, ignoreColumns, $"{expName}{DateTime.Now:yyyyMMdd}");
             }
             return Ok("");
         }
