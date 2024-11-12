@@ -6,7 +6,7 @@
     public class ContentType
     {
 
-        //public const string APPLICATIONSTREAM = "application/octet-stream";
-        public const string APPLICATIONSTREAM = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+        public const string APPLICATIONSTREAM = "application/octet-stream";
+        //public const string APPLICATIONSTREAM = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
     }
 }
