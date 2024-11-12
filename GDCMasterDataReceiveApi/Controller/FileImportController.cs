@@ -32,6 +32,7 @@ using SqlSugar;
 using SqlSugar.Extensions;
 using System.ComponentModel;
 using System.Reflection;
+using System.Xml.Linq;
 using UtilsSharp;
 namespace GDCMasterDataReceiveApi.Controller
 {
@@ -292,10 +293,14 @@ namespace GDCMasterDataReceiveApi.Controller
                 parames.Add("JsonObj", responseResult.ToJson(true));
             }
             List<string> ignoreColumns = new List<string>();
+            //默认忽略的字段
+            var excludedProperties = new List<string> { "CreatedAt", "CreateTime", "CreateId", "UpdateId", "DeleteTime", "Timestamp", "IsDelete", "UpdatedAt", "ZAWARDP_LIST", "DeleteId", "Zdelete", "Fzstate", "Fzversion", "Id", "Version", "DataIdentifier", "Ids", "TreeCode", "StatusOfUnit", "Fzdelete", "CreateBy", "CreatTime", "ChangeTime", "Children", "ModifiedBy", "SourceSystem", "UpdateBy", "UpdateTime", "State", "FzitAi", "FzitAg", "FzitAk", "FzitAh", "FzitDe", "FzitAj", "ViewIdentification", "ViewFlag", "Ztreeid1", "SubDepts", "CountryRegion" };
             if (request.IgoreColumns != null)
             {
                 ignoreColumns = request.IgoreColumns.Split(",", StringSplitOptions.RemoveEmptyEntries).ToList();
+                ignoreColumns = ignoreColumns.Select(x => char.ToUpper(x[0]) + x.Substring(1)).ToList();
             }
+            ignoreColumns.AddRange(excludedProperties);
             var interfaceInfoList = await webHelper.DoPostAsync(systemInterfaceInfoApi, parames);
             if (interfaceInfoList.Code == 200 && !string.IsNullOrWhiteSpace(interfaceInfoList.Result))
             {
