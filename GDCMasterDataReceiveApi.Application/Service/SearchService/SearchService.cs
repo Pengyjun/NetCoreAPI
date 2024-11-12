@@ -94,7 +94,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                         if (item.FieldName == "officeDepId" && item.ConditionalType == ConditionalType.In)
                         {
                             string filedVals = "";
-                            var oids = lt.GetTree(item.FieldValue, institution).Select(x => x.Oid).ToList();
+                            var oids = lt.GetAllNodes(item.FieldValue, institution).ToList();
                             if (!oids.Any())
                             {
                                 filedVals = item.FieldValue;
