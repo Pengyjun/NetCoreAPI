@@ -105,190 +105,158 @@ namespace GDCMasterDataReceiveApi.Controller
             parames.Add("InterfaceApiId", responseInterfaceInfo.Result.Data[0].Id);
             parames.Add("AppSystemId", responseInterfaceInfo.Result.Data[0].AppSystemId);
 
-            string expName = string.Empty;
             if (request.ImportType == 1)
             {
-                expName = "人员";
                 var responseResult = await searchService.GetUserSearchAsync(condition);
                 parames.Add("JsonObj", responseResult.ToJson(true));
             }
             else if (request.ImportType == 2)
             {
-                expName = "机构";
                 var responseResult = await searchService.GetInstitutionTreeDetailsAsync(condition);
                 parames.Add("JsonObj", responseResult.ToJson(true));
             }
             else if (request.ImportType == 3)
             {
-                expName = "项目";
                 var responseResult = await searchService.GetProjectSearchAsync(condition);
                 parames.Add("JsonObj", responseResult.ToJson(true));
             }
             else if (request.ImportType == 4)
             {
-                expName = "往来单位";
                 var responseResult = await searchService.GetCorresUnitSearchAsync(condition);
                 parames.Add("JsonObj", responseResult.ToJson(true));
             }
             else if (request.ImportType == 5)
             {
-                expName = "国家地区";
                 var responseResult = await searchService.GetCountryRegionSearchAsync(condition);
                 parames.Add("JsonObj", responseResult.ToJson(true));
             }
             else if (request.ImportType == 6)
             {
-                expName = "大洲";
                 var responseResult = await searchService.GetCountryContinentSearchAsync(condition);
                 parames.Add("JsonObj", responseResult.ToJson(true));
             }
             else if (request.ImportType == 7)
             {
-                expName = "金融机构";
                 var responseResult = await searchService.GetFinancialInstitutionSearchAsync(condition);
                 parames.Add("JsonObj", responseResult.ToJson(true));
             }
             else if (request.ImportType == 8)
             {
-                expName = "物资设备分类编码";
                 var responseResult = await searchService.GetDeviceClassCodeSearchAsync(condition);
                 parames.Add("JsonObj", responseResult.ToJson(true));
             }
             else if (request.ImportType == 9)
             {
-                expName = "发票类型";
                 var responseResult = await searchService.GetDeviceClassCodeSearchAsync(condition);
                 parames.Add("JsonObj", responseResult.ToJson(true));
             }
             else if (request.ImportType == 10)
             {
-                expName = "科研项目";
                 var responseResult = await searchService.GetScientifiCNoProjectSearchAsync(condition);
                 parames.Add("JsonObj", responseResult.ToJson(true));
             }
             else if (request.ImportType == 11)
             {
-                expName = "语言语种";
                 var responseResult = await searchService.GetLanguageSearchAsync(condition);
                 parames.Add("JsonObj", responseResult.ToJson(true));
             }
             else if (request.ImportType == 12)
             {
-                expName = "银行账号";
                 var responseResult = await searchService.GetBankCardSearchAsync(condition);
                 parames.Add("JsonObj", responseResult.ToJson(true));
             }
             else if (request.ImportType == 13)
             {
-                expName = "设备物资编码明细";
                 var responseResult = await searchService.GetDeviceDetailCodeSearchAsync(condition);
                 parames.Add("JsonObj", responseResult.ToJson(true));
             }
             else if (request.ImportType == 14)
             {
-                expName = "核算部门";
                 var responseResult = await searchService.GetAccountingDepartmentSearchAsync(condition);
                 parames.Add("JsonObj", responseResult.ToJson(true));
             }
             else if (request.ImportType == 15)
             {
-                expName = "委托关系";
                 var responseResult = await searchService.GetRelationalContractsSearchAsync(condition);
                 parames.Add("JsonObj", responseResult.ToJson(true));
             }
             else if (request.ImportType == 16)
             {
-                expName = "中交区域总部";
                 var responseResult = await searchService.GetRegionalSearchAsync(condition);
                 parames.Add("JsonObj", responseResult.ToJson(true));
             }
             else if (request.ImportType == 17)
             {
-                expName = "计量单位";
                 var responseResult = await searchService.GetUnitMeasurementSearchAsync(condition);
                 parames.Add("JsonObj", responseResult.ToJson(true));
             }
             else if (request.ImportType == 18)
             {
-                expName = "中交项目行业分类产业分类、业务板块、十二大业务类型、江河湖海对照关系";
                 var responseResult = await searchService.GetProjectClassificationSearchAsync(condition);
                 parames.Add("JsonObj", responseResult.ToJson(true));
             }
             else if (request.ImportType == 19)
             {
-                expName = "中交区域中心";
                 var responseResult = await searchService.GetRegionalCenterSearchAsync(condition);
                 parames.Add("JsonObj", responseResult.ToJson(true));
             }
             else if (request.ImportType == 20)
             {
-                expName = "国民经济行业分类";
                 var responseResult = await searchService.GetNationalEconomySearchAsync(condition);
                 parames.Add("JsonObj", responseResult.ToJson(true));
             }
             else if (request.ImportType == 21)
             {
-                expName = "行政机构和核算机构映射关系";
                 var responseResult = await searchService.GetAdministrativeAccountingMapperSearchAsync(condition);
                 parames.Add("JsonObj", responseResult.ToJson(true));
             }
             else if (request.ImportType == 22)
             {
-                expName = "多组织-税务代管组织(行政)";
                 var responseResult = await searchService.GetEscrowOrganizationSearchAsync(condition);
                 parames.Add("JsonObj", responseResult.ToJson(true));
             }
             else if (request.ImportType == 23)
             {
-                expName = "商机项目(境内)";
                 var responseResult = await searchService.GetBusinessNoCpportunitySearchAsync(condition, true);
                 parames.Add("JsonObj", responseResult.ToJson(true));
             }
             else if (request.ImportType == 24)
             {
-                expName = "商机项目(境外)";
                 var responseResult = await searchService.GetBusinessNoCpportunitySearchAsync(condition, false);
                 parames.Add("JsonObj", responseResult.ToJson(true));
             }
             else if (request.ImportType == 25)
             {
-                expName = "境内行政区划";
                 var responseResult = await searchService.GetAdministrativeDivisionSearchAsync(condition);
                 parames.Add("JsonObj", responseResult.ToJson(true));
             }
             else if (request.ImportType == 26)
             {
-                expName = "多组织-核算机构";
                 var responseResult = await searchService.GetAccountingOrganizationSearchAsync(condition);
                 parames.Add("JsonObj", responseResult.ToJson(true));
             }
             else if (request.ImportType == 27)
             {
-                expName = "币种";
                 var responseResult = await searchService.GetCurrencySearchAsync(condition);
                 parames.Add("JsonObj", responseResult.ToJson(true));
             }
             else if (request.ImportType == 28)
             {
-                expName = "值域";
                 var responseResult = await searchService.GetValueDomainReceiveAsync(condition);
                 parames.Add("JsonObj", responseResult.ToJson(true));
             }
             else if (request.ImportType == 29)
             {
-                expName = "虚拟项目";
                 var responseResult = await searchService.GetDHVirtualProjectAsync(condition);
                 parames.Add("JsonObj", responseResult.ToJson(true));
             }
             else if (request.ImportType == 30)
             {
-                expName = "多组织-行政组织";
                 var responseResult = await searchService.GetXZOrganzationSearchAsync(condition);
                 parames.Add("JsonObj", responseResult.ToJson(true));
             }
             else if (request.ImportType == 31)
             {
-                expName = "生产经营管理组织";
                 var responseResult = await searchService.GetDHMdmMultOrgAgencyRelPageAsync(condition);
                 parames.Add("JsonObj", responseResult.ToJson(true));
             }
