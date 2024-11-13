@@ -30,9 +30,9 @@ namespace GDCMasterDataReceiveApi.Controller
         /// <returns></returns>
         [HttpPost("InsertOrUpdate")]
         [UnitOfWork]
-        public async Task<ResponseAjaxResult<bool>> InsertOrUpdateAsync([FromBody] OperationExecutionRequestDto requestDto)
+        public async Task<ResponseAjaxResult<bool>> SaveDataAsync([FromBody] OperationExecutionRequestDto requestDto)
         {
-            return await _operate.InsertOrUpdateAsync(requestDto);
+            return await _operate.SaveDataAsync(requestDto);
         }
     }
 }

@@ -1,4 +1,6 @@
-﻿namespace GDCMasterDataReceiveApi.Application.Contracts.Dto
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace GDCMasterDataReceiveApi.Application.Contracts.Dto
 {
     /// <summary>
     /// 
@@ -9,7 +11,7 @@
     /// <summary>
     /// 操作响应Dto
     /// </summary>
-    public class OperationExecutionRequestDto
+    public class OperationExecutionRequestDto:IValidatableObject
     {
         /// <summary>
         /// 增还是改
@@ -22,7 +24,15 @@
         /// <summary>
         /// 操作实体对象Json
         /// </summary>
-        public object? EntityJson { get; set; }
+        public string? EntityJson { get; set; }
+
+        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+        {
+            if (string.IsNullOrWhiteSpace(EntityJson))
+            {
+                yield return new ValidationResult("操作实体对象不能为空", new string[] { nameof(EntityJson) });
+            }
+        }
     }
     /// <summary>
     /// 操作类型
