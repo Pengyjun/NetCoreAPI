@@ -2322,6 +2322,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
             var corresUnitList = await _dbContext.Queryable<CorresUnit>()
                 .WhereIF(!string.IsNullOrWhiteSpace(requestDto.KeyWords), cu => cu.ZBP.Contains(requestDto.KeyWords) || cu.ZBPNAME_ZH.Contains(requestDto.KeyWords))
                 .Where(jsonWhere)
+                .Where(x => x.IsDelete == 1)
                 .Select((cu) => new CorresUnitDetailsDto
                 {
                     Id = cu.Id.ToString(),
