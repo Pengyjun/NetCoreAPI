@@ -118,7 +118,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveDHDataService
             {
                 FCode = "68AEA3249B7C43F79234B7618620C683",
                 InterfaceUrl = "Department/GetOrganzationPageList",
-                //UpdateTime = DateTime.Now,
+                UpdateTime = DateTime.Now,
                 PageIndex = 1//从第一页开始拉取
             };
 
@@ -156,7 +156,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveDHDataService
             {
                 FCode = "68AEA3249B7C43F79234B7618620C692",
                 InterfaceUrl = "Department/GetAdministrativePageList",
-                //UpdateTime = DateTime.Now,
+                UpdateTime = DateTime.Now,
                 PageIndex = 1//从第一页开始拉取
             };
 
@@ -195,7 +195,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveDHDataService
             {
                 FCode = "68AEA3249B7C43F78234B7618620CB12",
                 InterfaceUrl = "Department/GetMdmOrganzationPageList",
-                //UpdateTime = DateTime.Now,
+                UpdateTime = DateTime.Now,
                 PageIndex = 1//从第一页开始拉取
             };
 
@@ -234,7 +234,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveDHDataService
             {
                 FCode = "68AEA3249B7C43F78234C7613652CB17",
                 InterfaceUrl = "Department/GetMdmAdjustAccountsMultipleOrgPageList",
-                //UpdateTime = DateTime.Now,
+                UpdateTime = DateTime.Now,
                 PageIndex = 1//从第一页开始拉取
             };
 
@@ -274,7 +274,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveDHDataService
             {
                 FCode = "68AEA3249C7C43F78234C7613652A956",
                 InterfaceUrl = "Department/GetMdmAccountingDeptPageList",
-                //UpdateTime = DateTime.Now,
+                UpdateTime = DateTime.Now,
                 PageIndex = 1//从第一页开始拉取
             };
 
@@ -314,7 +314,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveDHDataService
             {
                 FCode = "68AEA3249B7C43F79234B7618620C685",
                 InterfaceUrl = "Project/GetProjectsPageList",
-                //UpdateTime = DateTime.Now,
+                UpdateTime = DateTime.Now,
                 PageIndex = 1//从第一页开始拉取
             };
 
@@ -354,7 +354,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveDHDataService
             {
                 FCode = "68AEA3249B7C43F79234B7618620C678",
                 InterfaceUrl = "VirtualProject/GetVirtualProjectAsync",
-                //UpdateTime = DateTime.Now, 没有项目更新时间 全量拉
+                UpdateTime = DateTime.Now, //没有项目更新时间 全量拉
                 PageIndex = 1//从第一页开始拉取
             };
 
@@ -405,7 +405,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveDHDataService
             {
                 FCode = "68AEA3249B7C43F79234B7618620C679",
                 InterfaceUrl = "Opportunity/GetOpportunityAsync",
-                //UpdateTime = DateTime.Now, 没有项目更新时间 全量拉
+                UpdateTime = DateTime.Now,// 没有项目更新时间 全量拉
                 PageIndex = 1//从第一页开始拉取
             };
 
@@ -443,7 +443,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveDHDataService
             {
                 FCode = "68AEA3249B7C43F79234B7618620C710",
                 InterfaceUrl = "Research/GetResearchList",
-                //UpdateTime = DateTime.Now, 没有项目更新时间 全量拉
+                UpdateTime = DateTime.Now, //没有项目更新时间 全量拉
                 PageIndex = 1//从第一页开始拉取
             };
 
@@ -482,7 +482,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveDHDataService
             {
                 FCode = "68AEA32679C7C43F96587C7613652A18",
                 InterfaceUrl = "Department/GetMdmManagementOrgageList",
-                //UpdateTime = DateTime.Now, 没有项目更新时间 全量拉
+                UpdateTime = DateTime.Now, //没有项目更新时间 全量拉
                 PageIndex = 1//从第一页开始拉取
             };
 
@@ -521,7 +521,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveDHDataService
             {
                 FCode = "68AEA3249C7C43F65932C7613CB2A365",
                 InterfaceUrl = "Department/GetMdmMultOrgAgencyRelPageList",
-                //UpdateTime = DateTime.Now, 没有项目更新时间 全量拉
+                UpdateTime = DateTime.Now, //没有项目更新时间 全量拉
                 PageIndex = 1//从第一页开始拉取
             };
 

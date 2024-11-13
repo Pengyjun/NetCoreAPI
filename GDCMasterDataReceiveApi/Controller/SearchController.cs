@@ -34,7 +34,6 @@ using GDCMasterDataReceiveApi.Domain.Shared;
 using GDCMasterDataReceiveApi.Domain.Shared.Annotation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using SqlSugar;
 
 namespace GDCMasterDataReceiveApi.Controller
 {

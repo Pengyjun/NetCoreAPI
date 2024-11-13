@@ -264,7 +264,8 @@ namespace GDCMasterDataReceiveApi.Controller
             else if (request.ImportType == 32)
             {
                 var searchInterfaceAuth = AppsettingsHelper.GetValue("API:SearchInterfaceAuth");
-                searchInterfaceAuth = searchInterfaceAuth.Replace("$id", condition.Id)
+                searchInterfaceAuth = searchInterfaceAuth
+                    .Replace("$id", condition.Id)
                     .Replace("$keyWords", condition.KeyWords)
                     .Replace("$pageIndex", condition.PageIndex.ToString())
                     .Replace("$pageSize", condition.PageSize.ToString());
