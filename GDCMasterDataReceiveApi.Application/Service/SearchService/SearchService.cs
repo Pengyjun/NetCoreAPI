@@ -5073,7 +5073,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
             var jsonWhere = await _baseService.JsonToConventSqlAsync(requestDto.JsonToSqlRequestDtos, dto);
 
             var ccList = await _dbContext.Queryable<ValueDomain>()
-                .WhereIF(!string.IsNullOrWhiteSpace(requestDto.KeyWords), t => t.ZDOM_CODE.Contains(requestDto.KeyWords) || t.ZDOM_NAME.Contains(requestDto.KeyWords))
+                .WhereIF(!string.IsNullOrWhiteSpace(requestDto.KeyWords), t => t.ZDOM_CODE.Contains(requestDto.KeyWords) || t.ZDOM_DESC.Contains(requestDto.KeyWords))
                 .Where(jsonWhere)
                 .Select((cc) => new ValueDomainReceiveResponseDto
                 {
