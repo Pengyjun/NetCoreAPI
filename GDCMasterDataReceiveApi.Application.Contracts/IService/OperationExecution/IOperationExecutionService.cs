@@ -14,6 +14,6 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.IService.OperationExecut
         /// 增改用户信息
         /// </summary>
         /// <returns></returns>
-        Task<ResponseAjaxResult<bool>> InsertOrUpdateUserAsync(OperationExecutionRequestDto requestDto);
+        Task<ResponseAjaxResult<bool>> InsertOrUpdateAsync(OperationExecutionRequestDto requestDto);
     }
 }

@@ -323,7 +323,10 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// </summary>
         [DisplayName("中标交底项目编号")]
         public string? FZawardp { get; set; }
-
+        /// <summary>
+        /// 是否属于本系统自己新增或修改 true 是 默认false
+        /// </summary>
+        public bool OwnerSystem { get; set; } = false;
     }
     /// <summary>
     /// 曾用名

@@ -189,7 +189,8 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     Tel = u.TEL,
                     UserLogin = u.USER_LOGIN,
                     CreateTime = u.CreateTime,
-                    UpdateTime = u.UpdateTime
+                    UpdateTime = u.UpdateTime,
+                    OwnerSystem = u.OwnerSystem
                 })
                 .ToPageListAsync(requestDto.PageIndex, requestDto.PageSize, total);
 
@@ -1715,7 +1716,8 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     ZZCURRENCY = pro.ZZCURRENCY,
                     UpdateId = pro.UpdateId,
                     CreateTime = pro.CreateTime,
-                    UpdateTime = pro.UpdateTime
+                    UpdateTime = pro.UpdateTime,
+                    OwnerSystem = pro.OwnerSystem
                 })
                 .OrderByDescending(x => x.UpdatedAt)
                 .ToPageListAsync(requestDto.PageIndex, requestDto.PageSize, total);
@@ -2354,7 +2356,8 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     UnitSec = cu.Z2NDORG,
                     StatusOfUnit = cu.ZBPSTATE == "01" ? "有效" : "无效",
                     CreateTime = cu.CreateTime,
-                    UpdateTime = cu.UpdateTime
+                    UpdateTime = cu.UpdateTime,
+                    OwnerSystem = cu.OwnerSystem
                 })
                 .ToPageListAsync(requestDto.PageIndex, requestDto.PageSize, total);
 

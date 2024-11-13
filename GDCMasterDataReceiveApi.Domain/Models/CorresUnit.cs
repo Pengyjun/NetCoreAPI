@@ -46,7 +46,7 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// <summary>
         /// 往来单位类别:依据组织机构的功能和性质进行的分类
         /// </summary>
-        [SugarColumn(Length =8, ColumnName = "CategoryUnit")]
+        [SugarColumn(Length = 8, ColumnName = "CategoryUnit")]
         public string? ZBPTYPE { get; set; }
         /// <summary>
         /// 统一社会信用代码:境内单位-企业的唯一性校验标准
@@ -56,7 +56,7 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// <summary>
         /// 组织机构代码:境内单位获取的组织机构代码证的编号
         /// </summary>
-        [SugarColumn(Length =64, ColumnName = "OrgCode")]
+        [SugarColumn(Length = 64, ColumnName = "OrgCode")]
         public string? ZOIBC { get; set; }
         /// <summary>
         /// 工商注册号:境内单位-企业的工商注册登记号
@@ -158,6 +158,10 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// </summary>
         [SugarColumn(Length = 64, ColumnName = "UnitSec")]
         public string? Z2NDORG { get; set; }
+        /// <summary>
+        /// 是否属于本系统自己新增或修改 true 是 默认false
+        /// </summary>
+        public bool OwnerSystem { get; set; } = false;
     }
 
 }

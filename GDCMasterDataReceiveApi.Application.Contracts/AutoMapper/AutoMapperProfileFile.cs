@@ -131,6 +131,12 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.AutoMapper
             //mapperConfigurationExpression.CreateMap<PLeader, KyPLeader>();
             //mapperConfigurationExpression.CreateMap<CanYDep, KyCanYDep>();
             //mapperConfigurationExpression.CreateMap<LanguageC, LanguageDetails>();
+            mapperConfigurationExpression.CreateMap<CorresUnitDetailsDto, CorresUnit>()
+                .ForMember(x => x.ZBP, m => m.MapFrom(r => r.DealUnitMDCode))
+                .ForMember(x => x.ZINCLIENT, m => m.MapFrom(r => r.IsGroupUnit))
+                .ForMember(x => x.ZBPNAME_ZH, m => m.MapFrom(r => r.Name))
+                .ForMember(x => x.ZBPNAME_EN, m => m.MapFrom(r => r.NameEnglish))
+                .ForMember(x => x.ZUSCC, m => m.MapFrom(r => r.RegistrationNo));
             #endregion
 
         }

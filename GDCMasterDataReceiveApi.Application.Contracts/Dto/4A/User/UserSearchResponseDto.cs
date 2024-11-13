@@ -329,6 +329,10 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto._4A.User
         public DateTime? CreateTime { get; set; }
         [DisplayName("修改时间")]
         public DateTime? UpdateTime { get; set; }
+        /// <summary>
+        /// 是否属于本系统自己新增或修改 true 是 默认false
+        /// </summary>
+        public bool OwnerSystem { get; set; } = false;
     }
     /// <summary>
     /// 用户所在兼职

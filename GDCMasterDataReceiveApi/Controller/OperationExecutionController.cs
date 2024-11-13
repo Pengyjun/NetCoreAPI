@@ -24,7 +24,7 @@ namespace GDCMasterDataReceiveApi.Controller
             this._operate = operate;
         }
         /// <summary>
-        /// 增改用户信息
+        /// 增改往来单位信息
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
@@ -32,7 +32,7 @@ namespace GDCMasterDataReceiveApi.Controller
         [UnitOfWork]
         public async Task<ResponseAjaxResult<bool>> InsertOrUpdateUserAsync([FromBody] OperationExecutionRequestDto requestDto)
         {
-            return await _operate.InsertOrUpdateUserAsync(requestDto);
+            return await _operate.InsertOrUpdateAsync(requestDto);
         }
     }
 }

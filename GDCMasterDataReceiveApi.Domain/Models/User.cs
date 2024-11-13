@@ -178,5 +178,9 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// 是否启用   0 禁用  1 启用
         /// </summary>
         public int Enable { get; set; }
+        /// <summary>
+        /// 是否属于本系统自己新增或修改 true 是 默认false
+        /// </summary>
+        public bool OwnerSystem { get; set; } = false;
     }
 }

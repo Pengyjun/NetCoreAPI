@@ -223,6 +223,10 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.CorresUnit
         public string? StatusOfUnit { get; set; }
         public DateTime? CreateTime { get; set; }
         public DateTime? UpdateTime { get; set; }
+        /// <summary>
+        /// 是否属于本系统自己新增或修改 true 是 默认false
+        /// </summary>
+        public bool OwnerSystem { get; set; } = false;
     }
     /// <summary>
     /// 往来单位主数据 接收
