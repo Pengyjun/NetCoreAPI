@@ -4,6 +4,8 @@ using GDCMasterDataReceiveApi.Application.Contracts.Dto.CorresUnit;
 using GDCMasterDataReceiveApi.Application.Contracts.IService.OperationExecution;
 using GDCMasterDataReceiveApi.Domain.Models;
 using GDCMasterDataReceiveApi.Domain.Shared;
+using GDCMasterDataReceiveApi.Domain.Shared.Const;
+using GDCMasterDataReceiveApi.Domain.Shared.Enums;
 using GDCMasterDataReceiveApi.Domain.Shared.Utils;
 using Newtonsoft.Json;
 using SqlSugar;
@@ -41,7 +43,6 @@ namespace GDCMasterDataReceiveApi.Application.Service.OperationExecution
             {
                 await OpreateUserAsync(requestDto.EntityJson, requestDto.OperateType);
             }
-            responseAjaxResult.SuccessResult(success);
             return responseAjaxResult;
         }
         /// <summary>
@@ -57,27 +58,35 @@ namespace GDCMasterDataReceiveApi.Application.Service.OperationExecution
             if (obj != null)
             {
                 //数据转换
-                var convertObj = JsonConvert.DeserializeObject<List<CorresUnitDetailsDto>>(obj.ToString());
-                var map = _mapper.Map<List<CorresUnitDetailsDto>, List<CorresUnit>>(convertObj);
+                var convertObj = JsonConvert.DeserializeObject<CorresUnitDetailsDto>(obj.ToString());
+                var map = _mapper.Map<CorresUnitDetailsDto, CorresUnit>(convertObj);
+                //是否重复数据
+                var dt = await _dbContext.Queryable<CorresUnit>()
+                    .Where(t => t.IsDelete == 1 && t.ZUSCC == map.ZUSCC && t.ZBP == map.ZBP)
+                    .FirstAsync();
                 if (type == OperateType.Insert)
                 {
-                    map.Select(x => x.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId());
-                    map.Select(x => x.CreateTime = DateTime.Now);
+                    if (dt != null)
+                    {
+                        responseAjaxResult.Success(ResponseMessage.OPERATION_DATA_EXIST, HttpStatusCode.DataEXIST);
+                        return responseAjaxResult;
+                    }
+                    map.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
+                    map.CreateTime = DateTime.Now;
                     await _dbContext.Insertable(map).ExecuteCommandAsync();
                     responseAjaxResult.SuccessResult(true);
                 }
                 else if (type == OperateType.Update)
                 {
                     //不是接收的数据
-                    int isOwner = convertObj.Where(x => x.OwnerSystem == false).Count();
-                    if (isOwner > 0)
+                    if (map.OwnerSystem == false)
                     {
-                        responseAjaxResult.Fail("数据不可删除");
+                        responseAjaxResult.Success(ResponseMessage.OPERATION_PROHIBIT, HttpStatusCode.Data_Prohibit);
                         return responseAjaxResult;
                     }
                     else
                     {
-                        if (map.Any())
+                        if (map != null)
                         {
                             await _dbContext.Updateable(map).WhereColumns(x => x.Id).IgnoreNullColumns(true).ExecuteCommandAsync();
                             responseAjaxResult.SuccessResult(true);

@@ -11,6 +11,8 @@
         public const string OPERATION_Token_FAIL = "Token不合法";
         public const string OPERATION_PARAMETER_ERROR = "请求参数输入错误请检查";
         public const string OPERATION_DATA_NOTEXIST = "数据不存在";
+        public const string OPERATION_DATA_EXIST = "数据存在";
+        public const string OPERATION_PROHIBIT = "数据禁止删除";
         public const string OPERATION_UPDATE_FAIL = "更新失败";
         public const string OPERATION_UPDATE_SUCCESS = "更新成功";
         public const string OPERATION_SAVE_SUCCESS = "保存成功";
