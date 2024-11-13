@@ -2359,6 +2359,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     UpdateTime = cu.UpdateTime,
                     OwnerSystem = cu.OwnerSystem
                 })
+                .OrderByDescending(cu => cu.CreateTime)
                 .ToPageListAsync(requestDto.PageIndex, requestDto.PageSize, total);
 
             var zbps = corresUnitList.Select(x => x.DealUnitMDCode).ToList();
