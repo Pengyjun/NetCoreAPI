@@ -96,6 +96,7 @@ namespace GDCMasterDataReceiveApi.Controller
             condition.PageSize = request.IsFullExport ? int.MaxValue : request.PageSize;
             condition.IsFullExport = request.IsFullExport;
             condition.ImportType = request.ImportType;
+            condition.KeyWords = request.KeyWords;
 
             Dictionary<string, object> parames = new Dictionary<string, object>();//请求参数
             WebHelper webHelper = new WebHelper();
@@ -262,7 +263,7 @@ namespace GDCMasterDataReceiveApi.Controller
             }
             List<string> ignoreColumns = new List<string>();
             //默认忽略的字段
-            var excludedProperties = new List<string> { "CreatedAt",  "CreateId", "UpdateId", "DeleteTime", "Timestamp", "IsDelete", "UpdatedAt", "ZAWARDP_LIST", "DeleteId", "Zdelete", "Fzstate", "Fzversion", "Id", "Version", "DataIdentifier", "Ids", "TreeCode", "StatusOfUnit", "Fzdelete", "CreateBy", "CreatTime", "ChangeTime", "Children", "ModifiedBy", "SourceSystem", "UpdateBy", "UpdateTime", "State", "FzitAi", "FzitAg", "FzitAk", "FzitAh", "FzitDe", "FzitAj", "ViewIdentification", "ViewFlag", "Ztreeid1", "SubDepts", "CountryRegion" };
+            var excludedProperties = new List<string> { "CreatedAt", "CreateId", "UpdateId", "DeleteTime", "Timestamp", "IsDelete", "UpdatedAt", "ZAWARDP_LIST", "DeleteId", "Zdelete", "Fzstate", "Fzversion", "Id", "Version", "DataIdentifier", "Ids", "TreeCode", "StatusOfUnit", "Fzdelete", "CreateBy", "CreatTime", "ChangeTime", "Children", "ModifiedBy", "SourceSystem", "UpdateBy", "UpdateTime", "State", "FzitAi", "FzitAg", "FzitAk", "FzitAh", "FzitDe", "FzitAj", "ViewIdentification", "ViewFlag", "Ztreeid1", "SubDepts", "CountryRegion" };
             if (request.IgoreColumns != null)
             {
                 ignoreColumns = request.IgoreColumns.Split(",", StringSplitOptions.RemoveEmptyEntries).ToList();
@@ -373,7 +374,7 @@ namespace GDCMasterDataReceiveApi.Controller
                 }
 
                 // 在这里统一执行导入操作
-                ignoreColumns= ignoreColumns.Distinct().ToList();
+                ignoreColumns = ignoreColumns.Distinct().ToList();
                 return await ExcelImportAsync(data, ignoreColumns, $"{DateTime.Now:yyyyMMdd}");
             }
             return Ok("");

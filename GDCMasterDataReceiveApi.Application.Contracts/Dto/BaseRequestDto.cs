@@ -23,17 +23,6 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto
         /// 忽略列
         /// </summary>
         public string? IgoreColumns { get; set; }
-        ///// <summary>
-        ///// Appkey
-        ///// </summary>
-        //public string? AppKey { get; set; }
-        ///// <summary>
-        ///// AppinterfaceCode
-        ///// </summary>
-        //public string? AppinterfaceCode { get; set; }
-        ///// <summary>
-        ///// Oid
-        ///// </summary>
         public string? Oid { get; set; }
         /// <summary>
         /// 页码
