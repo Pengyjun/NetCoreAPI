@@ -100,6 +100,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.OperationExecution
                         dt.IsDelete = 0;
                     }
                     await _dbContext.Updateable(dt).ExecuteCommandAsync();
+                    responseAjaxResult.SuccessResult(true);
                 }
             }
 
