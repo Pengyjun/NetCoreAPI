@@ -35,14 +35,14 @@ namespace GDCMasterDataReceiveApi.Application.Service.OperationExecution
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<bool>> InsertOrUpdateAsync(OperationExecutionRequestDto requestDto)
+        public async Task<ResponseAjaxResult<bool>> SaveDataAsync(OperationExecutionRequestDto requestDto)
         {
-            ResponseAjaxResult<bool> responseAjaxResult = new();
-
-            if (requestDto.EntityJson != null)
+            ResponseAjaxResult<bool> responseAjaxResult = new ResponseAjaxResult<bool>();
+            if (requestDto.Table == 3)
             {
-                await OpreateUserAsync(requestDto.EntityJson, requestDto.OperateType);
+                responseAjaxResult= await OpreateCorresUnitAsync(requestDto.EntityJson, requestDto.OperateType);
             }
+
             return responseAjaxResult;
         }
         /// <summary>
@@ -51,14 +51,14 @@ namespace GDCMasterDataReceiveApi.Application.Service.OperationExecution
         /// <param name="obj">数据对象</param>
         /// <param name="type">1增 2改</param>
         /// <returns></returns>
-        private async Task<ResponseAjaxResult<bool>> OpreateUserAsync(object obj, OperateType type)
+        private async Task<ResponseAjaxResult<bool>> OpreateCorresUnitAsync(string obj, OperateType type)
         {
             ResponseAjaxResult<bool> responseAjaxResult = new();
 
             if (obj != null)
             {
                 //数据转换
-                var convertObj = JsonConvert.DeserializeObject<CorresUnitDetailsDto>(obj.ToString());
+                var convertObj = JsonConvert.DeserializeObject<CorresUnitDetailsDto>(obj);
                 var map = _mapper.Map<CorresUnitDetailsDto, CorresUnit>(convertObj);
                 //是否重复数据
                 var dt = await _dbContext.Queryable<CorresUnit>()
