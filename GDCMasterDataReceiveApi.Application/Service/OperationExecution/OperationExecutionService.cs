@@ -19,7 +19,6 @@ namespace GDCMasterDataReceiveApi.Application.Service.OperationExecution
     {
         private readonly ISqlSugarClient _dbContext;
         private readonly IMapper _mapper;
-        private static bool success = false;
         /// <summary>
         /// 构造函数，注入数据库上下文
         /// </summary>
@@ -31,16 +30,23 @@ namespace GDCMasterDataReceiveApi.Application.Service.OperationExecution
             this._mapper = mapper;
         }
         /// <summary>
-        /// 增改用户信息
+        /// 增改信息
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
         public async Task<ResponseAjaxResult<bool>> SaveDataAsync(OperationExecutionRequestDto requestDto)
         {
-            ResponseAjaxResult<bool> responseAjaxResult = new ResponseAjaxResult<bool>();
-            if (requestDto.Table == 3)
+            ResponseAjaxResult<bool> responseAjaxResult = new();
+
+            switch (requestDto.Table)
             {
-                responseAjaxResult = await OpreateCorresUnitAsync(requestDto.EntityJson, requestDto.OperateType);
+                case 1:
+                    break;
+                case 2:
+                    break;
+                case 3://往来单位增改
+                    responseAjaxResult = await OpreateCorresUnitAsync(requestDto.EntityJson, requestDto.OperateType);
+                    break;
             }
 
             return responseAjaxResult;

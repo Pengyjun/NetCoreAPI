@@ -11,7 +11,7 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.IService.OperationExecut
     public interface IOperationExecutionService
     {
         /// <summary>
-        /// 增改用户信息
+        /// 增改信息
         /// </summary>
         /// <returns></returns>
         Task<ResponseAjaxResult<bool>> SaveDataAsync(OperationExecutionRequestDto requestDto);
