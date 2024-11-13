@@ -2685,7 +2685,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     TypesOfOrg = cc.ZDFITYPE,
                     State = cc.ZDATSTATE == "1" ? "有效" : "无效",
                     BankNo = cc.ZBANKN,
-                    DataIdentifier = cc.ZDELETE,
+                    DataIdentifier = cc.ZDATSTATE,
                     MDCode = cc.ZFINC,
                     MDCodeofOrg = cc.ZORG,
                     RegistrationNo = cc.ZUSCC,

@@ -29,10 +29,8 @@ using Newtonsoft.Json;
 using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
 using SqlSugar;
-using SqlSugar.Extensions;
 using System.ComponentModel;
 using System.Reflection;
-using System.Xml.Linq;
 using UtilsSharp;
 namespace GDCMasterDataReceiveApi.Controller
 {
@@ -97,6 +95,7 @@ namespace GDCMasterDataReceiveApi.Controller
             condition.IsFullExport = request.IsFullExport;
             condition.ImportType = request.ImportType;
             condition.KeyWords = request.KeyWords;
+            condition.Id = request.Id;
 
             Dictionary<string, object> parames = new Dictionary<string, object>();//请求参数
             WebHelper webHelper = new WebHelper();
@@ -105,6 +104,7 @@ namespace GDCMasterDataReceiveApi.Controller
             var responseInterfaceInfo = await webHelper.DoGetAsync<ResponseAjaxResult<List<DataInterfaceResponseDto>>>(interfaceInfo);
             parames.Add("InterfaceApiId", responseInterfaceInfo.Result.Data[0].Id);
             parames.Add("AppSystemId", responseInterfaceInfo.Result.Data[0].AppSystemId);
+            List<string> ignoreColumns = new List<string>();
 
             if (request.ImportType == 1)
             {
@@ -261,7 +261,17 @@ namespace GDCMasterDataReceiveApi.Controller
                 var responseResult = await searchService.GetDHMdmMultOrgAgencyRelPageAsync(condition);
                 parames.Add("JsonObj", responseResult.ToJson(true));
             }
-            List<string> ignoreColumns = new List<string>();
+            else if (request.ImportType == 32)
+            {
+                var searchInterfaceAuth = AppsettingsHelper.GetValue("API:SearchInterfaceAuth");
+                searchInterfaceAuth = searchInterfaceAuth.Replace("$id", condition.Id)
+                    .Replace("$keyWords", condition.KeyWords)
+                    .Replace("$pageIndex", condition.PageIndex.ToString())
+                    .Replace("$pageSize", condition.PageSize.ToString());
+                var responseResult = await webHelper.DoGetAsync<ResponseAjaxResult<List<Application.Contracts.Dto.DataInterface.InterfaceAuthResponseDto>>>(searchInterfaceAuth);
+                ignoreColumns.AddRange(new List<string> { "PId", "SystemIdentity", "Id" });
+                return await ExcelImportAsync(responseResult.Result.Data.Where(t => t.Enable == 1), ignoreColumns, $"{DateTime.Now:yyyyMMdd}");
+            }
             //默认忽略的字段
             var excludedProperties = new List<string> { "CreatedAt", "CreateId", "UpdateId", "DeleteTime", "Timestamp", "IsDelete", "UpdatedAt", "ZAWARDP_LIST", "DeleteId", "Zdelete", "Fzstate", "Fzversion", "Id", "Version", "DataIdentifier", "Ids", "TreeCode", "StatusOfUnit", "Fzdelete", "CreateBy", "CreatTime", "ChangeTime", "Children", "ModifiedBy", "SourceSystem", "UpdateBy", "UpdateTime", "State", "FzitAi", "FzitAg", "FzitAk", "FzitAh", "FzitDe", "FzitAj", "ViewIdentification", "ViewFlag", "Ztreeid1", "SubDepts", "CountryRegion" };
             if (request.IgoreColumns != null)
