@@ -51,7 +51,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.OperationExecution
         /// <param name="obj">数据对象</param>
         /// <param name="type">1增 2改</param>
         /// <returns></returns>
-        private async Task<ResponseAjaxResult<bool>> OpreateCorresUnitAsync(string obj, OperateType type)
+        private async Task<ResponseAjaxResult<bool>> OpreateCorresUnitAsync(string obj, int type)
         {
             ResponseAjaxResult<bool> responseAjaxResult = new();
 
@@ -64,7 +64,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.OperationExecution
                 var dt = await _dbContext.Queryable<CorresUnit>()
                     .Where(t => t.IsDelete == 1 && t.ZUSCC == map.ZUSCC && t.ZBP == map.ZBP)
                     .FirstAsync();
-                if (type == OperateType.Insert)
+                if (type == 1)
                 {
                     if (dt != null)
                     {
@@ -77,22 +77,29 @@ namespace GDCMasterDataReceiveApi.Application.Service.OperationExecution
                     await _dbContext.Insertable(map).ExecuteCommandAsync();
                     responseAjaxResult.SuccessResult(true);
                 }
-                else if (type == OperateType.Update)
+                if (map.OwnerSystem == false)
                 {
                     //不是接收的数据
-                    if (map.OwnerSystem == false)
-                    {
-                        responseAjaxResult.Success(ResponseMessage.OPERATION_PROHIBIT, HttpStatusCode.Data_Prohibit);
-                        return responseAjaxResult;
-                    }
-                    else
+                    responseAjaxResult.Success(ResponseMessage.OPERATION_PROHIBIT, HttpStatusCode.Data_Prohibit);
+                    return responseAjaxResult;
+                }
+                else
+                {
+                    if (type == 2)
                     {
                         if (map != null)
                         {
                             await _dbContext.Updateable(map).WhereColumns(x => x.Id).IgnoreNullColumns(true).ExecuteCommandAsync();
-                            responseAjaxResult.SuccessResult(true);
                         }
                     }
+                    else if (type == 3)
+                    {
+                        if (map != null)
+                        {
+                            await _dbContext.Updateable(map).WhereColumns(x => x.Id).UpdateColumns(x => x.IsDelete == 1).ExecuteCommandAsync();
+                        }
+                    }
+                    responseAjaxResult.SuccessResult(true);
                 }
             }
             else

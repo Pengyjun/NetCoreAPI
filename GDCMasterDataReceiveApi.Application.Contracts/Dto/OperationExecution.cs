@@ -11,12 +11,12 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto
     /// <summary>
     /// 操作响应Dto
     /// </summary>
-    public class OperationExecutionRequestDto:IValidatableObject
+    public class OperationExecutionRequestDto : IValidatableObject
     {
         /// <summary>
-        /// 增还是改
+        /// 增还是改 1增 2改 3删
         /// </summary>
-        public OperateType OperateType { get; set; }
+        public int OperateType { get; set; }
         /// <summary>
         /// 1 用户 2 项目 3 往来单位
         /// </summary>
@@ -25,7 +25,11 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto
         /// 操作实体对象Json
         /// </summary>
         public string? EntityJson { get; set; }
-
+        /// <summary>
+        /// 数据校验
+        /// </summary>
+        /// <param name="validationContext"></param>
+        /// <returns></returns>
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
             if (string.IsNullOrWhiteSpace(EntityJson))
@@ -33,19 +37,5 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto
                 yield return new ValidationResult("操作实体对象不能为空", new string[] { nameof(EntityJson) });
             }
         }
-    }
-    /// <summary>
-    /// 操作类型
-    /// </summary>
-    public enum OperateType
-    {
-        /// <summary>
-        /// 增
-        /// </summary>
-        Insert = 1,
-        /// <summary>
-        /// 改
-        /// </summary>
-        Update = 2
     }
 }
