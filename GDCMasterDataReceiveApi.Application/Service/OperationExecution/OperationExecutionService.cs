@@ -63,7 +63,6 @@ namespace GDCMasterDataReceiveApi.Application.Service.OperationExecution
                 {
                     map.Select(x => x.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId());
                     map.Select(x => x.CreateTime = DateTime.Now);
-                    map.Select(x => x.OwnerSystem = true);
                     await _dbContext.Insertable(map).ExecuteCommandAsync();
                     responseAjaxResult.SuccessResult(true);
                 }
