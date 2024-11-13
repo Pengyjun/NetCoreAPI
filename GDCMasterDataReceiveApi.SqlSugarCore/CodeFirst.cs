@@ -90,7 +90,7 @@ namespace GDCMasterDataReceiveApi.SqlSugarCore
                 };
             });
             Type[] types = typeof(BaseEntity<long>).Assembly.GetTypes()
-            .Where(it =>it.FullName.Contains("AuditLogs")
+            .Where(it =>it.FullName.Contains("CorresUnit")
             )
             .ToArray();
             db.CodeFirst.InitTables(types);

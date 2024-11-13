@@ -31,17 +31,17 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// <summary>
         /// 名称（中文）:往来单位中文名称，境内单位必填
         /// </summary>
-        [SugarColumn(Length = 256, ColumnName = "Name")]
+        [SugarColumn(Length = 500, ColumnName = "Name")]
         public string? ZBPNAME_ZH { get; set; }
         /// <summary>
         /// 名称（英文）:往来单位英文名称，境外单位必填，
         /// </summary>
-        [SugarColumn(Length = 256, ColumnName = "NameEnglish")]
+        [SugarColumn(Length = 500, ColumnName = "NameEnglish")]
         public string? ZBPNAME_EN { get; set; }
         /// <summary>
         /// 名称（当地语言）:往来单位当地官方语言名称，当地语言为英文时，该属性与名称（英文）填写内容相同，境外单位必填
         /// </summary>
-        [SugarColumn(Length = 256, ColumnName = "NameInLLanguage")]
+        [SugarColumn(Length = 500, ColumnName = "NameInLLanguage")]
         public string? ZBPNAME_LOC { get; set; }
         /// <summary>
         /// 往来单位类别:依据组织机构的功能和性质进行的分类
@@ -161,6 +161,7 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// <summary>
         /// 是否属于本系统自己新增或修改 true 是 默认false
         /// </summary>
+        [SugarColumn(DefaultValue ="0")]
         public bool OwnerSystem { get; set; } = false;
     }
 
