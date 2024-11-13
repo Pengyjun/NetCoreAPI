@@ -96,7 +96,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.OperationExecution
                     {
                         if (map != null)
                         {
-                            await _dbContext.Updateable(map).WhereColumns(x => x.Id).UpdateColumns(x => x.IsDelete == 1).ExecuteCommandAsync();
+                            await _dbContext.Updateable(map).WhereColumns(x => x.Id).UpdateColumns(x => x.IsDelete == 0).ExecuteCommandAsync();
                         }
                     }
                     responseAjaxResult.SuccessResult(true);
