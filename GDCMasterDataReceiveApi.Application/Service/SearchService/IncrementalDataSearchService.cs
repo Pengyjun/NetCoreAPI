@@ -175,7 +175,8 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
             List<EachCompanyMainDataCountResponseDto> eachCompanyMainDataCountResponseDtos = new List<EachCompanyMainDataCountResponseDto>();
             var companyList = new CommonData().InitCompany();
             //获取机构数据
-            var institutionList = await _dbContext.Queryable<Institution>().Where(x => x.IsDelete == 1 && x.STATUS == "1")
+            var institutions = await _dbContext.Queryable<Institution>().Where(x => x.IsDelete == 1).ToListAsync();
+            var institutionList = institutions.Where(x => x.STATUS == "1")
                 .Select(x => new InstitutionTree()
                 {
                     Oid = x.OID,
@@ -184,7 +185,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     Name = x.NAME,
                     Sno = x.SNO,
                     GPoid = x.GPOID
-                }).ToListAsync();
+                }).ToList();
             #region 人员数量
             if (type == 1)
             {
@@ -193,7 +194,15 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                 foreach (var item in companyList)
                 {
                     var oids = new ListToTreeUtil().GetAllNodes(item.Key, institutionList);
-                    var userCount = userList.Where(x => oids.Contains(x.OFFICE_DEPID)).Count();
+                    var userCount = 0;
+                    if (item.Key == "101162350")
+                    {
+                        userCount = userList.Count();
+                    }
+                    else
+                    {
+                        userCount = userList.Where(x => oids.Contains(x.OFFICE_DEPID)).Count();
+                    }
                     EachCompanyMainDataCountResponseDto eachCompanyMainDataCountResponseDto = new EachCompanyMainDataCountResponseDto()
                     {
                         Type = type,
@@ -212,13 +221,21 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
             {
                 foreach (var item in companyList)
                 {
-                    var oids = new ListToTreeUtil().GetAllNodes(item.Key, institutionList);
+                    int count = 0;
+                    if (item.Key == "101162350")
+                    {
+                        count = institutions.Count();
+                    }
+                    else
+                    {
+                        count = new ListToTreeUtil().GetAllNodes(item.Key, institutionList).Count;
+                    }
                     EachCompanyMainDataCountResponseDto eachCompanyMainDataCountResponseDto = new EachCompanyMainDataCountResponseDto()
                     {
                         Type = type,
                         ConpanyName = item.Value,
                         XAxis = item.Value,
-                        YAxis = oids.Count
+                        YAxis = count
                     };
                     eachCompanyMainDataCountResponseDtos.Add(eachCompanyMainDataCountResponseDto);
                 }
@@ -234,8 +251,16 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     .ToListAsync();
                 foreach (var item in companyList)
                 {
-                    var oids = new ListToTreeUtil().GetAllNodes(item.Key, institutionList);
-                    var userCount = projectList.Where(x => oids.Contains(x.ZPRO_ORG)).Count();
+                    int userCount = 0;
+                    if (item.Key == "101162350")
+                    {
+                        userCount = projectList.Count();
+                    }
+                    else
+                    {
+                        var oids = new ListToTreeUtil().GetAllNodes(item.Key, institutionList);
+                        userCount = projectList.Where(x => oids.Contains(x.ZPRO_ORG)).Count();
+                    }
                     EachCompanyMainDataCountResponseDto eachCompanyMainDataCountResponseDto = new EachCompanyMainDataCountResponseDto()
                     {
                         Type = type,
@@ -328,7 +353,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
             var businessNoCpportunityCount = await _dbContext.Queryable<BusinessCpportunity>().Where(x => x.IsDelete == 1
             && SqlFunc.ToDate(x.CreateTime) >= startTime && SqlFunc.ToDate(x.CreateTime) <= endTime).ToListAsync();
 
-            for (int i = 0; i <7; i++)
+            for (int i = 0; i < 7; i++)
             {
                 var startTimeStr = Convert.ToDateTime(startTime.ObjToDate().AddDays(i).ToString("yyyy-MM-dd 00:00:00.000001"));
                 var endTimeStr = Convert.ToDateTime(startTime.AddDays(i).ToString("yyyy-MM-dd 23:59:59.999"));
@@ -379,13 +404,13 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                 startTime = Convert.ToDateTime(timeStr);
                 endTime = Convert.ToDateTime(timeEnd).AddDays(1);
             }
-           new CacheHelper().Set("time1", startTime.ToString("yyyy-MM-dd HH:mm:ss"), int.MaxValue);
-           new CacheHelper().Set("time2", endTime.ToString("yyyy-MM-dd HH:mm:ss"), int.MaxValue);
+            new CacheHelper().Set("time1", startTime.ToString("yyyy-MM-dd HH:mm:ss"), int.MaxValue);
+            new CacheHelper().Set("time2", endTime.ToString("yyyy-MM-dd HH:mm:ss"), int.MaxValue);
             #endregion
 
             //按接口
             var auditLogList = await _dbContext.Queryable<AuditLogs>()
-                .Where(x => x.AppKey!=null
+                .Where(x => x.AppKey != null
                  && SqlFunc.ToDate(x.RequestTime) >= startTime && SqlFunc.ToDate(x.RequestTime) < endTime && x.HttpStatusCode == 200)
                 .ToListAsync();
             if (auditLogList.Count > 0)
@@ -445,19 +470,20 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                             {
                                 AppKey = item.AppKey,
                                 XAxis = item.SystemName,
-                                YAxis = exp.Where(x=>x.AppKey==item.AppKey).Count(),
+                                YAxis = exp.Where(x => x.AppKey == item.AppKey).Count(),
 
                             };
                             if (eachMainDataCountResponseDtos.Where(x => x.AppKey == item.AppKey).Count() > 0)
                             {
                                 eachMainDataCountResponseDtos.Where(x => x.AppKey == item.AppKey).FirstOrDefault().YAxis += eachInterdaceCountResponseDto.YAxis;
                             }
-                            else {
+                            else
+                            {
                                 eachMainDataCountResponseDtos.Add(eachInterdaceCountResponseDto);
                             }
-                        
+
                         }
-                        
+
                     }
                 }
             }
@@ -490,11 +516,11 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
             if (!string.IsNullOrWhiteSpace(timeStr))
             {
                 strtimeStr = Convert.ToDateTime(timeStr.ObjToDate().ToString("yyyy-MM-dd 00:00:00.000001"));
-                 endTimeStr = Convert.ToDateTime(timeStr.ObjToDate().ToString("yyyy-MM-dd 23:59:59.999999"));
+                endTimeStr = Convert.ToDateTime(timeStr.ObjToDate().ToString("yyyy-MM-dd 23:59:59.999999"));
             }
             if (type == 2)
             {
-                strtimeStr=  new CacheHelper().Get("time1").Replace("\"","").ObjToDate();
+                strtimeStr = new CacheHelper().Get("time1").Replace("\"", "").ObjToDate();
                 endTimeStr = new CacheHelper().Get("time2").Replace("\"", "").ObjToDate();
                 await Console.Out.WriteLineAsync(strtimeStr.ToString());
                 await Console.Out.WriteLineAsync(endTimeStr.ToString());
@@ -506,8 +532,8 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
             var auditLogList = await _dbContext.Queryable<AuditLogs>()
                 .Where(x => x.AppKey != null && x.HttpStatusCode == 200
                  && SqlFunc.ToDate(x.RequestTime) >= strtimeStr
-                 && SqlFunc.ToDate(x.RequestTime)<= endTimeStr)
-                .WhereIF(type==2,x=>x.AppKey == appKey)
+                 && SqlFunc.ToDate(x.RequestTime) <= endTimeStr)
+                .WhereIF(type == 2, x => x.AppKey == appKey)
                 .ToListAsync();
             if (auditLogList.Count > 0)
             {
@@ -535,7 +561,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
 
                 if (type == 1)
                 {
-                    var aa=auditLogList.Select(x => x.AppKey).ToList();
+                    var aa = auditLogList.Select(x => x.AppKey).ToList();
                     foreach (var item in systemApiList)
                     {
 
@@ -543,7 +569,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                         foreach (var interfaces in systemList)
                         {
                             var interfaceName = systemINterfaceApiList.Where(x => x.AppinterfaceCode == interfaces.AppinterfaceCode).Select(x => x.InterfaceName).ToList();
-                            if (interfaceName.Count== 0)
+                            if (interfaceName.Count == 0)
                             {
                                 continue;
                             }
@@ -554,7 +580,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                                 InterfaceName = interfaceName[0],
                                 RequestTime = string.IsNullOrWhiteSpace(timeStr) == true ? DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") : timeStr,
                             };
-                            if (eachMainDataCountResponseDtos.Where(x => x.AppName == item.SystemName&&x.InterfaceName== interfaceName[0]).Count() > 0)
+                            if (eachMainDataCountResponseDtos.Where(x => x.AppName == item.SystemName && x.InterfaceName == interfaceName[0]).Count() > 0)
                             {
 
                                 eachMainDataCountResponseDtos.Where(x => x.AppName == item.SystemName && x.InterfaceName == interfaceName[0]).FirstOrDefault().Count += interfaceName.Count;
@@ -563,7 +589,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                             {
                                 eachMainDataCountResponseDtos.Add(eachAPIInterdaceItem);
                             }
-                           
+
 
                         }
                     }
@@ -572,7 +598,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                 else if (type == 2)
                 {
                     var systemNameList = auditLogList.Where(x => x.AppKey == appKey).ToList();
-                    var systemName= systemApiList.Where(x => x.AppKey == appKey).FirstOrDefault();
+                    var systemName = systemApiList.Where(x => x.AppKey == appKey).FirstOrDefault();
                     foreach (var interfaces in systemNameList)
                     {
                         var interfaceName = systemINterfaceApiList.Where(x => x.AppinterfaceCode == interfaces.AppinterfaceCode).Select(x => x.InterfaceName).ToList();
@@ -598,7 +624,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                         {
                             eachMainDataCountResponseDtos.Add(eachAPIInterdaceItem);
                         }
-                        
+
                     }
                 }
             }
