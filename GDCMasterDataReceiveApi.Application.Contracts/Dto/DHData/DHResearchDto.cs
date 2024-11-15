@@ -55,12 +55,12 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.DHData
         /// <summary>
         /// 否高新项目 (0:否;1:是)
         /// </summary>
-        [DisplayName("否高新项目")]
+        [DisplayName("否高新项目(0:否;1:是)")]
         public string? Fzhitech { get; set; }
         /// <summary>
         /// 是否委外项目 (0:否;1:是)
         /// </summary>
-        [DisplayName("是否委外项目")]
+        [DisplayName("是否委外项目(0:否;1:是)")]
         public string? Fzoutsourcing { get; set; }
         /// <summary>
         /// 所属二级单位
