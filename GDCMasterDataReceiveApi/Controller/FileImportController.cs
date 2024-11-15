@@ -95,6 +95,7 @@ namespace GDCMasterDataReceiveApi.Controller
             condition.IsFullExport = request.IsFullExport;
             condition.ImportType = request.ImportType;
             condition.KeyWords = request.KeyWords;
+            condition.Oid = request.Oid;
             condition.Id = request.Id;
 
             Dictionary<string, object> parames = new Dictionary<string, object>();//请求参数
