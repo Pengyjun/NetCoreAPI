@@ -194,15 +194,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                 foreach (var item in companyList)
                 {
                     var oids = new ListToTreeUtil().GetAllNodes(item.Key, institutionList);
-                    var userCount = 0;
-                    if (item.Key == "101162350")
-                    {
-                        userCount = userList.Count();
-                    }
-                    else
-                    {
-                        userCount = userList.Where(x => oids.Contains(x.OFFICE_DEPID)).Count();
-                    }
+                    var userCount = userList.Where(x => oids.Contains(x.OFFICE_DEPID)).Count();
                     EachCompanyMainDataCountResponseDto eachCompanyMainDataCountResponseDto = new EachCompanyMainDataCountResponseDto()
                     {
                         Type = type,
@@ -221,15 +213,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
             {
                 foreach (var item in companyList)
                 {
-                    int count = 0;
-                    if (item.Key == "101162350")
-                    {
-                        count = institutions.Count();
-                    }
-                    else
-                    {
-                        count = new ListToTreeUtil().GetAllNodes(item.Key, institutionList).Count;
-                    }
+                    int count = new ListToTreeUtil().GetAllNodes(item.Key, institutionList).Count;
                     EachCompanyMainDataCountResponseDto eachCompanyMainDataCountResponseDto = new EachCompanyMainDataCountResponseDto()
                     {
                         Type = type,
@@ -251,16 +235,8 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     .ToListAsync();
                 foreach (var item in companyList)
                 {
-                    int userCount = 0;
-                    if (item.Key == "101162350")
-                    {
-                        userCount = projectList.Count();
-                    }
-                    else
-                    {
-                        var oids = new ListToTreeUtil().GetAllNodes(item.Key, institutionList);
-                        userCount = projectList.Where(x => oids.Contains(x.ZPRO_ORG)).Count();
-                    }
+                    var oids = new ListToTreeUtil().GetAllNodes(item.Key, institutionList);
+                    int userCount = projectList.Where(x => oids.Contains(x.ZPRO_ORG)).Count();
                     EachCompanyMainDataCountResponseDto eachCompanyMainDataCountResponseDto = new EachCompanyMainDataCountResponseDto()
                     {
                         Type = type,
