@@ -33,6 +33,7 @@ using GHMonitoringCenterApi.Domain.Shared.Enums;
 using GHMonitoringCenterApi.Domain.Shared.Util;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
+using NPOI.HPSF;
 using SqlSugar;
 using UtilsSharp;
 using Model = GHMonitoringCenterApi.Domain.Models;
@@ -901,9 +902,12 @@ namespace GHMonitoringCenterApi.Application.Service
                 .WhereIF(!string.IsNullOrWhiteSpace(dealingUnitRequseDto.KeyWords), x => SqlFunc.Contains(x.ZBPNAME_ZH, dealingUnitRequseDto.KeyWords))
                 // .Where(x=>x.ZBPNAME_ZH.Contains("机关") || x.ZBPNAME_ZH.Contains("本部") || x.ZBPNAME_ZH.Contains("纳税人"))
                 .Where(x => !x.ZBPNAME_ZH.Contains("汇总）") && !x.ZBPNAME_ZH.Contains("合并）"))
-                .Where(x => x.ZBPTYPE == "01"||x.ZBPTYPE == "02" || x.ZBPTYPE == "03")
+               // .Where(x => x.ZBPTYPE == "01"||x.ZBPTYPE == "02" || x.ZBPTYPE == "03")
+                .OrderBy(x=>x.ZBPNAME_ZH)
                  .Select(x => new BasePullDownResponseDto { Id = x.PomId, Name = x.ZBPNAME_ZH })
                  .ToListAsync();
+            ProjectDealingUnitList = ProjectDealingUnitList.Where(x => !Utils.EndsWithParenthesis(x.Name)).OrderBy(x => x.Name).ToList();
+
             responseAjaxResult.Data = ProjectDealingUnitList;
             responseAjaxResult.Count = ProjectDealingUnitList.Count;
             responseAjaxResult.Success();

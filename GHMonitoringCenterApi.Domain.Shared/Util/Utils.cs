@@ -750,5 +750,18 @@ namespace GHMonitoringCenterApi.Domain.Shared.Util
         }
         #endregion
 
+
+
+        /// <summary>
+        /// 判断文本末尾是否是括号
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns></returns>
+       public static bool EndsWithParenthesis(string text)
+        {
+            // 检查是否以 '(' 或 ')' 结尾
+            return text.EndsWith("(") || text.EndsWith(")")|| text.EndsWith("（")|| text.EndsWith("）");
+        }
+
     }
 }
