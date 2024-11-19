@@ -643,7 +643,20 @@ namespace GHMonitoringCenterApi.Application.Service.Word
 
                 oneTable.GetRow(7).GetCell(0).SetText("工期信息");
                 oneTable.GetRow(7).GetCell(0).SetColor("#EEEEEE");
-                oneTable.GetRow(7).GetCell(1).SetText(item.DurationInformation + item.CommencementTime);
+                var gqorkg = string.Empty;
+                if (string.IsNullOrEmpty(item.DurationInformation))
+                {
+                    if (!string.IsNullOrEmpty(item.CommencementTime))
+                    {
+                        gqorkg = item.CommencementTime;
+                    }
+                }
+                else
+                {
+                    gqorkg = item.DurationInformation;
+                }
+                //oneTable.GetRow(7).GetCell(1).SetText(item.DurationInformation + item.CommencementTime);
+                oneTable.GetRow(7).GetCell(1).SetText(gqorkg);
 
                 oneTable.GetRow(8).GetCell(0).SetText("项目进展");
                 oneTable.GetRow(8).GetCell(0).SetColor("#EEEEEE");
