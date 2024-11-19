@@ -21,6 +21,11 @@ namespace GDCMasterDataReceiveApi.Domain.Shared.Utils
         public List<string> GetAllNodes(string printId, List<InstitutionTree> node)
         {
             GetTree(printId, node);
+            var isExist= AllNodes.Where(x => x == printId).Count();
+            if (isExist == 0)
+            {
+                AllNodes.Add(printId);
+            }
             return AllNodes;
         }
 
