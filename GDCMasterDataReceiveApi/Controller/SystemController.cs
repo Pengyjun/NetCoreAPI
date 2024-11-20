@@ -1,10 +1,8 @@
 ﻿using GDCMasterDataReceiveApi.Application.Contracts.Dto.System;
 using GDCMasterDataReceiveApi.Application.Contracts.IService.ISystemService;
 using GDCMasterDataReceiveApi.Domain.Shared;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
-using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace GDCMasterDataReceiveApi.Controller
@@ -16,12 +14,9 @@ namespace GDCMasterDataReceiveApi.Controller
     [ApiController]
     public class SystemController : BaseController
     {
-
-
-
         #region 依赖注入
         public IApiDescriptionGroupCollectionProvider apiDescriptionGroupCollectionProvider { get; set; }
-        public ISchemaGenerator schemaGenerator  { get; set; }
+        public ISchemaGenerator schemaGenerator { get; set; }
         public ISystemService systemService { get; set; }
         public SystemController(ISystemService systemService, IApiDescriptionGroupCollectionProvider apiDescriptionGroupCollectionProvider, ISchemaGenerator schemaGenerator)
         {
@@ -31,17 +26,17 @@ namespace GDCMasterDataReceiveApi.Controller
         }
         #endregion
 
+        #region 
         /// <summary>
         /// 获取所有接口方法 
         /// </summary>
         /// <returns></returns>
         [HttpGet("SearchInterfaceMethods")]
         [Obsolete]
-        public async Task<ResponseAjaxResult<List<SystemAllInterfaceResponseDto>>> SearchInterfaceMethodsAsync([FromQuery] SystemInterfaceRequestDto  systemInterfaceRequestDto)
+        public async Task<ResponseAjaxResult<List<SystemAllInterfaceResponseDto>>> SearchInterfaceMethodsAsync([FromQuery] SystemInterfaceRequestDto systemInterfaceRequestDto)
         {
             return await systemService.SearchInterfaceMethodsAsync(systemInterfaceRequestDto.SystemIdentity);
         }
-
         /// <summary>
         /// 获取所有接口响应字段  暂时不用
         /// </summary>
@@ -50,7 +45,7 @@ namespace GDCMasterDataReceiveApi.Controller
         [Obsolete]
         public async Task<ResponseAjaxResult<List<SystemAllInterfaceResponseDto>>> SearchInterfaceFieldsAsync([FromQuery] SystemMethodFieldRequestDto systemMethodFieldRequestDto)
         {
-          // var a= new OpenApiDocument();
+            // var a= new OpenApiDocument();
             //new OpenApiComponents().
             //foreach (var item in apiDescriptionGroupCollectionProvider.ApiDescriptionGroups.Items)
             //{
@@ -67,5 +62,18 @@ namespace GDCMasterDataReceiveApi.Controller
             //}
             return await systemService.SearchInterfaceFieldsAsync(systemMethodFieldRequestDto.InterfaceName);
         }
+        #endregion
+
+        #region 数据资源管理 
+
+        #endregion
+
+        #region 数据标准管理
+
+        #endregion
+
+        #region 数据质量管理
+
+        #endregion
     }
 }
