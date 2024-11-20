@@ -142,6 +142,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
 
             var userInfos = await _dbContext.Queryable<User>()
                 .WhereIF(!string.IsNullOrWhiteSpace(requestDto.KeyWords), t => t.NAME.Contains(requestDto.KeyWords) || t.EMP_CODE.Contains(requestDto.KeyWords))
+                .WhereIF(requestDto.IsDrilldown == true, t => t.CreateTime == requestDto.DrilldownDate)
                 .Where(jsonWhere)
                 .Select(u => new UserSearchDetailsDto
                 {
@@ -1242,6 +1243,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
             {
                 institutions = await _dbContext.Queryable<Institution>()
                 .WhereIF(!string.IsNullOrWhiteSpace(requestDto.KeyWords), t => t.OID.Contains(requestDto.KeyWords) || t.NAME.Contains(requestDto.KeyWords))
+                .WhereIF(requestDto.IsDrilldown == true, t => t.CreateTime == requestDto.DrilldownDate)
                 .Where(jsonWhere)
                 .Where(t => t.IsDelete == 1 && t.GPOID == requestDto.Oid)
                 .Select(ins => new InstitutionDetatilsDto
