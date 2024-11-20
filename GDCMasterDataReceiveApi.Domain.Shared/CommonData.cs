@@ -23,7 +23,7 @@ namespace GDCMasterDataReceiveApi.Domain.Shared
             companyList.Add("101332050", "四公司");//四公司
             companyList.Add("101305005", "五公司");//五公司
             companyList.Add("101288132", "福建公司");//福建公司
-            companyList.Add("101162351", "广航局");//广航局
+            companyList.Add("101162351", "广航局本部");//广航局本部
             return companyList;
         }
     }

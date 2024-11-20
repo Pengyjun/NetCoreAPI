@@ -688,6 +688,17 @@ namespace GDCMasterDataReceiveApi.Controller
             return await _searchService.GetValueDomainReceiveAsync(requestDto);
         }
         /// <summary>
+        /// 集成平台调用固定资产类型
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        [HttpPost("SearchValueDomain")]
+        [AllowAnonymous]
+        public async Task<ResponseAjaxResult<List<ValueDomainReceiveResponseDto>>> SearchValueDomainAsync([FromBody] FilterCondition requestDto)
+        {
+            return await _searchService.GetValueDomainReceiveAsync(requestDto);
+        }
+        /// <summary>
         /// 获取通用字典数据
         /// </summary>
         /// <param name="type"></param>
