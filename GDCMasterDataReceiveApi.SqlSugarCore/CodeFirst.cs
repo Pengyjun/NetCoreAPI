@@ -1,4 +1,5 @@
 ﻿using GDCMasterDataReceiveApi.Domain;
+using GDCMasterDataReceiveApi.Domain.Models;
 using SqlSugar;
 using System.Reflection;
 
@@ -90,7 +91,7 @@ namespace GDCMasterDataReceiveApi.SqlSugarCore
                 };
             });
             Type[] types = typeof(BaseEntity<long>).Assembly.GetTypes()
-            .Where(it =>it.FullName.Contains("CorresUnit")
+            .Where(it =>it.FullName.Contains("DHProjects")
             )
             .ToArray();
             db.CodeFirst.InitTables(types);

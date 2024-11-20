@@ -1,6 +1,7 @@
 ﻿using GDCMasterDataReceiveApi.Application.Contracts.IService.IReceiveDHDataService;
 using GDCMasterDataReceiveApi.Domain.Shared;
 using GDCMasterDataReceiveApi.Domain.Shared.Annotation;
+using GDCMasterDataReceiveApi.Domain.Shared.Enums;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GDCMasterDataReceiveApi.Controller
@@ -36,9 +37,25 @@ namespace GDCMasterDataReceiveApi.Controller
         /// <returns></returns>
         [HttpGet("ReceiveDHAdministrative")]
         [UnitOfWork]
-        public async Task<ResponseAjaxResult<bool>> ReceiveAdministrativeAsync()
+        public async Task<ResponseAjaxResult<bool>> ReceiveAdministrativeAsync(string? dateTime)
         {
-            return await _receiveDHDataService.ReceiveAdministrativeAsync();
+            ResponseAjaxResult<bool> responseAjaxResult = new ResponseAjaxResult<bool>();
+            var datetime = DateTime.MinValue;
+            if (!string.IsNullOrWhiteSpace(dateTime))
+            {
+                var isOk = DateTime.TryParse(dateTime, out datetime);
+                if (!isOk)
+                {
+                    responseAjaxResult.Data = false;
+                    responseAjaxResult.Success(message: "时间格式转换失败", HttpStatusCode.VerifyFail);
+                    return responseAjaxResult;
+                }
+            }
+            else
+            {
+                DateTime.TryParse(DateTime.Now.ToString("yyyy-MM-dd"), out datetime);
+            }
+            return await _receiveDHDataService.ReceiveAdministrativeAsync(datetime);
         }
         /// <summary>
         /// DH行政机构(多组织)
@@ -66,9 +83,24 @@ namespace GDCMasterDataReceiveApi.Controller
         /// <returns></returns>
         [HttpGet("ReveiveDHAccountingDept")]
         [UnitOfWork]
-        public async Task<ResponseAjaxResult<bool>> ReveiveAccountingDeptAsync()
+        public async Task<ResponseAjaxResult<bool>> ReveiveAccountingDeptAsync(string? dateTime)
         {
-            return await _receiveDHDataService.ReveiveAccountingDeptAsync();
+            ResponseAjaxResult<bool> responseAjaxResult = new ResponseAjaxResult<bool>();
+            var datetime = DateTime.MinValue;
+            if (!string.IsNullOrWhiteSpace(dateTime))
+            {
+                var isOk = DateTime.TryParse(dateTime, out datetime);
+                if (!isOk)
+                {
+                    responseAjaxResult.Data = false;
+                    responseAjaxResult.Success(message: "时间格式转换失败", HttpStatusCode.VerifyFail);
+                    return responseAjaxResult;
+                }
+            }
+            else {
+                DateTime.TryParse(DateTime.Now.ToString("yyyy-MM-dd"), out datetime);
+            }
+            return await _receiveDHDataService.ReveiveAccountingDeptAsync(datetime);
         }
         /// <summary>
         /// DH项目信息
@@ -76,9 +108,25 @@ namespace GDCMasterDataReceiveApi.Controller
         /// <returns></returns>
         [HttpGet("ReveiveDHProjects")]
         [UnitOfWork]
-        public async Task<ResponseAjaxResult<bool>> ReceiveProjectsAsync()
+        public async Task<ResponseAjaxResult<bool>> ReceiveProjectsAsync(string? dateTime)
         {
-            return await _receiveDHDataService.ReceiveProjectsAsync();
+            ResponseAjaxResult<bool> responseAjaxResult = new ResponseAjaxResult<bool>();
+            var datetime = DateTime.MinValue;
+            if (!string.IsNullOrWhiteSpace(dateTime))
+            {
+                var isOk = DateTime.TryParse(dateTime, out datetime);
+                if (!isOk)
+                {
+                    responseAjaxResult.Data = false;
+                    responseAjaxResult.Success(message: "时间格式转换失败", HttpStatusCode.VerifyFail);
+                    return responseAjaxResult;
+                }
+            }
+            else
+            {
+                 DateTime.TryParse("1900-01-01", out datetime);
+            }
+            return await _receiveDHDataService.ReceiveProjectsAsync(datetime,true);
         }
         /// <summary>
         /// DH虚拟项目
@@ -86,9 +134,26 @@ namespace GDCMasterDataReceiveApi.Controller
         /// <returns></returns>
         [HttpGet("ReveiveDHVirtualProject")]
         [UnitOfWork]
-        public async Task<ResponseAjaxResult<bool>> ReceiveVirtualProjectAsync()
+        public async Task<ResponseAjaxResult<bool>> ReceiveVirtualProjectAsync(string? dateTime)
         {
-            return await _receiveDHDataService.ReceiveVirtualProjectAsync();
+            ResponseAjaxResult<bool> responseAjaxResult = new ResponseAjaxResult<bool>();
+            var datetime = DateTime.MinValue;
+            if (!string.IsNullOrWhiteSpace(dateTime))
+            {
+                var isOk = DateTime.TryParse(dateTime, out datetime);
+                if (!isOk)
+                {
+                    responseAjaxResult.Data = false;
+                    responseAjaxResult.Success(message: "时间格式转换失败", HttpStatusCode.VerifyFail);
+                    return responseAjaxResult;
+                }
+            }
+            else
+            {
+                DateTime.TryParse("1900-01-01", out datetime);
+                // DateTime.TryParse(DateTime.Now.ToString("yyyy-MM-dd"), out datetime);
+            }
+            return await _receiveDHDataService.ReceiveVirtualProjectAsync(datetime,true);
         }
         /// <summary>
         /// DH商机项目
@@ -96,9 +161,25 @@ namespace GDCMasterDataReceiveApi.Controller
         /// <returns></returns>
         [HttpGet("ReveiveDHOpportunity")]
         [UnitOfWork]
-        public async Task<ResponseAjaxResult<bool>> ReceiveOpportunityAsync()
+        public async Task<ResponseAjaxResult<bool>> ReceiveOpportunityAsync(string? dateTime)
         {
-            return await _receiveDHDataService.ReceiveOpportunityAsync();
+            ResponseAjaxResult<bool> responseAjaxResult = new ResponseAjaxResult<bool>();
+            var datetime = DateTime.MinValue;
+            if (!string.IsNullOrWhiteSpace(dateTime))
+            {
+                var isOk = DateTime.TryParse(dateTime, out datetime);
+                if (!isOk)
+                {
+                    responseAjaxResult.Data = false;
+                    responseAjaxResult.Success(message: "时间格式转换失败", HttpStatusCode.VerifyFail);
+                    return responseAjaxResult;
+                }
+            }
+            else
+            {
+                DateTime.TryParse(DateTime.Now.ToString("yyyy-MM-dd"), out datetime);
+            }
+            return await _receiveDHDataService.ReceiveOpportunityAsync(datetime,true);
         }
         /// <summary>
         /// DH科研项目
@@ -106,9 +187,26 @@ namespace GDCMasterDataReceiveApi.Controller
         /// <returns></returns>
         [HttpGet("ReveiveDHResearch")]
         [UnitOfWork]
-        public async Task<ResponseAjaxResult<bool>> ReceiveResearchListAsync()
+        public async Task<ResponseAjaxResult<bool>> ReceiveResearchListAsync(string? dateTime)
         {
-            return await _receiveDHDataService.ReceiveResearchListAsync();
+            ResponseAjaxResult<bool> responseAjaxResult = new ResponseAjaxResult<bool>();
+            var datetime = DateTime.MinValue;
+            if (!string.IsNullOrWhiteSpace(dateTime))
+            {
+                var isOk = DateTime.TryParse(dateTime, out datetime);
+                if (!isOk)
+                {
+                    responseAjaxResult.Data = false;
+                    responseAjaxResult.Success(message: "时间格式转换失败", HttpStatusCode.VerifyFail);
+                    return responseAjaxResult;
+                }
+            }
+            else
+            {
+                DateTime.TryParse("1900-01-01", out datetime);
+                // DateTime.TryParse(DateTime.Now.ToString("yyyy-MM-dd"), out datetime);
+            }
+            return await _receiveDHDataService.ReceiveResearchListAsync(datetime,true);
         }
         /// <summary>
         /// DH生产经营管理组织

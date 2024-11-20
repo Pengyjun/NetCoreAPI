@@ -18,7 +18,7 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.IService.IReceiveDHDataS
         /// DH行政和核算机构映射写入
         /// </summary>
         /// <returns></returns>
-        Task<ResponseAjaxResult<bool>> ReceiveAdministrativeAsync();
+        Task<ResponseAjaxResult<bool>> ReceiveAdministrativeAsync(DateTime? datetime);
         /// <summary>
         /// DH行政机构(多组织)写入
         /// </summary>
@@ -33,27 +33,27 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.IService.IReceiveDHDataS
         /// DH核算部门写入
         /// </summary>
         /// <returns></returns>
-        Task<ResponseAjaxResult<bool>> ReveiveAccountingDeptAsync();
+        Task<ResponseAjaxResult<bool>> ReveiveAccountingDeptAsync(DateTime? datetime);
         /// <summary>
         /// DH项目信息写入
         /// </summary>
         /// <returns></returns>
-        Task<ResponseAjaxResult<bool>> ReceiveProjectsAsync();
+        Task<ResponseAjaxResult<bool>> ReceiveProjectsAsync(DateTime? datetime, bool isAllDelete = false);
         /// <summary>
         /// DH虚拟项目写入
         /// </summary>
         /// <returns></returns>
-        Task<ResponseAjaxResult<bool>> ReceiveVirtualProjectAsync();
+        Task<ResponseAjaxResult<bool>> ReceiveVirtualProjectAsync(DateTime? datetime, bool isAllDelete=false);
         /// <summary>
         /// DH商机项目写入
         /// </summary>
         /// <returns></returns>
-        Task<ResponseAjaxResult<bool>> ReceiveOpportunityAsync();
+        Task<ResponseAjaxResult<bool>> ReceiveOpportunityAsync(DateTime? datetime, bool isAllDelete = false);
         /// <summary>
         /// DH科研项目写入
         /// </summary>
         /// <returns></returns>
-        Task<ResponseAjaxResult<bool>> ReceiveResearchListAsync();
+        Task<ResponseAjaxResult<bool>> ReceiveResearchListAsync(DateTime? datetime, bool isAllDelete = false);
         /// <summary>
         /// DH生产经营管理组织
         /// </summary>

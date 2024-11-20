@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,6 +13,7 @@ namespace GDCMasterDataReceiveApi.Domain.Shared
     /// </summary>
     public class CommonData
     {
+       
         public Dictionary<string,string> companyList = new Dictionary<string, string>();
         /// <summary>
         /// 初始化公司静态数据

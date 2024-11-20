@@ -5,6 +5,8 @@ using GDCMasterDataReceiveApi.Domain.Shared;
 using GDCMasterDataReceiveApi.Domain.Shared.Utils;
 using Newtonsoft.Json;
 using SqlSugar;
+using SqlSugar.Extensions;
+using System;
 using UtilsSharp;
 
 namespace GDCMasterDataReceiveApi.Application.Service.ReceiveDHDataService
@@ -43,7 +45,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveDHDataService
         {
             var url = $"{AppsettingsHelper.GetValue("DHData:Url")}{requestDto.InterfaceUrl}?" +
                       $"{AppsettingsHelper.GetValue("DHData:SysCode")}&" +
-                      $"updatetime={(requestDto.UpdateTime != DateTime.MinValue ? requestDto.UpdateTime : "1900-01-01")}&" +
+                      $"updatetime={(requestDto.UpdateTime.HasValue==true ? requestDto.UpdateTime : "1900-01-01")}&" +
                       $"functionAuthorizationCode={requestDto.FCode}&" +
                       $"pageindex={requestDto.PageIndex}";
 
@@ -148,7 +150,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveDHDataService
         /// DH行政和核算机构映射写入
         /// </summary>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<bool>> ReceiveAdministrativeAsync()
+        public async Task<ResponseAjaxResult<bool>> ReceiveAdministrativeAsync(DateTime? datetime)
         {
             ResponseAjaxResult<bool> responseAjaxResult = new();
 
@@ -156,7 +158,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveDHDataService
             {
                 FCode = "68AEA3249B7C43F79234B7618620C692",
                 InterfaceUrl = "Department/GetAdministrativePageList",
-                UpdateTime = DateTime.Now,
+                UpdateTime = datetime,
                 PageIndex = 1//从第一页开始拉取
             };
 
@@ -170,7 +172,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveDHDataService
                     foreach (var item in insertTable)
                     {
                         item.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
-                        item.CreateTime = DateTime.Now;
+                        item.CreateTime = datetime;
                     }
                     await _dbContext.Fastest<DHAdministrative>().BulkCopyAsync(insertTable);
                 }
@@ -266,7 +268,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveDHDataService
         /// DH核算部门写入
         /// </summary>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<bool>> ReveiveAccountingDeptAsync()
+        public async Task<ResponseAjaxResult<bool>> ReveiveAccountingDeptAsync(DateTime? datetime)
         {
             ResponseAjaxResult<bool> responseAjaxResult = new();
 
@@ -274,7 +276,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveDHDataService
             {
                 FCode = "68AEA3249C7C43F78234C7613652A956",
                 InterfaceUrl = "Department/GetMdmAccountingDeptPageList",
-                UpdateTime = DateTime.Now,
+                UpdateTime = datetime,
                 PageIndex = 1//从第一页开始拉取
             };
 
@@ -288,7 +290,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveDHDataService
                     foreach (var item in insertTable)
                     {
                         item.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
-                        item.CreateTime = DateTime.Now;
+                        item.CreateTime = datetime;
                         item.IsDelete = item.Zdatstate == "0" ? 1 : item.Zdatstate == "1" ? 0 : 1;
                     }
                     await _dbContext.Fastest<DHAccountingDept>().BulkCopyAsync(insertTable);
@@ -306,15 +308,19 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveDHDataService
         /// DH项目信息写入
         /// </summary>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<bool>> ReceiveProjectsAsync()
+        public async Task<ResponseAjaxResult<bool>> ReceiveProjectsAsync(DateTime? datetime, bool isAllDelete = false)
         {
+            
+            if (isAllDelete)
+            { 
+             await _dbContext.Deleteable<DHProjects>().ExecuteCommandAsync();
+            }
             ResponseAjaxResult<bool> responseAjaxResult = new();
-
             var requestDto = new KeyVerificationRequestDto
             {
                 FCode = "68AEA3249B7C43F79234B7618620C685",
                 InterfaceUrl = "Project/GetProjectsPageList",
-                UpdateTime = DateTime.Now,
+                UpdateTime =datetime,
                 PageIndex = 1//从第一页开始拉取
             };
 
@@ -329,7 +335,9 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveDHDataService
                     foreach (var item in insertTable)
                     {
                         item.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
-                        item.CreateTime = DateTime.Now;
+                        item.CreateTime = item.CreatedAt;
+                        item.UpdateTime = item.UpdatedAt;
+                        item.Timestamp = Utils.GetTimeSpan();
                     }
                     await _dbContext.Fastest<DHProjects>().BulkCopyAsync(insertTable);
                 }
@@ -346,15 +354,19 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveDHDataService
         /// DH虚拟项目写入
         /// </summary>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<bool>> ReceiveVirtualProjectAsync()
+        public async Task<ResponseAjaxResult<bool>> ReceiveVirtualProjectAsync(DateTime? datetime, bool isAllDelete = false)
         {
+            if (isAllDelete)
+            {
+                await _dbContext.Deleteable<DHProjects>().ExecuteCommandAsync();
+            }
             ResponseAjaxResult<bool> responseAjaxResult = new();
-
+           
             var requestDto = new KeyVerificationRequestDto
             {
                 FCode = "68AEA3249B7C43F79234B7618620C678",
                 InterfaceUrl = "VirtualProject/GetVirtualProjectAsync",
-                UpdateTime = DateTime.Now, //没有项目更新时间 全量拉
+                UpdateTime =datetime, //没有项目更新时间 全量拉
                 PageIndex = 1//从第一页开始拉取
             };
 
@@ -375,7 +387,11 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveDHDataService
                     {
                         item.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
                         //item.IsDelete = Convert.ToInt32(item.Zdelete);
-                        item.CreateTime = DateTime.Now;
+                        item.CreateTime = string.IsNullOrWhiteSpace(item.CreatedAt) == false ? item.CreatedAt.ObjToDate(): DateTime.MinValue;
+                        item.UpdateTime = string.IsNullOrWhiteSpace(item.UpdatedAt)==false ? item.CreatedAt.ObjToDate() : DateTime.MinValue;
+                        item.Timestamp = Utils.GetTimeSpan();
+                        
+                       
                     }
                     await _dbContext.Fastest<DHVirtualProject>().BulkCopyAsync(insertTable);
                 }
@@ -397,15 +413,19 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveDHDataService
         /// DH商机项目写入
         /// </summary>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<bool>> ReceiveOpportunityAsync()
+        public async Task<ResponseAjaxResult<bool>> ReceiveOpportunityAsync(DateTime? datetime, bool isAllDelete = false)
         {
+            if (isAllDelete)
+            {
+                await _dbContext.Deleteable<DHProjects>().ExecuteCommandAsync();
+            }
             ResponseAjaxResult<bool> responseAjaxResult = new();
 
             var requestDto = new KeyVerificationRequestDto
             {
                 FCode = "68AEA3249B7C43F79234B7618620C679",
                 InterfaceUrl = "Opportunity/GetOpportunityAsync",
-                UpdateTime = DateTime.Now,// 没有项目更新时间 全量拉
+                UpdateTime =datetime,// 没有项目更新时间 全量拉
                 PageIndex = 1//从第一页开始拉取
             };
 
@@ -418,7 +438,9 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveDHDataService
                     foreach (var item in insertTable)
                     {
                         item.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
-                        item.CreateTime = DateTime.Now;
+                        item.CreateTime = item.CreatedAt;
+                        item.UpdateTime = item.UpdatedAt;
+                        item.Timestamp = Utils.GetTimeSpan();
                     }
                     await _dbContext.Fastest<DHOpportunity>().BulkMergeAsync(insertTable);
                 }
@@ -435,15 +457,19 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveDHDataService
         /// DH科研项目写入
         /// </summary>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<bool>> ReceiveResearchListAsync()
+        public async Task<ResponseAjaxResult<bool>> ReceiveResearchListAsync(DateTime? datetime,bool isAllDelete = false)
         {
+            if (isAllDelete)
+            {
+                await _dbContext.Deleteable<DHProjects>().ExecuteCommandAsync();
+            }
             ResponseAjaxResult<bool> responseAjaxResult = new();
 
             var requestDto = new KeyVerificationRequestDto
             {
                 FCode = "68AEA3249B7C43F79234B7618620C710",
                 InterfaceUrl = "Research/GetResearchList",
-                UpdateTime = DateTime.Now, //没有项目更新时间 全量拉
+                UpdateTime =datetime, //没有项目更新时间 全量拉
                 PageIndex = 1//从第一页开始拉取
             };
 
@@ -457,7 +483,9 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveDHDataService
                     foreach (var item in insertTable)
                     {
                         item.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
-                        item.CreateTime = DateTime.Now;
+                        item.CreateTime = item.CreatedAt;
+                        item.UpdateTime = item.UpdatedAt;
+                        item.Timestamp = Utils.GetTimeSpan();
                     }
                     await _dbContext.Fastest<DHResearch>().BulkMergeAsync(insertTable);
                 }

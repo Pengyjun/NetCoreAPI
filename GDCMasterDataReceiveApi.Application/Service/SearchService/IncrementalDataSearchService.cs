@@ -314,7 +314,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
             }
 
 
-            var projectCount = await _dbContext.Queryable<Project>().Where(x => x.IsDelete == 1
+            var projectCount = await _dbContext.Queryable<DHProjects>().Where(x => x.IsDelete == 1
             && SqlFunc.ToDate(x.CreateTime) >= startTime && SqlFunc.ToDate(x.CreateTime) <= endTime).ToListAsync();
 
             var financialInstitutionCount = await _dbContext.Queryable<FinancialInstitution>().Where(x => x.IsDelete == 1
@@ -323,10 +323,10 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
             var deviceClassCodeCount = await _dbContext.Queryable<DeviceClassCode>().Where(x => x.IsDelete == 1
             && SqlFunc.ToDate(x.CreateTime) >= startTime && SqlFunc.ToDate(x.CreateTime) <= endTime).ToListAsync();
 
-            var scientifiCNoProjectCount = await _dbContext.Queryable<ScientifiCNoProject>().Where(x => x.IsDelete == 1
+            var scientifiCNoProjectCount = await _dbContext.Queryable<DHResearch>().Where(x => x.IsDelete == 1
             && SqlFunc.ToDate(x.CreateTime) >= startTime && SqlFunc.ToDate(x.CreateTime) <= endTime).ToListAsync();
 
-            var businessNoCpportunityCount = await _dbContext.Queryable<BusinessCpportunity>().Where(x => x.IsDelete == 1
+            var businessNoCpportunityCount = await _dbContext.Queryable<DHOpportunity>().Where(x => x.IsDelete == 1
             && SqlFunc.ToDate(x.CreateTime) >= startTime && SqlFunc.ToDate(x.CreateTime) <= endTime).ToListAsync();
 
             for (int i = 0; i < 7; i++)
