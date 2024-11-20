@@ -6120,8 +6120,8 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                             num += ((item.Dredge ?? 0) + (item.Sail ?? 0) + (item.BlowingWater ?? 0) + (item.SedimentDisposal ?? 0) + (item.BlowingWater ?? 0));
                         }
                     }
-                    res.MonthWorkHours += num;
-                    res.YearWorkHours += num;
+                    //res.MonthWorkHours += num;
+                    //res.YearWorkHours += num;
                     #endregion
                 }
 
