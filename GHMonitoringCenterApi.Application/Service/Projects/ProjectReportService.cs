@@ -5975,7 +5975,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 YearOutputVal = Math.Round(osYearData.Where(y => y.ShipId == x.ShipId && y.ProjectId == x.ProjectId && y.DateMonth >= stMonth && y.DateMonth <= x.DateMonth).Sum(s => s.YearOutputVal), 2),
                 YearQuantity = Math.Round(osYearData.Where(y => y.ShipId == x.ShipId && y.ProjectId == x.ProjectId && y.DateMonth >= stMonth && y.DateMonth <= x.DateMonth).Sum(s => s.YearQuantity), 2),
                 YearWorkDays = Math.Round(osYearData.Where(y => y.ShipId == x.ShipId && y.ProjectId == x.ProjectId && y.DateMonth >= stMonth && y.DateMonth <= x.DateMonth).Sum(s => s.YearWorkDays), 2),
-                YearWorkHours = Math.Round(osYearData.Where(y => y.ShipId == x.ShipId && y.ProjectId == x.ProjectId && y.DateMonth >= stMonth && y.DateMonth <= x.DateMonth).Sum(s => s.YearWorkHours), 2),
+                //YearWorkHours = Math.Round(osYearData.Where(y => y.ShipId == x.ShipId && y.ProjectId == x.ProjectId && y.DateMonth >= stMonth && y.DateMonth <= x.DateMonth).Sum(s => s.YearWorkHours), 2),
                 SecUnitName = "广航局",
                 ThiUnitName = instinData.FirstOrDefault(y => y.Id == x.ProjectId)?.Name,
                 HeadUserName = usersData.FirstOrDefault(y => y.Id == x.ProjectId)?.Name,
