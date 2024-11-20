@@ -5964,7 +5964,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 ShipTypeName = shipTypeData.FirstOrDefault(y => y.ShipId == x.ShipId)?.Name,
                 EnterTime = x.EnterTime.ToString("yyyy-MM-dd"),
                 QuitTime = x.QuitTime.ToString("yyyy-MM-dd"),
-                MonthWorkHours = Math.Round(x.WorkingHours, 2),
+                //MonthWorkHours = Math.Round(x.WorkingHours, 2),
                 MonthWorkDays = x.ConstructionDays,
                 MonthQuantity = Math.Round(x.Production, 2),
                 MonthOutputVal = Math.Round(x.ProductionAmount, 2),
@@ -5974,7 +5974,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 //YearWorkHours = ownShipYearData.Any() && ownShipYearData.FirstOrDefault(y => y.ShipId == x.ShipId && y.ProjectId == x.ProjectId) != null ? Math.Round(ownShipYearData.FirstOrDefault(y => y.ShipId == x.ShipId && y.ProjectId == x.ProjectId).YearWorkHours, 2) : 0,
                 YearOutputVal = Math.Round(osYearData.Where(y => y.ShipId == x.ShipId && y.ProjectId == x.ProjectId && y.DateMonth >= stMonth && y.DateMonth <= x.DateMonth).Sum(s => s.YearOutputVal), 2),
                 YearQuantity = Math.Round(osYearData.Where(y => y.ShipId == x.ShipId && y.ProjectId == x.ProjectId && y.DateMonth >= stMonth && y.DateMonth <= x.DateMonth).Sum(s => s.YearQuantity), 2),
-                YearWorkDays = Math.Round(osYearData.Where(y => y.ShipId == x.ShipId && y.ProjectId == x.ProjectId && y.DateMonth >= stMonth && y.DateMonth <= x.DateMonth).Sum(s => s.YearWorkDays), 2),
+                //YearWorkDays = Math.Round(osYearData.Where(y => y.ShipId == x.ShipId && y.ProjectId == x.ProjectId && y.DateMonth >= stMonth && y.DateMonth <= x.DateMonth).Sum(s => s.YearWorkDays), 2),
                 YearWorkHours = Math.Round(osYearData.Where(y => y.ShipId == x.ShipId && y.ProjectId == x.ProjectId && y.DateMonth >= stMonth && y.DateMonth <= x.DateMonth).Sum(s => s.YearWorkHours), 2),
                 SecUnitName = "广航局",
                 ThiUnitName = instinData.FirstOrDefault(y => y.Id == x.ProjectId)?.Name,
@@ -5994,6 +5994,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 UpdateTime = string.IsNullOrEmpty(x.UpdateTime.ToString()) ? null : x.UpdateTime,
                 CreateTime = x.CreateTime,
                 DigDeep = x.DigDeep,
+                DateMonth = x.DateMonth,
                 BlowingDistance = x.BlowingDistance,
                 HaulDistance = x.HaulDistance
             }));
@@ -6020,10 +6021,42 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 var projectList = await _dbContext.Queryable<Project>().Where(x => x.IsDelete == 1).ToListAsync();
                 var sipMovementList = await _dbContext.Queryable<ShipMovement>().Where(x => x.IsDelete == 1).ToListAsync();
                 //船舶日报
-                var shipDailyData = await _dbShipDayReport.AsQueryable().Where(t => t.ProjectId == Guid.Empty && t.DateDay >= startTime && t.DateDay <= endTime && t.IsDelete == 1).ToListAsync();
+                var shipDaily = await _dbShipDayReport.AsQueryable().Where(t => t.IsDelete == 1).ToListAsync();
+                var shipDailyData = shipDaily.Where(t => t.ProjectId == Guid.Empty && t.DateDay >= startTime && t.DateDay <= endTime && t.IsDelete == 1).ToList();
 
                 foreach (var res in result)
                 {
+                    #region 船舶日报运转时间 或 其他字段统计
+                    ConvertHelper.TryParseFromDateMonth(res.DateMonth, out DateTime time);
+                    int sTime = 0;//开始日期
+                    int eTime = 0;//结束日期
+                    int dayyearst = 0;//开始年
+                    int dayyearet = 0;//结束年
+                    //跨年情况
+                    if (time.Month == 1)
+                    {
+                        //当月
+                        sTime = Convert.ToInt32($"{time.AddMonths(-1).Year}{time.AddMonths(-1).Month:D2}26");
+                        eTime = Convert.ToInt32($"{time.Year}{time.Month:D2}25");
+                        //当年
+                        dayyearst = Convert.ToInt32($"{time.AddMonths(-1).Year}{time.AddMonths(-1).Month:D2}26");
+                        dayyearet = Convert.ToInt32($"{res.DateMonth}25");
+                    }
+                    else
+                    {
+                        //当月
+                        sTime = Convert.ToInt32($"{time.Year}{time.AddMonths(-1).Month:D2}26");
+                        eTime = Convert.ToInt32($"{time.Year}{time.Month:D2}25");
+                        //当年
+                        dayyearst = Convert.ToInt32($"{time.AddYears(-1).Year}1226");
+                        dayyearet = Convert.ToInt32($"{res.DateMonth}25");
+                    }
+
+                    res.MonthWorkHours = Math.Round(shipDaily.Where(x => x.ProjectId == res.ProjectId && x.ShipId == res.OwnShipId && x.DateDay >= sTime && x.DateDay <= eTime).Sum(x => SqlFunc.ToDecimal(x.Dredge) + SqlFunc.ToDecimal(x.Sail) + SqlFunc.ToDecimal(x.BlowingWater) + SqlFunc.ToDecimal(x.SedimentDisposal) + SqlFunc.ToDecimal(x.BlowShore)), 2);
+
+                    res.YearWorkDays = Math.Round(shipDaily.Where(x => x.ProjectId == res.ProjectId && x.ShipId == res.OwnShipId && x.DateDay >= dayyearst && x.DateDay <= dayyearet).Sum(x => SqlFunc.ToDecimal(x.Dredge) + SqlFunc.ToDecimal(x.Sail) + SqlFunc.ToDecimal(x.BlowingWater) + SqlFunc.ToDecimal(x.SedimentDisposal) + SqlFunc.ToDecimal(x.BlowShore)), 2);
+                    #endregion
+
                     #region 新逻辑
                     var num = 0M;
                     if (projectList != null && projectList.Any() && sipMovementList != null && sipMovementList.Any())

@@ -132,6 +132,10 @@
         /// </summary>
         public int QDLXId { get; set; }
         /// <summary>
+        /// 日期
+        /// </summary>
+        public int DateMonth { get; set; }
+        /// <summary>
         /// 更新时间
         /// </summary>
         public DateTime? UpdateTime { get; set; }
