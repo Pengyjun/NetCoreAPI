@@ -63,7 +63,7 @@
         /// </summary>
         public decimal YearWorkHours { get; set; }
         /// <summary>
-        /// 年度运转时间
+        /// 年度施工天
         /// </summary>
         public decimal YearWorkDays { get; set; }
         /// <summary>
