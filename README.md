@@ -7,3 +7,4 @@ dotnet new hnkc.netcore.template --name <NAME>
 NAME是项目名称
 test
 test2
+test3
