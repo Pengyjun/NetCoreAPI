@@ -46,6 +46,7 @@ builder.Services.AddControllers(options =>
 
 }).AddJsonOptions(options =>
 {
+    //options.JsonSerializerOptions.PropertyNamingPolicy = null;
     options.JsonSerializerOptions.Converters.Add(new DateTimeJsonConverter("yyyy-MM-dd HH:mm:ss"));
 });
 builder.Services.AddHttpClient();

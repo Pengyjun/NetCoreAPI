@@ -5,12 +5,14 @@ using GDCMasterDataReceiveApi.Domain.Shared;
 using GDCMasterDataReceiveApi.Domain.Shared.Const;
 using GDCMasterDataReceiveApi.Domain.Shared.Enums;
 using GDCMasterDataReceiveApi.Domain.Shared.Utils;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using SqlSugar;
 using System.Text;
+using System.Text.Json.Nodes;
 using UtilsSharp;
 
 namespace GDCMasterDataReceiveApi.Filters
@@ -297,8 +299,18 @@ namespace GDCMasterDataReceiveApi.Filters
 
             #endregion
 
-            #region 是否开启审计日志
-            if (Convert.ToBoolean(AppsettingsHelper.GetValue("AuditLogs:IsOpen")))
+
+            #region 针对人员 机构 返回值处理
+            if (routeData[0].ToString().IndexOf("Person") >= 0)
+            {
+                var jsonObj=JsonConvert.DeserializeObject<MDMResponseResult>(((Microsoft.AspNetCore.Mvc.ObjectResult)context.Result).Value.ToJson());
+                context.Result= new ObjectResult(jsonObj);
+            }
+
+            #endregion
+
+                #region 是否开启审计日志
+                if (Convert.ToBoolean(AppsettingsHelper.GetValue("AuditLogs:IsOpen")))
             {
                 var redis = RedisUtil.Instance;
                 var res = await redis.GetAsync(context.HttpContext.TraceIdentifier.ToLower());
@@ -420,6 +432,8 @@ namespace GDCMasterDataReceiveApi.Filters
             }
             #endregion
 
+
+          
             await next.Invoke();
         }
         #endregion
