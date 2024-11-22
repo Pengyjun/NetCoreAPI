@@ -387,7 +387,10 @@ namespace GHElectronicFileApi.AopInterceptor
                     #endregion
 
                     #region 异步通知
-                    NotifyAsync(headParame, businessParame, logger);
+                    if (methodName != "PersonDataAsync" ||methodName!= "InstitutionDataAsync")
+                    {
+                        NotifyAsync(headParame, businessParame, logger);
+                    }
                     #endregion
             }
                 #endregion

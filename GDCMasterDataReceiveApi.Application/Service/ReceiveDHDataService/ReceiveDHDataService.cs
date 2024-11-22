@@ -358,7 +358,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveDHDataService
         {
             if (isAllDelete)
             {
-                await _dbContext.Deleteable<DHProjects>().ExecuteCommandAsync();
+                await _dbContext.Deleteable<DHVirtualProject>().ExecuteCommandAsync();
             }
             ResponseAjaxResult<bool> responseAjaxResult = new();
            
@@ -417,7 +417,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveDHDataService
         {
             if (isAllDelete)
             {
-                await _dbContext.Deleteable<DHProjects>().ExecuteCommandAsync();
+                await _dbContext.Deleteable<DHOpportunity>().ExecuteCommandAsync();
             }
             ResponseAjaxResult<bool> responseAjaxResult = new();
 
@@ -442,7 +442,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveDHDataService
                         item.UpdateTime = item.UpdatedAt;
                         item.Timestamp = Utils.GetTimeSpan();
                     }
-                    await _dbContext.Fastest<DHOpportunity>().BulkMergeAsync(insertTable);
+                    await _dbContext.Fastest<DHOpportunity>().BulkCopyAsync(insertTable);
                 }
 
                 responseAjaxResult.SuccessResult(true);
@@ -461,7 +461,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveDHDataService
         {
             if (isAllDelete)
             {
-                await _dbContext.Deleteable<DHProjects>().ExecuteCommandAsync();
+                await _dbContext.Deleteable<DHResearch>().ExecuteCommandAsync();
             }
             ResponseAjaxResult<bool> responseAjaxResult = new();
 
@@ -487,7 +487,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveDHDataService
                         item.UpdateTime = item.UpdatedAt;
                         item.Timestamp = Utils.GetTimeSpan();
                     }
-                    await _dbContext.Fastest<DHResearch>().BulkMergeAsync(insertTable);
+                    await _dbContext.Fastest<DHResearch>().BulkCopyAsync(insertTable);
                 }
 
                 responseAjaxResult.SuccessResult(true);
