@@ -31,6 +31,7 @@ using GDCMasterDataReceiveApi.Application.Contracts.Dto.ScientifiCNoProject;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.UnitMeasurement;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.ValueDomain;
 using GDCMasterDataReceiveApi.Domain.Models;
+using System;
 
 namespace GDCMasterDataReceiveApi.Application.Contracts.AutoMapper
 {
@@ -47,7 +48,7 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.AutoMapper
         {
             //mapperConfigurationExpression.CreateMap<PomCurrencyResponseDto, Currency>()
             //      .ForMember(x => x.PomId, y => y.MapFrom(u => u.Id));
-
+           
             //楼栋
             mapperConfigurationExpression.CreateMap<LouDongItem, LouDong>();
             //核算部门
@@ -92,6 +93,7 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.AutoMapper
             mapperConfigurationExpression.CreateMap<POPMangOrgItem, POPManagOrg>();
             //人员主数据
             mapperConfigurationExpression.CreateMap<Receive4AUser, User>();
+
             //项目类
             mapperConfigurationExpression.CreateMap<ProjectItem, Project>()
                 //.ForMember(dest => dest.ZOLDNAME_LISTItem, opt => opt.MapFrom(src => src.ZOLDNAME_LIST))
@@ -140,5 +142,8 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.AutoMapper
             #endregion
 
         }
+
+
+       
     }
 }

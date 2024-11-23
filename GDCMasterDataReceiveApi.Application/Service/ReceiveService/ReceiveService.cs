@@ -38,6 +38,7 @@ using GDCMasterDataReceiveApi.Domain.Shared.Utils;
 using Microsoft.Extensions.Logging;
 using SqlSugar;
 using SqlSugar.Extensions;
+using System;
 using System.Drawing.Drawing2D;
 using UtilsSharp;
 
@@ -2561,7 +2562,61 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
                     if (receiveUserRequestDto.OP_TYPE != null && receiveUserRequestDto.OP_TYPE.ToUpper() == "EDIT")
                     {
                         isExistUser.UpdateTime = DateTime.Now;
-                        var user = _mapper.Map<User>(receiveUserRequestDto.user);
+                        User user = new User()
+                        {
+                            Id = isExistUser.Id,
+                            ATTRIBUTE1 = string.IsNullOrWhiteSpace(receiveUserRequestDto.user.ATTRIBUTE1) == true ? isExistUser.ATTRIBUTE1 : receiveUserRequestDto.user.ATTRIBUTE1,
+                            ATTRIBUTE2 = string.IsNullOrWhiteSpace(receiveUserRequestDto.user.ATTRIBUTE2) == true ? isExistUser.ATTRIBUTE2 : receiveUserRequestDto.user.ATTRIBUTE2,
+                            ATTRIBUTE3 = string.IsNullOrWhiteSpace(receiveUserRequestDto.user.ATTRIBUTE3) == true ? isExistUser.ATTRIBUTE3 : receiveUserRequestDto.user.ATTRIBUTE3,
+                            ATTRIBUTE4 = string.IsNullOrWhiteSpace(receiveUserRequestDto.user.ATTRIBUTE4) == true ? isExistUser.ATTRIBUTE4 : receiveUserRequestDto.user.ATTRIBUTE4,
+                            ATTRIBUTE5 = string.IsNullOrWhiteSpace(receiveUserRequestDto.user.ATTRIBUTE5) == true ? isExistUser.ATTRIBUTE5 : receiveUserRequestDto.user.ATTRIBUTE5,
+                            BIRTHDAY = string.IsNullOrWhiteSpace(receiveUserRequestDto.user.BIRTHDAY) == true ? isExistUser.BIRTHDAY : receiveUserRequestDto.user.BIRTHDAY,
+                            CERT_NO = string.IsNullOrWhiteSpace(receiveUserRequestDto.user.CERT_NO) == true ? isExistUser.CERT_NO : receiveUserRequestDto.user.CERT_NO,
+
+                            CERT_TYPE = string.IsNullOrWhiteSpace(receiveUserRequestDto.user.CERT_TYPE) == true ? isExistUser.CERT_TYPE : receiveUserRequestDto.user.CERT_TYPE,
+                            DISPATCHUNITNAME = string.IsNullOrWhiteSpace(receiveUserRequestDto.user.DISPATCHUNITNAME) == true ? isExistUser.DISPATCHUNITNAME : receiveUserRequestDto.user.DISPATCHUNITNAME,
+                            DISPATCHUNITSHORTNAME = string.IsNullOrWhiteSpace(receiveUserRequestDto.user.DISPATCHUNITSHORTNAME) == true ? isExistUser.DISPATCHUNITSHORTNAME : receiveUserRequestDto.user.DISPATCHUNITSHORTNAME,
+                            EMAIL = string.IsNullOrWhiteSpace(receiveUserRequestDto.user.EMAIL) == true ? isExistUser.EMAIL : receiveUserRequestDto.user.EMAIL,
+                            EMP_CODE = string.IsNullOrWhiteSpace(receiveUserRequestDto.user.EMP_CODE) == true ? isExistUser.EMP_CODE : receiveUserRequestDto.user.EMP_CODE,
+                            EMP_SORT = string.IsNullOrWhiteSpace(receiveUserRequestDto.user.EMP_SORT) == true ? isExistUser.EMP_SORT : receiveUserRequestDto.user.EMP_SORT,
+                            EMP_STATUS = string.IsNullOrWhiteSpace(receiveUserRequestDto.user.EMP_STATUS) == true ? isExistUser.EMP_STATUS : receiveUserRequestDto.user.EMP_STATUS,
+
+                            EN_NAME = string.IsNullOrWhiteSpace(receiveUserRequestDto.user.EN_NAME) == true ? isExistUser.EN_NAME : receiveUserRequestDto.user.EN_NAME,
+                            ENTRY_TIME = string.IsNullOrWhiteSpace(receiveUserRequestDto.user.ENTRY_TIME) == true ? isExistUser.ENTRY_TIME : receiveUserRequestDto.user.ENTRY_TIME,
+                            HIGHESTGRADE = string.IsNullOrWhiteSpace(receiveUserRequestDto.user.HIGHESTGRADE) == true ? isExistUser.HIGHESTGRADE : receiveUserRequestDto.user.HIGHESTGRADE,
+                            EXTERNALUSER = string.IsNullOrWhiteSpace(receiveUserRequestDto.user.EXTERNALUSER) == true ? isExistUser.EXTERNALUSER : receiveUserRequestDto.user.EXTERNALUSER,
+                            HR_EMP_CODE = string.IsNullOrWhiteSpace(receiveUserRequestDto.user.HR_EMP_CODE) == true ? isExistUser.HR_EMP_CODE : receiveUserRequestDto.user.HR_EMP_CODE,
+                            JOB_NAME = string.IsNullOrWhiteSpace(receiveUserRequestDto.user.JOB_NAME) == true ? isExistUser.JOB_NAME : receiveUserRequestDto.user.JOB_NAME,
+                            JOB_TYPE = string.IsNullOrWhiteSpace(receiveUserRequestDto.user.JOB_TYPE) == true ? isExistUser.JOB_TYPE : receiveUserRequestDto.user.JOB_TYPE,
+                            NAME = string.IsNullOrWhiteSpace(receiveUserRequestDto.user.NAME) == true ? isExistUser.NAME : receiveUserRequestDto.user.NAME,
+                            NAME_SPELL = string.IsNullOrWhiteSpace(receiveUserRequestDto.user.NAME_SPELL) == true ? isExistUser.NAME_SPELL : receiveUserRequestDto.user.NAME_SPELL,
+                            NATION = string.IsNullOrWhiteSpace(receiveUserRequestDto.user.NATION) == true ? isExistUser.NATION : receiveUserRequestDto.user.NATION,
+                            NATIONALITY = string.IsNullOrWhiteSpace(receiveUserRequestDto.user.NATIONALITY) == true ? isExistUser.NATIONALITY : receiveUserRequestDto.user.NATIONALITY,
+                            USER_LOGIN = string.IsNullOrWhiteSpace(receiveUserRequestDto.user.USER_LOGIN) == true ? isExistUser.USER_LOGIN : receiveUserRequestDto.user.USER_LOGIN,
+
+
+
+                            PASSWORD = string.IsNullOrWhiteSpace(receiveUserRequestDto.user.CERT_NO) == true ? isExistUser.CERT_NO : receiveUserRequestDto.user.CERT_NO,
+                            OFFICE_DEPID = string.IsNullOrWhiteSpace(receiveUserRequestDto.user.CERT_NO) == true ? isExistUser.CERT_NO : receiveUserRequestDto.user.CERT_NO,
+                            POLITICSFACE = string.IsNullOrWhiteSpace(receiveUserRequestDto.user.CERT_NO) == true ? isExistUser.CERT_NO : receiveUserRequestDto.user.CERT_NO,
+                            POSITIONGRADENORM = string.IsNullOrWhiteSpace(receiveUserRequestDto.user.CERT_NO) == true ? isExistUser.CERT_NO : receiveUserRequestDto.user.CERT_NO,
+                            POSITION_GRADE = string.IsNullOrWhiteSpace(receiveUserRequestDto.user.CERT_NO) == true ? isExistUser.CERT_NO : receiveUserRequestDto.user.CERT_NO,
+                            SUB_DEPTS = string.IsNullOrWhiteSpace(receiveUserRequestDto.user.CERT_NO) == true ? isExistUser.CERT_NO : receiveUserRequestDto.user.CERT_NO,
+                            PHONE = string.IsNullOrWhiteSpace(receiveUserRequestDto.user.CERT_NO) == true ? isExistUser.CERT_NO : receiveUserRequestDto.user.CERT_NO,
+
+                            OFFICE_NUM = string.IsNullOrWhiteSpace(receiveUserRequestDto.user.OFFICE_NUM) == true ? isExistUser.OFFICE_NUM : receiveUserRequestDto.user.OFFICE_NUM,
+                            POSITIONS = string.IsNullOrWhiteSpace(receiveUserRequestDto.user.POSITIONS) == true ? isExistUser.POSITIONS : receiveUserRequestDto.user.POSITIONS,
+                            SAMEHIGHESTGRADE = string.IsNullOrWhiteSpace(receiveUserRequestDto.user.SAMEHIGHESTGRADE) == true ? isExistUser.SAMEHIGHESTGRADE : receiveUserRequestDto.user.SAMEHIGHESTGRADE,
+                            TEL = string.IsNullOrWhiteSpace(receiveUserRequestDto.user.TEL) == true ? isExistUser.TEL : receiveUserRequestDto.user.TEL,
+                            SNO = string.IsNullOrWhiteSpace(receiveUserRequestDto.user.SNO) == true ? isExistUser.SNO : receiveUserRequestDto.user.SNO,
+                            //Enable= string.IsNullOrWhiteSpace(receiveUserRequestDto.user.) == true ? isExistUser.CERT_NO : receiveUserRequestDto.user.CERT_NO,
+                            FAX = string.IsNullOrWhiteSpace(receiveUserRequestDto.user.FAX) == true ? isExistUser.FAX : receiveUserRequestDto.user.FAX,
+                            POSITION_NAME = string.IsNullOrWhiteSpace(receiveUserRequestDto.user.POSITION_NAME) == true ? isExistUser.POSITION_NAME : receiveUserRequestDto.user.POSITION_NAME,
+                            SEX = string.IsNullOrWhiteSpace(receiveUserRequestDto.user.CERT_NO) == true ? isExistUser.CERT_NO : receiveUserRequestDto.user.CERT_NO
+
+                                                                    
+                        };
+                        //var user = _mapper.Map<Receive4AUser, User>(receiveUserRequestDto.user);
                         await _dbContext.Updateable<User>(user).Where(x => x.EMP_CODE == isExistUser.EMP_CODE).IgnoreColumns(x => x.Id).ExecuteCommandAsync();
                         responseAjaxResult.Success();
                         return responseAjaxResult;
