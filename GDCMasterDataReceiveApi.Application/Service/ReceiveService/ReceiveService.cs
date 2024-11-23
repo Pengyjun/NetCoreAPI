@@ -37,6 +37,7 @@ using GDCMasterDataReceiveApi.Domain.Shared;
 using GDCMasterDataReceiveApi.Domain.Shared.Utils;
 using Microsoft.Extensions.Logging;
 using SqlSugar;
+using SqlSugar.Extensions;
 using System.Drawing.Drawing2D;
 using UtilsSharp;
 
@@ -2527,6 +2528,8 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
                     {
                         var user = _mapper.Map<User>(receiveUserRequestDto.user);
                         user.Enable = 1;
+                        user.Timestamp = Utils.GetTimeSpan();
+                        user.CreateTime = string.IsNullOrWhiteSpace(user.ENTRY_TIME)==true?DateTime.Now: user.ENTRY_TIME.ObjToDate();
                         user.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
                         await _dbContext.Insertable<User>(user).ExecuteCommandAsync();
 
@@ -2538,6 +2541,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
                         {
                             isExistUser.Enable = 1;
                         }
+                        isExistUser.UpdateTime = DateTime.Now;
                         await _dbContext.Updateable<User>(isExistUser).ExecuteCommandAsync();
                         responseAjaxResult.UpdateSuccess();
                     }
@@ -2556,6 +2560,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
                     }
                     if (receiveUserRequestDto.OP_TYPE != null && receiveUserRequestDto.OP_TYPE.ToUpper() == "EDIT")
                     {
+                        isExistUser.UpdateTime = DateTime.Now;
                         var user = _mapper.Map<User>(receiveUserRequestDto.user);
                         await _dbContext.Updateable<User>(user).Where(x => x.EMP_CODE == isExistUser.EMP_CODE).IgnoreColumns(x => x.Id).ExecuteCommandAsync();
                         responseAjaxResult.Success();
@@ -2571,7 +2576,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
                     {
                         isExistUser.Enable = 1;
                     }
-
+                    isExistUser.UpdateTime = DateTime.Now;
                     await _dbContext.Updateable<User>(isExistUser).Where(x => x.EMP_CODE == isExistUser.EMP_CODE).IgnoreColumns(x => x.Id).ExecuteCommandAsync();
                     responseAjaxResult.Success();
                 }
@@ -2609,7 +2614,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
                     var batchData = institutions.Where(x => insertOids.Contains(x.OID)).ToList();
                     foreach (var insetItem in batchData)
                     {
-                        insetItem.CreateTime = DateTime.Now;
+                        insetItem.CreateTime = string.IsNullOrWhiteSpace(insetItem.STARTDATE) == true?DateTime.Now:insetItem.STARTDATE.ObjToDate() ;
                         insetItem.Timestamp = Utils.GetTimeSpan();
                     }
                     await _dbContext.Fastest<Institution>().BulkCopyAsync(batchData);
@@ -2621,7 +2626,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
                     foreach (var insetItem in batchData)
                     {
                         insetItem.UpdateTime = DateTime.Now;
-                        insetItem.Timestamp = Utils.GetTimeSpan();
+                        //insetItem.Timestamp = Utils.GetTimeSpan();
                     }
                     await _dbContext.Fastest<Institution>().BulkUpdateAsync(batchData);
                 }
