@@ -33,6 +33,9 @@ using GDCMasterDataReceiveApi.Application.Contracts.IService.IReceiveService;
 using GDCMasterDataReceiveApi.Domain.Shared;
 using GDCMasterDataReceiveApi.Domain.Shared.Annotation;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json.Serialization;
+using Newtonsoft.Json;
+using System.Text.Json.Nodes;
 
 namespace GDCMasterDataReceiveApi.Controller
 {
@@ -347,9 +350,17 @@ namespace GDCMasterDataReceiveApi.Controller
         /// <returns></returns>
         [Route("/api/4A/Receive/Person")]
         [HttpPost]
-        public async Task<MDMResponseResult> PersonAsync([FromBody] ReceiveUserRequestDto receiveUserRequestDto)
+        public async Task<IActionResult> PersonAsync([FromBody] ReceiveUserRequestDto receiveUserRequestDto)
         {
-            return await _receiveService.PersonDataAsync(receiveUserRequestDto);
+            var res= await _receiveService.PersonDataAsync(receiveUserRequestDto);
+
+            return new JsonResult(res)
+            {
+                SerializerSettings =  new System.Text.Json.JsonSerializerOptions()
+                {
+                    PropertyNamingPolicy = null,
+                 }
+            }; 
         }
 
         /// <summary>

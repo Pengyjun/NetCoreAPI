@@ -221,7 +221,7 @@ namespace GDCMasterDataReceiveApi.Filters
             }
             catch (Exception ex)
             {
-                recordRequestInfo.Exceptions.ExceptionInfo = ex.Message + Environment.NewLine + ex.StackTrace;
+                //recordRequestInfo.Exceptions.ExceptionInfo = ex.Message + Environment.NewLine + ex.StackTrace;
                 logger.LogError(ex, "自定义接口入参格式化错误信息出现错误");
             }
             #endregion
@@ -300,16 +300,9 @@ namespace GDCMasterDataReceiveApi.Filters
             #endregion
 
 
-            #region 针对人员 机构 返回值处理
-            if (routeData[0].ToString().IndexOf("Person") >= 0)
-            {
-                var jsonObj=JsonConvert.DeserializeObject<MDMResponseResult>(((Microsoft.AspNetCore.Mvc.ObjectResult)context.Result).Value.ToJson());
-                context.Result= new ObjectResult(jsonObj);
-            }
+           
 
-            #endregion
-
-                #region 是否开启审计日志
+           #region 是否开启审计日志
                 if (Convert.ToBoolean(AppsettingsHelper.GetValue("AuditLogs:IsOpen")))
             {
                 var redis = RedisUtil.Instance;

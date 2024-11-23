@@ -2598,6 +2598,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
                 foreach (var item in institutions)
                 {
                     item.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
+                   
                 }
                 var institutiontOids = await _dbContext.Queryable<Institution>().Where(x => x.IsDelete == 1).Select(x => x.OID).ToListAsync();
                 var insertOids = institutions.Where(x => !institutiontOids.Contains(x.OID)).Select(x => x.OID).ToList();
@@ -2606,12 +2607,22 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
                 {
                     //插入操作
                     var batchData = institutions.Where(x => insertOids.Contains(x.OID)).ToList();
+                    foreach (var insetItem in batchData)
+                    {
+                        insetItem.CreateTime = DateTime.Now;
+                        insetItem.Timestamp = Utils.GetTimeSpan();
+                    }
                     await _dbContext.Fastest<Institution>().BulkCopyAsync(batchData);
                 }
                 if (updateOids.Any())
                 {
                     //更新操作
                     var batchData = institutions.Where(x => updateOids.Contains(x.OID)).ToList();
+                    foreach (var insetItem in batchData)
+                    {
+                        insetItem.UpdateTime = DateTime.Now;
+                        insetItem.Timestamp = Utils.GetTimeSpan();
+                    }
                     await _dbContext.Fastest<Institution>().BulkUpdateAsync(batchData);
                 }
                 responseAjaxResult.Success();
