@@ -5562,8 +5562,8 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
         private async Task<OwnerShipMonthReport?> GetOwnerShipMonthReportAsync(Guid projectId, Guid shipId, int dateMonth
             )
         {
-          return  await _dbOwnerShipMonthReport.GetFirstAsync(t => t.ProjectId == projectId && t.ShipId == shipId && t.DateMonth == dateMonth && t.IsDelete == 1);
-            
+            return await _dbOwnerShipMonthReport.GetFirstAsync(t => t.ProjectId == projectId && t.ShipId == shipId && t.DateMonth == dateMonth && t.IsDelete == 1);
+
         }
 
         /// <summary>
@@ -7660,7 +7660,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 var onSiteDays = dayRepList.Where(x => x.ProjectId == item.Key.ProjectId && x.ShipId == item.Key.ShipId && x.DateDay >= dayst && x.DateDay <= dayet).Count();
 
                 //运转时间
-                var workingHours = mRepShipsList.Where(x => x.ProjectId == item.Key.ProjectId && x.ShipId == item.Key.ShipId && x.DateMonth == nowMonth).Sum(x => x.WorkingHours);
+                var workingHours = Math.Round(dayRepList.Where(x => x.ProjectId == item.Key.ProjectId && x.ShipId == item.Key.ShipId && x.DateDay >= dayst && x.DateDay <= dayet).Sum(x => SqlFunc.ToDecimal(x.Dredge) + SqlFunc.ToDecimal(x.Sail) + SqlFunc.ToDecimal(x.BlowingWater) + SqlFunc.ToDecimal(x.SedimentDisposal) + SqlFunc.ToDecimal(x.BlowShore)), 2);
 
                 //产量*10000除运转时间 暂时不知道列名叫什么
                 var myPropertyRate1 = workingHours == 0 ? 0 : productionValue / workingHours * 10000;
@@ -7676,8 +7676,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 var yearOnSiteDays = dayRepList.Where(x => x.ProjectId == item.Key.ProjectId && x.ShipId == item.Key.ShipId).Count();
 
                 //运转时间 年累计
-                var yearWorkingHours = mRepShipsList.Where(x => x.ProjectId == item.Key.ProjectId && x.ShipId == item.Key.ShipId && x.DateMonth >= startMonth && x.DateMonth <= endMonth).Sum(x => x.WorkingHours);
-
+                var yearWorkingHours = Math.Round(dayRepList.Where(x => x.ProjectId == item.Key.ProjectId && x.ShipId == item.Key.ShipId).Sum(x => SqlFunc.ToDecimal(x.Dredge) + SqlFunc.ToDecimal(x.Sail) + SqlFunc.ToDecimal(x.BlowingWater) + SqlFunc.ToDecimal(x.SedimentDisposal) + SqlFunc.ToDecimal(x.BlowShore)), 2);
                 //产量*10000除运转时间 年累计 暂时不知道列名叫什么
                 var myPropertyRate2 = yearWorkingHours == 0 ? 0 : yearProductionValue / yearWorkingHours * 10000;
 
