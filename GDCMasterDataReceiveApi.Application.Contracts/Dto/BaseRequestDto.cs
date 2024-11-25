@@ -24,6 +24,10 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto
         /// </summary>
         public string? IgoreColumns { get; set; }
         /// <summary>
+        /// 表名
+        /// </summary>
+        public string? TableName { get; set; }
+        /// <summary>
         /// 
         /// </summary>
         public string? Oid { get; set; }

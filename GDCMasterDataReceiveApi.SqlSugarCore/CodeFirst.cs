@@ -1,5 +1,4 @@
-﻿using GDCMasterDataReceiveApi.Domain;
-using GDCMasterDataReceiveApi.Domain.Models;
+﻿using GDCMasterDataReceiveApi.Domain.Models;
 using SqlSugar;
 using System.Reflection;
 
@@ -90,8 +89,8 @@ namespace GDCMasterDataReceiveApi.SqlSugarCore
                     //Console.WriteLine(sql);
                 };
             });
-            Type[] types = typeof(BaseEntity<long>).Assembly.GetTypes()
-            .Where(it =>it.FullName.Contains("DHProjects")
+            Type[] types = typeof(CorresUnit).Assembly.GetTypes()
+            .Where(it =>it.FullName.Contains("GDCMasterDataReceiveApi.Domain.Models.MetaDataRelation")
             )
             .ToArray();
             db.CodeFirst.InitTables(types);

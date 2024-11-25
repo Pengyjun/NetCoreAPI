@@ -1,9 +1,13 @@
 ﻿using AutoMapper;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.GovernanceData;
 using GDCMasterDataReceiveApi.Application.Contracts.IService.GovernanceData;
 using GDCMasterDataReceiveApi.Domain.Models;
+using GDCMasterDataReceiveApi.Domain.Shared;
+using GDCMasterDataReceiveApi.Domain.Shared.Utils;
 using Microsoft.Extensions.Logging;
 using SqlSugar;
+using System.Data.Common;
 
 namespace GDCMasterDataReceiveApi.Application.Service.GovernanceData
 {
@@ -533,5 +537,195 @@ namespace GDCMasterDataReceiveApi.Application.Service.GovernanceData
             return flag;
         }
 
+        #region 数据资源
+        /// <summary>
+        /// 获取数据资源列表
+        /// </summary>
+        /// <returns></returns>
+        public async Task<ResponseAjaxResult<List<MetaDataDto>>> SearchMetaDataAsync(BaseRequestDto requestDto)
+        {
+            ResponseAjaxResult<List<MetaDataDto>> responseAjaxResult = new();
+            RefAsync<int> total = 0;
+
+            var dbColumns = _dbContext.DbMaintenance.GetColumnInfosByTableName(requestDto.TableName, false);
+            var dr = dbColumns
+                .WhereIF(!string.IsNullOrWhiteSpace(requestDto.KeyWords), x => x.DbColumnName.Contains(requestDto.KeyWords))
+                .Select(x => new MetaDataDto
+                {
+                    IsPrimaryKey = x.IsPrimarykey,
+                    ColumComment = x.ColumnDescription,
+                    ColumName = x.DbColumnName,
+                    DataLength = x.Length,
+                    DataType = x.OracleDataType,
+                    IsAllowToBeEmpty = x.IsNullable,
+                    DataDecimalPlaces = x.Scale
+                })
+                .ToList();
+
+            responseAjaxResult.Count = dr.Count;
+            responseAjaxResult.SuccessResult(dr.Skip((requestDto.PageIndex - 1) * requestDto.PageSize).Take(requestDto.PageSize).ToList());
+            return responseAjaxResult;
+        }
+        /// <summary>
+        /// 获取数据资源所有表
+        /// </summary>
+        /// <returns></returns>
+        public ResponseAjaxResult<List<Tables>> SearchTables()
+        {
+            ResponseAjaxResult<List<Tables>> responseAjaxResult = new();
+            List<Tables> dts = new();
+
+            var dti = _dbContext.DbMaintenance.GetTableInfoList(false);
+            foreach (var t in dti)
+            {
+                if (t.Name != "t_auditlogs")
+                {
+                    dts.Add(new Tables
+                    {
+                        TableName = t.Name
+                    });
+                }
+            }
+
+            responseAjaxResult.Count = dts.Count;
+            responseAjaxResult.SuccessResult(dts);
+            return responseAjaxResult;
+        }
+        /// <summary>
+        /// 增改数据资源列表
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        public async Task<ResponseAjaxResult<bool>> SaveMetaDataAsync(MetaDataRequestDto requestDto)
+        {
+            ResponseAjaxResult<bool> responseAjaxResult = new();
+
+            //传递过来的列名
+            var columnName = requestDto.Mds.ColumName.TrimAll();
+            List<MetaDataRelation> dtmdr = new();
+            var columnsInfo = _dbContext.DbMaintenance.GetColumnInfosByTableName(requestDto.TableName, false)
+                 .Where(x => x.DbColumnName == columnName)
+                 .Select(x => new MetaDataDto
+                 {
+                     IsPrimaryKey = x.IsPrimarykey,
+                     ColumComment = x.ColumnDescription,
+                     ColumName = x.DbColumnName,
+                     DataLength = x.Length,
+                     DataType = x.OracleDataType,
+                     IsAllowToBeEmpty = x.IsNullable,
+                     DataDecimalPlaces = x.Scale
+                 })
+                 .FirstOrDefault();
+
+            if (requestDto.Type == 1 && columnsInfo == null)//新增字段
+            {
+                // 列存在
+                if (_dbContext.DbMaintenance.IsAnyColumn(requestDto.TableName, requestDto.Mds.ColumName) == true)
+                {
+                    responseAjaxResult.SuccessResult(false, "列存在");
+                    return responseAjaxResult;
+                };
+
+                // 添加列操作
+                var dbColumn = new DbColumnInfo
+                {
+                    Length = requestDto.Mds.DataLength,
+                    IsPrimarykey = requestDto.Mds.IsPrimaryKey,
+                    TableName = requestDto.TableName,
+                    DataType = requestDto.Mds.DataType,
+                    IsNullable = requestDto.Mds.IsAllowToBeEmpty,
+                    DbColumnName = requestDto.Mds.ColumName.ToLower(),
+                };
+
+                var dtC1 = _dbContext.DbMaintenance.AddColumn(requestDto.TableName, dbColumn);
+                var dtC2 = _dbContext.DbMaintenance.AddColumnRemark(dbColumn.DbColumnName, requestDto.TableName, requestDto.Mds.ColumComment);
+
+                // 添加到副表
+                dtmdr.Add(new MetaDataRelation
+                {
+                    ColumnsLength = requestDto.Mds.DataLength,
+                    ColumnsName = requestDto.Mds.ColumName.ToPascal(),
+                    Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                    TableName = requestDto.TableName,
+                    CreateTime = DateTime.Now,
+                });
+
+                if (dtC1 == true && dtC2 == true) await _dbContext.Insertable(dtmdr).ExecuteCommandAsync();
+                responseAjaxResult.SuccessResult(true);
+            }
+            else if (requestDto.Type == 2 && columnsInfo != null)//修改字段
+            {
+                //根据表获取关联表初始字段长度
+                var columnLength = await _dbContext.Queryable<MetaDataRelation>()
+                    .Where(t => t.IsDelete == 1 && t.TableName == requestDto.TableName && t.ColumnsName == columnName)
+                    .FirstAsync();
+                if (requestDto.Mds.DataLength < columnLength.ColumnsLength)
+                {
+                    responseAjaxResult.SuccessResult(false, "字段:" + columnLength.ColumnsName + "小于初始设定长度:" + columnLength.ColumnsLength);
+                    return responseAjaxResult;
+                }
+
+                var dbColumn = new DbColumnInfo
+                {
+                    Length = requestDto.Mds.DataLength,
+                    IsPrimarykey = requestDto.Mds.IsPrimaryKey,
+                    TableName = requestDto.TableName,
+                    DataType = requestDto.Mds.DataType,
+                    IsNullable = requestDto.Mds.IsAllowToBeEmpty,
+                    DbColumnName = requestDto.Mds.ColumName.ToLower()
+                };
+                // 修改列操作  
+                var dtC1 = _dbContext.DbMaintenance.UpdateColumn(requestDto.TableName, dbColumn);
+                var dtC2 = _dbContext.DbMaintenance.AddColumnRemark(dbColumn.DbColumnName, requestDto.TableName, requestDto.Mds.ColumComment);
+
+                //副表增加字段
+                dtmdr.Add(new MetaDataRelation
+                {
+                    ColumnsLength = requestDto.Mds.DataLength,
+                    ColumnsName = requestDto.Mds.ColumName.ToPascal(),
+                    Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                    TableName = requestDto.TableName,
+                    UpdateTime = DateTime.Now
+                });
+
+                if (dtC1 == true && dtC2 == true) await _dbContext.Updateable(dtmdr).WhereColumns(t => t.Id).ExecuteCommandAsync();
+                responseAjaxResult.SuccessResult(true);
+            }
+            else
+            {
+                responseAjaxResult.SuccessResult(false);
+            }
+
+            return responseAjaxResult;
+        }
+        /// <summary>
+        /// 获取数据类型信息
+        /// </summary>
+        /// <returns></returns>
+        public async Task<ResponseAjaxResult<List<ColumnsInfo>>> GetColumnsTypesAsync()
+        {
+            ResponseAjaxResult<List<ColumnsInfo>> responseAjaxResult = new();
+            List<ColumnsInfo> rt = new();
+
+            var dt = await _dbContext.Ado.SqlQueryAsync<ColumnsInfoMapper>("SELECT TYPE_NAME,COLUMN_SIZE FROM SYSTYPEINFOS;");
+            rt = dt.GroupBy(x => new { x.TYPE_NAME, x.COLUMN_SIZE })
+                .Select(x => new ColumnsInfo
+                {
+                    ColumnSize = x.Key.COLUMN_SIZE,
+                    TypeName = x.Key.TYPE_NAME
+                }).ToList();
+
+            responseAjaxResult.SuccessResult(rt);
+            return responseAjaxResult;
+        }
+        #endregion
+
+        #region 数据质量
+
+        #endregion
+
+        #region 数据标准
+
+        #endregion
     }
 }
