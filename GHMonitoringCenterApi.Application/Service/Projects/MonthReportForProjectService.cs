@@ -74,7 +74,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
         /// <param name="stagingList">暂存的数据</param>
         /// <param name="dayRep">读取日报数据作为估算值</param>
         /// <returns></returns>
-        private async Task<List<ProjectWBSDto>> WBSConvertTree(Guid projectId, int? dateMonth, List<MonthReportForProjectBaseDataResponseDto> bData, bool isStaging, List<ProjectWBSDto> stagingList, bool dayRep)
+        private async Task<List<ProjectWBSDto>> WBSConvertTree(Guid projectId, int? dateMonth, List<MonthReportForProjectBaseDataResponseDto> bData, bool isStaging, List<ProjectWBSDto> stagingList, bool dayRep, bool IsExistZcAndMp)
         {
             /***
              * 1.获取请求数据
@@ -84,7 +84,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
              * 5.获取WBS数据
              * 6.获取基础数据(施工性质、产值属性、资源)
              */
-            var requestList = await GetWBSDataAsync(projectId, dateMonth, dayRep);
+            var requestList = await GetWBSDataAsync(projectId, dateMonth, dayRep, IsExistZcAndMp);
             var mReportList = requestList.Where(x => x.ValueType == ValueEnumType.NowMonth).OrderBy(x => x.DateMonth).ToList();
             var yReportList = requestList.Where(x => x.ValueType == ValueEnumType.NowYear).OrderBy(x => x.DateMonth).ToList();
             var klReportList = requestList.Where(x => x.ValueType == ValueEnumType.AccumulatedCommencement).OrderBy(x => x.DateMonth).ToList();
@@ -235,7 +235,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
         /// <param name="dateMonth">填报日期</param>
         /// <param name="dayRep">填报日期</param>
         /// <returns></returns>
-        private async Task<List<ProjectWBSDto>> GetWBSDataAsync(Guid pId, int? dateMonth, bool dayRep)
+        private async Task<List<ProjectWBSDto>> GetWBSDataAsync(Guid pId, int? dateMonth, bool dayRep, bool IsExistZcAndMp)
         {
             var pWBS = new List<ProjectWBSDto>();
             var calculatePWBS = new List<ProjectWBSDto>();
@@ -249,19 +249,6 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             //获取项目当年的汇率
             int yearParam = Convert.ToInt32(dateMonth.ToString().Substring(0, 4));
             var project = await _dbContext.Queryable<Project>().Where(t => t.Id == pId && t.IsDelete == 1).FirstAsync();
-            //var pRate = 1M;
-            //if (project != null)
-            //{
-            //    var val = await _dbContext.Queryable<CurrencyConverter>().Where(t => t.IsDelete == 1 && t.Year == yearParam && t.CurrencyId == project.CurrencyId.ToString()).FirstAsync();
-            //    if (val != null)
-            //    {
-            //        pRate = val.ExchangeRate.Value;
-            //    }
-            //    else
-            //    {
-            //        throw new Exception("未查到汇率");
-            //    }
-            //}
 
             //获取需要计算的月报填报数据 
             if (dateMonth != 0 && dateMonth.ToString().Length == 6)
@@ -591,6 +578,15 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     var model = nowYearMonthReport.Where(t => t.ProjectId == item.Key.ProjectId && t.ShipId == item.Key.ShipId && t.UnitPrice == item.Key.UnitPrice && t.ProjectWBSId == item.Key.ProjectWBSId).FirstOrDefault();
                     if (model != null)
                     {
+                        if (IsExistZcAndMp)//如果没有暂存 没有填报
+                        {
+                            dayRepYearAmount = dayReportList.Where(x => x.ProjectId.ToString() == model.ProjectId && (x.OwnerShipId == model.ShipId || x.SubShipId == model.ShipId) && x.UnitPrice == model.UnitPrice && x.ProjectWBSId == model.ProjectWBSId).Sum(x => x.UnitPrice * x.ActualDailyProduction);
+
+                            dayRepYearQuantity = dayReportList.Where(x => x.ProjectId.ToString() == model.ProjectId && (x.OwnerShipId == model.ShipId || x.SubShipId == model.ShipId) && x.UnitPrice == model.UnitPrice && x.ProjectWBSId == model.ProjectWBSId).Sum(x => x.ActualDailyProduction);
+
+                            dayRepYearOut = dayReportList.Where(x => x.ProjectId.ToString() == model.ProjectId && (x.OwnerShipId == model.ShipId || x.SubShipId == model.ShipId) && x.UnitPrice == model.UnitPrice && x.ProjectWBSId == model.ProjectWBSId).Sum(x => x.OutsourcingExpensesAmount);
+                        }
+
                         //合并计算 每条资源的年产值
                         model.YearCompleteProductionAmount = nowYearMonthReport.Where(t => t.ProjectId == item.Key.ProjectId && t.ShipId == item.Key.ShipId && t.UnitPrice == item.Key.UnitPrice && t.ProjectWBSId == item.Key.ProjectWBSId).Sum(x => x.CompleteProductionAmount) + dayRepYearAmount;
 
@@ -617,6 +613,15 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     var model = calculatePWBS.Where(t => t.ProjectId == item.Key.ProjectId && t.ShipId == item.Key.ShipId && t.UnitPrice == item.Key.UnitPrice && t.ProjectWBSId == item.Key.ProjectWBSId).FirstOrDefault();
                     if (model != null)
                     {
+                        if (IsExistZcAndMp)//如果没有暂存 没有填报
+                        {
+                            dayRepYearAmount = dayReportList.Where(x => x.ProjectId.ToString() == model.ProjectId && (x.OwnerShipId == model.ShipId || x.SubShipId == model.ShipId) && x.UnitPrice == model.UnitPrice && x.ProjectWBSId == model.ProjectWBSId).Sum(x => x.UnitPrice * x.ActualDailyProduction);
+
+                            dayRepYearQuantity = dayReportList.Where(x => x.ProjectId.ToString() == model.ProjectId && (x.OwnerShipId == model.ShipId || x.SubShipId == model.ShipId) && x.UnitPrice == model.UnitPrice && x.ProjectWBSId == model.ProjectWBSId).Sum(x => x.ActualDailyProduction);
+
+                            dayRepYearOut = dayReportList.Where(x => x.ProjectId.ToString() == model.ProjectId && (x.OwnerShipId == model.ShipId || x.SubShipId == model.ShipId) && x.UnitPrice == model.UnitPrice && x.ProjectWBSId == model.ProjectWBSId).Sum(x => x.OutsourcingExpensesAmount);
+                        }
+
                         //合并计算 每条资源的累计值
                         model.TotalCompleteProductionAmount = calculatePWBS.Where(t => t.ProjectId == item.Key.ProjectId && t.ShipId == item.Key.ShipId && t.UnitPrice == item.Key.UnitPrice && t.ProjectWBSId == item.Key.ProjectWBSId).Sum(x => x.CompleteProductionAmount) + dayRepYearAmount;
 
@@ -926,6 +931,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
 
             //是否获取项目日报数据统计作为当月月报估算值  如果当月月报没有填的情况下 系统计算上月26（含）至传入月25日产值日报
             bool dayRep = false;
+            bool IsExistZcAndMp = false;//是否暂存与月报都没有填 false 不处理  true没填
 
             if (monthReport != null)
             {
@@ -1007,7 +1013,11 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             if (result.IsCanSubmit && dateMonth == nowDateMonth)
             {
                 result.IsCanStaging = true;
-                if (stagingData == null || (!stagingData.IsEffectStaging) || stagingData.BizData == null) { }
+                if (stagingData == null && monthReport == null)//没有暂存数据 没有填报
+                {
+                    dayRep = false; IsExistZcAndMp = true;
+                }
+                else if (stagingData == null || (!stagingData.IsEffectStaging) || stagingData.BizData == null) { }
                 else
                 {
                     result.IsFromStaging = true; result.StatusText = "暂存中";
@@ -1047,7 +1057,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                                 item.TotalOutsourcingExpensesAmount = item.OutsourcingExpensesAmount;
                             }
                             dayRep = true;
-                            treeDetails = await WBSConvertTree(model.ProjectId, dateMonth, bData, result.IsFromStaging, resList, dayRep);
+                            treeDetails = await WBSConvertTree(model.ProjectId, dateMonth, bData, result.IsFromStaging, resList, dayRep, IsExistZcAndMp);
                             //树组合
                             result.TreeDetails = treeDetails;
 
@@ -1078,7 +1088,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             #endregion
 
             //取树
-            treeDetails = await WBSConvertTree(result.ProjectId, dateMonth, bData, result.IsFromStaging, new List<ProjectWBSDto>(), dayRep);
+            treeDetails = await WBSConvertTree(result.ProjectId, dateMonth, bData, result.IsFromStaging, new List<ProjectWBSDto>(), dayRep, IsExistZcAndMp);
 
             //树组合
             result.TreeDetails = treeDetails;
