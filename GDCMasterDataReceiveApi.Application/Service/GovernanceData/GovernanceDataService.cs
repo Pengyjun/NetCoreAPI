@@ -763,7 +763,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.GovernanceData
             RefAsync<int> total = 0;
 
             var dt = await _dbContext.Queryable<DataGruleSetting>()
-                .WhereIF(!string.IsNullOrWhiteSpace(requestDto.KeyWords), t => t.Column.Contains(requestDto.KeyWords) || t.Column.Contains(requestDto.KeyWords))
+                .WhereIF(!string.IsNullOrWhiteSpace(requestDto.KeyWords), t => t.Column.Contains(requestDto.KeyWords) || t.Table.Contains(requestDto.KeyWords))
                 .Where(t => t.IsDelete == 1 && requestDto.Type == (int)t.Type)
                 .OrderByDescending(t => t.Grade)
                 .ToPageListAsync(requestDto.PageIndex, requestDto.PageSize, total);
