@@ -1,13 +1,17 @@
 ﻿using AutoMapper;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto._4A.User;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.GovernanceData;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.ValueDomain;
 using GDCMasterDataReceiveApi.Application.Contracts.IService.GovernanceData;
 using GDCMasterDataReceiveApi.Domain.Models;
 using GDCMasterDataReceiveApi.Domain.Shared;
+using GDCMasterDataReceiveApi.Domain.Shared.Enums;
 using GDCMasterDataReceiveApi.Domain.Shared.Utils;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using SqlSugar;
+using UtilsSharp;
 
 namespace GDCMasterDataReceiveApi.Application.Service.GovernanceData
 {
@@ -21,7 +25,12 @@ namespace GDCMasterDataReceiveApi.Application.Service.GovernanceData
         private readonly ISqlSugarClient _dbContext;
         private readonly IMapper _mapper;
         private readonly ILogger<GovernanceDataService> logger;
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="dbContext"></param>
+        /// <param name="mapper"></param>
+        /// <param name="logger"></param>
         public GovernanceDataService(ISqlSugarClient dbContext, IMapper mapper, ILogger<GovernanceDataService> logger)
         {
             _dbContext = dbContext;
@@ -563,8 +572,12 @@ namespace GDCMasterDataReceiveApi.Application.Service.GovernanceData
                 })
                 .ToList();
 
+            if (!requestDto.IsFullExport)
+                responseAjaxResult.SuccessResult(dr.Skip((requestDto.PageIndex - 1) * requestDto.PageSize).Take(requestDto.PageSize).ToList());
+            else
+                responseAjaxResult.SuccessResult(dr.ToList());
+
             responseAjaxResult.Count = dr.Count;
-            responseAjaxResult.SuccessResult(dr.Skip((requestDto.PageIndex - 1) * requestDto.PageSize).Take(requestDto.PageSize).ToList());
             return responseAjaxResult;
         }
         /// <summary>
@@ -621,7 +634,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.GovernanceData
                     // 添加列操作
                     dbColumn = new DbColumnInfo
                     {
-                        Length = requestDto.Mds.DataLength,
+                        Length =/* requestDto.Mds.DataLength*/requestDto.Mds.DataType == "int" ? 0 : requestDto.Mds.DataLength,
                         IsPrimarykey = requestDto.Mds.IsPrimaryKey,
                         TableName = requestDto.TableName,
                         DataType = requestDto.Mds.DataType,
@@ -657,10 +670,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.GovernanceData
                     }
                     catch (Exception ex1)
                     {
-
-
                     }
-
                 }
 
             }
@@ -738,15 +748,343 @@ namespace GDCMasterDataReceiveApi.Application.Service.GovernanceData
             responseAjaxResult.SuccessResult(rt);
             return responseAjaxResult;
         }
-
-
         #endregion
 
         #region 数据质量
-        //public async Task<ResponseAjaxResult<string>> SearchTableDataAsync(DataQualityRequestDto requestDto)
-        //{
+        /// <summary>
+        /// 规则配置列表
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        public async Task<ResponseAjaxResult<List<DataQualityResponseDto>>> SearchTableDataAsync(DataQualityRequestDto requestDto)
+        {
+            ResponseAjaxResult<List<DataQualityResponseDto>> responseAjaxResult = new();
+            List<DataQualityResponseDto> rt = new();
+            RefAsync<int> total = 0;
 
-        //}
+            var dt = await _dbContext.Queryable<DataGruleSetting>()
+                .WhereIF(!string.IsNullOrWhiteSpace(requestDto.KeyWords), t => t.Column.Contains(requestDto.KeyWords) || t.Column.Contains(requestDto.KeyWords))
+                .Where(t => t.IsDelete == 1 && requestDto.Type == (int)t.Type)
+                .OrderByDescending(t => t.Grade)
+                .ToPageListAsync(requestDto.PageIndex, requestDto.PageSize, total);
+
+            foreach (var item in dt)
+            {
+                rt.Add(new DataQualityResponseDto
+                {
+                    Column = item.Column,
+                    Grade = item.Grade,
+                    Name = item.Name,
+                    Soure = item.Soure,
+                    Status = item.Status,
+                    Table = item.Table,
+                    Type = item.Type,
+                    Id = item.Id.ToString(),
+                    CreateTime = item.CreateTime.Value.ToString("yyyy-MM-dd HH:mm:ss")
+                });
+            }
+
+            responseAjaxResult.Count = total;
+            responseAjaxResult.SuccessResult(rt);
+            return responseAjaxResult;
+        }
+        /// <summary>
+        /// 保存数据规则配置
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        public async Task<ResponseAjaxResult<bool>> SaveDataQualityAsync(SaveDataQualityDto requestDto)
+        {
+            ResponseAjaxResult<bool> responseAjaxResult = new();
+            if (requestDto.DQ != null)
+            {
+                DataGruleSetting rt = new();
+
+                if (requestDto.Type == 1)
+                {
+                    var dquailty = await _dbContext.Queryable<DataGruleSetting>()
+                        .Where(t => t.IsDelete == 1 && requestDto.DQ.Type == t.Type && requestDto.DQ.Table == t.Table && requestDto.DQ.Column == t.Column)
+                        .FirstAsync();
+                    if (string.IsNullOrWhiteSpace(requestDto.DQ.Id))
+                    {
+                        rt = new DataGruleSetting
+                        {
+                            Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                            Column = requestDto.DQ.Column,
+                            CreateTime = DateTime.Now,
+                            Grade = requestDto.DQ.Grade,
+                            Name = requestDto.DQ.Name,
+                            Soure = requestDto.DQ.Soure,
+                            Status = requestDto.DQ.Status,
+                            Table = requestDto.DQ.Table,
+                            Type = requestDto.DQ.Type
+                        };
+
+                        await _dbContext.Insertable(rt).ExecuteCommandAsync();
+                        responseAjaxResult.SuccessResult(true);
+                        return responseAjaxResult;
+                    }
+                }
+                else if (requestDto.Type == 2)
+                {
+                    if (!string.IsNullOrWhiteSpace(requestDto.DQ.Id))
+                    {
+                        var dquailty = await _dbContext.Queryable<DataGruleSetting>()
+                            .Where(t => t.IsDelete == 1 && requestDto.DQ.Id == t.Id.ToString())
+                            .FirstAsync();
+                        if (dquailty != null)
+                        {
+                            dquailty.Column = requestDto.DQ.Column;
+                            dquailty.UpdateTime = DateTime.Now;
+                            dquailty.Grade = requestDto.DQ.Grade;
+                            dquailty.Name = requestDto.DQ.Name;
+                            dquailty.Soure = requestDto.DQ.Soure;
+                            dquailty.Status = requestDto.DQ.Status;
+                            dquailty.Table = requestDto.DQ.Table;
+                            dquailty.Type = requestDto.DQ.Type;
+
+                            await _dbContext.Updateable(dquailty).WhereColumns(x => x.Id).ExecuteCommandAsync();
+                            responseAjaxResult.SuccessResult(true);
+                            return responseAjaxResult;
+                        }
+                    }
+                }
+                else if (requestDto.Type == 3)
+                {
+                    if (!string.IsNullOrWhiteSpace(requestDto.DQ.Id))
+                    {
+                        var dquailty = await _dbContext.Queryable<DataGruleSetting>()
+                      .Where(t => t.IsDelete == 1 && requestDto.DQ.Id == t.Id.ToString())
+                      .FirstAsync();
+                        if (dquailty != null)
+                        {
+                            dquailty.IsDelete = 0;
+                            dquailty.DeleteTime = DateTime.Now;
+
+                            await _dbContext.Updateable(dquailty).ExecuteCommandAsync();
+                            responseAjaxResult.SuccessResult(true);
+                            return responseAjaxResult;
+                        }
+                    }
+                }
+            }
+            responseAjaxResult.SuccessResult(true);
+            return responseAjaxResult;
+        }
+        /// <summary>
+        /// 数据质量报告列表
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        public async Task<ResponseAjaxResult<List<DataReportResponseDto>>> SearchDataQualityReportAsync(DataReportRequestDto requestDto)
+        {
+            ResponseAjaxResult<List<DataReportResponseDto>> responseAjaxResult = new();
+            List<DataReportResponseDto> rt = new();
+
+            //获取规则当前表规则配置
+            var tbGrules = await _dbContext.Queryable<DataGruleSetting>()
+                .WhereIF(!string.IsNullOrWhiteSpace(requestDto.Table), t => t.Table == requestDto.Table)
+                .WhereIF(!string.IsNullOrWhiteSpace(requestDto.KeyWords), t => t.Name.Contains(requestDto.KeyWords))
+                .Where(t => t.IsDelete == 1 && t.Status == "1")
+                .ToListAsync();
+
+            var gtb = tbGrules.GroupBy(x => new { x.Table, x.Grade }).ToList();
+            foreach (var item in gtb)
+            {
+                var grules = tbGrules.Where(x => x.Table == item.Key.Table && x.Grade == item.Key.Grade).ToList();
+                //每张表的规则查询数据
+                foreach (var item2 in grules)
+                {
+                    string ids = string.Empty;
+                    if (item2.Type == GruleType.WZX)
+                    {
+                        ids = _dbContext.Queryable<object>()
+                            .AS(item2.Table.ToLower())
+                            .Where($@"{item2.Column.ToLower()} is null or {item2.Column.ToLower()} = ''")
+                            .Select($"CAST(id AS VARCHAR) AS id")
+                            .ToJson();
+                    }
+                    else if (item2.Type == GruleType.WYX)
+                    {
+                        ids = _dbContext.Queryable<object>()
+                            .AS(item2.Table.ToLower())
+                            .GroupBy(item2.Column.ToLower())
+                            .Having($"count({item2.Column.ToLower()}) > 1")
+                            .Select($"CAST(id AS VARCHAR) AS id")
+                            .ToList()
+                            .ToJson();
+                    }
+                    if (ids != null && ids.Any())
+                    {
+                        var js = JsonConvert.DeserializeObject<List<Dictionary<string, string>>>(ids);
+                        List<string> its = new List<string>();
+                        foreach (var it in js)
+                        {
+                            if (it.ContainsKey("id"))
+                            {
+                                its.Add(it["id"]);
+                            }
+                        }
+                        foreach (var item3 in its)
+                        {
+                            rt.Add(new DataReportResponseDto
+                            {
+                                Id = item3,
+                                Column = item2.Column,
+                                CreateTime = item2.CreateTime.Value.ToString("yyyy-MM-dd HH:mm:ss"),
+                                Grade = item2.Grade,
+                                Name = item2.Name,
+                                Soure = item2.Soure,
+                                Status = item2.Status,
+                                Table = item2.Table,
+                                Type = item2.Type
+                            });
+                        }
+                    }
+                }
+            }
+            rt = rt.OrderByDescending(x => x.Grade).ThenBy(x => x.Table).ToList();
+            responseAjaxResult.Count = rt.Count;
+
+            if (!requestDto.IsFullExport)
+            {
+                responseAjaxResult.SuccessResult(rt.Skip((requestDto.PageIndex - 1) * requestDto.PageSize).Take(requestDto.PageSize).ToList());
+            }
+            else
+            {
+                responseAjaxResult.SuccessResult(rt.ToList());
+            }
+            return responseAjaxResult;
+        }
+        /// <summary>
+        /// 获取用户详情
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<ResponseAjaxResult<UserSearchDetailsDto>> GetUserDetailsByIdAsync(string id)
+        {
+            ResponseAjaxResult<UserSearchDetailsDto> responseAjaxResult = new();
+            var rt = await _dbContext.Queryable<User>()
+                .Where(t => t.Id.ToString() == id && t.IsDelete == 1)
+                .Select(u => new UserSearchDetailsDto
+                {
+                    Id = u.Id.ToString(),
+                    Name = u.NAME,
+                    CertNo = u.CERT_NO,
+                    OfficeDepId = u.OFFICE_DEPID,
+                    Email = u.EMAIL,
+                    EmpCode = u.EMP_CODE,
+                    Enable = u.Enable == 1 ? "有效" : "禁用",
+                    Phone = u.PHONE,
+                    Attribute1 = u.ATTRIBUTE1,
+                    Attribute2 = u.ATTRIBUTE2,
+                    Attribute3 = u.ATTRIBUTE3,
+                    Attribute4 = u.ATTRIBUTE4,
+                    Attribute5 = u.ATTRIBUTE5,
+                    Birthday = u.BIRTHDAY,
+                    CertType = u.CERT_TYPE,
+                    DispatchunitName = u.DISPATCHUNITNAME,
+                    DispatchunitShortName = u.DISPATCHUNITSHORTNAME,
+                    EmpSort = u.EMP_SORT,
+                    EnName = u.EN_NAME,
+                    EntryTime = u.ENTRY_TIME,
+                    Externaluser = u.EXTERNALUSER,
+                    Fax = u.FAX,
+                    HighEstGrade = u.HIGHESTGRADE,
+                    HrEmpCode = u.HR_EMP_CODE,
+                    JobName = u.JOB_NAME,
+                    JobType = u.JOB_TYPE,
+                    NameSpell = u.NAME_SPELL,
+                    Nation = u.NATION,
+                    CountryRegion = u.NATIONALITY,
+                    Nationality = u.NATIONALITY,
+                    OfficeNum = u.OFFICE_NUM,
+                    PoliticsFace = u.POLITICSFACE,
+                    PositionGrade = u.POSITION_GRADE,
+                    PositionGradeNorm = u.POSITIONGRADENORM,
+                    PositionName = u.POSITION_NAME,
+                    Positions = u.POSITIONS,
+                    SameHighEstGrade = u.SAMEHIGHESTGRADE,
+                    Sex = u.SEX == "01" ? "男性" : "女性",
+                    Sno = u.SNO,
+                    UserInfoStatus = u.EMP_STATUS,
+                    SubDepts = u.SUB_DEPTS,
+                    Tel = u.TEL,
+                    UserLogin = u.USER_LOGIN,
+                    CreateTime = u.CreateTime,
+                    UpdateTime = u.UpdateTime,
+                    OwnerSystem = u.OwnerSystem
+                })
+                .FirstAsync();
+
+            responseAjaxResult.SuccessResult(rt);
+            return responseAjaxResult;
+        }
+        /// <summary>
+        /// 导出的数据
+        /// </summary>
+        /// <returns></returns>
+        public async Task<List<UserSearchDetailsDto>> GetUserInfosAsync()
+        {
+            //获取用户ids
+            var response = await SearchDataQualityReportAsync(new DataReportRequestDto { IsFullExport = true, Table = "t_user" });
+            var ids = response.Data.Select(x => x.Id).ToList();
+            //获取用户
+            var users = await _dbContext.Queryable<User>()
+                .Where(t => t.IsDelete == 1 && ids.Contains(t.Id.ToString()))
+                .Select(u => new UserSearchDetailsDto
+                {
+                    Id = u.Id.ToString(),
+                    Name = u.NAME,
+                    CertNo = u.CERT_NO,
+                    OfficeDepId = u.OFFICE_DEPID,
+                    Email = u.EMAIL,
+                    EmpCode = u.EMP_CODE,
+                    Enable = u.Enable == 1 ? "有效" : "禁用",
+                    Phone = u.PHONE,
+                    Attribute1 = u.ATTRIBUTE1,
+                    Attribute2 = u.ATTRIBUTE2,
+                    Attribute3 = u.ATTRIBUTE3,
+                    Attribute4 = u.ATTRIBUTE4,
+                    Attribute5 = u.ATTRIBUTE5,
+                    Birthday = u.BIRTHDAY,
+                    CertType = u.CERT_TYPE,
+                    DispatchunitName = u.DISPATCHUNITNAME,
+                    DispatchunitShortName = u.DISPATCHUNITSHORTNAME,
+                    EmpSort = u.EMP_SORT,
+                    EnName = u.EN_NAME,
+                    EntryTime = u.ENTRY_TIME,
+                    Externaluser = u.EXTERNALUSER,
+                    Fax = u.FAX,
+                    HighEstGrade = u.HIGHESTGRADE,
+                    HrEmpCode = u.HR_EMP_CODE,
+                    JobName = u.JOB_NAME,
+                    JobType = u.JOB_TYPE,
+                    NameSpell = u.NAME_SPELL,
+                    Nation = u.NATION,
+                    CountryRegion = u.NATIONALITY,
+                    Nationality = u.NATIONALITY,
+                    OfficeNum = u.OFFICE_NUM,
+                    PoliticsFace = u.POLITICSFACE,
+                    PositionGrade = u.POSITION_GRADE,
+                    PositionGradeNorm = u.POSITIONGRADENORM,
+                    PositionName = u.POSITION_NAME,
+                    Positions = u.POSITIONS,
+                    SameHighEstGrade = u.SAMEHIGHESTGRADE,
+                    Sex = u.SEX == "01" ? "男性" : "女性",
+                    Sno = u.SNO,
+                    UserInfoStatus = u.EMP_STATUS,
+                    SubDepts = u.SUB_DEPTS,
+                    Tel = u.TEL,
+                    UserLogin = u.USER_LOGIN,
+                    CreateTime = u.CreateTime,
+                    UpdateTime = u.UpdateTime,
+                    OwnerSystem = u.OwnerSystem
+                })
+                .ToListAsync();
+
+            return users;
+        }
         #endregion
 
         #region 数据标准
@@ -764,6 +1102,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.GovernanceData
                   .ToListAsync();
             valueDomainTypeList = valueDomainTypeList.GroupBy(i => i.Desc, (ii, key) => key.OrderByDescending(x => x.Desc).First()).ToList();
 
+            responseAjaxResult.Count = valueDomainTypeList.Count;
             responseAjaxResult.SuccessResult(valueDomainTypeList);
             return responseAjaxResult;
         }
@@ -778,18 +1117,27 @@ namespace GDCMasterDataReceiveApi.Application.Service.GovernanceData
             RefAsync<int> total = 0;
 
             var drt = await _dbContext.Queryable<ValueDomain>()
+                  .WhereIF(!string.IsNullOrWhiteSpace(requestDto.KeyWords), t => t.ZDOM_VALUE.Contains(requestDto.KeyWords) || t.ZDOM_NAME.Contains(requestDto.KeyWords))
                   .Where(t => t.IsDelete == 1 && t.ZDOM_CODE == requestDto.Code)
                   .Select(t => new DataStardardDto
                   {
+                      Id = t.Id.ToString(),
                       CreateTime = t.CreateTime.Value.ToString("yyyy-MM-dd HH:mm:ss"),
                       TypeCode = t.ZDOM_CODE,
                       TypeName = t.ZDOM_DESC,
                       StardardCode = t.ZDOM_VALUE,
                       StardardName = t.ZDOM_NAME,
-                      StatusName = "1"
+                      StatusName = "1",
+                      UTime = t.UpdateTime
                   })
                   .ToPageListAsync(requestDto.PageIndex, requestDto.PageSize, total);
 
+            foreach (var item in drt)
+            {
+                item.UpdateTime = string.IsNullOrWhiteSpace(item.UTime.ToString()) ? null : item.UTime.Value.ToString("yyyy-MM-dd HH:mm:ss");
+            }
+
+            responseAjaxResult.Count = total;
             responseAjaxResult.SuccessResult(drt);
             return responseAjaxResult;
         }
@@ -844,19 +1192,18 @@ namespace GDCMasterDataReceiveApi.Application.Service.GovernanceData
                         var uvd = vdomains.FirstOrDefault(x => x.Id.ToString() == requestDto.Vd.Id);
                         if (uvd != null)
                         {
-                            tabVd.Id = uvd.Id;
-                            tabVd.ZCHTIME = uvd.ZCHTIME;
-                            tabVd.ZDOM_CODE = uvd.ZDOM_VALUE;
-                            tabVd.ZDOM_DESC = uvd.ZDOM_VALUE;
-                            tabVd.ZDOM_VALUE = uvd.ZDOM_CODE;
-                            tabVd.ZDOM_NAME = uvd.ZDOM_DESC;
-                            tabVd.ZDOM_LEVEL = uvd.ZDOM_DESC;
-                            tabVd.ZDOM_SUP = uvd.ZDOM_DESC;
-                            tabVd.ZREMARKS = uvd.ZDOM_DESC;
-                            tabVd.ZVERSION = uvd.ZDOM_DESC;
-                            tabVd.ZSTATE = "1";
-                            tabVd.UpdateTime = DateTime.Now;
-                            await _dbContext.Updateable(tabVd).ExecuteCommandAsync();
+                            uvd.ZCHTIME = requestDto.Vd.ZCHTIME;
+                            uvd.ZDOM_CODE = requestDto.Vd.ZDOM_CODE;
+                            uvd.ZDOM_DESC = requestDto.Vd.ZDOM_DESC;
+                            uvd.ZDOM_VALUE = requestDto.Vd.ZDOM_VALUE;
+                            uvd.ZDOM_NAME = requestDto.Vd.ZDOM_NAME;
+                            uvd.ZDOM_LEVEL = requestDto.Vd.ZDOM_LEVEL;
+                            uvd.ZDOM_SUP = requestDto.Vd.ZDOM_SUP;
+                            uvd.ZREMARKS = requestDto.Vd.ZREMARKS;
+                            uvd.ZVERSION = requestDto.Vd.ZVERSION;
+                            uvd.ZSTATE = "1";
+                            uvd.UpdateTime = DateTime.Now;
+                            await _dbContext.Updateable(uvd).WhereColumns(x => x.Id).ExecuteCommandAsync();
                             responseAjaxResult.SuccessResult(true);
                             return responseAjaxResult;
                         }

@@ -1,4 +1,5 @@
 ﻿using GDCMasterDataReceiveApi.Application.Contracts.Dto;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto._4A.User;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.GovernanceData;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.ValueDomain;
 using GDCMasterDataReceiveApi.Application.Contracts.IService.GovernanceData;
@@ -16,7 +17,7 @@ namespace GDCMasterDataReceiveApi.Controller
     [Route("api/[controller]")]
     [ApiController]
     [AllowAnonymous]
-    public class GovernanceDataController : ControllerBase
+    public class GovernanceDataController : BaseController
     {
 
         #region 依赖注入
@@ -83,7 +84,57 @@ namespace GDCMasterDataReceiveApi.Controller
         #endregion
 
         #region 数据质量
+        /// <summary>
+        /// 规则配置列表
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        [HttpGet("SearchTableData")]
+        public async Task<ResponseAjaxResult<List<DataQualityResponseDto>>> SearchTableDataAsync([FromQuery] DataQualityRequestDto requestDto)
+        {
+            return await governanceDataService.SearchTableDataAsync(requestDto);
+        }
+        /// <summary>
+        /// 保存数据规则配置
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        [HttpPost("SaveDataQuality")]
+        public async Task<ResponseAjaxResult<bool>> SaveDataQualityAsync([FromBody] SaveDataQualityDto requestDto)
+        {
+            return await governanceDataService.SaveDataQualityAsync(requestDto);
+        }
+        /// <summary>
+        /// 数据质量报告列表
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        [HttpGet("SearchDataQualityReport")]
+        public async Task<ResponseAjaxResult<List<DataReportResponseDto>>> SearchDataQualityReportAsync([FromQuery] DataReportRequestDto requestDto)
+        {
+            return await governanceDataService.SearchDataQualityReportAsync(requestDto);
+        }
+        /// <summary>
+        /// 导出数据质量报告列表
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("ExportQualityReport")]
+        public async Task<IActionResult> ExportQualityReportAsync()
+        {
+            var data = await governanceDataService.GetUserInfosAsync();
 
+            return await ExcelImportAsync(data, null, $"{DateTime.Now:yyyyMMdd}");
+        }
+        /// <summary>
+        /// 获取用户详情
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet("GetUserDetailsById")]
+        public async Task<ResponseAjaxResult<UserSearchDetailsDto>> GetUserDetailsByIdAsync([FromQuery] string id)
+        {
+            return await governanceDataService.GetUserDetailsByIdAsync(id);
+        }
         #endregion
 
         #region 数据标准

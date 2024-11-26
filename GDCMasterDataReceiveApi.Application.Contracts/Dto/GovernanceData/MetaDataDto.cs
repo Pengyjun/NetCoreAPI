@@ -35,10 +35,6 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.GovernanceData
         /// 数据长度 自动带出 可更改
         /// </summary>
         public int DataLength { get; set; }
-        //{
-        //    get { if (DataType == "int") { DataLength = 0; } return 0; }
-        //    set { }
-        //}
         /// <summary>
         /// 数据小数位
         /// </summary>

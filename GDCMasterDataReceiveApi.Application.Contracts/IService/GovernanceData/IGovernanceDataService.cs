@@ -1,4 +1,5 @@
 ﻿using GDCMasterDataReceiveApi.Application.Contracts.Dto;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto._4A.User;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.GovernanceData;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.ValueDomain;
 using GDCMasterDataReceiveApi.Domain.Shared;
@@ -47,7 +48,35 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.IService.GovernanceData
         #endregion
 
         #region 数据质量
-
+        /// <summary>
+        /// 数据质量列表
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        Task<ResponseAjaxResult<List<DataQualityResponseDto>>> SearchTableDataAsync(DataQualityRequestDto requestDto);
+        /// <summary>
+        /// 保存数据规则配置
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        Task<ResponseAjaxResult<bool>> SaveDataQualityAsync(SaveDataQualityDto requestDto);
+        /// <summary>
+        /// 数据质量报告列表
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        Task<ResponseAjaxResult<List<DataReportResponseDto>>> SearchDataQualityReportAsync(DataReportRequestDto requestDto);
+        /// <summary>
+        /// 获取用户详情
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        Task<ResponseAjaxResult<UserSearchDetailsDto>> GetUserDetailsByIdAsync(string id);
+        /// <summary>
+        /// 导出用户需要的数据
+        /// </summary>
+        /// <returns></returns>
+        Task<List<UserSearchDetailsDto>> GetUserInfosAsync();
         #endregion
 
         #region 数据标准

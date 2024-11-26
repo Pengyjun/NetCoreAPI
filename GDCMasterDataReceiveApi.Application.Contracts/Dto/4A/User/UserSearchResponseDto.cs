@@ -63,7 +63,8 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto._4A.User
         [ExcelIgnore]
         public List<string>? Ids { get; set; }
 
-        [ExcelIgnore]
+        [Description("Id")]
+        [DisplayName("人员编码")]
         public string Id { get; set; }
         /// <summary>
         /// 人员编码  必填,HR 系统中定义的人员唯  一编码，默认用户名

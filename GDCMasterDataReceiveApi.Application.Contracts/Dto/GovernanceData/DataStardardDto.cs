@@ -6,6 +6,10 @@
     public class DataStardardDto
     {
         /// <summary>
+        /// 
+        /// </summary>
+        public string Id { get; set; }
+        /// <summary>
         /// 类别编码
         /// </summary>
         public string? TypeCode { get; set; }
@@ -29,6 +33,14 @@
         /// 创建时间
         /// </summary>
         public string? CreateTime { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
+        public string? UpdateTime { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
+        public DateTime? UTime { get; set; }
     }
     /// <summary>
     /// 请求dto
