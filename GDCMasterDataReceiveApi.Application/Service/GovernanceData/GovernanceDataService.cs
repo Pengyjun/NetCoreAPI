@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Dm.filter;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto._4A.User;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.GovernanceData;
@@ -11,6 +12,7 @@ using GDCMasterDataReceiveApi.Domain.Shared.Utils;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using SqlSugar;
+using System.Net.NetworkInformation;
 using UtilsSharp;
 
 namespace GDCMasterDataReceiveApi.Application.Service.GovernanceData
@@ -1024,7 +1026,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.GovernanceData
         /// 导出的数据
         /// </summary>
         /// <returns></returns>
-        public async Task<List<UserSearchDetailsDto>> GetUserInfosAsync()
+        public async Task<List<DataReportReportResponse>> GetUserInfosAsync()
         {
             //获取用户ids
             var response = await SearchDataQualityReportAsync(new DataReportRequestDto { IsFullExport = true, Table = "t_user" });
@@ -1032,58 +1034,63 @@ namespace GDCMasterDataReceiveApi.Application.Service.GovernanceData
             //获取用户
             var users = await _dbContext.Queryable<User>()
                 .Where(t => t.IsDelete == 1 && ids.Contains(t.Id.ToString()))
-                .Select(u => new UserSearchDetailsDto
+                .Select(u => new DataReportReportResponse
                 {
-                    Id = u.Id.ToString(),
                     Name = u.NAME,
-                    CertNo = u.CERT_NO,
-                    OfficeDepId = u.OFFICE_DEPID,
-                    Email = u.EMAIL,
                     EmpCode = u.EMP_CODE,
-                    Enable = u.Enable == 1 ? "有效" : "禁用",
-                    Phone = u.PHONE,
-                    Attribute1 = u.ATTRIBUTE1,
-                    Attribute2 = u.ATTRIBUTE2,
-                    Attribute3 = u.ATTRIBUTE3,
-                    Attribute4 = u.ATTRIBUTE4,
-                    Attribute5 = u.ATTRIBUTE5,
-                    Birthday = u.BIRTHDAY,
-                    CertType = u.CERT_TYPE,
-                    DispatchunitName = u.DISPATCHUNITNAME,
-                    DispatchunitShortName = u.DISPATCHUNITSHORTNAME,
-                    EmpSort = u.EMP_SORT,
-                    EnName = u.EN_NAME,
-                    EntryTime = u.ENTRY_TIME,
-                    Externaluser = u.EXTERNALUSER,
-                    Fax = u.FAX,
-                    HighEstGrade = u.HIGHESTGRADE,
-                    HrEmpCode = u.HR_EMP_CODE,
-                    JobName = u.JOB_NAME,
-                    JobType = u.JOB_TYPE,
-                    NameSpell = u.NAME_SPELL,
-                    Nation = u.NATION,
-                    CountryRegion = u.NATIONALITY,
-                    Nationality = u.NATIONALITY,
-                    OfficeNum = u.OFFICE_NUM,
-                    PoliticsFace = u.POLITICSFACE,
-                    PositionGrade = u.POSITION_GRADE,
-                    PositionGradeNorm = u.POSITIONGRADENORM,
-                    PositionName = u.POSITION_NAME,
-                    Positions = u.POSITIONS,
-                    SameHighEstGrade = u.SAMEHIGHESTGRADE,
-                    Sex = u.SEX == "01" ? "男性" : "女性",
-                    Sno = u.SNO,
                     UserInfoStatus = u.EMP_STATUS,
-                    SubDepts = u.SUB_DEPTS,
-                    Tel = u.TEL,
-                    UserLogin = u.USER_LOGIN,
-                    CreateTime = u.CreateTime,
-                    UpdateTime = u.UpdateTime,
-                    OwnerSystem = u.OwnerSystem
+                    OfficeDepId = u.OFFICE_DEPID,
                 })
                 .ToListAsync();
 
+            //机构信息
+            var institutions = await _dbContext.Queryable<Institution>()
+                .Where(t => t.IsDelete == 1)
+                .Select(t => new InstutionRespDto { Oid = t.OID, PoId = t.POID, Grule = t.GRULE, Name = t.NAME, OCode = t.OCODE })
+                .ToListAsync();
+
+            //值域信息
+            var us = users.Where(x => !string.IsNullOrWhiteSpace(x.UserInfoStatus)).Select(x => x.UserInfoStatus).ToList();
+            var valDomain = await _dbContext.Queryable<ValueDomain>()
+                .Where(t => !string.IsNullOrWhiteSpace(t.ZDOM_CODE))
+                .Select(t => new VDomainRespDto { ZDOM_CODE = t.ZDOM_CODE, ZDOM_DESC = t.ZDOM_DESC, ZDOM_VALUE = t.ZDOM_VALUE, ZDOM_NAME = t.ZDOM_NAME, ZDOM_LEVEL = t.ZDOM_LEVEL })
+                .ToListAsync();
+            var uStatus = valDomain.Where(x => us.Contains(x.ZDOM_VALUE) && x.ZDOM_CODE == "ZEMPSTATE").ToList();
+            foreach (var uInfo in users)
+            {
+                uInfo.UserInfoStatus = uStatus.FirstOrDefault(x => x.ZDOM_VALUE == uInfo.UserInfoStatus)?.ZDOM_NAME;
+                uInfo.CompanyName = GetUserCompany(uInfo.OfficeDepId, institutions);
+                uInfo.OfficeDepIdName = institutions.FirstOrDefault(x => x.Oid == uInfo.OfficeDepId)?.Name;
+            }
             return users;
+        } /// <summary>
+          /// 获取用户所属公司
+          /// </summary>
+          /// <param name="oid"></param>
+          /// <param name="uInstutionDtos"></param>
+          /// <returns></returns>
+        private string GetUserCompany(string? oid, List<InstutionRespDto> uInstutionDtos)
+        {
+            var uInsInfo = uInstutionDtos.FirstOrDefault(x => x.Oid == oid);
+            if (uInsInfo != null)
+            {
+                //获取用户机构全部规则  反查机构信息
+                if (!string.IsNullOrWhiteSpace(uInsInfo.Grule))
+                {
+                    var ruleIds = uInsInfo.Grule.Trim('-').Split('-').ToList();
+                    var companyNames = ruleIds
+                        .Select(id => uInstutionDtos.FirstOrDefault(inst => inst.Oid == id))
+                        .Where(inst => inst != null)
+                        .Select(inst => inst?.Name)
+                        .ToList();
+
+                    if (companyNames.Any())
+                    {
+                        return string.Join("/", companyNames);
+                    }
+                }
+            }
+            return string.Empty;
         }
         #endregion
 

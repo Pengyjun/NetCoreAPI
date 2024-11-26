@@ -76,7 +76,7 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.IService.GovernanceData
         /// 导出用户需要的数据
         /// </summary>
         /// <returns></returns>
-        Task<List<UserSearchDetailsDto>> GetUserInfosAsync();
+        Task<List<DataReportReportResponse>> GetUserInfosAsync();
         #endregion
 
         #region 数据标准

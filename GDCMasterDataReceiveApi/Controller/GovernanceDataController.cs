@@ -7,6 +7,7 @@ using GDCMasterDataReceiveApi.Domain.Shared;
 using GDCMasterDataReceiveApi.Domain.Shared.Annotation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using SqlSugar;
 
 namespace GDCMasterDataReceiveApi.Controller
 {
@@ -122,8 +123,9 @@ namespace GDCMasterDataReceiveApi.Controller
         public async Task<IActionResult> ExportQualityReportAsync()
         {
             var data = await governanceDataService.GetUserInfosAsync();
-
-            return await ExcelImportAsync(data, null, $"{DateTime.Now:yyyyMMdd}");
+            List<string> ignoreColumns = new();
+            ignoreColumns.Add("OfficeDepId");
+            return await ExcelImportAsync(data, ignoreColumns, $"{DateTime.Now:yyyyMMdd}");
         }
         /// <summary>
         /// 获取用户详情
