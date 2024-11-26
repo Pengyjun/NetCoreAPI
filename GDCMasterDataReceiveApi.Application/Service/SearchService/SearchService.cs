@@ -1244,6 +1244,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                 institutions = await _dbContext.Queryable<Institution>()
                 .WhereIF(!string.IsNullOrWhiteSpace(requestDto.KeyWords), t => t.OID.Contains(requestDto.KeyWords) || t.NAME.Contains(requestDto.KeyWords))
                 .WhereIF(!string.IsNullOrWhiteSpace(requestDto.Oid), t => t.OID == requestDto.Oid)
+                .WhereIF(string.IsNullOrWhiteSpace(requestDto.KeyWords), t => t.OID == requestDto.Oid)
                 .WhereIF(requestDto.IsDrilldown == true, t => Convert.ToDateTime(t.CreateTime).Date == Convert.ToDateTime(requestDto.DrilldownDate))
                 .Where(jsonWhere)
                 .Where(t => t.IsDelete == 1)
