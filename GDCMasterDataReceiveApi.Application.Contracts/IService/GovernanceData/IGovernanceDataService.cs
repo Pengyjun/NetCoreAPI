@@ -1,5 +1,6 @@
 ﻿using GDCMasterDataReceiveApi.Application.Contracts.Dto;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.GovernanceData;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.ValueDomain;
 using GDCMasterDataReceiveApi.Domain.Shared;
 using GDCMasterDataReceiveApi.Domain.Shared.Annotation;
 
@@ -50,7 +51,11 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.IService.GovernanceData
         #endregion
 
         #region 数据标准
-
+        /// <summary>
+        /// 获取值域分类
+        /// </summary>
+        /// <returns></returns>
+        Task<ResponseAjaxResult<List<ValueDomainTypeResponseDto>>> SearchValueDomainTypeAsync(); 
         #endregion
     }
 }

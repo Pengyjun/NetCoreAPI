@@ -1,4 +1,6 @@
-﻿namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.GovernanceData
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.GovernanceData
 {
     /// <summary>
     /// 
@@ -32,11 +34,31 @@
         /// <summary>
         /// 数据长度 自动带出 可更改
         /// </summary>
-        public int DataLength { get; set; }
+        //public int DataLength;
+
+
+
+
+        //private int Length;
+
+        public int DataLength
+        {
+            get { if (DataType == "int") { DataLength = 0; } return 0; }
+            set { }
+        }
+
+
         /// <summary>
         /// 数据小数位
         /// </summary>
         public int DataDecimalPlaces { get; set; }
+
+        /// <summary>
+        /// 默认值
+        /// </summary>
+        public string? DefaultValue { get; set; }
+
+      
     }
     /// <summary>
     /// 
@@ -44,7 +66,7 @@
     public class MetaDataRequestDto
     {
         /// <summary>
-        /// 增还是改  1 增 2 改
+        /// 增还是改  1 增 2 改   3是删除
         /// </summary>
         public int Type { get; set; }
         /// <summary>

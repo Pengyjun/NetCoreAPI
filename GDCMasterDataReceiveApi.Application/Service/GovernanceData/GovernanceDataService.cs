@@ -1,12 +1,14 @@
 ﻿using AutoMapper;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.GovernanceData;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.ValueDomain;
 using GDCMasterDataReceiveApi.Application.Contracts.IService.GovernanceData;
 using GDCMasterDataReceiveApi.Domain.Models;
 using GDCMasterDataReceiveApi.Domain.Shared;
 using GDCMasterDataReceiveApi.Domain.Shared.Utils;
 using Microsoft.Extensions.Logging;
 using SqlSugar;
+using SqlSugar.Extensions;
 using System.Data.Common;
 
 namespace GDCMasterDataReceiveApi.Application.Service.GovernanceData
@@ -574,21 +576,16 @@ namespace GDCMasterDataReceiveApi.Application.Service.GovernanceData
         {
             ResponseAjaxResult<List<Tables>> responseAjaxResult = new();
             List<Tables> dts = new();
-
-            var dti = _dbContext.DbMaintenance.GetTableInfoList(false);
-            foreach (var t in dti)
-            {
-                if (t.Name != "t_auditlogs")
+            List<string> ignoreTable = new List<string>();
+            ignoreTable.Add("t_auditlogs");
+            var dti = _dbContext.DbMaintenance.GetTableInfoList(false).Where(x => !ignoreTable.Contains(x.Name))
+                .Select(x => new Tables()
                 {
-                    dts.Add(new Tables
-                    {
-                        TableName = t.Name
-                    });
-                }
-            }
-
+                    TableName = x.Name,
+                }).ToList();
+            responseAjaxResult.Data = dts;
             responseAjaxResult.Count = dts.Count;
-            responseAjaxResult.SuccessResult(dts);
+            responseAjaxResult.Success();
             return responseAjaxResult;
         }
         /// <summary>
@@ -599,12 +596,11 @@ namespace GDCMasterDataReceiveApi.Application.Service.GovernanceData
         public async Task<ResponseAjaxResult<bool>> SaveMetaDataAsync(MetaDataRequestDto requestDto)
         {
             ResponseAjaxResult<bool> responseAjaxResult = new();
-
             //传递过来的列名
-            var columnName = requestDto.Mds.ColumName.TrimAll();
+            var columnName = requestDto.Mds.ColumName.ToLower().TrimAll();
             List<MetaDataRelation> dtmdr = new();
             var columnsInfo = _dbContext.DbMaintenance.GetColumnInfosByTableName(requestDto.TableName, false)
-                 .Where(x => x.DbColumnName == columnName)
+                 .Where(x =>SqlFunc.Equals(x.DbColumnName.ToLower(),columnName))
                  .Select(x => new MetaDataDto
                  {
                      IsPrimaryKey = x.IsPrimarykey,
@@ -619,39 +615,53 @@ namespace GDCMasterDataReceiveApi.Application.Service.GovernanceData
 
             if (requestDto.Type == 1 && columnsInfo == null)//新增字段
             {
-                // 列存在
-                if (_dbContext.DbMaintenance.IsAnyColumn(requestDto.TableName, requestDto.Mds.ColumName) == true)
+                DbColumnInfo dbColumn = new DbColumnInfo();
+                try
                 {
-                    responseAjaxResult.SuccessResult(false, "列存在");
-                    return responseAjaxResult;
-                };
-
-                // 添加列操作
-                var dbColumn = new DbColumnInfo
+                    // 添加列操作
+                    dbColumn = new DbColumnInfo
+                    {
+                        Length = requestDto.Mds.DataLength,
+                        IsPrimarykey = requestDto.Mds.IsPrimaryKey,
+                        TableName = requestDto.TableName,
+                        DataType = requestDto.Mds.DataType,
+                        IsNullable = requestDto.Mds.IsAllowToBeEmpty,
+                        DbColumnName = requestDto.Mds.ColumName.ToLower(),
+                        DefaultValue = requestDto.Mds.DefaultValue,
+                        ColumnDescription = requestDto.Mds.ColumComment
+                    };
+                    //添加列基本信息
+                    _dbContext.DbMaintenance.AddColumn(requestDto.TableName, dbColumn);
+                    //添加列备注
+                    _dbContext.DbMaintenance.AddColumnRemark(requestDto.Mds.ColumName.ToLower(), requestDto.TableName, requestDto.Mds.ColumComment);
+                    //添加默认值
+                    _dbContext.DbMaintenance.AddDefaultValue(requestDto.TableName, requestDto.Mds.ColumName.ToLower(), requestDto.Mds.DefaultValue);
+                    // 添加到副表
+                    dtmdr.Add(new MetaDataRelation
+                    {
+                        ColumnsLength = requestDto.Mds.DataType == "int" ? 10 : requestDto.Mds.DataLength,
+                        ColumnsName = requestDto.Mds.ColumName.ToLower(),
+                        Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                        TableName = requestDto.TableName,
+                        CreateTime = DateTime.Now,
+                    });
+                    await _dbContext.Insertable(dtmdr).ExecuteCommandAsync();
+                }
+                catch (Exception ex)
                 {
-                    Length = requestDto.Mds.DataLength,
-                    IsPrimarykey = requestDto.Mds.IsPrimaryKey,
-                    TableName = requestDto.TableName,
-                    DataType = requestDto.Mds.DataType,
-                    IsNullable = requestDto.Mds.IsAllowToBeEmpty,
-                    DbColumnName = requestDto.Mds.ColumName.ToLower(),
-                };
+                    logger.LogError(ex, $"添加数据表列添加出现异常");
+                    try
+                    {
+                        _dbContext.DbMaintenance.DropColumn(requestDto.TableName, requestDto.Mds.ColumName.ToLower());
+                    }
+                    catch (Exception ex1)
+                    {
 
-                var dtC1 = _dbContext.DbMaintenance.AddColumn(requestDto.TableName, dbColumn);
-                var dtC2 = _dbContext.DbMaintenance.AddColumnRemark(dbColumn.DbColumnName, requestDto.TableName, requestDto.Mds.ColumComment);
 
-                // 添加到副表
-                dtmdr.Add(new MetaDataRelation
-                {
-                    ColumnsLength = requestDto.Mds.DataLength,
-                    ColumnsName = requestDto.Mds.ColumName.ToPascal(),
-                    Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
-                    TableName = requestDto.TableName,
-                    CreateTime = DateTime.Now,
-                });
+                    }
 
-                if (dtC1 == true && dtC2 == true) await _dbContext.Insertable(dtmdr).ExecuteCommandAsync();
-                responseAjaxResult.SuccessResult(true);
+                }
+
             }
             else if (requestDto.Type == 2 && columnsInfo != null)//修改字段
             {
@@ -664,7 +674,6 @@ namespace GDCMasterDataReceiveApi.Application.Service.GovernanceData
                     responseAjaxResult.SuccessResult(false, "字段:" + columnLength.ColumnsName + "小于初始设定长度:" + columnLength.ColumnsLength);
                     return responseAjaxResult;
                 }
-
                 var dbColumn = new DbColumnInfo
                 {
                     Length = requestDto.Mds.DataLength,
@@ -674,9 +683,13 @@ namespace GDCMasterDataReceiveApi.Application.Service.GovernanceData
                     IsNullable = requestDto.Mds.IsAllowToBeEmpty,
                     DbColumnName = requestDto.Mds.ColumName.ToLower()
                 };
-                // 修改列操作  
-                var dtC1 = _dbContext.DbMaintenance.UpdateColumn(requestDto.TableName, dbColumn);
-                var dtC2 = _dbContext.DbMaintenance.AddColumnRemark(dbColumn.DbColumnName, requestDto.TableName, requestDto.Mds.ColumComment);
+
+                //添加列基本信息
+                _dbContext.DbMaintenance.UpdateColumn(requestDto.TableName, dbColumn);
+                ////添加列备注
+                _dbContext.DbMaintenance.AddColumnRemark(requestDto.Mds.ColumName.ToLower(), requestDto.TableName, requestDto.Mds.ColumComment);
+                ////添加默认值
+                _dbContext.DbMaintenance.AddDefaultValue(requestDto.TableName, requestDto.Mds.ColumName.ToLower(), requestDto.Mds.DefaultValue);
 
                 //副表增加字段
                 dtmdr.Add(new MetaDataRelation
@@ -687,15 +700,20 @@ namespace GDCMasterDataReceiveApi.Application.Service.GovernanceData
                     TableName = requestDto.TableName,
                     UpdateTime = DateTime.Now
                 });
-
-                if (dtC1 == true && dtC2 == true) await _dbContext.Updateable(dtmdr).WhereColumns(t => t.Id).ExecuteCommandAsync();
+                await _dbContext.Updateable(dtmdr).WhereColumns(t => t.Id).ExecuteCommandAsync();
                 responseAjaxResult.SuccessResult(true);
             }
-            else
+            else if (requestDto.Type == 3 && columnsInfo != null)
             {
-                responseAjaxResult.SuccessResult(false);
+                //删除操作
+                _dbContext.DbMaintenance.DropColumn(requestDto.TableName, requestDto.Mds.ColumName.ToLower());
+                var isExist=await _dbContext.Queryable<MetaDataRelation>().Where(x => x.TableName == requestDto.TableName && x.IsDelete == 1 && x.ColumnsName ==
+                requestDto.Mds.ColumName.ToLower()).FirstAsync();
+                isExist.IsDelete =0;
+               await _dbContext.Updateable(isExist).ExecuteCommandAsync();
             }
-
+            responseAjaxResult.Data = true;
+            responseAjaxResult.Success();
             return responseAjaxResult;
         }
         /// <summary>
@@ -718,6 +736,8 @@ namespace GDCMasterDataReceiveApi.Application.Service.GovernanceData
             responseAjaxResult.SuccessResult(rt);
             return responseAjaxResult;
         }
+
+
         #endregion
 
         #region 数据质量
@@ -725,7 +745,22 @@ namespace GDCMasterDataReceiveApi.Application.Service.GovernanceData
         #endregion
 
         #region 数据标准
-
+        /// <summary>
+        /// 获取值域分类
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        public async Task<ResponseAjaxResult<List<ValueDomainTypeResponseDto>>> SearchValueDomainTypeAsync()
+        {
+            ResponseAjaxResult<List<ValueDomainTypeResponseDto>> responseAjaxResult = new ResponseAjaxResult<List<ValueDomainTypeResponseDto>>();
+            var valueDomainTypeList= await _dbContext.Queryable<ValueDomain>().Where(x => x.IsDelete == 1)
+                .Select(x=>new ValueDomainTypeResponseDto() { Code=x.ZDOM_CODE,Desc= x.ZDOM_DESC })
+                .Distinct()
+               .ToListAsync();
+            responseAjaxResult.Data = valueDomainTypeList;
+            responseAjaxResult.Count = valueDomainTypeList.Count;
+            return responseAjaxResult;
+        }
         #endregion
     }
 }
