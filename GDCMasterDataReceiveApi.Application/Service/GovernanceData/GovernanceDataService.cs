@@ -721,7 +721,10 @@ namespace GDCMasterDataReceiveApi.Application.Service.GovernanceData
         #endregion
 
         #region 数据质量
+        //public async Task<ResponseAjaxResult<string>> SearchTableDataAsync(DataQualityRequestDto requestDto)
+        //{
 
+        //}
         #endregion
 
         #region 数据标准
