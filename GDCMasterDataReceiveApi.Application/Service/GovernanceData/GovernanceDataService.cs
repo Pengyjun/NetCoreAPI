@@ -765,8 +765,8 @@ namespace GDCMasterDataReceiveApi.Application.Service.GovernanceData
             var dt = await _dbContext.Queryable<DataGruleSetting>()
                 .WhereIF(!string.IsNullOrWhiteSpace(requestDto.KeyWords), t => t.Column.Contains(requestDto.KeyWords) || t.Table.Contains(requestDto.KeyWords))
                 .Where(t => t.IsDelete == 1 && requestDto.Type == (int)t.Type)
-                .OrderByDescending(t => t.Grade)
                 .ToPageListAsync(requestDto.PageIndex, requestDto.PageSize, total);
+            dt = dt.OrderByDescending(t => t.Grade).ThenByDescending(x => x.CreateTime).ToList();
 
             foreach (var item in dt)
             {
