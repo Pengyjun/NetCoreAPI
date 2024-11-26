@@ -55,7 +55,19 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.IService.GovernanceData
         /// 获取值域分类
         /// </summary>
         /// <returns></returns>
-        Task<ResponseAjaxResult<List<ValueDomainTypeResponseDto>>> SearchValueDomainTypeAsync(); 
+        Task<ResponseAjaxResult<List<ValueDomainTypeResponseDto>>> SearchValueDomainTypeAsync();
+        /// <summary>
+        /// 标准列表
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        Task<ResponseAjaxResult<List<DataStardardDto>>> SearchStardardAsync(DataStardardRequestDto requestDto);
+        /// <summary>
+        /// 保存数据标准
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        Task<ResponseAjaxResult<bool>> SaveStardardAsync(SaveVDomainDto requestDto);
         #endregion
     }
 }

@@ -96,6 +96,27 @@ namespace GDCMasterDataReceiveApi.Controller
         {
             return await governanceDataService.SearchValueDomainTypeAsync();
         }
+        /// <summary>
+        /// 标准列表
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        [HttpGet("SearchStardard")]
+        public async Task<ResponseAjaxResult<List<DataStardardDto>>> SearchStardardAsync([FromQuery] DataStardardRequestDto requestDto)
+        {
+            return await governanceDataService.SearchStardardAsync(requestDto);
+        }
+        /// <summary>
+        /// 保存数据标准
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        [HttpPost("SaveStardard")]
+        [UnitOfWork]
+        public async Task<ResponseAjaxResult<bool>> SaveStardardAsync([FromBody] SaveVDomainDto requestDto)
+        {
+            return await governanceDataService.SaveStardardAsync(requestDto);
+        }
         #endregion
     }
 }

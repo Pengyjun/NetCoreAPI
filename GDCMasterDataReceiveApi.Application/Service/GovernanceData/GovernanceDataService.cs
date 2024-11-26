@@ -8,10 +8,6 @@ using GDCMasterDataReceiveApi.Domain.Shared;
 using GDCMasterDataReceiveApi.Domain.Shared.Utils;
 using Microsoft.Extensions.Logging;
 using SqlSugar;
-using SqlSugar.Extensions;
-using System.Collections.Generic;
-using System.Data.Common;
-using static Dm.net.buffer.ByteArrayBuffer;
 
 namespace GDCMasterDataReceiveApi.Application.Service.GovernanceData
 {
@@ -563,7 +559,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.GovernanceData
                     DataType = x.OracleDataType,
                     IsAllowToBeEmpty = x.IsNullable,
                     DataDecimalPlaces = x.Scale,
-                    DefaultValue=x.DefaultValue
+                    DefaultValue = x.DefaultValue
                 })
                 .ToList();
 
@@ -604,7 +600,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.GovernanceData
             var columnName = requestDto.Mds.ColumName.ToLower().TrimAll();
             List<MetaDataRelation> dtmdr = new();
             var columnsInfo = _dbContext.DbMaintenance.GetColumnInfosByTableName(requestDto.TableName, false)
-                 .Where(x => x.DbColumnName == columnName)
+                 .Where(x => SqlFunc.Equals(x.DbColumnName.ToLower(), columnName))
                  .Select(x => new MetaDataDto
                  {
                      IsPrimaryKey = x.IsPrimarykey,
@@ -632,7 +628,8 @@ namespace GDCMasterDataReceiveApi.Application.Service.GovernanceData
                         IsNullable = requestDto.Mds.IsAllowToBeEmpty,
                         DbColumnName = requestDto.Mds.ColumName.ToLower(),
                         DefaultValue = requestDto.Mds.DefaultValue,
-                        ColumnDescription = requestDto.Mds.ColumComment
+                        ColumnDescription = requestDto.Mds.ColumComment,
+                        DecimalDigits = requestDto.Mds.DataDecimalPlaces
                     };
                     //添加列基本信息
                     _dbContext.DbMaintenance.AddColumn(requestDto.TableName, dbColumn);
@@ -685,7 +682,8 @@ namespace GDCMasterDataReceiveApi.Application.Service.GovernanceData
                     TableName = requestDto.TableName,
                     DataType = requestDto.Mds.DataType,
                     IsNullable = requestDto.Mds.IsAllowToBeEmpty,
-                    DbColumnName = requestDto.Mds.ColumName.ToLower()
+                    DbColumnName = requestDto.Mds.ColumName.ToLower(),
+                    DecimalDigits = requestDto.Mds.DataDecimalPlaces
                 };
 
                 //添加列基本信息
@@ -753,7 +751,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.GovernanceData
 
         #region 数据标准
         /// <summary>
-        /// 获取值域
+        /// 获取值域(左侧列表)
         /// </summary>
         /// <returns></returns>
         public async Task<ResponseAjaxResult<List<ValueDomainTypeResponseDto>>> SearchValueDomainTypeAsync()
@@ -766,9 +764,124 @@ namespace GDCMasterDataReceiveApi.Application.Service.GovernanceData
                   .ToListAsync();
             valueDomainTypeList = valueDomainTypeList.GroupBy(i => i.Desc, (ii, key) => key.OrderByDescending(x => x.Desc).First()).ToList();
 
-            responseAjaxResult.Data = valueDomainTypeList;
+            responseAjaxResult.SuccessResult(valueDomainTypeList);
             return responseAjaxResult;
         }
+        /// <summary>
+        /// 标准列表
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        public async Task<ResponseAjaxResult<List<DataStardardDto>>> SearchStardardAsync(DataStardardRequestDto requestDto)
+        {
+            ResponseAjaxResult<List<DataStardardDto>> responseAjaxResult = new();
+            RefAsync<int> total = 0;
+
+            var drt = await _dbContext.Queryable<ValueDomain>()
+                  .Where(t => t.IsDelete == 1 && t.ZDOM_CODE == requestDto.Code)
+                  .Select(t => new DataStardardDto
+                  {
+                      CreateTime = t.CreateTime.Value.ToString("yyyy-MM-dd HH:mm:ss"),
+                      TypeCode = t.ZDOM_CODE,
+                      TypeName = t.ZDOM_DESC,
+                      StardardCode = t.ZDOM_VALUE,
+                      StardardName = t.ZDOM_NAME,
+                      StatusName = "1"
+                  })
+                  .ToPageListAsync(requestDto.PageIndex, requestDto.PageSize, total);
+
+            responseAjaxResult.SuccessResult(drt);
+            return responseAjaxResult;
+        }
+        /// <summary>
+        /// 保存数据标准
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        public async Task<ResponseAjaxResult<bool>> SaveStardardAsync(SaveVDomainDto requestDto)
+        {
+            ResponseAjaxResult<bool> responseAjaxResult = new();
+
+            if (requestDto.Vd != null)
+            {
+                ValueDomain tabVd = new();
+                var vdomains = await _dbContext.Queryable<ValueDomain>()
+                  .Where(x => x.IsDelete == 1 && (x.ZDOM_CODE == "ZNATION" || x.ZDOM_CODE == "ZGENDER"))
+                  .ToListAsync();
+                if (requestDto.Type == 1)
+                {
+                    //新增  是否存在相同的数据
+                    var ivd = vdomains.FirstOrDefault(x => x.ZDOM_CODE == requestDto.Vd.ZDOM_CODE && x.ZDOM_DESC == requestDto.Vd.ZDOM_DESC && x.ZDOM_VALUE == requestDto.Vd.ZDOM_VALUE && x.ZDOM_NAME == requestDto.Vd.ZDOM_NAME);
+                    if (ivd != null)
+                    {
+                        responseAjaxResult.SuccessResult(true, "数据存在");
+                        return responseAjaxResult;
+                    }
+                    tabVd = new ValueDomain
+                    {
+                        Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                        ZCHTIME = requestDto.Vd.ZCHTIME,
+                        ZDELETE = requestDto.Vd.ZDELETE,
+                        ZDOM_CODE = requestDto.Vd.ZDOM_CODE,
+                        ZDOM_DESC = requestDto.Vd.ZDOM_DESC,
+                        ZDOM_LEVEL = requestDto.Vd.ZDOM_LEVEL,
+                        ZDOM_NAME = requestDto.Vd.ZDOM_NAME,
+                        ZDOM_SUP = requestDto.Vd.ZDOM_SUP,
+                        ZDOM_VALUE = requestDto.Vd.ZDOM_VALUE,
+                        ZREMARKS = requestDto.Vd.ZREMARKS,
+                        ZSTATE = requestDto.Vd.ZSTATE,
+                        ZVERSION = requestDto.Vd.ZVERSION
+                    };
+                    await _dbContext.Insertable(tabVd).ExecuteCommandAsync();
+
+                    responseAjaxResult.SuccessResult(true);
+                    return responseAjaxResult;
+                }
+                else if (requestDto.Type == 2)
+                {
+                    if (!string.IsNullOrEmpty(requestDto.Vd.Id))
+                    {
+                        var uvd = vdomains.FirstOrDefault(x => x.Id.ToString() == requestDto.Vd.Id);
+                        if (uvd != null)
+                        {
+                            tabVd.Id = uvd.Id;
+                            tabVd.ZCHTIME = uvd.ZCHTIME;
+                            tabVd.ZDOM_CODE = uvd.ZDOM_VALUE;
+                            tabVd.ZDOM_DESC = uvd.ZDOM_VALUE;
+                            tabVd.ZDOM_VALUE = uvd.ZDOM_CODE;
+                            tabVd.ZDOM_NAME = uvd.ZDOM_DESC;
+                            tabVd.ZDOM_LEVEL = uvd.ZDOM_DESC;
+                            tabVd.ZDOM_SUP = uvd.ZDOM_DESC;
+                            tabVd.ZREMARKS = uvd.ZDOM_DESC;
+                            tabVd.ZVERSION = uvd.ZDOM_DESC;
+                            tabVd.ZSTATE = "1";
+                            tabVd.UpdateTime = DateTime.Now;
+                            await _dbContext.Updateable(tabVd).ExecuteCommandAsync();
+                            responseAjaxResult.SuccessResult(true);
+                            return responseAjaxResult;
+                        }
+                    }
+                }
+                else if (requestDto.Type == 3)
+                {
+                    if (!string.IsNullOrEmpty(requestDto.Vd.Id))
+                    {
+                        var uvd = vdomains.FirstOrDefault(x => x.Id.ToString() == requestDto.Vd.Id);
+                        if (uvd != null)
+                        {
+                            uvd.IsDelete = 0;
+                            uvd.DeleteTime = DateTime.Now;
+                            await _dbContext.Updateable(uvd).ExecuteCommandAsync();
+                            responseAjaxResult.SuccessResult(true);
+                            return responseAjaxResult;
+                        }
+                    }
+                }
+            }
+            responseAjaxResult.SuccessResult(true);
+            return responseAjaxResult;
+        }
+
         #endregion
     }
 }
