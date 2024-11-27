@@ -6,9 +6,13 @@
     public class Tables
     {
         /// <summary>
-        /// 表名
+        /// 表
         /// </summary>
         public string? TableName { get; set; }
+        /// <summary>
+        /// 表名称
+        /// </summary>
+        public string? TName { get; set; }
     }
     /// <summary>
     /// 字段类型

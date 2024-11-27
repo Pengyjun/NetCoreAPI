@@ -596,12 +596,27 @@ namespace GDCMasterDataReceiveApi.Application.Service.GovernanceData
                 .Select(x => new Tables()
                 {
                     TableName = x.Name,
+                    TName = GetTableComment(x.Name)
                 }).ToList();
 
             responseAjaxResult.Data = dti;
             responseAjaxResult.Count = dti.Count;
             responseAjaxResult.Success();
             return responseAjaxResult;
+        }
+        /// <summary>
+        /// 获取表注释的自定义方法
+        /// </summary>
+        /// <param name="tableName"></param>
+        /// <returns></returns>
+        public string GetTableComment(string tableName)
+        {
+            // 查询达梦数据库中表的注释
+            var sql = $"SELECT COMMENTS FROM USER_TAB_COMMENTS WHERE TABLE_NAME = '{tableName}'";
+
+            // 执行 SQL 查询
+            var result = _dbContext.Ado.SqlQuery<string>(sql).FirstOrDefault();
+            return result ?? string.Empty; // 如果没有注释，返回空字符串
         }
         /// <summary>
         /// 增改数据资源列表
