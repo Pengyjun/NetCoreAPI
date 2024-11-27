@@ -72,8 +72,8 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                 case Domain.Shared.Enums.TableNameType.User:
                     // 获取新增的数据
                     insertList = await _dbContext.Queryable<User>()
-                                        .Where(t => !string.IsNullOrWhiteSpace(t.CreateTime.ToString()) && t.IsDelete == 1 && t.CreateTime.Value.Date >= sevTime && t.CreateTime.Value.Date <= time)
-                                        .Select(x => new TResult { CreateTime = x.CreateTime, Id = x.Id })
+                                        .Where(t => !string.IsNullOrWhiteSpace(t.ENTRY_TIME.ToString()) && t.IsDelete == 1 && SqlFunc.ToDate(t.ENTRY_TIME).Date >= sevTime && SqlFunc.ToDate(t.ENTRY_TIME).Date <= time)
+                                        .Select(x => new TResult { CreateTime = SqlFunc.ToDate(x.ENTRY_TIME), Id = x.Id })
                                         .ToListAsync();
                     //获取修改的数据
                     updateList = await _dbContext.Queryable<User>()
