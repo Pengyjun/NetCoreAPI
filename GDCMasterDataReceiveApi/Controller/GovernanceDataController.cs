@@ -57,9 +57,9 @@ namespace GDCMasterDataReceiveApi.Controller
         /// </summary>
         /// <returns></returns>
         [HttpGet("Table")]
-        public ResponseAjaxResult<List<Tables>> SearchTables()
+        public ResponseAjaxResult<List<Tables>> SearchTables([FromQuery] int type)
         {
-            return governanceDataService.SearchTables();
+            return governanceDataService.SearchTables(type);
         }
         /// <summary>
         /// 保存资源列表信息

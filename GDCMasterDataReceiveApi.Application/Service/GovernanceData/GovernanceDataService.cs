@@ -586,12 +586,13 @@ namespace GDCMasterDataReceiveApi.Application.Service.GovernanceData
         /// 获取数据资源所有表
         /// </summary>
         /// <returns></returns>
-        public ResponseAjaxResult<List<Tables>> SearchTables()
+        public ResponseAjaxResult<List<Tables>> SearchTables(int type)
         {
             ResponseAjaxResult<List<Tables>> responseAjaxResult = new();
             List<string> ignoreTable = new List<string>();
             ignoreTable.Add("t_auditlogs");
             var dti = _dbContext.DbMaintenance.GetTableInfoList(false)
+                .WhereIF(type == 3, x => x.Name.Contains("t_dh_"))
                 .Where(x => !ignoreTable.Contains(x.Name))
                 .Select(x => new Tables()
                 {
@@ -796,6 +797,9 @@ namespace GDCMasterDataReceiveApi.Application.Service.GovernanceData
                     Status = item.Status,
                     Table = item.Table,
                     Type = item.Type,
+                    ColumnName = item.ColumnName,
+                    Hour = item.Hour,
+                    TableName = item.TableName,
                     Id = item.Id.ToString(),
                     CreateTime = item.CreateTime.Value.ToString("yyyy-MM-dd HH:mm:ss")
                 });
@@ -836,7 +840,8 @@ namespace GDCMasterDataReceiveApi.Application.Service.GovernanceData
                             Table = requestDto.DQ.Table,
                             Type = requestDto.DQ.Type,
                             ColumnName = requestDto.DQ.ColumnName,
-                            TableName = requestDto.DQ.TableName
+                            TableName = requestDto.DQ.TableName,
+                            Hour = requestDto.DQ.Hour
                         };
 
                         await _dbContext.Insertable(rt).ExecuteCommandAsync();
@@ -863,6 +868,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.GovernanceData
                             dquailty.Type = requestDto.DQ.Type;
                             dquailty.ColumnName = requestDto.DQ.ColumnName;
                             dquailty.TableName = requestDto.DQ.TableName;
+                            dquailty.Hour = requestDto.DQ.Hour;
 
                             await _dbContext.Updateable(dquailty).WhereColumns(x => x.Id).ExecuteCommandAsync();
                             responseAjaxResult.SuccessResult(true);
@@ -932,8 +938,19 @@ namespace GDCMasterDataReceiveApi.Application.Service.GovernanceData
                             .GroupBy(item2.Column.ToLower())
                             .Having($"count({item2.Column.ToLower()}) > 1")
                             .Select($"CAST(id AS VARCHAR) AS id")
-                            .ToList()
                             .ToJson();
+                    }
+                    else if (item2.Type == GruleType.YXX)
+                    {
+                        // 获取当前时间，并减去 传入 小时
+                        var currentTime = DateTime.Now.AddHours(item2.Hour);
+                        var ctTimeStamp = new DateTimeOffset(currentTime).ToUnixTimeSeconds();
+                        // 查询数据库，筛选出 timestamp 小于当前时间减 传入 小时的记录
+                        ids = _dbContext.Queryable<object>()
+                                 .AS(item2.Table.ToLower())
+                                 .Where($"timestamp < '{ctTimeStamp}'")
+                                 .Select($"CAST(id AS VARCHAR) AS id")
+                                 .ToJson();
                     }
                     if (ids != null && ids.Any())
                     {
@@ -951,13 +968,13 @@ namespace GDCMasterDataReceiveApi.Application.Service.GovernanceData
                             rt.Add(new DataReportResponseDto
                             {
                                 Id = item3,
-                                Column = item2.ColumnName + $"({item2.Column})",
+                                Column = item2.ColumnName,
                                 CreateTime = item2.CreateTime.Value.ToString("yyyy-MM-dd HH:mm:ss"),
                                 Grade = item2.Grade,
                                 Name = item2.Name,
                                 Soure = item2.Soure,
                                 Status = item2.Status,
-                                Table = item2.TableName + $"({item2.Table})",
+                                Table = item2.TableName,
                                 Type = item2.Type
                             });
                         }

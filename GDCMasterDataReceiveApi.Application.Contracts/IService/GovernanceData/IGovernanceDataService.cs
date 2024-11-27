@@ -33,7 +33,7 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.IService.GovernanceData
         /// 获取数据资源所有表
         /// </summary>
         /// <returns></returns>
-        ResponseAjaxResult<List<Tables>> SearchTables();
+        ResponseAjaxResult<List<Tables>> SearchTables(int type);
         /// <summary>
         /// 保存资源列表信息
         /// </summary>

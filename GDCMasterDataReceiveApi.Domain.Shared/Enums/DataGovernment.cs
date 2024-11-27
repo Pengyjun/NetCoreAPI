@@ -22,7 +22,12 @@ namespace GDCMasterDataReceiveApi.Domain.Shared.Enums
         /// 唯一性
         /// </summary>
         [Description("唯一性")]
-        WYX = 2
+        WYX = 2,
+        /// <summary>
+        /// 有效性
+        /// </summary>
+        [Description("有效性")]
+        YXX = 3
     }
     /// <summary>
     /// 规则级别

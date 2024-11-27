@@ -54,5 +54,10 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// </summary>
         [SugarColumn(Length = 200)]
         public string? Status { get; set; }
+        /// <summary>
+        /// 小时数（及时性）
+        /// </summary>
+        [SugarColumn(ColumnDataType = "int")]
+        public int Hour { get; set; } = 0;
     }
 }

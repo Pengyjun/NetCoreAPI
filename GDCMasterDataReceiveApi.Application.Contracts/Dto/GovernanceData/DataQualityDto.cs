@@ -24,6 +24,10 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.GovernanceData
         /// </summary>
         public string? Name { get; set; }
         /// <summary>
+        /// 小时数
+        /// </summary>
+        public int Hour { get; set; }
+        /// <summary>
         /// 规则类型
         /// </summary>
         public GruleType Type { get; set; }
@@ -36,9 +40,17 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.GovernanceData
         /// </summary>
         public string? Table { get; set; }
         /// <summary>
+        /// 表名
+        /// </summary>
+        public string? TableName { get; set; }
+        /// <summary>
         /// 检查字段
         /// </summary>
         public string? Column { get; set; }
+        /// <summary>
+        /// 列名
+        /// </summary>
+        public string? ColumnName { get; set; }
         /// <summary>
         /// 规则级别
         /// </summary>
@@ -58,7 +70,7 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.GovernanceData
     public class DataQualityRequestDto : BaseRequestDto
     {
         /// <summary>
-        /// 1完整性 2唯一性
+        /// 1完整性 2唯一性 3有效性
         /// </summary>
         public int Type { get; set; }
     }
@@ -107,6 +119,10 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.GovernanceData
         /// 状态 1启用
         /// </summary>
         public string? Status { get; set; }
+        /// <summary>
+        /// 小时数（及时性）
+        /// </summary>
+        public int Hour { get; set; }
     }
     /// <summary>
     /// 保存数据规则配置
