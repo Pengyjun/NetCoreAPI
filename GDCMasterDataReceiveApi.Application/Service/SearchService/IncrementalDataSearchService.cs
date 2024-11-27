@@ -64,6 +64,8 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
             var sevDay = time.AddDays(-6).ToDateDay();
             Utils.TryConvertDateTimeFromDateDay(sevDay, out DateTime sevTime);
 
+            sevTime = Convert.ToDateTime(sevTime.ToString("yyyy-MM-dd 00:00:00.000001"));
+            var eTime = Convert.ToDateTime(Convert.ToDateTime(DateTime.Now).ToString("yyyy-MM-dd 23:59:59.9999"));
             List<TResult> insertList = new();
             List<TResult> updateList = new();
 
@@ -72,7 +74,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                 case Domain.Shared.Enums.TableNameType.User:
                     // 获取新增的数据
                     insertList = await _dbContext.Queryable<User>()
-                                        .Where(t => t.IsDelete == 1 && SqlFunc.ToDate(t.CreateTime) >= sevTime && SqlFunc.ToDate(t.CreateTime) <= DateTime.Now)
+                                        .Where(t => t.IsDelete == 1 && SqlFunc.ToDate(t.CreateTime) >= sevTime && SqlFunc.ToDate(t.CreateTime) <= eTime)
                                         .Select(x => new TResult { CreateTime = SqlFunc.ToDate(x.CreateTime), Id = x.Id })
                                         .ToListAsync();
                     ////获取修改的数据
@@ -83,12 +85,12 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     break;
                 case Domain.Shared.Enums.TableNameType.Institution:
                     insertList = await _dbContext.Queryable<Institution>()
-                                        .Where(t => t.IsDelete == 1 && SqlFunc.ToDate(t.CreateTime) >= sevTime && SqlFunc.ToDate(t.CreateTime) <= DateTime.Now)
+                                        .Where(t => t.IsDelete == 1 && SqlFunc.ToDate(t.CreateTime) >= sevTime && SqlFunc.ToDate(t.CreateTime) <= eTime)
                                         .Select(x => new TResult { CreateTime = x.CreateTime, Id = x.Id })
                                         .ToListAsync();
                     //获取修改的数据
                     updateList = await _dbContext.Queryable<Institution>()
-                       .Where(t => t.IsDelete == 1 && SqlFunc.ToDate(t.UpdateTime) >= sevTime && SqlFunc.ToDate(t.UpdateTime) <= DateTime.Now)
+                       .Where(t => t.IsDelete == 1 && SqlFunc.ToDate(t.UpdateTime) >= sevTime && SqlFunc.ToDate(t.UpdateTime) <= eTime)
                        .Select(x => new TResult { UpdateTime = x.UpdateTime, Id = x.Id })
                        .ToListAsync();
                     break;
