@@ -943,12 +943,12 @@ namespace GDCMasterDataReceiveApi.Application.Service.GovernanceData
                     else if (item2.Type == GruleType.YXX)
                     {
                         // 获取当前时间，并减去 传入 小时
-                        var currentTime = DateTime.Now.AddHours(item2.Hour);
+                        var currentTime = DateTime.Now.AddHours(-item2.Hour);
                         var ctTimeStamp = new DateTimeOffset(currentTime).ToUnixTimeSeconds();
                         // 查询数据库，筛选出 timestamp 小于当前时间减 传入 小时的记录
                         ids = _dbContext.Queryable<object>()
                                  .AS(item2.Table.ToLower())
-                                 .Where($"timestamp < '{ctTimeStamp}'")
+                                 .Where($"timestamp < {ctTimeStamp}")
                                  .Select($"CAST(id AS VARCHAR) AS id")
                                  .ToJson();
                     }
