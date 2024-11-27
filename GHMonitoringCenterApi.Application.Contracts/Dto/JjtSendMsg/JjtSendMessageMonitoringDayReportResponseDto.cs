@@ -54,6 +54,7 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.JjtSendMsg
         /// 船舶生产数据存在不完整部分主要是项目部未填报以下船舶
         /// </summary>
         public List<CompanyShipUnWriteReportInfo> CompanyShipUnWriteReportInfos { get; set; }
+        public List<EachCompanyProductionValue> EachCompanyProductionValue { get; set; }
 
     }
 
@@ -671,4 +672,28 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.JjtSendMsg
         public decimal ConstructionDays { get; set; }
 
     }
+
+
+
+    #region 各单位完成产值计划产值对比
+    public class EachCompanyProductionValue 
+    {
+        /// <summary>
+        /// 公司名称   为空不按公司   
+        /// </summary>
+        public string? ConpanyName { get; set; }
+        /// <summary>
+        /// X轴
+        /// </summary>
+        public int? XAxle { get; set; }
+        /// <summary>
+        /// 计划产值
+        /// </summary>
+        public decimal? YAxlePlanValue { get; set; }
+        /// <summary>
+        /// 计划产值
+        /// </summary>
+        public decimal? YAxleCompleteValue { get; set; }
+    }
+    #endregion
 }

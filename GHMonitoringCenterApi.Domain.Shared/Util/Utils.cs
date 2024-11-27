@@ -763,5 +763,27 @@ namespace GHMonitoringCenterApi.Domain.Shared.Util
             return text.EndsWith("(") || text.EndsWith(")")|| text.EndsWith("（")|| text.EndsWith("）");
         }
 
+
+
+        /// <summary>
+        /// 根据时间int类型 获取月份数据
+        /// </summary>
+        /// <param name="day"></param>
+        /// <returns></returns>
+        public static int GetMonth(int day)
+        {
+            DateTime now;
+            ConvertHelper.TryConvertDateTimeFromDateDay(day,out now);
+            var startTime =string.Empty;
+            if (now.Day >=27)
+            {
+                startTime = DateTime.Now.ToString("yyyy-MM-26 00:00:00");
+            }
+            else
+            {
+                startTime = DateTime.Now.AddMonths(-1).ToString("yyyy-MM-26 00:00:00");
+            }
+            return   Convert.ToDateTime(startTime).AddMonths(1).Month;
+        }
     }
 }

@@ -2847,6 +2847,59 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
 
             #endregion
 
+
+            #region 各单位计划、完成产值对比
+
+            #region 全局维度
+            List<EachCompanyProductionValue> eachCompanyProductionValues = new List<EachCompanyProductionValue>();
+            var length = 15;//查询半月的时间
+            var currentNowTimeInt = 0;
+            for (int i = 1; i <= length; i++)
+            {
+                currentNowTimeInt = int.Parse(DateTime.Now.ToString("yyyyMMdd")) - (i - 1);
+                //判断月份
+                var monthInt = Utils.GetMonth(currentNowTimeInt);
+                var dayActualProductionAmount = dayProductionValueList.Where(x => x.DateDay == (currentNowTimeInt - 1)).Sum(x => x.DayActualProductionAmount);
+                eachCompanyProductionValues.Add(new EachCompanyProductionValue()
+                {
+                    XAxle = currentNowTimeInt,
+                    YAxlePlanValue = Math.Round((GetProductionValueInfo(monthInt, companyProductionList).Sum(x => x.PlanProductionValue) / 30M), 2),
+                    YAxleCompleteValue = Math.Round(dayActualProductionAmount, 2)
+                });
+            }
+            #endregion
+
+
+            #region 已公司维度
+            var companyInfoList = companyList.Where(x =>!SqlFunc.IsNullOrEmpty(x.Name) &&x.Name != "广航局总体").ToList();
+            List<EachCompanyProductionValue> companyEachCompanyProductionValues = new List<EachCompanyProductionValue>();
+            for (int i = 1; i <= length; i++)
+            {
+                foreach (var item in companyInfoList)
+                {
+                    var currentMonthCompanyProductionValue = companyMonthProductionValue.Where(x => x.Id == item.ItemId).FirstOrDefault();
+                    currentNowTimeInt = int.Parse(DateTime.Now.ToString("yyyyMMdd")) - (i - 1);
+                    //判断月份
+                    var monthInt = Utils.GetMonth(currentNowTimeInt);
+                    var dayActualProductionAmount = dayProductionValueList.Where(x => x.DateDay == (currentNowTimeInt - 1)).Sum(x => x.DayActualProductionAmount);
+                    companyEachCompanyProductionValues.Add(new EachCompanyProductionValue()
+                    {
+                        ConpanyName = item.Name,
+                        XAxle = currentNowTimeInt,
+                        YAxlePlanValue = Math.Round((GetProductionValueInfo(monthInt, companyProductionList).Where(x => x.Id
+                        == item.ItemId).Sum(x => x.PlanProductionValue) / 30M), 2),
+                        YAxleCompleteValue = Math.Round(dayActualProductionAmount, 2)
+                    });
+                }
+               
+               
+            }
+            eachCompanyProductionValues.AddRange(companyEachCompanyProductionValues);
+            #endregion
+
+            jjtSendMessageMonitoringDayReportResponseDto.EachCompanyProductionValue = eachCompanyProductionValues;
+            #endregion
+
             jjtSendMessageMonitoringDayReportResponseDto.Month = month;
             jjtSendMessageMonitoringDayReportResponseDto.Year = int.Parse(yearStartTime);
             responseAjaxResult.Data = jjtSendMessageMonitoringDayReportResponseDto;
@@ -4111,6 +4164,8 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
 
 
         #region 根据不同月份获取不同的月计划产值 和完成产值
+
+        #region 根据不同月份获取不同的月计划产值 和完成产值
         /// <summary>
         /// 根据不同月份获取不同的月计划产值 和完成产值
         /// </summary>
@@ -4258,8 +4313,9 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
             }
             return companyPlanCompleteProductionDtos;
         }
+        #endregion
 
-
+        #region 根据不同月份获取交建公司计划产值和完成产值
 
 
         /// <summary>
@@ -4421,6 +4477,8 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
             return companyPlanCompleteProductionDtos;
         }
         #endregion
+        #endregion
+
         #region 船舶日报图片信息
         /// <summary>
         /// 获取自有船舶日报卡片消息详情
@@ -4769,8 +4827,6 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
         #endregion
 
 
-
-
         #region 项目日报未填报通知
         /// <summary>
         /// 项目日报未填报通知
@@ -4978,7 +5034,6 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
             return responseAjaxResult;
         }
         #endregion
-
 
         public static decimal GetCompanyProductuionValue(Guid companyId, List<MonthReport> data, List<Project> projects,
             List<MonthDiffProductionValue> monthDiffProductionValues)
