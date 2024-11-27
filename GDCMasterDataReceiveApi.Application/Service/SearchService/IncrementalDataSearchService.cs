@@ -61,7 +61,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
             Utils.TryConvertDateTimeFromDateDay(requestDto.DateDay, out DateTime time);
 
             //前六+当日  七天
-            var sevDay = time.AddDays(-6).ToDateDay();
+            var sevDay = time.AddDays(-7).ToDateDay();
             Utils.TryConvertDateTimeFromDateDay(sevDay, out DateTime sevTime);
 
             List<TResult> insertList = new();
