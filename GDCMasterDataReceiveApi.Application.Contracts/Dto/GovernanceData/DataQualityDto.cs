@@ -88,9 +88,17 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.GovernanceData
         /// </summary>
         public string? Table { get; set; }
         /// <summary>
+        /// 表名
+        /// </summary>
+        public string? TableName { get; set; }
+        /// <summary>
         /// 检查字段
         /// </summary>
         public string? Column { get; set; }
+        /// <summary>
+        /// 列名
+        /// </summary>
+        public string? ColumnName { get; set; }
         /// <summary>
         /// 规则级别
         /// </summary>

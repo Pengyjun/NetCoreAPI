@@ -834,7 +834,9 @@ namespace GDCMasterDataReceiveApi.Application.Service.GovernanceData
                             Soure = requestDto.DQ.Soure,
                             Status = requestDto.DQ.Status,
                             Table = requestDto.DQ.Table,
-                            Type = requestDto.DQ.Type
+                            Type = requestDto.DQ.Type,
+                            ColumnName = requestDto.DQ.ColumnName,
+                            TableName = requestDto.DQ.TableName
                         };
 
                         await _dbContext.Insertable(rt).ExecuteCommandAsync();
@@ -859,6 +861,8 @@ namespace GDCMasterDataReceiveApi.Application.Service.GovernanceData
                             dquailty.Status = requestDto.DQ.Status;
                             dquailty.Table = requestDto.DQ.Table;
                             dquailty.Type = requestDto.DQ.Type;
+                            dquailty.ColumnName = requestDto.DQ.ColumnName;
+                            dquailty.TableName = requestDto.DQ.TableName;
 
                             await _dbContext.Updateable(dquailty).WhereColumns(x => x.Id).ExecuteCommandAsync();
                             responseAjaxResult.SuccessResult(true);
@@ -947,13 +951,13 @@ namespace GDCMasterDataReceiveApi.Application.Service.GovernanceData
                             rt.Add(new DataReportResponseDto
                             {
                                 Id = item3,
-                                Column = item2.Column,
+                                Column = item2.ColumnName + $"({item2.Column})",
                                 CreateTime = item2.CreateTime.Value.ToString("yyyy-MM-dd HH:mm:ss"),
                                 Grade = item2.Grade,
                                 Name = item2.Name,
                                 Soure = item2.Soure,
                                 Status = item2.Status,
-                                Table = item2.Table,
+                                Table = item2.TableName + $"({item2.Table})",
                                 Type = item2.Type
                             });
                         }
@@ -1119,7 +1123,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.GovernanceData
             ResponseAjaxResult<List<ValueDomainTypeResponseDto>> responseAjaxResult = new();
 
             var valueDomainTypeList = await _dbContext.Queryable<ValueDomain>()
-                  .Where(x => x.IsDelete == 1 && (x.ZDOM_CODE == "ZNATION" || x.ZDOM_CODE == "ZGENDER"))
+                  .Where(x => x.IsDelete == 1)// && (x.ZDOM_CODE == "ZNATION" || x.ZDOM_CODE == "ZGENDER")
                   .Select(x => new ValueDomainTypeResponseDto() { Code = x.ZDOM_CODE, Desc = x.ZDOM_DESC })
                   .ToListAsync();
             valueDomainTypeList = valueDomainTypeList.GroupBy(i => i.Desc, (ii, key) => key.OrderByDescending(x => x.Desc).First()).ToList();

@@ -30,10 +30,20 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         [SugarColumn(Length = 200)]
         public string? Table { get; set; }
         /// <summary>
+        /// 表名称
+        /// </summary>
+        [SugarColumn(Length = 200)]
+        public string? TableName { get; set; }
+        /// <summary>
         /// 检查字段
         /// </summary>
         [SugarColumn(Length = 200)]
         public string? Column { get; set; }
+        /// <summary>
+        /// 检查字段名称
+        /// </summary>
+        [SugarColumn(Length = 200)]
+        public string? ColumnName { get; set; }
         /// <summary>
         /// 规则级别
         /// </summary>
