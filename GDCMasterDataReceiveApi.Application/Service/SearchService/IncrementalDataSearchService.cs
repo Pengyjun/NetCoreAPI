@@ -75,11 +75,11 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                                         .Where(t => !string.IsNullOrWhiteSpace(t.ENTRY_TIME.ToString()) && t.IsDelete == 1 && SqlFunc.ToDate(t.ENTRY_TIME).Date >= sevTime && SqlFunc.ToDate(t.ENTRY_TIME).Date <= time)
                                         .Select(x => new TResult { CreateTime = SqlFunc.ToDate(x.ENTRY_TIME), Id = x.Id })
                                         .ToListAsync();
-                    //获取修改的数据
-                    updateList = await _dbContext.Queryable<User>()
-                       .Where(t => !string.IsNullOrWhiteSpace(t.UpdateTime.ToString()) && t.IsDelete == 1 && t.UpdateTime.Value.Date >= sevTime && t.UpdateTime.Value.Date <= time)
-                       .Select(x => new TResult { UpdateTime = x.UpdateTime, Id = x.Id })
-                       .ToListAsync();
+                    ////获取修改的数据
+                    //updateList = await _dbContext.Queryable<User>()
+                    //   .Where(t => !string.IsNullOrWhiteSpace(t.UpdateTime.ToString()) && t.IsDelete == 1 && t.UpdateTime.Value.Date >= sevTime && t.UpdateTime.Value.Date <= time)
+                    //   .Select(x => new TResult { UpdateTime = x.UpdateTime, Id = x.Id })
+                    //   .ToListAsync();
                     break;
                 case Domain.Shared.Enums.TableNameType.Institution:
                     insertList = await _dbContext.Queryable<Institution>()
