@@ -1099,12 +1099,13 @@ namespace GDCMasterDataReceiveApi.Application.Service.GovernanceData
                 uInfo.OfficeDepIdName = institutions.FirstOrDefault(x => x.Oid == uInfo.OfficeDepId)?.Name;
             }
             return users;
-        } /// <summary>
-          /// 获取用户所属公司
-          /// </summary>
-          /// <param name="oid"></param>
-          /// <param name="uInstutionDtos"></param>
-          /// <returns></returns>
+        }
+        /// <summary>
+        /// 获取用户所属公司
+        /// </summary>
+        /// <param name="oid"></param>
+        /// <param name="uInstutionDtos"></param>
+        /// <returns></returns>
         private string GetUserCompany(string? oid, List<InstutionRespDto> uInstutionDtos)
         {
             var uInsInfo = uInstutionDtos.FirstOrDefault(x => x.Oid == oid);
