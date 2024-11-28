@@ -7,7 +7,6 @@ using GDCMasterDataReceiveApi.Domain.Shared;
 using GDCMasterDataReceiveApi.Domain.Shared.Annotation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using SqlSugar;
 
 namespace GDCMasterDataReceiveApi.Controller
 {
@@ -23,8 +22,10 @@ namespace GDCMasterDataReceiveApi.Controller
 
         #region 依赖注入
         private readonly IGovernanceDataService governanceDataService;
-
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="GovernanceDataService"></param>
         public GovernanceDataController(IGovernanceDataService GovernanceDataService)
         {
             governanceDataService = GovernanceDataService;
