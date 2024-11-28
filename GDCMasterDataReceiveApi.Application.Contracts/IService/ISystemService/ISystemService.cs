@@ -1,11 +1,6 @@
 ﻿using GDCMasterDataReceiveApi.Application.Contracts.Dto.System;
 using GDCMasterDataReceiveApi.Domain.Shared;
 using GDCMasterDataReceiveApi.Domain.Shared.Annotation;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace GDCMasterDataReceiveApi.Application.Contracts.IService.ISystemService
 {
@@ -30,5 +25,7 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.IService.ISystemService
         /// <param name="interfaceName"></param>
         /// <returns></returns>
         Task<ResponseAjaxResult<List<SystemAllInterfaceResponseDto>>> SearchInterfaceFieldsAsync(string interfaceName);
+
+        bool AadYu();
     }
 }

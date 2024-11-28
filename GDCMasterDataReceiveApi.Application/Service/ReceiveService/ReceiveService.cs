@@ -36,7 +36,6 @@ using GDCMasterDataReceiveApi.Domain.Models;
 using GDCMasterDataReceiveApi.Domain.Shared;
 using GDCMasterDataReceiveApi.Domain.Shared.Utils;
 using Microsoft.Extensions.Logging;
-using Novell.Directory.Ldap;
 using SqlSugar;
 using SqlSugar.Extensions;
 using UtilsSharp;
@@ -2710,64 +2709,6 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
             await Console.Out.WriteLineAsync(DateTime.Now.ToString());
             return dataCodeList.ToJson(true);
         }
-        #region ad域
-
-        public void AadYu()
-        {
-            var domain = "demo.cn";              //这里也可以是ip
-            var port = 389;                      //端口默认389
-            var account = "Common Name";         //用户姓名全名，即cn属性（Common Name）
-            var password = "123456";
-
-            //创建实例
-            using var connection = new LdapConnection();
-            //连接
-            connection.Connect(domain, port);
-            //绑定用户（认证）
-            connection.Bind(account, password);
-            //得到用户的账号信息
-            var res = connection.WhoAmI();
-            var authzId = res.AuthzIdWithoutType;
-            Console.WriteLine($"当前账号：{authzId}");
-            //获取根信息
-            var root = connection.GetRootDseInfo();
-            //根据authzId的格式来处理一下，方便后续查询
-            if (authzId.Contains("\\"))
-            {
-                account = authzId.Split('\\', StringSplitOptions.RemoveEmptyEntries).Last();
-            }
-            else if (authzId.Contains("@"))
-            {
-                account = authzId.Split(new string[] { "@" }, StringSplitOptions.RemoveEmptyEntries).First();
-            }
-            //过滤，规则可以自行百度下，这里根据account来查询
-            var filter = string.Format("(&(|(cn={0})(sAMAccountName={0}))(objectCategory=person)(objectClass=user))", account);
-            var result = connection.Search(root.DefaultNamingContext, LdapConnection.ScopeSub, filter, null, false);
-            //列出所有属性
-            while (result.HasMore())
-            {
-                try
-                {
-                    var entry = result.Next();
-                    var set = entry.GetAttributeSet();
-                    Console.WriteLine($"entry: {entry.Dn}{Environment.NewLine}attr count: {set.Count}");
-                    int index = 1;
-                    foreach (var attr in set)
-                    {
-                        if (attr.StringValueArray.Length <= 1)
-                        {
-                            Console.WriteLine($"attr{index}: {attr.Name} = {attr.StringValue}");
-                        }
-                        else
-                        {
-                            Console.WriteLine($"attr{index}: {attr.Name} = [{string.Join(", ", attr.StringValueArray)}]");
-                        }
-                        index++;
-                    }
-                }
-                catch { }
-            }
-        }
-        #endregion
+      
     }
 }
