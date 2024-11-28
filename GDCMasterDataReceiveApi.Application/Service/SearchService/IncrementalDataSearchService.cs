@@ -77,11 +77,6 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                                         .Where(t => t.IsDelete == 1 && SqlFunc.ToDate(t.CreateTime) >= sevTime && SqlFunc.ToDate(t.CreateTime) <= eTime)
                                         .Select(x => new TResult { CreateTime = SqlFunc.ToDate(x.CreateTime), Id = x.Id })
                                         .ToListAsync();
-                    ////获取修改的数据
-                    //updateList = await _dbContext.Queryable<User>()
-                    //   .Where(t => !string.IsNullOrWhiteSpace(t.UpdateTime.ToString()) && t.IsDelete == 1 && t.UpdateTime.Value.Date >= sevTime && t.UpdateTime.Value.Date <= time)
-                    //   .Select(x => new TResult { UpdateTime = x.UpdateTime, Id = x.Id })
-                    //   .ToListAsync();
                     break;
                 case Domain.Shared.Enums.TableNameType.Institution:
                     insertList = await _dbContext.Queryable<Institution>()
