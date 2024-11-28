@@ -96,8 +96,8 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                 var et = Convert.ToDateTime(sevTime.ToString("yyyy-MM-dd 23:59:59.9999"));
 
                 //数据
-                var tabInsertList = insertList.Where(x => x.CreateTime >= st).Select(x => x.Id.ToString()).ToList();
-                var tabUpdateList = updateList.Where(x => x.UpdateTime <= et).Select(x => x.Id.ToString()).ToList();
+                var tabInsertList = insertList.Where(x => x.CreateTime >= st && x.CreateTime <= et).Select(x => x.Id.ToString()).ToList();
+                var tabUpdateList = updateList.Where(x => x.UpdateTime >= st && x.UpdateTime <= et).Select(x => x.Id.ToString()).ToList();
                 incDetails.AddRange(tabInsertList);
                 incDetails.AddRange(tabUpdateList);
 
