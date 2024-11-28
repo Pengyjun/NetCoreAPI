@@ -92,10 +92,12 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
             {
                 //初始化
                 List<string> incDetails = new();
+                var st = Convert.ToDateTime(sevTime.ToString("yyyy-MM-dd 00:00:00.000001"));
+                var et = Convert.ToDateTime(sevTime.ToString("yyyy-MM-dd 23:59:59.9999"));
 
                 //数据
-                var tabInsertList = insertList.Where(x => x.CreateTime.Value.Date == sevTime).Select(x => x.Id.ToString()).ToList();
-                var tabUpdateList = updateList.Where(x => x.UpdateTime.Value.Date == sevTime).Select(x => x.Id.ToString()).ToList();
+                var tabInsertList = insertList.Where(x => x.CreateTime >= st).Select(x => x.Id.ToString()).ToList();
+                var tabUpdateList = updateList.Where(x => x.UpdateTime <= et).Select(x => x.Id.ToString()).ToList();
                 incDetails.AddRange(tabInsertList);
                 incDetails.AddRange(tabUpdateList);
 
