@@ -2863,38 +2863,38 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
                 eachCompanyProductionValues.Add(new EachCompanyProductionValue()
                 {
                     XAxle = currentNowTimeInt,
-                    YAxlePlanValue = Math.Round((GetProductionValueInfo(monthInt, companyProductionList).Sum(x => x.PlanProductionValue) / 30M), 2),
-                    YAxleCompleteValue = Math.Round(dayActualProductionAmount, 2)
+                    YAxlePlanValue = Math.Round((GetProductionValueInfo(monthInt, companyProductionList).Sum(x => x.PlanProductionValue) / 300000M), 2),
+                    YAxleCompleteValue = Math.Round(dayActualProductionAmount/100000000M, 2)
                 });
             }
             #endregion
 
 
             #region 已公司维度
-            var companyInfoList = companyList.Where(x =>!SqlFunc.IsNullOrEmpty(x.Name) &&x.Name != "广航局总体").ToList();
-            List<EachCompanyProductionValue> companyEachCompanyProductionValues = new List<EachCompanyProductionValue>();
-            for (int i = 1; i <= length; i++)
-            {
-                foreach (var item in companyInfoList)
-                {
-                    var currentMonthCompanyProductionValue = companyMonthProductionValue.Where(x => x.Id == item.ItemId).FirstOrDefault();
-                    currentNowTimeInt = int.Parse(DateTime.Now.ToString("yyyyMMdd")) - (i - 1);
-                    //判断月份
-                    var monthInt = Utils.GetMonth(currentNowTimeInt);
-                    var dayActualProductionAmount = dayProductionValueList.Where(x => x.DateDay == (currentNowTimeInt - 1)).Sum(x => x.DayActualProductionAmount);
-                    companyEachCompanyProductionValues.Add(new EachCompanyProductionValue()
-                    {
-                        ConpanyName = item.Name,
-                        XAxle = currentNowTimeInt,
-                        YAxlePlanValue = Math.Round((GetProductionValueInfo(monthInt, companyProductionList).Where(x => x.Id
-                        == item.ItemId).Sum(x => x.PlanProductionValue) / 30M), 2),
-                        YAxleCompleteValue = Math.Round(dayActualProductionAmount, 2)
-                    });
-                }
+            //var companyInfoList = companyList.Where(x =>!SqlFunc.IsNullOrEmpty(x.Name) &&x.Name != "广航局总体").ToList();
+            //List<EachCompanyProductionValue> companyEachCompanyProductionValues = new List<EachCompanyProductionValue>();
+            //for (int i = 1; i <= length; i++)
+            //{
+            //    foreach (var item in companyInfoList)
+            //    {
+            //        var currentMonthCompanyProductionValue = companyMonthProductionValue.Where(x => x.Id == item.ItemId).FirstOrDefault();
+            //        currentNowTimeInt = int.Parse(DateTime.Now.ToString("yyyyMMdd")) - (i - 1);
+            //        //判断月份
+            //        var monthInt = Utils.GetMonth(currentNowTimeInt);
+            //        var dayActualProductionAmount = dayProductionValueList.Where(x => x.DateDay == (currentNowTimeInt - 1)).Sum(x => x.DayActualProductionAmount);
+            //        companyEachCompanyProductionValues.Add(new EachCompanyProductionValue()
+            //        {
+            //            ConpanyName = item.Name,
+            //            XAxle = currentNowTimeInt,
+            //            YAxlePlanValue = Math.Round((GetProductionValueInfo(monthInt, companyProductionList).Where(x => x.Id
+            //            == item.ItemId).Sum(x => x.PlanProductionValue) / 30M), 2),
+            //            YAxleCompleteValue = Math.Round(dayActualProductionAmount, 2)
+            //        });
+            //    }
                
                
-            }
-            eachCompanyProductionValues.AddRange(companyEachCompanyProductionValues);
+            //}
+            //eachCompanyProductionValues.AddRange(companyEachCompanyProductionValues);
             #endregion
 
             jjtSendMessageMonitoringDayReportResponseDto.EachCompanyProductionValue = eachCompanyProductionValues;
