@@ -33,9 +33,6 @@ using GDCMasterDataReceiveApi.Application.Contracts.IService.IReceiveService;
 using GDCMasterDataReceiveApi.Domain.Shared;
 using GDCMasterDataReceiveApi.Domain.Shared.Annotation;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json.Serialization;
-using Newtonsoft.Json;
-using System.Text.Json.Nodes;
 
 namespace GDCMasterDataReceiveApi.Controller
 {
@@ -384,6 +381,10 @@ namespace GDCMasterDataReceiveApi.Controller
         
            return await _receiveService.TestAsync(baseReceiveDataRequestDto);
         }
+        #endregion
+
+        #region ad域
+
         #endregion
     }
 }
