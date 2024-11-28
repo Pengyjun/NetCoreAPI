@@ -10,9 +10,6 @@ using GDCMasterDataReceiveApi.Domain.Shared.Utils;
 using Newtonsoft.Json;
 using SqlSugar;
 using SqlSugar.Extensions;
-using System.Collections.Generic;
-using System.Linq.Expressions;
-using System.Security.Cryptography;
 using UtilsSharp;
 
 namespace GDCMasterDataReceiveApi.Application.Service.SearchService
@@ -65,7 +62,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
             Utils.TryConvertDateTimeFromDateDay(sevDay, out DateTime sevTime);
 
             sevTime = Convert.ToDateTime(sevTime.ToString("yyyy-MM-dd 00:00:00.000001"));
-            var eTime = Convert.ToDateTime(Convert.ToDateTime(DateTime.Now).ToString("yyyy-MM-dd 23:59:59.9999"));
+            var eTime = Convert.ToDateTime(time.ToString("yyyy-MM-dd 23:59:59.9999"));
             List<TResult> insertList = new();
             List<TResult> updateList = new();
 
