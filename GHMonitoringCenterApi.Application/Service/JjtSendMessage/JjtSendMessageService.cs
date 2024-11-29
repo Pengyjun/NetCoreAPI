@@ -2904,7 +2904,7 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
             //eachCompanyProductionValues.AddRange(companyEachCompanyProductionValues);
             #endregion
 
-            jjtSendMessageMonitoringDayReportResponseDto.EachCompanyProductionValue = eachCompanyProductionValues;
+            jjtSendMessageMonitoringDayReportResponseDto.EachCompanyProductionValue = eachCompanyProductionValues.OrderBy(x=>x.XAxle).ToList();
             #endregion
 
             jjtSendMessageMonitoringDayReportResponseDto.Month = month;
