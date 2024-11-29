@@ -2863,7 +2863,7 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
                 eachCompanyProductionValues.Add(new EachCompanyProductionValue()
                 {
                     XAxle = currentNowTimeInt,
-                    YAxlePlanValue = Math.Round((GetProductionValueInfo(monthInt, companyProductionList).Sum(x => x.PlanProductionValue) / 300000M), 2),
+                    YAxlePlanValue = Math.Round((GetProductionValueInfo(monthInt, companyProductionList).Sum(x => x.PlanProductionValue) / 3000000000M), 2),
                     YAxleCompleteValue = Math.Round(dayActualProductionAmount/100000000M, 2)
                 });
             }
