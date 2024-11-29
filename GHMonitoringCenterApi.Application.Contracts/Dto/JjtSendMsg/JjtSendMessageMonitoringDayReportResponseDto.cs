@@ -691,7 +691,7 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.JjtSendMsg
         /// </summary>
         public decimal? YAxlePlanValue { get; set; }
         /// <summary>
-        /// 计划产值
+        /// 完成产值
         /// </summary>
         public decimal? YAxleCompleteValue { get; set; }
     }

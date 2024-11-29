@@ -709,7 +709,7 @@ namespace GHMonitoringCenterApi.Domain.Shared.Util
                 {
                     endTime = new DateTime(now.Year, now.AddMonths(-1).Month, 25);
                 }
-               
+
             }
             else
             {
@@ -736,17 +736,19 @@ namespace GHMonitoringCenterApi.Domain.Shared.Util
         /// <param name="time"></param>
         /// <param name="startTime"></param>
         /// <param name="endTime"></param>
-        public static void GetDateRange(DateTime time,out int startTime, out int endTime) {
+        public static void GetDateRange(DateTime time, out int startTime, out int endTime)
+        {
             if (time.Day > 26 && time.Day <= 31)
             {
                 startTime = int.Parse(time.ToString("yyyyMM26"));
                 endTime = int.Parse(time.AddMonths(1).ToString("yyyyMM25"));
             }
-            else {
+            else
+            {
                 startTime = int.Parse(time.AddMonths(-1).ToString("yyyyMM26"));
                 endTime = int.Parse(time.ToString("yyyyMM25"));
             }
-            
+
         }
         #endregion
 
@@ -757,10 +759,10 @@ namespace GHMonitoringCenterApi.Domain.Shared.Util
         /// </summary>
         /// <param name="text"></param>
         /// <returns></returns>
-       public static bool EndsWithParenthesis(string text)
+        public static bool EndsWithParenthesis(string text)
         {
             // 检查是否以 '(' 或 ')' 结尾
-            return text.EndsWith("(") || text.EndsWith(")")|| text.EndsWith("（")|| text.EndsWith("）");
+            return text.EndsWith("(") || text.EndsWith(")") || text.EndsWith("（") || text.EndsWith("）");
         }
 
 
@@ -773,17 +775,40 @@ namespace GHMonitoringCenterApi.Domain.Shared.Util
         public static int GetMonth(int day)
         {
             DateTime now;
-            ConvertHelper.TryConvertDateTimeFromDateDay(day,out now);
-            var startTime =string.Empty;
-            if (now.Day >=27)
+            ConvertHelper.TryConvertDateTimeFromDateDay(day, out now);
+            var startTime = string.Empty;
+            if (now.Day >= 26)
             {
-                startTime = DateTime.Now.ToString("yyyy-MM-26 00:00:00");
+                startTime = now.AddMonths(1).ToString("yyyy-MM-26 00:00:00");
+                //startTime = DateTime.Now.ToString("yyyy-MM-26 00:00:00");
             }
             else
             {
-                startTime = DateTime.Now.AddMonths(-1).ToString("yyyy-MM-26 00:00:00");
+                startTime = now.ToString("yyyy-MM-26 00:00:00");
+                //startTime = DateTime.Now.AddMonths(-1).ToString("yyyy-MM-26 00:00:00");
             }
-            return   Convert.ToDateTime(startTime).AddMonths(1).Month;
+            return Convert.ToDateTime(startTime).Month;
+            //return   Convert.ToDateTime(startTime).AddMonths(1).Month;
+        }
+        /// <summary>
+        /// 根据时间int类型 获取年份数据
+        /// </summary>
+        /// <param name="day"></param>
+        /// <returns></returns>
+        public static int GetYear(int day)
+        {
+            DateTime now;
+            ConvertHelper.TryConvertDateTimeFromDateDay(day, out now);
+            var startTime = string.Empty;
+            if (now.Day >= 26)
+            {
+                startTime = now.AddMonths(1).ToString("yyyy-MM-26 00:00:00");
+            }
+            else
+            {
+                startTime = now.ToString("yyyy-MM-26 00:00:00");
+            }
+            return Convert.ToDateTime(startTime).Year;
         }
     }
 }
