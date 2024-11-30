@@ -945,7 +945,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.GovernanceData
                         // 查询数据库，筛选出 timestamp 大于 当前时间减 传入 小时的记录 属于未更新的数据
                         ids = _dbContext.Queryable<object>()
                                  .AS(item2.Table.ToLower())
-                                 .Where($"timestamp > {ctTimeStamp}")
+                                 .Where($"timestamp < {ctTimeStamp}")
                                  .Select($"CAST(id AS VARCHAR) AS id")
                                  .ToJson();
                     }
