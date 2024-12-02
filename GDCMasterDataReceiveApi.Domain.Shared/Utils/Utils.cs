@@ -12,6 +12,9 @@ using UtilsSharp;
 using System.Xml.Serialization;
 using System.Xml;
 using System;
+using System.DirectoryServices.Protocols;
+using System.Buffers.Text;
+using System.Collections;
 
 namespace GDCMasterDataReceiveApi.Domain.Shared.Utils
 {
@@ -489,7 +492,7 @@ namespace GDCMasterDataReceiveApi.Domain.Shared.Utils
         /// <param name="fileOut">输出</param>
         public static void DirectoryZip(string sourceDirectory, string fileOut)
         {
-            string[] allFiles = Directory.GetFiles(sourceDirectory, "", SearchOption.AllDirectories);
+            string[] allFiles = Directory.GetFiles(sourceDirectory, "", System.IO.SearchOption.AllDirectories);
             using (FileStream zipFileToOpen = new FileStream(fileOut, FileMode.OpenOrCreate))
             {
                 using (ZipArchive archive = new ZipArchive(zipFileToOpen, ZipArchiveMode.Update))
@@ -724,6 +727,65 @@ namespace GDCMasterDataReceiveApi.Domain.Shared.Utils
          
         }
         #endregion
+
+
+        /// <summary>
+        /// 获取预控人员信息
+        /// </summary>
+
+        //public static List<Dictionary<string,string>> SearchDomainUser() 
+        //{
+        //    List<Dictionary<string, string>> list =new List<Dictionary<string, string>>();
+        //   var account= AppsettingsHelper.GetValue("DomainInfo:Account");
+        //   var pwd= AppsettingsHelper.GetValue("DomainInfo:Pwd");
+        //   var baseDn = AppsettingsHelper.GetValue("DomainInfo:BaseDn");
+        //   var ip = AppsettingsHelper.GetValue("DomainInfo:Ip");
+        //    NetworkCredential credential = new NetworkCredential(account, pwd);
+        //    LdapConnection connection = new LdapConnection(ip);
+        //    connection.Credential = credential;
+        //    try
+        //    {
+        //        // 连接到LDAP服务器
+        //        connection.Bind();
+        //        string filter = "(objectClass=user)";
+        //        SearchRequest searchRequest = new SearchRequest(baseDn, filter, SearchScope.Subtree, null);
+        //        // 执行搜索
+        //        SearchResponse searchResponse = (SearchResponse)connection.SendRequest(searchRequest);
+        //        foreach (SearchResultEntry entry in searchResponse.Entries)
+        //        {
+        //            Console.WriteLine($"Found user: {entry.DistinguishedName}");
+
+        //            // 您可以根据需要获取更多用户属性
+        //            foreach (DictionaryEntry attribute in entry.Attributes)
+        //            {
+        //                var obj = ((System.DirectoryServices.Protocols.DirectoryAttribute)attribute.Value);
+        //                if (obj.Name == "pager")
+        //                {
+        //                    //职工号
+        //                    Dictionary<string, string> keyValuePairs = new Dictionary<string, string>();
+        //                    keyValuePairs.Add("pager", obj.GetValues(typeof(string)).ToString());
+        //                }
+        //                else if (obj.Name == "sAMAccountname")
+        //                {
+        //                    //域账号
+        //                    Dictionary<string, string> keyValuePairs = new Dictionary<string, string>();
+        //                    keyValuePairs.Add("pager", obj.GetValues(typeof(string)).ToString());
+        //                }
+        //                else if (obj.Name == "postOfficeBox")
+        //                {
+        //                    //域账号
+        //                    Dictionary<string, string> keyValuePairs = new Dictionary<string, string>();
+        //                    keyValuePairs.Add("pager", obj.GetValues(typeof(string)).ToString());
+        //                }
+        //            }
+        //            Console.WriteLine("---");
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Console.WriteLine($"获取域账号信息出现错误:{ex}");
+        //    }
+        //}
 
     }
 }

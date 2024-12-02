@@ -1,12 +1,16 @@
 ﻿using GDCMasterDataReceiveApi.Application.Contracts;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto._4A.DomainUser;
 using GDCMasterDataReceiveApi.Domain.Models;
 using GDCMasterDataReceiveApi.Domain.Shared;
 using GDCMasterDataReceiveApi.Domain.Shared.Enums;
+using GDCMasterDataReceiveApi.Domain.Shared.Utils;
 using Newtonsoft.Json;
 using SqlSugar;
+using System.Collections;
 using System.ComponentModel;
 using System.Data;
+using System.DirectoryServices.Protocols;
 using System.Reflection;
 using UtilsSharp;
 
@@ -397,6 +401,89 @@ namespace GDCMasterDataReceiveApi.Application
 
             // 如果没有找到 Description 特性，返回 null 或空字符串
             return null;
+        }
+
+
+
+        /// <summary>
+        /// 获取域账号信息  并保存到数据库
+        /// </summary>
+        /// <returns></returns>
+        public async Task<bool> SearchDomainUserAsync()
+        {
+            List<DomainUserResponseDto> list = new List<DomainUserResponseDto>();
+            var account = AppsettingsHelper.GetValue("DomainInfo:Account");
+            var pwd = AppsettingsHelper.GetValue("DomainInfo:Pwd");
+            var baseDn = AppsettingsHelper.GetValue("DomainInfo:BaseDn");
+            var ip = AppsettingsHelper.GetValue("DomainInfo:Ip");
+            System.Net.NetworkCredential credential = new System.Net.NetworkCredential(account, pwd);
+            LdapConnection connection = new LdapConnection(ip);
+            connection.Credential = credential;
+            try
+            {
+                // 连接到LDAP服务器
+                connection.Bind();
+                string filter = "(objectClass=user)";
+                SearchRequest searchRequest = new SearchRequest(baseDn, filter, SearchScope.Subtree, null);
+                // 执行搜索
+                SearchResponse searchResponse = (SearchResponse)connection.SendRequest(searchRequest);
+                foreach (SearchResultEntry entry in searchResponse.Entries)
+                {
+                    DomainUserResponseDto domainUserResponseDto = new DomainUserResponseDto();
+                    // 您可以根据需要获取更多用户属性
+                    foreach (DictionaryEntry attribute in entry.Attributes)
+                    {
+                      
+                        var obj = ((System.DirectoryServices.Protocols.DirectoryAttribute)attribute.Value);
+                        if (obj.Name == "pager")
+                        {
+                            domainUserResponseDto.WorkerAccount = string.Join(", ", obj.GetValues(typeof(string)));
+                        }
+                        else if (obj.Name == "sAMAccountName")
+                        {
+                            domainUserResponseDto.DomainAccount = string.Join(", ", obj.GetValues(typeof(string)));
+                        }
+                        else if (obj.Name == "postOfficeBox")
+                        {
+                            domainUserResponseDto.Card = string.Join(", ", obj.GetValues(typeof(string)));
+                        }
+                        else if (obj.Name == "mobile")
+                        {
+                            domainUserResponseDto.Phone = string.Join(", ", obj.GetValues(typeof(string)));
+                        }
+                       // await Console.Out.WriteLineAsync(obj.Name+"-----"+ string.Join(", ", obj.GetValues(typeof(string))));
+                    }
+                    if (!string.IsNullOrWhiteSpace(domainUserResponseDto.Card))
+                    {
+                        list.Add(domainUserResponseDto );
+                    }
+                }
+
+                if (list != null && list.Count > 0)
+                {
+                   List< GDCUser>   gDCUsers = new List< GDCUser >();
+                    foreach (var item in list)
+                    {
+                        gDCUsers.Add(new GDCUser()
+                        {
+                            Card = item.Card,
+                            DomainAccount = item.DomainAccount,
+                            WorkerAccount = item.WorkerAccount,
+                            Phone = item.Phone,
+                            CreateTime = DateTime.Now,
+                            Timestamp = Utils.GetTimeSpan(),
+                            Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId()
+                        });
+                    }
+                  await  _dbContext.Deleteable<GDCUser>().ExecuteCommandAsync();
+                  await _dbContext.Insertable<GDCUser>(gDCUsers).ExecuteCommandAsync();
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"获取域账号信息出现错误:{ex}");
+            }
+            return true;
         }
     }
 }

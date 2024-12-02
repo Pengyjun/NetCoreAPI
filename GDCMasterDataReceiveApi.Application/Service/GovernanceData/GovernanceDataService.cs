@@ -545,6 +545,31 @@ namespace GDCMasterDataReceiveApi.Application.Service.GovernanceData
             return flag;
         }
 
+         /// <summary>
+        /// 治理人员域账号数据
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        public async Task<bool> GovernanceUserDataAsync()
+        {
+            var userList= await _dbContext.Queryable<User>().Where(x => x.IsDelete == 1 && x.DomainAccount == null).ToListAsync();
+            if (userList != null && userList.Count > 0)
+            {
+                var  domainUserLIst= await  _dbContext.Queryable<GDCUser>().Where(x => x.IsDelete == 1).ToListAsync();
+                foreach (var item in userList)
+                {
+                   var currentUser=domainUserLIst.Where(x => x.Card == item.CERT_NO).FirstOrDefault();
+                    if (currentUser != null)
+                    {
+                        item.DomainAccount = currentUser.DomainAccount;
+                        item.WorkerAccount = currentUser.WorkerAccount;
+                    }
+                }
+               await _dbContext.Updateable<User>(userList).UpdateColumns(x => new { x.DomainAccount, x.WorkerAccount }).ExecuteCommandAsync();
+            }
+            return true;
+        }
+
         #region 数据资源
         /// <summary>
         /// 获取数据资源列表
@@ -1269,6 +1294,8 @@ namespace GDCMasterDataReceiveApi.Application.Service.GovernanceData
             responseAjaxResult.SuccessResult(true);
             return responseAjaxResult;
         }
+
+       
 
         #endregion
     }

@@ -1,4 +1,5 @@
 ﻿using GDCMasterDataReceiveApi.Application.Contracts.Dto;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto._4A.DomainUser;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.Institution;
 using GDCMasterDataReceiveApi.Domain.Models;
 using GDCMasterDataReceiveApi.Domain.Shared;
@@ -61,5 +62,12 @@ namespace GDCMasterDataReceiveApi.Application.Contracts
         /// <returns></returns>
         Task<List<IConditionalModel>> JsonToConventSqlAsync(List<JsonToSqlRequestDto> jsonToSqlRequestDtos, object dto);
         //Task<List<IConditionalModel>> JsonToConventSqlAsync(List<JsonToSqlRequestDto> jsonToSqlRequestDtos);
+
+
+        /// <summary>
+        /// 获取域账号信息  并保存到数据库
+        /// </summary>
+        /// <returns></returns>
+        Task<bool> SearchDomainUserAsync();
     }
 }
