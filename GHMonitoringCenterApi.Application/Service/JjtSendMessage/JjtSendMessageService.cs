@@ -2868,7 +2868,7 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
                 var dayPlanProAmount = GetProjectPlanAmount(monthPlanRepData, yearInt, monthInt);
                 eachCompanyProductionValues.Add(new EachCompanyProductionValue()
                 {
-                    XAxle = currentNowTimeInt,
+                    XAxle = currentNowTimeInt.ToString().Substring(0,4)+"-" + currentNowTimeInt.ToString().Substring(4, 2)+ "-" + currentNowTimeInt.ToString().Substring(6, 2),
                     YAxlePlanValue = Math.Round(dayPlanProAmount / 3000000000M, 2),
                     YAxleCompleteValue = Math.Round(dayActualProductionAmount / 100000000M, 2)
                     //YAxlePlanValue = Math.Round((GetProductionValueInfo(monthInt, companyProductionList).Sum(x => x.PlanProductionValue) / 300000M), 2),

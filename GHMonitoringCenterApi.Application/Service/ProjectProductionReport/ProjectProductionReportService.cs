@@ -258,6 +258,7 @@ namespace GHMonitoringCenterApi.Application.Service.ProjectProductionReport
                 .WhereIF(time != 0, x => x.DateDay == time)
                 .Select(x => new { x.DayReportId, x.ActualDailyProductionAmount, x.OutsourcingExpensesAmount, x.ActualDailyProduction, x.UnitPrice })
                 .ToListAsync();
+            var a = departmentIds.Where(x => x == "63115206-38d9-4e3a-8c5a-39abf7e5ea29".ToGuid()).ToList();
             var list = new List<DayReportInfo>();
             if (!searchRequestDto.IsDuiWai)//非对外查询接口  监控中心自己用
             {
@@ -274,7 +275,7 @@ namespace GHMonitoringCenterApi.Application.Service.ProjectProductionReport
                    .WhereIF(searchRequestDto.ProjectDept != null, (p, d) => p.ProjectDept == searchRequestDto.ProjectDept)
                    .WhereIF(searchRequestDto.ProjectStatusId != null && searchRequestDto.ProjectStatusId.Any(), (p, d) => searchRequestDto.ProjectStatusId.Contains(p.StatusId.Value.ToString()))
                    .WhereIF(searchRequestDto.ProjectTypeId != null, (p, d) => p.TypeId == searchRequestDto.ProjectTypeId)
-                   .WhereIF(!string.IsNullOrWhiteSpace(searchRequestDto.ProjectName), (p, d) => SqlFunc.Contains(p.Name, searchRequestDto.ProjectName))
+                    .WhereIF(!string.IsNullOrWhiteSpace(searchRequestDto.ProjectName), (p, d) => SqlFunc.Contains(p.Name, searchRequestDto.ProjectName))
                    .WhereIF(categoryList != null && categoryList.Any(), (p, d) => categoryList.Contains(p.Category))
                    .WhereIF(tagList != null && tagList.Any(), (p, d) => tagList.Contains(p.Tag))
                    .WhereIF(tag2List != null && tag2List.Any(), (p, d) => tag2List.Contains(p.Tag2))

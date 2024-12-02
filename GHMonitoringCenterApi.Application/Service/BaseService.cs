@@ -432,6 +432,7 @@ namespace GHMonitoringCenterApi.Application.Service
                 //    Id = x.PomId,
                 //    Name = x.Name
                 //}));
+             
                 responseAjaxResult.Data = departmentList;
                 responseAjaxResult.Count = departmentList.Count;
             }

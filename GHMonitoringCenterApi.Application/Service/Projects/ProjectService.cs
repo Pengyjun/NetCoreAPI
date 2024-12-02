@@ -160,7 +160,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             var oids = await dbContext.Queryable<Institution>().Where(x => x.IsDelete == 1 && x.Oid == _currentUser.CurrentLoginInstitutionOid).SingleAsync();
             var InstitutionId = await baseService.SearchCompanySubPullDownAsync(oids.PomId.Value, false, true);
             departmentIds = InstitutionId.Data.Select(x => x.Id.Value).ToList();
-
+            var a = departmentIds.Where(x => x == "e187aa5b-003d-4598-ad86-14fb7e69a53b".ToGuid()).ToList();
             var project = dbContext.Queryable<Project>()
                 .LeftJoin<ProjectStatus>((p, ps) => p.StatusId == ps.StatusId)
                 .Where(p => departmentIds.Contains(p.ProjectDept.Value))

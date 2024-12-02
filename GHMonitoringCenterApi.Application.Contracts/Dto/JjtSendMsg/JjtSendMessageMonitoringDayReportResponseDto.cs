@@ -685,7 +685,7 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.JjtSendMsg
         /// <summary>
         /// X轴
         /// </summary>
-        public int? XAxle { get; set; }
+        public string? XAxle { get; set; }
         /// <summary>
         /// 计划产值
         /// </summary>
