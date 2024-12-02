@@ -317,6 +317,14 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto._4A.User
         [DisplayName("外部人员标识（新版）")]
         public string? Externaluser { get; set; }
         /// <summary>
+        /// 域账号
+        /// </summary>
+        public string? DomainAccount { get; set; }
+        /// <summary>
+        /// 职工号
+        /// </summary>
+        public string? WorkerAccount { get; set; }
+        /// <summary>
         ///  扩展字段 4
         /// </summary>
         [DisplayName("扩展字段4")]

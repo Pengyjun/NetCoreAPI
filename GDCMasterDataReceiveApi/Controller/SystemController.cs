@@ -65,13 +65,17 @@ namespace GDCMasterDataReceiveApi.Controller
         }
         #endregion
 
-        #region adyu
-        [HttpGet("adyu")]
-        [AllowAnonymous]
-        public bool AadYu()
-        {
-            return systemService.AadYu();
-        }
+
+        #region 数据资源管理 
+
+        #endregion
+
+        #region 数据标准管理
+
+        #endregion
+
+        #region 数据质量管理
+
         #endregion
     }
 }

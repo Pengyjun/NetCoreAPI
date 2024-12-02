@@ -1,4 +1,5 @@
-﻿using GDCMasterDataReceiveApi.Application.Contracts.Dto;
+﻿using GDCMasterDataReceiveApi.Application.Contracts;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto._4A.User;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.GovernanceData;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.ValueDomain;
@@ -22,13 +23,15 @@ namespace GDCMasterDataReceiveApi.Controller
 
         #region 依赖注入
         private readonly IGovernanceDataService governanceDataService;
+        private readonly IBaseService baseService;
         /// <summary>
         /// 
         /// </summary>
         /// <param name="GovernanceDataService"></param>
-        public GovernanceDataController(IGovernanceDataService GovernanceDataService)
+        public GovernanceDataController(IGovernanceDataService GovernanceDataService, IBaseService baseService)
         {
             governanceDataService = GovernanceDataService;
+            this.baseService = baseService;
         }
         #endregion
         /// <summary>
@@ -40,6 +43,28 @@ namespace GDCMasterDataReceiveApi.Controller
         public async Task<bool> GovernanceDataAsync(int type = 1)
         {
             return await governanceDataService.GovernanceDataAsync(type);
+        }
+
+        /// <summary>
+        ///  获取域账号信息  并保存到数据库
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        [HttpGet("SearchDomainUser")]
+        public async Task<bool> SearchDomainUserAsync()
+        {
+            return await baseService.SearchDomainUserAsync();
+        }
+
+        /// <summary>
+        /// 治理人员域账号数据
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        [HttpGet("GovernanceUserData")]
+        public async Task<bool> GovernanceUserDataAsync()
+        {
+            return await governanceDataService.GovernanceUserDataAsync();
         }
 
         #region 数据资源

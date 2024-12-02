@@ -22,6 +22,15 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.IService.GovernanceData
         /// <returns></returns>
         Task<bool> GovernanceDataAsync(int type = 1);
 
+        /// <summary>
+        /// 治理人员域账号数据
+        /// </summary>
+        /// <returns></returns>
+        Task<bool> GovernanceUserDataAsync();
+
+
+
+
         #region 数据资源
         /// <summary>
         /// 获取数据资源列表
