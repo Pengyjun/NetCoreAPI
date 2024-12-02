@@ -10,11 +10,6 @@ namespace GDCMasterDataReceiveApi.Domain.Models
     public class TablesIssuedSettings : BaseEntity<long>
     {
         /// <summary>
-        /// 下发单位
-        /// </summary>
-        [SugarColumn(Length = 200)]
-        public string? InterfaceCode { get; set; }
-        /// <summary>
         /// 需要查询类型  ,拼接
         /// </summary>
         [SugarColumn(Length = 800)]
