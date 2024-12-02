@@ -87,6 +87,7 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// <summary>
         /// 兼职所在部门、 岗位类别、职级、岗位名称及排序 HR 兼职，“兼职所在部门 ID| 岗位类别 ID|兼职职级 |岗位名称|排序号，”多条兼职循环拼串
         /// </summary>
+        [SugarColumn(Length = 1024)]
         public string? SUB_DEPTS { get; set; }
         /// <summary>
         /// 用工类型
@@ -182,5 +183,17 @@ namespace GDCMasterDataReceiveApi.Domain.Models
         /// 是否属于本系统自己新增或修改 true 是 默认false
         /// </summary>
         public bool OwnerSystem { get; set; } = false;
+
+
+        /// <summary>
+        /// 域账号
+        /// </summary>
+        [SugarColumn(Length = 64)]
+        public string? DomainAccount { get; set; }
+        /// <summary>
+        /// 职工号
+        /// </summary>
+        [SugarColumn(Length = 64)]
+        public string? WorkerAccount { get; set; }
     }
 }

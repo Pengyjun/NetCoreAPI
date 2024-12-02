@@ -1,7 +1,6 @@
 ﻿using GDCMasterDataReceiveApi.Application.Contracts.Dto.System;
 using GDCMasterDataReceiveApi.Application.Contracts.IService.ISystemService;
 using GDCMasterDataReceiveApi.Domain.Shared;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Swashbuckle.AspNetCore.SwaggerGen;
@@ -65,13 +64,17 @@ namespace GDCMasterDataReceiveApi.Controller
         }
         #endregion
 
-        #region adyu
-        [HttpGet("adyu")]
-        [AllowAnonymous]
-        public bool AadYu()
-        {
-            return systemService.AadYu();
-        }
+
+        #region 数据资源管理 
+
+        #endregion
+
+        #region 数据标准管理
+
+        #endregion
+
+        #region 数据质量管理
+
         #endregion
     }
 }
