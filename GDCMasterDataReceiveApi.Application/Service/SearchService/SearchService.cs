@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using Dm.util.geoUtil;
 using GDCDataSecurityApi.Domain.Models;
 using GDCMasterDataReceiveApi.Application.Contracts;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto;
@@ -192,8 +191,8 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     CreateTime = u.CreateTime,
                     UpdateTime = u.UpdateTime,
                     OwnerSystem = u.OwnerSystem,
-                    WorkerAccount = u.WorkerAccount,
-                    DomainAccount = u.DomainAccount
+                    DomainAccount = u.DomainAccount,
+                    WorkerAccount = u.WorkerAccount
                 })
                 .ToPageListAsync(requestDto.PageIndex, requestDto.PageSize, total);
 
@@ -1052,7 +1051,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
             }
 
             var tableList = await _dbContext.Queryable<Institution>()
-                .Where(x => x.IsDelete == 1 )//&& x.STATUS == "1")
+                .Where(x => x.IsDelete == 1)//&& x.STATUS == "1")
                 .Select(t => new InstitutionConvertDto
                 {
                     GPOID = t.GPOID,

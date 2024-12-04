@@ -90,7 +90,7 @@ namespace GDCMasterDataReceiveApi.SqlSugarCore
                 };
             });
             Type[] types = typeof(CorresUnit).Assembly.GetTypes()
-            .Where(it =>it.FullName.Contains("GDCMasterDataReceiveApi.Domain.Models.User")
+            .Where(it =>it.FullName.Contains("GDCMasterDataReceiveApi.Domain.Models.TablesIssuedSettings")
             )
             .ToArray();
             db.CodeFirst.InitTables(types);
