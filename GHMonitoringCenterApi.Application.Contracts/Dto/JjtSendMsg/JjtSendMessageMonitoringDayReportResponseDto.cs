@@ -55,6 +55,7 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.JjtSendMsg
         /// </summary>
         public List<CompanyShipUnWriteReportInfo> CompanyShipUnWriteReportInfos { get; set; }
         public List<EachCompanyProductionValue> EachCompanyProductionValue { get; set; }
+        public List<ImpProjectWarning>? ImpProjectWarning { get; set; }
 
     }
 
@@ -695,5 +696,23 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.JjtSendMsg
         /// </summary>
         public decimal? YAxleCompleteValue { get; set; }
     }
+    #endregion 按天统计重点项目预警值
+    public class ImpProjectWarning
+    {
+        /// <summary>
+        /// 当日完成产值
+        /// </summary>
+        public decimal? DayAmount { get; set; }
+        /// <summary>
+        /// 项目名称
+        /// </summary>
+        public string? ProjectName { get; set; }
+        /// <summary>
+        /// 偏差内容
+        /// </summary>
+        public string? DeviationWarning { get; set; }
+    }
+    #region 
+
     #endregion
 }

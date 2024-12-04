@@ -2856,6 +2856,11 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
             //获取项目日报产值数据
             var dayRepData = await dbContext.Queryable<DayReport>().Where(t => t.IsDelete == 1).ToListAsync();
             #endregion
+            //得到-15天前的日期月份  从此月份的26至次月的25中的天数
+            var swMonth = DateTime.Now.AddDays(-16).Year + "-" + DateTime.Now.AddDays(-16).Month + "-";
+            //次月日期
+            var cyDate = DateTime.Now.AddDays(-16).AddMonths(1);
+            var difDays = TimeHelper.GetTimeSpan(Convert.ToDateTime(swMonth + "26"), Convert.ToDateTime(cyDate.ToString("yyyy-MM-25"))).Days + 1;
             for (int i = 1; i <= length; i++)
             {
                 //currentNowTimeInt = int.Parse(DateTime.Now.ToString("yyyyMMdd")) - (i - 1);
@@ -2866,10 +2871,11 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
                 //var dayActualProductionAmount = dayProductionValueList.Where(x => x.DateDay == (currentNowTimeInt - 1)).Sum(x => x.DayActualProductionAmount);
                 var dayActualProductionAmount = dayRepData.Where(x => x.DateDay == currentNowTimeInt).Sum(x => x.DayActualProductionAmount);
                 var dayPlanProAmount = GetProjectPlanAmount(monthPlanRepData, yearInt, monthInt);
+
                 eachCompanyProductionValues.Add(new EachCompanyProductionValue()
                 {
                     XAxle = currentNowTimeInt.ToString().Substring(0, 4) + "-" + currentNowTimeInt.ToString().Substring(4, 2) + "-" + currentNowTimeInt.ToString().Substring(6, 2),
-                    YAxlePlanValue = Math.Round(dayPlanProAmount / 3000000000M, 2),
+                    YAxlePlanValue = Math.Round(dayPlanProAmount / difDays, 2),
                     YAxleCompleteValue = Math.Round(dayActualProductionAmount / 100000000M, 2)
                     //YAxlePlanValue = Math.Round((GetProductionValueInfo(monthInt, companyProductionList).Sum(x => x.PlanProductionValue) / 300000M), 2),
                     //YAxleCompleteValue = Math.Round(dayActualProductionAmount / 100000000M, 2)
@@ -2904,7 +2910,35 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
             //eachCompanyProductionValues.AddRange(companyEachCompanyProductionValues);
             #endregion
 
+            #region  重点项目预警
+            List<ImpProjectWarning> imp = new();
+            //获取重点项目
+            var improjects = await dbContext.Queryable<KeyProject>().Where(t => t.IsDelete == 1).ToListAsync();
+            //获取日报数据
+            int nowDay = DateTime.Now.AddDays(-1).ToDateDay();
+            var impIds = improjects.Select(x => x.ProjectId).ToList();
+            var drData = dayRepData.Where(x => x.DateDay == nowDay && impIds.Contains(x.ProjectId) && !string.IsNullOrWhiteSpace(x.DeviationWarning)).ToList();
+
+            var npids = drData.Select(x => x.ProjectId).Distinct().ToList();
+            var np = improjects.Where(x => npids.Contains(x.ProjectId.Value)).ToList();
+
+            foreach (var item in np)
+            {
+                imp.Add(new ImpProjectWarning
+                {
+                    DayAmount = drData.FirstOrDefault(x => x.ProjectId == item.ProjectId)?.DayActualProductionAmount / 100000000,
+                    DeviationWarning = drData.FirstOrDefault(x => x.ProjectId == item.ProjectId)?.DeviationWarning,
+                    ProjectName = item.ProjectName
+                });
+            }
+            foreach (var item in imp)
+            {
+                item.DayAmount = item.DayAmount == 0 || string.IsNullOrWhiteSpace(item.DayAmount.ToString()) ? 0M : Math.Round(item.DayAmount.Value, 2);
+            }
+            #endregion
+
             jjtSendMessageMonitoringDayReportResponseDto.EachCompanyProductionValue = eachCompanyProductionValues.OrderBy(x => x.XAxle).ToList();
+            jjtSendMessageMonitoringDayReportResponseDto.ImpProjectWarning = imp;
             #endregion
 
             jjtSendMessageMonitoringDayReportResponseDto.Month = month;
