@@ -191,7 +191,9 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     UserLogin = u.USER_LOGIN,
                     CreateTime = u.CreateTime,
                     UpdateTime = u.UpdateTime,
-                    OwnerSystem = u.OwnerSystem
+                    OwnerSystem = u.OwnerSystem,
+                    WorkerAccount = u.WorkerAccount,
+                    DomainAccount = u.DomainAccount
                 })
                 .ToPageListAsync(requestDto.PageIndex, requestDto.PageSize, total);
 
