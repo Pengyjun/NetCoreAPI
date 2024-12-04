@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using SqlSugar;
-using GHMonitoringCenterApi.Domain.Enums;
-using GHMonitoringCenterApi.Application.Contracts.Dto.Enums;
+﻿using GHMonitoringCenterApi.Domain.Enums;
 
 namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project
 {
@@ -14,6 +7,23 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project
     /// </summary>
     public class ProjectDayReportResponseDto
     {
+
+        #region 新增两个字段
+        /// <summary>
+        /// 是否是重点项目   true是  fasle不是
+        /// </summary>
+        public bool IsKeyProject { get; set; }
+        /// <summary>
+        /// 最近半个月的平均产值  
+        /// </summary>
+        public decimal? MonthAveProduction { get; set; }
+        /// <summary>
+        /// -+区间比
+        /// </summary>
+        public decimal? Interval {  get; set; }
+        #endregion
+
+
         //辅助字段 目前只有项目年初计划使用
         public decimal DayAmount { get; set; }
         /// <summary>

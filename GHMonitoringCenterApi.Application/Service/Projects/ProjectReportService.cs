@@ -397,7 +397,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             {
                 isAddedDayReport = true;
                 model.IsHoliday = IsHoliday(model.DateDay);
-                dayReport = new DayReport() { Id = GuidUtil.Next(), ProjectId = model.ProjectId, DateDay = model.DateDay, ProcessStatus = DayReportProcessStatus.Steping, CreateId = _currentUser.Id, IsHoliday = model.IsHoliday };
+                dayReport = new DayReport() { Id = GuidUtil.Next(), ProjectId = model.ProjectId, DateDay = model.DateDay, ProcessStatus = DayReportProcessStatus.Steping, CreateId = _currentUser.Id, IsHoliday = model.IsHoliday, DeviationWarning = model.DeviationWarning };
                 await _dbDayReport.AsInsertable(dayReport).EnableDiffLogEvent(NewLogInfo(EntityType.DayReport, dayReport.Id, ModelState.Add)).ExecuteCommandAsync();
             }
             else
@@ -639,9 +639,30 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             }
             #endregion
 
+
+            #region 计算是否是重点项目   且最近半个月的平均产值
+            if (model.ProjectId != Guid.Empty)
+            {
+                var isExist = await _dbContext.Queryable<KeyProject>().Where(x => x.IsDelete == 1 && x.ProjectId == model.ProjectId).FirstAsync();
+                if (isExist != null)
+                {
+                    resDayReport.IsKeyProject = true;
+                    resDayReport.Interval = isExist.Interval;
+                    //计算半个月的平均产值
+                    var stime = DateTime.Now.AddDays(-1).ToDateDay();
+                    var etime = DateTime.Now.AddDays(-16).ToDateDay();
+                    //获取日报产值 
+                    resDayReport.MonthAveProduction = await _dbContext.Queryable<DayReport>().Where(t => t.IsDelete == 1 && t.DateDay >= stime && t.DateDay <= etime).SumAsync(x => x.DayActualProductionAmount) / 1500000000M;
+                }
+
+            }
+            #endregion
+
             // 统计月度计划产值
             var sumMonthProjectPlanned = await SumMonthProjectPlannedAsync(model.ProjectId, dayTime);
             resDayReport.Construction.DayPlannedProductionAmount = Math.Round(sumMonthProjectPlanned.PlannedOutputValue / 30.5m, 2);
+
+
             resDayReport.DateDay = dateDay;
             resDayReport.ProjectId = model.ProjectId;
             resDayReport.ProjectName = project.Name;

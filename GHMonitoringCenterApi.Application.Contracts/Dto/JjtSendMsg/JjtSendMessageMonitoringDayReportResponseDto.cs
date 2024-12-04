@@ -65,7 +65,7 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.JjtSendMsg
     public class ProjectBasePoduction
     {
         //排名前十的 当日产值合计
-       // public decimal TotalTopTenProductionValue { get; set; } 
+        // public decimal TotalTopTenProductionValue { get; set; } 
         /// <summary>
         /// 总日产值
         /// </summary>
@@ -676,7 +676,7 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.JjtSendMsg
 
 
     #region 各单位完成产值计划产值对比
-    public class EachCompanyProductionValue 
+    public class EachCompanyProductionValue
     {
         /// <summary>
         /// 公司名称   为空不按公司   

@@ -1,18 +1,8 @@
-﻿using SqlSugar.Extensions;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Diagnostics.PerformanceData;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using SqlSugar;
-using GHMonitoringCenterApi.Domain.Enums;
-using GHMonitoringCenterApi.Application.Contracts.Dto.Enums;
-using UtilsSharp;
-using System.Xml.Linq;
+﻿using GHMonitoringCenterApi.Application.Contracts.Dto.Enums;
 using GHMonitoringCenterApi.Application.Contracts.Dto.Project.Report;
-using GHMonitoringCenterApi.Domain.Shared.Util;
+using GHMonitoringCenterApi.Domain.Enums;
+using SqlSugar;
+using System.ComponentModel.DataAnnotations;
 
 namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project
 {
@@ -37,6 +27,10 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project
         /// 是否是节假日
         /// </summary>
         public bool IsHoliday { get; set; }
+        /// <summary>
+        /// 偏差预警
+        /// </summary>
+        public string? DeviationWarning { get; set; }
 
         /// <summary>
         /// 施工日志（步骤一）

@@ -247,5 +247,10 @@ namespace GHMonitoringCenterApi.Domain.Models
         /// </summary>
         [SugarColumn(ColumnDataType = "bit")]
         public bool IsHoliday { get; set; }
+        /// <summary>
+        /// 偏差预警
+        /// </summary>
+        [SugarColumn(ColumnDataType = "text")]
+        public string? DeviationWarning { get; set; }
     }
 }
