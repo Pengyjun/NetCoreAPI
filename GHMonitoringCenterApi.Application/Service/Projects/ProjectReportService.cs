@@ -649,8 +649,8 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     resDayReport.IsKeyProject = true;
                     resDayReport.Interval = isExist.Interval;
                     //计算半个月的平均产值
-                    var stime = DateTime.Now.AddDays(-1).ToDateDay();
-                    var etime = DateTime.Now.AddDays(-16).ToDateDay();
+                    var etime = DateTime.Now.AddDays(-1).ToDateDay();
+                    var stime = DateTime.Now.AddDays(-16).ToDateDay();
                     //获取日报产值 
                     resDayReport.MonthAveProduction = await _dbContext.Queryable<DayReport>().Where(t => t.IsDelete == 1 && t.DateDay >= stime && t.DateDay <= etime).SumAsync(x => x.DayActualProductionAmount) / 1500000000M;
                 }
