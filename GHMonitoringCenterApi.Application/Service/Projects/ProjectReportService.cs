@@ -639,9 +639,30 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             }
             #endregion
 
+
+            #region 计算是否是重点项目   且最近半个月的平均产值
+            if (model.ProjectId != Guid.Empty)
+            {
+                var isExist =await _dbContext.Queryable<KeyProject>().Where(x => x.IsDelete == 1 && x.ProjectId == model.ProjectId).FirstAsync();
+                if (isExist != null)
+                {
+                    resDayReport.IsKeyProject = true;
+                }
+                //计算半个月的平均产值
+                List<int> times = new List<int>();
+                for (int i = 0; i < 15; i++)
+                {
+                    //times.Add(DateTime.Now.AddDays(0))
+                }
+
+            }
+            #endregion
+
             // 统计月度计划产值
             var sumMonthProjectPlanned = await SumMonthProjectPlannedAsync(model.ProjectId, dayTime);
             resDayReport.Construction.DayPlannedProductionAmount = Math.Round(sumMonthProjectPlanned.PlannedOutputValue / 30.5m, 2);
+
+
             resDayReport.DateDay = dateDay;
             resDayReport.ProjectId = model.ProjectId;
             resDayReport.ProjectName = project.Name;
