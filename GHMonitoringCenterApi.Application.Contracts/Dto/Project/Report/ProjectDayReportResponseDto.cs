@@ -247,6 +247,10 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project
             /// 生产异常预警信息
             /// </summary>
             public string? ProductionWarningContent { get; set; }
+            /// <summary>
+            /// 偏差预警
+            /// </summary>
+            public string? DeviationWarning { get; set; }
 
             ///// <summary>
             ///// 已完成合同金额(元)

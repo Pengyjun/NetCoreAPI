@@ -2852,7 +2852,7 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
             var currentNowTimeInt = 0;
             #region 
             //获取项目产值计划表数据
-            var monthPlanRepData = await dbContext.Queryable<CompanyProductionValueInfo>().Where(x => x.IsDelete == 1).ToListAsync();
+            var monthPlanRepData = await dbContext.Queryable<CompanyProductionValueInfo>().Where(x => x.IsDelete == 1 && x.CompanyId != "bd840460-1e3a-45c8-abed-6e66903eb465".ToGuid()).ToListAsync();
             //获取项目日报产值数据
             var dayRepData = await dbContext.Queryable<DayReport>().Where(t => t.IsDelete == 1).ToListAsync();
             #endregion

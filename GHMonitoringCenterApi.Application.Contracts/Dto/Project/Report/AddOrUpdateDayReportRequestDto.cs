@@ -27,10 +27,6 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project
         /// 是否是节假日
         /// </summary>
         public bool IsHoliday { get; set; }
-        /// <summary>
-        /// 偏差预警
-        /// </summary>
-        public string? DeviationWarning { get; set; }
 
         /// <summary>
         /// 施工日志（步骤一）
@@ -307,6 +303,10 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project
             /// 特殊事项报告内容
             /// </summary>
             public string? ProductionWarningContent { get; set; }
+            /// <summary>
+            /// 偏差预警
+            /// </summary>
+            public string? DeviationWarning { get; set; }
 
             ///// <summary>
             ///// 已完成合同金额(元)

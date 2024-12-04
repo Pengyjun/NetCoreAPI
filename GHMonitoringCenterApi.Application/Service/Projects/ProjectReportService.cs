@@ -397,7 +397,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             {
                 isAddedDayReport = true;
                 model.IsHoliday = IsHoliday(model.DateDay);
-                dayReport = new DayReport() { Id = GuidUtil.Next(), ProjectId = model.ProjectId, DateDay = model.DateDay, ProcessStatus = DayReportProcessStatus.Steping, CreateId = _currentUser.Id, IsHoliday = model.IsHoliday, DeviationWarning = model.DeviationWarning };
+                dayReport = new DayReport() { Id = GuidUtil.Next(), ProjectId = model.ProjectId, DateDay = model.DateDay, ProcessStatus = DayReportProcessStatus.Steping, CreateId = _currentUser.Id, IsHoliday = model.IsHoliday };
                 await _dbDayReport.AsInsertable(dayReport).EnableDiffLogEvent(NewLogInfo(EntityType.DayReport, dayReport.Id, ModelState.Add)).ExecuteCommandAsync();
             }
             else
@@ -468,6 +468,8 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     construction.IsDelete = 0;
                 });
                 _mapper.Map(model.Construction, dayReport);
+
+                dayReport.DeviationWarning = model.Construction.DeviationWarning;
                 // 实际日产量/产值/外包支出
                 dayReport.DayActualProduction = model.Construction.DayReportConstructions.Sum(t => t.ActualDailyProduction);
                 dayReport.DayActualProductionAmount = model.Construction.DayReportConstructions.Sum(t => t.ActualDailyProductionAmount);
@@ -586,7 +588,6 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 resDayReport.Construction.IsShowWorkStatusOfSpringFestival = IsShowWorkStatusOfSpringFestival(dayTime);
                 resDayReport.CreateUserName = _currentUser.Name;
                 resDayReport.IsHoliday = holidayConfig.IsHoliday == 1; //true;// IsHoliday(dateDay);
-
             }
             else
             {
