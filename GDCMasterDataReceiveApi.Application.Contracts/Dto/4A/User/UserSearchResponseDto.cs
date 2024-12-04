@@ -344,16 +344,16 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto._4A.User
         /// </summary>
         public bool OwnerSystem { get; set; } = false;
 
-        /// <summary>
-        /// 域账号
-        /// </summary>
-        [DisplayName("域账号")]
-        public string? DomainAccount { get; set; }
-        /// <summary>
-        /// 职工号
-        /// </summary>
-        [DisplayName("职工号")]
-        public string? WorkerAccount { get; set; }
+        ///// <summary>
+        ///// 域账号
+        ///// </summary>
+        //[DisplayName("域账号")]
+        //public string? DomainAccount { get; set; }
+        ///// <summary>
+        ///// 职工号
+        ///// </summary>
+        //[DisplayName("职工号")]
+        //public string? WorkerAccount { get; set; }
     }
     /// <summary>
     /// 用户所在兼职
