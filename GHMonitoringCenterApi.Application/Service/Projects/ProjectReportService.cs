@@ -652,7 +652,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     var etime = DateTime.Now.AddDays(-1).ToDateDay();
                     var stime = DateTime.Now.AddDays(-16).ToDateDay();
                     //获取日报产值 
-                    resDayReport.MonthAveProduction = await _dbContext.Queryable<DayReport>().Where(t => t.IsDelete == 1 && t.DateDay >= stime && t.DateDay <= etime).SumAsync(x => x.DayActualProductionAmount) / 1500000000M;
+                    resDayReport.MonthAveProduction = await _dbContext.Queryable<DayReport>().Where(t => t.IsDelete == 1 && t.DateDay >= stime && t.DateDay <= etime).SumAsync(x => x.DayActualProductionAmount) / 15M;
                 }
 
             }
