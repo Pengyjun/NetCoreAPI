@@ -5574,6 +5574,18 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             }
             resMonthReport.ProductionAmount = Math.Round(resMonthReport.ProductionAmount, 2);
             resMonthReport.Production = Math.Round(resMonthReport.Production, 2);
+
+            #region 新增逻辑
+            if (resMonthReport!=null)
+            {
+                
+                var prpjectMonthList = await _dbContext.Queryable<MonthReport>().Where(x => x.ProjectId== resMonthReport.ProjectId &&x.DateMonth== model.DateMonth).ToListAsync();
+                resMonthReport.ProductionAmount = Math.Round(prpjectMonthList.Sum(x=>x.CompleteProductionAmount), 2);
+                resMonthReport.Production = Math.Round(prpjectMonthList.Sum(x => x.CompletedQuantity), 2); 
+            }
+
+            #endregion
+
             return result.SuccessResult(resMonthReport);
         }
 

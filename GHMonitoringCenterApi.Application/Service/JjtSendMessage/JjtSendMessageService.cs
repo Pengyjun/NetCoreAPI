@@ -2852,7 +2852,8 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
             var currentNowTimeInt = 0;
             #region 
             //获取项目产值计划表数据
-            var monthPlanRepData = await dbContext.Queryable<CompanyProductionValueInfo>().Where(x => x.IsDelete == 1 && x.CompanyId != "bd840460-1e3a-45c8-abed-6e66903eb465".ToGuid()).ToListAsync();
+            //var monthPlanRepData = await dbContext.Queryable<CompanyProductionValueInfo>().Where(x => x.IsDelete == 1 && x.CompanyId != "bd840460-1e3a-45c8-abed-6e66903eb465".ToGuid()).ToListAsync();
+            var monthPlanRepData = await dbContext.Queryable<CompanyProductionValueInfo>().Where(x => x.IsDelete == 1 ).ToListAsync();
             //获取项目日报产值数据
             var dayRepData = await dbContext.Queryable<DayReport>().Where(t => t.IsDelete == 1).ToListAsync();
             #endregion
@@ -2860,7 +2861,18 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
             var swMonth = DateTime.Now.AddDays(-16).Year + "-" + DateTime.Now.AddDays(-16).Month + "-";
             //次月日期
             var cyDate = DateTime.Now.AddDays(-16).AddMonths(1);
-            var difDays = TimeHelper.GetTimeSpan(Convert.ToDateTime(swMonth + "26"), Convert.ToDateTime(cyDate.ToString("yyyy-MM-25"))).Days + 1;
+            //var difDays = TimeHelper.GetTimeSpan(Convert.ToDateTime(swMonth + "26"), Convert.ToDateTime(cyDate.ToString("yyyy-MM-25"))).Days + 1;
+            Dictionary<int, int> daydiff = new Dictionary<int, int>();
+            daydiff.Add(1, 31);
+            daydiff.Add(3, 31);
+            daydiff.Add(5, 31);
+            daydiff.Add(7, 31);
+            daydiff.Add(8, 31);
+            daydiff.Add(10, 31);
+            daydiff.Add(12, 31);
+            daydiff.Add(2, 28);
+            var ziranMonth = DateTime.Now.Month;//不跨月日期
+            var difDays=daydiff[ziranMonth]!=0 ? daydiff[ziranMonth] : 30;
             for (int i = 1; i <= length; i++)
             {
                 //currentNowTimeInt = int.Parse(DateTime.Now.ToString("yyyyMMdd")) - (i - 1);
@@ -2875,7 +2887,7 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
                 eachCompanyProductionValues.Add(new EachCompanyProductionValue()
                 {
                     XAxle = currentNowTimeInt.ToString().Substring(0, 4) + "-" + currentNowTimeInt.ToString().Substring(4, 2) + "-" + currentNowTimeInt.ToString().Substring(6, 2),
-                    YAxlePlanValue = Math.Round(dayPlanProAmount / difDays, 2),
+                    YAxlePlanValue = Math.Round(dayPlanProAmount / difDays / 100000000M, 2),
                     YAxleCompleteValue = Math.Round(dayActualProductionAmount / 100000000M, 2)
                     //YAxlePlanValue = Math.Round((GetProductionValueInfo(monthInt, companyProductionList).Sum(x => x.PlanProductionValue) / 300000M), 2),
                     //YAxleCompleteValue = Math.Round(dayActualProductionAmount / 100000000M, 2)
