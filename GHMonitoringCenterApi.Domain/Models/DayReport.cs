@@ -252,5 +252,11 @@ namespace GHMonitoringCenterApi.Domain.Models
         /// </summary>
         [SugarColumn(ColumnDataType = "text")]
         public string? DeviationWarning { get; set; }
+
+        /// <summary>
+        /// 是否偏低    1 是偏高  0是偏低
+        /// </summary>
+        [SugarColumn(ColumnDataType = "int")]
+        public int? IsLow { get; set; }
     }
 }

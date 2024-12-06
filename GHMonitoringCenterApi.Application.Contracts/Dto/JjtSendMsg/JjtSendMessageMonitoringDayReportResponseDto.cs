@@ -708,6 +708,10 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.JjtSendMsg
         /// </summary>
         public string? ProjectName { get; set; }
         /// <summary>
+        /// 是否偏低  1是偏高  0是偏低
+        /// </summary>
+        public int? IsLow { get; set; }
+        /// <summary>
         /// 偏差内容
         /// </summary>
         public string? DeviationWarning { get; set; }

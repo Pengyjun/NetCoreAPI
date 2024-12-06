@@ -307,6 +307,10 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project
             /// 偏差预警
             /// </summary>
             public string? DeviationWarning { get; set; }
+            /// <summary>
+            /// 是否偏低    1 是偏高  0是偏低
+            /// </summary>
+            public int? IsLow { get; set; }
 
             ///// <summary>
             ///// 已完成合同金额(元)

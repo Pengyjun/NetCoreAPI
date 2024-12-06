@@ -2888,7 +2888,7 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
                 {
                     XAxle = currentNowTimeInt.ToString().Substring(0, 4) + "-" + currentNowTimeInt.ToString().Substring(4, 2) + "-" + currentNowTimeInt.ToString().Substring(6, 2),
                     YAxlePlanValue = Math.Round(dayPlanProAmount / difDays / 100000000M, 2),
-                    YAxleCompleteValue = Math.Round(dayActualProductionAmount / 10000M, 2)
+                    YAxleCompleteValue = Math.Round(dayActualProductionAmount / 100000000M, 2)
                     //YAxlePlanValue = Math.Round((GetProductionValueInfo(monthInt, companyProductionList).Sum(x => x.PlanProductionValue) / 300000M), 2),
                     //YAxleCompleteValue = Math.Round(dayActualProductionAmount / 100000000M, 2)
                 });
@@ -2931,14 +2931,16 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
             var impIds = improjects.Select(x => x.ProjectId).ToList();
             var drData = dayRepData.Where(x => x.DateDay == nowDay && impIds.Contains(x.ProjectId) && !string.IsNullOrWhiteSpace(x.DeviationWarning)).ToList();
 
-            var npids = drData.Select(x => x.ProjectId).Distinct().ToList();
+            var npids=drData.Select(x => x.ProjectId).Distinct().ToList();
             var np = improjects.Where(x => npids.Contains(x.ProjectId.Value)).ToList();
 
             foreach (var item in np)
             {
+               var islow= drData.Where(x => x.ProjectId == item.ProjectId&&x.DateDay== currentTimeInt).Select(x => x.IsLow).FirstOrDefault();
                 imp.Add(new ImpProjectWarning
                 {
-                    DayAmount = drData.FirstOrDefault(x => x.ProjectId == item.ProjectId)?.DayActualProductionAmount / 100000000,
+                    IsLow= islow==null?0:islow,
+                    DayAmount = drData.FirstOrDefault(x => x.ProjectId == item.ProjectId)?.DayActualProductionAmount / 10000,
                     DeviationWarning = drData.FirstOrDefault(x => x.ProjectId == item.ProjectId)?.DeviationWarning,
                     ProjectName = item.ProjectName
                 });

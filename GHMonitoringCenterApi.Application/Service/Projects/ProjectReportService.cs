@@ -470,6 +470,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 _mapper.Map(model.Construction, dayReport);
 
                 dayReport.DeviationWarning = model.Construction.DeviationWarning;
+                dayReport.IsLow = model.Construction.IsLow;
                 // 实际日产量/产值/外包支出
                 dayReport.DayActualProduction = model.Construction.DayReportConstructions.Sum(t => t.ActualDailyProduction);
                 dayReport.DayActualProductionAmount = model.Construction.DayReportConstructions.Sum(t => t.ActualDailyProductionAmount);
