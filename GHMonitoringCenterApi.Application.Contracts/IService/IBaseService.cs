@@ -354,5 +354,11 @@ namespace GHMonitoringCenterApi.Application.Contracts.IService
         /// <param name="getDeviceInformationResponseDto"></param>
         /// <returns></returns>
         Task<ResponseAjaxResult<List<InformationResponseDto>>> GetHomeMenuPermissionUserAsync(BaseRequestDto baseRequestDto);
+
+
+
+
+
+        Task UpdateProjectAsync();
     }
 }

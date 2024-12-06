@@ -1,7 +1,9 @@
 ﻿using GHMonitoringCenterApi.Application.Contracts.Dto.Information;
 using GHMonitoringCenterApi.Application.Contracts.Dto.SearchUser;
 using GHMonitoringCenterApi.Application.Contracts.Dto.User;
+using GHMonitoringCenterApi.Application.Contracts.IService;
 using GHMonitoringCenterApi.Application.Contracts.IService.User;
+using GHMonitoringCenterApi.Application.Service;
 using GHMonitoringCenterApi.Domain.Models;
 using GHMonitoringCenterApi.Domain.Shared;
 using GHMonitoringCenterApi.Domain.Shared.Const;
@@ -26,11 +28,13 @@ namespace GHMonitoringCenterApi.Controllers.User
 
         #region 依赖注入
         public IUserService UserService { get; set; }
+        public IBaseService baseService { get; set; }
         public ISqlSugarClient dbContent { get; set; }
-        public UserController(IUserService UserService, ISqlSugarClient dbContent)
+        public UserController(IUserService UserService, ISqlSugarClient dbContent, IBaseService baseService)
         {
             this.UserService = UserService;
             this.dbContent = dbContent;
+            this.baseService = baseService;
         }
         #endregion
         /// <summary>
@@ -97,6 +101,7 @@ namespace GHMonitoringCenterApi.Controllers.User
                 var isExist = await redis.ExistsAsync(user.Account);
                 if (isExist && currentActivateUser != null && currentActivateUser.Id != Guid.Empty)
                 {
+                     
                     CurrentUser.CurrentLoginInstitutionOid = currentActivateUser.Oid;
                     CurrentUser.CurrentLoginInstitutionId = currentActivateUser.InstitutionId;
                     CurrentUser.CurrentLoginInstitutionPoid = currentActivateUser.Poid;
@@ -107,6 +112,7 @@ namespace GHMonitoringCenterApi.Controllers.User
                     CurrentUser.CurrentLoginIsAdmin = currentActivateUser.IsAdmin;
                     CurrentUser.CurrentLoginUserType = currentActivateUser.Type;
                     CurrentUser.CurrentLoginOperationType = currentActivateUser.OperationType;
+                    await baseService.UpdateProjectAsync();
                     //更新缓存
                     var isSuccess = await redis.SetAsync(user.Account, CurrentUser);
                     if (isSuccess)

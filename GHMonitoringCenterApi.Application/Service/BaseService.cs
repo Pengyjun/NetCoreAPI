@@ -2479,6 +2479,41 @@ namespace GHMonitoringCenterApi.Application.Service
             }
             return responseAjaxResult;
         }
+
+
+        /// <summary>
+        /// 排除一些项目  如菲律宾帕塞吹填开发项目（1期）水工工程   只有交建公司能看到这个项目   
+        /// 其他公司包括局管理员如陈翠  他们也看不到这个项目 ，并且项目导出  月报 日报 生产日报统计等等 都不在范围内，交建公司要计算在内的  原因是  他是属于某个项目的分项，
+        /// 所以不需要看到这个项目
+        /// </summary>
+        /// <param name="companyId"></param>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        public async Task UpdateProjectAsync()
+        {
+            try
+            {
+                var project = await dbContext.Queryable<Project>().Where(x =>x.Id == "08dcdec4-4d90-4802-80fe-1293e55fbdff".ToGuid())
+                                   .FirstAsync();
+                if (_currentUser.CurrentLoginIsAdmin||_currentUser.CurrentLoginInstitutionGrule.IndexOf("101174265") > 0  )
+                {
+                    //说明是交建公司  
+                    project.IsDelete = 1;
+                    await dbContext.Updateable<Project>(project).ExecuteCommandAsync();
+                }
+                else
+                {
+                    project.IsDelete = 0;
+                    await dbContext.Updateable<Project>(project).ExecuteCommandAsync();
+                };
+            }
+            catch (Exception ex)
+            {
+                await Console.Out.WriteLineAsync($"激活登录用户删除项目出现问题:{ex}");
+
+            }
+            
+        }
         #endregion
     }
 }

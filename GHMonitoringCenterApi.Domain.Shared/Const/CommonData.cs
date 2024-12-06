@@ -128,5 +128,19 @@ namespace GHMonitoringCenterApi.Domain.Shared.Const
         //交建公司重点项目
         public static string jjCompanyProjectids = "08db3b35-fb38-4beb-8f31-7a1654ce60d2,08db3b35-fb38-4be9-8815-483744dec8e4,08dc31b3-f7f2-440f-8fe0-7ce613f79537,08db8665-81e2-4fdf-8099-e57bdde04e90";
 
+
+
+        /// <summary>
+        /// 只有交建公司/系统管理员/能看到这个项目  其他公司  管理员都看不到
+        /// </summary>
+
+        public Dictionary<string, string> res = new Dictionary<string, string>()
+        {
+            {"08dcdec4-4d90-4802-80fe-1293e55fbdff","a8db9bb0-4667-4320-b03d-b0b7f8728b61" },//项目ID,公司ID
+        };
+
+
+
+
     }
 }
