@@ -2888,7 +2888,7 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
                 {
                     XAxle = currentNowTimeInt.ToString().Substring(0, 4) + "-" + currentNowTimeInt.ToString().Substring(4, 2) + "-" + currentNowTimeInt.ToString().Substring(6, 2),
                     YAxlePlanValue = Math.Round(dayPlanProAmount / difDays / 100000000M, 2),
-                    YAxleCompleteValue = Math.Round(dayActualProductionAmount / 100000000M, 2)
+                    YAxleCompleteValue = Math.Round(dayActualProductionAmount / 10000M, 2)
                     //YAxlePlanValue = Math.Round((GetProductionValueInfo(monthInt, companyProductionList).Sum(x => x.PlanProductionValue) / 300000M), 2),
                     //YAxleCompleteValue = Math.Round(dayActualProductionAmount / 100000000M, 2)
                 });
@@ -2950,7 +2950,7 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
             #endregion
 
             jjtSendMessageMonitoringDayReportResponseDto.EachCompanyProductionValue = eachCompanyProductionValues.OrderBy(x => x.XAxle).ToList();
-            jjtSendMessageMonitoringDayReportResponseDto.ImpProjectWarning = imp;
+            jjtSendMessageMonitoringDayReportResponseDto.ImpProjectWarning = imp.OrderByDescending(x=>x.DayAmount).Take(3).ToList();
             #endregion
 
             jjtSendMessageMonitoringDayReportResponseDto.Month = month;
