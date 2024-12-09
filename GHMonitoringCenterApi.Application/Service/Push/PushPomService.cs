@@ -441,7 +441,7 @@ namespace GHMonitoringCenterApi.Application.Service.Push
 			var leaders = new List<ProjectStakeholders>();
 			var orgs = new List<ProjectStakeholderUnit>();
 			_mapper.Map(project, model);
-			model.ProjectDeptName = departMent.Name;
+			model.ProjectDeptName = departMent!=null?departMent.Name:string.Empty;
 			model.TCompanyId = tCompany.PomId.ToString();
 			model.TCompanyName = tCompany.Name;
 			model.Amount = Convert.ToDecimal(project.Amount);
@@ -1514,9 +1514,10 @@ namespace GHMonitoringCenterApi.Application.Service.Push
 		/// <returns></returns>
 		private async Task<List<PushChangeEntityDto<TEntity>>> GetPushChangeModelsAsync<TEntity>(EntityType entityType, DateTime maxChangeTime) where TEntity : BaseEntity<Guid>, new()
 		{
-			return await _dbContext.Queryable<TEntity>().InnerJoin(_dbEntityChangeRecord.AsQueryable(), (a, b) => a.Id == b.ItemId)
+			var a= await _dbContext.Queryable<TEntity>().InnerJoin(_dbEntityChangeRecord.AsQueryable(), (a, b) => a.Id == b.ItemId)
 				.Where((a, b) => b.Type == entityType && b.IsPush == false && b.ChangeTime <= maxChangeTime)
 				.Select((a, b) => new PushChangeEntityDto<TEntity>() { Entity = a, RecordId = b.Id }).ToPageListAsync(1, 10000);
+			return a;
 		}
 		/// <summary>
 		/// 推送项目月报特殊字段
