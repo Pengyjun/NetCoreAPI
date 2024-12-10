@@ -441,7 +441,8 @@ namespace GHMonitoringCenterApi.Application.Service.Push
 			var leaders = new List<ProjectStakeholders>();
 			var orgs = new List<ProjectStakeholderUnit>();
 			_mapper.Map(project, model);
-			model.ProjectDeptName = departMent!=null?departMent.Name:string.Empty;
+			model.CompanyId = tCompany.Ocode;
+            model.ProjectDeptName = departMent!=null?departMent.Name:string.Empty;
 			model.TCompanyId = tCompany.PomId.ToString();
 			model.TCompanyName = tCompany.Name;
 			model.Amount = Convert.ToDecimal(project.Amount);

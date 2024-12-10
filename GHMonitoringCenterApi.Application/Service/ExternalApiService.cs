@@ -154,7 +154,7 @@ namespace GHMonitoringCenterApi.Application.Service
                     BudgetInterestRate = x.BudgetInterestRate,
                     Category = x.Category,
                     ClassifyStandard = x.ClassifyStandard,
-                    Code = x.Code,
+                    Code = x.MasterCode,
                     CommencementTime = x.CommencementTime,
                     CompanyId = x.CompanyId,
                     CompilationTime = x.CompilationTime,
