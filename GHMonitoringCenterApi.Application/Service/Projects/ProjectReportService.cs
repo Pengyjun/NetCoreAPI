@@ -6162,6 +6162,23 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
 
             }
             #endregion
+
+
+            #region 新增逻辑船舶月报列表本月完成产值修正
+            if (result != null)
+            {
+                foreach (var item in result)
+                {
+                    var prpjectMonthList = await _dbContext.Queryable<MonthReport>().Where(x =>x.DateMonth == item.DateMonth).ToListAsync();
+                    item.MonthQuantity = Math.Round(prpjectMonthList.Where(x=>x.ProjectId == item.ProjectId).Sum(x => x.CompleteProductionAmount), 2);
+                    item.MonthOutputVal = Math.Round(prpjectMonthList.Where(x => x.ProjectId == item.ProjectId).Sum(x => x.CompletedQuantity), 2);
+                }
+               
+            }
+
+          
+            #endregion
+
             list.searchOwnShipMonthReps = result;
             list.ownShipMonth = sumInfo;
             responseDto.Count = total;
