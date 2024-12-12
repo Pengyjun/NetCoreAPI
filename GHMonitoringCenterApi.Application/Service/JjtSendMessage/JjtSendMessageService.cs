@@ -1510,6 +1510,7 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
         /// <returns></returns>
         public async Task<ResponseAjaxResult<JjtSendMessageMonitoringDayReportResponseDto>> JjtTextCardMsgDetailsAsync(int dateDay = 0)
         {
+            var timeOf = 20241126;//每个月的初始数
             #region 111
             var responseAjaxResult = new ResponseAjaxResult<JjtSendMessageMonitoringDayReportResponseDto>();
             var result = await dbContext.Queryable<TempTable>().FirstAsync();
@@ -1727,8 +1728,10 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
             // var yearProductionValue = companyList.Sum(x => x.YearProductionValue) + dayProductionValueList.Sum(x => x.DayActualProductionAmount);
             //var yearProductionValue = dayProductionValueList.Sum(x => x.DayActualProductionAmount);
             var companyValue = new ShareData().Init();
+
+
             var yearProductionValue = Math.Round(companyValue.Sum(x => x.Production * 100000000) + dayProductionValueList
-                 .Where(x => x.DateDay >= 20240426 && x.DateDay <= currentTimeInt)
+                 .Where(x => x.DateDay >= timeOf && x.DateDay <= currentTimeInt)
                     .Sum(x => x.DayActualProductionAmount), 3);
             //项目月报数据
             var monthReport = await dbContext.Queryable<MonthReport>().Where(x => x.IsDelete == 1 && x.DateMonth >= 202401).ToListAsync();
@@ -1753,8 +1756,10 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
                 var eachCompanyValue = companyValue.Where(x => x.CompanyId == item.ItemId.ToString()).FirstOrDefault()?.Production;
                 //await Console.Out.WriteLineAsync(item.ItemId.ToString());
                 var productionValue = eachCompanyValue == null ? 0 : eachCompanyValue.Value * 100000000;
+
+
                 var currentMonthCompanyCount = Math.Round(dayProductionValueList
-                    .Where(x => x.CompanyId == item.ItemId && x.DateDay >= 20240426 && x.DateDay <= currentTimeInt)
+                    .Where(x => x.CompanyId == item.ItemId && x.DateDay >= timeOf && x.DateDay <= currentTimeInt)
                     .Sum(x => x.DayActualProductionAmount), 3)
                     + productionValue;
                 //年度产值占比 （广航局）
