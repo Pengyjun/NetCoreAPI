@@ -6189,8 +6189,12 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     
                     item.MonthOutputVal = Math.Round(monthReporList.Where(x=>x.ProjectId == item.ProjectId&&x.ShipId==item.OwnShipId).Sum(x => x.CompleteProductionAmount), 2);
                     item.MonthQuantity = Math.Round(monthReporList.Where(x => x.ProjectId == item.ProjectId && x.ShipId == item.OwnShipId).Sum(x => x.CompletedQuantity), 2);
+                   
                 }
-               
+                sumInfo.SumMonthQuantity = Math.Round(result.Sum(t => t.MonthQuantity), 2);
+                sumInfo.SumMonthOutputVal = Math.Round(result.Sum(t => t.MonthOutputVal), 2);
+
+
             }
 
           
