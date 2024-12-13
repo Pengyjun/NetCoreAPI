@@ -295,6 +295,10 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Push
         /// </summary>
         public string OrganizationId { get; set; }
         /// <summary>
+        /// 往来单位Zbp
+        /// </summary>
+        public string? OrganizationZbp { get; set; }
+        /// <summary>
         /// 单位类型
         /// </summary>
         public string Type { get; set; }
