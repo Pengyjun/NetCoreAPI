@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using Aspose.Words.XAttr;
+using AutoMapper;
 using CDC.MDM.Core.Common.Util;
 using GHMonitoringCenterApi.Application.Contracts.Dto.Common;
 using GHMonitoringCenterApi.Application.Contracts.Dto.Enums;
@@ -5579,10 +5580,23 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             #region 新增逻辑
             if (resMonthReport!=null)
             {
-                
-                var prpjectMonthList = await _dbContext.Queryable<MonthReport>().Where(x => x.ProjectId== resMonthReport.ProjectId &&x.DateMonth== model.DateMonth).ToListAsync();
-                resMonthReport.ProductionAmount = Math.Round(prpjectMonthList.Sum(x=>x.CompleteProductionAmount), 2);
-                resMonthReport.Production = Math.Round(prpjectMonthList.Sum(x => x.CompletedQuantity), 2); 
+
+                //var prpjectMonthList = await _dbContext.Queryable<MonthReport>().Where(x => x.ProjectId== resMonthReport.ProjectId &&x.DateMonth== model.DateMonth).ToListAsync();
+                //resMonthReport.ProductionAmount = Math.Round(prpjectMonthList.Sum(x=>x.CompleteProductionAmount), 2);
+                //resMonthReport.Production = Math.Round(prpjectMonthList.Sum(x => x.CompletedQuantity), 2); 
+
+
+                #region 新增逻辑船舶月报列表本月完成产值修正
+                if (result != null)
+                {
+                    var monthReporList = await _dbContext.Queryable<MonthReportDetail>().Where(x =>x.IsDelete==1&&resMonthReport.ProjectId==x.ProjectId && x.DateMonth == model.DateMonth&&x.ShipId== resMonthReport.ShipId).ToListAsync();
+                    resMonthReport.ProductionAmount = Math.Round(monthReporList.Where(x => x.ProjectId == resMonthReport.ProjectId && x.ShipId == resMonthReport.ShipId).Sum(x => x.CompleteProductionAmount), 2);
+                    resMonthReport.Production = Math.Round(monthReporList.Where(x => x.ProjectId == resMonthReport.ProjectId && x.ShipId == resMonthReport.ShipId).Sum(x => x.CompletedQuantity), 2);
+
+                }
+
+
+                #endregion
             }
 
             #endregion
@@ -6162,6 +6176,30 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
 
             }
             #endregion
+
+
+            #region 新增逻辑船舶月报列表本月完成产值修正
+            if (result != null)
+            {
+                var  monthList = await _dbContext.Queryable<MonthReport>().Where(x =>x.IsDelete==1&& x.DateMonth >= startMonth && x.DateMonth <= endMonth).ToListAsync();
+                var ids = monthList.Select(x => x.ProjectId).ToList();
+                var  monthReporList = await _dbContext.Queryable<MonthReportDetail>().Where(x => x.IsDelete == 1 && ids.Contains(x.ProjectId) &&( x.DateMonth >= startMonth && x.DateMonth <= endMonth)).ToListAsync();
+                foreach (var item in result)
+                {
+                    
+                    item.MonthOutputVal = Math.Round(monthReporList.Where(x=>x.ProjectId == item.ProjectId&&x.ShipId==item.OwnShipId).Sum(x => x.CompleteProductionAmount), 2);
+                    item.MonthQuantity = Math.Round(monthReporList.Where(x => x.ProjectId == item.ProjectId && x.ShipId == item.OwnShipId).Sum(x => x.CompletedQuantity), 2);
+                   
+                }
+                sumInfo.SumMonthQuantity = Math.Round(result.Sum(t => t.MonthQuantity), 2);
+                sumInfo.SumMonthOutputVal = Math.Round(result.Sum(t => t.MonthOutputVal), 2);
+
+
+            }
+
+          
+            #endregion
+
             list.searchOwnShipMonthReps = result;
             list.ownShipMonth = sumInfo;
             responseDto.Count = total;
