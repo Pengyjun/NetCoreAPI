@@ -1,0 +1,15 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net8.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\src\BuildingBlocks\HNKC.CrewManagePlatform.SqlSugars\HNKC.CrewManagePlatform.SqlSugars.csproj" />
+		<ProjectReference Include="..\src\BuildingBlocks\HNKC.CrewManagePlatform.Utils\HNKC.CrewManagePlatform.Utils.csproj" />
+	</ItemGroup>
+
+</Project>
