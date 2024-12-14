@@ -8,6 +8,10 @@ using HNKC.CrewManagePlatform.Models.CommonResult;
 using HNKC.CrewManagePlatform.Web.ActionResults;
 
 namespace HNKC.CrewManagePlatform.Web.Filters
+
+
+
+
 {
     public class HttpGlobalExceptionFilter : IExceptionFilter
     {

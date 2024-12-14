@@ -1,0 +1,24 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+	<ItemGroup>
+		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.7" />
+		<PackageReference Include="Microsoft.AspNetCore.Mvc.Abstractions" Version="2.2.0" />
+		<PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.2.5" />
+		<PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.0.0" />
+	</ItemGroup>
+	<ItemGroup>
+<<<<<<<< HEAD:src/BuildingBlocks/HNKC.CrewManagePlatform.Web/HNKC.CrewManagePlatform.Web.csproj
+	  <ProjectReference Include="..\..\..\HNKC.CrewManagePlatform.Services\HNKC.CrewManagePlatform.Services.csproj" />
+	  <ProjectReference Include="..\HNKC.CrewManagePlatform.Exceptions\HNKC.CrewManagePlatform.Exceptions.csproj" />
+	  <ProjectReference Include="..\HNKC.CrewManagePlatform.Models\HNKC.CrewManagePlatform.Models.csproj" />
+========
+	  <ProjectReference Include="..\HNKC.Demo.Exceptions\HNKC.Demo.Exceptions.csproj" />
+	  <ProjectReference Include="..\HNKC.Demo.Models\HNKC.Demo.Models.csproj" />
+>>>>>>>> 7fd224848dc4910963de00d8c3a15a3418dc1847:src/BuildingBlocks/HNKC.Demo.Web/HNKC.Demo.Web.csproj
+	</ItemGroup>
+</Project>

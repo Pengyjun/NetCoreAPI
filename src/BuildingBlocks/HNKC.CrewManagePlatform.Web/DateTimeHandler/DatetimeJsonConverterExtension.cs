@@ -7,6 +7,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace HNKC.CrewManagePlatform.Web.DateTimeHandler
+
 {
     public class DatetimeJsonConverterExtension : JsonConverter<DateTime>
     {

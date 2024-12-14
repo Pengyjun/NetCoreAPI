@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace HNKC.CrewManagePlatform.Utils
+
 {
     public static class EnumUtil
     {

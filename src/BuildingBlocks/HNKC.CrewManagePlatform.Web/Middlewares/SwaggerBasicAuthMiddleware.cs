@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace HNKC.CrewManagePlatform.Web.Middlewares
+
 {
     public class SwaggerBasicAuthMiddleware
     {

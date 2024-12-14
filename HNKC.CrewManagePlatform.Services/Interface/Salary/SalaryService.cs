@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using HNKC.CrewManagePlatform.Models.CommonResult;
-using HNKC.CrewManagePlatform.Models.Dtos;
 using HNKC.CrewManagePlatform.Models.Dtos.Salary;
 using HNKC.CrewManagePlatform.Models.Enums;
 using HNKC.CrewManagePlatform.SqlSugars.Extensions;
@@ -8,13 +7,7 @@ using HNKC.CrewManagePlatform.SqlSugars.Models;
 using HNKC.CrewManagePlatform.Utils;
 using SqlSugar;
 using SqlSugar.Extensions;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UtilsSharp;
-using UtilsSharp.Shared.Standard;
 using salary = HNKC.CrewManagePlatform.SqlSugars.Models;
 
 namespace HNKC.CrewManagePlatform.Services.Interface.Salary

@@ -12,8 +12,12 @@
 		<PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.0.0" />
 	</ItemGroup>
 	<ItemGroup>
+
 	  <ProjectReference Include="..\..\..\HNKC.CrewManagePlatform.Services\HNKC.CrewManagePlatform.Services.csproj" />
 	  <ProjectReference Include="..\HNKC.CrewManagePlatform.Exceptions\HNKC.CrewManagePlatform.Exceptions.csproj" />
 	  <ProjectReference Include="..\HNKC.CrewManagePlatform.Models\HNKC.CrewManagePlatform.Models.csproj" />
+
+
+
 	</ItemGroup>
 </Project>

@@ -11,6 +11,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 
 namespace HNKC.CrewManagePlatform.Web.Jwt
+
 {
     public class JwtService : IJwtService
     {

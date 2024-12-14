@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace HNKC.CrewManagePlatform.Utils
+
 {
     /// <summary>
     /// 静态日志，写入文件

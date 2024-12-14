@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 #nullable disable
 
 namespace HNKC.CrewManagePlatform.Web.Jwt
+
 {
     public class JwtOptions
     {

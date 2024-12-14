@@ -13,7 +13,11 @@
 		<PackageReference Include="SqlSugarCore" Version="5.1.4.160" />
 	</ItemGroup>
 	<ItemGroup>
+
 	  <ProjectReference Include="..\HNKC.CrewManagePlatform.Models\HNKC.CrewManagePlatform.Models.csproj" />
 	  <ProjectReference Include="..\HNKC.CrewManagePlatform.Utils\HNKC.CrewManagePlatform.Utils.csproj" />
+
+	
+
 	</ItemGroup>
 </Project>

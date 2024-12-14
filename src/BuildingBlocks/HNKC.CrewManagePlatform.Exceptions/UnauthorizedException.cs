@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace HNKC.CrewManagePlatform.Exceptions
+
 {
     public class UnauthorizedException : Exception
     {

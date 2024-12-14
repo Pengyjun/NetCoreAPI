@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace HNKC.CrewManagePlatform.Web.Jwt
+
 {
     public static class JwtExtensions
     {

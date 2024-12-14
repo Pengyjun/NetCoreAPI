@@ -1,8 +1,5 @@
-using HNKC.CrewManagePlatform.Services.Admin.Api;
-using HNKC.CrewManagePlatform.SqlSugars;
-using SqlSugar;
-using UtilsSharp;
 
+using HNKC.CrewManagePlatform.Services.Admin.Api;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
