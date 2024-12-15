@@ -29,6 +29,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HNKC.CrewManagePlatform.Ser
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HNKC.CrewManagePlatform.Services", "HNKC.CrewManagePlatform.Services\HNKC.CrewManagePlatform.Services.csproj", "{5B7D543F-F9C4-440B-9B17-665CE5527999}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HNKC.CrewManagePlatform.Sms", "HNKC.CrewManagePlatform.Sms\HNKC.CrewManagePlatform.Sms.csproj", "{E5482E60-ECA3-40CD-BCA7-2070EE735190}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -63,6 +65,10 @@ Global
 		{5B7D543F-F9C4-440B-9B17-665CE5527999}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5B7D543F-F9C4-440B-9B17-665CE5527999}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5B7D543F-F9C4-440B-9B17-665CE5527999}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E5482E60-ECA3-40CD-BCA7-2070EE735190}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E5482E60-ECA3-40CD-BCA7-2070EE735190}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E5482E60-ECA3-40CD-BCA7-2070EE735190}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E5482E60-ECA3-40CD-BCA7-2070EE735190}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -80,6 +86,7 @@ Global
 		{AC2D00C9-5E9E-4812-8262-D8F9FBF74042} = {0D84E496-EBCD-4587-B867-7C6BBC5D2623}
 		{97C135DB-12C0-4EE1-AD5D-B2EF1231C62F} = {00F6E4B5-F777-4C71-8ABE-4DBFE3F4CF7C}
 		{5B7D543F-F9C4-440B-9B17-665CE5527999} = {00F6E4B5-F777-4C71-8ABE-4DBFE3F4CF7C}
+		{E5482E60-ECA3-40CD-BCA7-2070EE735190} = {0D84E496-EBCD-4587-B867-7C6BBC5D2623}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {B66B428A-6EED-48C2-A9E4-45B692B68346}

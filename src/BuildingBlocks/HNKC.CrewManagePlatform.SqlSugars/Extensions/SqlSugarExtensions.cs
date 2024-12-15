@@ -86,7 +86,7 @@ namespace HNKC.CrewManagePlatform.SqlSugars.Extensions
                                {
                                    var serviceBuilder = services.BuildServiceProvider();
                                    var _context = serviceBuilder.GetService<IHttpContextAccessor>();
-                                   entityInfo.SetValue(_context?.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? null);
+                                   entityInfo.SetValue(_context?.HttpContext?.User?.FindFirst(x=>x.Type=="Id")?.Value ?? null);
                                }
                                else if (entityInfo.PropertyName == "IsDelete")
                                {

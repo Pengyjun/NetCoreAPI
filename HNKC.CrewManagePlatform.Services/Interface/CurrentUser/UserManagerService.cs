@@ -51,9 +51,13 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CurrentUser
                 token = jwtService.CreateAccessToken(claims, expores);
                 //存入Redis
                 RedisUtil.Instance.Set(userInfo.Id.ToString(), token, expores);
+                return Result.Success(data: token);
+            }
+            else {
+                return Result.Fail("登录失败");
             }
             //HttpContentAccessFactory.Current.Response.Headers["Authorization"] = token;
-            return Result.Success(data:token);
+          
         }
 
         /// <summary>

@@ -13,7 +13,9 @@ namespace HNKC.CrewManagePlatform.Models.Dtos
     /// </summary>
     public class BaseRequest
     {
-        [Required(AllowEmptyStrings =false,ErrorMessage ="Id不能为空")]
+           /// <summary>
+           /// ID
+           /// </summary>
         public string? Id { get; set; }
     }
 }

@@ -44,5 +44,11 @@ namespace HNKC.CrewManagePlatform.SqlSugars.Models
         /// </summary>
         [SugarColumn(Length =512, ColumnDescription = "失败原因")]
         public string? Fail { get; set; }
+
+        /// <summary>
+        ///手机短信链接地址
+        /// </summary>
+        [SugarColumn(Length = 1024, ColumnDescription = "手机短信链接地址")]
+        public string? PhoneUrl { get; set; }
     }
 }

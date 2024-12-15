@@ -21,7 +21,7 @@ namespace HNKC.CrewManagePlatform.SqlSugars.Models
         /// 用户ID
         /// </summary>
         [SugarColumn(Length = 36)]
-        public Guid? UserId { get; set; }
+        public string? UserId { get; set; }
         /// <summary>
         /// 用户名
         /// </summary>

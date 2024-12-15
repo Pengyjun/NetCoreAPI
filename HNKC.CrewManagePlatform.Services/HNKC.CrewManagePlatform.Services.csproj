@@ -8,6 +8,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		<ProjectReference Include="..\HNKC.CrewManagePlatform.Sms\HNKC.CrewManagePlatform.Sms.csproj" />
 		<ProjectReference Include="..\src\BuildingBlocks\HNKC.CrewManagePlatform.SqlSugars\HNKC.CrewManagePlatform.SqlSugars.csproj" />
 		<ProjectReference Include="..\src\BuildingBlocks\HNKC.CrewManagePlatform.Utils\HNKC.CrewManagePlatform.Utils.csproj" />
 	</ItemGroup>

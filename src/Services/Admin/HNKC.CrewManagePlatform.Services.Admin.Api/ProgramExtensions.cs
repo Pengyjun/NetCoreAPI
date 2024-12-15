@@ -21,6 +21,8 @@ using HNKC.CrewManagePlatform.Utils;
 using HNKC.CrewManagePlatform.Services.Interface.Salary;
 using HNKC.CrewManagePlatform.Services.Interface;
 using HNKC.CrewManagePlatform.Services.Admin.Api.AutoMapper;
+using HNKC.CrewManagePlatform.Sms.Interfaces;
+using HNKC.CrewManagePlatform.Sms.Services;
 
 namespace HNKC.CrewManagePlatform.Services.Admin.Api
 {
@@ -289,7 +291,7 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api
             builder.Services.AddScoped<IUserManagerService, UserManagerService>();
             builder.Services.AddScoped<ISalaryService, SalaryService>();
             builder.Services.AddScoped<IBaseService, BaseService>();
-
+            builder.Services.AddScoped<ISmsService, CtyunSmsService>();
 
         }
     }

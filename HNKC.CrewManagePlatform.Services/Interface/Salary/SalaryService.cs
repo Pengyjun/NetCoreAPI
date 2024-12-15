@@ -1,26 +1,33 @@
 ﻿using AutoMapper;
 using HNKC.CrewManagePlatform.Models.CommonResult;
+using HNKC.CrewManagePlatform.Models.Dtos;
 using HNKC.CrewManagePlatform.Models.Dtos.Salary;
 using HNKC.CrewManagePlatform.Models.Enums;
+using HNKC.CrewManagePlatform.Sms.Interfaces;
 using HNKC.CrewManagePlatform.SqlSugars.Extensions;
 using HNKC.CrewManagePlatform.SqlSugars.Models;
 using HNKC.CrewManagePlatform.Utils;
+using Microsoft.AspNetCore.Mvc;
 using SqlSugar;
 using SqlSugar.Extensions;
+using System.Collections.Generic;
+using System.Linq;
 using UtilsSharp;
 using salary = HNKC.CrewManagePlatform.SqlSugars.Models;
 
 namespace HNKC.CrewManagePlatform.Services.Interface.Salary
 {
-    public class SalaryService :HNKC.CrewManagePlatform.Services.Interface.CurrentUser.CurrentUserService,ISalaryService
+    public class SalaryService : HNKC.CrewManagePlatform.Services.Interface.CurrentUser.CurrentUserService, ISalaryService
     {
         #region 依赖注入
         private readonly ISqlSugarClient dbContext;
         private readonly IMapper mapper;
-        public SalaryService(ISqlSugarClient dbContext, IMapper mapper)
+        public ISmsService smsService { get; set; }
+        public SalaryService(ISqlSugarClient dbContext, IMapper mapper, ISmsService smsService)
         {
             this.dbContext = dbContext;
             this.mapper = mapper;
+            this.smsService = smsService;
         }
 
         #endregion
@@ -39,14 +46,15 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Salary
             }
             RefAsync<int> total = 0;
             return await dbContext.Queryable<User>()
-                 .InnerJoin<salary.Salary>((x, y) =>  x.Id == y.UserId)
-                  .WhereIF(salaryRequest.Year.HasValue,(x,y)=>y.Year== salaryRequest.Year)
-                  .WhereIF(salaryRequest.Month.HasValue,(x,y)=>y.Month== salaryRequest.Month)
-                  .WhereIF(!string.IsNullOrWhiteSpace(salaryRequest.Name),(x,y)=>x.Name.Contains(salaryRequest.Name))
-                  .WhereIF(!string.IsNullOrWhiteSpace(salaryRequest.WorkNumber),(x,y)=>x.WorkNumber.Contains(salaryRequest.WorkNumber))
-                  .WhereIF(!string.IsNullOrWhiteSpace(salaryRequest.Phone),(x,y)=>x.Phone.Contains(salaryRequest.Phone))
-                  .Where((x,y)=>x.IsDelete==1&&y.IsDelete==1)
-                 .Select((x, y) => new SalaryResponse {
+                 .InnerJoin<salary.Salary>((x, y) => x.Id == y.UserId)
+                  .WhereIF(salaryRequest.Year.HasValue, (x, y) => y.Year == salaryRequest.Year)
+                  .WhereIF(salaryRequest.Month.HasValue, (x, y) => y.Month == salaryRequest.Month)
+                  .WhereIF(!string.IsNullOrWhiteSpace(salaryRequest.Name), (x, y) => x.Name.Contains(salaryRequest.Name))
+                  .WhereIF(!string.IsNullOrWhiteSpace(salaryRequest.WorkNumber), (x, y) => x.WorkNumber.Contains(salaryRequest.WorkNumber))
+                  .WhereIF(!string.IsNullOrWhiteSpace(salaryRequest.Phone), (x, y) => x.Phone.Contains(salaryRequest.Phone))
+                  .Where((x, y) => x.IsDelete == 1 && y.IsDelete == 1)
+                 .Select((x, y) => new SalaryResponse
+                 {
                      Id = x.Id.ToString(),
                      BaseWage = y.BaseWage,
                      CardId = x.CardId,
@@ -73,7 +81,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Salary
                      WorkAgeWage = y.WorkAgeWage,
                      WorkNumber = x.WorkNumber
                  }).MergeTable()
-                 .OrderByDescending(z => new {z.Year,z.Month })
+                 .OrderByDescending(z => new { z.Year, z.Month })
                 .ToPageResultAsync(salaryRequest.PageIndex, salaryRequest.PageSize, total);
         }
 
@@ -97,7 +105,8 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Salary
                .WhereIF(salaryPushRequest.PushResult.HasValue, (x, y) => x.Result == salaryPushRequest.PushResult.Value)
                .WhereIF(salaryPushRequest.BusinessType.HasValue, (x, y) => x.BusinessType == salaryPushRequest.BusinessType.Value)
                .Where((x, y) => x.IsDelete == 1)
-               .Select((x, y) => new SalaryPushResponse() {
+               .Select((x, y) => new SalaryPushResponse()
+               {
                    BusinessType = x.BusinessType,
                    CreateTime = x.Created,
                    DepartmentName = y.Oid,
@@ -124,7 +133,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Salary
                .WhereIF(salaryPushRequest.PushTime.HasValue, (x, y) => y.Created == salaryPushRequest.PushTime.Value)
                .WhereIF(salaryPushRequest.PushResult.HasValue, (x, y) => y.Result == salaryPushRequest.PushResult.Value)
                .WhereIF(salaryPushRequest.BusinessType.HasValue, (x, y) => y.BusinessType == salaryPushRequest.BusinessType.Value)
-               .Where((x, y) => x.IsDelete == 1&&y.UserId==id)
+               .Where((x, y) => x.IsDelete == 1 && y.UserId == id)
                .Select((x, y) => new SalaryPushResponse()
                {
                    BusinessType = y.BusinessType,
@@ -151,7 +160,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Salary
             SalaryAsExcelResponse salaryAsExcelResponse = new SalaryAsExcelResponse();
             salary.Salary salary = new salary.Salary();
             #region 基础信息
-            string pushTime =string.Empty;
+            string pushTime = string.Empty;
             var decrRes = (CryptoStringExtension.DecryptAsync(sign)).Split(",", StringSplitOptions.RemoveEmptyEntries).ToList();
             if (decrRes.Count != 3)
             {
@@ -161,28 +170,92 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Salary
             var year = decrRes[1].ObjToInt();
             var month = decrRes[2].ObjToInt();
             #endregion
-           
+
             //用户信息
             var user = await dbContext.Queryable<User>().Where(x => x.IsDelete == 1 && x.WorkNumber == workNumber).FirstAsync();
             if (user != null)
             {
                 //推送时间
-               pushTime=await dbContext.Queryable<SalaryPushRecord>().Where(x => x.UserId == user.Id && x.Result == (int)PushResultEnum.Success && x.IsDelete == 1&& x.Year == year && x.Month == month).Select(x=>x.CreatedBy).FirstAsync();
+                pushTime = await dbContext.Queryable<SalaryPushRecord>().Where(x => x.UserId == user.Id && x.Result == (int)PushResultEnum.Success && x.IsDelete == 1 && x.Year == year && x.Month == month).Select(x => x.CreatedBy).FirstAsync();
                 //工资信息
-                 salary = await dbContext.FirstAsync<salary.Salary>(x => x.IsDelete == 1 && x.UserId == user.Id && x.Month == month && x.Year == year);
+                salary = await dbContext.FirstAsync<salary.Salary>(x => x.IsDelete == 1 && x.UserId == user.Id && x.Month == month && x.Year == year);
 
-             }
+            }
             salaryAsExcelResponse = mapper.Map<salary.Salary, SalaryAsExcelResponse>(salary);
             if (salaryAsExcelResponse != null)
             {
-               var endTime= Convert.ToDateTime(pushTime).AddDays(3);
-                salaryAsExcelResponse.CutOffTime =Math.Round(TimeHelper.GetTimeSpan(DateTime.Now, endTime).TotalSeconds,0);
+                var endTime = Convert.ToDateTime(pushTime).AddDays(3);
+                salaryAsExcelResponse.CutOffTime = Math.Round(TimeHelper.GetTimeSpan(DateTime.Now, endTime).TotalSeconds, 0);
                 salaryAsExcelResponse.Name = user?.Name;
                 salaryAsExcelResponse.Phone = user?.Phone;
                 salaryAsExcelResponse.WorkNumber = user?.WorkNumber;
                 salaryAsExcelResponse.DepartmentName = user?.Oid;
             }
             return salaryAsExcelResponse;
+        }
+
+        /// <summary>
+        /// 群发 单发
+        /// </summary>
+        /// <param name="baseRequest">为空群发  否则单发</param>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        public async Task<Result> SendSmsAllAsync(BaseRequest baseRequest)
+        {
+            var year = DateTime.Now.Year;
+            var month = DateTime.Now.Month;
+            var pageIndex = 1;
+            var pageSize = 200;
+            var id = 0L;
+            try
+            {
+                 long.TryParse(baseRequest.Id, out id);
+                //用户信息
+                var allPhone = await dbContext.Queryable<User>().Where(x => x.IsDelete == 1 && !SqlFunc.IsNullOrEmpty(x.Phone))
+                        .WhereIF(baseRequest != null&& baseRequest.Id!= null, x => x.Id == id)
+                        .Select(x => new { Phone = x.Phone, UserId = x.Id, WorkNumber = x.WorkNumber }).Distinct().ToListAsync();
+                if (allPhone.Count > 0)
+                {
+                    var index = (allPhone.Count / pageSize) + 1;//计算循环次数
+                    var res = allPhone.Skip((pageIndex - 1) * pageSize).Take(pageSize)
+                            .ToList();
+                    for (int i = 0; i < index; i++)
+                    {
+                        List<SalaryPushRecord> salaryPushRecords = new List<SalaryPushRecord>();
+                        //发送短信
+                        var responseResult = await smsService.SendSmsAsync(new Sms.Model.SmsRequest()
+                        {
+                            PhoneNumber = res.Select(x => string.Join(",", x.Phone)).ToString(),
+                        });
+                        foreach (var item in res)
+                        {
+                            SalaryPushRecord salaryPushRecord = new SalaryPushRecord()
+                            {
+                                BusinessType = (baseRequest == null
+                            || string.IsNullOrWhiteSpace(baseRequest.Id)) ? (int)BusinessTypeEnum.BatchPush : (int)BusinessTypeEnum.PersonalPush,
+                                Result = responseResult.IsSuccess ? (int)PushResultEnum.Success : (int)PushResultEnum.Fail,
+                                Fail = !responseResult.IsSuccess ? responseResult.Data : string.Empty,
+                                Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                                Year = year,
+                                Month = month,
+                                PhoneUrl = CryptoStringExtension.EncryptAsync($"{item.WorkNumber},{year},{month}"),
+                                UserId = item.UserId
+                            };
+                            salaryPushRecords.Add(salaryPushRecord);
+
+                        }
+                        await dbContext.Insertable<SalaryPushRecord>(salaryPushRecords).ExecuteCommandAsync();
+                    }
+
+                    return  Result.Success("发送成功");
+                }
+            }
+            catch (Exception ex)
+            {
+
+                
+            }
+            return Result.Fail("发送失败");
         }
     }
 }

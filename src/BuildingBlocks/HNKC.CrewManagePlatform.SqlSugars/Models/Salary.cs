@@ -457,10 +457,6 @@ namespace HNKC.CrewManagePlatform.SqlSugars.Models
         [SugarColumn(ColumnDataType ="int", ColumnDescription = "数据来源 0时候导入  1是新增")]
         public int DataSource { get; set; }
 
-        /// <summary>
-        ///手机短信链接地址
-        /// </summary>
-        [SugarColumn(Length =1024, ColumnDescription = "手机短信链接地址")]
-        public string? PhoneUrl { get; set; }
+       
     }
 }

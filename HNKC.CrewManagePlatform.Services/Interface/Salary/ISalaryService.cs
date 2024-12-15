@@ -1,6 +1,7 @@
 ﻿using HNKC.CrewManagePlatform.Models.CommonResult;
 using HNKC.CrewManagePlatform.Models.Dtos;
 using HNKC.CrewManagePlatform.Models.Dtos.Salary;
+using SqlSugar;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -40,5 +41,11 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Salary
         /// <param name="baseRequest"></param>
         /// <returns></returns>
         Task<SalaryAsExcelResponse> FindUserInfoAsync(string sign);
+
+        /// <summary>
+        ///参数为空即 群发  否则单发
+        /// </summary>
+        /// <returns></returns>
+        Task<Result> SendSmsAllAsync(BaseRequest baseRequest);
     }
 }

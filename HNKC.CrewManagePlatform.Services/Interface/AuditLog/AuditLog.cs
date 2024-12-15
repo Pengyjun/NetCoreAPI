@@ -1,4 +1,5 @@
 ﻿using HNKC.CrewManagePlatform.Models.Dtos.AuditLog;
+using HNKC.CrewManagePlatform.Services.Interface.CurrentUser;
 using HNKC.CrewManagePlatform.SqlSugars.Models;
 using HNKC.CrewManagePlatform.Utils;
 using Microsoft.Extensions.DependencyInjection;
@@ -10,7 +11,7 @@ using UtilsSharp;
 
 namespace HNKC.CrewManagePlatform.Services.Interface.AuditLog
 {
-    public class AuditLog:IAuditLogService
+    public class AuditLog:HNKC.CrewManagePlatform.Services.Interface.CurrentUser.CurrentUserService, IAuditLogService
     {
         #region  注入日志
         /// <summary>
@@ -64,9 +65,13 @@ namespace HNKC.CrewManagePlatform.Services.Interface.AuditLog
             var cacheKey = string.Empty;
             try
             {
+                var userInfo = GlobalCurrentUser;
                 cacheKey = $"{HttpContentAccessFactory.Current.Request.HttpContext.TraceIdentifier.ToLower()}Log";
                 var currentTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.ffffff");
                 var auditLogInfo = cache.Get<RecordRequestInfo>(cacheKey);
+                if (auditLogInfo == null) {
+                    return;
+                }
                 //接口请求时间
                 var stamp1 = TimeHelper.DateTimeToTimeStamp(Convert.ToDateTime(auditLogInfo.RequestTime), TimeStampType.毫秒);
                 //接口响应时间
@@ -81,7 +86,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.AuditLog
                     {
                         ApplicationName = auditLogInfo.ApplicationName,
                         BrowserInfo = auditLogInfo.BrowserInfo.Browser,
-                        ClientIpAddress = Common.Utils.GetIP(),
+                        ClientIpAddress = Utils.Utils.GetIP(),
                         Exceptions = auditLogInfo.Exceptions.ExceptionInfo,
                         ExecutionDuration = auditLogInfo.ExecutionDuration,
                         HttpMethod = auditLogInfo.HttpMethod,
@@ -93,6 +98,8 @@ namespace HNKC.CrewManagePlatform.Services.Interface.AuditLog
                         SqlExecutionDuration = string.Join('|', sqlTotalTime.Select(x => x)),
                         Url = auditLogInfo.Url,
                         ActionMethodName = auditLogInfo.ActionMethodName,
+                        UserId = userInfo.Id.ToString(),
+                        UserName = userInfo.Name
                     };
                     if (db != null)
                     {

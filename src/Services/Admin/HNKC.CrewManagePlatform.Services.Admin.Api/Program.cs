@@ -1,5 +1,7 @@
 
 using HNKC.CrewManagePlatform.Services.Admin.Api;
+using HNKC.CrewManagePlatform.SqlSugars;
+using UtilsSharp;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -17,7 +19,7 @@ builder.AddConfigUpload();
 //注入AutoMapper
 builder.AddAutoMapper();
 //初始化表
-//CodeFirst.InitTable(AppsettingsHelper.GetValue("ConnectionStrings:ConnectionString"));
+CodeFirst.InitTable(AppsettingsHelper.GetValue("ConnectionStrings:ConnectionString"));
 //自动注入业务接口服务
 builder.AddAutoDependencyInjection();
 var app = builder.Build();

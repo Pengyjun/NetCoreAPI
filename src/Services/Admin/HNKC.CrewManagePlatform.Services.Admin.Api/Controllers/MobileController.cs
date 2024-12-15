@@ -5,17 +5,23 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using HNKC.CrewManagePlatform.Utils;
+using HNKC.CrewManagePlatform.Sms.Interfaces;
+using HNKC.CrewManagePlatform.Sms.Model;
+using HNKC.CrewManagePlatform.Sms;
+using HNKC.CrewManagePlatform.Models.CommonResult;
 
 namespace HNKC.CrewManagePlatform.Services.Admin.Api.Controllers
 {
     /// <summary>
     /// 移动端
     /// </summary>
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class MobileController : BaseController
     {
         public ISalaryService salaryService { get; set; }
+     
         public MobileController(ISalaryService salaryService)
         {
             this.salaryService = salaryService;
@@ -31,6 +37,17 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api.Controllers
         {
             var data =await salaryService.FindUserInfoAsync(sign);
             return Ok(data);
+        }
+
+        /// <summary>
+        /// 发送短信
+        /// </summary>
+        /// <param name="baseRequest"></param>
+        /// <returns></returns>
+        [HttpGet("SmsSend")]
+        public async Task<Result> SmsSendAsync([FromQuery] BaseRequest baseRequest)
+        {
+          return  (await salaryService.SendSmsAllAsync(baseRequest));
         }
     }
 }
