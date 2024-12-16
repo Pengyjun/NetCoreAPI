@@ -16,7 +16,6 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api.Controllers
     /// <summary>
     /// 移动端
     /// </summary>
-    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class MobileController : BaseController
