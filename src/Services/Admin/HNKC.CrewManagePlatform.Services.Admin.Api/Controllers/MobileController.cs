@@ -9,6 +9,7 @@ using HNKC.CrewManagePlatform.Sms.Interfaces;
 using HNKC.CrewManagePlatform.Sms.Model;
 using HNKC.CrewManagePlatform.Sms;
 using HNKC.CrewManagePlatform.Models.CommonResult;
+using HNKC.CrewManagePlatform.Web.ActionResults;
 
 namespace HNKC.CrewManagePlatform.Services.Admin.Api.Controllers
 {
@@ -33,10 +34,14 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api.Controllers
         /// <param name="sgin"></param>
         /// <returns></returns>
         [HttpGet("FindUserInfo")]
-        public async Task<IActionResult> FindUserInfoAsync([FromQuery]string sign)
+        public async Task<Result> FindUserInfoAsync([FromQuery]string sign)
         {
             var data =await salaryService.FindUserInfoAsync(sign);
-            return Ok(data);
+            if (data == null)
+            {
+                return Result.Fail(message:"连接已失效或数据不存在");
+            }
+            return Result.Success(data);
         }
 
         /// <summary>

@@ -12,6 +12,7 @@ using SqlSugar;
 using SqlSugar.Extensions;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using UtilsSharp;
 using salary = HNKC.CrewManagePlatform.SqlSugars.Models;
 
@@ -159,10 +160,23 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Salary
         {
             SalaryAsExcelResponse salaryAsExcelResponse = new SalaryAsExcelResponse();
             salary.Salary salary = new salary.Salary();
+            #region 信息校验
+            if (string.IsNullOrWhiteSpace(sign))
+            { 
+             return salaryAsExcelResponse;
+            }
+            var pushTimeCalc= await dbContext.Queryable<SalaryPushRecord>().Where(x => x.IsDelete == 1 && x.PhoneUrl == sign).Select(x => x.Created).FirstAsync();
+            
+            if (!pushTimeCalc.HasValue||(pushTimeCalc.Value.AddDays(3) - DateTime.Now).Seconds<=0)
+            {
+                return null;
+            }
+            #endregion
+
             #region 基础信息
-            string pushTime = string.Empty;
+            DateTime pushTime = default(DateTime);
             var decrRes = (CryptoStringExtension.DecryptAsync(sign)).Split(",", StringSplitOptions.RemoveEmptyEntries).ToList();
-            if (decrRes.Count != 3)
+            if (decrRes.Count != 4)
             {
                 return salaryAsExcelResponse;
             }
@@ -176,7 +190,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Salary
             if (user != null)
             {
                 //推送时间
-                pushTime = await dbContext.Queryable<SalaryPushRecord>().Where(x => x.UserId == user.Id && x.Result == (int)PushResultEnum.Success && x.IsDelete == 1 && x.Year == year && x.Month == month).Select(x => x.CreatedBy).FirstAsync();
+                pushTime = await dbContext.Queryable<SalaryPushRecord>().Where(x => x.UserId == user.Id && x.Result == (int)PushResultEnum.Success && x.IsDelete == 1 && x.Year == year && x.Month == month).Select(x => x.Created.Value).FirstAsync();
                 //工资信息
                 salary = await dbContext.FirstAsync<salary.Salary>(x => x.IsDelete == 1 && x.UserId == user.Id && x.Month == month && x.Year == year);
 
@@ -238,8 +252,9 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Salary
                                 Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
                                 Year = year,
                                 Month = month,
-                                PhoneUrl = CryptoStringExtension.EncryptAsync($"{item.WorkNumber},{year},{month}"),
-                                UserId = item.UserId
+                                PhoneUrl = WebUtility.UrlEncode(CryptoStringExtension.EncryptAsync($"{item.WorkNumber},{year},{month},{DateTime.Now.ToString("yyyyMMddHHmmssffff")}")),
+                                UserId = item.UserId,
+                               
                             };
                             salaryPushRecords.Add(salaryPushRecord);
 

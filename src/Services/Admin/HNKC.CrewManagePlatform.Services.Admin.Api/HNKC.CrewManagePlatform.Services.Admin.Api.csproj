@@ -17,4 +17,10 @@
     <ProjectReference Include="..\..\..\BuildingBlocks\HNKC.CrewManagePlatform.Web\HNKC.CrewManagePlatform.Web.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="Dockerfile">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>
