@@ -1295,7 +1295,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     Id = GuidUtil.Next(),
                     Interval = 60,
                     ProjectId = projectObject.Id,
-                    ProjectId = projectObject.Id,
+                    IsDelete=1,
                     ProjectName = projectObject.ShortName,
                     IsNew = true
                 }).ExecuteCommandAsync();

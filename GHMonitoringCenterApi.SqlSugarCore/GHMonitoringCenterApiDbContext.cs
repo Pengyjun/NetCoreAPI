@@ -45,7 +45,7 @@ namespace GHMonitoringCenterApi.SqlSugarCore
                         //}
                     }
                     ////调试时打印sql语句 生产时注释掉
-                    //Console.WriteLine($"{sqlParmae}");
+                     Console.WriteLine($"{sqlParmae}");
                 };
                 //db.Aop.OnError=(sql) => {
                 //  //记录出错的sql语句
