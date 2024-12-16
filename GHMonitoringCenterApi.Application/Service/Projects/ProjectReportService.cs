@@ -470,7 +470,12 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 });
                 _mapper.Map(model.Construction, dayReport);
 
-                dayReport.DeviationWarning = model.Construction.DeviationWarning;
+
+                #region 查询日报信息
+               var count=  await  _dbContext.Queryable<DayReport>().Where(x => x.IsDelete == 1 && x.ProjectId == model.ProjectId).CountAsync();
+                #endregion
+
+                dayReport.DeviationWarning = count==0? $"{project.ShortName}项目首次上报产值": model.Construction.DeviationWarning;
                 dayReport.IsLow = model.Construction.IsLow;
                 // 实际日产量/产值/外包支出
                 dayReport.DayActualProduction = model.Construction.DayReportConstructions.Sum(t => t.ActualDailyProduction);

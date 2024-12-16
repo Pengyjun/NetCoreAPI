@@ -2934,7 +2934,7 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
             //获取日报数据
             int nowDay = DateTime.Now.AddDays(-1).ToDateDay();
             var impIds = improjects.Select(x => x.ProjectId).ToList();
-            var drData = dayRepData.Where(x => x.DateDay == nowDay && impIds.Contains(x.ProjectId) && !string.IsNullOrWhiteSpace(x.DeviationWarning)).ToList();
+            var drData = dayRepData.Where(x => x.DateDay == nowDay && impIds.Contains(x.ProjectId) && !string.IsNullOrWhiteSpace(x.DeviationWarning)&& (!x.DeviationWarning.EndsWith("无")|| !x.DeviationWarning.EndsWith("无异常"))).ToList();
 
             var npids=drData.Select(x => x.ProjectId).Distinct().ToList();
             var np = improjects.Where(x => npids.Contains(x.ProjectId.Value)).ToList();

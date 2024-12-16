@@ -28,5 +28,10 @@ namespace GHMonitoringCenterApi.Domain.Models
         [SugarColumn(ColumnDataType = "decimal(20,8)")]
         public decimal? Interval { get; set; }
 
+       /// <summary>
+       /// 是否是新增项目
+       /// </summary>
+        public bool? IsNew { get; set; }
+
     }
 }

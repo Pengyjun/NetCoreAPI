@@ -1053,7 +1053,6 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             }
 
 
-            await Console.Out.WriteLineAsync("11");
             #region 计算项目停工天数 供交建通每天发消息使用
 
             //计算当前周期已过多少天
@@ -1177,7 +1176,6 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             #endregion
 
 
-            await Console.Out.WriteLineAsync("22221");
             if (addOrUpdateProjectRequestDto.RequestType)
             {
 
@@ -1291,6 +1289,17 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 await dbContext.Insertable(projectObject).EnableDiffLogEvent(logDto).ExecuteCommandAsync();
                 //项目变更记录
                 await entityChangeService.RecordEntitysChangeAsync(EntityType.Project, projectObject.Id);
+
+                //新增项目加入重点项目表
+                await dbContext.Insertable<KeyProject>(new KeyProject() {
+                    Id = GuidUtil.Next(),
+                    Interval = 60,
+                    ProjectId = projectObject.Id,
+                    ProjectId = projectObject.Id,
+                    ProjectName = projectObject.ShortName,
+                    IsNew = true
+                }).ExecuteCommandAsync();
+
                 //新增后直接推送项目信息
                 await _pushPomService.PushProjectAsync();
                 responseAjaxResult.Data = true;
@@ -1585,17 +1594,28 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 }
                 #endregion
                 //重新查询数据是否有开工日期
-                var newProjectObject = await dbContext.Queryable<Project>().SingleAsync(x => x.IsDelete == 1 && x.Id == addOrUpdateProjectRequestDto.Id);
-                if (newProjectObject.CommencementTime != DateTime.MinValue && !string.IsNullOrEmpty(newProjectObject.CommencementTime.ToString()))
-                {
-                    //修改项目信息
-                    await dbContext.Updateable(projectObject).IgnoreColumns(x => x.CommencementTime).EnableDiffLogEvent(logDto).ExecuteCommandAsync();
-                }
-                else
+                //var newProjectObject = await dbContext.Queryable<Project>().SingleAsync(x => x.IsDelete == 1 && x.Id == addOrUpdateProjectRequestDto.Id);
+                //if (newProjectObject.CommencementTime != DateTime.MinValue && !string.IsNullOrEmpty(newProjectObject.CommencementTime.ToString()))
+                //{
+                //    //修改项目信息
+                //    await dbContext.Updateable(projectObject).IgnoreColumns(x => x.CommencementTime).EnableDiffLogEvent(logDto).ExecuteCommandAsync();
+                //}
+                //else
+                //{
+                //    //修改项目信息
+                //    await dbContext.Updateable(projectObject).EnableDiffLogEvent(logDto).ExecuteCommandAsync();
+                //}
+                if (addOrUpdateProjectRequestDto.CommencementTime != null && addOrUpdateProjectRequestDto.CommencementTime.HasValue)
                 {
                     //修改项目信息
                     await dbContext.Updateable(projectObject).EnableDiffLogEvent(logDto).ExecuteCommandAsync();
                 }
+                else {
+                    //修改项目信息
+                    await dbContext.Updateable(projectObject).IgnoreColumns(x => x.CommencementTime).EnableDiffLogEvent(logDto).ExecuteCommandAsync();
+                }
+
+             
                 //项目变更记录
                 await entityChangeService.RecordEntitysChangeAsync(EntityType.Project, projectObject.Id);
                 //更改后直接推送项目信息
@@ -1604,9 +1624,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 responseAjaxResult.Success(ResponseMessage.OPERATION_UPDATE_SUCCESS);
                 return responseAjaxResult;
             }
-            await Console.Out.WriteLineAsync("33333");
         }
-
         #region 删除项目
         /// <summary>
         /// 删除项目
