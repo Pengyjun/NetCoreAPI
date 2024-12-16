@@ -1,5 +1,6 @@
 ﻿using HNKC.CrewManagePlatform.Models.CommonResult;
 using HNKC.CrewManagePlatform.Services.Interface;
+using HNKC.CrewManagePlatform.SqlSugars.UnitOfTransaction;
 using HNKC.CrewManagePlatform.Web.ActionResults;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -31,6 +32,7 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpPost("SalaryUpload")]
+        [Transactional]
         public async Task<Result> SalaryUploadAsync(IFormFile file)
         {
             var stream = await SingleFileUpdateAsync(file);
