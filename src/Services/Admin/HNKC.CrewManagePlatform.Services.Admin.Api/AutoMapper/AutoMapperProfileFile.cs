@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
+using HNKC.CrewManagePlatform.Models.Dtos.PullResult;
 using HNKC.CrewManagePlatform.Models.Dtos.Salary;
 using HNKC.CrewManagePlatform.SqlSugars.Models;
-using System;
 
 namespace HNKC.CrewManagePlatform.Services.Admin.Api.AutoMapper
 {
@@ -16,10 +16,12 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api.AutoMapper
         /// <param name="mapperConfigurationExpression"></param>
         public static void AutoMapperProfileInit(IMapperConfigurationExpression mapperConfigurationExpression)
         {
-            //多组织行政机构
             mapperConfigurationExpression.CreateMap<SalaryAsExcelResponse, Salary>();
             mapperConfigurationExpression.CreateMap<HNKC.CrewManagePlatform.SqlSugars.Models.Salary, SalaryAsExcelResponse>();
+            mapperConfigurationExpression.CreateMap<DictionaryCtDto, HNKC.CrewManagePlatform.SqlSugars.Models.DictionaryTable>()
+            .ForMember(x => x.VDId, y => y.MapFrom(u => u.Id));
+
         }
-       
+
     }
 }

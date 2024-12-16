@@ -1,28 +1,26 @@
-﻿using Microsoft.OpenApi.Models;
-using System.Reflection;
-using HNKC.CrewManagePlatform.Web.Filters;
-using HNKC.CrewManagePlatform.SqlSugars.UnitOfTransaction;
-using HNKC.CrewManagePlatform.SqlSugars.Extensions;
-using HNKC.CrewManagePlatform.Services.Admin.Api;
-using HNKC.CrewManagePlatform.Web.DateTimeHandler;
+﻿using HNKC.CrewManagePlatform.Services.Admin.Api;
+using HNKC.CrewManagePlatform.Services.Admin.Api.AutoMapper;
 using HNKC.CrewManagePlatform.Services.Admin.Api.Filters;
-using System.DirectoryServices.ActiveDirectory;
+using HNKC.CrewManagePlatform.Services.Interface;
+using HNKC.CrewManagePlatform.Services.Interface.AuditLog;
 using HNKC.CrewManagePlatform.Services.Interface.CurrentUser;
 using HNKC.CrewManagePlatform.Services.Interface.CurrentUserService;
-using HNKC.CrewManagePlatform.Services.Interface.AuditLog;
-using UtilsSharp;
-using HNKC.CrewManagePlatform.Web.Jwt;
-using Microsoft.AspNetCore.Mvc.Filters;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Tokens;
-using System.Text;
-using HNKC.CrewManagePlatform.Utils;
+using HNKC.CrewManagePlatform.Services.Interface.PullResult;
 using HNKC.CrewManagePlatform.Services.Interface.Salary;
-using HNKC.CrewManagePlatform.Services.Interface;
-using HNKC.CrewManagePlatform.Services.Admin.Api.AutoMapper;
 using HNKC.CrewManagePlatform.Sms.Interfaces;
 using HNKC.CrewManagePlatform.Sms.Services;
+using HNKC.CrewManagePlatform.SqlSugars.Extensions;
+using HNKC.CrewManagePlatform.SqlSugars.UnitOfTransaction;
+using HNKC.CrewManagePlatform.Utils;
+using HNKC.CrewManagePlatform.Web.DateTimeHandler;
+using HNKC.CrewManagePlatform.Web.Filters;
+using HNKC.CrewManagePlatform.Web.Jwt;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
+using System.Reflection;
+using System.Text;
+using UtilsSharp;
 
 namespace HNKC.CrewManagePlatform.Services.Admin.Api
 {
@@ -36,7 +34,7 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api
         {
             builder.Services.AddControllers(options =>
             {
-           
+
                 options.Filters.Add(new HttpGlobalExceptionFilter());
                 options.Filters.Add(typeof(ValidateModelFilter));
                 options.Filters.Add(typeof(RequestInfoFilter));
@@ -81,25 +79,28 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api
         /// <param name="builder"></param>
         public static void AddApplicationServices(this WebApplicationBuilder builder)
         {
-            builder.Services.AddJwtService(x => {
+            builder.Services.AddJwtService(x =>
+            {
                 x.SecurityKey = AppsettingsHelper.GetValue("AccessToken:SecretKey");
             });
 
-            builder.Services.AddAuthentication(x => {
+            builder.Services.AddAuthentication(x =>
+            {
                 x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                 x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-            }).AddJwtBearer(x => {
+            }).AddJwtBearer(x =>
+            {
 
                 x.TokenValidationParameters = new TokenValidationParameters
                 {
                     ValidateLifetime = true,
                     RequireExpirationTime = true,
-                    ClockSkew=TimeSpan.Zero,
+                    ClockSkew = TimeSpan.Zero,
                     ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(AppsettingsHelper.GetValue("AccessToken:SecretKey"))), 
-                    ValidateIssuer = false, 
-                    ValidateAudience = false, 
-                                             
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(AppsettingsHelper.GetValue("AccessToken:SecretKey"))),
+                    ValidateIssuer = false,
+                    ValidateAudience = false,
+
                 };
             });
 
@@ -292,6 +293,7 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api
             builder.Services.AddScoped<ISalaryService, SalaryService>();
             builder.Services.AddScoped<IBaseService, BaseService>();
             builder.Services.AddScoped<ISmsService, CtyunSmsService>();
+            builder.Services.AddScoped<IDataDictionaryService, DataDictionaryService>();
 
         }
     }

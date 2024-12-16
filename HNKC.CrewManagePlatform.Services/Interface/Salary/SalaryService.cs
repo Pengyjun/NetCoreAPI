@@ -13,6 +13,7 @@ using SqlSugar.Extensions;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Xml.Linq;
 using UtilsSharp;
 using salary = HNKC.CrewManagePlatform.SqlSugars.Models;
 
@@ -227,7 +228,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Salary
                 //用户信息
                 var allPhone = await dbContext.Queryable<User>().Where(x => x.IsDelete == 1 && !SqlFunc.IsNullOrEmpty(x.Phone))
                         .WhereIF(baseRequest != null&& baseRequest.Id!= null, x => x.Id == id)
-                        .Select(x => new { Phone = x.Phone, UserId = x.Id, WorkNumber = x.WorkNumber }).Distinct().ToListAsync();
+                        .Select(x => new { Phone = x.Phone, UserId = x.Id, WorkNumber = x.WorkNumber,Name=x.Name }).Distinct().ToListAsync();
                 if (allPhone.Count > 0)
                 {
                     var index = (allPhone.Count / pageSize) + 1;//计算循环次数
@@ -236,11 +237,14 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Salary
                     for (int i = 0; i < index; i++)
                     {
                         List<SalaryPushRecord> salaryPushRecords = new List<SalaryPushRecord>();
-                        //发送短信
-                        var responseResult = await smsService.SendSmsAsync(new Sms.Model.SmsRequest()
+                        var parame = new Sms.Model.SmsRequest()
                         {
-                            PhoneNumber = res.Select(x => string.Join(",", x.Phone)).ToString(),
-                        });
+                            TemplateParam = (baseRequest == null
+                            || string.IsNullOrWhiteSpace(baseRequest.Id))?string.Empty : res.Select(x =>new { name= x.Name }).FirstOrDefault().ToJson(true),
+                            PhoneNumber =string.Join(",", res.Select(x => x.Phone)),
+                        };
+                        //发送短信
+                        var responseResult = await smsService.SendSmsAsync(parame);
                         foreach (var item in res)
                         {
                             SalaryPushRecord salaryPushRecord = new SalaryPushRecord()
