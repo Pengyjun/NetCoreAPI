@@ -82,8 +82,20 @@ namespace HNKC.CrewManagePlatform.Services.Interface.PullResult
                     await _dbContext.Insertable(insertTb).ExecuteCommandAsync();
                 }
                 if (updateTb != null && updateTb.Any())
-                    await _dbContext.Updateable(updateTb).WhereColumns(x => x.Id).ExecuteCommandAsync();
-                return Result.Success("成功");
+                {
+                    List<DictionaryTable> upTb = new();
+                    foreach (var up in updateTb)
+                    {
+                        var u = dt.FirstOrDefault(x => x.VDId == up.Id);
+                        if (u != null)
+                        {
+                            up.Id = u.Id;
+                            upTb.Add(up);
+                        }
+                    }
+                    await _dbContext.Updateable(upTb).WhereColumns(x => x.VDId).ExecuteCommandAsync();
+                }
+                return Result.Success("操作成功");
             }
             return Result.Success("无数据操作成功");
             #endregion
