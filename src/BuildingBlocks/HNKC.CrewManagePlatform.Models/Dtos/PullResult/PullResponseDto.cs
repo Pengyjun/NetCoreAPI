@@ -29,9 +29,21 @@
     public class DictionaryCtDto
     {
         /// <summary>
-        /// 描述
+        /// 域值描述
         /// </summary>
         public string? ZDOM_NAME { get; set; }
+        /// <summary>
+        /// 域值
+        /// </summary>
+        public string? ZDOM_VALUE { get; set; }
+        /// <summary>
+        /// 编码描述
+        /// </summary>
+        public string? ZDOM_DESC { get; set; }
+        /// <summary>
+        /// 值域编码
+        /// </summary>
+        public string? ZDOM_CODE { get; set; }
         /// <summary>
         /// 域值层级 
         /// </summary>

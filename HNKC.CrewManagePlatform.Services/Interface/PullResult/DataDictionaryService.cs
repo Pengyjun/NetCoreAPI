@@ -63,27 +63,18 @@ namespace HNKC.CrewManagePlatform.Services.Interface.PullResult
             }
             #endregion
 
-            #region 数据写入
+            #region 数据写入 全量增后续逻辑处理重复数据
             if (rt != null && rt.Any())
             {
                 //数据映射
                 var mp = _mapper.Map<List<DictionaryCtDto>, List<DictionaryTable>>(rt);
 
-                //获取源数据
-                var dt = await _dbContext.Queryable<DictionaryTable>().Where(t => t.IsDelete == 1).ToListAsync();
-                var vdids = dt.Select(x => x.VDId).ToList();
-
-                List<DictionaryTable> insertTb = mp.Where(x => !vdids.Contains(x.VDId)).ToList();
-                List<DictionaryTable> updateTb = mp.Where(x => vdids.Contains(x.VDId)).ToList();
-
-                if (insertTb != null && insertTb.Any())
+                if (mp != null && mp.Any())
                 {
-                    insertTb.ForEach(x => x.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId());
-                    await _dbContext.Insertable(insertTb).ExecuteCommandAsync();
+                    mp.ForEach(x => x.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId());
+                    await _dbContext.Insertable(mp).ExecuteCommandAsync();
                 }
-                if (updateTb != null && updateTb.Any())
-                    await _dbContext.Updateable(updateTb).WhereColumns(x => x.Id).ExecuteCommandAsync();
-                return Result.Success("成功");
+                return Result.Success("操作成功");
             }
             return Result.Success("无数据操作成功");
             #endregion

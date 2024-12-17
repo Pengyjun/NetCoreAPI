@@ -18,8 +18,7 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api.AutoMapper
         {
             mapperConfigurationExpression.CreateMap<SalaryAsExcelResponse, Salary>();
             mapperConfigurationExpression.CreateMap<HNKC.CrewManagePlatform.SqlSugars.Models.Salary, SalaryAsExcelResponse>();
-            mapperConfigurationExpression.CreateMap<DictionaryCtDto, HNKC.CrewManagePlatform.SqlSugars.Models.DictionaryTable>()
-            .ForMember(x => x.VDId, y => y.MapFrom(u => u.Id));
+            mapperConfigurationExpression.CreateMap<DictionaryCtDto, HNKC.CrewManagePlatform.SqlSugars.Models.DictionaryTable>();
 
         }
 
