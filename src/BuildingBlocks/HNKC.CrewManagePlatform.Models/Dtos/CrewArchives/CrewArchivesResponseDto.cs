@@ -1,9 +1,9 @@
-﻿namespace HNKC.CrewManagePlatform.Models.Dtos
+﻿namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
 {
     /// <summary>
     /// 船员档案相关dto 
     /// </summary>
-    public class CrewArchives
+    public class CrewArchivesResponseDto
     { }
     #region 响应详情Dto
     /// <summary>
