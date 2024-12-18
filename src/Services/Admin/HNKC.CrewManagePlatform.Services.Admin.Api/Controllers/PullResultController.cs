@@ -10,6 +10,7 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api.Controllers
     /// </summary>
     [Route("api/[controller]")]
     [ApiController]
+    [Obsolete]
     public class PullResultController : BaseController
     {
         private IDataDictionaryService _dataDictionaryService;
