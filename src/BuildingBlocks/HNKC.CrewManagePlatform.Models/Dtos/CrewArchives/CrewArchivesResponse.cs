@@ -3,7 +3,7 @@
     /// <summary>
     /// 船员档案相关dto 
     /// </summary>
-    public class CrewArchivesResponseDto
+    public class CrewArchivesResponse
     { }
     #region 响应详情Dto
     /// <summary>

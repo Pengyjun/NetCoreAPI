@@ -1,4 +1,6 @@
-﻿using HNKC.CrewManagePlatform.Services.Interface.CrewArchives;
+﻿using HNKC.CrewManagePlatform.Models.CommonResult;
+using HNKC.CrewManagePlatform.Models.Dtos.CrewArchives;
+using HNKC.CrewManagePlatform.Services.Interface.CrewArchives;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HNKC.CrewManagePlatform.Services.Admin.Api.Controllers
@@ -19,7 +21,15 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api.Controllers
         {
             this._service = service;
         }
-
-
+        /// <summary>
+        /// 船员档案列表
+        /// </summary>
+        /// <param name="requestBody"></param>
+        /// <returns></returns>
+        [HttpGet]
+        public async Task<PageResult<SearchCrewArchivesResponse>> SearchCrewArchivesAsync([FromQuery] SearchCrewArchivesRequest requestBody)
+        {
+            return await _service.SearchCrewArchivesAsync(requestBody);
+        }
     }
 }
