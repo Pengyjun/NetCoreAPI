@@ -33,7 +33,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.PullResult
         public async Task<Result> SaveValueDomainAsync(PullRequestDto pullRequestDto)
         {
             //数据结果集
-            List<DictionaryCtDto> rt = new();
+            List<ValueDomainDto> rt = new();
             #region 数据接收
             var url = AppsettingsHelper.GetValue("PullMDM:ValueDomain:VDUrl");
             var sdt = pullRequestDto.CreateTime ?? DateTime.Parse("1900-01-01");
@@ -67,7 +67,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.PullResult
             if (rt != null && rt.Any())
             {
                 //数据映射
-                var mp = _mapper.Map<List<DictionaryCtDto>, List<DictionaryTable>>(rt);
+                var mp = _mapper.Map<List<ValueDomainDto>, List<ValueDomain>>(rt);
 
                 if (mp != null && mp.Any())
                 {

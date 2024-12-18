@@ -3,10 +3,10 @@
 namespace HNKC.CrewManagePlatform.SqlSugars.Models
 {
     /// <summary>
-    /// 字典数据表
+    /// 值域数据表
     /// </summary>
-    [SugarTable("t_dictionarytable", IsDisabledDelete = true, TableDescription = "字典表")]
-    public class DictionaryTable : BaseEntity<long>
+    [SugarTable("t_valuedomain", IsDisabledDelete = true, TableDescription = "字典表")]
+    public class ValueDomain : BaseEntity<long>
     {
         /// <summary>
         /// 域值描述

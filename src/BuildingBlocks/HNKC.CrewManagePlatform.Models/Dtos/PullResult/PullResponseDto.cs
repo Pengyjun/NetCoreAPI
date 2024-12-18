@@ -21,12 +21,12 @@
         /// <summary>
         /// 
         /// </summary>
-        public List<DictionaryCtDto>? Data { get; set; }
+        public List<ValueDomainDto>? Data { get; set; }
     }
     /// <summary>
     /// 响应dto
     /// </summary>
-    public class DictionaryCtDto
+    public class ValueDomainDto
     {
         /// <summary>
         /// 域值描述
