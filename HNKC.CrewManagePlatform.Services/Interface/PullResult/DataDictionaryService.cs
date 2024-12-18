@@ -35,25 +35,11 @@ namespace HNKC.CrewManagePlatform.Services.Interface.PullResult
             //数据结果集
             List<ValueDomainDto> rt = new();
             #region 数据接收
-            var url = AppsettingsHelper.GetValue("PullMDM:ValueDomain:VDUrl");
-            var sdt = pullRequestDto.CreateTime ?? DateTime.Parse("1900-01-01");
-            var edt = pullRequestDto.UpdateTime ?? DateTime.Now;
-            var replacements = new Dictionary<string, string>
-               {
-                   { "$createtime", sdt.ToString("yyyy-MM-dd") },
-                   { "$updatetime", edt.ToString("yyyy-MM-dd") }
-               };
-            foreach (var replacement in replacements)
-            {
-                url = url.Replace(replacement.Key, replacement.Value);
-            }
-            var appKey = AppsettingsHelper.GetValue("PullMDM:Appkey");
-            var appInterfaceCode = AppsettingsHelper.GetValue("PullMDM:ValueDomain:AppInterfaceCode");
-
+            var po = OutParams(pullRequestDto.CreateTime, pullRequestDto.UpdateTime, 1);
             WebHelper web = new();
-            web.Headers.Add("AppKey", appKey);
-            web.Headers.Add("AppInterfaceCode", appInterfaceCode);
-            var response = await web.DoGetAsync(url);
+            web.Headers.Add("AppKey", po.AppKey);
+            web.Headers.Add("AppInterfaceCode", po.AppKey);
+            var response = await web.DoGetAsync(po.Url);
             if (response.Code == 200)
             {
                 var jsonObject = JsonConvert.DeserializeObject(response.Result)?.ToString();
@@ -78,6 +64,55 @@ namespace HNKC.CrewManagePlatform.Services.Interface.PullResult
             }
             return Result.Success("无数据操作成功");
             #endregion
+        }
+
+        private static PullOutResponseDto OutParams(DateTime? sdt, DateTime? edt, int tbType)
+        {
+            PullOutResponseDto po = new();
+
+            var st = sdt ?? DateTime.Parse("1900-01-01");
+            var et = edt ?? DateTime.Now;
+            var replacements = new Dictionary<string, string>
+               {
+                   { "$createtime", st.ToString("yyyy-MM-dd") },
+                   { "$updatetime", et.ToString("yyyy-MM-dd") }
+               };
+            var appkey = AppsettingsHelper.GetValue("PullMDM:Appkey");
+
+            switch (tbType)
+            {
+                case 1:
+                    var url = AppsettingsHelper.GetValue("PullMDM:ValueDomain:VDUrl");
+                    foreach (var replacement in replacements) { url = url.Replace(replacement.Key, replacement.Value); }
+                    po = new PullOutResponseDto
+                    {
+                        Url = url,
+                        AppInterfaceCode = appkey,
+                        AppKey = AppsettingsHelper.GetValue("PullMDM:ValueDomain:AppInterfaceCode")
+                    };
+                    break;
+                case 2:
+                    var url2 = AppsettingsHelper.GetValue("PullMDM:CountryRegion:VDUrl");
+                    foreach (var replacement in replacements) { url2 = url2.Replace(replacement.Key, replacement.Value); }
+                    po = new PullOutResponseDto
+                    {
+                        Url = url2,
+                        AppInterfaceCode = appkey,
+                        AppKey = AppsettingsHelper.GetValue("PullMDM:CountryRegion:AppInterfaceCode")
+                    };
+                    break;
+                case 3:
+                    var url3 = AppsettingsHelper.GetValue("PullMDM:AdministrativeDivision:VDUrl");
+                    foreach (var replacement in replacements) { url3 = url3.Replace(replacement.Key, replacement.Value); }
+                    po = new PullOutResponseDto
+                    {
+                        Url = url3,
+                        AppInterfaceCode = appkey,
+                        AppKey = AppsettingsHelper.GetValue("PullMDM:AdministrativeDivision:AppInterfaceCode")
+                    };
+                    break;
+            }
+            return po;
         }
     }
 }
