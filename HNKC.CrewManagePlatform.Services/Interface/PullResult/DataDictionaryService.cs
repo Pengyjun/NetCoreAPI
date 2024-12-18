@@ -1,8 +1,6 @@
 ﻿using AutoMapper;
 using HNKC.CrewManagePlatform.Models.CommonResult;
 using HNKC.CrewManagePlatform.Models.Dtos.PullResult;
-using HNKC.CrewManagePlatform.SqlSugars.Models;
-using HNKC.CrewManagePlatform.Utils;
 using Newtonsoft.Json;
 using SqlSugar;
 using UtilsSharp;
@@ -50,18 +48,18 @@ namespace HNKC.CrewManagePlatform.Services.Interface.PullResult
             #endregion
 
             #region 数据写入 全量增后续逻辑处理重复数据
-            if (rt != null && rt.Any())
-            {
-                //数据映射
-                var mp = _mapper.Map<List<ValueDomainDto>, List<ValueDomain>>(rt);
+            //if (rt != null && rt.Any())
+            //{
+            //    //数据映射
+            //    var mp = _mapper.Map<List<ValueDomainDto>, List<ValueDomain>>(rt);
 
-                if (mp != null && mp.Any())
-                {
-                    mp.ForEach(x => x.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId());
-                    await _dbContext.Insertable(mp).ExecuteCommandAsync();
-                }
-                return Result.Success("操作成功");
-            }
+            //    if (mp != null && mp.Any())
+            //    {
+            //        mp.ForEach(x => x.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId());
+            //        await _dbContext.Insertable(mp).ExecuteCommandAsync();
+            //    }
+            //    return Result.Success("操作成功");
+            //}
             return Result.Success("无数据操作成功");
             #endregion
         }
