@@ -1,6 +1,4 @@
-﻿using HNKC.CrewManagePlatform.Models.CommonRequest;
-
-namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
+﻿namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
 {
     /// <summary>
     /// 列表响应

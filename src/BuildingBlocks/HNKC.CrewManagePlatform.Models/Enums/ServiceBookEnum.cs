@@ -8,10 +8,10 @@
         /// <summary>
         /// 国内
         /// </summary>
-        InChina = 1,
+        InChina = 0,
         /// <summary>
         /// 国外
         /// </summary>
-        Abroad = 2
+        Abroad = 1
     }
 }

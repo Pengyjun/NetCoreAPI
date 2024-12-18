@@ -1,17 +1,17 @@
 ﻿namespace HNKC.CrewManagePlatform.Models.Enums
 {
     /// <summary>
-    /// 合同枚举
+    /// 签证类型
     /// </summary>
-    public enum ContractEnum
+    public enum VisaTypeEnum
     {
         /// <summary>
-        /// 固定期限
+        /// 入境签证
         /// </summary>
-        FixedTerm = 0,
+        Entry = 0,
         /// <summary>
-        /// 无固定期限
+        /// 过境签证
         /// </summary>
-        NoFixedTerm = 1
+        Transit = 1
     }
 }
