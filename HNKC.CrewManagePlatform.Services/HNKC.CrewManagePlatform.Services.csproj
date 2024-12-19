@@ -13,4 +13,8 @@
 		<ProjectReference Include="..\src\BuildingBlocks\HNKC.CrewManagePlatform.Utils\HNKC.CrewManagePlatform.Utils.csproj" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Folder Include="Interface\Institution\" />
+	</ItemGroup>
+
 </Project>

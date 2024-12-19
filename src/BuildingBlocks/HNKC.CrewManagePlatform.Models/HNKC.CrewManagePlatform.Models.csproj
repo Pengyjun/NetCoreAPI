@@ -16,4 +16,10 @@
 		<ProjectReference Include="..\HNKC.CrewManagePlatform.Utils\HNKC.CrewManagePlatform.Utils.csproj" />
 	</ItemGroup>
 
-</Project>
+	<ItemGroup>
+	  <Folder Include="Dtos\Institution\" />
+	  <Folder Include="Dtos\Menus\" />
+	  <Folder Include="Dtos\Role\" />
+	</ItemGroup>
+
+ </Project>
