@@ -14,6 +14,9 @@ using HNKC.CrewManagePlatform.SqlSugars.Models;
 using HNKC.CrewManagePlatform.Util;
 using System.IO;
 using HNKC.CrewManagePlatform.Utils;
+using HNKC.CrewManagePlatform.Models.CommonResult;
+using HNKC.CrewManagePlatform.Models.Enums;
+using HNKC.CrewManagePlatform.Models.Dtos;
 
 namespace HNKC.CrewManagePlatform.Services.Menus
 {
@@ -83,7 +86,7 @@ namespace HNKC.CrewManagePlatform.Services.Menus
         /// <exception cref="NotImplementedException"></exception>
         public async Task<bool> AddMenusAsync(UserMenuRequest userMenuRequest)
         {
-           var menuList=await _dbContext.Queryable<Menu>().Where(x => x.IsDelete == 1).ToListAsync();
+            var menuList=await _dbContext.Queryable<Menu>().Where(x => x.IsDelete == 1).ToListAsync();
             var maxMid = menuList.Max(x => x.MId);
             var menuBuinessId = GuidUtil.Next();
             Menu menu = new Menu()
@@ -110,6 +113,42 @@ namespace HNKC.CrewManagePlatform.Services.Menus
             await  _dbContext.Insertable<Menu>(menu).ExecuteCommandAsync();
             await  _dbContext.Insertable<RoleMenu>(roleMenu).ExecuteCommandAsync();
             return true;
+        }
+
+        /// <summary>
+        /// 删除菜单
+        /// </summary>
+        /// <param name="userMenuRequest"></param>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        public async Task<Result> RemoveMenusAsync(BaseRequest  baseRequest)
+        {
+            var menu =await _dbContext.Queryable<Menu>().Where(x => x.IsDelete == 1 && x.BusinessId == baseRequest.BId).FirstAsync();
+            if (menu == null)
+            {
+              return  Result.Fail("数据不存在", (int)ResponseHttpCode.DataNoExist);
+            }
+             menu.IsDelete = 0;
+            _dbContext.Updateable<Menu>(menu);
+            return Result.Success("删除成功");
+        }
+
+        public async Task<Result> ModifyMenusAsync(UserMenuRequest userMenuRequest)
+        {
+            var menuInfo = await _dbContext.Queryable<Menu>().Where(x => x.IsDelete == 1 && x.BusinessId == userMenuRequest.BId).FirstAsync();
+            if (menuInfo == null)
+            {
+                return Result.Fail("数据不存在", (int)ResponseHttpCode.DataNoExist);
+            }
+            menuInfo.ComponentUrl = userMenuRequest.ComponentUrl;
+            menuInfo.Icon = userMenuRequest.Icon;
+            menuInfo.Name = userMenuRequest.Name;
+            menuInfo.Sort = userMenuRequest.Sort;
+            menuInfo.Url = userMenuRequest.Url;
+            menuInfo.Remark = userMenuRequest.Remark;
+            await _dbContext.Insertable<Menu>(menuInfo).ExecuteCommandAsync();
+            return Result.Success("修改成功");
+
         }
     }
 }

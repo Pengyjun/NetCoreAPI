@@ -35,6 +35,16 @@ namespace HNKC.CrewManagePlatform.Models.Enums
         /// <summary>
         /// 文件类型不允许
         /// </summary>
-        FileTypeNoAllow = 10002,
+        FileTypeNoAllow = 10003,
+
+        /// <summary>
+        /// 短信发送失败
+        /// </summary>
+        SendFail = 10004,
+
+        /// <summary>
+        /// 数据不存在
+        /// </summary>
+        DataNoExist = 10005,
     }
 }

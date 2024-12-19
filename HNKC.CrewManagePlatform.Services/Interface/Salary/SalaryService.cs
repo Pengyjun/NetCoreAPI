@@ -222,13 +222,16 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Salary
             var month = DateTime.Now.Month;
             var pageIndex = 1;
             var pageSize = 200;
-            var id = 0L;
+            if (baseRequest.BId == Guid.Empty)
+            {
+                return Result.Fail("发送失败", (int)ResponseHttpCode.SendFail);
+            }
             try
             {
-                 long.TryParse(baseRequest.Id, out id);
+                
                 //用户信息
                 var allPhone = await dbContext.Queryable<User>().Where(x => x.IsDelete == 1 && !SqlFunc.IsNullOrEmpty(x.Phone))
-                        .WhereIF(baseRequest != null&& baseRequest.Id!= null, x => x.Id == id)
+                        .WhereIF(baseRequest != null&& baseRequest.BId!= null, x => x.BusinessId == baseRequest.BId)
                         .Select(x => new { Phone = x.Phone, UserId = x.Id, WorkNumber = x.WorkNumber,Name=x.Name }).Distinct().ToListAsync();
                 if (allPhone.Count > 0)
                 {
@@ -241,7 +244,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Salary
                         var parame = new Sms.Model.SmsRequest()
                         {
                             TemplateParam = (baseRequest == null
-                            || string.IsNullOrWhiteSpace(baseRequest.Id))?string.Empty : res.Select(x =>new { name= x.Name }).FirstOrDefault().ToJson(true),
+                            || baseRequest.BId==Guid.Empty)?string.Empty : res.Select(x =>new { name= x.Name }).FirstOrDefault().ToJson(true),
                             PhoneNumber =string.Join(",", res.Select(x => x.Phone)),
                         };
                         //发送短信
@@ -251,7 +254,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Salary
                             SalaryPushRecord salaryPushRecord = new SalaryPushRecord()
                             {
                                 BusinessType = (baseRequest == null
-                            || string.IsNullOrWhiteSpace(baseRequest.Id)) ? (int)BusinessTypeEnum.BatchPush : (int)BusinessTypeEnum.PersonalPush,
+                            || baseRequest.BId == Guid.Empty) ? (int)BusinessTypeEnum.BatchPush : (int)BusinessTypeEnum.PersonalPush,
                                 Result = responseResult.IsSuccess ? (int)PushResultEnum.Success : (int)PushResultEnum.Fail,
                                 Fail = !responseResult.IsSuccess ? responseResult.Data : string.Empty,
                                 Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
