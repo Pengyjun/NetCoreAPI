@@ -5,7 +5,7 @@ namespace HNKC.CrewManagePlatform.Models.Enums
     /// <summary>
     /// 删除原因
     /// </summary>
-    public enum DeleteResonEnum
+    public enum CrewStatusEnum
     {
         /// <summary>
         /// 在岗

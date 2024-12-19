@@ -5,12 +5,8 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
     /// <summary>
     /// 列表响应
     /// </summary>
-    public class SearchCrewArchivesResponse
+    public class SearchCrewArchivesResponse:BaseResponse
     {
-        /// <summary>
-        /// 业务主键
-        /// </summary>
-        public Guid Id { get; set; }
         /// <summary>
         /// 用户名称
         /// </summary>
@@ -26,7 +22,7 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// <summary>
         /// 在职状态
         /// </summary>
-        public DeleteResonEnum OnStatus { get; set; }
+        public CrewStatusEnum OnStatus { get; set; }
         /// <summary>
         /// 
         /// </summary>
@@ -122,7 +118,7 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// <summary>
         /// 删除原因
         /// </summary>
-        public DeleteResonEnum DeleteReson { get; set; }
+        public CrewStatusEnum DeleteReson { get; set; }
         /// <summary>
         /// 是否删除
         /// </summary>

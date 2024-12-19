@@ -23,7 +23,7 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// <summary>
         /// 船员状态
         /// </summary>
-        public string? Staus { get; set; }
+        public List<string>? Staus { get; set; }
         /// <summary>
         /// 船舶类型
         /// </summary>
@@ -31,19 +31,51 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// <summary>
         /// 服务薄类型
         /// </summary>
-        public ServiceBookEnum ServiceBook { get; set; }
+        public List<string>? ServiceBooks { get; set; }
         /// <summary>
-        /// 第一适任证 ,拼接
+        /// 第一适任证 
         /// </summary>
         public List<string>? FPosition { get; set; }
         /// <summary>
-        /// 第二适任证 ,拼接
+        /// 第二适任证 
         /// </summary>
         public List<string>? SPosition { get; set; }
         /// <summary>
-        /// 培训证书 ,拼接
+        /// 培训证书 true代表选中
         /// </summary>
-        public List<string>? TrainingCertificates { get; set; }
+        public bool TrainingCertificate { get; set; }
+        /// <summary>
+        /// Z01有效日期
+        /// </summary>
+        public bool Z01Effective { get; set; }
+        /// <summary>
+        /// Z07有效日期
+        /// </summary>
+        public bool Z07Effective { get; set; }
+        /// <summary>
+        /// Z08有效日期
+        /// </summary>
+        public bool Z08Effective { get; set; }
+        /// <summary>
+        /// Z04有效日期
+        /// </summary>
+        public bool Z04Effective { get; set; }
+        /// <summary>
+        /// Z05有效日期
+        /// </summary>
+        public bool Z05Effective { get; set; }
+        /// <summary>
+        /// Z02有效日期
+        /// </summary>
+        public bool Z02Effective { get; set; }
+        /// <summary>
+        /// Z06有效日期
+        /// </summary>
+        public bool Z06Effective { get; set; }
+        /// <summary>
+        /// Z09有效日期
+        /// </summary>
+        public bool Z09Effective { get; set; }
         /// <summary>
         /// 技能证书
         /// </summary>
@@ -55,6 +87,6 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// <summary>
         /// 学历：全日制...
         /// </summary>
-        public QualificationTypeEnum Qualifications { get; set; }
+        public List<string>? Qualifications { get; set; }
     }
 }

@@ -171,6 +171,6 @@ namespace HNKC.CrewManagePlatform.SqlSugars.Models
         /// 删除原因
         /// </summary>
         [SugarColumn(ColumnDataType = "int", ColumnDescription = "删除原因", DefaultValue = "0")]
-        public DeleteResonEnum DeleteReson { get; set; }
+        public CrewStatusEnum DeleteReson { get; set; }
     }
 }

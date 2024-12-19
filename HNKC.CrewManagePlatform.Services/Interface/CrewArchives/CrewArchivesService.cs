@@ -32,10 +32,35 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
         {
             RefAsync<int> total = 0;
 
+            //名称相关不赋值
             var rt = await _dbContext.Queryable<User>()
-                .Select(t => new SearchCrewArchivesResponse //名称相关不赋值
+                .WhereIF(!string.IsNullOrWhiteSpace(requestBody.KeyWords), t => t.Name.Contains(requestBody.KeyWords) || t.CardId.Contains(requestBody.KeyWords)
+                || t.Phone.Contains(requestBody.KeyWords) || t.WorkNumber.Contains(requestBody.KeyWords))
+                .LeftJoin<WorkShip>((t, ws) => t.BusinessId == ws.BusinessId)
+                .LeftJoin<CrewType>((t, ws, ct) => t.BusinessId == ct.BusinessId)
+                .LeftJoin<CertificateOfCompetency>((t, ws, ct, coc) => t.BusinessId == coc.BusinessId)
+                .LeftJoin<SkillCertificates>((t, ws, ct, coc, sf) => t.BusinessId == sf.BusinessId)
+                .LeftJoin<OwnerShip>((t, ws, ct, coc, sf, ow) => ws.OnShip == sf.BusinessId.ToString())
+                .LeftJoin<EducationalBackground>((t, ws, ct, coc, sf, ow, eb) => eb.BusinessId == t.BusinessId)
+                .WhereIF(requestBody.ShipTypes.Any(), (t, ws, ct, coc, sf, ow, eb) => requestBody.ShipTypes.Contains(((int)ow.ShipType).ToString()))
+                .WhereIF(requestBody.ServiceBooks.Any(), (t, ws, ct, coc, sf, ow, eb) => requestBody.ServiceBooks.Contains(((int)t.ServiceBookType).ToString()))
+                .WhereIF(requestBody.FPosition.Any(), (t, ws, ct, coc, sf, ow, eb) => requestBody.FPosition.Contains(coc.FPosition))
+                .WhereIF(requestBody.SPosition.Any(), (t, ws, ct, coc, sf, ow, eb) => requestBody.SPosition.Contains(coc.SPosition))
+                .WhereIF(requestBody.TrainingCertificate, (t, ws, ct, coc, sf, ow, eb) => !string.IsNullOrWhiteSpace(coc.TrainingCertificate))
+                .WhereIF(requestBody.Z01Effective, (t, ws, ct, coc, sf, ow, eb) => !string.IsNullOrWhiteSpace(coc.Z01EffectiveTime.ToString()))
+                .WhereIF(requestBody.Z07Effective, (t, ws, ct, coc, sf, ow, eb) => !string.IsNullOrWhiteSpace(coc.Z07EffectiveTime.ToString()))
+                .WhereIF(requestBody.Z08Effective, (t, ws, ct, coc, sf, ow, eb) => !string.IsNullOrWhiteSpace(coc.Z08EffectiveTime.ToString()))
+                .WhereIF(requestBody.Z04Effective, (t, ws, ct, coc, sf, ow, eb) => !string.IsNullOrWhiteSpace(coc.Z04EffectiveTime.ToString()))
+                .WhereIF(requestBody.Z05Effective, (t, ws, ct, coc, sf, ow, eb) => !string.IsNullOrWhiteSpace(coc.Z05EffectiveTime.ToString()))
+                .WhereIF(requestBody.Z02Effective, (t, ws, ct, coc, sf, ow, eb) => !string.IsNullOrWhiteSpace(coc.Z02EffectiveTime.ToString()))
+                .WhereIF(requestBody.Z06Effective, (t, ws, ct, coc, sf, ow, eb) => !string.IsNullOrWhiteSpace(coc.Z06EffectiveTime.ToString()))
+                .WhereIF(requestBody.Z09Effective, (t, ws, ct, coc, sf, ow, eb) => !string.IsNullOrWhiteSpace(coc.Z09EffectiveTime.ToString()))
+                .WhereIF(requestBody.CertificateTypes.Any(), (t, ws, ct, coc, sf, ow, eb) => requestBody.CertificateTypes.Contains(((int)sf.SkillCertificateType).ToString()))
+                .WhereIF(requestBody.QualificationTypes.Any(), (t, ws, ct, coc, sf, ow, eb) => requestBody.QualificationTypes.Contains(((int)eb.QualificationType).ToString()))
+                .WhereIF(requestBody.Qualifications.Any(), (t, ws, ct, coc, sf, ow, eb) => requestBody.Qualifications.Contains(((int)eb.Qualification).ToString()))
+                .Select((t, ws, ct, coc, sf, ow, eb) => new SearchCrewArchivesResponse
                 {
-                    Id = t.BusinessId,
+                    BId = t.BusinessId,
                     BtnType = t.IsDelete == 0 ? 1 : 0,
                     UserName = t.Name,
                     CardId = t.CardId,
@@ -47,8 +72,8 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                     IsDelete = t.IsDelete,
                     DeleteReson = t.DeleteReson
                 })
-                .OrderByDescending(x => x.IsDelete)
-                .ToPageListAsync(requestBody.PageIndex, requestBody.PageSize, total);
+                .OrderByDescending(t => t.IsDelete)
+                .ToListAsync();
 
             return await GetResult(requestBody, total, rt);
         }
@@ -63,7 +88,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
         {
             if (rt.Any())
             {
-                var uIds = rt.Select(x => x.Id).ToList();
+                var uIds = rt.Select(x => x.BId).ToList();
                 //在职状态
                 var onBoardtab = await _dbContext.Queryable<WorkShip>().Where(t => t.IsDelete == 1 && uIds.Contains(t.BusinessId)).ToListAsync();
                 var ownerShipstab = await _dbContext.Queryable<OwnerShip>().Where(t => t.IsDelete == 1).ToListAsync();
@@ -89,19 +114,19 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                     var sctabs = new List<string>();//技能证书
                     var spctabNames = "";//特设证书
                     var spctabs = new List<string>();//特设证书
-                    foreach (var s in sctab.Where(x => x.BusinessId == t.Id))
+                    foreach (var s in sctab.Where(x => x.BusinessId == t.BId))
                     {
                         var val = (int)s.SkillCertificateType;
                         sctabs.Add(val.ToString());
                         sctabNames += EnumUtil.GetDescription(s.SkillCertificateType) + "、";
                     }
-                    foreach (var s in spctab.Where(x => x.BusinessId == t.Id))
+                    foreach (var s in spctab.Where(x => x.BusinessId == t.BId))
                     {
                         var val = (int)s.SpecialEquipsCertificateType;
                         spctabs.Add(val.ToString());
                         spctabNames += EnumUtil.GetDescription(s.SpecialEquipsCertificateType) + "、";
                     }
-                    var ob = onBoardtab.Where(x => x.BusinessId == t.Id).OrderByDescending(x => x.Created).FirstOrDefault();
+                    var ob = onBoardtab.Where(x => x.BusinessId == t.BId).OrderByDescending(x => x.Created).FirstOrDefault();
                     if (ob != null)
                     {
                         //所在船舶
@@ -111,7 +136,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                         if (ownerShips != null)
                         {
                             //所在国家
-                            var country = countrytab.FirstOrDefault(x => ownerShips.Country == t.Id.ToString());
+                            var country = countrytab.FirstOrDefault(x => ownerShips.Country == t.BId.ToString());
                             t.OnCountry = ownerShips.Country;
                             t.OnCountryName = country?.Name;
                         }
@@ -119,9 +144,9 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                     t.ShipTypeName = EnumUtil.GetDescription(t.ShipType);
                     t.EmploymentTypeName = emptab.FirstOrDefault(x => x.Code == t.EmploymentType)?.Name;
                     t.CrewTypeName = crewTypetab.FirstOrDefault(x => t.CrewType == x.BusinessId.ToString())?.Name;
-                    t.FCertificate = firSectab?.FirstOrDefault(x => x.BusinessId == t.Id)?.FPosition;
+                    t.FCertificate = firSectab?.FirstOrDefault(x => x.BusinessId == t.BId)?.FPosition;
                     if (t.FCertificate != null) t.FCertificateName = firSecPosition.FirstOrDefault(x => x.BusinessId.ToString() == t.FCertificate)?.Name;
-                    t.SCertificate = firSectab?.FirstOrDefault(x => x.BusinessId == t.Id)?.SPosition;
+                    t.SCertificate = firSectab?.FirstOrDefault(x => x.BusinessId == t.BId)?.SPosition;
                     if (t.SCertificate != null) t.SCertificateName = firSecPosition.FirstOrDefault(x => x.BusinessId.ToString() == t.SCertificate)?.Name;
                     t.ServiceBookName = EnumUtil.GetDescription(t.ServiceBookType);
                     t.SkillsCertificateName = sctabNames;
@@ -129,7 +154,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                     t.SpecialCertificate = spctabs;
                     t.SpecialCertificateName = spctabNames;
                     t.Age = CalculateAgeFromIdCard(t.CardId);
-                    t.OnStatus = ob == null ? DeleteResonEnum.Normal : ShipUserStatus(ob.WorkShipEndTime, ob.HolidayTime, t.DeleteReson);
+                    t.OnStatus = ob == null ? CrewStatusEnum.Normal : ShipUserStatus(ob.WorkShipEndTime, ob.HolidayTime, t.DeleteReson);
                     t.OnStatusName = ob == null ? null : EnumUtil.GetDescription(ShipUserStatus(ob.WorkShipEndTime, ob.HolidayTime, t.DeleteReson));
                 }
             }
@@ -179,10 +204,10 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
         /// <param name="holidayTime">休假时间</param>
         /// <param name="deleteResonEnum">是否删除</param>
         /// <returns></returns>
-        private static DeleteResonEnum ShipUserStatus(DateTime departureTime, DateTime? holidayTime, DeleteResonEnum deleteResonEnum)
+        private static CrewStatusEnum ShipUserStatus(DateTime departureTime, DateTime? holidayTime, CrewStatusEnum deleteResonEnum)
         {
-            var status = new DeleteResonEnum();
-            if (deleteResonEnum != DeleteResonEnum.Normal)
+            var status = new CrewStatusEnum();
+            if (deleteResonEnum != CrewStatusEnum.Normal)
             {
                 //删除：管理人员手动操作，包括离职、调离和退休，优先于其他任何状态
                 status = deleteResonEnum;
@@ -190,12 +215,12 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
             else if (holidayTime.HasValue)
             {
                 //休假：提交离船申请且经审批同意后，按所申请离船、归船日期设置为休假状态，优先于在岗、待岗状态
-                status = DeleteResonEnum.XiuJia;
+                status = CrewStatusEnum.XiuJia;
             }
             else if (departureTime <= DateTime.Now)
             {
                 //在岗、待岗:船员登记时必填任职船舶数据，看其中最新的任职船舶上船时间和下船时间，在此时间内为在岗状态，否则为待岗状态
-                status = DeleteResonEnum.Normal;
+                status = CrewStatusEnum.Normal;
             }
             return status;
         }
@@ -222,7 +247,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
             var holidayCount = onBoard.Where(x => x.HolidayTime > DateTime.Now).Select(x => x.BusinessId).Distinct().Count();//休假数
             var holidayProp = totalCount == 0 ? 0 + "%" : Convert.ToInt32(holidayCount / totalCount) + "%";
 
-            var otherCount = udtab.Where(x => x.DeleteReson != DeleteResonEnum.Normal && x.DeleteReson != DeleteResonEnum.XiuJia).Count();//离调退
+            var otherCount = udtab.Where(x => x.DeleteReson != CrewStatusEnum.Normal && x.DeleteReson != CrewStatusEnum.XiuJia).Count();//离调退
             var otherProp = totalCount == 0 ? 0 + "%" : Convert.ToInt32(otherCount / totalCount) + "%";
 
             return new CrewArchivesResponse()
