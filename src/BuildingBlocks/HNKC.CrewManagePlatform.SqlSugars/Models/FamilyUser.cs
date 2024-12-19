@@ -7,14 +7,9 @@ namespace HNKC.CrewManagePlatform.SqlSugars.Models
     /// 家庭成员
     /// </summary>
 
-    [SugarTable("t_homeuser", IsDisabledDelete = true, TableDescription = "家庭成员")]
-    public class HomeUser : BaseEntity<long>
+    [SugarTable("t_familyuser", IsDisabledDelete = true, TableDescription = "家庭成员")]
+    public class FamilyUser : BaseEntity<long>
     {
-        /// <summary>
-        /// 关联的用户id
-        /// </summary>
-        [SugarColumn(Length = 36, ColumnDescription = "用户id")]
-        public Guid UserId { get; set; }
         /// <summary>
         /// 名称
         /// </summary>

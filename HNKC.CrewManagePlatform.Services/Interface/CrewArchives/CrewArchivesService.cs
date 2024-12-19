@@ -44,16 +44,24 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
 
                 //所在国家
 
+                //在职状态
+
                 //用工类型
                 var emptCodes = maintab.Select(x => x.EmploymentId).ToList();
                 var emptab = await _dbContext.Queryable<EmploymentType>().Where(t => t.IsDelete == 1 && emptCodes.Contains(t.Code)).ToListAsync();
-                //第一适任
+                //第一适任 第二适任
                 var uIds = maintab.Select(x => x.BusinessId).ToList();
-                var firtab = await _dbContext.Queryable<CertificateOfCompetency>().Where(t => uIds.Contains(t.UserId)).ToListAsync();
-                //第二适任
+                var firSectab = await _dbContext.Queryable<CertificateOfCompetency>().Where(t => uIds.Contains(t.BusinessId)).ToListAsync();
+                //技能证书
+                var sctab = await _dbContext.Queryable<SkillCertificates>().Where(t => t.IsDelete == 1 && uIds.Contains(t.BusinessId)).ToListAsync();
 
                 foreach (var t in maintab)
                 {
+                    var sctabNames = "";
+                    foreach (var s in sctab.Where(x => x.BusinessId == t.BusinessId))
+                    {
+                        sctabNames += EnumUtil.GetDescription(s.SkillCertificateType) + "、";
+                    }
                     rt.Add(new SearchCrewArchivesResponse
                     {
                         UserName = t.Name,
@@ -63,7 +71,12 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                         OnBoard = t.OnBoard,
                         EmploymentType = emptab.FirstOrDefault(x => x.Code == t.EmploymentId)?.Name,
                         CrewTypee = t.CrewType,
-                        FCertificate = t.CrewType
+                        FCertificate = firSectab?.FirstOrDefault(x => x.BusinessId == t.BusinessId)?.FPosition,
+                        SCertificate = firSectab?.FirstOrDefault(x => x.BusinessId == t.BusinessId)?.SPosition,
+                        ServiceBook = EnumUtil.GetDescription(t.ServiceBookType),
+                        Id = t.BusinessId,
+                        SkillsCertificate = sctabNames,
+
                     });
                 }
             }

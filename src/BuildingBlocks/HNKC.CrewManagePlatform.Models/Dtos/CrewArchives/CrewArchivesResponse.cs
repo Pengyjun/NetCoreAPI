@@ -306,7 +306,7 @@
         /// <summary>
         /// 技能证书
         /// </summary>
-        public List<SkillCertificates>? SkillCertificates { get; set; }
+        public List<SkillCertificatess>? SkillCertificates { get; set; }
         #endregion
 
         #region 特种设备证书
@@ -319,7 +319,7 @@
     /// <summary>
     /// 技能证书
     /// </summary>
-    public class SkillCertificates
+    public class SkillCertificatess
     {
         /// <summary>
         /// 证书类型

@@ -10,11 +10,6 @@ namespace HNKC.CrewManagePlatform.SqlSugars.Models
     public class EmergencyContacts : BaseEntity<long>
     {
         /// <summary>
-        /// 关联的用户id
-        /// </summary>
-        [SugarColumn(Length = 36, ColumnDescription = "用户id")]
-        public Guid UserId { get; set; }
-        /// <summary>
         /// 名称
         /// </summary>
         [SugarColumn(Length = 100, ColumnDescription = "名称")]

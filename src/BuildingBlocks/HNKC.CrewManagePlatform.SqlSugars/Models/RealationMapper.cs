@@ -19,11 +19,6 @@ namespace HNKC.CrewManagePlatform.SqlSugars.Models
         [SugarColumn(Length = 19, ColumnDescription = "关联外键")]
         public long ForeignKey { get; set; }
         /// <summary>
-        /// 用户id
-        /// </summary>
-        [SugarColumn(Length = 36, ColumnDescription = "用户id")]
-        public Guid UserId { get; set; }
-        /// <summary>
         /// 1.证书类型2.学历3.
         /// </summary>
         [SugarColumn(Length = 8, ColumnDescription = "映射类型：1.证书类型 2.学历 3.")]

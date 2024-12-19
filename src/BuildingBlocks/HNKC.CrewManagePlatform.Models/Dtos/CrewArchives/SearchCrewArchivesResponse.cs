@@ -8,7 +8,7 @@
         /// <summary>
         /// 业务主键
         /// </summary>
-        public Guid BId { get; set; }
+        public Guid Id { get; set; }
         /// <summary>
         /// 用户名称
         /// </summary>

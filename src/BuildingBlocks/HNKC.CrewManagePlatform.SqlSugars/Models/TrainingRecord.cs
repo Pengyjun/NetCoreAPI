@@ -9,11 +9,6 @@ namespace HNKC.CrewManagePlatform.SqlSugars.Models
     public class TrainingRecord : BaseEntity<long>
     {
         /// <summary>
-        /// 用户id
-        /// </summary>
-        [SugarColumn(Length = 36, ColumnDescription = "用户id")]
-        public Guid UserId { get; set; }
-        /// <summary>
         /// 培训类型：安全培训...
         /// </summary>
         [SugarColumn(Length = 50, ColumnDescription = "联系方式")]
