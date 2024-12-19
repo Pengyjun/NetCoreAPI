@@ -32,6 +32,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CurrentUser
 
         public async Task<Result> UserLoginAsync(UserLoginRequest userLoginRequest)
         {
+            var currentUser = GlobalCurrentUser;
             var token = string.Empty;
             var secretKey = AppsettingsHelper.GetValue("MD5SecretKey");
             var pwd = $"{secretKey}{userLoginRequest.Password}".ToMd5();
@@ -46,7 +47,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CurrentUser
                     var userInstitution = await dbContext.Queryable<UserInstitution>().FirstAsync(x => x.IsDelete == 1 && x.UserBusinessId == userInfo.BusinessId && x.InstitutionBusinessId == instutionInfo.BusinessId);
                     if (userInstitution != null)
                     {
-                      var institutionRoleInfo= await dbContext.Queryable<InstitutionRole>().Where(x => x.IsDelete == 1 && x.InstitutionBusinessId == userInstitution.BusinessId).FirstAsync();
+                      var institutionRoleInfo= await dbContext.Queryable<InstitutionRole>().Where(x => x.IsDelete == 1 && x.InstitutionBusinessId == userInstitution.InstitutionBusinessId).FirstAsync();
                         Claim[] claims = new Claim[]
                        {
                       new Claim("Id",userInfo.Id.ToString()),
