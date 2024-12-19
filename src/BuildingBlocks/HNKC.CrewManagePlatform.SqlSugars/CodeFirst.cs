@@ -15,7 +15,7 @@ namespace HNKC.CrewManagePlatform.SqlSugars
             {
                 ConnectionString = dbCon,
                 DbType = DbType.Dm,
-                IsAutoCloseConnection = true,//不设成true要手动close
+                IsAutoCloseConnection = false,//不设成true要手动close
                 MoreSettings = new ConnMoreSettings()
                 {
                     IsAutoToUpper = false,//禁用自动转成大写表 5.1.3.41-preview04
