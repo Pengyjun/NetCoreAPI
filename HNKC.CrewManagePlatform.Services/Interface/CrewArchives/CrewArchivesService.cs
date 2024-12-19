@@ -1,6 +1,9 @@
 ﻿using HNKC.CrewManagePlatform.Models.CommonResult;
 using HNKC.CrewManagePlatform.Models.Dtos.CrewArchives;
+using HNKC.CrewManagePlatform.SqlSugars.Models;
+using HNKC.CrewManagePlatform.Utils;
 using SqlSugar;
+using System.Linq.Expressions;
 using UtilsSharp.Shared.Standard;
 
 namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
@@ -27,6 +30,57 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
         public async Task<PageResult<SearchCrewArchivesResponse>> SearchCrewArchivesAsync(SearchCrewArchivesRequest requestBody)
         {
             PageResult<SearchCrewArchivesResponse> resResult = new();
+            RefAsync<int> total = 0;
+
+            var maintab = await _dbContext.Queryable<User>()
+                .OrderByDescending(x => x.IsDelete)
+                .ToPageListAsync(requestBody.PageIndex, requestBody.PageSize, total);
+
+            if (maintab.Any())
+            {
+                List<SearchCrewArchivesResponse> rt = new();
+
+                //所在船舶
+
+                //所在国家
+
+                //在职状态
+
+                //用工类型
+                var emptCodes = maintab.Select(x => x.EmploymentId).ToList();
+                var emptab = await _dbContext.Queryable<EmploymentType>().Where(t => t.IsDelete == 1 && emptCodes.Contains(t.Code)).ToListAsync();
+                //第一适任 第二适任
+                var uIds = maintab.Select(x => x.BusinessId).ToList();
+                var firSectab = await _dbContext.Queryable<CertificateOfCompetency>().Where(t => uIds.Contains(t.BusinessId)).ToListAsync();
+                //技能证书
+                var sctab = await _dbContext.Queryable<SkillCertificates>().Where(t => t.IsDelete == 1 && uIds.Contains(t.BusinessId)).ToListAsync();
+
+                foreach (var t in maintab)
+                {
+                    var sctabNames = "";
+                    foreach (var s in sctab.Where(x => x.BusinessId == t.BusinessId))
+                    {
+                        sctabNames += EnumUtil.GetDescription(s.SkillCertificateType) + "、";
+                    }
+                    rt.Add(new SearchCrewArchivesResponse
+                    {
+                        UserName = t.Name,
+                        BtnType = t.IsDelete == 0 ? 1 : 0,
+                        ShipType = EnumUtil.GetDescription(t.ShipType),
+                        WorkNumber = t.WorkNumber,
+                        OnBoard = t.OnBoard,
+                        EmploymentType = emptab.FirstOrDefault(x => x.Code == t.EmploymentId)?.Name,
+                        CrewTypee = t.CrewType,
+                        FCertificate = firSectab?.FirstOrDefault(x => x.BusinessId == t.BusinessId)?.FPosition,
+                        SCertificate = firSectab?.FirstOrDefault(x => x.BusinessId == t.BusinessId)?.SPosition,
+                        ServiceBook = EnumUtil.GetDescription(t.ServiceBookType),
+                        Id = t.BusinessId,
+                        SkillsCertificate = sctabNames,
+
+                    });
+                }
+            }
+            //状态、年龄
             return resResult;
         }
     }

@@ -11,25 +11,27 @@ namespace HNKC.CrewManagePlatform.SqlSugars.Models
         /// <summary>
         /// 文件名称
         /// </summary>
-        [SugarColumn(Length = 100)]
+        [SugarColumn(Length = 100, ColumnDescription = "文件名称")]
         public string? Name { get; set; }
         /// <summary>
         /// 原始文件名称
         /// </summary>
-        [SugarColumn(Length = 100)]
+        [SugarColumn(Length = 100, ColumnDescription = "原始文件名称")]
         public string? OriginName { get; set; }
+        /// <summary>
+        /// 后缀名称
+        /// </summary>
+        [SugarColumn(Length = 50, ColumnDescription = "后缀名称")]
+        public string? SuffixName { get; set; }
         /// <summary>
         /// 文件类型
         /// </summary>
-        [SugarColumn(Length = 50)]
-        public string? SuffixName { get; set; }
+        [SugarColumn(Length = 50, ColumnDescription = "文件类型")]
+        public string? FileType { get; set; }
         /// <summary>
         /// 文件大小
         /// </summary>
-        [SugarColumn(ColumnDataType = "int", DefaultValue = "0")]
+        [SugarColumn(ColumnDataType = "int", DefaultValue = "0", ColumnDescription = "文件大小")]
         public long? FileSize { get; set; }
-
-        [SugarColumn(Length = 19)]
-        public long UserId { get; set; }
     }
 }

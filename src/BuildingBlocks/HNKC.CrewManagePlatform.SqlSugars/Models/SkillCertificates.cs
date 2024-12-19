@@ -10,11 +10,6 @@ namespace HNKC.CrewManagePlatform.SqlSugars.Models
     public class SkillCertificates : BaseEntity<long>
     {
         /// <summary>
-        /// 用户id
-        /// </summary>
-        [SugarColumn(Length = 19, ColumnDescription = "用户id")]
-        public long UserId { get; set; }
-        /// <summary>
         /// 证书类型
         /// </summary>
         [SugarColumn(Length = 5, ColumnDescription = "证书类型")]

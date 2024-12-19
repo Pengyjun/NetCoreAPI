@@ -10,11 +10,6 @@ namespace HNKC.CrewManagePlatform.SqlSugars.Models
     public class YearCheck : BaseEntity<long>
     {
         /// <summary>
-        /// 用户id
-        /// </summary>
-        [SugarColumn(Length = 19, ColumnDescription = "用户id")]
-        public long UserId { get; set; }
-        /// <summary>
         /// 考核结果：优秀...
         /// </summary>
         [SugarColumn(ColumnDataType = "int", DefaultValue = "0", ColumnDescription = "考核结果")]
