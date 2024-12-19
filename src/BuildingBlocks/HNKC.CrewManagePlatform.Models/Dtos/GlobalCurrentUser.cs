@@ -19,7 +19,7 @@ namespace HNKC.CrewManagePlatform.Models.Dtos
         /// <summary>
         /// 用户业务ID
         /// </summary>
-        public Guid? UserBusiessId { get; set; }
+        public Guid? UserBusinessId { get; set; }
         /// <summary>
         /// 工号
         /// </summary>
