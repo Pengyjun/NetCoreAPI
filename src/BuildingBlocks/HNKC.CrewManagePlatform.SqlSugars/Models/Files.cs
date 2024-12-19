@@ -31,7 +31,7 @@ namespace HNKC.CrewManagePlatform.SqlSugars.Models
         /// <summary>
         /// 用户id
         /// </summary>
-        [SugarColumn(Length = 19, ColumnDescription = "用户id")]
-        public long UserId { get; set; }
+        [SugarColumn(Length = 36, ColumnDescription = "用户id")]
+        public Guid UserId { get; set; }
     }
 }

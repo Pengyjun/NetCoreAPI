@@ -96,5 +96,27 @@ namespace HNKC.CrewManagePlatform.Utils
             }
             return dic;
         }
+
+        #region 获取枚举描述
+        /// <summary>
+        /// 获取枚举描述
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static string GetDescription(this Enum value)
+        {
+            var type = value.GetType();
+            var name = Enum.GetName(type, value);
+            if (string.IsNullOrWhiteSpace(name))
+                return value.ToString();
+
+            var field = type.GetField(name);
+            var des = field?.GetCustomAttribute<DescriptionAttribute>();
+            if (des == null)
+                return value.ToString();
+
+            return des.Description;
+        }
+        #endregion
     }
 }

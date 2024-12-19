@@ -5,14 +5,14 @@ namespace HNKC.CrewManagePlatform.SqlSugars.Models
     /// <summary>
     /// 职务晋升
     /// </summary>
-    [SugarTable("t_promotion", IsDisabledDelete = true, TableDescription = "用户表")]
+    [SugarTable("t_promotion", IsDisabledDelete = true, TableDescription = "职务晋升")]
     public class Promotion : BaseEntity<long>
     {
         /// <summary>
         /// 用户id
         /// </summary>
-        [SugarColumn(Length = 19, ColumnDescription = "用户id")]
-        public long UserId { get; set; }
+        [SugarColumn(Length = 36, ColumnDescription = "用户id")]
+        public Guid UserId { get; set; }
         /// <summary>
         /// 所在船舶
         /// </summary>

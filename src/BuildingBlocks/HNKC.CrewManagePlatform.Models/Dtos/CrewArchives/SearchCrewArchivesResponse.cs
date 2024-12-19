@@ -6,6 +6,10 @@
     public class SearchCrewArchivesResponse
     {
         /// <summary>
+        /// 业务主键
+        /// </summary>
+        public Guid BId { get; set; }
+        /// <summary>
         /// 用户名称
         /// </summary>
         public string? UserName { get; set; }
@@ -28,7 +32,7 @@
         /// <summary>
         /// 所在船舶
         /// </summary>
-        public string? OnShip { get; set; }
+        public string? OnBoard { get; set; }
         /// <summary>
         /// 所在国家
         /// </summary>
