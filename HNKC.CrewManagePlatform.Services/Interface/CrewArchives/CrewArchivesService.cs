@@ -1,9 +1,11 @@
 ﻿using HNKC.CrewManagePlatform.Models.CommonResult;
+using HNKC.CrewManagePlatform.Models.Dtos;
 using HNKC.CrewManagePlatform.Models.Dtos.CrewArchives;
 using HNKC.CrewManagePlatform.Models.Enums;
 using HNKC.CrewManagePlatform.SqlSugars.Models;
 using HNKC.CrewManagePlatform.Utils;
 using SqlSugar;
+using System.ComponentModel;
 using System.Globalization;
 
 namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
@@ -592,11 +594,293 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
         /// </summary>
         /// <param name="type"></param>
         /// <returns></returns>
-        //public async Task<Result> DropDownListAsync(int type)
-        //{
-
-        //}
-
-        //private static List<>
+        public async Task<Result> GetDropDownListAsync(int type)
+        {
+            switch (type)
+            {
+                case 1://籍贯
+                    return await GetNativePlaceListAsync();
+                case 2://民族
+                    return await GetNationListAsync();
+                case 3://船员类型
+                    return await GetCrewTypeListAsync();
+                case 4://船舶
+                    return await GetOwnerShipListAsync();
+                case 5://培训类型
+                    return await GetTrainingListAsync();
+                case 6://国家
+                    return await GetCountryListAsync();
+                case 7://家庭关系
+                    return GetFamilyRelationList();
+                case 8://船舶类型
+                    return GetShipTypeList();
+                case 9://服务簿类型
+                    return GetServiceBookList();
+                case 10://签证类型
+                    return GetVisaTypeList();
+                case 11://技能证书
+                    return GetCertificateTypeList();
+                case 12://学历类型
+                    return GetQualificationTypeList();
+                case 13://学历
+                    return GetQualificationList();
+                case 14://合同类型
+                    return GetContractList();
+                case 15://考核类型
+                    return GetCheckList();
+                case 16://船舶状态
+                    return GetShipStateEnumList();
+            }
+            return Result.Success("获取成功");
+        }
+        /// <summary>
+        /// 籍贯
+        /// </summary>
+        /// <returns></returns>
+        private async Task<Result> GetNativePlaceListAsync()
+        {
+            var rt = await _dbContext.Queryable<AdministrativeDivision>().Where(t => t.IsDelete == 1 && t.SupRegionalismCode == "0").Select(t => new DropDownResponse
+            {
+                Key = t.BusinessId.ToString(),
+                Value = t.Name,
+            }).ToListAsync();
+            return Result.Success(rt);
+        }
+        /// <summary>
+        /// 民族
+        /// </summary>
+        /// <returns></returns>
+        private async Task<Result> GetNationListAsync()
+        {
+            var rt = await _dbContext.Queryable<Nation>().Where(t => t.IsDelete == 1).Select(t => new DropDownResponse
+            {
+                Key = t.BusinessId.ToString(),
+                Value = t.Name,
+            }).ToListAsync();
+            return Result.Success(rt);
+        }
+        /// <summary>
+        /// 船员类型
+        /// </summary>
+        /// <returns></returns>
+        private async Task<Result> GetCrewTypeListAsync()
+        {
+            var rt = await _dbContext.Queryable<CrewType>().Where(t => t.IsDelete == 1).Select(t => new DropDownResponse
+            {
+                Key = t.BusinessId.ToString(),
+                Value = t.Name,
+            }).ToListAsync();
+            return Result.Success(rt);
+        }
+        /// <summary>
+        /// 船舶
+        /// </summary>
+        /// <returns></returns>
+        private async Task<Result> GetOwnerShipListAsync()
+        {
+            var rt = await _dbContext.Queryable<OwnerShip>().Where(t => t.IsDelete == 1).Select(t => new DropDownResponse
+            {
+                Key = t.BusinessId.ToString(),
+                Value = t.ShipName,
+            }).ToListAsync();
+            return Result.Success(rt);
+        }
+        /// <summary>
+        /// 培训类型
+        /// </summary>
+        /// <returns></returns>
+        private async Task<Result> GetTrainingListAsync()
+        {
+            var rt = await _dbContext.Queryable<TrainingType>().Where(t => t.IsDelete == 1).Select(t => new DropDownResponse
+            {
+                Key = t.BusinessId.ToString(),
+                Value = t.Name,
+            }).ToListAsync();
+            return Result.Success(rt);
+        }
+        /// <summary>
+        /// 国家
+        /// </summary>
+        /// <returns></returns>
+        private async Task<Result> GetCountryListAsync()
+        {
+            var rt = await _dbContext.Queryable<CountryRegion>().Where(t => t.IsDelete == 1).Select(t => new DropDownResponse
+            {
+                Key = t.BusinessId.ToString(),
+                Value = t.Name,
+            }).ToListAsync();
+            return Result.Success(rt);
+        }
+        /// <summary>
+        /// 家庭关系
+        /// </summary>
+        /// <returns></returns>
+        private static Result GetFamilyRelationList()
+        {
+            var enumConvertList = Enum.GetValues(typeof(FamilyRelationEnum))
+                                                   .Cast<FamilyRelationEnum>()
+                                                   .Select(x => new DropDownResponse
+                                                   {
+                                                       Key = ((int)x).ToString(),
+                                                       Value = GetEnumDescription(x)
+                                                   })
+                                                   .ToList();
+            return Result.Success(enumConvertList);
+        }
+        /// <summary>
+        /// 船舶类型
+        /// </summary>
+        /// <returns></returns>
+        private static Result GetShipTypeList()
+        {
+            var enumConvertList = Enum.GetValues(typeof(ShipTypeEnum))
+                                                   .Cast<ShipTypeEnum>()
+                                                   .Select(x => new DropDownResponse
+                                                   {
+                                                       Key = ((int)x).ToString(),
+                                                       Value = GetEnumDescription(x)
+                                                   })
+                                                   .ToList();
+            return Result.Success(enumConvertList);
+        }
+        /// <summary>
+        /// 服务簿类型
+        /// </summary>
+        /// <returns></returns>
+        private static Result GetServiceBookList()
+        {
+            var enumConvertList = Enum.GetValues(typeof(ServiceBookEnum))
+                                                   .Cast<ServiceBookEnum>()
+                                                   .Select(x => new DropDownResponse
+                                                   {
+                                                       Key = ((int)x).ToString(),
+                                                       Value = GetEnumDescription(x)
+                                                   })
+                                                   .ToList();
+            return Result.Success(enumConvertList);
+        }
+        /// <summary>
+        /// 签证类型
+        /// </summary>
+        /// <returns></returns>
+        private static Result GetVisaTypeList()
+        {
+            var enumConvertList = Enum.GetValues(typeof(VisaTypeEnum))
+                                                   .Cast<VisaTypeEnum>()
+                                                   .Select(x => new DropDownResponse
+                                                   {
+                                                       Key = ((int)x).ToString(),
+                                                       Value = GetEnumDescription(x)
+                                                   })
+                                                   .ToList();
+            return Result.Success(enumConvertList);
+        }
+        /// <summary>
+        /// 技能证书
+        /// </summary>
+        /// <returns></returns>
+        private static Result GetCertificateTypeList()
+        {
+            var enumConvertList = Enum.GetValues(typeof(CertificateTypeEnum))
+                                                   .Cast<CertificateTypeEnum>()
+                                                   .Select(x => new DropDownResponse
+                                                   {
+                                                       Key = ((int)x).ToString(),
+                                                       Value = GetEnumDescription(x)
+                                                   })
+                                                   .ToList();
+            return Result.Success(enumConvertList);
+        }
+        /// <summary>
+        /// 学历类型
+        /// </summary>
+        /// <returns></returns>
+        private static Result GetQualificationTypeList()
+        {
+            var enumConvertList = Enum.GetValues(typeof(QualificationTypeEnum))
+                                                   .Cast<QualificationTypeEnum>()
+                                                   .Select(x => new DropDownResponse
+                                                   {
+                                                       Key = ((int)x).ToString(),
+                                                       Value = GetEnumDescription(x)
+                                                   })
+                                                   .ToList();
+            return Result.Success(enumConvertList);
+        }
+        /// <summary>
+        /// 学历
+        /// </summary>
+        /// <returns></returns>
+        private static Result GetQualificationList()
+        {
+            var enumConvertList = Enum.GetValues(typeof(QualificationEnum))
+                                                   .Cast<QualificationEnum>()
+                                                   .Select(x => new DropDownResponse
+                                                   {
+                                                       Key = ((int)x).ToString(),
+                                                       Value = GetEnumDescription(x)
+                                                   })
+                                                   .ToList();
+            return Result.Success(enumConvertList);
+        }
+        /// <summary>
+        /// 合同
+        /// </summary>
+        /// <returns></returns>
+        private static Result GetContractList()
+        {
+            var enumConvertList = Enum.GetValues(typeof(ContractEnum))
+                                                   .Cast<ContractEnum>()
+                                                   .Select(x => new DropDownResponse
+                                                   {
+                                                       Key = ((int)x).ToString(),
+                                                       Value = GetEnumDescription(x)
+                                                   })
+                                                   .ToList();
+            return Result.Success(enumConvertList);
+        }
+        /// <summary>
+        /// 考核
+        /// </summary>
+        /// <returns></returns>
+        private static Result GetCheckList()
+        {
+            var enumConvertList = Enum.GetValues(typeof(CheckEnum))
+                                                   .Cast<CheckEnum>()
+                                                   .Select(x => new DropDownResponse
+                                                   {
+                                                       Key = ((int)x).ToString(),
+                                                       Value = GetEnumDescription(x)
+                                                   })
+                                                   .ToList();
+            return Result.Success(enumConvertList);
+        }
+        /// <summary>
+        /// 船舶状态
+        /// </summary>
+        /// <returns></returns>
+        private static Result GetShipStateEnumList()
+        {
+            var enumConvertList = Enum.GetValues(typeof(ShipStateEnum))
+                                                   .Cast<ShipStateEnum>()
+                                                   .Select(x => new DropDownResponse
+                                                   {
+                                                       Key = ((int)x).ToString(),
+                                                       Value = GetEnumDescription(x)
+                                                   })
+                                                   .ToList();
+            return Result.Success(enumConvertList);
+        }
+        /// <summary>
+        /// 获取枚举项的描述信息
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        private static string GetEnumDescription(Enum value)
+        {
+            var field = value.GetType().GetField(value.ToString());
+            var attribute = (DescriptionAttribute)Attribute.GetCustomAttribute(field, typeof(DescriptionAttribute));
+            return attribute != null ? attribute.Description : value.ToString();
+        }
     }
 }

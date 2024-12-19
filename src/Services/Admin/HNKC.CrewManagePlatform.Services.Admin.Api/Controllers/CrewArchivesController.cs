@@ -53,15 +53,16 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api.Controllers
         }
 
         #region 下拉列表
-        ///// <summary>
-        ///// 获取基本下拉列表
-        ///// </summary>
-        ///// <param name="type"></param>
-        ///// <returns></returns>
-        //public async Task<Result> DropDownListAsync([FromQuery] int type)
-        //{
-        //    return await _service.DropDownListAsync(type);
-        //}
+        /// <summary>
+        /// 获取基本下拉列表
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        [HttpGet("GetDropDownList")]
+        public async Task<Result> GetDropDownListAsync([FromQuery] int type)
+        {
+            return await _service.GetDropDownListAsync(type);
+        }
 
         #endregion
     }
