@@ -1,6 +1,5 @@
 ﻿
 using HNKC.CrewManagePlatform.Models.CommonResult;
-using HNKC.CrewManagePlatform.Models.Dtos.Role;
 using HNKC.CrewManagePlatform.Models.Enums;
 using HNKC.CrewManagePlatform.Services.Interface.CurrentUser;
 using HNKC.CrewManagePlatform.SqlSugars.Models;

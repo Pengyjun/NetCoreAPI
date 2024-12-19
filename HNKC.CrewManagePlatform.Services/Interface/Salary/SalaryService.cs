@@ -159,6 +159,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Salary
         /// <exception cref="NotImplementedException"></exception>
         public async Task<SalaryAsExcelResponse> FindUserInfoAsync(string sign)
         {
+            var parseSign=WebUtility.UrlDecode(sign);
             SalaryAsExcelResponse salaryAsExcelResponse = new SalaryAsExcelResponse();
             salary.Salary salary = new salary.Salary();
             #region 信息校验
@@ -176,7 +177,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Salary
 
             #region 基础信息
             DateTime pushTime = default(DateTime);
-            var decrRes = (CryptoStringExtension.DecryptAsync(sign)).Split(",", StringSplitOptions.RemoveEmptyEntries).ToList();
+            var decrRes = (CryptoStringExtension.DecryptAsync(parseSign)).Split(",", StringSplitOptions.RemoveEmptyEntries).ToList();
             if (decrRes.Count != 4)
             {
                 return salaryAsExcelResponse;
