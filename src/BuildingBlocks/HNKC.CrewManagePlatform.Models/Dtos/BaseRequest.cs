@@ -13,9 +13,10 @@ namespace HNKC.CrewManagePlatform.Models.Dtos
     /// </summary>
     public class BaseRequest
     {
-           /// <summary>
-           /// ID
-           /// </summary>
-        public string? Id { get; set; }
+        /// <summary>
+        /// 业务ID
+        /// </summary>
+      
+        public Guid? BId { get; set; }
     }
 }

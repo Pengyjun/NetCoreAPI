@@ -10,8 +10,9 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.Menus
     /// <summary>
     /// 添加菜单请求DTO
     /// </summary>
-    public class UserMenuRequest
+    public class UserMenuRequest:BaseRequest
     {
+       
         /// <summary>
         /// 当前节点的父节点   如果是根节点  传0
         /// </summary>

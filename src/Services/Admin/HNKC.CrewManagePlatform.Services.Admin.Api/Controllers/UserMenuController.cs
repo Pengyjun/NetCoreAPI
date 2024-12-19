@@ -1,4 +1,5 @@
-﻿using HNKC.CrewManagePlatform.Models.Dtos.Menus;
+﻿using HNKC.CrewManagePlatform.Models.Dtos;
+using HNKC.CrewManagePlatform.Models.Dtos.Menus;
 using HNKC.CrewManagePlatform.Services.Menus;
 using HNKC.CrewManagePlatform.Util;
 using HNKC.CrewManagePlatform.Web.ActionResults;
@@ -40,10 +41,38 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api.Controllers
         /// </summary>
         /// <param name="roltId"></param>
         /// <returns></returns>
-        [HttpPost("SearchUserMenus")]
-        public async Task<IActionResult> SearchUserMenusAsync([FromBody]UserMenuRequest userMenuRequest)
+        [HttpPost("AddMenus")]
+        public async Task<IActionResult> AddMenusAsync([FromBody]UserMenuRequest userMenuRequest)
         {
             var data = await menuService.AddMenusAsync(userMenuRequest);
+            return new OkMessageObjectResult("添加成功");
+        }
+
+
+
+        /// <summary>
+        /// 添加用户菜单
+        /// </summary>
+        /// <param name="roltId"></param>
+        /// <returns></returns>
+        [HttpPost("RemoveMenus")]
+        public async Task<IActionResult> RemoveMenusAsync([FromBody] BaseRequest  baseRequest)
+        {
+            var data = await menuService.RemoveMenusAsync(baseRequest);
+            return new OkMessageObjectResult("添加成功");
+        }
+
+
+
+        /// <summary>
+        /// 添加用户菜单
+        /// </summary>
+        /// <param name="roltId"></param>
+        /// <returns></returns>
+        [HttpPost("ModifyMenus")]
+        public async Task<IActionResult> ModifyMenusAsync([FromBody] UserMenuRequest userMenuRequest)
+        {
+            var data = await menuService.ModifyMenusAsync(userMenuRequest);
             return new OkMessageObjectResult("添加成功");
         }
     }
