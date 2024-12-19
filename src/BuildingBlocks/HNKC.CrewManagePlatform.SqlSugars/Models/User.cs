@@ -1,22 +1,18 @@
-﻿using SqlSugar;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using HNKC.CrewManagePlatform.Models.Enums;
+using SqlSugar;
 
 namespace HNKC.CrewManagePlatform.SqlSugars.Models
 {
     /// <summary>
     /// 用户表
     /// </summary>
-    [SugarTable("t_user", IsDisabledDelete = true,TableDescription = "用户表")]
-    public class User:BaseEntity<long>
+    [SugarTable("t_user", IsDisabledDelete = true, TableDescription = "用户表")]
+    public class User : BaseEntity<long>
     {
         /// <summary>
         /// 姓名
         /// </summary>
-        [SugarColumn(Length = 128,ColumnDescription = "姓名")]
+        [SugarColumn(Length = 128, ColumnDescription = "姓名")]
         public string? Name { get; set; }
 
         /// <summary>
@@ -29,7 +25,7 @@ namespace HNKC.CrewManagePlatform.SqlSugars.Models
         /// 所属船舶（部门）OID
         /// </summary>
         [SugarColumn(Length = 32, ColumnDescription = "所属船舶（部门）OID")]
-        public string?  Oid { get; set; }
+        public string? Oid { get; set; }
 
         /// <summary>
         /// 职务ID
@@ -48,7 +44,7 @@ namespace HNKC.CrewManagePlatform.SqlSugars.Models
         /// 劳务公司
         /// </summary>
         [SugarColumn(Length = 32, ColumnDescription = "劳务公司")]
-        public string? ServiceCompanyId{ get; set; }
+        public string? ServiceCompanyId { get; set; }
 
 
         /// <summary>
@@ -77,21 +73,99 @@ namespace HNKC.CrewManagePlatform.SqlSugars.Models
         public string? CardId { get; set; }
 
         /// <summary>
-        /// 第一适任证书（有职务）
+        /// 政治面貌
         /// </summary>
-        [SugarColumn(Length = 32, ColumnDescription = "第一适任证书（有职务）")]
-        public string? FirstCertificateId { get; set; }
+        [SugarColumn(Length = 32, ColumnDescription = "政治面貌")]
+        public string? PoliticalStatus { get; set; }
         /// <summary>
-        /// 第二适任证书
+        /// 船员照片 ,拼接文件
         /// </summary>
-        [SugarColumn(Length = 32, ColumnDescription = "第二适任证书")]
-        public string? SecondCertificateId { get; set; }
-
-
+        [SugarColumn(ColumnDataType = "text", ColumnDescription = "船员照片")]
+        public string? CrewPhoto { get; set; }
         /// <summary>
-        /// 培训合格证编号
+        /// 身份证扫描件 ,拼接文件
         /// </summary>
-        [SugarColumn(Length = 32, ColumnDescription = "培训合格证编号")]
-        public string? CertificateNumberId { get; set; }
+        [SugarColumn(ColumnDataType = "text", ColumnDescription = "身份证扫描件")]
+        public string? IdCardScans { get; set; }
+        /// <summary>
+        /// 籍贯(省)
+        /// </summary>
+        [SugarColumn(Length = 100, ColumnDescription = "籍贯")]
+        public string? NativePlace { get; set; }
+        /// <summary>
+        /// 家庭地址
+        /// </summary>
+        [SugarColumn(Length = 256, ColumnDescription = "家庭地址")]
+        public string? HomeAddress { get; set; }
+        /// <summary>
+        /// 常住地
+        /// </summary>
+        [SugarColumn(Length = 512, ColumnDescription = "常住地")]
+        public string? BuildAddress { get; set; }
+        /// <summary>
+        /// 民族
+        /// </summary>
+        [SugarColumn(Length = 50, ColumnDescription = "民族")]
+        public string? Nation { get; set; }
+        /// <summary>
+        /// 入职日期
+        /// </summary>
+        [SugarColumn(ColumnDataType = "datetime", ColumnDescription = "入职日期")]
+        public DateTime? EntryTime { get; set; }
+        /// <summary>
+        /// 入职材料 ,拼接文件
+        /// </summary>
+        [SugarColumn(ColumnDataType = "text", ColumnDescription = "入职材料")]
+        public string? EntryScans { get; set; }
+        /// <summary>
+        /// 劳务公司
+        /// </summary>
+        [SugarColumn(Length = 256, ColumnDescription = "劳务公司")]
+        public string? LaborCompany { get; set; }
+        /// <summary>
+        /// 合同主体
+        /// </summary>
+        [SugarColumn(Length = 200, ColumnDescription = "合同主体")]
+        public string? ContarctMain { get; set; }
+        /// <summary>
+        /// 合同类型
+        /// </summary>
+        [SugarColumn(ColumnDataType = "int", ColumnDescription = "合同类型", DefaultValue = "0")]
+        public ContractEnum ContarctType { get; set; }
+        /// <summary>
+        /// 开始时间
+        /// </summary>
+        [SugarColumn(ColumnDataType = "datetime", ColumnDescription = "开始时间")]
+        public DateTime? StartTime { get; set; }
+        /// <summary>
+        /// 结束时间
+        /// </summary>
+        [SugarColumn(ColumnDataType = "datetime", ColumnDescription = "结束时间")]
+        public DateTime? EndTime { get; set; }
+        /// <summary>
+        /// 船舶类型
+        /// </summary>
+        [SugarColumn(ColumnDataType = "int", ColumnDescription = "船舶类型", DefaultValue = "0")]
+        public ShipTypeEnum ShipType { get; set; }
+        /// <summary>
+        /// 船员类型
+        /// </summary>
+        [SugarColumn(Length = 50, ColumnDescription = "船员类型")]
+        public string? CrewType { get; set; }
+        /// <summary>
+        /// 服务簿类型
+        /// </summary>
+        [SugarColumn(ColumnDataType = "int", ColumnDescription = "服务簿类型", DefaultValue = "0")]
+        public ServiceBookEnum ServiceBookType { get; set; }
+        /// <summary>
+        /// 所在船舶
+        /// </summary>
+        [SugarColumn(Length = 50, ColumnDescription = "所在船舶")]
+        public string? OnBoard { get; set; }
+        /// <summary>
+        /// 在船职务
+        /// </summary>
+        [SugarColumn(Length = 50, ColumnDescription = "在船职务")]
+        public string? PositionOnBoard { get; set; }
     }
 }

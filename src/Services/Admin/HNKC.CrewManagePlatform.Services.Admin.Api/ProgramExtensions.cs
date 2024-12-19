@@ -3,6 +3,7 @@ using HNKC.CrewManagePlatform.Services.Admin.Api.AutoMapper;
 using HNKC.CrewManagePlatform.Services.Admin.Api.Filters;
 using HNKC.CrewManagePlatform.Services.Interface;
 using HNKC.CrewManagePlatform.Services.Interface.AuditLog;
+using HNKC.CrewManagePlatform.Services.Interface.CrewArchives;
 using HNKC.CrewManagePlatform.Services.Interface.CurrentUser;
 using HNKC.CrewManagePlatform.Services.Interface.CurrentUserService;
 using HNKC.CrewManagePlatform.Services.Interface.PullResult;
@@ -294,6 +295,7 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api
             builder.Services.AddScoped<IBaseService, BaseService>();
             builder.Services.AddScoped<ISmsService, CtyunSmsService>();
             builder.Services.AddScoped<IDataDictionaryService, DataDictionaryService>();
+            builder.Services.AddScoped<ICrewArchivesService, CrewArchivesService>();
 
         }
     }
