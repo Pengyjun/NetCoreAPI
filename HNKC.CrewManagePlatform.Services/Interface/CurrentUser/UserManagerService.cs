@@ -112,6 +112,14 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CurrentUser
             return Result.Success("密码重置成功");
         }
 
+
+        /// <summary>
+        /// 搜索用户
+        /// </summary>
+        /// <param name="pageRequest"></param>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+
         public Task<PageResult<UserResponse>> SearchUserAsync(PageRequest pageRequest)
         {
             throw new NotImplementedException();

@@ -11,6 +11,9 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.UserManager
     /// </summary>
     public class UserRequest
     {
-
+        public string? Name { get; set; } 
+        public string? Phone { get; set; } 
+        public string? Pwd { get; set; } 
+        public string? Oid { get; set; } 
     }
 }

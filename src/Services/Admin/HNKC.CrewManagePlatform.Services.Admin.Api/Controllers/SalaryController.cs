@@ -31,9 +31,10 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api.Controllers
         /// <param name="salaryRequest"></param>
         /// <returns></returns>
         [HttpGet("SearchSalaryList")]
-        public async Task<PageResult<SalaryResponse>> SearchSalaryListAsync( [FromQuery]SalaryRequest salaryRequest)
+        public async Task<IActionResult> SearchSalaryListAsync( [FromQuery]SalaryRequest salaryRequest)
         { 
-            return await salaryService.SearchSalaryListAsync(salaryRequest);
+            var data= await salaryService.SearchSalaryListAsync(salaryRequest);
+            return Ok(data);
         }
 
 
@@ -43,9 +44,10 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api.Controllers
         /// <param name="salaryRequest"></param>
         /// <returns></returns>
         [HttpGet("SearchSalaryPushRecord")]
-        public async Task<PageResult<SalaryPushResponse>> SearchSalaryPushRecordAsync([FromQuery]SalaryPushRequest salaryPushRequest)
+        public async Task<IActionResult> SearchSalaryPushRecordAsync([FromQuery]SalaryPushRequest salaryPushRequest)
         {
-            return await salaryService.SearchSalaryPushRecordAsync(salaryPushRequest);
+            var data= await salaryService.SearchSalaryPushRecordAsync(salaryPushRequest);
+            return Ok(data);
         }
 
         /// <summary>
@@ -54,9 +56,10 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api.Controllers
         /// <param name="salaryRequest"></param>
         /// <returns></returns>
         [HttpGet("GetSalaryPushRecordByUser")]
-        public async Task<PageResult<SalaryPushResponse>> GetSalaryPushRecordByUserAsync([FromQuery] SalaryPushRequest salaryPushRequest)
+        public async Task<IActionResult> GetSalaryPushRecordByUserAsync([FromQuery] SalaryPushRequest salaryPushRequest)
         {
-            return await salaryService.GetSalaryPushRecordByUserAsync(salaryPushRequest);
+            var data= await salaryService.GetSalaryPushRecordByUserAsync(salaryPushRequest);
+            return Ok(data);
         }
     }
 }
