@@ -23,10 +23,17 @@ namespace HNKC.CrewManagePlatform.Models.Dtos
         public DateTime? Created { get; set; }
     }
     /// <summary>
-    /// 
+    /// 基本响应体
     /// </summary>
-    public class BaseResponseDto
+    public class DropDownResponse
     {
-
+        /// <summary>
+        /// 
+        /// </summary>
+        public string Key { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
+        public string? Value { get; set; }
     }
 }

@@ -3,7 +3,7 @@
 namespace HNKC.CrewManagePlatform.Models.Enums
 {
     /// <summary>
-    /// 删除原因
+    /// 删除原因/船员状态
     /// </summary>
     public enum CrewStatusEnum
     {
