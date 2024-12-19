@@ -8,14 +8,19 @@ namespace HNKC.CrewManagePlatform.Models.Enums
     public enum ServiceBookEnum
     {
         /// <summary>
+        /// 无
+        /// </summary>
+        [Description("无")]
+        Normal = 0,
+        /// <summary>
         /// 国内
         /// </summary>
         [Description("国内")]
-        InChina = 0,
+        InChina = 1,
         /// <summary>
         /// 国外
         /// </summary>
         [Description("国外")]
-        Abroad = 1
+        Abroad = 2
     }
 }

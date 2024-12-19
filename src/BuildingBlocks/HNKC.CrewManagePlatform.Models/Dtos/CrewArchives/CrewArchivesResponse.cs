@@ -4,7 +4,44 @@
     /// 船员档案相关dto 
     /// </summary>
     public class CrewArchivesResponse
-    { }
+    {
+        /// <summary>
+        /// 船员总数
+        /// </summary>
+        public int TatalCount { get; set; }
+        /// <summary>
+        /// 在岗数量
+        /// </summary>
+        public int OnDutyCount { get; set; }
+        /// <summary>
+        /// 占比
+        /// </summary>
+        public string? OnDutyProp { get; set; }
+        /// <summary>
+        /// 待岗数量
+        /// </summary>
+        public int WaitCount { get; set; }
+        /// <summary>
+        /// 占比
+        /// </summary>
+        public string? WaitProp { get; set; }
+        /// <summary>
+        /// 休假数量
+        /// </summary>
+        public int HolidayCount { get; set; }
+        /// <summary>
+        /// 占比
+        /// </summary>
+        public string? HolidayProp { get; set; }
+        /// <summary>
+        /// 离调退数量
+        /// </summary>
+        public int OtherCount { get; set; }
+        /// <summary>
+        /// 占比 
+        /// </summary>
+        public string? OtherProp { get; set; }
+    }
     #region 响应详情Dto
     /// <summary>
     /// 基本信息
@@ -313,7 +350,7 @@
         /// <summary>
         /// 特种设备证书
         /// </summary>
-        public List<SpecialEquips>? SpecialEquips { get; set; }
+        public List<SpecialEquipss>? SpecialEquips { get; set; }
         #endregion
     }
     /// <summary>
@@ -333,7 +370,7 @@
     /// <summary>
     /// 特种设备证书
     /// </summary>
-    public class SpecialEquips
+    public class SpecialEquipss
     {
         /// <summary>
         /// 证书类型

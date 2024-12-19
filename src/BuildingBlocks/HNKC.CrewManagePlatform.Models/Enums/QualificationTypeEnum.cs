@@ -8,6 +8,11 @@ namespace HNKC.CrewManagePlatform.Models.Enums
     public enum QualificationTypeEnum
     {
         /// <summary>
+        /// 无
+        /// </summary>
+        [Description("无")]
+        Normal = 0,
+        /// <summary>
         /// 全日制
         /// </summary>
         [Description("全日制")]
