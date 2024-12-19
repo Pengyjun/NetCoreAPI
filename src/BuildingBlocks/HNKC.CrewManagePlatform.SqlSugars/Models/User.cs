@@ -39,14 +39,6 @@ namespace HNKC.CrewManagePlatform.SqlSugars.Models
         [SugarColumn(Length = 32, ColumnDescription = "用工形式")]
         public string? EmploymentId { get; set; }
 
-
-        /// <summary>
-        /// 劳务公司
-        /// </summary>
-        [SugarColumn(Length = 32, ColumnDescription = "劳务公司")]
-        public string? ServiceCompanyId { get; set; }
-
-
         /// <summary>
         /// 手机号
         /// </summary>
@@ -58,13 +50,6 @@ namespace HNKC.CrewManagePlatform.SqlSugars.Models
         /// </summary>
         [SugarColumn(Length = 32, ColumnDescription = "密码")]
         public string? Password { get; set; }
-
-
-        /// <summary>
-        /// 船舶类型
-        /// </summary>
-        [SugarColumn(Length = 32, ColumnDescription = "船舶类型")]
-        public string? ShipTypeId { get; set; }
 
         /// <summary>
         /// 身份证号
@@ -80,7 +65,7 @@ namespace HNKC.CrewManagePlatform.SqlSugars.Models
         /// <summary>
         /// 船员照片 ,拼接文件
         /// </summary>
-        [SugarColumn(ColumnDataType = "text", ColumnDescription = "船员照片")]
+        [SugarColumn(Length = 100, ColumnDescription = "船员照片")]
         public string? CrewPhoto { get; set; }
         /// <summary>
         /// 身份证扫描件 ,拼接文件

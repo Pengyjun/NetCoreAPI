@@ -22,4 +22,11 @@ namespace HNKC.CrewManagePlatform.Models.Dtos
         /// </summary>
         public DateTime? Created { get; set; }
     }
+    /// <summary>
+    /// 
+    /// </summary>
+    public class BaseResponseDto
+    {
+
+    }
 }

@@ -1,5 +1,4 @@
 ﻿using HNKC.CrewManagePlatform.Models.CommonRequest;
-using HNKC.CrewManagePlatform.Models.Enums;
 
 namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
 {

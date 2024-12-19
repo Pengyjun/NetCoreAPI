@@ -1,7 +1,6 @@
 ﻿using HNKC.CrewManagePlatform.Models.CommonResult;
 using HNKC.CrewManagePlatform.Models.Dtos.CrewArchives;
 using HNKC.CrewManagePlatform.Services.Interface.CrewArchives;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HNKC.CrewManagePlatform.Services.Admin.Api.Controllers
@@ -29,7 +28,7 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api.Controllers
         /// <param name="requestBody"></param>
         /// <returns></returns>
         [HttpGet("SearchCrewArchives")]
-        public async Task<PageResult<SearchCrewArchivesResponse>> SearchCrewArchivesAsync([FromQuery] SearchCrewArchivesRequest requestBody)
+        public async Task<Result> SearchCrewArchivesAsync([FromQuery] SearchCrewArchivesRequest requestBody)
         {
             return await _service.SearchCrewArchivesAsync(requestBody);
         }
@@ -38,9 +37,32 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet("CrewArchivesCount")]
-        public async Task<CrewArchivesResponse> CrewArchivesCountAsync()
+        public async Task<Result> CrewArchivesCountAsync()
         {
             return await _service.CrewArchivesCountAsync();
         }
+        /// <summary>
+        /// 保存数据
+        /// </summary>
+        /// <param name="requestBody"></param>
+        /// <returns></returns>
+        [HttpPost("SaveData")]
+        public async Task<Result> SaveDataAsync([FromBody] CrewArchivesRequest requestBody)
+        {
+            return await _service.SaveDataAsync(requestBody);
+        }
+
+        #region 下拉列表
+        ///// <summary>
+        ///// 获取基本下拉列表
+        ///// </summary>
+        ///// <param name="type"></param>
+        ///// <returns></returns>
+        //public async Task<Result> DropDownListAsync([FromQuery] int type)
+        //{
+        //    return await _service.DropDownListAsync(type);
+        //}
+
+        #endregion
     }
 }
