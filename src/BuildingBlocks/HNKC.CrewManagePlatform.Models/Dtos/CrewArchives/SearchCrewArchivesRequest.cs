@@ -45,35 +45,35 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// </summary>
         public bool TrainingCertificate { get; set; }
         /// <summary>
-        /// Z01有效日期
+        /// Z01
         /// </summary>
         public bool Z01Effective { get; set; }
         /// <summary>
-        /// Z07有效日期
+        /// Z07
         /// </summary>
         public bool Z07Effective { get; set; }
         /// <summary>
-        /// Z08有效日期
+        /// Z08
         /// </summary>
         public bool Z08Effective { get; set; }
         /// <summary>
-        /// Z04有效日期
+        /// Z04
         /// </summary>
         public bool Z04Effective { get; set; }
         /// <summary>
-        /// Z05有效日期
+        /// Z05
         /// </summary>
         public bool Z05Effective { get; set; }
         /// <summary>
-        /// Z02有效日期
+        /// Z02
         /// </summary>
         public bool Z02Effective { get; set; }
         /// <summary>
-        /// Z06有效日期
+        /// Z06
         /// </summary>
         public bool Z06Effective { get; set; }
         /// <summary>
-        /// Z09有效日期
+        /// Z09
         /// </summary>
         public bool Z09Effective { get; set; }
         /// <summary>
