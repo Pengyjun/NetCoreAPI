@@ -8,14 +8,19 @@ namespace HNKC.CrewManagePlatform.Models.Enums
     public enum VisaTypeEnum
     {
         /// <summary>
+        /// 无
+        /// </summary>
+        [Description("无")]
+        Normal = 0,
+        /// <summary>
         /// 入境签证
         /// </summary>
         [Description("入境签证")]
-        Entry = 0,
+        Entry = 1,
         /// <summary>
         /// 过境签证
         /// </summary>
         [Description("过境签证")]
-        Transit = 1
+        Transit = 2
     }
 }

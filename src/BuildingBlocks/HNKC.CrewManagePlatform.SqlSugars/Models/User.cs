@@ -167,5 +167,10 @@ namespace HNKC.CrewManagePlatform.SqlSugars.Models
         /// </summary>
         [SugarColumn(Length = 50, ColumnDescription = "在船职务")]
         public string? PositionOnBoard { get; set; }
+        /// <summary>
+        /// 删除原因
+        /// </summary>
+        [SugarColumn(ColumnDataType = "int", ColumnDescription = "删除原因", DefaultValue = "0")]
+        public CrewStatusEnum DeleteReson { get; set; }
     }
 }

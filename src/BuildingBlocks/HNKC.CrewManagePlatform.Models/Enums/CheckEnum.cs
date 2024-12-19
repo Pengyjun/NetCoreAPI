@@ -8,6 +8,11 @@ namespace HNKC.CrewManagePlatform.Models.Enums
     public enum CheckEnum
     {
         /// <summary>
+        /// 无
+        /// </summary>
+        [Description("无")]
+        Normal = 0,
+        /// <summary>
         /// 优秀
         /// </summary>
         [Description("优秀")]

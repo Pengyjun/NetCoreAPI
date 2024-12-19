@@ -35,6 +35,6 @@ namespace HNKC.CrewManagePlatform.Models.Enums
         /// <summary>
         /// 文件类型不允许
         /// </summary>
-        FileTypeNoAllow = 10002,
+        FileTypeNoAllow = 10003,
     }
 }

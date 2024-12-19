@@ -9,6 +9,12 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
     public interface ICrewArchivesService
     {
         /// <summary>
+        /// 首页占比 及 数量 统计
+        /// </summary>
+        /// <returns></returns>
+        Task<CrewArchivesResponse> CrewArchivesCountAsync();
+
+        /// <summary>
         /// 船员档案列表
         /// </summary>
         /// <param name="requestBody"></param>
