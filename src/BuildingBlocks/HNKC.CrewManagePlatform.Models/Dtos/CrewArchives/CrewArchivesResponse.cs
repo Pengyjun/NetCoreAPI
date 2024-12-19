@@ -313,7 +313,7 @@
         /// <summary>
         /// 特种设备证书
         /// </summary>
-        public List<SpecialEquips>? SpecialEquips { get; set; }
+        public List<SpecialEquipss>? SpecialEquips { get; set; }
         #endregion
     }
     /// <summary>
@@ -333,7 +333,7 @@
     /// <summary>
     /// 特种设备证书
     /// </summary>
-    public class SpecialEquips
+    public class SpecialEquipss
     {
         /// <summary>
         /// 证书类型

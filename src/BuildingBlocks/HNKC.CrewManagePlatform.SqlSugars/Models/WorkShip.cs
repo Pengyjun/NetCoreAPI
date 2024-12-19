@@ -28,12 +28,12 @@ namespace HNKC.CrewManagePlatform.SqlSugars.Models
         /// 上船日期
         /// </summary>
         [SugarColumn(ColumnDataType = "datetime", ColumnDescription = "上船日期")]
-        public DateTime? WorkShipStartTime { get; set; }
+        public DateTime WorkShipStartTime { get; set; }
         /// <summary>
         /// 下船日期
         /// </summary>
         [SugarColumn(ColumnDataType = "datetime", ColumnDescription = "下船日期")]
-        public DateTime? WorkShipEndTime { get; set; }
+        public DateTime WorkShipEndTime { get; set; }
         /// <summary>
         /// 在船日期
         /// </summary>
