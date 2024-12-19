@@ -31,6 +31,16 @@ namespace HNKC.CrewManagePlatform.Models.Enums
         /// 初级工
         /// </summary>
         [Description("初级工")]
-        Elementary = 4
+        Elementary = 4,
+        /// <summary>
+        /// 电焊证
+        /// </summary>
+        [Description("电焊证")]
+        DianHan = 5,
+        /// <summary>
+        /// 防辐射证
+        /// </summary>
+        [Description("防辐射证")]
+        FangFuShe = 6
     }
 }

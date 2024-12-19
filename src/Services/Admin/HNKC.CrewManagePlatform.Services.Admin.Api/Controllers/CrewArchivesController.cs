@@ -33,5 +33,14 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api.Controllers
         {
             return await _service.SearchCrewArchivesAsync(requestBody);
         }
+        /// <summary>
+        /// 船员数量
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("CrewArchivesCount")]
+        public async Task<CrewArchivesResponse> CrewArchivesCountAsync()
+        {
+            return await _service.CrewArchivesCountAsync();
+        }
     }
 }

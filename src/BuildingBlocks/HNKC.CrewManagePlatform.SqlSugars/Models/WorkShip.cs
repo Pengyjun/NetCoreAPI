@@ -15,11 +15,6 @@ namespace HNKC.CrewManagePlatform.SqlSugars.Models
         [SugarColumn(Length = 50, ColumnDescription = "所在船舶")]
         public string? OnShip { get; set; }
         /// <summary>
-        /// 船舶类型
-        /// </summary>
-        [SugarColumn(ColumnDataType = "int", DefaultValue = "0", ColumnDescription = "船舶类型")]
-        public ShipTypeEnum ShipType { get; set; }
-        /// <summary>
         /// 职务
         /// </summary>
         [SugarColumn(Length = 100, ColumnDescription = "职务")]
