@@ -61,7 +61,8 @@ namespace HNKC.CrewManagePlatform.Services.Menus
                 var menuList = await _dbContext.Queryable<Menu>().Where(x => x.IsDelete == 1 && menuId.Contains(x.BusinessId))
                      .Select(x => new UserMenuResponseTree()
                      {
-                         BId=x.BusinessId,
+                         MenuCode = x.MenuCode,
+                         BId = x.BusinessId,
                          Mid = x.MId.Value,
                          Sort = x.Sort,
                          Parentid = x.ParentId.Value,
@@ -128,18 +129,26 @@ namespace HNKC.CrewManagePlatform.Services.Menus
         /// <exception cref="NotImplementedException"></exception>
         public async Task<Result> RemoveMenusAsync(BaseRequest  baseRequest)
         {
+            if (!GlobalCurrentUser.IsAdmin)
+            {
+                return Result.Fail("无权限添加", (int)ResponseHttpCode.NoAuth);
+            }
             var menu =await _dbContext.Queryable<Menu>().Where(x => x.IsDelete == 1 && x.BusinessId == baseRequest.BId).FirstAsync();
             if (menu == null)
             {
               return  Result.Fail("数据不存在", (int)ResponseHttpCode.DataNoExist);
             }
              menu.IsDelete = 0;
-            _dbContext.Updateable<Menu>(menu);
+            await _dbContext.Updateable<Menu>(menu).ExecuteCommandAsync();
             return Result.Success("删除成功");
         }
 
         public async Task<Result> ModifyMenusAsync(UserMenuRequest userMenuRequest)
         {
+            if (!GlobalCurrentUser.IsAdmin)
+            {
+                return Result.Fail("无权限添加", (int)ResponseHttpCode.NoAuth);
+            }
             var menuInfo = await _dbContext.Queryable<Menu>().Where(x => x.IsDelete == 1 && x.BusinessId == userMenuRequest.BId).FirstAsync();
             if (menuInfo == null)
             {
@@ -151,7 +160,7 @@ namespace HNKC.CrewManagePlatform.Services.Menus
             menuInfo.Sort = userMenuRequest.Sort;
             menuInfo.Url = userMenuRequest.Url;
             menuInfo.Remark = userMenuRequest.Remark;
-            await _dbContext.Insertable<Menu>(menuInfo).ExecuteCommandAsync();
+            await _dbContext.Updateable<Menu>(menuInfo).ExecuteCommandAsync();
             return Result.Success("修改成功");
 
         }

@@ -15,6 +15,14 @@ namespace HNKC.CrewManagePlatform.SqlSugars.Models
     [SugarTable("t_menu", IsDisabledDelete = true)]
     public class Menu : BaseEntity<long>
     {
+        /// <summary>
+        /// 菜单编码
+        /// </summary>
+
+        public string? MenuCode { get; set; }
+        /// <summary>
+        /// 菜单名称
+        /// </summary>
         public string? Name { get; set; }
         /// <summary>
         /// 菜单ID

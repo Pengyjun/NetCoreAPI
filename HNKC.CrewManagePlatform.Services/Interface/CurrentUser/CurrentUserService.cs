@@ -2,6 +2,7 @@
 using HNKC.CrewManagePlatform.Models.Dtos;
 using HNKC.CrewManagePlatform.Services.Interface.CurrentUserService;
 using HNKC.CrewManagePlatform.Utils;
+using SqlSugar.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -55,7 +56,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CurrentUser
                     userInfo.RoleBusinessId = Guid.Parse(roleBusinessId);
                     userInfo.WorkNumber = workNumber;
                     userInfo.Phone= phone;
-                    userInfo.IsAdmin= isAdmin=="1";
+                    userInfo.IsAdmin= isAdmin.ObjToBool();
                     userInfo.InstitutionBusiessId = Guid.Parse(bInstitutionId);
                 }
             }

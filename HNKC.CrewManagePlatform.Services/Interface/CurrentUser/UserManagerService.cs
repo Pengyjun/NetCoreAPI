@@ -38,7 +38,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CurrentUser
         /// <returns></returns>
         public async Task<Result> UserLoginAsync(UserLoginRequest userLoginRequest)
         {
-            var currentUser = GlobalCurrentUser;
+            //var currentUser = GlobalCurrentUser;
             var token = string.Empty;
             var secretKey = AppsettingsHelper.GetValue("MD5SecretKey");
             var pwd = $"{secretKey}{userLoginRequest.Password}".ToMd5();

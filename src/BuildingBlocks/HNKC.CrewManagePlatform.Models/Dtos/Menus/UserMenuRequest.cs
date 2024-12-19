@@ -12,7 +12,10 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.Menus
     /// </summary>
     public class UserMenuRequest:BaseRequest
     {
-       
+        /// <summary>
+        /// 菜单编码
+        /// </summary>
+        public string? MenuCode { get; set; }
         /// <summary>
         /// 当前节点的父节点   如果是根节点  传0
         /// </summary>
