@@ -1,4 +1,5 @@
-﻿using HNKC.CrewManagePlatform.Models.Dtos;
+﻿using HNKC.CrewManagePlatform.Models.CommonResult;
+using HNKC.CrewManagePlatform.Models.Dtos;
 using HNKC.CrewManagePlatform.Models.Dtos.Menus;
 using HNKC.CrewManagePlatform.Services.Menus;
 using HNKC.CrewManagePlatform.Util;
@@ -42,38 +43,35 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api.Controllers
         /// <param name="roltId"></param>
         /// <returns></returns>
         [HttpPost("AddMenus")]
-        public async Task<IActionResult> AddMenusAsync([FromBody]UserMenuRequest userMenuRequest)
+        public async Task<Result> AddMenusAsync([FromBody]UserMenuRequest userMenuRequest)
         {
-            var data = await menuService.AddMenusAsync(userMenuRequest);
-            return new OkMessageObjectResult("添加成功");
+            return   await menuService.AddMenusAsync(userMenuRequest);
         }
 
 
 
         /// <summary>
-        /// 添加用户菜单
+        /// 删除用户菜单
         /// </summary>
         /// <param name="roltId"></param>
         /// <returns></returns>
         [HttpPost("RemoveMenus")]
-        public async Task<IActionResult> RemoveMenusAsync([FromBody] BaseRequest  baseRequest)
+        public async Task<Result> RemoveMenusAsync([FromBody] BaseRequest  baseRequest)
         {
-            var data = await menuService.RemoveMenusAsync(baseRequest);
-            return new OkMessageObjectResult("添加成功");
+           return await menuService.RemoveMenusAsync(baseRequest);
         }
 
 
 
         /// <summary>
-        /// 添加用户菜单
+        /// 修改用户菜单
         /// </summary>
         /// <param name="roltId"></param>
         /// <returns></returns>
         [HttpPost("ModifyMenus")]
-        public async Task<IActionResult> ModifyMenusAsync([FromBody] UserMenuRequest userMenuRequest)
+        public async Task<Result> ModifyMenusAsync([FromBody] UserMenuRequest userMenuRequest)
         {
-            var data = await menuService.ModifyMenusAsync(userMenuRequest);
-            return new OkMessageObjectResult("添加成功");
+           return  await menuService.ModifyMenusAsync(userMenuRequest);
         }
     }
 }

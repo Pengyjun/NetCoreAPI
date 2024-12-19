@@ -35,7 +35,7 @@ namespace HNKC.CrewManagePlatform.Services.Menus
         /// <param name="oid">所属公司OID</param>
         /// <param name="roltId"></param>
         /// <returns></returns>
-        Task<bool> AddMenusAsync(UserMenuRequest userMenuRequest);
+        Task<Result> AddMenusAsync(UserMenuRequest userMenuRequest);
 
 
         /// <summary>

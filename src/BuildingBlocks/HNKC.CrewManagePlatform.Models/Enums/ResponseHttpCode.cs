@@ -46,5 +46,9 @@ namespace HNKC.CrewManagePlatform.Models.Enums
         /// 数据不存在
         /// </summary>
         DataNoExist = 10005,
+        /// <summary>
+        /// 无权限操作
+        /// </summary>
+        NoAuth = 10006,
     }
 }

@@ -1,4 +1,5 @@
 ﻿using HNKC.CrewManagePlatform.Common;
+using HNKC.CrewManagePlatform.Models.CommonRequest;
 using HNKC.CrewManagePlatform.Models.CommonResult;
 using HNKC.CrewManagePlatform.Models.Dtos.UserManager;
 using HNKC.CrewManagePlatform.Services.Interface.CurrentUserService;
@@ -30,9 +31,14 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CurrentUser
 
         #endregion
 
+        /// <summary>
+        /// 用户登录
+        /// </summary>
+        /// <param name="userLoginRequest"></param>
+        /// <returns></returns>
         public async Task<Result> UserLoginAsync(UserLoginRequest userLoginRequest)
         {
-            var currentUser = GlobalCurrentUser;
+            //var currentUser = GlobalCurrentUser;
             var token = string.Empty;
             var secretKey = AppsettingsHelper.GetValue("MD5SecretKey");
             var pwd = $"{secretKey}{userLoginRequest.Password}".ToMd5();
@@ -48,16 +54,23 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CurrentUser
                     if (userInstitution != null)
                     {
                       var institutionRoleInfo= await dbContext.Queryable<InstitutionRole>().Where(x => x.IsDelete == 1 && x.InstitutionBusinessId == userInstitution.InstitutionBusinessId).FirstAsync();
+                        if (institutionRoleInfo == null)
+                        {
+                            return Result.Fail("登录失败");
+                        }
+                        var roltInfo = await dbContext.Queryable<HNKC.CrewManagePlatform.SqlSugars.Models.Role>().Where(x => x.IsDelete == 1 && x.BusinessId == institutionRoleInfo.RoleBusinessId).FirstAsync();
+
                         Claim[] claims = new Claim[]
                        {
-                      new Claim("Id",userInfo.Id.ToString()),
-                      new Claim("BId",userInfo.BusinessId.ToString()),
-                      new Claim("WorkNumber",userInfo.WorkNumber?.ToString()),
-                      new Claim("Name",userInfo.Name?.ToString()),
-                      new Claim("Oid",userInfo.Oid?.ToString()),
-                      new Claim("BInstitutionId",instutionInfo.BusinessId.ToString()),
-                      new Claim("Phone",userInfo.Phone?.ToString()),
-                      new Claim("RoleBusinessId",institutionRoleInfo.RoleBusinessId.ToString()),
+                          new Claim("Id",userInfo.Id.ToString()),
+                          new Claim("IsAdmin",roltInfo.IsAdmin.ToString()),
+                          new Claim("BId",userInfo.BusinessId.ToString()),
+                          new Claim("WorkNumber",userInfo.WorkNumber?.ToString()),
+                          new Claim("Name",userInfo.Name?.ToString()),
+                          new Claim("Oid",userInfo.Oid?.ToString()),
+                          new Claim("BInstitutionId",instutionInfo.BusinessId.ToString()),
+                          new Claim("Phone",userInfo.Phone?.ToString()),
+                          new Claim("RoleBusinessId",institutionRoleInfo.RoleBusinessId.ToString()),
                        };
                         var expores = int.Parse(AppsettingsHelper.GetValue("AccessToken:Expires"));
                         token = jwtService.CreateAccessToken(claims, expores);
@@ -97,6 +110,11 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CurrentUser
             currentUser.Password = newPwd;
             await dbContext.Updateable(currentUser).ExecuteCommandAsync();
             return Result.Success("密码重置成功");
+        }
+
+        public Task<PageResult<UserResponse>> SearchUserAsync(PageRequest pageRequest)
+        {
+            throw new NotImplementedException();
         }
     }
 }
