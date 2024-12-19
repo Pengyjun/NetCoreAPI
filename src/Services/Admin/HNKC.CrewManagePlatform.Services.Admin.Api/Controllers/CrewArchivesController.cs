@@ -38,9 +38,14 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet("CrewArchivesCount")]
-        public async Task<CrewArchivesResponse> CrewArchivesCountAsync()
+        public async Task<Result> CrewArchivesCountAsync()
         {
             return await _service.CrewArchivesCountAsync();
         }
+
+        //public async Task<Result> SaveDataAsync()
+        //{
+
+        //}
     }
 }

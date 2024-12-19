@@ -12,7 +12,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
         /// 首页占比 及 数量 统计
         /// </summary>
         /// <returns></returns>
-        Task<CrewArchivesResponse> CrewArchivesCountAsync();
+        Task<Result> CrewArchivesCountAsync();
 
         /// <summary>
         /// 船员档案列表

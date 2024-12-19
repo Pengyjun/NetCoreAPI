@@ -230,7 +230,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
         /// 首页占比及统计数
         /// </summary>
         /// <returns></returns>
-        public async Task<CrewArchivesResponse> CrewArchivesCountAsync()
+        public async Task<Result> CrewArchivesCountAsync()
         {
             var udtab = await _dbContext.Queryable<User>().ToListAsync();
             var udtabIds = udtab.Select(x => x.BusinessId).ToList();
@@ -250,7 +250,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
             var otherCount = udtab.Where(x => x.DeleteReson != CrewStatusEnum.Normal && x.DeleteReson != CrewStatusEnum.XiuJia).Count();//离调退
             var otherProp = totalCount == 0 ? 0 + "%" : Convert.ToInt32(otherCount / totalCount) + "%";
 
-            return new CrewArchivesResponse()
+            return Result.Success(new CrewArchivesResponse
             {
                 HolidayCount = holidayCount,
                 OtherCount = otherCount,
@@ -261,7 +261,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                 TatalCount = totalCount,
                 WaitCount = waitCount,
                 WaitProp = waitProp
-            };
+            });
         }
 
     }
