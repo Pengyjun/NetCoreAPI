@@ -13,12 +13,24 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
         /// </summary>
         /// <returns></returns>
         Task<Result> CrewArchivesCountAsync();
+        /// <summary>
+        /// 获取基本下拉列表
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        Task<Result> DropDownListAsync(int type);
 
+        /// <summary>
+        /// 数据保存
+        /// </summary>
+        /// <param name="requestBody"></param>
+        /// <returns></returns>
+        Task<Result> SaveDataAsync(CrewArchivesRequest requestBody);
         /// <summary>
         /// 船员档案列表
         /// </summary>
         /// <param name="requestBody"></param>
         /// <returns></returns>
-        Task<PageResult<SearchCrewArchivesResponse>> SearchCrewArchivesAsync(SearchCrewArchivesRequest requestBody);
+        Task<Result> SearchCrewArchivesAsync(SearchCrewArchivesRequest requestBody);
     }
 }

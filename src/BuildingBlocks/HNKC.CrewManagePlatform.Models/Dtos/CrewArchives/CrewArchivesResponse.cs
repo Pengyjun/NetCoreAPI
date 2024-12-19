@@ -1,4 +1,6 @@
-﻿namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
+﻿using HNKC.CrewManagePlatform.Models.Enums;
+
+namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
 {
     /// <summary>
     /// 船员档案相关dto 
@@ -16,7 +18,7 @@
         /// <summary>
         /// 占比
         /// </summary>
-        public string? OnDutyProp { get; set; }
+        public int OnDutyProp { get; set; }
         /// <summary>
         /// 待岗数量
         /// </summary>
@@ -24,7 +26,7 @@
         /// <summary>
         /// 占比
         /// </summary>
-        public string? WaitProp { get; set; }
+        public int WaitProp { get; set; }
         /// <summary>
         /// 休假数量
         /// </summary>
@@ -32,7 +34,7 @@
         /// <summary>
         /// 占比
         /// </summary>
-        public string? HolidayProp { get; set; }
+        public int HolidayProp { get; set; }
         /// <summary>
         /// 离调退数量
         /// </summary>
@@ -40,7 +42,7 @@
         /// <summary>
         /// 占比 
         /// </summary>
-        public string? OtherProp { get; set; }
+        public int OtherProp { get; set; }
     }
     #region 响应详情Dto
     /// <summary>
@@ -69,13 +71,61 @@
         /// 常住地
         /// </summary>
         public string? BuildAddress { get; set; }
+        /// <summary>
+        /// 身份证
+        /// </summary>
+        public string? CardId { get; set; }
+        /// <summary>
+        /// 职工号
+        /// </summary>
+        public string? WorkNumber { get; set; }
+        /// <summary>
+        /// 手机号
+        /// </summary>
+        public string? Phone { get; set; }
+        /// <summary>
+        /// 身份证扫描件 ,拼接
+        /// </summary>
+        public string? IdCardScans { get; set; }
+        /// <summary>
+        /// 入职日期
+        /// </summary>
+        public DateTime? EntryTime { get; set; }
+        /// <summary>
+        /// 开始时间
+        /// </summary>
+        public DateTime? StartTime { get; set; }
+        /// <summary>
+        /// 结束时间
+        /// </summary>
+        public DateTime? EndTime { get; set; }
+        /// <summary>
+        /// 入职材料 ,拼接
+        /// </summary>
+        public string? EntryScans { get; set; }
+        /// <summary>
+        /// 用工形式
+        /// </summary>
+        public string? EmploymentId { get; set; }
+        /// <summary>
+        /// 劳务公司
+        /// </summary>
+        public string? LaborCompany { get; set; }
+        /// <summary>
+        /// 合同主体
+        /// </summary>
+        public string? ContarctMain { get; set; }
+        /// <summary>
+        /// 合同类型
+        /// </summary>
+        public ContractEnum ContarctType { get; set; }
         #endregion
 
         #region 专业信息
         /// <summary>
         /// 船舶类型
         /// </summary>
-        public string? ShipType { get; set; }
+        public ShipTypeEnum ShipType { get; set; }
         /// <summary>
         /// 船员类型
         /// </summary>
@@ -83,7 +133,7 @@
         /// <summary>
         /// 服务簿类型
         /// </summary>
-        public string? ServiceBookType { get; set; }
+        public ServiceBookEnum ServiceBookType { get; set; }
         /// <summary>
         /// 所在船舶
         /// </summary>
@@ -92,6 +142,10 @@
         /// 在船职务
         /// </summary>
         public string? PositionOnBoard { get; set; }
+        /// <summary>
+        /// 船员照片 ,拼接
+        /// </summary>
+        public string? PhotoScans { get; set; }
         #endregion
 
         #region 家庭成员&紧急联系人
@@ -117,7 +171,7 @@
         /// <summary>
         /// 关系
         /// </summary>
-        public string? RelationShip { get; set; }
+        public FamilyRelationEnum RelationShip { get; set; }
         /// <summary>
         /// 联系方式
         /// </summary>
@@ -190,14 +244,15 @@
         /// 有效日期
         /// </summary>
         public DateTime? FEffectiveTime { get; set; }
+        ///// <summary>
+        ///// 有效期倒计时 100天
+        ///// </summary>
+        //public int FEffectiveCountdown { get; set; }
         /// <summary>
-        /// 有效期倒计时 100天
+        /// 扫描件 ,拼接
         /// </summary>
-        public int FEffectiveCountdown { get; set; }
-        /// <summary>
-        /// 扫描件 
-        /// </summary>
-        public List<FileInfos>? FScans { get; set; }
+        public string? FScans { get; set; }
+        //public List<FileInfos>? FScans { get; set; }
         #endregion
 
         #region 第二适任证
@@ -221,14 +276,15 @@
         /// 有效日期
         /// </summary>
         public DateTime? SEffectiveTime { get; set; }
+        ///// <summary>
+        ///// 有效期倒计时 100天
+        ///// </summary>
+        //public int SEffectiveCountdown { get; set; }
         /// <summary>
-        /// 有效期倒计时 100天
+        /// 扫描件 ,拼接
         /// </summary>
-        public int SEffectiveCountdown { get; set; }
-        /// <summary>
-        /// 扫描件 
-        /// </summary>
-        public List<FileInfos>? SScans { get; set; }
+        public string? SScans { get; set; }
+        //public List<FileInfos>? SScans { get; set; }
         #endregion
 
         #region 培训合格证
@@ -273,9 +329,10 @@
         /// </summary>
         public DateTime? Z09EffectiveTime { get; set; }
         /// <summary>
-        /// 扫描件 
+        /// 扫描件 ,拼接
         /// </summary>
-        public List<FileInfos>? TrainingScans { get; set; }
+        public string? TrainingScans { get; set; }
+        //public List<FileInfos>? TrainingScans { get; set; }
         #endregion
 
         #region 健康证
@@ -294,7 +351,8 @@
         /// <summary>
         /// 扫描件 
         /// </summary>
-        public List<FileInfos>? HealthScans { get; set; }
+        public string? HealthScans { get; set; }
+        //public List<FileInfos>? HealthScans { get; set; }
         #endregion
 
         #region 海员证
@@ -313,7 +371,8 @@
         /// <summary>
         /// 扫描件 
         /// </summary>
-        public List<FileInfos>? SeamanScans { get; set; }
+        public string? SeamanScans { get; set; }
+        //public List<FileInfos>? SeamanScans { get; set; }
         #endregion
 
         #region 护照
@@ -332,11 +391,12 @@
         /// <summary>
         /// 签证记录
         /// </summary>
-        public List<VisaRecords>? VisaRecords { get; set; }
+        public List<VisaRecordss>? VisaRecords { get; set; }
         /// <summary>
-        /// 扫描件 
+        /// 扫描件 ,拼接
         /// </summary>
-        public List<FileInfos>? PassportScans { get; set; }
+        public string? PassportScans { get; set; }
+        //public List<FileInfos>? PassportScans { get; set; }
         #endregion
 
         #region 技能证书
@@ -361,11 +421,12 @@
         /// <summary>
         /// 证书类型
         /// </summary>
-        public string? SkillCertificateType { get; set; }
+        public CertificateTypeEnum SkillCertificateType { get; set; }
         /// <summary>
-        /// 扫描件 
+        /// 扫描件 ,拼接
         /// </summary>
-        public FileInfos? SkillScans { get; set; }
+        public string? SkillScans { get; set; }
+        //public FileInfos? SkillScans { get; set; }
     }
     /// <summary>
     /// 特种设备证书
@@ -375,7 +436,7 @@
         /// <summary>
         /// 证书类型
         /// </summary>
-        public string? SpecialEquipsCertificateType { get; set; }
+        public CertificateTypeEnum SpecialEquipsCertificateType { get; set; }
         /// <summary>
         /// 有效日期
         /// </summary>
@@ -385,14 +446,15 @@
         /// </summary>
         public DateTime? AnnualReviewTime { get; set; }
         /// <summary>
-        /// 扫描件 
+        /// 扫描件 ,拼接
         /// </summary>
-        public FileInfos? SpecialEquipsScans { get; set; }
+        public string? SpecialEquipsScans { get; set; }
+        //public FileInfos? SpecialEquipsScans { get; set; }
     }
     /// <summary>
     /// 签证记录
     /// </summary>
-    public class VisaRecords
+    public class VisaRecordss
     {
         /// <summary>
         /// 国家
@@ -401,11 +463,11 @@
         /// <summary>
         /// 签证类型
         /// </summary>
-        public string? VisaType { get; set; }
+        public VisaTypeEnum VisaType { get; set; }
         /// <summary>
         /// 到期时间
         /// </summary>
-        public string? DueTimeRemarks { get; set; }
+        public DateTime? DueTime { get; set; }
         /// <summary>
         /// 是否到期 1未到期 0已到期
         /// </summary>
@@ -429,7 +491,7 @@
         /// <summary>
         /// 学历类型：全日制...
         /// </summary>
-        public string? QualificationType { get; set; }
+        public QualificationTypeEnum QualificationType { get; set; }
         /// <summary>
         /// 学校
         /// </summary>
@@ -437,7 +499,7 @@
         /// <summary>
         /// 学历：本科...
         /// </summary>
-        public string? Qualification { get; set; }
+        public QualificationEnum Qualification { get; set; }
         /// <summary>
         /// 专业：计算机网络
         /// </summary>
@@ -451,9 +513,10 @@
         /// </summary>
         public DateTime? EndTime { get; set; }
         /// <summary>
-        /// 证书
+        /// 证书 ,拼接
         /// </summary>
-        public List<FileInfos>? QualificationScans { get; set; }
+        public string? QualificationScans { get; set; }
+        //public List<FileInfos>? QualificationScans { get; set; }
     }
     /// <summary>
     /// 职务晋升
@@ -463,17 +526,17 @@
         /// <summary>
         /// 职务晋升
         /// </summary>
-        public List<Promotions>? PromotionScans { get; set; }
+        public List<Promotionss>? Promotions { get; set; }
     }
     /// <summary>
     /// 职务晋升
     /// </summary>
-    public class Promotions
+    public class Promotionss
     {
         /// <summary>
-        /// 船舶名称
+        /// 所在船舶
         /// </summary>
-        public string? ShipName { get; set; }
+        public string? OnShip { get; set; }
         /// <summary>
         /// 职务
         /// </summary>
@@ -483,9 +546,10 @@
         /// </summary>
         public DateTime? PromotionTime { get; set; }
         /// <summary>
-        /// 文件
+        /// 文件 ,拼接
         /// </summary>
-        public FileInfos? PromotionScan { get; set; }
+        public string? PromotionScan { get; set; }
+        //public FileInfos? PromotionScan { get; set; }
     }
     /// <summary>
     /// 任职船舶
@@ -505,7 +569,7 @@
         /// <summary>
         /// 船舶名称
         /// </summary>
-        public string? ShipName { get; set; }
+        public string? OnShip { get; set; }
         /// <summary>
         /// 船舶类型
         /// </summary>
@@ -515,21 +579,29 @@
         /// </summary>
         public string? Postition { get; set; }
         /// <summary>
-        /// 开始日期
+        /// 上船日期
         /// </summary>
-        public DateTime? WorkShipStartTime { get; set; }
+        public DateTime WorkShipStartTime { get; set; }
         /// <summary>
-        /// 结束日期
+        /// 下船日期
         /// </summary>
-        public DateTime? WorkShipEndTime { get; set; }
+        public DateTime WorkShipEndTime { get; set; }
         /// <summary>
-        /// 在船天数
+        /// 休假日期
         /// </summary>
-        public int OnBoardDay { get; set; }
+        public DateTime? HolidayTime { get; set; }
         /// <summary>
-        /// 休假天数
+        /// 在船时间
         /// </summary>
-        public int Holiday { get; set; }
+        public DateTime? OnBoardTime { get; set; }
+        ///// <summary>
+        ///// 在船天数
+        ///// </summary>
+        //public int OnBoardDay { get; set; }
+        ///// <summary>
+        ///// 休假天数
+        ///// </summary>
+        //public int Holiday { get; set; }
     }
     /// <summary>
     /// 培训记录
@@ -557,7 +629,8 @@
         /// <summary>
         /// 培训文件
         /// </summary>
-        public FileInfos? TrainingScan { get; set; }
+        public string? TrainingScan { get; set; }
+        //public FileInfos? TrainingScan { get; set; }
     }
     /// <summary>
     /// 年度考核
@@ -577,7 +650,7 @@
         /// <summary>
         /// 考核结果：优秀...
         /// </summary>
-        public string? CheckType { get; set; }
+        public CheckEnum CheckType { get; set; }
         /// <summary>
         /// 考核模式：2024年度考核
         /// </summary>
@@ -585,7 +658,8 @@
         /// <summary>
         /// 考核文件
         /// </summary>
-        public FileInfos? TrainingScan { get; set; }
+        public string? TrainingScan { get; set; }
+        //public FileInfos? TrainingScan { get; set; }
     }
     /// <summary>
     /// 备注
@@ -622,6 +696,29 @@
     /// </summary>
     public class FileInfos
     {
-
+        /// <summary>
+        /// 主键
+        /// </summary>
+        public string? Id { get; set; }
+        /// <summary>
+        /// 文件名称
+        /// </summary>
+        public string? Name { get; set; }
+        /// <summary>
+        /// 原始文件名称
+        /// </summary>
+        public string? OriginName { get; set; }
+        /// <summary>
+        /// 后缀名称
+        /// </summary>
+        public string? SuffixName { get; set; }
+        /// <summary>
+        /// 文件类型
+        /// </summary>
+        public string? FileType { get; set; }
+        /// <summary>
+        /// 文件大小
+        /// </summary>
+        public long? FileSize { get; set; }
     }
 }

@@ -28,7 +28,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
         /// </summary>
         /// <param name="requestBody"></param>
         /// <returns></returns>
-        public async Task<PageResult<SearchCrewArchivesResponse>> SearchCrewArchivesAsync(SearchCrewArchivesRequest requestBody)
+        public async Task<Result> SearchCrewArchivesAsync(SearchCrewArchivesRequest requestBody)
         {
             RefAsync<int> total = 0;
 
@@ -74,8 +74,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                 })
                 .OrderByDescending(t => t.IsDelete)
                 .ToListAsync();
-
-            return await GetResult(requestBody, total, rt);
+            return Result.Success(await GetResult(requestBody, total, rt));
         }
         /// <summary>
         /// 获取列表结果集
@@ -239,16 +238,16 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
             var totalCount = udtab.Count();//总数
 
             var onDutyCount = onBoard.Where(x => x.WorkShipEndTime <= DateTime.Now).Select(x => x.BusinessId).Distinct().Count();//在船数
-            var onDutyProp = totalCount == 0 ? 0 + "%" : Convert.ToInt32(onDutyCount / totalCount) + "%";
+            var onDutyProp = totalCount == 0 ? 0 : Convert.ToInt32(onDutyCount / totalCount);
 
             var waitCount = onBoard.Where(x => x.WorkShipEndTime > DateTime.Now).Select(x => x.BusinessId).Distinct().Count();//待岗数
-            var waitProp = totalCount == 0 ? 0 + "%" : Convert.ToInt32(waitCount / totalCount) + "%";
+            var waitProp = totalCount == 0 ? 0 : Convert.ToInt32(waitCount / totalCount);
 
             var holidayCount = onBoard.Where(x => x.HolidayTime > DateTime.Now).Select(x => x.BusinessId).Distinct().Count();//休假数
-            var holidayProp = totalCount == 0 ? 0 + "%" : Convert.ToInt32(holidayCount / totalCount) + "%";
+            var holidayProp = totalCount == 0 ? 0 : Convert.ToInt32(holidayCount / totalCount);
 
             var otherCount = udtab.Where(x => x.DeleteReson != CrewStatusEnum.Normal && x.DeleteReson != CrewStatusEnum.XiuJia).Count();//离调退
-            var otherProp = totalCount == 0 ? 0 + "%" : Convert.ToInt32(otherCount / totalCount) + "%";
+            var otherProp = totalCount == 0 ? 0 : Convert.ToInt32(otherCount / totalCount);
 
             return Result.Success(new CrewArchivesResponse
             {
@@ -263,6 +262,341 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                 WaitProp = waitProp
             });
         }
+        /// <summary>
+        /// 数据保存
+        /// </summary>
+        /// <param name="requestBody"></param>
+        /// <returns></returns>
+        public async Task<Result> SaveDataAsync(CrewArchivesRequest requestBody)
+        {
+            if (requestBody.BId == Guid.Empty || string.IsNullOrWhiteSpace(requestBody.BId.ToString())) { return await InsertDataAsync(requestBody); }
+            else { return await UpdateDataAsync(requestBody); }
+        }
+        /// <summary>
+        /// 数据新增
+        /// </summary>
+        /// <param name="requestBody"></param>
+        /// <returns></returns>
+        private async Task<Result> InsertDataAsync(CrewArchivesRequest requestBody)
+        {
+            #region 基本信息
+            User userInfo = new();
+            List<FamilyUser> hus = new();
+            List<EmergencyContacts> ecs = new();
 
+            var uId = GuidUtil.Next();
+            if (requestBody.BaseInfoDto != null)
+            {
+                userInfo = new()
+                {
+                    Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                    BuildAddress = requestBody.BaseInfoDto.BuildAddress,
+                    BusinessId = uId,
+                    CardId = requestBody.BaseInfoDto.CardId,
+                    WorkNumber = requestBody.BaseInfoDto.WorkNumber,
+                    Phone = requestBody.BaseInfoDto.Phone,
+                    CrewPhoto = requestBody.BaseInfoDto.PhotoScans,
+                    IdCardScans = requestBody.BaseInfoDto.IdCardScans,
+                    PoliticalStatus = requestBody.BaseInfoDto.PoliticalStatus,
+                    NativePlace = requestBody.BaseInfoDto.NativePlace,
+                    Nation = requestBody.BaseInfoDto.Nation,
+                    HomeAddress = requestBody.BaseInfoDto.HomeAddress,
+                    ShipType = requestBody.BaseInfoDto.ShipType,
+                    CrewType = requestBody.BaseInfoDto.CrewType,
+                    ServiceBookType = requestBody.BaseInfoDto.ServiceBookType,
+                    OnBoard = requestBody.BaseInfoDto.OnBoard,
+                    PositionOnBoard = requestBody.BaseInfoDto.PositionOnBoard,
+                    EntryTime = requestBody.BaseInfoDto.EntryTime,
+                    EntryScans = requestBody.BaseInfoDto.EntryScans,
+                    EmploymentId = requestBody.BaseInfoDto.EmploymentId,
+                    LaborCompany = requestBody.BaseInfoDto.LaborCompany,
+                    ContarctMain = requestBody.BaseInfoDto.ContarctMain,
+                    ContarctType = requestBody.BaseInfoDto.ContarctType,
+                    StartTime = requestBody.BaseInfoDto.StartTime,
+                    EndTime = requestBody.BaseInfoDto.EndTime
+                };
+                //家庭成员
+                if (requestBody.BaseInfoDto.HomeUser != null && requestBody.BaseInfoDto.HomeUser.Any())
+                {
+                    foreach (var item in requestBody.BaseInfoDto.HomeUser)
+                    {
+                        hus.Add(new FamilyUser
+                        {
+                            Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                            BusinessId = uId,
+                            Phone = item.Phone,
+                            RelationShip = item.RelationShip,
+                            UserName = item.UserName,
+                            WorkUnit = item.WorkUnit
+                        });
+                    }
+                }
+                //应急联系人
+                if (requestBody.BaseInfoDto.EmergencyContacts != null && requestBody.BaseInfoDto.EmergencyContacts.Any())
+                {
+                    foreach (var item in requestBody.BaseInfoDto.EmergencyContacts)
+                    {
+                        ecs.Add(new EmergencyContacts
+                        {
+                            Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                            BusinessId = uId,
+                            Phone = item.Phone,
+                            RelationShip = item.RelationShip,
+                            UserName = item.UserName,
+                            WorkUnit = item.WorkUnit
+                        });
+                    }
+                }
+            }
+            await _dbContext.Insertable(userInfo).ExecuteCommandAsync();
+            await _dbContext.Insertable(hus).ExecuteCommandAsync();
+            await _dbContext.Insertable(ecs).ExecuteCommandAsync();
+            #endregion
+
+            #region 适任及证书
+            CertificateOfCompetency coc = new();
+            List<VisaRecords> vrs = new();
+            List<SkillCertificates> sfs = new();
+            List<SpecialEquips> ses = new();
+
+            if (requestBody.CertificateOfCompetencyDto != null)
+            {
+                coc = new CertificateOfCompetency
+                {
+                    BusinessId = uId,
+                    Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                    FCertificate = requestBody.CertificateOfCompetencyDto.FCertificate,
+                    FNavigationArea = requestBody.CertificateOfCompetencyDto.FNavigationArea,
+                    FPosition = requestBody.CertificateOfCompetencyDto.FPosition,
+                    FSignTime = requestBody.CertificateOfCompetencyDto.FSignTime,
+                    FEffectiveTime = requestBody.CertificateOfCompetencyDto.FEffectiveTime,
+                    FScans = requestBody.CertificateOfCompetencyDto.FScans,
+                    SCertificate = requestBody.CertificateOfCompetencyDto.SCertificate,
+                    SNavigationArea = requestBody.CertificateOfCompetencyDto.SNavigationArea,
+                    SPosition = requestBody.CertificateOfCompetencyDto.SPosition,
+                    SSignTime = requestBody.CertificateOfCompetencyDto.SSignTime,
+                    SEffectiveTime = requestBody.CertificateOfCompetencyDto.SEffectiveTime,
+                    SScans = requestBody.CertificateOfCompetencyDto.SScans,
+                    TrainingCertificate = requestBody.CertificateOfCompetencyDto.TrainingCertificate,
+                    TrainingSignTime = requestBody.CertificateOfCompetencyDto.TrainingSignTime,
+                    TrainingScans = requestBody.CertificateOfCompetencyDto.TrainingScans,
+                    Z01EffectiveTime = requestBody.CertificateOfCompetencyDto.Z01EffectiveTime,
+                    Z07EffectiveTime = requestBody.CertificateOfCompetencyDto.Z07EffectiveTime,
+                    Z08EffectiveTime = requestBody.CertificateOfCompetencyDto.Z08EffectiveTime,
+                    Z04EffectiveTime = requestBody.CertificateOfCompetencyDto.Z04EffectiveTime,
+                    Z05EffectiveTime = requestBody.CertificateOfCompetencyDto.Z05EffectiveTime,
+                    Z02EffectiveTime = requestBody.CertificateOfCompetencyDto.Z02EffectiveTime,
+                    Z06EffectiveTime = requestBody.CertificateOfCompetencyDto.Z06EffectiveTime,
+                    Z09EffectiveTime = requestBody.CertificateOfCompetencyDto.Z09EffectiveTime,
+                    HealthCertificate = requestBody.CertificateOfCompetencyDto.HealthCertificate,
+                    HealthSignTime = requestBody.CertificateOfCompetencyDto.HealthSignTime,
+                    HealthEffectiveTime = requestBody.CertificateOfCompetencyDto.HealthEffectiveTime,
+                    HealthScans = requestBody.CertificateOfCompetencyDto.HealthScans,
+                    SeamanCertificate = requestBody.CertificateOfCompetencyDto.SeamanCertificate,
+                    SeamanSignTime = requestBody.CertificateOfCompetencyDto.SeamanSignTime,
+                    SeamanEffectiveTime = requestBody.CertificateOfCompetencyDto.SeamanEffectiveTime,
+                    SeamanScans = requestBody.CertificateOfCompetencyDto.SeamanScans,
+                    PassportCertificate = requestBody.CertificateOfCompetencyDto.PassportCertificate,
+                    PassportSignTime = requestBody.CertificateOfCompetencyDto.PassportSignTime,
+                    PassportEffectiveTime = requestBody.CertificateOfCompetencyDto.PassportEffectiveTime,
+                    PassportScans = requestBody.CertificateOfCompetencyDto.PassportScans
+                };
+
+                //签证记录
+                if (requestBody.CertificateOfCompetencyDto.VisaRecords != null && requestBody.CertificateOfCompetencyDto.VisaRecords.Any())
+                {
+                    foreach (var item in requestBody.CertificateOfCompetencyDto.VisaRecords)
+                    {
+                        vrs.Add(new VisaRecords
+                        {
+                            Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                            BusinessId = uId,
+                            Country = item.Country,
+                            DueTime = item.DueTime,
+                            VisaType = item.VisaType
+                        });
+                    }
+                }
+                //技能证书
+                if (requestBody.CertificateOfCompetencyDto.SkillCertificates != null && requestBody.CertificateOfCompetencyDto.SkillCertificates.Any())
+                {
+                    foreach (var item in requestBody.CertificateOfCompetencyDto.SkillCertificates)
+                    {
+                        sfs.Add(new SkillCertificates
+                        {
+                            Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                            BusinessId = uId,
+                            SkillCertificateType = item.SkillCertificateType,
+                            SkillScans = item.SkillScans
+                        });
+                    }
+                }
+                //特种设备证书
+                if (requestBody.CertificateOfCompetencyDto.SpecialEquips != null && requestBody.CertificateOfCompetencyDto.SpecialEquips.Any())
+                {
+                    foreach (var item in requestBody.CertificateOfCompetencyDto.SpecialEquips)
+                    {
+                        ses.Add(new SpecialEquips
+                        {
+                            Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                            BusinessId = uId,
+                            SpecialEquipsCertificateType = item.SpecialEquipsCertificateType,
+                            SpecialEquipsEffectiveTime = item.SpecialEquipsEffectiveTime,
+                            SpecialEquipsScans = item.SpecialEquipsScans
+                        });
+                    }
+                }
+            }
+            await _dbContext.Insertable(coc).ExecuteCommandAsync();
+            await _dbContext.Insertable(vrs).ExecuteCommandAsync();
+            await _dbContext.Insertable(sfs).ExecuteCommandAsync();
+            await _dbContext.Insertable(ses).ExecuteCommandAsync();
+            #endregion
+
+            #region 学历信息
+            List<EducationalBackground> ebs = new();
+
+            if (requestBody.EducationalBackgroundDto != null)
+            {
+                if (requestBody.EducationalBackgroundDto.QualificationInfos != null && requestBody.EducationalBackgroundDto.QualificationInfos.Any())
+                {
+                    foreach (var item in requestBody.EducationalBackgroundDto.QualificationInfos)
+                    {
+                        ebs.Add(new EducationalBackground
+                        {
+                            Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                            BusinessId = uId,
+                            School = item.School,
+                            Major = item.Major,
+                            Qualification = item.Qualification,
+                            EndTime = item.EndTime,
+                            QualificationScans = item.QualificationScans,
+                            QualificationType = item.QualificationType,
+                            StartTime = item.StartTime
+                        });
+                    }
+                }
+            }
+            await _dbContext.Insertable(ebs).ExecuteCommandAsync();
+            #endregion
+
+            #region 职务晋升
+            List<Promotion> pts = new();
+
+            if (requestBody.PromotionDto != null)
+            {
+                if (requestBody.PromotionDto.Promotions != null && requestBody.PromotionDto.Promotions.Any())
+                {
+                    foreach (var item in requestBody.PromotionDto.Promotions)
+                    {
+                        pts.Add(new Promotion()
+                        {
+                            Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                            BusinessId = uId,
+                            OnShip = item.OnShip,
+                            Postition = item.Postition,
+                            PromotionTime = item.PromotionTime,
+                            PromotionScan = item.PromotionScan
+                        });
+                    }
+                }
+            }
+            await _dbContext.Insertable(pts).ExecuteCommandAsync();
+            #endregion
+
+            #region 任职船舶
+            List<WorkShip> wss = new();
+
+            if (requestBody.WorkShipDto != null)
+            {
+                if (requestBody.WorkShipDto.WorkShips != null && requestBody.WorkShipDto.WorkShips.Any())
+                {
+                    foreach (var item in requestBody.WorkShipDto.WorkShips)
+                    {
+                        wss.Add(new WorkShip
+                        {
+                            Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                            BusinessId = uId,
+                            OnShip = item.OnShip,
+                            WorkShipStartTime = item.WorkShipStartTime,
+                            WorkShipEndTime = item.WorkShipEndTime,
+                            HolidayTime = item.HolidayTime,
+                            Postition = item.Postition,
+                            OnBoardTime = item.OnBoardTime
+                        });
+                    }
+                }
+            }
+            await _dbContext.Insertable(wss).ExecuteCommandAsync();
+            #endregion
+
+            #region 培训记录
+            List<TrainingRecord> trs = new();
+
+            if (requestBody.TrainingRecordDto != null)
+            {
+                if (requestBody.TrainingRecordDto.TrainingRecords != null && requestBody.TrainingRecordDto.TrainingRecords.Any())
+                {
+                    foreach (var item in requestBody.TrainingRecordDto.TrainingRecords)
+                    {
+                        trs.Add(new TrainingRecord
+                        {
+                            Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                            BusinessId = uId,
+                            TrainingScan = item.TrainingScan,
+                            TrainingTime = item.TrainingTime,
+                            TrainingType = item.TrainingType
+                        });
+                    }
+                }
+            }
+            await _dbContext.Insertable(trs).ExecuteCommandAsync();
+            #endregion
+
+            #region 年度考核
+            List<YearCheck> ycs = new();
+
+            if (requestBody.YearCheckDto != null)
+            {
+                if (requestBody.YearCheckDto.YearChecks != null && requestBody.YearCheckDto.YearChecks.Any())
+                {
+                    foreach (var item in requestBody.YearCheckDto.YearChecks)
+                    {
+                        ycs.Add(new YearCheck
+                        {
+                            Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                            BusinessId = uId,
+                            CheckType = item.CheckType,
+                            TrainingScan = item.TrainingScan,
+                            TrainingTime = item.TrainingTime
+                        });
+                    }
+                }
+            }
+            await _dbContext.Insertable(ycs).ExecuteCommandAsync();
+            #endregion
+
+            return Result.Success("新增成功");
+        }
+        /// <summary>
+        /// 数据修改
+        /// </summary>
+        /// <param name="requestBody"></param>
+        /// <returns></returns>
+        private async Task<Result> UpdateDataAsync(CrewArchivesRequest requestBody)
+        {
+            return Result.Success("修改成功");
+        }
+        /// <summary>
+        /// 基本下拉列表
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        //public async Task<Result> DropDownListAsync(int type)
+        //{
+
+        //}
+
+        //private static List<>
     }
 }
