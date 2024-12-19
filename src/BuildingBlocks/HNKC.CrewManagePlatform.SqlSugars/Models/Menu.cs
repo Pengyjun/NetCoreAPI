@@ -32,6 +32,11 @@ namespace HNKC.CrewManagePlatform.SqlSugars.Models
         [SugarColumn(Length = 300)]
         public string? Url { get; set; }
         /// <summary>
+        /// 前端组件URL
+        /// </summary>
+        [SugarColumn(Length = 300)]
+        public string? ComponentUrl{ get; set; }
+        /// <summary>
         /// ICON图标
         /// </summary>
         [SugarColumn(Length = 200)]

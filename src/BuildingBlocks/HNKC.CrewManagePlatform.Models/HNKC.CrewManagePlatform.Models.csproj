@@ -18,7 +18,6 @@
 
 	<ItemGroup>
 	  <Folder Include="Dtos\Institution\" />
-	  <Folder Include="Dtos\Menus\" />
 	  <Folder Include="Dtos\Role\" />
 	</ItemGroup>
 

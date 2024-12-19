@@ -6,12 +6,20 @@ using System.Threading.Tasks;
 
 namespace HNKC.CrewManagePlatform.Models.Dtos
 {
+    /// <summary>
+    /// 全局用户信息
+    /// </summary>
     public class GlobalCurrentUser
     {
         /// <summary>
-        /// Id
+        /// 用户Id
         /// </summary>
         public long Id { get; set; }
+
+        /// <summary>
+        /// 用户业务ID
+        /// </summary>
+        public Guid? UserBusiessId { get; set; }
         /// <summary>
         /// 工号
         /// </summary>
@@ -29,5 +37,18 @@ namespace HNKC.CrewManagePlatform.Models.Dtos
         /// 所属公司OID
         /// </summary>
         public string? Oid { get; set; }
+        /// <summary>
+        /// 机构业务ID
+        /// </summary>
+       public Guid? InstitutionBusiessId { get; set; }
+
+        /// <summary>
+        /// 角色ID
+        /// </summary>
+        public long? RoleId { get; set; }
+        /// <summary>
+        /// 业务角色ID
+        /// </summary>
+        public Guid? RoleBusinessId { get; set; }
     }
 }

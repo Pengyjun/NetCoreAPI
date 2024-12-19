@@ -39,25 +39,37 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CurrentUser
             && x.Password == pwd).FirstAsync();
             if (userInfo != null)
             {
-                Claim[] claims = new Claim[]
+               var instutionInfo=await dbContext.Queryable<Institution>().Where(x => x.IsDelete == 1 && x.Oid == userInfo.Oid 
+                ).FirstAsync();
+                if (instutionInfo != null)
                 {
-                  new Claim("Id",userInfo.Id.ToString()),
-                  new Claim("WorkNumber",userInfo.WorkNumber?.ToString()),
-                  new Claim("Name",userInfo.Name?.ToString()),
-                  new Claim("Oid",userInfo.Oid?.ToString()),
-                  new Claim("Phone",userInfo.Phone?.ToString()),
-                };
-                var expores = int.Parse(AppsettingsHelper.GetValue("AccessToken:Expires"));
-                token = jwtService.CreateAccessToken(claims, expores);
-                //存入Redis
-                RedisUtil.Instance.Set(userInfo.Id.ToString(), token, expores);
-                return Result.Success(data: token);
+                    var userInstitution = await dbContext.Queryable<UserInstitution>().FirstAsync(x => x.IsDelete == 1 && x.UserBusinessId == userInfo.BusinessId && x.InstitutionBusinessId == instutionInfo.BusinessId);
+                    if (userInstitution != null)
+                    {
+                      var institutionRoleInfo= await dbContext.Queryable<InstitutionRole>().Where(x => x.IsDelete == 1 && x.InstitutionBusinessId == userInstitution.BusinessId).FirstAsync();
+                        Claim[] claims = new Claim[]
+                       {
+                      new Claim("Id",userInfo.Id.ToString()),
+                      new Claim("BId",userInfo.BusinessId.ToString()),
+                      new Claim("WorkNumber",userInfo.WorkNumber?.ToString()),
+                      new Claim("Name",userInfo.Name?.ToString()),
+                      new Claim("Oid",userInfo.Oid?.ToString()),
+                      new Claim("BInstitutionId",instutionInfo.BusinessId.ToString()),
+                      new Claim("Phone",userInfo.Phone?.ToString()),
+                      new Claim("RoleBusinessId",institutionRoleInfo.RoleBusinessId.ToString()),
+                       };
+                        var expores = int.Parse(AppsettingsHelper.GetValue("AccessToken:Expires"));
+                        token = jwtService.CreateAccessToken(claims, expores);
+                        //存入Redis
+                        RedisUtil.Instance.Set(userInfo.Id.ToString(), token, expores);
+                        return Result.Success(data: token);
+                    }
+                   
+                }
             }
-            else {
-                return Result.Fail("登录失败");
-            }
+            return Result.Fail("登录失败");
             //HttpContentAccessFactory.Current.Response.Headers["Authorization"] = token;
-          
+
         }
 
         /// <summary>

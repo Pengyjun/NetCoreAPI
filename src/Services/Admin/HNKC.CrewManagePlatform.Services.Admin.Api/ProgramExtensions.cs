@@ -8,6 +8,7 @@ using HNKC.CrewManagePlatform.Services.Interface.CurrentUser;
 using HNKC.CrewManagePlatform.Services.Interface.CurrentUserService;
 using HNKC.CrewManagePlatform.Services.Interface.PullResult;
 using HNKC.CrewManagePlatform.Services.Interface.Salary;
+using HNKC.CrewManagePlatform.Services.Menus;
 using HNKC.CrewManagePlatform.Sms.Interfaces;
 using HNKC.CrewManagePlatform.Sms.Services;
 using HNKC.CrewManagePlatform.SqlSugars.Extensions;
@@ -170,7 +171,7 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api
         /// <param name="app"></param>
         public static void UseCustomSwagger(this WebApplication app)
         {
-            var prefixUrl = app.Configuration.GetValue<string>("SwaggerPrefixUrl");
+                var prefixUrl = app.Configuration.GetValue<string>("SwaggerPrefixUrl");
             app.UseSwagger(c =>
             {
                 c.PreSerializeFilters.Add((doc, request) =>
@@ -296,6 +297,7 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api
             builder.Services.AddScoped<ISmsService, CtyunSmsService>();
             builder.Services.AddScoped<IDataDictionaryService, DataDictionaryService>();
             builder.Services.AddScoped<ICrewArchivesService, CrewArchivesService>();
+            builder.Services.AddScoped<IMenuService, MenuService>();
 
         }
     }

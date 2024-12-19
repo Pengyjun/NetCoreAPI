@@ -14,9 +14,9 @@ namespace HNKC.CrewManagePlatform.SqlSugars.Models
         [SugarColumn(IsPrimaryKey = true)]
         public T Id { get; set; }
         /// <summary>
-        /// 业务主键
+        /// 业务ID
         /// </summary>
-        [SugarColumn(Length = 36, ColumnDescription = "业务主键")]
+        [SugarColumn(Length = 36, ColumnDescription = "业务ID")]
         public Guid BusinessId { get; set; }
         /// <summary>
         /// 创建人Id
