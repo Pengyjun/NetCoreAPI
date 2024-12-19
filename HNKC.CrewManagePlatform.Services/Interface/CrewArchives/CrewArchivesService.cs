@@ -3,9 +3,7 @@ using HNKC.CrewManagePlatform.Models.Dtos.CrewArchives;
 using HNKC.CrewManagePlatform.Models.Enums;
 using HNKC.CrewManagePlatform.SqlSugars.Models;
 using HNKC.CrewManagePlatform.Utils;
-using Microsoft.AspNetCore.Mvc;
 using SqlSugar;
-using System.Drawing.Printing;
 using System.Globalization;
 
 namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
