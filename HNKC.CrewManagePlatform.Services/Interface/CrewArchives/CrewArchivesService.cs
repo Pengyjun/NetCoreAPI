@@ -3,7 +3,9 @@ using HNKC.CrewManagePlatform.Models.Dtos.CrewArchives;
 using HNKC.CrewManagePlatform.Models.Enums;
 using HNKC.CrewManagePlatform.SqlSugars.Models;
 using HNKC.CrewManagePlatform.Utils;
+using Microsoft.AspNetCore.Mvc;
 using SqlSugar;
+using System.Drawing.Printing;
 using System.Globalization;
 
 namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
@@ -42,10 +44,10 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                 .LeftJoin<SkillCertificates>((t, ws, ct, coc, sf) => t.BusinessId == sf.BusinessId)
                 .LeftJoin<OwnerShip>((t, ws, ct, coc, sf, ow) => ws.OnShip == sf.BusinessId.ToString())
                 .LeftJoin<EducationalBackground>((t, ws, ct, coc, sf, ow, eb) => eb.BusinessId == t.BusinessId)
-                .WhereIF(requestBody.ShipTypes.Any(), (t, ws, ct, coc, sf, ow, eb) => requestBody.ShipTypes.Contains(((int)ow.ShipType).ToString()))
-                .WhereIF(requestBody.ServiceBooks.Any(), (t, ws, ct, coc, sf, ow, eb) => requestBody.ServiceBooks.Contains(((int)t.ServiceBookType).ToString()))
-                .WhereIF(requestBody.FPosition.Any(), (t, ws, ct, coc, sf, ow, eb) => requestBody.FPosition.Contains(coc.FPosition))
-                .WhereIF(requestBody.SPosition.Any(), (t, ws, ct, coc, sf, ow, eb) => requestBody.SPosition.Contains(coc.SPosition))
+                .WhereIF(requestBody.ShipTypes != null && requestBody.ShipTypes.Any(), (t, ws, ct, coc, sf, ow, eb) => requestBody.ShipTypes.Contains(((int)ow.ShipType).ToString()))
+                .WhereIF(requestBody.ServiceBooks != null && requestBody.ServiceBooks.Any(), (t, ws, ct, coc, sf, ow, eb) => requestBody.ServiceBooks.Contains(((int)t.ServiceBookType).ToString()))
+                .WhereIF(requestBody.FPosition != null && requestBody.FPosition.Any(), (t, ws, ct, coc, sf, ow, eb) => requestBody.FPosition.Contains(coc.FPosition))
+                .WhereIF(requestBody.SPosition != null && requestBody.SPosition.Any(), (t, ws, ct, coc, sf, ow, eb) => requestBody.SPosition.Contains(coc.SPosition))
                 .WhereIF(requestBody.TrainingCertificate, (t, ws, ct, coc, sf, ow, eb) => !string.IsNullOrWhiteSpace(coc.TrainingCertificate))
                 .WhereIF(requestBody.Z01Effective, (t, ws, ct, coc, sf, ow, eb) => !string.IsNullOrWhiteSpace(coc.Z01EffectiveTime.ToString()))
                 .WhereIF(requestBody.Z07Effective, (t, ws, ct, coc, sf, ow, eb) => !string.IsNullOrWhiteSpace(coc.Z07EffectiveTime.ToString()))
@@ -55,9 +57,9 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                 .WhereIF(requestBody.Z02Effective, (t, ws, ct, coc, sf, ow, eb) => !string.IsNullOrWhiteSpace(coc.Z02EffectiveTime.ToString()))
                 .WhereIF(requestBody.Z06Effective, (t, ws, ct, coc, sf, ow, eb) => !string.IsNullOrWhiteSpace(coc.Z06EffectiveTime.ToString()))
                 .WhereIF(requestBody.Z09Effective, (t, ws, ct, coc, sf, ow, eb) => !string.IsNullOrWhiteSpace(coc.Z09EffectiveTime.ToString()))
-                .WhereIF(requestBody.CertificateTypes.Any(), (t, ws, ct, coc, sf, ow, eb) => requestBody.CertificateTypes.Contains(((int)sf.SkillCertificateType).ToString()))
-                .WhereIF(requestBody.QualificationTypes.Any(), (t, ws, ct, coc, sf, ow, eb) => requestBody.QualificationTypes.Contains(((int)eb.QualificationType).ToString()))
-                .WhereIF(requestBody.Qualifications.Any(), (t, ws, ct, coc, sf, ow, eb) => requestBody.Qualifications.Contains(((int)eb.Qualification).ToString()))
+                .WhereIF(requestBody.CertificateTypes != null && requestBody.CertificateTypes.Any(), (t, ws, ct, coc, sf, ow, eb) => requestBody.CertificateTypes.Contains(((int)sf.SkillCertificateType).ToString()))
+                .WhereIF(requestBody.QualificationTypes != null && requestBody.QualificationTypes.Any(), (t, ws, ct, coc, sf, ow, eb) => requestBody.QualificationTypes.Contains(((int)eb.QualificationType).ToString()))
+                .WhereIF(requestBody.Qualifications != null && requestBody.Qualifications.Any(), (t, ws, ct, coc, sf, ow, eb) => requestBody.Qualifications.Contains(((int)eb.Qualification).ToString()))
                 .Select((t, ws, ct, coc, sf, ow, eb) => new SearchCrewArchivesResponse
                 {
                     BId = t.BusinessId,
@@ -161,7 +163,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
 
             return new PageResult<SearchCrewArchivesResponse>()
             {
-                List = rt,
+                List = rt.Skip((requestBody.PageIndex - 1) * requestBody.PageSize).Take(requestBody.PageSize),
                 PageIndex = requestBody.PageIndex,
                 PageSize = requestBody.PageSize,
                 TotalCount = total
