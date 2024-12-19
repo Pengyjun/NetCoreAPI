@@ -47,6 +47,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CurrentUser
                     var phone = userList?.Where(x => x.Type == "Phone").Select(x => x.Value).FirstOrDefault();
                     var roleBusinessId = userList?.Where(x => x.Type == "RoleBusinessId").Select(x => x.Value).FirstOrDefault();
                     var bInstitutionId = userList?.Where(x => x.Type == "BInstitutionId").Select(x => x.Value).FirstOrDefault();
+                    var isAdmin = userList?.Where(x => x.Type == "IsAdmin").Select(x => x.Value).FirstOrDefault();
                     userInfo.Id = long.Parse(id);
                     userInfo.UserBusinessId = Guid.Parse(bId);
                     userInfo.Name = name;
@@ -54,9 +55,9 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CurrentUser
                     userInfo.RoleBusinessId = Guid.Parse(roleBusinessId);
                     userInfo.WorkNumber = workNumber;
                     userInfo.Phone= phone;
+                    userInfo.IsAdmin= isAdmin=="1";
                     userInfo.InstitutionBusiessId = Guid.Parse(bInstitutionId);
                 }
-               
             }
             return userInfo;
         }

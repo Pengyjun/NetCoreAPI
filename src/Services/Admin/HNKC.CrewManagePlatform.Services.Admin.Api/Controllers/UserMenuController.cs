@@ -45,7 +45,7 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api.Controllers
         public async Task<IActionResult> AddMenusAsync([FromBody]UserMenuRequest userMenuRequest)
         {
             var data = await menuService.AddMenusAsync(userMenuRequest);
-            return new OkMessageObjectResult("添加成功");
+            return Ok(data);
         }
 
 

@@ -17,6 +17,11 @@ namespace HNKC.CrewManagePlatform.Models.Dtos
         public long Id { get; set; }
 
         /// <summary>
+        /// 是否是超级管理员 true是   其他不是
+        /// </summary>
+        public bool IsAdmin { get; set; }
+
+        /// <summary>
         /// 用户业务ID
         /// </summary>
         public Guid? UserBusinessId { get; set; }

@@ -84,8 +84,13 @@ namespace HNKC.CrewManagePlatform.Services.Menus
         /// <param name="userMenuRequest"></param>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
-        public async Task<bool> AddMenusAsync(UserMenuRequest userMenuRequest)
+        public async Task<Result> AddMenusAsync(UserMenuRequest userMenuRequest)
         {
+            if (!GlobalCurrentUser.IsAdmin)
+            {
+                return Result.Fail("无权限添加", (int)ResponseHttpCode.NoAuth);
+            }
+
             var menuList=await _dbContext.Queryable<Menu>().Where(x => x.IsDelete == 1).ToListAsync();
             var maxMid = menuList.Max(x => x.MId);
             var menuBuinessId = GuidUtil.Next();
@@ -112,7 +117,7 @@ namespace HNKC.CrewManagePlatform.Services.Menus
             };
             await  _dbContext.Insertable<Menu>(menu).ExecuteCommandAsync();
             await  _dbContext.Insertable<RoleMenu>(roleMenu).ExecuteCommandAsync();
-            return true;
+            return Result.Success("添加成功");
         }
 
         /// <summary>
