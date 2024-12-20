@@ -415,9 +415,9 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// <summary>
         /// 证书类型
         /// </summary>
-        public CertificateTypeEnum SkillCertificateType { get; set; }
+        public string? SkillCertificateType { get; set; }
         /// <summary>
-        /// 扫描件 ,拼接
+        /// 扫描件 
         /// </summary>
         public FileInfosForDetails? SkillScans { get; set; }
     }
@@ -433,7 +433,7 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// <summary>
         /// 证书类型
         /// </summary>
-        public CertificateTypeEnum SpecialEquipsCertificateType { get; set; }
+        public string? SpecialEquipsCertificateType { get; set; }
         /// <summary>
         /// 有效日期
         /// </summary>
@@ -443,7 +443,7 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// </summary>
         public DateTime? AnnualReviewTime { get; set; }
         /// <summary>
-        /// 扫描件 ,拼接
+        /// 扫描件 
         /// </summary>
         public FileInfosForDetails? SpecialEquipsScans { get; set; }
     }
@@ -463,13 +463,13 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// <summary>
         /// 签证类型
         /// </summary>
-        public VisaTypeEnum VisaType { get; set; }
+        public string? VisaType { get; set; }
         /// <summary>
         /// 到期时间
         /// </summary>
         public DateTime? DueTime { get; set; }
         /// <summary>
-        /// 是否到期 1未到期 0已到期
+        /// 是否到期 true到期 false未到期
         /// </summary>
         public bool IsDue { get; set; }
     }
@@ -489,13 +489,9 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
     public class QualificationForDetails
     {
         /// <summary>
-        /// 主键
-        /// </summary>
-        public string? Id { get; set; }
-        /// <summary>
         /// 学历类型：全日制...
         /// </summary>
-        public QualificationTypeEnum QualificationType { get; set; }
+        public string? QualificationType { get; set; }
         /// <summary>
         /// 学校
         /// </summary>
@@ -503,7 +499,7 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// <summary>
         /// 学历：本科...
         /// </summary>
-        public QualificationEnum Qualification { get; set; }
+        public string? Qualification { get; set; }
         /// <summary>
         /// 专业：计算机网络
         /// </summary>
@@ -537,10 +533,6 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
     public class PromotionsForDetails
     {
         /// <summary>
-        /// 主键
-        /// </summary>
-        public string? Id { get; set; }
-        /// <summary>
         /// 所在船舶
         /// </summary>
         public string? OnShip { get; set; }
@@ -555,7 +547,7 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// <summary>
         /// 文件 ,拼接
         /// </summary>
-        public FileInfosForDetails? PromotionScan { get; set; }
+        public List<FileInfosForDetails>? PromotionScans { get; set; }
     }
     /// <summary>
     /// 任职船舶
@@ -572,10 +564,6 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
     /// </summary>
     public class WorkShipsForDetails
     {
-        /// <summary>
-        /// 主键
-        /// </summary>
-        public string? Id { get; set; }
         /// <summary>
         /// 船舶名称
         /// </summary>
@@ -625,10 +613,6 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
     public class TrainingRecordsForDetails
     {
         /// <summary>
-        /// 主键
-        /// </summary>
-        public string? Id { get; set; }
-        /// <summary>
         /// 培训类型：安全培训...
         /// </summary>
         public string? TrainingType { get; set; }
@@ -639,7 +623,7 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// <summary>
         /// 培训文件
         /// </summary>
-        public FileInfosForDetails? TrainingScan { get; set; }
+        public List<FileInfosForDetails>? TrainingScans { get; set; }
     }
     /// <summary>
     /// 年度考核
@@ -657,13 +641,9 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
     public class YearChecksForDetails
     {
         /// <summary>
-        /// 主键
-        /// </summary>
-        public string? Id { get; set; }
-        /// <summary>
         /// 考核结果：优秀...
         /// </summary>
-        public CheckEnum CheckType { get; set; }
+        public string? CheckType { get; set; }
         /// <summary>
         /// 考核模式：2024年度考核
         /// </summary>
@@ -671,7 +651,7 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// <summary>
         /// 考核文件
         /// </summary>
-        public FileInfosForDetails? TrainingScan { get; set; }
+        public List<FileInfosForDetails>? TrainingScans { get; set; }
     }
     /// <summary>
     /// 备注

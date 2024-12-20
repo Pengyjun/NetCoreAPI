@@ -20,6 +20,11 @@ namespace HNKC.CrewManagePlatform.SqlSugars.Models
         [SugarColumn(ColumnDataType = "datetime", ColumnDescription = "有效日期")]
         public DateTime? SpecialEquipsEffectiveTime { get; set; }
         /// <summary>
+        /// 年审日期
+        /// </summary>
+        [SugarColumn(ColumnDataType = "datetime", ColumnDescription = "年审日期")]
+        public DateTime? AnnualReviewTime { get; set; }
+        /// <summary>
         /// 扫描件 
         /// </summary>
         [SugarColumn(ColumnDataType = "text", ColumnDescription = "扫描件")]

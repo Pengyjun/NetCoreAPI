@@ -33,7 +33,7 @@ namespace HNKC.CrewManagePlatform.SqlSugars.Models
         /// 在船日期
         /// </summary>
         [SugarColumn(ColumnDataType = "datetime", ColumnDescription = "在船日期")]
-        public DateTime? OnBoardTime { get; set; }
+        public DateTime OnBoardTime { get; set; }
         /// <summary>
         /// 休假日期
         /// </summary>

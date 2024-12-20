@@ -5,6 +5,7 @@ using HNKC.CrewManagePlatform.Models.Enums;
 using HNKC.CrewManagePlatform.SqlSugars.Models;
 using HNKC.CrewManagePlatform.Utils;
 using SqlSugar;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
 
@@ -1033,8 +1034,14 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                 case 17://适任职务
                     rt = await GetPositionListAsync();
                     break;
-                case 18://适任职务
+                case 18://船员状态
                     rt = GetCrewStatusList();
+                    break;
+                case 19://政治面貌
+                    rt = await GetPoliticalListAsync();
+                    break;
+                case 20://用工形式
+                    rt = await GetEmploymentTypeListAsync();
                     break;
             }
             return rt;
@@ -1103,6 +1110,34 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
         {
             ResponseResult<List<DropDownResponse>> rt = new();
             var rr = await _dbContext.Queryable<TrainingType>().Where(t => t.IsDelete == 1).Select(t => new DropDownResponse
+            {
+                Key = t.BusinessId.ToString(),
+                Value = t.Name,
+            }).ToListAsync();
+            return rt.SuccessResult(rr, rr.Count);
+        }
+        /// <summary>
+        /// 政治面貌
+        /// </summary>
+        /// <returns></returns>
+        private async Task<ResponseResult<List<DropDownResponse>>> GetPoliticalListAsync()
+        {
+            ResponseResult<List<DropDownResponse>> rt = new();
+            var rr = await _dbContext.Queryable<Political>().Where(t => t.IsDelete == 1).Select(t => new DropDownResponse
+            {
+                Key = t.BusinessId.ToString(),
+                Value = t.Name,
+            }).ToListAsync();
+            return rt.SuccessResult(rr, rr.Count);
+        }
+        /// <summary>
+        /// 用工形式
+        /// </summary>
+        /// <returns></returns>
+        private async Task<ResponseResult<List<DropDownResponse>>> GetEmploymentTypeListAsync()
+        {
+            ResponseResult<List<DropDownResponse>> rt = new();
+            var rr = await _dbContext.Queryable<EmploymentType>().Where(t => t.IsDelete == 1).Select(t => new DropDownResponse
             {
                 Key = t.BusinessId.ToString(),
                 Value = t.Name,
@@ -1340,42 +1375,261 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
         #endregion
 
         #region 详情
-
+        /// <summary>
+        /// 学历信息
+        /// </summary>
+        /// <param name="bId"></param>
+        /// <returns></returns>
         public async Task<ResponseResult<EducationalBackgroundDetails>> GetEducationalBackgroundDetailsAsync(string bId)
         {
-            throw new NotImplementedException();
-        }
+            ResponseResult<EducationalBackgroundDetails> rt = new();
+            EducationalBackgroundDetails ur = new();
 
+            var userInfo = await GetUserInfoAsync(bId);
+            var edutab = await _dbContext.Queryable<EducationalBackground>().Where(t => t.IsDelete == 1 && t.BusinessId == userInfo.BusinessId).ToListAsync();
+            //获取文件
+            List<string> fileIds = new();
+            foreach (var file in edutab)
+            {
+                var ids = file.QualificationScans?.Split(",").ToList();
+                if (ids != null && ids.Any())
+                {
+                    fileIds.AddRange(ids);
+                }
+            }
+            var files = await _dbContext.Queryable<Files>().Where(t => fileIds.Contains(t.BusinessId.ToString())).ToListAsync();
+            List<QualificationForDetails> qd = new();
+            foreach (var item in edutab)
+            {
+                var edFile = files.Where(x => item.QualificationScans.Split(",").Contains(x.BusinessId.ToString()))
+                    .Select(x => new FileInfosForDetails
+                    {
+                        Id = x.Id.ToString(),
+                        FileSize = x.FileSize,
+                        FileType = x.FileType,
+                        Name = x.Name,
+                        OriginName = x.OriginName,
+                        SuffixName = x.SuffixName
+                    })
+                    .ToList();
+                qd.Add(new QualificationForDetails
+                {
+                    StartTime = item.StartTime,
+                    EndTime = item.EndTime,
+                    Major = item.Major,
+                    QualificationType = EnumUtil.GetDescription(item.QualificationType),
+                    School = item.School,
+                    Qualification = EnumUtil.GetDescription(item.Qualification),
+                    QualificationScans = edFile
+                });
+            }
+            ur.QualificationInfos = qd;
+
+            return rt.SuccessResult(ur);
+        }
+        /// <summary>
+        /// 备注
+        /// </summary>
+        /// <param name="bId"></param>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
         public async Task<ResponseResult<NotesDetails>> GetNotesDetailsAsync(string bId)
         {
             throw new NotImplementedException();
         }
-
+        /// <summary>
+        /// 职务晋升
+        /// </summary>
+        /// <param name="bId"></param>
+        /// <returns></returns>
         public async Task<ResponseResult<PromotionDetails>> GetPromotionDetailsAsync(string bId)
         {
-            throw new NotImplementedException();
-        }
+            ResponseResult<PromotionDetails> rt = new();
+            PromotionDetails ur = new();
 
+            var userInfo = await GetUserInfoAsync(bId);
+            var promotion = await _dbContext.Queryable<Promotion>().Where(t => t.IsDelete == 1 && t.BusinessId == userInfo.BusinessId).OrderByDescending(x => x.PromotionTime).ToListAsync();
+            //获取文件
+            List<string> fileIds = new();
+            foreach (var file in promotion)
+            {
+                var ids = file.PromotionScan?.Split(",").ToList();
+                if (ids != null && ids.Any())
+                {
+                    fileIds.AddRange(ids);
+                }
+            }
+            var files = await _dbContext.Queryable<Files>().Where(t => fileIds.Contains(t.BusinessId.ToString())).ToListAsync();
+            var ownships = await _dbContext.Queryable<OwnerShip>().Where(t => t.IsDelete == 1).Select(x => new { x.BusinessId, x.ShipName, x.Country }).ToListAsync();
+            var positions = await _dbContext.Queryable<Position>().Where(t => t.IsDelete == 1).Select(x => new { x.BusinessId, x.Name }).ToListAsync();
+            List<PromotionsForDetails> pd = new();
+            foreach (var item in promotion)
+            {
+                var ids = item.PromotionScan?.Split(",").ToList();
+                var pdFiles = files.Where(x => ids.Contains(x.BusinessId.ToString()))
+                     .Select(x => new FileInfosForDetails
+                     {
+                         Id = x.Id.ToString(),
+                         FileSize = x.FileSize,
+                         FileType = x.FileType,
+                         Name = x.Name,
+                         OriginName = x.OriginName,
+                         SuffixName = x.SuffixName
+                     })
+                    .ToList();
+                pd.Add(new PromotionsForDetails
+                {
+                    OnShip = ownships.FirstOrDefault(x => x.BusinessId.ToString() == item.OnShip)?.ShipName,
+                    Postition = positions.FirstOrDefault(x => x.BusinessId.ToString() == item.Postition)?.Name,
+                    PromotionTime = item.PromotionTime,
+                    PromotionScans = pdFiles
+                });
+            }
+            ur.Promotions = pd;
+
+            return rt.SuccessResult(ur);
+        }
+        /// <summary>
+        /// 培训记录
+        /// </summary>
+        /// <param name="bId"></param>
+        /// <returns></returns>
         public async Task<ResponseResult<TrainingRecordDetails>> GetTrainingRecordDetailsAsync(string bId)
         {
-            throw new NotImplementedException();
-        }
+            ResponseResult<TrainingRecordDetails> rt = new();
+            TrainingRecordDetails ur = new();
 
+            var userInfo = await GetUserInfoAsync(bId);
+
+            var traningRecord = await _dbContext.Queryable<TrainingRecord>().Where(t => t.IsDelete == 1 && t.BusinessId == userInfo.BusinessId).OrderByDescending(x => x.TrainingTime).ToListAsync();
+            var trainType = await _dbContext.Queryable<TrainingType>().Where(t => t.IsDelete == 1 && t.BusinessId == userInfo.BusinessId).Select(x => new { x.BusinessId, x.Name }).ToListAsync();
+            //获取文件
+            List<string> fileIds = new();
+            foreach (var file in traningRecord)
+            {
+                var ids = file.TrainingScan?.Split(",").ToList();
+                if (ids != null && ids.Any())
+                {
+                    fileIds.AddRange(ids);
+                }
+            }
+            var files = await _dbContext.Queryable<Files>().Where(t => fileIds.Contains(t.BusinessId.ToString())).ToListAsync();
+            List<TrainingRecordsForDetails> td = new();
+            foreach (var item in traningRecord)
+            {
+                var trFile = files.Where(x => item.TrainingScan.Split(",").Contains(x.BusinessId.ToString()))
+                    .Select(x => new FileInfosForDetails
+                    {
+                        Id = x.Id.ToString(),
+                        FileSize = x.FileSize,
+                        FileType = x.FileType,
+                        Name = x.Name,
+                        OriginName = x.OriginName,
+                        SuffixName = x.SuffixName
+                    })
+                    .ToList();
+                td.Add(new TrainingRecordsForDetails
+                {
+                    TrainingTime = item.TrainingTime,
+                    TrainingType = trainType.FirstOrDefault(x => x.BusinessId.ToString() == item.TrainingType)?.Name,
+                    TrainingScans = trFile
+                });
+            }
+            ur.TrainingRecords = td;
+
+            return rt.SuccessResult(ur);
+        }
+        /// <summary>
+        /// 任职船舶
+        /// </summary>
+        /// <param name="bId"></param>
+        /// <returns></returns>
         public async Task<ResponseResult<WorkShipDetails>> GetWorkShipDetailsAsync(string bId)
         {
-            throw new NotImplementedException();
-        }
+            ResponseResult<WorkShipDetails> rt = new();
+            WorkShipDetails ur = new();
 
+            var userInfo = await GetUserInfoAsync(bId);
+            var workShips = await _dbContext.Queryable<WorkShip>().Where(t => t.IsDelete == 1 && t.BusinessId == userInfo.BusinessId).OrderByDescending(t => t.WorkShipEndTime).ToListAsync();
+            var ownships = await _dbContext.Queryable<OwnerShip>().Where(t => t.IsDelete == 1).Select(x => new { x.BusinessId, x.ShipName, x.Country }).ToListAsync();
+            var positions = await _dbContext.Queryable<Position>().Where(t => t.IsDelete == 1).Select(x => new { x.BusinessId, x.Name }).ToListAsync();
+
+            List<WorkShipsForDetails> wd = new();
+            foreach (var item in workShips)
+            {
+                DateTime date1 = new DateTime(item.WorkShipStartTime.Year, item.WorkShipStartTime.Month, item.WorkShipStartTime.Day);
+                DateTime date2 = new DateTime(item.WorkShipEndTime.Year, item.WorkShipEndTime.Month, item.WorkShipEndTime.Day);
+                var days = (date2 - date1).Days + 1;
+                wd.Add(new WorkShipsForDetails
+                {
+                    WorkShipEndTime = item.WorkShipEndTime,
+                    HolidayTime = item.HolidayTime,
+                    OnBoardTime = item.OnBoardTime,
+                    OnShip = ownships.FirstOrDefault(x => x.BusinessId.ToString() == item.OnShip)?.ShipName,
+                    Postition = positions.FirstOrDefault(x => x.BusinessId.ToString() == item.Postition)?.Name,
+                    WorkShipStartTime = item.WorkShipStartTime,
+                    OnBoardDay = days,
+                    Holiday = 0
+                });
+            }
+            ur.WorkShips = wd;
+
+            return rt.SuccessResult(ur);
+        }
+        /// <summary>
+        /// 年度考核
+        /// </summary>
+        /// <param name="bId"></param>
+        /// <returns></returns>
         public async Task<ResponseResult<YearCheckDetails>> GetYearCheckDetailAsync(string bId)
         {
-            throw new NotImplementedException();
+            ResponseResult<YearCheckDetails> rt = new();
+            YearCheckDetails ur = new();
+
+            var userInfo = await GetUserInfoAsync(bId);
+
+            var yearChecks = await _dbContext.Queryable<YearCheck>().Where(t => t.IsDelete == 1 && t.BusinessId == userInfo.BusinessId).OrderByDescending(x => x.TrainingTime).ToListAsync();
+            //获取文件
+            List<string> fileIds = new();
+            foreach (var file in yearChecks)
+            {
+                var ids = file.TrainingScan?.Split(",").ToList();
+                if (ids != null && ids.Any())
+                {
+                    fileIds.AddRange(ids);
+                }
+            }
+            var files = await _dbContext.Queryable<Files>().Where(t => fileIds.Contains(t.BusinessId.ToString())).ToListAsync();
+            List<YearChecksForDetails> yc = new();
+            foreach (var item in yearChecks)
+            {
+                var ycFile = files.Where(x => item.TrainingScan.Split(",").Contains(x.BusinessId.ToString()))
+                    .Select(x => new FileInfosForDetails
+                    {
+                        Id = x.Id.ToString(),
+                        FileSize = x.FileSize,
+                        FileType = x.FileType,
+                        Name = x.Name,
+                        OriginName = x.OriginName,
+                        SuffixName = x.SuffixName
+                    })
+                    .ToList();
+                yc.Add(new YearChecksForDetails
+                {
+                    TrainingTime = item.TrainingTime,
+                    CheckType = EnumUtil.GetDescription(item.CheckType),
+                    TrainingScans = ycFile
+                });
+            }
+            ur.YearChecks = yc;
+
+            return rt.SuccessResult(ur);
         }
         /// <summary>
         /// 适任证书
         /// </summary>
         /// <param name="bId"></param>
         /// <returns></returns>
-        /// <exception cref="NotImplementedException"></exception>
         public async Task<ResponseResult<CertificateOfCompetencyDetails>> GetCertificateOfCompetencyDetailsAsync(string bId)
         {
             ResponseResult<CertificateOfCompetencyDetails> rt = new();
@@ -1406,6 +1660,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                     ur.SEffectiveCountdown = (date1 - date2).Days + 1;
                 }
                 ur.TrainingCertificate = cerOfComp.TrainingCertificate;
+                ur.TrainingSignTime = cerOfComp.TrainingSignTime;
                 ur.Z01EffectiveTime = cerOfComp.Z01EffectiveTime;
                 ur.Z07EffectiveTime = cerOfComp.Z07EffectiveTime;
                 ur.Z08EffectiveTime = cerOfComp.Z08EffectiveTime;
@@ -1425,14 +1680,15 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                 ur.PassportEffectiveTime = cerOfComp.PassportEffectiveTime;
                 #endregion
                 //航区
-                //var navigationarea=await _dbContext.Queryable<NavigationArea>().Where(t=>t.IsDelete==1)
-                //ur.FNavigationArea=
+                var navigationarea = await _dbContext.Queryable<NavigationArea>().Where(t => t.IsDelete == 1).ToListAsync();
+                ur.FNavigationArea = navigationarea.FirstOrDefault(x => x.BusinessId.ToString() == cerOfComp.FNavigationArea)?.Name;
+                ur.SNavigationArea = navigationarea.FirstOrDefault(x => x.BusinessId.ToString() == cerOfComp.SNavigationArea)?.Name;
                 //适任职务
-
+                var position = await _dbContext.Queryable<Position>().Where(t => t.IsDelete == 1).ToListAsync();
+                ur.FPosition = position.FirstOrDefault(x => x.BusinessId.ToString() == cerOfComp.FPosition)?.Name;
+                ur.SPosition = position.FirstOrDefault(x => x.BusinessId.ToString() == cerOfComp.SPosition)?.Name;
                 //技能证书
                 var skillcf = await _dbContext.Queryable<SkillCertificates>().Where(t => t.IsDelete == 1 && t.BusinessId == userInfo.BusinessId).ToListAsync();
-
-
                 List<string> skillFileIds = new();
                 foreach (var item in skillcf)
                 {
@@ -1442,11 +1698,8 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                         skillFileIds.AddRange(ids);
                     }
                 }
-
                 //特种设备证书
                 var specFill = await _dbContext.Queryable<SpecialEquips>().Where(t => t.IsDelete == 1 && t.BusinessId == userInfo.BusinessId).ToListAsync();
-
-
                 List<string> specfilesIds = new();
                 foreach (var item in specFill)
                 {
@@ -1456,7 +1709,6 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                         specfilesIds.AddRange(ids);
                     }
                 }
-
                 //当前适任证书所有文件
                 List<string> curFilesIds = new();
                 curFilesIds.AddRange(cerOfComp.FScans.Split(",").ToList());
@@ -1469,7 +1721,148 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                 curFilesIds.AddRange(specfilesIds);
                 var files = await _dbContext.Queryable<Files>().Where(t => t.IsDelete == 1 && curFilesIds.Contains(t.BusinessId.ToString())).ToListAsync();
 
+                #region 扫描件
+                var fScans = files.Where(x => cerOfComp.FScans.Split(",").ToList().Contains(x.BusinessId.ToString()))
+                    .Select(x => new FileInfosForDetails
+                    {
+                        Id = x.Id.ToString(),
+                        FileSize = x.FileSize,
+                        FileType = x.FileType,
+                        Name = x.Name,
+                        OriginName = x.OriginName,
+                        SuffixName = x.SuffixName
+                    })
+                    .ToList();
+                var sScans = files.Where(x => cerOfComp.SScans.Split(",").ToList().Contains(x.BusinessId.ToString()))
+                    .Select(x => new FileInfosForDetails
+                    {
+                        Id = x.Id.ToString(),
+                        FileSize = x.FileSize,
+                        FileType = x.FileType,
+                        Name = x.Name,
+                        OriginName = x.OriginName,
+                        SuffixName = x.SuffixName
+                    })
+                    .ToList();
+                var trainingScans = files.Where(x => cerOfComp.TrainingScans.Split(",").ToList().Contains(x.BusinessId.ToString()))
+                   .Select(x => new FileInfosForDetails
+                   {
+                       Id = x.Id.ToString(),
+                       FileSize = x.FileSize,
+                       FileType = x.FileType,
+                       Name = x.Name,
+                       OriginName = x.OriginName,
+                       SuffixName = x.SuffixName
+                   })
+                   .ToList();
+                var healthScans = files.Where(x => cerOfComp.HealthScans.Split(",").ToList().Contains(x.BusinessId.ToString()))
+                   .Select(x => new FileInfosForDetails
+                   {
+                       Id = x.Id.ToString(),
+                       FileSize = x.FileSize,
+                       FileType = x.FileType,
+                       Name = x.Name,
+                       OriginName = x.OriginName,
+                       SuffixName = x.SuffixName
+                   })
+                   .ToList();
+                var seamanScans = files.Where(x => cerOfComp.SeamanScans.Split(",").ToList().Contains(x.BusinessId.ToString()))
+                   .Select(x => new FileInfosForDetails
+                   {
+                       Id = x.Id.ToString(),
+                       FileSize = x.FileSize,
+                       FileType = x.FileType,
+                       Name = x.Name,
+                       OriginName = x.OriginName,
+                       SuffixName = x.SuffixName
+                   })
+                   .ToList();
+                var passportScans = files.Where(x => cerOfComp.PassportScans.Split(",").ToList().Contains(x.BusinessId.ToString()))
+                   .Select(x => new FileInfosForDetails
+                   {
+                       Id = x.Id.ToString(),
+                       FileSize = x.FileSize,
+                       FileType = x.FileType,
+                       Name = x.Name,
+                       OriginName = x.OriginName,
+                       SuffixName = x.SuffixName
+                   })
+                   .ToList();
+                //技能证书
+                List<SkillCertificatesForDetails> sk = new();
+                foreach (var item in skillcf)
+                {
+                    var skFiles = files.Where(x => x.BusinessId.ToString() == item.SkillScans)
+                        .Select(x => new FileInfosForDetails
+                        {
+                            Id = x.Id.ToString(),
+                            FileSize = x.FileSize,
+                            FileType = x.FileType,
+                            Name = x.Name,
+                            OriginName = x.OriginName,
+                            SuffixName = x.SuffixName
+                        })
+                        .FirstOrDefault();
 
+                    sk.Add(new SkillCertificatesForDetails
+                    {
+                        Id = item.Id.ToString(),
+                        SkillCertificateType = EnumUtil.GetDescription(item.SkillCertificateType),
+                        SkillScans = skFiles
+                    });
+                }
+                //特种设备证书
+                List<SpecialEquipsForDetails> sp = new();
+                foreach (var item in specFill)
+                {
+                    var spFiles = files.Where(x => x.BusinessId.ToString() == item.SpecialEquipsScans)
+                        .Select(x => new FileInfosForDetails
+                        {
+                            Id = x.Id.ToString(),
+                            FileSize = x.FileSize,
+                            FileType = x.FileType,
+                            Name = x.Name,
+                            OriginName = x.OriginName,
+                            SuffixName = x.SuffixName
+                        })
+                        .FirstOrDefault();
+
+                    sp.Add(new SpecialEquipsForDetails
+                    {
+                        Id = item.Id.ToString(),
+                        AnnualReviewTime = item.AnnualReviewTime,
+                        SpecialEquipsEffectiveTime = item.SpecialEquipsEffectiveTime,
+                        SpecialEquipsCertificateType = EnumUtil.FetchDescription(item.SpecialEquipsCertificateType),
+                        SpecialEquipsScans = spFiles
+                    });
+                }
+                #endregion
+
+                ur.FScans = fScans;
+                ur.SScans = sScans;
+                ur.TrainingScans = trainingScans;
+                ur.HealthScans = healthScans;
+                ur.SeamanScans = seamanScans;
+                ur.PassportScans = passportScans;
+                ur.SkillCertificates = sk;
+                ur.SpecialEquips = sp;
+
+                //签证记录
+                var visarecords = await _dbContext.Queryable<VisaRecords>().Where(t => t.IsDelete == 1 && t.BusinessId == userInfo.BusinessId).ToListAsync();
+                var countrys = await _dbContext.Queryable<CountryRegion>().Where(t => t.IsDelete == 1).Select(x => new { x.BusinessId, x.Name }).ToListAsync();
+                List<VisaRecordsForDetails> vfd = new();
+                foreach (var item in visarecords)
+                {
+                    vfd.Add(new VisaRecordsForDetails
+                    {
+                        Id = item.Id.ToString(),
+                        Country = countrys.FirstOrDefault(x => x.BusinessId.ToString() == item.Country)?.Name,
+                        DueTime = item.DueTime,
+                        VisaType = EnumUtil.GetDescription(item.VisaType),
+                        IsDue = item.DueTime >= DateTime.Now ? false : true
+                    });
+                }
+                ur.VisaRecords = vfd;
             }
             return rt.SuccessResult(ur);
 

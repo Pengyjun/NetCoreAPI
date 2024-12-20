@@ -606,15 +606,7 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// <summary>
         /// 在船时间
         /// </summary>
-        public DateTime? OnBoardTime { get; set; }
-        ///// <summary>
-        ///// 在船天数
-        ///// </summary>
-        //public int OnBoardDay { get; set; }
-        ///// <summary>
-        ///// 休假天数
-        ///// </summary>
-        //public int Holiday { get; set; }
+        public DateTime OnBoardTime { get; set; }
     }
     /// <summary>
     /// 培训记录
