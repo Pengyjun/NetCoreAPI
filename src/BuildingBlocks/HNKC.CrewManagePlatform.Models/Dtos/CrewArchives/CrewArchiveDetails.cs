@@ -3,66 +3,37 @@
 namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
 {
     /// <summary>
-    /// 船员档案相关dto 
+    /// 查看详情
     /// </summary>
-    public class CrewArchivesResponse
-    {
-        /// <summary>
-        /// 船员总数
-        /// </summary>
-        public int TatalCount { get; set; }
-        /// <summary>
-        /// 在岗数量
-        /// </summary>
-        public int OnDutyCount { get; set; }
-        /// <summary>
-        /// 占比
-        /// </summary>
-        public int OnDutyProp { get; set; }
-        /// <summary>
-        /// 待岗数量
-        /// </summary>
-        public int WaitCount { get; set; }
-        /// <summary>
-        /// 占比
-        /// </summary>
-        public int WaitProp { get; set; }
-        /// <summary>
-        /// 休假数量
-        /// </summary>
-        public int HolidayCount { get; set; }
-        /// <summary>
-        /// 占比
-        /// </summary>
-        public int HolidayProp { get; set; }
-        /// <summary>
-        /// 离调退数量
-        /// </summary>
-        public int OtherCount { get; set; }
-        /// <summary>
-        /// 占比 
-        /// </summary>
-        public int OtherProp { get; set; }
-    }
+    public class CrewArchiveDetails
+    { }
     #region 
     /// <summary>
     /// 基本信息
     /// </summary>
-    public class BaseInfoDto
+    public class BaseInfoDetails
     {
         #region 基本信息
         /// <summary>
         /// 政治面貌
         /// </summary>
-        public string? PoliticalStatus { get; set; }
+        public string? PoliticalStatusName { get; set; }
+        /// <summary>
+        /// 当前船舶任职时间
+        /// </summary>
+        public string? CurrentShipEntryTime { get; set; }
+        /// <summary>
+        /// 用户状态
+        /// </summary>
+        public string? StatusName { get; set; }
         /// <summary>
         /// 籍贯
         /// </summary>
-        public string? NativePlace { get; set; }
+        public string? NativePlaceName { get; set; }
         /// <summary>
         /// 民族
         /// </summary>
-        public string? Nation { get; set; }
+        public string? NationName { get; set; }
         /// <summary>
         /// 家庭地址
         /// </summary>
@@ -90,11 +61,19 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// <summary>
         /// 身份证扫描件 ,拼接
         /// </summary>
-        public string? IdCardScans { get; set; }
+        public List<FileInfosForDetails>? IdCardScans { get; set; }
         /// <summary>
         /// 入职日期
         /// </summary>
         public DateTime? EntryTime { get; set; }
+        /// <summary>
+        /// 入职开始时间
+        /// </summary>
+        public DateTime? StartTime { get; set; }
+        /// <summary>
+        /// 入职结束时间
+        /// </summary>
+        public DateTime? EndTime { get; set; }
         /// <summary>
         /// 入职材料 ,拼接
         /// </summary>
@@ -104,71 +83,6 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// </summary>
         public string? EmploymentId { get; set; }
         /// <summary>
-        /// 合同类型
-        /// </summary>
-        public ContractEnum ContarctType { get; set; }
-        #endregion
-
-        #region 专业信息
-        /// <summary>
-        /// 船舶类型
-        /// </summary>
-        public ShipTypeEnum ShipType { get; set; }
-        /// <summary>
-        /// 船员类型
-        /// </summary>
-        public string? CrewType { get; set; }
-        /// <summary>
-        /// 服务簿类型
-        /// </summary>
-        public ServiceBookEnum ServiceBookType { get; set; }
-        /// <summary>
-        /// 所在船舶
-        /// </summary>
-        public string? OnBoard { get; set; }
-        /// <summary>
-        /// 在船职务
-        /// </summary>
-        public string? PositionOnBoard { get; set; }
-        /// <summary>
-        /// 船员照片 ,拼接
-        /// </summary>
-        public string? PhotoScans { get; set; }
-        #endregion
-
-        #region 家庭成员&紧急联系人
-        /// <summary>
-        /// 家庭成员
-        /// </summary>
-        public List<UserInfos>? HomeUser { get; set; }
-        /// <summary>
-        /// 紧急联系人
-        /// </summary>
-        public List<UserInfos>? EmergencyContacts { get; set; }
-        /// <summary>
-        /// 劳务合同
-        /// </summary>
-        public UserEntryInfosForDetaails? UserEntryInfo { get; set; }
-        #endregion
-    }
-    /// <summary>
-    /// 劳务合同
-    /// </summary>
-    public class UserEntryInfosForDetaails
-    {
-        /// <summary>
-        /// 入职日期
-        /// </summary>
-        public DateTime EntryTime { get; set; }
-        /// <summary>
-        /// 截止日期
-        /// </summary>
-        public DateTime EndTime { get; set; }
-        /// <summary>
-        /// 入职材料 ,拼接文件
-        /// </summary>
-        public string? EntryScans { get; set; }
-        /// <summary>
         /// 劳务公司
         /// </summary>
         public string? LaborCompany { get; set; }
@@ -177,14 +91,53 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// </summary>
         public string? ContarctMain { get; set; }
         /// <summary>
-        /// 用工形式
+        /// 合同类型
         /// </summary>
-        public string? EmploymentId { get; set; }
+        public string? ContarctType { get; set; }
+        #endregion
+
+        #region 专业信息
+        /// <summary>
+        /// 船舶类型
+        /// </summary>
+        public string? ShipTypeName { get; set; }
+        /// <summary>
+        /// 船员类型
+        /// </summary>
+        public string? CrewTypeName { get; set; }
+        /// <summary>
+        /// 服务簿类型
+        /// </summary>
+        public string? ServiceBookType { get; set; }
+        /// <summary>
+        /// 所在船舶
+        /// </summary>
+        public string? OnBoardName { get; set; }
+        /// <summary>
+        /// 在船职务
+        /// </summary>
+        public string? PositionOnBoard { get; set; }
+        /// <summary>
+        /// 船员照片 
+        /// </summary>
+        public FileInfosForDetails? PhotoScans { get; set; }
+        #endregion
+
+        #region 家庭成员&紧急联系人
+        /// <summary>
+        /// 家庭成员
+        /// </summary>
+        public List<UserInfosForDetails>? HomeUser { get; set; }
+        /// <summary>
+        /// 紧急联系人
+        /// </summary>
+        public List<UserInfosForDetails>? EmergencyContacts { get; set; }
+        #endregion
     }
     /// <summary>
     /// 家庭成员/紧急联系人
     /// </summary>
-    public class UserInfos
+    public class UserInfosForDetails
     {
         /// <summary>
         /// 主键
@@ -197,7 +150,7 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// <summary>
         /// 关系
         /// </summary>
-        public FamilyRelationEnum RelationShip { get; set; }
+        public string? RelationShip { get; set; }
         /// <summary>
         /// 联系方式
         /// </summary>
@@ -208,15 +161,65 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         public string? WorkUnit { get; set; }
     }
     /// <summary>
-    /// 适任及证书
+    /// 劳务信息
     /// </summary>
-    public class CertificateOfCompetencyDto
+    public class LaborServicesInfoDetails
     {
-        #region 第一适任证
+        #region 入职信息
+        /// <summary>
+        /// 入职时间
+        /// </summary>
+        public string? EntryTime { get; set; }
+        /// <summary>
+        /// 入职材料
+        /// </summary>
+        public List<FileInfosForDetails>? EntryMaterial { get; set; }
+        /// <summary>
+        /// 入职信息
+        /// </summary>
+        public List<UserEntryInfosForDetails>? UserEntryInfosForDetails { get; set; }
+        #endregion
+    }
+    /// <summary>
+    /// 劳务合同
+    /// </summary>
+    public class UserEntryInfosForDetails
+    {
         /// <summary>
         /// 主键
         /// </summary>
         public string? Id { get; set; }
+        /// <summary>
+        /// 入职日期
+        /// </summary>
+        public string? EntryDate { get; set; }
+        /// <summary>
+        /// 入职材料 ,拼接文件
+        /// </summary>
+        public List<FileInfosForDetails>? EntryScans { get; set; }
+        /// <summary>
+        /// 劳务公司
+        /// </summary>
+        public string? LaborCompany { get; set; }
+        /// <summary>
+        /// 合同主体
+        /// </summary>
+        public string? ContarctMain { get; set; }
+        /// <summary>
+        /// 用工形式
+        /// </summary>
+        public string? EmploymentName { get; set; }
+        /// <summary>
+        /// 状态：进行中...
+        /// </summary>
+        public string? Staus { get; set; }
+    }
+    /// <summary>
+    /// 适任及证书
+    /// </summary>
+    public class CertificateOfCompetencyDetails
+    {
+        #region 第一适任证
         /// <summary>
         /// 证书编号
         /// </summary>
@@ -237,15 +240,14 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// 有效日期
         /// </summary>
         public DateTime? FEffectiveTime { get; set; }
-        ///// <summary>
-        ///// 有效期倒计时 100天
-        ///// </summary>
-        //public int FEffectiveCountdown { get; set; }
+        /// <summary>
+        /// 有效期倒计时 100天
+        /// </summary>
+        public int FEffectiveCountdown { get; set; }
         /// <summary>
         /// 扫描件 ,拼接
         /// </summary>
-        public string? FScans { get; set; }
-        //public List<FileInfos>? FScans { get; set; }
+        public List<FileInfosForDetails>? FScans { get; set; }
         #endregion
 
         #region 第二适任证
@@ -269,15 +271,14 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// 有效日期
         /// </summary>
         public DateTime? SEffectiveTime { get; set; }
-        ///// <summary>
-        ///// 有效期倒计时 100天
-        ///// </summary>
-        //public int SEffectiveCountdown { get; set; }
+        /// <summary>
+        /// 有效期倒计时 100天
+        /// </summary>
+        public int SEffectiveCountdown { get; set; }
         /// <summary>
         /// 扫描件 ,拼接
         /// </summary>
-        public string? SScans { get; set; }
-        //public List<FileInfos>? SScans { get; set; }
+        public List<FileInfosForDetails>? SScans { get; set; }
         #endregion
 
         #region 培训合格证
@@ -324,8 +325,7 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// <summary>
         /// 扫描件 ,拼接
         /// </summary>
-        public string? TrainingScans { get; set; }
-        //public List<FileInfos>? TrainingScans { get; set; }
+        public List<FileInfosForDetails>? TrainingScans { get; set; }
         #endregion
 
         #region 健康证
@@ -344,8 +344,7 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// <summary>
         /// 扫描件 
         /// </summary>
-        public string? HealthScans { get; set; }
-        //public List<FileInfos>? HealthScans { get; set; }
+        public List<FileInfosForDetails>? HealthScans { get; set; }
         #endregion
 
         #region 海员证
@@ -364,8 +363,7 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// <summary>
         /// 扫描件 
         /// </summary>
-        public string? SeamanScans { get; set; }
-        //public List<FileInfos>? SeamanScans { get; set; }
+        public List<FileInfosForDetails>? SeamanScans { get; set; }
         #endregion
 
         #region 护照
@@ -384,32 +382,31 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// <summary>
         /// 签证记录
         /// </summary>
-        public List<VisaRecordss>? VisaRecords { get; set; }
+        public List<VisaRecordsForDetails>? VisaRecords { get; set; }
         /// <summary>
         /// 扫描件 ,拼接
         /// </summary>
-        public string? PassportScans { get; set; }
-        //public List<FileInfos>? PassportScans { get; set; }
+        public List<FileInfosForDetails>? PassportScans { get; set; }
         #endregion
 
         #region 技能证书
         /// <summary>
         /// 技能证书
         /// </summary>
-        public List<SkillCertificatess>? SkillCertificates { get; set; }
+        public List<SkillCertificatesForDetails>? SkillCertificates { get; set; }
         #endregion
 
         #region 特种设备证书
         /// <summary>
         /// 特种设备证书
         /// </summary>
-        public List<SpecialEquipss>? SpecialEquips { get; set; }
+        public List<SpecialEquipsForDetails>? SpecialEquips { get; set; }
         #endregion
     }
     /// <summary>
     /// 技能证书
     /// </summary>
-    public class SkillCertificatess
+    public class SkillCertificatesForDetails
     {
         /// <summary>
         /// 主键
@@ -422,13 +419,12 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// <summary>
         /// 扫描件 ,拼接
         /// </summary>
-        public string? SkillScans { get; set; }
-        //public FileInfos? SkillScans { get; set; }
+        public FileInfosForDetails? SkillScans { get; set; }
     }
     /// <summary>
     /// 特种设备证书
     /// </summary>
-    public class SpecialEquipss
+    public class SpecialEquipsForDetails
     {
         /// <summary>
         /// 主键
@@ -449,13 +445,12 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// <summary>
         /// 扫描件 ,拼接
         /// </summary>
-        public string? SpecialEquipsScans { get; set; }
-        //public FileInfos? SpecialEquipsScans { get; set; }
+        public FileInfosForDetails? SpecialEquipsScans { get; set; }
     }
     /// <summary>
     /// 签证记录
     /// </summary>
-    public class VisaRecordss
+    public class VisaRecordsForDetails
     {
         /// <summary>
         /// 主键
@@ -473,25 +468,25 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// 到期时间
         /// </summary>
         public DateTime? DueTime { get; set; }
-        ///// <summary>
-        ///// 是否到期 1未到期 0已到期
-        ///// </summary>
-        //public bool IsDue { get; set; }
+        /// <summary>
+        /// 是否到期 1未到期 0已到期
+        /// </summary>
+        public bool IsDue { get; set; }
     }
     /// <summary>
     /// 学历信息
     /// </summary>
-    public class EducationalBackgroundDto
+    public class EducationalBackgroundDetails
     {
         /// <summary>
         /// 学历信息
         /// </summary>
-        public List<QualificationInfo>? QualificationInfos { get; set; }
+        public List<QualificationForDetails>? QualificationInfos { get; set; }
     }
     /// <summary>
     /// 学历信息
     /// </summary>
-    public class QualificationInfo
+    public class QualificationForDetails
     {
         /// <summary>
         /// 主键
@@ -524,23 +519,22 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// <summary>
         /// 证书 ,拼接
         /// </summary>
-        public string? QualificationScans { get; set; }
-        //public List<FileInfos>? QualificationScans { get; set; }
+        public List<FileInfosForDetails>? QualificationScans { get; set; }
     }
     /// <summary>
     /// 职务晋升
     /// </summary>
-    public class PromotionDto
+    public class PromotionDetails
     {
         /// <summary>
         /// 职务晋升
         /// </summary>
-        public List<Promotionss>? Promotions { get; set; }
+        public List<PromotionsForDetails>? Promotions { get; set; }
     }
     /// <summary>
     /// 职务晋升
     /// </summary>
-    public class Promotionss
+    public class PromotionsForDetails
     {
         /// <summary>
         /// 主键
@@ -561,23 +555,22 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// <summary>
         /// 文件 ,拼接
         /// </summary>
-        public string? PromotionScan { get; set; }
-        //public FileInfos? PromotionScan { get; set; }
+        public FileInfosForDetails? PromotionScan { get; set; }
     }
     /// <summary>
     /// 任职船舶
     /// </summary>
-    public class WorkShipDto
+    public class WorkShipDetails
     {
         /// <summary>
         /// 任职船舶
         /// </summary>
-        public List<WorkShips>? WorkShips { get; set; }
+        public List<WorkShipsForDetails>? WorkShips { get; set; }
     }
     /// <summary>
     /// 任职船舶
     /// </summary>
-    public class WorkShips
+    public class WorkShipsForDetails
     {
         /// <summary>
         /// 主键
@@ -607,29 +600,29 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// 在船时间
         /// </summary>
         public DateTime? OnBoardTime { get; set; }
-        ///// <summary>
-        ///// 在船天数
-        ///// </summary>
-        //public int OnBoardDay { get; set; }
-        ///// <summary>
-        ///// 休假天数
-        ///// </summary>
-        //public int Holiday { get; set; }
+        /// <summary>
+        /// 在船天数
+        /// </summary>
+        public int OnBoardDay { get; set; }
+        /// <summary>
+        /// 休假天数
+        /// </summary>
+        public int Holiday { get; set; }
     }
     /// <summary>
     /// 培训记录
     /// </summary>
-    public class TrainingRecordDto
+    public class TrainingRecordDetails
     {
         /// <summary>
         /// 培训记录
         /// </summary>
-        public List<TrainingRecords>? TrainingRecords { get; set; }
+        public List<TrainingRecordsForDetails>? TrainingRecords { get; set; }
     }
     /// <summary>
     /// 培训记录
     /// </summary>
-    public class TrainingRecords
+    public class TrainingRecordsForDetails
     {
         /// <summary>
         /// 主键
@@ -646,23 +639,22 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// <summary>
         /// 培训文件
         /// </summary>
-        public string? TrainingScan { get; set; }
-        //public FileInfos? TrainingScan { get; set; }
+        public FileInfosForDetails? TrainingScan { get; set; }
     }
     /// <summary>
     /// 年度考核
     /// </summary>
-    public class YearCheckDto
+    public class YearCheckDetails
     {
         /// <summary>
         /// 年度考核
         /// </summary>
-        public List<YearChecks>? YearChecks { get; set; }
+        public List<YearChecksForDetails>? YearChecks { get; set; }
     }
     /// <summary>
     /// 年度考核
     /// </summary>
-    public class YearChecks
+    public class YearChecksForDetails
     {
         /// <summary>
         /// 主键
@@ -679,23 +671,22 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// <summary>
         /// 考核文件
         /// </summary>
-        public string? TrainingScan { get; set; }
-        //public FileInfos? TrainingScan { get; set; }
+        public FileInfosForDetails? TrainingScan { get; set; }
     }
     /// <summary>
     /// 备注
     /// </summary>
-    public class NotesDto
+    public class NotesDetails
     {
         /// <summary>
         /// 备注
         /// </summary>
-        public List<Notes>? Notes { get; set; }
+        public List<NotesForDetails>? Notes { get; set; }
     }
     /// <summary>
     /// 备注
     /// </summary>
-    public class Notes
+    public class NotesForDetails
     {
         /// <summary>
         /// 用户名
@@ -712,4 +703,34 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
     }
 
     #endregion
+    /// <summary>
+    /// 文件信息
+    /// </summary>
+    public class FileInfosForDetails
+    {
+        /// <summary>
+        /// 主键
+        /// </summary>
+        public string? Id { get; set; }
+        /// <summary>
+        /// 文件名称
+        /// </summary>
+        public string? Name { get; set; }
+        /// <summary>
+        /// 原始文件名称
+        /// </summary>
+        public string? OriginName { get; set; }
+        /// <summary>
+        /// 后缀名称
+        /// </summary>
+        public string? SuffixName { get; set; }
+        /// <summary>
+        /// 文件类型
+        /// </summary>
+        public string? FileType { get; set; }
+        /// <summary>
+        /// 文件大小
+        /// </summary>
+        public long? FileSize { get; set; }
+    }
 }

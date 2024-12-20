@@ -1,5 +1,6 @@
 ﻿using HNKC.CrewManagePlatform.Models.CommonRequest;
 using HNKC.CrewManagePlatform.Models.CommonResult;
+using HNKC.CrewManagePlatform.Models.Dtos;
 using HNKC.CrewManagePlatform.Models.Dtos.UserManager;
 using System;
 using System.Collections.Generic;
@@ -34,5 +35,28 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CurrentUser
         /// <param name="pageRequest"></param>
         /// <returns></returns>
         Task<PageResult<UserResponse>> SearchUserAsync(PageRequest  pageRequest);
+
+
+
+        /// <summary>
+        /// 新增用户
+        /// </summary>
+        /// <param name="pageRequest"></param>
+        /// <returns></returns>
+        Task<Result> AddUserAsync(AddUserRequest  addUserRequest);
+
+
+        /// <summary>
+        /// 删除用户
+        /// </summary>
+        /// <param name="pageRequest"></param>
+        /// <returns></returns>
+        Task<Result> RemoveUserAsync(BaseRequest  baseRequest);
+        /// <summary>
+        /// 修改用户
+        /// </summary>
+        /// <param name="pageRequest"></param>
+        /// <returns></returns>
+        Task<Result> ModifyUserAsync(ModifyUserResquest  modifyUserResquest);
     }
 }
