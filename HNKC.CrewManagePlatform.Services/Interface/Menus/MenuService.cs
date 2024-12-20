@@ -107,6 +107,7 @@ namespace HNKC.CrewManagePlatform.Services.Menus
                 Sort = userMenuRequest.Sort,
                 Url = userMenuRequest.Url,
                 Remark = userMenuRequest.Remark,
+                MenuCode=userMenuRequest.MenuCode,
             };
             RoleMenu roleMenu = new RoleMenu()
             {
