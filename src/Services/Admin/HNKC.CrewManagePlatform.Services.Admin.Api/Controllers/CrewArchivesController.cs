@@ -1,4 +1,5 @@
 ﻿using HNKC.CrewManagePlatform.Models.CommonResult;
+using HNKC.CrewManagePlatform.Models.Dtos;
 using HNKC.CrewManagePlatform.Models.Dtos.CrewArchives;
 using HNKC.CrewManagePlatform.Services.Interface.CrewArchives;
 using Microsoft.AspNetCore.Mvc;
@@ -27,8 +28,8 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api.Controllers
         /// </summary>
         /// <param name="requestBody"></param>
         /// <returns></returns>
-        [HttpGet("SearchCrewArchives")]
-        public async Task<Result> SearchCrewArchivesAsync([FromQuery] SearchCrewArchivesRequest requestBody)
+        [HttpPost("SearchCrewArchives")]
+        public async Task<ResponsePageResult<List<SearchCrewArchivesResponse>>> SearchCrewArchivesAsync([FromBody] SearchCrewArchivesRequest requestBody)
         {
             return await _service.SearchCrewArchivesAsync(requestBody);
         }
@@ -37,7 +38,7 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet("CrewArchivesCount")]
-        public async Task<Result> CrewArchivesCountAsync()
+        public async Task<ResponseResult<CrewArchivesResponse>> CrewArchivesCountAsync()
         {
             return await _service.CrewArchivesCountAsync();
         }
@@ -47,7 +48,7 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api.Controllers
         /// <param name="requestBody"></param>
         /// <returns></returns>
         [HttpPost("SaveData")]
-        public async Task<Result> SaveDataAsync([FromBody] CrewArchivesRequest requestBody)
+        public async Task<ResponseResult<bool>> SaveDataAsync([FromBody] CrewArchivesRequest requestBody)
         {
             return await _service.SaveDataAsync(requestBody);
         }
@@ -59,11 +60,102 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api.Controllers
         /// <param name="type"></param>
         /// <returns></returns>
         [HttpGet("GetDropDownList")]
-        public async Task<Result> GetDropDownListAsync([FromQuery] int type)
+        public async Task<ResponseResult<List<DropDownResponse>>> GetDropDownListAsync([FromQuery] int type)
         {
             return await _service.GetDropDownListAsync(type);
         }
-
+        #endregion
+        #region 详情
+        /// <summary>
+        /// 获取基本详情
+        /// </summary>
+        /// <param name="bId"></param>
+        /// <returns></returns>
+        [HttpGet("BasesicDetails")]
+        public async Task<ResponseResult<BaseInfoDetails>> GetBasesicDetailsAsync([FromQuery] string bId)
+        {
+            return await _service.GetBasesicDetailsAsync(bId);
+        }
+        /// <summary>
+        /// 获取劳务详情
+        /// </summary>
+        /// <param name="bId"></param>
+        /// <returns></returns>
+        [HttpGet("GetLaborServicesDetails")]
+        public async Task<ResponseResult<LaborServicesInfoDetails>> GetLaborServicesDetailsAsync([FromQuery] string bId)
+        {
+            return await _service.GetLaborServicesDetailsAsync(bId);
+        }
+        /// <summary>
+        /// 获取适任证书详情
+        /// </summary>
+        /// <param name="bId"></param>
+        /// <returns></returns>
+        [HttpGet("GetCertificateOfCompetencyDetails")]
+        public async Task<ResponseResult<CertificateOfCompetencyDetails>> GetCertificateOfCompetencyDetailsAsync([FromQuery] string bId)
+        {
+            return await _service.GetCertificateOfCompetencyDetailsAsync(bId);
+        }
+        /// <summary>
+        /// 获取学历详情
+        /// </summary>
+        /// <param name="bId"></param>
+        /// <returns></returns>
+        [HttpGet("GetEducationalBackgroundDetails")]
+        public async Task<ResponseResult<EducationalBackgroundDetails>> GetEducationalBackgroundDetailsAsync([FromQuery] string bId)
+        {
+            return await _service.GetEducationalBackgroundDetailsAsync(bId);
+        }
+        /// <summary>
+        /// 获取职务晋升详情
+        /// </summary>
+        /// <param name="bId"></param>
+        /// <returns></returns>
+        [HttpGet("GetPromotionDetails")]
+        public async Task<ResponseResult<PromotionDetails>> GetPromotionDetailsAsync([FromQuery] string bId)
+        {
+            return await _service.GetPromotionDetailsAsync(bId);
+        }
+        /// <summary>
+        /// 获取任职船舶详情
+        /// </summary>
+        /// <param name="bId"></param>
+        /// <returns></returns>
+        [HttpGet("GetWorkShipDetails")]
+        public async Task<ResponseResult<WorkShipDetails>> GetWorkShipDetailsAsync([FromQuery] string bId)
+        {
+            return await _service.GetWorkShipDetailsAsync(bId);
+        }
+        /// <summary>
+        /// 获取培训记录详情
+        /// </summary>
+        /// <param name="bId"></param>
+        /// <returns></returns>
+        [HttpGet("GetTrainingRecordDetails")]
+        public async Task<ResponseResult<TrainingRecordDetails>> GetTrainingRecordDetailsAsync([FromQuery] string bId)
+        {
+            return await _service.GetTrainingRecordDetailsAsync(bId);
+        }
+        /// <summary>
+        /// 获取年度考核详情
+        /// </summary>
+        /// <param name="bId"></param>
+        /// <returns></returns>
+        [HttpGet("GetYearCheckDetail")]
+        public async Task<ResponseResult<YearCheckDetails>> GetYearCheckDetailAsync([FromQuery] string bId)
+        {
+            return await _service.GetYearCheckDetailAsync(bId);
+        }
+        /// <summary>
+        /// 获取年度考核详情
+        /// </summary>
+        /// <param name="bId"></param>
+        /// <returns></returns>
+        [HttpGet("GetNotesDetails")]
+        public async Task<ResponseResult<NotesDetails>> GetNotesDetailsAsync([FromQuery] string bId)
+        {
+            return await _service.GetNotesDetailsAsync(bId);
+        }
         #endregion
     }
 }

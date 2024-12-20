@@ -18,49 +18,43 @@ namespace HNKC.CrewManagePlatform.SqlSugars.Models
         /// <summary>
         /// 工号
         /// </summary>
-        [SugarColumn(Length = 32, ColumnDescription = "工号")]
+        [SugarColumn(Length = 36, ColumnDescription = "工号")]
         public string? WorkNumber { get; set; }
 
         /// <summary>
         /// 所属船舶（部门）OID
         /// </summary>
-        [SugarColumn(Length = 32, ColumnDescription = "所属船舶（部门）OID")]
+        [SugarColumn(Length = 36, ColumnDescription = "所属船舶（部门）OID")]
         public string? Oid { get; set; }
 
         /// <summary>
         /// 职务ID
         /// </summary>
-        [SugarColumn(Length = 32, ColumnDescription = "职务ID")]
+        [SugarColumn(Length = 36, ColumnDescription = "职务ID")]
         public string? JobId { get; set; }
-
-        /// <summary>
-        /// 用工形式
-        /// </summary>
-        [SugarColumn(Length = 32, ColumnDescription = "用工形式")]
-        public string? EmploymentId { get; set; }
 
         /// <summary>
         /// 手机号
         /// </summary>
-        [SugarColumn(Length = 32, ColumnDescription = "手机号")]
+        [SugarColumn(Length = 36, ColumnDescription = "手机号")]
         public string? Phone { get; set; }
 
         /// <summary>
         /// 密码
         /// </summary>
-        [SugarColumn(Length = 32, ColumnDescription = "密码")]
+        [SugarColumn(Length = 36, ColumnDescription = "密码")]
         public string? Password { get; set; }
 
         /// <summary>
         /// 身份证号
         /// </summary>
-        [SugarColumn(Length = 32, ColumnDescription = "身份证号")]
+        [SugarColumn(Length = 36, ColumnDescription = "身份证号")]
         public string? CardId { get; set; }
 
         /// <summary>
         /// 政治面貌
         /// </summary>
-        [SugarColumn(Length = 32, ColumnDescription = "政治面貌")]
+        [SugarColumn(Length = 36, ColumnDescription = "政治面貌")]
         public string? PoliticalStatus { get; set; }
         /// <summary>
         /// 船员照片 ,拼接文件
@@ -68,7 +62,7 @@ namespace HNKC.CrewManagePlatform.SqlSugars.Models
         [SugarColumn(Length = 100, ColumnDescription = "船员照片")]
         public string? CrewPhoto { get; set; }
         /// <summary>
-        /// 身份证扫描件 ,拼接文件
+        /// 身份证扫描件
         /// </summary>
         [SugarColumn(ColumnDataType = "text", ColumnDescription = "身份证扫描件")]
         public string? IdCardScans { get; set; }
@@ -93,40 +87,10 @@ namespace HNKC.CrewManagePlatform.SqlSugars.Models
         [SugarColumn(Length = 50, ColumnDescription = "民族")]
         public string? Nation { get; set; }
         /// <summary>
-        /// 入职日期
-        /// </summary>
-        [SugarColumn(ColumnDataType = "datetime", ColumnDescription = "入职日期")]
-        public DateTime? EntryTime { get; set; }
-        /// <summary>
-        /// 入职材料 ,拼接文件
-        /// </summary>
-        [SugarColumn(ColumnDataType = "text", ColumnDescription = "入职材料")]
-        public string? EntryScans { get; set; }
-        /// <summary>
-        /// 劳务公司
-        /// </summary>
-        [SugarColumn(Length = 256, ColumnDescription = "劳务公司")]
-        public string? LaborCompany { get; set; }
-        /// <summary>
-        /// 合同主体
-        /// </summary>
-        [SugarColumn(Length = 200, ColumnDescription = "合同主体")]
-        public string? ContarctMain { get; set; }
-        /// <summary>
         /// 合同类型
         /// </summary>
         [SugarColumn(ColumnDataType = "int", ColumnDescription = "合同类型", DefaultValue = "0")]
         public ContractEnum ContarctType { get; set; }
-        /// <summary>
-        /// 开始时间
-        /// </summary>
-        [SugarColumn(ColumnDataType = "datetime", ColumnDescription = "开始时间")]
-        public DateTime? StartTime { get; set; }
-        /// <summary>
-        /// 结束时间
-        /// </summary>
-        [SugarColumn(ColumnDataType = "datetime", ColumnDescription = "结束时间")]
-        public DateTime? EndTime { get; set; }
         /// <summary>
         /// 船舶类型
         /// </summary>

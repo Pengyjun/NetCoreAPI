@@ -8,6 +8,22 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
     public class SearchCrewArchivesRequest : PageRequest
     {
         /// <summary>
+        /// 身份证
+        /// </summary>
+        public string? CardId { get; set; }
+        /// <summary>
+        /// 职工号
+        /// </summary>
+        public string? WorkNumber { get; set; }
+        /// <summary>
+        /// 用户名
+        /// </summary>
+        public string? Name { get; set; }
+        /// <summary>
+        /// 手机号
+        /// </summary>
+        public string? Phone { get; set; }
+        /// <summary>
         /// 所在船舶
         /// </summary>
         public string? OnBoard { get; set; }
@@ -40,7 +56,7 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// </summary>
         public List<string>? SPosition { get; set; }
         /// <summary>
-        /// 培训证书 true代表选中
+        /// 培训合格证书 true代表选中
         /// </summary>
         public bool TrainingCertificate { get; set; }
         /// <summary>
@@ -75,6 +91,18 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// Z09
         /// </summary>
         public bool Z09Effective { get; set; }
+        /// <summary>
+        /// 海员证
+        /// </summary>
+        public bool SeamanCertificate { get; set; }
+        /// <summary>
+        /// 护照
+        /// </summary>
+        public bool PassportCertificate { get; set; }
+        /// <summary>
+        /// 健康证
+        /// </summary>
+        public bool HealthCertificate { get; set; }
         /// <summary>
         /// 技能证书
         /// </summary>

@@ -71,7 +71,7 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api.Controllers
         [ApiExplorerSettings(IgnoreApi = true)]
         public async Task<Result> SingleFileUpdateAsync(IFormFile file, string defaultAllowFileType = "DefaultAllowFileType")
         {
-            UploadResponseDto responseAjaxResult = new();
+            UploadResponse responseAjaxResult = new();
             if (file.Length == 0)
             {
                 return Result.Fail("找不到文件");
@@ -95,7 +95,7 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api.Controllers
             {
                 await file.CopyToAsync(stream);
             }
-            var uploadResponseDto = new UploadResponseDto()
+            var uploadResponseDto = new UploadResponse()
             {
                 Id = newFileName,
                 Name = newFileName + suffixName,

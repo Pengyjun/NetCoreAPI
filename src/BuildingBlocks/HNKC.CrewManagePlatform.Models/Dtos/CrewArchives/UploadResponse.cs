@@ -3,7 +3,7 @@
     /// <summary>
     /// 上传文件响应dto
     /// </summary>
-    public class UploadResponseDto
+    public class UploadResponse
     {
         /// <summary>
         /// 文件ID

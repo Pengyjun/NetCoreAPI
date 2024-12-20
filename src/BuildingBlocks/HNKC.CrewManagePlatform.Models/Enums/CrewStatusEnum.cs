@@ -31,6 +31,11 @@ namespace HNKC.CrewManagePlatform.Models.Enums
         /// 休假
         /// </summary>
         [Description("休假")]
-        XiuJia = 4
+        XiuJia = 4,
+        /// <summary>
+        /// 待岗
+        /// </summary>
+        [Description("待岗")]
+        DaiGang = 4
     }
 }
