@@ -5,7 +5,6 @@ using HNKC.CrewManagePlatform.Models.Enums;
 using HNKC.CrewManagePlatform.SqlSugars.Models;
 using HNKC.CrewManagePlatform.Utils;
 using SqlSugar;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
 
