@@ -39,5 +39,10 @@ namespace HNKC.CrewManagePlatform.SqlSugars.Models
         /// </summary>
         [SugarColumn(ColumnDataType = "datetime", ColumnDescription = "休假日期")]
         public DateTime? HolidayTime { get; set; }
+        /// <summary>
+        /// 关联键
+        /// </summary>
+        [SugarColumn(Length = 36, ColumnDescription = "关联键")]
+        public Guid WorkShipId { get; set; }
     }
 }

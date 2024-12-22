@@ -6,7 +6,7 @@
     public class UploadResponse
     {
         /// <summary>
-        /// 文件ID
+        /// 主键ID
         /// </summary>
         public long Id { get; set; }
         /// <summary>
@@ -33,5 +33,9 @@
         /// 业务id
         /// </summary>
         public Guid BId { get; set; }
+        /// <summary>
+        /// 文件id
+        /// </summary>
+        public Guid FileId { get; set; }
     }
 }

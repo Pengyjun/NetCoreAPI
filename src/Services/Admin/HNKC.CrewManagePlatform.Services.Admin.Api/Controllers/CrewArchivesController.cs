@@ -192,16 +192,6 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api.Controllers
         {
             return await SingleFileUpdateAsync(file, "DefaultAllowFileType");
         }
-        /// <summary>
-        /// 保存文件
-        /// </summary>
-        /// <param name="requestBody"></param>
-        /// <returns></returns>
-        [HttpPost("SaveFilesInfo")]
-        public async Task<ResponseAjaxResult<bool>> SaveFilesInfoAsync([FromBody] List<UploadResponse> requestBody)
-        {
-            return await _service.InsertFileAsync(requestBody);
-        }
 
         #endregion
     }

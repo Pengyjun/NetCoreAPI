@@ -28,6 +28,11 @@ namespace HNKC.CrewManagePlatform.SqlSugars.Models
         /// 扫描件 
         /// </summary>
         [SugarColumn(ColumnDataType = "text", ColumnDescription = "扫描件")]
-        public string? SpecialEquipsScans { get; set; }
+        public Guid? SpecialEquipsScans { get; set; }
+        /// <summary>
+        /// 关联键
+        /// </summary>
+        [SugarColumn(Length = 36, ColumnDescription = "关联键")]
+        public Guid SpecialEquipId { get; set; }
     }
 }

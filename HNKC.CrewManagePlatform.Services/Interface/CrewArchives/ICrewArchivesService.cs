@@ -39,12 +39,6 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
         /// <returns></returns>
         Task<ResponseAjaxResult<bool>> SaveNotesAsync(NotesRequest requestBody);
         /// <summary>
-        /// 保存文件
-        /// </summary>
-        /// <param name="requestBody"></param>
-        /// <returns></returns>
-        Task<ResponseAjaxResult<bool>> InsertFileAsync(List<UploadResponse> requestBody);
-        /// <summary>
         /// 船员档案列表
         /// </summary>
         /// <param name="requestBody"></param>

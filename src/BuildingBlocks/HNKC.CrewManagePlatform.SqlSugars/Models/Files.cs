@@ -19,6 +19,11 @@ namespace HNKC.CrewManagePlatform.SqlSugars.Models
         [SugarColumn(Length = 100, ColumnDescription = "原始文件名称")]
         public string? OriginName { get; set; }
         /// <summary>
+        /// 文件id
+        /// </summary>
+        [SugarColumn(Length = 36, ColumnDescription = "文件id")]
+        public Guid FileId { get; set; }
+        /// <summary>
         /// 后缀名称
         /// </summary>
         [SugarColumn(Length = 50, ColumnDescription = "后缀名称")]
