@@ -2,6 +2,7 @@
 using HNKC.CrewManagePlatform.Models.CommonRequest;
 using HNKC.CrewManagePlatform.Models.CommonResult;
 using HNKC.CrewManagePlatform.Models.Dtos;
+using HNKC.CrewManagePlatform.Models.Dtos.Role;
 using HNKC.CrewManagePlatform.Models.Dtos.UserManager;
 using HNKC.CrewManagePlatform.Models.Enums;
 using HNKC.CrewManagePlatform.Services.Interface.CurrentUserService;
@@ -40,52 +41,102 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CurrentUser
         /// <returns></returns>
         public async Task<Result> UserLoginAsync(UserLoginRequest userLoginRequest)
         {
-            //var currentUser = GlobalCurrentUser;
             var token = string.Empty;
             var secretKey = AppsettingsHelper.GetValue("MD5SecretKey");
             var pwd = $"{secretKey}{userLoginRequest.Password}".ToMd5();
-            var userInfo = await dbContext.Queryable<User>().Where(x => x.IsDelete == 1 && x.WorkNumber == userLoginRequest.WorkNumber
+            //用户信息
+            var userInfo = await dbContext.Queryable<User>().Where(x => x.IsDelete == 1 && x.Phone == userLoginRequest.Phone
             && x.Password == pwd).FirstAsync();
             if (userInfo != null)
             {
-                var instutionInfo = await dbContext.Queryable<Institution>().Where(x => x.IsDelete == 1 && x.Oid == userInfo.Oid
-                 ).FirstAsync();
-                if (instutionInfo != null)
+                var instutionBusinessId = await dbContext.Queryable<Institution>().Where(x => x.IsDelete == 1 && x.Oid == userInfo.Oid
+              ).Select(x => x.BusinessId).FirstAsync();
+                if (instutionBusinessId == Guid.Empty)
                 {
-                    var userInstitution = await dbContext.Queryable<UserInstitution>().FirstAsync(x => x.IsDelete == 1 && x.UserBusinessId == userInfo.BusinessId && x.InstitutionBusinessId == instutionInfo.BusinessId);
-                    if (userInstitution != null)
-                    {
-                        var institutionRoleInfo = await dbContext.Queryable<InstitutionRole>().Where(x => x.IsDelete == 1 && x.InstitutionBusinessId == userInstitution.InstitutionBusinessId).FirstAsync();
-                        if (institutionRoleInfo == null)
-                        {
-                            return Result.Fail("登录失败");
-                        }
-                        var roltInfo = await dbContext.Queryable<HNKC.CrewManagePlatform.SqlSugars.Models.Role>().Where(x => x.IsDelete == 1 && x.BusinessId == institutionRoleInfo.RoleBusinessId).FirstAsync();
+                    return Result.Fail("登录失败", (int)ResponseHttpCode.LoginFail);
+                }
+                //存在多个角色时候  选择第一个创建的角色为默认角色
+                var userInstitutionList = await dbContext.Queryable<UserInstitution>().Where(x => x.IsDelete == 1 && x.UserBusinessId == userInfo.BusinessId && x.InstitutionBusinessId == instutionBusinessId).OrderBy(x => x.Created).ToListAsync();
+                if (userInstitutionList.Count == 0)
+                {
+                    return Result.Fail("登录失败", (int)ResponseHttpCode.LoginFail);
+                }
+                var roleBuinessId = userInstitutionList.Select(x => x.BusinessId).ToList();
+                //用户机构角色信息
+                var userInstitution = await dbContext.Queryable<InstitutionRole>().Where(x => x.IsDelete == 1 && roleBuinessId.Contains(x.BusinessId)).ToListAsync();
+                //机构信息
+                var institutionBusinessId = userInstitution.Select(x => x.InstitutionBusinessId).ToList();
+                var institution = await dbContext.Queryable<Institution>().Where(x => x.IsDelete == 1 && institutionBusinessId.Contains(x.BusinessId)).ToListAsync();
+                if (userInstitution.Count == 0)
+                {
+                    return Result.Fail("登录失败",(int)ResponseHttpCode.LoginFail);
+                }
+                var roleBusinessId = userInstitution.Select(x => x.BusinessId).ToList();
+                if (roleBusinessId.Count == 0)
+                {
+                    return Result.Fail("登录失败", (int)ResponseHttpCode.LoginFail);
+                }
+                //默认选择第一个角色登录
+                var firstRole = userInstitution.OrderBy(x => x.Created).FirstOrDefault();
+                //角色信息
+                var roleList = await dbContext.Queryable<HNKC.CrewManagePlatform.SqlSugars.Models.Role>().Where(x => x.IsDelete == 1 && roleBusinessId.Contains(x.BusinessId)).ToListAsync();
 
-                        Claim[] claims = new Claim[]
-                       {
-                          new Claim("Id",userInfo.Id.ToString()),
-                          new Claim("IsAdmin",roltInfo.IsAdmin.ToString()),
-                          new Claim("BId",userInfo.BusinessId.ToString()),
-                          new Claim("WorkNumber",userInfo.WorkNumber?.ToString()),
-                          new Claim("Name",userInfo.Name?.ToString()),
-                          new Claim("Oid",userInfo.Oid?.ToString()),
-                          new Claim("BInstitutionId",instutionInfo.BusinessId.ToString()),
-                          new Claim("Phone",userInfo.Phone?.ToString()),
-                          new Claim("RoleBusinessId",institutionRoleInfo.RoleBusinessId.ToString()),
-                       };
-                        var expores = int.Parse(AppsettingsHelper.GetValue("AccessToken:Expires"));
-                        token = jwtService.CreateAccessToken(claims, expores);
-                        //存入Redis
-                        RedisUtil.Instance.Set(userInfo.Id.ToString(), token, expores);
-                        return Result.Success(data: token);
+
+                if (roleList.Count > 0)
+                {
+
+                    UserLoginResponse userLoginResponse = new UserLoginResponse()
+                    {
+                        BId = userInfo.BusinessId,
+                        Name = userInfo.Name,
+                        WorkNumber = userInfo.WorkNumber,
+                        RoleList = new List<Models.Dtos.Role.RoleResponse>()
+                    };
+                    foreach (var item in userInstitution)
+                    {
+                        var roleInfo = roleList.Where(x => x.BusinessId == item.BusinessId).FirstOrDefault();
+                        var institutionInfo = institution.Where(x => x.BusinessId == item.InstitutionBusinessId).FirstOrDefault();
+                        RoleResponse role = new RoleResponse()
+                        {
+                            InstitutionBusinessId = item.InstitutionBusinessId,
+                            RoleBusinessId = item.BusinessId,
+                            IsAdmin = roleInfo?.IsAdmin,
+                            IsApprove = roleInfo?.IsApprove,
+                            Name = roleInfo?.Name,
+                            Oid = institutionInfo?.Oid
+                        };
+                        userLoginResponse.RoleList.Add(role);
+                    }
+                    var firstRoleLogin = userLoginResponse.RoleList.Where(x => x.RoleBusinessId == firstRole.BusinessId).FirstOrDefault();
+                    //切换角色
+                    if (userLoginRequest.RoleBusinessId.HasValue)
+                    {
+                        firstRoleLogin = userLoginResponse.RoleList.Where(x => x.RoleBusinessId == userLoginRequest.RoleBusinessId.Value).FirstOrDefault();
                     }
 
+                    //默认存第一个角色信息
+                    Claim[] claims = new Claim[]
+                    {
+                        new Claim("Id",userInfo.Id.ToString()),
+                        new Claim("IsAdmin",firstRoleLogin.IsAdmin.ToString()),
+                        new Claim("BId",userInfo.BusinessId.ToString()),
+                        new Claim("WorkNumber",userInfo.WorkNumber?.ToString()),
+                        new Claim("Name",userInfo.Name?.ToString()),
+                        new Claim("Oid",userInfo.Oid?.ToString()),
+                        new Claim("BInstitutionId",firstRoleLogin.InstitutionBusinessId.ToString()),
+                        new Claim("Phone",userInfo.Phone?.ToString()),
+                        new Claim("RoleBusinessId",firstRoleLogin.RoleBusinessId.ToString()),
+                    };
+                    var expores = int.Parse(AppsettingsHelper.GetValue("AccessToken:Expires"));
+                    token = jwtService.CreateAccessToken(claims, expores);
+                    userLoginResponse.Token = token;
+                    //存入Redis
+                    RedisUtil.Instance.Set(userInfo.Id.ToString(), token, expores);
+                    return Result.Success(data: userLoginResponse);
                 }
             }
-            return Result.Fail("登录失败");
+            return Result.Fail("登录失败", (int)ResponseHttpCode.LoginFail);
             //HttpContentAccessFactory.Current.Response.Headers["Authorization"] = token;
-
         }
 
         /// <summary>

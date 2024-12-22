@@ -54,5 +54,9 @@ namespace HNKC.CrewManagePlatform.Models.Enums
         /// 数据已存在
         /// </summary>
         DataExist = 10006,
+        /// <summary>
+        /// 登录失败
+        /// </summary>
+        LoginFail = 10007,
     }
 }
