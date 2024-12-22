@@ -489,6 +489,10 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
     public class QualificationForDetails
     {
         /// <summary>
+        /// 主键
+        /// </summary>
+        public Guid Id { get; set; }
+        /// <summary>
         /// 学历类型：全日制...
         /// </summary>
         public string? QualificationType { get; set; }

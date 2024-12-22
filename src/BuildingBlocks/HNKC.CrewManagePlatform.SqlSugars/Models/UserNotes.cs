@@ -18,5 +18,10 @@ namespace HNKC.CrewManagePlatform.SqlSugars.Models
         /// </summary>
         [SugarColumn(Length = 36, ColumnDescription = "备注信息")]
         public string? WritedUserId { get; set; }
+        /// <summary>
+        /// 关联键
+        /// </summary>
+        [SugarColumn(Length = 36, ColumnDescription = "关联键")]
+        public Guid UserNoteId { get; set; }
     }
 }

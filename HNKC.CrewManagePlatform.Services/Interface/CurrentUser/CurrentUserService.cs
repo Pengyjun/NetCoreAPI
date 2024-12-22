@@ -39,7 +39,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CurrentUser
                 var userList=HttpContentAccessFactory.Current.User?.Claims.ToList();
                 var id = userList?.Where(x => x.Type == "Id").Select(x => x.Value).FirstOrDefault();
                 var token=await RedisUtil.Instance.GetAsync(id);
-                if (!string.IsNullOrWhiteSpace(token) && token.Trim().Equals(requestToken.ToString().Replace("Bearer","").Trim()))
+                if (!string.IsNullOrWhiteSpace(token) && token.Trim().Equals(requestToken.ToString().Replace("Bearer", "").Trim()))
                 {
                     var workNumber = userList?.Where(x => x.Type == "WorkNumber").Select(x => x.Value).FirstOrDefault();
                     var bId = userList?.Where(x => x.Type == "BId").Select(x => x.Value).FirstOrDefault();
@@ -55,9 +55,12 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CurrentUser
                     userInfo.Oid = oid;
                     userInfo.RoleBusinessId = Guid.Parse(roleBusinessId);
                     userInfo.WorkNumber = workNumber;
-                    userInfo.Phone= phone;
-                    userInfo.IsAdmin= isAdmin.ObjToBool();
+                    userInfo.Phone = phone;
+                    userInfo.IsAdmin = isAdmin.ObjToBool();
                     userInfo.InstitutionBusiessId = Guid.Parse(bInstitutionId);
+                }
+                else {
+                    throw new UnauthorizedAccessException("您已在其他终端登录请重新登录");
                 }
             }
             return userInfo;
