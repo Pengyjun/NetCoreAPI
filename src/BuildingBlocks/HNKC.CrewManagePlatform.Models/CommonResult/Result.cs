@@ -169,7 +169,7 @@ namespace HNKC.CrewManagePlatform.Models.CommonResult
     /// 
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public class ResponseResult<T>
+    public class ResponseAjaxResult<T>
     {
         /// <summary>
         /// 接口描述
@@ -219,11 +219,25 @@ namespace HNKC.CrewManagePlatform.Models.CommonResult
         /// <param name="message"></param>
         /// <param name="count"></param>
         /// <returns></returns>
-        public ResponseResult<T> SuccessResult(T data, int count = 1, string? message = null)
+        public ResponseAjaxResult<T> SuccessResult(T data, int count = 1, string? message = null)
         {
             Count = count;
             Data = data;
             Success(message, Code = HttpStatusCode.OK);
+            return this;
+        }
+        /// <summary>
+        /// 接口响应成功 操作失败
+        /// </summary>
+        /// <param name="data"></param>
+        /// <param name="count"></param>
+        /// <param name="message"></param>
+        /// <returns></returns>
+        public ResponseAjaxResult<T> FailResult(T data, string? message = null)
+        {
+            Count = 0;
+            Data = data;
+            Fail(message);
             return this;
         }
     }

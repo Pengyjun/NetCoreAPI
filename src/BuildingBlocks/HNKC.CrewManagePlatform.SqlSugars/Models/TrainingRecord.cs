@@ -22,6 +22,6 @@ namespace HNKC.CrewManagePlatform.SqlSugars.Models
         /// 培训文件
         /// </summary>
         [SugarColumn(ColumnDataType = "text", ColumnDescription = "培训文件")]
-        public string? TrainingScan { get; set; }
+        public Guid? TrainingScan { get; set; }
     }
 }

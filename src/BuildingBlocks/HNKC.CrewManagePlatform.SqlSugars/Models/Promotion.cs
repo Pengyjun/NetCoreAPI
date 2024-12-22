@@ -24,10 +24,10 @@ namespace HNKC.CrewManagePlatform.SqlSugars.Models
         [SugarColumn(ColumnDataType = "datetime", ColumnDescription = "调动时间")]
         public DateTime? PromotionTime { get; set; }
         /// <summary>
-        /// 调单文件 ,拼接
+        /// 调单文件 
         /// </summary>
         [SugarColumn(ColumnDataType = "text", ColumnDescription = "调单文件")]
-        public string? PromotionScan { get; set; }
+        public Guid? PromotionScan { get; set; }
 
     }
 }

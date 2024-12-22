@@ -4,6 +4,7 @@ using HNKC.CrewManagePlatform.Models.Dtos.CrewArchives;
 using HNKC.CrewManagePlatform.Services.Interface.CurrentUserService;
 using HNKC.CrewManagePlatform.Utils;
 using Microsoft.AspNetCore.Mvc;
+using SqlSugar;
 using UtilsSharp;
 
 namespace HNKC.CrewManagePlatform.Services.Admin.Api.Controllers
@@ -102,6 +103,8 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api.Controllers
                 OriginName = file.FileName,
                 SuffixName = suffixName,
                 FileSize = fileSize,
+                FileType = file.ContentType,
+                BId = GuidUtil.Next()
             };
             return Result.Success(uploadResponseDto, "上传成功");
         }

@@ -131,7 +131,7 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// </summary>
         public string? PositionOnBoard { get; set; }
         /// <summary>
-        /// 船员照片 ,拼接
+        /// 船员照片 
         /// </summary>
         public string? PhotoScans { get; set; }
         #endregion
@@ -522,10 +522,9 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// </summary>
         public DateTime? EndTime { get; set; }
         /// <summary>
-        /// 证书 ,拼接
+        /// 证书 
         /// </summary>
-        public string? QualificationScans { get; set; }
-        //public List<FileInfos>? QualificationScans { get; set; }
+        public Guid? QualificationScans { get; set; }
     }
     /// <summary>
     /// 职务晋升
@@ -606,15 +605,7 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// <summary>
         /// 在船时间
         /// </summary>
-        public DateTime? OnBoardTime { get; set; }
-        ///// <summary>
-        ///// 在船天数
-        ///// </summary>
-        //public int OnBoardDay { get; set; }
-        ///// <summary>
-        ///// 休假天数
-        ///// </summary>
-        //public int Holiday { get; set; }
+        public DateTime OnBoardTime { get; set; }
     }
     /// <summary>
     /// 培训记录

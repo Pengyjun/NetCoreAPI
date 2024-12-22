@@ -20,9 +20,9 @@ namespace HNKC.CrewManagePlatform.SqlSugars.Models
         [SugarColumn(ColumnDataType = "datetime", ColumnDescription = "考核模式")]
         public DateTime? TrainingTime { get; set; }
         /// <summary>
-        /// 考核文件 ,拼接
+        /// 考核文件
         /// </summary>
         [SugarColumn(ColumnDataType = "text", ColumnDescription = "考核文件")]
-        public string? TrainingScan { get; set; }
+        public Guid? TrainingScan { get; set; }
     }
 }
