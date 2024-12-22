@@ -36,6 +36,10 @@
         /// <summary>
         /// 文件id
         /// </summary>
-        public Guid FileId { get; set; }
+        public Guid? FileId { get; set; }
+        /// <summary>
+        /// 用户id
+        /// </summary>
+        public Guid UserId { get; set; }
     }
 }

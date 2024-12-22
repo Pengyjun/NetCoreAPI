@@ -201,7 +201,7 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// <summary>
         /// 主键
         /// </summary>
-        public string? Id { get; set; }
+        public Guid? Bid { get; set; }
         /// <summary>
         /// 名称
         /// </summary>
@@ -436,7 +436,7 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// <summary>
         /// 主键
         /// </summary>
-        public string? Id { get; set; }
+        public Guid BId { get; set; }
         /// <summary>
         /// 证书类型
         /// </summary>
@@ -458,7 +458,7 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// <summary>
         /// 主键
         /// </summary>
-        public string? Id { get; set; }
+        public Guid BId { get; set; }
         /// <summary>
         /// 证书类型
         /// </summary>
@@ -488,7 +488,7 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// <summary>
         /// 主键
         /// </summary>
-        public string? Id { get; set; }
+        public Guid BId { get; set; }
         /// <summary>
         /// 国家
         /// </summary>
@@ -520,7 +520,7 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// <summary>
         /// 主键
         /// </summary>
-        public string? Id { get; set; }
+        public Guid BId { get; set; }
         /// <summary>
         /// 学历类型：全日制...
         /// </summary>
@@ -572,7 +572,7 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// <summary>
         /// 主键
         /// </summary>
-        public string? Id { get; set; }
+        public Guid BId { get; set; }
         /// <summary>
         /// 所在船舶
         /// </summary>
@@ -612,7 +612,7 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// <summary>
         /// 主键
         /// </summary>
-        public string? Id { get; set; }
+        public Guid BId { get; set; }
         /// <summary>
         /// 船舶名称
         /// </summary>
@@ -656,7 +656,7 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// <summary>
         /// 主键
         /// </summary>
-        public string? Id { get; set; }
+        public Guid BId { get; set; }
         /// <summary>
         /// 培训类型：安全培训...
         /// </summary>
@@ -692,7 +692,7 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// <summary>
         /// 主键
         /// </summary>
-        public string? Id { get; set; }
+        public Guid BId { get; set; }
         /// <summary>
         /// 考核结果：优秀...
         /// </summary>

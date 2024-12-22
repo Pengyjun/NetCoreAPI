@@ -45,7 +45,7 @@ namespace HNKC.CrewManagePlatform.Models.Dtos
         /// <summary>
         /// 机构业务ID
         /// </summary>
-       public Guid? InstitutionBusiessId { get; set; }
+        public Guid? InstitutionBusiessId { get; set; }
 
         /// <summary>
         /// 角色ID
@@ -55,5 +55,9 @@ namespace HNKC.CrewManagePlatform.Models.Dtos
         /// 业务角色ID
         /// </summary>
         public Guid? RoleBusinessId { get; set; }
+
+
+
+
     }
 }

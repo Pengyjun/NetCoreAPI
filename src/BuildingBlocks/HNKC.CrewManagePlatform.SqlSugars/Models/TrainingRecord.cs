@@ -14,6 +14,11 @@ namespace HNKC.CrewManagePlatform.SqlSugars.Models
         [SugarColumn(Length = 50, ColumnDescription = "联系方式")]
         public string? TrainingType { get; set; }
         /// <summary>
+        /// 关联键
+        /// </summary>
+        [SugarColumn(Length = 36, ColumnDescription = "关联键")]
+        public Guid TrainingId { get; set; }
+        /// <summary>
         /// 培训日期
         /// </summary>
         [SugarColumn(ColumnDataType = "datetime", ColumnDescription = "培训日期")]
@@ -23,10 +28,5 @@ namespace HNKC.CrewManagePlatform.SqlSugars.Models
         /// </summary>
         [SugarColumn(ColumnDataType = "text", ColumnDescription = "培训文件")]
         public Guid? TrainingScan { get; set; }
-        /// <summary>
-        /// 关联键
-        /// </summary>
-        [SugarColumn(Length = 36, ColumnDescription = "关联键")]
-        public Guid TrainingreCordId { get; set; }
     }
 }

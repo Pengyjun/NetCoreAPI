@@ -10,15 +10,19 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.UserManager
     public class UserLoginRequest
     {
         /// <summary>
-        /// 职工号
+        /// 手机号
         /// </summary>
         [Required(ErrorMessage ="账号不能为空")]
-        public string WorkNumber { get; set; }
+        public string? Phone { get; set; }
 
         /// <summary>
         /// 职工号
         /// </summary>
         [Required(ErrorMessage = "密码不能为空")]
-        public string Password { get; set; }
+        public string? Password { get; set; }
+        /// <summary>
+        /// 角色业务ID
+        /// </summary>
+        public Guid? RoleBusinessId { get; set; }
     }
 }
