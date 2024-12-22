@@ -171,7 +171,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                     t.SpecialCertificate = spctabs;
                     t.SpecialCertificateName = spctabNames;
                     t.Age = CalculateAgeFromIdCard(t.CardId);
-                    t.OnStatus = ob == null ? CrewStatusEnum.Normal : ShipUserStatus(ob.WorkShipEndTime, ob.HolidayTime, t.DeleteReson);
+                    t.OnStatus = ob == null ? CrewStatusEnum.DaiGang : ShipUserStatus(ob.WorkShipEndTime, ob.HolidayTime, t.DeleteReson);
                     t.OnStatusName = ob == null ? null : EnumUtil.GetDescription(ShipUserStatus(ob.WorkShipEndTime, ob.HolidayTime, t.DeleteReson));
                 }
             }
