@@ -13,19 +13,37 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
         /// 首页占比 及 数量 统计
         /// </summary>
         /// <returns></returns>
-        Task<ResponseResult<CrewArchivesResponse>> CrewArchivesCountAsync();
+        Task<ResponseAjaxResult<CrewArchivesResponse>> CrewArchivesCountAsync();
         /// <summary>
         /// 获取基本下拉列表
         /// </summary>
         /// <param name="type"></param>
         /// <returns></returns>
-        Task<ResponseResult<List<DropDownResponse>>> GetDropDownListAsync(int type);
+        Task<ResponseAjaxResult<List<DropDownResponse>>> GetDropDownListAsync(int type);
         /// <summary>
-        /// 数据保存
+        /// 用户保存
         /// </summary>
         /// <param name="requestBody"></param>
         /// <returns></returns>
-        Task<ResponseResult<bool>> SaveDataAsync(CrewArchivesRequest requestBody);
+        Task<ResponseAjaxResult<bool>> SaveUserAsync(CrewArchivesRequest requestBody);
+        /// <summary>
+        /// 切换用户状态
+        /// </summary>
+        /// <param name="requestBody"></param>
+        /// <returns></returns>
+        Task<ResponseAjaxResult<bool>> ToggleUserStatusAsync(ToggleUserStatus requestBody);
+        /// <summary>
+        /// 保存备注
+        /// </summary>
+        /// <param name="requestBody"></param>
+        /// <returns></returns>
+        Task<ResponseAjaxResult<bool>> SaveNotesAsync(NotesRequest requestBody);
+        /// <summary>
+        /// 保存文件
+        /// </summary>
+        /// <param name="requestBody"></param>
+        /// <returns></returns>
+        Task<ResponseAjaxResult<bool>> InsertFileAsync(List<UploadResponse> requestBody);
         /// <summary>
         /// 船员档案列表
         /// </summary>
@@ -37,54 +55,54 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
         /// </summary>
         /// <param name="bId"></param>
         /// <returns></returns>
-        Task<ResponseResult<EducationalBackgroundDetails>> GetEducationalBackgroundDetailsAsync(string bId);
+        Task<ResponseAjaxResult<EducationalBackgroundDetails>> GetEducationalBackgroundDetailsAsync(string bId);
         /// <summary>
         /// 备注
         /// </summary>
         /// <param name="bId"></param>
         /// <returns></returns>
-        Task<ResponseResult<NotesDetails>> GetNotesDetailsAsync(string bId);
+        Task<ResponseAjaxResult<NotesDetails>> GetNotesDetailsAsync(string bId);
         /// <summary>
         /// 职务晋升
         /// </summary>
         /// <param name="bId"></param>
         /// <returns></returns>
-        Task<ResponseResult<PromotionDetails>> GetPromotionDetailsAsync(string bId);
+        Task<ResponseAjaxResult<PromotionDetails>> GetPromotionDetailsAsync(string bId);
         /// <summary>
         /// 培训记录
         /// </summary>
         /// <param name="bId"></param>
         /// <returns></returns>
-        Task<ResponseResult<TrainingRecordDetails>> GetTrainingRecordDetailsAsync(string bId);
+        Task<ResponseAjaxResult<TrainingRecordDetails>> GetTrainingRecordDetailsAsync(string bId);
         /// <summary>
         /// 任职船舶
         /// </summary>
         /// <param name="bId"></param>
         /// <returns></returns>
-        Task<ResponseResult<WorkShipDetails>> GetWorkShipDetailsAsync(string bId);
+        Task<ResponseAjaxResult<WorkShipDetails>> GetWorkShipDetailsAsync(string bId);
         /// <summary>
         /// 年度考核
         /// </summary>
         /// <param name="bId"></param>
         /// <returns></returns>
-        Task<ResponseResult<YearCheckDetails>> GetYearCheckDetailAsync(string bId);
+        Task<ResponseAjaxResult<YearCheckDetails>> GetYearCheckDetailAsync(string bId);
         /// <summary>
         /// 适任证书
         /// </summary>
         /// <param name="bId"></param>
         /// <returns></returns>
-        Task<ResponseResult<CertificateOfCompetencyDetails>> GetCertificateOfCompetencyDetailsAsync(string bId);
+        Task<ResponseAjaxResult<CertificateOfCompetencyDetails>> GetCertificateOfCompetencyDetailsAsync(string bId);
         /// <summary>
         /// 劳务
         /// </summary>
         /// <param name="bId"></param>
         /// <returns></returns>
-        Task<ResponseResult<LaborServicesInfoDetails>> GetLaborServicesDetailsAsync(string bId);
+        Task<ResponseAjaxResult<LaborServicesInfoDetails>> GetLaborServicesDetailsAsync(string bId);
         /// <summary>
         /// 基本信息
         /// </summary>
         /// <param name="bId"></param>
         /// <returns></returns>
-        Task<ResponseResult<BaseInfoDetails>> GetBasesicDetailsAsync(string bId);
+        Task<ResponseAjaxResult<BaseInfoDetails>> GetBasesicDetailsAsync(string bId);
     }
 }

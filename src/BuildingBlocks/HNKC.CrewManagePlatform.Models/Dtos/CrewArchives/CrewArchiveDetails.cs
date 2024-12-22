@@ -1,4 +1,4 @@
-﻿using HNKC.CrewManagePlatform.Models.Enums;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
 {
@@ -661,7 +661,7 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// <summary>
         /// 备注
         /// </summary>
-        public List<NotesForDetails>? Notes { get; set; }
+        public List<NotesForDetails>? NotesForDetails { get; set; }
     }
     /// <summary>
     /// 备注
@@ -669,13 +669,17 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
     public class NotesForDetails
     {
         /// <summary>
+        /// 主键id
+        /// </summary>
+        public string? Id { get; set; }
+        /// <summary>
         /// 用户名
         /// </summary>
         public string? UserName { get; set; }
         /// <summary>
         /// 备注日期：yyyy-MM-dd HH：mm：ss
         /// </summary>
-        public DateTime? NoteTime { get; set; }
+        public string? NoteTime { get; set; }
         /// <summary>
         /// 内容
         /// </summary>

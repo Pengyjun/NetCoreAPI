@@ -18,12 +18,20 @@
         /// </summary>
         public string? OriginName { get; set; }
         /// <summary>
-        /// 文件类型
+        /// 文件后缀
         /// </summary>
         public string? SuffixName { get; set; }
         /// <summary>
         /// 文件大小
         /// </summary>
         public long? FileSize { get; set; }
+        /// <summary>
+        /// 文件类型
+        /// </summary>
+        public string? FileType { get; set; }
+        /// <summary>
+        /// 业务id
+        /// </summary>
+        public Guid BId { get; set; }
     }
 }

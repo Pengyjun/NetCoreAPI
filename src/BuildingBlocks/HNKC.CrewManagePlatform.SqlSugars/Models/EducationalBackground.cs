@@ -40,9 +40,9 @@ namespace HNKC.CrewManagePlatform.SqlSugars.Models
         [SugarColumn(ColumnDataType = "datetime", ColumnDescription = "毕业日期")]
         public DateTime? EndTime { get; set; }
         /// <summary>
-        /// 证书 ,拼接
+        /// 证书 
         /// </summary>
         [SugarColumn(ColumnDataType = "text", ColumnDescription = "证书")]
-        public string? QualificationScans { get; set; }
+        public Guid? QualificationScans { get; set; }
     }
 }

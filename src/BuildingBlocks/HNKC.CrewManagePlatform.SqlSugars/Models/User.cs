@@ -57,15 +57,15 @@ namespace HNKC.CrewManagePlatform.SqlSugars.Models
         [SugarColumn(Length = 36, ColumnDescription = "政治面貌")]
         public string? PoliticalStatus { get; set; }
         /// <summary>
-        /// 船员照片 ,拼接文件
+        /// 船员照片 
         /// </summary>
         [SugarColumn(Length = 100, ColumnDescription = "船员照片")]
-        public string? CrewPhoto { get; set; }
+        public Guid? CrewPhoto { get; set; }
         /// <summary>
         /// 身份证扫描件
         /// </summary>
         [SugarColumn(ColumnDataType = "text", ColumnDescription = "身份证扫描件")]
-        public string? IdCardScans { get; set; }
+        public Guid? IdCardScans { get; set; }
         /// <summary>
         /// 籍贯(省)
         /// </summary>

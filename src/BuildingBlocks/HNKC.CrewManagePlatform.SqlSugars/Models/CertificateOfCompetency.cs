@@ -35,10 +35,10 @@ namespace HNKC.CrewManagePlatform.SqlSugars.Models
         [SugarColumn(ColumnDataType = "datetime", ColumnDescription = "第一适任证有效日期")]
         public DateTime? FEffectiveTime { get; set; }
         /// <summary>
-        /// 第一适任证扫描件 ,拼接文件
+        /// 第一适任证扫描件
         /// </summary>
         [SugarColumn(ColumnDataType = "text", ColumnDescription = "第一适任证扫描件")]
-        public string? FScans { get; set; }
+        public Guid? FScans { get; set; }
         /// <summary>
         /// 第二适任证
         /// 证书编号
@@ -66,10 +66,10 @@ namespace HNKC.CrewManagePlatform.SqlSugars.Models
         [SugarColumn(ColumnDataType = "datetime", ColumnDescription = "第二适任证有效日期")]
         public DateTime? SEffectiveTime { get; set; }
         /// <summary>
-        /// 第二适任证扫描件 ,拼接文件
+        /// 第二适任证扫描件
         /// </summary>
         [SugarColumn(ColumnDataType = "text", ColumnDescription = "第二适任证扫描件")]
-        public string? SScans { get; set; }
+        public Guid? SScans { get; set; }
 
         #region 培训合格证
         /// <summary>
@@ -124,10 +124,10 @@ namespace HNKC.CrewManagePlatform.SqlSugars.Models
         [SugarColumn(ColumnDataType = "datetime", ColumnDescription = "Z09有效日期")]
         public DateTime? Z09EffectiveTime { get; set; }
         /// <summary>
-        /// 扫描件 ,拼接文件
+        /// 扫描件 
         /// </summary>
         [SugarColumn(ColumnDataType = "text", ColumnDescription = "培训合格证扫描件")]
-        public string? TrainingScans { get; set; }
+        public Guid? TrainingScans { get; set; }
         #endregion
 
         #region 健康证
@@ -148,10 +148,10 @@ namespace HNKC.CrewManagePlatform.SqlSugars.Models
         [SugarColumn(ColumnDataType = "datetime", ColumnDescription = "健康证有效日期")]
         public DateTime? HealthEffectiveTime { get; set; }
         /// <summary>
-        /// 扫描件 ,拼接文件
+        /// 扫描件
         /// </summary>
         [SugarColumn(ColumnDataType = "text", ColumnDescription = "健康证扫描件")]
-        public string? HealthScans { get; set; }
+        public Guid? HealthScans { get; set; }
         #endregion
 
         #region 海员证
@@ -172,10 +172,10 @@ namespace HNKC.CrewManagePlatform.SqlSugars.Models
         [SugarColumn(ColumnDataType = "datetime", ColumnDescription = "海员证有效日期")]
         public DateTime? SeamanEffectiveTime { get; set; }
         /// <summary>
-        /// 扫描件  ,拼接文件
+        /// 扫描件  
         /// </summary>
         [SugarColumn(ColumnDataType = "text", ColumnDescription = "海员证扫描件")]
-        public string? SeamanScans { get; set; }
+        public Guid? SeamanScans { get; set; }
         #endregion
 
         #region 护照
@@ -196,10 +196,10 @@ namespace HNKC.CrewManagePlatform.SqlSugars.Models
         [SugarColumn(ColumnDataType = "datetime", ColumnDescription = "护照有效日期")]
         public DateTime? PassportEffectiveTime { get; set; }
         /// <summary>
-        /// 扫描件 ,拼接
+        /// 扫描件 
         /// </summary>
         [SugarColumn(ColumnDataType = "text", ColumnDescription = "护照扫描件")]
-        public string? PassportScans { get; set; }
+        public Guid? PassportScans { get; set; }
         #endregion
     }
 }

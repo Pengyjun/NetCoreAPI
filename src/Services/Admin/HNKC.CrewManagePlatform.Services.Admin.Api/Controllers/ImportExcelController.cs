@@ -1,9 +1,7 @@
 ﻿using HNKC.CrewManagePlatform.Models.CommonResult;
 using HNKC.CrewManagePlatform.Services.Interface;
 using HNKC.CrewManagePlatform.SqlSugars.UnitOfTransaction;
-using HNKC.CrewManagePlatform.Web.ActionResults;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HNKC.CrewManagePlatform.Services.Admin.Api.Controllers
@@ -18,8 +16,11 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api.Controllers
     {
 
         #region 依赖注入
-        public IBaseService baseService { get; set; }
-
+        private IBaseService baseService { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="baseService"></param>
         public ImportExcelController(IBaseService baseService)
         {
             this.baseService = baseService;
@@ -36,7 +37,7 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api.Controllers
         public async Task<Result> SalaryUploadAsync(IFormFile file)
         {
             var stream = await SingleFileUpdateAsync(file);
-            if (stream == null||stream?.Length == 0)
+            if (stream == null || stream?.Length == 0)
             {
                 return Result.Fail("请先上传文件");
             }
