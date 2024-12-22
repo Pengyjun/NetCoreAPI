@@ -17,7 +17,7 @@ namespace HNKC.CrewManagePlatform.SqlSugars.Models
         /// 关联键
         /// </summary>
         [SugarColumn(Length = 36, ColumnDescription = "关联键")]
-        public Guid TrainingId { get; set; }
+        public Guid? TrainingId { get; set; }
         /// <summary>
         /// 培训日期
         /// </summary>
