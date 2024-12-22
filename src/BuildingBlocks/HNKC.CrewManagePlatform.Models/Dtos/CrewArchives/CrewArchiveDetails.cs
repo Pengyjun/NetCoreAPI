@@ -491,7 +491,7 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// <summary>
         /// 主键
         /// </summary>
-        public Guid Id { get; set; }
+        public string? Id { get; set; }
         /// <summary>
         /// 学历类型：全日制...
         /// </summary>

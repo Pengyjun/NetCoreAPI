@@ -34,6 +34,6 @@ namespace HNKC.CrewManagePlatform.SqlSugars.Models
         /// 家庭键
         /// </summary>
         [SugarColumn(Length = 36, ColumnDescription = "家庭键")]
-        public Guid FamilyId { get; set; }
+        public Guid? FamilyId { get; set; }
     }
 }

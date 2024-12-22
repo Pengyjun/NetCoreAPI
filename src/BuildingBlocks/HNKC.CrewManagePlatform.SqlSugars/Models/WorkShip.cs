@@ -1,5 +1,4 @@
-﻿using HNKC.CrewManagePlatform.Models.Enums;
-using SqlSugar;
+﻿using SqlSugar;
 
 namespace HNKC.CrewManagePlatform.SqlSugars.Models
 {
@@ -43,6 +42,6 @@ namespace HNKC.CrewManagePlatform.SqlSugars.Models
         /// 关联键
         /// </summary>
         [SugarColumn(Length = 36, ColumnDescription = "关联键")]
-        public Guid WorkShipId { get; set; }
+        public Guid? WorkShipId { get; set; }
     }
 }

@@ -33,6 +33,6 @@ namespace HNKC.CrewManagePlatform.SqlSugars.Models
         /// 关联键
         /// </summary>
         [SugarColumn(Length = 36, ColumnDescription = "关联键")]
-        public Guid SpecialEquipId { get; set; }
+        public Guid? SpecialEquipId { get; set; }
     }
 }

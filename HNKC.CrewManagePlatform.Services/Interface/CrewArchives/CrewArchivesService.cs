@@ -246,8 +246,8 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
             ResponseAjaxResult<CrewArchivesResponse> rr = new();
 
             var udtab = await _dbContext.Queryable<User>().ToListAsync();
-            var udtabIds = udtab.Select(x => x.BusinessId).ToList();
-            var onBoard = await _dbContext.Queryable<WorkShip>().Where(t => t.IsDelete == 1 && udtabIds.Contains(t.WorkShipId)).ToListAsync();
+            var udtabIds = udtab.Select(x => x.BusinessId.ToString()).ToList();
+            var onBoard = await _dbContext.Queryable<WorkShip>().Where(t => t.IsDelete == 1 && udtabIds.Contains(t.WorkShipId.ToString())).ToListAsync();
 
             var totalCount = udtab.Count();//总数
 
@@ -1705,7 +1705,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                     .ToList();
                 qd.Add(new QualificationForDetails
                 {
-                    Id = item.QualificationId,
+                    Id = item.BusinessId.ToString(),
                     StartTime = item.StartTime,
                     EndTime = item.EndTime,
                     Major = item.Major,
