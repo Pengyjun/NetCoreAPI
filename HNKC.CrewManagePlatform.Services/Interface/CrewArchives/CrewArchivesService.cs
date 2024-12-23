@@ -1729,7 +1729,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                         Name = x.Name,
                         OriginName = x.OriginName,
                         SuffixName = x.SuffixName,
-                        Url = url + x.Name
+                        Url = url + x.OriginName
                     })
                     .ToList();
                 qd.Add(new QualificationForDetails
@@ -1817,7 +1817,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                          Name = x.Name,
                          OriginName = x.OriginName,
                          SuffixName = x.SuffixName,
-                         Url = url + x.Name
+                         Url = url + x.OriginName
                      })
                     .ToList();
                 pd.Add(new PromotionsForDetails
@@ -1871,7 +1871,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                         Name = x.Name,
                         OriginName = x.OriginName,
                         SuffixName = x.SuffixName,
-                        Url = url + x.Name
+                        Url = url + x.OriginName
                     })
                     .ToList();
                 td.Add(new TrainingRecordsForDetails
@@ -1960,7 +1960,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                         Name = x.Name,
                         OriginName = x.OriginName,
                         SuffixName = x.SuffixName,
-                        Url = url + x.Name
+                        Url = url + x.OriginName
                     })
                     .ToList();
                 yc.Add(new YearChecksForDetails
@@ -2082,7 +2082,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                         Name = x.Name,
                         OriginName = x.OriginName,
                         SuffixName = x.SuffixName,
-                        Url = url + x.Name
+                        Url = url + x.OriginName
                     })
                     .ToList();
                 var sScans = files.Where(x => cerOfComp.SScans == x.FileId)
@@ -2094,7 +2094,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                         Name = x.Name,
                         OriginName = x.OriginName,
                         SuffixName = x.SuffixName,
-                        Url = url + x.Name
+                        Url = url + x.OriginName
                     })
                     .ToList();
                 var trainingScans = files.Where(x => cerOfComp.TrainingScans == x.FileId)
@@ -2106,7 +2106,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                        Name = x.Name,
                        OriginName = x.OriginName,
                        SuffixName = x.SuffixName,
-                       Url = url + x.Name
+                       Url = url + x.OriginName
                    })
                    .ToList();
                 var healthScans = files.Where(x => cerOfComp.HealthScans == x.FileId)
@@ -2118,7 +2118,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                        Name = x.Name,
                        OriginName = x.OriginName,
                        SuffixName = x.SuffixName,
-                       Url = url + x.Name
+                       Url = url + x.OriginName
                    })
                    .ToList();
                 var seamanScans = files.Where(x => cerOfComp.SeamanScans == x.FileId)
@@ -2130,7 +2130,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                        Name = x.Name,
                        OriginName = x.OriginName,
                        SuffixName = x.SuffixName,
-                       Url = url + x.Name
+                       Url = url + x.OriginName
                    })
                    .ToList();
                 var passportScans = files.Where(x => cerOfComp.PassportScans == x.FileId)
@@ -2142,7 +2142,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                        Name = x.Name,
                        OriginName = x.OriginName,
                        SuffixName = x.SuffixName,
-                       Url = url + x.Name
+                       Url = url + x.OriginName
                    })
                    .ToList();
                 //技能证书
@@ -2158,7 +2158,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                             Name = x.Name,
                             OriginName = x.OriginName,
                             SuffixName = x.SuffixName,
-                            Url = url + x.Name
+                            Url = url + x.OriginName
                         })
                         .FirstOrDefault();
 
@@ -2182,7 +2182,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                             Name = x.Name,
                             OriginName = x.OriginName,
                             SuffixName = x.SuffixName,
-                            Url = url + x.Name
+                            Url = url + x.OriginName
                         })
                         .FirstOrDefault();
 
@@ -2267,7 +2267,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                         Name = x.Name,
                         OriginName = x.OriginName,
                         SuffixName = x.SuffixName,
-                        Url = url + x.Name
+                        Url = url + x.OriginName
                     })
                     .ToList();
                 uEntry.Add(new UserEntryInfosForDetails
@@ -2295,7 +2295,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                     Name = x.Name,
                     OriginName = x.OriginName,
                     SuffixName = x.SuffixName,
-                    Url = url + x.Name
+                    Url = url + x.OriginName
                 })
                 .ToList();
             ur = new LaborServicesInfoDetails
@@ -2367,7 +2367,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                 Name = userPhoto.Name,
                 OriginName = userPhoto.OriginName,
                 SuffixName = userPhoto.SuffixName,
-                Url = url + userPhoto.Name
+                Url = url + userPhoto.OriginName
             };
             //扫描件
             List<FileInfosForDetails> ui = new();
@@ -2381,7 +2381,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                     Name = item.Name,
                     OriginName = item.OriginName,
                     SuffixName = item.SuffixName,
-                    Url = url + item.Name
+                    Url = url + item.OriginName
                 });
             }
             ur.IdCardScans = ui;
