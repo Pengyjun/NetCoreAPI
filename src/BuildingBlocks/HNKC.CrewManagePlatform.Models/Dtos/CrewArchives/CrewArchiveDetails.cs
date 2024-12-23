@@ -717,6 +717,10 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// </summary>
         public string? FileType { get; set; }
         /// <summary>
+        /// 文件路径
+        /// </summary>
+        public string? Url { get; set; }
+        /// <summary>
         /// 文件大小
         /// </summary>
         public long? FileSize { get; set; }

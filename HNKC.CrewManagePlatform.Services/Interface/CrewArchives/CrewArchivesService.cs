@@ -5,8 +5,11 @@ using HNKC.CrewManagePlatform.Models.Enums;
 using HNKC.CrewManagePlatform.SqlSugars.Models;
 using HNKC.CrewManagePlatform.Utils;
 using SqlSugar;
+using System;
 using System.ComponentModel;
 using System.Globalization;
+using System.Security.Policy;
+using UtilsSharp;
 
 namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
 {
@@ -1697,7 +1700,6 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
 
             var userInfo = await GetUserInfoAsync(bId);
             var edutab = await _dbContext.Queryable<EducationalBackground>().Where(t => t.IsDelete == 1 && t.BusinessId == userInfo.BusinessId).ToListAsync();
-            //获取文件
             List<string> fileIds = new();
             foreach (var file in edutab)
             {
@@ -1709,6 +1711,8 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
             }
             var files = await _dbContext.Queryable<Files>().Where(t => fileIds.Contains(t.FileId.ToString())).ToListAsync();
             List<QualificationForDetails> qd = new();
+            //获取文件
+            var url = AppsettingsHelper.GetValue("UpdateItem:Url");
             foreach (var item in edutab)
             {
                 var edFile = files.Where(x => item.QualificationScans == x.FileId)
@@ -1719,7 +1723,8 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                         FileType = x.FileType,
                         Name = x.Name,
                         OriginName = x.OriginName,
-                        SuffixName = x.SuffixName
+                        SuffixName = x.SuffixName,
+                        Url = url + x.Name
                     })
                     .ToList();
                 qd.Add(new QualificationForDetails
@@ -1781,6 +1786,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
             var userInfo = await GetUserInfoAsync(bId);
             var promotion = await _dbContext.Queryable<Promotion>().Where(t => t.IsDelete == 1 && t.PromotionId == userInfo.BusinessId).OrderByDescending(x => x.PromotionTime).ToListAsync();
             //获取文件
+            var url = AppsettingsHelper.GetValue("UpdateItem:Url");
             List<string> fileIds = new();
             foreach (var file in promotion)
             {
@@ -1805,7 +1811,8 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                          FileType = x.FileType,
                          Name = x.Name,
                          OriginName = x.OriginName,
-                         SuffixName = x.SuffixName
+                         SuffixName = x.SuffixName,
+                         Url = url + x.Name
                      })
                     .ToList();
                 pd.Add(new PromotionsForDetails
@@ -1846,6 +1853,8 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
             }
             var files = await _dbContext.Queryable<Files>().Where(t => fileIds.Contains(t.FileId.ToString())).ToListAsync();
             List<TrainingRecordsForDetails> td = new();
+            //获取文件
+            var url = AppsettingsHelper.GetValue("UpdateItem:Url");
             foreach (var item in traningRecord)
             {
                 var trFile = files.Where(x => item.TrainingScan == x.FileId)
@@ -1856,7 +1865,8 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                         FileType = x.FileType,
                         Name = x.Name,
                         OriginName = x.OriginName,
-                        SuffixName = x.SuffixName
+                        SuffixName = x.SuffixName,
+                        Url = url + x.Name
                     })
                     .ToList();
                 td.Add(new TrainingRecordsForDetails
@@ -1932,6 +1942,8 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
             }
             var files = await _dbContext.Queryable<Files>().Where(t => fileIds.Contains(t.FileId.ToString())).ToListAsync();
             List<YearChecksForDetails> yc = new();
+            //获取文件
+            var url = AppsettingsHelper.GetValue("UpdateItem:Url");
             foreach (var item in yearChecks)
             {
                 var ycFile = files.Where(x => item.TrainingScan == x.FileId)
@@ -1942,7 +1954,8 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                         FileType = x.FileType,
                         Name = x.Name,
                         OriginName = x.OriginName,
-                        SuffixName = x.SuffixName
+                        SuffixName = x.SuffixName,
+                        Url = url + x.Name
                     })
                     .ToList();
                 yc.Add(new YearChecksForDetails
@@ -1967,6 +1980,8 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
             CertificateOfCompetencyDetails ur = new();
 
             var userInfo = await GetUserInfoAsync(bId);
+            //获取文件
+            var url = AppsettingsHelper.GetValue("UpdateItem:Url");
             var cerOfComp = await _dbContext.Queryable<CertificateOfCompetency>().FirstAsync(t => t.IsDelete == 1 && t.CertificateId == userInfo.BusinessId);
             if (cerOfComp != null)
             {
@@ -2061,7 +2076,8 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                         FileType = x.FileType,
                         Name = x.Name,
                         OriginName = x.OriginName,
-                        SuffixName = x.SuffixName
+                        SuffixName = x.SuffixName,
+                        Url = url + x.Name
                     })
                     .ToList();
                 var sScans = files.Where(x => cerOfComp.SScans == x.FileId)
@@ -2072,7 +2088,8 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                         FileType = x.FileType,
                         Name = x.Name,
                         OriginName = x.OriginName,
-                        SuffixName = x.SuffixName
+                        SuffixName = x.SuffixName,
+                        Url = url + x.Name
                     })
                     .ToList();
                 var trainingScans = files.Where(x => cerOfComp.TrainingScans == x.FileId)
@@ -2083,7 +2100,8 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                        FileType = x.FileType,
                        Name = x.Name,
                        OriginName = x.OriginName,
-                       SuffixName = x.SuffixName
+                       SuffixName = x.SuffixName,
+                       Url = url + x.Name
                    })
                    .ToList();
                 var healthScans = files.Where(x => cerOfComp.HealthScans == x.FileId)
@@ -2094,7 +2112,8 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                        FileType = x.FileType,
                        Name = x.Name,
                        OriginName = x.OriginName,
-                       SuffixName = x.SuffixName
+                       SuffixName = x.SuffixName,
+                       Url = url + x.Name
                    })
                    .ToList();
                 var seamanScans = files.Where(x => cerOfComp.SeamanScans == x.FileId)
@@ -2105,7 +2124,8 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                        FileType = x.FileType,
                        Name = x.Name,
                        OriginName = x.OriginName,
-                       SuffixName = x.SuffixName
+                       SuffixName = x.SuffixName,
+                       Url = url + x.Name
                    })
                    .ToList();
                 var passportScans = files.Where(x => cerOfComp.PassportScans == x.FileId)
@@ -2116,7 +2136,8 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                        FileType = x.FileType,
                        Name = x.Name,
                        OriginName = x.OriginName,
-                       SuffixName = x.SuffixName
+                       SuffixName = x.SuffixName,
+                       Url = url + x.Name
                    })
                    .ToList();
                 //技能证书
@@ -2131,7 +2152,8 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                             FileType = x.FileType,
                             Name = x.Name,
                             OriginName = x.OriginName,
-                            SuffixName = x.SuffixName
+                            SuffixName = x.SuffixName,
+                            Url = url + x.Name
                         })
                         .FirstOrDefault();
 
@@ -2154,7 +2176,8 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                             FileType = x.FileType,
                             Name = x.Name,
                             OriginName = x.OriginName,
-                            SuffixName = x.SuffixName
+                            SuffixName = x.SuffixName,
+                            Url = url + x.Name
                         })
                         .FirstOrDefault();
 
@@ -2226,6 +2249,8 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
             //读取用户入职的所有文件资料
             var files = await _dbContext.Queryable<Files>().Where(t => t.IsDelete == 1 && fIds.Contains(t.FileId.ToString())).ToListAsync();
             List<UserEntryInfosForDetails> uEntry = new();
+            //获取文件
+            var url = AppsettingsHelper.GetValue("UpdateItem:Url");
             foreach (var item in userEntryInfo)
             {
                 var userEntryFiles = files.Where(x => item.EntryScans == x.FileId)
@@ -2236,7 +2261,8 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                         FileType = x.FileType,
                         Name = x.Name,
                         OriginName = x.OriginName,
-                        SuffixName = x.SuffixName
+                        SuffixName = x.SuffixName,
+                        Url = url + x.Name
                     })
                     .ToList();
                 uEntry.Add(new UserEntryInfosForDetails
@@ -2263,7 +2289,8 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                     FileType = x.FileType,
                     Name = x.Name,
                     OriginName = x.OriginName,
-                    SuffixName = x.SuffixName
+                    SuffixName = x.SuffixName,
+                    Url = url + x.Name
                 })
                 .ToList();
             ur = new LaborServicesInfoDetails
@@ -2286,6 +2313,8 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
             BaseInfoDetails ur = new();
 
             var userInfo = await GetUserInfoAsync(bId);
+            //获取文件
+            var url = AppsettingsHelper.GetValue("UpdateItem:Url");
             #region 匹配简易信息
             ur.Name = userInfo.Name;
             ur.WorkNumber = userInfo.WorkNumber;
@@ -2332,7 +2361,8 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                 FileType = userPhoto.FileType,
                 Name = userPhoto.Name,
                 OriginName = userPhoto.OriginName,
-                SuffixName = userPhoto.SuffixName
+                SuffixName = userPhoto.SuffixName,
+                Url = url + userPhoto.Name
             };
             //扫描件
             List<FileInfosForDetails> ui = new();
@@ -2345,7 +2375,8 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                     FileType = item.FileType,
                     Name = item.Name,
                     OriginName = item.OriginName,
-                    SuffixName = item.SuffixName
+                    SuffixName = item.SuffixName,
+                    Url = url + item.Name
                 });
             }
             ur.IdCardScans = ui;
