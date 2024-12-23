@@ -1734,15 +1734,8 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
 
             var userInfo = await GetUserInfoAsync(bId);
             var edutab = await _dbContext.Queryable<EducationalBackground>().Where(t => t.IsDelete == 1 && t.BusinessId == userInfo.BusinessId).ToListAsync();
-            List<string> fileIds = new();
-            foreach (var file in edutab)
-            {
-                var ids = file.QualificationScans.ToString();
-                if (ids != null)
-                {
-                    fileIds.Add(ids);
-                }
-            }
+            //获取文件
+            var fileIds = edutab.Select(x => x.QualificationScans.ToString()).ToList();
             var files = await _dbContext.Queryable<Files>().Where(t => fileIds.Contains(t.FileId.ToString())).ToListAsync();
             List<QualificationForDetails> qd = new();
             //获取文件
@@ -1821,23 +1814,15 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
             var promotion = await _dbContext.Queryable<Promotion>().Where(t => t.IsDelete == 1 && t.PromotionId == userInfo.BusinessId).OrderByDescending(x => x.PromotionTime).ToListAsync();
             //获取文件
             var url = AppsettingsHelper.GetValue("UpdateItem:Url");
-            List<string> fileIds = new();
-            foreach (var file in promotion)
-            {
-                var ids = file.PromotionScan.ToString();
-                if (ids != null)
-                {
-                    fileIds.Add(ids);
-                }
-            }
+            var fileIds = promotion.Select(x => x.PromotionScan.ToString()).ToList();
+            //获取文件
             var files = await _dbContext.Queryable<Files>().Where(t => fileIds.Contains(t.FileId.ToString())).ToListAsync();
             var ownships = await _dbContext.Queryable<OwnerShip>().Where(t => t.IsDelete == 1).Select(x => new { x.BusinessId, x.ShipName, x.Country }).ToListAsync();
             var positions = await _dbContext.Queryable<Position>().Where(t => t.IsDelete == 1).Select(x => new { x.BusinessId, x.Name }).ToListAsync();
             List<PromotionsForDetails> pd = new();
             foreach (var item in promotion)
             {
-                var ids = item.PromotionScan.ToString();
-                var pdFiles = files.Where(x => ids.Contains(x.FileId.ToString()))
+                var pdFiles = files.Where(x => item.PromotionScan == x.FileId)
                      .Select(x => new FileInfosForDetails
                      {
                          Id = x.BusinessId.ToString(),
@@ -1846,7 +1831,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                          Name = x.Name,
                          OriginName = x.OriginName,
                          SuffixName = x.SuffixName,
-                         Url = url + x.Name.Substring(0, x.Name.LastIndexOf(".")) + x.OriginName
+                         Url = url + x.Name?.Substring(0, x.Name.LastIndexOf(".")) + x.OriginName
                      })
                     .ToList();
                 pd.Add(new PromotionsForDetails
@@ -1876,15 +1861,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
             var traningRecord = await _dbContext.Queryable<TrainingRecord>().Where(t => t.IsDelete == 1 && t.TrainingId == userInfo.BusinessId).OrderByDescending(x => x.TrainingTime).ToListAsync();
             var trainType = await _dbContext.Queryable<TrainingType>().Where(t => t.IsDelete == 1 && t.BusinessId == userInfo.BusinessId).Select(x => new { x.BusinessId, x.Name }).ToListAsync();
             //获取文件
-            List<string> fileIds = new();
-            foreach (var file in traningRecord)
-            {
-                var ids = file.TrainingScan.ToString();
-                if (ids != null)
-                {
-                    fileIds.Add(ids);
-                }
-            }
+            var fileIds = traningRecord.Select(x => x.TrainingScan.ToString()).ToList();
             var files = await _dbContext.Queryable<Files>().Where(t => fileIds.Contains(t.FileId.ToString())).ToListAsync();
             List<TrainingRecordsForDetails> td = new();
             //获取文件
@@ -1965,15 +1942,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
 
             var yearChecks = await _dbContext.Queryable<YearCheck>().Where(t => t.IsDelete == 1 && t.TrainingId == userInfo.BusinessId).OrderByDescending(x => x.TrainingTime).ToListAsync();
             //获取文件
-            List<string> fileIds = new();
-            foreach (var file in yearChecks)
-            {
-                var ids = file.TrainingScan.ToString();
-                if (ids != null)
-                {
-                    fileIds.Add(ids);
-                }
-            }
+            var fileIds = yearChecks.Select(x => x.TrainingScan.ToString()).ToList();
             var files = await _dbContext.Queryable<Files>().Where(t => fileIds.Contains(t.FileId.ToString())).ToListAsync();
             List<YearChecksForDetails> yc = new();
             //获取文件
@@ -1989,7 +1958,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                         Name = x.Name,
                         OriginName = x.OriginName,
                         SuffixName = x.SuffixName,
-                        Url = url + x.Name.Substring(0, x.Name.LastIndexOf(".")) + x.OriginName
+                        Url = url + x.Name?.Substring(0, x.Name.LastIndexOf(".")) + x.OriginName
                     })
                     .ToList();
                 yc.Add(new YearChecksForDetails
@@ -2073,7 +2042,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                 foreach (var item in skillcf)
                 {
                     var ids = item.SkillScans.ToString();
-                    if (ids != null)
+                    if (item.SkillScans.ToString() != null)
                     {
                         skillFileIds.Add(ids);
                     }
@@ -2111,7 +2080,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                         Name = x.Name,
                         OriginName = x.OriginName,
                         SuffixName = x.SuffixName,
-                        Url = url + x.Name.Substring(0, x.Name.LastIndexOf(".")) + x.OriginName
+                        Url = url + x.Name?.Substring(0, x.Name.LastIndexOf(".")) + x.OriginName
                     })
                     .ToList();
                 var sScans = files.Where(x => cerOfComp.SScans == x.FileId)
@@ -2123,7 +2092,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                         Name = x.Name,
                         OriginName = x.OriginName,
                         SuffixName = x.SuffixName,
-                        Url = url + x.Name.Substring(0, x.Name.LastIndexOf(".")) + x.OriginName
+                        Url = url + x.Name?.Substring(0, x.Name.LastIndexOf(".")) + x.OriginName
                     })
                     .ToList();
                 var trainingScans = files.Where(x => cerOfComp.TrainingScans == x.FileId)
@@ -2135,7 +2104,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                        Name = x.Name,
                        OriginName = x.OriginName,
                        SuffixName = x.SuffixName,
-                       Url = url + x.Name.Substring(0, x.Name.LastIndexOf(".")) + x.OriginName
+                       Url = url + x.Name?.Substring(0, x.Name.LastIndexOf(".")) + x.OriginName
                    })
                    .ToList();
                 var healthScans = files.Where(x => cerOfComp.HealthScans == x.FileId)
@@ -2147,7 +2116,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                        Name = x.Name,
                        OriginName = x.OriginName,
                        SuffixName = x.SuffixName,
-                       Url = url + x.Name.Substring(0, x.Name.LastIndexOf(".")) + x.OriginName
+                       Url = url + x.Name?.Substring(0, x.Name.LastIndexOf(".")) + x.OriginName
                    })
                    .ToList();
                 var seamanScans = files.Where(x => cerOfComp.SeamanScans == x.FileId)
@@ -2159,7 +2128,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                        Name = x.Name,
                        OriginName = x.OriginName,
                        SuffixName = x.SuffixName,
-                       Url = url + x.Name.Substring(0, x.Name.LastIndexOf(".")) + x.OriginName
+                       Url = url + x.Name?.Substring(0, x.Name.LastIndexOf(".")) + x.OriginName
                    })
                    .ToList();
                 var passportScans = files.Where(x => cerOfComp.PassportScans == x.FileId)
@@ -2171,7 +2140,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                        Name = x.Name,
                        OriginName = x.OriginName,
                        SuffixName = x.SuffixName,
-                       Url = url + x.Name.Substring(0, x.Name.LastIndexOf(".")) + x.OriginName
+                       Url = url + x.Name?.Substring(0, x.Name.LastIndexOf(".")) + x.OriginName
                    })
                    .ToList();
                 //技能证书
@@ -2187,7 +2156,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                             Name = x.Name,
                             OriginName = x.OriginName,
                             SuffixName = x.SuffixName,
-                            Url = url + x.Name.Substring(0, x.Name.LastIndexOf(".")) + x.OriginName
+                            Url = url + x.Name?.Substring(0, x.Name.LastIndexOf(".")) + x.OriginName
                         })
                         .FirstOrDefault();
 
@@ -2211,7 +2180,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                             Name = x.Name,
                             OriginName = x.OriginName,
                             SuffixName = x.SuffixName,
-                            Url = url + x.Name.Substring(0, x.Name.LastIndexOf(".")) + x.OriginName
+                            Url = url + x.Name?.Substring(0, x.Name.LastIndexOf(".")) + x.OriginName
                         })
                         .FirstOrDefault();
 
@@ -2268,16 +2237,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
             var userInfo = await GetUserInfoAsync(bId);
             //入职材料
             var userEntryInfo = await _dbContext.Queryable<UserEntryInfo>().Where(t => t.IsDelete == 1 && t.UserEntryId == userInfo.BusinessId).OrderByDescending(x => x.EntryTime).ToListAsync();
-            var filesIds = userEntryInfo.Select(x => x.EntryScans).ToList();
-            List<string> fIds = new();
-            foreach (var f in filesIds)
-            {
-                var ids = f == null ? null : f.ToString();
-                if (ids != null)
-                {
-                    fIds.Add(ids);
-                }
-            }
+            var fIds = userEntryInfo.Select(x => x.EntryScans.ToString()).ToList();
             //用工类型
             var empType = await _dbContext.Queryable<EmploymentType>().Where(t => t.IsDelete == 1).ToListAsync();
             //读取用户入职的所有文件资料
@@ -2296,7 +2256,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                         Name = x.Name,
                         OriginName = x.OriginName,
                         SuffixName = x.SuffixName,
-                        Url = url + x.Name.Substring(0, x.Name.LastIndexOf(".")) + x.OriginName
+                        Url = url + x.Name?.Substring(0, x.Name.LastIndexOf(".")) + x.OriginName
                     })
                     .ToList();
                 uEntry.Add(new UserEntryInfosForDetails
@@ -2324,7 +2284,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                     Name = x.Name,
                     OriginName = x.OriginName,
                     SuffixName = x.SuffixName,
-                    Url = url + x.Name.Substring(0, x.Name.LastIndexOf(".")) + x.OriginName
+                    Url = url + x.Name?.Substring(0, x.Name.LastIndexOf(".")) + x.OriginName
                 })
                 .ToList();
             ur = new LaborServicesInfoDetails
@@ -2385,7 +2345,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                 //当前船舶任职时间
                 ur.CurrentShipEntryTime = string.IsNullOrWhiteSpace(userWorkShip.WorkShipStartTime.ToString()) || userWorkShip.WorkShipStartTime == DateTime.MinValue ? "" : userWorkShip.WorkShipStartTime.ToString("yyyy/MM/dd") + "~" + userWorkShip.WorkShipEndTime.ToString("yyyy/MM/dd");
             }
-            var userScans = await _dbContext.Queryable<Files>().Where(t => t.IsDelete == 1 && userInfo.BusinessId == t.FileId).ToListAsync();
+            var userScans = await _dbContext.Queryable<Files>().Where(t => t.IsDelete == 1 && userInfo.BusinessId == t.UserId).ToListAsync();
             //照片
             var userPhoto = userScans.FirstOrDefault(x => x.FileId == userInfo.CrewPhoto);
             ur.PhotoScans = userPhoto == null ? null : new FileInfosForDetails
@@ -2396,7 +2356,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                 Name = userPhoto.Name,
                 OriginName = userPhoto.OriginName,
                 SuffixName = userPhoto.SuffixName,
-                Url = url + userPhoto.Name.Substring(0, userPhoto.Name.LastIndexOf(".")) + userPhoto.OriginName
+                Url = url + userPhoto.Name?.Substring(0, userPhoto.Name.LastIndexOf(".")) + userPhoto.OriginName
             };
             //扫描件
             List<FileInfosForDetails> ui = new();
@@ -2410,7 +2370,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                     Name = item.Name,
                     OriginName = item.OriginName,
                     SuffixName = item.SuffixName,
-                    Url = url + item.Name.Substring(0, item.Name.LastIndexOf(".")) + item.OriginName
+                    Url = url + item.Name?.Substring(0, item.Name.LastIndexOf(".")) + item.OriginName
                 });
             }
             ur.IdCardScans = ui;
