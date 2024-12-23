@@ -29,6 +29,6 @@ namespace HNKC.CrewManagePlatform.Services.Interface
         /// </summary>
         /// <param name="path"></param>
         /// <returns></returns>
-        Task<Result> SearchInstitutionTreeAsync();
+        Task<ResponseAjaxResult<InstitutionTree>> SearchInstitutionTreeAsync();
     }
 }
