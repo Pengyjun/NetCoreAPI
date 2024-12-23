@@ -842,7 +842,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                         hus = await _dbContext.Queryable<FamilyUser>().Where(t => t.FamilyId == userInfo.BusinessId).ToListAsync();
                         foreach (var item in requestBody.BaseInfoDto.HomeUser)
                         {
-                            var ef = hus.FirstOrDefault(x => x.FamilyId == item.Bid);
+                            var ef = hus.FirstOrDefault(x => x.FamilyId.ToString() == item.Bid);
                             if (ef != null)
                             {
                                 ef.Phone = item.Phone;
@@ -858,7 +858,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                         ecs = await _dbContext.Queryable<EmergencyContacts>().Where(t => t.EmergencyContactId == userInfo.BusinessId).ToListAsync();
                         foreach (var item in requestBody.BaseInfoDto.EmergencyContacts)
                         {
-                            var ef = ecs.FirstOrDefault(x => x.EmergencyContactId == item.Bid);
+                            var ef = ecs.FirstOrDefault(x => x.EmergencyContactId.ToString() == item.Bid);
                             if (ef != null)
                             {
                                 ef.Phone = item.Phone;
@@ -964,7 +964,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                         vrs = await _dbContext.Queryable<VisaRecords>().Where(t => t.VisareCordId == userInfo.BusinessId).ToListAsync();
                         foreach (var item in requestBody.CertificateOfCompetencyDto.VisaRecords)
                         {
-                            var vr = vrs.FirstOrDefault(x => x.VisareCordId == item.BId);
+                            var vr = vrs.FirstOrDefault(x => x.VisareCordId.ToString() == item.BId);
                             if (vr != null)
                             {
                                 vr.Country = item.Country;
@@ -979,7 +979,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                         sfs = await _dbContext.Queryable<SkillCertificates>().Where(t => t.IsDelete == 1 && t.SkillcertificateId == userInfo.BusinessId).ToListAsync();
                         foreach (var item in requestBody.CertificateOfCompetencyDto.SkillCertificates)
                         {
-                            var sf = sfs.FirstOrDefault(x => x.SkillcertificateId == item.BId);
+                            var sf = sfs.FirstOrDefault(x => x.SkillcertificateId.ToString() == item.BId);
                             if (sf != null)
                             {
                                 sf.SkillCertificateType = item.SkillCertificateType;
@@ -999,7 +999,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                         ses = await _dbContext.Queryable<SpecialEquips>().Where(t => t.IsDelete == 1 && t.SpecialEquipId == userInfo.BusinessId).ToListAsync();
                         foreach (var item in requestBody.CertificateOfCompetencyDto.SpecialEquips)
                         {
-                            var se = ses.FirstOrDefault(x => x.SpecialEquipId == item.BId);
+                            var se = ses.FirstOrDefault(x => x.SpecialEquipId.ToString() == item.BId);
                             if (se != null)
                             {
                                 se.SpecialEquipsCertificateType = item.SpecialEquipsCertificateType;
@@ -1030,7 +1030,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                         ebs = await _dbContext.Queryable<EducationalBackground>().Where(t => t.IsDelete == 1 && userInfo.BusinessId == t.QualificationId).ToListAsync();
                         foreach (var item in requestBody.EducationalBackgroundDto.QualificationInfos)
                         {
-                            var eb = ebs.FirstOrDefault(x => x.QualificationId == item.BId);
+                            var eb = ebs.FirstOrDefault(x => x.QualificationId.ToString() == item.BId);
                             if (eb != null)
                             {
                                 eb.School = item.School;
@@ -1062,7 +1062,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                         pts = await _dbContext.Queryable<Promotion>().Where(t => t.PromotionId == userInfo.BusinessId).ToListAsync();
                         foreach (var item in requestBody.PromotionDto.Promotions)
                         {
-                            var po = pts.FirstOrDefault(x => x.PromotionId == item.BId);
+                            var po = pts.FirstOrDefault(x => x.PromotionId.ToString() == item.BId);
                             if (po != null)
                             {
                                 po.OnShip = item.OnShip;
@@ -1091,7 +1091,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                         wss = await _dbContext.Queryable<WorkShip>().Where(t => t.IsDelete == 1 && userInfo.BusinessId == t.WorkShipId).ToListAsync();
                         foreach (var item in requestBody.WorkShipDto.WorkShips)
                         {
-                            var ws = wss.FirstOrDefault(x => x.WorkShipId == item.BId);
+                            var ws = wss.FirstOrDefault(x => x.WorkShipId.ToString() == item.BId);
                             if (ws != null)
                             {
                                 ws.OnShip = item.OnShip;
@@ -1116,7 +1116,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                         trs = await _dbContext.Queryable<TrainingRecord>().Where(t => t.TrainingId == userInfo.BusinessId).ToListAsync();
                         foreach (var item in requestBody.TrainingRecordDto.TrainingRecords)
                         {
-                            var tr = trs.FirstOrDefault(x => x.TrainingId == item.BId);
+                            var tr = trs.FirstOrDefault(x => x.TrainingId.ToString() == item.BId);
                             if (tr != null)
                             {
                                 tr.TrainingScan = GuidUtil.Next();
@@ -1144,7 +1144,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                         ycs = await _dbContext.Queryable<YearCheck>().Where(t => t.IsDelete == 1 && t.TrainingId == userInfo.BusinessId).ToListAsync();
                         foreach (var item in requestBody.YearCheckDto.YearChecks)
                         {
-                            var yc = ycs.FirstOrDefault(x => x.TrainingId == item.BId);
+                            var yc = ycs.FirstOrDefault(x => x.TrainingId.ToString() == item.BId);
                             if (yc != null)
                             {
                                 yc.CheckType = item.CheckType;

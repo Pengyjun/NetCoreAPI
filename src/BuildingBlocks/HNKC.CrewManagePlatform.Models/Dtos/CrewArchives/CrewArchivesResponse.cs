@@ -90,7 +90,7 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// <summary>
         /// 身份证扫描件 
         /// </summary>
-        public Guid? IdCardScans { get; set; }
+        public string? IdCardScans { get; set; }
         /// <summary>
         /// 身份证扫描件上传
         /// </summary>
@@ -135,10 +135,6 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// </summary>
         public string? PositionOnBoard { get; set; }
         /// <summary>
-        /// 船员照片 
-        /// </summary>
-        public Guid? PhotoScans { get; set; }
-        /// <summary>
         /// 文件船员照片
         /// </summary>
         public UploadResponse? UploadPhotoScans { get; set; }
@@ -175,7 +171,7 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// <summary>
         /// 入职材料 
         /// </summary>
-        public Guid? EntryScans { get; set; }
+        public string? EntryScans { get; set; }
         /// <summary>
         /// 入职材料上传
         /// </summary>
@@ -201,7 +197,7 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// <summary>
         /// 主键
         /// </summary>
-        public Guid? Bid { get; set; }
+        public string? Bid { get; set; }
         /// <summary>
         /// 名称
         /// </summary>
@@ -252,7 +248,7 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// <summary>
         /// 扫描件 
         /// </summary>
-        public Guid? FScans { get; set; }
+        public string? FScans { get; set; }
         /// <summary>
         /// 扫描件上传
         /// </summary>
@@ -283,7 +279,7 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// <summary>
         /// 扫描件 
         /// </summary>
-        public Guid? SScans { get; set; }
+        public string? SScans { get; set; }
         /// <summary>
         /// 扫描件上传
         /// </summary>
@@ -334,7 +330,7 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// <summary>
         /// 扫描件 
         /// </summary>
-        public Guid? TrainingScans { get; set; }
+        public string? TrainingScans { get; set; }
         /// <summary>
         /// 扫描件上传
         /// </summary>
@@ -357,7 +353,7 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// <summary>
         /// 扫描件 
         /// </summary>
-        public Guid? HealthScans { get; set; }
+        public string? HealthScans { get; set; }
         /// <summary>
         /// 扫描件上传
         /// </summary>
@@ -380,7 +376,7 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// <summary>
         /// 扫描件 
         /// </summary>
-        public Guid? SeamanScans { get; set; }
+        public string? SeamanScans { get; set; }
         /// <summary>
         /// 扫描件上传
         /// </summary>
@@ -407,7 +403,7 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// <summary>
         /// 扫描件
         /// </summary>
-        public Guid? PassportScans { get; set; }
+        public string? PassportScans { get; set; }
         /// <summary>
         /// 扫描件上传
         /// </summary>
@@ -436,7 +432,7 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// <summary>
         /// 主键
         /// </summary>
-        public Guid? BId { get; set; }
+        public string? BId { get; set; }
         /// <summary>
         /// 证书类型
         /// </summary>
@@ -444,7 +440,7 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// <summary>
         /// 扫描件
         /// </summary>
-        public Guid? SkillScans { get; set; }
+        public string? SkillScans { get; set; }
         /// <summary>
         /// 扫描件上传
         /// </summary>
@@ -458,7 +454,7 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// <summary>
         /// 主键
         /// </summary>
-        public Guid? BId { get; set; }
+        public string? BId { get; set; }
         /// <summary>
         /// 证书类型
         /// </summary>
@@ -474,7 +470,7 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// <summary>
         /// 扫描件 
         /// </summary>
-        public Guid? SpecialEquipsScans { get; set; }
+        public string? SpecialEquipsScans { get; set; }
         /// <summary>
         /// 扫描件上传
         /// </summary>
@@ -488,7 +484,7 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// <summary>
         /// 主键
         /// </summary>
-        public Guid? BId { get; set; }
+        public string? BId { get; set; }
         /// <summary>
         /// 国家
         /// </summary>
@@ -520,7 +516,7 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// <summary>
         /// 主键
         /// </summary>
-        public Guid? BId { get; set; }
+        public string? BId { get; set; }
         /// <summary>
         /// 学历类型：全日制...
         /// </summary>
@@ -548,7 +544,7 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// <summary>
         /// 证书 
         /// </summary>
-        public Guid? QualificationScans { get; set; }
+        public string? QualificationScans { get; set; }
         /// <summary>
         /// 证书上传
         /// </summary>
@@ -572,7 +568,7 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// <summary>
         /// 主键
         /// </summary>
-        public Guid? BId { get; set; }
+        public string? BId { get; set; }
         /// <summary>
         /// 所在船舶
         /// </summary>
@@ -588,7 +584,7 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// <summary>
         /// 文件
         /// </summary>
-        public Guid? PromotionScan { get; set; }
+        public string? PromotionScan { get; set; }
         /// <summary>
         /// 文件上传
         /// </summary>
@@ -612,7 +608,7 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// <summary>
         /// 主键
         /// </summary>
-        public Guid? BId { get; set; }
+        public string? BId { get; set; }
         /// <summary>
         /// 船舶名称
         /// </summary>
@@ -656,7 +652,7 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// <summary>
         /// 主键
         /// </summary>
-        public Guid? BId { get; set; }
+        public string? BId { get; set; }
         /// <summary>
         /// 培训类型：安全培训...
         /// </summary>
@@ -668,7 +664,7 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// <summary>
         /// 培训文件
         /// </summary>
-        public Guid? TrainingScan { get; set; }
+        public string? TrainingScan { get; set; }
         /// <summary>
         /// 培训文件上传
         /// </summary>
@@ -692,7 +688,7 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// <summary>
         /// 主键
         /// </summary>
-        public Guid? BId { get; set; }
+        public string? BId { get; set; }
         /// <summary>
         /// 考核结果：优秀...
         /// </summary>
@@ -704,7 +700,7 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// <summary>
         /// 考核文件
         /// </summary>
-        public Guid? TrainingScan { get; set; }
+        public string? TrainingScan { get; set; }
         /// <summary>
         /// 考核文件上传
         /// </summary>
