@@ -1287,6 +1287,34 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                 return rr.FailResult(false, "数据不存在/已删除");
             }
         }
+        /// <summary>
+        /// 船员调任
+        /// </summary>
+        /// <param name="requestBody"></param>
+        /// <returns></returns>
+        public async Task<ResponseAjaxResult<bool>> CrewTransferAsync(CrewTransferRequest requestBody)
+        {
+            ResponseAjaxResult<bool> rt = new();
+            //前端自己调用任职船舶接口  这里只处理调任逻辑
+            var shipWork = await _dbContext.Queryable<WorkShip>().FirstAsync(t => t.IsDelete == 1 && t.BusinessId == requestBody.BId);
+            if (shipWork != null)
+            {
+                if (requestBody.WorkShipStartTime < shipWork.WorkShipEndTime)//新的上船日期小于旧的下船日期
+                {
+                    return rt.FailResult(false, "上船日期不可小于前下船日期");
+                }
+                if (requestBody.WorkShipStartTime < requestBody.WorkShipEndTime)
+                {
+                    return rt.FailResult(false, "下船日期不可小于上船日期");
+                }
+                shipWork.OnShip = requestBody.OnShip;
+                shipWork.Postition = requestBody.Postition;
+                shipWork.WorkShipEndTime = requestBody.WorkShipEndTime;
+                shipWork.WorkShipEndTime = requestBody.WorkShipEndTime;
+            }
+
+            return rt.SuccessResult(true);
+        }
         #endregion
 
         #region 下拉列表信息
@@ -2497,5 +2525,6 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
 
         }
         #endregion
+
     }
 }
