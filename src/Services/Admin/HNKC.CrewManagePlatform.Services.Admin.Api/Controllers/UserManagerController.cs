@@ -1,5 +1,6 @@
 ﻿using HNKC.CrewManagePlatform.Models.CommonRequest;
 using HNKC.CrewManagePlatform.Models.CommonResult;
+using HNKC.CrewManagePlatform.Models.Dtos;
 using HNKC.CrewManagePlatform.Models.Dtos.UserManager;
 using HNKC.CrewManagePlatform.Services.Admin.Api.Filters;
 using HNKC.CrewManagePlatform.Services.Interface.CurrentUser;
@@ -55,6 +56,42 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api.Controllers
         public async Task<IActionResult> SearchUserAsync([FromQuery]PageRequest pageRequest)
         {
             var data = await userManagerService.SearchUserAsync(pageRequest);
+            return Ok(data);
+        }
+
+
+
+        /// <summary>
+        /// 删除用户
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("RemoveUser")]
+        public async Task<IActionResult> RemoveUserAsync([FromQuery] BaseRequest baseRequest)
+        {
+            var data = await userManagerService.RemoveUserAsync(baseRequest);
+            return Ok(data);
+        }
+
+
+        /// <summary>
+        /// 新增用户
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost("AddUser")]
+        public async Task<IActionResult> AddUserAsync([FromBody] AddUserRequest  addUserRequest)
+        {
+            var data = await userManagerService.AddUserAsync(addUserRequest);
+            return Ok(data);
+        }
+
+        /// <summary>
+        /// 修改用户
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost("ModifyUser")]
+        public async Task<IActionResult> ModifyUserAsync([FromBody] ModifyUserResquest  modifyUserResquest)
+        {
+            var data = await userManagerService.ModifyUserAsync(modifyUserResquest);
             return Ok(data);
         }
     }
