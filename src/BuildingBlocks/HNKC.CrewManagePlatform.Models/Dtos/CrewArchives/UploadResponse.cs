@@ -8,7 +8,7 @@
         /// <summary>
         /// 主键ID
         /// </summary>
-        public long Id { get; set; }
+        public string Id { get; set; }
         /// <summary>
         /// 文件名称
         /// </summary>

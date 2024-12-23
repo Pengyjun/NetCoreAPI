@@ -184,11 +184,10 @@ namespace HNKC.CrewManagePlatform.Utils
         /// 32位guid
         /// </summary>
         /// <returns></returns>
-        public static int Generate32BitGuid()
+        public static string Generate32BitGuid()
         {
             var guid = Guid.NewGuid();  // 生成一个新的 GUID
-            byte[] bytes = guid.ToByteArray();  // 将 GUID 转换为字节数组
-            return BitConverter.ToInt32(bytes, 0);  // 从字节数组中提取前 4 个字节并转换为 32 位整数
+            return guid.ToString("N");  // 返回 32 位不带连字符的十六进制字符串
         }
     }
 }
