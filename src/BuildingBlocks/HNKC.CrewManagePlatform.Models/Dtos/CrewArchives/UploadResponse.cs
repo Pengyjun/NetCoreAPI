@@ -30,6 +30,10 @@
         /// </summary>
         public string? FileType { get; set; }
         /// <summary>
+        /// 文件路径
+        /// </summary>
+        public string? Url { get; set; }
+        /// <summary>
         /// 业务id
         /// </summary>
         public Guid? BId { get; set; }

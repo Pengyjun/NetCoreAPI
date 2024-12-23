@@ -102,7 +102,8 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api.Controllers
                 OriginName = file.FileName,
                 SuffixName = suffixName,
                 FileSize = fileSize,
-                FileType = file.ContentType
+                FileType = file.ContentType,
+                Url = AppsettingsHelper.GetValue("UpdateItem:Url") + newFileName + suffixName
             };
             return Result.Success(uploadResponseDto, "上传成功");
         }
