@@ -68,7 +68,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CurrentUser
                 //用户机构角色信息
                 var userInstitution = await dbContext.Queryable<InstitutionRole>().Where(x => x.IsDelete == 1 && x.UserBusinessId== userInfo.BusinessId).ToListAsync();
                 //机构信息
-                var institutionBusinessId = userInstitution.Select(x => x.InstitutionBusinessId).ToList();
+                var institutionBusinessId = userInstitution.Select(x => x.InstitutionBusinessId).Distinct().ToList();
                 var institution = await dbContext.Queryable<Institution>().Where(x => x.IsDelete == 1 && institutionBusinessId.Contains(x.BusinessId)).ToListAsync();
                 if (userInstitution.Count == 0)
                 {
@@ -257,7 +257,11 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CurrentUser
             await dbContext.Updateable<User>(userInfo).ExecuteCommandAsync();
             return Result.Success("删除成功");
         }
-
+        /// <summary>
+        /// 修改用户
+        /// </summary>
+        /// <param name="modifyUserResquest"></param>
+        /// <returns></returns>
         public async Task<Result> ModifyUserAsync(ModifyUserResquest modifyUserResquest)
         {
             var userInfo = await dbContext.Queryable<User>().Where(x => x.BusinessId == modifyUserResquest.BId).FirstAsync();
@@ -272,5 +276,8 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CurrentUser
             await dbContext.Updateable<User>(userInfo).ExecuteCommandAsync();
             return Result.Success("修改成功");
         }
+
+
+
     }
 }

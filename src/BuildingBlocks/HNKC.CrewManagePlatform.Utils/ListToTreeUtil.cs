@@ -82,6 +82,8 @@ namespace HNKC.CrewManagePlatform.Util
         public string Name { get; set; }
         public string ShortName { get; set; }
         public string Sno { get; set; }
+
+        public Guid BusinessId { get; set; }
         /// <summary>
         /// 当前节点下的所有节点（树形关系）
         /// </summary>

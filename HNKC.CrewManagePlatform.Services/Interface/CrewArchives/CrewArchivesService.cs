@@ -334,7 +334,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                     ServiceBookType = requestBody.BaseInfoDto.ServiceBookType,
                     OnBoard = requestBody.BaseInfoDto.OnBoard,
                     PositionOnBoard = requestBody.BaseInfoDto.PositionOnBoard,
-                    ContarctType = requestBody.BaseInfoDto.ContarctType,
+                    //ContarctType = requestBody.BaseInfoDto.ContarctType,
                     Name = requestBody.BaseInfoDto.Name
                 };
                 //劳务合同
@@ -679,7 +679,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                     userInfo.ServiceBookType = requestBody.BaseInfoDto.ServiceBookType;
                     userInfo.OnBoard = requestBody.BaseInfoDto.OnBoard;
                     userInfo.PositionOnBoard = requestBody.BaseInfoDto.PositionOnBoard;
-                    userInfo.ContarctType = requestBody.BaseInfoDto.ContarctType;
+                    //userInfo.ContarctType = requestBody.BaseInfoDto.ContarctType;
                     userInfo.Name = requestBody.BaseInfoDto.Name;
                     #endregion
 

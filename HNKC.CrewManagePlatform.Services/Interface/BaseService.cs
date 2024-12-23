@@ -1,8 +1,10 @@
 ﻿using AutoMapper;
 using HNKC.CrewManagePlatform.Models.CommonResult;
+using HNKC.CrewManagePlatform.Models.Dtos.Role;
 using HNKC.CrewManagePlatform.Models.Dtos.Salary;
 using HNKC.CrewManagePlatform.Models.Enums;
 using HNKC.CrewManagePlatform.SqlSugars.Models;
+using HNKC.CrewManagePlatform.Util;
 using HNKC.CrewManagePlatform.Utils;
 using MiniExcelLibs;
 using SqlSugar;
@@ -38,7 +40,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface
             List<SalaryAsExcelResponse> res = readResult.ToList();
             #region 数据验证
             //数据验证
-            var num = res.Where(x => x.DataMonth.ToString().Length!=6).Count();
+            var num = res.Where(x => x.DataMonth.ToString().Length != 6).Count();
             if (num > 0)
             {
                 return Result.Fail("数据日期有误请检查");
@@ -81,6 +83,37 @@ namespace HNKC.CrewManagePlatform.Services.Interface
                 await dbContext.Insertable<HNKC.CrewManagePlatform.SqlSugars.Models.Salary>(salaryList).ExecuteCommandAsync();
             }
             return Result.Success("导入成功");
+        }
+
+
+        /// <summary>
+        /// 机构树
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        public async Task<Result> SearchInstitutionTreeAsync()
+        {
+            var userInfo = GlobalCurrentUser;
+            #region 获取当前节点下的所有子节点
+            var allInstitution = await dbContext.Queryable<Institution>().Where(x => x.IsDelete == 1)
+                 .Select(x => new InstitutionTree()
+                 {
+                     GPoid = x.GPoid,
+                     Name = x.Name,
+                     POid = x.Poid,
+                     ShortName = x.ShortName,
+                     Oid = x.Oid,
+                     Sno = x.Sno,
+                     BusinessId = x.BusinessId
+                 })
+                .ToListAsync();
+            var instrturionTree = new ListToTreeUtil().GetTree(userInfo.Oid, allInstitution);
+            var rootNode = allInstitution.Where(x => x.Oid == "101162350").FirstOrDefault();
+            rootNode.Nodes = instrturionTree;
+            return Result.Success(data: rootNode, "响应成功");
+            #endregion
+
+
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using HNKC.CrewManagePlatform.Models.CommonResult;
 using HNKC.CrewManagePlatform.Models.Dtos.Salary;
+using HNKC.CrewManagePlatform.Util;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,5 +21,14 @@ namespace HNKC.CrewManagePlatform.Services.Interface
         /// <param name="path"></param>
         /// <returns></returns>
         Task<Result> ReadExcelAsModelAsync(Stream stream);
+
+
+
+        /// <summary>
+        /// 搜索机构数
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        Task<Result> SearchInstitutionTreeAsync();
     }
 }

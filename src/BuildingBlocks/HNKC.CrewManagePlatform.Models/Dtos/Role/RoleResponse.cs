@@ -24,6 +24,11 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.Role
         public Guid? InstitutionBusinessId { get; set; }
 
         /// <summary>
+        /// 机构名称
+        /// </summary>
+        public string? InstitutionName { get; set; }
+
+        /// <summary>
         /// 角色名称
         /// </summary>
         public string? Name { get; set; }
@@ -42,5 +47,11 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.Role
         /// 是否是超级管理员  1是  0不是
         /// </summary>
         public bool? IsAdmin { get; set; }
+
+
+        /// <summary>
+        /// 角色类型
+        /// </summary>
+        public int? Type { get; set; }
     }
 }

@@ -10,6 +10,7 @@ using HNKC.CrewManagePlatform.Services.Interface.CurrentUserService;
 using HNKC.CrewManagePlatform.Services.Interface.PullResult;
 using HNKC.CrewManagePlatform.Services.Interface.Salary;
 using HNKC.CrewManagePlatform.Services.Menus;
+using HNKC.CrewManagePlatform.Services.Role;
 using HNKC.CrewManagePlatform.Sms.Interfaces;
 using HNKC.CrewManagePlatform.Sms.Services;
 using HNKC.CrewManagePlatform.SqlSugars.Extensions;
@@ -299,6 +300,7 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api
             builder.Services.AddScoped<IDataDictionaryService, DataDictionaryService>();
             builder.Services.AddScoped<ICrewArchivesService, CrewArchivesService>();
             builder.Services.AddScoped<IMenuService, MenuService>();
+            builder.Services.AddScoped<IRoleService, RoleService>();
 
         }
     }
