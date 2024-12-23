@@ -5,10 +5,8 @@ using HNKC.CrewManagePlatform.Models.Enums;
 using HNKC.CrewManagePlatform.SqlSugars.Models;
 using HNKC.CrewManagePlatform.Utils;
 using SqlSugar;
-using System;
 using System.ComponentModel;
 using System.Globalization;
-using System.Security.Policy;
 using UtilsSharp;
 
 namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
@@ -35,6 +33,8 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
         /// <returns></returns>
         public async Task<ResponsePageResult<List<SearchCrewArchivesResponse>>> SearchCrewArchivesAsync(SearchCrewArchivesRequest requestBody)
         {
+            RefAsync<int> total = 0;
+
             //名称相关不赋值
             var rt = await _dbContext.Queryable<User>()
                 .WhereIF(!string.IsNullOrWhiteSpace(requestBody.KeyWords), t => t.Name.Contains(requestBody.KeyWords) || t.CardId.Contains(requestBody.KeyWords)
@@ -44,7 +44,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                 .WhereIF(!string.IsNullOrWhiteSpace(requestBody.WorkNumber), t => t.WorkNumber.Contains(requestBody.WorkNumber))
                 .WhereIF(!string.IsNullOrWhiteSpace(requestBody.Phone), t => t.Phone.Contains(requestBody.Phone))
                 .WhereIF(!string.IsNullOrWhiteSpace(requestBody.OnBoard), t => t.OnBoard.Contains(requestBody.OnBoard))
-                .WhereIF(!string.IsNullOrWhiteSpace(requestBody.CrewType), t => t.CrewType.Contains(requestBody.CrewType))
+                .WhereIF(requestBody.CrewType != null && requestBody.CrewType.Any(), t => requestBody.CrewType.Contains(t.CrewType))
                 .LeftJoin<WorkShip>((t, ws) => t.BusinessId == ws.WorkShipId)
                 .LeftJoin<CrewType>((t, ws, ct) => t.CrewType == ct.BusinessId.ToString())
                 .LeftJoin<CertificateOfCompetency>((t, ws, ct, coc) => t.BusinessId == coc.CertificateId)
@@ -84,23 +84,23 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                     CardId = t.CardId,
                     ShipType = t.ShipType,
                     WorkNumber = t.WorkNumber,
-                    //EmploymentType = t.EmploymentId,
                     ServiceBookType = t.ServiceBookType,
                     CrewType = t.CrewType,
                     IsDelete = t.IsDelete,
                     DeleteReson = t.DeleteReson
                 })
                 .OrderByDescending(t => t.IsDelete)
-                .ToListAsync();
-            return await GetResult(requestBody, rt);
+                .ToPageListAsync(requestBody.PageIndex, requestBody.PageSize, total);
+            return await GetResult(requestBody, rt, total);
         }
         /// <summary>
         /// 获取列表结果集
         /// </summary>
         /// <param name="requestBody"></param>
         /// <param name="rt"></param>
+        /// <param name="total"></param>
         /// <returns></returns>
-        private async Task<ResponsePageResult<List<SearchCrewArchivesResponse>>> GetResult(SearchCrewArchivesRequest requestBody, List<SearchCrewArchivesResponse> rt)
+        private async Task<ResponsePageResult<List<SearchCrewArchivesResponse>>> GetResult(SearchCrewArchivesRequest requestBody, List<SearchCrewArchivesResponse> rt, int total)
         {
             ResponsePageResult<List<SearchCrewArchivesResponse>> rr = new();
             if (rt.Any())
@@ -183,8 +183,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                     t.OnStatusName = ob == null ? EnumUtil.GetDescription(CrewStatusEnum.DaiGang) : EnumUtil.GetDescription(ShipUserStatus(ob.WorkShipEndTime, ob.HolidayTime, t.DeleteReson));
                 }
             }
-
-            return rr.SuccessPageResult(rt.Skip((requestBody.PageIndex - 1) * requestBody.PageSize).Take(requestBody.PageSize).ToList(), requestBody.PageIndex, requestBody.PageSize, rt.Count);
+            return rr.SuccessPageResult(rt, requestBody.PageIndex, requestBody.PageSize, total);
         }
         /// <summary>
         /// 通过身份证与当前日期计算年龄
