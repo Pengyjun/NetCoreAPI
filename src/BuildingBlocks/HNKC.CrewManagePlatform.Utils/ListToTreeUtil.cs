@@ -97,7 +97,7 @@ namespace HNKC.CrewManagePlatform.Util
         /// 菜单编码
         /// </summary>
         public string? MenuCode { get; set; }
-        public Guid BId { get; set; }
+        public Guid? BId { get; set; }
         /// <summary>
         /// 菜单名称
         /// </summary>

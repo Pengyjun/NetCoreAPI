@@ -22,12 +22,12 @@ namespace HNKC.CrewManagePlatform.SqlSugars.Models
         /// 文件id
         /// </summary>
         [SugarColumn(Length = 36, ColumnDescription = "文件id")]
-        public Guid FileId { get; set; }
+        public Guid? FileId { get; set; }
         /// <summary>
         /// 用户id
         /// </summary>
         [SugarColumn(Length = 36, ColumnDescription = "用户id")]
-        public Guid UserId { get; set; }
+        public Guid? UserId { get; set; }
         /// <summary>
         /// 后缀名称
         /// </summary>

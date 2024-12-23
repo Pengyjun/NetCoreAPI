@@ -41,7 +41,7 @@ namespace HNKC.CrewManagePlatform.Services.Menus
             this._dbContext = dbContext;
         }
 
-      
+
         #endregion
 
 
@@ -57,7 +57,7 @@ namespace HNKC.CrewManagePlatform.Services.Menus
             var roleMenu = await _dbContext.Queryable<RoleMenu>().Where(x => x.IsDelete == 1 && x.RoleBusinessId == userInfo.RoleBusinessId).ToListAsync();
             if (roleMenu.Count > 0)
             {
-                var menuId = roleMenu.Select(x => x.MenuBusinessId.Value).ToList();
+                var menuId = roleMenu.Select(x => x.MenuBusinessId).ToList();
                 var menuList = await _dbContext.Queryable<Menu>().Where(x => x.IsDelete == 1 && menuId.Contains(x.BusinessId))
                      .Select(x => new UserMenuResponseTree()
                      {
@@ -92,7 +92,7 @@ namespace HNKC.CrewManagePlatform.Services.Menus
                 return Result.Fail("无权限添加", (int)ResponseHttpCode.NoAuth);
             }
 
-            var menuList=await _dbContext.Queryable<Menu>().Where(x => x.IsDelete == 1).ToListAsync();
+            var menuList = await _dbContext.Queryable<Menu>().Where(x => x.IsDelete == 1).ToListAsync();
             var maxMid = menuList.Max(x => x.MId);
             var menuBuinessId = GuidUtil.Next();
             Menu menu = new Menu()
@@ -107,7 +107,7 @@ namespace HNKC.CrewManagePlatform.Services.Menus
                 Sort = userMenuRequest.Sort,
                 Url = userMenuRequest.Url,
                 Remark = userMenuRequest.Remark,
-                MenuCode=userMenuRequest.MenuCode,
+                MenuCode = userMenuRequest.MenuCode,
             };
             RoleMenu roleMenu = new RoleMenu()
             {
@@ -117,8 +117,8 @@ namespace HNKC.CrewManagePlatform.Services.Menus
                 RoleBusinessId = GlobalCurrentUser.RoleBusinessId,
 
             };
-            await  _dbContext.Insertable<Menu>(menu).ExecuteCommandAsync();
-            await  _dbContext.Insertable<RoleMenu>(roleMenu).ExecuteCommandAsync();
+            await _dbContext.Insertable<Menu>(menu).ExecuteCommandAsync();
+            await _dbContext.Insertable<RoleMenu>(roleMenu).ExecuteCommandAsync();
             return Result.Success("添加成功");
         }
 
@@ -128,18 +128,18 @@ namespace HNKC.CrewManagePlatform.Services.Menus
         /// <param name="userMenuRequest"></param>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
-        public async Task<Result> RemoveMenusAsync(BaseRequest  baseRequest)
+        public async Task<Result> RemoveMenusAsync(BaseRequest baseRequest)
         {
             if (!GlobalCurrentUser.IsAdmin)
             {
                 return Result.Fail("无权限添加", (int)ResponseHttpCode.NoAuth);
             }
-            var menu =await _dbContext.Queryable<Menu>().Where(x => x.IsDelete == 1 && x.BusinessId == baseRequest.BId).FirstAsync();
+            var menu = await _dbContext.Queryable<Menu>().Where(x => x.IsDelete == 1 && x.BusinessId == baseRequest.BId).FirstAsync();
             if (menu == null)
             {
-              return  Result.Fail("数据不存在", (int)ResponseHttpCode.DataNoExist);
+                return Result.Fail("数据不存在", (int)ResponseHttpCode.DataNoExist);
             }
-             menu.IsDelete = 0;
+            menu.IsDelete = 0;
             await _dbContext.Updateable<Menu>(menu).ExecuteCommandAsync();
             return Result.Success("删除成功");
         }

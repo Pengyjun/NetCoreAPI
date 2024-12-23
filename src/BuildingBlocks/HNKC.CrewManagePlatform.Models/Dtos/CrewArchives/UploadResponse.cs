@@ -8,7 +8,7 @@
         /// <summary>
         /// 主键ID
         /// </summary>
-        public string Id { get; set; }
+        public string? Id { get; set; }
         /// <summary>
         /// 文件名称
         /// </summary>
@@ -32,7 +32,7 @@
         /// <summary>
         /// 业务id
         /// </summary>
-        public Guid BId { get; set; }
+        public Guid? BId { get; set; }
         /// <summary>
         /// 文件id
         /// </summary>
@@ -40,6 +40,6 @@
         /// <summary>
         /// 用户id
         /// </summary>
-        public Guid UserId { get; set; }
+        public Guid? UserId { get; set; }
     }
 }

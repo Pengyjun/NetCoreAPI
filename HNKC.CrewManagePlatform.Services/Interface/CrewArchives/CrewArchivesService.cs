@@ -1246,9 +1246,18 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
         private async Task<ResponseAjaxResult<bool>> DeactivateUserASync(ToggleUserStatus requestBody)
         {
             ResponseAjaxResult<bool> rr = new();
-
-
-            return rr.SuccessResult(true);
+            var rt = await _dbContext.Queryable<User>().FirstAsync(t => t.IsDelete == 1 && t.BusinessId == requestBody.BId);
+            if (rt != null)
+            {
+                rt.IsDelete = 0;
+                rt.DeleteReson = requestBody.DeactivateStatus.Value;
+                await _dbContext.Updateable(rt).WhereColumns(x => new { x.IsDelete, x.DeleteReson }).ExecuteCommandAsync();
+                return rr.SuccessResult(true, 1, "已删除");
+            }
+            else
+            {
+                return rr.FailResult(false, "数据不存在/已删除");
+            }
         }
         /// <summary>
         /// 撤销删除（恢复）
@@ -1258,8 +1267,18 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
         private async Task<ResponseAjaxResult<bool>> UndoDeleteUserAsync(ToggleUserStatus requestBody)
         {
             ResponseAjaxResult<bool> rr = new();
-
-            return rr.SuccessResult(true);
+            var rt = await _dbContext.Queryable<User>().FirstAsync(t => t.IsDelete == 0 && t.BusinessId == requestBody.BId);
+            if (rt != null)
+            {
+                rt.IsDelete = 0;
+                rt.DeleteReson = CrewStatusEnum.Normal;
+                await _dbContext.Updateable(rt).WhereColumns(x => new { x.IsDelete, x.DeleteReson }).ExecuteCommandAsync();
+                return rr.SuccessResult(true, 1, "已恢复");
+            }
+            else
+            {
+                return rr.FailResult(false, "数据不存在/已删除");
+            }
         }
         #endregion
 
@@ -2394,7 +2413,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
         /// <param name="uploadResponse"></param>
         /// <param name="uId"></param>
         /// <returns></returns>
-        private async Task<ResponseAjaxResult<bool>> InsertFileAsync(List<UploadResponse> uploadResponse, Guid uId)
+        private async Task<ResponseAjaxResult<bool>> InsertFileAsync(List<UploadResponse> uploadResponse, Guid? uId)
         {
             ResponseAjaxResult<bool> rr = new();
             if (uploadResponse != null && uploadResponse.Any())
@@ -2412,7 +2431,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                         Name = item.Name,
                         OriginName = item.OriginName,
                         SuffixName = item.SuffixName,
-                        FileId = item.FileId.Value,
+                        FileId = item.FileId,
                         UserId = item.UserId
                     });
                 }
@@ -2427,7 +2446,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
         /// <param name="uploadResponse"></param>
         /// <param name="uId"></param>
         /// <returns></returns>
-        private async Task<ResponseAjaxResult<bool>> UpdateFileAsync(List<UploadResponse> uploadResponse, Guid uId)
+        private async Task<ResponseAjaxResult<bool>> UpdateFileAsync(List<UploadResponse> uploadResponse, Guid? uId)
         {
             ResponseAjaxResult<bool> rr = new();
             if (uploadResponse != null && uploadResponse.Any())
