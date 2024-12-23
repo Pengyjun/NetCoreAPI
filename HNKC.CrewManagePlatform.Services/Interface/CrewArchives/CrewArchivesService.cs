@@ -432,10 +432,10 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                     }
                 }
             }
-            await _dbContext.Insertable(userInfo).ExecuteCommandAsync();
-            await _dbContext.Insertable(userEntry).ExecuteCommandAsync();
-            await _dbContext.Insertable(hus).ExecuteCommandAsync();
-            await _dbContext.Insertable(ecs).ExecuteCommandAsync();
+            if (userInfo != null) await _dbContext.Insertable(userInfo).ExecuteCommandAsync();
+            if (userEntry != null) await _dbContext.Insertable(userEntry).ExecuteCommandAsync();
+            if (hus.Any()) await _dbContext.Insertable(hus).ExecuteCommandAsync();
+            if (ecs.Any()) await _dbContext.Insertable(ecs).ExecuteCommandAsync();
             #endregion
 
             #region 适任及证书
@@ -589,10 +589,10 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                     }
                 }
             }
-            await _dbContext.Insertable(coc).ExecuteCommandAsync();
-            await _dbContext.Insertable(vrs).ExecuteCommandAsync();
-            await _dbContext.Insertable(sfs).ExecuteCommandAsync();
-            await _dbContext.Insertable(ses).ExecuteCommandAsync();
+            if (coc != null) await _dbContext.Insertable(coc).ExecuteCommandAsync();
+            if (vrs.Any()) await _dbContext.Insertable(vrs).ExecuteCommandAsync();
+            if (sfs.Any()) await _dbContext.Insertable(sfs).ExecuteCommandAsync();
+            if (ses.Any()) await _dbContext.Insertable(ses).ExecuteCommandAsync();
             #endregion
 
             #region 学历信息
@@ -626,7 +626,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                     }
                 }
             }
-            await _dbContext.Insertable(ebs).ExecuteCommandAsync();
+            if (ebs.Any()) await _dbContext.Insertable(ebs).ExecuteCommandAsync();
             #endregion
 
             #region 职务晋升
@@ -657,7 +657,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                     }
                 }
             }
-            await _dbContext.Insertable(pts).ExecuteCommandAsync();
+            if (pts.Any()) await _dbContext.Insertable(pts).ExecuteCommandAsync();
             #endregion
 
             #region 任职船舶
@@ -683,7 +683,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                     }
                 }
             }
-            await _dbContext.Insertable(wss).ExecuteCommandAsync();
+            if (wss.Any()) await _dbContext.Insertable(wss).ExecuteCommandAsync();
             #endregion
 
             #region 培训记录
@@ -713,7 +713,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                     }
                 }
             }
-            await _dbContext.Insertable(trs).ExecuteCommandAsync();
+            if (trs.Any()) await _dbContext.Insertable(trs).ExecuteCommandAsync();
             #endregion
 
             #region 年度考核
@@ -743,7 +743,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                     }
                 }
             }
-            await _dbContext.Insertable(ycs).ExecuteCommandAsync();
+            if (ycs.Any()) await _dbContext.Insertable(ycs).ExecuteCommandAsync();
             #endregion
 
             #region 保存文件
@@ -868,10 +868,10 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                         }
                     }
                 }
-                await _dbContext.Updateable(userInfo).ExecuteCommandAsync();
-                await _dbContext.Updateable(userEntry).ExecuteCommandAsync();
-                await _dbContext.Updateable(hus).ExecuteCommandAsync();
-                await _dbContext.Updateable(ecs).ExecuteCommandAsync();
+                if (userInfo != null) await _dbContext.Updateable(userInfo).ExecuteCommandAsync();
+                if (userEntry != null) await _dbContext.Updateable(userEntry).ExecuteCommandAsync();
+                if (hus != null) await _dbContext.Updateable(hus).ExecuteCommandAsync();
+                if (ecs != null) await _dbContext.Updateable(ecs).ExecuteCommandAsync();
                 #endregion
 
                 #region 适任及证书
@@ -883,80 +883,83 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                 {
                     coc = await _dbContext.Queryable<CertificateOfCompetency>().FirstAsync(t => t.IsDelete == 1 && t.BusinessId == userInfo.BusinessId);
                     #region 
-                    coc.FCertificate = requestBody.CertificateOfCompetencyDto.FCertificate;
-                    coc.FNavigationArea = requestBody.CertificateOfCompetencyDto.FNavigationArea;
-                    coc.FPosition = requestBody.CertificateOfCompetencyDto.FPosition;
-                    coc.FSignTime = requestBody.CertificateOfCompetencyDto.FSignTime;
-                    coc.FEffectiveTime = requestBody.CertificateOfCompetencyDto.FEffectiveTime;
-                    coc.FScans = GuidUtil.Next();
-                    coc.SCertificate = requestBody.CertificateOfCompetencyDto.SCertificate;
-                    coc.SNavigationArea = requestBody.CertificateOfCompetencyDto.SNavigationArea;
-                    coc.SPosition = requestBody.CertificateOfCompetencyDto.SPosition;
-                    coc.SSignTime = requestBody.CertificateOfCompetencyDto.SSignTime;
-                    coc.SEffectiveTime = requestBody.CertificateOfCompetencyDto.SEffectiveTime;
-                    coc.SScans = GuidUtil.Next();
-                    coc.TrainingCertificate = requestBody.CertificateOfCompetencyDto.TrainingCertificate;
-                    coc.TrainingSignTime = requestBody.CertificateOfCompetencyDto.TrainingSignTime;
-                    coc.TrainingScans = GuidUtil.Next();
-                    coc.Z01EffectiveTime = requestBody.CertificateOfCompetencyDto.Z01EffectiveTime;
-                    coc.Z07EffectiveTime = requestBody.CertificateOfCompetencyDto.Z07EffectiveTime;
-                    coc.Z08EffectiveTime = requestBody.CertificateOfCompetencyDto.Z08EffectiveTime;
-                    coc.Z04EffectiveTime = requestBody.CertificateOfCompetencyDto.Z04EffectiveTime;
-                    coc.Z05EffectiveTime = requestBody.CertificateOfCompetencyDto.Z05EffectiveTime;
-                    coc.Z02EffectiveTime = requestBody.CertificateOfCompetencyDto.Z02EffectiveTime;
-                    coc.Z06EffectiveTime = requestBody.CertificateOfCompetencyDto.Z06EffectiveTime;
-                    coc.Z09EffectiveTime = requestBody.CertificateOfCompetencyDto.Z09EffectiveTime;
-                    coc.HealthCertificate = requestBody.CertificateOfCompetencyDto.HealthCertificate;
-                    coc.HealthSignTime = requestBody.CertificateOfCompetencyDto.HealthSignTime;
-                    coc.HealthEffectiveTime = requestBody.CertificateOfCompetencyDto.HealthEffectiveTime;
-                    coc.HealthScans = GuidUtil.Next();
-                    coc.SeamanCertificate = requestBody.CertificateOfCompetencyDto.SeamanCertificate;
-                    coc.SeamanSignTime = requestBody.CertificateOfCompetencyDto.SeamanSignTime;
-                    coc.SeamanEffectiveTime = requestBody.CertificateOfCompetencyDto.SeamanEffectiveTime;
-                    coc.SeamanScans = GuidUtil.Next();
-                    coc.PassportCertificate = requestBody.CertificateOfCompetencyDto.PassportCertificate;
-                    coc.PassportSignTime = requestBody.CertificateOfCompetencyDto.PassportSignTime;
-                    coc.PassportEffectiveTime = requestBody.CertificateOfCompetencyDto.PassportEffectiveTime;
-                    coc.PassportScans = GuidUtil.Next();
-                    #endregion
+                    if (coc != null)
+                    {
+                        coc.FCertificate = requestBody.CertificateOfCompetencyDto.FCertificate;
+                        coc.FNavigationArea = requestBody.CertificateOfCompetencyDto.FNavigationArea;
+                        coc.FPosition = requestBody.CertificateOfCompetencyDto.FPosition;
+                        coc.FSignTime = requestBody.CertificateOfCompetencyDto.FSignTime;
+                        coc.FEffectiveTime = requestBody.CertificateOfCompetencyDto.FEffectiveTime;
+                        coc.FScans = GuidUtil.Next();
+                        coc.SCertificate = requestBody.CertificateOfCompetencyDto.SCertificate;
+                        coc.SNavigationArea = requestBody.CertificateOfCompetencyDto.SNavigationArea;
+                        coc.SPosition = requestBody.CertificateOfCompetencyDto.SPosition;
+                        coc.SSignTime = requestBody.CertificateOfCompetencyDto.SSignTime;
+                        coc.SEffectiveTime = requestBody.CertificateOfCompetencyDto.SEffectiveTime;
+                        coc.SScans = GuidUtil.Next();
+                        coc.TrainingCertificate = requestBody.CertificateOfCompetencyDto.TrainingCertificate;
+                        coc.TrainingSignTime = requestBody.CertificateOfCompetencyDto.TrainingSignTime;
+                        coc.TrainingScans = GuidUtil.Next();
+                        coc.Z01EffectiveTime = requestBody.CertificateOfCompetencyDto.Z01EffectiveTime;
+                        coc.Z07EffectiveTime = requestBody.CertificateOfCompetencyDto.Z07EffectiveTime;
+                        coc.Z08EffectiveTime = requestBody.CertificateOfCompetencyDto.Z08EffectiveTime;
+                        coc.Z04EffectiveTime = requestBody.CertificateOfCompetencyDto.Z04EffectiveTime;
+                        coc.Z05EffectiveTime = requestBody.CertificateOfCompetencyDto.Z05EffectiveTime;
+                        coc.Z02EffectiveTime = requestBody.CertificateOfCompetencyDto.Z02EffectiveTime;
+                        coc.Z06EffectiveTime = requestBody.CertificateOfCompetencyDto.Z06EffectiveTime;
+                        coc.Z09EffectiveTime = requestBody.CertificateOfCompetencyDto.Z09EffectiveTime;
+                        coc.HealthCertificate = requestBody.CertificateOfCompetencyDto.HealthCertificate;
+                        coc.HealthSignTime = requestBody.CertificateOfCompetencyDto.HealthSignTime;
+                        coc.HealthEffectiveTime = requestBody.CertificateOfCompetencyDto.HealthEffectiveTime;
+                        coc.HealthScans = GuidUtil.Next();
+                        coc.SeamanCertificate = requestBody.CertificateOfCompetencyDto.SeamanCertificate;
+                        coc.SeamanSignTime = requestBody.CertificateOfCompetencyDto.SeamanSignTime;
+                        coc.SeamanEffectiveTime = requestBody.CertificateOfCompetencyDto.SeamanEffectiveTime;
+                        coc.SeamanScans = GuidUtil.Next();
+                        coc.PassportCertificate = requestBody.CertificateOfCompetencyDto.PassportCertificate;
+                        coc.PassportSignTime = requestBody.CertificateOfCompetencyDto.PassportSignTime;
+                        coc.PassportEffectiveTime = requestBody.CertificateOfCompetencyDto.PassportEffectiveTime;
+                        coc.PassportScans = GuidUtil.Next();
 
-                    //文件
-                    if (requestBody.CertificateOfCompetencyDto.FScansUpload != null && requestBody.CertificateOfCompetencyDto.FScansUpload.Any())
-                    {
-                        var ff = requestBody.CertificateOfCompetencyDto.FScansUpload;
-                        ff.ForEach(x => x.FileId = coc.FScans);
-                        upFiles.AddRange(ff);
+                        //文件
+                        if (requestBody.CertificateOfCompetencyDto.FScansUpload != null && requestBody.CertificateOfCompetencyDto.FScansUpload.Any())
+                        {
+                            var ff = requestBody.CertificateOfCompetencyDto.FScansUpload;
+                            ff.ForEach(x => x.FileId = coc.FScans);
+                            upFiles.AddRange(ff);
+                        }
+                        if (requestBody.CertificateOfCompetencyDto.SScansUpload != null && requestBody.CertificateOfCompetencyDto.SScansUpload.Any())
+                        {
+                            var ff = requestBody.CertificateOfCompetencyDto.SScansUpload;
+                            ff.ForEach(x => x.FileId = coc.SScans);
+                            upFiles.AddRange(ff);
+                        }
+                        if (requestBody.CertificateOfCompetencyDto.TrainingScansUpload != null && requestBody.CertificateOfCompetencyDto.TrainingScansUpload.Any())
+                        {
+                            var ff = requestBody.CertificateOfCompetencyDto.TrainingScansUpload;
+                            ff.ForEach(x => x.FileId = coc.TrainingScans);
+                            upFiles.AddRange(ff);
+                        }
+                        if (requestBody.CertificateOfCompetencyDto.HealthScansUpload != null && requestBody.CertificateOfCompetencyDto.HealthScansUpload.Any())
+                        {
+                            var ff = requestBody.CertificateOfCompetencyDto.HealthScansUpload;
+                            ff.ForEach(x => x.FileId = coc.HealthScans);
+                            upFiles.AddRange(ff);
+                        }
+                        if (requestBody.CertificateOfCompetencyDto.SeamanScansUpload != null && requestBody.CertificateOfCompetencyDto.SeamanScansUpload.Any())
+                        {
+                            var ff = requestBody.CertificateOfCompetencyDto.SeamanScansUpload;
+                            ff.ForEach(x => x.FileId = coc.SeamanScans);
+                            upFiles.AddRange(ff);
+                        }
+                        if (requestBody.CertificateOfCompetencyDto.PassportScansUpload != null && requestBody.CertificateOfCompetencyDto.PassportScansUpload.Any())
+                        {
+                            var ff = requestBody.CertificateOfCompetencyDto.PassportScansUpload;
+                            ff.ForEach(x => x.FileId = coc.PassportScans);
+                            upFiles.AddRange(ff);
+                        }
                     }
-                    if (requestBody.CertificateOfCompetencyDto.SScansUpload != null && requestBody.CertificateOfCompetencyDto.SScansUpload.Any())
-                    {
-                        var ff = requestBody.CertificateOfCompetencyDto.SScansUpload;
-                        ff.ForEach(x => x.FileId = coc.SScans);
-                        upFiles.AddRange(ff);
-                    }
-                    if (requestBody.CertificateOfCompetencyDto.TrainingScansUpload != null && requestBody.CertificateOfCompetencyDto.TrainingScansUpload.Any())
-                    {
-                        var ff = requestBody.CertificateOfCompetencyDto.TrainingScansUpload;
-                        ff.ForEach(x => x.FileId = coc.TrainingScans);
-                        upFiles.AddRange(ff);
-                    }
-                    if (requestBody.CertificateOfCompetencyDto.HealthScansUpload != null && requestBody.CertificateOfCompetencyDto.HealthScansUpload.Any())
-                    {
-                        var ff = requestBody.CertificateOfCompetencyDto.HealthScansUpload;
-                        ff.ForEach(x => x.FileId = coc.HealthScans);
-                        upFiles.AddRange(ff);
-                    }
-                    if (requestBody.CertificateOfCompetencyDto.SeamanScansUpload != null && requestBody.CertificateOfCompetencyDto.SeamanScansUpload.Any())
-                    {
-                        var ff = requestBody.CertificateOfCompetencyDto.SeamanScansUpload;
-                        ff.ForEach(x => x.FileId = coc.SeamanScans);
-                        upFiles.AddRange(ff);
-                    }
-                    if (requestBody.CertificateOfCompetencyDto.PassportScansUpload != null && requestBody.CertificateOfCompetencyDto.PassportScansUpload.Any())
-                    {
-                        var ff = requestBody.CertificateOfCompetencyDto.PassportScansUpload;
-                        ff.ForEach(x => x.FileId = coc.PassportScans);
-                        upFiles.AddRange(ff);
-                    }
+                    #endregion
                     //签证记录
                     if (requestBody.CertificateOfCompetencyDto.VisaRecords != null && requestBody.CertificateOfCompetencyDto.VisaRecords.Any())
                     {
@@ -1014,10 +1017,10 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                         }
                     }
                 }
-                await _dbContext.Updateable(coc).ExecuteCommandAsync();
-                await _dbContext.Updateable(vrs).ExecuteCommandAsync();
-                await _dbContext.Updateable(sfs).ExecuteCommandAsync();
-                await _dbContext.Updateable(ses).ExecuteCommandAsync();
+                if (coc != null) await _dbContext.Updateable(coc).ExecuteCommandAsync();
+                if (vrs.Any()) await _dbContext.Updateable(vrs).ExecuteCommandAsync();
+                if (sfs.Any()) await _dbContext.Updateable(sfs).ExecuteCommandAsync();
+                if (ses.Any()) await _dbContext.Updateable(ses).ExecuteCommandAsync();
                 #endregion
 
                 #region 学历信息
@@ -1049,7 +1052,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                         }
                     }
                 }
-                await _dbContext.Updateable(ebs).ExecuteCommandAsync();
+                if (ebs.Any()) await _dbContext.Updateable(ebs).ExecuteCommandAsync();
                 #endregion
 
                 #region 职务晋升
@@ -1078,7 +1081,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                         }
                     }
                 }
-                await _dbContext.Updateable(pts).ExecuteCommandAsync();
+                if (pts.Any()) await _dbContext.Updateable(pts).ExecuteCommandAsync();
                 #endregion
 
                 #region 任职船舶
@@ -1103,7 +1106,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                         }
                     }
                 }
-                await _dbContext.Updateable(wss).ExecuteCommandAsync();
+                if (wss.Any()) await _dbContext.Updateable(wss).ExecuteCommandAsync();
                 #endregion
 
                 #region 培训记录
@@ -1131,7 +1134,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                         }
                     }
                 }
-                await _dbContext.Updateable(trs).ExecuteCommandAsync();
+                if (trs.Any()) await _dbContext.Updateable(trs).ExecuteCommandAsync();
                 #endregion
 
                 #region 年度考核
@@ -1159,7 +1162,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                         }
                     }
                 }
-                await _dbContext.Updateable(ycs).ExecuteCommandAsync();
+                if (ycs.Any()) await _dbContext.Updateable(ycs).ExecuteCommandAsync();
                 #endregion
 
                 #region 文件保存
@@ -2494,10 +2497,10 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                         OriginName = item.OriginName,
                         SuffixName = item.SuffixName,
                         FileId = item.FileId,
-                        UserId = item.UserId
+                        UserId = uId
                     });
                 }
-                await _dbContext.Insertable(files).ExecuteCommandAsync();
+                if (files.Any()) await _dbContext.Insertable(files).ExecuteCommandAsync();
                 return rr.SuccessResult(true);
             }
             else { return rr.FailResult(false, "文件保存失败"); }
@@ -2516,7 +2519,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                 var bids = uploadResponse.Select(x => x.FileId).ToList();
                 //删除原有文件
                 var oldFiles = await _dbContext.Queryable<Files>().Where(t => t.IsDelete == 1 && uId == t.UserId).ToListAsync();
-                await _dbContext.Deleteable(oldFiles).ExecuteCommandAsync();
+                if (oldFiles.Any()) await _dbContext.Deleteable(oldFiles).ExecuteCommandAsync();
                 //重新新增文件
                 return await InsertFileAsync(uploadResponse, uId);
             }
