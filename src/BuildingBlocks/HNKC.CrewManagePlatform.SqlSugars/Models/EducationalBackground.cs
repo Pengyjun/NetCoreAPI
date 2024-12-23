@@ -44,5 +44,11 @@ namespace HNKC.CrewManagePlatform.SqlSugars.Models
         /// </summary>
         [SugarColumn(ColumnDataType = "text", ColumnDescription = "证书")]
         public Guid? QualificationScans { get; set; }
+
+        /// <summary>
+        /// 关联键 
+        /// </summary>
+        [SugarColumn(Length = 36, ColumnDescription = "关联键")]
+        public Guid? QualificationId { get; set; }
     }
 }

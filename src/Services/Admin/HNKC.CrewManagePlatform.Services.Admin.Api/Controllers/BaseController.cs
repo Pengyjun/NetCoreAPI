@@ -4,7 +4,6 @@ using HNKC.CrewManagePlatform.Models.Dtos.CrewArchives;
 using HNKC.CrewManagePlatform.Services.Interface.CurrentUserService;
 using HNKC.CrewManagePlatform.Utils;
 using Microsoft.AspNetCore.Mvc;
-using SqlSugar;
 using UtilsSharp;
 
 namespace HNKC.CrewManagePlatform.Services.Admin.Api.Controllers
@@ -90,7 +89,7 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api.Controllers
                 return Result.Fail("上传大小不允许");
             }
             var savePath = AppsettingsHelper.GetValue("UpdateItem:SavePath");
-            var newFileName = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
+            var newFileName = GuidUtil.Generate32BitGuid();
             savePath = Path.Combine(savePath, $"{newFileName}{file.FileName}");
             using (var stream = System.IO.File.Create(savePath))
             {
@@ -104,7 +103,7 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api.Controllers
                 SuffixName = suffixName,
                 FileSize = fileSize,
                 FileType = file.ContentType,
-                BId = GuidUtil.Next()
+                Url = AppsettingsHelper.GetValue("UpdateItem:Url") + newFileName + file.FileName
             };
             return Result.Success(uploadResponseDto, "上传成功");
         }

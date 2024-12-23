@@ -201,5 +201,10 @@ namespace HNKC.CrewManagePlatform.SqlSugars.Models
         [SugarColumn(ColumnDataType = "text", ColumnDescription = "护照扫描件")]
         public Guid? PassportScans { get; set; }
         #endregion
+        /// <summary>
+        /// 关联键
+        /// </summary>
+        [SugarColumn(Length = 36, ColumnDescription = "关联键")]
+        public Guid? CertificateId { get; set; }
     }
 }

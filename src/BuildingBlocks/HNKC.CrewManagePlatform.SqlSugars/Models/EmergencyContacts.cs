@@ -29,5 +29,10 @@ namespace HNKC.CrewManagePlatform.SqlSugars.Models
         /// </summary>
         [SugarColumn(Length = 100, ColumnDescription = "工作单位")]
         public string? WorkUnit { get; set; }
+        /// <summary>
+        /// 关联键
+        /// </summary>
+        [SugarColumn(Length = 36, ColumnDescription = "关联键")]
+        public Guid? EmergencyContactId { get; set; }
     }
 }

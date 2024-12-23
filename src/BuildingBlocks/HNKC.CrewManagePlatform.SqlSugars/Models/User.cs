@@ -87,11 +87,6 @@ namespace HNKC.CrewManagePlatform.SqlSugars.Models
         [SugarColumn(Length = 50, ColumnDescription = "民族")]
         public string? Nation { get; set; }
         /// <summary>
-        /// 合同类型
-        /// </summary>
-        //[SugarColumn(ColumnDataType = "int", ColumnDescription = "合同类型", DefaultValue = "0")]
-        //public ContractEnum ContarctType { get; set; }
-        /// <summary>
         /// 船舶类型
         /// </summary>
         [SugarColumn(ColumnDataType = "int", ColumnDescription = "船舶类型", DefaultValue = "0")]

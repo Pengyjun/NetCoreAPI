@@ -15,6 +15,11 @@ namespace HNKC.CrewManagePlatform.SqlSugars.Models
         [SugarColumn(Length = 100, ColumnDescription = "国家")]
         public string? Country { get; set; }
         /// <summary>
+        /// 关联键
+        /// </summary>
+        [SugarColumn(Length = 36, ColumnDescription = "关联键")]
+        public Guid? VisareCordId { get; set; }
+        /// <summary>
         /// 签证类型
         /// </summary>
         [SugarColumn(Length = 5, ColumnDescription = "签证类型")]

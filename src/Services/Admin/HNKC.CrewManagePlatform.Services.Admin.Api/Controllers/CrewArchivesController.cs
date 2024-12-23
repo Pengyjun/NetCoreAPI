@@ -65,6 +65,16 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api.Controllers
         {
             return await _service.ToggleUserStatusAsync(requestBody);
         }
+        /// <summary>
+        /// 船员调任
+        /// </summary>
+        /// <param name="requestBody"></param>
+        /// <returns></returns>
+        [HttpPost("CrewTransfer")]
+        public async Task<ResponseAjaxResult<bool>> CrewTransferAsync(CrewTransferRequest requestBody)
+        {
+            return await _service.CrewTransferAsync(requestBody);
+        }
         #region 下拉列表
         /// <summary>
         /// 获取基本下拉列表
@@ -191,16 +201,6 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api.Controllers
         public async Task<Result> UploadFileAsync(IFormFile file)
         {
             return await SingleFileUpdateAsync(file, "DefaultAllowFileType");
-        }
-        /// <summary>
-        /// 保存文件
-        /// </summary>
-        /// <param name="requestBody"></param>
-        /// <returns></returns>
-        [HttpPost("SaveFilesInfo")]
-        public async Task<ResponseAjaxResult<bool>> SaveFilesInfoAsync([FromBody] List<UploadResponse> requestBody)
-        {
-            return await _service.InsertFileAsync(requestBody);
         }
 
         #endregion

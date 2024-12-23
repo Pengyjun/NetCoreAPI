@@ -28,6 +28,11 @@ namespace HNKC.CrewManagePlatform.SqlSugars.Models
         /// </summary>
         [SugarColumn(ColumnDataType = "text", ColumnDescription = "调单文件")]
         public Guid? PromotionScan { get; set; }
+        /// <summary>
+        /// 关联键
+        /// </summary>
+        [SugarColumn(Length = 36, ColumnDescription = "关联键")]
+        public Guid? PromotionId { get; set; }
 
     }
 }

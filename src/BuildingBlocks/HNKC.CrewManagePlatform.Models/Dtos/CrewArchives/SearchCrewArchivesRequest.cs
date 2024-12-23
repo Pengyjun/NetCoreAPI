@@ -34,7 +34,7 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// <summary>
         /// 船员类型
         /// </summary>
-        public string? CrewType { get; set; }
+        public List<string>? CrewType { get; set; }
         /// <summary>
         /// 船员状态
         /// </summary>

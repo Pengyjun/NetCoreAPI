@@ -11,7 +11,7 @@ namespace HNKC.CrewManagePlatform.SqlSugars.Models
         /// <summary>
         /// 主键
         /// </summary>
-        [SugarColumn(Length = 19, ColumnDescription = "证书主键")]
+        [SugarColumn(Length = 19, ColumnDescription = "主键")]
         public long PrimaryKey { get; set; }
         /// <summary>
         /// 外键表

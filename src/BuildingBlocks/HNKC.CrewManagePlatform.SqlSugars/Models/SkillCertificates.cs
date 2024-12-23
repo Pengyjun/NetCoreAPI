@@ -15,9 +15,14 @@ namespace HNKC.CrewManagePlatform.SqlSugars.Models
         [SugarColumn(Length = 5, ColumnDescription = "证书类型")]
         public CertificateTypeEnum SkillCertificateType { get; set; }
         /// <summary>
-        /// 扫描件 ，拼接
+        /// 扫描件 
         /// </summary>
         [SugarColumn(ColumnDataType = "text", ColumnDescription = "扫描件")]
-        public string? SkillScans { get; set; }
+        public Guid? SkillScans { get; set; }
+        /// <summary>
+        /// 关联键
+        /// </summary>
+        [SugarColumn(Length = 36, ColumnDescription = "关联键")]
+        public Guid? SkillcertificateId { get; set; }
     }
 }

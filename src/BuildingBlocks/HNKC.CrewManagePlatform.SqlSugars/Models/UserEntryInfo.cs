@@ -1,4 +1,5 @@
-﻿using SqlSugar;
+﻿using HNKC.CrewManagePlatform.Models.Enums;
+using SqlSugar;
 
 namespace HNKC.CrewManagePlatform.SqlSugars.Models
 {
@@ -38,5 +39,15 @@ namespace HNKC.CrewManagePlatform.SqlSugars.Models
         /// </summary>
         [SugarColumn(Length = 36, ColumnDescription = "用工形式")]
         public string? EmploymentId { get; set; }
+        /// <summary>
+        /// 合同类型
+        /// </summary>
+        [SugarColumn(ColumnDataType = "int", ColumnDescription = "合同类型", DefaultValue = "0")]
+        public ContractEnum ContarctType { get; set; }
+        /// <summary>
+        /// 关联键
+        /// </summary>
+        [SugarColumn(Length = 36, ColumnDescription = "关联键")]
+        public Guid? UserEntryId { get; set; }
     }
 }

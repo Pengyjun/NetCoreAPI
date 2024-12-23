@@ -180,5 +180,14 @@ namespace HNKC.CrewManagePlatform.Utils
             /// </summary>
             AsEnd,
         }
+        /// <summary>
+        /// 32位guid
+        /// </summary>
+        /// <returns></returns>
+        public static string Generate32BitGuid()
+        {
+            var guid = Guid.NewGuid();  // 生成一个新的 GUID
+            return guid.ToString("N");  // 返回 32 位不带连字符的十六进制字符串
+        }
     }
 }

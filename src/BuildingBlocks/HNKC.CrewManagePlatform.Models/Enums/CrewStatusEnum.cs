@@ -36,6 +36,6 @@ namespace HNKC.CrewManagePlatform.Models.Enums
         /// 待岗
         /// </summary>
         [Description("待岗")]
-        DaiGang = 4
+        DaiGang = 5
     }
 }

@@ -6,9 +6,9 @@
     public class UploadResponse
     {
         /// <summary>
-        /// 文件ID
+        /// 主键ID
         /// </summary>
-        public long Id { get; set; }
+        public string? Id { get; set; }
         /// <summary>
         /// 文件名称
         /// </summary>
@@ -30,8 +30,20 @@
         /// </summary>
         public string? FileType { get; set; }
         /// <summary>
+        /// 文件路径
+        /// </summary>
+        public string? Url { get; set; }
+        /// <summary>
         /// 业务id
         /// </summary>
-        public Guid BId { get; set; }
+        public Guid? BId { get; set; }
+        /// <summary>
+        /// 文件id
+        /// </summary>
+        public Guid? FileId { get; set; }
+        /// <summary>
+        /// 用户id
+        /// </summary>
+        public Guid? UserId { get; set; }
     }
 }
