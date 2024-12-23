@@ -88,25 +88,9 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// </summary>
         public string? Phone { get; set; }
         /// <summary>
-        /// 身份证扫描件 
-        /// </summary>
-        public string? IdCardScans { get; set; }
-        /// <summary>
         /// 身份证扫描件上传
         /// </summary>
         public List<UploadResponse>? IdCardScansUpload { get; set; }
-        /// <summary>
-        /// 入职日期
-        /// </summary>
-        public DateTime? EntryTime { get; set; }
-        /// <summary>
-        /// 入职材料
-        /// </summary>
-        public string? EntryScans { get; set; }
-        /// <summary>
-        /// 用工形式
-        /// </summary>
-        public string? EmploymentId { get; set; }
         #endregion
 
         #region 专业信息
@@ -165,10 +149,6 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// </summary>
         public DateTime EndTime { get; set; }
         /// <summary>
-        /// 入职材料 
-        /// </summary>
-        public string? EntryScans { get; set; }
-        /// <summary>
         /// 入职材料上传
         /// </summary>
         public List<UploadResponse>? EntryScansUpload { get; set; }
@@ -187,7 +167,7 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// <summary>
         /// 合同类型
         /// </summary>
-        public ContractEnum ContarctType { get; set; }
+        public ContractEnum ContractType { get; set; }
     }
     /// <summary>
     /// 家庭成员/紧急联系人
@@ -222,10 +202,6 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
     {
         #region 第一适任证
         /// <summary>
-        /// 主键
-        /// </summary>
-        public string? Id { get; set; }
-        /// <summary>
         /// 证书编号
         /// </summary>
         public string? FCertificate { get; set; }
@@ -245,10 +221,6 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// 有效日期
         /// </summary>
         public DateTime? FEffectiveTime { get; set; }
-        /// <summary>
-        /// 扫描件 
-        /// </summary>
-        public string? FScans { get; set; }
         /// <summary>
         /// 扫描件上传
         /// </summary>
@@ -276,10 +248,6 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// 有效日期
         /// </summary>
         public DateTime? SEffectiveTime { get; set; }
-        /// <summary>
-        /// 扫描件 
-        /// </summary>
-        public string? SScans { get; set; }
         /// <summary>
         /// 扫描件上传
         /// </summary>
@@ -328,10 +296,6 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// </summary>
         public DateTime? Z09EffectiveTime { get; set; }
         /// <summary>
-        /// 扫描件 
-        /// </summary>
-        public string? TrainingScans { get; set; }
-        /// <summary>
         /// 扫描件上传
         /// </summary>
         public List<UploadResponse>? TrainingScansUpload { get; set; }
@@ -351,10 +315,6 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// </summary>
         public DateTime? HealthEffectiveTime { get; set; }
         /// <summary>
-        /// 扫描件 
-        /// </summary>
-        public string? HealthScans { get; set; }
-        /// <summary>
         /// 扫描件上传
         /// </summary>
         public List<UploadResponse>? HealthScansUpload { get; set; }
@@ -373,10 +333,6 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// 有效日期
         /// </summary>
         public DateTime? SeamanEffectiveTime { get; set; }
-        /// <summary>
-        /// 扫描件 
-        /// </summary>
-        public string? SeamanScans { get; set; }
         /// <summary>
         /// 扫描件上传
         /// </summary>
@@ -400,10 +356,6 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// 签证记录
         /// </summary>
         public List<VisaRecordss>? VisaRecords { get; set; }
-        /// <summary>
-        /// 扫描件
-        /// </summary>
-        public string? PassportScans { get; set; }
         /// <summary>
         /// 扫描件上传
         /// </summary>
@@ -438,10 +390,6 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// </summary>
         public CertificateTypeEnum SkillCertificateType { get; set; }
         /// <summary>
-        /// 扫描件
-        /// </summary>
-        public string? SkillScans { get; set; }
-        /// <summary>
         /// 扫描件上传
         /// </summary>
         public List<UploadResponse>? SkillScansUpload { get; set; }
@@ -467,10 +415,6 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// 年审日期
         /// </summary>
         public DateTime? AnnualReviewTime { get; set; }
-        /// <summary>
-        /// 扫描件 
-        /// </summary>
-        public string? SpecialEquipsScans { get; set; }
         /// <summary>
         /// 扫描件上传
         /// </summary>
@@ -542,10 +486,6 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// </summary>
         public DateTime? EndTime { get; set; }
         /// <summary>
-        /// 证书 
-        /// </summary>
-        public string? QualificationScans { get; set; }
-        /// <summary>
         /// 证书上传
         /// </summary>
         public List<UploadResponse>? QualificationScansUpload { get; set; }
@@ -581,10 +521,6 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// 日期：格式2024年10月15日
         /// </summary>
         public DateTime? PromotionTime { get; set; }
-        /// <summary>
-        /// 文件
-        /// </summary>
-        public string? PromotionScan { get; set; }
         /// <summary>
         /// 文件上传
         /// </summary>
@@ -662,10 +598,6 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// </summary>
         public DateTime? TrainingTime { get; set; }
         /// <summary>
-        /// 培训文件
-        /// </summary>
-        public string? TrainingScan { get; set; }
-        /// <summary>
         /// 培训文件上传
         /// </summary>
         public List<UploadResponse>? TrainingScanUpload { get; set; }
@@ -698,42 +630,9 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// </summary>
         public DateTime? TrainingTime { get; set; }
         /// <summary>
-        /// 考核文件
-        /// </summary>
-        public string? TrainingScan { get; set; }
-        /// <summary>
         /// 考核文件上传
         /// </summary>
         public List<UploadResponse>? TrainingScanUpload { get; set; }
     }
-    /// <summary>
-    /// 备注
-    /// </summary>
-    public class NotesDto
-    {
-        /// <summary>
-        /// 备注
-        /// </summary>
-        public List<Notes>? Notes { get; set; }
-    }
-    /// <summary>
-    /// 备注
-    /// </summary>
-    public class Notes
-    {
-        /// <summary>
-        /// 用户名
-        /// </summary>
-        public string? UserName { get; set; }
-        /// <summary>
-        /// 备注日期：yyyy-MM-dd HH：mm：ss
-        /// </summary>
-        public DateTime? NoteTime { get; set; }
-        /// <summary>
-        /// 内容
-        /// </summary>
-        public string? Content { get; set; }
-    }
-
     #endregion
 }

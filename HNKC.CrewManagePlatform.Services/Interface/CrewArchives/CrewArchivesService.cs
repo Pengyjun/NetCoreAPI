@@ -369,7 +369,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                         LaborCompany = requestBody.BaseInfoDto.UserEntryInfo.LaborCompany,
                         EmploymentId = requestBody.BaseInfoDto.UserEntryInfo.EmploymentId,
                         UserEntryId = uId,
-                        ContarctType = requestBody.BaseInfoDto.UserEntryInfo.ContarctType
+                        ContarctType = requestBody.BaseInfoDto.UserEntryInfo.ContractType
                     };
                 }
                 if (requestBody.BaseInfoDto.UserEntryInfo != null)
@@ -823,7 +823,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                             userEntry.EntryTime = requestBody.BaseInfoDto.UserEntryInfo.EntryTime;
                             userEntry.LaborCompany = requestBody.BaseInfoDto.UserEntryInfo.LaborCompany;
                             userEntry.EmploymentId = requestBody.BaseInfoDto.UserEntryInfo.EmploymentId;
-                            userEntry.ContarctType = requestBody.BaseInfoDto.UserEntryInfo.ContarctType;
+                            userEntry.ContarctType = requestBody.BaseInfoDto.UserEntryInfo.ContractType;
                             if (requestBody.BaseInfoDto.UserEntryInfo != null)
                             {
                                 if (requestBody.BaseInfoDto.UserEntryInfo.EntryScansUpload != null && requestBody.BaseInfoDto.UserEntryInfo.EntryScansUpload.Any())
