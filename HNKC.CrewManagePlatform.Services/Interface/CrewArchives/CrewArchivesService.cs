@@ -292,7 +292,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
         /// <returns></returns>
         public async Task<ResponseAjaxResult<bool>> SaveUserAsync(CrewArchivesRequest requestBody)
         {
-            if (requestBody.BId == Guid.Empty || string.IsNullOrWhiteSpace(requestBody.BId.ToString())) { return await InsertUserAsync(requestBody); }
+            if (requestBody.BId == Guid.Empty || string.IsNullOrEmpty(requestBody.BId.ToString())) { return await InsertUserAsync(requestBody); }
             else { return await UpdateUserAsync(requestBody); }
         }
         /// <summary>
@@ -339,7 +339,6 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                     ServiceBookType = requestBody.BaseInfoDto.ServiceBookType,
                     OnBoard = requestBody.BaseInfoDto.OnBoard,
                     PositionOnBoard = requestBody.BaseInfoDto.PositionOnBoard,
-                    ContarctType = requestBody.BaseInfoDto.ContarctType,
                     Name = requestBody.BaseInfoDto.Name
                 };
                 //文件
@@ -369,7 +368,8 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                         EntryTime = requestBody.BaseInfoDto.UserEntryInfo.EntryTime,
                         LaborCompany = requestBody.BaseInfoDto.UserEntryInfo.LaborCompany,
                         EmploymentId = requestBody.BaseInfoDto.UserEntryInfo.EmploymentId,
-                        UserEntryId = uId
+                        UserEntryId = uId,
+                        ContarctType = requestBody.BaseInfoDto.UserEntryInfo.ContarctType
                     };
                 }
                 if (requestBody.BaseInfoDto.UserEntryInfo != null)
@@ -796,7 +796,6 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                     userInfo.ServiceBookType = requestBody.BaseInfoDto.ServiceBookType;
                     userInfo.OnBoard = requestBody.BaseInfoDto.OnBoard;
                     userInfo.PositionOnBoard = requestBody.BaseInfoDto.PositionOnBoard;
-                    userInfo.ContarctType = requestBody.BaseInfoDto.ContarctType;
                     userInfo.Name = requestBody.BaseInfoDto.Name;
                     #endregion
                     //文件
@@ -824,7 +823,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                             userEntry.EntryTime = requestBody.BaseInfoDto.UserEntryInfo.EntryTime;
                             userEntry.LaborCompany = requestBody.BaseInfoDto.UserEntryInfo.LaborCompany;
                             userEntry.EmploymentId = requestBody.BaseInfoDto.UserEntryInfo.EmploymentId;
-
+                            userEntry.ContarctType = requestBody.BaseInfoDto.UserEntryInfo.ContarctType;
                             if (requestBody.BaseInfoDto.UserEntryInfo != null)
                             {
                                 if (requestBody.BaseInfoDto.UserEntryInfo.EntryScansUpload != null && requestBody.BaseInfoDto.UserEntryInfo.EntryScansUpload.Any())

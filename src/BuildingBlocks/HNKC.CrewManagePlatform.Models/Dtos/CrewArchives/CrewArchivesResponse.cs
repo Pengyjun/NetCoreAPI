@@ -107,10 +107,6 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// 用工形式
         /// </summary>
         public string? EmploymentId { get; set; }
-        /// <summary>
-        /// 合同类型
-        /// </summary>
-        public ContractEnum ContarctType { get; set; }
         #endregion
 
         #region 专业信息
@@ -188,6 +184,10 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// 用工形式
         /// </summary>
         public string? EmploymentId { get; set; }
+        /// <summary>
+        /// 合同类型
+        /// </summary>
+        public ContractEnum ContarctType { get; set; }
     }
     /// <summary>
     /// 家庭成员/紧急联系人
