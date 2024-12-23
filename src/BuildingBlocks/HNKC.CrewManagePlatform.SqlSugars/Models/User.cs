@@ -127,5 +127,12 @@ namespace HNKC.CrewManagePlatform.SqlSugars.Models
         /// </summary>
         [SugarColumn(ColumnDataType = "int", ColumnDescription = "是否是新增用户   从其他用户同步过来的用户不属于新增用户  默认值是1  不是新增   0是新增", DefaultValue = "1")]
         public int IsInsert { get; set; }
+
+
+        /// <summary>
+        /// 备注  
+        /// </summary>
+        [SugarColumn(Length =512)]
+        public string? Remark { get; set; }
     }
 }

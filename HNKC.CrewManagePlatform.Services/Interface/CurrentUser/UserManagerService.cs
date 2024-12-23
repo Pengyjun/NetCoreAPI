@@ -6,6 +6,7 @@ using HNKC.CrewManagePlatform.Models.Dtos.Role;
 using HNKC.CrewManagePlatform.Models.Dtos.UserManager;
 using HNKC.CrewManagePlatform.Models.Enums;
 using HNKC.CrewManagePlatform.Services.Interface.CurrentUserService;
+using HNKC.CrewManagePlatform.SqlSugars.Extensions;
 using HNKC.CrewManagePlatform.SqlSugars.Models;
 using HNKC.CrewManagePlatform.Utils;
 using HNKC.CrewManagePlatform.Web.Jwt;
@@ -17,6 +18,8 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using UtilsSharp;
+using UtilsSharp.Shared.Standard;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace HNKC.CrewManagePlatform.Services.Interface.CurrentUser
 {
@@ -56,14 +59,14 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CurrentUser
                     return Result.Fail("登录失败", (int)ResponseHttpCode.LoginFail);
                 }
                 //存在多个角色时候  选择第一个创建的角色为默认角色
-                var userInstitutionList = await dbContext.Queryable<UserInstitution>().Where(x => x.IsDelete == 1 && x.UserBusinessId == userInfo.BusinessId && x.InstitutionBusinessId == instutionBusinessId).OrderBy(x => x.Created).ToListAsync();
-                if (userInstitutionList.Count == 0)
-                {
-                    return Result.Fail("登录失败", (int)ResponseHttpCode.LoginFail);
-                }
-                var roleBuinessId = userInstitutionList.Select(x => x.BusinessId).ToList();
+                //var userInstitutionList = await dbContext.Queryable<UserInstitution>().Where(x => x.IsDelete == 1 && x.UserBusinessId == userInfo.BusinessId && x.InstitutionBusinessId == instutionBusinessId).OrderBy(x => x.Created).ToListAsync();
+                //if (userInstitutionList.Count == 0)
+                //{
+                //    return Result.Fail("登录失败", (int)ResponseHttpCode.LoginFail);
+                //}
+                //var roleBuinessId = userInstitutionList.Select(x => x.BusinessId).ToList();
                 //用户机构角色信息
-                var userInstitution = await dbContext.Queryable<InstitutionRole>().Where(x => x.IsDelete == 1 && roleBuinessId.Contains(x.BusinessId)).ToListAsync();
+                var userInstitution = await dbContext.Queryable<InstitutionRole>().Where(x => x.IsDelete == 1 && x.UserBusinessId== userInfo.BusinessId).ToListAsync();
                 //机构信息
                 var institutionBusinessId = userInstitution.Select(x => x.InstitutionBusinessId).ToList();
                 var institution = await dbContext.Queryable<Institution>().Where(x => x.IsDelete == 1 && institutionBusinessId.Contains(x.BusinessId)).ToListAsync();
@@ -173,9 +176,39 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CurrentUser
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
 
-        public Task<PageResult<UserResponse>> SearchUserAsync(PageRequest pageRequest)
+        public async Task<PageResult<UserResponse>> SearchUserAsync(PageRequest pageRequest)
         {
-            throw new NotImplementedException();
+            PageResult<UserResponse> pageResult = new PageResult<UserResponse>();
+            var data= await dbContext.Queryable<User>()
+                 .LeftJoin<InstitutionRole>((a, b) => a.BusinessId == b.UserBusinessId)
+                 .LeftJoin<HNKC.CrewManagePlatform.SqlSugars.Models.Role>((a, b, c) => b.RoleBusinessId == c.BusinessId)
+                 .LeftJoin<HNKC.CrewManagePlatform.SqlSugars.Models.Institution>((a, b, c, d) => b.InstitutionBusinessId == d.BusinessId)
+                 .Where(a => a.IsDelete == 1)
+                 .WhereIF(!string.IsNullOrWhiteSpace(pageRequest.KeyWords), a => a.Name.Contains(pageRequest.KeyWords)
+                 || a.Phone.Contains(pageRequest.KeyWords))
+                 .Select((a, b, c, d) => new UserResponse() {
+                     BId = a.BusinessId,
+                     Name = a.Name,
+                     Phone = a.Phone,
+                     Remark = a.Remark,
+                     Created = a.Created,
+                     RoleName = c.Name
+                 })
+               .ToListAsync();
+
+            List<UserResponse> replaceUser = new List<UserResponse>();
+            foreach (var item in data)
+            {
+                if (replaceUser.Count(x => x.BId == item.BId) == 0)
+                {
+                    item.RoleName = string.Join(",", data.Where(x => x.BId == item.BId).Select(x => x.RoleName).ToList());
+                    replaceUser.Add(item);
+                }
+            }
+
+            pageResult.TotalCount = replaceUser.Count;
+            pageResult.List = replaceUser.Skip((pageRequest.PageIndex - 1) * pageRequest.PageSize).Take(pageRequest.PageSize).ToList();
+            return pageResult;
         }
         /// <summary>
         /// 新增用户

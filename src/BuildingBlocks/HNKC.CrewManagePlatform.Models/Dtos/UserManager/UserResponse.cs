@@ -24,6 +24,10 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.UserManager
         /// 部门名称
         /// </summary>
         public string? DepartmentName { get; set; }
+        /// <summary>
+        /// 角色名称
+        /// </summary>
+        public string? RoleName { get; set; }
 
         /// <summary>
         /// 备注

@@ -1,4 +1,5 @@
-﻿using HNKC.CrewManagePlatform.Models.CommonResult;
+﻿using HNKC.CrewManagePlatform.Models.CommonRequest;
+using HNKC.CrewManagePlatform.Models.CommonResult;
 using HNKC.CrewManagePlatform.Models.Dtos.UserManager;
 using HNKC.CrewManagePlatform.Services.Admin.Api.Filters;
 using HNKC.CrewManagePlatform.Services.Interface.CurrentUser;
@@ -40,10 +41,20 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpPost("ResetPwd")]
-        [AllowAnonymous]
         public async Task<IActionResult> ResetPwdAsync([FromBody] ResetPwdResquest ResetPwdResquest)
         {
             var data= await userManagerService.ResetPwdAsync(ResetPwdResquest);
+            return Ok(data);
+        }
+
+        /// <summary>
+        /// 用户列表查询
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("SearchUser")]
+        public async Task<IActionResult> SearchUserAsync([FromQuery]PageRequest pageRequest)
+        {
+            var data = await userManagerService.SearchUserAsync(pageRequest);
             return Ok(data);
         }
     }
