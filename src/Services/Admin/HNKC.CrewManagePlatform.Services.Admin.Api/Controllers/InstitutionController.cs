@@ -28,7 +28,7 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet("SearchInstitutionTree")]
-        public async Task<ResponseAjaxResult<InstitutionTree>> SearchInstitutionTreeAsync()
+        public async Task<Result> SearchInstitutionTreeAsync()
         {
             return await baseService.SearchInstitutionTreeAsync();
         }

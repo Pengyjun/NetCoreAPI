@@ -91,11 +91,8 @@ namespace HNKC.CrewManagePlatform.Services.Interface
         /// </summary>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
-        public async Task<ResponseAjaxResult<InstitutionTree>> SearchInstitutionTreeAsync()
+        public async Task<Result> SearchInstitutionTreeAsync()
         {
-            ResponseAjaxResult<InstitutionTree> rt = new();
-            InstitutionTree rr = new();
-
             var userInfo = GlobalCurrentUser;
             #region 获取当前节点下的所有子节点
             var allInstitution = await dbContext.Queryable<Institution>().Where(x => x.IsDelete == 1)
@@ -113,8 +110,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface
             var instrturionTree = new ListToTreeUtil().GetTree(userInfo.Oid, allInstitution);
             var rootNode = allInstitution.Where(x => x.Oid == "101162350").FirstOrDefault();
             rootNode.Nodes = instrturionTree;
-            rr = rootNode;
-            return rt.SuccessResult(rr);
+            return Result.Success(data: rootNode, "响应成功");
             #endregion
 
 
