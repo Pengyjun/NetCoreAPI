@@ -111,5 +111,18 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api.Controllers
         {
             return await roleService.AddRoleMenuAsync(addRoleMenuRequest);
         }
+
+
+        /// <summary>
+        /// 角色查询菜单
+        /// </summary>
+        /// <param name="addRoleMenuRequest"></param>
+        /// <returns></returns>
+        [HttpPost("SearchRoleMenu")]
+        public async Task<IActionResult> SearchRoleMenuAsync([FromQuery] BaseRequest baseRequest)
+        {
+            var data= await roleService.SearchRoleMenuAsync(baseRequest);
+            return Ok(data);
+        }
     }
 }
