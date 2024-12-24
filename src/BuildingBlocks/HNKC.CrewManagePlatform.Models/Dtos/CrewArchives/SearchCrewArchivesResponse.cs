@@ -5,7 +5,7 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
     /// <summary>
     /// 列表响应
     /// </summary>
-    public class SearchCrewArchivesResponse:BaseResponse
+    public class SearchCrewArchivesResponse : BaseResponse
     {
         /// <summary>
         /// 用户名称
@@ -66,19 +66,19 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// <summary>
         /// 第一适任
         /// </summary>
-        public string? FCertificate { get; set; }
+        public string? FPosition { get; set; }
         /// <summary>
         /// 
         /// </summary>
-        public string? FCertificateName { get; set; }
+        public string? FPositionName { get; set; }
         /// <summary>
         /// 第二适任
         /// </summary>
-        public string? SCertificate { get; set; }
+        public string? SPosition { get; set; }
         /// <summary>
         /// 
         /// </summary>
-        public string? SCertificateName { get; set; }
+        public string? SPositionName { get; set; }
         /// <summary>
         /// 服务簿
         /// </summary>

@@ -1,4 +1,5 @@
 ﻿using HNKC.CrewManagePlatform.Models.CommonResult;
+using HNKC.CrewManagePlatform.Models.Dtos;
 using HNKC.CrewManagePlatform.Models.Dtos.CrewArchives;
 using HNKC.CrewManagePlatform.Models.Dtos.Role;
 using HNKC.CrewManagePlatform.Services.Interface.CrewArchives;
@@ -58,9 +59,9 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api.Controllers
         /// <returns></returns>
         [HttpPost("RemoveRole")]
         [Transactional]
-        public async Task<IActionResult> RemoveAsync([FromBody] AddRoleRequest addRoleRequest)
+        public async Task<IActionResult> RemoveAsync([FromBody] BaseRequest  baseRequest)
         {
-            var data = await roleService.RemoveAsync(addRoleRequest);
+            var data = await roleService.RemoveAsync(baseRequest);
             return Ok(data);
         }
         /// <summary>
