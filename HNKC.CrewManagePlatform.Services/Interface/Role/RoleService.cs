@@ -310,15 +310,19 @@ namespace HNKC.CrewManagePlatform.Services.Role
         {
             var menuIds = addRoleMenuRequest.RoleMenuOptions.Select(x => x.MenuBusinessId).ToList();
             var roleMenuList = await _dbContext.Queryable<RoleMenu>().Where(x => x.IsDelete == 1 && x.RoleBusinessId == addRoleMenuRequest.RoleBusinessId).ToListAsync();
-            if (roleMenuList.Count == 0)
-            { 
-                 return Result.Fail("数据不存在",(int)ResponseHttpCode.DataNoExist); 
-            }
-            foreach (var item in roleMenuList)
+            if (roleMenuList.Count > 0)
             {
-                item.IsDelete = 0;
+                foreach (var item in roleMenuList)
+                {
+                    item.IsDelete = 0;
+                }
+                await _dbContext.Updateable<RoleMenu>(roleMenuList).ExecuteCommandAsync();
             }
-            await _dbContext.Updateable<RoleMenu>(roleMenuList).ExecuteCommandAsync();
+            //if (roleMenuList.Count == 0)
+            //{ 
+            //     return Result.Fail("数据不存在",(int)ResponseHttpCode.DataNoExist); 
+            //}
+          
             List<RoleMenu> roleMenus = new List<RoleMenu>();
             foreach (var item in addRoleMenuRequest.RoleMenuOptions)
             {
