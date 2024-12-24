@@ -19,6 +19,13 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CurrentUser
         /// <param name="userLoginRequest"></param>
         /// <returns></returns>
         Task<Result> UserLoginAsync(UserLoginRequest userLoginRequest);
+        
+        /// <summary>
+        /// 切换角色
+        /// </summary>
+        /// <param name="roleBusinessId"></param>
+        /// <returns></returns>
+        Task<Result> ChangeRoleAsync(ChangRoleRequest  changRoleRequest);
 
 
         /// <summary>

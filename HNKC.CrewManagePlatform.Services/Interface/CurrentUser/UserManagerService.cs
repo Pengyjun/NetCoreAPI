@@ -10,9 +10,11 @@ using HNKC.CrewManagePlatform.SqlSugars.Extensions;
 using HNKC.CrewManagePlatform.SqlSugars.Models;
 using HNKC.CrewManagePlatform.Utils;
 using HNKC.CrewManagePlatform.Web.Jwt;
+using NetTaste;
 using SqlSugar;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Security.Claims;
 using System.Text;
@@ -97,25 +99,29 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CurrentUser
                     };
                     foreach (var item in userInstitution)
                     {
-                        var roleInfo = roleList.Where(x => x.BusinessId == item.BusinessId).FirstOrDefault();
+                        var roleInfo = roleList.Where(x => x.BusinessId == item.RoleBusinessId).FirstOrDefault();
                         var institutionInfo = institution.Where(x => x.BusinessId == item.InstitutionBusinessId).FirstOrDefault();
-                        RoleResponse role = new RoleResponse()
+                        if (userLoginResponse.RoleList.Count(x => x.RoleBusinessId == item.RoleBusinessId) == 0)
                         {
-                            InstitutionBusinessId = item.InstitutionBusinessId,
-                            RoleBusinessId = item.BusinessId,
-                            IsAdmin = roleInfo?.IsAdmin,
-                            IsApprove = roleInfo?.IsApprove,
-                            Name = roleInfo?.Name,
-                            Oid = institutionInfo?.Oid
-                        };
-                        userLoginResponse.RoleList.Add(role);
+                            RoleResponse role = new RoleResponse()
+                            {
+                                InstitutionBusinessId = item.InstitutionBusinessId,
+                                RoleBusinessId = item.BusinessId,
+                                IsAdmin = roleInfo?.IsAdmin,
+                                IsApprove = roleInfo?.IsApprove,
+                                Name = roleInfo?.Name,
+                                Oid = institutionInfo?.Oid
+                            };
+                            userLoginResponse.RoleList.Add(role);
+                        }
+                       
                     }
                     var firstRoleLogin = userLoginResponse.RoleList.Where(x => x.RoleBusinessId == firstRole.BusinessId).FirstOrDefault();
-                    //切换角色
-                    if (userLoginRequest.RoleBusinessId.HasValue)
-                    {
-                        firstRoleLogin = userLoginResponse.RoleList.Where(x => x.RoleBusinessId == userLoginRequest.RoleBusinessId.Value).FirstOrDefault();
-                    }
+                    ////切换角色
+                    //if (userLoginRequest.RoleBusinessId.HasValue)
+                    //{
+                    //    firstRoleLogin = userLoginResponse.RoleList.Where(x => x.RoleBusinessId == userLoginRequest.RoleBusinessId.Value).FirstOrDefault();
+                    //}
 
                     //默认存第一个角色信息
                     Claim[] claims = new Claim[]
@@ -140,6 +146,81 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CurrentUser
             }
             return Result.Fail("登录失败", (int)ResponseHttpCode.LoginFail);
             //HttpContentAccessFactory.Current.Response.Headers["Authorization"] = token;
+        }
+
+        /// <summary>
+        /// 切换角色
+        /// </summary>
+        /// <param name="roleBusinessId"></param>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        public async Task<Result> ChangeRoleAsync(ChangRoleRequest changRoleRequest)
+        {
+            var token = string.Empty;
+            var userInfo = GlobalCurrentUser;
+           var allRole=await dbContext.Queryable<InstitutionRole>().Where(x => x.IsDelete == 1 && x.RoleBusinessId == userInfo.RoleBusinessId
+            && x.UserBusinessId == userInfo.UserBusinessId).ToListAsync();
+            //角色ID
+            var roleIds=allRole.Select(x=>x.RoleBusinessId).ToList();
+            //角色信息
+            var roleList = await dbContext.Queryable<HNKC.CrewManagePlatform.SqlSugars.Models.Role>().Where(x => x.IsDelete == 1 && roleIds.Contains(x.BusinessId)).ToListAsync();
+            //机构ID
+            var institutionIds= allRole.Select(x=>x.InstitutionBusinessId).ToList();
+            //机构信息
+            var institution = await dbContext.Queryable<Institution>().Where(x => x.IsDelete == 1 && institutionIds.Contains(x.BusinessId)).ToListAsync();
+         
+            if (roleList.Count > 0)
+            {
+
+                UserLoginResponse userLoginResponse = new UserLoginResponse()
+                {
+                    BId = userInfo.UserBusinessId,
+                    Name = userInfo.Name,
+                    WorkNumber = userInfo.WorkNumber,
+                    RoleList = new List<Models.Dtos.Role.RoleResponse>()
+                };
+                foreach (var item in allRole)
+                {
+                    var roleInfo = roleList.Where(x => x.BusinessId == item.RoleBusinessId).FirstOrDefault();
+                    var institutionInfo = institution.Where(x => x.BusinessId == item.InstitutionBusinessId).FirstOrDefault();
+                    if (userLoginResponse.RoleList.Count(x => x.RoleBusinessId == item.RoleBusinessId) == 0)
+                    {
+                        RoleResponse role = new RoleResponse()
+                        {
+                            InstitutionBusinessId = item.InstitutionBusinessId,
+                            RoleBusinessId = item.BusinessId,
+                            IsAdmin = roleInfo?.IsAdmin,
+                            IsApprove = roleInfo?.IsApprove,
+                            Name = roleInfo?.Name,
+                            Oid = institutionInfo?.Oid
+                        };
+                        userLoginResponse.RoleList.Add(role);
+                    }
+
+                }
+                var loginRole = roleList.Where(x => x.BusinessId == changRoleRequest.RoleBusinessId).FirstOrDefault();
+  
+                //默认存第一个角色信息
+                Claim[] claims = new Claim[]
+                {
+                        new Claim("Id",userInfo.Id.ToString()),
+                        new Claim("IsAdmin",loginRole.IsAdmin.ToString()),
+                        new Claim("BId",userInfo.UserBusinessId.ToString()),
+                        new Claim("WorkNumber",userInfo.WorkNumber?.ToString()),
+                        new Claim("Name",userInfo.Name?.ToString()),
+                        new Claim("Oid",userInfo.Oid?.ToString()),
+                        new Claim("BInstitutionId",changRoleRequest.InstitutionBusinessId.ToString()),
+                        new Claim("Phone",userInfo.Phone?.ToString()),
+                        new Claim("RoleBusinessId",loginRole.BusinessId.ToString()),
+                };
+                var expores = int.Parse(AppsettingsHelper.GetValue("AccessToken:Expires"));
+                token = jwtService.CreateAccessToken(claims, expores);
+                userLoginResponse.Token = token;
+                //存入Redis
+                RedisUtil.Instance.Set(userInfo.Id.ToString(), token, expores);
+                return Result.Success(data: userLoginResponse);
+            }
+            return Result.Fail("角色切换失败", (int)ResponseHttpCode.LoginFail);
         }
 
         /// <summary>
@@ -277,7 +358,6 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CurrentUser
             return Result.Success("修改成功");
         }
 
-
-
+      
     }
 }

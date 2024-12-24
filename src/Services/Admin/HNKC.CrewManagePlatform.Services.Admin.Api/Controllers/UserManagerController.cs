@@ -35,7 +35,15 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api.Controllers
             return await userManagerService.UserLoginAsync(userLogin);
            
         }
-
+        /// <summary>
+        /// 切换角色
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost("ChangeRole")]
+        public async Task<Result> ChangeRoleAsync([FromBody] ChangRoleRequest  changRoleRequest)
+        {
+            return await userManagerService.ChangeRoleAsync(changRoleRequest);
+        }
 
         /// <summary>
         /// 重置密码

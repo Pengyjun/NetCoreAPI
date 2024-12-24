@@ -7,19 +7,17 @@ using System.Threading.Tasks;
 
 namespace HNKC.CrewManagePlatform.Models.Dtos.UserManager
 {
-    public class UserLoginRequest
+    public class ChangRoleRequest
     {
         /// <summary>
-        /// 手机号
+        /// 机构ID
         /// </summary>
-        [Required(ErrorMessage ="账号不能为空")]
-        public string? Phone { get; set; }
-
+        [Required(ErrorMessage ="机构ID不能为空")]
+        public Guid? InstitutionBusinessId { get; set; }
         /// <summary>
-        /// 职工号
+        /// 角色ID不
         /// </summary>
-        [Required(ErrorMessage = "密码不能为空")]
-        public string? Password { get; set; }
-       
+        [Required(ErrorMessage = "角色ID不能为空")]
+        public Guid? RoleBusinessId { get; set; }
     }
 }
