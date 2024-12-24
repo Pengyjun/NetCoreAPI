@@ -35,52 +35,43 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
         {
             RefAsync<int> total = 0;
 
+            #region 船员关联
+            //任职船舶 
+            var crewWorkShip = _dbContext.Queryable<WorkShip>()
+              .GroupBy(u => u.WorkShipId)
+              .WhereIF(!string.IsNullOrWhiteSpace(requestBody.OnBoard), t => t.BusinessId.ToString() == requestBody.OnBoard)//所在船舶
+              .WhereIF(!string.IsNullOrWhiteSpace(requestBody.HistoryOnBoard), t => t.BusinessId.ToString() == requestBody.HistoryOnBoard)//履历船舶
+              .Select(t => new { t.WorkShipId, WorkShipEndTime = SqlFunc.AggregateMax(t.WorkShipEndTime) });
+            var wShip = _dbContext.Queryable<WorkShip>()
+                .InnerJoin(crewWorkShip, (x, y) => x.WorkShipId == y.WorkShipId && x.WorkShipEndTime == y.WorkShipEndTime);
+
+            //入职时间
+            var uentityFist = _dbContext.Queryable<UserEntryInfo>()
+                .GroupBy(u => u.UserEntryId)
+                .Select(x => new { x.UserEntryId, EndTime = SqlFunc.AggregateMax(x.EndTime) });
+            var uentity = _dbContext.Queryable<UserEntryInfo>()
+                .InnerJoin(uentityFist, (x, y) => x.UserEntryId == y.UserEntryId && x.EndTime == y.EndTime);
+            #endregion
+
             //名称相关不赋值
             var rt = await _dbContext.Queryable<User>()
+                .WhereIF(requestBody.ServiceBooks != null && requestBody.ServiceBooks.Any(),
+                (t) => requestBody.ServiceBooks.Contains(((int)t.ServiceBookType).ToString()))//服务簿类型
                 .WhereIF(!string.IsNullOrWhiteSpace(requestBody.KeyWords), t => t.Name.Contains(requestBody.KeyWords) || t.CardId.Contains(requestBody.KeyWords)
                 || t.Phone.Contains(requestBody.KeyWords) || t.WorkNumber.Contains(requestBody.KeyWords))
                 .WhereIF(!string.IsNullOrWhiteSpace(requestBody.Name), t => t.Name.Contains(requestBody.Name))
                 .WhereIF(!string.IsNullOrWhiteSpace(requestBody.CardId), t => t.CardId.Contains(requestBody.CardId))
                 .WhereIF(!string.IsNullOrWhiteSpace(requestBody.WorkNumber), t => t.WorkNumber.Contains(requestBody.WorkNumber))
                 .WhereIF(!string.IsNullOrWhiteSpace(requestBody.Phone), t => t.Phone.Contains(requestBody.Phone))
-                .WhereIF(!string.IsNullOrWhiteSpace(requestBody.OnBoard), t => t.OnBoard.Contains(requestBody.OnBoard))
-                .WhereIF(requestBody.CrewType != null && requestBody.CrewType.Any(), t => requestBody.CrewType.Contains(t.CrewType))
-                .LeftJoin<WorkShip>((t, ws) => t.OnBoard == ws.BusinessId.ToString())
-                .LeftJoin<CrewType>((t, ws, ct) => t.CrewType == ct.BusinessId.ToString())
-                .LeftJoin<CertificateOfCompetency>((t, ws, ct, coc) => t.BusinessId == coc.CertificateId)
-                .LeftJoin<NavigationArea>((t, ws, ct, coc, na) => coc.FNavigationArea == na.BusinessId.ToString() || coc.SNavigationArea == na.BusinessId.ToString())
-                .LeftJoin<Position>((t, ws, ct, coc, na, po) => coc.FPosition == na.BusinessId.ToString() || coc.SPosition == na.BusinessId.ToString())
-                .LeftJoin<SkillCertificates>((t, ws, ct, coc, na, po, sf) => t.BusinessId == sf.SkillcertificateId)
-                .LeftJoin<EducationalBackground>((t, ws, ct, coc, na, po, sf, eb) => eb.QualificationId == t.BusinessId)
-                .LeftJoin<UserEntryInfo>((t, ws, ct, coc, na, po, sf, eb, ui) => ui.UserEntryId == t.BusinessId)
-                .LeftJoin<EmploymentType>((t, ws, ct, coc, na, po, sf, eb, ui, et) => et.BusinessId.ToString() == ui.EmploymentId)
-                .LeftJoin<OwnerShip>((t, ws, ct, coc, na, po, sf, eb, ui, et, ow) => t.OnBoard == ws.BusinessId.ToString())
-                .WhereIF(!string.IsNullOrWhiteSpace(requestBody.HistoryOnBoard), (t, ws, ct, coc, na, po, sf, eb, ui, et, ow) => ws.OnShip.Contains(requestBody.HistoryOnBoard))
-                .WhereIF(requestBody.ShipTypes != null && requestBody.ShipTypes.Any(), (t, ws, ct, coc, na, po, sf, eb, ui, et, ow) => requestBody.ShipTypes.Contains(((int)ow.ShipType).ToString()))
-                .WhereIF(requestBody.ServiceBooks != null && requestBody.ServiceBooks.Any(), (t, ws, ct, coc, na, po, sf, eb, ui, et, ow) => requestBody.ServiceBooks.Contains(((int)t.ServiceBookType).ToString()))
-                .WhereIF(requestBody.FPosition != null && requestBody.FPosition.Any(), (t, ws, ct, coc, na, po, sf, eb, ui, et, ow) => requestBody.FPosition.Contains(coc.FPosition))
-                .WhereIF(requestBody.SPosition != null && requestBody.SPosition.Any(), (t, ws, ct, coc, na, po, sf, eb, ui, et, ow) => requestBody.SPosition.Contains(coc.SPosition))
-                .WhereIF(requestBody.Staus != null && requestBody.Staus.Contains("0"), (t, ws, ct, coc, na, po, sf, eb, ui, et, ow) => DateTime.Now < ws.WorkShipEndTime)//在岗
-                .WhereIF(requestBody.Staus != null && requestBody.Staus.Contains("1"), (t, ws, ct, coc, na, po, sf, eb, ui, et, ow) => (int)t.DeleteReson == 1)//离职
-                .WhereIF(requestBody.Staus != null && requestBody.Staus.Contains("2"), (t, ws, ct, coc, na, po, sf, eb, ui, et, ow) => (int)t.DeleteReson == 2)//调离
-                .WhereIF(requestBody.Staus != null && requestBody.Staus.Contains("3"), (t, ws, ct, coc, na, po, sf, eb, ui, et, ow) => (int)t.DeleteReson == 3)//退休
-                .WhereIF(requestBody.Staus != null && requestBody.Staus.Contains("5"), (t, ws, ct, coc, na, po, sf, eb, ui, et, ow) => DateTime.Now >= ws.WorkShipEndTime)//待岗
-                .WhereIF(requestBody.TrainingCertificate, (t, ws, ct, coc, na, po, sf, eb, ui, et, ow) => !string.IsNullOrWhiteSpace(coc.TrainingCertificate))
-                .WhereIF(requestBody.Z01Effective, (t, ws, ct, coc, na, po, sf, eb, ui, et, ow) => !string.IsNullOrWhiteSpace(coc.Z01EffectiveTime.ToString()))
-                .WhereIF(requestBody.Z07Effective, (t, ws, ct, coc, na, po, sf, eb, ui, et, ow) => !string.IsNullOrWhiteSpace(coc.Z07EffectiveTime.ToString()))
-                .WhereIF(requestBody.Z08Effective, (t, ws, ct, coc, na, po, sf, eb, ui, et, ow) => !string.IsNullOrWhiteSpace(coc.Z08EffectiveTime.ToString()))
-                .WhereIF(requestBody.Z04Effective, (t, ws, ct, coc, na, po, sf, eb, ui, et, ow) => !string.IsNullOrWhiteSpace(coc.Z04EffectiveTime.ToString()))
-                .WhereIF(requestBody.Z05Effective, (t, ws, ct, coc, na, po, sf, eb, ui, et, ow) => !string.IsNullOrWhiteSpace(coc.Z05EffectiveTime.ToString()))
-                .WhereIF(requestBody.Z02Effective, (t, ws, ct, coc, na, po, sf, eb, ui, et, ow) => !string.IsNullOrWhiteSpace(coc.Z02EffectiveTime.ToString()))
-                .WhereIF(requestBody.Z06Effective, (t, ws, ct, coc, na, po, sf, eb, ui, et, ow) => !string.IsNullOrWhiteSpace(coc.Z06EffectiveTime.ToString()))
-                .WhereIF(requestBody.Z09Effective, (t, ws, ct, coc, na, po, sf, eb, ui, et, ow) => !string.IsNullOrWhiteSpace(coc.Z09EffectiveTime.ToString()))
-                .WhereIF(requestBody.SeamanCertificate, (t, ws, ct, coc, na, po, sf, eb, ui, et, ow) => !string.IsNullOrWhiteSpace(coc.SeamanCertificate))
-                .WhereIF(requestBody.PassportCertificate, (t, ws, ct, coc, na, po, sf, eb, ui, et, ow) => !string.IsNullOrWhiteSpace(coc.PassportCertificate))
-                .WhereIF(requestBody.HealthCertificate, (t, ws, ct, coc, na, po, sf, eb, ui, et, ow) => !string.IsNullOrWhiteSpace(coc.HealthCertificate))
-                .WhereIF(requestBody.CertificateTypes != null && requestBody.CertificateTypes.Any(), (t, ws, ct, coc, na, po, sf, eb, ui, et, ow) => requestBody.CertificateTypes.Contains(((int)sf.SkillCertificateType).ToString()))
-                .WhereIF(requestBody.QualificationTypes != null && requestBody.QualificationTypes.Any(), (t, ws, ct, coc, na, po, sf, eb, ui, et, ow) => requestBody.QualificationTypes.Contains(((int)eb.QualificationType).ToString()))
-                .WhereIF(requestBody.Qualifications != null && requestBody.Qualifications.Any(), (t, ws, ct, coc, na, po, sf, eb, ui, et, ow) => requestBody.Qualifications.Contains(((int)eb.Qualification).ToString()))
-                .Select((t, ws, ct, coc, na, po, sf, eb, ui, et, ow) => new SearchCrewArchivesResponse
+                .LeftJoin(wShip, (t, ws) => t.OnBoard == ws.BusinessId.ToString())
+                .LeftJoin<CertificateOfCompetency>((t, ws, coc) => t.BusinessId == coc.CertificateId)
+                .LeftJoin(uentity, (t, ws, coc, ue) => t.BusinessId == ue.UserEntryId)
+                .WhereIF(requestBody.Staus != null && requestBody.Staus.Contains("0"), (t, ws, coc, ue) => DateTime.Now < ws.WorkShipEndTime)//在岗
+                .WhereIF(requestBody.Staus != null && requestBody.Staus.Contains("1"), (t, ws, coc, ue) => (int)t.DeleteReson == 1)//离职
+                .WhereIF(requestBody.Staus != null && requestBody.Staus.Contains("2"), (t, ws, coc, ue) => (int)t.DeleteReson == 2)//调离
+                .WhereIF(requestBody.Staus != null && requestBody.Staus.Contains("3"), (t, ws, coc, ue) => (int)t.DeleteReson == 3)//退休
+                .WhereIF(requestBody.Staus != null && requestBody.Staus.Contains("5"), (t, ws, coc, ue) => DateTime.Now >= ws.WorkShipEndTime)//待岗
+                .Select((t, ws, coc, ue) => new SearchCrewArchivesResponse
                 {
                     BId = t.BusinessId,
                     BtnType = t.IsDelete == 0 ? 1 : 0,
@@ -90,14 +81,52 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                     WorkNumber = t.WorkNumber,
                     ServiceBookType = t.ServiceBookType,
                     CrewType = t.CrewType,
-                    EmploymentType = et.BusinessId.ToString(),
+                    EmploymentType = ue.BusinessId.ToString(),
                     FPosition = coc.FPosition,
                     SPosition = coc.SPosition,
                     IsDelete = t.IsDelete,
                     DeleteReson = t.DeleteReson
                 })
+                .MergeTable()
+                .WhereIF(requestBody.CrewType != null && requestBody.CrewType.Any(), child => SqlFunc.Subqueryable<SkillCertificates>()
+                               .Where(skcall => requestBody.CrewType.Contains(skcall.BusinessId.ToString())).Any())//船员类型
+                .WhereIF(requestBody.ShipTypes != null && requestBody.ShipTypes.Any(), child => SqlFunc.Subqueryable<OwnerShip>()
+                               .Where(skcall => requestBody.ShipTypes.Contains(skcall.ShipType.ToString())).Any())//船舶类型
+                .WhereIF(requestBody.PositionOnBoard != null, child => SqlFunc.Subqueryable<PositionOnBoard>()//在船职务
+                               .Where(skcall => requestBody.PositionOnBoard == skcall.BusinessId.ToString()).Any())
+                .WhereIF(requestBody.FPosition != null && requestBody.FPosition.Any(), child => SqlFunc.Subqueryable<CertificateOfCompetency>()//第一适任证
+                               .Where(skcall => requestBody.FPosition.Contains(skcall.BusinessId.ToString())).Any())
+                .WhereIF(requestBody.SPosition != null && requestBody.SPosition.Any(), child => SqlFunc.Subqueryable<CertificateOfCompetency>()//第二适任证
+                               .Where(skcall => requestBody.SPosition.Contains(skcall.BusinessId.ToString())).Any())
+                .WhereIF(requestBody.TrainingCertificate, child => SqlFunc.Subqueryable<CertificateOfCompetency>()
+                               .Where(skcall => !string.IsNullOrEmpty(skcall.TrainingCertificate)).Any())
+                .WhereIF(requestBody.Z01Effective, child => SqlFunc.Subqueryable<CertificateOfCompetency>()
+                               .Where(skcall => !string.IsNullOrEmpty(skcall.Z01EffectiveTime.ToString())).Any())
+                .WhereIF(requestBody.Z08Effective, child => SqlFunc.Subqueryable<CertificateOfCompetency>()
+                               .Where(skcall => !string.IsNullOrEmpty(skcall.Z08EffectiveTime.ToString())).Any())
+                .WhereIF(requestBody.Z04Effective, child => SqlFunc.Subqueryable<CertificateOfCompetency>()
+                               .Where(skcall => !string.IsNullOrEmpty(skcall.Z04EffectiveTime.ToString())).Any())
+                .WhereIF(requestBody.Z05Effective, child => SqlFunc.Subqueryable<CertificateOfCompetency>()
+                               .Where(skcall => !string.IsNullOrEmpty(skcall.Z05EffectiveTime.ToString())).Any())
+                .WhereIF(requestBody.Z02Effective, child => SqlFunc.Subqueryable<CertificateOfCompetency>()
+                               .Where(skcall => !string.IsNullOrEmpty(skcall.Z02EffectiveTime.ToString())).Any())
+                .WhereIF(requestBody.Z06Effective, child => SqlFunc.Subqueryable<CertificateOfCompetency>()
+                               .Where(skcall => !string.IsNullOrEmpty(skcall.Z06EffectiveTime.ToString())).Any())
+                .WhereIF(requestBody.Z09Effective, child => SqlFunc.Subqueryable<CertificateOfCompetency>()
+                               .Where(skcall => !string.IsNullOrEmpty(skcall.Z09EffectiveTime.ToString())).Any())
+                .WhereIF(requestBody.SeamanCertificate, child => SqlFunc.Subqueryable<CertificateOfCompetency>()
+                               .Where(skcall => !string.IsNullOrEmpty(skcall.SeamanCertificate)).Any())
+                .WhereIF(requestBody.PassportCertificate, child => SqlFunc.Subqueryable<CertificateOfCompetency>()
+                               .Where(skcall => !string.IsNullOrEmpty(skcall.PassportCertificate)).Any())
+                .WhereIF(requestBody.HealthCertificate, child => SqlFunc.Subqueryable<CertificateOfCompetency>()
+                               .Where(skcall => !string.IsNullOrEmpty(skcall.HealthCertificate)).Any())
+                //技能证书
+                //学历 
+                //学历类型
+
                 .OrderByDescending(t => t.IsDelete)
                 .ToPageListAsync(requestBody.PageIndex, requestBody.PageSize, total);
+
             return await GetResult(requestBody, rt, total);
         }
         /// <summary>
