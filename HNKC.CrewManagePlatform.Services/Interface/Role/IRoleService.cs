@@ -2,6 +2,7 @@
 using HNKC.CrewManagePlatform.Models.CommonResult;
 using HNKC.CrewManagePlatform.Models.Dtos;
 using HNKC.CrewManagePlatform.Models.Dtos.Role;
+using HNKC.CrewManagePlatform.Util;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -69,6 +70,11 @@ namespace HNKC.CrewManagePlatform.Services.Role
         Task<Result> AddRoleMenuAsync(AddRoleMenuRequest  addRoleMenuRequest);
 
 
-      
+        /// <summary>
+        /// 角色分配菜单
+        /// </summary>
+        /// <param name="userRoleRequest"></param>
+        /// <returns></returns>
+        Task<List<UserMenuResponseTree>> SearchRoleMenuAsync(BaseRequest baseRequest);
     }
 }
