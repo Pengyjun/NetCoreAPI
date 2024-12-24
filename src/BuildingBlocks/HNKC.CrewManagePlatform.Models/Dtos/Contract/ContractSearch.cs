@@ -1,10 +1,16 @@
-﻿namespace HNKC.CrewManagePlatform.Models.Dtos.Contract
+﻿using HNKC.CrewManagePlatform.Models.Enums;
+
+namespace HNKC.CrewManagePlatform.Models.Dtos.Contract
 {
     /// <summary>
     /// 合同列表
     /// </summary>
-    public class ContractSearch : BaseRequest
+    public class ContractSearch
     {
+        /// <summary>
+        /// 
+        /// </summary>
+        public string? Id { get; set; }
         /// <summary>
         /// 用户名称
         /// </summary>
@@ -12,7 +18,7 @@
         /// <summary>
         /// 船舶类型
         /// </summary>
-        public string? ShipType { get; set; }
+        public ShipTypeEnum ShipType { get; set; }
         /// <summary>
         /// 
         /// </summary>
@@ -32,7 +38,7 @@
         /// <summary>
         /// 
         /// </summary>
-        public string? CountryNamee { get; set; }
+        public string? CountryName { get; set; }
         /// <summary>
         /// 用工形式
         /// </summary>
@@ -44,7 +50,7 @@
         /// <summary>
         /// 合同类型
         /// </summary>
-        public string? ContractType { get; set; }
+        public ContractEnum ContractType { get; set; }
         /// <summary>
         /// 
         /// </summary>
@@ -60,7 +66,7 @@
         /// <summary>
         /// 开始时间
         /// </summary>
-        public string? StartTime { get; set; }
+        public string? EntryTime { get; set; }
         /// <summary>
         /// 结束时间
         /// </summary>

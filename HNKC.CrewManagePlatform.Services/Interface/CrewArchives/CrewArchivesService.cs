@@ -365,14 +365,14 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                     {
                         BusinessId = GuidUtil.Next(),
                         Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
-                        ContarctMain = requestBody.BaseInfoDto.UserEntryInfo.ContarctMain,
+                        ContractMain = requestBody.BaseInfoDto.UserEntryInfo.ContarctMain,
                         EndTime = requestBody.BaseInfoDto.UserEntryInfo.EndTime,
                         EntryScans = GuidUtil.Next(),
                         EntryTime = requestBody.BaseInfoDto.UserEntryInfo.EntryTime,
                         LaborCompany = requestBody.BaseInfoDto.UserEntryInfo.LaborCompany,
                         EmploymentId = requestBody.BaseInfoDto.UserEntryInfo.EmploymentId,
                         UserEntryId = uId,
-                        ContarctType = requestBody.BaseInfoDto.UserEntryInfo.ContractType
+                        ContractType = requestBody.BaseInfoDto.UserEntryInfo.ContractType
                     };
                 }
                 if (requestBody.BaseInfoDto.UserEntryInfo != null)
@@ -817,13 +817,13 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                         userEntry = await _dbContext.Queryable<UserEntryInfo>().Where(t => t.IsDelete == 1 && t.UserEntryId == userInfo.BusinessId).OrderByDescending(t => t.Created).FirstAsync();
                         if (userEntry != null)
                         {
-                            userEntry.ContarctMain = requestBody.BaseInfoDto.UserEntryInfo.ContarctMain;
+                            userEntry.ContractMain = requestBody.BaseInfoDto.UserEntryInfo.ContarctMain;
                             userEntry.EndTime = requestBody.BaseInfoDto.UserEntryInfo.EndTime;
                             userEntry.EntryScans = GuidUtil.Next();
                             userEntry.EntryTime = requestBody.BaseInfoDto.UserEntryInfo.EntryTime;
                             userEntry.LaborCompany = requestBody.BaseInfoDto.UserEntryInfo.LaborCompany;
                             userEntry.EmploymentId = requestBody.BaseInfoDto.UserEntryInfo.EmploymentId;
-                            userEntry.ContarctType = requestBody.BaseInfoDto.UserEntryInfo.ContractType;
+                            userEntry.ContractType = requestBody.BaseInfoDto.UserEntryInfo.ContractType;
                             if (requestBody.BaseInfoDto.UserEntryInfo != null)
                             {
                                 if (requestBody.BaseInfoDto.UserEntryInfo.EntryScansUpload != null && requestBody.BaseInfoDto.UserEntryInfo.EntryScansUpload.Any())
@@ -2258,11 +2258,11 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                 {
                     Id = item.BusinessId.ToString(),
                     EntryScans = userEntryFiles,
-                    ContarctMain = item.ContarctMain,
+                    ContarctMain = item.ContractMain,
                     EntryDate = item.EntryTime.ToString("yyyy/MM/dd") + "~" + item.EndTime.ToString("yyyy/MM/dd"),
                     LaborCompany = item.LaborCompany,
-                    ContractType = item.ContarctType,
-                    ContractTypeName = EnumUtil.GetDescription(item.ContarctType),
+                    ContractType = item.ContractType,
+                    ContractTypeName = EnumUtil.GetDescription(item.ContractType),
                     EmploymentName = empType.FirstOrDefault(x => x.BusinessId.ToString() == item.EmploymentId)?.Name,
                     EmploymentId = item.EmploymentId,
                     Staus = item.EndTime >= DateTime.Now ? "进行中" : "已结束"
