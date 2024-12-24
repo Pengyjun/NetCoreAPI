@@ -86,10 +86,9 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpPost("AddUser")]
-        public async Task<IActionResult> AddUserAsync([FromBody] AddUserRequest  addUserRequest)
+        public async Task<Result> AddUserAsync([FromBody] AddUserRequest  addUserRequest)
         {
-            var data = await userManagerService.AddUserAsync(addUserRequest);
-            return Ok(data);
+           return await userManagerService.AddUserAsync(addUserRequest);
         }
 
         /// <summary>

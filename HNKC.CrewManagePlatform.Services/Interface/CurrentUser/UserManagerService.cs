@@ -266,7 +266,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CurrentUser
             var data = await dbContext.Queryable<User>()
                  .LeftJoin<InstitutionRole>((a, b) => a.BusinessId == b.UserBusinessId)
                  .LeftJoin<HNKC.CrewManagePlatform.SqlSugars.Models.Role>((a, b, c) => b.RoleBusinessId == c.BusinessId)
-                 .LeftJoin<HNKC.CrewManagePlatform.SqlSugars.Models.Institution>((a, b, c, d) => b.InstitutionBusinessId == d.BusinessId)
+                 .LeftJoin<HNKC.CrewManagePlatform.SqlSugars.Models.Institution>((a, b, c, d) => a.Oid == d.Oid)
                  .Where(a => a.IsDelete == 1)
                  .WhereIF(!string.IsNullOrWhiteSpace(pageRequest.KeyWords), a => a.Name.Contains(pageRequest.KeyWords)
                  || a.Phone.Contains(pageRequest.KeyWords))
@@ -277,7 +277,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CurrentUser
                      Remark = a.Remark,
                      Created = a.Created,
                      RoleName = c.Name,
-                     Oid = d.Oid,
+                     Oid = a.Oid,
                      DepartmentName = d.ShortName
                  })
                .ToListAsync();
@@ -303,7 +303,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CurrentUser
         /// <returns></returns>
         public async Task<Result> AddUserAsync(AddUserRequest addUserRequest)
         {
-            var userInfo = dbContext.Queryable<User>().Where(x => x.Phone == addUserRequest.Phone).FirstAsync();
+            var userInfo = await dbContext.Queryable<User>().Where(x => x.Phone == addUserRequest.Phone).FirstAsync();
             if (userInfo != null)
             {
                 return Result.Fail("手机号已存在请修改", (int)ResponseHttpCode.DataExist);
