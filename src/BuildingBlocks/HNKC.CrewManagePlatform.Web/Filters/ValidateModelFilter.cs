@@ -25,9 +25,13 @@ namespace HNKC.CrewManagePlatform.Web.Filters
         {
             try
             {
-                context.ExceptionHandled = true;
-                context.Result = new JsonResult(Result.NoAuth(context.Exception.Message));
-                context.HttpContext.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
+                if (context.Exception!=null&&context.Exception.Message == "您已在其他终端登录请重新登录")
+                {
+                    context.ExceptionHandled = true;
+                    context.Result = new JsonResult(Result.NoAuth(context.Exception.Message));
+                    context.HttpContext.Response.StatusCode = (int)ResponseHttpCode.AlreadyLogin;
+                }
+               
             }
             catch (Exception ex)
             {

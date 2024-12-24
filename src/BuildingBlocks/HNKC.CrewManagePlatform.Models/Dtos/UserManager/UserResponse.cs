@@ -21,6 +21,11 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.UserManager
         public string? Phone { get; set; }
 
         /// <summary>
+        /// 机构OID
+        /// </summary>
+        public string? Oid { get; set; }
+
+        /// <summary>
         /// 部门名称
         /// </summary>
         public string? DepartmentName { get; set; }

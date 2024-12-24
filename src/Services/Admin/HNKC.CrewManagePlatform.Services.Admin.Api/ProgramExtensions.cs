@@ -1,4 +1,6 @@
-﻿using HNKC.CrewManagePlatform.Models.Dtos;
+﻿using HNKC.CrewManagePlatform.Common;
+using HNKC.CrewManagePlatform.Models.Dtos;
+using HNKC.CrewManagePlatform.Models.Dtos.UserManager;
 using HNKC.CrewManagePlatform.Services.Admin.Api;
 using HNKC.CrewManagePlatform.Services.Admin.Api.AutoMapper;
 using HNKC.CrewManagePlatform.Services.Admin.Api.Filters;
@@ -21,11 +23,16 @@ using HNKC.CrewManagePlatform.Web.DateTimeHandler;
 using HNKC.CrewManagePlatform.Web.Filters;
 using HNKC.CrewManagePlatform.Web.Jwt;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Newtonsoft.Json.Serialization;
+using Newtonsoft.Json;
 using System.Reflection;
 using System.Text;
 using UtilsSharp;
+using HNKC.CrewManagePlatform.Models.CommonResult;
+using HNKC.CrewManagePlatform.Models.Enums;
 
 namespace HNKC.CrewManagePlatform.Services.Admin.Api
 {
@@ -95,7 +102,6 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api
                 x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
             }).AddJwtBearer(x =>
             {
-
                 x.TokenValidationParameters = new TokenValidationParameters
                 {
                     ValidateLifetime = true,
@@ -107,6 +113,27 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api
                     ValidateAudience = false,
 
                 };
+                //jwt验证事件
+                //x.Events = new JwtBearerEvents()
+                //{
+                  
+                //    //jwt验证成功后出发
+                //    OnTokenValidated = context => {
+                //        //获取token
+                //        var token = HttpContentAccessFactory.GetUserToken;
+                //        //解析Claims
+                //        var userList = context.Principal.Claims.ToList();
+                //        var id = userList?.Where(x => x.Type == "Id").Select(x => x.Value).FirstOrDefault();
+                //        //获取redis存储的token
+                //        var redisToken = RedisUtil.Instance.Get(id);
+                //        if (string.IsNullOrWhiteSpace(redisToken)|| !token.Trim().Equals(redisToken.Trim()))
+                //        {
+                //            context.Response.StatusCode =(int) ResponseHttpCode.AlreadyLogin;
+                            
+                //        }
+                //        return Task.CompletedTask;
+                //    }
+                //};
             });
 
             builder.Services.AddHttpClient();

@@ -58,5 +58,9 @@ namespace HNKC.CrewManagePlatform.Models.Enums
         /// 登录失败
         /// </summary>
         LoginFail = 10007,
+        /// <summary>
+        /// 您已在其他终端登录
+        /// </summary>
+        AlreadyLogin = 10008,
     }
 }

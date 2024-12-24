@@ -263,7 +263,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CurrentUser
         public async Task<PageResult<UserResponse>> SearchUserAsync(PageRequest pageRequest)
         {
             PageResult<UserResponse> pageResult = new PageResult<UserResponse>();
-            var data= await dbContext.Queryable<User>()
+            var data = await dbContext.Queryable<User>()
                  .LeftJoin<InstitutionRole>((a, b) => a.BusinessId == b.UserBusinessId)
                  .LeftJoin<HNKC.CrewManagePlatform.SqlSugars.Models.Role>((a, b, c) => b.RoleBusinessId == c.BusinessId)
                  .LeftJoin<HNKC.CrewManagePlatform.SqlSugars.Models.Institution>((a, b, c, d) => b.InstitutionBusinessId == d.BusinessId)
@@ -276,7 +276,9 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CurrentUser
                      Phone = a.Phone,
                      Remark = a.Remark,
                      Created = a.Created,
-                     RoleName = c.Name
+                     RoleName = c.Name,
+                     Oid = d.Oid,
+                     DepartmentName = d.ShortName
                  })
                .ToListAsync();
 
@@ -316,7 +318,9 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CurrentUser
                 Phone = addUserRequest.Phone,
                 Oid = addUserRequest.Oid,
                 Password = pwd,
-                IsInsert = 1
+                IsInsert = 1,
+                Gender = addUserRequest.Gender.Value,
+                Remark = addUserRequest.Remark
             };
 
             await dbContext.Insertable<User>(user).ExecuteCommandAsync();

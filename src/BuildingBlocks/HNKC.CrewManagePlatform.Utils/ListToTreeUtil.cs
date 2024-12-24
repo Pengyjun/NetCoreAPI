@@ -125,6 +125,10 @@ namespace HNKC.CrewManagePlatform.Util
         /// </summary>
         public string? ComponentUrl { get; set; }
         /// <summary>
+        /// 备注
+        /// </summary>
+        public string? Remark { get; set; }
+        /// <summary>
         /// 排序
         /// </summary>
         public int? Sort { get; set; }

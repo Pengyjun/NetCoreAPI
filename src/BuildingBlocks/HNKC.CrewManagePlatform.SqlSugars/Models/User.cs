@@ -15,6 +15,13 @@ namespace HNKC.CrewManagePlatform.SqlSugars.Models
         [SugarColumn(Length = 128, ColumnDescription = "姓名")]
         public string? Name { get; set; }
 
+
+        /// <summary>
+        /// 姓名
+        /// </summary>
+        [SugarColumn(Length = 128, ColumnDescription = "性别 1是男  2是女")]
+        public int? Gender { get; set; }
+
         /// <summary>
         /// 工号
         /// </summary>

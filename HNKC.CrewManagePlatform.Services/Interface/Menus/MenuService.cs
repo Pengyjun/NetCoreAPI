@@ -17,6 +17,7 @@ using HNKC.CrewManagePlatform.Utils;
 using HNKC.CrewManagePlatform.Models.CommonResult;
 using HNKC.CrewManagePlatform.Models.Enums;
 using HNKC.CrewManagePlatform.Models.Dtos;
+using HNKC.CrewManagePlatform.Models.CommonRequest;
 
 namespace HNKC.CrewManagePlatform.Services.Menus
 {
@@ -69,7 +70,8 @@ namespace HNKC.CrewManagePlatform.Services.Menus
                          ComponentUrl = x.ComponentUrl,
                          Icon = x.Icon,
                          Url = x.Url,
-                         Name = x.Name
+                         Name = x.Name,
+                         Remark = x.Remark,
                      })
                     .ToListAsync();
 
@@ -108,6 +110,7 @@ namespace HNKC.CrewManagePlatform.Services.Menus
                 Url = userMenuRequest.Url,
                 Remark = userMenuRequest.Remark,
                 MenuCode = userMenuRequest.MenuCode,
+               
             };
             RoleMenu roleMenu = new RoleMenu()
             {
@@ -155,6 +158,8 @@ namespace HNKC.CrewManagePlatform.Services.Menus
             {
                 return Result.Fail("数据不存在", (int)ResponseHttpCode.DataNoExist);
             }
+            menuInfo.MId = userMenuRequest.Mid;
+            menuInfo.ParentId = userMenuRequest.ParentId;
             menuInfo.ComponentUrl = userMenuRequest.ComponentUrl;
             menuInfo.Icon = userMenuRequest.Icon;
             menuInfo.Name = userMenuRequest.Name;

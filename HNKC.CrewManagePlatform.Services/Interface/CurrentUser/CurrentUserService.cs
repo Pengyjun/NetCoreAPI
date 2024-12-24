@@ -59,9 +59,6 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CurrentUser
                     userInfo.IsAdmin = isAdmin.ObjToBool();
                     userInfo.InstitutionBusiessId = Guid.Parse(bInstitutionId);
                 }
-                else {
-                    throw new UnauthorizedAccessException("您已在其他终端登录请重新登录");
-                }
             }
             return userInfo;
         }
