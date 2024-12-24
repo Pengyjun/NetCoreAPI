@@ -150,7 +150,8 @@ namespace HNKC.CrewManagePlatform.Services.Role
                                 IsApprove = currentRole?.IsApprove,
                                 Name = currentRole?.Name,
                                 Type = currentRole?.Type,
-                                InstitutionName = institutionBuinsessId.ShortName
+                                InstitutionName = institutionBuinsessId.ShortName,
+                                 BId= currentRole.BusinessId,
                             };
                              pageResult.Add(roleResponse);
                         }

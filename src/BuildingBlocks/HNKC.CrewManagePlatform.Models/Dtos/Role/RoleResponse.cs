@@ -11,7 +11,7 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.Role
     /// <summary>
     /// 角色响应DTO
     /// </summary>
-    public class RoleResponse
+    public class RoleResponse:BaseResponse
     {
         /// <summary>
         /// 所属机构ID
