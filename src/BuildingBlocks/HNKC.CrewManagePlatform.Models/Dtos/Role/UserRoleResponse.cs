@@ -33,5 +33,10 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.Role
         /// </summary>
         public int? Status { get; set; }
 
+        /// <summary>
+        ///是否属于当前机构下
+        /// </summary>
+        public bool? IsOfInstitution { get; set; }
+
     }
 }

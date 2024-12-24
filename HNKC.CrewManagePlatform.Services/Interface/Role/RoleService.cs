@@ -64,7 +64,6 @@ namespace HNKC.CrewManagePlatform.Services.Role
                 InstitutionBusinessId = institutionBuinsessId,
                 RoleBusinessId = businessId,
             };
-
             await _dbContext.Insertable<HNKC.CrewManagePlatform.SqlSugars.Models.Role>(role).ExecuteCommandAsync();
             await _dbContext.Insertable<InstitutionRole>(institutionRole).ExecuteCommandAsync();
             return true;
@@ -151,14 +150,16 @@ namespace HNKC.CrewManagePlatform.Services.Role
                                 Name = currentRole?.Name,
                                 Type = currentRole?.Type,
                                 InstitutionName = institutionBuinsessId.ShortName,
-                                 BId= currentRole.BusinessId,
+                                BId= currentRole.BusinessId,
+                                Remark = currentRole?.Remark,
+                                Created = currentRole?.Created,
                             };
                              pageResult.Add(roleResponse);
                         }
                     }
                 }
             }
-            page.List = pageResult;
+            page.List = pageResult.OrderBy(x=>x.Created).ToList();
             page.TotalCount = pageResult.Count;
             return page;
         }
@@ -262,7 +263,9 @@ namespace HNKC.CrewManagePlatform.Services.Role
 
             foreach ( var user in userList ) 
             {
-               var currentAuthUser= authUserList.Where(x => x == user.BusinessId).FirstOrDefault();
+                var currentAuthUser= authUserList.Where(x => x == user.BusinessId).FirstOrDefault();
+                
+
                 if (addUserRoleRequest.Status == 1 && currentAuthUser != null)
                 {
                     data.Add(new UserRoleResponse()
@@ -272,7 +275,8 @@ namespace HNKC.CrewManagePlatform.Services.Role
                         DepartmentName = allInstitution.Where(x => x.Oid == user.Oid).FirstOrDefault()?.Name,
                         Phone = user.Phone,
                         UserName = user.Name,
-                        Status = currentAuthUser.HasValue == true ? 1 : 0
+                        Status = currentAuthUser.HasValue == true ? 1 : 0,
+                        IsOfInstitution = allNodes.Count(x => x == user.Oid) > 0
                     });
                 }
                 else if (addUserRoleRequest.Status == null)
@@ -285,8 +289,9 @@ namespace HNKC.CrewManagePlatform.Services.Role
                         DepartmentName = allInstitution.Where(x => x.Oid == user.Oid).FirstOrDefault()?.Name,
                         Phone = user.Phone,
                         UserName = user.Name,
-                        Status = currentAuthUser.HasValue == true ? 1 : 0
-                    });
+                        Status = currentAuthUser.HasValue == true ? 1 : 0,
+                        IsOfInstitution = allNodes.Count(x => x == user.Oid) > 0
+                    }) ;
                 }
             }
             pageResult.List = data ;
@@ -294,5 +299,41 @@ namespace HNKC.CrewManagePlatform.Services.Role
             pageResult.List.Skip((addUserRoleRequest.PageIndex - 1) * addUserRoleRequest.PageSize).Take(addUserRoleRequest.PageSize).ToList();
             return pageResult ;
         }
+
+        /// <summary>
+        /// 添加角色菜单
+        /// </summary>
+        /// <param name="addUserRoleRequest"></param>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        public async Task<Result> AddRoleMenuAsync(AddRoleMenuRequest addRoleMenuRequest)
+        {
+            var menuIds = addRoleMenuRequest.RoleMenuOptions.Select(x => x.MenuBusinessId).ToList();
+            var roleMenuList = await _dbContext.Queryable<RoleMenu>().Where(x => x.IsDelete == 1 && x.RoleBusinessId == addRoleMenuRequest.RoleBusinessId).ToListAsync();
+            if (roleMenuList.Count == 0)
+            { 
+                 return Result.Fail("数据不存在",(int)ResponseHttpCode.DataNoExist); 
+            }
+            foreach (var item in roleMenuList)
+            {
+                item.IsDelete = 0;
+            }
+            await _dbContext.Updateable<RoleMenu>(roleMenuList).ExecuteCommandAsync();
+            List<RoleMenu> roleMenus = new List<RoleMenu>();
+            foreach (var item in addRoleMenuRequest.RoleMenuOptions)
+            {
+                RoleMenu roleMenu = new RoleMenu()
+                {
+                    Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                    MenuBusinessId = item.MenuBusinessId,
+                    BusinessId = GuidUtil.Next(),
+                    RoleBusinessId = addRoleMenuRequest.RoleBusinessId
+                };
+            }
+            await _dbContext.Insertable<RoleMenu>(roleMenus).ExecuteCommandAsync();
+            return Result.Success("添加成功");
+        }
+        
+        
     }
 }

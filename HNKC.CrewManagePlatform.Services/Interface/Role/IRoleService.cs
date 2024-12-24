@@ -31,7 +31,7 @@ namespace HNKC.CrewManagePlatform.Services.Role
 
 
         /// <summary>
-        /// 修改角色
+        /// 删除角色
         /// </summary>
         /// <param name="addRoleRequest"></param>
         /// <returns></returns>
@@ -59,5 +59,16 @@ namespace HNKC.CrewManagePlatform.Services.Role
         /// <param name="userRoleRequest"></param>
         /// <returns></returns>
         Task<PageResult<UserRoleResponse>> SearchRoleUserAsync(AddUserRoleRequest  addUserRoleRequest);
+
+
+        /// <summary>
+        /// 角色分配菜单
+        /// </summary>
+        /// <param name="userRoleRequest"></param>
+        /// <returns></returns>
+        Task<Result> AddRoleMenuAsync(AddRoleMenuRequest  addRoleMenuRequest);
+
+
+      
     }
 }

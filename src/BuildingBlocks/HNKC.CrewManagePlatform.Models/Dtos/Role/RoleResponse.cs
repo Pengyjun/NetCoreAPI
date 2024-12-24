@@ -53,5 +53,10 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.Role
         /// 角色类型
         /// </summary>
         public int? Type { get; set; }
+
+        /// <summary>
+        /// 备注
+        /// </summary>
+        public string? Remark { get; set; }
     }
 }
