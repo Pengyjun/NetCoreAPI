@@ -291,7 +291,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
 
         #region 数据增改
         /// <summary>
-        /// 用户保存
+        /// 船员保存
         /// </summary>
         /// <param name="requestBody"></param>
         /// <returns></returns>
@@ -301,7 +301,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
             else { return await UpdateUserAsync(requestBody); }
         }
         /// <summary>
-        /// 用户新增
+        /// 船员新增
         /// </summary>
         /// <param name="requestBody"></param>
         /// <returns></returns>
@@ -756,7 +756,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
             return Result.Success();
         }
         /// <summary>
-        /// 用户修改
+        /// 船员修改
         /// </summary>
         /// <param name="requestBody"></param>
         /// <returns></returns>
@@ -1172,7 +1172,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
 
                 return Result.Success();
             }
-            return Result.Fail("无用户/该用户已被删除");
+            return Result.Fail("无船员/该船员已被删除");
         }
         /// <summary>
         /// 保存备注
@@ -1235,7 +1235,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
             }
         }
         /// <summary>
-        /// 切换用户状态（删除/恢复）
+        /// 切换船员状态（删除/恢复）
         /// </summary>
         /// <param name="requestBody"></param>
         /// <returns></returns>
@@ -1245,7 +1245,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
             else return await UndoDeleteUserAsync(requestBody);
         }
         /// <summary>
-        /// 删除用户（非永久删除）
+        /// 删除船员（非永久删除）
         /// </summary>
         /// <param name="requestBody"></param>
         /// <returns></returns>
