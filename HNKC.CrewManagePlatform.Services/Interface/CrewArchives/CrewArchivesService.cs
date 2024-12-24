@@ -124,7 +124,6 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                 var emptCodes = rt.Select(x => x.EmploymentType).ToList();
                 var emptab = await _dbContext.Queryable<EmploymentType>().Where(t => t.IsDelete == 1 && emptCodes.Contains(t.BusinessId.ToString())).ToListAsync();
                 //第一适任 第二适任
-                var firSectab = await _dbContext.Queryable<CertificateOfCompetency>().Where(t => uIds.Contains(t.CertificateId)).ToListAsync();
                 var firSecPosition = await _dbContext.Queryable<Position>().Where(t => t.IsDelete == 1).ToListAsync();
                 //技能证书
                 var sctab = await _dbContext.Queryable<SkillCertificates>().Where(t => t.IsDelete == 1 && uIds.Contains(t.SkillcertificateId)).ToListAsync();
