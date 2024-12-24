@@ -93,7 +93,7 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api.Controllers
         /// </summary>
         /// <param name="addUserRoleRequest"></param>
         /// <returns></returns>
-        [HttpPost("SearchRoleUser")]
+        [HttpGet("SearchRoleUser")]
         public async Task<IActionResult> SearchRoleUserAsync([FromQuery]AddUserRoleRequest addUserRoleRequest)
         {
             var data = await roleService.SearchRoleUserAsync(addUserRoleRequest);
@@ -107,7 +107,7 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api.Controllers
         /// <param name="addRoleMenuRequest"></param>
         /// <returns></returns>
         [HttpPost("RoleMenu")]
-        public async Task<Result> AddRoleMenuAsync([FromQuery] AddRoleMenuRequest  addRoleMenuRequest)
+        public async Task<Result> AddRoleMenuAsync([FromBody] AddRoleMenuRequest  addRoleMenuRequest)
         {
             return await roleService.AddRoleMenuAsync(addRoleMenuRequest);
         }
@@ -118,7 +118,7 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api.Controllers
         /// </summary>
         /// <param name="addRoleMenuRequest"></param>
         /// <returns></returns>
-        [HttpPost("SearchRoleMenu")]
+        [HttpGet("SearchRoleMenu")]
         public async Task<IActionResult> SearchRoleMenuAsync([FromQuery] BaseRequest baseRequest)
         {
             var data= await roleService.SearchRoleMenuAsync(baseRequest);

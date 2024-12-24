@@ -158,8 +158,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CurrentUser
         {
             var token = string.Empty;
             var userInfo = GlobalCurrentUser;
-           var allRole=await dbContext.Queryable<InstitutionRole>().Where(x => x.IsDelete == 1 && x.RoleBusinessId == userInfo.RoleBusinessId
-            && x.UserBusinessId == userInfo.UserBusinessId).ToListAsync();
+           var allRole=await dbContext.Queryable<InstitutionRole>().Where(x => x.IsDelete == 1 &&x.UserBusinessId == userInfo.UserBusinessId).ToListAsync();
             //角色ID
             var roleIds=allRole.Select(x=>x.RoleBusinessId).ToList();
             //角色信息
@@ -199,6 +198,10 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CurrentUser
 
                 }
                 var loginRole = roleList.Where(x => x.BusinessId == changRoleRequest.RoleBusinessId).FirstOrDefault();
+                if (loginRole == null)
+                {
+                    return Result.Fail("角色切换失败;当前用户不存在角色", (int)ResponseHttpCode.LoginFail);
+                }
   
                 //默认存第一个角色信息
                 Claim[] claims = new Claim[]

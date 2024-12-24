@@ -1,5 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc;
+using HNKC.CrewManagePlatform.Models.CommonResult;
+using System.Net;
+using HNKC.CrewManagePlatform.Models.Enums;
 
 namespace HNKC.CrewManagePlatform.Web.Filters
 
@@ -20,7 +23,17 @@ namespace HNKC.CrewManagePlatform.Web.Filters
 
         public void OnActionExecuted(ActionExecutedContext context)
         {
+            try
+            {
+                context.ExceptionHandled = true;
+                context.Result = new JsonResult(Result.NoAuth(context.Exception.Message));
+                context.HttpContext.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
+            }
+            catch (Exception ex)
+            {
 
+                
+            }
         }
     }
 }
