@@ -2,6 +2,7 @@
 using HNKC.CrewManagePlatform.Models.Dtos.CrewArchives;
 using HNKC.CrewManagePlatform.Services.Interface.CrewArchives;
 using HNKC.CrewManagePlatform.SqlSugars.UnitOfTransaction;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HNKC.CrewManagePlatform.Services.Admin.Api.Controllers
@@ -11,7 +12,7 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api.Controllers
     /// </summary>
     [Route("api/[controller]")]
     [ApiController]
-    //[Authorize]
+    [Authorize]
     public class CrewArchivesController : BaseController
     {
         private ICrewArchivesService _service;
