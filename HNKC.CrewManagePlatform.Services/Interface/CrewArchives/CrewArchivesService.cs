@@ -91,8 +91,8 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                     ServiceBookType = t.ServiceBookType,
                     CrewType = t.CrewType,
                     EmploymentType = et.BusinessId.ToString(),
-                    FPosition = po.BusinessId.ToString(),
-                    SPosition = po.BusinessId.ToString(),
+                    FPosition = coc.FPosition,
+                    SPosition = coc.SPosition,
                     IsDelete = t.IsDelete,
                     DeleteReson = t.DeleteReson
                 })
