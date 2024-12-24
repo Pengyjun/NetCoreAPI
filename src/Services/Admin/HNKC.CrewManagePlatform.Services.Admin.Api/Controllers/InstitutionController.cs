@@ -1,6 +1,7 @@
 ﻿using HNKC.CrewManagePlatform.Models.CommonResult;
 using HNKC.CrewManagePlatform.Services.Interface;
 using HNKC.CrewManagePlatform.Services.Interface.PullResult;
+using HNKC.CrewManagePlatform.Util;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -27,10 +28,9 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet("SearchInstitutionTree")]
-        public async Task<IActionResult> SearchInstitutionTreeAsync()
+        public async Task<ResponseAjaxResult<InstitutionTree>> SearchInstitutionTreeAsync()
         {
-            var data = await baseService.SearchInstitutionTreeAsync();
-            return Ok(data);
+            return await baseService.SearchInstitutionTreeAsync();
         }
 
     }

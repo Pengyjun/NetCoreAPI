@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using HNKC.CrewManagePlatform.Models.Enums;
+using System.ComponentModel.DataAnnotations;
 
 namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
 {
@@ -17,6 +18,7 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// <summary>
         /// 政治面貌
         /// </summary>
+        public string? PoliticalStatus { get; set; }
         public string? PoliticalStatusName { get; set; }
         /// <summary>
         /// 当前船舶任职时间
@@ -29,10 +31,12 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// <summary>
         /// 籍贯
         /// </summary>
+        public string? NativePlace { get; set; }
         public string? NativePlaceName { get; set; }
         /// <summary>
         /// 民族
         /// </summary>
+        public string? Nation { get; set; }
         public string? NationName { get; set; }
         /// <summary>
         /// 家庭地址
@@ -59,7 +63,7 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// </summary>
         public string? Phone { get; set; }
         /// <summary>
-        /// 身份证扫描件 ,拼接
+        /// 身份证扫描件 
         /// </summary>
         public List<FileInfosForDetails>? IdCardScans { get; set; }
         /// <summary>
@@ -75,7 +79,7 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// </summary>
         public DateTime? EndTime { get; set; }
         /// <summary>
-        /// 入职材料 ,拼接
+        /// 入职材料 
         /// </summary>
         public string? EntryScans { get; set; }
         /// <summary>
@@ -102,17 +106,24 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// </summary>
         public string? ShipTypeName { get; set; }
         /// <summary>
+        /// 
+        /// </summary>
+        public ShipTypeEnum ShipType { get; set; }
+        /// <summary>
         /// 船员类型
         /// </summary>
+        public string? CrewType { get; set; }
         public string? CrewTypeName { get; set; }
         /// <summary>
         /// 服务簿类型
         /// </summary>
-        public string? ServiceBookType { get; set; }
+        public string? ServiceBookTypeName { get; set; }
+        public ServiceBookEnum ServiceBookType { get; set; }
         /// <summary>
         /// 所在船舶
         /// </summary>
         public string? OnBoardName { get; set; }
+        public string? OnBoard { get; set; }
         /// <summary>
         /// 在船职务
         /// </summary>
@@ -150,7 +161,8 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// <summary>
         /// 关系
         /// </summary>
-        public string? RelationShip { get; set; }
+        public FamilyRelationEnum RelationShip { get; set; }
+        public string? RelationShipName { get; set; }
         /// <summary>
         /// 联系方式
         /// </summary>
@@ -206,9 +218,15 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// </summary>
         public string? ContarctMain { get; set; }
         /// <summary>
+        /// 合同类型
+        /// </summary>
+        public ContractEnum ContractType { get; set; }
+        public string? ContractTypeName { get; set; }
+        /// <summary>
         /// 用工形式
         /// </summary>
         public string? EmploymentName { get; set; }
+        public string? EmploymentId { get; set; }
         /// <summary>
         /// 状态：进行中...
         /// </summary>
@@ -228,10 +246,12 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// 适任航区
         /// </summary>
         public string? FNavigationArea { get; set; }
+        public string? FNavigationAreaName { get; set; }
         /// <summary>
         /// 适任职务
         /// </summary>
         public string? FPosition { get; set; }
+        public string? FPositionName { get; set; }
         /// <summary>
         /// 签发日期
         /// </summary>
@@ -259,10 +279,12 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// 适任航区
         /// </summary>
         public string? SNavigationArea { get; set; }
+        public string? SNavigationAreaName { get; set; }
         /// <summary>
         /// 适任职务
         /// </summary>
         public string? SPosition { get; set; }
+        public string? SPositionName { get; set; }
         /// <summary>
         /// 签发日期
         /// </summary>
@@ -415,7 +437,8 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// <summary>
         /// 证书类型
         /// </summary>
-        public string? SkillCertificateType { get; set; }
+        public CertificateTypeEnum SkillCertificateType { get; set; }
+        public string? SkillCertificateTypeName { get; set; }
         /// <summary>
         /// 扫描件 
         /// </summary>
@@ -460,10 +483,12 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// 国家
         /// </summary>
         public string? Country { get; set; }
+        public string? CountryName { get; set; }
         /// <summary>
         /// 签证类型
         /// </summary>
-        public string? VisaType { get; set; }
+        public VisaTypeEnum VisaType { get; set; }
+        public string? VisaTypeName { get; set; }
         /// <summary>
         /// 到期时间
         /// </summary>
@@ -495,7 +520,8 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// <summary>
         /// 学历类型：全日制...
         /// </summary>
-        public string? QualificationType { get; set; }
+        public QualificationTypeEnum QualificationType { get; set; }
+        public string? QualificationTypeName { get; set; }
         /// <summary>
         /// 学校
         /// </summary>
@@ -503,7 +529,8 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// <summary>
         /// 学历：本科...
         /// </summary>
-        public string? Qualification { get; set; }
+        public string? QualificationName { get; set; }
+        public QualificationEnum Qualification { get; set; }
         /// <summary>
         /// 专业：计算机网络
         /// </summary>
@@ -540,10 +567,12 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// 所在船舶
         /// </summary>
         public string? OnShip { get; set; }
+        public string? OnShipName { get; set; }
         /// <summary>
         /// 职务
         /// </summary>
         public string? Postition { get; set; }
+        public string? PostitionName { get; set; }
         /// <summary>
         /// 日期：格式2024年10月15日
         /// </summary>
@@ -572,10 +601,14 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// 船舶名称
         /// </summary>
         public string? OnShip { get; set; }
+        public string? OnShipName { get; set; }
+        public ShipTypeEnum ShipType { get; set; }
+        public string? ShipTypeName { get; set; }
         /// <summary>
         /// 职务
         /// </summary>
         public string? Postition { get; set; }
+        public string? PostitionName { get; set; }
         /// <summary>
         /// 上船日期
         /// </summary>
@@ -620,6 +653,7 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// 培训类型：安全培训...
         /// </summary>
         public string? TrainingType { get; set; }
+        public string? TrainingTypeName { get; set; }
         /// <summary>
         /// 培训日期
         /// </summary>
@@ -647,7 +681,8 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// <summary>
         /// 考核结果：优秀...
         /// </summary>
-        public string? CheckType { get; set; }
+        public CheckEnum CheckType { get; set; }
+        public string? CheckTypeName { get; set; }
         /// <summary>
         /// 考核模式：2024年度考核
         /// </summary>

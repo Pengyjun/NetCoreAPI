@@ -8,6 +8,11 @@ namespace HNKC.CrewManagePlatform.Models.Enums
     public enum CrewStatusEnum
     {
         /// <summary>
+        /// 无
+        /// </summary>
+        [Description("无")]
+        No = -1,
+        /// <summary>
         /// 在岗
         /// </summary>
         [Description("在岗")]
