@@ -3,6 +3,7 @@ using HNKC.CrewManagePlatform.Models.Dtos;
 using HNKC.CrewManagePlatform.Models.Dtos.CrewArchives;
 using HNKC.CrewManagePlatform.Services.Interface.CrewArchives;
 using HNKC.CrewManagePlatform.SqlSugars.UnitOfTransaction;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HNKC.CrewManagePlatform.Services.Admin.Api.Controllers
@@ -12,7 +13,7 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api.Controllers
     /// </summary>
     [Route("api/[controller]")]
     [ApiController]
-    //[Authorize]
+    [Authorize]
     public class CrewArchivesController : BaseController
     {
         private ICrewArchivesService _service;
@@ -30,7 +31,7 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api.Controllers
         /// <param name="requestBody"></param>
         /// <returns></returns>
         [HttpPost("SearchCrewArchives")]
-        public async Task<ResponsePageResult<List<SearchCrewArchivesResponse>>> SearchCrewArchivesAsync([FromBody] SearchCrewArchivesRequest requestBody)
+        public async Task<PageResult<SearchCrewArchivesResponse>> SearchCrewArchivesAsync([FromBody] SearchCrewArchivesRequest requestBody)
         {
             return await _service.SearchCrewArchivesAsync(requestBody);
         }
@@ -39,7 +40,7 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet("CrewArchivesCount")]
-        public async Task<ResponseAjaxResult<CrewArchivesResponse>> CrewArchivesCountAsync()
+        public async Task<Result> CrewArchivesCountAsync()
         {
             return await _service.CrewArchivesCountAsync();
         }
@@ -50,7 +51,7 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api.Controllers
         /// <returns></returns>
         [HttpPost("SaveUser")]
         [Transactional]
-        public async Task<ResponseAjaxResult<bool>> SaveUserAsync([FromBody] CrewArchivesRequest requestBody)
+        public async Task<Result> SaveUserAsync([FromBody] CrewArchivesRequest requestBody)
         {
             return await _service.SaveUserAsync(requestBody);
         }
@@ -61,7 +62,7 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api.Controllers
         /// <returns></returns>
         [HttpPost("ToggleUserStatus")]
         [Transactional]
-        public async Task<ResponseAjaxResult<bool>> ToggleUserStatusAsync([FromQuery] ToggleUserStatus requestBody)
+        public async Task<Result> ToggleUserStatusAsync([FromQuery] ToggleUserStatus requestBody)
         {
             return await _service.ToggleUserStatusAsync(requestBody);
         }
@@ -71,7 +72,7 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api.Controllers
         /// <param name="requestBody"></param>
         /// <returns></returns>
         [HttpPost("CrewTransfer")]
-        public async Task<ResponseAjaxResult<bool>> CrewTransferAsync(CrewTransferRequest requestBody)
+        public async Task<Result> CrewTransferAsync(CrewTransferRequest requestBody)
         {
             return await _service.CrewTransferAsync(requestBody);
         }
@@ -82,7 +83,7 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api.Controllers
         /// <param name="type"></param>
         /// <returns></returns>
         [HttpGet("GetDropDownList")]
-        public async Task<ResponseAjaxResult<List<DropDownResponse>>> GetDropDownListAsync([FromQuery] int type)
+        public async Task<Result> GetDropDownListAsync([FromQuery] int type)
         {
             return await _service.GetDropDownListAsync(type);
         }
@@ -93,7 +94,7 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api.Controllers
         /// <param name="requestBody"></param>
         /// <returns></returns>
         [HttpPost("SaveNotes")]
-        public async Task<ResponseAjaxResult<bool>> SaveNotesAsync([FromBody] NotesRequest requestBody)
+        public async Task<Result> SaveNotesAsync([FromBody] NotesRequest requestBody)
         {
             return await _service.SaveNotesAsync(requestBody);
         }
@@ -105,7 +106,7 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api.Controllers
         /// <param name="bId"></param>
         /// <returns></returns>
         [HttpGet("BasesicDetails")]
-        public async Task<ResponseAjaxResult<BaseInfoDetails>> GetBasesicDetailsAsync([FromQuery] string bId)
+        public async Task<Result> GetBasesicDetailsAsync([FromQuery] string bId)
         {
             return await _service.GetBasesicDetailsAsync(bId);
         }
@@ -115,7 +116,7 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api.Controllers
         /// <param name="bId"></param>
         /// <returns></returns>
         [HttpGet("GetLaborServicesDetails")]
-        public async Task<ResponseAjaxResult<LaborServicesInfoDetails>> GetLaborServicesDetailsAsync([FromQuery] string bId)
+        public async Task<Result> GetLaborServicesDetailsAsync([FromQuery] string bId)
         {
             return await _service.GetLaborServicesDetailsAsync(bId);
         }
@@ -125,7 +126,7 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api.Controllers
         /// <param name="bId"></param>
         /// <returns></returns>
         [HttpGet("GetCertificateOfCompetencyDetails")]
-        public async Task<ResponseAjaxResult<CertificateOfCompetencyDetails>> GetCertificateOfCompetencyDetailsAsync([FromQuery] string bId)
+        public async Task<Result> GetCertificateOfCompetencyDetailsAsync([FromQuery] string bId)
         {
             return await _service.GetCertificateOfCompetencyDetailsAsync(bId);
         }
@@ -135,7 +136,7 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api.Controllers
         /// <param name="bId"></param>
         /// <returns></returns>
         [HttpGet("GetEducationalBackgroundDetails")]
-        public async Task<ResponseAjaxResult<EducationalBackgroundDetails>> GetEducationalBackgroundDetailsAsync([FromQuery] string bId)
+        public async Task<Result> GetEducationalBackgroundDetailsAsync([FromQuery] string bId)
         {
             return await _service.GetEducationalBackgroundDetailsAsync(bId);
         }
@@ -145,7 +146,7 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api.Controllers
         /// <param name="bId"></param>
         /// <returns></returns>
         [HttpGet("GetPromotionDetails")]
-        public async Task<ResponseAjaxResult<PromotionDetails>> GetPromotionDetailsAsync([FromQuery] string bId)
+        public async Task<Result> GetPromotionDetailsAsync([FromQuery] string bId)
         {
             return await _service.GetPromotionDetailsAsync(bId);
         }
@@ -155,7 +156,7 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api.Controllers
         /// <param name="bId"></param>
         /// <returns></returns>
         [HttpGet("GetWorkShipDetails")]
-        public async Task<ResponseAjaxResult<WorkShipDetails>> GetWorkShipDetailsAsync([FromQuery] string bId)
+        public async Task<Result> GetWorkShipDetailsAsync([FromQuery] string bId)
         {
             return await _service.GetWorkShipDetailsAsync(bId);
         }
@@ -165,7 +166,7 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api.Controllers
         /// <param name="bId"></param>
         /// <returns></returns>
         [HttpGet("GetTrainingRecordDetails")]
-        public async Task<ResponseAjaxResult<TrainingRecordDetails>> GetTrainingRecordDetailsAsync([FromQuery] string bId)
+        public async Task<Result> GetTrainingRecordDetailsAsync([FromQuery] string bId)
         {
             return await _service.GetTrainingRecordDetailsAsync(bId);
         }
@@ -175,7 +176,7 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api.Controllers
         /// <param name="bId"></param>
         /// <returns></returns>
         [HttpGet("GetYearCheckDetail")]
-        public async Task<ResponseAjaxResult<YearCheckDetails>> GetYearCheckDetailAsync([FromQuery] string bId)
+        public async Task<Result> GetYearCheckDetailAsync([FromQuery] string bId)
         {
             return await _service.GetYearCheckDetailAsync(bId);
         }
@@ -185,7 +186,7 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api.Controllers
         /// <param name="bId"></param>
         /// <returns></returns>
         [HttpGet("GetNotesDetails")]
-        public async Task<ResponseAjaxResult<NotesDetails>> GetNotesDetailsAsync([FromQuery] string bId)
+        public async Task<Result> GetNotesDetailsAsync([FromQuery] string bId)
         {
             return await _service.GetNotesDetailsAsync(bId);
         }

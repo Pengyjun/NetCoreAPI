@@ -4,6 +4,7 @@ using HNKC.CrewManagePlatform.Services.Admin.Api.AutoMapper;
 using HNKC.CrewManagePlatform.Services.Admin.Api.Filters;
 using HNKC.CrewManagePlatform.Services.Interface;
 using HNKC.CrewManagePlatform.Services.Interface.AuditLog;
+using HNKC.CrewManagePlatform.Services.Interface.Contract;
 using HNKC.CrewManagePlatform.Services.Interface.CrewArchives;
 using HNKC.CrewManagePlatform.Services.Interface.CurrentUser;
 using HNKC.CrewManagePlatform.Services.Interface.CurrentUserService;
@@ -173,7 +174,7 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api
         /// <param name="app"></param>
         public static void UseCustomSwagger(this WebApplication app)
         {
-                var prefixUrl = app.Configuration.GetValue<string>("SwaggerPrefixUrl");
+            var prefixUrl = app.Configuration.GetValue<string>("SwaggerPrefixUrl");
             app.UseSwagger(c =>
             {
                 c.PreSerializeFilters.Add((doc, request) =>
@@ -301,6 +302,7 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api
             builder.Services.AddScoped<ICrewArchivesService, CrewArchivesService>();
             builder.Services.AddScoped<IMenuService, MenuService>();
             builder.Services.AddScoped<IRoleService, RoleService>();
+            builder.Services.AddScoped<IContractService, ContractService>();
 
         }
     }

@@ -31,7 +31,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
         /// </summary>
         /// <param name="requestBody"></param>
         /// <returns></returns>
-        public async Task<ResponsePageResult<List<SearchCrewArchivesResponse>>> SearchCrewArchivesAsync(SearchCrewArchivesRequest requestBody)
+        public async Task<PageResult<SearchCrewArchivesResponse>> SearchCrewArchivesAsync(SearchCrewArchivesRequest requestBody)
         {
             RefAsync<int> total = 0;
 
@@ -107,9 +107,9 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
         /// <param name="rt"></param>
         /// <param name="total"></param>
         /// <returns></returns>
-        private async Task<ResponsePageResult<List<SearchCrewArchivesResponse>>> GetResult(SearchCrewArchivesRequest requestBody, List<SearchCrewArchivesResponse> rt, int total)
+        private async Task<PageResult<SearchCrewArchivesResponse>> GetResult(SearchCrewArchivesRequest requestBody, List<SearchCrewArchivesResponse> rt, int total)
         {
-            ResponsePageResult<List<SearchCrewArchivesResponse>> rr = new();
+            PageResult<SearchCrewArchivesResponse> page = new();
             if (rt.Any())
             {
                 var uIds = rt.Select(x => x.BId).ToList();
@@ -187,7 +187,9 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                     t.OnStatusName = ob == null ? EnumUtil.GetDescription(CrewStatusEnum.DaiGang) : EnumUtil.GetDescription(ShipUserStatus(ob.WorkShipEndTime, ob.HolidayTime, t.DeleteReson));
                 }
             }
-            return rr.SuccessPageResult(rt, requestBody.PageIndex, requestBody.PageSize, total);
+            page.List = rt;
+            page.TotalCount = total;
+            return page;
         }
         /// <summary>
         /// 通过身份证与当前日期计算年龄
@@ -252,10 +254,8 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
         /// 首页占比及统计数
         /// </summary>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<CrewArchivesResponse>> CrewArchivesCountAsync()
+        public async Task<Result> CrewArchivesCountAsync()
         {
-            ResponseAjaxResult<CrewArchivesResponse> rr = new();
-
             var udtab = await _dbContext.Queryable<User>().ToListAsync();
             var udtabIds = udtab.Select(x => x.BusinessId.ToString()).ToList();
             var onBoard = await _dbContext.Queryable<WorkShip>().Where(t => t.IsDelete == 1 && udtabIds.Contains(t.WorkShipId.ToString())).ToListAsync();
@@ -274,7 +274,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
             var otherCount = udtab.Where(x => x.DeleteReson != CrewStatusEnum.Normal && x.DeleteReson != CrewStatusEnum.XiuJia).Count();//离调退
             var otherProp = totalCount == 0 ? 0 : Convert.ToInt32(otherCount / totalCount);
 
-            return rr.SuccessResult(new CrewArchivesResponse
+            var rr = new CrewArchivesResponse
             {
                 HolidayCount = holidayCount,
                 OtherCount = otherCount,
@@ -285,7 +285,8 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                 TatalCount = totalCount,
                 WaitCount = waitCount,
                 WaitProp = waitProp
-            }, 1);
+            };
+            return Result.Success(rr);
         }
 
         #region 数据增改
@@ -294,7 +295,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
         /// </summary>
         /// <param name="requestBody"></param>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<bool>> SaveUserAsync(CrewArchivesRequest requestBody)
+        public async Task<Result> SaveUserAsync(CrewArchivesRequest requestBody)
         {
             if (requestBody.BId == Guid.Empty || string.IsNullOrEmpty(requestBody.BId.ToString())) { return await InsertUserAsync(requestBody); }
             else { return await UpdateUserAsync(requestBody); }
@@ -304,9 +305,8 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
         /// </summary>
         /// <param name="requestBody"></param>
         /// <returns></returns>
-        private async Task<ResponseAjaxResult<bool>> InsertUserAsync(CrewArchivesRequest requestBody)
+        private async Task<Result> InsertUserAsync(CrewArchivesRequest requestBody)
         {
-            ResponseAjaxResult<bool> rr = new();
             List<UploadResponse> upLoadFiles = new();
 
             #region 基本信息
@@ -321,8 +321,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                 var existUi = await _dbContext.Queryable<User>().FirstAsync(t => t.IsDelete == 1 && requestBody.BaseInfoDto.WorkNumber == t.WorkNumber || requestBody.BaseInfoDto.Phone == t.Phone || requestBody.BaseInfoDto.CardId == t.CardId);
                 if (existUi != null)
                 {
-                    rr.Fail("用户存在");
-                    return rr;
+                    return Result.Fail("用户存在");
                 }
                 userInfo = new()
                 {
@@ -395,8 +394,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                         var ef = existFamily.FirstOrDefault(x => x.Phone == item.Phone);
                         if (ef != null)
                         {
-                            rr.Fail("家庭成员已经绑定过，请先删除该/注销成员");
-                            return rr;
+                            return Result.Fail("家庭成员已经绑定过，请先删除该/注销成员");
                         }
                         hus.Add(new FamilyUser
                         {
@@ -420,8 +418,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                         var ef = existFamily.FirstOrDefault(x => x.Phone == item.Phone);
                         if (ef != null)
                         {
-                            rr.Fail("应急联系人已经绑定过，请先删除/注销该成员");
-                            return rr;
+                            return Result.Fail("应急联系人已经绑定过，请先删除/注销该成员");
                         }
                         ecs.Add(new EmergencyContacts
                         {
@@ -756,22 +753,21 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
             await InsertFileAsync(upLoadFiles, uId);
             #endregion
 
-            return rr.SuccessResult(true);
+            return Result.Success();
         }
         /// <summary>
         /// 用户修改
         /// </summary>
         /// <param name="requestBody"></param>
         /// <returns></returns>
-        private async Task<ResponseAjaxResult<bool>> UpdateUserAsync(CrewArchivesRequest requestBody)
+        private async Task<Result> UpdateUserAsync(CrewArchivesRequest requestBody)
         {
-            ResponseAjaxResult<bool> rr = new();
+
             List<UploadResponse> upFiles = new();
 
             if (requestBody.BId == Guid.Empty || string.IsNullOrWhiteSpace(requestBody.BId.ToString()))
             {
-                rr.Fail("业务主键不能为空");
-                return rr;
+                return Result.Fail("业务主键不能为空");
             }
 
             var userInfo = await _dbContext.Queryable<User>().FirstAsync(t => t.BusinessId == requestBody.BId);
@@ -1174,16 +1170,16 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                 await UpdateFileAsync(upFiles, userInfo.BusinessId);
                 #endregion
 
-                return rr.SuccessResult(true);
+                return Result.Success();
             }
-            return rr.SuccessResult(true, 0, "无用户/该用户已被删除");
+            return Result.Fail("无用户/该用户已被删除");
         }
         /// <summary>
         /// 保存备注
         /// </summary>
         /// <param name="requestBody"></param>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<bool>> SaveNotesAsync(NotesRequest requestBody)
+        public async Task<Result> SaveNotesAsync(NotesRequest requestBody)
         {
             if (requestBody.Type == 1) return await InsertNotesAsync(requestBody);
             else return await UpdateNotesAsync(requestBody);
@@ -1193,10 +1189,8 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
         /// </summary>
         /// <param name="requestBody"></param>
         /// <returns></returns>
-        private async Task<ResponseAjaxResult<bool>> InsertNotesAsync(NotesRequest requestBody)
+        private async Task<Result> InsertNotesAsync(NotesRequest requestBody)
         {
-            ResponseAjaxResult<bool> rr = new();
-
             if (requestBody.SaveNotes != null)
             {
                 var userNotes = new UserNotes
@@ -1208,11 +1202,11 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                     Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId()
                 };
                 await _dbContext.Insertable(userNotes).ExecuteCommandAsync();
-                return rr.SuccessResult(true);
+                return Result.Success("保存成功");
             }
             else
             {
-                return rr.FailResult(false, "新增失败");
+                return Result.Fail("保存失败");
             }
         }
         /// <summary>
@@ -1220,9 +1214,8 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
         /// </summary>
         /// <param name="requestBody"></param>
         /// <returns></returns>
-        private async Task<ResponseAjaxResult<bool>> UpdateNotesAsync(NotesRequest requestBody)
+        private async Task<Result> UpdateNotesAsync(NotesRequest requestBody)
         {
-            ResponseAjaxResult<bool> rr = new();
             if (requestBody.SaveNotes != null)
             {
                 //获取数据
@@ -1234,11 +1227,11 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                 }
 
                 await _dbContext.Insertable(note).ExecuteCommandAsync();
-                return rr.SuccessResult(true);
+                return Result.Success("修改成功");
             }
             else
             {
-                return rr.FailResult(false, "修改失败");
+                return Result.Fail("修改失败");
             }
         }
         /// <summary>
@@ -1246,7 +1239,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
         /// </summary>
         /// <param name="requestBody"></param>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<bool>> ToggleUserStatusAsync(ToggleUserStatus requestBody)
+        public async Task<Result> ToggleUserStatusAsync(ToggleUserStatus requestBody)
         {
             if (requestBody.Type == 1) return await DeactivateUserASync(requestBody);
             else return await UndoDeleteUserAsync(requestBody);
@@ -1256,20 +1249,19 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
         /// </summary>
         /// <param name="requestBody"></param>
         /// <returns></returns>
-        private async Task<ResponseAjaxResult<bool>> DeactivateUserASync(ToggleUserStatus requestBody)
+        private async Task<Result> DeactivateUserASync(ToggleUserStatus requestBody)
         {
-            ResponseAjaxResult<bool> rr = new();
             var rt = await _dbContext.Queryable<User>().FirstAsync(t => t.IsDelete == 1 && t.BusinessId == requestBody.BId);
             if (rt != null)
             {
                 rt.IsDelete = 0;
                 rt.DeleteReson = requestBody.DeactivateStatus.Value;
                 await _dbContext.Updateable(rt).WhereColumns(x => new { x.IsDelete, x.DeleteReson }).ExecuteCommandAsync();
-                return rr.SuccessResult(true, 1, "已删除");
+                return Result.Success("已删除");
             }
             else
             {
-                return rr.FailResult(false, "数据不存在/已删除");
+                return Result.Fail("数据不存在/已删除");
             }
         }
         /// <summary>
@@ -1277,20 +1269,19 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
         /// </summary>
         /// <param name="requestBody"></param>
         /// <returns></returns>
-        private async Task<ResponseAjaxResult<bool>> UndoDeleteUserAsync(ToggleUserStatus requestBody)
+        private async Task<Result> UndoDeleteUserAsync(ToggleUserStatus requestBody)
         {
-            ResponseAjaxResult<bool> rr = new();
             var rt = await _dbContext.Queryable<User>().FirstAsync(t => t.IsDelete == 0 && t.BusinessId == requestBody.BId);
             if (rt != null)
             {
                 rt.IsDelete = 0;
                 rt.DeleteReson = CrewStatusEnum.Normal;
                 await _dbContext.Updateable(rt).WhereColumns(x => new { x.IsDelete, x.DeleteReson }).ExecuteCommandAsync();
-                return rr.SuccessResult(true, 1, "已恢复");
+                return Result.Success("已恢复");
             }
             else
             {
-                return rr.FailResult(false, "数据不存在/已删除");
+                return Result.Fail("数据不存在/已删除");
             }
         }
         /// <summary>
@@ -1298,9 +1289,8 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
         /// </summary>
         /// <param name="requestBody"></param>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<bool>> CrewTransferAsync(CrewTransferRequest requestBody)
+        public async Task<Result> CrewTransferAsync(CrewTransferRequest requestBody)
         {
-            ResponseAjaxResult<bool> rt = new();
             //前端自己调用任职船舶接口  这里只处理调任逻辑
             var shipWork = await _dbContext.Queryable<WorkShip>().FirstAsync(t => t.IsDelete == 1 && t.BusinessId == requestBody.BId);
             if (shipWork != null)
@@ -1314,11 +1304,11 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                 //}
                 if (requestBody.WorkShipStartTime < shipWork.WorkShipEndTime)//新的上船日期小于旧的下船日期
                 {
-                    return rt.FailResult(false, "上船日期不可小于前下船日期");
+                    return Result.Fail("上船日期不可小于前下船日期");
                 }
                 if (requestBody.WorkShipStartTime < requestBody.WorkShipEndTime)
                 {
-                    return rt.FailResult(false, "下船日期不可小于上船日期");
+                    return Result.Fail("下船日期不可小于上船日期");
                 }
                 shipWork.OnShip = requestBody.OnShip;
                 shipWork.Postition = requestBody.Postition;
@@ -1326,7 +1316,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                 shipWork.WorkShipEndTime = requestBody.WorkShipEndTime;
             }
 
-            return rt.SuccessResult(true);
+            return Result.Success("调任成功");
         }
         #endregion
 
@@ -1336,9 +1326,9 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
         /// </summary>
         /// <param name="type"></param>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<List<DropDownResponse>>> GetDropDownListAsync(int type)
+        public async Task<Result> GetDropDownListAsync(int type)
         {
-            ResponseAjaxResult<List<DropDownResponse>> rt = new();
+            Result rt = new();
             switch (type)
             {
                 case 1://籍贯
@@ -1408,138 +1398,126 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
         /// 籍贯
         /// </summary>
         /// <returns></returns>
-        private async Task<ResponseAjaxResult<List<DropDownResponse>>> GetNativePlaceListAsync()
+        private async Task<Result> GetNativePlaceListAsync()
         {
-            ResponseAjaxResult<List<DropDownResponse>> rt = new();
             var rr = await _dbContext.Queryable<AdministrativeDivision>().Where(t => t.IsDelete == 1 && t.SupRegionalismCode == "0").Select(t => new DropDownResponse
             {
                 Key = t.BusinessId.ToString(),
                 Value = t.Name,
             }).ToListAsync();
-            return rt.SuccessResult(rr, rr.Count);
+            return Result.Success(rr);
         }
         /// <summary>
         /// 民族
         /// </summary>
         /// <returns></returns>
-        private async Task<ResponseAjaxResult<List<DropDownResponse>>> GetNationListAsync()
+        private async Task<Result> GetNationListAsync()
         {
-            ResponseAjaxResult<List<DropDownResponse>> rt = new();
             var rr = await _dbContext.Queryable<Nation>().Where(t => t.IsDelete == 1).Select(t => new DropDownResponse
             {
                 Key = t.BusinessId.ToString(),
                 Value = t.Name,
             }).ToListAsync();
-            return rt.SuccessResult(rr, rr.Count);
+            return Result.Success(rr);
         }
         /// <summary>
         /// 船员类型
         /// </summary>
         /// <returns></returns>
-        private async Task<ResponseAjaxResult<List<DropDownResponse>>> GetCrewTypeListAsync()
+        private async Task<Result> GetCrewTypeListAsync()
         {
-            ResponseAjaxResult<List<DropDownResponse>> rt = new();
             var rr = await _dbContext.Queryable<CrewType>().Where(t => t.IsDelete == 1).Select(t => new DropDownResponse
             {
                 Key = t.BusinessId.ToString(),
                 Value = t.Name,
             }).ToListAsync();
-            return rt.SuccessResult(rr, rr.Count);
+            return Result.Success(rr);
         }
         /// <summary>
         /// 船舶
         /// </summary>
         /// <returns></returns>
-        private async Task<ResponseAjaxResult<List<DropDownResponse>>> GetOwnerShipListAsync()
+        private async Task<Result> GetOwnerShipListAsync()
         {
-            ResponseAjaxResult<List<DropDownResponse>> rt = new();
             var rr = await _dbContext.Queryable<OwnerShip>().Where(t => t.IsDelete == 1).Select(t => new DropDownResponse
             {
                 Key = t.BusinessId.ToString(),
                 Value = t.ShipName,
                 Type = (int)t.ShipType
             }).ToListAsync();
-            return rt.SuccessResult(rr, rr.Count);
+            return Result.Success(rr);
         }
         /// <summary>
         /// 培训类型
         /// </summary>
         /// <returns></returns>
-        private async Task<ResponseAjaxResult<List<DropDownResponse>>> GetTrainingListAsync()
+        private async Task<Result> GetTrainingListAsync()
         {
-            ResponseAjaxResult<List<DropDownResponse>> rt = new();
             var rr = await _dbContext.Queryable<TrainingType>().Where(t => t.IsDelete == 1).Select(t => new DropDownResponse
             {
                 Key = t.BusinessId.ToString(),
                 Value = t.Name,
             }).ToListAsync();
-            return rt.SuccessResult(rr, rr.Count);
+            return Result.Success(rr);
         }
         /// <summary>
         /// 政治面貌
         /// </summary>
         /// <returns></returns>
-        private async Task<ResponseAjaxResult<List<DropDownResponse>>> GetPoliticalListAsync()
+        private async Task<Result> GetPoliticalListAsync()
         {
-            ResponseAjaxResult<List<DropDownResponse>> rt = new();
             var rr = await _dbContext.Queryable<Political>().Where(t => t.IsDelete == 1).Select(t => new DropDownResponse
             {
                 Key = t.BusinessId.ToString(),
                 Value = t.Name,
             }).ToListAsync();
-            return rt.SuccessResult(rr, rr.Count);
+            return Result.Success(rr);
         }
         /// <summary>
         /// 用工形式
         /// </summary>
         /// <returns></returns>
-        private async Task<ResponseAjaxResult<List<DropDownResponse>>> GetEmploymentTypeListAsync()
+        private async Task<Result> GetEmploymentTypeListAsync()
         {
-            ResponseAjaxResult<List<DropDownResponse>> rt = new();
             var rr = await _dbContext.Queryable<EmploymentType>().Where(t => t.IsDelete == 1).Select(t => new DropDownResponse
             {
                 Key = t.BusinessId.ToString(),
                 Value = t.Name,
             }).ToListAsync();
-            return rt.SuccessResult(rr, rr.Count);
+            return Result.Success(rr);
         }
         /// <summary>
         /// 国家
         /// </summary>
         /// <returns></returns>
-        private async Task<ResponseAjaxResult<List<DropDownResponse>>> GetCountryListAsync()
+        private async Task<Result> GetCountryListAsync()
         {
-            ResponseAjaxResult<List<DropDownResponse>> rt = new();
-            List<DropDownResponse> rr = new();
-            rr = await _dbContext.Queryable<CountryRegion>().Where(t => t.IsDelete == 1).Select(t => new DropDownResponse
+            var rr = await _dbContext.Queryable<CountryRegion>().Where(t => t.IsDelete == 1).Select(t => new DropDownResponse
             {
                 Key = t.BusinessId.ToString(),
                 Value = t.Name,
             }).ToListAsync();
-            return rt.SuccessResult(rr, rr.Count);
+            return Result.Success(rr);
         }
         /// <summary>
         /// 适任职务
         /// </summary>
         /// <returns></returns>
-        private async Task<ResponseAjaxResult<List<DropDownResponse>>> GetPositionListAsync()
+        private async Task<Result> GetPositionListAsync()
         {
-            ResponseAjaxResult<List<DropDownResponse>> rt = new();
-            List<DropDownResponse> rr = new();
-            rr = await _dbContext.Queryable<Position>().Where(t => t.IsDelete == 1).Select(t => new DropDownResponse
+            var rr = await _dbContext.Queryable<Position>().Where(t => t.IsDelete == 1).Select(t => new DropDownResponse
             {
                 Key = t.BusinessId.ToString(),
                 Value = t.Name,
             }).ToListAsync();
-            return rt.SuccessResult(rr, rr.Count);
+            return Result.Success(rr);
         }
         /// <summary>
         /// 家庭关系
         /// </summary>
         /// <returns></returns>
-        private static ResponseAjaxResult<List<DropDownResponse>> GetFamilyRelationList()
+        private static Result GetFamilyRelationList()
         {
-            ResponseAjaxResult<List<DropDownResponse>> rt = new();
             var enumConvertList = Enum.GetValues(typeof(FamilyRelationEnum))
                                                    .Cast<FamilyRelationEnum>()
                                                    .Select(x => new DropDownResponse
@@ -1549,15 +1527,14 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                                                        Type = (int)x
                                                    })
                                                    .ToList();
-            return rt.SuccessResult(enumConvertList, enumConvertList.Count);
+            return Result.Success(enumConvertList);
         }
         /// <summary>
         /// 船舶类型
         /// </summary>
         /// <returns></returns>
-        private static ResponseAjaxResult<List<DropDownResponse>> GetShipTypeList()
+        private static Result GetShipTypeList()
         {
-            ResponseAjaxResult<List<DropDownResponse>> rt = new();
             var enumConvertList = Enum.GetValues(typeof(ShipTypeEnum))
                                                    .Cast<ShipTypeEnum>()
                                                    .Select(x => new DropDownResponse
@@ -1567,15 +1544,14 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                                                        Type = (int)x
                                                    })
                                                    .ToList();
-            return rt.SuccessResult(enumConvertList, enumConvertList.Count);
+            return Result.Success(enumConvertList);
         }
         /// <summary>
         /// 服务簿类型
         /// </summary>
         /// <returns></returns>
-        private static ResponseAjaxResult<List<DropDownResponse>> GetServiceBookList()
+        private static Result GetServiceBookList()
         {
-            ResponseAjaxResult<List<DropDownResponse>> rt = new();
             var enumConvertList = Enum.GetValues(typeof(ServiceBookEnum))
                                                    .Cast<ServiceBookEnum>()
                                                    .Select(x => new DropDownResponse
@@ -1585,15 +1561,14 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                                                        Type = (int)x
                                                    })
                                                    .ToList();
-            return rt.SuccessResult(enumConvertList, enumConvertList.Count);
+            return Result.Success(enumConvertList);
         }
         /// <summary>
         /// 签证类型
         /// </summary>
         /// <returns></returns>
-        private static ResponseAjaxResult<List<DropDownResponse>> GetVisaTypeList()
+        private static Result GetVisaTypeList()
         {
-            ResponseAjaxResult<List<DropDownResponse>> rt = new();
             var enumConvertList = Enum.GetValues(typeof(VisaTypeEnum))
                                                    .Cast<VisaTypeEnum>()
                                                    .Select(x => new DropDownResponse
@@ -1603,15 +1578,14 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                                                        Type = (int)x
                                                    })
                                                    .ToList();
-            return rt.SuccessResult(enumConvertList, enumConvertList.Count);
+            return Result.Success(enumConvertList);
         }
         /// <summary>
         /// 技能证书
         /// </summary>
         /// <returns></returns>
-        private static ResponseAjaxResult<List<DropDownResponse>> GetCertificateTypeList()
+        private static Result GetCertificateTypeList()
         {
-            ResponseAjaxResult<List<DropDownResponse>> rt = new();
             var enumConvertList = Enum.GetValues(typeof(CertificateTypeEnum))
                                                    .Cast<CertificateTypeEnum>()
                                                    .Select(x => new DropDownResponse
@@ -1621,15 +1595,14 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                                                        Type = (int)x
                                                    })
                                                    .ToList();
-            return rt.SuccessResult(enumConvertList, enumConvertList.Count);
+            return Result.Success(enumConvertList);
         }
         /// <summary>
         /// 学历类型
         /// </summary>
         /// <returns></returns>
-        private static ResponseAjaxResult<List<DropDownResponse>> GetQualificationTypeList()
+        private static Result GetQualificationTypeList()
         {
-            ResponseAjaxResult<List<DropDownResponse>> rt = new();
             var enumConvertList = Enum.GetValues(typeof(QualificationTypeEnum))
                                                    .Cast<QualificationTypeEnum>()
                                                    .Select(x => new DropDownResponse
@@ -1639,15 +1612,14 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                                                        Type = (int)x
                                                    })
                                                    .ToList();
-            return rt.SuccessResult(enumConvertList, enumConvertList.Count);
+            return Result.Success(enumConvertList);
         }
         /// <summary>
         /// 学历
         /// </summary>
         /// <returns></returns>
-        private static ResponseAjaxResult<List<DropDownResponse>> GetQualificationList()
+        private static Result GetQualificationList()
         {
-            ResponseAjaxResult<List<DropDownResponse>> rt = new();
             var enumConvertList = Enum.GetValues(typeof(QualificationEnum))
                                                    .Cast<QualificationEnum>()
                                                    .Select(x => new DropDownResponse
@@ -1657,15 +1629,14 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                                                        Type = (int)x
                                                    })
                                                    .ToList();
-            return rt.SuccessResult(enumConvertList, enumConvertList.Count);
+            return Result.Success(enumConvertList);
         }
         /// <summary>
         /// 合同
         /// </summary>
         /// <returns></returns>
-        private static ResponseAjaxResult<List<DropDownResponse>> GetContractList()
+        private static Result GetContractList()
         {
-            ResponseAjaxResult<List<DropDownResponse>> rt = new();
             var enumConvertList = Enum.GetValues(typeof(ContractEnum))
                                                    .Cast<ContractEnum>()
                                                    .Select(x => new DropDownResponse
@@ -1675,15 +1646,14 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                                                        Type = (int)x
                                                    })
                                                    .ToList();
-            return rt.SuccessResult(enumConvertList, enumConvertList.Count);
+            return Result.Success(enumConvertList);
         }
         /// <summary>
         /// 考核
         /// </summary>
         /// <returns></returns>
-        private static ResponseAjaxResult<List<DropDownResponse>> GetCheckList()
+        private static Result GetCheckList()
         {
-            ResponseAjaxResult<List<DropDownResponse>> rt = new();
             var enumConvertList = Enum.GetValues(typeof(CheckEnum))
                                                    .Cast<CheckEnum>()
                                                    .Select(x => new DropDownResponse
@@ -1693,15 +1663,14 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                                                        Type = (int)x
                                                    })
                                                    .ToList();
-            return rt.SuccessResult(enumConvertList, enumConvertList.Count);
+            return Result.Success(enumConvertList);
         }
         /// <summary>
         /// 船舶状态
         /// </summary>
         /// <returns></returns>
-        private static ResponseAjaxResult<List<DropDownResponse>> GetShipStateList()
+        private static Result GetShipStateList()
         {
-            ResponseAjaxResult<List<DropDownResponse>> rt = new();
             var enumConvertList = Enum.GetValues(typeof(ShipStateEnum))
                                                    .Cast<ShipStateEnum>()
                                                    .Select(x => new DropDownResponse
@@ -1711,15 +1680,14 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                                                        Type = (int)x
                                                    })
                                                    .ToList();
-            return rt.SuccessResult(enumConvertList, enumConvertList.Count);
+            return Result.Success(enumConvertList);
         }
         /// <summary>
         /// 船员状态
         /// </summary>
         /// <returns></returns>
-        private static ResponseAjaxResult<List<DropDownResponse>> GetCrewStatusList()
+        private static Result GetCrewStatusList()
         {
-            ResponseAjaxResult<List<DropDownResponse>> rt = new();
             var enumConvertList = Enum.GetValues(typeof(CrewStatusEnum))
                                                    .Cast<CrewStatusEnum>()
                                                    .Select(x => new DropDownResponse
@@ -1729,7 +1697,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                                                        Type = (int)x
                                                    })
                                                    .ToList();
-            return rt.SuccessResult(enumConvertList, enumConvertList.Count);
+            return Result.Success(enumConvertList);
         }
         /// <summary>
         /// 获取枚举项的描述信息
@@ -1750,11 +1718,9 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
         /// </summary>
         /// <param name="bId"></param>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<EducationalBackgroundDetails>> GetEducationalBackgroundDetailsAsync(string bId)
+        public async Task<Result> GetEducationalBackgroundDetailsAsync(string bId)
         {
-            ResponseAjaxResult<EducationalBackgroundDetails> rt = new();
             EducationalBackgroundDetails ur = new();
-
             var userInfo = await GetUserInfoAsync(bId);
             var edutab = await _dbContext.Queryable<EducationalBackground>().Where(t => t.IsDelete == 1 && t.BusinessId == userInfo.BusinessId).ToListAsync();
             //获取文件
@@ -1793,16 +1759,15 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
             }
             ur.QualificationInfos = qd;
 
-            return rt.SuccessResult(ur);
+            return Result.Success(ur);
         }
         /// <summary>
         /// 备注
         /// </summary>
         /// <param name="bId"></param>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<NotesDetails>> GetNotesDetailsAsync(string bId)
+        public async Task<Result> GetNotesDetailsAsync(string bId)
         {
-            ResponseAjaxResult<NotesDetails> rr = new();
             NotesDetails nd = new();
 
             var users = await _dbContext.Queryable<User>().Select(t => new { t.BusinessId, t.Name }).ToListAsync();
@@ -1823,16 +1788,15 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
             }
             nd.NotesForDetails = rt;
 
-            return rr.SuccessResult(nd);
+            return Result.Success(nd);
         }
         /// <summary>
         /// 职务晋升
         /// </summary>
         /// <param name="bId"></param>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<PromotionDetails>> GetPromotionDetailsAsync(string bId)
+        public async Task<Result> GetPromotionDetailsAsync(string bId)
         {
-            ResponseAjaxResult<PromotionDetails> rt = new();
             PromotionDetails ur = new();
 
             var userInfo = await GetUserInfoAsync(bId);
@@ -1871,16 +1835,15 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
             }
             ur.Promotions = pd;
 
-            return rt.SuccessResult(ur);
+            return Result.Success(ur);
         }
         /// <summary>
         /// 培训记录
         /// </summary>
         /// <param name="bId"></param>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<TrainingRecordDetails>> GetTrainingRecordDetailsAsync(string bId)
+        public async Task<Result> GetTrainingRecordDetailsAsync(string bId)
         {
-            ResponseAjaxResult<TrainingRecordDetails> rt = new();
             TrainingRecordDetails ur = new();
 
             var userInfo = await GetUserInfoAsync(bId);
@@ -1917,16 +1880,15 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
             }
             ur.TrainingRecords = td;
 
-            return rt.SuccessResult(ur);
+            return Result.Success(ur);
         }
         /// <summary>
         /// 任职船舶
         /// </summary>
         /// <param name="bId"></param>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<WorkShipDetails>> GetWorkShipDetailsAsync(string bId)
+        public async Task<Result> GetWorkShipDetailsAsync(string bId)
         {
-            ResponseAjaxResult<WorkShipDetails> rt = new();
             WorkShipDetails ur = new();
 
             var userInfo = await GetUserInfoAsync(bId);
@@ -1958,20 +1920,17 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
             }
             ur.WorkShips = wd;
 
-            return rt.SuccessResult(ur);
+            return Result.Success(ur);
         }
         /// <summary>
         /// 年度考核
         /// </summary>
         /// <param name="bId"></param>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<YearCheckDetails>> GetYearCheckDetailAsync(string bId)
+        public async Task<Result> GetYearCheckDetailAsync(string bId)
         {
-            ResponseAjaxResult<YearCheckDetails> rt = new();
             YearCheckDetails ur = new();
-
             var userInfo = await GetUserInfoAsync(bId);
-
             var yearChecks = await _dbContext.Queryable<YearCheck>().Where(t => t.IsDelete == 1 && t.TrainingId == userInfo.BusinessId).OrderByDescending(x => x.TrainingTime).ToListAsync();
             //获取文件
             var fileIds = yearChecks.Select(x => x.TrainingScan.ToString()).ToList();
@@ -2003,18 +1962,16 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
             }
             ur.YearChecks = yc;
 
-            return rt.SuccessResult(ur);
+            return Result.Success(ur);
         }
         /// <summary>
         /// 适任证书
         /// </summary>
         /// <param name="bId"></param>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<CertificateOfCompetencyDetails>> GetCertificateOfCompetencyDetailsAsync(string bId)
+        public async Task<Result> GetCertificateOfCompetencyDetailsAsync(string bId)
         {
-            ResponseAjaxResult<CertificateOfCompetencyDetails> rt = new();
             CertificateOfCompetencyDetails ur = new();
-
             var userInfo = await GetUserInfoAsync(bId);
             //获取文件
             var url = AppsettingsHelper.GetValue("UpdateItem:Url");
@@ -2261,17 +2218,15 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                 }
                 ur.VisaRecords = vfd;
             }
-            return rt.SuccessResult(ur);
-
+            return Result.Success(ur);
         }
         /// <summary>
         /// 劳务详情
         /// </summary>
         /// <param name="bId"></param>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<LaborServicesInfoDetails>> GetLaborServicesDetailsAsync(string bId)
+        public async Task<Result> GetLaborServicesDetailsAsync(string bId)
         {
-            ResponseAjaxResult<LaborServicesInfoDetails> rt = new();
             LaborServicesInfoDetails ur = new();
 
             var userInfo = await GetUserInfoAsync(bId);
@@ -2337,16 +2292,16 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                 UserEntryInfosForDetails = uEntry
             };
 
-            return rt.SuccessResult(ur);
+            return Result.Success(ur);
         }
         /// <summary>
         /// 基本信息
         /// </summary>
         /// <param name="bId"></param>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<BaseInfoDetails>> GetBasesicDetailsAsync(string bId)
+        public async Task<Result> GetBasesicDetailsAsync(string bId)
         {
-            ResponseAjaxResult<BaseInfoDetails> rt = new();
+            PageResult<BaseInfoDetails> rt = new();
             BaseInfoDetails ur = new();
 
             var userInfo = await GetUserInfoAsync(bId);
@@ -2470,7 +2425,8 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
             };
             ur.EmergencyContacts = eu;
             #endregion
-            return rt.SuccessResult(ur);
+
+            return Result.Success(ur); ;
         }
         /// <summary>
         /// 获取用户信息
@@ -2491,9 +2447,9 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
         /// <param name="uploadResponse"></param>
         /// <param name="uId"></param>
         /// <returns></returns>
-        private async Task<ResponseAjaxResult<bool>> InsertFileAsync(List<UploadResponse> uploadResponse, Guid? uId)
+        private async Task<Result> InsertFileAsync(List<UploadResponse> uploadResponse, Guid? uId)
         {
-            ResponseAjaxResult<bool> rr = new();
+
             if (uploadResponse != null && uploadResponse.Any())
             {
                 List<Files> files = new();
@@ -2514,9 +2470,9 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                     });
                 }
                 if (files.Any()) await _dbContext.Insertable(files).ExecuteCommandAsync();
-                return rr.SuccessResult(true);
+                return Result.Success();
             }
-            else { return rr.FailResult(false, "文件保存失败"); }
+            else { return Result.Fail("文件保存失败"); }
         }
         /// <summary>
         /// 修改文件
@@ -2524,9 +2480,8 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
         /// <param name="uploadResponse"></param>
         /// <param name="uId"></param>
         /// <returns></returns>
-        private async Task<ResponseAjaxResult<bool>> UpdateFileAsync(List<UploadResponse> uploadResponse, Guid? uId)
+        private async Task<Result> UpdateFileAsync(List<UploadResponse> uploadResponse, Guid? uId)
         {
-            ResponseAjaxResult<bool> rr = new();
             if (uploadResponse != null && uploadResponse.Any())
             {
                 var bids = uploadResponse.Select(x => x.FileId).ToList();
@@ -2536,7 +2491,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                 //重新新增文件
                 return await InsertFileAsync(uploadResponse, uId);
             }
-            else { return rr.FailResult(false, "文件保存失败"); }
+            else { return Result.Fail("文件保存失败"); }
 
         }
         #endregion
