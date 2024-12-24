@@ -1,9 +1,7 @@
 ﻿using HNKC.CrewManagePlatform.Models.CommonResult;
-using HNKC.CrewManagePlatform.Models.Dtos;
 using HNKC.CrewManagePlatform.Models.Dtos.CrewArchives;
 using HNKC.CrewManagePlatform.Services.Interface.CrewArchives;
 using HNKC.CrewManagePlatform.SqlSugars.UnitOfTransaction;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HNKC.CrewManagePlatform.Services.Admin.Api.Controllers
@@ -13,7 +11,7 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api.Controllers
     /// </summary>
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
+    //[Authorize]
     public class CrewArchivesController : BaseController
     {
         private ICrewArchivesService _service;
@@ -31,9 +29,10 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api.Controllers
         /// <param name="requestBody"></param>
         /// <returns></returns>
         [HttpPost("SearchCrewArchives")]
-        public async Task<PageResult<SearchCrewArchivesResponse>> SearchCrewArchivesAsync([FromBody] SearchCrewArchivesRequest requestBody)
+        public async Task<IActionResult> SearchCrewArchivesAsync([FromBody] SearchCrewArchivesRequest requestBody)
         {
-            return await _service.SearchCrewArchivesAsync(requestBody);
+            var data = await _service.SearchCrewArchivesAsync(requestBody);
+            return Ok(data);
         }
         /// <summary>
         /// 船员数量
@@ -62,7 +61,7 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api.Controllers
         /// <returns></returns>
         [HttpPost("ToggleUserStatus")]
         [Transactional]
-        public async Task<Result> ToggleUserStatusAsync([FromQuery] ToggleUserStatus requestBody)
+        public async Task<Result> ToggleUserStatusAsync([FromBody] ToggleUserStatus requestBody)
         {
             return await _service.ToggleUserStatusAsync(requestBody);
         }

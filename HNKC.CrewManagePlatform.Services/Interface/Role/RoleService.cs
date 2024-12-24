@@ -333,7 +333,37 @@ namespace HNKC.CrewManagePlatform.Services.Role
             await _dbContext.Insertable<RoleMenu>(roleMenus).ExecuteCommandAsync();
             return Result.Success("添加成功");
         }
-        
-        
+
+        /// <summary>
+        /// 搜索角色菜单
+        /// </summary>
+        /// <param name="baseRequest"></param>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        public async Task<List<UserMenuResponseTree>> SearchRoleMenuAsync(BaseRequest baseRequest)
+        {
+            var roleMenu = await _dbContext.Queryable<RoleMenu>().Where(x => x.IsDelete == 1 && x.RoleBusinessId == baseRequest.BId).ToListAsync();
+            if (roleMenu.Count > 0)
+            {
+                var menuId = roleMenu.Select(x => x.MenuBusinessId).ToList();
+                var menuList = await _dbContext.Queryable<Menu>().Where(x => x.IsDelete == 1 && menuId.Contains(x.BusinessId))
+                     .Select(x => new UserMenuResponseTree()
+                     {
+                         MenuCode = x.MenuCode,
+                         BId = x.BusinessId,
+                         Mid = x.MId.Value,
+                         Sort = x.Sort,
+                         Parentid = x.ParentId.Value,
+                         ComponentUrl = x.ComponentUrl,
+                         Icon = x.Icon,
+                         Url = x.Url,
+                         Name = x.Name
+                     })
+                    .ToListAsync();
+
+                return ListToTreeUtil.GetTree(0, menuList);
+            }
+            return null;
+        }
     }
 }
