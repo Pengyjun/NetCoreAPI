@@ -59,12 +59,12 @@ namespace HNKC.CrewManagePlatform.SqlSugars.Models
         /// <summary>
         /// 船员照片 
         /// </summary>
-        [SugarColumn(Length = 100, ColumnDescription = "船员照片")]
+        [SugarColumn(Length = 36, ColumnDescription = "船员照片")]
         public Guid? CrewPhoto { get; set; }
         /// <summary>
         /// 身份证扫描件
         /// </summary>
-        [SugarColumn(ColumnDataType = "text", ColumnDescription = "身份证扫描件")]
+        [SugarColumn(Length = 36, ColumnDescription = "身份证扫描件")]
         public Guid? IdCardScans { get; set; }
         /// <summary>
         /// 籍贯(省)
