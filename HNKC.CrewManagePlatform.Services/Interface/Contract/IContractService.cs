@@ -13,6 +13,6 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Contract
         /// </summary>
         /// <param name="requestBody"></param>
         /// <returns></returns>
-        //Task<ResponsePageResult<List<ContractSearch>>> SearchContractAsync(ContractRequest requestBody);
+        Task<PageResult<ContractSearch>> SearchContractAsync(ContractRequest requestBody);
     }
 }

@@ -33,7 +33,7 @@ namespace HNKC.CrewManagePlatform.SqlSugars.Models
         /// 合同主体
         /// </summary>
         [SugarColumn(Length = 200, ColumnDescription = "合同主体")]
-        public string? ContarctMain { get; set; }
+        public string? ContractMain { get; set; }
         /// <summary>
         /// 用工形式
         /// </summary>
@@ -43,7 +43,7 @@ namespace HNKC.CrewManagePlatform.SqlSugars.Models
         /// 合同类型
         /// </summary>
         [SugarColumn(ColumnDataType = "int", ColumnDescription = "合同类型", DefaultValue = "0")]
-        public ContractEnum ContarctType { get; set; }
+        public ContractEnum ContractType { get; set; }
         /// <summary>
         /// 关联键
         /// </summary>
