@@ -2180,13 +2180,14 @@ namespace GHMonitoringCenterApi.Application.Service.Timing
             var companyProducitonValueList = await dbContext.Queryable<CompanyProductionValueInfo>().Where(x => x.IsDelete == 1 && x.DateDay == year
             && x.Sort != 0).ToListAsync();
             var companyIds = companyProducitonValueList.Select(x => x.CompanyId).ToList();
-            var projectList = await dbContext.Queryable<Project>().Where(x => x.IsDelete == 1 && companyIds.Contains(x.CompanyId.Value)).ToListAsync();
+            var projectList = await dbContext.Queryable<Project>().Where(x => x.IsDelete == 1).ToListAsync();
             if (projectList.Any())
             {
                 //查询当前中期的日报
-                var dayProjectProductionList = await dbContext.Queryable<DayReport>().Where(x => x.IsDelete == 1
+                var dayProjectProductionList = await dbContext.Queryable<DayReport>().Where(x => x.IsDelete == 1 && x.ProcessStatus ==DayReportProcessStatus.Submited
                  && x.DateDay >= SqlFunc.ToInt32(startTime)
-                 && x.DateDay <= SqlFunc.ToInt32(endTime)).ToListAsync();
+                 && x.DateDay <= SqlFunc.ToInt32(endTime)
+                 ).ToListAsync();
                 if (dayProjectProductionList.Any())
                 {
                     //SumAsync(x => x.DayActualProductionAmount)
@@ -2194,6 +2195,7 @@ namespace GHMonitoringCenterApi.Application.Service.Timing
                     foreach (var item in companyProducitonValueList)
                     {
                         var ids = projectList.Where(x => x.CompanyId == item.CompanyId).Select(x => x.Id).ToList();
+                        var aa = dayProjectProductionList.Where(x => ids.Contains(x.ProjectId)).ToList();
                         var dayProjectProduction = dayProjectProductionList.Where(x => ids.Contains(x.ProjectId)).Sum(x => x.DayActualProductionAmount);
                         var currentCompany = companyProducitonValueList.Where(x => x.CompanyId == item.CompanyId).FirstOrDefault();
                         currentCompany = UpdateCompanyMonthProduction(currentCompany, month, dayProjectProduction);
