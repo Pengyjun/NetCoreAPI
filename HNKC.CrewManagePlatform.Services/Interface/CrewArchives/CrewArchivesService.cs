@@ -1457,6 +1457,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
             {
                 Key = t.BusinessId.ToString(),
                 Value = t.ShipName,
+                Type = (int)t.ShipType
             }).ToListAsync();
             return rt.SuccessResult(rr, rr.Count);
         }
@@ -1544,7 +1545,8 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                                                    .Select(x => new DropDownResponse
                                                    {
                                                        Key = ((int)x).ToString(),
-                                                       Value = GetEnumDescription(x)
+                                                       Value = GetEnumDescription(x),
+                                                       Type = (int)x
                                                    })
                                                    .ToList();
             return rt.SuccessResult(enumConvertList, enumConvertList.Count);
@@ -1561,7 +1563,8 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                                                    .Select(x => new DropDownResponse
                                                    {
                                                        Key = ((int)x).ToString(),
-                                                       Value = GetEnumDescription(x)
+                                                       Value = GetEnumDescription(x),
+                                                       Type = (int)x
                                                    })
                                                    .ToList();
             return rt.SuccessResult(enumConvertList, enumConvertList.Count);
@@ -1578,7 +1581,8 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                                                    .Select(x => new DropDownResponse
                                                    {
                                                        Key = ((int)x).ToString(),
-                                                       Value = GetEnumDescription(x)
+                                                       Value = GetEnumDescription(x),
+                                                       Type = (int)x
                                                    })
                                                    .ToList();
             return rt.SuccessResult(enumConvertList, enumConvertList.Count);
@@ -1595,7 +1599,8 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                                                    .Select(x => new DropDownResponse
                                                    {
                                                        Key = ((int)x).ToString(),
-                                                       Value = GetEnumDescription(x)
+                                                       Value = GetEnumDescription(x),
+                                                       Type = (int)x
                                                    })
                                                    .ToList();
             return rt.SuccessResult(enumConvertList, enumConvertList.Count);
@@ -1612,7 +1617,8 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                                                    .Select(x => new DropDownResponse
                                                    {
                                                        Key = ((int)x).ToString(),
-                                                       Value = GetEnumDescription(x)
+                                                       Value = GetEnumDescription(x),
+                                                       Type = (int)x
                                                    })
                                                    .ToList();
             return rt.SuccessResult(enumConvertList, enumConvertList.Count);
@@ -1629,7 +1635,8 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                                                    .Select(x => new DropDownResponse
                                                    {
                                                        Key = ((int)x).ToString(),
-                                                       Value = GetEnumDescription(x)
+                                                       Value = GetEnumDescription(x),
+                                                       Type = (int)x
                                                    })
                                                    .ToList();
             return rt.SuccessResult(enumConvertList, enumConvertList.Count);
@@ -1646,7 +1653,8 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                                                    .Select(x => new DropDownResponse
                                                    {
                                                        Key = ((int)x).ToString(),
-                                                       Value = GetEnumDescription(x)
+                                                       Value = GetEnumDescription(x),
+                                                       Type = (int)x
                                                    })
                                                    .ToList();
             return rt.SuccessResult(enumConvertList, enumConvertList.Count);
@@ -1663,7 +1671,8 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                                                    .Select(x => new DropDownResponse
                                                    {
                                                        Key = ((int)x).ToString(),
-                                                       Value = GetEnumDescription(x)
+                                                       Value = GetEnumDescription(x),
+                                                       Type = (int)x
                                                    })
                                                    .ToList();
             return rt.SuccessResult(enumConvertList, enumConvertList.Count);
@@ -1680,7 +1689,8 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                                                    .Select(x => new DropDownResponse
                                                    {
                                                        Key = ((int)x).ToString(),
-                                                       Value = GetEnumDescription(x)
+                                                       Value = GetEnumDescription(x),
+                                                       Type = (int)x
                                                    })
                                                    .ToList();
             return rt.SuccessResult(enumConvertList, enumConvertList.Count);
@@ -1697,7 +1707,8 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                                                    .Select(x => new DropDownResponse
                                                    {
                                                        Key = ((int)x).ToString(),
-                                                       Value = GetEnumDescription(x)
+                                                       Value = GetEnumDescription(x),
+                                                       Type = (int)x
                                                    })
                                                    .ToList();
             return rt.SuccessResult(enumConvertList, enumConvertList.Count);
@@ -1714,7 +1725,8 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                                                    .Select(x => new DropDownResponse
                                                    {
                                                        Key = ((int)x).ToString(),
-                                                       Value = GetEnumDescription(x)
+                                                       Value = GetEnumDescription(x),
+                                                       Type = (int)x
                                                    })
                                                    .ToList();
             return rt.SuccessResult(enumConvertList, enumConvertList.Count);

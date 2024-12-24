@@ -29,5 +29,9 @@
         /// 
         /// </summary>
         public string? Value { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
+        public int Type { get; set; }
     }
 }
