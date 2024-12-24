@@ -22,6 +22,10 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.Menus
         public int ParentId { get; set; } = 0;
 
         /// <summary>
+        /// 当前节点的父节点   如果是根节点  传0
+        /// </summary>
+        public int Mid { get; set; }
+        /// <summary>
         /// 菜单名称
         /// </summary>
         public string? Name { get; set; }
@@ -46,6 +50,6 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.Menus
         /// <summary>
         /// 备注
         /// </summary>
-        public string Remark { get; set; }
+        public string? Remark { get; set; }
     }
 }

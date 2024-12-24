@@ -1,5 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc;
+using HNKC.CrewManagePlatform.Models.CommonResult;
+using System.Net;
+using HNKC.CrewManagePlatform.Models.Enums;
 
 namespace HNKC.CrewManagePlatform.Web.Filters
 
@@ -20,7 +23,21 @@ namespace HNKC.CrewManagePlatform.Web.Filters
 
         public void OnActionExecuted(ActionExecutedContext context)
         {
+            try
+            {
+                if (context.Exception!=null&&context.Exception.Message == "您已在其他终端登录请重新登录")
+                {
+                    context.ExceptionHandled = true;
+                    context.Result = new JsonResult(Result.NoAuth(context.Exception.Message));
+                    context.HttpContext.Response.StatusCode = (int)ResponseHttpCode.AlreadyLogin;
+                }
+               
+            }
+            catch (Exception ex)
+            {
 
+                
+            }
         }
     }
 }

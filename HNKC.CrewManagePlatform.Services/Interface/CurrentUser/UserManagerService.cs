@@ -158,8 +158,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CurrentUser
         {
             var token = string.Empty;
             var userInfo = GlobalCurrentUser;
-           var allRole=await dbContext.Queryable<InstitutionRole>().Where(x => x.IsDelete == 1 && x.RoleBusinessId == userInfo.RoleBusinessId
-            && x.UserBusinessId == userInfo.UserBusinessId).ToListAsync();
+           var allRole=await dbContext.Queryable<InstitutionRole>().Where(x => x.IsDelete == 1 &&x.UserBusinessId == userInfo.UserBusinessId).ToListAsync();
             //角色ID
             var roleIds=allRole.Select(x=>x.RoleBusinessId).ToList();
             //角色信息
@@ -199,6 +198,10 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CurrentUser
 
                 }
                 var loginRole = roleList.Where(x => x.BusinessId == changRoleRequest.RoleBusinessId).FirstOrDefault();
+                if (loginRole == null)
+                {
+                    return Result.Fail("角色切换失败;当前用户不存在角色", (int)ResponseHttpCode.LoginFail);
+                }
   
                 //默认存第一个角色信息
                 Claim[] claims = new Claim[]
@@ -260,7 +263,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CurrentUser
         public async Task<PageResult<UserResponse>> SearchUserAsync(PageRequest pageRequest)
         {
             PageResult<UserResponse> pageResult = new PageResult<UserResponse>();
-            var data= await dbContext.Queryable<User>()
+            var data = await dbContext.Queryable<User>()
                  .LeftJoin<InstitutionRole>((a, b) => a.BusinessId == b.UserBusinessId)
                  .LeftJoin<HNKC.CrewManagePlatform.SqlSugars.Models.Role>((a, b, c) => b.RoleBusinessId == c.BusinessId)
                  .LeftJoin<HNKC.CrewManagePlatform.SqlSugars.Models.Institution>((a, b, c, d) => b.InstitutionBusinessId == d.BusinessId)
@@ -273,7 +276,9 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CurrentUser
                      Phone = a.Phone,
                      Remark = a.Remark,
                      Created = a.Created,
-                     RoleName = c.Name
+                     RoleName = c.Name,
+                     Oid = d.Oid,
+                     DepartmentName = d.ShortName
                  })
                .ToListAsync();
 
@@ -313,7 +318,9 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CurrentUser
                 Phone = addUserRequest.Phone,
                 Oid = addUserRequest.Oid,
                 Password = pwd,
-                IsInsert = 1
+                IsInsert = 1,
+                Gender = addUserRequest.Gender.Value,
+                Remark = addUserRequest.Remark
             };
 
             await dbContext.Insertable<User>(user).ExecuteCommandAsync();

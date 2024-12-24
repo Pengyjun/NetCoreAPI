@@ -17,5 +17,20 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CurrentUser
         public string Pwd { get; set; }
         [Required(ErrorMessage = "机构不能为空")]
         public string Oid { get; set; }
+
+        /// <summary>
+        /// 性别ID
+        /// </summary>
+        [Required(ErrorMessage = "性别不能为空")]
+        [Range(1,2,ErrorMessage ="性别不能为空")]
+        public int? Gender { get; set; }
+
+        /// <summary>
+        /// 备注
+        /// </summary>
+        [MaxLength(256)]
+        public string? Remark { get; set; }
+        
+
     }
 }
