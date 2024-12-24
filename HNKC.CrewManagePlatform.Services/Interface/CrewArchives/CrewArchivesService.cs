@@ -89,8 +89,8 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                     ServiceBookType = t.ServiceBookType,
                     CrewType = t.CrewType,
                     EmploymentType = et.BusinessId.ToString(),
-                    FCertificate = po.BusinessId.ToString(),
-                    SCertificate = po.BusinessId.ToString(),
+                    FPosition = po.BusinessId.ToString(),
+                    SPosition = po.BusinessId.ToString(),
                     IsDelete = t.IsDelete,
                     DeleteReson = t.DeleteReson
                 })
@@ -174,8 +174,8 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                     t.ShipTypeName = EnumUtil.GetDescription(t.ShipType);
                     t.EmploymentTypeName = emptab.FirstOrDefault(x => x.BusinessId.ToString() == t.EmploymentType)?.Name;
                     t.CrewTypeName = crewTypetab.FirstOrDefault(x => t.CrewType == x.BusinessId.ToString())?.Name;
-                    if (t.FCertificate != null) t.FCertificateName = firSecPosition.FirstOrDefault(x => x.BusinessId.ToString() == t.FCertificate)?.Name;
-                    if (t.SCertificate != null) t.SCertificateName = firSecPosition.FirstOrDefault(x => x.BusinessId.ToString() == t.SCertificate)?.Name;
+                    if (t.FPosition != null) t.FPositionName = firSecPosition.FirstOrDefault(x => x.BusinessId.ToString() == t.FPosition)?.Name;
+                    if (t.SPosition != null) t.SPositionName = firSecPosition.FirstOrDefault(x => x.BusinessId.ToString() == t.SPosition)?.Name;
                     t.ServiceBookName = EnumUtil.GetDescription(t.ServiceBookType);
                     t.SkillsCertificateName = sctabNames;
                     t.SkillsCertificate = sctabs;
