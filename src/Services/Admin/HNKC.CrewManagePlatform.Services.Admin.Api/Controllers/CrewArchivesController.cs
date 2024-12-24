@@ -1,4 +1,5 @@
-﻿using HNKC.CrewManagePlatform.Models.Dtos.CrewArchives;
+﻿using HNKC.CrewManagePlatform.Models.CommonResult;
+using HNKC.CrewManagePlatform.Models.Dtos.CrewArchives;
 using HNKC.CrewManagePlatform.Services.Interface.CrewArchives;
 using HNKC.CrewManagePlatform.SqlSugars.UnitOfTransaction;
 using Microsoft.AspNetCore.Authorization;
@@ -39,10 +40,9 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet("CrewArchivesCount")]
-        public async Task<IActionResult> CrewArchivesCountAsync()
+        public async Task<Result> CrewArchivesCountAsync()
         {
-            var data = await _service.CrewArchivesCountAsync();
-            return Ok(data);
+            return await _service.CrewArchivesCountAsync();
         }
         /// <summary>
         /// 保存数据
