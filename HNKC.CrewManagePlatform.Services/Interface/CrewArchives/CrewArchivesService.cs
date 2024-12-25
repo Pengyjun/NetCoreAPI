@@ -5,8 +5,10 @@ using HNKC.CrewManagePlatform.Models.Enums;
 using HNKC.CrewManagePlatform.SqlSugars.Models;
 using HNKC.CrewManagePlatform.Utils;
 using SqlSugar;
+using System;
 using System.ComponentModel;
 using System.Globalization;
+using System.Linq;
 using System.Text.RegularExpressions;
 using UtilsSharp;
 
@@ -74,12 +76,17 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                 .LeftJoin<OwnerShip>((t, ws, ow) => ws.OnShip == ow.BusinessId.ToString())
                 .LeftJoin(userCoC, (t, ws, ow, coc) => t.BusinessId == coc.CertificateId)
                 .LeftJoin(uentity, (t, ws, ow, coc, ue) => t.BusinessId == ue.UserEntryId)
-                .WhereIF(requestBody.Staus != null && requestBody.Staus.Contains("0"), (t, ws, coc, ue) => DateTime.Now < ws.WorkShipEndTime)//在岗
-                .WhereIF(requestBody.Staus != null && requestBody.Staus.Contains("1"), (t, ws, coc, ue) => (int)t.DeleteReson == 1)//离职
-                .WhereIF(requestBody.Staus != null && requestBody.Staus.Contains("2"), (t, ws, coc, ue) => (int)t.DeleteReson == 2)//调离
-                .WhereIF(requestBody.Staus != null && requestBody.Staus.Contains("3"), (t, ws, coc, ue) => (int)t.DeleteReson == 3)//退休
-                .WhereIF(requestBody.Staus != null && requestBody.Staus.Contains("5"), (t, ws, coc, ue) => DateTime.Now >= ws.WorkShipEndTime)//待岗
-                .Select((t, ws, ow, coc, ue) => new SearchCrewArchivesResponse
+                .LeftJoin<SkillCertificates>((t, ws, ow, coc, ue, sc) => sc.SkillcertificateId == t.BusinessId)
+                .LeftJoin<EducationalBackground>((t, ws, ow, coc, ue, sc, eb) => sc.SkillcertificateId == t.BusinessId)
+                .WhereIF(requestBody.CertificateTypes != null && requestBody.CertificateTypes.Any(), (t, ws, ow, coc, ue, sc, eb) => requestBody.CertificateTypes.Contains(sc.SkillCertificateType.ToString()))
+                .WhereIF(requestBody.QualificationTypes != null && requestBody.QualificationTypes.Any(), (t, ws, ow, coc, ue, sc, eb) => requestBody.QualificationTypes.Contains(eb.QualificationType.ToString()))
+                .WhereIF(requestBody.Qualifications != null && requestBody.Qualifications.Any(), (t, ws, ow, coc, ue, sc, eb) => requestBody.Qualifications.Contains(eb.Qualification.ToString()))
+                .WhereIF(requestBody.Staus != null && requestBody.Staus.Contains("0"), (t, ws, ow, coc, ue, sc, eb) => DateTime.Now < ws.WorkShipEndTime)//在岗
+                .WhereIF(requestBody.Staus != null && requestBody.Staus.Contains("1"), (t, ws, ow, coc, ue, sc, eb) => (int)t.DeleteReson == 1)//离职
+                .WhereIF(requestBody.Staus != null && requestBody.Staus.Contains("2"), (t, ws, ow, coc, ue, sc, eb) => (int)t.DeleteReson == 2)//调离
+                .WhereIF(requestBody.Staus != null && requestBody.Staus.Contains("3"), (t, ws, ow, coc, ue, sc, eb) => (int)t.DeleteReson == 3)//退休
+                .WhereIF(requestBody.Staus != null && requestBody.Staus.Contains("5"), (t, ws, ow, coc, ue, sc, eb) => DateTime.Now >= ws.WorkShipEndTime)//待岗
+                .Select((t, ws, ow, coc, ue, sc, eb) => new SearchCrewArchivesResponse
                 {
                     BId = t.BusinessId,
                     BtnType = t.IsDelete == 0 ? 1 : 0,
@@ -130,10 +137,9 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                                .Where(skcall => !string.IsNullOrEmpty(skcall.PassportCertificate)).Any())
                 .WhereIF(requestBody.HealthCertificate, child => SqlFunc.Subqueryable<CertificateOfCompetency>()
                                .Where(skcall => !string.IsNullOrEmpty(skcall.HealthCertificate)).Any())
-                //技能证书
                 //学历 
                 //学历类型
-
+                .Distinct()
                 .OrderByDescending(t => t.IsDelete)
                 .ToPageListAsync(requestBody.PageIndex, requestBody.PageSize, total);
 

@@ -123,6 +123,5 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// 是否删除
         /// </summary>
         public int IsDelete { get; set; }
-
     }
 }

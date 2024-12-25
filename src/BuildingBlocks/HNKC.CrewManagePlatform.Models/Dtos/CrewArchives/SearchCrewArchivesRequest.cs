@@ -116,7 +116,7 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// </summary>
         public List<string>? QualificationTypes { get; set; }
         /// <summary>
-        /// 学历：全日制...
+        /// 学历
         /// </summary>
         public List<string>? Qualifications { get; set; }
     }
