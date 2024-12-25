@@ -51,7 +51,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CurrentUser
             var pwd = $"{secretKey}{userLoginRequest.Password}".ToMd5();
             //用户信息
             var userInfo = await dbContext.Queryable<User>().Where(x => x.IsDelete == 1 && x.Phone == userLoginRequest.Phone
-            && x.Password == pwd).FirstAsync();
+            && x.Password == pwd&&x.IsLoginUser==0).FirstAsync();
             if (userInfo != null)
             {
                 var instutionBusinessId = await dbContext.Queryable<Institution>().Where(x => x.IsDelete == 1 && x.Oid == userInfo.Oid
@@ -85,8 +85,6 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CurrentUser
                 var firstRole = userInstitution.OrderBy(x => x.Created).FirstOrDefault();
                 //角色信息
                 var roleList = await dbContext.Queryable<HNKC.CrewManagePlatform.SqlSugars.Models.Role>().Where(x => x.IsDelete == 1 && roleBusinessId.Contains(x.BusinessId)).ToListAsync();
-
-
                 if (roleList.Count > 0)
                 {
 

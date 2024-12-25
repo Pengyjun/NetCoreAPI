@@ -130,7 +130,7 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api.Controllers
         /// <param name="addRoleMenuRequest"></param>
         /// <returns></returns>
         [HttpPost("RemoveRoleUser")]
-        public async Task<Result> RemoveRoleUserAsync([FromQuery] RemoveRoleUserRequest removeRoleUserRequest)
+        public async Task<Result> RemoveRoleUserAsync([FromBody] RemoveRoleUserRequest removeRoleUserRequest)
         {
             return await roleService.RemoveRoleUserAsync(removeRoleUserRequest);
         }
