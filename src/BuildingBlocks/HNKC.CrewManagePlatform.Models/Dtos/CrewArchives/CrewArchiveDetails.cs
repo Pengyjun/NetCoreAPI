@@ -256,17 +256,17 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// <summary>
         /// 签发日期
         /// </summary>
-        public DateTime? FSignTime { get; set; }
+        public string? FSignTime { get; set; }
         /// <summary>
         /// 有效日期
         /// </summary>
-        public DateTime? FEffectiveTime { get; set; }
+        public string? FEffectiveTime { get; set; }
         /// <summary>
         /// 有效期倒计时 100天
         /// </summary>
         public int FEffectiveCountdown { get; set; }
         /// <summary>
-        /// 扫描件 ,拼接
+        /// 扫描件 
         /// </summary>
         public List<FileInfosForDetails>? FScans { get; set; }
         #endregion
@@ -289,17 +289,17 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// <summary>
         /// 签发日期
         /// </summary>
-        public DateTime? SSignTime { get; set; }
+        public string? SSignTime { get; set; }
         /// <summary>
         /// 有效日期
         /// </summary>
-        public DateTime? SEffectiveTime { get; set; }
+        public string? SEffectiveTime { get; set; }
         /// <summary>
         /// 有效期倒计时 100天
         /// </summary>
         public int SEffectiveCountdown { get; set; }
         /// <summary>
-        /// 扫描件 ,拼接
+        /// 扫描件 
         /// </summary>
         public List<FileInfosForDetails>? SScans { get; set; }
         #endregion
@@ -312,39 +312,39 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// <summary>
         /// 签发日期
         /// </summary>
-        public DateTime? TrainingSignTime { get; set; }
+        public string? TrainingSignTime { get; set; }
         /// <summary>
         /// Z01有效日期
         /// </summary>
-        public DateTime? Z01EffectiveTime { get; set; }
+        public string? Z01EffectiveTime { get; set; }
         /// <summary>
         /// Z07有效日期
         /// </summary>
-        public DateTime? Z07EffectiveTime { get; set; }
+        public string? Z07EffectiveTime { get; set; }
         /// <summary>
         /// Z08有效日期
         /// </summary>
-        public DateTime? Z08EffectiveTime { get; set; }
+        public string? Z08EffectiveTime { get; set; }
         /// <summary>
         /// Z04有效日期
         /// </summary>
-        public DateTime? Z04EffectiveTime { get; set; }
+        public string? Z04EffectiveTime { get; set; }
         /// <summary>
         /// Z05有效日期
         /// </summary>
-        public DateTime? Z05EffectiveTime { get; set; }
+        public string? Z05EffectiveTime { get; set; }
         /// <summary>
         /// Z02有效日期
         /// </summary>
-        public DateTime? Z02EffectiveTime { get; set; }
+        public string? Z02EffectiveTime { get; set; }
         /// <summary>
         /// Z06有效日期
         /// </summary>
-        public DateTime? Z06EffectiveTime { get; set; }
+        public string? Z06EffectiveTime { get; set; }
         /// <summary>
         /// Z09有效日期
         /// </summary>
-        public DateTime? Z09EffectiveTime { get; set; }
+        public string? Z09EffectiveTime { get; set; }
         /// <summary>
         /// 扫描件 ,拼接
         /// </summary>
@@ -359,11 +359,11 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// <summary>
         /// 签发日期
         /// </summary>
-        public DateTime? HealthSignTime { get; set; }
+        public string? HealthSignTime { get; set; }
         /// <summary>
         /// 有效日期
         /// </summary>
-        public DateTime? HealthEffectiveTime { get; set; }
+        public string? HealthEffectiveTime { get; set; }
         /// <summary>
         /// 扫描件 
         /// </summary>
@@ -378,11 +378,11 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// <summary>
         /// 签发日期
         /// </summary>
-        public DateTime? SeamanSignTime { get; set; }
+        public string? SeamanSignTime { get; set; }
         /// <summary>
         /// 有效日期
         /// </summary>
-        public DateTime? SeamanEffectiveTime { get; set; }
+        public string? SeamanEffectiveTime { get; set; }
         /// <summary>
         /// 扫描件 
         /// </summary>
@@ -397,11 +397,11 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// <summary>
         /// 签发日期
         /// </summary>
-        public DateTime? PassportSignTime { get; set; }
+        public string? PassportSignTime { get; set; }
         /// <summary>
         /// 有效日期
         /// </summary>
-        public DateTime? PassportEffectiveTime { get; set; }
+        public string? PassportEffectiveTime { get; set; }
         /// <summary>
         /// 签证记录
         /// </summary>
@@ -540,11 +540,11 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// <summary>
         /// 开始日期
         /// </summary>
-        public DateTime? StartTime { get; set; }
+        public string? StartTime { get; set; }
         /// <summary>
         /// 结束日期
         /// </summary>
-        public DateTime? EndTime { get; set; }
+        public string? EndTime { get; set; }
         /// <summary>
         /// 证书 ,拼接
         /// </summary>
@@ -578,9 +578,9 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// <summary>
         /// 日期：格式2024年10月15日
         /// </summary>
-        public DateTime? PromotionTime { get; set; }
+        public string? PromotionTime { get; set; }
         /// <summary>
-        /// 文件 ,拼接
+        /// 文件 
         /// </summary>
         public List<FileInfosForDetails>? PromotionScans { get; set; }
     }
@@ -614,11 +614,11 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// <summary>
         /// 上船日期
         /// </summary>
-        public DateTime WorkShipStartTime { get; set; }
+        public string? WorkShipStartTime { get; set; }
         /// <summary>
         /// 下船日期
         /// </summary>
-        public DateTime WorkShipEndTime { get; set; }
+        public string? WorkShipEndTime { get; set; }
         /// <summary>
         /// 休假日期
         /// </summary>
@@ -659,7 +659,7 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// <summary>
         /// 培训日期
         /// </summary>
-        public DateTime? TrainingTime { get; set; }
+        public string? TrainingTime { get; set; }
         /// <summary>
         /// 培训文件
         /// </summary>
@@ -688,7 +688,7 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// <summary>
         /// 考核模式：2024年度考核
         /// </summary>
-        public DateTime? TrainingTime { get; set; }
+        public string? TrainingTime { get; set; }
         /// <summary>
         /// 考核文件
         /// </summary>

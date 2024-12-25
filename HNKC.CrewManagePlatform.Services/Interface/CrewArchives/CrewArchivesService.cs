@@ -1920,8 +1920,8 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                 qd.Add(new QualificationForDetails
                 {
                     Id = item.BusinessId.ToString(),
-                    StartTime = item.StartTime,
-                    EndTime = item.EndTime,
+                    StartTime = item.StartTime?.ToString("yyyy-MM-dd"),
+                    EndTime = item.EndTime?.ToString("yyyy-MM-dd"),
                     Major = item.Major,
                     QualificationType = item.QualificationType,
                     QualificationTypeName = EnumUtil.GetDescription(item.QualificationType),
@@ -1956,7 +1956,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                 {
                     Id = item.UserNoteId.ToString(),
                     Content = item.Content,
-                    NoteTime = string.IsNullOrWhiteSpace(item.Modified.ToString()) ? item.Created.Value.ToString("yyyy-MM-dd HH:mm:ss") : item.Modified.Value.ToString("yyyy-MM-dd HH:mm:ss"),
+                    NoteTime = string.IsNullOrWhiteSpace(item.Modified.ToString()) ? item.Created?.ToString("yyyy-MM-dd HH:mm:ss") : item.Modified?.ToString("yyyy-MM-dd HH:mm:ss"),
                     UserName = users.FirstOrDefault(x => x.BusinessId.ToString() == item.WritedUserId)?.Name
                 });
             }
@@ -2003,7 +2003,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                     OnShipName = ownships.FirstOrDefault(x => x.BusinessId.ToString() == item.OnShip)?.ShipName,
                     PostitionName = positions.FirstOrDefault(x => x.BusinessId.ToString() == item.Postition)?.Name,
                     Postition = item.Postition,
-                    PromotionTime = item.PromotionTime,
+                    PromotionTime = item.PromotionTime?.ToString("yyyy-MM-dd"),
                     PromotionScans = pdFiles
                 });
             }
@@ -2046,7 +2046,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                     .ToList();
                 td.Add(new TrainingRecordsForDetails
                 {
-                    TrainingTime = item.TrainingTime,
+                    TrainingTime = item.TrainingTime?.ToString("yyyy-MM-dd"),
                     TrainingType = item.TrainingType,
                     TrainingTypeName = trainType.FirstOrDefault(x => x.BusinessId.ToString() == item.TrainingType)?.Name,
                     TrainingScans = trFile
@@ -2078,14 +2078,14 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                 var days = (date2 - date1).Days + 1;
                 wd.Add(new WorkShipsForDetails
                 {
-                    WorkShipEndTime = item.WorkShipEndTime,
+                    WorkShipEndTime = item.WorkShipEndTime.ToString("yyyy-MM-dd"),
                     HolidayTime = item.HolidayTime,
                     OnBoardTime = item.OnBoardTime,
                     OnShipName = ownships.FirstOrDefault(x => x.BusinessId.ToString() == item.OnShip)?.ShipName,
                     OnShip = item.OnShip,
                     Postition = item.Postition,
                     PostitionName = positions.FirstOrDefault(x => x.BusinessId.ToString() == item.Postition)?.Name,
-                    WorkShipStartTime = item.WorkShipStartTime,
+                    WorkShipStartTime = item.WorkShipStartTime.ToString("yyyy-MM-dd"),
                     OnBoardDay = days,
                     ShipType = ownships.FirstOrDefault(x => x.BusinessId.ToString() == item.OnShip).ShipType,
                     ShipTypeName = EnumUtil.GetDescription(ownships.FirstOrDefault(x => x.BusinessId.ToString() == item.OnShip).ShipType),
@@ -2128,7 +2128,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                     .ToList();
                 yc.Add(new YearChecksForDetails
                 {
-                    TrainingTime = item.TrainingTime,
+                    TrainingTime = item.TrainingTime?.ToString("yyyy-MM-dd"),
                     CheckType = item.CheckType,
                     CheckTypeName = EnumUtil.GetDescription(item.CheckType),
                     TrainingScans = ycFile
@@ -2154,43 +2154,42 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
             {
                 #region 简易字段匹配
                 ur.FCertificate = cerOfComp.FCertificate;
-                ur.FSignTime = cerOfComp.FSignTime;
-                ur.FEffectiveTime = cerOfComp.FEffectiveTime;
+                ur.FSignTime = cerOfComp.FSignTime?.ToString("yyyy-MM-dd");
+                ur.FEffectiveTime = cerOfComp.FEffectiveTime?.ToString("yyyy-MM-dd");
                 if (cerOfComp.FEffectiveTime.HasValue)
                 {
-                    DateTime date1 = new DateTime(ur.FEffectiveTime.Value.Year, ur.FEffectiveTime.Value.Month, ur.FEffectiveTime.Value.Day);
+                    DateTime date1 = new DateTime(cerOfComp.FEffectiveTime.Value.Year, cerOfComp.FEffectiveTime.Value.Month, cerOfComp.FEffectiveTime.Value.Day);
                     DateTime date2 = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day);
                     ur.FEffectiveCountdown = (date1 - date2).Days + 1;
                 }
                 ur.SCertificate = cerOfComp.SCertificate;
-                ur.SSignTime = cerOfComp.SSignTime;
-                ur.SEffectiveTime = cerOfComp.SEffectiveTime;
-                ur.SEffectiveTime = cerOfComp.SEffectiveTime;
+                ur.SSignTime = cerOfComp.SSignTime?.ToString("yyyy-MM-dd");
+                ur.SEffectiveTime = cerOfComp.SEffectiveTime?.ToString("yyyy-MM-dd");
                 if (cerOfComp.SEffectiveTime.HasValue)
                 {
-                    DateTime date1 = new DateTime(ur.SEffectiveTime.Value.Year, ur.SEffectiveTime.Value.Month, ur.SEffectiveTime.Value.Day);
+                    DateTime date1 = new DateTime(cerOfComp.SEffectiveTime.Value.Year, cerOfComp.SEffectiveTime.Value.Month, cerOfComp.SEffectiveTime.Value.Day);
                     DateTime date2 = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day);
                     ur.SEffectiveCountdown = (date1 - date2).Days + 1;
                 }
                 ur.TrainingCertificate = cerOfComp.TrainingCertificate;
-                ur.TrainingSignTime = cerOfComp.TrainingSignTime;
-                ur.Z01EffectiveTime = cerOfComp.Z01EffectiveTime;
-                ur.Z07EffectiveTime = cerOfComp.Z07EffectiveTime;
-                ur.Z08EffectiveTime = cerOfComp.Z08EffectiveTime;
-                ur.Z04EffectiveTime = cerOfComp.Z04EffectiveTime;
-                ur.Z05EffectiveTime = cerOfComp.Z05EffectiveTime;
-                ur.Z02EffectiveTime = cerOfComp.Z02EffectiveTime;
-                ur.Z06EffectiveTime = cerOfComp.Z06EffectiveTime;
-                ur.Z09EffectiveTime = cerOfComp.Z09EffectiveTime;
+                ur.TrainingSignTime = cerOfComp.TrainingSignTime?.ToString("yyyy-MM-dd");
+                ur.Z01EffectiveTime = cerOfComp.Z01EffectiveTime?.ToString("yyyy-MM-dd");
+                ur.Z07EffectiveTime = cerOfComp.Z07EffectiveTime?.ToString("yyyy-MM-dd");
+                ur.Z08EffectiveTime = cerOfComp.Z08EffectiveTime?.ToString("yyyy-MM-dd");
+                ur.Z04EffectiveTime = cerOfComp.Z04EffectiveTime?.ToString("yyyy-MM-dd");
+                ur.Z05EffectiveTime = cerOfComp.Z05EffectiveTime?.ToString("yyyy-MM-dd");
+                ur.Z02EffectiveTime = cerOfComp.Z02EffectiveTime?.ToString("yyyy-MM-dd");
+                ur.Z06EffectiveTime = cerOfComp.Z06EffectiveTime?.ToString("yyyy-MM-dd");
+                ur.Z09EffectiveTime = cerOfComp.Z09EffectiveTime?.ToString("yyyy-MM-dd");
                 ur.HealthCertificate = cerOfComp.HealthCertificate;
-                ur.HealthSignTime = cerOfComp.HealthSignTime;
-                ur.HealthEffectiveTime = cerOfComp.HealthEffectiveTime;
+                ur.HealthSignTime = cerOfComp.HealthSignTime?.ToString("yyyy-MM-dd");
+                ur.HealthEffectiveTime = cerOfComp.HealthEffectiveTime?.ToString("yyyy-MM-dd");
                 ur.SeamanCertificate = cerOfComp.SeamanCertificate;
-                ur.SeamanSignTime = cerOfComp.SeamanSignTime;
-                ur.SeamanEffectiveTime = cerOfComp.SeamanEffectiveTime;
+                ur.SeamanSignTime = cerOfComp.SeamanSignTime?.ToString("yyyy-MM-dd");
+                ur.SeamanEffectiveTime = cerOfComp.SeamanEffectiveTime?.ToString("yyyy-MM-dd");
                 ur.PassportCertificate = cerOfComp.PassportCertificate;
-                ur.PassportSignTime = cerOfComp.PassportSignTime;
-                ur.PassportEffectiveTime = cerOfComp.PassportEffectiveTime;
+                ur.PassportSignTime = cerOfComp.PassportSignTime?.ToString("yyyy-MM-dd");
+                ur.PassportEffectiveTime = cerOfComp.PassportEffectiveTime?.ToString("yyyy-MM-dd");
                 #endregion
                 //航区
                 var navigationarea = await _dbContext.Queryable<NavigationArea>().Where(t => t.IsDelete == 1).ToListAsync();
