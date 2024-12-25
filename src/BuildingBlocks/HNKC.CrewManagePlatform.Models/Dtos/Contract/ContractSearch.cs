@@ -72,6 +72,10 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.Contract
         /// </summary>
         public string? LaborCompany { get; set; }
         /// <summary>
+        /// 身份证
+        /// </summary>
+        public string? CardId { get; set; }
+        /// <summary>
         /// 开始时间
         /// </summary>
         public string? EntryTime { get; set; }
