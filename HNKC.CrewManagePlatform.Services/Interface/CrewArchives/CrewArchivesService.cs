@@ -307,14 +307,15 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
             var onDutyCount = onBoard.Where(x => x.WorkShipEndTime <= DateTime.Now).Select(x => x.WorkShipId).Distinct().Count();//在船数
             var onDutyProp = totalCount == 0 ? 0 : Convert.ToInt32(onDutyCount / totalCount);
 
-            var waitCount = onBoard.Where(x => x.WorkShipEndTime > DateTime.Now).Select(x => x.WorkShipId).Distinct().Count();//待岗数
+            var otherCount = udtab.Where(x => x.DeleteReson != CrewStatusEnum.Normal && x.DeleteReson != CrewStatusEnum.XiuJia).Count();//离调退
+            var otherProp = totalCount == 0 ? 0 : Convert.ToInt32(otherCount / totalCount);
+
+            var waitCount = onBoard.Where(x => x.WorkShipEndTime > DateTime.Now).Select(x => x.WorkShipId).Distinct().Count() - otherCount;//待岗数 排掉休假 删除
             var waitProp = totalCount == 0 ? 0 : Convert.ToInt32(waitCount / totalCount);
 
             //var holidayCount = onBoard.Where(x => x.HolidayTime > DateTime.Now).Select(x => x.WorkShipId).Distinct().Count();//休假数
             //var holidayProp = totalCount == 0 ? 0 : Convert.ToInt32(holidayCount / totalCount);
 
-            var otherCount = udtab.Where(x => x.DeleteReson != CrewStatusEnum.Normal && x.DeleteReson != CrewStatusEnum.XiuJia).Count();//离调退
-            var otherProp = totalCount == 0 ? 0 : Convert.ToInt32(otherCount / totalCount);
 
             var rr = new CrewArchivesResponse
             {
