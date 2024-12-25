@@ -457,7 +457,8 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// <summary>
         /// 证书类型
         /// </summary>
-        public string? SpecialEquipsCertificateType { get; set; }
+        public CertificateTypeEnum SpecialEquipsCertificateType { get; set; }
+        public string? SpecialEquipsCertificateTypeName { get; set; }
         /// <summary>
         /// 有效日期
         /// </summary>

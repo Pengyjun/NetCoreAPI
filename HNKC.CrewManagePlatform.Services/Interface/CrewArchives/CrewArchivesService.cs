@@ -853,7 +853,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                     //劳务合同
                     if (requestBody.BaseInfoDto.UserEntryInfo != null)
                     {
-                        userEntry = await _dbContext.Queryable<UserEntryInfo>().Where(t => t.IsDelete == 1 && t.BusinessId == userInfo.BusinessId).OrderByDescending(t => t.Created).FirstAsync();
+                        userEntry = await _dbContext.Queryable<UserEntryInfo>().Where(t => t.IsDelete == 1 && t.UserEntryId == userInfo.BusinessId).OrderByDescending(t => t.Created).FirstAsync();
                         userEntryAdd = new UserEntryInfo
                         {
                             BusinessId = GuidUtil.Next(),
@@ -864,7 +864,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                             EntryTime = requestBody.BaseInfoDto.UserEntryInfo.EntryTime,
                             LaborCompany = requestBody.BaseInfoDto.UserEntryInfo.LaborCompany,
                             EmploymentId = requestBody.BaseInfoDto.UserEntryInfo.EmploymentId,
-                            UserEntryId = requestBody.BId,
+                            UserEntryId = userInfo.BusinessId,
                             ContractType = requestBody.BaseInfoDto.UserEntryInfo.ContractType
                         };
                         if (requestBody.BaseInfoDto.UserEntryInfo.EntryScansUpload != null && requestBody.BaseInfoDto.UserEntryInfo.EntryScansUpload.Any())
@@ -930,7 +930,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                 List<VisaRecords> vrsAdd = new();
                 if (requestBody.CertificateOfCompetencyDto != null)
                 {
-                    coc = await _dbContext.Queryable<CertificateOfCompetency>().FirstAsync(t => t.IsDelete == 1 && t.BusinessId == userInfo.BusinessId);
+                    coc = await _dbContext.Queryable<CertificateOfCompetency>().FirstAsync(t => t.IsDelete == 1 && t.CertificateId == userInfo.BusinessId);
                     #region 
                     if (coc != null)
                     {
@@ -1075,10 +1075,10 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                     }
                     #endregion
                 }
-                if (coc != null) await _dbContext.Updateable(coc).ExecuteCommandAsync();
                 if (vrs.Any()) await _dbContext.Deleteable(vrs).ExecuteCommandAsync();
                 if (sfs.Any()) await _dbContext.Deleteable(sfs).ExecuteCommandAsync();
                 if (ses.Any()) await _dbContext.Deleteable(ses).ExecuteCommandAsync();
+                if (coc != null) await _dbContext.Updateable(coc).ExecuteCommandAsync();
                 if (sesAdd != null && sesAdd.Any()) await _dbContext.Insertable(sesAdd).ExecuteCommandAsync();
                 if (sfsAdd != null && sfsAdd.Any()) await _dbContext.Insertable(sfsAdd).ExecuteCommandAsync();
                 if (vrsAdd != null && vrsAdd.Any()) await _dbContext.Insertable(vrsAdd).ExecuteCommandAsync();
@@ -1117,8 +1117,8 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                         }
                     }
                 }
-                if (ebsAdd != null && ebsAdd.Any()) await _dbContext.Insertable(ebsAdd).ExecuteCommandAsync();
                 if (ebsDel != null && ebsDel.Any()) await _dbContext.Deleteable(ebsDel).ExecuteCommandAsync();
+                if (ebsAdd != null && ebsAdd.Any()) await _dbContext.Insertable(ebsAdd).ExecuteCommandAsync();
                 #endregion
 
                 #region 职务晋升
@@ -1142,11 +1142,17 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                                 PromotionScan = fileId,
                                 PromotionId = userInfo.BusinessId
                             });
+                            if (item.PromotionScanUpload != null && item.PromotionScanUpload.Any())
+                            {
+                                var ff = item.PromotionScanUpload;
+                                ff.ForEach(x => x.FileId = fileId);
+                                upLoadFiles.AddRange(ff);
+                            }
                         }
                     }
                 }
-                if (pts.Any()) await _dbContext.Deleteable(pts).ExecuteCommandAsync();
                 if (ptsAdd != null && ptsAdd.Any()) await _dbContext.Insertable(ptsAdd).ExecuteCommandAsync();
+                if (pts.Any()) await _dbContext.Deleteable(pts).ExecuteCommandAsync();
                 #endregion
 
                 #region 任职船舶
@@ -2120,7 +2126,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                     }
                 }
                 //特种设备证书
-                var specFill = await _dbContext.Queryable<SpecialEquips>().Where(t => t.IsDelete == 1 && t.BusinessId == userInfo.BusinessId).ToListAsync();
+                var specFill = await _dbContext.Queryable<SpecialEquips>().Where(t => t.IsDelete == 1 && t.SpecialEquipId == userInfo.BusinessId).ToListAsync();
                 List<string> specfilesIds = new();
                 foreach (var item in specFill)
                 {
@@ -2262,7 +2268,8 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                         Id = item.BusinessId.ToString(),
                         AnnualReviewTime = item.AnnualReviewTime,
                         SpecialEquipsEffectiveTime = item.SpecialEquipsEffectiveTime,
-                        SpecialEquipsCertificateType = EnumUtil.FetchDescription(item.SpecialEquipsCertificateType),
+                        SpecialEquipsCertificateType = item.SpecialEquipsCertificateType,
+                        SpecialEquipsCertificateTypeName = EnumUtil.FetchDescription(item.SpecialEquipsCertificateType),
                         SpecialEquipsScans = spFiles
                     });
                 }
