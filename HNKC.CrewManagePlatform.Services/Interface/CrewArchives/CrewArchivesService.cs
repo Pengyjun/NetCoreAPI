@@ -816,6 +816,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                 List<EmergencyContacts> ecs = new();
                 List<EmergencyContacts> ecsAdd = new();
                 UserEntryInfo userEntry = new();
+                UserEntryInfo userEntryAdd = new();
 
                 #region 基本信息
                 if (requestBody.BaseInfoDto != null)
@@ -876,7 +877,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                         }
                         else
                         {
-                            userEntry = new UserEntryInfo
+                            userEntryAdd = new UserEntryInfo
                             {
                                 BusinessId = GuidUtil.Next(),
                                 Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
@@ -892,7 +893,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                             if (requestBody.BaseInfoDto.UserEntryInfo.EntryScansUpload != null && requestBody.BaseInfoDto.UserEntryInfo.EntryScansUpload.Any())
                             {
                                 var ff = requestBody.BaseInfoDto.UserEntryInfo.EntryScansUpload;
-                                ff.ForEach(x => x.FileId = userEntry.EntryScans);
+                                ff.ForEach(x => x.FileId = userEntryAdd.EntryScans);
                                 upLoadFiles.AddRange(ff);
                             }
                         }
@@ -903,7 +904,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                         hus = await _dbContext.Queryable<FamilyUser>().Where(t => t.FamilyId == userInfo.BusinessId).ToListAsync();
                         foreach (var item in requestBody.BaseInfoDto.HomeUser)
                         {
-                            var ef = hus.FirstOrDefault(x => x.FamilyId.ToString() == item.Bid);
+                            var ef = hus.FirstOrDefault(x => x.BusinessId.ToString() == item.Bid);
                             if (ef != null)
                             {
                                 ef.Phone = item.Phone;
@@ -932,7 +933,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                         ecs = await _dbContext.Queryable<EmergencyContacts>().Where(t => t.EmergencyContactId == userInfo.BusinessId).ToListAsync();
                         foreach (var item in requestBody.BaseInfoDto.EmergencyContacts)
                         {
-                            var ef = ecs.FirstOrDefault(x => x.EmergencyContactId.ToString() == item.Bid);
+                            var ef = ecs.FirstOrDefault(x => x.BusinessId.ToString() == item.Bid);
                             if (ef != null)
                             {
                                 ef.Phone = item.Phone;
@@ -962,6 +963,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                 if (ecs != null) await _dbContext.Updateable(ecs).ExecuteCommandAsync();
                 if (husAdd != null && husAdd.Any()) await _dbContext.Insertable(husAdd).ExecuteCommandAsync();
                 if (ecsAdd != null && ecsAdd.Any()) await _dbContext.Insertable(ecsAdd).ExecuteCommandAsync();
+                if (userEntryAdd != null) await _dbContext.Insertable(userEntryAdd).ExecuteCommandAsync();
                 #endregion
 
                 #region 适任及证书
@@ -1057,7 +1059,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                             vrs = await _dbContext.Queryable<VisaRecords>().Where(t => t.VisareCordId == userInfo.BusinessId).ToListAsync();
                             foreach (var item in requestBody.CertificateOfCompetencyDto.VisaRecords)
                             {
-                                var vr = vrs.FirstOrDefault(x => x.VisareCordId.ToString() == item.BId);
+                                var vr = vrs.FirstOrDefault(x => x.BusinessId.ToString() == item.BId);
                                 if (vr != null)
                                 {
                                     vr.Country = item.Country;
@@ -1084,11 +1086,12 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                             sfs = await _dbContext.Queryable<SkillCertificates>().Where(t => t.IsDelete == 1 && t.SkillcertificateId == userInfo.BusinessId).ToListAsync();
                             foreach (var item in requestBody.CertificateOfCompetencyDto.SkillCertificates)
                             {
-                                if (item.SkillScansUpload != null && item.SkillScansUpload.Any())
+                                var filedId = GuidUtil.Next();
+                                var sf = sfs.FirstOrDefault(x => x.BusinessId.ToString() == item.BId);
+                                if (sf != null)
                                 {
-                                    var ff = item.SkillScansUpload;
-                                    ff.ForEach(x => x.FileId = coc.FScans);
-                                    upLoadFiles.AddRange(ff);
+                                    sf.SkillCertificateType = item.SkillCertificateType;
+                                    sf.SkillScans = filedId;
                                 }
                                 else
                                 {
@@ -1097,9 +1100,15 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                                         Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
                                         BusinessId = GuidUtil.Next(),
                                         SkillCertificateType = item.SkillCertificateType,
-                                        SkillScans = coc.FScans,
+                                        SkillScans = filedId,
                                         SkillcertificateId = userInfo.BusinessId
                                     });
+                                }
+                                if (item.SkillScansUpload != null && item.SkillScansUpload.Any())
+                                {
+                                    var ff = item.SkillScansUpload;
+                                    ff.ForEach(x => x.FileId = filedId);
+                                    upLoadFiles.AddRange(ff);
                                 }
                             }
                         }
@@ -1110,7 +1119,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                             foreach (var item in requestBody.CertificateOfCompetencyDto.SpecialEquips)
                             {
                                 var fileId = GuidUtil.Next();
-                                var se = ses.FirstOrDefault(x => x.SpecialEquipId.ToString() == item.BId);
+                                var se = ses.FirstOrDefault(x => x.BusinessId.ToString() == item.BId);
                                 if (se != null)
                                 {
                                     se.SpecialEquipsCertificateType = item.SpecialEquipsCertificateType;
@@ -1161,7 +1170,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                         foreach (var item in requestBody.EducationalBackgroundDto.QualificationInfos)
                         {
                             var fileId = GuidUtil.Next();
-                            var eb = ebs.FirstOrDefault(x => x.QualificationId.ToString() == item.BId);
+                            var eb = ebs.FirstOrDefault(x => x.BusinessId.ToString() == item.BId);
                             if (eb != null)
                             {
                                 eb.School = item.School;
@@ -1213,7 +1222,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                         foreach (var item in requestBody.PromotionDto.Promotions)
                         {
                             var fileId = GuidUtil.Next();
-                            var po = pts.FirstOrDefault(x => x.PromotionId.ToString() == item.BId);
+                            var po = pts.FirstOrDefault(x => x.BusinessId.ToString() == item.BId);
                             if (po != null)
                             {
                                 po.OnShip = item.OnShip;
@@ -1257,7 +1266,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                         wss = await _dbContext.Queryable<WorkShip>().Where(t => t.IsDelete == 1 && userInfo.BusinessId == t.WorkShipId).ToListAsync();
                         foreach (var item in requestBody.WorkShipDto.WorkShips)
                         {
-                            var ws = wss.FirstOrDefault(x => x.WorkShipId.ToString() == item.BId);
+                            var ws = wss.FirstOrDefault(x => x.BusinessId.ToString() == item.BId);
                             if (ws != null)
                             {
                                 ws.OnShip = item.OnShip;
@@ -1300,7 +1309,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                         foreach (var item in requestBody.TrainingRecordDto.TrainingRecords)
                         {
                             var fileId = GuidUtil.Next();
-                            var tr = trs.FirstOrDefault(x => x.TrainingId.ToString() == item.BId);
+                            var tr = trs.FirstOrDefault(x => x.BusinessId.ToString() == item.BId);
                             if (tr != null)
                             {
                                 tr.TrainingScan = fileId;
@@ -1330,7 +1339,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                     }
                 }
                 if (trs.Any()) await _dbContext.Updateable(trs).ExecuteCommandAsync();
-                if (trsAdd != null && trsAdd.Any()) await _dbContext.Updateable(trsAdd).ExecuteCommandAsync();
+                if (trsAdd != null && trsAdd.Any()) await _dbContext.Insertable(trsAdd).ExecuteCommandAsync();
                 #endregion
 
                 #region 年度考核
@@ -1344,7 +1353,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                         foreach (var item in requestBody.YearCheckDto.YearChecks)
                         {
                             var fileId = GuidUtil.Next();
-                            var yc = ycs.FirstOrDefault(x => x.TrainingId.ToString() == item.BId);
+                            var yc = ycs.FirstOrDefault(x => x.BusinessId.ToString() == item.BId);
                             if (yc != null)
                             {
                                 yc.CheckType = item.CheckType;
@@ -2525,6 +2534,11 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
             var onBoard = await _dbContext.Queryable<OwnerShip>().Where(t => t.BusinessId.ToString() == userInfo.OnBoard).FirstAsync();
             ur.OnBoardName = onBoard?.ShipName;
             ur.OnBoard = userInfo.OnBoard;
+            //适任职务
+
+            var position = await _dbContext.Queryable<Position>().FirstAsync(t => userInfo.PositionOnBoard == t.BusinessId.ToString());
+            ur.PositionOnBoard = userInfo.PositionOnBoard;
+            ur.PositionOnBoardName = position?.Name;
             //用户状态
             if (userInfo.IsDelete == 1)
             {
