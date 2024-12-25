@@ -811,10 +811,10 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
             var userInfo = await _dbContext.Queryable<User>().FirstAsync(t => t.BusinessId == requestBody.BId);
             if (userInfo != null)
             {
-                List<FamilyUser> hus = new();
                 List<FamilyUser> husAdd = new();
-                List<EmergencyContacts> ecs = new();
+                List<FamilyUser> husDel = new();
                 List<EmergencyContacts> ecsAdd = new();
+                List<EmergencyContacts> ecsDel = new();
                 UserEntryInfo userEntry = new();
                 UserEntryInfo userEntryAdd = new();
 
@@ -901,68 +901,46 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                     //家庭成员
                     if (requestBody.BaseInfoDto.HomeUser != null && requestBody.BaseInfoDto.HomeUser.Any())
                     {
-                        hus = await _dbContext.Queryable<FamilyUser>().Where(t => t.FamilyId == userInfo.BusinessId).ToListAsync();
+                        husDel = await _dbContext.Queryable<FamilyUser>().Where(t => t.FamilyId == userInfo.BusinessId).ToListAsync();
                         foreach (var item in requestBody.BaseInfoDto.HomeUser)
                         {
-                            var ef = hus.FirstOrDefault(x => x.BusinessId.ToString() == item.Bid);
-                            if (ef != null)
+                            husAdd.Add(new FamilyUser
                             {
-                                ef.Phone = item.Phone;
-                                ef.RelationShip = item.RelationShip;
-                                ef.UserName = item.UserName;
-                                ef.WorkUnit = item.WorkUnit;
-                            }
-                            else
-                            {
-                                husAdd.Add(new FamilyUser
-                                {
-                                    Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
-                                    BusinessId = GuidUtil.Next(),
-                                    Phone = item.Phone,
-                                    RelationShip = item.RelationShip,
-                                    UserName = item.UserName,
-                                    WorkUnit = item.WorkUnit,
-                                    FamilyId = userInfo.BusinessId
-                                });
-                            }
+                                Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                                BusinessId = GuidUtil.Next(),
+                                Phone = item.Phone,
+                                RelationShip = item.RelationShip,
+                                UserName = item.UserName,
+                                WorkUnit = item.WorkUnit,
+                                FamilyId = userInfo.BusinessId
+                            });
                         }
                     }
                     //应急联系人
                     if (requestBody.BaseInfoDto.EmergencyContacts != null && requestBody.BaseInfoDto.EmergencyContacts.Any())
                     {
-                        ecs = await _dbContext.Queryable<EmergencyContacts>().Where(t => t.EmergencyContactId == userInfo.BusinessId).ToListAsync();
+                        ecsDel = await _dbContext.Queryable<EmergencyContacts>().Where(t => t.EmergencyContactId == userInfo.BusinessId).ToListAsync();
                         foreach (var item in requestBody.BaseInfoDto.EmergencyContacts)
                         {
-                            var ef = ecs.FirstOrDefault(x => x.BusinessId.ToString() == item.Bid);
-                            if (ef != null)
+                            ecsAdd.Add(new EmergencyContacts
                             {
-                                ef.Phone = item.Phone;
-                                ef.RelationShip = item.RelationShip;
-                                ef.UserName = item.UserName;
-                                ef.WorkUnit = item.WorkUnit;
-                            }
-                            else
-                            {
-                                ecsAdd.Add(new EmergencyContacts
-                                {
-                                    Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
-                                    BusinessId = GuidUtil.Next(),
-                                    Phone = item.Phone,
-                                    RelationShip = item.RelationShip,
-                                    UserName = item.UserName,
-                                    EmergencyContactId = userInfo.BusinessId,
-                                    WorkUnit = item.WorkUnit
-                                });
-                            }
+                                Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                                BusinessId = GuidUtil.Next(),
+                                Phone = item.Phone,
+                                RelationShip = item.RelationShip,
+                                UserName = item.UserName,
+                                EmergencyContactId = userInfo.BusinessId,
+                                WorkUnit = item.WorkUnit
+                            });
                         }
                     }
                 }
                 if (userInfo != null) await _dbContext.Updateable(userInfo).ExecuteCommandAsync();
                 if (userEntry != null) await _dbContext.Updateable(userEntry).ExecuteCommandAsync();
-                if (hus != null) await _dbContext.Updateable(hus).ExecuteCommandAsync();
-                if (ecs != null) await _dbContext.Updateable(ecs).ExecuteCommandAsync();
                 if (husAdd != null && husAdd.Any()) await _dbContext.Insertable(husAdd).ExecuteCommandAsync();
                 if (ecsAdd != null && ecsAdd.Any()) await _dbContext.Insertable(ecsAdd).ExecuteCommandAsync();
+                if (husDel != null && husDel.Any()) await _dbContext.Deleteable(husDel).ExecuteCommandAsync();
+                if (ecsDel != null && ecsDel.Any()) await _dbContext.Deleteable(ecsDel).ExecuteCommandAsync();
                 if (userEntryAdd != null) await _dbContext.Insertable(userEntryAdd).ExecuteCommandAsync();
                 #endregion
 
@@ -1059,25 +1037,15 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                             vrs = await _dbContext.Queryable<VisaRecords>().Where(t => t.VisareCordId == userInfo.BusinessId).ToListAsync();
                             foreach (var item in requestBody.CertificateOfCompetencyDto.VisaRecords)
                             {
-                                var vr = vrs.FirstOrDefault(x => x.BusinessId.ToString() == item.BId);
-                                if (vr != null)
+                                vrsAdd.Add(new VisaRecords
                                 {
-                                    vr.Country = item.Country;
-                                    vr.DueTime = item.DueTime;
-                                    vr.VisaType = item.VisaType;
-                                }
-                                else
-                                {
-                                    vrsAdd.Add(new VisaRecords
-                                    {
-                                        Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
-                                        VisareCordId = userInfo.BusinessId,
-                                        BusinessId = GuidUtil.Next(),
-                                        Country = item.Country,
-                                        DueTime = item.DueTime,
-                                        VisaType = item.VisaType,
-                                    });
-                                }
+                                    Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                                    VisareCordId = userInfo.BusinessId,
+                                    BusinessId = GuidUtil.Next(),
+                                    Country = item.Country,
+                                    DueTime = item.DueTime,
+                                    VisaType = item.VisaType,
+                                });
                             }
                         }
                         //技能证书
@@ -1087,23 +1055,14 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                             foreach (var item in requestBody.CertificateOfCompetencyDto.SkillCertificates)
                             {
                                 var filedId = GuidUtil.Next();
-                                var sf = sfs.FirstOrDefault(x => x.BusinessId.ToString() == item.BId);
-                                if (sf != null)
+                                sfsAdd.Add(new SkillCertificates
                                 {
-                                    sf.SkillCertificateType = item.SkillCertificateType;
-                                    sf.SkillScans = filedId;
-                                }
-                                else
-                                {
-                                    sfsAdd.Add(new SkillCertificates
-                                    {
-                                        Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
-                                        BusinessId = GuidUtil.Next(),
-                                        SkillCertificateType = item.SkillCertificateType,
-                                        SkillScans = filedId,
-                                        SkillcertificateId = userInfo.BusinessId
-                                    });
-                                }
+                                    Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                                    BusinessId = GuidUtil.Next(),
+                                    SkillCertificateType = item.SkillCertificateType,
+                                    SkillScans = filedId,
+                                    SkillcertificateId = userInfo.BusinessId
+                                });
                                 if (item.SkillScansUpload != null && item.SkillScansUpload.Any())
                                 {
                                     var ff = item.SkillScansUpload;
@@ -1119,26 +1078,16 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                             foreach (var item in requestBody.CertificateOfCompetencyDto.SpecialEquips)
                             {
                                 var fileId = GuidUtil.Next();
-                                var se = ses.FirstOrDefault(x => x.BusinessId.ToString() == item.BId);
-                                if (se != null)
+                                sesAdd.Add(new SpecialEquips
                                 {
-                                    se.SpecialEquipsCertificateType = item.SpecialEquipsCertificateType;
-                                    se.SpecialEquipsEffectiveTime = item.SpecialEquipsEffectiveTime;
-                                }
-                                else
-                                {
-                                    sesAdd.Add(new SpecialEquips
-                                    {
-                                        BusinessId = GuidUtil.Next(),
-                                        AnnualReviewTime = item.SpecialEquipsEffectiveTime,
-                                        Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
-                                        SpecialEquipId = userInfo.BusinessId,
-                                        SpecialEquipsCertificateType = item.SpecialEquipsCertificateType,
-                                        SpecialEquipsEffectiveTime = item.SpecialEquipsEffectiveTime,
-                                        SpecialEquipsScans = fileId
-                                    });
-
-                                }
+                                    BusinessId = GuidUtil.Next(),
+                                    AnnualReviewTime = item.SpecialEquipsEffectiveTime,
+                                    Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                                    SpecialEquipId = userInfo.BusinessId,
+                                    SpecialEquipsCertificateType = item.SpecialEquipsCertificateType,
+                                    SpecialEquipsEffectiveTime = item.SpecialEquipsEffectiveTime,
+                                    SpecialEquipsScans = fileId
+                                });
                                 if (item.SpecialEquipsScansUpload != null && item.SpecialEquipsScansUpload.Any())
                                 {
                                     var ff = item.SpecialEquipsScansUpload;
@@ -1151,53 +1100,38 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                     #endregion
                 }
                 if (coc != null) await _dbContext.Updateable(coc).ExecuteCommandAsync();
-                if (vrs.Any()) await _dbContext.Updateable(vrs).ExecuteCommandAsync();
-                if (sfs.Any()) await _dbContext.Updateable(sfs).ExecuteCommandAsync();
-                if (ses.Any()) await _dbContext.Updateable(ses).ExecuteCommandAsync();
+                if (vrs.Any()) await _dbContext.Deleteable(vrs).ExecuteCommandAsync();
+                if (sfs.Any()) await _dbContext.Deleteable(sfs).ExecuteCommandAsync();
+                if (ses.Any()) await _dbContext.Deleteable(ses).ExecuteCommandAsync();
                 if (sesAdd != null && sesAdd.Any()) await _dbContext.Insertable(sesAdd).ExecuteCommandAsync();
                 if (sfsAdd != null && sfsAdd.Any()) await _dbContext.Insertable(sfsAdd).ExecuteCommandAsync();
                 if (vrsAdd != null && vrsAdd.Any()) await _dbContext.Insertable(vrsAdd).ExecuteCommandAsync();
                 #endregion
 
                 #region 学历信息
-                List<EducationalBackground> ebs = new();
                 List<EducationalBackground> ebsAdd = new();
+                List<EducationalBackground> ebsDel = new();
                 if (requestBody.EducationalBackgroundDto != null)
                 {
                     if (requestBody.EducationalBackgroundDto.QualificationInfos != null && requestBody.EducationalBackgroundDto.QualificationInfos.Any())
                     {
-                        ebs = await _dbContext.Queryable<EducationalBackground>().Where(t => t.IsDelete == 1 && userInfo.BusinessId == t.QualificationId).ToListAsync();
+                        ebsDel = await _dbContext.Queryable<EducationalBackground>().Where(t => t.IsDelete == 1 && userInfo.BusinessId == t.QualificationId).ToListAsync();
                         foreach (var item in requestBody.EducationalBackgroundDto.QualificationInfos)
                         {
                             var fileId = GuidUtil.Next();
-                            var eb = ebs.FirstOrDefault(x => x.BusinessId.ToString() == item.BId);
-                            if (eb != null)
+                            ebsAdd.Add(new EducationalBackground
                             {
-                                eb.School = item.School;
-                                eb.Major = item.Major;
-                                eb.Qualification = item.Qualification;
-                                eb.EndTime = item.EndTime;
-                                eb.QualificationScans = fileId;
-                                eb.QualificationType = item.QualificationType;
-                                eb.StartTime = item.StartTime;
-
-                            }
-                            else
-                            {
-                                ebsAdd.Add(new EducationalBackground
-                                {
-                                    Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
-                                    BusinessId = GuidUtil.Next(),
-                                    School = item.School,
-                                    Major = item.Major,
-                                    Qualification = item.Qualification,
-                                    EndTime = item.EndTime,
-                                    QualificationScans = fileId,
-                                    QualificationType = item.QualificationType,
-                                    StartTime = item.StartTime,
-                                    QualificationId = userInfo.BusinessId
-                                });
-                            }
+                                Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                                BusinessId = GuidUtil.Next(),
+                                School = item.School,
+                                Major = item.Major,
+                                Qualification = item.Qualification,
+                                EndTime = item.EndTime,
+                                QualificationScans = fileId,
+                                QualificationType = item.QualificationType,
+                                StartTime = item.StartTime,
+                                QualificationId = userInfo.BusinessId
+                            });
                             if (item.QualificationScansUpload != null && item.QualificationScansUpload.Any())
                             {
                                 var ff = item.QualificationScansUpload;
@@ -1207,8 +1141,8 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                         }
                     }
                 }
-                if (ebs.Any()) await _dbContext.Updateable(ebs).ExecuteCommandAsync();
                 if (ebsAdd != null && ebsAdd.Any()) await _dbContext.Insertable(ebsAdd).ExecuteCommandAsync();
+                if (ebsDel != null && ebsDel.Any()) await _dbContext.Deleteable(ebsDel).ExecuteCommandAsync();
                 #endregion
 
                 #region 职务晋升
@@ -1222,37 +1156,20 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                         foreach (var item in requestBody.PromotionDto.Promotions)
                         {
                             var fileId = GuidUtil.Next();
-                            var po = pts.FirstOrDefault(x => x.BusinessId.ToString() == item.BId);
-                            if (po != null)
+                            ptsAdd.Add(new Promotion()
                             {
-                                po.OnShip = item.OnShip;
-                                po.Postition = item.Postition;
-                                po.PromotionTime = item.PromotionTime;
-                                po.PromotionScan = fileId;
-                                if (item.PromotionScanUpload != null && item.PromotionScanUpload.Any())
-                                {
-                                    var ff = item.PromotionScanUpload;
-                                    ff.ForEach(x => x.FileId = po.PromotionScan);
-                                    upLoadFiles.AddRange(ff);
-                                }
-                            }
-                            else
-                            {
-                                ptsAdd.Add(new Promotion()
-                                {
-                                    Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
-                                    BusinessId = GuidUtil.Next(),
-                                    OnShip = item.OnShip,
-                                    Postition = item.Postition,
-                                    PromotionTime = item.PromotionTime,
-                                    PromotionScan = fileId,
-                                    PromotionId = userInfo.BusinessId
-                                });
-                            }
+                                Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                                BusinessId = GuidUtil.Next(),
+                                OnShip = item.OnShip,
+                                Postition = item.Postition,
+                                PromotionTime = item.PromotionTime,
+                                PromotionScan = fileId,
+                                PromotionId = userInfo.BusinessId
+                            });
                         }
                     }
                 }
-                if (pts.Any()) await _dbContext.Updateable(pts).ExecuteCommandAsync();
+                if (pts.Any()) await _dbContext.Deleteable(pts).ExecuteCommandAsync();
                 if (ptsAdd != null && ptsAdd.Any()) await _dbContext.Insertable(ptsAdd).ExecuteCommandAsync();
                 #endregion
 
@@ -1266,35 +1183,22 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                         wss = await _dbContext.Queryable<WorkShip>().Where(t => t.IsDelete == 1 && userInfo.BusinessId == t.WorkShipId).ToListAsync();
                         foreach (var item in requestBody.WorkShipDto.WorkShips)
                         {
-                            var ws = wss.FirstOrDefault(x => x.BusinessId.ToString() == item.BId);
-                            if (ws != null)
+                            wssAdd.Add(new WorkShip
                             {
-                                ws.OnShip = item.OnShip;
-                                ws.WorkShipStartTime = item.WorkShipStartTime;
-                                ws.WorkShipEndTime = item.WorkShipEndTime;
-                                ws.HolidayTime = item.HolidayTime;
-                                ws.Postition = item.Postition;
-                                ws.OnBoardTime = item.OnBoardTime;
-                            }
-                            else
-                            {
-                                wssAdd.Add(new WorkShip
-                                {
-                                    Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
-                                    BusinessId = GuidUtil.Next(),
-                                    OnShip = item.OnShip,
-                                    WorkShipStartTime = item.WorkShipStartTime,
-                                    WorkShipEndTime = item.WorkShipEndTime,
-                                    HolidayTime = item.HolidayTime,
-                                    Postition = item.Postition,
-                                    OnBoardTime = item.OnBoardTime,
-                                    WorkShipId = userInfo.BusinessId
-                                });
-                            }
+                                Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                                BusinessId = GuidUtil.Next(),
+                                OnShip = item.OnShip,
+                                WorkShipStartTime = item.WorkShipStartTime,
+                                WorkShipEndTime = item.WorkShipEndTime,
+                                HolidayTime = item.HolidayTime,
+                                Postition = item.Postition,
+                                OnBoardTime = item.OnBoardTime,
+                                WorkShipId = userInfo.BusinessId
+                            });
                         }
                     }
                 }
-                if (wss.Any()) await _dbContext.Updateable(wss).ExecuteCommandAsync();
+                if (wss.Any()) await _dbContext.Deleteable(wss).ExecuteCommandAsync();
                 if (wssAdd != null && wssAdd.Any()) await _dbContext.Insertable(wssAdd).ExecuteCommandAsync();
                 #endregion
 
@@ -1309,26 +1213,15 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                         foreach (var item in requestBody.TrainingRecordDto.TrainingRecords)
                         {
                             var fileId = GuidUtil.Next();
-                            var tr = trs.FirstOrDefault(x => x.BusinessId.ToString() == item.BId);
-                            if (tr != null)
+                            trsAdd.Add(new TrainingRecord
                             {
-                                tr.TrainingScan = fileId;
-                                tr.TrainingTime = item.TrainingTime;
-                                tr.TrainingType = item.TrainingType;
-
-                            }
-                            else
-                            {
-                                trsAdd.Add(new TrainingRecord
-                                {
-                                    Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
-                                    BusinessId = GuidUtil.Next(),
-                                    TrainingScan = fileId,
-                                    TrainingTime = item.TrainingTime,
-                                    TrainingType = item.TrainingType,
-                                    TrainingId = userInfo.BusinessId
-                                });
-                            }
+                                Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                                BusinessId = GuidUtil.Next(),
+                                TrainingScan = fileId,
+                                TrainingTime = item.TrainingTime,
+                                TrainingType = item.TrainingType,
+                                TrainingId = userInfo.BusinessId
+                            });
                             if (item.TrainingScanUpload != null && item.TrainingScanUpload.Any())
                             {
                                 var ff = item.TrainingScanUpload;
@@ -1338,7 +1231,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                         }
                     }
                 }
-                if (trs.Any()) await _dbContext.Updateable(trs).ExecuteCommandAsync();
+                if (trs.Any()) await _dbContext.Deleteable(trs).ExecuteCommandAsync();
                 if (trsAdd != null && trsAdd.Any()) await _dbContext.Insertable(trsAdd).ExecuteCommandAsync();
                 #endregion
 
@@ -1353,35 +1246,25 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                         foreach (var item in requestBody.YearCheckDto.YearChecks)
                         {
                             var fileId = GuidUtil.Next();
-                            var yc = ycs.FirstOrDefault(x => x.BusinessId.ToString() == item.BId);
-                            if (yc != null)
+                            ycsAdd.Add(new YearCheck
                             {
-                                yc.CheckType = item.CheckType;
-                                yc.TrainingScan = fileId;
-                                yc.TrainingTime = item.TrainingTime;
-                                if (item.TrainingScanUpload != null && item.TrainingScanUpload.Any())
-                                {
-                                    var ff = item.TrainingScanUpload;
-                                    ff.ForEach(x => x.FileId = yc.TrainingScan);
-                                    upLoadFiles.AddRange(ff);
-                                }
-                            }
-                            else
+                                Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                                BusinessId = GuidUtil.Next(),
+                                CheckType = item.CheckType,
+                                TrainingScan = fileId,
+                                TrainingTime = item.TrainingTime,
+                                TrainingId = userInfo.BusinessId
+                            });
+                            if (item.TrainingScanUpload != null && item.TrainingScanUpload.Any())
                             {
-                                ycsAdd.Add(new YearCheck
-                                {
-                                    Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
-                                    BusinessId = GuidUtil.Next(),
-                                    CheckType = item.CheckType,
-                                    TrainingScan = fileId,
-                                    TrainingTime = item.TrainingTime,
-                                    TrainingId = userInfo.BusinessId
-                                });
+                                var ff = item.TrainingScanUpload;
+                                ff.ForEach(x => x.FileId = fileId);
+                                upLoadFiles.AddRange(ff);
                             }
                         }
                     }
                 }
-                if (ycs.Any()) await _dbContext.Updateable(ycs).ExecuteCommandAsync();
+                if (ycs.Any()) await _dbContext.Deleteable(ycs).ExecuteCommandAsync();
                 if (ycsAdd != null && ycsAdd.Any()) await _dbContext.Insertable(ycsAdd).ExecuteCommandAsync();
                 #endregion
 
