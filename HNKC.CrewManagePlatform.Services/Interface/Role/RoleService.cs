@@ -333,6 +333,7 @@ namespace HNKC.CrewManagePlatform.Services.Role
                     BusinessId = GuidUtil.Next(),
                     RoleBusinessId = addRoleMenuRequest.RoleBusinessId
                 };
+                roleMenus.Add(roleMenu);
             }
             await _dbContext.Insertable<RoleMenu>(roleMenus).ExecuteCommandAsync();
             return Result.Success("添加成功");
