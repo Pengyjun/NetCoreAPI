@@ -872,6 +872,22 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                                 }
                             }
                         }
+                        else
+                        {
+                            userEntry = new UserEntryInfo
+                            {
+                                BusinessId = GuidUtil.Next(),
+                                Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                                ContractMain = requestBody.BaseInfoDto.UserEntryInfo.ContarctMain,
+                                EndTime = requestBody.BaseInfoDto.UserEntryInfo.EndTime,
+                                EntryScans = GuidUtil.Next(),
+                                EntryTime = requestBody.BaseInfoDto.UserEntryInfo.EntryTime,
+                                LaborCompany = requestBody.BaseInfoDto.UserEntryInfo.LaborCompany,
+                                EmploymentId = requestBody.BaseInfoDto.UserEntryInfo.EmploymentId,
+                                UserEntryId = requestBody.BId,
+                                ContractType = requestBody.BaseInfoDto.UserEntryInfo.ContractType
+                            };
+                        }
                     }
                     //家庭成员
                     if (requestBody.BaseInfoDto.HomeUser != null && requestBody.BaseInfoDto.HomeUser.Any())
@@ -886,6 +902,19 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                                 ef.RelationShip = item.RelationShip;
                                 ef.UserName = item.UserName;
                                 ef.WorkUnit = item.WorkUnit;
+                            }
+                            else
+                            {
+                                hus.Add(new FamilyUser
+                                {
+                                    Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                                    BusinessId = GuidUtil.Next(),
+                                    Phone = item.Phone,
+                                    RelationShip = item.RelationShip,
+                                    UserName = item.UserName,
+                                    WorkUnit = item.WorkUnit,
+                                    FamilyId = userInfo.BusinessId
+                                });
                             }
                         }
                     }
@@ -902,6 +931,19 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                                 ef.RelationShip = item.RelationShip;
                                 ef.UserName = item.UserName;
                                 ef.WorkUnit = item.WorkUnit;
+                            }
+                            else
+                            {
+                                ecs.Add(new EmergencyContacts
+                                {
+                                    Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                                    BusinessId = GuidUtil.Next(),
+                                    Phone = item.Phone,
+                                    RelationShip = item.RelationShip,
+                                    UserName = item.UserName,
+                                    EmergencyContactId = userInfo.BusinessId,
+                                    WorkUnit = item.WorkUnit
+                                });
                             }
                         }
                     }
