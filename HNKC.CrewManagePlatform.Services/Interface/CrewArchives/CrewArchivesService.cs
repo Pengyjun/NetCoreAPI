@@ -5,10 +5,8 @@ using HNKC.CrewManagePlatform.Models.Enums;
 using HNKC.CrewManagePlatform.SqlSugars.Models;
 using HNKC.CrewManagePlatform.Utils;
 using SqlSugar;
-using System;
 using System.ComponentModel;
 using System.Globalization;
-using System.Linq;
 using System.Text.RegularExpressions;
 using UtilsSharp;
 
@@ -1392,7 +1390,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
             var rt = await _dbContext.Queryable<User>().FirstAsync(t => t.IsDelete == 0 && t.BusinessId == requestBody.BId);
             if (rt != null)
             {
-                rt.IsDelete = 0;
+                rt.IsDelete = 1;
                 rt.DeleteReson = CrewStatusEnum.Normal;
                 await _dbContext.Updateable(rt).UpdateColumns(x => new { x.IsDelete, x.DeleteReson }).ExecuteCommandAsync();
                 return Result.Success("已恢复");
