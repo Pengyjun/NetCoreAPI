@@ -221,8 +221,8 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                     t.SpecialCertificate = spctabs;
                     t.SpecialCertificateName = spctabNames;
                     t.Age = CalculateAgeFromIdCard(t.CardId);
-                    t.OnStatus = ob == null ? CrewStatusEnum.DaiGang : ShipUserStatus(ob.WorkShipEndTime, ob.HolidayTime, t.DeleteReson);
-                    t.OnStatusName = ob == null ? EnumUtil.GetDescription(CrewStatusEnum.DaiGang) : EnumUtil.GetDescription(ShipUserStatus(ob.WorkShipEndTime, ob.HolidayTime, t.DeleteReson));
+                    t.OnStatus = ob == null ? CrewStatusEnum.DaiGang : ShipUserStatus(ob.WorkShipEndTime, t.DeleteReson);
+                    t.OnStatusName = ob == null ? EnumUtil.GetDescription(CrewStatusEnum.DaiGang) : EnumUtil.GetDescription(ShipUserStatus(ob.WorkShipEndTime, t.DeleteReson));
                 }
             }
             page.List = rt;
@@ -263,10 +263,9 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
         /// 船员状态
         /// </summary>
         /// <param name="departureTime">下船时间</param>
-        /// <param name="holidayTime">休假时间</param>
         /// <param name="deleteResonEnum">是否删除</param>
         /// <returns></returns>
-        private static CrewStatusEnum ShipUserStatus(DateTime departureTime, DateTime? holidayTime, CrewStatusEnum deleteResonEnum)
+        private static CrewStatusEnum ShipUserStatus(DateTime departureTime, CrewStatusEnum deleteResonEnum)
         {
             var status = new CrewStatusEnum();
             if (deleteResonEnum != CrewStatusEnum.Normal)
@@ -274,11 +273,11 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                 //删除：管理人员手动操作，包括离职、调离和退休，优先于其他任何状态
                 status = deleteResonEnum;
             }
-            else if (holidayTime.HasValue)
-            {
-                //休假：提交离船申请且经审批同意后，按所申请离船、归船日期设置为休假状态，优先于在岗、待岗状态
-                status = CrewStatusEnum.XiuJia;
-            }
+            //else if (holidayTime.HasValue)
+            //{
+            //    //休假：提交离船申请且经审批同意后，按所申请离船、归船日期设置为休假状态，优先于在岗、待岗状态
+            //    status = CrewStatusEnum.XiuJia;
+            //}
             else if (departureTime <= DateTime.Now)
             {
                 //在岗、待岗:船员登记时必填任职船舶数据，看其中最新的任职船舶上船时间和下船时间，在此时间内为在岗状态，否则为待岗状态
@@ -306,18 +305,18 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
             var waitCount = onBoard.Where(x => x.WorkShipEndTime > DateTime.Now).Select(x => x.WorkShipId).Distinct().Count();//待岗数
             var waitProp = totalCount == 0 ? 0 : Convert.ToInt32(waitCount / totalCount);
 
-            var holidayCount = onBoard.Where(x => x.HolidayTime > DateTime.Now).Select(x => x.WorkShipId).Distinct().Count();//休假数
-            var holidayProp = totalCount == 0 ? 0 : Convert.ToInt32(holidayCount / totalCount);
+            //var holidayCount = onBoard.Where(x => x.HolidayTime > DateTime.Now).Select(x => x.WorkShipId).Distinct().Count();//休假数
+            //var holidayProp = totalCount == 0 ? 0 : Convert.ToInt32(holidayCount / totalCount);
 
             var otherCount = udtab.Where(x => x.DeleteReson != CrewStatusEnum.Normal && x.DeleteReson != CrewStatusEnum.XiuJia).Count();//离调退
             var otherProp = totalCount == 0 ? 0 : Convert.ToInt32(otherCount / totalCount);
 
             var rr = new CrewArchivesResponse
             {
-                HolidayCount = holidayCount,
+                //HolidayCount = holidayCount,
                 OtherCount = otherCount,
                 OtherProp = otherProp,
-                HolidayProp = holidayProp,
+                //HolidayProp = holidayProp,
                 OnDutyCount = onDutyCount,
                 OnDutyProp = onDutyProp,
                 TatalCount = totalCount,
@@ -2374,11 +2373,11 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
             var userWorkShip = await _dbContext.Queryable<WorkShip>().Where(t => t.IsDelete == 1).OrderByDescending(t => t.Created).FirstAsync();
             if (userWorkShip != null)
             {
-                //有休假时间  休假
-                if (userWorkShip.HolidayTime != DateTime.MinValue && !string.IsNullOrWhiteSpace(userWorkShip.HolidayTime.ToString()))
-                {
-                    ur.StatusName = userWorkShip.HolidayTime > DateTime.Now ? EnumUtil.GetDescription(CrewStatusEnum.XiuJia) : "";
-                }
+                ////有休假时间  休假
+                //if (userWorkShip.HolidayTime != DateTime.MinValue && !string.IsNullOrWhiteSpace(userWorkShip.HolidayTime.ToString()))
+                //{
+                //    ur.StatusName = userWorkShip.HolidayTime > DateTime.Now ? EnumUtil.GetDescription(CrewStatusEnum.XiuJia) : "";
+                //}
 
                 //在岗 待岗
                 ur.StatusName = userWorkShip.WorkShipEndTime > DateTime.Now ? EnumUtil.GetDescription(CrewStatusEnum.Normal) : EnumUtil.GetDescription(CrewStatusEnum.DaiGang);
