@@ -60,7 +60,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
 
             //名称相关不赋值
             var rt = await _dbContext.Queryable<User>()
-                .Where(t => t.IsUser == 1)
+                .Where(t => t.IsLoginUser == 1)
                 .WhereIF(requestBody.ServiceBooks != null && requestBody.ServiceBooks.Any(),
                 (t) => requestBody.ServiceBooks.Contains(((int)t.ServiceBookType).ToString()))//服务簿类型
                 .WhereIF(!string.IsNullOrWhiteSpace(requestBody.KeyWords), t => t.Name.Contains(requestBody.KeyWords) || t.CardId.Contains(requestBody.KeyWords)
@@ -293,7 +293,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
         /// <returns></returns>
         public async Task<Result> CrewArchivesCountAsync()
         {
-            var udtab = await _dbContext.Queryable<User>().Where(t => t.IsUser == 1).ToListAsync();
+            var udtab = await _dbContext.Queryable<User>().Where(t => t.IsLoginUser == 1).ToListAsync();
             var udtabIds = udtab.Select(x => x.BusinessId.ToString()).ToList();
             var onBoard = await _dbContext.Queryable<WorkShip>().Where(t => t.IsDelete == 1 && udtabIds.Contains(t.WorkShipId.ToString())).ToListAsync();
 
@@ -380,7 +380,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                     OnBoard = requestBody.BaseInfoDto.OnBoard,
                     PositionOnBoard = requestBody.BaseInfoDto.PositionOnBoard,
                     Name = requestBody.BaseInfoDto.Name,
-                    IsUser = 1
+                    IsLoginUser = 1
                 };
                 //文件
                 if (requestBody.BaseInfoDto.UploadPhotoScans != null)

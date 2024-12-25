@@ -140,6 +140,6 @@ namespace HNKC.CrewManagePlatform.SqlSugars.Models
         /// 用户还是船员  0用户 1船员
         /// </summary>
         [SugarColumn(ColumnDataType = "int", ColumnDescription = "用户还是船员  0用户 1船员", DefaultValue = "0")]
-        public int IsUser { get; set; }
+        public int IsLoginUser { get; set; }
     }
 }
