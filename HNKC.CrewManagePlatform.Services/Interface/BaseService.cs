@@ -110,6 +110,13 @@ namespace HNKC.CrewManagePlatform.Services.Interface
             var instrturionTree = new ListToTreeUtil().GetTree(userInfo.Oid, allInstitution);
             var rootNode = allInstitution.Where(x => x.Oid == "101162350").FirstOrDefault();
             rootNode.Nodes = instrturionTree;
+
+            if (instrturionTree.Count != 0)
+            { 
+               //instrturionTree.First().
+            }
+
+
             return Result.Success(data: rootNode, "响应成功");
             #endregion
 

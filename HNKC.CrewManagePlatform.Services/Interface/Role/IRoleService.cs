@@ -76,5 +76,15 @@ namespace HNKC.CrewManagePlatform.Services.Role
         /// <param name="userRoleRequest"></param>
         /// <returns></returns>
         Task<List<UserMenuResponseTree>> SearchRoleMenuAsync(BaseRequest baseRequest);
+
+
+
+
+        /// <summary>
+        /// 移除角色里面的用户
+        /// </summary>
+        /// <param name="userRoleRequest"></param>
+        /// <returns></returns>
+        Task<Result> RemoveRoleUserAsync(RemoveRoleUserRequest  removeRoleUserRequest);
     }
 }

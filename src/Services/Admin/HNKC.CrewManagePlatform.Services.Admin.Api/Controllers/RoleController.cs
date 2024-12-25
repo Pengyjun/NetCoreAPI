@@ -82,10 +82,9 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api.Controllers
         /// <param name="addRoleRequest"></param>
         /// <returns></returns>
         [HttpPost("AddUserRole")]
-        public async Task<IActionResult> AddUserRoleAsync([FromBody] UserRoleRequest  userRoleRequest)
+        public async Task<Result> AddUserRoleAsync([FromBody] UserRoleRequest  userRoleRequest)
         {
-            var data = await roleService.AddUserRoleAsync(userRoleRequest);
-            return Ok(data);
+            return await roleService.AddUserRoleAsync(userRoleRequest);
         }
 
         /// <summary>
@@ -123,6 +122,17 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api.Controllers
         {
             var data= await roleService.SearchRoleMenuAsync(baseRequest);
             return Ok(data);
+        }
+
+        /// <summary>
+        /// 删除角色用户
+        /// </summary>
+        /// <param name="addRoleMenuRequest"></param>
+        /// <returns></returns>
+        [HttpPost("RemoveRoleUser")]
+        public async Task<Result> RemoveRoleUserAsync([FromQuery] RemoveRoleUserRequest removeRoleUserRequest)
+        {
+            return await roleService.RemoveRoleUserAsync(removeRoleUserRequest);
         }
     }
 }

@@ -56,7 +56,7 @@ namespace HNKC.CrewManagePlatform.Services.Role
                 Remark = addRoleRequest.Remark,
                 Type = addRoleRequest.Type,
             };
-           var institutionBuinsessId=await _dbContext.Queryable<Institution>().Where(x => x.IsDelete == 1 && x.Oid == addRoleRequest.Oid).Select(x => x.BusinessId).FirstAsync();
+            var institutionBuinsessId = await _dbContext.Queryable<Institution>().Where(x => x.IsDelete == 1 && x.Oid == addRoleRequest.Oid).Select(x => x.BusinessId).FirstAsync();
             InstitutionRole institutionRole = new InstitutionRole()
             {
                 BusinessId = businessId,
@@ -76,11 +76,11 @@ namespace HNKC.CrewManagePlatform.Services.Role
         /// <exception cref="NotImplementedException"></exception>
         public async Task<Result> ModifyAsync(AddRoleRequest addRoleRequest)
         {
-           var roleInfo=await _dbContext.Queryable<HNKC.CrewManagePlatform.SqlSugars.Models.Role>()
-               .Where(x => x.IsDelete == 1 && x.BusinessId == addRoleRequest.BId).FirstAsync();
+            var roleInfo = await _dbContext.Queryable<HNKC.CrewManagePlatform.SqlSugars.Models.Role>()
+                .Where(x => x.IsDelete == 1 && x.BusinessId == addRoleRequest.BId).FirstAsync();
             if (roleInfo == null)
             {
-                return Result.Fail("数据不存在",(int)ResponseHttpCode.DataNoExist);
+                return Result.Fail("数据不存在", (int)ResponseHttpCode.DataNoExist);
             }
             roleInfo.Name = addRoleRequest.Name;
             roleInfo.Type = addRoleRequest.Type;
@@ -106,8 +106,8 @@ namespace HNKC.CrewManagePlatform.Services.Role
             }
 
             roleInfo.IsDelete = 0;
-           var res= await _dbContext.Queryable<InstitutionRole>()
-            .Where(x => x.IsDelete == 1 && x.BusinessId == roleInfo.BusinessId).ToListAsync();
+            var res = await _dbContext.Queryable<InstitutionRole>()
+             .Where(x => x.IsDelete == 1 && x.BusinessId == roleInfo.BusinessId).ToListAsync();
             foreach (var item in res)
             {
                 item.IsDelete = 0;
@@ -126,12 +126,12 @@ namespace HNKC.CrewManagePlatform.Services.Role
         /// <exception cref="NotImplementedException"></exception>
         public async Task<PageResult<RoleResponse>> SearchCurrentInstitutionRoleAsync(string oid)
         {
-            PageResult<RoleResponse>  page = new PageResult<RoleResponse>();
+            PageResult<RoleResponse> page = new PageResult<RoleResponse>();
             List<RoleResponse> pageResult = new List<RoleResponse>();
             var institutionBuinsessId = await _dbContext.Queryable<Institution>().Where(x => x.IsDelete == 1 && x.Oid == oid).FirstAsync();
-            if (institutionBuinsessId !=null)
+            if (institutionBuinsessId != null)
             {
-              var roleList=  await _dbContext.Queryable<InstitutionRole>().Where(x => x.IsDelete == 1 &&x.InstitutionBusinessId== institutionBuinsessId.BusinessId).ToListAsync();
+                var roleList = await _dbContext.Queryable<InstitutionRole>().Where(x => x.IsDelete == 1 && x.InstitutionBusinessId == institutionBuinsessId.BusinessId).ToListAsync();
                 if (roleList.Count > 0)
                 {
                     var roelBusinessIds = roleList.Select(x => x.BusinessId).Distinct().ToList();
@@ -141,7 +141,7 @@ namespace HNKC.CrewManagePlatform.Services.Role
 
                         foreach (var item in roelBusinessIds)
                         {
-                          var currentRole= roles.Where(x => x.BusinessId == item).FirstOrDefault();
+                            var currentRole = roles.Where(x => x.BusinessId == item).FirstOrDefault();
                             RoleResponse roleResponse = new RoleResponse()
                             {
                                 InstitutionBusinessId = institutionBuinsessId.BusinessId,
@@ -150,16 +150,16 @@ namespace HNKC.CrewManagePlatform.Services.Role
                                 Name = currentRole?.Name,
                                 Type = currentRole?.Type,
                                 InstitutionName = institutionBuinsessId.ShortName,
-                                BId= currentRole.BusinessId,
+                                BId = currentRole.BusinessId,
                                 Remark = currentRole?.Remark,
                                 Created = currentRole?.Created,
                             };
-                             pageResult.Add(roleResponse);
+                            pageResult.Add(roleResponse);
                         }
                     }
                 }
             }
-            page.List = pageResult.OrderBy(x=>x.Created).ToList();
+            page.List = pageResult.OrderBy(x => x.Created).ToList();
             page.TotalCount = pageResult.Count;
             return page;
         }
@@ -171,18 +171,18 @@ namespace HNKC.CrewManagePlatform.Services.Role
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
 
-       public  async Task<Result>  AddUserRoleAsync(UserRoleRequest  userRoleRequest)
+        public async Task<Result> AddUserRoleAsync(UserRoleRequest userRoleRequest)
         {
-          var institutionRoleInfo= await _dbContext.Queryable<InstitutionRole>().Where(x=>x.IsDelete==1&&x.BusinessId==userRoleRequest.RoleBusinessId
-           &&x.InstitutionBusinessId== userRoleRequest.InstitutionBusinessId&&x.UserBusinessId.HasValue==false).ToListAsync();
+            var institutionRoleInfo = await _dbContext.Queryable<InstitutionRole>().Where(x => x.IsDelete == 1 && x.BusinessId == userRoleRequest.RoleBusinessId
+             && x.InstitutionBusinessId == userRoleRequest.InstitutionBusinessId &&SqlFunc.IsNullOrEmpty(x.UserBusinessId)).ToListAsync();
             if (institutionRoleInfo.Count > 0)
             {
                 foreach (var item in institutionRoleInfo)
                 {
                     item.IsDelete = 0;
                 }
-               await _dbContext.Updateable<InstitutionRole>(institutionRoleInfo).
-                    ExecuteCommandAsync();
+                await _dbContext.Updateable<InstitutionRole>(institutionRoleInfo).
+                     ExecuteCommandAsync();
             }
             #region 数据校验
             var institutionBusinessId = await _dbContext.Queryable<Institution>().Where(x => x.IsDelete == 1 && x.BusinessId == userRoleRequest.InstitutionBusinessId).FirstAsync();
@@ -202,14 +202,16 @@ namespace HNKC.CrewManagePlatform.Services.Role
                 return Result.Fail("用户数据存在不合法", (int)ResponseHttpCode.DataNoExist);
             }
             #endregion
-            List<InstitutionRole> institutionRoles=new List< InstitutionRole >();
+            List<InstitutionRole> institutionRoles = new List<InstitutionRole>();
             foreach (var item in userRoleRequest.UserBusinessItems)
             {
                 institutionRoles.Add(new InstitutionRole()
                 {
+                    Id=SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
                     BusinessId = userRoleRequest.RoleBusinessId.Value,
                     RoleBusinessId = userRoleRequest.RoleBusinessId,
-                    UserBusinessId = item.UserBusinessId
+                    UserBusinessId = item.UserBusinessId,
+                    InstitutionBusinessId= userRoleRequest.InstitutionBusinessId,
 
                 });
             }
@@ -226,7 +228,7 @@ namespace HNKC.CrewManagePlatform.Services.Role
         /// <exception cref="NotImplementedException"></exception>
         public async Task<PageResult<UserRoleResponse>> SearchRoleUserAsync(AddUserRoleRequest addUserRoleRequest)
         {
-            PageResult<UserRoleResponse> pageResult=new PageResult<UserRoleResponse>();
+            PageResult<UserRoleResponse> pageResult = new PageResult<UserRoleResponse>();
             List<UserRoleResponse> data = new List<UserRoleResponse>();
             #region 获取当前节点下的所有子节点
             var allInstitution = await _dbContext.Queryable<Institution>().Where(x => x.IsDelete == 1)
@@ -242,12 +244,12 @@ namespace HNKC.CrewManagePlatform.Services.Role
                  })
                 .ToListAsync();
             //当前机构下的所有子节点
-           var currentInsititution= allInstitution.Where(x => x.BusinessId == addUserRoleRequest.InstitutionBusinessId).FirstOrDefault();
+            var currentInsititution = allInstitution.Where(x => x.BusinessId == addUserRoleRequest.InstitutionBusinessId).FirstOrDefault();
             if (currentInsititution == null)
             {
                 return null;
             }
-           var allNodes= new ListToTreeUtil().GetAllNodes(currentInsititution.Oid, allInstitution);
+            var allNodes = new ListToTreeUtil().GetAllNodes(currentInsititution.Oid, allInstitution);
             #endregion
             RefAsync<int> total = 0;
             #region 获取当前节点下已分配的用户
@@ -257,14 +259,14 @@ namespace HNKC.CrewManagePlatform.Services.Role
             #endregion
             var userList = await _dbContext.Queryable<User>()
                 .Where(x => x.IsDelete == 1)
-                .WhereIF(!string.IsNullOrWhiteSpace(addUserRoleRequest.KeyWords),x=>x.Name.Contains(addUserRoleRequest.KeyWords)
+                .WhereIF(!string.IsNullOrWhiteSpace(addUserRoleRequest.KeyWords), x => x.Name.Contains(addUserRoleRequest.KeyWords)
                 || x.Phone.Contains(addUserRoleRequest.KeyWords)
                 ).ToListAsync();
 
-            foreach ( var user in userList ) 
+            foreach (var user in userList)
             {
-                var currentAuthUser= authUserList.Where(x => x == user.BusinessId).FirstOrDefault();
-                
+                var currentAuthUser = authUserList.Where(x => x == user.BusinessId).FirstOrDefault();
+
 
                 if (addUserRoleRequest.Status == 1 && currentAuthUser != null)
                 {
@@ -291,13 +293,13 @@ namespace HNKC.CrewManagePlatform.Services.Role
                         UserName = user.Name,
                         Status = currentAuthUser.HasValue == true ? 1 : 0,
                         IsOfInstitution = allNodes.Count(x => x == user.Oid) > 0
-                    }) ;
+                    });
                 }
             }
-            pageResult.List = data ;
-            pageResult.TotalCount=data.Count;
+            pageResult.List = data;
+            pageResult.TotalCount = data.Count;
             pageResult.List.Skip((addUserRoleRequest.PageIndex - 1) * addUserRoleRequest.PageSize).Take(addUserRoleRequest.PageSize).ToList();
-            return pageResult ;
+            return pageResult;
         }
 
         /// <summary>
@@ -322,7 +324,7 @@ namespace HNKC.CrewManagePlatform.Services.Role
             //{ 
             //     return Result.Fail("数据不存在",(int)ResponseHttpCode.DataNoExist); 
             //}
-          
+
             List<RoleMenu> roleMenus = new List<RoleMenu>();
             foreach (var item in addRoleMenuRequest.RoleMenuOptions)
             {
@@ -369,6 +371,34 @@ namespace HNKC.CrewManagePlatform.Services.Role
                 return ListToTreeUtil.GetTree(0, menuList);
             }
             return null;
+        }
+
+        /// <summary>
+        /// 移除角色用户
+        /// </summary>
+        /// <param name="removeRoleUserRequest"></param>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        public async Task<Result> RemoveRoleUserAsync(RemoveRoleUserRequest removeRoleUserRequest)
+        {
+            var userBusinessId = removeRoleUserRequest.RoleUserOptions.Select(x => x.UserBusinsessId).ToList();
+            var removeRoleUserList = await _dbContext.Queryable<InstitutionRole>().Where(x => x.IsDelete == 1 && x.RoleBusinessId == removeRoleUserRequest.RoleBusinessId
+            && x.InstitutionBusinessId == removeRoleUserRequest.InstitutionBusinessId && userBusinessId.Contains(x.UserBusinessId)).ToListAsync();
+            if (removeRoleUserList.Count == 0)
+            {
+                return Result.Fail("数据不存在", (int)ResponseHttpCode.DataNoExist);
+            }
+            var removeCount = removeRoleUserList.Count();
+            if (removeCount != removeRoleUserRequest.RoleUserOptions.Count)
+            {
+                return Result.Fail("删除角色用户异常，删除数量和实际数量不一致", (int)ResponseHttpCode.DataNoExist);
+            }
+            foreach (var item in removeRoleUserList)
+            {
+                item.IsDelete = 0;
+            }
+            await _dbContext.Updateable<InstitutionRole>(removeRoleUserList).ExecuteCommandAsync();
+            return Result.Success("删除成功");
         }
     }
 }
