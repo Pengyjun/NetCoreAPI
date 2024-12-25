@@ -853,7 +853,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                     //劳务合同
                     if (requestBody.BaseInfoDto.UserEntryInfo != null)
                     {
-                        userEntry = await _dbContext.Queryable<UserEntryInfo>().Where(t => t.IsDelete == 1 && t.UserEntryId == userInfo.BusinessId).OrderByDescending(t => t.Created).FirstAsync();
+                        userEntry = await _dbContext.Queryable<UserEntryInfo>().Where(t => t.IsDelete == 1 && t.BusinessId == userInfo.BusinessId).OrderByDescending(t => t.Created).FirstAsync();
                         if (userEntry != null)
                         {
                             userEntry.ContractMain = requestBody.BaseInfoDto.UserEntryInfo.ContarctMain;
