@@ -51,10 +51,9 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api.Controllers
         /// <returns></returns>
         [HttpPost("SaveUser")]
         [Transactional]
-        public async Task<IActionResult> SaveUserAsync([FromBody] CrewArchivesRequest requestBody)
+        public async Task<Result> SaveUserAsync([FromBody] CrewArchivesRequest requestBody)
         {
-            var data = await _service.SaveUserAsync(requestBody);
-            return Ok(data);
+            return await _service.SaveUserAsync(requestBody);
         }
         /// <summary>
         /// 切换船员状态（删除/恢复）
@@ -63,10 +62,9 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api.Controllers
         /// <returns></returns>
         [HttpPost("ToggleUserStatus")]
         [Transactional]
-        public async Task<IActionResult> ToggleUserStatusAsync([FromBody] ToggleUserStatus requestBody)
+        public async Task<Result> ToggleUserStatusAsync([FromBody] ToggleUserStatus requestBody)
         {
-            var data = await _service.ToggleUserStatusAsync(requestBody);
-            return Ok(data);
+            return await _service.ToggleUserStatusAsync(requestBody);
         }
         /// <summary>
         /// 船员调任
@@ -74,10 +72,9 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api.Controllers
         /// <param name="requestBody"></param>
         /// <returns></returns>
         [HttpPost("CrewTransfer")]
-        public async Task<IActionResult> CrewTransferAsync(CrewTransferRequest requestBody)
+        public async Task<Result> CrewTransferAsync(CrewTransferRequest requestBody)
         {
-            var data = await _service.CrewTransferAsync(requestBody);
-            return Ok(data);
+            return await _service.CrewTransferAsync(requestBody);
         }
         #region 下拉列表
         /// <summary>
@@ -86,10 +83,9 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api.Controllers
         /// <param name="type"></param>
         /// <returns></returns>
         [HttpGet("GetDropDownList")]
-        public async Task<IActionResult> GetDropDownListAsync([FromQuery] int type)
+        public async Task<Result> GetDropDownListAsync([FromQuery] int type)
         {
-            var data = await _service.GetDropDownListAsync(type);
-            return Ok(data);
+            return await _service.GetDropDownListAsync(type);
         }
         #endregion
         /// <summary>
@@ -98,10 +94,9 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api.Controllers
         /// <param name="requestBody"></param>
         /// <returns></returns>
         [HttpPost("SaveNotes")]
-        public async Task<IActionResult> SaveNotesAsync([FromBody] NotesRequest requestBody)
+        public async Task<Result> SaveNotesAsync([FromBody] NotesRequest requestBody)
         {
-            var data = await _service.SaveNotesAsync(requestBody);
-            return Ok(data);
+            return await _service.SaveNotesAsync(requestBody);
         }
 
         #region 详情
@@ -111,10 +106,9 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api.Controllers
         /// <param name="bId"></param>
         /// <returns></returns>
         [HttpGet("BasesicDetails")]
-        public async Task<IActionResult> GetBasesicDetailsAsync([FromQuery] string bId)
+        public async Task<Result> GetBasesicDetailsAsync([FromQuery] string bId)
         {
-            var data = await _service.GetBasesicDetailsAsync(bId);
-            return Ok(data);
+            return await _service.GetBasesicDetailsAsync(bId);
         }
         /// <summary>
         /// 获取劳务详情
@@ -122,10 +116,9 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api.Controllers
         /// <param name="bId"></param>
         /// <returns></returns>
         [HttpGet("GetLaborServicesDetails")]
-        public async Task<IActionResult> GetLaborServicesDetailsAsync([FromQuery] string bId)
+        public async Task<Result> GetLaborServicesDetailsAsync([FromQuery] string bId)
         {
-            var data = await _service.GetLaborServicesDetailsAsync(bId);
-            return Ok(data);
+            return await _service.GetLaborServicesDetailsAsync(bId);
         }
         /// <summary>
         /// 获取适任证书详情
@@ -133,10 +126,9 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api.Controllers
         /// <param name="bId"></param>
         /// <returns></returns>
         [HttpGet("GetCertificateOfCompetencyDetails")]
-        public async Task<IActionResult> GetCertificateOfCompetencyDetailsAsync([FromQuery] string bId)
+        public async Task<Result> GetCertificateOfCompetencyDetailsAsync([FromQuery] string bId)
         {
-            var data = await _service.GetCertificateOfCompetencyDetailsAsync(bId);
-            return Ok(data);
+            return await _service.GetCertificateOfCompetencyDetailsAsync(bId);
         }
         /// <summary>
         /// 获取学历详情
@@ -144,10 +136,9 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api.Controllers
         /// <param name="bId"></param>
         /// <returns></returns>
         [HttpGet("GetEducationalBackgroundDetails")]
-        public async Task<IActionResult> GetEducationalBackgroundDetailsAsync([FromQuery] string bId)
+        public async Task<Result> GetEducationalBackgroundDetailsAsync([FromQuery] string bId)
         {
-            var data = await _service.GetEducationalBackgroundDetailsAsync(bId);
-            return Ok(data);
+            return await _service.GetEducationalBackgroundDetailsAsync(bId);
         }
         /// <summary>
         /// 获取职务晋升详情
@@ -155,10 +146,9 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api.Controllers
         /// <param name="bId"></param>
         /// <returns></returns>
         [HttpGet("GetPromotionDetails")]
-        public async Task<IActionResult> GetPromotionDetailsAsync([FromQuery] string bId)
+        public async Task<Result> GetPromotionDetailsAsync([FromQuery] string bId)
         {
-            var data = await _service.GetPromotionDetailsAsync(bId);
-            return Ok(data);
+            return await _service.GetPromotionDetailsAsync(bId);
         }
         /// <summary>
         /// 获取任职船舶详情
@@ -166,10 +156,9 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api.Controllers
         /// <param name="bId"></param>
         /// <returns></returns>
         [HttpGet("GetWorkShipDetails")]
-        public async Task<IActionResult> GetWorkShipDetailsAsync([FromQuery] string bId)
+        public async Task<Result> GetWorkShipDetailsAsync([FromQuery] string bId)
         {
-            var data = await _service.GetWorkShipDetailsAsync(bId);
-            return Ok(data);
+            return await _service.GetWorkShipDetailsAsync(bId);
         }
         /// <summary>
         /// 获取培训记录详情
@@ -177,10 +166,9 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api.Controllers
         /// <param name="bId"></param>
         /// <returns></returns>
         [HttpGet("GetTrainingRecordDetails")]
-        public async Task<IActionResult> GetTrainingRecordDetailsAsync([FromQuery] string bId)
+        public async Task<Result> GetTrainingRecordDetailsAsync([FromQuery] string bId)
         {
-            var data = await _service.GetTrainingRecordDetailsAsync(bId);
-            return Ok(data);
+            return await _service.GetTrainingRecordDetailsAsync(bId);
         }
         /// <summary>
         /// 获取年度考核详情
@@ -188,10 +176,9 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api.Controllers
         /// <param name="bId"></param>
         /// <returns></returns>
         [HttpGet("GetYearCheckDetail")]
-        public async Task<IActionResult> GetYearCheckDetailAsync([FromQuery] string bId)
+        public async Task<Result> GetYearCheckDetailAsync([FromQuery] string bId)
         {
-            var data = await _service.GetYearCheckDetailAsync(bId);
-            return Ok(data);
+            return await _service.GetYearCheckDetailAsync(bId);
         }
         /// <summary>
         /// 获取备注详情
@@ -199,10 +186,10 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api.Controllers
         /// <param name="bId"></param>
         /// <returns></returns>
         [HttpGet("GetNotesDetails")]
-        public async Task<IActionResult> GetNotesDetailsAsync([FromQuery] string bId)
+        public async Task<Result> GetNotesDetailsAsync([FromQuery] string bId)
         {
-            var data = await _service.GetNotesDetailsAsync(bId);
-            return Ok(data);
+            return await _service.GetNotesDetailsAsync(bId);
+
         }
         #endregion
 
@@ -213,10 +200,9 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api.Controllers
         /// <param name="file"></param>
         /// <returns></returns>
         [HttpPost("UploadFile")]
-        public async Task<IActionResult> UploadFileAsync(IFormFile file)
+        public async Task<Result> UploadFileAsync(IFormFile file)
         {
-            var data = await SingleFileUpdateAsync(file, "DefaultAllowFileType");
-            return Ok(data);
+           return await SingleFileUpdateAsync(file, "DefaultAllowFileType");
         }
 
         #endregion

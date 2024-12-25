@@ -35,69 +35,107 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
         {
             RefAsync<int> total = 0;
 
+            #region 船员关联
+            //任职船舶 
+            var crewWorkShip = _dbContext.Queryable<WorkShip>()
+              .GroupBy(u => u.WorkShipId)
+              .WhereIF(!string.IsNullOrWhiteSpace(requestBody.OnBoard), t => t.BusinessId.ToString() == requestBody.OnBoard)//所在船舶
+              .WhereIF(!string.IsNullOrWhiteSpace(requestBody.HistoryOnBoard), t => t.BusinessId.ToString() == requestBody.HistoryOnBoard)//履历船舶
+              .Select(t => new { t.WorkShipId, WorkShipEndTime = SqlFunc.AggregateMax(t.WorkShipEndTime) });
+            var wShip = _dbContext.Queryable<WorkShip>()
+                .InnerJoin(crewWorkShip, (x, y) => x.WorkShipId == y.WorkShipId && x.WorkShipEndTime == y.WorkShipEndTime);
+            //入职时间
+            var uentityFist = _dbContext.Queryable<UserEntryInfo>()
+                .GroupBy(u => u.UserEntryId)
+                .Select(x => new { x.UserEntryId, EndTime = SqlFunc.AggregateMax(x.EndTime) });
+            var uentity = _dbContext.Queryable<UserEntryInfo>()
+                .InnerJoin(uentityFist, (x, y) => x.UserEntryId == y.UserEntryId && x.EndTime == y.EndTime);
+            //适任证书
+            var userCoCFirst = _dbContext.Queryable<CertificateOfCompetency>()
+                .GroupBy(u => u.CertificateId)
+                .Select(x => new { x.CertificateId });
+            var userCoC = _dbContext.Queryable<CertificateOfCompetency>()
+                .InnerJoin(userCoCFirst, (x, y) => x.CertificateId == y.CertificateId);
+            #endregion
+
             //名称相关不赋值
             var rt = await _dbContext.Queryable<User>()
+                .Where(t => t.IsUser == 1)
+                .WhereIF(requestBody.ServiceBooks != null && requestBody.ServiceBooks.Any(),
+                (t) => requestBody.ServiceBooks.Contains(((int)t.ServiceBookType).ToString()))//服务簿类型
                 .WhereIF(!string.IsNullOrWhiteSpace(requestBody.KeyWords), t => t.Name.Contains(requestBody.KeyWords) || t.CardId.Contains(requestBody.KeyWords)
                 || t.Phone.Contains(requestBody.KeyWords) || t.WorkNumber.Contains(requestBody.KeyWords))
                 .WhereIF(!string.IsNullOrWhiteSpace(requestBody.Name), t => t.Name.Contains(requestBody.Name))
                 .WhereIF(!string.IsNullOrWhiteSpace(requestBody.CardId), t => t.CardId.Contains(requestBody.CardId))
                 .WhereIF(!string.IsNullOrWhiteSpace(requestBody.WorkNumber), t => t.WorkNumber.Contains(requestBody.WorkNumber))
                 .WhereIF(!string.IsNullOrWhiteSpace(requestBody.Phone), t => t.Phone.Contains(requestBody.Phone))
-                .WhereIF(!string.IsNullOrWhiteSpace(requestBody.OnBoard), t => t.OnBoard.Contains(requestBody.OnBoard))
-                .WhereIF(requestBody.CrewType != null && requestBody.CrewType.Any(), t => requestBody.CrewType.Contains(t.CrewType))
-                .LeftJoin<WorkShip>((t, ws) => t.OnBoard == ws.BusinessId.ToString())
-                .LeftJoin<CrewType>((t, ws, ct) => t.CrewType == ct.BusinessId.ToString())
-                .LeftJoin<CertificateOfCompetency>((t, ws, ct, coc) => t.BusinessId == coc.CertificateId)
-                .LeftJoin<NavigationArea>((t, ws, ct, coc, na) => coc.FNavigationArea == na.BusinessId.ToString() || coc.SNavigationArea == na.BusinessId.ToString())
-                .LeftJoin<Position>((t, ws, ct, coc, na, po) => coc.FPosition == na.BusinessId.ToString() || coc.SPosition == na.BusinessId.ToString())
-                .LeftJoin<SkillCertificates>((t, ws, ct, coc, na, po, sf) => t.BusinessId == sf.SkillcertificateId)
-                .LeftJoin<EducationalBackground>((t, ws, ct, coc, na, po, sf, eb) => eb.QualificationId == t.BusinessId)
-                .LeftJoin<UserEntryInfo>((t, ws, ct, coc, na, po, sf, eb, ui) => ui.UserEntryId == t.BusinessId)
-                .LeftJoin<EmploymentType>((t, ws, ct, coc, na, po, sf, eb, ui, et) => et.BusinessId.ToString() == ui.EmploymentId)
-                .LeftJoin<OwnerShip>((t, ws, ct, coc, na, po, sf, eb, ui, et, ow) => t.OnBoard == ws.BusinessId.ToString())
-                .WhereIF(!string.IsNullOrWhiteSpace(requestBody.HistoryOnBoard), (t, ws, ct, coc, na, po, sf, eb, ui, et, ow) => ws.OnShip.Contains(requestBody.HistoryOnBoard))
-                .WhereIF(requestBody.ShipTypes != null && requestBody.ShipTypes.Any(), (t, ws, ct, coc, na, po, sf, eb, ui, et, ow) => requestBody.ShipTypes.Contains(((int)ow.ShipType).ToString()))
-                .WhereIF(requestBody.ServiceBooks != null && requestBody.ServiceBooks.Any(), (t, ws, ct, coc, na, po, sf, eb, ui, et, ow) => requestBody.ServiceBooks.Contains(((int)t.ServiceBookType).ToString()))
-                .WhereIF(requestBody.FPosition != null && requestBody.FPosition.Any(), (t, ws, ct, coc, na, po, sf, eb, ui, et, ow) => requestBody.FPosition.Contains(coc.FPosition))
-                .WhereIF(requestBody.SPosition != null && requestBody.SPosition.Any(), (t, ws, ct, coc, na, po, sf, eb, ui, et, ow) => requestBody.SPosition.Contains(coc.SPosition))
-                .WhereIF(requestBody.Staus != null && requestBody.Staus.Contains("0"), (t, ws, ct, coc, na, po, sf, eb, ui, et, ow) => DateTime.Now < ws.WorkShipEndTime)//在岗
-                .WhereIF(requestBody.Staus != null && requestBody.Staus.Contains("1"), (t, ws, ct, coc, na, po, sf, eb, ui, et, ow) => (int)t.DeleteReson == 1)//离职
-                .WhereIF(requestBody.Staus != null && requestBody.Staus.Contains("2"), (t, ws, ct, coc, na, po, sf, eb, ui, et, ow) => (int)t.DeleteReson == 2)//调离
-                .WhereIF(requestBody.Staus != null && requestBody.Staus.Contains("3"), (t, ws, ct, coc, na, po, sf, eb, ui, et, ow) => (int)t.DeleteReson == 3)//退休
-                .WhereIF(requestBody.Staus != null && requestBody.Staus.Contains("5"), (t, ws, ct, coc, na, po, sf, eb, ui, et, ow) => DateTime.Now >= ws.WorkShipEndTime)//待岗
-                .WhereIF(requestBody.TrainingCertificate, (t, ws, ct, coc, na, po, sf, eb, ui, et, ow) => !string.IsNullOrWhiteSpace(coc.TrainingCertificate))
-                .WhereIF(requestBody.Z01Effective, (t, ws, ct, coc, na, po, sf, eb, ui, et, ow) => !string.IsNullOrWhiteSpace(coc.Z01EffectiveTime.ToString()))
-                .WhereIF(requestBody.Z07Effective, (t, ws, ct, coc, na, po, sf, eb, ui, et, ow) => !string.IsNullOrWhiteSpace(coc.Z07EffectiveTime.ToString()))
-                .WhereIF(requestBody.Z08Effective, (t, ws, ct, coc, na, po, sf, eb, ui, et, ow) => !string.IsNullOrWhiteSpace(coc.Z08EffectiveTime.ToString()))
-                .WhereIF(requestBody.Z04Effective, (t, ws, ct, coc, na, po, sf, eb, ui, et, ow) => !string.IsNullOrWhiteSpace(coc.Z04EffectiveTime.ToString()))
-                .WhereIF(requestBody.Z05Effective, (t, ws, ct, coc, na, po, sf, eb, ui, et, ow) => !string.IsNullOrWhiteSpace(coc.Z05EffectiveTime.ToString()))
-                .WhereIF(requestBody.Z02Effective, (t, ws, ct, coc, na, po, sf, eb, ui, et, ow) => !string.IsNullOrWhiteSpace(coc.Z02EffectiveTime.ToString()))
-                .WhereIF(requestBody.Z06Effective, (t, ws, ct, coc, na, po, sf, eb, ui, et, ow) => !string.IsNullOrWhiteSpace(coc.Z06EffectiveTime.ToString()))
-                .WhereIF(requestBody.Z09Effective, (t, ws, ct, coc, na, po, sf, eb, ui, et, ow) => !string.IsNullOrWhiteSpace(coc.Z09EffectiveTime.ToString()))
-                .WhereIF(requestBody.SeamanCertificate, (t, ws, ct, coc, na, po, sf, eb, ui, et, ow) => !string.IsNullOrWhiteSpace(coc.SeamanCertificate))
-                .WhereIF(requestBody.PassportCertificate, (t, ws, ct, coc, na, po, sf, eb, ui, et, ow) => !string.IsNullOrWhiteSpace(coc.PassportCertificate))
-                .WhereIF(requestBody.HealthCertificate, (t, ws, ct, coc, na, po, sf, eb, ui, et, ow) => !string.IsNullOrWhiteSpace(coc.HealthCertificate))
-                .WhereIF(requestBody.CertificateTypes != null && requestBody.CertificateTypes.Any(), (t, ws, ct, coc, na, po, sf, eb, ui, et, ow) => requestBody.CertificateTypes.Contains(((int)sf.SkillCertificateType).ToString()))
-                .WhereIF(requestBody.QualificationTypes != null && requestBody.QualificationTypes.Any(), (t, ws, ct, coc, na, po, sf, eb, ui, et, ow) => requestBody.QualificationTypes.Contains(((int)eb.QualificationType).ToString()))
-                .WhereIF(requestBody.Qualifications != null && requestBody.Qualifications.Any(), (t, ws, ct, coc, na, po, sf, eb, ui, et, ow) => requestBody.Qualifications.Contains(((int)eb.Qualification).ToString()))
-                .Select((t, ws, ct, coc, na, po, sf, eb, ui, et, ow) => new SearchCrewArchivesResponse
+                .LeftJoin(wShip, (t, ws) => t.BusinessId == ws.WorkShipId)
+                .LeftJoin<OwnerShip>((t, ws, ow) => ws.OnShip == ow.BusinessId.ToString())
+                .LeftJoin(userCoC, (t, ws, ow, coc) => t.BusinessId == coc.CertificateId)
+                .LeftJoin(uentity, (t, ws, ow, coc, ue) => t.BusinessId == ue.UserEntryId)
+                .WhereIF(requestBody.Staus != null && requestBody.Staus.Contains("0"), (t, ws, coc, ue) => DateTime.Now < ws.WorkShipEndTime)//在岗
+                .WhereIF(requestBody.Staus != null && requestBody.Staus.Contains("1"), (t, ws, coc, ue) => (int)t.DeleteReson == 1)//离职
+                .WhereIF(requestBody.Staus != null && requestBody.Staus.Contains("2"), (t, ws, coc, ue) => (int)t.DeleteReson == 2)//调离
+                .WhereIF(requestBody.Staus != null && requestBody.Staus.Contains("3"), (t, ws, coc, ue) => (int)t.DeleteReson == 3)//退休
+                .WhereIF(requestBody.Staus != null && requestBody.Staus.Contains("5"), (t, ws, coc, ue) => DateTime.Now >= ws.WorkShipEndTime)//待岗
+                .Select((t, ws, ow, coc, ue) => new SearchCrewArchivesResponse
                 {
                     BId = t.BusinessId,
                     BtnType = t.IsDelete == 0 ? 1 : 0,
                     UserName = t.Name,
+                    OnBoard = ow.BusinessId.ToString(),
+                    OnCountry = ow.Country,
                     CardId = t.CardId,
                     ShipType = t.ShipType,
                     WorkNumber = t.WorkNumber,
                     ServiceBookType = t.ServiceBookType,
                     CrewType = t.CrewType,
-                    EmploymentType = et.BusinessId.ToString(),
+                    EmploymentType = ue.EmploymentId,
                     FPosition = coc.FPosition,
                     SPosition = coc.SPosition,
                     IsDelete = t.IsDelete,
                     DeleteReson = t.DeleteReson
                 })
+                .MergeTable()
+                .WhereIF(requestBody.CrewType != null && requestBody.CrewType.Any(), child => SqlFunc.Subqueryable<SkillCertificates>()
+                               .Where(skcall => requestBody.CrewType.Contains(skcall.BusinessId.ToString())).Any())//船员类型
+                .WhereIF(requestBody.ShipTypes != null && requestBody.ShipTypes.Any(), child => SqlFunc.Subqueryable<OwnerShip>()
+                               .Where(skcall => requestBody.ShipTypes.Contains(skcall.ShipType.ToString())).Any())//船舶类型
+                .WhereIF(requestBody.PositionOnBoard != null, child => SqlFunc.Subqueryable<PositionOnBoard>()//在船职务
+                               .Where(skcall => requestBody.PositionOnBoard == skcall.BusinessId.ToString()).Any())
+                .WhereIF(requestBody.FPosition != null && requestBody.FPosition.Any(), child => SqlFunc.Subqueryable<CertificateOfCompetency>()//第一适任证
+                               .Where(skcall => requestBody.FPosition.Contains(skcall.BusinessId.ToString())).Any())
+                .WhereIF(requestBody.SPosition != null && requestBody.SPosition.Any(), child => SqlFunc.Subqueryable<CertificateOfCompetency>()//第二适任证
+                               .Where(skcall => requestBody.SPosition.Contains(skcall.BusinessId.ToString())).Any())
+                .WhereIF(requestBody.TrainingCertificate, child => SqlFunc.Subqueryable<CertificateOfCompetency>()
+                               .Where(skcall => !string.IsNullOrEmpty(skcall.TrainingCertificate)).Any())
+                .WhereIF(requestBody.Z01Effective, child => SqlFunc.Subqueryable<CertificateOfCompetency>()
+                               .Where(skcall => !string.IsNullOrEmpty(skcall.Z01EffectiveTime.ToString())).Any())
+                .WhereIF(requestBody.Z08Effective, child => SqlFunc.Subqueryable<CertificateOfCompetency>()
+                               .Where(skcall => !string.IsNullOrEmpty(skcall.Z08EffectiveTime.ToString())).Any())
+                .WhereIF(requestBody.Z04Effective, child => SqlFunc.Subqueryable<CertificateOfCompetency>()
+                               .Where(skcall => !string.IsNullOrEmpty(skcall.Z04EffectiveTime.ToString())).Any())
+                .WhereIF(requestBody.Z05Effective, child => SqlFunc.Subqueryable<CertificateOfCompetency>()
+                               .Where(skcall => !string.IsNullOrEmpty(skcall.Z05EffectiveTime.ToString())).Any())
+                .WhereIF(requestBody.Z02Effective, child => SqlFunc.Subqueryable<CertificateOfCompetency>()
+                               .Where(skcall => !string.IsNullOrEmpty(skcall.Z02EffectiveTime.ToString())).Any())
+                .WhereIF(requestBody.Z06Effective, child => SqlFunc.Subqueryable<CertificateOfCompetency>()
+                               .Where(skcall => !string.IsNullOrEmpty(skcall.Z06EffectiveTime.ToString())).Any())
+                .WhereIF(requestBody.Z09Effective, child => SqlFunc.Subqueryable<CertificateOfCompetency>()
+                               .Where(skcall => !string.IsNullOrEmpty(skcall.Z09EffectiveTime.ToString())).Any())
+                .WhereIF(requestBody.SeamanCertificate, child => SqlFunc.Subqueryable<CertificateOfCompetency>()
+                               .Where(skcall => !string.IsNullOrEmpty(skcall.SeamanCertificate)).Any())
+                .WhereIF(requestBody.PassportCertificate, child => SqlFunc.Subqueryable<CertificateOfCompetency>()
+                               .Where(skcall => !string.IsNullOrEmpty(skcall.PassportCertificate)).Any())
+                .WhereIF(requestBody.HealthCertificate, child => SqlFunc.Subqueryable<CertificateOfCompetency>()
+                               .Where(skcall => !string.IsNullOrEmpty(skcall.HealthCertificate)).Any())
+                //技能证书
+                //学历 
+                //学历类型
+
                 .OrderByDescending(t => t.IsDelete)
                 .ToPageListAsync(requestBody.PageIndex, requestBody.PageSize, total);
+
             return await GetResult(requestBody, rt, total);
         }
         /// <summary>
@@ -157,7 +195,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                     {
                         spctabNames = spctabNames.Substring(0, spctabNames.Length - 1);
                     }
-                    var ob = onBoardtab.Where(x => x.WorkShipId == t.BId).OrderByDescending(x => x.Created).FirstOrDefault();
+                    var ob = onBoardtab.Where(x => x.WorkShipId == t.BId).FirstOrDefault();
                     if (ob != null)
                     {
                         //所在船舶
@@ -183,8 +221,8 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                     t.SpecialCertificate = spctabs;
                     t.SpecialCertificateName = spctabNames;
                     t.Age = CalculateAgeFromIdCard(t.CardId);
-                    t.OnStatus = ob == null ? CrewStatusEnum.DaiGang : ShipUserStatus(ob.WorkShipEndTime, ob.HolidayTime, t.DeleteReson);
-                    t.OnStatusName = ob == null ? EnumUtil.GetDescription(CrewStatusEnum.DaiGang) : EnumUtil.GetDescription(ShipUserStatus(ob.WorkShipEndTime, ob.HolidayTime, t.DeleteReson));
+                    t.OnStatus = ob == null ? CrewStatusEnum.DaiGang : ShipUserStatus(ob.WorkShipEndTime, t.DeleteReson);
+                    t.OnStatusName = ob == null ? EnumUtil.GetDescription(CrewStatusEnum.DaiGang) : EnumUtil.GetDescription(ShipUserStatus(ob.WorkShipEndTime, t.DeleteReson));
                 }
             }
             page.List = rt;
@@ -225,10 +263,9 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
         /// 船员状态
         /// </summary>
         /// <param name="departureTime">下船时间</param>
-        /// <param name="holidayTime">休假时间</param>
         /// <param name="deleteResonEnum">是否删除</param>
         /// <returns></returns>
-        private static CrewStatusEnum ShipUserStatus(DateTime departureTime, DateTime? holidayTime, CrewStatusEnum deleteResonEnum)
+        private static CrewStatusEnum ShipUserStatus(DateTime departureTime, CrewStatusEnum deleteResonEnum)
         {
             var status = new CrewStatusEnum();
             if (deleteResonEnum != CrewStatusEnum.Normal)
@@ -236,11 +273,11 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                 //删除：管理人员手动操作，包括离职、调离和退休，优先于其他任何状态
                 status = deleteResonEnum;
             }
-            else if (holidayTime.HasValue)
-            {
-                //休假：提交离船申请且经审批同意后，按所申请离船、归船日期设置为休假状态，优先于在岗、待岗状态
-                status = CrewStatusEnum.XiuJia;
-            }
+            //else if (holidayTime.HasValue)
+            //{
+            //    //休假：提交离船申请且经审批同意后，按所申请离船、归船日期设置为休假状态，优先于在岗、待岗状态
+            //    status = CrewStatusEnum.XiuJia;
+            //}
             else if (departureTime <= DateTime.Now)
             {
                 //在岗、待岗:船员登记时必填任职船舶数据，看其中最新的任职船舶上船时间和下船时间，在此时间内为在岗状态，否则为待岗状态
@@ -256,7 +293,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
         /// <returns></returns>
         public async Task<Result> CrewArchivesCountAsync()
         {
-            var udtab = await _dbContext.Queryable<User>().ToListAsync();
+            var udtab = await _dbContext.Queryable<User>().Where(t => t.IsUser == 1).ToListAsync();
             var udtabIds = udtab.Select(x => x.BusinessId.ToString()).ToList();
             var onBoard = await _dbContext.Queryable<WorkShip>().Where(t => t.IsDelete == 1 && udtabIds.Contains(t.WorkShipId.ToString())).ToListAsync();
 
@@ -268,18 +305,18 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
             var waitCount = onBoard.Where(x => x.WorkShipEndTime > DateTime.Now).Select(x => x.WorkShipId).Distinct().Count();//待岗数
             var waitProp = totalCount == 0 ? 0 : Convert.ToInt32(waitCount / totalCount);
 
-            var holidayCount = onBoard.Where(x => x.HolidayTime > DateTime.Now).Select(x => x.WorkShipId).Distinct().Count();//休假数
-            var holidayProp = totalCount == 0 ? 0 : Convert.ToInt32(holidayCount / totalCount);
+            //var holidayCount = onBoard.Where(x => x.HolidayTime > DateTime.Now).Select(x => x.WorkShipId).Distinct().Count();//休假数
+            //var holidayProp = totalCount == 0 ? 0 : Convert.ToInt32(holidayCount / totalCount);
 
             var otherCount = udtab.Where(x => x.DeleteReson != CrewStatusEnum.Normal && x.DeleteReson != CrewStatusEnum.XiuJia).Count();//离调退
             var otherProp = totalCount == 0 ? 0 : Convert.ToInt32(otherCount / totalCount);
 
             var rr = new CrewArchivesResponse
             {
-                HolidayCount = holidayCount,
+                //HolidayCount = holidayCount,
                 OtherCount = otherCount,
                 OtherProp = otherProp,
-                HolidayProp = holidayProp,
+                //HolidayProp = holidayProp,
                 OnDutyCount = onDutyCount,
                 OnDutyProp = onDutyProp,
                 TatalCount = totalCount,
@@ -342,7 +379,8 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                     ServiceBookType = requestBody.BaseInfoDto.ServiceBookType,
                     OnBoard = requestBody.BaseInfoDto.OnBoard,
                     PositionOnBoard = requestBody.BaseInfoDto.PositionOnBoard,
-                    Name = requestBody.BaseInfoDto.Name
+                    Name = requestBody.BaseInfoDto.Name,
+                    IsUser = 1
                 };
                 //文件
                 if (requestBody.BaseInfoDto.UploadPhotoScans != null)
@@ -2242,22 +2280,9 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
             var url = AppsettingsHelper.GetValue("UpdateItem:Url");
             foreach (var item in userEntryInfo)
             {
-                var userEntryFiles = files.Where(x => item.EntryScans == x.FileId)
-                    .Select(x => new FileInfosForDetails
-                    {
-                        Id = x.BusinessId.ToString(),
-                        FileSize = x.FileSize,
-                        FileType = x.FileType,
-                        Name = x.Name,
-                        OriginName = x.OriginName,
-                        SuffixName = x.SuffixName,
-                        Url = url + x.Name?.Substring(0, x.Name.LastIndexOf(".")) + x.OriginName
-                    })
-                    .ToList();
                 uEntry.Add(new UserEntryInfosForDetails
                 {
                     Id = item.BusinessId.ToString(),
-                    EntryScans = userEntryFiles,
                     ContarctMain = item.ContractMain,
                     EntryDate = item.EntryTime.ToString("yyyy/MM/dd") + "~" + item.EndTime.ToString("yyyy/MM/dd"),
                     LaborCompany = item.LaborCompany,
@@ -2273,7 +2298,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
             var entryDateContent = userEntryInfo.FirstOrDefault()?.EntryTime.ToString("yyyy/MM/dd") + "~" + userEntryInfo.FirstOrDefault()?.EndTime.ToString("yyyy/MM/dd");
             //最新入职文件
             var newEntryFilesIds = userEntryInfo.FirstOrDefault()?.EntryScans;
-            var newFiles = files.Where(x => newEntryFilesIds == x.FileId)
+            var newFiles = files
                 .Select(x => new FileInfosForDetails
                 {
                     Id = x.BusinessId.ToString(),
@@ -2335,11 +2360,11 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
             var userWorkShip = await _dbContext.Queryable<WorkShip>().Where(t => t.IsDelete == 1).OrderByDescending(t => t.Created).FirstAsync();
             if (userWorkShip != null)
             {
-                //有休假时间  休假
-                if (userWorkShip.HolidayTime != DateTime.MinValue && !string.IsNullOrWhiteSpace(userWorkShip.HolidayTime.ToString()))
-                {
-                    ur.StatusName = userWorkShip.HolidayTime > DateTime.Now ? EnumUtil.GetDescription(CrewStatusEnum.XiuJia) : "";
-                }
+                ////有休假时间  休假
+                //if (userWorkShip.HolidayTime != DateTime.MinValue && !string.IsNullOrWhiteSpace(userWorkShip.HolidayTime.ToString()))
+                //{
+                //    ur.StatusName = userWorkShip.HolidayTime > DateTime.Now ? EnumUtil.GetDescription(CrewStatusEnum.XiuJia) : "";
+                //}
 
                 //在岗 待岗
                 ur.StatusName = userWorkShip.WorkShipEndTime > DateTime.Now ? EnumUtil.GetDescription(CrewStatusEnum.Normal) : EnumUtil.GetDescription(CrewStatusEnum.DaiGang);

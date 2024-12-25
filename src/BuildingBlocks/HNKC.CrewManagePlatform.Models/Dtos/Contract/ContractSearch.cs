@@ -35,6 +35,7 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.Contract
         /// 所在国家
         /// </summary>
         public string? Country { get; set; }
+        public List<int>? Params { get; set; }
         /// <summary>
         /// 
         /// </summary>

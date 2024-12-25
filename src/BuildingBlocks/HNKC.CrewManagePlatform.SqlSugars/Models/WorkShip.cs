@@ -31,13 +31,13 @@ namespace HNKC.CrewManagePlatform.SqlSugars.Models
         /// <summary>
         /// 在船日期
         /// </summary>
-        [SugarColumn(ColumnDataType = "datetime", ColumnDescription = "在船日期")]
-        public DateTime OnBoardTime { get; set; }
+        [SugarColumn(ColumnDataType = "int", ColumnDescription = "在船日期", DefaultValue = "0")]
+        public int OnBoardTime { get; set; }
         /// <summary>
         /// 休假日期
         /// </summary>
-        [SugarColumn(ColumnDataType = "datetime", ColumnDescription = "休假日期")]
-        public DateTime? HolidayTime { get; set; }
+        [SugarColumn(ColumnDataType = "int", ColumnDescription = "休假日期", DefaultValue = "0")]
+        public int HolidayTime { get; set; }
         /// <summary>
         /// 关联键
         /// </summary>

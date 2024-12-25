@@ -18,5 +18,10 @@ namespace HNKC.CrewManagePlatform.SqlSugars.Models
         /// </summary>
         [SugarColumn(Length = 50, ColumnDescription = "名称")]
         public string? Name { get; set; }
+        /// <summary>
+        /// 关联键
+        /// </summary>
+        [SugarColumn(Length = 36, ColumnDescription = "关联键")]
+        public string? ForeignKey { get; set; }
     }
 }

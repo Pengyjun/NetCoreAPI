@@ -564,11 +564,11 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// <summary>
         /// 休假日期
         /// </summary>
-        public DateTime? HolidayTime { get; set; }
+        public int HolidayTime { get; set; }
         /// <summary>
         /// 在船时间
         /// </summary>
-        public DateTime OnBoardTime { get; set; }
+        public int OnBoardTime { get; set; }
     }
     /// <summary>
     /// 培训记录
