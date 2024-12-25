@@ -2280,22 +2280,9 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
             var url = AppsettingsHelper.GetValue("UpdateItem:Url");
             foreach (var item in userEntryInfo)
             {
-                var userEntryFiles = files.Where(x => item.EntryScans == x.FileId)
-                    .Select(x => new FileInfosForDetails
-                    {
-                        Id = x.BusinessId.ToString(),
-                        FileSize = x.FileSize,
-                        FileType = x.FileType,
-                        Name = x.Name,
-                        OriginName = x.OriginName,
-                        SuffixName = x.SuffixName,
-                        Url = url + x.Name?.Substring(0, x.Name.LastIndexOf(".")) + x.OriginName
-                    })
-                    .ToList();
                 uEntry.Add(new UserEntryInfosForDetails
                 {
                     Id = item.BusinessId.ToString(),
-                    EntryScans = userEntryFiles,
                     ContarctMain = item.ContractMain,
                     EntryDate = item.EntryTime.ToString("yyyy/MM/dd") + "~" + item.EndTime.ToString("yyyy/MM/dd"),
                     LaborCompany = item.LaborCompany,
@@ -2311,7 +2298,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
             var entryDateContent = userEntryInfo.FirstOrDefault()?.EntryTime.ToString("yyyy/MM/dd") + "~" + userEntryInfo.FirstOrDefault()?.EndTime.ToString("yyyy/MM/dd");
             //最新入职文件
             var newEntryFilesIds = userEntryInfo.FirstOrDefault()?.EntryScans;
-            var newFiles = files.Where(x => newEntryFilesIds == x.FileId)
+            var newFiles = files
                 .Select(x => new FileInfosForDetails
                 {
                     Id = x.BusinessId.ToString(),

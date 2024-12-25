@@ -205,10 +205,10 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// 入职日期
         /// </summary>
         public string? EntryDate { get; set; }
-        /// <summary>
-        /// 入职材料 ,拼接文件
-        /// </summary>
-        public List<FileInfosForDetails>? EntryScans { get; set; }
+        ///// <summary>
+        ///// 入职材料 ,拼接文件
+        ///// </summary>
+        //public List<FileInfosForDetails>? EntryScans { get; set; }
         /// <summary>
         /// 劳务公司
         /// </summary>
