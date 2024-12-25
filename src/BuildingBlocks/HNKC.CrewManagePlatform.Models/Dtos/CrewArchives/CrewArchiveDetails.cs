@@ -128,6 +128,7 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// 在船职务
         /// </summary>
         public string? PositionOnBoard { get; set; }
+        public string? PositionOnBoardName { get; set; }
         /// <summary>
         /// 船员照片 
         /// </summary>
