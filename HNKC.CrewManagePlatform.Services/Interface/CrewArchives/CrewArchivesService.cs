@@ -714,9 +714,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                             OnShip = item.OnShip,
                             WorkShipStartTime = item.WorkShipStartTime,
                             WorkShipEndTime = item.WorkShipEndTime,
-                            HolidayTime = item.HolidayTime,
                             Postition = item.Postition,
-                            OnBoardTime = item.OnBoardTime,
                             WorkShipId = uId
                         });
                     }
@@ -1190,9 +1188,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                                 OnShip = item.OnShip,
                                 WorkShipStartTime = item.WorkShipStartTime,
                                 WorkShipEndTime = item.WorkShipEndTime,
-                                HolidayTime = item.HolidayTime,
                                 Postition = item.Postition,
-                                OnBoardTime = item.OnBoardTime,
                                 WorkShipId = userInfo.BusinessId
                             });
                         }

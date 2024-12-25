@@ -561,14 +561,14 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// 下船日期
         /// </summary>
         public DateTime WorkShipEndTime { get; set; }
-        /// <summary>
-        /// 休假日期
-        /// </summary>
-        public int HolidayTime { get; set; }
-        /// <summary>
-        /// 在船时间
-        /// </summary>
-        public int OnBoardTime { get; set; }
+        ///// <summary>
+        ///// 休假日期
+        ///// </summary>
+        //public int HolidayTime { get; set; }
+        ///// <summary>
+        ///// 在船时间
+        ///// </summary>
+        //public int OnBoardTime { get; set; }
     }
     /// <summary>
     /// 培训记录
