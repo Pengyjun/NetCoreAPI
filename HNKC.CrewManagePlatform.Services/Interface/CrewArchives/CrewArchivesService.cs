@@ -854,46 +854,24 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                     if (requestBody.BaseInfoDto.UserEntryInfo != null)
                     {
                         userEntry = await _dbContext.Queryable<UserEntryInfo>().Where(t => t.IsDelete == 1 && t.BusinessId == userInfo.BusinessId).OrderByDescending(t => t.Created).FirstAsync();
-                        if (userEntry != null)
+                        userEntryAdd = new UserEntryInfo
                         {
-                            userEntry.ContractMain = requestBody.BaseInfoDto.UserEntryInfo.ContarctMain;
-                            userEntry.EndTime = requestBody.BaseInfoDto.UserEntryInfo.EndTime;
-                            userEntry.EntryScans = GuidUtil.Next();
-                            userEntry.EntryTime = requestBody.BaseInfoDto.UserEntryInfo.EntryTime;
-                            userEntry.LaborCompany = requestBody.BaseInfoDto.UserEntryInfo.LaborCompany;
-                            userEntry.EmploymentId = requestBody.BaseInfoDto.UserEntryInfo.EmploymentId;
-                            userEntry.ContractType = requestBody.BaseInfoDto.UserEntryInfo.ContractType;
-                            if (requestBody.BaseInfoDto.UserEntryInfo != null)
-                            {
-                                if (requestBody.BaseInfoDto.UserEntryInfo.EntryScansUpload != null && requestBody.BaseInfoDto.UserEntryInfo.EntryScansUpload.Any())
-                                {
-                                    var ff = requestBody.BaseInfoDto.UserEntryInfo.EntryScansUpload;
-                                    ff.ForEach(x => x.FileId = userEntry.EntryScans);
-                                    upLoadFiles.AddRange(ff);
-                                }
-                            }
-                        }
-                        else
+                            BusinessId = GuidUtil.Next(),
+                            Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                            ContractMain = requestBody.BaseInfoDto.UserEntryInfo.ContarctMain,
+                            EndTime = requestBody.BaseInfoDto.UserEntryInfo.EndTime,
+                            EntryScans = GuidUtil.Next(),
+                            EntryTime = requestBody.BaseInfoDto.UserEntryInfo.EntryTime,
+                            LaborCompany = requestBody.BaseInfoDto.UserEntryInfo.LaborCompany,
+                            EmploymentId = requestBody.BaseInfoDto.UserEntryInfo.EmploymentId,
+                            UserEntryId = requestBody.BId,
+                            ContractType = requestBody.BaseInfoDto.UserEntryInfo.ContractType
+                        };
+                        if (requestBody.BaseInfoDto.UserEntryInfo.EntryScansUpload != null && requestBody.BaseInfoDto.UserEntryInfo.EntryScansUpload.Any())
                         {
-                            userEntryAdd = new UserEntryInfo
-                            {
-                                BusinessId = GuidUtil.Next(),
-                                Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
-                                ContractMain = requestBody.BaseInfoDto.UserEntryInfo.ContarctMain,
-                                EndTime = requestBody.BaseInfoDto.UserEntryInfo.EndTime,
-                                EntryScans = GuidUtil.Next(),
-                                EntryTime = requestBody.BaseInfoDto.UserEntryInfo.EntryTime,
-                                LaborCompany = requestBody.BaseInfoDto.UserEntryInfo.LaborCompany,
-                                EmploymentId = requestBody.BaseInfoDto.UserEntryInfo.EmploymentId,
-                                UserEntryId = requestBody.BId,
-                                ContractType = requestBody.BaseInfoDto.UserEntryInfo.ContractType
-                            };
-                            if (requestBody.BaseInfoDto.UserEntryInfo.EntryScansUpload != null && requestBody.BaseInfoDto.UserEntryInfo.EntryScansUpload.Any())
-                            {
-                                var ff = requestBody.BaseInfoDto.UserEntryInfo.EntryScansUpload;
-                                ff.ForEach(x => x.FileId = userEntryAdd.EntryScans);
-                                upLoadFiles.AddRange(ff);
-                            }
+                            var ff = requestBody.BaseInfoDto.UserEntryInfo.EntryScansUpload;
+                            ff.ForEach(x => x.FileId = userEntryAdd.EntryScans);
+                            upLoadFiles.AddRange(ff);
                         }
                     }
                     //家庭成员
@@ -934,7 +912,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                     }
                 }
                 if (userInfo != null) await _dbContext.Updateable(userInfo).ExecuteCommandAsync();
-                if (userEntry != null) await _dbContext.Updateable(userEntry).ExecuteCommandAsync();
+                if (userEntry != null) await _dbContext.Deleteable(userEntry).ExecuteCommandAsync();
                 if (husAdd != null && husAdd.Any()) await _dbContext.Insertable(husAdd).ExecuteCommandAsync();
                 if (ecsAdd != null && ecsAdd.Any()) await _dbContext.Insertable(ecsAdd).ExecuteCommandAsync();
                 if (husDel != null && husDel.Any()) await _dbContext.Deleteable(husDel).ExecuteCommandAsync();
@@ -1266,6 +1244,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
 
                 #region 文件保存
                 upLoadFiles.ForEach(x => x.BId = GuidUtil.Next());
+                upLoadFiles.ForEach(x => x.UserId = userInfo.BusinessId);
                 await UpdateFileAsync(upLoadFiles, userInfo.BusinessId);
                 #endregion
 
@@ -1821,7 +1800,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
         {
             EducationalBackgroundDetails ur = new();
             var userInfo = await GetUserInfoAsync(bId);
-            var edutab = await _dbContext.Queryable<EducationalBackground>().Where(t => t.IsDelete == 1 && t.BusinessId == userInfo.BusinessId).ToListAsync();
+            var edutab = await _dbContext.Queryable<EducationalBackground>().Where(t => t.IsDelete == 1 && t.QualificationId == userInfo.BusinessId).ToListAsync();
             //获取文件
             var fileIds = edutab.Select(x => x.QualificationScans.ToString()).ToList();
             var files = await _dbContext.Queryable<Files>().Where(t => fileIds.Contains(t.FileId.ToString())).ToListAsync();
