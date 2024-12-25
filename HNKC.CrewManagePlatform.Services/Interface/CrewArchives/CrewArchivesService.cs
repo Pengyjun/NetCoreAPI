@@ -1374,7 +1374,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
             {
                 rt.IsDelete = 0;
                 rt.DeleteReson = requestBody.DeactivateStatus.Value;
-                await _dbContext.Updateable(rt).WhereColumns(x => new { x.IsDelete, x.DeleteReson }).ExecuteCommandAsync();
+                await _dbContext.Updateable(rt).UpdateColumns(x => new { x.IsDelete, x.DeleteReson }).ExecuteCommandAsync();
                 return Result.Success("已删除");
             }
             else
@@ -1394,7 +1394,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
             {
                 rt.IsDelete = 0;
                 rt.DeleteReson = CrewStatusEnum.Normal;
-                await _dbContext.Updateable(rt).WhereColumns(x => new { x.IsDelete, x.DeleteReson }).ExecuteCommandAsync();
+                await _dbContext.Updateable(rt).UpdateColumns(x => new { x.IsDelete, x.DeleteReson }).ExecuteCommandAsync();
                 return Result.Success("已恢复");
             }
             else
@@ -1432,6 +1432,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                 shipWork.Postition = requestBody.Postition;
                 shipWork.WorkShipEndTime = requestBody.WorkShipEndTime;
                 shipWork.WorkShipEndTime = requestBody.WorkShipEndTime;
+                await _dbContext.Updateable(shipWork).ExecuteCommandAsync();
             }
 
             return Result.Success("调任成功");
