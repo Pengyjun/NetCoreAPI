@@ -18,6 +18,9 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CurrentUser
         [Required(ErrorMessage = "机构不能为空")]
         public string Oid { get; set; }
 
+        [Required(ErrorMessage = "工号不能为空")]
+        public string? WorkNumber { get; set; }
+
         /// <summary>
         /// 性别ID
         /// </summary>

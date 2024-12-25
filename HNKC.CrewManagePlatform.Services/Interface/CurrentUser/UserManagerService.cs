@@ -74,12 +74,12 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CurrentUser
                 var institution = await dbContext.Queryable<Institution>().Where(x => x.IsDelete == 1 && institutionBusinessId.Contains(x.BusinessId)).ToListAsync();
                 if (userInstitution.Count == 0)
                 {
-                    return Result.Fail("登录失败",(int)ResponseHttpCode.LoginFail);
+                    return Result.Fail("无权限请先分配权限",(int)ResponseHttpCode.LoginFail);
                 }
                 var roleBusinessId = userInstitution.Select(x => x.BusinessId).ToList();
                 if (roleBusinessId.Count == 0)
                 {
-                    return Result.Fail("登录失败", (int)ResponseHttpCode.LoginFail);
+                    return Result.Fail("无权限请先分配权限", (int)ResponseHttpCode.LoginFail);
                 }
                 //默认选择第一个角色登录
                 var firstRole = userInstitution.OrderBy(x => x.Created).FirstOrDefault();
@@ -144,7 +144,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CurrentUser
                     return Result.Success(data: userLoginResponse);
                 }
             }
-            return Result.Fail("登录失败", (int)ResponseHttpCode.LoginFail);
+            return Result.Fail("登录失败无效账号", (int)ResponseHttpCode.LoginFail);
             //HttpContentAccessFactory.Current.Response.Headers["Authorization"] = token;
         }
 
@@ -317,6 +317,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CurrentUser
                 Name = addUserRequest.Name,
                 Phone = addUserRequest.Phone,
                 Oid = addUserRequest.Oid,
+                WorkNumber = addUserRequest.WorkNumber,
                 Password = pwd,
                 IsInsert = 1,
                 Gender = addUserRequest.Gender.Value,
