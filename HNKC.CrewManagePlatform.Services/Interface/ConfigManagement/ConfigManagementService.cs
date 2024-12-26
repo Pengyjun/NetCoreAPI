@@ -217,7 +217,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.ConfigManagement
         /// <returns></returns>
         public async Task<Result> DeleteShipAsync(string id)
         {
-            var rt = await _dbContext.Queryable<OwnerShip>().FirstAsync(t => t.Id.ToString() == id && t.IsDelete == 1);
+            var rt = await _dbContext.Queryable<OwnerShip>().FirstAsync(t => t.BusinessId.ToString() == id && t.IsDelete == 1);
             if (rt != null)
             {
                 rt.IsDelete = 0;

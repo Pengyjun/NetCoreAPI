@@ -55,8 +55,8 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api.Controllers
         /// </summary>
         /// <param name="Id"></param>
         /// <returns></returns>
-        [HttpPost("DeleteShip")]
-        public async Task<Result> DeleteShipAsync([FromBody] string id)
+        [HttpGet("DeleteShip")]
+        public async Task<Result> DeleteShipAsync([FromQuery] string id)
         {
             return await _configManagementService.DeleteShipAsync(id);
         }
