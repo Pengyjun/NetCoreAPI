@@ -8,7 +8,11 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.Contract
     public class ContractSearch
     {
         /// <summary>
-        /// 
+        /// 用户业务id
+        /// </summary>
+        public string? BId { get; set; }
+        /// <summary>
+        /// 处理增改的业务主键id
         /// </summary>
         public string? Id { get; set; }
         /// <summary>
@@ -55,6 +59,30 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.Contract
         /// 
         /// </summary>
         public string? EmploymentTypeName { get; set; }
+        /// <summary>
+        /// 第一适任
+        /// </summary>
+        public string? FPosition { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
+        public string? FPositionName { get; set; }
+        /// <summary>
+        /// 第二适任
+        /// </summary>
+        public string? SPosition { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
+        public string? SPositionName { get; set; }
+        /// <summary>
+        /// 在船职务
+        /// </summary>
+        public string? OnBoardPosition { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
+        public string? OnBoardPositionName { get; set; }
         /// <summary>
         /// 合同类型
         /// </summary>

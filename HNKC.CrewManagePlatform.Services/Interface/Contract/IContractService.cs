@@ -16,10 +16,10 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Contract
         /// <returns></returns>
         Task<PageResult<ContractSearch>> SearchContractAsync(ContractRequest requestBody);
         /// <summary>
-        /// 续签详情
+        /// 合同续签
         /// </summary>
         /// <param name="requestBody"></param>
         /// <returns></returns>
-        Task<Result> ContractRenewalDetailsAsync(BaseRequest requestBody);
+        Task<Result> SaveContractAsync(ConntractRenewal requestBody);
     }
 }

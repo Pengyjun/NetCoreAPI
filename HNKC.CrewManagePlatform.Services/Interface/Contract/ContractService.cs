@@ -1,5 +1,4 @@
 ﻿using HNKC.CrewManagePlatform.Models.CommonResult;
-using HNKC.CrewManagePlatform.Models.Dtos;
 using HNKC.CrewManagePlatform.Models.Dtos.Contract;
 using HNKC.CrewManagePlatform.SqlSugars.Models;
 using HNKC.CrewManagePlatform.Utils;
@@ -38,6 +37,11 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Contract
                 .Select(x => new { x.UserEntryId, EndTime = SqlFunc.AggregateMax(x.EndTime) });
             var uentity = _dbContext.Queryable<UserEntryInfo>()
                 .InnerJoin(uentityFist, (x, y) => x.UserEntryId == y.UserEntryId && x.EndTime == y.EndTime);
+            var crewWorkShip = _dbContext.Queryable<WorkShip>()
+            .GroupBy(u => u.WorkShipId)
+            .Select(t => new { t.WorkShipId, WorkShipEndTime = SqlFunc.AggregateMax(t.WorkShipEndTime) });
+            var wShip = _dbContext.Queryable<WorkShip>()
+                .InnerJoin(crewWorkShip, (x, y) => x.WorkShipId == y.WorkShipId && x.WorkShipEndTime == y.WorkShipEndTime);
             #endregion
 
             var rr = await _dbContext.Queryable<User>()
@@ -45,10 +49,13 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Contract
                 .WhereIF(!string.IsNullOrEmpty(requestBody.KeyWords), t1 => requestBody.KeyWords.Contains(t1.Name) || requestBody.KeyWords.Contains(t1.Phone) || requestBody.KeyWords.Contains(t1.WorkNumber) || requestBody.KeyWords.Contains(t1.CardId))
                 .LeftJoin(uentity, (t1, t2) => t1.BusinessId == t2.UserEntryId)
                 .InnerJoin<OwnerShip>((t1, t2, t3) => t1.OnBoard == t3.BusinessId.ToString())
-                .WhereIF(!string.IsNullOrEmpty(requestBody.EmploymentType), (t1, t2, t3) => requestBody.EmploymentType == t2.EmploymentId)
-                .Select((t1, t2, t3) => new ContractSearch
+                .InnerJoin<CertificateOfCompetency>((t1, t2, t3, t4) => t1.BusinessId == t4.CertificateId)
+                .InnerJoin(wShip, (t1, t2, t3, t4, t5) => t1.BusinessId == t5.WorkShipId)
+                .WhereIF(!string.IsNullOrEmpty(requestBody.EmploymentType), (t1, t2, t3, t4, t5) => requestBody.EmploymentType == t2.EmploymentId)
+                .Select((t1, t2, t3, t4, t5) => new ContractSearch
                 {
-                    Id = t1.BusinessId.ToString(),
+                    BId = t1.BusinessId.ToString(),
+                    Id = t2.BusinessId.ToString(),
                     Country = t3.Country,
                     OnBoard = t1.OnBoard,
                     ShipType = t3.ShipType,
@@ -60,7 +67,10 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Contract
                     ContractType = t2.ContractType,
                     EmploymentType = t2.EmploymentId,
                     LaborCompany = t2.LaborCompany,
-                    CardId = t1.CardId
+                    CardId = t1.CardId,
+                    FPosition = t4.FPosition,
+                    SPosition = t4.SPosition,
+                    OnBoardPosition = t5.Postition
                 })
                 .ToPageListAsync(requestBody.PageIndex, requestBody.PageSize, total);
 
@@ -76,6 +86,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Contract
         {
             PageResult<ContractSearch> rt = new();
 
+            var position = await _dbContext.Queryable<Position>().Where(t => t.IsDelete == 1).ToListAsync();
             var empTable = await _dbContext.Queryable<EmploymentType>().Where(t => rr.Select(x => x.EmploymentType).Contains(t.BusinessId.ToString())).ToListAsync();
             var ownShipTable = await _dbContext.Queryable<OwnerShip>().Where(t => rr.Select(x => x.OnBoard).Contains(t.BusinessId.ToString())).ToListAsync();
             var countryTable = await _dbContext.Queryable<CountryRegion>().Where(t => rr.Select(x => x.Country).Contains(t.BusinessId.ToString())).ToListAsync();
@@ -89,6 +100,9 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Contract
                 u.ShipTypeName = EnumUtil.GetDescription(u.ShipType);
                 u.Age = CalculateAgeFromIdCard(u.CardId);
                 u.DueDays = TimeHelper.GetTimeSpan(Convert.ToDateTime(u.EndTime), DateTime.Now).Days + 1;
+                if (u.FPosition != null) u.FPositionName = position.FirstOrDefault(x => x.BusinessId.ToString() == u.FPosition)?.Name;
+                if (u.SPosition != null) u.SPositionName = position.FirstOrDefault(x => x.BusinessId.ToString() == u.SPosition)?.Name;
+                if (u.OnBoardPosition != null) u.OnBoardPositionName = position.FirstOrDefault(x => x.BusinessId.ToString() == u.OnBoardPosition)?.Name;
             }
 
             rt.List = rr;
@@ -129,62 +143,47 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Contract
 
         #region 合同续签
         /// <summary>
-        /// 合同 续签详情
+        /// 合同续签
         /// </summary>
+        /// <param name="requestBody"></param>
         /// <returns></returns>
-        public async Task<Result> ContractRenewalDetailsAsync(BaseRequest requestBody)
+        public async Task<Result> SaveContractAsync(ConntractRenewal requestBody)
         {
-            ConntractRenewalSearch rr = new();
-            var rt = await _dbContext.Queryable<User>()
-                .Where(t => t.IsLoginUser == 1 && requestBody.BId == t.BusinessId)
+            var newContract = await _dbContext.Queryable<UserEntryInfo>()
+                .Where(t => requestBody.Id == t.BusinessId.ToString())
+                .OrderByDescending(x => x.EndTime)
                 .FirstAsync();
-            if (rt != null)
+            if (requestBody.EntryTime < newContract.EndTime)
             {
-                #region 简易字段匹配
-                rr.UserName = rt.Name;
-                rr.WorkNumber = rt.WorkNumber;
-                #endregion
-                //适任职务
-                var position = await _dbContext.Queryable<Position>().ToListAsync();
-                var cerofcom = await _dbContext.Queryable<CertificateOfCompetency>().Where(t => t.CertificateId == rt.BusinessId).FirstAsync();
-                if (cerofcom != null)
-                {
-                    rr.FPositionName = position.FirstOrDefault(x => x.BusinessId.ToString() == cerofcom.FPosition)?.Name;
-                    rr.SPositionName = position.FirstOrDefault(x => x.BusinessId.ToString() == cerofcom.SPosition)?.Name;
-                }
-                //任职船舶
-                var ownShip = await _dbContext.Queryable<OwnerShip>().FirstAsync(t => t.BusinessId.ToString() == rt.OnBoard);
-                if (ownShip != null)
-                {
-                    rr.ShipTypeName = EnumUtil.GetDescription(ownShip.ShipType);
-                    rr.OnBoardName = ownShip?.ShipName;
-                }
-                //在船职务
-                var onBoardPosition = await _dbContext.Queryable<WorkShip>().Where(t => t.WorkShipId == rt.BusinessId).OrderByDescending(x => x.WorkShipEndTime).FirstAsync();
-                if (onBoardPosition != null)
-                {
-                    rr.OnBoardPositionName = position.FirstOrDefault(x => x.BusinessId.ToString() == onBoardPosition.Postition)?.Name;
-                }
-                //用工形式
-                var userEntity = await _dbContext.Queryable<UserEntryInfo>()
-                    .Where(t => t.UserEntryId == rt.BusinessId)
-                    .OrderByDescending(x => x.EndTime)
-                    .FirstAsync();
-                if (userEntity != null)
-                {
-                    var employ = await _dbContext.Queryable<EmploymentType>().FirstAsync(t => userEntity.EmploymentId == t.BusinessId.ToString());
-                    rr.EmploymentTypeName = employ?.Name;
-                    rr.LaborCompany = userEntity.LaborCompany;
-                    rr.ContractMain = userEntity.ContractMain;
-                    rr.ContractTypeName = EnumUtil.GetDescription(userEntity.ContractType);
-                    rr.EntryTime = userEntity.EntryTime.ToString("yyyy/MM/dd");
-                    rr.EndTime = userEntity.EndTime.ToString("yyyy/MM/dd");
-                }
-                return Result.Success(rr);
+                return Result.Fail("续签开始时间不能小于当前合同结束时间");
+            }
+            if (newContract != null)
+            {
+                newContract.EmploymentId = requestBody.EmploymentType;
+                newContract.LaborCompany = requestBody.LaborCompany;
+                newContract.ContractType = requestBody.ContractType;
+                newContract.EntryTime = requestBody.EntryTime;
+                newContract.EndTime = requestBody.EndTime;
+                newContract.ContractMain = requestBody.ContractMain;
+                await _dbContext.Updateable(newContract).ExecuteCommandAsync();
+                return Result.Success("续签更改成功");
             }
             else
             {
-                return Result.Fail("用户不存在");
+                var addContract = new UserEntryInfo
+                {
+                    Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                    BusinessId = GuidUtil.Next(),
+                    ContractMain = requestBody.ContractMain,
+                    ContractType = requestBody.ContractType,
+                    EmploymentId = requestBody.EmploymentType,
+                    EntryTime = requestBody.EntryTime,
+                    EndTime = requestBody.EndTime,
+                    LaborCompany = requestBody.LaborCompany,
+                    UserEntryId = requestBody.BId
+                };
+                await _dbContext.Insertable(addContract).ExecuteCommandAsync();
+                return Result.Success("续签成功");
             }
         }
         #endregion
