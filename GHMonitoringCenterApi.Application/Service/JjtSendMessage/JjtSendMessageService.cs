@@ -1510,7 +1510,7 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
         /// <returns></returns>
         public async Task<ResponseAjaxResult<JjtSendMessageMonitoringDayReportResponseDto>> JjtTextCardMsgDetailsAsync(int dateDay = 0)
         {
-            var timeOf = 20241126;//每个月的初始数
+            var timeOf = 20241226;//每个月的初始数
             #region 111
             var responseAjaxResult = new ResponseAjaxResult<JjtSendMessageMonitoringDayReportResponseDto>();
             var result = await dbContext.Queryable<TempTable>().FirstAsync();

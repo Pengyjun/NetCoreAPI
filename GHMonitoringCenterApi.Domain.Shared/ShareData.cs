@@ -83,6 +83,11 @@ namespace GHMonitoringCenterApi.Domain.Shared
             });
             return dataInits;
         }
+
+
+
+
+        public static string ProjectStatus = "cd3c6e83-1b7c-40c2-a415-5a44f13584cc,19050a4b-fe95-47cf-aafe-531d5894c88b,169c8afe-be81-4cbc-bfe7-61a40da0597b,75089b9a-b18b-442c-bfc8-fde4024d737f";
     }
 
     public class DataInit{

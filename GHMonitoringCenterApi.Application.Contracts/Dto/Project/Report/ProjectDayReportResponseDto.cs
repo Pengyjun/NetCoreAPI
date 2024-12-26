@@ -7,7 +7,10 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project
     /// </summary>
     public class ProjectDayReportResponseDto
     {
-
+        /// <summary>
+        /// 是否是必填日报  true是 false不是
+        /// </summary>
+        public bool? IsFillDay { get; set; }
         #region 新增两个字段
         /// <summary>
         /// 是否是重点项目   true是  fasle不是

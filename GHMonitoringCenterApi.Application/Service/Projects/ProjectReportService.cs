@@ -542,6 +542,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
         /// <returns></returns>
         public async Task<ResponseAjaxResult<ProjectDayReportResponseDto>> SearchProjectDayReportAsync(ProjectDayReportRequestDto model)
         {
+
             model.ResetModelProperty();
             var result = new ResponseAjaxResult<ProjectDayReportResponseDto>();
             var now = DateTime.Now;
@@ -559,6 +560,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             {
                 return result.FailResult(HttpStatusCode.DataNotEXIST, ResponseMessage.DATA_NOTEXIST_PROJECT);
             }
+           
             var dayReport = await GetDayReportAsync(model.ProjectId, dateDay);
             var resDayReport = new ProjectDayReportResponseDto();
             // 如日报对象不存在 返回默认空日报对象
@@ -670,7 +672,12 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             var sumMonthProjectPlanned = await SumMonthProjectPlannedAsync(model.ProjectId, dayTime);
             resDayReport.Construction.DayPlannedProductionAmount = Math.Round(sumMonthProjectPlanned.PlannedOutputValue / 30.5m, 2);
 
-
+            if (resDayReport != null)
+            {
+                var projectStauts = ShareData.ProjectStatus.Split(",", StringSplitOptions.RemoveEmptyEntries).ToList();
+                var count = projectStauts.Count(x => x == project.StatusId.Value.ToString());
+                resDayReport.IsFillDay = count > 0;
+            }
             resDayReport.DateDay = dateDay;
             resDayReport.ProjectId = model.ProjectId;
             resDayReport.ProjectName = project.Name;
@@ -6787,7 +6794,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
         /// <returns></returns>
         private async Task<Project?> GetProjectPartAsync(Guid projectId)
         {
-            return await _dbProject.AsQueryable().Where(t => t.Id == projectId && t.IsDelete == 1).Select(t => new Project() { Id = t.Id, PomId = t.PomId, Name = t.Name, Category = t.Category, CurrencyId = t.CurrencyId, TypeId = t.TypeId }).FirstAsync();
+            return await _dbProject.AsQueryable().Where(t => t.Id == projectId && t.IsDelete == 1).Select(t => new Project() { Id = t.Id, PomId = t.PomId, Name = t.Name, Category = t.Category, CurrencyId = t.CurrencyId, TypeId = t.TypeId,StatusId=t.StatusId }).FirstAsync();
         }
 
         /// <summary>
