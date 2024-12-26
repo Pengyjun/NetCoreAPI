@@ -29,9 +29,10 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api.Controllers
         /// <param name="requestBody"></param>
         /// <returns></returns>
         [HttpGet("SearchContract")]
-        public async Task<PageResult<ContractSearch>> SearchContractAsync([FromQuery] ContractRequest requestBody)
+        public async Task<IActionResult> SearchContractAsync([FromQuery] ContractRequest requestBody)
         {
-            return await _contractService.SearchContractAsync(requestBody);
+            var data = await _contractService.SearchContractAsync(requestBody);
+            return Ok(data);
         }
         /// <summary>
         /// 合同续签

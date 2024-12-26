@@ -150,19 +150,41 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Contract
         public async Task<Result> SaveContractAsync(ConntractRenewal requestBody)
         {
             var newContract = await _dbContext.Queryable<UserEntryInfo>()
-                .Where(t => requestBody.BId == t.UserEntryId)
+                .Where(t => requestBody.Id == t.BusinessId.ToString())
                 .OrderByDescending(x => x.EndTime)
                 .FirstAsync();
+            if (requestBody.EntryTime < newContract.EndTime)
+            {
+                return Result.Fail("续签开始时间不能小于当前合同结束时间");
+            }
             if (newContract != null)
             {
-                if (requestBody.EntryTime < newContract.EndTime)
-                {
-                    return Result.Fail("续签开始时间不能小于当前合同结束时间");
-                }
-
+                newContract.EmploymentId = requestBody.EmploymentType;
+                newContract.LaborCompany = requestBody.LaborCompany;
+                newContract.ContractType = requestBody.ContractType;
+                newContract.EntryTime = requestBody.EntryTime;
+                newContract.EndTime = requestBody.EndTime;
+                newContract.ContractMain = requestBody.ContractMain;
+                await _dbContext.Updateable(newContract).ExecuteCommandAsync();
+                return Result.Success("续签更改成功");
             }
-            return Result.Fail("无合同信息");
-
+            else
+            {
+                var addContract = new UserEntryInfo
+                {
+                    Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                    BusinessId = GuidUtil.Next(),
+                    ContractMain = requestBody.ContractMain,
+                    ContractType = requestBody.ContractType,
+                    EmploymentId = requestBody.EmploymentType,
+                    EntryTime = requestBody.EntryTime,
+                    EndTime = requestBody.EndTime,
+                    LaborCompany = requestBody.LaborCompany,
+                    UserEntryId = requestBody.BId
+                };
+                await _dbContext.Insertable(addContract).ExecuteCommandAsync();
+                return Result.Success("续签成功");
+            }
         }
         #endregion
     }
