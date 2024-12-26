@@ -51,6 +51,16 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api.Controllers
             return Ok(data);
         }
         /// <summary>
+        /// 删除船舶
+        /// </summary>
+        /// <param name="Id"></param>
+        /// <returns></returns>
+        [HttpPost("DeleteShip")]
+        public async Task<Result> DeleteShipAsync([FromBody] string id)
+        {
+            return await _configManagementService.DeleteShipAsync(id);
+        }
+        /// <summary>
         /// 提醒配置列表
         /// </summary>
         /// <returns></returns>

@@ -34,5 +34,11 @@ namespace HNKC.CrewManagePlatform.Services.Interface.ConfigManagement
         /// <param name="requestBody"></param>
         /// <returns></returns>
         Task<Result> SaveRemindSettingAsync(RemindRequest requestBody);
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        Task<Result> DeleteShipAsync(string id);
     }
 }

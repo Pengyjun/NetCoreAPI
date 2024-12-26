@@ -210,5 +210,21 @@ namespace HNKC.CrewManagePlatform.Services.Interface.ConfigManagement
             var attribute = (DescriptionAttribute)Attribute.GetCustomAttribute(field, typeof(DescriptionAttribute));
             return attribute != null ? attribute.Description : value.ToString();
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<Result> DeleteShipAsync(string id)
+        {
+            var rt = await _dbContext.Queryable<OwnerShip>().FirstAsync(t => t.Id.ToString() == id && t.IsDelete == 1);
+            if (rt != null)
+            {
+                rt.IsDelete = 0;
+                await _dbContext.Updateable(rt).UpdateColumns(x => x.IsDelete).ExecuteCommandAsync();
+                return Result.Success("删除成功");
+            }
+            return Result.Success("删除失败");
+        }
     }
 }
