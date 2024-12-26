@@ -5,10 +5,8 @@ using HNKC.CrewManagePlatform.Models.Enums;
 using HNKC.CrewManagePlatform.SqlSugars.Models;
 using HNKC.CrewManagePlatform.Utils;
 using SqlSugar;
-using System;
 using System.ComponentModel;
 using System.Globalization;
-using System.Linq;
 using System.Text.RegularExpressions;
 using UtilsSharp;
 
@@ -309,14 +307,15 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
             var onDutyCount = onBoard.Where(x => x.WorkShipEndTime <= DateTime.Now).Select(x => x.WorkShipId).Distinct().Count();//在船数
             var onDutyProp = totalCount == 0 ? 0 : Convert.ToInt32(onDutyCount / totalCount);
 
-            var waitCount = onBoard.Where(x => x.WorkShipEndTime > DateTime.Now).Select(x => x.WorkShipId).Distinct().Count();//待岗数
+            var otherCount = udtab.Where(x => x.DeleteReson != CrewStatusEnum.Normal && x.DeleteReson != CrewStatusEnum.XiuJia).Count();//离调退
+            var otherProp = totalCount == 0 ? 0 : Convert.ToInt32(otherCount / totalCount);
+
+            var waitCount = onBoard.Where(x => x.WorkShipEndTime > DateTime.Now).Select(x => x.WorkShipId).Distinct().Count() - otherCount;//待岗数 排掉休假 删除
             var waitProp = totalCount == 0 ? 0 : Convert.ToInt32(waitCount / totalCount);
 
             //var holidayCount = onBoard.Where(x => x.HolidayTime > DateTime.Now).Select(x => x.WorkShipId).Distinct().Count();//休假数
             //var holidayProp = totalCount == 0 ? 0 : Convert.ToInt32(holidayCount / totalCount);
 
-            var otherCount = udtab.Where(x => x.DeleteReson != CrewStatusEnum.Normal && x.DeleteReson != CrewStatusEnum.XiuJia).Count();//离调退
-            var otherProp = totalCount == 0 ? 0 : Convert.ToInt32(otherCount / totalCount);
 
             var rr = new CrewArchivesResponse
             {
@@ -1374,7 +1373,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
             {
                 rt.IsDelete = 0;
                 rt.DeleteReson = requestBody.DeactivateStatus.Value;
-                await _dbContext.Updateable(rt).WhereColumns(x => new { x.IsDelete, x.DeleteReson }).ExecuteCommandAsync();
+                await _dbContext.Updateable(rt).UpdateColumns(x => new { x.IsDelete, x.DeleteReson }).ExecuteCommandAsync();
                 return Result.Success("已删除");
             }
             else
@@ -1392,9 +1391,9 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
             var rt = await _dbContext.Queryable<User>().FirstAsync(t => t.IsDelete == 0 && t.BusinessId == requestBody.BId);
             if (rt != null)
             {
-                rt.IsDelete = 0;
+                rt.IsDelete = 1;
                 rt.DeleteReson = CrewStatusEnum.Normal;
-                await _dbContext.Updateable(rt).WhereColumns(x => new { x.IsDelete, x.DeleteReson }).ExecuteCommandAsync();
+                await _dbContext.Updateable(rt).UpdateColumns(x => new { x.IsDelete, x.DeleteReson }).ExecuteCommandAsync();
                 return Result.Success("已恢复");
             }
             else
@@ -1432,6 +1431,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                 shipWork.Postition = requestBody.Postition;
                 shipWork.WorkShipEndTime = requestBody.WorkShipEndTime;
                 shipWork.WorkShipEndTime = requestBody.WorkShipEndTime;
+                await _dbContext.Updateable(shipWork).ExecuteCommandAsync();
             }
 
             return Result.Success("调任成功");

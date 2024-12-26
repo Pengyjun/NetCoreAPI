@@ -1,4 +1,5 @@
-﻿using HNKC.CrewManagePlatform.Models.Dtos.Contract;
+﻿using HNKC.CrewManagePlatform.Models.CommonResult;
+using HNKC.CrewManagePlatform.Models.Dtos.Contract;
 using HNKC.CrewManagePlatform.Services.Interface.Contract;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -10,7 +11,7 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api.Controllers
     /// </summary>
     [Route("api/[controller]")]
     [ApiController]
-    //[Authorize]
+    [Authorize]
     public class ContractController : BaseController
     {
         private readonly IContractService _contractService;
@@ -28,10 +29,9 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api.Controllers
         /// <param name="requestBody"></param>
         /// <returns></returns>
         [HttpGet("SearchContract")]
-        public async Task<IActionResult> SearchContractAsync([FromQuery] ContractRequest requestBody)
+        public async Task<PageResult<ContractSearch>> SearchContractAsync([FromQuery] ContractRequest requestBody)
         {
-            var data = await _contractService.SearchContractAsync(requestBody);
-            return Ok(data);
+            return await _contractService.SearchContractAsync(requestBody);
         }
 
     }

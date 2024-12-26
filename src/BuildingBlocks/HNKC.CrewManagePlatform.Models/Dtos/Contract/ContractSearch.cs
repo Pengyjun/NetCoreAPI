@@ -35,11 +35,18 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.Contract
         /// 所在国家
         /// </summary>
         public string? Country { get; set; }
-        public List<int>? Params { get; set; }
         /// <summary>
         /// 
         /// </summary>
         public string? CountryName { get; set; }
+        /// <summary>
+        /// 所在船舶
+        /// </summary>
+        public string? OnBoard { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
+        public string? OnBoardName { get; set; }
         /// <summary>
         /// 用工形式
         /// </summary>
@@ -64,6 +71,10 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.Contract
         /// 劳务公司
         /// </summary>
         public string? LaborCompany { get; set; }
+        /// <summary>
+        /// 身份证
+        /// </summary>
+        public string? CardId { get; set; }
         /// <summary>
         /// 开始时间
         /// </summary>
