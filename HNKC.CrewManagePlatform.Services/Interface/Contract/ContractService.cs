@@ -22,6 +22,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Contract
         {
             this._dbContext = dbContext;
         }
+        #region 合同列表
         /// <summary>
         /// 合同列表
         /// </summary>
@@ -36,6 +37,11 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Contract
                 .Select(x => new { x.UserEntryId, EndTime = SqlFunc.AggregateMax(x.EndTime) });
             var uentity = _dbContext.Queryable<UserEntryInfo>()
                 .InnerJoin(uentityFist, (x, y) => x.UserEntryId == y.UserEntryId && x.EndTime == y.EndTime);
+            var crewWorkShip = _dbContext.Queryable<WorkShip>()
+            .GroupBy(u => u.WorkShipId)
+            .Select(t => new { t.WorkShipId, WorkShipEndTime = SqlFunc.AggregateMax(t.WorkShipEndTime) });
+            var wShip = _dbContext.Queryable<WorkShip>()
+                .InnerJoin(crewWorkShip, (x, y) => x.WorkShipId == y.WorkShipId && x.WorkShipEndTime == y.WorkShipEndTime);
             #endregion
 
             var rr = await _dbContext.Queryable<User>()
@@ -43,10 +49,13 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Contract
                 .WhereIF(!string.IsNullOrEmpty(requestBody.KeyWords), t1 => requestBody.KeyWords.Contains(t1.Name) || requestBody.KeyWords.Contains(t1.Phone) || requestBody.KeyWords.Contains(t1.WorkNumber) || requestBody.KeyWords.Contains(t1.CardId))
                 .LeftJoin(uentity, (t1, t2) => t1.BusinessId == t2.UserEntryId)
                 .InnerJoin<OwnerShip>((t1, t2, t3) => t1.OnBoard == t3.BusinessId.ToString())
-                .WhereIF(!string.IsNullOrEmpty(requestBody.EmploymentType), (t1, t2, t3) => requestBody.EmploymentType == t2.EmploymentId)
-                .Select((t1, t2, t3) => new ContractSearch
+                .InnerJoin<CertificateOfCompetency>((t1, t2, t3, t4) => t1.BusinessId == t4.CertificateId)
+                .InnerJoin(wShip, (t1, t2, t3, t4, t5) => t1.BusinessId == t5.WorkShipId)
+                .WhereIF(!string.IsNullOrEmpty(requestBody.EmploymentType), (t1, t2, t3, t4, t5) => requestBody.EmploymentType == t2.EmploymentId)
+                .Select((t1, t2, t3, t4, t5) => new ContractSearch
                 {
-                    Id = t1.BusinessId.ToString(),
+                    BId = t1.BusinessId.ToString(),
+                    Id = t2.BusinessId.ToString(),
                     Country = t3.Country,
                     OnBoard = t1.OnBoard,
                     ShipType = t3.ShipType,
@@ -58,7 +67,10 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Contract
                     ContractType = t2.ContractType,
                     EmploymentType = t2.EmploymentId,
                     LaborCompany = t2.LaborCompany,
-                    CardId = t1.CardId
+                    CardId = t1.CardId,
+                    FPosition = t4.FPosition,
+                    SPosition = t4.SPosition,
+                    OnBoardPosition = t5.Postition
                 })
                 .ToPageListAsync(requestBody.PageIndex, requestBody.PageSize, total);
 
@@ -74,6 +86,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Contract
         {
             PageResult<ContractSearch> rt = new();
 
+            var position = await _dbContext.Queryable<Position>().Where(t => t.IsDelete == 1).ToListAsync();
             var empTable = await _dbContext.Queryable<EmploymentType>().Where(t => rr.Select(x => x.EmploymentType).Contains(t.BusinessId.ToString())).ToListAsync();
             var ownShipTable = await _dbContext.Queryable<OwnerShip>().Where(t => rr.Select(x => x.OnBoard).Contains(t.BusinessId.ToString())).ToListAsync();
             var countryTable = await _dbContext.Queryable<CountryRegion>().Where(t => rr.Select(x => x.Country).Contains(t.BusinessId.ToString())).ToListAsync();
@@ -87,13 +100,15 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Contract
                 u.ShipTypeName = EnumUtil.GetDescription(u.ShipType);
                 u.Age = CalculateAgeFromIdCard(u.CardId);
                 u.DueDays = TimeHelper.GetTimeSpan(Convert.ToDateTime(u.EndTime), DateTime.Now).Days + 1;
+                if (u.FPosition != null) u.FPositionName = position.FirstOrDefault(x => x.BusinessId.ToString() == u.FPosition)?.Name;
+                if (u.SPosition != null) u.SPositionName = position.FirstOrDefault(x => x.BusinessId.ToString() == u.SPosition)?.Name;
+                if (u.OnBoardPosition != null) u.OnBoardPositionName = position.FirstOrDefault(x => x.BusinessId.ToString() == u.OnBoardPosition)?.Name;
             }
 
             rt.List = rr;
             rt.TotalCount = total;
             return rt;
         }
-
         /// <summary>
         /// 通过身份证与当前日期计算年龄
         /// </summary>
@@ -124,5 +139,31 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Contract
 
             return age;
         }
+        #endregion
+
+        #region 合同续签
+        /// <summary>
+        /// 合同续签
+        /// </summary>
+        /// <param name="requestBody"></param>
+        /// <returns></returns>
+        public async Task<Result> SaveContractAsync(ConntractRenewal requestBody)
+        {
+            var newContract = await _dbContext.Queryable<UserEntryInfo>()
+                .Where(t => requestBody.BId == t.UserEntryId)
+                .OrderByDescending(x => x.EndTime)
+                .FirstAsync();
+            if (newContract != null)
+            {
+                if (requestBody.EntryTime < newContract.EndTime)
+                {
+                    return Result.Fail("续签开始时间不能小于当前合同结束时间");
+                }
+
+            }
+            return Result.Fail("无合同信息");
+
+        }
+        #endregion
     }
 }

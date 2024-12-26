@@ -33,6 +33,16 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api.Controllers
         {
             return await _contractService.SearchContractAsync(requestBody);
         }
+        /// <summary>
+        /// 合同续签
+        /// </summary>
+        /// <param name="requestBody"></param>
+        /// <returns></returns>
+        [HttpPost("SaveContract")]
+        public async Task<Result> SaveContractAsync([FromBody] ConntractRenewal requestBody)
+        {
+            return await _contractService.SaveContractAsync(requestBody);
+        }
 
     }
 }
