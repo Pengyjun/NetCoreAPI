@@ -129,7 +129,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Contract
                 .Where(t => requestBody.Id == t.BusinessId.ToString())
                 .OrderByDescending(x => x.EndTime)
                 .FirstAsync();
-            if (requestBody.EntryTime < newContract.EndTime)
+            if (requestBody.StartTime < newContract.EndTime)
             {
                 return Result.Fail("续签开始时间不能小于当前合同结束时间");
             }
@@ -138,7 +138,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Contract
                 newContract.EmploymentId = requestBody.EmploymentType;
                 newContract.LaborCompany = requestBody.LaborCompany;
                 newContract.ContractType = requestBody.ContractType;
-                newContract.EntryTime = requestBody.EntryTime;
+                newContract.EntryTime = requestBody.StartTime;
                 newContract.EndTime = requestBody.EndTime;
                 newContract.ContractMain = requestBody.ContractMain;
                 await _dbContext.Updateable(newContract).ExecuteCommandAsync();
@@ -153,7 +153,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Contract
                     ContractMain = requestBody.ContractMain,
                     ContractType = requestBody.ContractType,
                     EmploymentId = requestBody.EmploymentType,
-                    EntryTime = requestBody.EntryTime,
+                    EntryTime = requestBody.StartTime,
                     EndTime = requestBody.EndTime,
                     LaborCompany = requestBody.LaborCompany,
                     UserEntryId = requestBody.BId

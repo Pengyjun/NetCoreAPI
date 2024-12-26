@@ -120,9 +120,9 @@ namespace HNKC.CrewManagePlatform.Services.Interface
             InstitutionTree currentNode = null;
             if (instrturionTree.Count != 0)
             {
-                var grule = instrturionTree.First().Grule;
-                var arr = grule.Split("-", StringSplitOptions.RemoveEmptyEntries);
-                for (int i = 4; i < arr.Length; i++)
+               var grule=instrturionTree.First().Grule;
+               var arr= grule.Split("-", StringSplitOptions.RemoveEmptyEntries);
+                for (int i =4; i < arr.Length-1; i++)
                 {
                     if (i == 4 && rootNode == null)
                     {
@@ -141,12 +141,17 @@ namespace HNKC.CrewManagePlatform.Services.Interface
                             currentNode.Nodes.Add(childNode);
                             currentNode = childNode;
                         }
+                      
                     }
-
-                    //if (i==(arr.Length - 2))
-                    //{
-                    //    currentNode.Nodes = instrturionTree;
-                    //}
+                    
+                    if (i == (arr.Length - 2))
+                    {
+                        if (currentNode == null)
+                        {
+                            currentNode = rootNode;
+                        }
+                        currentNode.Nodes = instrturionTree;
+                    }
                 }
             }
             return Result.Success(data: rootNode, "响应成功");

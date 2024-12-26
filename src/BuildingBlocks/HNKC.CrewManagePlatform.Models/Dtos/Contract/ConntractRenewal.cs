@@ -29,7 +29,7 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.Contract
         public string? LaborCompany { get; set; }
         /// 开始时间
         /// </summary>
-        public DateTime EntryTime { get; set; }
+        public DateTime StartTime { get; set; }
         /// <summary>
         /// 结束时间
         /// </summary>
