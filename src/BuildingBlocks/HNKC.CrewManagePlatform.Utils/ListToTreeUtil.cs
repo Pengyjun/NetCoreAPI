@@ -12,6 +12,7 @@ namespace HNKC.CrewManagePlatform.Util
         /// </summary>
         private List<string> AllNodes = new List<string>();
 
+        #region 获取当前机构下的所有子节点数据 （平级关系）
         /// <summary>
         /// 获取当前机构下的所有子节点数据 （平级关系）
         /// </summary>
@@ -28,6 +29,7 @@ namespace HNKC.CrewManagePlatform.Util
             }
             return AllNodes;
         }
+        #endregion
 
         #region  获取当前机构下的所有子节点数据 （树形关系） 适用于直接关系的 没有额外的条件 
         /// <summary>
@@ -82,12 +84,13 @@ namespace HNKC.CrewManagePlatform.Util
         public string Name { get; set; }
         public string ShortName { get; set; }
         public string Sno { get; set; }
+        public string Grule { get; set; }
 
         public Guid? BusinessId { get; set; }
         /// <summary>
         /// 当前节点下的所有节点（树形关系）
         /// </summary>
-        public List<InstitutionTree> Nodes { get; set; }
+        public List<InstitutionTree> Nodes { get; set; }= new List<InstitutionTree>();
     }
 
     /// <summary>

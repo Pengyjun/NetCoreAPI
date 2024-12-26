@@ -104,22 +104,46 @@ namespace HNKC.CrewManagePlatform.Services.Interface
                      ShortName = x.ShortName,
                      Oid = x.Oid,
                      Sno = x.Sno,
+                     Grule = x.Grule,
                      BusinessId = x.BusinessId
                  })
                 .ToListAsync();
+            //获取树形
             var instrturionTree = new ListToTreeUtil().GetTree(userInfo.Oid, allInstitution);
-            var rootNode = allInstitution.Where(x => x.Oid == "101162350").FirstOrDefault();
-            rootNode.Nodes = instrturionTree;
-
+           
+            InstitutionTree rootNode = null;
+            InstitutionTree currentNode = null;
             if (instrturionTree.Count != 0)
-            { 
-               //instrturionTree.First().
+            {
+               var grule=instrturionTree.First().Grule;
+               var arr= grule.Split("-", StringSplitOptions.RemoveEmptyEntries);
+                for (int i =4; i < arr.Length; i++)
+                {
+                    if (i == 4&&rootNode==null)
+                    {
+                        rootNode=allInstitution.First(x => x.Oid == arr[i]);
+                    }
+                    else {
+                        var childNode = allInstitution.First(x => x.Oid == arr[i]);
+                        if (currentNode == null)
+                        {
+                            currentNode = childNode;
+                            rootNode.Nodes.Add(currentNode);
+                        }
+                        else {
+                            currentNode.Nodes.Add(childNode);
+                            currentNode= childNode;
+                        }
+                    }
+                   
+                    if (i==(arr.Length - 1))
+                    {
+                        currentNode.Nodes = instrturionTree;
+                    }
+                }
             }
-
-
             return Result.Success(data: rootNode, "响应成功");
             #endregion
-
 
         }
 
