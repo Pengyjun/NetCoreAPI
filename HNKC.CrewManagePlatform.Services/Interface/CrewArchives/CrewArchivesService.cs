@@ -1409,7 +1409,9 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
         public async Task<Result> CrewTransferAsync(CrewTransferRequest requestBody)
         {
             //前端自己调用任职船舶接口  这里只处理调任逻辑
-            var shipWork = await _dbContext.Queryable<WorkShip>().FirstAsync(t => t.IsDelete == 1 && t.BusinessId == requestBody.BId);
+            var shipWork = await _dbContext.Queryable<WorkShip>()
+                .OrderByDescending(x => x.WorkShipEndTime)
+                .FirstAsync(t => t.IsDelete == 1 && t.WorkShipId == requestBody.BId);
             if (shipWork != null)
             {
                 ////主表 删除状态清空
