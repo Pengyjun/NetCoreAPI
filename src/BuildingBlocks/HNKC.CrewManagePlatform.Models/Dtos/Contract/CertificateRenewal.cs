@@ -1,4 +1,5 @@
-﻿using HNKC.CrewManagePlatform.Models.Enums;
+﻿using HNKC.CrewManagePlatform.Models.Dtos.CrewArchives;
+using HNKC.CrewManagePlatform.Models.Enums;
 
 namespace HNKC.CrewManagePlatform.Models.Dtos.Contract
 {
@@ -39,7 +40,7 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.Contract
         /// <summary>
         /// 第一适任证扫描件
         /// </summary>
-        public Guid? FScans { get; set; }
+        public List<UploadResponse>? FScans { get; set; }
         /// <summary>
         /// 第二适任证
         /// 证书编号
@@ -64,7 +65,7 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.Contract
         /// <summary>
         /// 第二适任证扫描件
         /// </summary>
-        public Guid? SScans { get; set; }
+        public List<UploadResponse>? SScans { get; set; }
 
         #region 培训合格证
         /// <summary>
@@ -111,7 +112,7 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.Contract
         /// <summary>
         /// 扫描件 
         /// </summary>
-        public Guid? TrainingScans { get; set; }
+        public List<UploadResponse>? TrainingScans { get; set; }
         #endregion
 
         #region 健康证
@@ -131,7 +132,7 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.Contract
         /// <summary>
         /// 扫描件
         /// </summary>
-        public Guid? HealthScans { get; set; }
+        public List<UploadResponse>? HealthScans { get; set; }
         #endregion
 
         #region 海员证
@@ -151,7 +152,7 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.Contract
         /// <summary>
         /// 扫描件  
         /// </summary>
-        public Guid? SeamanScans { get; set; }
+        public List<UploadResponse>? SeamanScans { get; set; }
         #endregion
 
         #region 护照
@@ -171,7 +172,7 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.Contract
         /// <summary>
         /// 扫描件 
         /// </summary>
-        public Guid? PassportScans { get; set; }
+        public List<UploadResponse>? PassportScans { get; set; }
         #endregion
     }
 }

@@ -433,6 +433,10 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                         {
                             return Result.Fail("家庭成员已经绑定过，请先删除该/注销成员");
                         }
+                        if (!ValidatePhone(item.Phone))
+                        {
+                            return Result.Fail("手机号错误");
+                        }
                         hus.Add(new FamilyUser
                         {
                             Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
@@ -456,6 +460,10 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                         if (ef != null)
                         {
                             return Result.Fail("应急联系人已经绑定过，请先删除/注销该成员");
+                        }
+                        if (!ValidatePhone(item.Phone))
+                        {
+                            return Result.Fail("手机号错误");
                         }
                         ecs.Add(new EmergencyContacts
                         {
@@ -888,6 +896,10 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                         husDel = await _dbContext.Queryable<FamilyUser>().Where(t => t.FamilyId == userInfo.BusinessId).ToListAsync();
                         foreach (var item in requestBody.BaseInfoDto.HomeUser)
                         {
+                            if (!ValidatePhone(item.Phone))
+                            {
+                                return Result.Fail("手机号错误");
+                            }
                             husAdd.Add(new FamilyUser
                             {
                                 Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
@@ -906,6 +918,10 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                         ecsDel = await _dbContext.Queryable<EmergencyContacts>().Where(t => t.EmergencyContactId == userInfo.BusinessId).ToListAsync();
                         foreach (var item in requestBody.BaseInfoDto.EmergencyContacts)
                         {
+                            if (!ValidatePhone(item.Phone))
+                            {
+                                return Result.Fail("手机号错误");
+                            }
                             ecsAdd.Add(new EmergencyContacts
                             {
                                 Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),

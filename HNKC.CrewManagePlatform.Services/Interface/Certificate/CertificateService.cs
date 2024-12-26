@@ -1,5 +1,4 @@
 ﻿using HNKC.CrewManagePlatform.Models.CommonResult;
-using HNKC.CrewManagePlatform.Models.Dtos;
 using HNKC.CrewManagePlatform.Models.Dtos.Contract;
 using HNKC.CrewManagePlatform.Models.Enums;
 using HNKC.CrewManagePlatform.SqlSugars.Models;
@@ -136,7 +135,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Certificate
                 if (u.OnBoardPosition != null) u.OnBoardPositionName = position.FirstOrDefault(x => x.BusinessId.ToString() == u.OnBoardPosition)?.Name;
             }
 
-            rt.List = rr;
+            rt.List = rr.OrderByDescending(x => x.DueDays);
             rt.TotalCount = total;
             return rt;
         }
@@ -157,27 +156,150 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Certificate
                 switch (requestBody.Certificates)
                 {
                     case CertificatesEnum.FCertificate:
-
+                        cerFirst.FCertificate = requestBody.FCertificate;
+                        cerFirst.FNavigationArea = requestBody.FNavigationArea;
+                        cerFirst.FPosition = requestBody.FPosition;
+                        cerFirst.FSignTime = requestBody.FSignTime;
+                        cerFirst.FEffectiveTime = requestBody.FEffectiveTime;
+                        if (requestBody.FScans != null && requestBody.FScans.Any())
+                        {
+                            var files = await _dbContext.Queryable<Files>().Where(t => t.FileId == cerFirst.FScans).ToListAsync();
+                            await _dbContext.Deleteable(files).ExecuteCommandAsync();
+                            cerFirst.FScans = GuidUtil.Next();
+                            requestBody.FScans.ForEach(x => x.FileId = cerFirst.FScans);
+                            await _baseService.InsertFileAsync(requestBody.FScans, Guid.Parse(requestBody.BId));
+                        }
+                        await _dbContext.Updateable(cerFirst).UpdateColumns(x => new
+                        {
+                            x.FCertificate,
+                            x.FNavigationArea,
+                            x.FPosition,
+                            x.FSignTime,
+                            x.FScans,
+                            x.FEffectiveTime
+                        }).ExecuteCommandAsync();
                         break;
                     case CertificatesEnum.SCertificate:
-
+                        cerFirst.SCertificate = requestBody.SCertificate;
+                        cerFirst.SNavigationArea = requestBody.SNavigationArea;
+                        cerFirst.SPosition = requestBody.SPosition;
+                        cerFirst.SSignTime = requestBody.SSignTime;
+                        cerFirst.SEffectiveTime = requestBody.SEffectiveTime;
+                        if (requestBody.SScans != null && requestBody.SScans.Any())
+                        {
+                            var files = await _dbContext.Queryable<Files>().Where(t => t.FileId == cerFirst.SScans).ToListAsync();
+                            await _dbContext.Deleteable(files).ExecuteCommandAsync();
+                            cerFirst.SScans = GuidUtil.Next();
+                            requestBody.SScans.ForEach(x => x.FileId = cerFirst.SScans);
+                            await _baseService.InsertFileAsync(requestBody.SScans, Guid.Parse(requestBody.BId));
+                        }
+                        await _dbContext.Updateable(cerFirst).UpdateColumns(x => new
+                        {
+                            x.SCertificate,
+                            x.SNavigationArea,
+                            x.SPosition,
+                            x.SSignTime,
+                            x.SScans,
+                            x.SEffectiveTime
+                        }).ExecuteCommandAsync();
                         break;
                     case CertificatesEnum.PXHGZ:
-
+                        cerFirst.TrainingCertificate = requestBody.TrainingCertificate;
+                        cerFirst.TrainingSignTime = requestBody.TrainingSignTime;
+                        cerFirst.Z01EffectiveTime = requestBody.Z01EffectiveTime;
+                        cerFirst.Z07EffectiveTime = requestBody.Z07EffectiveTime;
+                        cerFirst.Z08EffectiveTime = requestBody.Z08EffectiveTime;
+                        cerFirst.Z04EffectiveTime = requestBody.Z04EffectiveTime;
+                        cerFirst.Z05EffectiveTime = requestBody.Z05EffectiveTime;
+                        cerFirst.Z02EffectiveTime = requestBody.Z02EffectiveTime;
+                        cerFirst.Z06EffectiveTime = requestBody.Z06EffectiveTime;
+                        cerFirst.Z09EffectiveTime = requestBody.Z09EffectiveTime;
+                        if (requestBody.TrainingScans != null && requestBody.TrainingScans.Any())
+                        {
+                            var files = await _dbContext.Queryable<Files>().Where(t => t.FileId == cerFirst.SScans).ToListAsync();
+                            await _dbContext.Deleteable(files).ExecuteCommandAsync();
+                            cerFirst.TrainingScans = GuidUtil.Next();
+                            requestBody.TrainingScans.ForEach(x => x.FileId = cerFirst.TrainingScans);
+                            await _baseService.InsertFileAsync(requestBody.TrainingScans, Guid.Parse(requestBody.BId));
+                        }
+                        await _dbContext.Updateable(cerFirst).UpdateColumns(x => new
+                        {
+                            x.TrainingCertificate,
+                            x.TrainingSignTime,
+                            x.Z01EffectiveTime,
+                            x.Z07EffectiveTime,
+                            x.Z04EffectiveTime,
+                            x.Z05EffectiveTime,
+                            x.Z02EffectiveTime,
+                            x.Z06EffectiveTime,
+                            x.Z09EffectiveTime,
+                            x.Z08EffectiveTime,
+                            x.TrainingScans
+                        }).ExecuteCommandAsync();
                         break;
                     case CertificatesEnum.JKZ:
-
+                        cerFirst.HealthCertificate = requestBody.HealthCertificate;
+                        cerFirst.HealthSignTime = requestBody.HealthSignTime;
+                        cerFirst.HealthEffectiveTime = requestBody.HealthEffectiveTime;
+                        if (requestBody.HealthScans != null && requestBody.HealthScans.Any())
+                        {
+                            var files = await _dbContext.Queryable<Files>().Where(t => t.FileId == cerFirst.HealthScans).ToListAsync();
+                            await _dbContext.Deleteable(files).ExecuteCommandAsync();
+                            cerFirst.HealthScans = GuidUtil.Next();
+                            requestBody.HealthScans.ForEach(x => x.FileId = cerFirst.HealthScans);
+                            await _baseService.InsertFileAsync(requestBody.HealthScans, Guid.Parse(requestBody.BId));
+                        }
+                        await _dbContext.Updateable(cerFirst).UpdateColumns(x => new
+                        {
+                            x.HealthCertificate,
+                            x.HealthSignTime,
+                            x.HealthEffectiveTime,
+                            x.HealthScans
+                        }).ExecuteCommandAsync();
                         break;
                     case CertificatesEnum.HYZ:
-
+                        cerFirst.SeamanCertificate = requestBody.HealthCertificate;
+                        cerFirst.SeamanSignTime = requestBody.HealthSignTime;
+                        cerFirst.SeamanEffectiveTime = requestBody.HealthEffectiveTime;
+                        if (requestBody.SeamanScans != null && requestBody.SeamanScans.Any())
+                        {
+                            var files = await _dbContext.Queryable<Files>().Where(t => t.FileId == cerFirst.SeamanScans).ToListAsync();
+                            await _dbContext.Deleteable(files).ExecuteCommandAsync();
+                            cerFirst.SeamanScans = GuidUtil.Next();
+                            requestBody.SeamanScans.ForEach(x => x.FileId = cerFirst.SeamanScans);
+                            await _baseService.InsertFileAsync(requestBody.SeamanScans, Guid.Parse(requestBody.BId));
+                        }
+                        await _dbContext.Updateable(cerFirst).UpdateColumns(x => new
+                        {
+                            x.SeamanCertificate,
+                            x.SeamanSignTime,
+                            x.SeamanEffectiveTime,
+                            x.SeamanScans
+                        }).ExecuteCommandAsync();
                         break;
                     case CertificatesEnum.HZ:
-
+                        cerFirst.PassportCertificate = requestBody.PassportCertificate;
+                        cerFirst.PassportSignTime = requestBody.PassportSignTime;
+                        cerFirst.PassportEffectiveTime = requestBody.PassportEffectiveTime;
+                        if (requestBody.PassportScans != null && requestBody.PassportScans.Any())
+                        {
+                            var files = await _dbContext.Queryable<Files>().Where(t => t.FileId == cerFirst.PassportScans).ToListAsync();
+                            await _dbContext.Deleteable(files).ExecuteCommandAsync();
+                            cerFirst.PassportScans = GuidUtil.Next();
+                            requestBody.PassportScans.ForEach(x => x.FileId = cerFirst.PassportScans);
+                            await _baseService.InsertFileAsync(requestBody.PassportScans, Guid.Parse(requestBody.BId));
+                        }
+                        await _dbContext.Updateable(cerFirst).UpdateColumns(x => new
+                        {
+                            x.PassportCertificate,
+                            x.PassportSignTime,
+                            x.PassportEffectiveTime,
+                            x.PassportScans
+                        }).ExecuteCommandAsync();
                         break;
                 }
-
             }
-            return Result.Success();
+            return Result.Success("续签成功");
         }
 
         #endregion
