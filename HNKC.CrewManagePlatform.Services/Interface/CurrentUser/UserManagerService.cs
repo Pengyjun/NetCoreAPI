@@ -14,6 +14,7 @@ using NetTaste;
 using SqlSugar;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.IO;
 using System.Linq;
 using System.Security.Claims;
@@ -115,6 +116,12 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CurrentUser
                        
                     }
                     var firstRoleLogin = userLoginResponse.RoleList.Where(x => x.RoleBusinessId == firstRole.BusinessId).FirstOrDefault();
+                    //激活角色标识
+                    if (firstRoleLogin!=null)
+                    {
+                        firstRoleLogin.IsActivate = true;
+                    }
+                    
                     ////切换角色
                     //if (userLoginRequest.RoleBusinessId.HasValue)
                     //{
@@ -189,7 +196,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CurrentUser
                             IsAdmin = roleInfo?.IsAdmin,
                             IsApprove = roleInfo?.IsApprove,
                             Name = roleInfo?.Name,
-                            Oid = institutionInfo?.Oid
+                            Oid = institutionInfo?.Oid,
                         };
                         userLoginResponse.RoleList.Add(role);
                     }
@@ -200,7 +207,11 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CurrentUser
                 {
                     return Result.Fail("角色切换失败;当前用户不存在角色", (int)ResponseHttpCode.LoginFail);
                 }
-  
+                var roleResponse= userLoginResponse.RoleList.Where(x => x.RoleBusinessId == loginRole.BusinessId).FirstOrDefault();
+                if (roleResponse != null)
+                {
+                    roleResponse.IsActivate = true;
+                }
                 //默认存第一个角色信息
                 Claim[] claims = new Claim[]
                 {
