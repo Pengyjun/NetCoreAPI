@@ -1,5 +1,6 @@
 ﻿using HNKC.CrewManagePlatform.Models.CommonResult;
 using HNKC.CrewManagePlatform.Models.Dtos.Contract;
+using HNKC.CrewManagePlatform.Models.Enums;
 using HNKC.CrewManagePlatform.SqlSugars.Models;
 using HNKC.CrewManagePlatform.Utils;
 using SqlSugar;
@@ -70,7 +71,9 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Contract
                     CardId = t1.CardId,
                     FPosition = t4.FPosition,
                     SPosition = t4.SPosition,
-                    OnBoardPosition = t5.Postition
+                    OnBoardPosition = t5.Postition,
+                    WorkShipStartTime = t5.WorkShipStartTime,
+                    DeleteResonEnum = t1.DeleteReson
                 })
                 .ToPageListAsync(requestBody.PageIndex, requestBody.PageSize, total);
 
@@ -93,6 +96,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Contract
 
             foreach (var u in rr)
             {
+                u.OnStatus = EnumUtil.GetDescription(ShipUserStatus(u.WorkShipStartTime, u.DeleteResonEnum));
                 u.ContractTypeName = EnumUtil.GetDescription(u.ContractType);
                 u.EmploymentTypeName = empTable.FirstOrDefault(x => x.BusinessId.ToString() == u.EmploymentType)?.Name;
                 u.OnBoardName = ownShipTable.FirstOrDefault(x => x.BusinessId.ToString() == u.OnBoard)?.ShipName;
@@ -138,6 +142,32 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Contract
             }
 
             return age;
+        }
+        /// <summary>
+        /// 船员状态
+        /// </summary>
+        /// <param name="departureTime">下船时间</param>
+        /// <param name="deleteResonEnum">是否删除</param>
+        /// <returns></returns>
+        private static CrewStatusEnum ShipUserStatus(DateTime departureTime, CrewStatusEnum deleteResonEnum)
+        {
+            var status = new CrewStatusEnum();
+            if (deleteResonEnum != CrewStatusEnum.Normal)
+            {
+                //删除：管理人员手动操作，包括离职、调离和退休，优先于其他任何状态
+                status = deleteResonEnum;
+            }
+            //else if (holidayTime.HasValue)
+            //{
+            //    //休假：提交离船申请且经审批同意后，按所申请离船、归船日期设置为休假状态，优先于在岗、待岗状态
+            //    status = CrewStatusEnum.XiuJia;
+            //}
+            else if (departureTime <= DateTime.Now)
+            {
+                //在岗、待岗:船员登记时必填任职船舶数据，看其中最新的任职船舶上船时间和下船时间，在此时间内为在岗状态，否则为待岗状态
+                status = CrewStatusEnum.Normal;
+            }
+            return status;
         }
         #endregion
 

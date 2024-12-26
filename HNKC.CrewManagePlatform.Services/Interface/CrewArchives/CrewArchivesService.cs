@@ -1573,6 +1573,9 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                 case 20://用工形式
                     rt = await GetEmploymentTypeListAsync();
                     break;
+                case 21://航区
+                    rt = await GetNavigationareListAsync();
+                    break;
             }
             return rt;
         }
@@ -1675,6 +1678,19 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
         private async Task<Result> GetCountryListAsync()
         {
             var rr = await _dbContext.Queryable<CountryRegion>().Where(t => t.IsDelete == 1).Select(t => new DropDownResponse
+            {
+                Key = t.BusinessId.ToString(),
+                Value = t.Name,
+            }).ToListAsync();
+            return Result.Success(rr);
+        }
+        /// <summary>
+        /// 航区
+        /// </summary>
+        /// <returns></returns>
+        private async Task<Result> GetNavigationareListAsync()
+        {
+            var rr = await _dbContext.Queryable<NavigationArea>().Where(t => t.IsDelete == 1).Select(t => new DropDownResponse
             {
                 Key = t.BusinessId.ToString(),
                 Value = t.Name,
