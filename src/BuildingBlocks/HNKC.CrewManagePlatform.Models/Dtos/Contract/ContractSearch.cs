@@ -106,11 +106,23 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.Contract
         /// <summary>
         /// 开始时间
         /// </summary>
-        public string? EntryTime { get; set; }
+        public string? StartTime { get; set; }
         /// <summary>
         /// 结束时间
         /// </summary>
         public string? EndTime { get; set; }
+        /// <summary>
+        /// 状态
+        /// </summary>
+        public string? OnStatus { get; set; }
+        /// <summary>
+        /// 下船日期
+        /// </summary>
+        public DateTime WorkShipStartTime { get; set; }
+        /// <summary>
+        /// 删除原因
+        /// </summary>
+        public CrewStatusEnum DeleteResonEnum { get; set; }
         /// <summary>
         /// 到期天数
         /// </summary>

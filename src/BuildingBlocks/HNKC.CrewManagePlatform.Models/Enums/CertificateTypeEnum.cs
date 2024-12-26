@@ -3,7 +3,7 @@
 namespace HNKC.CrewManagePlatform.Models.Enums
 {
     /// <summary>
-    /// 证书类型
+    /// 技能证书类型
     /// </summary>
     public enum CertificateTypeEnum
     {
@@ -42,5 +42,12 @@ namespace HNKC.CrewManagePlatform.Models.Enums
         /// </summary>
         [Description("防辐射证")]
         FangFuShe = 6
+    }
+    /// <summary>
+    /// 证书
+    /// </summary>
+    public enum CertificatesEnum
+    {
+        //First=Certificate1,
     }
 }

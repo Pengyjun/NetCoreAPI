@@ -168,6 +168,10 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// 合同类型
         /// </summary>
         public ContractEnum ContractType { get; set; }
+        /// <summary>
+        /// 开始时间
+        /// </summary>
+        public DateTime StartTime { get; set; }
     }
     /// <summary>
     /// 家庭成员/紧急联系人
