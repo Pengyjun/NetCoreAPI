@@ -220,7 +220,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CurrentUser
                         new Claim("BId",userInfo.UserBusinessId.ToString()),
                         new Claim("WorkNumber",userInfo.WorkNumber?.ToString()),
                         new Claim("Name",userInfo.Name?.ToString()),
-                        new Claim("Oid",userInfo.Oid?.ToString()),
+                        new Claim("Oid",roleResponse.Oid?.ToString()),
                         new Claim("BInstitutionId",changRoleRequest.InstitutionBusinessId.ToString()),
                         new Claim("Phone",userInfo.Phone?.ToString()),
                         new Claim("RoleBusinessId",loginRole.BusinessId.ToString()),
