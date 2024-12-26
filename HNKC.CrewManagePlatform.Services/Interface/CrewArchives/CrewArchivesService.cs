@@ -1409,7 +1409,9 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
         public async Task<Result> CrewTransferAsync(CrewTransferRequest requestBody)
         {
             //前端自己调用任职船舶接口  这里只处理调任逻辑
-            var shipWork = await _dbContext.Queryable<WorkShip>().FirstAsync(t => t.IsDelete == 1 && t.BusinessId == requestBody.BId);
+            var shipWork = await _dbContext.Queryable<WorkShip>()
+                .OrderByDescending(x => x.WorkShipEndTime)
+                .FirstAsync(t => t.IsDelete == 1 && t.WorkShipId == requestBody.BId);
             if (shipWork != null)
             {
                 ////主表 删除状态清空
@@ -1419,11 +1421,11 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                 //    mainUser.DeleteReson = CrewStatusEnum.No;
                 //    await _dbContext.Updateable(mainUser).UpdateColumns(x => x.DeleteReson).ExecuteCommandAsync();
                 //}
-                if (requestBody.WorkShipStartTime < shipWork.WorkShipEndTime)//新的上船日期小于旧的下船日期
-                {
-                    return Result.Fail("上船日期不可小于前下船日期");
-                }
-                if (requestBody.WorkShipStartTime < requestBody.WorkShipEndTime)
+                //if (requestBody.WorkShipStartTime < shipWork.WorkShipEndTime)//新的上船日期小于旧的下船日期
+                //{
+                //    return Result.Fail("上船日期不可小于前下船日期");
+                //}
+                if (requestBody.WorkShipStartTime > requestBody.WorkShipEndTime)
                 {
                     return Result.Fail("下船日期不可小于上船日期");
                 }
