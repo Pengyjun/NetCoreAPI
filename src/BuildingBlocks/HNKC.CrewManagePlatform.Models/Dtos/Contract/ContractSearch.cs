@@ -106,7 +106,7 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.Contract
         /// <summary>
         /// 开始时间
         /// </summary>
-        public string? EntryTime { get; set; }
+        public string? StartTime { get; set; }
         /// <summary>
         /// 结束时间
         /// </summary>

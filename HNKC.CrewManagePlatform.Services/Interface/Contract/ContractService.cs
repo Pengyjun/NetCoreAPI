@@ -63,7 +63,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Contract
                     UserName = t1.Name,
                     WorkNumber = t1.WorkNumber,
                     EndTime = t2.EndTime.ToString("yyyy/MM/dd"),
-                    EntryTime = t2.EntryTime.ToString("yyyy/MM/dd"),
+                    StartTime = t2.StartTime.ToString("yyyy/MM/dd"),
                     ContractMain = t2.ContractMain,
                     ContractType = t2.ContractType,
                     EmploymentType = t2.EmploymentId,
