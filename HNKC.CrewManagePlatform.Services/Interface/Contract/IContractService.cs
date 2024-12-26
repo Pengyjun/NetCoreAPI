@@ -20,6 +20,6 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Contract
         /// </summary>
         /// <param name="requestBody"></param>
         /// <returns></returns>
-        Task<Result> GetContractRenewalAsync(BaseRequest requestBody);
+        Task<Result> ContractRenewalDetailsAsync(BaseRequest requestBody);
     }
 }

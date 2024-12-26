@@ -39,11 +39,13 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api.Controllers
         /// </summary>
         /// <param name="requestBody"></param>
         /// <returns></returns>
-        [HttpGet("GetContractRenewal")]
-        public async Task<Result> GetContractRenewalAsync([FromQuery] BaseRequest requestBody)
+        [HttpGet("ContractRenewalDetails")]
+        public async Task<Result> ContractRenewalDetailsAsync([FromQuery] BaseRequest requestBody)
         {
-            return await _contractService.GetContractRenewalAsync(requestBody);
+            return await _contractService.ContractRenewalDetailsAsync(requestBody);
         }
+
+        //public async Task<Result>
 
     }
 }

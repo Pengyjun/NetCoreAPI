@@ -132,7 +132,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Contract
         /// 合同 续签详情
         /// </summary>
         /// <returns></returns>
-        public async Task<Result> GetContractRenewalAsync(BaseRequest requestBody)
+        public async Task<Result> ContractRenewalDetailsAsync(BaseRequest requestBody)
         {
             ConntractRenewalSearch rr = new();
             var rt = await _dbContext.Queryable<User>()
