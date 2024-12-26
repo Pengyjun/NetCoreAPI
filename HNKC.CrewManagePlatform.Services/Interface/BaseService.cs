@@ -110,7 +110,12 @@ namespace HNKC.CrewManagePlatform.Services.Interface
                 .ToListAsync();
             //获取树形
             var instrturionTree = new ListToTreeUtil().GetTree(userInfo.Oid, allInstitution);
-           
+            if (instrturionTree.Count == 0)
+            {
+                //添加自身节点
+                var salfNode = allInstitution.Where(x => x.Oid == userInfo.Oid).FirstOrDefault();
+                instrturionTree.Add(salfNode);
+            }
             InstitutionTree rootNode = null;
             InstitutionTree currentNode = null;
             if (instrturionTree.Count != 0)
@@ -136,10 +141,10 @@ namespace HNKC.CrewManagePlatform.Services.Interface
                         }
                     }
                    
-                    if (i==(arr.Length - 1))
-                    {
-                        currentNode.Nodes = instrturionTree;
-                    }
+                    //if (i==(arr.Length - 2))
+                    //{
+                    //    currentNode.Nodes = instrturionTree;
+                    //}
                 }
             }
             return Result.Success(data: rootNode, "响应成功");
