@@ -785,7 +785,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
             #region 保存文件
             upLoadFiles.ForEach(x => x.BId = GuidUtil.Next());
             upLoadFiles.ForEach(x => x.UserId = uId);
-            await InsertFileAsync(upLoadFiles, uId);
+            await _baseService.InsertFileAsync(upLoadFiles, uId);
             #endregion
 
             return Result.Success();
@@ -1259,7 +1259,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                 #region 文件保存
                 upLoadFiles.ForEach(x => x.BId = GuidUtil.Next());
                 upLoadFiles.ForEach(x => x.UserId = userInfo.BusinessId);
-                await UpdateFileAsync(upLoadFiles, userInfo.BusinessId);
+                await _baseService.UpdateFileAsync(upLoadFiles, userInfo.BusinessId);
                 #endregion
 
                 return Result.Success();
@@ -2621,62 +2621,6 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
             return await _dbContext.Queryable<User>().FirstAsync(t => t.BusinessId.ToString() == bId);
         }
 
-        #endregion
-
-        #region 保存文件
-        /// <summary>
-        /// 新增文件
-        /// </summary>
-        /// <param name="uploadResponse"></param>
-        /// <param name="uId"></param>
-        /// <returns></returns>
-        private async Task<Result> InsertFileAsync(List<UploadResponse> uploadResponse, Guid? uId)
-        {
-
-            if (uploadResponse != null && uploadResponse.Any())
-            {
-                List<Files> files = new();
-                var fileId = GuidUtil.Next();
-                foreach (var item in uploadResponse)
-                {
-                    files.Add(new Files
-                    {
-                        Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
-                        BusinessId = item.BId,
-                        FileSize = item.FileSize,
-                        FileType = item.FileType,
-                        Name = item.Name,
-                        OriginName = item.OriginName,
-                        SuffixName = item.SuffixName,
-                        FileId = item.FileId,
-                        UserId = uId
-                    });
-                }
-                if (files.Any()) await _dbContext.Insertable(files).ExecuteCommandAsync();
-                return Result.Success();
-            }
-            else { return Result.Fail("文件保存失败"); }
-        }
-        /// <summary>
-        /// 修改文件
-        /// </summary>
-        /// <param name="uploadResponse"></param>
-        /// <param name="uId"></param>
-        /// <returns></returns>
-        private async Task<Result> UpdateFileAsync(List<UploadResponse> uploadResponse, Guid? uId)
-        {
-            if (uploadResponse != null && uploadResponse.Any())
-            {
-                var bids = uploadResponse.Select(x => x.FileId).ToList();
-                //删除原有文件
-                var oldFiles = await _dbContext.Queryable<Files>().Where(t => t.IsDelete == 1 && uId == t.UserId).ToListAsync();
-                if (oldFiles.Any()) await _dbContext.Deleteable(oldFiles).ExecuteCommandAsync();
-                //重新新增文件
-                return await InsertFileAsync(uploadResponse, uId);
-            }
-            else { return Result.Fail("文件保存失败"); }
-
-        }
         #endregion
 
     }

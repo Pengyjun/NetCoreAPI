@@ -1,4 +1,5 @@
 ﻿using HNKC.CrewManagePlatform.Models.CommonResult;
+using HNKC.CrewManagePlatform.Models.Dtos.CrewArchives;
 using HNKC.CrewManagePlatform.Models.Enums;
 
 namespace HNKC.CrewManagePlatform.Services.Interface
@@ -34,5 +35,19 @@ namespace HNKC.CrewManagePlatform.Services.Interface
         /// <param name="deleteResonEnum"></param>
         /// <returns></returns>
         CrewStatusEnum ShipUserStatus(DateTime departureTime, CrewStatusEnum deleteResonEnum);
+        /// <summary>
+        /// 新增文件
+        /// </summary>
+        /// <param name="uploadResponse"></param>
+        /// <param name="uId"></param>
+        /// <returns></returns>
+        Task<Result> InsertFileAsync(List<UploadResponse> uploadResponse, Guid? uId);
+        /// <summary>
+        /// 修改文件
+        /// </summary>
+        /// <param name="uploadResponse"></param>
+        /// <param name="uId"></param>
+        /// <returns></returns>
+        Task<Result> UpdateFileAsync(List<UploadResponse> uploadResponse, Guid? uId);
     }
 }

@@ -1,4 +1,5 @@
 ﻿using HNKC.CrewManagePlatform.Models.CommonResult;
+using HNKC.CrewManagePlatform.Models.Dtos;
 using HNKC.CrewManagePlatform.Models.Dtos.Contract;
 using HNKC.CrewManagePlatform.Models.Enums;
 using HNKC.CrewManagePlatform.SqlSugars.Models;
@@ -25,6 +26,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Certificate
             this._dbContext = dbContext;
             _baseService = baseService;
         }
+
         #region 证书
         /// <summary>
         /// 证书列表
@@ -138,6 +140,46 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Certificate
             rt.TotalCount = total;
             return rt;
         }
+        #endregion
+
+        #region 续签
+        /// <summary>
+        /// 证书续签
+        /// </summary>
+        /// <param name="requestBody"></param>
+        /// <returns></returns>
+        public async Task<Result> SaveCertificateAsync(CertificateRenewal requestBody)
+        {
+            var cerFirst = await _dbContext.Queryable<CertificateOfCompetency>().Where(t => t.CertificateId.ToString() == requestBody.BId).FirstAsync();
+
+            if (cerFirst != null)
+            {
+                switch (requestBody.Certificates)
+                {
+                    case CertificatesEnum.FCertificate:
+
+                        break;
+                    case CertificatesEnum.SCertificate:
+
+                        break;
+                    case CertificatesEnum.PXHGZ:
+
+                        break;
+                    case CertificatesEnum.JKZ:
+
+                        break;
+                    case CertificatesEnum.HYZ:
+
+                        break;
+                    case CertificatesEnum.HZ:
+
+                        break;
+                }
+
+            }
+            return Result.Success();
+        }
+
         #endregion
     }
 }

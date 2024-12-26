@@ -1,4 +1,5 @@
-﻿using HNKC.CrewManagePlatform.Models.Dtos.Contract;
+﻿using HNKC.CrewManagePlatform.Models.CommonResult;
+using HNKC.CrewManagePlatform.Models.Dtos.Contract;
 using HNKC.CrewManagePlatform.Services.Interface.Certificate;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -32,6 +33,16 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api.Controllers
         {
             var data = await _certificateService.SearchCertificateAsync(requestBody);
             return Ok(data);
+        }
+        /// <summary>
+        /// 续签
+        /// </summary>
+        /// <param name="requestBody"></param>
+        /// <returns></returns>
+        [HttpPost("SaveCertificate")]
+        public async Task<Result> SaveCertificateAsync([FromBody] CertificateRenewal requestBody)
+        {
+            return await _certificateService.SaveCertificateAsync(requestBody);
         }
     }
 }

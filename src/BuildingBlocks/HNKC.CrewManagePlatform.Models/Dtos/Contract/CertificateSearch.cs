@@ -1,5 +1,4 @@
-﻿using HNKC.CrewManagePlatform.Models.Dtos.CrewArchives;
-using HNKC.CrewManagePlatform.Models.Enums;
+﻿using HNKC.CrewManagePlatform.Models.Enums;
 
 namespace HNKC.CrewManagePlatform.Models.Dtos.Contract
 {
