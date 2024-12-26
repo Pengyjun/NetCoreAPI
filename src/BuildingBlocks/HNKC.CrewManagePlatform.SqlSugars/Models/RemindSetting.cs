@@ -12,12 +12,12 @@ namespace HNKC.CrewManagePlatform.SqlSugars.Models
         /// <summary>
         /// 提醒类型  
         /// </summary>
-        [SugarColumn(ColumnDataType = "int", ColumnDescription = "提醒类型  1合同 2 证书", DefaultValue = "0")]
+        [SugarColumn(ColumnDataType = "int", ColumnDescription = "提醒类型 ", DefaultValue = "0")]
         public CertificatesEnum Types { get; set; }
         /// <summary>
-        /// 类型
+        /// 类型 1合同 2 证书
         /// </summary>
-        [SugarColumn(ColumnDataType = "int", ColumnDescription = "类型", DefaultValue = "0")]
+        [SugarColumn(ColumnDataType = "int", ColumnDescription = "类型  1合同 2 证书", DefaultValue = "0")]
         public int RemindType { get; set; }
         /// <summary>
         /// 提醒时间

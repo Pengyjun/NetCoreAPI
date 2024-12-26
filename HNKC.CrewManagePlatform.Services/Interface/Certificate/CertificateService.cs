@@ -47,6 +47,11 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Certificate
             var wShip = _dbContext.Queryable<WorkShip>()
                 .InnerJoin(crewWorkShip, (x, y) => x.WorkShipId == y.WorkShipId && x.WorkShipEndTime == y.WorkShipEndTime);
             #endregion
+
+            //获取提醒天数
+            var remindSet = await _dbContext.Queryable<RemindSetting>().Where(t => t.RemindType == 2 && t.IsDelete == 1).ToListAsync();
+            if (remindSet.Count == 0) return new PageResult<CertificateSearch>();
+
             var rr = await _dbContext.Queryable<User>()
                 .LeftJoin<CertificateOfCompetency>((t1, t2) => t1.BusinessId == t2.CertificateId)
                 .WhereIF(requestBody.Certificates == CertificatesEnum.FCertificate, (t1, t2) => !string.IsNullOrEmpty(t2.FCertificate))

@@ -12,7 +12,7 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.ConfigManagement
         /// </summary>
         public string? Id { get; set; }
         /// <summary>
-        /// 提醒类型  1合同 2 证书
+        ///类型  
         /// </summary>
         public CertificatesEnum Types { get; set; }
         /// <summary>
@@ -20,7 +20,7 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.ConfigManagement
         /// </summary>
         public string? TypesName { get; set; }
         /// <summary>
-        /// 类型
+        /// 类型 1合同 2证书
         /// </summary>
         public int RemindType { get; set; }
         /// <summary>

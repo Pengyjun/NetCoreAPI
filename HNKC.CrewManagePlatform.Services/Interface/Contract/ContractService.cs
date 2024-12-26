@@ -1,7 +1,6 @@
 ﻿using HNKC.CrewManagePlatform.Models.CommonResult;
 using HNKC.CrewManagePlatform.Models.Dtos;
 using HNKC.CrewManagePlatform.Models.Dtos.Contract;
-using HNKC.CrewManagePlatform.Models.Dtos.CrewArchives;
 using HNKC.CrewManagePlatform.Models.Enums;
 using HNKC.CrewManagePlatform.SqlSugars.Models;
 using HNKC.CrewManagePlatform.Utils;
@@ -49,10 +48,15 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Contract
                 .InnerJoin(crewWorkShip, (x, y) => x.WorkShipId == y.WorkShipId && x.WorkShipEndTime == y.WorkShipEndTime);
             #endregion
 
+            //获取提醒天数
+            var remindSet = await _dbContext.Queryable<RemindSetting>().FirstAsync(t => t.RemindType == 1 && t.IsDelete == 1);
+            int days = remindSet == null ? 0 : remindSet.Days;
+            if (days == 0) return new PageResult<ContractSearch>();
             var rr = await _dbContext.Queryable<User>()
                 .Where(t1 => t1.IsLoginUser == 1 && t1.IsDelete == 1)
                 .WhereIF(!string.IsNullOrEmpty(requestBody.KeyWords), t1 => t1.Name.Contains(requestBody.KeyWords) || t1.Phone.Contains(requestBody.KeyWords) || t1.WorkNumber.Contains(requestBody.KeyWords) || t1.CardId.Contains(requestBody.KeyWords))
                 .LeftJoin(uentity, (t1, t2) => t1.BusinessId == t2.UserEntryId)
+                .Where((t1, t2) => SqlFunc.DateDiff(DateType.Day, DateTime.Now, Convert.ToDateTime(t2.EndTime)) + 1 <= days)
                 .InnerJoin<OwnerShip>((t1, t2, t3) => t1.OnBoard == t3.BusinessId.ToString())
                 .InnerJoin<CertificateOfCompetency>((t1, t2, t3, t4) => t1.BusinessId == t4.CertificateId)
                 .InnerJoin(wShip, (t1, t2, t3, t4, t5) => t1.BusinessId == t5.WorkShipId)
@@ -75,6 +79,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Contract
                     CardId = t1.CardId,
                     FPosition = t4.FPosition,
                     SPosition = t4.SPosition,
+                    DueDays = SqlFunc.DateDiff(DateType.Day, DateTime.Now, Convert.ToDateTime(t2.EndTime)) + 1,
                     OnBoardPosition = t5.Postition,
                     WorkShipStartTime = t5.WorkShipStartTime,
                     DeleteResonEnum = t1.DeleteReson
@@ -107,7 +112,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Contract
                 u.CountryName = countryTable.FirstOrDefault(x => x.BusinessId.ToString() == u.Country)?.Name;
                 u.ShipTypeName = EnumUtil.GetDescription(u.ShipType);
                 u.Age = _baseService.CalculateAgeFromIdCard(u.CardId);
-                u.DueDays = TimeHelper.GetTimeSpan(Convert.ToDateTime(u.EndTime), DateTime.Now).Days + 1;
+                //u.DueDays = TimeHelper.GetTimeSpan(Convert.ToDateTime(u.EndTime), DateTime.Now).Days + 1;
                 if (u.FPosition != null) u.FPositionName = position.FirstOrDefault(x => x.BusinessId.ToString() == u.FPosition)?.Name;
                 if (u.SPosition != null) u.SPositionName = position.FirstOrDefault(x => x.BusinessId.ToString() == u.SPosition)?.Name;
                 if (u.OnBoardPosition != null) u.OnBoardPositionName = position.FirstOrDefault(x => x.BusinessId.ToString() == u.OnBoardPosition)?.Name;

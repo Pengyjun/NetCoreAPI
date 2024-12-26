@@ -1,6 +1,4 @@
-﻿using HNKC.CrewManagePlatform.Models.CommonRequest;
-using HNKC.CrewManagePlatform.Models.CommonResult;
-using HNKC.CrewManagePlatform.Models.Dtos;
+﻿using HNKC.CrewManagePlatform.Models.CommonResult;
 using HNKC.CrewManagePlatform.Models.Dtos.ConfigManagement;
 using HNKC.CrewManagePlatform.Services.Interface.ConfigManagement;
 using Microsoft.AspNetCore.Authorization;
@@ -25,10 +23,6 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api.Controllers
             this._configManagementService = configManagementService;
         }
 
-        //public async Task<IActionResult> SearchShipAsync()
-        //{
-
-        //}
         /// <summary>
         /// 保存船舶
         /// </summary>

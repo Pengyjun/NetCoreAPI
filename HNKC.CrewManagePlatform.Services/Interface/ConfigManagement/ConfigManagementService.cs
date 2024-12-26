@@ -135,6 +135,12 @@ namespace HNKC.CrewManagePlatform.Services.Interface.ConfigManagement
                                                     Type = (int)x
                                                 })
                                                 .ToList();
+            enumConvertList.Add(new DropDownResponse
+            {
+                Key = "1",
+                Type = 0,
+                Value = "劳务合同"
+            });
 
             foreach (var item in enumConvertList)
             {
@@ -153,11 +159,13 @@ namespace HNKC.CrewManagePlatform.Services.Interface.ConfigManagement
                 }
                 else
                 {
+                    int type = 0;
+                    type = item.Key == "1" ? 1 : type;
                     rt.Add(new RemindSearch
                     {
                         Days = 0,
                         Enable = 0,
-                        RemindType = 1,
+                        RemindType = type,
                         Types = Convert.ToInt32(item.Key).ToString(),
                         TypesName = item.Value
                     });
@@ -165,7 +173,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.ConfigManagement
 
             }
 
-            return Result.Success(rt);
+            return Result.Success(rt.OrderBy(x => x.RemindType));
         }
         /// <summary>
         /// 保存提醒配置
@@ -189,7 +197,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.ConfigManagement
                 {
                     Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
                     Types = requestBody.Types,
-                    RemindType = 1,
+                    RemindType = requestBody.RemindType,
                     BusinessId = GuidUtil.Next(),
                     Days = requestBody.Days,
                     Enable = requestBody.Enable
