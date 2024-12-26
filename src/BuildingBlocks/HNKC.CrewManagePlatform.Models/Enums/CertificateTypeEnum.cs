@@ -3,7 +3,7 @@
 namespace HNKC.CrewManagePlatform.Models.Enums
 {
     /// <summary>
-    /// 证书类型
+    /// 技能证书类型
     /// </summary>
     public enum CertificateTypeEnum
     {
@@ -42,5 +42,41 @@ namespace HNKC.CrewManagePlatform.Models.Enums
         /// </summary>
         [Description("防辐射证")]
         FangFuShe = 6
+    }
+    /// <summary>
+    /// 证书
+    /// </summary>
+    public enum CertificatesEnum
+    {
+        /// <summary>
+        /// 第一适任证
+        /// </summary>
+        [Description("第一适任证")]
+        FCertificate = 1,
+        /// <summary>
+        /// 第二适任证
+        /// </summary>
+        [Description("第二适任证")]
+        SCertificate = 2,
+        /// <summary>
+        /// 培训合格证
+        /// </summary>
+        [Description("培训合格证")]
+        PXHGZ = 3,
+        /// <summary>
+        /// 健康证
+        /// </summary>
+        [Description("健康证")]
+        JKZ = 4,
+        /// <summary>
+        /// 海员证
+        /// </summary>
+        [Description("海员证")]
+        HYZ = 5,
+        /// <summary>
+        /// 护照
+        /// </summary>
+        [Description("护照")]
+        HZ = 6
     }
 }

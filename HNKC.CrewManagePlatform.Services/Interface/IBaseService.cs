@@ -1,11 +1,5 @@
 ﻿using HNKC.CrewManagePlatform.Models.CommonResult;
-using HNKC.CrewManagePlatform.Models.Dtos.Salary;
-using HNKC.CrewManagePlatform.Util;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using HNKC.CrewManagePlatform.Models.Enums;
 
 namespace HNKC.CrewManagePlatform.Services.Interface
 {
@@ -21,14 +15,24 @@ namespace HNKC.CrewManagePlatform.Services.Interface
         /// <param name="path"></param>
         /// <returns></returns>
         Task<Result> ReadExcelAsModelAsync(Stream stream);
-
-
-
         /// <summary>
         /// 搜索机构数
         /// </summary>
         /// <param name="path"></param>
         /// <returns></returns>
         Task<Result> SearchInstitutionTreeAsync();
+        /// <summary>
+        /// 通过身份证与当前日期计算年龄
+        /// </summary>
+        /// <param name="idCard"></param>
+        /// <returns></returns>
+        int CalculateAgeFromIdCard(string idCard);
+        /// <summary>
+        /// 船员状态
+        /// </summary>
+        /// <param name="departureTime"></param>
+        /// <param name="deleteResonEnum"></param>
+        /// <returns></returns>
+        CrewStatusEnum ShipUserStatus(DateTime departureTime, CrewStatusEnum deleteResonEnum);
     }
 }

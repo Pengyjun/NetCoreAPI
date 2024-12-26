@@ -1,5 +1,4 @@
 ﻿using HNKC.CrewManagePlatform.Models.CommonResult;
-using HNKC.CrewManagePlatform.Models.Dtos;
 using HNKC.CrewManagePlatform.Models.Dtos.Contract;
 
 namespace HNKC.CrewManagePlatform.Services.Interface.Contract

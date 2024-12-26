@@ -6,32 +6,32 @@ using HNKC.CrewManagePlatform.Utils;
 using SqlSugar;
 using UtilsSharp;
 
-namespace HNKC.CrewManagePlatform.Services.Interface.Contract
+namespace HNKC.CrewManagePlatform.Services.Interface.Certificate
 {
     /// <summary>
-    /// 合同实现层
+    /// 证书
     /// </summary>
-    public class ContractService : IContractService
+    public class CertificateService : ICertificateService
     {
         private readonly ISqlSugarClient _dbContext;
         private readonly IBaseService _baseService;
         /// <summary>
-        /// 
+        /// 注入
         /// </summary>
         /// <param name="dbContext"></param>
         /// <param name="baseService"></param>
-        public ContractService(ISqlSugarClient dbContext, IBaseService baseService)
+        public CertificateService(ISqlSugarClient dbContext, IBaseService baseService)
         {
             this._dbContext = dbContext;
             _baseService = baseService;
         }
-        #region 合同列表
+        #region 证书
         /// <summary>
-        /// 合同列表
+        /// 证书列表
         /// </summary>
         /// <param name="requestBody"></param>
         /// <returns></returns>
-        public async Task<PageResult<ContractSearch>> SearchContractAsync(ContractRequest requestBody)
+        public async Task<PageResult<CertificateSearch>> SearchCertificateAsync(CertificateRequest requestBody)
         {
             RefAsync<int> total = 0;
             #region 船员关联
@@ -46,66 +46,89 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Contract
             var wShip = _dbContext.Queryable<WorkShip>()
                 .InnerJoin(crewWorkShip, (x, y) => x.WorkShipId == y.WorkShipId && x.WorkShipEndTime == y.WorkShipEndTime);
             #endregion
-
             var rr = await _dbContext.Queryable<User>()
+                .LeftJoin<CertificateOfCompetency>((t1, t2) => t1.BusinessId == t2.CertificateId)
+                .WhereIF(requestBody.Certificates == CertificatesEnum.FCertificate, (t1, t2) => !string.IsNullOrEmpty(t2.FCertificate))
+                .WhereIF(requestBody.Certificates == CertificatesEnum.SCertificate, (t1, t2) => !string.IsNullOrEmpty(t2.SCertificate))
+                .WhereIF(requestBody.Certificates == CertificatesEnum.PXHGZ, (t1, t2) => !string.IsNullOrEmpty(t2.TrainingCertificate))
+                .WhereIF(requestBody.Certificates == CertificatesEnum.JKZ, (t1, t2) => !string.IsNullOrEmpty(t2.HealthCertificate))
+                .WhereIF(requestBody.Certificates == CertificatesEnum.HYZ, (t1, t2) => !string.IsNullOrEmpty(t2.SeamanCertificate))
+                .WhereIF(requestBody.Certificates == CertificatesEnum.HZ, (t1, t2) => !string.IsNullOrEmpty(t2.PassportCertificate))
                 .Where(t1 => t1.IsLoginUser == 1 && t1.IsDelete == 1)
                 .WhereIF(!string.IsNullOrEmpty(requestBody.KeyWords), t1 => requestBody.KeyWords.Contains(t1.Name) || requestBody.KeyWords.Contains(t1.Phone) || requestBody.KeyWords.Contains(t1.WorkNumber) || requestBody.KeyWords.Contains(t1.CardId))
-                .LeftJoin(uentity, (t1, t2) => t1.BusinessId == t2.UserEntryId)
-                .InnerJoin<OwnerShip>((t1, t2, t3) => t1.OnBoard == t3.BusinessId.ToString())
-                .InnerJoin<CertificateOfCompetency>((t1, t2, t3, t4) => t1.BusinessId == t4.CertificateId)
+                .LeftJoin(uentity, (t1, t2, t3) => t1.BusinessId == t3.UserEntryId)
+                .InnerJoin<OwnerShip>((t1, t2, t3, t4) => t1.OnBoard == t4.BusinessId.ToString())
                 .InnerJoin(wShip, (t1, t2, t3, t4, t5) => t1.BusinessId == t5.WorkShipId)
-                .WhereIF(!string.IsNullOrEmpty(requestBody.EmploymentType), (t1, t2, t3, t4, t5) => requestBody.EmploymentType == t2.EmploymentId)
-                .Select((t1, t2, t3, t4, t5) => new ContractSearch
+                .Select((t1, t2, t3, t4, t5) => new CertificateSearch
                 {
                     BId = t1.BusinessId.ToString(),
                     Id = t2.BusinessId.ToString(),
-                    Country = t3.Country,
+                    Country = t4.Country,
                     OnBoard = t1.OnBoard,
-                    ShipType = t3.ShipType,
+                    ShipType = t4.ShipType,
                     UserName = t1.Name,
                     WorkNumber = t1.WorkNumber,
-                    EndTime = t2.EndTime.ToString("yyyy/MM/dd"),
-                    StartTime = t2.StartTime.ToString("yyyy/MM/dd"),
-                    ContractMain = t2.ContractMain,
-                    ContractType = t2.ContractType,
-                    EmploymentType = t2.EmploymentId,
-                    LaborCompany = t2.LaborCompany,
-                    CardId = t1.CardId,
-                    FPosition = t4.FPosition,
-                    SPosition = t4.SPosition,
+                    FPosition = t2.FPosition,
+                    SPosition = t2.SPosition,
                     OnBoardPosition = t5.Postition,
+                    DeleteResonEnum = t1.DeleteReson,
                     WorkShipStartTime = t5.WorkShipStartTime,
-                    DeleteResonEnum = t1.DeleteReson
+                    CardId = t1.CardId
                 })
                 .ToPageListAsync(requestBody.PageIndex, requestBody.PageSize, total);
-
-            return await GetResultAsync(rr, total);
+            return await GetResultAsync(rr, total, requestBody.Certificates);
         }
         /// <summary>
         /// 获取查询结果集
         /// </summary>
         /// <param name="rr"></param>
         /// <param name="total"></param>
+        /// <param name="certificates"></param>
         /// <returns></returns>
-        private async Task<PageResult<ContractSearch>> GetResultAsync(List<ContractSearch> rr, int total)
+        private async Task<PageResult<CertificateSearch>> GetResultAsync(List<CertificateSearch> rr, int total, CertificatesEnum certificates)
         {
-            PageResult<ContractSearch> rt = new();
+            PageResult<CertificateSearch> rt = new();
 
             var position = await _dbContext.Queryable<Position>().Where(t => t.IsDelete == 1).ToListAsync();
-            var empTable = await _dbContext.Queryable<EmploymentType>().Where(t => rr.Select(x => x.EmploymentType).Contains(t.BusinessId.ToString())).ToListAsync();
             var ownShipTable = await _dbContext.Queryable<OwnerShip>().Where(t => rr.Select(x => x.OnBoard).Contains(t.BusinessId.ToString())).ToListAsync();
             var countryTable = await _dbContext.Queryable<CountryRegion>().Where(t => rr.Select(x => x.Country).Contains(t.BusinessId.ToString())).ToListAsync();
-
+            var certificateOfCompetency = await _dbContext.Queryable<CertificateOfCompetency>().Where(t => rr.Select(x => x.BId).ToList().Contains(t.CertificateId.ToString())).ToListAsync();
             foreach (var u in rr)
             {
+                var rs = certificateOfCompetency.FirstOrDefault(x => x.CertificateId.ToString() == u.BId);
+                switch (certificates)
+                {
+                    case CertificatesEnum.FCertificate:
+                        u.EffectiveTime = rs?.FEffectiveTime?.ToString("yyyy/MM/dd");
+                        u.DueDays = TimeHelper.GetTimeSpan(Convert.ToDateTime(rs?.FEffectiveTime), DateTime.Now).Days + 1;
+                        break;
+                    case CertificatesEnum.SCertificate:
+                        u.EffectiveTime = rs?.SEffectiveTime?.ToString("yyyy/MM/dd");
+                        u.DueDays = TimeHelper.GetTimeSpan(Convert.ToDateTime(rs?.SEffectiveTime), DateTime.Now).Days + 1;
+                        break;
+                    case CertificatesEnum.PXHGZ:
+                        u.EffectiveTime = rs?.TrainingSignTime?.ToString("yyyy/MM/dd");
+                        u.DueDays = TimeHelper.GetTimeSpan(Convert.ToDateTime(rs?.TrainingSignTime), DateTime.Now).Days + 1;
+                        break;
+                    case CertificatesEnum.JKZ:
+                        u.EffectiveTime = rs?.HealthEffectiveTime?.ToString("yyyy/MM/dd");
+                        u.DueDays = TimeHelper.GetTimeSpan(Convert.ToDateTime(rs?.HealthEffectiveTime), DateTime.Now).Days + 1;
+                        break;
+                    case CertificatesEnum.HYZ:
+                        u.EffectiveTime = rs?.SeamanEffectiveTime?.ToString("yyyy/MM/dd");
+                        u.DueDays = TimeHelper.GetTimeSpan(Convert.ToDateTime(rs?.SeamanEffectiveTime), DateTime.Now).Days + 1;
+                        break;
+                    case CertificatesEnum.HZ:
+                        u.EffectiveTime = rs?.PassportEffectiveTime?.ToString("yyyy/MM/dd");
+                        u.DueDays = TimeHelper.GetTimeSpan(Convert.ToDateTime(rs?.PassportEffectiveTime), DateTime.Now).Days + 1;
+                        break;
+                }
+
                 u.OnStatus = EnumUtil.GetDescription(_baseService.ShipUserStatus(u.WorkShipStartTime, u.DeleteResonEnum));
-                u.ContractTypeName = EnumUtil.GetDescription(u.ContractType);
-                u.EmploymentTypeName = empTable.FirstOrDefault(x => x.BusinessId.ToString() == u.EmploymentType)?.Name;
                 u.OnBoardName = ownShipTable.FirstOrDefault(x => x.BusinessId.ToString() == u.OnBoard)?.ShipName;
                 u.CountryName = countryTable.FirstOrDefault(x => x.BusinessId.ToString() == u.Country)?.Name;
                 u.ShipTypeName = EnumUtil.GetDescription(u.ShipType);
                 u.Age = _baseService.CalculateAgeFromIdCard(u.CardId);
-                u.DueDays = TimeHelper.GetTimeSpan(Convert.ToDateTime(u.EndTime), DateTime.Now).Days + 1;
                 if (u.FPosition != null) u.FPositionName = position.FirstOrDefault(x => x.BusinessId.ToString() == u.FPosition)?.Name;
                 if (u.SPosition != null) u.SPositionName = position.FirstOrDefault(x => x.BusinessId.ToString() == u.SPosition)?.Name;
                 if (u.OnBoardPosition != null) u.OnBoardPositionName = position.FirstOrDefault(x => x.BusinessId.ToString() == u.OnBoardPosition)?.Name;
@@ -116,54 +139,5 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Contract
             return rt;
         }
         #endregion
-
-        #region 合同续签
-        /// <summary>
-        /// 合同续签
-        /// </summary>
-        /// <param name="requestBody"></param>
-        /// <returns></returns>
-        public async Task<Result> SaveContractAsync(ConntractRenewal requestBody)
-        {
-            var newContract = await _dbContext.Queryable<UserEntryInfo>()
-                .Where(t => requestBody.Id == t.BusinessId.ToString())
-                .OrderByDescending(x => x.EndTime)
-                .FirstAsync();
-            if (requestBody.EntryTime < newContract.EndTime)
-            {
-                return Result.Fail("续签开始时间不能小于当前合同结束时间");
-            }
-            if (newContract != null)
-            {
-                newContract.EmploymentId = requestBody.EmploymentType;
-                newContract.LaborCompany = requestBody.LaborCompany;
-                newContract.ContractType = requestBody.ContractType;
-                newContract.EntryTime = requestBody.EntryTime;
-                newContract.EndTime = requestBody.EndTime;
-                newContract.ContractMain = requestBody.ContractMain;
-                await _dbContext.Updateable(newContract).ExecuteCommandAsync();
-                return Result.Success("续签更改成功");
-            }
-            else
-            {
-                var addContract = new UserEntryInfo
-                {
-                    Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
-                    BusinessId = GuidUtil.Next(),
-                    ContractMain = requestBody.ContractMain,
-                    ContractType = requestBody.ContractType,
-                    EmploymentId = requestBody.EmploymentType,
-                    EntryTime = requestBody.EntryTime,
-                    EndTime = requestBody.EndTime,
-                    LaborCompany = requestBody.LaborCompany,
-                    UserEntryId = requestBody.BId
-                };
-                await _dbContext.Insertable(addContract).ExecuteCommandAsync();
-                return Result.Success("续签成功");
-            }
-        }
-        #endregion
-
-
     }
 }

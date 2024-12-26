@@ -18,13 +18,16 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
     public class CrewArchivesService : HNKC.CrewManagePlatform.Services.Interface.CurrentUser.CurrentUserService, ICrewArchivesService
     {
         private ISqlSugarClient _dbContext { get; set; }
+        private IBaseService _baseService { get; set; }
         /// <summary>
         /// 注入
         /// </summary>
         /// <param name="dbContext"></param>
-        public CrewArchivesService(ISqlSugarClient dbContext)
+        /// <param name="baseService"></param>
+        public CrewArchivesService(ISqlSugarClient dbContext, IBaseService baseService)
         {
             this._dbContext = dbContext;
+            _baseService = baseService;
         }
         #region 船员档案列表
         /// <summary>
@@ -225,7 +228,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                     t.SkillsCertificate = sctabs;
                     t.SpecialCertificate = spctabs;
                     t.SpecialCertificateName = spctabNames;
-                    t.Age = CalculateAgeFromIdCard(t.CardId);
+                    t.Age = _baseService.CalculateAgeFromIdCard(t.CardId);
                     t.OnStatus = ob == null ? CrewStatusEnum.DaiGang : ShipUserStatus(ob.WorkShipEndTime, t.DeleteReson);
                     t.OnStatusName = ob == null ? EnumUtil.GetDescription(CrewStatusEnum.DaiGang) : EnumUtil.GetDescription(ShipUserStatus(ob.WorkShipEndTime, t.DeleteReson));
                 }
@@ -233,36 +236,6 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
             page.List = rt;
             page.TotalCount = total;
             return page;
-        }
-        /// <summary>
-        /// 通过身份证与当前日期计算年龄
-        /// </summary>
-        /// <param name="idCard"></param>
-        /// <returns></returns>
-        private static int CalculateAgeFromIdCard(string idCard)
-        {
-            if (idCard.Length != 18)
-            {
-                throw new ArgumentException("身份证号码应为18位");
-            }
-
-            // 提取出生日期（身份证的前 6 位是出生年月日，格式为yyyyMMdd）
-            string birthDateString = idCard.Substring(6, 8);
-
-            DateTime birthDate = DateTime.ParseExact(birthDateString, "yyyyMMdd", CultureInfo.InvariantCulture);
-
-            DateTime currentDate = DateTime.Now;
-
-            // 计算年龄
-            int age = currentDate.Year - birthDate.Year;
-
-            // 如果当前日期的月份和日子还没到出生日期的月份和日子，就减去 1 年
-            if (currentDate.Month < birthDate.Month || (currentDate.Month == birthDate.Month && currentDate.Day < birthDate.Day))
-            {
-                age--;
-            }
-
-            return age;
         }
         /// <summary>
         /// 船员状态
@@ -431,6 +404,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                         ContractMain = requestBody.BaseInfoDto.UserEntryInfo.ContarctMain,
                         EndTime = requestBody.BaseInfoDto.UserEntryInfo.EndTime,
                         EntryScans = GuidUtil.Next(),
+                        StartTime = requestBody.BaseInfoDto.UserEntryInfo.StartTime,
                         EntryTime = requestBody.BaseInfoDto.UserEntryInfo.EntryTime,
                         LaborCompany = requestBody.BaseInfoDto.UserEntryInfo.LaborCompany,
                         EmploymentId = requestBody.BaseInfoDto.UserEntryInfo.EmploymentId,
@@ -898,7 +872,8 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                             LaborCompany = requestBody.BaseInfoDto.UserEntryInfo.LaborCompany,
                             EmploymentId = requestBody.BaseInfoDto.UserEntryInfo.EmploymentId,
                             UserEntryId = userInfo.BusinessId,
-                            ContractType = requestBody.BaseInfoDto.UserEntryInfo.ContractType
+                            ContractType = requestBody.BaseInfoDto.UserEntryInfo.ContractType,
+                            StartTime = requestBody.BaseInfoDto.UserEntryInfo.StartTime
                         };
                         if (requestBody.BaseInfoDto.UserEntryInfo.EntryScansUpload != null && requestBody.BaseInfoDto.UserEntryInfo.EntryScansUpload.Any())
                         {
@@ -1573,6 +1548,12 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                 case 20://用工形式
                     rt = await GetEmploymentTypeListAsync();
                     break;
+                case 21://航区
+                    rt = await GetNavigationareListAsync();
+                    break;
+                case 22://证书类型
+                    rt = GetCertificatesList();
+                    break;
             }
             return rt;
         }
@@ -1682,6 +1663,19 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
             return Result.Success(rr);
         }
         /// <summary>
+        /// 航区
+        /// </summary>
+        /// <returns></returns>
+        private async Task<Result> GetNavigationareListAsync()
+        {
+            var rr = await _dbContext.Queryable<NavigationArea>().Where(t => t.IsDelete == 1).Select(t => new DropDownResponse
+            {
+                Key = t.BusinessId.ToString(),
+                Value = t.Name,
+            }).ToListAsync();
+            return Result.Success(rr);
+        }
+        /// <summary>
         /// 适任职务
         /// </summary>
         /// <returns></returns>
@@ -1702,6 +1696,23 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
         {
             var enumConvertList = Enum.GetValues(typeof(FamilyRelationEnum))
                                                    .Cast<FamilyRelationEnum>()
+                                                   .Select(x => new DropDownResponse
+                                                   {
+                                                       Key = ((int)x).ToString(),
+                                                       Value = GetEnumDescription(x),
+                                                       Type = (int)x
+                                                   })
+                                                   .ToList();
+            return Result.Success(enumConvertList);
+        }
+        /// <summary>
+        /// 证书类型
+        /// </summary>
+        /// <returns></returns>
+        private static Result GetCertificatesList()
+        {
+            var enumConvertList = Enum.GetValues(typeof(CertificatesEnum))
+                                                   .Cast<CertificatesEnum>()
                                                    .Select(x => new DropDownResponse
                                                    {
                                                        Key = ((int)x).ToString(),
@@ -2428,7 +2439,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                 {
                     Id = item.BusinessId.ToString(),
                     ContarctMain = item.ContractMain,
-                    EntryDate = item.EntryTime.ToString("yyyy/MM/dd") + "~" + item.EndTime.ToString("yyyy/MM/dd"),
+                    EntryDate = item.StartTime.ToString("yyyy/MM/dd") + "~" + item.EndTime.ToString("yyyy/MM/dd"),
                     LaborCompany = item.LaborCompany,
                     ContractType = item.ContractType,
                     ContractTypeName = EnumUtil.GetDescription(item.ContractType),
@@ -2438,8 +2449,6 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                 });
             }
 
-            //最新入职时间
-            var entryDateContent = userEntryInfo.FirstOrDefault()?.EntryTime.ToString("yyyy/MM/dd") + "~" + userEntryInfo.FirstOrDefault()?.EndTime.ToString("yyyy/MM/dd");
             //最新入职文件
             var newEntryFilesIds = userEntryInfo.FirstOrDefault()?.EntryScans;
             var newFiles = files
