@@ -86,7 +86,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Certificate
         /// <param name="total"></param>
         /// <param name="certificates"></param>
         /// <returns></returns>
-        private async Task<PageResult<CertificateSearch>> GetResultAsync(List<CertificateSearch> rr, int total, CertificatesEnum certificates)
+        private async Task<PageResult<CertificateSearch>> GetResultAsync(List<CertificateSearch> rr, int total, CertificatesEnum? certificates)
         {
             PageResult<CertificateSearch> rt = new();
 
@@ -100,26 +100,38 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Certificate
                 switch (certificates)
                 {
                     case CertificatesEnum.FCertificate:
+                        u.CertificateType = CertificatesEnum.FCertificate;
+                        u.CertificateTypeName = EnumUtil.GetDescription(CertificatesEnum.FCertificate);
                         u.EffectiveTime = rs?.FEffectiveTime?.ToString("yyyy/MM/dd");
                         u.DueDays = TimeHelper.GetTimeSpan(Convert.ToDateTime(rs?.FEffectiveTime), DateTime.Now).Days + 1;
                         break;
                     case CertificatesEnum.SCertificate:
+                        u.CertificateType = CertificatesEnum.SCertificate;
+                        u.CertificateTypeName = EnumUtil.GetDescription(CertificatesEnum.SCertificate);
                         u.EffectiveTime = rs?.SEffectiveTime?.ToString("yyyy/MM/dd");
                         u.DueDays = TimeHelper.GetTimeSpan(Convert.ToDateTime(rs?.SEffectiveTime), DateTime.Now).Days + 1;
                         break;
                     case CertificatesEnum.PXHGZ:
+                        u.CertificateType = CertificatesEnum.PXHGZ;
+                        u.CertificateTypeName = EnumUtil.GetDescription(CertificatesEnum.PXHGZ);
                         u.EffectiveTime = rs?.TrainingSignTime?.ToString("yyyy/MM/dd");
                         u.DueDays = TimeHelper.GetTimeSpan(Convert.ToDateTime(rs?.TrainingSignTime), DateTime.Now).Days + 1;
                         break;
                     case CertificatesEnum.JKZ:
+                        u.CertificateType = CertificatesEnum.JKZ;
+                        u.CertificateTypeName = EnumUtil.GetDescription(CertificatesEnum.JKZ);
                         u.EffectiveTime = rs?.HealthEffectiveTime?.ToString("yyyy/MM/dd");
                         u.DueDays = TimeHelper.GetTimeSpan(Convert.ToDateTime(rs?.HealthEffectiveTime), DateTime.Now).Days + 1;
                         break;
                     case CertificatesEnum.HYZ:
+                        u.CertificateType = CertificatesEnum.HYZ;
+                        u.CertificateTypeName = EnumUtil.GetDescription(CertificatesEnum.HYZ);
                         u.EffectiveTime = rs?.SeamanEffectiveTime?.ToString("yyyy/MM/dd");
                         u.DueDays = TimeHelper.GetTimeSpan(Convert.ToDateTime(rs?.SeamanEffectiveTime), DateTime.Now).Days + 1;
                         break;
                     case CertificatesEnum.HZ:
+                        u.CertificateType = CertificatesEnum.HZ;
+                        u.CertificateTypeName = EnumUtil.GetDescription(CertificatesEnum.HZ);
                         u.EffectiveTime = rs?.PassportEffectiveTime?.ToString("yyyy/MM/dd");
                         u.DueDays = TimeHelper.GetTimeSpan(Convert.ToDateTime(rs?.PassportEffectiveTime), DateTime.Now).Days + 1;
                         break;
@@ -167,7 +179,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Certificate
                             await _dbContext.Deleteable(files).ExecuteCommandAsync();
                             cerFirst.FScans = GuidUtil.Next();
                             requestBody.FScans.ForEach(x => x.FileId = cerFirst.FScans);
-                            await _baseService.InsertFileAsync(requestBody.FScans, Guid.Parse(requestBody.BId));
+                            await _baseService.UpdateFileAsync(requestBody.FScans, Guid.Parse(requestBody.BId));
                         }
                         await _dbContext.Updateable(cerFirst).UpdateColumns(x => new
                         {
@@ -191,7 +203,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Certificate
                             await _dbContext.Deleteable(files).ExecuteCommandAsync();
                             cerFirst.SScans = GuidUtil.Next();
                             requestBody.SScans.ForEach(x => x.FileId = cerFirst.SScans);
-                            await _baseService.InsertFileAsync(requestBody.SScans, Guid.Parse(requestBody.BId));
+                            await _baseService.UpdateFileAsync(requestBody.SScans, Guid.Parse(requestBody.BId));
                         }
                         await _dbContext.Updateable(cerFirst).UpdateColumns(x => new
                         {
@@ -220,7 +232,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Certificate
                             await _dbContext.Deleteable(files).ExecuteCommandAsync();
                             cerFirst.TrainingScans = GuidUtil.Next();
                             requestBody.TrainingScans.ForEach(x => x.FileId = cerFirst.TrainingScans);
-                            await _baseService.InsertFileAsync(requestBody.TrainingScans, Guid.Parse(requestBody.BId));
+                            await _baseService.UpdateFileAsync(requestBody.TrainingScans, Guid.Parse(requestBody.BId));
                         }
                         await _dbContext.Updateable(cerFirst).UpdateColumns(x => new
                         {
@@ -247,7 +259,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Certificate
                             await _dbContext.Deleteable(files).ExecuteCommandAsync();
                             cerFirst.HealthScans = GuidUtil.Next();
                             requestBody.HealthScans.ForEach(x => x.FileId = cerFirst.HealthScans);
-                            await _baseService.InsertFileAsync(requestBody.HealthScans, Guid.Parse(requestBody.BId));
+                            await _baseService.UpdateFileAsync(requestBody.HealthScans, Guid.Parse(requestBody.BId));
                         }
                         await _dbContext.Updateable(cerFirst).UpdateColumns(x => new
                         {
@@ -267,7 +279,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Certificate
                             await _dbContext.Deleteable(files).ExecuteCommandAsync();
                             cerFirst.SeamanScans = GuidUtil.Next();
                             requestBody.SeamanScans.ForEach(x => x.FileId = cerFirst.SeamanScans);
-                            await _baseService.InsertFileAsync(requestBody.SeamanScans, Guid.Parse(requestBody.BId));
+                            await _baseService.UpdateFileAsync(requestBody.SeamanScans, Guid.Parse(requestBody.BId));
                         }
                         await _dbContext.Updateable(cerFirst).UpdateColumns(x => new
                         {
@@ -287,7 +299,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Certificate
                             await _dbContext.Deleteable(files).ExecuteCommandAsync();
                             cerFirst.PassportScans = GuidUtil.Next();
                             requestBody.PassportScans.ForEach(x => x.FileId = cerFirst.PassportScans);
-                            await _baseService.InsertFileAsync(requestBody.PassportScans, Guid.Parse(requestBody.BId));
+                            await _baseService.UpdateFileAsync(requestBody.PassportScans, Guid.Parse(requestBody.BId));
                         }
                         await _dbContext.Updateable(cerFirst).UpdateColumns(x => new
                         {

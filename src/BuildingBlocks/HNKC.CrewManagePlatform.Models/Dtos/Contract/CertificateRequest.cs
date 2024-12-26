@@ -6,11 +6,11 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.Contract
     /// <summary>
     /// 证书
     /// </summary>
-    public class CertificateRequest:PageRequest
+    public class CertificateRequest : PageRequest
     {
         /// <summary>
         /// 证书类型
         /// </summary>
-        public CertificatesEnum Certificates { get; set; }
+        public CertificatesEnum? Certificates { get; set; }
     }
 }

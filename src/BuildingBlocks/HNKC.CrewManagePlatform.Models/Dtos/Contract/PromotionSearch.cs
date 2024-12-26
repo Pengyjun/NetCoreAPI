@@ -3,9 +3,9 @@
 namespace HNKC.CrewManagePlatform.Models.Dtos.Contract
 {
     /// <summary>
-    /// 证书列表
+    /// 职务晋升
     /// </summary>
-    public class CertificateSearch
+    public class PromotionSearch
     {
         /// <summary>
         /// 用户业务id
@@ -44,14 +44,6 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.Contract
         /// </summary>
         public string? CountryName { get; set; }
         /// <summary>
-        /// 在船职务
-        /// </summary>
-        public string? OnBoardPositionName { get; set; }
-        /// <summary>
-        /// 
-        /// </summary>
-        public string? OnBoardPosition { get; set; }
-        /// <summary>
         /// 所在船舶
         /// </summary>
         public string? OnBoard { get; set; }
@@ -60,17 +52,13 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.Contract
         /// </summary>
         public string? OnBoardName { get; set; }
         /// <summary>
-        /// 证书类型
+        /// 用工形式
         /// </summary>
-        public CertificatesEnum CertificateType { get; set; }
+        public string? EmploymentType { get; set; }
         /// <summary>
         /// 
         /// </summary>
-        public string? CertificateTypeName { get; set; }
-        /// <summary>
-        /// 有效期
-        /// </summary>
-        public string? EffectiveTime { get; set; }
+        public string? EmploymentTypeName { get; set; }
         /// <summary>
         /// 第一适任
         /// </summary>
@@ -88,24 +76,56 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.Contract
         /// </summary>
         public string? SPositionName { get; set; }
         /// <summary>
-        /// 
+        /// 在船职务
         /// </summary>
-        public string? OnStatus { get; set; }
+        public string? OnBoardPosition { get; set; }
         /// <summary>
         /// 
         /// </summary>
+        public string? OnBoardPositionName { get; set; }
+        /// <summary>
+        /// 合同类型
+        /// </summary>
+        public ContractEnum ContractType { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
+        public string? ContractTypeName { get; set; }
+        /// <summary>
+        /// 合同主体
+        /// </summary>
+        public string? ContractMain { get; set; }
+        /// <summary>
+        /// 劳务公司
+        /// </summary>
+        public string? LaborCompany { get; set; }
+        /// <summary>
+        /// 身份证
+        /// </summary>
         public string? CardId { get; set; }
+        /// <summary>
+        /// 开始时间
+        /// </summary>
+        public string? StartTime { get; set; }
+        /// <summary>
+        /// 结束时间
+        /// </summary>
+        public string? EndTime { get; set; }
+        /// <summary>
+        /// 状态
+        /// </summary>
+        public string? OnStatus { get; set; }
+        /// <summary>
+        /// 下船日期
+        /// </summary>
+        public DateTime WorkShipStartTime { get; set; }
+        /// <summary>
+        /// 删除原因
+        /// </summary>
+        public CrewStatusEnum DeleteResonEnum { get; set; }
         /// <summary>
         /// 到期天数
         /// </summary>
         public int DueDays { get; set; }
-        /// <summary>
-        /// 
-        /// </summary>
-        public CrewStatusEnum DeleteResonEnum { get; set; }
-        /// <summary>
-        /// 
-        /// </summary>
-        public DateTime WorkShipStartTime { get; set; }
     }
 }
