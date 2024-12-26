@@ -122,7 +122,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface
             {
                var grule=instrturionTree.First().Grule;
                var arr= grule.Split("-", StringSplitOptions.RemoveEmptyEntries);
-                for (int i =4; i < arr.Length; i++)
+                for (int i =4; i < arr.Length-1; i++)
                 {
                     if (i == 4&&rootNode==null)
                     {
@@ -137,14 +137,19 @@ namespace HNKC.CrewManagePlatform.Services.Interface
                         }
                         else {
                             currentNode.Nodes.Add(childNode);
-                            currentNode= childNode;
+                            currentNode = childNode;
                         }
+                      
                     }
-                   
-                    //if (i==(arr.Length - 2))
-                    //{
-                    //    currentNode.Nodes = instrturionTree;
-                    //}
+                    
+                    if (i == (arr.Length - 2))
+                    {
+                        if (currentNode == null)
+                        {
+                            currentNode = rootNode;
+                        }
+                        currentNode.Nodes = instrturionTree;
+                    }
                 }
             }
             return Result.Success(data: rootNode, "响应成功");
