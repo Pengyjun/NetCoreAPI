@@ -298,7 +298,7 @@ namespace HNKC.CrewManagePlatform.Services.Role
             }
             pageResult.List = data;
             pageResult.TotalCount = data.Count;
-            pageResult.List.Skip((addUserRoleRequest.PageIndex - 1) * addUserRoleRequest.PageSize).Take(addUserRoleRequest.PageSize).ToList();
+            pageResult.List=pageResult.List.Skip((addUserRoleRequest.PageIndex - 1) * addUserRoleRequest.PageSize).Take(addUserRoleRequest.PageSize).ToList();
             return pageResult;
         }
 
