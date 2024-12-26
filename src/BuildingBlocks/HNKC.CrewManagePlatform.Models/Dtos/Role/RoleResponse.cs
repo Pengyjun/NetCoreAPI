@@ -58,5 +58,9 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.Role
         /// 备注
         /// </summary>
         public string? Remark { get; set; }
+        /// <summary>
+        /// 是否激活当前登录
+        /// </summary>
+        public bool IsActivate { get; set; }
     }
 }

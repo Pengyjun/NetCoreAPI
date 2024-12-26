@@ -1421,11 +1421,11 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                 //    mainUser.DeleteReson = CrewStatusEnum.No;
                 //    await _dbContext.Updateable(mainUser).UpdateColumns(x => x.DeleteReson).ExecuteCommandAsync();
                 //}
-                if (requestBody.WorkShipStartTime < shipWork.WorkShipEndTime)//新的上船日期小于旧的下船日期
-                {
-                    return Result.Fail("上船日期不可小于前下船日期");
-                }
-                if (requestBody.WorkShipStartTime < requestBody.WorkShipEndTime)
+                //if (requestBody.WorkShipStartTime < shipWork.WorkShipEndTime)//新的上船日期小于旧的下船日期
+                //{
+                //    return Result.Fail("上船日期不可小于前下船日期");
+                //}
+                if (requestBody.WorkShipStartTime > requestBody.WorkShipEndTime)
                 {
                     return Result.Fail("下船日期不可小于上船日期");
                 }
