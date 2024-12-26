@@ -431,6 +431,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                         ContractMain = requestBody.BaseInfoDto.UserEntryInfo.ContarctMain,
                         EndTime = requestBody.BaseInfoDto.UserEntryInfo.EndTime,
                         EntryScans = GuidUtil.Next(),
+                        StartTime = requestBody.BaseInfoDto.UserEntryInfo.StartTime,
                         EntryTime = requestBody.BaseInfoDto.UserEntryInfo.EntryTime,
                         LaborCompany = requestBody.BaseInfoDto.UserEntryInfo.LaborCompany,
                         EmploymentId = requestBody.BaseInfoDto.UserEntryInfo.EmploymentId,
@@ -898,7 +899,8 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                             LaborCompany = requestBody.BaseInfoDto.UserEntryInfo.LaborCompany,
                             EmploymentId = requestBody.BaseInfoDto.UserEntryInfo.EmploymentId,
                             UserEntryId = userInfo.BusinessId,
-                            ContractType = requestBody.BaseInfoDto.UserEntryInfo.ContractType
+                            ContractType = requestBody.BaseInfoDto.UserEntryInfo.ContractType,
+                            StartTime = requestBody.BaseInfoDto.UserEntryInfo.StartTime
                         };
                         if (requestBody.BaseInfoDto.UserEntryInfo.EntryScansUpload != null && requestBody.BaseInfoDto.UserEntryInfo.EntryScansUpload.Any())
                         {
@@ -2444,7 +2446,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                 {
                     Id = item.BusinessId.ToString(),
                     ContarctMain = item.ContractMain,
-                    EntryDate = item.EntryTime.ToString("yyyy/MM/dd") + "~" + item.EndTime.ToString("yyyy/MM/dd"),
+                    EntryDate = item.StartTime.ToString("yyyy/MM/dd") + "~" + item.EndTime.ToString("yyyy/MM/dd"),
                     LaborCompany = item.LaborCompany,
                     ContractType = item.ContractType,
                     ContractTypeName = EnumUtil.GetDescription(item.ContractType),
@@ -2454,8 +2456,6 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                 });
             }
 
-            //最新入职时间
-            var entryDateContent = userEntryInfo.FirstOrDefault()?.EntryTime.ToString("yyyy/MM/dd") + "~" + userEntryInfo.FirstOrDefault()?.EndTime.ToString("yyyy/MM/dd");
             //最新入职文件
             var newEntryFilesIds = userEntryInfo.FirstOrDefault()?.EntryScans;
             var newFiles = files
