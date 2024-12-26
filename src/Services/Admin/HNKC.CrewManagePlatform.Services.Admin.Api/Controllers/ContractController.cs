@@ -1,4 +1,5 @@
 ﻿using HNKC.CrewManagePlatform.Models.CommonResult;
+using HNKC.CrewManagePlatform.Models.Dtos;
 using HNKC.CrewManagePlatform.Models.Dtos.Contract;
 using HNKC.CrewManagePlatform.Services.Interface.Contract;
 using Microsoft.AspNetCore.Authorization;
@@ -33,6 +34,18 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api.Controllers
         {
             return await _contractService.SearchContractAsync(requestBody);
         }
+        /// <summary>
+        /// 合同续签详情
+        /// </summary>
+        /// <param name="requestBody"></param>
+        /// <returns></returns>
+        [HttpGet("ContractRenewalDetails")]
+        public async Task<Result> ContractRenewalDetailsAsync([FromQuery] BaseRequest requestBody)
+        {
+            return await _contractService.ContractRenewalDetailsAsync(requestBody);
+        }
+
+        //public async Task<Result>
 
     }
 }

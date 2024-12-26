@@ -107,7 +107,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                                .Where(skcall => requestBody.CrewType.Contains(skcall.BusinessId.ToString())).Any())//船员类型
                 .WhereIF(requestBody.ShipTypes != null && requestBody.ShipTypes.Any(), child => SqlFunc.Subqueryable<OwnerShip>()
                                .Where(skcall => requestBody.ShipTypes.Contains(skcall.ShipType.ToString())).Any())//船舶类型
-                .WhereIF(requestBody.PositionOnBoard != null, child => SqlFunc.Subqueryable<PositionOnBoard>()//在船职务
+                .WhereIF(requestBody.PositionOnBoard != null, child => SqlFunc.Subqueryable<WorkShip>()//在船职务
                                .Where(skcall => requestBody.PositionOnBoard == skcall.BusinessId.ToString()).Any())
                 .WhereIF(requestBody.FPosition != null && requestBody.FPosition.Any(), child => SqlFunc.Subqueryable<CertificateOfCompetency>()//第一适任证
                                .Where(skcall => requestBody.FPosition.Contains(skcall.BusinessId.ToString())).Any())

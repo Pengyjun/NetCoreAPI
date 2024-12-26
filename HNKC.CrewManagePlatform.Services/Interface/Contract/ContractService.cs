@@ -1,4 +1,5 @@
 ﻿using HNKC.CrewManagePlatform.Models.CommonResult;
+using HNKC.CrewManagePlatform.Models.Dtos;
 using HNKC.CrewManagePlatform.Models.Dtos.Contract;
 using HNKC.CrewManagePlatform.SqlSugars.Models;
 using HNKC.CrewManagePlatform.Utils;
@@ -22,6 +23,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Contract
         {
             this._dbContext = dbContext;
         }
+        #region 合同列表
         /// <summary>
         /// 合同列表
         /// </summary>
@@ -93,7 +95,6 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Contract
             rt.TotalCount = total;
             return rt;
         }
-
         /// <summary>
         /// 通过身份证与当前日期计算年龄
         /// </summary>
@@ -124,5 +125,68 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Contract
 
             return age;
         }
+        #endregion
+
+        #region 合同续签
+        /// <summary>
+        /// 合同 续签详情
+        /// </summary>
+        /// <returns></returns>
+        public async Task<Result> ContractRenewalDetailsAsync(BaseRequest requestBody)
+        {
+            ConntractRenewalSearch rr = new();
+            var rt = await _dbContext.Queryable<User>()
+                .Where(t => t.IsLoginUser == 1 && requestBody.BId == t.BusinessId)
+                .FirstAsync();
+            if (rt != null)
+            {
+                #region 简易字段匹配
+                rr.UserName = rt.Name;
+                rr.WorkNumber = rt.WorkNumber;
+                #endregion
+                //适任职务
+                var position = await _dbContext.Queryable<Position>().ToListAsync();
+                var cerofcom = await _dbContext.Queryable<CertificateOfCompetency>().Where(t => t.CertificateId == rt.BusinessId).FirstAsync();
+                if (cerofcom != null)
+                {
+                    rr.FPositionName = position.FirstOrDefault(x => x.BusinessId.ToString() == cerofcom.FPosition)?.Name;
+                    rr.SPositionName = position.FirstOrDefault(x => x.BusinessId.ToString() == cerofcom.SPosition)?.Name;
+                }
+                //任职船舶
+                var ownShip = await _dbContext.Queryable<OwnerShip>().FirstAsync(t => t.BusinessId.ToString() == rt.OnBoard);
+                if (ownShip != null)
+                {
+                    rr.ShipTypeName = EnumUtil.GetDescription(ownShip.ShipType);
+                    rr.OnBoardName = ownShip?.ShipName;
+                }
+                //在船职务
+                var onBoardPosition = await _dbContext.Queryable<WorkShip>().Where(t => t.WorkShipId == rt.BusinessId).OrderByDescending(x => x.WorkShipEndTime).FirstAsync();
+                if (onBoardPosition != null)
+                {
+                    rr.OnBoardPositionName = position.FirstOrDefault(x => x.BusinessId.ToString() == onBoardPosition.Postition)?.Name;
+                }
+                //用工形式
+                var userEntity = await _dbContext.Queryable<UserEntryInfo>()
+                    .Where(t => t.UserEntryId == rt.BusinessId)
+                    .OrderByDescending(x => x.EndTime)
+                    .FirstAsync();
+                if (userEntity != null)
+                {
+                    var employ = await _dbContext.Queryable<EmploymentType>().FirstAsync(t => userEntity.EmploymentId == t.BusinessId.ToString());
+                    rr.EmploymentTypeName = employ?.Name;
+                    rr.LaborCompany = userEntity.LaborCompany;
+                    rr.ContractMain = userEntity.ContractMain;
+                    rr.ContractTypeName = EnumUtil.GetDescription(userEntity.ContractType);
+                    rr.EntryTime = userEntity.EntryTime.ToString("yyyy/MM/dd");
+                    rr.EndTime = userEntity.EndTime.ToString("yyyy/MM/dd");
+                }
+                return Result.Success(rr);
+            }
+            else
+            {
+                return Result.Fail("用户不存在");
+            }
+        }
+        #endregion
     }
 }
