@@ -43,5 +43,10 @@ namespace HNKC.CrewManagePlatform.SqlSugars.Models
         /// </summary>
         [SugarColumn(Length = 36, ColumnDescription = "填报人")]
         public Guid? FillRepUserId { get; set; }
+        /// <summary>
+        /// 父键
+        /// </summary>
+        [SugarColumn(Length = 36, ColumnDescription = "父键")]
+        public Guid? PId { get; set; }
     }
 }

@@ -4,6 +4,7 @@ using HNKC.CrewManagePlatform.Services.Admin.Api.Filters;
 using HNKC.CrewManagePlatform.Services.Interface;
 using HNKC.CrewManagePlatform.Services.Interface.AuditLog;
 using HNKC.CrewManagePlatform.Services.Interface.Certificate;
+using HNKC.CrewManagePlatform.Services.Interface.ConfigManagement;
 using HNKC.CrewManagePlatform.Services.Interface.Contract;
 using HNKC.CrewManagePlatform.Services.Interface.CrewArchives;
 using HNKC.CrewManagePlatform.Services.Interface.CurrentUser;
@@ -324,6 +325,7 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api
             builder.Services.AddScoped<IRoleService, RoleService>();
             builder.Services.AddScoped<IContractService, ContractService>();
             builder.Services.AddScoped<ICertificateService, CertificateService>();
+            builder.Services.AddScoped<IConfigManagementService, ConfigManagementService>();
 
         }
     }

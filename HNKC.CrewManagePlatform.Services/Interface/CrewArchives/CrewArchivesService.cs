@@ -6,7 +6,6 @@ using HNKC.CrewManagePlatform.SqlSugars.Models;
 using HNKC.CrewManagePlatform.Utils;
 using SqlSugar;
 using System.ComponentModel;
-using System.Globalization;
 using System.Text.RegularExpressions;
 using UtilsSharp;
 

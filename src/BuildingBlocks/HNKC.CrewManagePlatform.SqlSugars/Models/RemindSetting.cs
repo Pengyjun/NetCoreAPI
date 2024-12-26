@@ -10,7 +10,7 @@ namespace HNKC.CrewManagePlatform.SqlSugars.Models
     public class RemindSetting : BaseEntity<long>
     {
         /// <summary>
-        /// 提醒类型  1合同 2 证书
+        /// 提醒类型  
         /// </summary>
         [SugarColumn(ColumnDataType = "int", ColumnDescription = "提醒类型  1合同 2 证书", DefaultValue = "0")]
         public CertificatesEnum Types { get; set; }

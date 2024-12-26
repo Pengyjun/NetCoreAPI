@@ -45,11 +45,11 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api.Controllers
             return await _contractService.SaveContractAsync(requestBody);
         }
         /// <summary>
-        /// 职务晋升
+        /// 职务晋升列表
         /// </summary>
         /// <param name="requestBody"></param>
         /// <returns></returns>
-        [HttpPost("SearchPromotion")]
+        [HttpGet("SearchPromotion")]
         public async Task<IActionResult> SearchPromotionAsync([FromQuery] PromotionRequest requestBody)
         {
             var data = await _contractService.SearchPromotionAsync(requestBody);
@@ -75,6 +75,37 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api.Controllers
         {
             var data = await _contractService.SearchTrainingRecordAsync(requestBody);
             return Ok(data);
+        }
+        /// <summary>
+        /// 保存培训记录
+        /// </summary>
+        /// <param name="requestBody"></param>
+        /// <returns></returns>
+        [HttpPost("SaveTrainingRecord")]
+        public async Task<Result> SaveTrainingRecordAsync([FromBody] SaveTrainingRecord requestBody)
+        {
+            return await _contractService.SaveTrainingRecordAsync(requestBody);
+        }
+        /// <summary>
+        /// 年度考核列表
+        /// </summary>
+        /// <param name="requestBody"></param>
+        /// <returns></returns>
+        [HttpGet("SearchYearCheck")]
+        public async Task<IActionResult> SearchYearCheckAsync([FromQuery] YearCheckRequest requestBody)
+        {
+            var data = await _contractService.SearchYearCheckAsync(requestBody);
+            return Ok(data);
+        }
+        /// <summary>
+        /// 年度考核
+        /// </summary>
+        /// <param name="requestBody"></param>
+        /// <returns></returns>
+        [HttpPost("SaveYearCheck")]
+        public async Task<Result> SaveYearCheckAsync([FromBody] SaveYearCheck requestBody)
+        {
+            return await _contractService.SaveYearCheckAsync(requestBody);
         }
     }
 }

@@ -6,13 +6,13 @@
     public class TrainingRecordSearch
     {
         /// <summary>
-        /// 填报人
+        /// /增改业务主键
         /// </summary>
-        public Guid? FillRepUserId { get; set; }
+        public string? Id { get; set; }
         /// <summary>
         /// 
         /// </summary>
-        public string? FillRepUserName{ get; set; }
+        public string? FillRepUserName { get; set; }
         /// <summary>
         /// 填报时间
         /// </summary>
@@ -30,16 +30,24 @@
         /// </summary>
         public string? TrainingType { get; set; }
         /// <summary>
+        /// 
+        /// </summary>
+        public string? TrainingTypeName { get; set; }
+        /// <summary>
         /// 培训地点
         /// </summary>
         public string? TrainingAddress { get; set; }
         /// <summary>
         /// 人数
         /// </summary>
-        public string? TrainingCount { get; set; }
+        public int TrainingCount { get; set; }
         /// <summary>
         /// 具体人员
         /// </summary>
         public string? UserDetails { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
+        public string? UserIds { get; set; }
     }
 }

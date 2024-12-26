@@ -38,5 +38,23 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Contract
         /// <param name="requestBody"></param>
         /// <returns></returns>
         Task<PageResult<TrainingRecordSearch>> SearchTrainingRecordAsync(TrainingRecordRequest requestBody);
+        /// <summary>
+        /// 保存培训记录
+        /// </summary>
+        /// <param name="requestBody"></param>
+        /// <returns></returns>
+        Task<Result> SaveTrainingRecordAsync(SaveTrainingRecord requestBody);
+        /// <summary>
+        /// 年度考核列表
+        /// </summary>
+        /// <param name="requestBody"></param>
+        /// <returns></returns>
+        Task<PageResult<YearCheckSearch>> SearchYearCheckAsync(YearCheckRequest requestBody);
+        /// <summary>
+        /// 年度考核
+        /// </summary>
+        /// <param name="requestBody"></param>
+        /// <returns></returns>
+        Task<Result> SaveYearCheckAsync(SaveYearCheck requestBody);
     }
 }
