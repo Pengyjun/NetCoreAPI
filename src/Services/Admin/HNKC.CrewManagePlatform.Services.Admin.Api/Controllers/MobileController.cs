@@ -34,6 +34,7 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api.Controllers
         /// <param name="sgin"></param>
         /// <returns></returns>
         [HttpGet("FindUserInfo")]
+        [AllowAnonymous]
         public async Task<Result> FindUserInfoAsync([FromQuery]string sign)
         {
             var data =await salaryService.FindUserInfoAsync(sign);
