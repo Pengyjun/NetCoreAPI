@@ -173,7 +173,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.ConfigManagement
 
             }
 
-            return Result.Success(rt.OrderBy(x => x.RemindType));
+            return Result.Success(rt.OrderBy(x => x.RemindType).ThenBy(x => x.Types));
         }
         /// <summary>
         /// 保存提醒配置
@@ -188,7 +188,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.ConfigManagement
                 rt.Enable = requestBody.Enable;
                 rt.Days = requestBody.Days;
                 rt.Types = requestBody.Types;
-                await _dbContext.Updateable(rt).IgnoreColumns(x => x.RemindType).ExecuteCommandAsync();
+                await _dbContext.Updateable(rt).ExecuteCommandAsync();
                 return Result.Success("修改成功");
             }
             else
