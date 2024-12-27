@@ -137,14 +137,15 @@ namespace HNKC.CrewManagePlatform.Services.Interface.ConfigManagement
                                                 .ToList();
             enumConvertList.Add(new DropDownResponse
             {
-                Key = "1",
+                Key = "11",
                 Type = 0,
                 Value = "劳务合同"
             });
 
             foreach (var item in enumConvertList)
             {
-                var ex = rr.FirstOrDefault(x => (int)x.Types == Convert.ToInt32(item.Key));
+                var ex = rr.FirstOrDefault(x => (int)x.RemindType == Convert.ToInt32(item.Key));
+
                 if (ex != null)
                 {
                     rt.Add(new RemindSearch
@@ -159,13 +160,11 @@ namespace HNKC.CrewManagePlatform.Services.Interface.ConfigManagement
                 }
                 else
                 {
-                    int type = 0;
-                    type = item.Key == "1" ? 1 : type;
                     rt.Add(new RemindSearch
                     {
                         Days = 0,
                         Enable = 0,
-                        RemindType = type,
+                        RemindType = 0,
                         Types = Convert.ToInt32(item.Key).ToString(),
                         TypesName = item.Value
                     });
@@ -173,7 +172,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.ConfigManagement
 
             }
 
-            return Result.Success(rt.OrderBy(x => x.RemindType).ThenBy(x => x.Types));
+            return Result.Success(rt.OrderByDescending(x => x.RemindType).ThenBy(x => x.Types));
         }
         /// <summary>
         /// 保存提醒配置
