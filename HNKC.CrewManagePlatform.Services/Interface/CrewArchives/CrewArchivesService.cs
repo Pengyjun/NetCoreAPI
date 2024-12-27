@@ -6,7 +6,6 @@ using HNKC.CrewManagePlatform.SqlSugars.Models;
 using HNKC.CrewManagePlatform.Utils;
 using SqlSugar;
 using System.ComponentModel;
-using System.Globalization;
 using System.Text.RegularExpressions;
 using UtilsSharp;
 
@@ -18,13 +17,16 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
     public class CrewArchivesService : HNKC.CrewManagePlatform.Services.Interface.CurrentUser.CurrentUserService, ICrewArchivesService
     {
         private ISqlSugarClient _dbContext { get; set; }
+        private IBaseService _baseService { get; set; }
         /// <summary>
         /// 注入
         /// </summary>
         /// <param name="dbContext"></param>
-        public CrewArchivesService(ISqlSugarClient dbContext)
+        /// <param name="baseService"></param>
+        public CrewArchivesService(ISqlSugarClient dbContext, IBaseService baseService)
         {
             this._dbContext = dbContext;
+            _baseService = baseService;
         }
         #region 船员档案列表
         /// <summary>
@@ -225,7 +227,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                     t.SkillsCertificate = sctabs;
                     t.SpecialCertificate = spctabs;
                     t.SpecialCertificateName = spctabNames;
-                    t.Age = CalculateAgeFromIdCard(t.CardId);
+                    t.Age = _baseService.CalculateAgeFromIdCard(t.CardId);
                     t.OnStatus = ob == null ? CrewStatusEnum.DaiGang : ShipUserStatus(ob.WorkShipEndTime, t.DeleteReson);
                     t.OnStatusName = ob == null ? EnumUtil.GetDescription(CrewStatusEnum.DaiGang) : EnumUtil.GetDescription(ShipUserStatus(ob.WorkShipEndTime, t.DeleteReson));
                 }
@@ -233,36 +235,6 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
             page.List = rt;
             page.TotalCount = total;
             return page;
-        }
-        /// <summary>
-        /// 通过身份证与当前日期计算年龄
-        /// </summary>
-        /// <param name="idCard"></param>
-        /// <returns></returns>
-        private static int CalculateAgeFromIdCard(string idCard)
-        {
-            if (idCard.Length != 18)
-            {
-                throw new ArgumentException("身份证号码应为18位");
-            }
-
-            // 提取出生日期（身份证的前 6 位是出生年月日，格式为yyyyMMdd）
-            string birthDateString = idCard.Substring(6, 8);
-
-            DateTime birthDate = DateTime.ParseExact(birthDateString, "yyyyMMdd", CultureInfo.InvariantCulture);
-
-            DateTime currentDate = DateTime.Now;
-
-            // 计算年龄
-            int age = currentDate.Year - birthDate.Year;
-
-            // 如果当前日期的月份和日子还没到出生日期的月份和日子，就减去 1 年
-            if (currentDate.Month < birthDate.Month || (currentDate.Month == birthDate.Month && currentDate.Day < birthDate.Day))
-            {
-                age--;
-            }
-
-            return age;
         }
         /// <summary>
         /// 船员状态
@@ -460,6 +432,10 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                         {
                             return Result.Fail("家庭成员已经绑定过，请先删除该/注销成员");
                         }
+                        if (!ValidatePhone(item.Phone))
+                        {
+                            return Result.Fail("手机号错误");
+                        }
                         hus.Add(new FamilyUser
                         {
                             Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
@@ -483,6 +459,10 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                         if (ef != null)
                         {
                             return Result.Fail("应急联系人已经绑定过，请先删除/注销该成员");
+                        }
+                        if (!ValidatePhone(item.Phone))
+                        {
+                            return Result.Fail("手机号错误");
                         }
                         ecs.Add(new EmergencyContacts
                         {
@@ -812,7 +792,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
             #region 保存文件
             upLoadFiles.ForEach(x => x.BId = GuidUtil.Next());
             upLoadFiles.ForEach(x => x.UserId = uId);
-            await InsertFileAsync(upLoadFiles, uId);
+            await _baseService.InsertFileAsync(upLoadFiles, uId);
             #endregion
 
             return Result.Success();
@@ -915,6 +895,10 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                         husDel = await _dbContext.Queryable<FamilyUser>().Where(t => t.FamilyId == userInfo.BusinessId).ToListAsync();
                         foreach (var item in requestBody.BaseInfoDto.HomeUser)
                         {
+                            if (!ValidatePhone(item.Phone))
+                            {
+                                return Result.Fail("手机号错误");
+                            }
                             husAdd.Add(new FamilyUser
                             {
                                 Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
@@ -933,6 +917,10 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                         ecsDel = await _dbContext.Queryable<EmergencyContacts>().Where(t => t.EmergencyContactId == userInfo.BusinessId).ToListAsync();
                         foreach (var item in requestBody.BaseInfoDto.EmergencyContacts)
                         {
+                            if (!ValidatePhone(item.Phone))
+                            {
+                                return Result.Fail("手机号错误");
+                            }
                             ecsAdd.Add(new EmergencyContacts
                             {
                                 Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
@@ -1286,7 +1274,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                 #region 文件保存
                 upLoadFiles.ForEach(x => x.BId = GuidUtil.Next());
                 upLoadFiles.ForEach(x => x.UserId = userInfo.BusinessId);
-                await UpdateFileAsync(upLoadFiles, userInfo.BusinessId);
+                await _baseService.UpdateFileAsync(upLoadFiles, userInfo.BusinessId);
                 #endregion
 
                 return Result.Success();
@@ -1578,6 +1566,9 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                 case 21://航区
                     rt = await GetNavigationareListAsync();
                     break;
+                case 22://证书类型
+                    rt = GetCertificatesList();
+                    break;
             }
             return rt;
         }
@@ -1720,6 +1711,23 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
         {
             var enumConvertList = Enum.GetValues(typeof(FamilyRelationEnum))
                                                    .Cast<FamilyRelationEnum>()
+                                                   .Select(x => new DropDownResponse
+                                                   {
+                                                       Key = ((int)x).ToString(),
+                                                       Value = GetEnumDescription(x),
+                                                       Type = (int)x
+                                                   })
+                                                   .ToList();
+            return Result.Success(enumConvertList);
+        }
+        /// <summary>
+        /// 证书类型
+        /// </summary>
+        /// <returns></returns>
+        private static Result GetCertificatesList()
+        {
+            var enumConvertList = Enum.GetValues(typeof(CertificatesEnum))
+                                                   .Cast<CertificatesEnum>()
                                                    .Select(x => new DropDownResponse
                                                    {
                                                        Key = ((int)x).ToString(),
@@ -2628,62 +2636,6 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
             return await _dbContext.Queryable<User>().FirstAsync(t => t.BusinessId.ToString() == bId);
         }
 
-        #endregion
-
-        #region 保存文件
-        /// <summary>
-        /// 新增文件
-        /// </summary>
-        /// <param name="uploadResponse"></param>
-        /// <param name="uId"></param>
-        /// <returns></returns>
-        private async Task<Result> InsertFileAsync(List<UploadResponse> uploadResponse, Guid? uId)
-        {
-
-            if (uploadResponse != null && uploadResponse.Any())
-            {
-                List<Files> files = new();
-                var fileId = GuidUtil.Next();
-                foreach (var item in uploadResponse)
-                {
-                    files.Add(new Files
-                    {
-                        Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
-                        BusinessId = item.BId,
-                        FileSize = item.FileSize,
-                        FileType = item.FileType,
-                        Name = item.Name,
-                        OriginName = item.OriginName,
-                        SuffixName = item.SuffixName,
-                        FileId = item.FileId,
-                        UserId = uId
-                    });
-                }
-                if (files.Any()) await _dbContext.Insertable(files).ExecuteCommandAsync();
-                return Result.Success();
-            }
-            else { return Result.Fail("文件保存失败"); }
-        }
-        /// <summary>
-        /// 修改文件
-        /// </summary>
-        /// <param name="uploadResponse"></param>
-        /// <param name="uId"></param>
-        /// <returns></returns>
-        private async Task<Result> UpdateFileAsync(List<UploadResponse> uploadResponse, Guid? uId)
-        {
-            if (uploadResponse != null && uploadResponse.Any())
-            {
-                var bids = uploadResponse.Select(x => x.FileId).ToList();
-                //删除原有文件
-                var oldFiles = await _dbContext.Queryable<Files>().Where(t => t.IsDelete == 1 && uId == t.UserId).ToListAsync();
-                if (oldFiles.Any()) await _dbContext.Deleteable(oldFiles).ExecuteCommandAsync();
-                //重新新增文件
-                return await InsertFileAsync(uploadResponse, uId);
-            }
-            else { return Result.Fail("文件保存失败"); }
-
-        }
         #endregion
 
     }

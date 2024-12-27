@@ -1,11 +1,10 @@
-﻿using HNKC.CrewManagePlatform.Common;
-using HNKC.CrewManagePlatform.Models.Dtos;
-using HNKC.CrewManagePlatform.Models.Dtos.UserManager;
-using HNKC.CrewManagePlatform.Services.Admin.Api;
+﻿using HNKC.CrewManagePlatform.Services.Admin.Api;
 using HNKC.CrewManagePlatform.Services.Admin.Api.AutoMapper;
 using HNKC.CrewManagePlatform.Services.Admin.Api.Filters;
 using HNKC.CrewManagePlatform.Services.Interface;
 using HNKC.CrewManagePlatform.Services.Interface.AuditLog;
+using HNKC.CrewManagePlatform.Services.Interface.Certificate;
+using HNKC.CrewManagePlatform.Services.Interface.ConfigManagement;
 using HNKC.CrewManagePlatform.Services.Interface.Contract;
 using HNKC.CrewManagePlatform.Services.Interface.CrewArchives;
 using HNKC.CrewManagePlatform.Services.Interface.CurrentUser;
@@ -23,16 +22,11 @@ using HNKC.CrewManagePlatform.Web.DateTimeHandler;
 using HNKC.CrewManagePlatform.Web.Filters;
 using HNKC.CrewManagePlatform.Web.Jwt;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using Newtonsoft.Json.Serialization;
-using Newtonsoft.Json;
 using System.Reflection;
 using System.Text;
 using UtilsSharp;
-using HNKC.CrewManagePlatform.Models.CommonResult;
-using HNKC.CrewManagePlatform.Models.Enums;
 
 namespace HNKC.CrewManagePlatform.Services.Admin.Api
 {
@@ -116,7 +110,7 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api
                 //jwt验证事件
                 //x.Events = new JwtBearerEvents()
                 //{
-                  
+
                 //    //jwt验证成功后出发
                 //    OnTokenValidated = context => {
                 //        //获取token
@@ -129,7 +123,7 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api
                 //        if (string.IsNullOrWhiteSpace(redisToken)|| !token.Trim().Equals(redisToken.Trim()))
                 //        {
                 //            context.Response.StatusCode =(int) ResponseHttpCode.AlreadyLogin;
-                            
+
                 //        }
                 //        return Task.CompletedTask;
                 //    }
@@ -330,6 +324,8 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api
             builder.Services.AddScoped<IMenuService, MenuService>();
             builder.Services.AddScoped<IRoleService, RoleService>();
             builder.Services.AddScoped<IContractService, ContractService>();
+            builder.Services.AddScoped<ICertificateService, CertificateService>();
+            builder.Services.AddScoped<IConfigManagementService, ConfigManagementService>();
 
         }
     }
