@@ -15,7 +15,7 @@ namespace HNKC.CrewManagePlatform.SqlSugars
             SqlSugarClient db = new SqlSugarClient(new ConnectionConfig()
             {
                 ConnectionString = dbCon,
-                DbType = DbType.Dm,
+                DbType = DbType.MySql,
                 IsAutoCloseConnection = false,//不设成true要手动close
                 MoreSettings = new ConnMoreSettings()
                 {

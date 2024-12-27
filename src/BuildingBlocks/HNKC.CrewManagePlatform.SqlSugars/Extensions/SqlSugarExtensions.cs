@@ -30,7 +30,7 @@ namespace HNKC.CrewManagePlatform.SqlSugars.Extensions
                 //Scoped用SqlSugarClient 
                 SqlSugarClient sqlSugar = new SqlSugarClient(new ConnectionConfig()
                 {
-                    DbType = DbType.Dm,
+                    DbType = DbType.MySql,
                     ConnectionString = conn,
                     IsAutoCloseConnection = true,
                 },
