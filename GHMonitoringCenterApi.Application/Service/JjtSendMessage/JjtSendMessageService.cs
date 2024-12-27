@@ -5850,7 +5850,7 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
             if (result != null)
             {
                 var year = result.Data.Year;
-                var day = int.Parse(result.Data.DayTime.Replace("月", "").Replace("日", "").Trim());
+                var day =DateTime.Now.AddDays(-1).ToString("yyyy-MM-dd");
                 var totalProducitonValue = result.Data.projectBasePoduction.TotalYearProductionValue;
                 companyDayProductionValueResponseDto.DateDay = day;
                 companyDayProductionValueResponseDto.TotalYearProductionValue = totalProducitonValue;

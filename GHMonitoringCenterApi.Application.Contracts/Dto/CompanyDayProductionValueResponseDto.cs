@@ -8,7 +8,7 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto
 {
     public class CompanyDayProductionValueResponseDto
     {
-        public int  DateDay { get; set; }
+        public string  DateDay { get; set; }
         public decimal TotalYearProductionValue { get; set; }
 
         public List<CompanyItem> CompanyItems { get; set; }
