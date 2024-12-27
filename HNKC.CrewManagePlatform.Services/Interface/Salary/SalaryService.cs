@@ -251,27 +251,22 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Salary
                         };
                         //获取参数
                         var url= AppsettingsHelper.GetValue("CtyunSms:SendSmsPhoneUrl");
-                        var sendTime = DateTime.Now.ToString("yyyy-MM");
+                        var sendTime =int.Parse(DateTime.Now.ToString("yyyyMM"));
                         //个人版发送
                         if (baseRequest != null && baseRequest.BId.HasValue)
                         {
                             var userInfo= res.Where(x => x.BusinessId == baseRequest.BId).First();
                             //生成签名
-                            var smsUrl=WebUtility.UrlEncode(CryptoStringExtension.EncryptAsync($"{userInfo.WorkNumber},{year},{month},{DateTime.Now.ToString("yyyyMMddHHmmssffff")}"));
+                            var smsUrl=WebUtility.UrlEncode(CryptoStringExtension.EncryptAsync($"{userInfo.WorkNumber},{year},{month}"));
                             //替换url参数
                             url=url.Replace("@sign", smsUrl);
                             ParameTemplate parameTemplate = new ParameTemplate()
                             {
-                                sendUrl = new SendUrl() { Url = url },
-                                sendTime = new SendTime(),
-                                user = new UserInfo() { Name = userInfo.Name }
+                                 Name= userInfo.Name,
+                                  Url=url,
+                                  Time= sendTime
                             };
-                           var  a= parameTemplate.user.ToJson();
-                           var  b= parameTemplate.sendTime.ToJson();
-                           var  c= parameTemplate.sendUrl.ToJson();
-
-                            parame.TemplateParam = $"{a},{b},{c}";
-                           
+                            parame.TemplateParam = parameTemplate.ToJson();
                         }
                         else if(baseRequest==null) {
                             //群发版

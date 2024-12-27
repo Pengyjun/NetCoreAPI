@@ -9,12 +9,13 @@ namespace HNKC.CrewManagePlatform.SqlSugars
     /// </summary>
     public class CodeFirst
     {
+        
         public static void InitTable(string dbCon)
         {
             SqlSugarClient db = new SqlSugarClient(new ConnectionConfig()
             {
                 ConnectionString = dbCon,
-                DbType = DbType.MySql,
+                DbType = DbType.Dm,
                 IsAutoCloseConnection = false,//不设成true要手动close
                 MoreSettings = new ConnMoreSettings()
                 {

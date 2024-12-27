@@ -9,22 +9,22 @@ namespace HNKC.CrewManagePlatform.Sms.Model
     public class ParameTemplate
     {
 
-        public UserInfo user { get; set; }
-        public SendTime  sendTime { get; set; }
-        public SendUrl  sendUrl { get; set; }
+        public string Name { get; set; }
+        public int  Time { get; set; }
+        public string  Url { get; set; }
     }
+}
+//public class UserInfo 
+//{
+//    public string Name { get; set; }
+//}
+//public class SendTime
+//{
+//    public string Time { get; set; }=DateTime.Now.ToString("yyyy-MM");
+//}
 
-public class UserInfo 
-{
-    public string Name { get; set; }
-}
-public class SendTime
-{
-    public string Time { get; set; }=DateTime.Now.ToString("yyyy-MM");
-}
-
-public class SendUrl
-{
-    public string Url { get; set; } 
-}
-}
+//public class SendUrl
+//{
+//    public string Url { get; set; } 
+//}
+//}
