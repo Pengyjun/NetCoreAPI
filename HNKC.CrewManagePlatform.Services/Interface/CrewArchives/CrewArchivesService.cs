@@ -59,6 +59,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                 .Select(x => new { x.CertificateId });
             var userCoC = _dbContext.Queryable<CertificateOfCompetency>()
                 .InnerJoin(userCoCFirst, (x, y) => x.CertificateId == y.CertificateId);
+            var ss = userCoC.ToList();
             #endregion
 
             //名称相关不赋值
@@ -74,19 +75,19 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                 .WhereIF(!string.IsNullOrWhiteSpace(requestBody.Phone), t => t.Phone.Contains(requestBody.Phone))
                 .LeftJoin(wShip, (t, ws) => t.BusinessId == ws.WorkShipId)
                 .LeftJoin<OwnerShip>((t, ws, ow) => ws.OnShip == ow.BusinessId.ToString())
-                .LeftJoin(userCoC, (t, ws, ow, coc) => t.BusinessId == coc.CertificateId)
-                .LeftJoin(uentity, (t, ws, ow, coc, ue) => t.BusinessId == ue.UserEntryId)
-                .LeftJoin<SkillCertificates>((t, ws, ow, coc, ue, sc) => sc.SkillcertificateId == t.BusinessId)
-                .LeftJoin<EducationalBackground>((t, ws, ow, coc, ue, sc, eb) => sc.SkillcertificateId == t.BusinessId)
-                .WhereIF(requestBody.CertificateTypes != null && requestBody.CertificateTypes.Any(), (t, ws, ow, coc, ue, sc, eb) => requestBody.CertificateTypes.Contains(sc.SkillCertificateType.ToString()))
-                .WhereIF(requestBody.QualificationTypes != null && requestBody.QualificationTypes.Any(), (t, ws, ow, coc, ue, sc, eb) => requestBody.QualificationTypes.Contains(eb.QualificationType.ToString()))
-                .WhereIF(requestBody.Qualifications != null && requestBody.Qualifications.Any(), (t, ws, ow, coc, ue, sc, eb) => requestBody.Qualifications.Contains(eb.Qualification.ToString()))
-                .WhereIF(requestBody.Staus != null && requestBody.Staus.Contains("0"), (t, ws, ow, coc, ue, sc, eb) => DateTime.Now < ws.WorkShipEndTime)//在岗
-                .WhereIF(requestBody.Staus != null && requestBody.Staus.Contains("1"), (t, ws, ow, coc, ue, sc, eb) => (int)t.DeleteReson == 1)//离职
-                .WhereIF(requestBody.Staus != null && requestBody.Staus.Contains("2"), (t, ws, ow, coc, ue, sc, eb) => (int)t.DeleteReson == 2)//调离
-                .WhereIF(requestBody.Staus != null && requestBody.Staus.Contains("3"), (t, ws, ow, coc, ue, sc, eb) => (int)t.DeleteReson == 3)//退休
-                .WhereIF(requestBody.Staus != null && requestBody.Staus.Contains("5"), (t, ws, ow, coc, ue, sc, eb) => DateTime.Now >= ws.WorkShipEndTime)//待岗
-                .Select((t, ws, ow, coc, ue, sc, eb) => new SearchCrewArchivesResponse
+                //.LeftJoin(userCoC, (t, ws, ow, coc) => t.BusinessId == coc.CertificateId)
+                .LeftJoin(uentity, (t, ws, ow, ue) => t.BusinessId == ue.UserEntryId)
+                .LeftJoin<SkillCertificates>((t, ws, ow, ue, sc) => sc.SkillcertificateId == t.BusinessId)
+                .LeftJoin<EducationalBackground>((t, ws, ow, ue, sc, eb) => sc.SkillcertificateId == t.BusinessId)
+                .WhereIF(requestBody.CertificateTypes != null && requestBody.CertificateTypes.Any(), (t, ws, ow, ue, sc, eb) => requestBody.CertificateTypes.Contains(sc.SkillCertificateType.ToString()))
+                .WhereIF(requestBody.QualificationTypes != null && requestBody.QualificationTypes.Any(), (t, ws, ow, ue, sc, eb) => requestBody.QualificationTypes.Contains(eb.QualificationType.ToString()))
+                .WhereIF(requestBody.Qualifications != null && requestBody.Qualifications.Any(), (t, ws, ow, ue, sc, eb) => requestBody.Qualifications.Contains(eb.Qualification.ToString()))
+                .WhereIF(requestBody.Staus != null && requestBody.Staus.Contains("0"), (t, ws, ow, ue, sc, eb) => DateTime.Now < ws.WorkShipEndTime)//在岗
+                .WhereIF(requestBody.Staus != null && requestBody.Staus.Contains("1"), (t, ws, ow, ue, sc, eb) => (int)t.DeleteReson == 1)//离职
+                .WhereIF(requestBody.Staus != null && requestBody.Staus.Contains("2"), (t, ws, ow, ue, sc, eb) => (int)t.DeleteReson == 2)//调离
+                .WhereIF(requestBody.Staus != null && requestBody.Staus.Contains("3"), (t, ws, ow, ue, sc, eb) => (int)t.DeleteReson == 3)//退休
+                .WhereIF(requestBody.Staus != null && requestBody.Staus.Contains("5"), (t, ws, ow, ue, sc, eb) => DateTime.Now >= ws.WorkShipEndTime)//待岗
+                .Select((t, ws, ow, ue, sc, eb) => new SearchCrewArchivesResponse
                 {
                     BId = t.BusinessId,
                     BtnType = t.IsDelete == 0 ? 1 : 0,
@@ -99,8 +100,6 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                     ServiceBookType = t.ServiceBookType,
                     CrewType = t.CrewType,
                     EmploymentType = ue.EmploymentId,
-                    FPosition = coc.FPosition,
-                    SPosition = coc.SPosition,
                     IsDelete = t.IsDelete,
                     DeleteReson = t.DeleteReson
                 })
@@ -169,11 +168,13 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                 var emptCodes = rt.Select(x => x.EmploymentType).ToList();
                 var emptab = await _dbContext.Queryable<EmploymentType>().Where(t => t.IsDelete == 1 && emptCodes.Contains(t.BusinessId.ToString())).ToListAsync();
                 //第一适任 第二适任
-                var firSecPosition = await _dbContext.Queryable<Position>().Where(t => t.IsDelete == 1).ToListAsync();
+                var position = await _dbContext.Queryable<Position>().Where(t => t.IsDelete == 1).ToListAsync();
+                var cerOfComps = await _dbContext.Queryable<CertificateOfCompetency>().Where(x => uIds.Contains(x.CertificateId) && (x.Type == CertificatesEnum.FCertificate || x.Type == CertificatesEnum.SCertificate)).ToListAsync();
                 //技能证书
                 var sctab = await _dbContext.Queryable<SkillCertificates>().Where(t => t.IsDelete == 1 && uIds.Contains(t.SkillcertificateId)).ToListAsync();
                 //特设证书
                 var spctab = await _dbContext.Queryable<SpecialEquips>().Where(t => t.IsDelete == 1 && uIds.Contains(t.SpecialEquipId)).ToListAsync();
+
 
                 //名称赋值
                 foreach (var t in rt)
@@ -220,8 +221,15 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                     t.ShipTypeName = EnumUtil.GetDescription(t.ShipType);
                     t.EmploymentTypeName = emptab.FirstOrDefault(x => x.BusinessId.ToString() == t.EmploymentType)?.Name;
                     t.CrewTypeName = crewTypetab.FirstOrDefault(x => t.CrewType == x.BusinessId.ToString())?.Name;
-                    if (t.FPosition != null) t.FPositionName = firSecPosition.FirstOrDefault(x => x.BusinessId.ToString() == t.FPosition)?.Name;
-                    if (t.SPosition != null) t.SPositionName = firSecPosition.FirstOrDefault(x => x.BusinessId.ToString() == t.SPosition)?.Name;
+                    if (cerOfComps != null)
+                    {
+                        var cerofcF = cerOfComps.FirstOrDefault(x => x.Type == CertificatesEnum.FCertificate && x.CertificateId == t.BId);
+                        var cerofcS = cerOfComps.FirstOrDefault(x => x.Type == CertificatesEnum.FCertificate && x.CertificateId == t.BId);
+                        t.FPositionName = position.FirstOrDefault(x => x.BusinessId.ToString() == cerofcF?.FPosition)?.Name;
+                        t.FPosition = cerofcF?.FPosition;
+                        t.SPositionName = position.FirstOrDefault(x => x.BusinessId.ToString() == cerofcS?.SPosition)?.Name;
+                        t.SPosition = cerofcS?.SPosition;
+                    }
                     t.ServiceBookName = EnumUtil.GetDescription(t.ServiceBookType);
                     t.SkillsCertificateName = sctabNames;
                     t.SkillsCertificate = sctabs;
