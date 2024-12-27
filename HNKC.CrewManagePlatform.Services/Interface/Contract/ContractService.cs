@@ -49,7 +49,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Contract
             #endregion
 
             //获取提醒天数
-            var remindSet = await _dbContext.Queryable<RemindSetting>().FirstAsync(t => t.RemindType == 1 && t.IsDelete == 1);
+            var remindSet = await _dbContext.Queryable<RemindSetting>().FirstAsync(t => t.RemindType == 11 && t.IsDelete == 1);
             int days = remindSet == null ? 0 : remindSet.Days;
             if (days == 0) return new PageResult<ContractSearch>();
             var rr = await _dbContext.Queryable<User>()
