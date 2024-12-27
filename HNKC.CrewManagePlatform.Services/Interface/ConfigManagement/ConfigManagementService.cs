@@ -85,6 +85,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.ConfigManagement
         /// <returns></returns>
         public async Task<PageResult<ShipSearch>> SearchShipAsync(ShipRequest requestBody)
         {
+            RefAsync<int> total = 0;
             PageResult<ShipSearch> dt = new();
             var rr = await _dbContext.Queryable<OwnerShip>()
                 .Where(x => x.IsDelete == 1)
@@ -99,7 +100,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.ConfigManagement
                     ShipType = x.ShipType,
                     ProjectName = y.ProjectName
                 })
-                .ToListAsync();
+                .ToPageListAsync(requestBody.PageIndex, requestBody.PageSize, total);
 
             var countrys = await _dbContext.Queryable<CountryRegion>().Where(t => rr.Select(x => x.Country).ToList().Contains(t.BusinessId.ToString())).ToListAsync();
             var ins = await _dbContext.Queryable<Institution>().Where(t => rr.Select(x => x.Company).ToList().Contains(t.BusinessId.ToString())).ToListAsync();
@@ -132,19 +133,20 @@ namespace HNKC.CrewManagePlatform.Services.Interface.ConfigManagement
                                                 {
                                                     Key = ((int)x).ToString(),
                                                     Value = GetEnumDescription(x),
-                                                    Type = (int)x
+                                                    Type = 22
                                                 })
                                                 .ToList();
             enumConvertList.Add(new DropDownResponse
             {
                 Key = "1",
-                Type = 0,
+                Type = 11,
                 Value = "劳务合同"
             });
 
             foreach (var item in enumConvertList)
             {
-                var ex = rr.FirstOrDefault(x => (int)x.Types == Convert.ToInt32(item.Key));
+                var ex = rr.FirstOrDefault(x => x.RemindType == Convert.ToInt32(item.Type) && (int)x.Types == Convert.ToInt32(item.Key));
+
                 if (ex != null)
                 {
                     rt.Add(new RemindSearch
@@ -159,21 +161,19 @@ namespace HNKC.CrewManagePlatform.Services.Interface.ConfigManagement
                 }
                 else
                 {
-                    int type = 0;
-                    type = item.Key == "1" ? 1 : type;
+
                     rt.Add(new RemindSearch
                     {
                         Days = 0,
                         Enable = 0,
-                        RemindType = type,
+                        RemindType = Convert.ToInt32(item.Type),
                         Types = Convert.ToInt32(item.Key).ToString(),
                         TypesName = item.Value
                     });
                 }
-
             }
 
-            return Result.Success(rt.OrderBy(x => x.RemindType));
+            return Result.Success(rt.OrderBy(x => x.RemindType).ThenBy(x => x.Types));
         }
         /// <summary>
         /// 保存提醒配置
@@ -188,7 +188,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.ConfigManagement
                 rt.Enable = requestBody.Enable;
                 rt.Days = requestBody.Days;
                 rt.Types = requestBody.Types;
-                await _dbContext.Updateable(rt).IgnoreColumns(x => x.RemindType).ExecuteCommandAsync();
+                await _dbContext.Updateable(rt).ExecuteCommandAsync();
                 return Result.Success("修改成功");
             }
             else
