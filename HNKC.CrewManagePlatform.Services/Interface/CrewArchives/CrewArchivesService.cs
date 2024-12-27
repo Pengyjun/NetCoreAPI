@@ -59,6 +59,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                 .Select(x => new { x.CertificateId });
             var userCoC = _dbContext.Queryable<CertificateOfCompetency>()
                 .InnerJoin(userCoCFirst, (x, y) => x.CertificateId == y.CertificateId);
+            var ss = userCoC.ToList();
             #endregion
 
             //名称相关不赋值
@@ -74,19 +75,19 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                 .WhereIF(!string.IsNullOrWhiteSpace(requestBody.Phone), t => t.Phone.Contains(requestBody.Phone))
                 .LeftJoin(wShip, (t, ws) => t.BusinessId == ws.WorkShipId)
                 .LeftJoin<OwnerShip>((t, ws, ow) => ws.OnShip == ow.BusinessId.ToString())
-                .LeftJoin(userCoC, (t, ws, ow, coc) => t.BusinessId == coc.CertificateId)
-                .LeftJoin(uentity, (t, ws, ow, coc, ue) => t.BusinessId == ue.UserEntryId)
-                .LeftJoin<SkillCertificates>((t, ws, ow, coc, ue, sc) => sc.SkillcertificateId == t.BusinessId)
-                .LeftJoin<EducationalBackground>((t, ws, ow, coc, ue, sc, eb) => sc.SkillcertificateId == t.BusinessId)
-                .WhereIF(requestBody.CertificateTypes != null && requestBody.CertificateTypes.Any(), (t, ws, ow, coc, ue, sc, eb) => requestBody.CertificateTypes.Contains(sc.SkillCertificateType.ToString()))
-                .WhereIF(requestBody.QualificationTypes != null && requestBody.QualificationTypes.Any(), (t, ws, ow, coc, ue, sc, eb) => requestBody.QualificationTypes.Contains(eb.QualificationType.ToString()))
-                .WhereIF(requestBody.Qualifications != null && requestBody.Qualifications.Any(), (t, ws, ow, coc, ue, sc, eb) => requestBody.Qualifications.Contains(eb.Qualification.ToString()))
-                .WhereIF(requestBody.Staus != null && requestBody.Staus.Contains("0"), (t, ws, ow, coc, ue, sc, eb) => DateTime.Now < ws.WorkShipEndTime)//在岗
-                .WhereIF(requestBody.Staus != null && requestBody.Staus.Contains("1"), (t, ws, ow, coc, ue, sc, eb) => (int)t.DeleteReson == 1)//离职
-                .WhereIF(requestBody.Staus != null && requestBody.Staus.Contains("2"), (t, ws, ow, coc, ue, sc, eb) => (int)t.DeleteReson == 2)//调离
-                .WhereIF(requestBody.Staus != null && requestBody.Staus.Contains("3"), (t, ws, ow, coc, ue, sc, eb) => (int)t.DeleteReson == 3)//退休
-                .WhereIF(requestBody.Staus != null && requestBody.Staus.Contains("5"), (t, ws, ow, coc, ue, sc, eb) => DateTime.Now >= ws.WorkShipEndTime)//待岗
-                .Select((t, ws, ow, coc, ue, sc, eb) => new SearchCrewArchivesResponse
+                //.LeftJoin(userCoC, (t, ws, ow, coc) => t.BusinessId == coc.CertificateId)
+                .LeftJoin(uentity, (t, ws, ow, ue) => t.BusinessId == ue.UserEntryId)
+                .LeftJoin<SkillCertificates>((t, ws, ow, ue, sc) => sc.SkillcertificateId == t.BusinessId)
+                .LeftJoin<EducationalBackground>((t, ws, ow, ue, sc, eb) => sc.SkillcertificateId == t.BusinessId)
+                .WhereIF(requestBody.CertificateTypes != null && requestBody.CertificateTypes.Any(), (t, ws, ow, ue, sc, eb) => requestBody.CertificateTypes.Contains(sc.SkillCertificateType.ToString()))
+                .WhereIF(requestBody.QualificationTypes != null && requestBody.QualificationTypes.Any(), (t, ws, ow, ue, sc, eb) => requestBody.QualificationTypes.Contains(eb.QualificationType.ToString()))
+                .WhereIF(requestBody.Qualifications != null && requestBody.Qualifications.Any(), (t, ws, ow, ue, sc, eb) => requestBody.Qualifications.Contains(eb.Qualification.ToString()))
+                .WhereIF(requestBody.Staus != null && requestBody.Staus.Contains("0"), (t, ws, ow, ue, sc, eb) => DateTime.Now < ws.WorkShipEndTime)//在岗
+                .WhereIF(requestBody.Staus != null && requestBody.Staus.Contains("1"), (t, ws, ow, ue, sc, eb) => (int)t.DeleteReson == 1)//离职
+                .WhereIF(requestBody.Staus != null && requestBody.Staus.Contains("2"), (t, ws, ow, ue, sc, eb) => (int)t.DeleteReson == 2)//调离
+                .WhereIF(requestBody.Staus != null && requestBody.Staus.Contains("3"), (t, ws, ow, ue, sc, eb) => (int)t.DeleteReson == 3)//退休
+                .WhereIF(requestBody.Staus != null && requestBody.Staus.Contains("5"), (t, ws, ow, ue, sc, eb) => DateTime.Now >= ws.WorkShipEndTime)//待岗
+                .Select((t, ws, ow, ue, sc, eb) => new SearchCrewArchivesResponse
                 {
                     BId = t.BusinessId,
                     BtnType = t.IsDelete == 0 ? 1 : 0,
@@ -99,8 +100,6 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                     ServiceBookType = t.ServiceBookType,
                     CrewType = t.CrewType,
                     EmploymentType = ue.EmploymentId,
-                    FPosition = coc.FPosition,
-                    SPosition = coc.SPosition,
                     IsDelete = t.IsDelete,
                     DeleteReson = t.DeleteReson
                 })
@@ -169,11 +168,13 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                 var emptCodes = rt.Select(x => x.EmploymentType).ToList();
                 var emptab = await _dbContext.Queryable<EmploymentType>().Where(t => t.IsDelete == 1 && emptCodes.Contains(t.BusinessId.ToString())).ToListAsync();
                 //第一适任 第二适任
-                var firSecPosition = await _dbContext.Queryable<Position>().Where(t => t.IsDelete == 1).ToListAsync();
+                var position = await _dbContext.Queryable<Position>().Where(t => t.IsDelete == 1).ToListAsync();
+                var cerOfComps = await _dbContext.Queryable<CertificateOfCompetency>().Where(x => uIds.Contains(x.CertificateId) && (x.Type == CertificatesEnum.FCertificate || x.Type == CertificatesEnum.SCertificate)).ToListAsync();
                 //技能证书
                 var sctab = await _dbContext.Queryable<SkillCertificates>().Where(t => t.IsDelete == 1 && uIds.Contains(t.SkillcertificateId)).ToListAsync();
                 //特设证书
                 var spctab = await _dbContext.Queryable<SpecialEquips>().Where(t => t.IsDelete == 1 && uIds.Contains(t.SpecialEquipId)).ToListAsync();
+
 
                 //名称赋值
                 foreach (var t in rt)
@@ -220,8 +221,15 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                     t.ShipTypeName = EnumUtil.GetDescription(t.ShipType);
                     t.EmploymentTypeName = emptab.FirstOrDefault(x => x.BusinessId.ToString() == t.EmploymentType)?.Name;
                     t.CrewTypeName = crewTypetab.FirstOrDefault(x => t.CrewType == x.BusinessId.ToString())?.Name;
-                    if (t.FPosition != null) t.FPositionName = firSecPosition.FirstOrDefault(x => x.BusinessId.ToString() == t.FPosition)?.Name;
-                    if (t.SPosition != null) t.SPositionName = firSecPosition.FirstOrDefault(x => x.BusinessId.ToString() == t.SPosition)?.Name;
+                    if (cerOfComps != null)
+                    {
+                        var cerofcF = cerOfComps.FirstOrDefault(x => x.Type == CertificatesEnum.FCertificate && x.CertificateId == t.BId);
+                        var cerofcS = cerOfComps.FirstOrDefault(x => x.Type == CertificatesEnum.FCertificate && x.CertificateId == t.BId);
+                        t.FPositionName = position.FirstOrDefault(x => x.BusinessId.ToString() == cerofcF?.FPosition)?.Name;
+                        t.FPosition = cerofcF?.FPosition;
+                        t.SPositionName = position.FirstOrDefault(x => x.BusinessId.ToString() == cerofcS?.SPosition)?.Name;
+                        t.SPosition = cerofcS?.SPosition;
+                    }
                     t.ServiceBookName = EnumUtil.GetDescription(t.ServiceBookType);
                     t.SkillsCertificateName = sctabNames;
                     t.SkillsCertificate = sctabs;
@@ -484,13 +492,13 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
             #endregion
 
             #region 适任及证书
-            CertificateOfCompetency coc = new();
+            List<CertificateOfCompetency> cocs = new();
             List<VisaRecords> vrs = new();
             List<SkillCertificates> sfs = new();
             List<SpecialEquips> ses = new();
             if (requestBody.CertificateOfCompetencyDto != null)
             {
-                coc = new CertificateOfCompetency
+                var f = new CertificateOfCompetency
                 {
                     CertificateId = uId,
                     BusinessId = GuidUtil.Next(),
@@ -501,12 +509,26 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                     FSignTime = requestBody.CertificateOfCompetencyDto.FSignTime,
                     FEffectiveTime = requestBody.CertificateOfCompetencyDto.FEffectiveTime,
                     FScans = GuidUtil.Next(),
+                    Type = CertificatesEnum.FCertificate
+                };
+                var s = new CertificateOfCompetency
+                {
+                    CertificateId = uId,
+                    BusinessId = GuidUtil.Next(),
+                    Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
                     SCertificate = requestBody.CertificateOfCompetencyDto.SCertificate,
                     SNavigationArea = requestBody.CertificateOfCompetencyDto.SNavigationArea,
                     SPosition = requestBody.CertificateOfCompetencyDto.SPosition,
                     SSignTime = requestBody.CertificateOfCompetencyDto.SSignTime,
                     SEffectiveTime = requestBody.CertificateOfCompetencyDto.SEffectiveTime,
                     SScans = GuidUtil.Next(),
+                    Type = CertificatesEnum.SCertificate
+                };
+                var t = new CertificateOfCompetency
+                {
+                    CertificateId = uId,
+                    BusinessId = GuidUtil.Next(),
+                    Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
                     TrainingCertificate = requestBody.CertificateOfCompetencyDto.TrainingCertificate,
                     TrainingSignTime = requestBody.CertificateOfCompetencyDto.TrainingSignTime,
                     TrainingScans = GuidUtil.Next(),
@@ -518,56 +540,84 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                     Z02EffectiveTime = requestBody.CertificateOfCompetencyDto.Z02EffectiveTime,
                     Z06EffectiveTime = requestBody.CertificateOfCompetencyDto.Z06EffectiveTime,
                     Z09EffectiveTime = requestBody.CertificateOfCompetencyDto.Z09EffectiveTime,
+                    Type = CertificatesEnum.PXHGZ
+                };
+                var h = new CertificateOfCompetency
+                {
+                    CertificateId = uId,
+                    BusinessId = GuidUtil.Next(),
+                    Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
                     HealthCertificate = requestBody.CertificateOfCompetencyDto.HealthCertificate,
                     HealthSignTime = requestBody.CertificateOfCompetencyDto.HealthSignTime,
                     HealthEffectiveTime = requestBody.CertificateOfCompetencyDto.HealthEffectiveTime,
                     HealthScans = GuidUtil.Next(),
+                    Type = CertificatesEnum.JKZ
+                };
+                var se = new CertificateOfCompetency
+                {
+                    CertificateId = uId,
+                    BusinessId = GuidUtil.Next(),
+                    Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
                     SeamanCertificate = requestBody.CertificateOfCompetencyDto.SeamanCertificate,
                     SeamanSignTime = requestBody.CertificateOfCompetencyDto.SeamanSignTime,
                     SeamanEffectiveTime = requestBody.CertificateOfCompetencyDto.SeamanEffectiveTime,
                     SeamanScans = GuidUtil.Next(),
+                    Type = CertificatesEnum.HYZ
+                };
+                var p = new CertificateOfCompetency
+                {
+                    CertificateId = uId,
+                    BusinessId = GuidUtil.Next(),
+                    Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
                     PassportCertificate = requestBody.CertificateOfCompetencyDto.PassportCertificate,
                     PassportSignTime = requestBody.CertificateOfCompetencyDto.PassportSignTime,
                     PassportEffectiveTime = requestBody.CertificateOfCompetencyDto.PassportEffectiveTime,
-                    PassportScans = GuidUtil.Next()
+                    PassportScans = GuidUtil.Next(),
+                    Type = CertificatesEnum.HZ
                 };
+                cocs.Add(f);
+                cocs.Add(s);
+                cocs.Add(t);
+                cocs.Add(h);
+                cocs.Add(se);
+                cocs.Add(p);
                 //文件
                 if (requestBody.CertificateOfCompetencyDto.FScansUpload != null && requestBody.CertificateOfCompetencyDto.FScansUpload.Any())
                 {
                     var ff = requestBody.CertificateOfCompetencyDto.FScansUpload;
-                    ff.ForEach(x => x.FileId = coc.FScans);
+                    ff.ForEach(x => x.FileId = f.FScans);
                     upLoadFiles.AddRange(ff);
                 }
                 if (requestBody.CertificateOfCompetencyDto.SScansUpload != null && requestBody.CertificateOfCompetencyDto.SScansUpload.Any())
                 {
                     var ff = requestBody.CertificateOfCompetencyDto.SScansUpload;
-                    ff.ForEach(x => x.FileId = coc.SScans);
+                    ff.ForEach(x => x.FileId = s.SScans);
                     upLoadFiles.AddRange(ff);
                 }
                 if (requestBody.CertificateOfCompetencyDto.TrainingScansUpload != null && requestBody.CertificateOfCompetencyDto.TrainingScansUpload.Any())
                 {
                     var ff = requestBody.CertificateOfCompetencyDto.TrainingScansUpload;
                     ff.ForEach(x => x.BId = GuidUtil.Next());
-                    ff.ForEach(x => x.FileId = coc.TrainingScans);
+                    ff.ForEach(x => x.FileId = t.TrainingScans);
                     upLoadFiles.AddRange(ff);
                 }
                 if (requestBody.CertificateOfCompetencyDto.HealthScansUpload != null && requestBody.CertificateOfCompetencyDto.HealthScansUpload.Any())
                 {
                     var ff = requestBody.CertificateOfCompetencyDto.HealthScansUpload;
-                    ff.ForEach(x => x.FileId = coc.HealthScans);
+                    ff.ForEach(x => x.FileId = h.HealthScans);
                     upLoadFiles.AddRange(ff);
                 }
                 if (requestBody.CertificateOfCompetencyDto.SeamanScansUpload != null && requestBody.CertificateOfCompetencyDto.SeamanScansUpload.Any())
                 {
                     var ff = requestBody.CertificateOfCompetencyDto.SeamanScansUpload;
                     ff.ForEach(x => x.BId = GuidUtil.Next());
-                    ff.ForEach(x => x.FileId = coc.SeamanScans);
+                    ff.ForEach(x => x.FileId = se.SeamanScans);
                     upLoadFiles.AddRange(ff);
                 }
                 if (requestBody.CertificateOfCompetencyDto.PassportScansUpload != null && requestBody.CertificateOfCompetencyDto.PassportScansUpload.Any())
                 {
                     var ff = requestBody.CertificateOfCompetencyDto.PassportScansUpload;
-                    ff.ForEach(x => x.FileId = coc.PassportScans);
+                    ff.ForEach(x => x.FileId = p.PassportScans);
                     upLoadFiles.AddRange(ff);
                 }
 
@@ -634,7 +684,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                     }
                 }
             }
-            if (coc != null) await _dbContext.Insertable(coc).ExecuteCommandAsync();
+            if (cocs != null && cocs.Any()) await _dbContext.Insertable(cocs).ExecuteCommandAsync();
             if (vrs.Any()) await _dbContext.Insertable(vrs).ExecuteCommandAsync();
             if (sfs.Any()) await _dbContext.Insertable(sfs).ExecuteCommandAsync();
             if (ses.Any()) await _dbContext.Insertable(ses).ExecuteCommandAsync();
@@ -944,7 +994,8 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                 #endregion
 
                 #region 适任及证书
-                CertificateOfCompetency coc = new();
+                List<CertificateOfCompetency> cocs = new();
+                List<CertificateOfCompetency> cocsAdd = new();
                 List<VisaRecords> vrs = new();
                 List<SkillCertificates> sfs = new();
                 List<SpecialEquips> ses = new();
@@ -953,146 +1004,192 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                 List<VisaRecords> vrsAdd = new();
                 if (requestBody.CertificateOfCompetencyDto != null)
                 {
-                    coc = await _dbContext.Queryable<CertificateOfCompetency>().FirstAsync(t => t.IsDelete == 1 && t.CertificateId == userInfo.BusinessId);
+                    cocs = await _dbContext.Queryable<CertificateOfCompetency>().Where(t => t.IsDelete == 1 && t.CertificateId == userInfo.BusinessId).ToListAsync();
                     #region 
-                    if (coc != null)
+                    var f = new CertificateOfCompetency
                     {
-                        coc.FCertificate = requestBody.CertificateOfCompetencyDto.FCertificate;
-                        coc.FNavigationArea = requestBody.CertificateOfCompetencyDto.FNavigationArea;
-                        coc.FPosition = requestBody.CertificateOfCompetencyDto.FPosition;
-                        coc.FSignTime = requestBody.CertificateOfCompetencyDto.FSignTime;
-                        coc.FEffectiveTime = requestBody.CertificateOfCompetencyDto.FEffectiveTime;
-                        coc.FScans = GuidUtil.Next();
-                        coc.SCertificate = requestBody.CertificateOfCompetencyDto.SCertificate;
-                        coc.SNavigationArea = requestBody.CertificateOfCompetencyDto.SNavigationArea;
-                        coc.SPosition = requestBody.CertificateOfCompetencyDto.SPosition;
-                        coc.SSignTime = requestBody.CertificateOfCompetencyDto.SSignTime;
-                        coc.SEffectiveTime = requestBody.CertificateOfCompetencyDto.SEffectiveTime;
-                        coc.SScans = GuidUtil.Next();
-                        coc.TrainingCertificate = requestBody.CertificateOfCompetencyDto.TrainingCertificate;
-                        coc.TrainingSignTime = requestBody.CertificateOfCompetencyDto.TrainingSignTime;
-                        coc.TrainingScans = GuidUtil.Next();
-                        coc.Z01EffectiveTime = requestBody.CertificateOfCompetencyDto.Z01EffectiveTime;
-                        coc.Z07EffectiveTime = requestBody.CertificateOfCompetencyDto.Z07EffectiveTime;
-                        coc.Z08EffectiveTime = requestBody.CertificateOfCompetencyDto.Z08EffectiveTime;
-                        coc.Z04EffectiveTime = requestBody.CertificateOfCompetencyDto.Z04EffectiveTime;
-                        coc.Z05EffectiveTime = requestBody.CertificateOfCompetencyDto.Z05EffectiveTime;
-                        coc.Z02EffectiveTime = requestBody.CertificateOfCompetencyDto.Z02EffectiveTime;
-                        coc.Z06EffectiveTime = requestBody.CertificateOfCompetencyDto.Z06EffectiveTime;
-                        coc.Z09EffectiveTime = requestBody.CertificateOfCompetencyDto.Z09EffectiveTime;
-                        coc.HealthCertificate = requestBody.CertificateOfCompetencyDto.HealthCertificate;
-                        coc.HealthSignTime = requestBody.CertificateOfCompetencyDto.HealthSignTime;
-                        coc.HealthEffectiveTime = requestBody.CertificateOfCompetencyDto.HealthEffectiveTime;
-                        coc.HealthScans = GuidUtil.Next();
-                        coc.SeamanCertificate = requestBody.CertificateOfCompetencyDto.SeamanCertificate;
-                        coc.SeamanSignTime = requestBody.CertificateOfCompetencyDto.SeamanSignTime;
-                        coc.SeamanEffectiveTime = requestBody.CertificateOfCompetencyDto.SeamanEffectiveTime;
-                        coc.SeamanScans = GuidUtil.Next();
-                        coc.PassportCertificate = requestBody.CertificateOfCompetencyDto.PassportCertificate;
-                        coc.PassportSignTime = requestBody.CertificateOfCompetencyDto.PassportSignTime;
-                        coc.PassportEffectiveTime = requestBody.CertificateOfCompetencyDto.PassportEffectiveTime;
-                        coc.PassportScans = GuidUtil.Next();
-
-                        //文件
-                        if (requestBody.CertificateOfCompetencyDto.FScansUpload != null && requestBody.CertificateOfCompetencyDto.FScansUpload.Any())
+                        CertificateId = userInfo.BusinessId,
+                        BusinessId = GuidUtil.Next(),
+                        Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                        FCertificate = requestBody.CertificateOfCompetencyDto.FCertificate,
+                        FNavigationArea = requestBody.CertificateOfCompetencyDto.FNavigationArea,
+                        FPosition = requestBody.CertificateOfCompetencyDto.FPosition,
+                        FSignTime = requestBody.CertificateOfCompetencyDto.FSignTime,
+                        FEffectiveTime = requestBody.CertificateOfCompetencyDto.FEffectiveTime,
+                        FScans = GuidUtil.Next(),
+                        Type = CertificatesEnum.FCertificate
+                    };
+                    var s = new CertificateOfCompetency
+                    {
+                        CertificateId = userInfo.BusinessId,
+                        BusinessId = GuidUtil.Next(),
+                        Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                        SCertificate = requestBody.CertificateOfCompetencyDto.SCertificate,
+                        SNavigationArea = requestBody.CertificateOfCompetencyDto.SNavigationArea,
+                        SPosition = requestBody.CertificateOfCompetencyDto.SPosition,
+                        SSignTime = requestBody.CertificateOfCompetencyDto.SSignTime,
+                        SEffectiveTime = requestBody.CertificateOfCompetencyDto.SEffectiveTime,
+                        SScans = GuidUtil.Next(),
+                        Type = CertificatesEnum.SCertificate
+                    };
+                    var t = new CertificateOfCompetency
+                    {
+                        CertificateId = userInfo.BusinessId,
+                        BusinessId = GuidUtil.Next(),
+                        Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                        TrainingCertificate = requestBody.CertificateOfCompetencyDto.TrainingCertificate,
+                        TrainingSignTime = requestBody.CertificateOfCompetencyDto.TrainingSignTime,
+                        TrainingScans = GuidUtil.Next(),
+                        Z01EffectiveTime = requestBody.CertificateOfCompetencyDto.Z01EffectiveTime,
+                        Z07EffectiveTime = requestBody.CertificateOfCompetencyDto.Z07EffectiveTime,
+                        Z08EffectiveTime = requestBody.CertificateOfCompetencyDto.Z08EffectiveTime,
+                        Z04EffectiveTime = requestBody.CertificateOfCompetencyDto.Z04EffectiveTime,
+                        Z05EffectiveTime = requestBody.CertificateOfCompetencyDto.Z05EffectiveTime,
+                        Z02EffectiveTime = requestBody.CertificateOfCompetencyDto.Z02EffectiveTime,
+                        Z06EffectiveTime = requestBody.CertificateOfCompetencyDto.Z06EffectiveTime,
+                        Z09EffectiveTime = requestBody.CertificateOfCompetencyDto.Z09EffectiveTime,
+                        Type = CertificatesEnum.PXHGZ
+                    };
+                    var h = new CertificateOfCompetency
+                    {
+                        CertificateId = userInfo.BusinessId,
+                        BusinessId = GuidUtil.Next(),
+                        Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                        HealthCertificate = requestBody.CertificateOfCompetencyDto.HealthCertificate,
+                        HealthSignTime = requestBody.CertificateOfCompetencyDto.HealthSignTime,
+                        HealthEffectiveTime = requestBody.CertificateOfCompetencyDto.HealthEffectiveTime,
+                        HealthScans = GuidUtil.Next(),
+                        Type = CertificatesEnum.JKZ
+                    };
+                    var se = new CertificateOfCompetency
+                    {
+                        CertificateId = userInfo.BusinessId,
+                        BusinessId = GuidUtil.Next(),
+                        Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                        SeamanCertificate = requestBody.CertificateOfCompetencyDto.SeamanCertificate,
+                        SeamanSignTime = requestBody.CertificateOfCompetencyDto.SeamanSignTime,
+                        SeamanEffectiveTime = requestBody.CertificateOfCompetencyDto.SeamanEffectiveTime,
+                        SeamanScans = GuidUtil.Next(),
+                        Type = CertificatesEnum.HYZ
+                    };
+                    var p = new CertificateOfCompetency
+                    {
+                        CertificateId = userInfo.BusinessId,
+                        BusinessId = GuidUtil.Next(),
+                        Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                        PassportCertificate = requestBody.CertificateOfCompetencyDto.PassportCertificate,
+                        PassportSignTime = requestBody.CertificateOfCompetencyDto.PassportSignTime,
+                        PassportEffectiveTime = requestBody.CertificateOfCompetencyDto.PassportEffectiveTime,
+                        PassportScans = GuidUtil.Next(),
+                        Type = CertificatesEnum.HZ
+                    };
+                    cocsAdd.Add(f);
+                    cocsAdd.Add(s);
+                    cocsAdd.Add(t);
+                    cocsAdd.Add(h);
+                    cocsAdd.Add(se);
+                    cocsAdd.Add(p);
+                    //文件
+                    if (requestBody.CertificateOfCompetencyDto.FScansUpload != null && requestBody.CertificateOfCompetencyDto.FScansUpload.Any())
+                    {
+                        var ff = requestBody.CertificateOfCompetencyDto.FScansUpload;
+                        ff.ForEach(x => x.FileId = f.FScans);
+                        upLoadFiles.AddRange(ff);
+                    }
+                    if (requestBody.CertificateOfCompetencyDto.SScansUpload != null && requestBody.CertificateOfCompetencyDto.SScansUpload.Any())
+                    {
+                        var ff = requestBody.CertificateOfCompetencyDto.SScansUpload;
+                        ff.ForEach(x => x.FileId = s.SScans);
+                        upLoadFiles.AddRange(ff);
+                    }
+                    if (requestBody.CertificateOfCompetencyDto.TrainingScansUpload != null && requestBody.CertificateOfCompetencyDto.TrainingScansUpload.Any())
+                    {
+                        var ff = requestBody.CertificateOfCompetencyDto.TrainingScansUpload;
+                        ff.ForEach(x => x.BId = GuidUtil.Next());
+                        ff.ForEach(x => x.FileId = t.TrainingScans);
+                        upLoadFiles.AddRange(ff);
+                    }
+                    if (requestBody.CertificateOfCompetencyDto.HealthScansUpload != null && requestBody.CertificateOfCompetencyDto.HealthScansUpload.Any())
+                    {
+                        var ff = requestBody.CertificateOfCompetencyDto.HealthScansUpload;
+                        ff.ForEach(x => x.FileId = h.HealthScans);
+                        upLoadFiles.AddRange(ff);
+                    }
+                    if (requestBody.CertificateOfCompetencyDto.SeamanScansUpload != null && requestBody.CertificateOfCompetencyDto.SeamanScansUpload.Any())
+                    {
+                        var ff = requestBody.CertificateOfCompetencyDto.SeamanScansUpload;
+                        ff.ForEach(x => x.BId = GuidUtil.Next());
+                        ff.ForEach(x => x.FileId = se.SeamanScans);
+                        upLoadFiles.AddRange(ff);
+                    }
+                    if (requestBody.CertificateOfCompetencyDto.PassportScansUpload != null && requestBody.CertificateOfCompetencyDto.PassportScansUpload.Any())
+                    {
+                        var ff = requestBody.CertificateOfCompetencyDto.PassportScansUpload;
+                        ff.ForEach(x => x.FileId = p.PassportScans);
+                        upLoadFiles.AddRange(ff);
+                    }
+                    //签证记录
+                    if (requestBody.CertificateOfCompetencyDto.VisaRecords != null && requestBody.CertificateOfCompetencyDto.VisaRecords.Any())
+                    {
+                        vrs = await _dbContext.Queryable<VisaRecords>().Where(t => t.VisareCordId == userInfo.BusinessId).ToListAsync();
+                        foreach (var item in requestBody.CertificateOfCompetencyDto.VisaRecords)
                         {
-                            var ff = requestBody.CertificateOfCompetencyDto.FScansUpload;
-                            ff.ForEach(x => x.FileId = coc.FScans);
-                            upLoadFiles.AddRange(ff);
-                        }
-                        if (requestBody.CertificateOfCompetencyDto.SScansUpload != null && requestBody.CertificateOfCompetencyDto.SScansUpload.Any())
-                        {
-                            var ff = requestBody.CertificateOfCompetencyDto.SScansUpload;
-                            ff.ForEach(x => x.FileId = coc.SScans);
-                            upLoadFiles.AddRange(ff);
-                        }
-                        if (requestBody.CertificateOfCompetencyDto.TrainingScansUpload != null && requestBody.CertificateOfCompetencyDto.TrainingScansUpload.Any())
-                        {
-                            var ff = requestBody.CertificateOfCompetencyDto.TrainingScansUpload;
-                            ff.ForEach(x => x.FileId = coc.TrainingScans);
-                            upLoadFiles.AddRange(ff);
-                        }
-                        if (requestBody.CertificateOfCompetencyDto.HealthScansUpload != null && requestBody.CertificateOfCompetencyDto.HealthScansUpload.Any())
-                        {
-                            var ff = requestBody.CertificateOfCompetencyDto.HealthScansUpload;
-                            ff.ForEach(x => x.FileId = coc.HealthScans);
-                            upLoadFiles.AddRange(ff);
-                        }
-                        if (requestBody.CertificateOfCompetencyDto.SeamanScansUpload != null && requestBody.CertificateOfCompetencyDto.SeamanScansUpload.Any())
-                        {
-                            var ff = requestBody.CertificateOfCompetencyDto.SeamanScansUpload;
-                            ff.ForEach(x => x.FileId = coc.SeamanScans);
-                            upLoadFiles.AddRange(ff);
-                        }
-                        if (requestBody.CertificateOfCompetencyDto.PassportScansUpload != null && requestBody.CertificateOfCompetencyDto.PassportScansUpload.Any())
-                        {
-                            var ff = requestBody.CertificateOfCompetencyDto.PassportScansUpload;
-                            ff.ForEach(x => x.FileId = coc.PassportScans);
-                            upLoadFiles.AddRange(ff);
-                        }
-                        //签证记录
-                        if (requestBody.CertificateOfCompetencyDto.VisaRecords != null && requestBody.CertificateOfCompetencyDto.VisaRecords.Any())
-                        {
-                            vrs = await _dbContext.Queryable<VisaRecords>().Where(t => t.VisareCordId == userInfo.BusinessId).ToListAsync();
-                            foreach (var item in requestBody.CertificateOfCompetencyDto.VisaRecords)
+                            vrsAdd.Add(new VisaRecords
                             {
-                                vrsAdd.Add(new VisaRecords
-                                {
-                                    Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
-                                    VisareCordId = userInfo.BusinessId,
-                                    BusinessId = GuidUtil.Next(),
-                                    Country = item.Country,
-                                    DueTime = item.DueTime,
-                                    VisaType = item.VisaType,
-                                });
+                                Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                                VisareCordId = userInfo.BusinessId,
+                                BusinessId = GuidUtil.Next(),
+                                Country = item.Country,
+                                DueTime = item.DueTime,
+                                VisaType = item.VisaType,
+                            });
+                        }
+                    }
+                    //技能证书
+                    if (requestBody.CertificateOfCompetencyDto.SkillCertificates != null && requestBody.CertificateOfCompetencyDto.SkillCertificates.Any())
+                    {
+                        sfs = await _dbContext.Queryable<SkillCertificates>().Where(t => t.IsDelete == 1 && t.SkillcertificateId == userInfo.BusinessId).ToListAsync();
+                        foreach (var item in requestBody.CertificateOfCompetencyDto.SkillCertificates)
+                        {
+                            var filedId = GuidUtil.Next();
+                            sfsAdd.Add(new SkillCertificates
+                            {
+                                Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                                BusinessId = GuidUtil.Next(),
+                                SkillCertificateType = item.SkillCertificateType,
+                                SkillScans = filedId,
+                                SkillcertificateId = userInfo.BusinessId
+                            });
+                            if (item.SkillScansUpload != null && item.SkillScansUpload.Any())
+                            {
+                                var ff = item.SkillScansUpload;
+                                ff.ForEach(x => x.FileId = filedId);
+                                upLoadFiles.AddRange(ff);
                             }
                         }
-                        //技能证书
-                        if (requestBody.CertificateOfCompetencyDto.SkillCertificates != null && requestBody.CertificateOfCompetencyDto.SkillCertificates.Any())
+                    }
+                    //特种设备证书
+                    if (requestBody.CertificateOfCompetencyDto.SpecialEquips != null && requestBody.CertificateOfCompetencyDto.SpecialEquips.Any())
+                    {
+                        ses = await _dbContext.Queryable<SpecialEquips>().Where(t => t.IsDelete == 1 && t.SpecialEquipId == userInfo.BusinessId).ToListAsync();
+                        foreach (var item in requestBody.CertificateOfCompetencyDto.SpecialEquips)
                         {
-                            sfs = await _dbContext.Queryable<SkillCertificates>().Where(t => t.IsDelete == 1 && t.SkillcertificateId == userInfo.BusinessId).ToListAsync();
-                            foreach (var item in requestBody.CertificateOfCompetencyDto.SkillCertificates)
+                            var fileId = GuidUtil.Next();
+                            sesAdd.Add(new SpecialEquips
                             {
-                                var filedId = GuidUtil.Next();
-                                sfsAdd.Add(new SkillCertificates
-                                {
-                                    Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
-                                    BusinessId = GuidUtil.Next(),
-                                    SkillCertificateType = item.SkillCertificateType,
-                                    SkillScans = filedId,
-                                    SkillcertificateId = userInfo.BusinessId
-                                });
-                                if (item.SkillScansUpload != null && item.SkillScansUpload.Any())
-                                {
-                                    var ff = item.SkillScansUpload;
-                                    ff.ForEach(x => x.FileId = filedId);
-                                    upLoadFiles.AddRange(ff);
-                                }
-                            }
-                        }
-                        //特种设备证书
-                        if (requestBody.CertificateOfCompetencyDto.SpecialEquips != null && requestBody.CertificateOfCompetencyDto.SpecialEquips.Any())
-                        {
-                            ses = await _dbContext.Queryable<SpecialEquips>().Where(t => t.IsDelete == 1 && t.SpecialEquipId == userInfo.BusinessId).ToListAsync();
-                            foreach (var item in requestBody.CertificateOfCompetencyDto.SpecialEquips)
+                                BusinessId = GuidUtil.Next(),
+                                AnnualReviewTime = item.SpecialEquipsEffectiveTime,
+                                Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                                SpecialEquipId = userInfo.BusinessId,
+                                SpecialEquipsCertificateType = item.SpecialEquipsCertificateType,
+                                SpecialEquipsEffectiveTime = item.SpecialEquipsEffectiveTime,
+                                SpecialEquipsScans = fileId
+                            });
+                            if (item.SpecialEquipsScansUpload != null && item.SpecialEquipsScansUpload.Any())
                             {
-                                var fileId = GuidUtil.Next();
-                                sesAdd.Add(new SpecialEquips
-                                {
-                                    BusinessId = GuidUtil.Next(),
-                                    AnnualReviewTime = item.SpecialEquipsEffectiveTime,
-                                    Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
-                                    SpecialEquipId = userInfo.BusinessId,
-                                    SpecialEquipsCertificateType = item.SpecialEquipsCertificateType,
-                                    SpecialEquipsEffectiveTime = item.SpecialEquipsEffectiveTime,
-                                    SpecialEquipsScans = fileId
-                                });
-                                if (item.SpecialEquipsScansUpload != null && item.SpecialEquipsScansUpload.Any())
-                                {
-                                    var ff = item.SpecialEquipsScansUpload;
-                                    ff.ForEach(x => x.FileId = fileId);
-                                    upLoadFiles.AddRange(ff);
-                                }
+                                var ff = item.SpecialEquipsScansUpload;
+                                ff.ForEach(x => x.FileId = fileId);
+                                upLoadFiles.AddRange(ff);
                             }
                         }
                     }
@@ -1101,10 +1198,11 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                 if (vrs.Any()) await _dbContext.Deleteable(vrs).ExecuteCommandAsync();
                 if (sfs.Any()) await _dbContext.Deleteable(sfs).ExecuteCommandAsync();
                 if (ses.Any()) await _dbContext.Deleteable(ses).ExecuteCommandAsync();
-                if (coc != null) await _dbContext.Updateable(coc).ExecuteCommandAsync();
+                if (cocs != null && cocs.Any()) await _dbContext.Deleteable(cocs).ExecuteCommandAsync();
                 if (sesAdd != null && sesAdd.Any()) await _dbContext.Insertable(sesAdd).ExecuteCommandAsync();
                 if (sfsAdd != null && sfsAdd.Any()) await _dbContext.Insertable(sfsAdd).ExecuteCommandAsync();
                 if (vrsAdd != null && vrsAdd.Any()) await _dbContext.Insertable(vrsAdd).ExecuteCommandAsync();
+                if (cocsAdd != null && cocsAdd.Any()) await _dbContext.Insertable(cocsAdd).ExecuteCommandAsync();
                 #endregion
 
                 #region 学历信息
@@ -2183,60 +2281,84 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
             var userInfo = await GetUserInfoAsync(bId);
             //获取文件
             var url = AppsettingsHelper.GetValue("UpdateItem:Url");
-            var cerOfComp = await _dbContext.Queryable<CertificateOfCompetency>().FirstAsync(t => t.IsDelete == 1 && t.CertificateId == userInfo.BusinessId);
-            if (cerOfComp != null)
+            var cerOfComps = await _dbContext.Queryable<CertificateOfCompetency>().Where(t => t.IsDelete == 1 && t.CertificateId == userInfo.BusinessId).ToListAsync();
+            if (cerOfComps.Any())
             {
-                #region 简易字段匹配
-                ur.FCertificate = cerOfComp.FCertificate;
-                ur.FSignTime = cerOfComp.FSignTime?.ToString("yyyy-MM-dd");
-                ur.FEffectiveTime = cerOfComp.FEffectiveTime?.ToString("yyyy-MM-dd");
-                if (cerOfComp.FEffectiveTime.HasValue)
+                var f = cerOfComps.FirstOrDefault(x => x.Type == CertificatesEnum.FCertificate);
+                if (f != null)
                 {
-                    DateTime date1 = new DateTime(cerOfComp.FEffectiveTime.Value.Year, cerOfComp.FEffectiveTime.Value.Month, cerOfComp.FEffectiveTime.Value.Day);
-                    DateTime date2 = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day);
-                    ur.FEffectiveCountdown = (date1 - date2).Days + 1;
+                    ur.FCertificate = f.FCertificate;
+                    ur.FSignTime = f.FSignTime?.ToString("yyyy-MM-dd");
+                    ur.FEffectiveTime = f.FEffectiveTime?.ToString("yyyy-MM-dd");
+                    if (f.FEffectiveTime.HasValue)
+                    {
+                        DateTime date1 = new DateTime(f.FEffectiveTime.Value.Year, f.FEffectiveTime.Value.Month, f.FEffectiveTime.Value.Day);
+                        DateTime date2 = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day);
+                        ur.FEffectiveCountdown = (date1 - date2).Days + 1;
+                    }
                 }
-                ur.SCertificate = cerOfComp.SCertificate;
-                ur.SSignTime = cerOfComp.SSignTime?.ToString("yyyy-MM-dd");
-                ur.SEffectiveTime = cerOfComp.SEffectiveTime?.ToString("yyyy-MM-dd");
-                if (cerOfComp.SEffectiveTime.HasValue)
+                var s = cerOfComps.FirstOrDefault(x => x.Type == CertificatesEnum.SCertificate);
+                if (s != null)
                 {
-                    DateTime date1 = new DateTime(cerOfComp.SEffectiveTime.Value.Year, cerOfComp.SEffectiveTime.Value.Month, cerOfComp.SEffectiveTime.Value.Day);
-                    DateTime date2 = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day);
-                    ur.SEffectiveCountdown = (date1 - date2).Days + 1;
+                    ur.SCertificate = s.SCertificate;
+                    ur.SSignTime = s.SSignTime?.ToString("yyyy-MM-dd");
+                    ur.SEffectiveTime = s.SEffectiveTime?.ToString("yyyy-MM-dd");
+                    if (s.SEffectiveTime.HasValue)
+                    {
+                        DateTime date1 = new DateTime(s.SEffectiveTime.Value.Year, s.SEffectiveTime.Value.Month, s.SEffectiveTime.Value.Day);
+                        DateTime date2 = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day);
+                        ur.SEffectiveCountdown = (date1 - date2).Days + 1;
+                    }
                 }
-                ur.TrainingCertificate = cerOfComp.TrainingCertificate;
-                ur.TrainingSignTime = cerOfComp.TrainingSignTime?.ToString("yyyy-MM-dd");
-                ur.Z01EffectiveTime = cerOfComp.Z01EffectiveTime?.ToString("yyyy-MM-dd");
-                ur.Z07EffectiveTime = cerOfComp.Z07EffectiveTime?.ToString("yyyy-MM-dd");
-                ur.Z08EffectiveTime = cerOfComp.Z08EffectiveTime?.ToString("yyyy-MM-dd");
-                ur.Z04EffectiveTime = cerOfComp.Z04EffectiveTime?.ToString("yyyy-MM-dd");
-                ur.Z05EffectiveTime = cerOfComp.Z05EffectiveTime?.ToString("yyyy-MM-dd");
-                ur.Z02EffectiveTime = cerOfComp.Z02EffectiveTime?.ToString("yyyy-MM-dd");
-                ur.Z06EffectiveTime = cerOfComp.Z06EffectiveTime?.ToString("yyyy-MM-dd");
-                ur.Z09EffectiveTime = cerOfComp.Z09EffectiveTime?.ToString("yyyy-MM-dd");
-                ur.HealthCertificate = cerOfComp.HealthCertificate;
-                ur.HealthSignTime = cerOfComp.HealthSignTime?.ToString("yyyy-MM-dd");
-                ur.HealthEffectiveTime = cerOfComp.HealthEffectiveTime?.ToString("yyyy-MM-dd");
-                ur.SeamanCertificate = cerOfComp.SeamanCertificate;
-                ur.SeamanSignTime = cerOfComp.SeamanSignTime?.ToString("yyyy-MM-dd");
-                ur.SeamanEffectiveTime = cerOfComp.SeamanEffectiveTime?.ToString("yyyy-MM-dd");
-                ur.PassportCertificate = cerOfComp.PassportCertificate;
-                ur.PassportSignTime = cerOfComp.PassportSignTime?.ToString("yyyy-MM-dd");
-                ur.PassportEffectiveTime = cerOfComp.PassportEffectiveTime?.ToString("yyyy-MM-dd");
-                #endregion
+                var t = cerOfComps.FirstOrDefault(x => x.Type == CertificatesEnum.PXHGZ);
+                if (t != null)
+                {
+                    ur.TrainingCertificate = t.TrainingCertificate;
+                    ur.TrainingSignTime = t.TrainingSignTime?.ToString("yyyy-MM-dd");
+                    ur.Z01EffectiveTime = t.Z01EffectiveTime?.ToString("yyyy-MM-dd");
+                    ur.Z07EffectiveTime = t.Z07EffectiveTime?.ToString("yyyy-MM-dd");
+                    ur.Z08EffectiveTime = t.Z08EffectiveTime?.ToString("yyyy-MM-dd");
+                    ur.Z04EffectiveTime = t.Z04EffectiveTime?.ToString("yyyy-MM-dd");
+                    ur.Z05EffectiveTime = t.Z05EffectiveTime?.ToString("yyyy-MM-dd");
+                    ur.Z02EffectiveTime = t.Z02EffectiveTime?.ToString("yyyy-MM-dd");
+                    ur.Z06EffectiveTime = t.Z06EffectiveTime?.ToString("yyyy-MM-dd");
+                    ur.Z09EffectiveTime = t.Z09EffectiveTime?.ToString("yyyy-MM-dd");
+                }
+
+                var h = cerOfComps.FirstOrDefault(x => x.Type == CertificatesEnum.JKZ);
+                if (h != null)
+                {
+                    ur.HealthCertificate = h.HealthCertificate;
+                    ur.HealthSignTime = h.HealthSignTime?.ToString("yyyy-MM-dd");
+                    ur.HealthEffectiveTime = h.HealthEffectiveTime?.ToString("yyyy-MM-dd");
+                }
+                var sea = cerOfComps.FirstOrDefault(x => x.Type == CertificatesEnum.HYZ);
+                if (sea != null)
+                {
+                    ur.SeamanCertificate = sea.SeamanCertificate;
+                    ur.SeamanSignTime = sea.SeamanSignTime?.ToString("yyyy-MM-dd");
+                    ur.SeamanEffectiveTime = sea.SeamanEffectiveTime?.ToString("yyyy-MM-dd");
+                }
+                var hz = cerOfComps.FirstOrDefault(x => x.Type == CertificatesEnum.HZ);
+                if (hz != null)
+                {
+                    ur.PassportCertificate = hz.PassportCertificate;
+                    ur.PassportSignTime = hz.PassportSignTime?.ToString("yyyy-MM-dd");
+                    ur.PassportEffectiveTime = hz.PassportEffectiveTime?.ToString("yyyy-MM-dd");
+                }
+
                 //航区
                 var navigationarea = await _dbContext.Queryable<NavigationArea>().Where(t => t.IsDelete == 1).ToListAsync();
-                ur.FNavigationArea = cerOfComp.FNavigationArea;
-                ur.FNavigationAreaName = navigationarea.FirstOrDefault(x => x.BusinessId.ToString() == cerOfComp.FNavigationArea)?.Name;
-                ur.SNavigationArea = cerOfComp.SNavigationArea;
-                ur.SNavigationAreaName = navigationarea.FirstOrDefault(x => x.BusinessId.ToString() == cerOfComp.SNavigationArea)?.Name;
+                ur.FNavigationArea = f?.FNavigationArea;
+                ur.FNavigationAreaName = navigationarea.FirstOrDefault(x => x.BusinessId.ToString() == f?.FNavigationArea)?.Name;
+                ur.SNavigationArea = s?.SNavigationArea;
+                ur.SNavigationAreaName = navigationarea.FirstOrDefault(x => x.BusinessId.ToString() == s?.SNavigationArea)?.Name;
                 //适任职务
                 var position = await _dbContext.Queryable<Position>().Where(t => t.IsDelete == 1).ToListAsync();
-                ur.FPosition = cerOfComp.FPosition;
-                ur.FPositionName = position.FirstOrDefault(x => x.BusinessId.ToString() == cerOfComp.FPosition)?.Name;
-                ur.SPosition = cerOfComp.SPosition;
-                ur.SPositionName = position.FirstOrDefault(x => x.BusinessId.ToString() == cerOfComp.SPosition)?.Name;
+                ur.FPosition = f?.FPosition;
+                ur.FPositionName = position.FirstOrDefault(x => x.BusinessId.ToString() == f?.FPosition)?.Name;
+                ur.SPosition = s?.SPosition;
+                ur.SPositionName = position.FirstOrDefault(x => x.BusinessId.ToString() == s?.SPosition)?.Name;
                 //技能证书
                 var skillcf = await _dbContext.Queryable<SkillCertificates>().Where(t => t.IsDelete == 1 && t.SkillcertificateId == userInfo.BusinessId).ToListAsync();
                 List<string> skillFileIds = new();
@@ -2261,18 +2383,18 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                 }
                 //当前适任证书所有文件
                 List<string> curFilesIds = new();
-                curFilesIds.Add(cerOfComp.FScans.ToString());
-                curFilesIds.Add(cerOfComp.SScans.ToString());
-                curFilesIds.Add(cerOfComp.TrainingScans.ToString());
-                curFilesIds.Add(cerOfComp.HealthScans.ToString());
-                curFilesIds.Add(cerOfComp.SeamanScans.ToString());
-                curFilesIds.Add(cerOfComp.PassportScans.ToString());
+                curFilesIds.Add(f.FScans.ToString());
+                curFilesIds.Add(s.SScans.ToString());
+                curFilesIds.Add(t.TrainingScans.ToString());
+                curFilesIds.Add(h.HealthScans.ToString());
+                curFilesIds.Add(sea.SeamanScans.ToString());
+                curFilesIds.Add(hz.PassportScans.ToString());
                 curFilesIds.AddRange(skillFileIds);
                 curFilesIds.AddRange(specfilesIds);
                 var files = await _dbContext.Queryable<Files>().Where(t => t.IsDelete == 1 && curFilesIds.Contains(t.FileId.ToString())).ToListAsync();
 
                 #region 扫描件
-                var fScans = files.Where(x => cerOfComp.FScans == x.FileId)
+                var fScans = files.Where(x => f?.FScans == x.FileId)
                     .Select(x => new FileInfosForDetails
                     {
                         Id = x.BusinessId.ToString(),
@@ -2284,7 +2406,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                         Url = url + x.Name?.Substring(0, x.Name.LastIndexOf(".")) + x.OriginName
                     })
                     .ToList();
-                var sScans = files.Where(x => cerOfComp.SScans == x.FileId)
+                var sScans = files.Where(x => s?.SScans == x.FileId)
                     .Select(x => new FileInfosForDetails
                     {
                         Id = x.BusinessId.ToString(),
@@ -2296,7 +2418,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                         Url = url + x.Name?.Substring(0, x.Name.LastIndexOf(".")) + x.OriginName
                     })
                     .ToList();
-                var trainingScans = files.Where(x => cerOfComp.TrainingScans == x.FileId)
+                var trainingScans = files.Where(x => t?.TrainingScans == x.FileId)
                    .Select(x => new FileInfosForDetails
                    {
                        Id = x.BusinessId.ToString(),
@@ -2308,7 +2430,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                        Url = url + x.Name?.Substring(0, x.Name.LastIndexOf(".")) + x.OriginName
                    })
                    .ToList();
-                var healthScans = files.Where(x => cerOfComp.HealthScans == x.FileId)
+                var healthScans = files.Where(x => h?.HealthScans == x.FileId)
                    .Select(x => new FileInfosForDetails
                    {
                        Id = x.BusinessId.ToString(),
@@ -2320,7 +2442,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                        Url = url + x.Name?.Substring(0, x.Name.LastIndexOf(".")) + x.OriginName
                    })
                    .ToList();
-                var seamanScans = files.Where(x => cerOfComp.SeamanScans == x.FileId)
+                var seamanScans = files.Where(x => sea?.SeamanScans == x.FileId)
                    .Select(x => new FileInfosForDetails
                    {
                        Id = x.BusinessId.ToString(),
@@ -2332,7 +2454,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                        Url = url + x.Name?.Substring(0, x.Name.LastIndexOf(".")) + x.OriginName
                    })
                    .ToList();
-                var passportScans = files.Where(x => cerOfComp.PassportScans == x.FileId)
+                var passportScans = files.Where(x => hz?.PassportScans == x.FileId)
                    .Select(x => new FileInfosForDetails
                    {
                        Id = x.BusinessId.ToString(),

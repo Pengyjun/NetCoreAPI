@@ -1,4 +1,5 @@
-﻿using SqlSugar;
+﻿using HNKC.CrewManagePlatform.Models.Enums;
+using SqlSugar;
 
 namespace HNKC.CrewManagePlatform.SqlSugars.Models
 {
@@ -206,5 +207,11 @@ namespace HNKC.CrewManagePlatform.SqlSugars.Models
         /// </summary>
         [SugarColumn(Length = 36, ColumnDescription = "关联键")]
         public Guid? CertificateId { get; set; }
+        /// <summary>
+        /// 类型
+        /// </summary>
+        /// </summary>
+        [SugarColumn(ColumnDataType = "int", ColumnDescription = "类型", DefaultValue = "0")]
+        public CertificatesEnum Type { get; set; }
     }
 }
