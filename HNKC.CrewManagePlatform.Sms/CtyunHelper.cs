@@ -54,8 +54,14 @@ namespace HNKC.IMPS.Sms.Options
            
             return $"{headerString}\n{queryString}\n{bodySha256}";
         }
-
-        public static SortedDictionary<string, string> GetSortedBody(SmsRequest param, string phone)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="param"></param>
+        /// <param name="phone"></param>
+        /// <param name="type">群发还是个人发生  1是群发 2是个人发送</param>
+        /// <returns></returns>
+        public static SortedDictionary<string, string> GetSortedBody(SmsRequest param, string phone,int  type)
         {
             var sortDic = new SortedDictionary<string, string>
                 {
@@ -63,12 +69,11 @@ namespace HNKC.IMPS.Sms.Options
                     { "action", param.Action },                      //固定参数
                     { "phoneNumber",  phone},                        //请填写接收短信的目标手机号，多个手机号使用英文逗号分开  
                     { "signName", param.SignName },                   //请填写您在控制台上申请并通过的短信签名。  
-                    { "templateCode", param.TemplateCode},         //请填写您在控制台上申请并通过的短信模板，此模板为测试专用模板，可直接进行测试
+                    { "templateCode", param.TemplateCode.Where(x=>x.Type==type).Select(x=>x.Value).First()},         //请填写您在控制台上申请并通过的短信模板，此模板为测试专用模板，可直接进行测试
                     //{ "templateParam", param.TemplateParamJson}, //请填写短信模板对应的模板参数和值。此值为测试模板的变量及参数，可直接使用
                     //{ "extendCode", "" },                         //可选，非必填
                     //{ "sessionId", "" }                           //可选，非必填
                 };
-
             if (!string.IsNullOrWhiteSpace(param.TemplateParam))
             {
                 sortDic.Add("templateParam", param.TemplateParam);

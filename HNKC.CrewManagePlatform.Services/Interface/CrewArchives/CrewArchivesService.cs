@@ -501,6 +501,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                     FSignTime = requestBody.CertificateOfCompetencyDto.FSignTime,
                     FEffectiveTime = requestBody.CertificateOfCompetencyDto.FEffectiveTime,
                     FScans = GuidUtil.Next(),
+                    Type = CertificatesEnum.FCertificate
                 };
                 var s = new CertificateOfCompetency
                 {
@@ -513,6 +514,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                     SSignTime = requestBody.CertificateOfCompetencyDto.SSignTime,
                     SEffectiveTime = requestBody.CertificateOfCompetencyDto.SEffectiveTime,
                     SScans = GuidUtil.Next(),
+                    Type = CertificatesEnum.SCertificate
                 };
                 var t = new CertificateOfCompetency
                 {
@@ -529,7 +531,8 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                     Z05EffectiveTime = requestBody.CertificateOfCompetencyDto.Z05EffectiveTime,
                     Z02EffectiveTime = requestBody.CertificateOfCompetencyDto.Z02EffectiveTime,
                     Z06EffectiveTime = requestBody.CertificateOfCompetencyDto.Z06EffectiveTime,
-                    Z09EffectiveTime = requestBody.CertificateOfCompetencyDto.Z09EffectiveTime
+                    Z09EffectiveTime = requestBody.CertificateOfCompetencyDto.Z09EffectiveTime,
+                    Type = CertificatesEnum.PXHGZ
                 };
                 var h = new CertificateOfCompetency
                 {
@@ -540,6 +543,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                     HealthSignTime = requestBody.CertificateOfCompetencyDto.HealthSignTime,
                     HealthEffectiveTime = requestBody.CertificateOfCompetencyDto.HealthEffectiveTime,
                     HealthScans = GuidUtil.Next(),
+                    Type = CertificatesEnum.JKZ
                 };
                 var se = new CertificateOfCompetency
                 {
@@ -549,7 +553,8 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                     SeamanCertificate = requestBody.CertificateOfCompetencyDto.SeamanCertificate,
                     SeamanSignTime = requestBody.CertificateOfCompetencyDto.SeamanSignTime,
                     SeamanEffectiveTime = requestBody.CertificateOfCompetencyDto.SeamanEffectiveTime,
-                    SeamanScans = GuidUtil.Next()
+                    SeamanScans = GuidUtil.Next(),
+                    Type = CertificatesEnum.HYZ
                 };
                 var p = new CertificateOfCompetency
                 {
@@ -559,7 +564,8 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                     PassportCertificate = requestBody.CertificateOfCompetencyDto.PassportCertificate,
                     PassportSignTime = requestBody.CertificateOfCompetencyDto.PassportSignTime,
                     PassportEffectiveTime = requestBody.CertificateOfCompetencyDto.PassportEffectiveTime,
-                    PassportScans = GuidUtil.Next()
+                    PassportScans = GuidUtil.Next(),
+                    Type = CertificatesEnum.HZ
                 };
                 cocs.Add(f);
                 cocs.Add(s);
@@ -1003,6 +1009,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                         FSignTime = requestBody.CertificateOfCompetencyDto.FSignTime,
                         FEffectiveTime = requestBody.CertificateOfCompetencyDto.FEffectiveTime,
                         FScans = GuidUtil.Next(),
+                        Type = CertificatesEnum.FCertificate
                     };
                     var s = new CertificateOfCompetency
                     {
@@ -1015,6 +1022,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                         SSignTime = requestBody.CertificateOfCompetencyDto.SSignTime,
                         SEffectiveTime = requestBody.CertificateOfCompetencyDto.SEffectiveTime,
                         SScans = GuidUtil.Next(),
+                        Type = CertificatesEnum.SCertificate
                     };
                     var t = new CertificateOfCompetency
                     {
@@ -1031,7 +1039,8 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                         Z05EffectiveTime = requestBody.CertificateOfCompetencyDto.Z05EffectiveTime,
                         Z02EffectiveTime = requestBody.CertificateOfCompetencyDto.Z02EffectiveTime,
                         Z06EffectiveTime = requestBody.CertificateOfCompetencyDto.Z06EffectiveTime,
-                        Z09EffectiveTime = requestBody.CertificateOfCompetencyDto.Z09EffectiveTime
+                        Z09EffectiveTime = requestBody.CertificateOfCompetencyDto.Z09EffectiveTime,
+                        Type = CertificatesEnum.PXHGZ
                     };
                     var h = new CertificateOfCompetency
                     {
@@ -1042,6 +1051,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                         HealthSignTime = requestBody.CertificateOfCompetencyDto.HealthSignTime,
                         HealthEffectiveTime = requestBody.CertificateOfCompetencyDto.HealthEffectiveTime,
                         HealthScans = GuidUtil.Next(),
+                        Type = CertificatesEnum.JKZ
                     };
                     var se = new CertificateOfCompetency
                     {
@@ -1051,7 +1061,8 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                         SeamanCertificate = requestBody.CertificateOfCompetencyDto.SeamanCertificate,
                         SeamanSignTime = requestBody.CertificateOfCompetencyDto.SeamanSignTime,
                         SeamanEffectiveTime = requestBody.CertificateOfCompetencyDto.SeamanEffectiveTime,
-                        SeamanScans = GuidUtil.Next()
+                        SeamanScans = GuidUtil.Next(),
+                        Type = CertificatesEnum.HYZ
                     };
                     var p = new CertificateOfCompetency
                     {
@@ -1061,7 +1072,8 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                         PassportCertificate = requestBody.CertificateOfCompetencyDto.PassportCertificate,
                         PassportSignTime = requestBody.CertificateOfCompetencyDto.PassportSignTime,
                         PassportEffectiveTime = requestBody.CertificateOfCompetencyDto.PassportEffectiveTime,
-                        PassportScans = GuidUtil.Next()
+                        PassportScans = GuidUtil.Next(),
+                        Type = CertificatesEnum.HZ
                     };
                     cocsAdd.Add(f);
                     cocsAdd.Add(s);

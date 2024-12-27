@@ -4,15 +4,18 @@ using HNKC.CrewManagePlatform.Models.Dtos;
 using HNKC.CrewManagePlatform.Models.Dtos.Salary;
 using HNKC.CrewManagePlatform.Models.Enums;
 using HNKC.CrewManagePlatform.Sms.Interfaces;
+using HNKC.CrewManagePlatform.Sms.Model;
 using HNKC.CrewManagePlatform.SqlSugars.Extensions;
 using HNKC.CrewManagePlatform.SqlSugars.Models;
 using HNKC.CrewManagePlatform.Utils;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Routing.Template;
 using SqlSugar;
 using SqlSugar.Extensions;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Security.Policy;
 using System.Xml.Linq;
 using UtilsSharp;
 using salary = HNKC.CrewManagePlatform.SqlSugars.Models;
@@ -232,7 +235,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Salary
                 //用户信息
                 var allPhone = await dbContext.Queryable<User>().Where(x => x.IsDelete == 1 && !SqlFunc.IsNullOrEmpty(x.Phone))
                         .WhereIF(baseRequest != null&& baseRequest.BId!= null, x => x.BusinessId == baseRequest.BId)
-                        .Select(x => new { Phone = x.Phone, UserId = x.Id, WorkNumber = x.WorkNumber,Name=x.Name }).Distinct().ToListAsync();
+                        .Select(x => new { Phone = x.Phone, UserId = x.Id, WorkNumber = x.WorkNumber,Name=x.Name,BusinessId=x.BusinessId }).Distinct().ToListAsync();
                 if (allPhone.Count > 0)
                 {
                     var index = (allPhone.Count / pageSize) + 1;//计算循环次数
@@ -243,10 +246,37 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Salary
                         List<SalaryPushRecord> salaryPushRecords = new List<SalaryPushRecord>();
                         var parame = new Sms.Model.SmsRequest()
                         {
-                            TemplateParam = (baseRequest == null
-                            || baseRequest.BId==Guid.Empty)?string.Empty : res.Select(x =>new { name= x.Name }).FirstOrDefault().ToJson(true),
+                           
                             PhoneNumber =string.Join(",", res.Select(x => x.Phone)),
                         };
+                        //获取参数
+                        var url= AppsettingsHelper.GetValue("CtyunSms:SendSmsPhoneUrl");
+                        var sendTime = DateTime.Now.ToString("yyyy-MM");
+                        //个人版发送
+                        if (baseRequest != null && baseRequest.BId.HasValue)
+                        {
+                            var userInfo= res.Where(x => x.BusinessId == baseRequest.BId).First();
+                            //生成签名
+                            var smsUrl=WebUtility.UrlEncode(CryptoStringExtension.EncryptAsync($"{userInfo.WorkNumber},{year},{month},{DateTime.Now.ToString("yyyyMMddHHmmssffff")}"));
+                            //替换url参数
+                            url=url.Replace("@sign", smsUrl);
+                            ParameTemplate parameTemplate = new ParameTemplate()
+                            {
+                                sendUrl = new SendUrl() { Url = url },
+                                sendTime = new SendTime(),
+                                user = new UserInfo() { Name = userInfo.Name }
+                            };
+                           var  a= parameTemplate.user.ToJson();
+                           var  b= parameTemplate.sendTime.ToJson();
+                           var  c= parameTemplate.sendUrl.ToJson();
+
+                            parame.TemplateParam = $"{a},{b},{c}";
+                           
+                        }
+                        else if(baseRequest==null) {
+                            //群发版
+                            parame.TemplateParam = new { Time = sendTime, Url = url }.ToJson(true);
+                        }
                         //发送短信
                         var responseResult = await smsService.SendSmsAsync(parame);
                         foreach (var item in res)
