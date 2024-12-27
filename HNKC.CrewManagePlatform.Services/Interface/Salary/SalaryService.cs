@@ -261,7 +261,8 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Salary
                         //短信连接生成
                         var smsUrl = WebUtility.UrlEncode(CryptoStringExtension.EncryptAsync($"{allPhone[i].WorkNumber},{year},{month}"));
                         //随机生成固定数
-                        var random=RandomHelper.NumberAndLetters(16);
+                        var len = int.Parse(AppsettingsHelper.GetValue("Length"));
+                        var random=RandomHelper.NumberAndLetters(len);
                         #endregion
                         parame.PhoneNumber = parame.PhoneNumber.Substring(0, parame.PhoneNumber.Length - 1);
                         //替换url参数
