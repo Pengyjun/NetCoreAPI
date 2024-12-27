@@ -31,7 +31,7 @@ namespace HNKC.CrewManagePlatform.Sms.Model
         ///短信模板ID。请在控制台的模板管理页签下模板Code一列查看。说明：必须是已添加、并通过审核的短信模板。
         ///示例：SMS73419576145
         /// </summary>
-        public string? TemplateCode { get; set; }= AppsettingsHelper.GetValue("CtyunSms:TemplateCodes");
+        public List<SMSTemplate>? TemplateCode { get; set; }= AppsettingsHelper.GetSection<List<SMSTemplate>>("CtyunSms:TemplateCodes");
         /// <summary>
         /// 短信模板变量对应的实际值，JSON字符串格式。说明：如果JSON中需要带换行符，请参照标准的JSON协议处理。
         /// 示例：{"code":"1111"}
