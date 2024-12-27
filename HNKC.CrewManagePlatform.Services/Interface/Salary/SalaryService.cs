@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using HNKC.CrewManagePlatform.Models.CommonResult;
 using HNKC.CrewManagePlatform.Models.Dtos;
+using HNKC.CrewManagePlatform.Models.Dtos.CrewArchives;
 using HNKC.CrewManagePlatform.Models.Dtos.Salary;
 using HNKC.CrewManagePlatform.Models.Enums;
 using HNKC.CrewManagePlatform.Sms.Interfaces;
@@ -162,17 +163,17 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Salary
         /// <exception cref="NotImplementedException"></exception>
         public async Task<SalaryAsExcelResponse> FindUserInfoAsync(string sign)
         {
-            var parseSign=WebUtility.UrlDecode(sign);
+            var parseSign = WebUtility.UrlDecode(sign);
             SalaryAsExcelResponse salaryAsExcelResponse = new SalaryAsExcelResponse();
             salary.Salary salary = new salary.Salary();
             #region 信息校验
             if (string.IsNullOrWhiteSpace(sign))
-            { 
-             return salaryAsExcelResponse;
+            {
+                return salaryAsExcelResponse;
             }
-            var pushTimeCalc= await dbContext.Queryable<SalaryPushRecord>().Where(x => x.IsDelete == 1 && x.PhoneUrl == sign).Select(x => x.Created).FirstAsync();
-            
-            if (!pushTimeCalc.HasValue||(pushTimeCalc.Value.AddDays(3) - DateTime.Now).Seconds<=0)
+            var pushTimeCalc = await dbContext.Queryable<SalaryPushRecord>().Where(x => x.IsDelete == 1 && x.PhoneUrl == sign).Select(x => x.Created).FirstAsync();
+
+            if (!pushTimeCalc.HasValue || (pushTimeCalc.Value.AddDays(3) - DateTime.Now).Seconds <= 0)
             {
                 return null;
             }
@@ -225,83 +226,108 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Salary
             var month = DateTime.Now.Month;
             var pageIndex = 1;
             var pageSize = 200;
+            //群发信息集合
+            List<SmsRequest> smsRequests = new List<SmsRequest>();
+            List<SalaryPushRecord> salaryPushRecords = new List<SalaryPushRecord>();
             if (baseRequest.BId == Guid.Empty)
             {
                 return Result.Fail("发送失败", (int)ResponseHttpCode.SendFail);
             }
             try
             {
-                
+
                 //用户信息
                 var allPhone = await dbContext.Queryable<User>().Where(x => x.IsDelete == 1 && !SqlFunc.IsNullOrEmpty(x.Phone))
-                        .WhereIF(baseRequest != null&& baseRequest.BId!= null, x => x.BusinessId == baseRequest.BId)
-                        .Select(x => new { Phone = x.Phone, UserId = x.Id, WorkNumber = x.WorkNumber,Name=x.Name,BusinessId=x.BusinessId }).Distinct().ToListAsync();
+                        .WhereIF(baseRequest != null && baseRequest.BId != null, x => x.BusinessId == baseRequest.BId)
+                        .Select(x => new { Phone = x.Phone, UserId = x.Id, WorkNumber = x.WorkNumber, Name = x.Name, BusinessId = x.BusinessId }).Distinct().ToListAsync();
                 if (allPhone.Count > 0)
                 {
-                    var index = (allPhone.Count / pageSize) + 1;//计算循环次数
-                    var res = allPhone.Skip((pageIndex - 1) * pageSize).Take(pageSize)
-                            .ToList();
-                    for (int i = 0; i < index; i++)
+                    for (int i = 0; i < allPhone.Count; i++)
                     {
-                        List<SalaryPushRecord> salaryPushRecords = new List<SalaryPushRecord>();
+                        
                         var parame = new Sms.Model.SmsRequest()
                         {
-                           
-                            PhoneNumber =string.Join(",", res.Select(x => x.Phone)),
+                            PhoneNumber = allPhone[i].Phone + ","
                         };
+                        #region 基本参数生成
                         //获取参数
-                        var url= AppsettingsHelper.GetValue("CtyunSms:SendSmsPhoneUrl");
-                        var sendTime =int.Parse(DateTime.Now.ToString("yyyyMM"));
+                        var url = AppsettingsHelper.GetValue("CtyunSms:SendSmsPhoneUrl");
+                        var sendTime = int.Parse(DateTime.Now.ToString("yyyyMM"));
+                        //短信连接生成
+                        var smsUrl = WebUtility.UrlEncode(CryptoStringExtension.EncryptAsync($"{allPhone[i].WorkNumber},{year},{month}"));
+                        #endregion
+                        parame.PhoneNumber = parame.PhoneNumber.Substring(0, parame.PhoneNumber.Length - 1);
+                        //替换url参数
+                        url = url.Replace("@sign", smsUrl);
+                        #region 个人版推送
                         //个人版发送
                         if (baseRequest != null && baseRequest.BId.HasValue)
                         {
-                            var userInfo= res.Where(x => x.BusinessId == baseRequest.BId).First();
-                            //生成签名
-                            var smsUrl=WebUtility.UrlEncode(CryptoStringExtension.EncryptAsync($"{userInfo.WorkNumber},{year},{month}"));
-                            //替换url参数
-                            url=url.Replace("@sign", smsUrl);
+                            
                             ParameTemplate parameTemplate = new ParameTemplate()
                             {
-                                 Name= userInfo.Name,
-                                  Url=url,
-                                  Time= sendTime
+                                Name = allPhone[i].Name,
+                                Url = url,
+                                Time = sendTime
                             };
                             parame.TemplateParam = parameTemplate.ToJson();
+                            smsRequests.Add(parame);
                         }
-                        else if(baseRequest==null) {
+                        #endregion
+
+                        #region 群发版推送
+                        else if (baseRequest==null||baseRequest.BId == null)
+                        {
                             //群发版
-                            parame.TemplateParam = new { Time = sendTime, Url = url }.ToJson(true);
+                            ParameTemplate parameTemplate = new ParameTemplate()
+                            {
+                                Name = allPhone[i].Name,
+                                Url = url,
+                                Time = sendTime
+                            };
+                          
+                            parame.TemplateParam = parameTemplate.ToJson();
+                            smsRequests.Add(parame);
                         }
+                        #endregion
+
+                        #region 调用发短信接口
                         //发送短信
                         var responseResult = await smsService.SendSmsAsync(parame);
-                        foreach (var item in res)
+                        smsRequests.Where(x => x.PhoneNumber == parame.PhoneNumber).First().IsSuccess= responseResult.IsSuccess;
+                        #endregion
+
+                        #region 保存数据库
+                        foreach (var item in smsRequests)
                         {
+                            var userInfo = allPhone.Where(x => x.Phone == item.PhoneNumber).FirstOrDefault();
                             SalaryPushRecord salaryPushRecord = new SalaryPushRecord()
                             {
                                 BusinessType = (baseRequest == null
-                            || baseRequest.BId == Guid.Empty) ? (int)BusinessTypeEnum.BatchPush : (int)BusinessTypeEnum.PersonalPush,
+                           || baseRequest.BId == Guid.Empty) ? (int)BusinessTypeEnum.BatchPush : (int)BusinessTypeEnum.PersonalPush,
                                 Result = responseResult.IsSuccess ? (int)PushResultEnum.Success : (int)PushResultEnum.Fail,
                                 Fail = !responseResult.IsSuccess ? responseResult.Data : string.Empty,
                                 Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
                                 Year = year,
                                 Month = month,
-                                PhoneUrl = WebUtility.UrlEncode(CryptoStringExtension.EncryptAsync($"{item.WorkNumber},{year},{month},{DateTime.Now.ToString("yyyyMMddHHmmssffff")}")),
-                                UserId = item.UserId,
-                               
+                                PhoneUrl = WebUtility.UrlEncode(CryptoStringExtension.EncryptAsync($"{userInfo?.WorkNumber},{year},{month},{DateTime.Now.ToString("yyyyMMddHHmmssffff")}")),
+                                UserId = userInfo != null ? userInfo.UserId : 0,
+
                             };
                             salaryPushRecords.Add(salaryPushRecord);
 
                         }
-                        await dbContext.Insertable<SalaryPushRecord>(salaryPushRecords).ExecuteCommandAsync();
-                    }
+                        #endregion
 
-                    return  Result.Success("发送成功");
+                    }
+                    await dbContext.Insertable<SalaryPushRecord>(salaryPushRecords).ExecuteCommandAsync();
+                    return Result.Success("发送成功");
                 }
             }
             catch (Exception ex)
             {
 
-                
+
             }
             return Result.Fail("发送失败");
         }

@@ -35,6 +35,9 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Contract
         public async Task<PageResult<ContractSearch>> SearchContractAsync(ContractRequest requestBody)
         {
             RefAsync<int> total = 0;
+            var roleType = await _baseService.CurRoleType();
+            if (roleType == -1) { return new PageResult<ContractSearch>(); }
+            var onShips = await _dbContext.Queryable<WorkShip>().Where(t => t.IsDelete == 1 && GlobalCurrentUser.UserBusinessId == t.WorkShipId).Select(x => x.OnShip).ToListAsync();
             #region 船员关联
             var uentityFist = _dbContext.Queryable<UserEntryInfo>()
                 .GroupBy(u => u.UserEntryId)
@@ -58,10 +61,12 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Contract
                 .LeftJoin(uentity, (t1, t2) => t1.BusinessId == t2.UserEntryId)
                 .Where((t1, t2) => SqlFunc.DateDiff(DateType.Day, DateTime.Now, Convert.ToDateTime(t2.EndTime)) + 1 <= days)
                 .InnerJoin<OwnerShip>((t1, t2, t3) => t1.OnBoard == t3.BusinessId.ToString())
-                .InnerJoin<CertificateOfCompetency>((t1, t2, t3, t4) => t1.BusinessId == t4.CertificateId)
-                .InnerJoin(wShip, (t1, t2, t3, t4, t5) => t1.BusinessId == t5.WorkShipId)
-                .WhereIF(!string.IsNullOrEmpty(requestBody.EmploymentType), (t1, t2, t3, t4, t5) => requestBody.EmploymentType == t2.EmploymentId)
-                .Select((t1, t2, t3, t4, t5) => new ContractSearch
+                //.InnerJoin<CertificateOfCompetency>((t1, t2, t3, t4) => t1.BusinessId == t4.CertificateId)
+                .InnerJoin(wShip, (t1, t2, t3, t5) => t1.BusinessId == t5.WorkShipId)
+                .WhereIF(roleType == 3, (t1, t2, t3, t5) => t5.OnShip == t3.BusinessId.ToString() && onShips.Contains(t5.OnShip))//船长
+                .WhereIF(roleType == 2, (t1, t2, t3, t5) => GlobalCurrentUser.UserBusinessId == t5.WorkShipId)//船员
+                .WhereIF(!string.IsNullOrEmpty(requestBody.EmploymentType), (t1, t2, t3, t5) => requestBody.EmploymentType == t2.EmploymentId)
+                .Select((t1, t2, t3, t5) => new ContractSearch
                 {
                     BId = t1.BusinessId.ToString(),
                     Id = t2.BusinessId.ToString(),
@@ -77,13 +82,12 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Contract
                     EmploymentType = t2.EmploymentId,
                     LaborCompany = t2.LaborCompany,
                     CardId = t1.CardId,
-                    FPosition = t4.FPosition,
-                    SPosition = t4.SPosition,
                     DueDays = SqlFunc.DateDiff(DateType.Day, DateTime.Now, Convert.ToDateTime(t2.EndTime)) + 1,
                     OnBoardPosition = t5.Postition,
                     WorkShipStartTime = t5.WorkShipStartTime,
                     DeleteResonEnum = t1.DeleteReson
                 })
+                .Distinct()
                 .ToPageListAsync(requestBody.PageIndex, requestBody.PageSize, total);
 
             return await GetContractResultAsync(rr, total);
@@ -102,6 +106,9 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Contract
             var empTable = await _dbContext.Queryable<EmploymentType>().Where(t => rr.Select(x => x.EmploymentType).Contains(t.BusinessId.ToString())).ToListAsync();
             var ownShipTable = await _dbContext.Queryable<OwnerShip>().Where(t => rr.Select(x => x.OnBoard).Contains(t.BusinessId.ToString())).ToListAsync();
             var countryTable = await _dbContext.Queryable<CountryRegion>().Where(t => rr.Select(x => x.Country).Contains(t.BusinessId.ToString())).ToListAsync();
+            //第一适任 第二适任
+            var uIds = rr.Select(x => x.BId).ToList();
+            var cerOfComps = await _dbContext.Queryable<CertificateOfCompetency>().Where(x => uIds.Contains(x.CertificateId.ToString()) && (x.Type == CertificatesEnum.FCertificate || x.Type == CertificatesEnum.SCertificate)).ToListAsync();
 
             foreach (var u in rr)
             {
@@ -113,12 +120,21 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Contract
                 u.ShipTypeName = EnumUtil.GetDescription(u.ShipType);
                 u.Age = _baseService.CalculateAgeFromIdCard(u.CardId);
                 //u.DueDays = TimeHelper.GetTimeSpan(Convert.ToDateTime(u.EndTime), DateTime.Now).Days + 1;
+                if (cerOfComps != null)
+                {
+                    var cerofcF = cerOfComps.FirstOrDefault(x => x.Type == CertificatesEnum.FCertificate && x.CertificateId.ToString() == u.BId);
+                    var cerofcS = cerOfComps.FirstOrDefault(x => x.Type == CertificatesEnum.FCertificate && x.CertificateId.ToString() == u.BId);
+                    u.FPositionName = position.FirstOrDefault(x => x.BusinessId.ToString() == cerofcF?.FPosition)?.Name;
+                    u.FPosition = cerofcF?.FPosition;
+                    u.SPositionName = position.FirstOrDefault(x => x.BusinessId.ToString() == cerofcS?.SPosition)?.Name;
+                    u.SPosition = cerofcS?.SPosition;
+                }
                 if (u.FPosition != null) u.FPositionName = position.FirstOrDefault(x => x.BusinessId.ToString() == u.FPosition)?.Name;
                 if (u.SPosition != null) u.SPositionName = position.FirstOrDefault(x => x.BusinessId.ToString() == u.SPosition)?.Name;
                 if (u.OnBoardPosition != null) u.OnBoardPositionName = position.FirstOrDefault(x => x.BusinessId.ToString() == u.OnBoardPosition)?.Name;
             }
 
-            rt.List = rr;
+            rt.List = rr.OrderBy(x => x.DueDays);
             rt.TotalCount = total;
             return rt;
         }
@@ -181,6 +197,9 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Contract
         public async Task<PageResult<PromotionSearch>> SearchPromotionAsync(PromotionRequest requestBody)
         {
             RefAsync<int> total = 0;
+            var roleType = await _baseService.CurRoleType();
+            if (roleType == -1) { return new PageResult<PromotionSearch>(); }
+            var onShips = await _dbContext.Queryable<WorkShip>().Where(t => t.IsDelete == 1 && GlobalCurrentUser.UserBusinessId == t.WorkShipId).Select(x => x.OnShip).ToListAsync();
             #region 船员关联
             var uentityFist = _dbContext.Queryable<UserEntryInfo>()
                 .GroupBy(u => u.UserEntryId)
@@ -199,10 +218,12 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Contract
                 .WhereIF(!string.IsNullOrEmpty(requestBody.KeyWords), t1 => t1.Name.Contains(requestBody.KeyWords) || t1.Phone.Contains(requestBody.KeyWords) || t1.WorkNumber.Contains(requestBody.KeyWords) || t1.CardId.Contains(requestBody.KeyWords))
                 .LeftJoin(uentity, (t1, t2) => t1.BusinessId == t2.UserEntryId)
                 .InnerJoin<OwnerShip>((t1, t2, t3) => t1.OnBoard == t3.BusinessId.ToString())
-                .InnerJoin<CertificateOfCompetency>((t1, t2, t3, t4) => t1.BusinessId == t4.CertificateId)
-                .InnerJoin(wShip, (t1, t2, t3, t4, t5) => t1.BusinessId == t5.WorkShipId)
-                .WhereIF(!string.IsNullOrEmpty(requestBody.Position), (t1, t2, t3, t4, t5) => requestBody.Position == t5.Postition)
-                .Select((t1, t2, t3, t4, t5) => new PromotionSearch
+                //.InnerJoin<CertificateOfCompetency>((t1, t2, t3, t4) => t1.BusinessId == t4.CertificateId)
+                .InnerJoin(wShip, (t1, t2, t3, t5) => t1.BusinessId == t5.WorkShipId)
+                .WhereIF(roleType == 3, (t1, t2, t3, t5) => t5.OnShip == t3.BusinessId.ToString() && onShips.Contains(t5.OnShip))//船长
+                .WhereIF(roleType == 2, (t1, t2, t3, t5) => GlobalCurrentUser.UserBusinessId == t5.WorkShipId)//船员
+                .WhereIF(!string.IsNullOrEmpty(requestBody.Position), (t1, t2, t3, t5) => requestBody.Position == t5.Postition)
+                .Select((t1, t2, t3, t5) => new PromotionSearch
                 {
                     BId = t1.BusinessId.ToString(),
                     Id = t2.BusinessId.ToString(),
@@ -216,6 +237,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Contract
                     OnBoardPosition = t5.Postition,
                     DeleteResonEnum = t1.DeleteReson
                 })
+                .Distinct()
                 .ToPageListAsync(requestBody.PageIndex, requestBody.PageSize, total);
 
             return await GetPromotionResultAsync(rr, total);
@@ -234,7 +256,9 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Contract
             var empTable = await _dbContext.Queryable<EmploymentType>().Where(t => rr.Select(x => x.EmploymentType).Contains(t.BusinessId.ToString())).ToListAsync();
             var ownShipTable = await _dbContext.Queryable<OwnerShip>().Where(t => rr.Select(x => x.OnBoard).Contains(t.BusinessId.ToString())).ToListAsync();
             var countryTable = await _dbContext.Queryable<CountryRegion>().Where(t => rr.Select(x => x.Country).Contains(t.BusinessId.ToString())).ToListAsync();
-
+            //第一适任 第二适任
+            var uIds = rr.Select(x => x.BId).ToList();
+            var cerOfComps = await _dbContext.Queryable<CertificateOfCompetency>().Where(x => uIds.Contains(x.CertificateId.ToString()) && (x.Type == CertificatesEnum.FCertificate || x.Type == CertificatesEnum.SCertificate)).ToListAsync();
             foreach (var u in rr)
             {
                 u.OnStatus = EnumUtil.GetDescription(_baseService.ShipUserStatus(u.WorkShipStartTime, u.DeleteResonEnum));
@@ -245,6 +269,15 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Contract
                 u.ShipTypeName = EnumUtil.GetDescription(u.ShipType);
                 u.Age = _baseService.CalculateAgeFromIdCard(u.CardId);
                 u.DueDays = TimeHelper.GetTimeSpan(Convert.ToDateTime(u.EndTime), DateTime.Now).Days + 1;
+                if (cerOfComps != null)
+                {
+                    var cerofcF = cerOfComps.FirstOrDefault(x => x.Type == CertificatesEnum.FCertificate && x.CertificateId.ToString() == u.BId);
+                    var cerofcS = cerOfComps.FirstOrDefault(x => x.Type == CertificatesEnum.FCertificate && x.CertificateId.ToString() == u.BId);
+                    u.FPositionName = position.FirstOrDefault(x => x.BusinessId.ToString() == cerofcF?.FPosition)?.Name;
+                    u.FPosition = cerofcF?.FPosition;
+                    u.SPositionName = position.FirstOrDefault(x => x.BusinessId.ToString() == cerofcS?.SPosition)?.Name;
+                    u.SPosition = cerofcS?.SPosition;
+                }
                 if (u.FPosition != null) u.FPositionName = position.FirstOrDefault(x => x.BusinessId.ToString() == u.FPosition)?.Name;
                 if (u.SPosition != null) u.SPositionName = position.FirstOrDefault(x => x.BusinessId.ToString() == u.SPosition)?.Name;
                 if (u.OnBoardPosition != null) u.OnBoardPositionName = position.FirstOrDefault(x => x.BusinessId.ToString() == u.OnBoardPosition)?.Name;

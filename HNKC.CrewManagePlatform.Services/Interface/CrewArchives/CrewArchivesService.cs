@@ -37,7 +37,9 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
         public async Task<PageResult<SearchCrewArchivesResponse>> SearchCrewArchivesAsync(SearchCrewArchivesRequest requestBody)
         {
             RefAsync<int> total = 0;
-
+            var roleType = await _baseService.CurRoleType();
+            if (roleType == -1) { return new PageResult<SearchCrewArchivesResponse>(); }
+            var onShips = await _dbContext.Queryable<WorkShip>().Where(t => t.IsDelete == 1 && GlobalCurrentUser.UserBusinessId == t.WorkShipId).Select(x => x.OnShip).ToListAsync();
             #region 船员关联
             //任职船舶 
             var crewWorkShip = _dbContext.Queryable<WorkShip>()
@@ -55,7 +57,6 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                 .InnerJoin(uentityFist, (x, y) => x.UserEntryId == y.UserEntryId && x.EndTime == y.EndTime);
 
             #endregion
-
             //名称相关不赋值
             var rt = await _dbContext.Queryable<User>()
                 .Where(t => t.IsLoginUser == 1)
@@ -70,6 +71,8 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                 .LeftJoin(wShip, (t, ws) => t.BusinessId == ws.WorkShipId)
                 .LeftJoin<OwnerShip>((t, ws, ow) => ws.OnShip == ow.BusinessId.ToString())
                 .LeftJoin(uentity, (t, ws, ow, ue) => t.BusinessId == ue.UserEntryId)
+                .WhereIF(roleType == 3, (t, ws, ow, ue) => ws.OnShip == ow.BusinessId.ToString() && onShips.Contains(ws.OnShip))//船长
+                .WhereIF(roleType == 2, (t, ws, ow, ue) => GlobalCurrentUser.UserBusinessId == ws.WorkShipId)//船员
                 .LeftJoin<SkillCertificates>((t, ws, ow, ue, sc) => sc.SkillcertificateId == t.BusinessId)
                 .LeftJoin<EducationalBackground>((t, ws, ow, ue, sc, eb) => eb.QualificationId == t.BusinessId)
                 .WhereIF(requestBody.CertificateTypes != null && requestBody.CertificateTypes.Any(), (t, ws, ow, ue, sc, eb) => requestBody.CertificateTypes.Contains(sc.SkillCertificateType.ToString()))
@@ -268,31 +271,39 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
         /// <returns></returns>
         public async Task<Result> CrewArchivesCountAsync()
         {
-            var udtab = await _dbContext.Queryable<User>().Where(t => t.IsLoginUser == 1).ToListAsync();
-            var udtabIds = udtab.Select(x => x.BusinessId.ToString()).ToList();
-            var onBoard = await _dbContext.Queryable<WorkShip>().Where(t => t.IsDelete == 1 && udtabIds.Contains(t.WorkShipId.ToString())).ToListAsync();
+            //var roleType = await _baseService.CurRoleType();
+            //if (roleType == -1) { return Result.Success(); }
 
-            var totalCount = udtab.Count();//总数
+            var dt = await SearchCrewArchivesAsync(new SearchCrewArchivesRequest());
 
-            var onDutyCount = onBoard.Where(x => x.WorkShipEndTime <= DateTime.Now).Select(x => x.WorkShipId).Distinct().Count();//在船数
+            //var udtab = await _dbContext.Queryable<User>().Where(t => t.IsLoginUser == 1).ToListAsync();
+            //var udtabIds = udtab.Select(x => x.BusinessId.ToString()).ToList();
+            //var onBoard = await _dbContext.Queryable<WorkShip>().Where(t => t.IsDelete == 1 && udtabIds.Contains(t.WorkShipId.ToString())).ToListAsync();
+            if (dt.List == null) return Result.Success(new CrewArchivesResponse());
+            var totalCount = dt.List.Count();//总数
+
+            var onDutyCount = dt.List.Where(x => x.OnStatusName == "在岗").Count();
+            //var onDutyCount = onBoard.Where(x => x.WorkShipEndTime <= DateTime.Now).Select(x => x.WorkShipId).Distinct().Count();//在船数
             var onDutyProp = totalCount == 0 ? 0 : Convert.ToInt32(onDutyCount / totalCount);
 
-            var otherCount = udtab.Where(x => x.DeleteReson != CrewStatusEnum.Normal && x.DeleteReson != CrewStatusEnum.XiuJia).Count();//离调退
+            var otherCount = dt.List.Where(x => x.OnStatusName == "离调退").Count();
+            //var otherCount = udtab.Where(x => x.DeleteReson != CrewStatusEnum.Normal && x.DeleteReson != CrewStatusEnum.XiuJia).Count();//离调退
             var otherProp = totalCount == 0 ? 0 : Convert.ToInt32(otherCount / totalCount);
 
-            var waitCount = onBoard.Where(x => x.WorkShipEndTime > DateTime.Now).Select(x => x.WorkShipId).Distinct().Count() - otherCount;//待岗数 排掉休假 删除
+            var waitCount = dt.List.Where(x => x.OnStatusName == "待岗").Count();
+            //var waitCount = onBoard.Where(x => x.WorkShipEndTime > DateTime.Now).Select(x => x.WorkShipId).Distinct().Count() - otherCount;//待岗数 排掉休假 删除
             var waitProp = totalCount == 0 ? 0 : Convert.ToInt32(waitCount / totalCount);
 
+            var holidayCount = dt.List.Where(x => x.OnStatusName == "休假").Count();
             //var holidayCount = onBoard.Where(x => x.HolidayTime > DateTime.Now).Select(x => x.WorkShipId).Distinct().Count();//休假数
-            //var holidayProp = totalCount == 0 ? 0 : Convert.ToInt32(holidayCount / totalCount);
-
+            var holidayProp = totalCount == 0 ? 0 : Convert.ToInt32(holidayCount / totalCount);
 
             var rr = new CrewArchivesResponse
             {
-                //HolidayCount = holidayCount,
+                HolidayCount = holidayCount,
                 OtherCount = otherCount,
                 OtherProp = otherProp,
-                //HolidayProp = holidayProp,
+                HolidayProp = holidayProp,
                 OnDutyCount = onDutyCount,
                 OnDutyProp = onDutyProp,
                 TatalCount = totalCount,
@@ -331,7 +342,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
             if (requestBody.BaseInfoDto != null)
             {
                 //校验用户已经存在
-                var existUi = await _dbContext.Queryable<User>().FirstAsync(t => t.IsDelete == 1 && requestBody.BaseInfoDto.WorkNumber == t.WorkNumber || requestBody.BaseInfoDto.Phone == t.Phone || requestBody.BaseInfoDto.CardId == t.CardId);
+                var existUi = await _dbContext.Queryable<User>().FirstAsync(t => t.IsLoginUser == 1 && requestBody.BaseInfoDto.WorkNumber == t.WorkNumber || requestBody.BaseInfoDto.Phone == t.Phone || requestBody.BaseInfoDto.CardId == t.CardId);
                 if (existUi != null)
                 {
                     if (existUi.Phone == requestBody.BaseInfoDto.Phone)
@@ -375,7 +386,8 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                     OnBoard = requestBody.BaseInfoDto.OnBoard,
                     PositionOnBoard = requestBody.BaseInfoDto.PositionOnBoard,
                     Name = requestBody.BaseInfoDto.Name,
-                    IsLoginUser = 1
+                    IsLoginUser = 1,
+                    Oid = "101162350"
                 };
                 //文件
                 if (requestBody.BaseInfoDto.UploadPhotoScans != null)
@@ -852,7 +864,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                 return Result.Fail("业务主键不能为空");
             }
 
-            var userInfo = await _dbContext.Queryable<User>().FirstAsync(t => t.BusinessId == requestBody.BId);
+            var userInfo = await _dbContext.Queryable<User>().Where(t => t.IsLoginUser == 1).FirstAsync(t => t.BusinessId == requestBody.BId);
             if (userInfo != null)
             {
                 List<FamilyUser> husAdd = new();

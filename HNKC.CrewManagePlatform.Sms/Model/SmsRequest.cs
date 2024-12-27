@@ -37,5 +37,10 @@ namespace HNKC.CrewManagePlatform.Sms.Model
         /// 示例：{"code":"1111"}
         /// </summary>
         public string? TemplateParam { get; set; }
+
+        /// <summary>
+        /// 临时变量  是否成功
+        /// </summary>
+        public bool? IsSuccess { get; set; }
     }
 }

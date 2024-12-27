@@ -274,5 +274,25 @@ namespace HNKC.CrewManagePlatform.Services.Interface
 
         }
         #endregion
+
+        #region 获取当前角色
+
+        public async Task<int> CurRoleType()
+        {
+            //是管理员不做任何处理
+            if (!GlobalCurrentUser.IsAdmin)
+            {
+                //获取当前登录角色
+                var role = await _dbContext.Queryable<SqlSugars.Models.Role>().FirstAsync(t => t.IsDelete == 1 && t.BusinessId == GlobalCurrentUser.RoleBusinessId);
+                if (role != null)
+                {
+                    if (role.Type != 2 && role.Type != 3) return -1;//3船长 2船员 否则-1
+                    else return role.Type.Value;
+                }
+                else { return -1; }
+            }
+            else return 1;
+        }
+        #endregion
     }
 }
