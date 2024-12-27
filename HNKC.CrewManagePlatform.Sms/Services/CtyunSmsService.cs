@@ -57,7 +57,7 @@ namespace HNKC.CrewManagePlatform.Sms.Services
             {
                 var requestId = CtyunHelper.GenerateRequestId(); //生成请求id
                 var eopDate = CtyunHelper.ConstructTimestamp(); //生成时间戳
-                var type = phoneArr.Length > 1 ? 2 : 1;//1是群发 2是个人发
+                var type = 2;//phoneArr.Length > 1 ? 2 : 1;//1是群发 2是个人发
                 var requestBody = CtyunHelper.GetSortedBody(parame, smsParam.PhoneNumber, type);
                 string body = JsonSerializer.Serialize(requestBody,
                               new JsonSerializerOptions
