@@ -76,6 +76,16 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api.Controllers
         {
             return await _service.CrewTransferAsync(requestBody);
         }
+        /// <summary>
+        /// 保存备注
+        /// </summary>
+        /// <param name="requestBody"></param>
+        /// <returns></returns>
+        [HttpPost("SaveNotes")]
+        public async Task<Result> SaveNotesAsync([FromBody] NotesRequest requestBody)
+        {
+            return await _service.SaveNotesAsync(requestBody);
+        }
         #region 下拉列表
         /// <summary>
         /// 获取基本下拉列表
@@ -88,16 +98,6 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api.Controllers
             return await _service.GetDropDownListAsync(type);
         }
         #endregion
-        /// <summary>
-        /// 保存备注
-        /// </summary>
-        /// <param name="requestBody"></param>
-        /// <returns></returns>
-        [HttpPost("SaveNotes")]
-        public async Task<Result> SaveNotesAsync([FromBody] NotesRequest requestBody)
-        {
-            return await _service.SaveNotesAsync(requestBody);
-        }
 
         #region 详情
         /// <summary>
@@ -202,7 +202,7 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api.Controllers
         [HttpPost("UploadFile")]
         public async Task<Result> UploadFileAsync(IFormFile file)
         {
-           return await SingleFileUpdateAsync(file, "DefaultAllowFileType");
+            return await SingleFileUpdateAsync(file, "DefaultAllowFileType");
         }
 
         #endregion

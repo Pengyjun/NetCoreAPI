@@ -49,5 +49,10 @@ namespace HNKC.CrewManagePlatform.Services.Interface
         /// <param name="uId"></param>
         /// <returns></returns>
         Task<Result> UpdateFileAsync(List<UploadResponse> uploadResponse, Guid? uId);
+        /// <summary>
+        /// 当前角色类型
+        /// </summary>
+        /// <returns></returns>
+        Task<int> CurRoleType();
     }
 }

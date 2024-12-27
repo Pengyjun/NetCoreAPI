@@ -52,7 +52,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CurrentUser
             var pwd = $"{secretKey}{userLoginRequest.Password}".ToMd5();
             //用户信息
             var userInfo = await dbContext.Queryable<User>().Where(x => x.IsDelete == 1 && x.Phone == userLoginRequest.Phone
-            && x.Password == pwd&&x.IsLoginUser==0).FirstAsync();
+            && x.Password == pwd && x.IsLoginUser == 0).FirstAsync();
             if (userInfo != null)
             {
                 var instutionBusinessId = await dbContext.Queryable<Institution>().Where(x => x.IsDelete == 1 && x.Oid == userInfo.Oid
@@ -69,13 +69,13 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CurrentUser
                 //}
                 //var roleBuinessId = userInstitutionList.Select(x => x.BusinessId).ToList();
                 //用户机构角色信息
-                var userInstitution = await dbContext.Queryable<InstitutionRole>().Where(x => x.IsDelete == 1 && x.UserBusinessId== userInfo.BusinessId).ToListAsync();
+                var userInstitution = await dbContext.Queryable<InstitutionRole>().Where(x => x.IsDelete == 1 && x.UserBusinessId == userInfo.BusinessId).ToListAsync();
                 //机构信息
                 var institutionBusinessId = userInstitution.Select(x => x.InstitutionBusinessId).Distinct().ToList();
                 var institution = await dbContext.Queryable<Institution>().Where(x => x.IsDelete == 1 && institutionBusinessId.Contains(x.BusinessId)).ToListAsync();
                 if (userInstitution.Count == 0)
                 {
-                    return Result.Fail("无权限请先分配权限",(int)ResponseHttpCode.LoginFail);
+                    return Result.Fail("无权限请先分配权限", (int)ResponseHttpCode.LoginFail);
                 }
                 var roleBusinessId = userInstitution.Select(x => x.BusinessId).ToList();
                 if (roleBusinessId.Count == 0)
@@ -113,15 +113,15 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CurrentUser
                             };
                             userLoginResponse.RoleList.Add(role);
                         }
-                       
+
                     }
                     var firstRoleLogin = userLoginResponse.RoleList.Where(x => x.RoleBusinessId == firstRole.BusinessId).FirstOrDefault();
                     //激活角色标识
-                    if (firstRoleLogin!=null)
+                    if (firstRoleLogin != null)
                     {
                         firstRoleLogin.IsActivate = true;
                     }
-                    
+
                     ////切换角色
                     //if (userLoginRequest.RoleBusinessId.HasValue)
                     //{
@@ -163,16 +163,16 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CurrentUser
         {
             var token = string.Empty;
             var userInfo = GlobalCurrentUser;
-           var allRole=await dbContext.Queryable<InstitutionRole>().Where(x => x.IsDelete == 1 &&x.UserBusinessId == userInfo.UserBusinessId).ToListAsync();
+            var allRole = await dbContext.Queryable<InstitutionRole>().Where(x => x.IsDelete == 1 && x.UserBusinessId == userInfo.UserBusinessId).ToListAsync();
             //角色ID
-            var roleIds=allRole.Select(x=>x.RoleBusinessId).ToList();
+            var roleIds = allRole.Select(x => x.RoleBusinessId).ToList();
             //角色信息
             var roleList = await dbContext.Queryable<HNKC.CrewManagePlatform.SqlSugars.Models.Role>().Where(x => x.IsDelete == 1 && roleIds.Contains(x.BusinessId)).ToListAsync();
             //机构ID
-            var institutionIds= allRole.Select(x=>x.InstitutionBusinessId).ToList();
+            var institutionIds = allRole.Select(x => x.InstitutionBusinessId).ToList();
             //机构信息
             var institution = await dbContext.Queryable<Institution>().Where(x => x.IsDelete == 1 && institutionIds.Contains(x.BusinessId)).ToListAsync();
-         
+
             if (roleList.Count > 0)
             {
 
@@ -207,7 +207,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CurrentUser
                 {
                     return Result.Fail("角色切换失败;当前用户不存在角色", (int)ResponseHttpCode.LoginFail);
                 }
-                var roleResponse= userLoginResponse.RoleList.Where(x => x.RoleBusinessId == loginRole.BusinessId).FirstOrDefault();
+                var roleResponse = userLoginResponse.RoleList.Where(x => x.RoleBusinessId == loginRole.BusinessId).FirstOrDefault();
                 if (roleResponse != null)
                 {
                     roleResponse.IsActivate = true;
@@ -279,7 +279,8 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CurrentUser
                  .Where(a => a.IsDelete == 1)
                  .WhereIF(!string.IsNullOrWhiteSpace(pageRequest.KeyWords), a => a.Name.Contains(pageRequest.KeyWords)
                  || a.Phone.Contains(pageRequest.KeyWords))
-                 .Select((a, b, c, d) => new UserResponse() {
+                 .Select((a, b, c, d) => new UserResponse()
+                 {
                      BId = a.BusinessId,
                      Name = a.Name,
                      Phone = a.Phone,
@@ -375,6 +376,6 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CurrentUser
             return Result.Success("修改成功");
         }
 
-      
+
     }
 }
