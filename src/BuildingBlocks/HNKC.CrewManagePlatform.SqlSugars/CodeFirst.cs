@@ -14,7 +14,7 @@ namespace HNKC.CrewManagePlatform.SqlSugars
             SqlSugarClient db = new SqlSugarClient(new ConnectionConfig()
             {
                 ConnectionString = dbCon,
-                DbType = DbType.Dm,
+                DbType = DbType.MySql,
                 IsAutoCloseConnection = false,//不设成true要手动close
                 MoreSettings = new ConnMoreSettings()
                 {
@@ -65,7 +65,7 @@ namespace HNKC.CrewManagePlatform.SqlSugars
                 };
             });
             Type[] types = typeof(BaseEntity<Guid>).Assembly.GetTypes()
-            .Where(it => it.FullName.Contains("HNKC.CrewManagePlatform.SqlSugars.Models.ShipProjectRelation")
+            .Where(it => it.FullName.Contains("HNKC.CrewManagePlatform.SqlSugars.Models")
             &&!it.Name .Contains("BaseEntity")
             )
             .ToArray();
