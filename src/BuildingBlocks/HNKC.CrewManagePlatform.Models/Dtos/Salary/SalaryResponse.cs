@@ -9,7 +9,7 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.Salary
     /// <summary>
     /// 工资列表返回DTO
     /// </summary>
-    public class SalaryResponse
+    public class SalaryResponse:BaseResponse
     {
 
         public string Id { get; set; }
