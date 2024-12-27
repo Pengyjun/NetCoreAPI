@@ -1546,11 +1546,11 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
             //本年的月份
             var month = Convert.ToDateTime(startTime).AddMonths(1).Month;
             //本年的年份 
-            var yearStartTime = DateTime.Now.Year.ToString();
+            var yearStartTime = DateTime.Now.Year==2024?"2025": DateTime.Now.Year.ToString();
             //年累计开始时间（每年的开始时间）
-            var startYearTimeInt = int.Parse(DateTime.Now.AddYears(-1).ToString("yyyy") + "1226");//int.Parse(DateTime.Now.AddYears(-1).ToString("yyyy1226"));
+            var startYearTimeInt = 20241226; //int.Parse(DateTime.Now.AddYears(-1).ToString("yyyy") + "1226");//int.Parse(DateTime.Now.AddYears(-1).ToString("yyyy1226"));
             //年累计结束时间
-            var endYearTimeInt = int.Parse(DateTime.Now.ToString("yyyyMMdd")) > 1226 && int.Parse(DateTime.Now.ToString("yyyyMMdd")) <= 31 ? int.Parse(DateTime.Now.AddYears(1).ToString("yyyy1225")) : int.Parse(DateTime.Now.ToString("yyyy1225")); //int.Parse(DateTime.Now.ToString("yyyy1225"));
+            var endYearTimeInt = 20251225; //int.Parse(DateTime.Now.ToString("yyyyMMdd")) > 1226 && int.Parse(DateTime.Now.ToString("yyyyMMdd")) <= 31 ? int.Parse(DateTime.Now.AddYears(1).ToString("yyyy1225")) : int.Parse(DateTime.Now.ToString("yyyy1225")); //int.Parse(DateTime.Now.ToString("yyyy1225"));
                                                                                                                                                                                                                                                       //每月多少天
                                                                                                                                                                                                                                                       // int days = DateTime.DaysInMonth(int.Parse(endYearTimeInt.ToString().Substring(0, 4)), month);  //DateTime.DaysInMonth(DateTime.Now.Year, DateTime.Now.AddMonths(-1).Month);
             int days = TimeHelper.GetTimeSpan(Convert.ToDateTime(startTime), Convert.ToDateTime(endTime)).Days + 1;

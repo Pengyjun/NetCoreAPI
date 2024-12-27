@@ -2157,7 +2157,7 @@ namespace GHMonitoringCenterApi.Application.Service.Timing
         {
             ResponseAjaxResult<bool> responseAjaxResult = new ResponseAjaxResult<bool>();
             #region 筛选条件
-            var year = DateTime.Now.Year;
+            var year =2025;
             var currentDay = DateTime.Now.Day;
             var startTime = string.Empty;
             var endTime = string.Empty;
