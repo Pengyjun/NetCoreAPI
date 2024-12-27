@@ -61,6 +61,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Salary
                   .Where((x, y) => x.IsDelete == 1 && y.IsDelete == 1)
                  .Select((x, y) => new SalaryResponse
                  {
+                     BId=x.BusinessId,
                      Id = x.Id.ToString(),
                      BaseWage = y.BaseWage,
                      CardId = x.CardId,
