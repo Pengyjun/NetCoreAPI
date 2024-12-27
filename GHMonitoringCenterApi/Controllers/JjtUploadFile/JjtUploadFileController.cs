@@ -1,4 +1,5 @@
-﻿using GHMonitoringCenterApi.Application.Contracts.Dto.JjtSendMsg;
+﻿using GHMonitoringCenterApi.Application.Contracts.Dto;
+using GHMonitoringCenterApi.Application.Contracts.Dto.JjtSendMsg;
 using GHMonitoringCenterApi.Application.Contracts.IService;
 using GHMonitoringCenterApi.Application.Contracts.IService.File;
 using GHMonitoringCenterApi.Application.Contracts.IService.OperationLog;
@@ -169,5 +170,10 @@ namespace GHMonitoringCenterApi.Controllers.JjtUploadFile
 		{
 			return await fileService.GetImageJJT(media_id);
 		}
-	}
+
+
+
+        
+
+    }
 }

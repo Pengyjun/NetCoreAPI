@@ -1,4 +1,5 @@
 ﻿using CDC.MDM.Core.Common.Util;
+using GHMonitoringCenterApi.Application.Contracts.Dto;
 using GHMonitoringCenterApi.Application.Contracts.Dto.JjtSendMsg;
 using GHMonitoringCenterApi.Application.Contracts.Dto.Ship;
 using GHMonitoringCenterApi.Application.Contracts.IService;
@@ -15,6 +16,7 @@ using GHMonitoringCenterApi.Domain.Shared.Util;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using NPOI.SS.Formula.Functions;
 using SqlSugar;
 using SqlSugar.Extensions;
 using UtilsSharp;
@@ -1508,7 +1510,7 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
         /// 新版交建通发消息 监控运营中心图片消息
         /// </summary>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<JjtSendMessageMonitoringDayReportResponseDto>> JjtTextCardMsgDetailsAsync(int dateDay = 0)
+        public async Task<ResponseAjaxResult<JjtSendMessageMonitoringDayReportResponseDto>> JjtTextCardMsgDetailsAsync(int dateDay = 0, bool flag = true)
         {
             var timeOf = 20241226;//每个月的初始数
             #region 111
@@ -1863,6 +1865,7 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
                     var supersequenceProgress = yearIndex.Value != 0 ? (Math.Round((totalYearProductionValue / yearIndex.Value) * 100, 2) - timeProgress) : 0;
                     companyBasePoductionValues.Add(new CompanyBasePoductionValue()
                     {
+                        CompanyId=item.ItemId,
                         Name = item.Name,
                         DayProductionValue = Math.Round(currentCompanyCount / 10000, 2),
                         TotalYearProductionValue = totalYearProductionValue,
@@ -2960,9 +2963,34 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
             jjtSendMessageMonitoringDayReportResponseDto.ImpProjectWarning = imp.OrderByDescending(x=>x.DayAmount).Take(3).ToList();
             #endregion
 
+
+
             jjtSendMessageMonitoringDayReportResponseDto.Month = month;
             jjtSendMessageMonitoringDayReportResponseDto.Year = int.Parse(yearStartTime);
             responseAjaxResult.Data = jjtSendMessageMonitoringDayReportResponseDto;
+
+            #region 每天的生产结果已json的形式保存
+            if (flag)
+            {
+                try
+                {
+                    RecordPushDayReport recordPushDayReport = new RecordPushDayReport()
+                    {
+                        Id = GuidUtil.Next(),
+                        DateDay = int.Parse(DateTime.Now.AddDays(-1).ToString("yyyyMM")),
+                        Json = jjtSendMessageMonitoringDayReportResponseDto.ToJson()
+                    };
+                    dbContext.Insertable<RecordPushDayReport>(recordPushDayReport).ExecuteCommandAsync();
+                }
+                catch (Exception)
+                {
+
+
+                }
+            }
+          
+           
+            #endregion
             responseAjaxResult.Success();
             return responseAjaxResult;
             #endregion
@@ -5803,6 +5831,45 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
 
 
 
+        }
+
+
+
+
+
+
+        // JjtTextCardMsgDetailsAsync
+
+        public async Task<CompanyDayProductionValueResponseDto> SearchCompanyProductionValueAsync()
+        {
+            CompanyDayProductionValueResponseDto companyDayProductionValueResponseDto = new CompanyDayProductionValueResponseDto()
+            {
+                CompanyItems = new List<CompanyItem>()
+            };
+            var result = await JjtTextCardMsgDetailsAsync(flag:false) ;
+            if (result != null)
+            {
+                var year = result.Data.Year;
+                var day = int.Parse(result.Data.DayTime.Replace("月", "").Replace("日", "").Trim());
+                var totalProducitonValue = result.Data.projectBasePoduction.TotalYearProductionValue;
+                companyDayProductionValueResponseDto.DateDay = day;
+                companyDayProductionValueResponseDto.TotalYearProductionValue = totalProducitonValue;
+                //各个公司总产值
+                 List<CompanyItem> companys= new List<CompanyItem>();
+
+
+                foreach (var item in result.Data.projectBasePoduction.CompanyBasePoductionValues)
+                {
+                    companys.Add(new CompanyItem() { 
+                     CompanyId=item.CompanyId,
+                        DayProductionValue = item.DayProductionValue,
+                       YearProductionValue=item.TotalYearProductionValue
+                    });
+                }
+                companyDayProductionValueResponseDto.CompanyItems= companys.Where(x=>x.CompanyId!=null).ToList();
+            }
+
+            return companyDayProductionValueResponseDto;
         }
 
     }

@@ -230,6 +230,10 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.JjtSendMsg
     public class CompanyBasePoductionValue
     {
         /// <summary>
+        /// 公司ID
+        /// </summary>
+        public Guid? CompanyId { get; set; }
+        /// <summary>
         /// 项目名称
         /// </summary>
         public string Name { get; set; }

@@ -1,4 +1,5 @@
 ﻿using CDC.MDM.Core.Common.Util;
+using GHMonitoringCenterApi.Application.Contracts.Dto;
 using GHMonitoringCenterApi.Application.Contracts.Dto.JjtSendMsg;
 using GHMonitoringCenterApi.Application.Contracts.Dto.Ship;
 using GHMonitoringCenterApi.Domain.Shared;
@@ -90,7 +91,7 @@ namespace GHMonitoringCenterApi.Application.Contracts.IService.JjtSendMessage
         /// 新版交建通发消息 监控运营中心图片消息
         /// </summary>
         /// <returns></returns>
-        Task<ResponseAjaxResult<JjtSendMessageMonitoringDayReportResponseDto>> JjtTextCardMsgDetailsAsync(int dateDay = 0);
+        Task<ResponseAjaxResult<JjtSendMessageMonitoringDayReportResponseDto>> JjtTextCardMsgDetailsAsync(int dateDay = 0,bool flag=true);
 
         /// <summary>
         /// 交建公司生产日报推送
@@ -115,6 +116,13 @@ namespace GHMonitoringCenterApi.Application.Contracts.IService.JjtSendMessage
         /// <returns></returns>
 
         Task<ResponseAjaxResult<bool>> ProjectUnDayReportNotifAsync(bool isTimingTask, bool isFirst);
+
+        /// <summary>
+        /// 生产监控系统使用接口 其他系统不适用  本系统也不使用
+        /// </summary>
+        /// <returns></returns>
+
+        Task<CompanyDayProductionValueResponseDto> SearchCompanyProductionValueAsync();
 
     }
 }

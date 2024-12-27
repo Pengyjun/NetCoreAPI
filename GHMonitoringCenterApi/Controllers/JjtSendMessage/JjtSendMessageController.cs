@@ -1,4 +1,5 @@
 ﻿using CDC.MDM.Core.Common.Util;
+using GHMonitoringCenterApi.Application.Contracts.Dto;
 using GHMonitoringCenterApi.Application.Contracts.Dto.JjtSendMsg;
 using GHMonitoringCenterApi.Application.Contracts.Dto.Ship;
 using GHMonitoringCenterApi.Application.Contracts.IService.JjtSendMessage;
@@ -264,5 +265,17 @@ namespace GHMonitoringCenterApi.Controllers.JjtSendMessage
             return responseAjaxResult;
         }
         #endregion
+
+
+        /// <summary>
+        /// 生产运营监控系统使用接口  获取数据同步问题  
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("SearchCompanyProductionValue")]
+        [AllowAnonymous]
+        public async Task<CompanyDayProductionValueResponseDto> SearchCompanyProductionValueAsync()
+        {
+            return await jjtSendMessageService.SearchCompanyProductionValueAsync();
+        }
     }
 }
