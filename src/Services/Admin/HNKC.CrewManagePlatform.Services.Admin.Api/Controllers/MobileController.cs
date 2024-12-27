@@ -18,6 +18,7 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api.Controllers
     /// </summary>
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class MobileController : BaseController
     {
         public ISalaryService salaryService { get; set; }
