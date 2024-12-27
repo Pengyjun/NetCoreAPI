@@ -50,5 +50,12 @@ namespace HNKC.CrewManagePlatform.SqlSugars.Models
         /// </summary>
         [SugarColumn(Length = 1024, ColumnDescription = "手机短信链接地址")]
         public string? PhoneUrl { get; set; }
+
+
+        /// <summary>
+        ///随机数生成对应PhoneUrl的映射
+        /// </summary>
+        [SugarColumn(Length = 16, ColumnDescription = "手机短信链接地址")]
+        public string? RandomUrl { get; set; }
     }
 }

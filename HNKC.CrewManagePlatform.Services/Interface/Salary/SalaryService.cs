@@ -164,17 +164,21 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Salary
         /// <exception cref="NotImplementedException"></exception>
         public async Task<SalaryAsExcelResponse> FindUserInfoAsync(string sign)
         {
-            var parseSign = WebUtility.UrlDecode(sign);
             SalaryAsExcelResponse salaryAsExcelResponse = new SalaryAsExcelResponse();
-            salary.Salary salary = new salary.Salary();
-            #region 信息校验
             if (string.IsNullOrWhiteSpace(sign))
             {
                 return salaryAsExcelResponse;
             }
-            var pushTimeCalc = await dbContext.Queryable<SalaryPushRecord>().Where(x => x.IsDelete == 1 && x.PhoneUrl == sign).Select(x => x.Created).FirstAsync();
-
-            if (!pushTimeCalc.HasValue || (pushTimeCalc.Value.AddDays(3) - DateTime.Now).Seconds <= 0)
+            
+            salary.Salary salary = new salary.Salary();
+            #region 信息校验
+            var pushTimeCalc = await dbContext.Queryable<SalaryPushRecord>().Where(x => x.IsDelete == 1 && x.RandomUrl == sign).FirstAsync();
+            if (pushTimeCalc==null)
+            {
+                return salaryAsExcelResponse;
+            }
+            var parseSign = WebUtility.UrlDecode(pushTimeCalc.PhoneUrl);
+            if (!pushTimeCalc.Created.HasValue || (pushTimeCalc.Created.Value.AddDays(3) - DateTime.Now).Seconds <= 0)
             {
                 return null;
             }
@@ -183,7 +187,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Salary
             #region 基础信息
             DateTime pushTime = default(DateTime);
             var decrRes = (CryptoStringExtension.DecryptAsync(parseSign)).Split(",", StringSplitOptions.RemoveEmptyEntries).ToList();
-            if (decrRes.Count != 4)
+            if (decrRes.Count != 3)
             {
                 return salaryAsExcelResponse;
             }
@@ -256,10 +260,12 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Salary
                         var sendTime = int.Parse(DateTime.Now.ToString("yyyyMM"));
                         //短信连接生成
                         var smsUrl = WebUtility.UrlEncode(CryptoStringExtension.EncryptAsync($"{allPhone[i].WorkNumber},{year},{month}"));
+                        //随机生成固定数
+                        var random=RandomHelper.NumberAndLetters(16);
                         #endregion
                         parame.PhoneNumber = parame.PhoneNumber.Substring(0, parame.PhoneNumber.Length - 1);
                         //替换url参数
-                        url = url.Replace("@sign", smsUrl);
+                        url = url.Replace("@sign", random);
                         #region 个人版推送
                         //个人版发送
                         if (baseRequest != null && baseRequest.BId.HasValue)
@@ -311,7 +317,8 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Salary
                                 Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
                                 Year = year,
                                 Month = month,
-                                PhoneUrl = WebUtility.UrlEncode(CryptoStringExtension.EncryptAsync($"{userInfo?.WorkNumber},{year},{month},{DateTime.Now.ToString("yyyyMMddHHmmssffff")}")),
+                                PhoneUrl = smsUrl,
+                                RandomUrl = random,
                                 UserId = userInfo != null ? userInfo.UserId : 0,
 
                             };
