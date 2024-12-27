@@ -4,6 +4,7 @@ using HNKC.CrewManagePlatform.Models.Dtos.CrewArchives;
 using HNKC.CrewManagePlatform.Services.Interface.CurrentUserService;
 using HNKC.CrewManagePlatform.Utils;
 using Microsoft.AspNetCore.Mvc;
+using System.Diagnostics;
 using UtilsSharp;
 
 namespace HNKC.CrewManagePlatform.Services.Admin.Api.Controllers
@@ -95,6 +96,7 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api.Controllers
             {
                 await file.CopyToAsync(stream);
             }
+            SetFilePermissions(savePath);
             var uploadResponseDto = new UploadResponse()
             {
                 Id = newFileName,
@@ -109,6 +111,27 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api.Controllers
         }
         #endregion
         #endregion
+        /// <summary>
+        /// 权限修改
+        /// </summary>
+        /// <param name="filePath"></param>
+        private void SetFilePermissions(string filePath)
+        {
+            // 使用 chmod 命令修改文件权限 (适用于 Linux/Unix)
+            var processStartInfo = new ProcessStartInfo
+            {
+                FileName = "chmod",
+                Arguments = "644 " + filePath,  // 设置文件权限为 644
+                RedirectStandardOutput = true,
+                UseShellExecute = false,
+                CreateNoWindow = true
+            };
 
+            using (var process = Process.Start(processStartInfo))
+            {
+                process.WaitForExit();
+            }
+        }
     }
+
 }
