@@ -123,7 +123,7 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api.Controllers
                         SuffixName = name,
                         FileSize = fileSize,
                         FileType = file.ContentType,
-                        Url = AppsettingsHelper.GetValue("UpdateItem:Url") + newFileName + file.FileName
+                        Url = AppsettingsHelper.GetValue("UpdateItem:Url") + newFileName + name
                     };
                     uploadresponseDto.Add(uploadResponseDto);
                 }

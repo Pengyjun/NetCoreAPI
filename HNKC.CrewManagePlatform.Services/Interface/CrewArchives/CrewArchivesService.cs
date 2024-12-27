@@ -2048,7 +2048,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                         Name = x.Name,
                         OriginName = x.OriginName,
                         SuffixName = x.SuffixName,
-                        Url = url + x.Name?.Substring(0, x.Name.LastIndexOf(".")) + x.OriginName
+                        Url = url + x.Name
                     })
                     .ToList();
                 qd.Add(new QualificationForDetails
