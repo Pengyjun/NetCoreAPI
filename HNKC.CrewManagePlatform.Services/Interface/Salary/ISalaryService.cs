@@ -36,7 +36,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Salary
         Task<PageResult<SalaryPushResponse>> GetSalaryPushRecordByUserAsync(SalaryPushRequest salaryPushRequest);
 
         /// <summary>
-        /// 移动端
+        /// 移动端 点击链接查询
         /// </summary>
         /// <param name="baseRequest"></param>
         /// <returns></returns>
@@ -47,5 +47,12 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Salary
         /// </summary>
         /// <returns></returns>
         Task<Result> SendSmsAllAsync(BaseRequest baseRequest);
+
+        /// <summary>
+        /// 发短信
+        /// </summary>
+        /// <returns></returns>
+
+        Task<Result> SendSmsAsync();
     }
 }

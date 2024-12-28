@@ -9,7 +9,6 @@
         /// <summary>
         /// 业务ID
         /// </summary>
-      
         public Guid? BId { get; set; }
     }
 }

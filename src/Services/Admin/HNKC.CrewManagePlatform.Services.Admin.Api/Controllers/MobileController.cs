@@ -55,5 +55,19 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api.Controllers
         {
           return  (await salaryService.SendSmsAllAsync(baseRequest));
         }
+
+        /// <summary>
+        /// 补偿机制发送手机短信
+        /// </summary>
+        /// <param name="baseRequest"></param>
+        /// <returns></returns>
+        [HttpGet("SendPhoneSms")]
+        public async Task<Result> SendSmsAsync()
+        {
+            return await salaryService.SendSmsAsync();
+        }
+
+
+
     }
 }

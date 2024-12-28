@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing.Template;
 using SqlSugar;
 using SqlSugar.Extensions;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -229,112 +230,112 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Salary
         {
             var year = DateTime.Now.Year;
             var month = DateTime.Now.Month;
-            var pageIndex = 1;
-            var pageSize = 200;
-            //群发信息集合
-            List<SmsRequest> smsRequests = new List<SmsRequest>();
-            List<SalaryPushRecord> salaryPushRecords = new List<SalaryPushRecord>();
             if (baseRequest.BId == Guid.Empty)
             {
                 return Result.Fail("发送失败", (int)ResponseHttpCode.SendFail);
             }
+            var salarieList = await dbContext.Queryable<salary.Salary>().Where(x => x.IsDelete == 1&&x.Year==year&&x.Month==month).ToListAsync();
+            if (salarieList.Count == 0)
+            {
+                return Result.Fail("没有工资信息无法发送", (int)ResponseHttpCode.SendFail);
+            }
+
+            //工资推送记录
+            List<SalaryPushRecord> salaryPushRecords = new List<SalaryPushRecord>();
+
+            //所有用户
+            var allUser= await dbContext.Queryable<User>()
+                 .Where(x => x.IsDelete == 1&&!SqlFunc.IsNullOrEmpty(x.Phone))
+                 .WhereIF(baseRequest != null && baseRequest.BId != null, x => x.BusinessId == baseRequest.BId).ToListAsync();
+
+            //查询推送记录
+            //所有未推送的用户
+            var allNoPushUserId = await dbContext.Queryable<SalaryPushRecord>()
+                 .Where(x => x.IsDelete == 1 && x.Year==year&&x.Month==month&&x.Result==1)
+                 .Select(x=>x.UserId).ToListAsync();
+            var pushUserList= allUser.Where(x =>!allNoPushUserId.Contains(x.Id)).ToList();
+            if (pushUserList.Count == 0)
+            {
+                return Result.Fail("没有可发送的短信", (int)ResponseHttpCode.SendFail);
+            }
+            var len = int.Parse(AppsettingsHelper.GetValue("Length"));
+            foreach (var item in pushUserList)
+            {
+                salaryPushRecords.Add(new SalaryPushRecord()
+                {
+                    Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                    BusinessId = Guid.Empty,
+                    Month = month,
+                    Year = year,
+                    UserId = item.Id,
+                    Result = 0,
+                    RandomUrl = RandomHelper.NumberAndLetters(len),
+                    BusinessType = (baseRequest==null|| baseRequest.BId==null) ? 1 : 0,
+                    PhoneUrl = WebUtility.UrlEncode(CryptoStringExtension.EncryptAsync($"{item.WorkNumber},{year},{month}"))
+                });
+            }
+            await dbContext.Insertable<SalaryPushRecord>(salaryPushRecords).ExecuteCommandAsync();
+            //不等待
+            SendSmsAsync();
+            return Result.Success("发送成功");
+       }
+        
+        /// <summary>
+        /// 发短信
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        public async Task<Result> SendSmsAsync()
+        {
+            var year = DateTime.Now.Year;
+            var month = DateTime.Now.Month;
+            var allNoPushUserId = await dbContext.Queryable<SalaryPushRecord>()
+                .Where(x => x.IsDelete == 1 && x.Year == year && x.Month == month && x.Result != 1)
+                .ToListAsync();
+            if (allNoPushUserId.Count == 0)
+            {
+                return Result.Fail("没有可发送的短信", (int)ResponseHttpCode.SendFail);
+            }
+            var userIds = allNoPushUserId.Select(x => x.UserId).ToList();
+            var userList=await dbContext.Queryable<User>().Where(x => x.IsDelete == 1 && userIds.Contains(x.Id)).ToListAsync();
             try
             {
-
-                //用户信息
-                var allPhone = await dbContext.Queryable<User>().Where(x => x.IsDelete == 1 && !SqlFunc.IsNullOrEmpty(x.Phone))
-                        .WhereIF(baseRequest != null && baseRequest.BId != null, x => x.BusinessId == baseRequest.BId)
-                        .Select(x => new { Phone = x.Phone, UserId = x.Id, WorkNumber = x.WorkNumber, Name = x.Name, BusinessId = x.BusinessId }).Distinct().ToListAsync();
-                if (allPhone.Count > 0)
+                
+                foreach (var user in allNoPushUserId)
                 {
-                    for (int i = 0; i < allPhone.Count; i++)
+                    var userInfo = userList.Where(x => x.Id == user.UserId).FirstOrDefault();
+                    if (userInfo != null)
                     {
-                        
+                        var url = AppsettingsHelper.GetValue("CtyunSms:SendSmsPhoneUrl");
+                        url = url.Replace("@sign", user.RandomUrl);
                         var parame = new Sms.Model.SmsRequest()
                         {
-                            PhoneNumber = allPhone[i].Phone + ","
+                            PhoneNumber = userInfo.Phone
                         };
-                        #region 基本参数生成
-                        //获取参数
-                        var url = AppsettingsHelper.GetValue("CtyunSms:SendSmsPhoneUrl");
-                        var sendTime = int.Parse(DateTime.Now.ToString("yyyyMM"));
-                        //短信连接生成
-                        var smsUrl = WebUtility.UrlEncode(CryptoStringExtension.EncryptAsync($"{allPhone[i].WorkNumber},{year},{month}"));
-                        //随机生成固定数
-                        var len = int.Parse(AppsettingsHelper.GetValue("Length"));
-                        var random=RandomHelper.NumberAndLetters(len);
-                        #endregion
-                        parame.PhoneNumber = parame.PhoneNumber.Substring(0, parame.PhoneNumber.Length - 1);
-                        //替换url参数
-                        url = url.Replace("@sign", random);
-                        #region 个人版推送
-                        //个人版发送
-                        if (baseRequest != null && baseRequest.BId.HasValue)
+                        ParameTemplate parameTemplate = new ParameTemplate()
                         {
-                            
-                            ParameTemplate parameTemplate = new ParameTemplate()
-                            {
-                                Name = allPhone[i].Name,
-                                Url = url,
-                                Time = sendTime
-                            };
-                            parame.TemplateParam = parameTemplate.ToJson();
-                            smsRequests.Add(parame);
-                        }
-                        #endregion
-
-                        #region 群发版推送
-                        else if (baseRequest==null||baseRequest.BId == null)
-                        {
-                            //群发版
-                            ParameTemplate parameTemplate = new ParameTemplate()
-                            {
-                                Name = allPhone[i].Name,
-                                Url = url,
-                                Time = sendTime
-                            };
-                          
-                            parame.TemplateParam = parameTemplate.ToJson();
-                            smsRequests.Add(parame);
-                        }
-                        #endregion
-
-                        #region 调用发短信接口
-                        //发送短信
+                            Name = userInfo.Name,
+                            Url = url,
+                            Time = int.Parse(year.ToString() + month)
+                        };
+                        parame.TemplateParam = parameTemplate.ToJson();
                         var responseResult = await smsService.SendSmsAsync(parame);
-                        smsRequests.Where(x => x.PhoneNumber == parame.PhoneNumber).First().IsSuccess= responseResult.IsSuccess;
-                        #endregion
-
-                        #region 保存数据库
-                        var userInfo = allPhone.Where(x => x.Phone == smsRequests[0].PhoneNumber).FirstOrDefault();
-                        SalaryPushRecord salaryPushRecord = new SalaryPushRecord()
+                        user.Result= responseResult.IsSuccess? 1 : 0;
+                        if (user.Result != 1)
                         {
-                            BusinessType = (baseRequest == null
-                       || baseRequest.BId == Guid.Empty) ? (int)BusinessTypeEnum.BatchPush : (int)BusinessTypeEnum.PersonalPush,
-                            Result = responseResult.IsSuccess ? (int)PushResultEnum.Success : (int)PushResultEnum.Fail,
-                            Fail = !responseResult.IsSuccess ? responseResult.Data : string.Empty,
-                            Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
-                            Year = year,
-                            Month = month,
-                            PhoneUrl = smsUrl,
-                            RandomUrl = random,
-                            UserId = userInfo != null ? userInfo.UserId : 0,
-
-                        };
-                        salaryPushRecords.Add(salaryPushRecord);
-                        #endregion
+                            user.Fail = responseResult.Data;
+                        }
 
                     }
-                    await dbContext.Insertable<SalaryPushRecord>(salaryPushRecords).ExecuteCommandAsync();
-                    return Result.Success("发送成功");
                 }
+                await dbContext.Updateable<SalaryPushRecord>(allNoPushUserId).ExecuteCommandAsync();
             }
             catch (Exception ex)
             {
-
-
+                //如果失败 把之前发送成功的 更新 防止发送重复
+               await dbContext.Updateable<SalaryPushRecord>(allNoPushUserId).ExecuteCommandAsync();
             }
-            return Result.Fail("发送失败");
+            return Result.Success();
         }
     }
 }
