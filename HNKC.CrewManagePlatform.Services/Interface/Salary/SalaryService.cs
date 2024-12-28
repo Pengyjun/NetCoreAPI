@@ -306,26 +306,22 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Salary
                         #endregion
 
                         #region 保存数据库
-                        foreach (var item in smsRequests)
+                        var userInfo = allPhone.Where(x => x.Phone == smsRequests[0].PhoneNumber).FirstOrDefault();
+                        SalaryPushRecord salaryPushRecord = new SalaryPushRecord()
                         {
-                            var userInfo = allPhone.Where(x => x.Phone == item.PhoneNumber).FirstOrDefault();
-                            SalaryPushRecord salaryPushRecord = new SalaryPushRecord()
-                            {
-                                BusinessType = (baseRequest == null
-                           || baseRequest.BId == Guid.Empty) ? (int)BusinessTypeEnum.BatchPush : (int)BusinessTypeEnum.PersonalPush,
-                                Result = responseResult.IsSuccess ? (int)PushResultEnum.Success : (int)PushResultEnum.Fail,
-                                Fail = !responseResult.IsSuccess ? responseResult.Data : string.Empty,
-                                Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
-                                Year = year,
-                                Month = month,
-                                PhoneUrl = smsUrl,
-                                RandomUrl = random,
-                                UserId = userInfo != null ? userInfo.UserId : 0,
+                            BusinessType = (baseRequest == null
+                       || baseRequest.BId == Guid.Empty) ? (int)BusinessTypeEnum.BatchPush : (int)BusinessTypeEnum.PersonalPush,
+                            Result = responseResult.IsSuccess ? (int)PushResultEnum.Success : (int)PushResultEnum.Fail,
+                            Fail = !responseResult.IsSuccess ? responseResult.Data : string.Empty,
+                            Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                            Year = year,
+                            Month = month,
+                            PhoneUrl = smsUrl,
+                            RandomUrl = random,
+                            UserId = userInfo != null ? userInfo.UserId : 0,
 
-                            };
-                            salaryPushRecords.Add(salaryPushRecord);
-
-                        }
+                        };
+                        salaryPushRecords.Add(salaryPushRecord);
                         #endregion
 
                     }
