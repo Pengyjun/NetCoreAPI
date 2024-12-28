@@ -1,4 +1,5 @@
 ﻿using HNKC.CrewManagePlatform.Models.CommonResult;
+using HNKC.CrewManagePlatform.Models.Dtos;
 using HNKC.CrewManagePlatform.Models.Dtos.Contract;
 using HNKC.CrewManagePlatform.Models.Enums;
 using HNKC.CrewManagePlatform.SqlSugars.Models;
@@ -11,7 +12,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Certificate
     /// <summary>
     /// 证书
     /// </summary>
-    public class CertificateService : ICertificateService
+    public class CertificateService : HNKC.CrewManagePlatform.Services.Interface.CurrentUser.CurrentUserService, ICertificateService
     {
         private readonly ISqlSugarClient _dbContext;
         private readonly IBaseService _baseService;
@@ -35,6 +36,9 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Certificate
         public async Task<PageResult<CertificateSearch>> SearchCertificateAsync(CertificateRequest requestBody)
         {
             RefAsync<int> total = 0;
+            var roleType = await _baseService.CurRoleType();
+            if (roleType == -1) { return new PageResult<CertificateSearch>(); }
+            var onShips = await _dbContext.Queryable<WorkShip>().Where(t => t.IsDelete == 1 && GlobalCurrentUser.UserBusinessId == t.WorkShipId).Select(x => x.OnShip).ToListAsync();
             #region 船员关联
             var uentityFist = _dbContext.Queryable<UserEntryInfo>()
                 .GroupBy(u => u.UserEntryId)
@@ -64,6 +68,8 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Certificate
                 .LeftJoin(uentity, (t1, t2, t3) => t1.BusinessId == t3.UserEntryId)
                 .InnerJoin<OwnerShip>((t1, t2, t3, t4) => t1.OnBoard == t4.BusinessId.ToString())
                 .InnerJoin(wShip, (t1, t2, t3, t4, t5) => t1.BusinessId == t5.WorkShipId)
+                .WhereIF(roleType == 3, (t1, t2, t4, t3, t5) => t5.OnShip == t3.BusinessId.ToString() && onShips.Contains(t5.OnShip))//船长
+                .WhereIF(roleType == 2, (t1, t2, t3, t4, t5) => GlobalCurrentUser.UserBusinessId == t5.WorkShipId)//船员
                 .InnerJoin<RemindSetting>((t1, t2, t3, t4, t5, t6) => t6.Types == requestBody.Certificates && t6.RemindType == 2)
                 .Select((t1, t2, t3, t4, t5, t6) => new CertificateSearch
                 {
@@ -74,13 +80,12 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Certificate
                     ShipType = t4.ShipType,
                     UserName = t1.Name,
                     WorkNumber = t1.WorkNumber,
-                    FPosition = t2.FPosition,
-                    SPosition = t2.SPosition,
                     OnBoardPosition = t5.Postition,
                     DeleteResonEnum = t1.DeleteReson,
                     WorkShipStartTime = t5.WorkShipStartTime,
                     CardId = t1.CardId
                 })
+                .Distinct()
                 .ToPageListAsync(requestBody.PageIndex, requestBody.PageSize, total);
             return await GetResultAsync(rr, total, requestBody.Certificates);
         }
