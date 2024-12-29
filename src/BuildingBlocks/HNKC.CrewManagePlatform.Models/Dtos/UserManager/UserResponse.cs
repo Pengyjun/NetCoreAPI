@@ -38,5 +38,16 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.UserManager
         /// 备注
         /// </summary>
         public string? Remark { get; set; }
+        /// <summary>
+        /// 工号
+        /// </summary>
+        public string? WorkNumber { get; set; }
+
+        /// <summary>
+        /// 性别 1是男  0是女
+        /// </summary>
+        public int? Gender { get; set; }
+
+
     }
 }

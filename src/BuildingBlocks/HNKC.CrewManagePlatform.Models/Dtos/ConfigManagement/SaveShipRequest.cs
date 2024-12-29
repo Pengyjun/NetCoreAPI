@@ -26,6 +26,6 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.ConfigManagement
     public class ShipRequest : PageRequest
     {
         public string? ShipId { get; set; }
-        public string? ShipType { get; set; }
+        public ShipTypeEnum? ShipType { get; set; }
     }
 }

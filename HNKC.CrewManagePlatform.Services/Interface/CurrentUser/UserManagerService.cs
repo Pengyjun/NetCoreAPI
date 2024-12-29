@@ -288,6 +288,8 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CurrentUser
                      Created = a.Created,
                      RoleName = c.Name,
                      Oid = a.Oid,
+                     Gender=a.Gender,
+                     WorkNumber = a.WorkNumber,
                      DepartmentName = d.ShortName
                  })
                .ToListAsync();

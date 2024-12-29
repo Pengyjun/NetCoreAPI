@@ -90,6 +90,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.ConfigManagement
             var rr = await _dbContext.Queryable<OwnerShip>()
                 .Where(x => x.IsDelete == 1)
                 .LeftJoin<ShipProjectRelation>((x, y) => x.BusinessId == y.RelationShipId)
+                .WhereIF(!string.IsNullOrEmpty(requestBody.ShipType.ToString()), (x, y) => x.ShipType == requestBody.ShipType)
                 .Select((x, y) => new ShipSearch
                 {
                     Id = x.BusinessId.ToString(),

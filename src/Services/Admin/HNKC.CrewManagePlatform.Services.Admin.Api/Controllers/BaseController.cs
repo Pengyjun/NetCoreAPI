@@ -98,7 +98,7 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api.Controllers
             var passWord = AppsettingsHelper.GetValue("UpdateItem:PassWord");
             var savePath = AppsettingsHelper.GetValue("UpdateItem:SavePath");
             var savePath2 = AppsettingsHelper.GetValue("UpdateItem:SavePath");
-            var uploadresponseDto = new List<UploadResponse>();
+            var uploadresponseDto = new UploadResponse();
             //上传文件
             using (var sftp = new SftpClient(host, port, userName, passWord))
             {
@@ -115,7 +115,7 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api.Controllers
                         var uploadRes = sftp.BeginUploadFile(fileStream, savePath);
                         sftp.EndUploadFile(uploadRes);
                     }
-                    var uploadResponseDto = new UploadResponse()
+                    uploadresponseDto = new UploadResponse()
                     {
                         Id = newFileName.ToString(),
                         Name = newFileName + name,
@@ -125,7 +125,7 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api.Controllers
                         FileType = file.ContentType,
                         Url = AppsettingsHelper.GetValue("UpdateItem:Url") + newFileName + name
                     };
-                    uploadresponseDto.Add(uploadResponseDto);
+                    //uploadresponseDto.Add(uploadResponseDto);
                 }
                 sftp.Disconnect();
                 //}
