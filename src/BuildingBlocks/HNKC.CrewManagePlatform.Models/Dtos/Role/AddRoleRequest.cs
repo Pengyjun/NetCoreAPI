@@ -18,7 +18,7 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.Role
         /// 角色类型 1是超级管理员 2是船员 3是船长 
         /// </summary>
         [Required(ErrorMessage = "角色类型不能为空")]
-        [Range(1,3,ErrorMessage ="角色类型不合法")]
+        [Range(1,4,ErrorMessage ="角色类型不合法")]
         public int? Type { get; set; }
 
         /// <summary>
