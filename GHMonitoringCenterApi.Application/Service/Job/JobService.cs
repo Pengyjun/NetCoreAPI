@@ -1360,6 +1360,11 @@ namespace GHMonitoringCenterApi.Application.Service.Job
                     //赵锐
                     userIds = new List<string>() { "L20080287" };
                 }
+                if (projectFirst.CompanyId == "01ff7a0e-e827-4b46-9032-0a540ce1fba3".ToGuid())
+                {
+                    //冀登辉
+                    userIds = new List<string>() { "2017016771" };
+                }
                 if (userIds.Any())
                 {
                     //获取用户信息
