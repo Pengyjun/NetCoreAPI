@@ -34,7 +34,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
         /// <param name="requestBody"></param>
         /// <returns></returns>
         public async Task<PageResult<SearchCrewArchivesResponse>> SearchCrewArchivesAsync(SearchCrewArchivesRequest requestBody)
-        { 
+        {
             RefAsync<int> total = 0;
             var roleType = await _baseService.CurRoleType();
             if (roleType == -1) { return new PageResult<SearchCrewArchivesResponse>(); }
@@ -131,7 +131,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                                .Where(skcall => requestBody.ShipTypes.Contains(((int)child.ShipType).ToString())).Any())//船舶类型
                 .WhereIF(requestBody.CrewType != null && requestBody.CrewType.Any(), child => SqlFunc.Subqueryable<CrewType>()
                                .Where(skcall => requestBody.CrewType.Contains(child.CrewType)).Any())//船员类型
-                .OrderByDescending(t => t.IsDelete)
+                .OrderByDescending(t => t.Created)
                 .ToPageListAsync(requestBody.PageIndex, requestBody.PageSize, total);
 
             return await GetResult(requestBody, rt, total);
@@ -232,7 +232,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                     t.OnStatusName = ob == null ? EnumUtil.GetDescription(CrewStatusEnum.DaiGang) : EnumUtil.GetDescription(ShipUserStatus(ob.WorkShipEndTime, t.DeleteReson));
                 }
             }
-            page.List = rt;
+            page.List = rt.OrderByDescending(x => x.IsDelete);
             page.TotalCount = total;
             return page;
         }
