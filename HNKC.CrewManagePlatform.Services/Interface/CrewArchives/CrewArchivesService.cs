@@ -59,6 +59,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
             //名称相关不赋值
             var rt = await _dbContext.Queryable<User>()
                 .Where(t => t.IsLoginUser == 1)
+                .OrderByDescending(t => t.Created)
                 .WhereIF(requestBody.ServiceBooks != null && requestBody.ServiceBooks.Any(),
                 (t) => requestBody.ServiceBooks.Contains(((int)t.ServiceBookType).ToString()))//服务簿类型
                 .WhereIF(!string.IsNullOrWhiteSpace(requestBody.KeyWords), t => t.Name.Contains(requestBody.KeyWords) || t.CardId.Contains(requestBody.KeyWords)
@@ -77,10 +78,12 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                 .WhereIF(requestBody.CertificateTypes != null && requestBody.CertificateTypes.Any(), (t, ws, ow, ue, sc, eb) => requestBody.CertificateTypes.Contains(sc.SkillCertificateType.ToString()))
                 .WhereIF(requestBody.QualificationTypes != null && requestBody.QualificationTypes.Any(), (t, ws, ow, ue, sc, eb) => requestBody.QualificationTypes.Contains(eb.QualificationType.ToString()))
                 .WhereIF(requestBody.Qualifications != null && requestBody.Qualifications.Any(), (t, ws, ow, ue, sc, eb) => requestBody.Qualifications.Contains(eb.Qualification.ToString()))
-                .WhereIF(requestBody.Staus != null && requestBody.Staus.Contains("0"), (t, ws, ow, ue, sc, eb) => DateTime.Now < ws.WorkShipEndTime)//在岗
-                .WhereIF(requestBody.Staus != null && requestBody.Staus.Contains("1"), (t, ws, ow, ue, sc, eb) => (int)t.DeleteReson == 1)//离职
-                .WhereIF(requestBody.Staus != null && requestBody.Staus.Contains("2"), (t, ws, ow, ue, sc, eb) => (int)t.DeleteReson == 2)//调离
-                .WhereIF(requestBody.Staus != null && requestBody.Staus.Contains("3"), (t, ws, ow, ue, sc, eb) => (int)t.DeleteReson == 3)//退休
+                .WhereIF(requestBody.Staus != null && requestBody.Staus.Any(), (t, ws, ow, ue, sc, eb) =>
+                 requestBody.Staus.Contains("0") ? DateTime.Now < ws.WorkShipEndTime : true || // 在岗
+                 requestBody.Staus.Contains("1") ? (int)t.DeleteReson == 1 : true || // 离职
+                 requestBody.Staus.Contains("2") ? (int)t.DeleteReson == 2 : true || // 调离
+                 requestBody.Staus.Contains("3") ? (int)t.DeleteReson == 3 : true
+)
                 .WhereIF(requestBody.Staus != null && requestBody.Staus.Contains("5"), (t, ws, ow, ue, sc, eb) => DateTime.Now >= ws.WorkShipEndTime)//待岗
                 .WhereIF(requestBody.FPosition != null && requestBody.FPosition.Any(), (t, ws, ow, ue, sc, eb) => SqlFunc.Subqueryable<CertificateOfCompetency>()//第一适任证
                                .Where(skcall => requestBody.FPosition.Contains(skcall.FPosition) && t.BusinessId == skcall.CertificateId).Any())
@@ -131,7 +134,6 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                                .Where(skcall => requestBody.ShipTypes.Contains(((int)child.ShipType).ToString())).Any())//船舶类型
                 .WhereIF(requestBody.CrewType != null && requestBody.CrewType.Any(), child => SqlFunc.Subqueryable<CrewType>()
                                .Where(skcall => requestBody.CrewType.Contains(child.CrewType)).Any())//船员类型
-                .OrderByDescending(t => t.Created)
                 .ToPageListAsync(requestBody.PageIndex, requestBody.PageSize, total);
 
             return await GetResult(requestBody, rt, total);
@@ -285,7 +287,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
             //var onDutyCount = onBoard.Where(x => x.WorkShipEndTime <= DateTime.Now).Select(x => x.WorkShipId).Distinct().Count();//在船数
             var onDutyProp = totalCount == 0 ? 0 : Convert.ToInt32(onDutyCount / totalCount);
 
-            var otherCount = dt.List.Where(x => x.OnStatusName == "离调退").Count();
+            var otherCount = dt.List.Where(x => x.OnStatusName == "离职" || x.OnStatusName == "调离" || x.OnStatusName == "退休").Count();
             //var otherCount = udtab.Where(x => x.DeleteReson != CrewStatusEnum.Normal && x.DeleteReson != CrewStatusEnum.XiuJia).Count();//离调退
             var otherProp = totalCount == 0 ? 0 : Convert.ToInt32(otherCount / totalCount);
 
@@ -1523,10 +1525,6 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                 //{
                 //    return Result.Fail("上船日期不可小于前下船日期");
                 //}
-                if (requestBody.WorkShipStartTime > requestBody.WorkShipEndTime)
-                {
-                    return Result.Fail("下船日期不可小于上船日期");
-                }
                 shipWork.OnShip = requestBody.OnShip;
                 shipWork.Postition = requestBody.Postition;
                 shipWork.WorkShipEndTime = requestBody.WorkShipEndTime;

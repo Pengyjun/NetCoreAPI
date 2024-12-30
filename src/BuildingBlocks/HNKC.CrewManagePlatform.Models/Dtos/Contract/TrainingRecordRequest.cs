@@ -20,6 +20,10 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.Contract
         /// 填报类型
         /// </summary>
         public string? TraningType { get; set; }
+        /// <summary>
+        /// 填报人
+        /// </summary>
+        public string? FillRepUserName { get; set; }
     }
     /// <summary>
     /// 

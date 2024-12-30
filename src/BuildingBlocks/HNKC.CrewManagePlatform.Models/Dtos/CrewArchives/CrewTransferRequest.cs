@@ -1,11 +1,12 @@
 ﻿using HNKC.CrewManagePlatform.Models.Enums;
+using System.ComponentModel.DataAnnotations;
 
 namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
 {
     /// <summary>
     /// 船员调任
     /// </summary>
-    public class CrewTransferRequest : BaseRequest
+    public class CrewTransferRequest : BaseRequest, IValidatableObject
     {
         /// <summary>
         /// 船舶
@@ -27,5 +28,10 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// 下船日期
         /// </summary>
         public DateTime WorkShipEndTime { get; set; }
+
+        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+        {
+            if (WorkShipStartTime > WorkShipEndTime) yield return new ValidationResult("上船日期大于下船日期", new string[] { nameof(WorkShipStartTime) });
+        }
     }
 }
