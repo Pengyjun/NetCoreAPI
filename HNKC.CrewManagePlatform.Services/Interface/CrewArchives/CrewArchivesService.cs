@@ -79,12 +79,11 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                 .WhereIF(requestBody.QualificationTypes != null && requestBody.QualificationTypes.Any(), (t, ws, ow, ue, sc, eb) => requestBody.QualificationTypes.Contains(eb.QualificationType.ToString()))
                 .WhereIF(requestBody.Qualifications != null && requestBody.Qualifications.Any(), (t, ws, ow, ue, sc, eb) => requestBody.Qualifications.Contains(eb.Qualification.ToString()))
                 .WhereIF(requestBody.Staus != null && requestBody.Staus.Any(), (t, ws, ow, ue, sc, eb) =>
-                 requestBody.Staus.Contains("0") ? DateTime.Now < ws.WorkShipEndTime : true || // 在岗
-                 requestBody.Staus.Contains("1") ? (int)t.DeleteReson == 1 : true || // 离职
-                 requestBody.Staus.Contains("2") ? (int)t.DeleteReson == 2 : true || // 调离
-                 requestBody.Staus.Contains("3") ? (int)t.DeleteReson == 3 : true
-)
-                .WhereIF(requestBody.Staus != null && requestBody.Staus.Contains("5"), (t, ws, ow, ue, sc, eb) => DateTime.Now >= ws.WorkShipEndTime)//待岗
+                 (requestBody.Staus.Contains("0") && DateTime.Now < ws.WorkShipEndTime && t.DeleteReson == 0) || // 在岗
+                 (requestBody.Staus.Contains("1") && (int)t.DeleteReson == 1) || // 离职
+                 (requestBody.Staus.Contains("2") && (int)t.DeleteReson == 2) || // 调离
+                 (requestBody.Staus.Contains("3") && (int)t.DeleteReson == 3) || // 待岗
+                 (requestBody.Staus.Contains("5") && DateTime.Now >= ws.WorkShipEndTime)) // 待岗
                 .WhereIF(requestBody.FPosition != null && requestBody.FPosition.Any(), (t, ws, ow, ue, sc, eb) => SqlFunc.Subqueryable<CertificateOfCompetency>()//第一适任证
                                .Where(skcall => requestBody.FPosition.Contains(skcall.FPosition) && t.BusinessId == skcall.CertificateId).Any())
                 .WhereIF(requestBody.SPosition != null && requestBody.SPosition.Any(), (t, ws, ow, ue, sc, eb) => SqlFunc.Subqueryable<CertificateOfCompetency>()//第二适任证
