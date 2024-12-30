@@ -158,7 +158,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Certificate
                 }
             }
 
-            rt.List = rr.OrderByDescending(x => x.DueDays);
+            rt.List = rr.OrderBy(x => x.DueDays);
             rt.TotalCount = total;
             return rt;
         }
