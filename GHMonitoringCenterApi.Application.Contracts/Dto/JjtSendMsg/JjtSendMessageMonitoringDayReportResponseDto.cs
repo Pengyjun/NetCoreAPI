@@ -230,6 +230,15 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.JjtSendMsg
     public class CompanyBasePoductionValue
     {
         /// <summary>
+        ///  公司当日完成产值 单位元
+        /// </summary>
+        public decimal? CompanyDayProductionValue { get; set; }
+
+        /// <summary>
+        /// 公司当年累计产值 单位元
+        /// </summary>
+        public decimal? YearCompanyProductionValue { get; set; }
+        /// <summary>
         /// 公司ID
         /// </summary>
         public Guid? CompanyId { get; set; }

@@ -17,6 +17,15 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto
 
 
     public class CompanyItem {
+        /// <summary>
+        ///  公司当日完成产值 单位元
+        /// </summary>
+        public decimal? CompanyDayProductionValue { get; set; }
+
+        /// <summary>
+        /// 公司当年累计产值 单位元
+        /// </summary>
+        public decimal? YearCompanyProductionValue { get; set; }
         public Guid? CompanyId { get; set; }
 
         public decimal DayProductionValue { get; set; }

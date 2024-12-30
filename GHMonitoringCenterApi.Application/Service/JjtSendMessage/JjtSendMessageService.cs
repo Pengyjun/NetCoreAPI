@@ -1865,14 +1865,16 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
                     var supersequenceProgress = yearIndex.Value != 0 ? (Math.Round((totalYearProductionValue / yearIndex.Value) * 100, 2) - timeProgress) : 0;
                     companyBasePoductionValues.Add(new CompanyBasePoductionValue()
                     {
-                        CompanyId=item.ItemId,
+                        CompanyId = item.ItemId,
+                        CompanyDayProductionValue = currentCompanyCount,
+                        YearCompanyProductionValue = currentMonthCompanyCount,
                         Name = item.Name,
                         DayProductionValue = Math.Round(currentCompanyCount / 10000, 2),
                         TotalYearProductionValue = totalYearProductionValue,
                         YearProductionValueProgressPercent = yearProductionValuePercent,
                         ProductionValueProgressPercent = productionValueProgressPercent,
                         SupersequenceProgress = supersequenceProgress
-                    });
+                    }) ;
                 }
                 else
                 {
@@ -5860,10 +5862,13 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
 
                 foreach (var item in result.Data.projectBasePoduction.CompanyBasePoductionValues)
                 {
-                    companys.Add(new CompanyItem() { 
-                     CompanyId=item.CompanyId,
+                    companys.Add(new CompanyItem()
+                    {
+                        CompanyDayProductionValue = item.CompanyDayProductionValue,
+                        YearCompanyProductionValue = item.YearCompanyProductionValue,
+                        CompanyId = item.CompanyId,
                         DayProductionValue = item.DayProductionValue,
-                       YearProductionValue=item.TotalYearProductionValue
+                        YearProductionValue = item.TotalYearProductionValue
                     });
                 }
                 companyDayProductionValueResponseDto.CompanyItems= companys.Where(x=>x.CompanyId!=null).ToList();
