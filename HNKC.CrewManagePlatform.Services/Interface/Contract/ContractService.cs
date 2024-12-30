@@ -1,6 +1,7 @@
 ﻿using HNKC.CrewManagePlatform.Models.CommonResult;
 using HNKC.CrewManagePlatform.Models.Dtos;
 using HNKC.CrewManagePlatform.Models.Dtos.Contract;
+using HNKC.CrewManagePlatform.Models.Dtos.CrewArchives;
 using HNKC.CrewManagePlatform.Models.Enums;
 using HNKC.CrewManagePlatform.SqlSugars.Models;
 using HNKC.CrewManagePlatform.Utils;
@@ -359,11 +360,12 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Contract
             if (roleType == -1) { return new PageResult<TrainingRecordSearch>(); }
             var rr = await _dbContext.Queryable<TrainingRecord>()
                           .Where(y => y.IsDelete == 1 && string.IsNullOrEmpty(y.PId.ToString()))
+                          .WhereIF(!string.IsNullOrWhiteSpace(requestBody.FillRepUserName), y => y.FillRepUserName.Contains(requestBody.FillRepUserName))
                           .LeftJoin<User>((y, x) => y.FillRepUserId == x.BusinessId)
                           .LeftJoin<TrainingType>((y, x, z) => y.TrainingType == z.BusinessId.ToString())
                           .WhereIF(!string.IsNullOrEmpty(requestBody.TraningType), (y, x, z) => requestBody.TraningType == y.TrainingType)
                           .WhereIF(!string.IsNullOrEmpty(requestBody.StartTime) && !string.IsNullOrEmpty(requestBody.EndTime), (y, x, z) => y.TrainingTime >= Convert.ToDateTime(requestBody.StartTime) && y.TrainingTime <= Convert.ToDateTime(requestBody.EndTime))
-                         .WhereIF(roleType == 3, (y, x, z) => y.FillRepUserId == GlobalCurrentUser.UserBusinessId)//船长
+                          .WhereIF(roleType == 3, (y, x, z) => y.FillRepUserId == GlobalCurrentUser.UserBusinessId)//船长
                           .Select((y, x, z) => new TrainingRecordSearch
                           {
                               Id = y.BusinessId.ToString(),
@@ -374,6 +376,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Contract
                               TrainingTime = y.TrainingTime,
                               TrainingType = y.TrainingType,
                               TrainingTitle = y.TrainingTitle,
+                              Scans = y.TrainingScan,
                               TrainingCount = SqlFunc.Subqueryable<TrainingRecord>().
                                          Where(z => z.PId == y.BusinessId).Count()
                           })
@@ -382,9 +385,30 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Contract
             var uu = await _dbContext.Queryable<TrainingRecord>().Where(t => bids.Contains(t.PId.ToString())).ToListAsync();
             var uids = uu.Select(x => x.TrainingId).ToList();
             var users = await _dbContext.Queryable<User>().Where(t => t.IsDelete == 1 && t.IsLoginUser == 1 && uids.Contains(t.BusinessId)).ToListAsync();
+            //扫描件
+            var trainType = await _dbContext.Queryable<TrainingType>().Where(t => t.IsDelete == 1).Select(x => new { x.BusinessId, x.Name }).ToListAsync();
+            //获取文件
+            var files = await _dbContext.Queryable<Files>().Where(t => rr.Select(x => x.Scans).ToList().Contains(t.FileId)).ToListAsync();
+            List<TrainingRecordsForDetails> td = new();
+            //获取文件
+            var url = AppsettingsHelper.GetValue("UpdateItem:Url");
 
             foreach (var item in rr)
             {
+                var trFile = files.Where(x => item.Scans == x.FileId)
+                   .Select(x => new FileInfosForDetails
+                   {
+                       Id = x.BusinessId.ToString(),
+                       FileSize = x.FileSize,
+                       FileType = x.FileType,
+                       Name = x.Name,
+                       OriginName = x.OriginName,
+                       SuffixName = x.SuffixName,
+                       //Url = url + x.Name.Substring(0, x.Name.LastIndexOf(".")) + x.OriginName
+                       Url = url + x.Name
+                   })
+                   .ToList();
+                item.TrainingRecordScans = trFile;
                 var uuIds = uu.Where(x => x.PId.ToString() == item.Id).Select(x => x.TrainingId).ToList();
                 item.UserDetails = string.Join(",", users.Where(x => uuIds.Contains(x.BusinessId)).Select(x => x.Name));
                 item.UserIds = string.Join(",", users.Where(x => uuIds.Contains(x.BusinessId)).Select(x => x.BusinessId));
@@ -424,6 +448,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Contract
                 Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
                 BusinessId = bid,
                 FillRepUserId = GlobalCurrentUser.UserBusinessId,
+                FillRepUserName = GlobalCurrentUser.Name,
                 TrainingAddress = requestBody.TrainingAddress,
                 TrainingTime = requestBody.TrainingTime,
                 TrainingTitle = requestBody.TrainingTitle,
@@ -440,6 +465,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Contract
                     BusinessId = GuidUtil.Next(),
                     FillRepUserId = GlobalCurrentUser.UserBusinessId,
                     TrainingAddress = requestBody.TrainingAddress,
+                    FillRepUserName = GlobalCurrentUser.Name,
                     TrainingTime = requestBody.TrainingTime,
                     TrainingTitle = requestBody.TrainingTitle,
                     TrainingType = requestBody.TrainingType,

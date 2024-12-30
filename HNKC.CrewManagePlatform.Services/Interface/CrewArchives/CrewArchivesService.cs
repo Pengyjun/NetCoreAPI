@@ -59,6 +59,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
             //名称相关不赋值
             var rt = await _dbContext.Queryable<User>()
                 .Where(t => t.IsLoginUser == 1)
+                .OrderByDescending(t => t.Created)
                 .WhereIF(requestBody.ServiceBooks != null && requestBody.ServiceBooks.Any(),
                 (t) => requestBody.ServiceBooks.Contains(((int)t.ServiceBookType).ToString()))//服务簿类型
                 .WhereIF(!string.IsNullOrWhiteSpace(requestBody.KeyWords), t => t.Name.Contains(requestBody.KeyWords) || t.CardId.Contains(requestBody.KeyWords)
@@ -131,7 +132,6 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                                .Where(skcall => requestBody.ShipTypes.Contains(((int)child.ShipType).ToString())).Any())//船舶类型
                 .WhereIF(requestBody.CrewType != null && requestBody.CrewType.Any(), child => SqlFunc.Subqueryable<CrewType>()
                                .Where(skcall => requestBody.CrewType.Contains(child.CrewType)).Any())//船员类型
-                .OrderByDescending(t => t.Created)
                 .ToPageListAsync(requestBody.PageIndex, requestBody.PageSize, total);
 
             return await GetResult(requestBody, rt, total);
@@ -285,7 +285,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
             //var onDutyCount = onBoard.Where(x => x.WorkShipEndTime <= DateTime.Now).Select(x => x.WorkShipId).Distinct().Count();//在船数
             var onDutyProp = totalCount == 0 ? 0 : Convert.ToInt32(onDutyCount / totalCount);
 
-            var otherCount = dt.List.Where(x => x.OnStatusName == "离调退").Count();
+            var otherCount = dt.List.Where(x => x.OnStatusName == "离职" || x.OnStatusName == "调离" || x.OnStatusName == "退休").Count();
             //var otherCount = udtab.Where(x => x.DeleteReson != CrewStatusEnum.Normal && x.DeleteReson != CrewStatusEnum.XiuJia).Count();//离调退
             var otherProp = totalCount == 0 ? 0 : Convert.ToInt32(otherCount / totalCount);
 
@@ -1523,10 +1523,6 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                 //{
                 //    return Result.Fail("上船日期不可小于前下船日期");
                 //}
-                if (requestBody.WorkShipStartTime > requestBody.WorkShipEndTime)
-                {
-                    return Result.Fail("下船日期不可小于上船日期");
-                }
                 shipWork.OnShip = requestBody.OnShip;
                 shipWork.Postition = requestBody.Postition;
                 shipWork.WorkShipEndTime = requestBody.WorkShipEndTime;
