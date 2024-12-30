@@ -241,18 +241,18 @@
 		/// 开工时间
 		/// </summary>
         public DateTime? CommencementTime { get; set; }
-		/// <summary>
-		/// 完工日期
-		/// </summary>
-		public DateTime? CompletionTime { get; set; }
-		/// <summary>
-		/// 项目合同工期(开始)
-		/// </summary>
-		public DateTime? StartContractDuration { get; set; }
-		/// <summary>
-		/// 项目合同工期(结束)
-		/// </summary>
-		public DateTime? EndContractDuration { get; set; }
+        /// <summary>
+        /// 完工日期
+        /// </summary>
+        public DateTime? CompletionTime { get; set; }
+        /// <summary>
+        /// 项目合同工期(开始)
+        /// </summary>
+        public DateTime? StartContractDuration { get; set; }
+        /// <summary>
+        /// 项目合同工期(结束)
+        /// </summary>
+        public DateTime? EndContractDuration { get; set; }
         /// <summary>
 		/// 工程位置
 		/// </summary>
@@ -281,6 +281,22 @@
         /// 工期
         /// </summary>
         public int WorkDay { get; set; }
+        /// <summary>
+        /// 月报开累产值
+        /// </summary>
+        public decimal? CompleteOutputValue { get; set; }
+        /// <summary>
+        /// 合同约定开工日期
+        /// </summary>
+        public DateTime? ContractStipulationStartDate { get; set; }
+        /// <summary>
+        /// 合同约定完工日期
+        /// </summary>
+        public DateTime? ContractStipulationEndDate { get; set; }
+        /// <summary>
+        /// 合同签约日期
+        /// </summary>
+        public DateTime? ContractSignDate { get; set; }
     }
 
     /// <summary>
