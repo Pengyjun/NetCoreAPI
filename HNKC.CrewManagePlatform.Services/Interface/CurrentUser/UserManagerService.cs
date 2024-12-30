@@ -109,7 +109,8 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CurrentUser
                                 IsAdmin = roleInfo?.IsAdmin,
                                 IsApprove = roleInfo?.IsApprove,
                                 Name = roleInfo?.Name,
-                                Oid = institutionInfo?.Oid
+                                Oid = institutionInfo?.Oid,
+                                Type = roleInfo?.Type,
                             };
                             userLoginResponse.RoleList.Add(role);
                         }
@@ -140,6 +141,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CurrentUser
                         new Claim("BInstitutionId",firstRoleLogin.InstitutionBusinessId.ToString()),
                         new Claim("Phone",userInfo.Phone?.ToString()),
                         new Claim("RoleBusinessId",firstRoleLogin.RoleBusinessId.ToString()),
+                        new Claim("RoleType",firstRoleLogin.Type.ToString()),
                     };
                     var expores = int.Parse(AppsettingsHelper.GetValue("AccessToken:Expires"));
                     token = jwtService.CreateAccessToken(claims, expores);
@@ -197,6 +199,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CurrentUser
                             IsApprove = roleInfo?.IsApprove,
                             Name = roleInfo?.Name,
                             Oid = institutionInfo?.Oid,
+                            Type= roleInfo?.Type,
                         };
                         userLoginResponse.RoleList.Add(role);
                     }
@@ -224,6 +227,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CurrentUser
                         new Claim("BInstitutionId",changRoleRequest.InstitutionBusinessId.ToString()),
                         new Claim("Phone",userInfo.Phone?.ToString()),
                         new Claim("RoleBusinessId",loginRole.BusinessId.ToString()),
+                        new Claim("RoleType",loginRole.Type.ToString()),
                 };
                 var expores = int.Parse(AppsettingsHelper.GetValue("AccessToken:Expires"));
                 token = jwtService.CreateAccessToken(claims, expores);

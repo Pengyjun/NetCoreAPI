@@ -11,7 +11,7 @@ namespace HNKC.CrewManagePlatform.Models.Enums
         /// 高级技师
         /// </summary>
         [Description("高级技师")]
-        HighJs = 0,
+        HighJs = 1,
         /// <summary>
         /// 技师
         /// </summary>

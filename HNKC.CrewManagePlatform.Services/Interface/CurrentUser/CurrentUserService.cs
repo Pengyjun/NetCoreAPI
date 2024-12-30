@@ -6,6 +6,7 @@ using SqlSugar.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -49,6 +50,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CurrentUser
                     var roleBusinessId = userList?.Where(x => x.Type == "RoleBusinessId").Select(x => x.Value).FirstOrDefault();
                     var bInstitutionId = userList?.Where(x => x.Type == "BInstitutionId").Select(x => x.Value).FirstOrDefault();
                     var isAdmin = userList?.Where(x => x.Type == "IsAdmin").Select(x => x.Value).FirstOrDefault();
+                    var type = userList?.Where(x => x.Type == "RoleType").Select(x => x.Value).FirstOrDefault();
                     userInfo.Id = long.Parse(id);
                     userInfo.UserBusinessId = Guid.Parse(bId);
                     userInfo.Name = name;
@@ -58,6 +60,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CurrentUser
                     userInfo.Phone = phone;
                     userInfo.IsAdmin = isAdmin.ObjToBool();
                     userInfo.InstitutionBusiessId = Guid.Parse(bInstitutionId);
+                    userInfo.Type = type != null ? int.Parse(type) : 0;
                 }
             }
             return userInfo;
