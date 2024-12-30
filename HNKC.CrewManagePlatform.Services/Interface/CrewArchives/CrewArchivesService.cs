@@ -6,7 +6,6 @@ using HNKC.CrewManagePlatform.SqlSugars.Models;
 using HNKC.CrewManagePlatform.Utils;
 using SqlSugar;
 using System.ComponentModel;
-using System.Text.RegularExpressions;
 using UtilsSharp;
 
 namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
@@ -358,11 +357,11 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                         return Result.Fail("身份证重复");
                     }
                 }
-                if (!ValidateIdCard(requestBody.BaseInfoDto.CardId))
+                if (!IdCardUtils.ValidateIdCard(requestBody.BaseInfoDto.CardId))
                 {
                     return Result.Fail("身份证错误：" + requestBody.BaseInfoDto.CardId);
                 }
-                if (!ValidatePhone(requestBody.BaseInfoDto.Phone))
+                if (!ValidateUtils.ValidatePhone(requestBody.BaseInfoDto.Phone))
                 {
                     return Result.Fail("手机号错误：" + requestBody.BaseInfoDto.Phone);
                 }
@@ -442,11 +441,11 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                         {
                             return Result.Fail("家庭成员已经绑定过，请先删除该/注销成员");
                         }
-                        if (ValidatePhone(item.Phone) == false)
+                        if (ValidateUtils.ValidatePhone(item.Phone) == false)
                         {
                             return Result.Fail("家庭成员手机号为");
                         }
-                        if (!string.IsNullOrEmpty(item.Phone) && !ValidatePhone(item.Phone))
+                        if (!string.IsNullOrEmpty(item.Phone) && !ValidateUtils.ValidatePhone(item.Phone))
                         {
                             return Result.Fail("家庭成员手机号错误：" + item.Phone);
                         }
@@ -474,11 +473,11 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                         {
                             return Result.Fail("应急联系人已经绑定过，请先删除/注销该成员");
                         }
-                        if (ValidatePhone(item.Phone) == false)
+                        if (ValidateUtils.ValidatePhone(item.Phone) == false)
                         {
                             return Result.Fail("应急联系人手机号为空");
                         }
-                        if (!ValidatePhone(item.Phone))
+                        if (!ValidateUtils.ValidatePhone(item.Phone))
                         {
                             return Result.Fail("应急联系人手机号错误：" + item.Phone);
                         }
@@ -885,11 +884,11 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                 #region 基本信息
                 if (requestBody.BaseInfoDto != null)
                 {
-                    if (!ValidateIdCard(requestBody.BaseInfoDto.CardId))
+                    if (!IdCardUtils.ValidateIdCard(requestBody.BaseInfoDto.CardId))
                     {
                         return Result.Fail("身份证错误");
                     }
-                    if (!ValidatePhone(requestBody.BaseInfoDto.Phone))
+                    if (!ValidateUtils.ValidatePhone(requestBody.BaseInfoDto.Phone))
                     {
                         return Result.Fail("手机号错误");
                     }
@@ -955,7 +954,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                         husDel = await _dbContext.Queryable<FamilyUser>().Where(t => t.FamilyId == userInfo.BusinessId).ToListAsync();
                         foreach (var item in requestBody.BaseInfoDto.HomeUser)
                         {
-                            if (!ValidatePhone(item.Phone))
+                            if (!ValidateUtils.ValidatePhone(item.Phone))
                             {
                                 return Result.Fail("手机号错误");
                             }
@@ -977,7 +976,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                         ecsDel = await _dbContext.Queryable<EmergencyContacts>().Where(t => t.EmergencyContactId == userInfo.BusinessId).ToListAsync();
                         foreach (var item in requestBody.BaseInfoDto.EmergencyContacts)
                         {
-                            if (!ValidatePhone(item.Phone))
+                            if (!ValidateUtils.ValidatePhone(item.Phone))
                             {
                                 return Result.Fail("手机号错误");
                             }
@@ -1389,6 +1388,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
             }
             return Result.Fail("无船员/该船员已被删除");
         }
+        #endregion  
         /// <summary>
         /// 保存备注
         /// </summary>
@@ -1536,70 +1536,6 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
 
             return Result.Success("调任成功");
         }
-        #endregion
-
-        #region 校验身份证、手机号
-        /// <summary>
-        /// 校验18位身份证
-        /// </summary>
-        /// <param name="idCard"></param>
-        /// <returns></returns>
-        public static bool ValidateIdCard(string idCard)
-        {
-            if (string.IsNullOrEmpty(idCard)) return false;
-
-            // 校验长度和数字格式
-            if (idCard.Length != 18 || !Regex.IsMatch(idCard, @"^\d{17}(\d|X)$"))
-                return false;
-
-            // 校验出生日期是否合法
-            string birthDateStr = idCard.Substring(6, 8); // 从第7位到第14位为出生日期
-            DateTime birthDate;
-            if (!DateTime.TryParseExact(birthDateStr, "yyyyMMdd", null, System.Globalization.DateTimeStyles.None, out birthDate))
-                return false;
-
-            // 校验校验位
-            return CheckIdCardChecksum(idCard);
-        }
-
-        /// <summary>
-        /// 校验身份证最后一位校验位
-        /// </summary>
-        /// <param name="idCard"></param>
-        /// <returns></returns>
-        private static bool CheckIdCardChecksum(string idCard)
-        {
-            // 系统加权因子
-            int[] weight = { 7, 9, 10, 5, 8, 4, 2, 1, 6, 3, 7, 9, 10, 5, 8, 4, 2 };
-            // 校验码映射表
-            char[] checkDigits = { '1', '0', 'X', '9', '8', '7', '6', '5', '4', '3', '2' };
-
-            int sum = 0;
-            for (int i = 0; i < 17; i++)
-            {
-                sum += int.Parse(idCard[i].ToString()) * weight[i];
-            }
-
-            int mod = sum % 11;
-            char expectedCheckDigit = checkDigits[mod];
-            return idCard[17] == expectedCheckDigit;
-        }
-        /// <summary>
-        /// 校验手机号
-        /// </summary>
-        /// <param name="phone"></param>
-        /// <returns></returns>
-        public static bool ValidatePhone(string phone)
-        {
-            if (string.IsNullOrEmpty(phone)) return false;
-
-            // 手机号正则表达式（中国手机号）
-            string pattern = @"^1[3-9]\d{9}$";
-            return Regex.IsMatch(phone, pattern);
-        }
-
-        #endregion
-
         #region 下拉列表信息
         /// <summary>
         /// 基本下拉列表
