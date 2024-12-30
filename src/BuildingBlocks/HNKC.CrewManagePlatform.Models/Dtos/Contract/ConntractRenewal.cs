@@ -1,11 +1,12 @@
 ﻿using HNKC.CrewManagePlatform.Models.Enums;
+using System.ComponentModel.DataAnnotations;
 
 namespace HNKC.CrewManagePlatform.Models.Dtos.Contract
 {
     /// <summary>
     /// 合同续签
     /// </summary>
-    public class ConntractRenewal : BaseRequest
+    public class ConntractRenewal : BaseRequest, IValidatableObject
     {
         /// <summary>
         /// 主键id  用来做增改判断
@@ -34,5 +35,11 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.Contract
         /// 结束时间
         /// </summary>
         public DateTime EndTime { get; set; }
+
+        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+        {
+            if (!string.IsNullOrWhiteSpace(ContractMain) && ContractMain.Length > 20) yield return new ValidationResult("合同主体过长", new string[] { nameof(ContractMain) });
+            if (!string.IsNullOrWhiteSpace(LaborCompany) && LaborCompany.Length > 20) yield return new ValidationResult("劳务公司过长", new string[] { nameof(LaborCompany) });
+        }
     }
 }

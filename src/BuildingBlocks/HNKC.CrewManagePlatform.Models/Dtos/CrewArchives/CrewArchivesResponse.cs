@@ -1,4 +1,7 @@
 ﻿using HNKC.CrewManagePlatform.Models.Enums;
+using System.ComponentModel.DataAnnotations;
+using System.Security.Cryptography;
+using System.Xml.Linq;
 
 namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
 {
@@ -48,7 +51,7 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
     /// <summary>
     /// 基本信息
     /// </summary>
-    public class BaseInfoDto
+    public class BaseInfoDto : IValidatableObject
     {
         #region 基本信息
         /// <summary>
@@ -133,12 +136,23 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// 劳务合同
         /// </summary>
         public UserEntryInfosForDetaails? UserEntryInfo { get; set; }
+        /// <summary>
+        /// 基本校验
+        /// </summary>
+        /// <param name="validationContext"></param>
+        /// <returns></returns>
+        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+        {
+            if (!string.IsNullOrWhiteSpace(Name) && Name.Length > 20) yield return new ValidationResult("姓名过长", new string[] { nameof(Name) });
+            if (!string.IsNullOrWhiteSpace(BuildAddress) && BuildAddress.Length > 50) yield return new ValidationResult("常住地过长", new string[] { nameof(BuildAddress) });
+            if (!string.IsNullOrWhiteSpace(HomeAddress) && HomeAddress.Length > 50) yield return new ValidationResult("家庭住址过长", new string[] { nameof(HomeAddress) });
+        }
         #endregion
     }
     /// <summary>
     /// 劳务合同
     /// </summary>
-    public class UserEntryInfosForDetaails
+    public class UserEntryInfosForDetaails : IValidatableObject
     {
         /// <summary>
         /// 入职日期
@@ -172,11 +186,18 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// 开始时间
         /// </summary>
         public DateTime StartTime { get; set; }
+
+        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+        {
+            if (EntryTime > EntryTime) yield return new ValidationResult("入职日期大于截止日期", new string[] { nameof(EntryTime) });
+            if (!string.IsNullOrWhiteSpace(ContarctMain) && ContarctMain.Length > 30) yield return new ValidationResult("合同主体过长", new string[] { nameof(ContarctMain) });
+            if (!string.IsNullOrWhiteSpace(LaborCompany) && LaborCompany.Length > 30) yield return new ValidationResult("劳务公司过长", new string[] { nameof(LaborCompany) });
+        }
     }
     /// <summary>
     /// 家庭成员/紧急联系人
     /// </summary>
-    public class UserInfos
+    public class UserInfos : IValidatableObject
     {
         /// <summary>
         /// 主键
@@ -198,11 +219,16 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// 工作单位
         /// </summary>
         public string? WorkUnit { get; set; }
+
+        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+        {
+            if (!string.IsNullOrWhiteSpace(UserName) && UserName.Length > 15) yield return new ValidationResult("名称过长", new string[] { nameof(UserName) });
+        }
     }
     /// <summary>
     /// 适任及证书
     /// </summary>
-    public class CertificateOfCompetencyDto
+    public class CertificateOfCompetencyDto : IValidatableObject
     {
         #region 第一适任证
         /// <summary>
@@ -378,6 +404,16 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// 特种设备证书
         /// </summary>
         public List<SpecialEquipss>? SpecialEquips { get; set; }
+
+        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+        {
+            if (!string.IsNullOrWhiteSpace(FCertificate) && FCertificate.Length > 30) yield return new ValidationResult("第一适任证书过长", new string[] { nameof(FCertificate) });
+            if (!string.IsNullOrWhiteSpace(SCertificate) && SCertificate.Length > 30) yield return new ValidationResult("第二适任证书过长", new string[] { nameof(SCertificate) });
+            if (!string.IsNullOrWhiteSpace(TrainingCertificate) && TrainingCertificate.Length > 30) yield return new ValidationResult("培训合格证过长", new string[] { nameof(TrainingCertificate) });
+            if (!string.IsNullOrWhiteSpace(HealthCertificate) && HealthCertificate.Length > 30) yield return new ValidationResult("健康证过长", new string[] { nameof(HealthCertificate) });
+            if (!string.IsNullOrWhiteSpace(SeamanCertificate) && SeamanCertificate.Length > 30) yield return new ValidationResult("海员证过长", new string[] { nameof(SeamanCertificate) });
+            if (!string.IsNullOrWhiteSpace(PassportCertificate) && PassportCertificate.Length > 30) yield return new ValidationResult("护照过长", new string[] { nameof(PassportCertificate) });
+        }
         #endregion
     }
     /// <summary>
@@ -459,7 +495,7 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
     /// <summary>
     /// 学历信息
     /// </summary>
-    public class QualificationInfo
+    public class QualificationInfo : IValidatableObject
     {
         /// <summary>
         /// 主键
@@ -493,6 +529,12 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// 证书上传
         /// </summary>
         public List<UploadResponse>? QualificationScansUpload { get; set; }
+
+        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+        {
+            if (!string.IsNullOrWhiteSpace(School) && School.Length > 20) yield return new ValidationResult("学校过长", new string[] { nameof(School) });
+            if (!string.IsNullOrWhiteSpace(Major) && Major.Length > 20) yield return new ValidationResult("专业过长", new string[] { nameof(Major) });
+        }
     }
     /// <summary>
     /// 职务晋升
