@@ -36,7 +36,7 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api.Controllers
         /// <summary>
         /// 船舶管理列表
         /// </summary>
-        /// <param name=""></param>
+        /// <param name="requestBody"></param>
         /// <returns></returns>
         [HttpGet("SearchShip")]
         public async Task<IActionResult> SearchShipAsync([FromQuery] ShipRequest requestBody)
