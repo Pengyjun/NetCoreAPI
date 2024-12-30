@@ -360,11 +360,11 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                 }
                 if (!ValidateIdCard(requestBody.BaseInfoDto.CardId))
                 {
-                    return Result.Fail("身份证错误");
+                    return Result.Fail("身份证错误：" + requestBody.BaseInfoDto.CardId);
                 }
                 if (!ValidatePhone(requestBody.BaseInfoDto.Phone))
                 {
-                    return Result.Fail("手机号错误");
+                    return Result.Fail("手机号错误：" + requestBody.BaseInfoDto.Phone);
                 }
                 userInfo = new()
                 {
@@ -442,9 +442,13 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                         {
                             return Result.Fail("家庭成员已经绑定过，请先删除该/注销成员");
                         }
-                        if (!ValidatePhone(item.Phone))
+                        if (ValidatePhone(item.Phone) == false)
                         {
-                            return Result.Fail("手机号错误");
+                            return Result.Fail("家庭成员手机号为");
+                        }
+                        if (!string.IsNullOrEmpty(item.Phone) && !ValidatePhone(item.Phone))
+                        {
+                            return Result.Fail("家庭成员手机号错误：" + item.Phone);
                         }
                         hus.Add(new FamilyUser
                         {
@@ -470,9 +474,13 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                         {
                             return Result.Fail("应急联系人已经绑定过，请先删除/注销该成员");
                         }
+                        if (ValidatePhone(item.Phone) == false)
+                        {
+                            return Result.Fail("应急联系人手机号为空");
+                        }
                         if (!ValidatePhone(item.Phone))
                         {
-                            return Result.Fail("手机号错误");
+                            return Result.Fail("应急联系人手机号错误：" + item.Phone);
                         }
                         ecs.Add(new EmergencyContacts
                         {
@@ -2128,7 +2136,8 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                          Name = x.Name,
                          OriginName = x.OriginName,
                          SuffixName = x.SuffixName,
-                         Url = url + x.Name?.Substring(0, x.Name.LastIndexOf(".")) + x.OriginName
+                         //Url = url + x.Name?.Substring(0, x.Name.LastIndexOf(".")) + x.OriginName
+                         Url = url + x.Name
                      })
                     .ToList();
                 pd.Add(new PromotionsForDetails
@@ -2175,7 +2184,8 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                         Name = x.Name,
                         OriginName = x.OriginName,
                         SuffixName = x.SuffixName,
-                        Url = url + x.Name.Substring(0, x.Name.LastIndexOf(".")) + x.OriginName
+                        //Url = url + x.Name.Substring(0, x.Name.LastIndexOf(".")) + x.OriginName
+                        Url = url + x.Name
                     })
                     .ToList();
                 td.Add(new TrainingRecordsForDetails
@@ -2257,7 +2267,8 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                         Name = x.Name,
                         OriginName = x.OriginName,
                         SuffixName = x.SuffixName,
-                        Url = url + x.Name?.Substring(0, x.Name.LastIndexOf(".")) + x.OriginName
+                        //Url = url + x.Name?.Substring(0, x.Name.LastIndexOf(".")) + x.OriginName
+                        Url = url + x.Name
                     })
                     .ToList();
                 yc.Add(new YearChecksForDetails
@@ -2294,9 +2305,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                     ur.FEffectiveTime = f.FEffectiveTime?.ToString("yyyy-MM-dd");
                     if (f.FEffectiveTime.HasValue)
                     {
-                        DateTime date1 = new DateTime(f.FEffectiveTime.Value.Year, f.FEffectiveTime.Value.Month, f.FEffectiveTime.Value.Day);
-                        DateTime date2 = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day);
-                        ur.FEffectiveCountdown = (date1 - date2).Days + 1;
+                        ur.FEffectiveCountdown = TimeHelper.GetTimeSpan(Convert.ToDateTime(f?.FEffectiveTime), DateTime.Now).Days + 1;
                     }
                 }
                 var s = cerOfComps.FirstOrDefault(x => x.Type == CertificatesEnum.SCertificate);
@@ -2307,9 +2316,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                     ur.SEffectiveTime = s.SEffectiveTime?.ToString("yyyy-MM-dd");
                     if (s.SEffectiveTime.HasValue)
                     {
-                        DateTime date1 = new DateTime(s.SEffectiveTime.Value.Year, s.SEffectiveTime.Value.Month, s.SEffectiveTime.Value.Day);
-                        DateTime date2 = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day);
-                        ur.SEffectiveCountdown = (date1 - date2).Days + 1;
+                        ur.SEffectiveCountdown = TimeHelper.GetTimeSpan(Convert.ToDateTime(s?.SEffectiveTime), DateTime.Now).Days + 1;
                     }
                 }
                 var t = cerOfComps.FirstOrDefault(x => x.Type == CertificatesEnum.PXHGZ);
@@ -2405,7 +2412,8 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                         Name = x.Name,
                         OriginName = x.OriginName,
                         SuffixName = x.SuffixName,
-                        Url = url + x.Name?.Substring(0, x.Name.LastIndexOf(".")) + x.OriginName
+                        //Url = url + x.Name?.Substring(0, x.Name.LastIndexOf(".")) + x.OriginName
+                        Url = url + x.Name
                     })
                     .ToList();
                 var sScans = files.Where(x => s?.SScans == x.FileId)
@@ -2417,7 +2425,8 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                         Name = x.Name,
                         OriginName = x.OriginName,
                         SuffixName = x.SuffixName,
-                        Url = url + x.Name?.Substring(0, x.Name.LastIndexOf(".")) + x.OriginName
+                        //Url = url + x.Name?.Substring(0, x.Name.LastIndexOf(".")) + x.OriginName
+                        Url = url + x.Name
                     })
                     .ToList();
                 var trainingScans = files.Where(x => t?.TrainingScans == x.FileId)
@@ -2429,7 +2438,8 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                        Name = x.Name,
                        OriginName = x.OriginName,
                        SuffixName = x.SuffixName,
-                       Url = url + x.Name?.Substring(0, x.Name.LastIndexOf(".")) + x.OriginName
+                       //Url = url + x.Name?.Substring(0, x.Name.LastIndexOf(".")) + x.OriginName
+                       Url = url + x.Name
                    })
                    .ToList();
                 var healthScans = files.Where(x => h?.HealthScans == x.FileId)
@@ -2441,7 +2451,8 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                        Name = x.Name,
                        OriginName = x.OriginName,
                        SuffixName = x.SuffixName,
-                       Url = url + x.Name?.Substring(0, x.Name.LastIndexOf(".")) + x.OriginName
+                       //Url = url + x.Name?.Substring(0, x.Name.LastIndexOf(".")) + x.OriginName
+                       Url = url + x.Name
                    })
                    .ToList();
                 var seamanScans = files.Where(x => sea?.SeamanScans == x.FileId)
@@ -2453,7 +2464,8 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                        Name = x.Name,
                        OriginName = x.OriginName,
                        SuffixName = x.SuffixName,
-                       Url = url + x.Name?.Substring(0, x.Name.LastIndexOf(".")) + x.OriginName
+                       //Url = url + x.Name?.Substring(0, x.Name.LastIndexOf(".")) + x.OriginName
+                       Url = url + x.Name
                    })
                    .ToList();
                 var passportScans = files.Where(x => hz?.PassportScans == x.FileId)
@@ -2465,7 +2477,8 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                        Name = x.Name,
                        OriginName = x.OriginName,
                        SuffixName = x.SuffixName,
-                       Url = url + x.Name?.Substring(0, x.Name.LastIndexOf(".")) + x.OriginName
+                       //Url = url + x.Name?.Substring(0, x.Name.LastIndexOf(".")) + x.OriginName
+                       Url = url + x.Name
                    })
                    .ToList();
                 //技能证书
@@ -2481,7 +2494,8 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                             Name = x.Name,
                             OriginName = x.OriginName,
                             SuffixName = x.SuffixName,
-                            Url = url + x.Name?.Substring(0, x.Name.LastIndexOf(".")) + x.OriginName
+                            //Url = url + x.Name?.Substring(0, x.Name.LastIndexOf(".")) + x.OriginName
+                            Url = url + x.Name
                         })
                         .FirstOrDefault();
 
@@ -2506,7 +2520,8 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                             Name = x.Name,
                             OriginName = x.OriginName,
                             SuffixName = x.SuffixName,
-                            Url = url + x.Name?.Substring(0, x.Name.LastIndexOf(".")) + x.OriginName
+                            //Url = url + x.Name?.Substring(0, x.Name.LastIndexOf(".")) + x.OriginName
+                            Url = url + x.Name
                         })
                         .FirstOrDefault();
 
@@ -2599,7 +2614,8 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                     Name = x.Name,
                     OriginName = x.OriginName,
                     SuffixName = x.SuffixName,
-                    Url = url + x.Name?.Substring(0, x.Name.LastIndexOf(".")) + x.OriginName
+                    //Url = url + x.Name?.Substring(0, x.Name.LastIndexOf(".")) + x.OriginName
+                    Url = url + x.Name
                 })
                 .ToList();
             ur = new LaborServicesInfoDetails
@@ -2680,7 +2696,8 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                 Name = userPhoto.Name,
                 OriginName = userPhoto.OriginName,
                 SuffixName = userPhoto.SuffixName,
-                Url = url + userPhoto.Name?.Substring(0, userPhoto.Name.LastIndexOf(".")) + userPhoto.OriginName
+                //Url = url + userPhoto.Name?.Substring(0, userPhoto.Name.LastIndexOf(".")) + userPhoto.OriginName
+                Url = url + userPhoto.Name
             };
             //扫描件
             List<FileInfosForDetails> ui = new();
@@ -2694,7 +2711,8 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                     Name = item.Name,
                     OriginName = item.OriginName,
                     SuffixName = item.SuffixName,
-                    Url = url + item.Name?.Substring(0, item.Name.LastIndexOf(".")) + item.OriginName
+                    //Url = url + item.Name?.Substring(0, item.Name.LastIndexOf(".")) + item.OriginName
+                    Url = url + item.Name
                 });
             }
             ur.IdCardScans = ui;

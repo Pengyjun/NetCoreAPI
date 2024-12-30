@@ -52,7 +52,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Contract
             #endregion
 
             //获取提醒天数
-            var remindSet = await _dbContext.Queryable<RemindSetting>().FirstAsync(t => t.RemindType == 11 && t.IsDelete == 1);
+            var remindSet = await _dbContext.Queryable<RemindSetting>().FirstAsync(t => t.RemindType == 11 && t.Enable == 1 && t.IsDelete == 1);
             int days = remindSet == null ? 0 : remindSet.Days;
             if (days == 0) return new PageResult<ContractSearch>();
             var rr = await _dbContext.Queryable<User>()
@@ -355,12 +355,15 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Contract
         {
             PageResult<TrainingRecordSearch> rt = new();
             RefAsync<int> total = 0;
+            var roleType = await _baseService.CurRoleType();
+            if (roleType == -1) { return new PageResult<TrainingRecordSearch>(); }
             var rr = await _dbContext.Queryable<TrainingRecord>()
                           .Where(y => y.IsDelete == 1 && string.IsNullOrEmpty(y.PId.ToString()))
                           .LeftJoin<User>((y, x) => y.FillRepUserId == x.BusinessId)
                           .LeftJoin<TrainingType>((y, x, z) => y.TrainingType == z.BusinessId.ToString())
                           .WhereIF(!string.IsNullOrEmpty(requestBody.TraningType), (y, x, z) => requestBody.TraningType == y.TrainingType)
                           .WhereIF(!string.IsNullOrEmpty(requestBody.StartTime) && !string.IsNullOrEmpty(requestBody.EndTime), (y, x, z) => y.TrainingTime >= Convert.ToDateTime(requestBody.StartTime) && y.TrainingTime <= Convert.ToDateTime(requestBody.EndTime))
+                         .WhereIF(roleType == 3, (y, x, z) => y.FillRepUserId == GlobalCurrentUser.UserBusinessId)//船长
                           .Select((y, x, z) => new TrainingRecordSearch
                           {
                               Id = y.BusinessId.ToString(),

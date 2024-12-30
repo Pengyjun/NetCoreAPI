@@ -1,12 +1,13 @@
 ﻿using HNKC.CrewManagePlatform.Models.Dtos.CrewArchives;
 using HNKC.CrewManagePlatform.Models.Enums;
+using System.ComponentModel.DataAnnotations;
 
 namespace HNKC.CrewManagePlatform.Models.Dtos.Contract
 {
     /// <summary>
     /// 续签
     /// </summary>
-    public class CertificateRenewal
+    public class CertificateRenewal : IValidatableObject
     {
         /// <summary>
         /// 
@@ -173,6 +174,16 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.Contract
         /// 扫描件 
         /// </summary>
         public List<UploadResponse>? PassportScans { get; set; }
+
+        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+        {
+            if (!string.IsNullOrWhiteSpace(FCertificate) && FCertificate.Length > 30) yield return new ValidationResult("第一适任证书过长", new string[] { nameof(FCertificate) });
+            if (!string.IsNullOrWhiteSpace(SCertificate) && SCertificate.Length > 30) yield return new ValidationResult("第二适任证书过长", new string[] { nameof(SCertificate) });
+            if (!string.IsNullOrWhiteSpace(TrainingCertificate) && TrainingCertificate.Length > 30) yield return new ValidationResult("培训合格证过长", new string[] { nameof(TrainingCertificate) });
+            if (!string.IsNullOrWhiteSpace(HealthCertificate) && HealthCertificate.Length > 30) yield return new ValidationResult("健康证过长", new string[] { nameof(HealthCertificate) });
+            if (!string.IsNullOrWhiteSpace(SeamanCertificate) && SeamanCertificate.Length > 30) yield return new ValidationResult("海员证过长", new string[] { nameof(SeamanCertificate) });
+            if (!string.IsNullOrWhiteSpace(PassportCertificate) && PassportCertificate.Length > 30) yield return new ValidationResult("护照过长", new string[] { nameof(PassportCertificate) });
+        }
         #endregion
     }
 }

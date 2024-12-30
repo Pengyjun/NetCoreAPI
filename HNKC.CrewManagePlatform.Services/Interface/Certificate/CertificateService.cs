@@ -53,7 +53,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Certificate
             #endregion
 
             //获取提醒天数
-            var remindSet = await _dbContext.Queryable<RemindSetting>().Where(t => t.RemindType == 2 && t.IsDelete == 1).ToListAsync();
+            var remindSet = await _dbContext.Queryable<RemindSetting>().Where(t => t.RemindType == 22 && t.IsDelete == 1).ToListAsync();
             if (remindSet.Count == 0) return new PageResult<CertificateSearch>();
             var rr = await _dbContext.Queryable<User>()
                 .LeftJoin<CertificateOfCompetency>((t1, t2) => t1.BusinessId == t2.CertificateId)
@@ -70,11 +70,11 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Certificate
                 .InnerJoin(wShip, (t1, t2, t3, t4, t5) => t1.BusinessId == t5.WorkShipId)
                 .WhereIF(roleType == 3, (t1, t2, t4, t3, t5) => t5.OnShip == t3.BusinessId.ToString() && onShips.Contains(t5.OnShip))//船长
                 .WhereIF(roleType == 2, (t1, t2, t3, t4, t5) => GlobalCurrentUser.UserBusinessId == t5.WorkShipId)//船员
-                .InnerJoin<RemindSetting>((t1, t2, t3, t4, t5, t6) => t6.Types == requestBody.Certificates && t6.RemindType == 2)
+                .InnerJoin<RemindSetting>((t1, t2, t3, t4, t5, t6) => t6.Types == t2.Type && t6.RemindType == 22)
                 .Select((t1, t2, t3, t4, t5, t6) => new CertificateSearch
                 {
-                    BId = t1.BusinessId.ToString(),
                     Id = t2.BusinessId.ToString(),
+                    BId = t1.BusinessId.ToString(),
                     Country = t4.Country,
                     OnBoard = t1.OnBoard,
                     ShipType = t4.ShipType,
@@ -87,16 +87,15 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Certificate
                 })
                 .Distinct()
                 .ToPageListAsync(requestBody.PageIndex, requestBody.PageSize, total);
-            return await GetResultAsync(rr, total, requestBody.Certificates);
+            return await GetResultAsync(rr, total);
         }
         /// <summary>
         /// 获取查询结果集
         /// </summary>
         /// <param name="rr"></param>
         /// <param name="total"></param>
-        /// <param name="certificates"></param>
         /// <returns></returns>
-        private async Task<PageResult<CertificateSearch>> GetResultAsync(List<CertificateSearch> rr, int total, CertificatesEnum? certificates)
+        private async Task<PageResult<CertificateSearch>> GetResultAsync(List<CertificateSearch> rr, int total)
         {
             PageResult<CertificateSearch> rt = new();
 
@@ -106,55 +105,57 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Certificate
             var certificateOfCompetency = await _dbContext.Queryable<CertificateOfCompetency>().Where(t => rr.Select(x => x.BId).ToList().Contains(t.CertificateId.ToString())).ToListAsync();
             foreach (var u in rr)
             {
-                var rs = certificateOfCompetency.FirstOrDefault(x => x.CertificateId.ToString() == u.BId);
-                switch (certificates)
+                var rs = certificateOfCompetency.FirstOrDefault(x => x.CertificateId.ToString() == u.BId && u.Id == x.BusinessId.ToString());
+                if (rs != null)
                 {
-                    case CertificatesEnum.FCertificate:
-                        u.CertificateType = CertificatesEnum.FCertificate;
-                        u.CertificateTypeName = EnumUtil.GetDescription(CertificatesEnum.FCertificate);
-                        u.EffectiveTime = rs?.FEffectiveTime?.ToString("yyyy/MM/dd");
-                        u.DueDays = TimeHelper.GetTimeSpan(Convert.ToDateTime(rs?.FEffectiveTime), DateTime.Now).Days + 1;
-                        break;
-                    case CertificatesEnum.SCertificate:
-                        u.CertificateType = CertificatesEnum.SCertificate;
-                        u.CertificateTypeName = EnumUtil.GetDescription(CertificatesEnum.SCertificate);
-                        u.EffectiveTime = rs?.SEffectiveTime?.ToString("yyyy/MM/dd");
-                        u.DueDays = TimeHelper.GetTimeSpan(Convert.ToDateTime(rs?.SEffectiveTime), DateTime.Now).Days + 1;
-                        break;
-                    case CertificatesEnum.PXHGZ:
-                        u.CertificateType = CertificatesEnum.PXHGZ;
-                        u.CertificateTypeName = EnumUtil.GetDescription(CertificatesEnum.PXHGZ);
-                        u.EffectiveTime = rs?.TrainingSignTime?.ToString("yyyy/MM/dd");
-                        u.DueDays = TimeHelper.GetTimeSpan(Convert.ToDateTime(rs?.TrainingSignTime), DateTime.Now).Days + 1;
-                        break;
-                    case CertificatesEnum.JKZ:
-                        u.CertificateType = CertificatesEnum.JKZ;
-                        u.CertificateTypeName = EnumUtil.GetDescription(CertificatesEnum.JKZ);
-                        u.EffectiveTime = rs?.HealthEffectiveTime?.ToString("yyyy/MM/dd");
-                        u.DueDays = TimeHelper.GetTimeSpan(Convert.ToDateTime(rs?.HealthEffectiveTime), DateTime.Now).Days + 1;
-                        break;
-                    case CertificatesEnum.HYZ:
-                        u.CertificateType = CertificatesEnum.HYZ;
-                        u.CertificateTypeName = EnumUtil.GetDescription(CertificatesEnum.HYZ);
-                        u.EffectiveTime = rs?.SeamanEffectiveTime?.ToString("yyyy/MM/dd");
-                        u.DueDays = TimeHelper.GetTimeSpan(Convert.ToDateTime(rs?.SeamanEffectiveTime), DateTime.Now).Days + 1;
-                        break;
-                    case CertificatesEnum.HZ:
-                        u.CertificateType = CertificatesEnum.HZ;
-                        u.CertificateTypeName = EnumUtil.GetDescription(CertificatesEnum.HZ);
-                        u.EffectiveTime = rs?.PassportEffectiveTime?.ToString("yyyy/MM/dd");
-                        u.DueDays = TimeHelper.GetTimeSpan(Convert.ToDateTime(rs?.PassportEffectiveTime), DateTime.Now).Days + 1;
-                        break;
+                    switch (rs.Type)
+                    {
+                        case CertificatesEnum.FCertificate:
+                            u.CertificateType = CertificatesEnum.FCertificate;
+                            u.CertificateTypeName = EnumUtil.GetDescription(CertificatesEnum.FCertificate);
+                            u.EffectiveTime = rs?.FEffectiveTime?.ToString("yyyy/MM/dd");
+                            u.DueDays = TimeHelper.GetTimeSpan(Convert.ToDateTime(rs?.FEffectiveTime), DateTime.Now).Days + 1;
+                            break;
+                        case CertificatesEnum.SCertificate:
+                            u.CertificateType = CertificatesEnum.SCertificate;
+                            u.CertificateTypeName = EnumUtil.GetDescription(CertificatesEnum.SCertificate);
+                            u.EffectiveTime = rs?.SEffectiveTime?.ToString("yyyy/MM/dd");
+                            u.DueDays = TimeHelper.GetTimeSpan(Convert.ToDateTime(rs?.SEffectiveTime), DateTime.Now).Days + 1;
+                            break;
+                        case CertificatesEnum.PXHGZ:
+                            u.CertificateType = CertificatesEnum.PXHGZ;
+                            u.CertificateTypeName = EnumUtil.GetDescription(CertificatesEnum.PXHGZ);
+                            u.EffectiveTime = rs?.TrainingSignTime?.ToString("yyyy/MM/dd");
+                            u.DueDays = TimeHelper.GetTimeSpan(Convert.ToDateTime(rs?.TrainingSignTime), DateTime.Now).Days + 1;
+                            break;
+                        case CertificatesEnum.JKZ:
+                            u.CertificateType = CertificatesEnum.JKZ;
+                            u.CertificateTypeName = EnumUtil.GetDescription(CertificatesEnum.JKZ);
+                            u.EffectiveTime = rs?.HealthEffectiveTime?.ToString("yyyy/MM/dd");
+                            u.DueDays = TimeHelper.GetTimeSpan(Convert.ToDateTime(rs?.HealthEffectiveTime), DateTime.Now).Days + 1;
+                            break;
+                        case CertificatesEnum.HYZ:
+                            u.CertificateType = CertificatesEnum.HYZ;
+                            u.CertificateTypeName = EnumUtil.GetDescription(CertificatesEnum.HYZ);
+                            u.EffectiveTime = rs?.SeamanEffectiveTime?.ToString("yyyy/MM/dd");
+                            u.DueDays = TimeHelper.GetTimeSpan(Convert.ToDateTime(rs?.SeamanEffectiveTime), DateTime.Now).Days + 1;
+                            break;
+                        case CertificatesEnum.HZ:
+                            u.CertificateType = CertificatesEnum.HZ;
+                            u.CertificateTypeName = EnumUtil.GetDescription(CertificatesEnum.HZ);
+                            u.EffectiveTime = rs?.PassportEffectiveTime?.ToString("yyyy/MM/dd");
+                            u.DueDays = TimeHelper.GetTimeSpan(Convert.ToDateTime(rs?.PassportEffectiveTime), DateTime.Now).Days + 1;
+                            break;
+                    }
+                    u.OnStatus = EnumUtil.GetDescription(_baseService.ShipUserStatus(u.WorkShipStartTime, u.DeleteResonEnum));
+                    u.OnBoardName = ownShipTable.FirstOrDefault(x => x.BusinessId.ToString() == u.OnBoard)?.ShipName;
+                    u.CountryName = countryTable.FirstOrDefault(x => x.BusinessId.ToString() == u.Country)?.Name;
+                    u.ShipTypeName = EnumUtil.GetDescription(u.ShipType);
+                    u.Age = _baseService.CalculateAgeFromIdCard(u.CardId);
+                    if (u.FPosition != null) u.FPositionName = position.FirstOrDefault(x => x.BusinessId.ToString() == u.FPosition)?.Name;
+                    if (u.SPosition != null) u.SPositionName = position.FirstOrDefault(x => x.BusinessId.ToString() == u.SPosition)?.Name;
+                    if (u.OnBoardPosition != null) u.OnBoardPositionName = position.FirstOrDefault(x => x.BusinessId.ToString() == u.OnBoardPosition)?.Name;
                 }
-
-                u.OnStatus = EnumUtil.GetDescription(_baseService.ShipUserStatus(u.WorkShipStartTime, u.DeleteResonEnum));
-                u.OnBoardName = ownShipTable.FirstOrDefault(x => x.BusinessId.ToString() == u.OnBoard)?.ShipName;
-                u.CountryName = countryTable.FirstOrDefault(x => x.BusinessId.ToString() == u.Country)?.Name;
-                u.ShipTypeName = EnumUtil.GetDescription(u.ShipType);
-                u.Age = _baseService.CalculateAgeFromIdCard(u.CardId);
-                if (u.FPosition != null) u.FPositionName = position.FirstOrDefault(x => x.BusinessId.ToString() == u.FPosition)?.Name;
-                if (u.SPosition != null) u.SPositionName = position.FirstOrDefault(x => x.BusinessId.ToString() == u.SPosition)?.Name;
-                if (u.OnBoardPosition != null) u.OnBoardPositionName = position.FirstOrDefault(x => x.BusinessId.ToString() == u.OnBoardPosition)?.Name;
             }
 
             rt.List = rr.OrderByDescending(x => x.DueDays);
