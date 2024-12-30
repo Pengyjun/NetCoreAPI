@@ -35,7 +35,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
         /// <param name="requestBody"></param>
         /// <returns></returns>
         public async Task<PageResult<SearchCrewArchivesResponse>> SearchCrewArchivesAsync(SearchCrewArchivesRequest requestBody)
-        {
+        { 
             RefAsync<int> total = 0;
             var roleType = await _baseService.CurRoleType();
             if (roleType == -1) { return new PageResult<SearchCrewArchivesResponse>(); }

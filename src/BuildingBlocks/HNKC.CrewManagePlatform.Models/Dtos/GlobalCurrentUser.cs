@@ -56,8 +56,9 @@ namespace HNKC.CrewManagePlatform.Models.Dtos
         /// </summary>
         public Guid? RoleBusinessId { get; set; }
 
-
-
-
+        /// <summary>
+        /// 角色类型  1是超级管理员 2是船员  3是船长  4是船员部
+        /// </summary>
+        public int? Type { get; set; }
     }
 }
