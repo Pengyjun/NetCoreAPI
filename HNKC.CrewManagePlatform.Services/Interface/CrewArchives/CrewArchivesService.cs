@@ -6,7 +6,6 @@ using HNKC.CrewManagePlatform.SqlSugars.Models;
 using HNKC.CrewManagePlatform.Utils;
 using SqlSugar;
 using System.ComponentModel;
-using System.Text.RegularExpressions;
 using UtilsSharp;
 
 namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
@@ -35,7 +34,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
         /// <param name="requestBody"></param>
         /// <returns></returns>
         public async Task<PageResult<SearchCrewArchivesResponse>> SearchCrewArchivesAsync(SearchCrewArchivesRequest requestBody)
-        { 
+        {
             RefAsync<int> total = 0;
             var roleType = await _baseService.CurRoleType();
             if (roleType == -1) { return new PageResult<SearchCrewArchivesResponse>(); }
@@ -60,6 +59,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
             //名称相关不赋值
             var rt = await _dbContext.Queryable<User>()
                 .Where(t => t.IsLoginUser == 1)
+                .OrderByDescending(t => t.Created)
                 .WhereIF(requestBody.ServiceBooks != null && requestBody.ServiceBooks.Any(),
                 (t) => requestBody.ServiceBooks.Contains(((int)t.ServiceBookType).ToString()))//服务簿类型
                 .WhereIF(!string.IsNullOrWhiteSpace(requestBody.KeyWords), t => t.Name.Contains(requestBody.KeyWords) || t.CardId.Contains(requestBody.KeyWords)
@@ -78,11 +78,12 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                 .WhereIF(requestBody.CertificateTypes != null && requestBody.CertificateTypes.Any(), (t, ws, ow, ue, sc, eb) => requestBody.CertificateTypes.Contains(sc.SkillCertificateType.ToString()))
                 .WhereIF(requestBody.QualificationTypes != null && requestBody.QualificationTypes.Any(), (t, ws, ow, ue, sc, eb) => requestBody.QualificationTypes.Contains(eb.QualificationType.ToString()))
                 .WhereIF(requestBody.Qualifications != null && requestBody.Qualifications.Any(), (t, ws, ow, ue, sc, eb) => requestBody.Qualifications.Contains(eb.Qualification.ToString()))
-                .WhereIF(requestBody.Staus != null && requestBody.Staus.Contains("0"), (t, ws, ow, ue, sc, eb) => DateTime.Now < ws.WorkShipEndTime)//在岗
-                .WhereIF(requestBody.Staus != null && requestBody.Staus.Contains("1"), (t, ws, ow, ue, sc, eb) => (int)t.DeleteReson == 1)//离职
-                .WhereIF(requestBody.Staus != null && requestBody.Staus.Contains("2"), (t, ws, ow, ue, sc, eb) => (int)t.DeleteReson == 2)//调离
-                .WhereIF(requestBody.Staus != null && requestBody.Staus.Contains("3"), (t, ws, ow, ue, sc, eb) => (int)t.DeleteReson == 3)//退休
-                .WhereIF(requestBody.Staus != null && requestBody.Staus.Contains("5"), (t, ws, ow, ue, sc, eb) => DateTime.Now >= ws.WorkShipEndTime)//待岗
+                .WhereIF(requestBody.Staus != null && requestBody.Staus.Any(), (t, ws, ow, ue, sc, eb) =>
+                 (requestBody.Staus.Contains("0") && DateTime.Now < ws.WorkShipEndTime && t.DeleteReson == 0) || // 在岗
+                 (requestBody.Staus.Contains("1") && (int)t.DeleteReson == 1) || // 离职
+                 (requestBody.Staus.Contains("2") && (int)t.DeleteReson == 2) || // 调离
+                 (requestBody.Staus.Contains("3") && (int)t.DeleteReson == 3) || // 待岗
+                 (requestBody.Staus.Contains("5") && DateTime.Now >= ws.WorkShipEndTime)) // 待岗
                 .WhereIF(requestBody.FPosition != null && requestBody.FPosition.Any(), (t, ws, ow, ue, sc, eb) => SqlFunc.Subqueryable<CertificateOfCompetency>()//第一适任证
                                .Where(skcall => requestBody.FPosition.Contains(skcall.FPosition) && t.BusinessId == skcall.CertificateId).Any())
                 .WhereIF(requestBody.SPosition != null && requestBody.SPosition.Any(), (t, ws, ow, ue, sc, eb) => SqlFunc.Subqueryable<CertificateOfCompetency>()//第二适任证
@@ -110,6 +111,10 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                                .Where(skcall => skcall.Type == CertificatesEnum.HZ && t.BusinessId == skcall.CertificateId).Any())
                 .WhereIF(requestBody.HealthCertificate, (t, ws, ow, ue, sc, eb) => SqlFunc.Subqueryable<CertificateOfCompetency>()
                                .Where(skcall => skcall.Type == CertificatesEnum.JKZ && t.BusinessId == skcall.CertificateId).Any())
+                .WhereIF(requestBody.ShipTypes != null && requestBody.ShipTypes.Any(), (t, ws, ow, ue, sc, eb) => SqlFunc.Subqueryable<OwnerShip>()
+                               .Where(skcall => requestBody.ShipTypes.Contains(((int)t.ShipType).ToString())).Any())//船舶类型
+                .WhereIF(requestBody.CrewType != null && requestBody.CrewType.Any(), (t, ws, ow, ue, sc, eb) => SqlFunc.Subqueryable<CrewType>()
+                               .Where(skcall => requestBody.CrewType.Contains(t.CrewType)).Any())//船员类型
                 .Select((t, ws, ow, ue, sc, eb) => new SearchCrewArchivesResponse
                 {
                     BId = t.BusinessId,
@@ -126,13 +131,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                     IsDelete = t.IsDelete,
                     DeleteReson = t.DeleteReson
                 })
-                .MergeTable()
                 .Distinct()
-                .WhereIF(requestBody.ShipTypes != null && requestBody.ShipTypes.Any(), child => SqlFunc.Subqueryable<OwnerShip>()
-                               .Where(skcall => requestBody.ShipTypes.Contains(((int)child.ShipType).ToString())).Any())//船舶类型
-                .WhereIF(requestBody.CrewType != null && requestBody.CrewType.Any(), child => SqlFunc.Subqueryable<CrewType>()
-                               .Where(skcall => requestBody.CrewType.Contains(child.CrewType)).Any())//船员类型
-                .OrderByDescending(t => t.IsDelete)
                 .ToPageListAsync(requestBody.PageIndex, requestBody.PageSize, total);
 
             return await GetResult(requestBody, rt, total);
@@ -217,7 +216,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                     if (cerOfComps != null)
                     {
                         var cerofcF = cerOfComps.FirstOrDefault(x => x.Type == CertificatesEnum.FCertificate && x.CertificateId == t.BId);
-                        var cerofcS = cerOfComps.FirstOrDefault(x => x.Type == CertificatesEnum.FCertificate && x.CertificateId == t.BId);
+                        var cerofcS = cerOfComps.FirstOrDefault(x => x.Type == CertificatesEnum.SCertificate && x.CertificateId == t.BId);
                         t.FPositionName = position.FirstOrDefault(x => x.BusinessId.ToString() == cerofcF?.FPosition)?.Name;
                         t.FPosition = cerofcF?.FPosition;
                         t.SPositionName = position.FirstOrDefault(x => x.BusinessId.ToString() == cerofcS?.SPosition)?.Name;
@@ -233,7 +232,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                     t.OnStatusName = ob == null ? EnumUtil.GetDescription(CrewStatusEnum.DaiGang) : EnumUtil.GetDescription(ShipUserStatus(ob.WorkShipEndTime, t.DeleteReson));
                 }
             }
-            page.List = rt;
+            page.List = rt.OrderByDescending(x => x.IsDelete);
             page.TotalCount = total;
             return page;
         }
@@ -286,7 +285,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
             //var onDutyCount = onBoard.Where(x => x.WorkShipEndTime <= DateTime.Now).Select(x => x.WorkShipId).Distinct().Count();//在船数
             var onDutyProp = totalCount == 0 ? 0 : Convert.ToInt32(onDutyCount / totalCount);
 
-            var otherCount = dt.List.Where(x => x.OnStatusName == "离调退").Count();
+            var otherCount = dt.List.Where(x => x.OnStatusName == "离职" || x.OnStatusName == "调离" || x.OnStatusName == "退休").Count();
             //var otherCount = udtab.Where(x => x.DeleteReson != CrewStatusEnum.Normal && x.DeleteReson != CrewStatusEnum.XiuJia).Count();//离调退
             var otherProp = totalCount == 0 ? 0 : Convert.ToInt32(otherCount / totalCount);
 
@@ -358,11 +357,11 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                         return Result.Fail("身份证重复");
                     }
                 }
-                if (!ValidateIdCard(requestBody.BaseInfoDto.CardId))
+                if (!IdCardUtils.ValidateIdCard(requestBody.BaseInfoDto.CardId))
                 {
                     return Result.Fail("身份证错误：" + requestBody.BaseInfoDto.CardId);
                 }
-                if (!ValidatePhone(requestBody.BaseInfoDto.Phone))
+                if (!ValidateUtils.ValidatePhone(requestBody.BaseInfoDto.Phone))
                 {
                     return Result.Fail("手机号错误：" + requestBody.BaseInfoDto.Phone);
                 }
@@ -442,11 +441,11 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                         {
                             return Result.Fail("家庭成员已经绑定过，请先删除该/注销成员");
                         }
-                        if (ValidatePhone(item.Phone) == false)
+                        if (ValidateUtils.ValidatePhone(item.Phone) == false)
                         {
                             return Result.Fail("家庭成员手机号为");
                         }
-                        if (!string.IsNullOrEmpty(item.Phone) && !ValidatePhone(item.Phone))
+                        if (!string.IsNullOrEmpty(item.Phone) && !ValidateUtils.ValidatePhone(item.Phone))
                         {
                             return Result.Fail("家庭成员手机号错误：" + item.Phone);
                         }
@@ -474,11 +473,11 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                         {
                             return Result.Fail("应急联系人已经绑定过，请先删除/注销该成员");
                         }
-                        if (ValidatePhone(item.Phone) == false)
+                        if (ValidateUtils.ValidatePhone(item.Phone) == false)
                         {
                             return Result.Fail("应急联系人手机号为空");
                         }
-                        if (!ValidatePhone(item.Phone))
+                        if (!ValidateUtils.ValidatePhone(item.Phone))
                         {
                             return Result.Fail("应急联系人手机号错误：" + item.Phone);
                         }
@@ -885,11 +884,11 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                 #region 基本信息
                 if (requestBody.BaseInfoDto != null)
                 {
-                    if (!ValidateIdCard(requestBody.BaseInfoDto.CardId))
+                    if (!IdCardUtils.ValidateIdCard(requestBody.BaseInfoDto.CardId))
                     {
                         return Result.Fail("身份证错误");
                     }
-                    if (!ValidatePhone(requestBody.BaseInfoDto.Phone))
+                    if (!ValidateUtils.ValidatePhone(requestBody.BaseInfoDto.Phone))
                     {
                         return Result.Fail("手机号错误");
                     }
@@ -955,7 +954,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                         husDel = await _dbContext.Queryable<FamilyUser>().Where(t => t.FamilyId == userInfo.BusinessId).ToListAsync();
                         foreach (var item in requestBody.BaseInfoDto.HomeUser)
                         {
-                            if (!ValidatePhone(item.Phone))
+                            if (!ValidateUtils.ValidatePhone(item.Phone))
                             {
                                 return Result.Fail("手机号错误");
                             }
@@ -977,7 +976,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                         ecsDel = await _dbContext.Queryable<EmergencyContacts>().Where(t => t.EmergencyContactId == userInfo.BusinessId).ToListAsync();
                         foreach (var item in requestBody.BaseInfoDto.EmergencyContacts)
                         {
-                            if (!ValidatePhone(item.Phone))
+                            if (!ValidateUtils.ValidatePhone(item.Phone))
                             {
                                 return Result.Fail("手机号错误");
                             }
@@ -1389,6 +1388,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
             }
             return Result.Fail("无船员/该船员已被删除");
         }
+        #endregion  
         /// <summary>
         /// 保存备注
         /// </summary>
@@ -1512,21 +1512,6 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                 .FirstAsync(t => t.IsDelete == 1 && t.WorkShipId == requestBody.BId);
             if (shipWork != null)
             {
-                ////主表 删除状态清空
-                //var mainUser = await _dbContext.Queryable<User>().Where(t => t.BusinessId == requestBody.BId).FirstAsync();
-                //if (mainUser != null)
-                //{
-                //    mainUser.DeleteReson = CrewStatusEnum.No;
-                //    await _dbContext.Updateable(mainUser).UpdateColumns(x => x.DeleteReson).ExecuteCommandAsync();
-                //}
-                //if (requestBody.WorkShipStartTime < shipWork.WorkShipEndTime)//新的上船日期小于旧的下船日期
-                //{
-                //    return Result.Fail("上船日期不可小于前下船日期");
-                //}
-                if (requestBody.WorkShipStartTime > requestBody.WorkShipEndTime)
-                {
-                    return Result.Fail("下船日期不可小于上船日期");
-                }
                 shipWork.OnShip = requestBody.OnShip;
                 shipWork.Postition = requestBody.Postition;
                 shipWork.WorkShipEndTime = requestBody.WorkShipEndTime;
@@ -1536,70 +1521,6 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
 
             return Result.Success("调任成功");
         }
-        #endregion
-
-        #region 校验身份证、手机号
-        /// <summary>
-        /// 校验18位身份证
-        /// </summary>
-        /// <param name="idCard"></param>
-        /// <returns></returns>
-        public static bool ValidateIdCard(string idCard)
-        {
-            if (string.IsNullOrEmpty(idCard)) return false;
-
-            // 校验长度和数字格式
-            if (idCard.Length != 18 || !Regex.IsMatch(idCard, @"^\d{17}(\d|X)$"))
-                return false;
-
-            // 校验出生日期是否合法
-            string birthDateStr = idCard.Substring(6, 8); // 从第7位到第14位为出生日期
-            DateTime birthDate;
-            if (!DateTime.TryParseExact(birthDateStr, "yyyyMMdd", null, System.Globalization.DateTimeStyles.None, out birthDate))
-                return false;
-
-            // 校验校验位
-            return CheckIdCardChecksum(idCard);
-        }
-
-        /// <summary>
-        /// 校验身份证最后一位校验位
-        /// </summary>
-        /// <param name="idCard"></param>
-        /// <returns></returns>
-        private static bool CheckIdCardChecksum(string idCard)
-        {
-            // 系统加权因子
-            int[] weight = { 7, 9, 10, 5, 8, 4, 2, 1, 6, 3, 7, 9, 10, 5, 8, 4, 2 };
-            // 校验码映射表
-            char[] checkDigits = { '1', '0', 'X', '9', '8', '7', '6', '5', '4', '3', '2' };
-
-            int sum = 0;
-            for (int i = 0; i < 17; i++)
-            {
-                sum += int.Parse(idCard[i].ToString()) * weight[i];
-            }
-
-            int mod = sum % 11;
-            char expectedCheckDigit = checkDigits[mod];
-            return idCard[17] == expectedCheckDigit;
-        }
-        /// <summary>
-        /// 校验手机号
-        /// </summary>
-        /// <param name="phone"></param>
-        /// <returns></returns>
-        public static bool ValidatePhone(string phone)
-        {
-            if (string.IsNullOrEmpty(phone)) return false;
-
-            // 手机号正则表达式（中国手机号）
-            string pattern = @"^1[3-9]\d{9}$";
-            return Regex.IsMatch(phone, pattern);
-        }
-
-        #endregion
-
         #region 下拉列表信息
         /// <summary>
         /// 基本下拉列表
@@ -2217,9 +2138,6 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
             List<WorkShipsForDetails> wd = new();
             foreach (var item in workShips)
             {
-                DateTime date1 = new DateTime(item.WorkShipStartTime.Year, item.WorkShipStartTime.Month, item.WorkShipStartTime.Day);
-                DateTime date2 = new DateTime(item.WorkShipEndTime.Year, item.WorkShipEndTime.Month, item.WorkShipEndTime.Day);
-                var days = (date2 - date1).Days + 1;
                 wd.Add(new WorkShipsForDetails
                 {
                     WorkShipEndTime = item.WorkShipEndTime.ToString("yyyy-MM-dd"),
@@ -2230,7 +2148,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                     Postition = item.Postition,
                     PostitionName = positions.FirstOrDefault(x => x.BusinessId.ToString() == item.Postition)?.Name,
                     WorkShipStartTime = item.WorkShipStartTime.ToString("yyyy-MM-dd"),
-                    OnBoardDay = days,
+                    OnBoardDay = TimeHelper.GetTimeSpan(item.WorkShipStartTime, item.WorkShipEndTime).Days + 1,
                     ShipType = ownships.FirstOrDefault(x => x.BusinessId.ToString() == item.OnShip).ShipType,
                     ShipTypeName = EnumUtil.GetDescription(ownships.FirstOrDefault(x => x.BusinessId.ToString() == item.OnShip).ShipType),
                     Holiday = 0
@@ -2593,7 +2511,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                 {
                     Id = item.BusinessId.ToString(),
                     ContarctMain = item.ContractMain,
-                    EntryDate = item.StartTime.ToString("yyyy/MM/dd") + "~" + item.EndTime.ToString("yyyy/MM/dd"),
+                    EntryDate = item.StartTime?.ToString("yyyy-MM-dd") + "~" + item.EndTime?.ToString("yyyy-MM-dd"),
                     LaborCompany = item.LaborCompany,
                     ContractType = item.ContractType,
                     ContractTypeName = EnumUtil.GetDescription(item.ContractType),
@@ -2620,7 +2538,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                 .ToList();
             ur = new LaborServicesInfoDetails
             {
-                EntryTime = userEntryInfo.FirstOrDefault()?.EntryTime.ToString("yyyy/MM/dd"),
+                EntryTime = userEntryInfo.FirstOrDefault()?.EntryTime.ToString("yyyy-MM-dd"),
                 EntryMaterial = newFiles,
                 UserEntryInfosForDetails = uEntry
             };
@@ -2656,12 +2574,11 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
             #endregion
 
             #region 匹配链表字段
-            //所在船舶
+            //所在船舶  暂未确认是否获取调任船舶最新数据
             var onBoard = await _dbContext.Queryable<OwnerShip>().Where(t => t.BusinessId.ToString() == userInfo.OnBoard).FirstAsync();
             ur.OnBoardName = onBoard?.ShipName;
             ur.OnBoard = userInfo.OnBoard;
-            //适任职务
-
+            //适任职务  暂未确认是否获取调任船舶最新数据
             var position = await _dbContext.Queryable<Position>().FirstAsync(t => userInfo.PositionOnBoard == t.BusinessId.ToString());
             ur.PositionOnBoard = userInfo.PositionOnBoard;
             ur.PositionOnBoardName = position?.Name;
@@ -2670,7 +2587,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
             {
                 ur.StatusName = EnumUtil.GetDescription(userInfo.DeleteReson);//删除原因获取用户状态
             }
-            var userWorkShip = await _dbContext.Queryable<WorkShip>().Where(t => t.IsDelete == 1).OrderByDescending(t => t.Created).FirstAsync();
+            var userWorkShip = await _dbContext.Queryable<WorkShip>().Where(t => t.IsDelete == 1 && t.WorkShipId == userInfo.BusinessId).OrderByDescending(t => t.WorkShipEndTime).FirstAsync();
             if (userWorkShip != null)
             {
                 ////有休假时间  休假
@@ -2683,7 +2600,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                 ur.StatusName = userWorkShip.WorkShipEndTime > DateTime.Now ? EnumUtil.GetDescription(CrewStatusEnum.Normal) : EnumUtil.GetDescription(CrewStatusEnum.DaiGang);
 
                 //当前船舶任职时间
-                ur.CurrentShipEntryTime = string.IsNullOrWhiteSpace(userWorkShip.WorkShipStartTime.ToString()) || userWorkShip.WorkShipStartTime == DateTime.MinValue ? "" : userWorkShip.WorkShipStartTime.ToString("yyyy/MM/dd") + "~" + userWorkShip.WorkShipEndTime.ToString("yyyy/MM/dd");
+                ur.CurrentShipEntryTime = string.IsNullOrWhiteSpace(userWorkShip.WorkShipStartTime.ToString()) || userWorkShip.WorkShipStartTime == DateTime.MinValue ? "" : userWorkShip.WorkShipStartTime.ToString("yyyy-MM-dd") + "~" + userWorkShip.WorkShipEndTime.ToString("yyyy-MM-dd");
             }
             var userScans = await _dbContext.Queryable<Files>().Where(t => t.IsDelete == 1 && userInfo.BusinessId == t.UserId).ToListAsync();
             //照片

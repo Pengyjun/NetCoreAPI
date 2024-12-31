@@ -1,4 +1,6 @@
-﻿namespace HNKC.CrewManagePlatform.Models.Dtos.Contract
+﻿using HNKC.CrewManagePlatform.Models.Dtos.CrewArchives;
+
+namespace HNKC.CrewManagePlatform.Models.Dtos.Contract
 {
     /// <summary>
     /// 培训记录
@@ -49,5 +51,13 @@
         /// 
         /// </summary>
         public string? UserIds { get; set; }
+        /// <summary>
+        /// 扫描件
+        /// </summary>
+        public List<FileInfosForDetails>? TrainingRecordScans { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
+        public Guid? Scans { get; set; }
     }
 }

@@ -161,7 +161,7 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// <summary>
         /// 截止日期
         /// </summary>
-        public DateTime EndTime { get; set; }
+        public DateTime? EndTime { get; set; }
         /// <summary>
         /// 入职材料上传
         /// </summary>
@@ -185,11 +185,16 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// <summary>
         /// 开始时间
         /// </summary>
-        public DateTime StartTime { get; set; }
+        public DateTime? StartTime { get; set; }
 
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
-            if (EntryTime > EntryTime) yield return new ValidationResult("入职日期大于截止日期", new string[] { nameof(EntryTime) });
+            if (ContractType != ContractEnum.NoFixedTerm && ContractType != ContractEnum.Normal)
+            {
+                if (EntryTime > StartTime) yield return new ValidationResult("入职日期大于开始日期", new string[] { nameof(EntryTime) });
+                if (EntryTime > EndTime) yield return new ValidationResult("入职日期大于截止日期", new string[] { nameof(EntryTime) });
+                if (StartTime > EndTime) yield return new ValidationResult("开始日期大于截止日期", new string[] { nameof(EntryTime) });
+            }
             if (!string.IsNullOrWhiteSpace(ContarctMain) && ContarctMain.Length > 30) yield return new ValidationResult("合同主体过长", new string[] { nameof(ContarctMain) });
             if (!string.IsNullOrWhiteSpace(LaborCompany) && LaborCompany.Length > 30) yield return new ValidationResult("劳务公司过长", new string[] { nameof(LaborCompany) });
         }

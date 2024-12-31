@@ -1,5 +1,4 @@
-﻿using HNKC.CrewManagePlatform.Models.CommonRequest;
-using HNKC.CrewManagePlatform.Models.CommonResult;
+﻿using HNKC.CrewManagePlatform.Models.CommonResult;
 using HNKC.CrewManagePlatform.Models.Dtos;
 using HNKC.CrewManagePlatform.Models.Dtos.ConfigManagement;
 using HNKC.CrewManagePlatform.Models.Enums;
@@ -113,7 +112,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.ConfigManagement
                 item.ShipTypeName = EnumUtil.GetDescription(item.ShipType);
             }
             dt.List = rr;
-            dt.TotalCount = rr.Count;
+            dt.TotalCount = total;
             return dt;
         }
 

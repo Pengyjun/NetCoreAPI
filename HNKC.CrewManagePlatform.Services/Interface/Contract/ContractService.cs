@@ -1,6 +1,7 @@
 ﻿using HNKC.CrewManagePlatform.Models.CommonResult;
 using HNKC.CrewManagePlatform.Models.Dtos;
 using HNKC.CrewManagePlatform.Models.Dtos.Contract;
+using HNKC.CrewManagePlatform.Models.Dtos.CrewArchives;
 using HNKC.CrewManagePlatform.Models.Enums;
 using HNKC.CrewManagePlatform.SqlSugars.Models;
 using HNKC.CrewManagePlatform.Utils;
@@ -75,8 +76,8 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Contract
                     ShipType = t3.ShipType,
                     UserName = t1.Name,
                     WorkNumber = t1.WorkNumber,
-                    EndTime = t2.EndTime.ToString("yyyy/MM/dd"),
-                    StartTime = t2.StartTime.ToString("yyyy/MM/dd"),
+                    EndTime = t2.EndTime,
+                    StartTime = t2.StartTime,
                     ContractMain = t2.ContractMain,
                     ContractType = t2.ContractType,
                     EmploymentType = t2.EmploymentId,
@@ -123,7 +124,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Contract
                 if (cerOfComps != null)
                 {
                     var cerofcF = cerOfComps.FirstOrDefault(x => x.Type == CertificatesEnum.FCertificate && x.CertificateId.ToString() == u.BId);
-                    var cerofcS = cerOfComps.FirstOrDefault(x => x.Type == CertificatesEnum.FCertificate && x.CertificateId.ToString() == u.BId);
+                    var cerofcS = cerOfComps.FirstOrDefault(x => x.Type == CertificatesEnum.SCertificate && x.CertificateId.ToString() == u.BId);
                     u.FPositionName = position.FirstOrDefault(x => x.BusinessId.ToString() == cerofcF?.FPosition)?.Name;
                     u.FPosition = cerofcF?.FPosition;
                     u.SPositionName = position.FirstOrDefault(x => x.BusinessId.ToString() == cerofcS?.SPosition)?.Name;
@@ -272,7 +273,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Contract
                 if (cerOfComps != null)
                 {
                     var cerofcF = cerOfComps.FirstOrDefault(x => x.Type == CertificatesEnum.FCertificate && x.CertificateId.ToString() == u.BId);
-                    var cerofcS = cerOfComps.FirstOrDefault(x => x.Type == CertificatesEnum.FCertificate && x.CertificateId.ToString() == u.BId);
+                    var cerofcS = cerOfComps.FirstOrDefault(x => x.Type == CertificatesEnum.SCertificate && x.CertificateId.ToString() == u.BId);
                     u.FPositionName = position.FirstOrDefault(x => x.BusinessId.ToString() == cerofcF?.FPosition)?.Name;
                     u.FPosition = cerofcF?.FPosition;
                     u.SPositionName = position.FirstOrDefault(x => x.BusinessId.ToString() == cerofcS?.SPosition)?.Name;
@@ -359,11 +360,12 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Contract
             if (roleType == -1) { return new PageResult<TrainingRecordSearch>(); }
             var rr = await _dbContext.Queryable<TrainingRecord>()
                           .Where(y => y.IsDelete == 1 && string.IsNullOrEmpty(y.PId.ToString()))
+                          .WhereIF(!string.IsNullOrWhiteSpace(requestBody.FillRepUserName), y => y.FillRepUserName.Contains(requestBody.FillRepUserName))
                           .LeftJoin<User>((y, x) => y.FillRepUserId == x.BusinessId)
                           .LeftJoin<TrainingType>((y, x, z) => y.TrainingType == z.BusinessId.ToString())
                           .WhereIF(!string.IsNullOrEmpty(requestBody.TraningType), (y, x, z) => requestBody.TraningType == y.TrainingType)
                           .WhereIF(!string.IsNullOrEmpty(requestBody.StartTime) && !string.IsNullOrEmpty(requestBody.EndTime), (y, x, z) => y.TrainingTime >= Convert.ToDateTime(requestBody.StartTime) && y.TrainingTime <= Convert.ToDateTime(requestBody.EndTime))
-                         .WhereIF(roleType == 3, (y, x, z) => y.FillRepUserId == GlobalCurrentUser.UserBusinessId)//船长
+                          .WhereIF(roleType == 3, (y, x, z) => y.FillRepUserId == GlobalCurrentUser.UserBusinessId)//船长
                           .Select((y, x, z) => new TrainingRecordSearch
                           {
                               Id = y.BusinessId.ToString(),
@@ -374,6 +376,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Contract
                               TrainingTime = y.TrainingTime,
                               TrainingType = y.TrainingType,
                               TrainingTitle = y.TrainingTitle,
+                              Scans = y.TrainingScan,
                               TrainingCount = SqlFunc.Subqueryable<TrainingRecord>().
                                          Where(z => z.PId == y.BusinessId).Count()
                           })
@@ -382,9 +385,30 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Contract
             var uu = await _dbContext.Queryable<TrainingRecord>().Where(t => bids.Contains(t.PId.ToString())).ToListAsync();
             var uids = uu.Select(x => x.TrainingId).ToList();
             var users = await _dbContext.Queryable<User>().Where(t => t.IsDelete == 1 && t.IsLoginUser == 1 && uids.Contains(t.BusinessId)).ToListAsync();
+            //扫描件
+            var trainType = await _dbContext.Queryable<TrainingType>().Where(t => t.IsDelete == 1).Select(x => new { x.BusinessId, x.Name }).ToListAsync();
+            //获取文件
+            var files = await _dbContext.Queryable<Files>().Where(t => rr.Select(x => x.Scans).ToList().Contains(t.FileId)).ToListAsync();
+            List<TrainingRecordsForDetails> td = new();
+            //获取文件
+            var url = AppsettingsHelper.GetValue("UpdateItem:Url");
 
             foreach (var item in rr)
             {
+                var trFile = files.Where(x => item.Scans == x.FileId)
+                   .Select(x => new FileInfosForDetails
+                   {
+                       Id = x.BusinessId.ToString(),
+                       FileSize = x.FileSize,
+                       FileType = x.FileType,
+                       Name = x.Name,
+                       OriginName = x.OriginName,
+                       SuffixName = x.SuffixName,
+                       //Url = url + x.Name.Substring(0, x.Name.LastIndexOf(".")) + x.OriginName
+                       Url = url + x.Name
+                   })
+                   .ToList();
+                item.TrainingRecordScans = trFile;
                 var uuIds = uu.Where(x => x.PId.ToString() == item.Id).Select(x => x.TrainingId).ToList();
                 item.UserDetails = string.Join(",", users.Where(x => uuIds.Contains(x.BusinessId)).Select(x => x.Name));
                 item.UserIds = string.Join(",", users.Where(x => uuIds.Contains(x.BusinessId)).Select(x => x.BusinessId));
@@ -424,6 +448,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Contract
                 Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
                 BusinessId = bid,
                 FillRepUserId = GlobalCurrentUser.UserBusinessId,
+                FillRepUserName = GlobalCurrentUser.Name,
                 TrainingAddress = requestBody.TrainingAddress,
                 TrainingTime = requestBody.TrainingTime,
                 TrainingTitle = requestBody.TrainingTitle,
@@ -440,6 +465,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Contract
                     BusinessId = GuidUtil.Next(),
                     FillRepUserId = GlobalCurrentUser.UserBusinessId,
                     TrainingAddress = requestBody.TrainingAddress,
+                    FillRepUserName = GlobalCurrentUser.Name,
                     TrainingTime = requestBody.TrainingTime,
                     TrainingTitle = requestBody.TrainingTitle,
                     TrainingType = requestBody.TrainingType,
@@ -483,7 +509,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Contract
 
         #region 年度考核
         /// <summary>
-        /// 年度审核列表
+        /// 年度考核列表
         /// </summary>
         /// <param name="requestBody"></param>
         /// <returns></returns>
@@ -494,11 +520,11 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Contract
             if (roleType == -1) { return new PageResult<YearCheckSearch>(); }
             var onShips = await _dbContext.Queryable<WorkShip>().Where(t => t.IsDelete == 1 && GlobalCurrentUser.UserBusinessId == t.WorkShipId).Select(x => x.OnShip).ToListAsync();
             #region 船员关联
-            var uentityFist = _dbContext.Queryable<UserEntryInfo>()
-                .GroupBy(u => u.UserEntryId)
-                .Select(x => new { x.UserEntryId, EndTime = SqlFunc.AggregateMax(x.EndTime) });
-            var uentity = _dbContext.Queryable<UserEntryInfo>()
-                .InnerJoin(uentityFist, (x, y) => x.UserEntryId == y.UserEntryId && x.EndTime == y.EndTime);
+            //var uentityFist = _dbContext.Queryable<UserEntryInfo>()
+            //    .GroupBy(u => u.UserEntryId)
+            //    .Select(x => new { x.UserEntryId, EndTime = SqlFunc.AggregateMax(x.EndTime) });
+            //var uentity = _dbContext.Queryable<UserEntryInfo>()
+            //    .InnerJoin(uentityFist, (x, y) => x.UserEntryId == y.UserEntryId && x.EndTime == y.EndTime);
             var crewWorkShip = _dbContext.Queryable<WorkShip>()
                 .GroupBy(u => u.WorkShipId)
                 .Select(t => new { t.WorkShipId, WorkShipEndTime = SqlFunc.AggregateMax(t.WorkShipEndTime) });
@@ -509,17 +535,17 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Contract
             var rr = await _dbContext.Queryable<User>()
                 .Where(t1 => t1.IsLoginUser == 1 && t1.IsDelete == 1)
                 .WhereIF(!string.IsNullOrEmpty(requestBody.KeyWords), t1 => t1.Name.Contains(requestBody.KeyWords) || t1.Phone.Contains(requestBody.KeyWords) || t1.WorkNumber.Contains(requestBody.KeyWords) || t1.CardId.Contains(requestBody.KeyWords))
-                .LeftJoin(uentity, (t1, t2) => t1.BusinessId == t2.UserEntryId)
-                .InnerJoin<OwnerShip>((t1, t2, t3) => t1.OnBoard == t3.BusinessId.ToString())
+                //.LeftJoin(uentity, (t1, t2) => t1.BusinessId == t2.UserEntryId)
+                .InnerJoin<OwnerShip>((t1, t3) => t1.OnBoard == t3.BusinessId.ToString())
                 //.InnerJoin<CertificateOfCompetency>((t1, t2, t3, t4) => t1.BusinessId == t4.CertificateId)
-                .InnerJoin(wShip, (t1, t2, t3, t5) => t1.BusinessId == t5.WorkShipId)
-                .WhereIF(roleType == 3, (t1, t2, t3, t5) => t5.OnShip == t3.BusinessId.ToString() && onShips.Contains(t5.OnShip))//船长
-                .WhereIF(roleType == 2, (t1, t2, t3, t5) => GlobalCurrentUser.UserBusinessId == t5.WorkShipId)//船员
-                .LeftJoin<YearCheck>((t1, t2, t3, t5, t6) => t1.BusinessId == t6.TrainingId)
-                .WhereIF(requestBody.CheckStatus == 1, (t1, t2, t3, t5, t6) => t6.CheckType != CheckEnum.Normal)
-                .WhereIF(requestBody.CheckStatus == 2, (t1, t2, t3, t5, t6) => t6.CheckType == CheckEnum.Normal)
-                .WhereIF(!string.IsNullOrEmpty(requestBody.Year), (t1, t2, t3, t5, t6) => t6.TrainingTime.Value.Year.ToString() == requestBody.Year)
-                .Select((t1, t2, t3, t5, t6) => new YearCheckSearch
+                .InnerJoin(wShip, (t1, t3, t5) => t1.BusinessId == t5.WorkShipId)
+                .WhereIF(roleType == 3, (t1, t3, t5) => t5.OnShip == t3.BusinessId.ToString() && onShips.Contains(t5.OnShip))//船长
+                .WhereIF(roleType == 2, (t1, t3, t5) => GlobalCurrentUser.UserBusinessId == t5.WorkShipId)//船员
+                .LeftJoin<YearCheck>((t1, t3, t5, t6) => t1.BusinessId == t6.TrainingId)
+                .WhereIF(requestBody.CheckStatus == 1, (t1, t3, t5, t6) => t6.CheckType != CheckEnum.Normal)
+                .WhereIF(requestBody.CheckStatus == 2, (t1, t3, t5, t6) => t6.CheckType == CheckEnum.Normal)
+                .WhereIF(!string.IsNullOrEmpty(requestBody.Year), (t1, t3, t5, t6) => t6.TrainingTime.Value.Year.ToString() == requestBody.Year)
+                .Select((t1, t3, t5, t6) => new YearCheckSearch
                 {
                     BId = t1.BusinessId.ToString(),
                     Id = t6.BusinessId.ToString(),
@@ -529,11 +555,13 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Contract
                     UserName = t1.Name,
                     WorkNumber = t1.WorkNumber,
                     CardId = t1.CardId,
+                    Scans = t6.TrainingScan,
+                    CheckYear = t6.TrainingTime.Value.Year.ToString(),
                     CheckType = t6.CheckType,
                     CheckFillRepTime = t6.Created.Value.ToString("yyyy/MM/dd HH:mm:ss"),
                     CheckTypeStatus = t6.CheckType != CheckEnum.Normal ? "已考核" : "未考核",
                     DeleteResonEnum = t1.DeleteReson,
-                    ContractType = t2.ContractType,
+                    //ContractType = t2.ContractType,
                     OnBoardPosition = t5.Postition,
                     WorkShipStartTime = t5.WorkShipStartTime,
                 })
@@ -556,12 +584,29 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Contract
             //第一适任 第二适任
             var uIds = rr.Select(x => x.BId).ToList();
             var cerOfComps = await _dbContext.Queryable<CertificateOfCompetency>().Where(x => uIds.Contains(x.CertificateId.ToString()) && (x.Type == CertificatesEnum.FCertificate || x.Type == CertificatesEnum.SCertificate)).ToListAsync();
+            //获取文件
+            var fileIds = rr.Select(x => x.Scans).ToList();
+            var files = await _dbContext.Queryable<Files>().Where(t => fileIds.Contains(t.FileId)).ToListAsync();
+            //获取文件
+            var url = AppsettingsHelper.GetValue("UpdateItem:Url");
 
             foreach (var u in rr)
             {
+                u.TrainingScans = files.Where(x => u.Scans == x.FileId)
+                    .Select(x => new FileInfosForDetails
+                    {
+                        Id = x.BusinessId.ToString(),
+                        FileSize = x.FileSize,
+                        FileType = x.FileType,
+                        Name = x.Name,
+                        OriginName = x.OriginName,
+                        SuffixName = x.SuffixName,
+                        //Url = url + x.Name?.Substring(0, x.Name.LastIndexOf(".")) + x.OriginName
+                        Url = url + x.Name
+                    }).ToList();
                 u.CheckTypeName = EnumUtil.GetDescription(u.CheckType);
                 u.OnStatus = EnumUtil.GetDescription(_baseService.ShipUserStatus(u.WorkShipStartTime, u.DeleteResonEnum));
-                u.ContractTypeName = EnumUtil.GetDescription(u.ContractType);
+                //u.ContractTypeName = EnumUtil.GetDescription(u.ContractType);
                 u.OnBoardName = ownShipTable.FirstOrDefault(x => x.BusinessId.ToString() == u.OnBoard)?.ShipName;
                 u.CountryName = countryTable.FirstOrDefault(x => x.BusinessId.ToString() == u.Country)?.Name;
                 u.ShipTypeName = EnumUtil.GetDescription(u.ShipType);
@@ -569,7 +614,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Contract
                 if (cerOfComps != null)
                 {
                     var cerofcF = cerOfComps.FirstOrDefault(x => x.Type == CertificatesEnum.FCertificate && x.CertificateId.ToString() == u.BId);
-                    var cerofcS = cerOfComps.FirstOrDefault(x => x.Type == CertificatesEnum.FCertificate && x.CertificateId.ToString() == u.BId);
+                    var cerofcS = cerOfComps.FirstOrDefault(x => x.Type == CertificatesEnum.SCertificate && x.CertificateId.ToString() == u.BId);
                     u.FPositionName = position.FirstOrDefault(x => x.BusinessId.ToString() == cerofcF?.FPosition)?.Name;
                     u.FPosition = cerofcF?.FPosition;
                     u.SPositionName = position.FirstOrDefault(x => x.BusinessId.ToString() == cerofcS?.SPosition)?.Name;
@@ -580,7 +625,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Contract
                 if (u.OnBoardPosition != null) u.OnBoardPositionName = position.FirstOrDefault(x => x.BusinessId.ToString() == u.OnBoardPosition)?.Name;
             }
 
-            rt.List = rr;
+            rt.List = rr.OrderByDescending(t => t.UserName).ThenByDescending(t => t.CheckYear);
             rt.TotalCount = total;
             return rt;
         }
