@@ -17,7 +17,7 @@ namespace HNKC.CrewManagePlatform.SqlSugars.Models
         /// <summary>
         /// 考核模式：2024年度考核
         /// </summary>
-        [SugarColumn(ColumnDataType = "datetime", ColumnDescription = "考核模式")]
+        [SugarColumn(ColumnDataType = "datetime", ColumnDescription = "考核年份")]
         public DateTime? TrainingTime { get; set; }
         /// <summary>
         /// 考核文件

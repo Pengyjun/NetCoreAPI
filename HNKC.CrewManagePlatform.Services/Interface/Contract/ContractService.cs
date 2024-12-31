@@ -531,11 +531,11 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Contract
             var wShip = _dbContext.Queryable<WorkShip>()
                 .InnerJoin(crewWorkShip, (x, y) => x.WorkShipId == y.WorkShipId && x.WorkShipEndTime == y.WorkShipEndTime);
 
-            var ycheck = _dbContext.Queryable<YearCheck>()
-                .GroupBy(u => u.TrainingId)
-                .Select(t => new { t.TrainingId, TrainingTime = SqlFunc.AggregateMax(t.TrainingTime) });
-            var yc = _dbContext.Queryable<YearCheck>()
-                .InnerJoin(ycheck, (x, y) => x.TrainingId == y.TrainingId && x.TrainingTime == y.TrainingTime);
+            //var ycheck = _dbContext.Queryable<YearCheck>()
+            //    .GroupBy(u => u.TrainingId)
+            //    .Select(t => new { t.TrainingId, TrainingTime = SqlFunc.AggregateMax(t.TrainingTime) });
+            //var yc = _dbContext.Queryable<YearCheck>()
+            //    .InnerJoin(ycheck, (x, y) => x.TrainingId == y.TrainingId && x.TrainingTime == y.TrainingTime);
 
             #endregion
 
@@ -548,7 +548,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Contract
                 .InnerJoin(wShip, (t1, t3, t5) => t1.BusinessId == t5.WorkShipId)
                 .WhereIF(roleType == 3, (t1, t3, t5) => t5.OnShip == t3.BusinessId.ToString() && onShips.Contains(t5.OnShip))//船长
                 .WhereIF(roleType == 2, (t1, t3, t5) => GlobalCurrentUser.UserBusinessId == t5.WorkShipId)//船员
-                .InnerJoin(yc, (t1, t3, t5, t6) => t1.BusinessId == t6.TrainingId)
+                .LeftJoin<YearCheck>((t1, t3, t5, t6) => t1.BusinessId == t6.TrainingId)
                 .WhereIF(requestBody.CheckStatus == 1, (t1, t3, t5, t6) => t6.CheckType != CheckEnum.Normal)
                 .WhereIF(requestBody.CheckStatus == 2, (t1, t3, t5, t6) => t6.CheckType == CheckEnum.Normal)
                 .WhereIF(!string.IsNullOrEmpty(requestBody.Year), (t1, t3, t5, t6) => t6.TrainingTime.Value.Year.ToString() == requestBody.Year)
@@ -562,6 +562,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Contract
                     UserName = t1.Name,
                     WorkNumber = t1.WorkNumber,
                     CardId = t1.CardId,
+                    CheckYear = t6.TrainingTime.Value.Year.ToString(),
                     CheckType = t6.CheckType,
                     CheckFillRepTime = t6.Created.Value.ToString("yyyy/MM/dd HH:mm:ss"),
                     CheckTypeStatus = t6.CheckType != CheckEnum.Normal ? "已考核" : "未考核",

@@ -16,32 +16,32 @@ namespace HNKC.CrewManagePlatform.Models.Enums
         /// 技师
         /// </summary>
         [Description("技师")]
-        Js = 1,
+        Js = 2,
         /// <summary>
         /// 高级工
         /// </summary>
         [Description("高级工")]
-        HighWork = 2,
+        HighWork = 3,
         /// <summary>
         /// 中级工
         /// </summary>
         [Description("中级工")]
-        CenterWork = 3,
+        CenterWork = 4,
         /// <summary>
         /// 初级工
         /// </summary>
         [Description("初级工")]
-        Elementary = 4,
+        Elementary = 5,
         /// <summary>
         /// 电焊证
         /// </summary>
         [Description("电焊证")]
-        DianHan = 5,
+        DianHan = 6,
         /// <summary>
         /// 防辐射证
         /// </summary>
         [Description("防辐射证")]
-        FangFuShe = 6
+        FangFuShe = 7
     }
     /// <summary>
     /// 证书

@@ -104,6 +104,10 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.Contract
         /// </summary>
         public string? CheckFillRepTime { get; set; }
         /// <summary>
+        /// 考核年份
+        /// </summary>
+        public string? CheckYear { get; set; }
+        /// <summary>
         /// 状态
         /// </summary>
         public string? OnStatus { get; set; }
