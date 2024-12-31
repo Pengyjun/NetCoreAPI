@@ -242,10 +242,10 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Salary
 
             //工资推送记录
             List<SalaryPushRecord> salaryPushRecords = new List<SalaryPushRecord>();
-
+            var salaryIds= salarieList.Select(x=>x.WorkNumber).ToList();
             //所有用户
             var allUser= await dbContext.Queryable<User>()
-                 .Where(x => x.IsDelete == 1&&!SqlFunc.IsNullOrEmpty(x.Phone))
+                 .Where(x => x.IsDelete == 1&&!SqlFunc.IsNullOrEmpty(x.Phone)&& salaryIds.Contains(x.WorkNumber))
                  .WhereIF(baseRequest != null && baseRequest.BId != null, x => x.BusinessId == baseRequest.BId).ToListAsync();
 
             //查询推送记录
@@ -276,16 +276,29 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Salary
             }
             await dbContext.Insertable<SalaryPushRecord>(salaryPushRecords).ExecuteCommandAsync();
             //不等待
-            SendSmsAsync();
+            if (baseRequest == null && baseRequest.BId == Guid.Empty)
+            {
+                //群发
+                SendSmsAsync(null);
+            }
+            else {
+                if (allUser.Count > 0)
+                {
+                    //单发
+                    SendSmsAsync(allUser[0].Phone);
+                }
+               
+            }
+              
             return Result.Success("发送成功");
        }
-        
+
         /// <summary>
         /// 发短信
         /// </summary>
+        /// <param name="phone">为空 群发  否则单独发</param>
         /// <returns></returns>
-        /// <exception cref="NotImplementedException"></exception>
-        public async Task<Result> SendSmsAsync()
+        public async Task<Result> SendSmsAsync(string phone)
         {
             var year = DateTime.Now.Year;
             var month = DateTime.Now.Month;
@@ -297,7 +310,10 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Salary
                 return Result.Fail("没有可发送的短信", (int)ResponseHttpCode.SendFail);
             }
             var userIds = allNoPushUserId.Select(x => x.UserId).ToList();
-            var userList=await dbContext.Queryable<User>().Where(x => x.IsDelete == 1 && userIds.Contains(x.Id)).ToListAsync();
+            var userList=await dbContext.Queryable<User>()
+                .Where(x => x.IsDelete == 1 && userIds.Contains(x.Id))
+                .WhereIF(!string.IsNullOrWhiteSpace(phone),x=>x.Phone==phone)
+                .ToListAsync();
             try
             {
                 
@@ -333,7 +349,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Salary
             catch (Exception ex)
             {
                 //如果失败 把之前发送成功的 更新 防止发送重复
-               await dbContext.Updateable<SalaryPushRecord>(allNoPushUserId).ExecuteCommandAsync();
+                 await dbContext.Updateable<SalaryPushRecord>(allNoPushUserId).ExecuteCommandAsync();
             }
             return Result.Success();
         }
