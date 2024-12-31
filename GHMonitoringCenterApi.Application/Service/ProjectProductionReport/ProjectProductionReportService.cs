@@ -253,6 +253,10 @@ namespace GHMonitoringCenterApi.Application.Service.ProjectProductionReport
                 responseDtos.TimeValue = DateTime.Now.Date.AddDays(-1).Year + "年" + DateTime.Now.Date.AddDays(-1).Month + "月" + DateTime.Now.Date.AddDays(-1).Day + "日";
 
             }
+            departmentIds.Clear();
+            var oids = await dbContext.Queryable<Institution>().Where(x => x.IsDelete == 1 && x.Oid == _currentUser.CurrentLoginInstitutionOid).SingleAsync();
+            var InstitutionId = await baseService.SearchCompanySubPullDownAsync(oids.PomId.Value, false, true);
+            departmentIds = InstitutionId.Data.Select(x => x.Id.Value).ToList();
             //分页查询
             var dayReport = await dbContext.Queryable<DayReportConstruction>().Where(x => x.IsDelete == 1)
                 .WhereIF(time != 0, x => x.DateDay == time)

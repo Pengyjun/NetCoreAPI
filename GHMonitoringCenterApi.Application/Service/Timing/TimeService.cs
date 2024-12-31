@@ -2195,10 +2195,11 @@ namespace GHMonitoringCenterApi.Application.Service.Timing
                     foreach (var item in companyProducitonValueList)
                     {
                         var ids = projectList.Where(x => x.CompanyId == item.CompanyId).Select(x => x.Id).ToList();
-                        if (ids.Count != 0 && item.CompanyId == "a8db9bb0-4667-4320-b03d-b0b7f8728b61".ToGuid())
-                        {
-                            ids.Add("08dcdec4-4d90-4802-80fe-1293e55fbdff".ToGuid());
-                        }
+                        //添加交建公司水工项目
+                        //if (ids.Count != 0 && item.CompanyId == "a8db9bb0-4667-4320-b03d-b0b7f8728b61".ToGuid())
+                        //{
+                        //    ids.Add("08dcdec4-4d90-4802-80fe-1293e55fbdff".ToGuid());
+                        //}
                         var dayProjectProduction = dayProjectProductionList.Where(x => ids.Contains(x.ProjectId)).Sum(x => x.DayActualProductionAmount);
                         var currentCompany = companyProducitonValueList.Where(x => x.CompanyId == item.CompanyId).FirstOrDefault();
                         currentCompany = UpdateCompanyMonthProduction(currentCompany, month, dayProjectProduction);

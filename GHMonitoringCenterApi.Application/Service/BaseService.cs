@@ -432,7 +432,21 @@ namespace GHMonitoringCenterApi.Application.Service
                 //    Id = x.PomId,
                 //    Name = x.Name
                 //}));
-             
+               
+                if (departmentList.Count != 0)
+                {
+                    //说明不是交建公司  或者不是超级管理员 或者不是陈翠   就不让他看水工项目
+                    var len = _currentUser.CurrentLoginInstitutionGrule.IndexOf("101174265");
+                    if (!_currentUser.CurrentLoginIsAdmin && _currentUser.Account != "2016146340"&& len <= 0)
+                    {
+                        var res = departmentList.Where(x => x.Id == "00e9d13d-5678-47b5-90be-504985a31b1e".ToGuid()).FirstOrDefault();
+                        if (res != null)
+                        {
+                            departmentList.Remove(res);
+                        }
+                    }
+                   
+                }
                 responseAjaxResult.Data = departmentList;
                 responseAjaxResult.Count = departmentList.Count;
             }
