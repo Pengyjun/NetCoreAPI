@@ -51,8 +51,9 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Salary
         /// <summary>
         /// 发短信
         /// </summary>
+        /// <param name="phone">为空 群发  否则单独发</param>
         /// <returns></returns>
 
-        Task<Result> SendSmsAsync();
+        Task<Result> SendSmsAsync(string phone);
     }
 }

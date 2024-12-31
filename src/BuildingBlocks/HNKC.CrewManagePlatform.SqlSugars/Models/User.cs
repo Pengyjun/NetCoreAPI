@@ -93,31 +93,31 @@ namespace HNKC.CrewManagePlatform.SqlSugars.Models
         /// </summary>
         [SugarColumn(Length = 50, ColumnDescription = "民族")]
         public string? Nation { get; set; }
-        /// <summary>
-        /// 船舶类型
-        /// </summary>
-        [SugarColumn(ColumnDataType = "int", ColumnDescription = "船舶类型", DefaultValue = "0")]
-        public ShipTypeEnum ShipType { get; set; }
-        /// <summary>
-        /// 船员类型
-        /// </summary>
-        [SugarColumn(Length = 50, ColumnDescription = "船员类型")]
-        public string? CrewType { get; set; }
+        ///// <summary>
+        ///// 船舶类型
+        ///// </summary>
+        //[SugarColumn(ColumnDataType = "int", ColumnDescription = "船舶类型", DefaultValue = "0")]
+        //public ShipTypeEnum ShipType { get; set; }
+        ///// <summary>
+        ///// 船员类型
+        ///// </summary>
+        //[SugarColumn(Length = 50, ColumnDescription = "船员类型")]
+        //public string? CrewType { get; set; }
         /// <summary>
         /// 服务簿类型
         /// </summary>
         [SugarColumn(ColumnDataType = "int", ColumnDescription = "服务簿类型", DefaultValue = "0")]
         public ServiceBookEnum ServiceBookType { get; set; }
-        /// <summary>
-        /// 所在船舶
-        /// </summary>
-        [SugarColumn(Length = 50, ColumnDescription = "所在船舶")]
-        public string? OnBoard { get; set; }
-        /// <summary>
-        /// 在船职务
-        /// </summary>
-        [SugarColumn(Length = 50, ColumnDescription = "在船职务")]
-        public string? PositionOnBoard { get; set; }
+        ///// <summary>
+        ///// 所在船舶
+        ///// </summary>
+        //[SugarColumn(Length = 50, ColumnDescription = "所在船舶")]
+        //public string? OnBoard { get; set; }
+        ///// <summary>
+        ///// 在船职务
+        ///// </summary>
+        //[SugarColumn(Length = 50, ColumnDescription = "在船职务")]
+        //public string? PositionOnBoard { get; set; }
         /// <summary>
         /// 删除原因
         /// </summary>

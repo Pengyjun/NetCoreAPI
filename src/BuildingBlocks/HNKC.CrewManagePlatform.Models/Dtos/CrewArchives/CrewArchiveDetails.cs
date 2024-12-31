@@ -240,6 +240,10 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
     {
         #region 第一适任证
         /// <summary>
+        /// 服务簿类型
+        /// </summary>
+        public ServiceBookEnum ServiceBookType { get; set; }
+        /// <summary>
         /// 证书编号
         /// </summary>
         public string? FCertificate { get; set; }

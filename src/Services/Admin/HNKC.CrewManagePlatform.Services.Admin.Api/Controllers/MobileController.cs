@@ -64,7 +64,7 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api.Controllers
         [HttpGet("SendPhoneSms")]
         public async Task<Result> SendSmsAsync()
         {
-            return await salaryService.SendSmsAsync();
+            return await salaryService.SendSmsAsync(null);
         }
 
 

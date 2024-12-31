@@ -9,6 +9,10 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
     public class CrewTransferRequest : BaseRequest, IValidatableObject
     {
         /// <summary>
+        /// 改变船员计划工作时间 true是 修改原计划
+        /// </summary>
+        public bool IsChangePlan {  get; set; }
+        /// <summary>
         /// 船舶
         /// </summary>
         public string? OnShip { get; set; }
