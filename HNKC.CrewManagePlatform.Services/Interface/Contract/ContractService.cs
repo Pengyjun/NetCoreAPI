@@ -3,6 +3,7 @@ using HNKC.CrewManagePlatform.Models.Dtos;
 using HNKC.CrewManagePlatform.Models.Dtos.Contract;
 using HNKC.CrewManagePlatform.Models.Dtos.CrewArchives;
 using HNKC.CrewManagePlatform.Models.Enums;
+using HNKC.CrewManagePlatform.Services.Interface.Certificate;
 using HNKC.CrewManagePlatform.SqlSugars.Models;
 using HNKC.CrewManagePlatform.Utils;
 using SqlSugar;
@@ -17,15 +18,18 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Contract
     {
         private readonly ISqlSugarClient _dbContext;
         private readonly IBaseService _baseService;
+        private readonly ICertificateService _certificateService;
         /// <summary>
         /// 
         /// </summary>
         /// <param name="dbContext"></param>
         /// <param name="baseService"></param>
-        public ContractService(ISqlSugarClient dbContext, IBaseService baseService)
+        /// <param name="certificateService"></param>
+        public ContractService(ISqlSugarClient dbContext, IBaseService baseService, ICertificateService certificateService)
         {
             this._dbContext = dbContext;
-            _baseService = baseService;
+            this._baseService = baseService;
+            this._certificateService = certificateService;
         }
         #region 合同列表
         /// <summary>
@@ -76,8 +80,8 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Contract
                     ShipType = t3.ShipType,
                     UserName = t1.Name,
                     WorkNumber = t1.WorkNumber,
-                    EndTime = t2.EndTime.ToString("yyyy/MM/dd"),
-                    StartTime = t2.StartTime.ToString("yyyy/MM/dd"),
+                    EndTime = t2.EndTime,
+                    StartTime = t2.StartTime,
                     ContractMain = t2.ContractMain,
                     ContractType = t2.ContractType,
                     EmploymentType = t2.EmploymentId,
@@ -124,7 +128,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Contract
                 if (cerOfComps != null)
                 {
                     var cerofcF = cerOfComps.FirstOrDefault(x => x.Type == CertificatesEnum.FCertificate && x.CertificateId.ToString() == u.BId);
-                    var cerofcS = cerOfComps.FirstOrDefault(x => x.Type == CertificatesEnum.FCertificate && x.CertificateId.ToString() == u.BId);
+                    var cerofcS = cerOfComps.FirstOrDefault(x => x.Type == CertificatesEnum.SCertificate && x.CertificateId.ToString() == u.BId);
                     u.FPositionName = position.FirstOrDefault(x => x.BusinessId.ToString() == cerofcF?.FPosition)?.Name;
                     u.FPosition = cerofcF?.FPosition;
                     u.SPositionName = position.FirstOrDefault(x => x.BusinessId.ToString() == cerofcS?.SPosition)?.Name;
@@ -273,7 +277,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Contract
                 if (cerOfComps != null)
                 {
                     var cerofcF = cerOfComps.FirstOrDefault(x => x.Type == CertificatesEnum.FCertificate && x.CertificateId.ToString() == u.BId);
-                    var cerofcS = cerOfComps.FirstOrDefault(x => x.Type == CertificatesEnum.FCertificate && x.CertificateId.ToString() == u.BId);
+                    var cerofcS = cerOfComps.FirstOrDefault(x => x.Type == CertificatesEnum.SCertificate && x.CertificateId.ToString() == u.BId);
                     u.FPositionName = position.FirstOrDefault(x => x.BusinessId.ToString() == cerofcF?.FPosition)?.Name;
                     u.FPosition = cerofcF?.FPosition;
                     u.SPositionName = position.FirstOrDefault(x => x.BusinessId.ToString() == cerofcS?.SPosition)?.Name;
@@ -530,13 +534,6 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Contract
                 .Select(t => new { t.WorkShipId, WorkShipEndTime = SqlFunc.AggregateMax(t.WorkShipEndTime) });
             var wShip = _dbContext.Queryable<WorkShip>()
                 .InnerJoin(crewWorkShip, (x, y) => x.WorkShipId == y.WorkShipId && x.WorkShipEndTime == y.WorkShipEndTime);
-
-            //var ycheck = _dbContext.Queryable<YearCheck>()
-            //    .GroupBy(u => u.TrainingId)
-            //    .Select(t => new { t.TrainingId, TrainingTime = SqlFunc.AggregateMax(t.TrainingTime) });
-            //var yc = _dbContext.Queryable<YearCheck>()
-            //    .InnerJoin(ycheck, (x, y) => x.TrainingId == y.TrainingId && x.TrainingTime == y.TrainingTime);
-
             #endregion
 
             var rr = await _dbContext.Queryable<User>()
@@ -562,13 +559,14 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Contract
                     UserName = t1.Name,
                     WorkNumber = t1.WorkNumber,
                     CardId = t1.CardId,
+                    Scans = t6.TrainingScan,
                     CheckYear = t6.TrainingTime.Value.Year.ToString(),
                     CheckType = t6.CheckType,
                     CheckFillRepTime = t6.Created.Value.ToString("yyyy/MM/dd HH:mm:ss"),
                     CheckTypeStatus = t6.CheckType != CheckEnum.Normal ? "已考核" : "未考核",
                     DeleteResonEnum = t1.DeleteReson,
                     //ContractType = t2.ContractType,
-                    //OnBoardPosition = t5.Postition,
+                    OnBoardPosition = t5.Postition,
                     WorkShipStartTime = t5.WorkShipStartTime,
                 })
                 .ToPageListAsync(requestBody.PageIndex, requestBody.PageSize, total);
@@ -584,15 +582,32 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Contract
         {
             PageResult<YearCheckSearch> rt = new();
 
-            //var position = await _dbContext.Queryable<Position>().Where(t => t.IsDelete == 1).ToListAsync();
+            var position = await _dbContext.Queryable<Position>().Where(t => t.IsDelete == 1).ToListAsync();
             var ownShipTable = await _dbContext.Queryable<OwnerShip>().Where(t => rr.Select(x => x.OnBoard).Contains(t.BusinessId.ToString())).ToListAsync();
             var countryTable = await _dbContext.Queryable<CountryRegion>().Where(t => rr.Select(x => x.Country).Contains(t.BusinessId.ToString())).ToListAsync();
-            ////第一适任 第二适任
-            //var uIds = rr.Select(x => x.BId).ToList();
-            //var cerOfComps = await _dbContext.Queryable<CertificateOfCompetency>().Where(x => uIds.Contains(x.CertificateId.ToString()) && (x.Type == CertificatesEnum.FCertificate || x.Type == CertificatesEnum.SCertificate)).ToListAsync();
+            //第一适任 第二适任
+            var uIds = rr.Select(x => x.BId).ToList();
+            var cerOfComps = await _dbContext.Queryable<CertificateOfCompetency>().Where(x => uIds.Contains(x.CertificateId.ToString()) && (x.Type == CertificatesEnum.FCertificate || x.Type == CertificatesEnum.SCertificate)).ToListAsync();
+            //获取文件
+            var fileIds = rr.Select(x => x.Scans).ToList();
+            var files = await _dbContext.Queryable<Files>().Where(t => fileIds.Contains(t.FileId)).ToListAsync();
+            //获取文件
+            var url = AppsettingsHelper.GetValue("UpdateItem:Url");
 
             foreach (var u in rr)
             {
+                u.TrainingScans = files.Where(x => u.Scans == x.FileId)
+                    .Select(x => new FileInfosForDetails
+                    {
+                        Id = x.BusinessId.ToString(),
+                        FileSize = x.FileSize,
+                        FileType = x.FileType,
+                        Name = x.Name,
+                        OriginName = x.OriginName,
+                        SuffixName = x.SuffixName,
+                        //Url = url + x.Name?.Substring(0, x.Name.LastIndexOf(".")) + x.OriginName
+                        Url = url + x.Name
+                    }).ToList();
                 u.CheckTypeName = EnumUtil.GetDescription(u.CheckType);
                 u.OnStatus = EnumUtil.GetDescription(_baseService.ShipUserStatus(u.WorkShipStartTime, u.DeleteResonEnum));
                 //u.ContractTypeName = EnumUtil.GetDescription(u.ContractType);
@@ -600,21 +615,21 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Contract
                 u.CountryName = countryTable.FirstOrDefault(x => x.BusinessId.ToString() == u.Country)?.Name;
                 u.ShipTypeName = EnumUtil.GetDescription(u.ShipType);
                 u.Age = _baseService.CalculateAgeFromIdCard(u.CardId);
-                //if (cerOfComps != null)
-                //{
-                //    var cerofcF = cerOfComps.FirstOrDefault(x => x.Type == CertificatesEnum.FCertificate && x.CertificateId.ToString() == u.BId);
-                //    var cerofcS = cerOfComps.FirstOrDefault(x => x.Type == CertificatesEnum.FCertificate && x.CertificateId.ToString() == u.BId);
-                //    u.FPositionName = position.FirstOrDefault(x => x.BusinessId.ToString() == cerofcF?.FPosition)?.Name;
-                //    u.FPosition = cerofcF?.FPosition;
-                //    u.SPositionName = position.FirstOrDefault(x => x.BusinessId.ToString() == cerofcS?.SPosition)?.Name;
-                //    u.SPosition = cerofcS?.SPosition;
-                //}
-                //if (u.FPosition != null) u.FPositionName = position.FirstOrDefault(x => x.BusinessId.ToString() == u.FPosition)?.Name;
-                //if (u.SPosition != null) u.SPositionName = position.FirstOrDefault(x => x.BusinessId.ToString() == u.SPosition)?.Name;
-                //if (u.OnBoardPosition != null) u.OnBoardPositionName = position.FirstOrDefault(x => x.BusinessId.ToString() == u.OnBoardPosition)?.Name;
+                if (cerOfComps != null)
+                {
+                    var cerofcF = cerOfComps.FirstOrDefault(x => x.Type == CertificatesEnum.FCertificate && x.CertificateId.ToString() == u.BId);
+                    var cerofcS = cerOfComps.FirstOrDefault(x => x.Type == CertificatesEnum.SCertificate && x.CertificateId.ToString() == u.BId);
+                    u.FPositionName = position.FirstOrDefault(x => x.BusinessId.ToString() == cerofcF?.FPosition)?.Name;
+                    u.FPosition = cerofcF?.FPosition;
+                    u.SPositionName = position.FirstOrDefault(x => x.BusinessId.ToString() == cerofcS?.SPosition)?.Name;
+                    u.SPosition = cerofcS?.SPosition;
+                }
+                if (u.FPosition != null) u.FPositionName = position.FirstOrDefault(x => x.BusinessId.ToString() == u.FPosition)?.Name;
+                if (u.SPosition != null) u.SPositionName = position.FirstOrDefault(x => x.BusinessId.ToString() == u.SPosition)?.Name;
+                if (u.OnBoardPosition != null) u.OnBoardPositionName = position.FirstOrDefault(x => x.BusinessId.ToString() == u.OnBoardPosition)?.Name;
             }
 
-            rt.List = rr;
+            rt.List = rr.OrderByDescending(t => t.UserName).ThenByDescending(t => t.CheckYear);
             rt.TotalCount = total;
             return rt;
         }
@@ -669,6 +684,23 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Contract
                 return Result.Success("成功");
             }
         }
+
         #endregion
+
+        /// <summary>
+        /// 提醒证书/合同统计数
+        /// </summary>
+        /// <returns></returns>
+        public async Task<Result> RemindCountAsync()
+        {
+            RemindCountDto rt = new();
+            var contractList = await SearchContractAsync(new ContractRequest() { PageIndex = 1, PageSize = 1000000 });
+            var certificateList = await _certificateService.SearchCertificateAsync(new CertificateRequest() { PageIndex = 1, PageSize = 1000000 });
+
+            rt.ContractCount = contractList.TotalCount;
+            rt.CertificateCount = certificateList.TotalCount;
+
+            return Result.Success(rt);
+        }
     }
 }

@@ -111,6 +111,10 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                                .Where(skcall => skcall.Type == CertificatesEnum.HZ && t.BusinessId == skcall.CertificateId).Any())
                 .WhereIF(requestBody.HealthCertificate, (t, ws, ow, ue, sc, eb) => SqlFunc.Subqueryable<CertificateOfCompetency>()
                                .Where(skcall => skcall.Type == CertificatesEnum.JKZ && t.BusinessId == skcall.CertificateId).Any())
+                .WhereIF(requestBody.ShipTypes != null && requestBody.ShipTypes.Any(), (t, ws, ow, ue, sc, eb) => SqlFunc.Subqueryable<OwnerShip>()
+                               .Where(skcall => requestBody.ShipTypes.Contains(((int)t.ShipType).ToString())).Any())//船舶类型
+                .WhereIF(requestBody.CrewType != null && requestBody.CrewType.Any(), (t, ws, ow, ue, sc, eb) => SqlFunc.Subqueryable<CrewType>()
+                               .Where(skcall => requestBody.CrewType.Contains(t.CrewType)).Any())//船员类型
                 .Select((t, ws, ow, ue, sc, eb) => new SearchCrewArchivesResponse
                 {
                     BId = t.BusinessId,
@@ -127,12 +131,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                     IsDelete = t.IsDelete,
                     DeleteReson = t.DeleteReson
                 })
-                .MergeTable()
                 .Distinct()
-                .WhereIF(requestBody.ShipTypes != null && requestBody.ShipTypes.Any(), child => SqlFunc.Subqueryable<OwnerShip>()
-                               .Where(skcall => requestBody.ShipTypes.Contains(((int)child.ShipType).ToString())).Any())//船舶类型
-                .WhereIF(requestBody.CrewType != null && requestBody.CrewType.Any(), child => SqlFunc.Subqueryable<CrewType>()
-                               .Where(skcall => requestBody.CrewType.Contains(child.CrewType)).Any())//船员类型
                 .ToPageListAsync(requestBody.PageIndex, requestBody.PageSize, total);
 
             return await GetResult(requestBody, rt, total);
@@ -1513,17 +1512,6 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                 .FirstAsync(t => t.IsDelete == 1 && t.WorkShipId == requestBody.BId);
             if (shipWork != null)
             {
-                ////主表 删除状态清空
-                //var mainUser = await _dbContext.Queryable<User>().Where(t => t.BusinessId == requestBody.BId).FirstAsync();
-                //if (mainUser != null)
-                //{
-                //    mainUser.DeleteReson = CrewStatusEnum.No;
-                //    await _dbContext.Updateable(mainUser).UpdateColumns(x => x.DeleteReson).ExecuteCommandAsync();
-                //}
-                //if (requestBody.WorkShipStartTime < shipWork.WorkShipEndTime)//新的上船日期小于旧的下船日期
-                //{
-                //    return Result.Fail("上船日期不可小于前下船日期");
-                //}
                 shipWork.OnShip = requestBody.OnShip;
                 shipWork.Postition = requestBody.Postition;
                 shipWork.WorkShipEndTime = requestBody.WorkShipEndTime;
@@ -2150,9 +2138,6 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
             List<WorkShipsForDetails> wd = new();
             foreach (var item in workShips)
             {
-                DateTime date1 = new DateTime(item.WorkShipStartTime.Year, item.WorkShipStartTime.Month, item.WorkShipStartTime.Day);
-                DateTime date2 = new DateTime(item.WorkShipEndTime.Year, item.WorkShipEndTime.Month, item.WorkShipEndTime.Day);
-                var days = (date2 - date1).Days + 1;
                 wd.Add(new WorkShipsForDetails
                 {
                     WorkShipEndTime = item.WorkShipEndTime.ToString("yyyy-MM-dd"),
@@ -2163,7 +2148,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                     Postition = item.Postition,
                     PostitionName = positions.FirstOrDefault(x => x.BusinessId.ToString() == item.Postition)?.Name,
                     WorkShipStartTime = item.WorkShipStartTime.ToString("yyyy-MM-dd"),
-                    OnBoardDay = days,
+                    OnBoardDay = TimeHelper.GetTimeSpan(item.WorkShipStartTime, item.WorkShipEndTime).Days + 1,
                     ShipType = ownships.FirstOrDefault(x => x.BusinessId.ToString() == item.OnShip).ShipType,
                     ShipTypeName = EnumUtil.GetDescription(ownships.FirstOrDefault(x => x.BusinessId.ToString() == item.OnShip).ShipType),
                     Holiday = 0
@@ -2526,7 +2511,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                 {
                     Id = item.BusinessId.ToString(),
                     ContarctMain = item.ContractMain,
-                    EntryDate = item.StartTime.ToString("yyyy/MM/dd") + "~" + item.EndTime.ToString("yyyy/MM/dd"),
+                    EntryDate = item.StartTime?.ToString("yyyy-MM-dd") + "~" + item.EndTime?.ToString("yyyy-MM-dd"),
                     LaborCompany = item.LaborCompany,
                     ContractType = item.ContractType,
                     ContractTypeName = EnumUtil.GetDescription(item.ContractType),
@@ -2553,7 +2538,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                 .ToList();
             ur = new LaborServicesInfoDetails
             {
-                EntryTime = userEntryInfo.FirstOrDefault()?.EntryTime.ToString("yyyy/MM/dd"),
+                EntryTime = userEntryInfo.FirstOrDefault()?.EntryTime.ToString("yyyy-MM-dd"),
                 EntryMaterial = newFiles,
                 UserEntryInfosForDetails = uEntry
             };
@@ -2589,12 +2574,11 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
             #endregion
 
             #region 匹配链表字段
-            //所在船舶
+            //所在船舶  暂未确认是否获取调任船舶最新数据
             var onBoard = await _dbContext.Queryable<OwnerShip>().Where(t => t.BusinessId.ToString() == userInfo.OnBoard).FirstAsync();
             ur.OnBoardName = onBoard?.ShipName;
             ur.OnBoard = userInfo.OnBoard;
-            //适任职务
-
+            //适任职务  暂未确认是否获取调任船舶最新数据
             var position = await _dbContext.Queryable<Position>().FirstAsync(t => userInfo.PositionOnBoard == t.BusinessId.ToString());
             ur.PositionOnBoard = userInfo.PositionOnBoard;
             ur.PositionOnBoardName = position?.Name;
@@ -2603,7 +2587,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
             {
                 ur.StatusName = EnumUtil.GetDescription(userInfo.DeleteReson);//删除原因获取用户状态
             }
-            var userWorkShip = await _dbContext.Queryable<WorkShip>().Where(t => t.IsDelete == 1).OrderByDescending(t => t.Created).FirstAsync();
+            var userWorkShip = await _dbContext.Queryable<WorkShip>().Where(t => t.IsDelete == 1 && t.WorkShipId == userInfo.BusinessId).OrderByDescending(t => t.WorkShipEndTime).FirstAsync();
             if (userWorkShip != null)
             {
                 ////有休假时间  休假
@@ -2616,7 +2600,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                 ur.StatusName = userWorkShip.WorkShipEndTime > DateTime.Now ? EnumUtil.GetDescription(CrewStatusEnum.Normal) : EnumUtil.GetDescription(CrewStatusEnum.DaiGang);
 
                 //当前船舶任职时间
-                ur.CurrentShipEntryTime = string.IsNullOrWhiteSpace(userWorkShip.WorkShipStartTime.ToString()) || userWorkShip.WorkShipStartTime == DateTime.MinValue ? "" : userWorkShip.WorkShipStartTime.ToString("yyyy/MM/dd") + "~" + userWorkShip.WorkShipEndTime.ToString("yyyy/MM/dd");
+                ur.CurrentShipEntryTime = string.IsNullOrWhiteSpace(userWorkShip.WorkShipStartTime.ToString()) || userWorkShip.WorkShipStartTime == DateTime.MinValue ? "" : userWorkShip.WorkShipStartTime.ToString("yyyy-MM-dd") + "~" + userWorkShip.WorkShipEndTime.ToString("yyyy-MM-dd");
             }
             var userScans = await _dbContext.Queryable<Files>().Where(t => t.IsDelete == 1 && userInfo.BusinessId == t.UserId).ToListAsync();
             //照片

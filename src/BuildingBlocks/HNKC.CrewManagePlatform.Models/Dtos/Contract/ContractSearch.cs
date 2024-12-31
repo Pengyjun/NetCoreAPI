@@ -106,11 +106,11 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.Contract
         /// <summary>
         /// 开始时间
         /// </summary>
-        public string? StartTime { get; set; }
+        public DateTime? StartTime { get; set; }
         /// <summary>
         /// 结束时间
         /// </summary>
-        public string? EndTime { get; set; }
+        public DateTime? EndTime { get; set; }
         /// <summary>
         /// 状态
         /// </summary>
@@ -127,5 +127,20 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.Contract
         /// 到期天数
         /// </summary>
         public int DueDays { get; set; }
+    }
+    /// <summary>
+    /// 提醒统计数
+    /// </summary>
+    public class RemindCountDto
+    {
+        /// <summary>
+        /// 合同
+        /// </summary>
+        public long ContractCount { get; set; }
+        /// <summary>
+        /// 证书
+        /// </summary>
+        public long CertificateCount { get; set; }
+
     }
 }
