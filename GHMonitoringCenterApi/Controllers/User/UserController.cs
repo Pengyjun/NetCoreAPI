@@ -112,7 +112,7 @@ namespace GHMonitoringCenterApi.Controllers.User
                     CurrentUser.CurrentLoginIsAdmin = currentActivateUser.IsAdmin;
                     CurrentUser.CurrentLoginUserType = currentActivateUser.Type;
                     CurrentUser.CurrentLoginOperationType = currentActivateUser.OperationType;
-                    await baseService.UpdateProjectAsync();
+                    //await baseService.UpdateProjectAsync();
                     //更新缓存
                     var isSuccess = await redis.SetAsync(user.Account, CurrentUser);
                     if (isSuccess)
