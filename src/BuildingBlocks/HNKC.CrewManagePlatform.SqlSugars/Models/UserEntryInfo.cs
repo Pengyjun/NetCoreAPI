@@ -18,12 +18,12 @@ namespace HNKC.CrewManagePlatform.SqlSugars.Models
         /// 开始日期
         /// </summary>
         [SugarColumn(ColumnDataType = "datetime", ColumnDescription = "开始日期")]
-        public DateTime StartTime { get; set; }
+        public DateTime? StartTime { get; set; }
         /// <summary>
         /// 截止日期
         /// </summary>
         [SugarColumn(ColumnDataType = "datetime", ColumnDescription = "截止日期")]
-        public DateTime EndTime { get; set; }
+        public DateTime? EndTime { get; set; }
         /// <summary>
         /// 入职材料 
         /// </summary>

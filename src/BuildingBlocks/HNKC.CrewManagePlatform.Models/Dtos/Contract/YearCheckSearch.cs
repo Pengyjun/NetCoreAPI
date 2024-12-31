@@ -1,4 +1,5 @@
-﻿using HNKC.CrewManagePlatform.Models.Enums;
+﻿using HNKC.CrewManagePlatform.Models.Dtos.CrewArchives;
+using HNKC.CrewManagePlatform.Models.Enums;
 
 namespace HNKC.CrewManagePlatform.Models.Dtos.Contract
 {
@@ -111,6 +112,14 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.Contract
         /// 状态
         /// </summary>
         public string? OnStatus { get; set; }
+        /// <summary>
+        /// 回显文件
+        /// </summary>
+        public List<FileInfosForDetails>? TrainingScans { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
+        public Guid? Scans { get; set; }
         /// <summary>
         /// 下船日期
         /// </summary>
