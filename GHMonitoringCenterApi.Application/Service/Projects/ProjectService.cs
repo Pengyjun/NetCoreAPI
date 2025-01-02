@@ -733,7 +733,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
         /// <exception cref="NotImplementedException"></exception>
         public async Task<ResponseAjaxResult<ProjectDetailResponseDto>> SearchProjectDetailAsync(BasePrimaryRequestDto basePrimaryRequestDto)
         {
-            ResponseAjaxResult<ProjectDetailResponseDto> responseAjaxResult = new ResponseAjaxResult<ProjectDetailResponseDto>();
+            ResponseAjaxResult<ProjectDetailResponseDto> responseAjaxResult = new();
             var projectDeteilSingle = await dbContext.Queryable<Project>()
                  .Where((p) => p.Id == basePrimaryRequestDto.Id && p.IsDelete == 1)
                  .Select((p) => new ProjectDetailResponseDto
@@ -788,7 +788,10 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                      DurationInformation = p.DurationInformation,
                      ShutDownReason = p.ShutDownReason,
                      ContractChangeInfo = p.ContractChangeInfo,
-                     WorkDay = p.WorkDay
+                     WorkDay = p.WorkDay,
+                     ContractSignDate = p.ContractSignDate,
+                     ContractStipulationEndDate = p.ContractStipulationEndDate,
+                     ContractStipulationStartDate = p.ContractStipulationStartDate
                  }).SingleAsync();
             if (projectDeteilSingle == null)
             {
@@ -984,6 +987,16 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             projectDeteilSingle.projectDutyDtos = projectDutyDtoList;
             #endregion
 
+            #region 获取月报开累完成产值匹配实际合同额
+            //获取项目月报 (原币种计算  非全是人民币的情况)
+            var mpReport = await dbContext.Queryable<MonthReport>().Where(t => t.IsDelete == 1 && t.ProjectId == basePrimaryRequestDto.Id).ToListAsync();
+            if (mpReport != null && mpReport.Any())
+            {
+                projectDeteilSingle.CompleteOutputValue = mpReport.Sum(x => x.CurrencyCompleteProductionAmount);
+            }
+            else projectDeteilSingle.CompleteOutputValue = 0M;
+
+            #endregion
             responseAjaxResult.Data = projectDeteilSingle;
             responseAjaxResult.Success();
             return responseAjaxResult;
@@ -1291,11 +1304,12 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 await entityChangeService.RecordEntitysChangeAsync(EntityType.Project, projectObject.Id);
 
                 //新增项目加入重点项目表
-                await dbContext.Insertable<KeyProject>(new KeyProject() {
+                await dbContext.Insertable<KeyProject>(new KeyProject()
+                {
                     Id = GuidUtil.Next(),
                     Interval = 60,
                     ProjectId = projectObject.Id,
-                    IsDelete=1,
+                    IsDelete = 1,
                     ProjectName = projectObject.ShortName,
                     IsNew = true
                 }).ExecuteCommandAsync();
@@ -1610,12 +1624,13 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     //修改项目信息
                     await dbContext.Updateable(projectObject).EnableDiffLogEvent(logDto).ExecuteCommandAsync();
                 }
-                else {
+                else
+                {
                     //修改项目信息
                     await dbContext.Updateable(projectObject).IgnoreColumns(x => x.CommencementTime).EnableDiffLogEvent(logDto).ExecuteCommandAsync();
                 }
 
-             
+
                 //项目变更记录
                 await entityChangeService.RecordEntitysChangeAsync(EntityType.Project, projectObject.Id);
                 //更改后直接推送项目信息

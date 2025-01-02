@@ -310,6 +310,22 @@ namespace GHMonitoringCenterApi.Domain.Models
         /// 工期默认给1
         /// </summary>
         [SugarColumn(ColumnDataType = "int")]
-        public int WorkDay { get; set; } 
+        public int WorkDay { get; set; }
+
+        /// <summary>
+        /// 合同约定开工日期
+        /// </summary>
+        [SugarColumn(ColumnDataType = "datetime")]
+        public DateTime? ContractStipulationStartDate { get; set; }
+        /// <summary>
+        /// 合同约定完工日期
+        /// </summary>
+        [SugarColumn(ColumnDataType = "datetime")]
+        public DateTime? ContractStipulationEndDate { get; set; }
+        /// <summary>
+        /// 合同签约日期
+        /// </summary>
+        [SugarColumn(ColumnDataType = "datetime")]
+        public DateTime? ContractSignDate { get; set; }
     }
 }
