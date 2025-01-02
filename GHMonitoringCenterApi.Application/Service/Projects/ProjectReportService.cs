@@ -473,10 +473,10 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
 
 
                 #region 查询日报信息
-               var count=  await  _dbContext.Queryable<DayReport>().Where(x => x.IsDelete == 1 && x.ProjectId == model.ProjectId).CountAsync();
+                var count = await _dbContext.Queryable<DayReport>().Where(x => x.IsDelete == 1 && x.ProjectId == model.ProjectId).CountAsync();
                 #endregion
 
-                dayReport.DeviationWarning = count==0? $"{project.ShortName}项目首次上报产值": model.Construction.DeviationWarning;
+                dayReport.DeviationWarning = count == 0 ? $"{project.ShortName}项目首次上报产值" : model.Construction.DeviationWarning;
                 dayReport.IsLow = model.Construction.IsLow;
                 // 实际日产量/产值/外包支出
                 dayReport.DayActualProduction = model.Construction.DayReportConstructions.Sum(t => t.ActualDailyProduction);
@@ -561,7 +561,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             {
                 return result.FailResult(HttpStatusCode.DataNotEXIST, ResponseMessage.DATA_NOTEXIST_PROJECT);
             }
-           
+
             var dayReport = await GetDayReportAsync(model.ProjectId, dateDay);
             var resDayReport = new ProjectDayReportResponseDto();
             // 如日报对象不存在 返回默认空日报对象
@@ -5591,7 +5591,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             resMonthReport.Production = Math.Round(resMonthReport.Production, 2);
 
             #region 新增逻辑
-            if (resMonthReport!=null)
+            if (resMonthReport != null)
             {
 
                 //var prpjectMonthList = await _dbContext.Queryable<MonthReport>().Where(x => x.ProjectId== resMonthReport.ProjectId &&x.DateMonth== model.DateMonth).ToListAsync();
@@ -5602,7 +5602,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 #region 新增逻辑船舶月报列表本月完成产值修正
                 if (result != null)
                 {
-                    var monthReporList = await _dbContext.Queryable<MonthReportDetail>().Where(x =>x.IsDelete==1&&resMonthReport.ProjectId==x.ProjectId && x.DateMonth == model.DateMonth&&x.ShipId== resMonthReport.ShipId).ToListAsync();
+                    var monthReporList = await _dbContext.Queryable<MonthReportDetail>().Where(x => x.IsDelete == 1 && resMonthReport.ProjectId == x.ProjectId && x.DateMonth == model.DateMonth && x.ShipId == resMonthReport.ShipId).ToListAsync();
                     resMonthReport.ProductionAmount = Math.Round(monthReporList.Where(x => x.ProjectId == resMonthReport.ProjectId && x.ShipId == resMonthReport.ShipId).Sum(x => x.CompleteProductionAmount), 2);
                     resMonthReport.Production = Math.Round(monthReporList.Where(x => x.ProjectId == resMonthReport.ProjectId && x.ShipId == resMonthReport.ShipId).Sum(x => x.CompletedQuantity), 2);
 
@@ -6896,7 +6896,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
         /// <returns></returns>
         private async Task<Project?> GetProjectPartAsync(Guid projectId)
         {
-            return await _dbProject.AsQueryable().Where(t => t.Id == projectId && t.IsDelete == 1).Select(t => new Project() { Id = t.Id, PomId = t.PomId, Name = t.Name, Category = t.Category, CurrencyId = t.CurrencyId, TypeId = t.TypeId,StatusId=t.StatusId }).FirstAsync();
+            return await _dbProject.AsQueryable().Where(t => t.Id == projectId && t.IsDelete == 1).Select(t => new Project() { Id = t.Id, PomId = t.PomId, Name = t.Name, Category = t.Category, CurrencyId = t.CurrencyId, TypeId = t.TypeId, StatusId = t.StatusId }).FirstAsync();
         }
 
         /// <summary>
@@ -7601,7 +7601,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 var ownOutPutValue = mRepList.Where(x => x.ProjectId == item.Id && x.DateMonth == nowMonth && x.OutPutType == ConstructionOutPutType.Self).Sum(x => x.UnitPrice * x.CompletedQuantity * hv);
 
                 //当月分包支出
-                var subExpenditure = mRepList.Where(x => x.ProjectId == item.Id && x.DateMonth == nowMonth).Sum(x => x.OutsourcingExpensesAmount);
+                var subExpenditure = mRepList.Where(x => x.ProjectId == item.Id && x.DateMonth == nowMonth).Sum(x => x.OutsourcingExpensesAmount * hv);
 
                 //当月产值合计
                 var sumOutPutValue = mRepList.Where(x => x.ProjectId == item.Id && x.DateMonth == nowMonth).Sum(x => x.UnitPrice * x.CompletedQuantity * hv);
@@ -7623,7 +7623,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 var yearOwnOutPutValue = mRepList.Where(x => x.ProjectId == item.Id && x.DateMonth >= startMonth && x.DateMonth <= endMonth && x.OutPutType == ConstructionOutPutType.Self).Sum(x => x.UnitPrice * x.CompletedQuantity * hv);
 
                 //当年分包支出
-                var yearSubExpenditure = mRepList.Where(x => x.ProjectId == item.Id && x.DateMonth >= startMonth && x.DateMonth <= endMonth).Sum(x => x.OutsourcingExpensesAmount);
+                var yearSubExpenditure = mRepList.Where(x => x.ProjectId == item.Id && x.DateMonth >= startMonth && x.DateMonth <= endMonth).Sum(x => x.OutsourcingExpensesAmount * hv);
 
                 //当年产值合计
                 var yearSumOutPutValue = mRepList.Where(x => x.ProjectId == item.Id && x.DateMonth >= startMonth && x.DateMonth <= endMonth).Sum(x => x.UnitPrice * x.CompletedQuantity * hv);

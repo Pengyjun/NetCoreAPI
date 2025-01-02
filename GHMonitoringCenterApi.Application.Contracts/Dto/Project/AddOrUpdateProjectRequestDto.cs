@@ -230,6 +230,18 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project
         /// 工期默认给1
         /// </summary>
         public int WorkDay { get; set; }
+        /// <summary>
+        /// 合同约定开工日期
+        /// </summary>
+        public DateTime? ContractStipulationStartDate { get; set; }
+        /// <summary>
+        /// 合同约定完工日期
+        /// </summary>
+        public DateTime? ContractStipulationEndDate { get; set; }
+        /// <summary>
+        /// 合同签约日期
+        /// </summary>
+        public DateTime? ContractSignDate { get; set; }
 
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
