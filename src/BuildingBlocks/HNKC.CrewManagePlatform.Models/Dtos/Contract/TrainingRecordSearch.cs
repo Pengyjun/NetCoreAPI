@@ -22,7 +22,7 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.Contract
         /// <summary>
         /// 培训时间
         /// </summary>
-        public DateTime? TrainingTime { get; set; }
+        public string? TrainingTime { get; set; }
         /// <summary>
         /// 培训主题
         /// </summary>

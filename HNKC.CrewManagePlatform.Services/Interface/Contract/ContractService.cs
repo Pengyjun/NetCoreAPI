@@ -362,11 +362,11 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Contract
             if (roleType == -1) { return new PageResult<TrainingRecordSearch>(); }
             var rr = await _dbContext.Queryable<User>()
                           .LeftJoin<TrainingRecord>((x, y) => y.FillRepUserId == x.BusinessId)
-                          .Where((x, y) => y.IsDelete == 1 && string.IsNullOrEmpty(y.PId.ToString()))
+                          .Where((x, y) => y.IsDelete == 1 && string.IsNullOrWhiteSpace(y.PId.ToString()))
                           .WhereIF(!string.IsNullOrWhiteSpace(requestBody.FillRepUserName), (x, y) => y.FillRepUserName.Contains(requestBody.FillRepUserName))
+                          .WhereIF(!string.IsNullOrWhiteSpace(requestBody.StartTime.ToString()) && !string.IsNullOrWhiteSpace(requestBody.EndTime.ToString()), (x, y) => y.Created >= Convert.ToDateTime(requestBody.StartTime) && y.Created < Convert.ToDateTime(requestBody.EndTime.Value.AddDays(1)))
                           .LeftJoin<TrainingType>((x, y, z) => y.TrainingType == z.BusinessId.ToString())
-                          .WhereIF(!string.IsNullOrEmpty(requestBody.TraningType), (x, y, z) => requestBody.TraningType == y.TrainingType)
-                          .WhereIF(!string.IsNullOrEmpty(requestBody.StartTime) && !string.IsNullOrEmpty(requestBody.EndTime), (x, y, z) => y.Created >= Convert.ToDateTime(requestBody.StartTime) && y.Created <= Convert.ToDateTime(requestBody.EndTime))
+                          .WhereIF(!string.IsNullOrWhiteSpace(requestBody.TraningType), (x, y, z) => requestBody.TraningType == y.TrainingType)
                           .WhereIF(roleType == 3, (x, y, z) => y.FillRepUserId == GlobalCurrentUser.UserBusinessId)//船长
                           .Select((x, y, z) => new TrainingRecordSearch
                           {
@@ -375,7 +375,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Contract
                               TrainingTypeName = z.Name,
                               FillReportTime = y.Created.Value.ToString("yyyy/MM/dd"),
                               TrainingAddress = y.TrainingAddress,
-                              TrainingTime = y.TrainingTime,
+                              TrainingTime = y.TrainingTime.Value.ToString("yyyy/MM/dd"),
                               TrainingType = y.TrainingType,
                               TrainingTitle = y.TrainingTitle,
                               Scans = y.TrainingScan,
