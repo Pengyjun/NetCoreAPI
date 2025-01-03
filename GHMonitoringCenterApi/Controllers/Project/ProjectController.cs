@@ -2247,8 +2247,8 @@ namespace GHMonitoringCenterApi.Controllers.Project
             #endregion
             var complete = excelComplete.ToList();
             var plan = excelPlan.ToList();
-            _db.Insertable(complete).ExecuteCommand();
-            _db.Insertable(plan).ExecuteCommand();
+            //_db.Insertable(complete).ExecuteCommand();
+            //_db.Insertable(plan).ExecuteCommand();
 
 
             //var resList = JsonConvert.DeserializeObject<List<bb>>(jsonObject);
