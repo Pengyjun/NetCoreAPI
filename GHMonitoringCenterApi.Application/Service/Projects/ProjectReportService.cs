@@ -6240,6 +6240,13 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 ownShipMonth = new SumOwnShipMonth(),
                 searchOwnShipMonthReps = new List<SearchOwnShipMonthRep>(),
             };
+            #region 导出excel
+            if (import == 2)
+            {
+                requestDto.PageSize = int.MaxValue;
+            }
+            #endregion
+
             #region 时间信息
 
             //开始日期结束日期都是空  默认按当天日期匹配
