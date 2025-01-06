@@ -107,6 +107,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Certificate
             PageResult<CertificateSearch> rt = new();
             List<CertificateSearch> rList = new();
 
+            var remindSet = await _dbContext.Queryable<RemindSetting>().Where(t => t.RemindType == 22 && t.IsDelete == 1 && t.Enable == 1).ToListAsync();
             var position = await _dbContext.Queryable<Position>().Where(t => t.IsDelete == 1).ToListAsync();
             var ownShipTable = await _dbContext.Queryable<OwnerShip>().Where(t => rr.Select(x => x.OnBoard).Contains(t.BusinessId.ToString())).ToListAsync();
             var countryTable = await _dbContext.Queryable<CountryRegion>().Where(t => rr.Select(x => x.Country).Contains(t.BusinessId.ToString())).ToListAsync();
@@ -124,6 +125,8 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Certificate
                             if (rs?.FEffectiveTime.HasValue == false) continue;
                             u.EffectiveTime = rs?.FEffectiveTime?.ToString("yyyy/MM/dd");
                             u.DueDays = TimeHelper.GetTimeSpan(Convert.ToDateTime(rs?.FEffectiveTime), DateTime.Now).Days + 1;
+                            //var existData = remindSet.FirstOrDefault(x => x.Types == rs.Type && SqlFunc.DateDiff(DateType.Day, DateTime.Now, Convert.ToDateTime(rs?.FEffectiveTime)) + 1 <= x.Days);
+                            //if (existData == null) continue;
                             break;
                         case CertificatesEnum.SCertificate:
                             u.CertificateType = CertificatesEnum.SCertificate;
@@ -131,6 +134,8 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Certificate
                             if (rs?.SEffectiveTime.HasValue == false) continue;
                             u.EffectiveTime = rs?.SEffectiveTime?.ToString("yyyy/MM/dd");
                             u.DueDays = TimeHelper.GetTimeSpan(Convert.ToDateTime(rs?.SEffectiveTime), DateTime.Now).Days + 1;
+                            //var existData2 = remindSet.FirstOrDefault(x => x.Types == rs.Type && SqlFunc.DateDiff(DateType.Day, DateTime.Now, Convert.ToDateTime(rs?.SEffectiveTime)) + 1 <= x.Days);
+                            //if (existData2 == null) continue;
                             break;
                         case CertificatesEnum.PXHGZ:
                             u.CertificateType = CertificatesEnum.PXHGZ;
@@ -138,6 +143,8 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Certificate
                             if (rs?.TrainingSignTime.HasValue == false) continue;
                             u.EffectiveTime = rs?.TrainingSignTime?.ToString("yyyy/MM/dd");
                             u.DueDays = TimeHelper.GetTimeSpan(Convert.ToDateTime(rs?.TrainingSignTime), DateTime.Now).Days + 1;
+                            //var existData3 = remindSet.FirstOrDefault(x => x.Types == rs.Type && SqlFunc.DateDiff(DateType.Day, DateTime.Now, Convert.ToDateTime(rs?.TrainingSignTime)) + 1 <= x.Days);
+                            //if (existData3 == null) continue;
                             break;
                         case CertificatesEnum.JKZ:
                             u.CertificateType = CertificatesEnum.JKZ;
@@ -145,6 +152,8 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Certificate
                             if (rs?.HealthEffectiveTime.HasValue == false) continue;
                             u.EffectiveTime = rs?.HealthEffectiveTime?.ToString("yyyy/MM/dd");
                             u.DueDays = TimeHelper.GetTimeSpan(Convert.ToDateTime(rs?.HealthEffectiveTime), DateTime.Now).Days + 1;
+                            //var existData4 = remindSet.FirstOrDefault(x => x.Types == rs.Type && SqlFunc.DateDiff(DateType.Day, DateTime.Now, Convert.ToDateTime(rs?.HealthEffectiveTime)) + 1 <= x.Days);
+                            //if (existData4 == null) continue;
                             break;
                         case CertificatesEnum.HYZ:
                             u.CertificateType = CertificatesEnum.HYZ;
@@ -152,6 +161,8 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Certificate
                             if (rs?.SeamanEffectiveTime.HasValue == false) continue;
                             u.EffectiveTime = rs?.SeamanEffectiveTime?.ToString("yyyy/MM/dd");
                             u.DueDays = TimeHelper.GetTimeSpan(Convert.ToDateTime(rs?.SeamanEffectiveTime), DateTime.Now).Days + 1;
+                            //var existData5 = remindSet.FirstOrDefault(x => x.Types == rs.Type && SqlFunc.DateDiff(DateType.Day, DateTime.Now, Convert.ToDateTime(rs?.SeamanEffectiveTime)) + 1 <= x.Days);
+                            //if (existData5 == null) continue;
                             break;
                         case CertificatesEnum.HZ:
                             u.CertificateType = CertificatesEnum.HZ;
@@ -159,6 +170,8 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Certificate
                             if (rs?.PassportEffectiveTime.HasValue == false) continue;
                             u.EffectiveTime = rs?.PassportEffectiveTime?.ToString("yyyy/MM/dd");
                             u.DueDays = TimeHelper.GetTimeSpan(Convert.ToDateTime(rs?.PassportEffectiveTime), DateTime.Now).Days + 1;
+                            //var existData6 = remindSet.FirstOrDefault(x => x.Types == rs.Type && SqlFunc.DateDiff(DateType.Day, DateTime.Now, Convert.ToDateTime(rs?.PassportEffectiveTime)) + 1 <= x.Days);
+                            //if (existData6 == null) continue;
                             break;
                     }
                     u.OnStatus = EnumUtil.GetDescription(_baseService.ShipUserStatus(u.WorkShipStartTime, u.DeleteResonEnum));
@@ -173,7 +186,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Certificate
                 }
             }
 
-            rt.List = rList.Skip((pageIndex - 1) * pageSize).Take(pageSize).OrderBy(x => x.DueDays);
+            rt.List = rList.Skip((pageIndex - 1) * pageSize).Take(pageSize).OrderBy(x => x.UserName).ThenBy(x => x.DueDays);
             rt.TotalCount = rList.Count();
             return rt;
         }

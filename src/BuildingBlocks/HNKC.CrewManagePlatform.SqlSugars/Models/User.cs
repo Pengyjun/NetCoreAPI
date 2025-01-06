@@ -137,9 +137,14 @@ namespace HNKC.CrewManagePlatform.SqlSugars.Models
         [SugarColumn(Length = 512)]
         public string? Remark { get; set; }
         /// <summary>
-        /// 用户还是船员  0用户 1船员
+        /// 用户还是船员  0用户 1船员 2船
         /// </summary>
-        [SugarColumn(ColumnDataType = "int", ColumnDescription = "用户还是船员  0用户 1船员", DefaultValue = "0")]
+        [SugarColumn(ColumnDataType = "int", ColumnDescription = "用户还是船员  0用户 1船员 2船", DefaultValue = "0")]
         public int IsLoginUser { get; set; }
+        /// <summary>
+        /// 登录账号
+        /// </summary>
+        [SugarColumn(Length = 256, ColumnDescription = "登录账号")]
+        public string? LoginAccount { get; set; }
     }
 }
