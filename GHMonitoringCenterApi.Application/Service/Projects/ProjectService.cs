@@ -3479,111 +3479,157 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
         public async Task<ResponseAjaxResult<List<HistoryProjectMonthReportResponseDto>>> SearchHistoryProjectMonthRepAsync(HistoryProjectMonthReportRequestDto requestBody)
         {
             ResponseAjaxResult<List<HistoryProjectMonthReportResponseDto>> rt = new();
-            List<HistoryProjectMonthReportResponseDto> rr = new();
+            RefAsync<int> total = 0;
 
             //complete
             var completeData = await dbContext.Queryable<ExcelProductionConvertTable>()
-                .ToListAsync();
-            var pIds = completeData.Select(x => new { x.ProjectId, x.Name }).Distinct().ToList();
-            //plan
-            var planData = await dbContext.Queryable<ExcelPlanConvertTable>()
-                .Where(x => pIds.Select(x => x.ProjectId).Contains(x.ProjectId)).ToListAsync();
-
-            foreach (var item in pIds)
-            {
-                var month = new List<int> { 2019, 2020, 2021, 2022, 2023 };
-                foreach (var mh in month)
+                .WhereIF(!string.IsNullOrWhiteSpace(requestBody.KeyWords), x => x.Name.Contains(requestBody.KeyWords))
+                .WhereIF(requestBody.DateYear != 0, x => x.Year == requestBody.DateYear)
+                .Select(x => new HistoryProjectMonthReportResponseDto
                 {
-                    for (int i = 1; i < 13; i++)
-                    {
-                        decimal? compleValue = 0M;
-                        decimal? planValue = 0M;
-                        var md = Convert.ToInt32(mh + (i < 10 ? "0" + i : i.ToString()));
-                        ConvertHelper.TryParseFromDateMonth(md, out DateTime monthTime);
-                        //完成
-                        var crs = completeData.FirstOrDefault(x => x.DateMonth == md && x.ProjectId == item.ProjectId);
-                        //计划
-                        var prs = planData.FirstOrDefault(x => x.DateMonth == md && x.ProjectId == item.ProjectId);
-                        switch (i)
-                        {
-                            case 1:
-                                compleValue = crs?.OneCompleteValue;
-                                planValue = prs?.OnePlanProductionValue;
-                                break;
-                            case 2:
-                                compleValue = crs?.TwoCompleteValue;
-                                planValue = prs?.TwoPlanProductionValue;
-                                break;
-                            case 3:
-                                compleValue = crs?.ThreeCompleteValue;
-                                planValue = prs?.ThreePlanProductionValue;
-                                break;
-                            case 4:
-                                compleValue = crs?.FourCompleteValue;
-                                planValue = prs?.FourPlanProductionValue;
-                                break;
-                            case 5:
-                                compleValue = crs?.FiveCompleteValue;
-                                planValue = prs?.FivePlanProductionValue;
-                                break;
-                            case 6:
-                                compleValue = crs?.SixCompleteValue;
-                                planValue = prs?.SixPlanProductionValue;
-                                break;
-                            case 7:
-                                compleValue = crs?.SevenCompleteValue;
-                                planValue = prs?.SevenPlanProductionValue;
-                                break;
-                            case 8:
-                                compleValue = crs?.EightCompleteValue;
-                                planValue = prs?.EightPlanProductionValue;
-                                break;
-                            case 9:
-                                compleValue = crs?.NineCompleteValue;
-                                planValue = prs?.NinePlanProductionValue;
-                                break;
-                            case 10:
-                                compleValue = crs?.TenCompleteValue;
-                                planValue = prs?.TenPlanProductionValue;
-                                break;
-                            case 11:
-                                compleValue = crs?.ElevenCompleteValue;
-                                planValue = prs?.ElevenPlanProductionValue;
-                                break;
-                            case 12:
-                                compleValue = crs?.TwelveCompleteValue;
-                                planValue = prs?.TwelvePlanProductionValue;
-                                break;
-                        }
+                    ProjectId = x.ProjectId,
+                    ProjectName = x.Name,
+                    Year = x.Year
+                })
+                .OrderBy(x => x.ProjectName)
+                .Distinct()
+                .ToPageListAsync(requestBody.PageIndex, requestBody.PageSize, total);
 
-                        rr.Add(new HistoryProjectMonthReportResponseDto
-                        {
-                            Year = mh,
-                            ProjectId = item.ProjectId,
-                            CompleteValue = compleValue,
-                            PlanValue = planValue,
-                            DateMonth = Convert.ToDateTime(monthTime.ToString("yyyy/MM/dd")),
-                            CompleteId = crs?.Id,
-                            PlanId = prs?.Id,
-                            ProjectName = item.Name
-                        });
+            var pIds = completeData.Select(x => x.ProjectId).ToList();
+            var data = await dbContext.Queryable<ExcelProductionConvertTable>()
+                .Where(x => pIds.Contains(x.ProjectId))
+                .ToListAsync();
+            data = data.OrderBy(x => x.Year).ThenBy(x => x.DateMonth).ToList();
+            foreach (var item in completeData)
+            {
+                decimal? totalVal = 0M;
+                decimal? one = 0M;
+                decimal? two = 0M;
+                decimal? three = 0M;
+                decimal? four = 0M;
+                decimal? five = 0M;
+                decimal? six = 0M;
+                decimal? seven = 0M;
+                decimal? eight = 0M;
+                decimal? nine = 0M;
+                decimal? ten = 0M;
+                decimal? ele = 0M;
+                decimal? twe = 0M;
+                for (int i = 1; i <= 12; i++)
+                {
+                    var md = int.Parse(item.Year + (i < 10 ? "0" + i : i.ToString()));
+                    item.CompleteId = data.FirstOrDefault(x => x.DateMonth == md && x.ProjectId == item.ProjectId).Id;
+                    switch (i)
+                    {
+                        case 1:
+                            one = data.FirstOrDefault(x => x.DateMonth == md && x.ProjectId == item.ProjectId)?.OneCompleteValue;
+                            item.OneCompleteValue = one;
+                            totalVal += one;
+                            break;
+                        case 2:
+                            two = data.FirstOrDefault(x => x.DateMonth == md && x.ProjectId == item.ProjectId)?.TwoCompleteValue;
+                            item.TwoCompleteValue = two;
+                            totalVal += two;
+                            break;
+                        case 3:
+                            three = data.FirstOrDefault(x => x.DateMonth == md && x.ProjectId == item.ProjectId)?.ThreeCompleteValue;
+                            item.ThreeCompleteValue = three;
+                            totalVal += three;
+                            break;
+                        case 4:
+                            four = data.FirstOrDefault(x => x.DateMonth == md && x.ProjectId == item.ProjectId)?.FourCompleteValue;
+                            item.FourCompleteValue = four;
+                            totalVal += four;
+                            break;
+                        case 5:
+                            five = data.FirstOrDefault(x => x.DateMonth == md && x.ProjectId == item.ProjectId)?.FiveCompleteValue;
+                            item.FiveCompleteValue = five;
+                            totalVal += five;
+                            break;
+                        case 6:
+                            six = data.FirstOrDefault(x => x.DateMonth == md && x.ProjectId == item.ProjectId)?.SixCompleteValue;
+                            item.SixCompleteValue = six;
+                            totalVal += six;
+                            break;
+                        case 7:
+                            seven = data.FirstOrDefault(x => x.DateMonth == md && x.ProjectId == item.ProjectId)?.SevenCompleteValue;
+                            item.SevenCompleteValue = seven;
+                            totalVal += seven;
+                            break;
+                        case 8:
+                            eight = data.FirstOrDefault(x => x.DateMonth == md && x.ProjectId == item.ProjectId)?.EightCompleteValue;
+                            item.EightCompleteValue = eight;
+                            totalVal += eight;
+                            break;
+                        case 9:
+                            nine = data.FirstOrDefault(x => x.DateMonth == md && x.ProjectId == item.ProjectId)?.NineCompleteValue;
+                            item.NineCompleteValue = nine;
+                            totalVal += nine;
+                            break;
+                        case 10:
+                            ten = data.FirstOrDefault(x => x.DateMonth == md && x.ProjectId == item.ProjectId)?.TenCompleteValue;
+                            item.TenCompleteValue = ten;
+                            totalVal += ten;
+                            break;
+                        case 11:
+                            ele = data.FirstOrDefault(x => x.DateMonth == md && x.ProjectId == item.ProjectId)?.ElevenCompleteValue;
+                            item.ElevenCompleteValue = ele;
+                            totalVal += ele;
+                            break;
+                        case 12:
+                            twe = data.FirstOrDefault(x => x.DateMonth == md && x.ProjectId == item.ProjectId)?.TwelveCompleteValue;
+                            item.TwelveCompleteValue = twe;
+                            totalVal += twe;
+                            break;
                     }
+                    item.TotalCompleteValue = totalVal;
                 }
             }
-
-            var result = rr
-                .WhereIF(!string.IsNullOrWhiteSpace(requestBody.KeyWords), x => x.ProjectName.Contains(requestBody.KeyWords))
-                .WhereIF(!string.IsNullOrWhiteSpace(requestBody.DateMonth.ToString()), x => x.DateMonth == requestBody.DateMonth)
-                .ToList();
-            result.ForEach(x => x.TotalCompleteValue = result.Sum(x => x.CompleteValue));
-
-            var finallyrt = result.OrderBy(x => x.ProjectName)
-                .ThenByDescending(x => x.DateMonth)
-                .Skip(requestBody.PageSize * (requestBody.PageIndex - 1)).Take(requestBody.PageSize)
-                .ToList();
-
-            rt.Count = result.Count;
-            rt.SuccessResult(finallyrt);
+            rt.Count = total;
+            rt.SuccessResult(completeData);
+            return rt;
+        }
+        /// <summary>
+        /// 保存历史产值月报
+        /// </summary>
+        /// <param name="requestBody"></param>
+        /// <returns></returns>
+        public async Task<ResponseAjaxResult<bool>> SaveHistoryProjectMonthReportAsync(HistoryProjectMonthReportRequestParam requestBody)
+        {
+            ResponseAjaxResult<bool> rt = new();
+            var rr = await dbContext.Queryable<ExcelProductionConvertTable>().FirstAsync(x => x.Id == requestBody.CompleteId);
+            if (rr != null)
+            {
+                rr.OneCompleteValue = requestBody.OneCompleteValue;
+                rr.TwoCompleteValue = requestBody.TwoCompleteValue;
+                rr.ThreeCompleteValue = requestBody.ThreeCompleteValue;
+                rr.FourCompleteValue = requestBody.FourCompleteValue;
+                rr.FiveCompleteValue = requestBody.FiveCompleteValue;
+                rr.SixCompleteValue = requestBody.SixCompleteValue;
+                rr.SevenCompleteValue = requestBody.SevenCompleteValue;
+                rr.EightCompleteValue = requestBody.EightCompleteValue;
+                rr.NineCompleteValue = requestBody.NineCompleteValue;
+                rr.TenCompleteValue = requestBody.TenCompleteValue;
+                rr.ElevenCompleteValue = requestBody.ElevenCompleteValue;
+                rr.TwelveCompleteValue = requestBody.TwelveCompleteValue;
+                await dbContext.Updateable(rr).WhereColumns(x => x.Id).UpdateColumns(x => new
+                {
+                    x.OneCompleteValue,
+                    x.TwoCompleteValue,
+                    x.ThreeCompleteValue,
+                    x.FourCompleteValue,
+                    x.FiveCompleteValue,
+                    x.SixCompleteValue,
+                    x.SevenCompleteValue,
+                    x.EightCompleteValue,
+                    x.NineCompleteValue,
+                    x.TenCompleteValue,
+                    x.ElevenCompleteValue,
+                    x.TwelveCompleteValue,
+                }).ExecuteCommandAsync();
+                rt.SuccessResult(true);
+            }
+            else rt.FailResult(HttpStatusCode.UpdateFail, "无数据");
             return rt;
         }
     }

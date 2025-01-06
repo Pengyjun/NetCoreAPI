@@ -238,6 +238,12 @@ namespace GHMonitoringCenterApi.Application.Contracts.IService.Project
         /// <param name="requestBody"></param>
         /// <returns></returns>
         Task<ResponseAjaxResult<List<HistoryProjectMonthReportResponseDto>>> SearchHistoryProjectMonthRepAsync(HistoryProjectMonthReportRequestDto requestBody);
+        /// <summary>
+        /// 保存历史产值月报
+        /// </summary>
+        /// <param name="requestBody"></param>
+        /// <returns></returns>
+        Task<ResponseAjaxResult<bool>> SaveHistoryProjectMonthReportAsync(HistoryProjectMonthReportRequestParam requestBody);
         bool aa();
     }
 }
