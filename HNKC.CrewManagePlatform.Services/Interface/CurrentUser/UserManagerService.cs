@@ -5,24 +5,13 @@ using HNKC.CrewManagePlatform.Models.Dtos;
 using HNKC.CrewManagePlatform.Models.Dtos.Role;
 using HNKC.CrewManagePlatform.Models.Dtos.UserManager;
 using HNKC.CrewManagePlatform.Models.Enums;
-using HNKC.CrewManagePlatform.Services.Interface.CurrentUserService;
-using HNKC.CrewManagePlatform.SqlSugars.Extensions;
 using HNKC.CrewManagePlatform.SqlSugars.Models;
 using HNKC.CrewManagePlatform.Utils;
 using HNKC.CrewManagePlatform.Web.Jwt;
-using NetTaste;
 using SqlSugar;
-using System;
-using System.Collections.Generic;
 using System.Data;
-using System.IO;
-using System.Linq;
 using System.Security.Claims;
-using System.Text;
-using System.Threading.Tasks;
 using UtilsSharp;
-using UtilsSharp.Shared.Standard;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace HNKC.CrewManagePlatform.Services.Interface.CurrentUser
 {
@@ -51,8 +40,11 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CurrentUser
             var secretKey = AppsettingsHelper.GetValue("MD5SecretKey");
             var pwd = $"{secretKey}{userLoginRequest.Password}".ToMd5();
             //用户信息
-            var userInfo = await dbContext.Queryable<User>().Where(x => x.IsDelete == 1 && x.Phone == userLoginRequest.Phone
-            && x.Password == pwd && x.IsLoginUser == 0).FirstAsync();
+            var userInfo = await dbContext.Queryable<User>().Where(x => x.IsDelete == 1 && x.Password == pwd &&
+            ((x.Phone == userLoginRequest.Phone && x.IsLoginUser == 0) ||
+            (x.LoginAccount == userLoginRequest.Phone && x.IsLoginUser == 2))
+            )
+            .FirstAsync();
             if (userInfo != null)
             {
                 var instutionBusinessId = await dbContext.Queryable<Institution>().Where(x => x.IsDelete == 1 && x.Oid == userInfo.Oid
@@ -135,11 +127,11 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CurrentUser
                         new Claim("Id",userInfo.Id.ToString()),
                         new Claim("IsAdmin",firstRoleLogin.IsAdmin.ToString()),
                         new Claim("BId",userInfo.BusinessId.ToString()),
-                        new Claim("WorkNumber",userInfo.WorkNumber?.ToString()),
+                        new Claim("WorkNumber", userInfo.WorkNumber?.ToString() ?? string.Empty),
                         new Claim("Name",userInfo.Name?.ToString()),
                         new Claim("Oid",userInfo.Oid?.ToString()),
                         new Claim("BInstitutionId",firstRoleLogin.InstitutionBusinessId.ToString()),
-                        new Claim("Phone",userInfo.Phone?.ToString()),
+                        new Claim("Phone",userInfo.Phone?.ToString()?? string.Empty),
                         new Claim("RoleBusinessId",firstRoleLogin.RoleBusinessId.ToString()),
                         new Claim("RoleType",firstRoleLogin.Type.ToString()),
                     };
@@ -199,7 +191,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CurrentUser
                             IsApprove = roleInfo?.IsApprove,
                             Name = roleInfo?.Name,
                             Oid = institutionInfo?.Oid,
-                            Type= roleInfo?.Type,
+                            Type = roleInfo?.Type,
                         };
                         userLoginResponse.RoleList.Add(role);
                     }
@@ -280,7 +272,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CurrentUser
                  .LeftJoin<InstitutionRole>((a, b) => a.BusinessId == b.UserBusinessId)
                  .LeftJoin<HNKC.CrewManagePlatform.SqlSugars.Models.Role>((a, b, c) => b.RoleBusinessId == c.BusinessId)
                  .LeftJoin<HNKC.CrewManagePlatform.SqlSugars.Models.Institution>((a, b, c, d) => a.Oid == d.Oid)
-                 .Where(a => a.IsDelete == 1)
+                 .Where(a => a.IsDelete == 1 && a.IsLoginUser != 2)
                  .WhereIF(!string.IsNullOrWhiteSpace(pageRequest.KeyWords), a => a.Name.Contains(pageRequest.KeyWords)
                  || a.Phone.Contains(pageRequest.KeyWords))
                  .Select((a, b, c, d) => new UserResponse()
@@ -292,7 +284,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CurrentUser
                      Created = a.Created,
                      RoleName = c.Name,
                      Oid = a.Oid,
-                     Gender=a.Gender,
+                     Gender = a.Gender,
                      WorkNumber = a.WorkNumber,
                      DepartmentName = d.ShortName
                  })
