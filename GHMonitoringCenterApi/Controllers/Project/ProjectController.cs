@@ -798,30 +798,292 @@ namespace GHMonitoringCenterApi.Controllers.Project
             string filePath5 = @"C:\Users\pyej0\Desktop\2022年12月份产值完成情况与计划对比分析表（公布）改后(1).xlsx";
 
             //数据写入中间表 
-            List<ExcelConvertTable> excelVal = new();
+            List<ExcelProductionConvertTable> excelComplete = new();
+            List<ExcelPlanConvertTable> excelPlan = new();
             #region 2019年度在建项目产值完成情况与计划对比表                   
             var rows = MiniExcel
                         .Query(filePath)                      // 读取 Excel 文件
                         .Skip(6)                               // 跳过前6行，从第7行开始
                         .Select(row => new
                         {
-                            ColumnA = row.A,   // A 列
                             ColumnB = row.B,   // B 列
-                            ColumnG = row.G,   // G 列
-                            ColumnBL = row.BL  // BL 列
+                            ColumnBL = row.BL,  // BL 列
+                            ColumnK = row.K == null ? 0M : (decimal)row.K,
+                            ColumnL = row.L == null ? 0M : (decimal)row.L,
+                            ColumnO = row.O == null ? 0M : (decimal)row.O,
+                            ColumnP = row.P == null ? 0M : (decimal)row.P,
+                            ColumnS = row.S == null ? 0M : (decimal)row.S,
+                            ColumnT = row.T == null ? 0M : (decimal)row.T,
+                            ColumnW = row.W == null ? 0M : (decimal)row.W,
+                            ColumnX = row.X == null ? 0M : (decimal)row.X,
+                            ColumnAA = row.AA == null ? 0M : (decimal)row.AA,
+                            ColumnAB = row.AB == null ? 0M : (decimal)row.AB,
+                            ColumnAE = row.AE == null ? 0M : (decimal)row.AE,
+                            ColumnAF = row.AF == null ? 0M : (decimal)row.AF,
+                            ColumnAI = row.AI == null ? 0M : (decimal)row.AI,
+                            ColumnAJ = row.AJ == null ? 0M : (decimal)row.AJ,
+                            ColumnAM = row.AM == null ? 0M : (decimal)row.AM,
+                            ColumnAN = row.AN == null ? 0M : (decimal)row.AN,
+                            ColumnAQ = row.AQ == null ? 0M : (decimal)row.AQ,
+                            ColumnAR = row.AR == null ? 0M : (decimal)row.AR,
+                            ColumnAU = row.AU == null ? 0M : (decimal)row.AU,
+                            ColumnAV = row.AV == null ? 0M : (decimal)row.AV,
+                            ColumnAY = row.AY == null ? 0M : (decimal)row.AY,
+                            ColumnAZ = row.AZ == null ? 0M : (decimal)row.AZ,
+                            ColumnBC = row.BC == null ? 0M : (decimal)row.BC,
+                            ColumnBD = row.BD == null ? 0M : (decimal)row.BD
                         })
                         .ToList();
-            rows = rows.Where(x => !string.IsNullOrWhiteSpace(x.ColumnBL)).ToList();
+            rows = rows.Where(x => !string.IsNullOrEmpty(x.ColumnBL)).ToList();
+
             foreach (var row in rows)
             {
-                excelVal.Add(new ExcelConvertTable
+                for (int i = 0; i < 12; i++)
                 {
-                    Id = GuidUtil.Next().ToString(),
-                    Name = row.ColumnB,
-                    ProjectId = row.ColumnBL,
-                    Val = (decimal)row.ColumnG,
-                    Year = 2019
-                });
+                    switch (i)
+                    {
+                        case 0:
+                            excelComplete.Add(new ExcelProductionConvertTable
+                            {
+                                Id = GuidUtil.Next().ToString(),
+                                Name = row.ColumnB,
+                                ProjectId = row.ColumnBL,
+                                OneCompleteValue = row.ColumnL,
+                                DateMonth = 201901,
+                                Year = 2019
+                            });
+                            excelPlan.Add(new ExcelPlanConvertTable
+                            {
+                                Id = GuidUtil.Next().ToString(),
+                                Name = row.ColumnB,
+                                ProjectId = row.ColumnBL,
+                                OnePlanProductionValue = row.ColumnK,
+                                DateMonth = 201901,
+                                Year = 2019
+                            });
+                            break;
+                        case 1:
+                            excelComplete.Add(new ExcelProductionConvertTable
+                            {
+                                Id = GuidUtil.Next().ToString(),
+                                Name = row.ColumnB,
+                                ProjectId = row.ColumnBL,
+                                TwoCompleteValue = row.ColumnP,
+                                Year = 2019,
+                                DateMonth = 201902
+                            });
+                            excelPlan.Add(new ExcelPlanConvertTable
+                            {
+                                Id = GuidUtil.Next().ToString(),
+                                Name = row.ColumnB,
+                                ProjectId = row.ColumnBL,
+                                TwoPlanProductionValue = row.ColumnO,
+                                DateMonth = 201902,
+                                Year = 2019
+                            });
+                            break;
+                        case 2:
+                            excelComplete.Add(new ExcelProductionConvertTable
+                            {
+                                Id = GuidUtil.Next().ToString(),
+                                Name = row.ColumnB,
+                                ProjectId = row.ColumnBL,
+                                ThreeCompleteValue = row.ColumnT,
+                                Year = 2019,
+                                DateMonth = 201903
+                            });
+                            excelPlan.Add(new ExcelPlanConvertTable
+                            {
+                                Id = GuidUtil.Next().ToString(),
+                                Name = row.ColumnB,
+                                ProjectId = row.ColumnBL,
+                                ThreePlanProductionValue = row.ColumnS,
+                                DateMonth = 201903,
+                                Year = 2019
+                            });
+                            break;
+                        case 3:
+                            excelComplete.Add(new ExcelProductionConvertTable
+                            {
+                                Id = GuidUtil.Next().ToString(),
+                                Name = row.ColumnB,
+                                ProjectId = row.ColumnBL,
+                                FourCompleteValue = row.ColumnX,
+                                Year = 2019,
+                                DateMonth = 201904
+                            });
+                            excelPlan.Add(new ExcelPlanConvertTable
+                            {
+                                Id = GuidUtil.Next().ToString(),
+                                Name = row.ColumnB,
+                                ProjectId = row.ColumnBL,
+                                FourPlanProductionValue = row.ColumnW,
+                                DateMonth = 201904,
+                                Year = 2019
+                            });
+                            break;
+                        case 4:
+                            excelComplete.Add(new ExcelProductionConvertTable
+                            {
+                                Id = GuidUtil.Next().ToString(),
+                                Name = row.ColumnB,
+                                ProjectId = row.ColumnBL,
+                                FiveCompleteValue = row.ColumnAB,
+                                Year = 2019,
+                                DateMonth = 201905
+                            });
+                            excelPlan.Add(new ExcelPlanConvertTable
+                            {
+                                Id = GuidUtil.Next().ToString(),
+                                Name = row.ColumnB,
+                                ProjectId = row.ColumnBL,
+                                FivePlanProductionValue = row.ColumnAA,
+                                DateMonth = 201905,
+                                Year = 2019
+                            });
+                            break;
+                        case 5:
+                            excelComplete.Add(new ExcelProductionConvertTable
+                            {
+                                Id = GuidUtil.Next().ToString(),
+                                Name = row.ColumnB,
+                                ProjectId = row.ColumnBL,
+                                SixCompleteValue = row.ColumnAF,
+                                Year = 2019,
+                                DateMonth = 201906
+                            });
+                            excelPlan.Add(new ExcelPlanConvertTable
+                            {
+                                Id = GuidUtil.Next().ToString(),
+                                Name = row.ColumnB,
+                                ProjectId = row.ColumnBL,
+                                SixPlanProductionValue = row.ColumnAE,
+                                DateMonth = 201906,
+                                Year = 2019
+                            });
+                            break;
+                        case 6:
+                            excelComplete.Add(new ExcelProductionConvertTable
+                            {
+                                Id = GuidUtil.Next().ToString(),
+                                Name = row.ColumnB,
+                                ProjectId = row.ColumnBL,
+                                SevenCompleteValue = row.ColumnAJ,
+                                Year = 2019,
+                                DateMonth = 201907
+                            });
+                            excelPlan.Add(new ExcelPlanConvertTable
+                            {
+                                Id = GuidUtil.Next().ToString(),
+                                Name = row.ColumnB,
+                                ProjectId = row.ColumnBL,
+                                SevenPlanProductionValue = row.ColumnAI,
+                                DateMonth = 201907,
+                                Year = 2019
+                            });
+                            break;
+                        case 7:
+                            excelComplete.Add(new ExcelProductionConvertTable
+                            {
+                                Id = GuidUtil.Next().ToString(),
+                                Name = row.ColumnB,
+                                ProjectId = row.ColumnBL,
+                                EightCompleteValue = row.ColumnAN,
+                                Year = 2019,
+                                DateMonth = 201908
+                            });
+                            excelPlan.Add(new ExcelPlanConvertTable
+                            {
+                                Id = GuidUtil.Next().ToString(),
+                                Name = row.ColumnB,
+                                ProjectId = row.ColumnBL,
+                                EightPlanProductionValue = row.ColumnAM,
+                                DateMonth = 201908,
+                                Year = 2019
+                            });
+                            break;
+                        case 8:
+                            excelComplete.Add(new ExcelProductionConvertTable
+                            {
+                                Id = GuidUtil.Next().ToString(),
+                                Name = row.ColumnB,
+                                ProjectId = row.ColumnBL,
+                                NineCompleteValue = row.ColumnAR,
+                                Year = 2019,
+                                DateMonth = 201909
+                            });
+                            excelPlan.Add(new ExcelPlanConvertTable
+                            {
+                                Id = GuidUtil.Next().ToString(),
+                                Name = row.ColumnB,
+                                ProjectId = row.ColumnBL,
+                                NinePlanProductionValue = row.ColumnAQ,
+                                DateMonth = 201909,
+                                Year = 2019
+                            });
+                            break;
+                        case 9:
+                            excelComplete.Add(new ExcelProductionConvertTable
+                            {
+                                Id = GuidUtil.Next().ToString(),
+                                Name = row.ColumnB,
+                                ProjectId = row.ColumnBL,
+                                TenCompleteValue = row.ColumnAV,
+                                Year = 2019,
+                                DateMonth = 201910
+                            });
+                            excelPlan.Add(new ExcelPlanConvertTable
+                            {
+                                Id = GuidUtil.Next().ToString(),
+                                Name = row.ColumnB,
+                                ProjectId = row.ColumnBL,
+                                TenPlanProductionValue = row.ColumnAU,
+                                DateMonth = 201910,
+                                Year = 2019
+                            });
+                            break;
+                        case 10:
+                            excelComplete.Add(new ExcelProductionConvertTable
+                            {
+                                Id = GuidUtil.Next().ToString(),
+                                Name = row.ColumnB,
+                                ProjectId = row.ColumnBL,
+                                ElevenCompleteValue = row.ColumnAZ,
+                                Year = 2019,
+                                DateMonth = 201911
+                            });
+                            excelPlan.Add(new ExcelPlanConvertTable
+                            {
+                                Id = GuidUtil.Next().ToString(),
+                                Name = row.ColumnB,
+                                ProjectId = row.ColumnBL,
+                                ElevenPlanProductionValue = row.ColumnAY,
+                                DateMonth = 201911,
+                                Year = 2019
+                            });
+                            break;
+                        case 11:
+                            excelComplete.Add(new ExcelProductionConvertTable
+                            {
+                                Id = GuidUtil.Next().ToString(),
+                                Name = row.ColumnB,
+                                ProjectId = row.ColumnBL,
+                                TwelveCompleteValue = row.ColumnBD,
+                                Year = 2019,
+                                DateMonth = 201912
+                            });
+                            excelPlan.Add(new ExcelPlanConvertTable
+                            {
+                                Id = GuidUtil.Next().ToString(),
+                                Name = row.ColumnB,
+                                ProjectId = row.ColumnBL,
+                                TwelvePlanProductionValue = row.ColumnBC,
+                                DateMonth = 201912,
+                                Year = 2019
+                            });
+                            break;
+                    }
+                }
             }
             #endregion
 
@@ -831,23 +1093,284 @@ namespace GHMonitoringCenterApi.Controllers.Project
                         .Skip(7)                               // 跳过前7行，从第8行开始
                         .Select(row => new
                         {
-                            ColumnA = row.A,   // A 列
                             ColumnB = row.B,   // B 列
-                            ColumnG = row.G,   // G 列
-                            ColumnBK = row.BK  // Bk 列
+                            ColumnBK = row.BK,  // Bk 列
+                            ColumnK = row.K == null ? 0M : (decimal)row.K,
+                            ColumnL = row.L == null ? 0M : (decimal)row.L,
+                            ColumnO = row.O == null ? 0M : (decimal)row.O,
+                            ColumnP = row.P == null ? 0M : (decimal)row.P,
+                            ColumnS = row.S == null ? 0M : (decimal)row.S,
+                            ColumnT = row.T == null ? 0M : (decimal)row.T,
+                            ColumnW = row.W == null ? 0M : (decimal)row.W,
+                            ColumnX = row.X == null ? 0M : (decimal)row.X,
+                            ColumnAA = row.AA == null ? 0M : (decimal)row.AA,
+                            ColumnAB = row.AB == null ? 0M : (decimal)row.AB,
+                            ColumnAE = row.AE == null ? 0M : (decimal)row.AE,
+                            ColumnAF = row.AF == null ? 0M : (decimal)row.AF,
+                            ColumnAI = row.AI == null ? 0M : (decimal)row.AI,
+                            ColumnAJ = row.AJ == null ? 0M : (decimal)row.AJ,
+                            ColumnAM = row.AM == null ? 0M : (decimal)row.AM,
+                            ColumnAN = row.AN == null ? 0M : (decimal)row.AN,
+                            ColumnAQ = row.AQ == null ? 0M : (decimal)row.AQ,
+                            ColumnAR = row.AR == null ? 0M : (decimal)row.AR,
+                            ColumnAV = row.AV == null ? 0M : (decimal)row.AV,
+                            ColumnAW = row.AW == null ? 0M : (decimal)row.AW,
+                            ColumnBA = row.BA == null ? 0M : (decimal)row.BA,
+                            ColumnBB = row.BB == null ? 0M : (decimal)row.BB,
+                            ColumnBF = row.BF == null ? 0M : (decimal)row.BF,
+                            ColumnBG = row.BG == null ? 0M : (decimal)row.BG
                         })
                         .ToList();
-            rows2 = rows2.Where(x => !string.IsNullOrWhiteSpace(x.ColumnBK)).ToList();
+            rows2 = rows2.Where(x => !string.IsNullOrEmpty(x.ColumnBK)).ToList();
             foreach (var row in rows2)
             {
-                excelVal.Add(new ExcelConvertTable
+                for (int i = 0; i < 12; i++)
                 {
-                    Id = GuidUtil.Next().ToString(),
-                    Name = row.ColumnB,
-                    ProjectId = row.ColumnBK,
-                    Val = (decimal)row.ColumnG,
-                    Year = 2020
-                });
+                    switch (i)
+                    {
+                        case 0:
+                            excelComplete.Add(new ExcelProductionConvertTable
+                            {
+                                Id = GuidUtil.Next().ToString(),
+                                Name = row.ColumnB,
+                                ProjectId = row.ColumnBK,
+                                OneCompleteValue = row.ColumnL,
+                                Year = 2020,
+                                DateMonth = 202001
+                            });
+                            excelPlan.Add(new ExcelPlanConvertTable
+                            {
+                                Id = GuidUtil.Next().ToString(),
+                                Name = row.ColumnB,
+                                ProjectId = row.ColumnBK,
+                                OnePlanProductionValue = row.ColumnK,
+                                Year = 2020,
+                                DateMonth = 202001
+                            });
+                            break;
+                        case 1:
+                            excelComplete.Add(new ExcelProductionConvertTable
+                            {
+                                Id = GuidUtil.Next().ToString(),
+                                Name = row.ColumnB,
+                                ProjectId = row.ColumnBK,
+                                TwoCompleteValue = row.ColumnP,
+                                Year = 2020,
+                                DateMonth = 202002
+                            });
+                            excelPlan.Add(new ExcelPlanConvertTable
+                            {
+                                Id = GuidUtil.Next().ToString(),
+                                Name = row.ColumnB,
+                                ProjectId = row.ColumnBK,
+                                TwoPlanProductionValue = row.ColumnO,
+                                Year = 2020,
+                                DateMonth = 202002
+                            });
+                            break;
+                        case 2:
+                            excelComplete.Add(new ExcelProductionConvertTable
+                            {
+                                Id = GuidUtil.Next().ToString(),
+                                Name = row.ColumnB,
+                                ProjectId = row.ColumnBK,
+                                ThreeCompleteValue = row.ColumnT,
+                                Year = 2020,
+                                DateMonth = 202003
+                            });
+                            excelPlan.Add(new ExcelPlanConvertTable
+                            {
+                                Id = GuidUtil.Next().ToString(),
+                                Name = row.ColumnB,
+                                ProjectId = row.ColumnBK,
+                                ThreePlanProductionValue = row.ColumnS,
+                                Year = 2020,
+                                DateMonth = 202003
+                            });
+                            break;
+                        case 3:
+                            excelComplete.Add(new ExcelProductionConvertTable
+                            {
+                                Id = GuidUtil.Next().ToString(),
+                                Name = row.ColumnB,
+                                ProjectId = row.ColumnBK,
+                                FourCompleteValue = row.ColumnX,
+                                Year = 2020,
+                                DateMonth = 202004
+                            });
+                            excelPlan.Add(new ExcelPlanConvertTable
+                            {
+                                Id = GuidUtil.Next().ToString(),
+                                Name = row.ColumnB,
+                                ProjectId = row.ColumnBK,
+                                FourPlanProductionValue = row.ColumnW,
+                                Year = 2020,
+                                DateMonth = 202004
+                            });
+                            break;
+                        case 4:
+                            excelComplete.Add(new ExcelProductionConvertTable
+                            {
+                                Id = GuidUtil.Next().ToString(),
+                                Name = row.ColumnB,
+                                ProjectId = row.ColumnBK,
+                                FiveCompleteValue = row.ColumnAB,
+                                Year = 2020,
+                                DateMonth = 202005
+                            });
+                            excelPlan.Add(new ExcelPlanConvertTable
+                            {
+                                Id = GuidUtil.Next().ToString(),
+                                Name = row.ColumnB,
+                                ProjectId = row.ColumnBK,
+                                FivePlanProductionValue = row.ColumnAA,
+                                Year = 2020,
+                                DateMonth = 202005
+                            });
+                            break;
+                        case 5:
+                            excelComplete.Add(new ExcelProductionConvertTable
+                            {
+                                Id = GuidUtil.Next().ToString(),
+                                Name = row.ColumnB,
+                                ProjectId = row.ColumnBK,
+                                SixCompleteValue = row.ColumnAF,
+                                Year = 2020,
+                                DateMonth = 202006
+                            });
+                            excelPlan.Add(new ExcelPlanConvertTable
+                            {
+                                Id = GuidUtil.Next().ToString(),
+                                Name = row.ColumnB,
+                                ProjectId = row.ColumnBK,
+                                SixPlanProductionValue = row.ColumnAE,
+                                Year = 2020,
+                                DateMonth = 202006
+                            });
+                            break;
+                        case 6:
+                            excelComplete.Add(new ExcelProductionConvertTable
+                            {
+                                Id = GuidUtil.Next().ToString(),
+                                Name = row.ColumnB,
+                                ProjectId = row.ColumnBK,
+                                SevenCompleteValue = row.ColumnAJ,
+                                Year = 2020,
+                                DateMonth = 202007
+                            });
+                            excelPlan.Add(new ExcelPlanConvertTable
+                            {
+                                Id = GuidUtil.Next().ToString(),
+                                Name = row.ColumnB,
+                                ProjectId = row.ColumnBK,
+                                SevenPlanProductionValue = row.ColumnAI,
+                                Year = 2020,
+                                DateMonth = 202007
+                            });
+                            break;
+                        case 7:
+                            excelComplete.Add(new ExcelProductionConvertTable
+                            {
+                                Id = GuidUtil.Next().ToString(),
+                                Name = row.ColumnB,
+                                ProjectId = row.ColumnBK,
+                                EightCompleteValue = row.ColumnAN,
+                                Year = 2020,
+                                DateMonth = 202008
+                            });
+                            excelPlan.Add(new ExcelPlanConvertTable
+                            {
+                                Id = GuidUtil.Next().ToString(),
+                                Name = row.ColumnB,
+                                ProjectId = row.ColumnBK,
+                                EightPlanProductionValue = row.ColumnAM,
+                                Year = 2020,
+                                DateMonth = 202008
+                            });
+                            break;
+                        case 8:
+                            excelComplete.Add(new ExcelProductionConvertTable
+                            {
+                                Id = GuidUtil.Next().ToString(),
+                                Name = row.ColumnB,
+                                ProjectId = row.ColumnBK,
+                                NineCompleteValue = row.ColumnAR,
+                                Year = 2020,
+                                DateMonth = 202009
+                            });
+                            excelPlan.Add(new ExcelPlanConvertTable
+                            {
+                                Id = GuidUtil.Next().ToString(),
+                                Name = row.ColumnB,
+                                ProjectId = row.ColumnBK,
+                                NinePlanProductionValue = row.ColumnAQ,
+                                Year = 2020,
+                                DateMonth = 202009
+                            });
+                            break;
+                        case 9:
+                            excelComplete.Add(new ExcelProductionConvertTable
+                            {
+                                Id = GuidUtil.Next().ToString(),
+                                Name = row.ColumnB,
+                                ProjectId = row.ColumnBK,
+                                TenCompleteValue = row.ColumnAW,
+                                Year = 2020,
+                                DateMonth = 202010
+                            });
+                            excelPlan.Add(new ExcelPlanConvertTable
+                            {
+                                Id = GuidUtil.Next().ToString(),
+                                Name = row.ColumnB,
+                                ProjectId = row.ColumnBK,
+                                TenPlanProductionValue = row.ColumnAV,
+                                Year = 2020,
+                                DateMonth = 202010
+                            });
+                            break;
+                        case 10:
+                            excelComplete.Add(new ExcelProductionConvertTable
+                            {
+                                Id = GuidUtil.Next().ToString(),
+                                Name = row.ColumnB,
+                                ProjectId = row.ColumnBK,
+                                ElevenCompleteValue = row.ColumnBB,
+                                Year = 2020,
+                                DateMonth = 202011
+                            });
+                            excelPlan.Add(new ExcelPlanConvertTable
+                            {
+                                Id = GuidUtil.Next().ToString(),
+                                Name = row.ColumnB,
+                                ProjectId = row.ColumnBK,
+                                ElevenPlanProductionValue = row.ColumnBA,
+                                Year = 2020,
+                                DateMonth = 202011
+                            });
+                            break;
+                        case 11:
+                            excelComplete.Add(new ExcelProductionConvertTable
+                            {
+                                Id = GuidUtil.Next().ToString(),
+                                Name = row.ColumnB,
+                                ProjectId = row.ColumnBK,
+                                TwelveCompleteValue = row.ColumnBG,
+                                Year = 2020,
+                                DateMonth = 202012
+                            });
+                            excelPlan.Add(new ExcelPlanConvertTable
+                            {
+                                Id = GuidUtil.Next().ToString(),
+                                Name = row.ColumnB,
+                                ProjectId = row.ColumnBK,
+                                TwelvePlanProductionValue = row.ColumnBF,
+                                Year = 2020,
+                                DateMonth = 202012
+                            });
+                            break;
+                    }
+
+                }
             }
             #endregion
 
@@ -857,23 +1380,283 @@ namespace GHMonitoringCenterApi.Controllers.Project
                         .Skip(9)                               // 跳过前9行，从第10行开始
                         .Select(row => new
                         {
-                            ColumnB = row.B,   // B 列
                             ColumnC = row.C,   // C 列
-                            ColumnH = row.H,   // H 列
-                            ColumnAM = row.AM  // AM 列
+                            ColumnAM = row.AM, // AM 列
+                            ColumnJ = row.J == null ? 0M : (decimal)row.J,
+                            ColumnK = row.K == null ? 0M : (decimal)row.K,
+                            ColumnL = row.L == null ? 0M : (decimal)row.L,
+                            ColumnM = row.M == null ? 0M : (decimal)row.M,
+                            ColumnN = row.N == null ? 0M : (decimal)row.N,
+                            ColumnO = row.O == null ? 0M : (decimal)row.O,
+                            ColumnP = row.P == null ? 0M : (decimal)row.P,
+                            ColumnQ = row.Q == null ? 0M : (decimal)row.Q,
+                            ColumnR = row.R == null ? 0M : (decimal)row.R,
+                            ColumnS = row.S == null ? 0M : (decimal)row.S,
+                            ColumnT = row.T == null ? 0M : (decimal)row.T,
+                            ColumnU = row.U == null ? 0M : (decimal)row.U,
+                            ColumnV = row.V == null ? 0M : (decimal)row.V,
+                            ColumnW = row.W == null ? 0M : (decimal)row.W,
+                            ColumnX = row.X == null ? 0M : (decimal)row.X,
+                            ColumnY = row.Y == null ? 0M : (decimal)row.Y,
+                            ColumnZ = row.Z == null ? 0M : (decimal)row.Z,
+                            ColumnAA = row.AA == null ? 0M : (decimal)row.AA,
+                            ColumnAB = row.AB == null ? 0M : (decimal)row.AB,//十月完成产值  未存在十月计划
+                            //ColumnAW = row.AW,
+                            ColumnAD = row.AD == null ? 0M : (decimal)row.AD,
+                            ColumnAF = row.AF == null ? 0M : (decimal)row.AF,
+                            ColumnAH = row.AH == null ? 0M : (decimal)row.AH,
+                            ColumnAI = row.AI == null ? 0M : (decimal)row.AI
                         })
                         .ToList();
-            rows3 = rows3.Where(x => !string.IsNullOrWhiteSpace(x.ColumnAM)).ToList();
+            rows3 = rows3.Where(x => !string.IsNullOrEmpty(x.ColumnAM)).ToList();
             foreach (var row in rows3)
             {
-                excelVal.Add(new ExcelConvertTable
+                for (int i = 0; i < 12; i++)
                 {
-                    Id = GuidUtil.Next().ToString(),
-                    Name = row.ColumnC,
-                    ProjectId = row.ColumnAM,
-                    Val = (decimal)row.ColumnH,
-                    Year = 2021
-                });
+                    switch (i)
+                    {
+                        case 0:
+                            excelComplete.Add(new ExcelProductionConvertTable
+                            {
+                                Id = GuidUtil.Next().ToString(),
+                                Name = row.ColumnC,
+                                ProjectId = row.ColumnAM,
+                                OneCompleteValue = row.ColumnK,
+                                Year = 2021,
+                                DateMonth = 202101
+                            });
+                            excelPlan.Add(new ExcelPlanConvertTable
+                            {
+                                Id = GuidUtil.Next().ToString(),
+                                Name = row.ColumnC,
+                                ProjectId = row.ColumnAM,
+                                OnePlanProductionValue = row.ColumnJ,
+                                Year = 2021,
+                                DateMonth = 202101
+                            });
+                            break;
+                        case 1:
+                            excelComplete.Add(new ExcelProductionConvertTable
+                            {
+                                Id = GuidUtil.Next().ToString(),
+                                Name = row.ColumnC,
+                                ProjectId = row.ColumnAM,
+                                TwoCompleteValue = row.ColumnM,
+                                Year = 2021,
+                                DateMonth = 202102
+                            });
+                            excelPlan.Add(new ExcelPlanConvertTable
+                            {
+                                Id = GuidUtil.Next().ToString(),
+                                Name = row.ColumnC,
+                                ProjectId = row.ColumnAM,
+                                TwoPlanProductionValue = row.ColumnL,
+                                Year = 2021,
+                                DateMonth = 202102
+                            });
+                            break;
+                        case 2:
+                            excelComplete.Add(new ExcelProductionConvertTable
+                            {
+                                Id = GuidUtil.Next().ToString(),
+                                Name = row.ColumnC,
+                                ProjectId = row.ColumnAM,
+                                ThreeCompleteValue = row.ColumnO,
+                                Year = 2021,
+                                DateMonth = 202103
+                            });
+                            excelPlan.Add(new ExcelPlanConvertTable
+                            {
+                                Id = GuidUtil.Next().ToString(),
+                                Name = row.ColumnC,
+                                ProjectId = row.ColumnAM,
+                                ThreePlanProductionValue = row.ColumnN,
+                                Year = 2021,
+                                DateMonth = 202103
+                            });
+                            break;
+                        case 3:
+                            excelComplete.Add(new ExcelProductionConvertTable
+                            {
+                                Id = GuidUtil.Next().ToString(),
+                                Name = row.ColumnC,
+                                ProjectId = row.ColumnAM,
+                                FourCompleteValue = row.ColumnQ,
+                                Year = 2021,
+                                DateMonth = 202104
+                            });
+                            excelPlan.Add(new ExcelPlanConvertTable
+                            {
+                                Id = GuidUtil.Next().ToString(),
+                                Name = row.ColumnC,
+                                ProjectId = row.ColumnAM,
+                                FourPlanProductionValue = row.ColumnP,
+                                Year = 2021,
+                                DateMonth = 202104
+                            });
+                            break;
+                        case 4:
+                            excelComplete.Add(new ExcelProductionConvertTable
+                            {
+                                Id = GuidUtil.Next().ToString(),
+                                Name = row.ColumnC,
+                                ProjectId = row.ColumnAM,
+                                FiveCompleteValue = row.ColumnS,
+                                Year = 2021,
+                                DateMonth = 202105
+                            });
+                            excelPlan.Add(new ExcelPlanConvertTable
+                            {
+                                Id = GuidUtil.Next().ToString(),
+                                Name = row.ColumnC,
+                                ProjectId = row.ColumnAM,
+                                FivePlanProductionValue = row.ColumnR,
+                                Year = 2021,
+                                DateMonth = 202105
+                            });
+                            break;
+                        case 5:
+                            excelComplete.Add(new ExcelProductionConvertTable
+                            {
+                                Id = GuidUtil.Next().ToString(),
+                                Name = row.ColumnC,
+                                ProjectId = row.ColumnAM,
+                                SixCompleteValue = row.ColumnU,
+                                Year = 2021,
+                                DateMonth = 202106
+                            });
+                            excelPlan.Add(new ExcelPlanConvertTable
+                            {
+                                Id = GuidUtil.Next().ToString(),
+                                Name = row.ColumnC,
+                                ProjectId = row.ColumnAM,
+                                SixPlanProductionValue = row.ColumnT,
+                                Year = 2021,
+                                DateMonth = 202106
+                            });
+                            break;
+                        case 6:
+                            excelComplete.Add(new ExcelProductionConvertTable
+                            {
+                                Id = GuidUtil.Next().ToString(),
+                                Name = row.ColumnC,
+                                ProjectId = row.ColumnAM,
+                                SevenCompleteValue = row.ColumnW,
+                                Year = 2021,
+                                DateMonth = 202107
+                            });
+                            excelPlan.Add(new ExcelPlanConvertTable
+                            {
+                                Id = GuidUtil.Next().ToString(),
+                                Name = row.ColumnC,
+                                ProjectId = row.ColumnAM,
+                                SevenPlanProductionValue = row.ColumnV,
+                                Year = 2021,
+                                DateMonth = 202107
+                            });
+                            break;
+                        case 7:
+                            excelComplete.Add(new ExcelProductionConvertTable
+                            {
+                                Id = GuidUtil.Next().ToString(),
+                                Name = row.ColumnC,
+                                ProjectId = row.ColumnAM,
+                                EightCompleteValue = row.ColumnY,
+                                Year = 2021,
+                                DateMonth = 202108
+                            });
+                            excelPlan.Add(new ExcelPlanConvertTable
+                            {
+                                Id = GuidUtil.Next().ToString(),
+                                Name = row.ColumnC,
+                                ProjectId = row.ColumnAM,
+                                EightPlanProductionValue = row.ColumnX,
+                                Year = 2021,
+                                DateMonth = 202108
+                            });
+                            break;
+                        case 8:
+                            excelComplete.Add(new ExcelProductionConvertTable
+                            {
+                                Id = GuidUtil.Next().ToString(),
+                                Name = row.ColumnC,
+                                ProjectId = row.ColumnAM,
+                                NineCompleteValue = row.ColumnAA,
+                                Year = 2021,
+                                DateMonth = 202109
+                            });
+                            excelPlan.Add(new ExcelPlanConvertTable
+                            {
+                                Id = GuidUtil.Next().ToString(),
+                                Name = row.ColumnC,
+                                ProjectId = row.ColumnAM,
+                                NinePlanProductionValue = row.ColumnZ,
+                                Year = 2021,
+                                DateMonth = 202109
+                            });
+                            break;
+                        case 9:
+                            excelComplete.Add(new ExcelProductionConvertTable
+                            {
+                                Id = GuidUtil.Next().ToString(),
+                                Name = row.ColumnC,
+                                ProjectId = row.ColumnAM,
+                                TenCompleteValue = row.ColumnAB,
+                                Year = 2021,
+                                DateMonth = 202110
+                            });
+                            excelPlan.Add(new ExcelPlanConvertTable
+                            {
+                                Id = GuidUtil.Next().ToString(),
+                                Name = row.ColumnC,
+                                ProjectId = row.ColumnAM,
+                                //TenPlanProductionValue = row.ColumnAV
+                                Year = 2021,
+                                DateMonth = 202110
+                            });
+                            break;
+                        case 10:
+                            excelComplete.Add(new ExcelProductionConvertTable
+                            {
+                                Id = GuidUtil.Next().ToString(),
+                                Name = row.ColumnC,
+                                ProjectId = row.ColumnAM,
+                                ElevenCompleteValue = row.ColumnAF,
+                                Year = 2021,
+                                DateMonth = 202111
+                            });
+                            excelPlan.Add(new ExcelPlanConvertTable
+                            {
+                                Id = GuidUtil.Next().ToString(),
+                                Name = row.ColumnC,
+                                ProjectId = row.ColumnAM,
+                                ElevenPlanProductionValue = row.ColumnAD,
+                                Year = 2021,
+                                DateMonth = 202111
+                            });
+                            break;
+                        case 11:
+                            excelComplete.Add(new ExcelProductionConvertTable
+                            {
+                                Id = GuidUtil.Next().ToString(),
+                                Name = row.ColumnC,
+                                ProjectId = row.ColumnAM,
+                                TwelveCompleteValue = row.ColumnAI,
+                                Year = 2021,
+                                DateMonth = 202112
+                            });
+                            excelPlan.Add(new ExcelPlanConvertTable
+                            {
+                                Id = GuidUtil.Next().ToString(),
+                                Name = row.ColumnC,
+                                ProjectId = row.ColumnAM,
+                                TwelvePlanProductionValue = row.ColumnAH,
+                                Year = 2021,
+                                DateMonth = 202112
+                            });
+                            break;
+                    }
+                }
             }
             #endregion
 
@@ -883,23 +1666,285 @@ namespace GHMonitoringCenterApi.Controllers.Project
                         .Skip(10)                               // 跳过前10行，从第11行开始
                         .Select(row => new
                         {
-                            ColumnB = row.B,   // B 列
                             ColumnC = row.C,   // C 列
-                            ColumnI = row.I,   // I 列
-                            ColumnAX = row.AX  // AM 列
+                            ColumnAX = row.AX,  // AM 列
+                            ColumnL = row.L == null ? 0M : (decimal)row.L,
+                            ColumnM = row.M == null ? 0M : (decimal)row.M,
+                            ColumnO = row.O == null ? 0M : (decimal)row.O,
+                            ColumnP = row.P == null ? 0M : (decimal)row.P,
+                            ColumnR = row.R == null ? 0M : (decimal)row.R,
+                            ColumnS = row.S == null ? 0M : (decimal)row.S,
+                            ColumnU = row.U == null ? 0M : (decimal)row.U,
+                            ColumnV = row.V == null ? 0M : (decimal)row.V,
+                            ColumnX = row.X == null ? 0M : (decimal)row.X,
+                            ColumnY = row.Y == null ? 0M : (decimal)row.Y,
+                            ColumnAA = row.AA == null ? 0M : (decimal)row.AA,
+                            ColumnAB = row.AB == null ? 0M : (decimal)row.AB,
+                            ColumnAD = row.AD == null ? 0M : (decimal)row.AD,
+                            ColumnAE = row.AE == null ? 0M : (decimal)row.AE,
+                            ColumnAG = row.AG == null ? 0M : (decimal)row.AG,
+                            ColumnAH = row.AH == null ? 0M : (decimal)row.AH,
+                            ColumnAJ = row.AJ == null ? 0M : (decimal)row.AJ,
+                            ColumnAK = row.AK == null ? 0M : (decimal)row.AK,
+                            ColumnAM = row.AM == null ? 0M : (decimal)row.AM,
+                            ColumnAN = row.AN == null ? 0M : (decimal)row.AN,
+                            ColumnAP = row.AP == null ? 0M : (decimal)row.AP,
+                            ColumnAQ = row.AQ == null ? 0M : (decimal)row.AQ,
+                            ColumnAS = row.AS == null ? 0M : (decimal)row.AS,
+                            ColumnAT = row.AT == null ? 0M : (decimal)row.AT
                         })
                         .ToList();
-            rows4 = rows4.Where(x => !string.IsNullOrWhiteSpace(x.ColumnAX)).ToList();
+            rows4 = rows4.Where(x => !string.IsNullOrEmpty(x.ColumnAX)).ToList();
             foreach (var row in rows4)
             {
-                excelVal.Add(new ExcelConvertTable
+                for (int i = 0; i < 12; i++)
                 {
-                    Id = GuidUtil.Next().ToString(),
-                    Name = row.ColumnC,
-                    ProjectId = row.ColumnAX,
-                    Val = (decimal)row.ColumnI,
-                    Year = 2023
-                });
+                    switch (i)
+                    {
+                        case 0:
+                            excelComplete.Add(new ExcelProductionConvertTable
+                            {
+                                Id = GuidUtil.Next().ToString(),
+                                Name = row.ColumnC,
+                                ProjectId = row.ColumnAX,
+                                OneCompleteValue = row.ColumnM,
+                                Year = 2023,
+                                DateMonth = 202301
+                            });
+                            excelPlan.Add(new ExcelPlanConvertTable
+                            {
+                                Id = GuidUtil.Next().ToString(),
+                                Name = row.ColumnC,
+                                ProjectId = row.ColumnAX,
+                                OnePlanProductionValue = row.ColumnL,
+                                Year = 2023,
+                                DateMonth = 202301
+                            });
+                            break;
+                        case 1:
+                            excelComplete.Add(new ExcelProductionConvertTable
+                            {
+                                Id = GuidUtil.Next().ToString(),
+                                Name = row.ColumnC,
+                                ProjectId = row.ColumnAX,
+                                TwoCompleteValue = row.ColumnP,
+                                Year = 2023,
+                                DateMonth = 202302
+                            });
+                            excelPlan.Add(new ExcelPlanConvertTable
+                            {
+                                Id = GuidUtil.Next().ToString(),
+                                Name = row.ColumnC,
+                                ProjectId = row.ColumnAX,
+                                TwoPlanProductionValue = row.ColumnO,
+                                Year = 2023,
+                                DateMonth = 202302
+                            });
+                            break;
+                        case 2:
+                            excelComplete.Add(new ExcelProductionConvertTable
+                            {
+                                Id = GuidUtil.Next().ToString(),
+                                Name = row.ColumnC,
+                                ProjectId = row.ColumnAX,
+                                ThreeCompleteValue = row.ColumnS,
+                                Year = 2023,
+                                DateMonth = 202303
+                            });
+                            excelPlan.Add(new ExcelPlanConvertTable
+                            {
+                                Id = GuidUtil.Next().ToString(),
+                                Name = row.ColumnC,
+                                ProjectId = row.ColumnAX,
+                                ThreePlanProductionValue = row.ColumnR,
+                                Year = 2023,
+                                DateMonth = 202303
+                            });
+                            break;
+                        case 3:
+                            excelComplete.Add(new ExcelProductionConvertTable
+                            {
+                                Id = GuidUtil.Next().ToString(),
+                                Name = row.ColumnC,
+                                ProjectId = row.ColumnAX,
+                                FourCompleteValue = row.ColumnV,
+                                Year = 2023,
+                                DateMonth = 202304
+                            });
+                            excelPlan.Add(new ExcelPlanConvertTable
+                            {
+                                Id = GuidUtil.Next().ToString(),
+                                Name = row.ColumnC,
+                                ProjectId = row.ColumnAX,
+                                FourPlanProductionValue = row.ColumnU,
+                                Year = 2023,
+                                DateMonth = 202304
+                            });
+                            break;
+                        case 4:
+                            excelComplete.Add(new ExcelProductionConvertTable
+                            {
+                                Id = GuidUtil.Next().ToString(),
+                                Name = row.ColumnC,
+                                ProjectId = row.ColumnAX,
+                                FiveCompleteValue = row.ColumnY,
+                                Year = 2023,
+                                DateMonth = 202305
+                            });
+                            excelPlan.Add(new ExcelPlanConvertTable
+                            {
+                                Id = GuidUtil.Next().ToString(),
+                                Name = row.ColumnC,
+                                ProjectId = row.ColumnAX,
+                                FivePlanProductionValue = row.ColumnX,
+                                Year = 2023,
+                                DateMonth = 202305
+                            });
+                            break;
+                        case 5:
+                            excelComplete.Add(new ExcelProductionConvertTable
+                            {
+                                Id = GuidUtil.Next().ToString(),
+                                Name = row.ColumnC,
+                                ProjectId = row.ColumnAX,
+                                SixCompleteValue = row.ColumnAB,
+                                Year = 2023,
+                                DateMonth = 202306
+                            });
+                            excelPlan.Add(new ExcelPlanConvertTable
+                            {
+                                Id = GuidUtil.Next().ToString(),
+                                Name = row.ColumnC,
+                                ProjectId = row.ColumnAX,
+                                SixPlanProductionValue = row.ColumnAA,
+                                Year = 2023,
+                                DateMonth = 202306
+                            });
+                            break;
+                        case 6:
+                            excelComplete.Add(new ExcelProductionConvertTable
+                            {
+                                Id = GuidUtil.Next().ToString(),
+                                Name = row.ColumnC,
+                                ProjectId = row.ColumnAX,
+                                SevenCompleteValue = row.ColumnAE,
+                                Year = 2023,
+                                DateMonth = 202307
+                            });
+                            excelPlan.Add(new ExcelPlanConvertTable
+                            {
+                                Id = GuidUtil.Next().ToString(),
+                                Name = row.ColumnC,
+                                ProjectId = row.ColumnAX,
+                                SevenPlanProductionValue = row.ColumnAD,
+                                Year = 2023,
+                                DateMonth = 202307
+                            });
+                            break;
+                        case 7:
+                            excelComplete.Add(new ExcelProductionConvertTable
+                            {
+                                Id = GuidUtil.Next().ToString(),
+                                Name = row.ColumnC,
+                                ProjectId = row.ColumnAX,
+                                EightCompleteValue = row.ColumnAH,
+                                Year = 2023,
+                                DateMonth = 202308
+                            });
+                            excelPlan.Add(new ExcelPlanConvertTable
+                            {
+                                Id = GuidUtil.Next().ToString(),
+                                Name = row.ColumnC,
+                                ProjectId = row.ColumnAX,
+                                EightPlanProductionValue = row.ColumnAG,
+                                Year = 2023,
+                                DateMonth = 202308
+                            });
+                            break;
+                        case 8:
+                            excelComplete.Add(new ExcelProductionConvertTable
+                            {
+                                Id = GuidUtil.Next().ToString(),
+                                Name = row.ColumnC,
+                                ProjectId = row.ColumnAX,
+                                NineCompleteValue = row.ColumnAK,
+                                Year = 2023,
+                                DateMonth = 202309
+                            });
+                            excelPlan.Add(new ExcelPlanConvertTable
+                            {
+                                Id = GuidUtil.Next().ToString(),
+                                Name = row.ColumnC,
+                                ProjectId = row.ColumnAX,
+                                NinePlanProductionValue = row.ColumnAJ,
+                                Year = 2023,
+                                DateMonth = 202309
+                            });
+                            break;
+                        case 9:
+                            excelComplete.Add(new ExcelProductionConvertTable
+                            {
+                                Id = GuidUtil.Next().ToString(),
+                                Name = row.ColumnC,
+                                ProjectId = row.ColumnAX,
+                                TenCompleteValue = row.ColumnAN,
+                                Year = 2023,
+                                DateMonth = 202310
+                            });
+                            excelPlan.Add(new ExcelPlanConvertTable
+                            {
+                                Id = GuidUtil.Next().ToString(),
+                                Name = row.ColumnC,
+                                ProjectId = row.ColumnAX,
+                                TenPlanProductionValue = row.ColumnAM,
+                                Year = 2023,
+                                DateMonth = 202310
+                            });
+
+                            break;
+                        case 10:
+                            excelComplete.Add(new ExcelProductionConvertTable
+                            {
+                                Id = GuidUtil.Next().ToString(),
+                                Name = row.ColumnC,
+                                ProjectId = row.ColumnAX,
+                                ElevenCompleteValue = row.ColumnAQ,
+                                Year = 2023,
+                                DateMonth = 202311
+                            });
+                            excelPlan.Add(new ExcelPlanConvertTable
+                            {
+                                Id = GuidUtil.Next().ToString(),
+                                Name = row.ColumnC,
+                                ProjectId = row.ColumnAX,
+                                ElevenPlanProductionValue = row.ColumnAP,
+                                Year = 2023,
+                                DateMonth = 202311
+                            });
+                            break;
+                        case 11:
+                            excelComplete.Add(new ExcelProductionConvertTable
+                            {
+                                Id = GuidUtil.Next().ToString(),
+                                Name = row.ColumnC,
+                                ProjectId = row.ColumnAX,
+                                TwelveCompleteValue = row.ColumnAT,
+                                Year = 2023,
+                                DateMonth = 202312
+                            });
+                            excelPlan.Add(new ExcelPlanConvertTable
+                            {
+                                Id = GuidUtil.Next().ToString(),
+                                Name = row.ColumnC,
+                                ProjectId = row.ColumnAX,
+                                TwelvePlanProductionValue = row.ColumnAS,
+                                Year = 2023,
+                                DateMonth = 202312
+                            });
+                            break;
+                    }
+                }
+
             }
             #endregion
 
@@ -909,27 +1954,303 @@ namespace GHMonitoringCenterApi.Controllers.Project
                         .Skip(10)                               // 跳过前10行，从第11行开始
                         .Select(row => new
                         {
-                            ColumnB = row.B,   // B 列
                             ColumnC = row.C,   // C 列
-                            ColumnJ = row.J,   // J 列
-                            ColumnAP = row.AP  // AP 列
+                            ColumnAP = row.AP,  // AP 列
+                            ColumnL = row.L,
+                            ColumnM = row.M,
+                            ColumnN = row.N,
+                            ColumnO = row.O,
+                            ColumnP = row.P,
+                            ColumnQ = row.Q,
+                            ColumnR = row.R,
+                            ColumnS = row.S,
+                            ColumnT = row.T,
+                            ColumnU = row.U,
+                            ColumnW = row.W,
+                            ColumnX = row.X,
+                            ColumnY = row.Y,
+                            ColumnZ = row.Z,
+                            ColumnAA = row.AA,
+                            ColumnAB = row.AB,
+                            ColumnAC = row.AC,
+                            ColumnAD = row.AD,
+                            ColumnAE = row.AE,
+                            ColumnAF = row.AF,
+                            ColumnAG = row.AG,
+                            ColumnAH = row.AH,
+                            ColumnAJ = row.AJ,
+                            ColumnAK = row.AK
                         })
                         .ToList();
-            rows5 = rows5.Where(x => !string.IsNullOrWhiteSpace(x.ColumnAP)).ToList();
+            rows5 = rows5.Where(x => !string.IsNullOrEmpty(x.ColumnAP)).ToList();
+
+
             foreach (var row in rows5)
             {
-                excelVal.Add(new ExcelConvertTable
+                for (int i = 0; i < 12; i++)
                 {
-                    Id = GuidUtil.Next().ToString(),
-                    Name = row.ColumnC,
-                    ProjectId = row.ColumnAP,
-                    Val = (decimal)row.ColumnJ,
-                    Year = 2022
-                });
+                    try
+                    {
+
+                        switch (i)
+                        {
+                            case 0:
+                                excelComplete.Add(new ExcelProductionConvertTable
+                                {
+                                    Id = GuidUtil.Next().ToString(),
+                                    Name = row.ColumnC,
+                                    ProjectId = row.ColumnAP,
+                                    OneCompleteValue = Convert.ToDecimal(row.ColumnM),
+                                    Year = 2022,
+                                    DateMonth = 202201
+                                });
+                                excelPlan.Add(new ExcelPlanConvertTable
+                                {
+                                    Id = GuidUtil.Next().ToString(),
+                                    Name = row.ColumnC,
+                                    ProjectId = row.ColumnAP,
+                                    OnePlanProductionValue = Convert.ToDecimal(row.ColumnL),
+                                    Year = 2022,
+                                    DateMonth = 202201
+                                });
+                                break;
+                            case 1:
+                                excelComplete.Add(new ExcelProductionConvertTable
+                                {
+                                    Id = GuidUtil.Next().ToString(),
+                                    Name = row.ColumnC,
+                                    ProjectId = row.ColumnAP,
+                                    TwoCompleteValue = Convert.ToDecimal(row.ColumnO),
+                                    Year = 2022,
+                                    DateMonth = 202202
+                                });
+                                excelPlan.Add(new ExcelPlanConvertTable
+                                {
+                                    Id = GuidUtil.Next().ToString(),
+                                    Name = row.ColumnC,
+                                    ProjectId = row.ColumnAP,
+                                    TwoPlanProductionValue = Convert.ToDecimal(row.ColumnN),
+                                    Year = 2022,
+                                    DateMonth = 202202
+                                });
+                                break;
+                            case 2:
+                                excelComplete.Add(new ExcelProductionConvertTable
+                                {
+                                    Id = GuidUtil.Next().ToString(),
+                                    Name = row.ColumnC,
+                                    ProjectId = row.ColumnAP,
+                                    ThreeCompleteValue = Convert.ToDecimal(row.ColumnQ),
+                                    Year = 2022,
+                                    DateMonth = 202203
+                                });
+                                excelPlan.Add(new ExcelPlanConvertTable
+                                {
+                                    Id = GuidUtil.Next().ToString(),
+                                    Name = row.ColumnC,
+                                    ProjectId = row.ColumnAP,
+                                    ThreePlanProductionValue = Convert.ToDecimal(row.ColumnP),
+                                    Year = 2022,
+                                    DateMonth = 202203
+                                });
+                                break;
+                            case 3:
+                                excelComplete.Add(new ExcelProductionConvertTable
+                                {
+                                    Id = GuidUtil.Next().ToString(),
+                                    Name = row.ColumnC,
+                                    ProjectId = row.ColumnAP,
+                                    FourCompleteValue = Convert.ToDecimal(row.ColumnS),
+                                    Year = 2022,
+                                    DateMonth = 202204
+                                });
+                                excelPlan.Add(new ExcelPlanConvertTable
+                                {
+                                    Id = GuidUtil.Next().ToString(),
+                                    Name = row.ColumnC,
+                                    ProjectId = row.ColumnAP,
+                                    FourPlanProductionValue = Convert.ToDecimal(row.ColumnR),
+                                    Year = 2022,
+                                    DateMonth = 202204
+                                });
+                                break;
+                            case 4:
+                                excelComplete.Add(new ExcelProductionConvertTable
+                                {
+                                    Id = GuidUtil.Next().ToString(),
+                                    Name = row.ColumnC,
+                                    ProjectId = row.ColumnAP,
+                                    FiveCompleteValue = Convert.ToDecimal(row.ColumnU),
+                                    Year = 2022,
+                                    DateMonth = 202205
+                                });
+                                excelPlan.Add(new ExcelPlanConvertTable
+                                {
+                                    Id = GuidUtil.Next().ToString(),
+                                    Name = row.ColumnC,
+                                    ProjectId = row.ColumnAP,
+                                    FivePlanProductionValue = Convert.ToDecimal(row.ColumnT),
+                                    Year = 2022,
+                                    DateMonth = 202205
+                                });
+                                break;
+                            case 5:
+                                excelComplete.Add(new ExcelProductionConvertTable
+                                {
+                                    Id = GuidUtil.Next().ToString(),
+                                    Name = row.ColumnC,
+                                    ProjectId = row.ColumnAP,
+                                    SixCompleteValue = Convert.ToDecimal(row.ColumnX),
+                                    Year = 2022,
+                                    DateMonth = 202206
+                                });
+                                excelPlan.Add(new ExcelPlanConvertTable
+                                {
+                                    Id = GuidUtil.Next().ToString(),
+                                    Name = row.ColumnC,
+                                    ProjectId = row.ColumnAP,
+                                    SixPlanProductionValue = Convert.ToDecimal(row.ColumnW),
+                                    Year = 2022,
+                                    DateMonth = 202206
+                                });
+                                break;
+                            case 6:
+                                excelComplete.Add(new ExcelProductionConvertTable
+                                {
+                                    Id = GuidUtil.Next().ToString(),
+                                    Name = row.ColumnC,
+                                    ProjectId = row.ColumnAP,
+                                    SevenCompleteValue = Convert.ToDecimal(row.ColumnZ),
+                                    Year = 2022,
+                                    DateMonth = 202207
+                                });
+                                excelPlan.Add(new ExcelPlanConvertTable
+                                {
+                                    Id = GuidUtil.Next().ToString(),
+                                    Name = row.ColumnC,
+                                    ProjectId = row.ColumnAP,
+                                    SevenPlanProductionValue = Convert.ToDecimal(row.ColumnY),
+                                    Year = 2022,
+                                    DateMonth = 202207
+                                });
+                                break;
+                            case 7:
+                                excelComplete.Add(new ExcelProductionConvertTable
+                                {
+                                    Id = GuidUtil.Next().ToString(),
+                                    Name = row.ColumnC,
+                                    ProjectId = row.ColumnAP,
+                                    EightCompleteValue = Convert.ToDecimal(row.ColumnAB),
+                                    Year = 2022,
+                                    DateMonth = 202208
+                                });
+                                excelPlan.Add(new ExcelPlanConvertTable
+                                {
+                                    Id = GuidUtil.Next().ToString(),
+                                    Name = row.ColumnC,
+                                    ProjectId = row.ColumnAP,
+                                    EightPlanProductionValue = Convert.ToDecimal(row.ColumnAA),
+                                    Year = 2022,
+                                    DateMonth = 202208
+                                });
+                                break;
+                            case 8:
+                                excelComplete.Add(new ExcelProductionConvertTable
+                                {
+                                    Id = GuidUtil.Next().ToString(),
+                                    Name = row.ColumnC,
+                                    ProjectId = row.ColumnAP,
+                                    NineCompleteValue = Convert.ToDecimal(row.ColumnAD),
+                                    Year = 2022,
+                                    DateMonth = 202209
+                                });
+                                excelPlan.Add(new ExcelPlanConvertTable
+                                {
+                                    Id = GuidUtil.Next().ToString(),
+                                    Name = row.ColumnC,
+                                    ProjectId = row.ColumnAP,
+                                    NinePlanProductionValue = Convert.ToDecimal(row.ColumnAC),
+                                    Year = 2022,
+                                    DateMonth = 202209
+                                });
+                                break;
+                            case 9:
+                                excelComplete.Add(new ExcelProductionConvertTable
+                                {
+                                    Id = GuidUtil.Next().ToString(),
+                                    Name = row.ColumnC,
+                                    ProjectId = row.ColumnAP,
+                                    TenCompleteValue = Convert.ToDecimal(row.ColumnAF),
+                                    Year = 2022,
+                                    DateMonth = 202210
+                                });
+                                excelPlan.Add(new ExcelPlanConvertTable
+                                {
+                                    Id = GuidUtil.Next().ToString(),
+                                    Name = row.ColumnC,
+                                    ProjectId = row.ColumnAP,
+                                    TenPlanProductionValue = Convert.ToDecimal(row.ColumnAE),
+                                    Year = 2022,
+                                    DateMonth = 202210
+                                });
+                                break;
+                            case 10:
+                                excelComplete.Add(new ExcelProductionConvertTable
+                                {
+                                    Id = GuidUtil.Next().ToString(),
+                                    Name = row.ColumnC,
+                                    ProjectId = row.ColumnAP,
+                                    ElevenCompleteValue = Convert.ToDecimal(row.ColumnAH),
+                                    Year = 2022,
+                                    DateMonth = 202211
+                                });
+                                excelPlan.Add(new ExcelPlanConvertTable
+                                {
+                                    Id = GuidUtil.Next().ToString(),
+                                    Name = row.ColumnC,
+                                    ProjectId = row.ColumnAP,
+                                    ElevenPlanProductionValue = Convert.ToDecimal(row.ColumnAG),
+                                    Year = 2022,
+                                    DateMonth = 202211
+                                });
+                                break;
+                            case 11:
+                                excelComplete.Add(new ExcelProductionConvertTable
+                                {
+                                    Id = GuidUtil.Next().ToString(),
+                                    Name = row.ColumnC,
+                                    ProjectId = row.ColumnAP,
+                                    TwelveCompleteValue = Convert.ToDecimal(row.ColumnAK),
+                                    Year = 2022,
+                                    DateMonth = 202212
+                                });
+                                excelPlan.Add(new ExcelPlanConvertTable
+                                {
+                                    Id = GuidUtil.Next().ToString(),
+                                    Name = row.ColumnC,
+                                    ProjectId = row.ColumnAP,
+                                    TwelvePlanProductionValue = Convert.ToDecimal(row.ColumnAJ),
+                                    Year = 2022,
+                                    DateMonth = 202212
+                                });
+                                break;
+                        }
+
+                    }
+                    catch (Exception ex)
+                    {
+
+                        throw;
+                    }
+                }
             }
             #endregion
+            var complete = excelComplete.ToList();
+            var plan = excelPlan.ToList();
+            //_db.Insertable(complete).ExecuteCommand();
+            //_db.Insertable(plan).ExecuteCommand();
 
-            _db.Insertable(excelVal).ExecuteCommand();
+
             //var resList = JsonConvert.DeserializeObject<List<bb>>(jsonObject);
             //var ss = resList.Sum(x => x.UnitPrice * x.CompletedQuantity);
             //return projectService.aa();
