@@ -6241,6 +6241,31 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 searchOwnShipMonthReps = new List<SearchOwnShipMonthRep>(),
             };
             #region 时间信息
+
+            //开始日期结束日期都是空  默认按当天日期匹配
+            if ((requestDto.InStartDate == DateTime.MinValue || string.IsNullOrWhiteSpace(requestDto.InStartDate.ToString())) && (requestDto.InEndDate == DateTime.MinValue || string.IsNullOrWhiteSpace(requestDto.InEndDate.ToString())))
+            {
+                if (DateTime.Now.Day >= 26)
+                {
+                    requestDto.InStartDate = DateTime.Now;
+                    requestDto.InEndDate = DateTime.Now;
+                }
+                else
+                {
+                    requestDto.InStartDate = DateTime.Now.AddMonths(-1);
+                    requestDto.InEndDate = DateTime.Now.AddMonths(-1);
+                }
+            }
+            else
+            {
+                if (requestDto.InStartDate > requestDto.InEndDate)
+                {
+                    responseDto.Data = null;
+                    responseDto.FailResult(HttpStatusCode.ParameterError, "传入开始日期大于结束日期");
+                    return responseDto;
+                }
+            }
+
             var startTimeInt = int.Parse(requestDto.InStartDate.Value.ToString("yyyyMM"));
             var endTimeInt = int.Parse(requestDto.InEndDate.Value.ToString("yyyyMM"));
             var yearStart= int.Parse(requestDto.InStartDate.Value.ToString("yyyy01"));
@@ -6289,7 +6314,8 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 //.WhereIF(tag2List != null && tag2List.Any(), (osm, p) => tag2List.Contains(p.Tag2))
                 .WhereIF(!string.IsNullOrWhiteSpace(requestDto.ShipName), (a, b, c) => c.PomId.ToString() == requestDto.ShipName)
                 .WhereIF(requestDto.ShipTypeId != Guid.Empty && !string.IsNullOrWhiteSpace(requestDto.ShipTypeId.ToString()), (a, b, c) => requestDto.ShipTypeId == c.TypeId)
-               .OrderByDescending((a, b, c, d) => a.DateMonth)
+              // .OrderByDescending((a, b, c, d) => a.DateMonth)
+               .OrderByDescending((a, b, c, d) => new { b.Id, a.DateMonth,a.EnterTime })
                .Select((a, b, c, d, e) => new
                {
                    Id = a.Id,
@@ -6311,7 +6337,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                    MonthWorkDays = a.ConstructionDays,
                    RepUserName = b.ReportFormer,
                    RepUserTel = b.ReportForMertel,
-                   ProjectName = b.ShortName,
+                   ProjectName = b.Name,
                    OwnShipName = c.Name,
                    HeadUserName = string.Empty, //usersData.FirstOrDefault(y => y.Id == b.Id) != null ? usersData.FirstOrDefault(y => y.Id == b.Id).Name : string.Empty,
                    HeadUserTel = string.Empty,//usersData.FirstOrDefault(y => y.Id == b.Id) != null ? usersData.FirstOrDefault(y => y.Id == b.Id).Phone : string.Empty,
@@ -6338,7 +6364,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     BlowingDistance = item.BlowingDistance,
                     DateMonth = item.DateMonth,
                     DigDeep = item.DigDeep,
-                    EnterTime = item.EnterTime,
+                    EnterTime = item.EnterTime.ObjToDate().ToString("yyyy-MM-dd"),
                     HaulDistance = item.HaulDistance,
                     IsExamine = item.IsExamine,
                     MonthWorkDays = item.MonthWorkDays,
@@ -6361,8 +6387,9 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     MonthOutputVal = item.MonthOutputVal,
                     MonthQuantity = item.MonthQuantity,
                     Id = item.Id,
-                    QuitTime = item.QuitTime,
+                    QuitTime = item.QuitTime.ObjToDate().ToString("yyyy-MM-dd"),
                     MonthWorkHours = item.MonthWorkHours,
+                    SubmitDate = MonthDate(item.DateMonth),
                 }) ;
             }
             if (result.Count > 0)
