@@ -43,7 +43,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
     public class ProjectReportService : IProjectReportService
     {
         #region 注入实例
-    
+
         /// <summary>
         /// 项目
         /// </summary>
@@ -322,7 +322,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             , IPushPomService iPushPomService
             )
         {
-          
+
             _dbProject = dbProject;
             _dbDayReport = dbDayReport;
             _dbDayReportConstruction = dbDayReportConstruction;
@@ -3179,18 +3179,21 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
         {
             /***
              * 1.截取开始年份
-             * 2.获取存在的wbsids、
+             //* 2.获取存在的wbsids、
              * 3.获取月报主表 、获取年度、累计 明细
              * 4.排除掉202306的数据  历史数据在最后计算
              */
-
+            //if (projectId == "08dc48d2-81c6-477d-8d6e-914015773e32".ToGuid())
+            //{
+            //    var s = 1;
+            //}
             int initMonth = Convert.ToInt32(dateMonth.ToString().Substring(0, 4) + "01");
             var mMonthReport = mReport.Where(x => x.ProjectId == projectId && x.DateMonth != 202306 && x.DateMonth >= initMonth && x.DateMonth <= dateMonth).ToList();//年度
             var cumMonthReport = mReport.Where(x => x.ProjectId == projectId && x.DateMonth != 202306 && x.DateMonth <= dateMonth).ToList();//累计
 
             var wbsIds = wbsList.Select(x => x.Id).ToList();
-            var yearMonthReportList = mDetails.Where(x => x.DateMonth >= initMonth && x.DateMonth <= dateMonth && wbsIds.Contains(x.ProjectWBSId) && x.ProjectId == projectId).ToList();//年度
-            var cumMonthReportList = mDetails.Where(x => x.DateMonth <= dateMonth && wbsIds.Contains(x.ProjectWBSId) && x.ProjectId == projectId).ToList();//累计
+            var yearMonthReportList = mDetails.Where(x => x.DateMonth >= initMonth && x.DateMonth <= dateMonth/* && wbsIds.Contains(x.ProjectWBSId)*/ && x.ProjectId == projectId).ToList();//年度
+            var cumMonthReportList = mDetails.Where(x => x.DateMonth <= dateMonth /*&& wbsIds.Contains(x.ProjectWBSId)*/ && x.ProjectId == projectId).ToList();//累计
 
             return new MonthReportForProjectConvert
             {
@@ -6240,6 +6243,13 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 ownShipMonth = new SumOwnShipMonth(),
                 searchOwnShipMonthReps = new List<SearchOwnShipMonthRep>(),
             };
+            #region 导出excel
+            if (import == 2)
+            {
+                requestDto.PageSize = int.MaxValue;
+            }
+            #endregion
+
             #region 时间信息
 
             //开始日期结束日期都是空  默认按当天日期匹配
@@ -6268,7 +6278,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
 
             var startTimeInt = int.Parse(requestDto.InStartDate.Value.ToString("yyyyMM"));
             var endTimeInt = int.Parse(requestDto.InEndDate.Value.ToString("yyyyMM"));
-            var yearStart= int.Parse(requestDto.InStartDate.Value.ToString("yyyy01"));
+            var yearStart = int.Parse(requestDto.InStartDate.Value.ToString("yyyy01"));
             var yearEnd = int.Parse(requestDto.InEndDate.Value.ToString("yyyy12"));
             #endregion
 
@@ -6302,7 +6312,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                .LeftJoin<ShipPingType>((a, b, c, d) => c.TypeId == d.PomId)
                .LeftJoin<Institution>((a, b, c, d, e) => b.CompanyId == e.PomId)
                .Where((a, b) => a.IsDelete == 1 && a.DateMonth >= startTimeInt && a.DateMonth <= endTimeInt)
-                .WhereIF(requestDto.CompanyId != null, (a,b) => b.CompanyId == requestDto.CompanyId)
+                .WhereIF(requestDto.CompanyId != null, (a, b) => b.CompanyId == requestDto.CompanyId)
                 .WhereIF(requestDto.ProjectDept != null, (a, b) => b.ProjectDept == requestDto.ProjectDept)
                 .WhereIF(requestDto.ProjectStatusId != null && requestDto.ProjectStatusId.Any(), (a, b) => requestDto.ProjectStatusId.Contains(b.StatusId.Value.ToString()))
                 .WhereIF(requestDto.ProjectRegionId != null, (a, b) => b.RegionId == requestDto.ProjectRegionId)
@@ -6314,14 +6324,14 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 //.WhereIF(tag2List != null && tag2List.Any(), (osm, p) => tag2List.Contains(p.Tag2))
                 .WhereIF(!string.IsNullOrWhiteSpace(requestDto.ShipName), (a, b, c) => c.PomId.ToString() == requestDto.ShipName)
                 .WhereIF(requestDto.ShipTypeId != Guid.Empty && !string.IsNullOrWhiteSpace(requestDto.ShipTypeId.ToString()), (a, b, c) => requestDto.ShipTypeId == c.TypeId)
-              // .OrderByDescending((a, b, c, d) => a.DateMonth)
-               .OrderByDescending((a, b, c, d) => new { b.Id, a.DateMonth,a.EnterTime })
+               // .OrderByDescending((a, b, c, d) => a.DateMonth)
+               .OrderByDescending((a, b, c, d) => new { b.Id, a.DateMonth, a.EnterTime })
                .Select((a, b, c, d, e) => new
                {
                    Id = a.Id,
                    ProjectId = b.Id,
                    ShipId = a.ShipId,
-                   ShipTypeName=d.Name,
+                   ShipTypeName = d.Name,
                    BlowingDistance = a.BlowingDistance,
                    DateMonth = a.DateMonth,
                    DigDeep = a.DigDeep,
@@ -6329,7 +6339,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                    QuitTime = a.QuitTime.ToString(),
                    GKJBId = a.ConditionGradeId,
                    GYFSId = a.WorkModeId,
-                   ContractDetailType=a.ContractDetailType,
+                   ContractDetailType = a.ContractDetailType,
                    HaulDistance = a.HaulDistance,
                    MonthOutputVal = a.ProductionAmount,
                    MonthQuantity = a.Production,
@@ -6344,8 +6354,8 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                    ThiUnitName = e.Shortname,
                    SecUnitName = "广航局",
                    IsExamine = 0,
-                   YearOutputVal = SqlFunc.Subqueryable<OwnerShipMonthReport>().Where(x => x.DateMonth >= yearStart && x.DateMonth <=yearEnd
-                   && x.ShipId==a.ShipId&&x.ProjectId==a.ProjectId&&x.DateMonth<=a.DateMonth).Sum(x => x.Production),
+                   YearOutputVal = SqlFunc.Subqueryable<OwnerShipMonthReport>().Where(x => x.DateMonth >= yearStart && x.DateMonth <= yearEnd
+                   && x.ShipId == a.ShipId && x.ProjectId == a.ProjectId && x.DateMonth <= a.DateMonth).Sum(x => x.Production),
                    YearQuantity = SqlFunc.Subqueryable<OwnerShipMonthReport>().Where(x => x.DateMonth >= yearStart && x.DateMonth <= yearEnd && x.ShipId == a.ShipId && x.ProjectId == a.ProjectId && x.DateMonth <= a.DateMonth).Sum(x => x.ProductionAmount),
                    YearWorkDays = SqlFunc.Subqueryable<OwnerShipMonthReport>().Where(x => x.DateMonth >= yearStart && x.DateMonth <= yearEnd && x.ShipId == a.ShipId && x.ProjectId == a.ProjectId && x.DateMonth <= a.DateMonth).Sum(x => x.ConstructionDays),
                    YearWorkHours = SqlFunc.Subqueryable<OwnerShipMonthReport>().Where(x => x.DateMonth >= yearStart && x.DateMonth <= yearEnd && x.ShipId == a.ShipId && x.ProjectId == a.ProjectId && x.DateMonth <= a.DateMonth).Sum(x => x.WorkingHours),
@@ -6390,7 +6400,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     QuitTime = item.QuitTime.ObjToDate().ToString("yyyy-MM-dd"),
                     MonthWorkHours = item.MonthWorkHours,
                     SubmitDate = MonthDate(item.DateMonth),
-                }) ;
+                });
             }
             if (result.Count > 0)
             {
@@ -6398,9 +6408,9 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 {
                     SumMonthOutputVal = result.Sum(x => x.MonthOutputVal),
                     SumMonthQuantity = result.Sum(x => x.MonthQuantity),
-            };
+                };
             }
-            var pageResult= searchOwnShipMonthRepResponseDto.searchOwnShipMonthReps.Skip((requestDto.PageIndex - 1) * requestDto.PageSize).Take(requestDto.PageSize).ToList();
+            var pageResult = searchOwnShipMonthRepResponseDto.searchOwnShipMonthReps.Skip((requestDto.PageIndex - 1) * requestDto.PageSize).Take(requestDto.PageSize).ToList();
             searchOwnShipMonthRepResponseDto.searchOwnShipMonthReps = pageResult;
             responseDto.Count = result.Count;
             responseDto.Data = searchOwnShipMonthRepResponseDto;
@@ -8292,6 +8302,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             //var templatePath = "D:\\projectconllection\\dotnet\\szgh\\GHMonitoringCenterApi.Domain.Shared\\Template\\Excel\\ProjectMonthOutPutTemplate.xlsx";
 
             var templatePath = $"Template/Excel/ProjectMonthOutPutTemplate.xlsx";
+            //var templatePath = $@"E:\project\HNKC.SZGHAPI\szgh\ghmonitoringcenterapi\GHMonitoringCenterApi.Domain.Shared\Template\Excel\ProjectMonthOutPutTemplate.xlsx";
             //var templatePath = $@"E:\project\HNKC.SZGHAPI\szgh\ghmonitoringcenterapi\GHMonitoringCenterApi.Domain.Shared\Template\Excel\ProjectMonthOutPutTemplate.xlsx";
             XSSFWorkbook workbook = null;
             using (var fs = new FileStream(templatePath, FileMode.Open, FileAccess.Read))

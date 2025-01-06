@@ -3471,5 +3471,120 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             responseAjaxResult.SuccessResult(true);
             return responseAjaxResult;
         }
+        /// <summary>
+        /// 历史产值月报列表
+        /// </summary>
+        /// <param name="requestBody"></param>
+        /// <returns></returns>
+        public async Task<ResponseAjaxResult<List<HistoryProjectMonthReportResponseDto>>> SearchHistoryProjectMonthRepAsync(HistoryProjectMonthReportRequestDto requestBody)
+        {
+            ResponseAjaxResult<List<HistoryProjectMonthReportResponseDto>> rt = new();
+            List<HistoryProjectMonthReportResponseDto> rr = new();
+
+            //complete
+            var completeData = await dbContext.Queryable<ExcelProductionConvertTable>()
+                .ToListAsync();
+            var pIds = completeData.Select(x => new { x.ProjectId, x.Name }).Distinct().ToList();
+            //plan
+            var planData = await dbContext.Queryable<ExcelPlanConvertTable>()
+                .Where(x => pIds.Select(x => x.ProjectId).Contains(x.ProjectId)).ToListAsync();
+
+            foreach (var item in pIds)
+            {
+                var month = new List<int> { 2019, 2020, 2021, 2022, 2023 };
+                foreach (var mh in month)
+                {
+                    for (int i = 1; i < 13; i++)
+                    {
+                        decimal? compleValue = 0M;
+                        decimal? planValue = 0M;
+                        var md = Convert.ToInt32(mh + (i < 10 ? "0" + i : i.ToString()));
+                        ConvertHelper.TryParseFromDateMonth(md, out DateTime monthTime);
+                        //完成
+                        var crs = completeData.FirstOrDefault(x => x.DateMonth == md && x.ProjectId == item.ProjectId);
+                        //计划
+                        var prs = planData.FirstOrDefault(x => x.DateMonth == md && x.ProjectId == item.ProjectId);
+                        switch (i)
+                        {
+                            case 1:
+                                compleValue = crs?.OneCompleteValue;
+                                planValue = prs?.OnePlanProductionValue;
+                                break;
+                            case 2:
+                                compleValue = crs?.TwoCompleteValue;
+                                planValue = prs?.TwoPlanProductionValue;
+                                break;
+                            case 3:
+                                compleValue = crs?.ThreeCompleteValue;
+                                planValue = prs?.ThreePlanProductionValue;
+                                break;
+                            case 4:
+                                compleValue = crs?.FourCompleteValue;
+                                planValue = prs?.FourPlanProductionValue;
+                                break;
+                            case 5:
+                                compleValue = crs?.FiveCompleteValue;
+                                planValue = prs?.FivePlanProductionValue;
+                                break;
+                            case 6:
+                                compleValue = crs?.SixCompleteValue;
+                                planValue = prs?.SixPlanProductionValue;
+                                break;
+                            case 7:
+                                compleValue = crs?.SevenCompleteValue;
+                                planValue = prs?.SevenPlanProductionValue;
+                                break;
+                            case 8:
+                                compleValue = crs?.EightCompleteValue;
+                                planValue = prs?.EightPlanProductionValue;
+                                break;
+                            case 9:
+                                compleValue = crs?.NineCompleteValue;
+                                planValue = prs?.NinePlanProductionValue;
+                                break;
+                            case 10:
+                                compleValue = crs?.TenCompleteValue;
+                                planValue = prs?.TenPlanProductionValue;
+                                break;
+                            case 11:
+                                compleValue = crs?.ElevenCompleteValue;
+                                planValue = prs?.ElevenPlanProductionValue;
+                                break;
+                            case 12:
+                                compleValue = crs?.TwelveCompleteValue;
+                                planValue = prs?.TwelvePlanProductionValue;
+                                break;
+                        }
+
+                        rr.Add(new HistoryProjectMonthReportResponseDto
+                        {
+                            Year = mh,
+                            ProjectId = item.ProjectId,
+                            CompleteValue = compleValue,
+                            PlanValue = planValue,
+                            DateMonth = Convert.ToDateTime(monthTime.ToString("yyyy/MM/dd")),
+                            CompleteId = crs?.Id,
+                            PlanId = prs?.Id,
+                            ProjectName = item.Name
+                        });
+                    }
+                }
+            }
+
+            var result = rr
+                .WhereIF(!string.IsNullOrWhiteSpace(requestBody.KeyWords), x => x.ProjectName.Contains(requestBody.KeyWords))
+                .WhereIF(!string.IsNullOrWhiteSpace(requestBody.DateMonth.ToString()), x => x.DateMonth == requestBody.DateMonth)
+                .ToList();
+            result.ForEach(x => x.TotalCompleteValue = result.Sum(x => x.CompleteValue));
+
+            var finallyrt = result.OrderBy(x => x.ProjectName)
+                .ThenByDescending(x => x.DateMonth)
+                .Skip(requestBody.PageSize * (requestBody.PageIndex - 1)).Take(requestBody.PageSize)
+                .ToList();
+
+            rt.Count = result.Count;
+            rt.SuccessResult(finallyrt);
+            return rt;
+        }
     }
 }

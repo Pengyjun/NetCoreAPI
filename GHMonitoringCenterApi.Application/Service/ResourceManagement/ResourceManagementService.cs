@@ -45,7 +45,7 @@ namespace GHMonitoringCenterApi.Application.Service.ResourceManagement
         public async Task<ResponseAjaxResult<List<SearchShipTabulationRequestDto>>> SearchResourcesAsync(SearchShipTabulationResponseDto searchShipTabulationResponseDto)
         {
             var responseAjaxResult = new ResponseAjaxResult<List<SearchShipTabulationRequestDto>>();
-            if (searchShipTabulationResponseDto.Type == ConstructionOutPutType.Self)
+            if (searchShipTabulationResponseDto.Type == ConstructionOutPutType.Self|| searchShipTabulationResponseDto.Type == ConstructionOutPutType.SubOwner)
             {
                 //资源扩展表数据
                 var extendedData = await dbContext.Queryable<ShipResources>()
@@ -68,7 +68,7 @@ namespace GHMonitoringCenterApi.Application.Service.ResourceManagement
                 responseAjaxResult.Count = extendedData.Count;
                 responseAjaxResult.Success();
             }
-            else if (searchShipTabulationResponseDto.Type == ConstructionOutPutType.SubPackage || searchShipTabulationResponseDto.Type == ConstructionOutPutType.SubOwner)
+            else if (searchShipTabulationResponseDto.Type == ConstructionOutPutType.SubPackage )
             {
                 //资源扩展表数据
                 var extendedData = await dbContext.Queryable<ShipResources>()

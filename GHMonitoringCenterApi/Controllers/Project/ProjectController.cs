@@ -784,7 +784,28 @@ namespace GHMonitoringCenterApi.Controllers.Project
         {
             return await projectService.RevocationProjectMonthAsync(basePrimaryRequestDto.Id);
         }
-
+        /// <summary>
+        /// 历史产值月报列表
+        /// </summary>
+        /// <param name="requestBody"></param>
+        /// <returns></returns>
+        [HttpGet("SearchHistoryProjectMonthRep")]
+        public async Task<ResponseAjaxResult<List<HistoryProjectMonthReportResponseDto>>> SearchHistoryProjectMonthRepAsync([FromQuery] HistoryProjectMonthReportRequestDto requestBody)
+        {
+            return await projectService.SearchHistoryProjectMonthRepAsync(requestBody);
+        }
+        /// <summary>
+        /// 获取指定用户权限
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("GetPermissions")]
+        public ResponseAjaxResult<bool> GetPermissionsByUser()
+        {
+            ResponseAjaxResult<bool> rt = new();
+            if (CurrentUser.Account == "2016146340" || CurrentUser.Account == "2022002687") rt.Data = true;
+            else rt.Data = false;
+            return rt;
+        }
         #region  新的项目月报列表
         [HttpPost("aa")]
         [AllowAnonymous]
@@ -845,7 +866,7 @@ namespace GHMonitoringCenterApi.Controllers.Project
                         case 0:
                             excelComplete.Add(new ExcelProductionConvertTable
                             {
-                                Id = GuidUtil.Next().ToString(),
+                                Id = GuidUtil.Next(),
                                 Name = row.ColumnB,
                                 ProjectId = row.ColumnBL,
                                 OneCompleteValue = row.ColumnL,
@@ -854,7 +875,7 @@ namespace GHMonitoringCenterApi.Controllers.Project
                             });
                             excelPlan.Add(new ExcelPlanConvertTable
                             {
-                                Id = GuidUtil.Next().ToString(),
+                                Id = GuidUtil.Next(),
                                 Name = row.ColumnB,
                                 ProjectId = row.ColumnBL,
                                 OnePlanProductionValue = row.ColumnK,
@@ -865,7 +886,7 @@ namespace GHMonitoringCenterApi.Controllers.Project
                         case 1:
                             excelComplete.Add(new ExcelProductionConvertTable
                             {
-                                Id = GuidUtil.Next().ToString(),
+                                Id = GuidUtil.Next(),
                                 Name = row.ColumnB,
                                 ProjectId = row.ColumnBL,
                                 TwoCompleteValue = row.ColumnP,
@@ -874,7 +895,7 @@ namespace GHMonitoringCenterApi.Controllers.Project
                             });
                             excelPlan.Add(new ExcelPlanConvertTable
                             {
-                                Id = GuidUtil.Next().ToString(),
+                                Id = GuidUtil.Next(),
                                 Name = row.ColumnB,
                                 ProjectId = row.ColumnBL,
                                 TwoPlanProductionValue = row.ColumnO,
@@ -885,7 +906,7 @@ namespace GHMonitoringCenterApi.Controllers.Project
                         case 2:
                             excelComplete.Add(new ExcelProductionConvertTable
                             {
-                                Id = GuidUtil.Next().ToString(),
+                                Id = GuidUtil.Next(),
                                 Name = row.ColumnB,
                                 ProjectId = row.ColumnBL,
                                 ThreeCompleteValue = row.ColumnT,
@@ -894,7 +915,7 @@ namespace GHMonitoringCenterApi.Controllers.Project
                             });
                             excelPlan.Add(new ExcelPlanConvertTable
                             {
-                                Id = GuidUtil.Next().ToString(),
+                                Id = GuidUtil.Next(),
                                 Name = row.ColumnB,
                                 ProjectId = row.ColumnBL,
                                 ThreePlanProductionValue = row.ColumnS,
@@ -905,7 +926,7 @@ namespace GHMonitoringCenterApi.Controllers.Project
                         case 3:
                             excelComplete.Add(new ExcelProductionConvertTable
                             {
-                                Id = GuidUtil.Next().ToString(),
+                                Id = GuidUtil.Next(),
                                 Name = row.ColumnB,
                                 ProjectId = row.ColumnBL,
                                 FourCompleteValue = row.ColumnX,
@@ -914,7 +935,7 @@ namespace GHMonitoringCenterApi.Controllers.Project
                             });
                             excelPlan.Add(new ExcelPlanConvertTable
                             {
-                                Id = GuidUtil.Next().ToString(),
+                                Id = GuidUtil.Next(),
                                 Name = row.ColumnB,
                                 ProjectId = row.ColumnBL,
                                 FourPlanProductionValue = row.ColumnW,
@@ -925,7 +946,7 @@ namespace GHMonitoringCenterApi.Controllers.Project
                         case 4:
                             excelComplete.Add(new ExcelProductionConvertTable
                             {
-                                Id = GuidUtil.Next().ToString(),
+                                Id = GuidUtil.Next(),
                                 Name = row.ColumnB,
                                 ProjectId = row.ColumnBL,
                                 FiveCompleteValue = row.ColumnAB,
@@ -934,7 +955,7 @@ namespace GHMonitoringCenterApi.Controllers.Project
                             });
                             excelPlan.Add(new ExcelPlanConvertTable
                             {
-                                Id = GuidUtil.Next().ToString(),
+                                Id = GuidUtil.Next(),
                                 Name = row.ColumnB,
                                 ProjectId = row.ColumnBL,
                                 FivePlanProductionValue = row.ColumnAA,
@@ -945,7 +966,7 @@ namespace GHMonitoringCenterApi.Controllers.Project
                         case 5:
                             excelComplete.Add(new ExcelProductionConvertTable
                             {
-                                Id = GuidUtil.Next().ToString(),
+                                Id = GuidUtil.Next(),
                                 Name = row.ColumnB,
                                 ProjectId = row.ColumnBL,
                                 SixCompleteValue = row.ColumnAF,
@@ -954,7 +975,7 @@ namespace GHMonitoringCenterApi.Controllers.Project
                             });
                             excelPlan.Add(new ExcelPlanConvertTable
                             {
-                                Id = GuidUtil.Next().ToString(),
+                                Id = GuidUtil.Next(),
                                 Name = row.ColumnB,
                                 ProjectId = row.ColumnBL,
                                 SixPlanProductionValue = row.ColumnAE,
@@ -965,7 +986,7 @@ namespace GHMonitoringCenterApi.Controllers.Project
                         case 6:
                             excelComplete.Add(new ExcelProductionConvertTable
                             {
-                                Id = GuidUtil.Next().ToString(),
+                                Id = GuidUtil.Next(),
                                 Name = row.ColumnB,
                                 ProjectId = row.ColumnBL,
                                 SevenCompleteValue = row.ColumnAJ,
@@ -974,7 +995,7 @@ namespace GHMonitoringCenterApi.Controllers.Project
                             });
                             excelPlan.Add(new ExcelPlanConvertTable
                             {
-                                Id = GuidUtil.Next().ToString(),
+                                Id = GuidUtil.Next(),
                                 Name = row.ColumnB,
                                 ProjectId = row.ColumnBL,
                                 SevenPlanProductionValue = row.ColumnAI,
@@ -985,7 +1006,7 @@ namespace GHMonitoringCenterApi.Controllers.Project
                         case 7:
                             excelComplete.Add(new ExcelProductionConvertTable
                             {
-                                Id = GuidUtil.Next().ToString(),
+                                Id = GuidUtil.Next(),
                                 Name = row.ColumnB,
                                 ProjectId = row.ColumnBL,
                                 EightCompleteValue = row.ColumnAN,
@@ -994,7 +1015,7 @@ namespace GHMonitoringCenterApi.Controllers.Project
                             });
                             excelPlan.Add(new ExcelPlanConvertTable
                             {
-                                Id = GuidUtil.Next().ToString(),
+                                Id = GuidUtil.Next(),
                                 Name = row.ColumnB,
                                 ProjectId = row.ColumnBL,
                                 EightPlanProductionValue = row.ColumnAM,
@@ -1005,7 +1026,7 @@ namespace GHMonitoringCenterApi.Controllers.Project
                         case 8:
                             excelComplete.Add(new ExcelProductionConvertTable
                             {
-                                Id = GuidUtil.Next().ToString(),
+                                Id = GuidUtil.Next(),
                                 Name = row.ColumnB,
                                 ProjectId = row.ColumnBL,
                                 NineCompleteValue = row.ColumnAR,
@@ -1014,7 +1035,7 @@ namespace GHMonitoringCenterApi.Controllers.Project
                             });
                             excelPlan.Add(new ExcelPlanConvertTable
                             {
-                                Id = GuidUtil.Next().ToString(),
+                                Id = GuidUtil.Next(),
                                 Name = row.ColumnB,
                                 ProjectId = row.ColumnBL,
                                 NinePlanProductionValue = row.ColumnAQ,
@@ -1025,7 +1046,7 @@ namespace GHMonitoringCenterApi.Controllers.Project
                         case 9:
                             excelComplete.Add(new ExcelProductionConvertTable
                             {
-                                Id = GuidUtil.Next().ToString(),
+                                Id = GuidUtil.Next(),
                                 Name = row.ColumnB,
                                 ProjectId = row.ColumnBL,
                                 TenCompleteValue = row.ColumnAV,
@@ -1034,7 +1055,7 @@ namespace GHMonitoringCenterApi.Controllers.Project
                             });
                             excelPlan.Add(new ExcelPlanConvertTable
                             {
-                                Id = GuidUtil.Next().ToString(),
+                                Id = GuidUtil.Next(),
                                 Name = row.ColumnB,
                                 ProjectId = row.ColumnBL,
                                 TenPlanProductionValue = row.ColumnAU,
@@ -1045,7 +1066,7 @@ namespace GHMonitoringCenterApi.Controllers.Project
                         case 10:
                             excelComplete.Add(new ExcelProductionConvertTable
                             {
-                                Id = GuidUtil.Next().ToString(),
+                                Id = GuidUtil.Next(),
                                 Name = row.ColumnB,
                                 ProjectId = row.ColumnBL,
                                 ElevenCompleteValue = row.ColumnAZ,
@@ -1054,7 +1075,7 @@ namespace GHMonitoringCenterApi.Controllers.Project
                             });
                             excelPlan.Add(new ExcelPlanConvertTable
                             {
-                                Id = GuidUtil.Next().ToString(),
+                                Id = GuidUtil.Next(),
                                 Name = row.ColumnB,
                                 ProjectId = row.ColumnBL,
                                 ElevenPlanProductionValue = row.ColumnAY,
@@ -1065,7 +1086,7 @@ namespace GHMonitoringCenterApi.Controllers.Project
                         case 11:
                             excelComplete.Add(new ExcelProductionConvertTable
                             {
-                                Id = GuidUtil.Next().ToString(),
+                                Id = GuidUtil.Next(),
                                 Name = row.ColumnB,
                                 ProjectId = row.ColumnBL,
                                 TwelveCompleteValue = row.ColumnBD,
@@ -1074,7 +1095,7 @@ namespace GHMonitoringCenterApi.Controllers.Project
                             });
                             excelPlan.Add(new ExcelPlanConvertTable
                             {
-                                Id = GuidUtil.Next().ToString(),
+                                Id = GuidUtil.Next(),
                                 Name = row.ColumnB,
                                 ProjectId = row.ColumnBL,
                                 TwelvePlanProductionValue = row.ColumnBC,
@@ -1131,7 +1152,7 @@ namespace GHMonitoringCenterApi.Controllers.Project
                         case 0:
                             excelComplete.Add(new ExcelProductionConvertTable
                             {
-                                Id = GuidUtil.Next().ToString(),
+                                Id = GuidUtil.Next(),
                                 Name = row.ColumnB,
                                 ProjectId = row.ColumnBK,
                                 OneCompleteValue = row.ColumnL,
@@ -1140,7 +1161,7 @@ namespace GHMonitoringCenterApi.Controllers.Project
                             });
                             excelPlan.Add(new ExcelPlanConvertTable
                             {
-                                Id = GuidUtil.Next().ToString(),
+                                Id = GuidUtil.Next(),
                                 Name = row.ColumnB,
                                 ProjectId = row.ColumnBK,
                                 OnePlanProductionValue = row.ColumnK,
@@ -1151,7 +1172,7 @@ namespace GHMonitoringCenterApi.Controllers.Project
                         case 1:
                             excelComplete.Add(new ExcelProductionConvertTable
                             {
-                                Id = GuidUtil.Next().ToString(),
+                                Id = GuidUtil.Next(),
                                 Name = row.ColumnB,
                                 ProjectId = row.ColumnBK,
                                 TwoCompleteValue = row.ColumnP,
@@ -1160,7 +1181,7 @@ namespace GHMonitoringCenterApi.Controllers.Project
                             });
                             excelPlan.Add(new ExcelPlanConvertTable
                             {
-                                Id = GuidUtil.Next().ToString(),
+                                Id = GuidUtil.Next(),
                                 Name = row.ColumnB,
                                 ProjectId = row.ColumnBK,
                                 TwoPlanProductionValue = row.ColumnO,
@@ -1171,7 +1192,7 @@ namespace GHMonitoringCenterApi.Controllers.Project
                         case 2:
                             excelComplete.Add(new ExcelProductionConvertTable
                             {
-                                Id = GuidUtil.Next().ToString(),
+                                Id = GuidUtil.Next(),
                                 Name = row.ColumnB,
                                 ProjectId = row.ColumnBK,
                                 ThreeCompleteValue = row.ColumnT,
@@ -1180,7 +1201,7 @@ namespace GHMonitoringCenterApi.Controllers.Project
                             });
                             excelPlan.Add(new ExcelPlanConvertTable
                             {
-                                Id = GuidUtil.Next().ToString(),
+                                Id = GuidUtil.Next(),
                                 Name = row.ColumnB,
                                 ProjectId = row.ColumnBK,
                                 ThreePlanProductionValue = row.ColumnS,
@@ -1191,7 +1212,7 @@ namespace GHMonitoringCenterApi.Controllers.Project
                         case 3:
                             excelComplete.Add(new ExcelProductionConvertTable
                             {
-                                Id = GuidUtil.Next().ToString(),
+                                Id = GuidUtil.Next(),
                                 Name = row.ColumnB,
                                 ProjectId = row.ColumnBK,
                                 FourCompleteValue = row.ColumnX,
@@ -1200,7 +1221,7 @@ namespace GHMonitoringCenterApi.Controllers.Project
                             });
                             excelPlan.Add(new ExcelPlanConvertTable
                             {
-                                Id = GuidUtil.Next().ToString(),
+                                Id = GuidUtil.Next(),
                                 Name = row.ColumnB,
                                 ProjectId = row.ColumnBK,
                                 FourPlanProductionValue = row.ColumnW,
@@ -1211,7 +1232,7 @@ namespace GHMonitoringCenterApi.Controllers.Project
                         case 4:
                             excelComplete.Add(new ExcelProductionConvertTable
                             {
-                                Id = GuidUtil.Next().ToString(),
+                                Id = GuidUtil.Next(),
                                 Name = row.ColumnB,
                                 ProjectId = row.ColumnBK,
                                 FiveCompleteValue = row.ColumnAB,
@@ -1220,7 +1241,7 @@ namespace GHMonitoringCenterApi.Controllers.Project
                             });
                             excelPlan.Add(new ExcelPlanConvertTable
                             {
-                                Id = GuidUtil.Next().ToString(),
+                                Id = GuidUtil.Next(),
                                 Name = row.ColumnB,
                                 ProjectId = row.ColumnBK,
                                 FivePlanProductionValue = row.ColumnAA,
@@ -1231,7 +1252,7 @@ namespace GHMonitoringCenterApi.Controllers.Project
                         case 5:
                             excelComplete.Add(new ExcelProductionConvertTable
                             {
-                                Id = GuidUtil.Next().ToString(),
+                                Id = GuidUtil.Next(),
                                 Name = row.ColumnB,
                                 ProjectId = row.ColumnBK,
                                 SixCompleteValue = row.ColumnAF,
@@ -1240,7 +1261,7 @@ namespace GHMonitoringCenterApi.Controllers.Project
                             });
                             excelPlan.Add(new ExcelPlanConvertTable
                             {
-                                Id = GuidUtil.Next().ToString(),
+                                Id = GuidUtil.Next(),
                                 Name = row.ColumnB,
                                 ProjectId = row.ColumnBK,
                                 SixPlanProductionValue = row.ColumnAE,
@@ -1251,7 +1272,7 @@ namespace GHMonitoringCenterApi.Controllers.Project
                         case 6:
                             excelComplete.Add(new ExcelProductionConvertTable
                             {
-                                Id = GuidUtil.Next().ToString(),
+                                Id = GuidUtil.Next(),
                                 Name = row.ColumnB,
                                 ProjectId = row.ColumnBK,
                                 SevenCompleteValue = row.ColumnAJ,
@@ -1260,7 +1281,7 @@ namespace GHMonitoringCenterApi.Controllers.Project
                             });
                             excelPlan.Add(new ExcelPlanConvertTable
                             {
-                                Id = GuidUtil.Next().ToString(),
+                                Id = GuidUtil.Next(),
                                 Name = row.ColumnB,
                                 ProjectId = row.ColumnBK,
                                 SevenPlanProductionValue = row.ColumnAI,
@@ -1271,7 +1292,7 @@ namespace GHMonitoringCenterApi.Controllers.Project
                         case 7:
                             excelComplete.Add(new ExcelProductionConvertTable
                             {
-                                Id = GuidUtil.Next().ToString(),
+                                Id = GuidUtil.Next(),
                                 Name = row.ColumnB,
                                 ProjectId = row.ColumnBK,
                                 EightCompleteValue = row.ColumnAN,
@@ -1280,7 +1301,7 @@ namespace GHMonitoringCenterApi.Controllers.Project
                             });
                             excelPlan.Add(new ExcelPlanConvertTable
                             {
-                                Id = GuidUtil.Next().ToString(),
+                                Id = GuidUtil.Next(),
                                 Name = row.ColumnB,
                                 ProjectId = row.ColumnBK,
                                 EightPlanProductionValue = row.ColumnAM,
@@ -1291,7 +1312,7 @@ namespace GHMonitoringCenterApi.Controllers.Project
                         case 8:
                             excelComplete.Add(new ExcelProductionConvertTable
                             {
-                                Id = GuidUtil.Next().ToString(),
+                                Id = GuidUtil.Next(),
                                 Name = row.ColumnB,
                                 ProjectId = row.ColumnBK,
                                 NineCompleteValue = row.ColumnAR,
@@ -1300,7 +1321,7 @@ namespace GHMonitoringCenterApi.Controllers.Project
                             });
                             excelPlan.Add(new ExcelPlanConvertTable
                             {
-                                Id = GuidUtil.Next().ToString(),
+                                Id = GuidUtil.Next(),
                                 Name = row.ColumnB,
                                 ProjectId = row.ColumnBK,
                                 NinePlanProductionValue = row.ColumnAQ,
@@ -1311,7 +1332,7 @@ namespace GHMonitoringCenterApi.Controllers.Project
                         case 9:
                             excelComplete.Add(new ExcelProductionConvertTable
                             {
-                                Id = GuidUtil.Next().ToString(),
+                                Id = GuidUtil.Next(),
                                 Name = row.ColumnB,
                                 ProjectId = row.ColumnBK,
                                 TenCompleteValue = row.ColumnAW,
@@ -1320,7 +1341,7 @@ namespace GHMonitoringCenterApi.Controllers.Project
                             });
                             excelPlan.Add(new ExcelPlanConvertTable
                             {
-                                Id = GuidUtil.Next().ToString(),
+                                Id = GuidUtil.Next(),
                                 Name = row.ColumnB,
                                 ProjectId = row.ColumnBK,
                                 TenPlanProductionValue = row.ColumnAV,
@@ -1331,7 +1352,7 @@ namespace GHMonitoringCenterApi.Controllers.Project
                         case 10:
                             excelComplete.Add(new ExcelProductionConvertTable
                             {
-                                Id = GuidUtil.Next().ToString(),
+                                Id = GuidUtil.Next(),
                                 Name = row.ColumnB,
                                 ProjectId = row.ColumnBK,
                                 ElevenCompleteValue = row.ColumnBB,
@@ -1340,7 +1361,7 @@ namespace GHMonitoringCenterApi.Controllers.Project
                             });
                             excelPlan.Add(new ExcelPlanConvertTable
                             {
-                                Id = GuidUtil.Next().ToString(),
+                                Id = GuidUtil.Next(),
                                 Name = row.ColumnB,
                                 ProjectId = row.ColumnBK,
                                 ElevenPlanProductionValue = row.ColumnBA,
@@ -1351,7 +1372,7 @@ namespace GHMonitoringCenterApi.Controllers.Project
                         case 11:
                             excelComplete.Add(new ExcelProductionConvertTable
                             {
-                                Id = GuidUtil.Next().ToString(),
+                                Id = GuidUtil.Next(),
                                 Name = row.ColumnB,
                                 ProjectId = row.ColumnBK,
                                 TwelveCompleteValue = row.ColumnBG,
@@ -1360,7 +1381,7 @@ namespace GHMonitoringCenterApi.Controllers.Project
                             });
                             excelPlan.Add(new ExcelPlanConvertTable
                             {
-                                Id = GuidUtil.Next().ToString(),
+                                Id = GuidUtil.Next(),
                                 Name = row.ColumnB,
                                 ProjectId = row.ColumnBK,
                                 TwelvePlanProductionValue = row.ColumnBF,
@@ -1418,7 +1439,7 @@ namespace GHMonitoringCenterApi.Controllers.Project
                         case 0:
                             excelComplete.Add(new ExcelProductionConvertTable
                             {
-                                Id = GuidUtil.Next().ToString(),
+                                Id = GuidUtil.Next(),
                                 Name = row.ColumnC,
                                 ProjectId = row.ColumnAM,
                                 OneCompleteValue = row.ColumnK,
@@ -1427,7 +1448,7 @@ namespace GHMonitoringCenterApi.Controllers.Project
                             });
                             excelPlan.Add(new ExcelPlanConvertTable
                             {
-                                Id = GuidUtil.Next().ToString(),
+                                Id = GuidUtil.Next(),
                                 Name = row.ColumnC,
                                 ProjectId = row.ColumnAM,
                                 OnePlanProductionValue = row.ColumnJ,
@@ -1438,7 +1459,7 @@ namespace GHMonitoringCenterApi.Controllers.Project
                         case 1:
                             excelComplete.Add(new ExcelProductionConvertTable
                             {
-                                Id = GuidUtil.Next().ToString(),
+                                Id = GuidUtil.Next(),
                                 Name = row.ColumnC,
                                 ProjectId = row.ColumnAM,
                                 TwoCompleteValue = row.ColumnM,
@@ -1447,7 +1468,7 @@ namespace GHMonitoringCenterApi.Controllers.Project
                             });
                             excelPlan.Add(new ExcelPlanConvertTable
                             {
-                                Id = GuidUtil.Next().ToString(),
+                                Id = GuidUtil.Next(),
                                 Name = row.ColumnC,
                                 ProjectId = row.ColumnAM,
                                 TwoPlanProductionValue = row.ColumnL,
@@ -1458,7 +1479,7 @@ namespace GHMonitoringCenterApi.Controllers.Project
                         case 2:
                             excelComplete.Add(new ExcelProductionConvertTable
                             {
-                                Id = GuidUtil.Next().ToString(),
+                                Id = GuidUtil.Next(),
                                 Name = row.ColumnC,
                                 ProjectId = row.ColumnAM,
                                 ThreeCompleteValue = row.ColumnO,
@@ -1467,7 +1488,7 @@ namespace GHMonitoringCenterApi.Controllers.Project
                             });
                             excelPlan.Add(new ExcelPlanConvertTable
                             {
-                                Id = GuidUtil.Next().ToString(),
+                                Id = GuidUtil.Next(),
                                 Name = row.ColumnC,
                                 ProjectId = row.ColumnAM,
                                 ThreePlanProductionValue = row.ColumnN,
@@ -1478,7 +1499,7 @@ namespace GHMonitoringCenterApi.Controllers.Project
                         case 3:
                             excelComplete.Add(new ExcelProductionConvertTable
                             {
-                                Id = GuidUtil.Next().ToString(),
+                                Id = GuidUtil.Next(),
                                 Name = row.ColumnC,
                                 ProjectId = row.ColumnAM,
                                 FourCompleteValue = row.ColumnQ,
@@ -1487,7 +1508,7 @@ namespace GHMonitoringCenterApi.Controllers.Project
                             });
                             excelPlan.Add(new ExcelPlanConvertTable
                             {
-                                Id = GuidUtil.Next().ToString(),
+                                Id = GuidUtil.Next(),
                                 Name = row.ColumnC,
                                 ProjectId = row.ColumnAM,
                                 FourPlanProductionValue = row.ColumnP,
@@ -1498,7 +1519,7 @@ namespace GHMonitoringCenterApi.Controllers.Project
                         case 4:
                             excelComplete.Add(new ExcelProductionConvertTable
                             {
-                                Id = GuidUtil.Next().ToString(),
+                                Id = GuidUtil.Next(),
                                 Name = row.ColumnC,
                                 ProjectId = row.ColumnAM,
                                 FiveCompleteValue = row.ColumnS,
@@ -1507,7 +1528,7 @@ namespace GHMonitoringCenterApi.Controllers.Project
                             });
                             excelPlan.Add(new ExcelPlanConvertTable
                             {
-                                Id = GuidUtil.Next().ToString(),
+                                Id = GuidUtil.Next(),
                                 Name = row.ColumnC,
                                 ProjectId = row.ColumnAM,
                                 FivePlanProductionValue = row.ColumnR,
@@ -1518,7 +1539,7 @@ namespace GHMonitoringCenterApi.Controllers.Project
                         case 5:
                             excelComplete.Add(new ExcelProductionConvertTable
                             {
-                                Id = GuidUtil.Next().ToString(),
+                                Id = GuidUtil.Next(),
                                 Name = row.ColumnC,
                                 ProjectId = row.ColumnAM,
                                 SixCompleteValue = row.ColumnU,
@@ -1527,7 +1548,7 @@ namespace GHMonitoringCenterApi.Controllers.Project
                             });
                             excelPlan.Add(new ExcelPlanConvertTable
                             {
-                                Id = GuidUtil.Next().ToString(),
+                                Id = GuidUtil.Next(),
                                 Name = row.ColumnC,
                                 ProjectId = row.ColumnAM,
                                 SixPlanProductionValue = row.ColumnT,
@@ -1538,7 +1559,7 @@ namespace GHMonitoringCenterApi.Controllers.Project
                         case 6:
                             excelComplete.Add(new ExcelProductionConvertTable
                             {
-                                Id = GuidUtil.Next().ToString(),
+                                Id = GuidUtil.Next(),
                                 Name = row.ColumnC,
                                 ProjectId = row.ColumnAM,
                                 SevenCompleteValue = row.ColumnW,
@@ -1547,7 +1568,7 @@ namespace GHMonitoringCenterApi.Controllers.Project
                             });
                             excelPlan.Add(new ExcelPlanConvertTable
                             {
-                                Id = GuidUtil.Next().ToString(),
+                                Id = GuidUtil.Next(),
                                 Name = row.ColumnC,
                                 ProjectId = row.ColumnAM,
                                 SevenPlanProductionValue = row.ColumnV,
@@ -1558,7 +1579,7 @@ namespace GHMonitoringCenterApi.Controllers.Project
                         case 7:
                             excelComplete.Add(new ExcelProductionConvertTable
                             {
-                                Id = GuidUtil.Next().ToString(),
+                                Id = GuidUtil.Next(),
                                 Name = row.ColumnC,
                                 ProjectId = row.ColumnAM,
                                 EightCompleteValue = row.ColumnY,
@@ -1567,7 +1588,7 @@ namespace GHMonitoringCenterApi.Controllers.Project
                             });
                             excelPlan.Add(new ExcelPlanConvertTable
                             {
-                                Id = GuidUtil.Next().ToString(),
+                                Id = GuidUtil.Next(),
                                 Name = row.ColumnC,
                                 ProjectId = row.ColumnAM,
                                 EightPlanProductionValue = row.ColumnX,
@@ -1578,7 +1599,7 @@ namespace GHMonitoringCenterApi.Controllers.Project
                         case 8:
                             excelComplete.Add(new ExcelProductionConvertTable
                             {
-                                Id = GuidUtil.Next().ToString(),
+                                Id = GuidUtil.Next(),
                                 Name = row.ColumnC,
                                 ProjectId = row.ColumnAM,
                                 NineCompleteValue = row.ColumnAA,
@@ -1587,7 +1608,7 @@ namespace GHMonitoringCenterApi.Controllers.Project
                             });
                             excelPlan.Add(new ExcelPlanConvertTable
                             {
-                                Id = GuidUtil.Next().ToString(),
+                                Id = GuidUtil.Next(),
                                 Name = row.ColumnC,
                                 ProjectId = row.ColumnAM,
                                 NinePlanProductionValue = row.ColumnZ,
@@ -1598,7 +1619,7 @@ namespace GHMonitoringCenterApi.Controllers.Project
                         case 9:
                             excelComplete.Add(new ExcelProductionConvertTable
                             {
-                                Id = GuidUtil.Next().ToString(),
+                                Id = GuidUtil.Next(),
                                 Name = row.ColumnC,
                                 ProjectId = row.ColumnAM,
                                 TenCompleteValue = row.ColumnAB,
@@ -1607,7 +1628,7 @@ namespace GHMonitoringCenterApi.Controllers.Project
                             });
                             excelPlan.Add(new ExcelPlanConvertTable
                             {
-                                Id = GuidUtil.Next().ToString(),
+                                Id = GuidUtil.Next(),
                                 Name = row.ColumnC,
                                 ProjectId = row.ColumnAM,
                                 //TenPlanProductionValue = row.ColumnAV
@@ -1618,7 +1639,7 @@ namespace GHMonitoringCenterApi.Controllers.Project
                         case 10:
                             excelComplete.Add(new ExcelProductionConvertTable
                             {
-                                Id = GuidUtil.Next().ToString(),
+                                Id = GuidUtil.Next(),
                                 Name = row.ColumnC,
                                 ProjectId = row.ColumnAM,
                                 ElevenCompleteValue = row.ColumnAF,
@@ -1627,7 +1648,7 @@ namespace GHMonitoringCenterApi.Controllers.Project
                             });
                             excelPlan.Add(new ExcelPlanConvertTable
                             {
-                                Id = GuidUtil.Next().ToString(),
+                                Id = GuidUtil.Next(),
                                 Name = row.ColumnC,
                                 ProjectId = row.ColumnAM,
                                 ElevenPlanProductionValue = row.ColumnAD,
@@ -1638,7 +1659,7 @@ namespace GHMonitoringCenterApi.Controllers.Project
                         case 11:
                             excelComplete.Add(new ExcelProductionConvertTable
                             {
-                                Id = GuidUtil.Next().ToString(),
+                                Id = GuidUtil.Next(),
                                 Name = row.ColumnC,
                                 ProjectId = row.ColumnAM,
                                 TwelveCompleteValue = row.ColumnAI,
@@ -1647,7 +1668,7 @@ namespace GHMonitoringCenterApi.Controllers.Project
                             });
                             excelPlan.Add(new ExcelPlanConvertTable
                             {
-                                Id = GuidUtil.Next().ToString(),
+                                Id = GuidUtil.Next(),
                                 Name = row.ColumnC,
                                 ProjectId = row.ColumnAM,
                                 TwelvePlanProductionValue = row.ColumnAH,
@@ -1704,7 +1725,7 @@ namespace GHMonitoringCenterApi.Controllers.Project
                         case 0:
                             excelComplete.Add(new ExcelProductionConvertTable
                             {
-                                Id = GuidUtil.Next().ToString(),
+                                Id = GuidUtil.Next(),
                                 Name = row.ColumnC,
                                 ProjectId = row.ColumnAX,
                                 OneCompleteValue = row.ColumnM,
@@ -1713,7 +1734,7 @@ namespace GHMonitoringCenterApi.Controllers.Project
                             });
                             excelPlan.Add(new ExcelPlanConvertTable
                             {
-                                Id = GuidUtil.Next().ToString(),
+                                Id = GuidUtil.Next(),
                                 Name = row.ColumnC,
                                 ProjectId = row.ColumnAX,
                                 OnePlanProductionValue = row.ColumnL,
@@ -1724,7 +1745,7 @@ namespace GHMonitoringCenterApi.Controllers.Project
                         case 1:
                             excelComplete.Add(new ExcelProductionConvertTable
                             {
-                                Id = GuidUtil.Next().ToString(),
+                                Id = GuidUtil.Next(),
                                 Name = row.ColumnC,
                                 ProjectId = row.ColumnAX,
                                 TwoCompleteValue = row.ColumnP,
@@ -1733,7 +1754,7 @@ namespace GHMonitoringCenterApi.Controllers.Project
                             });
                             excelPlan.Add(new ExcelPlanConvertTable
                             {
-                                Id = GuidUtil.Next().ToString(),
+                                Id = GuidUtil.Next(),
                                 Name = row.ColumnC,
                                 ProjectId = row.ColumnAX,
                                 TwoPlanProductionValue = row.ColumnO,
@@ -1744,7 +1765,7 @@ namespace GHMonitoringCenterApi.Controllers.Project
                         case 2:
                             excelComplete.Add(new ExcelProductionConvertTable
                             {
-                                Id = GuidUtil.Next().ToString(),
+                                Id = GuidUtil.Next(),
                                 Name = row.ColumnC,
                                 ProjectId = row.ColumnAX,
                                 ThreeCompleteValue = row.ColumnS,
@@ -1753,7 +1774,7 @@ namespace GHMonitoringCenterApi.Controllers.Project
                             });
                             excelPlan.Add(new ExcelPlanConvertTable
                             {
-                                Id = GuidUtil.Next().ToString(),
+                                Id = GuidUtil.Next(),
                                 Name = row.ColumnC,
                                 ProjectId = row.ColumnAX,
                                 ThreePlanProductionValue = row.ColumnR,
@@ -1764,7 +1785,7 @@ namespace GHMonitoringCenterApi.Controllers.Project
                         case 3:
                             excelComplete.Add(new ExcelProductionConvertTable
                             {
-                                Id = GuidUtil.Next().ToString(),
+                                Id = GuidUtil.Next(),
                                 Name = row.ColumnC,
                                 ProjectId = row.ColumnAX,
                                 FourCompleteValue = row.ColumnV,
@@ -1773,7 +1794,7 @@ namespace GHMonitoringCenterApi.Controllers.Project
                             });
                             excelPlan.Add(new ExcelPlanConvertTable
                             {
-                                Id = GuidUtil.Next().ToString(),
+                                Id = GuidUtil.Next(),
                                 Name = row.ColumnC,
                                 ProjectId = row.ColumnAX,
                                 FourPlanProductionValue = row.ColumnU,
@@ -1784,7 +1805,7 @@ namespace GHMonitoringCenterApi.Controllers.Project
                         case 4:
                             excelComplete.Add(new ExcelProductionConvertTable
                             {
-                                Id = GuidUtil.Next().ToString(),
+                                Id = GuidUtil.Next(),
                                 Name = row.ColumnC,
                                 ProjectId = row.ColumnAX,
                                 FiveCompleteValue = row.ColumnY,
@@ -1793,7 +1814,7 @@ namespace GHMonitoringCenterApi.Controllers.Project
                             });
                             excelPlan.Add(new ExcelPlanConvertTable
                             {
-                                Id = GuidUtil.Next().ToString(),
+                                Id = GuidUtil.Next(),
                                 Name = row.ColumnC,
                                 ProjectId = row.ColumnAX,
                                 FivePlanProductionValue = row.ColumnX,
@@ -1804,7 +1825,7 @@ namespace GHMonitoringCenterApi.Controllers.Project
                         case 5:
                             excelComplete.Add(new ExcelProductionConvertTable
                             {
-                                Id = GuidUtil.Next().ToString(),
+                                Id = GuidUtil.Next(),
                                 Name = row.ColumnC,
                                 ProjectId = row.ColumnAX,
                                 SixCompleteValue = row.ColumnAB,
@@ -1813,7 +1834,7 @@ namespace GHMonitoringCenterApi.Controllers.Project
                             });
                             excelPlan.Add(new ExcelPlanConvertTable
                             {
-                                Id = GuidUtil.Next().ToString(),
+                                Id = GuidUtil.Next(),
                                 Name = row.ColumnC,
                                 ProjectId = row.ColumnAX,
                                 SixPlanProductionValue = row.ColumnAA,
@@ -1824,7 +1845,7 @@ namespace GHMonitoringCenterApi.Controllers.Project
                         case 6:
                             excelComplete.Add(new ExcelProductionConvertTable
                             {
-                                Id = GuidUtil.Next().ToString(),
+                                Id = GuidUtil.Next(),
                                 Name = row.ColumnC,
                                 ProjectId = row.ColumnAX,
                                 SevenCompleteValue = row.ColumnAE,
@@ -1833,7 +1854,7 @@ namespace GHMonitoringCenterApi.Controllers.Project
                             });
                             excelPlan.Add(new ExcelPlanConvertTable
                             {
-                                Id = GuidUtil.Next().ToString(),
+                                Id = GuidUtil.Next(),
                                 Name = row.ColumnC,
                                 ProjectId = row.ColumnAX,
                                 SevenPlanProductionValue = row.ColumnAD,
@@ -1844,7 +1865,7 @@ namespace GHMonitoringCenterApi.Controllers.Project
                         case 7:
                             excelComplete.Add(new ExcelProductionConvertTable
                             {
-                                Id = GuidUtil.Next().ToString(),
+                                Id = GuidUtil.Next(),
                                 Name = row.ColumnC,
                                 ProjectId = row.ColumnAX,
                                 EightCompleteValue = row.ColumnAH,
@@ -1853,7 +1874,7 @@ namespace GHMonitoringCenterApi.Controllers.Project
                             });
                             excelPlan.Add(new ExcelPlanConvertTable
                             {
-                                Id = GuidUtil.Next().ToString(),
+                                Id = GuidUtil.Next(),
                                 Name = row.ColumnC,
                                 ProjectId = row.ColumnAX,
                                 EightPlanProductionValue = row.ColumnAG,
@@ -1864,7 +1885,7 @@ namespace GHMonitoringCenterApi.Controllers.Project
                         case 8:
                             excelComplete.Add(new ExcelProductionConvertTable
                             {
-                                Id = GuidUtil.Next().ToString(),
+                                Id = GuidUtil.Next(),
                                 Name = row.ColumnC,
                                 ProjectId = row.ColumnAX,
                                 NineCompleteValue = row.ColumnAK,
@@ -1873,7 +1894,7 @@ namespace GHMonitoringCenterApi.Controllers.Project
                             });
                             excelPlan.Add(new ExcelPlanConvertTable
                             {
-                                Id = GuidUtil.Next().ToString(),
+                                Id = GuidUtil.Next(),
                                 Name = row.ColumnC,
                                 ProjectId = row.ColumnAX,
                                 NinePlanProductionValue = row.ColumnAJ,
@@ -1884,7 +1905,7 @@ namespace GHMonitoringCenterApi.Controllers.Project
                         case 9:
                             excelComplete.Add(new ExcelProductionConvertTable
                             {
-                                Id = GuidUtil.Next().ToString(),
+                                Id = GuidUtil.Next(),
                                 Name = row.ColumnC,
                                 ProjectId = row.ColumnAX,
                                 TenCompleteValue = row.ColumnAN,
@@ -1893,7 +1914,7 @@ namespace GHMonitoringCenterApi.Controllers.Project
                             });
                             excelPlan.Add(new ExcelPlanConvertTable
                             {
-                                Id = GuidUtil.Next().ToString(),
+                                Id = GuidUtil.Next(),
                                 Name = row.ColumnC,
                                 ProjectId = row.ColumnAX,
                                 TenPlanProductionValue = row.ColumnAM,
@@ -1905,7 +1926,7 @@ namespace GHMonitoringCenterApi.Controllers.Project
                         case 10:
                             excelComplete.Add(new ExcelProductionConvertTable
                             {
-                                Id = GuidUtil.Next().ToString(),
+                                Id = GuidUtil.Next(),
                                 Name = row.ColumnC,
                                 ProjectId = row.ColumnAX,
                                 ElevenCompleteValue = row.ColumnAQ,
@@ -1914,7 +1935,7 @@ namespace GHMonitoringCenterApi.Controllers.Project
                             });
                             excelPlan.Add(new ExcelPlanConvertTable
                             {
-                                Id = GuidUtil.Next().ToString(),
+                                Id = GuidUtil.Next(),
                                 Name = row.ColumnC,
                                 ProjectId = row.ColumnAX,
                                 ElevenPlanProductionValue = row.ColumnAP,
@@ -1925,7 +1946,7 @@ namespace GHMonitoringCenterApi.Controllers.Project
                         case 11:
                             excelComplete.Add(new ExcelProductionConvertTable
                             {
-                                Id = GuidUtil.Next().ToString(),
+                                Id = GuidUtil.Next(),
                                 Name = row.ColumnC,
                                 ProjectId = row.ColumnAX,
                                 TwelveCompleteValue = row.ColumnAT,
@@ -1934,7 +1955,7 @@ namespace GHMonitoringCenterApi.Controllers.Project
                             });
                             excelPlan.Add(new ExcelPlanConvertTable
                             {
-                                Id = GuidUtil.Next().ToString(),
+                                Id = GuidUtil.Next(),
                                 Name = row.ColumnC,
                                 ProjectId = row.ColumnAX,
                                 TwelvePlanProductionValue = row.ColumnAS,
@@ -1997,7 +2018,7 @@ namespace GHMonitoringCenterApi.Controllers.Project
                             case 0:
                                 excelComplete.Add(new ExcelProductionConvertTable
                                 {
-                                    Id = GuidUtil.Next().ToString(),
+                                    Id = GuidUtil.Next(),
                                     Name = row.ColumnC,
                                     ProjectId = row.ColumnAP,
                                     OneCompleteValue = Convert.ToDecimal(row.ColumnM),
@@ -2006,7 +2027,7 @@ namespace GHMonitoringCenterApi.Controllers.Project
                                 });
                                 excelPlan.Add(new ExcelPlanConvertTable
                                 {
-                                    Id = GuidUtil.Next().ToString(),
+                                    Id = GuidUtil.Next(),
                                     Name = row.ColumnC,
                                     ProjectId = row.ColumnAP,
                                     OnePlanProductionValue = Convert.ToDecimal(row.ColumnL),
@@ -2017,7 +2038,7 @@ namespace GHMonitoringCenterApi.Controllers.Project
                             case 1:
                                 excelComplete.Add(new ExcelProductionConvertTable
                                 {
-                                    Id = GuidUtil.Next().ToString(),
+                                    Id = GuidUtil.Next(),
                                     Name = row.ColumnC,
                                     ProjectId = row.ColumnAP,
                                     TwoCompleteValue = Convert.ToDecimal(row.ColumnO),
@@ -2026,7 +2047,7 @@ namespace GHMonitoringCenterApi.Controllers.Project
                                 });
                                 excelPlan.Add(new ExcelPlanConvertTable
                                 {
-                                    Id = GuidUtil.Next().ToString(),
+                                    Id = GuidUtil.Next(),
                                     Name = row.ColumnC,
                                     ProjectId = row.ColumnAP,
                                     TwoPlanProductionValue = Convert.ToDecimal(row.ColumnN),
@@ -2037,7 +2058,7 @@ namespace GHMonitoringCenterApi.Controllers.Project
                             case 2:
                                 excelComplete.Add(new ExcelProductionConvertTable
                                 {
-                                    Id = GuidUtil.Next().ToString(),
+                                    Id = GuidUtil.Next(),
                                     Name = row.ColumnC,
                                     ProjectId = row.ColumnAP,
                                     ThreeCompleteValue = Convert.ToDecimal(row.ColumnQ),
@@ -2046,7 +2067,7 @@ namespace GHMonitoringCenterApi.Controllers.Project
                                 });
                                 excelPlan.Add(new ExcelPlanConvertTable
                                 {
-                                    Id = GuidUtil.Next().ToString(),
+                                    Id = GuidUtil.Next(),
                                     Name = row.ColumnC,
                                     ProjectId = row.ColumnAP,
                                     ThreePlanProductionValue = Convert.ToDecimal(row.ColumnP),
@@ -2057,7 +2078,7 @@ namespace GHMonitoringCenterApi.Controllers.Project
                             case 3:
                                 excelComplete.Add(new ExcelProductionConvertTable
                                 {
-                                    Id = GuidUtil.Next().ToString(),
+                                    Id = GuidUtil.Next(),
                                     Name = row.ColumnC,
                                     ProjectId = row.ColumnAP,
                                     FourCompleteValue = Convert.ToDecimal(row.ColumnS),
@@ -2066,7 +2087,7 @@ namespace GHMonitoringCenterApi.Controllers.Project
                                 });
                                 excelPlan.Add(new ExcelPlanConvertTable
                                 {
-                                    Id = GuidUtil.Next().ToString(),
+                                    Id = GuidUtil.Next(),
                                     Name = row.ColumnC,
                                     ProjectId = row.ColumnAP,
                                     FourPlanProductionValue = Convert.ToDecimal(row.ColumnR),
@@ -2077,7 +2098,7 @@ namespace GHMonitoringCenterApi.Controllers.Project
                             case 4:
                                 excelComplete.Add(new ExcelProductionConvertTable
                                 {
-                                    Id = GuidUtil.Next().ToString(),
+                                    Id = GuidUtil.Next(),
                                     Name = row.ColumnC,
                                     ProjectId = row.ColumnAP,
                                     FiveCompleteValue = Convert.ToDecimal(row.ColumnU),
@@ -2086,7 +2107,7 @@ namespace GHMonitoringCenterApi.Controllers.Project
                                 });
                                 excelPlan.Add(new ExcelPlanConvertTable
                                 {
-                                    Id = GuidUtil.Next().ToString(),
+                                    Id = GuidUtil.Next(),
                                     Name = row.ColumnC,
                                     ProjectId = row.ColumnAP,
                                     FivePlanProductionValue = Convert.ToDecimal(row.ColumnT),
@@ -2097,7 +2118,7 @@ namespace GHMonitoringCenterApi.Controllers.Project
                             case 5:
                                 excelComplete.Add(new ExcelProductionConvertTable
                                 {
-                                    Id = GuidUtil.Next().ToString(),
+                                    Id = GuidUtil.Next(),
                                     Name = row.ColumnC,
                                     ProjectId = row.ColumnAP,
                                     SixCompleteValue = Convert.ToDecimal(row.ColumnX),
@@ -2106,7 +2127,7 @@ namespace GHMonitoringCenterApi.Controllers.Project
                                 });
                                 excelPlan.Add(new ExcelPlanConvertTable
                                 {
-                                    Id = GuidUtil.Next().ToString(),
+                                    Id = GuidUtil.Next(),
                                     Name = row.ColumnC,
                                     ProjectId = row.ColumnAP,
                                     SixPlanProductionValue = Convert.ToDecimal(row.ColumnW),
@@ -2117,7 +2138,7 @@ namespace GHMonitoringCenterApi.Controllers.Project
                             case 6:
                                 excelComplete.Add(new ExcelProductionConvertTable
                                 {
-                                    Id = GuidUtil.Next().ToString(),
+                                    Id = GuidUtil.Next(),
                                     Name = row.ColumnC,
                                     ProjectId = row.ColumnAP,
                                     SevenCompleteValue = Convert.ToDecimal(row.ColumnZ),
@@ -2126,7 +2147,7 @@ namespace GHMonitoringCenterApi.Controllers.Project
                                 });
                                 excelPlan.Add(new ExcelPlanConvertTable
                                 {
-                                    Id = GuidUtil.Next().ToString(),
+                                    Id = GuidUtil.Next(),
                                     Name = row.ColumnC,
                                     ProjectId = row.ColumnAP,
                                     SevenPlanProductionValue = Convert.ToDecimal(row.ColumnY),
@@ -2137,7 +2158,7 @@ namespace GHMonitoringCenterApi.Controllers.Project
                             case 7:
                                 excelComplete.Add(new ExcelProductionConvertTable
                                 {
-                                    Id = GuidUtil.Next().ToString(),
+                                    Id = GuidUtil.Next(),
                                     Name = row.ColumnC,
                                     ProjectId = row.ColumnAP,
                                     EightCompleteValue = Convert.ToDecimal(row.ColumnAB),
@@ -2146,7 +2167,7 @@ namespace GHMonitoringCenterApi.Controllers.Project
                                 });
                                 excelPlan.Add(new ExcelPlanConvertTable
                                 {
-                                    Id = GuidUtil.Next().ToString(),
+                                    Id = GuidUtil.Next(),
                                     Name = row.ColumnC,
                                     ProjectId = row.ColumnAP,
                                     EightPlanProductionValue = Convert.ToDecimal(row.ColumnAA),
@@ -2157,7 +2178,7 @@ namespace GHMonitoringCenterApi.Controllers.Project
                             case 8:
                                 excelComplete.Add(new ExcelProductionConvertTable
                                 {
-                                    Id = GuidUtil.Next().ToString(),
+                                    Id = GuidUtil.Next(),
                                     Name = row.ColumnC,
                                     ProjectId = row.ColumnAP,
                                     NineCompleteValue = Convert.ToDecimal(row.ColumnAD),
@@ -2166,7 +2187,7 @@ namespace GHMonitoringCenterApi.Controllers.Project
                                 });
                                 excelPlan.Add(new ExcelPlanConvertTable
                                 {
-                                    Id = GuidUtil.Next().ToString(),
+                                    Id = GuidUtil.Next(),
                                     Name = row.ColumnC,
                                     ProjectId = row.ColumnAP,
                                     NinePlanProductionValue = Convert.ToDecimal(row.ColumnAC),
@@ -2177,7 +2198,7 @@ namespace GHMonitoringCenterApi.Controllers.Project
                             case 9:
                                 excelComplete.Add(new ExcelProductionConvertTable
                                 {
-                                    Id = GuidUtil.Next().ToString(),
+                                    Id = GuidUtil.Next(),
                                     Name = row.ColumnC,
                                     ProjectId = row.ColumnAP,
                                     TenCompleteValue = Convert.ToDecimal(row.ColumnAF),
@@ -2186,7 +2207,7 @@ namespace GHMonitoringCenterApi.Controllers.Project
                                 });
                                 excelPlan.Add(new ExcelPlanConvertTable
                                 {
-                                    Id = GuidUtil.Next().ToString(),
+                                    Id = GuidUtil.Next(),
                                     Name = row.ColumnC,
                                     ProjectId = row.ColumnAP,
                                     TenPlanProductionValue = Convert.ToDecimal(row.ColumnAE),
@@ -2197,7 +2218,7 @@ namespace GHMonitoringCenterApi.Controllers.Project
                             case 10:
                                 excelComplete.Add(new ExcelProductionConvertTable
                                 {
-                                    Id = GuidUtil.Next().ToString(),
+                                    Id = GuidUtil.Next(),
                                     Name = row.ColumnC,
                                     ProjectId = row.ColumnAP,
                                     ElevenCompleteValue = Convert.ToDecimal(row.ColumnAH),
@@ -2206,7 +2227,7 @@ namespace GHMonitoringCenterApi.Controllers.Project
                                 });
                                 excelPlan.Add(new ExcelPlanConvertTable
                                 {
-                                    Id = GuidUtil.Next().ToString(),
+                                    Id = GuidUtil.Next(),
                                     Name = row.ColumnC,
                                     ProjectId = row.ColumnAP,
                                     ElevenPlanProductionValue = Convert.ToDecimal(row.ColumnAG),
@@ -2217,7 +2238,7 @@ namespace GHMonitoringCenterApi.Controllers.Project
                             case 11:
                                 excelComplete.Add(new ExcelProductionConvertTable
                                 {
-                                    Id = GuidUtil.Next().ToString(),
+                                    Id = GuidUtil.Next(),
                                     Name = row.ColumnC,
                                     ProjectId = row.ColumnAP,
                                     TwelveCompleteValue = Convert.ToDecimal(row.ColumnAK),
@@ -2226,7 +2247,7 @@ namespace GHMonitoringCenterApi.Controllers.Project
                                 });
                                 excelPlan.Add(new ExcelPlanConvertTable
                                 {
-                                    Id = GuidUtil.Next().ToString(),
+                                    Id = GuidUtil.Next(),
                                     Name = row.ColumnC,
                                     ProjectId = row.ColumnAP,
                                     TwelvePlanProductionValue = Convert.ToDecimal(row.ColumnAJ),
