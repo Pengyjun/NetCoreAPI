@@ -3491,6 +3491,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     ProjectName = x.Name,
                     Year = x.Year
                 })
+                .OrderByDescending(x => x.Year)
                 .Distinct()
                 .ToPageListAsync(requestBody.PageIndex, requestBody.PageSize, total);
 
