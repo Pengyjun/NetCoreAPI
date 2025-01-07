@@ -27,17 +27,12 @@ namespace GHMonitoringCenterApi.Domain.Models
         /// 状态
         /// </summary>
         [SugarColumn(Length = 50)]
-        public string? Status { get; set; }
+        public string? FangAnStatus { get; set; }
         /// <summary>
         /// 方案类型
         /// </summary>
         [SugarColumn(Length = 50)]
         public string? FangAnKind { get; set; }
-        /// <summary>
-        /// 
-        /// </summary>
-        [SugarColumn(Length = 50)]
-        public string? FangAnStatus { get; set; }
         /// <summary>
         /// 管理单位
         /// </summary>

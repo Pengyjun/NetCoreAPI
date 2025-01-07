@@ -2303,6 +2303,8 @@ namespace GHMonitoringCenterApi.Controllers.Project
         /// 获取当年所有节假日
         /// </summary>
         /// <returns></returns>
+        [HttpPost("bb")]
+        [AllowAnonymous]
         public bool bb()
         {
             return  projectService.GetHolidays();

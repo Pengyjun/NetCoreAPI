@@ -3491,7 +3491,6 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     ProjectName = x.Name,
                     Year = x.Year
                 })
-                .OrderBy(x => x.ProjectName)
                 .Distinct()
                 .ToPageListAsync(requestBody.PageIndex, requestBody.PageSize, total);
 
@@ -3499,10 +3498,10 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             var data = await dbContext.Queryable<ExcelProductionConvertTable>()
                 .Where(x => pIds.Contains(x.ProjectId))
                 .ToListAsync();
-            data = data.OrderBy(x => x.Year).ThenBy(x => x.DateMonth).ToList();
+            data = data.OrderBy(x => x.Year).ThenBy(x => x.Name).ToList();
             foreach (var item in completeData)
             {
-                decimal? totalVal = 0M;
+                decimal? totalCompleteValue = 0M;//年累
                 decimal? one = 0M;
                 decimal? two = 0M;
                 decimal? three = 0M;
@@ -3524,66 +3523,71 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                         case 1:
                             one = data.FirstOrDefault(x => x.DateMonth == md && x.ProjectId == item.ProjectId)?.OneCompleteValue;
                             item.OneCompleteValue = one;
-                            totalVal += one;
+                            totalCompleteValue += one;
                             break;
                         case 2:
                             two = data.FirstOrDefault(x => x.DateMonth == md && x.ProjectId == item.ProjectId)?.TwoCompleteValue;
                             item.TwoCompleteValue = two;
-                            totalVal += two;
+                            totalCompleteValue += two;
                             break;
                         case 3:
                             three = data.FirstOrDefault(x => x.DateMonth == md && x.ProjectId == item.ProjectId)?.ThreeCompleteValue;
                             item.ThreeCompleteValue = three;
-                            totalVal += three;
+                            totalCompleteValue += three;
                             break;
                         case 4:
                             four = data.FirstOrDefault(x => x.DateMonth == md && x.ProjectId == item.ProjectId)?.FourCompleteValue;
                             item.FourCompleteValue = four;
-                            totalVal += four;
+                            totalCompleteValue += four;
                             break;
                         case 5:
                             five = data.FirstOrDefault(x => x.DateMonth == md && x.ProjectId == item.ProjectId)?.FiveCompleteValue;
                             item.FiveCompleteValue = five;
-                            totalVal += five;
+                            totalCompleteValue += five;
                             break;
                         case 6:
                             six = data.FirstOrDefault(x => x.DateMonth == md && x.ProjectId == item.ProjectId)?.SixCompleteValue;
                             item.SixCompleteValue = six;
-                            totalVal += six;
+                            totalCompleteValue += six;
                             break;
                         case 7:
                             seven = data.FirstOrDefault(x => x.DateMonth == md && x.ProjectId == item.ProjectId)?.SevenCompleteValue;
                             item.SevenCompleteValue = seven;
-                            totalVal += seven;
+                            totalCompleteValue += seven;
                             break;
                         case 8:
                             eight = data.FirstOrDefault(x => x.DateMonth == md && x.ProjectId == item.ProjectId)?.EightCompleteValue;
                             item.EightCompleteValue = eight;
-                            totalVal += eight;
+                            totalCompleteValue += eight;
                             break;
                         case 9:
                             nine = data.FirstOrDefault(x => x.DateMonth == md && x.ProjectId == item.ProjectId)?.NineCompleteValue;
                             item.NineCompleteValue = nine;
-                            totalVal += nine;
+                            totalCompleteValue += nine;
                             break;
                         case 10:
                             ten = data.FirstOrDefault(x => x.DateMonth == md && x.ProjectId == item.ProjectId)?.TenCompleteValue;
                             item.TenCompleteValue = ten;
-                            totalVal += ten;
+                            totalCompleteValue += ten;
                             break;
                         case 11:
                             ele = data.FirstOrDefault(x => x.DateMonth == md && x.ProjectId == item.ProjectId)?.ElevenCompleteValue;
                             item.ElevenCompleteValue = ele;
-                            totalVal += ele;
+                            totalCompleteValue += ele;
                             break;
                         case 12:
                             twe = data.FirstOrDefault(x => x.DateMonth == md && x.ProjectId == item.ProjectId)?.TwelveCompleteValue;
                             item.TwelveCompleteValue = twe;
-                            totalVal += twe;
+                            totalCompleteValue += twe;
                             break;
                     }
-                    item.TotalCompleteValue = totalVal;
+                    item.TotalCompleteValue = totalCompleteValue;
                 }
+                //开累
+                var accumulateuCompleteValue = data
+                    .Where(x => x.Year <= item.Year && x.ProjectId == item.ProjectId)
+                    .Sum(x => SqlFunc.ToDecimal(x.OneCompleteValue) + SqlFunc.ToDecimal(x.TwoCompleteValue) + SqlFunc.ToDecimal(x.ThreeCompleteValue) + SqlFunc.ToDecimal(x.FourCompleteValue) + SqlFunc.ToDecimal(x.FiveCompleteValue) + SqlFunc.ToDecimal(x.SixCompleteValue) + SqlFunc.ToDecimal(x.SevenCompleteValue) + SqlFunc.ToDecimal(x.EightCompleteValue) + SqlFunc.ToDecimal(x.NineCompleteValue) + SqlFunc.ToDecimal(x.TenCompleteValue) + SqlFunc.ToDecimal(x.ElevenCompleteValue) + SqlFunc.ToDecimal(x.TwelveCompleteValue));
+                item.AccumulateuCompleteValue = accumulateuCompleteValue;
             }
             rt.Count = total;
             rt.SuccessResult(completeData);

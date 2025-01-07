@@ -55,7 +55,7 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Timing
         /// </summary>
         public string? FangAnKind { get; set; }
         /// <summary>
-        /// 
+        /// 方案状态
         /// </summary>
         public string? FangAnStatus { get; set; }
         /// <summary>
