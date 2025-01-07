@@ -29,5 +29,6 @@ namespace GHMonitoringCenterApi.Application.Contracts.IService.Timing
         Task<string> SynchronizationDealUnitsync();
 
         Task<string> SynchronizationDealUnitNewsync();
+        Task<bool> GetSpecialConstruction();
     }
 }

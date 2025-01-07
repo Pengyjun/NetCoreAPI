@@ -57,13 +57,13 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project
         {
             if (ProjectId == Guid.Empty)
             {
-                yield return new ValidationResult("项目Id不能为空", new string[] {nameof(ProjectId) });
+                yield return new ValidationResult("项目Id不能为空", new string[] { nameof(ProjectId) });
             }
             if (Step == DayReportProcessStep.DayReportConstructionFinish)
             {
                 if (Construction == null)
                 {
-                     yield return new ValidationResult("施工日志不能为空", new string[] { nameof(Construction) });
+                    yield return new ValidationResult("施工日志不能为空", new string[] { nameof(Construction) });
                 }
             }
             else if (Step == DayReportProcessStep.DayReportUploadFileFinish)
@@ -158,6 +158,10 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project
             ///  危大工程施工（项）
             /// </summary>
             public int HazardousConstructionNum { get; set; }
+            /// <summary>
+            /// 危大工程施工明细  ，拼接
+            /// </summary>
+            public string? HazardousConstructionDetails { get; set; }
 
             /// <summary>
             /// 陆地9人以上作业地点（处）
@@ -182,7 +186,7 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project
             /// <summary>
             /// 现场船舶（艘）
             /// </summary>
-  
+
             public int? SiteShipNum { get; set; }
 
             /// <summary>
@@ -218,7 +222,7 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project
                 {
                     yield return new ValidationResult("施工备注不能为空", new string[] { nameof(ConstructionRemarks) });
                 }
-                if (ConstructionDeviceNum<0)
+                if (ConstructionDeviceNum < 0)
                 {
                     yield return new ValidationResult(" 投入设备（台）不能小于0", new string[] { nameof(ConstructionDeviceNum) });
                 }
@@ -234,11 +238,11 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project
                 {
                     yield return new ValidationResult("项目负责人不能为空", new string[] { nameof(TeamLeader) });
                 }
-                if(LandWorkplace!=null&&LandWorkplace < 0)
+                if (LandWorkplace != null && LandWorkplace < 0)
                 {
                     yield return new ValidationResult("陆地9人以上作业地点（处）不能小于0", new string[] { nameof(LandWorkplace) });
                 }
-                if (FewLandWorkplace  != null && FewLandWorkplace < 0)
+                if (FewLandWorkplace != null && FewLandWorkplace < 0)
                 {
                     yield return new ValidationResult("陆域3-9人以上作业地点（处）不能小于0", new string[] { nameof(FewLandWorkplace) });
                 }
@@ -260,8 +264,8 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project
                 LandWorkplace = LandWorkplace ?? 0;
                 FewLandWorkplace = FewLandWorkplace ?? 0;
                 SiteShipNum = SiteShipNum ?? 0;
-                OnShipPersonNum= OnShipPersonNum ?? 0;
-        }
+                OnShipPersonNum = OnShipPersonNum ?? 0;
+            }
         }
 
         /// <summary>
@@ -269,7 +273,7 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project
         /// </summary>
         public class ReqDayReportFileInfo : IValidatableObject
         {
-         
+
             /// <summary>
             /// 文件集合
             /// </summary>
@@ -280,13 +284,13 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project
                 {
                     yield return new ValidationResult("文件不能为空", new string[] { nameof(Files) });
                 }
- 
+
             }
 
 
         }
 
-     
+
 
         /// <summary>
         /// 施工日志信息
@@ -326,7 +330,7 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project
             /// 是否显示，春节停工计划
             ///<para>备注1：true:表示当前时间在12月23-1月15范围内，false ：不在12月23-1月15范围内</para>
             /// </summary>
-            public  bool IsShowWorkStatusOfSpringFestival { get; set; }
+            public bool IsShowWorkStatusOfSpringFestival { get; set; }
 
             /// <summary>
             /// 春节停工计划（1：春节期间不停工，2：春节期间停工）
@@ -409,12 +413,12 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project
                 }
                 else
                 {
-                    if (DayReportConstructions.DistinctBy(t => new {  t.ProjectWBSId, t.OutPutType, ShipId =(t.OutPutType== ConstructionOutPutType.SubPackage?t.SubShipId:t.OwnerShipId) ,t.UnitPrice,t.ConstructionNature}).Count()
+                    if (DayReportConstructions.DistinctBy(t => new { t.ProjectWBSId, t.OutPutType, ShipId = (t.OutPutType == ConstructionOutPutType.SubPackage ? t.SubShipId : t.OwnerShipId), t.UnitPrice, t.ConstructionNature }).Count()
                              != DayReportConstructions.Count())
                     {
                         yield return new ValidationResult("施工记录存在重复", new string[] { nameof(DayReportConstructions) });
                     }
-				}
+                }
 
             }
 
@@ -445,7 +449,7 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project
                     EndStopWorkOfSpringFestival = null;
                     StartStopWorkOfSpringFestival = null;
                 }
-                if(IsHaveProductionWarning==0)
+                if (IsHaveProductionWarning == 0)
                 {
                     ProductionWarningContent = null;
                 }
@@ -482,10 +486,10 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project
             /// </summary>
             public Guid? SubShipId { get; set; }
 
-			/// <summary>
-			/// 单价
-			/// </summary>
-			public decimal UnitPrice { get; set; }
+            /// <summary>
+            /// 单价
+            /// </summary>
+            public decimal UnitPrice { get; set; }
 
             /// <summary>
             /// 外包支出
@@ -532,7 +536,7 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project
                 //{
                 //    yield return new ValidationResult("施工分类不能为空", new string[] { nameof(ProjectWBSId) });
                 //}
-                if (OutPutType == ConstructionOutPutType.Self|| OutPutType == ConstructionOutPutType.SubOwner)
+                if (OutPutType == ConstructionOutPutType.Self || OutPutType == ConstructionOutPutType.SubOwner)
                 {
                     if (OwnerShipId == null || OwnerShipId == Guid.Empty)
                     {
@@ -550,7 +554,7 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project
                 {
                     yield return new ValidationResult(" 产值属性只支持（自有，分包，分包-自有）", new string[] { nameof(OutPutType) });
                 }
-                if(UnitPrice<0)
+                if (UnitPrice < 0)
                 {
                     yield return new ValidationResult("单价(元)不能小于0", new string[] { nameof(UnitPrice) });
                 }
@@ -562,7 +566,7 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project
                 {
                     yield return new ValidationResult("实际日产量(m³)不能小于0", new string[] { nameof(ActualDailyProduction) });
                 }
-                if (ConstructionNature==null)
+                if (ConstructionNature == null)
                 {
                     yield return new ValidationResult("施工性质不能为空", new string[] { nameof(ConstructionNature) });
                 }
@@ -586,7 +590,7 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project
             /// </summary>
             public void ResetModelProperty()
             {
-                if (OutPutType != ConstructionOutPutType.Self&& OutPutType != ConstructionOutPutType.SubOwner)
+                if (OutPutType != ConstructionOutPutType.Self && OutPutType != ConstructionOutPutType.SubOwner)
                 {
                     OwnerShipId = null;
                 }
@@ -594,7 +598,7 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project
                 {
                     SubShipId = null;
                 }
-                if(ProjectWBSId==null)
+                if (ProjectWBSId == null)
                 {
                     ProjectWBSId = Guid.Empty;
                 }

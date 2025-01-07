@@ -227,5 +227,11 @@ namespace GHMonitoringCenterApi.Application.Contracts.IService.Project
         /// </summary>
         /// <returns></returns>
         Task<ResponseAjaxResult<ReportedMonthResponseDto>> SearchReportedMonthsAsync(ReportedMonthRequestDto model);
+        /// <summary>
+        /// 获取危大工程项
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        Task<ResponseAjaxResult<List<DangerousDetailsResponse>>> DangerousDetailsByDayRepIdAsync(string id);
     }
 }

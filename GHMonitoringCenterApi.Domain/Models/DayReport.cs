@@ -8,7 +8,7 @@ namespace GHMonitoringCenterApi.Domain.Models
     /// 项目日报表
     /// </summary>
     [SugarTable("t_dayreport", IsDisabledDelete = true)]
-    [SugarIndex("INDEX_UQ_KEY", nameof(ProjectId),OrderByType.Asc, nameof(DateDay), OrderByType.Asc, true)]
+    [SugarIndex("INDEX_UQ_KEY", nameof(ProjectId), OrderByType.Asc, nameof(DateDay), OrderByType.Asc, true)]
     public class DayReport : BaseEntity<Guid>
     {
         /// <summary>
@@ -87,7 +87,7 @@ namespace GHMonitoringCenterApi.Domain.Models
         /// <summary>
         /// 特殊事项报告（0：无,1:异常预警，2：嘉奖通报，3：提醒事项）
         /// </summary>
-        [SugarColumn(ColumnDataType = "int", DefaultValue ="0" )]
+        [SugarColumn(ColumnDataType = "int", DefaultValue = "0")]
         public int IsHaveProductionWarning { get; set; }
 
         /// <summary>
@@ -99,7 +99,7 @@ namespace GHMonitoringCenterApi.Domain.Models
         /// <summary>
         /// 春节停工计划（1：春节期间不停工，2：春节期间停工）
         /// </summary>
-        [SugarColumn(ColumnDataType = "int",DefaultValue = "0")]
+        [SugarColumn(ColumnDataType = "int", DefaultValue = "0")]
         public WorkStatusOfSpringFestival WorkStatusOfSpringFestival { get; set; }
 
         /// <summary>
@@ -166,7 +166,7 @@ namespace GHMonitoringCenterApi.Domain.Models
         /// 当月实际产值（元）
         /// </summary>
         [SugarColumn(ColumnDataType = "decimal(18,2)")]
-        public decimal MonthProductionAmount{ get; set; }
+        public decimal MonthProductionAmount { get; set; }
 
         /// <summary>
         /// 年度实际产值（元）
@@ -185,13 +185,18 @@ namespace GHMonitoringCenterApi.Domain.Models
         /// </summary>
         [SugarColumn(ColumnDataType = "int")]
 
-        public int ConstructionDeviceNum{ get; set; }
+        public int ConstructionDeviceNum { get; set; }
 
         /// <summary>
         ///  危大工程施工（项）
         /// </summary>
         [SugarColumn(ColumnDataType = "int")]
         public int HazardousConstructionNum { get; set; }
+        /// <summary>
+        /// 危大工程明细
+        /// </summary>
+        [SugarColumn(ColumnDataType = "text")]
+        public string? HazardousConstructionDetails { get; set; }
 
         /// <summary>
         /// 产能较低原因

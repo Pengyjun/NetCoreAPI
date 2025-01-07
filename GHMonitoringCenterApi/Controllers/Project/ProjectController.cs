@@ -229,6 +229,16 @@ namespace GHMonitoringCenterApi.Controllers.Project
         {
             return await projectReportService.SaveProjectDayReportAsync(model);
         }
+        /// <summary>
+        /// 获取危大工程项
+        /// </summary>
+        /// <param name="Id"></param>
+        /// <returns></returns>
+        [HttpGet("DangerousDetailsByDayRepId")]
+        public async Task<ResponseAjaxResult<List<DangerousDetailsResponse>>> DangerousDetailsByDayRepIdAsync([FromQuery] string Id)
+        {
+            return await projectReportService.DangerousDetailsByDayRepIdAsync(Id);
+        }
 
         /// <summary>
         /// 获取项目部相关产值
@@ -2288,6 +2298,14 @@ namespace GHMonitoringCenterApi.Controllers.Project
             //var ss = resList.Sum(x => x.UnitPrice * x.CompletedQuantity);
             //return projectService.aa();
             return true;
+        }
+        /// <summary>
+        /// 获取当年所有节假日
+        /// </summary>
+        /// <returns></returns>
+        public bool bb()
+        {
+            return  projectService.GetHolidays();
         }
 
         #endregion
