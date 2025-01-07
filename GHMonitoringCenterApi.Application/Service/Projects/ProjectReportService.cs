@@ -8972,7 +8972,8 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 new Guid("5a8f39de-8515-456b-8620-c0d01c012e04"),
                 new Guid("c0d51e81-03dd-4ef8-bd83-6eb1355879e1"),
                 new Guid("65052a94-6ea7-44ba-96b4-cf648de0d28a"),
-                new Guid("ef7bdb95-e802-4bf5-a7ae-9ef5205cd624")
+                new Guid("ef7bdb95-e802-4bf5-a7ae-9ef5205cd624"),
+                new Guid("01ff7a0e-e827-4b46-9032-0a540ce1fba3"),
             };
             var responseAjaxResult = new ResponseAjaxResult<List<MonthReportProjectWordResponseDto>>();
             var data = await SearchMonthReportsAsync(model);

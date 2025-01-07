@@ -44,11 +44,6 @@ namespace GHMonitoringCenterApi.Domain.Models
         [SugarColumn(Length = 256)]
         public string FangAnType { get; set; } = string.Empty;
         /// <summary>
-        /// 方案状态
-        /// </summary>
-        [SugarColumn(Length = 256)]
-        public string? FangAnState { get; set; } = string.Empty;
-        /// <summary>
         /// 方案编制时间
         /// </summary>
         [SugarColumn(ColumnDataType = "datetime")]
