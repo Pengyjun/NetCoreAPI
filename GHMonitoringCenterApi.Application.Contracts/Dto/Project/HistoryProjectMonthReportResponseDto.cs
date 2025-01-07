@@ -76,9 +76,13 @@
 
         #region 合计
         /// <summary>
-        /// 累计完成产值
+        /// 年度累计完成产值
         /// </summary>
         public decimal? TotalCompleteValue { get; set; }
+        /// <summary>
+        /// 开累
+        /// </summary>
+        public decimal? AccumulateuCompleteValue { get; set; }
         #endregion
     }
 }

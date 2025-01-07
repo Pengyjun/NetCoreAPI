@@ -9519,5 +9519,37 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             }
             return Tuple.Create(currentYearOffirmProductionValue, totalYearKaileaOffirmProductionValue, currenYearCollection, totalYearCollection);
         }
+        /// <summary>
+        /// 获取危大工程项
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<ResponseAjaxResult<List<DangerousDetailsResponse>>> DangerousDetailsByDayRepIdAsync(string id)
+        {
+            ResponseAjaxResult<List<DangerousDetailsResponse>> rt = new();
+            List<DangerousDetailsResponse> rr = new();
+
+            var dayRep = await _dbContext.Queryable<Project>().FirstAsync(x => id.ToGuid() == x.Id && x.IsDelete == 1 && !string.IsNullOrWhiteSpace(x.MasterCode));
+            if (dayRep != null)
+            {
+                var dDR = await _dbContext.Queryable<DangerousDetails>()
+                    .Where(x => x.IsDelete == 1 && x.ProjectCode == dayRep.MasterCode)
+                    .ToListAsync();
+                foreach (var ddr in dDR)
+                {
+                    rr.Add(new DangerousDetailsResponse
+                    {
+                        Id = ddr.Id.ToString(),
+                        Name = ddr.FangAnName,
+                        ProjectCode = ddr.ProjectCode,
+                        FangAnKind = ddr.FangAnKind
+                    });
+                }
+            }
+            rt.SuccessResult(rr);
+            rt.Count = rr.Count;
+
+            return rt;
+        }
     }
 }

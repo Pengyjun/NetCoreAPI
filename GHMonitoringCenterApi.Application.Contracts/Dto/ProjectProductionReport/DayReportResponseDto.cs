@@ -77,15 +77,19 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.ProjectProductionRepor
         /// <summary>
         /// 现场管理人员数量
         /// </summary>
-        public int Sitemanagementpersonnum {  get; set; }
+        public int Sitemanagementpersonnum { get; set; }
         /// <summary>
         /// 施工人员数量
         /// </summary>
-        public int Siteconstructionpersonnum {  get; set; }
+        public int Siteconstructionpersonnum { get; set; }
         /// <summary>
         /// 危大工程施工数量
         /// </summary>
-        public int Hazardousconstructionnum {  get; set; }
+        public int Hazardousconstructionnum { get; set; }
+        /// <summary>
+        /// 危大工程明细
+        /// </summary>
+        public string? HazardousConstructionDetails { get; set; }
         /// <summary>
         /// 项目类别
         /// </summary>

@@ -11,12 +11,10 @@ using GHMonitoringCenterApi.Application.Contracts.IService;
 using GHMonitoringCenterApi.Application.Contracts.IService.EquipmentManagement;
 using GHMonitoringCenterApi.Application.Contracts.IService.Project;
 using GHMonitoringCenterApi.Application.Contracts.IService.ProjectProductionReport;
-using GHMonitoringCenterApi.Application.Service.Projects;
 using GHMonitoringCenterApi.Domain.Models;
 using GHMonitoringCenterApi.Domain.Shared;
 using GHMonitoringCenterApi.Domain.Shared.Const;
 using HNKC.OperationLogsAPI.Dto.ResponseDto;
-using NPOI.SS.Formula.Functions;
 using SqlSugar;
 using SqlSugar.Extensions;
 using static GHMonitoringCenterApi.Application.Contracts.Dto.Project.Report.MonthtReportsResponseDto;
@@ -686,7 +684,7 @@ namespace GHMonitoringCenterApi.Application.Service
 
             var responseData = await _projectReportService.SearchMonthReportsAsync(model);
             var resList = responseData.Data.Reports;
-            responseAjaxResult.Data= resList;
+            responseAjaxResult.Data = resList;
             responseAjaxResult.Count = responseData.Count;
             responseAjaxResult.Success();
             return responseAjaxResult;
@@ -838,7 +836,7 @@ namespace GHMonitoringCenterApi.Application.Service
                   x.CreateTime >= sTime && x.CreateTime <= eTime
                 : x.UpdateTime >= sTime && x.UpdateTime <= eTime)
                 .ToList();
-            var CurrencyConverter = await _dbContext.Queryable<CurrencyConverter>().Where(x => x.IsDelete == 1&&x.Year==DateTime.Now.Year).ToListAsync();
+            var CurrencyConverter = await _dbContext.Queryable<CurrencyConverter>().Where(x => x.IsDelete == 1 && x.Year == DateTime.Now.Year).ToListAsync();
 
             foreach (var item in projectData)
             {
@@ -847,8 +845,8 @@ namespace GHMonitoringCenterApi.Application.Service
                     var isExist = CurrencyConverter.Where(x => x.CurrencyId == item.CurrencyId.Value.ToString()).FirstOrDefault();
                     if (isExist != null)
                     {
-                        item.Amount= item.Amount.Value * isExist.ExchangeRate;
-                        item.ECAmount= item.ECAmount.Value * isExist.ExchangeRate;
+                        item.Amount = item.Amount.Value * isExist.ExchangeRate;
+                        item.ECAmount = item.ECAmount.Value * isExist.ExchangeRate;
                     }
                 }
             }
@@ -1288,6 +1286,20 @@ namespace GHMonitoringCenterApi.Application.Service
             responseAjaxResult.Data = projectStatusChangResponses;
             responseAjaxResult.Success();
             return responseAjaxResult;
+        }
+        /// <summary>
+        /// 获取危大工程项
+        /// </summary>
+        /// <returns></returns>
+        public async Task<ResponseAjaxResult<List<DangerousDetails>>> DangerousDetailsAsync()
+        {
+            ResponseAjaxResult<List<DangerousDetails>> rt = new();
+            var rr = await _dbContext.Queryable<DangerousDetails>()
+                .Where(x => x.IsDelete == 1)
+                .ToListAsync();
+
+            rt.SuccessResult(rr);
+            return rt;
         }
         #endregion
     }

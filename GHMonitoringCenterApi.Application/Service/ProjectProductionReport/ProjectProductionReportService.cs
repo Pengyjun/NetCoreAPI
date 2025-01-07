@@ -205,7 +205,9 @@ namespace GHMonitoringCenterApi.Application.Service.ProjectProductionReport
             List<Guid> departmentIds = new List<Guid>();
             //获取所有机构
             //var institution = await dbContext.Queryable<Institution>().ToListAsync();
-            if (searchRequestDto.IsDuiWai) { _currentUser.CurrentLoginIsAdmin = true;_currentUser.CurrentLoginInstitutionOid = "101162350";
+            if (searchRequestDto.IsDuiWai)
+            {
+                _currentUser.CurrentLoginIsAdmin = true; _currentUser.CurrentLoginInstitutionOid = "101162350";
                 _currentUser.CurrentLoginInstitutionGrule = "-104396-104400-101114066-101114070-101162350-";
             }
             if (_currentUser.CurrentLoginIsAdmin)
@@ -314,7 +316,8 @@ namespace GHMonitoringCenterApi.Application.Service.ProjectProductionReport
                        CreateTime = d.CreateTime,
                        Sitemanagementpersonnum = d.SiteManagementPersonNum,
                        Siteconstructionpersonnum = d.SiteConstructionPersonNum,
-                       Hazardousconstructionnum = d.HazardousConstructionNum
+                       Hazardousconstructionnum = d.HazardousConstructionNum,
+                       HazardousConstructionDetails = d.HazardousConstructionDetails
                    }).ToListAsync();
             }
             else
@@ -363,7 +366,8 @@ namespace GHMonitoringCenterApi.Application.Service.ProjectProductionReport
                        CreateTime = d.CreateTime,
                        Sitemanagementpersonnum = d.SiteManagementPersonNum,
                        Siteconstructionpersonnum = d.SiteConstructionPersonNum,
-                       Hazardousconstructionnum = d.HazardousConstructionNum
+                       Hazardousconstructionnum = d.HazardousConstructionNum,
+                       HazardousConstructionDetails = d.HazardousConstructionDetails,
                    }).ToListAsync();
                 //对外接口日期筛选
                 list = list
@@ -685,7 +689,7 @@ namespace GHMonitoringCenterApi.Application.Service.ProjectProductionReport
         /// <exception cref="NotImplementedException"></exception>
         public async Task<ResponseAjaxResult<ShipsDayReportResponseDto>> SearchShipDayReportAsync(ShipDailyRequestDto searchRequestDto)
         {
-                ResponseAjaxResult<ShipsDayReportResponseDto> responseAjaxResult = new ResponseAjaxResult<ShipsDayReportResponseDto>();
+            ResponseAjaxResult<ShipsDayReportResponseDto> responseAjaxResult = new ResponseAjaxResult<ShipsDayReportResponseDto>();
             ShipsDayReportResponseDto shipsDayReportResponseDto = new ShipsDayReportResponseDto();
             RefAsync<int> total = 0;
             //属性标签
@@ -788,7 +792,7 @@ namespace GHMonitoringCenterApi.Application.Service.ProjectProductionReport
                 IsAdmin = false;
             }
             //船舶进退场（新逻辑）
-            var shiMovenmentList = await dbContext.Queryable<ShipMovement>().Where(x => x.IsDelete == 1&&x.Status== ShipMovementStatus.Enter).ToListAsync();
+            var shiMovenmentList = await dbContext.Queryable<ShipMovement>().Where(x => x.IsDelete == 1 && x.Status == ShipMovementStatus.Enter).ToListAsync();
             var projectList = await dbContext.Queryable<Project>().Where(x => x.IsDelete == 1).ToListAsync();
 
             //获取需要查询的字段
@@ -802,7 +806,7 @@ namespace GHMonitoringCenterApi.Application.Service.ProjectProductionReport
                         JoinType.Left, d.ProjectId == p.Id && departmentIdss.Contains(p.ProjectDept),
                         JoinType.Left, d.ShipId == s.PomId
                     ))
-                    .Where((d, p, s) =>d.IsDelete==1)
+                    .Where((d, p, s) => d.IsDelete == 1)
                     .OrderBy((d, p) => new { DateDay = SqlFunc.Desc(d.DateDay), Name = SqlFunc.Desc(p.Name) })
                     .WhereIF(!string.IsNullOrWhiteSpace(searchRequestDto.ShipPingId.ToString()), (d, p) => d.ShipId == searchRequestDto.ShipPingId)
                     .WhereIF(searchRequestDto.StartTime == null && searchRequestDto.EndTime == null, (d, p) => d.DateDay == time)
@@ -908,11 +912,12 @@ namespace GHMonitoringCenterApi.Application.Service.ProjectProductionReport
 
                     }
                 }
-                else {
+                else
+                {
                     var oldValue = list.Where(t => t.ShipId == item.shipId && t.DateDay == item.DateDay).FirstOrDefault();
                     if (oldValue != null)
                     {
-                        
+
                         oldValue.shipDayReportType = 2;
                     }
                 }

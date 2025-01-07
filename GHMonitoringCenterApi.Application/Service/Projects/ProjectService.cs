@@ -3491,7 +3491,6 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     ProjectName = x.Name,
                     Year = x.Year
                 })
-                .OrderBy(x => x.ProjectName)
                 .Distinct()
                 .ToPageListAsync(requestBody.PageIndex, requestBody.PageSize, total);
 
@@ -3499,10 +3498,10 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             var data = await dbContext.Queryable<ExcelProductionConvertTable>()
                 .Where(x => pIds.Contains(x.ProjectId))
                 .ToListAsync();
-            data = data.OrderBy(x => x.Year).ThenBy(x => x.DateMonth).ToList();
+            data = data.OrderBy(x => x.Year).ThenBy(x => x.Name).ToList();
             foreach (var item in completeData)
             {
-                decimal? totalVal = 0M;
+                decimal? totalCompleteValue = 0M;//年累
                 decimal? one = 0M;
                 decimal? two = 0M;
                 decimal? three = 0M;
@@ -3524,66 +3523,71 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                         case 1:
                             one = data.FirstOrDefault(x => x.DateMonth == md && x.ProjectId == item.ProjectId)?.OneCompleteValue;
                             item.OneCompleteValue = one;
-                            totalVal += one;
+                            totalCompleteValue += one;
                             break;
                         case 2:
                             two = data.FirstOrDefault(x => x.DateMonth == md && x.ProjectId == item.ProjectId)?.TwoCompleteValue;
                             item.TwoCompleteValue = two;
-                            totalVal += two;
+                            totalCompleteValue += two;
                             break;
                         case 3:
                             three = data.FirstOrDefault(x => x.DateMonth == md && x.ProjectId == item.ProjectId)?.ThreeCompleteValue;
                             item.ThreeCompleteValue = three;
-                            totalVal += three;
+                            totalCompleteValue += three;
                             break;
                         case 4:
                             four = data.FirstOrDefault(x => x.DateMonth == md && x.ProjectId == item.ProjectId)?.FourCompleteValue;
                             item.FourCompleteValue = four;
-                            totalVal += four;
+                            totalCompleteValue += four;
                             break;
                         case 5:
                             five = data.FirstOrDefault(x => x.DateMonth == md && x.ProjectId == item.ProjectId)?.FiveCompleteValue;
                             item.FiveCompleteValue = five;
-                            totalVal += five;
+                            totalCompleteValue += five;
                             break;
                         case 6:
                             six = data.FirstOrDefault(x => x.DateMonth == md && x.ProjectId == item.ProjectId)?.SixCompleteValue;
                             item.SixCompleteValue = six;
-                            totalVal += six;
+                            totalCompleteValue += six;
                             break;
                         case 7:
                             seven = data.FirstOrDefault(x => x.DateMonth == md && x.ProjectId == item.ProjectId)?.SevenCompleteValue;
                             item.SevenCompleteValue = seven;
-                            totalVal += seven;
+                            totalCompleteValue += seven;
                             break;
                         case 8:
                             eight = data.FirstOrDefault(x => x.DateMonth == md && x.ProjectId == item.ProjectId)?.EightCompleteValue;
                             item.EightCompleteValue = eight;
-                            totalVal += eight;
+                            totalCompleteValue += eight;
                             break;
                         case 9:
                             nine = data.FirstOrDefault(x => x.DateMonth == md && x.ProjectId == item.ProjectId)?.NineCompleteValue;
                             item.NineCompleteValue = nine;
-                            totalVal += nine;
+                            totalCompleteValue += nine;
                             break;
                         case 10:
                             ten = data.FirstOrDefault(x => x.DateMonth == md && x.ProjectId == item.ProjectId)?.TenCompleteValue;
                             item.TenCompleteValue = ten;
-                            totalVal += ten;
+                            totalCompleteValue += ten;
                             break;
                         case 11:
                             ele = data.FirstOrDefault(x => x.DateMonth == md && x.ProjectId == item.ProjectId)?.ElevenCompleteValue;
                             item.ElevenCompleteValue = ele;
-                            totalVal += ele;
+                            totalCompleteValue += ele;
                             break;
                         case 12:
                             twe = data.FirstOrDefault(x => x.DateMonth == md && x.ProjectId == item.ProjectId)?.TwelveCompleteValue;
                             item.TwelveCompleteValue = twe;
-                            totalVal += twe;
+                            totalCompleteValue += twe;
                             break;
                     }
-                    item.TotalCompleteValue = totalVal;
+                    item.TotalCompleteValue = totalCompleteValue;
                 }
+                //开累
+                var accumulateuCompleteValue = data
+                    .Where(x => x.Year <= item.Year && x.ProjectId == item.ProjectId)
+                    .Sum(x => SqlFunc.ToDecimal(x.OneCompleteValue) + SqlFunc.ToDecimal(x.TwoCompleteValue) + SqlFunc.ToDecimal(x.ThreeCompleteValue) + SqlFunc.ToDecimal(x.FourCompleteValue) + SqlFunc.ToDecimal(x.FiveCompleteValue) + SqlFunc.ToDecimal(x.SixCompleteValue) + SqlFunc.ToDecimal(x.SevenCompleteValue) + SqlFunc.ToDecimal(x.EightCompleteValue) + SqlFunc.ToDecimal(x.NineCompleteValue) + SqlFunc.ToDecimal(x.TenCompleteValue) + SqlFunc.ToDecimal(x.ElevenCompleteValue) + SqlFunc.ToDecimal(x.TwelveCompleteValue));
+                item.AccumulateuCompleteValue = accumulateuCompleteValue;
             }
             rt.Count = total;
             rt.SuccessResult(completeData);
@@ -3597,40 +3601,86 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
         public async Task<ResponseAjaxResult<bool>> SaveHistoryProjectMonthReportAsync(HistoryProjectMonthReportRequestParam requestBody)
         {
             ResponseAjaxResult<bool> rt = new();
+            List<ExcelProductionConvertTable> updateTable = new();
             var rr = await dbContext.Queryable<ExcelProductionConvertTable>().FirstAsync(x => x.Id == requestBody.CompleteId);
             if (rr != null)
             {
-                rr.OneCompleteValue = requestBody.OneCompleteValue;
-                rr.TwoCompleteValue = requestBody.TwoCompleteValue;
-                rr.ThreeCompleteValue = requestBody.ThreeCompleteValue;
-                rr.FourCompleteValue = requestBody.FourCompleteValue;
-                rr.FiveCompleteValue = requestBody.FiveCompleteValue;
-                rr.SixCompleteValue = requestBody.SixCompleteValue;
-                rr.SevenCompleteValue = requestBody.SevenCompleteValue;
-                rr.EightCompleteValue = requestBody.EightCompleteValue;
-                rr.NineCompleteValue = requestBody.NineCompleteValue;
-                rr.TenCompleteValue = requestBody.TenCompleteValue;
-                rr.ElevenCompleteValue = requestBody.ElevenCompleteValue;
-                rr.TwelveCompleteValue = requestBody.TwelveCompleteValue;
-                await dbContext.Updateable(rr).WhereColumns(x => x.Id).UpdateColumns(x => new
+                var data = await dbContext.Queryable<ExcelProductionConvertTable>().Where(x => x.ProjectId == rr.ProjectId && x.Year == rr.Year).ToListAsync();
+                for (int i = 1; i <= 12; i++)
                 {
-                    x.OneCompleteValue,
-                    x.TwoCompleteValue,
-                    x.ThreeCompleteValue,
-                    x.FourCompleteValue,
-                    x.FiveCompleteValue,
-                    x.SixCompleteValue,
-                    x.SevenCompleteValue,
-                    x.EightCompleteValue,
-                    x.NineCompleteValue,
-                    x.TenCompleteValue,
-                    x.ElevenCompleteValue,
-                    x.TwelveCompleteValue,
-                }).ExecuteCommandAsync();
+                    var md = int.Parse(rr.Year + (i < 10 ? "0" + i : i.ToString()));
+                    var fr = data.FirstOrDefault(x => x.DateMonth == md);
+                    switch (i)
+                    {
+                        case 1:
+                            if (fr != null) { fr.OneCompleteValue = requestBody.OneCompleteValue; updateTable.Add(fr); }
+                            break;
+                        case 2:
+                            if (fr != null) { fr.TwoCompleteValue = requestBody.TwoCompleteValue; updateTable.Add(fr); }
+                            break;
+                        case 3:
+                            if (fr != null) { fr.ThreeCompleteValue = requestBody.ThreeCompleteValue; updateTable.Add(fr); }
+                            break;
+                        case 4:
+                            if (fr != null) { fr.FourCompleteValue = requestBody.FourCompleteValue; updateTable.Add(fr); }
+                            break;
+                        case 5:
+                            if (fr != null) { fr.FiveCompleteValue = requestBody.FiveCompleteValue; updateTable.Add(fr); }
+                            break;
+                        case 6:
+                            if (fr != null) { fr.SixCompleteValue = requestBody.SixCompleteValue; updateTable.Add(fr); }
+                            break;
+                        case 7:
+                            if (fr != null) { fr.SevenCompleteValue = requestBody.SevenCompleteValue; updateTable.Add(fr); }
+                            break;
+                        case 8:
+                            if (fr != null) { fr.EightCompleteValue = requestBody.EightCompleteValue; updateTable.Add(fr); }
+                            break;
+                        case 9:
+                            if (fr != null) { fr.NineCompleteValue = requestBody.NineCompleteValue; updateTable.Add(fr); }
+                            break;
+                        case 10:
+                            if (fr != null) { fr.TenCompleteValue = requestBody.TenCompleteValue; updateTable.Add(fr); }
+                            break;
+                        case 11:
+                            if (fr != null) { fr.ElevenCompleteValue = requestBody.ElevenCompleteValue; updateTable.Add(fr); }
+                            break;
+                        case 12:
+                            if (fr != null) { fr.TwelveCompleteValue = requestBody.TwelveCompleteValue; updateTable.Add(fr); }
+                            break;
+                    }
+                }
+                await dbContext.Updateable(updateTable)
+                    .WhereColumns(x => x.Id)
+                    .UpdateColumns(x => new
+                    {
+                        x.OneCompleteValue,
+                        x.TwoCompleteValue,
+                        x.ThreeCompleteValue,
+                        x.FourCompleteValue,
+                        x.FiveCompleteValue,
+                        x.SixCompleteValue,
+                        x.SevenCompleteValue,
+                        x.EightCompleteValue,
+                        x.NineCompleteValue,
+                        x.TenCompleteValue,
+                        x.ElevenCompleteValue,
+                        x.TwelveCompleteValue,
+                    }).ExecuteCommandAsync();
                 rt.SuccessResult(true);
             }
             else rt.FailResult(HttpStatusCode.UpdateFail, "无数据");
             return rt;
         }
+
+        #region 获取每年的节假日
+        public bool GetHolidays()
+        {
+            var url = AppsettingsHelper.GetValue("Holidays");
+            url = url.Replace("year", DateTime.Now.Year.ToString());
+            return false;
+        }
+
+        #endregion
     }
 }

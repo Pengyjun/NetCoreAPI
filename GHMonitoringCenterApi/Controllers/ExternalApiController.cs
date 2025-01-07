@@ -352,6 +352,14 @@ namespace GHMonitoringCenterApi.Controllers
         [AllowAnonymous]//跳过鉴权
         public async Task<ResponseAjaxResult<List<ProjectStatusChangResponse>>> SearchProjectChangeList()
            => await _externalApiService.SearchProjectChangeList();
+        /// <summary>
+        /// 危大工程
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("DangerousDetails")]
+        [AllowAnonymous]//跳过鉴权
+        public async Task<ResponseAjaxResult<List<DangerousDetails>>> DangerousDetailsAsync()
+          => await _externalApiService.DangerousDetailsAsync();
         #endregion
     }
 }
