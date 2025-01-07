@@ -1,4 +1,6 @@
-﻿namespace GHMonitoringCenterApi.Application.Contracts.Dto.Timing
+﻿using SqlSugar;
+
+namespace GHMonitoringCenterApi.Application.Contracts.Dto.Timing
 {
     /// <summary>
     /// 接收京威危大工程方案清单
@@ -41,6 +43,14 @@
         /// </summary>
         public string? FangAnName { get; set; }
         /// <summary>
+        /// 状态
+        /// </summary>
+        public string? Status { get; set; }
+        /// <summary>
+        /// 外部系统方案主键
+        /// </summary>
+        public string? SystemId { get; set; }
+        /// <summary>
         /// 方案类型
         /// </summary>
         public string? FangAnKind { get; set; }
@@ -56,6 +66,10 @@
         /// 方案类型
         /// </summary>
         public string FangAnType { get; set; } = string.Empty;
+        /// <summary>
+        /// 方案状态
+        /// </summary>
+        public string? FangAnState { get; set; } = string.Empty;
         /// <summary>
         /// 方案编制时间
         /// </summary>
@@ -75,18 +89,22 @@
         /// <summary>
         /// 是否异常
         /// </summary>
+        [SugarColumn(Length = 256)]
         public string ErrorOrNot { get; set; } = string.Empty;
         /// <summary>
         /// 方案附件ID
         /// </summary>
+        [SugarColumn(Length = 800)]
         public string? FangAnFileObjectID { get; set; }
         /// <summary>
         /// 专家意见附件ID
         /// </summary>
+        [SugarColumn(Length = 800)]
         public string? ExpertOpinionFileObjectID { get; set; }
         /// <summary>
         /// 审核状态
         /// </summary>
+        [SugarColumn(Length = 256)]
         public string ApprovalState { get; set; } = string.Empty;
     }
 }

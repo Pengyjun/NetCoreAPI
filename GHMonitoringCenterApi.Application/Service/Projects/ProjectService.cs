@@ -3498,7 +3498,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             var data = await dbContext.Queryable<ExcelProductionConvertTable>()
                 .Where(x => pIds.Contains(x.ProjectId))
                 .ToListAsync();
-            data = data.OrderBy(x => x.Year).ThenBy(x => x.Name).ToList();
+            data = data.OrderByDescending(x => x.Year).ThenBy(x => x.Name).ToList();
             foreach (var item in completeData)
             {
                 decimal? totalCompleteValue = 0M;//年累
