@@ -219,13 +219,22 @@ namespace GHMonitoringCenterApi.Application.Contracts.IService
         /// <param name="requestDto"></param>
         /// <returns></returns>
         Task<ResponseAjaxResult<List<SearchEquipmentManagementResponseDto>>> GetSearchEquipmentManagementAsync(ExternalRequestDto requestDto);
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         Task<ResponseAjaxResult<List<ProjectStatusChangResponse>>> SearchProjectChangeList();
         /// <summary>
         /// 危大工程
         /// </summary>
         /// <returns></returns>
         Task<ResponseAjaxResult<List<DangerousDetails>>> DangerousDetailsAsync();
+        /// <summary>
+        /// 获取全表字段施工日志
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        Task<ResponseAjaxResult<List<DayReportConstruction>>> GetDayReportConstructionAsync(ExternalRequestDto requestDto);
 
         #endregion
     }
