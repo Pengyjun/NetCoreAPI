@@ -153,6 +153,10 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project
             ///  危大工程施工（项）
             /// </summary>
             public int? HazardousConstructionNum { get; set; }
+            /// <summary>
+            /// 危大工程施工明细  ，拼接
+            /// </summary>
+            public string? HazardousConstructionDetails { get; set; }
 
             /// <summary>
             /// 陆地9人以上作业地点（处）

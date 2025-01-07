@@ -221,6 +221,11 @@ namespace GHMonitoringCenterApi.Application.Contracts.IService
         Task<ResponseAjaxResult<List<SearchEquipmentManagementResponseDto>>> GetSearchEquipmentManagementAsync(ExternalRequestDto requestDto);
 
         Task<ResponseAjaxResult<List<ProjectStatusChangResponse>>> SearchProjectChangeList();
+        /// <summary>
+        /// 危大工程
+        /// </summary>
+        /// <returns></returns>
+        Task<ResponseAjaxResult<List<DangerousDetails>>> DangerousDetailsAsync();
 
         #endregion
     }

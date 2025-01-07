@@ -1,26 +1,18 @@
 ﻿using AutoMapper;
 using GHMonitoringCenterApi.Application.Contracts.Dto;
+using GHMonitoringCenterApi.Application.Contracts.Dto.Project;
 using GHMonitoringCenterApi.Application.Contracts.Dto.Timing;
 using GHMonitoringCenterApi.Application.Contracts.IService.Timing;
+using GHMonitoringCenterApi.Domain.Enums;
 using GHMonitoringCenterApi.Domain.IRepository;
 using GHMonitoringCenterApi.Domain.Models;
 using GHMonitoringCenterApi.Domain.Shared;
-using GHMonitoringCenterApi.Domain.Shared.Util;
-using GHMonitoringCenterApi.SqlSugarCore;
-using System.Collections.Generic;
-using Model = GHMonitoringCenterApi.Domain.Models;
-using UtilsSharp;
-using SqlSugar;
-using GHMonitoringCenterApi.Application.Contracts.Dto.Project;
-using System.Net;
-using System.Net.Sockets;
-using GHMonitoringCenterApi.Application.Service.OperationLog;
-using GHMonitoringCenterApi.Application.Contracts.IService.OperationLog;
-using GHMonitoringCenterApi.Application.Contracts.IService.User;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using GHMonitoringCenterApi.Domain.Shared.Const;
-using GHMonitoringCenterApi.Domain.Enums;
+using GHMonitoringCenterApi.Domain.Shared.Util;
+using Microsoft.Extensions.Logging;
+using SqlSugar;
+using UtilsSharp;
+using Model = GHMonitoringCenterApi.Domain.Models;
 
 namespace GHMonitoringCenterApi.Application.Service.Timing
 {
@@ -554,12 +546,12 @@ namespace GHMonitoringCenterApi.Application.Service.Timing
                                 ZIDNO = item.ZIDNO,
                                 ZUSCC = item.ZUSCC,
                                 CreateTime = DateTime.Now,
-                                ZBPTYPE= item.Fzbpkinds,
-                                
+                                ZBPTYPE = item.Fzbpkinds,
+
                             });
                         }
                     }
-                   var count= await dbContext.Fastest<DealingUnitCache>().BulkCopyAsync(dealingUnitCaches);
+                    var count = await dbContext.Fastest<DealingUnitCache>().BulkCopyAsync(dealingUnitCaches);
                     await Console.Out.WriteLineAsync($"保存成功有多少条:{count}");
                     ////循环次数
                     //var forCount = responseData.Count() % 1000M == 0 ? responseData.Count() / 1000M : Math.Floor(responseData.Count() / 1000M) + 1;
@@ -2157,7 +2149,7 @@ namespace GHMonitoringCenterApi.Application.Service.Timing
         {
             ResponseAjaxResult<bool> responseAjaxResult = new ResponseAjaxResult<bool>();
             #region 筛选条件
-            var year =2025;
+            var year = 2025;
             var currentDay = DateTime.Now.Day;
             var startTime = string.Empty;
             var endTime = string.Empty;
@@ -2184,7 +2176,7 @@ namespace GHMonitoringCenterApi.Application.Service.Timing
             if (projectList.Any())
             {
                 //查询当前中期的日报
-                var dayProjectProductionList = await dbContext.Queryable<DayReport>().Where(x => x.IsDelete == 1 && x.ProcessStatus ==DayReportProcessStatus.Submited
+                var dayProjectProductionList = await dbContext.Queryable<DayReport>().Where(x => x.IsDelete == 1 && x.ProcessStatus == DayReportProcessStatus.Submited
                  && x.DateDay >= SqlFunc.ToInt32(startTime)
                  && x.DateDay <= SqlFunc.ToInt32(endTime)
                  ).ToListAsync();
@@ -2299,12 +2291,12 @@ namespace GHMonitoringCenterApi.Application.Service.Timing
             try
             {
                 //中间表
-                 var baseDealCache= await baseDealingUnitCacheRepository.AsQueryable().Where(x => x.IsDelete == 1).ToListAsync();
+                var baseDealCache = await baseDealingUnitCacheRepository.AsQueryable().Where(x => x.IsDelete == 1).ToListAsync();
                 //目标表
-                var baseDeal= await baseDealingUnitRepository.AsQueryable().Where(x => x.IsDelete == 1).ToListAsync();
-                List<DealingUnit>  dealingUnits = new List<DealingUnit>();
-                var zbp= baseDeal.Select(x=>x.ZBP).ToList();
-                var  baseDealCachea = baseDealCache.Where(x => !zbp.Contains(x.ZBP)).ToList();
+                var baseDeal = await baseDealingUnitRepository.AsQueryable().Where(x => x.IsDelete == 1).ToListAsync();
+                List<DealingUnit> dealingUnits = new List<DealingUnit>();
+                var zbp = baseDeal.Select(x => x.ZBP).ToList();
+                var baseDealCachea = baseDealCache.Where(x => !zbp.Contains(x.ZBP)).ToList();
                 foreach (var item in baseDealCachea)
                 {
                     dealingUnits.Add(new DealingUnit()
@@ -2343,12 +2335,12 @@ namespace GHMonitoringCenterApi.Application.Service.Timing
             try
             {
                 //中间表
-                var baseDealCache = await baseDealingUnitCacheRepository.AsQueryable().Where(x => x.IsDelete == 1&&(x.ZBPTYPE=="02" || x.ZBPTYPE == "03")).ToListAsync();
+                var baseDealCache = await baseDealingUnitCacheRepository.AsQueryable().Where(x => x.IsDelete == 1 && (x.ZBPTYPE == "02" || x.ZBPTYPE == "03")).ToListAsync();
                 //目标表   
-               var aa= baseDealCache.Select(x => x.ZBP).ToList();
-               var baseDeal = await baseDealingUnitRepository.AsQueryable().Where(x => x.IsDelete == 1&&aa.Contains(x.ZBP)).ToListAsync();
+                var aa = baseDealCache.Select(x => x.ZBP).ToList();
+                var baseDeal = await baseDealingUnitRepository.AsQueryable().Where(x => x.IsDelete == 1 && aa.Contains(x.ZBP)).ToListAsync();
                 List<DealingUnit> dealingUnits = new List<DealingUnit>();
-                var a =0;
+                var a = 0;
                 foreach (var item in baseDeal)
                 {
                     var sing = baseDealCache.Where(x => x.ZBP == item.ZBP).SingleOrDefault();
@@ -2367,6 +2359,55 @@ namespace GHMonitoringCenterApi.Application.Service.Timing
             {
                 return (ex.Message + Environment.NewLine + ex.StackTrace).ToString();
             }
+        }
+        /// <summary>
+        /// 获取技术危大施工方案信息
+        /// </summary>
+        /// <returns></returns>
+        public async Task<bool> GetSpecialConstruction()
+        {
+            var url = AppsettingsHelper.GetValue("JingWeiSpecialConstruction");
+            var token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJVc2VyTmFtZSI6InNwYWRtaW5AY2NnZGMuY29tJDE2MzczMDEzOTUwMDBcdTAwMDAiLCJSb2xlcyI6WyJhZG1pbiIsImNvbW1vbnJvbGUiXSwiSXNBZG1pbiI6ZmFsc2UsIkV4cGlyeURhdGVUaW1lIjoiMjI1MC0wMS0yMVQxOTowMDo1Mi45NTY1ODcrMDg6MDAifQ.tg4JhClRQX2HxuIsjUzNo-Vissn4UBdskWnSDj0uZY0";
+
+            WebHelper webHelper = new();
+            webHelper.Headers.Add("auth", token);
+
+            Dictionary<string, object> di = new();
+            di.Add("Code", "");
+            var responseResult = await webHelper.DoPostAsync<SpecialConstructionResponse>(url, di);
+            if (responseResult.Result.Code == "20000")//请求成功
+            {
+                List<DangerousDetails> insertTable = new();
+                foreach (var item in responseResult.Result.Data.RspBody.List)
+                {
+                    insertTable.Add(new DangerousDetails
+                    {
+                        Id = GuidUtil.Next(),
+                        ProjectId = item.ProjectId,
+                        FangAnName = item.FangAnName,
+                        Status = item.Status,
+                        ProjectCode = item.ProjectCode,
+                        ApprovalState = item.ApprovalState,
+                        EndTime = item.EndTime,
+                        ErrorOrNot = item.ErrorOrNot,
+                        ExpertOpinionFileObjectID = item.ExpertOpinionFileObjectID,
+                        FangAnFileObjectID = item.FangAnFileObjectID,
+                        FangAnState = item.FangAnState,
+                        FangAnStatus = item.FangAnStatus,
+                        FangAnType = item.FangAnType,
+                        FinishTime = item.FinishTime,
+                        ManageDepartment = item.ManageDepartment,
+                        StartTime = item.StartTime,
+                        CreateTime = DateTime.Now,
+                        FangAnKind = item.FangAnKind
+                    });
+                }
+
+                if (insertTable.Any()) await dbContext.Fastest<DangerousDetails>().BulkCopyAsync(insertTable);
+                return true;
+            }
+
+            return false;
         }
     }
 }

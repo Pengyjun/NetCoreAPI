@@ -229,6 +229,16 @@ namespace GHMonitoringCenterApi.Controllers.Project
         {
             return await projectReportService.SaveProjectDayReportAsync(model);
         }
+        /// <summary>
+        /// 获取危大工程项
+        /// </summary>
+        /// <param name="Id"></param>
+        /// <returns></returns>
+        [HttpGet("DangerousDetailsByDayRepId")]
+        public async Task<ResponseAjaxResult<List<DangerousDetailsResponse>>> DangerousDetailsByDayRepIdAsync([FromQuery] string Id)
+        {
+            return await projectReportService.DangerousDetailsByDayRepIdAsync(Id);
+        }
 
         /// <summary>
         /// 获取项目部相关产值
@@ -795,6 +805,16 @@ namespace GHMonitoringCenterApi.Controllers.Project
             return await projectService.SearchHistoryProjectMonthRepAsync(requestBody);
         }
         /// <summary>
+        /// 编辑历史产值
+        /// </summary>
+        /// <param name="requestBody"></param>
+        /// <returns></returns>
+        [HttpPost("SaveHistoryProjectMonthReport")]
+        public async Task<ResponseAjaxResult<bool>> SaveHistoryProjectMonthReportAsync([FromBody] HistoryProjectMonthReportRequestParam requestBody)
+        {
+            return await projectService.SaveHistoryProjectMonthReportAsync(requestBody);
+        }
+        /// <summary>
         /// 获取指定用户权限
         /// </summary>
         /// <returns></returns>
@@ -802,8 +822,10 @@ namespace GHMonitoringCenterApi.Controllers.Project
         public ResponseAjaxResult<bool> GetPermissionsByUser()
         {
             ResponseAjaxResult<bool> rt = new();
-            if (CurrentUser.Account == "2016146340" || CurrentUser.Account == "2022002687") rt.Data = true;
-            else rt.Data = false;
+            bool rs = false;
+            if (CurrentUser.Account == "2016146340" || CurrentUser.Account == "2022002687") rs = true;
+            else rs = false;
+            rt.SuccessResult(rs);
             return rt;
         }
         #region  新的项目月报列表
@@ -2276,6 +2298,14 @@ namespace GHMonitoringCenterApi.Controllers.Project
             //var ss = resList.Sum(x => x.UnitPrice * x.CompletedQuantity);
             //return projectService.aa();
             return true;
+        }
+        /// <summary>
+        /// 获取当年所有节假日
+        /// </summary>
+        /// <returns></returns>
+        public bool bb()
+        {
+            return  projectService.GetHolidays();
         }
 
         #endregion

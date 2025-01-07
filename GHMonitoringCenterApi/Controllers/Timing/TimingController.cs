@@ -1,15 +1,9 @@
 ﻿using GHMonitoringCenterApi.Application.Contracts.Dto.Project;
 using GHMonitoringCenterApi.Application.Contracts.Dto.Timing;
-using GHMonitoringCenterApi.Application.Contracts.Dto.User;
 using GHMonitoringCenterApi.Application.Contracts.IService.Timing;
-using GHMonitoringCenterApi.Domain.IRepository;
-using GHMonitoringCenterApi.Domain.Models;
 using GHMonitoringCenterApi.Domain.Shared;
-using GHMonitoringCenterApi.SqlSugarCore;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using NSwag.Annotations;
-using SqlSugar;
 
 namespace GHMonitoringCenterApi.Controllers.Timing
 {
@@ -108,7 +102,7 @@ namespace GHMonitoringCenterApi.Controllers.Timing
         [HttpGet("SynchronizationDayProduction")]
         public async Task<ResponseAjaxResult<bool>> SynchronizationDayProductionAsync()
         {
-          return await timeService.SynchronizationDayProductionAsync();
+            return await timeService.SynchronizationDayProductionAsync();
         }
 
 
@@ -130,6 +124,15 @@ namespace GHMonitoringCenterApi.Controllers.Timing
         public async Task<string> SynchronizationDealUnitNewAsync()
         {
             return await timeService.SynchronizationDealUnitNewsync();
+        }
+        /// <summary>
+        /// 获取技术危大施工方案信息
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("SpecialConstruction")]
+        public async Task<bool> GetSpecialConstruction()
+        {
+            return await timeService.GetSpecialConstruction();
         }
     }
 }

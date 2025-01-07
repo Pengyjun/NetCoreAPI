@@ -90,7 +90,7 @@ namespace GHMonitoringCenterApi.SqlSugarCore
                 };
             });
             Type[] types = typeof(StartWorkRecord).Assembly.GetTypes()
-            .Where(it => it.FullName.Contains("GHMonitoringCenterApi.Domain.Models.ExcelProductionConvertTable"))
+            .Where(it => it.FullName.Contains("GHMonitoringCenterApi.Domain.Models.DangerousDetails"))
             .ToArray();
             db.CodeFirst.InitTables(types);
         }
