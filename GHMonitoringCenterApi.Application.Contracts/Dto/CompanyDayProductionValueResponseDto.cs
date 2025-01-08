@@ -8,7 +8,7 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto
 {
     public class CompanyDayProductionValueResponseDto
     {
-        public string  DateDay { get; set; }
+        
         public decimal TotalYearProductionValue { get; set; }
 
         public List<CompanyItem> CompanyItems { get; set; }
@@ -17,6 +17,10 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto
 
 
     public class CompanyItem {
+        /// <summary>
+        /// 日期
+        /// </summary>
+        public string DateDay { get; set; }
         /// <summary>
         ///  公司当日完成产值 单位元
         /// </summary>

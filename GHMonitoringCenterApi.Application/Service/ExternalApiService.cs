@@ -7,6 +7,7 @@ using GHMonitoringCenterApi.Application.Contracts.Dto.Project.Report;
 using GHMonitoringCenterApi.Application.Contracts.Dto.Project.ShipMovements;
 using GHMonitoringCenterApi.Application.Contracts.Dto.ProjectProductionReport;
 using GHMonitoringCenterApi.Application.Contracts.Dto.Ship;
+using GHMonitoringCenterApi.Application.Contracts.Dto.Word;
 using GHMonitoringCenterApi.Application.Contracts.IService;
 using GHMonitoringCenterApi.Application.Contracts.IService.EquipmentManagement;
 using GHMonitoringCenterApi.Application.Contracts.IService.Project;
@@ -15,8 +16,11 @@ using GHMonitoringCenterApi.Domain.Models;
 using GHMonitoringCenterApi.Domain.Shared;
 using GHMonitoringCenterApi.Domain.Shared.Const;
 using HNKC.OperationLogsAPI.Dto.ResponseDto;
+using Microsoft.AspNetCore.Mvc;
+using SkiaSharp;
 using SqlSugar;
 using SqlSugar.Extensions;
+using UtilsSharp;
 using static GHMonitoringCenterApi.Application.Contracts.Dto.Project.Report.MonthtReportsResponseDto;
 
 namespace GHMonitoringCenterApi.Application.Service
@@ -1302,5 +1306,53 @@ namespace GHMonitoringCenterApi.Application.Service
             return rt;
         }
         #endregion
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="baseExternalRequest"></param>
+        /// <returns></returns>
+
+        public async Task<CompanyDayProductionValueResponseDto> SearchCompanyProductionValueAsync(BaseExternalRequestDto baseExternalRequest)
+        {
+            CompanyDayProductionValueResponseDto companyDayProductionValueResponseDto = new CompanyDayProductionValueResponseDto()
+            {
+                CompanyItems = new List<CompanyItem>()
+            };
+
+            var projectList= await _dbContext.Queryable<Project>().Where(x => x.IsDelete == 1).ToListAsync();
+            var commonDataList = await _dbContext.Queryable<ProductionMonitoringOperationDayReport>().Where(x => x.IsDelete == 1&&x.Type==1&&!string.IsNullOrWhiteSpace(x.Name)&&x.Name!= "广航局总体").OrderBy(x=>x.Sort).ToListAsync();
+            if (projectList.Count > 0)
+            {
+                //各个公司总产值
+                List<CompanyItem> companys = new List<CompanyItem>();
+                var dayReportList = await _dbContext.Queryable<DayReport>()
+                    .Where(x => x.IsDelete == 1 &&(x.CreateTime>=SqlFunc.ToDate(baseExternalRequest.StartTime)&&x.CreateTime<= SqlFunc.ToDate(baseExternalRequest.EndTime)|| x.UpdateTime >= SqlFunc.ToDate(baseExternalRequest.StartTime) && x.UpdateTime <= SqlFunc.ToDate (baseExternalRequest.EndTime)))
+                .ToListAsync();
+                var diffTime = TimeHelper.GetTimeSpan(baseExternalRequest.StartTime.ObjToDate(), baseExternalRequest.EndTime.ObjToDate()).Days;
+                for (int i = 0; i <=diffTime; i++)
+                {
+                    foreach (var item in commonDataList)
+                    {
+                       var dateDay=int.Parse( baseExternalRequest.StartTime.ObjToDate().AddDays(i-1).ToString("yyyyMMdd"));
+                        var companyProjectIds = projectList.Where(x => x.CompanyId == item.ItemId).Select(x => x.Id).ToList();
+                        var dayProductionValue = dayReportList.Where(x => x.DateDay == dateDay && companyProjectIds.Contains(x.ProjectId)).Sum(x => x.DayActualProductionAmount);
+                            companys.Add(new CompanyItem()
+                        { 
+                            DateDay = baseExternalRequest.StartTime.ObjToDate().AddDays(i).ToString(),
+                            CompanyDayProductionValue = dayProductionValue,
+                            //YearCompanyProductionValue = item.YearCompanyProductionValue,
+                            CompanyId = item.ItemId,
+                            // DayProductionValue = dayProductionValue,
+                            //YearProductionValue = item.TotalYearProductionValue
+                        }) ;
+                    }
+                }
+               
+                companyDayProductionValueResponseDto.CompanyItems = companys.Where(x => x.CompanyId != null).ToList();
+            }
+            return companyDayProductionValueResponseDto;
+        }
     }
 }
