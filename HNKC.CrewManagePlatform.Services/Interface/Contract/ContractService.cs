@@ -549,8 +549,8 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Contract
                 .WhereIF(!string.IsNullOrEmpty(requestBody.Year), (t1, t5, t3, t6) => t6.TrainingTime.Value.Year.ToString() == requestBody.Year)
                 .Select((t1, t5, t3, t6) => new YearCheckSearch
                 {
-                    BId = t6.BusinessId.ToString(),
-                    Id = t1.BusinessId.ToString(),
+                    BId = t1.BusinessId.ToString(),
+                    Id = t6.BusinessId.ToString(),
                     Country = t3.Country,
                     OnBoard = t5.OnShip,
                     ShipType = t3.ShipType,
