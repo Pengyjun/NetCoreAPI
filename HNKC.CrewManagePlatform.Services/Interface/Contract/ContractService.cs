@@ -486,10 +486,10 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Contract
         /// <returns></returns>
         private async Task<Result> UpdateTrainingRecordAsync(SaveTrainingRecord requestBody)
         {
-            var rt = await _dbContext.Queryable<TrainingRecord>().Where(t => t.BusinessId.ToString() == requestBody.BId).FirstAsync();
+            var rt = await _dbContext.Queryable<TrainingRecord>().Where(t => t.BusinessId.ToString() == requestBody.Id).FirstAsync();
             if (rt != null)
             {
-                var rr = await _dbContext.Queryable<TrainingRecord>().Where(t => rt.PId == t.BusinessId).ToListAsync();
+                var rr = await _dbContext.Queryable<TrainingRecord>().Where(t => rt.BusinessId == t.BusinessId).ToListAsync();
                 if (rr.Any())
                 {
                     await _dbContext.Deleteable(rr).ExecuteCommandAsync();
@@ -549,8 +549,8 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Contract
                 .WhereIF(!string.IsNullOrEmpty(requestBody.Year), (t1, t5, t3, t6) => t6.TrainingTime.Value.Year.ToString() == requestBody.Year)
                 .Select((t1, t5, t3, t6) => new YearCheckSearch
                 {
-                    BId = t1.BusinessId.ToString(),
-                    Id = t6.BusinessId.ToString(),
+                    BId = t6.BusinessId.ToString(),
+                    Id = t1.BusinessId.ToString(),
                     Country = t3.Country,
                     OnBoard = t5.OnShip,
                     ShipType = t3.ShipType,
@@ -642,7 +642,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Contract
         /// <returns></returns>
         public async Task<Result> SaveYearCheckAsync(SaveYearCheck requestBody)
         {
-            var rt = await _dbContext.Queryable<YearCheck>().Where(t => t.IsDelete == 1 && t.TrainingId.ToString() == requestBody.BId && DateTime.Now.Year == t.TrainingTime.Value.Year).FirstAsync();
+            var rt = await _dbContext.Queryable<YearCheck>().Where(t => t.IsDelete == 1 && t.BusinessId.ToString() == requestBody.BId && requestBody.Year == t.TrainingTime.Value.Year).FirstAsync();
             if (rt != null)
             {
                 if (requestBody.Scans != null && requestBody.Scans.Any())
@@ -652,7 +652,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Contract
                     await _dbContext.Deleteable(files).ExecuteCommandAsync();
                     rt.TrainingScan = GuidUtil.Next();
                     requestBody.Scans.ForEach(x => x.FileId = rt.TrainingScan);
-                    await _baseService.InsertFileAsync(requestBody.Scans, Guid.Parse(requestBody.BId));
+                    await _baseService.InsertFileAsync(requestBody.Scans, rt.TrainingId);
                     await _dbContext.Updateable(rt).UpdateColumns(x => new { x.CheckType, x.TrainingScan }).ExecuteCommandAsync();
                     return Result.Success("成功");
                 }
@@ -663,24 +663,28 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Contract
             }
             else
             {
-                var fileId = GuidUtil.Next();
-                var addPromotion = new YearCheck
-                {
-                    Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
-                    BusinessId = GuidUtil.Next(),
-                    TrainingScan = fileId,
-                    CheckType = requestBody.CheckType,
-                    TrainingId = Guid.Parse(requestBody.BId),
-                    TrainingTime = DateTime.Now
-                };
-                if (requestBody.Scans != null && requestBody.Scans.Any())
-                {
-                    requestBody.Scans.ForEach(x => x.FileId = fileId);
-                    await _baseService.InsertFileAsync(requestBody.Scans, Guid.Parse(requestBody.BId));
-                }
-                await _dbContext.Insertable(addPromotion).ExecuteCommandAsync();
-                return Result.Success("成功");
+                return Result.Success("失败");
             }
+            //else
+            //{
+            //    var fileId = GuidUtil.Next();
+            //    var addPromotion = new YearCheck
+            //    {
+            //        Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+            //        BusinessId = GuidUtil.Next(),
+            //        TrainingScan = fileId,
+            //        CheckType = requestBody.CheckType,
+            //        TrainingId = Guid.Parse(requestBody.Id),
+            //        TrainingTime = DateTime.Now
+            //    };
+            //    if (requestBody.Scans != null && requestBody.Scans.Any())
+            //    {
+            //        requestBody.Scans.ForEach(x => x.FileId = fileId);
+            //        await _baseService.InsertFileAsync(requestBody.Scans, Guid.Parse(requestBody.Id));
+            //    }
+            //    await _dbContext.Insertable(addPromotion).ExecuteCommandAsync();
+            //    return Result.Success("成功");
+            //}
         }
 
         #endregion

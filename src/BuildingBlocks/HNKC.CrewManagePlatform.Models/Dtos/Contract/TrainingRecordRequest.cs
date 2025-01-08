@@ -37,7 +37,7 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.Contract
         /// <summary>
         /// 
         /// </summary>
-        public string? BId { get; set; }
+        public string? Id { get; set; }
         /// <summary>
         /// 培训类型：安全培训...
         /// </summary>

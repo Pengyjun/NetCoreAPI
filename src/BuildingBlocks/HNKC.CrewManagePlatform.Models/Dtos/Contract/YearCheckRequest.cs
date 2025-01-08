@@ -28,6 +28,10 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.Contract
         /// </summary>
         public string? BId { get; set; }
         /// <summary>
+        /// 
+        /// </summary>
+        public int Year { get; set; }
+        /// <summary>
         /// 考核结果
         /// </summary>
         public CheckEnum CheckType { get; set; }
