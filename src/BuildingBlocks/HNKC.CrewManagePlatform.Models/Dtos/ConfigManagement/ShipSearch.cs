@@ -8,9 +8,9 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.ConfigManagement
 
         public string? ShipId { get; set; }
         public string? ShipName { get; set; }
-        public string? Country { get; set; }
+        public Guid? Country { get; set; }
         public string? CountryName { get; set; }
-        public string? Company { get; set; }
+        public Guid? Company { get; set; }
         public string? CompanyName { get; set; }
         public ShipTypeEnum ShipType { get; set; }
         public string? ShipTypeName { get; set; }

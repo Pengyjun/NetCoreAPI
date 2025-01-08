@@ -95,22 +95,6 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         #endregion
 
         #region 专业信息
-        ///// <summary>
-        ///// 船舶类型
-        ///// </summary>
-        //public ShipTypeEnum ShipType { get; set; }
-        ///// <summary>
-        ///// 船员类型
-        ///// </summary>
-        //public string? CrewType { get; set; }
-        ///// <summary>
-        ///// 所在船舶
-        ///// </summary>
-        //public string? OnBoard { get; set; }
-        ///// <summary>
-        ///// 在船职务
-        ///// </summary>
-        //public string? PositionOnBoard { get; set; }
         /// <summary>
         /// 文件船员照片
         /// </summary>
@@ -129,7 +113,7 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// <summary>
         /// 劳务合同
         /// </summary>
-        public UserEntryInfosForDetaails? UserEntryInfo { get; set; }
+        public List<UserEntryInfosForDetaails>? UserEntryInfo { get; set; }
         /// <summary>
         /// 基本校验
         /// </summary>
@@ -227,13 +211,75 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
     /// <summary>
     /// 适任及证书
     /// </summary>
-    public class CertificateOfCompetencyDto : IValidatableObject
+    public class CertificateOfCompetencyDto
     {
-        #region 第一适任证
         /// <summary>
         /// 服务簿类型
         /// </summary>
         public ServiceBookEnum ServiceBookType { get; set; }
+        #region 第一适任证
+        /// <summary>
+        /// 第一适任证
+        /// </summary>
+        public List<FirstCertificateDto>? FirstCertificateDto { get; set; }
+        #endregion
+
+        #region 第二适任证
+        /// <summary>
+        /// 第二适任证
+        /// </summary>
+        public List<SeconedCertificateDto>? SeconedCertificateDto { get; set; }
+        #endregion
+
+        #region 培训合格证
+        /// <summary>
+        /// 培训合格证
+        /// </summary>
+        public List<TrainingCertificateDto>? TrainingCertificateDto { get; set; }
+        #endregion
+
+        #region 健康证
+        /// <summary>
+        /// 健康证
+        /// </summary>
+        public List<HealthCertificateDto>? HealthCertificateDto { get; set; }
+        #endregion
+
+        #region 海员证
+        /// <summary>
+        /// 海员证
+        /// </summary>
+        public List<SeamanCertificateDto>? SeamanCertificateDto { get; set; }
+        #endregion
+
+        #region 护照
+        /// <summary>
+        /// 护照
+        /// </summary>
+        public List<PassportCertificateDto>? PassportCertificateDto { get; set; }
+        #endregion
+
+        #region 技能证书
+        /// <summary>
+        /// 技能证书
+        /// </summary>
+        public List<SkillCertificatess>? SkillCertificates { get; set; }
+        #endregion
+
+        #region 特种设备证书
+        /// <summary>
+        /// 特种设备证书
+        /// </summary>
+        public List<SpecialEquipss>? SpecialEquips { get; set; }
+
+        #endregion
+    }
+    /// <summary>
+    /// 第一适任证
+    /// </summary>
+    public class FirstCertificateDto : IValidatableObject
+    {
+        #region 第一适任证
         /// <summary>
         /// 证书编号
         /// </summary>
@@ -258,8 +304,18 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// 扫描件上传
         /// </summary>
         public List<UploadResponse>? FScansUpload { get; set; }
-        #endregion
 
+        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+        {
+            if (!string.IsNullOrWhiteSpace(FCertificate) && FCertificate.Length > 30) yield return new ValidationResult("第一适任证书过长", new string[] { nameof(FCertificate) });
+        }
+        #endregion
+    }
+    /// <summary>
+    /// 第二适任证
+    /// </summary>
+    public class SeconedCertificateDto : IValidatableObject
+    {
         #region 第二适任证
         /// <summary>
         /// 证书编号
@@ -285,8 +341,18 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// 扫描件上传
         /// </summary>
         public List<UploadResponse>? SScansUpload { get; set; }
-        #endregion
 
+        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+        {
+            if (!string.IsNullOrWhiteSpace(SCertificate) && SCertificate.Length > 30) yield return new ValidationResult("第二适任证书过长", new string[] { nameof(SCertificate) });
+        }
+        #endregion
+    }
+    /// <summary>
+    /// 培训合格证
+    /// </summary>
+    public class TrainingCertificateDto : IValidatableObject
+    {
         #region 培训合格证
         /// <summary>
         /// 证书编号
@@ -332,8 +398,18 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// 扫描件上传
         /// </summary>
         public List<UploadResponse>? TrainingScansUpload { get; set; }
-        #endregion
 
+        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+        {
+            if (!string.IsNullOrWhiteSpace(TrainingCertificate) && TrainingCertificate.Length > 30) yield return new ValidationResult("培训合格证过长", new string[] { nameof(TrainingCertificate) });
+        }
+        #endregion
+    }
+    /// <summary>
+    /// 健康证
+    /// </summary>
+    public class HealthCertificateDto : IValidatableObject
+    {
         #region 健康证
         /// <summary>
         ///  证书编号
@@ -351,8 +427,18 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// 扫描件上传
         /// </summary>
         public List<UploadResponse>? HealthScansUpload { get; set; }
-        #endregion
 
+        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+        {
+            if (!string.IsNullOrWhiteSpace(HealthCertificate) && HealthCertificate.Length > 30) yield return new ValidationResult("健康证过长", new string[] { nameof(HealthCertificate) });
+        }
+        #endregion
+    }
+    /// <summary>
+    /// 海员证
+    /// </summary>
+    public class SeamanCertificateDto : IValidatableObject
+    {
         #region 海员证
         /// <summary>
         ///  证书编号
@@ -370,8 +456,18 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// 扫描件上传
         /// </summary>
         public List<UploadResponse>? SeamanScansUpload { get; set; }
-        #endregion
 
+        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+        {
+            if (!string.IsNullOrWhiteSpace(SeamanCertificate) && SeamanCertificate.Length > 30) yield return new ValidationResult("海员证过长", new string[] { nameof(SeamanCertificate) });
+        }
+        #endregion
+    }
+    /// <summary>
+    /// 护照
+    /// </summary>
+    public class PassportCertificateDto : IValidatableObject
+    {
         #region 护照
         /// <summary>
         ///  证书编号
@@ -393,32 +489,14 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// 扫描件上传
         /// </summary>
         public List<UploadResponse>? PassportScansUpload { get; set; }
-        #endregion
-
-        #region 技能证书
-        /// <summary>
-        /// 技能证书
-        /// </summary>
-        public List<SkillCertificatess>? SkillCertificates { get; set; }
-        #endregion
-
-        #region 特种设备证书
-        /// <summary>
-        /// 特种设备证书
-        /// </summary>
-        public List<SpecialEquipss>? SpecialEquips { get; set; }
 
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
-            if (!string.IsNullOrWhiteSpace(FCertificate) && FCertificate.Length > 30) yield return new ValidationResult("第一适任证书过长", new string[] { nameof(FCertificate) });
-            if (!string.IsNullOrWhiteSpace(SCertificate) && SCertificate.Length > 30) yield return new ValidationResult("第二适任证书过长", new string[] { nameof(SCertificate) });
-            if (!string.IsNullOrWhiteSpace(TrainingCertificate) && TrainingCertificate.Length > 30) yield return new ValidationResult("培训合格证过长", new string[] { nameof(TrainingCertificate) });
-            if (!string.IsNullOrWhiteSpace(HealthCertificate) && HealthCertificate.Length > 30) yield return new ValidationResult("健康证过长", new string[] { nameof(HealthCertificate) });
-            if (!string.IsNullOrWhiteSpace(SeamanCertificate) && SeamanCertificate.Length > 30) yield return new ValidationResult("海员证过长", new string[] { nameof(SeamanCertificate) });
             if (!string.IsNullOrWhiteSpace(PassportCertificate) && PassportCertificate.Length > 30) yield return new ValidationResult("护照过长", new string[] { nameof(PassportCertificate) });
         }
         #endregion
     }
+
     /// <summary>
     /// 技能证书
     /// </summary>
@@ -609,15 +687,15 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// <summary>
         /// 下船日期
         /// </summary>
-        public DateTime WorkShipEndTime { get; set; }
-        ///// <summary>
-        ///// 休假日期
-        ///// </summary>
-        //public int HolidayTime { get; set; }
-        ///// <summary>
-        ///// 在船时间
-        ///// </summary>
-        //public int OnBoardTime { get; set; }
+        public DateTime? WorkShipEndTime { get; set; }
+        /// <summary>
+        /// 所在项目
+        /// </summary>
+        public string? ProjectName { get; set; }
+        /// <summary>
+        /// 所在国家
+        /// </summary>
+        public Guid? Country { get; set; }
     }
     /// <summary>
     /// 培训记录

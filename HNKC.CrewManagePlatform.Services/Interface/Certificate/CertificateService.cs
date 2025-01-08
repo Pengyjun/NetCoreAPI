@@ -108,7 +108,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Certificate
             var remindSet = await _dbContext.Queryable<RemindSetting>().Where(t => t.RemindType == 22 && t.IsDelete == 1 && t.Enable == 1).ToListAsync();
             var position = await _dbContext.Queryable<Position>().Where(t => t.IsDelete == 1).ToListAsync();
             var ownShipTable = await _dbContext.Queryable<OwnerShip>().Where(t => rr.Select(x => x.OnBoard).Contains(t.BusinessId.ToString())).ToListAsync();
-            var countryTable = await _dbContext.Queryable<CountryRegion>().Where(t => rr.Select(x => x.Country).Contains(t.BusinessId.ToString())).ToListAsync();
+            var countryTable = await _dbContext.Queryable<CountryRegion>().Where(t => rr.Select(x => x.Country).Contains(t.BusinessId)).ToListAsync();
             var certificateOfCompetency = await _dbContext.Queryable<CertificateOfCompetency>().Where(t => rr.Select(x => x.BId).ToList().Contains(t.CertificateId.ToString())).ToListAsync();
             foreach (var u in rr)
             {
@@ -172,9 +172,9 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Certificate
                             //if (existData6 == null) continue;
                             break;
                     }
-                    u.OnStatus = EnumUtil.GetDescription(_baseService.ShipUserStatus(u.WorkShipStartTime, u.DeleteResonEnum));
+                    u.OnStatus = EnumUtil.GetDescription(_baseService.ShipUserStatus(u.WorkShipStartTime, u.DeleteResonEnum, u.WorkShipStartTime));
                     u.OnBoardName = ownShipTable.FirstOrDefault(x => x.BusinessId.ToString() == u.OnBoard)?.ShipName;
-                    u.CountryName = countryTable.FirstOrDefault(x => x.BusinessId.ToString() == u.Country)?.Name;
+                    u.CountryName = countryTable.FirstOrDefault(x => x.BusinessId == u.Country)?.Name;
                     u.ShipTypeName = EnumUtil.GetDescription(u.ShipType);
                     u.Age = _baseService.CalculateAgeFromIdCard(u.CardId);
                     if (u.FPosition != null) u.FPositionName = position.FirstOrDefault(x => x.BusinessId.ToString() == u.FPosition)?.Name;

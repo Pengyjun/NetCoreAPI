@@ -1,5 +1,4 @@
 ﻿using HNKC.CrewManagePlatform.Models.Enums;
-using System.ComponentModel.DataAnnotations;
 
 namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
 {
@@ -19,6 +18,9 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// 政治面貌
         /// </summary>
         public string? PoliticalStatus { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
         public string? PoliticalStatusName { get; set; }
         /// <summary>
         /// 当前船舶任职时间
@@ -32,11 +34,17 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// 籍贯
         /// </summary>
         public string? NativePlace { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
         public string? NativePlaceName { get; set; }
         /// <summary>
         /// 民族
         /// </summary>
         public string? Nation { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
         public string? NationName { get; set; }
         /// <summary>
         /// 家庭地址
@@ -66,38 +74,6 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// 身份证扫描件 
         /// </summary>
         public List<FileInfosForDetails>? IdCardScans { get; set; }
-        /// <summary>
-        /// 入职日期
-        /// </summary>
-        public DateTime? EntryTime { get; set; }
-        /// <summary>
-        /// 入职开始时间
-        /// </summary>
-        public DateTime? StartTime { get; set; }
-        /// <summary>
-        /// 入职结束时间
-        /// </summary>
-        public DateTime? EndTime { get; set; }
-        /// <summary>
-        /// 入职材料 
-        /// </summary>
-        public string? EntryScans { get; set; }
-        /// <summary>
-        /// 用工形式
-        /// </summary>
-        public string? EmploymentId { get; set; }
-        /// <summary>
-        /// 劳务公司
-        /// </summary>
-        public string? LaborCompany { get; set; }
-        /// <summary>
-        /// 合同主体
-        /// </summary>
-        public string? ContarctMain { get; set; }
-        /// <summary>
-        /// 合同类型
-        /// </summary>
-        public string? ContarctType { get; set; }
         #endregion
 
         #region 专业信息
@@ -113,21 +89,33 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// 船员类型
         /// </summary>
         public string? CrewType { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
         public string? CrewTypeName { get; set; }
         /// <summary>
         /// 服务簿类型
         /// </summary>
         public string? ServiceBookTypeName { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
         public ServiceBookEnum ServiceBookType { get; set; }
         /// <summary>
         /// 所在船舶
         /// </summary>
         public string? OnBoardName { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
         public string? OnBoard { get; set; }
         /// <summary>
         /// 在船职务
         /// </summary>
         public string? PositionOnBoard { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
         public string? PositionOnBoardName { get; set; }
         /// <summary>
         /// 船员照片 
@@ -163,6 +151,9 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// 关系
         /// </summary>
         public FamilyRelationEnum RelationShip { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
         public string? RelationShipName { get; set; }
         /// <summary>
         /// 联系方式
@@ -206,10 +197,6 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// 入职日期
         /// </summary>
         public string? EntryDate { get; set; }
-        ///// <summary>
-        ///// 入职材料 ,拼接文件
-        ///// </summary>
-        //public List<FileInfosForDetails>? EntryScans { get; set; }
         /// <summary>
         /// 劳务公司
         /// </summary>
@@ -222,11 +209,17 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// 合同类型
         /// </summary>
         public ContractEnum ContractType { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
         public string? ContractTypeName { get; set; }
         /// <summary>
         /// 用工形式
         /// </summary>
         public string? EmploymentName { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
         public string? EmploymentId { get; set; }
         /// <summary>
         /// 状态：进行中...
@@ -238,182 +231,50 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
     /// </summary>
     public class CertificateOfCompetencyDetails
     {
-        #region 第一适任证
         /// <summary>
         /// 服务簿类型
         /// </summary>
         public ServiceBookEnum ServiceBookType { get; set; }
+        #region 第一适任证
         /// <summary>
-        /// 证书编号
+        /// 第一适任证
         /// </summary>
-        public string? FCertificate { get; set; }
-        /// <summary>
-        /// 适任航区
-        /// </summary>
-        public string? FNavigationArea { get; set; }
-        public string? FNavigationAreaName { get; set; }
-        /// <summary>
-        /// 适任职务
-        /// </summary>
-        public string? FPosition { get; set; }
-        public string? FPositionName { get; set; }
-        /// <summary>
-        /// 签发日期
-        /// </summary>
-        public string? FSignTime { get; set; }
-        /// <summary>
-        /// 有效日期
-        /// </summary>
-        public string? FEffectiveTime { get; set; }
-        /// <summary>
-        /// 有效期倒计时 100天
-        /// </summary>
-        public int FEffectiveCountdown { get; set; }
-        /// <summary>
-        /// 扫描件 
-        /// </summary>
-        public List<FileInfosForDetails>? FScans { get; set; }
+        public List<FirstCertificateOfCompetencyDetailsDto>? FirstCertificateOfCompetencyDetailsDto { get; set; }
         #endregion
 
         #region 第二适任证
         /// <summary>
-        /// 证书编号
+        /// 第二适任证
         /// </summary>
-        public string? SCertificate { get; set; }
-        /// <summary>
-        /// 适任航区
-        /// </summary>
-        public string? SNavigationArea { get; set; }
-        public string? SNavigationAreaName { get; set; }
-        /// <summary>
-        /// 适任职务
-        /// </summary>
-        public string? SPosition { get; set; }
-        public string? SPositionName { get; set; }
-        /// <summary>
-        /// 签发日期
-        /// </summary>
-        public string? SSignTime { get; set; }
-        /// <summary>
-        /// 有效日期
-        /// </summary>
-        public string? SEffectiveTime { get; set; }
-        /// <summary>
-        /// 有效期倒计时 100天
-        /// </summary>
-        public int SEffectiveCountdown { get; set; }
-        /// <summary>
-        /// 扫描件 
-        /// </summary>
-        public List<FileInfosForDetails>? SScans { get; set; }
+        public List<SecondCertificateOfCompetencyDetailsDto>? SecondCertificateOfCompetencyDetailsDto { get; set; }
         #endregion
 
         #region 培训合格证
         /// <summary>
-        /// 证书编号
+        /// 培训合格证
         /// </summary>
-        public string? TrainingCertificate { get; set; }
-        /// <summary>
-        /// 签发日期
-        /// </summary>
-        public string? TrainingSignTime { get; set; }
-        /// <summary>
-        /// Z01有效日期
-        /// </summary>
-        public string? Z01EffectiveTime { get; set; }
-        /// <summary>
-        /// Z07有效日期
-        /// </summary>
-        public string? Z07EffectiveTime { get; set; }
-        /// <summary>
-        /// Z08有效日期
-        /// </summary>
-        public string? Z08EffectiveTime { get; set; }
-        /// <summary>
-        /// Z04有效日期
-        /// </summary>
-        public string? Z04EffectiveTime { get; set; }
-        /// <summary>
-        /// Z05有效日期
-        /// </summary>
-        public string? Z05EffectiveTime { get; set; }
-        /// <summary>
-        /// Z02有效日期
-        /// </summary>
-        public string? Z02EffectiveTime { get; set; }
-        /// <summary>
-        /// Z06有效日期
-        /// </summary>
-        public string? Z06EffectiveTime { get; set; }
-        /// <summary>
-        /// Z09有效日期
-        /// </summary>
-        public string? Z09EffectiveTime { get; set; }
-        /// <summary>
-        /// 扫描件 ,拼接
-        /// </summary>
-        public List<FileInfosForDetails>? TrainingScans { get; set; }
+        public List<TrainingCertificateDetailsDto>? TrainingCertificateDetailsDto { get; set; }
         #endregion
 
         #region 健康证
         /// <summary>
-        ///  证书编号
+        /// 健康证
         /// </summary>
-        public string? HealthCertificate { get; set; }
-        /// <summary>
-        /// 签发日期
-        /// </summary>
-        public string? HealthSignTime { get; set; }
-        /// <summary>
-        /// 有效日期
-        /// </summary>
-        public string? HealthEffectiveTime { get; set; }
-        /// <summary>
-        /// 扫描件 
-        /// </summary>
-        public List<FileInfosForDetails>? HealthScans { get; set; }
+        public List<HealthCertificateDetailsDto>? HealthCertificateDetailsDto { get; set; }
         #endregion
 
         #region 海员证
         /// <summary>
-        ///  证书编号
+        /// 海员证
         /// </summary>
-        public string? SeamanCertificate { get; set; }
-        /// <summary>
-        /// 签发日期
-        /// </summary>
-        public string? SeamanSignTime { get; set; }
-        /// <summary>
-        /// 有效日期
-        /// </summary>
-        public string? SeamanEffectiveTime { get; set; }
-        /// <summary>
-        /// 扫描件 
-        /// </summary>
-        public List<FileInfosForDetails>? SeamanScans { get; set; }
+        public List<SeamanCertificateDetailsDto>? SeamanCertificateDetailsDto { get; set; }
         #endregion
 
         #region 护照
         /// <summary>
-        ///  证书编号
+        /// 护照
         /// </summary>
-        public string? PassportCertificate { get; set; }
-        /// <summary>
-        /// 签发日期
-        /// </summary>
-        public string? PassportSignTime { get; set; }
-        /// <summary>
-        /// 有效日期
-        /// </summary>
-        public string? PassportEffectiveTime { get; set; }
-        /// <summary>
-        /// 签证记录
-        /// </summary>
-        public List<VisaRecordsForDetails>? VisaRecords { get; set; }
-        /// <summary>
-        /// 扫描件 ,拼接
-        /// </summary>
-        public List<FileInfosForDetails>? PassportScans { get; set; }
+        public List<PassportCertificateDetailsDto>? PassportCertificateDetailsDto { get; set; }
         #endregion
 
         #region 技能证书
@@ -431,6 +292,222 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         #endregion
     }
     /// <summary>
+    /// 第一适任证
+    /// </summary>
+    public class FirstCertificateOfCompetencyDetailsDto
+    {
+        #region 第一适任证
+        /// <summary>
+        /// 证书编号
+        /// </summary>
+        public string? FCertificate { get; set; }
+        /// <summary>
+        /// 适任航区
+        /// </summary>
+        public string? FNavigationArea { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
+        public string? FNavigationAreaName { get; set; }
+        /// <summary>
+        /// 适任职务
+        /// </summary>
+        public string? FPosition { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
+        public string? FPositionName { get; set; }
+        /// <summary>
+        /// 签发日期
+        /// </summary>
+        public DateTime? FSignTime { get; set; }
+        /// <summary>
+        /// 有效日期
+        /// </summary>
+        public DateTime? FEffectiveTime { get; set; }
+        /// <summary>
+        /// 有效期倒计时 100天
+        /// </summary>
+        public int FEffectiveCountdown { get; set; }
+        /// <summary>
+        /// 扫描件 
+        /// </summary>
+        public List<FileInfosForDetails>? FScans { get; set; }
+        #endregion
+    }
+    /// <summary>
+    /// 第二适任证
+    /// </summary>
+    public class SecondCertificateOfCompetencyDetailsDto
+    {
+        #region 第二适任证
+        /// <summary>
+        /// 证书编号
+        /// </summary>
+        public string? SCertificate { get; set; }
+        /// <summary>
+        /// 适任航区
+        /// </summary>
+        public string? SNavigationArea { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
+        public string? SNavigationAreaName { get; set; }
+        /// <summary>
+        /// 适任职务
+        /// </summary>
+        public string? SPosition { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
+        public string? SPositionName { get; set; }
+        /// <summary>
+        /// 签发日期
+        /// </summary>
+        public DateTime? SSignTime { get; set; }
+        /// <summary>
+        /// 有效日期
+        /// </summary>
+        public DateTime? SEffectiveTime { get; set; }
+        /// <summary>
+        /// 有效期倒计时 100天
+        /// </summary>
+        public int SEffectiveCountdown { get; set; }
+        /// <summary>
+        /// 扫描件 
+        /// </summary>
+        public List<FileInfosForDetails>? SScans { get; set; }
+        #endregion
+    }
+    /// <summary>
+    /// 培训合格证
+    /// </summary>
+    public class TrainingCertificateDetailsDto
+    {
+        #region 培训合格证
+        /// <summary>
+        /// 证书编号
+        /// </summary>
+        public string? TrainingCertificate { get; set; }
+        /// <summary>
+        /// 签发日期
+        /// </summary>
+        public DateTime? TrainingSignTime { get; set; }
+        /// <summary>
+        /// Z01有效日期
+        /// </summary>
+        public DateTime? Z01EffectiveTime { get; set; }
+        /// <summary>
+        /// Z07有效日期
+        /// </summary>
+        public DateTime? Z07EffectiveTime { get; set; }
+        /// <summary>
+        /// Z08有效日期
+        /// </summary>
+        public DateTime? Z08EffectiveTime { get; set; }
+        /// <summary>
+        /// Z04有效日期
+        /// </summary>
+        public DateTime? Z04EffectiveTime { get; set; }
+        /// <summary>
+        /// Z05有效日期
+        /// </summary>
+        public DateTime? Z05EffectiveTime { get; set; }
+        /// <summary>
+        /// Z02有效日期
+        /// </summary>
+        public DateTime? Z02EffectiveTime { get; set; }
+        /// <summary>
+        /// Z06有效日期
+        /// </summary>
+        public DateTime? Z06EffectiveTime { get; set; }
+        /// <summary>
+        /// Z09有效日期
+        /// </summary>
+        public DateTime? Z09EffectiveTime { get; set; }
+        /// <summary>
+        /// 扫描件 ,拼接
+        /// </summary>
+        public List<FileInfosForDetails>? TrainingScans { get; set; }
+        #endregion
+    }
+    /// <summary>
+    /// 健康证
+    /// </summary>
+    public class HealthCertificateDetailsDto
+    {
+        #region 健康证
+        /// <summary>
+        ///  证书编号
+        /// </summary>
+        public string? HealthCertificate { get; set; }
+        /// <summary>
+        /// 签发日期
+        /// </summary>
+        public DateTime? HealthSignTime { get; set; }
+        /// <summary>
+        /// 有效日期
+        /// </summary>
+        public DateTime? HealthEffectiveTime { get; set; }
+        /// <summary>
+        /// 扫描件 
+        /// </summary>
+        public List<FileInfosForDetails>? HealthScans { get; set; }
+        #endregion
+    }
+    /// <summary>
+    /// 海员证
+    /// </summary>
+    public class SeamanCertificateDetailsDto
+    {
+        #region 海员证
+        /// <summary>
+        ///  证书编号
+        /// </summary>
+        public string? SeamanCertificate { get; set; }
+        /// <summary>
+        /// 签发日期
+        /// </summary>
+        public DateTime? SeamanSignTime { get; set; }
+        /// <summary>
+        /// 有效日期
+        /// </summary>
+        public DateTime? SeamanEffectiveTime { get; set; }
+        /// <summary>
+        /// 扫描件 
+        /// </summary>
+        public List<FileInfosForDetails>? SeamanScans { get; set; }
+        #endregion
+    }
+    /// <summary>
+    /// 护照
+    /// </summary>
+    public class PassportCertificateDetailsDto
+    {
+        #region 护照
+        /// <summary>
+        ///  证书编号
+        /// </summary>
+        public string? PassportCertificate { get; set; }
+        /// <summary>
+        /// 签发日期
+        /// </summary>
+        public DateTime? PassportSignTime { get; set; }
+        /// <summary>
+        /// 有效日期
+        /// </summary>
+        public DateTime? PassportEffectiveTime { get; set; }
+        /// <summary>
+        /// 签证记录
+        /// </summary>
+        public List<VisaRecordsForDetails>? VisaRecords { get; set; }
+        /// <summary>
+        /// 扫描件 ,拼接
+        /// </summary>
+        public List<FileInfosForDetails>? PassportScans { get; set; }
+        #endregion
+    }
+    /// <summary>
     /// 技能证书
     /// </summary>
     public class SkillCertificatesForDetails
@@ -443,6 +520,9 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// 证书类型
         /// </summary>
         public CertificateTypeEnum SkillCertificateType { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
         public string? SkillCertificateTypeName { get; set; }
         /// <summary>
         /// 扫描件 
@@ -462,6 +542,9 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// 证书类型
         /// </summary>
         public CertificateTypeEnum SpecialEquipsCertificateType { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
         public string? SpecialEquipsCertificateTypeName { get; set; }
         /// <summary>
         /// 有效日期
@@ -489,11 +572,17 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// 国家
         /// </summary>
         public string? Country { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
         public string? CountryName { get; set; }
         /// <summary>
         /// 签证类型
         /// </summary>
         public VisaTypeEnum VisaType { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
         public string? VisaTypeName { get; set; }
         /// <summary>
         /// 到期时间
@@ -607,30 +696,34 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// 船舶名称
         /// </summary>
         public string? OnShip { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
         public string? OnShipName { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
         public ShipTypeEnum ShipType { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
         public string? ShipTypeName { get; set; }
         /// <summary>
         /// 职务
         /// </summary>
         public string? Postition { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
         public string? PostitionName { get; set; }
         /// <summary>
         /// 上船日期
         /// </summary>
-        public string? WorkShipStartTime { get; set; }
+        public DateTime? WorkShipStartTime { get; set; }
         /// <summary>
         /// 下船日期
         /// </summary>
-        public string? WorkShipEndTime { get; set; }
-        /// <summary>
-        /// 休假日期
-        /// </summary>
-        public int HolidayTime { get; set; }
-        /// <summary>
-        /// 在船时间
-        /// </summary>
-        public int OnBoardTime { get; set; }
+        public DateTime? WorkShipEndTime { get; set; }
         /// <summary>
         /// 在船天数
         /// </summary>
@@ -639,6 +732,18 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// 休假天数
         /// </summary>
         public int Holiday { get; set; }
+        /// <summary>
+        /// 所在国家
+        /// </summary>
+        public Guid? Country { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
+        public string? CountryName { get; set; }
+        /// <summary>
+        /// 所在项目
+        /// </summary>
+        public string? ProjectName { get; set; }
     }
     /// <summary>
     /// 培训记录

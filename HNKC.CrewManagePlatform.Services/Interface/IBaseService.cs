@@ -27,14 +27,15 @@ namespace HNKC.CrewManagePlatform.Services.Interface
         /// </summary>
         /// <param name="idCard"></param>
         /// <returns></returns>
-        int CalculateAgeFromIdCard(string idCard);
+        int CalculateAgeFromIdCard(string? idCard);
         /// <summary>
         /// 船员状态
         /// </summary>
         /// <param name="departureTime"></param>
         /// <param name="deleteResonEnum"></param>
+        /// <param name="holidayTime"></param>
         /// <returns></returns>
-        CrewStatusEnum ShipUserStatus(DateTime departureTime, CrewStatusEnum deleteResonEnum);
+        CrewStatusEnum ShipUserStatus(DateTime departureTime, CrewStatusEnum deleteResonEnum, DateTime? holidayTime);
         /// <summary>
         /// 新增文件
         /// </summary>

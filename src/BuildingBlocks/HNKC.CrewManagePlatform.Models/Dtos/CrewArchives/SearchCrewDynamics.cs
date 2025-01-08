@@ -34,7 +34,7 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// <summary>
         /// 所在国家
         /// </summary>
-        public string? Country { get; set; }
+        public Guid? Country { get; set; }
         /// <summary>
         /// 所在国家
         /// </summary>
@@ -62,7 +62,7 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// <summary>
         /// 最近下船时间
         /// </summary>
-        public DateTime DisembarkTime { get; set; }
+        public DateTime? DisembarkTime { get; set; }
         /// <summary>
         /// 在船天数
         /// </summary>

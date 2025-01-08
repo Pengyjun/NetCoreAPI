@@ -107,18 +107,17 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Contract
             var position = await _dbContext.Queryable<Position>().Where(t => t.IsDelete == 1).ToListAsync();
             var empTable = await _dbContext.Queryable<EmploymentType>().Where(t => rr.Select(x => x.EmploymentType).Contains(t.BusinessId.ToString())).ToListAsync();
             var ownShipTable = await _dbContext.Queryable<OwnerShip>().Where(t => rr.Select(x => x.OnBoard).Contains(t.BusinessId.ToString())).ToListAsync();
-            var countryTable = await _dbContext.Queryable<CountryRegion>().Where(t => rr.Select(x => x.Country).Contains(t.BusinessId.ToString())).ToListAsync();
+            var countryTable = await _dbContext.Queryable<CountryRegion>().Where(t => rr.Select(x => x.Country).Contains(t.BusinessId)).ToListAsync();
             //第一适任 第二适任
             var uIds = rr.Select(x => x.BId).ToList();
             var cerOfComps = await _dbContext.Queryable<CertificateOfCompetency>().Where(x => uIds.Contains(x.CertificateId.ToString()) && (x.Type == CertificatesEnum.FCertificate || x.Type == CertificatesEnum.SCertificate)).ToListAsync();
-
             foreach (var u in rr)
             {
-                u.OnStatus = EnumUtil.GetDescription(_baseService.ShipUserStatus(u.WorkShipStartTime, u.DeleteResonEnum));
+                u.OnStatus = EnumUtil.GetDescription(_baseService.ShipUserStatus(u.WorkShipStartTime, u.DeleteResonEnum, u.WorkShipStartTime));
                 u.ContractTypeName = EnumUtil.GetDescription(u.ContractType);
                 u.EmploymentTypeName = empTable.FirstOrDefault(x => x.BusinessId.ToString() == u.EmploymentType)?.Name;
                 u.OnBoardName = ownShipTable.FirstOrDefault(x => x.BusinessId.ToString() == u.OnBoard)?.ShipName;
-                u.CountryName = countryTable.FirstOrDefault(x => x.BusinessId.ToString() == u.Country)?.Name;
+                u.CountryName = countryTable.FirstOrDefault(x => x.BusinessId == u.Country)?.Name;
                 u.ShipTypeName = EnumUtil.GetDescription(u.ShipType);
                 u.Age = _baseService.CalculateAgeFromIdCard(u.CardId);
                 //u.DueDays = TimeHelper.GetTimeSpan(Convert.ToDateTime(u.EndTime), DateTime.Now).Days + 1;
@@ -254,17 +253,17 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Contract
             var position = await _dbContext.Queryable<Position>().Where(t => t.IsDelete == 1).ToListAsync();
             var empTable = await _dbContext.Queryable<EmploymentType>().Where(t => rr.Select(x => x.EmploymentType).Contains(t.BusinessId.ToString())).ToListAsync();
             var ownShipTable = await _dbContext.Queryable<OwnerShip>().Where(t => rr.Select(x => x.OnBoard).Contains(t.BusinessId.ToString())).ToListAsync();
-            var countryTable = await _dbContext.Queryable<CountryRegion>().Where(t => rr.Select(x => x.Country).Contains(t.BusinessId.ToString())).ToListAsync();
+            var countryTable = await _dbContext.Queryable<CountryRegion>().Where(t => rr.Select(x => x.Country).Contains(t.BusinessId)).ToListAsync();
             //第一适任 第二适任
             var uIds = rr.Select(x => x.BId).ToList();
             var cerOfComps = await _dbContext.Queryable<CertificateOfCompetency>().Where(x => uIds.Contains(x.CertificateId.ToString()) && (x.Type == CertificatesEnum.FCertificate || x.Type == CertificatesEnum.SCertificate)).ToListAsync();
             foreach (var u in rr)
             {
-                u.OnStatus = EnumUtil.GetDescription(_baseService.ShipUserStatus(u.WorkShipStartTime, u.DeleteResonEnum));
+                u.OnStatus = EnumUtil.GetDescription(_baseService.ShipUserStatus(u.WorkShipStartTime, u.DeleteResonEnum, u.WorkShipStartTime));
                 u.ContractTypeName = EnumUtil.GetDescription(u.ContractType);
                 u.EmploymentTypeName = empTable.FirstOrDefault(x => x.BusinessId.ToString() == u.EmploymentType)?.Name;
                 u.OnBoardName = ownShipTable.FirstOrDefault(x => x.BusinessId.ToString() == u.OnBoard)?.ShipName;
-                u.CountryName = countryTable.FirstOrDefault(x => x.BusinessId.ToString() == u.Country)?.Name;
+                u.CountryName = countryTable.FirstOrDefault(x => x.BusinessId == u.Country)?.Name;
                 u.ShipTypeName = EnumUtil.GetDescription(u.ShipType);
                 u.Age = _baseService.CalculateAgeFromIdCard(u.CardId);
                 u.DueDays = TimeHelper.GetTimeSpan(Convert.ToDateTime(u.EndTime), DateTime.Now).Days + 1;
@@ -572,7 +571,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Contract
 
             var position = await _dbContext.Queryable<Position>().Where(t => t.IsDelete == 1).ToListAsync();
             var ownShipTable = await _dbContext.Queryable<OwnerShip>().Where(t => rr.Select(x => x.OnBoard).Contains(t.BusinessId.ToString())).ToListAsync();
-            var countryTable = await _dbContext.Queryable<CountryRegion>().Where(t => rr.Select(x => x.Country).Contains(t.BusinessId.ToString())).ToListAsync();
+            var countryTable = await _dbContext.Queryable<CountryRegion>().Where(t => rr.Select(x => x.Country).Contains(t.BusinessId)).ToListAsync();
             //第一适任 第二适任
             var uIds = rr.Select(x => x.BId).ToList();
             var cerOfComps = await _dbContext.Queryable<CertificateOfCompetency>().Where(x => uIds.Contains(x.CertificateId.ToString()) && (x.Type == CertificatesEnum.FCertificate || x.Type == CertificatesEnum.SCertificate)).ToListAsync();
@@ -581,7 +580,6 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Contract
             var files = await _dbContext.Queryable<Files>().Where(t => fileIds.Contains(t.FileId)).ToListAsync();
             //获取文件
             var url = AppsettingsHelper.GetValue("UpdateItem:Url");
-
             foreach (var u in rr)
             {
                 u.TrainingScans = files.Where(x => u.Scans == x.FileId)
@@ -597,10 +595,10 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Contract
                         Url = url + x.Name
                     }).ToList();
                 u.CheckTypeName = EnumUtil.GetDescription(u.CheckType);
-                u.OnStatus = EnumUtil.GetDescription(_baseService.ShipUserStatus(u.WorkShipStartTime, u.DeleteResonEnum));
+                u.OnStatus = EnumUtil.GetDescription(_baseService.ShipUserStatus(u.WorkShipStartTime, u.DeleteResonEnum, u.WorkShipStartTime));
                 //u.ContractTypeName = EnumUtil.GetDescription(u.ContractType);
                 u.OnBoardName = ownShipTable.FirstOrDefault(x => x.BusinessId.ToString() == u.OnBoard)?.ShipName;
-                u.CountryName = countryTable.FirstOrDefault(x => x.BusinessId.ToString() == u.Country)?.Name;
+                u.CountryName = countryTable.FirstOrDefault(x => x.BusinessId == u.Country)?.Name;
                 u.ShipTypeName = EnumUtil.GetDescription(u.ShipType);
                 u.Age = _baseService.CalculateAgeFromIdCard(u.CardId);
                 if (cerOfComps != null)
