@@ -38,7 +38,6 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
             RefAsync<int> total = 0;
             var roleType = await _baseService.CurRoleType();
             if (roleType == -1) { return new PageResult<SearchCrewArchivesResponse>(); }
-            var onShips = await _dbContext.Queryable<WorkShip>().Where(t => t.IsDelete == 1 && GlobalCurrentUser.UserBusinessId == t.WorkShipId).Select(x => x.OnShip).ToListAsync();
 
             #region 船员关联
             //任职船舶 
@@ -53,13 +52,11 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                 .Select(x => new { x.UserEntryId, EndTime = SqlFunc.AggregateMax(x.EndTime) });
             var uentity = _dbContext.Queryable<UserEntryInfo>()
                 .InnerJoin(uentityFist, (x, y) => x.UserEntryId == y.UserEntryId && x.EndTime == y.EndTime);
-
             #endregion
             //名称相关不赋值
             var rt = await _dbContext.Queryable<User>()
                 .Where(t => t.IsLoginUser == 1)
                 .OrderByDescending(t => t.Created)
-
                 .WhereIF(!string.IsNullOrWhiteSpace(requestBody.KeyWords), t => t.Name.Contains(requestBody.KeyWords) || t.CardId.Contains(requestBody.KeyWords)
                 || t.Phone.Contains(requestBody.KeyWords) || t.WorkNumber.Contains(requestBody.KeyWords))
                 .WhereIF(!string.IsNullOrWhiteSpace(requestBody.Name), t => t.Name.Contains(requestBody.Name))
@@ -72,8 +69,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                 .LeftJoin<PositionOnBoard>((t, ws, pob) => ws.Postition == pob.BusinessId.ToString())
                 .LeftJoin<OwnerShip>((t, ws, pob, ow) => ws.OnShip == ow.BusinessId.ToString())
                 .LeftJoin(uentity, (t, ws, pob, ow, ue) => t.BusinessId == ue.UserEntryId)
-                .WhereIF(roleType == 3, (t, ws, pob, ow, ue) => ws.OnShip == ow.BusinessId.ToString() && onShips.Contains(ws.OnShip))//船长
-                //.WhereIF(roleType == 4, (t, ws, pob, ow, ue) => GlobalCurrentUser.UserBusinessId == ws.WorkShipId)//船员
+                .WhereIF(roleType == 3, (t, ws, pob, ow, ue) => ws.OnShip == ow.BusinessId.ToString() && GlobalCurrentUser.UserBusinessId.ToString() == ws.OnShip)//船长
                 .LeftJoin<SkillCertificates>((t, ws, pob, ow, ue, sc) => sc.SkillcertificateId == t.BusinessId)
                 .LeftJoin<EducationalBackground>((t, ws, pob, ow, ue, sc, eb) => eb.QualificationId == t.BusinessId)
                 .WhereIF(requestBody.ServiceBooks != null && requestBody.ServiceBooks.Any(),
@@ -172,7 +168,6 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                 //特设证书
                 var spctab = await _dbContext.Queryable<SpecialEquips>().Where(t => t.IsDelete == 1 && uIds.Contains(t.SpecialEquipId)).ToListAsync();
 
-
                 //名称赋值
                 foreach (var t in rt)
                 {
@@ -200,7 +195,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                     {
                         spctabNames = spctabNames.Substring(0, spctabNames.Length - 1);
                     }
-                    var ob = onBoardtab.Where(x => x.WorkShipId == t.BId).FirstOrDefault();
+                    var ob = onBoardtab.Where(x => x.WorkShipId == t.BId).OrderByDescending(x => x.WorkShipStartTime).FirstOrDefault();
                     if (ob != null)
                     {
                         //所在船舶
@@ -2744,8 +2739,85 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
         {
             return await _dbContext.Queryable<User>().FirstAsync(t => t.BusinessId.ToString() == bId);
         }
-
         #endregion
 
+        #region 船员动态
+        /// <summary>
+        /// 船员动态列表
+        /// </summary>
+        /// <param name="requestBody"></param>
+        /// <returns></returns>
+        public async Task<PageResult<SearchCrewDynamics>> SearchCrewDynamicsAsync(CrewDynamicsRequest requestBody)
+        {
+            RefAsync<int> total = 0;
+            var roleType = await _baseService.CurRoleType();
+            if (roleType == -1) { return new PageResult<SearchCrewDynamics>(); }
+            #region 船员关联
+            var crewWorkShip = _dbContext.Queryable<WorkShip>()
+                .GroupBy(u => u.WorkShipId)
+                .Select(t => new { t.WorkShipId, WorkShipEndTime = SqlFunc.AggregateMax(t.WorkShipEndTime) });
+            var wShip = _dbContext.Queryable<WorkShip>()
+                .InnerJoin(crewWorkShip, (x, y) => x.WorkShipId == y.WorkShipId && x.WorkShipEndTime == y.WorkShipEndTime);
+            #endregion
+
+            var rr = await _dbContext.Queryable<User>()
+                .Where(t1 => t1.IsLoginUser == 1 && t1.IsDelete == 1)
+                .WhereIF(!string.IsNullOrEmpty(requestBody.KeyWords), t1 => t1.Name.Contains(requestBody.KeyWords) || t1.Phone.Contains(requestBody.KeyWords) || t1.WorkNumber.Contains(requestBody.KeyWords) || t1.CardId.Contains(requestBody.KeyWords))
+                .InnerJoin(wShip, (t1, t5) => t1.BusinessId == t5.WorkShipId)
+                .InnerJoin<OwnerShip>((t1, t5, t3) => t5.OnShip == t3.BusinessId.ToString())
+                .WhereIF(roleType == 3, (t1, t5, t3) => GlobalCurrentUser.UserBusinessId.ToString() == t5.OnShip)
+                .WhereIF(!string.IsNullOrWhiteSpace(requestBody.StartTime.ToString()), (t1, t5, t3) => t5.WorkShipStartTime >= requestBody.StartTime && t5.WorkShipStartTime <= requestBody.EndTime)
+                .WhereIF(requestBody.BoardingDays != 0, (t1, t5, t3) => SqlFunc.DateDiff(DateType.Day, Convert.ToDateTime(t5.WorkShipStartTime), DateTime.Now) + 1 >= requestBody.BoardingDays)//在船天数  
+                .Select((t1, t5, t3) => new SearchCrewDynamics
+                {
+                    BId = t1.BusinessId.ToString(),
+                    Country = t3.Country,
+                    OnBoard = t5.OnShip,
+                    ShipType = t3.ShipType,
+                    UserName = t1.Name,
+                    WorkNumber = t1.WorkNumber,
+                    DeleteResonEnum = t1.DeleteReson,
+                    BoardingTime = t5.WorkShipStartTime,
+                    DisembarkTime = t5.WorkShipEndTime,
+                    CardId = t1.CardId,
+                    HolidayDays = 0,
+                    OnBoardDays = SqlFunc.DateDiff(DateType.Day, Convert.ToDateTime(t5.WorkShipStartTime), DateTime.Now)
+                })
+                .ToPageListAsync(requestBody.PageIndex, requestBody.PageSize, total);
+            return await GetCrewDynamicsAsync(rr, total);
+
+        }
+        /// <summary>
+        /// 获取结果集
+        /// </summary>
+        /// <param name="rr"></param>
+        /// <param name="total"></param>
+        /// <returns></returns>
+        public async Task<PageResult<SearchCrewDynamics>> GetCrewDynamicsAsync(List<SearchCrewDynamics> rr, int total)
+        {
+            PageResult<SearchCrewDynamics> rt = new();
+
+            var ownShipTable = await _dbContext.Queryable<OwnerShip>().Where(t => rr.Select(x => x.OnBoard).Contains(t.BusinessId.ToString())).ToListAsync();
+            var countryTable = await _dbContext.Queryable<CountryRegion>().Where(t => rr.Select(x => x.Country).Contains(t.BusinessId.ToString())).ToListAsync();
+            //上下船次数
+
+            foreach (var u in rr)
+            {
+                u.OnStatus = EnumUtil.GetDescription(_baseService.ShipUserStatus(u.BoardingTime, u.DeleteResonEnum));
+                u.OnBoardName = ownShipTable.FirstOrDefault(x => x.BusinessId.ToString() == u.OnBoard)?.ShipName;
+                u.CountryName = countryTable.FirstOrDefault(x => x.BusinessId.ToString() == u.Country)?.Name;
+                u.ShipTypeName = EnumUtil.GetDescription(u.ShipType);
+                u.Age = _baseService.CalculateAgeFromIdCard(u.CardId);
+                //u.BoardingNums = workShips.Where(x => x.WorkShipId.ToString() == u.BId).Count();
+                //u.DisembarkNums = u.BoardingNums == 0 ? 0 : u.BoardingNums - 1;
+            }
+
+            rt.List = rr.OrderByDescending(t => t.UserName).ToList();
+            rt.TotalCount = total;
+            return rt;
+        }
+
+
+        #endregion
     }
 }

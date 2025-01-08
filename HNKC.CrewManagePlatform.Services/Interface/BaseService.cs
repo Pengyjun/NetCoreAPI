@@ -166,11 +166,11 @@ namespace HNKC.CrewManagePlatform.Services.Interface
         /// </summary>
         /// <param name="idCard"></param>
         /// <returns></returns>
-        public int CalculateAgeFromIdCard(string idCard)
+        public int CalculateAgeFromIdCard(string? idCard)
         {
-            if (idCard.Length != 18)
+            if (idCard?.Length != 18)
             {
-                throw new ArgumentException("身份证号码应为18位");
+                return 0;
             }
 
             // 提取出生日期（身份证的前 6 位是出生年月日，格式为yyyyMMdd）
@@ -282,16 +282,10 @@ namespace HNKC.CrewManagePlatform.Services.Interface
             //是管理员不做任何处理
             if (!GlobalCurrentUser.IsAdmin)
             {
-                //获取当前登录角色
-                //var role = await _dbContext.Queryable<SqlSugars.Models.Role>().FirstAsync(t => t.IsDelete == 1 && t.BusinessId == GlobalCurrentUser.RoleBusinessId);
-                //if (role != null)
-                //{
-                if (GlobalCurrentUser.Type != 3 && GlobalCurrentUser.Type != 4) return -1;//3船长 4领导班子 否则-1
+                if (GlobalCurrentUser.Type != 3 && GlobalCurrentUser.Type != 1 && GlobalCurrentUser.Type != 4) return -1;//4船员部 3船长 1管理员  否则-1
                 else return GlobalCurrentUser.Type.Value;
-                //}
-                //else { return -1; }
             }
-            else return 1;
+            else return 0;
         }
         #endregion
     }

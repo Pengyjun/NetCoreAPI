@@ -103,5 +103,11 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
         /// <param name="bId"></param>
         /// <returns></returns>
         Task<Result> GetBasesicDetailsAsync(string bId);
+        /// <summary>
+        /// 船员动态
+        /// </summary>
+        /// <param name="requestBody"></param>
+        /// <returns></returns>
+        Task<PageResult<SearchCrewDynamics>> SearchCrewDynamicsAsync(CrewDynamicsRequest requestBody);
     }
 }

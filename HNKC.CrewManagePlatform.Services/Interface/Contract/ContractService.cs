@@ -42,7 +42,6 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Contract
             RefAsync<int> total = 0;
             var roleType = await _baseService.CurRoleType();
             if (roleType == -1) { return new PageResult<ContractSearch>(); }
-            var onShips = await _dbContext.Queryable<WorkShip>().Where(t => t.IsDelete == 1 && GlobalCurrentUser.UserBusinessId == t.WorkShipId).Select(x => x.OnShip).ToListAsync();
             #region 船员关联
             var uentityFist = _dbContext.Queryable<UserEntryInfo>()
                 .GroupBy(u => u.UserEntryId)
@@ -65,11 +64,9 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Contract
                 .WhereIF(!string.IsNullOrEmpty(requestBody.KeyWords), t1 => t1.Name.Contains(requestBody.KeyWords) || t1.Phone.Contains(requestBody.KeyWords) || t1.WorkNumber.Contains(requestBody.KeyWords) || t1.CardId.Contains(requestBody.KeyWords))
                 .LeftJoin(uentity, (t1, t2) => t1.BusinessId == t2.UserEntryId)
                 .Where((t1, t2) => SqlFunc.DateDiff(DateType.Day, DateTime.Now, Convert.ToDateTime(t2.EndTime)) + 1 <= days)
-                //.InnerJoin<CertificateOfCompetency>((t1, t2, t3, t4) => t1.BusinessId == t4.CertificateId)
                 .InnerJoin(wShip, (t1, t2, t5) => t1.BusinessId == t5.WorkShipId)
                 .InnerJoin<OwnerShip>((t1, t2, t5, t3) => t5.OnShip == t3.BusinessId.ToString())
-                .WhereIF(roleType == 3, (t1, t2, t5, t3) => t5.OnShip == t3.BusinessId.ToString() && onShips.Contains(t5.OnShip))//船长
-                //.WhereIF(roleType == 2, (t1, t2, t5, t3) => GlobalCurrentUser.UserBusinessId == t5.WorkShipId)//船员
+                .WhereIF(roleType == 3, (t1, t2, t5, t3) => t5.OnShip == t3.BusinessId.ToString() && GlobalCurrentUser.UserBusinessId.ToString() == t5.OnShip)//船长
                 .WhereIF(!string.IsNullOrEmpty(requestBody.EmploymentType), (t1, t2, t5, t3) => requestBody.EmploymentType == t2.EmploymentId)
                 .Select((t1, t2, t5, t3) => new ContractSearch
                 {
@@ -204,7 +201,6 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Contract
             RefAsync<int> total = 0;
             var roleType = await _baseService.CurRoleType();
             if (roleType == -1) { return new PageResult<PromotionSearch>(); }
-            var onShips = await _dbContext.Queryable<WorkShip>().Where(t => t.IsDelete == 1 && GlobalCurrentUser.UserBusinessId == t.WorkShipId).Select(x => x.OnShip).ToListAsync();
             #region 船员关联
             var uentityFist = _dbContext.Queryable<UserEntryInfo>()
                 .GroupBy(u => u.UserEntryId)
@@ -222,11 +218,9 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Contract
                 .Where(t1 => t1.IsLoginUser == 1 && t1.IsDelete == 1)
                 .WhereIF(!string.IsNullOrEmpty(requestBody.KeyWords), t1 => t1.Name.Contains(requestBody.KeyWords) || t1.Phone.Contains(requestBody.KeyWords) || t1.WorkNumber.Contains(requestBody.KeyWords) || t1.CardId.Contains(requestBody.KeyWords))
                 .LeftJoin(uentity, (t1, t2) => t1.BusinessId == t2.UserEntryId)
-                //.InnerJoin<CertificateOfCompetency>((t1, t2, t3, t4) => t1.BusinessId == t4.CertificateId)
                 .InnerJoin(wShip, (t1, t2, t5) => t1.BusinessId == t5.WorkShipId)
                 .InnerJoin<OwnerShip>((t1, t2, t5, t3) => t5.OnShip == t3.BusinessId.ToString())
-                .WhereIF(roleType == 3, (t1, t2, t5, t3) => t5.OnShip == t3.BusinessId.ToString() && onShips.Contains(t5.OnShip))//船长
-                //.WhereIF(roleType == 2, (t1, t2, t5, t3) => GlobalCurrentUser.UserBusinessId == t5.WorkShipId)//船员
+                .WhereIF(roleType == 3, (t1, t2, t5, t3) => t5.OnShip == t3.BusinessId.ToString() && GlobalCurrentUser.UserBusinessId.ToString() == t5.OnShip)//船长
                 .WhereIF(!string.IsNullOrEmpty(requestBody.Position), (t1, t2, t5, t3) => requestBody.Position == t5.Postition)
                 .Select((t1, t2, t5, t3) => new PromotionSearch
                 {
@@ -367,7 +361,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Contract
                           .WhereIF(!string.IsNullOrWhiteSpace(requestBody.StartTime.ToString()) && !string.IsNullOrWhiteSpace(requestBody.EndTime.ToString()), (x, y) => y.Created >= Convert.ToDateTime(requestBody.StartTime) && y.Created < Convert.ToDateTime(requestBody.EndTime.Value.AddDays(1)))
                           .LeftJoin<TrainingType>((x, y, z) => y.TrainingType == z.BusinessId.ToString())
                           .WhereIF(!string.IsNullOrWhiteSpace(requestBody.TraningType), (x, y, z) => requestBody.TraningType == y.TrainingType)
-                          .WhereIF(roleType == 3, (x, y, z) => y.FillRepUserId == GlobalCurrentUser.UserBusinessId)//船长
+                          .WhereIF(roleType == 3, (x, y, z) => y.FillRepUserId == GlobalCurrentUser.UserBusinessId)
                           .Select((x, y, z) => new TrainingRecordSearch
                           {
                               Id = y.BusinessId.ToString(),
@@ -520,7 +514,6 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Contract
             RefAsync<int> total = 0;
             var roleType = await _baseService.CurRoleType();
             if (roleType == -1) { return new PageResult<YearCheckSearch>(); }
-            var onShips = await _dbContext.Queryable<WorkShip>().Where(t => t.IsDelete == 1 && GlobalCurrentUser.UserBusinessId == t.WorkShipId).Select(x => x.OnShip).ToListAsync();
             #region 船员关联
             //var uentityFist = _dbContext.Queryable<UserEntryInfo>()
             //    .GroupBy(u => u.UserEntryId)
@@ -537,12 +530,9 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Contract
             var rr = await _dbContext.Queryable<User>()
                 .Where(t1 => t1.IsLoginUser == 1 && t1.IsDelete == 1)
                 .WhereIF(!string.IsNullOrEmpty(requestBody.KeyWords), t1 => t1.Name.Contains(requestBody.KeyWords) || t1.Phone.Contains(requestBody.KeyWords) || t1.WorkNumber.Contains(requestBody.KeyWords) || t1.CardId.Contains(requestBody.KeyWords))
-                //.LeftJoin(uentity, (t1, t2) => t1.BusinessId == t2.UserEntryId)
-                //.InnerJoin<CertificateOfCompetency>((t1, t2, t3, t4) => t1.BusinessId == t4.CertificateId)
                 .InnerJoin(wShip, (t1, t5) => t1.BusinessId == t5.WorkShipId)
                 .InnerJoin<OwnerShip>((t1, t5, t3) => t5.OnShip == t3.BusinessId.ToString())
-                .WhereIF(roleType == 3, (t1, t5, t3) => t5.OnShip == t3.BusinessId.ToString() && onShips.Contains(t5.OnShip))//船长
-                //.WhereIF(roleType == 2, (t1, t5, t3) => GlobalCurrentUser.UserBusinessId == t5.WorkShipId)//船员
+                .WhereIF(roleType == 3, (t1, t5, t3) => t5.OnShip == t3.BusinessId.ToString() && GlobalCurrentUser.UserBusinessId.ToString() == t5.OnShip)
                 .LeftJoin<YearCheck>((t1, t5, t3, t6) => t1.BusinessId == t6.TrainingId)
                 .WhereIF(requestBody.CheckStatus == 1, (t1, t5, t3, t6) => t6.CheckType != CheckEnum.Normal)
                 .WhereIF(requestBody.CheckStatus == 2, (t1, t5, t3, t6) => t6.CheckType == CheckEnum.Normal)
