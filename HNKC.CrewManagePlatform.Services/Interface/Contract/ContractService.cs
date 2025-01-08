@@ -69,7 +69,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Contract
                 .InnerJoin(wShip, (t1, t2, t5) => t1.BusinessId == t5.WorkShipId)
                 .InnerJoin<OwnerShip>((t1, t2, t5, t3) => t5.OnShip == t3.BusinessId.ToString())
                 .WhereIF(roleType == 3, (t1, t2, t5, t3) => t5.OnShip == t3.BusinessId.ToString() && onShips.Contains(t5.OnShip))//船长
-                .WhereIF(roleType == 2, (t1, t2, t5, t3) => GlobalCurrentUser.UserBusinessId == t5.WorkShipId)//船员
+                //.WhereIF(roleType == 2, (t1, t2, t5, t3) => GlobalCurrentUser.UserBusinessId == t5.WorkShipId)//船员
                 .WhereIF(!string.IsNullOrEmpty(requestBody.EmploymentType), (t1, t2, t5, t3) => requestBody.EmploymentType == t2.EmploymentId)
                 .Select((t1, t2, t5, t3) => new ContractSearch
                 {
@@ -226,7 +226,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Contract
                 .InnerJoin(wShip, (t1, t2, t5) => t1.BusinessId == t5.WorkShipId)
                 .InnerJoin<OwnerShip>((t1, t2, t5, t3) => t5.OnShip == t3.BusinessId.ToString())
                 .WhereIF(roleType == 3, (t1, t2, t5, t3) => t5.OnShip == t3.BusinessId.ToString() && onShips.Contains(t5.OnShip))//船长
-                .WhereIF(roleType == 2, (t1, t2, t5, t3) => GlobalCurrentUser.UserBusinessId == t5.WorkShipId)//船员
+                //.WhereIF(roleType == 2, (t1, t2, t5, t3) => GlobalCurrentUser.UserBusinessId == t5.WorkShipId)//船员
                 .WhereIF(!string.IsNullOrEmpty(requestBody.Position), (t1, t2, t5, t3) => requestBody.Position == t5.Postition)
                 .Select((t1, t2, t5, t3) => new PromotionSearch
                 {
@@ -542,7 +542,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Contract
                 .InnerJoin(wShip, (t1, t5) => t1.BusinessId == t5.WorkShipId)
                 .InnerJoin<OwnerShip>((t1, t5, t3) => t5.OnShip == t3.BusinessId.ToString())
                 .WhereIF(roleType == 3, (t1, t5, t3) => t5.OnShip == t3.BusinessId.ToString() && onShips.Contains(t5.OnShip))//船长
-                .WhereIF(roleType == 2, (t1, t5, t3) => GlobalCurrentUser.UserBusinessId == t5.WorkShipId)//船员
+                //.WhereIF(roleType == 2, (t1, t5, t3) => GlobalCurrentUser.UserBusinessId == t5.WorkShipId)//船员
                 .LeftJoin<YearCheck>((t1, t5, t3, t6) => t1.BusinessId == t6.TrainingId)
                 .WhereIF(requestBody.CheckStatus == 1, (t1, t5, t3, t6) => t6.CheckType != CheckEnum.Normal)
                 .WhereIF(requestBody.CheckStatus == 2, (t1, t5, t3, t6) => t6.CheckType == CheckEnum.Normal)

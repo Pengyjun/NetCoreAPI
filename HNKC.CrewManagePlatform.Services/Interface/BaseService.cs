@@ -286,7 +286,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface
                 //var role = await _dbContext.Queryable<SqlSugars.Models.Role>().FirstAsync(t => t.IsDelete == 1 && t.BusinessId == GlobalCurrentUser.RoleBusinessId);
                 //if (role != null)
                 //{
-                if (GlobalCurrentUser.Type != 2 && GlobalCurrentUser.Type != 3) return -1;//3船长 2船员 否则-1
+                if (GlobalCurrentUser.Type != 3 && GlobalCurrentUser.Type != 4) return -1;//3船长 4领导班子 否则-1
                 else return GlobalCurrentUser.Type.Value;
                 //}
                 //else { return -1; }
