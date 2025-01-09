@@ -1327,9 +1327,9 @@ namespace GHMonitoringCenterApi.Application.Service
             {
                 //各个公司总产值
                 List<CompanyItem> companys = new List<CompanyItem>();
-                var dayReportList = await _dbContext.Queryable<DayReport>()
-                    .Where(x => x.IsDelete == 1 &&(x.CreateTime>=SqlFunc.ToDate(baseExternalRequest.StartTime)&&x.CreateTime<= SqlFunc.ToDate(baseExternalRequest.EndTime)|| x.UpdateTime >= SqlFunc.ToDate(baseExternalRequest.StartTime) && x.UpdateTime <= SqlFunc.ToDate (baseExternalRequest.EndTime)))
-                .ToListAsync();
+                var allDayReport = await _dbContext.Queryable<DayReport>().Where(x => x.IsDelete == 1&&x.DateDay>=20241226).ToListAsync();
+                 var dayReportList= allDayReport.Where(x => x.IsDelete == 1 &&(x.CreateTime>=SqlFunc.ToDate(baseExternalRequest.StartTime)&&x.CreateTime<= SqlFunc.ToDate(baseExternalRequest.EndTime)|| x.UpdateTime >= SqlFunc.ToDate(baseExternalRequest.StartTime) && x.UpdateTime <= SqlFunc.ToDate (baseExternalRequest.EndTime)))
+                .ToList();
                 var diffTime = TimeHelper.GetTimeSpan(baseExternalRequest.StartTime.ObjToDate(), baseExternalRequest.EndTime.ObjToDate()).Days;
                 for (int i = 0; i <=diffTime; i++)
                 {
@@ -1338,14 +1338,16 @@ namespace GHMonitoringCenterApi.Application.Service
                        var dateDay=int.Parse( baseExternalRequest.StartTime.ObjToDate().AddDays(i-1).ToString("yyyyMMdd"));
                         var companyProjectIds = projectList.Where(x => x.CompanyId == item.ItemId).Select(x => x.Id).ToList();
                         var dayProductionValue = dayReportList.Where(x => x.DateDay == dateDay && companyProjectIds.Contains(x.ProjectId)).Sum(x => x.DayActualProductionAmount);
-                            companys.Add(new CompanyItem()
+
+                        var yearProductionValue = dayReportList.Where(x => x.DateDay <= dateDay && companyProjectIds.Contains(x.ProjectId)).Sum(x => x.DayActualProductionAmount);
+
+                        companys.Add(new CompanyItem()
                         { 
                             DateDay = baseExternalRequest.StartTime.ObjToDate().AddDays(i).ToString(),
                             CompanyDayProductionValue = dayProductionValue,
-                            //YearCompanyProductionValue = item.YearCompanyProductionValue,
+                            YearCompanyProductionValue = yearProductionValue,
                             CompanyId = item.ItemId,
-                            // DayProductionValue = dayProductionValue,
-                            //YearProductionValue = item.TotalYearProductionValue
+                            
                         }) ;
                     }
                 }
