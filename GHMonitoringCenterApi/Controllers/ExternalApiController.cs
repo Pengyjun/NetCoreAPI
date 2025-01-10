@@ -4,7 +4,9 @@ using GHMonitoringCenterApi.Application.Contracts.Dto.External;
 using GHMonitoringCenterApi.Application.Contracts.Dto.Project;
 using GHMonitoringCenterApi.Application.Contracts.Dto.Project.ShipMovements;
 using GHMonitoringCenterApi.Application.Contracts.Dto.ProjectProductionReport;
+using GHMonitoringCenterApi.Application.Contracts.Dto.Word;
 using GHMonitoringCenterApi.Application.Contracts.IService;
+using GHMonitoringCenterApi.Application.Service.JjtSendMessage;
 using GHMonitoringCenterApi.Domain.Models;
 using GHMonitoringCenterApi.Domain.Shared;
 using HNKC.OperationLogsAPI.Dto.ResponseDto;
@@ -370,5 +372,17 @@ namespace GHMonitoringCenterApi.Controllers
         public async Task<ResponseAjaxResult<List<DayReportConstruction>>> GetDayReportConstructionAsync([FromQuery] ExternalRequestDto requestDto)
           => await _externalApiService.GetDayReportConstructionAsync(requestDto);
         #endregion
+
+
+        /// <summary>
+        /// 生产运营监控系统使用接口  获取数据同步问题  
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("SearchCompanyProductionValue")]
+        [AllowAnonymous]
+        public async Task<CompanyDayProductionValueResponseDto> SearchCompanyProductionValueAsync([FromQuery]BaseExternalRequestDto baseExternalRequestDto)
+        {
+            return await _externalApiService.SearchCompanyProductionValueAsync(baseExternalRequestDto);
+        }
     }
 }

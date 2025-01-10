@@ -122,7 +122,7 @@ namespace GHMonitoringCenterApi.Application.Contracts.IService.JjtSendMessage
         /// </summary>
         /// <returns></returns>
 
-        Task<CompanyDayProductionValueResponseDto> SearchCompanyProductionValueAsync();
+        //Task<CompanyDayProductionValueResponseDto> SearchCompanyProductionValueAsync();
 
     }
 }

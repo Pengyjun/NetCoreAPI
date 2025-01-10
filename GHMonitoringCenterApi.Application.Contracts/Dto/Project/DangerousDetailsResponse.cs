@@ -6,5 +6,6 @@
         public string? Name { get; set; }
         public string? ProjectCode { get; set; }
         public string? FangAnKind { get; set; }
+        public string? ApprovalState { get; set; }
     }
 }

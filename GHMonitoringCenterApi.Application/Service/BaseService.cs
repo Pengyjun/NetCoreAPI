@@ -584,8 +584,9 @@ namespace GHMonitoringCenterApi.Application.Service
         {
             ResponseAjaxResult<List<BasePullDownResponseDto>> responseAjaxResult = new ResponseAjaxResult<List<BasePullDownResponseDto>>();
             var ProjectTypeList = await baseProjectTypeRepository.AsQueryable()
+             .Where(x=>x.BusinessRemark!=null)
             .WhereIF(!string.IsNullOrWhiteSpace(projectTypRequsetDto.Name), x => SqlFunc.Contains(x.Name, projectTypRequsetDto.Name))
-                .Select(x => new BasePullDownResponseDto { Id = x.PomId, Name = x.Name }).ToListAsync();
+                .Select(x => new BasePullDownResponseDto { Id = x.PomId, Name = x.Name+x.BusinessRemark }).ToListAsync();
             responseAjaxResult.Data = ProjectTypeList;
             responseAjaxResult.Count = ProjectTypeList.Count;
             responseAjaxResult.Success();

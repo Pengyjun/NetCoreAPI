@@ -6250,6 +6250,13 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             }
             #endregion
 
+            //对外接口
+            if (import == 1)
+            {
+                _currentUser.CurrentLoginInstitutionGrule = "-104396-104400-101114066-101114070-101162350-";
+                _currentUser.CurrentLoginInstitutionOid = "101162350";
+            }
+
             #region 时间信息
 
             //开始日期结束日期都是空  默认按当天日期匹配
@@ -9543,7 +9550,8 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                         Id = ddr.Id.ToString(),
                         Name = ddr.FangAnName,
                         ProjectCode = ddr.ProjectCode,
-                        FangAnKind = ddr.FangAnKind
+                        FangAnKind = ddr.FangAnKind,
+                        ApprovalState = ddr.ApprovalState
                     });
                 }
             }

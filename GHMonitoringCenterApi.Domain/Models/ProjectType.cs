@@ -28,6 +28,12 @@ namespace GHMonitoringCenterApi.Domain.Models
         /// </summary>
         [SugarColumn(Length = 255)]
         public string? Name { get; set; }
+
+        /// <summary>
+        /// 业务说明
+        /// </summary>
+        [SugarColumn(Length = 255)]
+        public string? BusinessRemark { get; set; }
         /// <summary>
         /// 
         /// </summary>
