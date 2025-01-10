@@ -5843,40 +5843,6 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
 
         // JjtTextCardMsgDetailsAsync
 
-        public async Task<CompanyDayProductionValueResponseDto> SearchCompanyProductionValueAsync()
-        {
-            CompanyDayProductionValueResponseDto companyDayProductionValueResponseDto = new CompanyDayProductionValueResponseDto()
-            {
-                CompanyItems = new List<CompanyItem>()
-            };
-            var result = await JjtTextCardMsgDetailsAsync(flag:false) ;
-            if (result != null)
-            {
-                var year = result.Data.Year;
-                var day =DateTime.Now.AddDays(-1).ToString("yyyy-MM-dd");
-                var totalProducitonValue = result.Data.projectBasePoduction.TotalYearProductionValue;
-                companyDayProductionValueResponseDto.DateDay = day;
-                companyDayProductionValueResponseDto.TotalYearProductionValue = totalProducitonValue;
-                //各个公司总产值
-                 List<CompanyItem> companys= new List<CompanyItem>();
-
-
-                foreach (var item in result.Data.projectBasePoduction.CompanyBasePoductionValues)
-                {
-                    companys.Add(new CompanyItem()
-                    {
-                        CompanyDayProductionValue = item.CompanyDayProductionValue,
-                        YearCompanyProductionValue = item.YearCompanyProductionValue,
-                        CompanyId = item.CompanyId,
-                        DayProductionValue = item.DayProductionValue,
-                        YearProductionValue = item.TotalYearProductionValue
-                    });
-                }
-                companyDayProductionValueResponseDto.CompanyItems= companys.Where(x=>x.CompanyId!=null).ToList();
-            }
-
-            return companyDayProductionValueResponseDto;
-        }
 
     }
 }
