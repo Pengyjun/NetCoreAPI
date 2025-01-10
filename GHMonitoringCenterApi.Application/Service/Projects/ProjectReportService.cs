@@ -9550,7 +9550,8 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                         Id = ddr.Id.ToString(),
                         Name = ddr.FangAnName,
                         ProjectCode = ddr.ProjectCode,
-                        FangAnKind = ddr.FangAnKind
+                        FangAnKind = ddr.FangAnKind,
+                        ApprovalState = ddr.ApprovalState
                     });
                 }
             }

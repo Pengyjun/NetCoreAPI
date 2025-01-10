@@ -1305,6 +1305,26 @@ namespace GHMonitoringCenterApi.Application.Service
             rt.SuccessResult(rr);
             return rt;
         }
+        /// <summary>
+        /// 施工日志
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        public async Task<ResponseAjaxResult<List<DayReportConstruction>>> GetDayReportConstructionAsync(ExternalRequestDto requestDto)
+        {
+            ResponseAjaxResult<List<DayReportConstruction>> rt = new();
+            var rr = await _dbContext.Queryable<DayReportConstruction>()
+                .Where(x => x.IsDelete == 1)
+                .ToListAsync();
+            rr = rr
+                .Where(x => string.IsNullOrEmpty(x.UpdateTime.ToString()) || x.UpdateTime == DateTime.MinValue ?
+                  x.CreateTime >= requestDto.StartTime && x.CreateTime <= requestDto.EndTime
+                : x.UpdateTime >= requestDto.StartTime && x.UpdateTime <= requestDto.EndTime)
+                .ToList();
+
+            rt.SuccessResult(rr);
+            return rt;
+        }
         #endregion
 
 

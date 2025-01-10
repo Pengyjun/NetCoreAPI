@@ -362,6 +362,15 @@ namespace GHMonitoringCenterApi.Controllers
         [AllowAnonymous]//跳过鉴权
         public async Task<ResponseAjaxResult<List<DangerousDetails>>> DangerousDetailsAsync()
           => await _externalApiService.DangerousDetailsAsync();
+        /// <summary>
+        /// 获取全表字段施工日志
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        [HttpGet("GetDayReportConstruction")]
+        [AllowAnonymous]//跳过鉴权
+        public async Task<ResponseAjaxResult<List<DayReportConstruction>>> GetDayReportConstructionAsync([FromQuery] ExternalRequestDto requestDto)
+          => await _externalApiService.GetDayReportConstructionAsync(requestDto);
         #endregion
 
 
