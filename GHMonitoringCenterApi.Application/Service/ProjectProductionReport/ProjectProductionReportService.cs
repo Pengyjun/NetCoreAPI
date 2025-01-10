@@ -319,6 +319,7 @@ namespace GHMonitoringCenterApi.Application.Service.ProjectProductionReport
                        Hazardousconstructionnum = d.HazardousConstructionNum,
                        HazardousConstructionDetails = d.HazardousConstructionDetails
                    }).ToListAsync();
+
             }
             else
             {

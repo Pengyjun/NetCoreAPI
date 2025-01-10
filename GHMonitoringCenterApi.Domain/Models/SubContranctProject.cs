@@ -3,10 +3,10 @@
 namespace GHMonitoringCenterApi.Domain.Models
 {
     /// <summary>
-    /// 项目表
+    /// 分包项目表
     /// </summary>
-    [SugarTable("t_project", IsDisabledDelete = true)]
-    public class Project : BaseEntity<Guid>
+    [SugarTable("t_subcontranctproject", IsDisabledDelete = true)]
+    public class SubContranctProject : BaseEntity<Guid>
     {
         /// <summary>
         /// PomId
@@ -328,15 +328,15 @@ namespace GHMonitoringCenterApi.Domain.Models
         [SugarColumn(ColumnDataType = "datetime")]
         public DateTime? ContractSignDate { get; set; }
 
-        /// <summary>
-        /// 分包项目得上级得主数据编码
-        /// </summary>
-        [SugarColumn(Length = 64)]
-        public string? PProjectMasterCode { get; set; }
-        /// <summary>
-        /// 是否时分包项目
-        /// </summary>
-        [SugarColumn(ColumnDataType = "int", DefaultValue = "0")]
-        public int IsSubContractProject { get; set; }
+        ///// <summary>
+        ///// 分包项目得上级得主数据编码
+        ///// </summary>
+        //[SugarColumn(Length = 64)]
+        //public string? PProjectMasterCode { get; set; }
+        ///// <summary>
+        ///// 是否时分包项目
+        ///// </summary>
+        //[SugarColumn(ColumnDataType = "int", DefaultValue = "0")]
+        //public int? IsSubContractProject { get; set; }
     }
 }
