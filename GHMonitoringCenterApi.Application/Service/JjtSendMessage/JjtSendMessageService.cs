@@ -1984,7 +1984,9 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
                     #endregion
 
                     projectBasePoduction.DayProductionValue = dayTotalPoductionValues;
-                    projectBasePoduction.TotalYearProductionValue = Math.Round(companyBasePoductionValues.Sum(x => x.YearCompanyProductionValue.Value) / 100000000M, 2);
+                    /*projectBasePoduction.TotalYearProductionValue =   Math.Round(companyBasePoductionValues.Sum(x => x.YearCompanyProductionValue.Value) / 100000000M, 2);*/
+
+                    projectBasePoduction.TotalYearProductionValue = companyBasePoductionValues.Sum(x => x.TotalYearProductionValue);
                     //projectBasePoduction.TotalYearProductionValue = companyBasePoductionValues.Sum(x => x.TotalYearProductionValue);
                     projectBasePoduction.ProductionValueProgressPercent = productionValueProgressPercent;
                     companyBasePoductionValues = companyBasePoductionValues.Where(x => !string.IsNullOrWhiteSpace(x.Name)).ToList();

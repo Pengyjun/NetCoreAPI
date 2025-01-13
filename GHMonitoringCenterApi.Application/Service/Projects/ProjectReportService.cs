@@ -2485,7 +2485,8 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 StatusText = m.StatusText,
                 OutsourcingExpensesAmount = m.OutsourcingExpensesAmount,
                 UpdateTime = m.UpdateTime,
-                CreateTime = m.CreateTime
+                CreateTime = m.CreateTime,
+                IsSubProject = p.IsSubContractProject
             });
 
             var list = new List<MonthtReportDto>();
@@ -2555,8 +2556,64 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             // 年度计划
             var pjects = await _dbProject.AsQueryable().Where(x => x.IsDelete == 1 && pIds.Contains(x.Id.ToString())).Select(x => new { x.Id, x.MasterCode }).ToListAsync();
 
+            #region 处理分包项目产值问题
+            bool specicalCondition = false;
+            if (_currentUser.CurrentLoginIsAdmin || _currentUser.CurrentLoginInstitutionOid == "101162350")
+            {
+                specicalCondition = true;
+            }
+            #endregion 
+
             foreach (var item in list)
             {
+                #region 处理分包项目产值问题 清空项目所有数值
+                if (specicalCondition && item.IsSubProject == 1)
+                {
+                    item.PlanQuantities = 0M;
+                    item.PlanOutPutValue = 0M;
+                    item.AccomplishQuantities = 0M;
+                    item.YearPlanQuantities = 0M;
+                    item.AccomplishValue = 0M;
+                    item.AccomplishValue2 = 0M;
+                    item.YearPlanOutPutValue = 0M;
+                    item.RecognizedValue = 0M;
+                    item.PaymentAmount = 0M;
+                    item.BudgetInterestRate = 0M;
+                    item.ProjectedCost = 0M;
+                    item.AccomplishCost = 0M;
+                    item.ContractMeaPayProp = 0M;
+                    item.TaxRate = 0M;
+                    item.OutsourcingExpensesAmount = 0M;
+                    item.ContractAmount = item.ContractAmount != null ? Math.Round(item.ContractAmount.Value, 2) : 0M;
+                    item.ValidContractAmount = item.ValidContractAmount != null ? Math.Round(item.ValidContractAmount.Value, 2) : 0M;
+                    item.YearAccomplishQuantities = 0M;
+                    item.YearAccomplishCost = 0M;
+                    item.YearAccomplishValue = 0M;
+                    item.YearPaymentAmount = 0M;
+                    item.YearRecognizedValue = 0M;
+                    item.YearProjectedCost = 0M;
+                    item.YearOutsourcingExpensesAmount = 0M;
+                    item.CumulativeOutsourcingExpensesAmount = 0M;
+                    item.AccumulativeQuantities = 0M;
+                    item.CumulativeAccomplishCost = 0M;
+                    item.CumulativeCompleted = 0M;
+                    item.CumulativePaymentAmount = 0M;
+                    item.CumulativeValue = 0M;
+                    item.PostmarkProjectedCost = 0M;
+                    item.PaymentLagRatio = 0M;
+                    item.EffectiveGrossMargin = 0M;
+                    item.ResidueContractAmount = 0M;
+                    item.DeviationQuantities = 0M;
+                    item.YearDeviation = 0M;
+                    item.ScheduleOutPutValue = 0M;
+                    item.YearAnnualOutputValue = 0M;
+                    item.CostDeviation = 0M;
+                    item.YearCostDeviation = 0M;
+                    item.PostmarkCostDeviation = 0M;
+                    item.GrossMarginDeviation = 0M;
+                    continue;
+                }
+                #endregion
                 #region 新 时间判断
                 //今天
                 ConvertHelper.TryConvertDateTimeFromDateDay(Convert.ToInt32(item.DateMonth.ToString() + DateTime.Now.Day), out DateTime nowDateTime);
@@ -2744,6 +2801,8 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 PaymentAmount = Math.Round(mpList.Sum(m => m.PartyAPayAmount), 2),
                 OutsourcingExpensesAmount = Math.Round(mpList.Sum(m => m.OutsourcingExpensesAmount), 2)
             };
+
+
             foreach (var item in list)
             {
                 item.PlanQuantities = Math.Round(item.PlanQuantities, 2);
@@ -2886,7 +2945,8 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 StatusText = m.StatusText,
                 OutsourcingExpensesAmount = m.OutsourcingExpensesAmount,
                 UpdateTime = m.UpdateTime,
-                CreateTime = m.CreateTime
+                CreateTime = m.CreateTime,
+                IsSubProject = p.IsSubContractProject
             });
 
             var list = await selQuery.ToListAsync();
@@ -2946,9 +3006,63 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             var pRates = await _dbContext.Queryable<CurrencyConverter>().Where(x => x.IsDelete == 1).ToListAsync();
             // 年度计划
             var pjects = await _dbProject.AsQueryable().Where(x => x.IsDelete == 1 && pIds.Contains(x.Id.ToString())).Select(x => new { x.Id, x.MasterCode }).ToListAsync();
-
+            #region 处理分包项目产值问题
+            bool specicalCondition = false;
+            if (_currentUser.CurrentLoginIsAdmin || _currentUser.CurrentLoginInstitutionOid == "101162350")
+            {
+                specicalCondition = true;
+            }
+            #endregion 
             foreach (var item in list)
             {
+                #region 处理分包项目产值问题 清空项目所有数值
+                if (specicalCondition && item.IsSubProject == 1)
+                {
+                    item.PlanQuantities = 0M;
+                    item.PlanOutPutValue = 0M;
+                    item.AccomplishQuantities = 0M;
+                    item.YearPlanQuantities = 0M;
+                    item.AccomplishValue = 0M;
+                    item.AccomplishValue2 = 0M;
+                    item.YearPlanOutPutValue = 0M;
+                    item.RecognizedValue = 0M;
+                    item.PaymentAmount = 0M;
+                    item.BudgetInterestRate = 0M;
+                    item.ProjectedCost = 0M;
+                    item.AccomplishCost = 0M;
+                    item.ContractMeaPayProp = 0M;
+                    item.TaxRate = 0M;
+                    item.OutsourcingExpensesAmount = 0M;
+                    item.ContractAmount = item.ContractAmount != null ? Math.Round(item.ContractAmount.Value, 2) : 0M;
+                    item.ValidContractAmount = item.ValidContractAmount != null ? Math.Round(item.ValidContractAmount.Value, 2) : 0M;
+                    item.YearAccomplishQuantities = 0M;
+                    item.YearAccomplishCost = 0M;
+                    item.YearAccomplishValue = 0M;
+                    item.YearPaymentAmount = 0M;
+                    item.YearRecognizedValue = 0M;
+                    item.YearProjectedCost = 0M;
+                    item.YearOutsourcingExpensesAmount = 0M;
+                    item.CumulativeOutsourcingExpensesAmount = 0M;
+                    item.AccumulativeQuantities = 0M;
+                    item.CumulativeAccomplishCost = 0M;
+                    item.CumulativeCompleted = 0M;
+                    item.CumulativePaymentAmount = 0M;
+                    item.CumulativeValue = 0M;
+                    item.PostmarkProjectedCost = 0M;
+                    item.PaymentLagRatio = 0M;
+                    item.EffectiveGrossMargin = 0M;
+                    item.ResidueContractAmount = 0M;
+                    item.DeviationQuantities = 0M;
+                    item.YearDeviation = 0M;
+                    item.ScheduleOutPutValue = 0M;
+                    item.YearAnnualOutputValue = 0M;
+                    item.CostDeviation = 0M;
+                    item.YearCostDeviation = 0M;
+                    item.PostmarkCostDeviation = 0M;
+                    item.GrossMarginDeviation = 0M;
+                    continue;
+                }
+                #endregion
                 #region 新 时间判断
                 //今天
                 ConvertHelper.TryConvertDateTimeFromDateDay(Convert.ToInt32(item.DateMonth.ToString() + DateTime.Now.Day), out DateTime nowDateTime);

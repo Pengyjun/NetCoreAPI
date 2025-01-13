@@ -556,6 +556,10 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project.Report
             /// 币种
             /// </summary>
             public Guid? CurrencyId { get; set; }
+            /// <summary>
+            /// 是分包项目
+            /// </summary>
+            public int IsSubProject { get; set; }
         }
     }
 
