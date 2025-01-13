@@ -130,13 +130,18 @@ namespace GHMonitoringCenterApi.Application.Service.ProjectProductionReport
             //查询项目日报下的施工记录集合
             var dayConstructionList = await dbContext.Queryable<DayReportConstruction>().Where(x => x.IsDelete == 1 && dayIds.Contains(x.DayReportId)).ToListAsync();
             #region 处理分包产值问题
-            foreach (var dayCons in dayConstructionList) {
-                var isExist = dayReports.Where(x => x.DayId == dayCons.DayReportId && x.IsSubContractProject == 1).FirstOrDefault();
-                if (isExist != null)
+            if (_currentUser.CurrentLoginIsAdmin || _currentUser.CurrentLoginInstitutionOid == "101162350")
+            {
+                foreach (var dayCons in dayConstructionList)
                 {
-                    dayCons.ActualDailyProduction = 0m; dayCons.ActualDailyProductionAmount = 0M;
+                    var isExist = dayReports.Where(x => x.DayId == dayCons.DayReportId && x.IsSubContractProject == 1).FirstOrDefault();
+                    if (isExist != null)
+                    {
+                        dayCons.ActualDailyProduction = 0m; dayCons.ActualDailyProductionAmount = 0M;
+                    }
                 }
             }
+          
             #endregion
             sumInfo.SumOutsourcingExpensesAmount = Math.Round(dayReports.Sum(x => x.ProSumOutsourcingExpensesAmount.Value), 2);
             sumInfo.SumActualDailyProduction = Math.Round(dayConstructionList.Sum(x => x.ActualDailyProduction), 3);
@@ -413,7 +418,7 @@ namespace GHMonitoringCenterApi.Application.Service.ProjectProductionReport
                 #region 处理分包项目  不计算产值 工程量  外包支出
                 //list[i].IsSubContractProject == 1
                 #endregion
-                if (list[i].IsSubContractProject == 1)
+                if ((_currentUser.CurrentLoginIsAdmin|| _currentUser.CurrentLoginInstitutionOid== "101162350")&& list[i].IsSubContractProject == 1)
                 {
                     //list[i].ProSumActualDailyProductionAmount = 0M;
                     list[i].ProSumOutsourcingExpensesAmount = 0M;
@@ -606,9 +611,9 @@ namespace GHMonitoringCenterApi.Application.Service.ProjectProductionReport
                     OwnerShipId = x.OwnerShipId,
                     SubShipId = x.SubShipId,
                     UnitPrice = Math.Round(x.UnitPrice * item.CurrencyExchangeRate, 2),
-                    OutsourcingExpensesAmount = item.IsSubContractProject == 1 ? 0 : Math.Round(x.OutsourcingExpensesAmount * item.CurrencyExchangeRate, 2),//处理分包项目
-                    ActualDailyProduction =item.IsSubContractProject==1?0:Math.Round(x.ActualDailyProduction, 3),//处理分包项目
-                    ActualDailyProductionAmount = item.IsSubContractProject == 1 ? 0 : Math.Round(x.ActualDailyProductionAmount, 2),//处理分包项目
+                    OutsourcingExpensesAmount = (_currentUser.CurrentLoginIsAdmin || _currentUser.CurrentLoginInstitutionOid == "101162350") && item .IsSubContractProject == 1 ? 0 : Math.Round(x.OutsourcingExpensesAmount * item.CurrencyExchangeRate, 2),//处理分包项目
+                    ActualDailyProduction = (_currentUser.CurrentLoginIsAdmin || _currentUser.CurrentLoginInstitutionOid == "101162350") && item.IsSubContractProject == 1 ? 0:Math.Round(x.ActualDailyProduction, 3),//处理分包项目
+                    ActualDailyProductionAmount = (_currentUser.CurrentLoginIsAdmin || _currentUser.CurrentLoginInstitutionOid == "101162350") && item.IsSubContractProject == 1 ? 0 : Math.Round(x.ActualDailyProductionAmount, 2),//处理分包项目
                     ConstructionNature = x.ConstructionNature,
                     OwnerShipName = ownerShipList.FirstOrDefault(t => t.PomId == x.OwnerShipId)?.Name,
                     SubShipName = subShipList.FirstOrDefault(t => t.PomId == x.SubShipId)?.Name == null ? dealingUnit.FirstOrDefault(t => t.PomId == x.SubShipId)?.ZBPNAME_ZH : subShipList.FirstOrDefault(t => t.PomId == x.SubShipId)?.Name,
