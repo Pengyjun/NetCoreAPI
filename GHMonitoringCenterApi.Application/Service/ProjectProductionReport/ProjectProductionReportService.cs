@@ -148,10 +148,10 @@ namespace GHMonitoringCenterApi.Application.Service.ProjectProductionReport
                 dayReports.WhereIF(dayConstructionIds.Count>0,x=>x.IsSubContractProject==1)
                 .Sum(x => x.ProSumOutsourcingExpensesAmount.Value), 2);
             sumInfo.SumActualDailyProduction = Math.Round(dayConstructionList
-                .WhereIF(dayConstructionIds.Count > 0, x => dayConstructionIds.Contains(x.ProjectId))
+                .WhereIF(dayConstructionIds.Count > 0, x =>!dayConstructionIds.Contains(x.ProjectId))
                 .Sum(x => x.ActualDailyProduction), 3);
             sumInfo.SumActualDailyProductionAmount = Math.Round(dayConstructionList
-                 .WhereIF(dayConstructionIds.Count > 0, x => dayConstructionIds.Contains(x.ProjectId))
+                 .WhereIF(dayConstructionIds.Count > 0, x => !dayConstructionIds.Contains(x.ProjectId))
                 .Sum(x => x.ActualDailyProductionAmount), 2);
             return sumInfo;
         }
