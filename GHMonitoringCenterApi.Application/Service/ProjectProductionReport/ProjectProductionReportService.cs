@@ -129,6 +129,15 @@ namespace GHMonitoringCenterApi.Application.Service.ProjectProductionReport
             var dayIds = dayReports.Select(x => x.DayId).ToList();
             //查询项目日报下的施工记录集合
             var dayConstructionList = await dbContext.Queryable<DayReportConstruction>().Where(x => x.IsDelete == 1 && dayIds.Contains(x.DayReportId)).ToListAsync();
+            #region 处理分包产值问题
+            foreach (var dayCons in dayConstructionList) {
+                var isExist = dayReports.Where(x => x.DayId == dayCons.DayReportId && x.IsSubContractProject == 1).FirstOrDefault();
+                if (isExist != null)
+                {
+                    dayCons.ActualDailyProduction = 0m; dayCons.ActualDailyProductionAmount = 0M;
+                }
+            }
+            #endregion
             sumInfo.SumOutsourcingExpensesAmount = Math.Round(dayReports.Sum(x => x.ProSumOutsourcingExpensesAmount.Value), 2);
             sumInfo.SumActualDailyProduction = Math.Round(dayConstructionList.Sum(x => x.ActualDailyProduction), 3);
             sumInfo.SumActualDailyProductionAmount = Math.Round(dayConstructionList.Sum(x => x.ActualDailyProductionAmount), 2);
@@ -270,10 +279,13 @@ namespace GHMonitoringCenterApi.Application.Service.ProjectProductionReport
             var list = new List<DayReportInfo>();
             if (!searchRequestDto.IsDuiWai)//非对外查询接口  监控中心自己用
             {
+               
+
                 list = await dbContext.Queryable<Project, DayReport>(
                    (p, d) =>
                    new JoinQueryInfos(
                        JoinType.Inner, p.Id == d.ProjectId && d.ProcessStatus == DayReportProcessStatus.Submited
+                      
                    ))
                    .WhereIF(true, (p, d) => p.IsDelete == 1)
                    .WhereIF(true, p => departmentIds.Contains(p.ProjectDept.Value))
@@ -287,8 +299,10 @@ namespace GHMonitoringCenterApi.Application.Service.ProjectProductionReport
                    .WhereIF(categoryList != null && categoryList.Any(), (p, d) => categoryList.Contains(p.Category))
                    .WhereIF(tagList != null && tagList.Any(), (p, d) => tagList.Contains(p.Tag))
                    .WhereIF(tag2List != null && tag2List.Any(), (p, d) => tag2List.Contains(p.Tag2))
+                   //.WhereIF(_currentUser.CurrentLoginIsAdmin||_currentUser.CurrentLoginInstitutionOid== "101162350")
                    .Select((p, d) => new DayReportInfo
                    {
+                       
                        Id = d.Id,
                        ProjectId = p.Id,
                        DayId = d.Id,
@@ -317,8 +331,11 @@ namespace GHMonitoringCenterApi.Application.Service.ProjectProductionReport
                        Sitemanagementpersonnum = d.SiteManagementPersonNum,
                        Siteconstructionpersonnum = d.SiteConstructionPersonNum,
                        Hazardousconstructionnum = d.HazardousConstructionNum,
-                       HazardousConstructionDetails = d.HazardousConstructionDetails
+                       HazardousConstructionDetails = d.HazardousConstructionDetails,
+                       IsSubContractProject = p.IsSubContractProject
                    }).ToListAsync();
+
+               
 
             }
             else
@@ -383,18 +400,35 @@ namespace GHMonitoringCenterApi.Application.Service.ProjectProductionReport
                 responseAjaxResult.Count = total;
                 return responseAjaxResult;
             }
+         
             var dayIds = list.Select(x => x.DayId).ToList();
             dayReport = dayReport.Where(x => dayIds.Contains(x.DayReportId)).ToList();
             for (int i = 0; i < list.Count; i++)
             {
+               
                 for (int j = 0; j < searchRequestDto.Sort.Length; j++)
                 {
                     list[i].Sort[j] = searchRequestDto.Sort[j];
                 }
-                list[i].ProSumActualDailyProductionAmount = Math.Round(dayReport.Where(x => x.DayReportId == list[i].DayId).Sum(x => x.ActualDailyProductionAmount), 2);
-                list[i].ProSumOutsourcingExpensesAmount = Math.Round(dayReport.Where(x => x.DayReportId == list[i].DayId).Sum(x => x.OutsourcingExpensesAmount) * list[i].CurrencyExchangeRate, 2);
-                list[i].ProSumActualDailyProduction = Math.Round(dayReport.Where(x => x.DayReportId == list[i].DayId).Sum(x => x.ActualDailyProduction), 2);
-                list[i].ProSumUnitPrice = Math.Round(dayReport.Where(x => x.DayReportId == list[i].DayId).Sum(x => x.UnitPrice) * list[i].CurrencyExchangeRate, 2);
+                #region 处理分包项目  不计算产值 工程量  外包支出
+                //list[i].IsSubContractProject == 1
+                #endregion
+                if (list[i].IsSubContractProject == 1)
+                {
+                    //list[i].ProSumActualDailyProductionAmount = 0M;
+                    list[i].ProSumOutsourcingExpensesAmount = 0M;
+                    list[i].DayActualProductionAmount = 0M;
+                    list[i].DayActualProductionQuantity = 0M;
+                    //list[i].ProSumActualDailyProduction = 0M;
+
+                }
+                else {
+                    list[i].ProSumActualDailyProductionAmount = Math.Round(dayReport.Where(x => x.DayReportId == list[i].DayId).Sum(x => x.ActualDailyProductionAmount), 2);
+                    list[i].ProSumOutsourcingExpensesAmount = Math.Round(dayReport.Where(x => x.DayReportId == list[i].DayId).Sum(x => x.OutsourcingExpensesAmount) * list[i].CurrencyExchangeRate, 2);
+                    list[i].ProSumActualDailyProduction = Math.Round(dayReport.Where(x => x.DayReportId == list[i].DayId).Sum(x => x.ActualDailyProduction), 2);
+                    list[i].ProSumUnitPrice = Math.Round(dayReport.Where(x => x.DayReportId == list[i].DayId).Sum(x => x.UnitPrice) * list[i].CurrencyExchangeRate, 2);
+                }
+               
             }
 
             #region 获取所有数据  合计值
@@ -572,9 +606,9 @@ namespace GHMonitoringCenterApi.Application.Service.ProjectProductionReport
                     OwnerShipId = x.OwnerShipId,
                     SubShipId = x.SubShipId,
                     UnitPrice = Math.Round(x.UnitPrice * item.CurrencyExchangeRate, 2),
-                    OutsourcingExpensesAmount = Math.Round(x.OutsourcingExpensesAmount * item.CurrencyExchangeRate, 2),
-                    ActualDailyProduction = Math.Round(x.ActualDailyProduction, 3),
-                    ActualDailyProductionAmount = Math.Round(x.ActualDailyProductionAmount, 2),
+                    OutsourcingExpensesAmount = item.IsSubContractProject == 1 ? 0 : Math.Round(x.OutsourcingExpensesAmount * item.CurrencyExchangeRate, 2),//处理分包项目
+                    ActualDailyProduction =item.IsSubContractProject==1?0:Math.Round(x.ActualDailyProduction, 3),//处理分包项目
+                    ActualDailyProductionAmount = item.IsSubContractProject == 1 ? 0 : Math.Round(x.ActualDailyProductionAmount, 2),//处理分包项目
                     ConstructionNature = x.ConstructionNature,
                     OwnerShipName = ownerShipList.FirstOrDefault(t => t.PomId == x.OwnerShipId)?.Name,
                     SubShipName = subShipList.FirstOrDefault(t => t.PomId == x.SubShipId)?.Name == null ? dealingUnit.FirstOrDefault(t => t.PomId == x.SubShipId)?.ZBPNAME_ZH : subShipList.FirstOrDefault(t => t.PomId == x.SubShipId)?.Name,

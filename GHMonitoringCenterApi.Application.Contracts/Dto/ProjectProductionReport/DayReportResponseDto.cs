@@ -219,6 +219,10 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.ProjectProductionRepor
         /// 施工记录集合
         /// </summary>
         public DayResConstruction[] DayReportConstructions { get; set; } = new DayResConstruction[0];
+        /// <summary>
+        /// 是否是分包项目
+        /// </summary>
+        public int IsSubContractProject { get; set; }
     }
 
 
