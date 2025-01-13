@@ -2566,54 +2566,6 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
 
             foreach (var item in list)
             {
-                #region 处理分包项目产值问题 清空项目所有数值
-                if (specicalCondition && item.IsSubProject == 1)
-                {
-                    item.PlanQuantities = 0M;
-                    item.PlanOutPutValue = 0M;
-                    item.AccomplishQuantities = 0M;
-                    item.YearPlanQuantities = 0M;
-                    item.AccomplishValue = 0M;
-                    item.AccomplishValue2 = 0M;
-                    item.YearPlanOutPutValue = 0M;
-                    item.RecognizedValue = 0M;
-                    item.PaymentAmount = 0M;
-                    item.BudgetInterestRate = 0M;
-                    item.ProjectedCost = 0M;
-                    item.AccomplishCost = 0M;
-                    item.ContractMeaPayProp = 0M;
-                    item.TaxRate = 0M;
-                    item.OutsourcingExpensesAmount = 0M;
-                    item.ContractAmount = item.ContractAmount != null ? Math.Round(item.ContractAmount.Value, 2) : 0M;
-                    item.ValidContractAmount = item.ValidContractAmount != null ? Math.Round(item.ValidContractAmount.Value, 2) : 0M;
-                    item.YearAccomplishQuantities = 0M;
-                    item.YearAccomplishCost = 0M;
-                    item.YearAccomplishValue = 0M;
-                    item.YearPaymentAmount = 0M;
-                    item.YearRecognizedValue = 0M;
-                    item.YearProjectedCost = 0M;
-                    item.YearOutsourcingExpensesAmount = 0M;
-                    item.CumulativeOutsourcingExpensesAmount = 0M;
-                    item.AccumulativeQuantities = 0M;
-                    item.CumulativeAccomplishCost = 0M;
-                    item.CumulativeCompleted = 0M;
-                    item.CumulativePaymentAmount = 0M;
-                    item.CumulativeValue = 0M;
-                    item.PostmarkProjectedCost = 0M;
-                    item.PaymentLagRatio = 0M;
-                    item.EffectiveGrossMargin = 0M;
-                    item.ResidueContractAmount = 0M;
-                    item.DeviationQuantities = 0M;
-                    item.YearDeviation = 0M;
-                    item.ScheduleOutPutValue = 0M;
-                    item.YearAnnualOutputValue = 0M;
-                    item.CostDeviation = 0M;
-                    item.YearCostDeviation = 0M;
-                    item.PostmarkCostDeviation = 0M;
-                    item.GrossMarginDeviation = 0M;
-                    continue;
-                }
-                #endregion
                 #region 新 时间判断
                 //今天
                 ConvertHelper.TryConvertDateTimeFromDateDay(Convert.ToInt32(item.DateMonth.ToString() + DateTime.Now.Day), out DateTime nowDateTime);
@@ -2791,16 +2743,38 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             mIds = mIds.Distinct().ToList();
             var mpList = await _dbMonthReport.AsQueryable()
                 .Where(x => x.IsDelete == 1 && mpIds.Contains(x.ProjectId))
-                .Select(x => new { x.Id, x.CompletedQuantity, x.CompleteProductionAmount, x.PartyAConfirmedProductionAmount, x.PartyAPayAmount, x.OutsourcingExpensesAmount, x.DateMonth })
+                .Select(x => new { x.Id, x.CompletedQuantity, x.CompleteProductionAmount, x.ProjectId, x.PartyAConfirmedProductionAmount, x.PartyAPayAmount, x.OutsourcingExpensesAmount, x.DateMonth })
                 .ToListAsync();
-            var totalMonthtReport = new MonthtReportsResponseDto.TotalMonthtReportsDto
+
+
+            #region 处理分包项目产值问题 
+            TotalMonthtReportsDto totalMonthtReport = new();
+
+            if (!specicalCondition)
             {
-                AccomplishQuantities = Math.Round(mpList.Sum(m => m.CompletedQuantity), 2),
-                AccomplishValue = Math.Round(mpList.Sum(m => m.CompleteProductionAmount), 2),
-                RecognizedValue = Math.Round(mpList.Sum(m => m.PartyAConfirmedProductionAmount), 2),
-                PaymentAmount = Math.Round(mpList.Sum(m => m.PartyAPayAmount), 2),
-                OutsourcingExpensesAmount = Math.Round(mpList.Sum(m => m.OutsourcingExpensesAmount), 2)
-            };
+                totalMonthtReport = new MonthtReportsResponseDto.TotalMonthtReportsDto
+                {
+                    AccomplishQuantities = Math.Round(mpList.Sum(m => m.CompletedQuantity), 2),
+                    AccomplishValue = Math.Round(mpList.Sum(m => m.CompleteProductionAmount), 2),
+                    RecognizedValue = Math.Round(mpList.Sum(m => m.PartyAConfirmedProductionAmount), 2),
+                    PaymentAmount = Math.Round(mpList.Sum(m => m.PartyAPayAmount), 2),
+                    OutsourcingExpensesAmount = Math.Round(mpList.Sum(m => m.OutsourcingExpensesAmount), 2)
+                };
+            }
+            else
+            {
+                //获取分包项目
+                var subpIds = await _dbContext.Queryable<Project>().Where(t => t.IsDelete == 1 && t.IsSubContractProject == 1).Select(x => x.Id).ToListAsync();
+                totalMonthtReport = new MonthtReportsResponseDto.TotalMonthtReportsDto
+                {
+                    AccomplishQuantities = Math.Round(mpList.Where(x => !subpIds.Contains(x.ProjectId)).Sum(m => m.CompletedQuantity), 2),
+                    AccomplishValue = Math.Round(mpList.Where(x => !subpIds.Contains(x.ProjectId)).Sum(m => m.CompleteProductionAmount), 2),
+                    RecognizedValue = Math.Round(mpList.Where(x => !subpIds.Contains(x.ProjectId)).Sum(m => m.PartyAConfirmedProductionAmount), 2),
+                    PaymentAmount = Math.Round(mpList.Where(x => !subpIds.Contains(x.ProjectId)).Sum(m => m.PartyAPayAmount), 2),
+                    OutsourcingExpensesAmount = Math.Round(mpList.Where(x => !subpIds.Contains(x.ProjectId)).Sum(m => m.OutsourcingExpensesAmount), 2)
+                };
+            }
+            #endregion
 
 
             foreach (var item in list)
@@ -3015,54 +2989,6 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             #endregion 
             foreach (var item in list)
             {
-                #region 处理分包项目产值问题 清空项目所有数值
-                if (specicalCondition && item.IsSubProject == 1)
-                {
-                    item.PlanQuantities = 0M;
-                    item.PlanOutPutValue = 0M;
-                    item.AccomplishQuantities = 0M;
-                    item.YearPlanQuantities = 0M;
-                    item.AccomplishValue = 0M;
-                    item.AccomplishValue2 = 0M;
-                    item.YearPlanOutPutValue = 0M;
-                    item.RecognizedValue = 0M;
-                    item.PaymentAmount = 0M;
-                    item.BudgetInterestRate = 0M;
-                    item.ProjectedCost = 0M;
-                    item.AccomplishCost = 0M;
-                    item.ContractMeaPayProp = 0M;
-                    item.TaxRate = 0M;
-                    item.OutsourcingExpensesAmount = 0M;
-                    item.ContractAmount = item.ContractAmount != null ? Math.Round(item.ContractAmount.Value, 2) : 0M;
-                    item.ValidContractAmount = item.ValidContractAmount != null ? Math.Round(item.ValidContractAmount.Value, 2) : 0M;
-                    item.YearAccomplishQuantities = 0M;
-                    item.YearAccomplishCost = 0M;
-                    item.YearAccomplishValue = 0M;
-                    item.YearPaymentAmount = 0M;
-                    item.YearRecognizedValue = 0M;
-                    item.YearProjectedCost = 0M;
-                    item.YearOutsourcingExpensesAmount = 0M;
-                    item.CumulativeOutsourcingExpensesAmount = 0M;
-                    item.AccumulativeQuantities = 0M;
-                    item.CumulativeAccomplishCost = 0M;
-                    item.CumulativeCompleted = 0M;
-                    item.CumulativePaymentAmount = 0M;
-                    item.CumulativeValue = 0M;
-                    item.PostmarkProjectedCost = 0M;
-                    item.PaymentLagRatio = 0M;
-                    item.EffectiveGrossMargin = 0M;
-                    item.ResidueContractAmount = 0M;
-                    item.DeviationQuantities = 0M;
-                    item.YearDeviation = 0M;
-                    item.ScheduleOutPutValue = 0M;
-                    item.YearAnnualOutputValue = 0M;
-                    item.CostDeviation = 0M;
-                    item.YearCostDeviation = 0M;
-                    item.PostmarkCostDeviation = 0M;
-                    item.GrossMarginDeviation = 0M;
-                    continue;
-                }
-                #endregion
                 #region 新 时间判断
                 //今天
                 ConvertHelper.TryConvertDateTimeFromDateDay(Convert.ToInt32(item.DateMonth.ToString() + DateTime.Now.Day), out DateTime nowDateTime);
@@ -3234,15 +3160,33 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             }
 
             //  合计
-            #region 新的
-            var totalMonthtReport = new MonthtReportsResponseDto.TotalMonthtReportsDto
+            #region 处理分包项目产值问题 
+            TotalMonthtReportsDto totalMonthtReport = new();
+
+            if (!specicalCondition)
             {
-                AccomplishQuantities = Math.Round(list.Sum(m => m.AccomplishQuantities), 2),
-                AccomplishValue = Math.Round(list.Sum(m => m.AccomplishValue2), 2),
-                RecognizedValue = Math.Round(list.Sum(m => m.RecognizedValue), 2),
-                PaymentAmount = Math.Round(list.Sum(m => m.PaymentAmount), 2),
-                OutsourcingExpensesAmount = Math.Round(list.Sum(m => m.OutsourcingExpensesAmount), 2)
-            };
+                totalMonthtReport = new MonthtReportsResponseDto.TotalMonthtReportsDto
+                {
+                    AccomplishQuantities = Math.Round(list.Sum(m => m.AccomplishQuantities), 2),
+                    AccomplishValue = Math.Round(list.Sum(m => m.AccomplishValue2), 2),
+                    RecognizedValue = Math.Round(list.Sum(m => m.RecognizedValue), 2),
+                    PaymentAmount = Math.Round(list.Sum(m => m.PaymentAmount), 2),
+                    OutsourcingExpensesAmount = Math.Round(list.Sum(m => m.OutsourcingExpensesAmount), 2)
+                };
+            }
+            else
+            {
+                //获取分包项目
+                var subpIds = await _dbContext.Queryable<Project>().Where(t => t.IsDelete == 1 && t.IsSubContractProject == 1).Select(x => x.Id).ToListAsync();
+                totalMonthtReport = new MonthtReportsResponseDto.TotalMonthtReportsDto
+                {
+                    AccomplishQuantities = Math.Round(list.Where(x => !subpIds.Contains(x.ProjectId)).Sum(m => m.AccomplishQuantities), 2),
+                    AccomplishValue = Math.Round(list.Where(x => !subpIds.Contains(x.ProjectId)).Sum(m => m.AccomplishValue2), 2),
+                    RecognizedValue = Math.Round(list.Where(x => !subpIds.Contains(x.ProjectId)).Sum(m => m.RecognizedValue), 2),
+                    PaymentAmount = Math.Round(list.Where(x => !subpIds.Contains(x.ProjectId)).Sum(m => m.PaymentAmount), 2),
+                    OutsourcingExpensesAmount = Math.Round(list.Where(x => !subpIds.Contains(x.ProjectId)).Sum(m => m.OutsourcingExpensesAmount), 2)
+                };
+            }
             foreach (var item in list)
             {
                 item.PlanQuantities = Math.Round(item.PlanQuantities, 2);
@@ -3285,6 +3229,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
 
             return result.SuccessResult(new MonthtReportsResponseDto() { Reports = pageData, Total = totalMonthtReport }, total);
         }
+
         /// <summary>
         /// 项目月报年度、累计值
         /// </summary>
@@ -7873,6 +7818,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
 
                 var outPutInfo = new OutPutInfo
                 {
+                    ProjectId = item.Id,
                     CompanyId = item.CompanyId,
                     CompanyName = companyList.FirstOrDefault(x => x.ItemId == item.CompanyId)?.Name ?? "",
                     DeptName = institutionList.FirstOrDefault(t => t.PomId == item.ProjectDept)?.Name ?? "",
@@ -7897,29 +7843,61 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 };
                 outPutInfos.Add(outPutInfo);
             }
-
-            //计算所有公司汇总值
-            List<SumOutPutInfo> sumOutPutInfos = new List<SumOutPutInfo>()
+            List<SumOutPutInfo> sumOutPutInfos = new();
+            #region 处理分包项目产值问题
+            if (_currentUser.CurrentLoginIsAdmin || _currentUser.CurrentLoginInstitutionOid == "101162350")
             {
-                 new  SumOutPutInfo()
+                //获取分包项目
+                var subpIds = await _dbContext.Queryable<Project>().Where(t => t.IsDelete == 1 && t.IsSubContractProject == 1).Select(x => x.Id).ToListAsync();
+                //计算所有公司汇总值
+                sumOutPutInfos = new List<SumOutPutInfo>()
                  {
-                        OwnProduction = outPutInfos.Sum(x=>x.OwnProduction),
-                        SubProduction = outPutInfos.Sum(x=>x.SubProduction),
-                        SumProduction = outPutInfos.Sum(x=>x.SumProduction),
-                        OwnOutPutValue = outPutInfos.Sum(x=>x.OwnOutPutValue),
-                        SubDiffValue = outPutInfos.Sum(x=>x.SubDiffValue),
-                        SubExpenditure = outPutInfos.Sum(x=>x.SubExpenditure),
-                        SumOutPutValue = outPutInfos.Sum(x=>x.SumOutPutValue),
-                        YearOwnProduction = outPutInfos.Sum(x=>x.YearOwnProduction),
-                        YearSubProduction = outPutInfos.Sum(x=>x.YearSubProduction),
-                        YearSumProduction = outPutInfos.Sum(x=>x.YearSumProduction),
-                        YearOwnOutPutValue = outPutInfos.Sum(x=>x.YearOwnOutPutValue),
-                        YearSubDiffValue = outPutInfos.Sum(x=>x.YearSubDiffValue),
-                        YearSubExpenditure = outPutInfos.Sum(x=>x.YearSubExpenditure),
-                        YearSumOutPutValue = outPutInfos.Sum(x=>x.YearSumOutPutValue),
-                        TotalSumOutPutValue = outPutInfos.Sum(x=>x.TotalOutPutValue)
-                 }
-            };
+                     new  SumOutPutInfo()
+                     {
+                            OwnProduction = outPutInfos.Where(x=>!subpIds.Contains(x.ProjectId)).Sum(x=>x.OwnProduction),
+                            SubProduction = outPutInfos.Where(x=>!subpIds.Contains(x.ProjectId)).Sum(x=>x.SubProduction),
+                            SumProduction = outPutInfos.Where(x=>!subpIds.Contains(x.ProjectId)).Sum(x=>x.SumProduction),
+                            OwnOutPutValue = outPutInfos.Where(x=>!subpIds.Contains(x.ProjectId)).Sum(x=>x.OwnOutPutValue),
+                            SubDiffValue = outPutInfos.Where(x=>!subpIds.Contains(x.ProjectId)).Sum(x=>x.SubDiffValue),
+                            SubExpenditure = outPutInfos.Where(x=>!subpIds.Contains(x.ProjectId)).Sum(x=>x.SubExpenditure),
+                            SumOutPutValue = outPutInfos.Where(x=>!subpIds.Contains(x.ProjectId)).Sum(x=>x.SumOutPutValue),
+                            YearOwnProduction = outPutInfos.Where(x=>!subpIds.Contains(x.ProjectId)).Sum(x=>x.YearOwnProduction),
+                            YearSubProduction = outPutInfos.Where(x=>!subpIds.Contains(x.ProjectId)).Sum(x=>x.YearSubProduction),
+                            YearSumProduction = outPutInfos.Where(x=>!subpIds.Contains(x.ProjectId)).Sum(x=>x.YearSumProduction),
+                            YearOwnOutPutValue = outPutInfos.Where(x=>!subpIds.Contains(x.ProjectId)).Sum(x=>x.YearOwnOutPutValue),
+                            YearSubDiffValue = outPutInfos.Where(x=>!subpIds.Contains(x.ProjectId)).Sum(x=>x.YearSubDiffValue),
+                            YearSubExpenditure = outPutInfos.Where(x=>!subpIds.Contains(x.ProjectId)).Sum(x=>x.YearSubExpenditure),
+                            YearSumOutPutValue = outPutInfos.Where(x=>!subpIds.Contains(x.ProjectId)).Sum(x=>x.YearSumOutPutValue),
+                            TotalSumOutPutValue = outPutInfos.Where(x=>!subpIds.Contains(x.ProjectId)).Sum(x=>x.TotalOutPutValue)
+                     }
+                 };
+            }
+            else
+            {
+                //计算所有公司汇总值
+                sumOutPutInfos = new List<SumOutPutInfo>()
+                 {
+                     new  SumOutPutInfo()
+                     {
+                            OwnProduction = outPutInfos.Sum(x=>x.OwnProduction),
+                            SubProduction = outPutInfos.Sum(x=>x.SubProduction),
+                            SumProduction = outPutInfos.Sum(x=>x.SumProduction),
+                            OwnOutPutValue = outPutInfos.Sum(x=>x.OwnOutPutValue),
+                            SubDiffValue = outPutInfos.Sum(x=>x.SubDiffValue),
+                            SubExpenditure = outPutInfos.Sum(x=>x.SubExpenditure),
+                            SumOutPutValue = outPutInfos.Sum(x=>x.SumOutPutValue),
+                            YearOwnProduction = outPutInfos.Sum(x=>x.YearOwnProduction),
+                            YearSubProduction = outPutInfos.Sum(x=>x.YearSubProduction),
+                            YearSumProduction = outPutInfos.Sum(x=>x.YearSumProduction),
+                            YearOwnOutPutValue = outPutInfos.Sum(x=>x.YearOwnOutPutValue),
+                            YearSubDiffValue = outPutInfos.Sum(x=>x.YearSubDiffValue),
+                            YearSubExpenditure = outPutInfos.Sum(x=>x.YearSubExpenditure),
+                            YearSumOutPutValue = outPutInfos.Sum(x=>x.YearSumOutPutValue),
+                            TotalSumOutPutValue = outPutInfos.Sum(x=>x.TotalOutPutValue)
+                     }
+                 };
+            }
+            #endregion
             List<OutPutInfo> SumList = new();
             var SumCompanyGroup = outPutInfos.GroupBy(x => new { x.CompanyId, x.CompanyName, x.CompanySort });
             foreach (var item in SumCompanyGroup)

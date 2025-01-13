@@ -840,13 +840,6 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 .FirstAsync();
             if (project == null) { responseAjaxResult.FailResult(HttpStatusCode.ParameterError, "找不到项目"); return responseAjaxResult; }
 
-            #region 分包项目产值处理
-            if (project.IsSubContractProject == 1 && (_currentUser.CurrentLoginIsAdmin || _currentUser.CurrentLoginInstitutionOid == "101162350"))
-            {
-                return responseAjaxResult.SuccessResult(result);
-            }
-            #endregion
-
             //获取当前项目币种
             result.CurrencyId = project.CurrencyId.Value;
 
