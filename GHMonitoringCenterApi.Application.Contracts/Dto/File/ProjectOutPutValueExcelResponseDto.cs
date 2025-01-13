@@ -38,6 +38,7 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.File
         /// 项目名称
         /// </summary>
         public string ProjectName { get; set; }
+        public Guid ProjectId { get; set; }
         /// <summary>
         /// 当月自行产量
         /// </summary>
