@@ -840,6 +840,13 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 .FirstAsync();
             if (project == null) { responseAjaxResult.FailResult(HttpStatusCode.ParameterError, "找不到项目"); return responseAjaxResult; }
 
+            #region 分包项目产值处理
+            if (project.IsSubContractProject == 1 && (_currentUser.CurrentLoginIsAdmin || _currentUser.CurrentLoginInstitutionOid == "101162350"))
+            {
+                return responseAjaxResult.SuccessResult(result);
+            }
+            #endregion
+
             //获取当前项目币种
             result.CurrencyId = project.CurrencyId.Value;
 
@@ -1318,7 +1325,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                    .Where(x => x.IsDelete == 1 && x.ProjectId == projectId).FirstAsync();
 
                 var currentTotalYearOffirmProductionValue = await _dbContext.Queryable<MonthReport>()
-                    .Where(x => x.IsDelete == 1 && x.ProjectId == projectId && x.DateMonth <= dateMonth&&x.Status!= MonthReportStatus.Revoca).ToListAsync();
+                    .Where(x => x.IsDelete == 1 && x.ProjectId == projectId && x.DateMonth <= dateMonth && x.Status != MonthReportStatus.Revoca).ToListAsync();
 
                 //本年甲方确认产值(当年)
                 var initMonth = new DateTime(currentYear, 1, 1).ToDateMonth();
