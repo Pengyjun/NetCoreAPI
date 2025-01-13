@@ -50,6 +50,11 @@ namespace GHMonitoringCenterApi.Domain.Models
         /// </summary>
         [SugarColumn(Length = 36)]
         public Guid ShipId { get; set; }
+        /// <summary>
+        /// 船舶名称
+        /// </summary>
+        [SugarColumn(Length = 256)]
+        public string? ShipName { get; set; }
 
         /// <summary>
         /// 单价
