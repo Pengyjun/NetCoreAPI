@@ -15,5 +15,6 @@ namespace GHMonitoringCenterApi.Application.Contracts.IService.Project
         /// <param name="model"></param>
         /// <returns></returns>
         Task<ResponseAjaxResult<MonthReportForProjectResponseDto>> SearchMonthReportForProjectAsync(ProjectMonthReportRequestDto model);
+
     }
 }

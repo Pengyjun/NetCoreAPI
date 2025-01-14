@@ -1,5 +1,4 @@
-﻿using Aspose.Words;
-using AutoMapper;
+﻿using AutoMapper;
 using GHMonitoringCenterApi.Application.Contracts.Dto.Enums;
 using GHMonitoringCenterApi.Application.Contracts.Dto.Project;
 using GHMonitoringCenterApi.Application.Contracts.Dto.Project.MonthReportForProject;
@@ -10,14 +9,9 @@ using GHMonitoringCenterApi.Domain.Enums;
 using GHMonitoringCenterApi.Domain.Models;
 using GHMonitoringCenterApi.Domain.Shared;
 using GHMonitoringCenterApi.Domain.Shared.Enums;
-using GHMonitoringCenterApi.Domain.Shared.Util;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using NPOI.SS.Formula.Functions;
 using SqlSugar;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Cryptography;
 using UtilsSharp;
 using Models = GHMonitoringCenterApi.Domain.Models;
 
@@ -1360,5 +1354,6 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             { }
             return Tuple.Create(currentYearOffirmProductionValue, totalYearKaileaOffirmProductionValue, currenYearCollection, totalYearCollection);
         }
+
     }
 }

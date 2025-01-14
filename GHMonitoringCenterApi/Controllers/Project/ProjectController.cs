@@ -384,6 +384,10 @@ namespace GHMonitoringCenterApi.Controllers.Project
             return await _monthReportForProjectService.SearchMonthReportForProjectAsync(model);
         }
 
+        #region 修改月报开累数据   开口子更改
+     
+        #endregion
+
         /// <summary>
         ///保存一条项目月报
         /// </summary>
@@ -2307,7 +2311,7 @@ namespace GHMonitoringCenterApi.Controllers.Project
         [AllowAnonymous]
         public bool bb()
         {
-            return  projectService.GetHolidays();
+            return projectService.GetHolidays();
         }
 
 

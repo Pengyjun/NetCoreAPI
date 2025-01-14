@@ -3257,21 +3257,21 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             return new MonthReportForProjectConvert
             {
                 //年度
-                YearAccomplishQuantities = Math.Round(yearMonthReportList.Sum(x => x.CompletedQuantity)),
-                YearAccomplishCost = Math.Round(mMonthReport.Sum(x => x.CostAmount)),
-                YearAccomplishValue = Math.Round(isConvert == true ? yearMonthReportList.Sum(x => x.CompleteProductionAmount) : yearMonthReportList.Sum(x => x.UnitPrice * x.CompletedQuantity)),
-                YearPaymentAmount = Math.Round(mMonthReport.Sum(x => x.PartyAPayAmount)),
-                YearRecognizedValue = Math.Round(mMonthReport.Sum(x => x.PartyAConfirmedProductionAmount)),
-                YearProjectedCost = Math.Round(mMonthReport.Sum(x => x.MonthEstimateCostAmount)),
-                YearOutsourcingExpensesAmount = Math.Round(mMonthReport.Sum(x => x.OutsourcingExpensesAmount)),
+                YearAccomplishQuantities = yearMonthReportList.Sum(x => x.CompletedQuantity),
+                YearAccomplishCost = mMonthReport.Sum(x => x.CostAmount),
+                YearAccomplishValue = isConvert == true ? yearMonthReportList.Sum(x => x.CompleteProductionAmount) : yearMonthReportList.Sum(x => x.UnitPrice * x.CompletedQuantity),
+                YearPaymentAmount = mMonthReport.Sum(x => x.PartyAPayAmount),
+                YearRecognizedValue = mMonthReport.Sum(x => x.PartyAConfirmedProductionAmount),
+                YearProjectedCost = mMonthReport.Sum(x => x.MonthEstimateCostAmount),
+                YearOutsourcingExpensesAmount = mMonthReport.Sum(x => x.OutsourcingExpensesAmount),
 
                 //累计
-                AccumulativeQuantities = Math.Round(cumMonthReportList.Sum(x => x.CompletedQuantity)),
-                CumulativeAccomplishCost = Math.Round(cumMonthReport.Sum(x => x.CostAmount)),
-                CumulativeCompleted = Math.Round(isConvert == true ? cumMonthReportList.Sum(x => x.CompleteProductionAmount) : cumMonthReportList.Sum(x => x.UnitPrice * x.CompletedQuantity)),
-                CumulativeOutsourcingExpensesAmount = Math.Round(cumMonthReport.Sum(x => x.OutsourcingExpensesAmount)),
-                CumulativePaymentAmount = Math.Round(cumMonthReport.Sum(x => x.PartyAPayAmount)),
-                CumulativeValue = Math.Round(cumMonthReport.Sum(x => x.PartyAConfirmedProductionAmount))
+                AccumulativeQuantities = cumMonthReportList.Sum(x => x.CompletedQuantity),
+                CumulativeAccomplishCost = cumMonthReport.Sum(x => x.CostAmount),
+                CumulativeCompleted = isConvert == true ? cumMonthReportList.Sum(x => x.CompleteProductionAmount) : cumMonthReportList.Sum(x => x.UnitPrice * x.CompletedQuantity),
+                CumulativeOutsourcingExpensesAmount = cumMonthReport.Sum(x => x.OutsourcingExpensesAmount),
+                CumulativePaymentAmount = cumMonthReport.Sum(x => x.PartyAPayAmount),
+                CumulativeValue = cumMonthReport.Sum(x => x.PartyAConfirmedProductionAmount)
             };
         }
         /// <summary>
