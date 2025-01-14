@@ -395,9 +395,9 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 return result.FailResult(HttpStatusCode.NotAllowChange, ResponseMessage.NOTALLOW_CHANGE_DAYREPORT);
             }
 
-            var subShipIdS= model.Construction.DayReportConstructions.Where(x=>x.OutPutType== ConstructionOutPutType.SubPackage).Select(x => x.SubShipId).ToList();
-           var count1=await _dbContext.Queryable<DealingUnit>().Where(x => subShipIdS.Contains(x.PomId)).CountAsync();
-           var count2= await _dbContext.Queryable<SubShip>().Where(x => subShipIdS.Contains(x.PomId)).CountAsync();
+            var subShipIdS = model.Construction.DayReportConstructions.Where(x => x.OutPutType == ConstructionOutPutType.SubPackage).Select(x => x.SubShipId).ToList();
+            var count1 = await _dbContext.Queryable<DealingUnit>().Where(x => subShipIdS.Contains(x.PomId)).CountAsync();
+            var count2 = await _dbContext.Queryable<SubShip>().Where(x => subShipIdS.Contains(x.PomId)).CountAsync();
             if (subShipIdS.Count != count1 + count2)
             {
                 return result.FailResult(HttpStatusCode.SaveFail, "数据存在有误请稍候再试");
@@ -3884,15 +3884,15 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             }
             else
             {
-                await _dbMonthReport.AsUpdateable(monthReport).EnableDiffLogEvent(NewLogInfo(EntityType.MonthReport, monthReport.Id, modelState)).ExecuteCommandAsync();
+                await _dbMonthReport.AsUpdateable(monthReport).IgnoreColumns(x => new { x.IsDelete }).EnableDiffLogEvent(NewLogInfo(EntityType.MonthReport, monthReport.Id, modelState)).ExecuteCommandAsync();
             }
             if (deleteDetails.Any())
             {
-                await _dbMonthReportDetail.AsUpdateable(deleteDetails).EnableDiffLogEvent(NewLogInfo(EntityType.MonthReport, monthReport.Id, modelState)).ExecuteCommandAsync();
+                await _dbMonthReportDetail.AsUpdateable(deleteDetails).IgnoreColumns(x => new { x.IsDelete }).EnableDiffLogEvent(NewLogInfo(EntityType.MonthReport, monthReport.Id, modelState)).ExecuteCommandAsync();
             }
             if (updateDetails.Any())
             {
-                await _dbMonthReportDetail.AsUpdateable(updateDetails).EnableDiffLogEvent(NewLogInfo(EntityType.MonthReport, monthReport.Id, modelState)).ExecuteCommandAsync();
+                await _dbMonthReportDetail.AsUpdateable(updateDetails).IgnoreColumns(x => new { x.IsDelete }).EnableDiffLogEvent(NewLogInfo(EntityType.MonthReport, monthReport.Id, modelState)).ExecuteCommandAsync();
             }
             if (addDetails.Any())
             {
@@ -9223,7 +9223,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             }
             //获取当前用户授权数据
             //var userAuthForData = await GetCurrentUserAuthForDataAsync();
-           
+
             var statusList = CommonData.PConstruc.Split(',').Select(x => x.ToGuid()).ToList();
             //var list = await _dbProject.AsQueryable().LeftJoin<DayReport>((p, d) => p.Id == d.ProjectId && d.DateDay == time)
             //    .LeftJoin<Institution>((p, d, c) => p.CompanyId == c.PomId)
