@@ -507,5 +507,13 @@ namespace GHMonitoringCenterApi.Controllers
         {
             return await baseService.GetHomeMenuPermissionUserAsync(baseRequestDto);
         }
+
+
+        [HttpPost("SearchProject")]
+        [AllowAnonymous]
+        public async Task<ResponseAjaxResult<List<BasePullDownResponseDto>>> SearchProjectAsync(BaseRequestDto baseRequestDto)
+        {
+            return await baseService.SearchProjectAsync(baseRequestDto);
+        }
     }
 }

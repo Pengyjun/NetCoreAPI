@@ -24,7 +24,7 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project
         /// <summary>
         /// 项目主数据编码
         /// </summary>
-        //public string? MasterCode { get; set; }
+         public string? MasterCode { get; set; }
         /// <summary>
         /// 项目编码
         /// </summary>
@@ -243,6 +243,11 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project
         /// </summary>
         public DateTime? ContractSignDate { get; set; }
 
+        /// <summary>
+        /// 是否是分包项目  0不是   1是  
+        /// </summary>
+        public int? IsSubContractProject { get; set; }
+
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
             if (WorkDay == 0)
@@ -365,6 +370,11 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project
                     }
                 }
 
+            }
+
+            if (IsSubContractProject == 1&&string.IsNullOrWhiteSpace(MasterCode))
+            {
+                yield return new ValidationResult("分包项目必须要填项目主数据编码", new string[] { nameof(MasterCode) });
             }
         }
     }

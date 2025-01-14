@@ -8406,6 +8406,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             var templatePath = $"Template/Excel/ProjectMonthOutPutTemplate.xlsx";
             //var templatePath = $@"E:\project\HNKC.SZGHAPI\szgh\ghmonitoringcenterapi\GHMonitoringCenterApi.Domain.Shared\Template\Excel\ProjectMonthOutPutTemplate.xlsx";
             //var templatePath = $@"E:\project\HNKC.SZGHAPI\szgh\ghmonitoringcenterapi\GHMonitoringCenterApi.Domain.Shared\Template\Excel\ProjectMonthOutPutTemplate.xlsx";
+            //var templatePath = $@"E:\project\HNKC.SZGHAPI\szgh\ghmonitoringcenterapi\GHMonitoringCenterApi.Domain.Shared\Template\Excel\ProjectMonthOutPutTemplate.xlsx";
             XSSFWorkbook workbook = null;
             using (var fs = new FileStream(templatePath, FileMode.Open, FileAccess.Read))
             {
@@ -8459,7 +8460,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 cellStyle2.VerticalAlignment = NPOI.SS.UserModel.VerticalAlignment.Center;
                 //设置字体
                 IFont font2 = workbook.CreateFont();
-                font2.FontHeightInPoints = 14;
+                font2.FontHeightInPoints = 16;
                 font2.FontName = "微软雅黑";
                 font2.IsBold = true;
                 cellStyle2.SetFont(font1);
