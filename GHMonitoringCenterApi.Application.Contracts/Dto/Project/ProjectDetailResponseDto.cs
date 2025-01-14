@@ -297,6 +297,11 @@
         /// 合同签约日期
         /// </summary>
         public DateTime? ContractSignDate { get; set; }
+
+        /// <summary>
+        /// 是否是分包项目
+        /// </summary>
+        public int IsSubContractProject { get; set; }
     }
 
     /// <summary>
@@ -379,6 +384,8 @@
         /// 结束日期
         /// </summary>
         public DateTime? EndDate { get; set; }
+
+        
     }
 
 

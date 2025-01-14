@@ -515,5 +515,16 @@ namespace GHMonitoringCenterApi.Controllers
         {
             return await baseService.SearchProjectAsync(baseRequestDto);
         }
+        /// <summary>
+        /// 记录节假日
+        /// </summary>
+        /// <param name="year"></param>
+        /// <returns></returns>
+        [HttpGet("RecordHoliday")]
+        [AllowAnonymous]
+        public async Task<ResponseAjaxResult<bool>> RecordHolidayAsync(int year)
+        {
+            return await baseService.RecordHolidayAsync(year);
+        }
     }
 }

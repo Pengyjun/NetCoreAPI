@@ -363,6 +363,14 @@ namespace GHMonitoringCenterApi.Application.Contracts.IService
 
         Task<ResponseAjaxResult<List<BasePullDownResponseDto>>> SearchProjectAsync(BaseRequestDto baseRequestDto);
 
+        /// <summary>
+        /// 记录每年的节假日日期  每年写一次
+        /// </summary>
+        /// <param name="year"></param>
+        /// <returns></returns>
+
+        Task<ResponseAjaxResult<bool>> RecordHolidayAsync(int year);
+
         //Task UpdateProjectAsync();
     }
 }
