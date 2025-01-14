@@ -738,6 +738,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                  .Where((p) => p.Id == basePrimaryRequestDto.Id && p.IsDelete == 1)
                  .Select((p) => new ProjectDetailResponseDto
                  {
+                     IsSubContractProject=p.IsSubContractProject,
                      Id = p.Id,
                      Name = p.Name,
                      MasterCode = p.MasterCode,
@@ -910,7 +911,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
 
             //获取项目干系单位
             var orgList = await dbContext.Queryable<ProjectOrg>()
-                .Where(p => (p.ProjectId == projectDeteilSingle.Id || p.ProjectId == projectDeteilSingle.MasterProjectId) && p.IsDelete == 1).ToListAsync();
+                .Where(p => (p.ProjectId == projectDeteilSingle.Id || p.ProjectId == projectDeteilSingle.MasterProjectId) && p.IsDelete == 1&&p.OrganizationId!=null).ToListAsync();
             if (orgList != null && orgList.Count > 0)
             {
                 projectDeteilSingle.projectOrgDtos = mapper.Map<List<ProjectOrg>, List<ProjectOrgDto>>(orgList);

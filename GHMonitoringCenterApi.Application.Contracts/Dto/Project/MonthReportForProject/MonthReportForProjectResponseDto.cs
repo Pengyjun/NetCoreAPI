@@ -38,6 +38,10 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project.MonthReportFor
         /// 历史完成产值
         /// </summary>
         public decimal HValue { get; set; }
+        /// <summary>
+        /// 外币完成产值
+        /// </summary>
+        public decimal CurrencyHValue { get; set; }
         #endregion
         /// <summary>
         /// 填报月份（例：202304，注解：上月的26-本月的25，例：2023.3.26-2023.04.25）

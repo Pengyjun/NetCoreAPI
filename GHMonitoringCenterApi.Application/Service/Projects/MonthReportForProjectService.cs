@@ -919,7 +919,8 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             {
                 result.HOutValue = his.OutsourcingExpensesAmount;
                 result.HQuantity = his.CompletedQuantity;
-                result.HValue = his.CurrencyCompleteProductionAmount;
+                result.HValue = his.CompleteProductionAmount;
+                result.CurrencyHValue = his.CurrencyCompleteProductionAmount;
             }
             #endregion
 

@@ -379,6 +379,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
         {
             model.ResetModelProperty();
             var result = new ResponseAjaxResult<bool>();
+
             if (!ConvertHelper.TryConvertDateTimeFromDateDay(model.DateDay, out DateTime dayTime))
             {
                 return result.FailResult(HttpStatusCode.SaveFail, "日期时间格式不正确");
@@ -393,6 +394,16 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             {
                 return result.FailResult(HttpStatusCode.NotAllowChange, ResponseMessage.NOTALLOW_CHANGE_DAYREPORT);
             }
+
+            var subShipIdS= model.Construction.DayReportConstructions.Where(x=>x.OutPutType== ConstructionOutPutType.SubPackage).Select(x => x.SubShipId).ToList();
+           var count1=await _dbContext.Queryable<DealingUnit>().Where(x => subShipIdS.Contains(x.PomId)).CountAsync();
+           var count2= await _dbContext.Queryable<SubShip>().Where(x => subShipIdS.Contains(x.PomId)).CountAsync();
+            if (subShipIdS.Count != count1 + count2)
+            {
+                return result.FailResult(HttpStatusCode.SaveFail, "数据存在有误请稍候再试");
+            }
+
+
             // 是否是新增的日报
             bool isAddedDayReport = false;
             if (dayReport == null)
@@ -548,8 +559,12 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             var result = new ResponseAjaxResult<ProjectDayReportResponseDto>();
             var now = DateTime.Now;
             int dateDay = model.DateDay ?? now.AddDays(-1).ToDateDay();
-            var holidayConfig = await _dbContext.Queryable<HolidayConfig>().Where(x => x.IsDelete == 1).FirstAsync();
-
+            var holidayConfig = await _dbContext.Queryable<HolidayConfig>().Where(x => x.IsDelete == 1 && x.DateDay == dateDay).FirstAsync();
+            if (holidayConfig == null)
+            {
+                holidayConfig = new HolidayConfig();
+                holidayConfig.IsHoliday = 0;
+            }
             //上一天日期
             int lastDateDay = 0;
             if (ConvertHelper.TryConvertDateTimeFromDateDay(dateDay, out DateTime dayTime))
@@ -9200,15 +9215,15 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             ResponseAjaxResult<ProjectShiftProductionResponseDto> responseAjaxResult = new ResponseAjaxResult<ProjectShiftProductionResponseDto>();
             ProjectShiftProductionResponseDto responseDto = new ProjectShiftProductionResponseDto();
             ProjectShiftProductionSumInfo productionSumInfo = new ProjectShiftProductionSumInfo();
-
-            var holidayConfig = await _dbContext.Queryable<HolidayConfig>().Where(x => x.IsDelete == 1).FirstAsync();
+            var time = DateTime.Now.AddDays(-1).ToDateDay();
+            var holidayConfig = await _dbContext.Queryable<HolidayConfig>().Where(x => x.IsDelete == 1 && x.DateDay == time).FirstAsync();
             if (holidayConfig != null)
             {
                 responseDto.Title = holidayConfig.Title;
             }
             //获取当前用户授权数据
             //var userAuthForData = await GetCurrentUserAuthForDataAsync();
-            var time = DateTime.Now.AddDays(-1).ToDateDay();
+           
             var statusList = CommonData.PConstruc.Split(',').Select(x => x.ToGuid()).ToList();
             //var list = await _dbProject.AsQueryable().LeftJoin<DayReport>((p, d) => p.Id == d.ProjectId && d.DateDay == time)
             //    .LeftJoin<Institution>((p, d, c) => p.CompanyId == c.PomId)
