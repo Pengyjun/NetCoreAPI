@@ -25,5 +25,14 @@ namespace GHMonitoringCenterApi.Domain.Models
         /// </summary>
         [SugarColumn(ColumnDataType = "int")]
         public int? IsHoliday { get; set; }
+        /// <summary>
+        /// 节假日日期
+        /// </summary>
+        public DateTime HolidayTime { get; set; }
+
+        /// <summary>
+        /// 节假日日期
+        /// </summary>
+        public int DateDay { get; set; }
     }
 }

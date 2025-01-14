@@ -8,6 +8,7 @@ using GHMonitoringCenterApi.Application.Contracts.Dto.Currency;
 using GHMonitoringCenterApi.Application.Contracts.Dto.DictionaryTable;
 using GHMonitoringCenterApi.Application.Contracts.Dto.EquipmentManagement;
 using GHMonitoringCenterApi.Application.Contracts.Dto.HelpCenter;
+using GHMonitoringCenterApi.Application.Contracts.Dto.Holiday;
 using GHMonitoringCenterApi.Application.Contracts.Dto.Information;
 using GHMonitoringCenterApi.Application.Contracts.Dto.Institution;
 using GHMonitoringCenterApi.Application.Contracts.Dto.Menu;
@@ -35,7 +36,9 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
 using NPOI.HPSF;
 using SqlSugar;
+using SqlSugar.Extensions;
 using UtilsSharp;
+using UtilsSharp.Shared.Standard;
 using Model = GHMonitoringCenterApi.Domain.Models;
 
 namespace GHMonitoringCenterApi.Application.Service
@@ -2506,6 +2509,50 @@ namespace GHMonitoringCenterApi.Application.Service
                 x.ShortName.Contains(baseRequestDto.KeyWords))
                 .Select(x=>new BasePullDownResponseDto() { Code=x.MasterCode,Name=x.Name, Id=x.Id }) .ToListAsync();
             responseAjaxResult.Count= responseAjaxResult.Data.Count;
+            responseAjaxResult.Success();
+            return responseAjaxResult;
+        }
+
+        /// <summary>
+        /// 记录每年的节假日日期  每年写一次
+        /// </summary>
+        /// <param name="year"></param>
+        /// <returns></returns>
+        public async Task<ResponseAjaxResult<bool>> RecordHolidayAsync(int year)
+        {
+            if (year == 0)
+            {
+                year = DateTime.Now.Year;
+            }
+            ResponseAjaxResult<bool> responseAjaxResult = new ResponseAjaxResult<bool>();
+            List<HolidayConfig> holidayConfigs = new List<HolidayConfig>();
+            WebHelper webHelper = new WebHelper();
+            var url=  AppsettingsHelper.GetValue("Holidays").Replace("@year",year.ToString());
+            var responseData=await webHelper.DoGetAsync(url);
+
+            if (responseData.Code == 200 && responseData.Result!=null)
+            {
+                //解析json
+                var parseData=JObject.Parse(responseData.Result).Values();
+                foreach (var item in parseData)
+                {
+                    holidayConfigs.Add(new HolidayConfig()
+                    {
+                        Id = GuidUtil.Next(),
+                        Title = item["name"].ToString(),
+                        IsHoliday = item["isOffDay"].ToString()== "True" ? 1 : 0,
+                        HolidayTime = item["date"].ToString().ObjToDate(),
+                         DateDay=int.Parse(item["date"].ToString().ObjToDate().ToString("yyyyMMdd"))
+
+                    });
+                }
+
+                if (holidayConfigs.Count > 0)
+                {
+                    await dbContext.Insertable<HolidayConfig>(holidayConfigs).ExecuteCommandAsync();
+                }
+            }
+            responseAjaxResult.Data = true;
             responseAjaxResult.Success();
             return responseAjaxResult;
         }
