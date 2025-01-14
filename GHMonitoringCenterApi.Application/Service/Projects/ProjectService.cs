@@ -738,6 +738,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                  .Where((p) => p.Id == basePrimaryRequestDto.Id && p.IsDelete == 1)
                  .Select((p) => new ProjectDetailResponseDto
                  {
+                     IsSubContractProject=p.IsSubContractProject,
                      Id = p.Id,
                      Name = p.Name,
                      MasterCode = p.MasterCode,
