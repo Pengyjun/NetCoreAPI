@@ -911,7 +911,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
 
             //获取项目干系单位
             var orgList = await dbContext.Queryable<ProjectOrg>()
-                .Where(p => (p.ProjectId == projectDeteilSingle.Id || p.ProjectId == projectDeteilSingle.MasterProjectId) && p.IsDelete == 1).ToListAsync();
+                .Where(p => (p.ProjectId == projectDeteilSingle.Id || p.ProjectId == projectDeteilSingle.MasterProjectId) && p.IsDelete == 1&&p.OrganizationId!=null).ToListAsync();
             if (orgList != null && orgList.Count > 0)
             {
                 projectDeteilSingle.projectOrgDtos = mapper.Map<List<ProjectOrg>, List<ProjectOrgDto>>(orgList);
