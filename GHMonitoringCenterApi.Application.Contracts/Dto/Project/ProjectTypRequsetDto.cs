@@ -15,5 +15,10 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project
         /// 模糊查询
         /// </summary>
         public string? Name { get; set; }
+
+        /// <summary>
+        /// 启动备注模式  1是启动   其他未启动
+        /// </summary>
+        public int EnableRemark { get; set; }
     }
 }

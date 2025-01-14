@@ -586,7 +586,11 @@ namespace GHMonitoringCenterApi.Application.Service
             var ProjectTypeList = await baseProjectTypeRepository.AsQueryable()
              .Where(x=>x.BusinessRemark!=null)
             .WhereIF(!string.IsNullOrWhiteSpace(projectTypRequsetDto.Name), x => SqlFunc.Contains(x.Name, projectTypRequsetDto.Name))
-                .Select(x => new BasePullDownResponseDto { Id = x.PomId, Name = x.Name+x.BusinessRemark }).ToListAsync();
+                .Select(x => new BasePullDownResponseDto { Id = x.PomId, Name = x.Name,Code= x.BusinessRemark }).ToListAsync();
+            if (projectTypRequsetDto.EnableRemark == 1)
+            {
+                responseAjaxResult .Data= ProjectTypeList.Select(x => new BasePullDownResponseDto() { Id = x.Id, Name = x.Name + x.Code }).ToList();
+            }
             responseAjaxResult.Data = ProjectTypeList;
             responseAjaxResult.Count = ProjectTypeList.Count;
             responseAjaxResult.Success();
@@ -2494,7 +2498,17 @@ namespace GHMonitoringCenterApi.Application.Service
             }
             return responseAjaxResult;
         }
-
+       public async Task<ResponseAjaxResult<List<BasePullDownResponseDto>>> SearchProjectAsync(BaseRequestDto baseRequestDto)
+        {
+            ResponseAjaxResult<List<BasePullDownResponseDto>> responseAjaxResult = new ResponseAjaxResult<List<BasePullDownResponseDto>>();
+            responseAjaxResult.Data=await dbContext.Queryable<Project>().Where(x => x.IsDelete == 1)
+                .WhereIF(!string.IsNullOrWhiteSpace(baseRequestDto.KeyWords),x=>x.Name.Contains(baseRequestDto.KeyWords)||
+                x.ShortName.Contains(baseRequestDto.KeyWords))
+                .Select(x=>new BasePullDownResponseDto() { Code=x.MasterCode,Name=x.Name, Id=x.Id }) .ToListAsync();
+            responseAjaxResult.Count= responseAjaxResult.Data.Count;
+            responseAjaxResult.Success();
+            return responseAjaxResult;
+        }
 
         /// <summary>
         /// 排除一些项目  如菲律宾帕塞吹填开发项目（1期）水工工程   只有交建公司能看到这个项目   
@@ -2504,31 +2518,33 @@ namespace GHMonitoringCenterApi.Application.Service
         /// <param name="companyId"></param>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
-        public async Task UpdateProjectAsync()
-        {
-            try
-            {
-                var project = await dbContext.Queryable<Project>().Where(x =>x.Id == "08dcdec4-4d90-4802-80fe-1293e55fbdff".ToGuid())
-                                   .FirstAsync();
-                if (_currentUser.CurrentLoginIsAdmin||_currentUser.CurrentLoginInstitutionGrule.IndexOf("101174265") > 0  )
-                {
-                    //说明是交建公司  
-                    project.IsDelete = 1;
-                    await dbContext.Updateable<Project>(project).ExecuteCommandAsync();
-                }
-                else
-                {
-                    project.IsDelete = 0;
-                    await dbContext.Updateable<Project>(project).ExecuteCommandAsync();
-                };
-            }
-            catch (Exception ex)
-            {
-                await Console.Out.WriteLineAsync($"激活登录用户删除项目出现问题:{ex}");
+        //public async Task UpdateProjectAsync()
+        //{
+        //    try
+        //    {
+        //        var project = await dbContext.Queryable<Project>().Where(x =>x.Id == "08dcdec4-4d90-4802-80fe-1293e55fbdff".ToGuid())
+        //                           .FirstAsync();
+        //        if (_currentUser.CurrentLoginIsAdmin||_currentUser.CurrentLoginInstitutionGrule.IndexOf("101174265") > 0  )
+        //        {
+        //            //说明是交建公司  
+        //            project.IsDelete = 1;
+        //            await dbContext.Updateable<Project>(project).ExecuteCommandAsync();
+        //        }
+        //        else
+        //        {
+        //            project.IsDelete = 0;
+        //            await dbContext.Updateable<Project>(project).ExecuteCommandAsync();
+        //        };
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        await Console.Out.WriteLineAsync($"激活登录用户删除项目出现问题:{ex}");
 
-            }
-            
-        }
+        //    }
+
+        //}
         #endregion
+
+
     }
 }

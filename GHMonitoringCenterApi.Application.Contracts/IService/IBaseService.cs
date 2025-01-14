@@ -355,10 +355,14 @@ namespace GHMonitoringCenterApi.Application.Contracts.IService
         /// <returns></returns>
         Task<ResponseAjaxResult<List<InformationResponseDto>>> GetHomeMenuPermissionUserAsync(BaseRequestDto baseRequestDto);
 
+        /// <summary>
+        /// 搜索所有项目供 分包项目选择时使用
+        /// </summary>
+        /// <param name="baseRequestDto"></param>
+        /// <returns></returns>
 
+        Task<ResponseAjaxResult<List<BasePullDownResponseDto>>> SearchProjectAsync(BaseRequestDto baseRequestDto);
 
-
-
-        Task UpdateProjectAsync();
+        //Task UpdateProjectAsync();
     }
 }
