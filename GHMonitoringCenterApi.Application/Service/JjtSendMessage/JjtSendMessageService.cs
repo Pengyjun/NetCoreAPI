@@ -2866,7 +2866,7 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
             #region 
             //获取项目产值计划表数据
             //var monthPlanRepData = await dbContext.Queryable<CompanyProductionValueInfo>().Where(x => x.IsDelete == 1 && x.CompanyId != "bd840460-1e3a-45c8-abed-6e66903eb465".ToGuid()).ToListAsync();
-            var storeProductionValue=await dbContext.Queryable<DayReportProductionValue>().Where(x => x.IsDelete == 1 && x.DateDay == currentTimeInt).Select(x=>x.ProductionValue).FirstAsync();
+            var storeProductionValueList=await dbContext.Queryable<DayReportProductionValue>().Where(x => x.IsDelete == 1 ).ToListAsync();
             var monthPlanRepData = await dbContext.Queryable<CompanyProductionValueInfo>().Where(x => x.IsDelete == 1 ).ToListAsync();
             //获取项目日报产值数据
             var dayRepData = await dbContext.Queryable<DayReport>().Where(t => t.IsDelete == 1).ToListAsync();
@@ -2897,13 +2897,14 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
                 //var dayActualProductionAmount = dayProductionValueList.Where(x => x.DateDay == (currentNowTimeInt - 1)).Sum(x => x.DayActualProductionAmount);
                 var dayActualProductionAmount = dayRepData.Where(x => x.DateDay == currentNowTimeInt).Sum(x => x.DayActualProductionAmount);
                 var dayPlanProAmount = GetProjectPlanAmount(monthPlanRepData, yearInt, monthInt);
+                var storeProductionValue = storeProductionValueList.Where(x => x.DateDay == currentNowTimeInt).Select(x => x.ProductionValue).FirstOrDefault();
                 var yCompleteValue = Math.Round(dayActualProductionAmount / 100000000M, 2);
 
                 eachCompanyProductionValues.Add(new EachCompanyProductionValue()
                 {
                     XAxle = currentNowTimeInt.ToString().Substring(0, 4) + "-" + currentNowTimeInt.ToString().Substring(4, 2) + "-" + currentNowTimeInt.ToString().Substring(6, 2),
                     YAxlePlanValue = Math.Round(dayPlanProAmount / difDays / 100000000M, 2),
-                    YAxleCompleteValue = (0.25M - yCompleteValue > 0) ? storeProductionValue : yCompleteValue,
+                    YAxleCompleteValue = storeProductionValue.HasValue? ((0.25M - yCompleteValue > 0) ? storeProductionValue : yCompleteValue): yCompleteValue
                     //YAxlePlanValue = Math.Round((GetProductionValueInfo(monthInt, companyProductionList).Sum(x => x.PlanProductionValue) / 300000M), 2),
                     //YAxleCompleteValue = Math.Round(dayActualProductionAmount / 100000000M, 2)
                 }) ;
