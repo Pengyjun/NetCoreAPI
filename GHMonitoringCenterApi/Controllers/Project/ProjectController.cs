@@ -385,7 +385,16 @@ namespace GHMonitoringCenterApi.Controllers.Project
         }
 
         #region 修改月报开累数据   开口子更改
-     
+        /// <summary>
+        /// 修改月报开累数据
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        [HttpPost("SaveMonthReportForProjectHistory")]
+        public async Task<ResponseAjaxResult<bool>> SaveMonthReportForProjectHistoryAsync([FromBody] SaveMonthReportForProjectHistoryDto model)
+        {
+            return await _monthReportForProjectService.SaveMonthReportForProjectHistoryAsync(model);
+        }
         #endregion
 
         /// <summary>

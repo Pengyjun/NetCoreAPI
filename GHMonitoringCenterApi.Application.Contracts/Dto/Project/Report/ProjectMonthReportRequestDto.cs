@@ -51,4 +51,64 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project
         }
 
     }
+    /// <summary>
+    /// 修改开累数
+    /// </summary>
+    public class SaveMonthReportForProjectHistoryDto
+    {
+        /// <summary>
+        /// 
+        /// </summary>
+        public List<ProjectHistory>? ProjectHistorys { get; set; }
+    }
+    /// <summary>
+    /// 
+    /// </summary>
+    public class ProjectHistory
+    {
+        /// <summary>
+        /// 主键
+        /// </summary>
+        public Guid DetailsId { get; set; }
+        /// <summary>
+        /// 本月外包支出(偏差元)
+        /// </summary>
+        public decimal? DeviationOutAmount { get; set; }
+        /// <summary>
+        /// 本月外包支出(偏差外币)
+        /// </summary>
+        public decimal? CurrencyDeviationOutAmount { get; set; }
+        /// <summary>
+        /// 本月外包支出(实际元)
+        /// </summary>
+        public decimal? ActualOutAmount { get; set; }
+        /// <summary>
+        /// 本月外包支出(实际外币)
+        /// </summary>
+        public decimal? CurrencyActualOutAmount { get; set; }
+        /// <summary>
+        /// 本月完成工程量(方)(偏差)
+        /// </summary>
+        public decimal? DeviationCompQuantity { get; set; }
+        /// <summary>
+        /// 本月完成工程量(方)(实际)
+        /// </summary>
+        public decimal? ActualCompQuantity { get; set; }
+        /// <summary>
+        /// 本月完成产值(偏差元)
+        /// </summary>
+        public decimal? DeviationCompAmount { get; set; }
+        /// <summary>
+        /// 本月完成产值(偏差外币)
+        /// </summary>
+        public decimal? CurrencyDeviationCompAmount { get; set; }
+        /// <summary>
+        /// 本月完成产值(实际元)
+        /// </summary>
+        public decimal? ActualCompAmount { get; set; }
+        /// <summary>
+        /// 本月完成产值(实际外币)
+        /// </summary>
+        public decimal? CurrencyActualCompAmount { get; set; }
+    }
 }
