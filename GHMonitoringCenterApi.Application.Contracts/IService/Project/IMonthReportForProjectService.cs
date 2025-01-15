@@ -22,6 +22,10 @@ namespace GHMonitoringCenterApi.Application.Contracts.IService.Project
         /// <param name="model"></param>
         /// <returns></returns>
         Task<ResponseAjaxResult<bool>> SaveMonthReportForProjectHistoryAsync(SaveMonthReportForProjectHistoryDto model);
-
+        /// <summary>
+        /// 启用 保存修改月报开累数据按钮  true 启用
+        /// </summary>
+        /// <returns></returns>
+        Task<ResponseAjaxResult<bool>> EnableSaveMonthRepHistoryBtnAsync();
     }
 }

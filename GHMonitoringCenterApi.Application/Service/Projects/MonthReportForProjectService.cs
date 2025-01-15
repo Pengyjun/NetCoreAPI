@@ -209,6 +209,17 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 report.TotalCompleteProductionAmount = klReportList.Where(x => x.ProjectId == report.ProjectId && report.ShipId == x.ShipId && x.ProjectWBSId == wbsId && x.UnitPrice == report.UnitPrice).Sum(x => x.TotalCompleteProductionAmount);
                 report.TotalCompletedQuantity = klReportList.Where(x => x.ProjectId == report.ProjectId && report.ShipId == x.ShipId && x.ProjectWBSId == wbsId && x.UnitPrice == report.UnitPrice).Sum(x => x.TotalCompletedQuantity);
                 report.TotalOutsourcingExpensesAmount = klReportList.Where(x => x.ProjectId == report.ProjectId && report.ShipId == x.ShipId && x.ProjectWBSId == wbsId && x.UnitPrice == report.UnitPrice).Sum(x => x.TotalOutsourcingExpensesAmount);
+
+                report.DeviationOutAmount = klReportList.Where(x => x.ProjectId == report.ProjectId && report.ShipId == x.ShipId && x.ProjectWBSId == wbsId && x.UnitPrice == report.UnitPrice).Sum(x => x.DeviationOutAmount);
+                report.ActualOutAmount = klReportList.Where(x => x.ProjectId == report.ProjectId && report.ShipId == x.ShipId && x.ProjectWBSId == wbsId && x.UnitPrice == report.UnitPrice).Sum(x => x.ActualOutAmount);
+                if (report.ActualOutAmount == 0M) report.ActualOutAmount = report.TotalOutsourcingExpensesAmount;
+                report.DeviationCompQuantity = klReportList.Where(x => x.ProjectId == report.ProjectId && report.ShipId == x.ShipId && x.ProjectWBSId == wbsId && x.UnitPrice == report.UnitPrice).Sum(x => x.DeviationCompQuantity);
+                report.ActualCompQuantity = klReportList.Where(x => x.ProjectId == report.ProjectId && report.ShipId == x.ShipId && x.ProjectWBSId == wbsId && x.UnitPrice == report.UnitPrice).Sum(x => x.ActualCompQuantity);
+                if (report.ActualCompQuantity == 0M) report.ActualCompQuantity = report.TotalCompletedQuantity;
+                report.DeviationCompAmount = klReportList.Where(x => x.ProjectId == report.ProjectId && report.ShipId == x.ShipId && x.ProjectWBSId == wbsId && x.UnitPrice == report.UnitPrice).Sum(x => x.DeviationCompAmount);
+                report.ActualCompAmount = klReportList.Where(x => x.ProjectId == report.ProjectId && report.ShipId == x.ShipId && x.ProjectWBSId == wbsId && x.UnitPrice == report.UnitPrice).Sum(x => x.ActualCompAmount);
+                if (report.ActualCompAmount == 0) report.ActualCompAmount = report.TotalCompleteProductionAmount;
+
                 /***
                  * 基本信息处理
                  */
@@ -273,7 +284,13 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                        ValueType = ValueEnumType.AccumulatedCommencement,
                        Remark = p.Remark,
                        DetailId = p.Id,
-                       CompleteProductionAmount = p.UnitPrice * p.CompletedQuantity //p.CompleteProductionAmount  外币|人民币
+                       CompleteProductionAmount = p.UnitPrice * p.CompletedQuantity, //p.CompleteProductionAmount  外币|人民币
+                       ActualCompAmount = p.ActualCompAmount,
+                       ActualCompQuantity = p.ActualCompQuantity,
+                       ActualOutAmount = p.ActualOutAmount,
+                       DeviationOutAmount = p.DeviationOutAmount,
+                       DeviationCompAmount = p.DeviationCompAmount,
+                       DeviationCompQuantity = p.DeviationCompQuantity
                    })
                    .ToListAsync();
 
@@ -630,27 +647,21 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                         }
                         else
                         {
-                            //计算2024修复的开累值 
-                            model.TotalCompleteProductionAmount = calculatePWBS.Where(t => t.ProjectId == item.Key.ProjectId && t.ShipId == item.Key.ShipId && t.UnitPrice == item.Key.UnitPrice && t.ProjectWBSId == item.Key.ProjectWBSId).Sum(x => Convert.ToDecimal(x.ActualCompAmount)) + dayRepYearAmount;
+                            //计算202412修复的开累值 
+                            var amount = calculatePWBS.Where(t => t.ProjectId == item.Key.ProjectId && t.ShipId == item.Key.ShipId && t.UnitPrice == item.Key.UnitPrice && t.ProjectWBSId == item.Key.ProjectWBSId).Sum(x => Convert.ToDecimal(x.ActualCompAmount));
+                            var quantity = calculatePWBS.Where(t => t.ProjectId == item.Key.ProjectId && t.ShipId == item.Key.ShipId && t.UnitPrice == item.Key.UnitPrice && t.ProjectWBSId == item.Key.ProjectWBSId).Sum(x => Convert.ToDecimal(x.ActualCompQuantity));
+                            var outAmount = calculatePWBS.Where(t => t.ProjectId == item.Key.ProjectId && t.ShipId == item.Key.ShipId && t.UnitPrice == item.Key.UnitPrice && t.ProjectWBSId == item.Key.ProjectWBSId).Sum(x => Convert.ToDecimal(x.ActualOutAmount));
 
-                            model.TotalCompletedQuantity = calculatePWBS.Where(t => t.ProjectId == item.Key.ProjectId && t.ShipId == item.Key.ShipId && t.UnitPrice == item.Key.UnitPrice && t.ProjectWBSId == item.Key.ProjectWBSId).Sum(x => Convert.ToDecimal(x.ActualCompQuantity)) + dayRepYearQuantity;
-
-                            model.TotalOutsourcingExpensesAmount = calculatePWBS.Where(t => t.ProjectId == item.Key.ProjectId && t.ShipId == item.Key.ShipId && t.UnitPrice == item.Key.UnitPrice && t.ProjectWBSId == item.Key.ProjectWBSId).Sum(x => Convert.ToDecimal(x.ActualOutAmount)) + dayRepYearOut;
-
-                            model.DeviationOutAmount = calculatePWBS.Where(t => t.ProjectId == item.Key.ProjectId && t.ShipId == item.Key.ShipId && t.UnitPrice == item.Key.UnitPrice && t.ProjectWBSId == item.Key.ProjectWBSId).Sum(x => Convert.ToDecimal(x.DeviationOutAmount)) + dayRepYearOut;
-                            model.CurrencyDeviationOutAmount = calculatePWBS.Where(t => t.ProjectId == item.Key.ProjectId && t.ShipId == item.Key.ShipId && t.UnitPrice == item.Key.UnitPrice && t.ProjectWBSId == item.Key.ProjectWBSId).Sum(x => Convert.ToDecimal(x.CurrencyDeviationOutAmount)) + dayRepYearOut;
-                            model.CurrencyActualOutAmount = calculatePWBS.Where(t => t.ProjectId == item.Key.ProjectId && t.ShipId == item.Key.ShipId && t.UnitPrice == item.Key.UnitPrice && t.ProjectWBSId == item.Key.ProjectWBSId).Sum(x => Convert.ToDecimal(x.CurrencyActualOutAmount)) + dayRepYearOut;
-                            model.DeviationCompQuantity = calculatePWBS.Where(t => t.ProjectId == item.Key.ProjectId && t.ShipId == item.Key.ShipId && t.UnitPrice == item.Key.UnitPrice && t.ProjectWBSId == item.Key.ProjectWBSId).Sum(x => Convert.ToDecimal(x.DeviationCompQuantity)) + dayRepYearOut;
-                            model.DeviationCompAmount = calculatePWBS.Where(t => t.ProjectId == item.Key.ProjectId && t.ShipId == item.Key.ShipId && t.UnitPrice == item.Key.UnitPrice && t.ProjectWBSId == item.Key.ProjectWBSId).Sum(x => Convert.ToDecimal(x.DeviationCompAmount)) + dayRepYearOut;
-                            model.CurrencyDeviationCompAmount = calculatePWBS.Where(t => t.ProjectId == item.Key.ProjectId && t.ShipId == item.Key.ShipId && t.UnitPrice == item.Key.UnitPrice && t.ProjectWBSId == item.Key.ProjectWBSId).Sum(x => Convert.ToDecimal(x.CurrencyDeviationCompAmount)) + dayRepYearOut;
-                            model.CurrencyActualCompAmount = calculatePWBS.Where(t => t.ProjectId == item.Key.ProjectId && t.ShipId == item.Key.ShipId && t.UnitPrice == item.Key.UnitPrice && t.ProjectWBSId == item.Key.ProjectWBSId).Sum(x => Convert.ToDecimal(x.CurrencyActualCompAmount)) + dayRepYearOut;
+                            //model.DeviationOutAmount = calculatePWBS.Where(t => t.ProjectId == item.Key.ProjectId && t.ShipId == item.Key.ShipId && t.UnitPrice == item.Key.UnitPrice && t.ProjectWBSId == item.Key.ProjectWBSId).Sum(x => Convert.ToDecimal(x.DeviationOutAmount));
+                            //model.DeviationCompQuantity = calculatePWBS.Where(t => t.ProjectId == item.Key.ProjectId && t.ShipId == item.Key.ShipId && t.UnitPrice == item.Key.UnitPrice && t.ProjectWBSId == item.Key.ProjectWBSId).Sum(x => Convert.ToDecimal(x.DeviationCompQuantity));
+                            //model.DeviationCompAmount = calculatePWBS.Where(t => t.ProjectId == item.Key.ProjectId && t.ShipId == item.Key.ShipId && t.UnitPrice == item.Key.UnitPrice && t.ProjectWBSId == item.Key.ProjectWBSId).Sum(x => Convert.ToDecimal(x.DeviationCompAmount));
 
                             // + 之后月的累计月
-                            model.TotalCompleteProductionAmount += calculatePWBS.Where(t => t.DateMonth > 202412 && t.ProjectId == item.Key.ProjectId && t.ShipId == item.Key.ShipId && t.UnitPrice == item.Key.UnitPrice && t.ProjectWBSId == item.Key.ProjectWBSId).Sum(x => x.CompleteProductionAmount) + dayRepYearAmount;
+                            model.TotalCompleteProductionAmount = amount + calculatePWBS.Where(t => t.DateMonth > 202412 && t.ProjectId == item.Key.ProjectId && t.ShipId == item.Key.ShipId && t.UnitPrice == item.Key.UnitPrice && t.ProjectWBSId == item.Key.ProjectWBSId).Sum(x => x.CompleteProductionAmount) + dayRepYearAmount;
 
-                            model.TotalCompletedQuantity += calculatePWBS.Where(t => t.DateMonth > 202412 && t.ProjectId == item.Key.ProjectId && t.ShipId == item.Key.ShipId && t.UnitPrice == item.Key.UnitPrice && t.ProjectWBSId == item.Key.ProjectWBSId).Sum(x => x.CompletedQuantity) + dayRepYearQuantity;
+                            model.TotalCompletedQuantity = quantity + calculatePWBS.Where(t => t.DateMonth > 202412 && t.ProjectId == item.Key.ProjectId && t.ShipId == item.Key.ShipId && t.UnitPrice == item.Key.UnitPrice && t.ProjectWBSId == item.Key.ProjectWBSId).Sum(x => x.CompletedQuantity) + dayRepYearQuantity;
 
-                            model.TotalOutsourcingExpensesAmount += calculatePWBS.Where(t => t.DateMonth > 202412 && t.ProjectId == item.Key.ProjectId && t.ShipId == item.Key.ShipId && t.UnitPrice == item.Key.UnitPrice && t.ProjectWBSId == item.Key.ProjectWBSId).Sum(x => x.OutsourcingExpensesAmount) + dayRepYearOut;
+                            model.TotalOutsourcingExpensesAmount = outAmount + calculatePWBS.Where(t => t.DateMonth > 202412 && t.ProjectId == item.Key.ProjectId && t.ShipId == item.Key.ShipId && t.UnitPrice == item.Key.UnitPrice && t.ProjectWBSId == item.Key.ProjectWBSId).Sum(x => x.OutsourcingExpensesAmount) + dayRepYearOut;
                         }
 
                         calPwbs.Add(model);
@@ -945,13 +956,23 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             #region 追加历史的外包支出、工程量
             var his = mpData.FirstOrDefault(x => x.DateMonth == 202306);
 
-            if (his != null && dateMonth <= 202412)
+            if (his != null)
             {
-                result.HOutValue = his.OutsourcingExpensesAmount;
-                result.HQuantity = his.CompletedQuantity;
-                result.HValue = his.CompleteProductionAmount;
-                result.CurrencyHValue = his.CurrencyCompleteProductionAmount;
-                result.CurrencyOutHValue = his.CurrencyOutsourcingExpensesAmount;
+                if (dateMonth <= 202412)
+                {
+                    result.HOutValue = his.OutsourcingExpensesAmount;
+                    result.HQuantity = his.CompletedQuantity;
+                    result.HValue = his.CompleteProductionAmount;
+                    result.CurrencyHValue = his.CurrencyCompleteProductionAmount;
+                    result.CurrencyOutHValue = his.CurrencyOutsourcingExpensesAmount;
+                }
+                //top 根节点202306历史数据置顶  不可编辑
+                result.TopTitleName = "旧系统开累数据（2023年7月前）";
+                result.TopHOutValue = his.OutsourcingExpensesAmount;
+                result.TopCurrencyHOutValue = his.CurrencyOutsourcingExpensesAmount;
+                result.TopHQuantity = his.CompletedQuantity;
+                result.TopHValue = his.CompleteProductionAmount;
+                result.TopCurrencyHValue = his.CurrencyCompleteProductionAmount;
             }
             #endregion
 
@@ -1404,15 +1425,11 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     if (f != null)
                     {
                         f.DeviationOutAmount = item.DeviationOutAmount;
-                        f.CurrencyDeviationOutAmount = item.CurrencyDeviationOutAmount;
                         f.ActualOutAmount = item.ActualOutAmount;
-                        f.CurrencyActualOutAmount = item.CurrencyActualOutAmount;
                         f.DeviationCompQuantity = item.DeviationCompQuantity;
                         f.ActualCompQuantity = item.ActualCompQuantity;
                         f.DeviationCompAmount = item.DeviationCompAmount;
-                        f.CurrencyDeviationCompAmount = item.CurrencyDeviationCompAmount;
                         f.ActualCompAmount = item.ActualCompAmount;
-                        f.CurrencyActualCompAmount = item.CurrencyActualCompAmount;
                         rs.Add(f);
                     }
                 }
@@ -1421,15 +1438,11 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     await _dbContext.Updateable(rs).UpdateColumns(x => new
                     {
                         x.DeviationOutAmount,
-                        x.CurrencyDeviationOutAmount,
                         x.ActualOutAmount,
-                        x.CurrencyActualOutAmount,
                         x.DeviationCompQuantity,
                         x.ActualCompQuantity,
                         x.DeviationCompAmount,
-                        x.CurrencyDeviationCompAmount,
                         x.ActualCompAmount,
-                        x.CurrencyActualCompAmount,
                     })
                     .ExecuteCommandAsync();
                 }
@@ -1437,6 +1450,36 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             }
             else rt.FailResult(HttpStatusCode.UpdateFail, "更新失败");
             return rt;
+        }
+        /// <summary>
+        /// 启用 保存修改月报开累数据按钮  true 启用
+        /// </summary>
+        /// <returns></returns>
+        public async Task<ResponseAjaxResult<bool>> EnableSaveMonthRepHistoryBtnAsync()
+        {
+            ResponseAjaxResult<bool> rt = new();
+            bool enableBtn = false;
+
+            var rr = await _dbContext.Queryable<MonRepHistoryMdConfig>().FirstAsync(t => t.IsDelete == 1 && t.Enable == true);
+            if (_currentUser.CurrentLoginIsAdmin) { enableBtn = true; return rt.SuccessResult(enableBtn); }
+            if (rr != null)
+            {
+                //获取限制时间
+                if (rr.StartTime <= DateTime.Now && DateTime.Now <= rr.EndTime)
+                {
+                    if (rr.UserId == "*")//所有用户
+                        enableBtn = true;
+                    else
+                    {
+                        var uIds = rr.UserId?.Split(',')
+                        .Select(id => string.IsNullOrEmpty(id) ? (Guid?)null : (Guid?)Guid.Parse(id))
+                        .ToList();
+                        if (uIds.Contains(_currentUser.Id)) enableBtn = true;
+                    }
+                }
+            }
+            else rt.SuccessResult(enableBtn);
+            return rt.SuccessResult(enableBtn);
         }
     }
 }
