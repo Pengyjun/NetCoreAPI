@@ -85,6 +85,57 @@ namespace GHMonitoringCenterApi.Domain.Models
         /// </summary>
         [SugarColumn(ColumnDataType = "decimal(20,8)")]
         public decimal CompleteProductionAmount { get; set; }
+
+        /// <summary>
+        /// 本月外包支出(偏差本币)
+        /// </summary>
+        [SugarColumn(ColumnDataType = "decimal(20,8)")]
+        public decimal? DeviationOutAmount { get; set; }
+        ///// <summary>
+        ///// 本月外包支出(偏差外币)
+        ///// </summary>
+        //[SugarColumn(ColumnDataType = "decimal(20,8)")]
+        //public decimal? CurrencyDeviationOutAmount { get; set; }
+        /// <summary>
+        /// 本月外包支出(实际本币)
+        /// </summary>
+        [SugarColumn(ColumnDataType = "decimal(20,8)")]
+        public decimal? ActualOutAmount { get; set; }
+        ///// <summary>
+        ///// 本月外包支出(实际外币)
+        ///// </summary>
+        //[SugarColumn(ColumnDataType = "decimal(20,8)")]
+        //public decimal? CurrencyActualOutAmount { get; set; }
+        /// <summary>
+        /// 本月完成工程量(方)(偏差)
+        /// </summary>
+        [SugarColumn(ColumnDataType = "decimal(20,8)")]
+        public decimal? DeviationCompQuantity { get; set; }
+        /// <summary>
+        /// 本月完成工程量(方)(实际)
+        /// </summary>
+        [SugarColumn(ColumnDataType = "decimal(20,8)")]
+        public decimal? ActualCompQuantity { get; set; }
+        /// <summary>
+        /// 本月完成产值(偏差本币)
+        /// </summary>
+        [SugarColumn(ColumnDataType = "decimal(20,8)")]
+        public decimal? DeviationCompAmount { get; set; }
+        ///// <summary>
+        ///// 本月完成产值(偏差外币)
+        ///// </summary>
+        //[SugarColumn(ColumnDataType = "decimal(20,8)")]
+        //public decimal? CurrencyDeviationCompAmount { get; set; }
+        /// <summary>
+        /// 本月完成产值(实际本币)
+        /// </summary>
+        [SugarColumn(ColumnDataType = "decimal(20,8)")]
+        public decimal? ActualCompAmount { get; set; }
+        ///// <summary>
+        ///// 本月完成产值(实际外币)
+        ///// </summary>
+        //[SugarColumn(ColumnDataType = "decimal(20,8)")]
+        //public decimal? CurrencyActualCompAmount { get; set; }
         /// <summary>
         /// 备注
         /// </summary>
