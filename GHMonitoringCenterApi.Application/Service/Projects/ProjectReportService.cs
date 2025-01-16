@@ -395,13 +395,13 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 return result.FailResult(HttpStatusCode.NotAllowChange, ResponseMessage.NOTALLOW_CHANGE_DAYREPORT);
             }
 
-            var subShipIdS = model.Construction.DayReportConstructions.Where(x => x.OutPutType == ConstructionOutPutType.SubPackage).Select(x => x.SubShipId).ToList();
-            var count1 = await _dbContext.Queryable<DealingUnit>().Where(x => subShipIdS.Contains(x.PomId)).CountAsync();
-            var count2 = await _dbContext.Queryable<SubShip>().Where(x => subShipIdS.Contains(x.PomId)).CountAsync();
-            if (subShipIdS.Count != count1 + count2)
-            {
-                return result.FailResult(HttpStatusCode.SaveFail, "数据存在有误请稍候再试");
-            }
+            //var subShipIdS = model.Construction.DayReportConstructions.Where(x => x.OutPutType == ConstructionOutPutType.SubPackage).Select(x => x.SubShipId).ToList();
+            //var count1 = await _dbContext.Queryable<DealingUnit>().Where(x => subShipIdS.Contains(x.PomId)).CountAsync();
+            //var count2 = await _dbContext.Queryable<SubShip>().Where(x => subShipIdS.Contains(x.PomId)).CountAsync();
+            //if (subShipIdS.Count != count1 + count2)
+            //{
+            //    return result.FailResult(HttpStatusCode.SaveFail, "数据存在有误请稍候再试");
+            //}
 
 
             // 是否是新增的日报
