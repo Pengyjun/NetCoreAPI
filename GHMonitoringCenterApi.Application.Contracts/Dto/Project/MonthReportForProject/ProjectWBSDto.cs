@@ -183,7 +183,7 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project.MonthReportFor
         /// 本月完成产值(偏差)
         /// </summary>
         public decimal? DeviationCompAmount { get; set; } = 0;
-        ///// <summary>
+        /////// <summary>
         ///// 本月完成产值(偏差外币)
         ///// </summary>
         //public decimal? CurrencyDeviationCompAmount { get; set; } = 0;
