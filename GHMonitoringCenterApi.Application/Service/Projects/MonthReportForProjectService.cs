@@ -68,7 +68,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
         /// <param name="stagingList">暂存的数据</param>
         /// <param name="dayRep">读取日报数据作为估算值</param>
         /// <returns></returns>
-        private async Task<List<ProjectWBSDto>> WBSConvertTree(Guid projectId, int? dateMonth, List<MonthReportForProjectBaseDataResponseDto> bData, bool isStaging, List<ProjectWBSDto> stagingList, bool dayRep, bool IsExistZcAndMp)
+        private async Task<List<ProjectWBSDto>> WBSConvertTree(Guid projectId, int? dateMonth, List<MonthReportForProjectBaseDataResponseDto> bData, bool isStaging, List<ProjectWBSDto> stagingList, bool dayRep, bool IsExistZcAndMp, bool exhaustedBtn)
         {
             /***
              * 1.获取请求数据
@@ -78,7 +78,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
              * 5.获取WBS数据
              * 6.获取基础数据(施工性质、产值属性、资源)
              */
-            var requestList = await GetWBSDataAsync(projectId, dateMonth, dayRep, IsExistZcAndMp);
+            var requestList = await GetWBSDataAsync(projectId, dateMonth, dayRep, IsExistZcAndMp, exhaustedBtn);
             var mReportList = requestList.Where(x => x.ValueType == ValueEnumType.NowMonth).OrderBy(x => x.DateMonth).ToList();
             var yReportList = requestList.Where(x => x.ValueType == ValueEnumType.NowYear).OrderBy(x => x.DateMonth).ToList();
             var klReportList = requestList.Where(x => x.ValueType == ValueEnumType.AccumulatedCommencement).OrderBy(x => x.DateMonth).ToList();
@@ -210,13 +210,10 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 report.TotalCompletedQuantity = klReportList.Where(x => x.ProjectId == report.ProjectId && report.ShipId == x.ShipId && x.ProjectWBSId == wbsId && x.UnitPrice == report.UnitPrice).Sum(x => x.TotalCompletedQuantity);
                 report.TotalOutsourcingExpensesAmount = klReportList.Where(x => x.ProjectId == report.ProjectId && report.ShipId == x.ShipId && x.ProjectWBSId == wbsId && x.UnitPrice == report.UnitPrice).Sum(x => x.TotalOutsourcingExpensesAmount);
 
-                report.DeviationOutAmount = klReportList.Where(x => x.ProjectId == report.ProjectId && report.ShipId == x.ShipId && x.ProjectWBSId == wbsId && x.UnitPrice == report.UnitPrice).Sum(x => x.DeviationOutAmount);
                 report.ActualOutAmount = klReportList.Where(x => x.ProjectId == report.ProjectId && report.ShipId == x.ShipId && x.ProjectWBSId == wbsId && x.UnitPrice == report.UnitPrice).Sum(x => x.ActualOutAmount);
                 if (report.ActualOutAmount == 0M) report.ActualOutAmount = report.TotalOutsourcingExpensesAmount;
-                report.DeviationCompQuantity = klReportList.Where(x => x.ProjectId == report.ProjectId && report.ShipId == x.ShipId && x.ProjectWBSId == wbsId && x.UnitPrice == report.UnitPrice).Sum(x => x.DeviationCompQuantity);
                 report.ActualCompQuantity = klReportList.Where(x => x.ProjectId == report.ProjectId && report.ShipId == x.ShipId && x.ProjectWBSId == wbsId && x.UnitPrice == report.UnitPrice).Sum(x => x.ActualCompQuantity);
                 if (report.ActualCompQuantity == 0M) report.ActualCompQuantity = report.TotalCompletedQuantity;
-                report.DeviationCompAmount = klReportList.Where(x => x.ProjectId == report.ProjectId && report.ShipId == x.ShipId && x.ProjectWBSId == wbsId && x.UnitPrice == report.UnitPrice).Sum(x => x.DeviationCompAmount);
                 report.ActualCompAmount = klReportList.Where(x => x.ProjectId == report.ProjectId && report.ShipId == x.ShipId && x.ProjectWBSId == wbsId && x.UnitPrice == report.UnitPrice).Sum(x => x.ActualCompAmount);
                 if (report.ActualCompAmount == 0) report.ActualCompAmount = report.TotalCompleteProductionAmount;
 
@@ -240,7 +237,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
         /// <param name="dateMonth">填报日期</param>
         /// <param name="dayRep">填报日期</param>
         /// <returns></returns>
-        private async Task<List<ProjectWBSDto>> GetWBSDataAsync(Guid pId, int? dateMonth, bool dayRep, bool IsExistZcAndMp)
+        private async Task<List<ProjectWBSDto>> GetWBSDataAsync(Guid pId, int? dateMonth, bool dayRep, bool IsExistZcAndMp, bool exhaustedBtn)
         {
             var pWBS = new List<ProjectWBSDto>();
             var calculatePWBS = new List<ProjectWBSDto>();
@@ -288,9 +285,6 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                        ActualCompAmount = p.ActualCompAmount,
                        ActualCompQuantity = p.ActualCompQuantity,
                        ActualOutAmount = p.ActualOutAmount,
-                       DeviationOutAmount = p.DeviationOutAmount,
-                       DeviationCompAmount = p.DeviationCompAmount,
-                       DeviationCompQuantity = p.DeviationCompQuantity
                    })
                    .ToListAsync();
 
@@ -652,18 +646,24 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                             var quantity = calculatePWBS.Where(t => t.ProjectId == item.Key.ProjectId && t.ShipId == item.Key.ShipId && t.UnitPrice == item.Key.UnitPrice && t.ProjectWBSId == item.Key.ProjectWBSId).Sum(x => Convert.ToDecimal(x.ActualCompQuantity));
                             var outAmount = calculatePWBS.Where(t => t.ProjectId == item.Key.ProjectId && t.ShipId == item.Key.ShipId && t.UnitPrice == item.Key.UnitPrice && t.ProjectWBSId == item.Key.ProjectWBSId).Sum(x => Convert.ToDecimal(x.ActualOutAmount));
 
-                            //model.DeviationOutAmount = calculatePWBS.Where(t => t.ProjectId == item.Key.ProjectId && t.ShipId == item.Key.ShipId && t.UnitPrice == item.Key.UnitPrice && t.ProjectWBSId == item.Key.ProjectWBSId).Sum(x => Convert.ToDecimal(x.DeviationOutAmount));
-                            //model.DeviationCompQuantity = calculatePWBS.Where(t => t.ProjectId == item.Key.ProjectId && t.ShipId == item.Key.ShipId && t.UnitPrice == item.Key.UnitPrice && t.ProjectWBSId == item.Key.ProjectWBSId).Sum(x => Convert.ToDecimal(x.DeviationCompQuantity));
-                            //model.DeviationCompAmount = calculatePWBS.Where(t => t.ProjectId == item.Key.ProjectId && t.ShipId == item.Key.ShipId && t.UnitPrice == item.Key.UnitPrice && t.ProjectWBSId == item.Key.ProjectWBSId).Sum(x => Convert.ToDecimal(x.DeviationCompAmount));
+                            //如果是从开累按钮进入列表
+                            if (exhaustedBtn)
+                            {
+                                //如果修改后的实际值是0 给原值 不加当月日报作为新的累计数
+                                model.TotalCompleteProductionAmount = amount == 0M ? model.TotalCompleteProductionAmount = calculatePWBS.Where(t => t.ProjectId == item.Key.ProjectId && t.ShipId == item.Key.ShipId && t.UnitPrice == item.Key.UnitPrice && t.ProjectWBSId == item.Key.ProjectWBSId).Sum(x => x.CompleteProductionAmount) : amount;
+                                model.TotalCompletedQuantity = quantity == 0M ? calculatePWBS.Where(t => t.ProjectId == item.Key.ProjectId && t.ShipId == item.Key.ShipId && t.UnitPrice == item.Key.UnitPrice && t.ProjectWBSId == item.Key.ProjectWBSId).Sum(x => x.CompletedQuantity) : quantity;
+                                model.TotalOutsourcingExpensesAmount = outAmount == 0M ? calculatePWBS.Where(t => t.ProjectId == item.Key.ProjectId && t.ShipId == item.Key.ShipId && t.UnitPrice == item.Key.UnitPrice && t.ProjectWBSId == item.Key.ProjectWBSId).Sum(x => x.OutsourcingExpensesAmount) : outAmount;
+                            }
+                            else
+                            {
+                                // + 之后月的累计月 + 日报数作为预算累计数
+                                model.TotalCompleteProductionAmount = amount + calculatePWBS.Where(t => t.DateMonth > 202412 && t.ProjectId == item.Key.ProjectId && t.ShipId == item.Key.ShipId && t.UnitPrice == item.Key.UnitPrice && t.ProjectWBSId == item.Key.ProjectWBSId).Sum(x => x.CompleteProductionAmount) + dayRepYearAmount;
 
-                            // + 之后月的累计月
-                            model.TotalCompleteProductionAmount = amount + calculatePWBS.Where(t => t.DateMonth > 202412 && t.ProjectId == item.Key.ProjectId && t.ShipId == item.Key.ShipId && t.UnitPrice == item.Key.UnitPrice && t.ProjectWBSId == item.Key.ProjectWBSId).Sum(x => x.CompleteProductionAmount) + dayRepYearAmount;
+                                model.TotalCompletedQuantity = quantity + calculatePWBS.Where(t => t.DateMonth > 202412 && t.ProjectId == item.Key.ProjectId && t.ShipId == item.Key.ShipId && t.UnitPrice == item.Key.UnitPrice && t.ProjectWBSId == item.Key.ProjectWBSId).Sum(x => x.CompletedQuantity) + dayRepYearQuantity;
 
-                            model.TotalCompletedQuantity = quantity + calculatePWBS.Where(t => t.DateMonth > 202412 && t.ProjectId == item.Key.ProjectId && t.ShipId == item.Key.ShipId && t.UnitPrice == item.Key.UnitPrice && t.ProjectWBSId == item.Key.ProjectWBSId).Sum(x => x.CompletedQuantity) + dayRepYearQuantity;
-
-                            model.TotalOutsourcingExpensesAmount = outAmount + calculatePWBS.Where(t => t.DateMonth > 202412 && t.ProjectId == item.Key.ProjectId && t.ShipId == item.Key.ShipId && t.UnitPrice == item.Key.UnitPrice && t.ProjectWBSId == item.Key.ProjectWBSId).Sum(x => x.OutsourcingExpensesAmount) + dayRepYearOut;
+                                model.TotalOutsourcingExpensesAmount = outAmount + calculatePWBS.Where(t => t.DateMonth > 202412 && t.ProjectId == item.Key.ProjectId && t.ShipId == item.Key.ShipId && t.UnitPrice == item.Key.UnitPrice && t.ProjectWBSId == item.Key.ProjectWBSId).Sum(x => x.OutsourcingExpensesAmount) + dayRepYearOut;
+                            }
                         }
-
                         calPwbs.Add(model);
                     }
                 }
@@ -955,10 +955,11 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
 
             #region 追加历史的外包支出、工程量
             var his = mpData.FirstOrDefault(x => x.DateMonth == 202306);
+            result.TopTitleName = "旧系统开累数据（2023年7月前）";
 
             if (his != null)
             {
-                if (dateMonth <= 202412)
+                if (!model.ExhaustedBtn)
                 {
                     result.HOutValue = his.OutsourcingExpensesAmount;
                     result.HQuantity = his.CompletedQuantity;
@@ -966,8 +967,8 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     result.CurrencyHValue = his.CurrencyCompleteProductionAmount;
                     result.CurrencyOutHValue = his.CurrencyOutsourcingExpensesAmount;
                 }
+
                 //top 根节点202306历史数据置顶  不可编辑
-                result.TopTitleName = "旧系统开累数据（2023年7月前）";
                 result.TopHOutValue = his.OutsourcingExpensesAmount;
                 result.TopCurrencyHOutValue = his.CurrencyOutsourcingExpensesAmount;
                 result.TopHQuantity = his.CompletedQuantity;
@@ -1101,7 +1102,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                                 item.TotalOutsourcingExpensesAmount = item.OutsourcingExpensesAmount;
                             }
                             dayRep = true;
-                            treeDetails = await WBSConvertTree(model.ProjectId, dateMonth, bData, result.IsFromStaging, resList, dayRep, IsExistZcAndMp);
+                            treeDetails = await WBSConvertTree(model.ProjectId, dateMonth, bData, result.IsFromStaging, resList, dayRep, IsExistZcAndMp, model.ExhaustedBtn);
                             //树组合
                             result.TreeDetails = treeDetails;
 
@@ -1132,7 +1133,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             #endregion
 
             //取树
-            treeDetails = await WBSConvertTree(result.ProjectId, dateMonth, bData, result.IsFromStaging, new List<ProjectWBSDto>(), dayRep, IsExistZcAndMp);
+            treeDetails = await WBSConvertTree(result.ProjectId, dateMonth, bData, result.IsFromStaging, new List<ProjectWBSDto>(), dayRep, IsExistZcAndMp, model.ExhaustedBtn);
 
             //树组合
             result.TreeDetails = treeDetails;
@@ -1461,7 +1462,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             bool enableBtn = false;
 
             var rr = await _dbContext.Queryable<MonRepHistoryMdConfig>().FirstAsync(t => t.IsDelete == 1 && t.Enable == true);
-            if (_currentUser.CurrentLoginIsAdmin) { enableBtn = true; return rt; }
+            if (_currentUser.CurrentLoginIsAdmin) { enableBtn = true; return rt.SuccessResult(enableBtn); }
             if (rr != null)
             {
                 //获取限制时间
@@ -1479,7 +1480,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 }
             }
             else rt.SuccessResult(enableBtn);
-            return rt;
+            return rt.SuccessResult(enableBtn);
         }
     }
 }

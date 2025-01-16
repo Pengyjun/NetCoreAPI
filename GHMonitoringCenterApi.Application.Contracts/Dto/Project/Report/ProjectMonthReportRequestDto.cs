@@ -8,6 +8,10 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project
     public class ProjectMonthReportRequestDto : IValidatableObject, IResetModelProperty
     {
         /// <summary>
+        /// 开累数修改列表按钮开放  true是
+        /// </summary>
+        public bool ExhaustedBtn { get; set; } = false;
+        /// <summary>
         /// 项目Id
         /// </summary>
         public Guid ProjectId { get; set; }
