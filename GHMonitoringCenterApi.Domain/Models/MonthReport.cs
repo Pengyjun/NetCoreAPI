@@ -26,13 +26,13 @@ namespace GHMonitoringCenterApi.Domain.Models
         /// 填报年份
         /// </summary>
         [SugarColumn(ColumnDataType = "int")]
-        public int DateYear{ get; set; }
+        public int DateYear { get; set; }
 
         /// <summary>
         /// 本月完成工程量(方)
         /// </summary>
         [SugarColumn(ColumnDataType = "decimal(20,8)")]
-        public decimal  CompletedQuantity{ get; set; }
+        public decimal CompletedQuantity { get; set; }
 
         /// <summary>
         /// 本月完成产值(元)
@@ -62,7 +62,7 @@ namespace GHMonitoringCenterApi.Domain.Models
         /// 月度应收账款(元)
         /// </summary>
         [SugarColumn(ColumnDataType = "decimal(18,2)")]
-        public decimal ReceivableAmount{ get; set; }
+        public decimal ReceivableAmount { get; set; }
 
         /// <summary>
         /// 进度偏差主因
@@ -134,11 +134,16 @@ namespace GHMonitoringCenterApi.Domain.Models
         /// </summary>
         [SugarColumn(ColumnDataType = "decimal(20,8)")]
         public decimal CurrencyCompleteProductionAmount { get; set; }
+        /// <summary>
+        /// 外包支出 (币种：元，美元，欧元等)
+        /// </summary>
+        [SugarColumn(ColumnDataType = "decimal(20,8)")]
+        public decimal CurrencyOutsourcingExpensesAmount { get; set; } = 0;
 
         /// <summary>
         /// 币种汇率
         /// </summary>
-        [SugarColumn(ColumnDataType = "decimal(18,4)",DefaultValue ="1")]
+        [SugarColumn(ColumnDataType = "decimal(18,4)", DefaultValue = "1")]
         public decimal CurrencyExchangeRate { get; set; }
 
         /// <summary>

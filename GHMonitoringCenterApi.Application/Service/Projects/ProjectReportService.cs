@@ -395,13 +395,13 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 return result.FailResult(HttpStatusCode.NotAllowChange, ResponseMessage.NOTALLOW_CHANGE_DAYREPORT);
             }
 
-            var subShipIdS= model.Construction.DayReportConstructions.Where(x=>x.OutPutType== ConstructionOutPutType.SubPackage).Select(x => x.SubShipId).ToList();
-           var count1=await _dbContext.Queryable<DealingUnit>().Where(x => subShipIdS.Contains(x.PomId)).CountAsync();
-           var count2= await _dbContext.Queryable<SubShip>().Where(x => subShipIdS.Contains(x.PomId)).CountAsync();
-            if (subShipIdS.Count != count1 + count2)
-            {
-                return result.FailResult(HttpStatusCode.SaveFail, "数据存在有误请稍候再试");
-            }
+            //var subShipIdS = model.Construction.DayReportConstructions.Where(x => x.OutPutType == ConstructionOutPutType.SubPackage).Select(x => x.SubShipId).ToList();
+            //var count1 = await _dbContext.Queryable<DealingUnit>().Where(x => subShipIdS.Contains(x.PomId)).CountAsync();
+            //var count2 = await _dbContext.Queryable<SubShip>().Where(x => subShipIdS.Contains(x.PomId)).CountAsync();
+            //if (subShipIdS.Count != count1 + count2)
+            //{
+            //    return result.FailResult(HttpStatusCode.SaveFail, "数据存在有误请稍候再试");
+            //}
 
 
             // 是否是新增的日报
@@ -559,8 +559,12 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             var result = new ResponseAjaxResult<ProjectDayReportResponseDto>();
             var now = DateTime.Now;
             int dateDay = model.DateDay ?? now.AddDays(-1).ToDateDay();
-            var holidayConfig = await _dbContext.Queryable<HolidayConfig>().Where(x => x.IsDelete == 1).FirstAsync();
-
+            var holidayConfig = await _dbContext.Queryable<HolidayConfig>().Where(x => x.IsDelete == 1 && x.DateDay == dateDay).FirstAsync();
+            if (holidayConfig == null)
+            {
+                holidayConfig = new HolidayConfig();
+                holidayConfig.IsHoliday = 0;
+            }
             //上一天日期
             int lastDateDay = 0;
             if (ConvertHelper.TryConvertDateTimeFromDateDay(dateDay, out DateTime dayTime))
@@ -3268,21 +3272,21 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             return new MonthReportForProjectConvert
             {
                 //年度
-                YearAccomplishQuantities = Math.Round(yearMonthReportList.Sum(x => x.CompletedQuantity)),
-                YearAccomplishCost = Math.Round(mMonthReport.Sum(x => x.CostAmount)),
-                YearAccomplishValue = Math.Round(isConvert == true ? yearMonthReportList.Sum(x => x.CompleteProductionAmount) : yearMonthReportList.Sum(x => x.UnitPrice * x.CompletedQuantity)),
-                YearPaymentAmount = Math.Round(mMonthReport.Sum(x => x.PartyAPayAmount)),
-                YearRecognizedValue = Math.Round(mMonthReport.Sum(x => x.PartyAConfirmedProductionAmount)),
-                YearProjectedCost = Math.Round(mMonthReport.Sum(x => x.MonthEstimateCostAmount)),
-                YearOutsourcingExpensesAmount = Math.Round(mMonthReport.Sum(x => x.OutsourcingExpensesAmount)),
+                YearAccomplishQuantities = yearMonthReportList.Sum(x => x.CompletedQuantity),
+                YearAccomplishCost = mMonthReport.Sum(x => x.CostAmount),
+                YearAccomplishValue = isConvert == true ? yearMonthReportList.Sum(x => x.CompleteProductionAmount) : yearMonthReportList.Sum(x => x.UnitPrice * x.CompletedQuantity),
+                YearPaymentAmount = mMonthReport.Sum(x => x.PartyAPayAmount),
+                YearRecognizedValue = mMonthReport.Sum(x => x.PartyAConfirmedProductionAmount),
+                YearProjectedCost = mMonthReport.Sum(x => x.MonthEstimateCostAmount),
+                YearOutsourcingExpensesAmount = mMonthReport.Sum(x => x.OutsourcingExpensesAmount),
 
                 //累计
-                AccumulativeQuantities = Math.Round(cumMonthReportList.Sum(x => x.CompletedQuantity)),
-                CumulativeAccomplishCost = Math.Round(cumMonthReport.Sum(x => x.CostAmount)),
-                CumulativeCompleted = Math.Round(isConvert == true ? cumMonthReportList.Sum(x => x.CompleteProductionAmount) : cumMonthReportList.Sum(x => x.UnitPrice * x.CompletedQuantity)),
-                CumulativeOutsourcingExpensesAmount = Math.Round(cumMonthReport.Sum(x => x.OutsourcingExpensesAmount)),
-                CumulativePaymentAmount = Math.Round(cumMonthReport.Sum(x => x.PartyAPayAmount)),
-                CumulativeValue = Math.Round(cumMonthReport.Sum(x => x.PartyAConfirmedProductionAmount))
+                AccumulativeQuantities = cumMonthReportList.Sum(x => x.CompletedQuantity),
+                CumulativeAccomplishCost = cumMonthReport.Sum(x => x.CostAmount),
+                CumulativeCompleted = isConvert == true ? cumMonthReportList.Sum(x => x.CompleteProductionAmount) : cumMonthReportList.Sum(x => x.UnitPrice * x.CompletedQuantity),
+                CumulativeOutsourcingExpensesAmount = cumMonthReport.Sum(x => x.OutsourcingExpensesAmount),
+                CumulativePaymentAmount = cumMonthReport.Sum(x => x.PartyAPayAmount),
+                CumulativeValue = cumMonthReport.Sum(x => x.PartyAConfirmedProductionAmount)
             };
         }
         /// <summary>
@@ -3880,15 +3884,15 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             }
             else
             {
-                await _dbMonthReport.AsUpdateable(monthReport).EnableDiffLogEvent(NewLogInfo(EntityType.MonthReport, monthReport.Id, modelState)).ExecuteCommandAsync();
+                await _dbMonthReport.AsUpdateable(monthReport).IgnoreColumns(x => new { x.IsDelete }).EnableDiffLogEvent(NewLogInfo(EntityType.MonthReport, monthReport.Id, modelState)).ExecuteCommandAsync();
             }
             if (deleteDetails.Any())
             {
-                await _dbMonthReportDetail.AsUpdateable(deleteDetails).EnableDiffLogEvent(NewLogInfo(EntityType.MonthReport, monthReport.Id, modelState)).ExecuteCommandAsync();
+                await _dbMonthReportDetail.AsUpdateable(deleteDetails).IgnoreColumns(x => new { x.IsDelete }).EnableDiffLogEvent(NewLogInfo(EntityType.MonthReport, monthReport.Id, modelState)).ExecuteCommandAsync();
             }
             if (updateDetails.Any())
             {
-                await _dbMonthReportDetail.AsUpdateable(updateDetails).EnableDiffLogEvent(NewLogInfo(EntityType.MonthReport, monthReport.Id, modelState)).ExecuteCommandAsync();
+                await _dbMonthReportDetail.AsUpdateable(updateDetails).IgnoreColumns(x => new { x.IsDelete }).EnableDiffLogEvent(NewLogInfo(EntityType.MonthReport, monthReport.Id, modelState)).ExecuteCommandAsync();
             }
             if (addDetails.Any())
             {
@@ -9211,15 +9215,15 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             ResponseAjaxResult<ProjectShiftProductionResponseDto> responseAjaxResult = new ResponseAjaxResult<ProjectShiftProductionResponseDto>();
             ProjectShiftProductionResponseDto responseDto = new ProjectShiftProductionResponseDto();
             ProjectShiftProductionSumInfo productionSumInfo = new ProjectShiftProductionSumInfo();
-
-            var holidayConfig = await _dbContext.Queryable<HolidayConfig>().Where(x => x.IsDelete == 1).FirstAsync();
+            var time = DateTime.Now.AddDays(-1).ToDateDay();
+            var holidayConfig = await _dbContext.Queryable<HolidayConfig>().Where(x => x.IsDelete == 1 && x.DateDay == time).FirstAsync();
             if (holidayConfig != null)
             {
                 responseDto.Title = holidayConfig.Title;
             }
             //获取当前用户授权数据
             //var userAuthForData = await GetCurrentUserAuthForDataAsync();
-            var time = DateTime.Now.AddDays(-1).ToDateDay();
+
             var statusList = CommonData.PConstruc.Split(',').Select(x => x.ToGuid()).ToList();
             //var list = await _dbProject.AsQueryable().LeftJoin<DayReport>((p, d) => p.Id == d.ProjectId && d.DateDay == time)
             //    .LeftJoin<Institution>((p, d, c) => p.CompanyId == c.PomId)

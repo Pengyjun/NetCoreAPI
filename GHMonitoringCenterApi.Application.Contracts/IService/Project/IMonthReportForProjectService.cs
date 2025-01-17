@@ -9,11 +9,23 @@ namespace GHMonitoringCenterApi.Application.Contracts.IService.Project
     /// </summary>
     public interface IMonthReportForProjectService
     {
+
         /// <summary>
         /// 月报产包构成列表
         /// </summary>
         /// <param name="model"></param>
         /// <returns></returns>
         Task<ResponseAjaxResult<MonthReportForProjectResponseDto>> SearchMonthReportForProjectAsync(ProjectMonthReportRequestDto model);
+        /// <summary>
+        /// 修改月报开累数据
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        Task<ResponseAjaxResult<bool>> SaveMonthReportForProjectHistoryAsync(SaveMonthReportForProjectHistoryDto model);
+        /// <summary>
+        /// 启用 保存修改月报开累数据按钮  true 启用
+        /// </summary>
+        /// <returns></returns>
+        Task<ResponseAjaxResult<bool>> EnableSaveMonthRepHistoryBtnAsync();
     }
 }

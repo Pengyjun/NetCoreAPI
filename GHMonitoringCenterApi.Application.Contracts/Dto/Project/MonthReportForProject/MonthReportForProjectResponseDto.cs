@@ -38,6 +38,14 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project.MonthReportFor
         /// 历史完成产值
         /// </summary>
         public decimal HValue { get; set; }
+        /// <summary>
+        /// 外币完成产值
+        /// </summary>
+        public decimal CurrencyHValue { get; set; }
+        /// <summary>
+        /// 外币外包支出
+        /// </summary>
+        public decimal CurrencyOutHValue { get; set; } = 0;
         #endregion
         /// <summary>
         /// 填报月份（例：202304，注解：上月的26-本月的25，例：2023.3.26-2023.04.25）
@@ -239,5 +247,32 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project.MonthReportFor
         /// 任务Id
         /// </summary>
         public Guid? JobId { get; set; }
+
+        #region top置顶行历史数202306
+        /// <summary>
+        /// 置顶数据名称
+        /// </summary>
+        public string? TopTitleName { get; set; }
+        /// <summary>
+        /// 历史外包支出(人民币)
+        /// </summary>
+        public decimal TopHOutValue { get; set; } = 0M;
+        /// <summary>
+        /// 历史外包支出(美元、欧元等)
+        /// </summary>
+        public decimal TopCurrencyHOutValue { get; set; } = 0M;
+        /// <summary>
+        /// 历史工程量
+        /// </summary>
+        public decimal TopHQuantity { get; set; } = 0M;
+        /// <summary>
+        /// 历史完成产值(人民币)
+        /// </summary>
+        public decimal TopHValue { get; set; } = 0M;
+        /// <summary>
+        /// 历史完成产值(美元、欧元等)
+        /// </summary>
+        public decimal TopCurrencyHValue { get; set; } = 0M;
+        #endregion
     }
 }

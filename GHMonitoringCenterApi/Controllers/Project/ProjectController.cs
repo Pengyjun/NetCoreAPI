@@ -384,6 +384,28 @@ namespace GHMonitoringCenterApi.Controllers.Project
             return await _monthReportForProjectService.SearchMonthReportForProjectAsync(model);
         }
 
+        #region 修改月报开累数据   开口子更改
+        /// <summary>
+        /// 修改月报开累数据
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        [HttpPost("SaveMonthReportForProjectHistory")]
+        public async Task<ResponseAjaxResult<bool>> SaveMonthReportForProjectHistoryAsync([FromBody] SaveMonthReportForProjectHistoryDto model)
+        {
+            return await _monthReportForProjectService.SaveMonthReportForProjectHistoryAsync(model);
+        }
+        /// <summary>
+        /// 启用 保存修改月报开累数据按钮  true 启用
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("EnableSaveMonthRepHistoryBtn")]
+        public async Task<ResponseAjaxResult<bool>> EnableSaveMonthRepHistoryBtnAsync()
+        {
+            return await _monthReportForProjectService.EnableSaveMonthRepHistoryBtnAsync();
+        }
+        #endregion
+
         /// <summary>
         ///保存一条项目月报
         /// </summary>
@@ -2307,7 +2329,7 @@ namespace GHMonitoringCenterApi.Controllers.Project
         [AllowAnonymous]
         public bool bb()
         {
-            return  projectService.GetHolidays();
+            return projectService.GetHolidays();
         }
 
 
