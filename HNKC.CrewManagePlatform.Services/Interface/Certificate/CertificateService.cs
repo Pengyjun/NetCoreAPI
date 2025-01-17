@@ -53,7 +53,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Certificate
             #endregion
 
             //获取提醒天数
-            var remindSet = await _dbContext.Queryable<RemindSetting>().Where(t => t.RemindType == 22 && t.IsDelete == 1).ToListAsync();
+            var remindSet = await _dbContext.Queryable<RemindSetting>().Where(t => t.RemindType == 22 && t.IsDelete == 1 && t.Enable == 1).ToListAsync();
             if (remindSet.Count == 0) return new PageResult<CertificateSearch>();
             var rr = await _dbContext.Queryable<User>()
                 .LeftJoin<CertificateOfCompetency>((t1, t2) => t1.BusinessId == t2.CertificateId)
@@ -66,17 +66,23 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Certificate
                 .Where(t1 => t1.IsLoginUser == 1 && t1.IsDelete == 1)
                 .WhereIF(!string.IsNullOrEmpty(requestBody.KeyWords), t1 => requestBody.KeyWords.Contains(t1.Name) || requestBody.KeyWords.Contains(t1.Phone) || requestBody.KeyWords.Contains(t1.WorkNumber) || requestBody.KeyWords.Contains(t1.CardId))
                 .LeftJoin(uentity, (t1, t2, t3) => t1.BusinessId == t3.UserEntryId)
-                .InnerJoin<OwnerShip>((t1, t2, t3, t4) => t1.OnBoard == t4.BusinessId.ToString())
-                .InnerJoin(wShip, (t1, t2, t3, t4, t5) => t1.BusinessId == t5.WorkShipId)
-                .WhereIF(roleType == 3, (t1, t2, t4, t3, t5) => t5.OnShip == t3.BusinessId.ToString() && onShips.Contains(t5.OnShip))//船长
-                .WhereIF(roleType == 2, (t1, t2, t3, t4, t5) => GlobalCurrentUser.UserBusinessId == t5.WorkShipId)//船员
-                .InnerJoin<RemindSetting>((t1, t2, t3, t4, t5, t6) => t6.Types == t2.Type && t6.RemindType == 22)
-                .Select((t1, t2, t3, t4, t5, t6) => new CertificateSearch
+                .InnerJoin(wShip, (t1, t2, t3, t5) => t1.BusinessId == t5.WorkShipId)
+                .InnerJoin<OwnerShip>((t1, t2, t3, t5, t4) => t5.OnShip == t4.BusinessId.ToString())
+                .WhereIF(roleType == 3, (t1, t2, t3, t5, t4) => t5.OnShip == t3.BusinessId.ToString() && onShips.Contains(t5.OnShip))//船长
+                //.WhereIF(roleType == 4, (t1, t2, t3, t5, t4) => GlobalCurrentUser.UserBusinessId == t5.WorkShipId)//船员
+                .InnerJoin<RemindSetting>((t1, t2, t3, t5, t4, t6) => t6.Types == t2.Type && t6.RemindType == 22 && t6.Enable == 1)
+                .WhereIF(requestBody.Certificates == CertificatesEnum.FCertificate, (t1, t2, t3, t5, t4, t6) => SqlFunc.DateDiff(DateType.Day, DateTime.Now, Convert.ToDateTime(t2.FEffectiveTime)) + 1 <= t6.Days)
+                .WhereIF(requestBody.Certificates == CertificatesEnum.SCertificate, (t1, t2, t3, t5, t4, t6) => SqlFunc.DateDiff(DateType.Day, DateTime.Now, Convert.ToDateTime(t2.SEffectiveTime)) + 1 <= t6.Days)
+                .WhereIF(requestBody.Certificates == CertificatesEnum.PXHGZ, (t1, t2, t3, t5, t4, t6) => SqlFunc.DateDiff(DateType.Day, DateTime.Now, Convert.ToDateTime(t2.TrainingSignTime)) + 1 <= t6.Days)
+                .WhereIF(requestBody.Certificates == CertificatesEnum.JKZ, (t1, t2, t3, t5, t4, t6) => SqlFunc.DateDiff(DateType.Day, DateTime.Now, Convert.ToDateTime(t2.HealthEffectiveTime)) + 1 <= t6.Days)
+                .WhereIF(requestBody.Certificates == CertificatesEnum.HYZ, (t1, t2, t3, t5, t4, t6) => SqlFunc.DateDiff(DateType.Day, DateTime.Now, Convert.ToDateTime(t2.SeamanEffectiveTime)) + 1 <= t6.Days)
+                .WhereIF(requestBody.Certificates == CertificatesEnum.HZ, (t1, t2, t3, t5, t4, t6) => SqlFunc.DateDiff(DateType.Day, DateTime.Now, Convert.ToDateTime(t2.PassportEffectiveTime)) + 1 <= t6.Days)
+                .Select((t1, t2, t3, t5, t4, t6) => new CertificateSearch
                 {
                     Id = t2.BusinessId.ToString(),
                     BId = t1.BusinessId.ToString(),
                     Country = t4.Country,
-                    OnBoard = t1.OnBoard,
+                    OnBoard = t5.OnShip,
                     ShipType = t4.ShipType,
                     UserName = t1.Name,
                     WorkNumber = t1.WorkNumber,
@@ -86,19 +92,22 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Certificate
                     CardId = t1.CardId
                 })
                 .Distinct()
-                .ToPageListAsync(requestBody.PageIndex, requestBody.PageSize, total);
-            return await GetResultAsync(rr, total);
+                .ToListAsync();
+            return await GetResultAsync(rr, requestBody.PageIndex, requestBody.PageSize);
         }
         /// <summary>
         /// 获取查询结果集
         /// </summary>
         /// <param name="rr"></param>
-        /// <param name="total"></param>
+        /// <param name="pageIndex"></param>
+        /// <param name="pageSize"></param>
         /// <returns></returns>
-        private async Task<PageResult<CertificateSearch>> GetResultAsync(List<CertificateSearch> rr, int total)
+        private async Task<PageResult<CertificateSearch>> GetResultAsync(List<CertificateSearch> rr, int pageIndex, int pageSize)
         {
             PageResult<CertificateSearch> rt = new();
+            List<CertificateSearch> rList = new();
 
+            var remindSet = await _dbContext.Queryable<RemindSetting>().Where(t => t.RemindType == 22 && t.IsDelete == 1 && t.Enable == 1).ToListAsync();
             var position = await _dbContext.Queryable<Position>().Where(t => t.IsDelete == 1).ToListAsync();
             var ownShipTable = await _dbContext.Queryable<OwnerShip>().Where(t => rr.Select(x => x.OnBoard).Contains(t.BusinessId.ToString())).ToListAsync();
             var countryTable = await _dbContext.Queryable<CountryRegion>().Where(t => rr.Select(x => x.Country).Contains(t.BusinessId.ToString())).ToListAsync();
@@ -113,38 +122,56 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Certificate
                         case CertificatesEnum.FCertificate:
                             u.CertificateType = CertificatesEnum.FCertificate;
                             u.CertificateTypeName = EnumUtil.GetDescription(CertificatesEnum.FCertificate);
+                            if (rs?.FEffectiveTime.HasValue == false) continue;
                             u.EffectiveTime = rs?.FEffectiveTime?.ToString("yyyy/MM/dd");
                             u.DueDays = TimeHelper.GetTimeSpan(Convert.ToDateTime(rs?.FEffectiveTime), DateTime.Now).Days + 1;
+                            //var existData = remindSet.FirstOrDefault(x => x.Types == rs.Type && SqlFunc.DateDiff(DateType.Day, DateTime.Now, Convert.ToDateTime(rs?.FEffectiveTime)) + 1 <= x.Days);
+                            //if (existData == null) continue;
                             break;
                         case CertificatesEnum.SCertificate:
                             u.CertificateType = CertificatesEnum.SCertificate;
                             u.CertificateTypeName = EnumUtil.GetDescription(CertificatesEnum.SCertificate);
+                            if (rs?.SEffectiveTime.HasValue == false) continue;
                             u.EffectiveTime = rs?.SEffectiveTime?.ToString("yyyy/MM/dd");
                             u.DueDays = TimeHelper.GetTimeSpan(Convert.ToDateTime(rs?.SEffectiveTime), DateTime.Now).Days + 1;
+                            //var existData2 = remindSet.FirstOrDefault(x => x.Types == rs.Type && SqlFunc.DateDiff(DateType.Day, DateTime.Now, Convert.ToDateTime(rs?.SEffectiveTime)) + 1 <= x.Days);
+                            //if (existData2 == null) continue;
                             break;
                         case CertificatesEnum.PXHGZ:
                             u.CertificateType = CertificatesEnum.PXHGZ;
                             u.CertificateTypeName = EnumUtil.GetDescription(CertificatesEnum.PXHGZ);
+                            if (rs?.TrainingSignTime.HasValue == false) continue;
                             u.EffectiveTime = rs?.TrainingSignTime?.ToString("yyyy/MM/dd");
                             u.DueDays = TimeHelper.GetTimeSpan(Convert.ToDateTime(rs?.TrainingSignTime), DateTime.Now).Days + 1;
+                            //var existData3 = remindSet.FirstOrDefault(x => x.Types == rs.Type && SqlFunc.DateDiff(DateType.Day, DateTime.Now, Convert.ToDateTime(rs?.TrainingSignTime)) + 1 <= x.Days);
+                            //if (existData3 == null) continue;
                             break;
                         case CertificatesEnum.JKZ:
                             u.CertificateType = CertificatesEnum.JKZ;
                             u.CertificateTypeName = EnumUtil.GetDescription(CertificatesEnum.JKZ);
+                            if (rs?.HealthEffectiveTime.HasValue == false) continue;
                             u.EffectiveTime = rs?.HealthEffectiveTime?.ToString("yyyy/MM/dd");
                             u.DueDays = TimeHelper.GetTimeSpan(Convert.ToDateTime(rs?.HealthEffectiveTime), DateTime.Now).Days + 1;
+                            //var existData4 = remindSet.FirstOrDefault(x => x.Types == rs.Type && SqlFunc.DateDiff(DateType.Day, DateTime.Now, Convert.ToDateTime(rs?.HealthEffectiveTime)) + 1 <= x.Days);
+                            //if (existData4 == null) continue;
                             break;
                         case CertificatesEnum.HYZ:
                             u.CertificateType = CertificatesEnum.HYZ;
                             u.CertificateTypeName = EnumUtil.GetDescription(CertificatesEnum.HYZ);
+                            if (rs?.SeamanEffectiveTime.HasValue == false) continue;
                             u.EffectiveTime = rs?.SeamanEffectiveTime?.ToString("yyyy/MM/dd");
                             u.DueDays = TimeHelper.GetTimeSpan(Convert.ToDateTime(rs?.SeamanEffectiveTime), DateTime.Now).Days + 1;
+                            //var existData5 = remindSet.FirstOrDefault(x => x.Types == rs.Type && SqlFunc.DateDiff(DateType.Day, DateTime.Now, Convert.ToDateTime(rs?.SeamanEffectiveTime)) + 1 <= x.Days);
+                            //if (existData5 == null) continue;
                             break;
                         case CertificatesEnum.HZ:
                             u.CertificateType = CertificatesEnum.HZ;
                             u.CertificateTypeName = EnumUtil.GetDescription(CertificatesEnum.HZ);
+                            if (rs?.PassportEffectiveTime.HasValue == false) continue;
                             u.EffectiveTime = rs?.PassportEffectiveTime?.ToString("yyyy/MM/dd");
                             u.DueDays = TimeHelper.GetTimeSpan(Convert.ToDateTime(rs?.PassportEffectiveTime), DateTime.Now).Days + 1;
+                            //var existData6 = remindSet.FirstOrDefault(x => x.Types == rs.Type && SqlFunc.DateDiff(DateType.Day, DateTime.Now, Convert.ToDateTime(rs?.PassportEffectiveTime)) + 1 <= x.Days);
+                            //if (existData6 == null) continue;
                             break;
                     }
                     u.OnStatus = EnumUtil.GetDescription(_baseService.ShipUserStatus(u.WorkShipStartTime, u.DeleteResonEnum));
@@ -155,11 +182,12 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Certificate
                     if (u.FPosition != null) u.FPositionName = position.FirstOrDefault(x => x.BusinessId.ToString() == u.FPosition)?.Name;
                     if (u.SPosition != null) u.SPositionName = position.FirstOrDefault(x => x.BusinessId.ToString() == u.SPosition)?.Name;
                     if (u.OnBoardPosition != null) u.OnBoardPositionName = position.FirstOrDefault(x => x.BusinessId.ToString() == u.OnBoardPosition)?.Name;
+                    rList.Add(u);
                 }
             }
 
-            rt.List = rr.OrderBy(x => x.DueDays);
-            rt.TotalCount = total;
+            rt.List = rList.Skip((pageIndex - 1) * pageSize).Take(pageSize).OrderBy(x => x.UserName).ThenBy(x => x.DueDays);
+            rt.TotalCount = rList.Count();
             return rt;
         }
         #endregion

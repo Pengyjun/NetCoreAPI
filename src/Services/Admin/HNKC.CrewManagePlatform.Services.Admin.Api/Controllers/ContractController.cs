@@ -107,5 +107,14 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api.Controllers
         {
             return await _contractService.SaveYearCheckAsync(requestBody);
         }
+        /// <summary>
+        /// 提醒证书/合同统计数
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("RemindCount")]
+        public async Task<Result> RemindCountAsync()
+        {
+            return await _contractService.RemindCountAsync();
+        }
     }
 }

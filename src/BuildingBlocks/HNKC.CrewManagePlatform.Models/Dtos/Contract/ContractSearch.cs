@@ -128,4 +128,19 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.Contract
         /// </summary>
         public int DueDays { get; set; }
     }
+    /// <summary>
+    /// 提醒统计数
+    /// </summary>
+    public class RemindCountDto
+    {
+        /// <summary>
+        /// 合同
+        /// </summary>
+        public long ContractCount { get; set; }
+        /// <summary>
+        /// 证书
+        /// </summary>
+        public long CertificateCount { get; set; }
+
+    }
 }

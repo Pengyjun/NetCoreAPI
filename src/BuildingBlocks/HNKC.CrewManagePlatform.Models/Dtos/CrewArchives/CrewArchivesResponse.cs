@@ -1,7 +1,5 @@
 ﻿using HNKC.CrewManagePlatform.Models.Enums;
 using System.ComponentModel.DataAnnotations;
-using System.Security.Cryptography;
-using System.Xml.Linq;
 
 namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
 {
@@ -97,26 +95,22 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         #endregion
 
         #region 专业信息
-        /// <summary>
-        /// 船舶类型
-        /// </summary>
-        public ShipTypeEnum ShipType { get; set; }
-        /// <summary>
-        /// 船员类型
-        /// </summary>
-        public string? CrewType { get; set; }
-        /// <summary>
-        /// 服务簿类型
-        /// </summary>
-        public ServiceBookEnum ServiceBookType { get; set; }
-        /// <summary>
-        /// 所在船舶
-        /// </summary>
-        public string? OnBoard { get; set; }
-        /// <summary>
-        /// 在船职务
-        /// </summary>
-        public string? PositionOnBoard { get; set; }
+        ///// <summary>
+        ///// 船舶类型
+        ///// </summary>
+        //public ShipTypeEnum ShipType { get; set; }
+        ///// <summary>
+        ///// 船员类型
+        ///// </summary>
+        //public string? CrewType { get; set; }
+        ///// <summary>
+        ///// 所在船舶
+        ///// </summary>
+        //public string? OnBoard { get; set; }
+        ///// <summary>
+        ///// 在船职务
+        ///// </summary>
+        //public string? PositionOnBoard { get; set; }
         /// <summary>
         /// 文件船员照片
         /// </summary>
@@ -236,6 +230,10 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
     public class CertificateOfCompetencyDto : IValidatableObject
     {
         #region 第一适任证
+        /// <summary>
+        /// 服务簿类型
+        /// </summary>
+        public ServiceBookEnum ServiceBookType { get; set; }
         /// <summary>
         /// 证书编号
         /// </summary>

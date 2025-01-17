@@ -56,5 +56,10 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Contract
         /// <param name="requestBody"></param>
         /// <returns></returns>
         Task<Result> SaveYearCheckAsync(SaveYearCheck requestBody);
+        /// <summary>
+        /// 提醒证书/合同统计数
+        /// </summary>
+        /// <returns></returns>
+        Task<Result> RemindCountAsync();
     }
 }

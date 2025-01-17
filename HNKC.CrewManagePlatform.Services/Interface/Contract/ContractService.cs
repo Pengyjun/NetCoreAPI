@@ -3,6 +3,7 @@ using HNKC.CrewManagePlatform.Models.Dtos;
 using HNKC.CrewManagePlatform.Models.Dtos.Contract;
 using HNKC.CrewManagePlatform.Models.Dtos.CrewArchives;
 using HNKC.CrewManagePlatform.Models.Enums;
+using HNKC.CrewManagePlatform.Services.Interface.Certificate;
 using HNKC.CrewManagePlatform.SqlSugars.Models;
 using HNKC.CrewManagePlatform.Utils;
 using SqlSugar;
@@ -17,15 +18,18 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Contract
     {
         private readonly ISqlSugarClient _dbContext;
         private readonly IBaseService _baseService;
+        private readonly ICertificateService _certificateService;
         /// <summary>
         /// 
         /// </summary>
         /// <param name="dbContext"></param>
         /// <param name="baseService"></param>
-        public ContractService(ISqlSugarClient dbContext, IBaseService baseService)
+        /// <param name="certificateService"></param>
+        public ContractService(ISqlSugarClient dbContext, IBaseService baseService, ICertificateService certificateService)
         {
             this._dbContext = dbContext;
-            _baseService = baseService;
+            this._baseService = baseService;
+            this._certificateService = certificateService;
         }
         #region 合同列表
         /// <summary>
@@ -61,18 +65,18 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Contract
                 .WhereIF(!string.IsNullOrEmpty(requestBody.KeyWords), t1 => t1.Name.Contains(requestBody.KeyWords) || t1.Phone.Contains(requestBody.KeyWords) || t1.WorkNumber.Contains(requestBody.KeyWords) || t1.CardId.Contains(requestBody.KeyWords))
                 .LeftJoin(uentity, (t1, t2) => t1.BusinessId == t2.UserEntryId)
                 .Where((t1, t2) => SqlFunc.DateDiff(DateType.Day, DateTime.Now, Convert.ToDateTime(t2.EndTime)) + 1 <= days)
-                .InnerJoin<OwnerShip>((t1, t2, t3) => t1.OnBoard == t3.BusinessId.ToString())
                 //.InnerJoin<CertificateOfCompetency>((t1, t2, t3, t4) => t1.BusinessId == t4.CertificateId)
-                .InnerJoin(wShip, (t1, t2, t3, t5) => t1.BusinessId == t5.WorkShipId)
-                .WhereIF(roleType == 3, (t1, t2, t3, t5) => t5.OnShip == t3.BusinessId.ToString() && onShips.Contains(t5.OnShip))//船长
-                .WhereIF(roleType == 2, (t1, t2, t3, t5) => GlobalCurrentUser.UserBusinessId == t5.WorkShipId)//船员
-                .WhereIF(!string.IsNullOrEmpty(requestBody.EmploymentType), (t1, t2, t3, t5) => requestBody.EmploymentType == t2.EmploymentId)
-                .Select((t1, t2, t3, t5) => new ContractSearch
+                .InnerJoin(wShip, (t1, t2, t5) => t1.BusinessId == t5.WorkShipId)
+                .InnerJoin<OwnerShip>((t1, t2, t5, t3) => t5.OnShip == t3.BusinessId.ToString())
+                .WhereIF(roleType == 3, (t1, t2, t5, t3) => t5.OnShip == t3.BusinessId.ToString() && onShips.Contains(t5.OnShip))//船长
+                //.WhereIF(roleType == 2, (t1, t2, t5, t3) => GlobalCurrentUser.UserBusinessId == t5.WorkShipId)//船员
+                .WhereIF(!string.IsNullOrEmpty(requestBody.EmploymentType), (t1, t2, t5, t3) => requestBody.EmploymentType == t2.EmploymentId)
+                .Select((t1, t2, t5, t3) => new ContractSearch
                 {
                     BId = t1.BusinessId.ToString(),
                     Id = t2.BusinessId.ToString(),
                     Country = t3.Country,
-                    OnBoard = t1.OnBoard,
+                    OnBoard = t5.OnShip,
                     ShipType = t3.ShipType,
                     UserName = t1.Name,
                     WorkNumber = t1.WorkNumber,
@@ -218,18 +222,18 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Contract
                 .Where(t1 => t1.IsLoginUser == 1 && t1.IsDelete == 1)
                 .WhereIF(!string.IsNullOrEmpty(requestBody.KeyWords), t1 => t1.Name.Contains(requestBody.KeyWords) || t1.Phone.Contains(requestBody.KeyWords) || t1.WorkNumber.Contains(requestBody.KeyWords) || t1.CardId.Contains(requestBody.KeyWords))
                 .LeftJoin(uentity, (t1, t2) => t1.BusinessId == t2.UserEntryId)
-                .InnerJoin<OwnerShip>((t1, t2, t3) => t1.OnBoard == t3.BusinessId.ToString())
                 //.InnerJoin<CertificateOfCompetency>((t1, t2, t3, t4) => t1.BusinessId == t4.CertificateId)
-                .InnerJoin(wShip, (t1, t2, t3, t5) => t1.BusinessId == t5.WorkShipId)
-                .WhereIF(roleType == 3, (t1, t2, t3, t5) => t5.OnShip == t3.BusinessId.ToString() && onShips.Contains(t5.OnShip))//船长
-                .WhereIF(roleType == 2, (t1, t2, t3, t5) => GlobalCurrentUser.UserBusinessId == t5.WorkShipId)//船员
-                .WhereIF(!string.IsNullOrEmpty(requestBody.Position), (t1, t2, t3, t5) => requestBody.Position == t5.Postition)
-                .Select((t1, t2, t3, t5) => new PromotionSearch
+                .InnerJoin(wShip, (t1, t2, t5) => t1.BusinessId == t5.WorkShipId)
+                .InnerJoin<OwnerShip>((t1, t2, t5, t3) => t5.OnShip == t3.BusinessId.ToString())
+                .WhereIF(roleType == 3, (t1, t2, t5, t3) => t5.OnShip == t3.BusinessId.ToString() && onShips.Contains(t5.OnShip))//船长
+                //.WhereIF(roleType == 2, (t1, t2, t5, t3) => GlobalCurrentUser.UserBusinessId == t5.WorkShipId)//船员
+                .WhereIF(!string.IsNullOrEmpty(requestBody.Position), (t1, t2, t5, t3) => requestBody.Position == t5.Postition)
+                .Select((t1, t2, t5, t3) => new PromotionSearch
                 {
                     BId = t1.BusinessId.ToString(),
                     Id = t2.BusinessId.ToString(),
                     Country = t3.Country,
-                    OnBoard = t1.OnBoard,
+                    OnBoard = t5.OnShip,
                     ShipType = t3.ShipType,
                     UserName = t1.Name,
                     WorkNumber = t1.WorkNumber,
@@ -314,7 +318,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Contract
                     await _dbContext.Deleteable(files).ExecuteCommandAsync();
                     promotion.PromotionScan = GuidUtil.Next();
                     requestBody.PromotionScan.ForEach(x => x.FileId = promotion.PromotionScan);
-                    await _baseService.UpdateFileAsync(requestBody.PromotionScan, requestBody.BId);
+                    await _baseService.InsertFileAsync(requestBody.PromotionScan, requestBody.BId);
                 }
                 await _dbContext.Updateable(promotion).ExecuteCommandAsync();
                 return Result.Success("成功");
@@ -334,10 +338,8 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Contract
                 };
                 if (requestBody.PromotionScan != null && requestBody.PromotionScan.Any())
                 {
-                    var files = await _dbContext.Queryable<Files>().Where(t => t.FileId == fileId).ToListAsync();
-                    await _dbContext.Deleteable(files).ExecuteCommandAsync();
                     requestBody.PromotionScan.ForEach(x => x.FileId = fileId);
-                    await _baseService.UpdateFileAsync(requestBody.PromotionScan, requestBody.BId);
+                    await _baseService.InsertFileAsync(requestBody.PromotionScan, requestBody.BId);
                 }
                 await _dbContext.Insertable(addPromotion).ExecuteCommandAsync();
                 return Result.Success("成功");
@@ -358,22 +360,22 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Contract
             RefAsync<int> total = 0;
             var roleType = await _baseService.CurRoleType();
             if (roleType == -1) { return new PageResult<TrainingRecordSearch>(); }
-            var rr = await _dbContext.Queryable<TrainingRecord>()
-                          .Where(y => y.IsDelete == 1 && string.IsNullOrEmpty(y.PId.ToString()))
-                          .WhereIF(!string.IsNullOrWhiteSpace(requestBody.FillRepUserName), y => y.FillRepUserName.Contains(requestBody.FillRepUserName))
-                          .LeftJoin<User>((y, x) => y.FillRepUserId == x.BusinessId)
-                          .LeftJoin<TrainingType>((y, x, z) => y.TrainingType == z.BusinessId.ToString())
-                          .WhereIF(!string.IsNullOrEmpty(requestBody.TraningType), (y, x, z) => requestBody.TraningType == y.TrainingType)
-                          .WhereIF(!string.IsNullOrEmpty(requestBody.StartTime) && !string.IsNullOrEmpty(requestBody.EndTime), (y, x, z) => y.TrainingTime >= Convert.ToDateTime(requestBody.StartTime) && y.TrainingTime <= Convert.ToDateTime(requestBody.EndTime))
-                          .WhereIF(roleType == 3, (y, x, z) => y.FillRepUserId == GlobalCurrentUser.UserBusinessId)//船长
-                          .Select((y, x, z) => new TrainingRecordSearch
+            var rr = await _dbContext.Queryable<User>()
+                          .LeftJoin<TrainingRecord>((x, y) => y.FillRepUserId == x.BusinessId)
+                          .Where((x, y) => y.IsDelete == 1 && string.IsNullOrWhiteSpace(y.PId.ToString()))
+                          .WhereIF(!string.IsNullOrWhiteSpace(requestBody.FillRepUserName), (x, y) => y.FillRepUserName.Contains(requestBody.FillRepUserName))
+                          .WhereIF(!string.IsNullOrWhiteSpace(requestBody.StartTime.ToString()) && !string.IsNullOrWhiteSpace(requestBody.EndTime.ToString()), (x, y) => y.Created >= Convert.ToDateTime(requestBody.StartTime) && y.Created < Convert.ToDateTime(requestBody.EndTime.Value.AddDays(1)))
+                          .LeftJoin<TrainingType>((x, y, z) => y.TrainingType == z.BusinessId.ToString())
+                          .WhereIF(!string.IsNullOrWhiteSpace(requestBody.TraningType), (x, y, z) => requestBody.TraningType == y.TrainingType)
+                          .WhereIF(roleType == 3, (x, y, z) => y.FillRepUserId == GlobalCurrentUser.UserBusinessId)//船长
+                          .Select((x, y, z) => new TrainingRecordSearch
                           {
                               Id = y.BusinessId.ToString(),
                               FillRepUserName = x.Name,
                               TrainingTypeName = z.Name,
                               FillReportTime = y.Created.Value.ToString("yyyy/MM/dd"),
                               TrainingAddress = y.TrainingAddress,
-                              TrainingTime = y.TrainingTime,
+                              TrainingTime = y.TrainingTime.Value.ToString("yyyy/MM/dd"),
                               TrainingType = y.TrainingType,
                               TrainingTitle = y.TrainingTitle,
                               Scans = y.TrainingScan,
@@ -440,7 +442,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Contract
             if (requestBody.Scans != null && requestBody.Scans.Any())
             {
                 requestBody.Scans.ForEach(x => x.FileId = fileId);
-                await _baseService.UpdateFileAsync(requestBody.Scans, GlobalCurrentUser.UserBusinessId);
+                await _baseService.InsertFileAsync(requestBody.Scans, GlobalCurrentUser.UserBusinessId);
             }
             var bid = GuidUtil.Next();
             var add = new TrainingRecord
@@ -484,10 +486,10 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Contract
         /// <returns></returns>
         private async Task<Result> UpdateTrainingRecordAsync(SaveTrainingRecord requestBody)
         {
-            var rt = await _dbContext.Queryable<TrainingRecord>().Where(t => t.BusinessId.ToString() == requestBody.BId).FirstAsync();
+            var rt = await _dbContext.Queryable<TrainingRecord>().Where(t => t.BusinessId.ToString() == requestBody.Id).FirstAsync();
             if (rt != null)
             {
-                var rr = await _dbContext.Queryable<TrainingRecord>().Where(t => rt.PId == t.BusinessId).ToListAsync();
+                var rr = await _dbContext.Queryable<TrainingRecord>().Where(t => rt.BusinessId == t.BusinessId).ToListAsync();
                 if (rr.Any())
                 {
                     await _dbContext.Deleteable(rr).ExecuteCommandAsync();
@@ -536,21 +538,21 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Contract
                 .Where(t1 => t1.IsLoginUser == 1 && t1.IsDelete == 1)
                 .WhereIF(!string.IsNullOrEmpty(requestBody.KeyWords), t1 => t1.Name.Contains(requestBody.KeyWords) || t1.Phone.Contains(requestBody.KeyWords) || t1.WorkNumber.Contains(requestBody.KeyWords) || t1.CardId.Contains(requestBody.KeyWords))
                 //.LeftJoin(uentity, (t1, t2) => t1.BusinessId == t2.UserEntryId)
-                .InnerJoin<OwnerShip>((t1, t3) => t1.OnBoard == t3.BusinessId.ToString())
                 //.InnerJoin<CertificateOfCompetency>((t1, t2, t3, t4) => t1.BusinessId == t4.CertificateId)
-                .InnerJoin(wShip, (t1, t3, t5) => t1.BusinessId == t5.WorkShipId)
-                .WhereIF(roleType == 3, (t1, t3, t5) => t5.OnShip == t3.BusinessId.ToString() && onShips.Contains(t5.OnShip))//船长
-                .WhereIF(roleType == 2, (t1, t3, t5) => GlobalCurrentUser.UserBusinessId == t5.WorkShipId)//船员
-                .LeftJoin<YearCheck>((t1, t3, t5, t6) => t1.BusinessId == t6.TrainingId)
-                .WhereIF(requestBody.CheckStatus == 1, (t1, t3, t5, t6) => t6.CheckType != CheckEnum.Normal)
-                .WhereIF(requestBody.CheckStatus == 2, (t1, t3, t5, t6) => t6.CheckType == CheckEnum.Normal)
-                .WhereIF(!string.IsNullOrEmpty(requestBody.Year), (t1, t3, t5, t6) => t6.TrainingTime.Value.Year.ToString() == requestBody.Year)
-                .Select((t1, t3, t5, t6) => new YearCheckSearch
+                .InnerJoin(wShip, (t1, t5) => t1.BusinessId == t5.WorkShipId)
+                .InnerJoin<OwnerShip>((t1, t5, t3) => t5.OnShip == t3.BusinessId.ToString())
+                .WhereIF(roleType == 3, (t1, t5, t3) => t5.OnShip == t3.BusinessId.ToString() && onShips.Contains(t5.OnShip))//船长
+                //.WhereIF(roleType == 2, (t1, t5, t3) => GlobalCurrentUser.UserBusinessId == t5.WorkShipId)//船员
+                .LeftJoin<YearCheck>((t1, t5, t3, t6) => t1.BusinessId == t6.TrainingId)
+                .WhereIF(requestBody.CheckStatus == 1, (t1, t5, t3, t6) => t6.CheckType != CheckEnum.Normal)
+                .WhereIF(requestBody.CheckStatus == 2, (t1, t5, t3, t6) => t6.CheckType == CheckEnum.Normal)
+                .WhereIF(!string.IsNullOrEmpty(requestBody.Year), (t1, t5, t3, t6) => t6.TrainingTime.Value.Year.ToString() == requestBody.Year)
+                .Select((t1, t5, t3, t6) => new YearCheckSearch
                 {
                     BId = t1.BusinessId.ToString(),
                     Id = t6.BusinessId.ToString(),
                     Country = t3.Country,
-                    OnBoard = t1.OnBoard,
+                    OnBoard = t5.OnShip,
                     ShipType = t3.ShipType,
                     UserName = t1.Name,
                     WorkNumber = t1.WorkNumber,
@@ -640,7 +642,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Contract
         /// <returns></returns>
         public async Task<Result> SaveYearCheckAsync(SaveYearCheck requestBody)
         {
-            var rt = await _dbContext.Queryable<YearCheck>().Where(t => t.IsDelete == 1 && t.TrainingId.ToString() == requestBody.BId && DateTime.Now.Year == t.TrainingTime.Value.Year).FirstAsync();
+            var rt = await _dbContext.Queryable<YearCheck>().Where(t => t.IsDelete == 1 && t.BusinessId.ToString() == requestBody.BId && requestBody.Year == t.TrainingTime.Value.Year).FirstAsync();
             if (rt != null)
             {
                 if (requestBody.Scans != null && requestBody.Scans.Any())
@@ -650,7 +652,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Contract
                     await _dbContext.Deleteable(files).ExecuteCommandAsync();
                     rt.TrainingScan = GuidUtil.Next();
                     requestBody.Scans.ForEach(x => x.FileId = rt.TrainingScan);
-                    await _baseService.UpdateFileAsync(requestBody.Scans, Guid.Parse(requestBody.BId));
+                    await _baseService.InsertFileAsync(requestBody.Scans, rt.TrainingId);
                     await _dbContext.Updateable(rt).UpdateColumns(x => new { x.CheckType, x.TrainingScan }).ExecuteCommandAsync();
                     return Result.Success("成功");
                 }
@@ -661,25 +663,46 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Contract
             }
             else
             {
-                var fileId = GuidUtil.Next();
-                var addPromotion = new YearCheck
-                {
-                    Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
-                    BusinessId = GuidUtil.Next(),
-                    TrainingScan = fileId,
-                    CheckType = requestBody.CheckType,
-                    TrainingId = Guid.Parse(requestBody.BId),
-                    TrainingTime = DateTime.Now
-                };
-                if (requestBody.Scans != null && requestBody.Scans.Any())
-                {
-                    requestBody.Scans.ForEach(x => x.FileId = fileId);
-                    await _baseService.UpdateFileAsync(requestBody.Scans, Guid.Parse(requestBody.BId));
-                }
-                await _dbContext.Insertable(addPromotion).ExecuteCommandAsync();
-                return Result.Success("成功");
+                return Result.Success("失败");
             }
+            //else
+            //{
+            //    var fileId = GuidUtil.Next();
+            //    var addPromotion = new YearCheck
+            //    {
+            //        Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+            //        BusinessId = GuidUtil.Next(),
+            //        TrainingScan = fileId,
+            //        CheckType = requestBody.CheckType,
+            //        TrainingId = Guid.Parse(requestBody.Id),
+            //        TrainingTime = DateTime.Now
+            //    };
+            //    if (requestBody.Scans != null && requestBody.Scans.Any())
+            //    {
+            //        requestBody.Scans.ForEach(x => x.FileId = fileId);
+            //        await _baseService.InsertFileAsync(requestBody.Scans, Guid.Parse(requestBody.Id));
+            //    }
+            //    await _dbContext.Insertable(addPromotion).ExecuteCommandAsync();
+            //    return Result.Success("成功");
+            //}
         }
+
         #endregion
+
+        /// <summary>
+        /// 提醒证书/合同统计数
+        /// </summary>
+        /// <returns></returns>
+        public async Task<Result> RemindCountAsync()
+        {
+            RemindCountDto rt = new();
+            var contractList = await SearchContractAsync(new ContractRequest() { PageIndex = 1, PageSize = 1000000 });
+            var certificateList = await _certificateService.SearchCertificateAsync(new CertificateRequest() { PageIndex = 1, PageSize = 1000000 });
+
+            rt.ContractCount = contractList.List == null ? 0 : contractList.List.Count();
+            rt.CertificateCount = certificateList.List == null ? 0 : certificateList.List.Count();
+
+            return Result.Success(rt);
+        }
     }
 }

@@ -119,6 +119,7 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api.Controllers
                     {
                         Id = newFileName.ToString(),
                         Name = newFileName + name,
+                        BId = GuidUtil.Next(),
                         OriginName = file.FileName,
                         SuffixName = name,
                         FileSize = fileSize,

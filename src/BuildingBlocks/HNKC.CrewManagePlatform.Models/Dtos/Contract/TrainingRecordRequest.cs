@@ -11,11 +11,11 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.Contract
         /// <summary>
         /// 填报开始时间
         /// </summary>
-        public string? StartTime { get; set; }
+        public DateTime? StartTime { get; set; }
         /// <summary>
         /// 填报结束时间
         /// </summary>
-        public string? EndTime { get; set; }
+        public DateTime? EndTime { get; set; }
         /// <summary>
         /// 填报类型
         /// </summary>
@@ -37,7 +37,7 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.Contract
         /// <summary>
         /// 
         /// </summary>
-        public string? BId { get; set; }
+        public string? Id { get; set; }
         /// <summary>
         /// 培训类型：安全培训...
         /// </summary>

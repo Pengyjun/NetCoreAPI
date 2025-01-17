@@ -123,5 +123,14 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// 是否删除
         /// </summary>
         public int IsDelete { get; set; }
+
+        /// <summary>
+        /// 上船日期
+        /// </summary>
+        public DateTime WorkShipStartTime { get; set; }
+        /// <summary>
+        /// 下船日期
+        /// </summary>
+        public DateTime WorkShipEndTime { get; set; }
     }
 }
