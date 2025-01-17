@@ -237,6 +237,12 @@ namespace GHMonitoringCenterApi.Application.Contracts.IService
         /// <param name="requestDto"></param>
         /// <returns></returns>
         Task<ResponseAjaxResult<List<DayReportConstruction>>> GetDayReportConstructionAsync(ExternalRequestDto requestDto);
+
+        /// <summary>
+        /// 获取施工日志列表 对外提供
+        /// </summary>
+        /// <returns></returns>
+        Task<ResponseAjaxResult<List<ConstructionLogResponseDto>>> SearchExternalConstructionLogAsync(ConstructionLogRequestDto constructionLogRequestDto);
         /// <summary>
         /// 获取施工日志详情
         /// </summary>

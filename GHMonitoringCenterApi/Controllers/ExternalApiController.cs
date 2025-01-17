@@ -374,13 +374,22 @@ namespace GHMonitoringCenterApi.Controllers
           => await _externalApiService.GetDayReportConstructionAsync(requestDto);
 
         /// <summary>
+        /// 获取施工日志列表 对外提供
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("SearchExternalConstructionLog")]
+        [AllowAnonymous]//跳过鉴权
+        public async Task<ResponseAjaxResult<List<ConstructionLogResponseDto>>> SearchExternalConstructionLogAsync([FromQuery]ConstructionLogRequestDto constructionLogRequestDto)
+            => await _externalApiService.SearchExternalConstructionLogAsync(constructionLogRequestDto);
+
+        /// <summary>
         /// 获取施工日志详情
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
         [HttpGet("GetDayReportConstructionDetails")]
         [AllowAnonymous]//跳过鉴权
-        public async Task<ResponseAjaxResult<SearchConstructionLoDetailsgResponseDto>> GetDayReportConstructionDetailAsync([FromQuery]SearchConstructionLoDetailsgRequestDto requestDto)
+        public async Task<ResponseAjaxResult<SearchConstructionLoDetailsgResponseDto>> GetDayReportConstructionDetailAsync([FromQuery] SearchConstructionLoDetailsgRequestDto requestDto)
             => await _externalApiService.GetDayReportConstructionDetailAsync(requestDto);
         #endregion
 

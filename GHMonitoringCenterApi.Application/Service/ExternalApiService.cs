@@ -24,6 +24,9 @@ using SqlSugar.Extensions;
 using UtilsSharp;
 using static GHMonitoringCenterApi.Application.Contracts.Dto.Project.Report.MonthtReportsResponseDto;
 using GHMonitoringCenterApi.Application.Contracts.Dto.ConstructionLog;
+using System.Collections.Generic;
+using GHMonitoringCenterApi.Domain.Enums;
+using Spire.Doc.Documents;
 
 namespace GHMonitoringCenterApi.Application.Service
 {
@@ -1333,6 +1336,55 @@ namespace GHMonitoringCenterApi.Application.Service
             return rt;
         }
 
+        /// <summary>
+        /// 获取施工日志列表 对外提供
+        /// </summary>
+        /// <returns></returns>
+        public async Task<ResponseAjaxResult<List<ConstructionLogResponseDto>>> SearchExternalConstructionLogAsync(ConstructionLogRequestDto constructionLogRequestDto)
+        {
+            ResponseAjaxResult<List<ConstructionLogResponseDto>> responseAjaxResult = new ResponseAjaxResult<List<ConstructionLogResponseDto>>();
+            RefAsync<int> total = 0;
+            var constructionLog = await _dbContext.Queryable<Project>()
+                .InnerJoin<DayReport>((x, y) => x.Id == y.ProjectId)
+                .Where((x, y) => y.IsDelete == 1 && y.ProcessStatus == DayReportProcessStatus.Submited)
+                .WhereIF(!string.IsNullOrWhiteSpace(constructionLogRequestDto.ProjectName), (x, y) => x.Name.Contains(constructionLogRequestDto.ProjectName))
+                .WhereIF(constructionLogRequestDto.Time.HasValue, (x, y) => y.DateDay == constructionLogRequestDto.Time.Value.ToDateDay())
+                .OrderByDescending((x, y) => y.DateDay)
+                .Select((x, y) => new ConstructionLogResponseDto
+                {
+                    Id = y.Id,
+                    ProjectId = x.Id,
+                    ProjectName = x.Name,
+                    CompanyId = x.CompanyId,
+                    Status = x.StatusId,
+                    DateDay = y.DateDay
+                })
+              .ToPageListAsync(constructionLogRequestDto.PageIndex, constructionLogRequestDto.PageSize, total);
+
+
+             var projectStatus = await _dbContext.Queryable<ProjectStatus>().Where(t => t.IsDelete == 1).Select(t => new { t.StatusId, t.Name }).ToListAsync();
+            var company = await _dbContext.Queryable<Institution>().ToListAsync();
+            if (constructionLog.Any())
+            {
+                foreach (var item in constructionLog)
+                {
+                    item.StatusName = projectStatus.Where(t => t.StatusId == item.Status).FirstOrDefault()?.Name;
+                    if (!string.IsNullOrWhiteSpace(item.DateDay.ToString()))
+                    {
+                        ConvertHelper.TryConvertDateTimeFromDateDay(item.DateDay.Value, out DateTime dayTimes);
+                        item.SubmitTime = dayTimes;
+                    }
+                    item.CompanyName = company.Where(x => x.PomId == item.CompanyId).Select(x => x.Name).FirstOrDefault();
+
+                }
+            }
+            responseAjaxResult.Data = constructionLog;
+            responseAjaxResult.Count = total;
+            responseAjaxResult.Success();
+
+
+            return responseAjaxResult;
+        }
 
         /// <summary>
         /// 获取施工日志详情

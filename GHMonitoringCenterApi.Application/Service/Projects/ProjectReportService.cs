@@ -2517,8 +2517,8 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             {
                 list = list
                 .Where(x => string.IsNullOrEmpty(x.UpdateTime.ToString()) || x.UpdateTime == DateTime.MinValue ?
-                  x.CreateTime >= model.StartTime && x.CreateTime <= model.EndTime
-                : x.UpdateTime >= model.StartTime && x.UpdateTime <= model.EndTime)
+                  x.CreateTime.Value.Date >= model.StartTime && x.CreateTime.Value.Date <= model.EndTime
+                : x.UpdateTime.Value.Date >= model.StartTime && x.UpdateTime.Value.Date <= model.EndTime)
                 .ToList();
             }
 
@@ -2943,9 +2943,14 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             {
                 list = list
                 .Where(x => string.IsNullOrEmpty(x.UpdateTime.ToString()) || x.UpdateTime == DateTime.MinValue ?
-                  x.CreateTime >= model.StartTime && x.CreateTime <= model.EndTime
-                : x.UpdateTime >= model.StartTime && x.UpdateTime <= model.EndTime)
+                (x.CreateTime.Value.Year > model.StartTime.Value.Year || (x.CreateTime.Value.Year == model.StartTime.Value.Year && x.CreateTime.Value.Month >= model.StartTime.Value.Month)) &&
+                (x.CreateTime.Value.Year < model.EndTime.Value.Year || (x.CreateTime.Value.Year == model.EndTime.Value.Year && x.CreateTime.Value.Month <= model.EndTime.Value.Month)) :
+                (x.UpdateTime.Value.Year > model.StartTime.Value.Year || (x.UpdateTime.Value.Year == model.StartTime.Value.Year && x.UpdateTime.Value.Month >= model.StartTime.Value.Month)) &&
+                (x.UpdateTime.Value.Year < model.EndTime.Value.Year || (x.UpdateTime.Value.Year == model.EndTime.Value.Year && x.UpdateTime.Value.Month <= model.EndTime.Value.Month)))
+                .OrderByDescending(x => x.DateMonth)
                 .ToList();
+                //x.CreateTime >= model.StartTime && x.CreateTime <= model.EndTime
+                //: x.UpdateTime >= model.StartTime && x.UpdateTime <= model.EndTime
             }
 
             var projectIds = list.Select(t => t.ProjectId).Distinct().ToArray();
