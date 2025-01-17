@@ -6,6 +6,7 @@ using GHMonitoringCenterApi.Application.Contracts.Dto.Project;
 using GHMonitoringCenterApi.Application.Contracts.Dto.Project.Report;
 using GHMonitoringCenterApi.Application.Contracts.Dto.Project.ShipMovements;
 using GHMonitoringCenterApi.Application.Contracts.Dto.ProjectProductionReport;
+using GHMonitoringCenterApi.Application.Contracts.IService.ConstructionLog;
 using GHMonitoringCenterApi.Application.Contracts.Dto.Ship;
 using GHMonitoringCenterApi.Application.Contracts.Dto.Word;
 using GHMonitoringCenterApi.Application.Contracts.IService;
@@ -22,6 +23,10 @@ using SqlSugar;
 using SqlSugar.Extensions;
 using UtilsSharp;
 using static GHMonitoringCenterApi.Application.Contracts.Dto.Project.Report.MonthtReportsResponseDto;
+using GHMonitoringCenterApi.Application.Contracts.Dto.ConstructionLog;
+using System.Collections.Generic;
+using GHMonitoringCenterApi.Domain.Enums;
+using Spire.Doc.Documents;
 
 namespace GHMonitoringCenterApi.Application.Service
 {
@@ -57,6 +62,10 @@ namespace GHMonitoringCenterApi.Application.Service
         /// </summary>
         private IProjectReportService _projectReportService { get; set; }
         /// <summary>
+        /// 施工日志接口注入
+        /// </summary>
+        private IConstructionLogService _constructionLogService { get; set; }
+        /// <summary>
         /// 注入设备管理层
         /// </summary>
         private IEquipmentManagementService _eqipment { get; set; }
@@ -68,7 +77,7 @@ namespace GHMonitoringCenterApi.Application.Service
         /// <param name="projectReportService"></param>
         /// <param name="globalObject"></param>
         /// <param name="shipMovementService"></param>
-        public ExternalApiService(ISqlSugarClient sqlSugarClient, IProjectProductionReportService projectProductionReportService, IProjectReportService projectReportService, GlobalObject globalObject, IProjectShipMovementsService shipMovementService, IEquipmentManagementService eqipment)
+        public ExternalApiService(ISqlSugarClient sqlSugarClient, IProjectProductionReportService projectProductionReportService, IProjectReportService projectReportService, GlobalObject globalObject, IProjectShipMovementsService shipMovementService, IConstructionLogService constructionLogService, IEquipmentManagementService eqipment)
         {
             this._dbContext = sqlSugarClient;
             this._projectProductionReportService = projectProductionReportService;
@@ -76,6 +85,7 @@ namespace GHMonitoringCenterApi.Application.Service
             this._globalObject = globalObject;
             this._shipMovementService = shipMovementService;
             this._eqipment = eqipment;
+            this._constructionLogService = constructionLogService;
         }
         /// <summary>
         /// s获取人员信息
@@ -1325,6 +1335,68 @@ namespace GHMonitoringCenterApi.Application.Service
             rt.SuccessResult(rr);
             return rt;
         }
+
+        /// <summary>
+        /// 获取施工日志列表 对外提供
+        /// </summary>
+        /// <returns></returns>
+        public async Task<ResponseAjaxResult<List<ConstructionLogResponseDto>>> SearchExternalConstructionLogAsync(ConstructionLogRequestDto constructionLogRequestDto)
+        {
+            ResponseAjaxResult<List<ConstructionLogResponseDto>> responseAjaxResult = new ResponseAjaxResult<List<ConstructionLogResponseDto>>();
+            RefAsync<int> total = 0;
+            var constructionLog = await _dbContext.Queryable<Project>()
+                .InnerJoin<DayReport>((x, y) => x.Id == y.ProjectId)
+                .Where((x, y) => y.IsDelete == 1 && y.ProcessStatus == DayReportProcessStatus.Submited)
+                .WhereIF(!string.IsNullOrWhiteSpace(constructionLogRequestDto.ProjectName), (x, y) => x.Name.Contains(constructionLogRequestDto.ProjectName))
+                .WhereIF(constructionLogRequestDto.Time.HasValue, (x, y) => y.DateDay == constructionLogRequestDto.Time.Value.ToDateDay())
+                .OrderByDescending((x, y) => y.DateDay)
+                .Select((x, y) => new ConstructionLogResponseDto
+                {
+                    Id = y.Id,
+                    ProjectId = x.Id,
+                    ProjectName = x.Name,
+                    CompanyId = x.CompanyId,
+                    Status = x.StatusId,
+                    DateDay = y.DateDay
+                })
+              .ToPageListAsync(constructionLogRequestDto.PageIndex, constructionLogRequestDto.PageSize, total);
+
+
+             var projectStatus = await _dbContext.Queryable<ProjectStatus>().Where(t => t.IsDelete == 1).Select(t => new { t.StatusId, t.Name }).ToListAsync();
+            var company = await _dbContext.Queryable<Institution>().ToListAsync();
+            if (constructionLog.Any())
+            {
+                foreach (var item in constructionLog)
+                {
+                    item.StatusName = projectStatus.Where(t => t.StatusId == item.Status).FirstOrDefault()?.Name;
+                    if (!string.IsNullOrWhiteSpace(item.DateDay.ToString()))
+                    {
+                        ConvertHelper.TryConvertDateTimeFromDateDay(item.DateDay.Value, out DateTime dayTimes);
+                        item.SubmitTime = dayTimes;
+                    }
+                    item.CompanyName = company.Where(x => x.PomId == item.CompanyId).Select(x => x.Name).FirstOrDefault();
+
+                }
+            }
+            responseAjaxResult.Data = constructionLog;
+            responseAjaxResult.Count = total;
+            responseAjaxResult.Success();
+
+
+            return responseAjaxResult;
+        }
+
+        /// <summary>
+        /// 获取施工日志详情
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        public async Task<ResponseAjaxResult<SearchConstructionLoDetailsgResponseDto>> GetDayReportConstructionDetailAsync(SearchConstructionLoDetailsgRequestDto requestDto)
+        {
+            int time = requestDto.SearchTime.ToDateDay();
+            var result = await _constructionLogService.SearchConstructionLogDetailsgAsync(requestDto.Id, time);
+            return result;
+        }
         #endregion
 
 
@@ -1341,37 +1413,37 @@ namespace GHMonitoringCenterApi.Application.Service
                 CompanyItems = new List<CompanyItem>()
             };
 
-            var projectList= await _dbContext.Queryable<Project>().Where(x => x.IsDelete == 1).ToListAsync();
-            var commonDataList = await _dbContext.Queryable<ProductionMonitoringOperationDayReport>().Where(x => x.IsDelete == 1&&x.Type==1&&!string.IsNullOrWhiteSpace(x.Name)&&x.Name!= "广航局总体").OrderBy(x=>x.Sort).ToListAsync();
+            var projectList = await _dbContext.Queryable<Project>().Where(x => x.IsDelete == 1).ToListAsync();
+            var commonDataList = await _dbContext.Queryable<ProductionMonitoringOperationDayReport>().Where(x => x.IsDelete == 1 && x.Type == 1 && !string.IsNullOrWhiteSpace(x.Name) && x.Name != "广航局总体").OrderBy(x => x.Sort).ToListAsync();
             if (projectList.Count > 0)
             {
                 //各个公司总产值
                 List<CompanyItem> companys = new List<CompanyItem>();
-                var allDayReport = await _dbContext.Queryable<DayReport>().Where(x => x.IsDelete == 1&&x.DateDay>=20241226).ToListAsync();
-                 var dayReportList= allDayReport.Where(x => x.IsDelete == 1 &&(x.CreateTime>=SqlFunc.ToDate(baseExternalRequest.StartTime)&&x.CreateTime<= SqlFunc.ToDate(baseExternalRequest.EndTime)|| x.UpdateTime >= SqlFunc.ToDate(baseExternalRequest.StartTime) && x.UpdateTime <= SqlFunc.ToDate (baseExternalRequest.EndTime)))
-                .ToList();
+                var allDayReport = await _dbContext.Queryable<DayReport>().Where(x => x.IsDelete == 1 && x.DateDay >= 20241226).ToListAsync();
+                var dayReportList = allDayReport.Where(x => x.IsDelete == 1 && (x.CreateTime >= SqlFunc.ToDate(baseExternalRequest.StartTime) && x.CreateTime <= SqlFunc.ToDate(baseExternalRequest.EndTime) || x.UpdateTime >= SqlFunc.ToDate(baseExternalRequest.StartTime) && x.UpdateTime <= SqlFunc.ToDate(baseExternalRequest.EndTime)))
+               .ToList();
                 var diffTime = TimeHelper.GetTimeSpan(baseExternalRequest.StartTime.ObjToDate(), baseExternalRequest.EndTime.ObjToDate()).Days;
-                for (int i = 0; i <=diffTime; i++)
+                for (int i = 0; i <= diffTime; i++)
                 {
                     foreach (var item in commonDataList)
                     {
-                       var dateDay=int.Parse( baseExternalRequest.StartTime.ObjToDate().AddDays(i-1).ToString("yyyyMMdd"));
+                        var dateDay = int.Parse(baseExternalRequest.StartTime.ObjToDate().AddDays(i - 1).ToString("yyyyMMdd"));
                         var companyProjectIds = projectList.Where(x => x.CompanyId == item.ItemId).Select(x => x.Id).ToList();
                         var dayProductionValue = dayReportList.Where(x => x.DateDay == dateDay && companyProjectIds.Contains(x.ProjectId)).Sum(x => x.DayActualProductionAmount);
 
                         var yearProductionValue = dayReportList.Where(x => x.DateDay <= dateDay && companyProjectIds.Contains(x.ProjectId)).Sum(x => x.DayActualProductionAmount);
 
                         companys.Add(new CompanyItem()
-                        { 
+                        {
                             DateDay = baseExternalRequest.StartTime.ObjToDate().AddDays(i).ToString(),
                             CompanyDayProductionValue = dayProductionValue,
                             YearCompanyProductionValue = yearProductionValue,
                             CompanyId = item.ItemId,
-                            
-                        }) ;
+
+                        });
                     }
                 }
-               
+
                 companyDayProductionValueResponseDto.CompanyItems = companys.Where(x => x.CompanyId != null).ToList();
             }
             return companyDayProductionValueResponseDto;

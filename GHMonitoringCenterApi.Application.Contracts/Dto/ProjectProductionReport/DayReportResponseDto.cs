@@ -232,6 +232,10 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.ProjectProductionRepor
     public class DayResConstruction
     {
         /// <summary>
+        /// 日报id
+        /// </summary>
+        public Guid DayId { get; set; }
+        /// <summary>
         /// 施工记录Id
         /// </summary>
         public Guid? ConstructionId { get; set; }

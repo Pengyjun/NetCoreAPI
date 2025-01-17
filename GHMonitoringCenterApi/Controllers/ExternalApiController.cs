@@ -1,4 +1,5 @@
 ﻿using GHMonitoringCenterApi.Application.Contracts.Dto;
+using GHMonitoringCenterApi.Application.Contracts.Dto.ConstructionLog;
 using GHMonitoringCenterApi.Application.Contracts.Dto.EquipmentManagement;
 using GHMonitoringCenterApi.Application.Contracts.Dto.External;
 using GHMonitoringCenterApi.Application.Contracts.Dto.Project;
@@ -371,6 +372,25 @@ namespace GHMonitoringCenterApi.Controllers
         [AllowAnonymous]//跳过鉴权
         public async Task<ResponseAjaxResult<List<DayReportConstruction>>> GetDayReportConstructionAsync([FromQuery] ExternalRequestDto requestDto)
           => await _externalApiService.GetDayReportConstructionAsync(requestDto);
+
+        /// <summary>
+        /// 获取施工日志列表 对外提供
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("SearchExternalConstructionLog")]
+        [AllowAnonymous]//跳过鉴权
+        public async Task<ResponseAjaxResult<List<ConstructionLogResponseDto>>> SearchExternalConstructionLogAsync([FromQuery]ConstructionLogRequestDto constructionLogRequestDto)
+            => await _externalApiService.SearchExternalConstructionLogAsync(constructionLogRequestDto);
+
+        /// <summary>
+        /// 获取施工日志详情
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        [HttpGet("GetDayReportConstructionDetails")]
+        [AllowAnonymous]//跳过鉴权
+        public async Task<ResponseAjaxResult<SearchConstructionLoDetailsgResponseDto>> GetDayReportConstructionDetailAsync([FromQuery] SearchConstructionLoDetailsgRequestDto requestDto)
+            => await _externalApiService.GetDayReportConstructionDetailAsync(requestDto);
         #endregion
 
 
@@ -380,7 +400,7 @@ namespace GHMonitoringCenterApi.Controllers
         /// <returns></returns>
         [HttpGet("SearchCompanyProductionValue")]
         [AllowAnonymous]
-        public async Task<CompanyDayProductionValueResponseDto> SearchCompanyProductionValueAsync([FromQuery]BaseExternalRequestDto baseExternalRequestDto)
+        public async Task<CompanyDayProductionValueResponseDto> SearchCompanyProductionValueAsync([FromQuery] BaseExternalRequestDto baseExternalRequestDto)
         {
             return await _externalApiService.SearchCompanyProductionValueAsync(baseExternalRequestDto);
         }

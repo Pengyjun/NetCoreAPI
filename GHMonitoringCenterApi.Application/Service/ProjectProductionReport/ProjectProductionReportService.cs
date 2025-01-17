@@ -145,10 +145,10 @@ namespace GHMonitoringCenterApi.Application.Service.ProjectProductionReport
             }
             #endregion
             sumInfo.SumOutsourcingExpensesAmount = Math.Round(
-                dayReports.WhereIF(dayConstructionIds.Count>0,x=>x.IsSubContractProject==1)
+                dayReports.WhereIF(dayConstructionIds.Count > 0, x => x.IsSubContractProject == 1)
                 .Sum(x => x.ProSumOutsourcingExpensesAmount.Value), 2);
             sumInfo.SumActualDailyProduction = Math.Round(dayConstructionList
-                .WhereIF(dayConstructionIds.Count > 0, x =>!dayConstructionIds.Contains(x.ProjectId))
+                .WhereIF(dayConstructionIds.Count > 0, x => !dayConstructionIds.Contains(x.ProjectId))
                 .Sum(x => x.ActualDailyProduction), 3);
             sumInfo.SumActualDailyProductionAmount = Math.Round(dayConstructionList
                  .WhereIF(dayConstructionIds.Count > 0, x => !dayConstructionIds.Contains(x.ProjectId))
@@ -291,13 +291,13 @@ namespace GHMonitoringCenterApi.Application.Service.ProjectProductionReport
             var list = new List<DayReportInfo>();
             if (!searchRequestDto.IsDuiWai)//非对外查询接口  监控中心自己用
             {
-               
+
 
                 list = await dbContext.Queryable<Project, DayReport>(
                    (p, d) =>
                    new JoinQueryInfos(
                        JoinType.Inner, p.Id == d.ProjectId && d.ProcessStatus == DayReportProcessStatus.Submited
-                      
+
                    ))
                    .WhereIF(true, (p, d) => p.IsDelete == 1)
                    .WhereIF(true, p => departmentIds.Contains(p.ProjectDept.Value))
@@ -314,7 +314,7 @@ namespace GHMonitoringCenterApi.Application.Service.ProjectProductionReport
                    //.WhereIF(_currentUser.CurrentLoginIsAdmin||_currentUser.CurrentLoginInstitutionOid== "101162350")
                    .Select((p, d) => new DayReportInfo
                    {
-                       
+
                        Id = d.Id,
                        ProjectId = p.Id,
                        DayId = d.Id,
@@ -347,7 +347,7 @@ namespace GHMonitoringCenterApi.Application.Service.ProjectProductionReport
                        IsSubContractProject = p.IsSubContractProject
                    }).ToListAsync();
 
-               
+
 
             }
             else
@@ -402,8 +402,8 @@ namespace GHMonitoringCenterApi.Application.Service.ProjectProductionReport
                 //对外接口日期筛选
                 list = list
                     .Where(x => string.IsNullOrEmpty(x.UpdateTime.ToString()) || x.UpdateTime == DateTime.MinValue ?
-                     x.CreateTime >= searchRequestDto.StartTime && x.CreateTime <= searchRequestDto.EndTime
-                    : x.UpdateTime >= searchRequestDto.StartTime && x.UpdateTime <= searchRequestDto.EndTime)
+                     x.CreateTime.Value.Date >= searchRequestDto.StartTime && x.CreateTime.Value.Date <= searchRequestDto.EndTime
+                    : x.UpdateTime.Value.Date >= searchRequestDto.StartTime && x.UpdateTime.Value.Date <= searchRequestDto.EndTime)
                     .ToList();
             }
             if (!list.Any())
@@ -412,12 +412,12 @@ namespace GHMonitoringCenterApi.Application.Service.ProjectProductionReport
                 responseAjaxResult.Count = total;
                 return responseAjaxResult;
             }
-         
+
             var dayIds = list.Select(x => x.DayId).ToList();
             dayReport = dayReport.Where(x => dayIds.Contains(x.DayReportId)).ToList();
             for (int i = 0; i < list.Count; i++)
             {
-               
+
                 for (int j = 0; j < searchRequestDto.Sort.Length; j++)
                 {
                     list[i].Sort[j] = searchRequestDto.Sort[j];
@@ -597,6 +597,7 @@ namespace GHMonitoringCenterApi.Application.Service.ProjectProductionReport
                 item.CreateUser = userList.FirstOrDefault(x => x.Id.ToString() == item.CreateUser)?.Name;
                 item.DayReportConstructions = dayConstructionList.Where(x => x.DayReportId == item.DayId).Select(x => new DayResConstruction
                 {
+                    DayId = item.DayId,
                     ConstructionId = x.Id,
                     PId = item.ProjectId,
                     ProjectWBSId = x.ProjectWBSId,
