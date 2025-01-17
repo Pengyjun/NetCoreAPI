@@ -2952,7 +2952,7 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
 
             foreach (var item in np)
             {
-               var islow= drData.Where(x => x.ProjectId == item.ProjectId&&x.DateDay== currentTimeInt).Select(x => x.IsLow).FirstOrDefault();
+               var islow= drData.Where(x => x.ProjectId == item.ProjectId&&x.DateDay== currentTimeInt&&x.IsLow==0).Select(x => x.IsLow).FirstOrDefault();
                 imp.Add(new ImpProjectWarning
                 {
                     IsLow= islow==null?0:islow,
