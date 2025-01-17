@@ -167,6 +167,8 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                 var sctab = await _dbContext.Queryable<SkillCertificates>().Where(t => t.IsDelete == 1 && uIds.Contains(t.SkillcertificateId)).ToListAsync();
                 //特设证书
                 var spctab = await _dbContext.Queryable<SpecialEquips>().Where(t => t.IsDelete == 1 && uIds.Contains(t.SpecialEquipId)).ToListAsync();
+                //航区 
+                var nArea = await _dbContext.Queryable<NavigationArea>().Where(t => t.IsDelete == 1).ToListAsync();
 
                 //名称赋值
                 foreach (var t in rt)
@@ -219,8 +221,12 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                         var cerofcS = cerOfComps.FirstOrDefault(x => x.Type == CertificatesEnum.SCertificate && x.CertificateId == t.BId);
                         t.FPositionName = position.FirstOrDefault(x => x.BusinessId.ToString() == cerofcF?.FPosition)?.Name;
                         t.FPosition = cerofcF?.FPosition;
+                        t.FNarea = cerofcF?.FNavigationArea;
+                        t.FNareaName = nArea.FirstOrDefault(x => x.BusinessId.ToString() == cerofcF?.FNavigationArea)?.Name;
                         t.SPositionName = position.FirstOrDefault(x => x.BusinessId.ToString() == cerofcS?.SPosition)?.Name;
                         t.SPosition = cerofcS?.SPosition;
+                        t.SNarea = cerofcS?.SNavigationArea;
+                        t.SNareaName = nArea.FirstOrDefault(x => x.BusinessId.ToString() == cerofcS?.SNavigationArea)?.Name;
                     }
                     t.ServiceBookName = EnumUtil.GetDescription(t.ServiceBookType);
                     t.SkillsCertificateName = sctabNames;

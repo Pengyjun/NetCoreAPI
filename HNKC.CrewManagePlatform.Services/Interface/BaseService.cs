@@ -42,7 +42,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface
             #region 数据验证
             //数据验证
             var num = res.Where(x => x.DataMonth.ToString().Length != 6).Count();
-            if (num >= 0)
+            if (num > 0)
             {
                 return Result.Fail("数据日期有误请检查");
             }

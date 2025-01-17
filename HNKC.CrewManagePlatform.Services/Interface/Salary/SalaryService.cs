@@ -250,33 +250,41 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Salary
 
             //查询推送记录
             //所有未推送的用户
-            var allNoPushUserId = await dbContext.Queryable<SalaryPushRecord>()
-                 .Where(x => x.IsDelete == 1 && x.Year==year&&x.Month==month&&x.Result==1)
-                 .Select(x=>x.UserId).ToListAsync();
+            var allPushUserId = await dbContext.Queryable<SalaryPushRecord>()
+                 .Where(x => x.IsDelete == 1 && x.Year==year&&x.Month==month)
+                 .ToListAsync();
+            var allNoPushUserId= allPushUserId.Where(x=>x.Result==1).Select(x=>x.UserId).ToList();
             var pushUserList= allUser.Where(x =>!allNoPushUserId.Contains(x.Id)).ToList();
             if (pushUserList.Count == 0)
             {
-                return Result.Fail("没有可发送的短信", (int)ResponseHttpCode.SendFail);
+                return Result.Fail("本月短信已发送，没有可发送的短信", (int)ResponseHttpCode.SendFail);
             }
             var len = int.Parse(AppsettingsHelper.GetValue("Length"));
             foreach (var item in pushUserList)
             {
-                salaryPushRecords.Add(new SalaryPushRecord()
+                if (allPushUserId.Where(x => x.UserId == item.Id).Count() == 0)
                 {
-                    Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
-                    BusinessId = Guid.Empty,
-                    Month = month,
-                    Year = year,
-                    UserId = item.Id,
-                    Result = 0,
-                    RandomUrl = RandomHelper.NumberAndLetters(len),
-                    BusinessType = (baseRequest==null|| baseRequest.BId==null) ? 1 : 0,
-                    PhoneUrl = WebUtility.UrlEncode(CryptoStringExtension.EncryptAsync($"{item.WorkNumber},{year},{month}"))
-                });
+                    salaryPushRecords.Add(new SalaryPushRecord()
+                    {
+                        Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                        BusinessId = Guid.Empty,
+                        Month = month,
+                        Year = year,
+                        UserId = item.Id,
+                        Result = 0,
+                        RandomUrl = RandomHelper.NumberAndLetters(len),
+                        BusinessType = (baseRequest == null || baseRequest.BId == null) ? 1 : 0,
+                        PhoneUrl = WebUtility.UrlEncode(CryptoStringExtension.EncryptAsync($"{item.WorkNumber},{year},{month}"))
+                    });
+                }
+               
             }
-            await dbContext.Insertable<SalaryPushRecord>(salaryPushRecords).ExecuteCommandAsync();
+            if (salaryPushRecords.Count > 0)
+            {
+                await dbContext.Insertable<SalaryPushRecord>(salaryPushRecords).ExecuteCommandAsync();
+            }
             //不等待
-            if (baseRequest == null && baseRequest.BId == Guid.Empty)
+            if (baseRequest!=null&&baseRequest.BId==null)
             {
                 //群发
                 SendSmsAsync(null);

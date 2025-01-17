@@ -1,5 +1,6 @@
 ﻿using HNKC.CrewManagePlatform.Models.CommonResult;
 using HNKC.CrewManagePlatform.Models.Dtos.Disembark;
+using UtilsSharp.Shared.Standard;
 
 namespace HNKC.CrewManagePlatform.Services.Interface.Disembark
 {
@@ -13,12 +14,35 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Disembark
         /// </summary>
         /// <param name="requestBody"></param>
         /// <returns></returns>
-        Task<Result> SaveDisembarkAsync(DisembarkRequest requestBody);
+        Task<Result> SaveCrewDisembarkAsync(DisembarkRequest requestBody);
         /// <summary>
         /// 离船申请列表
         /// </summary>
         /// <param name="requestBody"></param>
         /// <returns></returns>
-        Task<PageResult<SearchDisembark>> SearchDisembarkAsync(SearchDisembarkRequest requestBody);
+        Task<PageResult<SearchDisembark>> SearchCrewDisembarkAsync(SearchDisembarkRequest requestBody);
+        /// <summary>
+        /// 船舶排班
+        /// </summary>
+        /// <param name="requestBody"></param>
+        /// <returns></returns>
+        Task<Result> SaveCrewRotaAsync(SaveSchedulingRequest requestBody);
+        /// <summary>
+        /// 船员船舶排班回显
+        /// </summary>
+        /// <param name="requestBody"></param>
+        /// <returns></returns>
+        Task<Result> CrewRotaListAsync(SchedulingRequest requestBody);
+        /// <summary>
+        /// 船舶排班用户列表
+        /// </summary>
+        /// <returns></returns>
+        Task<Result> CrewRotaUserListAsync(Guid shipId);
+        /// <summary>
+        /// 值班管理列表
+        /// </summary>
+        /// <param name="requestBody"></param>
+        /// <returns></returns>
+        Task<PageResult<SearchCrewRota>> SearchCrewRotaAsync(SearchCrewRotaRequest requestBody);
     }
 }

@@ -14,9 +14,9 @@ namespace HNKC.CrewManagePlatform.SqlSugars.Models
         [SugarColumn(Length = 50, ColumnDescription = "所在船舶")]
         public string? OnShip { get; set; }
         /// <summary>
-        /// 职务
+        /// 在船职务
         /// </summary>
-        [SugarColumn(Length = 100, ColumnDescription = "职务")]
+        [SugarColumn(Length = 100, ColumnDescription = "在船职务")]
         public string? Postition { get; set; }
         /// <summary>
         /// 上船日期

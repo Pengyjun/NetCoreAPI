@@ -55,7 +55,7 @@ namespace HNKC.CrewManagePlatform.SqlSugars.Extensions
                            if (isOpenSql)
                            {
                                //获取无参数化sql  会影响性能  建议调试使用生产环境禁止使用
-                               sqlParmae = UtilMethods.GetSqlString(DbType.Dm, sql, pars);
+                               sqlParmae = UtilMethods.GetSqlString(DbType.MySql, sql, pars);
                            }
                            else
                            {
@@ -108,7 +108,7 @@ namespace HNKC.CrewManagePlatform.SqlSugars.Extensions
                        }
                    };
                });
-                return sqlSugar;
+                return sqlSugar.CopyNew();
             });
         }
 
