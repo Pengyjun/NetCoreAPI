@@ -10,6 +10,7 @@ using GHMonitoringCenterApi.Domain.Models;
 using GHMonitoringCenterApi.Application.Contracts.Dto.EquipmentManagement;
 using HNKC.OperationLogsAPI.Dto.ResponseDto;
 using GHMonitoringCenterApi.Application.Contracts.Dto.Word;
+using GHMonitoringCenterApi.Application.Contracts.Dto.ConstructionLog;
 
 namespace GHMonitoringCenterApi.Application.Contracts.IService
 {
@@ -236,7 +237,12 @@ namespace GHMonitoringCenterApi.Application.Contracts.IService
         /// <param name="requestDto"></param>
         /// <returns></returns>
         Task<ResponseAjaxResult<List<DayReportConstruction>>> GetDayReportConstructionAsync(ExternalRequestDto requestDto);
-
+        /// <summary>
+        /// 获取施工日志详情
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        Task<ResponseAjaxResult<SearchConstructionLoDetailsgResponseDto>> GetDayReportConstructionDetailAsync(SearchConstructionLoDetailsgRequestDto requestDto);
 
         /// <summary>
         /// 生产监控系统使用接口 其他系统不适用  本系统也不使用

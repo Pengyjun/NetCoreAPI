@@ -20,5 +20,10 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.ConstructionLog
         /// </summary>
         public int? DateTime { get; set; }
 
+        /// <summary>
+        /// 对外查询使用
+        /// </summary>
+        public DateTime SearchTime { get; set; }
+
     }
 }
