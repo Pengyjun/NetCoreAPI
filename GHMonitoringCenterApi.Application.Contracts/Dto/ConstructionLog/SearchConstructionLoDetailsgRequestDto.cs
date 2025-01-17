@@ -21,7 +21,7 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.ConstructionLog
         public int? DateTime { get; set; }
 
         /// <summary>
-        /// 对外查询使用
+        /// 对外查询使用 填报时间
         /// </summary>
         public DateTime SearchTime { get; set; }
 
