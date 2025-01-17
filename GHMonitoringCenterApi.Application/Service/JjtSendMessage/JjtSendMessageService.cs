@@ -2952,14 +2952,18 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
 
             foreach (var item in np)
             {
-               var islow= drData.Where(x => x.ProjectId == item.ProjectId&&x.DateDay== currentTimeInt&&x.IsLow==0).Select(x => x.IsLow).FirstOrDefault();
-                imp.Add(new ImpProjectWarning
+               var islow= drData.Where(x => x.ProjectId == item.ProjectId&&x.DateDay== currentTimeInt&&x.IsLow==0).FirstOrDefault();
+                if (islow != null)
                 {
-                    IsLow= islow==null?0:islow,
-                    DayAmount = drData.FirstOrDefault(x => x.ProjectId == item.ProjectId)?.DayActualProductionAmount / 10000,
-                    DeviationWarning = drData.FirstOrDefault(x => x.ProjectId == item.ProjectId)?.DeviationWarning,
-                    ProjectName = item.ProjectName
-                });
+                    imp.Add(new ImpProjectWarning
+                    {
+                        IsLow = islow.IsLow,
+                        DayAmount = drData.FirstOrDefault(x => x.ProjectId == item.ProjectId)?.DayActualProductionAmount / 10000,
+                        DeviationWarning = drData.FirstOrDefault(x => x.ProjectId == item.ProjectId)?.DeviationWarning,
+                        ProjectName = item.ProjectName
+                    });
+                }
+               
             }
             foreach (var item in imp)
             {
