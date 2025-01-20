@@ -65,7 +65,7 @@ namespace HNKC.CrewManagePlatform.SqlSugars.Extensions
                        //调试时打印sql语句 生产时注释掉
                        if (isOpenSql)
                        {
-                           Console.WriteLine($"{sqlParmae}");
+                          // Console.WriteLine($"{sqlParmae}");
                        }
                    };
                    db.Aop.DataExecuting = (value, entityInfo) =>

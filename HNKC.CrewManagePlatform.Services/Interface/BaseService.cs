@@ -41,6 +41,11 @@ namespace HNKC.CrewManagePlatform.Services.Interface
             List<SalaryAsExcelResponse> res = readResult.ToList();
             #region 数据验证
             //数据验证
+            if (res.Where(x=>string.IsNullOrWhiteSpace(x.WorkNumber)).Count()> 0)
+            {
+                return Result.Fail("职工号存在为空的情况请检查");
+            }
+           
             var num = res.Where(x => x.DataMonth.ToString().Length != 6).Count();
             if (num > 0)
             {
@@ -68,7 +73,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface
             var salaryList = mapper.Map<List<SalaryAsExcelResponse>, List<HNKC.CrewManagePlatform.SqlSugars.Models.Salary>>(res);
             if (salaryList.Any())
             {
-                var userList = await _dbContext.Queryable<User>().Where(x => x.IsDelete == 1).ToListAsync();
+                var userList = await _dbContext.Queryable<User>().Where(x => x.IsDelete == 1&&!SqlFunc.IsNullOrEmpty(x.WorkNumber)).ToListAsync();
                 foreach (var item in salaryList)
                 {
                     item.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();

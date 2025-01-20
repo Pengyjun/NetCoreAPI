@@ -356,8 +356,9 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Salary
             }
             catch (Exception ex)
             {
+                await Console.Out.WriteLineAsync("保存审计日志报错:"+ex);
                 //如果失败 把之前发送成功的 更新 防止发送重复
-                 await dbContext.Updateable<SalaryPushRecord>(allNoPushUserId).ExecuteCommandAsync();
+                await dbContext.Updateable<SalaryPushRecord>(allNoPushUserId).ExecuteCommandAsync();
             }
             return Result.Success();
         }

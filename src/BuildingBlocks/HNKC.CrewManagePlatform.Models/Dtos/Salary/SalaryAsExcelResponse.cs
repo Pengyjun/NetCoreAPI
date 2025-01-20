@@ -20,7 +20,7 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.Salary
         /// <summary>
         /// 应发工资
         /// </summary>
-        public decimal WagesPayable { get; set; }
+       //public decimal WagesPayable { get; set; }
         /// <summary>
         /// 职工号
         /// </summary>
@@ -28,7 +28,7 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.Salary
         public string? WorkNumber { get; set; }
         /// <summary>
         /// 姓名
-        /// </summary>
+          /// </summary>
         [ExcelColumnName("姓名")]
         public string? Name { get; set; }
         /// <summary>
@@ -63,9 +63,9 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.Salary
 
 
         /// <summary>
-        /// 基本工资
+        /// 基础工资
         /// </summary>
-        [ExcelColumnName("基本工资")]
+        [ExcelColumnName("基础工资")]
         public decimal BaseWage { get; set; }
 
         /// <summary>
@@ -96,31 +96,31 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.Salary
 
 
         /// <summary>
-        /// 月度绩效
+        /// 月度绩效工资
         /// </summary>
-        [ExcelColumnName("月度绩效")]
+        [ExcelColumnName("月度绩效工资")]
         public decimal MonthPerformance { get; set; }
 
 
         /// <summary>
-        /// 季度绩效
+        /// 季度绩效结算
         /// </summary>
-        [ExcelColumnName("季度绩效")]
+        [ExcelColumnName("季度绩效结算")]
         public decimal QuarterPerformance { get; set; }
 
 
 
         /// <summary>
-        /// 顶岗工资
+        /// 船员顶岗工资
         /// </summary>
-        [ExcelColumnName("顶岗工资")]
+        [ExcelColumnName("船员顶岗工资")]
         public decimal RegularWage { get; set; }
 
 
         /// <summary>
-        /// 培训绩效
+        /// 船员培训绩效
         /// </summary>
-        [ExcelColumnName("培训绩效")]
+        [ExcelColumnName("船员培训绩效")]
         public decimal TrainPerformance { get; set; }
 
         /// <summary>
@@ -130,15 +130,15 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.Salary
         public decimal OvertimeWage { get; set; }
 
         /// <summary>
-        /// 补发补扣
+        /// 补发补扣工资
         /// </summary>
-        [ExcelColumnName("补发补扣")]
+        [ExcelColumnName("补发补扣工资")]
         public decimal ReissueBuckleMoney { get; set; }
 
         /// <summary>
-        /// 其他工资
+        /// 其它工资
         /// </summary>
-        [ExcelColumnName("其他工资")]
+        [ExcelColumnName("其它工资")]
         public decimal OtherWage { get; set; }
 
 
@@ -270,9 +270,9 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.Salary
 
 
         /// <summary>
-        /// 上一年绩效结算
+        /// 上年绩效结算
         /// </summary>
-        [ExcelColumnName("上一年绩效结算")]
+        [ExcelColumnName("上年绩效结算")]
         public decimal UpYearPerformance { get; set; }
 
         /// <summary>

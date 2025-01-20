@@ -103,7 +103,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.AuditLog
                     };
                     if (db != null)
                     {
-                        await db.Insertable<AuditLogs>(auditLogs).ExecuteCommandAsync();
+                        await db.CopyNew().Insertable<AuditLogs>(auditLogs).ExecuteCommandAsync();
                     }
 
 
