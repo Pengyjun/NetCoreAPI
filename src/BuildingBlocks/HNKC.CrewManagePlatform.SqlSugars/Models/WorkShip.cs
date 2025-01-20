@@ -14,9 +14,9 @@ namespace HNKC.CrewManagePlatform.SqlSugars.Models
         [SugarColumn(Length = 50, ColumnDescription = "所在船舶")]
         public string? OnShip { get; set; }
         /// <summary>
-        /// 职务
+        /// 在船职务
         /// </summary>
-        [SugarColumn(Length = 100, ColumnDescription = "职务")]
+        [SugarColumn(Length = 100, ColumnDescription = "在船职务")]
         public string? Postition { get; set; }
         /// <summary>
         /// 上船日期
@@ -27,17 +27,17 @@ namespace HNKC.CrewManagePlatform.SqlSugars.Models
         /// 下船日期
         /// </summary>
         [SugarColumn(ColumnDataType = "datetime", ColumnDescription = "下船日期")]
-        public DateTime WorkShipEndTime { get; set; }
+        public DateTime? WorkShipEndTime { get; set; }
         /// <summary>
-        /// 在船日期
+        /// 所在项目
         /// </summary>
-        [SugarColumn(ColumnDataType = "int", ColumnDescription = "在船日期", DefaultValue = "0")]
-        public int OnBoardTime { get; set; }
+        [SugarColumn(Length = 256, ColumnDescription = "所在项目")]
+        public string? ProjectName { get; set; }
         /// <summary>
-        /// 休假日期
+        /// 所在国家
         /// </summary>
-        [SugarColumn(ColumnDataType = "int", ColumnDescription = "休假日期", DefaultValue = "0")]
-        public int HolidayTime { get; set; }
+        [SugarColumn(Length = 36, ColumnDescription = "所在国家")]
+        public Guid? Country { get; set; }
         /// <summary>
         /// 关联键
         /// </summary>

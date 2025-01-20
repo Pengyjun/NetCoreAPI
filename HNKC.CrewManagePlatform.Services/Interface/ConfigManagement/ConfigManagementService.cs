@@ -102,13 +102,13 @@ namespace HNKC.CrewManagePlatform.Services.Interface.ConfigManagement
                 })
                 .ToPageListAsync(requestBody.PageIndex, requestBody.PageSize, total);
 
-            var countrys = await _dbContext.Queryable<CountryRegion>().Where(t => rr.Select(x => x.Country).ToList().Contains(t.BusinessId.ToString())).ToListAsync();
-            var ins = await _dbContext.Queryable<Institution>().Where(t => rr.Select(x => x.Company).ToList().Contains(t.BusinessId.ToString())).ToListAsync();
+            var countrys = await _dbContext.Queryable<CountryRegion>().Where(t => rr.Select(x => x.Country).ToList().Contains(t.BusinessId)).ToListAsync();
+            var ins = await _dbContext.Queryable<Institution>().Where(t => rr.Select(x => x.Company).ToList().Contains(t.BusinessId)).ToListAsync();
 
             foreach (var item in rr)
             {
-                item.CompanyName = ins.FirstOrDefault(x => x.BusinessId.ToString() == item.Company)?.Name;
-                item.CountryName = countrys.FirstOrDefault(x => x.BusinessId.ToString() == item.Country)?.Name;
+                item.CompanyName = ins.FirstOrDefault(x => x.BusinessId == item.Company)?.Name;
+                item.CountryName = countrys.FirstOrDefault(x => x.BusinessId == item.Country)?.Name;
                 item.ShipTypeName = EnumUtil.GetDescription(item.ShipType);
             }
             dt.List = rr;

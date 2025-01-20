@@ -66,7 +66,7 @@ namespace HNKC.CrewManagePlatform.SqlSugars
                 };
             });
             Type[] types = typeof(BaseEntity<Guid>).Assembly.GetTypes()
-            .Where(it => it.FullName.Contains("HNKC.CrewManagePlatform.SqlSugars.Models.SalaryPushRecord")
+            .Where(it => it.FullName.Contains("HNKC.CrewManagePlatform.SqlSugars.Models.CrewRota")
             &&!it.Name .Contains("BaseEntity")
             )
             .ToArray();

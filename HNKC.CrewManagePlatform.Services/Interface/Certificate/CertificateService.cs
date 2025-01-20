@@ -38,7 +38,6 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Certificate
             RefAsync<int> total = 0;
             var roleType = await _baseService.CurRoleType();
             if (roleType == -1) { return new PageResult<CertificateSearch>(); }
-            var onShips = await _dbContext.Queryable<WorkShip>().Where(t => t.IsDelete == 1 && GlobalCurrentUser.UserBusinessId == t.WorkShipId).Select(x => x.OnShip).ToListAsync();
             #region 船员关联
             var uentityFist = _dbContext.Queryable<UserEntryInfo>()
                 .GroupBy(u => u.UserEntryId)
@@ -68,8 +67,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Certificate
                 .LeftJoin(uentity, (t1, t2, t3) => t1.BusinessId == t3.UserEntryId)
                 .InnerJoin(wShip, (t1, t2, t3, t5) => t1.BusinessId == t5.WorkShipId)
                 .InnerJoin<OwnerShip>((t1, t2, t3, t5, t4) => t5.OnShip == t4.BusinessId.ToString())
-                .WhereIF(roleType == 3, (t1, t2, t3, t5, t4) => t5.OnShip == t3.BusinessId.ToString() && onShips.Contains(t5.OnShip))//船长
-                //.WhereIF(roleType == 4, (t1, t2, t3, t5, t4) => GlobalCurrentUser.UserBusinessId == t5.WorkShipId)//船员
+                .WhereIF(roleType == 3, (t1, t2, t3, t5, t4) => t5.OnShip == t3.BusinessId.ToString() && GlobalCurrentUser.UserBusinessId.ToString() == t5.OnShip)//船长
                 .InnerJoin<RemindSetting>((t1, t2, t3, t5, t4, t6) => t6.Types == t2.Type && t6.RemindType == 22 && t6.Enable == 1)
                 .WhereIF(requestBody.Certificates == CertificatesEnum.FCertificate, (t1, t2, t3, t5, t4, t6) => SqlFunc.DateDiff(DateType.Day, DateTime.Now, Convert.ToDateTime(t2.FEffectiveTime)) + 1 <= t6.Days)
                 .WhereIF(requestBody.Certificates == CertificatesEnum.SCertificate, (t1, t2, t3, t5, t4, t6) => SqlFunc.DateDiff(DateType.Day, DateTime.Now, Convert.ToDateTime(t2.SEffectiveTime)) + 1 <= t6.Days)
@@ -110,7 +108,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Certificate
             var remindSet = await _dbContext.Queryable<RemindSetting>().Where(t => t.RemindType == 22 && t.IsDelete == 1 && t.Enable == 1).ToListAsync();
             var position = await _dbContext.Queryable<Position>().Where(t => t.IsDelete == 1).ToListAsync();
             var ownShipTable = await _dbContext.Queryable<OwnerShip>().Where(t => rr.Select(x => x.OnBoard).Contains(t.BusinessId.ToString())).ToListAsync();
-            var countryTable = await _dbContext.Queryable<CountryRegion>().Where(t => rr.Select(x => x.Country).Contains(t.BusinessId.ToString())).ToListAsync();
+            var countryTable = await _dbContext.Queryable<CountryRegion>().Where(t => rr.Select(x => x.Country).Contains(t.BusinessId)).ToListAsync();
             var certificateOfCompetency = await _dbContext.Queryable<CertificateOfCompetency>().Where(t => rr.Select(x => x.BId).ToList().Contains(t.CertificateId.ToString())).ToListAsync();
             foreach (var u in rr)
             {
@@ -174,9 +172,9 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Certificate
                             //if (existData6 == null) continue;
                             break;
                     }
-                    u.OnStatus = EnumUtil.GetDescription(_baseService.ShipUserStatus(u.WorkShipStartTime, u.DeleteResonEnum));
+                    u.OnStatus = EnumUtil.GetDescription(_baseService.ShipUserStatus(u.WorkShipStartTime, u.DeleteResonEnum, u.WorkShipStartTime));
                     u.OnBoardName = ownShipTable.FirstOrDefault(x => x.BusinessId.ToString() == u.OnBoard)?.ShipName;
-                    u.CountryName = countryTable.FirstOrDefault(x => x.BusinessId.ToString() == u.Country)?.Name;
+                    u.CountryName = countryTable.FirstOrDefault(x => x.BusinessId == u.Country)?.Name;
                     u.ShipTypeName = EnumUtil.GetDescription(u.ShipType);
                     u.Age = _baseService.CalculateAgeFromIdCard(u.CardId);
                     if (u.FPosition != null) u.FPositionName = position.FirstOrDefault(x => x.BusinessId.ToString() == u.FPosition)?.Name;

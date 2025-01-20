@@ -86,6 +86,21 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api.Controllers
         {
             return await _service.SaveNotesAsync(requestBody);
         }
+
+        #region 船员动态
+        /// <summary>
+        /// 船员动态列表
+        /// </summary>
+        /// <param name="requestBody"></param>
+        /// <returns></returns>
+        [HttpGet("SearchCrewDynamics")]
+        public async Task<IActionResult> SearchCrewDynamicsAsync([FromQuery] CrewDynamicsRequest requestBody)
+        {
+            var data = await _service.SearchCrewDynamicsAsync(requestBody);
+            return Ok(data);
+        }
+
+        #endregion
         #region 下拉列表
         /// <summary>
         /// 获取基本下拉列表

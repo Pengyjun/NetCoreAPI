@@ -171,11 +171,11 @@ namespace HNKC.CrewManagePlatform.Services.Interface
         /// </summary>
         /// <param name="idCard"></param>
         /// <returns></returns>
-        public int CalculateAgeFromIdCard(string idCard)
+        public int CalculateAgeFromIdCard(string? idCard)
         {
-            if (idCard.Length != 18)
+            if (idCard?.Length != 18)
             {
-                throw new ArgumentException("身份证号码应为18位");
+                return 0;
             }
 
             // 提取出生日期（身份证的前 6 位是出生年月日，格式为yyyyMMdd）
@@ -201,8 +201,9 @@ namespace HNKC.CrewManagePlatform.Services.Interface
         /// </summary>
         /// <param name="departureTime">下船时间</param>
         /// <param name="deleteResonEnum">是否删除</param>
+        /// <param name="holidayTime">休假下船时间</param>
         /// <returns></returns>
-        public CrewStatusEnum ShipUserStatus(DateTime departureTime, CrewStatusEnum deleteResonEnum)
+        public CrewStatusEnum ShipUserStatus(DateTime departureTime, CrewStatusEnum deleteResonEnum, DateTime? holidayTime)
         {
             var status = new CrewStatusEnum();
             if (deleteResonEnum != CrewStatusEnum.Normal)
@@ -210,11 +211,14 @@ namespace HNKC.CrewManagePlatform.Services.Interface
                 //删除：管理人员手动操作，包括离职、调离和退休，优先于其他任何状态
                 status = deleteResonEnum;
             }
-            //else if (holidayTime.HasValue)
-            //{
-            //    //休假：提交离船申请且经审批同意后，按所申请离船、归船日期设置为休假状态，优先于在岗、待岗状态
-            //    status = CrewStatusEnum.XiuJia;
-            //}
+            else if (holidayTime.HasValue)
+            {
+                if (holidayTime < DateTime.Now)
+                {
+                    //休假：提交离船申请且经审批同意后，按所申请离船、归船日期设置为休假状态，优先于在岗、待岗状态
+                    status = CrewStatusEnum.XiuJia;
+                }
+            }
             else if (departureTime <= DateTime.Now)
             {
                 //在岗、待岗:船员登记时必填任职船舶数据，看其中最新的任职船舶上船时间和下船时间，在此时间内为在岗状态，否则为待岗状态
@@ -287,16 +291,10 @@ namespace HNKC.CrewManagePlatform.Services.Interface
             //是管理员不做任何处理
             if (!GlobalCurrentUser.IsAdmin)
             {
-                //获取当前登录角色
-                //var role = await _dbContext.Queryable<SqlSugars.Models.Role>().FirstAsync(t => t.IsDelete == 1 && t.BusinessId == GlobalCurrentUser.RoleBusinessId);
-                //if (role != null)
-                //{
-                if (GlobalCurrentUser.Type != 3 && GlobalCurrentUser.Type != 4) return -1;//3船长 4领导班子 否则-1
+                if (GlobalCurrentUser.Type != 3 && GlobalCurrentUser.Type != 1 && GlobalCurrentUser.Type != 4) return -1;//4船员部 3船长 1管理员  否则-1
                 else return GlobalCurrentUser.Type.Value;
-                //}
-                //else { return -1; }
             }
-            else return 1;
+            else return 0;
         }
         #endregion
     }

@@ -9,6 +9,7 @@ using HNKC.CrewManagePlatform.Services.Interface.Contract;
 using HNKC.CrewManagePlatform.Services.Interface.CrewArchives;
 using HNKC.CrewManagePlatform.Services.Interface.CurrentUser;
 using HNKC.CrewManagePlatform.Services.Interface.CurrentUserService;
+using HNKC.CrewManagePlatform.Services.Interface.Disembark;
 using HNKC.CrewManagePlatform.Services.Interface.PullResult;
 using HNKC.CrewManagePlatform.Services.Interface.Salary;
 using HNKC.CrewManagePlatform.Services.Menus;
@@ -326,6 +327,7 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api
             builder.Services.AddScoped<IContractService, ContractService>();
             builder.Services.AddScoped<ICertificateService, CertificateService>();
             builder.Services.AddScoped<IConfigManagementService, ConfigManagementService>();
+            builder.Services.AddScoped<IDisembarkService, DisembarkService>();
 
         }
     }

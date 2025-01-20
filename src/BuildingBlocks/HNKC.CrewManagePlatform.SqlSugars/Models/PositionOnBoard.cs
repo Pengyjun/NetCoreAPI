@@ -1,4 +1,5 @@
-﻿using SqlSugar;
+﻿using HNKC.CrewManagePlatform.Models.Enums;
+using SqlSugar;
 
 namespace HNKC.CrewManagePlatform.SqlSugars.Models
 {
@@ -28,5 +29,10 @@ namespace HNKC.CrewManagePlatform.SqlSugars.Models
         /// </summary>
         [SugarColumn(ColumnDataType = "int", ColumnDescription = "船员类型", DefaultValue = "0")]
         public int Type { get; set; }
+        /// <summary>
+        /// 部门类型
+        /// </summary>
+        [SugarColumn(ColumnDataType = "int", ColumnDescription = "部门类型", DefaultValue = "0")]
+        public RotaEnum RotaType { get; set; }
     }
 }

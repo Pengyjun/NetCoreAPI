@@ -50,7 +50,7 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// <summary>
         /// 所在国家
         /// </summary>
-        public string? OnCountry { get; set; }
+        public Guid? OnCountry { get; set; }
         /// <summary>
         /// 
         /// </summary>
@@ -131,6 +131,22 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// <summary>
         /// 下船日期
         /// </summary>
-        public DateTime WorkShipEndTime { get; set; }
+        public DateTime? WorkShipEndTime { get; set; }
+        /// <summary>
+        /// 第一航区
+        /// </summary>
+        public string? FNarea { get; set; }
+        /// <summary>
+        /// 第一航区
+        /// </summary>
+        public string? FNareaName { get; set; }
+        /// <summary>
+        /// 第二航区
+        /// </summary>
+        public string? SNarea { get; set; }
+        /// <summary>
+        /// 第二航区
+        /// </summary>
+        public string? SNareaName { get; set; }
     }
 }

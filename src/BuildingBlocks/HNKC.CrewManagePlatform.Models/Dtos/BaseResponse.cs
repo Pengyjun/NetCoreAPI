@@ -33,5 +33,13 @@
         /// 
         /// </summary>
         public int Type { get; set; }
+        /// <summary>
+        /// 国家
+        /// </summary>
+        public Guid? Country { get; set; }
+        /// <summary>
+        /// 所在项目
+        /// </summary>
+        public string? ProjectName { get; set; }
     }
 }

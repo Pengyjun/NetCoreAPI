@@ -29,5 +29,10 @@ namespace HNKC.CrewManagePlatform.SqlSugars.Models
         /// </summary>
         [SugarColumn(ColumnDataType = "datetime", ColumnDescription = "到期时间")]
         public DateTime? DueTime { get; set; }
+        /// <summary>
+        /// 护照id
+        /// </summary>
+        [SugarColumn(Length = 36, ColumnDescription = "护照id")]
+        public Guid? PassportCertificateId {  get; set; }
     }
 }

@@ -18,12 +18,17 @@ namespace HNKC.CrewManagePlatform.SqlSugars.Models
         /// 所属国家
         /// </summary>
         [SugarColumn(Length = 200, ColumnDescription = "所属国家")]
-        public string? Country { get; set; }
+        public Guid? Country { get; set; }
         /// <summary>
         /// 所属公司
         /// </summary>
         [SugarColumn(Length = 200, ColumnDescription = "所属公司")]
-        public string? Company { get; set; }
+        public Guid? Company { get; set; }
+        /// <summary>
+        /// 项目名称
+        /// </summary>
+        [SugarColumn(Length = 256, ColumnDescription = "项目名称")]
+        public string? ProjectName { get; set; }
         /// <summary>
         /// 船舶类型
         /// </summary>
