@@ -1739,6 +1739,13 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
             var monthReport = await dbContext.Queryable<MonthReport>().Where(x => x.IsDelete == 1 && x.DateMonth >= 202401).ToListAsync();
             //
             var projectIds = await dbContext.Queryable<Project>().Where(x => x.IsDelete == 1).ToListAsync();
+            //新增得查询----------
+            var dayNewProjectValue =await dbContext.Queryable<DayReportProductionValue>().Where(x => x.IsDelete == 1)
+                     .ToListAsync();
+            var companyProductionList = dbContext.Queryable<CompanyProductionValueInfo>()
+               .Where(x => x.IsDelete == 1 && x.DateDay.Value == SqlFunc.ToInt32(yearStartTime)).ToList();
+            var companyMonthProductionValue = GetProductionValueInfo(month, companyProductionList);
+            //新增得查询----------
             foreach (var item in companyList)
             {
                 //if (item.ItemId != "11c9c978-9ef3-411d-ba70-0d0eed93e048".ToGuid())
@@ -1858,7 +1865,7 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
                 if (item.Collect == 0)
                 {
 
-
+                 
                     //var totalYearProductionValue = Math.Round(((item.YearProductionValue + currentMonthCompanyCount) / 100000000), 2);
                     var totalYearProductionValue = Math.Round(((currentMonthCompanyCount) / 100000000), 2);
                     //超序时进度
@@ -1869,8 +1876,9 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
                         CompanyDayProductionValue = currentCompanyCount,
                         YearCompanyProductionValue = currentMonthCompanyCount,
                         Name = item.Name,
-                        DayProductionValue = Math.Round(currentCompanyCount / 10000, 2),
+                        DayProductionValue =Math.Round(currentCompanyCount / 10000, 2),
                         TotalYearProductionValue = totalYearProductionValue,
+                        //TotalYearProductionValue = companyMonthProductionValue.Sum(x => x.PlanProductionValue), //totalYearProductionValue,
                         YearProductionValueProgressPercent = yearProductionValuePercent,
                         ProductionValueProgressPercent = productionValueProgressPercent,
                         SupersequenceProgress = supersequenceProgress
@@ -1983,11 +1991,16 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
                     projectBasePoduction.IncomeSecurityLevel = incomeStar;
                     #endregion
 
-                    projectBasePoduction.DayProductionValue = dayTotalPoductionValues;
+                    var planProducitonValue = dayNewProjectValue.Where(x => x.DateDay == currentTimeInt).Select(x=>x.ProductionValue).FirstOrDefault();
+                    projectBasePoduction.DayProductionValue = Math.Round(planProducitonValue.Value/10000, 2);//dayTotalPoductionValues;
                     /*projectBasePoduction.TotalYearProductionValue =   Math.Round(companyBasePoductionValues.Sum(x => x.YearCompanyProductionValue.Value) / 100000000M, 2);*/
+                    //计算日报数据
+                    var newDayValues = await dbContext.Queryable<DayReport>().Where(x => x.IsDelete == 1 && x.DateDay >= startYearTimeInt && x.DateDay <= 20250113).SumAsync(x => x.DayActualProductionAmount);
 
-                    projectBasePoduction.TotalYearProductionValue = companyBasePoductionValues.Sum(x => x.TotalYearProductionValue);
+                    projectBasePoduction.TotalYearProductionValue = Math.Round((dayNewProjectValue.Where(x => x.DateDay <= currentTimeInt).Sum(x => x.ProductionValue.Value)+ newDayValues) / 100000000, 2);// companyBasePoductionValues.Sum(x => x.TotalYearProductionValue);
                     //projectBasePoduction.TotalYearProductionValue = companyBasePoductionValues.Sum(x => x.TotalYearProductionValue);
+                   
+
                     projectBasePoduction.ProductionValueProgressPercent = productionValueProgressPercent;
                     companyBasePoductionValues = companyBasePoductionValues.Where(x => !string.IsNullOrWhiteSpace(x.Name)).ToList();
                     projectBasePoduction.CompanyBasePoductionValues = companyBasePoductionValues;
@@ -1998,10 +2011,10 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
                     companyBasePoductionValues.Add(new CompanyBasePoductionValue()
                     {
                         Name = name,
-                        DayProductionValue = dayTotalPoductionValues,
+                        //DayProductionValue = dayTotalPoductionValues,
+                        DayProductionValue = Math.Round(planProducitonValue.Value / 10000, 2),
                         // TotalYearProductionValue = Math.Round(yearProductionValue / 100000000, 2),
-                        TotalYearProductionValue = companyBasePoductionValues.Sum(x => x.TotalYearProductionValue),
-
+                        TotalYearProductionValue = Math.Round((dayNewProjectValue.Where(x => x.DateDay <= currentTimeInt).Sum(x => x.ProductionValue.Value)+ newDayValues) / 100000000,2),
                         YearProductionValueProgressPercent = 100,
                         ProductionValueProgressPercent = productionValueProgressPercent,
                         SupersequenceProgress = projectBasePoduction.SupersequenceProgress
@@ -2012,9 +2025,9 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
             #endregion
 
             #region 柱形图
-            var companyProductionList = dbContext.Queryable<CompanyProductionValueInfo>()
-                .Where(x => x.IsDelete == 1 && x.DateDay.Value == SqlFunc.ToInt32(yearStartTime)).ToList();
-            var companyMonthProductionValue = GetProductionValueInfo(month, companyProductionList);
+            //var companyProductionList = dbContext.Queryable<CompanyProductionValueInfo>()
+            //    .Where(x => x.IsDelete == 1 && x.DateDay.Value == SqlFunc.ToInt32(yearStartTime)).ToList();
+            //var companyMonthProductionValue = GetProductionValueInfo(month, companyProductionList);
             CompanyProductionCompare companyProductionCompares = new CompanyProductionCompare()
             {
                 PlanCompleteRate = new List<decimal>(),
@@ -2904,7 +2917,7 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
                 {
                     XAxle = currentNowTimeInt.ToString().Substring(0, 4) + "-" + currentNowTimeInt.ToString().Substring(4, 2) + "-" + currentNowTimeInt.ToString().Substring(6, 2),
                     YAxlePlanValue = Math.Round(dayPlanProAmount / difDays / 100000000M, 2),
-                    YAxleCompleteValue = storeProductionValue.HasValue? ((0.25M - yCompleteValue > 0) ? storeProductionValue : yCompleteValue): yCompleteValue
+                    YAxleCompleteValue = storeProductionValue.HasValue? ((0.25M - yCompleteValue > 0) ? Math.Round(storeProductionValue.Value/100000000,2) : yCompleteValue): yCompleteValue
                     //YAxlePlanValue = Math.Round((GetProductionValueInfo(monthInt, companyProductionList).Sum(x => x.PlanProductionValue) / 300000M), 2),
                     //YAxleCompleteValue = Math.Round(dayActualProductionAmount / 100000000M, 2)
                 }) ;
@@ -2950,21 +2963,21 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
             var npids=drData.Select(x => x.ProjectId).Distinct().ToList();
             var np = improjects.Where(x => npids.Contains(x.ProjectId.Value)).ToList();
 
-            foreach (var item in np)
-            {
-               var islow= drData.Where(x => x.ProjectId == item.ProjectId&&x.DateDay== currentTimeInt&&x.IsLow==0).FirstOrDefault();
-                if (islow != null)
-                {
-                    imp.Add(new ImpProjectWarning
-                    {
-                        IsLow = islow.IsLow,
-                        DayAmount = drData.FirstOrDefault(x => x.ProjectId == item.ProjectId)?.DayActualProductionAmount / 10000,
-                        DeviationWarning = drData.FirstOrDefault(x => x.ProjectId == item.ProjectId)?.DeviationWarning,
-                        ProjectName = item.ProjectName
-                    });
-                }
+            //foreach (var item in np)
+            //{
+            //   var islow= drData.Where(x => x.ProjectId == item.ProjectId&&x.DateDay== currentTimeInt&&x.IsLow==0).FirstOrDefault();
+            //    if (islow != null)
+            //    {
+            //        imp.Add(new ImpProjectWarning
+            //        {
+            //            IsLow = islow.IsLow,
+            //            DayAmount = drData.FirstOrDefault(x => x.ProjectId == item.ProjectId)?.DayActualProductionAmount / 10000,
+            //            DeviationWarning = drData.FirstOrDefault(x => x.ProjectId == item.ProjectId)?.DeviationWarning,
+            //            ProjectName = item.ProjectName
+            //        });
+            //    }
                
-            }
+            //}
             foreach (var item in imp)
             {
                 item.DayAmount = item.DayAmount == 0 || string.IsNullOrWhiteSpace(item.DayAmount.ToString()) ? 0M : Math.Round(item.DayAmount.Value, 2);
