@@ -150,9 +150,9 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.Salary
 
 
         /// <summary>
-        /// 昵称补贴
+        /// 职称补贴
         /// </summary>
-        [ExcelColumnName("昵称补贴")]
+        [ExcelColumnName("职称补贴")]
         public decimal NameSubsidy { get; set; }
 
 
@@ -194,9 +194,9 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.Salary
 
 
         /// <summary>
-        /// 值班津贴
+        /// 值班补贴
         /// </summary>
-        [ExcelColumnName("值班津贴")]
+        [ExcelColumnName("值班补贴")]
         public decimal DutyAllowance { get; set; }
 
 
@@ -232,9 +232,9 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.Salary
 
 
         /// <summary>
-        /// 伙食补贴
+        /// 伙食津贴
         /// </summary>
-        [ExcelColumnName("伙食补贴")]
+        [ExcelColumnName("伙食津贴")]
         public decimal FoodSubsidy { get; set; }
 
 
@@ -276,9 +276,9 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.Salary
         public decimal UpYearPerformance { get; set; }
 
         /// <summary>
-        /// 本年年绩效结算
+        /// 本年绩效预结算
         /// </summary>
-        [ExcelColumnName("本年年绩效结算")]
+        [ExcelColumnName("本年绩效预结算")]
         public decimal YearPerformance { get; set; }
 
         /// <summary>
@@ -407,12 +407,14 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.Salary
         ///境外发放（人民币）
         /// </summary>
         [ExcelColumnName("境外发放（人民币）")]
+        [ExcelColumnIndex(51)]
         public decimal OffShoreIssuanceRMB { get; set; }
 
         /// <summary>
         ///境外发放（美元）
         /// </summary>
-        [ExcelColumnName("境外发放（美元）")]
+        [ExcelColumnName("境外发放  （美元）")]
+        [ExcelColumnIndex(52)]
         public decimal OffShoreReleaseUS { get; set; }
 
         /// <summary>

@@ -79,9 +79,10 @@ namespace HNKC.CrewManagePlatform.Services.Interface
                     item.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
                     var userInfo = userList.Where(x => x.WorkNumber == item.WorkNumber).FirstOrDefault();
                     if (userInfo != null)
-                    {
+                    {   
                         item.UserId = userInfo.Id;
                     }
+                    item.BusinessId = GuidUtil.Next();
                     item.DataSource = (int)DataSourceEnum.Import;
                     item.Year = item.DataMonth.ToString().Substring(0, 4).ObjToInt();
                     item.Month = item.DataMonth.ToString().Substring(4, 2).ObjToInt();
