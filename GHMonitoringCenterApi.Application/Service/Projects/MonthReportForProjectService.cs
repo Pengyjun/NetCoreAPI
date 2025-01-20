@@ -9,6 +9,7 @@ using GHMonitoringCenterApi.Domain.Enums;
 using GHMonitoringCenterApi.Domain.Models;
 using GHMonitoringCenterApi.Domain.Shared;
 using GHMonitoringCenterApi.Domain.Shared.Enums;
+using GHMonitoringCenterApi.Domain.Shared.Util;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using SqlSugar;
@@ -211,11 +212,12 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 report.TotalOutsourcingExpensesAmount = klReportList.Where(x => x.ProjectId == report.ProjectId && report.ShipId == x.ShipId && x.ProjectWBSId == wbsId && x.UnitPrice == report.UnitPrice).Sum(x => x.TotalOutsourcingExpensesAmount);
 
                 report.ActualOutAmount = klReportList.Where(x => x.ProjectId == report.ProjectId && report.ShipId == x.ShipId && x.ProjectWBSId == wbsId && x.UnitPrice == report.UnitPrice).Sum(x => x.ActualOutAmount);
-                if (report.ActualOutAmount == 0M) report.ActualOutAmount = report.TotalOutsourcingExpensesAmount;
                 report.ActualCompQuantity = klReportList.Where(x => x.ProjectId == report.ProjectId && report.ShipId == x.ShipId && x.ProjectWBSId == wbsId && x.UnitPrice == report.UnitPrice).Sum(x => x.ActualCompQuantity);
-                if (report.ActualCompQuantity == 0M) report.ActualCompQuantity = report.TotalCompletedQuantity;
                 report.ActualCompAmount = klReportList.Where(x => x.ProjectId == report.ProjectId && report.ShipId == x.ShipId && x.ProjectWBSId == wbsId && x.UnitPrice == report.UnitPrice).Sum(x => x.ActualCompAmount);
-                if (report.ActualCompAmount == 0) report.ActualCompAmount = report.TotalCompleteProductionAmount;
+
+                report.OldHQuantity = klReportList.Where(x => x.ProjectId == report.ProjectId && report.ShipId == x.ShipId && x.ProjectWBSId == wbsId && x.UnitPrice == report.UnitPrice).Sum(x => x.OldHQuantity);
+                report.OldCurrencyHValue = klReportList.Where(x => x.ProjectId == report.ProjectId && report.ShipId == x.ShipId && x.ProjectWBSId == wbsId && x.UnitPrice == report.UnitPrice).Sum(x => x.OldCurrencyHValue);
+                report.OldCurrencyHOutValue = klReportList.Where(x => x.ProjectId == report.ProjectId && report.ShipId == x.ShipId && x.ProjectWBSId == wbsId && x.UnitPrice == report.UnitPrice).Sum(x => x.OldCurrencyHOutValue);
 
                 report.RMBHValue = klReportList.Where(x => x.ProjectId == report.ProjectId && report.ShipId == x.ShipId && x.ProjectWBSId == wbsId && x.UnitPrice == report.UnitPrice).Sum(x => x.RMBHValue);
                 report.RMBHOutValue = klReportList.Where(x => x.ProjectId == report.ProjectId && report.ShipId == x.ShipId && x.ProjectWBSId == wbsId && x.UnitPrice == report.UnitPrice).Sum(x => x.RMBHOutValue);
@@ -287,9 +289,9 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                        CompleteProductionAmount = p.UnitPrice * p.CompletedQuantity, //p.CompleteProductionAmount  外币|人民币
                        ActualCompAmount = p.ActualCompAmount,
                        ActualCompQuantity = p.ActualCompQuantity,
-                       ActualOutAmount = p.ActualOutAmount,
+                       ActualOutAmount = p.CurrencyOutsourcingExpensesAmount,
                        RMBHOutValue = p.RMBHOutValue,
-                       RMBHValue = p.RMBHValue,
+                       RMBHValue = p.RMBHValue
                    })
                    .ToListAsync();
 
@@ -654,10 +656,14 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                             //如果是从开累按钮进入列表
                             if (exhaustedBtn)
                             {
-                                //如果修改后的实际值是0 给原值 不加当月日报作为新的累计数
-                                model.TotalCompleteProductionAmount = amount == 0M ? calculatePWBS.Where(t => t.ProjectId == item.Key.ProjectId && t.ShipId == item.Key.ShipId && t.UnitPrice == item.Key.UnitPrice && t.ProjectWBSId == item.Key.ProjectWBSId).Sum(x => x.CompleteProductionAmount) : amount;
-                                model.TotalCompletedQuantity = quantity == 0M ? calculatePWBS.Where(t => t.ProjectId == item.Key.ProjectId && t.ShipId == item.Key.ShipId && t.UnitPrice == item.Key.UnitPrice && t.ProjectWBSId == item.Key.ProjectWBSId).Sum(x => x.CompletedQuantity) : quantity;
-                                model.TotalOutsourcingExpensesAmount = outAmount == 0M ? calculatePWBS.Where(t => t.ProjectId == item.Key.ProjectId && t.ShipId == item.Key.ShipId && t.UnitPrice == item.Key.UnitPrice && t.ProjectWBSId == item.Key.ProjectWBSId).Sum(x => x.OutsourcingExpensesAmount) : outAmount;
+                                //如果修改后的实际值是0  不加当月日报作为新的累计数
+                                model.TotalCompleteProductionAmount = amount;
+                                model.TotalCompletedQuantity = quantity;
+                                model.TotalOutsourcingExpensesAmount = outAmount;
+
+                                model.OldCurrencyHValue = calculatePWBS.Where(t => t.ProjectId == item.Key.ProjectId && t.ShipId == item.Key.ShipId && t.UnitPrice == item.Key.UnitPrice && t.ProjectWBSId == item.Key.ProjectWBSId).Sum(x => x.CompleteProductionAmount);
+                                model.OldHQuantity = calculatePWBS.Where(t => t.ProjectId == item.Key.ProjectId && t.ShipId == item.Key.ShipId && t.UnitPrice == item.Key.UnitPrice && t.ProjectWBSId == item.Key.ProjectWBSId).Sum(x => x.CompletedQuantity);
+                                model.OldCurrencyHOutValue = calculatePWBS.Where(t => t.ProjectId == item.Key.ProjectId && t.ShipId == item.Key.ShipId && t.UnitPrice == item.Key.UnitPrice && t.ProjectWBSId == item.Key.ProjectWBSId).Sum(x => x.OutsourcingExpensesAmount);
                             }
                             else
                             {
@@ -966,21 +972,39 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             {
                 if (!model.ExhaustedBtn)
                 {
+                    //是否计算是统计的偏差月
+                    bool pianchaMonth = dateMonth > 202412 ? true : false;
                     result.HOutValue = his.OutsourcingExpensesAmount;
                     result.HQuantity = his.CompletedQuantity;
                     result.HValue = his.CompleteProductionAmount;
                     result.CurrencyHValue = his.CurrencyCompleteProductionAmount;
                     result.CurrencyOutHValue = his.CurrencyOutsourcingExpensesAmount;
+                    if (pianchaMonth)
+                    {
+                        result.HOutValue = his.RMBHOutValue;
+                        result.HQuantity = his.ActualCompCompletedQuantity;
+                        result.HValue = his.RMBHValue;
+                        result.CurrencyHValue = his.ActualCompAmount;
+                        result.CurrencyOutHValue = his.ActualCompHOutValue;
+                        if (project.CurrencyId == "2a0e99b4-f989-4967-b5f1-5519091d4280".ToGuid())//人民币
+                        {
+                            result.HValue = his.ActualCompAmount;
+                            result.HOutValue = his.ActualCompHOutValue;
+                        }
+                    }
                 }
+                result.OldHQuantity = his.CompletedQuantity;
+                result.OldHOutValue = his.OutsourcingExpensesAmount;
+                result.OldCurrencyHOutValue = his.CurrencyOutsourcingExpensesAmount;
+                result.OldHValue = his.CompleteProductionAmount;
+                result.OldCurrencyHValue = his.CurrencyCompleteProductionAmount;
 
                 //top 根节点202306历史数据置顶  
-                result.TopHOutValue = his.OutsourcingExpensesAmount;
-                result.TopCurrencyHOutValue = his.CurrencyOutsourcingExpensesAmount;
-                result.TopHQuantity = his.CompletedQuantity;
-                result.TopHValue = his.CompleteProductionAmount;
-                result.TopCurrencyHValue = his.CurrencyCompleteProductionAmount;
-                result.TopRMBHValue = his.RMBHValue == 0M ? result.TopHValue : his.RMBHValue;
-                result.TopRMBHOutValue = his.RMBHOutValue == 0M ? result.TopHOutValue : his.RMBHOutValue;
+                result.TopCurrencyHOutValue = his.ActualCompHOutValue;
+                result.TopHQuantity = his.ActualCompCompletedQuantity;
+                result.TopCurrencyHValue = his.ActualCompAmount;
+                result.TopRMBHValue = his.RMBHValue;
+                result.TopRMBHOutValue = his.RMBHOutValue;
             }
             #endregion
 
@@ -1025,8 +1049,8 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
 
                 //需公司协调事项
                 result.CoordinationMatters = monthReport.CoordinationMatters;
-                #endregion
             }
+            #endregion
 
             #region 其他定义字段
 
@@ -1432,7 +1456,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     var f = rr.FirstOrDefault(x => x.Id == item.Id);
                     if (f != null)
                     {
-                        f.ActualOutAmount = item.ActualOutAmount;
+                        f.CurrencyOutsourcingExpensesAmount = item.ActualOutAmount;
                         f.ActualCompQuantity = item.ActualCompQuantity;
                         f.ActualCompAmount = item.ActualCompAmount;
                         f.RMBHValue = item.RMBHValue;
@@ -1444,7 +1468,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 {
                     await _dbContext.Updateable(rs).UpdateColumns(x => new
                     {
-                        x.ActualOutAmount,
+                        x.CurrencyOutsourcingExpensesAmount,
                         x.ActualCompQuantity,
                         x.ActualCompAmount,
                         x.RMBHOutValue,
@@ -1457,20 +1481,16 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 var mainTab = await _dbContext.Queryable<MonthReport>().FirstAsync(t => t.IsDelete == 1 && model.ProjectId == t.ProjectId && t.DateMonth == 202306);
                 if (mainTab != null)
                 {
-                    mainTab.CompleteProductionAmount = Convert.ToDecimal(model.TopHValue);
-                    mainTab.CurrencyCompleteProductionAmount = Convert.ToDecimal(model.TopCurrencyHValue);
-                    mainTab.CompletedQuantity = Convert.ToDecimal(model.TopHQuantity);
-                    mainTab.OutsourcingExpensesAmount = Convert.ToDecimal(model.TopHOutValue);
-                    mainTab.CurrencyOutsourcingExpensesAmount = Convert.ToDecimal(model.TopCurrencyHOutValue);
+                    mainTab.ActualCompAmount = Convert.ToDecimal(model.TopCurrencyHValue);
+                    mainTab.ActualCompHOutValue = Convert.ToDecimal(model.TopCurrencyHOutValue);
+                    mainTab.ActualCompCompletedQuantity = Convert.ToDecimal(model.TopHQuantity);
                     mainTab.RMBHOutValue = Convert.ToDecimal(model.TopRMBHOutValue);
                     mainTab.RMBHValue = Convert.ToDecimal(model.TopRMBHValue);
                     await _dbContext.Updateable(mainTab).UpdateColumns(x => new
                     {
-                        x.CompleteProductionAmount,
-                        x.CurrencyCompleteProductionAmount,
-                        x.CompletedQuantity,
-                        x.OutsourcingExpensesAmount,
-                        x.CurrencyOutsourcingExpensesAmount,
+                        x.ActualCompAmount,
+                        x.ActualCompHOutValue,
+                        x.ActualCompCompletedQuantity,
                         x.RMBHOutValue,
                         x.RMBHValue,
                     })

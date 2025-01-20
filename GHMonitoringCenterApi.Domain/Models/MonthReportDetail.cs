@@ -69,45 +69,48 @@ namespace GHMonitoringCenterApi.Domain.Models
         public int? ConstructionNature { get; set; }
 
         /// <summary>
-        /// 本月外包支出
+        /// 本月外包支出 （元）（原外包支出）
         /// </summary>
         [SugarColumn(ColumnDataType = "decimal(20,8)")]
-        public decimal OutsourcingExpensesAmount { get; set; }
+        public decimal OutsourcingExpensesAmount { get; set; } = 0M;
         /// <summary>
-        /// 本月完成工程量(方)
+        /// 本月完成工程量(方)（原产量）
         /// </summary>
         [SugarColumn(ColumnDataType = "decimal(20,8)")]
-        public decimal CompletedQuantity { get; set; }
+        public decimal CompletedQuantity { get; set; } = 0M;
         /// <summary>
-        /// 本月完成产值（元）
+        /// 本月完成产值（元）(原产值)
         /// </summary>
         [SugarColumn(ColumnDataType = "decimal(20,8)")]
-        public decimal CompleteProductionAmount { get; set; }
+        public decimal CompleteProductionAmount { get; set; } = 0M;
         /// <summary>
-        /// 本月外包支出(实际本币)
+        /// 本月外包支出(实际本币)（原外包支出）
         /// </summary>
         [SugarColumn(ColumnDataType = "decimal(20,8)")]
-        public decimal? ActualOutAmount { get; set; }
+        public decimal? CurrencyOutsourcingExpensesAmount { get; set; } = 0M;
+
+
         /// <summary>
         /// 本月完成工程量(方)(实际)
         /// </summary>
         [SugarColumn(ColumnDataType = "decimal(20,8)")]
-        public decimal? ActualCompQuantity { get; set; }
+        public decimal? ActualCompQuantity { get; set; } = 0M;
         /// <summary>
         /// 本月完成产值(实际本币)
         /// </summary>
         [SugarColumn(ColumnDataType = "decimal(20,8)")]
-        public decimal? ActualCompAmount { get; set; }
+        public decimal? ActualCompAmount { get; set; } = 0M;
+
         /// <summary>
         /// 实际人民币产值（用户 输入）
         /// </summary>
         [SugarColumn(ColumnDataType = "decimal(20,8)")]
-        public decimal? RMBHValue { get; set; }
+        public decimal? RMBHValue { get; set; } = 0M;
         /// <summary>
         /// 实际人民币外包支出（用户 输入）
         /// </summary>
         [SugarColumn(ColumnDataType = "decimal(20,8)")]
-        public decimal? RMBHOutValue { get; set; }
+        public decimal? RMBHOutValue { get; set; } = 0M;
         /// <summary>
         /// 备注
         /// </summary>

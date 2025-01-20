@@ -66,25 +66,17 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project
         /// </summary>
         public Guid ProjectId { get; set; }
         /// <summary>
-        /// 顶部历史外包支出(人民币)
-        /// </summary>
-        public decimal TopHOutValue { get; set; } = 0M;
-        /// <summary>
         /// 顶部历史外包支出(美元、欧元等)
         /// </summary>
-        public decimal TopCurrencyHOutValue { get; set; } = 0M;
+        public decimal? TopCurrencyHOutValue { get; set; } = 0M;
         /// <summary>
         /// 顶部历史工程量
         /// </summary>
-        public decimal TopHQuantity { get; set; } = 0M;
-        /// <summary>
-        /// 顶部历史完成产值(人民币)
-        /// </summary>
-        public decimal TopHValue { get; set; } = 0M;
+        public decimal? TopHQuantity { get; set; } = 0M;
         /// <summary>
         /// 顶部历史完成产值(美元、欧元等)
         /// </summary>
-        public decimal TopCurrencyHValue { get; set; } = 0M;
+        public decimal? TopCurrencyHValue { get; set; } = 0M;
         /// <summary>
         /// 顶部实际人民币产值
         /// </summary>
@@ -111,22 +103,22 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project
         /// <summary>
         /// 本月外包支出(实际)
         /// </summary>
-        public decimal? ActualOutAmount { get; set; }
+        public decimal? ActualOutAmount { get; set; } = 0M;
         /// <summary>
         /// 本月完成工程量(方)(实际)
         /// </summary>
-        public decimal? ActualCompQuantity { get; set; }
+        public decimal? ActualCompQuantity { get; set; } = 0M;
         /// <summary>
         /// 本月完成产值(实际)
         /// </summary>
-        public decimal? ActualCompAmount { get; set; }
+        public decimal? ActualCompAmount { get; set; } = 0M;
         /// <summary>
         /// 实际人民币产值
         /// </summary>
-        public decimal? RMBHValue { get; set; }
+        public decimal? RMBHValue { get; set; } = 0M;
         /// <summary>
         /// 实际人民币外包支出
         /// </summary>
-        public decimal? RMBHOutValue { get; set; }
+        public decimal? RMBHOutValue { get; set; } = 0M;
     }
 }
