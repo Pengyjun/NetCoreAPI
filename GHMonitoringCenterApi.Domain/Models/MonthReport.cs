@@ -200,5 +200,15 @@ namespace GHMonitoringCenterApi.Domain.Models
         /// </summary>
         [SugarColumn(Length = 500)]
         public string? RejectReason { get; set; }
+        /// <summary>
+        /// 实际人民币产值（用户 输入）
+        /// </summary>
+        [SugarColumn(ColumnDataType = "decimal(20,8)")]
+        public decimal? RMBHValue { get; set; } = 0M;
+        /// <summary>
+        /// 实际人民币外包支出（用户 输入）
+        /// </summary>
+        [SugarColumn(ColumnDataType = "decimal(20,8)")]
+        public decimal? RMBHOutValue { get; set; } = 0M;
     }
 }

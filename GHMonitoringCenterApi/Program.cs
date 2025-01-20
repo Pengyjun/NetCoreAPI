@@ -39,7 +39,7 @@ builder.Services.AddControllers(options =>
 builder.WebHost.ConfigureKestrel((context, options) =>
 {
     //限制大小200M
-   options.Limits.MaxRequestBodySize =int.Parse(AppsettingsHelper.GetValue("UpdateItem:DefaultSingleFileSize"));
+    options.Limits.MaxRequestBodySize = int.Parse(AppsettingsHelper.GetValue("UpdateItem:DefaultSingleFileSize"));
 });
 builder.Services.AddHttpContextAccessor();
 HttpContentAccessFactory.services = builder.Services;
@@ -90,7 +90,7 @@ builder.Services.AddCors(options =>
                                               );
 });
 //配置认证
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(x => 
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(x =>
 {
     var securyKeyByte = Encoding.UTF8.GetBytes(AppsettingsHelper.GetValue("Authentication:SecurityKey"));
     //验证token相关参数
@@ -104,8 +104,10 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
         ClockSkew = TimeSpan.Zero,
         IssuerSigningKey = new SymmetricSecurityKey(securyKeyByte)
     };
-    x.Events = new JwtBearerEvents() {
-        OnAuthenticationFailed = fail => {
+    x.Events = new JwtBearerEvents()
+    {
+        OnAuthenticationFailed = fail =>
+        {
             return Task.CompletedTask;
         },
         #region 暂时不用

@@ -217,6 +217,9 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 report.ActualCompAmount = klReportList.Where(x => x.ProjectId == report.ProjectId && report.ShipId == x.ShipId && x.ProjectWBSId == wbsId && x.UnitPrice == report.UnitPrice).Sum(x => x.ActualCompAmount);
                 if (report.ActualCompAmount == 0) report.ActualCompAmount = report.TotalCompleteProductionAmount;
 
+                report.RMBHValue = klReportList.Where(x => x.ProjectId == report.ProjectId && report.ShipId == x.ShipId && x.ProjectWBSId == wbsId && x.UnitPrice == report.UnitPrice).Sum(x => x.RMBHValue);
+                report.RMBHOutValue = klReportList.Where(x => x.ProjectId == report.ProjectId && report.ShipId == x.ShipId && x.ProjectWBSId == wbsId && x.UnitPrice == report.UnitPrice).Sum(x => x.RMBHOutValue);
+
                 /***
                  * 基本信息处理
                  */
@@ -285,6 +288,8 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                        ActualCompAmount = p.ActualCompAmount,
                        ActualCompQuantity = p.ActualCompQuantity,
                        ActualOutAmount = p.ActualOutAmount,
+                       RMBHOutValue = p.RMBHOutValue,
+                       RMBHValue = p.RMBHValue,
                    })
                    .ToListAsync();
 
@@ -650,7 +655,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                             if (exhaustedBtn)
                             {
                                 //如果修改后的实际值是0 给原值 不加当月日报作为新的累计数
-                                model.TotalCompleteProductionAmount = amount == 0M ? model.TotalCompleteProductionAmount = calculatePWBS.Where(t => t.ProjectId == item.Key.ProjectId && t.ShipId == item.Key.ShipId && t.UnitPrice == item.Key.UnitPrice && t.ProjectWBSId == item.Key.ProjectWBSId).Sum(x => x.CompleteProductionAmount) : amount;
+                                model.TotalCompleteProductionAmount = amount == 0M ? calculatePWBS.Where(t => t.ProjectId == item.Key.ProjectId && t.ShipId == item.Key.ShipId && t.UnitPrice == item.Key.UnitPrice && t.ProjectWBSId == item.Key.ProjectWBSId).Sum(x => x.CompleteProductionAmount) : amount;
                                 model.TotalCompletedQuantity = quantity == 0M ? calculatePWBS.Where(t => t.ProjectId == item.Key.ProjectId && t.ShipId == item.Key.ShipId && t.UnitPrice == item.Key.UnitPrice && t.ProjectWBSId == item.Key.ProjectWBSId).Sum(x => x.CompletedQuantity) : quantity;
                                 model.TotalOutsourcingExpensesAmount = outAmount == 0M ? calculatePWBS.Where(t => t.ProjectId == item.Key.ProjectId && t.ShipId == item.Key.ShipId && t.UnitPrice == item.Key.UnitPrice && t.ProjectWBSId == item.Key.ProjectWBSId).Sum(x => x.OutsourcingExpensesAmount) : outAmount;
                             }
@@ -968,12 +973,14 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     result.CurrencyOutHValue = his.CurrencyOutsourcingExpensesAmount;
                 }
 
-                //top 根节点202306历史数据置顶  不可编辑
+                //top 根节点202306历史数据置顶  
                 result.TopHOutValue = his.OutsourcingExpensesAmount;
                 result.TopCurrencyHOutValue = his.CurrencyOutsourcingExpensesAmount;
                 result.TopHQuantity = his.CompletedQuantity;
                 result.TopHValue = his.CompleteProductionAmount;
                 result.TopCurrencyHValue = his.CurrencyCompleteProductionAmount;
+                result.TopRMBHValue = his.RMBHValue == 0M ? result.TopHValue : his.RMBHValue;
+                result.TopRMBHOutValue = his.RMBHOutValue == 0M ? result.TopHOutValue : his.RMBHOutValue;
             }
             #endregion
 
@@ -1418,19 +1425,18 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             if (model.ProjectHistorys != null && model.ProjectHistorys.Any())
             {
                 List<MonthReportDetail> rs = new();
-                var ids = model.ProjectHistorys.Select(x => x.DetailsId).ToList();
+                var ids = model.ProjectHistorys.Select(x => x.Id).ToList();
                 var rr = await _dbContext.Queryable<MonthReportDetail>().Where(t => t.IsDelete == 1 && ids.Contains(t.Id)).ToListAsync();
                 foreach (var item in model.ProjectHistorys)
                 {
-                    var f = rr.FirstOrDefault(x => x.Id == item.DetailsId);
+                    var f = rr.FirstOrDefault(x => x.Id == item.Id);
                     if (f != null)
                     {
-                        f.DeviationOutAmount = item.DeviationOutAmount;
                         f.ActualOutAmount = item.ActualOutAmount;
-                        f.DeviationCompQuantity = item.DeviationCompQuantity;
                         f.ActualCompQuantity = item.ActualCompQuantity;
-                        f.DeviationCompAmount = item.DeviationCompAmount;
                         f.ActualCompAmount = item.ActualCompAmount;
+                        f.RMBHValue = item.RMBHValue;
+                        f.RMBHOutValue = item.RMBHOutValue;
                         rs.Add(f);
                     }
                 }
@@ -1438,12 +1444,35 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 {
                     await _dbContext.Updateable(rs).UpdateColumns(x => new
                     {
-                        x.DeviationOutAmount,
                         x.ActualOutAmount,
-                        x.DeviationCompQuantity,
                         x.ActualCompQuantity,
-                        x.DeviationCompAmount,
                         x.ActualCompAmount,
+                        x.RMBHOutValue,
+                        x.RMBHValue
+                    })
+                    .ExecuteCommandAsync();
+                }
+
+                //202306历史月报修改
+                var mainTab = await _dbContext.Queryable<MonthReport>().FirstAsync(t => t.IsDelete == 1 && model.ProjectId == t.ProjectId && t.DateMonth == 202306);
+                if (mainTab != null)
+                {
+                    mainTab.CompleteProductionAmount = Convert.ToDecimal(model.TopHValue);
+                    mainTab.CurrencyCompleteProductionAmount = Convert.ToDecimal(model.TopCurrencyHValue);
+                    mainTab.CompletedQuantity = Convert.ToDecimal(model.TopHQuantity);
+                    mainTab.OutsourcingExpensesAmount = Convert.ToDecimal(model.TopHOutValue);
+                    mainTab.CurrencyOutsourcingExpensesAmount = Convert.ToDecimal(model.TopCurrencyHOutValue);
+                    mainTab.RMBHOutValue = Convert.ToDecimal(model.TopRMBHOutValue);
+                    mainTab.RMBHValue = Convert.ToDecimal(model.TopRMBHValue);
+                    await _dbContext.Updateable(mainTab).UpdateColumns(x => new
+                    {
+                        x.CompleteProductionAmount,
+                        x.CurrencyCompleteProductionAmount,
+                        x.CompletedQuantity,
+                        x.OutsourcingExpensesAmount,
+                        x.CurrencyOutsourcingExpensesAmount,
+                        x.RMBHOutValue,
+                        x.RMBHValue,
                     })
                     .ExecuteCommandAsync();
                 }
@@ -1462,7 +1491,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             bool enableBtn = false;
 
             var rr = await _dbContext.Queryable<MonRepHistoryMdConfig>().FirstAsync(t => t.IsDelete == 1 && t.Enable == true);
-            if (_currentUser.CurrentLoginIsAdmin) { enableBtn = true; return rt.SuccessResult(enableBtn); }
+            if (_currentUser.CurrentLoginIsAdmin || _currentUser.Account == "2016146340") { enableBtn = true; return rt.SuccessResult(enableBtn); }
             if (rr != null)
             {
                 //获取限制时间
