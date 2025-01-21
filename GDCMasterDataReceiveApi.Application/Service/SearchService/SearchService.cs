@@ -1066,6 +1066,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     GRULE = t.GRULE,
                     NAME = t.NAME
                 })
+                .OrderBy(x => Convert.ToInt32(x.SNO))
                 .ToListAsync();
 
             #region 初始查询
@@ -7798,9 +7799,9 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
         {
             ResponseAjaxResult<List<OwnerShipReponseDto>> responseAjaxResult = new ResponseAjaxResult<List<OwnerShipReponseDto>>();
             RefAsync<int> total = 0;
-            var list=await _dbContext.Queryable<OwnerShip>().Where(x => x.IsDelete == 1)
-                .ToPageListAsync(baseRequestDto.PageIndex,baseRequestDto.PageSize, total);
-            var data= _mapper.Map<List<OwnerShipReponseDto>>(list);
+            var list = await _dbContext.Queryable<OwnerShip>().Where(x => x.IsDelete == 1)
+                .ToPageListAsync(baseRequestDto.PageIndex, baseRequestDto.PageSize, total);
+            var data = _mapper.Map<List<OwnerShipReponseDto>>(list);
             responseAjaxResult.Count = total;
             responseAjaxResult.Data = data;
             responseAjaxResult.Success();
