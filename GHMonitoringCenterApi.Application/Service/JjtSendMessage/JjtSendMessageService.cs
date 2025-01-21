@@ -2917,7 +2917,7 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
                 {
                     XAxle = currentNowTimeInt.ToString().Substring(0, 4) + "-" + currentNowTimeInt.ToString().Substring(4, 2) + "-" + currentNowTimeInt.ToString().Substring(6, 2),
                     YAxlePlanValue = Math.Round(dayPlanProAmount / difDays / 100000000M, 2),
-                    YAxleCompleteValue = storeProductionValue.HasValue? ((0.25M - yCompleteValue > 0) ? Math.Round(storeProductionValue.Value/100000000,2) : yCompleteValue): yCompleteValue
+                    YAxleCompleteValue = storeProductionValue.HasValue?Math.Round(storeProductionValue.Value / 100000000, 2): yCompleteValue /*storeProductionValue.HasValue? ((0.25M - yCompleteValue > 0) ? Math.Round(storeProductionValue.Value/100000000,2) : yCompleteValue): yCompleteValue*/
                     //YAxlePlanValue = Math.Round((GetProductionValueInfo(monthInt, companyProductionList).Sum(x => x.PlanProductionValue) / 300000M), 2),
                     //YAxleCompleteValue = Math.Round(dayActualProductionAmount / 100000000M, 2)
                 }) ;
