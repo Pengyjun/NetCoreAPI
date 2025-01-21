@@ -138,7 +138,7 @@ namespace GHMonitoringCenterApi.Domain.Models
         /// 外包支出 (币种：元，美元，欧元等)
         /// </summary>
         [SugarColumn(ColumnDataType = "decimal(20,8)")]
-        public decimal CurrencyOutsourcingExpensesAmount { get; set; } = 0;
+        public decimal CurrencyOutsourcingExpensesAmount { get; set; } = 0M;
 
         /// <summary>
         /// 币种汇率
@@ -200,5 +200,30 @@ namespace GHMonitoringCenterApi.Domain.Models
         /// </summary>
         [SugarColumn(Length = 500)]
         public string? RejectReason { get; set; }
+        /// <summary>
+        /// 实际人民币产值（用户 输入）
+        /// </summary>
+        [SugarColumn(ColumnDataType = "decimal(20,8)")]
+        public decimal? RMBHValue { get; set; } = 0M;
+        /// <summary>
+        /// 实际本币产值（用户 输入  美元等）
+        /// </summary>
+        [SugarColumn(ColumnDataType = "decimal(20,8)")]
+        public decimal? ActualCompAmount { get; set; } = 0M;
+        /// <summary>
+        /// 实际人民币外包支出（用户 输入）
+        /// </summary>
+        [SugarColumn(ColumnDataType = "decimal(20,8)")]
+        public decimal? RMBHOutValue { get; set; } = 0M;
+        /// <summary>
+        ///  实际本币外包支出（用户 输入  美元等）
+        /// </summary>
+        [SugarColumn(ColumnDataType = "decimal(20,8)")]
+        public decimal? ActualCompHOutValue { get; set; } = 0M;
+        /// <summary>
+        /// 实际完成工程量
+        /// </summary>
+        [SugarColumn(ColumnDataType = "decimal(20,8)")]
+        public decimal? ActualCompCompletedQuantity { get; set; } = 0M;
     }
 }

@@ -129,15 +129,15 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project.MonthReportFor
         /// <summary>
         /// 累计完成产值
         /// </summary>
-        public decimal TotalCompleteProductionAmount { get; set; }
+        public decimal TotalCompleteProductionAmount { get; set; } = 0M;
         /// <summary>
         /// 累计完成工程量
         /// </summary>
-        public decimal TotalCompletedQuantity { get; set; }
+        public decimal TotalCompletedQuantity { get; set; } = 0M;
         /// <summary>
         /// 累计外包支出
         /// </summary>
-        public decimal TotalOutsourcingExpensesAmount { get; set; }
+        public decimal TotalOutsourcingExpensesAmount { get; set; } = 0M;
         /// <summary>
         /// 单价
         /// </summary>
@@ -154,48 +154,41 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project.MonthReportFor
         /// 本年外包支出
         /// </summary>
         public decimal YearOutsourcingExpensesAmount { get; set; }
-
-        /// <summary>
-        /// 本月外包支出(偏差)
-        /// </summary>
-        public decimal? DeviationOutAmount { get; set; } = 0;
-        ///// <summary>
-        ///// 本月外包支出(偏差外币)
-        ///// </summary>
-        //public decimal? CurrencyDeviationOutAmount { get; set; } = 0;
         /// <summary>
         /// 本月外包支出(实际)
         /// </summary>
-        public decimal? ActualOutAmount { get; set; } = 0;
-        ///// <summary>
-        ///// 本月外包支出(实际外币)
-        ///// </summary>
-        //public decimal? CurrencyActualOutAmount { get; set; } = 0;
-        /// <summary>
-        /// 本月完成工程量(方)(偏差)
-        /// </summary>
-        public decimal? DeviationCompQuantity { get; set; } = 0;
+        public decimal? ActualOutAmount { get; set; } = 0M;
         /// <summary>
         /// 本月完成工程量(方)(实际)
         /// </summary>
-        public decimal? ActualCompQuantity { get; set; } = 0;
-        /// <summary>
-        /// 本月完成产值(偏差)
-        /// </summary>
-        public decimal? DeviationCompAmount { get; set; } = 0;
-        /////// <summary>
-        ///// 本月完成产值(偏差外币)
-        ///// </summary>
-        //public decimal? CurrencyDeviationCompAmount { get; set; } = 0;
+        public decimal? ActualCompQuantity { get; set; } = 0M;
         /// <summary>
         /// 本月完成产值(实际)
         /// </summary>
-        public decimal? ActualCompAmount { get; set; } = 0;
-        ///// <summary>
-        ///// 本月完成产值(实际外币)
-        ///// </summary>
-        //public decimal? CurrencyActualCompAmount { get; set; } = 0;
+        public decimal? ActualCompAmount { get; set; } = 0M;
+        /// <summary>
+        /// 实际人民币产值（用户 输入）
+        /// </summary>
+        public decimal? RMBHValue { get; set; } = 0M;
+        /// <summary>
+        /// 实际人民币外包支出（用户 输入）
+        /// </summary>
+        public decimal? RMBHOutValue { get; set; } = 0M;
 
+        #region 原值
+        /// <summary>
+        /// 原值工程量
+        /// </summary>
+        public decimal? OldHQuantity { get; set; } = 0M;
+        /// <summary>
+        /// 历史外包支出(美元、欧元等)
+        /// </summary>
+        public decimal? OldCurrencyHOutValue { get; set; } = 0M;
+        /// <summary>
+        /// 历史完成产值(美元、欧元等)
+        /// </summary>
+        public decimal? OldCurrencyHValue { get; set; } = 0M;
+        #endregion
         #endregion
         /// <summary>
         /// wbs使用

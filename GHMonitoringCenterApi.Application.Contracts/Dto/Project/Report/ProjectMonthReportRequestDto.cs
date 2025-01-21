@@ -60,43 +60,65 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project
     /// </summary>
     public class SaveMonthReportForProjectHistoryDto
     {
+        #region 顶部行
         /// <summary>
-        /// 
+        /// 项目id
+        /// </summary>
+        public Guid ProjectId { get; set; }
+        /// <summary>
+        /// 顶部历史外包支出(美元、欧元等)
+        /// </summary>
+        public decimal? TopCurrencyHOutValue { get; set; } = 0M;
+        /// <summary>
+        /// 顶部历史工程量
+        /// </summary>
+        public decimal? TopHQuantity { get; set; } = 0M;
+        /// <summary>
+        /// 顶部历史完成产值(美元、欧元等)
+        /// </summary>
+        public decimal? TopCurrencyHValue { get; set; } = 0M;
+        /// <summary>
+        /// 顶部实际人民币产值
+        /// </summary>
+        public decimal? TopRMBHValue { get; set; } = 0M;
+        /// <summary>
+        /// 顶部实际人民币外包支出
+        /// </summary>
+        public decimal? TopRMBHOutValue { get; set; } = 0M;
+        #endregion
+        /// <summary>
+        /// 子项数据
         /// </summary>
         public List<ProjectHistory>? ProjectHistorys { get; set; }
     }
     /// <summary>
-    /// 
+    /// 子项数据
     /// </summary>
     public class ProjectHistory
     {
         /// <summary>
         /// 主键
         /// </summary>
-        public Guid DetailsId { get; set; }
-        /// <summary>
-        /// 本月外包支出(偏差)
-        /// </summary>
-        public decimal? DeviationOutAmount { get; set; }
+        public Guid Id { get; set; }
         /// <summary>
         /// 本月外包支出(实际)
         /// </summary>
-        public decimal? ActualOutAmount { get; set; }
-        /// <summary>
-        /// 本月完成工程量(方)(偏差)
-        /// </summary>
-        public decimal? DeviationCompQuantity { get; set; }
+        public decimal? ActualOutAmount { get; set; } = 0M;
         /// <summary>
         /// 本月完成工程量(方)(实际)
         /// </summary>
-        public decimal? ActualCompQuantity { get; set; }
-        /// <summary>
-        /// 本月完成产值(偏差)
-        /// </summary>
-        public decimal? DeviationCompAmount { get; set; }
+        public decimal? ActualCompQuantity { get; set; } = 0M;
         /// <summary>
         /// 本月完成产值(实际)
         /// </summary>
-        public decimal? ActualCompAmount { get; set; }
+        public decimal? ActualCompAmount { get; set; } = 0M;
+        /// <summary>
+        /// 实际人民币产值
+        /// </summary>
+        public decimal? RMBHValue { get; set; } = 0M;
+        /// <summary>
+        /// 实际人民币外包支出
+        /// </summary>
+        public decimal? RMBHOutValue { get; set; } = 0M;
     }
 }
