@@ -53,23 +53,24 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Salary
             }
             RefAsync<int> total = 0;
             return await dbContext.Queryable<salary.Salary>()
-                 .LeftJoin<User>((x, y) => x.UserId == y.Id)
+                 .LeftJoin<User>((x, y) => x.UserId == y.Id && x.IsDelete == 1)
+                 .LeftJoin<Institution>((x, y, z) => y.Oid == z.Oid)
                   .WhereIF(salaryRequest.Year.HasValue, (x, y) => x.Year == salaryRequest.Year)
                   .WhereIF(salaryRequest.Month.HasValue, (x, y) => x.Month == salaryRequest.Month)
                   .WhereIF(!string.IsNullOrWhiteSpace(salaryRequest.Name), (x, y) => y.Name.Contains(salaryRequest.Name))
                   .WhereIF(!string.IsNullOrWhiteSpace(salaryRequest.WorkNumber), (x, y) => x.WorkNumber.Contains(salaryRequest.WorkNumber))
                   .WhereIF(!string.IsNullOrWhiteSpace(salaryRequest.Phone), (x, y) => y.Phone.Contains(salaryRequest.Phone))
-                  .Where((x, y) => y.IsDelete ==1)
-                 .Select((x, y) => new SalaryResponse
+                  .Where((x, y) => y.IsDelete == 1)
+                 .Select((x, y, z) => new SalaryResponse
                  {
-                     BId=y.BusinessId,
+                     BId = y.BusinessId,
                      Id = y.Id.ToString(),
                      BaseWage = x.BaseWage,
                      CardId = y.CardId,
                      CertificateSubsidy = x.CertificateSubsidy,
                      Year = x.Year,
                      Month = x.Month,
-                     DepartmentName = y.Oid,
+                     DepartmentName = z.ShortName,
                      HolidaysWage = x.HolidaysWage,
                      MasterApprenticeSubsidy = x.MasterApprenticeAllowance,
                      MonthPerformance = x.MonthPerformance,
@@ -83,7 +84,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Salary
                      RankWage = x.RankWage,
                      RegularWage = x.RegularWage,
                      ReissueBuckleMoney = x.ReissueBuckleMoney,
-                     SkillSubsidy =x.SkillSubsidy,
+                     SkillSubsidy = x.SkillSubsidy,
                      SkillWage = x.SkillWage,
                      TrainPerformance = x.TrainPerformance,
                      WorkAgeWage = x.WorkAgeWage,
@@ -170,11 +171,11 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Salary
             {
                 return salaryAsExcelResponse;
             }
-            
+
             salary.Salary salary = new salary.Salary();
             #region 信息校验
             var pushTimeCalc = await dbContext.Queryable<SalaryPushRecord>().Where(x => x.IsDelete == 1 && x.RandomUrl == sign).FirstAsync();
-            if (pushTimeCalc==null)
+            if (pushTimeCalc == null)
             {
                 return salaryAsExcelResponse;
             }
@@ -234,7 +235,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Salary
             {
                 return Result.Fail("发送失败", (int)ResponseHttpCode.SendFail);
             }
-            var salarieList = await dbContext.Queryable<salary.Salary>().Where(x => x.IsDelete == 1&&x.Year==year&&x.Month==month).ToListAsync();
+            var salarieList = await dbContext.Queryable<salary.Salary>().Where(x => x.IsDelete == 1 && x.Year == year && x.Month == month).ToListAsync();
             if (salarieList.Count == 0)
             {
                 return Result.Fail("没有工资信息无法发送", (int)ResponseHttpCode.SendFail);
@@ -242,19 +243,19 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Salary
 
             //工资推送记录
             List<SalaryPushRecord> salaryPushRecords = new List<SalaryPushRecord>();
-            var salaryIds= salarieList.Select(x=>x.WorkNumber).ToList();
+            var salaryIds = salarieList.Select(x => x.WorkNumber).ToList();
             //所有用户
-            var allUser= await dbContext.Queryable<User>()
-                 .Where(x => x.IsDelete == 1&&!SqlFunc.IsNullOrEmpty(x.Phone)&& salaryIds.Contains(x.WorkNumber))
+            var allUser = await dbContext.Queryable<User>()
+                 .Where(x => x.IsDelete == 1 && !SqlFunc.IsNullOrEmpty(x.Phone) && salaryIds.Contains(x.WorkNumber))
                  .WhereIF(baseRequest != null && baseRequest.BId != null, x => x.BusinessId == baseRequest.BId).ToListAsync();
 
             //查询推送记录
             //所有未推送的用户
             var allPushUserId = await dbContext.Queryable<SalaryPushRecord>()
-                 .Where(x => x.IsDelete == 1 && x.Year==year&&x.Month==month)
+                 .Where(x => x.IsDelete == 1 && x.Year == year && x.Month == month)
                  .ToListAsync();
-            var allNoPushUserId= allPushUserId.Where(x=>x.Result==1).Select(x=>x.UserId).ToList();
-            var pushUserList= allUser.Where(x =>!allNoPushUserId.Contains(x.Id)).ToList();
+            var allNoPushUserId = allPushUserId.Where(x => x.Result == 1).Select(x => x.UserId).ToList();
+            var pushUserList = allUser.Where(x => !allNoPushUserId.Contains(x.Id)).ToList();
             if (pushUserList.Count == 0)
             {
                 return Result.Fail("本月短信已发送，没有可发送的短信", (int)ResponseHttpCode.SendFail);
@@ -277,29 +278,30 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Salary
                         PhoneUrl = WebUtility.UrlEncode(CryptoStringExtension.EncryptAsync($"{item.WorkNumber},{year},{month}"))
                     });
                 }
-               
+
             }
             if (salaryPushRecords.Count > 0)
             {
                 await dbContext.Insertable<SalaryPushRecord>(salaryPushRecords).ExecuteCommandAsync();
             }
             //不等待
-            if (baseRequest!=null&&baseRequest.BId==null)
+            if (baseRequest != null && baseRequest.BId == null)
             {
                 //群发
                 SendSmsAsync(null);
             }
-            else {
+            else
+            {
                 if (allUser.Count > 0)
                 {
                     //单发
                     SendSmsAsync(allUser[0].Phone);
                 }
-               
+
             }
-              
+
             return Result.Success("发送成功");
-       }
+        }
 
         /// <summary>
         /// 发短信
@@ -318,13 +320,13 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Salary
                 return Result.Fail("没有可发送的短信", (int)ResponseHttpCode.SendFail);
             }
             var userIds = allNoPushUserId.Select(x => x.UserId).ToList();
-            var userList=await dbContext.Queryable<User>()
+            var userList = await dbContext.Queryable<User>()
                 .Where(x => x.IsDelete == 1 && userIds.Contains(x.Id))
-                .WhereIF(!string.IsNullOrWhiteSpace(phone),x=>x.Phone==phone)
+                .WhereIF(!string.IsNullOrWhiteSpace(phone), x => x.Phone == phone)
                 .ToListAsync();
             try
             {
-                
+
                 foreach (var user in allNoPushUserId)
                 {
                     var userInfo = userList.Where(x => x.Id == user.UserId).FirstOrDefault();
@@ -344,7 +346,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Salary
                         };
                         parame.TemplateParam = parameTemplate.ToJson();
                         var responseResult = await smsService.SendSmsAsync(parame);
-                        user.Result= responseResult.IsSuccess? 1 : 0;
+                        user.Result = responseResult.IsSuccess ? 1 : 0;
                         if (user.Result != 1)
                         {
                             user.Fail = responseResult.Data;
@@ -356,7 +358,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Salary
             }
             catch (Exception ex)
             {
-                await Console.Out.WriteLineAsync("保存审计日志报错:"+ex);
+                await Console.Out.WriteLineAsync("保存审计日志报错:" + ex);
                 //如果失败 把之前发送成功的 更新 防止发送重复
                 await dbContext.Updateable<SalaryPushRecord>(allNoPushUserId).ExecuteCommandAsync();
             }
