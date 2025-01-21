@@ -62,8 +62,8 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Salary
                   .Where((x, y) => y.IsDelete ==1)
                  .Select((x, y) => new SalaryResponse
                  {
-                     BId=x.BusinessId,
-                     Id = x.Id.ToString(),
+                     BId=y.BusinessId,
+                     Id = y.Id.ToString(),
                      BaseWage = x.BaseWage,
                      CardId = y.CardId,
                      CertificateSubsidy = x.CertificateSubsidy,
@@ -109,7 +109,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Salary
                .WhereIF(!string.IsNullOrWhiteSpace(salaryPushRequest.WorkNumber), (x, y) => y.WorkNumber.Contains(salaryPushRequest.WorkNumber))
                .WhereIF(!string.IsNullOrWhiteSpace(salaryPushRequest.Phone), (x, y) => y.Phone.Contains(salaryPushRequest.Phone))
                .WhereIF(!string.IsNullOrWhiteSpace(salaryPushRequest.Oid), (x, y) => y.Oid.Contains(salaryPushRequest.Oid))
-               .WhereIF(salaryPushRequest.PushTime.HasValue, (x, y) => x.Created <= salaryPushRequest.PushTime.Value)
+               .WhereIF(salaryPushRequest.PushTime.HasValue, (x, y) => x.Created >= salaryPushRequest.PushTime.Value)
                .WhereIF(salaryPushRequest.PushResult.HasValue, (x, y) => x.Result == salaryPushRequest.PushResult.Value)
                .WhereIF(salaryPushRequest.BusinessType.HasValue, (x, y) => x.BusinessType == salaryPushRequest.BusinessType.Value)
                .Where((x, y) => x.IsDelete == 1)
