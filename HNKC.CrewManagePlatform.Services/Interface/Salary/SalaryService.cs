@@ -52,41 +52,41 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Salary
                 salaryRequest.Month = DateTime.Now.Month;
             }
             RefAsync<int> total = 0;
-            return await dbContext.Queryable<User>()
-                 .InnerJoin<salary.Salary>((x, y) => x.Id == y.UserId)
-                  .WhereIF(salaryRequest.Year.HasValue, (x, y) => y.Year == salaryRequest.Year)
-                  .WhereIF(salaryRequest.Month.HasValue, (x, y) => y.Month == salaryRequest.Month)
-                  .WhereIF(!string.IsNullOrWhiteSpace(salaryRequest.Name), (x, y) => x.Name.Contains(salaryRequest.Name))
+            return await dbContext.Queryable<salary.Salary>()
+                 .LeftJoin<User>((x, y) => x.UserId == y.Id)
+                  .WhereIF(salaryRequest.Year.HasValue, (x, y) => x.Year == salaryRequest.Year)
+                  .WhereIF(salaryRequest.Month.HasValue, (x, y) => x.Month == salaryRequest.Month)
+                  .WhereIF(!string.IsNullOrWhiteSpace(salaryRequest.Name), (x, y) => y.Name.Contains(salaryRequest.Name))
                   .WhereIF(!string.IsNullOrWhiteSpace(salaryRequest.WorkNumber), (x, y) => x.WorkNumber.Contains(salaryRequest.WorkNumber))
-                  .WhereIF(!string.IsNullOrWhiteSpace(salaryRequest.Phone), (x, y) => x.Phone.Contains(salaryRequest.Phone))
-                  .Where((x, y) => x.IsDelete == 1 && y.IsDelete == 1)
+                  .WhereIF(!string.IsNullOrWhiteSpace(salaryRequest.Phone), (x, y) => y.Phone.Contains(salaryRequest.Phone))
+                  .Where((x, y) => y.IsDelete ==1)
                  .Select((x, y) => new SalaryResponse
                  {
                      BId=x.BusinessId,
                      Id = x.Id.ToString(),
-                     BaseWage = y.BaseWage,
-                     CardId = x.CardId,
-                     CertificateSubsidy = y.CertificateSubsidy,
-                     Year = y.Year,
-                     Month = y.Month,
-                     DepartmentName = x.Oid,
-                     HolidaysWage = y.HolidaysWage,
-                     MasterApprenticeSubsidy = y.MasterApprenticeAllowance,
-                     MonthPerformance = y.MonthPerformance,
-                     Name = x.Name,
-                     NameSubsidy = y.NameSubsidy,
-                     OtherWage = y.OtherWage,
-                     OvertimeWage = y.OvertimeWage,
-                     Phone = x.Phone,
-                     PostWage = y.PostWage,
-                     QuarterPerformance = y.QuarterPerformance,
-                     RankWage = y.RankWage,
-                     RegularWage = y.RegularWage,
-                     ReissueBuckleMoney = y.ReissueBuckleMoney,
-                     SkillSubsidy = y.SkillSubsidy,
-                     SkillWage = y.SkillWage,
-                     TrainPerformance = y.TrainPerformance,
-                     WorkAgeWage = y.WorkAgeWage,
+                     BaseWage = x.BaseWage,
+                     CardId = y.CardId,
+                     CertificateSubsidy = x.CertificateSubsidy,
+                     Year = x.Year,
+                     Month = x.Month,
+                     DepartmentName = y.Oid,
+                     HolidaysWage = x.HolidaysWage,
+                     MasterApprenticeSubsidy = x.MasterApprenticeAllowance,
+                     MonthPerformance = x.MonthPerformance,
+                     Name = y.Name,
+                     NameSubsidy = x.NameSubsidy,
+                     OtherWage = x.OtherWage,
+                     OvertimeWage = x.OvertimeWage,
+                     Phone = y.Phone,
+                     PostWage = x.PostWage,
+                     QuarterPerformance = x.QuarterPerformance,
+                     RankWage = x.RankWage,
+                     RegularWage = x.RegularWage,
+                     ReissueBuckleMoney = x.ReissueBuckleMoney,
+                     SkillSubsidy =x.SkillSubsidy,
+                     SkillWage = x.SkillWage,
+                     TrainPerformance = x.TrainPerformance,
+                     WorkAgeWage = x.WorkAgeWage,
                      WorkNumber = x.WorkNumber
                  }).MergeTable()
                  .OrderByDescending(z => new { z.Year, z.Month })
@@ -109,7 +109,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Salary
                .WhereIF(!string.IsNullOrWhiteSpace(salaryPushRequest.WorkNumber), (x, y) => y.WorkNumber.Contains(salaryPushRequest.WorkNumber))
                .WhereIF(!string.IsNullOrWhiteSpace(salaryPushRequest.Phone), (x, y) => y.Phone.Contains(salaryPushRequest.Phone))
                .WhereIF(!string.IsNullOrWhiteSpace(salaryPushRequest.Oid), (x, y) => y.Oid.Contains(salaryPushRequest.Oid))
-               .WhereIF(salaryPushRequest.PushTime.HasValue, (x, y) => x.Created == salaryPushRequest.PushTime.Value)
+               .WhereIF(salaryPushRequest.PushTime.HasValue, (x, y) => x.Created <= salaryPushRequest.PushTime.Value)
                .WhereIF(salaryPushRequest.PushResult.HasValue, (x, y) => x.Result == salaryPushRequest.PushResult.Value)
                .WhereIF(salaryPushRequest.BusinessType.HasValue, (x, y) => x.BusinessType == salaryPushRequest.BusinessType.Value)
                .Where((x, y) => x.IsDelete == 1)
