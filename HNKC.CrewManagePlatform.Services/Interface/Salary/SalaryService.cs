@@ -53,7 +53,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Salary
             }
             RefAsync<int> total = 0;
             return await dbContext.Queryable<salary.Salary>()
-                 .LeftJoin<User>((x, y) => x.UserId == y.Id)
+                 .LeftJoin<User>((x, y) => x.UserId == y.Id&&x.IsDelete==1)
                   .WhereIF(salaryRequest.Year.HasValue, (x, y) => x.Year == salaryRequest.Year)
                   .WhereIF(salaryRequest.Month.HasValue, (x, y) => x.Month == salaryRequest.Month)
                   .WhereIF(!string.IsNullOrWhiteSpace(salaryRequest.Name), (x, y) => y.Name.Contains(salaryRequest.Name))
