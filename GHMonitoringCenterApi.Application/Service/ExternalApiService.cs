@@ -1362,7 +1362,7 @@ namespace GHMonitoringCenterApi.Application.Service
               .ToPageListAsync(constructionLogRequestDto.PageIndex, constructionLogRequestDto.PageSize, total);
 
 
-             var projectStatus = await _dbContext.Queryable<ProjectStatus>().Where(t => t.IsDelete == 1).Select(t => new { t.StatusId, t.Name }).ToListAsync();
+            var projectStatus = await _dbContext.Queryable<ProjectStatus>().Where(t => t.IsDelete == 1).Select(t => new { t.StatusId, t.Name }).ToListAsync();
             var company = await _dbContext.Queryable<Institution>().ToListAsync();
             if (constructionLog.Any())
             {
@@ -1391,10 +1391,9 @@ namespace GHMonitoringCenterApi.Application.Service
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<SearchConstructionLoDetailsgResponseDto>> GetDayReportConstructionDetailAsync(SearchConstructionLoDetailsgRequestDto requestDto)
+        public async Task<ResponseAjaxResult<List<SearchConstructionLoDetailsgResponseDto>>> GetDayReportConstructionDetailAsync(ExternalDateRequestDto requestDto)
         {
-            int time = requestDto.SearchTime.ToDateDay();
-            var result = await _constructionLogService.SearchConstructionLogDetailsgAsync(requestDto.Id, time);
+            var result = await _constructionLogService.SearchExternalConstructionLogDetailsgAsync(requestDto);
             return result;
         }
         #endregion

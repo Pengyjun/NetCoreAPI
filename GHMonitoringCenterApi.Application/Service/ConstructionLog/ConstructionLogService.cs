@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using GHMonitoringCenterApi.Application.Contracts.Dto.ConstructionLog;
+using GHMonitoringCenterApi.Application.Contracts.Dto.External;
 using GHMonitoringCenterApi.Application.Contracts.Dto.Project;
 using GHMonitoringCenterApi.Application.Contracts.IService;
 using GHMonitoringCenterApi.Application.Contracts.IService.ConstructionLog;
@@ -52,7 +53,7 @@ namespace GHMonitoringCenterApi.Application.Service.ConstructionLog
         /// <returns></returns>
         public async Task<ResponseAjaxResult<List<ConstructionLogResponseDto>>> SearchConstructionLogAsync(ConstructionLogRequestDto constructionLogRequestDto, string oid)
         {
-           
+
             ResponseAjaxResult<List<ConstructionLogResponseDto>> responseAjaxResult = new ResponseAjaxResult<List<ConstructionLogResponseDto>>();
             List<ConstructionLogResponseDto> constructionLog = new List<ConstructionLogResponseDto>();
             var currentInstitutionList = await dbContent.Queryable<Institution>().Where(x => x.IsDelete == 1).ToListAsync();
@@ -64,14 +65,14 @@ namespace GHMonitoringCenterApi.Application.Service.ConstructionLog
                 constructionLog = await dbContent.Queryable<Project>()
                 .InnerJoin<DayReport>((x, y) => x.Id == y.ProjectId && y.ProcessStatus == DayReportProcessStatus.Submited)
                 .InnerJoin<ProjectStatus>((x, y, z) => x.StatusId == z.StatusId)
-            .Where((x,y) => y.IsDelete == 1)
+            .Where((x, y) => y.IsDelete == 1)
             .WhereIF(currentAffCompanyInfo != null, x => x.ProjectDept == currentAffCompanyInfo.DPomId)
             .WhereIF(!string.IsNullOrWhiteSpace(constructionLogRequestDto.ProjectName), x => x.Name.Contains(constructionLogRequestDto.ProjectName))
             .WhereIF(constructionLogRequestDto.CompanyId.HasValue, x => x.CompanyId == constructionLogRequestDto.CompanyId)
             .WhereIF(constructionLogRequestDto.Time.HasValue, (x, y) => y.DateDay == constructionLogRequestDto.Time.Value.ToDateDay())
             .WhereIF(constructionLogRequestDto.ProjectDepartmentId.HasValue, x => x.ProjectDept == constructionLogRequestDto.ProjectDepartmentId)
             .WhereIF(constructionLogRequestDto.StatusId != null && constructionLogRequestDto.StatusId.Any(), (x, y, z) => constructionLogRequestDto.StatusId.Contains(x.StatusId.ToString()))
-            .OrderByDescending((x, y, z)=> y.DateDay)
+            .OrderByDescending((x, y, z) => y.DateDay)
             .Select((x, y, z) => new ConstructionLogResponseDto
             {
                 Id = y.Id,
@@ -86,7 +87,7 @@ namespace GHMonitoringCenterApi.Application.Service.ConstructionLog
             else
             {
                 constructionLog = await dbContent.Queryable<Project>()
-                  .InnerJoin<DayReport>((x, y) => x.Id == y.ProjectId )
+                  .InnerJoin<DayReport>((x, y) => x.Id == y.ProjectId)
                   .InnerJoin<ProjectStatus>((x, y, z) => x.StatusId == z.StatusId)
                   .Where((x, y, z) => y.IsDelete == 1 && y.ProcessStatus == DayReportProcessStatus.Submited)
                   .WhereIF(!string.IsNullOrWhiteSpace(constructionLogRequestDto.ProjectName), (x, y, z) => x.Name.Contains(constructionLogRequestDto.ProjectName))
@@ -118,7 +119,7 @@ namespace GHMonitoringCenterApi.Application.Service.ConstructionLog
                         item.SubmitTime = dayTimes;
                     }
                     item.CompanyName = company.Where(x => x.PomId == item.CompanyId).Select(x => x.Name).FirstOrDefault();
-                    
+
                 }
             }
             responseAjaxResult.Data = constructionLog;
@@ -137,13 +138,13 @@ namespace GHMonitoringCenterApi.Application.Service.ConstructionLog
 
             ResponseAjaxResult<List<SearchCompletedConstructionLogRequestDto>> responseAjaxResult = new ResponseAjaxResult<List<SearchCompletedConstructionLogRequestDto>>();
             var times = await dbContent.Queryable<DayReport>()
-               .Where(x => x.IsDelete == 1 && x.DateDay >= dateTime.Value.ToDateDay() && x.DateDay <= dateTime.Value.ToDateDay() + 30 && x.ProjectId == projectid&&x.ProcessStatus == DayReportProcessStatus.Submited)
+               .Where(x => x.IsDelete == 1 && x.DateDay >= dateTime.Value.ToDateDay() && x.DateDay <= dateTime.Value.ToDateDay() + 30 && x.ProjectId == projectid && x.ProcessStatus == DayReportProcessStatus.Submited)
                 .Select(x => x.DateDay).ToListAsync();
             List<SearchCompletedConstructionLogRequestDto> constructionLog = new List<SearchCompletedConstructionLogRequestDto>();
             DateTime dateTimes;
             foreach (var item in times)
             {
-                if(ConvertHelper.TryConvertDateTimeFromDateDay(item, out dateTimes))
+                if (ConvertHelper.TryConvertDateTimeFromDateDay(item, out dateTimes))
                 {
                     SearchCompletedConstructionLogRequestDto searchCompletedConstructionLogRequestDto = new SearchCompletedConstructionLogRequestDto()
                     {
@@ -153,7 +154,7 @@ namespace GHMonitoringCenterApi.Application.Service.ConstructionLog
                     constructionLog.Add(searchCompletedConstructionLogRequestDto);
                 }
             };
-               
+
             responseAjaxResult.Data = constructionLog;
             responseAjaxResult.Count = constructionLog.Count;
             responseAjaxResult.Success();
@@ -170,13 +171,13 @@ namespace GHMonitoringCenterApi.Application.Service.ConstructionLog
             ResponseAjaxResult<SearchConstructionLoDetailsgResponseDto> responseAjaxResult = new ResponseAjaxResult<SearchConstructionLoDetailsgResponseDto>();
             if (dateTime == null)
             {
-                dateTime = DateTime.Now.ToDateDay()-1;
+                dateTime = DateTime.Now.ToDateDay() - 1;
             }
             var constructionLogs = await dbContent.Queryable<DayReport>()
                 .LeftJoin<Project>((x, y) => x.ProjectId == y.Id)
                 .LeftJoin<DictionaryTable>((x, y, s) => s.TypeNo == 4 && s.Type == x.Weather)
                 .LeftJoin<Domain.Models.User>((x, y, s, z) => z.Id == x.CreateId)
-                .Where(x => x.IsDelete == 1 && x.ProjectId == Id&& x.ProcessStatus == DayReportProcessStatus.Submited)
+                .Where(x => x.IsDelete == 1 && x.ProjectId == Id && x.ProcessStatus == DayReportProcessStatus.Submited)
                 .Select((x, y, s, z) => new SearchConstructionLoDetailsgResponseDto
                 {
                     Id = x.Id,
@@ -195,19 +196,19 @@ namespace GHMonitoringCenterApi.Application.Service.ConstructionLog
                     LandWorkplace = x.LandWorkplace,
                     ShiftLeader = x.ShiftLeader,
                     ShiftLeaderPhone = x.ShiftLeaderPhone,
-                    FewLandWorkplace= x.FewLandWorkplace,
-                    SiteShipNum= x.SiteShipNum,
-                    OnShipPersonNum= x.OnShipPersonNum,
-                    HazardousConstructionDescription= x.HazardousConstructionDescription,
-                    IsHoliday= x.IsHoliday,
+                    FewLandWorkplace = x.FewLandWorkplace,
+                    SiteShipNum = x.SiteShipNum,
+                    OnShipPersonNum = x.OnShipPersonNum,
+                    HazardousConstructionDescription = x.HazardousConstructionDescription,
+                    IsHoliday = x.IsHoliday,
                     FillingDateTime = x.DateDay
                 })
                .ToListAsync();
-            var  constructionLog = constructionLogs.Where(x => x.FillingDateTime == dateTime).FirstOrDefault();
+            var constructionLog = constructionLogs.Where(x => x.FillingDateTime == dateTime).FirstOrDefault();
             //var dayReportIds = await dbContent.Queryable<DayReport>().Where(x => x.IsDelete == 1 && x.CreateTime.ToDateDay() == dateTime.Value.ToDateDay() && x.ProjectId == Id).Select(x => x.Id).SingleAsync();
             if (constructionLog == null || string.IsNullOrWhiteSpace(constructionLog.ProjectId.ToString()) || constructionLog.ProjectId == Guid.Empty)
             {
-                var dayReportConstructions = await dbContent.Queryable<DayReport>().Where(x => x.IsDelete == 1 && x.ProjectId == Id&& x.ProcessStatus == DayReportProcessStatus.Submited).OrderByDescending(x => x.CreateTime).ToListAsync();
+                var dayReportConstructions = await dbContent.Queryable<DayReport>().Where(x => x.IsDelete == 1 && x.ProjectId == Id && x.ProcessStatus == DayReportProcessStatus.Submited).OrderByDescending(x => x.CreateTime).ToListAsync();
 
                 if (!dayReportConstructions.Any())
                 {
@@ -239,6 +240,94 @@ namespace GHMonitoringCenterApi.Application.Service.ConstructionLog
             }
             responseAjaxResult.Count = 1;
             responseAjaxResult.Data = constructionLog;
+            responseAjaxResult.Success();
+            return responseAjaxResult;
+        }
+
+        /// <summary>
+        /// 获取施工日志详情（对外接口使用）
+        /// </summary>
+        /// <returns></returns>
+        public async Task<ResponseAjaxResult<List<SearchConstructionLoDetailsgResponseDto>>> SearchExternalConstructionLogDetailsgAsync(ExternalDateRequestDto requestDto)
+        {
+            ResponseAjaxResult<List<SearchConstructionLoDetailsgResponseDto>> responseAjaxResult = new ResponseAjaxResult<List<SearchConstructionLoDetailsgResponseDto>>();
+
+            // 如果 startDate 为空，设置为当前月份的第一天
+            if (!requestDto.StartTime.HasValue)
+            {
+                requestDto.StartTime = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1); // 当前月的第一天
+            }
+
+            // 如果 endDate 为空，设置为当前月份的最后一天
+            if (!requestDto.EndTime.HasValue)
+            {
+                requestDto.EndTime = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1)
+                     .AddMonths(1)
+                     .AddDays(-1); // 当前月的最后一天
+            }
+            var startMonth = requestDto.StartTime.Value.ToDateDay();
+            var endMonth = requestDto.EndTime.Value.ToDateDay();
+            var projectId = await dbContent.Queryable<Project>().Where(t => t.IsDelete == 1)
+                .WhereIF(!string.IsNullOrWhiteSpace(requestDto.ProjectName), t => t.Name.Contains(requestDto.ProjectName)).Select(t => t.Id)
+                .FirstAsync();
+            RefAsync<int> total = 0;
+            var constructionLogs = await dbContent.Queryable<DayReport>()
+                .LeftJoin<Project>((x, y) => x.ProjectId == y.Id)
+                .LeftJoin<DictionaryTable>((x, y, s) => s.TypeNo == 4 && s.Type == x.Weather)
+                .LeftJoin<Domain.Models.User>((x, y, s, z) => z.Id == x.CreateId)
+                .Where(x => x.IsDelete == 1 && x.ProcessStatus == DayReportProcessStatus.Submited && x.DateDay >= startMonth && x.DateDay <= endMonth)
+                .WhereIF(!string.IsNullOrWhiteSpace(requestDto.ProjectName) && projectId != Guid.Empty, x => x.ProjectId == projectId)
+                .Select((x, y, s, z) => new SearchConstructionLoDetailsgResponseDto
+                {
+                    Id = x.Id,
+                    Name = y.Name,
+                    ProjectId = x.ProjectId,
+                    ConstructionRemarks = x.ConstructionRemarks,
+                    Weather = s.Name,
+                    RecorderName = z.Name,
+                    Management = x.SiteManagementPersonNum,
+                    ConstructionPersonnel = x.SiteConstructionPersonNum,
+                    ConstructionEquipment = x.ConstructionDevice,
+                    OtherRecords = x.OtherRecord,
+                    ConstructionDeviceNum = x.ConstructionDeviceNum,
+                    HazardousConstructionNum = x.HazardousConstructionNum,
+                    TeamLeader = x.TeamLeader,
+                    LandWorkplace = x.LandWorkplace,
+                    ShiftLeader = x.ShiftLeader,
+                    ShiftLeaderPhone = x.ShiftLeaderPhone,
+                    FewLandWorkplace = x.FewLandWorkplace,
+                    SiteShipNum = x.SiteShipNum,
+                    OnShipPersonNum = x.OnShipPersonNum,
+                    HazardousConstructionDescription = x.HazardousConstructionDescription,
+                    IsHoliday = x.IsHoliday,
+                    FillingDateTime = x.DateDay
+                }).ToPageListAsync(requestDto.PageIndex, requestDto.PageSize, total);
+            var projectIds = constructionLogs.Select(t => t.ProjectId).Distinct().ToArray();
+            var dayReportConstructionList = await dbContent.Queryable<DayReportConstruction>().Where(x => x.DateDay >= startMonth && x.DateDay <= endMonth && projectIds.Contains(x.ProjectId) && x.IsDelete == 1).ToListAsync();
+            var projectWBSList = await dbContent.Queryable<ProjectWBS>().Where(x => x.IsDelete == 1).ToListAsync();
+            foreach (var item in constructionLogs)
+            {
+                ConvertHelper.TryConvertDateTimeFromDateDay(item.FillingDateTime.Value, out DateTime dayTimes);
+                item.DateTime = dayTimes;
+                item.DayReportConstruction = new List<DayReportConstructions>();
+                var dayReportConstruction = dayReportConstructionList.Where(t => t.ProjectId == item.ProjectId && t.DateDay == item.FillingDateTime).ToList();
+                foreach (var item2 in dayReportConstruction)
+                {
+                    var projectWBS = projectWBSList.Where(t => t.ProjectId == item.ProjectId.ToString()).ToList();
+                    var projectwbsList = projectWBS.FirstOrDefault(x => x.Id == item2.ProjectWBSId);
+                    DayReportConstructions dayReportConstructions = new DayReportConstructions();
+                    dayReportConstructions.ActualDailyProduction = item2.ActualDailyProduction;
+                    dayReportConstructions.ActualDailyProductionAmount = item2.ActualDailyProductionAmount;
+                    if (projectwbsList != null)
+                    {
+                        dayReportConstructions.ConstructionContent = GetProjectWBSLevelName(projectWBSList, projectwbsList.Name, projectwbsList.Pid);
+                        dayReportConstructions.ConstructionRecord = GetProjectWBSLevel1Name(projectWBSList, projectwbsList);
+                    }
+                    item.DayReportConstruction.Add(dayReportConstructions);
+                }
+            }
+            responseAjaxResult.Count = total;
+            responseAjaxResult.Data = constructionLogs;
             responseAjaxResult.Success();
             return responseAjaxResult;
         }
