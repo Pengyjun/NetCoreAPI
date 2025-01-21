@@ -128,7 +128,7 @@ namespace GHMonitoringCenterApi.Controllers.File
             await logService.WriteLogAsync(logObj);
             #endregion
             //模板位置      
-             var templatePath = $"Template/Excel/ProjectTemplate.xlsx";
+            var templatePath = $"Template/Excel/ProjectTemplate.xlsx";
             //var templatePath = @"D:\projectconllection\dotnet\szgh\GHMonitoringCenterApi.Domain.Shared\Template\Excel\ProjectTemplate.xlsx";
             //获取数据
             var data = await projectService.GetProjectExcelAsync(projectSearchRequestDto);
@@ -326,9 +326,10 @@ namespace GHMonitoringCenterApi.Controllers.File
             await logService.WriteLogAsync(logObj);
             #endregion
             //模板位置      
+            //var templatePath = $@"E:\project\HNKC.SZGHAPI\szgh\ghmonitoringcenterapi\GHMonitoringCenterApi.Domain.Shared\Template\Excel\ProjectMonthly.xlsx";
             var templatePath = $"Template/Excel/ProjectMonthly.xlsx";
-            var startMonth = ((DateTime)searchRequestDto.StartTime).ToString("yyyy-MM");
-            var endMonth = ((DateTime)searchRequestDto.EndTime).ToString("yyyy-MM");
+            var startMonth = searchRequestDto.StartTime?.ToString("yyyy-MM");// ((DateTime)searchRequestDto.StartTime).ToString("yyyy-MM");
+            var endMonth = searchRequestDto.EndTime?.ToString("yyyy-MM");// ((DateTime)searchRequestDto.EndTime).ToString("yyyy-MM");
             var title = startMonth == endMonth ? $"{startMonth}月在建项目报表" : $"{startMonth}~{endMonth}月在建项目报表";
             //获取数据
             var result = await projectReportService.SearchMonthReportsAsync(searchRequestDto);
@@ -724,8 +725,8 @@ namespace GHMonitoringCenterApi.Controllers.File
                 WordImageSetup = new WordImageSetup()
                 {
                     type = PictureType.PNG,
-                     FileName = Path.GetFileName(templatePath),
-                     LogoStream = new FileStream(templatePath, FileMode.Open, FileAccess.Read)
+                    FileName = Path.GetFileName(templatePath),
+                    LogoStream = new FileStream(templatePath, FileMode.Open, FileAccess.Read)
                 }
             };
             var stream = await wordService.MonthReportImportWordAsync(config, model);
