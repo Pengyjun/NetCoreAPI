@@ -4,6 +4,7 @@ using HNKC.CrewManagePlatform.Models.Enums;
 using HNKC.CrewManagePlatform.SqlSugars.Models;
 using HNKC.CrewManagePlatform.Utils;
 using SqlSugar;
+using System.ComponentModel.DataAnnotations;
 using UtilsSharp;
 
 namespace HNKC.CrewManagePlatform.Services.Interface.Disembark
@@ -388,13 +389,12 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Disembark
             HeaderTtitle title = new();
             List<CrewRotaDetailsDto> jiaBans = new();
             List<CrewRotaDetailsDto> lunJis = new();
-            List<FeiBanDetails> jiabanFeiban = new();
-            List<FeiBanDetails> lunjiFeiban = new();
+            //List<FeiBanDetails> lunjiFeiban = new();
 
-            //拿最新的12条数据
+            //拿最新的6条数据
             var crewRotaData = await _dbContext.Queryable<CrewRota>().Where(t => t.IsDelete == 1)
                 .OrderByDescending(x => x.SchedulingTime)
-                .Take(12)
+                .Take(6)
                 .ToListAsync();
 
             //任职船舶 
@@ -403,7 +403,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Disembark
               .Select(t => new { t.WorkShipId, WorkShipEndTime = SqlFunc.AggregateMax(t.WorkShipEndTime) });
             var wShip = _dbContext.Queryable<WorkShip>()
               .InnerJoin(crewWorkShip, (x, y) => x.WorkShipId == y.WorkShipId && x.WorkShipEndTime == y.WorkShipEndTime);
-            var onboard = await _dbContext.Queryable<User>().Where(t => t.IsLoginUser == 1)
+            var userOnboard = await _dbContext.Queryable<User>().Where(t => t.IsLoginUser == 1)
                 .InnerJoin(wShip, (t, ws) => t.BusinessId == ws.WorkShipId)
                 .InnerJoin<PositionOnBoard>((t, ws, po) => po.BusinessId.ToString() == ws.Postition)
                 .Select((t, ws, po) => new
@@ -411,20 +411,55 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Disembark
                     t.BusinessId,
                     UserName = t.Name,
                     OnboardName = po.Name,
+                    po.RotaType
                 })
                 .ToListAsync();
 
             var jiaban = crewRotaData.Where(x => x.RotaType == RotaEnum.JiaBan).ToList();
             var lunji = crewRotaData.Where(x => x.RotaType == RotaEnum.LunJi).ToList();
 
+            List<Guid?> jiabanUIds = new();
             foreach (var item in jiaban.OrderBy(x => x.TimeSlotType))
             {
-                var leader = onboard.FirstOrDefault(x => x.BusinessId == item.FLeaderUserId);
-                var otherUser = item.OhterUserId?.Split(',').ToList();
+                var leader1 = userOnboard.FirstOrDefault(x => x.BusinessId == item.FLeaderUserId);
+                var leader2 = userOnboard.FirstOrDefault(x => x.BusinessId == item.SLeaderUserId);
+                var otherUser = item.OhterUserId?.Split(',')
+                    .Select(id => string.IsNullOrEmpty(id) ? (Guid?)null : Guid.Parse(id))
+                    .ToList();
+                var otherUserNames = string.Empty;
+                if (otherUser != null && otherUser.Any())
+                {
+                    foreach (var item2 in otherUser)
+                    {
+                        var rs = userOnboard.FirstOrDefault(x => x.BusinessId == item2);
+                        var user = rs?.UserName + (string.IsNullOrEmpty(rs?.OnboardName) ? "" : $"({rs?.OnboardName})") ?? string.Empty;
+                        otherUserNames = string.Join("、", user);
+                    }
+                }
+                jiabanUIds.Add(leader1?.BusinessId);
+                jiabanUIds.Add(leader2?.BusinessId);
+                if (otherUser != null && otherUser.Any()) jiabanUIds.AddRange(otherUser);
+                //甲板剩下的非班人员
+                var feibanuser = userOnboard.Where(x => x.RotaType == RotaEnum.JiaBan && !jiabanUIds.Contains(x.BusinessId)).ToList();
+                List<FeiBanDetails> jiabanFeiban = new();
+                if (feibanuser.Any())
+                {
+                    foreach (var item3 in feibanuser)
+                    {
+                        jiabanFeiban.Add(new FeiBanDetails
+                        {
+                            UserName = item3?.UserName + (string.IsNullOrEmpty(item3?.OnboardName) ? "" : $"({item3?.OnboardName})") ?? string.Empty,
+                            PositionName = string.IsNullOrEmpty(item3?.OnboardName) ? "" : item3?.OnboardName
+                        });
+                    }
+                }
                 jiaBans.Add(new CrewRotaDetailsDto
                 {
-                    FLeaderUserName = leader?.UserName + (string.IsNullOrEmpty(leader?.OnboardName) ? "" : $"({leader?.OnboardName})") ?? string.Empty,
-
+                    FLeaderUserName = leader1?.UserName + (string.IsNullOrEmpty(leader1?.OnboardName) ? "" : $"({leader1?.OnboardName})") ?? string.Empty,
+                    SLeaderUserName = leader2?.UserName + (string.IsNullOrEmpty(leader2?.OnboardName) ? "" : $"({leader2?.OnboardName})") ?? string.Empty,
+                    FeiBanUsers = jiabanFeiban,
+                    OhterUserName = otherUserNames,
+                    //TimeSlotTypeName =item.TimeType== TimeEnum.FixedTime? EnumUtil.GetDescription(item.TimeSlotType):
                 });
             }
             return rt;

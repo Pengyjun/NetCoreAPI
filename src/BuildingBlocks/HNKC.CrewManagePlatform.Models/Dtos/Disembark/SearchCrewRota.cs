@@ -176,7 +176,7 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.Disembark
     public class FeiBanDetails
     {
         /// <summary>
-        /// 名称
+        /// 名称（职务）
         /// </summary>
         public string? UserName { get; set; }
         /// <summary>
