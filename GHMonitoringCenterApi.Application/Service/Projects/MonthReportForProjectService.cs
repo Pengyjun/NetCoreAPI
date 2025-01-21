@@ -1456,6 +1456,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     var f = rr.FirstOrDefault(x => x.Id == item.Id);
                     if (f != null)
                     {
+                        f.ShipId = item.ShipId;
                         f.CurrencyOutsourcingExpensesAmount = item.ActualOutAmount;
                         f.ActualCompQuantity = item.ActualCompQuantity;
                         f.ActualCompAmount = item.ActualCompAmount;
@@ -1472,7 +1473,8 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                         x.ActualCompQuantity,
                         x.ActualCompAmount,
                         x.RMBHOutValue,
-                        x.RMBHValue
+                        x.RMBHValue,
+                        x.ShipId
                     })
                     .ExecuteCommandAsync();
                 }
