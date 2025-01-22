@@ -1127,7 +1127,8 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     OCode = ins.OCode,
                     Sno = ins.SNO,
                 })
-            .ToList();
+                .OrderBy(x => Convert.ToInt32(x.Sno))
+                .ToList();
 
             //根节点
             var rootNode = tableList
@@ -1169,6 +1170,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     Sno = child.Sno,
                     Children = GetInstitutionTreeChild(child.Oid, children)
                 })
+                .OrderBy(x => Convert.ToInt32(x.Sno))
                 .ToList();
 
             return childs; // 返回子节点列表
