@@ -1451,18 +1451,37 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 List<MonthReportDetail> rs = new();
                 var ids = model.ProjectHistorys.Select(x => x.Id).ToList();
                 var rr = await _dbContext.Queryable<MonthReportDetail>().Where(t => t.IsDelete == 1 && ids.Contains(t.Id)).ToListAsync();
+                ////获取当前项目的日报
+                //var dayReps = await _dbContext.Queryable<DayReportConstruction>().Where(x => x.IsDelete == 1 && x.ProjectId == model.ProjectId).ToListAsync();
                 foreach (var item in model.ProjectHistorys)
                 {
                     var f = rr.FirstOrDefault(x => x.Id == item.Id);
                     if (f != null)
                     {
-                        f.ShipId = item.ShipId;
+                        //f.ShipId = item.ShipId;
                         f.CurrencyOutsourcingExpensesAmount = item.ActualOutAmount;
                         f.ActualCompQuantity = item.ActualCompQuantity;
                         f.ActualCompAmount = item.ActualCompAmount;
                         f.RMBHValue = item.RMBHValue;
                         f.RMBHOutValue = item.RMBHOutValue;
                         rs.Add(f);
+                        ////日报资源修改
+                        //var dps = dayReps.Where(x => x.SubShipId == f.ShipId || f.ShipId == x.OwnerShipId).ToList();
+                        //foreach (var item2 in dps)
+                        //{
+                        //    if (item2.OutPutType == ConstructionOutPutType.SubPackage)
+                        //        item2.SubShipId = item.ShipId;
+                        //    else item2.OwnerShipId = item.ShipId;
+
+                        //    if (item2.OutPutType == ConstructionOutPutType.SubPackage)
+                        //    {
+                        //        await _dbContext.Updateable(item2).UpdateColumns(x => new { x.SubShipId }).ExecuteCommandAsync();
+                        //    }
+                        //    else
+                        //    {
+                        //        await _dbContext.Updateable(item2).UpdateColumns(x => new { x.OwnerShipId }).ExecuteCommandAsync();
+                        //    }
+                        //}
                     }
                 }
                 if (rs.Any())
@@ -1474,7 +1493,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                         x.ActualCompAmount,
                         x.RMBHOutValue,
                         x.RMBHValue,
-                        x.ShipId
+                        //x.ShipId
                     })
                     .ExecuteCommandAsync();
                 }

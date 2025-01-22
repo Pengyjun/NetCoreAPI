@@ -17,6 +17,10 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project.MonthReportFor
         /// </summary>
         public string? ProjectId { get; set; }
         /// <summary>
+        /// 日报主键id
+        /// </summary>
+        public Guid? DayReportId { get; set; }
+        /// <summary>
         /// 合同工程量
         /// </summary>
         public decimal? EngQuantity { get; set; }
