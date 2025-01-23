@@ -271,7 +271,8 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 //获取当月前需要计算的的所有填报数据(累计的所有数据/开累)
                 calculatePWBS = await _dbContext.Queryable<MonthReportDetail>()
                    .Where(p => mPIds.Contains(p.MonthReportId) && !string.IsNullOrEmpty(p.ProjectId.ToString()) && p.ProjectId != Guid.Empty && p.IsDelete == 1 && SqlFunc.ToGuid(p.ProjectId) == pId && p.DateMonth <= dateMonth)
-                   .Select(p => new ProjectWBSDto
+                   .LeftJoin<MonthReportDetailHistory>((p, y) => p.Id == y.Id)
+                   .Select((p, y) => new ProjectWBSDto
                    {
                        Id = p.Id,
                        ProjectId = p.ProjectId.ToString(),
@@ -288,11 +289,11 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                        Remark = p.Remark,
                        DetailId = p.Id,
                        CompleteProductionAmount = p.UnitPrice * p.CompletedQuantity, //p.CompleteProductionAmount  外币|人民币
-                       ActualCompAmount = p.ActualCompAmount,
-                       ActualCompQuantity = p.ActualCompQuantity,
-                       ActualOutAmount = p.CurrencyOutsourcingExpensesAmount,
-                       RMBHOutValue = p.RMBHOutValue,
-                       RMBHValue = p.RMBHValue
+                       ActualCompAmount = y.ActualCompAmount,
+                       ActualCompQuantity = y.ActualCompQuantity,
+                       ActualOutAmount = y.CurrencyOutsourcingExpensesAmount,
+                       RMBHOutValue = y.RMBHOutValue,
+                       RMBHValue = y.RMBHValue
                    })
                    .ToListAsync();
 
@@ -618,6 +619,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                  */
                 //是否计算是统计的偏差月
                 bool pianchaMonth = dateMonth > 202412 ? true : false;
+                var historyKaiLei = await _dbContext.Queryable<MonthReportDetailHistory>().Where(t => t.IsDelete == 1).ToListAsync();
 
                 var calPwbs = new List<ProjectWBSDto>();
                 foreach (var item in gList)
@@ -648,10 +650,10 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                         }
                         else
                         {
-                            //计算202412修复的开累值 
-                            var amount = calculatePWBS.Where(t => t.ProjectId == item.Key.ProjectId && t.ShipId == item.Key.ShipId && t.UnitPrice == item.Key.UnitPrice && t.ProjectWBSId == item.Key.ProjectWBSId).Sum(x => Convert.ToDecimal(x.ActualCompAmount));
-                            var quantity = calculatePWBS.Where(t => t.ProjectId == item.Key.ProjectId && t.ShipId == item.Key.ShipId && t.UnitPrice == item.Key.UnitPrice && t.ProjectWBSId == item.Key.ProjectWBSId).Sum(x => Convert.ToDecimal(x.ActualCompQuantity));
-                            var outAmount = calculatePWBS.Where(t => t.ProjectId == item.Key.ProjectId && t.ShipId == item.Key.ShipId && t.UnitPrice == item.Key.UnitPrice && t.ProjectWBSId == item.Key.ProjectWBSId).Sum(x => Convert.ToDecimal(x.ActualOutAmount));
+                            //计算202412修复的开累值  
+                            var amount = historyKaiLei.Where(t => t.ProjectId.ToString() == item.Key.ProjectId && t.ShipId == item.Key.ShipId && t.UnitPrice == item.Key.UnitPrice && t.ProjectWBSId == item.Key.ProjectWBSId).Sum(x => Convert.ToDecimal(x.ActualCompAmount));
+                            var quantity = historyKaiLei.Where(t => t.ProjectId.ToString() == item.Key.ProjectId && t.ShipId == item.Key.ShipId && t.UnitPrice == item.Key.UnitPrice && t.ProjectWBSId == item.Key.ProjectWBSId).Sum(x => Convert.ToDecimal(x.ActualCompQuantity));
+                            var outAmount = historyKaiLei.Where(t => t.ProjectId.ToString() == item.Key.ProjectId && t.ShipId == item.Key.ShipId && t.UnitPrice == item.Key.UnitPrice && t.ProjectWBSId == item.Key.ProjectWBSId).Sum(x => Convert.ToDecimal(x.CurrencyOutsourcingExpensesAmount));
 
                             //如果是从开累按钮进入列表
                             if (exhaustedBtn)
@@ -664,6 +666,12 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                                 model.OldCurrencyHValue = calculatePWBS.Where(t => t.ProjectId == item.Key.ProjectId && t.ShipId == item.Key.ShipId && t.UnitPrice == item.Key.UnitPrice && t.ProjectWBSId == item.Key.ProjectWBSId).Sum(x => x.CompleteProductionAmount);
                                 model.OldHQuantity = calculatePWBS.Where(t => t.ProjectId == item.Key.ProjectId && t.ShipId == item.Key.ShipId && t.UnitPrice == item.Key.UnitPrice && t.ProjectWBSId == item.Key.ProjectWBSId).Sum(x => x.CompletedQuantity);
                                 model.OldCurrencyHOutValue = calculatePWBS.Where(t => t.ProjectId == item.Key.ProjectId && t.ShipId == item.Key.ShipId && t.UnitPrice == item.Key.UnitPrice && t.ProjectWBSId == item.Key.ProjectWBSId).Sum(x => x.OutsourcingExpensesAmount);
+
+                                model.ActualCompAmount = historyKaiLei.Where(t => t.ProjectId.ToString() == item.Key.ProjectId && t.ShipId == item.Key.ShipId && t.UnitPrice == item.Key.UnitPrice && t.ProjectWBSId == item.Key.ProjectWBSId).Sum(x => x.ActualCompAmount);
+                                model.ActualCompQuantity = historyKaiLei.Where(t => t.ProjectId.ToString() == item.Key.ProjectId && t.ShipId == item.Key.ShipId && t.UnitPrice == item.Key.UnitPrice && t.ProjectWBSId == item.Key.ProjectWBSId).Sum(x => x.ActualCompQuantity);
+                                model.ActualOutAmount = historyKaiLei.Where(t => t.ProjectId.ToString() == item.Key.ProjectId && t.ShipId == item.Key.ShipId && t.UnitPrice == item.Key.UnitPrice && t.ProjectWBSId == item.Key.ProjectWBSId).Sum(x => x.CurrencyOutsourcingExpensesAmount);
+                                model.RMBHOutValue = historyKaiLei.Where(t => t.ProjectId.ToString() == item.Key.ProjectId && t.ShipId == item.Key.ShipId && t.UnitPrice == item.Key.UnitPrice && t.ProjectWBSId == item.Key.ProjectWBSId).Sum(x => x.RMBHOutValue);
+                                model.RMBHValue = historyKaiLei.Where(t => t.ProjectId.ToString() == item.Key.ProjectId && t.ShipId == item.Key.ShipId && t.UnitPrice == item.Key.UnitPrice && t.ProjectWBSId == item.Key.ProjectWBSId).Sum(x => x.RMBHValue);
                             }
                             else
                             {
@@ -1448,12 +1456,12 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
 
             if (model.ProjectHistorys != null && model.ProjectHistorys.Any())
             {
-                List<MonthReportDetail> rs = new();
+                List<MonthReportDetailHistory> rsh = new();
                 var ids = model.ProjectHistorys.Select(x => x.Id).ToList();
-                var rr = await _dbContext.Queryable<MonthReportDetail>().Where(t => t.IsDelete == 1 && ids.Contains(t.Id)).ToListAsync();
+                var rrh = await _dbContext.Queryable<MonthReportDetailHistory>().Where(t => t.IsDelete == 1 && ids.Contains(t.Id)).ToListAsync();
                 foreach (var item in model.ProjectHistorys)
                 {
-                    var f = rr.FirstOrDefault(x => x.Id == item.Id);
+                    var f = rrh.FirstOrDefault(x => x.Id == item.Id);
                     if (f != null)
                     {
                         f.ShipId = item.ShipId;
@@ -1462,13 +1470,13 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                         f.ActualCompAmount = item.ActualCompAmount;
                         f.RMBHValue = item.RMBHValue;
                         f.RMBHOutValue = item.RMBHOutValue;
-                        rs.Add(f);
-                       
+                        rsh.Add(f);
+
                     }
                 }
-                if (rs.Any())
+                if (rsh.Any())
                 {
-                    await _dbContext.Updateable(rs).UpdateColumns(x => new
+                    await _dbContext.Updateable(rsh).UpdateColumns(x => new
                     {
                         x.CurrencyOutsourcingExpensesAmount,
                         x.ActualCompQuantity,

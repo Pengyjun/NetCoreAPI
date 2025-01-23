@@ -171,11 +171,11 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project.MonthReportFor
         /// </summary>
         public decimal? ActualCompAmount { get; set; } = 0M;
         /// <summary>
-        /// 实际人民币产值（用户 输入）
+        /// 实际人民币产值
         /// </summary>
         public decimal? RMBHValue { get; set; } = 0M;
         /// <summary>
-        /// 实际人民币外包支出（用户 输入）
+        /// 实际人民币外包支出
         /// </summary>
         public decimal? RMBHOutValue { get; set; } = 0M;
 
