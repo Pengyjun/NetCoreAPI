@@ -103,7 +103,7 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project
         /// <summary>
         /// 资源id
         /// </summary>
-        public Guid ShipId { get; set; }
+        public Guid? ShipId { get; set; }
         /// <summary>
         /// 本月外包支出(实际)
         /// </summary>
