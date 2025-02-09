@@ -273,6 +273,14 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project.MonthReportFor
         /// 实际人民币外包支出
         /// </summary>
         public decimal? TopRMBHOutValue { get; set; } = 0M;
+        /// <summary>
+        /// 给前端计算好的外币开累数（产值）
+        /// </summary>
+        public decimal CurrencyTotalAmount { get; set; } = 0M;
+        /// <summary>
+        /// 给前端计算好的外币开累数（外包支出）
+        /// </summary>
+        public decimal CurrencyTotalOutAmount { get; set; } = 0M;
 
         #region 原值
         /// <summary>
