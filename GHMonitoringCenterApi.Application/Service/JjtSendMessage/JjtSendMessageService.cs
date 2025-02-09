@@ -1865,7 +1865,7 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
                 if (item.Collect == 0)
                 {
 
-                 
+                   
                     //var totalYearProductionValue = Math.Round(((item.YearProductionValue + currentMonthCompanyCount) / 100000000), 2);
                     var totalYearProductionValue = Math.Round(((currentMonthCompanyCount) / 100000000), 2);
                     //超序时进度
@@ -1992,7 +1992,7 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
                     #endregion
 
                     var planProducitonValue = dayNewProjectValue.Where(x => x.DateDay == currentTimeInt).Select(x=>x.ProductionValue).FirstOrDefault();
-                    projectBasePoduction.DayProductionValue = Math.Round(planProducitonValue.Value/10000, 2);//dayTotalPoductionValues;
+                    projectBasePoduction.DayProductionValue = dayTotalPoductionValues;//Math.Round(planProducitonValue.Value/10000, 2);//;
                     /*projectBasePoduction.TotalYearProductionValue =   Math.Round(companyBasePoductionValues.Sum(x => x.YearCompanyProductionValue.Value) / 100000000M, 2);*/
                     //计算日报数据
                     var newDayValues = await dbContext.Queryable<DayReport>().Where(x => x.IsDelete == 1 && x.DateDay >= startYearTimeInt && x.DateDay <= 20250113).SumAsync(x => x.DayActualProductionAmount);
@@ -2011,8 +2011,8 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
                     companyBasePoductionValues.Add(new CompanyBasePoductionValue()
                     {
                         Name = name,
-                        //DayProductionValue = dayTotalPoductionValues,
-                        DayProductionValue = Math.Round(planProducitonValue.Value / 10000, 2),
+                       DayProductionValue = dayTotalPoductionValues,
+                        //DayProductionValue = Math.Round(planProducitonValue.Value / 10000, 2),
                         // TotalYearProductionValue = Math.Round(yearProductionValue / 100000000, 2),
                         TotalYearProductionValue = Math.Round((dayNewProjectValue.Where(x => x.DateDay <= currentTimeInt).Sum(x => x.ProductionValue.Value)+ newDayValues) / 100000000,2),
                         YearProductionValueProgressPercent = 100,
@@ -2917,7 +2917,8 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
                 {
                     XAxle = currentNowTimeInt.ToString().Substring(0, 4) + "-" + currentNowTimeInt.ToString().Substring(4, 2) + "-" + currentNowTimeInt.ToString().Substring(6, 2),
                     YAxlePlanValue = Math.Round(dayPlanProAmount / difDays / 100000000M, 2),
-                    YAxleCompleteValue = storeProductionValue.HasValue?Math.Round(storeProductionValue.Value / 100000000, 2): yCompleteValue /*storeProductionValue.HasValue? ((0.25M - yCompleteValue > 0) ? Math.Round(storeProductionValue.Value/100000000,2) : yCompleteValue): yCompleteValue*/
+                   // YAxleCompleteValue = storeProductionValue.HasValue?Math.Round(storeProductionValue.Value / 100000000, 2): yCompleteValue /*storeProductionValue.HasValue? ((0.25M - yCompleteValue > 0) ? Math.Round(storeProductionValue.Value/100000000,2) : yCompleteValue): yCompleteValue*/
+                    YAxleCompleteValue = false?Math.Round(storeProductionValue.Value / 100000000, 2): yCompleteValue /*storeProductionValue.HasValue? ((0.25M - yCompleteValue > 0) ? Math.Round(storeProductionValue.Value/100000000,2) : yCompleteValue): yCompleteValue*/
                     //YAxlePlanValue = Math.Round((GetProductionValueInfo(monthInt, companyProductionList).Sum(x => x.PlanProductionValue) / 300000M), 2),
                     //YAxleCompleteValue = Math.Round(dayActualProductionAmount / 100000000M, 2)
                 }) ;
