@@ -1402,7 +1402,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                    .Where(x => x.IsDelete == 1 && x.ProjectId == projectId).FirstAsync();
 
                 var currentTotalYearOffirmProductionValue = await _dbContext.Queryable<MonthReport>()
-                    .Where(x => x.IsDelete == 1 && x.ProjectId == projectId && x.DateMonth <= dateMonth && x.Status != MonthReportStatus.Revoca).ToListAsync();
+                    .Where(x => x.IsDelete == 1 && x.ProjectId == projectId && x.DateMonth < dateMonth && x.Status != MonthReportStatus.Revoca).ToListAsync();
 
                 //本年甲方确认产值(当年)
                 var initMonth = new DateTime(currentYear, 1, 1).ToDateMonth();
