@@ -38,9 +38,8 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api.Controllers
         }
 
 
-
-
         #region 文件上传  在WebHelper 工具类里面也有上传文件的方法和下载文件的方法
+
         #region 单个文件上传(针对小文件上传大小建议不超过4M)  可以修改此值如果单个文件过大建议使用流式上传
         /// <summary>
         /// 单个文件上传(针对小文件上传大小建议不超过4M)  可以修改此值如果单个文件过大建议使用流式上传
@@ -90,108 +89,83 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api.Controllers
                 return Result.Fail("上传大小不允许");
             }
 
-            #region 
+      
             #region 文件上传至前端服务器
-            var host = AppsettingsHelper.GetValue("UpdateItem:Host");
-            var port = Convert.ToInt32(AppsettingsHelper.GetValue("UpdateItem:Port"));
-            var userName = AppsettingsHelper.GetValue("UpdateItem:UserName");
-            var passWord = AppsettingsHelper.GetValue("UpdateItem:PassWord");
-            var savePath = AppsettingsHelper.GetValue("UpdateItem:SavePath");
-            var savePath2 = AppsettingsHelper.GetValue("UpdateItem:SavePath");
-            var uploadresponseDto = new UploadResponse();
-            //上传文件
-            using (var sftp = new SftpClient(host, port, userName, passWord))
-            {
-                sftp.Connect();
-
-                //foreach (var item in files)
-                {
-                    var name = Path.GetExtension(file.FileName);
-                    var newFileName = GuidUtil.Generate32BitGuid();
-                    savePath = Path.Combine(savePath, $"{newFileName}{name}");
-                    sftp.BufferSize = 1024 * 100000;
-                    using (var fileStream = file.OpenReadStream())
-                    {
-                        var uploadRes = sftp.BeginUploadFile(fileStream, savePath);
-                        sftp.EndUploadFile(uploadRes);
-                    }
-                    uploadresponseDto = new UploadResponse()
-                    {
-                        Id = newFileName.ToString(),
-                        Name = newFileName + name,
-                        BId = GuidUtil.Next(),
-                        OriginName = file.FileName,
-                        SuffixName = name,
-                        FileSize = fileSize,
-                        FileType = file.ContentType,
-                        Url = AppsettingsHelper.GetValue("UpdateItem:Url") + newFileName + name
-                    };
-                    //uploadresponseDto.Add(uploadResponseDto);
-                }
-                sftp.Disconnect();
-                //}
-
-                //修改权限
-                using (var client = new SshClient(host, port, userName, passWord))
-                {
-                    client.Connect();
-                    //foreach (var item in files)
-                    //{
-                    var command = $"chmod 644 {savePath}";
-                    var result = client.RunCommand(command);
-                    //}
-                    client.Disconnect();
-                }
-                return Result.Success(uploadresponseDto, "上传成功");
-                #endregion
-
-                #endregion
-
-                //var savePath = AppsettingsHelper.GetValue("UpdateItem:SavePath");
-                //var newFileName = GuidUtil.Generate32BitGuid();
-                //savePath = Path.Combine(savePath, $"{newFileName}{file.FileName}");
-                //using (var stream = System.IO.File.Create(savePath))
-                //{
-                //    await file.CopyToAsync(stream);
-                //}
-
-
-                //SetFilePermissions(savePath);
-                //var uploadResponseDto = new UploadResponse()
-                //{
-                //    Id = newFileName,
-                //    Name = newFileName + suffixName,
-                //    OriginName = file.FileName,
-                //    SuffixName = suffixName,
-                //    FileSize = fileSize,
-                //    FileType = file.ContentType,
-                //    Url = AppsettingsHelper.GetValue("UpdateItem:Url") + newFileName + file.FileName
-                //};
-                //return Result.Success(uploadResponseDto, "上传成功");
-            }
-            #endregion
-            #endregion
-            ///// <summary>
-            ///// 权限修改
-            ///// </summary>
-            ///// <param name="filePath"></param>
-            //private void SetFilePermissions(string filePath)
+            //var host = AppsettingsHelper.GetValue("UpdateItem:Host");
+            //var port = Convert.ToInt32(AppsettingsHelper.GetValue("UpdateItem:Port"));
+            //var userName = AppsettingsHelper.GetValue("UpdateItem:UserName");
+            //var passWord = AppsettingsHelper.GetValue("UpdateItem:PassWord");
+            //var savePath = AppsettingsHelper.GetValue("UpdateItem:SavePath");
+            //var savePath2 = AppsettingsHelper.GetValue("UpdateItem:SavePath");
+            //var uploadresponseDto = new UploadResponse();
+            ////上传文件
+            //using (var sftp = new SftpClient(host, port, userName, passWord))
             //{
-            //    // 使用 chmod 命令修改文件权限 (适用于 Linux/Unix)
-            //    var processStartInfo = new ProcessStartInfo
-            //    {
-            //        FileName = "chmod",
-            //        Arguments = "644 " + filePath,  // 设置文件权限为 644
-            //        RedirectStandardOutput = true,
-            //        UseShellExecute = false,
-            //        CreateNoWindow = true
-            //    };
+            //    sftp.Connect();
 
-            //    using (var process = Process.Start(processStartInfo))
+            //    //foreach (var item in files)
             //    {
-            //        process.WaitForExit();
+            //        var name = Path.GetExtension(file.FileName);
+            //        var newFileName = GuidUtil.Generate32BitGuid();
+            //        savePath = Path.Combine(savePath, $"{newFileName}{name}");
+            //        sftp.BufferSize = 1024 * 100000;
+            //        using (var fileStream = file.OpenReadStream())
+            //        {
+            //            var uploadRes = sftp.BeginUploadFile(fileStream, savePath);
+            //            sftp.EndUploadFile(uploadRes);
+            //        }
+            //        uploadresponseDto = new UploadResponse()
+            //        {
+            //            Id = newFileName.ToString(),
+            //            Name = newFileName + name,
+            //            BId = GuidUtil.Next(),
+            //            OriginName = file.FileName,
+            //            SuffixName = name,
+            //            FileSize = fileSize,
+            //            FileType = file.ContentType,
+            //            Url = AppsettingsHelper.GetValue("UpdateItem:Url") + newFileName + name
+            //        };
+            //        //uploadresponseDto.Add(uploadResponseDto);
             //    }
+            //    sftp.Disconnect();
+            //    //}
+
+            //    //修改权限
+            //    using (var client = new SshClient(host, port, userName, passWord))
+            //    {
+            //        client.Connect();
+            //        //foreach (var item in files)
+            //        //{
+            //        var command = $"chmod 644 {savePath}";
+            //        var result = client.RunCommand(command);
+            //        //}
+            //        client.Disconnect();
+            //    }
+            //    return Result.Success(uploadresponseDto, "上传成功");
             //}
+            #endregion
+            var savePath = AppsettingsHelper.GetValue("UpdateItem:SavePath");
+            var newFileName = GuidUtil.Generate32BitGuid();
+            savePath = Path.Combine(savePath, $"{newFileName}{Path.GetExtension(file.FileName)}");
+            using (var stream = System.IO.File.Create(savePath))
+            {
+                await file.CopyToAsync(stream);
+            }
+            //SetFilePermissions(savePath);
+            var uploadResponseDto = new UploadResponse()
+            {
+                Id = newFileName,
+                Name = newFileName + suffixName,
+                OriginName = file.FileName,
+                SuffixName = suffixName,
+                FileSize = fileSize,
+                FileType = file.ContentType,
+                Url = AppsettingsHelper.GetValue("UpdateItem:Url") + newFileName + file.FileName
+            };
+            return Result.Success(uploadResponseDto, "上传成功");
         }
+        #endregion
+
+        #endregion
     }
 }

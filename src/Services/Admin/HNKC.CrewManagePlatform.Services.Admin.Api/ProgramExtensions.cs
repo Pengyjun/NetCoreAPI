@@ -210,7 +210,7 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api
             });
             app.UseSwaggerUI(c =>
             {
-                c.SwaggerEndpoint("/visible-leader/swagger/v1/swagger.json", $"Visible Leader Api V1");
+                c.SwaggerEndpoint(" swagger.json", $"Visible Leader Api V1");
                 c.OAuthClientId("swaggerui");
                 c.OAuthAppName("Swagger UI");
             });
