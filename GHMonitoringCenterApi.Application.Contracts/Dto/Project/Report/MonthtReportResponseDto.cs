@@ -560,6 +560,34 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project.Report
             /// 是分包项目
             /// </summary>
             public int IsSubProject { get; set; }
+
+            /// <summary>
+            /// 本月外包支出(实际本币)
+            /// </summary>
+            [SugarColumn(ColumnDataType = "decimal(20,8)")]
+            public decimal? CurrencyOutsourcingExpensesAmount { get; set; } = 0M;
+
+            /// <summary>
+            /// 本月完成工程量(方)(实际)
+            /// </summary>
+            [SugarColumn(ColumnDataType = "decimal(20,8)")]
+            public decimal? ActualCompQuantity { get; set; } = 0M;
+            /// <summary>
+            /// 本月完成产值(实际本币)
+            /// </summary>
+            [SugarColumn(ColumnDataType = "decimal(20,8)")]
+            public decimal? ActualCompAmount { get; set; } = 0M;
+
+            /// <summary>
+            /// 实际人民币产值（用户 输入）
+            /// </summary>
+            [SugarColumn(ColumnDataType = "decimal(20,8)")]
+            public decimal? RMBHValue { get; set; } = 0M;
+            /// <summary>
+            /// 实际人民币外包支出（用户 输入）
+            /// </summary>
+            [SugarColumn(ColumnDataType = "decimal(20,8)")]
+            public decimal? RMBHOutValue { get; set; } = 0M;
         }
     }
 
