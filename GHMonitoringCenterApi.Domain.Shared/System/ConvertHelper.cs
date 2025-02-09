@@ -103,12 +103,14 @@ namespace System
         /// <returns></returns>
         public static DateTime ToChineseDate(this DateTime date)
         {
+           
             var calendar = new ChineseLunisolarCalendar();
             var year = calendar.GetYear(date);
             // 是否有闰月,返回正整数（比如2023年闰2月，返回值为3）
             int flag = calendar.GetLeapMonth(year);
             //有闰月则实际月份减1
-            int month = flag > 0 ? calendar.GetMonth(date) - 1 : calendar.GetMonth(date);
+            int month = flag > 0 ? calendar.GetMonth(date) : calendar.GetMonth(date);
+            //int month = flag > 0 ? calendar.GetMonth(date) - 1 : calendar.GetMonth(date);
             int day = calendar.GetDayOfMonth(date);
             if (flag==0&& month==2)//润年
             {
