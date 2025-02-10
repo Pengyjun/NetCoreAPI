@@ -302,6 +302,11 @@
         /// 是否是分包项目
         /// </summary>
         public int IsSubContractProject { get; set; }
+
+        /// <summary>
+        /// 是否是分包项目
+        /// </summary>
+        public string? PProjectMasterCode { get; set; }
     }
 
     /// <summary>
