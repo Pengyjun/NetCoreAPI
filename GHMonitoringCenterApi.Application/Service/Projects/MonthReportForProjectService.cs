@@ -12,6 +12,7 @@ using GHMonitoringCenterApi.Domain.Shared.Enums;
 using GHMonitoringCenterApi.Domain.Shared.Util;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using NPOI.HSSF.Record;
 using NPOI.SS.Formula.Functions;
 using SqlSugar;
 using UtilsSharp;
@@ -220,10 +221,16 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 report.OldCurrencyHValue = klReportList.Where(x => x.ProjectId == report.ProjectId && report.ShipId == x.ShipId && x.ProjectWBSId == wbsId && x.UnitPrice == report.UnitPrice).Sum(x => x.OldCurrencyHValue);
                 report.OldCurrencyHOutValue = klReportList.Where(x => x.ProjectId == report.ProjectId && report.ShipId == x.ShipId && x.ProjectWBSId == wbsId && x.UnitPrice == report.UnitPrice).Sum(x => x.OldCurrencyHOutValue);
 
-                report.RMBHValue = 0;
-                report.RMBHOutValue = 0;
-                //report.RMBHValue = klReportList.Where(x => x.ProjectId == report.ProjectId && report.ShipId == x.ShipId && x.ProjectWBSId == wbsId && x.UnitPrice == report.UnitPrice).Sum(x => x.RMBHValue);
-                //report.RMBHOutValue = klReportList.Where(x => x.ProjectId == report.ProjectId && report.ShipId == x.ShipId && x.ProjectWBSId == wbsId && x.UnitPrice == report.UnitPrice).Sum(x => x.RMBHOutValue);
+                if (report.CurrencyId == "2a0e99b4-f989-4967-b5f1-5519091d4280".ToGuid())
+                {
+                    report.RMBHValue = 0;
+                    report.RMBHOutValue = 0;
+                }
+                else
+                {
+                    report.RMBHValue = klReportList.Where(x => x.ProjectId == report.ProjectId && report.ShipId == x.ShipId && x.ProjectWBSId == wbsId && x.UnitPrice == report.UnitPrice && x.OutPutType == report.OutPutType).Sum(x => x.RMBHValue);
+                    report.RMBHOutValue = klReportList.Where(x => x.ProjectId == report.ProjectId && report.ShipId == x.ShipId && x.ProjectWBSId == wbsId && x.UnitPrice == report.UnitPrice && x.OutPutType == report.OutPutType).Sum(x => x.RMBHOutValue);
+                }
 
                 /***
                  * 基本信息处理
@@ -298,7 +305,8 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                        ActualCompQuantity = y.ActualCompQuantity,
                        ActualOutAmount = y.CurrencyOutsourcingExpensesAmount,
                        RMBHOutValue = y.RMBHOutValue,
-                       RMBHValue = y.RMBHValue
+                       RMBHValue = y.RMBHValue,
+                       CurrencyId = project.CurrencyId
                    })
                    .ToListAsync();
 

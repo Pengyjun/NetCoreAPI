@@ -2654,15 +2654,28 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 var hisMonthRep = mReportData.FirstOrDefault(x => x.ProjectId == item.ProjectId && x.DateMonth == 202306 && x.IsDelete == 1);
                 if (item.DateMonth > 202412)
                 {
-                    if (item.CurrencyId == "2a0e99b4-f989-4967-b5f1-5519091d4280".ToGuid())//国内
+                    if (hisMonthRep != null)
                     {
-                        item.CumulativeOutsourcingExpensesAmount = Convert.ToDecimal(item.CurrencyOutsourcingExpensesAmount);
-                        item.CumulativeCompleted = Convert.ToDecimal(item.ActualCompAmount);
-                        item.AccumulativeQuantities = Convert.ToDecimal(item.ActualCompQuantity);
-                    }
-                    else
-                    {
-
+                        if (item.CurrencyId == "2a0e99b4-f989-4967-b5f1-5519091d4280".ToGuid())//国内
+                        {
+                            hisMonthRep.OutsourcingExpensesAmount = Convert.ToDecimal(hisMonthRep.ActualCompHOutValue);
+                            hisMonthRep.CompleteProductionAmount = Convert.ToDecimal(hisMonthRep.ActualCompAmount);
+                            hisMonthRep.CompletedQuantity = Convert.ToDecimal(hisMonthRep.ActualCompCompletedQuantity);
+                        }
+                        else
+                        {
+                            if (model.IsConvert == true)
+                            {
+                                hisMonthRep.CompleteProductionAmount = Convert.ToDecimal(hisMonthRep.RMBHValue);
+                                hisMonthRep.OutsourcingExpensesAmount = Convert.ToDecimal(hisMonthRep.RMBHOutValue);
+                            }
+                            else
+                            {
+                                hisMonthRep.CompleteProductionAmount = Convert.ToDecimal(hisMonthRep.ActualCompAmount);
+                                hisMonthRep.OutsourcingExpensesAmount = Convert.ToDecimal(hisMonthRep.ActualCompHOutValue);
+                            }
+                            hisMonthRep.CompletedQuantity = Convert.ToDecimal(hisMonthRep.ActualCompCompletedQuantity);
+                        }
                     }
                 }
                 else
@@ -2693,7 +2706,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 item.CumulativeAccomplishCost = hisMonthRep == null ? val.CumulativeAccomplishCost : hisMonthRep.CostAmount + val.CumulativeAccomplishCost;
                 item.CumulativeOutsourcingExpensesAmount = hisMonthRep == null ? val.CumulativeOutsourcingExpensesAmount : hisMonthRep.OutsourcingExpensesAmount + val.CumulativeOutsourcingExpensesAmount;
 
-                item.CumulativeCompleted = val.CumulativeCompleted + (hisMonthRep == null ? 0 : (model.IsConvert == true ? hisMonthRep.CompleteProductionAmount : hisMonthRep.CurrencyCompleteProductionAmount));
+                item.CumulativeCompleted = val.CumulativeCompleted + (hisMonthRep == null ? 0 : hisMonthRep.CompleteProductionAmount);
 
                 item.CumulativePaymentAmount = hisMonthRep == null ? val.CumulativePaymentAmount : hisMonthRep.PartyAPayAmount + val.CumulativePaymentAmount;
                 item.CumulativeValue = hisMonthRep == null ? val.CumulativeValue : hisMonthRep.PartyAConfirmedProductionAmount + val.CumulativeValue;
@@ -3098,12 +3111,42 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
 
                 //读取202306的历史数据
                 var hisMonthRep = mReportData.FirstOrDefault(x => x.ProjectId == item.ProjectId && x.DateMonth == 202306 && x.IsDelete == 1);
-                if (model.IsConvert == false)
+                if (item.DateMonth > 202412)
                 {
-                    var h = pRates.FirstOrDefault(x => x.Year == 2023 && x.CurrencyId == item.CurrencyId.ToString());
                     if (hisMonthRep != null)
                     {
-                        hisMonthRep.CompleteProductionAmount = h == null ? 0M : h.ExchangeRate == null ? 0M : hisMonthRep.CurrencyCompleteProductionAmount / h.ExchangeRate.Value;
+                        if (item.CurrencyId == "2a0e99b4-f989-4967-b5f1-5519091d4280".ToGuid())//国内
+                        {
+                            hisMonthRep.OutsourcingExpensesAmount = Convert.ToDecimal(hisMonthRep.ActualCompHOutValue);
+                            hisMonthRep.CompleteProductionAmount = Convert.ToDecimal(hisMonthRep.ActualCompAmount);
+                            hisMonthRep.CompletedQuantity = Convert.ToDecimal(hisMonthRep.ActualCompCompletedQuantity);
+                        }
+                        else
+                        {
+                            if (model.IsConvert == true)
+                            {
+                                hisMonthRep.CompleteProductionAmount = Convert.ToDecimal(hisMonthRep.RMBHValue);
+                                hisMonthRep.OutsourcingExpensesAmount = Convert.ToDecimal(hisMonthRep.RMBHOutValue);
+                            }
+                            else
+                            {
+                                hisMonthRep.CompleteProductionAmount = Convert.ToDecimal(hisMonthRep.ActualCompAmount);
+                                hisMonthRep.OutsourcingExpensesAmount = Convert.ToDecimal(hisMonthRep.ActualCompHOutValue);
+
+                            }
+                            hisMonthRep.CompletedQuantity = Convert.ToDecimal(hisMonthRep.ActualCompCompletedQuantity);
+                        }
+                    }
+                }
+                else
+                {
+                    if (model.IsConvert == false)
+                    {
+                        var h = pRates.FirstOrDefault(x => x.Year == 2023 && x.CurrencyId == item.CurrencyId.ToString());
+                        if (hisMonthRep != null)
+                        {
+                            hisMonthRep.CompleteProductionAmount = h == null ? 0M : h.ExchangeRate == null ? 0M : hisMonthRep.CurrencyCompleteProductionAmount / h.ExchangeRate.Value;
+                        }
                     }
                 }
 
@@ -3124,7 +3167,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 item.CumulativeAccomplishCost = hisMonthRep == null ? val.CumulativeAccomplishCost : hisMonthRep.CostAmount + val.CumulativeAccomplishCost;
                 item.CumulativeOutsourcingExpensesAmount = hisMonthRep == null ? val.CumulativeOutsourcingExpensesAmount : hisMonthRep.OutsourcingExpensesAmount + val.CumulativeOutsourcingExpensesAmount;
 
-                item.CumulativeCompleted = val.CumulativeCompleted + (hisMonthRep == null ? 0 : (model.IsConvert == true ? hisMonthRep.CompleteProductionAmount : hisMonthRep.CurrencyCompleteProductionAmount));
+                item.CumulativeCompleted = val.CumulativeCompleted + (hisMonthRep == null ? 0 : hisMonthRep.CompleteProductionAmount);
 
                 item.CumulativePaymentAmount = hisMonthRep == null ? val.CumulativePaymentAmount : hisMonthRep.PartyAPayAmount + val.CumulativePaymentAmount;
                 item.CumulativeValue = hisMonthRep == null ? val.CumulativeValue : hisMonthRep.PartyAConfirmedProductionAmount + val.CumulativeValue;
