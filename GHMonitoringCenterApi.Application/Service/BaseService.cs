@@ -592,9 +592,11 @@ namespace GHMonitoringCenterApi.Application.Service
                 .Select(x => new BasePullDownResponseDto { Id = x.PomId, Name = x.Name,Code= x.BusinessRemark }).ToListAsync();
             if (projectTypRequsetDto.EnableRemark == 1)
             {
-                responseAjaxResult .Data= ProjectTypeList.Select(x => new BasePullDownResponseDto() { Id = x.Id, Name = x.Name + x.Code }).ToList();
+                responseAjaxResult.Data = ProjectTypeList.Select(x => new BasePullDownResponseDto() { Id = x.Id, Name = x.Name + x.Code }).ToList();
             }
-            responseAjaxResult.Data = ProjectTypeList;
+            else {
+                responseAjaxResult.Data = ProjectTypeList;
+            }
             responseAjaxResult.Count = ProjectTypeList.Count;
             responseAjaxResult.Success();
             return responseAjaxResult;

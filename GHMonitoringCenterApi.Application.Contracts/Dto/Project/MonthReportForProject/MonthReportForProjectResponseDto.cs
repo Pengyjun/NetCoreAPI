@@ -276,11 +276,11 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project.MonthReportFor
         /// <summary>
         /// 给前端计算好的外币开累数（产值）
         /// </summary>
-        public decimal CurrencyTotalAmount { get; set; } = 0M;
+        public decimal RMBTotalAmount { get; set; } = 0M;
         /// <summary>
         /// 给前端计算好的外币开累数（外包支出）
         /// </summary>
-        public decimal CurrencyTotalOutAmount { get; set; } = 0M;
+        public decimal RMBTotalOutAmount { get; set; } = 0M;
 
         #region 原值
         /// <summary>
