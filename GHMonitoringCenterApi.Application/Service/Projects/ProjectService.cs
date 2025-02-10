@@ -1012,6 +1012,19 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
         public async Task<ResponseAjaxResult<bool>> AddORUpdateProjectDetailAsync(AddOrUpdateProjectRequestDto addOrUpdateProjectRequestDto, LogInfo logDto)
         {
             ResponseAjaxResult<bool> responseAjaxResult = new ResponseAjaxResult<bool>();
+
+            #region 条件判断
+            List<int> orgs = new List<int>() {1,6,2 };
+            var validCount= addOrUpdateProjectRequestDto.projectOrgDtos.Count(x => orgs.Contains(x.Type));
+            if (validCount < 3)
+            {
+                responseAjaxResult.Fail("业主、甲方、监理单位必须填写",HttpStatusCode.VerifyFail);
+                responseAjaxResult.Data = false;
+                return responseAjaxResult;
+            }
+            #endregion
+
+
             //获取项目数据
             var projectList = await dbContext.Queryable<Project>().ToListAsync();
             //增改项目信息
