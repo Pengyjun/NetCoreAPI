@@ -738,6 +738,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                  .Where((p) => p.Id == basePrimaryRequestDto.Id && p.IsDelete == 1)
                  .Select((p) => new ProjectDetailResponseDto
                  {
+                      PProjectMasterCode=p.PProjectMasterCode,
                      IsSubContractProject=p.IsSubContractProject,
                      Id = p.Id,
                      Name = p.Name,
@@ -1012,6 +1013,19 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
         public async Task<ResponseAjaxResult<bool>> AddORUpdateProjectDetailAsync(AddOrUpdateProjectRequestDto addOrUpdateProjectRequestDto, LogInfo logDto)
         {
             ResponseAjaxResult<bool> responseAjaxResult = new ResponseAjaxResult<bool>();
+
+            #region 条件判断
+            List<int> orgs = new List<int>() {1,6,2 };
+            var validCount= addOrUpdateProjectRequestDto.projectOrgDtos.Count(x => orgs.Contains(x.Type));
+            if (validCount < 3)
+            {
+                responseAjaxResult.Fail("业主、甲方、监理单位必须填写",HttpStatusCode.VerifyFail);
+                responseAjaxResult.Data = false;
+                return responseAjaxResult;
+            }
+            #endregion
+
+
             //获取项目数据
             var projectList = await dbContext.Queryable<Project>().ToListAsync();
             //增改项目信息
@@ -1302,7 +1316,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 await dbContext.Insertable(proLeaderList).EnableDiffLogEvent(logDto).ExecuteCommandAsync();
                 if (addOrUpdateProjectRequestDto.IsSubContractProject == 1)
                 {
-                    projectObject.MasterCode = addOrUpdateProjectRequestDto.MasterCode;
+                    projectObject.PProjectMasterCode = addOrUpdateProjectRequestDto.PProjectMasterCode;
                 }
                 //新增项目
                 await dbContext.Insertable(projectObject).EnableDiffLogEvent(logDto).ExecuteCommandAsync();
@@ -1627,7 +1641,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 //}
                 if (addOrUpdateProjectRequestDto.IsSubContractProject == 1)
                 {
-                    projectObject.MasterCode = addOrUpdateProjectRequestDto.MasterCode;
+                    projectObject.PProjectMasterCode = addOrUpdateProjectRequestDto.PProjectMasterCode;
                 }
                 if (addOrUpdateProjectRequestDto.CommencementTime != null && addOrUpdateProjectRequestDto.CommencementTime.HasValue)
                 {

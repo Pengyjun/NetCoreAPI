@@ -929,8 +929,8 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             {
                 if (project.CurrencyId != "2a0e99b4-f989-4967-b5f1-5519091d4280".ToGuid())
                 {
-                    result.CurrencyTotalAmount = await _dbContext.Queryable<MonthReport>().Where(x => x.DateMonth > 202412 && x.DateMonth <= dateMonth).SumAsync(x => x.CurrencyCompleteProductionAmount);
-                    result.CurrencyTotalOutAmount = await _dbContext.Queryable<MonthReport>().Where(x => x.DateMonth > 202412 && x.DateMonth <= dateMonth).SumAsync(x => x.CurrencyOutsourcingExpensesAmount);
+                    result.RMBTotalAmount = await _dbContext.Queryable<MonthReport>().Where(x => x.DateMonth > 202412 && x.DateMonth <= dateMonth).SumAsync(x => x.CompleteProductionAmount);
+                    result.RMBTotalOutAmount = await _dbContext.Queryable<MonthReport>().Where(x => x.DateMonth > 202412 && x.DateMonth <= dateMonth).SumAsync(x => x.OutsourcingExpensesAmount);
                 }
             }
             #endregion
@@ -1450,7 +1450,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 }
 
                 var currenTotalYearCollection = await _dbContext.Queryable<MonthReport>()
-                    .Where(x => x.IsDelete == 1 && x.ProjectId == projectId && x.DateYear <= currentYear && x.DateMonth <= dateMonth && x.Status != MonthReportStatus.Revoca).ToListAsync();
+                    .Where(x => x.IsDelete == 1 && x.ProjectId == projectId && x.DateYear <= currentYear && x.DateMonth < dateMonth && x.Status != MonthReportStatus.Revoca).ToListAsync();
 
                 //本年甲方付款金额
                 currenYearCollection = currenTotalYearCollection.Where(x => x.DateYear == currentYear).Sum(x => x.PartyAPayAmount);
@@ -1535,6 +1535,20 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     .ExecuteCommandAsync();
                 }
 
+                var rr = await _dbContext.Queryable<MonthReportDetail>().Where(t => t.IsDelete == 1 && model.ProjectHistorys.Select(x => x.Id).Contains(t.Id)).ToListAsync();
+                foreach (var item in rr)
+                {
+                    var f = model.ProjectHistorys.FirstOrDefault(x => x.Id == item.Id);
+                    if (f != null)
+                    {
+                        item.ShipId = f.ShipId;
+                    }
+                }
+                if (rr.Any())
+                {
+                    await _dbContext.Updateable(rr).UpdateColumns(x => new { x.ShipId })
+                    .ExecuteCommandAsync();
+                }
                 //202306历史月报修改
                 var mainTab = await _dbContext.Queryable<MonthReport>().FirstAsync(t => t.IsDelete == 1 && model.ProjectId == t.ProjectId && t.DateMonth == 202306);
                 if (mainTab != null)

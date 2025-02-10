@@ -244,6 +244,10 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project
         public DateTime? ContractSignDate { get; set; }
 
         /// <summary>
+        /// 分包项目主数据编码
+        /// </summary>
+        public string? PProjectMasterCode { get; set; }
+        /// <summary>
         /// 是否是分包项目  0不是   1是  
         /// </summary>
         public int? IsSubContractProject { get; set; }
@@ -372,9 +376,9 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project
 
             }
 
-            if (IsSubContractProject == 1&&string.IsNullOrWhiteSpace(MasterCode))
+            if (IsSubContractProject == 1&&string.IsNullOrWhiteSpace(PProjectMasterCode))
             {
-                yield return new ValidationResult("分包项目必须要填项目主数据编码", new string[] { nameof(MasterCode) });
+                yield return new ValidationResult("分包项目必须要填项目主数据编码", new string[] { nameof(PProjectMasterCode) });
             }
         }
     }

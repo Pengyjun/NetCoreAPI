@@ -304,7 +304,7 @@ namespace GHMonitoringCenterApi.Application.Service.ConstructionLog
                 }).ToPageListAsync(requestDto.PageIndex, requestDto.PageSize, total);
             var projectIds = constructionLogs.Select(t => t.ProjectId).Distinct().ToArray();
             var dayReportConstructionList = await dbContent.Queryable<DayReportConstruction>().Where(x => x.DateDay >= startMonth && x.DateDay <= endMonth && projectIds.Contains(x.ProjectId) && x.IsDelete == 1).ToListAsync();
-            var projectWBSList = await dbContent.Queryable<ProjectWBS>().Where(x => x.IsDelete == 1).ToListAsync();
+            var projectWBSList = await dbContent.Queryable<ProjectWBS>().Where(x => x.IsDelete == 1 && projectIds.Select(t => t.ToString()).Contains(x.ProjectId)).ToListAsync();
             foreach (var item in constructionLogs)
             {
                 ConvertHelper.TryConvertDateTimeFromDateDay(item.FillingDateTime.Value, out DateTime dayTimes);
