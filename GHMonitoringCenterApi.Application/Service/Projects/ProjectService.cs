@@ -1302,7 +1302,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 await dbContext.Insertable(proLeaderList).EnableDiffLogEvent(logDto).ExecuteCommandAsync();
                 if (addOrUpdateProjectRequestDto.IsSubContractProject == 1)
                 {
-                    projectObject.MasterCode = addOrUpdateProjectRequestDto.MasterCode;
+                    projectObject.PProjectMasterCode = addOrUpdateProjectRequestDto.PProjectMasterCode;
                 }
                 //新增项目
                 await dbContext.Insertable(projectObject).EnableDiffLogEvent(logDto).ExecuteCommandAsync();
@@ -1627,7 +1627,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 //}
                 if (addOrUpdateProjectRequestDto.IsSubContractProject == 1)
                 {
-                    projectObject.MasterCode = addOrUpdateProjectRequestDto.MasterCode;
+                    projectObject.PProjectMasterCode = addOrUpdateProjectRequestDto.PProjectMasterCode;
                 }
                 if (addOrUpdateProjectRequestDto.CommencementTime != null && addOrUpdateProjectRequestDto.CommencementTime.HasValue)
                 {
