@@ -220,8 +220,10 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 report.OldCurrencyHValue = klReportList.Where(x => x.ProjectId == report.ProjectId && report.ShipId == x.ShipId && x.ProjectWBSId == wbsId && x.UnitPrice == report.UnitPrice).Sum(x => x.OldCurrencyHValue);
                 report.OldCurrencyHOutValue = klReportList.Where(x => x.ProjectId == report.ProjectId && report.ShipId == x.ShipId && x.ProjectWBSId == wbsId && x.UnitPrice == report.UnitPrice).Sum(x => x.OldCurrencyHOutValue);
 
-                report.RMBHValue = klReportList.Where(x => x.ProjectId == report.ProjectId && report.ShipId == x.ShipId && x.ProjectWBSId == wbsId && x.UnitPrice == report.UnitPrice).Sum(x => x.RMBHValue);
-                report.RMBHOutValue = klReportList.Where(x => x.ProjectId == report.ProjectId && report.ShipId == x.ShipId && x.ProjectWBSId == wbsId && x.UnitPrice == report.UnitPrice).Sum(x => x.RMBHOutValue);
+                report.RMBHValue = 0;
+                report.RMBHOutValue = 0;
+                //report.RMBHValue = klReportList.Where(x => x.ProjectId == report.ProjectId && report.ShipId == x.ShipId && x.ProjectWBSId == wbsId && x.UnitPrice == report.UnitPrice).Sum(x => x.RMBHValue);
+                //report.RMBHOutValue = klReportList.Where(x => x.ProjectId == report.ProjectId && report.ShipId == x.ShipId && x.ProjectWBSId == wbsId && x.UnitPrice == report.UnitPrice).Sum(x => x.RMBHOutValue);
 
                 /***
                  * 基本信息处理
@@ -248,6 +250,9 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             var pWBS = new List<ProjectWBSDto>();
             var calculatePWBS = new List<ProjectWBSDto>();
 
+            //是否计算是统计的偏差月
+            bool pianchaMonth = dateMonth > 202412 ? true : false;
+            var historyKaiLei = await _dbContext.Queryable<MonthReportDetailHistory>().Where(t => t.IsDelete == 1).ToListAsync();
 
             //空的项目id  不返回数据; 一个项目对应一个wbs
             if (pId == Guid.Empty) return pWBS;
@@ -617,9 +622,6 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 /***
                  * 追加开累数据 calculatePWBS
                  */
-                //是否计算是统计的偏差月
-                bool pianchaMonth = dateMonth > 202412 ? true : false;
-                var historyKaiLei = await _dbContext.Queryable<MonthReportDetailHistory>().Where(t => t.IsDelete == 1).ToListAsync();
 
                 var calPwbs = new List<ProjectWBSDto>();
                 foreach (var item in gList)
@@ -1457,8 +1459,9 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             if (model.ProjectHistorys != null && model.ProjectHistorys.Any())
             {
                 List<MonthReportDetailHistory> rsh = new();
+                List<MonthReportDetailHistory> rsh2 = new();
                 var ids = model.ProjectHistorys.Select(x => x.Id).ToList();
-                var rrh = await _dbContext.Queryable<MonthReportDetailHistory>().Where(t => t.IsDelete == 1 && ids.Contains(t.Id)).ToListAsync();
+                var rrh = await _dbContext.Queryable<MonthReportDetailHistory>().Where(t => t.IsDelete == 1).ToListAsync();
                 foreach (var item in model.ProjectHistorys)
                 {
                     var f = rrh.FirstOrDefault(x => x.Id == item.Id);
@@ -1471,9 +1474,28 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                         f.RMBHValue = item.RMBHValue;
                         f.RMBHOutValue = item.RMBHOutValue;
                         rsh.Add(f);
-
                     }
                 }
+
+                #region 资源处理 
+                //其他资源都清空 除了传入行数据
+                int dateMonth = 20241231;//受控的资源 后续如果需要调整 此处设置资源 的日期   且历史表同步月报资源数据
+                var rsh2Child = rrh.Where(t => t.ProjectId == model.ProjectId && !ids.Contains(t.Id) && t.DateMonth <= dateMonth).ToList();
+                foreach (var ot in rsh2Child)
+                {
+                    ot.IsDelete = 0;
+                }
+                rsh2.AddRange(rsh2Child);
+
+                if (rsh2.Any())
+                {
+                    await _dbContext.Updateable(rsh2).UpdateColumns(x => new
+                    {
+                        x.IsDelete
+                    })
+                    .ExecuteCommandAsync();
+                }
+                #endregion
                 if (rsh.Any())
                 {
                     await _dbContext.Updateable(rsh).UpdateColumns(x => new
