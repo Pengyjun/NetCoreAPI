@@ -302,6 +302,11 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                    })
                    .ToListAsync();
 
+                if (exhaustedBtn == true)
+                {
+                    calculatePWBS = calculatePWBS.Where(x => x.DateMonth <= 202412).ToList();
+                }
+
                 foreach (var item in calculatePWBS)
                 {
                     item.EngQuantity = pWBS.FirstOrDefault(x => x.ProjectWBSId == item.ProjectWBSId)?.EngQuantity;
@@ -1479,7 +1484,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
 
                 #region 资源处理 
                 //其他资源都清空 除了传入行数据
-                int dateMonth = 20241231;//受控的资源 后续如果需要调整 此处设置资源 的日期   且历史表同步月报资源数据
+                int dateMonth = 202412;//受控的资源 后续如果需要调整 此处设置资源 的日期   且历史表同步月报资源数据
                 var rsh2Child = rrh.Where(t => t.ProjectId == model.ProjectId && !ids.Contains(t.Id) && t.DateMonth <= dateMonth).ToList();
                 foreach (var ot in rsh2Child)
                 {
