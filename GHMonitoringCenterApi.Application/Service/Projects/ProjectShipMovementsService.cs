@@ -726,7 +726,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                          startTime=int.Parse(currentEnterShipInfo.EnterTime.Value.ToString("yyyyMMdd"));
                          endTime=int.Parse(model.DateDayTime.Value.ToString("yyyyMMdd"));
                     }
-                    if (currentEnterShipInfo != null&& startTime < endTime)
+                    if (currentEnterShipInfo != null&& startTime <= endTime)
                     {
                         res.EnterTime = currentEnterShipInfo.EnterTime;
                         res.ProjectId = currentEnterShipInfo.ProjectId;
