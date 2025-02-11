@@ -20,6 +20,7 @@ using GHMonitoringCenterApi.Application.Contracts.IService.RepairParts;
 using GHMonitoringCenterApi.Application.Contracts.IService.ResourceManagement;
 using GHMonitoringCenterApi.Application.Contracts.IService.Role;
 using GHMonitoringCenterApi.Application.Contracts.IService.Ship;
+using GHMonitoringCenterApi.Application.Contracts.IService.ShipPlan;
 using GHMonitoringCenterApi.Application.Contracts.IService.ShipSurvey;
 using GHMonitoringCenterApi.Application.Contracts.IService.SystemUpdatLog;
 using GHMonitoringCenterApi.Application.Contracts.IService.Timing;
@@ -46,6 +47,7 @@ using GHMonitoringCenterApi.Application.Service.RepairParts;
 using GHMonitoringCenterApi.Application.Service.ResourceManagement;
 using GHMonitoringCenterApi.Application.Service.Role;
 using GHMonitoringCenterApi.Application.Service.Ship;
+using GHMonitoringCenterApi.Application.Service.ShipPlan;
 using GHMonitoringCenterApi.Application.Service.ShipSurvey;
 using GHMonitoringCenterApi.Application.Service.SystemUpdatLog;
 using GHMonitoringCenterApi.Application.Service.Timing;
@@ -132,6 +134,7 @@ namespace GHMonitoringCenterApi.Ioc
 
             builder.RegisterType<ExternalApiService>().As<IExternalApiService>().InstancePerLifetimeScope();
             builder.RegisterType<MonthReportForProjectService>().As<IMonthReportForProjectService>().InstancePerLifetimeScope();
+            builder.RegisterType<ShipPlanService>().As<IShipPlanService>().InstancePerLifetimeScope();
         }
     }
 }

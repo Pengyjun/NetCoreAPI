@@ -15,6 +15,7 @@ using GHMonitoringCenterApi.Application.Contracts.Dto.ProjectPlanProduction;
 using GHMonitoringCenterApi.Application.Contracts.Dto.ProjectYearPlan;
 using GHMonitoringCenterApi.Application.Contracts.Dto.Push;
 using GHMonitoringCenterApi.Application.Contracts.Dto.RepairParts;
+using GHMonitoringCenterApi.Application.Contracts.Dto.ShipPlan;
 using GHMonitoringCenterApi.Application.Contracts.Dto.ShipSurvey;
 using GHMonitoringCenterApi.Application.Contracts.Dto.Timing;
 using GHMonitoringCenterApi.Application.Contracts.Dto.Upload;
@@ -268,6 +269,8 @@ namespace GHMonitoringCenterApi.Application.Contracts.AutoMapper
 
             mapperConfigurationExpression.CreateMap<ProjectRank, ExcelProjectRank>();
             mapperConfigurationExpression.CreateMap<ProjectIntensity, ExcelProjectIntensity>();
+            mapperConfigurationExpression.CreateMap<SaveShipPlanRequestDto, ShipYearPlanProduction>();
+            mapperConfigurationExpression.CreateMap<SaveShipCompleteRequestDto, ShipCompleteProduction>();
 
 
         }
