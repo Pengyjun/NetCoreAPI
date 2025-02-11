@@ -136,8 +136,10 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 mpWbsIds = mpWbsIds.Distinct().ToList();
             }
 
+            //2025年前没有出现过的资源月报数据
+            var addBefore2024 = await _dbContext.Queryable<MonthReportDetailAdd>().Where(t => t.IsDelete == 1).ToListAsync();
             //转换wbs树
-            var pWbsTree = BuildTree("0", wbsList, mpWbsIds, mReportList, yReportList, klReportList, bData);
+            var pWbsTree = BuildTree("0", wbsList, mpWbsIds, mReportList, yReportList, klReportList, bData, addBefore2024);
 
             return pWbsTree;
         }
@@ -151,8 +153,9 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
         /// <param name="yReportList"></param>
         /// <param name="klReportList"></param>
         /// <param name="bData"></param>
+        /// <param name="addBefore2024"></param>
         /// <returns></returns>
-        public List<ProjectWBSDto> BuildTree(string? rootPid, List<ProjectWBSDto> wbsList, List<Guid>? mpWbsIds, List<ProjectWBSDto> mReportList, List<ProjectWBSDto> yReportList, List<ProjectWBSDto> klReportList, List<MonthReportForProjectBaseDataResponseDto> bData)
+        public List<ProjectWBSDto> BuildTree(string? rootPid, List<ProjectWBSDto> wbsList, List<Guid>? mpWbsIds, List<ProjectWBSDto> mReportList, List<ProjectWBSDto> yReportList, List<ProjectWBSDto> klReportList, List<MonthReportForProjectBaseDataResponseDto> bData, List<MonthReportDetailAdd> addBefore2024)
         {
             var tree = new List<ProjectWBSDto>();
             // 获取所有主节点
@@ -161,7 +164,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             foreach (var node in mainNodes)
             {
                 // 递归获取子节点
-                var children = BuildTree(node.KeyId, wbsList, mpWbsIds, mReportList, yReportList, klReportList, bData);
+                var children = BuildTree(node.KeyId, wbsList, mpWbsIds, mReportList, yReportList, klReportList, bData, addBefore2024);
                 // 判断当前节点是否是最后节点
                 if (!children.Any()) // 如果没有子节点
                 {
@@ -174,7 +177,8 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 tree.Add(node);
 
                 var values = mReportList.Where(x => x.ProjectWBSId == node.ProjectWBSId).ToList();
-                var finallyList = MReportForProjectList(node.ProjectWBSId, values, yReportList, klReportList, bData);
+                var finallyList = MReportForProjectList(node.ProjectWBSId, values, yReportList, klReportList, bData, addBefore2024);
+
                 node.ReportDetails.AddRange(finallyList);
             }
 
@@ -188,13 +192,17 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
         /// <param name="yReportList">当年月报详细数据(做统计数据使用)</param>
         /// <param name="klReportList">开累月报详细数据(做统计数据使用)</param>
         /// <param name="bData">施工性质、产值属性</param>
+        /// <param name="addBefore2024">施工性质、产值属性</param>
         /// <returns></returns>
-        private List<ProjectWBSDto> MReportForProjectList(Guid wbsId, List<ProjectWBSDto> mReportList, List<ProjectWBSDto> yReportList, List<ProjectWBSDto> klReportList, List<MonthReportForProjectBaseDataResponseDto> bData)
+        private List<ProjectWBSDto> MReportForProjectList(Guid wbsId, List<ProjectWBSDto> mReportList, List<ProjectWBSDto> yReportList, List<ProjectWBSDto> klReportList, List<MonthReportForProjectBaseDataResponseDto> bData, List<MonthReportDetailAdd> addBefore2024)
         {
             /***
              * 1.根据(当前施工分类)wbsid获取所有资源（船舶）信息
              * 2.统计资源（每条船）年度、开累值
              */
+            List<ProjectWBSDto> add = new();
+            var pwbsIds = addBefore2024.Select(x => x.ProjectWBSId).ToList();
+            var projectIds = addBefore2024.Select(x => x.ProjectId.ToString()).ToList();
             var mReport = mReportList.OrderBy(x => x.ShipId).ThenBy(x => x.DateMonth).Where(x => x.ProjectWBSId == wbsId).ToList();
             foreach (var report in mReport)
             {
@@ -241,7 +249,44 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 report.ShipName = bData.FirstOrDefault(x => x.Id == report.ShipId)?.Name;
                 report.DetailId = klReportList.FirstOrDefault(x => x.ProjectId == report.ProjectId && report.ShipId == x.ShipId && x.ProjectWBSId == wbsId)?.DetailId;
                 #endregion
+
+                //追加202412月前没存在过的wbs数据 如果之前存在过则相加产值、工程量、外包支出、否则追加整条数据
+                #region 追加202412月前没存在过的wbs数据 如果之前存在过则相加产值、工程量、外包支出、否则追加整条数据
+                if (pwbsIds.Contains(report.ProjectWBSId) && projectIds.Contains(report.ProjectId))
+                {
+                    var existBefore2024 = addBefore2024.FirstOrDefault(x => x.ProjectWBSId == report.ProjectWBSId && x.UnitPrice == report.UnitPrice && x.ShipId == report.ShipId && x.OutPutType == report.OutPutType && x.ProjectId.ToString() == report.ProjectId && x.ConstructionNature == report.ConstructionNature);
+                    if (existBefore2024 != null)//如果存在  相加
+                    {
+                        report.TotalCompletedQuantity += existBefore2024.CompletedQuantity;
+                        report.TotalCompleteProductionAmount += existBefore2024.CompleteProductionAmount;
+                        report.TotalOutsourcingExpensesAmount += existBefore2024.OutsourcingExpensesAmount;
+                    }
+                    else
+                    {
+                        var addList = addBefore2024.Where(x => x.ProjectWBSId == report.ProjectWBSId).ToList();
+                        //追加整条
+                        foreach (var item2 in addList)
+                        {
+                            add.Add(new ProjectWBSDto
+                            {
+                                Id = Guid.Empty,
+                                ProjectId = item2.ProjectId.ToString(),
+                                UnitPrice = item2.UnitPrice,
+                                OutPutType = item2.OutPutType,
+                                ShipId = item2.ShipId,
+                                ProjectWBSId = item2.ProjectWBSId,
+                                ConstructionNature = item2.ConstructionNature,
+                                TotalOutsourcingExpensesAmount = item2.OutsourcingExpensesAmount,
+                                TotalCompletedQuantity = item2.CompletedQuantity,
+                                TotalCompleteProductionAmount = item2.CompleteProductionAmount
+                            });
+                        }
+                    }
+                }
+                #endregion
             }
+
+            mReport.AddRange(add);
 
             return mReport;
         }
@@ -929,8 +974,13 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             {
                 if (project.CurrencyId != "2a0e99b4-f989-4967-b5f1-5519091d4280".ToGuid())
                 {
-                    result.RMBTotalAmount = await _dbContext.Queryable<MonthReport>().Where(x => x.DateMonth > 202412 && x.DateMonth <= dateMonth).SumAsync(x => x.CompleteProductionAmount);
-                    result.RMBTotalOutAmount = await _dbContext.Queryable<MonthReport>().Where(x => x.DateMonth > 202412 && x.DateMonth <= dateMonth).SumAsync(x => x.OutsourcingExpensesAmount);
+                    result.RMBTotalAmount = await _dbContext.Queryable<MonthReport>().Where(x => x.DateMonth > 202412 && x.DateMonth <= dateMonth && x.ProjectId == project.Id).SumAsync(x => x.CompleteProductionAmount)
+                        +
+                        await _dbContext.Queryable<MonthReportDetailHistory>().Where(x => x.ProjectId == project.Id).SumAsync(x => Convert.ToDecimal(x.RMBHValue));
+
+                    result.RMBTotalOutAmount = await _dbContext.Queryable<MonthReport>().Where(x => x.DateMonth > 202412 && x.DateMonth <= dateMonth && x.ProjectId == project.Id).SumAsync(x => x.OutsourcingExpensesAmount)
+                        +
+                        await _dbContext.Queryable<MonthReportDetailHistory>().Where(x => x.ProjectId == project.Id).SumAsync(x => Convert.ToDecimal(x.RMBHOutValue));
                 }
             }
             #endregion
@@ -1549,28 +1599,62 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     await _dbContext.Updateable(rr).UpdateColumns(x => new { x.ShipId })
                     .ExecuteCommandAsync();
                 }
-                //202306历史月报修改
-                var mainTab = await _dbContext.Queryable<MonthReport>().FirstAsync(t => t.IsDelete == 1 && model.ProjectId == t.ProjectId && t.DateMonth == 202306);
-                if (mainTab != null)
-                {
-                    mainTab.ActualCompAmount = Convert.ToDecimal(model.TopCurrencyHValue);
-                    mainTab.ActualCompHOutValue = Convert.ToDecimal(model.TopCurrencyHOutValue);
-                    mainTab.ActualCompCompletedQuantity = Convert.ToDecimal(model.TopHQuantity);
-                    mainTab.RMBHOutValue = Convert.ToDecimal(model.TopRMBHOutValue);
-                    mainTab.RMBHValue = Convert.ToDecimal(model.TopRMBHValue);
-                    await _dbContext.Updateable(mainTab).UpdateColumns(x => new
-                    {
-                        x.ActualCompAmount,
-                        x.ActualCompHOutValue,
-                        x.ActualCompCompletedQuantity,
-                        x.RMBHOutValue,
-                        x.RMBHValue,
-                    })
-                    .ExecuteCommandAsync();
-                }
-                rt.SuccessResult(true);
             }
-            else rt.FailResult(HttpStatusCode.UpdateFail, "更新失败");
+            //202306历史月报修改
+            var mainTab = await _dbContext.Queryable<MonthReport>().FirstAsync(t => t.IsDelete == 1 && model.ProjectId == t.ProjectId && t.DateMonth == 202306);
+            if (mainTab != null)
+            {
+                mainTab.ActualCompAmount = Convert.ToDecimal(model.TopCurrencyHValue);
+                mainTab.ActualCompHOutValue = Convert.ToDecimal(model.TopCurrencyHOutValue);
+                mainTab.ActualCompCompletedQuantity = Convert.ToDecimal(model.TopHQuantity);
+                mainTab.RMBHOutValue = Convert.ToDecimal(model.TopRMBHOutValue);
+                mainTab.RMBHValue = Convert.ToDecimal(model.TopRMBHValue);
+                await _dbContext.Updateable(mainTab).UpdateColumns(x => new
+                {
+                    x.ActualCompAmount,
+                    x.ActualCompHOutValue,
+                    x.ActualCompCompletedQuantity,
+                    x.RMBHOutValue,
+                    x.RMBHValue,
+                })
+                .ExecuteCommandAsync();
+            }
+            else// 追加202306的历史数据
+            {
+                var project = await _dbContext.Queryable<Project>().Where(t => t.IsDelete == 1 && t.Id == model.ProjectId).FirstAsync();
+                if (project != null)
+                {
+                    MonthReport insertTable = new();
+                    insertTable.Id = GuidUtil.Next();
+                    insertTable.CurrencyId = "2a0e99b4-f989-4967-b5f1-5519091d4280".ToGuid();
+                    insertTable.ProjectId = project.Id;
+                    insertTable.DateMonth = 202306;
+                    insertTable.CompletedQuantity = Convert.ToDecimal(model.TopHQuantity);
+                    insertTable.CompleteProductionAmount = Convert.ToDecimal(model.TopCurrencyHValue);
+                    insertTable.OutsourcingExpensesAmount = Convert.ToDecimal(model.TopCurrencyHOutValue);
+                    insertTable.ActualCompCompletedQuantity = Convert.ToDecimal(model.TopHQuantity);
+                    insertTable.ActualCompAmount = Convert.ToDecimal(model.TopCurrencyHValue);
+                    insertTable.ActualCompHOutValue = Convert.ToDecimal(model.TopCurrencyHOutValue);
+                    if (project.CurrencyId == "2a0e99b4-f989-4967-b5f1-5519091d4280".ToGuid())//国内
+                    {
+                        insertTable.RMBHValue = Convert.ToDecimal(model.TopCurrencyHValue);
+                        insertTable.RMBHOutValue = Convert.ToDecimal(model.TopCurrencyHOutValue);
+                        insertTable.CompleteProductionAmount = Convert.ToDecimal(model.TopCurrencyHValue);
+                        insertTable.OutsourcingExpensesAmount = Convert.ToDecimal(model.TopCurrencyHOutValue);
+                    }
+                    else//国外
+                    {
+                        insertTable.RMBHValue = Convert.ToDecimal(model.TopRMBHValue);
+                        insertTable.RMBHOutValue = Convert.ToDecimal(model.TopRMBHOutValue);
+                        insertTable.CurrencyCompleteProductionAmount = Convert.ToDecimal(model.TopCurrencyHValue);
+                        insertTable.CurrencyOutsourcingExpensesAmount = Convert.ToDecimal(model.TopCurrencyHOutValue);
+                        insertTable.CompleteProductionAmount = Convert.ToDecimal(model.TopRMBHValue);
+                        insertTable.OutsourcingExpensesAmount = Convert.ToDecimal(model.TopRMBHOutValue);
+                    }
+                    await _dbContext.Insertable(insertTable).ExecuteCommandAsync();
+                }
+            }
+            rt.SuccessResult(true);
             return rt;
         }
         /// <summary>

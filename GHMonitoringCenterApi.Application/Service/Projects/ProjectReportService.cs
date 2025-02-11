@@ -4045,7 +4045,17 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             }
             if (addDetails.Any())
             {
-                await _dbMonthReportDetail.AsInsertable(addDetails).EnableDiffLogEvent(NewLogInfo(EntityType.MonthReport, monthReport.Id, modelState)).ExecuteCommandAsync();
+                List<MonthReportDetail> insertTable = new();
+                //处理当月有存在过的数据（主要针对驳回会新增重复数据 处理 ）
+                foreach (var item in addDetails)
+                {
+                    var existDetails = oldMDetails.FirstOrDefault(x => x.ShipId == item.ShipId && x.ProjectId == item.ProjectId && x.ProjectWBSId == item.ProjectWBSId && x.UnitPrice == item.UnitPrice && x.DateMonth == model.DateMonth && x.ConstructionNature == item.ConstructionNature && x.OutPutType == item.OutPutType);
+                    if (existDetails == null)
+                    {
+                        insertTable.Add(item);
+                    }
+                }
+                await _dbMonthReportDetail.AsInsertable(insertTable).EnableDiffLogEvent(NewLogInfo(EntityType.MonthReport, monthReport.Id, modelState)).ExecuteCommandAsync();
             }
             //失效暂存数据
             await CeaseEffectStagingMonthReportAsync(model.ProjectId, model.DateMonth);
