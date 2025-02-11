@@ -175,6 +175,8 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
 
                 var values = mReportList.Where(x => x.ProjectWBSId == node.ProjectWBSId).ToList();
                 var finallyList = MReportForProjectList(node.ProjectWBSId, values, yReportList, klReportList, bData);
+                //如果三个累计为空 不追加
+                //finallyList = finallyList.Where(x => (x.TotalCompletedQuantity != 0M && x.TotalCompleteProductionAmount != 0M && x.TotalOutsourcingExpensesAmount != 0M) || (x.ActualOutAmount != 0M && x.ActualCompQuantity != 0M && x.ActualCompAmount != 0M)).ToList();
                 node.ReportDetails.AddRange(finallyList);
             }
 
@@ -929,8 +931,13 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             {
                 if (project.CurrencyId != "2a0e99b4-f989-4967-b5f1-5519091d4280".ToGuid())
                 {
-                    result.RMBTotalAmount = await _dbContext.Queryable<MonthReport>().Where(x => x.DateMonth > 202412 && x.DateMonth <= dateMonth).SumAsync(x => x.CompleteProductionAmount);
-                    result.RMBTotalOutAmount = await _dbContext.Queryable<MonthReport>().Where(x => x.DateMonth > 202412 && x.DateMonth <= dateMonth).SumAsync(x => x.OutsourcingExpensesAmount);
+                    result.RMBTotalAmount = await _dbContext.Queryable<MonthReport>().Where(x => x.DateMonth > 202412 && x.DateMonth <= dateMonth && x.ProjectId == project.Id).SumAsync(x => x.CompleteProductionAmount)
+                        +
+                        await _dbContext.Queryable<MonthReportDetailHistory>().Where(x => x.ProjectId == project.Id).SumAsync(x => Convert.ToDecimal(x.RMBHValue));
+
+                    result.RMBTotalOutAmount = await _dbContext.Queryable<MonthReport>().Where(x => x.DateMonth > 202412 && x.DateMonth <= dateMonth && x.ProjectId == project.Id).SumAsync(x => x.OutsourcingExpensesAmount)
+                        +
+                        await _dbContext.Queryable<MonthReportDetailHistory>().Where(x => x.ProjectId == project.Id).SumAsync(x => Convert.ToDecimal(x.RMBHOutValue));
                 }
             }
             #endregion
@@ -1549,28 +1556,62 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     await _dbContext.Updateable(rr).UpdateColumns(x => new { x.ShipId })
                     .ExecuteCommandAsync();
                 }
-                //202306历史月报修改
-                var mainTab = await _dbContext.Queryable<MonthReport>().FirstAsync(t => t.IsDelete == 1 && model.ProjectId == t.ProjectId && t.DateMonth == 202306);
-                if (mainTab != null)
-                {
-                    mainTab.ActualCompAmount = Convert.ToDecimal(model.TopCurrencyHValue);
-                    mainTab.ActualCompHOutValue = Convert.ToDecimal(model.TopCurrencyHOutValue);
-                    mainTab.ActualCompCompletedQuantity = Convert.ToDecimal(model.TopHQuantity);
-                    mainTab.RMBHOutValue = Convert.ToDecimal(model.TopRMBHOutValue);
-                    mainTab.RMBHValue = Convert.ToDecimal(model.TopRMBHValue);
-                    await _dbContext.Updateable(mainTab).UpdateColumns(x => new
-                    {
-                        x.ActualCompAmount,
-                        x.ActualCompHOutValue,
-                        x.ActualCompCompletedQuantity,
-                        x.RMBHOutValue,
-                        x.RMBHValue,
-                    })
-                    .ExecuteCommandAsync();
-                }
-                rt.SuccessResult(true);
             }
-            else rt.FailResult(HttpStatusCode.UpdateFail, "更新失败");
+            //202306历史月报修改
+            var mainTab = await _dbContext.Queryable<MonthReport>().FirstAsync(t => t.IsDelete == 1 && model.ProjectId == t.ProjectId && t.DateMonth == 202306);
+            if (mainTab != null)
+            {
+                mainTab.ActualCompAmount = Convert.ToDecimal(model.TopCurrencyHValue);
+                mainTab.ActualCompHOutValue = Convert.ToDecimal(model.TopCurrencyHOutValue);
+                mainTab.ActualCompCompletedQuantity = Convert.ToDecimal(model.TopHQuantity);
+                mainTab.RMBHOutValue = Convert.ToDecimal(model.TopRMBHOutValue);
+                mainTab.RMBHValue = Convert.ToDecimal(model.TopRMBHValue);
+                await _dbContext.Updateable(mainTab).UpdateColumns(x => new
+                {
+                    x.ActualCompAmount,
+                    x.ActualCompHOutValue,
+                    x.ActualCompCompletedQuantity,
+                    x.RMBHOutValue,
+                    x.RMBHValue,
+                })
+                .ExecuteCommandAsync();
+            }
+            else// 追加202306的历史数据
+            {
+                var project = await _dbContext.Queryable<Project>().Where(t => t.IsDelete == 1 && t.Id == model.ProjectId).FirstAsync();
+                if (project != null)
+                {
+                    MonthReport insertTable = new();
+                    insertTable.Id = GuidUtil.Next();
+                    insertTable.CurrencyId = "2a0e99b4-f989-4967-b5f1-5519091d4280".ToGuid();
+                    insertTable.ProjectId = project.Id;
+                    insertTable.DateMonth = 202306;
+                    insertTable.CompletedQuantity = Convert.ToDecimal(model.TopHQuantity);
+                    insertTable.CompleteProductionAmount = Convert.ToDecimal(model.TopCurrencyHValue);
+                    insertTable.OutsourcingExpensesAmount = Convert.ToDecimal(model.TopCurrencyHOutValue);
+                    insertTable.ActualCompCompletedQuantity = Convert.ToDecimal(model.TopHQuantity);
+                    insertTable.ActualCompAmount = Convert.ToDecimal(model.TopCurrencyHValue);
+                    insertTable.ActualCompHOutValue = Convert.ToDecimal(model.TopCurrencyHOutValue);
+                    if (project.CurrencyId == "2a0e99b4-f989-4967-b5f1-5519091d4280".ToGuid())//国内
+                    {
+                        insertTable.RMBHValue = Convert.ToDecimal(model.TopCurrencyHValue);
+                        insertTable.RMBHOutValue = Convert.ToDecimal(model.TopCurrencyHOutValue);
+                        insertTable.CompleteProductionAmount = Convert.ToDecimal(model.TopCurrencyHValue);
+                        insertTable.OutsourcingExpensesAmount = Convert.ToDecimal(model.TopCurrencyHOutValue);
+                    }
+                    else//国外
+                    {
+                        insertTable.RMBHValue = Convert.ToDecimal(model.TopRMBHValue);
+                        insertTable.RMBHOutValue = Convert.ToDecimal(model.TopRMBHOutValue);
+                        insertTable.CurrencyCompleteProductionAmount = Convert.ToDecimal(model.TopCurrencyHValue);
+                        insertTable.CurrencyOutsourcingExpensesAmount = Convert.ToDecimal(model.TopCurrencyHOutValue);
+                        insertTable.CompleteProductionAmount = Convert.ToDecimal(model.TopRMBHValue);
+                        insertTable.OutsourcingExpensesAmount = Convert.ToDecimal(model.TopRMBHOutValue);
+                    }
+                    await _dbContext.Insertable(insertTable).ExecuteCommandAsync();
+                }
+            }
+            rt.SuccessResult(true);
             return rt;
         }
         /// <summary>
