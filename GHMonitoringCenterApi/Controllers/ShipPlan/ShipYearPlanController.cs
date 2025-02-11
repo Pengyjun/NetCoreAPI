@@ -2,6 +2,7 @@
 using GHMonitoringCenterApi.Application.Contracts.IService.Push;
 using GHMonitoringCenterApi.Application.Contracts.IService.ShipPlan;
 using GHMonitoringCenterApi.Domain.Shared;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,6 +12,7 @@ namespace GHMonitoringCenterApi.Controllers.ShipPlan
     /// 船舶年初计划产值控制器
     /// </summary>
     [Route("api/[controller]")]
+    [Authorize]
     [ApiController]
     public class ShipYearPlanController : ControllerBase
     {

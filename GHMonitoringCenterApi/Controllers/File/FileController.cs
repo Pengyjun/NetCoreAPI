@@ -41,7 +41,7 @@ namespace GHMonitoringCenterApi.Controllers.File
     [Route("api/[controller]")]
     [ApiController]
     [OpenApiTag("导出/导入/")]
-    //[Authorize]
+    [Authorize]
     public class FileController : BaseController
     {
 
