@@ -23,6 +23,7 @@ using GHMonitoringCenterApi.Domain.Shared.Enums;
 using GHMonitoringCenterApi.Domain.Shared.Util;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using NPOI.SS.Formula.Eval;
 using NPOI.SS.Formula.Functions;
 using NPOI.SS.UserModel;
 using NPOI.SS.Util;
@@ -4044,7 +4045,17 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             }
             if (addDetails.Any())
             {
-                await _dbMonthReportDetail.AsInsertable(addDetails).EnableDiffLogEvent(NewLogInfo(EntityType.MonthReport, monthReport.Id, modelState)).ExecuteCommandAsync();
+                List<MonthReportDetail> insertTable = new();
+                //处理当月有存在过的数据（主要针对驳回会新增重复数据 处理 ）
+                foreach (var item in addDetails)
+                {
+                    var existDetails = oldMDetails.FirstOrDefault(x => x.ShipId == item.ShipId && x.ProjectId == item.ProjectId && x.ProjectWBSId == item.ProjectWBSId && x.UnitPrice == item.UnitPrice && x.DateMonth == model.DateMonth && x.ConstructionNature == item.ConstructionNature && x.OutPutType == item.OutPutType);
+                    if (existDetails == null)
+                    {
+                        insertTable.Add(item);
+                    }
+                }
+                await _dbMonthReportDetail.AsInsertable(insertTable).EnableDiffLogEvent(NewLogInfo(EntityType.MonthReport, monthReport.Id, modelState)).ExecuteCommandAsync();
             }
             //失效暂存数据
             await CeaseEffectStagingMonthReportAsync(model.ProjectId, model.DateMonth);
@@ -7915,6 +7926,8 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             //汇率
             var hcvList = await _dbContext.Queryable<CurrencyConverter>().Where(x => x.IsDelete == 1 && x.Year == Convert.ToInt32(nowMonth.ToString().Substring(0, 4))).ToListAsync();
 
+            //截止 24年月报历史明细数据（调整过的）
+            var hisMonthRep24 = await _dbContext.Queryable<MonthReportDetailHistory>().Where(x => x.IsDelete == 1).ToListAsync();
             List<OutPutInfo> outPutInfos = new();
             foreach (var item in pjectInfos)
             {
@@ -7969,11 +7982,31 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 //开累产值
                 var hiss = 0M;
                 var his = 0M;
-                if (item.CurrencyId == "2a0e99b4-f989-4967-b5f1-5519091d4280".ToGuid())
-                { his = historyList.FirstOrDefault(x => x.DateMonth == 202306 && x.ProjectId == item.Id)?.ActualCompAmount ?? hiss; }
-                else { his = historyList.FirstOrDefault(x => x.DateMonth == 202306 && x.ProjectId == item.Id)?.RMBHValue ?? hiss; }
+                if (item.CurrencyId == "2a0e99b4-f989-4967-b5f1-5519091d4280".ToGuid())//国内
+                {
+                    his = historyList.FirstOrDefault(x => x.DateMonth == 202306 && x.ProjectId == item.Id)?.ActualCompAmount ?? hiss;
+                }
+                else
+                {
+                    his = historyList.FirstOrDefault(x => x.DateMonth == 202306 && x.ProjectId == item.Id)?.RMBHValue ?? hiss;
+                }
                 var totalOutPutValue = mRepList.Where(x => x.ProjectId == item.Id).Sum(x => x.UnitPrice * x.CompletedQuantity * hv) + his;
 
+                #region 24年之后的开累产值
+                if (nowMonth > 202412)
+                {
+                    var before2024 = hisMonthRep24.Where(x => x.ProjectId == item.Id).ToList();
+                    var after2024 = mRepList.Where(x => x.ProjectId == item.Id && x.DateMonth > 202412 && x.DateMonth <= nowMonth && x.DateMonth != 202306).ToList();
+                    if (item.CurrencyId == "2a0e99b4-f989-4967-b5f1-5519091d4280".ToGuid())//国内
+                    {
+                        totalOutPutValue = before2024.Sum(x => Convert.ToDecimal(x.ActualCompAmount)) + after2024.Sum(x => x.CompleteProductionAmount) + his;
+                    }
+                    else
+                    {
+                        totalOutPutValue = before2024.Sum(x => Convert.ToDecimal(x.RMBHValue)) + after2024.Sum(x => x.CompleteProductionAmount) + his;
+                    }
+                }
+                #endregion
                 var state = "";
                 if (historyList.Where(t => t.DateMonth == nowMonth && t.ProjectId == item.Id && t.Status != MonthReportStatus.Finish).Any())
                 {

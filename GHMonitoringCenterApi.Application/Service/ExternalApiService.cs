@@ -1348,7 +1348,7 @@ namespace GHMonitoringCenterApi.Application.Service
                 .InnerJoin<DayReport>((x, y) => x.Id == y.ProjectId)
                 .Where((x, y) => y.IsDelete == 1 && y.ProcessStatus == DayReportProcessStatus.Submited)
                 .WhereIF(!string.IsNullOrWhiteSpace(constructionLogRequestDto.ProjectName), (x, y) => x.Name.Contains(constructionLogRequestDto.ProjectName))
-                .WhereIF(constructionLogRequestDto.Time.HasValue, (x, y) => y.DateDay == constructionLogRequestDto.Time.Value.ToDateDay())
+                .WhereIF(constructionLogRequestDto.StartTime.HasValue && constructionLogRequestDto.EndTime.HasValue, (x, y) => y.DateDay >= constructionLogRequestDto.StartTime.Value.ToDateDay() && y.DateDay <= constructionLogRequestDto.EndTime.Value.ToDateDay())
                 .OrderByDescending((x, y) => y.DateDay)
                 .Select((x, y) => new ConstructionLogResponseDto
                 {
