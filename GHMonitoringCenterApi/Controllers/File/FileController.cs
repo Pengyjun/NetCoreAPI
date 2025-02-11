@@ -7,6 +7,7 @@ using GHMonitoringCenterApi.Application.Contracts.Dto.Project.Report;
 using GHMonitoringCenterApi.Application.Contracts.Dto.ProjectPlanProduction;
 using GHMonitoringCenterApi.Application.Contracts.Dto.ProjectWBSUpload;
 using GHMonitoringCenterApi.Application.Contracts.Dto.Ship;
+using GHMonitoringCenterApi.Application.Contracts.Dto.ShipPlan;
 using GHMonitoringCenterApi.Application.Contracts.Dto.Word;
 using GHMonitoringCenterApi.Application.Contracts.IService;
 using GHMonitoringCenterApi.Application.Contracts.IService.EquipmentManagement;
@@ -15,12 +16,14 @@ using GHMonitoringCenterApi.Application.Contracts.IService.OperationLog;
 using GHMonitoringCenterApi.Application.Contracts.IService.Project;
 using GHMonitoringCenterApi.Application.Contracts.IService.ProjectProductionReport;
 using GHMonitoringCenterApi.Application.Contracts.IService.ResourceManagement;
+using GHMonitoringCenterApi.Application.Contracts.IService.ShipPlan;
 using GHMonitoringCenterApi.Application.Contracts.IService.Word;
 using GHMonitoringCenterApi.Domain.Shared;
 using GHMonitoringCenterApi.Domain.Shared.Const;
 using GHMonitoringCenterApi.Domain.Shared.Util;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Routing.Template;
 using MiniExcelLibs;
 using NPOI.SS.UserModel;
 using NSwag.Annotations;
@@ -56,7 +59,8 @@ namespace GHMonitoringCenterApi.Controllers.File
         public IProjectProductionReportService projectProductionReportService { get; set; }
         public ILogService logService { get; set; }
         private IBaseService baseService { get; set; }
-        public FileController(IFileService fileService, IWordService wordService, IMapper mapper, IEquipmentManagementService equipmentManagementService, IResourceManagementService resourceManagementService, IProjectService projectService, IProjectReportService projectReportService, IProjectProductionReportService projectProductionReportService, ILogService logService, IBaseService baseService)
+        public IShipPlanService shipPlanService { get; set; }
+        public FileController(IFileService fileService, IWordService wordService, IMapper mapper, IEquipmentManagementService equipmentManagementService, IResourceManagementService resourceManagementService, IProjectService projectService, IProjectReportService projectReportService, IProjectProductionReportService projectProductionReportService, ILogService logService, IBaseService baseService, IShipPlanService shipPlanService)
         {
             this.fileService = fileService;
             this.wordService = wordService;
@@ -68,6 +72,7 @@ namespace GHMonitoringCenterApi.Controllers.File
             this.projectProductionReportService = projectProductionReportService;
             this.logService = logService;
             this.baseService = baseService;
+            this.shipPlanService = shipPlanService;
         }
         #endregion
 
@@ -1156,6 +1161,20 @@ namespace GHMonitoringCenterApi.Controllers.File
             System.IO.File.Delete(path);
             return await WordTemplateImportAsync(response, "项目月报简报导出", "pdf");
         }
+        #endregion
+
+
+
+        #region 导出船舶年度计划产值
+        [HttpGet("ImportShipPlan")]
+        public async Task<IActionResult> ImportShipPlanAsync([FromQuery]ShipPlanRequestDto  shipPlanRequestDto)
+        {
+           
+            //获取数据
+            var result=await shipPlanService.SearchShipPlanAsync(shipPlanRequestDto);
+            return await ExcelImportAsync<List<ShipPlanResponseDto>>(result.Data, null,$"{shipPlanRequestDto.Year}度船舶产值计划");
+        }
+
         #endregion
     }
 }
