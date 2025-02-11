@@ -3160,7 +3160,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                         }
                     }
 
-                    var before2024 = hisMonthRep24.Where(x => x.ProjectId == item.ProjectId && x.DateMonth <= 202412).ToList();
+                    var before2024 = hisMonthRep24.Where(x => x.ProjectId == item.ProjectId).ToList();
                     var after2024 = mReportData.Where(x => x.ProjectId == item.ProjectId && x.DateMonth > 202412 && x.DateMonth <= item.DateMonth && x.DateMonth != 202306).ToList();
                     if (item.CurrencyId == "2a0e99b4-f989-4967-b5f1-5519091d4280".ToGuid())//国内
                     {
