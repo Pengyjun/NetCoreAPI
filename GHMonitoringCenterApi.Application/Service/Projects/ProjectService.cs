@@ -166,6 +166,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 .Where(p => departmentIds.Contains(p.ProjectDept.Value))
                 .Where(p => p.StatusId != "0c686c96-889e-4c4d-b24d-fa2886d9dceb".ToGuid())
                 .WhereIF(true, p => p.IsDelete == 1)
+                .WhereIF(searchRequestDto.ManagerType.HasValue, p => p.ManagerType == searchRequestDto.ManagerType.Value)
                 .WhereIF(searchRequestDto.CompanyId != null, p => p.CompanyId == searchRequestDto.CompanyId)
                 .WhereIF(searchRequestDto.ProjectDept != null, p => p.ProjectDept == searchRequestDto.ProjectDept)
                 .WhereIF(searchRequestDto.ProjectStatusId != null && searchRequestDto.ProjectStatusId.Any(), p => searchRequestDto.ProjectStatusId.Contains(p.StatusId.Value.ToString()))

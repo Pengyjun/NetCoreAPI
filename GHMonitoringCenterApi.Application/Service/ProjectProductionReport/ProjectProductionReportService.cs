@@ -301,6 +301,7 @@ namespace GHMonitoringCenterApi.Application.Service.ProjectProductionReport
                    ))
                    .WhereIF(true, (p, d) => p.IsDelete == 1)
                    .WhereIF(true, p => departmentIds.Contains(p.ProjectDept.Value))
+                    .WhereIF(searchRequestDto.ManagerType.HasValue, p => p.ManagerType == searchRequestDto.ManagerType.Value)
                    .WhereIF(searchRequestDto.StartTime == null && searchRequestDto.EndTime == null, (p, d) => d.DateDay == time)
                    .WhereIF(searchRequestDto.StartTime != null && searchRequestDto.EndTime != null, (p, d) => d.DateDay >= searchRequestDto.StartTime.Value.ToDateDay() && d.DateDay <= searchRequestDto.EndTime.Value.ToDateDay())
                    .WhereIF(searchRequestDto.CompanyId != null, (p, d) => p.CompanyId == searchRequestDto.CompanyId)
@@ -358,6 +359,7 @@ namespace GHMonitoringCenterApi.Application.Service.ProjectProductionReport
                        JoinType.Inner, p.Id == d.ProjectId && d.ProcessStatus == DayReportProcessStatus.Submited
                    ))
                    .WhereIF(true, (p, d) => p.IsDelete == 1)
+                     .WhereIF(searchRequestDto.ManagerType.HasValue, p => p.ManagerType == searchRequestDto.ManagerType.Value)
                    .WhereIF(true, p => departmentIds.Contains(p.ProjectDept.Value))
                    .WhereIF(searchRequestDto.CompanyId != null, (p, d) => p.CompanyId == searchRequestDto.CompanyId)
                    .WhereIF(searchRequestDto.ProjectDept != null, (p, d) => p.ProjectDept == searchRequestDto.ProjectDept)

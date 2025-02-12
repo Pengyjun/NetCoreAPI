@@ -8,6 +8,11 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project.Report
     public class MonthtReportsRequstDto : BaseRequestDto, IResetModelProperty
     {
         /// <summary>
+        /// 管理类型
+        /// </summary>
+
+        public int? ManagerType { get; set; }
+        /// <summary>
         /// 所属公司
         /// </summary>
         public Guid? CompanyId { get; set; }

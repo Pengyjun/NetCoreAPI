@@ -2453,7 +2453,10 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             query = MonthReportsWheres(query, model, userAuthForData, categoryList, tagList, tag2List)
                     .OrderByDescending((m, p) => new { m.DateMonth });
             //.OrderByDescending((m, p) => new { m.ProjectId, m.DateMonth });
-            var selQuery = query.Where((m, p) => m.DateMonth != 202306).Select((m, p) => new MonthtReportsResponseDto.MonthtReportDto()
+            var selQuery = query
+                 .Where((m, p) => m.DateMonth != 202306)
+                  .WhereIF(model.ManagerType.HasValue, (m, p) => p.ManagerType == model.ManagerType)
+                .Select((m, p) => new MonthtReportsResponseDto.MonthtReportDto()
             {
                 Id = m.Id,
                 ProjectId = m.ProjectId,
@@ -3632,6 +3635,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
         private ISugarQueryable<MonthReport, Project> MonthReportsWheres(ISugarQueryable<MonthReport, Project> query, MonthtReportsRequstDto model, UserAuthForDataDto userAuthForData, List<int> categoryList, List<int> tagList, List<int> tag2List)
         {
             return query
+                 
               //.Where((m, p) => m.DateMonth >= startMonth && m.DateMonth <= endMonth)
               .WhereIF(!userAuthForData.IsAdmin, (m, p) => userAuthForData.CompanyIds.Contains(p.ProjectDept))
               .WhereIF(model.CompanyId != null, (m, p) => p.CompanyId == model.CompanyId)

@@ -59,5 +59,11 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project
         /// 是否是对外接口   如果是 为true   权限更改为最高权限级别
         /// </summary>
         public bool IsDuiWai { get; set; }
+
+        /// <summary>
+        /// 项目类型
+        /// </summary>
+
+        public int? ManagerType { get; set; }
     }
 }
