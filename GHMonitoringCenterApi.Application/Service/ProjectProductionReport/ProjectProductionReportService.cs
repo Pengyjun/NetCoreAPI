@@ -588,6 +588,8 @@ namespace GHMonitoringCenterApi.Application.Service.ProjectProductionReport
             var subShipList = await dbContext.Queryable<SubShip>().Where(x => x.IsDelete == 1 && subIds.Contains(x.PomId)).ToListAsync();
             //获取往来单位数据
             var dealingUnit = await dbContext.Queryable<DealingUnit>().Where(x => x.IsDelete == 1 && subIds.Contains(x.PomId)).ToListAsync();
+            //获取施工性质
+            var constructionList = await dbContext.Queryable<DictionaryTable>().Where(t => t.IsDelete == 1 && t.TypeNo == 7).ToListAsync();
 
             foreach (var item in list)
             {
@@ -609,6 +611,7 @@ namespace GHMonitoringCenterApi.Application.Service.ProjectProductionReport
                     ActualDailyProduction = Math.Round(x.ActualDailyProduction, 2),//处理分包项目
                     ActualDailyProductionAmount = Math.Round(x.ActualDailyProductionAmount, 2),//处理分包项目
                     ConstructionNature = x.ConstructionNature,
+                    ConstructionNatureName = constructionList.FirstOrDefault(t => t.Type == x.ConstructionNature)?.Name,
                     OwnerShipName = ownerShipList.FirstOrDefault(t => t.PomId == x.OwnerShipId)?.Name,
                     SubShipName = subShipList.FirstOrDefault(t => t.PomId == x.SubShipId)?.Name == null ? dealingUnit.FirstOrDefault(t => t.PomId == x.SubShipId)?.ZBPNAME_ZH : subShipList.FirstOrDefault(t => t.PomId == x.SubShipId)?.Name,
                     ProjectWBSName = GetProjectWBSLevelName(projectWbsList.Where(x => x.ProjectId == item.ProjectId.ToString()).ToList(), projectWbsList.FirstOrDefault(t => t.Id == x.ProjectWBSId)?.Name, projectWbsList.FirstOrDefault(t => t.Id == x.ProjectWBSId)?.Pid)
