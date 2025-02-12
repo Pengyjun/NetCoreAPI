@@ -14,7 +14,7 @@ namespace GHMonitoringCenterApi.Controllers.ShipPlan
     [Route("api/[controller]")]
     [Authorize]
     [ApiController]
-    public class ShipYearPlanController : ControllerBase
+    public class ShipYearPlanController : BaseController
     {
 
         public  IShipPlanService shipPlanService;

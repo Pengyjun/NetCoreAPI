@@ -346,7 +346,6 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                         var add = exist.Where(x => x.Id != Guid.Empty).ToList();
                         addRes.AddRange(add);
                     }
-
                 }
             }
 
