@@ -2996,14 +2996,14 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
             responseAjaxResult.Data = jjtSendMessageMonitoringDayReportResponseDto;
 
             #region 每天的生产结果已json的形式保存
-            if (flag)
+            if (flag && Utils.IsLinxuSystem())
             {
                 try
                 {
                     RecordPushDayReport recordPushDayReport = new RecordPushDayReport()
                     {
                         Id = GuidUtil.Next(),
-                        DateDay = int.Parse(DateTime.Now.AddDays(-1).ToString("yyyyMM")),
+                        DateDay = int.Parse(DateTime.Now.AddDays(-1).ToString("yyyyMMdd")),
                         Json = jjtSendMessageMonitoringDayReportResponseDto.ToJson()
                     };
                     dbContext.Insertable<RecordPushDayReport>(recordPushDayReport).ExecuteCommandAsync();

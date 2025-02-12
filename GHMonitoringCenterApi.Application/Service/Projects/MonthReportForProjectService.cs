@@ -235,10 +235,10 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
              * 1.根据(当前施工分类)wbsid获取所有资源（船舶）信息
              * 2.统计资源（每条船）年度、开累值
              */
-            //if (wbsId == "08dd1aa4-33ec-4bba-88bd-19c220446e6c".ToGuid())
-            //{
-            //    var s = 1;
-            //}
+            if (wbsId == "08dd1aa4-33ec-4bdc-8bec-33e238a7beec".ToGuid())
+            {
+                var s = 1;
+            }
             List<ProjectWBSDto> add = new();
             var pwbsIds = addBefore2024.Select(x => x.ProjectWBSId).ToList();
             var projectIds = addBefore2024.Select(x => x.ProjectId.ToString()).ToList();
@@ -295,8 +295,10 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 {
                     if (pwbsIds.Contains(report.ProjectWBSId) && projectIds.Contains(report.ProjectId))
                     {
+                        //如果当月数据在追加数据表中存在 则相加
                         var existBefore2024 = addBefore2024.FirstOrDefault(x => x.ProjectWBSId == report.ProjectWBSId && x.UnitPrice == report.UnitPrice && x.ShipId == report.ShipId && x.ProjectId.ToString() == report.ProjectId && x.ConstructionNature == report.ConstructionNature);
-                        if (existBefore2024 != null)//如果存在  相加
+
+                        if ( existBefore2024 != null)
                         {
                             report.TotalCompletedQuantity += existBefore2024.CompletedQuantity;
                             report.TotalCompleteProductionAmount += existBefore2024.CompleteProductionAmount;
@@ -304,10 +306,6 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                         }
                         else
                         {
-                            ////如果当月已经存在了 就不追加了 避免重复加载以前的数据
-                            //var exist = mReport.FirstOrDefault(x => x.ProjectWBSId == report.ProjectWBSId && x.UnitPrice == report.UnitPrice && x.ShipId == report.ShipId && x.ProjectId == report.ProjectId && x.ConstructionNature == report.ConstructionNature);
-                            //if (exist == null)
-                            //{
                             var addList = addBefore2024.Where(x => x.ProjectWBSId == report.ProjectWBSId).ToList();
                             //追加整条
                             foreach (var item2 in addList)
@@ -327,7 +325,6 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                                     ShipName = item2.ShipName,
                                 });
                             }
-                            //}
                         }
                     }
                 }

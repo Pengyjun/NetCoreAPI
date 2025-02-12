@@ -3,6 +3,7 @@ using System.Collections;
 using System.ComponentModel;
 using System.Data;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -283,12 +284,13 @@ namespace GHMonitoringCenterApi.Domain.Shared.Util
         #region 判断当前系统是否是Linux
         public static bool IsLinxuSystem()
         {
-            var platFrom = Environment.OSVersion.Platform.ToString().ToLower();
-            if (platFrom.IndexOf("win") >= 0 || platFrom.IndexOf("windows") >= 0)
-            {
-                return false;
-            }
-            return true;
+             return RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
+            //var platFrom = Environment.OSVersion.Platform.ToString().ToLower();
+            //if (platFrom.IndexOf("win") >= 0 || platFrom.IndexOf("windows") >= 0)
+            //{
+            //    return false;
+            //}
+            //return true;
         }
         #endregion
 
