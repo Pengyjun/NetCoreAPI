@@ -739,6 +739,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                  .Where((p) => p.Id == basePrimaryRequestDto.Id && p.IsDelete == 1)
                  .Select((p) => new ProjectDetailResponseDto
                  {
+                      ManagerType=p.ManagerType,
                       PProjectName=SqlFunc.Subqueryable<Project>().Where(x=>p.PProjectMasterCode==x.MasterCode).Select(x=>x.Name),
                       PProjectMasterCode=p.PProjectMasterCode,
                      IsSubContractProject=p.IsSubContractProject,
@@ -797,11 +798,18 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                      ContractStipulationEndDate = p.ContractStipulationEndDate,
                      ContractStipulationStartDate = p.ContractStipulationStartDate
                  }).SingleAsync();
+
+
+
             if (projectDeteilSingle == null)
             {
                 responseAjaxResult.Success(ResponseMessage.OPERATION_DATA_NOTEXIST, HttpStatusCode.DataNotEXIST);
                 return responseAjaxResult;
             }
+
+            //项目管理类型
+            var managerTypeName =await dbContext.Queryable<ProjectMangerType>().Where(x => x.IsDelete == 1&&x.Code== SqlFunc.ToString( projectDeteilSingle.ManagerType)).Select(x=>x.Name).FirstAsync();
+            projectDeteilSingle.ManagerTypeName = managerTypeName;
             //获取机构信息
             var intitutionList = dbContext.Queryable<Institution>().Where(x => x.IsDelete == 1);
             projectDeteilSingle.CompanyName = intitutionList.SingleAsync(x => x.PomId == projectDeteilSingle.CompanyId).Result.Name;

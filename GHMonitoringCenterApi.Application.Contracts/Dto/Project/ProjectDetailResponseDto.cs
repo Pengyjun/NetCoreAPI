@@ -314,6 +314,9 @@
         /// 分包项目名称
         /// </summary>
         public string? PProjectName { get; set; }
+
+        public int ManagerType { get; set; }
+        public string ManagerTypeName { get; set; }
     }
 
     /// <summary>
