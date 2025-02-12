@@ -338,5 +338,10 @@ namespace GHMonitoringCenterApi.Domain.Models
         /// </summary>
         [SugarColumn(ColumnDataType = "int", DefaultValue = "0")]
         public int IsSubContractProject { get; set; }
+        /// <summary>
+        /// 项目管理类型
+        /// </summary>
+        [SugarColumn(ColumnDataType = "int")]
+        public int ManagerType { get; set; }
     }
 }

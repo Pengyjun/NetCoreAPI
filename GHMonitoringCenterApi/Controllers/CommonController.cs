@@ -127,6 +127,17 @@ namespace GHMonitoringCenterApi.Controllers
         {
             return await baseService.SearchProjectTypePullDownAsync(projectTypRequsetDto);
         }
+
+        /// <summary>
+        /// 获取项目管理类型
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("SearchManagerType")]
+        [AllowAnonymous]
+        public async Task<ResponseAjaxResult<List<BasePullDownResponseDto>>> SearchManagerTypeAsync([FromQuery] ProjectTypRequsetDto projectTypRequsetDto)
+        {
+            return await baseService.SearchManagerTypeAsync(projectTypRequsetDto);
+        }
         /// <summary>
         /// 获取项目区域
         /// </summary>

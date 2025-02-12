@@ -10,6 +10,10 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project
     public class AddOrUpdateProjectRequestDto : IValidatableObject
     {
         /// <summary>
+        /// 项目管理类型
+        /// </summary>
+        public int? ManagerType { get; set; }
+        /// <summary>
         /// 请求类型  true是添加   false是修改
         /// </summary>
         public bool RequestType { get; set; }
@@ -258,6 +262,12 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project
             {
                 WorkDay = 1;
             }
+
+            if (ManagerType==null&&ManagerType<1|| ManagerType >5)
+            {
+                yield return new ValidationResult("项目类型不合法请重新填", new string[] { nameof(ManagerType) });
+            }
+
             if (string.IsNullOrWhiteSpace(Name))
             {
                 yield return new ValidationResult("Name参数不能为空且类型是string类型", new string[] { nameof(Name) });

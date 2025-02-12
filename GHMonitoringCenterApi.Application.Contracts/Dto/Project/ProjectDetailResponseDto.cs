@@ -5,6 +5,8 @@
     /// </summary>
     public class ProjectDetailResponseDto
     {
+
+  
         /// <summary>
         /// 项目ID
         /// </summary>
@@ -307,6 +309,11 @@
         /// 是否是分包项目
         /// </summary>
         public string? PProjectMasterCode { get; set; }
+
+        /// <summary>
+        /// 分包项目名称
+        /// </summary>
+        public string? PProjectName { get; set; }
     }
 
     /// <summary>

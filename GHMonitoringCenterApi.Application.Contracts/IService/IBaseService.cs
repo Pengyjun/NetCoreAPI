@@ -372,5 +372,12 @@ namespace GHMonitoringCenterApi.Application.Contracts.IService
         Task<ResponseAjaxResult<bool>> RecordHolidayAsync(int year);
 
         //Task UpdateProjectAsync();
+
+        /// <summary>
+        /// 管理类型
+        /// </summary>
+        /// <param name="projectTypRequsetDto"></param>
+        /// <returns></returns>
+        Task<ResponseAjaxResult<List<BasePullDownResponseDto>>> SearchManagerTypeAsync(ProjectTypRequsetDto projectTypRequsetDto);
     }
 }
