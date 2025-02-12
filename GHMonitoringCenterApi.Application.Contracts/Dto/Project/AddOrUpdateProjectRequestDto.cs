@@ -385,10 +385,14 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project
                 }
 
             }
-
+            
             if (IsSubContractProject == 1&&string.IsNullOrWhiteSpace(PProjectMasterCode))
             {
                 yield return new ValidationResult("分包项目必须要填项目主数据编码", new string[] { nameof(PProjectMasterCode) });
+            }
+            if (ManagerType==null||!ManagerType.HasValue||ManagerType.Value<1||ManagerType.Value>5)
+            {
+                yield return new ValidationResult("项目管理类型不合法", new string[] { nameof(ManagerType) });
             }
         }
     }

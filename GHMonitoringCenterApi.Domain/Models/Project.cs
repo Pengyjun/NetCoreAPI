@@ -341,7 +341,7 @@ namespace GHMonitoringCenterApi.Domain.Models
         /// <summary>
         /// 项目管理类型
         /// </summary>
-        [SugarColumn(ColumnDataType = "int")]
+        [SugarColumn(ColumnDataType = "int",DefaultValue ="0")]
         public int ManagerType { get; set; }
     }
 }
