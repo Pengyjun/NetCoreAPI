@@ -235,11 +235,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
              * 1.根据(当前施工分类)wbsid获取所有资源（船舶）信息
              * 2.统计资源（每条船）年度、开累值
              */
-            if (wbsId == "08dd1aa4-33ec-4bdc-8bec-33e238a7beec".ToGuid())
-            {
-                var s = 1;
-            }
-            List<ProjectWBSDto> add = new();
+            List<ProjectWBSDto> addHis = new();
             var pwbsIds = addBefore2024.Select(x => x.ProjectWBSId).ToList();
             var projectIds = addBefore2024.Select(x => x.ProjectId.ToString()).ToList();
             var mReport = mReportList.OrderBy(x => x.ShipId).ThenBy(x => x.DateMonth).Where(x => x.ProjectWBSId == wbsId).ToList();
@@ -298,7 +294,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                         //如果当月数据在追加数据表中存在 则相加
                         var existBefore2024 = addBefore2024.FirstOrDefault(x => x.ProjectWBSId == report.ProjectWBSId && x.UnitPrice == report.UnitPrice && x.ShipId == report.ShipId && x.ProjectId.ToString() == report.ProjectId && x.ConstructionNature == report.ConstructionNature);
 
-                        if ( existBefore2024 != null)
+                        if (existBefore2024 != null)
                         {
                             report.TotalCompletedQuantity += existBefore2024.CompletedQuantity;
                             report.TotalCompleteProductionAmount += existBefore2024.CompleteProductionAmount;
@@ -310,7 +306,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                             //追加整条
                             foreach (var item2 in addList)
                             {
-                                add.Add(new ProjectWBSDto
+                                addHis.Add(new ProjectWBSDto
                                 {
                                     Id = Guid.Empty,
                                     ProjectId = item2.ProjectId.ToString(),
@@ -330,9 +326,32 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 }
                 #endregion
             }
+            mReport.AddRange(addHis);
 
-            mReport.AddRange(add);
+            //排除掉本月有的 追加的 重复资源
+            List<ProjectWBSDto> addRes = new();
+            var gpHis = mReport.GroupBy(x => new { x.ShipId, x.ProjectId, x.ConstructionNature, x.OutPutType, x.UnitPrice, x.ProjectWBSId }).ToList();
+            foreach (var item in gpHis)
+            {
+                if (pwbsIds.Contains(item.Key.ProjectWBSId) && projectIds.Contains(item.Key.ProjectId))
+                {
+                    var exist = mReport.Where(x => x.ShipId == item.Key.ShipId && x.ProjectId == item.Key.ProjectId && x.ConstructionNature == item.Key.ConstructionNature && x.OutPutType == item.Key.OutPutType && x.UnitPrice == item.Key.UnitPrice && x.ProjectWBSId == item.Key.ProjectWBSId).ToList();
+                    if (exist.Count == 1 || exist.Count == 0)
+                    {
+                        continue;
+                    }
+                    else
+                    {
+                        mReport = mReport.Where(x => !(x.ShipId == item.Key.ShipId && x.ProjectId == item.Key.ProjectId && x.ConstructionNature == item.Key.ConstructionNature && x.OutPutType == item.Key.OutPutType && x.UnitPrice == item.Key.UnitPrice && x.ProjectWBSId == item.Key.ProjectWBSId)).ToList();
+                        var add = exist.Where(x => x.Id != Guid.Empty).ToList();
+                        addRes.AddRange(add);
+                    }
 
+                }
+            }
+
+            //最终结果
+            mReport.AddRange(addRes);
             return mReport;
         }
         /// <summary>
