@@ -738,6 +738,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                  .Where((p) => p.Id == basePrimaryRequestDto.Id && p.IsDelete == 1)
                  .Select((p) => new ProjectDetailResponseDto
                  {
+                      PProjectName=SqlFunc.Subqueryable<Project>().Where(x=>p.PProjectMasterCode==x.MasterCode).Select(x=>x.Name),
                       PProjectMasterCode=p.PProjectMasterCode,
                      IsSubContractProject=p.IsSubContractProject,
                      Id = p.Id,
@@ -1487,6 +1488,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
 
                 mapper.Map(addOrUpdateProjectRequestDto, projectObject);
                 //税率
+                projectObject.ManagerType = addOrUpdateProjectRequestDto.ManagerType.Value;
                 projectObject.Rate = projectObject.Rate / 100;
                 projectObject.ExchangeRate = await dbContext.Queryable<CurrencyConverter>().Where(x => x.Year == DateTime.Now.Year && x.CurrencyId == projectObject.CurrencyId.ToString()).Select(x => x.ExchangeRate).SingleAsync();
                 //标后预算毛利率

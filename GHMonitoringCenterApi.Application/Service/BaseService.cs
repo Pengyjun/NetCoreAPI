@@ -35,6 +35,7 @@ using GHMonitoringCenterApi.Domain.Shared.Util;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
 using NPOI.HPSF;
+using SixLabors.ImageSharp;
 using SqlSugar;
 using SqlSugar.Extensions;
 using UtilsSharp;
@@ -2555,6 +2556,33 @@ namespace GHMonitoringCenterApi.Application.Service
                 }
             }
             responseAjaxResult.Data = true;
+            responseAjaxResult.Success();
+            return responseAjaxResult;
+        }
+
+
+        /// <summary>
+        /// 管理类型
+        /// </summary>
+        /// <param name="projectTypRequsetDto"></param>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        public async Task<ResponseAjaxResult<List<BasePullDownResponseDto>>> SearchManagerTypeAsync(ProjectTypRequsetDto projectTypRequsetDto)
+        {
+            ResponseAjaxResult<List<BasePullDownResponseDto>> responseAjaxResult = new ResponseAjaxResult<List<BasePullDownResponseDto>>();
+            var ProjectTypeList = await dbContext.Queryable<ProjectMangerType>()
+             .Where(x => x.IsDelete==1)
+            .WhereIF(!string.IsNullOrWhiteSpace(projectTypRequsetDto.Name), x => SqlFunc.Contains(x.Name, projectTypRequsetDto.Name))
+             .Select(x => new BasePullDownResponseDto { Id = x.Id, Name = x.Name, Type =SqlFunc.ToInt32(x.Code),Code=x.BusinessRemark}).OrderBy(x=>x.Type).ToListAsync();
+            if (projectTypRequsetDto.EnableRemark == 1)
+            {
+                responseAjaxResult.Data = ProjectTypeList.Select(x => new BasePullDownResponseDto() { Id = x.Id, Name = x.Name + x.Code }).ToList();
+            }
+            else
+            {
+                responseAjaxResult.Data = ProjectTypeList;
+            }
+            responseAjaxResult.Count = ProjectTypeList.Count;
             responseAjaxResult.Success();
             return responseAjaxResult;
         }
