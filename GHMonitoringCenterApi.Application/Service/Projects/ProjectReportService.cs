@@ -1533,7 +1533,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             }
             if (sumReport != null)
             {
-                sumReport.WorkingHours += num;
+                //sumReport.WorkingHours += num;
             }
 
             #endregion
