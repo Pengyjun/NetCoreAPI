@@ -2583,6 +2583,10 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             if (_currentUser.CurrentLoginIsAdmin || _currentUser.CurrentLoginInstitutionOid == "101162350")
             {
                 specicalCondition = true;
+                if (!string.IsNullOrWhiteSpace(model.CompanyId.ToString()))
+                {
+                    specicalCondition = false;
+                }
             }
             #endregion 
 
@@ -2836,8 +2840,8 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             }
             else
             {
-                //获取分包项目
-                var subpIds = await _dbContext.Queryable<Project>().Where(t => t.IsDelete == 1 && t.IsSubContractProject == 1).Select(x => x.Id).ToListAsync();
+                //获取分包项目 局内分包分项目
+                var subpIds = await _dbContext.Queryable<Project>().Where(t => t.IsDelete == 1 && t.IsSubContractProject == 2).Select(x => x.Id).ToListAsync();
                 totalMonthtReport = new MonthtReportsResponseDto.TotalMonthtReportsDto
                 {
                     AccomplishQuantities = Math.Round(mpList.Where(x => !subpIds.Contains(x.ProjectId)).Sum(m => m.CompletedQuantity), 2),
@@ -3065,6 +3069,10 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             if (_currentUser.CurrentLoginIsAdmin || _currentUser.CurrentLoginInstitutionOid == "101162350")
             {
                 specicalCondition = true;
+                if (!string.IsNullOrWhiteSpace(model.CompanyId.ToString()))
+                {
+                    specicalCondition = false;
+                }
             }
             #endregion 
             foreach (var item in list)
@@ -3308,7 +3316,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             else
             {
                 //获取分包项目
-                var subpIds = await _dbContext.Queryable<Project>().Where(t => t.IsDelete == 1 && t.IsSubContractProject == 1).Select(x => x.Id).ToListAsync();
+                var subpIds = await _dbContext.Queryable<Project>().Where(t => t.IsDelete == 1 && t.IsSubContractProject == 2).Select(x => x.Id).ToListAsync();
                 totalMonthtReport = new MonthtReportsResponseDto.TotalMonthtReportsDto
                 {
                     AccomplishQuantities = Math.Round(list.Where(x => !subpIds.Contains(x.ProjectId)).Sum(m => m.AccomplishQuantities), 2),
@@ -8051,27 +8059,28 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             if (_currentUser.CurrentLoginIsAdmin || _currentUser.CurrentLoginInstitutionOid == "101162350")
             {
                 //获取分包项目
-                var subpIds = await _dbContext.Queryable<Project>().Where(t => t.IsDelete == 1 && t.IsSubContractProject == 1).Select(x => x.Id).ToListAsync();
+                var subpIds = await _dbContext.Queryable<Project>().Where(t => t.IsDelete == 1 && t.IsSubContractProject == 2).Select(x => x.Id).ToListAsync();
+                outPutInfos = outPutInfos.Where(x => !subpIds.Contains(x.ProjectId)).ToList();
                 //计算所有公司汇总值
                 sumOutPutInfos = new List<SumOutPutInfo>()
                  {
                      new  SumOutPutInfo()
                      {
-                            OwnProduction = outPutInfos.Where(x=>!subpIds.Contains(x.ProjectId)).Sum(x=>x.OwnProduction),
-                            SubProduction = outPutInfos.Where(x=>!subpIds.Contains(x.ProjectId)).Sum(x=>x.SubProduction),
-                            SumProduction = outPutInfos.Where(x=>!subpIds.Contains(x.ProjectId)).Sum(x=>x.SumProduction),
-                            OwnOutPutValue = outPutInfos.Where(x=>!subpIds.Contains(x.ProjectId)).Sum(x=>x.OwnOutPutValue),
-                            SubDiffValue = outPutInfos.Where(x=>!subpIds.Contains(x.ProjectId)).Sum(x=>x.SubDiffValue),
-                            SubExpenditure = outPutInfos.Where(x=>!subpIds.Contains(x.ProjectId)).Sum(x=>x.SubExpenditure),
-                            SumOutPutValue = outPutInfos.Where(x=>!subpIds.Contains(x.ProjectId)).Sum(x=>x.SumOutPutValue),
-                            YearOwnProduction = outPutInfos.Where(x=>!subpIds.Contains(x.ProjectId)).Sum(x=>x.YearOwnProduction),
-                            YearSubProduction = outPutInfos.Where(x=>!subpIds.Contains(x.ProjectId)).Sum(x=>x.YearSubProduction),
-                            YearSumProduction = outPutInfos.Where(x=>!subpIds.Contains(x.ProjectId)).Sum(x=>x.YearSumProduction),
-                            YearOwnOutPutValue = outPutInfos.Where(x=>!subpIds.Contains(x.ProjectId)).Sum(x=>x.YearOwnOutPutValue),
-                            YearSubDiffValue = outPutInfos.Where(x=>!subpIds.Contains(x.ProjectId)).Sum(x=>x.YearSubDiffValue),
-                            YearSubExpenditure = outPutInfos.Where(x=>!subpIds.Contains(x.ProjectId)).Sum(x=>x.YearSubExpenditure),
-                            YearSumOutPutValue = outPutInfos.Where(x=>!subpIds.Contains(x.ProjectId)).Sum(x=>x.YearSumOutPutValue),
-                            TotalSumOutPutValue = outPutInfos.Where(x=>!subpIds.Contains(x.ProjectId)).Sum(x=>x.TotalOutPutValue)
+                            OwnProduction = outPutInfos.Sum(x=>x.OwnProduction),
+                            SubProduction = outPutInfos.Sum(x=>x.SubProduction),
+                            SumProduction = outPutInfos.Sum(x=>x.SumProduction),
+                            OwnOutPutValue = outPutInfos.Sum(x=>x.OwnOutPutValue),
+                            SubDiffValue = outPutInfos.Sum(x=>x.SubDiffValue),
+                            SubExpenditure = outPutInfos.Sum(x=>x.SubExpenditure),
+                            SumOutPutValue = outPutInfos.Sum(x=>x.SumOutPutValue),
+                            YearOwnProduction = outPutInfos.Sum(x=>x.YearOwnProduction),
+                            YearSubProduction = outPutInfos.Sum(x=>x.YearSubProduction),
+                            YearSumProduction = outPutInfos.Sum(x=>x.YearSumProduction),
+                            YearOwnOutPutValue = outPutInfos.Sum(x=>x.YearOwnOutPutValue),
+                            YearSubDiffValue = outPutInfos.Sum(x=>x.YearSubDiffValue),
+                            YearSubExpenditure = outPutInfos.Sum(x=>x.YearSubExpenditure),
+                            YearSumOutPutValue = outPutInfos.Sum(x=>x.YearSumOutPutValue),
+                            TotalSumOutPutValue = outPutInfos.Sum(x=>x.TotalOutPutValue)
                      }
                  };
             }

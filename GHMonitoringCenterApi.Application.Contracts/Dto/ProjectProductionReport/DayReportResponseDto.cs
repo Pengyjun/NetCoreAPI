@@ -287,8 +287,10 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.ProjectProductionRepor
         /// 施工性质
         /// </summary>
         public int? ConstructionNature { get; set; }
-
-
+        /// <summary>
+        /// 施工性质名称
+        /// </summary>
+        public string? ConstructionNatureName { get; set; }
         /// <summary>
         /// 施工层级名称
         /// </summary>
