@@ -52,5 +52,13 @@ namespace GHMonitoringCenterApi.Application.Contracts.IService.ShipPlan
 
         Task<ResponseAjaxResult<List<ShipCompleteResponseDto>>> SearchShiCompleteAsync(ShipCompleteRequestDto shipPlanRequestDto);
 
+        /// <summary>
+        /// 根据用户填的船舶计划数据 生产图  
+        /// </summary>
+        /// <param name="type">1是项目为中心   2是船舶为中心</param>
+        /// <returns></returns>
+        Task<ResponseAjaxResult<ShipPlanImageResponseDto>> SearchShipPlanImagesAsync(int type);
+
+
     }
 }

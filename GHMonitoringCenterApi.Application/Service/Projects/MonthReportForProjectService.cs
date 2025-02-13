@@ -91,8 +91,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             //2025年前没有出现过的资源月报数据
             var addBefore2024 = await _dbContext.Queryable<MonthReportDetailAdd>().Where(t => t.IsDelete == 1).ToListAsync();
             var pwbsIds = addBefore2024.Select(x => x.ProjectWBSId).ToList();
-            var projectIds = addBefore2024.Select(x => x.ProjectId.ToString()).ToList();
-
+            var projectIds = addBefore2024.Select(x => x.ProjectId.ToString()).Distinct().ToList();
             if (isStaging)
             {
                 //本月的数据为暂存的数据  清零是为了不做重复计算
@@ -111,7 +110,6 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     }
                     else
                     {
-
                         mRep.IsAllowDelete = true;
                         mRep.CompleteProductionAmount = item.CompleteProductionAmount;
                         mRep.CompletedQuantity = item.CompletedQuantity;
@@ -124,31 +122,6 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                         mRep.TotalCompleteProductionAmount = item.TotalCompleteProductionAmount;
                         mRep.TotalCompletedQuantity = item.TotalCompletedQuantity;
                         mRep.TotalOutsourcingExpensesAmount = item.TotalOutsourcingExpensesAmount;
-                    }
-
-                    if (pwbsIds.Contains(item.ProjectWBSId) && projectIds.Contains(item.ProjectId))
-                    {
-                        if(item.ProjectWBSId== "08dd1aa4-33ec-4bba-88bd-19c220446e6c".ToGuid()){
-                            var s= 1;
-                        }
-                        //如果在当月存在  相加 否则排掉
-                        if (mRep != null)
-                        {
-                            if (item.ProjectId == mRep.ProjectId && item.ShipId == mRep.ShipId && item.UnitPrice == mRep.UnitPrice && item.ProjectWBSId == mRep.ProjectWBSId)
-                            {
-                                item.YearCompletedQuantity += mRep.YearCompletedQuantity;
-                                item.YearCompleteProductionAmount += mRep.YearCompleteProductionAmount;
-                                item.YearOutsourcingExpensesAmount += mRep.YearOutsourcingExpensesAmount;
-
-                                item.TotalCompleteProductionAmount += mRep.TotalCompleteProductionAmount;
-                                item.TotalCompletedQuantity += mRep.TotalCompletedQuantity;
-                                item.TotalOutsourcingExpensesAmount += mRep.TotalOutsourcingExpensesAmount;
-                            }
-                            else
-                            {
-                                stagingList = stagingList.Where(item => !(item.ProjectId == mRep.ProjectId && item.ShipId == mRep.ShipId && item.UnitPrice == mRep.UnitPrice && item.ProjectWBSId == mRep.ProjectWBSId)).ToList();
-                            }
-                        }
                     }
                 }
                 mReportList.AddRange(newMRep);
@@ -343,12 +316,12 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                                     UnitPrice = item2.UnitPrice,
                                     OutPutType = item2.OutPutType,
                                     ShipId = item2.ShipId,
+                                    ShipName = item2.ShipName,
                                     ProjectWBSId = item2.ProjectWBSId,
                                     ConstructionNature = item2.ConstructionNature,
                                     TotalOutsourcingExpensesAmount = item2.OutsourcingExpensesAmount,
                                     TotalCompletedQuantity = item2.CompletedQuantity,
                                     TotalCompleteProductionAmount = item2.CompleteProductionAmount,
-                                    ShipName = item2.ShipName,
                                 });
                             }
                         }
