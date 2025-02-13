@@ -2576,7 +2576,7 @@ namespace GHMonitoringCenterApi.Application.Service
              .Select(x => new BasePullDownResponseDto { Id = x.Id, Name = x.Name, Type =SqlFunc.ToInt32(x.Code),Code=x.BusinessRemark}).OrderBy(x=>x.Type).ToListAsync();
             if (projectTypRequsetDto.EnableRemark == 1)
             {
-                responseAjaxResult.Data = ProjectTypeList.Select(x => new BasePullDownResponseDto() { Id = x.Id, Name = x.Name + x.Code }).ToList();
+                responseAjaxResult.Data = ProjectTypeList.Select(x => new BasePullDownResponseDto() { Id = x.Id, Type = SqlFunc.ToInt32(x.Code), Name = x.Name + x.Code }).ToList();
             }
             else
             {
