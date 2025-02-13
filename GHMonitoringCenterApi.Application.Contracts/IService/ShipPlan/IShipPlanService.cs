@@ -52,5 +52,9 @@ namespace GHMonitoringCenterApi.Application.Contracts.IService.ShipPlan
 
         Task<ResponseAjaxResult<List<ShipCompleteResponseDto>>> SearchShiCompleteAsync(ShipCompleteRequestDto shipPlanRequestDto);
 
+
+
+
+
     }
 }

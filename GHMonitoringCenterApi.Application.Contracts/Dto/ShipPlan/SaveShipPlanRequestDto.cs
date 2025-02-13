@@ -165,12 +165,12 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.ShipPlan
                 yield return new ValidationResult("船舶状态类型不合法", new string[] { nameof(ShipStatusType) });
             }
 
-            if (ShipStatusType != null && ShipStatusType.HasValue && ShipStatusType==1&& (ProjectId==null|| !ProjectId.HasValue))
+            if (ShipStatusType != null && ShipStatusType.HasValue && ShipStatusType==0&& (ProjectId==null|| !ProjectId.HasValue))
             {
                 yield return new ValidationResult("船舶为施工状态时项目Id必须要传", new string[] { nameof(ProjectId) });
             }
 
-            if (ShipStatusType != null && ShipStatusType.HasValue && (ShipStatusType > 1 || ShipStatusType <= 5) && ProjectId.HasValue)
+            if (ShipStatusType != null && ShipStatusType.HasValue && ShipStatusType > 1 && ShipStatusType <= 5 && ProjectId!=null&&ProjectId.HasValue)
             {
                 yield return new ValidationResult("船舶为非施工状态时项目Id不能传", new string[] { nameof(ProjectId) });
             }
