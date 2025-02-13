@@ -126,12 +126,9 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                         mRep.TotalOutsourcingExpensesAmount = item.TotalOutsourcingExpensesAmount;
                     }
                 }
-                mReportList = stagingList;
-                yReportList = stagingList;
-                klReportList = stagingList;
-                //mReportList.AddRange(newMRep);
-                //yReportList.AddRange(stagingList);
-                //klReportList.AddRange(stagingList);
+                mReportList.AddRange(newMRep);
+                yReportList.AddRange(stagingList);
+                klReportList.AddRange(stagingList);
             }
 
             //获取当前项目所有的月报存在的wbsid  不包含的wbsid 全部去掉
