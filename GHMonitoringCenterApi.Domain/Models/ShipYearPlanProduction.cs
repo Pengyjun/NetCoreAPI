@@ -14,6 +14,7 @@ namespace GHMonitoringCenterApi.Domain.Models
     [SugarTable("t_shipyearplanproduction", IsDisabledDelete = true)]
     public class ShipYearPlanProduction:BaseEntity<Guid>
     {
+       
         /// <summary>
         /// 船舶id
         /// </summary>
@@ -24,7 +25,11 @@ namespace GHMonitoringCenterApi.Domain.Models
         /// </summary>
         [SugarColumn(Length = 100)]
         public string ShipName { get; set; }
-
+        /// <summary>
+        /// 船舶类型
+        /// </summary>
+        [SugarColumn(Length = 36)]
+        public Guid ShipTypeId { get; set; }
         /// <summary>
         /// 项目id
         /// </summary>

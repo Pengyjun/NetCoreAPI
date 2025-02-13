@@ -45,11 +45,13 @@ namespace GHMonitoringCenterApi.Application.Service.ShipPlan
         public async Task<ResponseAjaxResult<bool>> SaveShipPlanAsync(SaveShipPlanRequestDto saveShipPlanRequestDto)
         {
             ResponseAjaxResult<bool> responseAjaxResult = new ();
+            var shipTypeId= await dbContent.Queryable<OwnerShip>().Where(x => x.IsDelete == 1 && x.PomId == saveShipPlanRequestDto.ShipId).Select(x=>x.TypeId.Value).FirstAsync();
             if (saveShipPlanRequestDto.ReuqestType)
             {
                 ShipYearPlanProduction model=mapper.Map<SaveShipPlanRequestDto, ShipYearPlanProduction>(saveShipPlanRequestDto);
                 int days= TimeHelper.GetTimeSpan(saveShipPlanRequestDto.StartTime, saveShipPlanRequestDto.EndTime).Days;
                 model.Days = days;
+                model.ShipTypeId = shipTypeId;
                 model.Year=DateTime.Now.Year;
                 var total = await dbContent.Queryable<ShipYearPlanProduction>().CountAsync(x => x.IsDelete == 1 && x.ShipId == saveShipPlanRequestDto.ShipId
                  && x.ProjectId == saveShipPlanRequestDto.ProjectId);
@@ -69,6 +71,7 @@ namespace GHMonitoringCenterApi.Application.Service.ShipPlan
                 ShipYearPlanProduction model = mapper.Map<SaveShipPlanRequestDto, ShipYearPlanProduction>(saveShipPlanRequestDto);
                 int days = TimeHelper.GetTimeSpan(saveShipPlanRequestDto.StartTime, saveShipPlanRequestDto.EndTime).Days;
                 model.Days = days;
+                model.ShipTypeId = shipTypeId;
                 var entity = await dbContent.Queryable<ShipYearPlanProduction>().Where(x => x.IsDelete == 1 && x.ShipId == saveShipPlanRequestDto.ShipId
                  && x.ProjectId == saveShipPlanRequestDto.ProjectId).FirstAsync();
                 if (entity ==null)
@@ -226,6 +229,28 @@ namespace GHMonitoringCenterApi.Application.Service.ShipPlan
             responseAjaxResult.Count = total;
             responseAjaxResult.Success();
             return responseAjaxResult;
+        }
+
+        /// <summary>
+        /// 根据用户填的船舶计划数据 生产图  
+        /// </summary>
+        /// <param name="type">1是项目为中心   2是船舶为中心</param>
+        /// <returns></returns>
+        public async Task<ResponseAjaxResult<ShipPlanImageResponseDto>> SearchShipPlanImagesAsync(int type)
+        {
+            ResponseAjaxResult<ShipPlanImageResponseDto> response = new ResponseAjaxResult<ShipPlanImageResponseDto>();
+            ShipPlanImageResponseDto shipPlanImageResponseDto = new ShipPlanImageResponseDto();
+            if (type == 1) 
+            {
+               var shipYearPlanList= await dbContent.Queryable<ShipYearPlanProduction>()
+                     .Where(x => x.IsDelete == 1).ToListAsync();
+            
+            
+            }
+            else if (type == 2) { }
+            response.Data = shipPlanImageResponseDto;
+            response.Success();
+            return response;
         }
     }
 }

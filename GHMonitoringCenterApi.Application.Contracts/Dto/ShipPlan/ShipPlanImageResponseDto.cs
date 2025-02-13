@@ -36,5 +36,10 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.ShipPlan
         /// 资源名称
         /// </summary>
         public string? ShipName { get; set; }
+
+        /// <summary>
+        /// 子节点
+        /// </summary>
+        public List<ShipPlanImageResponseDto> Children { get; set; }
     }
 }
