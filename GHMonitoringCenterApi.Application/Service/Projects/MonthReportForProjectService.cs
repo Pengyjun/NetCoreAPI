@@ -96,6 +96,8 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             {
                 //本月的数据为暂存的数据  清零是为了不做重复计算
                 List<ProjectWBSDto> newMRep = new(); //为了合并当月月报暂存的分组
+                List<ProjectWBSDto> newYRep = new(); //为了合并当月月报暂存的分组
+                List<ProjectWBSDto> newKlRep = new(); //为了合并当月月报暂存的分组
 
                 foreach (var item in stagingList)
                 {
@@ -124,11 +126,60 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                         mRep.TotalOutsourcingExpensesAmount = item.TotalOutsourcingExpensesAmount;
                     }
 
+                    var yRep = yReportList.FirstOrDefault(t => t.ProjectId == item.ProjectId && t.ShipId == item.ShipId && t.UnitPrice == item.UnitPrice && t.ProjectWBSId == item.ProjectWBSId);
+                    if (yRep == null)
+                    {
+                        if (Convert.ToInt32(item.CompletedQuantity) == 0)//过滤
+                        {
+                            item.IsAllowDelete = false;
+                        }
+                        newYRep.Add(item);
+                    }
+                    else
+                    {
+                        yRep.IsAllowDelete = true;
+                        yRep.CompleteProductionAmount = item.CompleteProductionAmount;
+                        yRep.CompletedQuantity = item.CompletedQuantity;
+                        yRep.OutsourcingExpensesAmount = item.OutsourcingExpensesAmount;
+
+                        yRep.YearCompletedQuantity = item.YearCompletedQuantity;
+                        yRep.YearCompleteProductionAmount = item.YearCompleteProductionAmount;
+                        yRep.YearOutsourcingExpensesAmount = item.YearOutsourcingExpensesAmount;
+
+                        yRep.TotalCompleteProductionAmount = item.TotalCompleteProductionAmount;
+                        yRep.TotalCompletedQuantity = item.TotalCompletedQuantity;
+                        yRep.TotalOutsourcingExpensesAmount = item.TotalOutsourcingExpensesAmount;
+                    }
+
+                    var klRep = yReportList.FirstOrDefault(t => t.ProjectId == item.ProjectId && t.ShipId == item.ShipId && t.UnitPrice == item.UnitPrice && t.ProjectWBSId == item.ProjectWBSId);
+                    if (klRep == null)
+                    {
+                        if (Convert.ToInt32(item.CompletedQuantity) == 0)//过滤
+                        {
+                            item.IsAllowDelete = false;
+                        }
+                        newKlRep.Add(item);
+                    }
+                    else
+                    {
+                        klRep.IsAllowDelete = true;
+                        klRep.CompleteProductionAmount = item.CompleteProductionAmount;
+                        klRep.CompletedQuantity = item.CompletedQuantity;
+                        klRep.OutsourcingExpensesAmount = item.OutsourcingExpensesAmount;
+
+                        klRep.YearCompletedQuantity = item.YearCompletedQuantity;
+                        klRep.YearCompleteProductionAmount = item.YearCompleteProductionAmount;
+                        klRep.YearOutsourcingExpensesAmount = item.YearOutsourcingExpensesAmount;
+
+                        klRep.TotalCompleteProductionAmount = item.TotalCompleteProductionAmount;
+                        klRep.TotalCompletedQuantity = item.TotalCompletedQuantity;
+                        klRep.TotalOutsourcingExpensesAmount = item.TotalOutsourcingExpensesAmount;
+                    }
                 }
 
                 mReportList.AddRange(newMRep);
-                yReportList.AddRange(stagingList);
-                klReportList.AddRange(stagingList);
+                yReportList.AddRange(newYRep);
+                klReportList.AddRange(newKlRep);
             }
 
             //获取当前项目所有的月报存在的wbsid  不包含的wbsid 全部去掉
