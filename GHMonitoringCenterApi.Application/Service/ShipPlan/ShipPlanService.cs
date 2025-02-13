@@ -350,7 +350,7 @@ namespace GHMonitoringCenterApi.Application.Service.ShipPlan
                            EndTime = x.EndTime.ToString("yyyy-MM-dd"),
                            Days = TimeHelper.GetTimeSpan(x.StartTime, x.EndTime).Days,
                            Id = x.Id,
-                           Pid= shipItem.Pid,
+                           Pid= shipItem.Sid,
                            ShipName = x.ShipName,
                            
                        })
