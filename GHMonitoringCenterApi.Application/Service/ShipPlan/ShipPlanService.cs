@@ -328,6 +328,7 @@ namespace GHMonitoringCenterApi.Application.Service.ShipPlan
                             });
                             shipPlanImageitem.Children = zdShip;
                         }
+                        sIndex += 1;
                     }
                     index += 1;
                     shipPlanImageResponseDtos.Add(shipPlanImageitem);
