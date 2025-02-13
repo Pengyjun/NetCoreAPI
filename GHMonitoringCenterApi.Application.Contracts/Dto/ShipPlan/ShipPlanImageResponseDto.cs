@@ -16,6 +16,12 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.ShipPlan
         /// 编号
         /// </summary>
         public Guid  Id { get; set; }
+
+        public int Sid { get; set; }
+        /// <summary>
+        /// 父ID
+        /// </summary>
+        public int Pid { get; set; }
         /// <summary>
         /// 名称
         /// </summary>
