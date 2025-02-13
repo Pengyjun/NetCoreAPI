@@ -10,6 +10,7 @@ namespace GHMonitoringCenterApi.Domain.Models
     /// <summary>
     /// 项目管理类型
     /// </summary>
+    [SugarTable("t_projectmangertype", IsDisabledDelete = true)]
     public class ProjectMangerType:BaseEntity<Guid>
     {
         /// <summary>

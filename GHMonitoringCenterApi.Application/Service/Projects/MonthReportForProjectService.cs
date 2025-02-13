@@ -121,8 +121,8 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     }
                 }
                 mReportList.AddRange(newMRep);
-                yReportList.AddRange(stagingList);
-                klReportList.AddRange(stagingList);
+                yReportList.AddRange(stagingList.Where(x => x.DateMonth != 0));
+                klReportList.AddRange(stagingList.Where(x => x.DateMonth != 0));
             }
 
             //获取当前项目所有的月报存在的wbsid  不包含的wbsid 全部去掉
@@ -154,6 +154,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
         /// <param name="klReportList"></param>
         /// <param name="bData"></param>
         /// <param name="addBefore2024"></param>
+        /// <param name="dateMonth"></param>
         /// <returns></returns>
         public List<ProjectWBSDto> BuildTree(string? rootPid, List<ProjectWBSDto> wbsList, List<Guid>? mpWbsIds, List<ProjectWBSDto> mReportList, List<ProjectWBSDto> yReportList, List<ProjectWBSDto> klReportList, List<MonthReportForProjectBaseDataResponseDto> bData, List<MonthReportDetailAdd> addBefore2024, int? dateMonth)
         {
