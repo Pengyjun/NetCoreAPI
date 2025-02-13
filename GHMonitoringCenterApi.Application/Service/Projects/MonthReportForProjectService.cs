@@ -123,7 +123,14 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                         mRep.TotalCompletedQuantity = item.TotalCompletedQuantity;
                         mRep.TotalOutsourcingExpensesAmount = item.TotalOutsourcingExpensesAmount;
                     }
+
                 }
+                var idsy = stagingList.Select(x =>x.Id).ToList();
+                yReportList = yReportList.Where(x => !idsy.Contains(x.Id)).ToList();
+
+                var idskailei = stagingList.Select(x => x.Id).ToList();
+                klReportList = klReportList.Where(x => !idskailei.Contains(x.Id)).ToList();
+
                 mReportList.AddRange(newMRep);
                 yReportList.AddRange(stagingList);
                 klReportList.AddRange(stagingList);

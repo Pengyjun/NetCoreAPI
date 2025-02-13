@@ -812,5 +812,19 @@ namespace GHMonitoringCenterApi.Domain.Shared.Util
             }
             return Convert.ToDateTime(startTime).Year;
         }
+
+
+
+        #region 判断是否是闰年
+        /// <summary>
+        /// 判断是否是闰年
+        /// </summary>
+        /// <param name="year"></param>
+        /// <returns></returns>
+       public static  bool IsLeapYear(int year)
+        {
+            return (year % 4 == 0 && year % 100 != 0) || (year % 400 == 0);
+        }
+        #endregion
     }
 }
