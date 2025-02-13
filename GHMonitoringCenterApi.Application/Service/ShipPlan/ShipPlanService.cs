@@ -7,6 +7,7 @@ using GHMonitoringCenterApi.Domain.Models;
 using GHMonitoringCenterApi.Domain.Shared;
 using GHMonitoringCenterApi.Domain.Shared.Const;
 using GHMonitoringCenterApi.Domain.Shared.Util;
+using Microsoft.AspNetCore.Mvc;
 using Npgsql.TypeHandlers.DateTimeHandlers;
 using NPOI.HPSF;
 using SqlSugar;
@@ -261,14 +262,20 @@ namespace GHMonitoringCenterApi.Application.Service.ShipPlan
                   new ShipPlanImageResponseDto(){ 
                    Name="耙吸船",
                     ShipType="06b7a5ce-e105-46c8-8b1d-24c8ba7f9dbf".ToGuid(),
+                     Sid=2,
+                     Pid=1,
                   },
                   new ShipPlanImageResponseDto(){
                    Name="绞吸船",
                     ShipType="f1718922-c213-4409-a59f-fdaf3d6c5e23".ToGuid(),
+                     Sid=3,
+                     Pid=1,
                   },
                   new ShipPlanImageResponseDto(){
                    Name="抓斗船",
                    ShipType="6959792d-27a4-4f2b-8fa4-a44222f08cb2".ToGuid(),
+                    Sid=4,
+                    Pid=1,
                   },
                 };
                 shipPlanImageResponseDtoItem.Children= shipPlanImageResponseDtos;
@@ -294,6 +301,8 @@ namespace GHMonitoringCenterApi.Application.Service.ShipPlan
 
                 #region 数据结构拼接
                 //第三级查询
+                var sid = 4;
+                
                 foreach (var item in shipYearPlanList)
                 {
                     var result = shipYearPlanList.Where(x => x.ShipTypeId == item.ShipTypeId)
@@ -301,22 +310,25 @@ namespace GHMonitoringCenterApi.Application.Service.ShipPlan
                        {
                            Children = new List<ShipPlanImageResponseDto>(),
                            Name = x.ShipName,
-                           Id=x.ShipId.Value,
+                           Id = x.ShipId.Value,
                            ShipType = x.ShipTypeId,
                            StartTime = x.StartTime.ToString("yyyy-MM-dd"),
                            EndTime = x.EndTime.ToString("yyyy-MM-dd"),
                            Days = TimeHelper.GetTimeSpan(x.StartTime, x.EndTime).Days,
-                           ShipName=x.ShipName
-                       }).Distinct()
+                           ShipName = x.ShipName,
+                           Sid = sid + 1,
+                           Pid= item.ShipTypeId== "06b7a5ce-e105-46c8-8b1d-24c8ba7f9dbf".ToGuid()?2:
+                           item.ShipTypeId == "f1718922-c213-4409-a59f-fdaf3d6c5e23".ToGuid()?3:
+                           item.ShipTypeId == "6959792d-27a4-4f2b-8fa4-a44222f08cb2".ToGuid()?4:0,
+                       })
                        .ToList();
                     if (
                         shipPlanImageResponseDtos.Count(x => x.ShipType == item.ShipTypeId)> 0
                         && shipPlanImageResponseDtos.Where(x => x.ShipType == item.ShipTypeId).First().Children.Count==0)
                     {
-                        result = result.GroupBy(x => x.ShipName).Select(x => x.First()).ToList();
                         shipPlanImageResponseDtos.Where(x => x.ShipType == item.ShipTypeId).First().Children.AddRange(result);
                     }
-              
+                    sid += 1;
                 }
                 //第四级查询
                 foreach (var shipItem in shipPlanImageResponseDtos)
@@ -342,6 +354,7 @@ namespace GHMonitoringCenterApi.Application.Service.ShipPlan
 
                     shipItem.StartTime = shipItem.Children?.Min(x => x.StartTime);
                     shipItem.EndTime = shipItem.Children?.Max(x => x.EndTime);
+                    shipItem.Children = shipItem.Children!=null?shipItem.Children.GroupBy(x => x.ShipName).Select(x => x.First()).ToList():new List<ShipPlanImageResponseDto>();
                 }
                 response.Data = shipPlanImageResponseDtoItem;
                 response.Count= shipPlanImageResponseDtos.Count;
