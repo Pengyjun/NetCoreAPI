@@ -17,6 +17,15 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.ShipPlan
         /// 请求类型
         /// </summary>
         public bool ReuqestType { get; set; }
+
+        /// <summary>
+        ///船舶状态类型
+        /// </summary>
+        public int? ShipStatusType { get; set; }
+        /// <summary>
+        /// 船舶状态名称
+        /// </summary>
+        public string? ShipStatusName { get; set; }
         /// <summary>
         /// 主键
         /// </summary>
@@ -40,7 +49,7 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.ShipPlan
         /// 项目名称
         /// </summary>
 
-        public string ProjectName { get; set; }
+        public string? ProjectName { get; set; }
 
         /// <summary>
         /// 间隔天数
@@ -149,6 +158,21 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.ShipPlan
             if (!ReuqestType && (Id==null||  !Id.HasValue || Id.Value == Guid.Empty))
             {
                 yield return new ValidationResult("编辑时Id不能为空", new string[]{nameof(Id) }); 
+            }
+
+            if (ShipStatusType == null || !ShipStatusType.HasValue || ShipStatusType.Value < 0 || ShipStatusType.Value > 5)
+            {
+                yield return new ValidationResult("船舶状态类型不合法", new string[] { nameof(ShipStatusType) });
+            }
+
+            if (ShipStatusType != null && ShipStatusType.HasValue && ShipStatusType==1&& (ProjectId==null|| !ProjectId.HasValue))
+            {
+                yield return new ValidationResult("船舶为施工状态时项目Id必须要传", new string[] { nameof(ProjectId) });
+            }
+
+            if (ShipStatusType != null && ShipStatusType.HasValue && (ShipStatusType > 1 || ShipStatusType <= 5) && ProjectId.HasValue)
+            {
+                yield return new ValidationResult("船舶为非施工状态时项目Id不能传", new string[] { nameof(ProjectId) });
             }
         }
     }
