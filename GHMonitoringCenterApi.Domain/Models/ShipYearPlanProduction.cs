@@ -38,6 +38,17 @@ namespace GHMonitoringCenterApi.Domain.Models
         public string ProjectName { get; set; }
 
         /// <summary>
+        ///船舶状态类型
+        /// </summary>
+        [SugarColumn(ColumnDataType = "int")]
+        public int? ShipStatusType { get; set; }
+        /// <summary>
+        /// 船舶状态名称
+        /// </summary>
+        [SugarColumn(Length = 36)]
+        public string? ShipStatusName { get; set; }
+
+        /// <summary>
         /// 间隔天数
         /// </summary>
         [SugarColumn(ColumnDataType = "int")]

@@ -29,7 +29,17 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.ShipPlan
         [ExcelColumnName("船舶名称")]
         [ExcelColumnWidth(20)]
         public string ShipName { get; set; }
-
+        /// <summary>
+        ///船舶状态类型
+        /// </summary>
+        [ExcelIgnore]
+        public int? ShipStatusType { get; set; }
+        /// <summary>
+        /// 船舶状态名称
+        /// </summary>
+        [ExcelColumnName("船舶状态名称")]
+        [ExcelColumnWidth(20)]
+        public string? ShipStatusName { get; set; }
         /// <summary>
         /// 项目id
         /// </summary>
