@@ -307,11 +307,13 @@ namespace GHMonitoringCenterApi.Application.Service.ShipPlan
                            EndTime = x.EndTime.ToString("yyyy-MM-dd"),
                            Days = TimeHelper.GetTimeSpan(x.StartTime, x.EndTime).Days,
                            ShipName=x.ShipName
-                       })
+                       }).Distinct()
                        .ToList();
-                    if (shipPlanImageResponseDtos.Count(x => x.ShipType == item.ShipTypeId)> 0
+                    if (
+                        shipPlanImageResponseDtos.Count(x => x.ShipType == item.ShipTypeId)> 0
                         && shipPlanImageResponseDtos.Where(x => x.ShipType == item.ShipTypeId).First().Children.Count==0)
                     {
+                        result = result.GroupBy(x => x.ShipName).Select(x => x.First()).ToList();
                         shipPlanImageResponseDtos.Where(x => x.ShipType == item.ShipTypeId).First().Children.AddRange(result);
                     }
               
