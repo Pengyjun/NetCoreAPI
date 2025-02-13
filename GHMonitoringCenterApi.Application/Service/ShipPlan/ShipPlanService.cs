@@ -243,6 +243,7 @@ namespace GHMonitoringCenterApi.Application.Service.ShipPlan
             ResponseAjaxResult<ShipPlanImageResponseDto> response = new ResponseAjaxResult<ShipPlanImageResponseDto>();
             if (type == 1)
             {
+                //第一级
                 ShipPlanImageResponseDto shipPlanImageResponseDtoItem = new ShipPlanImageResponseDto()
                 {
                     Name = $"公司{DateTime.Now.Year}年船舶计划",
@@ -254,87 +255,100 @@ namespace GHMonitoringCenterApi.Application.Service.ShipPlan
                     Sid=1,
                     Pid=0,
                 };
+                //第二级
+                List<ShipPlanImageResponseDto> shipPlanImageResponseDtos = new List<ShipPlanImageResponseDto>()
+                { 
+                  new ShipPlanImageResponseDto(){ 
+                   Name="耙吸船",
+                    ShipType="06b7a5ce-e105-46c8-8b1d-24c8ba7f9dbf".ToGuid(),
+                  },
+                  new ShipPlanImageResponseDto(){
+                   Name="绞吸船",
+                    ShipType="f1718922-c213-4409-a59f-fdaf3d6c5e23".ToGuid(),
+                  },
+                  new ShipPlanImageResponseDto(){
+                   Name="抓斗船",
+                   ShipType="6959792d-27a4-4f2b-8fa4-a44222f08cb2".ToGuid(),
+                  },
+                };
+                shipPlanImageResponseDtoItem.Children= shipPlanImageResponseDtos;
+                //第三级
                 List<ShipPlanImageResponseDto> pxShip = new List<ShipPlanImageResponseDto>();
                 List<ShipPlanImageResponseDto> jxShip = new List<ShipPlanImageResponseDto>();
                 List<ShipPlanImageResponseDto> zdShip = new List<ShipPlanImageResponseDto>();
-                  
-                  var shipYearPlanList= await dbContent.Queryable<ShipYearPlanProduction>()
-                     .Where(x => x.IsDelete == 1).ToListAsync();
-                var shipTypeIds= shipYearPlanList.Select(x=>x.ShipTypeId).ToList();
-               var shipTypeList= await dbContent.Queryable<ShipPingType>().Where(x => x.IsDelete == 1&& shipTypeIds.Contains(x.PomId.Value)).OrderBy(x=>x.Sequence).ToListAsync();
-                List<ShipPlanImageResponseDto> shipPlanImageResponseDtos = new List<ShipPlanImageResponseDto>();
-                var index = 0;
-                var sIndex =4;
-                foreach (var item in shipTypeList)
-                {
+                //第四级
+                List<ShipPlanImageResponseDto> pxProjectShip = new List<ShipPlanImageResponseDto>();
+                List<ShipPlanImageResponseDto> jxProjectShip = new List<ShipPlanImageResponseDto>();
+                List<ShipPlanImageResponseDto> zdProjectShip = new List<ShipPlanImageResponseDto>();
 
-                    var shipPlanImageitem = new ShipPlanImageResponseDto()
+
+                #region 数据查询
+                var shipYearPlanList = await dbContent.Queryable<ShipYearPlanProduction>()
+                    .Where(x => x.IsDelete == 1).ToListAsync();
+                //船舶类型
+                var shipTypeIds = shipYearPlanList.Select(x => x.ShipTypeId).ToList();
+                //船舶类型
+                var shipTypeList = await dbContent.Queryable<ShipPingType>().Where(x => x.IsDelete == 1 && shipTypeIds.Contains(x.PomId.Value)).OrderBy(x => x.Sequence).ToListAsync();
+                #endregion
+
+
+                #region 数据结构拼接
+                //第三级查询
+                foreach (var item in shipYearPlanList)
+                {
+                    var result = shipYearPlanList.Where(x => x.ShipTypeId == item.ShipTypeId)
+                       .Select(x => new ShipPlanImageResponseDto()
+                       {
+                           Children = new List<ShipPlanImageResponseDto>(),
+                           Name = x.ShipName,
+                           Id=x.ShipId.Value,
+                           ShipType = x.ShipTypeId,
+                           StartTime = x.StartTime.ToString("yyyy-MM-dd"),
+                           EndTime = x.EndTime.ToString("yyyy-MM-dd"),
+                           Days = TimeHelper.GetTimeSpan(x.StartTime, x.EndTime).Days,
+                           ShipName=x.ShipName
+                       }).Distinct()
+                       .ToList();
+                    if (
+                        shipPlanImageResponseDtos.Count(x => x.ShipType == item.ShipTypeId)> 0
+                        && shipPlanImageResponseDtos.Where(x => x.ShipType == item.ShipTypeId).First().Children.Count==0)
                     {
-                        Name = item.Name.Replace("挖泥", "").Trim(),
-                        Days = Utils.IsLeapYear(DateTime.Now.Year) ? 366 : 365,
-                        Children = new List<ShipPlanImageResponseDto>(),
-                        Id = GuidUtil.Next(),
-                        StartTime = DateTime.Now.ToString("yyyy-01-01"),
-                        EndTime = DateTime.Now.ToString("yyyy-12-31"),
-                        Sid = (index + 2),
-                        Pid = 1
-                    };
-                    //过滤类型
-                    shipYearPlanList= shipYearPlanList.Where(x=>x.ShipTypeId==item.PomId).ToList();
-                    foreach (var ship in shipYearPlanList)
-                    {
-                        if (index == 0)
-                        {
-                            pxShip.Add(new ShipPlanImageResponseDto()
-                            {
-                                Name = ship.ShipName,
-                                Days = TimeHelper.GetTimeSpan(ship.StartTime, ship.EndTime).Days,
-                                Children = new List<ShipPlanImageResponseDto>(),
-                                Id = ship.Id,
-                                StartTime = ship.StartTime.ToString("yyyy-MM-dd"),
-                                EndTime = ship.EndTime.ToString("yyyy-MM-dd"),
-                                Sid = sIndex + 1,
-                                Pid= 2
-                            }) ;
-                            shipPlanImageitem.Children = pxShip;
-                        }
-                        else if (index == 1)
-                        {
-                            jxShip.Add(new ShipPlanImageResponseDto()
-                            {
-                                Name = ship.ShipName,
-                                Days = TimeHelper.GetTimeSpan(ship.StartTime, ship.EndTime).Days,
-                                Children = new List<ShipPlanImageResponseDto>(),
-                                Id = ship.Id,
-                                StartTime = ship.StartTime.ToString("yyyy-MM-dd"),
-                                EndTime = ship.EndTime.ToString("yyyy-MM-dd"),
-                                Sid = sIndex + 1,
-                                Pid = 3
-                            });
-                            shipPlanImageitem.Children = jxShip;
-                        }
-                        else if (index == 2)
-                        {
-                            zdShip.Add(new ShipPlanImageResponseDto()
-                            {
-                                Name = ship.ShipName,
-                                Days = TimeHelper.GetTimeSpan(ship.StartTime, ship.EndTime).Days,
-                                Children = new List<ShipPlanImageResponseDto>(),
-                                Id = ship.Id,
-                                StartTime = ship.StartTime.ToString("yyyy-MM-dd"),
-                                EndTime = ship.EndTime.ToString("yyyy-MM-dd"),
-                                Sid = sIndex + 1,
-                                Pid = 4
-                            });
-                            shipPlanImageitem.Children = zdShip;
-                        }
-                        sIndex += 1;
+                        result = result.GroupBy(x => x.ShipName).Select(x => x.First()).ToList();
+                        shipPlanImageResponseDtos.Where(x => x.ShipType == item.ShipTypeId).First().Children.AddRange(result);
                     }
-                    index += 1;
-                    shipPlanImageResponseDtos.Add(shipPlanImageitem);
+              
                 }
-                shipPlanImageResponseDtoItem.Children = shipPlanImageResponseDtos;
+                //第四级查询
+                foreach (var shipItem in shipPlanImageResponseDtos)
+                {
+                    
+                    foreach (var sitem in shipItem.Children)
+                    {
+                        var result = shipYearPlanList.Where(x => x.ShipTypeId == sitem.ShipType && x.ShipId == sitem.Id)
+                       .Select(x => new ShipPlanImageResponseDto()
+                       {
+                           Children = new List<ShipPlanImageResponseDto>(),
+                           Name = string.IsNullOrWhiteSpace(x.ProjectName) ? x.ShipStatusName : x.ProjectName,
+                           ShipType = x.ShipTypeId,
+                           StartTime = x.StartTime.ToString("yyyy-MM-dd"),
+                           EndTime = x.EndTime.ToString("yyyy-MM-dd"),
+                           Days = TimeHelper.GetTimeSpan(x.StartTime, x.EndTime).Days,
+                           Id = x.Id,
+                           ShipName = x.ShipName,
+                       })
+                       .ToList();
+                        sitem.Children.AddRange(result);
+                    }
+
+                    shipItem.StartTime = shipItem.Children?.Min(x => x.StartTime);
+                    shipItem.EndTime = shipItem.Children?.Max(x => x.EndTime);
+                }
                 response.Data = shipPlanImageResponseDtoItem;
+                response.Count= shipPlanImageResponseDtos.Count;
+                #endregion
+
+
+
             }
             else if (type == 2) 
             {

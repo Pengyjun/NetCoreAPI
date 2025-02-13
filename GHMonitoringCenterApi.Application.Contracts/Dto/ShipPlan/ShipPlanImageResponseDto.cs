@@ -16,6 +16,10 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.ShipPlan
         /// 编号
         /// </summary>
         public Guid  Id { get; set; }
+        /// <summary>
+        /// 船舶类型
+        /// </summary>
+        public Guid ShipType { get; set; }
 
         public int Sid { get; set; }
         /// <summary>
@@ -46,6 +50,6 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.ShipPlan
         /// <summary>
         /// 子节点
         /// </summary>
-        public List<ShipPlanImageResponseDto> Children { get; set; }
+        public List<ShipPlanImageResponseDto> Children { get; set; }=new List<ShipPlanImageResponseDto>();
     }
 }
