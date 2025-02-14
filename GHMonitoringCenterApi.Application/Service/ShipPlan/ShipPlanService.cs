@@ -279,14 +279,6 @@ namespace GHMonitoringCenterApi.Application.Service.ShipPlan
                   },
                 };
                 shipPlanImageResponseDtoItem.Children= shipPlanImageResponseDtos;
-                //第三级
-                List<ShipPlanImageResponseDto> pxShip = new List<ShipPlanImageResponseDto>();
-                List<ShipPlanImageResponseDto> jxShip = new List<ShipPlanImageResponseDto>();
-                List<ShipPlanImageResponseDto> zdShip = new List<ShipPlanImageResponseDto>();
-                //第四级
-                List<ShipPlanImageResponseDto> pxProjectShip = new List<ShipPlanImageResponseDto>();
-                List<ShipPlanImageResponseDto> jxProjectShip = new List<ShipPlanImageResponseDto>();
-                List<ShipPlanImageResponseDto> zdProjectShip = new List<ShipPlanImageResponseDto>();
 
 
                 #region 数据查询
@@ -350,6 +342,7 @@ namespace GHMonitoringCenterApi.Application.Service.ShipPlan
                            EndTime = x.EndTime.ToString("yyyy-MM-dd"),
                            Days = TimeHelper.GetTimeSpan(x.StartTime, x.EndTime).Days,
                            Id = x.Id,
+                           Pid= shipItem.Sid,
                            ShipName = x.ShipName,
                            
                        })

@@ -116,19 +116,37 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                         mRep.CompleteProductionAmount = item.CompleteProductionAmount;
                         mRep.CompletedQuantity = item.CompletedQuantity;
                         mRep.OutsourcingExpensesAmount = item.OutsourcingExpensesAmount;
+                    }
 
-                        mRep.YearCompletedQuantity = item.YearCompletedQuantity;
-                        mRep.YearCompleteProductionAmount = item.YearCompleteProductionAmount;
-                        mRep.YearOutsourcingExpensesAmount = item.YearOutsourcingExpensesAmount;
+                    var yRep = yReportList.FirstOrDefault(t => t.ProjectId == item.ProjectId && t.ShipId == item.ShipId && t.UnitPrice == item.UnitPrice && t.ProjectWBSId == item.ProjectWBSId);
+                    if (yRep == null)
+                    {
+                        newYRep.Add(item);
+                    }
+                    else
+                    {
+                        yRep.IsAllowDelete = true;
+                        yRep.CompleteProductionAmount = item.CompleteProductionAmount;
+                        yRep.CompletedQuantity = item.CompletedQuantity;
+                        yRep.OutsourcingExpensesAmount = item.OutsourcingExpensesAmount;
+                    }
 
-                        mRep.TotalCompletedQuantity = item.TotalCompletedQuantity;
-                        mRep.TotalCompleteProductionAmount = item.TotalCompleteProductionAmount;
-                        mRep.TotalOutsourcingExpensesAmount = item.TotalOutsourcingExpensesAmount;
+                    var kRep = klReportList.FirstOrDefault(t => t.ProjectId == item.ProjectId && t.ShipId == item.ShipId && t.UnitPrice == item.UnitPrice && t.ProjectWBSId == item.ProjectWBSId);
+                    if (kRep == null)
+                    {
+                        newKlRep.Add(item);
+                    }
+                    else
+                    {
+                        kRep.IsAllowDelete = true;
+                        kRep.CompleteProductionAmount = item.CompleteProductionAmount;
+                        kRep.CompletedQuantity = item.CompletedQuantity;
+                        kRep.OutsourcingExpensesAmount = item.OutsourcingExpensesAmount;
                     }
                 }
                 mReportList.AddRange(newMRep);
-                yReportList.AddRange(stagingList);
-                klReportList.AddRange(stagingList);
+                yReportList.AddRange(newYRep);
+                klReportList.AddRange(newKlRep);
             }
 
             //获取当前项目所有的月报存在的wbsid  不包含的wbsid 全部去掉
