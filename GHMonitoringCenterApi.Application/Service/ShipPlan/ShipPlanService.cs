@@ -191,7 +191,7 @@ namespace GHMonitoringCenterApi.Application.Service.ShipPlan
                 model.QuantityWork = model.QuantityWork * 10000;
                 model.CompleteOutputValue = model.CompleteOutputValue * 10000;
                 model.PlanOutputValue = model.PlanOutputValue * 10000;
-                var total = await dbContent.Queryable<ShipCompleteProduction>().CountAsync(x => x.IsDelete == 1 && x.ShipId == saveShipCompleteRequestDto.ShipId);
+                var total = await dbContent.Queryable<ShipCompleteProduction>().CountAsync(x => x.IsDelete == 1 && x.ShipId == saveShipCompleteRequestDto.ShipId&&x.DateDay== saveShipCompleteRequestDto.DateDay);
 
                 if (total >= 1)
                 {
@@ -208,7 +208,7 @@ namespace GHMonitoringCenterApi.Application.Service.ShipPlan
                 ShipCompleteProduction model = mapper.Map<SaveShipCompleteRequestDto, ShipCompleteProduction>(saveShipCompleteRequestDto);
                 model.DateDay = saveShipCompleteRequestDto.DateDay;
                 model.DiffProductionValue = model.CompleteOutputValue - model.PlanOutputValue;
-                var entity = await dbContent.Queryable<ShipCompleteProduction>().Where(x => x.IsDelete == 1 && x.ShipId == saveShipCompleteRequestDto.ShipId
+                var entity = await dbContent.Queryable<ShipCompleteProduction>().Where(x => x.IsDelete == 1 && x.ShipId == saveShipCompleteRequestDto.ShipId&&x.DateDay== saveShipCompleteRequestDto.DateDay
                  ).FirstAsync();
                 if (entity == null)
                 {
