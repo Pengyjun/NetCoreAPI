@@ -43,6 +43,9 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project.Report
         /// </summary>
         public class ResShipForReport
         {
+
+            public DateTime EnterTime { get; set; }
+            public DateTime QuitTime { get; set; }
             /// <summary>
             /// 项目Id
             /// </summary>

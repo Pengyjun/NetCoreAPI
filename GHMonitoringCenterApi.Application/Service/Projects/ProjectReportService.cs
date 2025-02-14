@@ -5968,11 +5968,28 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 .OrderByDescending(t => t.CreateTime)
                 .Select(t => new ShipsForReportResponseDto.ResShipForReport()
                 {
+                    EnterTime = t.EnterTime.Value,
+                    QuitTime=t.QuitTime.Value,
                     ShipId = t.ShipId,
                     ProjectId = t.ProjectId,
                     ShipType = t.ShipType,
                     Remarks = t.Remarks,
                 }).ToPageListAsync(model.PageIndex, model.PageSize, total);
+            List<Guid> removeShipIds = new List<Guid>();
+            foreach (var item in resShips)
+            {
+                if (item.QuitTime == default(DateTime))
+                {
+                    item.QuitTime = DateTime.MaxValue;
+                }
+                    var time = item.QuitTime.ToString("yyyyMM").ObjToInt();
+                if (time <model.DateMonth)
+                {
+                    removeShipIds.Add(item.ShipId);
+                }
+            }
+            resShips = resShips.Where(x => !removeShipIds.Contains(x.ShipId)).ToList();
+            total = total - removeShipIds.Count;
             var ownerShipIds = resShips.Where(t => t.ShipType == ShipType.OwnerShip).Select(t => t.ShipId).ToArray();
             var subShipIds = resShips.Where(t => t.ShipType == ShipType.SubShip).Select(t => t.ShipId).ToArray();
             var ships = await GetShipPartsAsync(ownerShipIds, ShipType.OwnerShip);
