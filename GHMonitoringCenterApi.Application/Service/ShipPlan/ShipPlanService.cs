@@ -504,8 +504,8 @@ namespace GHMonitoringCenterApi.Application.Service.ShipPlan
                 .ToListAsync();
 
             //计划产值
-            var startTime = DateTime.Now.Year.ToString("yyyy01").ObjToInt();
-            var endTime = DateTime.Now.Year.ToString("yyyy12").ObjToInt();
+            var startTime = DateTime.Now.ToString("yyyy01").ObjToInt();
+            var endTime = DateTime.Now.ToString("yyyy12").ObjToInt();
             shipPlanCompleteResponseDtos.YAxisPlan= shipCompleteList.Where(x=>x.DateDay>= startTime&&x.DateDay>= endTime).Select(x=>x.PlanOutputValue).ToList();
             shipPlanCompleteResponseDtos.YAxisComplete = shipCompleteList.Where(x => x.DateDay >= startTime && x.DateDay >= endTime).Select(x => x.CompleteOutputValue).ToList();
             response.Data= shipPlanCompleteResponseDtos;
@@ -540,8 +540,8 @@ namespace GHMonitoringCenterApi.Application.Service.ShipPlan
             //6959792d-27a4-4f2b-8fa4-a44222f08cb2  抓斗船
             var zdShipList = shipTypeList.Where(x => x.TypeId == "6959792d-27a4-4f2b-8fa4-a44222f08cb2".ToGuid()).Select(x => x.PomId).ToList();
             //计划产值
-            var startTime = DateTime.Now.Year.ToString("yyyy01").ObjToInt();
-            var endTime = DateTime.Now.Year.ToString("yyyy12").ObjToInt();
+            var startTime = DateTime.Now.ToString("yyyy01").ObjToInt();
+            var endTime = DateTime.Now.ToString("yyyy12").ObjToInt();
 
             shipPlanCompleteResponseDtos.YAxisPxPlan = shipCompleteList.Where(x => x.DateDay >= startTime && x.DateDay >= endTime
             && pxShipList.Contains(x.ShipId.Value)).Select(x => x.PlanOutputValue).ToList();
