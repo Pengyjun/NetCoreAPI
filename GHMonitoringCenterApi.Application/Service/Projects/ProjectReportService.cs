@@ -2457,61 +2457,61 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                  .Where((m, p) => m.DateMonth != 202306)
                   .WhereIF(model.ManagerType.HasValue, (m, p) => p.ManagerType == model.ManagerType)
                 .Select((m, p) => new MonthtReportsResponseDto.MonthtReportDto()
-            {
-                Id = m.Id,
-                ProjectId = m.ProjectId,
-                DateMonth = m.DateMonth,
-                AccomplishQuantities = SqlFunc.Round(m.CompletedQuantity, 2),
-                AccomplishValue = model.IsConvert == true ? m.CompleteProductionAmount : m.CurrencyCompleteProductionAmount,
-                AccomplishValue2 = m.CompleteProductionAmount,
-                RecognizedValue = SqlFunc.Round(m.PartyAConfirmedProductionAmount, 2),
-                PaymentAmount = m.PartyAPayAmount,
-                ProgressDeviationReasonType = m.ProgressDeviationReason,
-                CostDeviationReasonType = m.CostDeviationReason,
-                CostDeviationDescription = m.CostDeviationDescription,
-                ProjectedCost = m.MonthEstimateCostAmount,
-                Name = p.Name,
-                ProjectTypeId = p.TypeId,
-                ExchangeRate = p.ExchangeRate,
-                ConstructionQualificationId = p.ProjectConstructionQualificationId,
-                Tag = p.Tag,
-                Tag2 = p.Tag2,
-                Category = p.Category,
-                CompanyId = p.CompanyId,
-                AreaId = p.AreaId,
-                RegionId = p.RegionId,
-                StatusId = p.StatusId,
-                CurrencyId = p.CurrencyId,
-                ClassifyStandard = p.ClassifyStandard,
-                ContractAmount = p.Amount,//合同额
-                ValidContractAmount = p.ECAmount,//有效合同额
-                Remarks = p.QuantityRemarks,
-                BudgetInterestRate = p.BudgetInterestRate * 100,
-                BudgetaryReasons = p.BudgetaryReasons,
-                CompilationTime = p.CompilationTime,
-                AdministrationNumber = p.Administrator,
-                ConstructionNumber = p.Constructor,
-                PersonReportForms = p.ReportFormer,
-                PhoneReportForms = p.ReportForMertel,
-                Code = p.Code, //项目编码
-                ContractMeaPayProp = p.ContractMeaPayProp, //比例
-                TaxRate = p.Rate * 100,
-                ProgressDescription = m.ProgressDescription,//形象进度描述
-                ProgressDeviationDescription = m.ProgressDeviationDescription,//进度偏差原因
-                ProgressDeviationDescriptionPushPom = m.ProgressDeviationDescriptionPushPom,//进度偏差原因（pom）
-                ProgressDescriptionPushPom = m.ProgressDescriptionPushPom,//形象进度描述（pom）
-                PushStatus = m.IsPushPom,//推送次数
-                StatusText = m.StatusText,
-                OutsourcingExpensesAmount = m.OutsourcingExpensesAmount,
-                UpdateTime = m.UpdateTime,
-                CreateTime = m.CreateTime,
-                IsSubProject = p.IsSubContractProject,
-                ActualCompAmount = m.ActualCompAmount,
-                CurrencyOutsourcingExpensesAmount = m.CurrencyOutsourcingExpensesAmount,
-                RMBHOutValue = m.RMBHOutValue,
-                RMBHValue = m.RMBHValue,
-                ActualCompQuantity = m.ActualCompCompletedQuantity,
-            });
+                {
+                    Id = m.Id,
+                    ProjectId = m.ProjectId,
+                    DateMonth = m.DateMonth,
+                    AccomplishQuantities = SqlFunc.Round(m.CompletedQuantity, 2),
+                    AccomplishValue = model.IsConvert == true ? m.CompleteProductionAmount : m.CurrencyCompleteProductionAmount,
+                    AccomplishValue2 = m.CompleteProductionAmount,
+                    RecognizedValue = SqlFunc.Round(m.PartyAConfirmedProductionAmount, 2),
+                    PaymentAmount = m.PartyAPayAmount,
+                    ProgressDeviationReasonType = m.ProgressDeviationReason,
+                    CostDeviationReasonType = m.CostDeviationReason,
+                    CostDeviationDescription = m.CostDeviationDescription,
+                    ProjectedCost = m.MonthEstimateCostAmount,
+                    Name = p.Name,
+                    ProjectTypeId = p.TypeId,
+                    ExchangeRate = p.ExchangeRate,
+                    ConstructionQualificationId = p.ProjectConstructionQualificationId,
+                    Tag = p.Tag,
+                    Tag2 = p.Tag2,
+                    Category = p.Category,
+                    CompanyId = p.CompanyId,
+                    AreaId = p.AreaId,
+                    RegionId = p.RegionId,
+                    StatusId = p.StatusId,
+                    CurrencyId = p.CurrencyId,
+                    ClassifyStandard = p.ClassifyStandard,
+                    ContractAmount = p.Amount,//合同额
+                    ValidContractAmount = p.ECAmount,//有效合同额
+                    Remarks = p.QuantityRemarks,
+                    BudgetInterestRate = p.BudgetInterestRate * 100,
+                    BudgetaryReasons = p.BudgetaryReasons,
+                    CompilationTime = p.CompilationTime,
+                    AdministrationNumber = p.Administrator,
+                    ConstructionNumber = p.Constructor,
+                    PersonReportForms = p.ReportFormer,
+                    PhoneReportForms = p.ReportForMertel,
+                    Code = p.Code, //项目编码
+                    ContractMeaPayProp = p.ContractMeaPayProp, //比例
+                    TaxRate = p.Rate * 100,
+                    ProgressDescription = m.ProgressDescription,//形象进度描述
+                    ProgressDeviationDescription = m.ProgressDeviationDescription,//进度偏差原因
+                    ProgressDeviationDescriptionPushPom = m.ProgressDeviationDescriptionPushPom,//进度偏差原因（pom）
+                    ProgressDescriptionPushPom = m.ProgressDescriptionPushPom,//形象进度描述（pom）
+                    PushStatus = m.IsPushPom,//推送次数
+                    StatusText = m.StatusText,
+                    OutsourcingExpensesAmount = m.OutsourcingExpensesAmount,
+                    UpdateTime = m.UpdateTime,
+                    CreateTime = m.CreateTime,
+                    IsSubProject = p.IsSubContractProject,
+                    ActualCompAmount = m.ActualCompAmount,
+                    CurrencyOutsourcingExpensesAmount = m.CurrencyOutsourcingExpensesAmount,
+                    RMBHOutValue = m.RMBHOutValue,
+                    RMBHValue = m.RMBHValue,
+                    ActualCompQuantity = m.ActualCompCompletedQuantity,
+                });
 
             var list = new List<MonthtReportDto>();
             if (model.IsFullExport)
@@ -2525,9 +2525,9 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             if (model.IsDuiWai)
             {
                 list = list
-                .Where(x => string.IsNullOrEmpty(x.UpdateTime.ToString()) || x.UpdateTime == DateTime.MinValue ?
-                  x.CreateTime.Value.Date >= model.StartTime && x.CreateTime.Value.Date <= model.EndTime
-                : x.UpdateTime.Value.Date >= model.StartTime && x.UpdateTime.Value.Date <= model.EndTime)
+                //.Where(x => string.IsNullOrEmpty(x.UpdateTime.ToString()) || x.UpdateTime == DateTime.MinValue ?
+                //  x.CreateTime.Value.Date >= model.StartTime && x.CreateTime.Value.Date <= model.EndTime
+                //: x.UpdateTime.Value.Date >= model.StartTime && x.UpdateTime.Value.Date <= model.EndTime)
                 .ToList();
             }
 
@@ -2573,6 +2573,8 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             var mDetailsData = await _dbContext.Queryable<MonthReportDetail>().Where(x => x.IsDelete == 1 && projectIds.Contains(x.ProjectId)).ToListAsync();
             //截止 24年月报历史明细数据（调整过的）
             var hisMonthRep24 = await _dbContext.Queryable<MonthReportDetailHistory>().Where(x => x.IsDelete == 1).ToListAsync();
+            //25年之前不存在的历史数据
+            var monthreportAdd2024 = await _dbContext.Queryable<MonthReportDetailAdd>().Where(x => x.IsDelete == 1).ToListAsync();
             var pIds = list.Select(t => t.ProjectId.ToString()).Distinct().ToList();
             var pHWBSLsit = await _dbContext.Queryable<ProjectWbsHistoryMonth>().Where(x => pIds.Contains(x.ProjectId)).ToListAsync();
             var pWBSList = await _dbContext.Queryable<ProjectWBS>().Where(x => x.IsDelete == 1 && pIds.Contains(x.ProjectId)).ToListAsync();
@@ -2690,15 +2692,16 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     var after2024 = mReportData.Where(x => x.ProjectId == item.ProjectId && x.DateMonth > 202412 && x.DateMonth <= item.DateMonth && x.DateMonth != 202306).ToList();
                     if (item.CurrencyId == "2a0e99b4-f989-4967-b5f1-5519091d4280".ToGuid())//国内
                     {
-                        val.CumulativeCompleted = before2024.Sum(x => Convert.ToDecimal(x.ActualCompAmount)) + after2024.Sum(x => x.CompleteProductionAmount);
-                        val.CumulativeOutsourcingExpensesAmount = before2024.Sum(x => Convert.ToDecimal(x.CurrencyOutsourcingExpensesAmount)) + after2024.Sum(x => x.OutsourcingExpensesAmount);
+                        val.CumulativeCompleted = before2024.Sum(x => Convert.ToDecimal(x.ActualCompAmount)) + after2024.Sum(x => x.CompleteProductionAmount)
+                            + monthreportAdd2024.Where(x => x.ProjectId == item.ProjectId).Sum(x => x.CompleteProductionAmount);
+                        val.CumulativeOutsourcingExpensesAmount = before2024.Sum(x => Convert.ToDecimal(x.CurrencyOutsourcingExpensesAmount)) + after2024.Sum(x => x.OutsourcingExpensesAmount) + monthreportAdd2024.Where(x => x.ProjectId == item.ProjectId).Sum(x => x.OutsourcingExpensesAmount);
                     }
                     else
                     {
                         if (model.IsConvert == true)//切换人民币
                         {
-                            val.CumulativeCompleted = before2024.Sum(x => Convert.ToDecimal(x.RMBHValue)) + after2024.Sum(x => x.CompleteProductionAmount);
-                            val.CumulativeOutsourcingExpensesAmount = before2024.Sum(x => Convert.ToDecimal(x.RMBHOutValue)) + after2024.Sum(x => x.OutsourcingExpensesAmount);
+                            val.CumulativeCompleted = before2024.Sum(x => Convert.ToDecimal(x.RMBHValue)) + after2024.Sum(x => x.CompleteProductionAmount) + monthreportAdd2024.Where(x => x.ProjectId == item.ProjectId).Sum(x => x.CompleteProductionAmount);
+                            val.CumulativeOutsourcingExpensesAmount = before2024.Sum(x => Convert.ToDecimal(x.RMBHOutValue)) + after2024.Sum(x => x.OutsourcingExpensesAmount) + monthreportAdd2024.Where(x => x.ProjectId == item.ProjectId).Sum(x => x.OutsourcingExpensesAmount);
                         }
                         else
                         {
@@ -2706,7 +2709,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                             val.CumulativeOutsourcingExpensesAmount = before2024.Sum(x => Convert.ToDecimal(x.CurrencyOutsourcingExpensesAmount)) + after2024.Sum(x => x.OutsourcingExpensesAmount);
                         }
                     }
-                    val.AccumulativeQuantities = before2024.Sum(x => Convert.ToDecimal(x.ActualCompQuantity)) + after2024.Sum(x => x.CompletedQuantity);
+                    val.AccumulativeQuantities = before2024.Sum(x => Convert.ToDecimal(x.ActualCompQuantity)) + after2024.Sum(x => x.CompletedQuantity) + monthreportAdd2024.Where(x => x.ProjectId == item.ProjectId).Sum(x => x.CompletedQuantity);
                 }
                 else
                 {
@@ -2819,7 +2822,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
 
             //因追加历史的所有月报 此处重写合计
             //取所有的项目月报ids
-            var mpIds = await selQuery.Select(m => m.ProjectId).ToListAsync();
+            var mpIds = await selQuery.Where(m => m.StatusText != "已驳回").Select(m => m.ProjectId).ToListAsync();
             mIds = mIds.Distinct().ToList();
             var mpList = await _dbMonthReport.AsQueryable()
                 .Where(x => x.IsDelete == 1 && mpIds.Contains(x.ProjectId))
@@ -3007,11 +3010,11 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             if (model.IsDuiWai)
             {
                 list = list
-                .Where(x => string.IsNullOrEmpty(x.UpdateTime.ToString()) || x.UpdateTime == DateTime.MinValue ?
-                (x.CreateTime.Value.Year > model.StartTime.Value.Year || (x.CreateTime.Value.Year == model.StartTime.Value.Year && x.CreateTime.Value.Month >= model.StartTime.Value.Month)) &&
-                (x.CreateTime.Value.Year < model.EndTime.Value.Year || (x.CreateTime.Value.Year == model.EndTime.Value.Year && x.CreateTime.Value.Month <= model.EndTime.Value.Month)) :
-                (x.UpdateTime.Value.Year > model.StartTime.Value.Year || (x.UpdateTime.Value.Year == model.StartTime.Value.Year && x.UpdateTime.Value.Month >= model.StartTime.Value.Month)) &&
-                (x.UpdateTime.Value.Year < model.EndTime.Value.Year || (x.UpdateTime.Value.Year == model.EndTime.Value.Year && x.UpdateTime.Value.Month <= model.EndTime.Value.Month)))
+                //.Where(x => string.IsNullOrEmpty(x.UpdateTime.ToString()) || x.UpdateTime == DateTime.MinValue ?
+                //(x.CreateTime.Value.Year > model.StartTime.Value.Year || (x.CreateTime.Value.Year == model.StartTime.Value.Year && x.CreateTime.Value.Month >= model.StartTime.Value.Month)) &&
+                //(x.CreateTime.Value.Year < model.EndTime.Value.Year || (x.CreateTime.Value.Year == model.EndTime.Value.Year && x.CreateTime.Value.Month <= model.EndTime.Value.Month)) :
+                //(x.UpdateTime.Value.Year > model.StartTime.Value.Year || (x.UpdateTime.Value.Year == model.StartTime.Value.Year && x.UpdateTime.Value.Month >= model.StartTime.Value.Month)) &&
+                //(x.UpdateTime.Value.Year < model.EndTime.Value.Year || (x.UpdateTime.Value.Year == model.EndTime.Value.Year && x.UpdateTime.Value.Month <= model.EndTime.Value.Month)))
                 .OrderByDescending(x => x.DateMonth)
                 .ToList();
                 //x.CreateTime >= model.StartTime && x.CreateTime <= model.EndTime
@@ -3059,6 +3062,8 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             var mDetailsData = await _dbContext.Queryable<MonthReportDetail>().Where(x => x.IsDelete == 1 && projectIds.Contains(x.ProjectId)).ToListAsync();
             //截止 24年月报历史明细数据（调整过的）
             var hisMonthRep24 = await _dbContext.Queryable<MonthReportDetailHistory>().Where(x => x.IsDelete == 1).ToListAsync();
+            //25年之前不存在的历史数据
+            var monthreportAdd2024 = await _dbContext.Queryable<MonthReportDetailAdd>().Where(x => x.IsDelete == 1).ToListAsync();
 
             var pIds = list.Select(t => t.ProjectId.ToString()).Distinct().ToList();
             var pHWBSLsit = await _dbContext.Queryable<ProjectWbsHistoryMonth>().Where(x => pIds.Contains(x.ProjectId)).ToListAsync();
@@ -3175,15 +3180,16 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     var after2024 = mReportData.Where(x => x.ProjectId == item.ProjectId && x.DateMonth > 202412 && x.DateMonth <= item.DateMonth && x.DateMonth != 202306).ToList();
                     if (item.CurrencyId == "2a0e99b4-f989-4967-b5f1-5519091d4280".ToGuid())//国内
                     {
-                        val.CumulativeCompleted = before2024.Sum(x => Convert.ToDecimal(x.ActualCompAmount)) + after2024.Sum(x => x.CompleteProductionAmount);
-                        val.CumulativeOutsourcingExpensesAmount = before2024.Sum(x => Convert.ToDecimal(x.CurrencyOutsourcingExpensesAmount)) + after2024.Sum(x => x.OutsourcingExpensesAmount);
+                        val.CumulativeCompleted = before2024.Sum(x => Convert.ToDecimal(x.ActualCompAmount)) + after2024.Sum(x => x.CompleteProductionAmount)
+                            + monthreportAdd2024.Where(x => x.ProjectId == item.ProjectId).Sum(x => x.CompleteProductionAmount);
+                        val.CumulativeOutsourcingExpensesAmount = before2024.Sum(x => Convert.ToDecimal(x.CurrencyOutsourcingExpensesAmount)) + after2024.Sum(x => x.OutsourcingExpensesAmount) + monthreportAdd2024.Where(x => x.ProjectId == item.ProjectId).Sum(x => x.OutsourcingExpensesAmount);
                     }
                     else
                     {
                         if (model.IsConvert == true)//切换人民币
                         {
-                            val.CumulativeCompleted = before2024.Sum(x => Convert.ToDecimal(x.RMBHValue)) + after2024.Sum(x => x.CompleteProductionAmount);
-                            val.CumulativeOutsourcingExpensesAmount = before2024.Sum(x => Convert.ToDecimal(x.RMBHOutValue)) + after2024.Sum(x => x.OutsourcingExpensesAmount);
+                            val.CumulativeCompleted = before2024.Sum(x => Convert.ToDecimal(x.RMBHValue)) + after2024.Sum(x => x.CompleteProductionAmount) + monthreportAdd2024.Where(x => x.ProjectId == item.ProjectId).Sum(x => x.CompleteProductionAmount);
+                            val.CumulativeOutsourcingExpensesAmount = before2024.Sum(x => Convert.ToDecimal(x.RMBHOutValue)) + after2024.Sum(x => x.OutsourcingExpensesAmount) + monthreportAdd2024.Where(x => x.ProjectId == item.ProjectId).Sum(x => x.OutsourcingExpensesAmount);
                         }
                         else
                         {
@@ -3191,7 +3197,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                             val.CumulativeOutsourcingExpensesAmount = before2024.Sum(x => Convert.ToDecimal(x.CurrencyOutsourcingExpensesAmount)) + after2024.Sum(x => x.OutsourcingExpensesAmount);
                         }
                     }
-                    val.AccumulativeQuantities = before2024.Sum(x => Convert.ToDecimal(x.ActualCompQuantity)) + after2024.Sum(x => x.CompletedQuantity);
+                    val.AccumulativeQuantities = before2024.Sum(x => Convert.ToDecimal(x.ActualCompQuantity)) + after2024.Sum(x => x.CompletedQuantity) + monthreportAdd2024.Where(x => x.ProjectId == item.ProjectId).Sum(x => x.CompletedQuantity);
                 }
                 else
                 {
@@ -3304,16 +3310,15 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             //  合计
             #region 处理分包项目产值问题 
             TotalMonthtReportsDto totalMonthtReport = new();
-
             if (!specicalCondition)
             {
                 totalMonthtReport = new MonthtReportsResponseDto.TotalMonthtReportsDto
                 {
-                    AccomplishQuantities = Math.Round(list.Sum(m => m.AccomplishQuantities), 2),
-                    AccomplishValue = Math.Round(list.Sum(m => m.AccomplishValue2), 2),
-                    RecognizedValue = Math.Round(list.Sum(m => m.RecognizedValue), 2),
-                    PaymentAmount = Math.Round(list.Sum(m => m.PaymentAmount), 2),
-                    OutsourcingExpensesAmount = Math.Round(list.Sum(m => m.OutsourcingExpensesAmount), 2)
+                    AccomplishQuantities = Math.Round(list.Where(m => m.StatusText != "已驳回").Sum(m => m.AccomplishQuantities), 2),
+                    AccomplishValue = Math.Round(list.Where(m => m.StatusText != "已驳回").Sum(m => m.AccomplishValue2), 2),
+                    RecognizedValue = Math.Round(list.Where(m => m.StatusText != "已驳回").Sum(m => m.RecognizedValue), 2),
+                    PaymentAmount = Math.Round(list.Where(m => m.StatusText != "已驳回").Sum(m => m.PaymentAmount), 2),
+                    OutsourcingExpensesAmount = Math.Round(list.Where(m => m.StatusText != "已驳回").Sum(m => m.OutsourcingExpensesAmount), 2)
                 };
             }
             else
@@ -3322,11 +3327,11 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 var subpIds = await _dbContext.Queryable<Project>().Where(t => t.IsDelete == 1 && t.IsSubContractProject == 2).Select(x => x.Id).ToListAsync();
                 totalMonthtReport = new MonthtReportsResponseDto.TotalMonthtReportsDto
                 {
-                    AccomplishQuantities = Math.Round(list.Where(x => !subpIds.Contains(x.ProjectId)).Sum(m => m.AccomplishQuantities), 2),
-                    AccomplishValue = Math.Round(list.Where(x => !subpIds.Contains(x.ProjectId)).Sum(m => m.AccomplishValue2), 2),
-                    RecognizedValue = Math.Round(list.Where(x => !subpIds.Contains(x.ProjectId)).Sum(m => m.RecognizedValue), 2),
-                    PaymentAmount = Math.Round(list.Where(x => !subpIds.Contains(x.ProjectId)).Sum(m => m.PaymentAmount), 2),
-                    OutsourcingExpensesAmount = Math.Round(list.Where(x => !subpIds.Contains(x.ProjectId)).Sum(m => m.OutsourcingExpensesAmount), 2)
+                    AccomplishQuantities = Math.Round(list.Where(m => !subpIds.Contains(m.ProjectId) && m.StatusText != "已驳回").Sum(m => m.AccomplishQuantities), 2),
+                    AccomplishValue = Math.Round(list.Where(m => !subpIds.Contains(m.ProjectId) && m.StatusText != "已驳回").Sum(m => m.AccomplishValue2), 2),
+                    RecognizedValue = Math.Round(list.Where(m => !subpIds.Contains(m.ProjectId) && m.StatusText != "已驳回").Sum(m => m.RecognizedValue), 2),
+                    PaymentAmount = Math.Round(list.Where(m => !subpIds.Contains(m.ProjectId) && m.StatusText != "已驳回").Sum(m => m.PaymentAmount), 2),
+                    OutsourcingExpensesAmount = Math.Round(list.Where(m => !subpIds.Contains(m.ProjectId) && m.StatusText != "已驳回").Sum(m => m.OutsourcingExpensesAmount), 2)
                 };
             }
             foreach (var item in list)
@@ -3643,7 +3648,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
         private ISugarQueryable<MonthReport, Project> MonthReportsWheres(ISugarQueryable<MonthReport, Project> query, MonthtReportsRequstDto model, UserAuthForDataDto userAuthForData, List<int> categoryList, List<int> tagList, List<int> tag2List)
         {
             return query
-                 
+
               //.Where((m, p) => m.DateMonth >= startMonth && m.DateMonth <= endMonth)
               .WhereIF(!userAuthForData.IsAdmin, (m, p) => userAuthForData.CompanyIds.Contains(p.ProjectDept))
               .WhereIF(model.CompanyId != null, (m, p) => p.CompanyId == model.CompanyId)
@@ -3914,6 +3919,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             var updateDetails = new List<MonthReportDetail>();
             var deleteDetails = new List<MonthReportDetail>();
             //循环匹配原来的数据与传入参数值是否完全一致
+            var deleteRepeat = new List<MonthReportDetail>();
             foreach (var item in reqDetails)
             {
                 if (item.Id != Guid.Empty && !string.IsNullOrEmpty(item.Id.ToString()))
@@ -3922,21 +3928,48 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     var oCurMonthRp = oldMDetails.Where(x => x.DateMonth == model.DateMonth).ToList();
                     if (oCurMonthRp != null && oCurMonthRp.Any())
                     {
-                        //如果当月有数据 查询是否与之匹配  如果匹配为修改的数据
-                        var piPei = oCurMonthRp.FirstOrDefault(x => x.Id == item.Id);
-                        if (piPei != null)
+                        //重复数据处理
+                        var piPeis = oCurMonthRp.Where(x => x.UnitPrice == item.UnitPrice && x.ProjectId == model.ProjectId && x.ProjectWBSId == item.ProjectWBSId && x.ShipId == item.ShipId && x.ConstructionNature == item.ConstructionNature && x.DateMonth == model.DateMonth).ToList();
+                        if (piPeis.Count > 1)
                         {
-                            piPei.OutsourcingExpensesAmount = item.OutsourcingExpensesAmount.Value;
-                            piPei.CompleteProductionAmount = item.CompleteProductionAmount.Value;
-                            piPei.CompletedQuantity = item.CompletedQuantity.Value;
-                            piPei.ShipId = item.ShipId.Value;
-                            piPei.ConstructionNature = item.ConstructionNature;
-                            piPei.OutPutType = item.OutPutType.Value;
-                            piPei.UnitPrice = item.UnitPrice.Value;
-                            piPei.Remark = item.Remark;
-                            piPei.ShipName = item.ShipName;
-                            piPei.Id = item.Id;
-                            updateDetails.Add(piPei);
+                            var pp = piPeis.OrderByDescending(x => x.CreateTime).FirstOrDefault();
+
+                            if (pp != null)
+                            {
+                                pp.OutsourcingExpensesAmount = item.OutsourcingExpensesAmount.Value;
+                                pp.CompleteProductionAmount = item.CompleteProductionAmount.Value;
+                                pp.CompletedQuantity = item.CompletedQuantity.Value;
+                                pp.ShipId = item.ShipId.Value;
+                                pp.ConstructionNature = item.ConstructionNature;
+                                pp.OutPutType = item.OutPutType.Value;
+                                pp.UnitPrice = item.UnitPrice.Value;
+                                pp.Remark = item.Remark;
+                                pp.ShipName = item.ShipName;
+                                updateDetails.Add(pp);
+
+                                var repeat = piPeis.Where(x => x != pp).ToList();//删除重复的项
+                                repeat.ForEach(x => x.IsDelete = 0);
+                                deleteRepeat.AddRange(repeat);
+                            }
+                        }
+                        else
+                        {
+                            //如果当月有数据 查询是否与之匹配  如果匹配为修改的数据
+                            var piPei = oCurMonthRp.FirstOrDefault(x => x.Id == item.Id);
+                            if (piPei != null)
+                            {
+                                piPei.OutsourcingExpensesAmount = item.OutsourcingExpensesAmount.Value;
+                                piPei.CompleteProductionAmount = item.CompleteProductionAmount.Value;
+                                piPei.CompletedQuantity = item.CompletedQuantity.Value;
+                                piPei.ShipId = item.ShipId.Value;
+                                piPei.ConstructionNature = item.ConstructionNature;
+                                piPei.OutPutType = item.OutPutType.Value;
+                                piPei.UnitPrice = item.UnitPrice.Value;
+                                piPei.Remark = item.Remark;
+                                piPei.ShipName = item.ShipName;
+                                piPei.Id = item.Id;
+                                updateDetails.Add(piPei);
+                            }
                         }
                     }
                     //是不是本月之外的数据需要追加到本月
@@ -4054,6 +4087,10 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             if (updateDetails.Any())
             {
                 await _dbMonthReportDetail.AsUpdateable(updateDetails).IgnoreColumns(x => new { x.IsDelete }).EnableDiffLogEvent(NewLogInfo(EntityType.MonthReport, monthReport.Id, modelState)).ExecuteCommandAsync();
+            }
+            if (deleteRepeat.Any())
+            {
+                await _dbMonthReportDetail.AsUpdateable(deleteRepeat).UpdateColumns(x => x.IsDelete).EnableDiffLogEvent(NewLogInfo(EntityType.MonthReport, monthReport.Id, modelState)).ExecuteCommandAsync();
             }
             if (addDetails.Any())
             {
@@ -4191,7 +4228,6 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             }
 
             stagingData.BizData = JsonConvert.SerializeObject(model);
-            //这里要把原来驳回的明细进行处理  删掉存在的   暂存的都是最新的
 
             #region 新的逻辑
             //////只要本月的月报数据
@@ -7957,6 +7993,8 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
 
             //截止 24年月报历史明细数据（调整过的）
             var hisMonthRep24 = await _dbContext.Queryable<MonthReportDetailHistory>().Where(x => x.IsDelete == 1).ToListAsync();
+            //25年之前不存在的历史数据
+            var monthreportAdd2024 = await _dbContext.Queryable<MonthReportDetailAdd>().Where(x => x.IsDelete == 1).ToListAsync();
             List<OutPutInfo> outPutInfos = new();
             foreach (var item in pjectInfos)
             {
@@ -8034,6 +8072,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     {
                         totalOutPutValue = before2024.Sum(x => Convert.ToDecimal(x.RMBHValue)) + after2024.Sum(x => x.CompleteProductionAmount) + his;
                     }
+                    totalOutPutValue += monthreportAdd2024.Where(x => x.ProjectId == item.Id).Sum(x => x.CompleteProductionAmount);//手动追加的25年前的开累数
                 }
                 #endregion
                 var state = "";
