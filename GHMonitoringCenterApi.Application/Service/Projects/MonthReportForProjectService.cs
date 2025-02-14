@@ -319,10 +319,10 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 #endregion
 
                 //追加202412月前没存在过的wbs数据 如果之前存在过则相加产值、工程量、外包支出、否则追加整条数据
-                #region 追加202412月前没存在过的wbs数据 如果之前存在过则相加产值、工程量、外包支出、否则追加整条数据
+                #region 追加202412月前没存在过的wbs数据 如果之前存在过则相加产值、工程量、外包支出、否则追加整条数据  
                 if (dateMonth != null && dateMonth > 202412)
                 {
-                    if (isStaging == false)
+                    if (isStaging == false)//跳过暂存状态
                     {
                         if (pwbsIds.Contains(report.ProjectWBSId) && projectIds.Contains(report.ProjectId))
                         {
@@ -363,30 +363,31 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 #endregion
             }
             mReport.AddRange(addHis);
-
-            //排除掉本月有的 追加的 重复资源
-            List<ProjectWBSDto> addRes = new();
-            var gpHis = mReport.GroupBy(x => new { x.ShipId, x.ProjectId, x.ConstructionNature, x.OutPutType, x.UnitPrice, x.ProjectWBSId }).ToList();
-            foreach (var item in gpHis)
+            if (isStaging == false)//跳过暂存状态
             {
-                if (pwbsIds.Contains(item.Key.ProjectWBSId) && projectIds.Contains(item.Key.ProjectId))
+                //排除掉本月有的 追加的 重复资源
+                List<ProjectWBSDto> addRes = new();
+                var gpHis = mReport.GroupBy(x => new { x.ShipId, x.ProjectId, x.ConstructionNature, x.OutPutType, x.UnitPrice, x.ProjectWBSId }).ToList();
+                foreach (var item in gpHis)
                 {
-                    var exist = mReport.Where(x => x.ShipId == item.Key.ShipId && x.ProjectId == item.Key.ProjectId && x.ConstructionNature == item.Key.ConstructionNature && x.OutPutType == item.Key.OutPutType && x.UnitPrice == item.Key.UnitPrice && x.ProjectWBSId == item.Key.ProjectWBSId).ToList();
-                    if (exist.Count == 1 || exist.Count == 0)
+                    if (pwbsIds.Contains(item.Key.ProjectWBSId) && projectIds.Contains(item.Key.ProjectId))
                     {
-                        continue;
-                    }
-                    else
-                    {
-                        mReport = mReport.Where(x => !(x.ShipId == item.Key.ShipId && x.ProjectId == item.Key.ProjectId && x.ConstructionNature == item.Key.ConstructionNature && x.OutPutType == item.Key.OutPutType && x.UnitPrice == item.Key.UnitPrice && x.ProjectWBSId == item.Key.ProjectWBSId)).ToList();
-                        var add = exist.Where(x => x.Id != Guid.Empty).ToList();
-                        addRes.AddRange(add);
+                        var exist = mReport.Where(x => x.ShipId == item.Key.ShipId && x.ProjectId == item.Key.ProjectId && x.ConstructionNature == item.Key.ConstructionNature && x.OutPutType == item.Key.OutPutType && x.UnitPrice == item.Key.UnitPrice && x.ProjectWBSId == item.Key.ProjectWBSId).ToList();
+                        if (exist.Count == 1 || exist.Count == 0)
+                        {
+                            continue;
+                        }
+                        else
+                        {
+                            mReport = mReport.Where(x => !(x.ShipId == item.Key.ShipId && x.ProjectId == item.Key.ProjectId && x.ConstructionNature == item.Key.ConstructionNature && x.OutPutType == item.Key.OutPutType && x.UnitPrice == item.Key.UnitPrice && x.ProjectWBSId == item.Key.ProjectWBSId)).ToList();
+                            var add = exist.Where(x => x.Id != Guid.Empty).ToList();
+                            addRes.AddRange(add);
+                        }
                     }
                 }
+                //最终结果
+                mReport.AddRange(addRes);
             }
-
-            //最终结果
-            mReport.AddRange(addRes);
             return mReport;
         }
         /// <summary>

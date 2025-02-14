@@ -3919,6 +3919,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             var updateDetails = new List<MonthReportDetail>();
             var deleteDetails = new List<MonthReportDetail>();
             //循环匹配原来的数据与传入参数值是否完全一致
+            var deleteRepeat = new List<MonthReportDetail>();
             foreach (var item in reqDetails)
             {
                 if (item.Id != Guid.Empty && !string.IsNullOrEmpty(item.Id.ToString()))
@@ -3927,21 +3928,49 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     var oCurMonthRp = oldMDetails.Where(x => x.DateMonth == model.DateMonth).ToList();
                     if (oCurMonthRp != null && oCurMonthRp.Any())
                     {
-                        //如果当月有数据 查询是否与之匹配  如果匹配为修改的数据
-                        var piPei = oCurMonthRp.FirstOrDefault(x => x.Id == item.Id);
-                        if (piPei != null)
+                        //重复数据处理
+                        var piPeis = oCurMonthRp.Where(x => x.UnitPrice == item.UnitPrice && x.ProjectId == model.ProjectId && x.ProjectWBSId == item.ProjectWBSId && x.ShipId == item.ShipId && x.ConstructionNature == item.ConstructionNature && x.DateMonth == model.DateMonth).ToList();
+                        if (piPeis.Count > 1)
                         {
-                            piPei.OutsourcingExpensesAmount = item.OutsourcingExpensesAmount.Value;
-                            piPei.CompleteProductionAmount = item.CompleteProductionAmount.Value;
-                            piPei.CompletedQuantity = item.CompletedQuantity.Value;
-                            piPei.ShipId = item.ShipId.Value;
-                            piPei.ConstructionNature = item.ConstructionNature;
-                            piPei.OutPutType = item.OutPutType.Value;
-                            piPei.UnitPrice = item.UnitPrice.Value;
-                            piPei.Remark = item.Remark;
-                            piPei.ShipName = item.ShipName;
-                            piPei.Id = item.Id;
-                            updateDetails.Add(piPei);
+                            var pp = piPeis.OrderByDescending(x => x.CreateTime).FirstOrDefault();
+
+                            if (pp != null)
+                            {
+                                pp.OutsourcingExpensesAmount = item.OutsourcingExpensesAmount.Value;
+                                pp.CompleteProductionAmount = item.CompleteProductionAmount.Value;
+                                pp.CompletedQuantity = item.CompletedQuantity.Value;
+                                pp.ShipId = item.ShipId.Value;
+                                pp.ConstructionNature = item.ConstructionNature;
+                                pp.OutPutType = item.OutPutType.Value;
+                                pp.UnitPrice = item.UnitPrice.Value;
+                                pp.Remark = item.Remark;
+                                pp.ShipName = item.ShipName;
+                                pp.Id = item.Id;
+                                updateDetails.Add(pp);
+
+                                var repeat = piPeis.Where(x => x.Id != pp.Id).ToList();//删除重复的项
+                                repeat.ForEach(x => x.IsDelete = 0);
+                                deleteRepeat.AddRange(repeat);
+                            }
+                        }
+                        else
+                        {
+                            //如果当月有数据 查询是否与之匹配  如果匹配为修改的数据
+                            var piPei = oCurMonthRp.FirstOrDefault(x => x.Id == item.Id);
+                            if (piPei != null)
+                            {
+                                piPei.OutsourcingExpensesAmount = item.OutsourcingExpensesAmount.Value;
+                                piPei.CompleteProductionAmount = item.CompleteProductionAmount.Value;
+                                piPei.CompletedQuantity = item.CompletedQuantity.Value;
+                                piPei.ShipId = item.ShipId.Value;
+                                piPei.ConstructionNature = item.ConstructionNature;
+                                piPei.OutPutType = item.OutPutType.Value;
+                                piPei.UnitPrice = item.UnitPrice.Value;
+                                piPei.Remark = item.Remark;
+                                piPei.ShipName = item.ShipName;
+                                piPei.Id = item.Id;
+                                updateDetails.Add(piPei);
+                            }
                         }
                     }
                     //是不是本月之外的数据需要追加到本月
@@ -4059,6 +4088,10 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             if (updateDetails.Any())
             {
                 await _dbMonthReportDetail.AsUpdateable(updateDetails).IgnoreColumns(x => new { x.IsDelete }).EnableDiffLogEvent(NewLogInfo(EntityType.MonthReport, monthReport.Id, modelState)).ExecuteCommandAsync();
+            }
+            if (deleteRepeat.Any())
+            {
+                await _dbMonthReportDetail.AsUpdateable(deleteRepeat).UpdateColumns(x => x.IsDelete).EnableDiffLogEvent(NewLogInfo(EntityType.MonthReport, monthReport.Id, modelState)).ExecuteCommandAsync();
             }
             if (addDetails.Any())
             {
@@ -8256,7 +8289,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 var shipId = item.Key.ShipId;
 
                 //项目名称
-                var projectName = projects.FirstOrDefault(x => x.Id == item.Key.ProjectId)?.ShortName ?? "";
+                var projectName = projects.FirstOrDefault(x => x.Id == item.Key.ProjectId)?.Name ?? "";
                 var projectId = item.Key.ProjectId;
 
                 //当月产量
