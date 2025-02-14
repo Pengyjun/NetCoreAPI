@@ -8249,7 +8249,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 var shipId = item.Key.ShipId;
 
                 //项目名称
-                var projectName = projects.FirstOrDefault(x => x.Id == item.Key.ProjectId)?.ShortName ?? "";
+                var projectName = projects.FirstOrDefault(x => x.Id == item.Key.ProjectId)?.Name ?? "";
                 var projectId = item.Key.ProjectId;
 
                 //当月产量
