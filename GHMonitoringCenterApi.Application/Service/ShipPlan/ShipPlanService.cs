@@ -496,6 +496,7 @@ namespace GHMonitoringCenterApi.Application.Service.ShipPlan
         {
             ResponseAjaxResult<ShipPlanCompleteResponseDto> response = new ResponseAjaxResult<ShipPlanCompleteResponseDto>();
             ShipPlanCompleteResponseDto shipPlanCompleteResponseDtos = new ShipPlanCompleteResponseDto();
+            decimal unitValue = 100000000M;
             for (int i = 1; i <=12; i++)
             {
                 shipPlanCompleteResponseDtos.XAxis.Add(i + "月");
@@ -507,8 +508,8 @@ namespace GHMonitoringCenterApi.Application.Service.ShipPlan
             //计划产值
             var startTime = DateTime.Now.ToString("yyyy01").ObjToInt();
             var endTime = DateTime.Now.ToString("yyyy12").ObjToInt();
-            shipPlanCompleteResponseDtos.YAxisPlan= shipCompleteList.Where(x=>x.DateDay>= startTime&&x.DateDay<= endTime).Select(x=>x.PlanOutputValue).ToList();
-            shipPlanCompleteResponseDtos.YAxisComplete = shipCompleteList.Where(x => x.DateDay >= startTime && x.DateDay <= endTime).Select(x => x.CompleteOutputValue).ToList();
+            shipPlanCompleteResponseDtos.YAxisPlan= shipCompleteList.Where(x=>x.DateDay>= startTime&&x.DateDay<= endTime).Select(x=> Math.Round(x.PlanOutputValue/unitValue,2)).ToList();
+            shipPlanCompleteResponseDtos.YAxisComplete = shipCompleteList.Where(x => x.DateDay >= startTime && x.DateDay <= endTime).Select(x => Math.Round(x.CompleteOutputValue/ unitValue, 2)).ToList();
             response.Data= shipPlanCompleteResponseDtos;
             response.Success();
             return response;
@@ -532,6 +533,7 @@ namespace GHMonitoringCenterApi.Application.Service.ShipPlan
                 .ToListAsync();
 
             //
+            decimal unitValue = 100000000M;
 
             var shipTypeList= await dbContent.Queryable<OwnerShip>().Where(x => x.IsDelete == 1).ToListAsync();
             //06b7a5ce-e105-46c8-8b1d-24c8ba7f9dbf  耙吸船
@@ -545,28 +547,28 @@ namespace GHMonitoringCenterApi.Application.Service.ShipPlan
             var endTime = DateTime.Now.ToString("yyyy12").ObjToInt();
 
             shipPlanCompleteResponseDtos.YAxisPxPlan = shipCompleteList.Where(x => x.DateDay >= startTime && x.DateDay <= endTime
-            && pxShipList.Contains(x.ShipId.Value)).Select(x => x.PlanOutputValue).ToList();
+            && pxShipList.Contains(x.ShipId.Value)).Select(x => Math.Round(x.PlanOutputValue / unitValue,2)).ToList();
             shipPlanCompleteResponseDtos.YAxisPxComplete = shipCompleteList.Where(x => x.DateDay >= startTime && x.DateDay <= endTime
-            && pxShipList.Contains(x.ShipId.Value)).Select(x => x.CompleteOutputValue).ToList();
+            && pxShipList.Contains(x.ShipId.Value)).Select(x => Math.Round(x.CompleteOutputValue / unitValue,2)).ToList();
 
 
             shipPlanCompleteResponseDtos.YAxisJxPlan = shipCompleteList.Where(x => x.DateDay >= startTime && x.DateDay <= endTime
-            && jxShipList.Contains(x.ShipId.Value)).Select(x => x.PlanOutputValue).ToList();
+            && jxShipList.Contains(x.ShipId.Value)).Select(x => Math.Round(x.PlanOutputValue / unitValue,2)).ToList();
             shipPlanCompleteResponseDtos.YAxisJxComplete = shipCompleteList.Where(x => x.DateDay >= startTime && x.DateDay <= endTime
-            && jxShipList.Contains(x.ShipId.Value)).Select(x => x.CompleteOutputValue).ToList();
+            && jxShipList.Contains(x.ShipId.Value)).Select(x => Math.Round(x.CompleteOutputValue / unitValue,2)).ToList();
 
 
 
             shipPlanCompleteResponseDtos.YAxisZdPlan = shipCompleteList.Where(x => x.DateDay >= startTime && x.DateDay <= endTime
-       && zdShipList.Contains(x.ShipId.Value)).Select(x => x.PlanOutputValue).ToList();
+       && zdShipList.Contains(x.ShipId.Value)).Select(x => Math.Round(x.PlanOutputValue / unitValue,2)).ToList();
             shipPlanCompleteResponseDtos.YAxisZdComplete = shipCompleteList.Where(x => x.DateDay >= startTime && x.DateDay <= endTime
-            && zdShipList.Contains(x.ShipId.Value)).Select(x => x.CompleteOutputValue).ToList();
+            && zdShipList.Contains(x.ShipId.Value)).Select(x => Math.Round(x.CompleteOutputValue / unitValue,2)).ToList();
 
             shipPlanCompleteResponseDtos.YAxisPlan = shipCompleteList.Where(x => x.DateDay >= startTime && x.DateDay <= endTime
-        ).Select(x => x.PlanOutputValue).ToList();
+        ).Select(x => Math.Round(x.PlanOutputValue/ unitValue,2)).ToList();
 
             shipPlanCompleteResponseDtos.YAxisComplete = shipCompleteList.Where(x => x.DateDay >= startTime && x.DateDay <= endTime
-            ).Select(x => x.CompleteOutputValue).ToList();
+            ).Select(x =>Math.Round( x.CompleteOutputValue / unitValue,2)).ToList();
 
 
             response.Data = shipPlanCompleteResponseDtos;
