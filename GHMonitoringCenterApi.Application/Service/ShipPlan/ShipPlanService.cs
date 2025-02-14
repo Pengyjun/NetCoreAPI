@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 using Npgsql.TypeHandlers.DateTimeHandlers;
 using NPOI.HPSF;
 using SqlSugar;
+using SqlSugar.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -480,6 +481,34 @@ namespace GHMonitoringCenterApi.Application.Service.ShipPlan
                 shipPlanImageResponseDtoItem.Children = shipPlanImageResponseDtos;
                 response.Data = shipPlanImageResponseDtoItem;
             }
+            response.Success();
+            return response;
+        }
+
+
+        /// <summary>
+        ///根据船舶完成产值 生成图
+        /// </summary>
+        /// <param name="type">1是自有年度产值计划与完成对比图 2是自有船舶产值走势图</param>
+        /// <returns></returns>
+        public async Task<ResponseAjaxResult<ShipPlanCompleteResponseDto>> SearchShipCompleteImagesAsync()
+        {
+            ResponseAjaxResult<ShipPlanCompleteResponseDto> response = new ResponseAjaxResult<ShipPlanCompleteResponseDto>();
+            ShipPlanCompleteResponseDto shipPlanCompleteResponseDtos = new ShipPlanCompleteResponseDto();
+            for (int i = 1; i <=12; i++)
+            {
+                shipPlanCompleteResponseDtos.XAxis.Add(i + "月");
+            }
+
+            var shipCompleteList= await  dbContent.Queryable<ShipCompleteProduction>().Where(x => x.IsDelete == 1)
+                .ToListAsync();
+
+            //计划产值
+            var startTime = DateTime.Now.Year.ToString("yyyy01").ObjToInt();
+            var endTime = DateTime.Now.Year.ToString("yyyy12").ObjToInt();
+            shipPlanCompleteResponseDtos.YAxisPlan= shipCompleteList.Where(x=>x.DateDay>= startTime&&x.DateDay>= endTime).Select(x=>x.PlanOutputValue).ToList();
+            shipPlanCompleteResponseDtos.YAxisComplete = shipCompleteList.Where(x => x.DateDay >= startTime && x.DateDay >= endTime).Select(x => x.CompleteOutputValue).ToList();
+            response.Data= shipPlanCompleteResponseDtos;
             response.Success();
             return response;
         }
