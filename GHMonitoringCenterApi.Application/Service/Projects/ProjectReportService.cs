@@ -3945,10 +3945,9 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                                 pp.UnitPrice = item.UnitPrice.Value;
                                 pp.Remark = item.Remark;
                                 pp.ShipName = item.ShipName;
-                                pp.Id = item.Id;
                                 updateDetails.Add(pp);
 
-                                var repeat = piPeis.Where(x => x.Id != pp.Id).ToList();//删除重复的项
+                                var repeat = piPeis.Where(x => x != pp).ToList();//删除重复的项
                                 repeat.ForEach(x => x.IsDelete = 0);
                                 deleteRepeat.AddRange(repeat);
                             }
