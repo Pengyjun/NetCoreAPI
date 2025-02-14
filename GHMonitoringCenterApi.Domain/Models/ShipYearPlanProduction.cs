@@ -74,13 +74,13 @@ namespace GHMonitoringCenterApi.Domain.Models
         /// <summary>
         /// 工程量  单位万m3
         /// </summary>
-        [SugarColumn(ColumnDataType = "decimal(18,2)")]
+        [SugarColumn(ColumnDataType = "decimal(18,8)")]
         public decimal QuantityWork { get; set; }
 
         /// <summary>
         /// 单价  单位 元
         /// </summary>
-        [SugarColumn(ColumnDataType = "decimal(18,2)")]
+        [SugarColumn(ColumnDataType = "decimal(18,8)")]
         public decimal Price { get; set; }
 
         /// <summary>
@@ -92,62 +92,62 @@ namespace GHMonitoringCenterApi.Domain.Models
         /// <summary>
         /// 计划产值 第一月    单位万元 
         /// </summary>
-        [SugarColumn(ColumnDataType = "decimal(18,2)")]
+        [SugarColumn(ColumnDataType = "decimal(18,8)")]
         public decimal OnePlannedOutputValue { get; set; }
         /// <summary>
         /// 计划产值   第二月
         /// </summary>
-        [SugarColumn(ColumnDataType = "decimal(18,2)")]
+        [SugarColumn(ColumnDataType = "decimal(18,8)")]
         public decimal TwoPlannedOutputValue { get; set; }
         /// <summary>
         /// 计划产值  第三月
         /// </summary>
-        [SugarColumn(ColumnDataType = "decimal(18,2)")]
+        [SugarColumn(ColumnDataType = "decimal(18,8)")]
         public decimal ThreePlannedOutputValue { get; set; }
         /// <summary>
         /// 计划产值  第四月
         /// </summary>
-        [SugarColumn(ColumnDataType = "decimal(18,2)")]
+        [SugarColumn(ColumnDataType = "decimal(18,8)")]
         public decimal FourPlannedOutputValue { get; set; }
         /// <summary>
         /// 计划产值  第五月
         /// </summary>
-        [SugarColumn(ColumnDataType = "decimal(18,2)")]
+        [SugarColumn(ColumnDataType = "decimal(18,8)")]
         public decimal FivPlannedOutputValue { get; set; }
         /// <summary>
         /// 计划产值  第六月
         /// </summary>
-        [SugarColumn(ColumnDataType = "decimal(18,2)")]
+        [SugarColumn(ColumnDataType = "decimal(18,8)")]
         public decimal SixPlannedOutputValue { get; set; }
         /// <summary>
         /// 计划产值  第七月
         /// </summary>
-        [SugarColumn(ColumnDataType = "decimal(18,2)")]
+        [SugarColumn(ColumnDataType = "decimal(18,8)")]
         public decimal SevPlannedOutputValue { get; set; }
         /// <summary>
         /// 计划产值  第八月
         /// </summary>
-        [SugarColumn(ColumnDataType = "decimal(18,2)")]
+        [SugarColumn(ColumnDataType = "decimal(18,8)")]
         public decimal EigPlannedOutputValue { get; set; }
         /// <summary>
         /// 计划产值  第九月
         /// </summary>
-        [SugarColumn(ColumnDataType = "decimal(18,2)")]
+        [SugarColumn(ColumnDataType = "decimal(18,8)")]
         public decimal NinPlannedOutputValue { get; set; }
         /// <summary>
         /// 计划产值  第十月
         /// </summary>
-        [SugarColumn(ColumnDataType = "decimal(18,2)")]
+        [SugarColumn(ColumnDataType = "decimal(18,8)")]
         public decimal TenPlannedOutputValue { get; set; }
         /// <summary>
         /// 计划产值  第十一月
         /// </summary>
-        [SugarColumn(ColumnDataType = "decimal(18,2)")]
+        [SugarColumn(ColumnDataType = "decimal(18,8)")]
         public decimal ElePlannedOutputValue { get; set; }
         /// <summary>
         /// 计划产值  第十二月
         /// </summary>
-        [SugarColumn(ColumnDataType = "decimal(18,2)")]
+        [SugarColumn(ColumnDataType = "decimal(18,8)")]
         public decimal TwePlannedOutputValue { get; set; }
 
         /// <summary>

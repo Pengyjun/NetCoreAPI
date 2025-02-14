@@ -57,19 +57,19 @@ namespace GHMonitoringCenterApi.Application.Service.ShipPlan
                 model.Days = days;
                 model.ShipTypeId = shipTypeId;
                 model.Year=DateTime.Now.Year;
-                model.QuantityWork = model.QuantityWork * 10000;
-                model.OnePlannedOutputValue = model.OnePlannedOutputValue * 10000;
-                model.TwoPlannedOutputValue = model.TwoPlannedOutputValue * 10000;
-                model.ThreePlannedOutputValue = model.ThreePlannedOutputValue * 10000;
-                model.FourPlannedOutputValue = model.FourPlannedOutputValue * 10000;
-                model.FivPlannedOutputValue = model.SixPlannedOutputValue * 10000;
-                model.SixPlannedOutputValue = model.SixPlannedOutputValue * 10000;
-                model.SevPlannedOutputValue = model.SevPlannedOutputValue * 10000;
-                model.EigPlannedOutputValue = model.EigPlannedOutputValue * 10000;
-                model.NinPlannedOutputValue = model.NinPlannedOutputValue * 10000;
-                model.TenPlannedOutputValue = model.TenPlannedOutputValue * 10000;
-                model.ElePlannedOutputValue = model.ElePlannedOutputValue * 10000;
-                model.TwePlannedOutputValue = model.TwePlannedOutputValue * 10000;
+                //model.QuantityWork = model.QuantityWork * 10000;
+                //model.OnePlannedOutputValue = model.OnePlannedOutputValue * 10000;
+                //model.TwoPlannedOutputValue = model.TwoPlannedOutputValue * 10000;
+                //model.ThreePlannedOutputValue = model.ThreePlannedOutputValue * 10000;
+                //model.FourPlannedOutputValue = model.FourPlannedOutputValue * 10000;
+                //model.FivPlannedOutputValue = model.SixPlannedOutputValue * 10000;
+                //model.SixPlannedOutputValue = model.SixPlannedOutputValue * 10000;
+                //model.SevPlannedOutputValue = model.SevPlannedOutputValue * 10000;
+                //model.EigPlannedOutputValue = model.EigPlannedOutputValue * 10000;
+                //model.NinPlannedOutputValue = model.NinPlannedOutputValue * 10000;
+                //model.TenPlannedOutputValue = model.TenPlannedOutputValue * 10000;
+                //model.ElePlannedOutputValue = model.ElePlannedOutputValue * 10000;
+                //model.TwePlannedOutputValue = model.TwePlannedOutputValue * 10000;
                 var total = await dbContent.Queryable<ShipYearPlanProduction>().CountAsync(x => x.IsDelete == 1 && x.ShipId == saveShipPlanRequestDto.ShipId
                  && x.ProjectId == saveShipPlanRequestDto.ProjectId);
 
@@ -99,19 +99,19 @@ namespace GHMonitoringCenterApi.Application.Service.ShipPlan
                 }
                 model.Id = entity.Id;
                 model.Year = entity.Year;
-                model.QuantityWork = model.QuantityWork * 10000;
-                model.OnePlannedOutputValue = model.OnePlannedOutputValue * 10000;
-                model.TwoPlannedOutputValue = model.TwoPlannedOutputValue * 10000;
-                model.ThreePlannedOutputValue = model.ThreePlannedOutputValue * 10000;
-                model.FourPlannedOutputValue = model.FourPlannedOutputValue * 10000;
-                model.FivPlannedOutputValue = model.SixPlannedOutputValue * 10000;
-                model.SixPlannedOutputValue = model.SixPlannedOutputValue * 10000;
-                model.SevPlannedOutputValue = model.SevPlannedOutputValue * 10000;
-                model.EigPlannedOutputValue = model.EigPlannedOutputValue * 10000;
-                model.NinPlannedOutputValue = model.NinPlannedOutputValue * 10000;
-                model.TenPlannedOutputValue = model.TenPlannedOutputValue * 10000;
-                model.ElePlannedOutputValue = model.ElePlannedOutputValue * 10000;
-                model.TwePlannedOutputValue = model.TwePlannedOutputValue * 10000;
+                //model.QuantityWork = model.QuantityWork * 10000;
+                //model.OnePlannedOutputValue = model.OnePlannedOutputValue * 10000;
+                //model.TwoPlannedOutputValue = model.TwoPlannedOutputValue * 10000;
+                //model.ThreePlannedOutputValue = model.ThreePlannedOutputValue * 10000;
+                //model.FourPlannedOutputValue = model.FourPlannedOutputValue * 10000;
+                //model.FivPlannedOutputValue = model.SixPlannedOutputValue * 10000;
+                //model.SixPlannedOutputValue = model.SixPlannedOutputValue * 10000;
+                //model.SevPlannedOutputValue = model.SevPlannedOutputValue * 10000;
+                //model.EigPlannedOutputValue = model.EigPlannedOutputValue * 10000;
+                //model.NinPlannedOutputValue = model.NinPlannedOutputValue * 10000;
+                //model.TenPlannedOutputValue = model.TenPlannedOutputValue * 10000;
+                //model.ElePlannedOutputValue = model.ElePlannedOutputValue * 10000;
+                //model.TwePlannedOutputValue = model.TwePlannedOutputValue * 10000;
                 await dbContent.Updateable<ShipYearPlanProduction>(model).ExecuteCommandAsync();
                 responseAjaxResult.Data = true;
                 responseAjaxResult.Success();
@@ -188,9 +188,9 @@ namespace GHMonitoringCenterApi.Application.Service.ShipPlan
                 ShipCompleteProduction model = mapper.Map<SaveShipCompleteRequestDto, ShipCompleteProduction>(saveShipCompleteRequestDto);
                 model.DateDay = saveShipCompleteRequestDto.DateDay;
                 model.DiffProductionValue = model.CompleteOutputValue - model.PlanOutputValue;
-                model.QuantityWork = model.QuantityWork * 10000;
-                model.CompleteOutputValue = model.CompleteOutputValue * 10000;
-                model.PlanOutputValue = model.PlanOutputValue * 10000;
+                //model.QuantityWork = model.QuantityWork * 10000;
+                //model.CompleteOutputValue = model.CompleteOutputValue * 10000;
+                //model.PlanOutputValue = model.PlanOutputValue * 10000;
                 var total = await dbContent.Queryable<ShipCompleteProduction>().CountAsync(x => x.IsDelete == 1 && x.ShipId == saveShipCompleteRequestDto.ShipId&&x.DateDay== saveShipCompleteRequestDto.DateDay);
 
                 if (total >= 1)
@@ -217,9 +217,9 @@ namespace GHMonitoringCenterApi.Application.Service.ShipPlan
                     return responseAjaxResult;
                 }
                 model.Id = entity.Id;
-                model.QuantityWork = model.QuantityWork * 10000;
-                model.CompleteOutputValue = model.CompleteOutputValue * 10000;
-                model.PlanOutputValue = model.PlanOutputValue * 10000;
+                //model.QuantityWork = model.QuantityWork * 10000;
+                //model.CompleteOutputValue = model.CompleteOutputValue * 10000;
+                //model.PlanOutputValue = model.PlanOutputValue * 10000;
                 await dbContent.Updateable<ShipCompleteProduction>(model).ExecuteCommandAsync();
                 responseAjaxResult.Data = true;
                 responseAjaxResult.Success();

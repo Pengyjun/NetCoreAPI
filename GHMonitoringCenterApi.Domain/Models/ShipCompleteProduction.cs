@@ -29,13 +29,13 @@ namespace GHMonitoringCenterApi.Domain.Models
         /// <summary>
         /// 工程量  单位 万m³
         /// </summary>
-        [SugarColumn(ColumnDataType = "decimal(18,2)")]
+        [SugarColumn(ColumnDataType = "decimal(18,8)")]
         public decimal QuantityWork { get; set; }
 
         /// <summary>
         /// 单价  单位元m³
         /// </summary>
-        [SugarColumn(ColumnDataType = "decimal(18,2)")]
+        [SugarColumn(ColumnDataType = "decimal(18,8)")]
         public decimal Price { get; set; }
 
         /// <summary>
@@ -47,12 +47,12 @@ namespace GHMonitoringCenterApi.Domain.Models
         /// <summary>
         /// 完成产值 
         /// </summary>
-        [SugarColumn(ColumnDataType = "decimal(18,2)")]
+        [SugarColumn(ColumnDataType = "decimal(18,8)")]
         public decimal CompleteOutputValue { get; set; }
         /// <summary>
         /// 计划产值 
         /// </summary>
-        [SugarColumn(ColumnDataType = "decimal(18,2)")]
+        [SugarColumn(ColumnDataType = "decimal(18,8)")]
         public decimal PlanOutputValue { get; set; }
 
       /// <summary>
