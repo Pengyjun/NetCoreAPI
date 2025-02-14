@@ -9347,7 +9347,8 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 .LeftJoin<ProjectStatus>((x, y, z, s, q, t) => y.StatusId == t.StatusId)
                 .OrderBy((x, y) => y.Category)
                 .OrderByDescending((x, y) => y.Latitude)
-                .Where((x, y) => x.IsDelete == 1 && ids.Contains(x.Id) && company.Contains(y.CompanyId.Value) && projectStatusId.Contains(y.StatusId.Value) && y.TypeId != projectTypeId)
+                //.Where((x, y) => x.IsDelete == 1 && ids.Contains(x.Id) && company.Contains(y.CompanyId.Value) && projectStatusId.Contains(y.StatusId.Value) && y.TypeId != projectTypeId)
+                .Where((x, y) => x.IsDelete == 1 && ids.Contains(x.Id) && company.Contains(y.CompanyId.Value)  && y.TypeId != projectTypeId)
                 .Select((x, y, z, s, q, t) => new MonthReportProjectWordResponseDto
                 {
                     Id = x.Id,
