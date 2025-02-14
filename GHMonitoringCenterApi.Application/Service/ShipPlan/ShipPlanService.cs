@@ -217,6 +217,7 @@ namespace GHMonitoringCenterApi.Application.Service.ShipPlan
                     return responseAjaxResult;
                 }
                 model.Id = entity.Id;
+                model.DateDay = entity.DateDay;
                 //model.QuantityWork = model.QuantityWork * 10000;
                 //model.CompleteOutputValue = model.CompleteOutputValue * 10000;
                 //model.PlanOutputValue = model.PlanOutputValue * 10000;
