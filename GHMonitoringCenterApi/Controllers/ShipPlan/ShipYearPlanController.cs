@@ -98,5 +98,16 @@ namespace GHMonitoringCenterApi.Controllers.ShipPlan
         {
             return await shipPlanService.SearchShipCompleteImagesAsync();
         }
+
+        /// <summary>
+        /// 根据船舶完成产值 生成图
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        [HttpGet("SearchShipEachPlanCompleteImages")]
+        public async Task<ResponseAjaxResult<ShipEachPlanCompleteResponseDto>> SearchShipEachPlanCompleteImagesAsync()
+        {
+            return await shipPlanService.SearchShipEachPlanCompleteImagesAsync();
+        }
     }
 }

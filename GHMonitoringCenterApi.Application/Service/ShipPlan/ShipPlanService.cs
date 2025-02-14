@@ -512,5 +512,65 @@ namespace GHMonitoringCenterApi.Application.Service.ShipPlan
             response.Success();
             return response;
         }
+
+        /// <summary>
+        /// 根据船舶完成 计划产值 生产图
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        public async Task<ResponseAjaxResult<ShipEachPlanCompleteResponseDto>> SearchShipEachPlanCompleteImagesAsync()
+        {
+            ResponseAjaxResult<ShipEachPlanCompleteResponseDto> response = new ResponseAjaxResult<ShipEachPlanCompleteResponseDto>();
+            ShipEachPlanCompleteResponseDto shipPlanCompleteResponseDtos = new ShipEachPlanCompleteResponseDto();
+            for (int i = 1; i <= 12; i++)
+            {
+                shipPlanCompleteResponseDtos.XAxis.Add(i + "月");
+            }
+
+            var shipCompleteList = await dbContent.Queryable<ShipCompleteProduction>().Where(x => x.IsDelete == 1)
+                .ToListAsync();
+
+            //
+
+            var shipTypeList= await dbContent.Queryable<OwnerShip>().Where(x => x.IsDelete == 1).ToListAsync();
+            //06b7a5ce-e105-46c8-8b1d-24c8ba7f9dbf  耙吸船
+            var pxShipList= shipTypeList.Where(x => x.TypeId == "06b7a5ce-e105-46c8-8b1d-24c8ba7f9dbf".ToGuid()).Select(x=>x.PomId).ToList();
+            //f1718922-c213-4409-a59f-fdaf3d6c5e23  绞吸船
+            var jxShipList = shipTypeList.Where(x => x.TypeId == "f1718922-c213-4409-a59f-fdaf3d6c5e23".ToGuid()).Select(x => x.PomId).ToList();
+            //6959792d-27a4-4f2b-8fa4-a44222f08cb2  抓斗船
+            var zdShipList = shipTypeList.Where(x => x.TypeId == "6959792d-27a4-4f2b-8fa4-a44222f08cb2".ToGuid()).Select(x => x.PomId).ToList();
+            //计划产值
+            var startTime = DateTime.Now.Year.ToString("yyyy01").ObjToInt();
+            var endTime = DateTime.Now.Year.ToString("yyyy12").ObjToInt();
+
+            shipPlanCompleteResponseDtos.YAxisPxPlan = shipCompleteList.Where(x => x.DateDay >= startTime && x.DateDay >= endTime
+            && pxShipList.Contains(x.ShipId.Value)).Select(x => x.PlanOutputValue).ToList();
+            shipPlanCompleteResponseDtos.YAxisPxComplete = shipCompleteList.Where(x => x.DateDay >= startTime && x.DateDay >= endTime
+            && pxShipList.Contains(x.ShipId.Value)).Select(x => x.CompleteOutputValue).ToList();
+
+
+            shipPlanCompleteResponseDtos.YAxisJxPlan = shipCompleteList.Where(x => x.DateDay >= startTime && x.DateDay >= endTime
+            && jxShipList.Contains(x.ShipId.Value)).Select(x => x.PlanOutputValue).ToList();
+            shipPlanCompleteResponseDtos.YAxisJxComplete = shipCompleteList.Where(x => x.DateDay >= startTime && x.DateDay >= endTime
+            && jxShipList.Contains(x.ShipId.Value)).Select(x => x.CompleteOutputValue).ToList();
+
+
+
+            shipPlanCompleteResponseDtos.YAxisZdPlan = shipCompleteList.Where(x => x.DateDay >= startTime && x.DateDay >= endTime
+       && zdShipList.Contains(x.ShipId.Value)).Select(x => x.PlanOutputValue).ToList();
+            shipPlanCompleteResponseDtos.YAxisZdComplete = shipCompleteList.Where(x => x.DateDay >= startTime && x.DateDay >= endTime
+            && zdShipList.Contains(x.ShipId.Value)).Select(x => x.CompleteOutputValue).ToList();
+
+            shipPlanCompleteResponseDtos.YAxisPlan = shipCompleteList.Where(x => x.DateDay >= startTime && x.DateDay >= endTime
+        ).Select(x => x.PlanOutputValue).ToList();
+
+            shipPlanCompleteResponseDtos.YAxisComplete = shipCompleteList.Where(x => x.DateDay >= startTime && x.DateDay >= endTime
+            ).Select(x => x.CompleteOutputValue).ToList();
+
+
+            response.Data = shipPlanCompleteResponseDtos;
+            response.Success();
+            return response;
+        }
     }
 }

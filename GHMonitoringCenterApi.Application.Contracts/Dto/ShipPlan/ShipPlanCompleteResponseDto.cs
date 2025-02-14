@@ -15,20 +15,65 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.ShipPlan
         /// <summary>
         /// x轴
         /// </summary>
-        public List<string> XAxis { get; set; }
+        public List<string> XAxis { get; set; } = new List<string>();
         /// <summary>
         /// y轴完成产值
         /// </summary>
-        public List<decimal> YAxisComplete { get; set; }
+        public List<decimal> YAxisComplete { get; set; } = new List<decimal>();
         /// <summary>
         /// Y轴计划产值
         /// </summary>
-        public List<decimal> YAxisPlan { get; set; }
+        public List<decimal> YAxisPlan { get; set; } = new List<decimal>();
     }
 
-
-
-
     public class ShipEachPlanCompleteResponseDto
-    { }
+    {
+
+        /// <summary>
+        /// x轴
+        /// </summary>
+        public List<string> XAxis { get; set; }=new List<string>();
+        /// <summary>
+        /// y轴完成产值
+        /// </summary>
+        public List<decimal> YAxisPxComplete { get; set; } = new List<decimal>();
+        /// <summary>
+        /// Y轴计划产值
+        /// </summary>
+        public List<decimal> YAxisPxPlan { get; set; } = new List<decimal>();
+
+
+
+
+        /// <summary>
+        /// y轴完成产值
+        /// </summary>
+        public List<decimal> YAxisJxComplete { get; set; } = new List<decimal>();
+        /// <summary>
+        /// Y轴计划产值
+        /// </summary>
+        public List<decimal> YAxisJxPlan { get; set; } = new List<decimal>();
+
+
+
+        /// <summary>
+        /// y轴完成产值
+        /// </summary>
+        public List<decimal> YAxisZdComplete { get; set; } = new List<decimal>();
+        /// <summary>
+        /// Y轴计划产值
+        /// </summary>
+        public List<decimal> YAxisZdPlan { get; set; } = new List<decimal>();
+
+
+        /// <summary>
+        /// y轴完成产值
+        /// </summary>
+        public List<decimal> YAxisComplete { get; set; } = new List<decimal>();
+        /// <summary>
+        /// Y轴计划产值
+        /// </summary>
+        public List<decimal> YAxisPlan { get; set; } = new List<decimal>();
+
+    }
 }

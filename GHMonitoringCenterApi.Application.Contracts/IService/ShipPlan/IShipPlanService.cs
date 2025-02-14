@@ -67,5 +67,13 @@ namespace GHMonitoringCenterApi.Application.Contracts.IService.ShipPlan
         /// <returns></returns>
         Task<ResponseAjaxResult<ShipPlanCompleteResponseDto>> SearchShipCompleteImagesAsync();
 
+
+        /// <summary>
+        ///根据船舶类型完成产值  计划产值 生成图
+        /// </summary>
+        /// <param name="type">是自有年度产值计划与完成对比图 </param>
+        /// <returns></returns>
+        Task<ResponseAjaxResult<ShipEachPlanCompleteResponseDto>> SearchShipEachPlanCompleteImagesAsync();
+
     }
 }
