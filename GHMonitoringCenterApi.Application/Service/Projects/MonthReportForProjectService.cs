@@ -121,27 +121,37 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     var yRep = yReportList.FirstOrDefault(t => t.ProjectId == item.ProjectId && t.ShipId == item.ShipId && t.UnitPrice == item.UnitPrice && t.ProjectWBSId == item.ProjectWBSId);
                     if (yRep == null)
                     {
+                        if (Convert.ToInt32(item.CompletedQuantity) == 0)//过滤
+                        {
+                            item.IsAllowDelete = false;
+                        }
                         newYRep.Add(item);
                     }
                     else
                     {
                         yRep.IsAllowDelete = true;
-                        yRep.CompleteProductionAmount = item.CompleteProductionAmount;
-                        yRep.CompletedQuantity = item.CompletedQuantity;
-                        yRep.OutsourcingExpensesAmount = item.OutsourcingExpensesAmount;
+
+                        yRep.YearCompletedQuantity = item.YearCompletedQuantity;
+                        yRep.YearCompleteProductionAmount = item.YearCompleteProductionAmount;
+                        yRep.YearOutsourcingExpensesAmount = item.YearOutsourcingExpensesAmount;
                     }
 
                     var kRep = klReportList.FirstOrDefault(t => t.ProjectId == item.ProjectId && t.ShipId == item.ShipId && t.UnitPrice == item.UnitPrice && t.ProjectWBSId == item.ProjectWBSId);
                     if (kRep == null)
                     {
+                        if (Convert.ToInt32(item.CompletedQuantity) == 0)//过滤
+                        {
+                            item.IsAllowDelete = false;
+                        }
                         newKlRep.Add(item);
                     }
                     else
                     {
                         kRep.IsAllowDelete = true;
-                        kRep.CompleteProductionAmount = item.CompleteProductionAmount;
-                        kRep.CompletedQuantity = item.CompletedQuantity;
-                        kRep.OutsourcingExpensesAmount = item.OutsourcingExpensesAmount;
+
+                        kRep.TotalCompletedQuantity = item.TotalCompletedQuantity;
+                        kRep.TotalCompleteProductionAmount = item.TotalCompleteProductionAmount;
+                        kRep.TotalOutsourcingExpensesAmount = item.TotalOutsourcingExpensesAmount;
                     }
                 }
                 mReportList.AddRange(newMRep);
@@ -161,7 +171,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             }
 
             //转换wbs树
-            var pWbsTree = BuildTree("0", wbsList, mpWbsIds, mReportList, yReportList, klReportList, bData, addBefore2024, dateMonth);
+            var pWbsTree = BuildTree("0", wbsList, mpWbsIds, mReportList, yReportList, klReportList, bData, addBefore2024, dateMonth, isStaging);
 
             return pWbsTree;
         }
@@ -178,7 +188,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
         /// <param name="addBefore2024"></param>
         /// <param name="dateMonth"></param>
         /// <returns></returns>
-        public List<ProjectWBSDto> BuildTree(string? rootPid, List<ProjectWBSDto> wbsList, List<Guid>? mpWbsIds, List<ProjectWBSDto> mReportList, List<ProjectWBSDto> yReportList, List<ProjectWBSDto> klReportList, List<MonthReportForProjectBaseDataResponseDto> bData, List<MonthReportDetailAdd> addBefore2024, int? dateMonth)
+        public List<ProjectWBSDto> BuildTree(string? rootPid, List<ProjectWBSDto> wbsList, List<Guid>? mpWbsIds, List<ProjectWBSDto> mReportList, List<ProjectWBSDto> yReportList, List<ProjectWBSDto> klReportList, List<MonthReportForProjectBaseDataResponseDto> bData, List<MonthReportDetailAdd> addBefore2024, int? dateMonth, bool isStaging)
         {
             var tree = new List<ProjectWBSDto>();
             // 获取所有主节点
@@ -187,7 +197,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             foreach (var node in mainNodes)
             {
                 // 递归获取子节点
-                var children = BuildTree(node.KeyId, wbsList, mpWbsIds, mReportList, yReportList, klReportList, bData, addBefore2024, dateMonth);
+                var children = BuildTree(node.KeyId, wbsList, mpWbsIds, mReportList, yReportList, klReportList, bData, addBefore2024, dateMonth, isStaging);
                 // 判断当前节点是否是最后节点
                 if (!children.Any()) // 如果没有子节点
                 {
@@ -200,7 +210,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 tree.Add(node);
 
                 var values = mReportList.Where(x => x.ProjectWBSId == node.ProjectWBSId).ToList();
-                var finallyList = MReportForProjectList(node.ProjectWBSId, values, yReportList, klReportList, bData, addBefore2024, dateMonth);
+                var finallyList = MReportForProjectList(node.ProjectWBSId, values, yReportList, klReportList, bData, addBefore2024, dateMonth, isStaging);
                 if (!finallyList.Any())//如果没有子节点  看当前节点是否存在2025年前需要补录的开累数据
                 {
                     List<ProjectWBSDto> add = new();
@@ -252,7 +262,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
         /// <param name="bData">施工性质、产值属性</param>
         /// <param name="addBefore2024">施工性质、产值属性</param>
         /// <returns></returns>
-        private List<ProjectWBSDto> MReportForProjectList(Guid wbsId, List<ProjectWBSDto> mReportList, List<ProjectWBSDto> yReportList, List<ProjectWBSDto> klReportList, List<MonthReportForProjectBaseDataResponseDto> bData, List<MonthReportDetailAdd> addBefore2024, int? dateMonth)
+        private List<ProjectWBSDto> MReportForProjectList(Guid wbsId, List<ProjectWBSDto> mReportList, List<ProjectWBSDto> yReportList, List<ProjectWBSDto> klReportList, List<MonthReportForProjectBaseDataResponseDto> bData, List<MonthReportDetailAdd> addBefore2024, int? dateMonth, bool isStaging)
         {
             /***
              * 1.根据(当前施工分类)wbsid获取所有资源（船舶）信息
@@ -312,37 +322,40 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 #region 追加202412月前没存在过的wbs数据 如果之前存在过则相加产值、工程量、外包支出、否则追加整条数据
                 if (dateMonth != null && dateMonth > 202412)
                 {
-                    if (pwbsIds.Contains(report.ProjectWBSId) && projectIds.Contains(report.ProjectId))
+                    if (isStaging == false)
                     {
-                        //如果当月数据在追加数据表中存在 则相加
-                        var existBefore2024 = addBefore2024.FirstOrDefault(x => x.ProjectWBSId == report.ProjectWBSId && x.UnitPrice == report.UnitPrice && x.ShipId == report.ShipId && x.ProjectId.ToString() == report.ProjectId && x.ConstructionNature == report.ConstructionNature);
+                        if (pwbsIds.Contains(report.ProjectWBSId) && projectIds.Contains(report.ProjectId))
+                        {
+                            //如果当月数据在追加数据表中存在 则相加
+                            var existBefore2024 = addBefore2024.FirstOrDefault(x => x.ProjectWBSId == report.ProjectWBSId && x.UnitPrice == report.UnitPrice && x.ShipId == report.ShipId && x.ProjectId.ToString() == report.ProjectId && x.ConstructionNature == report.ConstructionNature);
 
-                        if (existBefore2024 != null)
-                        {
-                            report.TotalCompletedQuantity += existBefore2024.CompletedQuantity;
-                            report.TotalCompleteProductionAmount += existBefore2024.CompleteProductionAmount;
-                            report.TotalOutsourcingExpensesAmount += existBefore2024.OutsourcingExpensesAmount;
-                        }
-                        else
-                        {
-                            var addList = addBefore2024.Where(x => x.ProjectWBSId == report.ProjectWBSId).ToList();
-                            //追加整条
-                            foreach (var item2 in addList)
+                            if (existBefore2024 != null)
                             {
-                                addHis.Add(new ProjectWBSDto
+                                report.TotalCompletedQuantity += existBefore2024.CompletedQuantity;
+                                report.TotalCompleteProductionAmount += existBefore2024.CompleteProductionAmount;
+                                report.TotalOutsourcingExpensesAmount += existBefore2024.OutsourcingExpensesAmount;
+                            }
+                            else
+                            {
+                                var addList = addBefore2024.Where(x => x.ProjectWBSId == report.ProjectWBSId).ToList();
+                                //追加整条
+                                foreach (var item2 in addList)
                                 {
-                                    Id = Guid.Empty,
-                                    ProjectId = item2.ProjectId.ToString(),
-                                    UnitPrice = item2.UnitPrice,
-                                    OutPutType = item2.OutPutType,
-                                    ShipId = item2.ShipId,
-                                    ShipName = item2.ShipName,
-                                    ProjectWBSId = item2.ProjectWBSId,
-                                    ConstructionNature = item2.ConstructionNature,
-                                    TotalOutsourcingExpensesAmount = item2.OutsourcingExpensesAmount,
-                                    TotalCompletedQuantity = item2.CompletedQuantity,
-                                    TotalCompleteProductionAmount = item2.CompleteProductionAmount,
-                                });
+                                    addHis.Add(new ProjectWBSDto
+                                    {
+                                        Id = Guid.Empty,
+                                        ProjectId = item2.ProjectId.ToString(),
+                                        UnitPrice = item2.UnitPrice,
+                                        OutPutType = item2.OutPutType,
+                                        ShipId = item2.ShipId,
+                                        ShipName = item2.ShipName,
+                                        ProjectWBSId = item2.ProjectWBSId,
+                                        ConstructionNature = item2.ConstructionNature,
+                                        TotalOutsourcingExpensesAmount = item2.OutsourcingExpensesAmount,
+                                        TotalCompletedQuantity = item2.CompletedQuantity,
+                                        TotalCompleteProductionAmount = item2.CompleteProductionAmount,
+                                    });
+                                }
                             }
                         }
                     }
@@ -1295,13 +1308,13 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                                 item.KeyId = wbss.FirstOrDefault(x => x.Id == item.ProjectWBSId)?.KeyId;
                                 item.IsDelete = wbss.FirstOrDefault(x => x.Id == item.ProjectWBSId).IsDelete;
 
-                                item.YearCompleteProductionAmount = item.CompleteProductionAmount;
-                                item.YearCompletedQuantity = item.CompletedQuantity;
-                                item.YearOutsourcingExpensesAmount = item.OutsourcingExpensesAmount;
+                                //item.YearCompleteProductionAmount = item.CompleteProductionAmount;
+                                //item.YearCompletedQuantity = item.CompletedQuantity;
+                                //item.YearOutsourcingExpensesAmount = item.OutsourcingExpensesAmount;
 
-                                item.TotalCompleteProductionAmount = item.CompleteProductionAmount;
-                                item.TotalCompletedQuantity = item.CompletedQuantity;
-                                item.TotalOutsourcingExpensesAmount = item.OutsourcingExpensesAmount;
+                                //item.TotalCompleteProductionAmount = item.CompleteProductionAmount;
+                                //item.TotalCompletedQuantity = item.CompletedQuantity;
+                                //item.TotalOutsourcingExpensesAmount = item.OutsourcingExpensesAmount;
                             }
                             dayRep = true;
                             treeDetails = await WBSConvertTree(model.ProjectId, dateMonth, bData, result.IsFromStaging, resList, dayRep, IsExistZcAndMp, model.ExhaustedBtn);

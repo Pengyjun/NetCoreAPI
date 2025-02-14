@@ -1008,6 +1008,23 @@ namespace GHMonitoringCenterApi.Application.Service
                 responseAjaxResult.Count = total;
                 responseAjaxResult.Success();
             }
+            if (requestDto.Type == 4)
+            {
+                //自有船舶  且船舶类型 是耙吸船    绞吸  抓斗船三种
+                List<Guid> gUIDs = new List<Guid>();
+                gUIDs.Add("06b7a5ce-e105-46c8-8b1d-24c8ba7f9dbf".ToGuid());
+                gUIDs.Add("f1718922-c213-4409-a59f-fdaf3d6c5e23".ToGuid());
+                gUIDs.Add("6959792d-27a4-4f2b-8fa4-a44222f08cb2".ToGuid());
+                //获取自有船舶数据
+                var ownerList = await baseOwnerShipRepository.AsQueryable()
+                    .Where(x=> gUIDs.Contains(x.TypeId.Value))
+                    .WhereIF(!string.IsNullOrWhiteSpace(requestDto.KeyWords), x => SqlFunc.Contains(x.Name, requestDto.KeyWords))
+                    .Select(x => new BasePullDownResponseDto { Id = x.PomId, Name = x.Name, Type = (int)ShipType.OwnerShip })
+                    .ToPageListAsync(requestDto.PageIndex, requestDto.PageSize, total);
+                responseAjaxResult.Data = ownerList;
+                responseAjaxResult.Count = ownerList.Count;
+                responseAjaxResult.Success();
+            }
             return responseAjaxResult;
         }
         #endregion

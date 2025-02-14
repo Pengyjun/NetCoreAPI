@@ -4196,7 +4196,6 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             }
 
             stagingData.BizData = JsonConvert.SerializeObject(model);
-            //这里要把原来驳回的明细进行处理  删掉存在的   暂存的都是最新的
 
             #region 新的逻辑
             //////只要本月的月报数据
