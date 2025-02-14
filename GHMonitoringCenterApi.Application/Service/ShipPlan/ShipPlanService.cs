@@ -506,8 +506,8 @@ namespace GHMonitoringCenterApi.Application.Service.ShipPlan
             //计划产值
             var startTime = DateTime.Now.ToString("yyyy01").ObjToInt();
             var endTime = DateTime.Now.ToString("yyyy12").ObjToInt();
-            shipPlanCompleteResponseDtos.YAxisPlan= shipCompleteList.Where(x=>x.DateDay>= startTime&&x.DateDay>= endTime).Select(x=>x.PlanOutputValue).ToList();
-            shipPlanCompleteResponseDtos.YAxisComplete = shipCompleteList.Where(x => x.DateDay >= startTime && x.DateDay >= endTime).Select(x => x.CompleteOutputValue).ToList();
+            shipPlanCompleteResponseDtos.YAxisPlan= shipCompleteList.Where(x=>x.DateDay>= startTime&&x.DateDay<= endTime).Select(x=>x.PlanOutputValue).ToList();
+            shipPlanCompleteResponseDtos.YAxisComplete = shipCompleteList.Where(x => x.DateDay >= startTime && x.DateDay <= endTime).Select(x => x.CompleteOutputValue).ToList();
             response.Data= shipPlanCompleteResponseDtos;
             response.Success();
             return response;
@@ -543,28 +543,28 @@ namespace GHMonitoringCenterApi.Application.Service.ShipPlan
             var startTime = DateTime.Now.ToString("yyyy01").ObjToInt();
             var endTime = DateTime.Now.ToString("yyyy12").ObjToInt();
 
-            shipPlanCompleteResponseDtos.YAxisPxPlan = shipCompleteList.Where(x => x.DateDay >= startTime && x.DateDay >= endTime
+            shipPlanCompleteResponseDtos.YAxisPxPlan = shipCompleteList.Where(x => x.DateDay >= startTime && x.DateDay <= endTime
             && pxShipList.Contains(x.ShipId.Value)).Select(x => x.PlanOutputValue).ToList();
-            shipPlanCompleteResponseDtos.YAxisPxComplete = shipCompleteList.Where(x => x.DateDay >= startTime && x.DateDay >= endTime
+            shipPlanCompleteResponseDtos.YAxisPxComplete = shipCompleteList.Where(x => x.DateDay >= startTime && x.DateDay <= endTime
             && pxShipList.Contains(x.ShipId.Value)).Select(x => x.CompleteOutputValue).ToList();
 
 
-            shipPlanCompleteResponseDtos.YAxisJxPlan = shipCompleteList.Where(x => x.DateDay >= startTime && x.DateDay >= endTime
+            shipPlanCompleteResponseDtos.YAxisJxPlan = shipCompleteList.Where(x => x.DateDay >= startTime && x.DateDay <= endTime
             && jxShipList.Contains(x.ShipId.Value)).Select(x => x.PlanOutputValue).ToList();
-            shipPlanCompleteResponseDtos.YAxisJxComplete = shipCompleteList.Where(x => x.DateDay >= startTime && x.DateDay >= endTime
+            shipPlanCompleteResponseDtos.YAxisJxComplete = shipCompleteList.Where(x => x.DateDay >= startTime && x.DateDay <= endTime
             && jxShipList.Contains(x.ShipId.Value)).Select(x => x.CompleteOutputValue).ToList();
 
 
 
-            shipPlanCompleteResponseDtos.YAxisZdPlan = shipCompleteList.Where(x => x.DateDay >= startTime && x.DateDay >= endTime
+            shipPlanCompleteResponseDtos.YAxisZdPlan = shipCompleteList.Where(x => x.DateDay >= startTime && x.DateDay <= endTime
        && zdShipList.Contains(x.ShipId.Value)).Select(x => x.PlanOutputValue).ToList();
-            shipPlanCompleteResponseDtos.YAxisZdComplete = shipCompleteList.Where(x => x.DateDay >= startTime && x.DateDay >= endTime
+            shipPlanCompleteResponseDtos.YAxisZdComplete = shipCompleteList.Where(x => x.DateDay >= startTime && x.DateDay <= endTime
             && zdShipList.Contains(x.ShipId.Value)).Select(x => x.CompleteOutputValue).ToList();
 
-            shipPlanCompleteResponseDtos.YAxisPlan = shipCompleteList.Where(x => x.DateDay >= startTime && x.DateDay >= endTime
+            shipPlanCompleteResponseDtos.YAxisPlan = shipCompleteList.Where(x => x.DateDay >= startTime && x.DateDay <= endTime
         ).Select(x => x.PlanOutputValue).ToList();
 
-            shipPlanCompleteResponseDtos.YAxisComplete = shipCompleteList.Where(x => x.DateDay >= startTime && x.DateDay >= endTime
+            shipPlanCompleteResponseDtos.YAxisComplete = shipCompleteList.Where(x => x.DateDay >= startTime && x.DateDay <= endTime
             ).Select(x => x.CompleteOutputValue).ToList();
 
 
