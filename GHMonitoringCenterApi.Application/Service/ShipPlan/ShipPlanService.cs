@@ -208,7 +208,7 @@ namespace GHMonitoringCenterApi.Application.Service.ShipPlan
                 ShipCompleteProduction model = mapper.Map<SaveShipCompleteRequestDto, ShipCompleteProduction>(saveShipCompleteRequestDto);
                 model.DateDay = saveShipCompleteRequestDto.DateDay;
                 model.DiffProductionValue = model.CompleteOutputValue - model.PlanOutputValue;
-                var entity = await dbContent.Queryable<ShipCompleteProduction>().Where(x => x.IsDelete == 1 && x.ShipId == saveShipCompleteRequestDto.ShipId&&x.DateDay== saveShipCompleteRequestDto.DateDay
+                var entity = await dbContent.Queryable<ShipCompleteProduction>().Where(x => x.IsDelete == 1 && x.ShipId == saveShipCompleteRequestDto.ShipId
                  ).FirstAsync();
                 if (entity == null)
                 {
