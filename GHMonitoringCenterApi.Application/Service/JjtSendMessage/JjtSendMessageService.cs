@@ -1736,7 +1736,7 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
                  .Where(x => x.DateDay >= timeOf && x.DateDay <= currentTimeInt)
                     .Sum(x => x.DayActualProductionAmount), 3);
             //项目月报数据
-            var monthReport = await dbContext.Queryable<MonthReport>().Where(x => x.IsDelete == 1 && x.DateMonth >= 202401).ToListAsync();
+            //var monthReport = await dbContext.Queryable<MonthReport>().Where(x => x.IsDelete == 1 && x.DateMonth >= 202401).ToListAsync();
             //
             var projectIds = await dbContext.Queryable<Project>().Where(x => x.IsDelete == 1).ToListAsync();
             //新增得查询----------
@@ -1995,10 +1995,10 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
                     projectBasePoduction.DayProductionValue = dayTotalPoductionValues;//Math.Round(planProducitonValue.Value/10000, 2);//;
                     /*projectBasePoduction.TotalYearProductionValue =   Math.Round(companyBasePoductionValues.Sum(x => x.YearCompanyProductionValue.Value) / 100000000M, 2);*/
                     //计算日报数据
-                    var newDayValues = await dbContext.Queryable<DayReport>().Where(x => x.IsDelete == 1 && x.DateDay >= startYearTimeInt && x.DateDay <= 20250113).SumAsync(x => x.DayActualProductionAmount);
+                    //var newDayValues = await dbContext.Queryable<DayReport>().Where(x => x.IsDelete == 1 && x.DateDay >= startYearTimeInt && x.DateDay <= 20250113).SumAsync(x => x.DayActualProductionAmount);
 
-                    projectBasePoduction.TotalYearProductionValue = Math.Round((dayNewProjectValue.Where(x => x.DateDay <= currentTimeInt).Sum(x => x.ProductionValue.Value)+ newDayValues) / 100000000, 2);// companyBasePoductionValues.Sum(x => x.TotalYearProductionValue);
-                    //projectBasePoduction.TotalYearProductionValue = companyBasePoductionValues.Sum(x => x.TotalYearProductionValue);
+                    // projectBasePoduction.TotalYearProductionValue = Math.Round((dayNewProjectValue.Where(x => x.DateDay <= currentTimeInt).Sum(x => x.ProductionValue.Value)+ newDayValues) / 100000000, 2);// companyBasePoductionValues.Sum(x => x.TotalYearProductionValue);
+                    projectBasePoduction.TotalYearProductionValue = companyBasePoductionValues.Sum(x => x.TotalYearProductionValue);
                    
 
                     projectBasePoduction.ProductionValueProgressPercent = productionValueProgressPercent;
@@ -2013,12 +2013,12 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
                         Name = name,
                        DayProductionValue = dayTotalPoductionValues,
                         //DayProductionValue = Math.Round(planProducitonValue.Value / 10000, 2),
-                        // TotalYearProductionValue = Math.Round(yearProductionValue / 100000000, 2),
-                        TotalYearProductionValue = Math.Round((dayNewProjectValue.Where(x => x.DateDay <= currentTimeInt).Sum(x => x.ProductionValue.Value)+ newDayValues) / 100000000,2),
+                         TotalYearProductionValue = projectBasePoduction.TotalYearProductionValue, //Math.Round(yearProductionValue / 100000000, 2),
+                        //TotalYearProductionValue = Math.Round((dayNewProjectValue.Where(x => x.DateDay <= currentTimeInt).Sum(x => x.ProductionValue.Value)+ newDayValues) / 100000000,2),
                         YearProductionValueProgressPercent = 100,
                         ProductionValueProgressPercent = productionValueProgressPercent,
                         SupersequenceProgress = projectBasePoduction.SupersequenceProgress
-                    });
+                    });;
 
                 }
             }
