@@ -17,6 +17,7 @@ using GHMonitoringCenterApi.Domain.Shared.Enums;
 using GHMonitoringCenterApi.Domain.Shared.Util;
 using SqlSugar;
 using SqlSugar.Extensions;
+using System.Linq;
 using System.Text;
 using UtilsSharp;
 
@@ -476,6 +477,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 .Select((p, ps) => new ProjectExcelSearchResponseDto
                 {
                     Id = p.Id,
+                    ManagerType=p.ManagerType,
                     MasterProjectId = p.MasterProjectId.Value,
                     Name = p.Name,
                     Category = p.Category,
@@ -524,8 +526,13 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     DurationInformation = p.DurationInformation,
                     ShutDownReason = p.ShutDownReason,
                     ContractChangeInfo = p.ContractChangeInfo,
-                    MasterCode = p.MasterCode
+                    MasterCode = p.MasterCode,
+                    ProjectDeptId=p.ProjectDept.Value,
                 });
+
+            
+
+           
 
             //是否全量导出
             var projectList = new List<ProjectExcelSearchResponseDto>();
@@ -538,7 +545,14 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 projectList = await project.OrderBy("ps.Sequence asc,p.CreateTime desc ").ToListAsync();
                 total = projectList.Count;
             }
-
+            var managerType = await dbContext.Queryable<ProjectMangerType>().Where(x => x.IsDelete == 1).ToListAsync();
+            foreach (var item in projectList)
+            {
+               var ids= item.ManagerType.Split(",").ToList();
+               var res = managerType.Where(x => ids.Contains(x.Code)).Select(x => x.Name).ToList();
+               item.ManagerTypeName=string.Join(",",res);
+                item.ProjectDept = institution.Where(x => x.Poid == item.ProjectDeptId.ToString()).Select(x => x.Name).FirstOrDefault();
+            }
             #region 获取所有类型的id
             //获取项目Id 
             var projectIds = projectList.Select(x => x.Id).ToList();
