@@ -551,7 +551,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                var ids= item.ManagerType.Split(",").ToList();
                var res = managerType.Where(x => ids.Contains(x.Code)).Select(x => x.Name).ToList();
                item.ManagerTypeName=string.Join(",",res);
-                item.ProjectDept = institution.Where(x => x.Poid == item.ProjectDeptId.ToString()).Select(x => x.Name).FirstOrDefault();
+                item.ProjectDept = institution.Where(x => x.PomId == item.ProjectDeptId).Select(x => x.Name).FirstOrDefault();
             }
             #region 获取所有类型的id
             //获取项目Id 
