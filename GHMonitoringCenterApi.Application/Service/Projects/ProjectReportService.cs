@@ -2525,9 +2525,9 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             if (model.IsDuiWai)
             {
                 list = list
-                .Where(x => string.IsNullOrEmpty(x.UpdateTime.ToString()) || x.UpdateTime == DateTime.MinValue ?
-                  x.CreateTime.Value.Date >= model.StartTime && x.CreateTime.Value.Date <= model.EndTime
-                : x.UpdateTime.Value.Date >= model.StartTime && x.UpdateTime.Value.Date <= model.EndTime)
+                //.Where(x => string.IsNullOrEmpty(x.UpdateTime.ToString()) || x.UpdateTime == DateTime.MinValue ?
+                //  x.CreateTime.Value.Date >= model.StartTime && x.CreateTime.Value.Date <= model.EndTime
+                //: x.UpdateTime.Value.Date >= model.StartTime && x.UpdateTime.Value.Date <= model.EndTime)
                 .ToList();
             }
 
@@ -3010,11 +3010,11 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             if (model.IsDuiWai)
             {
                 list = list
-                .Where(x => string.IsNullOrEmpty(x.UpdateTime.ToString()) || x.UpdateTime == DateTime.MinValue ?
-                (x.CreateTime.Value.Year > model.StartTime.Value.Year || (x.CreateTime.Value.Year == model.StartTime.Value.Year && x.CreateTime.Value.Month >= model.StartTime.Value.Month)) &&
-                (x.CreateTime.Value.Year < model.EndTime.Value.Year || (x.CreateTime.Value.Year == model.EndTime.Value.Year && x.CreateTime.Value.Month <= model.EndTime.Value.Month)) :
-                (x.UpdateTime.Value.Year > model.StartTime.Value.Year || (x.UpdateTime.Value.Year == model.StartTime.Value.Year && x.UpdateTime.Value.Month >= model.StartTime.Value.Month)) &&
-                (x.UpdateTime.Value.Year < model.EndTime.Value.Year || (x.UpdateTime.Value.Year == model.EndTime.Value.Year && x.UpdateTime.Value.Month <= model.EndTime.Value.Month)))
+                //.Where(x => string.IsNullOrEmpty(x.UpdateTime.ToString()) || x.UpdateTime == DateTime.MinValue ?
+                //(x.CreateTime.Value.Year > model.StartTime.Value.Year || (x.CreateTime.Value.Year == model.StartTime.Value.Year && x.CreateTime.Value.Month >= model.StartTime.Value.Month)) &&
+                //(x.CreateTime.Value.Year < model.EndTime.Value.Year || (x.CreateTime.Value.Year == model.EndTime.Value.Year && x.CreateTime.Value.Month <= model.EndTime.Value.Month)) :
+                //(x.UpdateTime.Value.Year > model.StartTime.Value.Year || (x.UpdateTime.Value.Year == model.StartTime.Value.Year && x.UpdateTime.Value.Month >= model.StartTime.Value.Month)) &&
+                //(x.UpdateTime.Value.Year < model.EndTime.Value.Year || (x.UpdateTime.Value.Year == model.EndTime.Value.Year && x.UpdateTime.Value.Month <= model.EndTime.Value.Month)))
                 .OrderByDescending(x => x.DateMonth)
                 .ToList();
                 //x.CreateTime >= model.StartTime && x.CreateTime <= model.EndTime
