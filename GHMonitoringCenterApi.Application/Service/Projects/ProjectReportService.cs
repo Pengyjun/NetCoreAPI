@@ -2454,7 +2454,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     .OrderByDescending((m, p) => new { m.DateMonth });
             //.OrderByDescending((m, p) => new { m.ProjectId, m.DateMonth });
             var selQuery = query
-                 .Where((m, p) => m.DateMonth != 202306)
+                 .Where((m, p) => m.DateMonth != 202306 && !m.StatusText.Contains("驳回"))
                   .WhereIF(!string.IsNullOrWhiteSpace(model.ManagerType), (m, p) => p.ManagerType == model.ManagerType)
                 .Select((m, p) => new MonthtReportsResponseDto.MonthtReportDto()
                 {
@@ -2822,7 +2822,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
 
             //因追加历史的所有月报 此处重写合计
             //取所有的项目月报ids
-            var mpIds = await selQuery.Where(m => m.StatusText != "已驳回").Select(m => m.ProjectId).ToListAsync();
+            var mpIds = await selQuery.Where(m => !m.StatusText.Contains("驳回")).Select(m => m.ProjectId).ToListAsync();
             mIds = mIds.Distinct().ToList();
             var mpList = await _dbMonthReport.AsQueryable()
                 .Where(x => x.IsDelete == 1 && mpIds.Contains(x.ProjectId))
@@ -2954,7 +2954,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             }
 
 
-            var selQuery = query.Where((m, p) => m.DateMonth != 202306).Select((m, p) => new MonthtReportsResponseDto.MonthtReportDto()
+            var selQuery = query.Where((m, p) => m.DateMonth != 202306 && !m.StatusText.Contains("驳回")).Select((m, p) => new MonthtReportsResponseDto.MonthtReportDto()
             {
                 Id = m.Id,
                 ProjectId = m.ProjectId,
@@ -3314,11 +3314,11 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             {
                 totalMonthtReport = new MonthtReportsResponseDto.TotalMonthtReportsDto
                 {
-                    AccomplishQuantities = Math.Round(list.Where(m => m.StatusText != "已驳回").Sum(m => m.AccomplishQuantities), 2),
-                    AccomplishValue = Math.Round(list.Where(m => m.StatusText != "已驳回").Sum(m => m.AccomplishValue2), 2),
-                    RecognizedValue = Math.Round(list.Where(m => m.StatusText != "已驳回").Sum(m => m.RecognizedValue), 2),
-                    PaymentAmount = Math.Round(list.Where(m => m.StatusText != "已驳回").Sum(m => m.PaymentAmount), 2),
-                    OutsourcingExpensesAmount = Math.Round(list.Where(m => m.StatusText != "已驳回").Sum(m => m.OutsourcingExpensesAmount), 2)
+                    AccomplishQuantities = Math.Round(list.Where(m => !m.StatusText.Contains("驳回")).Sum(m => m.AccomplishQuantities), 2),
+                    AccomplishValue = Math.Round(list.Where(m => !m.StatusText.Contains("驳回")).Sum(m => m.AccomplishValue2), 2),
+                    RecognizedValue = Math.Round(list.Where(m => !m.StatusText.Contains("驳回")).Sum(m => m.RecognizedValue), 2),
+                    PaymentAmount = Math.Round(list.Where(m => !m.StatusText.Contains("驳回")).Sum(m => m.PaymentAmount), 2),
+                    OutsourcingExpensesAmount = Math.Round(list.Where(m => !m.StatusText.Contains("驳回")).Sum(m => m.OutsourcingExpensesAmount), 2)
                 };
             }
             else
@@ -3327,11 +3327,11 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 var subpIds = await _dbContext.Queryable<Project>().Where(t => t.IsDelete == 1 && t.IsSubContractProject == 2).Select(x => x.Id).ToListAsync();
                 totalMonthtReport = new MonthtReportsResponseDto.TotalMonthtReportsDto
                 {
-                    AccomplishQuantities = Math.Round(list.Where(m => !subpIds.Contains(m.ProjectId) && m.StatusText != "已驳回").Sum(m => m.AccomplishQuantities), 2),
-                    AccomplishValue = Math.Round(list.Where(m => !subpIds.Contains(m.ProjectId) && m.StatusText != "已驳回").Sum(m => m.AccomplishValue2), 2),
-                    RecognizedValue = Math.Round(list.Where(m => !subpIds.Contains(m.ProjectId) && m.StatusText != "已驳回").Sum(m => m.RecognizedValue), 2),
-                    PaymentAmount = Math.Round(list.Where(m => !subpIds.Contains(m.ProjectId) && m.StatusText != "已驳回").Sum(m => m.PaymentAmount), 2),
-                    OutsourcingExpensesAmount = Math.Round(list.Where(m => !subpIds.Contains(m.ProjectId) && m.StatusText != "已驳回").Sum(m => m.OutsourcingExpensesAmount), 2)
+                    AccomplishQuantities = Math.Round(list.Where(m => !subpIds.Contains(m.ProjectId) && !m.StatusText.Contains("驳回")).Sum(m => m.AccomplishQuantities), 2),
+                    AccomplishValue = Math.Round(list.Where(m => !subpIds.Contains(m.ProjectId) && !m.StatusText.Contains("驳回")).Sum(m => m.AccomplishValue2), 2),
+                    RecognizedValue = Math.Round(list.Where(m => !subpIds.Contains(m.ProjectId) && !m.StatusText.Contains("驳回")).Sum(m => m.RecognizedValue), 2),
+                    PaymentAmount = Math.Round(list.Where(m => !subpIds.Contains(m.ProjectId) && !m.StatusText.Contains("驳回")).Sum(m => m.PaymentAmount), 2),
+                    OutsourcingExpensesAmount = Math.Round(list.Where(m => !subpIds.Contains(m.ProjectId) && !m.StatusText.Contains("驳回")).Sum(m => m.OutsourcingExpensesAmount), 2)
                 };
             }
             foreach (var item in list)

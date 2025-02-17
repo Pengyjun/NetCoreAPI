@@ -850,6 +850,23 @@ namespace GHMonitoringCenterApi.Controllers.Project
             rt.SuccessResult(rs);
             return rt;
         }
+
+        #region 月报编辑按钮权限控制
+        /// <summary>
+        /// 月报编辑按钮权限控制
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("BtnEditMonthlyReport")]
+        public ResponseAjaxResult<bool> BtnEditMonthlyReport()
+        {
+            ResponseAjaxResult<bool> rt = new();
+            bool rs = false;
+            if (CurrentUser.Account == "2016146340" || CurrentUser.Account == "2022002687") rs = true;
+            else rs = false;
+            rt.SuccessResult(rs);
+            return rt;
+        }
+        #endregion
         #region  新的项目月报列表
         [HttpPost("aa")]
         [AllowAnonymous]
