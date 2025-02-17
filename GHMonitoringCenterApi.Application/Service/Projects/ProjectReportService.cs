@@ -6005,7 +6005,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 .Select(t => new ShipsForReportResponseDto.ResShipForReport()
                 {
                     EnterTime = t.EnterTime.Value,
-                    QuitTime=t.QuitTime.Value,
+                    QuitTime = t.QuitTime.Value,
                     ShipId = t.ShipId,
                     ProjectId = t.ProjectId,
                     ShipType = t.ShipType,
@@ -6018,8 +6018,8 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 {
                     item.QuitTime = DateTime.MaxValue;
                 }
-                    var time = item.QuitTime.ToString("yyyyMM").ObjToInt();
-                if (time <model.DateMonth)
+                var time = item.QuitTime.ToString("yyyyMM").ObjToInt();
+                if (time < model.DateMonth)
                 {
                     removeShipIds.Add(item.ShipId);
                 }
@@ -6587,8 +6587,8 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
 
             var startTimeInt = int.Parse(requestDto.InStartDate.Value.ToString("yyyyMM"));
             var endTimeInt = int.Parse(requestDto.InEndDate.Value.ToString("yyyyMM"));
-            var yearStart = int.Parse(requestDto.InStartDate.Value.ToString("yyyy01"));
-            var yearEnd = int.Parse(requestDto.InEndDate.Value.ToString("yyyy12"));
+            //var yearStart = int.Parse(requestDto.InStartDate.Value.ToString("yyyy01"));
+            //var yearEnd = int.Parse(requestDto.InEndDate.Value.ToString("yyyy12"));
             #endregion
 
             #region 项目负责人
@@ -6620,7 +6620,8 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                .LeftJoin<OwnerShip>((a, b, c) => a.ShipId == c.PomId)
                .LeftJoin<ShipPingType>((a, b, c, d) => c.TypeId == d.PomId)
                .LeftJoin<Institution>((a, b, c, d, e) => b.CompanyId == e.PomId)
-               .Where((a, b) => a.IsDelete == 1 && a.DateMonth >= startTimeInt && a.DateMonth <= endTimeInt)
+               .WhereIF(!requestDto.IsDuiWai, (a, b) => a.IsDelete == 1 && a.DateMonth >= startTimeInt && a.DateMonth <= endTimeInt)
+                .WhereIF(requestDto.IsDuiWai, (a, b) => a.IsDelete == 1 && a.DateMonth >= 190001 && a.DateMonth <= SqlFunc.ToInt32(DateTime.Now.ToString("yyyyMM")))
                 .WhereIF(requestDto.CompanyId != null, (a, b) => b.CompanyId == requestDto.CompanyId)
                 .WhereIF(requestDto.ProjectDept != null, (a, b) => b.ProjectDept == requestDto.ProjectDept)
                 .WhereIF(requestDto.ProjectStatusId != null && requestDto.ProjectStatusId.Any(), (a, b) => requestDto.ProjectStatusId.Contains(b.StatusId.Value.ToString()))
@@ -6663,11 +6664,10 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                    ThiUnitName = e.Shortname,
                    SecUnitName = "广航局",
                    IsExamine = 0,
-                   YearOutputVal = SqlFunc.Subqueryable<OwnerShipMonthReport>().Where(x => x.DateMonth >= yearStart && x.DateMonth <= yearEnd
-                   && x.ShipId == a.ShipId && x.ProjectId == a.ProjectId && x.DateMonth <= a.DateMonth).Sum(x => x.Production),
-                   YearQuantity = SqlFunc.Subqueryable<OwnerShipMonthReport>().Where(x => x.DateMonth >= yearStart && x.DateMonth <= yearEnd && x.ShipId == a.ShipId && x.ProjectId == a.ProjectId && x.DateMonth <= a.DateMonth).Sum(x => x.ProductionAmount),
-                   YearWorkDays = SqlFunc.Subqueryable<OwnerShipMonthReport>().Where(x => x.DateMonth >= yearStart && x.DateMonth <= yearEnd && x.ShipId == a.ShipId && x.ProjectId == a.ProjectId && x.DateMonth <= a.DateMonth).Sum(x => x.ConstructionDays),
-                   YearWorkHours = SqlFunc.Subqueryable<OwnerShipMonthReport>().Where(x => x.DateMonth >= yearStart && x.DateMonth <= yearEnd && x.ShipId == a.ShipId && x.ProjectId == a.ProjectId && x.DateMonth <= a.DateMonth).Sum(x => x.WorkingHours),
+                   YearOutputVal = SqlFunc.Subqueryable<OwnerShipMonthReport>().Where(x => x.DateMonth >= Convert.ToInt32(a.DateMonth.ToString().Substring(0, 4) + "01") && x.DateMonth <= Convert.ToInt32(a.DateMonth.ToString().Substring(0, 4) + "12") && x.ShipId == a.ShipId && x.ProjectId == a.ProjectId).Sum(x => x.Production),
+                   YearQuantity = SqlFunc.Subqueryable<OwnerShipMonthReport>().Where(x => x.DateMonth >= Convert.ToInt32(a.DateMonth.ToString().Substring(0, 4) + "01") && x.DateMonth <= Convert.ToInt32(a.DateMonth.ToString().Substring(0, 4) + "12") && x.ShipId == a.ShipId && x.ProjectId == a.ProjectId && x.DateMonth <= a.DateMonth).Sum(x => x.ProductionAmount),
+                   YearWorkDays = SqlFunc.Subqueryable<OwnerShipMonthReport>().Where(x => x.DateMonth >= Convert.ToInt32(a.DateMonth.ToString().Substring(0, 4) + "01") && x.DateMonth <= Convert.ToInt32(a.DateMonth.ToString().Substring(0, 4) + "12") && x.ShipId == a.ShipId && x.ProjectId == a.ProjectId && x.DateMonth <= a.DateMonth).Sum(x => x.ConstructionDays),
+                   YearWorkHours = SqlFunc.Subqueryable<OwnerShipMonthReport>().Where(x => x.DateMonth >= Convert.ToInt32(a.DateMonth.ToString().Substring(0, 4) + "01") && x.DateMonth <= Convert.ToInt32(a.DateMonth.ToString().Substring(0, 4) + "12") && x.ShipId == a.ShipId && x.ProjectId == a.ProjectId && x.DateMonth <= a.DateMonth).Sum(x => x.WorkingHours),
                    //SumMonthQuantity = SqlFunc.Subqueryable<OwnerShipMonthReport>().Where(x => x.DateMonth >= startTimeInt && x.DateMonth <= endTimeInt).Sum(x => x.Production),
                    //SumMonthOutputVal = SqlFunc.Subqueryable<OwnerShipMonthReport>().Where(x => x.DateMonth >= startTimeInt && x.DateMonth <= endTimeInt).Sum(x => x.ProductionAmount),
                    //SumYearQuantity = allShipDayInfo.Where(x => x.DateDay <= SqlFunc.ToInt64(a.DateMonth + "26")).Sum(x => x.ShipReportedProduction),
@@ -9365,7 +9365,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 .OrderBy((x, y) => y.Category)
                 .OrderByDescending((x, y) => y.Latitude)
                 //.Where((x, y) => x.IsDelete == 1 && ids.Contains(x.Id) && company.Contains(y.CompanyId.Value) && projectStatusId.Contains(y.StatusId.Value) && y.TypeId != projectTypeId)
-                .Where((x, y) => x.IsDelete == 1 && ids.Contains(x.Id) && company.Contains(y.CompanyId.Value)  && y.TypeId != projectTypeId)
+                .Where((x, y) => x.IsDelete == 1 && ids.Contains(x.Id) && company.Contains(y.CompanyId.Value) && y.TypeId != projectTypeId)
                 .Select((x, y, z, s, q, t) => new MonthReportProjectWordResponseDto
                 {
                     Id = x.Id,
