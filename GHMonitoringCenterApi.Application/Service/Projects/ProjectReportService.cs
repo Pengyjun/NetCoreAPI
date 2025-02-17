@@ -1,5 +1,4 @@
-﻿using Aspose.Words.XAttr;
-using AutoMapper;
+﻿using AutoMapper;
 using CDC.MDM.Core.Common.Util;
 using GHMonitoringCenterApi.Application.Contracts.Dto.Common;
 using GHMonitoringCenterApi.Application.Contracts.Dto.Enums;
@@ -23,12 +22,9 @@ using GHMonitoringCenterApi.Domain.Shared.Enums;
 using GHMonitoringCenterApi.Domain.Shared.Util;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using NPOI.SS.Formula.Eval;
-using NPOI.SS.Formula.Functions;
 using NPOI.SS.UserModel;
 using NPOI.SS.Util;
 using NPOI.XSSF.UserModel;
-using SkiaSharp;
 using SqlSugar;
 using SqlSugar.Extensions;
 using System.Data;
@@ -272,6 +268,10 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
         /// 当前登录用户
         /// </summary>
         private CurrentUser _currentUser { get { return _globalObject.CurrentUser; } }
+        /// <summary>
+        /// 月报编辑按钮权限
+        /// </summary>
+        public IProjectService _iProjectService { get; set; }
 
 
         /// <summary>
@@ -321,6 +321,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             , GlobalObject globalObject
             , ISqlSugarClient dbContext
             , IPushPomService iPushPomService
+            , IProjectService iProjectService
             )
         {
 
@@ -368,6 +369,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             _globalObject = globalObject;
             _dbContext = dbContext;
             _iPushPomService = iPushPomService;
+            _iProjectService = iProjectService;
         }
 
         #region 项目日报
@@ -2444,6 +2446,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
 				"2019013759", //朱智文
 				"2016146340"//陈翠
 			};
+            var permission = await _dbContext.Queryable<BtnEditMonthlyReportPermission>().Where(t => t.IsDelete == 1 && t.MonthReportEnable == true).ToListAsync();
             var userAuthForData = await GetCurrentUserAuthForDataAsync();
             //解析属性标签
             ResolveTagNames(model.TagName, out List<int> categoryList, out List<int> tagList, out List<int> tag2List);
@@ -2454,7 +2457,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     .OrderByDescending((m, p) => new { m.DateMonth });
             //.OrderByDescending((m, p) => new { m.ProjectId, m.DateMonth });
             var selQuery = query
-                 .Where((m, p) => m.DateMonth != 202306)
+                 .Where((m, p) => m.DateMonth != 202306 && !m.StatusText.Contains("驳回"))
                   .WhereIF(!string.IsNullOrWhiteSpace(model.ManagerType), (m, p) => p.ManagerType == model.ManagerType)
                 .Select((m, p) => new MonthtReportsResponseDto.MonthtReportDto()
                 {
@@ -2610,6 +2613,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 }
                 #endregion
 
+                item.BtnEditMonthlyReport = _iProjectService.BtnEditMonthlyReport(1, item.DateMonth, permission);
                 var thisMonthTime = item.DateMonthTime;
                 var area = areas.FirstOrDefault(t => t.PomId == item.AreaId);
                 var thispProjectOrgs = projectOrgs.Where(t => t.ProjectId == item.ProjectId).ToList();
@@ -2822,7 +2826,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
 
             //因追加历史的所有月报 此处重写合计
             //取所有的项目月报ids
-            var mpIds = await selQuery.Where(m => m.StatusText != "已驳回").Select(m => m.ProjectId).ToListAsync();
+            var mpIds = await selQuery.Where(m => !m.StatusText.Contains("驳回")).Select(m => m.ProjectId).ToListAsync();
             mIds = mIds.Distinct().ToList();
             var mpList = await _dbMonthReport.AsQueryable()
                 .Where(x => x.IsDelete == 1 && mpIds.Contains(x.ProjectId))
@@ -2954,7 +2958,8 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             }
 
 
-            var selQuery = query.Where((m, p) => m.DateMonth != 202306).Select((m, p) => new MonthtReportsResponseDto.MonthtReportDto()
+            var permission = await _dbContext.Queryable<BtnEditMonthlyReportPermission>().Where(t => t.IsDelete == 1 && t.MonthReportEnable == true).ToListAsync();
+            var selQuery = query.Where((m, p) => m.DateMonth != 202306 && !m.StatusText.Contains("驳回")).Select((m, p) => new MonthtReportsResponseDto.MonthtReportDto()
             {
                 Id = m.Id,
                 ProjectId = m.ProjectId,
@@ -3003,7 +3008,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 OutsourcingExpensesAmount = m.OutsourcingExpensesAmount,
                 UpdateTime = m.UpdateTime,
                 CreateTime = m.CreateTime,
-                IsSubProject = p.IsSubContractProject
+                IsSubProject = p.IsSubContractProject,
             });
 
             var list = await selQuery.ToListAsync();
@@ -3098,6 +3103,8 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 }
 
                 #endregion
+
+                item.BtnEditMonthlyReport = _iProjectService.BtnEditMonthlyReport(1, item.DateMonth, permission);
                 var thisMonthTime = item.DateMonthTime;
                 var area = areas.FirstOrDefault(t => t.PomId == item.AreaId);
                 var thispProjectOrgs = projectOrgs.Where(t => t.ProjectId == item.ProjectId).ToList();
@@ -3314,11 +3321,11 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             {
                 totalMonthtReport = new MonthtReportsResponseDto.TotalMonthtReportsDto
                 {
-                    AccomplishQuantities = Math.Round(list.Where(m => m.StatusText != "已驳回").Sum(m => m.AccomplishQuantities), 2),
-                    AccomplishValue = Math.Round(list.Where(m => m.StatusText != "已驳回").Sum(m => m.AccomplishValue2), 2),
-                    RecognizedValue = Math.Round(list.Where(m => m.StatusText != "已驳回").Sum(m => m.RecognizedValue), 2),
-                    PaymentAmount = Math.Round(list.Where(m => m.StatusText != "已驳回").Sum(m => m.PaymentAmount), 2),
-                    OutsourcingExpensesAmount = Math.Round(list.Where(m => m.StatusText != "已驳回").Sum(m => m.OutsourcingExpensesAmount), 2)
+                    AccomplishQuantities = Math.Round(list.Where(m => !m.StatusText.Contains("驳回")).Sum(m => m.AccomplishQuantities), 2),
+                    AccomplishValue = Math.Round(list.Where(m => !m.StatusText.Contains("驳回")).Sum(m => m.AccomplishValue2), 2),
+                    RecognizedValue = Math.Round(list.Where(m => !m.StatusText.Contains("驳回")).Sum(m => m.RecognizedValue), 2),
+                    PaymentAmount = Math.Round(list.Where(m => !m.StatusText.Contains("驳回")).Sum(m => m.PaymentAmount), 2),
+                    OutsourcingExpensesAmount = Math.Round(list.Where(m => !m.StatusText.Contains("驳回")).Sum(m => m.OutsourcingExpensesAmount), 2)
                 };
             }
             else
@@ -3327,11 +3334,11 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 var subpIds = await _dbContext.Queryable<Project>().Where(t => t.IsDelete == 1 && t.IsSubContractProject == 2).Select(x => x.Id).ToListAsync();
                 totalMonthtReport = new MonthtReportsResponseDto.TotalMonthtReportsDto
                 {
-                    AccomplishQuantities = Math.Round(list.Where(m => !subpIds.Contains(m.ProjectId) && m.StatusText != "已驳回").Sum(m => m.AccomplishQuantities), 2),
-                    AccomplishValue = Math.Round(list.Where(m => !subpIds.Contains(m.ProjectId) && m.StatusText != "已驳回").Sum(m => m.AccomplishValue2), 2),
-                    RecognizedValue = Math.Round(list.Where(m => !subpIds.Contains(m.ProjectId) && m.StatusText != "已驳回").Sum(m => m.RecognizedValue), 2),
-                    PaymentAmount = Math.Round(list.Where(m => !subpIds.Contains(m.ProjectId) && m.StatusText != "已驳回").Sum(m => m.PaymentAmount), 2),
-                    OutsourcingExpensesAmount = Math.Round(list.Where(m => !subpIds.Contains(m.ProjectId) && m.StatusText != "已驳回").Sum(m => m.OutsourcingExpensesAmount), 2)
+                    AccomplishQuantities = Math.Round(list.Where(m => !subpIds.Contains(m.ProjectId) && !m.StatusText.Contains("驳回")).Sum(m => m.AccomplishQuantities), 2),
+                    AccomplishValue = Math.Round(list.Where(m => !subpIds.Contains(m.ProjectId) && !m.StatusText.Contains("驳回")).Sum(m => m.AccomplishValue2), 2),
+                    RecognizedValue = Math.Round(list.Where(m => !subpIds.Contains(m.ProjectId) && !m.StatusText.Contains("驳回")).Sum(m => m.RecognizedValue), 2),
+                    PaymentAmount = Math.Round(list.Where(m => !subpIds.Contains(m.ProjectId) && !m.StatusText.Contains("驳回")).Sum(m => m.PaymentAmount), 2),
+                    OutsourcingExpensesAmount = Math.Round(list.Where(m => !subpIds.Contains(m.ProjectId) && !m.StatusText.Contains("驳回")).Sum(m => m.OutsourcingExpensesAmount), 2)
                 };
             }
             foreach (var item in list)

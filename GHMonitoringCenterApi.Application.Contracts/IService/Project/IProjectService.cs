@@ -1,7 +1,9 @@
 ﻿using GHMonitoringCenterApi.Application.Contracts.Dto;
 using GHMonitoringCenterApi.Application.Contracts.Dto.Project;
 using GHMonitoringCenterApi.Application.Contracts.Dto.Project.ExcelImport;
+using GHMonitoringCenterApi.Application.Contracts.Dto.Project.Report;
 using GHMonitoringCenterApi.Application.Contracts.Dto.ProjectPlanProduction;
+using GHMonitoringCenterApi.Domain.Models;
 using GHMonitoringCenterApi.Domain.Shared;
 
 namespace GHMonitoringCenterApi.Application.Contracts.IService.Project
@@ -244,6 +246,13 @@ namespace GHMonitoringCenterApi.Application.Contracts.IService.Project
         /// <param name="requestBody"></param>
         /// <returns></returns>
         Task<ResponseAjaxResult<bool>> SaveHistoryProjectMonthReportAsync(HistoryProjectMonthReportRequestParam requestBody);
+        /// <summary>
+        /// 月报编辑按钮权限控制 列表
+        /// </summary>
+        /// <returns></returns>
+        bool BtnEditMonthlyReport(int type, int date, List<BtnEditMonthlyReportPermission> permissions);
+        Task<ResponseAjaxResult<List<BtnEditMonthlyReportSearch>>> BtnEditMonthlyReportSearchAsync(string? name);
+        Task<ResponseAjaxResult<bool>> SaveBtnEditReportAsync(SaveBtnEditMonthlyReport requestBody);
         bool aa();
         bool GetHolidays();
     }

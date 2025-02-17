@@ -3,6 +3,7 @@ using GHMonitoringCenterApi.Application.Contracts.Dto;
 using GHMonitoringCenterApi.Application.Contracts.Dto.Enums;
 using GHMonitoringCenterApi.Application.Contracts.Dto.Project;
 using GHMonitoringCenterApi.Application.Contracts.Dto.Project.ExcelImport;
+using GHMonitoringCenterApi.Application.Contracts.Dto.Project.Report;
 using GHMonitoringCenterApi.Application.Contracts.Dto.ProjectPlanProduction;
 using GHMonitoringCenterApi.Application.Contracts.IService;
 using GHMonitoringCenterApi.Application.Contracts.IService.OperationLog;
@@ -17,7 +18,6 @@ using GHMonitoringCenterApi.Domain.Shared.Enums;
 using GHMonitoringCenterApi.Domain.Shared.Util;
 using SqlSugar;
 using SqlSugar.Extensions;
-using System.Linq;
 using System.Text;
 using UtilsSharp;
 
@@ -477,7 +477,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 .Select((p, ps) => new ProjectExcelSearchResponseDto
                 {
                     Id = p.Id,
-                    ManagerType=p.ManagerType,
+                    ManagerType = p.ManagerType,
                     MasterProjectId = p.MasterProjectId.Value,
                     Name = p.Name,
                     Category = p.Category,
@@ -527,12 +527,12 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     ShutDownReason = p.ShutDownReason,
                     ContractChangeInfo = p.ContractChangeInfo,
                     MasterCode = p.MasterCode,
-                    ProjectDeptId=p.ProjectDept.Value,
+                    ProjectDeptId = p.ProjectDept.Value,
                 });
 
-            
 
-           
+
+
 
             //是否全量导出
             var projectList = new List<ProjectExcelSearchResponseDto>();
@@ -548,9 +548,9 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             var managerType = await dbContext.Queryable<ProjectMangerType>().Where(x => x.IsDelete == 1).ToListAsync();
             foreach (var item in projectList)
             {
-               var ids= item.ManagerType.Split(",").ToList();
-               var res = managerType.Where(x => ids.Contains(x.Code)).Select(x => x.Name).ToList();
-               item.ManagerTypeName=string.Join(",",res);
+                var ids = item.ManagerType.Split(",").ToList();
+                var res = managerType.Where(x => ids.Contains(x.Code)).Select(x => x.Name).ToList();
+                item.ManagerTypeName = string.Join(",", res);
                 item.ProjectDept = institution.Where(x => x.PomId == item.ProjectDeptId).Select(x => x.Name).FirstOrDefault();
             }
             #region 获取所有类型的id
@@ -753,10 +753,10 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                  .Where((p) => p.Id == basePrimaryRequestDto.Id && p.IsDelete == 1)
                  .Select((p) => new ProjectDetailResponseDto
                  {
-                      ManagerType=p.ManagerType,
-                      PProjectName=SqlFunc.Subqueryable<Project>().Where(x=>p.PProjectMasterCode==x.MasterCode).Select(x=>x.Name),
-                      PProjectMasterCode=p.PProjectMasterCode,
-                     IsSubContractProject=p.IsSubContractProject,
+                     ManagerType = p.ManagerType,
+                     PProjectName = SqlFunc.Subqueryable<Project>().Where(x => p.PProjectMasterCode == x.MasterCode).Select(x => x.Name),
+                     PProjectMasterCode = p.PProjectMasterCode,
+                     IsSubContractProject = p.IsSubContractProject,
                      Id = p.Id,
                      Name = p.Name,
                      MasterCode = p.MasterCode,
@@ -822,7 +822,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             }
 
             //项目管理类型
-            var managerTypeName =await dbContext.Queryable<ProjectMangerType>().Where(x => x.IsDelete == 1&&x.Code== SqlFunc.ToString( projectDeteilSingle.ManagerType)).Select(x=>x.Name).FirstAsync();
+            var managerTypeName = await dbContext.Queryable<ProjectMangerType>().Where(x => x.IsDelete == 1 && x.Code == SqlFunc.ToString(projectDeteilSingle.ManagerType)).Select(x => x.Name).FirstAsync();
             projectDeteilSingle.ManagerTypeName = managerTypeName;
             //获取机构信息
             var intitutionList = dbContext.Queryable<Institution>().Where(x => x.IsDelete == 1);
@@ -936,7 +936,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
 
             //获取项目干系单位
             var orgList = await dbContext.Queryable<ProjectOrg>()
-                .Where(p => (p.ProjectId == projectDeteilSingle.Id || p.ProjectId == projectDeteilSingle.MasterProjectId) && p.IsDelete == 1&&p.OrganizationId!=null).ToListAsync();
+                .Where(p => (p.ProjectId == projectDeteilSingle.Id || p.ProjectId == projectDeteilSingle.MasterProjectId) && p.IsDelete == 1 && p.OrganizationId != null).ToListAsync();
             if (orgList != null && orgList.Count > 0)
             {
                 projectDeteilSingle.projectOrgDtos = mapper.Map<List<ProjectOrg>, List<ProjectOrgDto>>(orgList);
@@ -1039,11 +1039,11 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             ResponseAjaxResult<bool> responseAjaxResult = new ResponseAjaxResult<bool>();
 
             #region 条件判断
-            List<int> orgs = new List<int>() {1,6,2 };
-            var validCount= addOrUpdateProjectRequestDto.projectOrgDtos.Count(x => orgs.Contains(x.Type));
+            List<int> orgs = new List<int>() { 1, 6, 2 };
+            var validCount = addOrUpdateProjectRequestDto.projectOrgDtos.Count(x => orgs.Contains(x.Type));
             if (validCount < 3)
             {
-                responseAjaxResult.Fail("业主、甲方、监理单位必须填写",HttpStatusCode.VerifyFail);
+                responseAjaxResult.Fail("业主、甲方、监理单位必须填写", HttpStatusCode.VerifyFail);
                 responseAjaxResult.Data = false;
                 return responseAjaxResult;
             }
@@ -1237,7 +1237,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 {
                     projectObject.PomId = Convert.ToInt32(TimeHelper.DateTimeToTimeStamp(DateTime.Now));
                 }
-               
+
                 projectObject.Id = projectId;
                 //projectObject.Id = GuidUtil.Next();
                 projectObject.MasterProjectId = Guid.NewGuid();
@@ -3723,6 +3723,172 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             return rt;
         }
 
+        #region 月报编辑按钮控制权限
+        /// <summary>
+        /// 月报编辑按钮控制权限 1月报 2 日报
+        /// </summary>
+        /// <param name="type"></param>
+        /// <param name="date"></param>
+        /// <param name="permissions"></param>
+        /// <returns></returns>
+        public bool BtnEditMonthlyReport(int type, int date, List<BtnEditMonthlyReportPermission> permissions)
+        {
+            bool rs = false;
+            ConvertHelper.TryConvertDateTimeFromDateDay(date, out DateTime nowTime);
+            //获取登录用户按钮权限控制表
+            var permission = permissions.FirstOrDefault(t => t.IsDelete == 1 && t.UserId == _currentUser.Id && type == t.PermissionType);
+            if (_currentUser.CurrentLoginIsAdmin || _currentUser.Account == "2016146340") rs = true;
+            else if (type == 1)
+            {
+                if (permission != null && permission.MonthReportEnable == true)//如果设置了权限  优先级最大
+                {
+                    //获取可以修改的月份
+                    var months = string.IsNullOrEmpty(permission.MonthTime)
+                        ? new List<int>()
+                        : permission.MonthTime.Split(',')
+                        .Where(s => int.TryParse(s, out _))
+                        .Select(int.Parse)
+                        .ToList();
+                    if (months.Any() && months.Contains(date) && permission.MonthEffectiveTime >= DateTime.Now)//并且在有效期内
+                        rs = true;
+                }
+                else
+                {
+                    //没设置权限
+                    //月报 默认加载情况
+                    //日期判断 是否在当月26-次月6日期间 可以修改当月的月报 
+                    var tMonth = 0;
+                    if (DateTime.Now.Day >= 26) tMonth = ConvertHelper.ToDateMonth(DateTime.Now);
+                    else if (DateTime.Now.Day >= 1 && DateTime.Now.Day <= 6) tMonth = ConvertHelper.ToDateMonth(DateTime.Now.AddMonths(-1));
+                    if (tMonth != 0 && tMonth == date) rs = true;
+                }
+            }
+            else if (type == 2)
+            {
+                //设置了权限 优先级最大
+                if (permission != null && permission.DailyReportEnable == true)
+                {
+                    if (DateTime.Now >= permission.DailyStartTime && DateTime.Now <= permission.DailyEndTime)
+                    {
+                        //只能更改在这个时间范围内的日报
+                        if (nowTime >= permission.DailyStartTime.AddDays(-1) && nowTime <= permission.DailyEndTime.AddDays(-1)) rs = true;
+                    }
+                }
+                else
+                {
+                    //默认只能修改当日日报 并且在十点前可以修改 否则不可以修改
+                    var sTime = Convert.ToDateTime(DateTime.Now.AddDays(-1).ToString("yyyy-MM-dd 00:00:00"));
+                    var eTime = Convert.ToDateTime(DateTime.Now.AddDays(-1).ToString("yyyy-MM-dd 23:59:59"));
+                    if (DateTime.Now <= Convert.ToDateTime(DateTime.Now.ToString("yyyy-MM-dd 10:00:00")))
+                    {
+                        //在范围内的日报可以修改
+                        if (nowTime >= sTime && nowTime <= eTime) rs = true;
+                    }
+                }
+            }
+            return rs;
+        }
+        /// <summary>
+        /// 月报编辑按钮权限控制 列表
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        public async Task<ResponseAjaxResult<List<BtnEditMonthlyReportSearch>>> BtnEditMonthlyReportSearchAsync(string? name)
+        {
+            ResponseAjaxResult<List<BtnEditMonthlyReportSearch>> rt = new();
+            List<BtnEditMonthlyReportSearch> rs = new();
+            var users = await dbContext.Queryable<Domain.Models.User>()
+                .Where(t => t.IsDelete == 1 && t.LoginAccount != "2016146340" && t.LoginAccount != "2022002687")
+                .WhereIF(!string.IsNullOrWhiteSpace(name), t => t.Name.Contains(name) || t.Phone.Contains(name))
+                .ToListAsync();
+
+            //所有启用的用户
+            var permissions = await dbContext.Queryable<BtnEditMonthlyReportPermission>().Where(t => t.IsDelete == 1).ToListAsync();
+            foreach (var item in users)
+            {
+                BtnEditMonthlyReportSearch rr = new();
+                var monthStatus = "关闭";
+                var dailyStatus = "关闭";
+                rr.UserName = item.Name + "(" + item.Phone + ")";
+                rr.UserId = item.Id;
+                var per = permissions.FirstOrDefault(x => x.UserId == item.Id);
+                if (per != null)
+                {
+                    rr.Id = per.Id;
+                    //月报
+                    if (per.PermissionType == 1 && per.MonthReportEnable == true)
+                    {
+                        monthStatus = per.MonthReportEnable == true ? "开启" : monthStatus;
+                        //月报可修改的月份
+                        var months = string.IsNullOrEmpty(per.MonthTime)
+                           ? new List<int>()
+                           : per.MonthTime.Split(',')
+                           .Where(s => int.TryParse(s, out _))
+                           .Select(int.Parse)
+                           .OrderBy(x => x)
+                           .ToList();
+                        var monthTime = string.Empty;
+                        if (months.Any())
+                        {
+                            List<string> resultList = new();
+                            foreach (var item2 in months)
+                            {
+                                if (ConvertHelper.TryParseFromDateMonth(item2, out DateTime nowTime))
+                                {
+                                    resultList.Add(nowTime.ToString("yyyy年MM月"));
+                                }
+                            }
+                            monthTime = string.Join("、", resultList);
+                        }
+                        rr.MonthTime = monthTime;
+                        //月报修改有效日期
+                        rr.MonthEffectiveTime = per.MonthEffectiveTime.ToString("yyyy-MM-dd HH:mm:ss");
+                    }
+                    //日报
+                    if (per.PermissionType == 2 && per.DailyReportEnable == true)
+                    {
+                        dailyStatus = per.DailyReportEnable == true ? "开启" : dailyStatus;
+                        rr.DailyStartTime = per.DailyStartTime.ToString("yyyy-MM-dd HH:mm:ss");
+                        rr.DailyEndTime = per.DailyEndTime.ToString("yyyy-MM-dd HH:mm:ss");
+                    }
+                }
+                rr.MonthReportEnableStatus = monthStatus;
+                rr.DailyReportEnableStatus = dailyStatus;
+                rs.Add(rr);
+            }
+            return rt.SuccessResult(rs);
+        }
+
+        /// <summary>
+        /// 保存编辑按钮权限
+        /// </summary>
+        /// <param name="requestBody"></param>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        public async Task<ResponseAjaxResult<bool>> SaveBtnEditReportAsync(SaveBtnEditMonthlyReport requestBody)
+        {
+            ResponseAjaxResult<bool> rt = new();
+
+            if (requestBody != null)
+            {
+                if (!string.IsNullOrWhiteSpace(requestBody.Id.ToString()) && requestBody.Id != Guid.Empty)
+                {
+                    //修改保存
+                    var per = await dbContext.Queryable<BtnEditMonthlyReportPermission>().Where(t => t.IsDelete == 1 && t.Id == requestBody.Id).FirstAsync();
+                    if (per != null)
+                    {
+                        if (requestBody.PermissionType == 1)//
+                        {
+
+                        }
+                    }
+                }
+            }
+            return rt;
+        }
+        #endregion
+
         #region 获取每年的节假日
         public bool GetHolidays()
         {
@@ -3730,6 +3896,8 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             url = url.Replace("year", DateTime.Now.Year.ToString());
             return false;
         }
+
+
 
         #endregion
     }

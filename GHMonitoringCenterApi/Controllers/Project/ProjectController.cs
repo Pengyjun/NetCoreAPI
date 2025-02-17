@@ -850,6 +850,28 @@ namespace GHMonitoringCenterApi.Controllers.Project
             rt.SuccessResult(rs);
             return rt;
         }
+
+        #region 月报编辑按钮权限控制
+        /// <summary>
+        /// 月报编辑按钮权限控制 列表
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        [HttpGet("BtnEditReportSearch")]
+        public async Task<ResponseAjaxResult<List<BtnEditMonthlyReportSearch>>> BtnEditReportSearchAsync(string? name)
+        {
+            return await projectService.BtnEditMonthlyReportSearchAsync(name);
+        }
+        /// <summary>
+        /// 保存编辑按钮权限
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost("SaveBtnEditReport")]
+        public async Task<ResponseAjaxResult<bool>> SaveBtnEditReportAsync([FromBody] SaveBtnEditMonthlyReport requestBody)
+        {
+            return await projectService.SaveBtnEditReportAsync(requestBody);
+        }
+        #endregion
         #region  新的项目月报列表
         [HttpPost("aa")]
         [AllowAnonymous]

@@ -338,6 +338,10 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project.Report
             /// 当前登陆人是否是陈翠
             /// </summary>
             public bool IsAdmin { get; set; }
+            /// <summary>
+            /// 编辑按钮开启 true
+            /// </summary>
+            public bool BtnEditMonthlyReport { get; set; }
 
 
             /// <summary>
