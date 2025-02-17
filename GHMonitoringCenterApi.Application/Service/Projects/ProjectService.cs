@@ -477,7 +477,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 .Select((p, ps) => new ProjectExcelSearchResponseDto
                 {
                     Id = p.Id,
-                    ManagerType=p.ManagerType,
+                    ManagerType = p.ManagerType,
                     MasterProjectId = p.MasterProjectId.Value,
                     Name = p.Name,
                     Category = p.Category,
@@ -527,12 +527,12 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     ShutDownReason = p.ShutDownReason,
                     ContractChangeInfo = p.ContractChangeInfo,
                     MasterCode = p.MasterCode,
-                    ProjectDeptId=p.ProjectDept.Value,
+                    ProjectDeptId = p.ProjectDept.Value,
                 });
 
-            
 
-           
+
+
 
             //是否全量导出
             var projectList = new List<ProjectExcelSearchResponseDto>();
@@ -548,9 +548,9 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             var managerType = await dbContext.Queryable<ProjectMangerType>().Where(x => x.IsDelete == 1).ToListAsync();
             foreach (var item in projectList)
             {
-               var ids= item.ManagerType.Split(",").ToList();
-               var res = managerType.Where(x => ids.Contains(x.Code)).Select(x => x.Name).ToList();
-               item.ManagerTypeName=string.Join(",",res);
+                var ids = item.ManagerType.Split(",").ToList();
+                var res = managerType.Where(x => ids.Contains(x.Code)).Select(x => x.Name).ToList();
+                item.ManagerTypeName = string.Join(",", res);
                 item.ProjectDept = institution.Where(x => x.PomId == item.ProjectDeptId).Select(x => x.Name).FirstOrDefault();
             }
             #region 获取所有类型的id
@@ -753,10 +753,10 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                  .Where((p) => p.Id == basePrimaryRequestDto.Id && p.IsDelete == 1)
                  .Select((p) => new ProjectDetailResponseDto
                  {
-                      ManagerType=p.ManagerType,
-                      PProjectName=SqlFunc.Subqueryable<Project>().Where(x=>p.PProjectMasterCode==x.MasterCode).Select(x=>x.Name),
-                      PProjectMasterCode=p.PProjectMasterCode,
-                     IsSubContractProject=p.IsSubContractProject,
+                     ManagerType = p.ManagerType,
+                     PProjectName = SqlFunc.Subqueryable<Project>().Where(x => p.PProjectMasterCode == x.MasterCode).Select(x => x.Name),
+                     PProjectMasterCode = p.PProjectMasterCode,
+                     IsSubContractProject = p.IsSubContractProject,
                      Id = p.Id,
                      Name = p.Name,
                      MasterCode = p.MasterCode,
@@ -822,7 +822,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             }
 
             //项目管理类型
-            var managerTypeName =await dbContext.Queryable<ProjectMangerType>().Where(x => x.IsDelete == 1&&x.Code== SqlFunc.ToString( projectDeteilSingle.ManagerType)).Select(x=>x.Name).FirstAsync();
+            var managerTypeName = await dbContext.Queryable<ProjectMangerType>().Where(x => x.IsDelete == 1 && x.Code == SqlFunc.ToString(projectDeteilSingle.ManagerType)).Select(x => x.Name).FirstAsync();
             projectDeteilSingle.ManagerTypeName = managerTypeName;
             //获取机构信息
             var intitutionList = dbContext.Queryable<Institution>().Where(x => x.IsDelete == 1);
@@ -936,7 +936,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
 
             //获取项目干系单位
             var orgList = await dbContext.Queryable<ProjectOrg>()
-                .Where(p => (p.ProjectId == projectDeteilSingle.Id || p.ProjectId == projectDeteilSingle.MasterProjectId) && p.IsDelete == 1&&p.OrganizationId!=null).ToListAsync();
+                .Where(p => (p.ProjectId == projectDeteilSingle.Id || p.ProjectId == projectDeteilSingle.MasterProjectId) && p.IsDelete == 1 && p.OrganizationId != null).ToListAsync();
             if (orgList != null && orgList.Count > 0)
             {
                 projectDeteilSingle.projectOrgDtos = mapper.Map<List<ProjectOrg>, List<ProjectOrgDto>>(orgList);
@@ -1039,11 +1039,11 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             ResponseAjaxResult<bool> responseAjaxResult = new ResponseAjaxResult<bool>();
 
             #region 条件判断
-            List<int> orgs = new List<int>() {1,6,2 };
-            var validCount= addOrUpdateProjectRequestDto.projectOrgDtos.Count(x => orgs.Contains(x.Type));
+            List<int> orgs = new List<int>() { 1, 6, 2 };
+            var validCount = addOrUpdateProjectRequestDto.projectOrgDtos.Count(x => orgs.Contains(x.Type));
             if (validCount < 3)
             {
-                responseAjaxResult.Fail("业主、甲方、监理单位必须填写",HttpStatusCode.VerifyFail);
+                responseAjaxResult.Fail("业主、甲方、监理单位必须填写", HttpStatusCode.VerifyFail);
                 responseAjaxResult.Data = false;
                 return responseAjaxResult;
             }
@@ -1237,7 +1237,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 {
                     projectObject.PomId = Convert.ToInt32(TimeHelper.DateTimeToTimeStamp(DateTime.Now));
                 }
-               
+
                 projectObject.Id = projectId;
                 //projectObject.Id = GuidUtil.Next();
                 projectObject.MasterProjectId = Guid.NewGuid();
@@ -3722,6 +3722,19 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             else rt.FailResult(HttpStatusCode.UpdateFail, "无数据");
             return rt;
         }
+
+        #region 月报编辑按钮控制权限
+        /// <summary>
+        /// 月报编辑按钮控制权限
+        /// </summary>
+        /// <returns></returns>
+        public ResponseAjaxResult<bool> BtnEditMonthlyReport()
+        {
+            ResponseAjaxResult<bool> rt = new();
+            return rt;
+        }
+
+        #endregion
 
         #region 获取每年的节假日
         public bool GetHolidays()

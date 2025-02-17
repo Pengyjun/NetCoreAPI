@@ -244,6 +244,11 @@ namespace GHMonitoringCenterApi.Application.Contracts.IService.Project
         /// <param name="requestBody"></param>
         /// <returns></returns>
         Task<ResponseAjaxResult<bool>> SaveHistoryProjectMonthReportAsync(HistoryProjectMonthReportRequestParam requestBody);
+        /// <summary>
+        /// 月报编辑按钮权限控制
+        /// </summary>
+        /// <returns></returns>
+        ResponseAjaxResult<bool> BtnEditMonthlyReport();
         bool aa();
         bool GetHolidays();
     }
