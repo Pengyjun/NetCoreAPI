@@ -64,6 +64,6 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project
         /// 项目类型
         /// </summary>
 
-        public int? ManagerType { get; set; }
+        public string? ManagerType { get; set; }
     }
 }

@@ -2455,7 +2455,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             //.OrderByDescending((m, p) => new { m.ProjectId, m.DateMonth });
             var selQuery = query
                  .Where((m, p) => m.DateMonth != 202306)
-                  .WhereIF(model.ManagerType.HasValue, (m, p) => p.ManagerType == model.ManagerType)
+                  .WhereIF(!string.IsNullOrWhiteSpace(model.ManagerType), (m, p) => p.ManagerType == model.ManagerType)
                 .Select((m, p) => new MonthtReportsResponseDto.MonthtReportDto()
                 {
                     Id = m.Id,

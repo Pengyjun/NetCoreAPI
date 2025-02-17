@@ -12,7 +12,7 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project
         /// <summary>
         /// 项目管理类型
         /// </summary>
-        public int? ManagerType { get; set; }
+        public string? ManagerType { get; set; }
         /// <summary>
         /// 请求类型  true是添加   false是修改
         /// </summary>
@@ -263,10 +263,15 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project
                 WorkDay = 1;
             }
 
-            if (ManagerType==null&&ManagerType<1|| ManagerType >5)
+            //if (ManagerType==null&&ManagerType<1|| ManagerType >6)
+            //{
+            //    yield return new ValidationResult("项目类型不合法请重新填", new string[] { nameof(ManagerType) });
+            //}
+            if (string.IsNullOrWhiteSpace(ManagerType))
             {
                 yield return new ValidationResult("项目类型不合法请重新填", new string[] { nameof(ManagerType) });
             }
+
 
             if (string.IsNullOrWhiteSpace(Name))
             {
@@ -390,10 +395,10 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project
             {
                 yield return new ValidationResult("分包项目必须要填项目主数据编码", new string[] { nameof(PProjectMasterCode) });
             }
-            if (ManagerType==null||!ManagerType.HasValue||ManagerType.Value<1||ManagerType.Value>5)
-            {
-                yield return new ValidationResult("项目管理类型不合法", new string[] { nameof(ManagerType) });
-            }
+            //if (ManagerType==null||!ManagerType.HasValue||ManagerType.Value<1||ManagerType.Value>5)
+            //{
+            //    yield return new ValidationResult("项目管理类型不合法", new string[] { nameof(ManagerType) });
+            //}
         }
     }
     /// <summary>

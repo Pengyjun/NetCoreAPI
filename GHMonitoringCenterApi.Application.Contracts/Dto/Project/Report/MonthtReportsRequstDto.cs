@@ -11,7 +11,7 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project.Report
         /// 管理类型
         /// </summary>
 
-        public int? ManagerType { get; set; }
+        public string? ManagerType { get; set; }
         /// <summary>
         /// 所属公司
         /// </summary>

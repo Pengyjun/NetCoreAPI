@@ -315,7 +315,7 @@
         /// </summary>
         public string? PProjectName { get; set; }
 
-        public int ManagerType { get; set; }
+        public string ManagerType { get; set; }
         public string ManagerTypeName { get; set; }
     }
 
