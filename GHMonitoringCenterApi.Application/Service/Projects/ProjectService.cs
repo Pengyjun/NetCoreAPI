@@ -3735,7 +3735,6 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
         public bool BtnEditMonthlyReport(int type, int date, List<BtnEditMonthlyReportPermission> permissions)
         {
             bool rs = false;
-            ConvertHelper.TryConvertDateTimeFromDateDay(date, out DateTime nowTime);
             //获取登录用户按钮权限控制表
             var permission = permissions.FirstOrDefault(t => t.IsDelete == 1 && t.UserId == _currentUser.Id);
             if (_currentUser.CurrentLoginIsAdmin || _currentUser.Account == "2016146340") rs = true;
@@ -3769,21 +3768,17 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 //设置了权限 优先级最大
                 if (permission != null && permission.DailyReportEnable == true)
                 {
-                    if (DateTime.Now >= permission.DailyStartTime && DateTime.Now <= permission.DailyEndTime)
-                    {
-                        //只能更改在这个时间范围内的日报
-                        if (nowTime >= permission.DailyStartTime.AddDays(-1) && nowTime <= permission.DailyEndTime.AddDays(-1)) rs = true;
-                    }
+                    //只能更改在这个时间范围内的日报
+                    if (date >= permission.DailyStartTime.ToDateDay() && date <= permission.DailyEndTime.ToDateDay()) rs = true;
                 }
                 else
                 {
                     //默认只能修改当日日报 并且在十点前可以修改 否则不可以修改
-                    var sTime = Convert.ToDateTime(DateTime.Now.AddDays(-1).ToString("yyyy-MM-dd 00:00:00"));
-                    var eTime = Convert.ToDateTime(DateTime.Now.AddDays(-1).ToString("yyyy-MM-dd 23:59:59"));
+                    var nowDay = Convert.ToDateTime(DateTime.Now.AddDays(-1)).ToDateDay();
                     if (DateTime.Now <= Convert.ToDateTime(DateTime.Now.ToString("yyyy-MM-dd 10:00:00")))
                     {
-                        //在范围内的日报可以修改
-                        if (nowTime >= sTime && nowTime <= eTime) rs = true;
+                        //当天日报可以修改
+                        if (date == nowDay) rs = true;
                     }
                 }
             }
@@ -3886,7 +3881,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                         {
                             per.MonthTime = string.Empty;
                         }
-                        per.MonthEffectiveTime = DateTime.Now.AddDays(3);//往后加三天
+                        per.MonthEffectiveTime = Convert.ToDateTime(DateTime.Now.AddDays(2).ToString("23:59:59"));//往后加三天
                         per.MonthReportEnable = requestBody.MonthReportEnable;
                         await dbContext.Updateable(per).UpdateColumns(x => new
                         {

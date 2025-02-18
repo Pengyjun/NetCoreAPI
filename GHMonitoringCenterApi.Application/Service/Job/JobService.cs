@@ -1021,23 +1021,6 @@ namespace GHMonitoringCenterApi.Application.Service.Job
                 {
                     return result.FailResult(HttpStatusCode.DataNotMatch, ResponseMessage.DATA_NOTMATCH_BIZ);
                 }
-                //var uIds = await _dbJobApprover.AsQueryable().Where(t => t.IsDelete == 1 && t.JobId == job.Id).Select(t => t.ApproverId).ToListAsync();
-                //if (uIds.Any())
-                //{
-                //    var resJobApprovers = new List<ResJobApproverDto>();
-                //    //获取用户信息
-                //    var userList = await _dbUser.AsQueryable().Where(x => x.IsDelete == 1 && uIds.Contains(x.Id)).ToListAsync();
-                //    foreach (var item in userList)
-                //    {
-                //        ResJobApproverDto resJobApprover = new ResJobApproverDto();
-                //        resJobApprover.ApproverId = item.Id;
-                //        resJobApprover.ApproverName = item.Name;
-                //        resJobApprover.ApproverPhone = item.Phone;
-                //        resJobApprovers.Add(resJobApprover);
-                //    }
-
-                //    jobBizRes.Approvers = resJobApprovers.ToArray();
-                //}
                 bizResult = JsonConvert.DeserializeObject<TBizResult>(job.BizData);
             }
             else if (model.RequestType == JobBizRequestType.FindDBBizData)
@@ -1051,6 +1034,7 @@ namespace GHMonitoringCenterApi.Application.Service.Job
                         return result.FailResult(wbsResult.Code, wbsResult.Message);
                     }
                     bizResult = wbsResult.Data as TBizResult;
+                    if (wbsResult.Data != null && wbsResult.Data.Nodes.Any()) jobBizRes.BtnImportShowHide = true;
                 }
             }
             jobBizRes.BizData = bizResult;
@@ -1341,8 +1325,8 @@ namespace GHMonitoringCenterApi.Application.Service.Job
                 if (projectFirst.CompanyId == "c0d51e81-03dd-4ef8-bd83-6eb1355879e1".ToGuid())
                 {
                     //孟浩
-                   // userIds = new List<string>() { "2017005354" };
-                   //朱晴
+                    // userIds = new List<string>() { "2017005354" };
+                    //朱晴
                     userIds = new List<string>() { "2016027005" };
                 }
                 if (projectFirst.CompanyId == "65052a94-6ea7-44ba-96b4-cf648de0d28a".ToGuid())
@@ -1409,10 +1393,11 @@ namespace GHMonitoringCenterApi.Application.Service.Job
                 {
                     nextLevel = job.ApproveLevel + 1;
                 }
-                else {
+                else
+                {
                     nextLevel = job.ApproveLevel + 2;
                 }
-             
+
                 projectId = job.ProjectId;
                 bizModule = job.BizModule;
             }

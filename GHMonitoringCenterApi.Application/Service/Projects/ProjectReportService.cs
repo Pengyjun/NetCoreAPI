@@ -269,7 +269,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
         /// </summary>
         private CurrentUser _currentUser { get { return _globalObject.CurrentUser; } }
         /// <summary>
-        /// 月报编辑按钮权限
+        /// 编辑按钮权限
         /// </summary>
         public IProjectService _iProjectService { get; set; }
 

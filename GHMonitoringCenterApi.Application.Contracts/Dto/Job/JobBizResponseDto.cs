@@ -5,7 +5,7 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Job
     /// <summary>
     /// 任务业务返回
     /// </summary>
-    public   class JobBizResponseDto<TBizResult> where TBizResult : class
+    public class JobBizResponseDto<TBizResult> where TBizResult : class
     {
         /// <summary>
         /// 任务Id
@@ -16,11 +16,15 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Job
         /// 项目Id
         /// </summary>
         public Guid? ProjectId { get; set; }
+        /// <summary>
+        /// true 显示
+        /// </summary>
+        public bool BtnImportShowHide { get; set; } = false;
 
         /// <summary>
         /// 业务模块
         /// </summary>
-        public  BizModule BizModule { get; set; }
+        public BizModule BizModule { get; set; }
 
         /// <summary>
         /// 业务数据对象
@@ -36,6 +40,6 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Job
         /// 下一级审批人集合
         /// </summary>
         public ResJobApproverDto[] NextApprovers { get; set; } = new ResJobApproverDto[0];
-      
+
     }
 }

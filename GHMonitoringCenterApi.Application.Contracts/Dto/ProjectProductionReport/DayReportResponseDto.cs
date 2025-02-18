@@ -240,6 +240,10 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.ProjectProductionRepor
         /// </summary>
         public Guid? ConstructionId { get; set; }
         /// <summary>
+        /// 编辑按钮控制
+        /// </summary>
+        public bool BtnEditDailyReport { get; set; }
+        /// <summary>
         /// 项目关联id
         /// </summary>
         public Guid? PId { get; set; }

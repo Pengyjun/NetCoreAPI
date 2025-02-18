@@ -3,6 +3,7 @@ using GHMonitoringCenterApi.Application.Contracts.Dto.ConstructionProjectDaily;
 using GHMonitoringCenterApi.Application.Contracts.Dto.ProjectProductionReport;
 using GHMonitoringCenterApi.Application.Contracts.IService;
 using GHMonitoringCenterApi.Application.Contracts.IService.OperationLog;
+using GHMonitoringCenterApi.Application.Contracts.IService.Project;
 using GHMonitoringCenterApi.Application.Contracts.IService.ProjectProductionReport;
 using GHMonitoringCenterApi.Domain.Enums;
 using GHMonitoringCenterApi.Domain.IRepository;
@@ -10,7 +11,6 @@ using GHMonitoringCenterApi.Domain.Models;
 using GHMonitoringCenterApi.Domain.Shared;
 using GHMonitoringCenterApi.Domain.Shared.Const;
 using GHMonitoringCenterApi.Domain.Shared.Util;
-using NPOI.SS.Formula.Functions;
 using SqlSugar;
 using System.Linq.Expressions;
 using UtilsSharp;
@@ -44,6 +44,10 @@ namespace GHMonitoringCenterApi.Application.Service.ProjectProductionReport
         /// </summary>
         public IBaseRepository<SafeSupervisionDayReport> _dbSafeDayReport;
         /// <summary>
+        /// 编辑按钮权限
+        /// </summary>
+        public IProjectService _iProjectService { get; set; }
+        /// <summary>
         /// 全局对象
         /// </summary>
         private readonly GlobalObject _globalObject;
@@ -52,7 +56,7 @@ namespace GHMonitoringCenterApi.Application.Service.ProjectProductionReport
         /// </summary>
         private CurrentUser _currentUser { get { return _globalObject.CurrentUser; } }
 
-        public ProjectProductionReportService(ISqlSugarClient dbContext, IMapper mapper, IBaseService baseService, ILogService logService, IBaseRepository<DayReport> _dbDayReport, IBaseRepository<ShipDayReport> _dbShipDayReport, IBaseRepository<Institution> _dbInstitution, IBaseRepository<SafeSupervisionDayReport> _dbSafeDayReport, GlobalObject globalObject)
+        public ProjectProductionReportService(ISqlSugarClient dbContext, IMapper mapper, IBaseService baseService, ILogService logService, IBaseRepository<DayReport> _dbDayReport, IBaseRepository<ShipDayReport> _dbShipDayReport, IBaseRepository<Institution> _dbInstitution, IBaseRepository<SafeSupervisionDayReport> _dbSafeDayReport, IProjectService iProjectService, GlobalObject globalObject)
         {
             this.dbContext = dbContext;
             this.mapper = mapper;
@@ -63,6 +67,7 @@ namespace GHMonitoringCenterApi.Application.Service.ProjectProductionReport
             this._dbSafeDayReport = _dbSafeDayReport;
             this._globalObject = globalObject;
             this._dbInstitution = _dbInstitution;
+            this._iProjectService = iProjectService;
         }
         #endregion
 
@@ -592,7 +597,8 @@ namespace GHMonitoringCenterApi.Application.Service.ProjectProductionReport
             var dealingUnit = await dbContext.Queryable<DealingUnit>().Where(x => x.IsDelete == 1 && subIds.Contains(x.PomId)).ToListAsync();
             //获取施工性质
             var constructionList = await dbContext.Queryable<DictionaryTable>().Where(t => t.IsDelete == 1 && t.TypeNo == 7).ToListAsync();
-
+            //编辑按钮
+            var permission = await dbContext.Queryable<BtnEditMonthlyReportPermission>().Where(t => t.IsDelete == 1 && t.DailyReportEnable == true).ToListAsync();
             foreach (var item in list)
             {
                 item.CompanyName = companyList.FirstOrDefault(x => x.PomId.ToString() == item.CompanyName)?.Name;
@@ -601,6 +607,7 @@ namespace GHMonitoringCenterApi.Application.Service.ProjectProductionReport
                 item.CreateUser = userList.FirstOrDefault(x => x.Id.ToString() == item.CreateUser)?.Name;
                 item.DayReportConstructions = dayConstructionList.Where(x => x.DayReportId == item.DayId).Select(x => new DayResConstruction
                 {
+                    BtnEditDailyReport = _iProjectService.BtnEditMonthlyReport(2, x.DateDay, permission),
                     DayId = item.DayId,
                     ConstructionId = x.Id,
                     PId = item.ProjectId,
