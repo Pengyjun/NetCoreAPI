@@ -57,6 +57,11 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.JjtSendMsg
         public List<EachCompanyProductionValue> EachCompanyProductionValue { get; set; }
         public List<ImpProjectWarning>? ImpProjectWarning { get; set; }
 
+        public List<ProjectWokrItem>?  ProjectWokrItems { get; set; }
+
+
+
+
     }
 
     #region 项目总体生产情况
@@ -729,7 +734,18 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.JjtSendMsg
         /// </summary>
         public string? DeviationWarning { get; set; }
     }
-    #region 
 
+
+
+    #region 节后停工  来了未开工的项目和今日已开工的项目 临时用
+    /// <summary>
+    /// 节后停工  来了未开工的项目和今日已开工的项目
+    /// </summary>
+    public class ProjectWokrItem {
+
+        public List<string> DayWorkProject { get; set; }
+        public List<string> NoWorkProject { get; set; }
+
+    }
     #endregion
 }
