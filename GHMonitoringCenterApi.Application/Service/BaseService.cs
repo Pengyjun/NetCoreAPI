@@ -2653,11 +2653,14 @@ namespace GHMonitoringCenterApi.Application.Service
             responseAjaxResult.Success();
             return responseAjaxResult;
         }
-        public async Task<string> SearchDayReportApproveAsync()
+        public async Task<ResponseAjaxResult<string>> SearchDayReportApproveAsync()
         {
+            ResponseAjaxResult<string> responseAjaxResult = new ResponseAjaxResult<string>();
             var time = DateTime.Now.AddDays(-1).ToDateDay();
             var staus= await dbContext.Queryable<DayPushApprove>().Where(x=>x.DayTime== time).Select(x=>x.Status).FirstAsync();
-            return staus==null?"未审核":staus;
+            responseAjaxResult.Data = staus;
+            responseAjaxResult.Success();
+            return responseAjaxResult;
         }
         /// <summary>
         /// 排除一些项目  如菲律宾帕塞吹填开发项目（1期）水工工程   只有交建公司能看到这个项目   

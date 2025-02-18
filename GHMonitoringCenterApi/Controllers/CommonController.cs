@@ -559,7 +559,7 @@ namespace GHMonitoringCenterApi.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet("SearchDayReportApprove")]
-        public async Task<string> SearchDayReportApproveAsync()
+        public async Task<ResponseAjaxResult<string>> SearchDayReportApproveAsync()
         {
             return await baseService.SearchDayReportApproveAsync();
         }
