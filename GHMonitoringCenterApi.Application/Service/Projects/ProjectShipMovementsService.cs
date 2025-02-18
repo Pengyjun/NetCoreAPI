@@ -262,11 +262,10 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             }
             shipMovement.UpdateId = _currentUser.Id;
             shipMovement.Status = model.Status;
-            
-            shipMovement.EnterTime = model.EnterOrQuitTime;
+            shipMovement.Remarks = model.Remarks;
             if (shipMovement.Status == ShipMovementStatus.Enter)
             {
-                shipMovement.Remarks = model.Remarks;
+                shipMovement.EnterTime = model.EnterOrQuitTime;
                 var enterShipMovement = await GetShipMovementAsync(shipMovement.ShipId, shipMovement.ShipType, ShipMovementStatus.Enter, shipMovement.ProjectId);
                 if (enterShipMovement != null)
                 {
