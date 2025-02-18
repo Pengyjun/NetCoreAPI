@@ -2964,25 +2964,34 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
             var npids=drData.Select(x => x.ProjectId).Distinct().ToList();
             var np = improjects.Where(x => npids.Contains(x.ProjectId.Value)).ToList();
 
-            //foreach (var item in np)
-            //{
-            //   var islow= drData.Where(x => x.ProjectId == item.ProjectId&&x.DateDay== currentTimeInt&&x.IsLow==0).FirstOrDefault();
-            //    if (islow != null)
-            //    {
-            //        imp.Add(new ImpProjectWarning
-            //        {
-            //            IsLow = islow.IsLow,
-            //            DayAmount = drData.FirstOrDefault(x => x.ProjectId == item.ProjectId)?.DayActualProductionAmount / 10000,
-            //            DeviationWarning = drData.FirstOrDefault(x => x.ProjectId == item.ProjectId)?.DeviationWarning,
-            //            ProjectName = item.ProjectName
-            //        });
-            //    }
-               
-            //}
+            foreach (var item in np)
+            {
+                var islow = drData.Where(x => x.ProjectId == item.ProjectId && x.DateDay == currentTimeInt && x.IsLow == 0).FirstOrDefault();
+                if (islow != null)
+                {
+                    imp.Add(new ImpProjectWarning
+                    {
+                        IsLow = islow.IsLow,
+                        DayAmount = drData.FirstOrDefault(x => x.ProjectId == item.ProjectId)?.DayActualProductionAmount / 10000,
+                        DeviationWarning = drData.FirstOrDefault(x => x.ProjectId == item.ProjectId)?.DeviationWarning,
+                        ProjectName = item.ProjectName
+                    });
+                }
+
+            }
             foreach (var item in imp)
             {
                 item.DayAmount = item.DayAmount == 0 || string.IsNullOrWhiteSpace(item.DayAmount.ToString()) ? 0M : Math.Round(item.DayAmount.Value, 2);
             }
+            #endregion
+
+
+            #region 复工项目检测  临时使用
+
+            var shareProjectIds=ProjectShare.projectShare;
+            var shareDayList= dayProductionValueList.Where(x => x.DateDay >= 20250129 && x.DateDay <= 20250228).ToList();
+            List<ProjectWokrItem> projectWokrItems = new List<ProjectWokrItem>();
+
             #endregion
 
             jjtSendMessageMonitoringDayReportResponseDto.EachCompanyProductionValue = eachCompanyProductionValues.OrderBy(x => x.XAxle).ToList();
