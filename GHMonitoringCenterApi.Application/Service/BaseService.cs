@@ -2631,7 +2631,7 @@ namespace GHMonitoringCenterApi.Application.Service
         /// </summary>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
-        public async Task<ResponseAjaxResult<bool>> DayReportApproveAsync()
+        public async Task<ResponseAjaxResult<bool>> DayReportApproveAsync(bool isApprove)
         {
             ResponseAjaxResult<bool> responseAjaxResult = new ResponseAjaxResult<bool>();
             if (_currentUser.Account != "2018015149" ||
@@ -2645,7 +2645,7 @@ namespace GHMonitoringCenterApi.Application.Service
             var obj = new DayPushApprove() {
                 ApproveId = _currentUser.Id,
                 ApproveName = _currentUser.Name,
-                Status = "已审批",
+                Status = isApprove ? "已审批" :"未审批",
                 DayTime=DateTime.Now.AddDays(-1).ToDateDay(),
             };
             await dbContext.Insertable<DayPushApprove>(obj).ExecuteCommandAsync();

@@ -549,9 +549,9 @@ namespace GHMonitoringCenterApi.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet("DayReportApprove")]
-        public async Task<ResponseAjaxResult<bool>> DayReportApproveAsync()
+        public async Task<ResponseAjaxResult<bool>> DayReportApproveAsync(bool isApprove)
         {
-            return await baseService.DayReportApproveAsync();
+            return await baseService.DayReportApproveAsync(isApprove);
         }
 
         /// <summary>

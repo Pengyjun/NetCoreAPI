@@ -392,7 +392,7 @@ namespace GHMonitoringCenterApi.Application.Contracts.IService
         /// 页面审核
         /// </summary>
         /// <returns></returns>
-        Task<ResponseAjaxResult<bool>> DayReportApproveAsync();
+        Task<ResponseAjaxResult<bool>> DayReportApproveAsync(bool isApprove);
         Task<ResponseAjaxResult<string>> SearchDayReportApproveAsync();
 
     }
