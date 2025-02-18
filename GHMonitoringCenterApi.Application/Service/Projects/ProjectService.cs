@@ -16,6 +16,7 @@ using GHMonitoringCenterApi.Domain.Shared;
 using GHMonitoringCenterApi.Domain.Shared.Const;
 using GHMonitoringCenterApi.Domain.Shared.Enums;
 using GHMonitoringCenterApi.Domain.Shared.Util;
+using NPOI.SS.Formula.Functions;
 using SqlSugar;
 using SqlSugar.Extensions;
 using System.Text;
@@ -3736,7 +3737,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             bool rs = false;
             ConvertHelper.TryConvertDateTimeFromDateDay(date, out DateTime nowTime);
             //获取登录用户按钮权限控制表
-            var permission = permissions.FirstOrDefault(t => t.IsDelete == 1 && t.UserId == _currentUser.Id && type == t.PermissionType);
+            var permission = permissions.FirstOrDefault(t => t.IsDelete == 1 && t.UserId == _currentUser.Id);
             if (_currentUser.CurrentLoginIsAdmin || _currentUser.Account == "2016146340") rs = true;
             else if (type == 1)
             {
@@ -3791,25 +3792,24 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
         /// <summary>
         /// 月报编辑按钮权限控制 列表
         /// </summary>
-        /// <param name="name"></param>
+        /// <param name="requestBody"></param>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
-        public async Task<ResponseAjaxResult<List<BtnEditMonthlyReportSearch>>> BtnEditMonthlyReportSearchAsync(string? name)
+        public async Task<ResponseAjaxResult<List<BtnEditMonthlyReportSearch>>> BtnEditMonthlyReportSearchAsync(BaseRequestDto requestBody)
         {
             ResponseAjaxResult<List<BtnEditMonthlyReportSearch>> rt = new();
             List<BtnEditMonthlyReportSearch> rs = new();
+            RefAsync<int> total = 0;
             var users = await dbContext.Queryable<Domain.Models.User>()
                 .Where(t => t.IsDelete == 1 && t.LoginAccount != "2016146340" && t.LoginAccount != "2022002687")
-                .WhereIF(!string.IsNullOrWhiteSpace(name), t => t.Name.Contains(name) || t.Phone.Contains(name))
-                .ToListAsync();
+                .WhereIF(!string.IsNullOrWhiteSpace(requestBody.KeyWords), t => t.Name.Contains(requestBody.KeyWords) || t.Phone.Contains(requestBody.KeyWords))
+                .ToPageListAsync(requestBody.PageIndex, requestBody.PageSize, total);
 
             //所有启用的用户
             var permissions = await dbContext.Queryable<BtnEditMonthlyReportPermission>().Where(t => t.IsDelete == 1).ToListAsync();
             foreach (var item in users)
             {
                 BtnEditMonthlyReportSearch rr = new();
-                var monthStatus = "关闭";
-                var dailyStatus = "关闭";
                 rr.UserName = item.Name + "(" + item.Phone + ")";
                 rr.UserId = item.Id;
                 var per = permissions.FirstOrDefault(x => x.UserId == item.Id);
@@ -3817,9 +3817,9 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 {
                     rr.Id = per.Id;
                     //月报
-                    if (per.PermissionType == 1 && per.MonthReportEnable == true)
+                    if (per.MonthReportEnable == true)
                     {
-                        monthStatus = per.MonthReportEnable == true ? "开启" : monthStatus;
+                        rr.MonthReportEnableStatus = per.MonthReportEnable;
                         //月报可修改的月份
                         var months = string.IsNullOrEmpty(per.MonthTime)
                            ? new List<int>()
@@ -3846,17 +3846,16 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                         rr.MonthEffectiveTime = per.MonthEffectiveTime.ToString("yyyy-MM-dd HH:mm:ss");
                     }
                     //日报
-                    if (per.PermissionType == 2 && per.DailyReportEnable == true)
+                    if (per.DailyReportEnable == true)
                     {
-                        dailyStatus = per.DailyReportEnable == true ? "开启" : dailyStatus;
+                        rr.DailyReportEnableStatus = per.DailyReportEnable;
                         rr.DailyStartTime = per.DailyStartTime.ToString("yyyy-MM-dd HH:mm:ss");
                         rr.DailyEndTime = per.DailyEndTime.ToString("yyyy-MM-dd HH:mm:ss");
                     }
                 }
-                rr.MonthReportEnableStatus = monthStatus;
-                rr.DailyReportEnableStatus = dailyStatus;
                 rs.Add(rr);
             }
+            rt.Count = total;
             return rt.SuccessResult(rs);
         }
 
@@ -3869,25 +3868,106 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
         public async Task<ResponseAjaxResult<bool>> SaveBtnEditReportAsync(SaveBtnEditMonthlyReport requestBody)
         {
             ResponseAjaxResult<bool> rt = new();
+            bool status = false;
 
-            if (requestBody != null)
+            if (!string.IsNullOrWhiteSpace(requestBody.Id.ToString()) && requestBody.Id != Guid.Empty)
             {
-                if (!string.IsNullOrWhiteSpace(requestBody.Id.ToString()) && requestBody.Id != Guid.Empty)
+                //修改保存
+                var per = await dbContext.Queryable<BtnEditMonthlyReportPermission>().Where(t => t.IsDelete == 1 && t.Id == requestBody.Id).FirstAsync();
+                if (per != null)
                 {
-                    //修改保存
-                    var per = await dbContext.Queryable<BtnEditMonthlyReportPermission>().Where(t => t.IsDelete == 1 && t.Id == requestBody.Id).FirstAsync();
-                    if (per != null)
+                    if (requestBody.PermissionType == 1)//月报
                     {
-                        if (requestBody.PermissionType == 1)//
+                        if (requestBody.MonthTime != null && requestBody.MonthTime.Any())
                         {
-
+                            per.MonthTime = string.Join(',', requestBody.MonthTime);
                         }
+                        else
+                        {
+                            per.MonthTime = string.Empty;
+                        }
+                        per.MonthEffectiveTime = DateTime.Now.AddDays(3);//往后加三天
+                        per.MonthReportEnable = requestBody.MonthReportEnable;
+                        await dbContext.Updateable(per).UpdateColumns(x => new
+                        {
+                            x.MonthTime,
+                            x.MonthEffectiveTime,
+                            x.MonthReportEnable
+                        })
+                        .ExecuteCommandAsync();
+                        status = true;
                     }
+                    else if (requestBody.PermissionType == 2)//日报
+                    {
+                        per.DailyStartTime = requestBody.DailyStartTime;
+                        per.DailyEndTime = requestBody.DailyEndTime;
+                        per.DailyReportEnable = requestBody.DailyReportEnable;
+                        await dbContext.Updateable(per).UpdateColumns(x => new
+                        {
+                            x.DailyStartTime,
+                            x.DailyEndTime,
+                            x.DailyReportEnable
+                        })
+                        .ExecuteCommandAsync();
+                        status = true;
+                    }
+                    else status = false;
                 }
+                else status = false;
             }
-            return rt;
+            else
+            {
+                //新增
+                if (requestBody.PermissionType == 1)//月报
+                {
+                    var monthTime = string.Empty;
+                    if (requestBody.MonthTime != null && requestBody.MonthTime.Any())
+                    {
+                        monthTime = string.Join(',', requestBody.MonthTime);
+                    }
+                    else
+                    {
+                        monthTime = string.Empty;
+                    }
+                    var add = new BtnEditMonthlyReportPermission
+                    {
+                        Id = GuidUtil.Next(),
+                        DailyEndTime = DateTime.Now,//默认当前时间 不做处理
+                        DailyStartTime = DateTime.Now,//默认当前时间 不做处理
+                        MonthEffectiveTime = requestBody.MonthEffectiveTime,
+                        MonthReportEnable = requestBody.MonthReportEnable,
+                        MonthTime = monthTime,
+                        UserId = requestBody.UserId,
+                        DailyReportEnable = false
+                    };
+                    await dbContext.Insertable(add).ExecuteCommandAsync();
+                    status = true;
+                }
+                else if (requestBody.PermissionType == 2)//日报
+                {
+                    var add = new BtnEditMonthlyReportPermission
+                    {
+                        Id = GuidUtil.Next(),
+                        DailyEndTime = requestBody.DailyEndTime,
+                        DailyStartTime = requestBody.DailyStartTime,
+                        MonthEffectiveTime = DateTime.Now,
+                        MonthReportEnable = false,
+                        MonthTime = string.Empty,
+                        UserId = requestBody.UserId,
+                        DailyReportEnable = requestBody.DailyReportEnable
+                    };
+                    await dbContext.Insertable(add).ExecuteCommandAsync();
+                    status = true;
+                }
+                else status = false;
+            }
+            if (status == true)
+                return rt.SuccessResult(status, "保存成功");
+            else
+                return rt.SuccessResult(status, "保存失败");
         }
         #endregion
+
 
         #region 获取每年的节假日
         public bool GetHolidays()

@@ -14,11 +14,6 @@ namespace GHMonitoringCenterApi.Domain.Models
         [SugarColumn(Length = 36)]
         public Guid UserId { get; set; }
         /// <summary>
-        /// 权限类型  1 月报 2日报
-        /// </summary>
-        [SugarColumn(ColumnDataType = "int")]
-        public int PermissionType { get; set; }
-        /// <summary>
         /// 授权开始时间 针对日报
         /// </summary>
         [SugarColumn(ColumnDataType = "datetime")]

@@ -9815,7 +9815,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             var maxMonthTime = GetDefaultReportDateMonthTime();
             var result = new ResponseAjaxResult<ReportedMonthResponseDto>();
             var reportedMonths = new List<string>();
-            var dateMonths = await _dbMonthReport.AsQueryable().Where(t => t.IsDelete == 1 && t.ProjectId == model.ProjectId).OrderByDescending(t => t.DateMonth).Select(t => t.DateMonth).ToListAsync();
+            var dateMonths = await _dbMonthReport.AsQueryable().Where(t => t.IsDelete == 1 && t.ProjectId == model.ProjectId && !t.StatusText.Contains("驳回")).OrderByDescending(t => t.DateMonth).Select(t => t.DateMonth).ToListAsync();
             dateMonths.ForEach(item =>
             {
                 ConvertHelper.TryParseFromDateMonth(item, out DateTime monthTime);

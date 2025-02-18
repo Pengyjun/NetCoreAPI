@@ -855,12 +855,12 @@ namespace GHMonitoringCenterApi.Controllers.Project
         /// <summary>
         /// 月报编辑按钮权限控制 列表
         /// </summary>
-        /// <param name="name"></param>
+        /// <param name="requestBody"></param>
         /// <returns></returns>
         [HttpGet("BtnEditReportSearch")]
-        public async Task<ResponseAjaxResult<List<BtnEditMonthlyReportSearch>>> BtnEditReportSearchAsync(string? name)
+        public async Task<ResponseAjaxResult<List<BtnEditMonthlyReportSearch>>> BtnEditReportSearchAsync([FromQuery] BaseRequestDto requestBody)
         {
-            return await projectService.BtnEditMonthlyReportSearchAsync(name);
+            return await projectService.BtnEditMonthlyReportSearchAsync(requestBody);
         }
         /// <summary>
         /// 保存编辑按钮权限

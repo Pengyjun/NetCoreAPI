@@ -27,11 +27,11 @@
         /// <summary>
         /// true 启用
         /// </summary>
-        public string? DailyReportEnableStatus { get; set; }
+        public bool DailyReportEnableStatus { get; set; }
         /// <summary>
         /// true 启用
         /// </summary>
-        public string? MonthReportEnableStatus { get; set; }
+        public bool MonthReportEnableStatus { get; set; }
         /// <summary>
         /// 月报允许修改的月份 字符串拼接 202401,202501
         /// </summary>
@@ -50,6 +50,10 @@
         /// 主键
         /// </summary>
         public Guid Id { get; set; }
+        /// <summary>
+        /// 用户id
+        /// </summary>
+        public Guid UserId { get; set; }
         /// <summary>
         /// 权限类型  1 月报 2日报
         /// </summary>
