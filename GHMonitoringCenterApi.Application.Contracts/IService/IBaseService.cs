@@ -379,5 +379,21 @@ namespace GHMonitoringCenterApi.Application.Contracts.IService
         /// <param name="projectTypRequsetDto"></param>
         /// <returns></returns>
         Task<ResponseAjaxResult<List<BasePullDownResponseDto>>> SearchManagerTypeAsync(ProjectTypRequsetDto projectTypRequsetDto);
+
+        /// <summary>
+        /// 日报审批推送提醒
+        /// </summary>
+        /// <returns></returns>
+
+        Task<bool> DayReportApprovePushAsync();
+
+
+        /// <summary>
+        /// 页面审核
+        /// </summary>
+        /// <returns></returns>
+        Task<ResponseAjaxResult<bool>> DayReportApproveAsync();
+        Task<string> SearchDayReportApproveAsync();
+
     }
 }

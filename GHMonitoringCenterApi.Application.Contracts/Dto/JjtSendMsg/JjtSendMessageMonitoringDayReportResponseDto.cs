@@ -57,7 +57,7 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.JjtSendMsg
         public List<EachCompanyProductionValue> EachCompanyProductionValue { get; set; }
         public List<ImpProjectWarning>? ImpProjectWarning { get; set; }
 
-        public List<ProjectWokrItem>?  ProjectWokrItems { get; set; }
+        public ProjectWokrItem?  ProjectWokrItems { get; set; }
 
 
 
@@ -743,8 +743,8 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.JjtSendMsg
     /// </summary>
     public class ProjectWokrItem {
 
-        public List<string> DayWorkProject { get; set; }
-        public List<string> NoWorkProject { get; set; }
+        public List<string> DayWorkProject { get; set; }=new List<string>();
+        public List<string> NoWorkProject { get; set; } = new List<string>();
 
     }
     #endregion
