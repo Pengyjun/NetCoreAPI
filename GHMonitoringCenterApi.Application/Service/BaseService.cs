@@ -2634,23 +2634,28 @@ namespace GHMonitoringCenterApi.Application.Service
         public async Task<ResponseAjaxResult<bool>> DayReportApproveAsync(bool isApprove)
         {
             ResponseAjaxResult<bool> responseAjaxResult = new ResponseAjaxResult<bool>();
-            if (_currentUser.Account != "2018015149" ||
-                _currentUser.Account != "2016146439" ||
-                _currentUser.Account != "L20132106")
+            if (_currentUser.CurrentLoginIsAdmin ||
+                _currentUser.Account == "2018015149" ||
+                _currentUser.Account == "2016146439" ||
+                _currentUser.Account == "L20132106")
             {
+                var obj = new DayPushApprove()
+                {
+                    ApproveId = _currentUser.Id,
+                    ApproveName = _currentUser.Name,
+                    Status = isApprove ? "已审批" : "未审批",
+                    DayTime = DateTime.Now.AddDays(-1).ToDateDay(),
+                };
+                await dbContext.Insertable<DayPushApprove>(obj).ExecuteCommandAsync();
+                responseAjaxResult.Data = true;
+                responseAjaxResult.Success();
+            }
+            else {
                 responseAjaxResult.Data = false;
-                responseAjaxResult.Success("您没有权限审核",HttpStatusCode.VerifyFail);
+                responseAjaxResult.Success("您没有权限审核", HttpStatusCode.VerifyFail);
                 return responseAjaxResult;
             }
-            var obj = new DayPushApprove() {
-                ApproveId = _currentUser.Id,
-                ApproveName = _currentUser.Name,
-                Status = isApprove ? "已审批" :"未审批",
-                DayTime=DateTime.Now.AddDays(-1).ToDateDay(),
-            };
-            await dbContext.Insertable<DayPushApprove>(obj).ExecuteCommandAsync();
-            responseAjaxResult.Data = true;
-            responseAjaxResult.Success();
+            
             return responseAjaxResult;
         }
         public async Task<ResponseAjaxResult<string>> SearchDayReportApproveAsync()
