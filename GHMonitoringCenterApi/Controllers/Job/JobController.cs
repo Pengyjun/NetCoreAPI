@@ -1,7 +1,6 @@
 ﻿using GHMonitoringCenterApi.Application.Contracts.Dto.Job;
 using GHMonitoringCenterApi.Application.Contracts.Dto.Project;
 using GHMonitoringCenterApi.Application.Contracts.Dto.Project.MonthReportForProject;
-using GHMonitoringCenterApi.Application.Contracts.Dto.Project.Report;
 using GHMonitoringCenterApi.Application.Contracts.IService.Job;
 using GHMonitoringCenterApi.CustomAttribute;
 using GHMonitoringCenterApi.Domain.Enums;

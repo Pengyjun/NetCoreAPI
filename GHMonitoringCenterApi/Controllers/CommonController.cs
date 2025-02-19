@@ -537,5 +537,31 @@ namespace GHMonitoringCenterApi.Controllers
         {
             return await baseService.RecordHolidayAsync(year);
         }
+
+        [HttpGet("DayReportApprovePush")]
+        [AllowAnonymous]
+        public async Task<bool> DayReportApprovePushAsync()
+        {
+            return await baseService.DayReportApprovePushAsync();
+        }
+        /// <summary>
+        /// 生产日报审核
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("DayReportApprove")]
+        public async Task<ResponseAjaxResult<bool>> DayReportApproveAsync(bool isApprove)
+        {
+            return await baseService.DayReportApproveAsync(isApprove);
+        }
+
+        /// <summary>
+        /// 生产日报审核查询
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("SearchDayReportApprove")]
+        public async Task<ResponseAjaxResult<string>> SearchDayReportApproveAsync()
+        {
+            return await baseService.SearchDayReportApproveAsync();
+        }
     }
 }

@@ -29,6 +29,7 @@ namespace GHMonitoringCenterApi.Domain.Shared
          "08dcbb45-2fea-4ec2-865d-c39988e1dd77".ToGuid(),
          "08db3b35-fb38-4be8-813b-1942519277c6".ToGuid(),
          "08db3b35-fb38-4be3-896d-b174b155113e".ToGuid(),
+         "08db3b35-fb38-4be9-8f98-365fff1041e1".ToGuid(),
         };
     }
 }

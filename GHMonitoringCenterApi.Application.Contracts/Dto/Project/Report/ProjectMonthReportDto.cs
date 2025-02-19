@@ -282,7 +282,7 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project.Report
         /// <summary>
         /// 单价
         /// </summary>
-        public decimal? UnitPrice { get; set; }
+        public decimal? UnitPrice { get; set; } = 0M;
 
         /// <summary>
         /// 施工性质
@@ -307,7 +307,7 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project.Report
         /// <summary>
         /// 本月完成工程量(方)
         /// </summary>
-        public decimal? CompletedQuantity { get; set; }
+        public decimal? CompletedQuantity { get; set; } = 0M;
 
         /// <summary>
         /// 本月完成产值

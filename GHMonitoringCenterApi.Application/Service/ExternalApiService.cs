@@ -1,4 +1,5 @@
 ﻿using GHMonitoringCenterApi.Application.Contracts.Dto;
+using GHMonitoringCenterApi.Application.Contracts.Dto.ConstructionLog;
 using GHMonitoringCenterApi.Application.Contracts.Dto.ConstructionProjectDaily;
 using GHMonitoringCenterApi.Application.Contracts.Dto.EquipmentManagement;
 using GHMonitoringCenterApi.Application.Contracts.Dto.External;
@@ -6,27 +7,24 @@ using GHMonitoringCenterApi.Application.Contracts.Dto.Project;
 using GHMonitoringCenterApi.Application.Contracts.Dto.Project.Report;
 using GHMonitoringCenterApi.Application.Contracts.Dto.Project.ShipMovements;
 using GHMonitoringCenterApi.Application.Contracts.Dto.ProjectProductionReport;
-using GHMonitoringCenterApi.Application.Contracts.IService.ConstructionLog;
 using GHMonitoringCenterApi.Application.Contracts.Dto.Ship;
 using GHMonitoringCenterApi.Application.Contracts.Dto.Word;
 using GHMonitoringCenterApi.Application.Contracts.IService;
+using GHMonitoringCenterApi.Application.Contracts.IService.ConstructionLog;
 using GHMonitoringCenterApi.Application.Contracts.IService.EquipmentManagement;
 using GHMonitoringCenterApi.Application.Contracts.IService.Project;
 using GHMonitoringCenterApi.Application.Contracts.IService.ProjectProductionReport;
+using GHMonitoringCenterApi.Domain.Enums;
 using GHMonitoringCenterApi.Domain.Models;
 using GHMonitoringCenterApi.Domain.Shared;
 using GHMonitoringCenterApi.Domain.Shared.Const;
+using GHMonitoringCenterApi.Domain.Shared.Util;
 using HNKC.OperationLogsAPI.Dto.ResponseDto;
-using Microsoft.AspNetCore.Mvc;
-using SkiaSharp;
 using SqlSugar;
 using SqlSugar.Extensions;
+using System.Linq;
 using UtilsSharp;
 using static GHMonitoringCenterApi.Application.Contracts.Dto.Project.Report.MonthtReportsResponseDto;
-using GHMonitoringCenterApi.Application.Contracts.Dto.ConstructionLog;
-using System.Collections.Generic;
-using GHMonitoringCenterApi.Domain.Enums;
-using Spire.Doc.Documents;
 
 namespace GHMonitoringCenterApi.Application.Service
 {
@@ -507,9 +505,9 @@ namespace GHMonitoringCenterApi.Application.Service
                 });
             }
 
-            var pageData = resList.Skip((requestDto.PageIndex - 1) * requestDto.PageSize).Take(requestDto.PageSize).ToList();
-            responseAjaxResult.Count = responseData.Count;
-            responseAjaxResult.SuccessResult(pageData, ResponseMessage.OPERATION_SUCCESS);
+            //var pageData = resList.Skip((requestDto.PageIndex - 1) * requestDto.PageSize).Take(requestDto.PageSize).ToList();
+            responseAjaxResult.Count = resList.Count;
+            responseAjaxResult.SuccessResult(resList, ResponseMessage.OPERATION_SUCCESS);
             return responseAjaxResult;
         }
         /// <summary>
@@ -560,9 +558,9 @@ namespace GHMonitoringCenterApi.Application.Service
                 });
             }
 
-            var pageData = resList.Skip((requestDto.PageIndex - 1) * requestDto.PageSize).Take(requestDto.PageSize).ToList();
-            responseAjaxResult.Count = responseData.Count;
-            responseAjaxResult.SuccessResult(pageData, ResponseMessage.OPERATION_SUCCESS);
+            //var pageData = resList.Skip((requestDto.PageIndex - 1) * requestDto.PageSize).Take(requestDto.PageSize).ToList();
+            responseAjaxResult.Count = resList.Count;
+            responseAjaxResult.SuccessResult(resList, ResponseMessage.OPERATION_SUCCESS);
             return responseAjaxResult;
         }
         /// <summary>
@@ -657,22 +655,51 @@ namespace GHMonitoringCenterApi.Application.Service
         public async Task<ResponseAjaxResult<List<DayReportInfo>>> GetSearchDayReportAsync(DayReportRequestDto requestDto)
         {
             var responseAjaxResult = new ResponseAjaxResult<List<DayReportInfo>>();
-            var searchRequestDto = new ProductionSafetyRequestDto
-            {
-                ProjectName = requestDto.ProjectName,
-                ProjectStatusId = requestDto.ProjectStatusId,
-                StartTime = requestDto.StartTime,
-                EndTime = requestDto.EndTime,
-                IsDuiWai = true,
-                PageIndex = requestDto.PageIndex,
-                PageSize = requestDto.PageSize
-            };
+            List<DayReportInfo> resList = new();
+            #region 原来的
 
-            var responseData = await _projectProductionReportService.SearchDayReportAsync(searchRequestDto);
-            var resList = responseData.Data.dayReportInfos;
+            //var searchRequestDto = new ProductionSafetyRequestDto
+            //{
+            //    ProjectName = requestDto.ProjectName,
+            //    ProjectStatusId = requestDto.ProjectStatusId,
+            //    StartTime = requestDto.StartTime,
+            //    EndTime = requestDto.EndTime,
+            //    IsDuiWai = true,
+            //    PageIndex = requestDto.PageIndex,
+            //    PageSize = requestDto.PageSize
+            //};
 
-            responseAjaxResult.Count = responseData.Count;
-            responseAjaxResult.SuccessResult(resList, ResponseMessage.OPERATION_SUCCESS);
+            //var responseData = await _projectProductionReportService.SearchDayReportAsync(searchRequestDto);
+            //resList = responseData.Data.dayReportInfos;
+            //responseAjaxResult.Count = responseData.Count;
+
+            #endregion
+
+            #region 新的
+            var data = await _dbContext.Queryable<DayReport>()
+                .Where(x => x.IsDelete == 1)
+                .Select(x => new DayReportInfo
+                {
+                    Id = x.Id,
+                    CreateTime = x.CreateTime,
+                    UpdateTime = x.UpdateTime,
+                    ProjectId = x.ProjectId,
+                    DateDay = x.DateDay,
+                    DayActualProductionAmount = x.DayActualProductionAmount,
+                    DayActualProductionQuantity = x.DayActualProduction,
+                    ProSumOutsourcingExpensesAmount = x.OutsourcingExpensesAmount,
+                    SiteShipNum = x.SiteShipNum,
+                    OnShipPersonNum = x.OnShipPersonNum,
+                    Sitemanagementpersonnum = x.SiteManagementPersonNum,
+                    Siteconstructionpersonnum = x.SiteConstructionPersonNum,
+                    Hazardousconstructionnum = x.HazardousConstructionNum,
+                    HazardousConstructionDetails = x.HazardousConstructionDetails
+                })
+                .ToListAsync();
+
+            #endregion
+            responseAjaxResult.Count = data.Count;
+            responseAjaxResult.SuccessResult(data, ResponseMessage.OPERATION_SUCCESS);
             return responseAjaxResult;
         }
         /// <summary>
@@ -698,112 +725,89 @@ namespace GHMonitoringCenterApi.Application.Service
 
             var responseData = await _projectReportService.SearchMonthReportsAsync(model);
             var resList = responseData.Data.Reports;
+            #endregion
+            var projects = await _dbContext.Queryable<Project>().Where(t => t.IsDelete == 1).ToListAsync();
+            //202412月累计数
+            var accumulate24 = await _dbContext.Queryable<MonthReportDetailHistory>().Where(x => x.IsDelete == 1).ToListAsync();
+            List<DayReport> dayReport = new();
+            #region 添加新逻辑 通过日期获取最新月的数据 如果没有月报取日报数作为月报数传出
+            //需要补充的最新月的月报
+            var startday = 0;
+            var endday = 0;
+            var nowTime = DateTime.Now;
+            if (nowTime.Day < 26)
+            {
+                startday = new DateTime(nowTime.AddMonths(-1).Year, nowTime.AddMonths(-1).Month, 26).ToDateDay();
+                endday = new DateTime(nowTime.Year, nowTime.Month, 25).ToDateDay();
+                dayReport = await _dbContext.Queryable<DayReport>().Where(x => x.IsDelete == 1 && x.DateDay >= startday && x.DateDay <= endday).ToListAsync();
+            }
+            //获取当前月的数据
+            var nowMonth = DateTime.Now.ToDateMonth();
+            List<MonthtReportDto> addNowMonthRep = new();
+            foreach (var pp in projects)
+            {
+                var nowMonthRep = resList.FirstOrDefault(x => x.ProjectId == pp.Id && x.DateMonth == nowMonth);
+                if (nowMonthRep != null)
+                    continue;
+                else//最新月没有填月报  取日报数据作为月报产值
+                {
+                    //截止到当天的产值
+                    var dayHValue = dayReport.Where(x => x.ProjectId == pp.Id).Sum(x => x.DayActualProductionAmount);
+                    var dayProduction = dayReport.Where(x => x.ProjectId == pp.Id).Sum(x => x.DayActualProduction);
+
+                    //年累处理
+                    var initialYear = new DateTime(DateTime.Now.Year, 1, 1).ToDateMonth();
+                    var yearHValue = resList.Where(x => x.DateMonth >= initialYear && x.DateMonth <= nowMonth && x.ProjectId == pp.Id).Sum(x => x.AccomplishValue);
+                    var yearAccomplishQuantities = resList.Where(x => x.DateMonth >= initialYear && x.DateMonth <= nowMonth && x.ProjectId == pp.Id).Sum(x => x.YearAccomplishQuantities);
+                    var yearRecognizedValue = resList.Where(x => x.DateMonth >= initialYear && x.DateMonth <= nowMonth && x.ProjectId == pp.Id).Sum(x => x.YearRecognizedValue);
+                    var cumulativeValue = resList.Where(x => x.DateMonth >= initialYear && x.DateMonth <= nowMonth && x.ProjectId == pp.Id).Sum(x => x.CumulativeValue);
+                    var yearPaymentAmount = resList.Where(x => x.DateMonth >= initialYear && x.DateMonth <= nowMonth && x.ProjectId == pp.Id).Sum(x => x.YearPaymentAmount);
+                    var cumulativePaymentAmount = resList.Where(x => x.DateMonth >= initialYear && x.DateMonth <= nowMonth && x.ProjectId == pp.Id).Sum(x => x.CumulativePaymentAmount);
+                    //开累产值处理
+                    var cumulativeCompleted = 0M;
+                    var accomplishQuantities = 0M;
+                    if (pp.CurrencyId == "2a0e99b4-f989-4967-b5f1-5519091d4280".ToGuid())//国内
+                    {
+                        cumulativeCompleted = accumulate24.Where(x => x.ProjectId == pp.Id).Sum(x => Convert.ToDecimal(x.ActualCompAmount));
+                    }
+                    else//国外
+                    {
+                        cumulativeCompleted = accumulate24.Where(x => x.ProjectId == pp.Id).Sum(x => Convert.ToDecimal(x.RMBHValue));
+                    }
+                    accomplishQuantities = accumulate24.Where(x => x.ProjectId == pp.Id).Sum(x => Convert.ToDecimal(x.ActualCompQuantity));
+                    //追加截止到当月的实际产值、工程量
+                    accomplishQuantities += resList.Where(x => x.DateMonth > 202412 && x.DateMonth <= nowMonth && x.ProjectId == pp.Id).Sum(x => Convert.ToDecimal(x.ActualCompQuantity));
+                    cumulativeCompleted += resList.Where(x => x.DateMonth > 202412 && x.DateMonth <= nowMonth && x.ProjectId == pp.Id).Sum(x => x.AccomplishValue);
+
+                    addNowMonthRep.Add(new MonthtReportDto
+                    {
+                        DateMonth = nowMonth,
+                        CreateTime = DateTime.Now,
+                        UpdateTime = DateTime.Now,
+                        ProjectId = pp.Id,
+                        AccomplishValue = dayHValue,
+                        AccomplishQuantities = dayProduction,
+                        YearAccomplishValue = yearHValue + dayHValue,
+                        YearAccomplishQuantities = yearAccomplishQuantities + dayProduction,
+                        CumulativeCompleted = cumulativeCompleted + dayHValue,
+                        AccumulativeQuantities = accomplishQuantities + dayProduction,
+                        YearRecognizedValue = yearRecognizedValue,
+                        CumulativeValue = cumulativeValue,
+                        YearPaymentAmount = yearPaymentAmount,
+                        CumulativePaymentAmount = cumulativePaymentAmount
+                    });
+                }
+            }
+            #endregion
+            if (addNowMonthRep.Any())
+            {
+                resList.AddRange(addNowMonthRep);
+            }
             responseAjaxResult.Data = resList;
-            responseAjaxResult.Count = responseData.Count;
+            responseAjaxResult.Count = resList.Count;
             responseAjaxResult.Success();
             return responseAjaxResult;
-            #endregion
 
-            #region 参数校验
-            //当前月份
-            var month = string.Empty;
-            if (requestDto.StartTime == null || requestDto.EndTime == null)
-            {
-                if (DateTime.Now.Day >= 27)
-                {
-                    requestDto.StartTime = DateTime.Now.ToString("yyyy-MM-26 00:00:00").ObjToDate();
-                }
-                else
-                {
-                    requestDto.StartTime = DateTime.Now.AddMonths(-1).ToString("yyyy-MM-26 00:00:00").ObjToDate();
-                }
-                month = requestDto.StartTime.Value.Month.ToString();
-            }
-            else
-            {
-                if (requestDto.EndTime.Value.Day > 26)
-                {
-                    month = requestDto.StartTime.Value.Month.ToString();
-                }
-                else
-                {
-                    month = requestDto.EndTime.Value.AddMonths(-1).Month.ToString();
-                }
-
-
-            }
-            if (month.Length == 1)
-            {
-                month = "0" + month;
-            }
-            var currentMonth = int.Parse(DateTime.Now.Year + month);
-            //当年开始时间
-            var yearStartIime = DateTime.Now.ToString("yyyy01").ObjToInt();
-            var yearEndTime = DateTime.Now.ToString("yyyy12").ObjToInt();
-
-            #endregion
-
-            #region MyRegion
-
-
-            //var responseAjaxResult = new ResponseAjaxResult<List<MonthtReportDto>>();
-            //List<MonthtReportDto> monthtReportDtos = new List<MonthtReportDto>();
-            //var projectMonthList = await _dbContext.Queryable<MonthReport>().Where(x => x.IsDelete == 1)
-            //    .WhereIF(requestDto.StartTime != null && requestDto.EndTime != null, x => (x.CreateTime >= requestDto.StartTime.Value && x.CreateTime <= requestDto.EndTime.Value)
-            //    || (x.UpdateTime >= requestDto.StartTime.Value && x.UpdateTime <= requestDto.EndTime.Value)).ToListAsync();
-
-            //var projectHistoryList = await _dbContext.Queryable<ProjectMonthReportHistory>().Where(x => x.IsDelete == 1).ToListAsync();
-
-
-            //var projectValueHistoryList = await _dbContext.Queryable<ProjectHistoryData>().Where(x => x.IsDelete == 1).ToListAsync();
-            //if (projectMonthList.Any())
-            //{
-            //    foreach (var item in projectMonthList)
-            //    {
-            //        //当月产值
-            //        //var currentProjectMonthRepost = projectMonthList.Where(x =>x.ProjectId == item.ProjectId).FirstOrDefault();
-            //        //当年完成产值
-            //        var yearCompletProductionValue = projectMonthList.Where(x => x.ProjectId == item.ProjectId
-            //        && x.DateMonth >= yearStartIime && x.DateMonth <= yearEndTime).ToList();
-            //        //累计完成成本
-            //        var yearTotalCompletProductionValue = projectMonthList.Where(x => x.ProjectId == item.ProjectId
-            //       ).ToList();
-            //        monthtReportDtos.Add(new MonthtReportDto()
-            //        {
-            //            Id = item.Id,
-            //            DateMonth = item.DateMonth,
-            //            ProjectId = item.ProjectId,
-            //            AccomplishQuantities = item.CompletedQuantity,
-            //            YearAccomplishQuantities = yearCompletProductionValue.Sum(x => x.CompletedQuantity),
-            //            AccumulativeQuantities = yearTotalCompletProductionValue.Sum(x => x.CompletedQuantity) + projectValueHistoryList.Where(x => x.ProjectId == item.ProjectId && x.AccumulatedProduction != null).Sum(x => x.AccumulatedProduction.Value),
-
-            //            RecognizedValue = item.PartyAConfirmedProductionAmount,
-            //            YearRecognizedValue = yearCompletProductionValue.Sum(x => x.PartyAConfirmedProductionAmount),
-            //            CumulativeValue = yearTotalCompletProductionValue.Sum(x => x.PartyAConfirmedProductionAmount) + projectHistoryList.Where(x => x.ProjectId == item.ProjectId && x.KaileiOwnerConfirmation != null).Sum(x => x.KaileiOwnerConfirmation.Value),
-
-            //            PaymentAmount = item.PartyAPayAmount,
-            //            YearPaymentAmount = yearCompletProductionValue.Sum(x => x.PartyAPayAmount),
-            //            CumulativePaymentAmount = yearTotalCompletProductionValue.Sum(x => x.PartyAPayAmount) + projectHistoryList.Where(x => x.ProjectId == item.ProjectId && x.KaileiProjectPayment != null).Sum(x => x.KaileiProjectPayment.Value),
-
-
-            //            AccomplishValue = item.CompleteProductionAmount,// currentProjectMonthRepost.CompleteProductionAmount,
-            //            YearAccomplishValue = yearCompletProductionValue.Sum(x => x.CompleteProductionAmount),
-            //            //YearAccomplishCost = yearCompletProductionValue.Sum(x => x.CompleteProductionAmount),
-            //            // CumulativeAccomplishCost = yearTotalCompletProductionValue.Sum(x => x.CompleteProductionAmount),
-
-            //            CumulativeCompleted = yearTotalCompletProductionValue.Sum(x => x.CompleteProductionAmount) + projectValueHistoryList.Where(x => x.ProjectId == item.ProjectId
-            //            && x.AccumulatedOutputValue != null).Sum(x => x.AccumulatedOutputValue.Value),
-            //            OutsourcingExpensesAmount = item.OutsourcingExpensesAmount,
-            //        });
-
-            //    }
-            //}
-
-            //responseAjaxResult.Data = monthtReportDtos;
-            //responseAjaxResult.Count = monthtReportDtos.Count;
-            //responseAjaxResult.Success();
-            //return responseAjaxResult;
-            #endregion
 
         }
         /// <summary>
@@ -845,11 +849,11 @@ namespace GHMonitoringCenterApi.Application.Service
             var projectData = await _dbContext.Queryable<Project>()
                 .Where(x => x.IsDelete == 1)
                 .ToListAsync();
-            projectData = projectData
-                .Where(x => string.IsNullOrEmpty(x.UpdateTime.ToString()) || x.UpdateTime == DateTime.MinValue ?
-                  x.CreateTime >= sTime && x.CreateTime <= eTime
-                : x.UpdateTime >= sTime && x.UpdateTime <= eTime)
-                .ToList();
+            //projectData = projectData
+            //.Where(x => string.IsNullOrEmpty(x.UpdateTime.ToString()) || x.UpdateTime == DateTime.MinValue ?
+            //  x.CreateTime >= sTime && x.CreateTime <= eTime
+            //: x.UpdateTime >= sTime && x.UpdateTime <= eTime)
+            //.ToList();
             var CurrencyConverter = await _dbContext.Queryable<CurrencyConverter>().Where(x => x.IsDelete == 1 && x.Year == DateTime.Now.Year).ToListAsync();
 
             foreach (var item in projectData)
@@ -889,11 +893,11 @@ namespace GHMonitoringCenterApi.Application.Service
             var institutionData = await _dbContext.Queryable<Institution>()
                 .Where(x => x.IsDelete == 1)
                 .ToListAsync();
-            institutionData = institutionData
-                .Where(x => string.IsNullOrEmpty(x.UpdateTime.ToString()) || x.UpdateTime == DateTime.MinValue ?
-                  x.CreateTime >= sTime && x.CreateTime <= eTime
-                : x.UpdateTime >= sTime && x.UpdateTime <= eTime)
-                .ToList();
+            //institutionData = institutionData
+            //.Where(x => string.IsNullOrEmpty(x.UpdateTime.ToString()) || x.UpdateTime == DateTime.MinValue ?
+            //  x.CreateTime >= sTime && x.CreateTime <= eTime
+            //: x.UpdateTime >= sTime && x.UpdateTime <= eTime)
+            //.ToList();
 
             responseAjaxResult.Count = institutionData.Count;
             responseAjaxResult.SuccessResult(institutionData);
@@ -1070,11 +1074,11 @@ namespace GHMonitoringCenterApi.Application.Service
             var ownshipData = await _dbContext.Queryable<OwnerShip>()
                 .Where(x => x.IsDelete == 1)
                 .ToListAsync();
-            ownshipData = ownshipData
-                .Where(x => string.IsNullOrEmpty(x.UpdateTime.ToString()) || x.UpdateTime == DateTime.MinValue ?
-                  x.CreateTime >= sTime && x.CreateTime <= eTime
-                : x.UpdateTime >= sTime && x.UpdateTime <= eTime)
-                .ToList();
+            //ownshipData = ownshipData
+            //    .Where(x => string.IsNullOrEmpty(x.UpdateTime.ToString()) || x.UpdateTime == DateTime.MinValue ?
+            //      x.CreateTime >= sTime && x.CreateTime <= eTime
+            //    : x.UpdateTime >= sTime && x.UpdateTime <= eTime)
+            //    .ToList();
 
             responseAjaxResult.Count = ownshipData.Count;
             responseAjaxResult.SuccessResult(ownshipData);
@@ -1100,11 +1104,11 @@ namespace GHMonitoringCenterApi.Application.Service
             var subShipData = await _dbContext.Queryable<SubShip>()
                 .Where(x => x.IsDelete == 1)
                 .ToListAsync();
-            subShipData = subShipData
-                .Where(x => string.IsNullOrEmpty(x.UpdateTime.ToString()) || x.UpdateTime == DateTime.MinValue ?
-                  x.CreateTime >= sTime && x.CreateTime <= eTime
-                : x.UpdateTime >= sTime && x.UpdateTime <= eTime)
-                .ToList();
+            //subShipData = subShipData
+            //    .Where(x => string.IsNullOrEmpty(x.UpdateTime.ToString()) || x.UpdateTime == DateTime.MinValue ?
+            //      x.CreateTime >= sTime && x.CreateTime <= eTime
+            //    : x.UpdateTime >= sTime && x.UpdateTime <= eTime)
+            //    .ToList();
 
             responseAjaxResult.Count = subShipData.Count;
             responseAjaxResult.SuccessResult(subShipData);

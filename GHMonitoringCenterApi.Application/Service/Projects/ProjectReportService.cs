@@ -2457,8 +2457,9 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     .OrderByDescending((m, p) => new { m.DateMonth });
             //.OrderByDescending((m, p) => new { m.ProjectId, m.DateMonth });
             var selQuery = query
-                 .Where((m, p) => m.DateMonth != 202306 && !m.StatusText.Contains("驳回"))
+                 .Where((m, p) => m.DateMonth != 202306)
                   .WhereIF(!string.IsNullOrWhiteSpace(model.ManagerType), (m, p) => p.ManagerType == model.ManagerType)
+                  .WhereIF(model.IsDuiWai == false, (m, p) => !m.StatusText.Contains("驳回"))
                 .Select((m, p) => new MonthtReportsResponseDto.MonthtReportDto()
                 {
                     Id = m.Id,
@@ -2517,21 +2518,24 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 });
 
             var list = new List<MonthtReportDto>();
-            if (model.IsFullExport)
-            {
-                list = await selQuery.ToListAsync();
-            }
-            else
-            {
-                list = await selQuery.ToPageListAsync(model.PageIndex, model.PageSize, total);
-            }
+
             if (model.IsDuiWai)
             {
-                list = list
+                list = await selQuery.ToListAsync();
                 //.Where(x => string.IsNullOrEmpty(x.UpdateTime.ToString()) || x.UpdateTime == DateTime.MinValue ?
                 //  x.CreateTime.Value.Date >= model.StartTime && x.CreateTime.Value.Date <= model.EndTime
                 //: x.UpdateTime.Value.Date >= model.StartTime && x.UpdateTime.Value.Date <= model.EndTime)
-                .ToList();
+            }
+            else
+            {
+                if (model.IsFullExport)
+                {
+                    list = await selQuery.ToListAsync();
+                }
+                else
+                {
+                    list = await selQuery.ToPageListAsync(model.PageIndex, model.PageSize, total);
+                }
             }
 
             var projectIds = list.Select(t => t.ProjectId).Distinct().ToArray();
@@ -2826,7 +2830,9 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
 
             //因追加历史的所有月报 此处重写合计
             //取所有的项目月报ids
-            var mpIds = await selQuery.Where(m => !m.StatusText.Contains("驳回")).Select(m => m.ProjectId).ToListAsync();
+            var mpIds = await selQuery
+                .Where(m => !m.StatusText.Contains("驳回"))
+                .Select(m => m.ProjectId).ToListAsync();
             mIds = mIds.Distinct().ToList();
             var mpList = await _dbMonthReport.AsQueryable()
                 .Where(x => x.IsDelete == 1 && mpIds.Contains(x.ProjectId))
@@ -4020,7 +4026,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                         Id = GuidUtil.Next(),
                         ProjectId = model.ProjectId,
                         CompletedQuantity = item.CompletedQuantity.Value,
-                        CompleteProductionAmount = item.CompleteProductionAmount.Value,
+                        CompleteProductionAmount = Convert.ToDecimal(item.CompletedQuantity) * Convert.ToDecimal(item.UnitPrice) * currencyExchangeRate,//item.CompleteProductionAmount.Value,
                         ConstructionNature = item.ConstructionNature,
                         DateMonth = model.DateMonth,
                         MonthReportId = monthReport == null ? mpId : monthReport.Id,
@@ -6726,7 +6732,15 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     SumMonthQuantity = result.Sum(x => x.MonthQuantity),
                 };
             }
-            var pageResult = searchOwnShipMonthRepResponseDto.searchOwnShipMonthReps.Skip((requestDto.PageIndex - 1) * requestDto.PageSize).Take(requestDto.PageSize).ToList();
+            List<SearchOwnShipMonthRep> pageResult = new();
+            if (requestDto.IsDuiWai == true)
+            {
+                pageResult = searchOwnShipMonthRepResponseDto.searchOwnShipMonthReps.ToList();
+            }
+            else
+            {
+                pageResult = searchOwnShipMonthRepResponseDto.searchOwnShipMonthReps.Skip((requestDto.PageIndex - 1) * requestDto.PageSize).Take(requestDto.PageSize).ToList();
+            }
             searchOwnShipMonthRepResponseDto.searchOwnShipMonthReps = pageResult;
             responseDto.Count = result.Count;
             responseDto.Data = searchOwnShipMonthRepResponseDto;

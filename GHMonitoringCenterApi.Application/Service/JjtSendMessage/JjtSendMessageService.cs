@@ -1611,8 +1611,10 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
             var companyProjectList = await dbContext.Queryable<Project>().Where(x => x.IsDelete == 1
             && contractProjectStatusIds.Contains(x.StatusId.Value)
             && x.TypeId != noConstrutionProject).ToListAsync();
+            //所有项目
+            var allProject = await dbContext.Queryable<Project>().Where(x => x.IsDelete == 1).ToListAsync();
             //取出相关日报信息(当天项目日报)
-            var currentDayProjectList = await dbContext.Queryable<DayReport>().Where(x => x.IsDelete == 1 && x.DateDay == currentTimeInt && x.ProcessStatus == DayReportProcessStatus.Submited)
+          var currentDayProjectList = await dbContext.Queryable<DayReport>().Where(x => x.IsDelete == 1 && x.DateDay == currentTimeInt && x.ProcessStatus == DayReportProcessStatus.Submited)
                   .ToListAsync();
             //公共数据取出项目相关信息
             var companyList = commonDataList.Where(x => x.Type == 1).OrderBy(x => x.Sort).ToList();
@@ -2990,12 +2992,33 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
 
             var shareProjectIds=ProjectShare.projectShare;
             var shareDayList= dayProductionValueList.Where(x => x.DateDay >= 20250129 && x.DateDay <= 20250228).ToList();
-            List<ProjectWokrItem> projectWokrItems = new List<ProjectWokrItem>();
+            ProjectWokrItem projectWokrItems = new ProjectWokrItem();
+            foreach (var item in shareProjectIds)
+            {
+                //今日开工项目
+                var workProject= shareDayList.Where(x => x.ProjectId == item).OrderBy(x => x.DateDay).FirstOrDefault();
+                if (workProject!=null&&workProject.DateDay == DateTime.Now.ToDateDay())
+                {
+                    //项目名称
+                    var parojectName = allProject.Where(x => x.Id == workProject.ProjectId).Select(x => x.Name).FirstOrDefault();
+                    projectWokrItems.DayWorkProject.Add(parojectName);
+                }
 
+                //未开工的项目
+                var noWorkProject= shareDayList.Where(x => x.ProjectId == item).FirstOrDefault();
+                if (noWorkProject==null)
+                {
+                    //项目名称
+                    var parojectName = allProject.Where(x => x.Id == item).Select(x => x.ShortName).FirstOrDefault();
+                    projectWokrItems.NoWorkProject.Add(parojectName);
+                }
+                
+            }
             #endregion
 
             jjtSendMessageMonitoringDayReportResponseDto.EachCompanyProductionValue = eachCompanyProductionValues.OrderBy(x => x.XAxle).ToList();
             jjtSendMessageMonitoringDayReportResponseDto.ImpProjectWarning = imp.OrderByDescending(x=>x.DayAmount).Take(3).ToList();
+            jjtSendMessageMonitoringDayReportResponseDto.ProjectWokrItems = projectWokrItems;
             #endregion
 
 

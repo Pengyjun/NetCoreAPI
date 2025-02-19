@@ -135,29 +135,45 @@ namespace GHMonitoringCenterApi.Application.Service.ProjectProductionReport
             //查询项目日报下的施工记录集合
             var dayConstructionList = await dbContext.Queryable<DayReportConstruction>().Where(x => x.IsDelete == 1 && dayIds.Contains(x.DayReportId)).ToListAsync();
             #region 处理分包产值问题
-            List<Guid> dayConstructionIds = new List<Guid>();
+            //List<Guid> dayConstructionIds = new List<Guid>();
+            //if (_currentUser.CurrentLoginIsAdmin || _currentUser.CurrentLoginInstitutionOid == "101162350")
+            //{
+            //    foreach (var dayCons in dayConstructionList)
+            //    {
+            //        var isExist = dayReports.Where(x => x.DayId == dayCons.DayReportId && x.IsSubContractProject == 1).FirstOrDefault();
+            //        if (isExist != null)
+            //        {
+            //            dayConstructionIds.Add(dayCons.ProjectId);
+            //        }
+
+            //    }
+            //}
+            //sumInfo.SumOutsourcingExpensesAmount = Math.Round(
+            //    dayReports.WhereIF(dayConstructionIds.Count > 0, x => x.IsSubContractProject == 1)
+            //    .Sum(x => x.ProSumOutsourcingExpensesAmount.Value), 2);
+            //sumInfo.SumActualDailyProduction = Math.Round(dayConstructionList
+            //    .WhereIF(dayConstructionIds.Count > 0, x => !dayConstructionIds.Contains(x.ProjectId))
+            //    .Sum(x => x.ActualDailyProduction), 3);
+            //sumInfo.SumActualDailyProductionAmount = Math.Round(dayConstructionList
+            //     .WhereIF(dayConstructionIds.Count > 0, x => !dayConstructionIds.Contains(x.ProjectId))
+            //    .Sum(x => x.ActualDailyProductionAmount), 2);
+            var pIds = new List<Guid>();
             if (_currentUser.CurrentLoginIsAdmin || _currentUser.CurrentLoginInstitutionOid == "101162350")
             {
-                foreach (var dayCons in dayConstructionList)
-                {
-                    var isExist = dayReports.Where(x => x.DayId == dayCons.DayReportId && x.IsSubContractProject == 1).FirstOrDefault();
-                    if (isExist != null)
-                    {
-                        dayConstructionIds.Add(dayCons.ProjectId);
-                    }
-
-                }
+                //获取分包项目
+                pIds = await dbContext.Queryable<Project>().Where(x => x.IsDelete == 1 && x.IsSubContractProject == 2).Select(x => x.Id).ToListAsync();
             }
-            #endregion
+
             sumInfo.SumOutsourcingExpensesAmount = Math.Round(
-                dayReports.WhereIF(dayConstructionIds.Count > 0, x => x.IsSubContractProject == 1)
+                dayReports.WhereIF(pIds.Count > 0, x => x.IsSubContractProject == 1)
                 .Sum(x => x.ProSumOutsourcingExpensesAmount.Value), 2);
             sumInfo.SumActualDailyProduction = Math.Round(dayConstructionList
-                .WhereIF(dayConstructionIds.Count > 0, x => !dayConstructionIds.Contains(x.ProjectId))
+                .WhereIF(pIds.Count > 0, x => !pIds.Contains(x.ProjectId))
                 .Sum(x => x.ActualDailyProduction), 3);
             sumInfo.SumActualDailyProductionAmount = Math.Round(dayConstructionList
-                 .WhereIF(dayConstructionIds.Count > 0, x => !dayConstructionIds.Contains(x.ProjectId))
+                 .WhereIF(pIds.Count > 0, x => !pIds.Contains(x.ProjectId))
                 .Sum(x => x.ActualDailyProductionAmount), 2);
+            #endregion
             return sumInfo;
         }
 
@@ -894,9 +910,9 @@ namespace GHMonitoringCenterApi.Application.Service.ProjectProductionReport
                     .Select(selectExpr).ToListAsync();
                 //对外接口日期条件筛选
                 list = list
-                    .Where(x => string.IsNullOrEmpty(x.UpdateTime.ToString()) || x.UpdateTime == DateTime.MinValue ?
-                     x.CreateTime >= searchRequestDto.StartTime && x.CreateTime <= searchRequestDto.EndTime
-                    : x.UpdateTime >= searchRequestDto.StartTime && x.UpdateTime <= searchRequestDto.EndTime)
+                    //.Where(x => string.IsNullOrEmpty(x.UpdateTime.ToString()) || x.UpdateTime == DateTime.MinValue ?
+                    // x.CreateTime >= searchRequestDto.StartTime && x.CreateTime <= searchRequestDto.EndTime
+                    //: x.UpdateTime >= searchRequestDto.StartTime && x.UpdateTime <= searchRequestDto.EndTime)
                     .ToList();
             }
 
@@ -977,11 +993,19 @@ namespace GHMonitoringCenterApi.Application.Service.ProjectProductionReport
             #endregion
             //是否全量导出
             var shipList = new List<ShipsDayReportInfo>();
-            if (!searchRequestDto.IsFullExport)
+            if (searchRequestDto.IsDuiWai != true)
             {
-                shipList = list.OrderBy(x => x.ShipId).ToList();
-                total = shipList.Count;
-                shipList = shipList.Skip((searchRequestDto.PageIndex - 1) * searchRequestDto.PageSize).Take(searchRequestDto.PageSize).ToList();
+                if (!searchRequestDto.IsFullExport)
+                {
+                    shipList = list.OrderBy(x => x.ShipId).ToList();
+                    total = shipList.Count;
+                    shipList = shipList.Skip((searchRequestDto.PageIndex - 1) * searchRequestDto.PageSize).Take(searchRequestDto.PageSize).ToList();
+                }
+                else
+                {
+                    shipList = list.OrderBy(x => x.ShipId).ToList();
+                    total = shipList.Count;
+                }
             }
             else
             {

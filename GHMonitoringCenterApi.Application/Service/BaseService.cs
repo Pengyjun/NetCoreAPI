@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using CDC.MDM.Core.Common.Util;
 using GHMonitoringCenterApi.Application.Contracts.Dto;
 using GHMonitoringCenterApi.Application.Contracts.Dto.ApprovalUser;
 using GHMonitoringCenterApi.Application.Contracts.Dto.AttributeLabelc;
@@ -33,13 +34,16 @@ using GHMonitoringCenterApi.Domain.Shared.Const;
 using GHMonitoringCenterApi.Domain.Shared.Enums;
 using GHMonitoringCenterApi.Domain.Shared.Util;
 using Microsoft.Extensions.Logging;
+using NetTaste;
 using Newtonsoft.Json.Linq;
 using NPOI.HPSF;
+using NPOI.SS.Formula.Functions;
 using SixLabors.ImageSharp;
 using SqlSugar;
 using SqlSugar.Extensions;
 using UtilsSharp;
 using UtilsSharp.Shared.Standard;
+using static System.Net.Mime.MediaTypeNames;
 using Model = GHMonitoringCenterApi.Domain.Models;
 
 namespace GHMonitoringCenterApi.Application.Service
@@ -2604,6 +2608,65 @@ namespace GHMonitoringCenterApi.Application.Service
             return responseAjaxResult;
         }
 
+        /// <summary>
+        /// 日报审批推送提醒
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        public async Task<bool> DayReportApprovePushAsync()
+        {
+            var pushJjtUserList = await dbContext.Queryable<DayReportJjtPushConfi>().Where(x => x.IsDelete == 1 && x.Type == 7).Select(x => x.PushAccount).ToListAsync();
+            //九点第一批人员发送
+            var obj = new SingleMessageTemplateRequestDto()
+            { MessageType = "text",
+                TextContent ="您好:"+DateTime.Now.AddDays(-1).ToString("MM月dd") + "日报还未审核,请登录智慧运营中心-日报推送审核页面进行审核",
+                UserIds = pushJjtUserList
+            };
+            var pushResult = JjtUtils.SinglePushMessage(obj, false);
+            return pushResult;
+        }
+
+        /// <summary>
+        /// 页面审核
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        public async Task<ResponseAjaxResult<bool>> DayReportApproveAsync(bool isApprove)
+        {
+            ResponseAjaxResult<bool> responseAjaxResult = new ResponseAjaxResult<bool>();
+            if (_currentUser.CurrentLoginIsAdmin ||
+                _currentUser.Account == "2018015149" ||
+                _currentUser.Account == "2016146439" ||
+                _currentUser.Account == "L20132106")
+            {
+                var obj = new DayPushApprove()
+                {
+                    ApproveId = _currentUser.Id,
+                    ApproveName = _currentUser.Name,
+                    Status = isApprove ? "已审批" : "未审批",
+                    DayTime = DateTime.Now.AddDays(-1).ToDateDay(),
+                };
+                await dbContext.Insertable<DayPushApprove>(obj).ExecuteCommandAsync();
+                responseAjaxResult.Data = true;
+                responseAjaxResult.Success();
+            }
+            else {
+                responseAjaxResult.Data = false;
+                responseAjaxResult.Success("您没有权限审核", HttpStatusCode.VerifyFail);
+                return responseAjaxResult;
+            }
+            
+            return responseAjaxResult;
+        }
+        public async Task<ResponseAjaxResult<string>> SearchDayReportApproveAsync()
+        {
+            ResponseAjaxResult<string> responseAjaxResult = new ResponseAjaxResult<string>();
+            var time = DateTime.Now.AddDays(-1).ToDateDay();
+            var staus= await dbContext.Queryable<DayPushApprove>().Where(x=>x.DayTime== time).Select(x=>x.Status).FirstAsync();
+            responseAjaxResult.Data = staus;
+            responseAjaxResult.Success();
+            return responseAjaxResult;
+        }
         /// <summary>
         /// 排除一些项目  如菲律宾帕塞吹填开发项目（1期）水工工程   只有交建公司能看到这个项目   
         /// 其他公司包括局管理员如陈翠  他们也看不到这个项目 ，并且项目导出  月报 日报 生产日报统计等等 都不在范围内，交建公司要计算在内的  原因是  他是属于某个项目的分项，

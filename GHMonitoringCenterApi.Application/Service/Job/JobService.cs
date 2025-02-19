@@ -1034,7 +1034,6 @@ namespace GHMonitoringCenterApi.Application.Service.Job
                         return result.FailResult(wbsResult.Code, wbsResult.Message);
                     }
                     bizResult = wbsResult.Data as TBizResult;
-                    if (wbsResult.Data != null && wbsResult.Data.Nodes.Any()) jobBizRes.BtnImportShowHide = true;
                 }
             }
             jobBizRes.BizData = bizResult;

@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using GHMonitoringCenterApi.Application.Contracts.Dto.Information;
 using GHMonitoringCenterApi.Application.Contracts.Dto.SearchUser;
-using GHMonitoringCenterApi.Application.Contracts.Dto.Timing;
 using GHMonitoringCenterApi.Application.Contracts.IService;
 using GHMonitoringCenterApi.Application.Contracts.IService.User;
 using GHMonitoringCenterApi.Domain.IRepository;
@@ -11,10 +10,6 @@ using GHMonitoringCenterApi.Domain.Shared.Util;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using SqlSugar;
-
-using System.Collections.Generic;
-using System.Security.Cryptography;
-using System.Security.Principal;
 using UtilsSharp;
 
 using Model = GHMonitoringCenterApi.Domain.Models;

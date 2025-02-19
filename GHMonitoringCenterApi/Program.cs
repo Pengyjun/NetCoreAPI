@@ -20,7 +20,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddScoped<GlobalObject>();
 //配置中间件
 builder.Services.AddScoped<IAuthorizationMiddlewareResultHandler, CustomAuthorizationMiddleware>();
-
+//自定义固定鉴权
+builder.Services.AddScoped<CustomFixedAuthAttribute>();
 //配置json格式化时间
 builder.Services.AddControllers(options =>
 {

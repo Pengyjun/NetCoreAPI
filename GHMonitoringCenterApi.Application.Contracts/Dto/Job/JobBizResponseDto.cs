@@ -16,10 +16,6 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Job
         /// 项目Id
         /// </summary>
         public Guid? ProjectId { get; set; }
-        /// <summary>
-        /// true 显示
-        /// </summary>
-        public bool BtnImportShowHide { get; set; } = false;
 
         /// <summary>
         /// 业务模块
