@@ -3006,10 +3006,10 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
 
                 //未开工的项目
                 var noWorkProject= shareDayList.Where(x => x.ProjectId == item).FirstOrDefault();
-                if (noWorkProject!=null)
+                if (noWorkProject==null)
                 {
                     //项目名称
-                    var parojectName = allProject.Where(x => x.Id == noWorkProject.ProjectId).Select(x => x.Name).FirstOrDefault();
+                    var parojectName = allProject.Where(x => x.Id == item).Select(x => x.ShortName).FirstOrDefault();
                     projectWokrItems.NoWorkProject.Add(parojectName);
                 }
                 
