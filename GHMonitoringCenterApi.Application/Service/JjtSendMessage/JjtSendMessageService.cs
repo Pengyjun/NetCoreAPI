@@ -2997,10 +2997,10 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
             {
                 //今日开工项目
                 var workProject= shareDayList.Where(x => x.ProjectId == item).OrderBy(x => x.DateDay).FirstOrDefault();
-                if (workProject!=null&&workProject.DateDay == DateTime.Now.ToDateDay())
+                if (workProject!=null&&workProject.DateDay == DateTime.Now.AddDays(-1).ToDateDay())
                 {
                     //项目名称
-                    var parojectName = allProject.Where(x => x.Id == workProject.ProjectId).Select(x => x.Name).FirstOrDefault();
+                    var parojectName = allProject.Where(x => x.Id == workProject.ProjectId).Select(x => x.ShortName).FirstOrDefault();
                     projectWokrItems.DayWorkProject.Add(parojectName);
                 }
 
