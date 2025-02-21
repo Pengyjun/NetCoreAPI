@@ -162,6 +162,11 @@ namespace GHMonitoringCenterApi.Domain.Models
         /// </summary>
         [SugarColumn(ColumnDataType = "int")]
         public int Tag2 { get; set; }
+        /// <summary>
+        /// 修改项目是否状态发生改变   0 不发生  1发生
+        /// </summary>
+        [SugarColumn(ColumnDataType = "int", DefaultValue = "0")]
+        public int IsChangeStatus { get; set; }
 
         /// <summary>
         /// 项目类别 0 境内  1 境外
@@ -341,7 +346,7 @@ namespace GHMonitoringCenterApi.Domain.Models
         /// <summary>
         /// 项目管理类型
         /// </summary>
-        [SugarColumn(ColumnDataType = "int",DefaultValue ="0")]
+        [SugarColumn(ColumnDataType = "int", DefaultValue = "0")]
         public string? ManagerType { get; set; }
     }
 }

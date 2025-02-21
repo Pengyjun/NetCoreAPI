@@ -1507,6 +1507,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                             }
                         }
                     }
+                    projectObject.IsChangeStatus = 1;
                 }
                 #endregion
 
