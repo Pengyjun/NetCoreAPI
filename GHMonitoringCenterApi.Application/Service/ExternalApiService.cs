@@ -729,6 +729,10 @@ namespace GHMonitoringCenterApi.Application.Service
             var projects = await _dbContext.Queryable<Project>().Where(t => t.IsDelete == 1).ToListAsync();
             //202412月累计数
             var accumulate24 = await _dbContext.Queryable<MonthReportDetailHistory>().Where(x => x.IsDelete == 1).ToListAsync();
+            //202306月累计数
+            var accumulate23 = await _dbContext.Queryable<MonthReport>().Where(x => x.IsDelete == 1 && x.DateMonth == 202306).ToListAsync();
+            //手动入库的数据
+            var handAdd = await _dbContext.Queryable<MonthReportDetailAdd>().Where(x => x.IsDelete == 1).ToListAsync();
             List<DayReport> dayReport = new();
             #region 添加新逻辑 通过日期获取最新月的数据 如果没有月报取日报数作为月报数传出
             //需要补充的最新月的月报
@@ -768,16 +772,25 @@ namespace GHMonitoringCenterApi.Application.Service
                     var accomplishQuantities = 0M;
                     if (pp.CurrencyId == "2a0e99b4-f989-4967-b5f1-5519091d4280".ToGuid())//国内
                     {
-                        cumulativeCompleted = accumulate24.Where(x => x.ProjectId == pp.Id).Sum(x => Convert.ToDecimal(x.ActualCompAmount));
+                        //202306的数
+                        cumulativeCompleted = accumulate23.Where(x => x.ProjectId == pp.Id).Sum(x => Convert.ToDecimal(x.ActualCompAmount));
+                        //截止到2024 12月的数
+                        cumulativeCompleted += accumulate24.Where(x => x.ProjectId == pp.Id).Sum(x => Convert.ToDecimal(x.ActualCompAmount));
                     }
                     else//国外
                     {
-                        cumulativeCompleted = accumulate24.Where(x => x.ProjectId == pp.Id).Sum(x => Convert.ToDecimal(x.RMBHValue));
+                        //202306的数
+                        cumulativeCompleted = accumulate23.Where(x => x.ProjectId == pp.Id).Sum(x => Convert.ToDecimal(x.RMBHValue));
+                        cumulativeCompleted += accumulate24.Where(x => x.ProjectId == pp.Id).Sum(x => Convert.ToDecimal(x.RMBHValue));
                     }
                     accomplishQuantities = accumulate24.Where(x => x.ProjectId == pp.Id).Sum(x => Convert.ToDecimal(x.ActualCompQuantity));
                     //追加截止到当月的实际产值、工程量
                     accomplishQuantities += resList.Where(x => x.DateMonth > 202412 && x.DateMonth <= nowMonth && x.ProjectId == pp.Id).Sum(x => Convert.ToDecimal(x.ActualCompQuantity));
                     cumulativeCompleted += resList.Where(x => x.DateMonth > 202412 && x.DateMonth <= nowMonth && x.ProjectId == pp.Id).Sum(x => x.AccomplishValue);
+
+                    //手动追加入库的数
+                    cumulativeCompleted += handAdd.Where(x => x.ProjectId == pp.Id).Sum(x => x.CompleteProductionAmount);
+                    accomplishQuantities += handAdd.Where(x => x.ProjectId == pp.Id).Sum(x => x.CompletedQuantity);
 
                     addNowMonthRep.Add(new MonthtReportDto
                     {
