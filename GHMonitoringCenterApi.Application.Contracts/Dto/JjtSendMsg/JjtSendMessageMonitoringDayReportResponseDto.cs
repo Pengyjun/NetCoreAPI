@@ -743,9 +743,15 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.JjtSendMsg
     /// </summary>
     public class ProjectWokrItem {
 
-        public List<string> DayWorkProject { get; set; }=new List<string>();
-        public List<string> NoWorkProject { get; set; } = new List<string>();
+        public List<DayWorkProject> DayWorkProject { get; set; }=new List<DayWorkProject>();
+        public List<DayWorkProject> NoWorkProject { get; set; } = new List<DayWorkProject>();
 
+    }
+
+    public class DayWorkProject 
+    {
+        public Guid ProjectId { get; set; }
+        public string Name { get; set; }
     }
     #endregion
 }

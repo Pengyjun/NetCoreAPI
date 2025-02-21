@@ -395,5 +395,11 @@ namespace GHMonitoringCenterApi.Application.Contracts.IService
         Task<ResponseAjaxResult<bool>> DayReportApproveAsync(bool isApprove);
         Task<ResponseAjaxResult<string>> SearchDayReportApproveAsync();
 
+        Task<ResponseAjaxResult<bool>> UpdateShowProjectAsync(Guid projectId);
+        /// <summary>
+        /// 临时功能
+        /// </summary>
+        /// <returns></returns>
+        Task<ResponseAjaxResult<List<ProjectOpen>>> SelectShowProjectAsync();
     }
 }

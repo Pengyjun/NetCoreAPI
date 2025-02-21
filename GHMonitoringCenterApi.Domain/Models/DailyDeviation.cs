@@ -18,6 +18,8 @@ namespace GHMonitoringCenterApi.Domain.Models
         /// </summary>
         [SugarColumn(Length = 36)]
         public Guid ProjectId { get; set; }
+        [SugarColumn(Length = 36)]
+        public Guid CompanyId { get; set; }
         /// <summary>
         /// 项目名称
         /// </summary>

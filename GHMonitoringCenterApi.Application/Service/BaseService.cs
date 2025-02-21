@@ -2702,6 +2702,42 @@ namespace GHMonitoringCenterApi.Application.Service
         //}
         #endregion
 
+        #region 控制项目隐藏 日报推送使用
 
+        ///控制项目隐藏 日报推送使用
+        public async Task<ResponseAjaxResult<bool>> UpdateShowProjectAsync(Guid projectId) 
+        {
+            ResponseAjaxResult<bool> responseAjaxResult = new ResponseAjaxResult<bool>();
+            var project= await dbContext.Queryable<ProjectOpen>().Where(x => x.ProjectId == projectId).FirstAsync();
+            if (project == null)
+            {
+               await dbContext.Insertable<ProjectOpen>(new ProjectOpen() {
+                    ProjectId = projectId,
+                    IsShow = 0
+                }).ExecuteCommandAsync();
+            }
+            if (project != null && project.IsShow == 1)
+            {
+                project.IsShow = 0;
+            }
+            else if (project != null && project.IsShow == 0)
+            {
+                project.IsShow = 1;
+            }
+            await dbContext.Updateable<ProjectOpen>(project).ExecuteCommandAsync();
+            responseAjaxResult.Data = true;
+            responseAjaxResult.Success();
+            return responseAjaxResult;
+        }
+
+
+        public async Task<ResponseAjaxResult<List<ProjectOpen>>> SelectShowProjectAsync()
+        {
+            ResponseAjaxResult<List<ProjectOpen>> responseAjaxResult = new ResponseAjaxResult<List<ProjectOpen>>();
+            responseAjaxResult.Data= await dbContext.Queryable<ProjectOpen>().Where(x => x.IsDelete == 1).ToListAsync();
+            responseAjaxResult.Success();
+            return responseAjaxResult;
+        }
+        #endregion
     }
 }

@@ -1542,7 +1542,8 @@ namespace GHMonitoringCenterApi.Application.Service.ProjectProductionReport
         public async Task<ResponseAjaxResult<bool>> UpdateDayReportDeviationAsync(UpdateDayDeviationRequestDto requestDto)
         {
             ResponseAjaxResult<bool> responseAjaxResult = new ResponseAjaxResult<bool>();
-            var dailyDeviation = await dbContext.Queryable<DailyDeviation>().Where(t => t.IsDelete == 1 && t.ProjectId == requestDto.ProjectId).FirstAsync();
+            var dayTime=DateTime.Today.AddDays(-1).ToDateDay();
+            var dailyDeviation = await dbContext.Queryable<DailyDeviation>().Where(t => t.IsDelete == 1 && t.ProjectId == requestDto.ProjectId&&t.dateday== dayTime).FirstAsync();
             if (dailyDeviation != null)
             {
                 dailyDeviation.DayActualProductionAmountDeviation = requestDto.DayActualProductionAmountDeviation;
@@ -1550,9 +1551,11 @@ namespace GHMonitoringCenterApi.Application.Service.ProjectProductionReport
             }
             else
             {
+               var  companyId=await dbContext.Queryable<Project>().Where(x => x.Id == requestDto.ProjectId).Select(x => x.CompanyId).FirstAsync();
                 DailyDeviation daily = new DailyDeviation();
                 daily.Id = GuidUtil.Next();
                 daily.ProjectId = requestDto.ProjectId;
+                daily.CompanyId = companyId.Value;
                 daily.ProjectName = requestDto.ProjectName;
                 daily.StatusId = requestDto.StatusId;
                 daily.DayActualProductionAmount = requestDto.DayActualProductionAmount;

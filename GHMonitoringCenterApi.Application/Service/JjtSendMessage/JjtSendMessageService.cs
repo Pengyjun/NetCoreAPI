@@ -1740,6 +1740,7 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
             //项目月报数据
             //var monthReport = await dbContext.Queryable<MonthReport>().Where(x => x.IsDelete == 1 && x.DateMonth >= 202401).ToListAsync();
             //
+            var dayDiffValue=await dbContext.Queryable<DailyDeviation>().Where(x => x.IsDelete == 1&&x.dateday==currentTimeInt).ToListAsync();
             var projectIds = await dbContext.Queryable<Project>().Where(x => x.IsDelete == 1).ToListAsync();
             //新增得查询----------
             var dayNewProjectValue =await dbContext.Queryable<DayReportProductionValue>().Where(x => x.IsDelete == 1)
@@ -1750,14 +1751,21 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
             //新增得查询----------
             foreach (var item in companyList)
             {
+                var diffValues= dayDiffValue.Where(x => x.CompanyId == item.ItemId).FirstOrDefault();
                 //if (item.ItemId != "11c9c978-9ef3-411d-ba70-0d0eed93e048".ToGuid())
+
+                if (diffValues == null)
+                {
+                    diffValues = new DailyDeviation() { DayActualProductionAmount=0,DayActualProductionAmountDeviation=0 };
+                }
+
                 //    continue;
                 //当前公司日产值 || x.UpdateTime >= SqlFunc.ToDate(startTime) && x.UpdateTime <= SqlFunc.ToDate(endTime))
-                decimal currentCompanyCount = dayProductionValueList.Where(x => x.CompanyId == item.ItemId
+                decimal currentCompanyCount =   dayProductionValueList.Where(x => x.CompanyId == item.ItemId
                   && x.DateDay == currentTimeInt
                   //&& x.CreateTime >= SqlFunc.ToDate(startTime) && x.CreateTime <= SqlFunc.ToDate(endTime)
                   //|| x.UpdateTime >= SqlFunc.ToDate(startTime) && x.UpdateTime <= SqlFunc.ToDate(endTime)
-                  ).Sum(x => x.DayActualProductionAmount);
+                  ).Sum(x => x.DayActualProductionAmount)+ Math.Round( Math.Abs(diffValues.DayActualProductionAmountDeviation- diffValues.DayActualProductionAmount)/100000000M,2);
                 //当前公司的累计产值（前几个月报产值加上日产值）
                 //var currentMonthCompanyCount =Math.Round( dayProductionValueList
                 //    .Where(x => x.CompanyId == item.ItemId && x.DateDay >=20240326 && x.DateDay <= currentTimeInt)
@@ -1961,7 +1969,7 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
                     }
 
                     //当日产值
-                    decimal dayTotalPoductionValues = companyBasePoductionValues.Sum(x => x.DayProductionValue);
+                    decimal dayTotalPoductionValues = companyBasePoductionValues.Sum(x => x.DayProductionValue) + Math.Round(Math.Abs(dayDiffValue.Sum(x=>x. DayActualProductionAmountDeviation) - dayDiffValue.Sum(x=>x.DayActualProductionAmount)) / 100000000M, 2);
                     //名称排除‘个’字
                     var filterStr = "(个)";
                     var name = item.Name.IndexOf(filterStr) >= 0 ? item.Name.Replace(filterStr, "").TrimAll() : item.Name;
@@ -2904,6 +2912,7 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
             var difDays=daydiff[ziranMonth]!=0 ? daydiff[ziranMonth] : 30;
             for (int i = 1; i <= length; i++)
             {
+              
                 //currentNowTimeInt = int.Parse(DateTime.Now.ToString("yyyyMMdd")) - (i - 1);
                 currentNowTimeInt = int.Parse(DateTime.Now.AddDays(-i).ToString("yyyyMMdd"));
                 //判断月份
@@ -2913,7 +2922,13 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
                 var dayActualProductionAmount = dayRepData.Where(x => x.DateDay == currentNowTimeInt).Sum(x => x.DayActualProductionAmount);
                 var dayPlanProAmount = GetProjectPlanAmount(monthPlanRepData, yearInt, monthInt);
                 var storeProductionValue = storeProductionValueList.Where(x => x.DateDay == currentNowTimeInt).Select(x => x.ProductionValue).FirstOrDefault();
-                var yCompleteValue = Math.Round(dayActualProductionAmount / 100000000M, 2);
+                var dayDiffValues = 0M;
+                if (dayDiffValue.Count > 0)
+                {
+                    dayDiffValues=Math.Round( Math.Abs(dayDiffValue.Where(x=>x.dateday==currentNowTimeInt).Sum(x => x.DayActualProductionAmountDeviation) - dayDiffValue.Where(x => x.dateday== currentNowTimeInt).Sum(x => x.DayActualProductionAmount))/ 100000000M,2);
+                }
+
+                var yCompleteValue = Math.Round(dayActualProductionAmount / 100000000M, 2) + dayDiffValues;
 
                 eachCompanyProductionValues.Add(new EachCompanyProductionValue()
                 {
@@ -2989,19 +3004,33 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
 
 
             #region 复工项目检测  临时使用
-
+            var projectOpen=await dbContext.Queryable<ProjectOpen>().Where(x => x.IsDelete == 1&&x.IsShow==1).ToListAsync();
             var shareProjectIds=ProjectShare.projectShare;
             var shareDayList= dayProductionValueList.Where(x => x.DateDay >= 20250129 && x.DateDay <= 20250228).ToList();
-            ProjectWokrItem projectWokrItems = new ProjectWokrItem();
+           
+            List<DayWorkProject> dayWorkProject = new List<DayWorkProject>();
+            List<DayWorkProject> noWorkProjects = new List<DayWorkProject>();
+            ProjectWokrItem projectWokrItems = new ProjectWokrItem()
+            {
+                DayWorkProject = dayWorkProject,
+                NoWorkProject = noWorkProjects,
+            };
             foreach (var item in shareProjectIds)
             {
+               var isShow= projectOpen.Where(x => x.ProjectId == item).FirstOrDefault();
+                if (isShow == null)
+                {
+                    continue;
+                }
                 //今日开工项目
                 var workProject= shareDayList.Where(x => x.ProjectId == item).OrderBy(x => x.DateDay).FirstOrDefault();
                 if (workProject!=null&&workProject.DateDay == DateTime.Now.AddDays(-1).ToDateDay()&& workProject.DayActualProductionAmount>0)
                 {
                     //项目名称
                     var parojectName = allProject.Where(x => x.Id == workProject.ProjectId).Select(x => x.ShortName).FirstOrDefault();
-                    projectWokrItems.DayWorkProject.Add(parojectName);
+                    
+                    //projectWokrItems.DayWorkProject.Add(parojectName);
+                    dayWorkProject.Add(new DayWorkProject() { Name= parojectName, ProjectId= item });
                 }
 
                 //未开工的项目
@@ -3010,7 +3039,8 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
                 {
                     //项目名称
                     var parojectName = allProject.Where(x => x.Id == item).Select(x => x.ShortName).FirstOrDefault();
-                    projectWokrItems.NoWorkProject.Add(parojectName);
+                    //projectWokrItems.NoWorkProject.Add(parojectName);
+                    noWorkProjects.Add(new DayWorkProject() { Name = parojectName, ProjectId = item });
                 }
                 
             }

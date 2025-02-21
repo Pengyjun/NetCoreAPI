@@ -17,6 +17,7 @@ using GHMonitoringCenterApi.Application.Contracts.Dto.Province;
 using GHMonitoringCenterApi.Application.Contracts.Dto.Ship;
 using GHMonitoringCenterApi.Application.Contracts.Dto.Subsidiary;
 using GHMonitoringCenterApi.Application.Contracts.IService;
+using GHMonitoringCenterApi.Domain.Models;
 using GHMonitoringCenterApi.Domain.Shared;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -562,6 +563,28 @@ namespace GHMonitoringCenterApi.Controllers
         public async Task<ResponseAjaxResult<string>> SearchDayReportApproveAsync()
         {
             return await baseService.SearchDayReportApproveAsync();
+        }
+        /// <summary>
+        /// 修改项目是否展示
+        /// </summary>
+        /// <param name="projectId"></param>
+        /// <returns></returns>
+        [HttpGet("UpdateShowProject")]
+        [AllowAnonymous]
+        public async Task<ResponseAjaxResult<bool>> UpdateShowProjectAsync(Guid projectId)
+        {
+            return await baseService.UpdateShowProjectAsync(projectId);
+        }
+        /// <summary>
+        /// 修改项目是否展示
+        /// </summary>
+        /// <param name="projectId"></param>
+        /// <returns></returns>
+        [HttpGet("SelectShowProject")]
+        [AllowAnonymous]
+        public async Task<ResponseAjaxResult<List<ProjectOpen>>> SelectShowProjectAsync()
+        {
+            return await baseService.SelectShowProjectAsync();
         }
     }
 }
