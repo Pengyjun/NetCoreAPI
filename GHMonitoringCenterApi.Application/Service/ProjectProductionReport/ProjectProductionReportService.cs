@@ -1455,5 +1455,82 @@ namespace GHMonitoringCenterApi.Application.Service.ProjectProductionReport
             }
             return b;
         }
+
+
+
+
+        /// <summary>
+        /// 日报偏差值列表
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        public async Task<ResponseAjaxResult<List<DayReportDeviationListResponseDto>>> SearchDayReportDeviationListAsync(DayReportDeviationRequestDto requestDto)
+        {
+            ResponseAjaxResult<List<DayReportDeviationListResponseDto>> responseAjaxResult = new ResponseAjaxResult<List<DayReportDeviationListResponseDto>>();
+            RefAsync<int> total = 0;
+            var day = DateTime.Today.AddDays(-1).ToDateDay();
+            var dayStr = DateTime.Today.AddDays(-1).ToString("yyyy-MM-dd");
+            var data = await dbContext.Queryable<Project>()
+                .LeftJoin(dbContext.Queryable<DayReport>().Where(t => t.IsDelete == 1 && t.DateDay == day), (x, y) => x.Id == y.ProjectId)
+                .LeftJoin(dbContext.Queryable<DailyDeviation>().Where(t => t.IsDelete == 1), (x, y, z) => x.Id == z.ProjectId)
+                .WhereIF(!string.IsNullOrWhiteSpace(requestDto.ProjectName), (x, y, z) => x.Name.Contains(requestDto.ProjectName))
+                .WhereIF(requestDto.ProjectStatusId != null && requestDto.ProjectStatusId.Any(), x => requestDto.ProjectStatusId.Contains(x.StatusId.Value.ToString()))
+                .OrderByDescending((x, y, z) => y.DateDay)
+                .Select((x, y, z) => new DayReportDeviationListResponseDto
+                {
+                    ProjectId = x.Id,
+                    ProjectName = x.Name,
+                    StatusId = x.StatusId,
+                    DayActualProductionAmount = y.DayActualProductionAmount,
+                    DayActualProductionAmountDeviation = z.DayActualProductionAmountDeviation,
+                    Dateday = y.DateDay,
+                    DatedayStr = y.CreateTime.Value.ToString("yyyy-MM-dd")
+                }).ToPageListAsync(requestDto.PageIndex, requestDto.PageSize, total);
+
+            var StatusList = await dbContext.Queryable<ProjectStatus>().Where(t => t.IsDelete == 1).ToListAsync();
+
+            foreach (var item in data)
+            {
+                item.StatusName = StatusList.FirstOrDefault(t => t.StatusId == item.StatusId)?.Name;
+                item.Dateday = item.Dateday == 0 ? day : item.Dateday;
+                item.DatedayStr = item.DatedayStr == null ? dayStr : item.DatedayStr;
+            }
+            responseAjaxResult.Data = data;
+            responseAjaxResult.Success();
+            return responseAjaxResult;
+        }
+
+
+
+        /// <summary>
+        /// 日报偏差值变更
+        /// </summary>
+        /// <returns></returns>
+        public async Task<ResponseAjaxResult<bool>> UpdateDayReportDeviationAsync(UpdateDayDeviationRequestDto requestDto)
+        {
+            ResponseAjaxResult<bool> responseAjaxResult = new ResponseAjaxResult<bool>();
+            var dailyDeviation = await dbContext.Queryable<DailyDeviation>().Where(t => t.IsDelete == 1 && t.ProjectId == requestDto.ProjectId).FirstAsync();
+            if (dailyDeviation != null)
+            {
+                dailyDeviation.DayActualProductionAmountDeviation = requestDto.DayActualProductionAmountDeviation;
+                await dbContext.Updateable(dailyDeviation).ExecuteCommandAsync();
+            }
+            else
+            {
+                DailyDeviation daily = new DailyDeviation();
+                daily.Id = GuidUtil.Next();
+                daily.ProjectId = requestDto.ProjectId;
+                daily.ProjectName = requestDto.ProjectName;
+                daily.StatusId = requestDto.StatusId;
+                daily.DayActualProductionAmount = requestDto.DayActualProductionAmount;
+                daily.DayActualProductionAmountDeviation = requestDto.DayActualProductionAmountDeviation;
+                daily.dateday = DateTime.Today.AddDays(-1).ToDateDay();
+                await dbContext.Insertable(daily).ExecuteCommandAsync();
+            }
+
+            responseAjaxResult.Data = true;
+            responseAjaxResult.Success();
+            return responseAjaxResult;
+        }
     }
 }
