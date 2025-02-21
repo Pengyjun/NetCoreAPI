@@ -1475,7 +1475,7 @@ namespace GHMonitoringCenterApi.Application.Service.ProjectProductionReport
                 .LeftJoin(dbContext.Queryable<DailyDeviation>().Where(t => t.IsDelete == 1), (x, y, z) => x.Id == z.ProjectId)
                 .WhereIF(!string.IsNullOrWhiteSpace(requestDto.ProjectName), (x, y, z) => x.Name.Contains(requestDto.ProjectName))
                 .WhereIF(requestDto.ProjectStatusId != null && requestDto.ProjectStatusId.Any(), x => requestDto.ProjectStatusId.Contains(x.StatusId.Value.ToString()))
-                .OrderByDescending((x, y, z) => y.DateDay)
+                .OrderByDescending((x, y, z) => new { y.DateDay, x.Id, x.StatusId })
                 .Select((x, y, z) => new DayReportDeviationListResponseDto
                 {
                     ProjectId = x.Id,
@@ -1496,6 +1496,7 @@ namespace GHMonitoringCenterApi.Application.Service.ProjectProductionReport
                 item.DatedayStr = item.DatedayStr == null ? dayStr : item.DatedayStr;
             }
             responseAjaxResult.Data = data;
+            responseAjaxResult.Count = total;
             responseAjaxResult.Success();
             return responseAjaxResult;
         }
