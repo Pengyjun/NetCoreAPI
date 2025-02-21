@@ -20,7 +20,7 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.ProjectProductionRepor
         /// <summary>
         /// 项目状态
         /// </summary>
-        public string[]? ProjectStatusId { get; set; }
+        //public string[]? ProjectStatusId { get; set; }
         /// <summary>
         /// 页码
         /// </summary>
