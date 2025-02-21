@@ -1510,7 +1510,7 @@ namespace GHMonitoringCenterApi.Application.Service.ProjectProductionReport
                 .Select((x, y, z) => new DayReportDeviationListResponseDto
                 {
                     ProjectId = x.Id,
-                    ProjectName = x.Name,
+                    ProjectName = x.ShortName,
                     StatusId = x.StatusId,
                     DayActualProductionAmount = y.DayActualProductionAmount,
                     DayActualProductionAmountDeviation = z.DayActualProductionAmountDeviation,
