@@ -1551,11 +1551,11 @@ namespace GHMonitoringCenterApi.Application.Service.ProjectProductionReport
             }
             else
             {
-               var  companyId=await dbContext.Queryable<Project>().Where(x => x.Id == requestDto.ProjectId).Select(x => x.CompanyId).FirstAsync();
+               var  companyId=await dbContext.Queryable<Project>().Where(x => x.Id == requestDto.ProjectId).FirstAsync();
                 DailyDeviation daily = new DailyDeviation();
                 daily.Id = GuidUtil.Next();
                 daily.ProjectId = requestDto.ProjectId;
-                daily.CompanyId = companyId.Value;
+                daily.CompanyId = companyId.CompanyId.Value;
                 daily.ProjectName = requestDto.ProjectName;
                 daily.StatusId = requestDto.StatusId;
                 daily.DayActualProductionAmount = requestDto.DayActualProductionAmount;
