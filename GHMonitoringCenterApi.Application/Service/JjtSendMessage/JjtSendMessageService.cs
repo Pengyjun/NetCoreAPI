@@ -2927,8 +2927,8 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
                 {
                     dayDiffValues=Math.Round( Math.Abs(dayDiffValue.Where(x=>x.dateday==currentNowTimeInt).Sum(x => x.DayActualProductionAmountDeviation) - dayDiffValue.Where(x => x.dateday== currentNowTimeInt).Sum(x => x.DayActualProductionAmount))/ 100000000M,2);
                 }
-
-                var yCompleteValue = Math.Round(dayActualProductionAmount / 100000000M, 2) + dayDiffValues;
+                //+ dayDiffValues
+                var yCompleteValue = Math.Round(dayActualProductionAmount / 100000000M, 2) ;
 
                 eachCompanyProductionValues.Add(new EachCompanyProductionValue()
                 {
