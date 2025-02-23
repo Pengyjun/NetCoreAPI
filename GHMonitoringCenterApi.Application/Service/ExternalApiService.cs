@@ -677,7 +677,7 @@ namespace GHMonitoringCenterApi.Application.Service
 
             #region 新的
             var data = await _dbContext.Queryable<DayReport>()
-                .Where(x => x.IsDelete == 1)
+                .Where(x => x.IsDelete == 1 && x.ProcessStatus == DayReportProcessStatus.Submited)
                 .Select(x => new DayReportInfo
                 {
                     Id = x.Id,
@@ -743,7 +743,7 @@ namespace GHMonitoringCenterApi.Application.Service
             {
                 startday = new DateTime(nowTime.AddMonths(-1).Year, nowTime.AddMonths(-1).Month, 26).ToDateDay();
                 endday = new DateTime(nowTime.Year, nowTime.Month, 25).ToDateDay();
-                dayReport = await _dbContext.Queryable<DayReport>().Where(x => x.IsDelete == 1 && x.DateDay >= startday && x.DateDay <= endday).ToListAsync();
+                dayReport = await _dbContext.Queryable<DayReport>().Where(x => x.IsDelete == 1 && x.DateDay >= startday && x.DateDay <= endday && x.ProcessStatus == DayReportProcessStatus.Submited).ToListAsync();
             }
             //获取当前月的数据
             var nowMonth = DateTime.Now.ToDateMonth();
