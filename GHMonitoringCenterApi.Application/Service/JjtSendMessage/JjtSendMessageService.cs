@@ -6651,7 +6651,619 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
         }
 
 
+        #region 计算当年船舶在场天数
+        /// <summary>
+        /// 计算当年船舶在场天数
+        /// </summary>
+        /// <returns></returns>
+        public static int CalcYearShipDays(List<ShipMovementRecord> movementList, List<Guid> shipIds, int year)
+        {
+            var onDays = 0;
+            var shipMovements = movementList.Where(x => shipIds.Contains(x.ShipId) && x.Status != 0).ToList();
+            foreach (var item in shipMovements)
+            {
+                //船舶退场时间为空，且进场时间大于今年的1月1号
+                if (item.QuitTime == null && item.EnterTime.HasValue && item.EnterTime.Value.ToString("yyyyMMdd").ObjToInt() >= (year + "0101").ObjToInt())
+                {
+                    onDays += TimeHelper.GetTimeSpan(item.EnterTime.Value, DateTime.Now).Days;
+                }
+                //船舶退场时间为空，且进场时间小于今年的1月1号
+                if (item.QuitTime == null && item.EnterTime.HasValue && item.EnterTime.Value.ToString("yyyyMMdd").ObjToInt() < (year + "0101").ObjToInt())
+                {
+                    onDays += TimeHelper.GetTimeSpan(DateTime.Now.ToString("yyyy-01-01").ObjToDate(), DateTime.Now).Days;
+                }
 
+
+                //船舶退场时间不为空，且退场时间大于今年的1月1号进场时间小于今年的1月1号
+                if (item.QuitTime != null && item.QuitTime.Value.ToString("yyyyMMdd").ObjToInt() >= (year + "0101").ObjToInt() && item.EnterTime.HasValue && item.EnterTime.Value.ToString("yyyyMMdd").ObjToInt() < (year + "0101").ObjToInt() && item.QuitTime.Value.ToString("yyyyMMdd").ObjToInt() >= DateTime.Now.ToDateDay())
+                {
+                    onDays += TimeHelper.GetTimeSpan(DateTime.Now.ToString("yyyy-01-01").ObjToDate(), DateTime.Now).Days;
+                }
+                //船舶退场时间不为空，且退场时间大于今年的1月1号进场时间大于今年的1月1号
+                if (item.QuitTime != null && item.QuitTime.Value.ToString("yyyyMMdd").ObjToInt() >= (year + "0101").ObjToInt() && item.EnterTime.HasValue && item.EnterTime.Value.ToString("yyyyMMdd").ObjToInt() >= (year + "0101").ObjToInt() && item.QuitTime.Value.ToString("yyyyMMdd").ObjToInt() < DateTime.Now.ToDateDay())
+                {
+                    onDays += TimeHelper.GetTimeSpan(item.EnterTime.Value, item.QuitTime.Value).Days;
+                }
+            }
+            return onDays;
+        }
+        #endregion
+
+        #region 计算缺少的日报
+        public static int CalcUnWriteReport(DayWriteReportRecord dayWriteReportRecords, int dayTime)
+        {
+            var connt = 0;
+            if (dayTime == 27)
+            {
+                connt += dayWriteReportRecords.TwentySix == null ? 1 : 0;
+            }
+            else if (dayTime == 28)
+            {
+                connt += dayWriteReportRecords.TwentySix == null ? 1 : 0;
+                connt += dayWriteReportRecords.TwentySeven == null ? 1 : 0;
+            }
+            else if (dayTime == 29)
+            {
+                connt += dayWriteReportRecords.TwentySix == null ? 1 : 0;
+                connt += dayWriteReportRecords.TwentySeven == null ? 1 : 0;
+                connt += dayWriteReportRecords.TwentyEight == null ? 1 : 0;
+            }
+            else if (dayTime == 30)
+            {
+                connt += dayWriteReportRecords.TwentySix == null ? 1 : 0;
+                connt += dayWriteReportRecords.TwentySeven == null ? 1 : 0;
+                connt += dayWriteReportRecords.TwentyEight == null ? 1 : 0;
+                connt += dayWriteReportRecords.TwentyNine == null ? 1 : 0;
+            }
+            else if (dayTime == 31)
+            {
+                connt += dayWriteReportRecords.TwentySix == null ? 1 : 0;
+                connt += dayWriteReportRecords.TwentySeven == null ? 1 : 0;
+                connt += dayWriteReportRecords.TwentyEight == null ? 1 : 0;
+                connt += dayWriteReportRecords.TwentyNine == null ? 1 : 0;
+                connt += dayWriteReportRecords.Thirty == null ? 1 : 0;
+            }
+            else if (dayTime == 1)
+            {
+                connt += dayWriteReportRecords.TwentySix == null ? 1 : 0;
+                connt += dayWriteReportRecords.TwentySeven == null ? 1 : 0;
+                connt += dayWriteReportRecords.TwentyEight == null ? 1 : 0;
+                connt += dayWriteReportRecords.TwentyNine == null ? 1 : 0;
+                connt += dayWriteReportRecords.ThirtyOne == null ? 1 : 0;
+            }
+            else if (dayTime == 2)
+            {
+                connt += dayWriteReportRecords.TwentySix == null ? 1 : 0;
+                connt += dayWriteReportRecords.TwentySeven == null ? 1 : 0;
+                connt += dayWriteReportRecords.TwentyEight == null ? 1 : 0;
+                connt += dayWriteReportRecords.TwentyNine == null ? 1 : 0;
+                connt += dayWriteReportRecords.ThirtyOne == null ? 1 : 0;
+                connt += dayWriteReportRecords.One == null ? 1 : 0;
+            }
+            else if (dayTime == 3)
+            {
+                connt += dayWriteReportRecords.TwentySix == null ? 1 : 0;
+                connt += dayWriteReportRecords.TwentySeven == null ? 1 : 0;
+                connt += dayWriteReportRecords.TwentyEight == null ? 1 : 0;
+                connt += dayWriteReportRecords.TwentyNine == null ? 1 : 0;
+                connt += dayWriteReportRecords.ThirtyOne == null ? 1 : 0;
+                connt += dayWriteReportRecords.One == null ? 1 : 0;
+                connt += dayWriteReportRecords.Two == null ? 1 : 0;
+            }
+            else if (dayTime == 4)
+            {
+                connt += dayWriteReportRecords.TwentySix == null ? 1 : 0;
+                connt += dayWriteReportRecords.TwentySeven == null ? 1 : 0;
+                connt += dayWriteReportRecords.TwentyEight == null ? 1 : 0;
+                connt += dayWriteReportRecords.TwentyNine == null ? 1 : 0;
+                connt += dayWriteReportRecords.ThirtyOne == null ? 1 : 0;
+                connt += dayWriteReportRecords.One == null ? 1 : 0;
+                connt += dayWriteReportRecords.Two == null ? 1 : 0;
+                connt += dayWriteReportRecords.Three == null ? 1 : 0;
+            }
+            else if (dayTime == 5)
+            {
+                connt += dayWriteReportRecords.TwentySix == null ? 1 : 0;
+                connt += dayWriteReportRecords.TwentySeven == null ? 1 : 0;
+                connt += dayWriteReportRecords.TwentyEight == null ? 1 : 0;
+                connt += dayWriteReportRecords.TwentyNine == null ? 1 : 0;
+                connt += dayWriteReportRecords.ThirtyOne == null ? 1 : 0;
+                connt += dayWriteReportRecords.One == null ? 1 : 0;
+                connt += dayWriteReportRecords.Two == null ? 1 : 0;
+                connt += dayWriteReportRecords.Three == null ? 1 : 0;
+                connt += dayWriteReportRecords.Four == null ? 1 : 0;
+            }
+            else if (dayTime == 6)
+            {
+                connt += dayWriteReportRecords.TwentySix == null ? 1 : 0;
+                connt += dayWriteReportRecords.TwentySeven == null ? 1 : 0;
+                connt += dayWriteReportRecords.TwentyEight == null ? 1 : 0;
+                connt += dayWriteReportRecords.TwentyNine == null ? 1 : 0;
+                connt += dayWriteReportRecords.ThirtyOne == null ? 1 : 0;
+                connt += dayWriteReportRecords.One == null ? 1 : 0;
+                connt += dayWriteReportRecords.Two == null ? 1 : 0;
+                connt += dayWriteReportRecords.Three == null ? 1 : 0;
+                connt += dayWriteReportRecords.Four == null ? 1 : 0;
+                connt += dayWriteReportRecords.Five == null ? 1 : 0;
+            }
+            else if (dayTime == 7)
+            {
+                connt += dayWriteReportRecords.TwentySix == null ? 1 : 0;
+                connt += dayWriteReportRecords.TwentySeven == null ? 1 : 0;
+                connt += dayWriteReportRecords.TwentyEight == null ? 1 : 0;
+                connt += dayWriteReportRecords.TwentyNine == null ? 1 : 0;
+                connt += dayWriteReportRecords.ThirtyOne == null ? 1 : 0;
+                connt += dayWriteReportRecords.One == null ? 1 : 0;
+                connt += dayWriteReportRecords.Two == null ? 1 : 0;
+                connt += dayWriteReportRecords.Three == null ? 1 : 0;
+                connt += dayWriteReportRecords.Four == null ? 1 : 0;
+                connt += dayWriteReportRecords.Five == null ? 1 : 0;
+                connt += dayWriteReportRecords.Six == null ? 1 : 0;
+            }
+            else if (dayTime == 8)
+            {
+                connt += dayWriteReportRecords.TwentySix == null ? 1 : 0;
+                connt += dayWriteReportRecords.TwentySeven == null ? 1 : 0;
+                connt += dayWriteReportRecords.TwentyEight == null ? 1 : 0;
+                connt += dayWriteReportRecords.TwentyNine == null ? 1 : 0;
+                connt += dayWriteReportRecords.ThirtyOne == null ? 1 : 0;
+                connt += dayWriteReportRecords.One == null ? 1 : 0;
+                connt += dayWriteReportRecords.Two == null ? 1 : 0;
+                connt += dayWriteReportRecords.Three == null ? 1 : 0;
+                connt += dayWriteReportRecords.Four == null ? 1 : 0;
+                connt += dayWriteReportRecords.Five == null ? 1 : 0;
+                connt += dayWriteReportRecords.Six == null ? 1 : 0;
+                connt += dayWriteReportRecords.Seven == null ? 1 : 0;
+            }
+            else if (dayTime == 9)
+            {
+                connt += dayWriteReportRecords.TwentySix == null ? 1 : 0;
+                connt += dayWriteReportRecords.TwentySeven == null ? 1 : 0;
+                connt += dayWriteReportRecords.TwentyEight == null ? 1 : 0;
+                connt += dayWriteReportRecords.TwentyNine == null ? 1 : 0;
+                connt += dayWriteReportRecords.ThirtyOne == null ? 1 : 0;
+                connt += dayWriteReportRecords.One == null ? 1 : 0;
+                connt += dayWriteReportRecords.Two == null ? 1 : 0;
+                connt += dayWriteReportRecords.Three == null ? 1 : 0;
+                connt += dayWriteReportRecords.Four == null ? 1 : 0;
+                connt += dayWriteReportRecords.Five == null ? 1 : 0;
+                connt += dayWriteReportRecords.Six == null ? 1 : 0;
+                connt += dayWriteReportRecords.Seven == null ? 1 : 0;
+                connt += dayWriteReportRecords.Eight == null ? 1 : 0;
+            }
+            else if (dayTime == 10)
+            {
+                connt += dayWriteReportRecords.TwentySix == null ? 1 : 0;
+                connt += dayWriteReportRecords.TwentySeven == null ? 1 : 0;
+                connt += dayWriteReportRecords.TwentyEight == null ? 1 : 0;
+                connt += dayWriteReportRecords.TwentyNine == null ? 1 : 0;
+                connt += dayWriteReportRecords.ThirtyOne == null ? 1 : 0;
+                connt += dayWriteReportRecords.One == null ? 1 : 0;
+                connt += dayWriteReportRecords.Two == null ? 1 : 0;
+                connt += dayWriteReportRecords.Three == null ? 1 : 0;
+                connt += dayWriteReportRecords.Four == null ? 1 : 0;
+                connt += dayWriteReportRecords.Five == null ? 1 : 0;
+                connt += dayWriteReportRecords.Six == null ? 1 : 0;
+                connt += dayWriteReportRecords.Seven == null ? 1 : 0;
+                connt += dayWriteReportRecords.Eight == null ? 1 : 0;
+                connt += dayWriteReportRecords.Nine == null ? 1 : 0;
+            }
+            else if (dayTime == 11)
+            {
+                connt += dayWriteReportRecords.TwentySix == null ? 1 : 0;
+                connt += dayWriteReportRecords.TwentySeven == null ? 1 : 0;
+                connt += dayWriteReportRecords.TwentyEight == null ? 1 : 0;
+                connt += dayWriteReportRecords.TwentyNine == null ? 1 : 0;
+                connt += dayWriteReportRecords.ThirtyOne == null ? 1 : 0;
+                connt += dayWriteReportRecords.One == null ? 1 : 0;
+                connt += dayWriteReportRecords.Two == null ? 1 : 0;
+                connt += dayWriteReportRecords.Three == null ? 1 : 0;
+                connt += dayWriteReportRecords.Four == null ? 1 : 0;
+                connt += dayWriteReportRecords.Five == null ? 1 : 0;
+                connt += dayWriteReportRecords.Six == null ? 1 : 0;
+                connt += dayWriteReportRecords.Seven == null ? 1 : 0;
+                connt += dayWriteReportRecords.Eight == null ? 1 : 0;
+                connt += dayWriteReportRecords.Nine == null ? 1 : 0;
+                connt += dayWriteReportRecords.Ten == null ? 1 : 0;
+            }
+            else if (dayTime == 12)
+            {
+                connt += dayWriteReportRecords.TwentySix == null ? 1 : 0;
+                connt += dayWriteReportRecords.TwentySeven == null ? 1 : 0;
+                connt += dayWriteReportRecords.TwentyEight == null ? 1 : 0;
+                connt += dayWriteReportRecords.TwentyNine == null ? 1 : 0;
+                connt += dayWriteReportRecords.ThirtyOne == null ? 1 : 0;
+                connt += dayWriteReportRecords.One == null ? 1 : 0;
+                connt += dayWriteReportRecords.Two == null ? 1 : 0;
+                connt += dayWriteReportRecords.Three == null ? 1 : 0;
+                connt += dayWriteReportRecords.Four == null ? 1 : 0;
+                connt += dayWriteReportRecords.Five == null ? 1 : 0;
+                connt += dayWriteReportRecords.Six == null ? 1 : 0;
+                connt += dayWriteReportRecords.Seven == null ? 1 : 0;
+                connt += dayWriteReportRecords.Eight == null ? 1 : 0;
+                connt += dayWriteReportRecords.Nine == null ? 1 : 0;
+                connt += dayWriteReportRecords.Ten == null ? 1 : 0;
+                connt += dayWriteReportRecords.Eleven == null ? 1 : 0;
+            }
+            else if (dayTime == 13)
+            {
+                connt += dayWriteReportRecords.TwentySix == null ? 1 : 0;
+                connt += dayWriteReportRecords.TwentySeven == null ? 1 : 0;
+                connt += dayWriteReportRecords.TwentyEight == null ? 1 : 0;
+                connt += dayWriteReportRecords.TwentyNine == null ? 1 : 0;
+                connt += dayWriteReportRecords.ThirtyOne == null ? 1 : 0;
+                connt += dayWriteReportRecords.One == null ? 1 : 0;
+                connt += dayWriteReportRecords.Two == null ? 1 : 0;
+                connt += dayWriteReportRecords.Three == null ? 1 : 0;
+                connt += dayWriteReportRecords.Four == null ? 1 : 0;
+                connt += dayWriteReportRecords.Five == null ? 1 : 0;
+                connt += dayWriteReportRecords.Six == null ? 1 : 0;
+                connt += dayWriteReportRecords.Seven == null ? 1 : 0;
+                connt += dayWriteReportRecords.Eight == null ? 1 : 0;
+                connt += dayWriteReportRecords.Nine == null ? 1 : 0;
+                connt += dayWriteReportRecords.Ten == null ? 1 : 0;
+                connt += dayWriteReportRecords.Eleven == null ? 1 : 0;
+                connt += dayWriteReportRecords.Twelve == null ? 1 : 0;
+            }
+            else if (dayTime == 14)
+            {
+                connt += dayWriteReportRecords.TwentySix == null ? 1 : 0;
+                connt += dayWriteReportRecords.TwentySeven == null ? 1 : 0;
+                connt += dayWriteReportRecords.TwentyEight == null ? 1 : 0;
+                connt += dayWriteReportRecords.TwentyNine == null ? 1 : 0;
+                connt += dayWriteReportRecords.ThirtyOne == null ? 1 : 0;
+                connt += dayWriteReportRecords.One == null ? 1 : 0;
+                connt += dayWriteReportRecords.Two == null ? 1 : 0;
+                connt += dayWriteReportRecords.Three == null ? 1 : 0;
+                connt += dayWriteReportRecords.Four == null ? 1 : 0;
+                connt += dayWriteReportRecords.Five == null ? 1 : 0;
+                connt += dayWriteReportRecords.Six == null ? 1 : 0;
+                connt += dayWriteReportRecords.Seven == null ? 1 : 0;
+                connt += dayWriteReportRecords.Eight == null ? 1 : 0;
+                connt += dayWriteReportRecords.Nine == null ? 1 : 0;
+                connt += dayWriteReportRecords.Ten == null ? 1 : 0;
+                connt += dayWriteReportRecords.Eleven == null ? 1 : 0;
+                connt += dayWriteReportRecords.Twelve == null ? 1 : 0;
+                connt += dayWriteReportRecords.Thirteen == null ? 1 : 0;
+            }
+            else if (dayTime == 15)
+            {
+                connt += dayWriteReportRecords.TwentySix == null ? 1 : 0;
+                connt += dayWriteReportRecords.TwentySeven == null ? 1 : 0;
+                connt += dayWriteReportRecords.TwentyEight == null ? 1 : 0;
+                connt += dayWriteReportRecords.TwentyNine == null ? 1 : 0;
+                connt += dayWriteReportRecords.ThirtyOne == null ? 1 : 0;
+                connt += dayWriteReportRecords.One == null ? 1 : 0;
+                connt += dayWriteReportRecords.Two == null ? 1 : 0;
+                connt += dayWriteReportRecords.Three == null ? 1 : 0;
+                connt += dayWriteReportRecords.Four == null ? 1 : 0;
+                connt += dayWriteReportRecords.Five == null ? 1 : 0;
+                connt += dayWriteReportRecords.Six == null ? 1 : 0;
+                connt += dayWriteReportRecords.Seven == null ? 1 : 0;
+                connt += dayWriteReportRecords.Eight == null ? 1 : 0;
+                connt += dayWriteReportRecords.Nine == null ? 1 : 0;
+                connt += dayWriteReportRecords.Ten == null ? 1 : 0;
+                connt += dayWriteReportRecords.Eleven == null ? 1 : 0;
+                connt += dayWriteReportRecords.Twelve == null ? 1 : 0;
+                connt += dayWriteReportRecords.Thirteen == null ? 1 : 0;
+                connt += dayWriteReportRecords.Fourteen == null ? 1 : 0;
+
+            }
+            else if (dayTime == 16)
+            {
+                connt += dayWriteReportRecords.TwentySix == null ? 1 : 0;
+                connt += dayWriteReportRecords.TwentySeven == null ? 1 : 0;
+                connt += dayWriteReportRecords.TwentyEight == null ? 1 : 0;
+                connt += dayWriteReportRecords.TwentyNine == null ? 1 : 0;
+                connt += dayWriteReportRecords.ThirtyOne == null ? 1 : 0;
+                connt += dayWriteReportRecords.One == null ? 1 : 0;
+                connt += dayWriteReportRecords.Two == null ? 1 : 0;
+                connt += dayWriteReportRecords.Three == null ? 1 : 0;
+                connt += dayWriteReportRecords.Four == null ? 1 : 0;
+                connt += dayWriteReportRecords.Five == null ? 1 : 0;
+                connt += dayWriteReportRecords.Six == null ? 1 : 0;
+                connt += dayWriteReportRecords.Seven == null ? 1 : 0;
+                connt += dayWriteReportRecords.Eight == null ? 1 : 0;
+                connt += dayWriteReportRecords.Nine == null ? 1 : 0;
+                connt += dayWriteReportRecords.Ten == null ? 1 : 0;
+                connt += dayWriteReportRecords.Eleven == null ? 1 : 0;
+                connt += dayWriteReportRecords.Twelve == null ? 1 : 0;
+                connt += dayWriteReportRecords.Thirteen == null ? 1 : 0;
+                connt += dayWriteReportRecords.Fourteen == null ? 1 : 0;
+                connt += dayWriteReportRecords.Fifteen == null ? 1 : 0;
+
+            }
+            else if (dayTime == 17)
+            {
+                connt += dayWriteReportRecords.TwentySix == null ? 1 : 0;
+                connt += dayWriteReportRecords.TwentySeven == null ? 1 : 0;
+                connt += dayWriteReportRecords.TwentyEight == null ? 1 : 0;
+                connt += dayWriteReportRecords.TwentyNine == null ? 1 : 0;
+                connt += dayWriteReportRecords.ThirtyOne == null ? 1 : 0;
+                connt += dayWriteReportRecords.One == null ? 1 : 0;
+                connt += dayWriteReportRecords.Two == null ? 1 : 0;
+                connt += dayWriteReportRecords.Three == null ? 1 : 0;
+                connt += dayWriteReportRecords.Four == null ? 1 : 0;
+                connt += dayWriteReportRecords.Five == null ? 1 : 0;
+                connt += dayWriteReportRecords.Six == null ? 1 : 0;
+                connt += dayWriteReportRecords.Seven == null ? 1 : 0;
+                connt += dayWriteReportRecords.Eight == null ? 1 : 0;
+                connt += dayWriteReportRecords.Nine == null ? 1 : 0;
+                connt += dayWriteReportRecords.Ten == null ? 1 : 0;
+                connt += dayWriteReportRecords.Eleven == null ? 1 : 0;
+                connt += dayWriteReportRecords.Twelve == null ? 1 : 0;
+                connt += dayWriteReportRecords.Thirteen == null ? 1 : 0;
+                connt += dayWriteReportRecords.Fourteen == null ? 1 : 0;
+                connt += dayWriteReportRecords.Fifteen == null ? 1 : 0;
+                connt += dayWriteReportRecords.Sixteen == null ? 1 : 0;
+
+            }
+            else if (dayTime == 18)
+            {
+                connt += dayWriteReportRecords.TwentySix == null ? 1 : 0;
+                connt += dayWriteReportRecords.TwentySeven == null ? 1 : 0;
+                connt += dayWriteReportRecords.TwentyEight == null ? 1 : 0;
+                connt += dayWriteReportRecords.TwentyNine == null ? 1 : 0;
+                connt += dayWriteReportRecords.ThirtyOne == null ? 1 : 0;
+                connt += dayWriteReportRecords.One == null ? 1 : 0;
+                connt += dayWriteReportRecords.Two == null ? 1 : 0;
+                connt += dayWriteReportRecords.Three == null ? 1 : 0;
+                connt += dayWriteReportRecords.Four == null ? 1 : 0;
+                connt += dayWriteReportRecords.Five == null ? 1 : 0;
+                connt += dayWriteReportRecords.Six == null ? 1 : 0;
+                connt += dayWriteReportRecords.Seven == null ? 1 : 0;
+                connt += dayWriteReportRecords.Eight == null ? 1 : 0;
+                connt += dayWriteReportRecords.Nine == null ? 1 : 0;
+                connt += dayWriteReportRecords.Ten == null ? 1 : 0;
+                connt += dayWriteReportRecords.Eleven == null ? 1 : 0;
+                connt += dayWriteReportRecords.Twelve == null ? 1 : 0;
+                connt += dayWriteReportRecords.Thirteen == null ? 1 : 0;
+                connt += dayWriteReportRecords.Fourteen == null ? 1 : 0;
+                connt += dayWriteReportRecords.Fifteen == null ? 1 : 0;
+                connt += dayWriteReportRecords.Sixteen == null ? 1 : 0;
+                connt += dayWriteReportRecords.Seventeen == null ? 1 : 0;
+
+            }
+            else if (dayTime == 19)
+            {
+                connt += dayWriteReportRecords.TwentySix == null ? 1 : 0;
+                connt += dayWriteReportRecords.TwentySeven == null ? 1 : 0;
+                connt += dayWriteReportRecords.TwentyEight == null ? 1 : 0;
+                connt += dayWriteReportRecords.TwentyNine == null ? 1 : 0;
+                connt += dayWriteReportRecords.ThirtyOne == null ? 1 : 0;
+                connt += dayWriteReportRecords.One == null ? 1 : 0;
+                connt += dayWriteReportRecords.Two == null ? 1 : 0;
+                connt += dayWriteReportRecords.Three == null ? 1 : 0;
+                connt += dayWriteReportRecords.Four == null ? 1 : 0;
+                connt += dayWriteReportRecords.Five == null ? 1 : 0;
+                connt += dayWriteReportRecords.Six == null ? 1 : 0;
+                connt += dayWriteReportRecords.Seven == null ? 1 : 0;
+                connt += dayWriteReportRecords.Eight == null ? 1 : 0;
+                connt += dayWriteReportRecords.Nine == null ? 1 : 0;
+                connt += dayWriteReportRecords.Ten == null ? 1 : 0;
+                connt += dayWriteReportRecords.Eleven == null ? 1 : 0;
+                connt += dayWriteReportRecords.Twelve == null ? 1 : 0;
+                connt += dayWriteReportRecords.Thirteen == null ? 1 : 0;
+                connt += dayWriteReportRecords.Fourteen == null ? 1 : 0;
+                connt += dayWriteReportRecords.Fifteen == null ? 1 : 0;
+                connt += dayWriteReportRecords.Sixteen == null ? 1 : 0;
+                connt += dayWriteReportRecords.Seventeen == null ? 1 : 0;
+                connt += dayWriteReportRecords.Eighteen == null ? 1 : 0;
+            }
+            else if (dayTime == 20)
+            {
+                connt += dayWriteReportRecords.TwentySix == null ? 1 : 0;
+                connt += dayWriteReportRecords.TwentySeven == null ? 1 : 0;
+                connt += dayWriteReportRecords.TwentyEight == null ? 1 : 0;
+                connt += dayWriteReportRecords.TwentyNine == null ? 1 : 0;
+                connt += dayWriteReportRecords.ThirtyOne == null ? 1 : 0;
+                connt += dayWriteReportRecords.One == null ? 1 : 0;
+                connt += dayWriteReportRecords.Two == null ? 1 : 0;
+                connt += dayWriteReportRecords.Three == null ? 1 : 0;
+                connt += dayWriteReportRecords.Four == null ? 1 : 0;
+                connt += dayWriteReportRecords.Five == null ? 1 : 0;
+                connt += dayWriteReportRecords.Six == null ? 1 : 0;
+                connt += dayWriteReportRecords.Seven == null ? 1 : 0;
+                connt += dayWriteReportRecords.Eight == null ? 1 : 0;
+                connt += dayWriteReportRecords.Nine == null ? 1 : 0;
+                connt += dayWriteReportRecords.Ten == null ? 1 : 0;
+                connt += dayWriteReportRecords.Eleven == null ? 1 : 0;
+                connt += dayWriteReportRecords.Twelve == null ? 1 : 0;
+                connt += dayWriteReportRecords.Thirteen == null ? 1 : 0;
+                connt += dayWriteReportRecords.Fourteen == null ? 1 : 0;
+                connt += dayWriteReportRecords.Fifteen == null ? 1 : 0;
+                connt += dayWriteReportRecords.Sixteen == null ? 1 : 0;
+                connt += dayWriteReportRecords.Seventeen == null ? 1 : 0;
+                connt += dayWriteReportRecords.Eighteen == null ? 1 : 0;
+                connt += dayWriteReportRecords.Nineteen == null ? 1 : 0;
+            }
+            else if (dayTime == 21)
+            {
+                connt += dayWriteReportRecords.TwentySix == null ? 1 : 0;
+                connt += dayWriteReportRecords.TwentySeven == null ? 1 : 0;
+                connt += dayWriteReportRecords.TwentyEight == null ? 1 : 0;
+                connt += dayWriteReportRecords.TwentyNine == null ? 1 : 0;
+                connt += dayWriteReportRecords.ThirtyOne == null ? 1 : 0;
+                connt += dayWriteReportRecords.One == null ? 1 : 0;
+                connt += dayWriteReportRecords.Two == null ? 1 : 0;
+                connt += dayWriteReportRecords.Three == null ? 1 : 0;
+                connt += dayWriteReportRecords.Four == null ? 1 : 0;
+                connt += dayWriteReportRecords.Five == null ? 1 : 0;
+                connt += dayWriteReportRecords.Six == null ? 1 : 0;
+                connt += dayWriteReportRecords.Seven == null ? 1 : 0;
+                connt += dayWriteReportRecords.Eight == null ? 1 : 0;
+                connt += dayWriteReportRecords.Nine == null ? 1 : 0;
+                connt += dayWriteReportRecords.Ten == null ? 1 : 0;
+                connt += dayWriteReportRecords.Eleven == null ? 1 : 0;
+                connt += dayWriteReportRecords.Twelve == null ? 1 : 0;
+                connt += dayWriteReportRecords.Thirteen == null ? 1 : 0;
+                connt += dayWriteReportRecords.Fourteen == null ? 1 : 0;
+                connt += dayWriteReportRecords.Fifteen == null ? 1 : 0;
+                connt += dayWriteReportRecords.Sixteen == null ? 1 : 0;
+                connt += dayWriteReportRecords.Seventeen == null ? 1 : 0;
+                connt += dayWriteReportRecords.Eighteen == null ? 1 : 0;
+                connt += dayWriteReportRecords.Nineteen == null ? 1 : 0;
+                connt += dayWriteReportRecords.Twenty == null ? 1 : 0;
+            }
+            else if (dayTime == 22)
+            {
+                connt += dayWriteReportRecords.TwentySix == null ? 1 : 0;
+                connt += dayWriteReportRecords.TwentySeven == null ? 1 : 0;
+                connt += dayWriteReportRecords.TwentyEight == null ? 1 : 0;
+                connt += dayWriteReportRecords.TwentyNine == null ? 1 : 0;
+                connt += dayWriteReportRecords.ThirtyOne == null ? 1 : 0;
+                connt += dayWriteReportRecords.One == null ? 1 : 0;
+                connt += dayWriteReportRecords.Two == null ? 1 : 0;
+                connt += dayWriteReportRecords.Three == null ? 1 : 0;
+                connt += dayWriteReportRecords.Four == null ? 1 : 0;
+                connt += dayWriteReportRecords.Five == null ? 1 : 0;
+                connt += dayWriteReportRecords.Six == null ? 1 : 0;
+                connt += dayWriteReportRecords.Seven == null ? 1 : 0;
+                connt += dayWriteReportRecords.Eight == null ? 1 : 0;
+                connt += dayWriteReportRecords.Nine == null ? 1 : 0;
+                connt += dayWriteReportRecords.Ten == null ? 1 : 0;
+                connt += dayWriteReportRecords.Eleven == null ? 1 : 0;
+                connt += dayWriteReportRecords.Twelve == null ? 1 : 0;
+                connt += dayWriteReportRecords.Thirteen == null ? 1 : 0;
+                connt += dayWriteReportRecords.Fourteen == null ? 1 : 0;
+                connt += dayWriteReportRecords.Fifteen == null ? 1 : 0;
+                connt += dayWriteReportRecords.Sixteen == null ? 1 : 0;
+                connt += dayWriteReportRecords.Seventeen == null ? 1 : 0;
+                connt += dayWriteReportRecords.Eighteen == null ? 1 : 0;
+                connt += dayWriteReportRecords.Nineteen == null ? 1 : 0;
+                connt += dayWriteReportRecords.Twenty == null ? 1 : 0;
+                connt += dayWriteReportRecords.TwentyOne == null ? 1 : 0;
+            }
+            else if (dayTime == 23)
+            {
+                connt += dayWriteReportRecords.TwentySix == null ? 1 : 0;
+                connt += dayWriteReportRecords.TwentySeven == null ? 1 : 0;
+                connt += dayWriteReportRecords.TwentyEight == null ? 1 : 0;
+                connt += dayWriteReportRecords.TwentyNine == null ? 1 : 0;
+                connt += dayWriteReportRecords.ThirtyOne == null ? 1 : 0;
+                connt += dayWriteReportRecords.One == null ? 1 : 0;
+                connt += dayWriteReportRecords.Two == null ? 1 : 0;
+                connt += dayWriteReportRecords.Three == null ? 1 : 0;
+                connt += dayWriteReportRecords.Four == null ? 1 : 0;
+                connt += dayWriteReportRecords.Five == null ? 1 : 0;
+                connt += dayWriteReportRecords.Six == null ? 1 : 0;
+                connt += dayWriteReportRecords.Seven == null ? 1 : 0;
+                connt += dayWriteReportRecords.Eight == null ? 1 : 0;
+                connt += dayWriteReportRecords.Nine == null ? 1 : 0;
+                connt += dayWriteReportRecords.Ten == null ? 1 : 0;
+                connt += dayWriteReportRecords.Eleven == null ? 1 : 0;
+                connt += dayWriteReportRecords.Twelve == null ? 1 : 0;
+                connt += dayWriteReportRecords.Thirteen == null ? 1 : 0;
+                connt += dayWriteReportRecords.Fourteen == null ? 1 : 0;
+                connt += dayWriteReportRecords.Fifteen == null ? 1 : 0;
+                connt += dayWriteReportRecords.Sixteen == null ? 1 : 0;
+                connt += dayWriteReportRecords.Seventeen == null ? 1 : 0;
+                connt += dayWriteReportRecords.Eighteen == null ? 1 : 0;
+                connt += dayWriteReportRecords.Nineteen == null ? 1 : 0;
+                connt += dayWriteReportRecords.Twenty == null ? 1 : 0;
+                connt += dayWriteReportRecords.TwentyOne == null ? 1 : 0;
+                connt += dayWriteReportRecords.TwentyTwo == null ? 1 : 0;
+            }
+            else if (dayTime == 24)
+            {
+                connt += dayWriteReportRecords.TwentySix == null ? 1 : 0;
+                connt += dayWriteReportRecords.TwentySeven == null ? 1 : 0;
+                connt += dayWriteReportRecords.TwentyEight == null ? 1 : 0;
+                connt += dayWriteReportRecords.TwentyNine == null ? 1 : 0;
+                connt += dayWriteReportRecords.ThirtyOne == null ? 1 : 0;
+                connt += dayWriteReportRecords.One == null ? 1 : 0;
+                connt += dayWriteReportRecords.Two == null ? 1 : 0;
+                connt += dayWriteReportRecords.Three == null ? 1 : 0;
+                connt += dayWriteReportRecords.Four == null ? 1 : 0;
+                connt += dayWriteReportRecords.Five == null ? 1 : 0;
+                connt += dayWriteReportRecords.Six == null ? 1 : 0;
+                connt += dayWriteReportRecords.Seven == null ? 1 : 0;
+                connt += dayWriteReportRecords.Eight == null ? 1 : 0;
+                connt += dayWriteReportRecords.Nine == null ? 1 : 0;
+                connt += dayWriteReportRecords.Ten == null ? 1 : 0;
+                connt += dayWriteReportRecords.Eleven == null ? 1 : 0;
+                connt += dayWriteReportRecords.Twelve == null ? 1 : 0;
+                connt += dayWriteReportRecords.Thirteen == null ? 1 : 0;
+                connt += dayWriteReportRecords.Fourteen == null ? 1 : 0;
+                connt += dayWriteReportRecords.Fifteen == null ? 1 : 0;
+                connt += dayWriteReportRecords.Sixteen == null ? 1 : 0;
+                connt += dayWriteReportRecords.Seventeen == null ? 1 : 0;
+                connt += dayWriteReportRecords.Eighteen == null ? 1 : 0;
+                connt += dayWriteReportRecords.Nineteen == null ? 1 : 0;
+                connt += dayWriteReportRecords.Twenty == null ? 1 : 0;
+                connt += dayWriteReportRecords.TwentyOne == null ? 1 : 0;
+                connt += dayWriteReportRecords.TwentyTwo == null ? 1 : 0;
+                connt += dayWriteReportRecords.TwentyThree == null ? 1 : 0;
+            }
+            else if (dayTime == 25)
+            {
+                connt += dayWriteReportRecords.TwentySix == null ? 1 : 0;
+                connt += dayWriteReportRecords.TwentySeven == null ? 1 : 0;
+                connt += dayWriteReportRecords.TwentyEight == null ? 1 : 0;
+                connt += dayWriteReportRecords.TwentyNine == null ? 1 : 0;
+                connt += dayWriteReportRecords.ThirtyOne == null ? 1 : 0;
+                connt += dayWriteReportRecords.One == null ? 1 : 0;
+                connt += dayWriteReportRecords.Two == null ? 1 : 0;
+                connt += dayWriteReportRecords.Three == null ? 1 : 0;
+                connt += dayWriteReportRecords.Four == null ? 1 : 0;
+                connt += dayWriteReportRecords.Five == null ? 1 : 0;
+                connt += dayWriteReportRecords.Six == null ? 1 : 0;
+                connt += dayWriteReportRecords.Seven == null ? 1 : 0;
+                connt += dayWriteReportRecords.Eight == null ? 1 : 0;
+                connt += dayWriteReportRecords.Nine == null ? 1 : 0;
+                connt += dayWriteReportRecords.Ten == null ? 1 : 0;
+                connt += dayWriteReportRecords.Eleven == null ? 1 : 0;
+                connt += dayWriteReportRecords.Twelve == null ? 1 : 0;
+                connt += dayWriteReportRecords.Thirteen == null ? 1 : 0;
+                connt += dayWriteReportRecords.Fourteen == null ? 1 : 0;
+                connt += dayWriteReportRecords.Fifteen == null ? 1 : 0;
+                connt += dayWriteReportRecords.Sixteen == null ? 1 : 0;
+                connt += dayWriteReportRecords.Seventeen == null ? 1 : 0;
+                connt += dayWriteReportRecords.Eighteen == null ? 1 : 0;
+                connt += dayWriteReportRecords.Nineteen == null ? 1 : 0;
+                connt += dayWriteReportRecords.Twenty == null ? 1 : 0;
+                connt += dayWriteReportRecords.TwentyOne == null ? 1 : 0;
+                connt += dayWriteReportRecords.TwentyTwo == null ? 1 : 0;
+                connt += dayWriteReportRecords.TwentyThree == null ? 1 : 0;
+                connt += dayWriteReportRecords.TwentyFour == null ? 1 : 0;
+            }
+            else if (dayTime == 26)
+            {
+                connt += dayWriteReportRecords.TwentySix == null ? 1 : 0;
+                connt += dayWriteReportRecords.TwentySeven == null ? 1 : 0;
+                connt += dayWriteReportRecords.TwentyEight == null ? 1 : 0;
+                connt += dayWriteReportRecords.TwentyNine == null ? 1 : 0;
+                connt += dayWriteReportRecords.ThirtyOne == null ? 1 : 0;
+                connt += dayWriteReportRecords.One == null ? 1 : 0;
+                connt += dayWriteReportRecords.Two == null ? 1 : 0;
+                connt += dayWriteReportRecords.Three == null ? 1 : 0;
+                connt += dayWriteReportRecords.Four == null ? 1 : 0;
+                connt += dayWriteReportRecords.Five == null ? 1 : 0;
+                connt += dayWriteReportRecords.Six == null ? 1 : 0;
+                connt += dayWriteReportRecords.Seven == null ? 1 : 0;
+                connt += dayWriteReportRecords.Eight == null ? 1 : 0;
+                connt += dayWriteReportRecords.Nine == null ? 1 : 0;
+                connt += dayWriteReportRecords.Ten == null ? 1 : 0;
+                connt += dayWriteReportRecords.Eleven == null ? 1 : 0;
+                connt += dayWriteReportRecords.Twelve == null ? 1 : 0;
+                connt += dayWriteReportRecords.Thirteen == null ? 1 : 0;
+                connt += dayWriteReportRecords.Fourteen == null ? 1 : 0;
+                connt += dayWriteReportRecords.Fifteen == null ? 1 : 0;
+                connt += dayWriteReportRecords.Sixteen == null ? 1 : 0;
+                connt += dayWriteReportRecords.Seventeen == null ? 1 : 0;
+                connt += dayWriteReportRecords.Eighteen == null ? 1 : 0;
+                connt += dayWriteReportRecords.Nineteen == null ? 1 : 0;
+                connt += dayWriteReportRecords.Twenty == null ? 1 : 0;
+                connt += dayWriteReportRecords.TwentyOne == null ? 1 : 0;
+                connt += dayWriteReportRecords.TwentyTwo == null ? 1 : 0;
+                connt += dayWriteReportRecords.TwentyThree == null ? 1 : 0;
+                connt += dayWriteReportRecords.TwentyFour == null ? 1 : 0;
+                connt += dayWriteReportRecords.TwentyFive == null ? 1 : 0;
+            }
+
+            return connt;
+        }
+        #endregion
 
 
 
