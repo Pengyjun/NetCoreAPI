@@ -811,7 +811,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             RefAsync<int> total = 0;
             var list = new List<UnReportProjectResponseDto>();
             var query = _dbProject.AsQueryable()
-                .InnerJoin(_dbCrossDateDay.AsQueryable(), (p, c) => c.DateDay >= startDay && c.DateDay <= endDay)
+                .InnerJoin(_dbCrossDateDay.AsQueryable(), (p, c) => c.DateDay >= startDay && c.DateDay <= endDay && p.StatusId != "75089b9a-b18b-442c-bfc8-fde4024d737f".ToGuid())//中标已签不强制填报 
                 .LeftJoin(_dbDayReport.AsQueryable(), (p, c, d) => p.Id == d.ProjectId && c.DateDay == d.DateDay && d.DateDay >= startDay && d.DateDay <= endDay && d.IsDelete == 1)
                 .LeftJoin<ProjectChangeRecord>((p, c, d, r) => p.Id == r.ProjectId && c.DateDayTime >= r.StartTime && c.DateDayTime < r.EndTime)
                 .Where((p, c, d) => p.IsDelete == 1 && CommonData.ConstructionStatus.Contains(p.StatusId))
