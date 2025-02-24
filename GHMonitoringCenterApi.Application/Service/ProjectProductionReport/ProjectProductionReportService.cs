@@ -158,10 +158,13 @@ namespace GHMonitoringCenterApi.Application.Service.ProjectProductionReport
             //     .WhereIF(dayConstructionIds.Count > 0, x => !dayConstructionIds.Contains(x.ProjectId))
             //    .Sum(x => x.ActualDailyProductionAmount), 2);
             var pIds = new List<Guid>();
-            if (_currentUser.CurrentLoginIsAdmin || _currentUser.CurrentLoginInstitutionOid == "101162350" || !string.IsNullOrWhiteSpace(searchRequestDto.CompanyId.ToString()))
+            if (_currentUser.CurrentLoginIsAdmin || _currentUser.CurrentLoginInstitutionOid == "101162350")
             {
-                //获取分包项目
-                pIds = await dbContext.Queryable<Project>().Where(x => x.IsDelete == 1 && x.IsSubContractProject == 2).Select(x => x.Id).ToListAsync();
+                if (string.IsNullOrWhiteSpace(searchRequestDto.CompanyId.ToString()))
+                {
+                    //获取分包项目
+                    pIds = await dbContext.Queryable<Project>().Where(x => x.IsDelete == 1 && x.IsSubContractProject == 2).Select(x => x.Id).ToListAsync();
+                }
             }
 
             sumInfo.SumOutsourcingExpensesAmount = Math.Round(
