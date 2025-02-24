@@ -3113,13 +3113,6 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
         /// <returns></returns>
         public async Task<ResponseAjaxResult<JjtSendMessageMonitoringDayReportResponseDto>> JjtTextCardMsgDetailsAsync(int dateDay = 0, bool flag = true)
         {
-            #region 基本信息
-            ResponseAjaxResult<JjtSendMessageMonitoringDayReportResponseDto> responseAjaxResult = new ResponseAjaxResult<JjtSendMessageMonitoringDayReportResponseDto>();
-            var jjtSendMessageMonitoringDayReportResponseDto = new JjtSendMessageMonitoringDayReportResponseDto()
-            {
-                DayTime = DateTime.Now.AddDays(-1).ToString("MM月dd日")
-            };
-            #endregion
 
             #region 查询条件相关
             //亿单位
@@ -3162,9 +3155,19 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
             var monthDiffDays = TimeHelper.GetTimeSpan(startMonthTimeDate, endMonthTimeDate).Days;
             #endregion
 
+            #region 基本信息
+            ResponseAjaxResult<JjtSendMessageMonitoringDayReportResponseDto> responseAjaxResult = new ResponseAjaxResult<JjtSendMessageMonitoringDayReportResponseDto>();
+            var jjtSendMessageMonitoringDayReportResponseDto = new JjtSendMessageMonitoringDayReportResponseDto()
+            {
+                DayTime = DateTime.Now.AddDays(-1).ToString("MM月dd日"),
+                 Month=currentMonth,
+                 Year=year
+            };
+            #endregion
+
             #region 共用数据
             //基础数据
-            var commonDataList = await dbContext.Queryable<ProductionMonitoringOperationDayReport>().Where(x => x.IsDelete == 1).ToListAsync();
+            var commonDataList = await dbContext.Queryable<ProductionMonitoringOperationDayReport>().Where(x => x.IsDelete == 1&&!SqlFunc.IsNullOrEmpty(x.Name)).ToListAsync();
 
             //公司完成产值信息
             var comonDataProductionList = await dbContext.Queryable<CompanyProductionValueInfo>()
@@ -3219,7 +3222,7 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
                 TotalFacilityCount = deviceNumber,
                 TotalWorkerCount = personNumber,
                 TotalRiskWorkCount = wdNumber,
-                TotalBuildCountPercent = htProjectCount != 0 ? Math.Round(zjProjectCount.ObjToDecimal() / htProjectCount, 2) : 0M,
+                TotalBuildCountPercent = htProjectCount != 0 ? Math.Round((zjProjectCount.ObjToDecimal() / htProjectCount)*100, 2) : 0M,
                 CompanyProjectBasePoductions = new List<CompanyProjectBasePoduction>(),
                 CompanyBasePoductionValues = new List<CompanyBasePoductionValue>(),
             };
@@ -3240,7 +3243,7 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
                     companyBasePoductionValue.OnContractProjectCount = companyBasePoductionValues.Sum(x => x.OnContractProjectCount);
                     companyBasePoductionValue.OnBuildProjectCount = companyBasePoductionValues.Sum(x => x.OnBuildProjectCount);
                     companyBasePoductionValue.StopBuildProjectCount = companyBasePoductionValues.Sum(x => x.StopBuildProjectCount);
-                    companyBasePoductionValue.BuildCountPercent = Math.Round(companyBasePoductionValue.OnBuildProjectCount.ObjToDecimal() / companyBasePoductionValue.OnContractProjectCount, 2);
+                    companyBasePoductionValue.BuildCountPercent = Math.Round((companyBasePoductionValue.OnBuildProjectCount.ObjToDecimal() / companyBasePoductionValue.OnContractProjectCount)*100, 2);
                     companyBasePoductionValue.FacilityCount = dayYearList.Where(x => x.DateDay == dayTime).Sum(x => x.ConstructionDeviceNum);
                     companyBasePoductionValue.WorkerCount = dayYearList.Where(x => x.DateDay == dayTime).Sum(x => x.SiteConstructionPersonNum);
                     companyBasePoductionValue.RiskWorkCount = dayYearList.Where(x => x.DateDay == dayTime).Sum(x => x.HazardousConstructionNum);
@@ -3250,12 +3253,11 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
                 else
                 {
                     companyBasePoductionValue = new CompanyProjectBasePoduction();
-
                     companyBasePoductionValue.Name = production.Name;
                     companyBasePoductionValue.OnContractProjectCount = projectList.Count(x => x.CompanyId == production.ItemId && contractProjectStatusIds.Contains(x.StatusId.Value));
                     companyBasePoductionValue.OnBuildProjectCount = projectList.Count(x => x.CompanyId == production.ItemId && buildProjectId == x.StatusId.Value);
                     companyBasePoductionValue.StopBuildProjectCount = projectList.Count(x => x.CompanyId == production.ItemId && stopProjectIds.Contains(x.StatusId.Value));
-                    companyBasePoductionValue.BuildCountPercent = companyBasePoductionValue.OnContractProjectCount != 0 ? Math.Round(companyBasePoductionValue.OnBuildProjectCount.ObjToDecimal() / companyBasePoductionValue.OnContractProjectCount, 2) : 0;
+                    companyBasePoductionValue.BuildCountPercent = companyBasePoductionValue.OnContractProjectCount != 0 ? Math.Round((companyBasePoductionValue.OnBuildProjectCount.ObjToDecimal() / companyBasePoductionValue.OnContractProjectCount)*100, 2) : 0;
                     companyBasePoductionValue.FacilityCount = dayYearList.Where(x => x.DateDay == dayTime && companyProjectId.Contains(x.ProjectId)).Sum(x => x.ConstructionDeviceNum);
                     companyBasePoductionValue.WorkerCount = dayYearList.Where(x => x.DateDay == dayTime && companyProjectId.Contains(x.ProjectId)).Sum(x => x.SiteConstructionPersonNum);
                     companyBasePoductionValue.RiskWorkCount = dayYearList.Where(x => x.DateDay == dayTime && companyProjectId.Contains(x.ProjectId)).Sum(x => x.HazardousConstructionNum);
@@ -3285,12 +3287,12 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
                     //广航局每天日报产值
                     dayTotalProductionValue = companyBasePoductions.Sum(x => x.DayProductionValue);
                     //广航局总体年累产值
-                    yearTotalProductionValue = companyBasePoductions.Sum(x => x.YearCompanyProductionValue.Value);
+                    yearTotalProductionValue = companyBasePoductions.Sum(x => x.TotalYearProductionValue);
                     companyBasePoductions.Add(new CompanyBasePoductionValue()
                     {
                         Name = companyProduction.Name,
                         DayProductionValue = dayTotalProductionValue,
-                        YearCompanyProductionValue = yearTotalProductionValue,
+                        TotalYearProductionValue = yearTotalProductionValue,
                         CompanyId = companyProduction.ItemId,
                         YearProductionValueProgressPercent = 100
                     });
@@ -3310,8 +3312,9 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
                     {
                         Name = companyProduction.Name,
                         DayProductionValue = Math.Round(dayProducitionValue / baseWanConst, 2),
-                        YearCompanyProductionValue = Math.Round(totalProductionValue / baseConst, 2),
-                        CompanyId = companyProduction.ItemId
+                        TotalYearProductionValue = Math.Round(totalProductionValue / baseConst, 2),
+                        CompanyId = companyProduction.ItemId,
+                       
                     });
                 }
 
@@ -3320,7 +3323,7 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
             //计算年度产值占比
             foreach (var calcProduction in companyBasePoductions)
             {
-                calcProduction.YearProductionValueProgressPercent = Math.Round((calcProduction.YearCompanyProductionValue.Value) / yearTotalProductionValue, 2);
+                calcProduction.YearProductionValueProgressPercent = Math.Round(((calcProduction.TotalYearProductionValue) / yearTotalProductionValue)*100, 2);
             }
 
             //数据结构组合
@@ -3361,7 +3364,7 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
                 {
                     XAxle = currentNowTimeInt.ToString().Substring(0, 4) + "-" + currentNowTimeInt.ToString().Substring(4, 2) + "-" + currentNowTimeInt.ToString().Substring(6, 2),
                     YAxlePlanValue = Math.Round(dayPlanProAmount / difDays / 100000000M, 2),
-                    YAxleCompleteValue = Math.Round(companyMonthDayProduction / baseWanConst, 2)
+                    YAxleCompleteValue = Math.Round(companyMonthDayProduction / baseConst, 2)
                 });
             }
             //数据组合
@@ -3467,7 +3470,7 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
                     //施工船数量
                     var shipWorkCount = companyShipBuildInfos.Sum(x => x.BuildCount);
                     //开工率
-                    var workPercent = shipTotalCount != 0 ? Math.Round(shipWorkCount.ObjToDecimal() / shipTotalCount, 2) : 0;
+                    var workPercent = shipTotalCount != 0 ? Math.Round((shipWorkCount.ObjToDecimal() / shipTotalCount)*100, 2) : 0;
                     companyShipBuildInfos.Add(new GHMonitoringCenterApi.Application.Contracts.Dto.JjtSendMsg.CompanyShipBuildInfo()
                     {
                         AssignCount = companyShipBuildInfos.Sum(x => x.AssignCount),
@@ -3542,12 +3545,12 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
                     //船舶IDS
                     var shipIds = ownerShipList.Where(x => x.TypeId == shipProduction.ItemId).Select(x => x.PomId).ToList();
                     //当日产值
-                    var shipDayProductionValue = Math.Round(shipDayList.Where(x => x.DateDay == dayTime && shipIds.Contains(x.ShipId)).Sum(x => x.EstimatedOutputAmount).Value, 2);
+                    var shipDayProductionValue = Math.Round(shipDayList.Where(x => x.DateDay == dayTime && shipIds.Contains(x.ShipId)).Sum(x => x.EstimatedOutputAmount).Value/baseWanConst, 2);
                     //当日运转时间
                     var dayHours = shipDayList.Where(x => x.DateDay == dayTime && shipIds.Contains(x.ShipId)).Sum(x => x.Dredge ?? 0 + x.Sail ?? 0 + x.BlowingWater ?? 0
                     + x.SedimentDisposal ?? 0 + x.BlowShore ?? 0);
                     //累计数
-                    var totalYearProductionValue = shipDayList.Where(x => shipIds.Contains(x.ShipId)).Sum(x => x.EstimatedOutputAmount);
+                    var totalYearProductionValue =Math.Round(shipDayList.Where(x => shipIds.Contains(x.ShipId)).Sum(x => x.EstimatedOutputAmount.Value)/baseConst,2);
                     //当年累计运转小时
                     var yearHours = shipDayList.Where(x => shipIds.Contains(x.ShipId)).Sum(x => x.Dredge ?? 0 + x.Sail ?? 0 + x.BlowingWater ?? 0
                     + x.SedimentDisposal ?? 0 + x.BlowShore ?? 0);
@@ -3560,7 +3563,7 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
                         DayProductionValue = shipDayProductionValue == null ? 0 : shipDayProductionValue,
                         DayTurnHours = dayHours,
                         Name = shipProduction.Name,
-                        YearTotalProductionValue = totalYearProductionValue == null ? 0 : totalYearProductionValue.Value,
+                        YearTotalProductionValue = totalYearProductionValue == null ? 0 : totalYearProductionValue,
                         YearTotalTurnHours = yearHours,
                         TimePercent = timePercent,
                         OnDays = onDays,
@@ -3588,8 +3591,8 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
                 var shipDayValue = shipDayList.Where(x => x.DateDay == dayTime && x.ShipId == top.Key).Select(x => x.EstimatedOutputAmount).FirstOrDefault();
                 //计算在场天数
                 var onDays = CalcYearShipDays(movementList, new List<Guid>() { top.Key }, year);
-                //当年累计运转小时
-                var shipYearHours = shipDayList.Where(x => x.ShipId == top.Key).Sum(x => x.Dredge ?? 0 + x.Sail ?? 0 + x.BlowingWater ?? 0
+                //当天累计运转小时
+                var shipYearHours = shipDayList.Where(x => x.ShipId == top.Key&&x.DateDay==dayTime).Sum(x => x.Dredge ?? 0 + x.Sail ?? 0 + x.BlowingWater ?? 0
                     + x.SedimentDisposal ?? 0 + x.BlowShore ?? 0);
                 //时间利用率
                 var shipTimePercent = onDays != 0 ? Math.Round((shipYearHours.ObjToDecimal() / onDays / 24) * 100, 0) : 0;
@@ -3598,24 +3601,52 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
                     ShipId = top.Key,
                     ShipName = ownerShipList.Where(x => x.PomId == top.Key).Select(x => x.Name).FirstOrDefault(),
                     ShipYearOutput = Math.Round(top.Value / baseConst, 2),
-                    TimePercent = shipTimePercent
-                });
+                    TimePercent = shipTimePercent,
+                    ShipDayOutput = shipDayValue.HasValue ? Math.Round(shipDayValue.Value/baseWanConst,2) : 0,
+                    ConstructionDays= onDays,
+                     WorkingHours= shipYearHours,
+                }) ;
             }
+
+            //求合计
+            //当日总产值
+            var shiDayOutValue = shipFives.Sum(x => x.ShipDayOutput.Value);
+            //年累产值
+            var shipYearOutput = shipFives.Sum(x => x.ShipYearOutput.Value);
+            //时间利用率
+            var totalOnDays = shipFives.Sum(x => x.ConstructionDays);
+            var totalOnDayHours = shipFives.Sum(x => x.WorkingHours);
+            var totalTimePercent = totalOnDayHours != 0 ? Math.Round((totalOnDays.ObjToDecimal() / totalOnDayHours / 24) * 100, 2) : 0;
+            //文字描述
+            var totalShipValue= companyShipProductionValueInfos.Sum(x => x.YearTotalProductionValue);
+            //占自有船舶产值比例
+            var shipYearOutputPercent = totalShipValue != 0 ? Math.Round((shipYearOutput / totalShipValue) * 100, 2) : 0;
             #endregion
 
             #region 数据组合
             OwnerShipBuildInfo ownerShipBuildInfo = new OwnerShipBuildInfo()
             {
                 AssignCount = companyShipBuildInfos.Where(x => x.Name == "总计").Select(x => x.AssignCount).FirstOrDefault(),
-                AwaitCount = companyShipBuildInfos.Where(x => x.Name == "总计").Select(x => x.AssignCount).FirstOrDefault(),
-                BuildCount = companyShipBuildInfos.Where(x => x.Name == "总计").Select(x => x.AssignCount).FirstOrDefault(),
-                BuildPercent = companyShipBuildInfos.Where(x => x.Name == "总计").Select(x => x.AssignCount).FirstOrDefault(),
+                AwaitCount = companyShipBuildInfos.Where(x => x.Name == "总计").Select(x => x.AwaitCount).FirstOrDefault(),
+                BuildCount = companyShipBuildInfos.Where(x => x.Name == "总计").Select(x => x.BuildCount).FirstOrDefault(),
+                BuildPercent = companyShipBuildInfos.Where(x => x.Name == "总计").Select(x => x.BuildPercent).FirstOrDefault(),
                 TotalCount = companyShipBuildInfos.Where(x => x.Name == "总计").Select(x => x.Count).FirstOrDefault(),
                 ReconditionCount = companyShipBuildInfos.Where(x => x.Name == "总计").Select(x => x.ReconditionCount).FirstOrDefault(),
                 companyShipBuildInfos = companyShipBuildInfos,
                 companyShipProductionValueInfos = companyShipProductionValueInfos,
-                companyShipTopFiveInfoList = shipFives
+                companyShipTopFiveInfoList = shipFives,
+                 BulidProductionValue= companyShipProductionValueInfos.Where(x => x.Name == "合计").Select(x => x.DayProductionValue).FirstOrDefault(),
+                  DayTurnHours= companyShipProductionValueInfos.Where(x => x.Name == "合计").Select(x => x.DayTurnHours).FirstOrDefault(),
+                   YearTotalProductionValue= companyShipProductionValueInfos.Where(x => x.Name == "合计").Select(x => x.YearTotalProductionValue).FirstOrDefault(),
+                    YearTotalTurnHours= companyShipProductionValueInfos.Where(x => x.Name == "合计").Select(x => x.YearTotalTurnHours).FirstOrDefault(),
+                      
             };
+
+
+            jjtSendMessageMonitoringDayReportResponseDto.projectBasePoduction.YearTopFiveTotalOutput = shiDayOutValue;
+            jjtSendMessageMonitoringDayReportResponseDto.projectBasePoduction.YearFiveTotalOutput = shipYearOutput;
+            jjtSendMessageMonitoringDayReportResponseDto.projectBasePoduction.YearFiveTimeRate = shipYearOutputPercent;
+            jjtSendMessageMonitoringDayReportResponseDto.projectBasePoduction.YearTotalTopFiveOutputPercent = totalTimePercent;
             jjtSendMessageMonitoringDayReportResponseDto.OwnerShipBuildInfo = ownerShipBuildInfo;
             #endregion
 
@@ -3692,7 +3723,7 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
             foreach (var report in productionBaseInfo)
             {
                 //在建项目(所有)
-                var onBuildProjectCount = projectList.Where(x => x.StatusId == buildProjectId).Count();
+                var onBuildProjectCount = projectList.Where(x => x.StatusId == buildProjectId&&x.CompanyId==report.ItemId).Count();
                 //排除掉今天改成在建项目状态的
                 var noDayBuildProjectCount = projectList.Where(x => x.IsChangeStatus == 1 && x.UpdateTime >= startDayTime.ObjToDate() && x.UpdateTime <= endDayTime.ObjToDate()).Count();
                 //排除掉今天修改的项目状态
@@ -3705,7 +3736,7 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
                 //当日未填报项目数量（在建数量-已填报的数量）
                 var dayUnReportCount = onBuildProjectCount - dayReportCount;
                 //填报率
-                var writePercent = Math.Round((dayReportCount.ObjToDecimal() / onBuildProjectCount) * 100, 0);
+                var writePercent = onBuildProjectCount!=0 ?Math.Round((dayReportCount.ObjToDecimal() / onBuildProjectCount) * 100, 0):0;
                 companyWriteReportInfos.Add(new CompanyWriteReportInfo()
                 {
                     Name = report.Name,
@@ -3804,6 +3835,9 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
 
 
             #endregion
+
+
+
 
             responseAjaxResult.Data = jjtSendMessageMonitoringDayReportResponseDto;
             responseAjaxResult.Success();
