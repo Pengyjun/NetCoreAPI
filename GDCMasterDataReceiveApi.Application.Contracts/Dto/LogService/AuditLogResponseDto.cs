@@ -13,7 +13,14 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto.LogService
     /// </summary>
     public class AuditLogResponseDto
     {
-      
+        /// <summary>
+        /// 
+        /// </summary>
+        public string? AppKey { get; set; }
+        /// <summary>
+        /// 系统名称
+        /// </summary>
+        public string? SystemName { get; set; }
         /// <summary>
         /// 请求地址
         /// </summary>

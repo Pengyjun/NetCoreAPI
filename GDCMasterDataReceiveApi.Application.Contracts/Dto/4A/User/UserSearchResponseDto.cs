@@ -1,4 +1,5 @@
 ﻿using MiniExcelLibs.Attributes;
+using SqlSugar;
 using System.ComponentModel;
 
 namespace GDCMasterDataReceiveApi.Application.Contracts.Dto._4A.User
@@ -342,6 +343,17 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.Dto._4A.User
         /// 是否属于本系统自己新增或修改 true 是 默认false
         /// </summary>
         public bool OwnerSystem { get; set; } = false;
+
+        ///// <summary>
+        ///// 域账号
+        ///// </summary>
+        //[DisplayName("域账号")]
+        //public string? DomainAccount { get; set; }
+        ///// <summary>
+        ///// 职工号
+        ///// </summary>
+        //[DisplayName("职工号")]
+        //public string? WorkerAccount { get; set; }
     }
     /// <summary>
     /// 用户所在兼职

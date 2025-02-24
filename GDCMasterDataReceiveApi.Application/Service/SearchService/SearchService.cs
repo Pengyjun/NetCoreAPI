@@ -28,6 +28,7 @@ using GDCMasterDataReceiveApi.Application.Contracts.Dto.Regional;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.RegionalCenter;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.RelationalContracts;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.ScientifiCNoProject;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.Ship;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.UnitMeasurement;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.ValueDomain;
 using GDCMasterDataReceiveApi.Application.Contracts.IService.ISearchService;
@@ -1065,6 +1066,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     GRULE = t.GRULE,
                     NAME = t.NAME
                 })
+                .OrderBy(x => Convert.ToInt32(x.SNO))
                 .ToListAsync();
 
             #region 初始查询
@@ -1125,7 +1127,8 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     OCode = ins.OCode,
                     Sno = ins.SNO,
                 })
-            .ToList();
+                .OrderBy(x => Convert.ToInt32(x.Sno))
+                .ToList();
 
             //根节点
             var rootNode = tableList
@@ -1167,6 +1170,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                     Sno = child.Sno,
                     Children = GetInstitutionTreeChild(child.Oid, children)
                 })
+                .OrderBy(x => Convert.ToInt32(x.Sno))
                 .ToList();
 
             return childs; // 返回子节点列表
@@ -7787,6 +7791,40 @@ namespace GDCMasterDataReceiveApi.Application.Service.SearchService
                 }
             }
             return string.Empty;
+        }
+        /// <summary>
+        /// 搜索自有船舶列表
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        public async Task<ResponseAjaxResult<List<OwnerShipReponseDto>>> SearchOwnerShipListAsync(BaseRequestDto baseRequestDto)
+        {
+            ResponseAjaxResult<List<OwnerShipReponseDto>> responseAjaxResult = new ResponseAjaxResult<List<OwnerShipReponseDto>>();
+            RefAsync<int> total = 0;
+            var list = await _dbContext.Queryable<OwnerShip>().Where(x => x.IsDelete == 1)
+                .ToPageListAsync(baseRequestDto.PageIndex, baseRequestDto.PageSize, total);
+            var data = _mapper.Map<List<OwnerShipReponseDto>>(list);
+            responseAjaxResult.Count = total;
+            responseAjaxResult.Data = data;
+            responseAjaxResult.Success();
+            return responseAjaxResult;
+        }
+        /// <summary>
+        /// 搜索分包船舶列表
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        public async Task<ResponseAjaxResult<List<SubShipUserResponseDto>>> SearchSubShipListAsync(BaseRequestDto baseRequestDto)
+        {
+            ResponseAjaxResult<List<SubShipUserResponseDto>> responseAjaxResult = new ResponseAjaxResult<List<SubShipUserResponseDto>>();
+            RefAsync<int> total = 0;
+            var list = await _dbContext.Queryable<SubShip>().Where(x => x.IsDelete == 1)
+                .ToPageListAsync(baseRequestDto.PageIndex, baseRequestDto.PageSize, total);
+            var data = _mapper.Map<List<SubShipUserResponseDto>>(list);
+            responseAjaxResult.Count = total;
+            responseAjaxResult.Data = data;
+            responseAjaxResult.Success();
+            return responseAjaxResult;
         }
     }
 }

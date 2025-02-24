@@ -28,6 +28,7 @@ using GDCMasterDataReceiveApi.Application.Contracts.Dto.RegionalCenter;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.RelationalContracts;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.RoomNumber;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.ScientifiCNoProject;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.Ship;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.UnitMeasurement;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.ValueDomain;
 using GDCMasterDataReceiveApi.Domain.Models;
@@ -118,6 +119,8 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.AutoMapper
             mapperConfigurationExpression.CreateMap<UnitMeasurementItem, UnitMeasurement>();
             //多组织行政机构
             mapperConfigurationExpression.CreateMap<AdministrativeOrganizationReceiveRequestDto, AdministrativeOrganization>();
+            mapperConfigurationExpression.CreateMap<OwnerShip, OwnerShipReponseDto>();
+            mapperConfigurationExpression.CreateMap<SubShip, SubShipUserResponseDto>();
 
 
             #region 其他映射

@@ -26,6 +26,7 @@ using GDCMasterDataReceiveApi.Application.Contracts.Dto.Regional;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.RegionalCenter;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.RelationalContracts;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.ScientifiCNoProject;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.Ship;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.UnitMeasurement;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.ValueDomain;
 using GDCMasterDataReceiveApi.Application.Contracts.IService.ISearchService;
@@ -787,6 +788,7 @@ namespace GDCMasterDataReceiveApi.Controller
         /// </summary>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
+
         [HttpGet("SearchInstitutionTree")]
         [AllowAnonymous]
         public async Task<ResponseAjaxResult<List<InstitutionResponseDto>>> SearchInstitutionTreeAsync()
@@ -794,16 +796,34 @@ namespace GDCMasterDataReceiveApi.Controller
             return await _searchService.SearchInstitutionTreeAsync();
         }
 
-        /// <summary>
-        /// 111111
-        /// </summary>
-        /// <param name="jsonToSqlRequestDto"></param>
-        /// <returns></returns>
+
         //[HttpPost("Test")]
         //[AllowAnonymous]
         //public async Task<List<IConditionalModel>> TestAsync([FromBody] List<JsonToSqlRequestDto> jsonToSqlRequestDto)
         //{
         //    return await _baseService.JsonToConventSqlAsync(jsonToSqlRequestDto);
         //}
+
+        /// <summary>
+        /// 搜索自有船舶列表
+        /// </summary>
+        /// <param name="baseRequestDto"></param>
+        /// <returns></returns>
+        [HttpPost("SearchOwnerShipList")]
+        public async Task<ResponseAjaxResult<List<OwnerShipReponseDto>>> SearchOwnerShipAsync([FromBody] BaseRequestDto baseRequestDto)
+        {
+            return await _searchService.SearchOwnerShipListAsync(baseRequestDto);
+        }
+
+        /// <summary>
+        /// 搜索分包船舶列表
+        /// </summary>
+        /// <param name="baseRequestDto"></param>
+        /// <returns></returns>
+        [HttpPost("SearchSubShipList")]
+        public async Task<ResponseAjaxResult<List<SubShipUserResponseDto>>> SearchSubShipAsync([FromBody] BaseRequestDto baseRequestDto)
+        {
+            return await _searchService.SearchSubShipListAsync(baseRequestDto);
+        }
     }
 }
