@@ -1506,6 +1506,7 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
             responseAjaxResult.Success();
             return responseAjaxResult;
         }
+        #region 生产日报推送发送 旧版本
         /// <summary>
         /// 新版交建通发消息 监控运营中心图片消息
         /// </summary>
@@ -3102,6 +3103,14 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
             return responseAjaxResult;
             #endregion
         }
+
+        #endregion
+
+        #region 生产日报推送发送  新版本
+
+        #endregion
+
+
         /// <summary>
         /// 获取计划产值
         /// </summary>
