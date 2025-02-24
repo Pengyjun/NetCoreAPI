@@ -440,7 +440,7 @@ namespace GHMonitoringCenterApi.Application.Service
                 //    Id = x.PomId,
                 //    Name = x.Name
                 //}));
-               
+
                 //if (departmentList.Count != 0)
                 //{
                 //    //说明不是交建公司  或者不是超级管理员 或者不是陈翠   就不让他看水工项目
@@ -453,7 +453,7 @@ namespace GHMonitoringCenterApi.Application.Service
                 //            departmentList.Remove(res);
                 //        }
                 //    }
-                   
+
                 //}
                 responseAjaxResult.Data = departmentList;
                 responseAjaxResult.Count = departmentList.Count;
@@ -592,14 +592,15 @@ namespace GHMonitoringCenterApi.Application.Service
         {
             ResponseAjaxResult<List<BasePullDownResponseDto>> responseAjaxResult = new ResponseAjaxResult<List<BasePullDownResponseDto>>();
             var ProjectTypeList = await baseProjectTypeRepository.AsQueryable()
-             .Where(x=>x.BusinessRemark!=null)
+             .Where(x => x.BusinessRemark != null)
             .WhereIF(!string.IsNullOrWhiteSpace(projectTypRequsetDto.Name), x => SqlFunc.Contains(x.Name, projectTypRequsetDto.Name))
-                .Select(x => new BasePullDownResponseDto { Id = x.PomId, Name = x.Name,Code= x.BusinessRemark }).ToListAsync();
+                .Select(x => new BasePullDownResponseDto { Id = x.PomId, Name = x.Name, Code = x.BusinessRemark }).ToListAsync();
             if (projectTypRequsetDto.EnableRemark == 1)
             {
                 responseAjaxResult.Data = ProjectTypeList.Select(x => new BasePullDownResponseDto() { Id = x.Id, Name = x.Name + x.Code }).ToList();
             }
-            else {
+            else
+            {
                 responseAjaxResult.Data = ProjectTypeList;
             }
             responseAjaxResult.Count = ProjectTypeList.Count;
@@ -620,7 +621,7 @@ namespace GHMonitoringCenterApi.Application.Service
             var DictionaryTableList = await baseDictionaryTableRepository.AsQueryable()
                 .Where(x => x.TypeNo == baseDictionaryTableRequestDto.Type)
                 .Select(x => new BasePullDownResponseDto { Type = x.Type, Name = x.Name, Code = x.Remark })
-                .OrderBy(x=>x.Type).ToListAsync();
+                .OrderBy(x => x.Type).ToListAsync();
             responseAjaxResult.Data = DictionaryTableList;
             responseAjaxResult.Count = DictionaryTableList.Count;
             responseAjaxResult.Success();
@@ -932,8 +933,8 @@ namespace GHMonitoringCenterApi.Application.Service
                 .WhereIF(!string.IsNullOrWhiteSpace(dealingUnitRequseDto.KeyWords), x => SqlFunc.Contains(x.ZBPNAME_ZH, dealingUnitRequseDto.KeyWords))
                 // .Where(x=>x.ZBPNAME_ZH.Contains("机关") || x.ZBPNAME_ZH.Contains("本部") || x.ZBPNAME_ZH.Contains("纳税人"))
                 .Where(x => !x.ZBPNAME_ZH.Contains("汇总）") && !x.ZBPNAME_ZH.Contains("合并）"))
-               // .Where(x => x.ZBPTYPE == "01"||x.ZBPTYPE == "02" || x.ZBPTYPE == "03")
-                .OrderBy(x=>x.ZBPNAME_ZH)
+                // .Where(x => x.ZBPTYPE == "01"||x.ZBPTYPE == "02" || x.ZBPTYPE == "03")
+                .OrderBy(x => x.ZBPNAME_ZH)
                  .Select(x => new BasePullDownResponseDto { Id = x.PomId, Name = x.ZBPNAME_ZH })
                  .ToListAsync();
             ProjectDealingUnitList = ProjectDealingUnitList.Where(x => !Utils.EndsWithParenthesis(x.Name)).OrderBy(x => x.Name).ToList();
@@ -1021,7 +1022,7 @@ namespace GHMonitoringCenterApi.Application.Service
                 gUIDs.Add("6959792d-27a4-4f2b-8fa4-a44222f08cb2".ToGuid());
                 //获取自有船舶数据
                 var ownerList = await baseOwnerShipRepository.AsQueryable()
-                    .Where(x=> gUIDs.Contains(x.TypeId.Value))
+                    .Where(x => gUIDs.Contains(x.TypeId.Value))
                     .WhereIF(!string.IsNullOrWhiteSpace(requestDto.KeyWords), x => SqlFunc.Contains(x.Name, requestDto.KeyWords))
                     .Select(x => new BasePullDownResponseDto { Id = x.PomId, Name = x.Name, Type = (int)ShipType.OwnerShip })
                     .ToPageListAsync(requestDto.PageIndex, requestDto.PageSize, total);
@@ -1808,10 +1809,10 @@ namespace GHMonitoringCenterApi.Application.Service
             //项目状态Id
             List<Guid> projectStatusList = new List<Guid>()
             {
-                "2c800da1-184f-408a-b5a4-fd915e8d6b6a".ToGuid(),
-                "19050a4b-fe95-47cf-aafe-531d5894c88b".ToGuid(),
-                "cd3c6e83-1b7c-40c2-a415-5a44f13584cc".ToGuid(),
-                "75089b9a-b18b-442c-bfc8-fde4024d737f".ToGuid()
+                "2c800da1-184f-408a-b5a4-fd915e8d6b6a".ToGuid(),//在建（间歇性停工）
+                "19050a4b-fe95-47cf-aafe-531d5894c88b".ToGuid(),//在建（短暂性停工）
+                "cd3c6e83-1b7c-40c2-a415-5a44f13584cc".ToGuid(),//在建
+                //"75089b9a-b18b-442c-bfc8-fde4024d737f".ToGuid(),//中标已签的   
             };
             ResponseAjaxResult<List<ProjectInformationResponseDto>> responseAjaxResult = new ResponseAjaxResult<List<ProjectInformationResponseDto>>();
             var oids = await dbContext.Queryable<Institution>().Where(x => x.IsDelete == 1 && x.Oid == _currentUser.CurrentLoginInstitutionOid).SingleAsync();
@@ -2451,8 +2452,8 @@ namespace GHMonitoringCenterApi.Application.Service
                 var userAccount = userInformation.Data.Select(x => x.Name).ToList();
                 var userList = await baseUserRepository.AsQueryable().Where(x => userAccount.Contains(x.GroupCode))
                     .WhereIF(baseRequestDto.KeyWords != null, x => x.Name.Contains(baseRequestDto.KeyWords) || x.Phone.Contains(baseRequestDto.KeyWords))
-                    .OrderByDescending(x=>x.CreateTime)
-                    .Select( x => new InformationResponseDto
+                    .OrderByDescending(x => x.CreateTime)
+                    .Select(x => new InformationResponseDto
                     {
                         UserId = x.Id,
                         Name = x.Name + "(" + x.Phone + ")",
@@ -2461,7 +2462,7 @@ namespace GHMonitoringCenterApi.Application.Service
                         DepartmentName = x.DepartmentId.ToString(),
                         Phone = x.Phone
                     }).ToListAsync();
-                
+
                 var userList1 = await baseUserRepository.AsQueryable().Where(x => !userAccount.Contains(x.GroupCode) && roleUserList.Contains(x.Id))
                     .WhereIF(baseRequestDto.KeyWords != null, x => x.Name.Contains(baseRequestDto.KeyWords) || x.Phone.Contains(baseRequestDto.KeyWords))
                     .Select(x => new InformationResponseDto
@@ -2498,12 +2499,12 @@ namespace GHMonitoringCenterApi.Application.Service
             else
             {
                 var userList = await baseUserRepository.AsQueryable()
-                    .Where(x=> roleUserList.Contains(x.Id))
+                    .Where(x => roleUserList.Contains(x.Id))
                     .WhereIF(baseRequestDto.KeyWords != null, x => x.Name.Contains(baseRequestDto.KeyWords) || x.Phone.Contains(baseRequestDto.KeyWords))
                     .Select(x => new InformationResponseDto
                     {
                         UserId = x.Id,
-                        Name = x.Name+ "(" + x.Phone + ")",
+                        Name = x.Name + "(" + x.Phone + ")",
                         LoginAccount = "2",
                         Company = x.CompanyId.ToString(),
                         DepartmentName = x.DepartmentId.ToString(),
@@ -2525,14 +2526,14 @@ namespace GHMonitoringCenterApi.Application.Service
             }
             return responseAjaxResult;
         }
-       public async Task<ResponseAjaxResult<List<BasePullDownResponseDto>>> SearchProjectAsync(BaseRequestDto baseRequestDto)
+        public async Task<ResponseAjaxResult<List<BasePullDownResponseDto>>> SearchProjectAsync(BaseRequestDto baseRequestDto)
         {
             ResponseAjaxResult<List<BasePullDownResponseDto>> responseAjaxResult = new ResponseAjaxResult<List<BasePullDownResponseDto>>();
-            responseAjaxResult.Data=await dbContext.Queryable<Project>().Where(x => x.IsDelete == 1)
-                .WhereIF(!string.IsNullOrWhiteSpace(baseRequestDto.KeyWords),x=>x.Name.Contains(baseRequestDto.KeyWords)||
+            responseAjaxResult.Data = await dbContext.Queryable<Project>().Where(x => x.IsDelete == 1)
+                .WhereIF(!string.IsNullOrWhiteSpace(baseRequestDto.KeyWords), x => x.Name.Contains(baseRequestDto.KeyWords) ||
                 x.ShortName.Contains(baseRequestDto.KeyWords))
-                .Select(x=>new BasePullDownResponseDto() { Code=x.MasterCode,Name=x.Name, Id=x.Id }) .ToListAsync();
-            responseAjaxResult.Count= responseAjaxResult.Data.Count;
+                .Select(x => new BasePullDownResponseDto() { Code = x.MasterCode, Name = x.Name, Id = x.Id }).ToListAsync();
+            responseAjaxResult.Count = responseAjaxResult.Data.Count;
             responseAjaxResult.Success();
             return responseAjaxResult;
         }
@@ -2551,22 +2552,22 @@ namespace GHMonitoringCenterApi.Application.Service
             ResponseAjaxResult<bool> responseAjaxResult = new ResponseAjaxResult<bool>();
             List<HolidayConfig> holidayConfigs = new List<HolidayConfig>();
             WebHelper webHelper = new WebHelper();
-            var url=  AppsettingsHelper.GetValue("Holidays").Replace("@year",year.ToString());
-            var responseData=await webHelper.DoGetAsync(url);
+            var url = AppsettingsHelper.GetValue("Holidays").Replace("@year", year.ToString());
+            var responseData = await webHelper.DoGetAsync(url);
 
-            if (responseData.Code == 200 && responseData.Result!=null)
+            if (responseData.Code == 200 && responseData.Result != null)
             {
                 //解析json
-                var parseData=JObject.Parse(responseData.Result).Values();
+                var parseData = JObject.Parse(responseData.Result).Values();
                 foreach (var item in parseData)
                 {
                     holidayConfigs.Add(new HolidayConfig()
                     {
                         Id = GuidUtil.Next(),
                         Title = item["name"].ToString(),
-                        IsHoliday = item["isOffDay"].ToString()== "True" ? 1 : 0,
+                        IsHoliday = item["isOffDay"].ToString() == "True" ? 1 : 0,
                         HolidayTime = item["date"].ToString().ObjToDate(),
-                         DateDay=int.Parse(item["date"].ToString().ObjToDate().ToString("yyyyMMdd"))
+                        DateDay = int.Parse(item["date"].ToString().ObjToDate().ToString("yyyyMMdd"))
 
                     });
                 }
@@ -2592,9 +2593,9 @@ namespace GHMonitoringCenterApi.Application.Service
         {
             ResponseAjaxResult<List<BasePullDownResponseDto>> responseAjaxResult = new ResponseAjaxResult<List<BasePullDownResponseDto>>();
             var ProjectTypeList = await dbContext.Queryable<ProjectMangerType>()
-             .Where(x => x.IsDelete==1)
+             .Where(x => x.IsDelete == 1)
             .WhereIF(!string.IsNullOrWhiteSpace(projectTypRequsetDto.Name), x => SqlFunc.Contains(x.Name, projectTypRequsetDto.Name))
-             .Select(x => new BasePullDownResponseDto { Id = x.Id, Name = x.Name, Type =SqlFunc.ToInt32(x.Code),Code=x.BusinessRemark}).OrderBy(x=>x.Type).ToListAsync();
+             .Select(x => new BasePullDownResponseDto { Id = x.Id, Name = x.Name, Type = SqlFunc.ToInt32(x.Code), Code = x.BusinessRemark }).OrderBy(x => x.Type).ToListAsync();
             if (projectTypRequsetDto.EnableRemark == 1)
             {
                 responseAjaxResult.Data = ProjectTypeList.Select(x => new BasePullDownResponseDto() { Id = x.Id, Type = x.Type, Name = x.Name + x.Code }).ToList();
@@ -2618,8 +2619,9 @@ namespace GHMonitoringCenterApi.Application.Service
             var pushJjtUserList = await dbContext.Queryable<DayReportJjtPushConfi>().Where(x => x.IsDelete == 1 && x.Type == 7).Select(x => x.PushAccount).ToListAsync();
             //九点第一批人员发送
             var obj = new SingleMessageTemplateRequestDto()
-            { MessageType = "text",
-                TextContent ="您好:"+DateTime.Now.AddDays(-1).ToString("MM月dd") + "日报还未审核,请登录智慧运营中心-日报推送审核页面进行审核",
+            {
+                MessageType = "text",
+                TextContent = "您好:" + DateTime.Now.AddDays(-1).ToString("MM月dd") + "日报还未审核,请登录智慧运营中心-日报推送审核页面进行审核",
                 UserIds = pushJjtUserList
             };
             var pushResult = JjtUtils.SinglePushMessage(obj, false);
@@ -2650,19 +2652,20 @@ namespace GHMonitoringCenterApi.Application.Service
                 responseAjaxResult.Data = true;
                 responseAjaxResult.Success();
             }
-            else {
+            else
+            {
                 responseAjaxResult.Data = false;
                 responseAjaxResult.Success("您没有权限审核", HttpStatusCode.VerifyFail);
                 return responseAjaxResult;
             }
-            
+
             return responseAjaxResult;
         }
         public async Task<ResponseAjaxResult<string>> SearchDayReportApproveAsync()
         {
             ResponseAjaxResult<string> responseAjaxResult = new ResponseAjaxResult<string>();
             var time = DateTime.Now.AddDays(-1).ToDateDay();
-            var staus= await dbContext.Queryable<DayPushApprove>().Where(x=>x.DayTime== time).Select(x=>x.Status).FirstAsync();
+            var staus = await dbContext.Queryable<DayPushApprove>().Where(x => x.DayTime == time).Select(x => x.Status).FirstAsync();
             responseAjaxResult.Data = staus;
             responseAjaxResult.Success();
             return responseAjaxResult;
@@ -2705,13 +2708,14 @@ namespace GHMonitoringCenterApi.Application.Service
         #region 控制项目隐藏 日报推送使用
 
         ///控制项目隐藏 日报推送使用
-        public async Task<ResponseAjaxResult<bool>> UpdateShowProjectAsync(Guid projectId) 
+        public async Task<ResponseAjaxResult<bool>> UpdateShowProjectAsync(Guid projectId)
         {
             ResponseAjaxResult<bool> responseAjaxResult = new ResponseAjaxResult<bool>();
-            var project= await dbContext.Queryable<ProjectOpen>().Where(x => x.ProjectId == projectId).FirstAsync();
+            var project = await dbContext.Queryable<ProjectOpen>().Where(x => x.ProjectId == projectId).FirstAsync();
             if (project == null)
             {
-               await dbContext.Insertable<ProjectOpen>(new ProjectOpen() {
+                await dbContext.Insertable<ProjectOpen>(new ProjectOpen()
+                {
                     ProjectId = projectId,
                     IsShow = 0
                 }).ExecuteCommandAsync();
@@ -2734,7 +2738,7 @@ namespace GHMonitoringCenterApi.Application.Service
         public async Task<ResponseAjaxResult<List<ProjectOpen>>> SelectShowProjectAsync()
         {
             ResponseAjaxResult<List<ProjectOpen>> responseAjaxResult = new ResponseAjaxResult<List<ProjectOpen>>();
-            responseAjaxResult.Data= await dbContext.Queryable<ProjectOpen>().Where(x => x.IsDelete == 1).ToListAsync();
+            responseAjaxResult.Data = await dbContext.Queryable<ProjectOpen>().Where(x => x.IsDelete == 1).ToListAsync();
             responseAjaxResult.Success();
             return responseAjaxResult;
         }
