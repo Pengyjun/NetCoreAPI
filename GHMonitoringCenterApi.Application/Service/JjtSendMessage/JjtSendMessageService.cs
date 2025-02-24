@@ -1874,10 +1874,27 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
                 var timeProgress = Math.Round((dayOfYear / 365M) * 100, 2);
                 if (item.Collect == 0)
                 {
-
-                   
-                    //var totalYearProductionValue = Math.Round(((item.YearProductionValue + currentMonthCompanyCount) / 100000000), 2);
                     var totalYearProductionValue = Math.Round(((currentMonthCompanyCount) / 100000000), 2);
+                    if (item.Name == "疏浚公司")
+                    {
+                        companyBasePoductionValues.Add(new CompanyBasePoductionValue()
+                        {
+                            CompanyId = item.ItemId,
+                            CompanyDayProductionValue = currentCompanyCount,
+                            YearCompanyProductionValue = currentMonthCompanyCount,
+                            Name = item.Name,
+                            DayProductionValue = Math.Round(currentCompanyCount / 10000, 2),
+                            TotalYearProductionValue = totalYearProductionValue-0.03M,
+                            //TotalYearProductionValue = companyMonthProductionValue.Sum(x => x.PlanProductionValue), //totalYearProductionValue,
+                            YearProductionValueProgressPercent = yearProductionValuePercent,
+                            ProductionValueProgressPercent = productionValueProgressPercent,
+                            //SupersequenceProgress = supersequenceProgress
+                        });
+                    }
+                    else { 
+
+                        //var totalYearProductionValue = Math.Round(((item.YearProductionValue + currentMonthCompanyCount) / 100000000), 2);
+                
                     //超序时进度
                     var supersequenceProgress = yearIndex.Value != 0 ? (Math.Round((totalYearProductionValue / yearIndex.Value) * 100, 2) - timeProgress) : 0;
                     companyBasePoductionValues.Add(new CompanyBasePoductionValue()
@@ -1893,6 +1910,8 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
                         ProductionValueProgressPercent = productionValueProgressPercent,
                         SupersequenceProgress = supersequenceProgress
                     }) ;
+
+                   }
                 }
                 else
                 {

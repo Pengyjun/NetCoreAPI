@@ -128,7 +128,7 @@ namespace GHMonitoringCenterApi.Application.Service.ProjectProductionReport
         /// <param name="dayReports"></param>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
-        public async Task<SumDayValue> GetSumDayValueAsync(List<DayReportInfo> dayReports)
+        public async Task<SumDayValue> GetSumDayValueAsync(List<DayReportInfo> dayReports, ProductionSafetyRequestDto searchRequestDto)
         {
             SumDayValue sumInfo = new SumDayValue();
             var dayIds = dayReports.Select(x => x.DayId).ToList();
@@ -158,7 +158,7 @@ namespace GHMonitoringCenterApi.Application.Service.ProjectProductionReport
             //     .WhereIF(dayConstructionIds.Count > 0, x => !dayConstructionIds.Contains(x.ProjectId))
             //    .Sum(x => x.ActualDailyProductionAmount), 2);
             var pIds = new List<Guid>();
-            if (_currentUser.CurrentLoginIsAdmin || _currentUser.CurrentLoginInstitutionOid == "101162350")
+            if (_currentUser.CurrentLoginIsAdmin || _currentUser.CurrentLoginInstitutionOid == "101162350" || !string.IsNullOrWhiteSpace(searchRequestDto.CompanyId.ToString()))
             {
                 //获取分包项目
                 pIds = await dbContext.Queryable<Project>().Where(x => x.IsDelete == 1 && x.IsSubContractProject == 2).Select(x => x.Id).ToListAsync();
@@ -453,7 +453,7 @@ namespace GHMonitoringCenterApi.Application.Service.ProjectProductionReport
             }
 
             #region 获取所有数据  合计值
-            responseDtos.sumDayValue = await GetSumDayValueAsync(list);
+            responseDtos.sumDayValue = await GetSumDayValueAsync(list, searchRequestDto);
             #endregion
             #region 是否全量导出
             //是否全量导出
@@ -1542,8 +1542,8 @@ namespace GHMonitoringCenterApi.Application.Service.ProjectProductionReport
         public async Task<ResponseAjaxResult<bool>> UpdateDayReportDeviationAsync(UpdateDayDeviationRequestDto requestDto)
         {
             ResponseAjaxResult<bool> responseAjaxResult = new ResponseAjaxResult<bool>();
-            var dayTime=DateTime.Today.AddDays(-1).ToDateDay();
-            var dailyDeviation = await dbContext.Queryable<DailyDeviation>().Where(t => t.IsDelete == 1 && t.ProjectId == requestDto.ProjectId&&t.dateday== dayTime).FirstAsync();
+            var dayTime = DateTime.Today.AddDays(-1).ToDateDay();
+            var dailyDeviation = await dbContext.Queryable<DailyDeviation>().Where(t => t.IsDelete == 1 && t.ProjectId == requestDto.ProjectId && t.dateday == dayTime).FirstAsync();
             if (dailyDeviation != null)
             {
                 dailyDeviation.DayActualProductionAmountDeviation = requestDto.DayActualProductionAmountDeviation;
@@ -1551,7 +1551,7 @@ namespace GHMonitoringCenterApi.Application.Service.ProjectProductionReport
             }
             else
             {
-               var  companyId=await dbContext.Queryable<Project>().Where(x => x.Id == requestDto.ProjectId).FirstAsync();
+                var companyId = await dbContext.Queryable<Project>().Where(x => x.Id == requestDto.ProjectId).FirstAsync();
                 DailyDeviation daily = new DailyDeviation();
                 daily.Id = GuidUtil.Next();
                 daily.ProjectId = requestDto.ProjectId;

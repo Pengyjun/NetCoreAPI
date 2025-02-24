@@ -34,7 +34,7 @@ namespace GHMonitoringCenterApi.Application.Contracts.IService.ProjectProduction
         /// 获取产值日报需要计算的合计值
         /// </summary>
         /// <returns></returns>
-        Task<SumDayValue> GetSumDayValueAsync(List<DayReportInfo> dayReports);
+        Task<SumDayValue> GetSumDayValueAsync(List<DayReportInfo> dayReports, ProductionSafetyRequestDto searchRequestDto);
 
         /// <summary>
         /// 获取产值日报处理过的数据
