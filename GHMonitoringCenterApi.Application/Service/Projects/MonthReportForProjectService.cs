@@ -458,6 +458,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 //新项目处理逻辑  赋初始值
                 if (!calculatePWBS.Any())
                 {
+                    var shipid = GuidUtil.Next();
                     calculatePWBS = await _dbContext.Queryable<ProjectWBS>()
                   .Where(p => !string.IsNullOrEmpty(p.ProjectId.ToString()) && SqlFunc.ToGuid(p.ProjectId) == pId)
                   .Select((p) => new ProjectWBSDto
@@ -470,7 +471,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                       DateYear = DateTime.Now.Year,
                       ValueType = ValueEnumType.AccumulatedCommencement,
                       DetailId = p.Id,
-                      ShipId = new Guid(),
+                      ShipId = shipid,
                       OutPutType = ConstructionOutPutType.Self,
                       CurrencyId = project.CurrencyId
                   })
