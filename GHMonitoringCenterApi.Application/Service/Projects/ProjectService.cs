@@ -42,6 +42,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
         public IBaseRepository<ProjectLeader> baseProjectLeaderRepository { get; set; }
         public IPushPomService _pushPomService { get; set; }
         public IBaseService baseService { get; set; }
+        public IProjectReportService iProjectReportService { get; set; }
         public ILogService logService { get; set; }
         public IEntityChangeService entityChangeService { get; set; }
 
@@ -55,7 +56,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
         private CurrentUser _currentUser { get { return _globalObject.CurrentUser; } }
 
         //public ActionExecutingContext context { get; set; }
-        public ProjectService(IBaseRepository<ProjectWbsHistoryMonth> baseProjectWbsHistory, IBaseRepository<ProjectWBS> baseProjectWBSRepository, ISqlSugarClient dbContext, IMapper mapper, IBaseRepository<Files> baseFilesRepository, IBaseRepository<ProjectOrg> baseProjectOrgRepository, IBaseRepository<ProjectLeader> baseProjectLeaderRepository, IPushPomService pushPomService, IBaseService baseService, ILogService logService, IEntityChangeService entityChangeService, GlobalObject globalObject, IBaseRepository<Project> baseProjects)
+        public ProjectService(IBaseRepository<ProjectWbsHistoryMonth> baseProjectWbsHistory, IBaseRepository<ProjectWBS> baseProjectWBSRepository, ISqlSugarClient dbContext, IMapper mapper, IBaseRepository<Files> baseFilesRepository, IBaseRepository<ProjectOrg> baseProjectOrgRepository, IBaseRepository<ProjectLeader> baseProjectLeaderRepository, IPushPomService pushPomService, IBaseService baseService, ILogService logService, IEntityChangeService entityChangeService, GlobalObject globalObject, IBaseRepository<Project> baseProjects, IProjectReportService iProjectReportService)
         {
             this.baseProjectWBSRepository = baseProjectWBSRepository;
             this.dbContext = dbContext;
@@ -70,6 +71,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             this._globalObject = globalObject;
             this.baseProjectWbsHistory = baseProjectWbsHistory;
             this.baseProjects = baseProjects;
+            this.iProjectReportService = iProjectReportService;
             //this.context = context;
         }
         #endregion
@@ -3964,6 +3966,152 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
         }
         #endregion
 
+        #region 项目年初计划
+        /// <summary>
+        /// 列表
+        /// </summary>
+        /// <param name="requestBody"></param>
+        /// <returns></returns>
+        public async Task<ResponseAjaxResult<SearchProjectAnnualProduction>> SearchProjectAnnualProductionAsync(SearchProjectAnnualProductionRequest requestBody)
+        {
+            ResponseAjaxResult<SearchProjectAnnualProduction> rt = new();
+            SearchProjectAnnualProduction rr = new();
+            List<SearchProjectAnnualProductionDto> rsList = new();
+
+            //初始化
+            RefAsync<int> total = 0;
+            List<ProjectAnnualProduction> pPlanProduction = new();
+
+            // 初始化公司键值对，包含序号
+            var companyDictionary = KeyValuePairs();
+
+            //授权用户得到的公司ids
+            var userAuthForData = await iProjectReportService.GetCurrentUserAuthForDataAsync();
+            if (_currentUser.CurrentLoginIsAdmin == true)
+            {
+                pPlanProduction = await dbContext.Queryable<ProjectAnnualProduction>()
+                    .WhereIF(!string.IsNullOrWhiteSpace(requestBody.ProjectId.ToString()), t => t.ProjectId == requestBody.ProjectId)
+                    .Where(t => t.IsDelete == 1)
+                    .ToPageListAsync(requestBody.PageIndex, requestBody.PageSize, total);
+            }
+            else
+            {
+                var companyIds = userAuthForData.CompanyIds.ToList();
+                pPlanProduction = await dbContext.Queryable<ProjectAnnualProduction>()
+                    .WhereIF(!string.IsNullOrWhiteSpace(requestBody.ProjectId.ToString()), t => t.ProjectId == requestBody.ProjectId)
+                    .Where(t => t.IsDelete == 1 && companyIds.Contains(t.CompanyId))
+                    .ToPageListAsync(requestBody.PageIndex, requestBody.PageSize, total);
+            }
+            if (!pPlanProduction.Any())
+            {
+                return rt;
+            }
+            var pIds = pPlanProduction.Select(x => x.ProjectId).ToList();
+
+            //项目基本信息
+            var projects = await dbContext.Queryable<Project>().Where(t => t.IsDelete == 1 && pIds.Contains(t.Id)).Select(x => new { x.Id, x.CurrencyId, x.ShortName, x.ECAmount, x.ContractStipulationEndDate }).ToListAsync();
+
+            var ships = await dbContext.Queryable<OwnerShip>().Where(t => t.IsDelete == 1).ToListAsync();
+
+            //项目开累产值   24年调整最终版本+至今为止月报数据
+            var monthReport = await dbContext.Queryable<MonthReport>().Where(t => t.IsDelete == 1 && pIds.Contains(t.ProjectId)).ToListAsync();
+            var monthReport24 = await dbContext.Queryable<MonthReportDetailHistory>().Where(t => pIds.Contains(t.ProjectId)).ToListAsync();
+
+            if (!string.IsNullOrWhiteSpace(requestBody.ProjectId.ToString()))
+            {
+                decimal completeAmount = 0M;//完成产值
+                decimal accumulatedOutputValue = 0M;//开累产值
+                var pp = projects.FirstOrDefault(x => x.Id == requestBody.ProjectId);
+                if (pp != null)
+                {
+                    var dateMonth = DateTime.Now.ToDateMonth();
+                    var yearMonth = Convert.ToInt32(DateTime.Now.Year + "01");
+                    if (pp.CurrencyId == "2a0e99b4-f989-4967-b5f1-5519091d4280".ToGuid())//国内
+                    {
+                        accumulatedOutputValue = monthReport24.Where(x => x.ProjectId == pp.Id).Sum(x => Convert.ToDecimal(x.ActualCompAmount));//开累
+                    }
+                    else
+                    {
+                        accumulatedOutputValue = monthReport24.Where(x => x.ProjectId == pp.Id).Sum(x => Convert.ToDecimal(x.RMBHValue));//开累
+                    }
+                    //截止到当月的完成产值+历史调整开累产值=开累产值
+                    accumulatedOutputValue += monthReport.Where(x => x.ProjectId == pp.Id && x.DateMonth > 202412 && x.DateMonth <= dateMonth).Sum(x => x.CompleteProductionAmount);
+                    //2024年调整的开累数+截止到当年一月的开累数（年初开累产值）
+                    completeAmount = accumulatedOutputValue + monthReport.Where(x => x.ProjectId == pp.Id && x.DateMonth > 202412 && x.DateMonth < yearMonth).Sum(x => x.CompleteProductionAmount);
+
+                    rr.ProjectName = pp.ShortName;
+                    rr.EffectiveAmount = Convert.ToDecimal(pp.ECAmount);
+                    rr.ContractStipulationEndDate = pp.ContractStipulationEndDate?.ToString("yyyy-MM-dd");
+                    rr.RemainingAmount = Convert.ToDecimal(pp.ECAmount) - completeAmount;
+                    rr.AccumulatedOutputValue = accumulatedOutputValue;
+                }
+            }
+
+            foreach (var item in pPlanProduction)
+            {
+                SearchProjectAnnualProductionDto ppChild = new();
+                ppChild.JanuaryProductionQuantity = item.JanuaryProductionQuantity;
+                ppChild.JanuaryProductionValue = item.JanuaryProductionValue;
+                ppChild.FebruaryProductionQuantity = item.FebruaryProductionQuantity;
+                ppChild.FebruaryProductionValue = item.FebruaryProductionValue;
+                ppChild.MarchProductionQuantity = item.MarchProductionQuantity;
+                ppChild.MarchProductionValue = item.MarchProductionValue;
+                ppChild.AprilProductionQuantity = item.AprilProductionQuantity;
+                ppChild.AprilProductionValue = item.AprilProductionValue;
+                ppChild.MayProductionQuantity = item.MayProductionQuantity;
+                ppChild.MayProductionValue = item.MayProductionValue;
+                ppChild.JuneProductionQuantity = item.JuneProductionQuantity;
+                ppChild.JuneProductionValue = item.JuneProductionValue;
+                ppChild.JulyProductionQuantity = item.JulyProductionQuantity;
+                ppChild.JulyProductionValue = item.JulyProductionValue;
+                ppChild.AugustProductionValue = item.AugustProductionValue;
+                ppChild.AugustProductionQuantity = item.AugustProductionQuantity;
+                ppChild.SeptemberProductionQuantity = item.SeptemberProductionQuantity;
+                ppChild.SeptemberProductionValue = item.SeptemberProductionValue;
+                ppChild.OctoberProductionQuantity = item.OctoberProductionQuantity;
+                ppChild.OctoberProductionValue = item.OctoberProductionValue;
+                ppChild.NovemberProductionQuantity = item.NovemberProductionQuantity;
+                ppChild.NovemberProductionValue = item.NovemberProductionValue;
+                ppChild.DecemberProductionQuantity = item.DecemberProductionQuantity;
+                ppChild.DecemberProductionValue = item.DecemberProductionValue;
+                ppChild.ShipId = item.ShipId;
+                ppChild.ShipName = ships.FirstOrDefault(x => item.ShipId == x.PomId)?.Name;
+                //排序
+                if (companyDictionary.TryGetValue(item.CompanyId, out var companyInfo))
+                {
+                    ppChild.Sequence = companyInfo.Sequence;
+                }
+                rsList.Add(ppChild);
+            }
+
+            rsList = rsList.OrderBy(x => x.Sequence).ToList();
+            rt.Count = rsList.Count;
+            rr.SearchProjectAnnualProductionDto = rsList;
+            return rt.SuccessResult(rr);
+        }
+
+        /// <summary>
+        /// 公司初始化
+        /// </summary>
+        /// <returns></returns>
+        private Dictionary<Guid, (string Name, int Sequence)> KeyValuePairs()
+        {
+            return new Dictionary<Guid, (string, int)>
+            {
+                { "c0d51e81-03dd-4ef8-bd83-6eb1355879e1".ToGuid(), ("五公司", 5) },
+                { "bd840460-1e3a-45c8-abed-6e66903eb465".ToGuid(), ("直营项目", 9) },
+                { "5a8f39de-8515-456b-8620-c0d01c012e04".ToGuid(), ("四公司", 4) },
+                { "3c5b138b-601a-442a-9519-2508ec1c1eb2".ToGuid(), ("疏浚公司", 1) },
+                { "65052a94-6ea7-44ba-96b4-cf648de0d28a".ToGuid(), ("福建公司", 6) },
+                { "a8db9bb0-4667-4320-b03d-b0b7f8728b61".ToGuid(), ("交建公司", 2) },
+                { "11c9c978-9ef3-411d-ba70-0d0eed93e048".ToGuid(), ("三公司", 3) },
+                { "01ff7a0e-e827-4b46-9032-0a540ce1fba3".ToGuid(), ("菲律宾公司", 7) },
+                { "9930ca6d-7131-4a2a-8b75-ced9c0579b8c".ToGuid(), ("广航水利", 8) }
+            };
+        }
+
+        #endregion
+
 
         #region 获取每年的节假日
         public bool GetHolidays()
@@ -3972,6 +4120,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             url = url.Replace("year", DateTime.Now.Year.ToString());
             return false;
         }
+
 
 
 

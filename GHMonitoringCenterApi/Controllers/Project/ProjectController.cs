@@ -2358,5 +2358,20 @@ namespace GHMonitoringCenterApi.Controllers.Project
 
 
         #endregion
+
+        #region 项目年初计划
+        /// <summary>
+        /// 列表
+        /// </summary>
+        /// <param name="requestBody"></param>
+        /// <returns></returns>
+        [HttpGet("SearchProjectAnnualProduction")]
+        public async Task<ResponseAjaxResult<SearchProjectAnnualProduction>> SearchProjectAnnualProductionAsync([FromQuery] SearchProjectAnnualProductionRequest requestBody)
+        {
+            return await projectService.SearchProjectAnnualProductionAsync(requestBody);
+        }
+
+
+        #endregion
     }
 }

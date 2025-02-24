@@ -255,5 +255,11 @@ namespace GHMonitoringCenterApi.Application.Contracts.IService.Project
         Task<ResponseAjaxResult<bool>> SaveBtnEditReportAsync(SaveBtnEditMonthlyReport requestBody);
         bool aa();
         bool GetHolidays();
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="requestBody"></param>
+        /// <returns></returns>
+        Task<ResponseAjaxResult<SearchProjectAnnualProduction>> SearchProjectAnnualProductionAsync(SearchProjectAnnualProductionRequest requestBody);
     }
 }

@@ -1,4 +1,5 @@
 ﻿
+using GHMonitoringCenterApi.Application.Contracts.Dto.Common;
 using GHMonitoringCenterApi.Application.Contracts.Dto.File;
 using GHMonitoringCenterApi.Application.Contracts.Dto.Project;
 using GHMonitoringCenterApi.Application.Contracts.Dto.Project.Report;
@@ -233,5 +234,7 @@ namespace GHMonitoringCenterApi.Application.Contracts.IService.Project
         /// <param name="id"></param>
         /// <returns></returns>
         Task<ResponseAjaxResult<List<DangerousDetailsResponse>>> DangerousDetailsByDayRepIdAsync(string id);
+
+        Task<UserAuthForDataDto> GetCurrentUserAuthForDataAsync();
     }
 }
