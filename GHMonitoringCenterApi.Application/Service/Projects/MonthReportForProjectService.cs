@@ -455,6 +455,28 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                    })
                    .ToListAsync();
 
+                //新项目处理逻辑
+                if (!calculatePWBS.Any())
+                {
+                    calculatePWBS = await _dbContext.Queryable<ProjectWBS>()
+                  .Where(p => !string.IsNullOrEmpty(p.ProjectId.ToString())  && SqlFunc.ToGuid(p.ProjectId) == pId)
+                  .Select((p) => new ProjectWBSDto
+                  {
+                      Id = p.Id,
+                      ProjectId = p.ProjectId.ToString(),
+                      ProjectWBSId = p.Id,
+                      UnitPrice = p.UnitPrice,
+                      DateMonth =SqlFunc.ToInt32( dateMonth),
+                      DateYear =DateTime.Now.Year,
+                      ValueType = ValueEnumType.AccumulatedCommencement,
+                      DetailId = p.Id,
+                      CurrencyId = project.CurrencyId
+                  })
+                  .ToListAsync();
+                }
+
+
+
                 if (exhaustedBtn == true)
                 {
                     calculatePWBS = calculatePWBS.Where(x => x.DateMonth <= 202412).ToList();
