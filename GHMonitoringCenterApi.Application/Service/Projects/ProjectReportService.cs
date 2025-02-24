@@ -4018,7 +4018,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                         }
                     }
 
-                    if (oCurMonthRp == null && outMonthRp == null)//项目是新增的
+                    if (!oCurMonthRp.Any() && !outMonthRp.Any())//项目是新增的
                     {
                         //新增本月的数据
                         addDetails.Add(new MonthReportDetail
