@@ -516,6 +516,11 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.JjtSendMsg
         /// 当年累计运转小时
         /// </summary>
         public decimal YearTotalTurnHours { get; set; }
+
+        /// <summary>
+        /// 在场天数
+        /// </summary>
+        public decimal OnDays { get; set; }
     }
     #endregion
 

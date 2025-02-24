@@ -6693,6 +6693,11 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
         public static int CalcUnWriteReport(DayWriteReportRecord dayWriteReportRecords, int dayTime)
         {
             var connt = 0;
+            if (dayWriteReportRecords == null)
+            {
+                return connt;
+            }
+           
             if (dayTime == 27)
             {
                 connt += dayWriteReportRecords.TwentySix == null ? 1 : 0;
