@@ -26,6 +26,12 @@ namespace GHMonitoringCenterApi.Application.Contracts.IService.Timing
         /// <returns></returns>
         Task<ResponseAjaxResult<bool>> SynchronizationDayProductionAsync();
 
+        /// <summary>
+        /// 刷 项目日报填报信息
+        /// </summary>
+        /// <returns></returns>
+        Task<ResponseAjaxResult<bool>> SynchronizationProjectReportAsync(int daytime,bool isAll=false);
+
         Task<string> SynchronizationDealUnitsync();
 
         Task<string> SynchronizationDealUnitNewsync();

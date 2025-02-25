@@ -3641,16 +3641,12 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
                     YearTotalTurnHours= companyShipProductionValueInfos.Where(x => x.Name == "合计").Select(x => x.YearTotalTurnHours).FirstOrDefault(),
                       
             };
-
-
             jjtSendMessageMonitoringDayReportResponseDto.projectBasePoduction.YearTopFiveTotalOutput = shiDayOutValue;
             jjtSendMessageMonitoringDayReportResponseDto.projectBasePoduction.YearFiveTotalOutput = shipYearOutput;
             jjtSendMessageMonitoringDayReportResponseDto.projectBasePoduction.YearFiveTimeRate = shipYearOutputPercent;
             jjtSendMessageMonitoringDayReportResponseDto.projectBasePoduction.YearTotalTopFiveOutputPercent = totalTimePercent;
             jjtSendMessageMonitoringDayReportResponseDto.OwnerShipBuildInfo = ownerShipBuildInfo;
             #endregion
-
-
 
             #endregion
 
@@ -3725,26 +3721,44 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
                 //在建项目(所有)
                 var onBuildProjectCount = projectList.Where(x => x.StatusId == buildProjectId&&x.CompanyId==report.ItemId).Count();
                 //排除掉今天改成在建项目状态的
-                var noDayBuildProjectCount = projectList.Where(x => x.IsChangeStatus == 1 && x.UpdateTime >= startDayTime.ObjToDate() && x.UpdateTime <= endDayTime.ObjToDate()).Count();
+                var noDayBuildProjectCount = projectList.Where(x => x.StatusId == buildProjectId&&x.CompanyId==report.ItemId && x.IsChangeStatus == 1 && x.UpdateTime >= startDayTime.ObjToDate() && x.UpdateTime <= endDayTime.ObjToDate()).Select(x => x.Id).Count();
                 //排除掉今天修改的项目状态
                 onBuildProjectCount = onBuildProjectCount - noDayBuildProjectCount;
                 //项目Ids
                 var companyProjectId = projectList.Where(x => x.CompanyId == report.ItemId)
                    .WhereIF(!isCalcSub, x => x.IsSubContractProject != 2).Select(x => x.Id).ToList();
-                //当日已填报的项目
-                var dayReportCount = dayYearList.Where(x => x.DateDay == dayTime && companyProjectId.Contains(x.ProjectId)).Count();
-                //当日未填报项目数量（在建数量-已填报的数量）
-                var dayUnReportCount = onBuildProjectCount - dayReportCount;
-                //填报率
-                var writePercent = onBuildProjectCount!=0 ?Math.Round((dayReportCount.ObjToDecimal() / onBuildProjectCount) * 100, 0):0;
-                companyWriteReportInfos.Add(new CompanyWriteReportInfo()
+                if (report.Collect == 1)
                 {
-                    Name = report.Name,
-                    OnBulidCount = onBuildProjectCount,
-                    UnReportCount = dayUnReportCount,
-                    WritePercent = writePercent,
-                    QualityLevel = 0
-                });
+                    //所有在建项目
+                    var allBuildProject = companyWriteReportInfos.Sum(x => x.OnBulidCount);
+                    var allWriteReportProject = companyWriteReportInfos.Sum(x => x.UnReportCount);
+                    //填报率
+                    var wrtieRecent = Math.Round((allWriteReportProject.ObjToDecimal() / allBuildProject) * 100, 2);
+                    companyWriteReportInfos.Add(new CompanyWriteReportInfo() 
+                    {
+                        Name = report.Name,
+                        OnBulidCount = allBuildProject,
+                        UnReportCount = allWriteReportProject,
+                        WritePercent = wrtieRecent,
+                        QualityLevel = 3
+                    });
+                }
+                else {
+                    //当日已填报的项目
+                    var dayReportCount = dayYearList.Where(x => x.DateDay == dayTime && companyProjectId.Contains(x.ProjectId)).Count();
+                    //当日未填报项目数量（在建数量-已填报的数量）
+                    var dayUnReportCount = onBuildProjectCount - dayReportCount < 0 ? 0 : onBuildProjectCount - dayReportCount;
+                    //填报率
+                    var writePercent = onBuildProjectCount != 0 ? Math.Round((dayReportCount.ObjToDecimal() / onBuildProjectCount) * 100, 0) : 0;
+                    companyWriteReportInfos.Add(new CompanyWriteReportInfo()
+                    {
+                        Name = report.Name,
+                        OnBulidCount = onBuildProjectCount,
+                        UnReportCount = dayUnReportCount,
+                        WritePercent = writePercent,
+                        QualityLevel =3
+                    });
+                }
             }
 
             #region 数据组合
@@ -3755,7 +3769,11 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
 
             #region 第二张图
             List<Guid> onBuildsProjectList = new List<Guid>();
-            var reportPorjectList = projectList.Where(x => x.IsChangeStatus == 1 && x.UpdateTime < startDayTime.ObjToDate()).ToList();
+            //所有在建项目
+            var reportPorjectList = projectList.Where(x => x.StatusId == buildProjectId).ToList();
+            //不符合的在建项目
+            var noReportPorjectList = projectList.Where(x => x.StatusId == buildProjectId && x.IsChangeStatus == 1 && x.UpdateTime >= startDayTime.ObjToDate()&&x.UpdateTime<=endDayTime.ObjToDate()).Select(x=>x.Id).ToList();
+            reportPorjectList = reportPorjectList.Where(x => !noReportPorjectList.Contains(x.Id)).ToList();
             List<CompanyUnWriteReportInfo> companyUnWriteReportInfos = new List<CompanyUnWriteReportInfo>();
             //查询业务单位
             var companyIds = reportPorjectList.Select(x => x.CompanyId).ToList();
@@ -3802,6 +3820,11 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
             var onProjectShipIds = shipMovementList.Select(x => x.ShipId).Distinct().ToList();
             foreach (var shipId in onProjectShipIds)
             {
+               var shiDayReports=shipDayList.Where(x => x.DateDay == dayTime && x.ShipId == shipId).Count();
+                if (shiDayReports > 0)
+                {
+                    continue;
+                }
                 //项目ID
                 var shipProjectIds = shipMovementList.Where(x => x.ShipId == shipId).Select(x => x.ProjectId).First();
                 if (shipProjectIds == Guid.Empty)
@@ -3822,22 +3845,17 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
                 }
                 companyShipUnWriteReportInfos.Add(new CompanyShipUnWriteReportInfo()
                 {
+                    
                     ShipName = shipName,
                     OnProjectName = projectName,
                 });
             }
-
             #region 数据组合
             jjtSendMessageMonitoringDayReportResponseDto.CompanyShipUnWriteReportInfos = companyShipUnWriteReportInfos;
             #endregion
             #endregion
 
-
-
             #endregion
-
-
-
 
             responseAjaxResult.Data = jjtSendMessageMonitoringDayReportResponseDto;
             responseAjaxResult.Success();
