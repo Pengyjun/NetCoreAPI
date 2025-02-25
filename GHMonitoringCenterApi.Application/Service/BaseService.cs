@@ -2630,7 +2630,7 @@ namespace GHMonitoringCenterApi.Application.Service
                     var obj = new SingleMessageTemplateRequestDto()
                     {
                         MessageType = "text",
-                        TextContent = $"您好:" + DateTime.Now.AddDays(-1).ToString("MM月dd") + "日报还未审核,请登录智慧运营中心-日报推送审核页面进行审核;移动端请访问:" + phonePage,
+                        TextContent = $"您好:" + DateTime.Now.AddDays(-1).ToString("MM月dd") + "日报还未审核,请登录智慧运营中心-日报推送审核页面进行审核;移动端请访问:<br>" + phonePage,
                         UserIds = new List<string>() { item }
                     };
                     var pushResult = JjtUtils.SinglePushMessage(obj, false);
@@ -2655,7 +2655,7 @@ namespace GHMonitoringCenterApi.Application.Service
                     var obj = new DayPushApprove()
                     {
                         ApproveId = _currentUser.Id,
-                        ApproveName = _currentUser.Name,
+                        ApproveName = (account== "L20132106"? "姜世珂": account == "2018015149" ? "刘国银": account == "2022002687"?"管理员": "于亚南"),
                         Status = isApprove ? "已审批" : "未审批",
                         DayTime = DateTime.Now.AddDays(-1).ToDateDay(),
                     };
