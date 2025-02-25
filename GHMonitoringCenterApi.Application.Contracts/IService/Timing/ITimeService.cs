@@ -27,10 +27,10 @@ namespace GHMonitoringCenterApi.Application.Contracts.IService.Timing
         Task<ResponseAjaxResult<bool>> SynchronizationDayProductionAsync();
 
         /// <summary>
-        /// 刷 项目日报填报信息
+        /// 每月26号凌晨12点刷新项目信息  供日报推送使用
         /// </summary>
         /// <returns></returns>
-        Task<ResponseAjaxResult<bool>> SynchronizationProjectReportAsync(int daytime,bool isAll=false);
+        Task<ResponseAjaxResult<bool>> SynchronizationProjectAsync();
 
         Task<string> SynchronizationDealUnitsync();
 

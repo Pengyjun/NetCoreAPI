@@ -2411,18 +2411,35 @@ namespace GHMonitoringCenterApi.Application.Service.Timing
         }
 
         /// <summary>
-        /// 刷项目日报填报信息
+        /// 每月26号凌晨12点刷新项目信息  供日报推送使用
         /// </summary>
-        /// <param name="daytime"></param>
-        /// <param name="isAll">如果等于treu 刷新最近一个月的数据</param>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<bool>> SynchronizationProjectReportAsync(int daytime, bool isAll=false)
+        public async Task<ResponseAjaxResult<bool>> SynchronizationProjectAsync()
         {
             ResponseAjaxResult<bool> responseAjaxResult = new ResponseAjaxResult<bool>();
+            var projectInfoList=await dbContext.Queryable<ProjectStatusChangeRecord>().Where(x => x.IsValid == 1).ToListAsync();
+            foreach (var item in projectInfoList)
+            {
+                item.IsValid = 11111111;
+            }
+           var projectList= await dbContext.Queryable<Project>().Where(x=>x.IsDelete==1).ToListAsync();
+            List<ProjectStatusChangeRecord> project = new List<ProjectStatusChangeRecord>();
+            foreach (var item in projectList)
+            {
+                project.Add(new ProjectStatusChangeRecord()
+                {
+                    ChangeTime = DateTime.Now,
+                    Id = item.Id,
+                    IsValid = 1,
+                    ItemId = item.Id,
+                    Status = item.StatusId.Value,
+                    StopDay = 0
+                });
+            }
+            await dbContext.Insertable<ProjectStatusChangeRecord>(project).ExecuteCommandAsync();
             responseAjaxResult.Data = true;
             responseAjaxResult.Success();
             return responseAjaxResult;
         }
-        
     }
 }

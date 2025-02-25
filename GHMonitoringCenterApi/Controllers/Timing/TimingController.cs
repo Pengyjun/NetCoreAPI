@@ -106,18 +106,15 @@ namespace GHMonitoringCenterApi.Controllers.Timing
             return await timeService.SynchronizationDayProductionAsync();
         }
         /// <summary>
-        /// 同步项目日报
+        /// 每月26号凌晨12点刷新项目信息  供日报推送使用
         /// </summary>
-        /// <param name="daytime">根据时间同步  不传为默认时间</param>
-        /// <param name="isAll">同步一个月的时间</param>
         /// <returns></returns>
-        [HttpGet("SynchronizationProjectReport")]
+        [HttpGet("SynchronizationProject")]
         [UnitOfWork]
-        public async Task<ResponseAjaxResult<bool>> SynchronizationProjectReportAsync(int daytime, bool isAll = false)
+        public async Task<ResponseAjaxResult<bool>> SynchronizationProjectReportAsync()
         {
-            return await timeService.SynchronizationProjectReportAsync(daytime, isAll);
+            return await timeService.SynchronizationProjectAsync();
         }
-
         /// <summary>
         /// 定时同步往来单位
         /// </summary>
