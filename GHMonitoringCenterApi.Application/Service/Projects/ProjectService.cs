@@ -4086,10 +4086,6 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     rr.AccumulatedOutputValue = accumulatedOutputValue;
                 }
             }
-            if (!pPlanProduction.Any())
-            {
-                return rt.SuccessResult(rr);
-            }
 
             var annualProductionShips = await dbContext.Queryable<AnnualProductionShips>().Where(t => t.IsDelete == 1).ToListAsync();
 
@@ -4148,9 +4144,6 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             //初始化
             RefAsync<int> total = 0;
             List<ProjectAnnualPlanProduction> pPlanProduction = new();
-
-            // 初始化公司键值对，包含序号
-            var companyDictionary = KeyValuePairs();
 
             if (_currentUser.CurrentLoginIsAdmin == true)
             {
@@ -4439,7 +4432,6 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                         NovemberProductionValue = item.NovemberProductionValue,
                         DecemberProductionValue = item.DecemberProductionValue,
                         ProjectId = item.ProjectId,
-                        //ShipType = 2,
                         CompanyId = compId.Value,
                         Year = DateTime.Now.Year,
                         Id = GuidUtil.Next()
