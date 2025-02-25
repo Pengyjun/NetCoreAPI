@@ -1506,8 +1506,8 @@ namespace GHMonitoringCenterApi.Application.Service.ProjectProductionReport
             var dayStr = DateTime.Today.AddDays(-1).ToString("yyyy-MM-dd");
             var data = await dbContext.Queryable<Project>()
                 .LeftJoin(dbContext.Queryable<DayReport>().Where(t => t.IsDelete == 1 && t.DateDay == day), (x, y) => x.Id == y.ProjectId)
-                .LeftJoin(dbContext.Queryable<DailyDeviation>().Where(t => t.IsDelete == 1), (x, y, z) => x.Id == z.ProjectId)
-                 .Where((x, y, z) => x.IsDelete == 1 && x.StatusId == "cd3c6e83-1b7c-40c2-a415-5a44f13584cc".ToGuid()) //只看在建状态
+                .LeftJoin(dbContext.Queryable<DailyDeviation>().Where(t => t.IsDelete == 1 && t.Dateday == day), (x, y, z) => x.Id == z.ProjectId)
+                 .Where((x, y, z) => x.IsDelete == 1 && x.StatusId == "cd3c6e83-1b7c-40c2-a415-5a44f13584cc".ToGuid() && x.TypeId != "048120ae-1e9f-46d8-a38f-5d5e9e49ecba".ToGuid()) //只看在建状态,排除非施工类项目
                 .WhereIF(!string.IsNullOrWhiteSpace(requestDto.ProjectName), (x, y, z) => x.Name.Contains(requestDto.ProjectName))
                 //.WhereIF(requestDto.ProjectStatusId != null && requestDto.ProjectStatusId.Any(), (x, y, z) => requestDto.ProjectStatusId.Contains(x.StatusId.Value.ToString()))
                 .OrderByDescending((x, y, z) => new { y.DateDay, x.Id, x.StatusId })
@@ -1546,7 +1546,7 @@ namespace GHMonitoringCenterApi.Application.Service.ProjectProductionReport
         {
             ResponseAjaxResult<bool> responseAjaxResult = new ResponseAjaxResult<bool>();
             var dayTime = DateTime.Today.AddDays(-1).ToDateDay();
-            var dailyDeviation = await dbContext.Queryable<DailyDeviation>().Where(t => t.IsDelete == 1 && t.ProjectId == requestDto.ProjectId && t.dateday == dayTime).FirstAsync();
+            var dailyDeviation = await dbContext.Queryable<DailyDeviation>().Where(t => t.IsDelete == 1 && t.ProjectId == requestDto.ProjectId && t.Dateday == dayTime).FirstAsync();
             if (dailyDeviation != null)
             {
                 dailyDeviation.DayActualProductionAmountDeviation = requestDto.DayActualProductionAmountDeviation;
@@ -1563,7 +1563,7 @@ namespace GHMonitoringCenterApi.Application.Service.ProjectProductionReport
                 daily.StatusId = requestDto.StatusId;
                 daily.DayActualProductionAmount = requestDto.DayActualProductionAmount;
                 daily.DayActualProductionAmountDeviation = requestDto.DayActualProductionAmountDeviation;
-                daily.dateday = DateTime.Today.AddDays(-1).ToDateDay();
+                daily.Dateday = DateTime.Today.AddDays(-1).ToDateDay();
                 await dbContext.Insertable(daily).ExecuteCommandAsync();
             }
 
