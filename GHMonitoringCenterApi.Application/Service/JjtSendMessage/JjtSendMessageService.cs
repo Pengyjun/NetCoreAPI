@@ -3768,11 +3768,11 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
 
             #region 各单位填报情况（数据质量）
 
-            #region 数据查询
-            //船舶进退场
-            var shipMovementList = await dbContext.Queryable<ShipMovement>().Where(x => x.IsDelete == 1 && x.Status.Equals(ShipMovementStatus.Enter)).ToListAsync();
+            #region 各单位填报情况使用数据查询
             //项目停工记录
-            var projectStatusRecord=await dbContext.Queryable<ProjectStatusChangeRecord>().Where(x => x.IsValid == 1).ToListAsync();
+            var projectStatusRecord = await dbContext.CopyNew().Queryable<ProjectStatusChangeRecord>().Where(x => x.IsValid == 1).ToListAsync();
+            //船舶进退场
+            var shipMovementList = await dbContext.CopyNew().Queryable<ShipMovement>().Where(x => x.IsDelete == 1 && x.Status.Equals(ShipMovementStatus.Enter)).ToListAsync();
             #endregion
 
             #region 计算星星

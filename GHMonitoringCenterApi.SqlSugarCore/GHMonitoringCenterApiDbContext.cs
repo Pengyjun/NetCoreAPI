@@ -26,7 +26,7 @@ namespace GHMonitoringCenterApi.SqlSugarCore
             {
                 ConnectionString = dbCon,
                 DbType = DbType.MySql,
-                IsAutoCloseConnection = true
+                IsAutoCloseConnection = true,
             }, db =>
             {
                 var sqlParmae = string.Empty;
