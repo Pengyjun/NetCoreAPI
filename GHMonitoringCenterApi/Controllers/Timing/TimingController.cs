@@ -1,6 +1,7 @@
 ﻿using GHMonitoringCenterApi.Application.Contracts.Dto.Project;
 using GHMonitoringCenterApi.Application.Contracts.Dto.Timing;
 using GHMonitoringCenterApi.Application.Contracts.IService.Timing;
+using GHMonitoringCenterApi.CustomAttribute;
 using GHMonitoringCenterApi.Domain.Shared;
 using Microsoft.AspNetCore.Mvc;
 using NSwag.Annotations;
@@ -104,8 +105,16 @@ namespace GHMonitoringCenterApi.Controllers.Timing
         {
             return await timeService.SynchronizationDayProductionAsync();
         }
-
-
+        /// <summary>
+        /// 每月26号凌晨12点刷新项目信息  供日报推送使用
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("SynchronizationProject")]
+        [UnitOfWork]
+        public async Task<ResponseAjaxResult<bool>> SynchronizationProjectReportAsync()
+        {
+            return await timeService.SynchronizationProjectAsync();
+        }
         /// <summary>
         /// 定时同步往来单位
         /// </summary>

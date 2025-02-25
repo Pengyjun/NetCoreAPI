@@ -683,6 +683,8 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.JjtSendMsg
         public decimal? ShipYearOutput { get; set; }
         public decimal? TimePercent { get; set; }
 
+        public int Status { get; set; }
+
         /// <summary>
         /// 运转时间(小时)
         /// </summary>

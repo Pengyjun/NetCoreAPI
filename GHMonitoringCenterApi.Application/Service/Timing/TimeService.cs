@@ -11,6 +11,7 @@ using GHMonitoringCenterApi.Domain.Shared.Const;
 using GHMonitoringCenterApi.Domain.Shared.Util;
 using Microsoft.Extensions.Logging;
 using SqlSugar;
+using SqlSugar.Extensions;
 using UtilsSharp;
 using Model = GHMonitoringCenterApi.Domain.Models;
 
@@ -2407,6 +2408,38 @@ namespace GHMonitoringCenterApi.Application.Service.Timing
             }
 
             return false;
+        }
+
+        /// <summary>
+        /// 每月26号凌晨12点刷新项目信息  供日报推送使用
+        /// </summary>
+        /// <returns></returns>
+        public async Task<ResponseAjaxResult<bool>> SynchronizationProjectAsync()
+        {
+            ResponseAjaxResult<bool> responseAjaxResult = new ResponseAjaxResult<bool>();
+            var projectInfoList=await dbContext.Queryable<ProjectStatusChangeRecord>().Where(x => x.IsValid == 1).ToListAsync();
+            foreach (var item in projectInfoList)
+            {
+                item.IsValid = 11111111;
+            }
+           var projectList= await dbContext.Queryable<Project>().Where(x=>x.IsDelete==1).ToListAsync();
+            List<ProjectStatusChangeRecord> project = new List<ProjectStatusChangeRecord>();
+            foreach (var item in projectList)
+            {
+                project.Add(new ProjectStatusChangeRecord()
+                {
+                    ChangeTime = DateTime.Now,
+                    Id = item.Id,
+                    IsValid = 1,
+                    ItemId = item.Id,
+                    Status = item.StatusId.Value,
+                    StopDay = 0
+                });
+            }
+            await dbContext.Insertable<ProjectStatusChangeRecord>(project).ExecuteCommandAsync();
+            responseAjaxResult.Data = true;
+            responseAjaxResult.Success();
+            return responseAjaxResult;
         }
     }
 }

@@ -235,6 +235,5 @@ namespace GHMonitoringCenterApi.Application.Contracts.IService.Project
         /// <returns></returns>
         Task<ResponseAjaxResult<List<DangerousDetailsResponse>>> DangerousDetailsByDayRepIdAsync(string id);
 
-        Task<UserAuthForDataDto> GetCurrentUserAuthForDataAsync();
     }
 }

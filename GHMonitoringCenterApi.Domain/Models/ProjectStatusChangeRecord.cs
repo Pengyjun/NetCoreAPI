@@ -20,11 +20,11 @@ namespace GHMonitoringCenterApi.Domain.Models
         [SugarColumn(Length = 36)]
         public Guid Id { get; set; }
         [SugarColumn(Length = 36)]
-        public Guid OldStatus { get; set; }
-        [SugarColumn(Length = 36)]
-        public Guid NewStatus { get; set; }
-        [SugarColumn(ColumnDataType = "datetime")]
-        public DateTime ChangeTime { get; set; }
+        public Guid Status { get; set; }
+        //[SugarColumn(Length = 36)]
+        //public Guid NewStatus { get; set; }
+         [SugarColumn(ColumnDataType = "datetime")]
+         public DateTime ChangeTime { get; set; }
 
         /// <summary>
         /// 是否有效   辅助字段  2023年7月份有用 后面无用  0无效 1有效
