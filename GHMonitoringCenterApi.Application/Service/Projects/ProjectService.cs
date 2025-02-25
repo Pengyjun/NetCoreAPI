@@ -4146,7 +4146,6 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             List<SearchProjectAnnualProductionDto> rr = new();
 
             //初始化
-            RefAsync<int> total = 0;
             List<ProjectAnnualPlanProduction> pPlanProduction = new();
 
             var annualProductionShips = await dbContext.Queryable<AnnualProductionShips>()
