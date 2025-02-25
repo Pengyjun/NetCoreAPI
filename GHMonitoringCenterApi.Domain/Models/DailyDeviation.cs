@@ -44,7 +44,7 @@ namespace GHMonitoringCenterApi.Domain.Models
         /// 日期
         /// </summary>
         [SugarColumn(ColumnDataType = "int")]
-        public int dateday { get; set; }
+        public int Dateday { get; set; }
 
     }
 }
