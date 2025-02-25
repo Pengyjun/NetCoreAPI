@@ -380,9 +380,16 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
         /// <returns></returns>
         public async Task<ResponseAjaxResult<bool>> SaveProjectDayReportAsync(AddOrUpdateDayReportRequestDto model)
         {
+
             model.ResetModelProperty();
             var result = new ResponseAjaxResult<bool>();
 
+            var permission = await _dbContext.Queryable<BtnEditMonthlyReportPermission>().Where(t => t.IsDelete == 1 && t.MonthReportEnable == true).ToListAsync();
+            var isEdit = _iProjectService.BtnEditMonthlyReport(2, model.DateDay, permission);
+            if (!isEdit)
+            {
+                return result.FailResult(HttpStatusCode.SaveFail, "日报不可修改");
+            }
             if (!ConvertHelper.TryConvertDateTimeFromDateDay(model.DateDay, out DateTime dayTime))
             {
                 return result.FailResult(HttpStatusCode.SaveFail, "日期时间格式不正确");

@@ -4026,32 +4026,17 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             //初始化
             List<ProjectAnnualPlanProduction> pPlanProduction = new();
 
-            // 初始化公司键值对，包含序号
-            var companyDictionary = KeyValuePairs();
-
             var annualProductionShips = await dbContext.Queryable<AnnualProductionShips>()
                 .WhereIF(!requestBody.IsProjectAnnualProduction, x => x.ShipType == 1)
                 .Where(t => t.IsDelete == 1).ToListAsync();
 
             var mainIds = annualProductionShips.Select(x => x.ProjectAnnualProductionId).ToList();
 
-            if (_currentUser.CurrentLoginIsAdmin == true)
-            {
-                pPlanProduction = await dbContext.Queryable<ProjectAnnualPlanProduction>()
-                    .WhereIF(!string.IsNullOrWhiteSpace(requestBody.ProjectId.ToString()), t => t.ProjectId == requestBody.ProjectId)
-                    .Where(t => t.IsDelete == 1 && mainIds.Contains(t.Id))
-                    .ToListAsync();
-            }
-            else
-            {
-                //授权用户得到的公司ids
-                var userAuthForData = await GetCurrentUserAuthForDataAsync();
-                var companyIds = userAuthForData.CompanyIds.ToList();
-                pPlanProduction = await dbContext.Queryable<ProjectAnnualPlanProduction>()
-                    .WhereIF(!string.IsNullOrWhiteSpace(requestBody.ProjectId.ToString()), t => t.ProjectId == requestBody.ProjectId)
-                    .Where(t => t.IsDelete == 1 && companyIds.Contains(t.CompanyId) && mainIds.Contains(t.Id))
-                    .ToListAsync();
-            }
+            pPlanProduction = await dbContext.Queryable<ProjectAnnualPlanProduction>()
+                .WhereIF(!string.IsNullOrWhiteSpace(requestBody.ProjectId.ToString()), t => t.ProjectId == requestBody.ProjectId)
+                .Where(t => t.IsDelete == 1 && mainIds.Contains(t.Id))
+                .ToListAsync();
+
             var pIds = pPlanProduction.Select(x => x.ProjectId).ToList();
 
             //项目基本信息
@@ -4154,24 +4139,10 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
 
             var mainIds = annualProductionShips.Select(x => x.ProjectAnnualProductionId).ToList();
 
-            if (_currentUser.CurrentLoginIsAdmin == true)
-            {
-                pPlanProduction = await dbContext.Queryable<ProjectAnnualPlanProduction>()
-                    .WhereIF(!string.IsNullOrWhiteSpace(requestBody.ProjectId.ToString()), t => t.ProjectId == requestBody.ProjectId)
-                    .Where(t => t.IsDelete == 1 && mainIds.Contains(t.Id))
-                    .ToListAsync();
-            }
-            else
-            {
-                //授权用户得到的公司ids
-                var userAuthForData = await GetCurrentUserAuthForDataAsync();
-                var companyIds = userAuthForData.CompanyIds.ToList();
-                pPlanProduction = await dbContext.Queryable<ProjectAnnualPlanProduction>()
-                    .WhereIF(!string.IsNullOrWhiteSpace(requestBody.ProjectId.ToString()), t => t.ProjectId == requestBody.ProjectId)
-                    .Where(t => t.IsDelete == 1 && companyIds.Contains(t.CompanyId) && mainIds.Contains(t.Id))
-                    .ToListAsync();
-            }
-
+            pPlanProduction = await dbContext.Queryable<ProjectAnnualPlanProduction>()
+                .WhereIF(!string.IsNullOrWhiteSpace(requestBody.ProjectId.ToString()), t => t.ProjectId == requestBody.ProjectId)
+                .Where(t => t.IsDelete == 1 && mainIds.Contains(t.Id))
+                .ToListAsync();
 
             foreach (var item in pPlanProduction)
             {
@@ -4359,31 +4330,20 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             ResponseAjaxResult<BaseAnnualProduction> rt = new();
             BaseAnnualProduction rr = new();
 
+            var bProjects = await baseService.SearchProjectInformationAsync(new BaseRequestDto());
+            var ppIds = bProjects.Data?.Select(x => x.Id).ToList();
+
             List<ProjectInfosForAnnualProduction> projectInfosForAnnualProductions = new();
             List<OwnShipsForAnnualProduction> ownShipsForAnnualProductions = new();
 
-            if (_currentUser.CurrentLoginIsAdmin == true)
-            {
-                projectInfosForAnnualProductions = await dbContext.Queryable<Project>().Where(t => t.IsDelete == 1)
-                    .Select(x => new ProjectInfosForAnnualProduction
-                    {
-                        CompanyId = x.CompanyId,
-                        ProjectId = x.Id,
-                        ProjectName = x.Name
-                    }).ToListAsync();
-            }
-            else
-            {
-                //授权用户得到的公司ids
-                var userAuthForData = await GetCurrentUserAuthForDataAsync();
-                projectInfosForAnnualProductions = await dbContext.Queryable<Project>().Where(t => t.IsDelete == 1 && userAuthForData.CompanyIds.Contains(t.CompanyId))
-                    .Select(x => new ProjectInfosForAnnualProduction
-                    {
-                        CompanyId = x.CompanyId,
-                        ProjectId = x.Id,
-                        ProjectName = x.Name
-                    }).ToListAsync();
-            }
+            projectInfosForAnnualProductions = await dbContext.Queryable<Project>().Where(t => t.IsDelete == 1 && ppIds.Contains(t.Id))
+                .Select(x => new ProjectInfosForAnnualProduction
+                {
+                    CompanyId = x.CompanyId,
+                    ProjectId = x.Id,
+                    ProjectName = x.Name
+                }).ToListAsync();
+
             var owns = await dbContext.Queryable<OwnerShip>().Where(x => x.IsDelete == 1)
                 .Select(x => new OwnShipsForAnnualProduction
                 {
@@ -4487,30 +4447,6 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 { "01ff7a0e-e827-4b46-9032-0a540ce1fba3".ToGuid(), ("菲律宾公司", 7) },
                 { "9930ca6d-7131-4a2a-8b75-ced9c0579b8c".ToGuid(), ("广航水利", 8) }
             };
-        }
-
-        /// <summary>
-        /// 获取当前用户授权数据
-        /// </summary>
-        /// <returns></returns>
-        public async Task<UserAuthForDataDto> GetCurrentUserAuthForDataAsync()
-        {
-            var userAuthData = new UserAuthForDataDto() { IsAdmin = _currentUser.CurrentLoginIsAdmin };
-            if (userAuthData.IsAdmin)
-            {
-                return userAuthData;
-            }
-            //非超级管理员 授权逻辑
-            var institution = await dbContext.Queryable<Institution>().FirstAsync(t => t.Oid == _currentUser.CurrentLoginInstitutionOid && t.IsDelete == 1);
-            if (institution.PomId != null)
-            {
-                var result = await baseService.SearchCompanySubPullDownAsync(institution.PomId.Value, false, true);
-                if (result.Code == HttpStatusCode.Success && result.Data != null)
-                {
-                    userAuthData.CompanyIds = result.Data.Where(t => t.Id != null).Select(t => t.Id).ToArray();
-                }
-            }
-            return userAuthData;
         }
         #endregion
 
