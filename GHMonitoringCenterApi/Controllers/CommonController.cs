@@ -558,6 +558,7 @@ namespace GHMonitoringCenterApi.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet("DayReportApprove")]
+        [AllowAnonymous]
         public async Task<ResponseAjaxResult<bool>> DayReportApproveAsync(bool isApprove,string? vali)
         {
             ResponseAjaxResult<bool> responseAjaxResult = new ResponseAjaxResult<bool>();

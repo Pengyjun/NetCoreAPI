@@ -26,6 +26,7 @@ using GHMonitoringCenterApi.Application.Contracts.Dto.Subsidiary;
 using GHMonitoringCenterApi.Application.Contracts.Dto.User;
 using GHMonitoringCenterApi.Application.Contracts.IService;
 using GHMonitoringCenterApi.Application.Contracts.IService.Project;
+using GHMonitoringCenterApi.Application.Contracts.IService.User;
 using GHMonitoringCenterApi.Domain.Enums;
 using GHMonitoringCenterApi.Domain.IRepository;
 using GHMonitoringCenterApi.Domain.Models;
@@ -33,6 +34,7 @@ using GHMonitoringCenterApi.Domain.Shared;
 using GHMonitoringCenterApi.Domain.Shared.Const;
 using GHMonitoringCenterApi.Domain.Shared.Enums;
 using GHMonitoringCenterApi.Domain.Shared.Util;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NetTaste;
 using Newtonsoft.Json.Linq;
@@ -2672,10 +2674,20 @@ namespace GHMonitoringCenterApi.Application.Service
                 }
             }
             else {
-                if (_currentUser.CurrentLoginIsAdmin ||
-                   _currentUser.Account == "2018015149" ||
-                   _currentUser.Account == "2016146439" ||
-                   _currentUser.Account == "L20132106")
+
+                var token= HttpContentAccessFactory.GetUserToken;
+                var userService= HttpContentAccessFactory.Current.Request.HttpContext.RequestServices.GetService<IUserService>();
+                if (userService == null)
+                {
+                    responseAjaxResult.Data = false;
+                    responseAjaxResult.Success("审核错误", HttpStatusCode.VerifyFail);
+                    return responseAjaxResult;
+                }
+               var userInfo= userService.GetUserInfoAsync(token);
+                if (userInfo.CurrentLoginIsAdmin ||
+                   userInfo.Account == "2018015149" ||
+                   userInfo.Account == "2016146439" ||
+                   userInfo.Account == "L20132106")
                 {
                     var obj = new DayPushApprove()
                     {
