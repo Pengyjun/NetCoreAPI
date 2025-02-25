@@ -285,6 +285,17 @@ namespace GHMonitoringCenterApi.Application.Service.File
             #endregion
 
 
+            #region 检查是否可以发送
+            var today = DateTime.Now.AddDays(-1).ToDateDay();
+            var approveResult= await dbContext.Queryable<DayPushApprove>().Where(x => x.IsDelete == 1 && x.DayTime == today).FirstAsync();
+            if (approveResult == null)
+            {
+                responseAjaxResult.Data = false;
+                return responseAjaxResult;
+            }
+           
+            #endregion
+
             #region 使用交建通代理方式的情况
             var url = AppsettingsHelper.GetValue("JjtPushMesssage:UploadTempJjt");
             var name = "formFile";

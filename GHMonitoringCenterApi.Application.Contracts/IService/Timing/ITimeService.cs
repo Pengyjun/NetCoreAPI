@@ -36,5 +36,11 @@ namespace GHMonitoringCenterApi.Application.Contracts.IService.Timing
 
         Task<string> SynchronizationDealUnitNewsync();
         Task<bool> GetSpecialConstruction();
+
+        /// <summary>
+        /// 同步外网交建云数据
+        /// </summary>
+        /// <returns></returns>
+        Task<ResponseAjaxResult<string>> SynchronizationJJYDataAsync();
     }
 }

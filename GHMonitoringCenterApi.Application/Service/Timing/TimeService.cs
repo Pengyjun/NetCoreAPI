@@ -2441,5 +2441,19 @@ namespace GHMonitoringCenterApi.Application.Service.Timing
             responseAjaxResult.Success();
             return responseAjaxResult;
         }
+
+        /// <summary>
+        /// 同步外网交建云数据
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        public async Task<ResponseAjaxResult<string>> SynchronizationJJYDataAsync()
+        {
+            ResponseAjaxResult<string> responseAjaxResult = new ResponseAjaxResult<string>();
+            var approveResult= await dbContext.Queryable<DayPushApprove>().Where(x => x.IsDelete == 1).ToJsonAsync();
+            responseAjaxResult.Data = approveResult;
+            responseAjaxResult.Success();
+            return responseAjaxResult;
+        }
     }
 }

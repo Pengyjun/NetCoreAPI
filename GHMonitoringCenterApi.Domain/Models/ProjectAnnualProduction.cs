@@ -6,7 +6,7 @@ namespace GHMonitoringCenterApi.Domain.Models
     /// 项目年初计划产值 产量
     /// </summary>
     [SugarTable("t_projectannualproduction", IsDisabledDelete = true)]
-    public class ProjectAnnualProduction : BaseEntity<Guid>
+    public class ProjectAnnualPlanProduction : BaseEntity<Guid>
     {
         /// <summary>
         /// 1月产量
@@ -158,24 +158,6 @@ namespace GHMonitoringCenterApi.Domain.Models
         [SugarColumn(ColumnDataType = "int", DefaultValue = "0")]
         public int Year { get; set; }
 
-        ///// <summary>
-        ///// 平均日产值 =当月产值/月天数  先不用
-        ///// </summary>
-        //[SugarColumn(ColumnDataType = "decimal(20,8)")]
-        //public decimal DayProductionValue { get; set; }
-
-        ///// <summary>
-        ///// 当月多少天 先不用
-        ///// </summary>
-        //[SugarColumn(ColumnDataType = "int", DefaultValue = "0")]
-        //public int Days { get; set; }
-
-        /// <summary>
-        /// 资源id(船舶)
-        /// </summary>
-        [SugarColumn(Length = 36)]
-        public Guid? ShipId { get; set; }
-
         /// <summary>
         /// 项目id
         /// </summary>
@@ -187,11 +169,30 @@ namespace GHMonitoringCenterApi.Domain.Models
         /// </summary>
         [SugarColumn(Length = 36)]
         public Guid CompanyId { get; set; }
+    }
 
-        ///// <summary>
-        ///// 排序
-        ///// </summary>
-        //[SugarColumn(ColumnDataType = "int", DefaultValue = "0")]
-        //public int Sequence { get; set; }
+    /// <summary>
+    /// 年度计划关联船舶
+    /// </summary>
+    [SugarTable("t_annualproductionships", IsDisabledDelete = true)]
+    public class AnnualProductionShips : BaseEntity<Guid>
+    {
+        /// <summary>
+        /// 主键id
+        /// </summary>
+        [SugarColumn(Length = 36)]
+        public Guid ProjectAnnualProductionId { get; set; }
+
+        /// <summary>
+        /// 船舶id
+        /// </summary>
+        [SugarColumn(Length = 36)]
+        public Guid? ShipId { get; set; }
+
+        /// <summary>
+        /// 船舶 1 自有 2 分包
+        /// </summary>
+        [SugarColumn(ColumnDataType = "int", DefaultValue = "0")]
+        public int ShipType { get; set; }
     }
 }
