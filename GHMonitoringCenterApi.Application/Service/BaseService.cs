@@ -2616,16 +2616,25 @@ namespace GHMonitoringCenterApi.Application.Service
         /// <exception cref="NotImplementedException"></exception>
         public async Task<bool> DayReportApprovePushAsync()
         {
+            var phonePage = AppsettingsHelper.GetValue("PhoneDayUrl");
             var pushJjtUserList = await dbContext.Queryable<DayReportJjtPushConfi>().Where(x => x.IsDelete == 1 && x.Type == 7).Select(x => x.PushAccount).ToListAsync();
-            //九点第一批人员发送
-            var obj = new SingleMessageTemplateRequestDto()
+            foreach (var item in pushJjtUserList)
             {
-                MessageType = "text",
-                TextContent = "您好:" + DateTime.Now.AddDays(-1).ToString("MM月dd") + "日报还未审核,请登录智慧运营中心-日报推送审核页面进行审核",
-                UserIds = pushJjtUserList
-            };
-            var pushResult = JjtUtils.SinglePushMessage(obj, false);
-            return pushResult;
+                if (item != "2022002687")
+                {
+                   var userIdCrypt=CryptoStringExtension.EncryptAsync(item);
+                    phonePage = phonePage.Replace("@vali", userIdCrypt).TrimAll();
+                    //九点第一批人员发送
+                    var obj = new SingleMessageTemplateRequestDto()
+                    {
+                        MessageType = "text",
+                        TextContent = $"您好:" + DateTime.Now.AddDays(-1).ToString("MM月dd") + "日报还未审核,请登录智慧运营中心-日报推送审核页面进行审核;移动端请访问:" + phonePage,
+                        UserIds = new List<string>() { item }
+                    };
+                    var pushResult = JjtUtils.SinglePushMessage(obj, false);
+                }
+            }
+            return true;
         }
 
         /// <summary>
@@ -2633,31 +2642,70 @@ namespace GHMonitoringCenterApi.Application.Service
         /// </summary>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
-        public async Task<ResponseAjaxResult<bool>> DayReportApproveAsync(bool isApprove)
+        public async Task<ResponseAjaxResult<bool>> DayReportApproveAsync(bool isApprove,string? vali)
         {
             ResponseAjaxResult<bool> responseAjaxResult = new ResponseAjaxResult<bool>();
-            if (_currentUser.CurrentLoginIsAdmin ||
-                _currentUser.Account == "2018015149" ||
-                _currentUser.Account == "2016146439" ||
-                _currentUser.Account == "L20132106")
+            if (!string.IsNullOrWhiteSpace(vali))
             {
-                var obj = new DayPushApprove()
+                var account = CryptoStringExtension.DecryptAsync(vali);
+                if (!string.IsNullOrWhiteSpace(account))
                 {
-                    ApproveId = _currentUser.Id,
-                    ApproveName = _currentUser.Name,
-                    Status = isApprove ? "已审批" : "未审批",
-                    DayTime = DateTime.Now.AddDays(-1).ToDateDay(),
-                };
-                await dbContext.Insertable<DayPushApprove>(obj).ExecuteCommandAsync();
-                responseAjaxResult.Data = true;
-                responseAjaxResult.Success();
+                    var obj = new DayPushApprove()
+                    {
+                        ApproveId = _currentUser.Id,
+                        ApproveName = _currentUser.Name,
+                        Status = isApprove ? "已审批" : "未审批",
+                        DayTime = DateTime.Now.AddDays(-1).ToDateDay(),
+                    };
+                    await dbContext.Insertable<DayPushApprove>(obj).ExecuteCommandAsync();
+                    responseAjaxResult.Data = true;
+                    #region 触发定时任务
+                    if (DateTime.Now.Hour >= 10)
+                    {
+                        var res = AppsettingsHelper.GetValue("jjtPush");
+                        WebHelper webHelper = new WebHelper();
+                        webHelper.DoGetAsync(res);
+                    }
+                   
+                    #endregion
+                    responseAjaxResult.Success();
+                }
             }
-            else
-            {
-                responseAjaxResult.Data = false;
-                responseAjaxResult.Success("您没有权限审核", HttpStatusCode.VerifyFail);
-                return responseAjaxResult;
+            else {
+                if (_currentUser.CurrentLoginIsAdmin ||
+                   _currentUser.Account == "2018015149" ||
+                   _currentUser.Account == "2016146439" ||
+                   _currentUser.Account == "L20132106")
+                {
+                    var obj = new DayPushApprove()
+                    {
+                        ApproveId = _currentUser.Id,
+                        ApproveName = _currentUser.Name,
+                        Status = isApprove ? "已审批" : "未审批",
+                        DayTime = DateTime.Now.AddDays(-1).ToDateDay(),
+                    };
+                    await dbContext.Insertable<DayPushApprove>(obj).ExecuteCommandAsync();
+                    #region 触发定时任务
+                    if (DateTime.Now.Hour >= 10)
+                    {
+                        var res = AppsettingsHelper.GetValue("jjtPush");
+                        WebHelper webHelper = new WebHelper();
+                        webHelper.DoGetAsync(res);
+                    }
+
+                    #endregion
+                    responseAjaxResult.Data = true;
+                    responseAjaxResult.Success();
+                }
+                else
+                {
+                    responseAjaxResult.Data = false;
+                    responseAjaxResult.Success("您没有权限审核", HttpStatusCode.VerifyFail);
+                    return responseAjaxResult;
+                }
             }
+
+
 
             return responseAjaxResult;
         }

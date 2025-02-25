@@ -45,6 +45,8 @@ builder.WebHost.ConfigureKestrel((context, options) =>
 builder.Services.AddHttpContextAccessor();
 HttpContentAccessFactory.services = builder.Services;
 builder.Services.AddEndpointsApiExplorer();
+//判断是否是移动端访问判断
+builder.Services.AddDetection();
 //配置swagger
 builder.Services.AddSwaggerGen(options =>
 {
@@ -190,7 +192,7 @@ app.Use(async (context, next) =>
 //app.UseSwagger();
 //app.UseSwaggerUI();
 #endif
-
+app.UseDetection();
 app.UseCors("Cors");
 app.UseAuthentication();
 app.UseAuthorization();
