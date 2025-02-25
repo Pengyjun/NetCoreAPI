@@ -5584,9 +5584,9 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
         public static decimal CalcDiffValue(int dateDay,List<DailyDeviation> dailyDeviations,Guid companyId)
         {
             //今日实际的调差产值
-            var dayCompanyProValue = dailyDeviations.WhereIF(companyId!=Guid.Empty, x => x.CompanyId == companyId).Sum(x => x.DayActualProductionAmountDeviation);
+            var dayCompanyProValue = dailyDeviations.Where(x=>x.DayActualProductionAmountDeviation!=0).WhereIF(companyId!=Guid.Empty, x => x.CompanyId == companyId).Sum(x => x.DayActualProductionAmountDeviation);
             //今日实际的产值
-           var dayCompanyPValue= dailyDeviations.WhereIF(companyId != Guid.Empty, x => x.CompanyId == companyId).Sum(x => x.DayActualProductionAmount);
+           var dayCompanyPValue= dailyDeviations.Where(x => x.DayActualProductionAmountDeviation != 0).WhereIF(companyId != Guid.Empty, x => x.CompanyId == companyId).Sum(x => x.DayActualProductionAmount);
            return Math.Abs( dayCompanyProValue - dayCompanyPValue);
         }
         #endregion

@@ -4086,10 +4086,6 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     rr.AccumulatedOutputValue = accumulatedOutputValue;
                 }
             }
-            if (!pPlanProduction.Any())
-            {
-                return rt.SuccessResult(rr);
-            }
 
             var annualProductionShips = await dbContext.Queryable<AnnualProductionShips>().Where(t => t.IsDelete == 1).ToListAsync();
 
@@ -4148,9 +4144,6 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             //初始化
             RefAsync<int> total = 0;
             List<ProjectAnnualPlanProduction> pPlanProduction = new();
-
-            // 初始化公司键值对，包含序号
-            var companyDictionary = KeyValuePairs();
 
             if (_currentUser.CurrentLoginIsAdmin == true)
             {
@@ -4420,10 +4413,15 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 var tables = await dbContext.Queryable<ProjectAnnualPlanProduction>().Where(t => t.IsDelete == 1 && t.Year == DateTime.Now.Year).ToListAsync();
                 tables.ForEach(x => x.IsDelete = 0);
                 await dbContext.Updateable(tables).UpdateColumns(x => x.IsDelete).ExecuteCommandAsync();
-                var projects = await dbContext.Queryable<Project>().Where(t => t.IsDelete == 1).Select(x => new { x.Id, x.CompanyId }).ToListAsync();
+                var projects = await dbContext.Queryable<Project>().Select(x => new { x.Id, x.CompanyId, x.Name }).ToListAsync();
                 foreach (var item in rr)
                 {
-                    var compId = projects.FirstOrDefault(x => x.Id == item.ProjectId)?.CompanyId;
+                    var name = "";
+                    if (item.ProjectName.Length > 10)
+                    {
+                        name = item.ProjectName.Substring(0, 10);
+                    }
+                    var pp = projects.FirstOrDefault(x => x.Name.Contains(name));
                     add.Add(new ProjectAnnualPlanProduction
                     {
                         JanuaryProductionValue = item.JanuaryProductionValue,
@@ -4438,12 +4436,17 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                         OctoberProductionValue = item.OctoberProductionValue,
                         NovemberProductionValue = item.NovemberProductionValue,
                         DecemberProductionValue = item.DecemberProductionValue,
-                        ProjectId = item.ProjectId,
-                        //ShipType = 2,
-                        CompanyId = compId.Value,
+                        ProjectId = pp?.Id ?? null,
+                        CompanyId = Guid.Empty,
                         Year = DateTime.Now.Year,
                         Id = GuidUtil.Next()
                     });
+                }
+                add = add.Where(x => x.ProjectId != Guid.Empty && x.ProjectId != null).ToList();
+                foreach (var item in add)
+                {
+                    var compId = projects.FirstOrDefault(x => x.Id == item.ProjectId)?.CompanyId;
+                    item.CompanyId = compId.Value;
                 }
                 await dbContext.Insertable(add).ExecuteCommandAsync();
 
