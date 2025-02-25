@@ -3317,9 +3317,9 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
                          .WhereIF(!isDayCalc, x => x.DateDay >= startYearTime && x.DateDay <= endYearTime)
                          .Sum(x => x.DayActualProductionAmount);
                     //各个公司每天日报产值数
-                    var dayProducitionValue = Math.Round((dayYearList.Where(x => companyProjectId.Contains(x.ProjectId) && x.DateDay == dayTime).Sum(x => x.DayActualProductionAmount)- diffValue), 2);
+                    var dayProducitionValue = Math.Round((dayYearList.Where(x => companyProjectId.Contains(x.ProjectId) && x.DateDay == dayTime).Sum(x => x.DayActualProductionAmount)+ diffValue), 2);
                     //各个公司本年累计数
-                    var totalProductionValue = isDayCalc ? Math.Round(monthYearList.Where(x => companyProjectId.Contains(x.ProjectId)).Sum(x => x.CompleteProductionAmount)- diffValue + companyMonthDayProduction / baseConst, 2) : companyMonthDayProduction;
+                    var totalProductionValue = isDayCalc ? Math.Round(monthYearList.Where(x => companyProjectId.Contains(x.ProjectId)).Sum(x => x.CompleteProductionAmount)+ diffValue + companyMonthDayProduction / baseConst, 2) : companyMonthDayProduction;
                     companyBasePoductions.Add(new CompanyBasePoductionValue()
                     {
                         Name = companyProduction.Name,
@@ -3381,7 +3381,7 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
                 {
                     XAxle = currentNowTimeInt.ToString().Substring(0, 4) + "-" + currentNowTimeInt.ToString().Substring(4, 2) + "-" + currentNowTimeInt.ToString().Substring(6, 2),
                     YAxlePlanValue = Math.Round(dayPlanProAmount / difDays / 100000000M, 2),
-                    YAxleCompleteValue = Math.Round((companyMonthDayProduction - diffValue) / baseConst, 2)
+                    YAxleCompleteValue = Math.Round((companyMonthDayProduction + diffValue) / baseConst, 2)
                 });
             }
             //数据组合
@@ -3414,7 +3414,7 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
                 if (currentMonthCompanyProductionValue != null)
                 {
                     //完成产值
-                    var completeValue = Math.Round((currentMonthCompanyProductionValue.CompleteProductionValue- diffValue) / baseConst, 2);
+                    var completeValue = Math.Round((currentMonthCompanyProductionValue.CompleteProductionValue+diffValue) / baseConst, 2);
                     //计划产值
                     var planValue = Math.Round(currentMonthCompanyProductionValue.PlanProductionValue / baseConst, 2);
                     companyProductionCompares.CompleteProductuin.Add(completeValue);
@@ -3842,6 +3842,10 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
             //查询本月周期未填报的次数
             foreach (var writeReport in reportPorjectList)
             {
+                //if ("219e55e0-1237-44bf-8752-311ede2ec6e8".ToGuid() != writeReport.Id)
+                //{
+                //    continue;
+                //}
                 var onBuildsProject = onBuildsProjectList.Where(x => x == writeReport.Id).FirstOrDefault();
                 if (onBuildsProject != Guid.Empty)
                 {
@@ -3851,15 +3855,20 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
                 var projectName = projectList.Where(x => x.Id == writeReport.Id).Select(x => x.ShortName).FirstOrDefault();
                 //业务单位
                 var businessName = companyList.Where(x => x.PomId == writeReport.CompanyId).Select(x => x.Shortname).FirstOrDefault();
-                //未填报次数
-                //var unWriteCount = CalcUnWriteReport(writeData, DateTime.Now.AddDays(-1).Day);
+                //实际已经填报的数量
+                var writeReportCount = dayYearList.Where(x =>x.IsDelete==1&&x.DateDay >= startMonthTime && x.DateDay <= dayTime
+                &&x.ProjectId== writeReport.Id).Count();
                 //停工天数
                 var stopDays= projectStatusRecord.Where(x => x.Id == writeReport.Id).Select(x => x.StopDay).FirstOrDefault();
-                //未填报次数
-                var unWriteCount = monthDiffDays - (stopDays == null? 0:stopDays.Value);
+                //未填报次数  总天数-实际停工日期（不需要填报）-实际应该填报的数量
+                var unWriteCount = monthDiffDays - (stopDays == null? 0:stopDays.Value)- writeReportCount;
+                if (unWriteCount <= 0)
+                {
+                    continue;
+                }
                 companyUnWriteReportInfos.Add(new CompanyUnWriteReportInfo()
                 {
-                    Count = unWriteCount,
+                    Count = unWriteCount<0?0:unWriteCount,
                     Name = businessName,
                     ProjectName = projectName
                 });
