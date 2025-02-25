@@ -2655,7 +2655,7 @@ namespace GHMonitoringCenterApi.Application.Service
                     var obj = new DayPushApprove()
                     {
                         ApproveId = _currentUser.Id,
-                        ApproveName = _currentUser.Name,
+                        ApproveName = (account== "L20132106"? "姜世珂": account == "2018015149" ? "刘国银": account == "2022002687"?"管理员": "于亚南"),
                         Status = isApprove ? "已审批" : "未审批",
                         DayTime = DateTime.Now.AddDays(-1).ToDateDay(),
                     };
