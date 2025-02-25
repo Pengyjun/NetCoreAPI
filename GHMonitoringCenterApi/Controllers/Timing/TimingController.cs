@@ -3,6 +3,7 @@ using GHMonitoringCenterApi.Application.Contracts.Dto.Timing;
 using GHMonitoringCenterApi.Application.Contracts.IService.Timing;
 using GHMonitoringCenterApi.CustomAttribute;
 using GHMonitoringCenterApi.Domain.Shared;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using NSwag.Annotations;
 
@@ -111,6 +112,7 @@ namespace GHMonitoringCenterApi.Controllers.Timing
         /// <returns></returns>
         [HttpGet("SynchronizationProject")]
         [UnitOfWork]
+        [AllowAnonymous]
         public async Task<ResponseAjaxResult<bool>> SynchronizationProjectReportAsync()
         {
             return await timeService.SynchronizationProjectAsync();
@@ -149,6 +151,7 @@ namespace GHMonitoringCenterApi.Controllers.Timing
           /// </summary>
           /// <returns></returns>
         [HttpGet("SynchronizationJJYData")]
+        [AllowAnonymous]
         public async Task<ResponseAjaxResult<string>> SynchronizationJJYDataAsync()
         {
             return await timeService.SynchronizationJJYDataAsync();

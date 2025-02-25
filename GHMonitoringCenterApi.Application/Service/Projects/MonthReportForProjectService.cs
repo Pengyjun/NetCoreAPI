@@ -1234,6 +1234,9 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 //月度应收账款(元)
                 result.ReceivableAmount = monthReport.ReceivableAmount;
 
+                //下月滚动计划
+                result.RollingPlanForNextMonth = monthReport.RollingPlanForNextMonth;
+
                 //进度偏差主因
                 result.ProgressDeviationReason = monthReport.ProgressDeviationReason;
 
@@ -1366,6 +1369,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                             result.CoordinationMatters = saveModel.CoordinationMatters;
                             result.ProblemDescription = saveModel.ProblemDescription;
                             result.SolveProblemDescription = saveModel.SolveProblemDescription;
+                            result.RollingPlanForNextMonth = saveModel.RollingPlanForNextMonth;
                             #endregion
 
                             //数据回显

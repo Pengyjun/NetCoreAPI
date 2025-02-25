@@ -158,7 +158,7 @@ builder.Services.AddSqlSugarContext(builder.Configuration, AppsettingsHelper.Get
 #region 表初始化不需要初始化的表结构数据则注释此方法
 #if DEBUG
 //DbFirst.InitTable(AppsettingsHelper.GetValue("ConnectionStrings:ConnectionString"), false);
-//CodeFirst.InitTable(AppsettingsHelper.GetValue("ConnectionStrings:ConnectionString"));
+CodeFirst.InitTable(AppsettingsHelper.GetValue("ConnectionStrings:ConnectionString"));
 #endif
 #endregion
 //注入AutoMapper
@@ -188,10 +188,10 @@ app.Use(async (context, next) =>
     context.Request.EnableBuffering();
     await next.Invoke(context);
 });
-#if DEBUG
-app.UseSwagger();
-app.UseSwaggerUI();
-#endif
+//#if DEBUG
+//app.UseSwagger();
+//app.UseSwaggerUI();
+//#endif
 app.UseDetection();
 app.UseCors("Cors");
 app.UseAuthentication();

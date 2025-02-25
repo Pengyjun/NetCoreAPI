@@ -65,6 +65,12 @@ namespace GHMonitoringCenterApi.Domain.Models
         public decimal ReceivableAmount { get; set; } = 0;
 
         /// <summary>
+        /// 下月滚动计划
+        /// </summary>
+        [SugarColumn(ColumnDataType = "decimal(18,2)")]
+        public decimal RollingPlanForNextMonth { get; set; } = 0;
+
+        /// <summary>
         /// 进度偏差主因
         /// </summary>
         [SugarColumn(ColumnDataType = "int")]

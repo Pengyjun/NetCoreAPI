@@ -186,7 +186,7 @@ namespace GHMonitoringCenterApi.Application.Contracts.AutoMapper
                 .ForMember(x => x.CompanyId, y => y.MapFrom(u => u.CompanyId))
                 .ForMember(x => x.DepartmentId, y => y.MapFrom(u => u.DepartmentId)
                 );
-
+            
 
             mapperConfigurationExpression.CreateMap<SaveShipDayReportRequestDto, ShipDayReport>();
             mapperConfigurationExpression.CreateMap<ShipDayReport, ShipDayReportResponseDto>();

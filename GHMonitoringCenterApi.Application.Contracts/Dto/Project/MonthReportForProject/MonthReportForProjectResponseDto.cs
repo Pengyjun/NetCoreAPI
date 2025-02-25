@@ -164,6 +164,10 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project.MonthReportFor
         /// </summary>
         public decimal? ReceivableAmount { get; set; } = 0M;
         /// <summary>
+        /// 下月滚动计划
+        /// </summary>
+        public decimal RollingPlanForNextMonth { get; set; } = 0M;
+        /// <summary>
         /// 相关描述是否推送pom
         /// </summary>
         public bool IsPushPom { get; set; }

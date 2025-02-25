@@ -86,6 +86,10 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project.MonthReportFor
         /// </summary>
         public decimal CompletedQuantity { get; set; }
         /// <summary>
+        /// 下月滚动计划
+        /// </summary>
+        public decimal RollingPlanForNextMonth { get; set; }
+        /// <summary>
         /// 施工性质
         /// </summary>
         public int? ConstructionNature { get; set; }

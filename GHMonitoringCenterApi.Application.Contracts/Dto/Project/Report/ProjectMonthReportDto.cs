@@ -136,6 +136,11 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project.Report
         public decimal CurrencyExchangeRate { get; set; } = 1m;
 
         /// <summary>
+        /// 下月滚动计划
+        /// </summary>
+        public decimal RollingPlanForNextMonth { get; set; }
+
+        /// <summary>
         /// 是否是非施工类项目
         /// </summary>
         public bool IsNonConstruction { get; set; }

@@ -11,8 +11,9 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.IO;
 using UtilsSharp;
+using Wangkanai.Detection.Models;
+using Wangkanai.Detection.Services;
 using static ICSharpCode.SharpZipLib.Zip.ExtendedUnixData;
-
 namespace GHMonitoringCenterApi.Controllers.JjtSendMessage
 {
     /// <summary>
@@ -25,9 +26,11 @@ namespace GHMonitoringCenterApi.Controllers.JjtSendMessage
     {
         #region 依赖注入
         public IJjtSendMessageService jjtSendMessageService { get; set; }
-        public JjtSendMessageController(IJjtSendMessageService jjtSendMessageService)
+        public IDetectionService  detectionService { get; set; }
+        public JjtSendMessageController(IJjtSendMessageService jjtSendMessageService, IDetectionService detectionService)
         {
             this.jjtSendMessageService = jjtSendMessageService;
+            this.detectionService = detectionService;
         }
         #endregion
 
@@ -180,7 +183,14 @@ namespace GHMonitoringCenterApi.Controllers.JjtSendMessage
         [AllowAnonymous]
         public async Task<ResponseAjaxResult<JjtSendMessageMonitoringDayReportResponseDto>> JjtTextCardMsgDetailsAsync(int dateDay = 0)
         {
-            return await jjtSendMessageService.JjtTextCardMsgDetailsAsync(dateDay);
+            if (detectionService.Device.Type == Device.Mobile)
+            {
+                return await jjtSendMessageService.JjtTextCardMsgDetailsAsync(dateDay, true);
+            }
+            else {
+                return await jjtSendMessageService.JjtTextCardMsgDetailsAsync(dateDay);
+            }
+            
         }
 
         /// <summary>
