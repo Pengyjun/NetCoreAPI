@@ -384,7 +384,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             model.ResetModelProperty();
             var result = new ResponseAjaxResult<bool>();
 
-            var permission = await _dbContext.Queryable<BtnEditMonthlyReportPermission>().Where(t => t.IsDelete == 1 && t.MonthReportEnable == true).ToListAsync();
+            var permission = await _dbContext.Queryable<BtnEditMonthlyReportPermission>().Where(t => t.IsDelete == 1 && t.DailyReportEnable == true).ToListAsync();
             var isEdit = _iProjectService.BtnEditMonthlyReport(2, model.DateDay, permission);
             if (!isEdit)
             {

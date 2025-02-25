@@ -4049,8 +4049,8 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             var ships = await dbContext.Queryable<OwnerShip>().Where(t => t.IsDelete == 1).ToListAsync();
 
             //项目开累产值   24年调整最终版本+至今为止月报数据
-            var monthReport = await dbContext.Queryable<MonthReport>().Where(t => t.IsDelete == 1 && pIds.Contains(t.ProjectId)).ToListAsync();
-            var monthReport24 = await dbContext.Queryable<MonthReportDetailHistory>().Where(t => pIds.Contains(t.ProjectId)).ToListAsync();
+            var monthReport = await dbContext.Queryable<MonthReport>().Where(t => t.IsDelete == 1).ToListAsync();
+            var monthReport24 = await dbContext.Queryable<MonthReportDetailHistory>().ToListAsync();
 
             if (!string.IsNullOrWhiteSpace(requestBody.ProjectId.ToString()))
             {
@@ -4063,11 +4063,19 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     var yearMonth = Convert.ToInt32(DateTime.Now.Year + "01");
                     if (pp.CurrencyId == "2a0e99b4-f989-4967-b5f1-5519091d4280".ToGuid())//国内
                     {
+
                         accumulatedOutputValue = monthReport24.Where(x => x.ProjectId == pp.Id).Sum(x => Convert.ToDecimal(x.ActualCompAmount));//开累
+                        //202306历史产值追加
+                        accumulatedOutputValue += monthReport.Where(x => x.ProjectId == pp.Id && x.DateMonth == 202306).Sum(x => Convert.ToDecimal(x.ActualCompAmount));
                     }
                     else
                     {
+                        //获取汇率
+                        var currencyConvert = await dbContext.Queryable<CurrencyConverter>().Where(t => t.IsDelete == 1 && t.CurrencyId == pp.CurrencyId.ToString()).OrderByDescending(x => x.Year).FirstAsync();
+                        pp.ECAmount = pp.ECAmount * currencyConvert.ExchangeRate;
                         accumulatedOutputValue = monthReport24.Where(x => x.ProjectId == pp.Id).Sum(x => Convert.ToDecimal(x.RMBHValue));//开累
+                        //202306历史产值追加
+                        accumulatedOutputValue += monthReport.Where(x => x.ProjectId == pp.Id && x.DateMonth == 202306).Sum(x => Convert.ToDecimal(x.RMBHValue));
                     }
                     //截止到当月的完成产值+历史调整开累产值=开累产值
                     accumulatedOutputValue += monthReport.Where(x => x.ProjectId == pp.Id && x.DateMonth > 202412 && x.DateMonth <= dateMonth).Sum(x => x.CompleteProductionAmount);
