@@ -47,6 +47,21 @@
     public class SearchProjectAnnualProductionDto
     {
         /// <summary>
+        /// 主键
+        /// </summary>
+        public Guid Id { get; set; }
+
+        /// <summary>
+        /// 项目id
+        /// </summary>
+        public Guid? ProjectId { get; set; }
+
+        /// <summary>
+        /// 公司id
+        /// </summary>
+        public Guid CompanyId { get; set; }
+
+        /// <summary>
         /// 1月产量
         /// </summary>
         public decimal JanuaryProductionQuantity { get; set; }
@@ -176,9 +191,56 @@
         /// </summary>
         public string? ShipName { get; set; }
 
+        ///// <summary>
+        ///// 排序
+        ///// </summary>
+        //public int Sequence { get; set; }
+    }
+    /// <summary>
+    /// 
+    /// </summary>
+    public class BaseAnnualProduction
+    {
         /// <summary>
-        /// 排序
+        /// 项目
         /// </summary>
-        public int Sequence { get; set; }
+        public List<ProjectInfosForAnnualProduction> ProjectInfosForAnnualProductions { get; set; } = new List<ProjectInfosForAnnualProduction>();
+        /// <summary>
+        /// 船
+        /// </summary>
+        public List<OwnShipsForAnnualProduction> OwnShipsForAnnualProductions { get; set; } = new List<OwnShipsForAnnualProduction>();
+    }
+    /// <summary>
+    /// 年度计划项目信息
+    /// </summary>
+    public class ProjectInfosForAnnualProduction
+    {
+        /// <summary>
+        /// 项目id
+        /// </summary>
+        public Guid ProjectId { get; set; }
+        /// <summary>
+        /// 项目名称
+        /// </summary>
+        public string? ProjectName { get; set; }
+        /// <summary>
+        /// 项目所属公司
+        /// </summary>
+        public Guid? CompanyId { get; set; }
+
+    }
+    /// <summary>
+    /// 年度计划船舶信息
+    /// </summary>
+    public class OwnShipsForAnnualProduction
+    {
+        /// <summary>
+        /// 主键
+        /// </summary>
+        public Guid Id { get; set; }
+        /// <summary>
+        /// 名称
+        /// </summary>
+        public string? Name { get; set; }
     }
 }

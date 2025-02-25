@@ -2371,6 +2371,25 @@ namespace GHMonitoringCenterApi.Controllers.Project
             return await projectService.SearchProjectAnnualProductionAsync(requestBody);
         }
 
+        /// <summary>
+        /// 保存
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost("SaveProjectAnnualProduction")]
+        public async Task<ResponseAjaxResult<bool>> SaveProjectAnnualProductionAsync([FromBody] List<SearchProjectAnnualProductionDto>? requestBody)
+        {
+            return await projectService.SaveProjectAnnualProductionAsync(requestBody);
+        }
+
+        /// <summary>
+        /// 项目 & 船舶
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("BaseAnnualProduction")]
+        public async Task<ResponseAjaxResult<BaseAnnualProduction>> BaseAnnualProductionAsync()
+        {
+            return await projectService.BaseAnnualProductionAsync();
+        }
 
         #endregion
     }

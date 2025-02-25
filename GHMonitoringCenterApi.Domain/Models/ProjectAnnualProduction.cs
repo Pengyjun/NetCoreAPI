@@ -158,17 +158,17 @@ namespace GHMonitoringCenterApi.Domain.Models
         [SugarColumn(ColumnDataType = "int", DefaultValue = "0")]
         public int Year { get; set; }
 
-        /// <summary>
-        /// 平均日产值 =当月产值/月天数
-        /// </summary>
-        [SugarColumn(ColumnDataType = "decimal(20,8)")]
-        public decimal DayProductionValue { get; set; }
+        ///// <summary>
+        ///// 平均日产值 =当月产值/月天数  先不用
+        ///// </summary>
+        //[SugarColumn(ColumnDataType = "decimal(20,8)")]
+        //public decimal DayProductionValue { get; set; }
 
-        /// <summary>
-        /// 当月多少天
-        /// </summary>
-        [SugarColumn(ColumnDataType = "int", DefaultValue = "0")]
-        public int Days { get; set; }
+        ///// <summary>
+        ///// 当月多少天 先不用
+        ///// </summary>
+        //[SugarColumn(ColumnDataType = "int", DefaultValue = "0")]
+        //public int Days { get; set; }
 
         /// <summary>
         /// 资源id(船舶)
@@ -188,10 +188,10 @@ namespace GHMonitoringCenterApi.Domain.Models
         [SugarColumn(Length = 36)]
         public Guid CompanyId { get; set; }
 
-        /// <summary>
-        /// 排序
-        /// </summary>
-        [SugarColumn(ColumnDataType = "int", DefaultValue = "0")]
-        public int Sequence { get; set; }
+        ///// <summary>
+        ///// 排序
+        ///// </summary>
+        //[SugarColumn(ColumnDataType = "int", DefaultValue = "0")]
+        //public int Sequence { get; set; }
     }
 }

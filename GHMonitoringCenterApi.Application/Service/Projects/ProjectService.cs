@@ -17,7 +17,6 @@ using GHMonitoringCenterApi.Domain.Shared;
 using GHMonitoringCenterApi.Domain.Shared.Const;
 using GHMonitoringCenterApi.Domain.Shared.Enums;
 using GHMonitoringCenterApi.Domain.Shared.Util;
-using NPOI.SS.Formula.Functions;
 using SqlSugar;
 using SqlSugar.Extensions;
 using System.Text;
@@ -1247,8 +1246,9 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 };
                 await dbContext.Insertable<ProjectStatusChangeRecord>(projectStatusChangeRecord).ExecuteCommandAsync();
             }
-            else {
-             var projectStatusSingle=await dbContext.Queryable<ProjectStatusChangeRecord>().Where(x => x.IsValid == 1 && x.Id == addOrUpdateProjectRequestDto.Id).FirstAsync();
+            else
+            {
+                var projectStatusSingle = await dbContext.Queryable<ProjectStatusChangeRecord>().Where(x => x.IsValid == 1 && x.Id == addOrUpdateProjectRequestDto.Id).FirstAsync();
                 if (projectStatusSingle.Status != CommonData.PConstruc.ToGuid() && addOrUpdateProjectRequestDto.StatusId.Value == CommonData.PConstruc.ToGuid())
                 {
                     //计算停工天数
@@ -1732,7 +1732,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
 
 
 
-            
+
         }
         #region 删除项目
         /// <summary>
@@ -4026,8 +4026,6 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             // 初始化公司键值对，包含序号
             var companyDictionary = KeyValuePairs();
 
-            //授权用户得到的公司ids
-            var userAuthForData = await GetCurrentUserAuthForDataAsync();
             if (_currentUser.CurrentLoginIsAdmin == true)
             {
                 pPlanProduction = await dbContext.Queryable<ProjectAnnualProduction>()
@@ -4037,6 +4035,8 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             }
             else
             {
+                //授权用户得到的公司ids
+                var userAuthForData = await GetCurrentUserAuthForDataAsync();
                 var companyIds = userAuthForData.CompanyIds.ToList();
                 pPlanProduction = await dbContext.Queryable<ProjectAnnualProduction>()
                     .WhereIF(!string.IsNullOrWhiteSpace(requestBody.ProjectId.ToString()), t => t.ProjectId == requestBody.ProjectId)
@@ -4045,7 +4045,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             }
             if (!pPlanProduction.Any())
             {
-                return rt;
+                return rt.SuccessResult(rr);
             }
             var pIds = pPlanProduction.Select(x => x.ProjectId).ToList();
 
@@ -4091,6 +4091,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             foreach (var item in pPlanProduction)
             {
                 SearchProjectAnnualProductionDto ppChild = new();
+                ppChild.Id = item.Id;
                 ppChild.JanuaryProductionQuantity = item.JanuaryProductionQuantity;
                 ppChild.JanuaryProductionValue = item.JanuaryProductionValue;
                 ppChild.FebruaryProductionQuantity = item.FebruaryProductionQuantity;
@@ -4116,21 +4117,163 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 ppChild.DecemberProductionQuantity = item.DecemberProductionQuantity;
                 ppChild.DecemberProductionValue = item.DecemberProductionValue;
                 ppChild.ShipId = item.ShipId;
+                ppChild.ProjectId = item.ProjectId;
+                ppChild.CompanyId = item.CompanyId;
                 ppChild.ShipName = ships.FirstOrDefault(x => item.ShipId == x.PomId)?.Name;
-                //排序
-                if (companyDictionary.TryGetValue(item.CompanyId, out var companyInfo))
-                {
-                    ppChild.Sequence = companyInfo.Sequence;
-                }
                 rsList.Add(ppChild);
             }
 
-            rsList = rsList.OrderBy(x => x.Sequence).ToList();
             rt.Count = rsList.Count;
             rr.SearchProjectAnnualProductionDto = rsList;
             return rt.SuccessResult(rr);
         }
 
+        /// <summary>
+        /// 保存
+        /// </summary>
+        /// <param name="requestBody"></param>
+        /// <returns></returns>
+
+        public async Task<ResponseAjaxResult<bool>> SaveProjectAnnualProductionAsync(List<SearchProjectAnnualProductionDto>? requestBody)
+        {
+            ResponseAjaxResult<bool> rt = new();
+
+            List<ProjectAnnualProduction> addTables = new();
+            List<ProjectAnnualProduction> upTables = new();
+
+            if (requestBody != null && requestBody.Any())
+            {
+                var tables = await dbContext.Queryable<ProjectAnnualProduction>().Where(t => t.IsDelete == 1 && requestBody.Select(x => x.Id).Contains(t.Id)).ToListAsync();
+                foreach (var item in requestBody)
+                {
+                    if (!string.IsNullOrWhiteSpace(item.Id.ToString()) && item.Id != Guid.Empty)
+                    {
+                        var first = tables.FirstOrDefault(x => x.Id == item.Id);
+                        if (first != null)
+                        {
+                            first.JanuaryProductionQuantity = item.JanuaryProductionQuantity;
+                            first.JanuaryProductionValue = item.JanuaryProductionValue;
+                            first.FebruaryProductionQuantity = item.FebruaryProductionQuantity;
+                            first.FebruaryProductionValue = item.FebruaryProductionValue;
+                            first.MarchProductionQuantity = item.MarchProductionQuantity;
+                            first.MarchProductionValue = item.MarchProductionValue;
+                            first.AprilProductionQuantity = item.AprilProductionQuantity;
+                            first.AprilProductionValue = item.AprilProductionValue;
+                            first.MayProductionQuantity = item.MayProductionQuantity;
+                            first.MayProductionValue = item.MayProductionValue;
+                            first.JuneProductionQuantity = item.JuneProductionQuantity;
+                            first.JuneProductionValue = item.JuneProductionValue;
+                            first.JulyProductionQuantity = item.JulyProductionQuantity;
+                            first.JulyProductionValue = item.JulyProductionValue;
+                            first.AugustProductionValue = item.AugustProductionValue;
+                            first.AugustProductionQuantity = item.AugustProductionQuantity;
+                            first.SeptemberProductionQuantity = item.SeptemberProductionQuantity;
+                            first.SeptemberProductionValue = item.SeptemberProductionValue;
+                            first.OctoberProductionQuantity = item.OctoberProductionQuantity;
+                            first.OctoberProductionValue = item.OctoberProductionValue;
+                            first.NovemberProductionQuantity = item.NovemberProductionQuantity;
+                            first.NovemberProductionValue = item.NovemberProductionValue;
+                            first.DecemberProductionQuantity = item.DecemberProductionQuantity;
+                            first.DecemberProductionValue = item.DecemberProductionValue;
+                            first.ShipId = item.ShipId;
+                            upTables.Add(first);
+                        }
+                    }
+                    else
+                    {
+                        item.Id = GuidUtil.Next();
+                        addTables.Add(new ProjectAnnualProduction
+                        {
+                            JanuaryProductionQuantity = item.JanuaryProductionQuantity,
+                            JanuaryProductionValue = item.JanuaryProductionValue,
+                            FebruaryProductionQuantity = item.FebruaryProductionQuantity,
+                            FebruaryProductionValue = item.FebruaryProductionValue,
+                            MarchProductionQuantity = item.MarchProductionQuantity,
+                            MarchProductionValue = item.MarchProductionValue,
+                            AprilProductionQuantity = item.AprilProductionQuantity,
+                            AprilProductionValue = item.AprilProductionValue,
+                            MayProductionQuantity = item.MayProductionQuantity,
+                            MayProductionValue = item.MayProductionValue,
+                            JuneProductionQuantity = item.JuneProductionQuantity,
+                            JuneProductionValue = item.JuneProductionValue,
+                            JulyProductionQuantity = item.JulyProductionQuantity,
+                            JulyProductionValue = item.JulyProductionValue,
+                            AugustProductionValue = item.AugustProductionValue,
+                            AugustProductionQuantity = item.AugustProductionQuantity,
+                            SeptemberProductionQuantity = item.SeptemberProductionQuantity,
+                            SeptemberProductionValue = item.SeptemberProductionValue,
+                            OctoberProductionQuantity = item.OctoberProductionQuantity,
+                            OctoberProductionValue = item.OctoberProductionValue,
+                            NovemberProductionQuantity = item.NovemberProductionQuantity,
+                            NovemberProductionValue = item.NovemberProductionValue,
+                            DecemberProductionQuantity = item.DecemberProductionQuantity,
+                            DecemberProductionValue = item.DecemberProductionValue,
+                            ShipId = item.ShipId,
+                            ProjectId = item.ProjectId,
+                            CompanyId = item.CompanyId
+                        });
+                    }
+                }
+                if (upTables.Any())
+                {
+                    await dbContext.Updateable(upTables).ExecuteCommandAsync();
+                }
+                if (addTables.Any())
+                {
+                    await dbContext.Updateable(addTables).ExecuteCommandAsync();
+                }
+                rt.SuccessResult(true, "保存成功");
+            }
+            else rt.FailResult(HttpStatusCode.SaveFail, "保存失败");
+
+            return rt;
+        }
+
+        /// <summary>
+        /// 基本数据
+        /// </summary>
+        /// <returns></returns>
+        public async Task<ResponseAjaxResult<BaseAnnualProduction>> BaseAnnualProductionAsync()
+        {
+            ResponseAjaxResult<BaseAnnualProduction> rt = new();
+            BaseAnnualProduction rr = new();
+
+            List<ProjectInfosForAnnualProduction> projectInfosForAnnualProductions = new();
+            List<OwnShipsForAnnualProduction> ownShipsForAnnualProductions = new();
+
+            if (_currentUser.CurrentLoginIsAdmin == true)
+            {
+                projectInfosForAnnualProductions = await dbContext.Queryable<Project>().Where(t => t.IsDelete == 1)
+                    .Select(x => new ProjectInfosForAnnualProduction
+                    {
+                        CompanyId = x.CompanyId,
+                        ProjectId = x.Id,
+                        ProjectName = x.ShortName
+                    }).ToListAsync();
+            }
+            else
+            {
+                //授权用户得到的公司ids
+                var userAuthForData = await GetCurrentUserAuthForDataAsync();
+                projectInfosForAnnualProductions = await dbContext.Queryable<Project>().Where(t => t.IsDelete == 1 && userAuthForData.CompanyIds.Contains(t.CompanyId))
+                    .Select(x => new ProjectInfosForAnnualProduction
+                    {
+                        CompanyId = x.CompanyId,
+                        ProjectId = x.Id,
+                        ProjectName = x.ShortName
+                    }).ToListAsync();
+            }
+            ownShipsForAnnualProductions = await dbContext.Queryable<OwnerShip>().Where(x => x.IsDelete == 1)
+                .Select(x => new OwnShipsForAnnualProduction
+                {
+                    Id = x.PomId,
+                    Name = x.Name
+                }).ToListAsync();
+
+            rr.ProjectInfosForAnnualProductions = projectInfosForAnnualProductions;
+            rr.OwnShipsForAnnualProductions = ownShipsForAnnualProductions;
+            return rt.SuccessResult(rr);
+        }
         /// <summary>
         /// 公司初始化
         /// </summary>
@@ -4184,6 +4327,8 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             url = url.Replace("year", DateTime.Now.Year.ToString());
             return false;
         }
+
+
 
 
 

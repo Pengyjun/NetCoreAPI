@@ -261,5 +261,12 @@ namespace GHMonitoringCenterApi.Application.Contracts.IService.Project
         /// <param name="requestBody"></param>
         /// <returns></returns>
         Task<ResponseAjaxResult<SearchProjectAnnualProduction>> SearchProjectAnnualProductionAsync(SearchProjectAnnualProductionRequest requestBody);
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="requestBody"></param>
+        /// <returns></returns>
+        Task<ResponseAjaxResult<bool>> SaveProjectAnnualProductionAsync(List<SearchProjectAnnualProductionDto>? requestBody);
+        Task<ResponseAjaxResult<BaseAnnualProduction>> BaseAnnualProductionAsync();
     }
 }
