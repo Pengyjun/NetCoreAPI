@@ -3154,7 +3154,7 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
             var endMonthTimeDate = default(DateTime);
             ConvertHelper.TryConvertDateTimeFromDateDay(startMonthTime, out startMonthTimeDate);
             ConvertHelper.TryConvertDateTimeFromDateDay(endMonthTime, out endMonthTimeDate);
-            var monthDiffDays = TimeHelper.GetTimeSpan(startMonthTimeDate, endMonthTimeDate).Days;
+            var monthDiffDays = TimeHelper.GetTimeSpan(startMonthTimeDate, endMonthTimeDate).Days+1;
             #endregion
 
             #region 基本信息
