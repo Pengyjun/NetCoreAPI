@@ -4017,6 +4017,29 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                             }
                         }
                     }
+
+                    if (!oCurMonthRp.Any() && !outMonthRp.Any())//项目是新增的
+                    {
+                        //新增本月的数据
+                        addDetails.Add(new MonthReportDetail
+                        {
+                            Id = GuidUtil.Next(),
+                            ProjectId = model.ProjectId,
+                            CompletedQuantity = item.CompletedQuantity.Value,
+                            CompleteProductionAmount = Convert.ToDecimal(item.CompletedQuantity) * Convert.ToDecimal(item.UnitPrice) * currencyExchangeRate,//item.CompleteProductionAmount.Value,
+                            ConstructionNature = item.ConstructionNature,
+                            DateMonth = model.DateMonth,
+                            MonthReportId = monthReport == null ? mpId : monthReport.Id,
+                            DateYear = Convert.ToInt32(model.DateMonth.ToString().Substring(0, 4)),
+                            OutPutType = item.OutPutType.Value,
+                            OutsourcingExpensesAmount = item.OutsourcingExpensesAmount.Value,
+                            ProjectWBSId = item.ProjectWBSId,
+                            Remark = item.Remark,
+                            ShipId = item.ShipId.Value,
+                            ShipName = item.ShipName,
+                            UnitPrice = item.UnitPrice.Value
+                        });
+                    }
                 }
                 else
                 {
