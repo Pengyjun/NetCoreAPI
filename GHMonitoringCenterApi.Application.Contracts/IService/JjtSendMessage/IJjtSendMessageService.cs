@@ -91,7 +91,7 @@ namespace GHMonitoringCenterApi.Application.Contracts.IService.JjtSendMessage
         /// 新版交建通发消息 监控运营中心图片消息
         /// </summary>
         /// <returns></returns>
-        Task<ResponseAjaxResult<JjtSendMessageMonitoringDayReportResponseDto>> JjtTextCardMsgDetailsAsync(int dateDay = 0,bool flag=true);
+        Task<ResponseAjaxResult<JjtSendMessageMonitoringDayReportResponseDto>> JjtTextCardMsgDetailsAsync(int dateDay = 0,bool isPhone=false);
 
         /// <summary>
         /// 交建公司生产日报推送

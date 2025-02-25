@@ -19,10 +19,10 @@ using Newtonsoft.Json;
 using NPOI.SS.Formula.Functions;
 using SqlSugar;
 using SqlSugar.Extensions;
+using System.ComponentModel.Design;
 using System.Linq;
 using UtilsSharp;
 using Model = GHMonitoringCenterApi.Domain.Models;
-
 namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
 {
     /// <summary>
@@ -36,6 +36,7 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
         public ISqlSugarClient dbContext { get; set; }
         public IBaseService _baseService { get; set; }
         public ITimeService _timeService { get; set; }
+
         public IResourceManagementService _resourceManagementService { get; set; }
         public JjtSendMessageService(ILogger<FileService> logger, ISqlSugarClient dbContext, IBaseService baseService, ITimeService timeService, IResourceManagementService resourceManagementService)
         {
@@ -3112,7 +3113,7 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
         /// 新版交建通发消息 监控运营中心图片消息
         /// </summary>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<JjtSendMessageMonitoringDayReportResponseDto>> JjtTextCardMsgDetailsAsync(int dateDay = 0, bool flag = true)
+        public async Task<ResponseAjaxResult<JjtSendMessageMonitoringDayReportResponseDto>> JjtTextCardMsgDetailsAsync(int dateDay = 0, bool isPhone = false)
         {
 
             #region 查询条件相关
@@ -3192,9 +3193,20 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
             #endregion
 
 
+            #region 移动端使用的json数据
+            if (isPhone)
+            {
+                var result = await dbContext.Queryable<TempTable>().FirstAsync();
+                if (result != null && !string.IsNullOrWhiteSpace(result.Value))
+                {
+                    return JsonConvert.DeserializeObject<ResponseAjaxResult<JjtSendMessageMonitoringDayReportResponseDto>>(result.Value);
+                }
+            }
+            #endregion
+
             #region 计算今日调差产值数 数据源
             //获取今日调差的数据
-            var dayDiffProductionValue=await dbContext.Queryable<DailyDeviation>().Where(x => x.IsDelete == 1).ToListAsync();
+            var dayDiffProductionValue =await dbContext.Queryable<DailyDeviation>().Where(x => x.IsDelete == 1).ToListAsync();
             #endregion
 
             #region 项目总体生产情况
@@ -3731,6 +3743,28 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
             jjtSendMessageMonitoringDayReportResponseDto.SpecialProjectInfo = specialProjectList;
             #endregion
 
+            #region 每天的生产结果已json的形式保存
+            if (!isPhone&&Utils.IsLinxuSystem())
+            {
+                try
+                {
+                    RecordPushDayReport recordPushDayReport = new RecordPushDayReport()
+                    {
+                        Id = GuidUtil.Next(),
+                        DateDay = int.Parse(DateTime.Now.AddDays(-1).ToString("yyyyMMdd")),
+                        Json = jjtSendMessageMonitoringDayReportResponseDto.ToJson()
+                    };
+                    dbContext.Insertable<RecordPushDayReport>(recordPushDayReport).ExecuteCommandAsync();
+                }
+                catch (Exception)
+                {
+
+
+                }
+            }
+
+
+            #endregion
 
             #region 各单位填报情况（数据质量）
 

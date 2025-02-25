@@ -558,6 +558,7 @@ namespace GHMonitoringCenterApi.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet("DayReportApprove")]
+        [AllowAnonymous]
         public async Task<ResponseAjaxResult<bool>> DayReportApproveAsync(bool isApprove,string? vali)
         {
             ResponseAjaxResult<bool> responseAjaxResult = new ResponseAjaxResult<bool>();
@@ -588,7 +589,7 @@ namespace GHMonitoringCenterApi.Controllers
             else
             {
                 responseAjaxResult.Data = false;
-                responseAjaxResult.Success();
+                responseAjaxResult.Success("非法请求拒绝访问",Domain.Shared.Enums.HttpStatusCode.VerifyFail);
                 return responseAjaxResult;
             }
            
