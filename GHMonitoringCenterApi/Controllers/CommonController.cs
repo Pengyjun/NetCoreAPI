@@ -22,7 +22,11 @@ using GHMonitoringCenterApi.Domain.Shared;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using NSwag.Annotations;
-
+using SqlSugar.Extensions;
+using UtilsSharp;
+using Wangkanai.Detection;
+using Wangkanai.Detection.Models;
+using Wangkanai.Detection.Services;
 namespace GHMonitoringCenterApi.Controllers
 {
 
@@ -36,11 +40,12 @@ namespace GHMonitoringCenterApi.Controllers
     public class CommonController : BaseController
     {
         #region 依赖注入
-
+        private readonly IDetectionService  detectionService;
         private IBaseService baseService { get; set; }
 
-        public CommonController(IBaseService baseService)
+        public CommonController(IBaseService baseService, IDetectionService detectionService)
         {
+            this.detectionService = detectionService;
             this.baseService = baseService;
         }
 
@@ -538,7 +543,10 @@ namespace GHMonitoringCenterApi.Controllers
         {
             return await baseService.RecordHolidayAsync(year);
         }
-
+        /// <summary>
+        /// 日报推送审核人
+        /// </summary>
+        /// <returns></returns>
         [HttpGet("DayReportApprovePush")]
         [AllowAnonymous]
         public async Task<bool> DayReportApprovePushAsync()
@@ -550,9 +558,40 @@ namespace GHMonitoringCenterApi.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet("DayReportApprove")]
-        public async Task<ResponseAjaxResult<bool>> DayReportApproveAsync(bool isApprove)
+        public async Task<ResponseAjaxResult<bool>> DayReportApproveAsync(bool isApprove,string? vali)
         {
-            return await baseService.DayReportApproveAsync(isApprove);
+            ResponseAjaxResult<bool> responseAjaxResult = new ResponseAjaxResult<bool>();
+            var nowTime= DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+            var endTime= DateTime.Now.ToString("yyyy-MM-dd 10:01:00");
+            var sec=TimeHelper.GetTimeSpan(nowTime.ObjToDate(), endTime.ObjToDate()).Seconds;
+            if (sec > 0 && DateTime.Now.Hour == 10)
+            {
+                responseAjaxResult.Data = false;
+                responseAjaxResult.Success($"当前时间不能审核请等待{sec}后点击审核");
+                return responseAjaxResult;
+            }
+            else if(DateTime.Now.Hour >= 10&& DateTime.Now.Minute==59 && DateTime.Now.Second >= 55)
+            {
+                //如果是11点的时候 就不允许审核了
+                responseAjaxResult.Data = false;
+                responseAjaxResult.Success($"审核时间已过，请联系管理员");
+                return responseAjaxResult;
+            }
+            if (detectionService.Device.Type == Device.Mobile && !string.IsNullOrWhiteSpace(vali))
+            {
+                return await baseService.DayReportApproveAsync(isApprove, vali);
+            }
+            else if (detectionService.Device.Type == Device.Desktop)
+            {
+                return await baseService.DayReportApproveAsync(isApprove,string.Empty);
+            }
+            else
+            {
+                responseAjaxResult.Data = false;
+                responseAjaxResult.Success();
+                return responseAjaxResult;
+            }
+           
         }
 
         /// <summary>

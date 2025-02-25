@@ -177,6 +177,12 @@ namespace GHMonitoringCenterApi.Domain.Models
         public Guid? ShipId { get; set; }
 
         /// <summary>
+        /// 船舶 1 自有 2 分包
+        /// </summary>
+        [SugarColumn(ColumnDataType = "int", DefaultValue = "0")]
+        public int ShipType { get; set; }
+
+        /// <summary>
         /// 项目id
         /// </summary>
         [SugarColumn(Length = 36)]

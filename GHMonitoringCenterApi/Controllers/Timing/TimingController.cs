@@ -143,5 +143,16 @@ namespace GHMonitoringCenterApi.Controllers.Timing
         {
             return await timeService.GetSpecialConstruction();
         }
+
+          /// <summary>
+          /// 同步外网交建云日报审核数据
+          /// </summary>
+          /// <returns></returns>
+        [HttpGet("SynchronizationJJYData")]
+        public async Task<ResponseAjaxResult<string>> SynchronizationJJYDataAsync()
+        {
+            return await timeService.SynchronizationJJYDataAsync();
+        }
+
     }
 }

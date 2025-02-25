@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using Aspose.Words.Drawing;
+using AutoMapper;
 using GHMonitoringCenterApi.Application.Contracts.Dto;
 using GHMonitoringCenterApi.Application.Contracts.Dto.Common;
 using GHMonitoringCenterApi.Application.Contracts.Dto.Enums;
@@ -6,6 +7,7 @@ using GHMonitoringCenterApi.Application.Contracts.Dto.Project;
 using GHMonitoringCenterApi.Application.Contracts.Dto.Project.ExcelImport;
 using GHMonitoringCenterApi.Application.Contracts.Dto.Project.Report;
 using GHMonitoringCenterApi.Application.Contracts.Dto.ProjectPlanProduction;
+using GHMonitoringCenterApi.Application.Contracts.Dto.ProjectWBSUpload;
 using GHMonitoringCenterApi.Application.Contracts.IService;
 using GHMonitoringCenterApi.Application.Contracts.IService.OperationLog;
 using GHMonitoringCenterApi.Application.Contracts.IService.Project;
@@ -17,6 +19,7 @@ using GHMonitoringCenterApi.Domain.Shared;
 using GHMonitoringCenterApi.Domain.Shared.Const;
 using GHMonitoringCenterApi.Domain.Shared.Enums;
 using GHMonitoringCenterApi.Domain.Shared.Util;
+using NPOI.SS.Formula.Functions;
 using SqlSugar;
 using SqlSugar.Extensions;
 using System.Text;
@@ -4013,7 +4016,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
         /// </summary>
         /// <param name="requestBody"></param>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<SearchProjectAnnualProduction>> SearchProjectAnnualProductionAsync(SearchProjectAnnualProductionRequest requestBody)
+        public async Task<ResponseAjaxResult<SearchProjectAnnualProduction>> SearchProjectAnnualProductionDetailsAsync(SearchProjectAnnualProductionRequest requestBody)
         {
             ResponseAjaxResult<SearchProjectAnnualProduction> rt = new();
             SearchProjectAnnualProduction rr = new();
@@ -4043,10 +4046,6 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     .Where(t => t.IsDelete == 1 && companyIds.Contains(t.CompanyId))
                     .ToPageListAsync(requestBody.PageIndex, requestBody.PageSize, total);
             }
-            if (!pPlanProduction.Any())
-            {
-                return rt.SuccessResult(rr);
-            }
             var pIds = pPlanProduction.Select(x => x.ProjectId).ToList();
 
             //项目基本信息
@@ -4062,7 +4061,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             {
                 decimal completeAmount = 0M;//完成产值
                 decimal accumulatedOutputValue = 0M;//开累产值
-                var pp = projects.FirstOrDefault(x => x.Id == requestBody.ProjectId);
+                var pp = await dbContext.Queryable<Project>().FirstAsync(x => x.Id == requestBody.ProjectId && x.IsDelete == 1);
                 if (pp != null)
                 {
                     var dateMonth = DateTime.Now.ToDateMonth();
@@ -4086,6 +4085,10 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     rr.RemainingAmount = Convert.ToDecimal(pp.ECAmount) - completeAmount;
                     rr.AccumulatedOutputValue = accumulatedOutputValue;
                 }
+            }
+            if (!pPlanProduction.Any())
+            {
+                return rt.SuccessResult(rr);
             }
 
             foreach (var item in pPlanProduction)
@@ -4128,6 +4131,78 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             return rt.SuccessResult(rr);
         }
 
+        /// <summary>
+        /// 列表
+        /// </summary>
+        /// <param name="requestBody"></param>
+        /// <returns></returns>
+        public async Task<ResponseAjaxResult<List<SearchProjectAnnualProductionDto>>> SearchProjectAnnualProductionAsync(SearchProjectAnnualProductionRequest requestBody)
+        {
+            ResponseAjaxResult<List<SearchProjectAnnualProductionDto>> rt = new();
+            List<SearchProjectAnnualProductionDto> rr = new();
+
+            //初始化
+            RefAsync<int> total = 0;
+            List<ProjectAnnualProduction> pPlanProduction = new();
+
+            // 初始化公司键值对，包含序号
+            var companyDictionary = KeyValuePairs();
+
+            if (_currentUser.CurrentLoginIsAdmin == true)
+            {
+                pPlanProduction = await dbContext.Queryable<ProjectAnnualProduction>()
+                    .WhereIF(!string.IsNullOrWhiteSpace(requestBody.ProjectId.ToString()), t => t.ProjectId == requestBody.ProjectId)
+                    .Where(t => t.IsDelete == 1)
+                    .ToPageListAsync(requestBody.PageIndex, requestBody.PageSize, total);
+            }
+            else
+            {
+                //授权用户得到的公司ids
+                var userAuthForData = await GetCurrentUserAuthForDataAsync();
+                var companyIds = userAuthForData.CompanyIds.ToList();
+                pPlanProduction = await dbContext.Queryable<ProjectAnnualProduction>()
+                    .WhereIF(!string.IsNullOrWhiteSpace(requestBody.ProjectId.ToString()), t => t.ProjectId == requestBody.ProjectId)
+                    .Where(t => t.IsDelete == 1 && companyIds.Contains(t.CompanyId))
+                    .ToPageListAsync(requestBody.PageIndex, requestBody.PageSize, total);
+            }
+
+            foreach (var item in pPlanProduction)
+            {
+                SearchProjectAnnualProductionDto ppChild = new();
+                ppChild.Id = item.Id;
+                ppChild.JanuaryProductionQuantity = item.JanuaryProductionQuantity;
+                ppChild.JanuaryProductionValue = item.JanuaryProductionValue;
+                ppChild.FebruaryProductionQuantity = item.FebruaryProductionQuantity;
+                ppChild.FebruaryProductionValue = item.FebruaryProductionValue;
+                ppChild.MarchProductionQuantity = item.MarchProductionQuantity;
+                ppChild.MarchProductionValue = item.MarchProductionValue;
+                ppChild.AprilProductionQuantity = item.AprilProductionQuantity;
+                ppChild.AprilProductionValue = item.AprilProductionValue;
+                ppChild.MayProductionQuantity = item.MayProductionQuantity;
+                ppChild.MayProductionValue = item.MayProductionValue;
+                ppChild.JuneProductionQuantity = item.JuneProductionQuantity;
+                ppChild.JuneProductionValue = item.JuneProductionValue;
+                ppChild.JulyProductionQuantity = item.JulyProductionQuantity;
+                ppChild.JulyProductionValue = item.JulyProductionValue;
+                ppChild.AugustProductionValue = item.AugustProductionValue;
+                ppChild.AugustProductionQuantity = item.AugustProductionQuantity;
+                ppChild.SeptemberProductionQuantity = item.SeptemberProductionQuantity;
+                ppChild.SeptemberProductionValue = item.SeptemberProductionValue;
+                ppChild.OctoberProductionQuantity = item.OctoberProductionQuantity;
+                ppChild.OctoberProductionValue = item.OctoberProductionValue;
+                ppChild.NovemberProductionQuantity = item.NovemberProductionQuantity;
+                ppChild.NovemberProductionValue = item.NovemberProductionValue;
+                ppChild.DecemberProductionQuantity = item.DecemberProductionQuantity;
+                ppChild.DecemberProductionValue = item.DecemberProductionValue;
+                ppChild.ShipId = item.ShipId;
+                ppChild.ProjectId = item.ProjectId;
+                ppChild.CompanyId = item.CompanyId;
+                rr.Add(ppChild);
+            }
+
+            rt.Count = rr.Count;
+            return rt.SuccessResult(rr);
+        }
         /// <summary>
         /// 保存
         /// </summary>
@@ -4176,12 +4251,12 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                             first.DecemberProductionQuantity = item.DecemberProductionQuantity;
                             first.DecemberProductionValue = item.DecemberProductionValue;
                             first.ShipId = item.ShipId;
+                            first.ShipType = item.ShipType;
                             upTables.Add(first);
                         }
                     }
                     else
                     {
-                        item.Id = GuidUtil.Next();
                         addTables.Add(new ProjectAnnualProduction
                         {
                             JanuaryProductionQuantity = item.JanuaryProductionQuantity,
@@ -4210,7 +4285,10 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                             DecemberProductionValue = item.DecemberProductionValue,
                             ShipId = item.ShipId,
                             ProjectId = item.ProjectId,
-                            CompanyId = item.CompanyId
+                            CompanyId = item.CompanyId,
+                            ShipType = item.ShipType,
+                            Year = DateTime.Now.Year,
+                            Id = GuidUtil.Next()
                         });
                     }
                 }
@@ -4263,17 +4341,79 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                         ProjectName = x.ShortName
                     }).ToListAsync();
             }
-            ownShipsForAnnualProductions = await dbContext.Queryable<OwnerShip>().Where(x => x.IsDelete == 1)
+            var owns = await dbContext.Queryable<OwnerShip>().Where(x => x.IsDelete == 1)
                 .Select(x => new OwnShipsForAnnualProduction
                 {
                     Id = x.PomId,
-                    Name = x.Name
+                    Name = x.Name,
+                    SubOrOwn = 1
                 }).ToListAsync();
+            var subs = await dbContext.Queryable<SubShip>().Where(x => x.IsDelete == 1)
+                .Select(x => new OwnShipsForAnnualProduction
+                {
+                    Id = x.PomId,
+                    Name = x.Name,
+                    SubOrOwn = 2
+                }).ToListAsync();
+            ownShipsForAnnualProductions.AddRange(owns);
+            ownShipsForAnnualProductions.AddRange(subs);
 
             rr.ProjectInfosForAnnualProductions = projectInfosForAnnualProductions;
             rr.OwnShipsForAnnualProductions = ownShipsForAnnualProductions;
             return rt.SuccessResult(rr);
         }
+
+        /// <summary>
+        /// 导入数据
+        /// </summary>
+        /// <param name="requestBody"></param>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        public async Task<ResponseAjaxResult<bool>> ExcelProjectAnnualProductionAsync(ProjectAnnualProductionDto requestBody)
+        {
+            ResponseAjaxResult<bool> rt = new();
+            List<ProjectAnnualProduction> add = new();
+
+            var rr = requestBody.ExcelImport.ToList();
+
+            if (rr != null && rr.Any())
+            {
+                var tables = await dbContext.Queryable<ProjectAnnualProduction>().Where(t => t.IsDelete == 1 && t.Year == DateTime.Now.Year).ToListAsync();
+                tables.ForEach(x => x.IsDelete = 0);
+                await dbContext.Updateable(tables).UpdateColumns(x => x.IsDelete).ExecuteCommandAsync();
+                var projects = await dbContext.Queryable<Project>().Where(t => t.IsDelete == 1).Select(x => new { x.Id, x.CompanyId }).ToListAsync();
+                foreach (var item in rr)
+                {
+                    var compId = projects.FirstOrDefault(x => x.Id == item.ProjectId)?.CompanyId;
+                    add.Add(new ProjectAnnualProduction
+                    {
+                        JanuaryProductionValue = item.JanuaryProductionValue,
+                        FebruaryProductionValue = item.FebruaryProductionValue,
+                        MarchProductionValue = item.MarchProductionValue,
+                        AprilProductionValue = item.AprilProductionValue,
+                        MayProductionValue = item.MayProductionValue,
+                        JuneProductionValue = item.JuneProductionValue,
+                        JulyProductionValue = item.JulyProductionValue,
+                        AugustProductionValue = item.AugustProductionValue,
+                        SeptemberProductionValue = item.SeptemberProductionValue,
+                        OctoberProductionValue = item.OctoberProductionValue,
+                        NovemberProductionValue = item.NovemberProductionValue,
+                        DecemberProductionValue = item.DecemberProductionValue,
+                        ProjectId = item.ProjectId,
+                        ShipType = 2,
+                        CompanyId = compId.Value,
+                        Year = DateTime.Now.Year,
+                        Id = GuidUtil.Next()
+                    });
+                }
+                await dbContext.Insertable(add).ExecuteCommandAsync();
+
+                rt.Data = true;
+                rt.Success();
+            }
+            return rt;
+        }
+
         /// <summary>
         /// 公司初始化
         /// </summary>
@@ -4327,10 +4467,6 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             url = url.Replace("year", DateTime.Now.Year.ToString());
             return false;
         }
-
-
-
-
 
 
         #endregion
