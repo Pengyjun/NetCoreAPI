@@ -213,6 +213,11 @@
         /// </summary>
         public int ShipType { get; set; }
 
+        /// <summary>
+        /// 船舶名称
+        /// </summary>
+        public string? ShipName { get; set; }
+
     }
     /// <summary>
     /// 

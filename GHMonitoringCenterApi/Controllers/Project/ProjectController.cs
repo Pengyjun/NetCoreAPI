@@ -2424,7 +2424,7 @@ namespace GHMonitoringCenterApi.Controllers.Project
             {
                 var production = new ProjectAnnualProductionDto()
                 {
-                    ExcelImport = rows.Where(x => x.ProjectId != Guid.Empty && !string.IsNullOrWhiteSpace(x.ProjectId.ToString())).ToList()
+                    ExcelImport = rows
                 };
                 var insert = await projectService.ExcelProjectAnnualProductionAsync(production);
                 responseAjaxResult.Data = true;

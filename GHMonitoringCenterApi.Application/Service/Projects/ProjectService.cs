@@ -4087,7 +4087,9 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 }
             }
 
-            var annualProductionShips = await dbContext.Queryable<AnnualProductionShips>().Where(t => t.IsDelete == 1).ToListAsync();
+            var annualProductionShips = await dbContext.Queryable<AnnualProductionShips>()
+                .WhereIF(!requestBody.IsProjectAnnualProduction, x => x.ShipType == 2)
+                .Where(t => t.IsDelete == 1).ToListAsync();
 
             foreach (var item in pPlanProduction)
             {
@@ -4119,7 +4121,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 ppChild.DecemberProductionValue = item.DecemberProductionValue;
                 ppChild.AnnualProductionShips = annualProductionShips
                     .Where(x => x.ProjectAnnualProductionId == item.Id)
-                    .Select(x => new AnnualPlanProductionShips { ShipId = x.ShipId, ShipType = x.ShipType })
+                    .Select(x => new AnnualPlanProductionShips { ShipId = x.ShipId, ShipType = x.ShipType, ShipName = x.ShipName })
                     .ToList();
                 ppChild.ProjectId = item.ProjectId;
                 ppChild.CompanyId = item.CompanyId;
@@ -4163,7 +4165,9 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     .ToPageListAsync(requestBody.PageIndex, requestBody.PageSize, total);
             }
 
-            var annualProductionShips = await dbContext.Queryable<AnnualProductionShips>().Where(t => t.IsDelete == 1).ToListAsync();
+            var annualProductionShips = await dbContext.Queryable<AnnualProductionShips>()
+                .WhereIF(!requestBody.IsProjectAnnualProduction, x => x.ShipType == 2)
+                .Where(t => t.IsDelete == 1).ToListAsync();
 
             foreach (var item in pPlanProduction)
             {
@@ -4195,7 +4199,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 ppChild.DecemberProductionValue = item.DecemberProductionValue;
                 ppChild.AnnualProductionShips = annualProductionShips
                     .Where(x => x.ProjectAnnualProductionId == item.Id)
-                    .Select(x => new AnnualPlanProductionShips { ShipId = x.ShipId, ShipType = x.ShipType })
+                    .Select(x => new AnnualPlanProductionShips { ShipId = x.ShipId, ShipType = x.ShipType, ShipName = x.ShipName })
                     .ToList();
                 ppChild.ProjectId = item.ProjectId;
                 ppChild.CompanyId = item.CompanyId;
@@ -4263,6 +4267,8 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                                 {
                                     Id = GuidUtil.Next(),
                                     ShipType = ship.ShipType,
+                                    ShipId = ship.ShipId,
+                                    ShipName = ship.ShipName,
                                     ProjectAnnualProductionId = first.Id
                                 });
                             }
@@ -4309,10 +4315,17 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                             {
                                 Id = GuidUtil.Next(),
                                 ShipType = ship.ShipType,
+                                ShipId = ship.ShipId,
+                                ShipName = ship.ShipName,
                                 ProjectAnnualProductionId = id
                             });
                         }
                     }
+                }
+                if (Ids.Any())
+                {
+                    var delete = await dbContext.Queryable<AnnualProductionShips>().Where(x => Ids.Contains(x.ProjectAnnualProductionId)).ToListAsync();
+                    await dbContext.Deleteable(delete).ExecuteCommandAsync();
                 }
                 if (upTables.Any())
                 {
@@ -4325,12 +4338,6 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 if (addShipTables.Any())
                 {
                     await dbContext.Insertable(addShipTables).ExecuteCommandAsync();
-                }
-                if (Ids.Any())
-                {
-                    var delete = await dbContext.Queryable<AnnualProductionShips>().Where(x => Ids.Contains(x.ProjectAnnualProductionId)).ToListAsync();
-                    delete.ForEach(x => x.IsDelete = 0);
-                    await dbContext.Updateable(delete).UpdateColumns(x => x.IsDelete).ExecuteCommandAsync();
                 }
                 rt.SuccessResult(true, "保存成功");
             }
@@ -4358,7 +4365,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     {
                         CompanyId = x.CompanyId,
                         ProjectId = x.Id,
-                        ProjectName = x.ShortName
+                        ProjectName = x.Name
                     }).ToListAsync();
             }
             else
@@ -4370,7 +4377,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     {
                         CompanyId = x.CompanyId,
                         ProjectId = x.Id,
-                        ProjectName = x.ShortName
+                        ProjectName = x.Name
                     }).ToListAsync();
             }
             var owns = await dbContext.Queryable<OwnerShip>().Where(x => x.IsDelete == 1)
@@ -4413,10 +4420,16 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 var tables = await dbContext.Queryable<ProjectAnnualPlanProduction>().Where(t => t.IsDelete == 1 && t.Year == DateTime.Now.Year).ToListAsync();
                 tables.ForEach(x => x.IsDelete = 0);
                 await dbContext.Updateable(tables).UpdateColumns(x => x.IsDelete).ExecuteCommandAsync();
-                var projects = await dbContext.Queryable<Project>().Where(t => t.IsDelete == 1).Select(x => new { x.Id, x.CompanyId }).ToListAsync();
+                var projects = await dbContext.Queryable<Project>().Select(x => new { x.Id, x.CompanyId, x.Name }).ToListAsync();
+                var names = new List<string>();
                 foreach (var item in rr)
                 {
-                    var compId = projects.FirstOrDefault(x => x.Id == item.ProjectId)?.CompanyId;
+                    var name = "";
+                    if (item.ProjectName.Length > 10)
+                    {
+                        name = item.ProjectName.Substring(0, 10);
+                    }
+                    var pp = projects.FirstOrDefault(x => x.Name.Contains(name));
                     add.Add(new ProjectAnnualPlanProduction
                     {
                         JanuaryProductionValue = item.JanuaryProductionValue,
@@ -4431,11 +4444,18 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                         OctoberProductionValue = item.OctoberProductionValue,
                         NovemberProductionValue = item.NovemberProductionValue,
                         DecemberProductionValue = item.DecemberProductionValue,
-                        ProjectId = item.ProjectId,
-                        CompanyId = compId.Value,
+                        ProjectId = pp?.Id ?? null,
+                        CompanyId = Guid.Empty,
                         Year = DateTime.Now.Year,
                         Id = GuidUtil.Next()
                     });
+                    if (pp == null) names.Add(item.ProjectName);
+                }
+                add = add.Where(x => x.ProjectId != Guid.Empty && x.ProjectId != null).ToList();
+                foreach (var item in add)
+                {
+                    var compId = projects.FirstOrDefault(x => x.Id == item.ProjectId)?.CompanyId;
+                    item.CompanyId = compId.Value;
                 }
                 await dbContext.Insertable(add).ExecuteCommandAsync();
 
