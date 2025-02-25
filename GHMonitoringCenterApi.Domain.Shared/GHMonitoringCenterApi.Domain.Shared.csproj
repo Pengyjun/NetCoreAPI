@@ -36,6 +36,9 @@
 	  <None Update="Template\Excel\ProductionDayReport.xlsx">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </None>
+	  <None Update="Template\Excel\ProjectAnnualProductionTemp.xlsx">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
 	  <None Update="Template\Excel\RepairPartsTemplate.xlsx">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </None>

@@ -7,11 +7,9 @@ using GHMonitoringCenterApi.Application.Contracts.Dto.Project.ShipMovements;
 using GHMonitoringCenterApi.Application.Contracts.Dto.ProjectDepartMent;
 using GHMonitoringCenterApi.Application.Contracts.Dto.ProjectPlanProduction;
 using GHMonitoringCenterApi.Application.Contracts.Dto.ProjectProductionReport;
-using GHMonitoringCenterApi.Application.Contracts.Dto.ProjectWBSUpload;
 using GHMonitoringCenterApi.Application.Contracts.Dto.Ship;
 using GHMonitoringCenterApi.Application.Contracts.Dto.Upload;
 using GHMonitoringCenterApi.Application.Contracts.IService.Project;
-using GHMonitoringCenterApi.Application.Service;
 using GHMonitoringCenterApi.CustomAttribute;
 using GHMonitoringCenterApi.Domain.Models;
 using GHMonitoringCenterApi.Domain.Shared;
@@ -2411,28 +2409,49 @@ namespace GHMonitoringCenterApi.Controllers.Project
         public async Task<ResponseAjaxResult<bool>> ExcelProjectAnnualProductionAsync()
         {
             ResponseAjaxResult<bool> responseAjaxResult = new();
-            //var streamUpdateFile = await StreamUpdateFileAsync();
-            //var streamUpdate = streamUpdateFile.Data;
-            //if (streamUpdateFile != null)
-            //{
-            //var savePath = AppsettingsHelper.GetValue("UpdateItem:SavePath");
-            var savePath = $@"C:\\Users\\pyej0\\Desktop\\12f50423457b1ab96376da8a9bb01fca_3bd90de8e99f5d15b27804159cff8651_8.xlsx";
-            //var path = savePath + streamUpdate.Name;
-            //var rows = MiniExcel.Query<SearchProjectAnnualProductionDto>(path, startCell: "A3").ToList();
-            var rows = MiniExcel.Query<SearchProjectAnnualProductionDto>(savePath, startCell: "A2").ToList();
-            if (rows.Any())
+            var streamUpdateFile = await StreamUpdateFileAsync();
+            var streamUpdate = streamUpdateFile.Data;
+            if (streamUpdateFile != null)
             {
-                var production = new ProjectAnnualProductionDto()
+                var savePath = AppsettingsHelper.GetValue("UpdateItem:SavePath");
+                var path = savePath + streamUpdate.Name;
+                var rows = MiniExcel.Query<SearchProjectAnnualProductionDto>(path, startCell: "A4").ToList();
+                if (rows.Any())
                 {
-                    ExcelImport = rows
-                };
-                var insert = await projectService.ExcelProjectAnnualProductionAsync(production);
-                responseAjaxResult.Data = true;
+                    var production = new ProjectAnnualProductionDto()
+                    {
+                        ExcelImport = rows
+                    };
+                    var insert = await projectService.ExcelProjectAnnualProductionAsync(production);
+                    responseAjaxResult.Data = true;
+                }
+                responseAjaxResult.Success();
             }
-            responseAjaxResult.Success();
-
+            else
+            {
+                responseAjaxResult.Fail(ResponseMessage.OPERATION_UPLOAD_FAIL);
+            }
             return responseAjaxResult;
         }
+
+
+        /// <summary>
+        /// 生产计划模板下载
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("ExcelProjectAnnualProductionTemp")]
+        public async Task<IActionResult> ExcelProjectAnnualProductionTempAsync()
+        {
+            var templatePath = $"Template/Excel/ProjectAnnualProductionTemp.xlsx";
+            var importData = new
+            {
+                year = DateTime.Now.Year,
+                month = DateTime.Now.Month,
+                day = DateTime.Now.Day,
+            };
+            return await ExcelTemplateImportAsync(templatePath, importData, "生产计划模板");
+        }
+
         #endregion
     }
 }
