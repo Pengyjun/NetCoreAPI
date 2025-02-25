@@ -192,24 +192,27 @@
         public decimal DecemberProductionValue { get; set; }
 
         /// <summary>
-        /// 资源Id(船舶)
+        /// 船舶
+        /// </summary>
+        public List<AnnualPlanProductionShips> AnnualProductionShips { get; set; } = new List<AnnualPlanProductionShips>();
+
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public class AnnualPlanProductionShips
+    {
+        /// <summary>
+        /// 资源id  船舶id
         /// </summary>
         public Guid? ShipId { get; set; }
 
         /// <summary>
-        /// 船舶 1自有 2分包
+        /// 1自有 2 分包
         /// </summary>
         public int ShipType { get; set; }
 
-        /// <summary>
-        /// 资源(船舶)
-        /// </summary>
-        public string? ShipName { get; set; }
-
-        ///// <summary>
-        ///// 排序
-        ///// </summary>
-        //public int Sequence { get; set; }
     }
     /// <summary>
     /// 
