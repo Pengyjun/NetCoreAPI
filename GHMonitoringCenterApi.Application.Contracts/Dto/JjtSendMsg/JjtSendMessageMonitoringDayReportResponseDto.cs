@@ -607,6 +607,8 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.JjtSendMsg
         /// 未填报次数
         /// </summary>
         public int Count { get; set; }
+
+        public int? Sort { get; set; }
     }
     #endregion
 
