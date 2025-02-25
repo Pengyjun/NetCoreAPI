@@ -7,9 +7,11 @@ using GHMonitoringCenterApi.Application.Contracts.Dto.Project.ShipMovements;
 using GHMonitoringCenterApi.Application.Contracts.Dto.ProjectDepartMent;
 using GHMonitoringCenterApi.Application.Contracts.Dto.ProjectPlanProduction;
 using GHMonitoringCenterApi.Application.Contracts.Dto.ProjectProductionReport;
+using GHMonitoringCenterApi.Application.Contracts.Dto.ProjectWBSUpload;
 using GHMonitoringCenterApi.Application.Contracts.Dto.Ship;
 using GHMonitoringCenterApi.Application.Contracts.Dto.Upload;
 using GHMonitoringCenterApi.Application.Contracts.IService.Project;
+using GHMonitoringCenterApi.Application.Service;
 using GHMonitoringCenterApi.CustomAttribute;
 using GHMonitoringCenterApi.Domain.Models;
 using GHMonitoringCenterApi.Domain.Shared;
@@ -19,6 +21,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MiniExcelLibs;
 using SqlSugar;
+using UtilsSharp;
 
 namespace GHMonitoringCenterApi.Controllers.Project
 {
@@ -2354,9 +2357,82 @@ namespace GHMonitoringCenterApi.Controllers.Project
             return projectService.GetHolidays();
         }
 
+        #endregion
 
+        #region 项目年初计划
+        /// <summary>
+        /// 列表子项
+        /// </summary>
+        /// <param name="requestBody"></param>
+        /// <returns></returns>
+        [HttpGet("SearchProjectAnnualProductionDetails")]
+        public async Task<ResponseAjaxResult<SearchProjectAnnualProduction>> SearchProjectAnnualProductionDetailsAsync([FromQuery] SearchProjectAnnualProductionRequest requestBody)
+        {
+            return await projectService.SearchProjectAnnualProductionDetailsAsync(requestBody);
+        }
 
+        /// <summary>
+        /// 列表
+        /// </summary>
+        /// <param name="requestBody"></param>
+        /// <returns></returns>
+        [HttpGet("SearchProjectAnnualProduction")]
+        public async Task<ResponseAjaxResult<List<SearchProjectAnnualProductionDto>>> SearchProjectAnnualProductionAsync([FromQuery] SearchProjectAnnualProductionRequest requestBody)
+        {
+            return await projectService.SearchProjectAnnualProductionAsync(requestBody);
+        }
 
+        /// <summary>
+        /// 保存
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost("SaveProjectAnnualProduction")]
+        public async Task<ResponseAjaxResult<bool>> SaveProjectAnnualProductionAsync([FromBody] List<SearchProjectAnnualProductionDto>? requestBody)
+        {
+            return await projectService.SaveProjectAnnualProductionAsync(requestBody);
+        }
+
+        /// <summary>
+        /// 项目 船舶
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("BaseAnnualProduction")]
+        public async Task<ResponseAjaxResult<BaseAnnualProduction>> BaseAnnualProductionAsync()
+        {
+            return await projectService.BaseAnnualProductionAsync();
+        }
+
+        /// <summary>
+        ///导入 
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost("ExcelProjectAnnualProduction")]
+        [AllowAnonymous]
+        public async Task<ResponseAjaxResult<bool>> ExcelProjectAnnualProductionAsync()
+        {
+            ResponseAjaxResult<bool> responseAjaxResult = new();
+            //var streamUpdateFile = await StreamUpdateFileAsync();
+            //var streamUpdate = streamUpdateFile.Data;
+            //if (streamUpdateFile != null)
+            //{
+            //var savePath = AppsettingsHelper.GetValue("UpdateItem:SavePath");
+            var savePath = $@"C:\\Users\\pyej0\\Desktop\\12f50423457b1ab96376da8a9bb01fca_3bd90de8e99f5d15b27804159cff8651_8.xlsx";
+            //var path = savePath + streamUpdate.Name;
+            //var rows = MiniExcel.Query<SearchProjectAnnualProductionDto>(path, startCell: "A3").ToList();
+            var rows = MiniExcel.Query<SearchProjectAnnualProductionDto>(savePath, startCell: "A2").ToList();
+            if (rows.Any())
+            {
+                var production = new ProjectAnnualProductionDto()
+                {
+                    ExcelImport = rows.Where(x => x.ProjectId != Guid.Empty && !string.IsNullOrWhiteSpace(x.ProjectId.ToString())).ToList()
+                };
+                var insert = await projectService.ExcelProjectAnnualProductionAsync(production);
+                responseAjaxResult.Data = true;
+            }
+            responseAjaxResult.Success();
+
+            return responseAjaxResult;
+        }
         #endregion
     }
 }

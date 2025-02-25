@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace GHMonitoringCenterApi.Application.Contracts.Dto.Common
+﻿namespace GHMonitoringCenterApi.Application.Contracts.Dto.Common
 {
     /// <summary>
     /// 用户授权数据允许访问dto
