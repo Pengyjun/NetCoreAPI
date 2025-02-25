@@ -2630,7 +2630,7 @@ namespace GHMonitoringCenterApi.Application.Service
                     var obj = new SingleMessageTemplateRequestDto()
                     {
                         MessageType = "text",
-                        TextContent = $"您好:" + DateTime.Now.AddDays(-1).ToString("MM月dd") + "日报还未审核,请登录智慧运营中心-日报推送审核页面进行审核;移动端请访问:" + phonePage,
+                        TextContent = $"您好:" + DateTime.Now.AddDays(-1).ToString("MM月dd") + "日报还未审核,请登录智慧运营中心-日报推送审核页面进行审核;移动端请访问:\r\n" + phonePage,
                         UserIds = new List<string>() { item }
                     };
                     var pushResult = JjtUtils.SinglePushMessage(obj, false);
