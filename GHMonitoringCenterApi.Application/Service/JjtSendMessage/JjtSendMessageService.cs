@@ -19,6 +19,7 @@ using Newtonsoft.Json;
 using NPOI.SS.Formula.Functions;
 using SqlSugar;
 using SqlSugar.Extensions;
+using System.Linq;
 using UtilsSharp;
 using Model = GHMonitoringCenterApi.Domain.Models;
 
@@ -3178,14 +3179,22 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
 
             //项目数据 项目类型为其他非施工类业务 排除
             var noConstrutionProject = CommonData.NoConstrutionProjectType;
+            //公司ID
+            var comIds=commonDataList.Where(x => x.Type == 1).Select(x => x.ItemId).ToList();
             var projectList = await dbContext.Queryable<Project>().Where(x => x.IsDelete == 1
-          && x.TypeId != noConstrutionProject).ToListAsync();
+          && x.TypeId != noConstrutionProject&& comIds.Contains(x.CompanyId)).ToListAsync();
             //本年月报数据
             List<MonthReport> monthYearList = null;
             if (isDayCalc)
             {
                 monthYearList = await dbContext.Queryable<MonthReport>().Where(x => x.IsDelete == 1 && x.DateMonth >= monthStartTime && x.DateMonth <= monthEndTime).ToListAsync();
             }
+            #endregion
+
+
+            #region 计算今日调差产值数 数据源
+            //获取今日调差的数据
+            var dayDiffProductionValue=await dbContext.Queryable<DailyDeviation>().Where(x => x.IsDelete == 1).ToListAsync();
             #endregion
 
             #region 项目总体生产情况
@@ -3278,6 +3287,9 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
             var dayTotalProductionValue = 0M;
             foreach (var companyProduction in productionBaseInfo)
             {
+                #region 计算调差产值
+                var diffValue = CalcDiffValue(dayTime, dayDiffProductionValue, companyProduction.ItemId.Value);
+                #endregion
                 var companyProjectId = projectList
                     .Where(x => x.CompanyId == companyProduction.ItemId)
                     .WhereIF(!isCalcSub, x => x.IsSubContractProject != 2).Select(x => x.Id).ToList();
@@ -3305,9 +3317,9 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
                          .WhereIF(!isDayCalc, x => x.DateDay >= startYearTime && x.DateDay <= endYearTime)
                          .Sum(x => x.DayActualProductionAmount);
                     //各个公司每天日报产值数
-                    var dayProducitionValue = Math.Round(dayYearList.Where(x => companyProjectId.Contains(x.ProjectId) && x.DateDay == dayTime).Sum(x => x.DayActualProductionAmount), 2);
+                    var dayProducitionValue = Math.Round((dayYearList.Where(x => companyProjectId.Contains(x.ProjectId) && x.DateDay == dayTime).Sum(x => x.DayActualProductionAmount)- diffValue), 2);
                     //各个公司本年累计数
-                    var totalProductionValue = isDayCalc ? Math.Round(monthYearList.Where(x => companyProjectId.Contains(x.ProjectId)).Sum(x => x.CompleteProductionAmount) + companyMonthDayProduction / baseConst, 2) : companyMonthDayProduction;
+                    var totalProductionValue = isDayCalc ? Math.Round(monthYearList.Where(x => companyProjectId.Contains(x.ProjectId)).Sum(x => x.CompleteProductionAmount)- diffValue + companyMonthDayProduction / baseConst, 2) : companyMonthDayProduction;
                     companyBasePoductions.Add(new CompanyBasePoductionValue()
                     {
                         Name = companyProduction.Name,
@@ -3350,9 +3362,14 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
             var difDays = daydiff[ziranMonth] != 0 ? daydiff[ziranMonth] : 30;
             var monthPlanRepData = await dbContext.Queryable<CompanyProductionValueInfo>().Where(x => x.IsDelete == 1).ToListAsync();
             var projectId = projectList.WhereIF(!isCalcSub, x => x.IsSubContractProject != 2).Select(x => x.Id).ToList();
+          
             for (int i = 1; i <= queryDay; i++)
             {
+             
                 var currentNowTimeInt = int.Parse(DateTime.Now.AddDays(-i).ToString("yyyyMMdd"));
+                #region 计算调差产值
+                var diffValue = CalcDiffValue(currentNowTimeInt, dayDiffProductionValue, Guid.Empty);
+                #endregion
                 //日报信息
                 var companyMonthDayProduction = dayYearList.Where(x => projectId.Contains(x.ProjectId) && x.DateDay == currentNowTimeInt)
                        .Sum(x => x.DayActualProductionAmount);
@@ -3364,7 +3381,7 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
                 {
                     XAxle = currentNowTimeInt.ToString().Substring(0, 4) + "-" + currentNowTimeInt.ToString().Substring(4, 2) + "-" + currentNowTimeInt.ToString().Substring(6, 2),
                     YAxlePlanValue = Math.Round(dayPlanProAmount / difDays / 100000000M, 2),
-                    YAxleCompleteValue = Math.Round(companyMonthDayProduction / baseConst, 2)
+                    YAxleCompleteValue = Math.Round((companyMonthDayProduction - diffValue) / baseConst, 2)
                 });
             }
             //数据组合
@@ -3388,14 +3405,16 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
                 {
                     continue;
                 }
-
+                #region 计算调差产值
+                var diffValue = CalcDiffValue(dayTime, dayDiffProductionValue,item.ItemId.Value);
+                #endregion
                 companyProductionCompares.XAxisData.Add(item.Name);
                 //获取各个公司本月的完成和计划产值
                 var currentMonthCompanyProductionValue = companyMonthProductionValue.Where(x => x.Id == item.ItemId).FirstOrDefault();
                 if (currentMonthCompanyProductionValue != null)
                 {
                     //完成产值
-                    var completeValue = Math.Round(currentMonthCompanyProductionValue.CompleteProductionValue / baseConst, 2);
+                    var completeValue = Math.Round((currentMonthCompanyProductionValue.CompleteProductionValue- diffValue) / baseConst, 2);
                     //计划产值
                     var planValue = Math.Round(currentMonthCompanyProductionValue.PlanProductionValue / baseConst, 2);
                     companyProductionCompares.CompleteProductuin.Add(completeValue);
@@ -3409,6 +3428,45 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
                 companyProductionCompares.TimeSchedule.Add(timeSchedult);
                 projectBasePoduction.CompanyProductionCompares = companyProductionCompares;
             }
+            #endregion
+
+            #region 复工项目检测  临时使用
+            var shareProjectIds = ProjectShare.projectShare;
+            var shareDayList = dayYearList.Where(x => x.DateDay >= 20250129 && x.DateDay <= 20250228).ToList();
+            List<DayWorkProject> dayWorkProject = new List<DayWorkProject>();
+            List<DayWorkProject> noWorkProjects = new List<DayWorkProject>();
+            ProjectWokrItem projectWokrItems = new ProjectWokrItem()
+            {
+                DayWorkProject = dayWorkProject,
+                NoWorkProject = noWorkProjects,
+            };
+            foreach (var item in shareProjectIds)
+            {
+                //今日开工项目
+                var workProject = shareDayList.Where(x => x.ProjectId == item).OrderBy(x => x.DateDay).FirstOrDefault();
+                if (workProject != null && workProject.DateDay == DateTime.Now.AddDays(-1).ToDateDay() && workProject.DayActualProductionAmount > 0)
+                {
+                    //项目名称
+                    var parojectName = projectList.Where(x => x.Id == workProject.ProjectId).Select(x => x.ShortName).FirstOrDefault();
+                    dayWorkProject.Add(new DayWorkProject() { Name = parojectName, ProjectId = item });
+                    continue;
+                }
+
+                //未开工的项目
+                var noWorkProject = shareDayList.Where(x => x.ProjectId == item).FirstOrDefault();
+                if (noWorkProject == null)
+                {
+                    //项目名称
+                    var parojectName = projectList.Where(x => x.Id == item).Select(x => x.ShortName).FirstOrDefault();
+                    noWorkProjects.Add(new DayWorkProject() { Name = parojectName, ProjectId = item });
+                }
+
+            }
+
+            #region 拼接数据
+            jjtSendMessageMonitoringDayReportResponseDto.ProjectWokrItems = projectWokrItems;
+            #endregion
+
             #endregion
 
             #region 项目产值强度表格
@@ -3587,6 +3645,8 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
             var topFiveList = keyValuePairs.SelectMany(x => x).OrderByDescending(x => x.Value).Take(5).ToDictionary(key => key.Key, key => key.Value);
             foreach (var top in topFiveList)
             {
+                //船舶状态 最近一次
+                var shipStatus=shipDayList.Where(x => x.ShipId == top.Key).OrderByDescending(x => x.DateDay).Select(x => x.ShipState).FirstOrDefault();
                 //当日产值
                 var shipDayValue = shipDayList.Where(x => x.DateDay == dayTime && x.ShipId == top.Key).Select(x => x.EstimatedOutputAmount).FirstOrDefault();
                 //计算在场天数
@@ -3604,7 +3664,8 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
                     TimePercent = shipTimePercent,
                     ShipDayOutput = shipDayValue.HasValue ? Math.Round(shipDayValue.Value/baseWanConst,2) : 0,
                     ConstructionDays= onDays,
-                     WorkingHours= shipYearHours,
+                    WorkingHours= shipYearHours,
+                    Status= (int)shipStatus,
                 }) ;
             }
 
@@ -3676,9 +3737,8 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
             #region 数据查询
             //船舶进退场
             var shipMovementList = await dbContext.Queryable<ShipMovement>().Where(x => x.IsDelete == 1 && x.Status.Equals(ShipMovementStatus.Enter)).ToListAsync();
-            //查询日报填报记录
-            var writeReportRecords = await dbContext.Queryable<DayWriteReportRecord>().Where(x => x.IsDelete == 1 && x.DateDay >= startMonthTime && x.DateDay <= endMonthTime).ToListAsync();
-
+            //项目停工记录
+            var projectStatusRecord=await dbContext.Queryable<ProjectStatusChangeRecord>().Where(x => x.IsValid == 1).ToListAsync();
             #endregion
 
             #region 计算星星
@@ -3787,18 +3847,16 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
                 {
                     continue;
                 }
-                //数据源
-                var writeData = writeReportRecords.Where(x => x.ProjectId == writeReport.Id).FirstOrDefault();
-                if (writeReport == null)
-                {
-                    continue;
-                }
                 //项目名称
                 var projectName = projectList.Where(x => x.Id == writeReport.Id).Select(x => x.ShortName).FirstOrDefault();
                 //业务单位
                 var businessName = companyList.Where(x => x.PomId == writeReport.CompanyId).Select(x => x.Shortname).FirstOrDefault();
                 //未填报次数
-                var unWriteCount = CalcUnWriteReport(writeData, DateTime.Now.AddDays(-1).Day);
+                //var unWriteCount = CalcUnWriteReport(writeData, DateTime.Now.AddDays(-1).Day);
+                //停工天数
+                var stopDays= projectStatusRecord.Where(x => x.Id == writeReport.Id).Select(x => x.StopDay).FirstOrDefault();
+                //未填报次数
+                var unWriteCount = monthDiffDays - (stopDays == null? 0:stopDays.Value);
                 companyUnWriteReportInfos.Add(new CompanyUnWriteReportInfo()
                 {
                     Count = unWriteCount,
@@ -3921,1243 +3979,7 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
         /// </summary>
         /// <param name="dateDay"></param>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<JjtSendMessageMonitoringDayReportResponseDto>> JjtTextCardMsgDetailsAsync(DateTime date)
-        {
-            #region 111
-            var responseAjaxResult = new ResponseAjaxResult<JjtSendMessageMonitoringDayReportResponseDto>();
-            var result = await dbContext.Queryable<TempTable>().FirstAsync();
-            if (result != null && !string.IsNullOrWhiteSpace(result.Value))
-            {
-                return JsonConvert.DeserializeObject<ResponseAjaxResult<JjtSendMessageMonitoringDayReportResponseDto>>(result.Value);
-            }
-            //在建项目的IDs
-            List<Guid> onBuildProjectIds = new List<Guid>();
-            var jjtSendMessageMonitoringDayReportResponseDto = new JjtSendMessageMonitoringDayReportResponseDto()
-            {
-                DayTime = date.AddDays(-1).ToString("MM月dd日")
-            };
-            #region 查询条件相关
-
-            //周期开始时间
-            var startTime = string.Empty;
-            if (date.Day >= 27)
-            {
-                startTime = date.ToString("yyyy-MM-26 00:00:00");
-            }
-            else
-            {
-                startTime = date.AddMonths(-1).ToString("yyyy-MM-26 00:00:00");
-            }
-            //周期结束时间
-            var endTime = Convert.ToDateTime(startTime).AddMonths(1).ToString("yyyy-MM-25 23:59:59");
-            //统计周期 上个月的26号到本月的25号之间为一个周期
-            //当前时间上限int类型
-            var currentTimeIntUp = int.Parse(Convert.ToDateTime(startTime).ToString("yyyyMM26"));
-            //当前时间下限int类型
-            var currentTimeInt = date.AddDays(-1).ToDateDay();
-            //本年的月份
-            var month = Convert.ToDateTime(startTime).AddMonths(1).Month;
-            //本年的年份 
-            var yearStartTime = date.Year.ToString();
-            //年累计开始时间（每年的开始时间）
-            var startYearTimeInt = int.Parse(date.AddYears(-1).ToString("yyyy") + "1226");//int.Parse(DateTime.Now.AddYears(-1).ToString("yyyy1226"));
-            //年累计结束时间
-            var endYearTimeInt = int.Parse(date.ToString("yyyyMMdd")) > 1226 && int.Parse(date.ToString("yyyyMMdd")) <= 31 ? int.Parse(date.AddYears(1).ToString("yyyy1225")) : int.Parse(date.ToString("yyyy1225")); //int.Parse(DateTime.Now.ToString("yyyy1225"));
-                                                                                                                                                                                                                      //每月多少天
-                                                                                                                                                                                                                      // int days = DateTime.DaysInMonth(int.Parse(endYearTimeInt.ToString().Substring(0, 4)), month);  //DateTime.DaysInMonth(DateTime.Now.Year, DateTime.Now.AddMonths(-1).Month);
-            int days = TimeHelper.GetTimeSpan(Convert.ToDateTime(startTime), Convert.ToDateTime(endTime)).Days + 1;
-            //已过多少天
-            var ofdays = date.Day <= 26 ? (date.Day + ((days - 26))) : date.Day - 26;
-            //今年已过多少天
-            var dayOfYear = 0;
-            //if (int.Parse(DateTime.Now.ToString("yyyyMMdd")) > startYearTimeInt && int.Parse(DateTime.Now.ToString("yyyyMMdd")) < int.Parse(DateTime.Now.AddYears(-1).ToString("yyyy1231")))
-            if (int.Parse(date.ToString("yyyyMMdd")) > startYearTimeInt && int.Parse(date.ToString("yyyyMMdd")) < int.Parse(yearStartTime + "1231"))
-            {
-                dayOfYear = ofdays;
-            }
-            else
-            {
-                //这个6天是上一年1226-1231之间的天数
-                dayOfYear = date.DayOfYear + 6;
-            }
-            #endregion
-
-            #region 共用数据
-            var commonDataList = await dbContext.Queryable<ProductionMonitoringOperationDayReport>().Where(x => x.IsDelete == 1).ToListAsync();
-            var comonDataProductionList = await dbContext.Queryable<CompanyProductionValueInfo>()
-                .Where(x => x.IsDelete == 1 && x.DateDay == date.Year).ToListAsync();
-            #endregion
-
-            #region 项目总体生产情况
-            //在建项目的所有IDS
-
-
-            #region 广航局合同项目基本信息
-            ProjectBasePoduction projectBasePoduction = null;
-            List<CompanyProjectBasePoduction> companyProjectBasePoductions = new List<CompanyProjectBasePoduction>();
-            //合同项目状态ids集合
-            var contractProjectStatusIds = CommonData.BuildIds.SplitStr(",").Select(x => x.ToGuid()).ToList();
-            //项目类型为其他非施工类业务 排除
-            var noConstrutionProject = CommonData.NoConstrutionProjectType;
-            //在建项目状态ID
-            var buildProjectId = CommonData.PConstruc.ToGuid();
-            //停缓建Ids
-            var stopProjectIds = CommonData.PSuspend.Split(",").Select(x => x.ToGuid()).ToList();
-            //未开工状态
-            var notWorkIds = CommonData.NotWorkStatusIds.Split(",").Select(x => x.ToGuid()).ToList();
-            //各个公司的项目信息
-            var companyProjectList = await dbContext.Queryable<Project>().Where(x => x.IsDelete == 1
-            && contractProjectStatusIds.Contains(x.StatusId.Value)
-            && x.TypeId != noConstrutionProject).ToListAsync();
-            //取出相关日报信息(当天项目日报)
-            var currentDayProjectList = await dbContext.Queryable<DayReport>().Where(x => x.IsDelete == 1 && x.DateDay == currentTimeInt && x.ProcessStatus == DayReportProcessStatus.Submited)
-                  .ToListAsync();
-            //公共数据取出项目相关信息
-            var companyList = commonDataList.Where(x => x.Type == 1).OrderBy(x => x.Sort).ToList();
-            foreach (var item in companyList)
-            {
-                //在建项目IDS
-                var currentCompanyIds = companyProjectList.Where(x => x.CompanyId == item.ItemId && x.StatusId == buildProjectId)
-                    .Select(x => x.Id).ToList();
-                if (item.Collect == 0)
-                {
-                    onBuildProjectIds.AddRange(currentCompanyIds);
-                }
-                //合同项目数
-                var currentCompanyCount = companyProjectList.Count(x => x.CompanyId == item.ItemId);
-                //当前公司在建合同项数
-                var currentCompany = companyProjectList.Count(x => x.CompanyId == item.ItemId && x.StatusId == buildProjectId);
-                //停缓建项目数
-                var stopProjectCount = companyProjectList.Count(x => x.CompanyId == item.ItemId && stopProjectIds.Contains(x.StatusId.Value));
-                //未开工的项目数量
-                var notWorkCount = companyProjectList.Count(x => x.CompanyId == item.ItemId && notWorkIds.Contains(x.StatusId.Value));
-                //当前合同项目的所有ids
-                var dayIds = companyProjectList.Where(x => x.CompanyId == item.ItemId).Select(x => x.Id).ToList();
-                //设备数量
-                var facilityCount = currentDayProjectList.Where(x => dayIds.Contains(x.ProjectId)).Select(x => x.ConstructionDeviceNum).Sum();
-                //线程施工人数量
-                var workerCount = currentDayProjectList.Where(x => dayIds.Contains(x.ProjectId)).Select(x => x.SiteConstructionPersonNum).Sum();
-                //危大工程项数量
-                var riskWorkCountCount = currentDayProjectList.Where(x => dayIds.Contains(x.ProjectId)).Select(x => x.HazardousConstructionNum).Sum();
-
-                if (item.Collect == 0)
-                {
-
-                    companyProjectBasePoductions.Add(new CompanyProjectBasePoduction()
-                    {
-                        Name = item.Name,
-                        OnContractProjectCount = currentCompanyCount,
-                        OnBuildProjectCount = currentCompany,
-                        StopBuildProjectCount = stopProjectCount,
-                        BuildCountPercent = currentCompanyCount == 0M ? 0M : Math.Round((((decimal)(currentCompany)) / currentCompanyCount) * 100, 2),
-                        FacilityCount = facilityCount,
-                        WorkerCount = workerCount,
-                        RiskWorkCount = riskWorkCountCount,
-                        NotWorkCount = notWorkCount,
-                    });
-                }
-                else
-                {
-
-                    var totalContractProjectCount = companyProjectBasePoductions.Sum(x => x.OnContractProjectCount);
-                    var totalOnBuildProjectCount = companyProjectBasePoductions.Sum(x => x.OnBuildProjectCount);
-                    var totalStopBuildProjectCount = companyProjectBasePoductions.Sum(x => x.StopBuildProjectCount);
-                    var totalNotWorkProjectCount = companyProjectBasePoductions.Sum(x => x.NotWorkCount);
-                    var totalContractProjectPercent = totalContractProjectCount == 0M ? 0M : Math.Round(((decimal)totalOnBuildProjectCount / totalContractProjectCount) * 100, 2);
-                    //设备  施工   危大
-                    var totalFacilityCount = companyProjectBasePoductions.Sum(x => x.FacilityCount);
-                    var totalWorkerCount = companyProjectBasePoductions.Sum(x => x.WorkerCount);
-                    var totalRiskWorkCount = companyProjectBasePoductions.Sum(x => x.RiskWorkCount);
-
-
-                    //汇总项
-                    companyProjectBasePoductions.Add(new CompanyProjectBasePoduction()
-                    {
-                        Name = item.Name,
-                        OnContractProjectCount = companyProjectList.Count,
-                        OnBuildProjectCount = totalOnBuildProjectCount,
-                        StopBuildProjectCount = totalStopBuildProjectCount,
-                        NotWorkCount = totalNotWorkProjectCount,
-                        BuildCountPercent = totalContractProjectPercent,
-                        FacilityCount = totalFacilityCount,
-                        RiskWorkCount = totalRiskWorkCount,
-                        WorkerCount = totalWorkerCount
-                    });
-                    companyProjectBasePoductions = companyProjectBasePoductions.Where(x => !string.IsNullOrWhiteSpace(x.Name)).ToList();
-                    projectBasePoduction = new ProjectBasePoduction()
-                    {
-                        TotalOnContractProjectCount = companyProjectList.Count,
-                        //TotalOnContractProjectCount = totalContractProjectCount,
-                        TotalStopBuildProjectCount = totalStopBuildProjectCount,
-                        TotalBuildCountPercent = totalContractProjectPercent,
-                        TotalOnBuildProjectCount = totalOnBuildProjectCount,
-                        TotalFacilityCount = totalFacilityCount,
-                        TotalRiskWorkCount = totalRiskWorkCount,
-                        TotalWorkerCount = totalWorkerCount,
-                        CompanyProjectBasePoductions = companyProjectBasePoductions,
-                        CompanyBasePoductionValues = new List<CompanyBasePoductionValue>()
-                    };
-
-                    jjtSendMessageMonitoringDayReportResponseDto.projectBasePoduction = projectBasePoduction;
-                }
-
-            }
-
-
-
-            #endregion
-
-            #region 广航局在建项目产值信息
-            List<CompanyBasePoductionValue> companyBasePoductionValues = new List<CompanyBasePoductionValue>();
-            //统计当年所有的项目日报信息
-            var dayProductionValueList = await dbContext.Queryable<DayReport>()
-                .LeftJoin<Project>((x, y) => x.ProjectId == y.Id)
-                .Where(x => x.IsDelete == 1
-             //&& onBuildProjectIds.Contains(x.ProjectId)
-             && (x.DateDay >= startYearTimeInt && x.DateDay <= endYearTimeInt))
-                .Select((x, y) => new JjtProjectDayReport
-                {
-                    CompanyId = y.CompanyId.Value,
-                    ProjectId = x.ProjectId,
-                    DateDay = x.DateDay,
-                    CreateTime = x.CreateTime.Value,
-                    UpdateTime = x.UpdateTime.Value,
-                    DayActualProductionAmount = x.DayActualProductionAmount
-                }).ToListAsync();
-            //广航局年累计产值(基础数据累加+几个公司的所有日产值)
-            // var yearProductionValue = companyList.Sum(x => x.YearProductionValue) + dayProductionValueList.Sum(x => x.DayActualProductionAmount);
-            var yearProductionValue = dayProductionValueList.Sum(x => x.DayActualProductionAmount);
-            foreach (var item in companyList)
-            {
-                //当前公司日产值 || x.UpdateTime >= SqlFunc.ToDate(startTime) && x.UpdateTime <= SqlFunc.ToDate(endTime))
-                decimal currentCompanyCount = dayProductionValueList.Where(x => x.CompanyId == item.ItemId
-                  && x.DateDay == currentTimeInt
-                  //&& x.CreateTime >= SqlFunc.ToDate(startTime) && x.CreateTime <= SqlFunc.ToDate(endTime)
-                  //|| x.UpdateTime >= SqlFunc.ToDate(startTime) && x.UpdateTime <= SqlFunc.ToDate(endTime)
-                  ).Sum(x => x.DayActualProductionAmount);
-                //当前公司的累计产值
-                var currentMonthCompanyCount = dayProductionValueList.Where(x => x.CompanyId == item.ItemId).Sum(x => x.DayActualProductionAmount);
-                //年度产值占比 （广航局）
-                //var yearProductionValuePercent = Math.Round(((decimal)(item.YearProductionValue + currentMonthCompanyCount) / yearProductionValue) * 100, 2);
-                var yearProductionValuePercent = Math.Round(((decimal)(currentMonthCompanyCount) / yearProductionValue) * 100, 2);
-                //较产值进度  计算公示如下
-                //(年累计产值-（当前月-1）的计划产值+本月的计划产值/30.5*当前已过去多少天)/（当前月-1）的完成产值+本月的计划产值/30.5*当前已过去多少天)
-                //累计完成产值
-                var totalCompleteProductionValue = comonDataProductionList
-                    .Where(x => x.CompanyId == item.ItemId)
-                    .Sum(x => x.OnePlanProductionValue +
-                 x.TwoPlanProductionValue +
-                 x.ThreePlaProductionValue +
-                 x.FourPlaProductionValue +
-                 x.FivePlaProductionValue +
-                 x.SixPlaProductionValue +
-                 x.SevenPlaProductionValue +
-                 x.EightPlaProductionValue +
-                 x.NinePlaProductionValue +
-                 x.TenPlaProductionValue +
-                 x.ElevenPlaProductionValue +
-                 x.TwelvePlaProductionValue);
-                //本月计划产值
-                var currentMonthPlanProductionValue = 0M;
-                //本月计划产值汇总
-                var currentTotalMonthPlanProductionValue = 0M;
-                #region 查询当前月份计划产值
-                //当前月份
-                var currentMonth = date.Day <= 26 ? date.Month : date.AddMonths(1).Month;
-                if (currentMonth == 1)
-                {
-                    currentMonthPlanProductionValue = comonDataProductionList.Where(x => x.CompanyId == item.ItemId.Value).Sum(x => x.OnePlanProductionValue.Value);
-                };
-                if (currentMonth == 2)
-                {
-                    currentMonthPlanProductionValue = comonDataProductionList.Where(x => x.CompanyId == item.ItemId.Value).Sum(x => x.TwoPlanProductionValue.Value);
-                };
-                if (currentMonth == 3)
-                {
-                    currentMonthPlanProductionValue = comonDataProductionList.Where(x => x.CompanyId == item.ItemId.Value).Sum(x => x.ThreePlaProductionValue.Value);
-                };
-                if (currentMonth == 4)
-                {
-                    currentMonthPlanProductionValue = comonDataProductionList.Where(x => x.CompanyId == item.ItemId.Value).Sum(x => x.FourPlaProductionValue.Value);
-                };
-                if (currentMonth == 5)
-                {
-                    currentMonthPlanProductionValue = comonDataProductionList.Where(x => x.CompanyId == item.ItemId.Value).Sum(x => x.FivePlaProductionValue.Value);
-                };
-                if (currentMonth == 6)
-                {
-                    currentMonthPlanProductionValue = comonDataProductionList.Where(x => x.CompanyId == item.ItemId.Value).Sum(x => x.SixPlaProductionValue.Value);
-                }
-                if (currentMonth == 7)
-                {
-                    currentMonthPlanProductionValue = comonDataProductionList.Where(x => x.CompanyId == item.ItemId.Value).Sum(x => x.SevenPlaProductionValue.Value);
-                };
-                if (currentMonth == 8)
-                {
-                    currentMonthPlanProductionValue = comonDataProductionList.Where(x => x.CompanyId == item.ItemId.Value).Sum(x => x.EightPlaProductionValue.Value);
-                };
-                if (currentMonth == 9)
-                {
-                    currentMonthPlanProductionValue = comonDataProductionList.Where(x => x.CompanyId == item.ItemId.Value).Sum(x => x.NinePlaProductionValue.Value);
-                };
-                if (currentMonth == 10)
-                {
-                    currentMonthPlanProductionValue = comonDataProductionList.Where(x => x.CompanyId == item.ItemId.Value).Sum(x => x.TenPlaProductionValue.Value);
-                };
-                if (currentMonth == 11)
-                {
-                    currentMonthPlanProductionValue = comonDataProductionList.Where(x => x.CompanyId == item.ItemId.Value).Sum(x => x.ElevenPlaProductionValue.Value);
-                };
-                if (currentMonth == 12)
-                {
-                    currentMonthPlanProductionValue = comonDataProductionList.Where(x => x.CompanyId == item.ItemId.Value).Sum(x => x.TwelvePlaProductionValue.Value);
-                };
-
-                #endregion
-                var baseCalc = totalCompleteProductionValue - currentMonthPlanProductionValue + currentMonthPlanProductionValue / 30.5M * ofdays;
-                //较产值进度
-                var productionValueProgressPercent = 0M;
-                if (baseCalc.Value != 0)
-                {
-                    //var yearCompanyProductionValue = item.YearProductionValue + currentMonthCompanyCount;
-                    var yearCompanyProductionValue = currentMonthCompanyCount;
-                    //productionValueProgressPercent = Math.Round((yearCompanyProductionValue -baseCalc.Value) / baseCalc.Value * 100, 2);
-                    productionValueProgressPercent = Math.Round((baseCalc.Value) / baseCalc.Value * 100, 2);
-                }
-                //每年公司完成指标
-                //var yearIndex = comonDataProductionList.Where(x => x.CompanyId == item.ItemId.Value).First().YearIndex;
-                //序时进度
-                var timeProgress = Math.Round((dayOfYear / 365M) * 100, 2);
-                if (item.Collect == 0)
-                {
-                    //var totalYearProductionValue = Math.Round(((item.YearProductionValue + currentMonthCompanyCount) / 100000000), 2);
-                    var totalYearProductionValue = Math.Round(((currentMonthCompanyCount) / 100000000), 2);
-                    //超序时进度
-                    //var supersequenceProgress = yearIndex.Value != 0 ? (Math.Round(totalYearProductionValue / yearIndex.Value, 2) * 100 - timeProgress) : 0;
-                    companyBasePoductionValues.Add(new CompanyBasePoductionValue()
-                    {
-                        Name = item.Name,
-                        DayProductionValue = Math.Round(currentCompanyCount / 10000, 2),
-                        TotalYearProductionValue = totalYearProductionValue,
-                        YearProductionValueProgressPercent = yearProductionValuePercent,
-                        ProductionValueProgressPercent = productionValueProgressPercent,
-                        //SupersequenceProgress = supersequenceProgress
-                    });
-                }
-                else
-                {
-                    totalCompleteProductionValue = comonDataProductionList
-                   .Sum(x => x.OnePlanProductionValue +
-                x.TwoPlanProductionValue +
-                x.ThreePlaProductionValue +
-                x.FourPlaProductionValue +
-                x.FivePlaProductionValue +
-                x.SixPlaProductionValue +
-                x.SevenPlaProductionValue +
-                x.EightPlaProductionValue +
-                x.NinePlaProductionValue +
-                x.TenPlaProductionValue +
-                x.ElevenPlaProductionValue +
-                x.TwelvePlaProductionValue);
-                    #region 查询汇总值
-                    //查询汇总产值
-                    if (currentMonth == 1)
-                    {
-                        currentTotalMonthPlanProductionValue = comonDataProductionList.Sum(x => x.OnePlanProductionValue.Value);
-                    };
-                    if (currentMonth == 2)
-                    {
-                        currentTotalMonthPlanProductionValue = comonDataProductionList.Sum(x => x.TwoPlanProductionValue.Value);
-                    };
-                    if (currentMonth == 3)
-                    {
-                        currentTotalMonthPlanProductionValue = comonDataProductionList.Sum(x => x.ThreePlaProductionValue.Value);
-                    };
-                    if (currentMonth == 4)
-                    {
-                        currentTotalMonthPlanProductionValue = comonDataProductionList.Sum(x => x.FourPlaProductionValue.Value);
-                    };
-                    if (currentMonth == 5)
-                    {
-                        currentTotalMonthPlanProductionValue = comonDataProductionList.Sum(x => x.FivePlaProductionValue.Value);
-                    };
-                    if (currentMonth == 6)
-                    {
-                        currentTotalMonthPlanProductionValue = comonDataProductionList.Sum(x => x.SixPlaProductionValue.Value);
-                    }
-                    if (currentMonth == 7)
-                    {
-                        currentTotalMonthPlanProductionValue = comonDataProductionList.Sum(x => x.SevenPlaProductionValue.Value);
-                    };
-                    if (currentMonth == 8)
-                    {
-                        currentTotalMonthPlanProductionValue = comonDataProductionList.Sum(x => x.EightPlaProductionValue.Value);
-                    };
-                    if (currentMonth == 9)
-                    {
-                        currentTotalMonthPlanProductionValue = comonDataProductionList.Sum(x => x.NinePlaProductionValue.Value);
-                    };
-                    if (currentMonth == 10)
-                    {
-                        currentTotalMonthPlanProductionValue = comonDataProductionList.Sum(x => x.TenPlaProductionValue.Value);
-                    };
-                    if (currentMonth == 11)
-                    {
-                        currentTotalMonthPlanProductionValue = comonDataProductionList.Sum(x => x.ElevenPlaProductionValue.Value);
-                    };
-                    if (currentMonth == 12)
-                    {
-                        currentTotalMonthPlanProductionValue = comonDataProductionList.Sum(x => x.TwelvePlaProductionValue.Value);
-                    };
-                    #endregion
-
-                    baseCalc = totalCompleteProductionValue - currentTotalMonthPlanProductionValue + currentTotalMonthPlanProductionValue / 30.5M * ofdays;
-                    if (baseCalc.Value != 0)
-                    {
-                        var diffValue = ((yearProductionValue) - baseCalc);
-                        productionValueProgressPercent = Math.Round(diffValue.Value / baseCalc.Value * 100, 2);
-                    }
-
-                    //当日产值
-                    decimal dayTotalPoductionValues = companyBasePoductionValues.Sum(x => x.DayProductionValue);
-                    //名称排除‘个’字
-                    var filterStr = "(个)";
-                    var name = item.Name.IndexOf(filterStr) >= 0 ? item.Name.Replace(filterStr, "").TrimAll() : item.Name;
-
-                    #region 营业收入保障指数
-                    //营业收入保障指数
-                    var incomeSecurityLevel = (dayTotalPoductionValues / 3000) * 100;
-                    var incomeStar = 0;
-                    if (incomeSecurityLevel <= 30)
-                    {
-                        incomeStar = 1;
-                    }
-                    else if (incomeSecurityLevel > 30 && incomeSecurityLevel <= 60)
-                    {
-                        incomeStar = 2;
-                    }
-                    else if (incomeSecurityLevel > 60 && incomeSecurityLevel <= 80)
-                    {
-                        incomeStar = 3;
-                    }
-                    else if (incomeSecurityLevel > 80 && incomeSecurityLevel <= 90)
-                    {
-                        incomeStar = 4;
-                    }
-                    else if (incomeSecurityLevel > 90)
-                    {
-                        incomeStar = 5;
-                    }
-                    projectBasePoduction.IncomeSecurityLevel = incomeStar;
-                    #endregion
-
-                    projectBasePoduction.DayProductionValue = dayTotalPoductionValues;
-                    projectBasePoduction.TotalYearProductionValue = Math.Round(yearProductionValue / 100000000, 2);
-                    projectBasePoduction.ProductionValueProgressPercent = productionValueProgressPercent;
-                    companyBasePoductionValues = companyBasePoductionValues.Where(x => !string.IsNullOrWhiteSpace(x.Name)).ToList();
-                    projectBasePoduction.CompanyBasePoductionValues = companyBasePoductionValues;
-                    //广航局年度指标
-                    //yearIndex = comonDataProductionList.Sum(x => x.YearIndex.Value);
-                    //超序时进度
-                    //projectBasePoduction.SupersequenceProgress = yearIndex.Value != 0 ? (Math.Round(projectBasePoduction.TotalYearProductionValue / yearIndex.Value, 2) * 100 - timeProgress) : 0;
-                    companyBasePoductionValues.Add(new CompanyBasePoductionValue()
-                    {
-                        Name = name,
-                        DayProductionValue = dayTotalPoductionValues,
-                        TotalYearProductionValue = Math.Round(yearProductionValue / 100000000, 2),
-                        YearProductionValueProgressPercent = 100,
-                        ProductionValueProgressPercent = productionValueProgressPercent,
-                        SupersequenceProgress = projectBasePoduction.SupersequenceProgress
-                    });
-
-                }
-            }
-            #endregion
-
-            #region 柱形图
-            var companyProductionList = dbContext.Queryable<CompanyProductionValueInfo>()
-                .Where(x => x.IsDelete == 1 && x.DateDay.Value == SqlFunc.ToInt32(yearStartTime)).ToList();
-            var companyMonthProductionValue = GetProductionValueInfo(month, companyProductionList);
-            CompanyProductionCompare companyProductionCompares = new CompanyProductionCompare()
-            {
-                PlanCompleteRate = new List<decimal>(),
-                TimeSchedule = new List<decimal>(),
-                XAxisData = new List<string>(),
-                CompleteProductuin = new List<decimal>(),
-                PlanProductuin = new List<decimal>()
-            };
-
-            foreach (var item in companyList)
-            {
-                if (string.IsNullOrWhiteSpace(item.Name) || item.Name.Contains("广航局"))
-                {
-                    continue;
-                }
-
-                companyProductionCompares.XAxisData.Add(item.Name);
-                //获取各个公司本月的完成和计划产值
-                var currentMonthCompanyProductionValue = companyMonthProductionValue.Where(x => x.Id == item.ItemId).FirstOrDefault();
-                if (currentMonthCompanyProductionValue != null)
-                {
-                    var completeProductionValue = Math.Round(currentMonthCompanyProductionValue.CompleteProductionValue / 100000000M, 2);
-                    var planProductionValue = Math.Round(currentMonthCompanyProductionValue.PlanProductionValue / 100000000M, 2);
-                    companyProductionCompares.CompleteProductuin.Add(completeProductionValue);
-                    companyProductionCompares.PlanProductuin.Add(planProductionValue);
-                }
-
-                //计划完成率
-                if (currentMonthCompanyProductionValue != null && currentMonthCompanyProductionValue.PlanProductionValue != 0)
-                {
-                    var completeRate = Math.Round((((decimal)currentMonthCompanyProductionValue.CompleteProductionValue) / currentMonthCompanyProductionValue.PlanProductionValue) * 100, 0);
-                    companyProductionCompares.PlanCompleteRate.Add(completeRate);
-                }
-                //时间进度
-                var timeSchedult = Math.Round((ofdays / 31M) * 100, 0);
-                companyProductionCompares.TimeSchedule.Add(timeSchedult);
-                projectBasePoduction.CompanyProductionCompares = companyProductionCompares;
-            }
-
-            companyProductionCompares.YMax = companyProductionCompares.PlanProductuin.Count == 0 ? 0 : companyProductionCompares.PlanProductuin.Max();
-            #endregion
-
-            #region 项目产值完成排名 暂时不用
-            //List<ProjectRank> projectRankList = new List<ProjectRank>();
-            ////获取公司信息
-            //var companyIds = await dbContext.Queryable<CompanyProductionValueInfo>()
-            //    .Where(x => x.IsDelete == 1 && x.DateDay.Value == SqlFunc.ToInt32(yearStartTime)).Select(x => x.CompanyId).ToListAsync();
-            //var planList = await dbContext.Queryable<ProjectPlanProduction>().Where(x => x.IsDelete == 1 && x.Year == Convert.ToInt32(yearStartTime)).ToListAsync();
-            //var dayReport = dbContext.Queryable<DayReport>()
-            //    .LeftJoin<Project>((d, p) => d.ProjectId == p.Id)
-            //    .OrderByDescending((d, p) => p.Name)
-            //    .Where((d, p) => companyIds.Contains(p.CompanyId.Value) && d.IsDelete == 1
-            //    && d.DateDay == currentTimeInt)
-            //    .GroupBy((d, p) => d.ProjectId)
-            //    .Select((d, p) => new
-            //    {
-            //        ProjectId = p.Id,
-            //        ProjectName = p.ShortName,
-            //        CompanyId = p.CompanyId,
-            //        MonthAmount = SqlFunc.AggregateSum(d.DayActualProductionAmount)
-            //    })
-            //    .ToList();
-            //var dayReportData = await dbContext.Queryable<DayReport>().Where(x => x.IsDelete == 1).ToListAsync();
-            ////项目完成产值历史数据
-            //var historyOutPut =await dbContext.Queryable<ProjectHistoryData>().Where(x => x.IsDelete == 1).ToListAsync();
-            //var projectPlanProductionData = await dbContext.Queryable<ProjectPlanProduction>().Where(x => x.IsDelete == 1).ToListAsync();
-            //foreach (var item in dayReport)
-            //{
-            //    ProjectRank model = new ProjectRank();
-            //    var planValue = GetProjectPlanValue(month, planList.Where(x => x.ProjectId == item.ProjectId && x.CompanyId == item.CompanyId).FirstOrDefault());
-            //    model.ProjectName = item.ProjectName;
-            //    model.CurrentYearPlanProductionValue = Math.Round(GetRrojectProductionValue(projectPlanProductionData, item.ProjectId).Value, 2);
-            //    model.CurrentYearCompleteProductionValue = Math.Round(GetRrojectCompletProductionValue(dayReportData, historyOutPut, item.ProjectId), 2);
-            //    if (model.CurrentYearPlanProductionValue != 0)
-            //    {
-            //        model.CompleteRate = Math.Round(model.CurrentYearCompleteProductionValue / model.CurrentYearPlanProductionValue*100, 2);
-            //    }
-            //    model.DayActualValue = Math.Round(item.MonthAmount / 10000, 2);
-            //    projectRankList.Add(model);
-            //}
-            //projectBasePoduction.ProjectRanks = projectRankList.OrderByDescending(x => x.CurrentYearCompleteProductionValue).Take(10).ToList();
-            ////合计
-            //var totalYearPlanProductionValue = projectBasePoduction.ProjectRanks.Sum(x => x.CurrentYearPlanProductionValue);
-            //var totalYearCompletProductionValue = projectBasePoduction.ProjectRanks.Sum(x => x.CurrentYearCompleteProductionValue);
-            //decimal totalYearCompletRate = 0;
-            //if (totalYearPlanProductionValue != 0)
-            //{
-            //    totalYearCompletRate = Math.Round((totalYearCompletProductionValue / totalYearPlanProductionValue)*100, 2);
-            //}
-            //projectBasePoduction.TotalCurrentYearPlanProductionValue = totalYearPlanProductionValue;
-            //projectBasePoduction.TotalCurrentYearCompleteProductionValue = totalYearCompletProductionValue;
-            //// projectBasePoduction.TotalCompleteRate = totalYearCompletRate;
-            //if (projectBasePoduction.TotalYearProductionValue != 0)
-            //{
-            //    projectBasePoduction.TotalCompleteRate = Math.Round((projectBasePoduction.TotalCurrentYearCompleteProductionValue / projectBasePoduction.TotalYearProductionValue)*100, 2) ;
-            //}
-            //if (projectBasePoduction.TotalCurrentYearPlanProductionValue != 0)
-            //{
-            //    projectBasePoduction.SumCompleteRate = Math.Round((projectBasePoduction.TotalCurrentYearCompleteProductionValue / projectBasePoduction.TotalCurrentYearPlanProductionValue) * 100, 2);
-            //}
-            ////当日所有项目汇总
-            //projectBasePoduction.SumProjectRanks = Math.Round(projectRankList.Sum(x => x.DayActualValue), 2);
-            ////当日排名前10条汇总
-            //projectBasePoduction.SumProjectRanksTen = Math.Round(projectBasePoduction.ProjectRanks.Sum(x => x.DayActualValue), 2);
-            ////总产值占比
-            //projectBasePoduction.TotalProportion = Math.Round(projectBasePoduction.SumProjectRanksTen == 0 || projectBasePoduction.SumProjectRanks == 0 ? 0 : projectBasePoduction.SumProjectRanksTen / projectBasePoduction.SumProjectRanks * 100, 2);
-
-
-            #endregion
-
-            #region 项目年度产值完成排名
-            List<ProjectRank> projectRankList = new List<ProjectRank>();
-            var projectLists = await dbContext.Queryable<Project>().Where(x => x.IsDelete == 1)
-                .Select(x => new { x.Id, x.ShortName, x.CompanyId }).ToListAsync();
-            var projectSumDayProductionValue = await dbContext.Queryable<DayReport>().Where(x => x.IsDelete == 1
-            && projectLists.Select(x => x.Id).ToList().Contains(x.ProjectId))
-                 .GroupBy(x => x.ProjectId)
-                 .Select(x => new { x.ProjectId, productionValue = SqlFunc.AggregateSum(x.DayActualProductionAmount) }).ToListAsync();
-            //projectSumDayProductionValue = projectSumDayProductionValue.OrderByDescending(x => x.productionValue).Take(10).ToList();
-            var planList = await dbContext.Queryable<ProjectPlanProduction>().Where(x => x.IsDelete == 1 && x.Year == Convert.ToInt32(yearStartTime)).ToListAsync();
-            var projectPlanProductionData = await dbContext.Queryable<ProjectPlanProduction>().Where(x => x.IsDelete == 1).ToListAsync();
-            var dayReportData = await dbContext.Queryable<DayReport>().Where(x => x.IsDelete == 1).ToListAsync();
-            //项目完成产值历史数据
-            var historyOutPut = await dbContext.Queryable<ProjectHistoryData>().Where(x => x.IsDelete == 1).ToListAsync();
-            var monthStartTime = int.Parse(startYearTimeInt.ToString().Substring(0, 6));
-            var monthEndTime = int.Parse(endYearTimeInt.ToString().Substring(0, 6));
-            //月报数据
-            var monthDataList = await dbContext.Queryable<MonthReport>().Where(x => x.IsDelete == 1
-            && x.DateMonth >= monthStartTime && x.DateMonth <= monthEndTime).ToListAsync();
-            foreach (var item in projectSumDayProductionValue)
-            {
-                ProjectRank model = new ProjectRank();
-                //var planValue = GetProjectPlanValue(month, planList.Where(x => x.ProjectId == item.ProjectId && x.CompanyId == item.CompanyId).FirstOrDefault());
-                var projectInfo = projectLists.Where(x => x.Id == item.ProjectId).SingleOrDefault();
-                model.ProjectName = projectInfo == null ? string.Empty : projectInfo.ShortName;
-                //if (model.ProjectName == "茂名港博贺项目")
-                //{
-
-                //}
-                model.CurrentYearPlanProductionValue = Math.Round(GetRrojectProductionValue(projectPlanProductionData, item.ProjectId).Value, 2);
-                model.CurrentYearCompleteProductionValue = Math.Round(GetRrojectCompletProductionValue(dayReportData, historyOutPut, monthDataList, currentTimeIntUp, currentTimeInt, item.ProjectId), 2);
-                if (model.CurrentYearPlanProductionValue != 0)
-                {
-                    model.CompleteRate = Math.Round(model.CurrentYearCompleteProductionValue / model.CurrentYearPlanProductionValue * 100, 2);
-                }
-                //model.DayActualValue = Math.Round(item.MonthAmount / 10000, 2);
-                projectRankList.Add(model);
-            }
-            projectBasePoduction.ProjectRanks = projectRankList;
-            projectBasePoduction.ProjectRanks = projectBasePoduction.ProjectRanks.OrderByDescending(x => x.CurrentYearCompleteProductionValue).Take(10).ToList();
-
-            //合计
-            var totalYearPlanProductionValue = projectBasePoduction.ProjectRanks.Sum(x => x.CurrentYearPlanProductionValue);
-            var totalYearCompletProductionValue = projectBasePoduction.ProjectRanks.Sum(x => x.CurrentYearCompleteProductionValue);
-            decimal totalYearCompletRate = 0;
-            if (totalYearPlanProductionValue != 0)
-            {
-                totalYearCompletRate = Math.Round((totalYearCompletProductionValue / totalYearPlanProductionValue) * 100, 2);
-            }
-            projectBasePoduction.TotalCurrentYearPlanProductionValue = totalYearPlanProductionValue;
-            projectBasePoduction.TotalCurrentYearCompleteProductionValue = totalYearCompletProductionValue;
-            // projectBasePoduction.TotalCompleteRate = totalYearCompletRate;
-            if (projectBasePoduction.TotalYearProductionValue != 0)
-            {
-                projectBasePoduction.TotalCompleteRate = Math.Round((projectBasePoduction.TotalCurrentYearCompleteProductionValue / projectBasePoduction.TotalYearProductionValue) * 100, 2);
-            }
-            if (projectBasePoduction.TotalCurrentYearPlanProductionValue != 0)
-            {
-                projectBasePoduction.SumCompleteRate = Math.Round((projectBasePoduction.TotalCurrentYearCompleteProductionValue / projectBasePoduction.TotalCurrentYearPlanProductionValue) * 100, 2);
-            }
-
-
-            #endregion
-
-            #region 项目产值强度表格
-            List<ProjectIntensity> projectIntensities = new List<ProjectIntensity>();
-            //获取只需要在建的项目
-            var onBuildProjectList = companyProjectList.Where(x => onBuildProjectIds.Contains(x.Id)).ToList();
-            var onBuildIds = onBuildProjectList.Select(x => x.Id).ToList();
-            var planValueList = await dbContext.Queryable<ProjectPlanProduction>().Where(x => x.IsDelete == 1 && onBuildIds.Contains(x.ProjectId)).ToListAsync();
-            if (onBuildProjectList.Any())
-            {
-                foreach (var item in onBuildProjectList)
-                {
-                    //项目当日实际产值
-                    var currentDayProjectPrduction = currentDayProjectList.Where(x => x.ProjectId == item.Id).FirstOrDefault();
-                    //项目当日计划
-                    var planValueFirst = planValueList.Where(x => x.ProjectId == item.Id && x.Year == Convert.ToInt32(yearStartTime)).FirstOrDefault();
-                    var planValue = GetProjectPlanValue(month, planValueFirst);
-                    var rate = currentDayProjectPrduction == null || planValue == 0 ? 0 : Math.Round(((currentDayProjectPrduction.DayActualProductionAmount / 10000) / (planValue / 10000) * 100), 0);
-                    if (rate < 80)
-                    {
-                        projectIntensities.Add(new ProjectIntensity()
-                        {
-                            Id = item.Id,
-                            Name = item.ShortName,
-                            PlanDayProduciton = Math.Round(planValue / 10000, 0),
-                            DayProduciton = currentDayProjectPrduction == null ? 0 : Math.Round(currentDayProjectPrduction.DayActualProductionAmount / 10000, 0),
-                            CompleteDayProducitonRate = rate,
-                            DayProductionIntensityDesc = currentDayProjectPrduction == null ? null : currentDayProjectPrduction.LowProductionReason
-                        });
-                    }
-                }
-            }
-            projectBasePoduction.ProjectIntensities = projectIntensities.Where(x => x.PlanDayProduciton > 0).OrderBy(x => x.CompleteDayProducitonRate).ToList();
-            #endregion
-
-            #endregion
-
-            #region 自有船施工情况  自有船运转以及产值情况
-            //三种船舶的shiid集合
-            List<Guid> allShipIds = new List<Guid>();
-            //计算船舶填报率和船舶未填报统计使用 其他无使用此集合（此集合就是已填报的船舶会记录shiid）
-            List<Guid> shipIds = new List<Guid>();
-            //需要更新在场天数的一个合计
-            List<ShipOnDay> keyValuePairs = new List<ShipOnDay>();
-            var ownerShipBuildInfos = new List<CompanyShipBuildInfo>();
-            var companyShipProductionValueInfo = new List<CompanyShipProductionValueInfo>();
-            //三类船舶类型集合
-            var shipTypeIds = CommonData.ShipType.SplitStr(",").Select(x => x.ToGuid()).ToList();
-            //三类船舶的数据
-            var shipList = await dbContext.Queryable<OwnerShip>()
-                .Where(x => x.IsDelete == 1
-                  && shipTypeIds.Contains(x.TypeId.Value)).ToListAsync();
-            //船舶日报相关(施工  调遣  待命  检修)
-            var shipDayList = await dbContext.Queryable<ShipDayReport>()
-               .Where(x => x.IsDelete == 1
-               && x.DateDay >= startYearTimeInt && x.DateDay <= endYearTimeInt
-               ).ToListAsync();
-            OwnerShipBuildInfo ownerShipBuildInfo = null;
-            if (shipList != null && shipList.Any())
-            {
-                allShipIds = shipList.Select(x => x.PomId).ToList();
-                companyList = commonDataList.Where(x => x.Type == 2).OrderBy(x => x.Sort).ToList();
-                foreach (var item in companyList)
-                {
-                    //当前船舶的类型数量
-                    var currentCompanyShipCount = shipList.Where(x => x.TypeId == item.ItemId).Count();
-                    //当前船舶施工数量
-                    var constructionShipIds = shipDayList.Where(x => x.DateDay == currentTimeInt && x.ShipState == ProjectShipState.Construction).Select(x => x.ShipId).ToList();
-                    shipIds.AddRange(constructionShipIds);
-                    var constructionShipCount = shipList.Where(x => x.TypeId == item.ItemId && x.ShipState == ProjectShipState.Construction).Count(); //shipList.Where(x => constructionShipIds.Contains(x.PomId)&&x.TypeId == item.ItemId.Value).Count();
-                    //当前船舶修理数量
-                    var repairShipIds = shipDayList.Where(x => x.DateDay == currentTimeInt && x.ShipState == ProjectShipState.Repair).Select(x => x.ShipId).ToList();
-                    shipIds.AddRange(repairShipIds);
-                    var repairShipCount = shipList.Where(x => x.TypeId == item.ItemId && x.ShipState == ProjectShipState.Repair).Count(); //shipList.Where(x => repairShipIds.Contains(x.PomId) && x.TypeId == item.ItemId.Value).Count();
-                    //当前船舶调遣数量
-                    var dispatchShipIds = shipDayList.Where(x => x.DateDay == currentTimeInt && x.ShipState == ProjectShipState.Dispatch).Select(x => x.ShipId).ToList();
-                    shipIds.AddRange(dispatchShipIds);
-                    var dispatchShipCount = shipList.Where(x => x.TypeId == item.ItemId && x.ShipState == ProjectShipState.Dispatch).Count();//shipList.Where(x => dispatchShipIds.Contains(x.PomId) && x.TypeId == item.ItemId.Value).Count();
-                    //当前船舶待命数量
-                    var standbyShipIds = shipDayList.Where(x => x.DateDay == currentTimeInt && x.ShipState == ProjectShipState.Standby).Select(x => x.ShipId).ToList();
-                    shipIds.AddRange(standbyShipIds);
-                    var standbyShipCount = shipList.Where(x => x.TypeId == item.ItemId && x.ShipState == ProjectShipState.Standby).Count(); //shipList.Where(x => standbyShipIds.Contains(x.PomId) && x.TypeId == item.ItemId.Value).Count();
-                    //当前舶航修数量
-                    var voyageRepairIds = shipDayList.Where(x => x.DateDay == currentTimeInt && x.ShipState == ProjectShipState.VoyageRepair).Select(x => x.ShipId).ToList();
-                    shipIds.AddRange(voyageRepairIds);
-                    var voyageRepairCount = shipList.Where(x => x.TypeId == item.ItemId && x.ShipState == ProjectShipState.VoyageRepair).Count(); //shipList.Where(x => standbyShipIds.Contains(x.PomId) && x.TypeId == item.ItemId.Value).Count();
-                    //当前检修数量
-                    var overHaulIds = shipDayList.Where(x => x.DateDay == currentTimeInt && x.ShipState == ProjectShipState.OverHaul).Select(x => x.ShipId).ToList();
-                    shipIds.AddRange(overHaulIds);
-                    var overHaulCount = shipList.Where(x => x.TypeId == item.ItemId && x.ShipState == ProjectShipState.OverHaul).Count(); //shipList.Where(x => standbyShipIds.Contains(x.PomId) && x.TypeId == item.ItemId.Value).Count();
-                    //开工率
-                    var buildPercent = 0M;
-                    if (currentCompanyShipCount != 0)
-                    {
-                        //明天的在场天数
-                        var nextDayCount = item.OnDayCount + constructionShipCount;
-                        //记录需要更新的id和值
-                        keyValuePairs.Add(new ShipOnDay() { Id = item.Id, OnDayCount = nextDayCount });
-                        buildPercent = Math.Round((((decimal)(constructionShipCount)) / currentCompanyShipCount) * 100, 2);
-                    }
-
-                    #region 自有船施工情况  自有船运转产值情况
-
-                    var allShipDayReportIds = shipList.Where(x => x.TypeId == item.ItemId).Select(x => x.PomId).ToList();
-                    //当日产值
-                    var dayConstructionShipPrudctionValue = shipDayList.Where(x => x.DateDay == currentTimeInt
-                    && allShipDayReportIds.Contains(x.ShipId)).Select(x => x.EstimatedOutputAmount).Sum();
-                    //当日运转小时
-                    foreach (var key in shipDayList)
-                    {
-                        key.Dredge = key.Dredge.HasValue == false ? 0M : key.Dredge.Value;
-                        key.Sail = key.Sail == null ? 0M : key.Sail.Value;
-                        key.BlowingWater = key.BlowingWater == null ? 0M : key.BlowingWater.Value;
-                        key.BlowShore = key.BlowShore == null ? 0M : key.BlowShore.Value;
-                        key.SedimentDisposal = key.SedimentDisposal == null ? 0M : key.SedimentDisposal.Value;
-                    }
-                    var dayShipTurnHours = shipDayList.Where(x => x.DateDay == currentTimeInt
-                    && allShipDayReportIds.Contains(x.ShipId))
-                       .Sum(x => x.Dredge.Value + x.Sail.Value + x.BlowingWater.Value + x.BlowShore.Value + x.SedimentDisposal.Value);
-                    //年累计产值 (含基础数据)
-                    var yearConstructionShipPrudctionValue = shipDayList.Where(x =>
-                   allShipDayReportIds.Contains(x.ShipId)).Select(x => x.EstimatedOutputAmount).Sum(); //+item.YearProductionValue;
-                    //当年累计运转小时
-                    var yearShipTurnHours = shipDayList.Where(x =>
-                   allShipDayReportIds.Contains(x.ShipId))
-                        .Sum(x => x.Dredge.Value + x.Sail.Value + x.BlowingWater.Value + x.BlowShore.Value + x.SedimentDisposal.Value);
-                    //+ item.TurnHours;
-                    //时间利用率年累计运转小时/在场天数累计/24
-                    var TimePercent = 0M;
-                    if (currentCompanyShipCount != 0)
-                    {
-                        var ondayCount = item.OnDayCount + constructionShipCount;
-
-
-                        TimePercent = Math.Round(yearShipTurnHours / ondayCount / 24M * 100, 2);
-                    }
-                    #endregion
-
-                    if (item.Collect == 0)
-                    {
-                        ownerShipBuildInfos.Add(new CompanyShipBuildInfo()
-                        {
-                            Name = item.Name,
-                            AssignCount = dispatchShipCount,
-                            AwaitCount = standbyShipCount,
-                            BuildCount = constructionShipCount,
-                            ReconditionCount = repairShipCount + voyageRepairCount + overHaulCount,
-                            BuildPercent = buildPercent,
-                            Count = currentCompanyShipCount
-
-                        });
-                        companyShipProductionValueInfo.Add(new CompanyShipProductionValueInfo()
-                        {
-                            DayTurnHours = dayShipTurnHours,
-                            Name = item.Name,
-                            YearTotalProductionValue = Math.Round((((decimal)yearConstructionShipPrudctionValue.Value) / 100000000), 2),
-                            YearTotalTurnHours = yearShipTurnHours,
-                            DayProductionValue = Math.Round(((decimal)dayConstructionShipPrudctionValue.Value) / 10000, 2),
-                            TimePercent = TimePercent
-
-                        });
-                    }
-                    else
-                    {
-                        //合计
-                        var totalShipCount = ownerShipBuildInfos.Sum(x => x.Count);
-                        var totalBuildShipCount = ownerShipBuildInfos.Sum(x => x.BuildCount);
-                        var totalAwaitShipCount = ownerShipBuildInfos.Sum(x => x.AwaitCount);
-                        var totalAssignShipCount = ownerShipBuildInfos.Sum(x => x.AssignCount);
-                        var totalReconditShipCount = ownerShipBuildInfos.Sum(x => x.ReconditionCount);
-                        var totalBuildShipPercent = ownerShipBuildInfos.Sum(x => x.BuildPercent);
-                        //产值合计
-                        var totalDayShipProductionValue = companyShipProductionValueInfo.Sum(x => x.DayProductionValue);
-                        var totalDayShipTurnHours = companyShipProductionValueInfo.Sum(x => x.DayTurnHours);
-                        //var totalDayTimePercent = companyShipProductionValueInfo.Sum(x => x.TimePercent);
-                        var totalYearProductionValue = companyShipProductionValueInfo.Sum(x => x.YearTotalProductionValue);
-                        var totalYearTurnHours = companyShipProductionValueInfo.Sum(x => x.YearTotalTurnHours);
-                        //合计时间利用率
-                        var totalDayTimePercent = 0M;
-                        if (item.OnDayCount != 0)
-                        {
-                            var totalOnDayCount = keyValuePairs.Sum(x => x.OnDayCount);
-                            totalDayTimePercent = Math.Round(totalYearTurnHours / totalOnDayCount / 24M * 100, 2);
-                        }
-
-                        //开工率
-                        var BuildPercent = Math.Round(((decimal)totalBuildShipCount) / totalShipCount * 100, 2);
-                        ownerShipBuildInfos.Add(new CompanyShipBuildInfo()
-                        {
-                            Name = item.Name,
-                            AssignCount = totalAssignShipCount,
-                            AwaitCount = totalAwaitShipCount,
-                            BuildCount = totalBuildShipCount,
-                            ReconditionCount = totalReconditShipCount,
-                            BuildPercent = BuildPercent,
-                            Count = totalShipCount,
-                        });
-                        companyShipProductionValueInfo.Add(new CompanyShipProductionValueInfo()
-                        {
-                            DayTurnHours = totalDayShipTurnHours,
-                            Name = item.Name,
-                            YearTotalProductionValue = totalYearProductionValue,
-                            YearTotalTurnHours = totalYearTurnHours,
-                            DayProductionValue = totalDayShipProductionValue,
-                            TimePercent = totalDayTimePercent
-
-                        });
-                        ownerShipBuildInfo = new OwnerShipBuildInfo()
-                        {
-                            BuildCount = totalBuildShipCount,
-                            AwaitCount = totalAwaitShipCount,
-                            AssignCount = totalAssignShipCount,
-                            ReconditionCount = totalReconditShipCount,
-                            TotalCount = totalShipCount,
-                            BulidProductionValue = totalDayShipProductionValue,
-                            DayTurnHours = totalDayShipTurnHours,
-                            YearTotalProductionValue = totalYearProductionValue,
-                            YearTotalTurnHours = totalYearTurnHours,
-                            BuildPercent = BuildPercent,
-                            companyShipBuildInfos = ownerShipBuildInfos,
-                            companyShipProductionValueInfos = companyShipProductionValueInfo
-                        };
-                        jjtSendMessageMonitoringDayReportResponseDto.OwnerShipBuildInfo = ownerShipBuildInfo;
-                    }
-                }
-                #region 更新船舶在场天数
-                if (keyValuePairs.Any())
-                {
-                    var ids = keyValuePairs.Select(x => x.Id).ToList();
-                    var updateStartDay = date.ToString("yyyy-MM-dd 00:00:00");
-                    var updateEndDay = date.ToString("yyyy-MM-dd 23:59:59");
-                    //判断需要更新不 
-                    var updateData = commonDataList.Where(x => ids.Contains(x.Id)
-                     && x.UpdateTime >= SqlFunc.ToDate(updateStartDay)
-                     && x.UpdateTime <= SqlFunc.ToDate(updateEndDay)).ToList();
-                    if (updateData.Count == 0)
-                    {
-                        var entitysChange = commonDataList.Where(x => ids.Contains(x.Id)).ToList();
-                        foreach (var item in entitysChange)
-                        {
-                            var singleEntity = keyValuePairs.SingleOrDefault(x => x.Id == item.Id);
-                            if (singleEntity != null)
-                            {
-                                item.OnDayCount = singleEntity.OnDayCount;
-                            }
-                        }
-                        await dbContext.Updateable<ProductionMonitoringOperationDayReport>(entitysChange).ExecuteCommandAsync();
-                    }
-                }
-                #endregion
-            }
-            #endregion
-
-            #region  施工船舶产值强度低于80%
-
-
-            #endregion
-
-            #region 自有船舶排行前五的产值
-            List<ShipProductionValue> shipProductionValue = new List<ShipProductionValue>();
-            //获取船舶ids  EstimatedUnitPrice
-            var ownShipIds = shipList.Select(x => x.PomId).ToList();
-            //  前五船舶 -年产值(todo 加入历史数据)
-            var yearQuery = await dbContext.Queryable<ShipDayReport>()
-                  .Where(x => x.IsDelete == 1
-                  //&& x.ShipDayReportType == ShipDayReportType.ProjectShip
-                  && x.DateDay >= startYearTimeInt && x.DateDay <= endYearTimeInt
-                  ).ToListAsync();
-            //
-            //var shipDaysList=
-            //    await dbContext.Queryable<ShipDayReport>().Where(x => x.IsDelete == 1
-            //    && x.DateDay >= startYearTimeInt && x.DateDay <= endYearTimeInt
-            //    ).ToListAsync();
-            //自有船舶历史数据
-            var histotyShipList = await dbContext.Queryable<OwnerShipHistory>()
-                 .Where(x => x.IsDelete == 1 && x.Year == 2023).OrderBy(x => x.Sort)
-                  .ToListAsync();
-            foreach (var item in histotyShipList)
-            {
-                //当日产值
-                var onDayCount = yearQuery.Where(x => x.ShipId == item.Id
-                ).Count();
-
-                //当日产值
-                var dayValue = yearQuery.Where(x => x.ShipId == item.Id && x.DateDay == currentTimeInt).Sum(x => x.EstimatedOutputAmount.Value);
-                //当年产值
-                var yearValue = yearQuery.Where(x => x.ShipId == item.Id).Sum(x => x.EstimatedOutputAmount.Value);
-                //当年运转小时
-                var yearHoursValue = yearQuery.Where(x => x.ShipId == item.Id)
-                .Select(t => new
-                {
-                    a = t.Dredge ?? 0,
-                    b = t.Sail ?? 0,
-                    c = t.BlowingWater ?? 0,
-                    d = t.SedimentDisposal ?? 0,
-                    e = t.BlowShore ?? 0
-                }).ToList();
-                var totalHoursValue = yearHoursValue.Select(x => x.a + x.b + x.c + x.d + x.e).ToList().Sum();
-                var obj = new ShipProductionValue()
-                {
-                    ShipName = item.Name,
-                    ShipDayOutput = Math.Round(dayValue / 10000, 2),
-                    //ShipYearOutput = Math.Round(yearValue/100000000,2) + item.YearShipHistory,
-                    ShipYearOutput = Math.Round(yearValue / 100000000, 2),// + item.YearShipHistory,
-                    WorkingHours = totalHoursValue,// + item.WorkingHours.Value,
-                    //ConstructionDays = onDayCount+ item.OnDay.Value,
-                    ConstructionDays = onDayCount,
-
-                };
-                if (obj.ConstructionDays != 0)
-                    obj.TimePercent = Math.Round((obj.WorkingHours / obj.ConstructionDays / 24) * 100, 2);
-                shipProductionValue.Add(obj);
-
-            }
-            projectBasePoduction.YearTopFiveTotalOutput = shipProductionValue.Sum(x => x.ShipDayOutput.Value);
-            projectBasePoduction.YearFiveTotalOutput = shipProductionValue.Sum(x => x.ShipYearOutput.Value);
-            var totalOnDay = shipProductionValue.Sum(x => x.ConstructionDays);
-            if (totalOnDay != 0)
-            {
-                projectBasePoduction.YearTotalTopFiveOutputPercent = Math.Round((shipProductionValue.Sum(x => x.WorkingHours) / totalOnDay / 24) * 100, 2);
-            }
-            if (ownerShipBuildInfo.YearTotalProductionValue != 0)
-            {
-                projectBasePoduction.YearFiveTimeRate = Math.Round(
-                    (projectBasePoduction.YearFiveTotalOutput /
-                    ownerShipBuildInfo.YearTotalProductionValue) * 100, 2);
-
-            }
-            jjtSendMessageMonitoringDayReportResponseDto.OwnerShipBuildInfo.companyShipTopFiveInfoList = shipProductionValue;
-
-            #endregion
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-            #region 特殊情况
-            var specialProjectList = new List<SpecialProjectInfo>();
-            var dayRepNoticeData = await dbContext.Queryable<DayReport>().Where(x => x.IsDelete == 1 && x.DateDay == currentTimeInt && (x.IsHaveProductionWarning == 1 || x.IsHaveProductionWarning == 2 || x.IsHaveProductionWarning == 3))
-                .Select(x => new { x.IsHaveProductionWarning, x.ProductionWarningContent, x.ProjectId }).OrderByDescending(x => x.IsHaveProductionWarning).ToListAsync();
-            dayRepNoticeData.ForEach(x => specialProjectList.Add(new SpecialProjectInfo
-            {
-                ProjectId = x.ProjectId,
-                Type = x.IsHaveProductionWarning,
-                Description = x.ProductionWarningContent
-            }));
-            var pIds = dayRepNoticeData.Select(x => x.ProjectId).ToList();
-            var sourceProjectList = companyProjectList.Where(x => pIds.Contains(x.Id)).ToList();
-            foreach (var item in specialProjectList)
-            {
-                var projectInfo = sourceProjectList.Where(x => x.Id == item.ProjectId).FirstOrDefault();
-                item.SourceMatter = projectInfo?.ShortName;
-            }
-            jjtSendMessageMonitoringDayReportResponseDto.SpecialProjectInfo = specialProjectList;
-            #endregion
-
-            #region 各单位填报情况(数据质量)
-            //未填报项目的IDS
-            List<Guid> unWriteReportIds = new List<Guid>();
-
-            #region 各单位产值日报填报率情况
-            List<CompanyWriteReportInfo> companyWriteReportInfos = new List<CompanyWriteReportInfo>();
-            //所有已填报的项目
-            var writeReportList = await dbContext.Queryable<DayReport>()
-                .LeftJoin<Project>((x, y) => x.ProjectId == y.Id)
-                .Where((x, y) => x.IsDelete == 1 && onBuildProjectIds.Contains(x.ProjectId) && x.DateDay == currentTimeInt)
-                .Select((x, y) => new JjtProjectDayReport() { ProjectId = x.Id, CompanyId = y.CompanyId.Value, DateDay = x.DateDay })
-                .ToListAsync();
-            companyList = commonDataList.Where(x => x.Type == 1).OrderBy(x => x.Sort).ToList();
-            foreach (var item in companyList)
-            {
-                //当前公司在建合同项数
-                var currentCompany = companyProjectList.Count(x => x.CompanyId == item.ItemId && x.StatusId == buildProjectId);
-                //当前公司已填报的数量
-                var currentDayUnReportCount = writeReportList.Where(x => x.CompanyId == item.ItemId).Count();
-
-                //填报率
-                var writeReportPercent = 0M;
-                if (currentCompany != 0)
-                {
-                    writeReportPercent = Math.Round(((decimal)currentDayUnReportCount / currentCompany) * 100, 2);
-                }
-
-                if (item.Collect == 0)
-                {
-                    companyWriteReportInfos.Add(new CompanyWriteReportInfo()
-                    {
-                        Name = item.Name,
-                        OnBulidCount = currentCompany,
-                        UnReportCount = currentCompany - currentDayUnReportCount,
-                        WritePercent = writeReportPercent,
-                        QualityLevel = 0,
-                        ProjectId = item.Id
-                    });
-                }
-                else
-                {
-                    //在建项目合计
-                    var totalBuildCount = companyWriteReportInfos.Sum(x => x.OnBulidCount);
-                    var totalUnReportCount = companyWriteReportInfos.Sum(x => x.UnReportCount);
-                    var totalWritePercent = 0M;
-                    if (totalBuildCount != 0)
-                    {
-                        totalWritePercent = Math.Round(((decimal)(totalBuildCount - totalUnReportCount)) / totalBuildCount * 100, 2);
-                    }
-
-                    companyWriteReportInfos.Add(new CompanyWriteReportInfo()
-                    {
-                        Name = item.Name,
-                        OnBulidCount = totalBuildCount,
-                        UnReportCount = totalUnReportCount,
-                        WritePercent = totalWritePercent,
-                    });
-                }
-            }
-            //数据质量程度 几颗星（//船舶填报率 待命填报率+调遣填报率+修理填报率+施工填报率）
-            //评分 1：一颗星[0 - 30) 2:两颗星[30 - 60) 3:三颗星[60 - 80) 4:四颗星[80 - 90) 5:五颗星[90 - 100)
-            /// 计算公式：（项目当日产值/3300*50%+船舶当日产值/490*25%+项目填报率*20%+船舶填报率*5%）*100
-            /// 计算船舶填报率
-            var shipPercent = 0M;
-            var reportShipCount = shipDayList.Where(x => x.DateDay == currentTimeInt && shipIds.Contains(x.ShipId)).Count();
-            var tatalShipCount = jjtSendMessageMonitoringDayReportResponseDto.OwnerShipBuildInfo.TotalCount;
-            if (tatalShipCount != 0)
-            {
-                shipPercent = ((decimal)reportShipCount) / tatalShipCount;
-            }
-            //计算星星的数据质量程度
-            var qualityLevel = ((jjtSendMessageMonitoringDayReportResponseDto.projectBasePoduction.DayProductionValue / 3300M) * 50 / 100 +
-            (jjtSendMessageMonitoringDayReportResponseDto.OwnerShipBuildInfo.BulidProductionValue / 490M) * 25 / 100 +
-            (companyWriteReportInfos[8].WritePercent / 100M * 20 / 100) +
-            shipPercent * 5 / 100M) * 100;
-
-            var star = 0;
-            if (qualityLevel <= 30)
-            {
-                star = 1;
-            }
-            else if (qualityLevel > 30 && qualityLevel <= 60)
-            {
-                star = 2;
-            }
-            else if (qualityLevel > 60 && qualityLevel <= 80)
-            {
-                star = 3;
-            }
-            else if (qualityLevel > 80 && qualityLevel <= 90)
-            {
-                star = 4;
-            }
-            else if (qualityLevel > 90)
-            {
-                star = 5;
-            }
-            jjtSendMessageMonitoringDayReportResponseDto.QualityLevel = star;
-            companyWriteReportInfos = companyWriteReportInfos.Where(x => !string.IsNullOrWhiteSpace(x.Name)).ToList();
-            jjtSendMessageMonitoringDayReportResponseDto.CompanyWriteReportInfos = companyWriteReportInfos;
-
-            #endregion
-
-            #region 说明：项目生产数据存在不完整部分主要是以下项目未填报
-            List<CompanyUnWriteReportInfo> companyUnWriteReportInfos = new List<CompanyUnWriteReportInfo>();
-            //统计本周期内已填报的日报
-            var writeCompanyReportList = await dbContext.Queryable<DayReport>()
-             .Where(x => x.IsDelete == 1
-              && x.CreateTime >= SqlFunc.ToDate(startTime) && x.CreateTime <= SqlFunc.ToDate(endTime)
-              && x.DateDay >= currentTimeIntUp && x.DateDay <= currentTimeInt
-              && (x.UpdateTime == null || x.UpdateTime >= SqlFunc.ToDate(startTime) && x.UpdateTime <= SqlFunc.ToDate(endTime)))
-             .ToListAsync();
-            //查询项目信息
-            var projectList = await dbContext.Queryable<Project>().Where(x => x.IsDelete == 1 && onBuildProjectIds.Contains(x.Id)).ToListAsync();
-            companyList = commonDataList.Where(x => x.Type == 1).OrderBy(x => x.Sort).ToList();
-            var distinctOnBuildProjects = onBuildProjectIds.Distinct();
-            //查询符合范围内的数据
-            var projectStatusChangeRecordList = await dbContext.Queryable<ProjectStatusChangeRecord>()
-                .Where(x => x.NewStatus == buildProjectId && (x.ChangeTime >= SqlFunc.ToDate(startTime) && x.ChangeTime <= SqlFunc.ToDate(endTime)))
-                .ToListAsync();
-            //特殊项
-            //var sIds = projectStatusChangeRecordList.Where(x => x.IsValid == 0).Select(x => x.Id).Distinct().ToList();
-            //排除掉不满足的条件 得到满足的条件
-            var satisfyIds = projectStatusChangeRecordList.Where(x => x.IsValid == 1).Select(x => x.Id).ToList();
-            onBuildProjectIds = onBuildProjectIds.Where(x => satisfyIds.Contains(x)).ToList();
-            foreach (var item in onBuildProjectIds)
-            {
-                //if (item != "08db3b35-fb38-4be0-8ad8-5a0a29a2d73f".ToGuid())
-                //    continue;
-
-                //查询当前项目什么时间变更状态的(变更时间就是当前填写日报的时间)
-                var currentProjectStatusChangeTime = projectStatusChangeRecordList.Where(x => x.Id == item && x.IsValid == 1)
-                     .Select(x => x.ChangeTime)
-                     .FirstOrDefault();
-                //当前项目在本周期范围内停了多少天
-                var projectStopDay = projectStatusChangeRecordList.Where(x => x.Id == item && x.IsValid == 1)
-                .Select(x => x.StopDay)
-                .FirstOrDefault();
-                //当前项目本周期需要填写的数量
-                var changeTimeInt = int.Parse(currentProjectStatusChangeTime.ToString("dd"));
-                //计算当前项目需要填写的日报的数量
-                var currentWriteReportCount = 0;
-                if (changeTimeInt >= 26)
-                {
-                    currentWriteReportCount = days - changeTimeInt + 26;
-                }
-                else
-                {
-                    currentWriteReportCount = days - (((days - 26)) + changeTimeInt - 1);
-                }
-                //未过天数
-                var unDays = days - ofdays;
-                //已填报数量
-                var dayReportCount = writeCompanyReportList.Where(x => x.ProjectId == item).Count();
-                //未填报数量
-                var unReportCount = (days - projectStopDay.Value - unDays) - dayReportCount;
-                if (unReportCount <= 0)
-                {
-                    unReportCount = 0;
-                }
-                //ofdays - dayReportCount<= 0 ? 0 : ofdays - dayReportCount- passedTime;
-                //当前项目信息
-                var currentProjectInfo = projectList.SingleOrDefault(x => x.Id == item);
-                //业主单位
-                var companyInfo = companyList.SingleOrDefault(x => x.ItemId == currentProjectInfo.CompanyId && x.Collect == 0);
-
-                if (unReportCount != 0)
-                {
-                    companyUnWriteReportInfos.Add(new CompanyUnWriteReportInfo()
-                    {
-                        ProjectName = currentProjectInfo.Name,
-                        Name = companyInfo.Name,
-                        Count = unReportCount
-                    });
-                }
-            }
-            if (jjtSendMessageMonitoringDayReportResponseDto != null)
-            {
-
-                jjtSendMessageMonitoringDayReportResponseDto.CompanyUnWriteReportInfos = companyUnWriteReportInfos
-                    .OrderByDescending(x => x.Count).ToList();
-            }
-            #endregion
-
-            #region 说明：船舶生产数据存在不完整部分主要是项目部未填报以下船舶
-            List<CompanyShipUnWriteReportInfo> companyShipUnWriteReportInfos = new List<CompanyShipUnWriteReportInfo>();
-            //未填写船舶日报的ids集合
-            var unReportShipIds = allShipIds.Where(x => !shipIds.Contains(x)).ToList();
-            if (unReportShipIds != null && unReportShipIds.Any())
-            {
-                //查询每个项目上的船舶信息
-                var writeReportShipList = await dbContext.Queryable<ShipMovement>()
-                   .Where(x => x.IsDelete == 1
-                           && unReportShipIds.Contains(x.ShipId)
-                           && x.Status == ShipMovementStatus.Enter
-                           && x.ShipType == ShipType.OwnerShip
-                        )
-                   .ToListAsync();
-                if (writeReportShipList != null && writeReportShipList.Any())
-                {
-                    foreach (var item in unReportShipIds)
-                    {
-                        var singleProject = writeReportShipList.FirstOrDefault(x => x.ShipId == item);
-                        if (singleProject != null)
-                        {
-                            //船舶信息
-                            var shipInfo = shipList.FirstOrDefault(x => x.PomId == item);
-                            if (shipInfo != null)
-                            {
-                                //项目信息
-                                var projectInfo = companyProjectList.FirstOrDefault(x => x.Id == singleProject.ProjectId);
-                                if (projectInfo != null)
-                                {
-                                    companyShipUnWriteReportInfos.Add(new CompanyShipUnWriteReportInfo()
-                                    {
-                                        ShipName = shipInfo?.Name,
-                                        OnProjectName = projectInfo?.Name,
-                                    });
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            if (jjtSendMessageMonitoringDayReportResponseDto != null)
-            {
-                jjtSendMessageMonitoringDayReportResponseDto.CompanyShipUnWriteReportInfos = companyShipUnWriteReportInfos;
-            }
-            #endregion
-
-
-            #endregion
-
-            jjtSendMessageMonitoringDayReportResponseDto.Month = month;
-            jjtSendMessageMonitoringDayReportResponseDto.Year = int.Parse(yearStartTime);
-            responseAjaxResult.Data = jjtSendMessageMonitoringDayReportResponseDto;
-            responseAjaxResult.Success();
-            return responseAjaxResult;
-            #endregion
-
-
-        }
+        
 
 
 
@@ -6623,7 +5445,7 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
             var distinctOnBuildProjects = onBuildProjectIds.Distinct();
             //查询符合范围内的数据
             var projectStatusChangeRecordList = await dbContext.Queryable<ProjectStatusChangeRecord>()
-                .Where(x => x.NewStatus == buildProjectId && (x.ChangeTime >= SqlFunc.ToDate(startTime) && x.ChangeTime <= SqlFunc.ToDate(endTime)))
+                .Where(x =>  (x.ChangeTime >= SqlFunc.ToDate(startTime) && x.ChangeTime <= SqlFunc.ToDate(endTime)))
                 .ToListAsync();
             //特殊项
             //var sIds = projectStatusChangeRecordList.Where(x => x.IsValid == 0).Select(x => x.Id).Distinct().ToList();
@@ -6741,587 +5563,24 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
         }
         #endregion
 
-        #region 计算缺少的日报
-        public static int CalcUnWriteReport(DayWriteReportRecord dayWriteReportRecords, int dayTime)
+
+        #region 计算各个公司今日调差数
+        /// <summary>
+        /// 计算各个公司今日调差数
+        /// </summary>
+        /// <param name="dateDay"></param>
+        /// <param name="dailyDeviations"></param>
+        /// <param name="companyId">如果为空  算全公司的产值</param>
+        /// <returns></returns>
+        public static decimal CalcDiffValue(int dateDay,List<DailyDeviation> dailyDeviations,Guid companyId)
         {
-            var connt = 0;
-            if (dayWriteReportRecords == null)
-            {
-                return connt;
-            }
-           
-            if (dayTime == 27)
-            {
-                connt += dayWriteReportRecords.TwentySix == null ? 1 : 0;
-            }
-            else if (dayTime == 28)
-            {
-                connt += dayWriteReportRecords.TwentySix == null ? 1 : 0;
-                connt += dayWriteReportRecords.TwentySeven == null ? 1 : 0;
-            }
-            else if (dayTime == 29)
-            {
-                connt += dayWriteReportRecords.TwentySix == null ? 1 : 0;
-                connt += dayWriteReportRecords.TwentySeven == null ? 1 : 0;
-                connt += dayWriteReportRecords.TwentyEight == null ? 1 : 0;
-            }
-            else if (dayTime == 30)
-            {
-                connt += dayWriteReportRecords.TwentySix == null ? 1 : 0;
-                connt += dayWriteReportRecords.TwentySeven == null ? 1 : 0;
-                connt += dayWriteReportRecords.TwentyEight == null ? 1 : 0;
-                connt += dayWriteReportRecords.TwentyNine == null ? 1 : 0;
-            }
-            else if (dayTime == 31)
-            {
-                connt += dayWriteReportRecords.TwentySix == null ? 1 : 0;
-                connt += dayWriteReportRecords.TwentySeven == null ? 1 : 0;
-                connt += dayWriteReportRecords.TwentyEight == null ? 1 : 0;
-                connt += dayWriteReportRecords.TwentyNine == null ? 1 : 0;
-                connt += dayWriteReportRecords.Thirty == null ? 1 : 0;
-            }
-            else if (dayTime == 1)
-            {
-                connt += dayWriteReportRecords.TwentySix == null ? 1 : 0;
-                connt += dayWriteReportRecords.TwentySeven == null ? 1 : 0;
-                connt += dayWriteReportRecords.TwentyEight == null ? 1 : 0;
-                connt += dayWriteReportRecords.TwentyNine == null ? 1 : 0;
-                connt += dayWriteReportRecords.ThirtyOne == null ? 1 : 0;
-            }
-            else if (dayTime == 2)
-            {
-                connt += dayWriteReportRecords.TwentySix == null ? 1 : 0;
-                connt += dayWriteReportRecords.TwentySeven == null ? 1 : 0;
-                connt += dayWriteReportRecords.TwentyEight == null ? 1 : 0;
-                connt += dayWriteReportRecords.TwentyNine == null ? 1 : 0;
-                connt += dayWriteReportRecords.ThirtyOne == null ? 1 : 0;
-                connt += dayWriteReportRecords.One == null ? 1 : 0;
-            }
-            else if (dayTime == 3)
-            {
-                connt += dayWriteReportRecords.TwentySix == null ? 1 : 0;
-                connt += dayWriteReportRecords.TwentySeven == null ? 1 : 0;
-                connt += dayWriteReportRecords.TwentyEight == null ? 1 : 0;
-                connt += dayWriteReportRecords.TwentyNine == null ? 1 : 0;
-                connt += dayWriteReportRecords.ThirtyOne == null ? 1 : 0;
-                connt += dayWriteReportRecords.One == null ? 1 : 0;
-                connt += dayWriteReportRecords.Two == null ? 1 : 0;
-            }
-            else if (dayTime == 4)
-            {
-                connt += dayWriteReportRecords.TwentySix == null ? 1 : 0;
-                connt += dayWriteReportRecords.TwentySeven == null ? 1 : 0;
-                connt += dayWriteReportRecords.TwentyEight == null ? 1 : 0;
-                connt += dayWriteReportRecords.TwentyNine == null ? 1 : 0;
-                connt += dayWriteReportRecords.ThirtyOne == null ? 1 : 0;
-                connt += dayWriteReportRecords.One == null ? 1 : 0;
-                connt += dayWriteReportRecords.Two == null ? 1 : 0;
-                connt += dayWriteReportRecords.Three == null ? 1 : 0;
-            }
-            else if (dayTime == 5)
-            {
-                connt += dayWriteReportRecords.TwentySix == null ? 1 : 0;
-                connt += dayWriteReportRecords.TwentySeven == null ? 1 : 0;
-                connt += dayWriteReportRecords.TwentyEight == null ? 1 : 0;
-                connt += dayWriteReportRecords.TwentyNine == null ? 1 : 0;
-                connt += dayWriteReportRecords.ThirtyOne == null ? 1 : 0;
-                connt += dayWriteReportRecords.One == null ? 1 : 0;
-                connt += dayWriteReportRecords.Two == null ? 1 : 0;
-                connt += dayWriteReportRecords.Three == null ? 1 : 0;
-                connt += dayWriteReportRecords.Four == null ? 1 : 0;
-            }
-            else if (dayTime == 6)
-            {
-                connt += dayWriteReportRecords.TwentySix == null ? 1 : 0;
-                connt += dayWriteReportRecords.TwentySeven == null ? 1 : 0;
-                connt += dayWriteReportRecords.TwentyEight == null ? 1 : 0;
-                connt += dayWriteReportRecords.TwentyNine == null ? 1 : 0;
-                connt += dayWriteReportRecords.ThirtyOne == null ? 1 : 0;
-                connt += dayWriteReportRecords.One == null ? 1 : 0;
-                connt += dayWriteReportRecords.Two == null ? 1 : 0;
-                connt += dayWriteReportRecords.Three == null ? 1 : 0;
-                connt += dayWriteReportRecords.Four == null ? 1 : 0;
-                connt += dayWriteReportRecords.Five == null ? 1 : 0;
-            }
-            else if (dayTime == 7)
-            {
-                connt += dayWriteReportRecords.TwentySix == null ? 1 : 0;
-                connt += dayWriteReportRecords.TwentySeven == null ? 1 : 0;
-                connt += dayWriteReportRecords.TwentyEight == null ? 1 : 0;
-                connt += dayWriteReportRecords.TwentyNine == null ? 1 : 0;
-                connt += dayWriteReportRecords.ThirtyOne == null ? 1 : 0;
-                connt += dayWriteReportRecords.One == null ? 1 : 0;
-                connt += dayWriteReportRecords.Two == null ? 1 : 0;
-                connt += dayWriteReportRecords.Three == null ? 1 : 0;
-                connt += dayWriteReportRecords.Four == null ? 1 : 0;
-                connt += dayWriteReportRecords.Five == null ? 1 : 0;
-                connt += dayWriteReportRecords.Six == null ? 1 : 0;
-            }
-            else if (dayTime == 8)
-            {
-                connt += dayWriteReportRecords.TwentySix == null ? 1 : 0;
-                connt += dayWriteReportRecords.TwentySeven == null ? 1 : 0;
-                connt += dayWriteReportRecords.TwentyEight == null ? 1 : 0;
-                connt += dayWriteReportRecords.TwentyNine == null ? 1 : 0;
-                connt += dayWriteReportRecords.ThirtyOne == null ? 1 : 0;
-                connt += dayWriteReportRecords.One == null ? 1 : 0;
-                connt += dayWriteReportRecords.Two == null ? 1 : 0;
-                connt += dayWriteReportRecords.Three == null ? 1 : 0;
-                connt += dayWriteReportRecords.Four == null ? 1 : 0;
-                connt += dayWriteReportRecords.Five == null ? 1 : 0;
-                connt += dayWriteReportRecords.Six == null ? 1 : 0;
-                connt += dayWriteReportRecords.Seven == null ? 1 : 0;
-            }
-            else if (dayTime == 9)
-            {
-                connt += dayWriteReportRecords.TwentySix == null ? 1 : 0;
-                connt += dayWriteReportRecords.TwentySeven == null ? 1 : 0;
-                connt += dayWriteReportRecords.TwentyEight == null ? 1 : 0;
-                connt += dayWriteReportRecords.TwentyNine == null ? 1 : 0;
-                connt += dayWriteReportRecords.ThirtyOne == null ? 1 : 0;
-                connt += dayWriteReportRecords.One == null ? 1 : 0;
-                connt += dayWriteReportRecords.Two == null ? 1 : 0;
-                connt += dayWriteReportRecords.Three == null ? 1 : 0;
-                connt += dayWriteReportRecords.Four == null ? 1 : 0;
-                connt += dayWriteReportRecords.Five == null ? 1 : 0;
-                connt += dayWriteReportRecords.Six == null ? 1 : 0;
-                connt += dayWriteReportRecords.Seven == null ? 1 : 0;
-                connt += dayWriteReportRecords.Eight == null ? 1 : 0;
-            }
-            else if (dayTime == 10)
-            {
-                connt += dayWriteReportRecords.TwentySix == null ? 1 : 0;
-                connt += dayWriteReportRecords.TwentySeven == null ? 1 : 0;
-                connt += dayWriteReportRecords.TwentyEight == null ? 1 : 0;
-                connt += dayWriteReportRecords.TwentyNine == null ? 1 : 0;
-                connt += dayWriteReportRecords.ThirtyOne == null ? 1 : 0;
-                connt += dayWriteReportRecords.One == null ? 1 : 0;
-                connt += dayWriteReportRecords.Two == null ? 1 : 0;
-                connt += dayWriteReportRecords.Three == null ? 1 : 0;
-                connt += dayWriteReportRecords.Four == null ? 1 : 0;
-                connt += dayWriteReportRecords.Five == null ? 1 : 0;
-                connt += dayWriteReportRecords.Six == null ? 1 : 0;
-                connt += dayWriteReportRecords.Seven == null ? 1 : 0;
-                connt += dayWriteReportRecords.Eight == null ? 1 : 0;
-                connt += dayWriteReportRecords.Nine == null ? 1 : 0;
-            }
-            else if (dayTime == 11)
-            {
-                connt += dayWriteReportRecords.TwentySix == null ? 1 : 0;
-                connt += dayWriteReportRecords.TwentySeven == null ? 1 : 0;
-                connt += dayWriteReportRecords.TwentyEight == null ? 1 : 0;
-                connt += dayWriteReportRecords.TwentyNine == null ? 1 : 0;
-                connt += dayWriteReportRecords.ThirtyOne == null ? 1 : 0;
-                connt += dayWriteReportRecords.One == null ? 1 : 0;
-                connt += dayWriteReportRecords.Two == null ? 1 : 0;
-                connt += dayWriteReportRecords.Three == null ? 1 : 0;
-                connt += dayWriteReportRecords.Four == null ? 1 : 0;
-                connt += dayWriteReportRecords.Five == null ? 1 : 0;
-                connt += dayWriteReportRecords.Six == null ? 1 : 0;
-                connt += dayWriteReportRecords.Seven == null ? 1 : 0;
-                connt += dayWriteReportRecords.Eight == null ? 1 : 0;
-                connt += dayWriteReportRecords.Nine == null ? 1 : 0;
-                connt += dayWriteReportRecords.Ten == null ? 1 : 0;
-            }
-            else if (dayTime == 12)
-            {
-                connt += dayWriteReportRecords.TwentySix == null ? 1 : 0;
-                connt += dayWriteReportRecords.TwentySeven == null ? 1 : 0;
-                connt += dayWriteReportRecords.TwentyEight == null ? 1 : 0;
-                connt += dayWriteReportRecords.TwentyNine == null ? 1 : 0;
-                connt += dayWriteReportRecords.ThirtyOne == null ? 1 : 0;
-                connt += dayWriteReportRecords.One == null ? 1 : 0;
-                connt += dayWriteReportRecords.Two == null ? 1 : 0;
-                connt += dayWriteReportRecords.Three == null ? 1 : 0;
-                connt += dayWriteReportRecords.Four == null ? 1 : 0;
-                connt += dayWriteReportRecords.Five == null ? 1 : 0;
-                connt += dayWriteReportRecords.Six == null ? 1 : 0;
-                connt += dayWriteReportRecords.Seven == null ? 1 : 0;
-                connt += dayWriteReportRecords.Eight == null ? 1 : 0;
-                connt += dayWriteReportRecords.Nine == null ? 1 : 0;
-                connt += dayWriteReportRecords.Ten == null ? 1 : 0;
-                connt += dayWriteReportRecords.Eleven == null ? 1 : 0;
-            }
-            else if (dayTime == 13)
-            {
-                connt += dayWriteReportRecords.TwentySix == null ? 1 : 0;
-                connt += dayWriteReportRecords.TwentySeven == null ? 1 : 0;
-                connt += dayWriteReportRecords.TwentyEight == null ? 1 : 0;
-                connt += dayWriteReportRecords.TwentyNine == null ? 1 : 0;
-                connt += dayWriteReportRecords.ThirtyOne == null ? 1 : 0;
-                connt += dayWriteReportRecords.One == null ? 1 : 0;
-                connt += dayWriteReportRecords.Two == null ? 1 : 0;
-                connt += dayWriteReportRecords.Three == null ? 1 : 0;
-                connt += dayWriteReportRecords.Four == null ? 1 : 0;
-                connt += dayWriteReportRecords.Five == null ? 1 : 0;
-                connt += dayWriteReportRecords.Six == null ? 1 : 0;
-                connt += dayWriteReportRecords.Seven == null ? 1 : 0;
-                connt += dayWriteReportRecords.Eight == null ? 1 : 0;
-                connt += dayWriteReportRecords.Nine == null ? 1 : 0;
-                connt += dayWriteReportRecords.Ten == null ? 1 : 0;
-                connt += dayWriteReportRecords.Eleven == null ? 1 : 0;
-                connt += dayWriteReportRecords.Twelve == null ? 1 : 0;
-            }
-            else if (dayTime == 14)
-            {
-                connt += dayWriteReportRecords.TwentySix == null ? 1 : 0;
-                connt += dayWriteReportRecords.TwentySeven == null ? 1 : 0;
-                connt += dayWriteReportRecords.TwentyEight == null ? 1 : 0;
-                connt += dayWriteReportRecords.TwentyNine == null ? 1 : 0;
-                connt += dayWriteReportRecords.ThirtyOne == null ? 1 : 0;
-                connt += dayWriteReportRecords.One == null ? 1 : 0;
-                connt += dayWriteReportRecords.Two == null ? 1 : 0;
-                connt += dayWriteReportRecords.Three == null ? 1 : 0;
-                connt += dayWriteReportRecords.Four == null ? 1 : 0;
-                connt += dayWriteReportRecords.Five == null ? 1 : 0;
-                connt += dayWriteReportRecords.Six == null ? 1 : 0;
-                connt += dayWriteReportRecords.Seven == null ? 1 : 0;
-                connt += dayWriteReportRecords.Eight == null ? 1 : 0;
-                connt += dayWriteReportRecords.Nine == null ? 1 : 0;
-                connt += dayWriteReportRecords.Ten == null ? 1 : 0;
-                connt += dayWriteReportRecords.Eleven == null ? 1 : 0;
-                connt += dayWriteReportRecords.Twelve == null ? 1 : 0;
-                connt += dayWriteReportRecords.Thirteen == null ? 1 : 0;
-            }
-            else if (dayTime == 15)
-            {
-                connt += dayWriteReportRecords.TwentySix == null ? 1 : 0;
-                connt += dayWriteReportRecords.TwentySeven == null ? 1 : 0;
-                connt += dayWriteReportRecords.TwentyEight == null ? 1 : 0;
-                connt += dayWriteReportRecords.TwentyNine == null ? 1 : 0;
-                connt += dayWriteReportRecords.ThirtyOne == null ? 1 : 0;
-                connt += dayWriteReportRecords.One == null ? 1 : 0;
-                connt += dayWriteReportRecords.Two == null ? 1 : 0;
-                connt += dayWriteReportRecords.Three == null ? 1 : 0;
-                connt += dayWriteReportRecords.Four == null ? 1 : 0;
-                connt += dayWriteReportRecords.Five == null ? 1 : 0;
-                connt += dayWriteReportRecords.Six == null ? 1 : 0;
-                connt += dayWriteReportRecords.Seven == null ? 1 : 0;
-                connt += dayWriteReportRecords.Eight == null ? 1 : 0;
-                connt += dayWriteReportRecords.Nine == null ? 1 : 0;
-                connt += dayWriteReportRecords.Ten == null ? 1 : 0;
-                connt += dayWriteReportRecords.Eleven == null ? 1 : 0;
-                connt += dayWriteReportRecords.Twelve == null ? 1 : 0;
-                connt += dayWriteReportRecords.Thirteen == null ? 1 : 0;
-                connt += dayWriteReportRecords.Fourteen == null ? 1 : 0;
-
-            }
-            else if (dayTime == 16)
-            {
-                connt += dayWriteReportRecords.TwentySix == null ? 1 : 0;
-                connt += dayWriteReportRecords.TwentySeven == null ? 1 : 0;
-                connt += dayWriteReportRecords.TwentyEight == null ? 1 : 0;
-                connt += dayWriteReportRecords.TwentyNine == null ? 1 : 0;
-                connt += dayWriteReportRecords.ThirtyOne == null ? 1 : 0;
-                connt += dayWriteReportRecords.One == null ? 1 : 0;
-                connt += dayWriteReportRecords.Two == null ? 1 : 0;
-                connt += dayWriteReportRecords.Three == null ? 1 : 0;
-                connt += dayWriteReportRecords.Four == null ? 1 : 0;
-                connt += dayWriteReportRecords.Five == null ? 1 : 0;
-                connt += dayWriteReportRecords.Six == null ? 1 : 0;
-                connt += dayWriteReportRecords.Seven == null ? 1 : 0;
-                connt += dayWriteReportRecords.Eight == null ? 1 : 0;
-                connt += dayWriteReportRecords.Nine == null ? 1 : 0;
-                connt += dayWriteReportRecords.Ten == null ? 1 : 0;
-                connt += dayWriteReportRecords.Eleven == null ? 1 : 0;
-                connt += dayWriteReportRecords.Twelve == null ? 1 : 0;
-                connt += dayWriteReportRecords.Thirteen == null ? 1 : 0;
-                connt += dayWriteReportRecords.Fourteen == null ? 1 : 0;
-                connt += dayWriteReportRecords.Fifteen == null ? 1 : 0;
-
-            }
-            else if (dayTime == 17)
-            {
-                connt += dayWriteReportRecords.TwentySix == null ? 1 : 0;
-                connt += dayWriteReportRecords.TwentySeven == null ? 1 : 0;
-                connt += dayWriteReportRecords.TwentyEight == null ? 1 : 0;
-                connt += dayWriteReportRecords.TwentyNine == null ? 1 : 0;
-                connt += dayWriteReportRecords.ThirtyOne == null ? 1 : 0;
-                connt += dayWriteReportRecords.One == null ? 1 : 0;
-                connt += dayWriteReportRecords.Two == null ? 1 : 0;
-                connt += dayWriteReportRecords.Three == null ? 1 : 0;
-                connt += dayWriteReportRecords.Four == null ? 1 : 0;
-                connt += dayWriteReportRecords.Five == null ? 1 : 0;
-                connt += dayWriteReportRecords.Six == null ? 1 : 0;
-                connt += dayWriteReportRecords.Seven == null ? 1 : 0;
-                connt += dayWriteReportRecords.Eight == null ? 1 : 0;
-                connt += dayWriteReportRecords.Nine == null ? 1 : 0;
-                connt += dayWriteReportRecords.Ten == null ? 1 : 0;
-                connt += dayWriteReportRecords.Eleven == null ? 1 : 0;
-                connt += dayWriteReportRecords.Twelve == null ? 1 : 0;
-                connt += dayWriteReportRecords.Thirteen == null ? 1 : 0;
-                connt += dayWriteReportRecords.Fourteen == null ? 1 : 0;
-                connt += dayWriteReportRecords.Fifteen == null ? 1 : 0;
-                connt += dayWriteReportRecords.Sixteen == null ? 1 : 0;
-
-            }
-            else if (dayTime == 18)
-            {
-                connt += dayWriteReportRecords.TwentySix == null ? 1 : 0;
-                connt += dayWriteReportRecords.TwentySeven == null ? 1 : 0;
-                connt += dayWriteReportRecords.TwentyEight == null ? 1 : 0;
-                connt += dayWriteReportRecords.TwentyNine == null ? 1 : 0;
-                connt += dayWriteReportRecords.ThirtyOne == null ? 1 : 0;
-                connt += dayWriteReportRecords.One == null ? 1 : 0;
-                connt += dayWriteReportRecords.Two == null ? 1 : 0;
-                connt += dayWriteReportRecords.Three == null ? 1 : 0;
-                connt += dayWriteReportRecords.Four == null ? 1 : 0;
-                connt += dayWriteReportRecords.Five == null ? 1 : 0;
-                connt += dayWriteReportRecords.Six == null ? 1 : 0;
-                connt += dayWriteReportRecords.Seven == null ? 1 : 0;
-                connt += dayWriteReportRecords.Eight == null ? 1 : 0;
-                connt += dayWriteReportRecords.Nine == null ? 1 : 0;
-                connt += dayWriteReportRecords.Ten == null ? 1 : 0;
-                connt += dayWriteReportRecords.Eleven == null ? 1 : 0;
-                connt += dayWriteReportRecords.Twelve == null ? 1 : 0;
-                connt += dayWriteReportRecords.Thirteen == null ? 1 : 0;
-                connt += dayWriteReportRecords.Fourteen == null ? 1 : 0;
-                connt += dayWriteReportRecords.Fifteen == null ? 1 : 0;
-                connt += dayWriteReportRecords.Sixteen == null ? 1 : 0;
-                connt += dayWriteReportRecords.Seventeen == null ? 1 : 0;
-
-            }
-            else if (dayTime == 19)
-            {
-                connt += dayWriteReportRecords.TwentySix == null ? 1 : 0;
-                connt += dayWriteReportRecords.TwentySeven == null ? 1 : 0;
-                connt += dayWriteReportRecords.TwentyEight == null ? 1 : 0;
-                connt += dayWriteReportRecords.TwentyNine == null ? 1 : 0;
-                connt += dayWriteReportRecords.ThirtyOne == null ? 1 : 0;
-                connt += dayWriteReportRecords.One == null ? 1 : 0;
-                connt += dayWriteReportRecords.Two == null ? 1 : 0;
-                connt += dayWriteReportRecords.Three == null ? 1 : 0;
-                connt += dayWriteReportRecords.Four == null ? 1 : 0;
-                connt += dayWriteReportRecords.Five == null ? 1 : 0;
-                connt += dayWriteReportRecords.Six == null ? 1 : 0;
-                connt += dayWriteReportRecords.Seven == null ? 1 : 0;
-                connt += dayWriteReportRecords.Eight == null ? 1 : 0;
-                connt += dayWriteReportRecords.Nine == null ? 1 : 0;
-                connt += dayWriteReportRecords.Ten == null ? 1 : 0;
-                connt += dayWriteReportRecords.Eleven == null ? 1 : 0;
-                connt += dayWriteReportRecords.Twelve == null ? 1 : 0;
-                connt += dayWriteReportRecords.Thirteen == null ? 1 : 0;
-                connt += dayWriteReportRecords.Fourteen == null ? 1 : 0;
-                connt += dayWriteReportRecords.Fifteen == null ? 1 : 0;
-                connt += dayWriteReportRecords.Sixteen == null ? 1 : 0;
-                connt += dayWriteReportRecords.Seventeen == null ? 1 : 0;
-                connt += dayWriteReportRecords.Eighteen == null ? 1 : 0;
-            }
-            else if (dayTime == 20)
-            {
-                connt += dayWriteReportRecords.TwentySix == null ? 1 : 0;
-                connt += dayWriteReportRecords.TwentySeven == null ? 1 : 0;
-                connt += dayWriteReportRecords.TwentyEight == null ? 1 : 0;
-                connt += dayWriteReportRecords.TwentyNine == null ? 1 : 0;
-                connt += dayWriteReportRecords.ThirtyOne == null ? 1 : 0;
-                connt += dayWriteReportRecords.One == null ? 1 : 0;
-                connt += dayWriteReportRecords.Two == null ? 1 : 0;
-                connt += dayWriteReportRecords.Three == null ? 1 : 0;
-                connt += dayWriteReportRecords.Four == null ? 1 : 0;
-                connt += dayWriteReportRecords.Five == null ? 1 : 0;
-                connt += dayWriteReportRecords.Six == null ? 1 : 0;
-                connt += dayWriteReportRecords.Seven == null ? 1 : 0;
-                connt += dayWriteReportRecords.Eight == null ? 1 : 0;
-                connt += dayWriteReportRecords.Nine == null ? 1 : 0;
-                connt += dayWriteReportRecords.Ten == null ? 1 : 0;
-                connt += dayWriteReportRecords.Eleven == null ? 1 : 0;
-                connt += dayWriteReportRecords.Twelve == null ? 1 : 0;
-                connt += dayWriteReportRecords.Thirteen == null ? 1 : 0;
-                connt += dayWriteReportRecords.Fourteen == null ? 1 : 0;
-                connt += dayWriteReportRecords.Fifteen == null ? 1 : 0;
-                connt += dayWriteReportRecords.Sixteen == null ? 1 : 0;
-                connt += dayWriteReportRecords.Seventeen == null ? 1 : 0;
-                connt += dayWriteReportRecords.Eighteen == null ? 1 : 0;
-                connt += dayWriteReportRecords.Nineteen == null ? 1 : 0;
-            }
-            else if (dayTime == 21)
-            {
-                connt += dayWriteReportRecords.TwentySix == null ? 1 : 0;
-                connt += dayWriteReportRecords.TwentySeven == null ? 1 : 0;
-                connt += dayWriteReportRecords.TwentyEight == null ? 1 : 0;
-                connt += dayWriteReportRecords.TwentyNine == null ? 1 : 0;
-                connt += dayWriteReportRecords.ThirtyOne == null ? 1 : 0;
-                connt += dayWriteReportRecords.One == null ? 1 : 0;
-                connt += dayWriteReportRecords.Two == null ? 1 : 0;
-                connt += dayWriteReportRecords.Three == null ? 1 : 0;
-                connt += dayWriteReportRecords.Four == null ? 1 : 0;
-                connt += dayWriteReportRecords.Five == null ? 1 : 0;
-                connt += dayWriteReportRecords.Six == null ? 1 : 0;
-                connt += dayWriteReportRecords.Seven == null ? 1 : 0;
-                connt += dayWriteReportRecords.Eight == null ? 1 : 0;
-                connt += dayWriteReportRecords.Nine == null ? 1 : 0;
-                connt += dayWriteReportRecords.Ten == null ? 1 : 0;
-                connt += dayWriteReportRecords.Eleven == null ? 1 : 0;
-                connt += dayWriteReportRecords.Twelve == null ? 1 : 0;
-                connt += dayWriteReportRecords.Thirteen == null ? 1 : 0;
-                connt += dayWriteReportRecords.Fourteen == null ? 1 : 0;
-                connt += dayWriteReportRecords.Fifteen == null ? 1 : 0;
-                connt += dayWriteReportRecords.Sixteen == null ? 1 : 0;
-                connt += dayWriteReportRecords.Seventeen == null ? 1 : 0;
-                connt += dayWriteReportRecords.Eighteen == null ? 1 : 0;
-                connt += dayWriteReportRecords.Nineteen == null ? 1 : 0;
-                connt += dayWriteReportRecords.Twenty == null ? 1 : 0;
-            }
-            else if (dayTime == 22)
-            {
-                connt += dayWriteReportRecords.TwentySix == null ? 1 : 0;
-                connt += dayWriteReportRecords.TwentySeven == null ? 1 : 0;
-                connt += dayWriteReportRecords.TwentyEight == null ? 1 : 0;
-                connt += dayWriteReportRecords.TwentyNine == null ? 1 : 0;
-                connt += dayWriteReportRecords.ThirtyOne == null ? 1 : 0;
-                connt += dayWriteReportRecords.One == null ? 1 : 0;
-                connt += dayWriteReportRecords.Two == null ? 1 : 0;
-                connt += dayWriteReportRecords.Three == null ? 1 : 0;
-                connt += dayWriteReportRecords.Four == null ? 1 : 0;
-                connt += dayWriteReportRecords.Five == null ? 1 : 0;
-                connt += dayWriteReportRecords.Six == null ? 1 : 0;
-                connt += dayWriteReportRecords.Seven == null ? 1 : 0;
-                connt += dayWriteReportRecords.Eight == null ? 1 : 0;
-                connt += dayWriteReportRecords.Nine == null ? 1 : 0;
-                connt += dayWriteReportRecords.Ten == null ? 1 : 0;
-                connt += dayWriteReportRecords.Eleven == null ? 1 : 0;
-                connt += dayWriteReportRecords.Twelve == null ? 1 : 0;
-                connt += dayWriteReportRecords.Thirteen == null ? 1 : 0;
-                connt += dayWriteReportRecords.Fourteen == null ? 1 : 0;
-                connt += dayWriteReportRecords.Fifteen == null ? 1 : 0;
-                connt += dayWriteReportRecords.Sixteen == null ? 1 : 0;
-                connt += dayWriteReportRecords.Seventeen == null ? 1 : 0;
-                connt += dayWriteReportRecords.Eighteen == null ? 1 : 0;
-                connt += dayWriteReportRecords.Nineteen == null ? 1 : 0;
-                connt += dayWriteReportRecords.Twenty == null ? 1 : 0;
-                connt += dayWriteReportRecords.TwentyOne == null ? 1 : 0;
-            }
-            else if (dayTime == 23)
-            {
-                connt += dayWriteReportRecords.TwentySix == null ? 1 : 0;
-                connt += dayWriteReportRecords.TwentySeven == null ? 1 : 0;
-                connt += dayWriteReportRecords.TwentyEight == null ? 1 : 0;
-                connt += dayWriteReportRecords.TwentyNine == null ? 1 : 0;
-                connt += dayWriteReportRecords.ThirtyOne == null ? 1 : 0;
-                connt += dayWriteReportRecords.One == null ? 1 : 0;
-                connt += dayWriteReportRecords.Two == null ? 1 : 0;
-                connt += dayWriteReportRecords.Three == null ? 1 : 0;
-                connt += dayWriteReportRecords.Four == null ? 1 : 0;
-                connt += dayWriteReportRecords.Five == null ? 1 : 0;
-                connt += dayWriteReportRecords.Six == null ? 1 : 0;
-                connt += dayWriteReportRecords.Seven == null ? 1 : 0;
-                connt += dayWriteReportRecords.Eight == null ? 1 : 0;
-                connt += dayWriteReportRecords.Nine == null ? 1 : 0;
-                connt += dayWriteReportRecords.Ten == null ? 1 : 0;
-                connt += dayWriteReportRecords.Eleven == null ? 1 : 0;
-                connt += dayWriteReportRecords.Twelve == null ? 1 : 0;
-                connt += dayWriteReportRecords.Thirteen == null ? 1 : 0;
-                connt += dayWriteReportRecords.Fourteen == null ? 1 : 0;
-                connt += dayWriteReportRecords.Fifteen == null ? 1 : 0;
-                connt += dayWriteReportRecords.Sixteen == null ? 1 : 0;
-                connt += dayWriteReportRecords.Seventeen == null ? 1 : 0;
-                connt += dayWriteReportRecords.Eighteen == null ? 1 : 0;
-                connt += dayWriteReportRecords.Nineteen == null ? 1 : 0;
-                connt += dayWriteReportRecords.Twenty == null ? 1 : 0;
-                connt += dayWriteReportRecords.TwentyOne == null ? 1 : 0;
-                connt += dayWriteReportRecords.TwentyTwo == null ? 1 : 0;
-            }
-            else if (dayTime == 24)
-            {
-                connt += dayWriteReportRecords.TwentySix == null ? 1 : 0;
-                connt += dayWriteReportRecords.TwentySeven == null ? 1 : 0;
-                connt += dayWriteReportRecords.TwentyEight == null ? 1 : 0;
-                connt += dayWriteReportRecords.TwentyNine == null ? 1 : 0;
-                connt += dayWriteReportRecords.ThirtyOne == null ? 1 : 0;
-                connt += dayWriteReportRecords.One == null ? 1 : 0;
-                connt += dayWriteReportRecords.Two == null ? 1 : 0;
-                connt += dayWriteReportRecords.Three == null ? 1 : 0;
-                connt += dayWriteReportRecords.Four == null ? 1 : 0;
-                connt += dayWriteReportRecords.Five == null ? 1 : 0;
-                connt += dayWriteReportRecords.Six == null ? 1 : 0;
-                connt += dayWriteReportRecords.Seven == null ? 1 : 0;
-                connt += dayWriteReportRecords.Eight == null ? 1 : 0;
-                connt += dayWriteReportRecords.Nine == null ? 1 : 0;
-                connt += dayWriteReportRecords.Ten == null ? 1 : 0;
-                connt += dayWriteReportRecords.Eleven == null ? 1 : 0;
-                connt += dayWriteReportRecords.Twelve == null ? 1 : 0;
-                connt += dayWriteReportRecords.Thirteen == null ? 1 : 0;
-                connt += dayWriteReportRecords.Fourteen == null ? 1 : 0;
-                connt += dayWriteReportRecords.Fifteen == null ? 1 : 0;
-                connt += dayWriteReportRecords.Sixteen == null ? 1 : 0;
-                connt += dayWriteReportRecords.Seventeen == null ? 1 : 0;
-                connt += dayWriteReportRecords.Eighteen == null ? 1 : 0;
-                connt += dayWriteReportRecords.Nineteen == null ? 1 : 0;
-                connt += dayWriteReportRecords.Twenty == null ? 1 : 0;
-                connt += dayWriteReportRecords.TwentyOne == null ? 1 : 0;
-                connt += dayWriteReportRecords.TwentyTwo == null ? 1 : 0;
-                connt += dayWriteReportRecords.TwentyThree == null ? 1 : 0;
-            }
-            else if (dayTime == 25)
-            {
-                connt += dayWriteReportRecords.TwentySix == null ? 1 : 0;
-                connt += dayWriteReportRecords.TwentySeven == null ? 1 : 0;
-                connt += dayWriteReportRecords.TwentyEight == null ? 1 : 0;
-                connt += dayWriteReportRecords.TwentyNine == null ? 1 : 0;
-                connt += dayWriteReportRecords.ThirtyOne == null ? 1 : 0;
-                connt += dayWriteReportRecords.One == null ? 1 : 0;
-                connt += dayWriteReportRecords.Two == null ? 1 : 0;
-                connt += dayWriteReportRecords.Three == null ? 1 : 0;
-                connt += dayWriteReportRecords.Four == null ? 1 : 0;
-                connt += dayWriteReportRecords.Five == null ? 1 : 0;
-                connt += dayWriteReportRecords.Six == null ? 1 : 0;
-                connt += dayWriteReportRecords.Seven == null ? 1 : 0;
-                connt += dayWriteReportRecords.Eight == null ? 1 : 0;
-                connt += dayWriteReportRecords.Nine == null ? 1 : 0;
-                connt += dayWriteReportRecords.Ten == null ? 1 : 0;
-                connt += dayWriteReportRecords.Eleven == null ? 1 : 0;
-                connt += dayWriteReportRecords.Twelve == null ? 1 : 0;
-                connt += dayWriteReportRecords.Thirteen == null ? 1 : 0;
-                connt += dayWriteReportRecords.Fourteen == null ? 1 : 0;
-                connt += dayWriteReportRecords.Fifteen == null ? 1 : 0;
-                connt += dayWriteReportRecords.Sixteen == null ? 1 : 0;
-                connt += dayWriteReportRecords.Seventeen == null ? 1 : 0;
-                connt += dayWriteReportRecords.Eighteen == null ? 1 : 0;
-                connt += dayWriteReportRecords.Nineteen == null ? 1 : 0;
-                connt += dayWriteReportRecords.Twenty == null ? 1 : 0;
-                connt += dayWriteReportRecords.TwentyOne == null ? 1 : 0;
-                connt += dayWriteReportRecords.TwentyTwo == null ? 1 : 0;
-                connt += dayWriteReportRecords.TwentyThree == null ? 1 : 0;
-                connt += dayWriteReportRecords.TwentyFour == null ? 1 : 0;
-            }
-            else if (dayTime == 26)
-            {
-                connt += dayWriteReportRecords.TwentySix == null ? 1 : 0;
-                connt += dayWriteReportRecords.TwentySeven == null ? 1 : 0;
-                connt += dayWriteReportRecords.TwentyEight == null ? 1 : 0;
-                connt += dayWriteReportRecords.TwentyNine == null ? 1 : 0;
-                connt += dayWriteReportRecords.ThirtyOne == null ? 1 : 0;
-                connt += dayWriteReportRecords.One == null ? 1 : 0;
-                connt += dayWriteReportRecords.Two == null ? 1 : 0;
-                connt += dayWriteReportRecords.Three == null ? 1 : 0;
-                connt += dayWriteReportRecords.Four == null ? 1 : 0;
-                connt += dayWriteReportRecords.Five == null ? 1 : 0;
-                connt += dayWriteReportRecords.Six == null ? 1 : 0;
-                connt += dayWriteReportRecords.Seven == null ? 1 : 0;
-                connt += dayWriteReportRecords.Eight == null ? 1 : 0;
-                connt += dayWriteReportRecords.Nine == null ? 1 : 0;
-                connt += dayWriteReportRecords.Ten == null ? 1 : 0;
-                connt += dayWriteReportRecords.Eleven == null ? 1 : 0;
-                connt += dayWriteReportRecords.Twelve == null ? 1 : 0;
-                connt += dayWriteReportRecords.Thirteen == null ? 1 : 0;
-                connt += dayWriteReportRecords.Fourteen == null ? 1 : 0;
-                connt += dayWriteReportRecords.Fifteen == null ? 1 : 0;
-                connt += dayWriteReportRecords.Sixteen == null ? 1 : 0;
-                connt += dayWriteReportRecords.Seventeen == null ? 1 : 0;
-                connt += dayWriteReportRecords.Eighteen == null ? 1 : 0;
-                connt += dayWriteReportRecords.Nineteen == null ? 1 : 0;
-                connt += dayWriteReportRecords.Twenty == null ? 1 : 0;
-                connt += dayWriteReportRecords.TwentyOne == null ? 1 : 0;
-                connt += dayWriteReportRecords.TwentyTwo == null ? 1 : 0;
-                connt += dayWriteReportRecords.TwentyThree == null ? 1 : 0;
-                connt += dayWriteReportRecords.TwentyFour == null ? 1 : 0;
-                connt += dayWriteReportRecords.TwentyFive == null ? 1 : 0;
-            }
-
-            return connt;
+            //今日实际的调差产值
+            var dayCompanyProValue = dailyDeviations.WhereIF(companyId!=Guid.Empty, x => x.CompanyId == companyId).Sum(x => x.DayActualProductionAmountDeviation);
+            //今日实际的产值
+           var dayCompanyPValue= dailyDeviations.WhereIF(companyId != Guid.Empty, x => x.CompanyId == companyId).Sum(x => x.DayActualProductionAmount);
+           return Math.Abs( dayCompanyProValue - dayCompanyPValue);
         }
         #endregion
-
 
 
         // JjtTextCardMsgDetailsAsync

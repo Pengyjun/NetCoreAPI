@@ -100,7 +100,7 @@ namespace GHMonitoringCenterApi.Application.Contracts.IService.JjtSendMessage
         /// <returns></returns>
         Task<ResponseAjaxResult<JjtSendMessageMonitoringDayReportResponseDto>> JjtDayReportPushAsync(int dateDay = 0);
 
-        Task<ResponseAjaxResult<JjtSendMessageMonitoringDayReportResponseDto>> JjtTextCardMsgDetailsAsync(DateTime dateDay);
+     
         /// <summary>
         /// 获取自有船舶日报卡片消息详情
         /// </summary>
