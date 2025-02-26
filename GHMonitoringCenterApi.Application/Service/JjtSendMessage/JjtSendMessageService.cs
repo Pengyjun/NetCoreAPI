@@ -3404,25 +3404,20 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
             #endregion
 
             #region 产值异常情况说明
+             
             //控制是否显示的设置
            var projectOpen=await dbContext.CopyNew().Queryable<ProjectOpen>().Where(x => x.IsDelete == 1).ToListAsync();
             //检查当天查询异常的项目
             var expreProject=dayYearList.Where(x=>x.DateDay==dayTime&&x.IsLow==0).ToList();
             List<ImpProjectWarning> expProjects = new List<ImpProjectWarning>();
+            List<ProjectOpen> projectOpens = new List<ProjectOpen>();
+
             foreach (var exprePro in expreProject)
             {
                 //项目名称
-                var proName=projectList.Where(x => x.Id == exprePro.ProjectId).FirstOrDefault();
-                var proOpen= projectOpen.Where(x => x.ProjectId == exprePro.ProjectId).FirstOrDefault();
-                if (proOpen != null && proOpen.IsShow == 1)
-                {
-                    expProjects.Add(new ImpProjectWarning()
-                    {
-                        Name = proName?.Name,
-                        DeviationWarning = exprePro?.DeviationWarning,
-                        DayAmount = exprePro.DayActualProductionAmount,
-                    });
-                }else if (proOpen == null )
+                var proName = projectList.Where(x => x.Id == exprePro.ProjectId).FirstOrDefault();
+                var proOpen = projectOpen.Where(x => x.ProjectId == exprePro.ProjectId).FirstOrDefault();
+                if (proOpen.IsShow == 1)
                 {
                     expProjects.Add(new ImpProjectWarning()
                     {
@@ -3431,8 +3426,26 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
                         DayAmount = exprePro.DayActualProductionAmount,
                     });
                 }
+                projectOpens.Add(new ProjectOpen()
+                {
+                    IsShow = 1,
+                    Name = proName?.Name,
+                    ProjectId = exprePro.ProjectId
+                });
+
 
             }
+            #region 保存数据库
+            try
+            {
+                await dbContext.CopyNew().Insertable<ProjectOpen>(projectOpens).ExecuteCommandAsync();
+            }
+            catch (Exception ex)
+            {
+
+            }
+            #endregion
+
             #region 数据组合
             jjtSendMessageMonitoringDayReportResponseDto.ImpProjectWarning = expProjects;
             #endregion
