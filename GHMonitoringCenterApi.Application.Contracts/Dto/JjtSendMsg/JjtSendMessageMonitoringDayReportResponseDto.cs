@@ -735,7 +735,7 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.JjtSendMsg
         /// <summary>
         /// 项目名称
         /// </summary>
-        public string? ProjectName { get; set; }
+        public string? Name { get; set; }
         /// <summary>
         /// 是否偏低  1是偏高  0是偏低
         /// </summary>
