@@ -1501,6 +1501,19 @@ namespace GHMonitoringCenterApi.Application.Service.ProjectProductionReport
         /// <returns></returns>
         public async Task<ResponseAjaxResult<List<DayReportDeviationListResponseDto>>> SearchDayReportDeviationListAsync(DayReportDeviationRequestDto requestDto)
         {
+            //本年的周期范围(统计周期  年开始和结束时间)
+            var startYearTime = DateTime.Now.ToDateDay() > int.Parse(DateTime.Now.ToString("yyyy1226")) ? DateTime.Now.ToString("yyyy1226").ObjToInt() : DateTime.Now.AddYears(-1).ToString("yyyy1226").ObjToInt();
+            var endYearTime = DateTime.Now.ToDateDay() > int.Parse(DateTime.Now.ToString("yyyy1226")) ? DateTime.Now.AddYears(1).ToString("yyyy1225").ObjToInt() : DateTime.Now.ToString("yyyy1225").ObjToInt();
+            //本月周期开始时间（统计周期  月开始和结束时间 用于过滤日报数据的条件）
+            var startMonthTime = DateTime.Now.ToDateDay() > int.Parse(DateTime.Now.ToString("yyyyMM26")) ? DateTime.Now.ToString("yyyyMM26").ObjToInt() : DateTime.Now.AddMonths(-1).ToString("yyyyMM26").ObjToInt();
+            var endMonthTime = DateTime.Now.ToDateDay() > int.Parse(DateTime.Now.ToString("yyyyMM26")) ? DateTime.Now.AddYears(1).ToString("yyyyMM25").ObjToInt() : DateTime.Now.ToString("yyyyMM25").ObjToInt();
+            //月报周期(用于过滤月报数据的条件)
+            var monthStartTime = DateTime.Now.ToDateDay() > int.Parse(DateTime.Now.ToString("yyyyMM26")) ? DateTime.Now.AddYears(1).ToString("yyyy01").ObjToInt() : DateTime.Now.ToString("yyyy01").ObjToInt();
+            var monthEndTime = DateTime.Now.ToDateDay() > int.Parse(DateTime.Now.ToString("yyyyMM26")) ? DateTime.Now.AddYears(1).ToString("yyyy12").ObjToInt() : DateTime.Now.ToString("yyyy12").ObjToInt();
+            //当前月份 当前处于某个月
+            var currentMonth = DateTime.Now.ToDateDay() > int.Parse(DateTime.Now.ToString("yyyyMM26")) ? DateTime.Now.AddMonths(1).ToString("MM").ObjToInt() : DateTime.Now.ToString("yyyyMM").ObjToInt();
+
+
             ResponseAjaxResult<List<DayReportDeviationListResponseDto>> responseAjaxResult = new ResponseAjaxResult<List<DayReportDeviationListResponseDto>>();
             RefAsync<int> total = 0;
             //false是按日统计    true是按月+日报的形式统计
@@ -1528,10 +1541,10 @@ namespace GHMonitoringCenterApi.Application.Service.ProjectProductionReport
 
             var projectIds = data.Select(t => t.ProjectId).ToArray();
             //获取项目的日报产值与月报产值
-            var dayList = await dbContext.Queryable<DayReport>().Where(t => t.IsDelete == 1 && projectIds.Contains(t.ProjectId) && t.DateDay <= day).Select(t => new { t.ProjectId, t.DayActualProductionAmount, t.DateDay }).ToListAsync();
-            var time = DateTime.Now;
-            var month = time.AddMonths(-1).Date.ToDateMonth();
-            var monthList = await dbContext.Queryable<MonthReport>().Where(t => t.IsDelete == 1 && projectIds.Contains(t.ProjectId)).Select(t => new { t.ProjectId, t.CompleteProductionAmount, t.DateMonth }).ToListAsync();
+            //上个月
+            var month = DateTime.Now.ToDateDay() > int.Parse(DateTime.Now.ToString("yyyyMM26")) ? DateTime.Now.ToString("MM").ObjToInt() : DateTime.Now.AddMonths(-1).ToString("yyyyMM").ObjToInt();
+            var dayList = await dbContext.Queryable<DayReport>().Where(t => t.IsDelete == 1 && projectIds.Contains(t.ProjectId) && t.DateDay <= endYearTime).Select(t => new { t.ProjectId, t.DayActualProductionAmount, t.DateDay }).ToListAsync();
+            var monthList = await dbContext.Queryable<MonthReport>().Where(t => t.IsDelete == 1 && projectIds.Contains(t.ProjectId) && t.DateMonth <= monthEndTime).Select(t => new { t.ProjectId, t.CompleteProductionAmount, t.DateMonth }).ToListAsync();
 
             var StatusList = await dbContext.Queryable<ProjectStatus>().Where(t => t.IsDelete == 1).ToListAsync();
             foreach (var item in data)
@@ -1542,31 +1555,30 @@ namespace GHMonitoringCenterApi.Application.Service.ProjectProductionReport
                 //判断当前日期是否是26号，此日期为月报填报日期。  若是则判断项目当月是否有月报数据，有则取月报 无则取日报
                 if (isDayCalc)
                 {
-                    if (time.Day == 26)
+                    if (DateTime.Now.Day == 26)
                     {
-                        var isHasMonth = monthList.Where(t => t.ProjectId == item.ProjectId && t.DateMonth == time.Date.ToDateMonth()).Any();
+                        var isHasMonth = monthList.Where(t => t.ProjectId == item.ProjectId && t.DateMonth == currentMonth).Any();
                         if (isHasMonth)
                         {
                             item.TotalAmount = monthList.Where(t => t.ProjectId == item.ProjectId).Sum(t => t.CompleteProductionAmount);
                         }
                         else
                         {
-                            var firstDay = new DateTime(time.Year, time.Month, 1).ToDateDay();
-                            var daySum = dayList.Where(t => t.ProjectId == item.ProjectId && t.DateDay >= firstDay).Sum(t => t.DayActualProductionAmount);
+                            var daySum = dayList.Where(t => t.ProjectId == item.ProjectId && t.DateDay >= startMonthTime && t.DateDay <= day).Sum(t => t.DayActualProductionAmount);
                             var monthSum = monthList.Where(t => t.ProjectId == item.ProjectId && t.DateMonth <= month).Sum(t => t.CompleteProductionAmount);
                             item.TotalAmount = daySum + monthSum;
                         }
                     }
                     else
                     {
-                        var daySum = dayList.Sum(t => t.DayActualProductionAmount);
+                        var daySum = dayList.Where(t => t.ProjectId == item.ProjectId && t.DateDay >= startMonthTime && t.DateDay <= day).Sum(t => t.DayActualProductionAmount);
                         var monthSum = monthList.Where(t => t.ProjectId == item.ProjectId && t.DateMonth <= month).Sum(t => t.CompleteProductionAmount);
                         item.TotalAmount = daySum + monthSum;
                     }
                 }
                 else
                 {
-                    item.TotalAmount = dayList.Sum(t => t.DayActualProductionAmount);
+                    item.TotalAmount = dayList.Where(t => t.ProjectId == item.ProjectId && t.DateDay <= day).Sum(t => t.DayActualProductionAmount);
                 }
             }
             responseAjaxResult.Data = data;
