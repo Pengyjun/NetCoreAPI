@@ -19,11 +19,15 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project
         /// <summary>
         /// 最近半个月的平均产值  
         /// </summary>
-        public decimal? MonthAveProduction { get; set; }
+        //public decimal? MonthAveProduction { get; set; }
+        /// <summary>
+        /// 最近三天的平均产值 * 20%
+        /// </summary>
+        public decimal? ThreeDayAveProduction { get; set; }
         /// <summary>
         /// -+区间比
         /// </summary>
-        public decimal? Interval {  get; set; }
+        public decimal? Interval { get; set; }
         #endregion
 
 
@@ -79,7 +83,7 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project
         /// 日报信息（步骤三）
         /// </summary>
         public ResDayReport DayReport { get; set; } = new();
-       
+
         /// <summary>
         /// 日期(时间格式)
         /// </summary>
@@ -201,7 +205,7 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project
         /// </summary>
         public class ResDayReportFileInfo
         {
-          
+
             /// <summary>
             /// 文件集合
             /// </summary>

@@ -57,10 +57,12 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.JjtSendMsg
         public List<EachCompanyProductionValue> EachCompanyProductionValue { get; set; }
         public List<ImpProjectWarning>? ImpProjectWarning { get; set; }
 
-        public ProjectWokrItem?  ProjectWokrItems { get; set; }
+        public ProjectWokrItem? ProjectWokrItems { get; set; }
 
-
-
+        /// <summary>
+        /// 用于判断当前返回值是否是用于手机端日报图片数据返回
+        /// </summary>
+        public bool IsPhone { get; set; }
 
     }
 
@@ -750,14 +752,15 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.JjtSendMsg
     /// <summary>
     /// 节后停工  来了未开工的项目和今日已开工的项目
     /// </summary>
-    public class ProjectWokrItem {
+    public class ProjectWokrItem
+    {
 
-        public List<DayWorkProject> DayWorkProject { get; set; }=new List<DayWorkProject>();
+        public List<DayWorkProject> DayWorkProject { get; set; } = new List<DayWorkProject>();
         public List<DayWorkProject> NoWorkProject { get; set; } = new List<DayWorkProject>();
 
     }
 
-    public class DayWorkProject 
+    public class DayWorkProject
     {
         public Guid ProjectId { get; set; }
         public string Name { get; set; }
