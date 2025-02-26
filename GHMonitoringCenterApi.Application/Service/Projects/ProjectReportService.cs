@@ -684,11 +684,18 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 {
                     resDayReport.IsKeyProject = true;
                     resDayReport.Interval = isExist.Interval;
-                    //计算半个月的平均产值
-                    var etime = DateTime.Now.AddDays(-1).ToDateDay();
-                    var stime = DateTime.Now.AddDays(-6).ToDateDay();
-                    //获取日报产值 
-                    resDayReport.MonthAveProduction = await _dbContext.Queryable<DayReport>().Where(t => t.IsDelete == 1 && t.DateDay >= stime && t.DateDay <= etime).SumAsync(x => x.DayActualProductionAmount) / 15M;
+                    ////计算半个月的平均产值
+                    //var etime = DateTime.Now.AddDays(-1).ToDateDay();
+                    //var stime = DateTime.Now.AddDays(-6).ToDateDay();
+                    ////获取日报产值 
+                    //resDayReport.MonthAveProduction = await _dbContext.Queryable<DayReport>().Where(t => t.IsDelete == 1 && t.DateDay >= stime && t.DateDay <= etime).SumAsync(x => x.DayActualProductionAmount) / 15M;
+
+                    //近三天
+                    var stime1 = DateTime.Now.AddDays(-3).ToDateDay();
+                    var etime1 = DateTime.Now.AddDays(-1).ToDateDay();
+                    //获取日报近三天产值
+                    var dayValue = await _dbContext.Queryable<DayReport>().Where(t => t.IsDelete == 1 && t.DateDay >= stime1 && t.DateDay <= etime1 && t.ProjectId == model.ProjectId).SumAsync(x => x.DayActualProductionAmount) / 3M;
+                    resDayReport.ThreeDayAveProduction = dayValue * (isExist.Interval / 100);
                 }
 
             }
