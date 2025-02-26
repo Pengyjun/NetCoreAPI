@@ -18,6 +18,9 @@ namespace GHMonitoringCenterApi.Domain.Models
         /// </summary>
         [SugarColumn(Length = 36)]
         public Guid ProjectId { get; set; }
+        /// <summary>
+        /// 公司id
+        /// </summary>
         [SugarColumn(Length = 36)]
         public Guid CompanyId { get; set; }
         /// <summary>
@@ -40,6 +43,26 @@ namespace GHMonitoringCenterApi.Domain.Models
         /// </summary>
         [SugarColumn(ColumnDataType = "decimal(20,8)")]
         public decimal DayActualProductionAmountDeviation { get; set; }
+        /// <summary>
+        /// 开累实际产值实际产值（月累加日累）
+        /// </summary>
+        [SugarColumn(ColumnDataType = "decimal(20,8)")]
+        public decimal TotalMonthAmount { get; set; }
+        /// <summary>
+        /// 开累实际产值实际产值（日累）
+        /// </summary>
+        [SugarColumn(ColumnDataType = "decimal(20,8)")]
+        public decimal TotalDayAmount { get; set; }
+        /// <summary>
+        /// 开累日报偏差值（月累加日累）
+        /// </summary>
+        [SugarColumn(ColumnDataType = "decimal(20,8)")]
+        public decimal TotalMonthAmountDeviation { get; set; }
+        /// <summary>
+        /// 开累日报偏差值（日累）
+        /// </summary>
+        [SugarColumn(ColumnDataType = "decimal(20,8)")]
+        public decimal TotalDayAmountDeviation { get; set; }
         /// <summary>
         /// 日期
         /// </summary>

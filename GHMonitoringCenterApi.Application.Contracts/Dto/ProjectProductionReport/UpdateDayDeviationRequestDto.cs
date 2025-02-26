@@ -32,6 +32,14 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.ProjectProductionRepor
         /// 日报偏差值
         /// </summary>
         public decimal DayActualProductionAmountDeviation { get; set; }
+        /// <summary>
+        /// 开累产值
+        /// </summary>
+        public decimal TotalAmount { get; set; }
+        /// <summary>
+        /// 开累偏差值
+        /// </summary>
+        public decimal TotalAmountDeviation { get; set; }
 
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
