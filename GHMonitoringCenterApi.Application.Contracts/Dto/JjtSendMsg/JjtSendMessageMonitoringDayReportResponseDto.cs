@@ -764,6 +764,10 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.JjtSendMsg
     {
         public Guid ProjectId { get; set; }
         public string Name { get; set; }
+
+        public decimal DayAmount { get; set; }
+        public string DeviationWarning { get; set; }
+        public bool IsShow { get; set; }
     }
     #endregion
 }

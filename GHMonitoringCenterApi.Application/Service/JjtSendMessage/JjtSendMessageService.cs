@@ -3403,6 +3403,35 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
             jjtSendMessageMonitoringDayReportResponseDto.EachCompanyProductionValue = eachCompanyProductionValues.OrderBy(x => x.XAxle).ToList();
             #endregion
 
+            #region 产值异常情况说明
+            //控制是否显示的设置
+           var projectOpen=await dbContext.CopyNew().Queryable<ProjectOpen>().Where(x => x.IsDelete == 1).ToListAsync();
+            //检查当天查询异常的项目
+            var expreProject=dayYearList.Where(x=>x.DateDay==dayTime&&x.IsLow==0).ToList();
+            List<DayWorkProject> expProjects = new List<DayWorkProject>();
+            foreach (var exprePro in expreProject)
+            {
+                //项目名称
+                var proName=projectList.Where(x => x.Id == exprePro.ProjectId).FirstOrDefault();
+                if (proName == null)
+                {
+                    continue;
+                }
+                var proOpen= projectOpen.Where(x => x.ProjectId == exprePro.ProjectId).FirstOrDefault();
+                if (proOpen!=null&&proOpen.IsShow==1)
+                {
+                    expProjects.Add(new DayWorkProject()
+                    {
+                        Name = proName?.Name,
+                        DeviationWarning = exprePro?.DeviationWarning,
+                        ProjectId = exprePro.ProjectId,
+                        DayAmount = exprePro.DayActualProductionAmount,
+                        IsShow = true
+                    });
+                }
+            }
+            #endregion
+
             #region 柱形图
             CompanyProductionCompare companyProductionCompares = new CompanyProductionCompare()
             {
