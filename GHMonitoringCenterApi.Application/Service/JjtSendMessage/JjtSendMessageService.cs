@@ -3192,7 +3192,6 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
             }
             #endregion
 
-
             #region 移动端使用的json数据
             if (isPhone)
             {
@@ -3332,6 +3331,10 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
                     var dayProducitionValue = Math.Round((dayYearList.Where(x => companyProjectId.Contains(x.ProjectId) && x.DateDay == dayTime).Sum(x => x.DayActualProductionAmount)+ diffValue), 2);
                     //各个公司本年累计数
                     var totalProductionValue = isDayCalc ? Math.Round(monthYearList.Where(x => companyProjectId.Contains(x.ProjectId)).Sum(x => x.CompleteProductionAmount)+ diffValue + companyMonthDayProduction / baseConst, 2) : companyMonthDayProduction;
+                    if (companyProduction.ItemId == "3c5b138b-601a-442a-9519-2508ec1c1eb2".ToGuid())
+                    {
+                        totalProductionValue = totalProductionValue - 3000000;
+                    }
                     companyBasePoductions.Add(new CompanyBasePoductionValue()
                     {
                         Name = companyProduction.Name,

@@ -2634,6 +2634,10 @@ namespace GHMonitoringCenterApi.Application.Service
                         UserIds = new List<string>() { item }
                     };
                     var pushResult = JjtUtils.SinglePushMessage(obj, false);
+                    if (pushResult)
+                    {
+                        await Console.Out.WriteLineAsync($"{item}:已推送成功");
+                    }
                 }
             }
             return true;
