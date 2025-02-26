@@ -3132,12 +3132,12 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
             var endYearTime = DateTime.Now.ToDateDay() > int.Parse(DateTime.Now.ToString("yyyy1226")) ? DateTime.Now.AddYears(1).ToString("yyyy1225").ObjToInt() : DateTime.Now.ToString("yyyy1225").ObjToInt();
             //本月周期开始时间（统计周期  月开始和结束时间 用于过滤日报数据的条件）
             var startMonthTime = DateTime.Now.ToDateDay() > int.Parse(DateTime.Now.ToString("yyyyMM26")) ? DateTime.Now.ToString("yyyyMM26").ObjToInt() : DateTime.Now.AddMonths(-1).ToString("yyyyMM26").ObjToInt();
-            var endMonthTime = DateTime.Now.ToDateDay() > int.Parse(DateTime.Now.ToString("yyyyMM26")) ? DateTime.Now.AddYears(1).ToString("yyyyMM25").ObjToInt() : DateTime.Now.ToString("yyyyMM25").ObjToInt();
+            var endMonthTime = DateTime.Now.ToDateDay() > int.Parse(DateTime.Now.ToString("yyyyMM26")) ? DateTime.Now.AddMonths(1).ToString("yyyyMM25").ObjToInt() : DateTime.Now.ToString("yyyyMM25").ObjToInt();
             //当前月份 当前处于某个月
             var currentMonth = DateTime.Now.ToDateDay() > int.Parse(DateTime.Now.ToString("yyyyMM26")) ? DateTime.Now.AddMonths(1).ToString("MM").ObjToInt() : DateTime.Now.ToString("MM").ObjToInt();
             //月报周期(用于过滤月报数据的条件)
-            var monthStartTime = DateTime.Now.ToDateDay() > int.Parse(DateTime.Now.ToString("yyyyMM26")) ? DateTime.Now.AddYears(1).ToString("yyyy01").ObjToInt() : DateTime.Now.ToString("yyyy01").ObjToInt();
-            var monthEndTime = DateTime.Now.ToDateDay() > int.Parse(DateTime.Now.ToString("yyyyMM26")) ? DateTime.Now.AddYears(1).ToString("yyyy12").ObjToInt() : DateTime.Now.ToString("yyyy12").ObjToInt();
+            var monthStartTime = DateTime.Now.ToDateDay() > int.Parse(DateTime.Now.ToString("yyyy1226")) ? DateTime.Now.AddYears(1).ToString("yyyy01").ObjToInt() : DateTime.Now.ToString("yyyy01").ObjToInt();
+            var monthEndTime = DateTime.Now.ToDateDay() > int.Parse(DateTime.Now.ToString("yyyy1226")) ? DateTime.Now.AddYears(1).ToString("yyyy12").ObjToInt() : DateTime.Now.ToString("yyyy12").ObjToInt();
             //本月已过多少天
             var time1 = default(DateTime);
             var time2 = default(DateTime);
@@ -3406,7 +3406,7 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
             #region 产值异常情况说明
              
             //控制是否显示的设置
-           var projectOpen=await dbContext.CopyNew().Queryable<ProjectOpen>().Where(x => x.IsDelete == 1).ToListAsync();
+           var projectOpen=await dbContext.CopyNew().Queryable<ProjectOpen>().Where(x => x.IsDelete == 1&&x.DateDay==dayTime).ToListAsync();
             //检查当天查询异常的项目
             var expreProject=dayYearList.Where(x=>x.DateDay==dayTime&&x.IsLow==0).ToList();
             List<ImpProjectWarning> expProjects = new List<ImpProjectWarning>();

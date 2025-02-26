@@ -19,6 +19,8 @@ namespace GHMonitoringCenterApi.Domain.Models
         [SugarColumn(Length = 36)]
         public Guid ProjectId { get; set; }
         [SugarColumn(ColumnDataType = "int")]
+        public int DateDay { get; set; }
+        [SugarColumn(ColumnDataType = "int")]
         public int IsShow { get; set; }
     }
 }

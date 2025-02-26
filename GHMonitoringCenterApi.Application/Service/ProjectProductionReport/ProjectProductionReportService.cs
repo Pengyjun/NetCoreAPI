@@ -1506,7 +1506,7 @@ namespace GHMonitoringCenterApi.Application.Service.ProjectProductionReport
             var endYearTime = DateTime.Now.ToDateDay() > int.Parse(DateTime.Now.ToString("yyyy1226")) ? DateTime.Now.AddYears(1).ToString("yyyy1225").ObjToInt() : DateTime.Now.ToString("yyyy1225").ObjToInt();
             //本月周期开始时间（统计周期  月开始和结束时间 用于过滤日报数据的条件）
             var startMonthTime = DateTime.Now.ToDateDay() > int.Parse(DateTime.Now.ToString("yyyyMM26")) ? DateTime.Now.ToString("yyyyMM26").ObjToInt() : DateTime.Now.AddMonths(-1).ToString("yyyyMM26").ObjToInt();
-            var endMonthTime = DateTime.Now.ToDateDay() > int.Parse(DateTime.Now.ToString("yyyyMM26")) ? DateTime.Now.AddYears(1).ToString("yyyyMM25").ObjToInt() : DateTime.Now.ToString("yyyyMM25").ObjToInt();
+            var endMonthTime = DateTime.Now.ToDateDay() > int.Parse(DateTime.Now.ToString("yyyyMM26")) ? DateTime.Now.AddMonths(1).ToString("yyyyMM25").ObjToInt() : DateTime.Now.ToString("yyyyMM25").ObjToInt();
             //月报周期(用于过滤月报数据的条件)
             var monthStartTime = DateTime.Now.ToDateDay() > int.Parse(DateTime.Now.ToString("yyyyMM26")) ? DateTime.Now.AddYears(1).ToString("yyyy01").ObjToInt() : DateTime.Now.ToString("yyyy01").ObjToInt();
             var monthEndTime = DateTime.Now.ToDateDay() > int.Parse(DateTime.Now.ToString("yyyyMM26")) ? DateTime.Now.AddYears(1).ToString("yyyy12").ObjToInt() : DateTime.Now.ToString("yyyy12").ObjToInt();
