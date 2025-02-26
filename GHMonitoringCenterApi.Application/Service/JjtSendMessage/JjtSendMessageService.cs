@@ -3192,7 +3192,6 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
             }
             #endregion
 
-
             #region 移动端使用的json数据
             if (isPhone)
             {
@@ -3332,6 +3331,10 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
                     var dayProducitionValue = Math.Round((dayYearList.Where(x => companyProjectId.Contains(x.ProjectId) && x.DateDay == dayTime).Sum(x => x.DayActualProductionAmount)+ diffValue), 2);
                     //各个公司本年累计数
                     var totalProductionValue = isDayCalc ? Math.Round(monthYearList.Where(x => companyProjectId.Contains(x.ProjectId)).Sum(x => x.CompleteProductionAmount)+ diffValue + companyMonthDayProduction / baseConst, 2) : companyMonthDayProduction;
+                    if (companyProduction.ItemId == "3c5b138b-601a-442a-9519-2508ec1c1eb2".ToGuid())
+                    {
+                        totalProductionValue = totalProductionValue - 3000000;
+                    }
                     companyBasePoductions.Add(new CompanyBasePoductionValue()
                     {
                         Name = companyProduction.Name,
@@ -3775,38 +3778,6 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
             var shipMovementList = await dbContext.CopyNew().Queryable<ShipMovement>().Where(x => x.IsDelete == 1 && x.Status.Equals(ShipMovementStatus.Enter)).ToListAsync();
             #endregion
 
-            #region 计算星星
-            ////数据质量程度 几颗星（//船舶填报率 待命填报率+调遣填报率+修理填报率+施工填报率）
-            ////评分 1：一颗星[0 - 30) 2:两颗星[30 - 60) 3:三颗星[60 - 80) 4:四颗星[80 - 90) 5:五颗星[90 - 100)
-            ///// 计算公式：（项目当日产值/3300*50%+船舶当日产值/490*25%+项目填报率*20%+船舶填报率*5%）*100
-            ////计算星星的数据质量程度
-            ////var qualityLevel = ((jjtSendMessageMonitoringDayReportResponseDto.projectBasePoduction.DayProductionValue / 3300M) * 50 / 100 +
-            ////(jjtSendMessageMonitoringDayReportResponseDto.OwnerShipBuildInfo.BulidProductionValue / 490M) * 25 / 100 +
-            ////(companyWriteReportInfos[8].WritePercent / 100M * 20 / 100) +
-            ////shipPercent * 5 / 100M) * 100;
-
-            //var star = 0;
-            //if (qualityLevel <= 30)
-            //{
-            //    star = 1;
-            //}
-            //else if (qualityLevel > 30 && qualityLevel <= 60)
-            //{
-            //    star = 2;
-            //}
-            //else if (qualityLevel > 60 && qualityLevel <= 80)
-            //{
-            //    star = 3;
-            //}
-            //else if (qualityLevel > 80 && qualityLevel <= 90)
-            //{
-            //    star = 4;
-            //}
-            //else if (qualityLevel > 90)
-            //{
-            //    star = 5;
-            //}
-            #endregion
 
             #region 第一张图
             List<CompanyWriteReportInfo> companyWriteReportInfos = new List<CompanyWriteReportInfo>();
@@ -3819,7 +3790,7 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
                 //排除掉今天修改的项目状态
                 onBuildProjectCount = onBuildProjectCount - noDayBuildProjectCount;
                 //项目Ids
-                var companyProjectId = projectList.Where(x => x.CompanyId == report.ItemId)
+                var companyProjectId = projectList.Where(x => x.CompanyId == report.ItemId&&x.StatusId== buildProjectId)
                    .WhereIF(!isCalcSub, x => x.IsSubContractProject != 2).Select(x => x.Id).ToList();
                 if (report.Collect == 1)
                 {
@@ -3827,14 +3798,14 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
                     var allBuildProject = companyWriteReportInfos.Sum(x => x.OnBulidCount);
                     var allWriteReportProject = companyWriteReportInfos.Sum(x => x.UnReportCount);
                     //填报率
-                    var wrtieRecent = Math.Round((allWriteReportProject.ObjToDecimal() / allBuildProject) * 100, 2);
+                     var wrtieRecent = Math.Round(((allBuildProject-allWriteReportProject).ObjToDecimal() / allBuildProject) * 100, 2);
                     companyWriteReportInfos.Add(new CompanyWriteReportInfo() 
                     {
                         Name = report.Name,
                         OnBulidCount = allBuildProject,
                         UnReportCount = allWriteReportProject,
-                        WritePercent = wrtieRecent,
-                        QualityLevel = 3
+                        WritePercent = wrtieRecent==0?100: wrtieRecent,
+                        QualityLevel = 3, 
                     });
                 }
                 else {
@@ -3849,13 +3820,14 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
                         Name = report.Name,
                         OnBulidCount = onBuildProjectCount,
                         UnReportCount = dayUnReportCount,
-                        WritePercent = writePercent,
-                        QualityLevel =3
+                        WritePercent = writePercent==0?100: writePercent,
+                        QualityLevel =3,
                     });
                 }
             }
 
             #region 数据组合
+        
             jjtSendMessageMonitoringDayReportResponseDto.CompanyWriteReportInfos = companyWriteReportInfos;
             #endregion
             #endregion
@@ -3959,7 +3931,53 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
             #endregion
             #endregion
 
+            #region 计算星星
+            //数据质量程度 几颗星（//船舶填报率 待命填报率+调遣填报率+修理填报率+施工填报率）
+            //评分 1：一颗星[0 - 30) 2:两颗星[30 - 60) 3:三颗星[60 - 80) 4:四颗星[80 - 90) 5:五颗星[90 - 100)
+            /// 计算公式：（项目当日产值/3300*50%+船舶当日产值/490*25%+项目填报率*20%+船舶填报率*5%）*100
+            //计算星星的数据质量程度
+            var shipPercent = 0M;
+            var reportShipCount = shipDayList.Where(x => x.DateDay == dayTime && onProjectShipIds.Contains(x.ShipId)).Count();
+            var tatalShipCount = jjtSendMessageMonitoringDayReportResponseDto.OwnerShipBuildInfo.TotalCount;
+            if (tatalShipCount != 0)
+            {
+                shipPercent = ((decimal)reportShipCount) / tatalShipCount;
+            }
+
+            var qualityLevel = ((jjtSendMessageMonitoringDayReportResponseDto.projectBasePoduction.DayProductionValue / 3300M) * 50 / 100 +
+            (jjtSendMessageMonitoringDayReportResponseDto.OwnerShipBuildInfo.BulidProductionValue / 490M) * 25 / 100 +
+            (companyWriteReportInfos[8].WritePercent / 100M * 20 / 100) +
+            shipPercent * 5 / 100M) * 100;
+
+            var star = 0;
+            if (qualityLevel <= 30)
+            {
+                star = 1;
+            }
+            else if (qualityLevel > 30 && qualityLevel <= 60)
+            {
+                star = 2;
+            }
+            else if (qualityLevel > 60 && qualityLevel <= 80)
+            {
+                star = 3;
+            }
+            else if (qualityLevel > 80 && qualityLevel <= 90)
+            {
+                star = 4;
+            }
+            else if (qualityLevel > 90)
+            {
+                star = 5;
+            }
+            #region 数据组合
+            jjtSendMessageMonitoringDayReportResponseDto.QualityLevel = star;
             #endregion
+
+            #endregion
+
+            #endregion
+
 
             responseAjaxResult.Data = jjtSendMessageMonitoringDayReportResponseDto;
             responseAjaxResult.Success();

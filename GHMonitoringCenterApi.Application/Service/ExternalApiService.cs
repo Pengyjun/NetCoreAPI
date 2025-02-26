@@ -676,8 +676,12 @@ namespace GHMonitoringCenterApi.Application.Service
             #endregion
 
             #region 新的
+            var projectIdArray = await _dbContext.Queryable<Project>().Where(t => t.IsDelete == 1)
+                .WhereIF(!string.IsNullOrWhiteSpace(requestDto.ProjectName), t => SqlFunc.Contains(t.Name, requestDto.ProjectName)).Select(t => t.Id).ToArrayAsync();
+            var searchCondition = !string.IsNullOrWhiteSpace(requestDto.ProjectName) && projectIdArray != null && projectIdArray.Length > 0;
             var data = await _dbContext.Queryable<DayReport>()
                 .Where(x => x.IsDelete == 1 && x.ProcessStatus == DayReportProcessStatus.Submited)
+                .WhereIF(searchCondition, x => projectIdArray.Contains(x.ProjectId))
                 .Select(x => new DayReportInfo
                 {
                     Id = x.Id,

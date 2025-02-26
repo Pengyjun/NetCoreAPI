@@ -2634,6 +2634,10 @@ namespace GHMonitoringCenterApi.Application.Service
                         UserIds = new List<string>() { item }
                     };
                     var pushResult = JjtUtils.SinglePushMessage(obj, false);
+                    if (pushResult)
+                    {
+                        await Console.Out.WriteLineAsync($"{item}:已推送成功");
+                    }
                 }
             }
             return true;
@@ -2683,7 +2687,7 @@ namespace GHMonitoringCenterApi.Application.Service
                     responseAjaxResult.Success("审核错误", HttpStatusCode.VerifyFail);
                     return responseAjaxResult;
                 }
-               var userInfo= userService.GetUserInfoAsync(token);
+               var userInfo= userService.GetUserInfoAsync(token.Replace("Bearer","").Trim());
                 if (userInfo.CurrentLoginIsAdmin ||
                    userInfo.Account == "2018015149" ||
                    userInfo.Account == "2016146439" ||
