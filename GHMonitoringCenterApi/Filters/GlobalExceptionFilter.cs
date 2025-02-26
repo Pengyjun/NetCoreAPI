@@ -94,15 +94,14 @@ namespace GHMonitoringCenterApi.Filters
                 {
                     var obj = new ContentResult();
                     var res = ((GHMonitoringCenterApi.Domain.Shared.ResponseAjaxResult<GHMonitoringCenterApi.Application.Contracts.Dto.JjtSendMsg.JjtSendMessageMonitoringDayReportResponseDto>)((Microsoft.AspNetCore.Mvc.ObjectResult)context.Result).Value).Data;
-                    var encryptResult=CryptoStringExtension.EncryptAsync(res.ToJson(true));
+                    var encryptResult = CryptoStringExtension.EncryptAsync(res.ToJson(true));
                     obj = new ContentResult()
                     {
-
                         StatusCode = (int)HttpStatusCode.Success,
                         Content = encryptResult
                     };
                     context.Result = obj;
-                  
+
                 }
             }
             catch (Exception ex)
