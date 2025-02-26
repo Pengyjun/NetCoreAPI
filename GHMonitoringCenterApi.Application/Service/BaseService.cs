@@ -2687,7 +2687,7 @@ namespace GHMonitoringCenterApi.Application.Service
                     responseAjaxResult.Success("审核错误", HttpStatusCode.VerifyFail);
                     return responseAjaxResult;
                 }
-               var userInfo= userService.GetUserInfoAsync(token);
+               var userInfo= userService.GetUserInfoAsync(token.Replace("Bearer","").Trim());
                 if (userInfo.CurrentLoginIsAdmin ||
                    userInfo.Account == "2018015149" ||
                    userInfo.Account == "2016146439" ||
