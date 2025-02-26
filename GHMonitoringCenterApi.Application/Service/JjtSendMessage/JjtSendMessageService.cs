@@ -3411,13 +3411,12 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
             var expreProject=dayYearList.Where(x=>x.DateDay==dayTime&&x.IsLow==0).ToList();
             List<ImpProjectWarning> expProjects = new List<ImpProjectWarning>();
             List<ProjectOpen> projectOpens = new List<ProjectOpen>();
-
             foreach (var exprePro in expreProject)
             {
                 //项目名称
                 var proName = projectList.Where(x => x.Id == exprePro.ProjectId).FirstOrDefault();
                 var proOpen = projectOpen.Where(x => x.ProjectId == exprePro.ProjectId).FirstOrDefault();
-                if (proOpen.IsShow == 1)
+                if (proOpen!=null&&proOpen.IsShow == 1)
                 {
                     expProjects.Add(new ImpProjectWarning()
                     {
@@ -3432,13 +3431,18 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
                     Name = proName?.Name,
                     ProjectId = exprePro.ProjectId
                 });
-
-
             }
             #region 保存数据库
             try
             {
-                await dbContext.CopyNew().Insertable<ProjectOpen>(projectOpens).ExecuteCommandAsync();
+               var checkIds= projectOpens.Select(x => x.ProjectId).ToList();
+               var existProjectIds=await dbContext.CopyNew().Queryable<ProjectOpen>().Where(x => checkIds.Contains(x.ProjectId)).Select(x=>x.ProjectId).ToListAsync();
+               var insetObj= projectOpens.Where(x => !existProjectIds.Contains(x.ProjectId)).ToList();
+                if (insetObj.Count > 0)
+                {
+                    await dbContext.CopyNew().Insertable<ProjectOpen>(insetObj).ExecuteCommandAsync();
+                }
+               
             }
             catch (Exception ex)
             {
