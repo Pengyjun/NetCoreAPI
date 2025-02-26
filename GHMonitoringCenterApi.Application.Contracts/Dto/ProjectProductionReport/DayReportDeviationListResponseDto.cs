@@ -37,7 +37,19 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.ProjectProductionRepor
         /// </summary>
         public decimal DayActualProductionAmountDeviation { get; set; }
         /// <summary>
-        /// 日期
+        /// 开累产值
+        /// </summary>
+        public decimal TotalAmount { get; set; }
+        /// <summary>
+        /// 开累偏差值
+        /// </summary>
+        public decimal TotalAmountDeviation { get; set; }
+        /// <summary>
+        ///  false是按日统计    true是按月+日报的形式统计
+        /// </summary>
+        public bool IsDayCalc { get; set; }
+        /// <summary>
+        /// 日期 int类型
         /// </summary>
         public int Dateday { get; set; }
         /// <summary>

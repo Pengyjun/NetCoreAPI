@@ -12,6 +12,7 @@ using GHMonitoringCenterApi.Domain.Shared;
 using GHMonitoringCenterApi.Domain.Shared.Const;
 using GHMonitoringCenterApi.Domain.Shared.Util;
 using SqlSugar;
+using SqlSugar.Extensions;
 using System.Linq.Expressions;
 using UtilsSharp;
 
@@ -1502,6 +1503,8 @@ namespace GHMonitoringCenterApi.Application.Service.ProjectProductionReport
         {
             ResponseAjaxResult<List<DayReportDeviationListResponseDto>> responseAjaxResult = new ResponseAjaxResult<List<DayReportDeviationListResponseDto>>();
             RefAsync<int> total = 0;
+            //false是按日统计    true是按月+日报的形式统计
+            var isDayCalc = AppsettingsHelper.GetValue("jjtPushDayReportItem:JjtPushDayReport").ObjToBool();
             var day = DateTime.Today.AddDays(-1).ToDateDay();
             var dayStr = DateTime.Today.AddDays(-1).ToString("yyyy-MM-dd");
             var data = await dbContext.Queryable<Project>()
@@ -1519,16 +1522,52 @@ namespace GHMonitoringCenterApi.Application.Service.ProjectProductionReport
                     DayActualProductionAmount = y.DayActualProductionAmount,
                     DayActualProductionAmountDeviation = z.DayActualProductionAmountDeviation,
                     Dateday = y.DateDay,
-                    DatedayStr = y.CreateTime.Value.ToString("yyyy-MM-dd")
+                    DatedayStr = y.CreateTime.Value.ToString("yyyy-MM-dd"),
+                    TotalAmountDeviation = isDayCalc ? z.TotalMonthAmountDeviation : z.TotalDayAmountDeviation
                 }).ToPageListAsync(requestDto.PageIndex, requestDto.PageSize, total);
 
-            var StatusList = await dbContext.Queryable<ProjectStatus>().Where(t => t.IsDelete == 1).ToListAsync();
+            var projectIds = data.Select(t => t.ProjectId).ToArray();
+            //获取项目的日报产值与月报产值
+            var dayList = await dbContext.Queryable<DayReport>().Where(t => t.IsDelete == 1 && projectIds.Contains(t.ProjectId) && t.DateDay <= day).Select(t => new { t.ProjectId, t.DayActualProductionAmount, t.DateDay }).ToListAsync();
+            var time = DateTime.Now;
+            var month = time.AddMonths(-1).Date.ToDateMonth();
+            var monthList = await dbContext.Queryable<MonthReport>().Where(t => t.IsDelete == 1 && projectIds.Contains(t.ProjectId)).Select(t => new { t.ProjectId, t.CompleteProductionAmount, t.DateMonth }).ToListAsync();
 
+            var StatusList = await dbContext.Queryable<ProjectStatus>().Where(t => t.IsDelete == 1).ToListAsync();
             foreach (var item in data)
             {
                 item.StatusName = StatusList.FirstOrDefault(t => t.StatusId == item.StatusId)?.Name;
                 item.Dateday = item.Dateday == 0 ? day : item.Dateday;
                 item.DatedayStr = item.DatedayStr == null ? dayStr : item.DatedayStr;
+                //判断当前日期是否是26号，此日期为月报填报日期。  若是则判断项目当月是否有月报数据，有则取月报 无则取日报
+                if (isDayCalc)
+                {
+                    if (time.Day == 26)
+                    {
+                        var isHasMonth = monthList.Where(t => t.ProjectId == item.ProjectId && t.DateMonth == time.Date.ToDateMonth()).Any();
+                        if (isHasMonth)
+                        {
+                            item.TotalAmount = monthList.Where(t => t.ProjectId == item.ProjectId).Sum(t => t.CompleteProductionAmount);
+                        }
+                        else
+                        {
+                            var firstDay = new DateTime(time.Year, time.Month, 1).ToDateDay();
+                            var daySum = dayList.Where(t => t.ProjectId == item.ProjectId && t.DateDay >= firstDay).Sum(t => t.DayActualProductionAmount);
+                            var monthSum = monthList.Where(t => t.ProjectId == item.ProjectId && t.DateMonth <= month).Sum(t => t.CompleteProductionAmount);
+                            item.TotalAmount = daySum + monthSum;
+                        }
+                    }
+                    else
+                    {
+                        var daySum = dayList.Sum(t => t.DayActualProductionAmount);
+                        var monthSum = monthList.Where(t => t.ProjectId == item.ProjectId && t.DateMonth <= month).Sum(t => t.CompleteProductionAmount);
+                        item.TotalAmount = daySum + monthSum;
+                    }
+                }
+                else
+                {
+                    item.TotalAmount = dayList.Sum(t => t.DayActualProductionAmount);
+                }
             }
             responseAjaxResult.Data = data;
             responseAjaxResult.Count = total;
@@ -1545,11 +1584,22 @@ namespace GHMonitoringCenterApi.Application.Service.ProjectProductionReport
         public async Task<ResponseAjaxResult<bool>> UpdateDayReportDeviationAsync(UpdateDayDeviationRequestDto requestDto)
         {
             ResponseAjaxResult<bool> responseAjaxResult = new ResponseAjaxResult<bool>();
+            var isDayCalc = AppsettingsHelper.GetValue("jjtPushDayReportItem:JjtPushDayReport").ObjToBool();
             var dayTime = DateTime.Today.AddDays(-1).ToDateDay();
             var dailyDeviation = await dbContext.Queryable<DailyDeviation>().Where(t => t.IsDelete == 1 && t.ProjectId == requestDto.ProjectId && t.Dateday == dayTime).FirstAsync();
             if (dailyDeviation != null)
             {
                 dailyDeviation.DayActualProductionAmountDeviation = requestDto.DayActualProductionAmountDeviation;
+                if (isDayCalc)
+                {
+                    dailyDeviation.TotalMonthAmount = requestDto.TotalAmount;
+                    dailyDeviation.TotalMonthAmountDeviation = requestDto.TotalAmountDeviation;
+                }
+                else
+                {
+                    dailyDeviation.TotalDayAmount = requestDto.TotalAmount;
+                    dailyDeviation.TotalDayAmountDeviation = requestDto.TotalAmountDeviation;
+                }
                 await dbContext.Updateable(dailyDeviation).ExecuteCommandAsync();
             }
             else
@@ -1564,6 +1614,16 @@ namespace GHMonitoringCenterApi.Application.Service.ProjectProductionReport
                 daily.DayActualProductionAmount = requestDto.DayActualProductionAmount;
                 daily.DayActualProductionAmountDeviation = requestDto.DayActualProductionAmountDeviation;
                 daily.Dateday = DateTime.Today.AddDays(-1).ToDateDay();
+                if (isDayCalc)
+                {
+                    daily.TotalMonthAmount = requestDto.TotalAmount;
+                    daily.TotalMonthAmountDeviation = requestDto.TotalAmountDeviation;
+                }
+                else
+                {
+                    daily.TotalDayAmount = requestDto.TotalAmount;
+                    daily.TotalDayAmountDeviation = requestDto.TotalAmountDeviation;
+                }
                 await dbContext.Insertable(daily).ExecuteCommandAsync();
             }
 
