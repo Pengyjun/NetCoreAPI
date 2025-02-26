@@ -676,8 +676,12 @@ namespace GHMonitoringCenterApi.Application.Service
             #endregion
 
             #region 新的
+            var projectIdArray = await _dbContext.Queryable<Project>().Where(t => t.IsDelete == 1)
+                .WhereIF(!string.IsNullOrWhiteSpace(requestDto.ProjectName), t => SqlFunc.Contains(t.Name, requestDto.ProjectName)).Select(t => t.Id).ToArrayAsync();
+            var searchCondition = !string.IsNullOrWhiteSpace(requestDto.ProjectName) && projectIdArray != null && projectIdArray.Length > 0;
             var data = await _dbContext.Queryable<DayReport>()
                 .Where(x => x.IsDelete == 1 && x.ProcessStatus == DayReportProcessStatus.Submited)
+                .WhereIF(searchCondition, x => projectIdArray.Contains(x.ProjectId))
                 .Select(x => new DayReportInfo
                 {
                     Id = x.Id,
@@ -726,7 +730,7 @@ namespace GHMonitoringCenterApi.Application.Service
             var responseData = await _projectReportService.SearchMonthReportsAsync(model);
             var resList = responseData.Data.Reports;
             #endregion
-            var projects = await _dbContext.Queryable<Project>().Where(t => t.IsDelete == 1).ToListAsync();
+            var projects = await _dbContext.Queryable<Project>().Where(t => t.IsDelete == 1).WhereIF(!string.IsNullOrWhiteSpace(model.ProjectName), t => SqlFunc.Contains(t.Name, model.ProjectName)).ToListAsync();
             //202412月累计数
             var accumulate24 = await _dbContext.Queryable<MonthReportDetailHistory>().Where(x => x.IsDelete == 1).ToListAsync();
             //202306月累计数
