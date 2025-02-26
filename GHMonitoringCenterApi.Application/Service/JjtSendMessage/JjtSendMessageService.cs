@@ -3154,7 +3154,7 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
             var endMonthTimeDate = default(DateTime);
             ConvertHelper.TryConvertDateTimeFromDateDay(startMonthTime, out startMonthTimeDate);
             ConvertHelper.TryConvertDateTimeFromDateDay(endMonthTime, out endMonthTimeDate);
-            var monthDiffDays = TimeHelper.GetTimeSpan(startMonthTimeDate, endMonthTimeDate).Days;
+            var monthDiffDays = TimeHelper.GetTimeSpan(startMonthTimeDate, endMonthTimeDate).Days+1;
             #endregion
 
             #region 基本信息
@@ -3888,7 +3888,7 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
                 //项目名称
                 var projectName = projectList.Where(x => x.Id == writeReport.Id).Select(x => x.ShortName).FirstOrDefault();
                 //业务单位
-                var businessName = companyList.Where(x => x.PomId == writeReport.CompanyId).Select(x => x.Shortname).FirstOrDefault();
+               // var businessName = companyList.Where(x => x.PomId == writeReport.CompanyId).Select(x => x.Shortname).FirstOrDefault();
                 //实际已经填报的数量
                 var writeReportCount = dayYearList.Where(x =>x.IsDelete==1&&x.DateDay >= startMonthTime && x.DateDay <= dayTime
                 &&x.ProjectId== writeReport.Id).Count();
@@ -3900,17 +3900,20 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
                 {
                     continue;
                 }
+                //排序序号
+               var companyIdInfo=commonDataList.Where(x => x.ItemId == writeReport.CompanyId).Select(x => new {Sort= x.Sort,Name=x.Name }).FirstOrDefault();
                 companyUnWriteReportInfos.Add(new CompanyUnWriteReportInfo()
                 {
-                    Count = unWriteCount<0?0:unWriteCount,
-                    Name = businessName,
-                    ProjectName = projectName
-                });
+                    Count = unWriteCount < 0 ? 0 : unWriteCount,
+                    Name = companyIdInfo.Name,
+                    ProjectName = projectName,
+                    Sort = companyIdInfo.Sort
+                }) ;
             }
 
             #region 数据组合
             jjtSendMessageMonitoringDayReportResponseDto.CompanyUnWriteReportInfos = companyUnWriteReportInfos
-                .OrderByDescending(x => x.Count).ToList();
+                .OrderBy(x => x.Sort).OrderByDescending(x => x.Count).ToList();
             #endregion
 
             #endregion

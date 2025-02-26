@@ -1237,7 +1237,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             if (addOrUpdateProjectRequestDto.RequestType)//新增
             {
                 //计算停工天数
-                var stopDay = TimeHelper.GetTimeSpan(startYearTime.ObjToDate(), DateTime.Now).Days - 1;
+                var stopDay = TimeHelper.GetTimeSpan(startYearTime.ObjToDate(), DateTime.Now).Days;
                 //新增项目
                 ProjectStatusChangeRecord projectStatusChangeRecord = new ProjectStatusChangeRecord()
                 {
@@ -1256,13 +1256,13 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 if (projectStatusSingle.Status != CommonData.PConstruc.ToGuid() && addOrUpdateProjectRequestDto.StatusId.Value == CommonData.PConstruc.ToGuid())
                 {
                     //计算停工天数
-                    var stopDay = TimeHelper.GetTimeSpan(projectStatusSingle.ChangeTime, DateTime.Now).Days - 1;
+                    var stopDay = TimeHelper.GetTimeSpan(projectStatusSingle.ChangeTime, DateTime.Now).Days;
                     projectStatusSingle.StopDay += stopDay;
                 }
                 else if (projectStatusSingle.Status == CommonData.PConstruc.ToGuid() && addOrUpdateProjectRequestDto.StatusId.Value != CommonData.PConstruc.ToGuid())
                 {
                     //计算停工天数
-                    var stopDay = TimeHelper.GetTimeSpan(projectStatusSingle.ChangeTime, DateTime.Now).Days - 1;
+                    var stopDay = TimeHelper.GetTimeSpan(projectStatusSingle.ChangeTime, DateTime.Now).Days;
                     projectStatusSingle.StopDay += stopDay;
                 }
                 projectStatusSingle.ChangeTime = DateTime.Now.ToString("yyyy-MM-dd 00:00:00").ObjToDate();
