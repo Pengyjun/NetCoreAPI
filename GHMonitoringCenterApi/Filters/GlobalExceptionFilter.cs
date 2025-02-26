@@ -15,6 +15,8 @@ using Microsoft.AspNetCore.Http;
 using GHMonitoringCenterApi.Application.Contracts.IService.User;
 using GHMonitoringCenterApi.Application.Service.User;
 using NetTaste;
+using Wangkanai.Detection.Services;
+using Wangkanai.Detection.Models;
 
 namespace GHMonitoringCenterApi.Filters
 {
@@ -25,9 +27,11 @@ namespace GHMonitoringCenterApi.Filters
         /// 注入日志
         /// </summary>
         private readonly ILogger<GlobalExceptionFilter> logger;
-        public GlobalExceptionFilter(ILogger<GlobalExceptionFilter> logger)
+        public IDetectionService _detectionService { get; set; }
+        public GlobalExceptionFilter(ILogger<GlobalExceptionFilter> logger, IDetectionService detectionService)
         {
             this.logger = logger;
+            this._detectionService = detectionService;
         }
         #endregion
 
@@ -48,7 +52,7 @@ namespace GHMonitoringCenterApi.Filters
 
                 ResponseAjaxResult<List<ErrorMessage>> responseAjaxResult = new();
                 //格式化请求参数错误提示0HMOVSRFRALDE:00000019
-                if (context.Result!=null&& context.Result.ToString().IndexOf("FileStreamResult")<0&& context.Result != null && context.Result.ToString().IndexOf("EmptyResult") < 0 && ((Microsoft.AspNetCore.Mvc.ObjectResult)context.Result).StatusCode == 400)
+                if (context.Result != null && context.Result.ToString().IndexOf("FileStreamResult") < 0 && context.Result != null && context.Result.ToString().IndexOf("EmptyResult") < 0 && ((Microsoft.AspNetCore.Mvc.ObjectResult)context.Result).StatusCode == 400)
                 {
                     var errMsg = ((Microsoft.AspNetCore.Mvc.ValidationProblemDetails)((Microsoft.AspNetCore.Mvc.ObjectResult)context.Result).Value).Errors;
                     List<ErrorMessage> errors = new();
@@ -80,11 +84,25 @@ namespace GHMonitoringCenterApi.Filters
                             //首字母小写问题
                             ContractResolver = new CamelCasePropertyNamesContractResolver()
                         }),
-                      
+
                         //StatusCode = (int)HttpStatusCode.ParameterError,
                         StatusCode = (int)HttpStatusCode.Success,
                         ContentType = "application/json charset=utf-8"
                     };
+                }
+                if (_detectionService.Device.Type == Device.Mobile && ((Microsoft.AspNetCore.Mvc.Controllers.ControllerActionDescriptor)context.ActionDescriptor).ActionName == "JjtTextCardMsgDetails")
+                {
+                    var obj = new ContentResult();
+                    var res = ((GHMonitoringCenterApi.Domain.Shared.ResponseAjaxResult<GHMonitoringCenterApi.Application.Contracts.Dto.JjtSendMsg.JjtSendMessageMonitoringDayReportResponseDto>)((Microsoft.AspNetCore.Mvc.ObjectResult)context.Result).Value).Data;
+                    var encryptResult=CryptoStringExtension.EncryptAsync(res.ToJson(true));
+                    obj = new ContentResult()
+                    {
+
+                        StatusCode = (int)HttpStatusCode.Success,
+                        Content = encryptResult
+                    };
+                    context.Result = obj;
+                  
                 }
             }
             catch (Exception ex)
@@ -97,7 +115,7 @@ namespace GHMonitoringCenterApi.Filters
             if (Convert.ToBoolean(AppsettingsHelper.GetValue("AuditLogs:IsOpen")))
             {
                 var redis = RedisUtil.Instance;
-                var res =await redis.GetAsync(context.HttpContext.TraceIdentifier.ToLower());
+                var res = await redis.GetAsync(context.HttpContext.TraceIdentifier.ToLower());
                 if (!string.IsNullOrWhiteSpace(res))
                 {
                     try
@@ -138,8 +156,8 @@ namespace GHMonitoringCenterApi.Filters
                                 Id = recordRequestInfo.Id,
                                 RequestParames = recordRequestInfo.RequestInfo.Input,
                                 RequestTime = recordRequestInfo.RequestTime,
-                                Sql = string.Join('|',sql.Select(x=>x)),
-                                SqlExecutionDuration = string.Join('|',sqlTotalTime.Select(x => x)),
+                                Sql = string.Join('|', sql.Select(x => x)),
+                                SqlExecutionDuration = string.Join('|', sqlTotalTime.Select(x => x)),
                                 Url = recordRequestInfo.Url,
                                 ActionMethodName = recordRequestInfo.ActionMethodName,
                             };
@@ -150,17 +168,17 @@ namespace GHMonitoringCenterApi.Filters
                                 head = head.Replace("Bearer", "").Trim();
                                 if (userService != null)
                                 {
-                                     userInfo = userService.GetUserInfoAsync(head);
+                                    userInfo = userService.GetUserInfoAsync(head);
                                     auditLogs.UserId = userInfo?.Id;
                                     auditLogs.UserName = userInfo?.Name;
                                 }
                             }
 
                             if (db != null)
-                            await db.Insertable<AuditLogs>(auditLogs).ExecuteCommandAsync();
+                                await db.Insertable<AuditLogs>(auditLogs).ExecuteCommandAsync();
 
                             #region 只有退出帐号后才会执行下面代码
-                            if (userInfo!=null&&auditLogs.Url.IndexOf("/OperationLog/LogoutLog") > 0)
+                            if (userInfo != null && auditLogs.Url.IndexOf("/OperationLog/LogoutLog") > 0)
                             {
                                 //删除当前用户在redis里面的缓存
                                 if (await redis.ExistsAsync(userInfo.Account))
@@ -175,7 +193,8 @@ namespace GHMonitoringCenterApi.Filters
                     {
                         logger.LogError(ex, "保存请求信息到数据库时出现错误");
                     }
-                    finally {
+                    finally
+                    {
                         try
                         {
                             await redis.DelAsync(context.HttpContext.TraceIdentifier.ToLower());
@@ -187,7 +206,7 @@ namespace GHMonitoringCenterApi.Filters
                     }
                 }
 
-               
+
             }
             #endregion
 

@@ -3116,7 +3116,6 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
         /// <returns></returns>
         public async Task<ResponseAjaxResult<JjtSendMessageMonitoringDayReportResponseDto>> JjtTextCardMsgDetailsAsync(int dateDay = 0, bool isPhone = false)
         {
-
             #region 查询条件相关
             //亿单位
             var baseConst = 100000000M;
@@ -3199,12 +3198,7 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
                 var result = await dbContext.Queryable<TempTable>().FirstAsync();
                 if (result != null && !string.IsNullOrWhiteSpace(result.Value))
                 {
-                    var json = JsonConvert.DeserializeObject<JjtSendMessageMonitoringDayReportResponseDto>(result.Value).ToString();
-                    jjtSendMessageMonitoringDayReportResponseDto.IsPhone = true;
-                    responseAjaxResult.Message = CryptoStringExtension.EncryptAsync(json);
-                    responseAjaxResult.Data = jjtSendMessageMonitoringDayReportResponseDto;
-                    responseAjaxResult.Success();
-                    return responseAjaxResult;
+                    return JsonConvert.DeserializeObject<ResponseAjaxResult<JjtSendMessageMonitoringDayReportResponseDto>>(result.Value);
                 }
             }
             #endregion
@@ -3336,7 +3330,7 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
                     //各个公司每天日报产值数
                     var dayProducitionValue = Math.Round((dayYearList.Where(x => companyProjectId.Contains(x.ProjectId) && x.DateDay == dayTime).Sum(x => x.DayActualProductionAmount) + diffValue), 2);
                     //各个公司本年累计数
-                    var totalProductionValue = isDayCalc ? Math.Round(monthYearList.Where(x => companyProjectId.Contains(x.ProjectId)).Sum(x => x.CompleteProductionAmount)+ diffValue + companyMonthDayProduction / baseConst, 2) : companyMonthDayProduction;
+                    var totalProductionValue = isDayCalc ? Math.Round(monthYearList.Where(x => companyProjectId.Contains(x.ProjectId)).Sum(x => x.CompleteProductionAmount) + diffValue + companyMonthDayProduction / baseConst, 2) : companyMonthDayProduction;
                     if (companyProduction.ItemId == "3c5b138b-601a-442a-9519-2508ec1c1eb2".ToGuid())
                     {
                         totalProductionValue = totalProductionValue - 3000000;
@@ -3796,7 +3790,7 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
                 //排除掉今天修改的项目状态
                 onBuildProjectCount = onBuildProjectCount - noDayBuildProjectCount;
                 //项目Ids
-                var companyProjectId = projectList.Where(x => x.CompanyId == report.ItemId&&x.StatusId== buildProjectId)
+                var companyProjectId = projectList.Where(x => x.CompanyId == report.ItemId && x.StatusId == buildProjectId)
                    .WhereIF(!isCalcSub, x => x.IsSubContractProject != 2).Select(x => x.Id).ToList();
                 if (report.Collect == 1)
                 {
@@ -3804,14 +3798,14 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
                     var allBuildProject = companyWriteReportInfos.Sum(x => x.OnBulidCount);
                     var allWriteReportProject = companyWriteReportInfos.Sum(x => x.UnReportCount);
                     //填报率
-                     var wrtieRecent = Math.Round(((allBuildProject-allWriteReportProject).ObjToDecimal() / allBuildProject) * 100, 2);
-                    companyWriteReportInfos.Add(new CompanyWriteReportInfo() 
+                    var wrtieRecent = Math.Round(((allBuildProject - allWriteReportProject).ObjToDecimal() / allBuildProject) * 100, 2);
+                    companyWriteReportInfos.Add(new CompanyWriteReportInfo()
                     {
                         Name = report.Name,
                         OnBulidCount = allBuildProject,
                         UnReportCount = allWriteReportProject,
-                        WritePercent = wrtieRecent==0?100: wrtieRecent,
-                        QualityLevel = 3, 
+                        WritePercent = wrtieRecent == 0 ? 100 : wrtieRecent,
+                        QualityLevel = 3,
                     });
                 }
                 else
@@ -3827,14 +3821,14 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
                         Name = report.Name,
                         OnBulidCount = onBuildProjectCount,
                         UnReportCount = dayUnReportCount,
-                        WritePercent = writePercent==0?100: writePercent,
-                        QualityLevel =3,
+                        WritePercent = writePercent == 0 ? 100 : writePercent,
+                        QualityLevel = 3,
                     });
                 }
             }
 
             #region 数据组合
-        
+
             jjtSendMessageMonitoringDayReportResponseDto.CompanyWriteReportInfos = companyWriteReportInfos;
             #endregion
             #endregion
