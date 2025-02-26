@@ -3143,7 +3143,7 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
             var time2 = default(DateTime);
             ConvertHelper.TryConvertDateTimeFromDateDay(startMonthTime, out time1);
             ConvertHelper.TryConvertDateTimeFromDateDay(dayTime, out time2);
-            var diffDay = TimeHelper.GetTimeSpan(time1, time2).Days;
+            var diffDay = TimeHelper.GetTimeSpan(time1, time2).Days+1;
             //当前年份
             var year = DateTime.Now.Year;
             //一天中的周期时间
@@ -3507,25 +3507,25 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
                 DayWorkProject = dayWorkProject,
                 NoWorkProject = noWorkProjects,
             };
-            foreach (var item in shareProjectIds)
+            foreach (var dayProject in shareProjectIds)
             {
                 //今日开工项目
-                var workProject = shareDayList.Where(x => x.ProjectId == item).OrderBy(x => x.DateDay).FirstOrDefault();
+                var workProject = shareDayList.Where(x => x.ProjectId == dayProject).OrderBy(x => x.DateDay).FirstOrDefault();
                 if (workProject != null && workProject.DateDay == DateTime.Now.AddDays(-1).ToDateDay() && workProject.DayActualProductionAmount > 0)
                 {
                     //项目名称
                     var parojectName = projectList.Where(x => x.Id == workProject.ProjectId).Select(x => x.ShortName).FirstOrDefault();
-                    dayWorkProject.Add(new DayWorkProject() { Name = parojectName, ProjectId = item });
+                    dayWorkProject.Add(new DayWorkProject() { Name = parojectName, ProjectId = dayProject });
                     continue;
                 }
 
                 //未开工的项目
-                var noWorkProject = shareDayList.Where(x => x.ProjectId == item).FirstOrDefault();
+                var noWorkProject = shareDayList.Where(x => x.ProjectId == dayProject).FirstOrDefault();
                 if (noWorkProject == null)
                 {
                     //项目名称
-                    var parojectName = projectList.Where(x => x.Id == item).Select(x => x.ShortName).FirstOrDefault();
-                    noWorkProjects.Add(new DayWorkProject() { Name = parojectName, ProjectId = item });
+                    var parojectName = projectList.Where(x => x.Id == dayProject).Select(x => x.ShortName).FirstOrDefault();
+                    noWorkProjects.Add(new DayWorkProject() { Name = parojectName, ProjectId = dayProject });
                 }
 
             }
@@ -3919,8 +3919,8 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
                 && x.ProjectId == writeReport.Id).Count();
                 //停工天数
                 var stopDays = projectStatusRecord.Where(x => x.Id == writeReport.Id).Select(x => x.StopDay).FirstOrDefault();
-                //未填报次数  总天数-实际停工日期（不需要填报）-实际应该填报的数量
-                var unWriteCount = monthDiffDays - (stopDays == null ? 0 : stopDays.Value) - writeReportCount;
+                //未填报次数  当月已过天数（总天数）-实际停工日期（不需要填报）-实际应该填报的数量
+                var unWriteCount = diffDay - (stopDays == null ? 0 : stopDays.Value) - writeReportCount;
                 if (unWriteCount <= 0)
                 {
                     continue;
