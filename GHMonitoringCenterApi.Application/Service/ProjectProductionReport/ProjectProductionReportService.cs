@@ -1555,7 +1555,7 @@ namespace GHMonitoringCenterApi.Application.Service.ProjectProductionReport
                 //判断当前日期是否是26号，此日期为月报填报日期。  若是则判断项目当月是否有月报数据，有则取月报 无则取日报
                 if (isDayCalc)
                 {
-                    if (time.Day == 26)
+                    if (DateTime.Now.Day == 26)
                     {
                         var isHasMonth = monthList.Where(t => t.ProjectId == item.ProjectId && t.DateMonth == currentMonth).Any();
                         if (isHasMonth)
