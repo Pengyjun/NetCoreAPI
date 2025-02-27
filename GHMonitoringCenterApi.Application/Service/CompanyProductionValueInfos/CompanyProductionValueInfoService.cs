@@ -102,12 +102,12 @@ namespace GHMonitoringCenterApi.Application.Service.CompanyProductionValueInfos
         public async Task<ResponseAjaxResult<bool>> AddORUpdateCompanyProductionValueInfoAsync(AddOrUpdateCompanyProductionValueInfoRequestDto companyProductionValueInfoRequestDto)
         {
             ResponseAjaxResult<bool> responseAjaxResult = new ResponseAjaxResult<bool>();
-            Guid projectId = GuidUtil.Next();
+            Guid id = GuidUtil.Next();
             var model = new Model.CompanyProductionValueInfo();
             if (companyProductionValueInfoRequestDto.RequestType == true)
             {
-
                 model = mapper.Map<AddOrUpdateCompanyProductionValueInfoRequestDto, Model.CompanyProductionValueInfo>(companyProductionValueInfoRequestDto);
+                model.Id = id;
                 model.IsDelete = 1;
                 model.CreateId = _currentUser.Id;
                 model.CreateTime = DateTime.Now;
