@@ -767,7 +767,7 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.JjtSendMsg
 
         public decimal DayAmount { get; set; }
         public string DeviationWarning { get; set; }
-        public bool IsShow { get; set; }
+        public bool IsShow { get; set; } = true;
     }
     #endregion
 }
