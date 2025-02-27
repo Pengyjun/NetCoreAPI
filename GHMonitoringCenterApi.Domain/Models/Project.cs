@@ -169,6 +169,12 @@ namespace GHMonitoringCenterApi.Domain.Models
         public int IsChangeStatus { get; set; }
 
         /// <summary>
+        /// 修改项目是否状态发生改变   记录改变状态的时间
+        /// </summary>
+        [SugarColumn(ColumnDataType = "datetime")]
+        public DateTime IsChangeStatusTime { get; set; }
+
+        /// <summary>
         /// 项目类别 0 境内  1 境外
         /// </summary>
         [SugarColumn(ColumnDataType = "int")]
