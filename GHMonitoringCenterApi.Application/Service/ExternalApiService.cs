@@ -685,6 +685,7 @@ namespace GHMonitoringCenterApi.Application.Service
                 .Select(x => new DayReportInfo
                 {
                     Id = x.Id,
+                    DayId = x.Id,
                     CreateTime = x.CreateTime,
                     UpdateTime = x.UpdateTime,
                     ProjectId = x.ProjectId,
