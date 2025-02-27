@@ -264,7 +264,7 @@ namespace GDCMasterDataReceiveApi.Application
                     }
                     else
                     {
-                        responseAjaxResult.SuccessResult(false, "密码错误，登录失败");
+                        responseAjaxResult.FailResult(HttpStatusCode.VerifyFail, "密码错误，登录失败");
                     }
                 }
                 else

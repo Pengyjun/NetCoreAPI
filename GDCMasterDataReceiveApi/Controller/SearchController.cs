@@ -788,7 +788,7 @@ namespace GDCMasterDataReceiveApi.Controller
         /// </summary>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
-        
+
         [HttpGet("SearchInstitutionTree")]
         [AllowAnonymous]
         public async Task<ResponseAjaxResult<List<InstitutionResponseDto>>> SearchInstitutionTreeAsync()
@@ -810,9 +810,9 @@ namespace GDCMasterDataReceiveApi.Controller
         /// <param name="baseRequestDto"></param>
         /// <returns></returns>
         [HttpPost("SearchOwnerShipList")]
-        public async Task<ResponseAjaxResult<List<OwnerShipReponseDto>>> SearchOwnerShipAsync([FromQuery]BaseRequestDto baseRequestDto)
-        { 
-          return  await _searchService.SearchOwnerShipListAsync(baseRequestDto);
+        public async Task<ResponseAjaxResult<List<OwnerShipReponseDto>>> SearchOwnerShipAsync([FromBody] BaseRequestDto baseRequestDto)
+        {
+            return await _searchService.SearchOwnerShipListAsync(baseRequestDto);
         }
 
         /// <summary>
@@ -821,7 +821,7 @@ namespace GDCMasterDataReceiveApi.Controller
         /// <param name="baseRequestDto"></param>
         /// <returns></returns>
         [HttpPost("SearchSubShipList")]
-        public async Task<ResponseAjaxResult<List<SubShipUserResponseDto>>> SearchSubShipAsync([FromQuery] BaseRequestDto baseRequestDto)
+        public async Task<ResponseAjaxResult<List<SubShipUserResponseDto>>> SearchSubShipAsync([FromBody] BaseRequestDto baseRequestDto)
         {
             return await _searchService.SearchSubShipListAsync(baseRequestDto);
         }
