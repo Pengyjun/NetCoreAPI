@@ -3144,7 +3144,7 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
             var time2 = default(DateTime);
             ConvertHelper.TryConvertDateTimeFromDateDay(startMonthTime, out time1);
             ConvertHelper.TryConvertDateTimeFromDateDay(dayTime, out time2);
-            var diffDay = TimeHelper.GetTimeSpan(time1, time2).Days+1;
+            var diffDay = TimeHelper.GetTimeSpan(time1, time2).Days + 1;
             //当前年份
             var year = DateTime.Now.Year;
             //一天中的周期时间
@@ -3240,7 +3240,7 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
             ProjectBasePoduction projectBasePoduction = new ProjectBasePoduction()
             {
                 TotalOnContractProjectCount = htProjectCount,
-                TotalOnBuildProjectCount = zjProjectCount- noDayProjectCount.Count,
+                TotalOnBuildProjectCount = zjProjectCount - noDayProjectCount.Count,
                 TotalStopBuildProjectCount = thProjectCount,
                 TotalFacilityCount = deviceNumber,
                 TotalWorkerCount = personNumber,
@@ -3257,7 +3257,7 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
             List<CompanyProjectBasePoduction> companyBasePoductionValues = new List<CompanyProjectBasePoduction>();
             foreach (var production in productionBaseInfo)
             {
-               
+
 
                 var companyProjectId = projectList.Where(x => x.CompanyId == production.ItemId)
                     .WhereIF(!isCalcSub, x => x.IsSubContractProject != 2).Select(x => x.Id).ToList();
@@ -3283,7 +3283,7 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
                     //在建的数量 排除掉今天改成在建项目状态的
                     var toDayProCount = (projectList.Count(x => x.CompanyId == production.ItemId && buildProjectId == x.StatusId.Value) - noDayBuildProjectCount);
 
-                    toDayProCount= (toDayProCount- noDayBuildProjectCount)<0 ? 0 : toDayProCount;
+                    toDayProCount = (toDayProCount - noDayBuildProjectCount) < 0 ? 0 : toDayProCount;
                     companyBasePoductionValue = new CompanyProjectBasePoduction();
                     companyBasePoductionValue.Name = production.Name;
                     companyBasePoductionValue.OnContractProjectCount = projectList.Count(x => x.CompanyId == production.ItemId && contractProjectStatusIds.Contains(x.StatusId.Value));
@@ -3342,7 +3342,7 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
                     //各个公司每天日报产值数
                     var dayProducitionValue = Math.Round((dayYearList.Where(x => companyProjectId.Contains(x.ProjectId) && x.DateDay == dayTime).Sum(x => x.DayActualProductionAmount) + diffValue), 2);
                     //各个公司本年累计数
-                    var totalProductionValue = isDayCalc ? Math.Round(monthYearList.Where(x => companyProjectId.Contains(x.ProjectId)).Sum(x => x.CompleteProductionAmount)+ companyMonthDayProduction / baseConst, 2) : companyMonthDayProduction;
+                    var totalProductionValue = isDayCalc ? Math.Round(monthYearList.Where(x => companyProjectId.Contains(x.ProjectId)).Sum(x => x.CompleteProductionAmount) + companyMonthDayProduction / baseConst, 2) : companyMonthDayProduction;
                     if (companyProduction.ItemId == "3c5b138b-601a-442a-9519-2508ec1c1eb2".ToGuid())
                     {
                         totalProductionValue = totalProductionValue - 3000000;
@@ -3416,11 +3416,11 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
             #endregion
 
             #region 产值异常情况说明
-             
+
             //控制是否显示的设置
-            var projectOpen=await dbContext.CopyNew().Queryable<ProjectOpen>().Where(x => x.IsDelete == 1&&x.DateDay==dayTime).ToListAsync();
+            var projectOpen = await dbContext.CopyNew().Queryable<ProjectOpen>().Where(x => x.IsDelete == 1 && x.DateDay == dayTime).ToListAsync();
             //检查当天查询异常的项目
-            var expreProject=dayYearList.Where(x=>x.DateDay==dayTime&&x.IsLow==0).ToList();
+            var expreProject = dayYearList.Where(x => x.DateDay == dayTime && x.IsLow == 0).ToList();
             List<ImpProjectWarning> expProjects = new List<ImpProjectWarning>();
             List<ProjectOpen> projectOpens = new List<ProjectOpen>();
             foreach (var exprePro in expreProject)
@@ -3428,7 +3428,7 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
                 //项目名称
                 var proName = projectList.Where(x => x.Id == exprePro.ProjectId).FirstOrDefault();
                 var proOpen = projectOpen.Where(x => x.ProjectId == exprePro.ProjectId).FirstOrDefault();
-                if (proOpen!=null&&proOpen.IsShow == 1)
+                if (proOpen != null && proOpen.IsShow == 1)
                 {
                     expProjects.Add(new ImpProjectWarning()
                     {
@@ -3442,21 +3442,21 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
                     IsShow = 1,
                     Name = proName?.Name,
                     ProjectId = exprePro.ProjectId,
-                    DateDay=dayTime,
-                     
+                    DateDay = dayTime,
+
                 });
             }
             #region 保存数据库
             try
             {
-               var checkIds= projectOpens.Select(x => x.ProjectId).ToList();
-               var existProjectIds=await dbContext.CopyNew().Queryable<ProjectOpen>().Where(x => checkIds.Contains(x.ProjectId)).Select(x=>x.ProjectId).ToListAsync();
-               var insetObj= projectOpens.Where(x => !existProjectIds.Contains(x.ProjectId)).ToList();
+                var checkIds = projectOpens.Select(x => x.ProjectId).ToList();
+                var existProjectIds = await dbContext.CopyNew().Queryable<ProjectOpen>().Where(x => checkIds.Contains(x.ProjectId)).Select(x => x.ProjectId).ToListAsync();
+                var insetObj = projectOpens.Where(x => !existProjectIds.Contains(x.ProjectId)).ToList();
                 if (insetObj.Count > 0)
                 {
                     await dbContext.CopyNew().Insertable<ProjectOpen>(insetObj).ExecuteCommandAsync();
                 }
-               
+
             }
             catch (Exception ex)
             {
@@ -3874,7 +3874,7 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
                 else
                 {
                     //当日已填报的项目
-                    var dayReportCount = dayYearList.Where(x => x.DateDay == dayTime && companyProjectId.Contains(x.ProjectId)&&!noDayBuildProjectCount.Contains(x.ProjectId)).Count();
+                    var dayReportCount = dayYearList.Where(x => x.DateDay == dayTime && companyProjectId.Contains(x.ProjectId) && !noDayBuildProjectCount.Contains(x.ProjectId)).Count();
                     //当日未填报项目数量（在建数量-已填报的数量）
                     var dayUnReportCount = onBuildProjectCount - dayReportCount < 0 ? 0 : onBuildProjectCount - dayReportCount;
                     //填报率
@@ -3882,9 +3882,9 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
                     companyWriteReportInfos.Add(new CompanyWriteReportInfo()
                     {
                         Name = report.Name,
-                        OnBulidCount = onBuildProjectCount<0?0: onBuildProjectCount,
+                        OnBulidCount = onBuildProjectCount < 0 ? 0 : onBuildProjectCount,
                         UnReportCount = dayUnReportCount,
-                        WritePercent = writePercent == 0 ? 100 : writePercent>100?100: writePercent,
+                        WritePercent = writePercent == 0 ? 100 : writePercent > 100 ? 100 : writePercent,
                         QualityLevel = 3,
                     });
                 }
@@ -4135,8 +4135,8 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
                     companyPlanCompleteProductionDtos = companyProductionList.Select(x => new CompanyPlanCompleteProductionDto()
                     {
                         Id = x.CompanyId,
-                        CompleteProductionValue = x.OneCompleteProductionValue.Value,
-                        PlanProductionValue = x.OnePlanProductionValue.Value
+                        CompleteProductionValue = x.OneCompleteProductionValue ?? 0M,
+                        PlanProductionValue = x.OnePlanProductionValue ?? 0M
                     }).ToList();
                 }
 
@@ -4146,8 +4146,8 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
                     companyPlanCompleteProductionDtos = companyProductionList.Select(x => new CompanyPlanCompleteProductionDto()
                     {
                         Id = x.CompanyId,
-                        CompleteProductionValue = x.TwoCompleteProductionValue.Value,
-                        PlanProductionValue = x.TwoPlanProductionValue.Value
+                        CompleteProductionValue = x.TwoCompleteProductionValue ?? 0M,
+                        PlanProductionValue = x.TwoPlanProductionValue ?? 0M
                     }).ToList();
                 }
 
@@ -4157,8 +4157,8 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
                     companyPlanCompleteProductionDtos = companyProductionList.Select(x => new CompanyPlanCompleteProductionDto()
                     {
                         Id = x.CompanyId,
-                        CompleteProductionValue = x.ThreeCompleteProductionValue.Value,
-                        PlanProductionValue = x.ThreePlaProductionValue.Value
+                        CompleteProductionValue = x.ThreeCompleteProductionValue ?? 0M,
+                        PlanProductionValue = x.ThreePlaProductionValue ?? 0M
                     }).ToList();
                 }
 
@@ -4168,8 +4168,8 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
                     companyPlanCompleteProductionDtos = companyProductionList.Select(x => new CompanyPlanCompleteProductionDto()
                     {
                         Id = x.CompanyId,
-                        CompleteProductionValue = x.FourCompleteProductionValue.Value,
-                        PlanProductionValue = x.FourPlaProductionValue.Value
+                        CompleteProductionValue = x.FourCompleteProductionValue ?? 0M,
+                        PlanProductionValue = x.FourPlaProductionValue ?? 0M
                     }).ToList();
                 }
 
@@ -4179,8 +4179,8 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
                     companyPlanCompleteProductionDtos = companyProductionList.Select(x => new CompanyPlanCompleteProductionDto()
                     {
                         Id = x.CompanyId,
-                        CompleteProductionValue = x.FiveCompleteProductionValue.Value,
-                        PlanProductionValue = x.FivePlaProductionValue.Value
+                        CompleteProductionValue = x.FiveCompleteProductionValue ?? 0M,
+                        PlanProductionValue = x.FivePlaProductionValue ?? 0M
                     }).ToList();
                 }
 
@@ -4190,8 +4190,8 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
                     companyPlanCompleteProductionDtos = companyProductionList.Select(x => new CompanyPlanCompleteProductionDto()
                     {
                         Id = x.CompanyId,
-                        CompleteProductionValue = x.SixCompleteProductionValue.Value,
-                        PlanProductionValue = x.SixPlaProductionValue.Value
+                        CompleteProductionValue = x.SixCompleteProductionValue ?? 0M,
+                        PlanProductionValue = x.SixPlaProductionValue ?? 0M
                     }).ToList();
                 }
 
@@ -4201,8 +4201,8 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
                     companyPlanCompleteProductionDtos = companyProductionList.Select(x => new CompanyPlanCompleteProductionDto()
                     {
                         Id = x.CompanyId,
-                        CompleteProductionValue = x.SevenCompleteProductionValue.Value,
-                        PlanProductionValue = x.SevenPlaProductionValue.Value
+                        CompleteProductionValue = x.SevenCompleteProductionValue ?? 0M,
+                        PlanProductionValue = x.SevenPlaProductionValue ?? 0M
                     }).ToList();
                 }
 
@@ -4212,8 +4212,8 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
                     companyPlanCompleteProductionDtos = companyProductionList.Select(x => new CompanyPlanCompleteProductionDto()
                     {
                         Id = x.CompanyId,
-                        CompleteProductionValue = x.EightCompleteProductionValue.Value,
-                        PlanProductionValue = x.EightPlaProductionValue.Value
+                        CompleteProductionValue = x.EightCompleteProductionValue ?? 0M,
+                        PlanProductionValue = x.EightPlaProductionValue ?? 0M
                     }).ToList();
                 }
 
@@ -4223,8 +4223,8 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
                     companyPlanCompleteProductionDtos = companyProductionList.Select(x => new CompanyPlanCompleteProductionDto()
                     {
                         Id = x.CompanyId,
-                        CompleteProductionValue = x.NineCompleteProductionValue.Value,
-                        PlanProductionValue = x.NinePlaProductionValue.Value
+                        CompleteProductionValue = x.NineCompleteProductionValue ?? 0M,
+                        PlanProductionValue = x.NinePlaProductionValue ?? 0M
                     }).ToList();
                 }
 
@@ -4234,8 +4234,8 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
                     companyPlanCompleteProductionDtos = companyProductionList.Select(x => new CompanyPlanCompleteProductionDto()
                     {
                         Id = x.CompanyId,
-                        CompleteProductionValue = x.TenCompleteProductionValue.Value,
-                        PlanProductionValue = x.TenPlaProductionValue.Value
+                        CompleteProductionValue = x.TenCompleteProductionValue ?? 0M,
+                        PlanProductionValue = x.TenPlaProductionValue ?? 0M
                     }).ToList();
                 }
 
@@ -4244,8 +4244,8 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
                     companyPlanCompleteProductionDtos = companyProductionList.Select(x => new CompanyPlanCompleteProductionDto()
                     {
                         Id = x.CompanyId,
-                        CompleteProductionValue = x.ElevenCompleteProductionValue.Value,
-                        PlanProductionValue = x.ElevenPlaProductionValue.Value
+                        CompleteProductionValue = x.ElevenCompleteProductionValue ?? 0M,
+                        PlanProductionValue = x.ElevenPlaProductionValue ?? 0M
                     }).ToList();
                 }
 
@@ -4254,8 +4254,8 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
                     companyPlanCompleteProductionDtos = companyProductionList.Select(x => new CompanyPlanCompleteProductionDto()
                     {
                         Id = x.CompanyId,
-                        CompleteProductionValue = x.TwelveCompleteProductionValue.Value,
-                        PlanProductionValue = x.TwelvePlaProductionValue.Value
+                        CompleteProductionValue = x.TwelveCompleteProductionValue ?? 0M,
+                        PlanProductionValue = x.TwelvePlaProductionValue ?? 0M
                     }).ToList();
                 }
                 #endregion
