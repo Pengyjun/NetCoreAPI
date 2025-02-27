@@ -55,11 +55,17 @@ namespace GHMonitoringCenterApi.Application.Contracts.IService.Push
         /// <returns></returns>
         Task<ResponseAjaxResult<bool>> PushSafeDayReportsAsync();
 
-		/// <summary>
-		///推送分包船舶
-		/// </summary>
-		/// <returns></returns>
-		Task<ResponseAjaxResult<bool>> PushSubShipsAsync();
-	}
+        /// <summary>
+        ///推送分包船舶
+        /// </summary>
+        /// <returns></returns>
+        Task<ResponseAjaxResult<bool>> PushSubShipsAsync();
+
+        /// <summary>
+        ///推送生产日报数据
+        /// </summary>
+        /// <returns></returns>
+        Task<ResponseAjaxResult<bool>> PushJjtTextCardMsgDetailsAsync();
+    }
 
 }

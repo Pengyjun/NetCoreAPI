@@ -22,6 +22,10 @@ using SqlSugar.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Spire.Doc;
 using GHMonitoringCenterApi.Domain.Shared.Util;
+using GHMonitoringCenterApi.Application.Contracts.IService.JjtSendMessage;
+using GHMonitoringCenterApi.Application.Contracts.Dto.JjtSendMsg;
+using MySqlConnector;
+using Microsoft.Data.SqlClient;
 
 namespace GHMonitoringCenterApi.Application.Service.Push
 {
@@ -208,6 +212,10 @@ namespace GHMonitoringCenterApi.Application.Service.Push
         /// 项目币种
         /// </summary>
         private readonly IBaseRepository<Currency> _dbCurrency;
+        /// <summary>
+        /// 运营中心图片消息
+        /// </summary>
+        private readonly IJjtSendMessageService _jjtSendMessageService;
 
         /// <summary>
         /// 对象变更记录
@@ -268,6 +276,7 @@ namespace GHMonitoringCenterApi.Application.Service.Push
             , IBaseRepository<Currency> dbCurrency
             , IBaseRepository<ConstructionQualification> dbConstructionQualification
             , IBaseRepository<ProjectScale> dbProjectScale
+            , IJjtSendMessageService jjtSendMessageService
             , IBaseRepository<EntityChangeRecord> dbEntityChangeRecord
             , IMapper mapper
             , GlobalObject globalObject
@@ -310,6 +319,7 @@ namespace GHMonitoringCenterApi.Application.Service.Push
             _dbWaterCarriage = dbWaterCarriage;
             _dbProjectLeader = dbProjectLeader;
             _dbCurrency = dbCurrency;
+            _jjtSendMessageService = jjtSendMessageService;
             _dbEntityChangeRecord = dbEntityChangeRecord;
             _mapper = mapper;
             _globalObject = globalObject;
@@ -1561,6 +1571,57 @@ namespace GHMonitoringCenterApi.Application.Service.Push
             {
                 throw new HttpRequestException(httpResult.Msg);
             }
+        }
+
+
+        /// <summary>
+        ///同步生产日报数据
+        /// </summary>
+        /// <returns></returns>
+        public async Task<ResponseAjaxResult<bool>> PushJjtTextCardMsgDetailsAsync()
+        {
+            ResponseAjaxResult<bool> response = new ResponseAjaxResult<bool>();
+            //获取运营中心图片消息
+            var json = string.Empty;
+            var data = await _jjtSendMessageService.JjtTextCardMsgDetailsAsync();
+            if (data != null && data.Code == HttpStatusCode.Success)
+            {
+                json = JsonConvert.SerializeObject(data);
+            }
+            var mySqlConnectionString = AppsettingsHelper.GetValue("ConnectionStrings:ConnectionString2");
+            try
+            {
+                SqlSugarClient db = new SqlSugarClient(new ConnectionConfig()
+                {
+                    ConnectionString = mySqlConnectionString,
+                    DbType = DbType.MySql,
+                    IsAutoCloseConnection = true//手动释放  是长连接 
+                });
+                var temdata = await db.Queryable<TempTable>().FirstAsync();
+                if (temdata != null)
+                {
+                    if (string.IsNullOrWhiteSpace(temdata.Value))
+                    {
+                        TempTable model = new TempTable();
+                        model.Value = json;
+                        await db.Insertable(model).ExecuteCommandAsync();
+                    }
+                    else
+                    {
+                        temdata.Value = json;
+                        await db.Updateable(temdata).ExecuteCommandAsync();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                response.Data = false;
+                response.FailResult(HttpStatusCode.InsertFail, ex.Message);
+                return response;
+            }
+            response.Data = true;
+            response.Success();
+            return response;
         }
 
         /// <summary>

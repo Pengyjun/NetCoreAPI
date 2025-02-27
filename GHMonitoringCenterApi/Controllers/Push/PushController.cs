@@ -42,7 +42,7 @@ namespace GHMonitoringCenterApi.Controllers.Push
             return await _pushPomService.PushProjectAsync();
         }
 
-        
+
 
         /// <summary>
         ///推送项目月报
@@ -74,21 +74,21 @@ namespace GHMonitoringCenterApi.Controllers.Push
             return await _pushPomService.PushSubShipMonthReportsAsync();
         }
 
-		/// <summary>
-		/// 推送分包船舶
-		/// </summary>
-		/// <returns></returns>
-		[HttpPost("PushSubShips")]
-		public async Task<ResponseAjaxResult<bool>> PushSubShipsAsync()
-		{
-			return await _pushPomService.PushSubShipsAsync();
-		}
+        /// <summary>
+        /// 推送分包船舶
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost("PushSubShips")]
+        public async Task<ResponseAjaxResult<bool>> PushSubShipsAsync()
+        {
+            return await _pushPomService.PushSubShipsAsync();
+        }
 
-		/// <summary>
-		///推送船舶日报
-		/// </summary>
-		/// <returns></returns>
-		[HttpPost("PushShipDayReports")]
+        /// <summary>
+        ///推送船舶日报
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost("PushShipDayReports")]
         public async Task<ResponseAjaxResult<bool>> PushShipDayReportsAsync()
         {
             return await _pushPomService.PushShipDayReportsAsync();
@@ -112,6 +112,17 @@ namespace GHMonitoringCenterApi.Controllers.Push
         public async Task<ResponseAjaxResult<bool>> PushSafeDayReportsAsync()
         {
             return await _pushPomService.PushSafeDayReportsAsync();
+        }
+
+        /// <summary>
+        ///同步生产日报数据
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("PushJjtTextCardMsgDetails")]
+        [UnitOfWork]
+        public async Task<ResponseAjaxResult<bool>> PushJjtTextCardMsgDetailsAsync()
+        {
+            return await _pushPomService.PushJjtTextCardMsgDetailsAsync();
         }
     }
 }
