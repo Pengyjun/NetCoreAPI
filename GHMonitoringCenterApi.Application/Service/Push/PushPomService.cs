@@ -1609,7 +1609,7 @@ namespace GHMonitoringCenterApi.Application.Service.Push
                     else
                     {
                         temdata.Value = json;
-                        await db.Updateable(temdata).ExecuteCommandAsync();
+                        await db.Updateable(temdata).Where(t => true).ExecuteCommandAsync();
                     }
                 }
             }
