@@ -264,7 +264,7 @@ namespace GHMonitoringCenterApi.Application.Service.CompanyProductionValueInfos
             var responseAjaxResult = new ResponseAjaxResult<List<ProductionMonitoringOperationDayReport>>();
             RefAsync<int> total = 0;
             var List = await productionMonitoringOperationDayReport.AsQueryable()
-            .Where(x => x.IsDelete == 1 && x.Name != "广航局总体" && !SqlFunc.IsNullOrEmpty(x.Name))
+            .Where(x => x.IsDelete == 1 && x.Name != "广航局总体" && !SqlFunc.IsNullOrEmpty(x.Name) && x.Type==1)
             .OrderByDescending(x => x.CreateTime)
             .Select(x => new ProductionMonitoringOperationDayReport
             {
