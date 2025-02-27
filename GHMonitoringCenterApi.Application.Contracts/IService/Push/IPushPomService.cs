@@ -1,4 +1,5 @@
 ﻿using GHMonitoringCenterApi.Domain.Shared;
+using GHMonitoringCenterApi.Domain.Models;
 
 namespace GHMonitoringCenterApi.Application.Contracts.IService.Push
 {
@@ -66,6 +67,12 @@ namespace GHMonitoringCenterApi.Application.Contracts.IService.Push
         /// </summary>
         /// <returns></returns>
         Task<ResponseAjaxResult<bool>> PushJjtTextCardMsgDetailsAsync();
+
+        /// <summary>
+        ///同步审核数据
+        /// </summary>
+        /// <returns></returns>
+        Task<ResponseAjaxResult<bool>> PushApproveDataAsync();
     }
 
 }

@@ -691,8 +691,19 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     //resDayReport.MonthAveProduction = await _dbContext.Queryable<DayReport>().Where(t => t.IsDelete == 1 && t.DateDay >= stime && t.DateDay <= etime).SumAsync(x => x.DayActualProductionAmount) / 15M;
 
                     //近三天
-                    var stime1 = DateTime.Now.AddDays(-4).ToDateDay();
-                    var etime1 = DateTime.Now.AddDays(-2).ToDateDay();
+                    var stime1 = 0;
+                    var etime1 = 0;
+                    if (model.DateDayTime != null)
+                    {
+                        stime1 = model.DateDayTime.Value.AddDays(-3).ToDateDay();
+                        etime1 = model.DateDayTime.Value.AddDays(-1).ToDateDay();
+                    }
+                    else
+                    {
+                        stime1 = DateTime.Now.AddDays(-4).ToDateDay();
+                        etime1 = DateTime.Now.AddDays(-2).ToDateDay();
+                    }
+
                     //获取日报近三天产值
                     var dayValue = await _dbContext.Queryable<DayReport>().Where(t => t.IsDelete == 1 && t.DateDay >= stime1 && t.DateDay <= etime1 && t.ProjectId == model.ProjectId).SumAsync(x => x.DayActualProductionAmount) / 3M;
                     resDayReport.ThreeDayAveProduction = dayValue * (isExist.Interval / 100);

@@ -8,6 +8,10 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <PackageReference Include="Wangkanai.Detection" Version="6.1.0" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<ProjectReference Include="..\GHMonitoringCenterApi.Application.Contracts\GHMonitoringCenterApi.Application.Contracts.csproj" />
 		<ProjectReference Include="..\GHMonitoringCenterApi.Domain\GHMonitoringCenterApi.Domain.csproj" />
 	</ItemGroup>

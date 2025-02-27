@@ -26,6 +26,7 @@ using GHMonitoringCenterApi.Application.Contracts.Dto.Subsidiary;
 using GHMonitoringCenterApi.Application.Contracts.Dto.User;
 using GHMonitoringCenterApi.Application.Contracts.IService;
 using GHMonitoringCenterApi.Application.Contracts.IService.Project;
+using GHMonitoringCenterApi.Application.Contracts.IService.Push;
 using GHMonitoringCenterApi.Application.Contracts.IService.User;
 using GHMonitoringCenterApi.Domain.Enums;
 using GHMonitoringCenterApi.Domain.IRepository;
@@ -45,6 +46,8 @@ using SqlSugar;
 using SqlSugar.Extensions;
 using UtilsSharp;
 using UtilsSharp.Shared.Standard;
+using Wangkanai.Detection.Models;
+using Wangkanai.Detection.Services;
 using static System.Net.Mime.MediaTypeNames;
 using Model = GHMonitoringCenterApi.Domain.Models;
 
@@ -56,8 +59,9 @@ namespace GHMonitoringCenterApi.Application.Service
     public class BaseService : IBaseService
     {
         #region 依赖注入
+        public IDetectionService _detectionService { get; set; }
         public ILogger<BaseService> logger { get; set; }
-
+        public IPushPomService _pushPomService { get; set; }
         public IBaseRepository<DealingUnit> baseDealingUnitRepository { get; set; }
         public IBaseRepository<Currency> baseCurrencyRepository { get; set; }
         public IBaseRepository<ProjectDepartment> baseProjectDepartmentRepository { get; set; }
@@ -84,7 +88,7 @@ namespace GHMonitoringCenterApi.Application.Service
         private readonly GlobalObject _globalObject;
         private CurrentUser _currentUser { get { return _globalObject.CurrentUser; } }
         public BaseService(ILogger<BaseService> logger,
-            IBaseRepository<DealingUnit> baseDealingUnitRepository, IBaseRepository<Currency> baseCurrencyRepository, IBaseRepository<ProjectDepartment> baseProjectDepartmentRepository, IBaseRepository<AttributeLabelc> baseAttributeLabelcRepository, IBaseRepository<ConstructionQualification> baseConstructionQualificationRepository, IBaseRepository<IndustryClassification> baseIndustryClassificationRepository, IBaseRepository<WaterCarriage> baseWaterCarriageRepository, IBaseRepository<DictionaryTable> baseDictionaryTableRepository, IBaseRepository<ProjectScale> baseProjectScaleRepository, IBaseRepository<Province> baseProvinceRepository, IBaseRepository<ProjectType> baseProjectTypeRepository, IBaseRepository<Institution> baseInstitutionRepository, IBaseRepository<ProjectStatus> baseProjectStatusRepository, IBaseRepository<ProjectArea> baseProjectAreaRepository, IBaseRepository<ProjectLeader> baseProjectLeaderRepository, IBaseRepository<Model.User> baseUserRepository, IBaseRepository<OwnerShip> baseOwnerShipRepository, IBaseRepository<SubShip> baseSubShipRepository, IMapper mapper, ISqlSugarClient dbContext, GlobalObject globalObject)
+            IBaseRepository<DealingUnit> baseDealingUnitRepository, IBaseRepository<Currency> baseCurrencyRepository, IBaseRepository<ProjectDepartment> baseProjectDepartmentRepository, IBaseRepository<AttributeLabelc> baseAttributeLabelcRepository, IBaseRepository<ConstructionQualification> baseConstructionQualificationRepository, IBaseRepository<IndustryClassification> baseIndustryClassificationRepository, IBaseRepository<WaterCarriage> baseWaterCarriageRepository, IBaseRepository<DictionaryTable> baseDictionaryTableRepository, IBaseRepository<ProjectScale> baseProjectScaleRepository, IBaseRepository<Province> baseProvinceRepository, IBaseRepository<ProjectType> baseProjectTypeRepository, IBaseRepository<Institution> baseInstitutionRepository, IBaseRepository<ProjectStatus> baseProjectStatusRepository, IBaseRepository<ProjectArea> baseProjectAreaRepository, IBaseRepository<ProjectLeader> baseProjectLeaderRepository, IBaseRepository<Model.User> baseUserRepository, IBaseRepository<OwnerShip> baseOwnerShipRepository, IBaseRepository<SubShip> baseSubShipRepository, IPushPomService pushPomService, IDetectionService detectionService, IMapper mapper, ISqlSugarClient dbContext, GlobalObject globalObject)
         {
             this.logger = logger;
 
@@ -106,7 +110,8 @@ namespace GHMonitoringCenterApi.Application.Service
             this.baseUserRepository = baseUserRepository;
             this.baseOwnerShipRepository = baseOwnerShipRepository;
             this.baseSubShipRepository = baseSubShipRepository;
-
+            this._pushPomService = pushPomService;
+            this._detectionService = detectionService;
             this.mapper = mapper;
             this.dbContext = dbContext;
             _globalObject = globalObject;
@@ -2624,7 +2629,7 @@ namespace GHMonitoringCenterApi.Application.Service
             {
                 if (item != "2022002687")
                 {
-                   var userIdCrypt=CryptoStringExtension.EncryptAsync(item);
+                    var userIdCrypt = CryptoStringExtension.EncryptAsync(item);
                     phonePage = phonePage.Replace("@vali", userIdCrypt).TrimAll();
                     //九点第一批人员发送
                     var obj = new SingleMessageTemplateRequestDto()
@@ -2648,7 +2653,7 @@ namespace GHMonitoringCenterApi.Application.Service
         /// </summary>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
-        public async Task<ResponseAjaxResult<bool>> DayReportApproveAsync(bool isApprove,string? vali)
+        public async Task<ResponseAjaxResult<bool>> DayReportApproveAsync(bool isApprove, string? vali)
         {
             ResponseAjaxResult<bool> responseAjaxResult = new ResponseAjaxResult<bool>();
             if (!string.IsNullOrWhiteSpace(vali))
@@ -2659,7 +2664,7 @@ namespace GHMonitoringCenterApi.Application.Service
                     var obj = new DayPushApprove()
                     {
                         ApproveId = _currentUser.Id,
-                        ApproveName = (account== "L20132106"? "姜世珂": account == "2018015149" ? "刘国银": account == "2022002687"?"管理员": "于亚南"),
+                        ApproveName = (account == "L20132106" ? "姜世珂" : account == "2018015149" ? "刘国银" : account == "2022002687" ? "管理员" : "于亚南"),
                         Status = isApprove ? "已审批" : "未审批",
                         DayTime = DateTime.Now.AddDays(-1).ToDateDay(),
                     };
@@ -2672,22 +2677,27 @@ namespace GHMonitoringCenterApi.Application.Service
                         WebHelper webHelper = new WebHelper();
                         webHelper.DoGetAsync(res);
                     }
-                   
+                    if (_detectionService.Device.Type == Device.Mobile)
+                    {
+                        //同步审核数据
+                        await _pushPomService.PushApproveDataAsync();
+                    }
                     #endregion
                     responseAjaxResult.Success();
                 }
             }
-            else {
+            else
+            {
 
-                var token= HttpContentAccessFactory.GetUserToken;
-                var userService= HttpContentAccessFactory.Current.Request.HttpContext.RequestServices.GetService<IUserService>();
+                var token = HttpContentAccessFactory.GetUserToken;
+                var userService = HttpContentAccessFactory.Current.Request.HttpContext.RequestServices.GetService<IUserService>();
                 if (userService == null)
                 {
                     responseAjaxResult.Data = false;
                     responseAjaxResult.Success("审核错误", HttpStatusCode.VerifyFail);
                     return responseAjaxResult;
                 }
-               var userInfo= userService.GetUserInfoAsync(token.Replace("Bearer","").Trim());
+                var userInfo = userService.GetUserInfoAsync(token.Replace("Bearer", "").Trim());
                 if (userInfo.CurrentLoginIsAdmin ||
                    userInfo.Account == "2018015149" ||
                    userInfo.Account == "2016146439" ||
@@ -2708,7 +2718,11 @@ namespace GHMonitoringCenterApi.Application.Service
                         WebHelper webHelper = new WebHelper();
                         webHelper.DoGetAsync(res);
                     }
-
+                    if (_detectionService.Device.Type == Device.Mobile)
+                    {
+                        //同步审核数据
+                        await _pushPomService.PushApproveDataAsync();
+                    }
                     #endregion
                     responseAjaxResult.Data = true;
                     responseAjaxResult.Success();
@@ -2720,8 +2734,6 @@ namespace GHMonitoringCenterApi.Application.Service
                     return responseAjaxResult;
                 }
             }
-
-
 
             return responseAjaxResult;
         }
