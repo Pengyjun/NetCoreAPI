@@ -32,7 +32,6 @@ using NetTaste;
 using NPOI.SS.Formula.Functions;
 using NPOI.HPSF;
 using System;
-using Microsoft.AspNetCore.Http.Internal;
 using System.Net.Http;
 
 namespace GHMonitoringCenterApi.Application.Service.File
