@@ -1594,7 +1594,7 @@ namespace GHMonitoringCenterApi.Application.Service.Push
                 {
                     ConnectionString = mySqlConnectionString,
                     DbType = DbType.MySql,
-                    IsAutoCloseConnection = true//手动释放  是长连接 
+                    IsAutoCloseConnection = true 
                 });
                 var temdata = await db.Queryable<TempTable>().FirstAsync();
                 if (temdata != null)
@@ -1620,39 +1620,6 @@ namespace GHMonitoringCenterApi.Application.Service.Push
             }
             response.Data = true;
             response.Success();
-            return response;
-        }
-
-        /// <summary>
-        ///同步审核数据
-        /// </summary>
-        /// <returns></returns>
-        public async Task<ResponseAjaxResult<bool>> PushApproveDataAsync()
-        {
-            ResponseAjaxResult<bool> response = new ResponseAjaxResult<bool>();
-            try
-            {
-                var mySqlConnectionString = AppsettingsHelper.GetValue("ConnectionStrings:ConnectionString2");
-                SqlSugarClient db = new SqlSugarClient(new ConnectionConfig()
-                {
-                    ConnectionString = mySqlConnectionString,
-                    DbType = DbType.MySql,
-                    IsAutoCloseConnection = true//手动释放  是长连接 
-                });
-                //获取最新一条审核数据
-                var daypush = await db.Queryable<DayPushApprove>().Where(t => t.IsDelete == 1).OrderByDescending(t => t.CreateTime).FirstAsync();
-                if (daypush != null)
-                {
-                    await _dbContext.Insertable(daypush).ExecuteCommandAsync();
-                }
-            }
-            catch (Exception ex)
-            {
-                response.Data = false;
-                response.FailResult(HttpStatusCode.InsertFail, ex.Message);
-                return response;
-            }
-
             return response;
         }
 
