@@ -29,6 +29,7 @@ using SqlSugar.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections;
 using Microsoft.AspNetCore.Authorization;
+using NPOI.SS.Formula.Functions;
 
 namespace GHMonitoringCenterApi.Application.Service.CompanyProductionValueInfos
 {
@@ -208,7 +209,7 @@ namespace GHMonitoringCenterApi.Application.Service.CompanyProductionValueInfos
             var List = await baseCompanyProductionValueInfoRepository.AsQueryable()
             .Where(x => x.IsDelete == 1)
             .WhereIF(requsetDto.Dateday.HasValue, x => x.DateDay == requsetDto.Dateday)
-            .OrderByDescending(x => x.Sort)
+            .OrderBy(x => x.Sort)
             .Select(x => new CompanyProductionValueInfoResponseDto
             {
                 Id = x.Id,
@@ -230,12 +231,23 @@ namespace GHMonitoringCenterApi.Application.Service.CompanyProductionValueInfos
             }).ToPageListAsync(requsetDto.PageIndex, requsetDto.PageSize, total);
 
             var institutionIds = new List<Guid?>();
-            //institutionIds.AddRange(List.Select(t => t.CompanyId).Distinct().ToArray());
+            institutionIds.AddRange(List.Select(t => t.CompanyId).Distinct().ToArray());
             var institutions = await GetCompanyList();
 
             List.ForEach(item =>
             {
-
+                item.OnePlanProductionValue = Math.Round(item.OnePlanProductionValue.GetValueOrDefault(), 2);
+                item.EightPlaProductionValue = Math.Round(item.EightPlaProductionValue.GetValueOrDefault(), 2);
+                item.ElevenPlaProductionValue = Math.Round(item.ElevenPlaProductionValue.GetValueOrDefault(), 2);
+                item.FourPlaProductionValue = Math.Round(item.FourPlaProductionValue.GetValueOrDefault(), 2);
+                item.FivePlaProductionValue = Math.Round(item.FivePlaProductionValue.GetValueOrDefault(), 2);
+                item.NinePlaProductionValue = Math.Round(item.NinePlaProductionValue.GetValueOrDefault(), 2);
+                item.SevenPlaProductionValue = Math.Round(item.SevenPlaProductionValue.GetValueOrDefault(), 2);
+                item.SixPlaProductionValue = Math.Round(item.SixPlaProductionValue.GetValueOrDefault(), 2);
+                item.TenPlaProductionValue = Math.Round(item.TenPlaProductionValue.GetValueOrDefault(), 2);
+                item.ThreePlaProductionValue = Math.Round(item.ThreePlaProductionValue.GetValueOrDefault(), 2);
+                item.TwelvePlaProductionValue = Math.Round(item.TwelvePlaProductionValue.GetValueOrDefault(), 2);
+                item.TwoPlanProductionValue = Math.Round(item.TwoPlanProductionValue.GetValueOrDefault(), 2);
                 item.CompanyName = institutions.FirstOrDefault(t => t.ItemId == item.CompanyId)?.Name;
             });
             responseAjaxResult.Success();
@@ -274,7 +286,7 @@ namespace GHMonitoringCenterApi.Application.Service.CompanyProductionValueInfos
         {
             return await productionMonitoringOperationDayReport.AsQueryable()
                         .Where(x => x.IsDelete == 1 && x.Name != "广航局总体" && !SqlFunc.IsNullOrEmpty(x.Name) && x.Type == 1)
-                        .OrderByDescending(x => x.Sort)
+                        .OrderBy(x => x.Sort)
                         .Select(x => new ProductionMonitoringOperationDayReport
                         {
                             ItemId = x.ItemId,
