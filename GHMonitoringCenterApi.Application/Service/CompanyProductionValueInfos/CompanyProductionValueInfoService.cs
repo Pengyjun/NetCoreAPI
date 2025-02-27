@@ -208,7 +208,7 @@ namespace GHMonitoringCenterApi.Application.Service.CompanyProductionValueInfos
             var List = await baseCompanyProductionValueInfoRepository.AsQueryable()
             .Where(x => x.IsDelete == 1)
             .WhereIF(requsetDto.Dateday.HasValue, x => x.DateDay == requsetDto.Dateday)
-            .OrderByDescending(x => x.CreateTime)
+            .OrderByDescending(x => x.Sort)
             .Select(x => new CompanyProductionValueInfoResponseDto
             {
                 Id = x.Id,
@@ -230,12 +230,13 @@ namespace GHMonitoringCenterApi.Application.Service.CompanyProductionValueInfos
             }).ToPageListAsync(requsetDto.PageIndex, requsetDto.PageSize, total);
 
             var institutionIds = new List<Guid?>();
-            institutionIds.AddRange(List.Select(t => t.CompanyId).Distinct().ToArray());
-            var institutions = await GetInstitutionsAsync(institutionIds.ToArray());
+            //institutionIds.AddRange(List.Select(t => t.CompanyId).Distinct().ToArray());
+            var institutions = await GetCompanyList();
+
             List.ForEach(item =>
             {
 
-                item.CompanyName = institutions.FirstOrDefault(t => t.PomId == item.CompanyId)?.Shortname;
+                item.CompanyName = institutions.FirstOrDefault(t => t.ItemId == item.CompanyId)?.Name;
             });
             responseAjaxResult.Success();
             responseAjaxResult.Count = total;
@@ -263,18 +264,23 @@ namespace GHMonitoringCenterApi.Application.Service.CompanyProductionValueInfos
 
             var responseAjaxResult = new ResponseAjaxResult<List<ProductionMonitoringOperationDayReport>>();
             RefAsync<int> total = 0;
-            var List = await productionMonitoringOperationDayReport.AsQueryable()
-            .Where(x => x.IsDelete == 1 && x.Name != "广航局总体" && !SqlFunc.IsNullOrEmpty(x.Name) && x.Type==1)
-            .OrderByDescending(x => x.CreateTime)
-            .Select(x => new ProductionMonitoringOperationDayReport
-            {
-                ItemId = x.ItemId,
-                Name = x.Name
-
-            }).ToListAsync();
+            List<ProductionMonitoringOperationDayReport> List = await GetCompanyList();
             responseAjaxResult.Data = List;
             responseAjaxResult.Success();
             return responseAjaxResult;
+        }
+
+        private async Task<List<ProductionMonitoringOperationDayReport>> GetCompanyList()
+        {
+            return await productionMonitoringOperationDayReport.AsQueryable()
+                        .Where(x => x.IsDelete == 1 && x.Name != "广航局总体" && !SqlFunc.IsNullOrEmpty(x.Name) && x.Type == 1)
+                        .OrderByDescending(x => x.Sort)
+                        .Select(x => new ProductionMonitoringOperationDayReport
+                        {
+                            ItemId = x.ItemId,
+                            Name = x.Name
+
+                        }).ToListAsync();
         }
     }
 }
