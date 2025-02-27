@@ -3169,33 +3169,33 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
 
             #region 共用数据
             //基础数据
-            var commonDataList = await dbContext.Queryable<ProductionMonitoringOperationDayReport>().Where(x => x.IsDelete == 1 && !SqlFunc.IsNullOrEmpty(x.Name)).ToListAsync();
+            var commonDataList = await dbContext.CopyNew().Queryable<ProductionMonitoringOperationDayReport>().Where(x => x.IsDelete == 1 && !SqlFunc.IsNullOrEmpty(x.Name)).ToListAsync();
 
             //公司完成产值信息
-            var comonDataProductionList = await dbContext.Queryable<CompanyProductionValueInfo>()
+            var comonDataProductionList = await dbContext.CopyNew().Queryable<CompanyProductionValueInfo>()
                 .Where(x => x.IsDelete == 1 && x.DateDay == DateTime.Now.Year).ToListAsync();
 
             //统计本年周期所有日报数据
-            var dayYearList = await dbContext.Queryable<DayReport>().Where(x => x.DateDay >= startYearTime && x.DateDay <= endYearTime).ToListAsync();
+            var dayYearList = await dbContext.CopyNew().Queryable<DayReport>().Where(x => x.DateDay >= startYearTime && x.DateDay <= endYearTime).ToListAsync();
 
             //项目数据 项目类型为其他非施工类业务 排除
             var noConstrutionProject = CommonData.NoConstrutionProjectType;
             //公司ID
             var comIds = commonDataList.Where(x => x.Type == 1).Select(x => x.ItemId).ToList();
-            var projectList = await dbContext.Queryable<Project>().Where(x => x.IsDelete == 1
+            var projectList = await dbContext.CopyNew().Queryable<Project>().Where(x => x.IsDelete == 1
           && x.TypeId != noConstrutionProject && comIds.Contains(x.CompanyId)).ToListAsync();
             //本年月报数据
             List<MonthReport> monthYearList = null;
             if (isDayCalc)
             {
-                monthYearList = await dbContext.Queryable<MonthReport>().Where(x => x.IsDelete == 1 && x.DateMonth >= monthStartTime && x.DateMonth <= monthEndTime).ToListAsync();
+                monthYearList = await dbContext.CopyNew().Queryable<MonthReport>().Where(x => x.IsDelete == 1 && x.DateMonth >= monthStartTime && x.DateMonth <= monthEndTime).ToListAsync();
             }
             #endregion
 
             #region 移动端使用的json数据
             if (isPhone)
             {
-                var result = await dbContext.Queryable<TempTable>().FirstAsync();
+                var result = await dbContext.CopyNew().Queryable<TempTable>().FirstAsync();
                 if (result != null && !string.IsNullOrWhiteSpace(result.Value))
                 {
                     return JsonConvert.DeserializeObject<ResponseAjaxResult<JjtSendMessageMonitoringDayReportResponseDto>>(result.Value);
@@ -3205,7 +3205,7 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
 
             #region 计算今日调差产值数 数据源
             //获取今日调差的数据
-            var dayDiffProductionValue = await dbContext.Queryable<DailyDeviation>().Where(x => x.IsDelete == 1).ToListAsync();
+            var dayDiffProductionValue = await dbContext.CopyNew().Queryable<DailyDeviation>().Where(x => x.IsDelete == 1).ToListAsync();
             #endregion
 
             #region 项目总体生产情况
@@ -3375,7 +3375,7 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
             daydiff.Add(2, 28);
             var ziranMonth = DateTime.Now.Month;
             var difDays = daydiff[ziranMonth] != 0 ? daydiff[ziranMonth] : 30;
-            var monthPlanRepData = await dbContext.Queryable<CompanyProductionValueInfo>().Where(x => x.IsDelete == 1).ToListAsync();
+            var monthPlanRepData = await dbContext.CopyNew().Queryable<CompanyProductionValueInfo>().Where(x => x.IsDelete == 1).ToListAsync();
             var projectId = projectList.WhereIF(!isCalcSub, x => x.IsSubContractProject != 2).Select(x => x.Id).ToList();
 
             for (int i = 1; i <= queryDay; i++)
@@ -3578,9 +3578,9 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
             //三种船舶类型
             var shipTypeIds = CommonData.ShipType.Split(",", StringSplitOptions.RemoveEmptyEntries).Select(x => x.ToGuid()).ToList();
             //查询所有自有的船舶信息
-            var ownerShipList = await dbContext.Queryable<OwnerShip>().Where(x => x.IsDelete == 1 && shipTypeIds.Contains(x.TypeId.Value)).ToListAsync();
+            var ownerShipList = await dbContext.CopyNew().Queryable<OwnerShip>().Where(x => x.IsDelete == 1 && shipTypeIds.Contains(x.TypeId.Value)).ToListAsync();
             //船舶日报(本年的所有船舶日报)
-            var shipDayList = await dbContext.Queryable<ShipDayReport>().Where(x => x.IsDelete == 1 && x.DateDay >= startYearTime && x.DateDay <= endYearTime).ToListAsync();
+            var shipDayList = await dbContext.CopyNew().Queryable<ShipDayReport>().Where(x => x.IsDelete == 1 && x.DateDay >= startYearTime && x.DateDay <= endYearTime).ToListAsync();
             #endregion
 
 
