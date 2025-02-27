@@ -2,6 +2,7 @@
 using GHMonitoringCenterApi.Application.Contracts.Dto.CompanyProductionValueInfos;
 using GHMonitoringCenterApi.Application.Contracts.Dto.Project;
 using GHMonitoringCenterApi.Domain.Enums;
+using GHMonitoringCenterApi.Domain.Models;
 using GHMonitoringCenterApi.Domain.Shared;
 using System;
 using System.Collections.Generic;
@@ -38,6 +39,15 @@ namespace GHMonitoringCenterApi.Application.Contracts.IService.CompanyProduction
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
         Task<ResponseAjaxResult<bool>> DelectCompanyProductionValueInfoAsync(DeleteCompanyProductionValueInfoRequestDto deleteCompanyProductionValueInfoRequestDto);
+
+        /// <summary>
+        /// 查询公司下拉框
+        /// </summary>
+        /// <param name="requsetDto"></param>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        Task<ResponseAjaxResult<List<ProductionMonitoringOperationDayReport>>> SearchCompanyAsync();
+
     }
 }
 

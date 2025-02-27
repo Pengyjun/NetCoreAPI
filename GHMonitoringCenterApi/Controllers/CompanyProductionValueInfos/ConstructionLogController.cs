@@ -3,6 +3,7 @@ using GHMonitoringCenterApi.Application.Contracts.Dto.CompanyProductionValueInfo
 using GHMonitoringCenterApi.Application.Contracts.Dto.ConstructionLog;
 using GHMonitoringCenterApi.Application.Contracts.IService.CompanyProductionValueInfos;
 using GHMonitoringCenterApi.Application.Contracts.IService.ConstructionLog;
+using GHMonitoringCenterApi.Domain.Models;
 using GHMonitoringCenterApi.Domain.Shared;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -60,6 +61,16 @@ namespace GHMonitoringCenterApi.Controllers.CompanyProductionValueInfos
         public async Task<ResponseAjaxResult<bool>> DelectCompanyProductionValueInfoAsync([FromBody] DeleteCompanyProductionValueInfoRequestDto requestDto)
         {
             return await companyProductionValueInfoService.DelectCompanyProductionValueInfoAsync(requestDto);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("SearchCompanyProductionValueInfo")]
+        public async Task<ResponseAjaxResult<List<ProductionMonitoringOperationDayReport>>> SearchCompanyAsync()
+        {
+            return await companyProductionValueInfoService.SearchCompanyAsync();
         }
     }
 }

@@ -63,6 +63,8 @@ namespace GHMonitoringCenterApi.Application.Service.CompanyProductionValueInfos
         /// </summary>
         private readonly GlobalObject _globalObject;
 
+        public IBaseRepository<ProductionMonitoringOperationDayReport> productionMonitoringOperationDayReport;
+
         /// <summary>
         /// 
         /// </summary>
@@ -74,7 +76,7 @@ namespace GHMonitoringCenterApi.Application.Service.CompanyProductionValueInfos
         /// <param name="logService"></param>
         /// <param name="entityChangeService"></param>
         /// <param name="globalObject"></param>
-        public CompanyProductionValueInfoService(IBaseRepository<Model.CompanyProductionValueInfo> baseCompanyProductionValueInfoRepository, IBaseRepository<Company> baseCompanyRepository, ISqlSugarClient dbContext, IMapper mapper, IBaseService baseService, ILogService logService, IEntityChangeService entityChangeService, GlobalObject globalObject, IBaseRepository<Institution> dbInstitution)
+        public CompanyProductionValueInfoService(IBaseRepository<Model.CompanyProductionValueInfo> baseCompanyProductionValueInfoRepository, IBaseRepository<Company> baseCompanyRepository, ISqlSugarClient dbContext, IMapper mapper, IBaseService baseService, ILogService logService, IEntityChangeService entityChangeService, GlobalObject globalObject, IBaseRepository<Institution> dbInstitution, IBaseRepository<ProductionMonitoringOperationDayReport> productionMonitoringOperationDayReport)
         {
             this.baseCompanyProductionValueInfoRepository = baseCompanyProductionValueInfoRepository;
             this.baseCompanyRepository = baseCompanyRepository;
@@ -85,6 +87,7 @@ namespace GHMonitoringCenterApi.Application.Service.CompanyProductionValueInfos
             this.entityChangeService = entityChangeService;
             _globalObject = globalObject;
             _dbInstitution = dbInstitution;
+            this.productionMonitoringOperationDayReport = productionMonitoringOperationDayReport;
         }
 
 
@@ -232,7 +235,7 @@ namespace GHMonitoringCenterApi.Application.Service.CompanyProductionValueInfos
             List.ForEach(item =>
             {
 
-                item.CompanyName = institutions.FirstOrDefault(t => t.PomId == item.CompanyId)?.Name;
+                item.CompanyName = institutions.FirstOrDefault(t => t.PomId == item.CompanyId)?.Shortname;
             });
             responseAjaxResult.Success();
             responseAjaxResult.Count = total;
@@ -247,6 +250,31 @@ namespace GHMonitoringCenterApi.Application.Service.CompanyProductionValueInfos
                 return new List<Institution>();
             }
             return await _dbInstitution.GetListAsync(t => institutionIds.Contains(t.PomId) && t.IsDelete == 1);
+        }
+
+        /// <summary>
+        /// 查询公司下拉框
+        /// </summary>
+        /// <param name="requsetDto"></param>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        public async Task<ResponseAjaxResult<List<ProductionMonitoringOperationDayReport>>> SearchCompanyAsync()
+        {
+
+            var responseAjaxResult = new ResponseAjaxResult<List<ProductionMonitoringOperationDayReport>>();
+            RefAsync<int> total = 0;
+            var List = await productionMonitoringOperationDayReport.AsQueryable()
+            .Where(x => x.IsDelete == 1 && x.Name != "广航局总体" && !SqlFunc.IsNullOrEmpty(x.Name))
+            .OrderByDescending(x => x.CreateTime)
+            .Select(x => new ProductionMonitoringOperationDayReport
+            {
+                ItemId = x.ItemId,
+                Name = x.Name
+
+            }).ToListAsync();
+            responseAjaxResult.Data = List;
+            responseAjaxResult.Success();
+            return responseAjaxResult;
         }
     }
 }
