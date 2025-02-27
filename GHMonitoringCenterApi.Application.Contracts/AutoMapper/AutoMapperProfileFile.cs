@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using GHMonitoringCenterApi.Application.Contracts.Dto.CompanyProductionValueInfos;
 using GHMonitoringCenterApi.Application.Contracts.Dto.File;
 using GHMonitoringCenterApi.Application.Contracts.Dto.Information;
 using GHMonitoringCenterApi.Application.Contracts.Dto.JjtSendMsg;
@@ -186,7 +187,7 @@ namespace GHMonitoringCenterApi.Application.Contracts.AutoMapper
                 .ForMember(x => x.CompanyId, y => y.MapFrom(u => u.CompanyId))
                 .ForMember(x => x.DepartmentId, y => y.MapFrom(u => u.DepartmentId)
                 );
-            
+
 
             mapperConfigurationExpression.CreateMap<SaveShipDayReportRequestDto, ShipDayReport>();
             mapperConfigurationExpression.CreateMap<ShipDayReport, ShipDayReportResponseDto>();
@@ -271,6 +272,8 @@ namespace GHMonitoringCenterApi.Application.Contracts.AutoMapper
             mapperConfigurationExpression.CreateMap<ProjectIntensity, ExcelProjectIntensity>();
             mapperConfigurationExpression.CreateMap<SaveShipPlanRequestDto, ShipYearPlanProduction>();
             mapperConfigurationExpression.CreateMap<SaveShipCompleteRequestDto, ShipCompleteProduction>();
+
+            mapperConfigurationExpression.CreateMap<AddOrUpdateCompanyProductionValueInfoRequestDto, CompanyProductionValueInfo>();
 
 
         }
