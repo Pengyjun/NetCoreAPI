@@ -3406,7 +3406,7 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
             #region 产值异常情况说明
              
             //控制是否显示的设置
-           var projectOpen=await dbContext.CopyNew().Queryable<ProjectOpen>().Where(x => x.IsDelete == 1&&x.DateDay==dayTime).ToListAsync();
+            var projectOpen=await dbContext.CopyNew().Queryable<ProjectOpen>().Where(x => x.IsDelete == 1&&x.DateDay==dayTime).ToListAsync();
             //检查当天查询异常的项目
             var expreProject=dayYearList.Where(x=>x.DateDay==dayTime&&x.IsLow==0).ToList();
             List<ImpProjectWarning> expProjects = new List<ImpProjectWarning>();
@@ -3429,7 +3429,9 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
                 {
                     IsShow = 1,
                     Name = proName?.Name,
-                    ProjectId = exprePro.ProjectId
+                    ProjectId = exprePro.ProjectId,
+                    DateDay=dayTime,
+                     
                 });
             }
             #region 保存数据库
