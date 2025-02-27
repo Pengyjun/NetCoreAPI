@@ -61,7 +61,6 @@ namespace GHMonitoringCenterApi.Application.Service
         #region 依赖注入
         public IDetectionService _detectionService { get; set; }
         public ILogger<BaseService> logger { get; set; }
-        public IPushPomService _pushPomService { get; set; }
         public IBaseRepository<DealingUnit> baseDealingUnitRepository { get; set; }
         public IBaseRepository<Currency> baseCurrencyRepository { get; set; }
         public IBaseRepository<ProjectDepartment> baseProjectDepartmentRepository { get; set; }
@@ -88,7 +87,7 @@ namespace GHMonitoringCenterApi.Application.Service
         private readonly GlobalObject _globalObject;
         private CurrentUser _currentUser { get { return _globalObject.CurrentUser; } }
         public BaseService(ILogger<BaseService> logger,
-            IBaseRepository<DealingUnit> baseDealingUnitRepository, IBaseRepository<Currency> baseCurrencyRepository, IBaseRepository<ProjectDepartment> baseProjectDepartmentRepository, IBaseRepository<AttributeLabelc> baseAttributeLabelcRepository, IBaseRepository<ConstructionQualification> baseConstructionQualificationRepository, IBaseRepository<IndustryClassification> baseIndustryClassificationRepository, IBaseRepository<WaterCarriage> baseWaterCarriageRepository, IBaseRepository<DictionaryTable> baseDictionaryTableRepository, IBaseRepository<ProjectScale> baseProjectScaleRepository, IBaseRepository<Province> baseProvinceRepository, IBaseRepository<ProjectType> baseProjectTypeRepository, IBaseRepository<Institution> baseInstitutionRepository, IBaseRepository<ProjectStatus> baseProjectStatusRepository, IBaseRepository<ProjectArea> baseProjectAreaRepository, IBaseRepository<ProjectLeader> baseProjectLeaderRepository, IBaseRepository<Model.User> baseUserRepository, IBaseRepository<OwnerShip> baseOwnerShipRepository, IBaseRepository<SubShip> baseSubShipRepository, IPushPomService pushPomService, IDetectionService detectionService, IMapper mapper, ISqlSugarClient dbContext, GlobalObject globalObject)
+            IBaseRepository<DealingUnit> baseDealingUnitRepository, IBaseRepository<Currency> baseCurrencyRepository, IBaseRepository<ProjectDepartment> baseProjectDepartmentRepository, IBaseRepository<AttributeLabelc> baseAttributeLabelcRepository, IBaseRepository<ConstructionQualification> baseConstructionQualificationRepository, IBaseRepository<IndustryClassification> baseIndustryClassificationRepository, IBaseRepository<WaterCarriage> baseWaterCarriageRepository, IBaseRepository<DictionaryTable> baseDictionaryTableRepository, IBaseRepository<ProjectScale> baseProjectScaleRepository, IBaseRepository<Province> baseProvinceRepository, IBaseRepository<ProjectType> baseProjectTypeRepository, IBaseRepository<Institution> baseInstitutionRepository, IBaseRepository<ProjectStatus> baseProjectStatusRepository, IBaseRepository<ProjectArea> baseProjectAreaRepository, IBaseRepository<ProjectLeader> baseProjectLeaderRepository, IBaseRepository<Model.User> baseUserRepository, IBaseRepository<OwnerShip> baseOwnerShipRepository, IBaseRepository<SubShip> baseSubShipRepository, IDetectionService detectionService, IMapper mapper, ISqlSugarClient dbContext, GlobalObject globalObject)
         {
             this.logger = logger;
 
@@ -110,7 +109,6 @@ namespace GHMonitoringCenterApi.Application.Service
             this.baseUserRepository = baseUserRepository;
             this.baseOwnerShipRepository = baseOwnerShipRepository;
             this.baseSubShipRepository = baseSubShipRepository;
-            this._pushPomService = pushPomService;
             this._detectionService = detectionService;
             this.mapper = mapper;
             this.dbContext = dbContext;
@@ -2680,7 +2678,7 @@ namespace GHMonitoringCenterApi.Application.Service
                     if (_detectionService.Device.Type == Device.Mobile)
                     {
                         //同步审核数据
-                        await _pushPomService.PushApproveDataAsync();
+                        await PushApproveDataAsync();
                     }
                     #endregion
                     responseAjaxResult.Success();
@@ -2721,7 +2719,7 @@ namespace GHMonitoringCenterApi.Application.Service
                     if (_detectionService.Device.Type == Device.Mobile)
                     {
                         //同步审核数据
-                        await _pushPomService.PushApproveDataAsync();
+                        await PushApproveDataAsync();
                     }
                     #endregion
                     responseAjaxResult.Data = true;
@@ -2736,6 +2734,39 @@ namespace GHMonitoringCenterApi.Application.Service
             }
 
             return responseAjaxResult;
+        }
+
+        /// <summary>
+        ///同步审核数据
+        /// </summary>
+        /// <returns></returns>
+        public async Task<ResponseAjaxResult<bool>> PushApproveDataAsync()
+        {
+            ResponseAjaxResult<bool> response = new ResponseAjaxResult<bool>();
+            try
+            {
+                var mySqlConnectionString = AppsettingsHelper.GetValue("ConnectionStrings:ConnectionString2");
+                SqlSugarClient db = new SqlSugarClient(new ConnectionConfig()
+                {
+                    ConnectionString = mySqlConnectionString,
+                    DbType = DbType.MySql,
+                    IsAutoCloseConnection = true//手动释放  是长连接 
+                });
+                //获取最新一条审核数据
+                var daypush = await db.Queryable<DayPushApprove>().Where(t => t.IsDelete == 1).OrderByDescending(t => t.CreateTime).FirstAsync();
+                if (daypush != null)
+                {
+                    await dbContext.Insertable(daypush).ExecuteCommandAsync();
+                }
+            }
+            catch (Exception ex)
+            {
+                response.Data = false;
+                response.FailResult(HttpStatusCode.InsertFail, ex.Message);
+                return response;
+            }
+
+            return response;
         }
         public async Task<ResponseAjaxResult<string>> SearchDayReportApproveAsync()
         {

@@ -189,8 +189,8 @@ app.Use(async (context, next) =>
     await next.Invoke(context);
 });
 //#if DEBUG
-app.UseSwagger();
-app.UseSwaggerUI();
+//app.UseSwagger();
+//app.UseSwaggerUI();
 //#endif
 app.UseDetection();
 app.UseCors("Cors");

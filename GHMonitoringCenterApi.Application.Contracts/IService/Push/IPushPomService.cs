@@ -68,11 +68,6 @@ namespace GHMonitoringCenterApi.Application.Contracts.IService.Push
         /// <returns></returns>
         Task<ResponseAjaxResult<bool>> PushJjtTextCardMsgDetailsAsync();
 
-        /// <summary>
-        ///同步审核数据
-        /// </summary>
-        /// <returns></returns>
-        Task<ResponseAjaxResult<bool>> PushApproveDataAsync();
     }
 
 }
