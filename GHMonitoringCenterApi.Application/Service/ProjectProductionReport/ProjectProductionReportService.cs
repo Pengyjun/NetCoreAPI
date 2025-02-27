@@ -1508,8 +1508,20 @@ namespace GHMonitoringCenterApi.Application.Service.ProjectProductionReport
             var startMonthTime = DateTime.Now.ToDateDay() > int.Parse(DateTime.Now.ToString("yyyyMM26")) ? DateTime.Now.ToString("yyyyMM26").ObjToInt() : DateTime.Now.AddMonths(-1).ToString("yyyyMM26").ObjToInt();
             var endMonthTime = DateTime.Now.ToDateDay() > int.Parse(DateTime.Now.ToString("yyyyMM26")) ? DateTime.Now.AddMonths(1).ToString("yyyyMM25").ObjToInt() : DateTime.Now.ToString("yyyyMM25").ObjToInt();
             //月报周期(用于过滤月报数据的条件)
-            var monthStartTime = DateTime.Now.ToDateDay() > int.Parse(DateTime.Now.ToString("yyyyMM26")) ? DateTime.Now.AddYears(1).ToString("yyyy01").ObjToInt() : DateTime.Now.ToString("yyyy01").ObjToInt();
-            var monthEndTime = DateTime.Now.ToDateDay() > int.Parse(DateTime.Now.ToString("yyyyMM26")) ? DateTime.Now.AddYears(1).ToString("yyyy12").ObjToInt() : DateTime.Now.ToString("yyyy12").ObjToInt();
+            var monthStartTime = DateTime.MinValue;
+            var monthEndTime = DateTime.MaxValue;
+            if (DateTime.Now.Month == 12 && DateTime.Now.Day >= 26)
+            {
+                monthStartTime = new DateTime(DateTime.Now.Year, 12, 26);
+                monthEndTime = new DateTime(DateTime.Now.AddDays(1).Year, 12, 25);
+            }
+            else
+            {
+                monthStartTime = new DateTime(DateTime.Now.AddYears(-1).Year, 12, 26);
+                monthEndTime = new DateTime(DateTime.Now.Year, 12, 25);
+            }
+
+
             //当前月份 当前处于某个月
             var currentMonth = DateTime.Now.ToDateDay() > int.Parse(DateTime.Now.ToString("yyyyMM26")) ? DateTime.Now.AddMonths(1).ToString("MM").ObjToInt() : DateTime.Now.ToString("yyyyMM").ObjToInt();
 
@@ -1542,10 +1554,9 @@ namespace GHMonitoringCenterApi.Application.Service.ProjectProductionReport
             var projectIds = data.Select(t => t.ProjectId).ToArray();
             //获取项目的日报产值与月报产值
             //上个月
-            var month = DateTime.Now.ToDateDay() > int.Parse(DateTime.Now.ToString("yyyyMM26")) ? DateTime.Now.ToString("MM").ObjToInt() : DateTime.Now.AddMonths(-1).ToString("yyyyMM").ObjToInt();
+            var month = DateTime.Now.ToDateDay() > int.Parse(DateTime.Now.ToString("yyyyMM26")) ? DateTime.Now.ToString("yyyyMM").ObjToInt() : DateTime.Now.AddMonths(-1).ToString("yyyyMM").ObjToInt();
             var dayList = await dbContext.Queryable<DayReport>().Where(t => t.IsDelete == 1 && projectIds.Contains(t.ProjectId) && t.DateDay <= endYearTime).Select(t => new { t.ProjectId, t.DayActualProductionAmount, t.DateDay }).ToListAsync();
-            var monthList = await dbContext.Queryable<MonthReport>().Where(t => t.IsDelete == 1 && projectIds.Contains(t.ProjectId) && t.DateMonth <= monthEndTime).Select(t => new { t.ProjectId, t.CompleteProductionAmount, t.DateMonth }).ToListAsync();
-
+            var monthList = await dbContext.Queryable<MonthReport>().Where(t => t.IsDelete == 1 && projectIds.Contains(t.ProjectId) && t.DateMonth <= monthEndTime.ToString("yyyyMM").ObjToInt()).Select(t => new { t.ProjectId, t.CompleteProductionAmount, t.DateMonth }).ToListAsync();
             var StatusList = await dbContext.Queryable<ProjectStatus>().Where(t => t.IsDelete == 1).ToListAsync();
             foreach (var item in data)
             {

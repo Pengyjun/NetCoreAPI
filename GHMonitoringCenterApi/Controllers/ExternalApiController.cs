@@ -194,6 +194,15 @@ namespace GHMonitoringCenterApi.Controllers
         [HttpGet("GetSearchDayReport")]
         public async Task<ResponseAjaxResult<List<DayReportInfo>>> GetSearchDayReportAsync([FromQuery] DayReportRequestDto requestDto)
             => await _externalApiService.GetSearchDayReportAsync(requestDto);
+
+        /// <summary>
+        /// 获取项目日报(包含施工日志数据)
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        [HttpGet("GetSearchDayReportConstruct")]
+        public async Task<ResponseAjaxResult<List<DayReportInfo>>> GetSearchDayReportConstructAsync([FromQuery] DayReportRequestDto requestDto)
+            => await _externalApiService.GetSearchDayReportConstructAsync(requestDto);
         /// <summary>
         /// 获取项目月报
         /// </summary>

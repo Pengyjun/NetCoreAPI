@@ -685,6 +685,7 @@ namespace GHMonitoringCenterApi.Application.Service
                 .Select(x => new DayReportInfo
                 {
                     Id = x.Id,
+                    DayId = x.Id,
                     CreateTime = x.CreateTime,
                     UpdateTime = x.UpdateTime,
                     ProjectId = x.ProjectId,
@@ -704,6 +705,33 @@ namespace GHMonitoringCenterApi.Application.Service
             #endregion
             responseAjaxResult.Count = data.Count;
             responseAjaxResult.SuccessResult(data, ResponseMessage.OPERATION_SUCCESS);
+            return responseAjaxResult;
+        }
+        /// <summary>
+        /// 获取项目日报(包含施工日志数据)
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        public async Task<ResponseAjaxResult<List<DayReportInfo>>> GetSearchDayReportConstructAsync(DayReportRequestDto requestDto)
+        {
+            var responseAjaxResult = new ResponseAjaxResult<List<DayReportInfo>>();
+            List<DayReportInfo> resList = new();
+            var searchRequestDto = new ProductionSafetyRequestDto
+            {
+                ProjectName = requestDto.ProjectName,
+                ProjectStatusId = requestDto.ProjectStatusId,
+                StartTime = requestDto.StartTime,
+                EndTime = requestDto.EndTime,
+                IsDuiWai = true,
+                PageIndex = requestDto.PageIndex,
+                PageSize = requestDto.PageSize
+            };
+
+            var responseData = await _projectProductionReportService.SearchDayReportAsync(searchRequestDto);
+            resList = responseData.Data.dayReportInfos;
+            responseAjaxResult.Data = resList;
+            responseAjaxResult.Count = responseData.Count;
+            responseAjaxResult.Success();
             return responseAjaxResult;
         }
         /// <summary>

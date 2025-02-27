@@ -120,6 +120,12 @@ namespace GHMonitoringCenterApi.Application.Contracts.IService
         /// <returns></returns>
         Task<ResponseAjaxResult<List<DayReportInfo>>> GetSearchDayReportAsync(DayReportRequestDto requestDto);
         /// <summary>
+        /// 获取项目日报(包含施工日志数据)
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        Task<ResponseAjaxResult<List<DayReportInfo>>> GetSearchDayReportConstructAsync(DayReportRequestDto requestDto);
+        /// <summary>
         /// 获取项目月报
         /// </summary>
         /// <param name="requestDto"></param>
