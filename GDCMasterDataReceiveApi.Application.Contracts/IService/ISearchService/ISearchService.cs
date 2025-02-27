@@ -25,6 +25,7 @@ using GDCMasterDataReceiveApi.Application.Contracts.Dto.Regional;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.RegionalCenter;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.RelationalContracts;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.ScientifiCNoProject;
+using GDCMasterDataReceiveApi.Application.Contracts.Dto.Ship;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.UnitMeasurement;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.ValueDomain;
 using GDCMasterDataReceiveApi.Domain.Models;
@@ -428,5 +429,16 @@ namespace GDCMasterDataReceiveApi.Application.Contracts.IService.ISearchService
 
 
         Task<ResponseAjaxResult<List<InstitutionResponseDto>>> SearchInstitutionTreeAsync();
+        /// <summary>
+        /// 搜索自有船舶列表
+        /// </summary>
+        /// <returns></returns>
+        Task<ResponseAjaxResult<List<OwnerShipReponseDto>>> SearchOwnerShipListAsync(BaseRequestDto baseRequestDto);
+        /// <summary>
+        /// 搜索分包船舶列表
+        /// </summary>
+        /// <returns></returns>
+        Task<ResponseAjaxResult<List<SubShipUserResponseDto>>> SearchSubShipListAsync(BaseRequestDto baseRequestDto);
+
     }
 }

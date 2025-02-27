@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using GDCInterfaceApi.Application.Contracts.Dto.IncrementalData;
 using GDCMasterDataReceiveApi.Application.Contracts.Dto.LogService;
 using GDCMasterDataReceiveApi.Application.Contracts.IService.ILogService;
 using GDCMasterDataReceiveApi.Domain.Models;
@@ -6,6 +7,7 @@ using GDCMasterDataReceiveApi.Domain.Shared;
 using Microsoft.Extensions.Logging;
 using SqlSugar;
 using SqlSugar.Extensions;
+using UtilsSharp;
 
 namespace GDCMasterDataReceiveApi.Application.Service.LogService
 {
@@ -43,18 +45,33 @@ namespace GDCMasterDataReceiveApi.Application.Service.LogService
 
 
             responseAjaxResult.Data = await _dbContext.Queryable<AuditLogs>()
-                .WhereIF(!string.IsNullOrWhiteSpace(auditLogRequestDto.StartTime), x =>SqlFunc.ToDate(x.RequestTime) >=auditLogRequestDto.StartTime.ObjToDate())
+                .WhereIF(!string.IsNullOrWhiteSpace(auditLogRequestDto.StartTime), x => SqlFunc.ToDate(x.RequestTime) >= auditLogRequestDto.StartTime.ObjToDate())
                 .WhereIF(!string.IsNullOrWhiteSpace(auditLogRequestDto.StartTime), x => SqlFunc.ToDate(x.RequestTime) <= auditLogRequestDto.EndTime.ObjToDate())
-                .WhereIF(!string.IsNullOrWhiteSpace(auditLogRequestDto.KeyWords),x=>x.Url.Contains(auditLogRequestDto.KeyWords))
+                .WhereIF(!string.IsNullOrWhiteSpace(auditLogRequestDto.KeyWords), x => x.Url.Contains(auditLogRequestDto.KeyWords)
+                ||x.AppKey.Contains(auditLogRequestDto.KeyWords))
                  .Select(x => new AuditLogResponseDto() {
                      Exceptions = x.Exceptions,
                      Ip = x.ClientIpAddress,
                      RequestParame = x.RequestParames,
                      RequestTime = x.RequestTime,
                      ResponseStatus = x.HttpStatusCode,
-                     Url = x.Url
+                     Url = x.Url,
+                     SystemName = x.ApplicationName,
+                     AppKey=x.AppKey
                  }).OrderByDescending(x => x.RequestTime)
                  .ToPageListAsync(auditLogRequestDto.PageIndex, auditLogRequestDto.PageSize,total);
+            if (responseAjaxResult.Data.Count > 0)
+            {
+                var a = responseAjaxResult.Data.Select(x => x.SystemName).ToList();
+                var url = AppsettingsHelper.GetValue("API:SystemInfo");
+                WebHelper webHelper = new WebHelper();
+                var systemList= await webHelper.DoGetAsync<ResponseAjaxResult<List<SystemResponseDto>>>(url);
+                var res= responseAjaxResult.Data.Where(x => x.SystemName != "GDCMasterDataReceiveApi" && x.AppKey != null).ToList();
+                foreach (var item in res)
+                {
+                    item.SystemName= systemList.Result.Data.Where(x=>x.AppKey==item.AppKey).FirstOrDefault()?.SystemName;
+                }
+            }
             responseAjaxResult.Count= total;
             responseAjaxResult.Success();
             return responseAjaxResult;
