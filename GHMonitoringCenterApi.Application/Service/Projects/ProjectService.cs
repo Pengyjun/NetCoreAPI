@@ -1551,6 +1551,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                         }
                     }
                     projectObject.IsChangeStatus = 1;
+                    projectObject.IsChangeStatusTime = DateTime.Now;
                 }
                 #endregion
 

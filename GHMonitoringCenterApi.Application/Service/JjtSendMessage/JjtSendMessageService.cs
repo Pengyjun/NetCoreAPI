@@ -16,6 +16,7 @@ using GHMonitoringCenterApi.Domain.Shared.Util;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using NPOI.HSSF.Record;
 using NPOI.SS.Formula.Functions;
 using SixLabors.ImageSharp.Processing;
 using SqlSugar;
@@ -3213,6 +3214,8 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
             var contractProjectStatusIds = CommonData.BuildIds.SplitStr(",").Select(x => x.ToGuid()).ToList();
             //在建项目状态ID
             var buildProjectId = CommonData.PConstruc.ToGuid();
+            //排除掉今天改的项目状态
+            var noDayProjectCount = projectList.Where(x => x.StatusId == buildProjectId && x.IsChangeStatus == 1 && x.IsChangeStatusTime >= startDayTime.ObjToDate() && x.IsChangeStatusTime <= endDayTime.ObjToDate()).Select(x => x.Id).ToList();
             //停缓建Ids
             var stopProjectIds = CommonData.PSuspend.Split(",").Select(x => x.ToGuid()).ToList();
             //未开工状态
@@ -3237,7 +3240,7 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
             ProjectBasePoduction projectBasePoduction = new ProjectBasePoduction()
             {
                 TotalOnContractProjectCount = htProjectCount,
-                TotalOnBuildProjectCount = zjProjectCount,
+                TotalOnBuildProjectCount = zjProjectCount- noDayProjectCount.Count,
                 TotalStopBuildProjectCount = thProjectCount,
                 TotalFacilityCount = deviceNumber,
                 TotalWorkerCount = personNumber,
@@ -3254,6 +3257,8 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
             List<CompanyProjectBasePoduction> companyBasePoductionValues = new List<CompanyProjectBasePoduction>();
             foreach (var production in productionBaseInfo)
             {
+               
+
                 var companyProjectId = projectList.Where(x => x.CompanyId == production.ItemId)
                     .WhereIF(!isCalcSub, x => x.IsSubContractProject != 2).Select(x => x.Id).ToList();
                 if (production.Collect == 1)
@@ -3272,10 +3277,17 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
                 }
                 else
                 {
+
+                    //排除掉今天改成在建项目状态的
+                    var noDayBuildProjectCount = projectList.Where(x => x.StatusId == buildProjectId && x.CompanyId == production.ItemId && x.IsChangeStatus == 1 && x.IsChangeStatusTime >= startDayTime.ObjToDate() && x.IsChangeStatusTime <= endDayTime.ObjToDate()).Select(x => x.Id).Count();
+                    //在建的数量 排除掉今天改成在建项目状态的
+                    var toDayProCount = (projectList.Count(x => x.CompanyId == production.ItemId && buildProjectId == x.StatusId.Value) - noDayBuildProjectCount);
+
+                    toDayProCount= (toDayProCount- noDayBuildProjectCount)<0 ? 0 : toDayProCount;
                     companyBasePoductionValue = new CompanyProjectBasePoduction();
                     companyBasePoductionValue.Name = production.Name;
                     companyBasePoductionValue.OnContractProjectCount = projectList.Count(x => x.CompanyId == production.ItemId && contractProjectStatusIds.Contains(x.StatusId.Value));
-                    companyBasePoductionValue.OnBuildProjectCount = projectList.Count(x => x.CompanyId == production.ItemId && buildProjectId == x.StatusId.Value);
+                    companyBasePoductionValue.OnBuildProjectCount = toDayProCount;
                     companyBasePoductionValue.StopBuildProjectCount = projectList.Count(x => x.CompanyId == production.ItemId && stopProjectIds.Contains(x.StatusId.Value));
                     companyBasePoductionValue.BuildCountPercent = companyBasePoductionValue.OnContractProjectCount != 0 ? Math.Round((companyBasePoductionValue.OnBuildProjectCount.ObjToDecimal() / companyBasePoductionValue.OnContractProjectCount) * 100, 2) : 0;
                     companyBasePoductionValue.FacilityCount = dayYearList.Where(x => x.DateDay == dayTime && companyProjectId.Contains(x.ProjectId)).Sum(x => x.ConstructionDeviceNum);
@@ -3330,7 +3342,7 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
                     //各个公司每天日报产值数
                     var dayProducitionValue = Math.Round((dayYearList.Where(x => companyProjectId.Contains(x.ProjectId) && x.DateDay == dayTime).Sum(x => x.DayActualProductionAmount) + diffValue), 2);
                     //各个公司本年累计数
-                    var totalProductionValue = isDayCalc ? Math.Round(monthYearList.Where(x => companyProjectId.Contains(x.ProjectId)).Sum(x => x.CompleteProductionAmount) + diffValue + companyMonthDayProduction / baseConst, 2) : companyMonthDayProduction;
+                    var totalProductionValue = isDayCalc ? Math.Round(monthYearList.Where(x => companyProjectId.Contains(x.ProjectId)).Sum(x => x.CompleteProductionAmount)+ companyMonthDayProduction / baseConst, 2) : companyMonthDayProduction;
                     if (companyProduction.ItemId == "3c5b138b-601a-442a-9519-2508ec1c1eb2".ToGuid())
                     {
                         totalProductionValue = totalProductionValue - 3000000;
@@ -3474,16 +3486,13 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
                 {
                     continue;
                 }
-                #region 计算调差产值
-                var diffValue = CalcDiffValue(dayTime, dayDiffProductionValue, item.ItemId.Value);
-                #endregion
                 companyProductionCompares.XAxisData.Add(item.Name);
                 //获取各个公司本月的完成和计划产值
                 var currentMonthCompanyProductionValue = companyMonthProductionValue.Where(x => x.Id == item.ItemId).FirstOrDefault();
                 if (currentMonthCompanyProductionValue != null)
                 {
                     //完成产值
-                    var completeValue = Math.Round((currentMonthCompanyProductionValue.CompleteProductionValue + diffValue) / baseConst, 2);
+                    var completeValue = Math.Round((currentMonthCompanyProductionValue.CompleteProductionValue) / baseConst, 2);
                     //计划产值
                     var planValue = Math.Round(currentMonthCompanyProductionValue.PlanProductionValue / baseConst, 2);
                     companyProductionCompares.CompleteProductuin.Add(completeValue);
@@ -3500,40 +3509,40 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
             #endregion
 
             #region 复工项目检测  临时使用
-            var shareProjectIds = ProjectShare.projectShare;
-            var shareDayList = dayYearList.Where(x => x.DateDay >= 20250129 && x.DateDay <= 20250228).ToList();
-            List<DayWorkProject> dayWorkProject = new List<DayWorkProject>();
-            List<DayWorkProject> noWorkProjects = new List<DayWorkProject>();
-            ProjectWokrItem projectWokrItems = new ProjectWokrItem()
-            {
-                DayWorkProject = dayWorkProject,
-                NoWorkProject = noWorkProjects,
-            };
-            foreach (var dayProject in shareProjectIds)
-            {
-                //今日开工项目
-                var workProject = shareDayList.Where(x => x.ProjectId == dayProject).OrderBy(x => x.DateDay).FirstOrDefault();
-                if (workProject != null && workProject.DateDay == DateTime.Now.AddDays(-1).ToDateDay() && workProject.DayActualProductionAmount > 0)
-                {
-                    //项目名称
-                    var parojectName = projectList.Where(x => x.Id == workProject.ProjectId).Select(x => x.ShortName).FirstOrDefault();
-                    dayWorkProject.Add(new DayWorkProject() { Name = parojectName, ProjectId = dayProject });
-                    continue;
-                }
+            //var shareProjectIds = ProjectShare.projectShare;
+            //var shareDayList = dayYearList.Where(x => x.DateDay >= 20250129 && x.DateDay <= 20250228).ToList();
+            //List<DayWorkProject> dayWorkProject = new List<DayWorkProject>();
+            //List<DayWorkProject> noWorkProjects = new List<DayWorkProject>();
+            //ProjectWokrItem projectWokrItems = new ProjectWokrItem()
+            //{
+            //    DayWorkProject = dayWorkProject,
+            //    NoWorkProject = noWorkProjects,
+            //};
+            //foreach (var dayProject in shareProjectIds)
+            //{
+            //    //今日开工项目
+            //    var workProject = shareDayList.Where(x => x.ProjectId == dayProject).OrderBy(x => x.DateDay).FirstOrDefault();
+            //    if (workProject != null && workProject.DateDay == DateTime.Now.AddDays(-1).ToDateDay() && workProject.DayActualProductionAmount > 0)
+            //    {
+            //        //项目名称
+            //        var parojectName = projectList.Where(x => x.Id == workProject.ProjectId).Select(x => x.ShortName).FirstOrDefault();
+            //        dayWorkProject.Add(new DayWorkProject() { Name = parojectName, ProjectId = dayProject });
+            //        continue;
+            //    }
 
-                //未开工的项目
-                var noWorkProject = shareDayList.Where(x => x.ProjectId == dayProject).FirstOrDefault();
-                if (noWorkProject == null)
-                {
-                    //项目名称
-                    var parojectName = projectList.Where(x => x.Id == dayProject).Select(x => x.ShortName).FirstOrDefault();
-                    noWorkProjects.Add(new DayWorkProject() { Name = parojectName, ProjectId = dayProject });
-                }
+            //    //未开工的项目
+            //    var noWorkProject = shareDayList.Where(x => x.ProjectId == dayProject).FirstOrDefault();
+            //    if (noWorkProject == null)
+            //    {
+            //        //项目名称
+            //        var parojectName = projectList.Where(x => x.Id == dayProject).Select(x => x.ShortName).FirstOrDefault();
+            //        noWorkProjects.Add(new DayWorkProject() { Name = parojectName, ProjectId = dayProject });
+            //    }
 
-            }
+            //}
 
             #region 拼接数据
-            jjtSendMessageMonitoringDayReportResponseDto.ProjectWokrItems = projectWokrItems;
+            //jjtSendMessageMonitoringDayReportResponseDto.ProjectWokrItems = projectWokrItems;
             #endregion
 
             #endregion
@@ -3840,9 +3849,9 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
                 //在建项目(所有)
                 var onBuildProjectCount = projectList.Where(x => x.StatusId == buildProjectId && x.CompanyId == report.ItemId).Count();
                 //排除掉今天改成在建项目状态的
-                var noDayBuildProjectCount = projectList.Where(x => x.StatusId == buildProjectId && x.CompanyId == report.ItemId && x.IsChangeStatus == 1 && x.UpdateTime >= startDayTime.ObjToDate() && x.UpdateTime <= endDayTime.ObjToDate()).Select(x => x.Id).Count();
+                var noDayBuildProjectCount = projectList.Where(x => x.StatusId == buildProjectId && x.CompanyId == report.ItemId && x.IsChangeStatus == 1 && x.UpdateTime >= startDayTime.ObjToDate() && x.UpdateTime <= endDayTime.ObjToDate()).Select(x => x.Id).ToList();
                 //排除掉今天修改的项目状态
-                onBuildProjectCount = onBuildProjectCount - noDayBuildProjectCount;
+                onBuildProjectCount = onBuildProjectCount - noDayBuildProjectCount.Count;
                 //项目Ids
                 var companyProjectId = projectList.Where(x => x.CompanyId == report.ItemId && x.StatusId == buildProjectId)
                    .WhereIF(!isCalcSub, x => x.IsSubContractProject != 2).Select(x => x.Id).ToList();
@@ -3865,7 +3874,7 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
                 else
                 {
                     //当日已填报的项目
-                    var dayReportCount = dayYearList.Where(x => x.DateDay == dayTime && companyProjectId.Contains(x.ProjectId)).Count();
+                    var dayReportCount = dayYearList.Where(x => x.DateDay == dayTime && companyProjectId.Contains(x.ProjectId)&&!noDayBuildProjectCount.Contains(x.ProjectId)).Count();
                     //当日未填报项目数量（在建数量-已填报的数量）
                     var dayUnReportCount = onBuildProjectCount - dayReportCount < 0 ? 0 : onBuildProjectCount - dayReportCount;
                     //填报率
@@ -3873,9 +3882,9 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
                     companyWriteReportInfos.Add(new CompanyWriteReportInfo()
                     {
                         Name = report.Name,
-                        OnBulidCount = onBuildProjectCount,
+                        OnBulidCount = onBuildProjectCount<0?0: onBuildProjectCount,
                         UnReportCount = dayUnReportCount,
-                        WritePercent = writePercent == 0 ? 100 : writePercent,
+                        WritePercent = writePercent == 0 ? 100 : writePercent>100?100: writePercent,
                         QualityLevel = 3,
                     });
                 }
