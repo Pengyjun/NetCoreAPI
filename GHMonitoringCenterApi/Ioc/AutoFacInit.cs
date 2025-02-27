@@ -1,6 +1,7 @@
 ﻿using Autofac;
 using GHMonitoringCenterApi.Application.Contracts.IService;
 using GHMonitoringCenterApi.Application.Contracts.IService.BizAuthorize;
+using GHMonitoringCenterApi.Application.Contracts.IService.CompanyProductionValueInfos;
 using GHMonitoringCenterApi.Application.Contracts.IService.ConstructionLog;
 using GHMonitoringCenterApi.Application.Contracts.IService.EquipmentManagement;
 using GHMonitoringCenterApi.Application.Contracts.IService.File;
@@ -28,6 +29,7 @@ using GHMonitoringCenterApi.Application.Contracts.IService.User;
 using GHMonitoringCenterApi.Application.Contracts.IService.Word;
 using GHMonitoringCenterApi.Application.Service;
 using GHMonitoringCenterApi.Application.Service.Authorize;
+using GHMonitoringCenterApi.Application.Service.CompanyProductionValueInfos;
 using GHMonitoringCenterApi.Application.Service.ConstructionLog;
 using GHMonitoringCenterApi.Application.Service.EquipmentManagement;
 using GHMonitoringCenterApi.Application.Service.File;
@@ -135,6 +137,8 @@ namespace GHMonitoringCenterApi.Ioc
             builder.RegisterType<ExternalApiService>().As<IExternalApiService>().InstancePerLifetimeScope();
             builder.RegisterType<MonthReportForProjectService>().As<IMonthReportForProjectService>().InstancePerLifetimeScope();
             builder.RegisterType<ShipPlanService>().As<IShipPlanService>().InstancePerLifetimeScope();
+
+            builder.RegisterType<CompanyProductionValueInfoService>().As<ICompanyProductionValueInfoService>().InstancePerLifetimeScope();
         }
     }
 }
