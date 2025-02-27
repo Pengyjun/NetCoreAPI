@@ -1270,12 +1270,25 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             }
 
             #endregion
+            if (addOrUpdateProjectRequestDto.RequestType && addOrUpdateProjectRequestDto.StatusId == CommonData.PConstruc.ToGuid())
+            {
+                projectObject.IsChangeStatus = 1;
+                projectObject.IsChangeStatusTime = DateTime.Now;
+            }
+            if (!addOrUpdateProjectRequestDto.RequestType && addOrUpdateProjectRequestDto.StatusId == CommonData.PConstruc.ToGuid())
+            {
+               
+            }
 
 
             if (addOrUpdateProjectRequestDto.RequestType)
             {
 
-
+                if (addOrUpdateProjectRequestDto.StatusId == CommonData.PConstruc.ToGuid())
+                {
+                    projectObject.IsChangeStatus = 1;
+                    projectObject.IsChangeStatusTime = DateTime.Now;
+                }
                 projectObject = mapper.Map<AddOrUpdateProjectRequestDto, Project>(addOrUpdateProjectRequestDto);
                 lock (projectObject)
                 {
@@ -1412,6 +1425,12 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             {
 
                 projectObject = await dbContext.Queryable<Project>().SingleAsync(x => x.IsDelete == 1 && x.Id == addOrUpdateProjectRequestDto.Id);
+
+                if (projectObject.StatusId != CommonData.PConstruc.ToGuid()&& addOrUpdateProjectRequestDto.StatusId == CommonData.PConstruc.ToGuid()) {
+                    projectObject.IsChangeStatus = 1;
+                    projectObject.IsChangeStatusTime = DateTime.Now;
+                }
+
                 #region 业务判断
                 if (projectObject == null)
                 {
@@ -1550,8 +1569,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                             }
                         }
                     }
-                    projectObject.IsChangeStatus = 1;
-                    projectObject.IsChangeStatusTime = DateTime.Now;
+                    
                 }
                 #endregion
 
@@ -1735,7 +1753,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 return responseAjaxResult;
             }
 
-
+            
 
 
         }
