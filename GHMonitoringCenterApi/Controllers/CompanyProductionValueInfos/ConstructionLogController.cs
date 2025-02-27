@@ -67,7 +67,7 @@ namespace GHMonitoringCenterApi.Controllers.CompanyProductionValueInfos
         /// 
         /// </summary>
         /// <returns></returns>
-        [HttpGet("SearchCompanyProductionValueInfo")]
+        [HttpGet("SearchCompany")]
         public async Task<ResponseAjaxResult<List<ProductionMonitoringOperationDayReport>>> SearchCompanyAsync()
         {
             return await companyProductionValueInfoService.SearchCompanyAsync();
