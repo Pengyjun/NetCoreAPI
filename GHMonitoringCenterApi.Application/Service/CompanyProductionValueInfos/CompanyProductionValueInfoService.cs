@@ -14,22 +14,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using GHMonitoringCenterApi.Domain.Models;
-using GHMonitoringCenterApi.Application.Contracts.Dto.Information;
-using GHMonitoringCenterApi.Application.Contracts.Dto.SearchUser;
-using Spire.Doc.Documents;
-using UtilsSharp;
-using GHMonitoringCenterApi.Application.Contracts.Dto.RepairParts;
-using GHMonitoringCenterApi.SqlSugarCore;
-using GHMonitoringCenterApi.Application.Contracts.Dto.Project;
-using GHMonitoringCenterApi.Application.Service.Push;
 using GHMonitoringCenterApi.Domain.Enums;
 using GHMonitoringCenterApi.Domain.Shared.Const;
 using GHMonitoringCenterApi.Domain.Shared.Util;
-using SqlSugar.Extensions;
-using Microsoft.AspNetCore.Mvc;
-using System.Collections;
-using Microsoft.AspNetCore.Authorization;
-using NPOI.SS.Formula.Functions;
+
 
 namespace GHMonitoringCenterApi.Application.Service.CompanyProductionValueInfos
 {
@@ -114,6 +102,32 @@ namespace GHMonitoringCenterApi.Application.Service.CompanyProductionValueInfos
             ResponseAjaxResult<bool> responseAjaxResult = new ResponseAjaxResult<bool>();
             Guid id = GuidUtil.Next();
             var model = new Model.CompanyProductionValueInfo();
+
+
+            companyProductionValueInfoRequestDto.OnePlanProductionValue = Setnumericalconversiontwo(companyProductionValueInfoRequestDto.OnePlanProductionValue);
+
+            companyProductionValueInfoRequestDto.EightPlaProductionValue = Setnumericalconversiontwo(companyProductionValueInfoRequestDto.EightPlaProductionValue);
+
+            companyProductionValueInfoRequestDto.ElevenPlaProductionValue = Setnumericalconversiontwo(companyProductionValueInfoRequestDto.ElevenPlaProductionValue);
+
+            companyProductionValueInfoRequestDto.FourPlaProductionValue = Setnumericalconversiontwo(companyProductionValueInfoRequestDto.FourPlaProductionValue);
+
+            companyProductionValueInfoRequestDto.FivePlaProductionValue = Setnumericalconversiontwo(companyProductionValueInfoRequestDto.FivePlaProductionValue);
+
+            companyProductionValueInfoRequestDto.NinePlaProductionValue = Setnumericalconversiontwo(companyProductionValueInfoRequestDto.NinePlaProductionValue);
+
+            companyProductionValueInfoRequestDto.SevenPlaProductionValue = Setnumericalconversiontwo(companyProductionValueInfoRequestDto.SevenPlaProductionValue);
+
+            companyProductionValueInfoRequestDto.SixPlaProductionValue = Setnumericalconversiontwo(companyProductionValueInfoRequestDto.SixPlaProductionValue);
+
+            companyProductionValueInfoRequestDto.TenPlaProductionValue = Setnumericalconversiontwo(companyProductionValueInfoRequestDto.TenPlaProductionValue);
+
+            companyProductionValueInfoRequestDto.ThreePlaProductionValue = Setnumericalconversiontwo(companyProductionValueInfoRequestDto.ThreePlaProductionValue);
+
+            companyProductionValueInfoRequestDto.TwelvePlaProductionValue = Setnumericalconversiontwo(companyProductionValueInfoRequestDto.TwelvePlaProductionValue);
+
+            companyProductionValueInfoRequestDto.TwoPlanProductionValue = Setnumericalconversiontwo(companyProductionValueInfoRequestDto.TwoPlanProductionValue);
+
             if (companyProductionValueInfoRequestDto.RequestType == true)
             {
                 model = mapper.Map<AddOrUpdateCompanyProductionValueInfoRequestDto, Model.CompanyProductionValueInfo>(companyProductionValueInfoRequestDto);
@@ -312,6 +326,11 @@ namespace GHMonitoringCenterApi.Application.Service.CompanyProductionValueInfos
                     item1.Total = Setnumericalconversion(item1.Total);
                 }
 
+                foreach (var itema in item.adjustmentValues)
+                {
+                    itema.AdjustmentValue = Setnumericalconversion(itema.AdjustmentValue);
+                }
+
                 months.RemoveAll(x => item.MonthlyDatas.Select(it => it.Month).Contains(x));
                 item.MonthlyDatas = item.MonthlyDatas.Union(months.Select(it => new MonthlyDataProductionValue() { Month = it, Total = 0 })).OrderBy(x => x.Month).ToList();
             }
@@ -334,6 +353,20 @@ namespace GHMonitoringCenterApi.Application.Service.CompanyProductionValueInfos
                 var val = Math.Floor((value.GetValueOrDefault() / 10000) * 100) / 100;
 
                 return Convert.ToDecimal(val.ToString("0"));
+            }
+        }
+
+
+        public decimal Setnumericalconversiontwo(decimal? value)
+        {
+            if (value.GetValueOrDefault() == 0)
+            {
+                return 0;
+            }
+            else
+            {
+                var val = value.GetValueOrDefault() * 10000;
+                return val;
             }
         }
 
@@ -385,9 +418,11 @@ namespace GHMonitoringCenterApi.Application.Service.CompanyProductionValueInfos
         {
             ResponseAjaxResult<bool> responseAjaxResult = new ResponseAjaxResult<bool>();
             Guid id = GuidUtil.Next();
+         
             var model = await baseCompanyAdjustmentValueRepository.AsQueryable().Where(x => x.PlanId == requestDto.PlanId && x.Month == requestDto.Month).FirstAsync();
             if (model == null)
             {
+                requestDto.Adjustmentvalue = Setnumericalconversiontwo(requestDto.Adjustmentvalue);
                 var mappermodel = mapper.Map<AddORUpdateCompanyAdjustmentValueRequestDto, CompanyAdjustmentValue>(requestDto);
                 mappermodel.Id = id;
                 mappermodel.IsDelete = 1;
@@ -408,7 +443,7 @@ namespace GHMonitoringCenterApi.Application.Service.CompanyProductionValueInfos
             {
                 if (model != null)
                 {
-                    model.AdjustmentValue = requestDto.Adjustmentvalue;
+                    model.AdjustmentValue = Setnumericalconversiontwo(requestDto.Adjustmentvalue);
                     model.UpdateId = _currentUser.Id;
                     model.UpdateTime = DateTime.Now;
                     var save = await dbContext.Updateable<Model.CompanyAdjustmentValue>(model).UpdateColumns(it => new

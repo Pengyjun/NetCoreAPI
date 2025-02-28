@@ -9879,7 +9879,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             var reportedMonths = new List<string>();
             var dateMonths = await _dbMonthReport.AsQueryable().Where(t => t.IsDelete == 1 && t.ProjectId == model.ProjectId && !t.StatusText.Contains("驳回")).OrderByDescending(t => t.DateMonth).Select(t => t.DateMonth).ToListAsync();
             //查询出当前登录人 允许修改的填报月份
-            var btnMonth = await _dbContext.Queryable<BtnEditMonthlyReportPermission>().Where(t => t.IsDelete == 1 && t.UserId == _currentUser.Id).Select(t => t.MonthTime).FirstAsync();
+            var btnMonth = await _dbContext.Queryable<BtnEditMonthlyReportPermission>().Where(t => t.IsDelete == 1 && t.UserId == _currentUser.Id && t.MonthReportEnable).Select(t => t.MonthTime).FirstAsync();
             if (btnMonth != null)
             {
                 var btnArray = btnMonth.Split(',').Select(t => Convert.ToInt32(t)).ToList();

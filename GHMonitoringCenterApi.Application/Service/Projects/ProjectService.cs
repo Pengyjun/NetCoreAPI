@@ -3927,6 +3927,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 {
                     // 计算到过期的时间间隔
                     var delayTime = user.MonthEffectiveTime - DateTime.Now;
+                    Console.WriteLine($"服务器时间：{DateTime.Now}");
                     // 如果当前时间已经超过过期时间，则立即更新状态为 false
                     if (delayTime.TotalMilliseconds < 0)
                     {
