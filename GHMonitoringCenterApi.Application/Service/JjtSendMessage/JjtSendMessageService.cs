@@ -3849,7 +3849,7 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
                 //在建项目(所有)
                 var onBuildProjectCount = projectList.Where(x => x.StatusId == buildProjectId && x.CompanyId == report.ItemId).Count();
                 //排除掉今天改成在建项目状态的
-                var noDayBuildProjectCount = projectList.Where(x => x.StatusId == buildProjectId && x.CompanyId == report.ItemId && x.IsChangeStatus == 1 && x.UpdateTime >= startDayTime.ObjToDate() && x.UpdateTime <= endDayTime.ObjToDate()).Select(x => x.Id).ToList();
+                var noDayBuildProjectCount = projectList.Where(x => x.StatusId == buildProjectId && x.CompanyId == report.ItemId && x.IsChangeStatus == 1 && x.IsChangeStatusTime >= startDayTime.ObjToDate() && x.IsChangeStatusTime <= endDayTime.ObjToDate()).Select(x => x.Id).ToList();
                 //排除掉今天修改的项目状态
                 onBuildProjectCount = onBuildProjectCount - noDayBuildProjectCount.Count;
                 //项目Ids
