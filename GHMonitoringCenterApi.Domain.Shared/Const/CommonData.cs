@@ -55,10 +55,10 @@ namespace GHMonitoringCenterApi.Domain.Shared.Const
             "cd3c6e83-1b7c-40c2-a415-5a44f13584cc,19050a4b-fe95-47cf-aafe-531d5894c88b,2c800da1-184f-408a-b5a4-fd915e8d6b6a,169c8afe-be81-4cbc-bfe7-61a40da0597b,fa66f679-c749-4f25-8f1a-5e1728a219ad,75089b9a-b18b-442c-bfc8-fde4024d737f";
 
         /// <summary>
-        /// 必填项目日报的状态 = 在建+ 在建短暂性停工 +  在建间歇性停工+中标已签
+        /// 必填项目日报的状态 = 在建+ 在建短暂性停工 +  在建间歇性停工
         /// </summary>
         public const string DayReportIds =
-            "cd3c6e83-1b7c-40c2-a415-5a44f13584cc,19050a4b-fe95-47cf-aafe-531d5894c88b,2c800da1-184f-408a-b5a4-fd915e8d6b6a,75089b9a-b18b-442c-bfc8-fde4024d737f";
+            "cd3c6e83-1b7c-40c2-a415-5a44f13584cc,19050a4b-fe95-47cf-aafe-531d5894c88b,2c800da1-184f-408a-b5a4-fd915e8d6b6a";
         /// <summary>
         /// 合同项目 排除长期停工
         /// </summary>
