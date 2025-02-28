@@ -33,6 +33,7 @@ using NPOI.SS.Formula.Functions;
 using NPOI.HPSF;
 using System;
 using System.Net.Http;
+using System.Security.Cryptography;
 
 namespace GHMonitoringCenterApi.Application.Service.File
 {
@@ -292,7 +293,16 @@ namespace GHMonitoringCenterApi.Application.Service.File
                 responseAjaxResult.Data = false;
                 return responseAjaxResult;
             }
-           
+
+            //判断Redis是否已经存在发消息的记录
+            var isExist= await RedisUtil.Instance.ExistsAsync(DateTime.Now.AddDays(-1).ToDateDay() + "two");
+            if (isExist)
+            {
+                //已存在 说明已发送 不再重复发送
+                responseAjaxResult.Data = false;
+                return responseAjaxResult;
+            }
+
             #endregion
 
             #region 使用交建通代理方式的情况
