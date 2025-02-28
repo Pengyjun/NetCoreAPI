@@ -1,4 +1,5 @@
-﻿using SqlSugar;
+﻿using GHMonitoringCenterApi.Domain.Models;
+using SqlSugar;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -128,8 +129,25 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.CompanyProductionValue
         public int? Sort { get; set; }
 
         /// <summary>
+        /// 月
+        /// </summary>
+        public List<MonthlyDataProductionValue> MonthlyDatas { get; set; }
+
+        /// <summary>
+        /// 调整值列表
+        /// </summary>
+        public List<CompanyAdjustmentValue> adjustmentValues { get; set; }
+
+        /// <summary>
         /// 每年指标
         /// </summary>
         //public decimal? YearIndex { get; set; }
+    }
+
+
+    public class MonthlyDataProductionValue
+    {
+        public int Month { get; set; }
+        public decimal Total { get; set; }
     }
 }

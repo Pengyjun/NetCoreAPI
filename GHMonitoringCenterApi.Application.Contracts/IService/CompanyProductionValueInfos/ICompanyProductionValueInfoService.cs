@@ -48,6 +48,13 @@ namespace GHMonitoringCenterApi.Application.Contracts.IService.CompanyProduction
         /// <exception cref="NotImplementedException"></exception>
         Task<ResponseAjaxResult<List<ProductionMonitoringOperationDayReport>>> SearchCompanyAsync();
 
+        /// <summary>
+        /// 添加或修改公司调整值
+        /// </summary>
+        /// <param name="addORUpdateCompanyAdjustmentValueRequestDto"></param>
+        /// <returns></returns>
+        Task<ResponseAjaxResult<bool>> AddORUpdateCompanyAdjustmentValueAsync(AddORUpdateCompanyAdjustmentValueRequestDto  addORUpdateCompanyAdjustmentValueRequestDto);
+
     }
 }
 

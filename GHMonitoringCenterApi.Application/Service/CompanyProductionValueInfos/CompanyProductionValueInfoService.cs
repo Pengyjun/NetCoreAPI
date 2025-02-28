@@ -30,6 +30,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Collections;
 using Microsoft.AspNetCore.Authorization;
 using NPOI.SS.Formula.Functions;
+using Microsoft.AspNetCore.Mvc.Formatters.Internal;
 
 namespace GHMonitoringCenterApi.Application.Service.CompanyProductionValueInfos
 {
@@ -42,6 +43,12 @@ namespace GHMonitoringCenterApi.Application.Service.CompanyProductionValueInfos
         #region 依赖注入
         public IBaseRepository<Model.CompanyProductionValueInfo> baseCompanyProductionValueInfoRepository { get; set; }
         public IBaseRepository<Company> baseCompanyRepository { get; set; }
+
+        public IBaseRepository<Project> baseProjectRepository { get; set; }
+
+        public IBaseRepository<MonthReport> baseMonthReportRepository { get; set; }
+
+        public IBaseRepository<CompanyAdjustmentValue> baseCompanyAdjustmentValueRepository { get; set; }
 
         public ISqlSugarClient dbContext { get; set; }
         public IMapper mapper { get; set; }
@@ -77,7 +84,7 @@ namespace GHMonitoringCenterApi.Application.Service.CompanyProductionValueInfos
         /// <param name="logService"></param>
         /// <param name="entityChangeService"></param>
         /// <param name="globalObject"></param>
-        public CompanyProductionValueInfoService(IBaseRepository<Model.CompanyProductionValueInfo> baseCompanyProductionValueInfoRepository, IBaseRepository<Company> baseCompanyRepository, ISqlSugarClient dbContext, IMapper mapper, IBaseService baseService, ILogService logService, IEntityChangeService entityChangeService, GlobalObject globalObject, IBaseRepository<Institution> dbInstitution, IBaseRepository<ProductionMonitoringOperationDayReport> productionMonitoringOperationDayReport)
+        public CompanyProductionValueInfoService(IBaseRepository<Model.CompanyProductionValueInfo> baseCompanyProductionValueInfoRepository, IBaseRepository<Company> baseCompanyRepository, ISqlSugarClient dbContext, IMapper mapper, IBaseService baseService, ILogService logService, IEntityChangeService entityChangeService, GlobalObject globalObject, IBaseRepository<Institution> dbInstitution, IBaseRepository<ProductionMonitoringOperationDayReport> productionMonitoringOperationDayReport, IBaseRepository<Project> baseProjectRepository, IBaseRepository<MonthReport> baseMonthReportRepository, IBaseRepository<CompanyAdjustmentValue> baseCompanyAdjustmentValueRepository)
         {
             this.baseCompanyProductionValueInfoRepository = baseCompanyProductionValueInfoRepository;
             this.baseCompanyRepository = baseCompanyRepository;
@@ -89,6 +96,9 @@ namespace GHMonitoringCenterApi.Application.Service.CompanyProductionValueInfos
             _globalObject = globalObject;
             _dbInstitution = dbInstitution;
             this.productionMonitoringOperationDayReport = productionMonitoringOperationDayReport;
+            this.baseProjectRepository = baseProjectRepository;
+            this.baseMonthReportRepository = baseMonthReportRepository;
+            this.baseCompanyAdjustmentValueRepository = baseCompanyAdjustmentValueRepository;
         }
 
 
@@ -206,54 +216,118 @@ namespace GHMonitoringCenterApi.Application.Service.CompanyProductionValueInfos
         {
             var responseAjaxResult = new ResponseAjaxResult<List<CompanyProductionValueInfoResponseDto>>();
             RefAsync<int> total = 0;
-            var List = await baseCompanyProductionValueInfoRepository.AsQueryable()
+            var List = await baseCompanyProductionValueInfoRepository.AsQueryable().InnerJoin<ProductionMonitoringOperationDayReport>((x, c) => x.CompanyId == c.ItemId && c.IsDelete == 1 && c.Type == 1)
             .Where(x => x.IsDelete == 1)
+            .Where((x, c) => c.Name != "广航局总体" && !SqlFunc.IsNullOrEmpty(c.Name))
             .WhereIF(requsetDto.Dateday.HasValue, x => x.DateDay == requsetDto.Dateday)
             .OrderBy(x => x.Sort)
-            .Select(x => new CompanyProductionValueInfoResponseDto
+            .Select((x, c) => new CompanyProductionValueInfoResponseDto
             {
                 Id = x.Id,
                 CompanyId = x.CompanyId,
+                CompanyName = c.Name,
                 DateDay = x.DateDay,
-                EightPlaProductionValue = x.EightPlaProductionValue,
-                ElevenPlaProductionValue = x.ElevenPlaProductionValue,
+                OnePlanProductionValue = x.OnePlanProductionValue,
+                TwoPlanProductionValue = x.TwoPlanProductionValue,
+                ThreePlaProductionValue = x.ThreePlaProductionValue,
                 FourPlaProductionValue = x.FourPlaProductionValue,
                 FivePlaProductionValue = x.FivePlaProductionValue,
-                NinePlaProductionValue = x.NinePlaProductionValue,
-                OnePlanProductionValue = x.OnePlanProductionValue,
-                SevenPlaProductionValue = x.SevenPlaProductionValue,
                 SixPlaProductionValue = x.SixPlaProductionValue,
-                Sort = x.Sort,
+                SevenPlaProductionValue = x.SevenPlaProductionValue,
+                EightPlaProductionValue = x.EightPlaProductionValue,
+                NinePlaProductionValue = x.NinePlaProductionValue,
                 TenPlaProductionValue = x.TenPlaProductionValue,
-                ThreePlaProductionValue = x.ThreePlaProductionValue,
+                ElevenPlaProductionValue = x.ElevenPlaProductionValue,
                 TwelvePlaProductionValue = x.TwelvePlaProductionValue,
-                TwoPlanProductionValue = x.TwoPlanProductionValue
+                Sort = x.Sort
             }).ToPageListAsync(requsetDto.PageIndex, requsetDto.PageSize, total);
 
             var institutionIds = new List<Guid?>();
             institutionIds.AddRange(List.Select(t => t.CompanyId).Distinct().ToArray());
-            var institutions = await GetCompanyList();
 
-            List.ForEach(item =>
+            var list = await baseProjectRepository.AsQueryable().Where(x => institutionIds.Contains(x.CompanyId) && x.IsDelete == 1).Select(it => new Project()
             {
-                item.OnePlanProductionValue = Math.Round(item.OnePlanProductionValue.GetValueOrDefault(), 2);
-                item.EightPlaProductionValue = Math.Round(item.EightPlaProductionValue.GetValueOrDefault(), 2);
-                item.ElevenPlaProductionValue = Math.Round(item.ElevenPlaProductionValue.GetValueOrDefault(), 2);
-                item.FourPlaProductionValue = Math.Round(item.FourPlaProductionValue.GetValueOrDefault(), 2);
-                item.FivePlaProductionValue = Math.Round(item.FivePlaProductionValue.GetValueOrDefault(), 2);
-                item.NinePlaProductionValue = Math.Round(item.NinePlaProductionValue.GetValueOrDefault(), 2);
-                item.SevenPlaProductionValue = Math.Round(item.SevenPlaProductionValue.GetValueOrDefault(), 2);
-                item.SixPlaProductionValue = Math.Round(item.SixPlaProductionValue.GetValueOrDefault(), 2);
-                item.TenPlaProductionValue = Math.Round(item.TenPlaProductionValue.GetValueOrDefault(), 2);
-                item.ThreePlaProductionValue = Math.Round(item.ThreePlaProductionValue.GetValueOrDefault(), 2);
-                item.TwelvePlaProductionValue = Math.Round(item.TwelvePlaProductionValue.GetValueOrDefault(), 2);
-                item.TwoPlanProductionValue = Math.Round(item.TwoPlanProductionValue.GetValueOrDefault(), 2);
-                item.CompanyName = institutions.FirstOrDefault(t => t.ItemId == item.CompanyId)?.Name;
-            });
+                CompanyId = it.CompanyId,
+                Name = it.Name,
+                Id = it.Id
+            }).ToListAsync();
+
+            var planIds = new List<Guid?>();
+            planIds.AddRange(List.Select(t => t.Id).Distinct().ToArray());
+            var adjustmentValues = await baseCompanyAdjustmentValueRepository.AsQueryable().Where(x => planIds.Contains(x.PlanId)).Select(it => new CompanyAdjustmentValue()
+            {
+                PlanId = it.PlanId,
+                Id = it.Id,
+                AdjustmentValue = it.AdjustmentValue,
+                Month = it.Month
+            }).ToListAsync();
+
+            foreach (var item in List)
+            {
+                item.adjustmentValues = adjustmentValues.Where(x => x.PlanId == item.Id).OrderBy(x=>x.Month).ToList();
+
+                item.OnePlanProductionValue = Setnumericalconversion(item.OnePlanProductionValue);
+
+                item.EightPlaProductionValue = Setnumericalconversion(item.EightPlaProductionValue);
+
+                item.ElevenPlaProductionValue = Setnumericalconversion(item.ElevenPlaProductionValue);
+
+                item.FourPlaProductionValue = Setnumericalconversion(item.FourPlaProductionValue);
+
+                item.FivePlaProductionValue = Setnumericalconversion(item.FivePlaProductionValue);
+
+                item.NinePlaProductionValue = Setnumericalconversion(item.NinePlaProductionValue);
+
+                item.SevenPlaProductionValue = Setnumericalconversion(item.SevenPlaProductionValue);
+
+                item.SixPlaProductionValue = Setnumericalconversion(item.SixPlaProductionValue);
+
+                item.TenPlaProductionValue = Setnumericalconversion(item.TenPlaProductionValue);
+
+                item.ThreePlaProductionValue = Setnumericalconversion(item.ThreePlaProductionValue);
+
+                item.TwelvePlaProductionValue = Setnumericalconversion(item.TwelvePlaProductionValue);
+
+                item.TwoPlanProductionValue = Setnumericalconversion(item.TwoPlanProductionValue);
+
+                var clist = list.Where(x => x.CompanyId == item.CompanyId).ToList();
+
+                int year = item.DateDay.GetValueOrDefault();
+                var targetYear = year;
+                var months = new List<int>();
+
+                months = Enumerable.Range(1, 12)
+               .Select(m => targetYear * 100 + m)
+               .ToList();
+
+
+                item.MonthlyDatas = await baseMonthReportRepository.AsQueryable().Where(x => clist.Select(it => it.Id).ToList().Contains(x.ProjectId) && months.Contains(x.DateMonth) && x.IsDelete == 1 && x.Status != MonthReportStatus.ApproveReject).GroupBy(x => new { x.DateMonth })
+                    .Select(x => new MonthlyDataProductionValue
+                    {
+                        Month = x.DateMonth,
+                        Total = SqlFunc.AggregateSum(x.RollingPlanForNextMonth)
+                    }).ToListAsync();
+                months.RemoveAll(x => item.MonthlyDatas.Select(it => it.Month).Contains(x));
+                item.MonthlyDatas = item.MonthlyDatas.Union(months.Select(it => new MonthlyDataProductionValue() { Month = it, Total = 0 })).OrderBy(x => x.Month).ToList();
+            }
+
             responseAjaxResult.Success();
             responseAjaxResult.Count = total;
             responseAjaxResult.Data = List;
             return responseAjaxResult;
+        }
+
+
+        public decimal? Setnumericalconversion(decimal? value)
+        {
+            if (value.GetValueOrDefault() == 0)
+            {
+                return 0;
+            }
+            else
+            {
+                return Math.Floor((value.GetValueOrDefault() / 10000) * 100) / 100;
+            }
         }
 
         private async Task<List<Institution>> GetInstitutionsAsync(Guid?[] institutionIds)
@@ -293,6 +367,61 @@ namespace GHMonitoringCenterApi.Application.Service.CompanyProductionValueInfos
                             Name = x.Name
 
                         }).ToListAsync();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        public async Task<ResponseAjaxResult<bool>> AddORUpdateCompanyAdjustmentValueAsync(AddORUpdateCompanyAdjustmentValueRequestDto requestDto)
+        {
+            ResponseAjaxResult<bool> responseAjaxResult = new ResponseAjaxResult<bool>();
+            Guid id = GuidUtil.Next();
+            var model = await baseCompanyAdjustmentValueRepository.AsQueryable().Where(x => x.PlanId == requestDto.PlanId && x.Month == requestDto.Month).FirstAsync();
+            if (model == null)
+            {
+                var mappermodel = mapper.Map<AddORUpdateCompanyAdjustmentValueRequestDto, CompanyAdjustmentValue>(requestDto);
+                mappermodel.Id = id;
+                mappermodel.IsDelete = 1;
+                mappermodel.CreateId = _currentUser.Id;
+                mappermodel.CreateTime = DateTime.Now;
+                var result = await dbContext.Insertable<Model.CompanyAdjustmentValue>(mappermodel).ExecuteCommandAsync();
+                if (result > 0)
+                {
+                    responseAjaxResult.Data = true;
+                    responseAjaxResult.Success();
+                }
+                else
+                {
+                    responseAjaxResult.Fail(ResponseMessage.OPERATION_INSERT_FAIL, Domain.Shared.Enums.HttpStatusCode.InsertFail);
+                }
+            }
+            else
+            {
+                if (model != null)
+                {
+                    model.AdjustmentValue = requestDto.Adjustmentvalue;
+                    model.UpdateId = _currentUser.Id;
+                    model.UpdateTime = DateTime.Now;
+                    var save = await dbContext.Updateable<Model.CompanyAdjustmentValue>(model).UpdateColumns(it => new
+                    {
+                        it.AdjustmentValue,
+                        it.UpdateId,
+                        it.UpdateTime
+                    }).ExecuteCommandAsync();
+                    if (save > 0)
+                    {
+                        responseAjaxResult.Data = true;
+                        responseAjaxResult.Success();
+                    }
+                    else
+                    {
+                        responseAjaxResult.Fail(ResponseMessage.OPERATION_UPDATE_FAIL, Domain.Shared.Enums.HttpStatusCode.UpdateFail);
+                    }
+                }
+            }
+            return responseAjaxResult;
         }
     }
 }

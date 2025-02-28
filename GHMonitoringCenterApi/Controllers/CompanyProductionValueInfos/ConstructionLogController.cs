@@ -23,6 +23,7 @@ namespace GHMonitoringCenterApi.Controllers.CompanyProductionValueInfos
     {
         #region 依赖注入
         public ICompanyProductionValueInfoService companyProductionValueInfoService { get; set; }
+
         /// <summary>
         /// 
         /// </summary>
@@ -64,13 +65,25 @@ namespace GHMonitoringCenterApi.Controllers.CompanyProductionValueInfos
         }
 
         /// <summary>
-        /// 
+        /// 查询公司下拉框
         /// </summary>
         /// <returns></returns>
         [HttpGet("SearchCompany")]
         public async Task<ResponseAjaxResult<List<ProductionMonitoringOperationDayReport>>> SearchCompanyAsync()
         {
             return await companyProductionValueInfoService.SearchCompanyAsync();
+        }
+
+
+
+        /// <summary>
+        /// 更新或修改调整值
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost("AddORUpdateCompanyAdjustmentValue")]
+        public async Task<ResponseAjaxResult<bool>> AddORUpdateCompanyAdjustmentValueAsync([FromBody] AddORUpdateCompanyAdjustmentValueRequestDto requestDto)
+        {
+            return await companyProductionValueInfoService.AddORUpdateCompanyAdjustmentValueAsync(requestDto);
         }
     }
 }
