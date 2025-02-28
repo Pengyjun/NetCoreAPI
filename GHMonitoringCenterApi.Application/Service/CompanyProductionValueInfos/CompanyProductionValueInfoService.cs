@@ -102,6 +102,32 @@ namespace GHMonitoringCenterApi.Application.Service.CompanyProductionValueInfos
             ResponseAjaxResult<bool> responseAjaxResult = new ResponseAjaxResult<bool>();
             Guid id = GuidUtil.Next();
             var model = new Model.CompanyProductionValueInfo();
+
+
+            companyProductionValueInfoRequestDto.OnePlanProductionValue = Setnumericalconversiontwo(companyProductionValueInfoRequestDto.OnePlanProductionValue);
+
+            companyProductionValueInfoRequestDto.EightPlaProductionValue = Setnumericalconversiontwo(companyProductionValueInfoRequestDto.EightPlaProductionValue);
+
+            companyProductionValueInfoRequestDto.ElevenPlaProductionValue = Setnumericalconversiontwo(companyProductionValueInfoRequestDto.ElevenPlaProductionValue);
+
+            companyProductionValueInfoRequestDto.FourPlaProductionValue = Setnumericalconversiontwo(companyProductionValueInfoRequestDto.FourPlaProductionValue);
+
+            companyProductionValueInfoRequestDto.FivePlaProductionValue = Setnumericalconversiontwo(companyProductionValueInfoRequestDto.FivePlaProductionValue);
+
+            companyProductionValueInfoRequestDto.NinePlaProductionValue = Setnumericalconversiontwo(companyProductionValueInfoRequestDto.NinePlaProductionValue);
+
+            companyProductionValueInfoRequestDto.SevenPlaProductionValue = Setnumericalconversiontwo(companyProductionValueInfoRequestDto.SevenPlaProductionValue);
+
+            companyProductionValueInfoRequestDto.SixPlaProductionValue = Setnumericalconversiontwo(companyProductionValueInfoRequestDto.SixPlaProductionValue);
+
+            companyProductionValueInfoRequestDto.TenPlaProductionValue = Setnumericalconversiontwo(companyProductionValueInfoRequestDto.TenPlaProductionValue);
+
+            companyProductionValueInfoRequestDto.ThreePlaProductionValue = Setnumericalconversiontwo(companyProductionValueInfoRequestDto.ThreePlaProductionValue);
+
+            companyProductionValueInfoRequestDto.TwelvePlaProductionValue = Setnumericalconversiontwo(companyProductionValueInfoRequestDto.TwelvePlaProductionValue);
+
+            companyProductionValueInfoRequestDto.TwoPlanProductionValue = Setnumericalconversiontwo(companyProductionValueInfoRequestDto.TwoPlanProductionValue);
+
             if (companyProductionValueInfoRequestDto.RequestType == true)
             {
                 model = mapper.Map<AddOrUpdateCompanyProductionValueInfoRequestDto, Model.CompanyProductionValueInfo>(companyProductionValueInfoRequestDto);
@@ -322,6 +348,20 @@ namespace GHMonitoringCenterApi.Application.Service.CompanyProductionValueInfos
                 var val = Math.Floor((value.GetValueOrDefault() / 10000) * 100) / 100;
 
                 return Convert.ToDecimal(val.ToString("0"));
+            }
+        }
+
+
+        public decimal Setnumericalconversiontwo(decimal? value)
+        {
+            if (value.GetValueOrDefault() == 0)
+            {
+                return 0;
+            }
+            else
+            {
+                var val = value.GetValueOrDefault() * 10000;
+                return val;
             }
         }
 
