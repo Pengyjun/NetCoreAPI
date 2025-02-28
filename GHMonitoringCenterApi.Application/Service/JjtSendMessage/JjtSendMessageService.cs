@@ -3688,8 +3688,9 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
                     //累计数
                     var totalYearProductionValue = Math.Round(shipDayList.Where(x => shipIds.Contains(x.ShipId)).Sum(x => x.EstimatedOutputAmount.Value) / baseConst, 2);
                     //当年累计运转小时
-                    var yearHours = shipDayList.Where(x => shipIds.Contains(x.ShipId)).Sum(x => x.Dredge ?? 0 + x.Sail ?? 0 + x.BlowingWater ?? 0
-                    + x.SedimentDisposal ?? 0 + x.BlowShore ?? 0);
+                    var yearHours = shipDayList.Where(x => shipIds.Contains(x.ShipId)).Select(x => new { Dredge = x.Dredge.Value, Sail = x.Sail.Value, BlowingWater = x.BlowingWater.Value, SedimentDisposal = x.SedimentDisposal.Value, BlowShore = x.BlowShore.Value })
+                    .Sum(x => x.Dredge + x.Sail + x.BlowingWater
+                    + x.SedimentDisposal + x.BlowShore);
                     //当年在场天数(在场天数  不一定船舶是施工状态  也可能是修理状态 待命状态 
                     var onDays = CalcYearShipDays(movementList, shipIds, year);
                     //时间利用率 （公式 年累计运转小时/在场天数累计/24）
@@ -3730,8 +3731,10 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
                 //计算在场天数
                 var onDays = CalcYearShipDays(movementList, new List<Guid>() { top.Key }, year);
                 //当天累计运转小时
-                var shipYearHours = shipDayList.Where(x => x.ShipId == top.Key && x.DateDay == dayTime).Sum(x => x.Dredge ?? 0 + x.Sail ?? 0 + x.BlowingWater ?? 0
-                    + x.SedimentDisposal ?? 0 + x.BlowShore ?? 0);
+                var shipYearHours = shipDayList.Where(x => x.ShipId == top.Key && x.DateDay == dayTime).
+                    Select(x =>new { Dredge= x.Dredge.Value, Sail=x.Sail.Value, BlowingWater=x.BlowingWater.Value, SedimentDisposal=x.SedimentDisposal.Value, BlowShore=x.BlowShore.Value })
+                    .Sum(x => x.Dredge  + x.Sail  + x.BlowingWater 
+                    + x.SedimentDisposal+ x.BlowShore);
                 //时间利用率
                 var shipTimePercent = onDays != 0 ? Math.Round((shipYearHours.ObjToDecimal() / onDays / 24) * 100, 0) : 0;
                 shipFives.Add(new GHMonitoringCenterApi.Application.Contracts.Dto.JjtSendMsg.ShipProductionValue()
