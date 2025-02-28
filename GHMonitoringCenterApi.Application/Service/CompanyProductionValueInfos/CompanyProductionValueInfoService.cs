@@ -14,24 +14,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using GHMonitoringCenterApi.Domain.Models;
-using GHMonitoringCenterApi.Application.Contracts.Dto.Information;
-using GHMonitoringCenterApi.Application.Contracts.Dto.SearchUser;
-using Spire.Doc.Documents;
-using UtilsSharp;
-using GHMonitoringCenterApi.Application.Contracts.Dto.RepairParts;
-using GHMonitoringCenterApi.SqlSugarCore;
-using GHMonitoringCenterApi.Application.Contracts.Dto.Project;
-using GHMonitoringCenterApi.Application.Service.Push;
 using GHMonitoringCenterApi.Domain.Enums;
 using GHMonitoringCenterApi.Domain.Shared.Const;
 using GHMonitoringCenterApi.Domain.Shared.Util;
-using SqlSugar.Extensions;
-using Microsoft.AspNetCore.Mvc;
-using System.Collections;
-using Microsoft.AspNetCore.Authorization;
-using NPOI.SS.Formula.Functions;
-using Microsoft.AspNetCore.Mvc.Formatters.Internal;
-using NPOI.SS.Formula.Eval;
+
 
 namespace GHMonitoringCenterApi.Application.Service.CompanyProductionValueInfos
 {
