@@ -3658,12 +3658,6 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
             var movementList = await dbContext.Queryable<ShipMovementRecord>().Where(x => x.IsDelete == 1).ToListAsync();
             foreach (var shipProduction in shipList)
             {
-                //各类船舶的数量
-                var shipCount = ownerShipList.Count(x => x.TypeId == shipProduction.ItemId);
-                if (shipCount == 0)
-                {
-                    shipCount = 1;
-                }
                 if (shipProduction.Collect == 1)
                 {
                     //总的在场天数
@@ -3715,7 +3709,7 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
                     //当年在场天数(在场天数  不一定船舶是施工状态  也可能是修理状态 待命状态 
                     var onDays = CalcYearShipDays(movementList, shipIds, year);
                     //时间利用率 （公式 年累计运转小时/在场天数累计/24/7）
-                    var timePercent = onDays != 0 ? Math.Round((yearHours.ObjToDecimal()/onDays/24/shipCount) * 100, 0) : 0;
+                    var timePercent = onDays != 0 ? Math.Round((yearHours.ObjToDecimal()/onDays/24/1) * 100, 0) : 0;
                     companyShipProductionValueInfos.Add(new GHMonitoringCenterApi.Application.Contracts.Dto.JjtSendMsg.CompanyShipProductionValueInfo()
                     {
                         DayProductionValue = shipDayProductionValue == null ? 0 : shipDayProductionValue,
@@ -3785,7 +3779,7 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
             //时间利用率
             var totalOnDays = shipFives.Sum(x => x.ConstructionDays);
             var totalOnDayHours = shipFives.Sum(x => x.WorkingHours);
-            var totalTimePercent = totalOnDayHours != 0 ? Math.Round((totalOnDays.ObjToDecimal() / totalOnDayHours / 24) * 100, 2) : 0;
+            var totalTimePercent = totalOnDayHours != 0 ? Math.Round((totalOnDayHours.ObjToDecimal()/totalOnDays/ 24) * 100, 2) : 0;
             //文字描述
             var totalShipValue = companyShipProductionValueInfos.Sum(x => x.YearTotalProductionValue);
             //占自有船舶产值比例
@@ -5717,6 +5711,11 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
                 {
                     onDays += TimeHelper.GetTimeSpan(item.EnterTime.Value, item.QuitTime.Value).Days;
                 }
+                if (item.QuitTime != null && item.QuitTime.Value.ToString("yyyyMMdd").ObjToInt() >= (year + "0101").ObjToInt() && item.EnterTime.HasValue && item.EnterTime.Value.ToString("yyyyMMdd").ObjToInt() <= (year + "0101").ObjToInt() && item.QuitTime.Value.ToString("yyyyMMdd").ObjToInt() < DateTime.Now.ToDateDay())
+                {
+                    onDays += TimeHelper.GetTimeSpan(DateTime.Now.ToString("yyyy-01-01").ObjToDate(), item.QuitTime.Value).Days;
+                }
+
 
                 if (item.EnterTime != null && item.EnterTime.Value.ToString("yyyyMMdd").ObjToInt() <= ((year-1) + "1226").ObjToInt()
                     && (item.QuitTime==null|| item.QuitTime.Value.ToDateDay()>= (year + "0101").ObjToInt()))
