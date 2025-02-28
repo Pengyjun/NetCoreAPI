@@ -3650,12 +3650,20 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
             #endregion
 
 
+            
+
             #region 第二张图
             List<GHMonitoringCenterApi.Application.Contracts.Dto.JjtSendMsg.CompanyShipProductionValueInfo> companyShipProductionValueInfos = new List<GHMonitoringCenterApi.Application.Contracts.Dto.JjtSendMsg.CompanyShipProductionValueInfo>();
             //船舶进退场记录
             var movementList = await dbContext.Queryable<ShipMovementRecord>().Where(x => x.IsDelete == 1).ToListAsync();
             foreach (var shipProduction in shipList)
             {
+                //各类船舶的数量
+                var shipCount = ownerShipList.Count(x => x.TypeId == shipProduction.ItemId);
+                if (shipCount == 0)
+                {
+                    shipCount = 1;
+                }
                 if (shipProduction.Collect == 1)
                 {
                     //总的在场天数
@@ -3683,18 +3691,31 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
                     //当日产值
                     var shipDayProductionValue = Math.Round(shipDayList.Where(x => x.DateDay == dayTime && shipIds.Contains(x.ShipId)).Sum(x => x.EstimatedOutputAmount).Value / baseWanConst, 2);
                     //当日运转时间
-                    var dayHours = shipDayList.Where(x => x.DateDay == dayTime && shipIds.Contains(x.ShipId)).Sum(x => x.Dredge ?? 0 + x.Sail ?? 0 + x.BlowingWater ?? 0
-                    + x.SedimentDisposal ?? 0 + x.BlowShore ?? 0);
+                    var dayHours = shipDayList.Where(x => x.DateDay == dayTime && shipIds.Contains(x.ShipId))
+                       .Select(x => new {
+                           Dredge = x.Dredge ?? 0,
+                           Sail = x.Sail ?? 0,
+                           BlowingWater = x.BlowingWater ?? 0,
+                           SedimentDisposal = x.SedimentDisposal ?? 0,
+                           BlowShore = x.BlowShore ?? 0
+                       }).Sum(x => x.Dredge + x.Sail + x.BlowingWater+ x.SedimentDisposal + x.BlowShore);
                     //累计数
                     var totalYearProductionValue = Math.Round(shipDayList.Where(x => shipIds.Contains(x.ShipId)).Sum(x => x.EstimatedOutputAmount.Value) / baseConst, 2);
                     //当年累计运转小时
-                    var yearHours = shipDayList.Where(x => shipIds.Contains(x.ShipId)).Select(x => new { Dredge = x.Dredge.Value, Sail = x.Sail.Value, BlowingWater = x.BlowingWater.Value, SedimentDisposal = x.SedimentDisposal.Value, BlowShore = x.BlowShore.Value })
+                    var yearHours = shipDayList.Where(x => shipIds.Contains(x.ShipId))
+                        .Select(x => new {
+                        Dredge = x.Dredge??0,
+                        Sail = x.Sail??0, 
+                        BlowingWater = x.BlowingWater??0,
+                        SedimentDisposal = x.SedimentDisposal??0, 
+                        BlowShore =x.BlowShore??0})
                     .Sum(x => x.Dredge + x.Sail + x.BlowingWater
                     + x.SedimentDisposal + x.BlowShore);
+                     
                     //当年在场天数(在场天数  不一定船舶是施工状态  也可能是修理状态 待命状态 
                     var onDays = CalcYearShipDays(movementList, shipIds, year);
-                    //时间利用率 （公式 年累计运转小时/在场天数累计/24）
-                    var timePercent = onDays != 0 ? Math.Round((yearHours.ObjToDecimal() / onDays / 24) * 100, 0) : 0;
+                    //时间利用率 （公式 年累计运转小时/在场天数累计/24/7）
+                    var timePercent = onDays != 0 ? Math.Round((yearHours.ObjToDecimal()/onDays/24/shipCount) * 100, 0) : 0;
                     companyShipProductionValueInfos.Add(new GHMonitoringCenterApi.Application.Contracts.Dto.JjtSendMsg.CompanyShipProductionValueInfo()
                     {
                         DayProductionValue = shipDayProductionValue == null ? 0 : shipDayProductionValue,
@@ -3730,11 +3751,17 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
                 var shipDayValue = shipDayList.Where(x => x.DateDay == dayTime && x.ShipId == top.Key).Select(x => x.EstimatedOutputAmount).FirstOrDefault();
                 //计算在场天数
                 var onDays = CalcYearShipDays(movementList, new List<Guid>() { top.Key }, year);
-                //当天累计运转小时
-                var shipYearHours = shipDayList.Where(x => x.ShipId == top.Key && x.DateDay == dayTime).
-                    Select(x =>new { Dredge= x.Dredge.Value, Sail=x.Sail.Value, BlowingWater=x.BlowingWater.Value, SedimentDisposal=x.SedimentDisposal.Value, BlowShore=x.BlowShore.Value })
-                    .Sum(x => x.Dredge  + x.Sail  + x.BlowingWater 
-                    + x.SedimentDisposal+ x.BlowShore);
+                //当年累计运转小时
+                var shipYearHours = shipDayList.Where(x => x.ShipId == top.Key)
+                     .Select(x => new {
+                         Dredge = x.Dredge ?? 0,
+                         Sail = x.Sail ?? 0,
+                         BlowingWater = x.BlowingWater ?? 0,
+                         SedimentDisposal = x.SedimentDisposal ?? 0,
+                         BlowShore = x.BlowShore ?? 0
+                     })
+                    .Sum(x => x.Dredge + x.Sail + x.BlowingWater
+                    + x.SedimentDisposal + x.BlowShore);
                 //时间利用率
                 var shipTimePercent = onDays != 0 ? Math.Round((shipYearHours.ObjToDecimal() / onDays / 24) * 100, 0) : 0;
                 shipFives.Add(new GHMonitoringCenterApi.Application.Contracts.Dto.JjtSendMsg.ShipProductionValue()
@@ -5663,6 +5690,7 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
         /// <returns></returns>
         public static int CalcYearShipDays(List<ShipMovementRecord> movementList, List<Guid> shipIds, int year)
         {
+           
             var onDays = 0;
             var shipMovements = movementList.Where(x => shipIds.Contains(x.ShipId) && x.Status != 0).ToList();
             foreach (var item in shipMovements)
@@ -5688,6 +5716,15 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
                 if (item.QuitTime != null && item.QuitTime.Value.ToString("yyyyMMdd").ObjToInt() >= (year + "0101").ObjToInt() && item.EnterTime.HasValue && item.EnterTime.Value.ToString("yyyyMMdd").ObjToInt() >= (year + "0101").ObjToInt() && item.QuitTime.Value.ToString("yyyyMMdd").ObjToInt() < DateTime.Now.ToDateDay())
                 {
                     onDays += TimeHelper.GetTimeSpan(item.EnterTime.Value, item.QuitTime.Value).Days;
+                }
+
+                if (item.EnterTime != null && item.EnterTime.Value.ToString("yyyyMMdd").ObjToInt() <= ((year-1) + "1226").ObjToInt()
+                    && (item.QuitTime==null|| item.QuitTime.Value.ToDateDay()>= (year + "0101").ObjToInt()))
+                {
+                    var time1 = (year - 1 + "-12-26").ObjToDate();
+                    var time2 = (year+ "-01-01").ObjToDate();
+                    var days = TimeHelper.GetTimeSpan(time1, time2).Days;
+                    onDays += days;
                 }
             }
             return onDays;
