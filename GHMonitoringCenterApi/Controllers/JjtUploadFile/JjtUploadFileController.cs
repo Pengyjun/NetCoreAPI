@@ -56,7 +56,7 @@ namespace GHMonitoringCenterApi.Controllers.JjtUploadFile
                 logger.LogWarning($"人为触发消息推送机制,浏览器版本信息:{Request.Headers["User-Agent"].ToString()}");
                 return new ResponseAjaxResult<bool>()
                 {
-                    Code = GHMonitoringCenterApi.Domain.Shared.Enums.HttpStatusCode.Success,
+                    Code = GHMonitoringCenterApi.Domain.Shared.Enums.HttpStatusCode.VerifyFail,
                     Message = "发送生产推送日报人为触发",
                 };
             }
