@@ -2845,7 +2845,8 @@ namespace GHMonitoringCenterApi.Application.Service
         public async Task<ResponseAjaxResult<List<ProjectOpen>>> SelectShowProjectAsync()
         {
             ResponseAjaxResult<List<ProjectOpen>> responseAjaxResult = new ResponseAjaxResult<List<ProjectOpen>>();
-            responseAjaxResult.Data = await dbContext.Queryable<ProjectOpen>().Where(x => x.IsDelete == 1).ToListAsync();
+            var time = DateTime.Now.AddDays(-1).ToDateDay();
+            responseAjaxResult.Data = await dbContext.Queryable<ProjectOpen>().Where(x => x.IsDelete == 1&&x.DateDay== time).ToListAsync();
             responseAjaxResult.Success();
             return responseAjaxResult;
         }
