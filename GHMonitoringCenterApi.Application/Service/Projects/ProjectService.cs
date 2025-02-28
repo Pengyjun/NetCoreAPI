@@ -3902,7 +3902,34 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             rt.Count = total;
             return rt.SuccessResult(rs);
         }
-
+        /// <summary>
+        /// 月报编辑按钮权限刷新
+        /// </summary>
+        /// <returns></returns>
+        public async Task<ResponseAjaxResult<bool>> PermissionRefreshAsync()
+        {
+            ResponseAjaxResult<bool> responseAjaxResult = new ResponseAjaxResult<bool>();
+            //获取当前登录用户的授权时间
+            var user = await dbContext.Queryable<BtnEditMonthlyReportPermission>().Where(t => t.IsDelete == 1 && t.UserId == _currentUser.Id).FirstAsync();
+            if (user != null)
+            {
+                if (user.MonthReportEnable)
+                {
+                    // 计算到过期的时间间隔
+                    var delayTime = user.MonthEffectiveTime - DateTime.Now;
+                    // 如果当前时间已经超过过期时间，则立即更新状态为 false
+                    if (delayTime.TotalMilliseconds < 0)
+                    {
+                        // 到期后更新状态
+                        user.MonthReportEnable = false;
+                        await dbContext.Updateable(user).WhereColumns(t => t.Id).UpdateColumns(t => new { t.MonthReportEnable, t.UpdateId, t.UpdateTime }).ExecuteCommandAsync();
+                    }
+                }
+            }
+            responseAjaxResult.Success();
+            responseAjaxResult.Data = true;
+            return responseAjaxResult;
+        }
         /// <summary>
         /// 保存编辑按钮权限
         /// </summary>
@@ -3930,7 +3957,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                         {
                             per.MonthTime = string.Empty;
                         }
-                        per.MonthEffectiveTime = Convert.ToDateTime(DateTime.Now.AddDays(2).ToString("23:59:59"));//往后加三天
+                        per.MonthEffectiveTime = Convert.ToDateTime(DateTime.Now.AddDays(1).ToString("yyyy-MM-dd HH:mm:ss"));//往后加一天
                         per.MonthReportEnable = requestBody.MonthReportEnable;
                         await dbContext.Updateable(per).UpdateColumns(x => new
                         {
@@ -3978,7 +4005,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                         Id = GuidUtil.Next(),
                         DailyEndTime = DateTime.Now,//默认当前时间 不做处理
                         DailyStartTime = DateTime.Now,//默认当前时间 不做处理
-                        MonthEffectiveTime = requestBody.MonthEffectiveTime,
+                        MonthEffectiveTime = Convert.ToDateTime(DateTime.Now.AddDays(1).ToString("yyyy-MM-dd HH:mm:ss")),//往后加一天
                         MonthReportEnable = requestBody.MonthReportEnable,
                         MonthTime = monthTime,
                         UserId = requestBody.UserId,
@@ -4437,7 +4464,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                         ProjectId = pp.Id,
                         CompanyId = pp.CompanyId.Value,
                         Year = DateTime.Now.Year,
-                        Id = Guid.NewGuid() 
+                        Id = Guid.NewGuid()
                     });
                 }
 
