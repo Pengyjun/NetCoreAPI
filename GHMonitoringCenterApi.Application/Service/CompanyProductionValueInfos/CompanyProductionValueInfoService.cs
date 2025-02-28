@@ -326,6 +326,11 @@ namespace GHMonitoringCenterApi.Application.Service.CompanyProductionValueInfos
                     item1.Total = Setnumericalconversion(item1.Total);
                 }
 
+                foreach (var itema in item.adjustmentValues)
+                {
+                    itema.AdjustmentValue = Setnumericalconversion(itema.AdjustmentValue);
+                }
+
                 months.RemoveAll(x => item.MonthlyDatas.Select(it => it.Month).Contains(x));
                 item.MonthlyDatas = item.MonthlyDatas.Union(months.Select(it => new MonthlyDataProductionValue() { Month = it, Total = 0 })).OrderBy(x => x.Month).ToList();
             }
@@ -413,9 +418,11 @@ namespace GHMonitoringCenterApi.Application.Service.CompanyProductionValueInfos
         {
             ResponseAjaxResult<bool> responseAjaxResult = new ResponseAjaxResult<bool>();
             Guid id = GuidUtil.Next();
+         
             var model = await baseCompanyAdjustmentValueRepository.AsQueryable().Where(x => x.PlanId == requestDto.PlanId && x.Month == requestDto.Month).FirstAsync();
             if (model == null)
             {
+                requestDto.Adjustmentvalue = Setnumericalconversiontwo(requestDto.Adjustmentvalue);
                 var mappermodel = mapper.Map<AddORUpdateCompanyAdjustmentValueRequestDto, CompanyAdjustmentValue>(requestDto);
                 mappermodel.Id = id;
                 mappermodel.IsDelete = 1;
@@ -436,7 +443,7 @@ namespace GHMonitoringCenterApi.Application.Service.CompanyProductionValueInfos
             {
                 if (model != null)
                 {
-                    model.AdjustmentValue = requestDto.Adjustmentvalue;
+                    model.AdjustmentValue = Setnumericalconversiontwo(requestDto.Adjustmentvalue);
                     model.UpdateId = _currentUser.Id;
                     model.UpdateTime = DateTime.Now;
                     var save = await dbContext.Updateable<Model.CompanyAdjustmentValue>(model).UpdateColumns(it => new
