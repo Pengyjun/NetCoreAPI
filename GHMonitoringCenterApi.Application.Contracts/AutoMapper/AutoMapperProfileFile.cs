@@ -274,6 +274,7 @@ namespace GHMonitoringCenterApi.Application.Contracts.AutoMapper
             mapperConfigurationExpression.CreateMap<SaveShipCompleteRequestDto, ShipCompleteProduction>();
 
             mapperConfigurationExpression.CreateMap<AddOrUpdateCompanyProductionValueInfoRequestDto, CompanyProductionValueInfo>();
+            mapperConfigurationExpression.CreateMap<AddORUpdateCompanyAdjustmentValueRequestDto, CompanyAdjustmentValue>();
 
 
         }
