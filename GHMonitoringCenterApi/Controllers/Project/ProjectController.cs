@@ -864,6 +864,15 @@ namespace GHMonitoringCenterApi.Controllers.Project
             return await projectService.BtnEditMonthlyReportSearchAsync(requestBody);
         }
         /// <summary>
+        /// 月报编辑按钮权限刷新
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("PermissionRefresh")]
+        public async Task<ResponseAjaxResult<bool>> PermissionRefreshAsync()
+        {
+            return await projectService.PermissionRefreshAsync();
+        }
+        /// <summary>
         /// 保存编辑按钮权限
         /// </summary>
         /// <returns></returns>
