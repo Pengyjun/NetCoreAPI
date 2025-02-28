@@ -31,6 +31,7 @@ using System.Collections;
 using Microsoft.AspNetCore.Authorization;
 using NPOI.SS.Formula.Functions;
 using Microsoft.AspNetCore.Mvc.Formatters.Internal;
+using NPOI.SS.Formula.Eval;
 
 namespace GHMonitoringCenterApi.Application.Service.CompanyProductionValueInfos
 {
@@ -264,7 +265,7 @@ namespace GHMonitoringCenterApi.Application.Service.CompanyProductionValueInfos
 
             foreach (var item in List)
             {
-                item.adjustmentValues = adjustmentValues.Where(x => x.PlanId == item.Id).OrderBy(x=>x.Month).ToList();
+                item.adjustmentValues = adjustmentValues.Where(x => x.PlanId == item.Id).OrderBy(x => x.Month).ToList();
 
                 item.OnePlanProductionValue = Setnumericalconversion(item.OnePlanProductionValue);
 
@@ -307,6 +308,12 @@ namespace GHMonitoringCenterApi.Application.Service.CompanyProductionValueInfos
                         Month = x.DateMonth,
                         Total = SqlFunc.AggregateSum(x.RollingPlanForNextMonth)
                     }).ToListAsync();
+
+                foreach (var item1 in item.MonthlyDatas)
+                {
+                    item1.Total = Setnumericalconversion(item1.Total);
+                }
+
                 months.RemoveAll(x => item.MonthlyDatas.Select(it => it.Month).Contains(x));
                 item.MonthlyDatas = item.MonthlyDatas.Union(months.Select(it => new MonthlyDataProductionValue() { Month = it, Total = 0 })).OrderBy(x => x.Month).ToList();
             }
@@ -318,7 +325,7 @@ namespace GHMonitoringCenterApi.Application.Service.CompanyProductionValueInfos
         }
 
 
-        public decimal? Setnumericalconversion(decimal? value)
+        public decimal Setnumericalconversion(decimal? value)
         {
             if (value.GetValueOrDefault() == 0)
             {
@@ -326,7 +333,9 @@ namespace GHMonitoringCenterApi.Application.Service.CompanyProductionValueInfos
             }
             else
             {
-                return Math.Floor((value.GetValueOrDefault() / 10000) * 100) / 100;
+                var val = Math.Floor((value.GetValueOrDefault() / 10000) * 100) / 100;
+
+                return Convert.ToDecimal(val.ToString("0"));
             }
         }
 
