@@ -253,6 +253,11 @@ namespace GHMonitoringCenterApi.Application.Contracts.IService.Project
         bool BtnEditMonthlyReport(int type, int date, List<BtnEditMonthlyReportPermission> permissions);
         Task<ResponseAjaxResult<List<BtnEditMonthlyReportSearch>>> BtnEditMonthlyReportSearchAsync(BaseRequestDto requestBody);
         Task<ResponseAjaxResult<bool>> SaveBtnEditReportAsync(SaveBtnEditMonthlyReport requestBody);
+        /// <summary>
+        /// 月报编辑按钮权限刷新
+        /// </summary>
+        /// <returns></returns>
+        Task<ResponseAjaxResult<bool>> PermissionRefreshAsync();
         bool aa();
         bool GetHolidays();
         /// <summary>
