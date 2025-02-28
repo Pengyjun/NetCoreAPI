@@ -30,7 +30,6 @@ using Microsoft.AspNetCore.Mvc;
 using System.Collections;
 using Microsoft.AspNetCore.Authorization;
 using NPOI.SS.Formula.Functions;
-using Microsoft.AspNetCore.Mvc.Formatters.Internal;
 using NPOI.SS.Formula.Eval;
 
 namespace GHMonitoringCenterApi.Application.Service.CompanyProductionValueInfos
