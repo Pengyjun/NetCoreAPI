@@ -1233,7 +1233,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             #endregion
 
             #region 计算项目停工天数 供交建通每天发消息使用 新版本
-            var startYearTime = DateTime.Now.ToDateDay() > int.Parse(DateTime.Now.ToString("yyyy1226")) ? DateTime.Now.ToString("yyyy-12-26 00:00:00") : DateTime.Now.AddYears(-1).ToString("yyyy-12-26 00:00:00");
+            var startYearTime = DateTime.Now.ToDateDay() >= int.Parse(DateTime.Now.ToString("yyyyMM26")) ? DateTime.Now.ToString("yyyy-MM-26 00:00:00") : DateTime.Now.AddYears(-1).ToString("yyyy-MM-26 00:00:00");
             if (addOrUpdateProjectRequestDto.RequestType)//新增
             {
                 //计算停工天数
@@ -1270,15 +1270,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             }
 
             #endregion
-            if (addOrUpdateProjectRequestDto.RequestType && addOrUpdateProjectRequestDto.StatusId == CommonData.PConstruc.ToGuid())
-            {
-                projectObject.IsChangeStatus = 1;
-                projectObject.IsChangeStatusTime = DateTime.Now;
-            }
-            if (!addOrUpdateProjectRequestDto.RequestType && addOrUpdateProjectRequestDto.StatusId == CommonData.PConstruc.ToGuid())
-            {
-               
-            }
+           
 
 
             if (addOrUpdateProjectRequestDto.RequestType)

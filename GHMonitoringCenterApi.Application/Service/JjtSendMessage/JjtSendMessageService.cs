@@ -3779,7 +3779,7 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
             //时间利用率
             var totalOnDays = shipFives.Sum(x => x.ConstructionDays);
             var totalOnDayHours = shipFives.Sum(x => x.WorkingHours);
-            var totalTimePercent = totalOnDayHours != 0 ? Math.Round((totalOnDayHours.ObjToDecimal()/totalOnDays/ 24) * 100, 2) : 0;
+            var totalTimePercent = totalOnDayHours != 0 ? Math.Round((totalOnDayHours.ObjToDecimal()/totalOnDays/ 24) * 100, 0) : 0;
             //文字描述
             var totalShipValue = companyShipProductionValueInfos.Sum(x => x.YearTotalProductionValue);
             //占自有船舶产值比例
