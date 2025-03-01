@@ -3434,7 +3434,7 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
                     {
                         Name = proName?.Name,
                         DeviationWarning = exprePro?.DeviationWarning,
-                        DayAmount = exprePro.DayActualProductionAmount,
+                        DayAmount =Math.Round(exprePro.DayActualProductionAmount/10000M,2),
                     });
                 }
                 projectOpens.Add(new ProjectOpen()
