@@ -3385,8 +3385,6 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
             daydiff.Add(10, 31);
             daydiff.Add(12, 31);
             daydiff.Add(2, 28);
-            var ziranMonth = DateTime.Now.Month;
-            var difDays = daydiff[ziranMonth] != 0 ? daydiff[ziranMonth] : 30;
             var monthPlanRepData = await dbContext.CopyNew().Queryable<CompanyProductionValueInfo>().Where(x => x.IsDelete == 1).ToListAsync();
             var projectId = projectList.WhereIF(!isCalcSub, x => x.IsSubContractProject != 2).Select(x => x.Id).ToList();
 
@@ -3400,8 +3398,11 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
                 //日报信息
                 var companyMonthDayProduction = dayYearList.Where(x => projectId.Contains(x.ProjectId) && x.DateDay == currentNowTimeInt)
                        .Sum(x => x.DayActualProductionAmount);
+                
                 //判断月份
                 var monthInt = Utils.GetMonth(currentNowTimeInt);
+                //判断天数
+                var difDays = daydiff[monthInt] != 0 ? daydiff[monthInt] : 30;
                 var yearInt = Utils.GetYear(currentNowTimeInt);
                 var dayPlanProAmount = GetProjectPlanAmount(monthPlanRepData, yearInt, monthInt);
                 eachCompanyProductionValues.Add(new EachCompanyProductionValue()
@@ -3432,7 +3433,7 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
                 {
                     expProjects.Add(new ImpProjectWarning()
                     {
-                        Name = proName?.Name,
+                        Name = proName?.ShortName,
                         DeviationWarning = exprePro?.DeviationWarning,
                         DayAmount =Math.Round(exprePro.DayActualProductionAmount/10000M,2),
                     });
@@ -3440,7 +3441,7 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
                 projectOpens.Add(new ProjectOpen()
                 {
                     IsShow = 1,
-                    Name = proName?.Name,
+                    Name = proName?.ShortName,
                     ProjectId = exprePro.ProjectId,
                     DateDay = dayTime,
 
