@@ -803,6 +803,8 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                      QuantityRemarks = p.QuantityRemarks,
                      MasterProjectId = p.MasterProjectId,
                      CommencementTime = p.CommencementTime,
+                     CompleteQuantity = p.CompleteQuantity,
+                     CompleteOutput = p.CompleteOutput,
                      CompletionTime = p.CompletionTime,
                      StartContractDuration = p.StartContractDuration,
                      EndContractDuration = p.EndContractDuration,
@@ -1233,7 +1235,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             #endregion
 
             #region 计算项目停工天数 供交建通每天发消息使用 新版本
-            var startYearTime = DateTime.Now.ToDateDay() > int.Parse(DateTime.Now.ToString("yyyy1226")) ? DateTime.Now.ToString("yyyy-12-26 00:00:00") : DateTime.Now.AddYears(-1).ToString("yyyy-12-26 00:00:00");
+            var startYearTime = DateTime.Now.ToDateDay() >= int.Parse(DateTime.Now.ToString("yyyyMM26")) ? DateTime.Now.ToString("yyyy-MM-26 00:00:00") : DateTime.Now.AddYears(-1).ToString("yyyy-MM-26 00:00:00");
             if (addOrUpdateProjectRequestDto.RequestType)//新增
             {
                 //计算停工天数
@@ -1270,15 +1272,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             }
 
             #endregion
-            if (addOrUpdateProjectRequestDto.RequestType && addOrUpdateProjectRequestDto.StatusId == CommonData.PConstruc.ToGuid())
-            {
-                projectObject.IsChangeStatus = 1;
-                projectObject.IsChangeStatusTime = DateTime.Now;
-            }
-            if (!addOrUpdateProjectRequestDto.RequestType && addOrUpdateProjectRequestDto.StatusId == CommonData.PConstruc.ToGuid())
-            {
-               
-            }
+
 
 
             if (addOrUpdateProjectRequestDto.RequestType)
@@ -1426,7 +1420,8 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
 
                 projectObject = await dbContext.Queryable<Project>().SingleAsync(x => x.IsDelete == 1 && x.Id == addOrUpdateProjectRequestDto.Id);
 
-                if (projectObject.StatusId != CommonData.PConstruc.ToGuid()&& addOrUpdateProjectRequestDto.StatusId == CommonData.PConstruc.ToGuid()) {
+                if (projectObject.StatusId != CommonData.PConstruc.ToGuid() && addOrUpdateProjectRequestDto.StatusId == CommonData.PConstruc.ToGuid())
+                {
                     projectObject.IsChangeStatus = 1;
                     projectObject.IsChangeStatusTime = DateTime.Now;
                 }
@@ -1569,7 +1564,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                             }
                         }
                     }
-                    
+
                 }
                 #endregion
 
@@ -1753,7 +1748,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 return responseAjaxResult;
             }
 
-            
+
 
 
         }
@@ -3935,6 +3930,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 {
                     // 计算到过期的时间间隔
                     var delayTime = user.MonthEffectiveTime - DateTime.Now;
+                    Console.WriteLine($"服务器时间：{DateTime.Now}");
                     // 如果当前时间已经超过过期时间，则立即更新状态为 false
                     if (delayTime.TotalMilliseconds < 0)
                     {

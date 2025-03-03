@@ -49,7 +49,9 @@ namespace GHMonitoringCenterApi.Controllers.JjtUploadFile
         {
             if (isSystemSend == 1)
             {
+                await Console.Out.WriteLineAsync("开始发送");
                 return await fileService.UploadImageJJT(formFile);
+               
             }
             else
             {
