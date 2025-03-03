@@ -248,6 +248,14 @@
         /// </summary>
         public DateTime? CompletionTime { get; set; }
         /// <summary>
+        /// 完工工程量
+        /// </summary>
+        public decimal? CompleteQuantity { get; set; }
+        /// <summary>
+        ///  完工产值
+        /// </summary>
+        public decimal? CompleteOutput { get; set; }
+        /// <summary>
         /// 项目合同工期(开始)
         /// </summary>
         public DateTime? StartContractDuration { get; set; }

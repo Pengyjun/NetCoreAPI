@@ -803,6 +803,8 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                      QuantityRemarks = p.QuantityRemarks,
                      MasterProjectId = p.MasterProjectId,
                      CommencementTime = p.CommencementTime,
+                     CompleteQuantity = p.CompleteQuantity,
+                     CompleteOutput = p.CompleteOutput,
                      CompletionTime = p.CompletionTime,
                      StartContractDuration = p.StartContractDuration,
                      EndContractDuration = p.EndContractDuration,
@@ -1270,7 +1272,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             }
 
             #endregion
-           
+
 
 
             if (addOrUpdateProjectRequestDto.RequestType)
@@ -1418,7 +1420,8 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
 
                 projectObject = await dbContext.Queryable<Project>().SingleAsync(x => x.IsDelete == 1 && x.Id == addOrUpdateProjectRequestDto.Id);
 
-                if (projectObject.StatusId != CommonData.PConstruc.ToGuid()&& addOrUpdateProjectRequestDto.StatusId == CommonData.PConstruc.ToGuid()) {
+                if (projectObject.StatusId != CommonData.PConstruc.ToGuid() && addOrUpdateProjectRequestDto.StatusId == CommonData.PConstruc.ToGuid())
+                {
                     projectObject.IsChangeStatus = 1;
                     projectObject.IsChangeStatusTime = DateTime.Now;
                 }
@@ -1561,7 +1564,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                             }
                         }
                     }
-                    
+
                 }
                 #endregion
 
@@ -1745,7 +1748,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 return responseAjaxResult;
             }
 
-            
+
 
 
         }
