@@ -1229,7 +1229,7 @@ namespace GHMonitoringCenterApi.Application.Service
                 if (authMenus.Any())
                 {
                     //全部显示
-                    menuDisplayTime = await dbContext.Queryable<HomeMenu>()
+                    menuDisplayTime = await dbContext.Queryable<HomeMenu>().Where(t => t.IsDelete == 1)
                     .OrderBy(h => h.Sort)
                     .Select(h => h.MenuName)
                     .ToListAsync();
@@ -1238,7 +1238,7 @@ namespace GHMonitoringCenterApi.Application.Service
                 {
                     var today = DateTime.Now.Day;
                     var todayInt = DateTime.Now.Month * 100 + today;
-                    menuDisplayTime = await dbContext.Queryable<HomeMenu>()
+                    menuDisplayTime = await dbContext.Queryable<HomeMenu>().Where(t => t.IsDelete == 1)
                          .LeftJoin<DisplayTime>((h, d) => h.Id == d.MenuId)
                          .Where((h, d) => (h.IsDelete == 1) && ((d.StartTime <= todayInt && d.EndTime >= todayInt) || (d.StartTime <= today && d.EndTime >= today)))
                          .OrderBy(h => h.Sort)
