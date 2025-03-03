@@ -17,6 +17,7 @@ using GHMonitoringCenterApi.Application.Contracts.IService.ProjectMasterData;
 using GHMonitoringCenterApi.Application.Contracts.IService.ProjectProductionReport;
 using GHMonitoringCenterApi.Application.Contracts.IService.ProjectYearPlan;
 using GHMonitoringCenterApi.Application.Contracts.IService.Push;
+using GHMonitoringCenterApi.Application.Contracts.IService.RecordPushDayReport;
 using GHMonitoringCenterApi.Application.Contracts.IService.RepairParts;
 using GHMonitoringCenterApi.Application.Contracts.IService.ResourceManagement;
 using GHMonitoringCenterApi.Application.Contracts.IService.Role;
@@ -45,6 +46,7 @@ using GHMonitoringCenterApi.Application.Service.ProjectProductionReport;
 using GHMonitoringCenterApi.Application.Service.Projects;
 using GHMonitoringCenterApi.Application.Service.ProjectYearPlan;
 using GHMonitoringCenterApi.Application.Service.Push;
+using GHMonitoringCenterApi.Application.Service.RecordPushDayReportNew;
 using GHMonitoringCenterApi.Application.Service.RepairParts;
 using GHMonitoringCenterApi.Application.Service.ResourceManagement;
 using GHMonitoringCenterApi.Application.Service.Role;
@@ -139,6 +141,8 @@ namespace GHMonitoringCenterApi.Ioc
             builder.RegisterType<ShipPlanService>().As<IShipPlanService>().InstancePerLifetimeScope();
 
             builder.RegisterType<CompanyProductionValueInfoService>().As<ICompanyProductionValueInfoService>().InstancePerLifetimeScope();
+
+            builder.RegisterType<RecordPushDayReportService>().As<IRecordPushDayReportService>().InstancePerLifetimeScope();
         }
     }
 }

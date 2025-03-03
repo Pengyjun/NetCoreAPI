@@ -21,6 +21,6 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.RecordPushDayReport
         /// </summary>
         public string? Json { get; set; }
 
-        public int Index { get; set; }
+        //public int Index { get; set; }
     }
 }

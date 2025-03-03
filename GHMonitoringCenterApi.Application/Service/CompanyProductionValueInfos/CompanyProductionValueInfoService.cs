@@ -319,8 +319,6 @@ namespace GHMonitoringCenterApi.Application.Service.CompanyProductionValueInfos
                 foreach (var item1 in item.MonthlyDatas)
                 {
                     item1.Total = Setnumericalconversion(item1.Total);
-
-                    item1.ActualDate = AddMonthToIntDate(item1.Month);
                 }
 
                 foreach (var itema in item.adjustmentValues)
@@ -333,7 +331,7 @@ namespace GHMonitoringCenterApi.Application.Service.CompanyProductionValueInfos
 
                 foreach (var item1 in item.MonthlyDatas)
                 {
-                    item1.ActualDate = AddMonthToIntDate(item1.Month);
+                    item1.Month = AddMonthToIntDate(item1.Month);
                 }
             }
 

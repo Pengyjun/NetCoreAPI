@@ -153,6 +153,6 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.CompanyProductionValue
         /// <summary>
         /// 实际日期
         /// </summary>
-        public int ActualDate { get; set; }
+        //public int ActualDate { get; set; }
     }
 }

@@ -14,11 +14,11 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.RecordPushDayReport
         /// <summary>
         /// 
         /// </summary>
-        public DateTime StartDateDay { get; set; }
+        public string StartDateDay { get; set; }
 
         /// <summary>
         /// 
         /// </summary>
-        public DateTime EndDateDay { get; set; }
+        public string EndDateDay { get; set; }
     }
 }
