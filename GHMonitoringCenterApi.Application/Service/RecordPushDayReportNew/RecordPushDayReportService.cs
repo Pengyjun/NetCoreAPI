@@ -15,6 +15,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using GHMonitoringCenterApi.Application.Contracts.Dto.Project.MonthReportForProject;
+using UtilsSharp;
 
 namespace GHMonitoringCenterApi.Application.Service.RecordPushDayReportNew
 {
@@ -84,7 +85,13 @@ namespace GHMonitoringCenterApi.Application.Service.RecordPushDayReportNew
                     DateDay = x.DateDay,
                     Json = x.Json,
                 })
+
                 .ToList();
+
+            foreach (var item in result)
+            {
+                item.Json = item.Json.ToJson(true);
+            }
 
 
             //var list = await baseRecordPushDayReportRepository.AsQueryable().Where(p => p.DateDay >= startDate && p.DateDay <= endDate).Select(it => new RecordPushDayReportResponseDto()
