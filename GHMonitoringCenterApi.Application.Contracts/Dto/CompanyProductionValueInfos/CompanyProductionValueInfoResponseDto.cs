@@ -149,5 +149,10 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.CompanyProductionValue
     {
         public int Month { get; set; }
         public decimal Total { get; set; }
+
+        /// <summary>
+        /// 实际日期
+        /// </summary>
+        //public int ActualDate { get; set; }
     }
 }
