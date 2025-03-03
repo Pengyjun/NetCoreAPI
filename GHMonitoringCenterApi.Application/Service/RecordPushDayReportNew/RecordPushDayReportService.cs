@@ -78,6 +78,7 @@ namespace GHMonitoringCenterApi.Application.Service.RecordPushDayReportNew
 
             var result = _dbContext.Queryable<RecordPushDayReport>()
                 .InnerJoin(subQuery, (x, y) => x.DateDay == y.dateday && x.CreateTime == y.max_createtime)
+                .Where((x,y)=>x.DateDay>= startDate && x.DateDay<=endDate)
                 .Select((x, y) => new RecordPushDayReportResponseDto()
                 {
                     DateDay = x.DateDay,
