@@ -16,6 +16,7 @@ using System.Text;
 using System.Threading.Tasks;
 using GHMonitoringCenterApi.Application.Contracts.Dto.Project.MonthReportForProject;
 using UtilsSharp;
+using GHMonitoringCenterApi.Application.Contracts.Dto.JjtSendMsg;
 
 namespace GHMonitoringCenterApi.Application.Service.RecordPushDayReportNew
 {
@@ -90,7 +91,8 @@ namespace GHMonitoringCenterApi.Application.Service.RecordPushDayReportNew
 
             foreach (var item in result)
             {
-                item.Json = item.Json.ToJson(true);
+                var json = JsonHelper.FromJson<JjtSendMessageMonitoringDayReportResponseDto>(item.Json).ToJson(true);
+                item.Json = json;
             }
 
 
