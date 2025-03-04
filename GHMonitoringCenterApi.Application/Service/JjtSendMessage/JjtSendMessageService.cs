@@ -3834,29 +3834,6 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
             jjtSendMessageMonitoringDayReportResponseDto.SpecialProjectInfo = specialProjectList;
             #endregion
 
-            #region 每天的生产结果已json的形式保存
-            if (!isPhone && Utils.IsLinxuSystem())
-            {
-                try
-                {
-                    RecordPushDayReport recordPushDayReport = new RecordPushDayReport()
-                    {
-                        Id = GuidUtil.Next(),
-                        DateDay = int.Parse(DateTime.Now.AddDays(-1).ToString("yyyyMMdd")),
-                        Json = jjtSendMessageMonitoringDayReportResponseDto.ToJson(true)
-                    };
-                    dbContext.Insertable<RecordPushDayReport>(recordPushDayReport).ExecuteCommandAsync();
-                }
-                catch (Exception)
-                {
-
-
-                }
-            }
-
-
-            #endregion
-
             #region 各单位填报情况（数据质量）
 
             #region 各单位填报情况使用数据查询
@@ -4067,6 +4044,28 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
 
             #endregion
 
+            #region 每天的生产结果已json的形式保存
+            if (!isPhone && Utils.IsLinxuSystem())
+            {
+                try
+                {
+                    RecordPushDayReport recordPushDayReport = new RecordPushDayReport()
+                    {
+                        Id = GuidUtil.Next(),
+                        DateDay = int.Parse(DateTime.Now.AddDays(-1).ToString("yyyyMMdd")),
+                        Json = jjtSendMessageMonitoringDayReportResponseDto.ToJson(true)
+                    };
+                    dbContext.Insertable<RecordPushDayReport>(recordPushDayReport).ExecuteCommandAsync();
+                }
+                catch (Exception)
+                {
+
+
+                }
+            }
+
+
+            #endregion
 
             responseAjaxResult.Data = jjtSendMessageMonitoringDayReportResponseDto;
             responseAjaxResult.Success();
