@@ -3843,7 +3843,7 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
                     {
                         Id = GuidUtil.Next(),
                         DateDay = int.Parse(DateTime.Now.AddDays(-1).ToString("yyyyMMdd")),
-                        Json = jjtSendMessageMonitoringDayReportResponseDto.ToJson()
+                        Json = jjtSendMessageMonitoringDayReportResponseDto.ToJson(true)
                     };
                     dbContext.Insertable<RecordPushDayReport>(recordPushDayReport).ExecuteCommandAsync();
                 }
