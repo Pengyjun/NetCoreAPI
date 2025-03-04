@@ -28,7 +28,7 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project
         /// <summary>
         /// 项目主数据编码
         /// </summary>
-         public string? MasterCode { get; set; }
+        public string? MasterCode { get; set; }
         /// <summary>
         /// 项目编码
         /// </summary>
@@ -198,6 +198,14 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project
         /// 完工日期
         /// </summary>
         public DateTime? CompletionTime { get; set; }
+        /// <summary>
+        /// 完工工程量
+        /// </summary>
+        public decimal? CompleteQuantity { get; set; }
+        /// <summary>
+        ///  完工产值
+        /// </summary>
+        public decimal? CompleteOutput { get; set; }
         /// <summary>
         /// 项目合同工期(开始)
         /// </summary>
@@ -379,6 +387,13 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project
                     yield return new ValidationResult("交工、竣工、完工项目必须输入完工时间", new string[] { nameof(CompletionTime) });
                 }
             }
+
+            //其他非施工类业务 不走此验证 暂时和项目状态不关联
+            if ((StatusId == "2a30d69d-ad3a-4a51-a1d7-7b363150437d".ToGuid() || StatusId == "28bc58dc-41ed-4135-8628-a4e6a571032b".ToGuid() || StatusId == "62986752-9b40-4d02-8887-b014a6ee7a9d".ToGuid()) && !CompletionTime.HasValue)
+            {
+                yield return new ValidationResult("交工、竣工、完工项目必须输入完工工程量及完工产值", new string[] { nameof(CompleteQuantity), nameof(CompleteOutput) });
+            }
+
             if (projectDutyDtos.Any())
             {
                 foreach (var item in projectDutyDtos)
@@ -390,8 +405,8 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project
                 }
 
             }
-            
-            if (IsSubContractProject == 1&&string.IsNullOrWhiteSpace(PProjectMasterCode))
+
+            if (IsSubContractProject == 1 && string.IsNullOrWhiteSpace(PProjectMasterCode))
             {
                 yield return new ValidationResult("分包项目必须要填项目主数据编码", new string[] { nameof(PProjectMasterCode) });
             }

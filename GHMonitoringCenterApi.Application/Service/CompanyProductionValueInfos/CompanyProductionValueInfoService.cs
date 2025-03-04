@@ -3,20 +3,15 @@ using GHMonitoringCenterApi.Application.Contracts.Dto.CompanyProductionValueInfo
 using GHMonitoringCenterApi.Application.Contracts.IService;
 using GHMonitoringCenterApi.Application.Contracts.IService.CompanyProductionValueInfos;
 using GHMonitoringCenterApi.Application.Contracts.IService.OperationLog;
-using GHMonitoringCenterApi.Application.Contracts.IService.Push;
-using GHMonitoringCenterApi.Domain.IRepository;
-using Model = GHMonitoringCenterApi.Domain.Models;
-using GHMonitoringCenterApi.Domain.Shared;
-using SqlSugar;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using GHMonitoringCenterApi.Domain.Models;
 using GHMonitoringCenterApi.Domain.Enums;
+using GHMonitoringCenterApi.Domain.IRepository;
+using GHMonitoringCenterApi.Domain.Models;
+using GHMonitoringCenterApi.Domain.Shared;
 using GHMonitoringCenterApi.Domain.Shared.Const;
 using GHMonitoringCenterApi.Domain.Shared.Util;
+using SqlSugar;
+using Model = GHMonitoringCenterApi.Domain.Models;
+
 
 
 namespace GHMonitoringCenterApi.Application.Service.CompanyProductionValueInfos
@@ -333,6 +328,11 @@ namespace GHMonitoringCenterApi.Application.Service.CompanyProductionValueInfos
 
                 months.RemoveAll(x => item.MonthlyDatas.Select(it => it.Month).Contains(x));
                 item.MonthlyDatas = item.MonthlyDatas.Union(months.Select(it => new MonthlyDataProductionValue() { Month = it, Total = 0 })).OrderBy(x => x.Month).ToList();
+
+                foreach (var item1 in item.MonthlyDatas)
+                {
+                    item1.Month = AddMonthToIntDate(item1.Month);
+                }
             }
 
             responseAjaxResult.Success();
@@ -341,7 +341,11 @@ namespace GHMonitoringCenterApi.Application.Service.CompanyProductionValueInfos
             return responseAjaxResult;
         }
 
-
+        /// <summary>
+        /// 去除小数点及转换成万元
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
         public decimal Setnumericalconversion(decimal? value)
         {
             if (value.GetValueOrDefault() == 0)
@@ -356,7 +360,11 @@ namespace GHMonitoringCenterApi.Application.Service.CompanyProductionValueInfos
             }
         }
 
-
+        /// <summary>
+        /// 去除小数点及转换成元
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
         public decimal Setnumericalconversiontwo(decimal? value)
         {
             if (value.GetValueOrDefault() == 0)
@@ -418,7 +426,7 @@ namespace GHMonitoringCenterApi.Application.Service.CompanyProductionValueInfos
         {
             ResponseAjaxResult<bool> responseAjaxResult = new ResponseAjaxResult<bool>();
             Guid id = GuidUtil.Next();
-         
+
             var model = await baseCompanyAdjustmentValueRepository.AsQueryable().Where(x => x.PlanId == requestDto.PlanId && x.Month == requestDto.Month).FirstAsync();
             if (model == null)
             {
@@ -464,6 +472,19 @@ namespace GHMonitoringCenterApi.Application.Service.CompanyProductionValueInfos
                 }
             }
             return responseAjaxResult;
+        }
+
+        /// <summary>
+        /// 添加月份
+        /// </summary>
+        /// <param name="dateInt"></param>
+        /// <returns></returns>
+        public static int AddMonthToIntDate(int dateInt)
+        {
+            string dateStr = dateInt.ToString("000000") + "01";
+            DateTime date = DateTime.ParseExact(dateStr, "yyyyMMdd", System.Globalization.CultureInfo.InvariantCulture);
+            date = date.AddMonths(1);
+            return int.Parse(date.ToString("yyyyMM"));
         }
     }
 }

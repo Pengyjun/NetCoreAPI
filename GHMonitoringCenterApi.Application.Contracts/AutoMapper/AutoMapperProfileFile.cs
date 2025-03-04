@@ -15,6 +15,7 @@ using GHMonitoringCenterApi.Application.Contracts.Dto.Project.ShipMovements;
 using GHMonitoringCenterApi.Application.Contracts.Dto.ProjectPlanProduction;
 using GHMonitoringCenterApi.Application.Contracts.Dto.ProjectYearPlan;
 using GHMonitoringCenterApi.Application.Contracts.Dto.Push;
+using GHMonitoringCenterApi.Application.Contracts.Dto.RecordPushDayReport;
 using GHMonitoringCenterApi.Application.Contracts.Dto.RepairParts;
 using GHMonitoringCenterApi.Application.Contracts.Dto.ShipPlan;
 using GHMonitoringCenterApi.Application.Contracts.Dto.ShipSurvey;
@@ -275,6 +276,8 @@ namespace GHMonitoringCenterApi.Application.Contracts.AutoMapper
 
             mapperConfigurationExpression.CreateMap<AddOrUpdateCompanyProductionValueInfoRequestDto, CompanyProductionValueInfo>();
             mapperConfigurationExpression.CreateMap<AddORUpdateCompanyAdjustmentValueRequestDto, CompanyAdjustmentValue>();
+
+            mapperConfigurationExpression.CreateMap<RecordPushDayReportResponseDto, RecordPushDayReport>();
 
 
         }
