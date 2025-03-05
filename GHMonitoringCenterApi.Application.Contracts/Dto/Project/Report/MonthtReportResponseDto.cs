@@ -592,6 +592,16 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project.Report
             /// </summary>
             [SugarColumn(ColumnDataType = "decimal(20,8)")]
             public decimal? RMBHOutValue { get; set; } = 0M;
+
+            /// <summary>
+            /// 下月滚动计划 下月产值计划
+            /// </summary>
+            public decimal RollingPlanForNextMonth { get; set; } = 0;
+
+            /// <summary>
+            /// 下月预计成功 下月成本计划
+            /// </summary>
+            public decimal NextMonthEstimateCostAmount { get; set; } = 0;
         }
     }
 

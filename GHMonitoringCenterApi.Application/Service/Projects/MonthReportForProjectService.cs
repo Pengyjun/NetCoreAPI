@@ -1069,7 +1069,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
 
 
             /***
-             * 1.获取项目字段信息
+             * 1.获取项目字段信息 
              * 2.取项目月报字段信息
              * 3.其他定义字段
              * 4.取树基础数据
@@ -1221,6 +1221,12 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 result.TopRMBHOutValue = his.RMBHOutValue;
             }
             #endregion
+
+            //本年产值计划
+            result.TotalRollingPlanAmount = yMonthReports.Sum(p => p.RollingPlanForNextMonth);
+
+            //本年累计产值
+            result.YearTotalProductionAmount = result.CurrencyExchangeRate == 0M ? 0 : yMonthReports.Sum(x => x.CompleteProductionAmount) / result.CurrencyExchangeRate;
 
             //是否获取项目日报数据统计作为当月月报估算值  如果当月月报没有填的情况下 系统计算上月26（含）至传入月25日产值日报
             bool dayRep = false;
