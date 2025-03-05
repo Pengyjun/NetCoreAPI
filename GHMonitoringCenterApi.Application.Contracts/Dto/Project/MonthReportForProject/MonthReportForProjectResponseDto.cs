@@ -252,62 +252,72 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project.MonthReportFor
         /// </summary>
         public Guid? JobId { get; set; }
 
+        /// <summary>
+        /// 本年产值计划
+        /// </summary>
+        public decimal TotalRollingPlanAmount { get; set; } = 0M;
+
+        /// <summary>
+        /// 本年累计产值
+        /// </summary>
+        public decimal YearTotalProductionAmount { get; set; } = 0M;
+
         #region top置顶行历史数202306
         /// <summary>
         /// 置顶数据名称
         /// </summary>
         public string? TopTitleName { get; set; }
-        /// <summary>
-        /// 历史外包支出(美元、欧元等)
-        /// </summary>
-        public decimal? TopCurrencyHOutValue { get; set; } = 0M;
-        /// <summary>
-        /// 历史工程量
-        /// </summary>
-        public decimal? TopHQuantity { get; set; } = 0M;
-        /// <summary>
-        /// 历史完成产值(美元、欧元等)
-        /// </summary>
-        public decimal? TopCurrencyHValue { get; set; } = 0M;
-        /// <summary>
-        /// 实际人民币产值
-        /// </summary>
-        public decimal? TopRMBHValue { get; set; } = 0M;
-        /// <summary>
-        /// 实际人民币外包支出
-        /// </summary>
-        public decimal? TopRMBHOutValue { get; set; } = 0M;
-        /// <summary>
-        /// 给前端计算好的外币开累数（产值）
-        /// </summary>
-        public decimal RMBTotalAmount { get; set; } = 0M;
-        /// <summary>
-        /// 给前端计算好的外币开累数（外包支出）
-        /// </summary>
-        public decimal RMBTotalOutAmount { get; set; } = 0M;
+    /// <summary>
+    /// 历史外包支出(美元、欧元等)
+    /// </summary>
+    public decimal? TopCurrencyHOutValue { get; set; } = 0M;
+    /// <summary>
+    /// 历史工程量
+    /// </summary>
+    public decimal? TopHQuantity { get; set; } = 0M;
+    /// <summary>
+    /// 历史完成产值(美元、欧元等)
+    /// </summary>
+    public decimal? TopCurrencyHValue { get; set; } = 0M;
+    /// <summary>
+    /// 实际人民币产值
+    /// </summary>
+    public decimal? TopRMBHValue { get; set; } = 0M;
+    /// <summary>
+    /// 实际人民币外包支出
+    /// </summary>
+    public decimal? TopRMBHOutValue { get; set; } = 0M;
+    /// <summary>
+    /// 给前端计算好的外币开累数（产值）
+    /// </summary>
+    public decimal RMBTotalAmount { get; set; } = 0M;
+    /// <summary>
+    /// 给前端计算好的外币开累数（外包支出）
+    /// </summary>
+    public decimal RMBTotalOutAmount { get; set; } = 0M;
 
-        #region 原值
-        /// <summary>
-        /// 工程量
-        /// </summary>
-        public decimal? OldHQuantity { get; set; } = 0M;
-        /// <summary>
-        /// 历史外包支出(人民币)
-        /// </summary>
-        public decimal? OldHOutValue { get; set; } = 0M;
-        /// <summary>
-        /// 历史外包支出(美元、欧元等)
-        /// </summary>
-        public decimal? OldCurrencyHOutValue { get; set; } = 0M;
-        /// <summary>
-        /// 历史完成产值(人民币)
-        /// </summary>
-        public decimal? OldHValue { get; set; } = 0M;
-        /// <summary>
-        /// 历史完成产值(美元、欧元等)
-        /// </summary>
-        public decimal? OldCurrencyHValue { get; set; } = 0M;
-        #endregion
-        #endregion
-    }
+    #region 原值
+    /// <summary>
+    /// 工程量
+    /// </summary>
+    public decimal? OldHQuantity { get; set; } = 0M;
+    /// <summary>
+    /// 历史外包支出(人民币)
+    /// </summary>
+    public decimal? OldHOutValue { get; set; } = 0M;
+    /// <summary>
+    /// 历史外包支出(美元、欧元等)
+    /// </summary>
+    public decimal? OldCurrencyHOutValue { get; set; } = 0M;
+    /// <summary>
+    /// 历史完成产值(人民币)
+    /// </summary>
+    public decimal? OldHValue { get; set; } = 0M;
+    /// <summary>
+    /// 历史完成产值(美元、欧元等)
+    /// </summary>
+    public decimal? OldCurrencyHValue { get; set; } = 0M;
+    #endregion
+    #endregion
+}
 }
