@@ -20,11 +20,13 @@ using GHMonitoringCenterApi.Domain.Shared;
 using GHMonitoringCenterApi.Domain.Shared.Const;
 using GHMonitoringCenterApi.Domain.Shared.Enums;
 using GHMonitoringCenterApi.Domain.Shared.Util;
+using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NPOI.SS.UserModel;
 using NPOI.SS.Util;
 using NPOI.XSSF.UserModel;
+using SkiaSharp;
 using SqlSugar;
 using SqlSugar.Extensions;
 using System.Data;
@@ -2529,6 +2531,8 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     RMBHOutValue = m.RMBHOutValue,
                     RMBHValue = m.RMBHValue,
                     ActualCompQuantity = m.ActualCompCompletedQuantity,
+                    NextMonthEstimateCostAmount = m.NextMonthEstimateCostAmount,
+                    RollingPlanForNextMonth = m.RollingPlanForNextMonth
                 });
 
             var list = new List<MonthtReportDto>();
@@ -2644,9 +2648,9 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 // 项目负责人
                 var projectLeader = projectLeaderUsers.FirstOrDefault(t => t.PomId == projectLeaders.FirstOrDefault(i => i.ProjectId == item.ProjectId)?.AssistantManagerId);
                 // 月度项目计划（产值/产量）
-                var sumProjectMonthPlanned = SumMonthProjectPlanned(projectAnnualPlans, item.ProjectId, thisMonthTime);
+                var sumProjectMonthPlanned = SumMonthProjectPlannedNew(projectAnnualPlans, item.ProjectId, thisMonthTime);
                 // 年度项目计划（产值/产量）
-                var sumProjectYearPlanned = SumYearProjectPlannedAsync(projectAnnualPlans, item.ProjectId, thisMonthTime.Year);
+                var sumProjectYearPlanned = SumYearProjectPlannedNewAsync(projectAnnualPlans, item.ProjectId, thisMonthTime.Year);
                 item.IsAdmin = userId.Contains(_currentUser.Account) ? true : false;
                 item.State = projectStatusList.FirstOrDefault(t => t.StatusId == item.StatusId)?.Name;
                 item.Construction = constructionQualifications.FirstOrDefault(t => t.PomId == item.ConstructionQualificationId)?.Name;
@@ -2917,6 +2921,8 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 item.YearCostDeviation = Math.Round(item.YearCostDeviation, 2);
                 item.PostmarkCostDeviation = Math.Round(item.PostmarkCostDeviation, 2);
                 item.GrossMarginDeviation = item.GrossMarginDeviation != null ? Math.Round(item.GrossMarginDeviation.Value, 2) : 0M;
+                item.NextMonthEstimateCostAmount = Math.Round(item.NextMonthEstimateCostAmount, 2);
+                item.RollingPlanForNextMonth = Math.Round(item.RollingPlanForNextMonth, 2);
             }
 
             #endregion
@@ -3137,9 +3143,9 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 // 项目负责人
                 var projectLeader = projectLeaderUsers.FirstOrDefault(t => t.PomId == projectLeaders.FirstOrDefault(i => i.ProjectId == item.ProjectId)?.AssistantManagerId);
                 // 月度项目计划（产值/产量）
-                var sumProjectMonthPlanned = SumMonthProjectPlanned(projectAnnualPlans, item.ProjectId, thisMonthTime);
+                var sumProjectMonthPlanned = SumMonthProjectPlannedNew(projectAnnualPlans, item.ProjectId, thisMonthTime);
                 // 年度项目计划（产值/产量）
-                var sumProjectYearPlanned = SumYearProjectPlannedAsync(projectAnnualPlans, item.ProjectId, thisMonthTime.Year);
+                var sumProjectYearPlanned = SumYearProjectPlannedNewAsync(projectAnnualPlans, item.ProjectId, thisMonthTime.Year);
                 item.IsAdmin = userId.Contains(_currentUser.Account) ? true : false;
                 item.State = projectStatusList.FirstOrDefault(t => t.StatusId == item.StatusId)?.Name;
                 item.Construction = constructionQualifications.FirstOrDefault(t => t.PomId == item.ConstructionQualificationId)?.Name;
@@ -3768,6 +3774,29 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
         }
 
         /// <summary>
+        /// 读取基准计划的全年计划产值。
+        /// </summary>
+        /// <param name="projectAnnualPlans"></param>
+        /// <param name="projectId"></param>
+        /// <param name="year"></param>
+        /// <returns></returns>
+        private SumProjectPlannedDto SumYearProjectPlannedNewAsync(List<ProjectPlanProduction> projectAnnualPlans, Guid projectId, int year)
+        {
+            var monthPlanneds = new List<SumProjectPlannedDto>();
+
+            var monthPlanned = new SumProjectPlannedDto();
+            for (int i = 1; i <= 12; i++)
+            {
+                var monthTime = new DateTime(year, i, 1);
+                monthPlanneds.Add(SumMonthProjectPlanned(projectAnnualPlans, projectId, monthTime));
+            }
+
+            monthPlanned = SumYearProjectPlannedNew(projectAnnualPlans, projectId, year);
+            return new SumProjectPlannedDto() { PlannedOutputValue = monthPlanned.PlannedOutputValue, PlannedQuantities = monthPlanneds.Sum(t => t.PlannedQuantities) };
+        }
+
+
+        /// <summary>
         /// 统计项目月计划
         /// </summary>
         /// <returns></returns>
@@ -3835,6 +3864,131 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     break;
             }
             return new SumProjectPlannedDto() { PlannedOutputValue = planOutValue ?? 0, PlannedQuantities = plannedQuantities ?? 0 };
+        }
+
+        /// <summary>
+        /// 统计项目月计划 本月计划产值取值逻辑：取上个月的月报的下月产值计划（滚动计划）
+        /// </summary>
+        /// <returns></returns>
+        private SumProjectPlannedDto SumMonthProjectPlannedNew(List<ProjectPlanProduction> projectAnnualPlans, Guid projectId, DateTime monthTime)
+        {
+            var startYearTime = new DateTime(monthTime.Year, 1, 1);
+            var endYearTime = startYearTime.AddYears(1);
+            // 本年内的最新提交的一条项目年度计划
+
+            var mpData = _dbMonthReport.AsQueryable()
+               .Where(x => x.IsDelete == 1 && x.ProjectId == projectId && x.DateMonth == monthTime.AddMonths(-1).ToDateMonth())
+               .First();
+
+
+            var projectAnnualPlan = projectAnnualPlans.FirstOrDefault(t => t.ProjectId == projectId && t.Year == monthTime.Year);
+            if (projectAnnualPlan == null)
+            {
+                if (mpData != null)
+                {
+                    return new SumProjectPlannedDto() { PlannedOutputValue = mpData.RollingPlanForNextMonth, PlannedQuantities = 0 };
+                }
+                return new SumProjectPlannedDto();
+            }
+            decimal? planOutValue = null;
+            decimal? plannedQuantities = null;
+            //获取当前月报基本信息
+            if (mpData != null)
+            {
+                planOutValue = mpData.RollingPlanForNextMonth;
+            }
+
+            switch (monthTime.Month)
+            {
+                case 1:
+                    //planOutValue = projectAnnualPlanPrevYear.OnePlanProductionValue;
+                    plannedQuantities = projectAnnualPlan.OnePlannedQuantities;
+                    break;
+                case 2:
+                    //planOutValue = projectAnnualPlan.TwoPlanProductionValue;
+                    plannedQuantities = projectAnnualPlan.TwoPlannedQuantities;
+                    break;
+                case 3:
+                    //planOutValue = projectAnnualPlan.ThreePlanProductionValue;
+                    plannedQuantities = projectAnnualPlan.ThreePlannedQuantities;
+                    break;
+                case 4:
+                    //planOutValue = projectAnnualPlan.FourPlanProductionValue;
+                    plannedQuantities = projectAnnualPlan.FourPlannedQuantities;
+                    break;
+                case 5:
+                    //planOutValue = projectAnnualPlan.FivePlanProductionValue;
+                    plannedQuantities = projectAnnualPlan.FivPlannedQuantities;
+                    break;
+                case 6:
+                    //planOutValue = projectAnnualPlan.SixPlanProductionValue;
+                    plannedQuantities = projectAnnualPlan.SixPlannedQuantities;
+                    break;
+                case 7:
+                    //planOutValue = projectAnnualPlan.SevenPlanProductionValue;
+                    plannedQuantities = projectAnnualPlan.SevPlannedQuantities;
+                    break;
+                case 8:
+                    //planOutValue = projectAnnualPlan.EightPlanProductionValue;
+                    plannedQuantities = projectAnnualPlan.EigPlannedQuantities;
+                    break;
+                case 9:
+                    //planOutValue = projectAnnualPlan.NinePlanProductionValue;
+                    plannedQuantities = projectAnnualPlan.NinPlannedQuantities;
+                    break;
+                case 10:
+                    //planOutValue = projectAnnualPlan.TenPlanProductionValue;
+                    plannedQuantities = projectAnnualPlan.TenPlannedQuantities;
+                    break;
+                case 11:
+                    //planOutValue = projectAnnualPlan.ElevenPlanProductionValue;
+                    plannedQuantities = projectAnnualPlan.ElePlannedQuantities;
+                    break;
+                case 12:
+                    //planOutValue = projectAnnualPlan.TwelvePlanProductionValue;
+                    plannedQuantities = projectAnnualPlan.TwePlannedQuantities;
+                    break;
+            }
+            return new SumProjectPlannedDto() { PlannedOutputValue = planOutValue ?? 0, PlannedQuantities = plannedQuantities ?? 0 };
+        }
+
+        /// <summary>
+        /// 年度计划关联船舶 获取年度总产值
+        /// </summary>
+        /// <param name="projectAnnualPlans"></param>
+        /// <param name="projectId"></param>
+        /// <param name="year"></param>
+        /// <returns></returns>
+        private SumProjectPlannedDto SumYearProjectPlannedNew(List<ProjectPlanProduction> projectAnnualPlans, Guid projectId, int year)
+        {
+
+            //var projectAnnualPlanlist = projectAnnualPlans.Where(t => t.ProjectId == projectId && t.Year == year).ToList();
+
+            List<ProjectAnnualPlanProduction> pPlanProduction = new();
+
+            var annualProductionShips = _dbContext.Queryable<AnnualProductionShips>()
+                .Where(t => t.IsDelete == 1 && t.ShipType == 1).ToList();
+
+            var mainIds = annualProductionShips.Select(x => x.ProjectAnnualProductionId).ToList();
+
+            pPlanProduction = _dbContext.Queryable<ProjectAnnualPlanProduction>()
+                .Where(t => t.IsDelete == 1 && mainIds.Contains(t.Id) && t.ProjectId == projectId)
+                .ToList();
+
+            decimal? planOutValue = pPlanProduction.Sum(p =>
+                p.JanuaryProductionValue +
+                p.FebruaryProductionValue +
+                p.MarchProductionValue +
+                p.AprilProductionValue +
+                p.MayProductionValue +
+                p.JuneProductionValue +
+                p.JulyProductionValue +
+                p.AugustProductionValue +
+                p.SeptemberProductionValue +
+                p.OctoberProductionValue +
+                p.NovemberProductionValue +
+                p.DecemberProductionValue);
+            return new SumProjectPlannedDto() { PlannedOutputValue = planOutValue ?? 0 };
         }
 
         /// <summary>
@@ -3908,6 +4062,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
         {
             var result = new ResponseAjaxResult<bool>();
             model.ResetModelProperty();
+
             if (model.DateMonth == 202306)
             {
                 return result.FailResult(HttpStatusCode.SaveFail, "由于历史数据的缘故，系统不允许修改6月份月报数据");
@@ -3916,12 +4071,15 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             {
                 return result.FailResult(HttpStatusCode.SaveFail, "月份时间格式不正确");
             }
+
+
             var project = await GetProjectPartAsync(model.ProjectId);
             if (project == null)
             {
                 return result.FailResult(HttpStatusCode.DataNotEXIST, ResponseMessage.DATA_NOTEXIST_PROJECT);
             }
             var monthReport = await GetMonthReportAsync(model.ProjectId, model.DateMonth);
+
             var mpId = GuidUtil.Next();
             // 是否是非施工项目
             var isNonConstruction = project.TypeId == CommonData.NoConstrutionProjectType;
@@ -4103,7 +4261,20 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             {
                 monthReport.UpdateId = _currentUser.Id;
             }
+
+            //提交月报要判断下月计划产值是否等于0，如果等于0则项目状态必须是完工或者停工，否则一律提交不通过。
+            var projectStatusList = await GetProjectStatusListAsync();
             monthReport = _mapper.Map(model, monthReport);
+            var StateName = projectStatusList.FirstOrDefault(t => t.StatusId == project.StatusId)?.Name;
+            if (!string.IsNullOrWhiteSpace(StateName))
+            {
+                if (monthReport.RollingPlanForNextMonth == 0 && !StateName.Contains("完工") || !StateName.Contains("停工"))
+                {
+                    return result.FailResult(HttpStatusCode.SaveFail, "项目状态不为完工或者停工,下月计划产值不能为0");
+                }
+            }
+
+
             /*
              * 计算项目月报外包支出/产量/产值
              * 1、非施工类项目 外包支出/产值/产量以客户直接填写为准
