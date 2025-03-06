@@ -4279,7 +4279,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             var StateName = projectStatusList.FirstOrDefault(t => t.StatusId == project.StatusId)?.Name;
             if (!string.IsNullOrWhiteSpace(StateName))
             {
-                if (monthReport.RollingPlanForNextMonth == 0 && !StateName.Contains("完工") || !StateName.Contains("停工"))
+                if (monthReport.RollingPlanForNextMonth == 0 && (!StateName.Contains("完工") || !StateName.Contains("停工")))
                 {
                     return result.FailResult(HttpStatusCode.SaveFail, "项目状态不为完工或者停工,下月计划产值不能为0");
                 }
