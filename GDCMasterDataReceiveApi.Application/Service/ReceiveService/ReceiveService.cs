@@ -38,6 +38,7 @@ using GDCMasterDataReceiveApi.Domain.Shared.Utils;
 using Microsoft.Extensions.Logging;
 using SqlSugar;
 using SqlSugar.Extensions;
+using System.Security.Cryptography;
 using UtilsSharp;
 
 namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
@@ -2665,9 +2666,10 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
                     item.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
                    
                 }
-                var institutiontOids = await _dbContext.Queryable<Institution>().Where(x => x.IsDelete == 1).Select(x => x.OID).ToListAsync();
+                var institutiont = await _dbContext.Queryable<Institution>().Where(x => x.IsDelete == 1).Select(x => new {Id=x.Id, OID=x.OID }).ToListAsync();
+                var institutiontOids= institutiont.Select(x=>x.OID).ToList();
                 var insertOids = institutions.Where(x => !institutiontOids.Contains(x.OID)).Select(x => x.OID).ToList();
-                var updateOids = institutions.Where(x => institutiontOids.Contains(x.OID)).Select(x => x.OID).ToList();
+                var updateOids = institutions.Where(x => institutiontOids.Contains(x.OID)).Select(x => new{ID =x.Id,OID=x.OID }).ToList();
                 if (insertOids.Any())
                 {
                     //插入操作
@@ -2681,14 +2683,17 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
                 }
                 if (updateOids.Any())
                 {
+                    var updateIds= updateOids.Select(x=>x.OID).ToList();
                     //更新操作
-                    var batchData = institutions.Where(x => updateOids.Contains(x.OID)).ToList();
+                    var batchData = institutions.Where(x => updateIds.Contains(x.OID)).ToList();
                     foreach (var insetItem in batchData)
                     {
+                        var obj= institutiont.Where(x=>x.OID== insetItem.OID).FirstOrDefault();
+                        insetItem.Id = obj.Id;
                         insetItem.UpdateTime = DateTime.Now;
                         //insetItem.Timestamp = Utils.GetTimeSpan();
                     }
-                    await _dbContext.Fastest<Institution>().BulkUpdateAsync(batchData);
+                     var res=await _dbContext.Updateable<Institution>(batchData).WhereColumns(it => new { it.Id }).ExecuteCommandAsync();
                 }
                 responseAjaxResult.Success();
             }
