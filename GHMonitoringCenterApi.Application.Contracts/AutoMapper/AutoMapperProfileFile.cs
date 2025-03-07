@@ -279,6 +279,7 @@ namespace GHMonitoringCenterApi.Application.Contracts.AutoMapper
 
             mapperConfigurationExpression.CreateMap<RecordPushDayReportResponseDto, RecordPushDayReport>();
 
+            mapperConfigurationExpression.CreateMap<BaseLinePlanAncomparisonResponseDto, BaseLinePlanAncomparison>();
 
         }
     }

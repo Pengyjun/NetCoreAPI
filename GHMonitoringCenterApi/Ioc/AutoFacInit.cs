@@ -143,6 +143,8 @@ namespace GHMonitoringCenterApi.Ioc
             builder.RegisterType<CompanyProductionValueInfoService>().As<ICompanyProductionValueInfoService>().InstancePerLifetimeScope();
 
             builder.RegisterType<RecordPushDayReportService>().As<IRecordPushDayReportService>().InstancePerLifetimeScope();
+
+            builder.RegisterType<BaseLinePlanProjectService>().As<IBaseLinePlanProjectService>().InstancePerLifetimeScope();
         }
     }
 }

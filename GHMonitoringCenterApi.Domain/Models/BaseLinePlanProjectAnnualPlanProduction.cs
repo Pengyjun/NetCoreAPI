@@ -3,11 +3,17 @@
 namespace GHMonitoringCenterApi.Domain.Models
 {
     /// <summary>
-    /// 项目年初计划产值 产量
+    /// 基准计划产值 产量
     /// </summary>
-    [SugarTable("t_projectannualproduction", IsDisabledDelete = true)]
-    public class ProjectAnnualPlanProduction : BaseEntity<Guid>
+    [SugarTable("t_baselineplanprojectannualproduction", IsDisabledDelete = true)]
+    public class BaseLinePlanProjectAnnualPlanProduction : BaseEntity<Guid>
     {
+
+        /// <summary>
+        /// 基准计划主Id
+        /// </summary>
+        //public Guid BaseLinePlanProject { get; set; }
+
         /// <summary>
         /// 1月产量
         /// </summary>
@@ -169,19 +175,13 @@ namespace GHMonitoringCenterApi.Domain.Models
         /// </summary>
         [SugarColumn(Length = 36)]
         public Guid CompanyId { get; set; }
-
-        /// <summary>
-        /// 基准Id
-        /// </summary>
-        [SugarColumn(Length = 36)]
-        public Guid BaseLinePlanProject { get; set; }
     }
 
     /// <summary>
-    /// 年度计划关联船舶
+    /// 基准年度计划关联船舶
     /// </summary>
-    [SugarTable("t_annualproductionships", IsDisabledDelete = true)]
-    public class AnnualProductionShips : BaseEntity<Guid>
+    [SugarTable("t_baselineplanannualproductionships", IsDisabledDelete = true)]
+    public class BaseLinePlanAnnualProductionShips : BaseEntity<Guid>
     {
         /// <summary>
         /// 主键id
