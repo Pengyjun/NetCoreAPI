@@ -792,6 +792,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 if (userInfo.Account != "2019013759" &&
               userInfo.Account != "2020012489" &&
               userInfo.Account != "2016146340" &&
+              userInfo.Account != "2018014370" &&
               !userInfo.CurrentLoginIsAdmin)
                 {
                     pids = projectList.Select(x => x.Id).ToList();
