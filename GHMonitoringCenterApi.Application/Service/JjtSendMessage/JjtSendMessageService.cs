@@ -3764,7 +3764,7 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
                     ShipId = top.Key,
                     ShipName = ownerShipList.Where(x => x.PomId == top.Key).Select(x => x.Name).FirstOrDefault(),
                     ShipYearOutput = Math.Round(top.Value / baseConst, 2),
-                    TimePercent = shipTimePercent,
+                    TimePercent = shipTimePercent>100?100: shipTimePercent,
                     ShipDayOutput = shipDayValue.HasValue ? Math.Round(shipDayValue.Value / baseWanConst, 2) : 0,
                     ConstructionDays = onDays,
                     WorkingHours = shipYearHours,
