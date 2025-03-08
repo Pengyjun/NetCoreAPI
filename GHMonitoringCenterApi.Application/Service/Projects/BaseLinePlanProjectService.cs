@@ -12,6 +12,7 @@ using GHMonitoringCenterApi.Domain.Models;
 using GHMonitoringCenterApi.Domain.Shared;
 using GHMonitoringCenterApi.Domain.Shared.Enums;
 using GHMonitoringCenterApi.Domain.Shared.Util;
+using Microsoft.AspNetCore.Mvc.Formatters.Internal;
 using NPOI.SS.Formula.Functions;
 using SqlSugar;
 using UtilsSharp;
@@ -655,13 +656,13 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
 
             ResponseAjaxResult<SearchBaseLinePlanProjectAnnualProduction> rt = new();
             SearchBaseLinePlanProjectAnnualProduction rr = new();
-
-            //if (requestBody.ProjectId == Guid.Empty || string.IsNullOrWhiteSpace(requestBody.ProjectId.ToString()))
-            //{
-            //    return rt.SuccessResult(rr);
-            //}
-            //初始化
             List<BaseLinePlanProjectAnnualPlanProduction> pPlanProduction = new();
+
+            var pomids = await dbContext.Queryable<Institution>().Where(p => p.Grule.Contains(_currentUser.CurrentLoginInstitutionOid)).ToListAsync();
+            List<Guid?> guids = pomids.Select(p => p.PomId).ToList();
+            var projects = await dbContext.Queryable<Project>().Where(p => p.IsDelete == 1 && guids.Contains(p.ProjectDept)).Select(p => p.Id).ToListAsync();
+            var baseplanproject = await dbContext.Queryable<BaseLinePlanProject>()
+             .Where(t => t.IsDelete == 1).ToListAsync();
 
             var annualProductionShips = await dbContext.Queryable<BaseLinePlanAnnualProductionShips>()
                 .Where(t => t.IsDelete == 1).ToListAsync();
@@ -669,7 +670,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             var mainIds = annualProductionShips.Select(x => x.ProjectAnnualProductionId).ToList();
 
             var sums = await dbContext.Queryable<BaseLinePlanProjectAnnualPlanProduction>()
-                .Where(t => t.IsDelete == 1 && mainIds.Contains(t.Id)).Select(p => new BaseLinePlanProjectAnnualPlanProduction
+                .Where(t => t.IsDelete == 1 && mainIds.Contains(t.Id) && projects.Contains(t.ProjectId.Value)).Select(p => new BaseLinePlanProjectAnnualPlanProduction
                 {
                     JanuaryProductionValue = SqlFunc.AggregateSum(p.JanuaryProductionValue),
                     FebruaryProductionValue = SqlFunc.AggregateSum(p.FebruaryProductionValue),
@@ -698,15 +699,200 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     sumall.NovemberProductionValue + sumall.DecemberProductionValue;
             }
 
-            pPlanProduction =await dbContext.Queryable<BaseLinePlanProjectAnnualPlanProduction>().Where(it => it.IsDelete == 1).ToListAsync();
+            pPlanProduction = await dbContext.Queryable<BaseLinePlanProjectAnnualPlanProduction>().Where(it => it.IsDelete == 1).ToListAsync();
 
             var pIds = pPlanProduction.Select(x => x.ProjectId).ToList();
 
-            var baseplanproject = await dbContext.Queryable<BaseLinePlanProject>()
-               .Where(t => t.IsDelete == 1 && t.ProjectId == requestBody.ProjectId).FirstAsync();
+            //var baseplanproject = await dbContext.Queryable<BaseLinePlanProject>()
+            //   .Where(t => t.IsDelete == 1 && t.ProjectId == requestBody.ProjectId).FirstAsync();
 
-            //项目基本信息
-            var projects = await dbContext.Queryable<Project>().Where(t => t.IsDelete == 1 && pIds.Contains(t.Id)).Select(x => new { x.Id, x.CurrencyId, x.ShortName, x.ECAmount, x.ContractStipulationEndDate }).ToListAsync();
+            ////项目基本信息
+            //var projects = await dbContext.Queryable<Project>().Where(t => t.IsDelete == 1 && pIds.Contains(t.Id)).Select(x => new { x.Id, x.CurrencyId, x.ShortName, x.ECAmount, x.ContractStipulationEndDate }).ToListAsync();
+
+            var ships = await dbContext.Queryable<OwnerShip>().Where(t => t.IsDelete == 1).ToListAsync();
+
+            //项目开累产值   24年调整最终版本+至今为止月报数据
+            var monthReport = await dbContext.Queryable<MonthReport>().Where(t => t.IsDelete == 1).ToListAsync();
+            var monthReport24 = await dbContext.Queryable<MonthReportDetailHistory>().ToListAsync();
+            decimal completeAmount = 0M;//完成产值
+            decimal accumulatedOutputValue = 0M;//开累产值
+            decimal EffectiveAmount = 0M;
+            decimal RemainingAmount = 0M;
+            foreach (var item in pIds)
+            {
+                var pp = await dbContext.Queryable<Project>().FirstAsync(x => x.Id == item && x.IsDelete == 1);
+                if (pp != null)
+                {
+                    var dateMonth = DateTime.Now.ToDateMonth();
+                    var yearMonth = Convert.ToInt32(DateTime.Now.Year + "01");
+                    if (pp.CurrencyId == "2a0e99b4-f989-4967-b5f1-5519091d4280".ToGuid())//国内
+                    {
+
+                        accumulatedOutputValue = monthReport24.Where(x => x.ProjectId == pp.Id).Sum(x => Convert.ToDecimal(x.ActualCompAmount));//开累
+                                                                                                                                                //202306历史产值追加
+                        accumulatedOutputValue += monthReport.Where(x => x.ProjectId == pp.Id && x.DateMonth == 202306).Sum(x => Convert.ToDecimal(x.ActualCompAmount));
+                    }
+                    else
+                    {
+                        //获取汇率
+                        var currencyConvert = await dbContext.Queryable<CurrencyConverter>().Where(t => t.IsDelete == 1 && t.CurrencyId == pp.CurrencyId.ToString()).OrderByDescending(x => x.Year).FirstAsync();
+                        pp.ECAmount = pp.ECAmount * currencyConvert.ExchangeRate;
+                        accumulatedOutputValue = monthReport24.Where(x => x.ProjectId == pp.Id).Sum(x => Convert.ToDecimal(x.RMBHValue));//开累
+                                                                                                                                         //202306历史产值追加
+                        accumulatedOutputValue += monthReport.Where(x => x.ProjectId == pp.Id && x.DateMonth == 202306).Sum(x => Convert.ToDecimal(x.RMBHValue));
+                    }
+                    //截止到当月的完成产值+历史调整开累产值=开累产值
+                    accumulatedOutputValue += monthReport.Where(x => x.ProjectId == pp.Id && x.DateMonth > 202412 && x.DateMonth <= dateMonth).Sum(x => x.CompleteProductionAmount);
+                    //2024年调整的开累数+截止到当年一月的开累数（年初开累产值）
+                    completeAmount = accumulatedOutputValue + monthReport.Where(x => x.ProjectId == pp.Id && x.DateMonth > 202412 && x.DateMonth < yearMonth).Sum(x => x.CompleteProductionAmount);
+
+                    rr.ProjectName = pp.ShortName;
+                    EffectiveAmount += Convert.ToDecimal(pp.ECAmount);
+                    rr.ContractStipulationEndDate = pp.ContractStipulationEndDate?.ToString("yyyy-MM-dd");
+                    RemainingAmount += Convert.ToDecimal(pp.ECAmount) - completeAmount;
+                    rr.AccumulatedOutputValue = accumulatedOutputValue;
+                }
+            }
+
+            rr.EffectiveAmount = EffectiveAmount;
+            rr.RemainingAmount = RemainingAmount;
+            rr.AccumulatedOutputValue = sum;
+            rt.Data = rr;
+            rt.Success();
+            return rt;
+        }
+
+
+
+
+        /// <summary>
+        /// 基准计划项目界面 局工程部界面 
+        /// </summary>
+        /// <param name="requestBody"></param>
+        /// <returns></returns>
+        public async Task<ResponseAjaxResult<List<SearchSubsidiaryCompaniesProjectProductionDto>>> SearchBureauProjectProductionAsync(SearchBaseLinePlanProjectAnnualProductionRequest requestBody)
+        {
+            List<SearchSubsidiaryCompaniesProjectProductionDto> resultlist = new List<SearchSubsidiaryCompaniesProjectProductionDto>();
+            ResponseAjaxResult<List<SearchSubsidiaryCompaniesProjectProductionDto>> rt = new();
+
+
+
+            var baseplanproject = await dbContext.Queryable<BaseLinePlanProject>()
+           .Where(t => t.IsDelete == 1).ToListAsync();
+
+            List<Guid?> baseplanprojectIds = new List<Guid?>();
+            baseplanprojectIds = baseplanproject
+                .Select(t => t.ProjectId).ToList();
+
+            var annualProductionShips = await dbContext.Queryable<BaseLinePlanAnnualProductionShips>()
+                .Where(t => t.IsDelete == 1).ToListAsync();
+
+            var mainIds = annualProductionShips.Select(x => x.ProjectAnnualProductionId).ToList();
+
+
+            var projectList = await dbContext.Queryable<Project>().Where(x => x.IsDelete == 1).Select(x => new Project { Id = x.Id, Name = x.Name, CompanyId = x.CompanyId }).ToListAsync();
+
+            var pPlanProduction = await dbContext.Queryable<BaseLinePlanProjectAnnualPlanProduction>()
+                 .Where(t => t.IsDelete == 1 && mainIds.Contains(t.Id))
+                 .GroupBy(p => p.ProjectId)
+                 .Select(it => new SearchSubsidiaryCompaniesProjectProductionDto()
+                 {
+                     ProjectId = it.ProjectId,
+                     JanuaryProductionValue = SqlFunc.AggregateSum(it.JanuaryProductionValue),
+                     FebruaryProductionValue = SqlFunc.AggregateSum(it.FebruaryProductionValue),
+                     MarchProductionValue = SqlFunc.AggregateSum(it.MarchProductionValue),
+                     AprilProductionValue = SqlFunc.AggregateSum(it.AprilProductionValue),
+                     MayProductionValue = SqlFunc.AggregateSum(it.MayProductionValue),
+                     JuneProductionValue = SqlFunc.AggregateSum(it.JuneProductionValue),
+                     JulyProductionValue = SqlFunc.AggregateSum(it.JulyProductionValue),
+                     AugustProductionValue = SqlFunc.AggregateSum(it.AugustProductionValue),
+                     SeptemberProductionValue = SqlFunc.AggregateSum(it.SeptemberProductionValue),
+                     OctoberProductionValue = SqlFunc.AggregateSum(it.OctoberProductionValue),
+                     NovemberProductionValue = SqlFunc.AggregateSum(it.NovemberProductionValue),
+                     DecemberProductionValue = SqlFunc.AggregateSum(it.DecemberProductionValue)
+                 })
+                 .ToListAsync();
+
+            foreach (var item in pPlanProduction)
+            {
+                item.ProjectName = projectList.Where(p => p.Id == item.ProjectId).FirstOrDefault()?.Name;
+                var plantype = baseplanproject.Where(p => p.ProjectId == item.ProjectId).FirstOrDefault()?.PlanType;
+                if (plantype == "新建")
+                {
+                    item.NewPlanName = item.ProjectName + "-新建";
+                }
+                else
+                {
+                    item.BasePlanName = item.ProjectName + "-基准";
+                }
+
+            }
+            rt.Count = pPlanProduction.Count;
+            return rt.SuccessResult(pPlanProduction);
+        }
+
+        /// <summary>
+        /// 局工程部界面 项目合计
+        /// </summary>
+        /// <param name="requestBody"></param>
+        /// <returns></returns>
+        public async Task<ResponseAjaxResult<SearchBaseLinePlanProjectAnnualProduction>> SearchBureauProjectProductionAsyncSumAsync(SearchBaseLinePlanProjectAnnualProductionRequest requestBody)
+        {
+
+            ResponseAjaxResult<SearchBaseLinePlanProjectAnnualProduction> rt = new();
+            SearchBaseLinePlanProjectAnnualProduction rr = new();
+            List<BaseLinePlanProjectAnnualPlanProduction> pPlanProduction = new();
+
+            var pomids = await dbContext.Queryable<Institution>().Where(p => p.Grule.Contains(_currentUser.CurrentLoginInstitutionOid)).ToListAsync();
+            List<Guid?> guids = pomids.Select(p => p.PomId).ToList();
+            var projects = await dbContext.Queryable<Project>().Where(p => p.IsDelete == 1 && guids.Contains(p.ProjectDept)).Select(p => p.Id).ToListAsync();
+            var baseplanproject = await dbContext.Queryable<BaseLinePlanProject>()
+             .Where(t => t.IsDelete == 1).ToListAsync();
+
+            var annualProductionShips = await dbContext.Queryable<BaseLinePlanAnnualProductionShips>()
+                .Where(t => t.IsDelete == 1).ToListAsync();
+
+            var mainIds = annualProductionShips.Select(x => x.ProjectAnnualProductionId).ToList();
+
+            var sums = await dbContext.Queryable<BaseLinePlanProjectAnnualPlanProduction>()
+                .Where(t => t.IsDelete == 1 && mainIds.Contains(t.Id) && projects.Contains(t.ProjectId.Value)).Select(p => new BaseLinePlanProjectAnnualPlanProduction
+                {
+                    JanuaryProductionValue = SqlFunc.AggregateSum(p.JanuaryProductionValue),
+                    FebruaryProductionValue = SqlFunc.AggregateSum(p.FebruaryProductionValue),
+                    MarchProductionValue = SqlFunc.AggregateSum(p.MarchProductionValue),
+                    AprilProductionValue = SqlFunc.AggregateSum(p.AprilProductionValue),
+                    MayProductionValue = SqlFunc.AggregateSum(p.MayProductionValue),
+                    JuneProductionValue = SqlFunc.AggregateSum(p.JuneProductionValue),
+                    JulyProductionValue = SqlFunc.AggregateSum(p.JulyProductionValue),
+                    AugustProductionValue = SqlFunc.AggregateSum(p.AugustProductionValue),
+                    SeptemberProductionValue = SqlFunc.AggregateSum(p.SeptemberProductionValue),
+                    OctoberProductionValue = SqlFunc.AggregateSum(p.OctoberProductionValue),
+                    NovemberProductionValue = SqlFunc.AggregateSum(p.NovemberProductionValue),
+                    DecemberProductionValue = SqlFunc.AggregateSum(p.DecemberProductionValue)
+                }).FirstAsync();
+
+            var sumall = sums;
+
+            var sum = 0M;
+            if (sumall != null)
+            {
+                sum = sumall.JanuaryProductionValue + sumall.FebruaryProductionValue +
+                    sumall.MarchProductionValue + sumall.AprilProductionValue +
+                    sumall.MayProductionValue + sumall.JuneProductionValue +
+                    sumall.JulyProductionValue + sumall.AugustProductionValue +
+                    sumall.SeptemberProductionValue + sumall.OctoberProductionValue +
+                    sumall.NovemberProductionValue + sumall.DecemberProductionValue;
+            }
+
+            pPlanProduction = await dbContext.Queryable<BaseLinePlanProjectAnnualPlanProduction>().Where(it => it.IsDelete == 1).ToListAsync();
+
+            var pIds = pPlanProduction.Select(x => x.ProjectId).ToList();
+
+            //var baseplanproject = await dbContext.Queryable<BaseLinePlanProject>()
+            //   .Where(t => t.IsDelete == 1 && t.ProjectId == requestBody.ProjectId).FirstAsync();
+
+            ////项目基本信息
+            //var projects = await dbContext.Queryable<Project>().Where(t => t.IsDelete == 1 && pIds.Contains(t.Id)).Select(x => new { x.Id, x.CurrencyId, x.ShortName, x.ECAmount, x.ContractStipulationEndDate }).ToListAsync();
 
             var ships = await dbContext.Queryable<OwnerShip>().Where(t => t.IsDelete == 1).ToListAsync();
 
@@ -763,75 +949,6 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
 
 
         /// <summary>
-        /// 基准计划项目界面 局工程部界面 
-        /// </summary>
-        /// <param name="requestBody"></param>
-        /// <returns></returns>
-        public async Task<ResponseAjaxResult<List<SearchSubsidiaryCompaniesProjectProductionDto>>> SearchBureauProjectProductionAsync(SearchBaseLinePlanProjectAnnualProductionRequest requestBody)
-        {
-            var departmentIds = new List<Guid>();
-            var oids = await dbContext.Queryable<Institution>().Where(x => x.IsDelete == 1 && x.Oid == _currentUser.CurrentLoginInstitutionOid).SingleAsync();
-            var InstitutionId = await baseService.SearchCompanySubPullDownAsync(oids.PomId.Value, false, true);
-            departmentIds = InstitutionId.Data.Select(x => x.Id.Value).ToList();
-
-            List<SearchSubsidiaryCompaniesProjectProductionDto> resultlist = new List<SearchSubsidiaryCompaniesProjectProductionDto>();
-            ResponseAjaxResult<List<SearchSubsidiaryCompaniesProjectProductionDto>> rt = new();
-
-            var baseplanproject = await dbContext.Queryable<BaseLinePlanProject>()
-           .Where(t => t.IsDelete == 1).ToListAsync();
-
-            var baseplanprojectIds = await dbContext.Queryable<BaseLinePlanProject>()
-                .Select(t => t.ProjectId).ToListAsync();
-
-            var annualProductionShips = await dbContext.Queryable<BaseLinePlanAnnualProductionShips>()
-                .Where(t => t.IsDelete == 1).ToListAsync();
-
-            var mainIds = annualProductionShips.Select(x => x.ProjectAnnualProductionId).ToList();
-
-
-            var projectList = await dbContext.Queryable<Project>().Where(x => x.IsDelete == 1).Select(x => new Project { Id = x.Id, Name = x.Name, CompanyId = x.CompanyId }).ToListAsync();
-
-            var pPlanProduction = await dbContext.Queryable<BaseLinePlanProjectAnnualPlanProduction>()
-                 .Where(t => t.IsDelete == 1 && mainIds.Contains(t.Id))
-                 .GroupBy(p => p.ProjectId)
-                 .Select(it => new SearchSubsidiaryCompaniesProjectProductionDto()
-                 {
-                     ProjectId = it.ProjectId,
-                     JanuaryProductionValue = SqlFunc.AggregateSum(it.JanuaryProductionValue),
-                     FebruaryProductionValue = SqlFunc.AggregateSum(it.FebruaryProductionValue),
-                     MarchProductionValue = SqlFunc.AggregateSum(it.MarchProductionValue),
-                     AprilProductionValue = SqlFunc.AggregateSum(it.AprilProductionValue),
-                     MayProductionValue = SqlFunc.AggregateSum(it.MayProductionValue),
-                     JuneProductionValue = SqlFunc.AggregateSum(it.JuneProductionValue),
-                     JulyProductionValue = SqlFunc.AggregateSum(it.JulyProductionValue),
-                     AugustProductionValue = SqlFunc.AggregateSum(it.AugustProductionValue),
-                     SeptemberProductionValue = SqlFunc.AggregateSum(it.SeptemberProductionValue),
-                     OctoberProductionValue = SqlFunc.AggregateSum(it.OctoberProductionValue),
-                     NovemberProductionValue = SqlFunc.AggregateSum(it.NovemberProductionValue),
-                     DecemberProductionValue = SqlFunc.AggregateSum(it.DecemberProductionValue)
-                 })
-                 .ToListAsync();
-
-            foreach (var item in pPlanProduction)
-            {
-                item.ProjectName = projectList.Where(p => p.Id == item.ProjectId).FirstOrDefault()?.Name;
-                var plantype = baseplanproject.Where(p => p.ProjectId == item.ProjectId).FirstOrDefault()?.PlanType;
-                if (plantype == "新建")
-                {
-                    item.NewPlanName = item.ProjectName + "-新建";
-                }
-                else
-                {
-                    item.BasePlanName = item.ProjectName + "-基准";
-                }
-
-            }
-            rt.Count = pPlanProduction.Count;
-            return rt.SuccessResult(pPlanProduction);
-        }
-
-
-        /// <summary>
         /// 基准计划公司界面
         /// </summary>
         /// <param name="requestBody"></param>
@@ -839,9 +956,19 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
         public async Task<ResponseAjaxResult<List<SearchCompaniesProjectProductionDto>>> SearchCompaniesProjectProductionAsync(SearchBaseLinePlanProjectAnnualProductionRequest requestBody)
         {
             var departmentIds = new List<Guid>();
-            var oids = await dbContext.Queryable<Institution>().Where(x => x.IsDelete == 1 && x.Oid == _currentUser.CurrentLoginInstitutionOid).SingleAsync();
-            var InstitutionId = await baseService.SearchCompanySubPullDownAsync(oids.PomId.Value, false, true);
-            departmentIds = InstitutionId.Data.Select(x => x.Id.Value).ToList();
+            //var oids = await dbContext.Queryable<Institution>().Where(x => x.IsDelete == 1 && x.Oid == _currentUser.CurrentLoginInstitutionOid).SingleAsync();
+            //var InstitutionId = await baseService.SearchCompanySubPullDownAsync(oids.PomId.Value, false, true);
+            //departmentIds = InstitutionId.Data.Select(x => x.Id.Value).ToList();
+
+            var baseplanproject = await dbContext.Queryable<BaseLinePlanProject>().Where(t => t.IsDelete == 1)
+                 .WhereIF(!string.IsNullOrWhiteSpace(requestBody.PlanType), p => p.PlanType == requestBody.PlanType)
+                 .WhereIF(!string.IsNullOrWhiteSpace(requestBody.StartStatus), p => p.StartStatus == requestBody.StartStatus)
+         .ToListAsync();
+
+            List<Guid?> baseplanprojectIds = new List<Guid?>();
+            baseplanprojectIds = baseplanproject
+                .Select(t => t.ProjectId).ToList();
+
 
             List<SearchCompaniesProjectProductionDto> resultlist = new List<SearchCompaniesProjectProductionDto>();
             ResponseAjaxResult<List<SearchCompaniesProjectProductionDto>> rt = new();
@@ -854,7 +981,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             var projectList = await dbContext.Queryable<Project>().Where(x => x.IsDelete == 1).Select(x => new Project { Id = x.Id, Name = x.Name, CompanyId = x.CompanyId }).ToListAsync();
 
             var pPlanProduction = await dbContext.Queryable<BaseLinePlanProjectAnnualPlanProduction>()
-                 .Where(t => t.IsDelete == 1 && mainIds.Contains(t.Id))
+                 .Where(t => t.IsDelete == 1 && mainIds.Contains(t.Id) && baseplanprojectIds.Contains(t.ProjectId))
                  .GroupBy(p => p.CompanyId)
                  .Select(it => new SearchCompaniesProjectProductionDto()
                  {
@@ -888,13 +1015,15 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             foreach (var item in pPlanProduction)
             {
                 item.CompanyName = List.Where(p => p.CompanyId == item.CompanyId).FirstOrDefault()?.CompanyName;
-
+                item.AnnualTotal = item.JanuaryProductionValue + item.FebruaryProductionValue + item.MarchProductionValue + item.AprilProductionValue
+                    + item.MayProductionValue + item.JuneProductionValue + item.JulyProductionValue + item.AugustProductionValue + item.SeptemberProductionValue
+                    + item.OctoberProductionValue + item.NovemberProductionValue + item.DecemberProductionValue;
             }
             rt.Count = pPlanProduction.Count;
             return rt.SuccessResult(pPlanProduction);
         }
 
-        /// <summary>
+        /// <summary>                    
         /// 计划基准
         /// </summary>
         /// <param name="requsetDto"></param>

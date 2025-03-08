@@ -22,6 +22,18 @@
 
         public bool IsProjectAnnualProduction {  get; set; }
 
+        /// <summary>
+        /// 计划版本
+        /// </summary>
+        public string? PlanType { get; set; }
+
+        /// <summary>
+        /// 计划版本
+        /// </summary>
+        public string? StartStatus { get; set; }
+
+
+
         ///// <summary>
         ///// 基准计划ID
         ///// </summary>

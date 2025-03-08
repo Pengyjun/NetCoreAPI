@@ -70,7 +70,7 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project
     public class SearchBaseLinePlanProjectAnnualProductionDto
     {
 
-       public BaseLinePlanprojectRequestDto baseLinePlanproject { get; set; }
+        public BaseLinePlanprojectRequestDto baseLinePlanproject { get; set; }
 
         /// <summary>
         /// 主键
@@ -223,7 +223,7 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project
     public class BaseLinePlanprojectRequestDto
     {
 
-        
+
         //public Guid? BasePlanProjectId { get; set; }
 
         ///// <summary>
@@ -608,6 +608,11 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project
         /// 12月产值
         /// </summary>
         public decimal DecemberProductionValue { get; set; }
+
+        /// <summary>
+        /// 年度合计
+        /// </summary>
+        public decimal AnnualTotal {get; set;}
     }
 
 

@@ -132,7 +132,7 @@ namespace GHMonitoringCenterApi.Controllers.Project
         }
 
         /// <summary>
-        /// 基准列表 分子公司
+        /// 基准列表 分子公司项目合计
         /// </summary>
         /// <param name="requestBody"></param>
         /// <returns></returns>
@@ -154,6 +154,18 @@ namespace GHMonitoringCenterApi.Controllers.Project
         {
             return await baseLinePlanProjectService.SearchBureauProjectProductionAsync(requestBody);
         }
+
+        /// <summary>
+        /// 局工程部界面 项目界面 项目合计汇总
+        /// </summary>
+        /// <param name="requestBody"></param>
+        /// <returns></returns>
+        [HttpGet("SearchBureauProjectProductionAsyncSum")]
+        public async Task<ResponseAjaxResult<SearchBaseLinePlanProjectAnnualProduction>> SearchBureauProjectProductionAsyncSumAsync([FromQuery] SearchBaseLinePlanProjectAnnualProductionRequest requestBody)
+        {
+            return await baseLinePlanProjectService.SearchBureauProjectProductionAsyncSumAsync(requestBody);
+        }
+
 
         /// <summary>
         /// 局工程部界面 公司界面
