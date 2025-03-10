@@ -20,7 +20,7 @@
         /// 项目生产计划查询  true
         /// </summary>
 
-        public bool IsProjectAnnualProduction {  get; set; }
+        public bool IsProjectAnnualProduction { get; set; }
 
         /// <summary>
         /// 计划版本
@@ -32,8 +32,10 @@
         /// </summary>
         public string? StartStatus { get; set; }
 
-
-
+        /// <summary>
+        /// 年份
+        /// </summary>
+        public int? Year { get; set; }
         ///// <summary>
         ///// 基准计划ID
         ///// </summary>
