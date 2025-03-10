@@ -4274,16 +4274,16 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             }
 
             //提交月报要判断下月计划产值是否等于0，如果等于0则项目状态必须是完工或者停工，否则一律提交不通过。
-            var projectStatusList = await GetProjectStatusListAsync();
-            monthReport = _mapper.Map(model, monthReport);
-            var StateName = projectStatusList.FirstOrDefault(t => t.StatusId == project.StatusId)?.Name;
-            if (!string.IsNullOrWhiteSpace(StateName))
-            {
-                if (monthReport.RollingPlanForNextMonth == 0 && !StateName.Contains("完工") && !StateName.Contains("交工") && !StateName.Contains("竣工"))
-                {
-                    return result.FailResult(HttpStatusCode.SaveFail, "项目状态不为完工或者停工,下月计划产值不能为0");
-                }
-            }
+            //var projectStatusList = await GetProjectStatusListAsync();
+            //monthReport = _mapper.Map(model, monthReport);
+            //var StateName = projectStatusList.FirstOrDefault(t => t.StatusId == project.StatusId)?.Name;
+            //if (!string.IsNullOrWhiteSpace(StateName))
+            //{
+            //    if (monthReport.RollingPlanForNextMonth == 0 && !StateName.Contains("完工") || !StateName.Contains("停工"))
+            //    {
+            //        return result.FailResult(HttpStatusCode.SaveFail, "项目状态不为完工或者停工,下月计划产值不能为0");
+            //    }
+            //}
 
 
             /*
