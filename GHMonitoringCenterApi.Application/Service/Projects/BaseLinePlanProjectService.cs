@@ -232,22 +232,22 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 if (pp != null)
                 {
                     var dateMonth = DateTime.Now.ToDateMonth();
-                    var yearMonth = Convert.ToInt32(DateTime.Now.Year + "01");
+                    var yearMonth = System.Convert.ToInt32(DateTime.Now.Year + "01");
                     if (pp.CurrencyId == "2a0e99b4-f989-4967-b5f1-5519091d4280".ToGuid())//国内
                     {
 
-                        accumulatedOutputValue = monthReport24.Where(x => x.ProjectId == pp.Id).Sum(x => Convert.ToDecimal(x.ActualCompAmount));//开累
+                        accumulatedOutputValue = monthReport24.Where(x => x.ProjectId == pp.Id).Sum(x => System.Convert.ToDecimal(x.ActualCompAmount));//开累
                         //202306历史产值追加
-                        accumulatedOutputValue += monthReport.Where(x => x.ProjectId == pp.Id && x.DateMonth == 202306).Sum(x => Convert.ToDecimal(x.ActualCompAmount));
+                        accumulatedOutputValue += monthReport.Where(x => x.ProjectId == pp.Id && x.DateMonth == 202306).Sum(x => System.Convert.ToDecimal(x.ActualCompAmount));
                     }
                     else
                     {
                         //获取汇率
                         var currencyConvert = await dbContext.Queryable<CurrencyConverter>().Where(t => t.IsDelete == 1 && t.CurrencyId == pp.CurrencyId.ToString()).OrderByDescending(x => x.Year).FirstAsync();
                         pp.ECAmount = pp.ECAmount * currencyConvert.ExchangeRate;
-                        accumulatedOutputValue = monthReport24.Where(x => x.ProjectId == pp.Id).Sum(x => Convert.ToDecimal(x.RMBHValue));//开累
+                        accumulatedOutputValue = monthReport24.Where(x => x.ProjectId == pp.Id).Sum(x => System.Convert.ToDecimal(x.RMBHValue));//开累
                         //202306历史产值追加
-                        accumulatedOutputValue += monthReport.Where(x => x.ProjectId == pp.Id && x.DateMonth == 202306).Sum(x => Convert.ToDecimal(x.RMBHValue));
+                        accumulatedOutputValue += monthReport.Where(x => x.ProjectId == pp.Id && x.DateMonth == 202306).Sum(x => System.Convert.ToDecimal(x.RMBHValue));
                     }
                     //截止到当月的完成产值+历史调整开累产值=开累产值
                     accumulatedOutputValue += monthReport.Where(x => x.ProjectId == pp.Id && x.DateMonth > 202412 && x.DateMonth <= dateMonth).Sum(x => x.CompleteProductionAmount);
@@ -255,9 +255,9 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     completeAmount = accumulatedOutputValue + monthReport.Where(x => x.ProjectId == pp.Id && x.DateMonth > 202412 && x.DateMonth < yearMonth).Sum(x => x.CompleteProductionAmount);
 
                     rr.ProjectName = pp.ShortName;
-                    rr.EffectiveAmount = Convert.ToDecimal(pp.ECAmount);
+                    rr.EffectiveAmount = System.Convert.ToDecimal(pp.ECAmount);
                     rr.ContractStipulationEndDate = pp.ContractStipulationEndDate?.ToString("yyyy-MM-dd");
-                    rr.RemainingAmount = Convert.ToDecimal(pp.ECAmount) - completeAmount;
+                    rr.RemainingAmount = System.Convert.ToDecimal(pp.ECAmount) - completeAmount;
                     rr.AccumulatedOutputValue = accumulatedOutputValue;
                     if (baseplanproject != null)
                     {
@@ -344,32 +344,33 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
 
             foreach (var item in pPlanProduction)
             {
+
                 SearchBaseLinePlanProjectAnnualProductionDto ppChild = new();
                 ppChild.Id = item.Id;
-                ppChild.JanuaryProductionQuantity = item.JanuaryProductionQuantity;
-                ppChild.JanuaryProductionValue = item.JanuaryProductionValue;
-                ppChild.FebruaryProductionQuantity = item.FebruaryProductionQuantity;
-                ppChild.FebruaryProductionValue = item.FebruaryProductionValue;
-                ppChild.MarchProductionQuantity = item.MarchProductionQuantity;
-                ppChild.MarchProductionValue = item.MarchProductionValue;
-                ppChild.AprilProductionQuantity = item.AprilProductionQuantity;
-                ppChild.AprilProductionValue = item.AprilProductionValue;
-                ppChild.MayProductionQuantity = item.MayProductionQuantity;
-                ppChild.MayProductionValue = item.MayProductionValue;
-                ppChild.JuneProductionQuantity = item.JuneProductionQuantity;
-                ppChild.JuneProductionValue = item.JuneProductionValue;
-                ppChild.JulyProductionQuantity = item.JulyProductionQuantity;
-                ppChild.JulyProductionValue = item.JulyProductionValue;
-                ppChild.AugustProductionValue = item.AugustProductionValue;
-                ppChild.AugustProductionQuantity = item.AugustProductionQuantity;
-                ppChild.SeptemberProductionQuantity = item.SeptemberProductionQuantity;
-                ppChild.SeptemberProductionValue = item.SeptemberProductionValue;
-                ppChild.OctoberProductionQuantity = item.OctoberProductionQuantity;
-                ppChild.OctoberProductionValue = item.OctoberProductionValue;
-                ppChild.NovemberProductionQuantity = item.NovemberProductionQuantity;
-                ppChild.NovemberProductionValue = item.NovemberProductionValue;
-                ppChild.DecemberProductionQuantity = item.DecemberProductionQuantity;
-                ppChild.DecemberProductionValue = item.DecemberProductionValue;
+                ppChild.JanuaryProductionQuantity = Setnumericalconversion(item.JanuaryProductionQuantity);
+                ppChild.JanuaryProductionValue = Setnumericalconversion(item.JanuaryProductionValue);
+                ppChild.FebruaryProductionQuantity = Setnumericalconversion(item.FebruaryProductionQuantity);
+                ppChild.FebruaryProductionValue = Setnumericalconversion(item.FebruaryProductionValue);
+                ppChild.MarchProductionQuantity = Setnumericalconversion(item.MarchProductionQuantity);
+                ppChild.MarchProductionValue = Setnumericalconversion(item.MarchProductionValue);
+                ppChild.AprilProductionQuantity = Setnumericalconversion(item.AprilProductionQuantity);
+                ppChild.AprilProductionValue = Setnumericalconversion(item.AprilProductionValue);
+                ppChild.MayProductionQuantity = Setnumericalconversion(item.MayProductionQuantity);
+                ppChild.MayProductionValue = Setnumericalconversion(item.MayProductionValue);
+                ppChild.JuneProductionQuantity = Setnumericalconversion(item.JuneProductionQuantity);
+                ppChild.JuneProductionValue = Setnumericalconversion(item.JuneProductionValue);
+                ppChild.JulyProductionQuantity = Setnumericalconversion(item.JulyProductionQuantity);
+                ppChild.JulyProductionValue = Setnumericalconversion(item.JulyProductionValue);
+                ppChild.AugustProductionValue = Setnumericalconversion(item.AugustProductionValue);
+                ppChild.AugustProductionQuantity = Setnumericalconversion(item.AugustProductionQuantity);
+                ppChild.SeptemberProductionQuantity = Setnumericalconversion(item.SeptemberProductionQuantity);
+                ppChild.SeptemberProductionValue = Setnumericalconversion(item.SeptemberProductionValue);
+                ppChild.OctoberProductionQuantity = Setnumericalconversion(item.OctoberProductionQuantity);
+                ppChild.OctoberProductionValue = Setnumericalconversion(item.OctoberProductionValue);
+                ppChild.NovemberProductionQuantity = Setnumericalconversion(item.NovemberProductionQuantity);
+                ppChild.NovemberProductionValue = Setnumericalconversion(item.NovemberProductionValue);
+                ppChild.DecemberProductionQuantity = Setnumericalconversion(item.DecemberProductionQuantity);
+                ppChild.DecemberProductionValue = Setnumericalconversion(item.DecemberProductionValue);
                 ppChild.AnnualProductionShips = annualProductionShips
                     .Where(x => x.ProjectAnnualProductionId == item.Id)
                     .Select(x => new BaseLinePlanAnnualPlanProductionShips { ShipId = x.ShipId, ShipType = x.ShipType, ShipName = x.ShipName })
@@ -431,30 +432,30 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                         var first = tables.FirstOrDefault(x => x.Id == item.Id);
                         if (first != null)
                         {
-                            first.JanuaryProductionQuantity = item.JanuaryProductionQuantity;
-                            first.JanuaryProductionValue = item.JanuaryProductionValue;
-                            first.FebruaryProductionQuantity = item.FebruaryProductionQuantity;
-                            first.FebruaryProductionValue = item.FebruaryProductionValue;
-                            first.MarchProductionQuantity = item.MarchProductionQuantity;
-                            first.MarchProductionValue = item.MarchProductionValue;
-                            first.AprilProductionQuantity = item.AprilProductionQuantity;
-                            first.AprilProductionValue = item.AprilProductionValue;
-                            first.MayProductionQuantity = item.MayProductionQuantity;
-                            first.MayProductionValue = item.MayProductionValue;
-                            first.JuneProductionQuantity = item.JuneProductionQuantity;
-                            first.JuneProductionValue = item.JuneProductionValue;
-                            first.JulyProductionQuantity = item.JulyProductionQuantity;
-                            first.JulyProductionValue = item.JulyProductionValue;
-                            first.AugustProductionValue = item.AugustProductionValue;
-                            first.AugustProductionQuantity = item.AugustProductionQuantity;
-                            first.SeptemberProductionQuantity = item.SeptemberProductionQuantity;
-                            first.SeptemberProductionValue = item.SeptemberProductionValue;
-                            first.OctoberProductionQuantity = item.OctoberProductionQuantity;
-                            first.OctoberProductionValue = item.OctoberProductionValue;
-                            first.NovemberProductionQuantity = item.NovemberProductionQuantity;
-                            first.NovemberProductionValue = item.NovemberProductionValue;
-                            first.DecemberProductionQuantity = item.DecemberProductionQuantity;
-                            first.DecemberProductionValue = item.DecemberProductionValue;
+                            first.JanuaryProductionQuantity = Setnumericalconversiontwo(item.JanuaryProductionQuantity);
+                            first.JanuaryProductionValue = Setnumericalconversiontwo(item.JanuaryProductionValue);
+                            first.FebruaryProductionQuantity = Setnumericalconversiontwo(item.FebruaryProductionQuantity);
+                            first.FebruaryProductionValue = Setnumericalconversiontwo(item.FebruaryProductionValue);
+                            first.MarchProductionQuantity = Setnumericalconversiontwo(item.MarchProductionQuantity);
+                            first.MarchProductionValue = Setnumericalconversiontwo(item.MarchProductionValue);
+                            first.AprilProductionQuantity = Setnumericalconversiontwo(item.AprilProductionQuantity);
+                            first.AprilProductionValue = Setnumericalconversiontwo(item.AprilProductionValue);
+                            first.MayProductionQuantity = Setnumericalconversiontwo(item.MayProductionQuantity);
+                            first.MayProductionValue = Setnumericalconversiontwo(item.MayProductionValue);
+                            first.JuneProductionQuantity = Setnumericalconversiontwo(item.JuneProductionQuantity);
+                            first.JuneProductionValue = Setnumericalconversiontwo(item.JuneProductionValue);
+                            first.JulyProductionQuantity = Setnumericalconversiontwo(item.JulyProductionQuantity);
+                            first.JulyProductionValue = Setnumericalconversiontwo(item.JulyProductionValue);
+                            first.AugustProductionValue = Setnumericalconversiontwo(item.AugustProductionValue);
+                            first.AugustProductionQuantity = Setnumericalconversiontwo(item.AugustProductionQuantity);
+                            first.SeptemberProductionQuantity = Setnumericalconversiontwo(item.SeptemberProductionQuantity);
+                            first.SeptemberProductionValue = Setnumericalconversiontwo(item.SeptemberProductionValue);
+                            first.OctoberProductionQuantity = Setnumericalconversiontwo(item.OctoberProductionQuantity);
+                            first.OctoberProductionValue = Setnumericalconversiontwo(item.OctoberProductionValue);
+                            first.NovemberProductionQuantity = Setnumericalconversiontwo(item.NovemberProductionQuantity);
+                            first.NovemberProductionValue = Setnumericalconversiontwo(item.NovemberProductionValue);
+                            first.DecemberProductionQuantity = Setnumericalconversiontwo(item.DecemberProductionQuantity);
+                            first.DecemberProductionValue = Setnumericalconversiontwo(item.DecemberProductionValue);
                             upTables.Add(first);
                             Ids.Add(first.Id);
 
@@ -476,30 +477,30 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                         var id = GuidUtil.Next();
                         addTables.Add(new BaseLinePlanProjectAnnualPlanProduction
                         {
-                            JanuaryProductionQuantity = item.JanuaryProductionQuantity,
-                            JanuaryProductionValue = item.JanuaryProductionValue,
-                            FebruaryProductionQuantity = item.FebruaryProductionQuantity,
-                            FebruaryProductionValue = item.FebruaryProductionValue,
-                            MarchProductionQuantity = item.MarchProductionQuantity,
-                            MarchProductionValue = item.MarchProductionValue,
-                            AprilProductionQuantity = item.AprilProductionQuantity,
-                            AprilProductionValue = item.AprilProductionValue,
-                            MayProductionQuantity = item.MayProductionQuantity,
-                            MayProductionValue = item.MayProductionValue,
-                            JuneProductionQuantity = item.JuneProductionQuantity,
-                            JuneProductionValue = item.JuneProductionValue,
-                            JulyProductionQuantity = item.JulyProductionQuantity,
-                            JulyProductionValue = item.JulyProductionValue,
-                            AugustProductionValue = item.AugustProductionValue,
-                            AugustProductionQuantity = item.AugustProductionQuantity,
-                            SeptemberProductionQuantity = item.SeptemberProductionQuantity,
-                            SeptemberProductionValue = item.SeptemberProductionValue,
-                            OctoberProductionQuantity = item.OctoberProductionQuantity,
-                            OctoberProductionValue = item.OctoberProductionValue,
-                            NovemberProductionQuantity = item.NovemberProductionQuantity,
-                            NovemberProductionValue = item.NovemberProductionValue,
-                            DecemberProductionQuantity = item.DecemberProductionQuantity,
-                            DecemberProductionValue = item.DecemberProductionValue,
+                            JanuaryProductionQuantity = Setnumericalconversiontwo(item.JanuaryProductionQuantity),
+                            JanuaryProductionValue = Setnumericalconversiontwo(item.JanuaryProductionValue),
+                            FebruaryProductionQuantity = Setnumericalconversiontwo(item.FebruaryProductionQuantity),
+                            FebruaryProductionValue = Setnumericalconversiontwo(item.FebruaryProductionValue),
+                            MarchProductionQuantity = Setnumericalconversiontwo(item.MarchProductionQuantity),
+                            MarchProductionValue = Setnumericalconversiontwo(item.MarchProductionValue),
+                            AprilProductionQuantity = Setnumericalconversiontwo(item.AprilProductionQuantity),
+                            AprilProductionValue = Setnumericalconversiontwo(item.AprilProductionValue),
+                            MayProductionQuantity = Setnumericalconversiontwo(item.MayProductionQuantity),
+                            MayProductionValue = Setnumericalconversiontwo(item.MayProductionValue),
+                            JuneProductionQuantity = Setnumericalconversiontwo(item.JuneProductionQuantity),
+                            JuneProductionValue = Setnumericalconversiontwo(item.JuneProductionValue),
+                            JulyProductionQuantity = Setnumericalconversiontwo(item.JulyProductionQuantity),
+                            JulyProductionValue = Setnumericalconversiontwo(item.JulyProductionValue),
+                            AugustProductionValue = Setnumericalconversiontwo(item.AugustProductionValue),
+                            AugustProductionQuantity = Setnumericalconversiontwo(item.AugustProductionQuantity),
+                            SeptemberProductionQuantity = Setnumericalconversiontwo(item.SeptemberProductionQuantity),
+                            SeptemberProductionValue = Setnumericalconversiontwo(item.SeptemberProductionValue),
+                            OctoberProductionQuantity = Setnumericalconversiontwo(item.OctoberProductionQuantity),
+                            OctoberProductionValue = Setnumericalconversiontwo(item.OctoberProductionValue),
+                            NovemberProductionQuantity = Setnumericalconversiontwo(item.NovemberProductionQuantity),
+                            NovemberProductionValue = Setnumericalconversiontwo(item.NovemberProductionValue),
+                            DecemberProductionQuantity = Setnumericalconversiontwo(item.DecemberProductionQuantity),
+                            DecemberProductionValue = Setnumericalconversiontwo(item.DecemberProductionValue),
                             ProjectId = item.ProjectId,
                             CompanyId = item.CompanyId,
                             Year = DateTime.Now.Year,
@@ -634,6 +635,8 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
 
             foreach (var item in pPlanProduction)
             {
+                Converttowanyuan(item);
+
                 item.ProjectName = projectList.Where(p => p.Id == item.ProjectId).FirstOrDefault()?.Name;
                 var plantype = baseplanproject.Where(p => p.ProjectId == item.ProjectId).FirstOrDefault()?.PlanType;
                 if (plantype == "新建")
@@ -647,6 +650,22 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             }
             rt.Count = pPlanProduction.Count;
             return rt.SuccessResult(pPlanProduction);
+        }
+
+        private void Converttowanyuan(SearchSubsidiaryCompaniesProjectProductionDto item)
+        {
+            item.JanuaryProductionValue = Setnumericalconversion(item.JanuaryProductionValue);
+            item.FebruaryProductionValue = Setnumericalconversion(item.FebruaryProductionValue);
+            item.MarchProductionValue = Setnumericalconversion(item.MarchProductionValue);
+            item.AprilProductionValue = Setnumericalconversion(item.AprilProductionValue);
+            item.MayProductionValue = Setnumericalconversion(item.MayProductionValue);
+            item.JuneProductionValue = Setnumericalconversion(item.JuneProductionValue);
+            item.JulyProductionValue = Setnumericalconversion(item.JulyProductionValue);
+            item.AugustProductionValue = Setnumericalconversion(item.AugustProductionValue);
+            item.SeptemberProductionValue = Setnumericalconversion(item.SeptemberProductionValue);
+            item.OctoberProductionValue = Setnumericalconversion(item.OctoberProductionValue);
+            item.NovemberProductionValue = Setnumericalconversion(item.NovemberProductionValue);
+            item.DecemberProductionValue = Setnumericalconversion(item.DecemberProductionValue);
         }
 
         public async Task<ResponseAjaxResult<SearchBaseLinePlanProjectAnnualProduction>> SearchBaseLinePlanProjectAnnualProductionSumAsync(SearchBaseLinePlanProjectAnnualProductionRequest requestBody)
@@ -722,22 +741,22 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 if (pp != null)
                 {
                     var dateMonth = DateTime.Now.ToDateMonth();
-                    var yearMonth = Convert.ToInt32(DateTime.Now.Year + "01");
+                    var yearMonth = System.Convert.ToInt32(DateTime.Now.Year + "01");
                     if (pp.CurrencyId == "2a0e99b4-f989-4967-b5f1-5519091d4280".ToGuid())//国内
                     {
 
-                        accumulatedOutputValue = monthReport24.Where(x => x.ProjectId == pp.Id).Sum(x => Convert.ToDecimal(x.ActualCompAmount));//开累
-                                                                                                                                                //202306历史产值追加
-                        accumulatedOutputValue += monthReport.Where(x => x.ProjectId == pp.Id && x.DateMonth == 202306).Sum(x => Convert.ToDecimal(x.ActualCompAmount));
+                        accumulatedOutputValue = monthReport24.Where(x => x.ProjectId == pp.Id).Sum(x => System.Convert.ToDecimal(x.ActualCompAmount));//开累
+                                                                                                                                                       //202306历史产值追加
+                        accumulatedOutputValue += monthReport.Where(x => x.ProjectId == pp.Id && x.DateMonth == 202306).Sum(x => System.Convert.ToDecimal(x.ActualCompAmount));
                     }
                     else
                     {
                         //获取汇率
                         var currencyConvert = await dbContext.Queryable<CurrencyConverter>().Where(t => t.IsDelete == 1 && t.CurrencyId == pp.CurrencyId.ToString()).OrderByDescending(x => x.Year).FirstAsync();
                         pp.ECAmount = pp.ECAmount * currencyConvert.ExchangeRate;
-                        accumulatedOutputValue = monthReport24.Where(x => x.ProjectId == pp.Id).Sum(x => Convert.ToDecimal(x.RMBHValue));//开累
-                                                                                                                                         //202306历史产值追加
-                        accumulatedOutputValue += monthReport.Where(x => x.ProjectId == pp.Id && x.DateMonth == 202306).Sum(x => Convert.ToDecimal(x.RMBHValue));
+                        accumulatedOutputValue = monthReport24.Where(x => x.ProjectId == pp.Id).Sum(x => System.Convert.ToDecimal(x.RMBHValue));//开累
+                                                                                                                                                //202306历史产值追加
+                        accumulatedOutputValue += monthReport.Where(x => x.ProjectId == pp.Id && x.DateMonth == 202306).Sum(x => System.Convert.ToDecimal(x.RMBHValue));
                     }
                     //截止到当月的完成产值+历史调整开累产值=开累产值
                     accumulatedOutputValue += monthReport.Where(x => x.ProjectId == pp.Id && x.DateMonth > 202412 && x.DateMonth <= dateMonth).Sum(x => x.CompleteProductionAmount);
@@ -745,16 +764,16 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     completeAmount = accumulatedOutputValue + monthReport.Where(x => x.ProjectId == pp.Id && x.DateMonth > 202412 && x.DateMonth < yearMonth).Sum(x => x.CompleteProductionAmount);
 
                     rr.ProjectName = pp.ShortName;
-                    EffectiveAmount += Convert.ToDecimal(pp.ECAmount);
+                    EffectiveAmount += System.Convert.ToDecimal(pp.ECAmount);
                     rr.ContractStipulationEndDate = pp.ContractStipulationEndDate?.ToString("yyyy-MM-dd");
-                    RemainingAmount += Convert.ToDecimal(pp.ECAmount) - completeAmount;
+                    RemainingAmount += System.Convert.ToDecimal(pp.ECAmount) - completeAmount;
                     rr.AccumulatedOutputValue = accumulatedOutputValue;
                 }
             }
 
             rr.EffectiveAmount = EffectiveAmount;
             rr.RemainingAmount = RemainingAmount;
-            rr.AccumulatedOutputValue = sum;
+            rr.AccumulatedOutputValue = Setnumericalconversion(sum);
             rt.Data = rr;
             rt.Success();
             return rt;
@@ -813,6 +832,10 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
 
             foreach (var item in pPlanProduction)
             {
+
+                Converttowanyuan(item);
+
+
                 item.ProjectName = projectList.Where(p => p.Id == item.ProjectId).FirstOrDefault()?.Name;
                 var plantype = baseplanproject.Where(p => p.ProjectId == item.ProjectId).FirstOrDefault()?.PlanType;
                 if (plantype == "新建")
@@ -907,22 +930,22 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 if (pp != null)
                 {
                     var dateMonth = DateTime.Now.ToDateMonth();
-                    var yearMonth = Convert.ToInt32(DateTime.Now.Year + "01");
+                    var yearMonth = System.Convert.ToInt32(DateTime.Now.Year + "01");
                     if (pp.CurrencyId == "2a0e99b4-f989-4967-b5f1-5519091d4280".ToGuid())//国内
                     {
 
-                        accumulatedOutputValue = monthReport24.Where(x => x.ProjectId == pp.Id).Sum(x => Convert.ToDecimal(x.ActualCompAmount));//开累
-                                                                                                                                                //202306历史产值追加
-                        accumulatedOutputValue += monthReport.Where(x => x.ProjectId == pp.Id && x.DateMonth == 202306).Sum(x => Convert.ToDecimal(x.ActualCompAmount));
+                        accumulatedOutputValue = monthReport24.Where(x => x.ProjectId == pp.Id).Sum(x => System.Convert.ToDecimal(x.ActualCompAmount));//开累
+                                                                                                                                                       //202306历史产值追加
+                        accumulatedOutputValue += monthReport.Where(x => x.ProjectId == pp.Id && x.DateMonth == 202306).Sum(x => System.Convert.ToDecimal(x.ActualCompAmount));
                     }
                     else
                     {
                         //获取汇率
                         var currencyConvert = await dbContext.Queryable<CurrencyConverter>().Where(t => t.IsDelete == 1 && t.CurrencyId == pp.CurrencyId.ToString()).OrderByDescending(x => x.Year).FirstAsync();
                         pp.ECAmount = pp.ECAmount * currencyConvert.ExchangeRate;
-                        accumulatedOutputValue = monthReport24.Where(x => x.ProjectId == pp.Id).Sum(x => Convert.ToDecimal(x.RMBHValue));//开累
-                                                                                                                                         //202306历史产值追加
-                        accumulatedOutputValue += monthReport.Where(x => x.ProjectId == pp.Id && x.DateMonth == 202306).Sum(x => Convert.ToDecimal(x.RMBHValue));
+                        accumulatedOutputValue = monthReport24.Where(x => x.ProjectId == pp.Id).Sum(x => System.Convert.ToDecimal(x.RMBHValue));//开累
+                                                                                                                                                //202306历史产值追加
+                        accumulatedOutputValue += monthReport.Where(x => x.ProjectId == pp.Id && x.DateMonth == 202306).Sum(x => System.Convert.ToDecimal(x.RMBHValue));
                     }
                     //截止到当月的完成产值+历史调整开累产值=开累产值
                     accumulatedOutputValue += monthReport.Where(x => x.ProjectId == pp.Id && x.DateMonth > 202412 && x.DateMonth <= dateMonth).Sum(x => x.CompleteProductionAmount);
@@ -930,16 +953,16 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     completeAmount = accumulatedOutputValue + monthReport.Where(x => x.ProjectId == pp.Id && x.DateMonth > 202412 && x.DateMonth < yearMonth).Sum(x => x.CompleteProductionAmount);
 
                     rr.ProjectName = pp.ShortName;
-                    EffectiveAmount += Convert.ToDecimal(pp.ECAmount);
+                    EffectiveAmount += System.Convert.ToDecimal(pp.ECAmount);
                     rr.ContractStipulationEndDate = pp.ContractStipulationEndDate?.ToString("yyyy-MM-dd");
-                    RemainingAmount += Convert.ToDecimal(pp.ECAmount) - completeAmount;
+                    RemainingAmount += System.Convert.ToDecimal(pp.ECAmount) - completeAmount;
                     rr.AccumulatedOutputValue = accumulatedOutputValue;
                 }
             }
 
             rr.EffectiveAmount = EffectiveAmount;
             rr.RemainingAmount = RemainingAmount;
-            rr.AccumulatedOutputValue = sum;
+            rr.AccumulatedOutputValue = Setnumericalconversion(sum);
             rt.Data = rr;
             rt.Success();
             return rt;
@@ -1010,8 +1033,22 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                        }).ToListAsync();
 
 
+
             foreach (var item in pPlanProduction)
             {
+
+                item.JanuaryProductionValue = Setnumericalconversion(item.JanuaryProductionValue);
+                item.FebruaryProductionValue = Setnumericalconversion(item.FebruaryProductionValue);
+                item.MarchProductionValue = Setnumericalconversion(item.MarchProductionValue);
+                item.AprilProductionValue = Setnumericalconversion(item.AprilProductionValue);
+                item.MayProductionValue = Setnumericalconversion(item.MayProductionValue);
+                item.JuneProductionValue = Setnumericalconversion(item.JuneProductionValue);
+                item.JulyProductionValue = Setnumericalconversion(item.JulyProductionValue);
+                item.AugustProductionValue = Setnumericalconversion(item.AugustProductionValue);
+                item.SeptemberProductionValue = Setnumericalconversion(item.SeptemberProductionValue);
+                item.OctoberProductionValue = Setnumericalconversion(item.OctoberProductionValue);
+                item.NovemberProductionValue = Setnumericalconversion(item.NovemberProductionValue);
+                item.DecemberProductionValue = Setnumericalconversion(item.DecemberProductionValue);
                 item.CompanyName = List.Where(p => p.CompanyId == item.CompanyId).FirstOrDefault()?.CompanyName;
                 item.AnnualTotal = item.JanuaryProductionValue + item.FebruaryProductionValue + item.MarchProductionValue + item.AprilProductionValue
                     + item.MayProductionValue + item.JuneProductionValue + item.JulyProductionValue + item.AugustProductionValue + item.SeptemberProductionValue
@@ -1052,6 +1089,34 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 NovemberProductionValue = x.NovemberProductionValue,
                 DecemberProductionValue = x.DecemberProductionValue
             }).ToPageListAsync(requsetDto.PageIndex, requsetDto.PageSize, total);
+            foreach (var x in List)
+            {
+                //x.JanuaryProductionValue = Setnumericalconversion(x.JanuaryProductionValue);
+                //x.FebruaryProductionValue = Setnumericalconversion(x.FebruaryProductionValue);
+                //x.MarchProductionValue = Setnumericalconversion(x.MarchProductionValue);
+                //x.AprilProductionValue = Setnumericalconversion(x.AprilProductionValue);
+                //x.MayProductionValue = Setnumericalconversion(x.MayProductionValue);
+                //x.JuneProductionValue = Setnumericalconversion(x.JuneProductionValue);
+                //x.JulyProductionValue = Setnumericalconversion(x.JulyProductionValue);
+                //x.AugustProductionValue = Setnumericalconversion(x.AugustProductionValue);
+                //x.SeptemberProductionValue = Setnumericalconversion(x.SeptemberProductionValue);
+                //x.OctoberProductionValue = Setnumericalconversion(x.OctoberProductionValue);
+                //x.NovemberProductionValue = Setnumericalconversion(x.NovemberProductionValue);
+                //x.DecemberProductionValue = Setnumericalconversion(x.DecemberProductionValue);
+
+                x.JanuaryProductionValue = (x.JanuaryProductionValue);
+                x.FebruaryProductionValue = (x.FebruaryProductionValue);
+                x.MarchProductionValue = (x.MarchProductionValue);
+                x.AprilProductionValue = (x.AprilProductionValue);
+                x.MayProductionValue = (x.MayProductionValue);
+                x.JuneProductionValue = (x.JuneProductionValue);
+                x.JulyProductionValue = (x.JulyProductionValue);
+                x.AugustProductionValue = (x.AugustProductionValue);
+                x.SeptemberProductionValue = (x.SeptemberProductionValue);
+                x.OctoberProductionValue = (x.OctoberProductionValue);
+                x.NovemberProductionValue = (x.NovemberProductionValue);
+                x.DecemberProductionValue = (x.DecemberProductionValue);
+            }
 
             responseAjaxResult.Success();
             responseAjaxResult.Count = total;
@@ -1078,23 +1143,61 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 {
                     rt.Data = new BaseLinePlanprojectComparisonRequestDto()
                     {
-                        JanuaryProductionValue = basemodel.JanuaryProductionValue,
-                        FebruaryProductionValue = basemodel.FebruaryProductionValue,
-                        MarchProductionValue = basemodel.MarchProductionValue,
-                        AprilProductionValue = basemodel.AprilProductionValue,
-                        MayProductionValue = basemodel.MayProductionValue,
-                        JuneProductionValue = basemodel.JuneProductionValue,
-                        JulyProductionValue = basemodel.JulyProductionValue,
-                        AugustProductionValue = basemodel.AugustProductionValue,
-                        SeptemberProductionValue = basemodel.SeptemberProductionValue,
-                        OctoberProductionValue = basemodel.OctoberProductionValue,
-                        NovemberProductionValue = basemodel.NovemberProductionValue,
-                        DecemberProductionValue = basemodel.DecemberProductionValue
+                        JanuaryProductionValue = (basemodel.JanuaryProductionValue),
+                        FebruaryProductionValue = (basemodel.FebruaryProductionValue),
+                        MarchProductionValue = (basemodel.MarchProductionValue),
+                        AprilProductionValue = (basemodel.AprilProductionValue),
+                        MayProductionValue = (basemodel.MayProductionValue),
+                        JuneProductionValue = (basemodel.JuneProductionValue),
+                        JulyProductionValue = (basemodel.JulyProductionValue),
+                        AugustProductionValue = (basemodel.AugustProductionValue),
+                        SeptemberProductionValue = (basemodel.SeptemberProductionValue),
+                        OctoberProductionValue = (basemodel.OctoberProductionValue),
+                        NovemberProductionValue = (basemodel.NovemberProductionValue),
+                        DecemberProductionValue = (basemodel.DecemberProductionValue)
                     };
                 }
             }
             rt.Success();
             return rt;
+        }
+
+
+        /// <summary>
+        /// 去除小数点及转换成万元
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public decimal Setnumericalconversion(decimal? value)
+        {
+            if (value.GetValueOrDefault() == 0)
+            {
+                return 0;
+            }
+            else
+            {
+                var val = Math.Floor((value.GetValueOrDefault() / 10000) * 100) / 100;
+
+                return System.Convert.ToDecimal(val.ToString("0"));
+            }
+        }
+
+        /// <summary>
+        /// 去除小数点及转换成元
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public decimal Setnumericalconversiontwo(decimal? value)
+        {
+            if (value.GetValueOrDefault() == 0)
+            {
+                return 0;
+            }
+            else
+            {
+                var val = value.GetValueOrDefault() * 10000;
+                return val;
+            }
         }
     }
 }
