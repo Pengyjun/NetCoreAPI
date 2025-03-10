@@ -169,12 +169,6 @@ namespace GHMonitoringCenterApi.Domain.Models
         /// </summary>
         [SugarColumn(Length = 36)]
         public Guid CompanyId { get; set; }
-
-        /// <summary>
-        /// 基准Id
-        /// </summary>
-        [SugarColumn(Length = 36)]
-        public Guid BaseLinePlanProject { get; set; }
     }
 
     /// <summary>
