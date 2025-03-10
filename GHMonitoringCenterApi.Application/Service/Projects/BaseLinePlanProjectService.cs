@@ -1206,7 +1206,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             {
                 SearchBaseLinePlanProjectAnnualProductionDto ppChild = new();
                 var basemodel = await dbContext.Queryable<BaseLinePlanAncomparison>().Where(p => p.ProjectName == porjectName.Name).FirstAsync();
-                if (basemodel == null)
+                if (basemodel == null && !string.IsNullOrWhiteSpace(porjectName.MasterCode))
                 {
                     basemodel = await dbContext.Queryable<BaseLinePlanAncomparison>().Where(p => p.Code == porjectName.MasterCode).FirstAsync();
                 }
