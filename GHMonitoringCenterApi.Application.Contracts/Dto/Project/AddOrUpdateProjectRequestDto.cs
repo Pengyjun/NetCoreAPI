@@ -273,24 +273,19 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project
                 yield return new ValidationResult("StatusId参数不能为空且类型是guid类型", new string[] { nameof(StatusId) });
             }
 
-            if (CompanyId == Guid.Empty)
+            if (CompanyId == Guid.Empty || CompanyId == null)
             {
                 yield return new ValidationResult("CompanyId参数不能为空且类型是guid类型", new string[] { nameof(CompanyId) });
             }
-            if (ProjectDept == Guid.Empty)
+            if (ProjectDept == Guid.Empty || ProjectDept == null)
             {
-                yield return new ValidationResult("DownCompanyId参数不能为空且类型是string类型", new string[] { nameof(ProjectDept) });
+                yield return new ValidationResult("ProjectDept参数不能为空且类型是string类型", new string[] { nameof(ProjectDept) });
             }
-            if (string.IsNullOrWhiteSpace(ProjectDeptAddress))
-            {
-                yield return new ValidationResult("ProjectDeptAddress参数不能为空且类型是string类型", new string[] { nameof(ProjectDeptAddress) });
-            }
-
 
             //中标已签  中表未签 项目状态为中标已签或中标未签 其他必填项可为空
             if (StatusId != Guid.Empty && (StatusId == "75089b9a-b18b-442c-bfc8-fde4024d737f".ToGuid() || StatusId == "fa66f679-c749-4f25-8f1a-5e1728a219ad".ToGuid()))
             {
-                
+
             }
             else
             {
@@ -326,6 +321,10 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project
                 if (ShortName != null && ShortName.Length > 300)
                 {
                     yield return new ValidationResult("项目简称过长，长度不能超过300", new string[] { nameof(ShortName) });
+                }
+                if (string.IsNullOrWhiteSpace(ProjectDeptAddress))
+                {
+                    yield return new ValidationResult("ProjectDeptAddress参数不能为空且类型是string类型", new string[] { nameof(ProjectDeptAddress) });
                 }
                 if (Rate < 0)
                 {
