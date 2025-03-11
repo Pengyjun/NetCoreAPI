@@ -523,6 +523,8 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     Sequence = ps.Sequence.Value,
                     CommencementTime = p.CommencementTime.Value.ToString("yyyy-MM-dd"),
                     CompletionTime = p.CompletionTime,
+                     ContractStipulationEndDate=p.ContractStipulationEndDate,
+                      ContractStipulationStartDate=p.ContractStipulationStartDate,
                     StartContractDuration = p.StartContractDuration,
                     EndContractDuration = p.EndContractDuration,
                     ProjectLocation = p.ProjectLocation,
@@ -556,6 +558,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 var ids = item.ManagerType.Split(",").ToList();
                 var res = managerType.Where(x => ids.Contains(x.Code)).Select(x => x.Name).ToList();
                 item.ManagerTypeName = string.Join(",", res);
+               
                 item.ProjectDept = institution.Where(x => x.PomId == item.ProjectDeptId).Select(x => x.Name).FirstOrDefault();
             }
             #region 获取所有类型的id
