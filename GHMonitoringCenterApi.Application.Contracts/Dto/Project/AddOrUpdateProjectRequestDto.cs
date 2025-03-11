@@ -285,7 +285,7 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project
             //中标已签  中表未签 项目状态为中标已签或中标未签 其他必填项可为空
             if (StatusId != Guid.Empty && (StatusId == "75089b9a-b18b-442c-bfc8-fde4024d737f".ToGuid() || StatusId == "fa66f679-c749-4f25-8f1a-5e1728a219ad".ToGuid()))
             {
-                Console.WriteLine("aaa");
+                
             }
             else
             {
