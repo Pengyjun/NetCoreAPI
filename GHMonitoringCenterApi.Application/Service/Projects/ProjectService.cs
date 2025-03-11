@@ -872,7 +872,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             var classList = await dbContext.Queryable<IndustryClassification>()
                 .Select(x => new { x.PomId, x.ParentId, x.Name }).ToListAsync();
             //行业分类标准分割
-            if (projectDeteilSingle.ClassifyStandard != null)
+            if (!string.IsNullOrWhiteSpace(projectDeteilSingle.ClassifyStandard))
             {
                 var classifyArrays = projectDeteilSingle.ClassifyStandard.Split(',');
                 projectDeteilSingle.ClassifyArray = classifyArrays;
@@ -1057,15 +1057,15 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 return responseAjaxResult;
             }
 
-            if (addOrUpdateProjectRequestDto.CompanyId == null)
-            {
-                addOrUpdateProjectRequestDto.CompanyId = _currentUser.CurrentLoginInstitutionId;
-            }
+            //if (addOrUpdateProjectRequestDto.CompanyId == null)
+            //{
+            //    addOrUpdateProjectRequestDto.CompanyId = _currentUser.CurrentLoginInstitutionId;
+            //}
 
-            if (addOrUpdateProjectRequestDto.ProjectDept==null)
-            {
-                addOrUpdateProjectRequestDto.ProjectDept = _currentUser.CurrentLoginInstitutionId;
-            }
+            //if (addOrUpdateProjectRequestDto.ProjectDept==null)
+            //{
+            //    addOrUpdateProjectRequestDto.ProjectDept = _currentUser.CurrentLoginInstitutionId;
+            //}
 
             #endregion
 
