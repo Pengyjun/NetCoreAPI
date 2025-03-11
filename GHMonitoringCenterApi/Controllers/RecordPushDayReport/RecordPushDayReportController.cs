@@ -35,10 +35,22 @@ public class RecordPushDayReportController : BaseController
     /// </summary>
     /// <returns></returns>
     [HttpGet("GetRecordPushDayReportList")]
-    public async Task<ResponseAjaxResult<List<RecordPushDayReportResponseDto>>> GetRecordPushDayReportListAsync([FromQuery]RecordPushDayReportRequestDto requestDto)
+    public async Task<ResponseAjaxResult<List<RecordPushDayReportResponseDto>>> GetRecordPushDayReportListAsync([FromQuery] RecordPushDayReportRequestDto requestDto)
     {
         return await _recordPushDayReportService.GetRecordPushDayReportListAsync(requestDto);
     }
+
+    /// <summary>
+    ///获取上一天推送日报结果
+    /// </summary>
+    /// <returns></returns>
+    [HttpGet("GetPrevDatePushDayReport")]
+    public async Task<ResponseAjaxResult<RecordPushDayReportResponseDto>> GetPrevDatePushDayReportAsync([FromQuery] SearchRecordPushDayReportRequestDto requestDto)
+    {
+        return await _recordPushDayReportService.GetPrevDatePushDayReportAsync(requestDto);
+    }
+
+
 
 
 }

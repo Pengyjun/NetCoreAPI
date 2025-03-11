@@ -15,7 +15,16 @@ namespace GHMonitoringCenterApi.Application.Contracts.IService.RecordPushDayRepo
         /// </summary>
         /// <returns></returns>
         Task<ResponseAjaxResult<List<RecordPushDayReportResponseDto>>> GetRecordPushDayReportListAsync(RecordPushDayReportRequestDto requestDto);
-        
+
+        /// <summary>
+        /// 获取上一天的推送日报结果记录
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        Task<ResponseAjaxResult<RecordPushDayReportResponseDto>> GetPrevDatePushDayReportAsync(SearchRecordPushDayReportRequestDto requestDto);
+
+
+
 
     }
 
