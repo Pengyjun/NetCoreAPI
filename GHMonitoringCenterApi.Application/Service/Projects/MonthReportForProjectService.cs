@@ -483,6 +483,41 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 if (exhaustedBtn == true)
                 {
                     calculatePWBS = calculatePWBS.Where(x => x.DateMonth <= 202412).ToList();
+                    //月报明细历史表
+                    var monthHistory = await _dbContext.Queryable<MonthReportDetailHistory>().Where(t => t.IsDelete == 1 && t.ProjectId == pId && t.DateMonth<=202412).ToListAsync();
+                    foreach (var item in monthHistory)
+                    {
+                        var isExist = calculatePWBS.Where(t => t.ProjectId == item.ProjectId.ToString() && t.ShipId == item.ShipId && t.ProjectWBSId == item.ProjectWBSId).Any();
+                        if (!isExist)
+                        {
+                            var model = new ProjectWBSDto
+                            {
+                                Id = GuidUtil.Next(),   
+                                ProjectId = item.ProjectId.ToString(),
+                                ProjectWBSId = item.ProjectWBSId,
+                                UnitPrice = item.UnitPrice,//月报明细填的单价
+                                CompletedQuantity = item.CompletedQuantity,//月报明细填的工程量
+                                ConstructionNature = item.ConstructionNature,
+                                DateMonth = item.DateMonth,
+                                DateYear = item.DateYear,
+                                OutsourcingExpensesAmount = item.OutsourcingExpensesAmount,//月报明细填的外包支出
+                                ShipId = item.ShipId,
+                                OutPutType = item.OutPutType,
+                                ValueType = ValueEnumType.AccumulatedCommencement,
+                                Remark = item.Remark,
+                                DetailId = item.MonthReportId,
+                                CompleteProductionAmount = item.UnitPrice * item.CompletedQuantity, //p.CompleteProductionAmount  外币|人民币
+                                ActualCompAmount = item.ActualCompAmount,
+                                ActualCompQuantity = item.ActualCompQuantity,
+                                ActualOutAmount = item.CurrencyOutsourcingExpensesAmount,
+                                RMBHOutValue = item.RMBHOutValue,
+                                RMBHValue = item.RMBHValue,
+                                CurrencyId = project.CurrencyId
+                            };
+                            calculatePWBS.Add(model);
+                        }
+                    }
+
                 }
 
                 foreach (var item in calculatePWBS)
