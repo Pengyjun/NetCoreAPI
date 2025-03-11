@@ -125,7 +125,7 @@ namespace GHMonitoringCenterApi.Application.Service.RecordPushDayReportNew
 
             var result = await _dbContext.Queryable<RecordPushDayReport>()
                 .InnerJoin(subQuery, (x, y) => x.DateDay == y.dateday && x.CreateTime == y.max_createtime)
-                .WhereIF(string.IsNullOrWhiteSpace(requestDto.Date), (x, y) => x.DateDay < DateTime.Now.ToDateDay())
+                .WhereIF(string.IsNullOrWhiteSpace(requestDto.Date), (x, y) => x.DateDay < DateTime.Now.AddDays(-1).ToDateDay())
                 .WhereIF(!string.IsNullOrWhiteSpace(requestDto.Date), (x, y) => x.DateDay == Convert.ToInt32(requestDto.Date))
                 .OrderByDescending((x, y) => x.CreateTime)
                 .Select((x, y) => new RecordPushDayReportResponseDto()

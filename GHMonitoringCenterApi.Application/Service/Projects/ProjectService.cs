@@ -838,10 +838,14 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             {
                 projectDeteilSingle.ProjectDeptName = await dbContext.Queryable<ProjectDepartment>().Where(x => x.Name == "临时补录项目部" && x.PomId == projectDeteilSingle.ProjectDept).Select(x => x.Name).SingleAsync();
             }
+
             //获取省份
             var provinceList = await dbContext.Queryable<Province>().Where(x => x.IsDelete == 1).ToListAsync();
             //获取地点名称
-            projectDeteilSingle.AreaName = await baseService.GetProvincemarket(provinceList, projectDeteilSingle.AreaName.ToGuid());
+            if (!string.IsNullOrWhiteSpace(projectDeteilSingle.AreaName))
+            {
+                projectDeteilSingle.AreaName = await baseService.GetProvincemarket(provinceList, projectDeteilSingle.AreaName.ToGuid());
+            }
             //获取区域名称
             projectDeteilSingle.RegionName = await dbContext.Queryable<ProjectArea>().Where(x => x.IsDelete == 1 && x.AreaId == projectDeteilSingle.RegionId).Select(x => x.Name).SingleAsync();
             //类型
@@ -1060,7 +1064,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
 
             if (addOrUpdateProjectRequestDto.ProjectDept==null)
             {
-                addOrUpdateProjectRequestDto.ProjectDept = _currentUser.CurrentLoginDepartmentId;
+                addOrUpdateProjectRequestDto.ProjectDept = _currentUser.CurrentLoginInstitutionId;
             }
 
             #endregion
