@@ -1046,12 +1046,23 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             #region 条件判断
             List<int> orgs = new List<int>() { 1, 6, 2 };
             var validCount = addOrUpdateProjectRequestDto.projectOrgDtos.Count(x => orgs.Contains(x.Type));
-            if (validCount < 3)
+            if (validCount < 3 && addOrUpdateProjectRequestDto.StatusId != "75089b9a-b18b-442c-bfc8-fde4024d737f".ToGuid() && addOrUpdateProjectRequestDto.StatusId != "fa66f679-c749-4f25-8f1a-5e1728a219ad".ToGuid())
             {
                 responseAjaxResult.Fail("业主、甲方、监理单位必须填写", HttpStatusCode.VerifyFail);
                 responseAjaxResult.Data = false;
                 return responseAjaxResult;
             }
+
+            if (addOrUpdateProjectRequestDto.CompanyId == null)
+            {
+                addOrUpdateProjectRequestDto.CompanyId = _currentUser.CurrentLoginInstitutionId;
+            }
+
+            if (addOrUpdateProjectRequestDto.ProjectDept==null)
+            {
+                addOrUpdateProjectRequestDto.ProjectDept = _currentUser.CurrentLoginDepartmentId;
+            }
+
             #endregion
 
 
@@ -1403,7 +1414,10 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 }).ExecuteCommandAsync();
 
                 //新增后直接推送项目信息
-                await _pushPomService.PushProjectAsync();
+
+                //项目信息状态为中标已签或者中标未签不执行推送项目信息
+                if (addOrUpdateProjectRequestDto.StatusId != "75089b9a-b18b-442c-bfc8-fde4024d737f".ToGuid() && addOrUpdateProjectRequestDto.StatusId != "fa66f679-c749-4f25-8f1a-5e1728a219ad".ToGuid())
+                    await _pushPomService.PushProjectAsync();
                 responseAjaxResult.Data = true;
                 responseAjaxResult.Success(ResponseMessage.OPERATION_INSERT_SUCCESS);
                 return responseAjaxResult;
@@ -1728,8 +1742,13 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
 
                 //项目变更记录
                 await entityChangeService.RecordEntitysChangeAsync(EntityType.Project, projectObject.Id);
-                //更改后直接推送项目信息
-                await _pushPomService.PushProjectAsync();
+
+
+                //项目信息状态为中标已签或者中标未签不执行推送项目信息
+                if (addOrUpdateProjectRequestDto.StatusId != "75089b9a-b18b-442c-bfc8-fde4024d737f".ToGuid() && addOrUpdateProjectRequestDto.StatusId != "fa66f679-c749-4f25-8f1a-5e1728a219ad".ToGuid())
+                    //更改后直接推送项目信息
+                    await _pushPomService.PushProjectAsync();
+
                 responseAjaxResult.Data = true;
                 responseAjaxResult.Success(ResponseMessage.OPERATION_UPDATE_SUCCESS);
                 return responseAjaxResult;
@@ -4437,7 +4456,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                         ProjectId = pp.Id,
                         CompanyId = pp.CompanyId.Value,
                         Year = DateTime.Now.Year,
-                        Id = Guid.NewGuid() 
+                        Id = Guid.NewGuid()
                     });
                 }
 
