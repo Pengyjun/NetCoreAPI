@@ -21,4 +21,10 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.RecordPushDayReport
         /// </summary>
         public string EndDateDay { get; set; }
     }
+
+
+    public class SearchRecordPushDayReportRequestDto
+    {
+        public string? Date { get; set; }
+    }
 }
