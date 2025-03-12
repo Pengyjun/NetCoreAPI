@@ -266,154 +266,158 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project
 
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
-            if (WorkDay == 0)
-            {
-                WorkDay = 1;
-            }
-
-            //if (ManagerType==null&&ManagerType<1|| ManagerType >6)
-            //{
-            //    yield return new ValidationResult("项目类型不合法请重新填", new string[] { nameof(ManagerType) });
-            //}
-            if (string.IsNullOrWhiteSpace(ManagerType))
-            {
-                yield return new ValidationResult("项目类型不合法请重新填", new string[] { nameof(ManagerType) });
-            }
-
-
             if (string.IsNullOrWhiteSpace(Name))
             {
                 yield return new ValidationResult("Name参数不能为空且类型是string类型", new string[] { nameof(Name) });
             }
-            if (ProjectLocation != null && ProjectLocation.Length > 2000)
-            {
-                yield return new ValidationResult("工程位置字数不能超过2000", new string[] { nameof(ProjectLocation) });
-            }
-            if (DurationInformation != null && DurationInformation.Length > 2000)
-            {
-                yield return new ValidationResult("工程信息字数不能超过2000", new string[] { nameof(DurationInformation) });
-            }
+
             if (Name != null && Name.Length > 300)
             {
                 yield return new ValidationResult("项目名称过长，长度不能超过300", new string[] { nameof(Name) });
             }
-            //if (string.IsNullOrWhiteSpace(Code))
-            //{
-            //    yield return new ValidationResult("Code参数不能为空且类型是string类型", new string[] { nameof(Code) });
-            //}
-            if (string.IsNullOrWhiteSpace(ShortName))
-            {
-                yield return new ValidationResult("ShortName参数不能为空且类型是string类型", new string[] { nameof(ShortName) });
-            }
-            if (ShortName != null && ShortName.Length > 300)
-            {
-                yield return new ValidationResult("项目简称过长，长度不能超过300", new string[] { nameof(ShortName) });
-            }
-            if (CompanyId == Guid.Empty)
-            {
-                yield return new ValidationResult("CompanyId参数不能为空且类型是guid类型", new string[] { nameof(CompanyId) });
-            }
-            if (ProjectDept == Guid.Empty)
-            {
-                yield return new ValidationResult("DownCompanyId参数不能为空且类型是string类型", new string[] { nameof(ProjectDept) });
-            }
-            if (string.IsNullOrWhiteSpace(ProjectDeptAddress))
-            {
-                yield return new ValidationResult("ProjectDeptAddress参数不能为空且类型是string类型", new string[] { nameof(ProjectDeptAddress) });
-            }
-            if (Rate < 0)
-            {
-                yield return new ValidationResult("Rate参数不能为空，不能为负数且类型是decimal类型", new string[] { nameof(Rate) });
-            }
-            if (Amount < 0)
-            {
-                yield return new ValidationResult("Amount参数不能为空，不能为负数且类型是decimal类型", new string[] { nameof(Amount) });
-            }
-            if (ECAmount < 0)
-            {
-                yield return new ValidationResult("ECAmount参数不能为空，不能为负数且类型是decimal类型", new string[] { nameof(ECAmount) });
-            }
-            if (ContractMeaPayProp < 0)
-            {
-                yield return new ValidationResult("ContractMeaPayProp参数不能为空，不能为负数且类型是decimal类型", new string[] { nameof(ContractMeaPayProp) });
-            }
-            if (TypeId == Guid.Empty)
-            {
-                yield return new ValidationResult("TypeId参数不能为空且类型是guid类型", new string[] { nameof(TypeId) });
-            }
+
             if (StatusId == Guid.Empty)
             {
                 yield return new ValidationResult("StatusId参数不能为空且类型是guid类型", new string[] { nameof(StatusId) });
             }
-            if (GradeId == Guid.Empty)
+
+            if (CompanyId == Guid.Empty || CompanyId == null)
             {
-                yield return new ValidationResult("GradeId参数不能为空且类型是guid类型", new string[] { nameof(GradeId) });
+                yield return new ValidationResult("CompanyId参数不能为空且类型是guid类型", new string[] { nameof(CompanyId) });
             }
-            if (IsStrength)
+            if (ProjectDept == Guid.Empty || ProjectDept == null)
             {
-                if (string.IsNullOrWhiteSpace(BudgetInterestRate.ToString()))
-                {
-                    yield return new ValidationResult("BudgetInterestRate参数不能为空且类型是decimal类型", new string[] { nameof(BudgetInterestRate) });
-                }
-            }
-            if (string.IsNullOrWhiteSpace(ClassifyStandard))
-            {
-                yield return new ValidationResult("ClassifyStandard参数不能为空且类型是sting类型", new string[] { nameof(ClassifyStandard) });
-            }
-            if (!IsStrength)
-            {
-                if (!CompilationTime.HasValue)
-                {
-                    yield return new ValidationResult("CompilationTime参数不能为空且类型是datetime类型", new string[] { nameof(CompilationTime) });
-                }
-            }
-            if (ProjectConstructionQualificationId == Guid.Empty)
-            {
-                yield return new ValidationResult("ProjectConstructionQualificationId参数不能为空且类型是guid类型", new string[] { nameof(ProjectConstructionQualificationId) });
-            }
-            //其他非施工类业务 不走此验证 暂时和项目状态不关联
-            if (TypeId != "048120ae-1e9f-46d8-a38f-5d5e9e49ecba".ToGuid())
-            {
-                if (StatusId == "cd3c6e83-1b7c-40c2-a415-5a44f13584cc".ToGuid() && !CommencementTime.HasValue)
-                {
-                    yield return new ValidationResult("在建项目必须输入开工时间", new string[] { nameof(CommencementTime) });
-                }
-            }
-            //其他非施工类业务 不走此验证 暂时和项目状态不关联
-            if (TypeId != "048120ae-1e9f-46d8-a38f-5d5e9e49ecba".ToGuid())
-            {
-                if ((StatusId == "2a30d69d-ad3a-4a51-a1d7-7b363150437d".ToGuid() || StatusId == "28bc58dc-41ed-4135-8628-a4e6a571032b".ToGuid() || StatusId == "62986752-9b40-4d02-8887-b014a6ee7a9d".ToGuid()) && !CompletionTime.HasValue)
-                {
-                    yield return new ValidationResult("交工、竣工、完工项目必须输入完工时间", new string[] { nameof(CompletionTime) });
-                }
+                yield return new ValidationResult("ProjectDept参数不能为空且类型是string类型", new string[] { nameof(ProjectDept) });
             }
 
-            //其他非施工类业务 不走此验证 暂时和项目状态不关联
-            if ((StatusId == "2a30d69d-ad3a-4a51-a1d7-7b363150437d".ToGuid() || StatusId == "28bc58dc-41ed-4135-8628-a4e6a571032b".ToGuid() || StatusId == "62986752-9b40-4d02-8887-b014a6ee7a9d".ToGuid()) && !CompletionTime.HasValue)
+            //中标已签  中表未签 项目状态为中标已签或中标未签 其他必填项可为空
+            if (StatusId != Guid.Empty && (StatusId == "75089b9a-b18b-442c-bfc8-fde4024d737f".ToGuid() || StatusId == "fa66f679-c749-4f25-8f1a-5e1728a219ad".ToGuid()))
             {
-                yield return new ValidationResult("交工、竣工、完工项目必须输入完工工程量及完工产值", new string[] { nameof(CompleteQuantity), nameof(CompleteOutput) });
-            }
 
-            if (projectDutyDtos.Any())
+            }
+            else
             {
-                foreach (var item in projectDutyDtos)
+                if (WorkDay == 0)
                 {
-                    if (item.BeginDate != null && item.EndDate != null && item.BeginDate > item.EndDate)
+                    WorkDay = 1;
+                }
+
+                //if (ManagerType==null&&ManagerType<1|| ManagerType >6)
+                //{
+                //    yield return new ValidationResult("项目类型不合法请重新填", new string[] { nameof(ManagerType) });
+                //}
+                if (string.IsNullOrWhiteSpace(ManagerType))
+                {
+                    yield return new ValidationResult("项目类型不合法请重新填", new string[] { nameof(ManagerType) });
+                }
+                if (ProjectLocation != null && ProjectLocation.Length > 2000)
+                {
+                    yield return new ValidationResult("工程位置字数不能超过2000", new string[] { nameof(ProjectLocation) });
+                }
+                if (DurationInformation != null && DurationInformation.Length > 2000)
+                {
+                    yield return new ValidationResult("工程信息字数不能超过2000", new string[] { nameof(DurationInformation) });
+                }
+                //if (string.IsNullOrWhiteSpace(Code))
+                //{
+                //    yield return new ValidationResult("Code参数不能为空且类型是string类型", new string[] { nameof(Code) });
+                //}
+                if (string.IsNullOrWhiteSpace(ShortName))
+                {
+                    yield return new ValidationResult("ShortName参数不能为空且类型是string类型", new string[] { nameof(ShortName) });
+                }
+                if (ShortName != null && ShortName.Length > 300)
+                {
+                    yield return new ValidationResult("项目简称过长，长度不能超过300", new string[] { nameof(ShortName) });
+                }
+                if (string.IsNullOrWhiteSpace(ProjectDeptAddress))
+                {
+                    yield return new ValidationResult("ProjectDeptAddress参数不能为空且类型是string类型", new string[] { nameof(ProjectDeptAddress) });
+                }
+                if (Rate < 0)
+                {
+                    yield return new ValidationResult("Rate参数不能为空，不能为负数且类型是decimal类型", new string[] { nameof(Rate) });
+                }
+                if (Amount < 0)
+                {
+                    yield return new ValidationResult("Amount参数不能为空，不能为负数且类型是decimal类型", new string[] { nameof(Amount) });
+                }
+                if (ECAmount < 0)
+                {
+                    yield return new ValidationResult("ECAmount参数不能为空，不能为负数且类型是decimal类型", new string[] { nameof(ECAmount) });
+                }
+                if (ContractMeaPayProp < 0)
+                {
+                    yield return new ValidationResult("ContractMeaPayProp参数不能为空，不能为负数且类型是decimal类型", new string[] { nameof(ContractMeaPayProp) });
+                }
+                if (TypeId == Guid.Empty)
+                {
+                    yield return new ValidationResult("TypeId参数不能为空且类型是guid类型", new string[] { nameof(TypeId) });
+                }
+                if (GradeId == Guid.Empty)
+                {
+                    yield return new ValidationResult("GradeId参数不能为空且类型是guid类型", new string[] { nameof(GradeId) });
+                }
+                if (IsStrength)
+                {
+                    if (string.IsNullOrWhiteSpace(BudgetInterestRate.ToString()))
                     {
-                        yield return new ValidationResult("创建时间必须小于结束时间", new string[] { nameof(item.EndDate) });
+                        yield return new ValidationResult("BudgetInterestRate参数不能为空且类型是decimal类型", new string[] { nameof(BudgetInterestRate) });
                     }
                 }
+                if (string.IsNullOrWhiteSpace(ClassifyStandard))
+                {
+                    yield return new ValidationResult("ClassifyStandard参数不能为空且类型是sting类型", new string[] { nameof(ClassifyStandard) });
+                }
+                if (!IsStrength)
+                {
+                    if (!CompilationTime.HasValue)
+                    {
+                        yield return new ValidationResult("CompilationTime参数不能为空且类型是datetime类型", new string[] { nameof(CompilationTime) });
+                    }
+                }
+                if (ProjectConstructionQualificationId == Guid.Empty)
+                {
+                    yield return new ValidationResult("ProjectConstructionQualificationId参数不能为空且类型是guid类型", new string[] { nameof(ProjectConstructionQualificationId) });
+                }
+                //其他非施工类业务 不走此验证 暂时和项目状态不关联
+                if (TypeId != "048120ae-1e9f-46d8-a38f-5d5e9e49ecba".ToGuid())
+                {
+                    if (StatusId == "cd3c6e83-1b7c-40c2-a415-5a44f13584cc".ToGuid() && !CommencementTime.HasValue)
+                    {
+                        yield return new ValidationResult("在建项目必须输入开工时间", new string[] { nameof(CommencementTime) });
+                    }
+                }
+                //其他非施工类业务 不走此验证 暂时和项目状态不关联
+                if (TypeId != "048120ae-1e9f-46d8-a38f-5d5e9e49ecba".ToGuid())
+                {
+                    if ((StatusId == "2a30d69d-ad3a-4a51-a1d7-7b363150437d".ToGuid() || StatusId == "28bc58dc-41ed-4135-8628-a4e6a571032b".ToGuid() || StatusId == "62986752-9b40-4d02-8887-b014a6ee7a9d".ToGuid()) && !CompletionTime.HasValue)
+                    {
+                        yield return new ValidationResult("交工、竣工、完工项目必须输入完工时间", new string[] { nameof(CompletionTime) });
+                    }
+                }
+                if (projectDutyDtos.Any())
+                {
+                    foreach (var item in projectDutyDtos)
+                    {
+                        if (item.BeginDate != null && item.EndDate != null && item.BeginDate > item.EndDate)
+                        {
+                            yield return new ValidationResult("创建时间必须小于结束时间", new string[] { nameof(item.EndDate) });
+                        }
+                    }
+
+                }
+
+                if (IsSubContractProject == 1 && string.IsNullOrWhiteSpace(PProjectMasterCode))
+                {
+                    yield return new ValidationResult("分包项目必须要填项目主数据编码", new string[] { nameof(PProjectMasterCode) });
+                }
+                //if (ManagerType==null||!ManagerType.HasValue||ManagerType.Value<1||ManagerType.Value>5)
+                //{
+                //    yield return new ValidationResult("项目管理类型不合法", new string[] { nameof(ManagerType) });
+                //}
 
             }
-
-            if (IsSubContractProject == 1 && string.IsNullOrWhiteSpace(PProjectMasterCode))
-            {
-                yield return new ValidationResult("分包项目必须要填项目主数据编码", new string[] { nameof(PProjectMasterCode) });
-            }
-            //if (ManagerType==null||!ManagerType.HasValue||ManagerType.Value<1||ManagerType.Value>5)
-            //{
-            //    yield return new ValidationResult("项目管理类型不合法", new string[] { nameof(ManagerType) });
-            //}
         }
     }
     /// <summary>

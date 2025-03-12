@@ -80,7 +80,7 @@ namespace GHMonitoringCenterApi.Application.Service.RecordPushDayReportNew
 
             var result = _dbContext.Queryable<RecordPushDayReport>()
                 .InnerJoin(subQuery, (x, y) => x.DateDay == y.dateday && x.CreateTime == y.max_createtime)
-                .Where((x,y)=>x.DateDay>= startDate && x.DateDay<=endDate)
+                .Where((x, y) => x.DateDay >= startDate && x.DateDay <= endDate)
                 .Select((x, y) => new RecordPushDayReportResponseDto()
                 {
                     DateDay = x.DateDay,
@@ -107,5 +107,44 @@ namespace GHMonitoringCenterApi.Application.Service.RecordPushDayReportNew
             return responseAjaxResult;
         }
 
+        /// <summary>
+        /// 获取上一天日报记录
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        public async Task<ResponseAjaxResult<RecordPushDayReportResponseDto>> GetPrevDatePushDayReportAsync(SearchRecordPushDayReportRequestDto requestDto)
+        {
+            var responseAjaxResult = new ResponseAjaxResult<RecordPushDayReportResponseDto>();
+            var subQuery = _dbContext.Queryable<RecordPushDayReport>()
+                .GroupBy(x => x.DateDay)
+                .Select(x => new
+                {
+                    dateday = x.DateDay,
+                    max_createtime = SqlFunc.AggregateMax(x.CreateTime)
+                });
+
+            var result = await _dbContext.Queryable<RecordPushDayReport>()
+                .InnerJoin(subQuery, (x, y) => x.DateDay == y.dateday && x.CreateTime == y.max_createtime)
+                .WhereIF(string.IsNullOrWhiteSpace(requestDto.Date), (x, y) => x.DateDay < DateTime.Now.AddDays(-1).ToDateDay())
+                .WhereIF(!string.IsNullOrWhiteSpace(requestDto.Date), (x, y) => x.DateDay == Convert.ToInt32(requestDto.Date))
+                .OrderByDescending((x, y) => x.CreateTime)
+                .Select((x, y) => new RecordPushDayReportResponseDto()
+                {
+                    DateDay = x.DateDay,
+                    Json = x.Json,
+                })
+                .FirstAsync();
+            if (result != null)
+            {
+                var json = JsonHelper.FromJson<JjtSendMessageMonitoringDayReportResponseDto>(result.Json).ToJson(true);
+                result.Json = json;
+            }
+            responseAjaxResult.Data = result;
+            responseAjaxResult.Success();
+            return responseAjaxResult;
+        }
+
     }
+
+
 }

@@ -483,6 +483,41 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 if (exhaustedBtn == true)
                 {
                     calculatePWBS = calculatePWBS.Where(x => x.DateMonth <= 202412).ToList();
+                    //月报明细历史表
+                    var monthHistory = await _dbContext.Queryable<MonthReportDetailHistory>().Where(t => t.IsDelete == 1 && t.ProjectId == pId && t.DateMonth <= 202412).ToListAsync();
+                    foreach (var item in monthHistory)
+                    {
+                        var isExist = calculatePWBS.Where(t => t.ProjectId == item.ProjectId.ToString() && t.ShipId == item.ShipId && t.ProjectWBSId == item.ProjectWBSId && t.Id == item.Id).Any();
+                        if (!isExist)
+                        {
+                            var model = new ProjectWBSDto
+                            {
+                                Id = item.Id,
+                                ProjectId = item.ProjectId.ToString(),
+                                ProjectWBSId = item.ProjectWBSId,
+                                UnitPrice = item.UnitPrice,//月报明细填的单价
+                                CompletedQuantity = item.CompletedQuantity,//月报明细填的工程量
+                                ConstructionNature = item.ConstructionNature,
+                                DateMonth = item.DateMonth,
+                                DateYear = item.DateYear,
+                                OutsourcingExpensesAmount = item.OutsourcingExpensesAmount,//月报明细填的外包支出
+                                ShipId = item.ShipId,
+                                OutPutType = item.OutPutType,
+                                ValueType = ValueEnumType.AccumulatedCommencement,
+                                Remark = item.Remark,
+                                DetailId = item.MonthReportId,
+                                CompleteProductionAmount = item.UnitPrice * item.CompletedQuantity, //p.CompleteProductionAmount  外币|人民币
+                                ActualCompAmount = item.ActualCompAmount,
+                                ActualCompQuantity = item.ActualCompQuantity,
+                                ActualOutAmount = item.CurrencyOutsourcingExpensesAmount,
+                                RMBHOutValue = item.RMBHOutValue,
+                                RMBHValue = item.RMBHValue,
+                                CurrencyId = project.CurrencyId
+                            };
+                            calculatePWBS.Add(model);
+                        }
+                    }
+
                 }
 
                 foreach (var item in calculatePWBS)
@@ -687,7 +722,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 handleList.AddRange(historyMonthReport);
                 if (!dayRep) handleList.AddRange(dayRepList);
 
-                var gList = handleList.GroupBy(x => new { x.ProjectId, x.ShipId, x.UnitPrice, x.ProjectWBSId }).ToList();
+                var gList = handleList.GroupBy(x => new { x.ProjectId, x.ShipId, x.UnitPrice, x.ProjectWBSId,x.Id }).ToList();
                 foreach (var item in gList)
                 {
                     var model = handleList.Where(t => t.ProjectId == item.Key.ProjectId && t.ShipId == item.Key.ShipId && t.UnitPrice == item.Key.UnitPrice && t.ProjectWBSId == item.Key.ProjectWBSId).FirstOrDefault();
@@ -1675,7 +1710,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 List<MonthReportDetailHistory> rsh = new();
                 List<MonthReportDetailHistory> rsh2 = new();
                 var ids = model.ProjectHistorys.Select(x => x.Id).ToList();
-                var rrh = await _dbContext.Queryable<MonthReportDetailHistory>().Where(t => t.IsDelete == 1).ToListAsync();
+                var rrh = await _dbContext.Queryable<MonthReportDetailHistory>().Where(t => t.IsDelete == 1 && t.ProjectId == model.ProjectId).ToListAsync();
                 foreach (var item in model.ProjectHistorys)
                 {
                     var f = rrh.FirstOrDefault(x => x.Id == item.Id);
@@ -1712,7 +1747,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 #endregion
                 if (rsh.Any())
                 {
-                    await _dbContext.Updateable(rsh).UpdateColumns(x => new
+                    await _dbContext.Updateable(rsh).WhereColumns(t => t.Id).UpdateColumns(x => new
                     {
                         x.CurrencyOutsourcingExpensesAmount,
                         x.ActualCompQuantity,
