@@ -487,7 +487,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     var monthHistory = await _dbContext.Queryable<MonthReportDetailHistory>().Where(t => t.IsDelete == 1 && t.ProjectId == pId && t.DateMonth <= 202412).ToListAsync();
                     foreach (var item in monthHistory)
                     {
-                        var isExist = calculatePWBS.Where(t => t.ProjectId == item.ProjectId.ToString() && t.ShipId == item.ShipId && t.ProjectWBSId == item.ProjectWBSId && t.Id == item.Id).Any();
+                        var isExist = calculatePWBS.Where(t => t.ProjectId == item.ProjectId.ToString() && t.ShipId == item.ShipId && t.ProjectWBSId == item.ProjectWBSId).Any();
                         if (!isExist)
                         {
                             var model = new ProjectWBSDto
@@ -722,7 +722,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 handleList.AddRange(historyMonthReport);
                 if (!dayRep) handleList.AddRange(dayRepList);
 
-                var gList = handleList.GroupBy(x => new { x.ProjectId, x.ShipId, x.UnitPrice, x.ProjectWBSId,x.Id }).ToList();
+                var gList = handleList.GroupBy(x => new { x.ProjectId, x.ShipId, x.UnitPrice, x.ProjectWBSId }).ToList();
                 foreach (var item in gList)
                 {
                     var model = handleList.Where(t => t.ProjectId == item.Key.ProjectId && t.ShipId == item.Key.ShipId && t.UnitPrice == item.Key.UnitPrice && t.ProjectWBSId == item.Key.ProjectWBSId).FirstOrDefault();
