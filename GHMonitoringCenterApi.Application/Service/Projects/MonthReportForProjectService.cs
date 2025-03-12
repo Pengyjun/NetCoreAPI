@@ -484,7 +484,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 {
                     calculatePWBS = calculatePWBS.Where(x => x.DateMonth <= 202412).ToList();
                     //月报明细历史表
-                    var monthHistory = await _dbContext.Queryable<MonthReportDetailHistory>().Where(t => t.IsDelete == 1 && t.ProjectId == pId && t.DateMonth<=202412).ToListAsync();
+                    var monthHistory = await _dbContext.Queryable<MonthReportDetailHistory>().Where(t => t.IsDelete == 1 && t.ProjectId == pId && t.DateMonth <= 202412).ToListAsync();
                     foreach (var item in monthHistory)
                     {
                         var isExist = calculatePWBS.Where(t => t.ProjectId == item.ProjectId.ToString() && t.ShipId == item.ShipId && t.ProjectWBSId == item.ProjectWBSId).Any();
@@ -492,7 +492,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                         {
                             var model = new ProjectWBSDto
                             {
-                                Id = GuidUtil.Next(),   
+                                Id = item.Id,
                                 ProjectId = item.ProjectId.ToString(),
                                 ProjectWBSId = item.ProjectWBSId,
                                 UnitPrice = item.UnitPrice,//月报明细填的单价
@@ -1710,7 +1710,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 List<MonthReportDetailHistory> rsh = new();
                 List<MonthReportDetailHistory> rsh2 = new();
                 var ids = model.ProjectHistorys.Select(x => x.Id).ToList();
-                var rrh = await _dbContext.Queryable<MonthReportDetailHistory>().Where(t => t.IsDelete == 1).ToListAsync();
+                var rrh = await _dbContext.Queryable<MonthReportDetailHistory>().Where(t => t.IsDelete == 1 && t.ProjectId == model.ProjectId).ToListAsync();
                 foreach (var item in model.ProjectHistorys)
                 {
                     var f = rrh.FirstOrDefault(x => x.Id == item.Id);
@@ -1747,7 +1747,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 #endregion
                 if (rsh.Any())
                 {
-                    await _dbContext.Updateable(rsh).UpdateColumns(x => new
+                    await _dbContext.Updateable(rsh).WhereColumns(t => t.Id).UpdateColumns(x => new
                     {
                         x.CurrencyOutsourcingExpensesAmount,
                         x.ActualCompQuantity,
