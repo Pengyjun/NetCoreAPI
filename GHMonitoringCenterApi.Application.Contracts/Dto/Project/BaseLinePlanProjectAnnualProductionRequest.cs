@@ -28,7 +28,7 @@
         public string? PlanType { get; set; }
 
         /// <summary>
-        /// 计划版本
+        /// 年初状态
         /// </summary>
         public string? StartStatus { get; set; }
 
