@@ -492,7 +492,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                         {
                             var model = new ProjectWBSDto
                             {
-                                Id = GuidUtil.Next(),
+                                Id = item.Id,
                                 ProjectId = item.ProjectId.ToString(),
                                 ProjectWBSId = item.ProjectWBSId,
                                 UnitPrice = item.UnitPrice,//月报明细填的单价
