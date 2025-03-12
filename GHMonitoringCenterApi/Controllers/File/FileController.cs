@@ -60,8 +60,7 @@ namespace GHMonitoringCenterApi.Controllers.File
         public ILogService logService { get; set; }
         private IBaseService baseService { get; set; }
         public IShipPlanService shipPlanService { get; set; }
-        public IBaseLinePlanProjectService baseLinePlanProjectService { get; set; }
-        public FileController(IFileService fileService, IWordService wordService, IMapper mapper, IEquipmentManagementService equipmentManagementService, IResourceManagementService resourceManagementService, IProjectService projectService, IProjectReportService projectReportService, IProjectProductionReportService projectProductionReportService, ILogService logService, IBaseService baseService, IShipPlanService shipPlanService, IBaseLinePlanProjectService baseLinePlanProjectService)
+        public FileController(IFileService fileService, IWordService wordService, IMapper mapper, IEquipmentManagementService equipmentManagementService, IResourceManagementService resourceManagementService, IProjectService projectService, IProjectReportService projectReportService, IProjectProductionReportService projectProductionReportService, ILogService logService, IBaseService baseService, IShipPlanService shipPlanService)
         {
             this.fileService = fileService;
             this.wordService = wordService;
@@ -74,7 +73,6 @@ namespace GHMonitoringCenterApi.Controllers.File
             this.logService = logService;
             this.baseService = baseService;
             this.shipPlanService = shipPlanService;
-            this.baseLinePlanProjectService = baseLinePlanProjectService;
         }
         #endregion
 
@@ -1165,17 +1163,18 @@ namespace GHMonitoringCenterApi.Controllers.File
         }
         #endregion
 
+
+
         #region 导出船舶年度计划产值
         [HttpGet("ImportShipPlan")]
-        public async Task<IActionResult> ImportShipPlanAsync([FromQuery] ShipPlanRequestDto shipPlanRequestDto)
+        public async Task<IActionResult> ImportShipPlanAsync([FromQuery]ShipPlanRequestDto  shipPlanRequestDto)
         {
-
+           
             //获取数据
-            var result = await shipPlanService.SearchShipPlanAsync(shipPlanRequestDto);
-            return await ExcelImportAsync<List<ShipPlanResponseDto>>(result.Data, null, $"{shipPlanRequestDto.Year}度船舶产值计划");
+            var result=await shipPlanService.SearchShipPlanAsync(shipPlanRequestDto);
+            return await ExcelImportAsync<List<ShipPlanResponseDto>>(result.Data, null,$"{shipPlanRequestDto.Year}度船舶产值计划");
         }
 
         #endregion
-
     }
 }

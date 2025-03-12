@@ -143,7 +143,7 @@ namespace GHMonitoringCenterApi.Controllers.Project
         }
 
 
-
+       
         /// <summary>
         /// 局工程部界面 项目界面
         /// </summary>
@@ -178,6 +178,58 @@ namespace GHMonitoringCenterApi.Controllers.Project
             return await baseLinePlanProjectService.SearchCompaniesProjectProductionAsync(requestBody);
         }
 
+
+        /// <summary>
+        ///导入 
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost("ExcelProjectAnnualProduction")]
+        [AllowAnonymous]
+        public async Task<ResponseAjaxResult<bool>> ExcelProjectAnnualProductionAsync()
+        {
+            ResponseAjaxResult<bool> responseAjaxResult = new();
+            var streamUpdateFile = await StreamUpdateFileAsync();
+            var streamUpdate = streamUpdateFile.Data;
+            if (streamUpdateFile != null)
+            {
+                var savePath = AppsettingsHelper.GetValue("UpdateItem:SavePath");
+                var path = savePath + streamUpdate.Name;
+                var rows = MiniExcel.Query<SearchProjectAnnualProductionDto>(path, startCell: "A4").ToList();
+                if (rows.Any())
+                {
+                    var production = new ProjectAnnualProductionDto()
+                    {
+                        ExcelImport = rows
+                    };
+                    var insert = await projectService.ExcelProjectAnnualProductionAsync(production);
+                    responseAjaxResult.Data = true;
+                }
+                responseAjaxResult.Success();
+            }
+            else
+            {
+                responseAjaxResult.Fail(ResponseMessage.OPERATION_UPLOAD_FAIL);
+            }
+            return responseAjaxResult;
+        }
+
+
+        /// <summary>
+        /// 生产计划模板下载
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("ExcelProjectAnnualProductionTemp")]
+        public async Task<IActionResult> ExcelProjectAnnualProductionTempAsync()
+        {
+            var templatePath = $"Template/Excel/ProjectAnnualProductionTemp.xlsx";
+            var importData = new
+            {
+                year = DateTime.Now.Year,
+                month = DateTime.Now.Month,
+                day = DateTime.Now.Day,
+            };
+            return await ExcelTemplateImportAsync(templatePath, importData, "生产计划模板");
+        }
         #endregion
 
         /// <summary>
@@ -190,83 +242,6 @@ namespace GHMonitoringCenterApi.Controllers.Project
         {
             return await baseLinePlanProjectService.SearchBaseLinePlanAncomparisonAsync(requestBody);
         }
-
-        /// <summary>
-        /// 计划基准列表新
-        /// </summary>
-        /// <param name="requestBody"></param>
-        /// <returns></returns>
-        [HttpGet("SearchBaseLinePlanAncomparisonNew")]
-        public async Task<ResponseAjaxResult<List<BaseLinePlanAncomparisonResponseDto>>> SearchBaseLinePlanAncomparisonNewAsync([FromQuery] BaseLinePlanAncomparisonRequsetDto requestBody)
-        {
-            return await baseLinePlanProjectService.SearchBaseLinePlanAncomparisonAsync(requestBody);
-        }
-
-        /// <summary>
-        /// 基准计划审核
-        /// </summary>
-        /// <returns></returns>
-        [HttpGet("BaseLinePlanProjectApprove")]
-        [AllowAnonymous]
-        public async Task<ResponseAjaxResult<bool>> BaseLinePlanProjectApproveAsync([FromQuery] int isApprove, [FromQuery] string? id)
-        {
-            return await baseLinePlanProjectService.BaseLinePlanProjectApproveAsync(isApprove, id);
-        }
-
-        #region 项目基准计划
-        /// <summary>
-        /// 项目基准计划导入模板下载
-        /// </summary>
-        /// <returns></returns>
-        [HttpGet("BasePlanLineDownloadTemplate")]
-        public async Task<IActionResult> BasePlanLineProjectDownloadTemplateAsync()
-        {
-            var templatePath = $"Template/Excel/BasePlanLineProjectTemplate.xlsx";
-            var importData = new
-            {
-                title = DateTime.Now.Year + "年项目基准计划",
-                ProjectPlan = new List<ProjectPlanResponseDto>()
-            };
-            return await ExcelTemplateImportAsync(templatePath, importData, importData.title);
-        }
-
-        /// <summary>
-        /// 项目基准计划导入
-        /// </summary>
-        /// <returns></returns>
-        [HttpPost("BasePlanLineProjectImport")]
-        public async Task<ResponseAjaxResult<bool>> BasePlanLineProjectImportAsync()
-        {
-            ResponseAjaxResult<bool> responseAjaxResult = new ResponseAjaxResult<bool>();
-            var streamUpdateFile = await StreamUpdateFileAsync();
-            var streamData = streamUpdateFile.Data;
-            if (streamUpdateFile != null)
-            {
-                var savePath = AppsettingsHelper.GetValue("UpdateItem:SavePath");
-                var path = savePath + streamData.Name;
-                var rows = MiniExcel.Query<BaseLinePlanProjectAnnualProductionImport>(path, startCell: "A2").ToList();
-                if (rows != null)
-                {
-                    var insert = await baseLinePlanProjectService.BaseLinePlanProjectAnnualProductionImport(rows);
-                    if (insert.Data)
-                    {
-                        responseAjaxResult.Data = true;
-                        responseAjaxResult.Success(ResponseMessage.OPERATION_IMPORTEXCEL_SUCCESS);
-                    }
-                    else
-                    {
-                        return insert;
-                    }
-                }
-            }
-            else
-            {
-                responseAjaxResult.Data = false;
-                responseAjaxResult.Success(ResponseMessage.DEVICE_IMPORT_FAIL);
-            }
-            return responseAjaxResult;
-        }
-        #endregion
 
     }
 }

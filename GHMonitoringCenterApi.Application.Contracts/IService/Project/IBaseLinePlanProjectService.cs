@@ -1,5 +1,4 @@
 ﻿using GHMonitoringCenterApi.Application.Contracts.Dto;
-using GHMonitoringCenterApi.Application.Contracts.Dto.EquipmentManagement;
 using GHMonitoringCenterApi.Application.Contracts.Dto.Project;
 using GHMonitoringCenterApi.Application.Contracts.Dto.Project.ExcelImport;
 using GHMonitoringCenterApi.Application.Contracts.Dto.Project.Report;
@@ -94,20 +93,5 @@ namespace GHMonitoringCenterApi.Application.Contracts.IService.Project
         /// <param name="requestBody"></param>
         /// <returns></returns>
         Task<ResponseAjaxResult<BaseLinePlanprojectComparisonRequestDto>> SearchBaseLinePlanComparisonAsync(SearchBaseLinePlanprojectComparisonRequestDtoRequest requestBody);
-
-
-        /// <summary>
-        /// 项目基准计划导入
-        /// </summary>
-        /// <param name="imports"></param>
-        /// <returns></returns>
-        Task<ResponseAjaxResult<bool>> BaseLinePlanProjectAnnualProductionImport(List<BaseLinePlanProjectAnnualProductionImport> imports);
-
-
-
-        Task<ResponseAjaxResult<bool>> BaseLinePlanProjectApproveAsync(int isApprove, string? id);
-
-
-        Task<ResponseAjaxResult<List<SearchSubsidiaryCompaniesProjectProductionDto>>> SearchBaseLinePlanAncomparisonNewAsync(BaseLinePlanAncomparisonRequsetDto requestBody);
     }
 }
