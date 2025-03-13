@@ -88,5 +88,16 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api.Controllers
             var data = await _disembarkService.SearchCrewRotaAsync(requestBody);
             return Ok(data);
         }
+        /// <summary>
+        /// 年休假计划列表
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        [HttpGet("SearchAnnualLeavePlan")]
+        public async Task<IActionResult> SearchAnnualLeavePlanAsync([FromQuery] AnnualLeavePlanRequestDto requestDto)
+        {
+            var data = await _disembarkService.SearchAnnualLeavePlanAsync(requestDto);
+            return Ok(data);
+        }
     }
 }

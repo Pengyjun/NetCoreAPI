@@ -4,6 +4,7 @@ using HNKC.CrewManagePlatform.Models.Enums;
 using HNKC.CrewManagePlatform.SqlSugars.Models;
 using HNKC.CrewManagePlatform.Utils;
 using SqlSugar;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using UtilsSharp;
 
@@ -465,5 +466,59 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Disembark
             return rt;
         }
         #endregion
+
+        /// <summary>
+        /// 年休假计划列表
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        public async Task<PageResult<AnnualLeavePlanResponseDto>> SearchAnnualLeavePlanAsync(AnnualLeavePlanRequestDto requestDto)
+        {
+            PageResult<AnnualLeavePlanResponseDto> result = new();
+            RefAsync<int> total = 0;
+            var data = await _dbContext.Queryable<OwnerShip>().Where(t => t.IsDelete == 1)
+                .WhereIF(!string.IsNullOrWhiteSpace(requestDto.ShipName), t => SqlFunc.Equals(t.ShipName, requestDto.ShipName))
+                .Select(t => new AnnualLeavePlanResponseDto
+                {
+                    ShipId = t.BusinessId,
+                    LeaveYear = DateTime.Now.Year,
+                    ShipName = t.ShipName,
+                    ShipType = t.ShipType,
+                    CountryId = t.Country,
+                    CompanyId = t.Company,
+                    SubStatus = 1,
+                    SubUser = "测试用户",
+                    SubTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")
+                }).ToPageListAsync(requestDto.PageIndex, requestDto.PageSize, total);
+            //获取国家
+            var countryInfo = await _dbContext.Queryable<CountryRegion>().Where(t => t.IsDelete == 1 && data.Select(t => t.CountryId).Contains(t.BusinessId)).ToListAsync();
+            //获取公司
+            var institutionInfo = await _dbContext.Queryable<Institution>().Where(t => t.IsDelete == 1 && data.Select(t => t.CompanyId).Contains(t.BusinessId)).ToListAsync();
+            //获取船舶关联项目
+            var shipProjectInfo = await _dbContext.Queryable<ShipProjectRelation>().Where(t => t.IsDelete == 1 && data.Select(t => t.ShipId).Contains(t.RelationShipId)).ToListAsync();
+            foreach (var item in data)
+            {
+                item.ShipTypeName = GetEnumDescription(item.ShipType);
+                item.CountryName = countryInfo.FirstOrDefault(t => t.BusinessId == item.CountryId)?.Name ?? "";
+                item.ProjectName = shipProjectInfo.FirstOrDefault(t => t.BusinessId == item.ShipId)?.ProjectName ?? "";
+                item.CompanyName = institutionInfo.FirstOrDefault(t => t.BusinessId == item.CompanyId)?.Name ?? "";
+            }
+            result.List = data;
+            result.TotalCount = total;
+            return result;
+        }
+
+
+        /// <summary>
+        /// 获取枚举项的描述信息
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        private static string GetEnumDescription(Enum value)
+        {
+            var field = value.GetType().GetField(value.ToString());
+            var attribute = (DescriptionAttribute)Attribute.GetCustomAttribute(field, typeof(DescriptionAttribute));
+            return attribute != null ? attribute.Description : value.ToString();
+        }
     }
 }
