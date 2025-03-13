@@ -1,4 +1,5 @@
-﻿using HNKC.CrewManagePlatform.Models.CommonResult;
+﻿using AutoMapper;
+using HNKC.CrewManagePlatform.Models.CommonResult;
 using HNKC.CrewManagePlatform.Models.Dtos.Disembark;
 using HNKC.CrewManagePlatform.Models.Enums;
 using HNKC.CrewManagePlatform.SqlSugars.Models;
@@ -17,15 +18,17 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Disembark
     {
         private readonly ISqlSugarClient _dbContext;
         private IBaseService _baseService { get; set; }
+        private readonly IMapper _mapper;
         /// <summary>
         /// 
         /// </summary>
         /// <param name="dbContext"></param>
         /// <param name="baseService"></param>
-        public DisembarkService(ISqlSugarClient dbContext, IBaseService baseService)
+        public DisembarkService(ISqlSugarClient dbContext, IBaseService baseService, IMapper mapper)
         {
             this._dbContext = dbContext;
             this._baseService = baseService;
+            this._mapper = mapper;
         }
         #region 离船申请
         /// <summary>
@@ -608,6 +611,49 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Disembark
             }
             return Result.Success("提交成功");
         }
+
+        /// <summary>
+        /// 获取休假日期详情
+        /// </summary>
+        /// <returns></returns>
+        public async Task<Result> SearchLeaveDetailAsync(SearchLeavePlanUserRequestDto requestDto)
+        {
+            List<SearchLeaveDetailResponseDto> searchLeave = new List<SearchLeaveDetailResponseDto>();
+            if (requestDto.Year <= 0)
+            {
+                requestDto.Year = DateTime.Now.Year;
+            }
+            var data = await SearchLeavePlanUserAsync(requestDto);
+            var list = data.Data == null ? new List<SearchLeavePlanUserResponseDto>() : (List<SearchLeavePlanUserResponseDto>)data.Data;
+            var userIds = list.Select(t => t.UserId).Distinct().ToArray();
+            //获取休假日期明细
+            var leaveInfo = await _dbContext.Queryable<LeavePlanUserVacation>().Where(t => t.IsDelete == 1 && userIds.Contains(t.UserId) && t.ShipId == requestDto.ShipId && t.Year == requestDto.Year).ToListAsync();
+
+            foreach (var item in list)
+            {
+                SearchLeaveDetailResponseDto model = new SearchLeaveDetailResponseDto();
+                model = _mapper.Map<SearchLeavePlanUserResponseDto, SearchLeaveDetailResponseDto>(item);
+                model.Year = requestDto.Year;
+                for (int i = 1; i <= 12; i++)
+                {
+                    VacationList model2 = new VacationList();
+                    //查询对应月份上半是否休假
+                    var firstHalf = leaveInfo.FirstOrDefault(t => t.UserId == item.UserId && t.Month == i && t.VacationHalfMonth == 1);
+                    model2.Month = i;
+                    if (firstHalf != null) model2.FirstHalf = true;
+                    //查询对应月份下半是否休假
+                    var lowerHalf = leaveInfo.FirstOrDefault(t => t.UserId == item.UserId && t.Month == i && t.VacationHalfMonth == 2);
+                    if (lowerHalf != null) model2.LowerHalf = true;
+                    model.vacationLists.Add(model2);
+                }
+                //统计当前人员总休假月数
+                model.LeaveMonth = leaveInfo.Where(t => t.UserId == item.UserId).Select(t => t.VacationMonth).Sum();
+                model.OnShipMonth = 12 - model.LeaveMonth;
+                searchLeave.Add(model);
+            }
+            return Result.Success(searchLeave);
+        }
+
 
         /// <summary>
         /// 获取枚举项的描述信息

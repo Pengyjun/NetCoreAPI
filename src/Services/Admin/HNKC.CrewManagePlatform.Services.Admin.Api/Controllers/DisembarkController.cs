@@ -124,5 +124,15 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api.Controllers
         {
             return await _disembarkService.SaveLeavePlanUserVacationAsync(requestDto);
         }
+
+        /// <summary>
+        /// 获取休假日期详情
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("SearchLeaveDetail")]
+        public async Task<Result> SearchLeaveDetailAsync([FromQuery] SearchLeavePlanUserRequestDto requestDto)
+        {
+            return await _disembarkService.SearchLeaveDetailAsync(requestDto);
+        }
     }
 }

@@ -64,5 +64,10 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Disembark
         /// <param name="requestDto"></param>
         /// <returns></returns>
         Task<Result> SaveLeavePlanUserVacationAsync(AddLeavePlanVacationRequestDto requestDto);
+        /// <summary>
+        /// 获取休假日期详情
+        /// </summary>
+        /// <returns></returns>
+        Task<Result> SearchLeaveDetailAsync(SearchLeavePlanUserRequestDto requestDto);
     }
 }
