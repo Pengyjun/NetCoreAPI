@@ -728,6 +728,7 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.JjtSendMsg
     #endregion 按天统计重点项目预警值
     public class ImpProjectWarning
     {
+        public Guid Id { get; set; }
         /// <summary>
         /// 当日完成产值
         /// </summary>

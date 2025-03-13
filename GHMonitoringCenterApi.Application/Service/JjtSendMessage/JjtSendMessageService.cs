@@ -3417,7 +3417,6 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
             #endregion
 
             #region 产值异常情况说明
-
             //控制是否显示的设置
             var projectOpen = await dbContext.CopyNew().Queryable<ProjectOpen>().Where(x => x.IsDelete == 1 && x.DateDay == dayTime).ToListAsync();
             //检查当天查询异常的项目
@@ -3428,36 +3427,41 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
             {
                 //项目名称
                 var proName = projectList.Where(x => x.Id == exprePro.ProjectId).FirstOrDefault();
-                var proOpen = projectOpen.Where(x => x.ProjectId == exprePro.ProjectId).FirstOrDefault();
-                if (proOpen != null && proOpen.IsShow == 1)
-                {
-                    expProjects.Add(new ImpProjectWarning()
-                    {
-                        Name = proName?.ShortName,
-                        DeviationWarning = exprePro?.DeviationWarning,
-                        DayAmount =Math.Round(exprePro.DayActualProductionAmount/10000M,2),
-                    });
-                }
-                projectOpens.Add(new ProjectOpen()
-                {
-                    IsShow = 1,
+                expProjects.Add(new ImpProjectWarning()
+                { 
+                    Id= exprePro.ProjectId,
                     Name = proName?.ShortName,
-                    ProjectId = exprePro.ProjectId,
-                    DateDay = dayTime,
-
+                    DeviationWarning = exprePro?.DeviationWarning,
+                    DayAmount = Math.Round(exprePro.DayActualProductionAmount / 10000M, 2),
                 });
             }
             #region 保存数据库
             try
             {
-                var checkIds = projectOpens.Select(x => x.ProjectId).ToList();
-                var existProjectIds = await dbContext.CopyNew().Queryable<ProjectOpen>().Where(x => checkIds.Contains(x.ProjectId)).Select(x => x.ProjectId).ToListAsync();
-                var insetObj = projectOpens.Where(x => !existProjectIds.Contains(x.ProjectId)).ToList();
-                if (insetObj.Count > 0)
+                 var existProjectIds = await dbContext.CopyNew().Queryable<ProjectOpen>().Where(x =>x.DateDay==dayTime) .ToListAsync();
+                foreach (var item in expProjects)
                 {
-                    await dbContext.CopyNew().Insertable<ProjectOpen>(insetObj).ExecuteCommandAsync();
+                    if (existProjectIds.Count > 0)
+                    {
+                        item.IsLow = existProjectIds.Where(x => x.ProjectId == item.Id && x.DateDay == dayTime).Select(x => x.IsShow).First();
+                    }
                 }
-
+                if (existProjectIds.Count > 0)
+                {
+                   await dbContext.CopyNew().Deleteable<ProjectOpen>(existProjectIds).ExecuteCommandAsync();
+                }
+                foreach (var item in expProjects)
+                {
+                    var obj = new ProjectOpen()
+                    {   DateDay = dayTime,
+                        Id = Guid.NewGuid(),
+                        ProjectId = item.Id,
+                        IsShow = item.IsLow.HasValue ? item.IsLow.Value :null,
+                        Name = item.Name,
+                    };
+                    projectOpens.Add(obj);
+                }
+                 await dbContext.CopyNew().Insertable<ProjectOpen>(projectOpens).ExecuteCommandAsync();
             }
             catch (Exception ex)
             {

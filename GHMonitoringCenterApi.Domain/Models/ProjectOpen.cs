@@ -21,6 +21,6 @@ namespace GHMonitoringCenterApi.Domain.Models
         [SugarColumn(ColumnDataType = "int")]
         public int DateDay { get; set; }
         [SugarColumn(ColumnDataType = "int")]
-        public int IsShow { get; set; }
+        public int? IsShow { get; set; }
     }
 }
