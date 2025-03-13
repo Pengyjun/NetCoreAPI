@@ -545,7 +545,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Disembark
             var positionInfo = await _dbContext.Queryable<PositionOnBoard>().Where(t => jobTypeId.Contains(t.BusinessId.ToString())).ToListAsync();
             foreach (var item in userInfos)
             {
-                //第一适任证书编号
+                //第一适任证书职务
                 var position = certificateInfo.FirstOrDefault(x => x.CertificateId == item.UserId)?.FPosition;
                 //第一适任扫描件
                 var scans = certificateInfo.FirstOrDefault(x => x.CertificateId == item.UserId)?.FScans;
@@ -558,6 +558,56 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Disembark
             return Result.Success(userInfos);
         }
 
+        /// <summary>
+        /// 新增或修改年休计划
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        public async Task<Result> SaveLeavePlanUserVacationAsync(AddLeavePlanVacationRequestDto requestDto)
+        {
+            try
+            {
+                //查询用户当前年月是否有数据
+                var data = await _dbContext.Queryable<LeavePlanUserVacation>().Where(t => t.IsDelete == 1 && t.UserId == requestDto.UserId && t.ShipId == requestDto.ShipId && t.Year == requestDto.Year && t.Month == requestDto.Month && t.VacationHalfMonth == requestDto.VacationHalfMonth).FirstAsync();
+                if (data == null)
+                {
+                    LeavePlanUser leavePlanUser = new LeavePlanUser();
+                    leavePlanUser.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
+                    leavePlanUser.BusinessId = GuidUtil.Next();
+                    leavePlanUser.UserId = requestDto.UserId;
+                    leavePlanUser.ShipId = requestDto.ShipId;
+                    leavePlanUser.UserName = requestDto.UserName;
+                    leavePlanUser.JobTypeId = requestDto.JobTypeId;
+                    leavePlanUser.CertificateId = requestDto.CertificateId;
+                    leavePlanUser.IsOnShipLastYear = requestDto.IsOnShipLastYear;
+                    leavePlanUser.IsOnShipCurrentYear = requestDto.IsOnShipCurrentYear;
+                    leavePlanUser.Remark = requestDto.Remark;
+
+                    LeavePlanUserVacation model = new LeavePlanUserVacation();
+                    model.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
+                    model.BusinessId = GuidUtil.Next();
+                    model.ShipId = requestDto.ShipId;
+                    model.UserId = requestDto.UserId;
+                    model.Year = requestDto.Year;
+                    model.Month = requestDto.Month;
+                    model.VacationHalfMonth = requestDto.VacationHalfMonth;
+                    model.VacationMonth = 0.5;
+
+                    await _dbContext.Insertable(leavePlanUser).ExecuteCommandAsync();
+                    await _dbContext.Insertable(model).ExecuteCommandAsync();
+                }
+                else
+                {
+                    data.IsDelete = 0;
+                    await _dbContext.Updateable(data).WhereColumns(t => t.BusinessId).UpdateColumns(t => new { t.IsDelete, t.ModifiedBy, t.Modified }).ExecuteCommandAsync();
+                }
+            }
+            catch (Exception)
+            {
+                return Result.Fail("提交失败");
+            }
+            return Result.Success("提交成功");
+        }
 
         /// <summary>
         /// 获取枚举项的描述信息
