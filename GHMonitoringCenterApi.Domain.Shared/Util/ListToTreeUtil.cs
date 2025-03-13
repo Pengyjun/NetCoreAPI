@@ -54,7 +54,7 @@
         }
         #endregion
 
-       
+        #region 导入WBS专用
         /// <summary>
         /// 导入WBS专用
         /// </summary>
@@ -74,6 +74,7 @@
             }
             return mainNodes;
         }
+        #endregion
 
         #region 此方法适用于本项目机构表的非懒加载查询
         /// <summary>
@@ -123,8 +124,7 @@
         #endregion
 
 
-
-
+        #region 项目年初计划wbs专用
         /// <summary>
         /// 项目年初计划wbs专用
         /// </summary>
@@ -143,9 +143,31 @@
             }
             return mainNodes;
         }
+        #endregion
 
+        #region 调整开累数wbs专用
+        /// <summary>
+        /// 调整开累数wbs专用
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="printId"></param>
+        /// <param name="node"></param>
+        /// <returns></returns>
+        public static List<ProjectAdjustProductionValueResponseDto> GetTree(string printId, List<ProjectAdjustProductionValueResponseDto> node)  
+        {
+            List<ProjectAdjustProductionValueResponseDto> mainNodes = node.Where(x => x.PNodeId == printId).ToList<ProjectAdjustProductionValueResponseDto>();
+            List<ProjectAdjustProductionValueResponseDto> otherNodes = node.Where(x => x.PNodeId != printId).ToList<ProjectAdjustProductionValueResponseDto>();
+            foreach (ProjectAdjustProductionValueResponseDto dpt in mainNodes)
+            {
+                dpt.Childs = GetTree(dpt.NodeId, otherNodes);
+            }
+            return mainNodes;
+        }
+        #endregion
     }
 
+    #region 通用类
+   
     /// <summary>
     /// 通用类
     /// </summary>
@@ -181,7 +203,9 @@
         public int? Sort { get; set; }
         public string? ParentId { get; set; }
     }
+    #endregion
 
+    #region WBS专用类 取父级ID
     /// <summary>
     /// WBS专用类 取父级ID
     /// </summary>
@@ -217,6 +241,10 @@
         public Guid? ParentId { get; set; }
 
     }
+
+    #endregion
+
+    #region 导入WBS专用
     /// <summary>
     /// 导入WBS专用
     /// </summary>
@@ -241,8 +269,9 @@
 
     }
 
+    #endregion
 
-
+    #region 项目年初计划
     /// <summary>
     /// 项目年初计划
     /// </summary>
@@ -271,4 +300,89 @@
         /// </summary>
         public string Pid { get; set; }
     }
+    #endregion
+
+
+    #region 调整项目开累数使用
+    public class ProjectAdjustProductionValueResponseDto
+    {
+        public Guid ProjectId { get; set; }
+        public Guid WbsId { get; set; }
+        public string NodeId { get; set; }
+        public string PNodeId { get; set; }
+        public string ConstructionClassificationName { get; set; }
+        public string ConstructionType { get; set; }
+        public string ConstructionTypeName { get; set; }
+        public string ProductionProperty { get; set; }
+        public string ProductionPropertyName { get; set; }
+        public string ResourceName { get; set; }
+
+        /// <summary>
+        /// 汇率
+        /// </summary>
+        public decimal ExchangeRate { get; set; }
+
+        /// <summary>
+        /// 原单价
+        /// </summary>
+        public decimal SourceUnitPrice { get; set; }
+        /// <summary>
+        /// 实际单价
+        /// </summary>
+        public decimal UnitPrice { get; set; }
+        /// <summary>
+        /// 原工程量
+        /// </summary>
+        public decimal SourceWorkQuantities { get; set; }
+        /// <summary>
+        /// 实际工程量
+        /// </summary>
+        public decimal WorkQuantities { get; set; }
+        /// <summary>
+        /// 原产值
+        /// </summary>
+        public decimal SourceProductionValue { get; set; }
+        /// <summary>
+        /// 实际产值
+        /// </summary>
+        public decimal ProductionValue { get; set; }
+        /// <summary>
+        /// 原外包支出
+        /// </summary>
+        public decimal SourceOutsourcingExpenditure { get; set; }
+        /// <summary>
+        /// 实际外包支出
+        /// </summary>
+        public decimal OutsourcingExpenditure { get; set; }
+
+        /// <summary>
+        /// 是否是新数据   如果是新增的资源 此值传1  如果是修改的此值传2   如果已经存在的此值是0
+        /// </summary>
+        public int IsNew { get; set; }
+
+        public List<ProjectAdjustProductionValueResponseDto> Childs { get; set; } = new List<ProjectAdjustProductionValueResponseDto>();
+
+
+
+        /// <summary>
+        /// 递归计算
+        /// </summary>
+        public void CalculateSourceProductionValue()
+        {
+            // 产值计算
+            SourceProductionValue = UnitPrice * WorkQuantities;
+            //工程量计算
+
+            //外包支出计算
+
+
+
+            // 递归计算子节点的原产值
+            foreach (var child in Childs)
+            {
+                child.CalculateSourceProductionValue();
+            }
+        }
+    }
+    #endregion
 }
