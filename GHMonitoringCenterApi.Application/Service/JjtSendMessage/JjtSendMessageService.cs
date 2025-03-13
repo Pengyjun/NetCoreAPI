@@ -3456,7 +3456,7 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
                     {   DateDay = dayTime,
                         Id = Guid.NewGuid(),
                         ProjectId = item.Id,
-                        IsShow = item.IsLow.HasValue ? item.IsLow.Value :null,
+                        IsShow = item.IsLow.HasValue ? item.IsLow.Value :0,
                         Name = item.Name,
                     };
                     projectOpens.Add(obj);
