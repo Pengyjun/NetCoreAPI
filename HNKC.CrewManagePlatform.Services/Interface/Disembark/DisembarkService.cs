@@ -508,6 +508,56 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Disembark
             return result;
         }
 
+        /// <summary>
+        /// 年休计划  获取船舶人员信息
+        /// </summary>
+        /// <param name="ShipId"></param>
+        /// <returns></returns>
+        public async Task<Result> SearchLeavePlanUserAsync(SearchLeavePlanUserRequestDto requestDto)
+        {
+            #region 任职船舶
+            //任职船舶 
+            var crewWorkShip = _dbContext.Queryable<WorkShip>()
+                .Where(t => t.OnShip == requestDto.ShipId.ToString())
+              .GroupBy(u => u.WorkShipId)
+              .Select(t => new { t.WorkShipId, WorkShipEndTime = SqlFunc.AggregateMax(t.WorkShipEndTime) });
+            var wShip = _dbContext.Queryable<WorkShip>()
+              .InnerJoin(crewWorkShip, (x, y) => x.WorkShipId == y.WorkShipId && x.WorkShipEndTime == y.WorkShipEndTime);
+            #endregion
+
+            var userInfos = await _dbContext.Queryable<User>()
+                .Where(t => t.IsLoginUser == 1)
+                .InnerJoin(wShip, (t, ws) => ws.WorkShipId == t.BusinessId)
+                .Select((t, ws) => new SearchLeavePlanUserResponseDto
+                {
+                    UserId = t.BusinessId,
+                    UserName = t.Name,
+                    JobTypeId = ws.Postition,
+                })
+                .ToListAsync();
+            var userIds = userInfos.Select(t => t.UserId).ToArray();
+            var jobTypeId = userInfos.Select(t => t.JobTypeId).ToArray();
+
+            var url = AppsettingsHelper.GetValue("UpdateItem:Url");
+            //文件
+            var fileAll = await _dbContext.Queryable<Files>().Where(t => t.IsDelete == 1 && userIds.Contains(t.UserId)).ToListAsync();
+            var certificateInfo = await _dbContext.Queryable<CertificateOfCompetency>().Where(t => t.Type == CertificatesEnum.FCertificate && userIds.Contains(t.CertificateId)).ToListAsync();
+            var positionInfo = await _dbContext.Queryable<PositionOnBoard>().Where(t => jobTypeId.Contains(t.BusinessId.ToString())).ToListAsync();
+            foreach (var item in userInfos)
+            {
+                //第一适任证书编号
+                var position = certificateInfo.FirstOrDefault(x => x.CertificateId == item.UserId)?.FPosition;
+                //第一适任扫描件
+                var scans = certificateInfo.FirstOrDefault(x => x.CertificateId == item.UserId)?.FScans;
+                item.JobTypeName = positionInfo.FirstOrDefault(x => x.BusinessId.ToString() == position)?.Name ?? "";
+                item.CertificateId = certificateInfo.FirstOrDefault(x => x.CertificateId == item.UserId)?.BusinessId;
+                item.CertificateName = certificateInfo.FirstOrDefault(x => x.CertificateId == item.UserId)?.FCertificate ?? "";
+                item.CertificateScans = url + fileAll.FirstOrDefault(t => t.FileId == scans)?.Name;
+            }
+
+            return Result.Success(userInfos);
+        }
+
 
         /// <summary>
         /// 获取枚举项的描述信息

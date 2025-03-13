@@ -51,5 +51,12 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Disembark
         /// <param name="requestDto"></param>
         /// <returns></returns>
         Task<PageResult<AnnualLeavePlanResponseDto>> SearchAnnualLeavePlanAsync(AnnualLeavePlanRequestDto requestDto);
+
+        /// <summary>
+        /// 年休计划  获取船舶人员信息
+        /// </summary>
+        /// <param name="ShipId"></param>
+        /// <returns></returns>
+        Task<Result> SearchLeavePlanUserAsync(SearchLeavePlanUserRequestDto requestDto);
     }
 }

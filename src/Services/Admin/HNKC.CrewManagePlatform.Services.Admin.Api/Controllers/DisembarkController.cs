@@ -4,6 +4,7 @@ using HNKC.CrewManagePlatform.Services.Interface.Disembark;
 using HNKC.CrewManagePlatform.SqlSugars.UnitOfTransaction;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Runtime.InteropServices;
 
 namespace HNKC.CrewManagePlatform.Services.Admin.Api.Controllers
 {
@@ -98,6 +99,18 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api.Controllers
         {
             var data = await _disembarkService.SearchAnnualLeavePlanAsync(requestDto);
             return Ok(data);
+        }
+
+
+        /// <summary>
+        /// 年休计划  获取船舶人员信息
+        /// </summary>
+        /// <param name="ShipId"></param>
+        /// <returns></returns>
+        [HttpGet("SearchLeavePlanUser")]
+        public async Task<Result> SearchLeavePlanUserAsync([FromQuery] SearchLeavePlanUserRequestDto requestDto)
+        {
+            return await _disembarkService.SearchLeavePlanUserAsync(requestDto);
         }
     }
 }
