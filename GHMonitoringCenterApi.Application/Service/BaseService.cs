@@ -2690,6 +2690,7 @@ namespace GHMonitoringCenterApi.Application.Service
                     };
                     await dbContext.Insertable<DayPushApprove>(obj).ExecuteCommandAsync();
                     responseAjaxResult.Data = true;
+                  
                     #region 触发定时任务
                     if (DateTime.Now.Hour >= 10)
                     {
