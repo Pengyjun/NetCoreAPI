@@ -1492,7 +1492,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     if (baseLine != null)
                     {
                         responseAjaxResult.Data = "";
-                        responseAjaxResult.Success(ResponseMessage.OPERATION_COMPANY_IDENTICAL);
+                        responseAjaxResult.Fail(ResponseMessage.OPERATION_COMPANY_IDENTICAL);
                         return responseAjaxResult;
                     }
 
@@ -1500,7 +1500,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     if (string.IsNullOrWhiteSpace(years))
                     {
                         responseAjaxResult.Data = "";
-                        responseAjaxResult.Success("年份不能为空");
+                        responseAjaxResult.Fail("年份不能为空");
                     }
 
                     int fyear;
@@ -1509,7 +1509,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     if (fresult == false)
                     {
                         responseAjaxResult.Data = "";
-                        responseAjaxResult.Success("年份格式异常");
+                        responseAjaxResult.Fail("年份格式异常");
                     }
                     var add = new BaseLinePlanProject()
                     {
@@ -1538,7 +1538,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                         if (!string.IsNullOrWhiteSpace(item.Year))
                         {
                             responseAjaxResult.Data = "";
-                            responseAjaxResult.Success("年份不能为空");
+                            responseAjaxResult.Fail("年份不能为空");
                         }
 
                         int year;
@@ -1547,7 +1547,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                         if (result == false)
                         {
                             responseAjaxResult.Data = "";
-                            responseAjaxResult.Success("年份格式异常");
+                            responseAjaxResult.Fail("年份格式异常");
                         }
 
                         //if (string.IsNullOrWhiteSpace(item.ShipName))

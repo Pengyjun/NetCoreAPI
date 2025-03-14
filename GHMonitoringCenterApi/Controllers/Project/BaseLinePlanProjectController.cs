@@ -270,7 +270,7 @@ namespace GHMonitoringCenterApi.Controllers.Project
             else
             {
                 responseAjaxResult.Data = "Excel表格有误";
-                responseAjaxResult.Success(ResponseMessage.DEVICE_IMPORT_FAIL);
+                responseAjaxResult.Fail(ResponseMessage.DEVICE_IMPORT_FAIL);
             }
             return responseAjaxResult;
         }
