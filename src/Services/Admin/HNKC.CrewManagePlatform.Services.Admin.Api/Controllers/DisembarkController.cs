@@ -16,6 +16,7 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api.Controllers
     public class DisembarkController : BaseController
     {
         private readonly IDisembarkService _disembarkService;
+
         /// <summary>
         /// 
         /// </summary>
@@ -24,7 +25,55 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api.Controllers
         {
             this._disembarkService = disembarkService;
         }
+
         /// <summary>
+        /// 获取离船申请列表
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        [HttpGet("ApplyList")]
+        public async Task<IActionResult> DepartureApplyListAsync([FromQuery] DepartureApplyQuery query)
+        {
+            var data = await _disembarkService.DepartureApplyListAsync(query);
+            return Ok(data);
+        }
+
+        /// <summary>
+        /// 提交离船申请
+        /// </summary>
+        /// <param name="requestBody"></param>
+        /// <returns></returns>
+        [HttpPost("SubmitApply")]
+        [Transactional]
+        public async Task<Result> SubmitDepartureApply([FromBody] DepartureApplyDto requestBody)
+        {
+            return await _disembarkService.SubmitDepartureApplyAsync(requestBody);
+        }
+
+        /// <summary>
+        /// 执行审批
+        /// </summary>
+        /// <param name="requestBody"></param>
+        /// <returns></returns>
+        [HttpPost("SubmitApprove")]
+        [Transactional]
+        public async Task<Result> SubmitApprove([FromBody] SubmitApproveRequestDto requestBody)
+        {
+            return await _disembarkService.SubmitApprove(requestBody);
+        }
+
+        /// <summary>
+        /// 填报实际离船时间
+        /// </summary>
+        /// <param name="requestBody"></param>
+        /// <returns></returns>
+        [HttpPost("RegisterActualTime")]
+        public async Task<Result> RegisterActualTime([FromBody] RegisterActualTimeDto requestBody)
+        {
+            return await _disembarkService.RegisterActualTime(requestBody);
+        }
+
+        /*/// <summary>
         /// 保存离船申请
         /// </summary>
         /// <param name="requestBody"></param>
@@ -35,6 +84,7 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api.Controllers
         {
             return await _disembarkService.SaveCrewDisembarkAsync(requestBody);
         }
+
         /// <summary>
         /// 离船申请列表
         /// </summary>
@@ -45,48 +95,28 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api.Controllers
         {
             var data = await _disembarkService.SearchCrewDisembarkAsync(requestBody);
             return Ok(data);
-        }
+        }*/
+
         /// <summary>
-        /// 保存船舶排班
-        /// </summary>
-        /// <param name="requestBody"></param>
-        /// <returns></returns>
-        [HttpPost("SaveCrewRota")]
-        [Transactional]
-        public async Task<Result> SaveCrewRotaAsync([FromBody] SaveSchedulingRequest requestBody)
-        {
-            return await _disembarkService.SaveCrewRotaAsync(requestBody);
-        }
-        /// <summary>
-        /// 船员船舶排班回显
-        /// </summary>
-        /// <param name="requestBody"></param>
-        /// <returns></returns>
-        [HttpGet("CrewRotaList")]
-        public async Task<Result> CrewRotaListAsync([FromQuery] SchedulingRequest requestBody)
-        {
-            return await _disembarkService.CrewRotaListAsync(requestBody);
-        }
-        /// <summary>
-        /// 船舶排班用户下拉列表
+        /// 申请用户下拉列表
         /// </summary>
         /// <param name="shipId"></param>
         /// <returns></returns>
-        [HttpGet("CrewRotaUserList")]
-        public async Task<Result> CrewRotaUserListAsync(Guid shipId)
+        [HttpGet("ShipUserList")]
+        public async Task<Result> ShipUserListAsync(Guid shipId)
         {
-            return await _disembarkService.CrewRotaUserListAsync(shipId);
+            return await _disembarkService.ShipUserListAsync(shipId);
         }
+
         /// <summary>
-        /// 值班管理列表
+        /// 审批用户下拉列表
         /// </summary>
-        /// <param name="requestBody"></param>
+        /// <param name="shipId"></param>
         /// <returns></returns>
-        [HttpGet("SearchCrewRota")]
-        public async Task<IActionResult> SearchCrewRotaAsync([FromQuery] SearchCrewRotaRequest requestBody)
+        [HttpGet("approveUserList")]
+        public async Task<Result> CrewRotaApproveUserListAsync(Guid shipId)
         {
-            var data = await _disembarkService.SearchCrewRotaAsync(requestBody);
-            return Ok(data);
+            return await _disembarkService.ApproveUserListAsync(shipId);
         }
     }
 }

@@ -14,13 +14,13 @@ builder.AddApplicationServices();
 builder.AddSqlSugar();
 builder.AddCustomSwagger();
 builder.AddCors();
-//文件上传
+//鏂囦欢涓婁紶
 builder.AddConfigUpload();
-//注入AutoMapper
+//娉ㄥ叆AutoMapper
 builder.AddAutoMapper();
-//初始化表
+//鍒濆鍖栬〃
 //CodeFirst.InitTable(AppsettingsHelper.GetValue("ConnectionStrings:ConnectionString"));
-//自动注入业务接口服务
+//鑷姩娉ㄥ叆涓氬姟鎺ュ彛鏈嶅姟
 builder.AddAutoDependencyInjection();
 var app = builder.Build();
 
