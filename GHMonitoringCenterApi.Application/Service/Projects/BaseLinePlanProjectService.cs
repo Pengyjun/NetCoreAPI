@@ -1419,12 +1419,13 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
              .Where(t => t.IsDelete == 1).ToListAsync();
             List<Guid> userIds = new List<Guid>();
             userIds.Add("08db4e0d-a531-4619-8fae-d97e57eeb375".ToGuid());
+            userIds.Add("08db3bbb-7e36-4e20-8024-ee9c9bc516e3".ToGuid());
 
             RefAsync<int> total = 0;
 
             var projects = await dbContext.Queryable<BaseLinePlanProject>().Where(p => p.IsDelete == 1)
                 .WhereIF(requestBody.Year != null, p => p.Year == requestBody.Year)
-                .WhereIF(userIds[0] != userInfo.Id, x => x.CompanyId == companyId)
+                .WhereIF(userIds.Contains(userInfo.Id), x => x.CompanyId == companyId)
                 .WhereIF(!string.IsNullOrWhiteSpace(requestBody.Name), p => p.ShortName.Contains(requestBody.Name))
                 .WhereIF(requestBody.PlanStatus != null, p => p.PlanStatus == requestBody.PlanStatus)
                 .WhereIF(requestBody.IsSubPackage != null, p => p.IsSubPackage == requestBody.IsSubPackage)
