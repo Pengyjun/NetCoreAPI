@@ -58,10 +58,5 @@ namespace HNKC.CrewManagePlatform.SqlSugars.Models
         /// </summary>
         [SugarColumn(ColumnDataType = "int")]
         public int Year { get; set; }
-        /// <summary>
-        /// 是否在船过年
-        /// </summary>
-        [SugarColumn(ColumnDataType = "bit")]
-        public bool IsOnShipYear { get; set; }
     }
 }

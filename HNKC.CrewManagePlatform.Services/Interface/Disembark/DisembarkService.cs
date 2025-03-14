@@ -756,8 +756,8 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Disembark
                         //统计当前人员总休假月数
                         model.LeaveMonth = leaveInfo.Where(t => t.UserId == item.UserId && t.ShipId.ToString() == item.ShipId).Select(t => t.VacationMonth).Sum();
                         model.OnShipMonth = 12 - model.LeaveMonth;
-                        model.IsOnShipLastYear = leaveUser.FirstOrDefault(t => t.Year == requestDto.Year - 1)?.IsOnShipYear ?? false;
-                        model.IsOnShipCurrentYear = leaveUser.FirstOrDefault(t => t.Year == requestDto.Year)?.IsOnShipYear ?? false;
+                        model.IsOnShipLastYear = leaveUser.FirstOrDefault(t => t.Year == requestDto.Year )?.IsOnShipLastYear ?? false;
+                        model.IsOnShipCurrentYear = leaveUser.FirstOrDefault(t => t.Year == requestDto.Year)?.IsOnShipCurrentYear ?? false;
                         detail.leaveUsers.Add(model);
                     }
                     searchLeave.Add(detail);
