@@ -240,12 +240,12 @@ namespace GHMonitoringCenterApi.Controllers.Project
         /// </summary>
         /// <returns></returns>
         [HttpPost("BasePlanLineProjectImport")]
-        public async Task<ResponseAjaxResult<string>> BasePlanLineProjectImportAsync()
+        public async Task<ResponseAjaxResult<BaseLineImportOutput>> BasePlanLineProjectImportAsync()
         {
 
             //[FromBody] 
-            BaseLinePlanprojectImportDto input=new BaseLinePlanprojectImportDto();
-            ResponseAjaxResult<string> responseAjaxResult = new ResponseAjaxResult<string>();
+            BaseLinePlanprojectImportDto input = new BaseLinePlanprojectImportDto();
+            ResponseAjaxResult<BaseLineImportOutput> responseAjaxResult = new ResponseAjaxResult<BaseLineImportOutput>();
             var streamUpdateFile = await StreamUpdateFileAsync();
             var streamData = streamUpdateFile.Data;
             if (streamUpdateFile != null)
@@ -256,20 +256,13 @@ namespace GHMonitoringCenterApi.Controllers.Project
                 if (rows != null)
                 {
                     var insert = await baseLinePlanProjectService.BaseLinePlanProjectAnnualProductionImport(rows, input);
-                    if (!insert.Data.Contains("失败") && !string.IsNullOrWhiteSpace(insert.Data))
-                    {
-                        responseAjaxResult.Data = insert.Data;
-                        responseAjaxResult.Success(ResponseMessage.OPERATION_IMPORTEXCEL_SUCCESS);
-                    }
-                    else
-                    {
-                        return insert;
-                    }
+                    responseAjaxResult.Data = insert.Data;
+                    responseAjaxResult.Success(ResponseMessage.OPERATION_IMPORTEXCEL_SUCCESS);
+                    return responseAjaxResult;
                 }
             }
             else
             {
-                responseAjaxResult.Data = "Excel表格有误";
                 responseAjaxResult.Fail(ResponseMessage.DEVICE_IMPORT_FAIL);
             }
             return responseAjaxResult;

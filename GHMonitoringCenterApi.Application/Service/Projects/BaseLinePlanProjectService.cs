@@ -1471,9 +1471,9 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
         /// <param name="imports"></param>
         /// <param name="input"></param>
         /// <returns></returns>
-        public async Task<ResponseAjaxResult<string>> BaseLinePlanProjectAnnualProductionImport(List<BaseLinePlanProjectAnnualProductionImport> imports, BaseLinePlanprojectImportDto input)
+        public async Task<ResponseAjaxResult<BaseLineImportOutput>> BaseLinePlanProjectAnnualProductionImport(List<BaseLinePlanProjectAnnualProductionImport> imports, BaseLinePlanprojectImportDto input)
         {
-            var responseAjaxResult = new ResponseAjaxResult<string>();
+            var responseAjaxResult = new ResponseAjaxResult<BaseLineImportOutput>();
             try
             {
                 List<BaseLinePlanProjectAnnualPlanProduction> addTables = new();
@@ -1491,7 +1491,6 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     var baseLine = baseLinePlans.FirstOrDefault(x => x.ShortName == group.Key && x.CompanyId == _currentUser.CurrentLoginInstitutionId);
                     if (baseLine != null)
                     {
-                        responseAjaxResult.Data = "";
                         responseAjaxResult.Fail(ResponseMessage.OPERATION_COMPANY_IDENTICAL);
                         return responseAjaxResult;
                     }
@@ -1499,7 +1498,6 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     var years = group.FirstOrDefault().Year;
                     if (string.IsNullOrWhiteSpace(years))
                     {
-                        responseAjaxResult.Data = "";
                         responseAjaxResult.Fail("年份不能为空");
                     }
 
@@ -1508,7 +1506,6 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     bool fresult = int.TryParse(years, out fyear);
                     if (fresult == false)
                     {
-                        responseAjaxResult.Data = "";
                         responseAjaxResult.Fail("年份格式异常");
                     }
                     var add = new BaseLinePlanProject()
@@ -1537,7 +1534,6 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     {
                         if (!string.IsNullOrWhiteSpace(item.Year))
                         {
-                            responseAjaxResult.Data = "";
                             responseAjaxResult.Fail("年份不能为空");
                         }
 
@@ -1546,7 +1542,6 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                         bool result = int.TryParse(item.Year, out year);
                         if (result == false)
                         {
-                            responseAjaxResult.Data = "";
                             responseAjaxResult.Fail("年份格式异常");
                         }
 
@@ -1611,13 +1606,12 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 await dbContext.Insertable(addTables).ExecuteCommandAsync();
                 await dbContext.Insertable(addbaseLinePlanProjects).ExecuteCommandAsync();
                 //await dbContext.Insertable(addShipTables).ExecuteCommandAsync();
-                responseAjaxResult.Data = BaseId.ToString();
+                responseAjaxResult.Data = new BaseLineImportOutput() { Id = BaseId };
                 responseAjaxResult.Success();
                 return responseAjaxResult;
             }
             catch
             {
-                responseAjaxResult.Data = "导入失败";
                 responseAjaxResult.Success(ResponseMessage.OPERATION_UPLOAD_FAIL, HttpStatusCode.UploadFail);
                 return responseAjaxResult;
             }

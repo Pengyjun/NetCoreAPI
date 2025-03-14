@@ -977,6 +977,11 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project
 
     }
 
+    public class BaseLineImportOutput
+    {
+        public Guid? Id { get; set; }
+    }
+
 
     public class BaseLinePlanSelectOptiong
     {
