@@ -996,8 +996,20 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             List<SearchSubsidiaryCompaniesProjectProductionDto> resultlist = new List<SearchSubsidiaryCompaniesProjectProductionDto>();
             ResponseAjaxResult<List<SearchSubsidiaryCompaniesProjectProductionDto>> rt = new();
 
+
+            var userInfo = _currentUser;
+            //公司ID
+            var companyId = await dbContext.Queryable<Institution>().Where(p => p.IsDelete == 1 && p.Oid == userInfo.CurrentLoginInstitutionOid).Select(x => x.PomId).FirstAsync();
+
+            List<Guid> userIds = new List<Guid>();
+            userIds.Add("08db4e0d-a531-4619-8fae-d97e57eeb375".ToGuid());
+
+
             var baseplanproject = await dbContext.Queryable<BaseLinePlanProject>()
-           .Where(t => t.IsDelete == 1).WhereIF(!string.IsNullOrWhiteSpace(requestBody.StartStatus), t => t.StartStatus == requestBody.StartStatus).WhereIF(requestBody.Year != null, t => t.Year == requestBody.Year).ToListAsync();
+           .Where(t => t.IsDelete == 1)
+           .WhereIF(userIds[0] != userInfo.Id, x => x.CompanyId == companyId).
+           WhereIF(!string.IsNullOrWhiteSpace(requestBody.StartStatus), t => t.StartStatus == requestBody.StartStatus).
+           WhereIF(requestBody.Year != null, t => t.Year == requestBody.Year).ToListAsync();
 
             List<Guid> baseplanprojectIds = new List<Guid>();
             baseplanprojectIds = baseplanproject
@@ -1018,7 +1030,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 .Select(x => new Project { Id = x.Id, Name = x.Name, CompanyId = x.CompanyId }).ToListAsync();
 
             var pPlanProduction = await dbContext.Queryable<BaseLinePlanProjectAnnualPlanProduction>()
-                 .Where(t => t.IsDelete == 1 && t.Year == requestBody.Year)
+                 .Where(t => t.IsDelete == 1 && t.Year == requestBody.Year && baseplanprojectIds.Contains(t.ProjectId.Value))
                  .WhereIF(requestBody.CompanyId != null, p => p.CompanyId == requestBody.CompanyId)
                  .GroupBy(p => p.ProjectId)
                  .Select(it => new SearchSubsidiaryCompaniesProjectProductionDto()
@@ -1209,8 +1221,18 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             //var InstitutionId = await baseService.SearchCompanySubPullDownAsync(oids.PomId.Value, false, true);
             //departmentIds = InstitutionId.Data.Select(x => x.Id.Value).ToList();
 
+            //用户信息
+            var userInfo = _currentUser;
+            //公司ID
+            var companyId = await dbContext.Queryable<Institution>().Where(p => p.IsDelete == 1 && p.Oid == userInfo.CurrentLoginInstitutionOid).Select(x => x.PomId).FirstAsync();
+
+            List<Guid> userIds = new List<Guid>();
+            userIds.Add("08db4e0d-a531-4619-8fae-d97e57eeb375".ToGuid());
+
+
             var baseplanproject = await dbContext.Queryable<BaseLinePlanProject>().Where(t => t.IsDelete == 1)
                  .WhereIF(!string.IsNullOrWhiteSpace(requestBody.PlanType), p => p.PlanType == requestBody.PlanType)
+                 .WhereIF(userIds[0] != userInfo.Id, x => x.CompanyId == companyId)
                  .WhereIF(!string.IsNullOrWhiteSpace(requestBody.StartStatus), p => p.StartStatus == requestBody.StartStatus)
          .ToListAsync();
             RefAsync<int> total = 0;
@@ -1234,7 +1256,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             var projectList = await dbContext.Queryable<Project>().Where(x => x.IsDelete == 1).Select(x => new Project { Id = x.Id, Name = x.Name, CompanyId = x.CompanyId }).ToListAsync();
 
             var pPlanProduction = await dbContext.Queryable<BaseLinePlanProjectAnnualPlanProduction>()
-                 .Where(t => t.IsDelete == 1 && mainIds.Contains(t.Id) && baseplanprojectIds.Contains(t.ProjectId.Value) && t.Year == requestBody.Year)
+                 .Where(t => t.IsDelete == 1 && baseplanprojectIds.Contains(t.ProjectId.Value) && t.Year == requestBody.Year)
                  .GroupBy(p => p.CompanyId)
                  .Select(it => new SearchCompaniesProjectProductionDto()
                  {
@@ -1391,7 +1413,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             //用户信息
             var userInfo = _currentUser;
             //公司ID
-             var companyId = await dbContext.Queryable<Institution>().Where(p => p.IsDelete == 1&&p.Oid== userInfo.CurrentLoginInstitutionOid).Select(x=>x.PomId).FirstAsync();
+            var companyId = await dbContext.Queryable<Institution>().Where(p => p.IsDelete == 1 && p.Oid == userInfo.CurrentLoginInstitutionOid).Select(x => x.PomId).FirstAsync();
 
             var baseplanproject = await dbContext.Queryable<BaseLinePlanProject>()
              .Where(t => t.IsDelete == 1).ToListAsync();
@@ -1402,7 +1424,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
 
             var projects = await dbContext.Queryable<BaseLinePlanProject>().Where(p => p.IsDelete == 1)
                 .WhereIF(requestBody.Year != null, p => p.Year == requestBody.Year)
-                .WhereIF(userIds[0]!= userInfo.Id,x=>x.CompanyId== companyId)
+                .WhereIF(userIds[0] != userInfo.Id, x => x.CompanyId == companyId)
                 .WhereIF(!string.IsNullOrWhiteSpace(requestBody.Name), p => p.ShortName.Contains(requestBody.Name))
                 .WhereIF(requestBody.PlanStatus != null, p => p.PlanStatus == requestBody.PlanStatus)
                 .WhereIF(requestBody.IsSubPackage != null, p => p.IsSubPackage == requestBody.IsSubPackage)
