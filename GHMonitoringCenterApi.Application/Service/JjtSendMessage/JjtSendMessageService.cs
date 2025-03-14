@@ -3309,7 +3309,7 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
                     companyBasePoductionValue.NotWorkCount = projectList.Count(x => x.CompanyId == production.ItemId && notWorkIds.Contains(x.StatusId.Value));
                     companyBasePoductionValue.CompanyId = production.ItemId;
                     var onProjectCount= yeaterDayProject.Where(x => x.CompanyId== production.ItemId).Select(x=>x.OnBuildProjectCount).FirstOrDefault();
-                    companyBasePoductionValue.Numner = toDayProCount - onProjectCount;
+                    companyBasePoductionValue.Numner = 0;// toDayProCount - onProjectCount;
                     companyBasePoductionValues.Add(companyBasePoductionValue);
                 }
             }
