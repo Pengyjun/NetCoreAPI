@@ -188,10 +188,10 @@ app.Use(async (context, next) =>
     context.Request.EnableBuffering();
     await next.Invoke(context);
 });
-//#if DEBUG
-//app.UseSwagger();
-//app.UseSwaggerUI();
-//#endif
+#if DEBUG
+app.UseSwagger();
+app.UseSwaggerUI();
+#endif
 app.UseDetection();
 app.UseCors("Cors");
 app.UseAuthentication();
