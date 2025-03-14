@@ -24,6 +24,6 @@ namespace GHMonitoringCenterApi.Application.Contracts.IService.ProjectAdjustMont
         /// <param name="projectAdjustResponseDto"></param>
         /// <returns></returns>
 
-        Task<ResponseAjaxResult<bool>> SearchProjectAdjustMonthReportAsync(ProjectAdjustResponseDto projectAdjustResponseDto);
+        Task<ResponseAjaxResult<bool>> SaveProjectAdjustMonthReportAsync(ProjectAdjustItemResponseDto projectAdjustItemResponseDto);
     }
 }

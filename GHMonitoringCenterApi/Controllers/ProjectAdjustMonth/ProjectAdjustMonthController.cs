@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using GHMonitoringCenterApi.Application.Contracts.Dto.ProjectAdjustMonthReport;
 using Microsoft.AspNetCore.Authorization;
+using GHMonitoringCenterApi.CustomAttribute;
 
 namespace GHMonitoringCenterApi.Controllers.ProjectAdjustMonth
 {
@@ -34,5 +35,18 @@ namespace GHMonitoringCenterApi.Controllers.ProjectAdjustMonth
         {
             return await projectAdjustMonthReportService.SearchProjectAdjustMonthReportAsync(projectId);
         }
+
+        /// <summary>
+        /// 保存开累数调整
+        /// </summary>
+        /// <param name="projectId"></param>
+        /// <returns></returns>
+        [HttpPost("SaveProjectAdjustMonthReport")]
+        [UnitOfWork]
+        public async Task<ResponseAjaxResult<bool>> SaveProjectAdjustMonthReportAsync([FromBody] ProjectAdjustItemResponseDto  projectAdjustItemResponseDto)
+        {
+            return await projectAdjustMonthReportService.SaveProjectAdjustMonthReportAsync(projectAdjustItemResponseDto);
+        }
+      
     }
 }

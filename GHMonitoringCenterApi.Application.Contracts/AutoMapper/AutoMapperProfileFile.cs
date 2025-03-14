@@ -23,6 +23,7 @@ using GHMonitoringCenterApi.Application.Contracts.Dto.ShipSurvey;
 using GHMonitoringCenterApi.Application.Contracts.Dto.Timing;
 using GHMonitoringCenterApi.Application.Contracts.Dto.Upload;
 using GHMonitoringCenterApi.Domain.Models;
+using GHMonitoringCenterApi.Domain.Shared.Util;
 using static GHMonitoringCenterApi.Application.Contracts.Dto.Project.Report.ProjectMonthReportResponseDto;
 
 namespace GHMonitoringCenterApi.Application.Contracts.AutoMapper
@@ -281,6 +282,7 @@ namespace GHMonitoringCenterApi.Application.Contracts.AutoMapper
             mapperConfigurationExpression.CreateMap<RecordPushDayReportResponseDto, RecordPushDayReport>();
 
             mapperConfigurationExpression.CreateMap<BaseLinePlanAncomparisonResponseDto, BaseLinePlanAncomparison>();
+            mapperConfigurationExpression.CreateMap<ProjectAdjustProductionValueResponseDto, ProjectAdjustProductionValueDetails>();
 
         }
     }
