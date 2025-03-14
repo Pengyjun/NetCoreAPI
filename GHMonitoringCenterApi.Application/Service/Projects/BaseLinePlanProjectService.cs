@@ -1666,9 +1666,8 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                             CompanyId = _currentUser.CurrentLoginInstitutionId,
                             Year = year
                         };
-                        b.Id = Guid.NewGuid();
+                       
                         addTables.Add(b);
-
                         //addShipTables.Add(new BaseLinePlanAnnualProductionShips
                         //{
                         //    Id = GuidUtil.Next(),
@@ -1680,7 +1679,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     }
                 }
 
-                foreach (var item in addbaseLinePlanProjects)
+                foreach (var item in addTables)
                 {
                     item.Id = GuidUtil.Next();
                 }
