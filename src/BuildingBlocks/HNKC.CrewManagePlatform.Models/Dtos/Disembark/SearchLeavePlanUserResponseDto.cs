@@ -16,6 +16,10 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.Disembark
         /// </summary>
         public Guid? UserId { get; set; }
         /// <summary>
+        /// 船舶id
+        /// </summary>
+        public string? ShipId { get; set; }
+        /// <summary>
         /// 人员名称
         /// </summary>
         public string UserName { get; set; }

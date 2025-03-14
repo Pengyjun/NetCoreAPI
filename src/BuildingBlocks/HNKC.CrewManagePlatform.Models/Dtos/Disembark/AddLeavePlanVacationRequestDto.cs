@@ -12,13 +12,22 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.Disembark
     public class AddLeavePlanVacationRequestDto
     {
         /// <summary>
-        /// 用户id
-        /// </summary>
-        public Guid UserId { get; set; }
-        /// <summary>
         /// 船舶id
         /// </summary>
         public Guid ShipId { get; set; }
+        /// <summary>
+        /// 年
+        /// </summary>
+        public int Year { get; set; }
+        public List<VacationVBase> vacationVBases { get; set; }
+    }
+
+    public class VacationVBase
+    {
+        /// <summary>
+        /// 用户id
+        /// </summary>
+        public Guid UserId { get; set; }
         /// <summary>
         /// 用户名称
         /// </summary>
@@ -40,17 +49,9 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.Disembark
         /// </summary>
         public bool IsOnShipCurrentYear { get; set; }
         /// <summary>
-        /// 年
+        /// 休假计划
         /// </summary>
-        public int Year { get; set; }
-        /// <summary>
-        /// 月
-        /// </summary>
-        public int Month { get; set; }
-        /// <summary>
-        /// 上半月或下半月  1：上半月  2：下半月
-        /// </summary>
-        public int VacationHalfMonth { get; set; }
+        public List<VacationInfo> vacationInfos { get; set; }
         /// <summary>
         /// 备注
         /// </summary>
