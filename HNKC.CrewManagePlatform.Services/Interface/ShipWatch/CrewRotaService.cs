@@ -147,7 +147,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.ShipWatch
             var userInfos = await _dbContext.Queryable<User>()
                 .Where(t => t.IsLoginUser == 1)
                 .InnerJoin(wShip, (t, ws) => ws.WorkShipId == t.BusinessId && shipId.ToString() == ws.OnShip)
-                .InnerJoin<PositionOnBoard>((t, ws, po) => po.BusinessId.ToString() == ws.OnShip)
+                .InnerJoin<PositionOnBoard>((t, ws, po) => po.BusinessId.ToString() == ws.Postition)
                 .Select((t, ws, po) => new SchedulingUser
                 {
                     UserId = t.BusinessId,
@@ -157,13 +157,13 @@ namespace HNKC.CrewManagePlatform.Services.Interface.ShipWatch
                     RotaEnum = po.RotaType
                 })
                 .ToListAsync();
-            var posiIds = userInfos.Select(x => x.Position).ToList();
+            /*var posiIds = userInfos.Select(x => x.Position).ToList();
             var position = await _dbContext.Queryable<PositionOnBoard>()
                 .Where(t => posiIds.Contains(t.BusinessId.ToString())).ToListAsync();
             foreach (var item in userInfos)
             {
                 item.PositionName = position.FirstOrDefault(x => x.BusinessId.ToString() == item.Position)?.Name;
-            }
+            }*/
 
             return Result.Success(userInfos);
         }
