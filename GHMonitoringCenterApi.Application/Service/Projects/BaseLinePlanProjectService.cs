@@ -762,12 +762,14 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             var baseplanproject = await dbContext.Queryable<BaseLinePlanProject>()
              .Where(t => t.IsDelete == 1).ToListAsync();
 
+
             var projects = await dbContext.Queryable<BaseLinePlanProject>()
                 .Where(p => p.IsDelete == 1 && guids.Contains(p.CompanyId))
                 .WhereIF(requestBody.Year != null, p => p.Year == requestBody.Year)
                 .WhereIF(!string.IsNullOrWhiteSpace(requestBody.StartStatus), p => p.StartStatus == requestBody.StartStatus)
                 .WhereIF(requestBody.CompanyId != null, p => p.CompanyId == requestBody.CompanyId)
                 .Select(p => p.Id).ToListAsync();
+
 
             if (requestBody.Year == null)
             {
@@ -1414,7 +1416,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             //var projectList = await dbContext.Queryable<Project>().Where(x => x.IsDelete == 1).Select(x => new Project { Id = x.Id, Name = x.Name, CompanyId = x.CompanyId }).ToListAsync();
 
             var pPlanProduction = await dbContext.Queryable<BaseLinePlanProjectAnnualPlanProduction>()
-                 .Where(t => t.IsDelete == 1 && mainIds.Contains(t.Id) && projects.Contains(t.ProjectId.Value) && t.Year == requestBody.Year)
+                 .Where(t => t.IsDelete == 1  && projects.Contains(t.ProjectId.Value) && t.Year == requestBody.Year)
                  .GroupBy(p => p.ProjectId)
                  .Select(it => new SearchSubsidiaryCompaniesProjectProductionDto()
                  {
@@ -1543,6 +1545,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                         Year = fyear,
                         CreateTime = DateTime.Now,
                     };
+                    await GetPlanVersion(add);
                     if (input.Association > 0)
                     {
                         add.Association = group.FirstOrDefault().Association;
