@@ -43,5 +43,10 @@ namespace HNKC.CrewManagePlatform.SqlSugars.Models
         /// </summary>
         [SugarColumn(ColumnDataType = "double")]
         public double VacationMonth { get; set; }
+        /// <summary>
+        /// 是否异常
+        /// </summary>
+        [SugarColumn(ColumnDataType = "bit")]
+        public bool IsAbnormal { get; set; }
     }
 }

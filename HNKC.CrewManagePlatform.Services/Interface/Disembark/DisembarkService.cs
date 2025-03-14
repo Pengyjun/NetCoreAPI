@@ -647,6 +647,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Disembark
                             model.Month = item2.Month;
                             model.VacationHalfMonth = item2.VacationHalfMonth;
                             model.VacationMonth = 0.5;
+                            model.IsAbnormal = item2.IsAbnormal;
                             addLeavePlanUsers.Add(model);
                         }
                         else
@@ -711,6 +712,8 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Disembark
                     //查询对应月份下半是否休假
                     var lowerHalf = leaveInfo.FirstOrDefault(t => t.UserId == item.UserId && t.Month == i && t.VacationHalfMonth == 2);
                     if (lowerHalf != null) model2.LowerHalf = true;
+                    model2.FirstHalfAbnormal = leaveInfo.FirstOrDefault(t => t.UserId == item.UserId && t.Month == i && t.VacationHalfMonth == 1)?.IsAbnormal ?? false;
+                    model2.LowerHalfAbnormal = leaveInfo.FirstOrDefault(t => t.UserId == item.UserId && t.Month == i && t.VacationHalfMonth == 2)?.IsAbnormal ?? false;
                     model.vacationLists.Add(model2);
                 }
                 //统计当前人员总休假月数

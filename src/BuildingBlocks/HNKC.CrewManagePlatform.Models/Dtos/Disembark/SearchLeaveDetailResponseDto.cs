@@ -82,5 +82,13 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.Disembark
         /// 下半月  true 休假
         /// </summary>
         public bool LowerHalf { get; set; }
+        /// <summary>
+        /// 是否异常  上半
+        /// </summary>
+        public bool FirstHalfAbnormal { get; set; }
+        /// <summary>
+        /// 是否异常 下半
+        /// </summary>
+        public bool LowerHalfAbnormal { get; set; }
     }
 }
