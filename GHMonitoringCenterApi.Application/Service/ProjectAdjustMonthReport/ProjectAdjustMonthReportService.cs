@@ -123,7 +123,7 @@ namespace GHMonitoringCenterApi.Application.Service.ProjectAdjustMonthReport
                         SourceRmbProductionValue = x.SourceRmbProductionValue.Value,
                         SourceUnitPrice = x.SourceUnitPrice.Value,
                         SourceWorkQuantities = x.SourceWorkQuantities,
-                        UnitPrice = x.SourceWorkQuantities,
+                        UnitPrice = x.UnitPrice.Value,
                         WbsId = x.WbsId,
                         WorkQuantities = x.WorkQuantities.Value
                     }).ToListAsync();
@@ -294,6 +294,15 @@ namespace GHMonitoringCenterApi.Application.Service.ProjectAdjustMonthReport
                 await _dbContext.Deleteable(detailsTableData).ExecuteCommandAsync();
             }
             #endregion
+
+
+            //搜索旧系统数据
+            var historyData= data.Where(x =>x.ConstructionClassificationName!=null&& x.ConstructionClassificationName.Contains("旧系统") && x.MonthDetailId == Guid.Empty && x.NodeId == null).FirstOrDefault();
+            if (historyData != null)
+            {
+                historyData.PNodeId = "0";
+                historyData.NodeId = "-1";
+            }
             await _dbContext.Insertable<ProjectAdjustProductionValue>(projectAdjustProductionValue).ExecuteCommandAsync();
             await _dbContext.Insertable<ProjectAdjustProductionValueDetails>(data).ExecuteCommandAsync();
             responseAjaxResult.Success();
