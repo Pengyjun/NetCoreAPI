@@ -25,6 +25,10 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.Disembark
         /// </summary>
         public string? ShipName { get; set; }
         /// <summary>
+        /// 船舶首字母拼音
+        /// </summary>
+        public string ShipNamePinyin { get; set; }
+        /// <summary>
         /// 船舶类型
         /// </summary>
         public ShipTypeEnum ShipType { get; set; }

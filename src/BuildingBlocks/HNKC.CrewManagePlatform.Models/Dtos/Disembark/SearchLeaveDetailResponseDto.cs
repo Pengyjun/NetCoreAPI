@@ -12,6 +12,22 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.Disembark
     public class SearchLeaveDetailResponseDto
     {
         /// <summary>
+        /// 船舶id
+        /// </summary>
+        public string? ShipId { get; set; }
+        /// <summary>
+        /// 船舶名称
+        /// </summary>
+        public string ShipName { get; set; }
+        /// <summary>
+        /// 船舶对应人员信息
+        /// </summary>
+        public List<LeaveUserInfo> leaveUsers { get; set; } = new List<LeaveUserInfo>();
+    }
+
+    public class LeaveUserInfo
+    {
+        /// <summary>
         /// 人员id
         /// </summary>
         public Guid? UserId { get; set; }
