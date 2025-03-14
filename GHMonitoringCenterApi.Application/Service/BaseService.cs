@@ -2622,26 +2622,46 @@ namespace GHMonitoringCenterApi.Application.Service
         public async Task<bool> DayReportApprovePushAsync()
         {
             var phonePage = AppsettingsHelper.GetValue("PhoneDayUrl");
-            var pushJjtUserList = await dbContext.Queryable<DayReportJjtPushConfi>().Where(x => x.IsDelete == 1 && x.Type == 7).Select(x => x.PushAccount).ToListAsync();
-            foreach (var item in pushJjtUserList)
+            var groupNumber = await dbContext.Queryable<DayReportJjtPushConfi>().Where(x => x.IsDelete == 1 && x.Type == 8).Select(x => x.PushAccount).ToListAsync();
+            foreach (var item in groupNumber)
             {
                 if (item != "2022002687")
                 {
-                    var timeSpan = DateTime.Now.ToString("yyyyMMddHHmmssfff").ObjToInt();
-                    var userIdCrypt = CryptoStringExtension.EncryptAsync(item+","+ timeSpan);
+                    var timeSpan = DateTime.Now.ToString("ssfff").ObjToInt().ToString();
+                    var userIdCrypt = CryptoStringExtension.EncryptAsync(timeSpan);
                     phonePage = phonePage.Replace("@vali", userIdCrypt).TrimAll();
+                    var text = $"您好:" + DateTime.Now.AddDays(-1).ToString("MM月dd") + "日报还未审核,请登录智慧运营中心-日报推送审核页面进行审核;移动端请访问:<br>" + phonePage;
+                    #region 个人推送
                     //九点第一批人员发送
+                    //var obj = new SingleMessageTemplateRequestDto()
+                    //{
+                    //    MessageType = "text",
+                    //    TextContent = $"您好:" + DateTime.Now.AddDays(-1).ToString("MM月dd") + "日报还未审核,请登录智慧运营中心-日报推送审核页面进行审核;移动端请访问:<br>" + phonePage,
+                    //    UserIds = new List<string>() { item }
+                    //};
+                    //var pushResult = JjtUtils.SinglePushMessage(obj, false);
+                    //if (pushResult)
+                    //{
+                    //    await Console.Out.WriteLineAsync($"{item}:已推送成功");
+                    //}
+                    #endregion
+
+                    #region 群推送
                     var obj = new SingleMessageTemplateRequestDto()
                     {
-                        MessageType = "text",
-                        TextContent = $"您好:" + DateTime.Now.AddDays(-1).ToString("MM月dd") + "日报还未审核,请登录智慧运营中心-日报推送审核页面进行审核;移动端请访问:<br>" + phonePage,
-                        UserIds = new List<string>() { item }
+                        IsAll = false,
+                        MessageType = JjtMessageType.CHATID,
+                        ChatId = groupNumber[0],
+                        TextContent = text
                     };
-                    var pushResult = JjtUtils.SinglePushMessage(obj, false);
+                    var pushResult = JjtUtils.SinglePushMessage(obj);
+                    logger.LogWarning($"测试第一批推送人员结果:{pushResult}");
                     if (pushResult)
                     {
                         await Console.Out.WriteLineAsync($"{item}:已推送成功");
                     }
+                    #endregion
+
                 }
             }
             return true;

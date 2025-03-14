@@ -600,6 +600,7 @@ namespace GHMonitoringCenterApi.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet("SearchDayReportApprove")]
+        [AllowAnonymous]
         public async Task<ResponseAjaxResult<string>> SearchDayReportApproveAsync()
         {
             return await baseService.SearchDayReportApproveAsync();
