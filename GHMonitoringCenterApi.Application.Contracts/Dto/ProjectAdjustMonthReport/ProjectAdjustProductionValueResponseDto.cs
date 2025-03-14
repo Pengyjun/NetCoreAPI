@@ -1,4 +1,5 @@
-﻿using System;
+﻿using GHMonitoringCenterApi.Domain.Shared.Util;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,63 +11,25 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.ProjectAdjustMonthRepo
     /// <summary>
     /// 调整开累数响应DTO
     /// </summary>
-    public class ProjectAdjustProductionValueResponseDto
+    public class ProjectAdjustResponseDto
     {
-        public Guid ProjectId { get; set; }
-        public Guid WbsId { get; set; }
-        public string NodeId { get; set; }
-        public string PNodeId { get; set; }
-        public string ConstructionClassificationName { get; set; }
-        public string ConstructionType  { get; set; }
-        public string ConstructionTypeName  { get; set; }
-        public string ProductionProperty { get; set; }
-        public string ProductionPropertyName { get; set; }
-        public string ResourceName { get; set; }
-
         /// <summary>
-        /// 汇率
+        /// 项目名称
         /// </summary>
+        public string ProjectName { get; set; }
+        /// <summary>
+        /// 月份
+        /// </summary>
+        public int DateMonth { get; set; }
+        /// <summary>
+        /// 币种
+        /// </summary>
+        public string Current { get; set; }
+
         public decimal ExchangeRate { get; set; }
+        //public decimal? TaxRate { get; set; }
 
-        /// <summary>
-        /// 原单价
-        /// </summary>
-        public decimal SourceUnitPrice { get; set; }
-        /// <summary>
-        /// 实际单价
-        /// </summary>
-        public decimal UnitPrice { get; set; }
-        /// <summary>
-        /// 原工程量
-        /// </summary>
-        public decimal SourceWorkQuantities { get; set; }
-        /// <summary>
-        /// 实际工程量
-        /// </summary>
-        public decimal  WorkQuantities { get; set; }
-        /// <summary>
-        /// 原产值
-        /// </summary>
-        public decimal SourceProductionValue { get; set; }
-        /// <summary>
-        /// 实际产值
-        /// </summary>
-        public decimal ProductionValue { get; set; }
-        /// <summary>
-        /// 原外包支出
-        /// </summary>
-        public decimal SourceOutsourcingExpenditure { get; set; }
-        /// <summary>
-        /// 实际外包支出
-        /// </summary>
-        public decimal OutsourcingExpenditure { get; set; }
+        public List<ProjectAdjustProductionValueResponseDto> projectAdjustProductionValueResponseDtos { get; set; }
 
-        /// <summary>
-        /// 是否是新数据   如果是新增的资源 此值传1  如果是修改的此值传2   如果已经存在的此值是0
-        /// </summary>
-        public int IsNew { get; set; }
-
-        public List<ProjectAdjustProductionValueResponseDto> Childs { get; set; }
     }
-
 }

@@ -16,8 +16,4 @@
 		<ProjectReference Include="..\GHMonitoringCenterApi.Domain\GHMonitoringCenterApi.Domain.csproj" />
 	</ItemGroup>
 
-	<ItemGroup>
-	  <Folder Include="Service\ProjectAdjustMonthReport\" />
-	</ItemGroup>
-
 </Project>

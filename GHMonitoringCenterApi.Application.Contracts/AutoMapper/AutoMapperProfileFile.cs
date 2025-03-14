@@ -12,6 +12,7 @@ using GHMonitoringCenterApi.Application.Contracts.Dto.Project.ExcelImport;
 using GHMonitoringCenterApi.Application.Contracts.Dto.Project.MonthReportForProject;
 using GHMonitoringCenterApi.Application.Contracts.Dto.Project.Report;
 using GHMonitoringCenterApi.Application.Contracts.Dto.Project.ShipMovements;
+using GHMonitoringCenterApi.Application.Contracts.Dto.ProjectAdjustMonthReport;
 using GHMonitoringCenterApi.Application.Contracts.Dto.ProjectPlanProduction;
 using GHMonitoringCenterApi.Application.Contracts.Dto.ProjectYearPlan;
 using GHMonitoringCenterApi.Application.Contracts.Dto.Push;

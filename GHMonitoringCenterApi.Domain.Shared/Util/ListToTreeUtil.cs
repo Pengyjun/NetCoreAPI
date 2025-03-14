@@ -153,13 +153,13 @@
         /// <param name="printId"></param>
         /// <param name="node"></param>
         /// <returns></returns>
-        public static List<ProjectAdjustProductionValueResponseDto> GetTree(string printId, List<ProjectAdjustProductionValueResponseDto> node)  
+        public static List<ProjectAdjustProductionValueResponseDto> GetMonthReportTree(string printId, List<ProjectAdjustProductionValueResponseDto> node)  
         {
             List<ProjectAdjustProductionValueResponseDto> mainNodes = node.Where(x => x.PNodeId == printId).ToList<ProjectAdjustProductionValueResponseDto>();
             List<ProjectAdjustProductionValueResponseDto> otherNodes = node.Where(x => x.PNodeId != printId).ToList<ProjectAdjustProductionValueResponseDto>();
             foreach (ProjectAdjustProductionValueResponseDto dpt in mainNodes)
             {
-                dpt.Childs = GetTree(dpt.NodeId, otherNodes);
+                dpt.Childs = GetMonthReportTree(dpt.NodeId, otherNodes);
             }
             return mainNodes;
         }
@@ -315,6 +315,7 @@
         public string ConstructionTypeName { get; set; }
         public string ProductionProperty { get; set; }
         public string ProductionPropertyName { get; set; }
+        public string ResourceId { get; set; }
         public string ResourceName { get; set; }
 
         /// <summary>
@@ -339,13 +340,23 @@
         /// </summary>
         public decimal WorkQuantities { get; set; }
         /// <summary>
-        /// 原产值
+        /// 原产值（人民币  欧元  美元  ）
         /// </summary>
         public decimal SourceProductionValue { get; set; }
         /// <summary>
-        /// 实际产值
+        /// 实际产值（人民币  欧元  美元  ）
         /// </summary>
         public decimal ProductionValue { get; set; }
+
+
+        /// <summary>
+        /// 原产值（人民币  ）
+        /// </summary>
+        public decimal SourceRmbProductionValue { get; set; }
+        /// <summary>
+        /// 实际产值（人民币  ）
+        /// </summary>
+        public decimal RmbProductionValue { get; set; }
         /// <summary>
         /// 原外包支出
         /// </summary>
@@ -367,21 +378,32 @@
         /// <summary>
         /// 递归计算
         /// </summary>
-        public void CalculateSourceProductionValue()
+        /// <param name="totalProductionValue"></param>
+        /// <param name="totalWorkQuantities"></param>
+        /// <param name="totalOutsourcingExpenditure"></param>
+        public void CalculateParentValues()
         {
-            // 产值计算
-            SourceProductionValue = UnitPrice * WorkQuantities;
-            //工程量计算
+            if (Childs == null || Childs.Count == 0)
+            {
+                return;
+            }
 
-            //外包支出计算
+            decimal totalWorkQuantities = 0;
+            decimal totalOutsourcingExpenditure = 0;
+            decimal totalProductionValue = 0;
 
 
-
-            // 递归计算子节点的原产值
             foreach (var child in Childs)
             {
-                child.CalculateSourceProductionValue();
+
+                child.CalculateParentValues();
+                totalWorkQuantities += child.WorkQuantities;
+                totalOutsourcingExpenditure += child.OutsourcingExpenditure;
+                totalProductionValue += child.WorkQuantities;
             }
+            this.WorkQuantities = totalWorkQuantities;
+            this.OutsourcingExpenditure = totalOutsourcingExpenditure;
+            this.ProductionValue = totalProductionValue;
         }
     }
     #endregion
