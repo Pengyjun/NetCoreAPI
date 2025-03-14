@@ -505,143 +505,147 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             List<BaseLinePlanProjectAnnualPlanProduction> addTables = new();
             List<BaseLinePlanProjectAnnualPlanProduction> upTables = new();
             List<BaseLinePlanAnnualProductionShips> addShipTables = new();
+            List<BaseLinePlanProject> addBaseLine = new();
             List<Guid> Ids = new();
 
             if (requestBody != null && requestBody.Any())
             {
                 var tables = await dbContext.Queryable<BaseLinePlanProjectAnnualPlanProduction>().Where(t => t.IsDelete == 1 && requestBody.Select(x => x.Id).Contains(t.Id)).ToListAsync();
+                var baseid = GuidUtil.Next();
                 foreach (var item in requestBody)
                 {
-                    var baseid = GuidUtil.Next();
+
                     BaseLinePlanProject baseLinePlanProject = null;
                     var baselineplan = item.baseLinePlanproject;
-                    var baselinefirbaseLinePlanProject = await dbContext.Queryable<BaseLinePlanProject>().Where(p => p.Id == baselineplan.ProjectId).FirstAsync();
-                    if (baselinefirbaseLinePlanProject != null)
-                    {
-                        //baselinefirbaseLinePlanProject.PlanType = baselineplan.PlanType;
-                        baselinefirbaseLinePlanProject.StartStatus = baselineplan.StartStatus;
-                        baselinefirbaseLinePlanProject.CompanyId = _currentUser.CurrentLoginInstitutionId;
-                        baselinefirbaseLinePlanProject.Year = baselineplan.Year;
-                        baselinefirbaseLinePlanProject.StartStatus = baselineplan.StartStatus;
-                        baselinefirbaseLinePlanProject.ProjectId = baselineplan.ProjectId;
-                        baselinefirbaseLinePlanProject.Association = baselineplan.Association;
-                        baselinefirbaseLinePlanProject.CompletionTime = baselineplan.CompletionTime;
-                        baselinefirbaseLinePlanProject.EffectiveAmount = baselineplan.EffectiveAmount;
-                        baselinefirbaseLinePlanProject.IsSubPackage = baselineplan.IsSubPackage;
-                        baselinefirbaseLinePlanProject.RemainingAmount = baselineplan.RemainingAmount;
-                        await GetPlanVersion(baselinefirbaseLinePlanProject);
-                        await dbContext.Updateable(baselinefirbaseLinePlanProject).ExecuteCommandAsync();
-                    }
-                    else
-                    {
-                        baseLinePlanProject = new BaseLinePlanProject();
-                        baseLinePlanProject.Id = baseid;
-                        baseLinePlanProject.CompanyId = _currentUser.CurrentLoginInstitutionId;
-                        baseLinePlanProject.Year = baselineplan.Year;
-                        baseLinePlanProject.StartStatus = baselineplan.StartStatus;
-                        baseLinePlanProject.ProjectId = baselineplan.ProjectId;
-                        baseLinePlanProject.Association = baselineplan.Association;
-                        baseLinePlanProject.CompletionTime = baselineplan.CompletionTime;
-                        baseLinePlanProject.EffectiveAmount = baselineplan.EffectiveAmount;
-                        baseLinePlanProject.IsSubPackage = baselineplan.IsSubPackage;
-                        baseLinePlanProject.RemainingAmount = baselineplan.RemainingAmount;
-                        baseLinePlanProject.ShortName = baselineplan.ShortName;
-                        await GetPlanVersion(baseLinePlanProject);
-                        await dbContext.Insertable(baseLinePlanProject).ExecuteCommandAsync();
-                    }
+                    //var baselinefirbaseLinePlanProject = await dbContext.Queryable<BaseLinePlanProject>().Where(p => p.Id == baselineplan.ProjectId).FirstAsync();
+                    //if (baselinefirbaseLinePlanProject != null)
+                    //{
+                    //    //baselinefirbaseLinePlanProject.PlanType = baselineplan.PlanType;
+                    //    baselinefirbaseLinePlanProject.StartStatus = baselineplan.StartStatus;
+                    //    baselinefirbaseLinePlanProject.CompanyId = _currentUser.CurrentLoginInstitutionId;
+                    //    baselinefirbaseLinePlanProject.Year = baselineplan.Year;
+                    //    baselinefirbaseLinePlanProject.StartStatus = baselineplan.StartStatus;
+                    //    baselinefirbaseLinePlanProject.ProjectId = baselineplan.ProjectId;
+                    //    baselinefirbaseLinePlanProject.Association = baselineplan.Association;
+                    //    baselinefirbaseLinePlanProject.CompletionTime = baselineplan.CompletionTime;
+                    //    baselinefirbaseLinePlanProject.EffectiveAmount = baselineplan.EffectiveAmount;
+                    //    baselinefirbaseLinePlanProject.IsSubPackage = baselineplan.IsSubPackage;
+                    //    baselinefirbaseLinePlanProject.RemainingAmount = baselineplan.RemainingAmount;
+                    //    await GetPlanVersion(baselinefirbaseLinePlanProject);
+                    //    await dbContext.Updateable(baselinefirbaseLinePlanProject).ExecuteCommandAsync();
+                    //}
+                    //else
+                    //{
+                    baseLinePlanProject = new BaseLinePlanProject();
+                    baseLinePlanProject.Id = baseid;
+                    baseLinePlanProject.CompanyId = _currentUser.CurrentLoginInstitutionId;
+                    baseLinePlanProject.Year = baselineplan.Year;
+                    baseLinePlanProject.StartStatus = baselineplan.StartStatus;
+                    baseLinePlanProject.ProjectId = baselineplan.ProjectId;
+                    baseLinePlanProject.Association = baselineplan.Association;
+                    baseLinePlanProject.CompletionTime = baselineplan.CompletionTime;
+                    baseLinePlanProject.EffectiveAmount = baselineplan.EffectiveAmount;
+                    baseLinePlanProject.IsSubPackage = baselineplan.IsSubPackage;
+                    baseLinePlanProject.RemainingAmount = baselineplan.RemainingAmount;
+                    baseLinePlanProject.ShortName = baselineplan.ShortName;
+                    await GetPlanVersion(baseLinePlanProject);
 
-                    if (!string.IsNullOrWhiteSpace(item.Id.ToString()) && item.Id != Guid.Empty)
-                    {
-                        var first = tables.FirstOrDefault(x => x.Id == item.Id);
-                        if (first != null)
-                        {
-                            first.JanuaryProductionQuantity = Setnumericalconversiontwo(item.JanuaryProductionQuantity);
-                            first.JanuaryProductionValue = Setnumericalconversiontwo(item.JanuaryProductionValue);
-                            first.FebruaryProductionQuantity = Setnumericalconversiontwo(item.FebruaryProductionQuantity);
-                            first.FebruaryProductionValue = Setnumericalconversiontwo(item.FebruaryProductionValue);
-                            first.MarchProductionQuantity = Setnumericalconversiontwo(item.MarchProductionQuantity);
-                            first.MarchProductionValue = Setnumericalconversiontwo(item.MarchProductionValue);
-                            first.AprilProductionQuantity = Setnumericalconversiontwo(item.AprilProductionQuantity);
-                            first.AprilProductionValue = Setnumericalconversiontwo(item.AprilProductionValue);
-                            first.MayProductionQuantity = Setnumericalconversiontwo(item.MayProductionQuantity);
-                            first.MayProductionValue = Setnumericalconversiontwo(item.MayProductionValue);
-                            first.JuneProductionQuantity = Setnumericalconversiontwo(item.JuneProductionQuantity);
-                            first.JuneProductionValue = Setnumericalconversiontwo(item.JuneProductionValue);
-                            first.JulyProductionQuantity = Setnumericalconversiontwo(item.JulyProductionQuantity);
-                            first.JulyProductionValue = Setnumericalconversiontwo(item.JulyProductionValue);
-                            first.AugustProductionValue = Setnumericalconversiontwo(item.AugustProductionValue);
-                            first.AugustProductionQuantity = Setnumericalconversiontwo(item.AugustProductionQuantity);
-                            first.SeptemberProductionQuantity = Setnumericalconversiontwo(item.SeptemberProductionQuantity);
-                            first.SeptemberProductionValue = Setnumericalconversiontwo(item.SeptemberProductionValue);
-                            first.OctoberProductionQuantity = Setnumericalconversiontwo(item.OctoberProductionQuantity);
-                            first.OctoberProductionValue = Setnumericalconversiontwo(item.OctoberProductionValue);
-                            first.NovemberProductionQuantity = Setnumericalconversiontwo(item.NovemberProductionQuantity);
-                            first.NovemberProductionValue = Setnumericalconversiontwo(item.NovemberProductionValue);
-                            first.DecemberProductionQuantity = Setnumericalconversiontwo(item.DecemberProductionQuantity);
-                            first.DecemberProductionValue = Setnumericalconversiontwo(item.DecemberProductionValue);
-                            upTables.Add(first);
-                            Ids.Add(first.Id);
+                    addBaseLine.Add(baseLinePlanProject);
+                    //await dbContext.Insertable(baseLinePlanProject).ExecuteCommandAsync();
+                    //}
 
-                            foreach (var ship in item.AnnualProductionShips)
-                            {
-                                addShipTables.Add(new BaseLinePlanAnnualProductionShips
-                                {
-                                    Id = GuidUtil.Next(),
-                                    ShipType = ship.ShipType,
-                                    ShipId = ship.ShipId,
-                                    ShipName = ship.ShipName,
-                                    ProjectAnnualProductionId = first.Id
-                                });
-                            }
-                        }
-                    }
-                    else
+                    //if (!string.IsNullOrWhiteSpace(item.Id.ToString()) && item.Id != Guid.Empty)
+                    //{
+                    //    var first = tables.FirstOrDefault(x => x.Id == item.Id);
+                    //    if (first != null)
+                    //    {
+                    //        first.JanuaryProductionQuantity = Setnumericalconversiontwo(item.JanuaryProductionQuantity);
+                    //        first.JanuaryProductionValue = Setnumericalconversiontwo(item.JanuaryProductionValue);
+                    //        first.FebruaryProductionQuantity = Setnumericalconversiontwo(item.FebruaryProductionQuantity);
+                    //        first.FebruaryProductionValue = Setnumericalconversiontwo(item.FebruaryProductionValue);
+                    //        first.MarchProductionQuantity = Setnumericalconversiontwo(item.MarchProductionQuantity);
+                    //        first.MarchProductionValue = Setnumericalconversiontwo(item.MarchProductionValue);
+                    //        first.AprilProductionQuantity = Setnumericalconversiontwo(item.AprilProductionQuantity);
+                    //        first.AprilProductionValue = Setnumericalconversiontwo(item.AprilProductionValue);
+                    //        first.MayProductionQuantity = Setnumericalconversiontwo(item.MayProductionQuantity);
+                    //        first.MayProductionValue = Setnumericalconversiontwo(item.MayProductionValue);
+                    //        first.JuneProductionQuantity = Setnumericalconversiontwo(item.JuneProductionQuantity);
+                    //        first.JuneProductionValue = Setnumericalconversiontwo(item.JuneProductionValue);
+                    //        first.JulyProductionQuantity = Setnumericalconversiontwo(item.JulyProductionQuantity);
+                    //        first.JulyProductionValue = Setnumericalconversiontwo(item.JulyProductionValue);
+                    //        first.AugustProductionValue = Setnumericalconversiontwo(item.AugustProductionValue);
+                    //        first.AugustProductionQuantity = Setnumericalconversiontwo(item.AugustProductionQuantity);
+                    //        first.SeptemberProductionQuantity = Setnumericalconversiontwo(item.SeptemberProductionQuantity);
+                    //        first.SeptemberProductionValue = Setnumericalconversiontwo(item.SeptemberProductionValue);
+                    //        first.OctoberProductionQuantity = Setnumericalconversiontwo(item.OctoberProductionQuantity);
+                    //        first.OctoberProductionValue = Setnumericalconversiontwo(item.OctoberProductionValue);
+                    //        first.NovemberProductionQuantity = Setnumericalconversiontwo(item.NovemberProductionQuantity);
+                    //        first.NovemberProductionValue = Setnumericalconversiontwo(item.NovemberProductionValue);
+                    //        first.DecemberProductionQuantity = Setnumericalconversiontwo(item.DecemberProductionQuantity);
+                    //        first.DecemberProductionValue = Setnumericalconversiontwo(item.DecemberProductionValue);
+                    //        upTables.Add(first);
+                    //        Ids.Add(first.Id);
+
+                    //        foreach (var ship in item.AnnualProductionShips)
+                    //        {
+                    //            addShipTables.Add(new BaseLinePlanAnnualProductionShips
+                    //            {
+                    //                Id = GuidUtil.Next(),
+                    //                ShipType = ship.ShipType,
+                    //                ShipId = ship.ShipId,
+                    //                ShipName = ship.ShipName,
+                    //                ProjectAnnualProductionId = first.Id
+                    //            });
+                    //        }
+                    //    }
+                    //}
+                    //else
+                    //{
+                    var id = GuidUtil.Next();
+                    addTables.Add(new BaseLinePlanProjectAnnualPlanProduction
                     {
-                        var id = GuidUtil.Next();
-                        addTables.Add(new BaseLinePlanProjectAnnualPlanProduction
+                        JanuaryProductionQuantity = Setnumericalconversiontwo(item.JanuaryProductionQuantity),
+                        JanuaryProductionValue = Setnumericalconversiontwo(item.JanuaryProductionValue),
+                        FebruaryProductionQuantity = Setnumericalconversiontwo(item.FebruaryProductionQuantity),
+                        FebruaryProductionValue = Setnumericalconversiontwo(item.FebruaryProductionValue),
+                        MarchProductionQuantity = Setnumericalconversiontwo(item.MarchProductionQuantity),
+                        MarchProductionValue = Setnumericalconversiontwo(item.MarchProductionValue),
+                        AprilProductionQuantity = Setnumericalconversiontwo(item.AprilProductionQuantity),
+                        AprilProductionValue = Setnumericalconversiontwo(item.AprilProductionValue),
+                        MayProductionQuantity = Setnumericalconversiontwo(item.MayProductionQuantity),
+                        MayProductionValue = Setnumericalconversiontwo(item.MayProductionValue),
+                        JuneProductionQuantity = Setnumericalconversiontwo(item.JuneProductionQuantity),
+                        JuneProductionValue = Setnumericalconversiontwo(item.JuneProductionValue),
+                        JulyProductionQuantity = Setnumericalconversiontwo(item.JulyProductionQuantity),
+                        JulyProductionValue = Setnumericalconversiontwo(item.JulyProductionValue),
+                        AugustProductionValue = Setnumericalconversiontwo(item.AugustProductionValue),
+                        AugustProductionQuantity = Setnumericalconversiontwo(item.AugustProductionQuantity),
+                        SeptemberProductionQuantity = Setnumericalconversiontwo(item.SeptemberProductionQuantity),
+                        SeptemberProductionValue = Setnumericalconversiontwo(item.SeptemberProductionValue),
+                        OctoberProductionQuantity = Setnumericalconversiontwo(item.OctoberProductionQuantity),
+                        OctoberProductionValue = Setnumericalconversiontwo(item.OctoberProductionValue),
+                        NovemberProductionQuantity = Setnumericalconversiontwo(item.NovemberProductionQuantity),
+                        NovemberProductionValue = Setnumericalconversiontwo(item.NovemberProductionValue),
+                        DecemberProductionQuantity = Setnumericalconversiontwo(item.DecemberProductionQuantity),
+                        DecemberProductionValue = Setnumericalconversiontwo(item.DecemberProductionValue),
+                        ProjectId = baseid,
+                        CompanyId = _currentUser.CurrentLoginInstitutionId,
+                        Year = DateTime.Now.Year,
+                        Id = id
+                    });
+
+                    foreach (var ship in item.AnnualProductionShips)
+                    {
+                        addShipTables.Add(new BaseLinePlanAnnualProductionShips
                         {
-                            JanuaryProductionQuantity = Setnumericalconversiontwo(item.JanuaryProductionQuantity),
-                            JanuaryProductionValue = Setnumericalconversiontwo(item.JanuaryProductionValue),
-                            FebruaryProductionQuantity = Setnumericalconversiontwo(item.FebruaryProductionQuantity),
-                            FebruaryProductionValue = Setnumericalconversiontwo(item.FebruaryProductionValue),
-                            MarchProductionQuantity = Setnumericalconversiontwo(item.MarchProductionQuantity),
-                            MarchProductionValue = Setnumericalconversiontwo(item.MarchProductionValue),
-                            AprilProductionQuantity = Setnumericalconversiontwo(item.AprilProductionQuantity),
-                            AprilProductionValue = Setnumericalconversiontwo(item.AprilProductionValue),
-                            MayProductionQuantity = Setnumericalconversiontwo(item.MayProductionQuantity),
-                            MayProductionValue = Setnumericalconversiontwo(item.MayProductionValue),
-                            JuneProductionQuantity = Setnumericalconversiontwo(item.JuneProductionQuantity),
-                            JuneProductionValue = Setnumericalconversiontwo(item.JuneProductionValue),
-                            JulyProductionQuantity = Setnumericalconversiontwo(item.JulyProductionQuantity),
-                            JulyProductionValue = Setnumericalconversiontwo(item.JulyProductionValue),
-                            AugustProductionValue = Setnumericalconversiontwo(item.AugustProductionValue),
-                            AugustProductionQuantity = Setnumericalconversiontwo(item.AugustProductionQuantity),
-                            SeptemberProductionQuantity = Setnumericalconversiontwo(item.SeptemberProductionQuantity),
-                            SeptemberProductionValue = Setnumericalconversiontwo(item.SeptemberProductionValue),
-                            OctoberProductionQuantity = Setnumericalconversiontwo(item.OctoberProductionQuantity),
-                            OctoberProductionValue = Setnumericalconversiontwo(item.OctoberProductionValue),
-                            NovemberProductionQuantity = Setnumericalconversiontwo(item.NovemberProductionQuantity),
-                            NovemberProductionValue = Setnumericalconversiontwo(item.NovemberProductionValue),
-                            DecemberProductionQuantity = Setnumericalconversiontwo(item.DecemberProductionQuantity),
-                            DecemberProductionValue = Setnumericalconversiontwo(item.DecemberProductionValue),
-                            ProjectId = baseid,
-                            CompanyId = _currentUser.CurrentLoginInstitutionId,
-                            Year = DateTime.Now.Year,
-                            Id = id
+                            Id = GuidUtil.Next(),
+                            ShipType = ship.ShipType,
+                            ShipId = ship.ShipId,
+                            ShipName = ship.ShipName,
+                            ProjectAnnualProductionId = id
                         });
-
-                        foreach (var ship in item.AnnualProductionShips)
-                        {
-                            addShipTables.Add(new BaseLinePlanAnnualProductionShips
-                            {
-                                Id = GuidUtil.Next(),
-                                ShipType = ship.ShipType,
-                                ShipId = ship.ShipId,
-                                ShipName = ship.ShipName,
-                                ProjectAnnualProductionId = id
-                            });
-                        }
                     }
+                    //}
                 }
                 if (Ids.Any())
                 {
@@ -656,6 +660,20 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 {
                     await dbContext.Insertable(addTables).ExecuteCommandAsync();
                 }
+                var addl = new List<BaseLinePlanProject>();
+                foreach (var item in addBaseLine)
+                {
+                    if (addl.Where(p => p.ShortName == item.ShortName).Count() == 0)
+                    {
+                        addl.Add(item);
+                    }
+                }
+
+                if (addl.Any())
+                {
+                    await dbContext.Insertable(addl).ExecuteCommandAsync();
+                }
+
                 if (addShipTables.Any())
                 {
                     await dbContext.Insertable(addShipTables).ExecuteCommandAsync();
@@ -670,21 +688,8 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
         private async Task GetPlanVersion(BaseLinePlanProject baseLinePlanProject)
         {
             //var baseLinePlan = await dbContext.Queryable<BaseLinePlanProject>().Where(x => x.Year == baseLinePlanProject.Year && x.CompanyId == _currentUser.CurrentLoginInstitutionId).OrderByDescending(p => p.CreateTime).FirstAsync();
-            var baseLinePlan = await dbContext.Queryable<BaseLinePlanProject>().Where(x => x.Year == baseLinePlanProject.Year && x.ShortName == baseLinePlanProject.ShortName).OrderByDescending(p => p.CreateTime).FirstAsync();
-            if (baseLinePlan != null && !string.IsNullOrWhiteSpace(baseLinePlan.PlanVersion))
-            {
-                string targetChar = "v";
-                int index = baseLinePlan.PlanVersion.IndexOf("V");
-                if (index != -1)
-                {
-                    string result = baseLinePlan.PlanVersion.Substring(index + targetChar.Length);
-                    baseLinePlanProject.PlanVersion = baseLinePlanProject.ShortName + "-" + baseLinePlanProject.Year + "年基准计划V" + (Convert.ToInt32(result) + 1);
-                }
-            }
-            else
-            {
-                baseLinePlanProject.PlanVersion = baseLinePlanProject.ShortName + "-" + baseLinePlanProject.Year + "年基准计划V1";
-            }
+            var baseLinePlan = await dbContext.Queryable<BaseLinePlanProject>().Where(x => x.Year == baseLinePlanProject.Year && x.ShortName == baseLinePlanProject.ShortName).CountAsync();
+            baseLinePlanProject.PlanVersion = baseLinePlanProject.ShortName + "-" + baseLinePlanProject.Year + "年基准计划V" + (baseLinePlan + 1);
         }
 
         /// <summary>
@@ -1510,12 +1515,12 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 var BaseId = GuidUtil.Next();
                 foreach (var group in imports.GroupBy(it => it.ShortName))
                 {
-                    var baseLine = baseLinePlans.FirstOrDefault(x => x.ShortName == group.Key && x.CompanyId == _currentUser.CurrentLoginInstitutionId);
-                    if (baseLine != null)
-                    {
-                        responseAjaxResult.Fail(ResponseMessage.OPERATION_COMPANY_IDENTICAL);
-                        return responseAjaxResult;
-                    }
+                    //var baseLine = baseLinePlans.FirstOrDefault(x => x.ShortName == group.Key && x.CompanyId == _currentUser.CurrentLoginInstitutionId);
+                    //if (baseLine != null)
+                    //{
+                    //    responseAjaxResult.Fail(ResponseMessage.OPERATION_COMPANY_IDENTICAL);
+                    //    return responseAjaxResult;
+                    //}
 
                     var years = group.FirstOrDefault().Year;
                     if (string.IsNullOrWhiteSpace(years))
