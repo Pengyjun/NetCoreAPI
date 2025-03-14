@@ -1441,7 +1441,11 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 .WhereIF(!string.IsNullOrWhiteSpace(requestBody.Name), p => p.ShortName.Contains(requestBody.Name))
                 .WhereIF(requestBody.PlanStatus != null, p => p.PlanStatus == requestBody.PlanStatus)
                 .WhereIF(requestBody.IsSubPackage != null, p => p.IsSubPackage == requestBody.IsSubPackage)
-                .Select(p => p.Id).ToListAsync();
+                .ToListAsync();
+
+            List<Guid> baseplanprojectIds = new List<Guid>();
+            baseplanprojectIds = projects
+                .Select(t => t.Id).ToList();
 
             if (requestBody.Year == null)
             {
@@ -1456,7 +1460,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             //var projectList = await dbContext.Queryable<Project>().Where(x => x.IsDelete == 1).Select(x => new Project { Id = x.Id, Name = x.Name, CompanyId = x.CompanyId }).ToListAsync();
 
             var pPlanProduction = await dbContext.Queryable<BaseLinePlanProjectAnnualPlanProduction>()
-                 .Where(t => t.IsDelete == 1 && projects.Contains(t.ProjectId.Value) && t.Year == requestBody.Year)
+                 .Where(t => t.IsDelete == 1 && baseplanprojectIds.Contains(t.ProjectId.Value) && t.Year == requestBody.Year)
                  .GroupBy(p => p.ProjectId)
                  .Select(it => new SearchSubsidiaryCompaniesProjectProductionDto()
                  {
