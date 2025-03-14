@@ -572,7 +572,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Disembark
             #region 任职船舶
             //任职船舶 
             var crewWorkShip = _dbContext.Queryable<WorkShip>()
-                .Where(t => requestDto.ShipId.Contains(t.OnShip))
+                .WhereIF(requestDto.ShipId != null && requestDto.ShipId.Length > 0, t => requestDto.ShipId.Contains(t.OnShip))
               .GroupBy(u => u.WorkShipId)
               .Select(t => new { t.WorkShipId, WorkShipEndTime = SqlFunc.AggregateMax(t.WorkShipEndTime) });
             var wShip = _dbContext.Queryable<WorkShip>()
