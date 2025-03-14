@@ -256,17 +256,8 @@ namespace GHMonitoringCenterApi.Controllers.Project
                 if (rows != null)
                 {
                     var insert = await baseLinePlanProjectService.BaseLinePlanProjectAnnualProductionImport(rows, input);
-                    if (insert.Data!=null)
-                    {
-                        responseAjaxResult.Data = insert.Data;
-                        responseAjaxResult.Success(ResponseMessage.OPERATION_IMPORTEXCEL_SUCCESS);
-                        return responseAjaxResult;
-                    }
-                    else
-                    {
-                        responseAjaxResult = insert;
-                    }
-                        
+                    responseAjaxResult.Data = insert.Data;
+                    responseAjaxResult.Success(ResponseMessage.OPERATION_IMPORTEXCEL_SUCCESS);
                     return responseAjaxResult;
                 }
             }
