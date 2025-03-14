@@ -285,46 +285,49 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             {
                 decimal completeAmount = 0M;//完成产值
                 decimal accumulatedOutputValue = 0M;//开累产值
-                if (baseplanproject != null && !string.IsNullOrWhiteSpace(baseplanproject.Association))
+                if (baseplanproject != null)
                 {
-                    //关联项目 MasterCode为导入时关联项目 
-                    var pp = await dbContext.Queryable<Project>().FirstAsync(x => x.MasterCode == baseplanproject.Association && x.IsDelete == 1);
-                    if (pp == null)
+                    if (!string.IsNullOrWhiteSpace(baseplanproject.Association))
                     {
-                        //关联项目 Association为界面关联项目 
-                        await dbContext.Queryable<Project>().FirstAsync(x => x.Association == baseplanproject.Id.ToString() && x.IsDelete == 1);
-                    }
-                    if (pp != null)
-                    {
-                        rr.AssociationName = pp.ShortName;
-                        var dateMonth = DateTime.Now.ToDateMonth();
-                        var yearMonth = System.Convert.ToInt32(DateTime.Now.Year + "01");
-                        if (pp.CurrencyId == "2a0e99b4-f989-4967-b5f1-5519091d4280".ToGuid())//国内
+                        //关联项目 MasterCode为导入时关联项目 
+                        var pp = await dbContext.Queryable<Project>().FirstAsync(x => x.MasterCode == baseplanproject.Association && x.IsDelete == 1);
+                        if (pp == null)
                         {
-
-                            accumulatedOutputValue = monthReport24.Where(x => x.ProjectId == pp.Id).Sum(x => System.Convert.ToDecimal(x.ActualCompAmount));//开累
-                                                                                                                                                           //202306历史产值追加
-                            accumulatedOutputValue += monthReport.Where(x => x.ProjectId == pp.Id && x.DateMonth == 202306).Sum(x => System.Convert.ToDecimal(x.ActualCompAmount));
+                            //关联项目 Association为界面关联项目 
+                            await dbContext.Queryable<Project>().FirstAsync(x => x.Association == baseplanproject.Id.ToString() && x.IsDelete == 1);
                         }
-                        else
+                        if (pp != null)
                         {
-                            //获取汇率
-                            var currencyConvert = await dbContext.Queryable<CurrencyConverter>().Where(t => t.IsDelete == 1 && t.CurrencyId == pp.CurrencyId.ToString()).OrderByDescending(x => x.Year).FirstAsync();
-                            pp.ECAmount = pp.ECAmount * currencyConvert.ExchangeRate;
-                            accumulatedOutputValue = monthReport24.Where(x => x.ProjectId == pp.Id).Sum(x => System.Convert.ToDecimal(x.RMBHValue));//开累
-                                                                                                                                                    //202306历史产值追加
-                            accumulatedOutputValue += monthReport.Where(x => x.ProjectId == pp.Id && x.DateMonth == 202306).Sum(x => System.Convert.ToDecimal(x.RMBHValue));
-                        }
-                        //截止到当月的完成产值+历史调整开累产值=开累产值
-                        accumulatedOutputValue += monthReport.Where(x => x.ProjectId == pp.Id && x.DateMonth > 202412 && x.DateMonth <= dateMonth).Sum(x => x.CompleteProductionAmount);
-                        //2024年调整的开累数+截止到当年一月的开累数（年初开累产值）
-                        completeAmount = accumulatedOutputValue + monthReport.Where(x => x.ProjectId == pp.Id && x.DateMonth > 202412 && x.DateMonth < yearMonth).Sum(x => x.CompleteProductionAmount);
+                            rr.AssociationName = pp.ShortName;
+                            var dateMonth = DateTime.Now.ToDateMonth();
+                            var yearMonth = System.Convert.ToInt32(DateTime.Now.Year + "01");
+                            if (pp.CurrencyId == "2a0e99b4-f989-4967-b5f1-5519091d4280".ToGuid())//国内
+                            {
 
-                        rr.EffectiveAmount = System.Convert.ToDecimal(pp.ECAmount);
-                        rr.ContractStipulationEndDate = pp.ContractStipulationEndDate?.ToString("yyyy-MM-dd");
-                        rr.RemainingAmount = System.Convert.ToDecimal(pp.ECAmount) - completeAmount;
-                        //rr.AccumulatedOutputValue = accumulatedOutputValue;
-                        //rr.AccumulatedOutputValue = sum;
+                                accumulatedOutputValue = monthReport24.Where(x => x.ProjectId == pp.Id).Sum(x => System.Convert.ToDecimal(x.ActualCompAmount));//开累
+                                                                                                                                                               //202306历史产值追加
+                                accumulatedOutputValue += monthReport.Where(x => x.ProjectId == pp.Id && x.DateMonth == 202306).Sum(x => System.Convert.ToDecimal(x.ActualCompAmount));
+                            }
+                            else
+                            {
+                                //获取汇率
+                                var currencyConvert = await dbContext.Queryable<CurrencyConverter>().Where(t => t.IsDelete == 1 && t.CurrencyId == pp.CurrencyId.ToString()).OrderByDescending(x => x.Year).FirstAsync();
+                                pp.ECAmount = pp.ECAmount * currencyConvert.ExchangeRate;
+                                accumulatedOutputValue = monthReport24.Where(x => x.ProjectId == pp.Id).Sum(x => System.Convert.ToDecimal(x.RMBHValue));//开累
+                                                                                                                                                        //202306历史产值追加
+                                accumulatedOutputValue += monthReport.Where(x => x.ProjectId == pp.Id && x.DateMonth == 202306).Sum(x => System.Convert.ToDecimal(x.RMBHValue));
+                            }
+                            //截止到当月的完成产值+历史调整开累产值=开累产值
+                            accumulatedOutputValue += monthReport.Where(x => x.ProjectId == pp.Id && x.DateMonth > 202412 && x.DateMonth <= dateMonth).Sum(x => x.CompleteProductionAmount);
+                            //2024年调整的开累数+截止到当年一月的开累数（年初开累产值）
+                            completeAmount = accumulatedOutputValue + monthReport.Where(x => x.ProjectId == pp.Id && x.DateMonth > 202412 && x.DateMonth < yearMonth).Sum(x => x.CompleteProductionAmount);
+
+                            rr.EffectiveAmount = System.Convert.ToDecimal(pp.ECAmount);
+                            rr.ContractStipulationEndDate = pp.ContractStipulationEndDate?.ToString("yyyy-MM-dd");
+                            rr.RemainingAmount = System.Convert.ToDecimal(pp.ECAmount) - completeAmount;
+                            //rr.AccumulatedOutputValue = accumulatedOutputValue;
+                            //rr.AccumulatedOutputValue = sum;
+                        }
                     }
                 }
                 else if (baseplanproject != null)
@@ -341,7 +344,11 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     rr.StartStatus = baseplanproject.StartStatus;
                     if (rr.StartStatus != null)
                     {
-                        rr.StartStatusName = projectStatus.Where(p => p.StatusId == rr.StartStatus.ToGuid()).FirstOrDefault()?.Name;
+                        var status = projectStatus.Where(p => p.StatusId == rr.StartStatus.ToGuid()).FirstOrDefault();
+                        if (status != null)
+                        {
+                            rr.StartStatusName = status.Name;
+                        }
                     }
                     rr.Association = baseplanproject.Association;
                     rr.CompletionTime = baseplanproject.CompletionTime;
@@ -710,15 +717,23 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     Name = x.Name,
                     SubOrOwn = 1
                 }).ToListAsync();
-            var subs = await dbContext.Queryable<SubShip>().Where(x => x.IsDelete == 1)
-                .Select(x => new BaseLinePlanShipsForAnnualProduction
-                {
-                    Id = x.PomId,
-                    Name = x.Name,
-                    SubOrOwn = 2
-                }).ToListAsync();
+
+            var ownsn = await dbContext.Queryable<OwnerShip>().Where(x => x.IsDelete == 3)
+               .Select(x => new BaseLinePlanShipsForAnnualProduction
+               {
+                   Id = x.PomId,
+                   Name = x.Name,
+                   SubOrOwn = 1
+               }).ToListAsync();
+            //var subs = await dbContext.Queryable<SubShip>().Where(x => x.IsDelete == 1)
+            //    .Select(x => new BaseLinePlanShipsForAnnualProduction
+            //    {
+            //        Id = x.PomId,
+            //        Name = x.Name,
+            //        SubOrOwn = 2
+            //    }).ToListAsync();
             ownShipsForAnnualProductions.AddRange(owns);
-            ownShipsForAnnualProductions.AddRange(subs);
+            ownShipsForAnnualProductions.AddRange(ownsn);
 
             rr.ProjectInfosForAnnualProductions = projectInfosForAnnualProductions;
             rr.OwnShipsForAnnualProductions = ownShipsForAnnualProductions;
@@ -755,7 +770,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             }
             var intitutionList = dbContext.Queryable<Institution>().Where(x => x.IsDelete == 1);
             //var list= dbContext.Queryable<BaseLinePlanAncomparison>().LeftJoin<Project>((b,p)=>b.Code==p.MasterCode).
-
+            RefAsync<int> total = 0;
             var annualProductionShips = await dbContext.Queryable<BaseLinePlanAnnualProductionShips>()
                 .Where(t => t.IsDelete == 1).ToListAsync();
             var mainIds = annualProductionShips.Select(x => x.ProjectAnnualProductionId).ToList();
@@ -781,7 +796,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                      NovemberProductionValue = SqlFunc.AggregateSum(it.NovemberProductionValue),
                      DecemberProductionValue = SqlFunc.AggregateSum(it.DecemberProductionValue)
                  })
-                 .ToListAsync();
+                 .ToPageListAsync(requestBody.PageIndex, requestBody.PageSize, total);
 
             foreach (var item in pPlanProduction)
             {
@@ -810,8 +825,10 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 //    item.BasePlanName = item.ProjectName + "-基准";
                 //}
             }
-            rt.Count = pPlanProduction.Count;
-            return rt.SuccessResult(pPlanProduction);
+            rt.Count = total;
+            rt.Data = pPlanProduction;
+            rt.Success();
+            return rt;
         }
 
         private void Converttowanyuan(SearchSubsidiaryCompaniesProjectProductionDto item)
@@ -990,7 +1007,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             {
                 requestBody.Year = DateTime.Now.Year;
             }
-
+            RefAsync<int> total = 0;
             var projectList = await dbContext.Queryable<Project>()
                 .Where(x => x.IsDelete == 1)
                 .Select(x => new Project { Id = x.Id, Name = x.Name, CompanyId = x.CompanyId }).ToListAsync();
@@ -1015,7 +1032,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                      NovemberProductionValue = SqlFunc.AggregateSum(it.NovemberProductionValue),
                      DecemberProductionValue = SqlFunc.AggregateSum(it.DecemberProductionValue)
                  })
-                 .ToListAsync();
+                .ToPageListAsync(requestBody.PageIndex, requestBody.PageSize, total);
 
             foreach (var item in pPlanProduction)
             {
@@ -1047,8 +1064,10 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 //}
 
             }
-            rt.Count = pPlanProduction.Count;
-            return rt.SuccessResult(pPlanProduction);
+            rt.Count = total;
+            rt.Data = pPlanProduction;
+            rt.Success();
+            return rt;
         }
 
         /// <summary>
@@ -1189,7 +1208,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                  .WhereIF(!string.IsNullOrWhiteSpace(requestBody.PlanType), p => p.PlanType == requestBody.PlanType)
                  .WhereIF(!string.IsNullOrWhiteSpace(requestBody.StartStatus), p => p.StartStatus == requestBody.StartStatus)
          .ToListAsync();
-
+            RefAsync<int> total = 0;
             List<Guid> baseplanprojectIds = new List<Guid>();
             baseplanprojectIds = baseplanproject
                 .Select(t => t.Id).ToList();
@@ -1228,7 +1247,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                      NovemberProductionValue = SqlFunc.AggregateSum(it.NovemberProductionValue),
                      DecemberProductionValue = SqlFunc.AggregateSum(it.DecemberProductionValue)
                  })
-                 .ToListAsync();
+                 .ToPageListAsync(requestBody.PageIndex, requestBody.PageSize, total);
 
 
             var List = await dbContext.Queryable<ProductionMonitoringOperationDayReport>().Where(c => c.IsDelete == 1 && c.Type == 1)
@@ -1262,8 +1281,10 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 //    + item.MayProductionValue + item.JuneProductionValue + item.JulyProductionValue + item.AugustProductionValue + item.SeptemberProductionValue
                 //    + item.OctoberProductionValue + item.NovemberProductionValue + item.DecemberProductionValue;
             }
-            rt.Count = pPlanProduction.Count;
-            return rt.SuccessResult(pPlanProduction);
+            rt.Count = total;
+            rt.Data = pPlanProduction;
+            rt.Success();
+            return rt;
         }
 
         /// <summary>                    
@@ -1367,10 +1388,11 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             //var projects = await dbContext.Queryable<Project>().Where(p => p.IsDelete == 1 && guids.Contains(p.ProjectDept)).Select(p => p.Id).ToListAsync();
             var baseplanproject = await dbContext.Queryable<BaseLinePlanProject>()
              .Where(t => t.IsDelete == 1).ToListAsync();
-
+            RefAsync<int> total = 0;
             var projects = await dbContext.Queryable<BaseLinePlanProject>().Where(p => p.IsDelete == 1)
                 .WhereIF(requestBody.Year != null, p => p.Year == requestBody.Year)
-                .WhereIF(!string.IsNullOrWhiteSpace(requestBody.StartStatus), p => p.StartStatus == requestBody.StartStatus)
+                .WhereIF(!string.IsNullOrWhiteSpace(requestBody.Name), p => p.ShortName.Contains(requestBody.Name))
+                .WhereIF(requestBody.PlanStatus != null, p => p.PlanStatus == requestBody.PlanStatus)
                 .WhereIF(requestBody.IsSubPackage != null, p => p.IsSubPackage == requestBody.IsSubPackage)
                 .Select(p => p.Id).ToListAsync();
 
@@ -1405,7 +1427,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                      NovemberProductionValue = SqlFunc.AggregateSum(it.NovemberProductionValue),
                      DecemberProductionValue = SqlFunc.AggregateSum(it.DecemberProductionValue)
                  })
-                 .ToListAsync();
+                .ToPageListAsync(requestBody.PageIndex, requestBody.PageSize, total);
             foreach (var item in pPlanProduction)
             {
                 Converttowanyuan(item);
@@ -1420,11 +1442,11 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     item.PlanStatusStr = baseline.PlanStatus == 0 ? "待审核" : baseline.PlanStatus == 1 ? "驳回" : baseline.PlanStatus == 2 ? "通过" : "撤回";
                     item.CompanyId = baseline.CompanyId;
                 }
-
-
             }
-            rt.Count = pPlanProduction.Count;
-            return rt.SuccessResult(pPlanProduction);
+            rt.Success();
+            rt.Count = total;
+            rt.Data = pPlanProduction;
+            return rt;
         }
 
 
@@ -1532,7 +1554,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     addbaseLinePlanProjects.Add(add);
                     foreach (var item in group)
                     {
-                        if (!string.IsNullOrWhiteSpace(item.Year))
+                        if (string.IsNullOrWhiteSpace(item.Year))
                         {
                             responseAjaxResult.Fail("年份不能为空");
                         }
@@ -1560,8 +1582,9 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                         //    return responseAjaxResult;
                         //}
 
-                        var id = GuidUtil.Next();
-                        addTables.Add(new BaseLinePlanProjectAnnualPlanProduction
+                        //var id = 
+
+                        var b = new BaseLinePlanProjectAnnualPlanProduction
                         {
                             //JanuaryProductionQuantity = Setnumericalconversiontwo(item.JanuaryProductionQuantity),
                             JanuaryProductionValue = Setnumericalconversiontwo(item.JanuaryProductionValue),
@@ -1589,9 +1612,10 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                             DecemberProductionValue = Setnumericalconversiontwo(item.DecemberProductionValue),
                             ProjectId = BaseId,
                             CompanyId = _currentUser.CurrentLoginInstitutionId,
-                            Year = year,
-                            Id = id
-                        });
+                            Year = year
+                        };
+                        b.Id = Guid.NewGuid();
+                        addTables.Add(b);
 
                         //addShipTables.Add(new BaseLinePlanAnnualProductionShips
                         //{
@@ -1600,8 +1624,13 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                         //    ShipId = Ship.Id,
                         //    ShipName = Ship.Name,
                         //    ProjectAnnualProductionId = id
-                        //});
+                        //}); 
                     }
+                }
+
+                foreach (var item in addbaseLinePlanProjects)
+                {
+                    item.Id = GuidUtil.Next();
                 }
                 await dbContext.Insertable(addTables).ExecuteCommandAsync();
                 await dbContext.Insertable(addbaseLinePlanProjects).ExecuteCommandAsync();

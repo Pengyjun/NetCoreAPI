@@ -802,6 +802,11 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project
         public int? Year { get; set; }
 
         /// <summary>
+        /// 审核状态，0  待审核 （1：驳回，2：通过  3:撤回）
+        /// </summary>
+        public int? PlanStatus { get; set; }
+
+        /// <summary>
         /// 是否分包
         /// </summary>
         public int? IsSubPackage { get; set; }
