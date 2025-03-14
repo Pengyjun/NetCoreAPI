@@ -56,10 +56,6 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.Disembark
         /// 备注
         /// </summary>
         public string? Remark { get; set; }
-        /// <summary>
-        /// 是否在船过年
-        /// </summary>
-        public bool IsOnShipYear { get; set; }
     }
 
     /// <summary>

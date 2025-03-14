@@ -575,23 +575,25 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Disembark
                 .WhereIF(requestDto.ShipId != null && requestDto.ShipId.Length > 0, t => requestDto.ShipId.Contains(t.OnShip))
               .GroupBy(u => u.WorkShipId)
               .Select(t => new { t.WorkShipId, WorkShipEndTime = SqlFunc.AggregateMax(t.WorkShipEndTime) });
-            var wShip = _dbContext.Queryable<WorkShip>()
+            var wShip = _dbContext.Queryable<WorkShip>().WhereIF(requestDto.ShipId != null && requestDto.ShipId.Length > 0, t => requestDto.ShipId.Contains(t.OnShip))
               .InnerJoin(crewWorkShip, (x, y) => x.WorkShipId == y.WorkShipId && x.WorkShipEndTime == y.WorkShipEndTime);
             #endregion
 
             var userInfos = await _dbContext.Queryable<User>()
                 .Where(t => t.IsLoginUser == 1)
                 .InnerJoin(wShip, (t, ws) => ws.WorkShipId == t.BusinessId)
-                //.LeftJoin(_dbContext.Queryable<LeavePlanUser>().Where(t => t.IsDelete == 1), (t, ws, le) => t.BusinessId == le.UserId)
+                .LeftJoin(_dbContext.Queryable<LeavePlanUser>().Where(t => t.IsDelete == 1), (t, ws, le) => t.BusinessId == le.UserId && ws.OnShip == le.ShipId.ToString())
                 .WhereIF(!string.IsNullOrWhiteSpace(requestDto.KeyWords), (t, ws) => SqlFunc.Contains(t.Name, requestDto.KeyWords) || SqlFunc.Contains(t.Phone, requestDto.KeyWords) || SqlFunc.Contains(t.CardId, requestDto.KeyWords) || SqlFunc.Contains(t.WorkNumber, requestDto.KeyWords))
-                //.WhereIF(requestDto.Year == 1, (t, ws, le) => le.IsOnShipYear && le.Year == DateTime.Now.Year)
-                //.WhereIF(requestDto.Year == 2, (t, ws, le) => le.IsOnShipLastYear && le.Year == DateTime.Now.Year - 1)
-                .Select((t, ws) => new SearchLeavePlanUserResponseDto
+                .WhereIF(requestDto.Year == 1, (t, ws, le) => le.IsOnShipCurrentYear && le.Year == DateTime.Now.Year)
+                .WhereIF(requestDto.Year == 2, (t, ws, le) => le.IsOnShipLastYear && le.Year == DateTime.Now.Year - 1)
+                .Select((t, ws, le) => new SearchLeavePlanUserResponseDto
                 {
                     UserId = t.BusinessId,
                     UserName = t.Name,
                     JobTypeId = ws.Postition,
-                    ShipId = ws.OnShip
+                    ShipId = ws.OnShip,
+                    IsOnShipCurrentYear = le.IsOnShipCurrentYear,
+                    IsOnShipLastYear = le.IsOnShipLastYear
                 })
                 .ToListAsync();
             var userIds = userInfos.Select(t => t.UserId).ToArray();
@@ -653,7 +655,6 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Disembark
                     leavePlanUser.IsOnShipCurrentYear = item.IsOnShipCurrentYear;
                     leavePlanUser.Remark = item.Remark;
                     leavePlanUser.Year = requestDto.Year;
-                    leavePlanUser.IsOnShipYear = item.IsOnShipYear;
                     leavePlans.Add(leavePlanUser);
                     foreach (var item2 in item.vacationInfos)
                     {

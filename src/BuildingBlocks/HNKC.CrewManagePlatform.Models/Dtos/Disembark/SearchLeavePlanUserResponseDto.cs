@@ -51,5 +51,6 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.Disembark
         /// 是否在船过年 当前年
         /// </summary>
         public bool IsOnShipCurrentYear { get; set; }
+        public int year { get; set; }
     }
 }
