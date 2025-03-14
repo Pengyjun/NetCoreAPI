@@ -27,7 +27,7 @@ namespace GHMonitoringCenterApi.Domain.Models
         public Guid CompanyId { get; set; }
 
         /// <summary>
-        /// 计划版本呢
+        /// 计划名称
         /// </summary>
         [SugarColumn(Length = 36)]
         public string PlanVersion { get; set; }
@@ -43,7 +43,50 @@ namespace GHMonitoringCenterApi.Domain.Models
         /// </summary>
         [SugarColumn(Length = 36)]
         public string StartStatus { get; set; }
+
+        /// <summary>
+        /// 简称
+        /// </summary>
+        [SugarColumn(Length = 36)]
+        public string ShortName { get; set; }
+
+        /// <summary>
+        /// 是否分包
+        /// </summary>
+        public int? IsSubPackage { get; set; }
+
+        /// <summary>
+        /// 总有效合同额
+        /// </summary>
+        public decimal EffectiveAmount { get; set; }
+
+        /// <summary>
+        /// 剩余合同额
+        /// </summary>
+        public decimal RemainingAmount { get; set; }
+
+        /// <summary>
+        /// 最新完工时间
+        /// </summary>
+        public DateTime? CompletionTime { get; set; }
+
+
+        /// <summary>
+        /// 计划状态
+        /// </summary>
+        public int PlanStatus { get; set; }
+
+        /// <summary>
+        /// 关联项目
+        /// </summary>
+        public string? Association { get; set; }
+
+        /// <summary>
+        /// 驳回原因
+        /// </summary>
+        public string RejectReason { get; set; }
+
     }
 
-    
+
 }

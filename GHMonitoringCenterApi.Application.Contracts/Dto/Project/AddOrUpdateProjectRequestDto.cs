@@ -264,6 +264,11 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project
         /// </summary>
         public int? IsSubContractProject { get; set; }
 
+        /// <summary>
+        /// 关联基准计划
+        /// </summary>
+        public string Association { get; set; }
+
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
             if (string.IsNullOrWhiteSpace(Name))

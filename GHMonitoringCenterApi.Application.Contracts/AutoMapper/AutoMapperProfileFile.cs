@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using GHMonitoringCenterApi.Application.Contracts.Dto.BaseLinePlan;
 using GHMonitoringCenterApi.Application.Contracts.Dto.CompanyProductionValueInfos;
 using GHMonitoringCenterApi.Application.Contracts.Dto.File;
 using GHMonitoringCenterApi.Application.Contracts.Dto.Information;
@@ -283,6 +284,8 @@ namespace GHMonitoringCenterApi.Application.Contracts.AutoMapper
 
             mapperConfigurationExpression.CreateMap<BaseLinePlanAncomparisonResponseDto, BaseLinePlanAncomparison>();
             mapperConfigurationExpression.CreateMap<ProjectAdjustProductionValueResponseDto, ProjectAdjustProductionValueDetails>();
+
+            mapperConfigurationExpression.CreateMap<SaveBaseLinePlanApproverRequestDto, BaseLinePlanApprover>();
 
         }
     }

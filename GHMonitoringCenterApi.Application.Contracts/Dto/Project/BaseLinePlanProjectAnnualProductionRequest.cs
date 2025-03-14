@@ -28,7 +28,7 @@
         public string? PlanType { get; set; }
 
         /// <summary>
-        /// 计划版本
+        /// 年初状态
         /// </summary>
         public string? StartStatus { get; set; }
 
@@ -36,6 +36,11 @@
         /// 年份
         /// </summary>
         public int? Year { get; set; }
+
+        /// <summary>
+        /// 公司ID
+        /// </summary>
+        public Guid? CompanyId { get; set; }
         ///// <summary>
         ///// 基准计划ID
         ///// </summary>

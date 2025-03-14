@@ -1,4 +1,5 @@
 ﻿using GHMonitoringCenterApi.Application.Contracts.Dto;
+using GHMonitoringCenterApi.Application.Contracts.Dto.Job;
 using GHMonitoringCenterApi.Application.Contracts.Dto.Project;
 using GHMonitoringCenterApi.Application.Contracts.Dto.Project.Approver;
 using GHMonitoringCenterApi.Application.Contracts.Dto.Project.MonthReportForProject;
@@ -9,6 +10,7 @@ using GHMonitoringCenterApi.Application.Contracts.Dto.ProjectPlanProduction;
 using GHMonitoringCenterApi.Application.Contracts.Dto.ProjectProductionReport;
 using GHMonitoringCenterApi.Application.Contracts.Dto.Ship;
 using GHMonitoringCenterApi.Application.Contracts.Dto.Upload;
+using GHMonitoringCenterApi.Application.Contracts.IService.Job;
 using GHMonitoringCenterApi.Application.Contracts.IService.Project;
 using GHMonitoringCenterApi.CustomAttribute;
 using GHMonitoringCenterApi.Domain.Models;
@@ -38,17 +40,20 @@ namespace GHMonitoringCenterApi.Controllers.Project
 
         public IProjectService projectService { get; set; }
 
+        private readonly IJobService _jobService;
+
         /// <summary>
         /// 
         /// </summary>
         /// <param name="db"></param>
         /// <param name="projectService"></param>
         /// <param name="baseLinePlanProjectService"></param>
-        public BaseLinePlanProjectController(ISqlSugarClient db, IBaseLinePlanProjectService baseLinePlanProjectService, IProjectService projectService)
+        public BaseLinePlanProjectController(ISqlSugarClient db, IBaseLinePlanProjectService baseLinePlanProjectService, IProjectService projectService, IJobService jobService)
         {
             this.baseLinePlanProjectService = baseLinePlanProjectService;
             this.projectService = projectService;
             this._db = db;
+            _jobService = jobService;
         }
         #endregion
 
@@ -143,7 +148,7 @@ namespace GHMonitoringCenterApi.Controllers.Project
         }
 
 
-       
+
         /// <summary>
         /// 局工程部界面 项目界面
         /// </summary>
@@ -178,58 +183,6 @@ namespace GHMonitoringCenterApi.Controllers.Project
             return await baseLinePlanProjectService.SearchCompaniesProjectProductionAsync(requestBody);
         }
 
-
-        /// <summary>
-        ///导入 
-        /// </summary>
-        /// <returns></returns>
-        [HttpPost("ExcelProjectAnnualProduction")]
-        [AllowAnonymous]
-        public async Task<ResponseAjaxResult<bool>> ExcelProjectAnnualProductionAsync()
-        {
-            ResponseAjaxResult<bool> responseAjaxResult = new();
-            var streamUpdateFile = await StreamUpdateFileAsync();
-            var streamUpdate = streamUpdateFile.Data;
-            if (streamUpdateFile != null)
-            {
-                var savePath = AppsettingsHelper.GetValue("UpdateItem:SavePath");
-                var path = savePath + streamUpdate.Name;
-                var rows = MiniExcel.Query<SearchProjectAnnualProductionDto>(path, startCell: "A4").ToList();
-                if (rows.Any())
-                {
-                    var production = new ProjectAnnualProductionDto()
-                    {
-                        ExcelImport = rows
-                    };
-                    var insert = await projectService.ExcelProjectAnnualProductionAsync(production);
-                    responseAjaxResult.Data = true;
-                }
-                responseAjaxResult.Success();
-            }
-            else
-            {
-                responseAjaxResult.Fail(ResponseMessage.OPERATION_UPLOAD_FAIL);
-            }
-            return responseAjaxResult;
-        }
-
-
-        /// <summary>
-        /// 生产计划模板下载
-        /// </summary>
-        /// <returns></returns>
-        [HttpGet("ExcelProjectAnnualProductionTemp")]
-        public async Task<IActionResult> ExcelProjectAnnualProductionTempAsync()
-        {
-            var templatePath = $"Template/Excel/ProjectAnnualProductionTemp.xlsx";
-            var importData = new
-            {
-                year = DateTime.Now.Year,
-                month = DateTime.Now.Month,
-                day = DateTime.Now.Day,
-            };
-            return await ExcelTemplateImportAsync(templatePath, importData, "生产计划模板");
-        }
         #endregion
 
         /// <summary>
@@ -241,6 +194,112 @@ namespace GHMonitoringCenterApi.Controllers.Project
         public async Task<ResponseAjaxResult<List<BaseLinePlanAncomparisonResponseDto>>> SearchBaseLinePlanAncomparisonAsync([FromQuery] BaseLinePlanAncomparisonRequsetDto requestBody)
         {
             return await baseLinePlanProjectService.SearchBaseLinePlanAncomparisonAsync(requestBody);
+        }
+
+        /// <summary>
+        /// 计划基准列表新
+        /// </summary>
+        /// <param name="requestBody"></param>
+        /// <returns></returns>
+        [HttpGet("SearchBaseLinePlanAncomparisonNew")]
+        public async Task<ResponseAjaxResult<List<SearchSubsidiaryCompaniesProjectProductionDto>>> SearchBaseLinePlanAncomparisonNewAsync([FromQuery] BaseLinePlanAncomparisonRequsetDto requestBody)
+        {
+            return await baseLinePlanProjectService.SearchBaseLinePlanAncomparisonNewAsync(requestBody);
+        }
+
+        ///// <summary>
+        ///// 基准计划审核
+        ///// </summary>
+        ///// <returns></returns>
+        //[HttpGet("BaseLinePlanProjectApprove")]
+        //[AllowAnonymous]
+        //public async Task<ResponseAjaxResult<bool>> BaseLinePlanProjectApproveAsync([FromQuery] int isApprove, [FromQuery] string? id)
+        //{
+        //    return await baseLinePlanProjectService.BaseLinePlanProjectApproveAsync(isApprove, id);
+        //}
+
+        #region 项目基准计划
+        /// <summary>
+        /// 项目基准计划导入模板下载
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("BasePlanLineDownloadTemplate")]
+        public async Task<IActionResult> BasePlanLineProjectDownloadTemplateAsync()
+        {
+            var templatePath = $"Template/Excel/BasePlanLineProjectTemplate.xlsx";
+            var importData = new
+            {
+                title = DateTime.Now.Year + "年项目基准计划",
+                ProjectPlan = new List<ProjectPlanResponseDto>()
+            };
+            return await ExcelTemplateImportAsync(templatePath, importData, importData.title);
+        }
+
+        /// <summary>
+        /// 项目基准计划导入
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost("BasePlanLineProjectImport")]
+        public async Task<ResponseAjaxResult<BaseLineImportOutput>> BasePlanLineProjectImportAsync()
+        {
+
+            //[FromBody] 
+            BaseLinePlanprojectImportDto input = new BaseLinePlanprojectImportDto();
+            ResponseAjaxResult<BaseLineImportOutput> responseAjaxResult = new ResponseAjaxResult<BaseLineImportOutput>();
+            var streamUpdateFile = await StreamUpdateFileAsync();
+            var streamData = streamUpdateFile.Data;
+            if (streamUpdateFile != null)
+            {
+                var savePath = AppsettingsHelper.GetValue("UpdateItem:SavePath");
+                var path = savePath + streamData.Name;
+                var rows = MiniExcel.Query<BaseLinePlanProjectAnnualProductionImport>(path, startCell: "A2").ToList();
+                if (rows != null)
+                {
+                    var insert = await baseLinePlanProjectService.BaseLinePlanProjectAnnualProductionImport(rows, input);
+                    if (insert.Data != null)
+                    {
+                        responseAjaxResult.Data = insert.Data;
+                        responseAjaxResult.Success(ResponseMessage.OPERATION_IMPORTEXCEL_SUCCESS);
+                        return responseAjaxResult;
+                    }
+                    else
+                    {
+                        responseAjaxResult = insert;
+                    }
+
+                    return responseAjaxResult;
+                }
+            }
+            else
+            {
+                responseAjaxResult.Fail(ResponseMessage.DEVICE_IMPORT_FAIL);
+            }
+            return responseAjaxResult;
+        }
+        #endregion
+
+
+        /// <summary>
+        /// 查询基准计划下拉框选择
+        /// </summary>
+        /// <param name="requsetDto"></param>
+        /// <returns></returns>
+        [HttpGet("SearchBaseLinePlanOptions")]
+        [AllowAnonymous]
+        public async Task<ResponseAjaxResult<List<BaseLinePlanSelectOptiong>>> SearchBaseLinePlanOptionsAsync([FromQuery] BaseLinePlanAncomparisonRequsetDto requsetDto)
+        {
+            return await baseLinePlanProjectService.SearchBaseLinePlanOptionsAsync(requsetDto);
+        }
+
+        /// <summary>
+        /// 提交基准计划审批
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost("SubmitJobOfBaseLinePlan")]
+        [UnitOfWork]
+        public async Task<ResponseAjaxResult<bool>> SubmitJobOfBaseLinePlanAsync([FromBody] SubmitJobOfBaseLinePlanRequestDto model)
+        {
+            return await _jobService.SubmitJobAsync(model);
         }
 
     }
