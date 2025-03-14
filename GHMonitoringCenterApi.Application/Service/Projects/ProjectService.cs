@@ -815,7 +815,8 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                      WorkDay = p.WorkDay,
                      ContractSignDate = p.ContractSignDate,
                      ContractStipulationEndDate = p.ContractStipulationEndDate,
-                     ContractStipulationStartDate = p.ContractStipulationStartDate
+                     ContractStipulationStartDate = p.ContractStipulationStartDate,
+                     Association = p.Association
                  }).SingleAsync();
 
 
@@ -829,6 +830,11 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             //项目管理类型
             var managerTypeName = await dbContext.Queryable<ProjectMangerType>().Where(x => x.IsDelete == 1 && x.Code == SqlFunc.ToString(projectDeteilSingle.ManagerType)).Select(x => x.Name).FirstAsync();
             projectDeteilSingle.ManagerTypeName = managerTypeName;
+
+            //获取基准计划
+            var association = await dbContext.Queryable<BaseLinePlanProject>().Where(x => x.IsDelete == 1 && x.Association == projectDeteilSingle.Association && x.Association != null).Select(x => x.ShortName).FirstAsync();
+            projectDeteilSingle.AssociationName = association;
+
             //获取机构信息
             var intitutionList = dbContext.Queryable<Institution>().Where(x => x.IsDelete == 1);
             projectDeteilSingle.CompanyName = intitutionList.SingleAsync(x => x.PomId == projectDeteilSingle.CompanyId).Result.Name;

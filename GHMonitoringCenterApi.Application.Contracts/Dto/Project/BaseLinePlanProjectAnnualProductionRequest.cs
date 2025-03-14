@@ -36,6 +36,11 @@
         /// 年份
         /// </summary>
         public int? Year { get; set; }
+
+        /// <summary>
+        /// 公司ID
+        /// </summary>
+        public Guid? CompanyId { get; set; }
         ///// <summary>
         ///// 基准计划ID
         ///// </summary>

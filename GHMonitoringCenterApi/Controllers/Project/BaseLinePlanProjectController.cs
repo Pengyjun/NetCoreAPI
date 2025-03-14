@@ -1,4 +1,5 @@
 ﻿using GHMonitoringCenterApi.Application.Contracts.Dto;
+using GHMonitoringCenterApi.Application.Contracts.Dto.Job;
 using GHMonitoringCenterApi.Application.Contracts.Dto.Project;
 using GHMonitoringCenterApi.Application.Contracts.Dto.Project.Approver;
 using GHMonitoringCenterApi.Application.Contracts.Dto.Project.MonthReportForProject;
@@ -9,6 +10,7 @@ using GHMonitoringCenterApi.Application.Contracts.Dto.ProjectPlanProduction;
 using GHMonitoringCenterApi.Application.Contracts.Dto.ProjectProductionReport;
 using GHMonitoringCenterApi.Application.Contracts.Dto.Ship;
 using GHMonitoringCenterApi.Application.Contracts.Dto.Upload;
+using GHMonitoringCenterApi.Application.Contracts.IService.Job;
 using GHMonitoringCenterApi.Application.Contracts.IService.Project;
 using GHMonitoringCenterApi.CustomAttribute;
 using GHMonitoringCenterApi.Domain.Models;
@@ -38,17 +40,20 @@ namespace GHMonitoringCenterApi.Controllers.Project
 
         public IProjectService projectService { get; set; }
 
+        private readonly IJobService _jobService;
+
         /// <summary>
         /// 
         /// </summary>
         /// <param name="db"></param>
         /// <param name="projectService"></param>
         /// <param name="baseLinePlanProjectService"></param>
-        public BaseLinePlanProjectController(ISqlSugarClient db, IBaseLinePlanProjectService baseLinePlanProjectService, IProjectService projectService)
+        public BaseLinePlanProjectController(ISqlSugarClient db, IBaseLinePlanProjectService baseLinePlanProjectService, IProjectService projectService, IJobService jobService)
         {
             this.baseLinePlanProjectService = baseLinePlanProjectService;
             this.projectService = projectService;
             this._db = db;
+            _jobService = jobService;
         }
         #endregion
 
@@ -197,21 +202,21 @@ namespace GHMonitoringCenterApi.Controllers.Project
         /// <param name="requestBody"></param>
         /// <returns></returns>
         [HttpGet("SearchBaseLinePlanAncomparisonNew")]
-        public async Task<ResponseAjaxResult<List<BaseLinePlanAncomparisonResponseDto>>> SearchBaseLinePlanAncomparisonNewAsync([FromQuery] BaseLinePlanAncomparisonRequsetDto requestBody)
+        public async Task<ResponseAjaxResult<List<SearchSubsidiaryCompaniesProjectProductionDto>>> SearchBaseLinePlanAncomparisonNewAsync([FromQuery] BaseLinePlanAncomparisonRequsetDto requestBody)
         {
-            return await baseLinePlanProjectService.SearchBaseLinePlanAncomparisonAsync(requestBody);
+            return await baseLinePlanProjectService.SearchBaseLinePlanAncomparisonNewAsync(requestBody);
         }
 
-        /// <summary>
-        /// 基准计划审核
-        /// </summary>
-        /// <returns></returns>
-        [HttpGet("BaseLinePlanProjectApprove")]
-        [AllowAnonymous]
-        public async Task<ResponseAjaxResult<bool>> BaseLinePlanProjectApproveAsync([FromQuery] int isApprove, [FromQuery] string? id)
-        {
-            return await baseLinePlanProjectService.BaseLinePlanProjectApproveAsync(isApprove, id);
-        }
+        ///// <summary>
+        ///// 基准计划审核
+        ///// </summary>
+        ///// <returns></returns>
+        //[HttpGet("BaseLinePlanProjectApprove")]
+        //[AllowAnonymous]
+        //public async Task<ResponseAjaxResult<bool>> BaseLinePlanProjectApproveAsync([FromQuery] int isApprove, [FromQuery] string? id)
+        //{
+        //    return await baseLinePlanProjectService.BaseLinePlanProjectApproveAsync(isApprove, id);
+        //}
 
         #region 项目基准计划
         /// <summary>
@@ -235,9 +240,12 @@ namespace GHMonitoringCenterApi.Controllers.Project
         /// </summary>
         /// <returns></returns>
         [HttpPost("BasePlanLineProjectImport")]
-        public async Task<ResponseAjaxResult<bool>> BasePlanLineProjectImportAsync()
+        public async Task<ResponseAjaxResult<string>> BasePlanLineProjectImportAsync()
         {
-            ResponseAjaxResult<bool> responseAjaxResult = new ResponseAjaxResult<bool>();
+
+            //[FromBody] 
+            BaseLinePlanprojectImportDto input=new BaseLinePlanprojectImportDto();
+            ResponseAjaxResult<string> responseAjaxResult = new ResponseAjaxResult<string>();
             var streamUpdateFile = await StreamUpdateFileAsync();
             var streamData = streamUpdateFile.Data;
             if (streamUpdateFile != null)
@@ -247,10 +255,10 @@ namespace GHMonitoringCenterApi.Controllers.Project
                 var rows = MiniExcel.Query<BaseLinePlanProjectAnnualProductionImport>(path, startCell: "A2").ToList();
                 if (rows != null)
                 {
-                    var insert = await baseLinePlanProjectService.BaseLinePlanProjectAnnualProductionImport(rows);
-                    if (insert.Data)
+                    var insert = await baseLinePlanProjectService.BaseLinePlanProjectAnnualProductionImport(rows, input);
+                    if (!insert.Data.Contains("失败") && !string.IsNullOrWhiteSpace(insert.Data))
                     {
-                        responseAjaxResult.Data = true;
+                        responseAjaxResult.Data = insert.Data;
                         responseAjaxResult.Success(ResponseMessage.OPERATION_IMPORTEXCEL_SUCCESS);
                     }
                     else
@@ -261,12 +269,36 @@ namespace GHMonitoringCenterApi.Controllers.Project
             }
             else
             {
-                responseAjaxResult.Data = false;
+                responseAjaxResult.Data = "Excel表格有误";
                 responseAjaxResult.Success(ResponseMessage.DEVICE_IMPORT_FAIL);
             }
             return responseAjaxResult;
         }
         #endregion
+
+
+        /// <summary>
+        /// 查询基准计划下拉框选择
+        /// </summary>
+        /// <param name="requsetDto"></param>
+        /// <returns></returns>
+        [HttpGet("SearchBaseLinePlanOptions")]
+        [AllowAnonymous]
+        public async Task<ResponseAjaxResult<List<BaseLinePlanSelectOptiong>>> SearchBaseLinePlanOptionsAsync([FromQuery] BaseLinePlanAncomparisonRequsetDto requsetDto)
+        {
+            return await baseLinePlanProjectService.SearchBaseLinePlanOptionsAsync(requsetDto);
+        }
+
+        /// <summary>
+        /// 提交基准计划审批
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost("SubmitJobOfBaseLinePlan")]
+        [UnitOfWork]
+        public async Task<ResponseAjaxResult<bool>> SubmitJobOfBaseLinePlanAsync([FromBody] SubmitJobOfBaseLinePlanRequestDto model)
+        {
+            return await _jobService.SubmitJobAsync(model);
+        }
 
     }
 }

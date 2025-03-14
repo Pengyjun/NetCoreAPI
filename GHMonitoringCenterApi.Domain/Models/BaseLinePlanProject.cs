@@ -53,8 +53,7 @@ namespace GHMonitoringCenterApi.Domain.Models
         /// <summary>
         /// 是否分包
         /// </summary>
-        [SugarColumn(Length = 36)]
-        public string IsSubPackage { get; set; }
+        public int? IsSubPackage { get; set; }
 
         /// <summary>
         /// 总有效合同额
@@ -81,6 +80,11 @@ namespace GHMonitoringCenterApi.Domain.Models
         /// 关联项目
         /// </summary>
         public string? Association { get; set; }
+
+        /// <summary>
+        /// 驳回原因
+        /// </summary>
+        public string RejectReason { get; set; }
 
     }
 

@@ -256,6 +256,11 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project
         /// </summary>
         public int? IsSubContractProject { get; set; }
 
+        /// <summary>
+        /// 关联基准计划
+        /// </summary>
+        public string Association { get; set; }
+
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
             if (string.IsNullOrWhiteSpace(Name))
@@ -275,11 +280,11 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project
 
             if (CompanyId == Guid.Empty || CompanyId == null)
             {
-                yield return new ValidationResult("CompanyId参数不能为空且类型是guid类型", new string[] { nameof(CompanyId) });
+                yield return new ValidationResult("所属公司参数不能为空且类型是guid类型", new string[] { nameof(CompanyId) });
             }
             if (ProjectDept == Guid.Empty || ProjectDept == null)
             {
-                yield return new ValidationResult("ProjectDept参数不能为空且类型是string类型", new string[] { nameof(ProjectDept) });
+                yield return new ValidationResult("所属项目组不能为空且类型是string类型", new string[] { nameof(ProjectDept) });
             }
 
             //中标已签  中表未签 项目状态为中标已签或中标未签 其他必填项可为空

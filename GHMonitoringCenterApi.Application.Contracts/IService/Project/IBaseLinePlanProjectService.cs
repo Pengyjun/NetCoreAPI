@@ -52,6 +52,11 @@ namespace GHMonitoringCenterApi.Application.Contracts.IService.Project
         Task<ResponseAjaxResult<List<SearchSubsidiaryCompaniesProjectProductionDto>>> SearchSubsidiaryCompaniesProjectProductionAsync(SearchBaseLinePlanProjectAnnualProductionRequest requestBody);
 
 
+        /// <summary>
+        /// 分子公司合计 暂时废弃
+        /// </summary>
+        /// <param name="requestBody"></param>
+        /// <returns></returns>
         Task<ResponseAjaxResult<SearchBaseLinePlanProjectAnnualProduction>> SearchBaseLinePlanProjectAnnualProductionSumAsync(SearchBaseLinePlanProjectAnnualProductionRequest requestBody);
 
 
@@ -84,7 +89,7 @@ namespace GHMonitoringCenterApi.Application.Contracts.IService.Project
         /// <summary>
         /// 计划基准
         /// </summary>
-        /// <param name="requestBody"></param>
+        /// <param name="requsetDto"></param>
         /// <returns></returns>
         Task<ResponseAjaxResult<List<BaseLinePlanAncomparisonResponseDto>>> SearchBaseLinePlanAncomparisonAsync(BaseLinePlanAncomparisonRequsetDto requsetDto);
 
@@ -101,13 +106,38 @@ namespace GHMonitoringCenterApi.Application.Contracts.IService.Project
         /// </summary>
         /// <param name="imports"></param>
         /// <returns></returns>
-        Task<ResponseAjaxResult<bool>> BaseLinePlanProjectAnnualProductionImport(List<BaseLinePlanProjectAnnualProductionImport> imports);
+        Task<ResponseAjaxResult<string>> BaseLinePlanProjectAnnualProductionImport(List<BaseLinePlanProjectAnnualProductionImport> imports, BaseLinePlanprojectImportDto import);
 
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="isApprove"></param>
+        /// <param name="id"></param>
+        /// <returns></returns>
 
-        Task<ResponseAjaxResult<bool>> BaseLinePlanProjectApproveAsync(int isApprove, string? id);
+        Task<ResponseAjaxResult<bool>> BaseLinePlanProjectApproveAsync(SearchSubsidiaryCompaniesProjectProductionDto input);
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
+        Task<ResponseAjaxResult<bool>> BaseLinePlanProjectApprove(SearchSubsidiaryCompaniesProjectProductionDto  input);
 
+        /// <summary>
+        /// 基准计划新
+        /// </summary>
+        /// <param name="requestBody"></param>
+        /// <returns></returns>
         Task<ResponseAjaxResult<List<SearchSubsidiaryCompaniesProjectProductionDto>>> SearchBaseLinePlanAncomparisonNewAsync(BaseLinePlanAncomparisonRequsetDto requestBody);
+
+        /// <summary>
+        /// 基准计划下拉框
+        /// </summary>
+        /// <param name="requsetDto"></param>
+        /// <returns></returns>
+        Task<ResponseAjaxResult<List<BaseLinePlanSelectOptiong>>> SearchBaseLinePlanOptionsAsync(BaseLinePlanAncomparisonRequsetDto requsetDto);
+        
     }
 }

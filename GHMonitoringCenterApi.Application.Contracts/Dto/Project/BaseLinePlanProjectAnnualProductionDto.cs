@@ -60,9 +60,14 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project
         public string StartStatus { get; set; }
 
         /// <summary>
+        /// 年初状态名称
+        /// </summary>
+        public string StartStatusName { get; set; }
+
+        /// <summary>
         /// 是否分包
         /// </summary>
-        public string IsSubPackage { get; set; }
+        public int? IsSubPackage { get; set; }
 
 
         /// <summary>
@@ -72,7 +77,7 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project
 
 
         /// <summary>
-        /// 审核状态
+        /// 审核状态 审核状态，0  待审核 （1：驳回，2：通过  3:撤回）
         /// </summary>
         public int PlanStatus { get; set; }
 
@@ -85,6 +90,11 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project
         /// 关联项目
         /// </summary>
         public string? Association { get; set; }
+
+        /// <summary>
+        /// 关联项目名称
+        /// </summary>
+        public string? AssociationName { get; set; }
 
         /// <summary>
         /// 细项
@@ -257,7 +267,7 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project
         /// <summary>
         /// 基准或新建计划
         /// </summary>
-        public string PlanType { get; set; }
+        //public string PlanType { get; set; }
 
         /// <summary>
         /// 年份
@@ -279,7 +289,7 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project
         /// <summary>
         /// 是否分包
         /// </summary>
-        public string IsSubPackage { get; set; }
+        public int? IsSubPackage { get; set; }
 
         /// <summary>
         /// 总有效合同额
@@ -298,9 +308,9 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project
 
 
         /// <summary>
-        /// 计划状态
+        /// 计划状态 审核状态，0  待审核 （1：驳回，2：通过  3:撤回）
         /// </summary>
-        public int PlanStatus { get; set; }
+        public int? PlanStatus { get; set; }
 
         /// <summary>
         /// 关联项目
@@ -494,7 +504,9 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project
         /// <summary>
         /// 主键
         /// </summary>
-        public Guid Id { get; set; }
+        public Guid? Id { get; set; }
+
+        public Guid? JobId { get; set; }
 
         /// <summary>
         /// 项目id
@@ -520,6 +532,23 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project
         /// 公司id
         /// </summary>
         public Guid CompanyId { get; set; }
+
+        public string CompanyName { get; set; }
+
+        /// <summary>
+        /// 审核状态，0  待审核 （1：驳回，2：通过  3:撤回）
+        /// </summary>
+        public int PlanStatus { get; set; }
+
+        /// <summary>
+        /// 驳回原因
+        /// </summary>
+        public string RejectReason { get; set; }
+
+        /// <summary>
+        ///  审核状态，0  待审核 （1：驳回，2：通过  3:撤回）
+        /// </summary>
+        public string PlanStatusStr { get; set; }
 
         /// <summary>
         /// 1月产值
@@ -771,6 +800,11 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project
         /// 年份
         /// </summary>
         public int? Year { get; set; }
+
+        /// <summary>
+        /// 是否分包
+        /// </summary>
+        public int? IsSubPackage { get; set; }
     }
 
     /// <summary>
@@ -779,6 +813,7 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project
     public class BaseLinePlanProjectAnnualProductionImport
     {
 
+        [ExcelColumnName("项目名称")]
         /// <summary>
         /// 项目名称
         /// </summary>
@@ -787,23 +822,28 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project
         /// <summary>
         /// 船舶名称
         /// </summary>
-        public string? ShipName { get; set; }
+        //public string? ShipName { get; set; }
 
+
+        [ExcelColumnName("PG码")]
         /// <summary>
-        /// 关联项目
+        /// PG码
         /// </summary>
         public string? Association { get; set; }
 
+
+        [ExcelColumnName("年度")]
         /// <summary>
         /// 年份
         /// </summary>
-        public int Year { get; set; }
+        public string? Year { get; set; }
 
         /// <summary>
         /// 1月产量
         /// </summary>
-        public decimal JanuaryProductionQuantity { get; set; }
+        //public decimal JanuaryProductionQuantity { get; set; }
 
+        [ExcelColumnName("一月份产值")]
         /// <summary>
         /// 1月产值
         /// </summary>
@@ -812,8 +852,9 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project
         /// <summary>
         /// 2月产量
         /// </summary>
-        public decimal FebruaryProductionQuantity { get; set; }
+        //public decimal FebruaryProductionQuantity { get; set; }
 
+        [ExcelColumnName("二月份产值")]
         /// <summary>
         /// 2月产值
         /// </summary>
@@ -822,8 +863,10 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project
         /// <summary>
         /// 3月产量
         /// </summary>
-        public decimal MarchProductionQuantity { get; set; }
+        //public decimal MarchProductionQuantity { get; set; }
 
+
+        [ExcelColumnName("三月份产值")]
         /// <summary>
         /// 3月产值
         /// </summary>
@@ -832,8 +875,9 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project
         /// <summary>
         /// 4月产量
         /// </summary>
-        public decimal AprilProductionQuantity { get; set; }
+        //public decimal AprilProductionQuantity { get; set; }
 
+        [ExcelColumnName("四月份产值")]
         /// <summary>
         /// 4月产值
         /// </summary>
@@ -842,8 +886,9 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project
         /// <summary>
         /// 5月产量
         /// </summary>
-        public decimal MayProductionQuantity { get; set; }
+        //public decimal MayProductionQuantity { get; set; }
 
+        [ExcelColumnName("五月份产值")]
         /// <summary>
         /// 5月产值
         /// </summary>
@@ -852,8 +897,9 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project
         /// <summary>
         /// 6月产量
         /// </summary>
-        public decimal JuneProductionQuantity { get; set; }
+        //public decimal JuneProductionQuantity { get; set; }
 
+        [ExcelColumnName("六月份产值")]
         /// <summary>
         /// 6月产值
         /// </summary>
@@ -862,7 +908,10 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project
         /// <summary>
         /// 7月产量
         /// </summary>
-        public decimal JulyProductionQuantity { get; set; }
+        //public decimal JulyProductionQuantity { get; set; }
+
+
+        [ExcelColumnName("七月份产值")]
 
         /// <summary>
         /// 7月产值
@@ -872,8 +921,10 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project
         /// <summary>
         /// 8月产量
         /// </summary>
-        public decimal AugustProductionQuantity { get; set; }
+        //public decimal AugustProductionQuantity { get; set; }
 
+
+        [ExcelColumnName("八月份产值")]
         /// <summary>
         /// 8月产值
         /// </summary>
@@ -882,8 +933,10 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project
         /// <summary>
         /// 9月产量
         /// </summary>
-        public decimal SeptemberProductionQuantity { get; set; }
+        //public decimal SeptemberProductionQuantity { get; set; }
 
+
+        [ExcelColumnName("九月份产值")]
         /// <summary>
         /// 9月产值
         /// </summary>
@@ -892,8 +945,9 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project
         /// <summary>
         /// 10月产量
         /// </summary>
-        public decimal OctoberProductionQuantity { get; set; }
+        //public decimal OctoberProductionQuantity { get; set; }
 
+        [ExcelColumnName("十月份产值")]
         /// <summary>
         /// 10月产值
         /// </summary>
@@ -902,8 +956,9 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project
         /// <summary>
         /// 11月产量
         /// </summary>
-        public decimal NovemberProductionQuantity { get; set; }
+        //public decimal NovemberProductionQuantity { get; set; }
 
+        [ExcelColumnName("十一月份产值")]
         /// <summary>
         /// 11月产值
         /// </summary>
@@ -912,12 +967,41 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project
         /// <summary>
         /// 12月产量
         /// </summary>
-        public decimal DecemberProductionQuantity { get; set; }
+        //public decimal DecemberProductionQuantity { get; set; }
 
+        [ExcelColumnName("十二月份产值")]
         /// <summary>
         /// 12月产值
         /// </summary>
         public decimal DecemberProductionValue { get; set; }
 
+    }
+
+
+    public class BaseLinePlanSelectOptiong
+    {
+        /// <summary>
+        /// 主键
+        /// </summary>
+        public Guid Id { get; set; }
+
+        /// <summary>
+        /// 项目名称
+        /// </summary>
+        public string ShortName { get; set; }
+
+        /// <summary>
+        /// 计划版本
+        /// </summary>
+        public string PlanVersion { get; set; }
+    }
+
+    public class BaseLinePlanprojectImportDto
+    {
+
+        /// <summary>
+        /// 是否关联项目 1是 0否
+        /// </summary>
+        public int Association { get; set; }
     }
 }

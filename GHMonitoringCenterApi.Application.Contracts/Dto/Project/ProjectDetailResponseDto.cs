@@ -6,7 +6,7 @@
     public class ProjectDetailResponseDto
     {
 
-  
+
         /// <summary>
         /// 项目ID
         /// </summary>
@@ -317,6 +317,16 @@
 
         public string ManagerType { get; set; }
         public string ManagerTypeName { get; set; }
+
+        /// <summary>
+        /// 关联基准计划
+        /// </summary>
+        public string? Association { get; set; }
+
+        /// <summary>
+        /// 关联基准计划名称
+        /// </summary>
+        public string AssociationName { get; set; }
     }
 
     /// <summary>
@@ -400,7 +410,7 @@
         /// </summary>
         public DateTime? EndDate { get; set; }
 
-        
+
     }
 
 

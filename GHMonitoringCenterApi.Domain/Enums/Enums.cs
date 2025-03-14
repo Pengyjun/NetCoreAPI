@@ -329,7 +329,13 @@ namespace GHMonitoringCenterApi.Domain.Enums
         /// 项目月报
         /// </summary>
         [Description("项目月报")]
-        MonthReport = 2
+        MonthReport = 2,
+
+        /// <summary>
+        /// 基准计划
+        /// </summary>
+        [Description("基准计划")]
+        BaseLinePlan = 3
     }
 
     /// <summary>

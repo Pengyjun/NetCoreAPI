@@ -124,6 +124,11 @@ namespace GHMonitoringCenterApi.Application.Service.Job
         private readonly IMonthReportForProjectService _mPService;
 
         /// <summary>
+        /// 基准计划信息业务层
+        /// </summary>
+        private readonly IBaseLinePlanProjectService _baseLinePlanProjectService;
+
+        /// <summary>
         /// 全局对象
         /// </summary>
         private readonly GlobalObject _globalObject;
@@ -165,7 +170,8 @@ namespace GHMonitoringCenterApi.Application.Service.Job
             , GlobalObject globalObject
             , ISqlSugarClient dbContext
             , IMonthReportForProjectService mPService
-            )
+,
+IBaseLinePlanProjectService baseLinePlanProjectService)
         {
             _baseService = baseService;
             _dbProject = dbProject;
@@ -189,6 +195,7 @@ namespace GHMonitoringCenterApi.Application.Service.Job
             _globalObject = globalObject;
             _dbContext = dbContext;
             _mPService = mPService;
+            _baseLinePlanProjectService = baseLinePlanProjectService;
         }
         #region 提交任务
 
@@ -296,6 +303,12 @@ namespace GHMonitoringCenterApi.Application.Service.Job
                 ApproveStatus = job.ApproveStatus,
                 RejectReason = job.RejectReason
             };
+
+            if (model.BizModule == BizModule.BaseLinePlan)
+            {
+                jobRecord.OperateContent = model.SubmitType == JobSubmitType.AddJob ? "新建基准计划" : "修改基准计划";
+            }
+
             // 业务处理
             var bizHandleResult = await HandleBizAsync(job);
             if (bizHandleResult.Code != HttpStatusCode.Success)
@@ -767,6 +780,7 @@ namespace GHMonitoringCenterApi.Application.Service.Job
                 ApproveStatus = job.ApproveStatus,
                 RejectReason = job.RejectReason,
             };
+
             // 业务处理
             var bizHandleResult = await HandleBizAsync(job);
             if (bizHandleResult.Code != HttpStatusCode.Success)
@@ -834,6 +848,15 @@ namespace GHMonitoringCenterApi.Application.Service.Job
                 saveModel.Status = job.IsFinish ? MonthReportStatus.Finish : (job.ApproveStatus == JobApproveStatus.Reject ? MonthReportStatus.ApproveReject : MonthReportStatus.Approveling);
                 saveModel.StatusText = GetApproveStatusText(job.IsFinish, job.ApproveLevel, job.ApproveStatus);
                 result = await _projectReportService.SaveProjectMonthReportAsync(saveModel);
+            }
+            else if (job.BizModule == BizModule.BaseLinePlan)
+            {
+                var saveModel = CastDeserializeObject<SearchSubsidiaryCompaniesProjectProductionDto>(job.BizData);
+                saveModel.JobId = job.Id;
+                var baseline = await _dbContext.Queryable<BaseLinePlanProject>().Where(p => p.Id == saveModel.Id).FirstAsync();
+                baseline.PlanStatus = (int)job.ApproveStatus;
+                baseline.RejectReason = job.RejectReason;
+                result = await _baseLinePlanProjectService.BaseLinePlanProjectApproveAsync(saveModel);
             }
             return result;
         }
