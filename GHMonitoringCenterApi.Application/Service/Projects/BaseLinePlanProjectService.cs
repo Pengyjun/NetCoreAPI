@@ -1388,14 +1388,21 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
         {
             List<SearchSubsidiaryCompaniesProjectProductionDto> resultlist = new List<SearchSubsidiaryCompaniesProjectProductionDto>();
             ResponseAjaxResult<List<SearchSubsidiaryCompaniesProjectProductionDto>> rt = new();
-            var pomids = await dbContext.Queryable<Institution>().Where(p => p.Grule.Contains(_currentUser.CurrentLoginInstitutionOid)).ToListAsync();
-            List<Guid?> guids = pomids.Select(p => p.PomId).ToList();
-            //var projects = await dbContext.Queryable<Project>().Where(p => p.IsDelete == 1 && guids.Contains(p.ProjectDept)).Select(p => p.Id).ToListAsync();
+            //用户信息
+            var userInfo = _currentUser;
+            //公司ID
+             var companyId = await dbContext.Queryable<Institution>().Where(p => p.IsDelete == 1&&p.Oid== userInfo.CurrentLoginInstitutionOid).Select(x=>x.PomId).FirstAsync();
+
             var baseplanproject = await dbContext.Queryable<BaseLinePlanProject>()
              .Where(t => t.IsDelete == 1).ToListAsync();
+            List<Guid> userIds = new List<Guid>();
+            userIds.Add("08db4e0d-a531-4619-8fae-d97e57eeb375".ToGuid());
+
             RefAsync<int> total = 0;
+
             var projects = await dbContext.Queryable<BaseLinePlanProject>().Where(p => p.IsDelete == 1)
                 .WhereIF(requestBody.Year != null, p => p.Year == requestBody.Year)
+                .WhereIF(userIds[0]!= userInfo.Id,x=>x.CompanyId== companyId)
                 .WhereIF(!string.IsNullOrWhiteSpace(requestBody.Name), p => p.ShortName.Contains(requestBody.Name))
                 .WhereIF(requestBody.PlanStatus != null, p => p.PlanStatus == requestBody.PlanStatus)
                 .WhereIF(requestBody.IsSubPackage != null, p => p.IsSubPackage == requestBody.IsSubPackage)
