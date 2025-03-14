@@ -762,9 +762,17 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             var baseplanproject = await dbContext.Queryable<BaseLinePlanProject>()
              .Where(t => t.IsDelete == 1).ToListAsync();
 
+            var userInfo = _currentUser;
+            //公司ID
+            var companyId = await dbContext.Queryable<Institution>().Where(p => p.IsDelete == 1 && p.Oid == userInfo.CurrentLoginInstitutionOid).Select(x => x.PomId.Value).FirstAsync();
+
+            List<Guid> userIds = new List<Guid>();
+            userIds.Add("08db4e0d-a531-4619-8fae-d97e57eeb375".ToGuid());
+           
 
             var projects = await dbContext.Queryable<BaseLinePlanProject>()
                 .Where(p => p.IsDelete == 1 && guids.Contains(p.CompanyId))
+                .WhereIF(userIds[0] != userInfo.Id, x => x.CompanyId == companyId)
                 .WhereIF(requestBody.Year != null, p => p.Year == requestBody.Year)
                 .WhereIF(!string.IsNullOrWhiteSpace(requestBody.StartStatus), p => p.StartStatus == requestBody.StartStatus)
                 .WhereIF(requestBody.CompanyId != null, p => p.CompanyId == requestBody.CompanyId)
@@ -1001,7 +1009,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
 
             var userInfo = _currentUser;
             //公司ID
-            var companyId = await dbContext.Queryable<Institution>().Where(p => p.IsDelete == 1 && p.Oid == userInfo.CurrentLoginInstitutionOid).Select(x => x.PomId).FirstAsync();
+            var companyId = await dbContext.Queryable<Institution>().Where(p => p.IsDelete == 1 && p.Oid == userInfo.CurrentLoginInstitutionOid).Select(x => x.PomId.Value).FirstAsync();
 
             List<Guid> userIds = new List<Guid>();
             userIds.Add("08db4e0d-a531-4619-8fae-d97e57eeb375".ToGuid());
@@ -1226,7 +1234,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             //用户信息
             var userInfo = _currentUser;
             //公司ID
-            var companyId = await dbContext.Queryable<Institution>().Where(p => p.IsDelete == 1 && p.Oid == userInfo.CurrentLoginInstitutionOid).Select(x => x.PomId).FirstAsync();
+            var companyId = await dbContext.Queryable<Institution>().Where(p => p.IsDelete == 1 && p.Oid == userInfo.CurrentLoginInstitutionOid).Select(x => x.PomId.Value).FirstAsync();
 
             List<Guid> userIds = new List<Guid>();
             userIds.Add("08db4e0d-a531-4619-8fae-d97e57eeb375".ToGuid());
@@ -1415,7 +1423,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             //用户信息
             var userInfo = _currentUser;
             //公司ID
-            var companyId = await dbContext.Queryable<Institution>().Where(p => p.IsDelete == 1 && p.Oid == userInfo.CurrentLoginInstitutionOid).Select(x => x.PomId).FirstAsync();
+            var companyId = await dbContext.Queryable<Institution>().Where(p => p.IsDelete == 1 && p.Oid == userInfo.CurrentLoginInstitutionOid).Select(x => x.PomId.Value).FirstAsync();
 
             var baseplanproject = await dbContext.Queryable<BaseLinePlanProject>()
              .Where(t => t.IsDelete == 1).ToListAsync();
