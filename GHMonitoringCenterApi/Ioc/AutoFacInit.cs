@@ -13,6 +13,7 @@ using GHMonitoringCenterApi.Application.Contracts.IService.OperationLog;
 using GHMonitoringCenterApi.Application.Contracts.IService.PersonnelOrganizeAdjust;
 using GHMonitoringCenterApi.Application.Contracts.IService.ProductionValueImport;
 using GHMonitoringCenterApi.Application.Contracts.IService.Project;
+using GHMonitoringCenterApi.Application.Contracts.IService.ProjectAdjustMonthReport;
 using GHMonitoringCenterApi.Application.Contracts.IService.ProjectMasterData;
 using GHMonitoringCenterApi.Application.Contracts.IService.ProjectProductionReport;
 using GHMonitoringCenterApi.Application.Contracts.IService.ProjectYearPlan;
@@ -41,6 +42,7 @@ using GHMonitoringCenterApi.Application.Service.Menu;
 using GHMonitoringCenterApi.Application.Service.OperationLog;
 using GHMonitoringCenterApi.Application.Service.PersonnelOrganizeAdjust;
 using GHMonitoringCenterApi.Application.Service.ProductionValueImport;
+using GHMonitoringCenterApi.Application.Service.ProjectAdjustMonthReport;
 using GHMonitoringCenterApi.Application.Service.ProjectMasterData;
 using GHMonitoringCenterApi.Application.Service.ProjectProductionReport;
 using GHMonitoringCenterApi.Application.Service.Projects;
@@ -145,6 +147,7 @@ namespace GHMonitoringCenterApi.Ioc
             builder.RegisterType<RecordPushDayReportService>().As<IRecordPushDayReportService>().InstancePerLifetimeScope();
 
             builder.RegisterType<BaseLinePlanProjectService>().As<IBaseLinePlanProjectService>().InstancePerLifetimeScope();
+            builder.RegisterType<ProjectAdjustMonthReportService>().As<IProjectAdjustMonthReportService>().InstancePerLifetimeScope();
         }
     }
 }

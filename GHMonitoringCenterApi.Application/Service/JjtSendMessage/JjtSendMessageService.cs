@@ -3169,6 +3169,9 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
             #endregion
 
             #region 共用数据
+            //昨天数据查询
+            var day = DateTime.Now.AddDays(-2).ToDateDay();
+            var yesterDayData = await dbContext.Queryable<RecordPushDayReport>().Where(x => x.IsDelete == 1 && x.DateDay == day).OrderByDescending(x => x.CreateTime).Select(x=>x.Json).FirstAsync();
             //基础数据
             var commonDataList = await dbContext.CopyNew().Queryable<ProductionMonitoringOperationDayReport>().Where(x => x.IsDelete == 1 && !SqlFunc.IsNullOrEmpty(x.Name)).ToListAsync();
 
@@ -3255,10 +3258,17 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
             var productionBaseInfo = commonDataList.Where(x => x.Type == 1).OrderBy(x => x.Sort).ToList();
             CompanyProjectBasePoduction companyBasePoductionValue = null;
             List<CompanyProjectBasePoduction> companyBasePoductionValues = new List<CompanyProjectBasePoduction>();
+
+            #region 昨天的数据
+            //序列化昨天的数据
+            var res = JsonHelper.FromJson<JjtSendMessageMonitoringDayReportResponseDto>(yesterDayData);
+            //昨天公司各个产值信息
+            var yeaterDayProject = res.projectBasePoduction.CompanyProjectBasePoductions;
+            //昨天公司各个产值信息
+            var yeaterDayCompany = res.projectBasePoduction.CompanyBasePoductionValues;
+            #endregion
             foreach (var production in productionBaseInfo)
             {
-
-
                 var companyProjectId = projectList.Where(x => x.CompanyId == production.ItemId)
                     .WhereIF(!isCalcSub, x => x.IsSubContractProject != 2).Select(x => x.Id).ToList();
                 if (production.Collect == 1)
@@ -3278,12 +3288,15 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
                 else
                 {
 
+
                     //排除掉今天改成在建项目状态的
                     var noDayBuildProjectCount = projectList.Where(x => x.StatusId == buildProjectId && x.CompanyId == production.ItemId && x.IsChangeStatus == 1 && x.IsChangeStatusTime >= startDayTime.ObjToDate() && x.IsChangeStatusTime <= endDayTime.ObjToDate()).Select(x => x.Id).Count();
                     //在建的数量 排除掉今天改成在建项目状态的
                     var toDayProCount = (projectList.Count(x => x.CompanyId == production.ItemId && buildProjectId == x.StatusId.Value) - noDayBuildProjectCount);
-
                     toDayProCount = (toDayProCount - noDayBuildProjectCount) < 0 ? 0 : toDayProCount;
+
+                    
+
                     companyBasePoductionValue = new CompanyProjectBasePoduction();
                     companyBasePoductionValue.Name = production.Name;
                     companyBasePoductionValue.OnContractProjectCount = projectList.Count(x => x.CompanyId == production.ItemId && contractProjectStatusIds.Contains(x.StatusId.Value));
@@ -3294,6 +3307,9 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
                     companyBasePoductionValue.WorkerCount = dayYearList.Where(x => x.DateDay == dayTime && companyProjectId.Contains(x.ProjectId)).Sum(x => x.SiteConstructionPersonNum);
                     companyBasePoductionValue.RiskWorkCount = dayYearList.Where(x => x.DateDay == dayTime && companyProjectId.Contains(x.ProjectId)).Sum(x => x.HazardousConstructionNum);
                     companyBasePoductionValue.NotWorkCount = projectList.Count(x => x.CompanyId == production.ItemId && notWorkIds.Contains(x.StatusId.Value));
+                    companyBasePoductionValue.CompanyId = production.ItemId;
+                    var onProjectCount= yeaterDayProject.Where(x => x.CompanyId== production.ItemId).Select(x=>x.OnBuildProjectCount).FirstOrDefault();
+                    companyBasePoductionValue.Numner = toDayProCount - onProjectCount;
                     companyBasePoductionValues.Add(companyBasePoductionValue);
                 }
             }
@@ -3308,6 +3324,8 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
             var yearTotalProductionValue = 0M;
             //广航局每天产值
             var dayTotalProductionValue = 0M;
+
+
             foreach (var companyProduction in productionBaseInfo)
             {
                 #region 计算调差产值
@@ -3341,24 +3359,40 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
                          .Sum(x => x.DayActualProductionAmount);
                     //各个公司每天日报产值数
                     var dayProducitionValue = Math.Round((dayYearList.Where(x => companyProjectId.Contains(x.ProjectId) && x.DateDay == dayTime).Sum(x => x.DayActualProductionAmount) + diffValue), 2);
+
+                    
                     //各个公司本年累计数
                     var totalProductionValue = isDayCalc ? Math.Round(monthYearList.Where(x => companyProjectId.Contains(x.ProjectId)).Sum(x => x.CompleteProductionAmount) + companyMonthDayProduction / baseConst, 2) : companyMonthDayProduction;
                     if (companyProduction.ItemId == "3c5b138b-601a-442a-9519-2508ec1c1eb2".ToGuid())
                     {
                         totalProductionValue = totalProductionValue - 3000000;
                     }
-                    companyBasePoductions.Add(new CompanyBasePoductionValue()
+                    var obj = new CompanyBasePoductionValue()
                     {
                         Name = companyProduction.Name,
                         DayProductionValue = Math.Round(dayProducitionValue / baseWanConst, 2),
                         TotalYearProductionValue = Math.Round(totalProductionValue / baseConst, 2),
                         CompanyId = companyProduction.ItemId,
+                    };
+                    //昨天日产值
+                   var yeaterDayProducution= yeaterDayCompany.Where(x => x.CompanyId == companyProduction.ItemId).Select(x => x.DayProductionValue).FirstOrDefault();
+                    if (Math.Round(obj.DayProductionValue, 2) > yeaterDayProducution * 1.05M)
+                    {
+                        obj.Icon = 1;
+                    } else if (Math.Round(obj.DayProductionValue , 2) < yeaterDayProducution * 0.95M)
+                    {
+                        obj.Icon = 1;
+                    }
+                    else if (yeaterDayProducution*0.95M < Math.Round(obj.DayProductionValue, 2)&&
+                        Math.Round(obj.DayProductionValue, 2) < Math.Round(yeaterDayProducution * 1.05M, 2))
+                    {
+                        obj.Icon = -1;
+                    }
 
-                    });
+                    companyBasePoductions.Add(obj);
                 }
 
             }
-
             //计算年度产值占比
             foreach (var calcProduction in companyBasePoductions)
             {

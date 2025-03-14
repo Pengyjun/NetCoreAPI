@@ -2627,7 +2627,8 @@ namespace GHMonitoringCenterApi.Application.Service
             {
                 if (item != "2022002687")
                 {
-                    var userIdCrypt = CryptoStringExtension.EncryptAsync(item);
+                    var timeSpan = DateTime.Now.ToString("yyyyMMddHHmmssfff").ObjToInt();
+                    var userIdCrypt = CryptoStringExtension.EncryptAsync(item+","+ timeSpan);
                     phonePage = phonePage.Replace("@vali", userIdCrypt).TrimAll();
                     //九点第一批人员发送
                     var obj = new SingleMessageTemplateRequestDto()
@@ -2659,6 +2660,7 @@ namespace GHMonitoringCenterApi.Application.Service
                 var account = CryptoStringExtension.DecryptAsync(vali);
                 if (!string.IsNullOrWhiteSpace(account))
                 {
+                    account = account.Split(",", StringSplitOptions.RemoveEmptyEntries)[0];
                     var obj = new DayPushApprove()
                     {
                         ApproveId = _currentUser.Id,
