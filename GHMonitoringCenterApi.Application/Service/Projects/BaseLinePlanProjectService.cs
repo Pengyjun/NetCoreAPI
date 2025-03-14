@@ -1425,7 +1425,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
 
             var projects = await dbContext.Queryable<BaseLinePlanProject>().Where(p => p.IsDelete == 1)
                 .WhereIF(requestBody.Year != null, p => p.Year == requestBody.Year)
-                .WhereIF(userIds.Contains(userInfo.Id), x => x.CompanyId == companyId)
+                .WhereIF(!userIds.Contains(userInfo.Id), x => x.CompanyId == companyId)
                 .WhereIF(!string.IsNullOrWhiteSpace(requestBody.Name), p => p.ShortName.Contains(requestBody.Name))
                 .WhereIF(requestBody.PlanStatus != null, p => p.PlanStatus == requestBody.PlanStatus)
                 .WhereIF(requestBody.IsSubPackage != null, p => p.IsSubPackage == requestBody.IsSubPackage)
