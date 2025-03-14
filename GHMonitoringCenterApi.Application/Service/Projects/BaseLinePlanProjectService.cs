@@ -1391,7 +1391,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             //用户信息
             var userInfo = _currentUser;
             //公司ID
-             var companyId = await dbContext.Queryable<Institution>().Where(p => p.IsDelete == 1&&p.Oid== userInfo.CurrentLoginInstitutionOid).Select(x=>x.PomId).FirstAsync();
+             var companyId = await dbContext.Queryable<Institution>().Where(p => p.IsDelete == 1&&p.Oid== userInfo.CurrentLoginInstitutionOid).Select(x=>x.PomId.Value).FirstAsync();
 
             var baseplanproject = await dbContext.Queryable<BaseLinePlanProject>()
              .Where(t => t.IsDelete == 1).ToListAsync();
