@@ -18,7 +18,12 @@ namespace GHMonitoringCenterApi.Controllers
         public async Task<IActionResult> ImagePrviewAsync(string fileName)
         {
             var filePath=AppsettingsHelper.GetValue("UpdateItem:SavePath")+ fileName;
+            var extName= Path.GetExtension(fileName);
             var imageFileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
+            if (extName == "xlsx")
+            {
+                return File(imageFileStream, "application/octet-stream");
+            }
             return File(imageFileStream, "image/jpeg");
         }
     }
