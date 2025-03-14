@@ -999,15 +999,16 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
 
             var userInfo = _currentUser;
             //公司ID
-            var companyId = await dbContext.Queryable<Institution>().Where(p => p.IsDelete == 1 && p.Oid == userInfo.CurrentLoginInstitutionOid).Select(x => x.PomId).FirstAsync();
+            var companyId = await dbContext.Queryable<Institution>().Where(p => p.IsDelete == 1 && p.Oid == userInfo.CurrentLoginInstitutionOid).Select(x => x.PomId.Value).FirstAsync();
 
             List<Guid> userIds = new List<Guid>();
             userIds.Add("08db4e0d-a531-4619-8fae-d97e57eeb375".ToGuid());
+            userIds.Add("08db3bbb-7e36-4e20-8024-ee9c9bc516e3".ToGuid());
 
 
             var baseplanproject = await dbContext.Queryable<BaseLinePlanProject>()
            .Where(t => t.IsDelete == 1)
-           .WhereIF(userIds[0] != userInfo.Id, x => x.CompanyId == companyId).
+            .WhereIF(!userIds.Contains(userInfo.Id), x => x.CompanyId == companyId).
            WhereIF(!string.IsNullOrWhiteSpace(requestBody.StartStatus), t => t.StartStatus == requestBody.StartStatus).
            WhereIF(requestBody.Year != null, t => t.Year == requestBody.Year).ToListAsync();
 
@@ -1224,15 +1225,16 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             //用户信息
             var userInfo = _currentUser;
             //公司ID
-            var companyId = await dbContext.Queryable<Institution>().Where(p => p.IsDelete == 1 && p.Oid == userInfo.CurrentLoginInstitutionOid).Select(x => x.PomId).FirstAsync();
+            var companyId = await dbContext.Queryable<Institution>().Where(p => p.IsDelete == 1 && p.Oid == userInfo.CurrentLoginInstitutionOid).Select(x => x.PomId.Value).FirstAsync();
 
             List<Guid> userIds = new List<Guid>();
             userIds.Add("08db4e0d-a531-4619-8fae-d97e57eeb375".ToGuid());
+            userIds.Add("08db3bbb-7e36-4e20-8024-ee9c9bc516e3".ToGuid());
 
 
             var baseplanproject = await dbContext.Queryable<BaseLinePlanProject>().Where(t => t.IsDelete == 1)
                  .WhereIF(!string.IsNullOrWhiteSpace(requestBody.PlanType), p => p.PlanType == requestBody.PlanType)
-                 .WhereIF(userIds[0] != userInfo.Id, x => x.CompanyId == companyId)
+                 .WhereIF(!userIds.Contains(userInfo.Id), x => x.CompanyId == companyId)
                  .WhereIF(!string.IsNullOrWhiteSpace(requestBody.StartStatus), p => p.StartStatus == requestBody.StartStatus)
          .ToListAsync();
             RefAsync<int> total = 0;
@@ -1413,7 +1415,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             //用户信息
             var userInfo = _currentUser;
             //公司ID
-             var companyId = await dbContext.Queryable<Institution>().Where(p => p.IsDelete == 1&&p.Oid== userInfo.CurrentLoginInstitutionOid).Select(x=>x.PomId.Value).FirstAsync();
+            var companyId = await dbContext.Queryable<Institution>().Where(p => p.IsDelete == 1 && p.Oid == userInfo.CurrentLoginInstitutionOid).Select(x => x.PomId.Value).FirstAsync();
 
             var baseplanproject = await dbContext.Queryable<BaseLinePlanProject>()
              .Where(t => t.IsDelete == 1).ToListAsync();
