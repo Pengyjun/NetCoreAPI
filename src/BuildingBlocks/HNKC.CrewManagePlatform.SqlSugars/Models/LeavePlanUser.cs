@@ -58,10 +58,5 @@ namespace HNKC.CrewManagePlatform.SqlSugars.Models
         /// </summary>
         [SugarColumn(ColumnDataType = "int")]
         public int Year { get; set; }
-        /// <summary>
-        /// 是否已填报
-        /// </summary>
-        [SugarColumn(ColumnDataType = "bit")]
-        public bool IsSubmit { get; set; }
     }
 }

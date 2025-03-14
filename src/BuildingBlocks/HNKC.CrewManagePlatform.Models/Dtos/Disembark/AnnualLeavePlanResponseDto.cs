@@ -23,7 +23,7 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.Disembark
         /// <summary>
         /// 船舶名称
         /// </summary>
-        public string ShipName { get; set; }
+        public string? ShipName { get; set; }
         /// <summary>
         /// 船舶类型
         /// </summary>
@@ -67,7 +67,7 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.Disembark
         /// <summary>
         /// 填报状态
         /// </summary>
-        public int SubStatus { get; set; }
+        public bool SubStatus { get; set; }
         /// <summary>
         /// 填报人
         /// </summary>

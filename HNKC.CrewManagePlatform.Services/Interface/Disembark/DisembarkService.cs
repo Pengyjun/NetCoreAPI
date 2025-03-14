@@ -476,21 +476,31 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Disembark
         /// <returns></returns>
         public async Task<PageResult<AnnualLeavePlanResponseDto>> SearchAnnualLeavePlanAsync(AnnualLeavePlanRequestDto requestDto)
         {
+            //for (int i = 0; i < 1000; i++)
+            //{
+            //    ShipPersonnelPosition model = new ShipPersonnelPosition();
+            //    model.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
+            //    model.BusinessId = GuidUtil.Next();
+            //    await _dbContext.Insertable(model).ExecuteCommandAsync();
+            //}
             PageResult<AnnualLeavePlanResponseDto> result = new();
             RefAsync<int> total = 0;
             var data = await _dbContext.Queryable<OwnerShip>().Where(t => t.IsDelete == 1)
-                .WhereIF(!string.IsNullOrWhiteSpace(requestDto.ShipName), t => SqlFunc.Equals(t.ShipName, requestDto.ShipName))
-                .Select(t => new AnnualLeavePlanResponseDto
+                .LeftJoin(_dbContext.Queryable<LeavePlanSubmitInfo>().Where(t => t.IsDelete == 1 && t.Year == requestDto.Year), (x, y) => x.BusinessId == y.ShipId)
+                .WhereIF(!string.IsNullOrWhiteSpace(requestDto.ShipName), (x, y) => SqlFunc.Equals(x.ShipName, requestDto.ShipName))
+                .WhereIF(requestDto.IsSubmit != null && requestDto.IsSubmit == true, (x, y) => y.IsSubmit == requestDto.IsSubmit)
+                .WhereIF(requestDto.IsSubmit != null && requestDto.IsSubmit == false, (x, y) => y.ShipId == null)
+                .Select((x, y) => new AnnualLeavePlanResponseDto
                 {
-                    ShipId = t.BusinessId,
-                    LeaveYear = DateTime.Now.Year,
-                    ShipName = t.ShipName,
-                    ShipType = t.ShipType,
-                    CountryId = t.Country,
-                    CompanyId = t.Company,
-                    SubStatus = 1,
-                    SubUser = "测试用户",
-                    SubTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")
+                    ShipId = x.BusinessId,
+                    LeaveYear = requestDto.Year <= 0 ? DateTime.Now.Year : requestDto.Year,
+                    ShipName = x.ShipName,
+                    ShipType = x.ShipType,
+                    CountryId = x.Country,
+                    CompanyId = x.Company,
+                    SubStatus = y.IsSubmit,
+                    SubUser = y.SubUser,
+                    SubTime = y.Created.Value.ToString("yyyy-MM-dd HH:mm:ss")
                 }).ToPageListAsync(requestDto.PageIndex, requestDto.PageSize, total);
             //获取国家
             var countryInfo = await _dbContext.Queryable<CountryRegion>().Where(t => t.IsDelete == 1 && data.Select(t => t.CountryId).Contains(t.BusinessId)).ToListAsync();
@@ -554,6 +564,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Disembark
             var userInfos = await _dbContext.Queryable<User>()
                 .Where(t => t.IsLoginUser == 1)
                 .InnerJoin(wShip, (t, ws) => ws.WorkShipId == t.BusinessId)
+                .WhereIF(!string.IsNullOrWhiteSpace(requestDto.KeyWords), (t, ws) => SqlFunc.Contains(t.Name, requestDto.KeyWords) || SqlFunc.Contains(t.Phone, requestDto.KeyWords) || SqlFunc.Contains(t.CardId, requestDto.KeyWords) || SqlFunc.Contains(t.WorkNumber, requestDto.KeyWords))
                 .Select((t, ws) => new SearchLeavePlanUserResponseDto
                 {
                     UserId = t.BusinessId,
@@ -573,11 +584,12 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Disembark
             {
                 //第一适任证书职务
                 var position = certificateInfo.FirstOrDefault(x => x.CertificateId == item.UserId)?.FPosition;
+                var area = certificateInfo.FirstOrDefault(x => x.CertificateId == item.UserId)?.FNavigationArea;
                 //第一适任扫描件
                 var scans = certificateInfo.FirstOrDefault(x => x.CertificateId == item.UserId)?.FScans;
                 item.JobTypeName = positionInfo.FirstOrDefault(x => x.BusinessId.ToString() == position)?.Name ?? "";
                 item.CertificateId = certificateInfo.FirstOrDefault(x => x.CertificateId == item.UserId)?.BusinessId;
-                item.CertificateName = certificateInfo.FirstOrDefault(x => x.CertificateId == item.UserId)?.FCertificate ?? "";
+                item.CertificateName = position + area;
                 item.CertificateScans = url + fileAll.FirstOrDefault(t => t.FileId == scans)?.Name;
             }
 
@@ -598,6 +610,13 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Disembark
                 List<LeavePlanUserVacation> updateLeavePlanUsers = new List<LeavePlanUserVacation>();
                 //获取对应船舶年休数据
                 var vacationList = await _dbContext.Queryable<LeavePlanUserVacation>().Where(t => t.IsDelete == 1 && t.ShipId == requestDto.ShipId && t.Year == requestDto.Year).ToListAsync();
+                LeavePlanSubmitInfo leavePlanBaseInfo = new LeavePlanSubmitInfo();
+                leavePlanBaseInfo.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
+                leavePlanBaseInfo.BusinessId = GuidUtil.Next();
+                leavePlanBaseInfo.ShipId = requestDto.ShipId;
+                leavePlanBaseInfo.Year = requestDto.Year;
+                leavePlanBaseInfo.IsSubmit = true;
+                leavePlanBaseInfo.SubUser = GlobalCurrentUser.Name ?? "";
                 foreach (var item in requestDto.vacationVBases)
                 {
                     LeavePlanUser leavePlanUser = new LeavePlanUser();
@@ -612,7 +631,6 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Disembark
                     leavePlanUser.IsOnShipCurrentYear = item.IsOnShipCurrentYear;
                     leavePlanUser.Remark = item.Remark;
                     leavePlanUser.Year = requestDto.Year;
-                    leavePlanUser.IsSubmit = true;
                     leavePlans.Add(leavePlanUser);
                     foreach (var item2 in item.vacationInfos)
                     {
@@ -639,6 +657,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Disembark
                     }
                 }
 
+                await _dbContext.Insertable(leavePlanBaseInfo).ExecuteCommandAsync();
                 if (leavePlans.Any())
                 {
                     await _dbContext.Insertable(leavePlans).ExecuteCommandAsync();
@@ -702,6 +721,79 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Disembark
             return Result.Success(searchLeave);
         }
 
+        /// <summary>
+        /// 年休假规则验证
+        /// </summary>
+        /// <returns></returns>
+        public async Task<Result> LeaveCheckRuleAsync(LeaveCheckRuleRequestDto requestDto)
+        {
+            #region 任职船舶
+            //任职船舶 
+            var crewWorkShip = _dbContext.Queryable<WorkShip>()
+                .Where(t => t.OnShip == requestDto.ShipId.ToString())
+              .GroupBy(u => u.WorkShipId)
+              .Select(t => new { t.WorkShipId, WorkShipEndTime = SqlFunc.AggregateMax(t.WorkShipEndTime) });
+            var wShip = _dbContext.Queryable<WorkShip>()
+              .InnerJoin(crewWorkShip, (x, y) => x.WorkShipId == y.WorkShipId && x.WorkShipEndTime == y.WorkShipEndTime);
+            #endregion
+            //获取所有在船的人员数据
+            var userInfos = await _dbContext.Queryable<User>()
+                .Where(t => t.IsLoginUser == 1)
+                .InnerJoin(wShip, (t, ws) => ws.WorkShipId == t.BusinessId)
+                .Select((t, ws) => new SearchLeavePlanUserResponseDto
+                {
+                    UserId = t.BusinessId,
+                    UserName = t.Name,
+                    JobTypeId = ws.Postition,
+                })
+                .ToListAsync();
+
+            //获取所有已休假的人员
+            var leaveVacation = _dbContext.Queryable<LeavePlanUserVacation>()
+                .Where(t => t.IsDelete == 1 && t.UserId == requestDto.UserId && t.ShipId == requestDto.ShipId
+                            && t.Year == requestDto.Year && t.Month == requestDto.Month
+                            && t.VacationHalfMonth == requestDto.VacationHalfMonth);
+            var leaveUser = await _dbContext.Queryable<LeavePlanUser>().InnerJoin(leaveVacation, (x, y) => x.UserId == y.UserId && x.ShipId == y.ShipId && x.Year == y.Year)
+                                      .Where((x, y) => x.IsDelete == 1)
+                                      .Select((x, y) => new
+                                      {
+                                          x.UserId,
+                                          x.UserName,
+                                          x.JobTypeId,
+                                          x.ShipId,
+                                          x.Year,
+                                          y.Month,
+                                          y.VacationHalfMonth
+                                      })
+                                      .ToListAsync();
+
+            //获取对应船舶的定员标准
+            var shipStandard = await _dbContext.Queryable<ShipPersonnelStandard>().Where(t => t.IsDelete == 1 && t.ShipStatus == 1 && t.ShipId == requestDto.ShipId)
+                .InnerJoin(_dbContext.Queryable<ShipPersonnelPosition>().Where(t => t.IsDelete == 1), (x, y) => x.BusinessId == y.ConnectionId)
+                .Where((x, y) => y.PositionId == requestDto.JobTypeId)
+                .Select((x, y) => new
+                {
+                    x.ShipId,
+                    x.ShipName,
+                    y.PositionId,
+                    y.Position,
+                    y.Num
+                })
+                .FirstAsync();
+            var result = false;
+            //先查出同条船上相同职务的人员数量
+            var positionNum = userInfos.Where(t => t.JobTypeId == requestDto.JobTypeId.ToString() && t.UserId != requestDto.UserId).Count();
+            //在判断当前人员是否有休假
+            if (leaveUser.Any())
+            {
+                if (shipStandard != null)
+                {
+                    result = positionNum < shipStandard.Num;
+                    return Result.Success(result);
+                }
+            }
+            return Result.Success(result);
+        }
 
         /// <summary>
         /// 获取枚举项的描述信息

@@ -23,6 +23,6 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.Disembark
         /// <summary>
         /// 是否填报
         /// </summary>
-        public bool IsSubmit { get; set; }
+        public bool? IsSubmit { get; set; }
     }
 }

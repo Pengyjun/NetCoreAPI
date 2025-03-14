@@ -134,5 +134,15 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api.Controllers
         {
             return await _disembarkService.SearchLeaveDetailAsync(requestDto);
         }
+
+        /// <summary>
+        /// 年休假规则验证
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost("LeaveCheckRule")]
+        public async Task<Result> LeaveCheckRuleAsync([FromBody] LeaveCheckRuleRequestDto requestDto)
+        {
+            return await _disembarkService.LeaveCheckRuleAsync(requestDto);
+        }
     }
 }
