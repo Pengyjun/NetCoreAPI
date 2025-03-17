@@ -27,6 +27,8 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Reflection;
 using System.Text;
+using HNKC.CrewManagePlatform.Services.Interface.Common;
+using HNKC.CrewManagePlatform.Services.Interface.ShipWatch;
 using UtilsSharp;
 
 namespace HNKC.CrewManagePlatform.Services.Admin.Api
@@ -328,6 +330,8 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api
             builder.Services.AddScoped<ICertificateService, CertificateService>();
             builder.Services.AddScoped<IConfigManagementService, ConfigManagementService>();
             builder.Services.AddScoped<IDisembarkService, DisembarkService>();
+            builder.Services.AddScoped<ICommonService,CommonService>();
+            builder.Services.AddScoped<ICrewRotaService,CrewRotaService>();
 
         }
     }

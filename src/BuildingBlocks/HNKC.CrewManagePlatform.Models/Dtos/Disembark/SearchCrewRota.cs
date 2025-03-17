@@ -312,7 +312,7 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.Disembark
         /// </summary>
         public Guid? UserId { get; set; }
         /// <summary>
-        /// 人员
+        /// 人员名称
         /// </summary>
         public string? UserName { get; set; }
         /// <summary>
@@ -320,13 +320,33 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.Disembark
         /// </summary>
         public string? Position { get; set; }
         /// <summary>
-        /// 职务
+        /// 职务名称
         /// </summary>
         public string? PositionName { get; set; }
         /// <summary>
-        /// 部门
+        /// 值班类型
         /// </summary>
         public RotaEnum RotaEnum { get; set; }
+        /// <summary>
+        /// 职工号
+        /// </summary>
+        public string? WorkNumber { get; set; }
+    }
+
+    /// <summary>
+    /// 审批用户列表
+    /// </summary>
+    public class ApproveUser
+    {
+        /// <summary>
+        /// 人员ID
+        /// </summary>
+        public Guid? UserId { get; set; }
+
+        /// <summary>
+        /// 人员名称
+        /// </summary>
+        public string? UserName { get; set; }
     }
     #endregion
 }

@@ -32,6 +32,12 @@ namespace HNKC.CrewManagePlatform.Web.Filters
                     context.HttpContext.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
                     context.ExceptionHandled = true;
                     break;
+                case BusinessException:
+                    logger.LogError(JsonConvert.SerializeObject(context.Exception));
+                    context.Result = new InternalServerErrorObjectResult(Result.Fail(context.Exception.Message));
+                    context.HttpContext.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+                    context.ExceptionHandled = true;
+                    break;
                 default:
                     logger.LogError(JsonConvert.SerializeObject(context.Exception));
                     context.Result = new InternalServerErrorObjectResult(Result.Fail("服务器错误,请重试."));
