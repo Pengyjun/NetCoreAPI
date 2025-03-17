@@ -88,35 +88,39 @@ namespace HNKC.CrewManagePlatform.Services.Interface.ShipWatch
             List<SearchSchedulingDto> lunJichedulings = new();
 
             var rr = await _dbContext.Queryable<CrewRota>()
-                .Where(t => t.IsDelete == 1 && requestBody.ShipId == t.ShipId && t.TimeType == requestBody.TimeType)
+                // .Where(t => t.IsDelete == 1 && requestBody.ShipId == t.ShipId && t.TimeType == requestBody.TimeType)
+                .Where(t => t.IsDelete == 1 && requestBody.ShipId == t.ShipId)
                 .OrderByDescending(x => x.Version)
                 .ToListAsync();
-            var verMax = rr.Max(x => x.Version);
-            rr = rr.Where(x => x.Version == verMax).ToList();
-
-            foreach (var item in rr)
+            if (rr.Count > 0)
             {
-                if (item.RotaType == RotaEnum.JiaBan)
+                var verMax = rr.Max(x => x.Version);
+                rr = rr.Where(x => x.Version == verMax).ToList();
+
+                foreach (var item in rr)
                 {
-                    jiaBanSchedulings.Add(new SearchSchedulingDto
+                    if (item.RotaType == RotaEnum.JiaBan)
                     {
-                        FLeaderUserId = item.FLeaderUserId,
-                        OhterUserId = item.OhterUserId,
-                        SLeaderUserId = item.SLeaderUserId,
-                        TimeSlotType = item.TimeSlotType,
-                        TimeSlotTypeName = EnumUtil.GetDescription(item.TimeSlotType)
-                    });
-                }
-                else if (item.RotaType == RotaEnum.LunJi)
-                {
-                    lunJichedulings.Add(new SearchSchedulingDto
+                        jiaBanSchedulings.Add(new SearchSchedulingDto
+                        {
+                            FLeaderUserId = item.FLeaderUserId,
+                            OhterUserId = item.OhterUserId,
+                            SLeaderUserId = item.SLeaderUserId,
+                            TimeSlotType = item.TimeSlotType,
+                            TimeSlotTypeName = EnumUtil.GetDescription(item.TimeSlotType)
+                        });
+                    }
+                    else if (item.RotaType == RotaEnum.LunJi)
                     {
-                        FLeaderUserId = item.FLeaderUserId,
-                        OhterUserId = item.OhterUserId,
-                        SLeaderUserId = item.SLeaderUserId,
-                        TeamGroup = item.TeamGroup,
-                        TeamGroupDesc = item.TeamGroupDesc
-                    });
+                        lunJichedulings.Add(new SearchSchedulingDto
+                        {
+                            FLeaderUserId = item.FLeaderUserId,
+                            OhterUserId = item.OhterUserId,
+                            SLeaderUserId = item.SLeaderUserId,
+                            TeamGroup = item.TeamGroup,
+                            TeamGroupDesc = item.TeamGroupDesc
+                        });
+                    }
                 }
             }
 

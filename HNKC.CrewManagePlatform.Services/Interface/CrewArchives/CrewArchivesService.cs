@@ -2928,7 +2928,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
         /// <param name="rr"></param>
         /// <param name="total"></param>
         /// <returns></returns>
-        public async Task<PageResult<SearchCrewDynamics>> GetCrewDynamicsAsync(List<SearchCrewDynamics> rr, int total)
+        private async Task<PageResult<SearchCrewDynamics>> GetCrewDynamicsAsync(List<SearchCrewDynamics> rr, int total)
         {
             PageResult<SearchCrewDynamics> rt = new();
 

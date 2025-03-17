@@ -68,7 +68,7 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// </summary>
         public int OnBoardDays { get; set; }
         /// <summary>
-        /// 下船天数
+        /// 休假天数
         /// </summary>
         public int HolidayDays { get; set; }
         /// <summary>
