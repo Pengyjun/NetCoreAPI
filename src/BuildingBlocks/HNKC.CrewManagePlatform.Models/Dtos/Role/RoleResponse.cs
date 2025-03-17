@@ -11,7 +11,7 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.Role
     /// <summary>
     /// 角色响应DTO
     /// </summary>
-    public class RoleResponse:BaseResponse
+    public class RoleResponse : BaseResponse
     {
         /// <summary>
         /// 所属机构ID
@@ -27,6 +27,14 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.Role
         /// 机构名称
         /// </summary>
         public string? InstitutionName { get; set; }
+        /// <summary>
+        /// 船舶id
+        /// </summary>
+        public Guid? ShipId { get; set; }
+        /// <summary>
+        /// 船舶名称
+        /// </summary>
+        public string? ShipName { get; set; }
 
         /// <summary>
         /// 角色名称

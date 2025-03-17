@@ -803,6 +803,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Disembark
                 .InnerJoin(wShip, (t, ws) => ws.WorkShipId == t.BusinessId)
                 .LeftJoin(_dbContext.Queryable<LeavePlanUser>().Where(t => t.IsDelete == 1), (t, ws, le) => t.BusinessId == le.UserId && ws.OnShip == le.ShipId.ToString())
                 .WhereIF(!string.IsNullOrWhiteSpace(requestDto.KeyWords), (t, ws) => SqlFunc.Contains(t.Name, requestDto.KeyWords) || SqlFunc.Contains(t.Phone, requestDto.KeyWords) || SqlFunc.Contains(t.CardId, requestDto.KeyWords) || SqlFunc.Contains(t.WorkNumber, requestDto.KeyWords))
+                 .WhereIF(!string.IsNullOrWhiteSpace(requestDto.CertificateId.ToString()), (t, ws, le) => le.CertificateId == requestDto.CertificateId)
                 .WhereIF(requestDto.Year == 1, (t, ws, le) => le.IsOnShipCurrentYear && le.Year == DateTime.Now.Year)
                 .WhereIF(requestDto.Year == 2, (t, ws, le) => le.IsOnShipLastYear && le.Year == DateTime.Now.Year - 1)
                 .Select((t, ws, le) => new SearchLeavePlanUserResponseDto
@@ -812,7 +813,8 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Disembark
                     JobTypeId = ws.Postition,
                     ShipId = ws.OnShip,
                     IsOnShipCurrentYear = le.IsOnShipCurrentYear,
-                    IsOnShipLastYear = le.IsOnShipLastYear
+                    IsOnShipLastYear = le.IsOnShipLastYear,
+                    CertificateId = le.CertificateId
                 })
                 .ToListAsync();
             var userIds = userInfos.Select(t => t.UserId).ToArray();
@@ -1095,6 +1097,24 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Disembark
                 }
             }
             return Result.Success(result);
+        }
+
+        /// <summary>
+        /// 获取适任证书下拉
+        /// </summary>
+        /// <returns></returns>
+        public async Task<Result> SearchCertificateSelectAsync()
+        {
+            var certificate = await _dbContext.Queryable<CertificateOfCompetency>()
+                .LeftJoin(_dbContext.Queryable<PositionOnBoard>().Where(t => t.IsDelete == 1), (x, y) => x.FPosition == y.BusinessId.ToString())
+                .LeftJoin(_dbContext.Queryable<NavigationArea>().Where(t => t.IsDelete == 1), (x, y, z) => x.FNavigationArea == z.BusinessId.ToString())
+                .Where((x, y, z) => x.IsDelete == 1 && (!string.IsNullOrWhiteSpace(y.Name) || !string.IsNullOrWhiteSpace(z.Name)))
+                .Select((x, y, z) => new
+                {
+                    x.BusinessId,
+                    Name = y.Name ?? "" + z.Name ?? ""
+                }).ToListAsync();
+            return Result.Success(certificate);
         }
 
         /// <summary>

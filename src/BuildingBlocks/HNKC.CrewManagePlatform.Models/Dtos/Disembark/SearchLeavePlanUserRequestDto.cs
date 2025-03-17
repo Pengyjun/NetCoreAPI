@@ -20,6 +20,10 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.Disembark
         /// </summary>
         public string[]? ShipId { get; set; }
         /// <summary>
+        /// 适任证书id
+        /// </summary>
+        public Guid? CertificateId { get; set; }
+        /// <summary>
         /// 获取休假日期详情接口使用   1 当前年在船过年情况  2 去年在船过年情况
         /// </summary>
         public int Year { get; set; }
