@@ -1,5 +1,6 @@
 ﻿using HNKC.CrewManagePlatform.Models.CommonResult;
 using HNKC.CrewManagePlatform.Models.Dtos.Disembark;
+using Microsoft.AspNetCore.Mvc;
 using UtilsSharp.Shared.Standard;
 
 namespace HNKC.CrewManagePlatform.Services.Interface.Disembark
@@ -69,7 +70,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Disembark
         /// </summary>
         /// <param name="requestBody"></param>
         /// <returns></returns>
-        Task<PageResult<SearchCrewRota>> SearchCrewRotaAsync(SearchCrewRotaRequest requestBody);
+        Task<Result> RegisterActualTime(RegisterActualTimeDto requestBody);
 
         /// <summary>
         /// 年休假计划列表

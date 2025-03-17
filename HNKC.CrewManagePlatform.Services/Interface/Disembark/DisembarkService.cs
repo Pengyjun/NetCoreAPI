@@ -7,7 +7,7 @@ using HNKC.CrewManagePlatform.Models.Enums;
 using HNKC.CrewManagePlatform.SqlSugars.Models;
 using HNKC.CrewManagePlatform.Utils;
 using SqlSugar;
-using System.ComponentModel.DataAnnotations;
+using System.ComponentModel;
 using UtilsSharp;
 
 namespace HNKC.CrewManagePlatform.Services.Interface.Disembark
