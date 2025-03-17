@@ -69,6 +69,38 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Disembark
         /// </summary>
         /// <param name="requestBody"></param>
         /// <returns></returns>
-        Task<Result> RegisterActualTime(RegisterActualTimeDto requestBody);
+        Task<PageResult<SearchCrewRota>> SearchCrewRotaAsync(SearchCrewRotaRequest requestBody);
+
+        /// <summary>
+        /// 年休假计划列表
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        Task<PageResult<AnnualLeavePlanResponseDto>> SearchAnnualLeavePlanAsync(AnnualLeavePlanRequestDto requestDto);
+
+        /// <summary>
+        /// 年休计划  获取船舶人员信息
+        /// </summary>
+        /// <param name="ShipId"></param>
+        /// <returns></returns>
+        Task<Result> SearchLeavePlanUserAsync(SearchLeavePlanUserRequestDto requestDto);
+        /// <summary>
+        /// 新增或修改年休计划
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        Task<Result> SaveLeavePlanUserVacationAsync(AddLeavePlanVacationRequestDto requestDto);
+        /// <summary>
+        /// 获取休假日期详情
+        /// </summary>
+        /// <returns></returns>
+        Task<Result> SearchLeaveDetailAsync(SearchLeavePlanUserRequestDto requestDto);
+
+        /// <summary>
+        /// 年休假规则验证
+        /// </summary>
+        /// <returns></returns>
+        Task<Result> LeaveCheckRuleAsync(LeaveCheckRuleRequestDto requestDto);
+
     }
 }

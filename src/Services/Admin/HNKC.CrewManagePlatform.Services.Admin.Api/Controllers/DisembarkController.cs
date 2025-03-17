@@ -4,6 +4,7 @@ using HNKC.CrewManagePlatform.Services.Interface.Disembark;
 using HNKC.CrewManagePlatform.SqlSugars.UnitOfTransaction;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Runtime.InteropServices;
 
 namespace HNKC.CrewManagePlatform.Services.Admin.Api.Controllers
 {
@@ -117,6 +118,61 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api.Controllers
         public async Task<Result> CrewRotaApproveUserListAsync(Guid shipId)
         {
             return await _disembarkService.ApproveUserListAsync(shipId);
+        }
+        /// <summary>
+        /// 年休假计划列表
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        [HttpGet("SearchAnnualLeavePlan")]
+        public async Task<IActionResult> SearchAnnualLeavePlanAsync([FromQuery] AnnualLeavePlanRequestDto requestDto)
+        {
+            var data = await _disembarkService.SearchAnnualLeavePlanAsync(requestDto);
+            return Ok(data);
+        }
+
+
+        /// <summary>
+        /// 年休计划  获取船舶人员信息
+        /// </summary>
+        /// <param name="ShipId"></param>
+        /// <returns></returns>
+        [HttpGet("SearchLeavePlanUser")]
+        public async Task<Result> SearchLeavePlanUserAsync([FromQuery] SearchLeavePlanUserRequestDto requestDto)
+        {
+            return await _disembarkService.SearchLeavePlanUserAsync(requestDto);
+        }
+
+        /// <summary>
+        /// 新增或修改年休计划
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        [HttpPost("SaveLeavePlanUserVacation")]
+        [Transactional]
+        public async Task<Result> SaveLeavePlanUserVacationAsync([FromBody] AddLeavePlanVacationRequestDto requestDto)
+        {
+            return await _disembarkService.SaveLeavePlanUserVacationAsync(requestDto);
+        }
+
+        /// <summary>
+        /// 获取休假日期详情
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost("SearchLeaveDetail")]
+        public async Task<Result> SearchLeaveDetailAsync([FromBody] SearchLeavePlanUserRequestDto requestDto)
+        {
+            return await _disembarkService.SearchLeaveDetailAsync(requestDto);
+        }
+
+        /// <summary>
+        /// 年休假规则验证
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost("LeaveCheckRule")]
+        public async Task<Result> LeaveCheckRuleAsync([FromBody] LeaveCheckRuleRequestDto requestDto)
+        {
+            return await _disembarkService.LeaveCheckRuleAsync(requestDto);
         }
     }
 }
