@@ -1,4 +1,5 @@
 ﻿using HNKC.CrewManagePlatform.Models.CommonResult;
+using HNKC.CrewManagePlatform.Models.Dtos.Common;
 using HNKC.CrewManagePlatform.Models.Dtos.CrewArchives;
 using HNKC.CrewManagePlatform.Models.Enums;
 
@@ -17,11 +18,17 @@ namespace HNKC.CrewManagePlatform.Services.Interface
         /// <returns></returns>
         Task<Result> ReadExcelAsModelAsync(Stream stream);
         /// <summary>
-        /// 搜索机构数
+        /// 搜索机构树
         /// </summary>
         /// <param name="path"></param>
         /// <returns></returns>
         Task<Result> SearchInstitutionTreeAsync();
+        /// <summary>
+        /// 添加机构树
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        Task<Result> AddInstitutionTreeAsync(AddInstutionRequestDto requestDto);
         /// <summary>
         /// 通过身份证与当前日期计算年龄
         /// </summary>
