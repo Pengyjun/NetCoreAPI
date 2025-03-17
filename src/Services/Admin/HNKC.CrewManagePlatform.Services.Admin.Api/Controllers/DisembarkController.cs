@@ -195,5 +195,15 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api.Controllers
         {
             return await _disembarkService.SearchCertificateSelectAsync();
         }
+
+        /// <summary>
+        /// 获取船舶定员标准
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost("SearchShipPersonStandard")]
+        public async Task<Result> SearchShipPersonStandardAsync([FromBody] ShipPersonRequestDto requestDto)
+        {
+            return await _disembarkService.SearchShipPersonStandardAsync(requestDto);
+        }
     }
 }

@@ -107,5 +107,10 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Disembark
         /// </summary>
         /// <returns></returns>
         Task<Result> SearchCertificateSelectAsync();
+        /// <summary>
+        /// 获取船舶定员标准
+        /// </summary>
+        /// <returns></returns>
+        Task<Result> SearchShipPersonStandardAsync(ShipPersonRequestDto requestDto);
     }
 }

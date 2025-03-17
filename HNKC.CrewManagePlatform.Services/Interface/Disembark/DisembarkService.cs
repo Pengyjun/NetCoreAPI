@@ -74,15 +74,15 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Disembark
                         !string.IsNullOrWhiteSpace(query.EndTime.ToString()),
                         (da) => da.Created >= Convert.ToDateTime(query.StartTime) &&
                                 da.Created < Convert.ToDateTime(query.EndTime.Value.AddDays(1)))
-                    .WhereIF(query.Status == 1,da => da.ApproveStatus == ApproveStatus.PExamination)
-                    .WhereIF(query.Status == 2,da => da.ApproveStatus == ApproveStatus.Pass)
-                    .WhereIF(query.Status == 3,da => da.ApproveStatus == ApproveStatus.Reject)
+                    .WhereIF(query.Status == 1, da => da.ApproveStatus == ApproveStatus.PExamination)
+                    .WhereIF(query.Status == 2, da => da.ApproveStatus == ApproveStatus.Pass)
+                    .WhereIF(query.Status == 3, da => da.ApproveStatus == ApproveStatus.Reject)
                     .WhereIF(!string.IsNullOrEmpty(query.ShipId.ToString()), da => da.ShipId == query.ShipId)
                     .WhereIF(!string.IsNullOrEmpty(query.UserId.ToString()), da => da.UserId == query.UserId)
                     .LeftJoin<User>((da, u) => da.UserId == u.BusinessId)
                     .LeftJoin(wShip, (da, u, ws) => ws.WorkShipId == da.UserId)
                     .LeftJoin<OwnerShip>((da, u, ws, ow) => ws.OnShip == ow.BusinessId.ToString())
-                    .WhereIF(!string.IsNullOrEmpty(query.UserName),(da, u)=>u.Name.Contains(query.UserName))
+                    .WhereIF(!string.IsNullOrEmpty(query.UserName), (da, u) => u.Name.Contains(query.UserName))
                     .OrderBy(da => da.ApproveStatus).OrderBy(da => SqlFunc.Desc(da.ApplyTime))
                     .Select((da, u, ws, ow) => new DepartureApplyVo
                     {
@@ -425,11 +425,11 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Disembark
             }
 
             await _dbContext.Updateable(departureApplyUserList).UpdateColumns(dau => new
-                {
-                    dau.RealDisembarkDate,
-                    dau.RealReturnShipDate,
-                    dau.ModifiedBy
-                }).WhereColumns(dau => new { dau.BusinessId }).Where(dau => dau.ApplyCode == requestBody.ApplyCode)
+            {
+                dau.RealDisembarkDate,
+                dau.RealReturnShipDate,
+                dau.ModifiedBy
+            }).WhereColumns(dau => new { dau.BusinessId }).Where(dau => dau.ApplyCode == requestBody.ApplyCode)
                 .ExecuteCommandAsync();
 
             return Result.Success("提交成功");
@@ -675,9 +675,9 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Disembark
             var company = await _dbContext.Queryable<OwnerShip>()
                 .Where(os => os.BusinessId == shipId)
                 .Select(os => new
-                    {
-                        os.Company
-                    }
+                {
+                    os.Company
+                }
                 ).FirstAsync();
 
             var userInfos = await _dbContext.Queryable<User>()
@@ -1068,7 +1068,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Disembark
 
             //获取所有已休假的人员
             var leaveVacation = _dbContext.Queryable<LeavePlanUserVacation>()
-                .Where(t => t.IsDelete == 1 && t.UserId == requestDto.UserId && t.ShipId == requestDto.ShipId
+                .Where(t => t.IsDelete == 1 && t.ShipId == requestDto.ShipId
                             && t.Year == requestDto.Year && t.Month == requestDto.Month
                             && t.VacationHalfMonth == requestDto.VacationHalfMonth);
             var leaveUser = await _dbContext.Queryable<LeavePlanUser>().InnerJoin(leaveVacation, (x, y) => x.UserId == y.UserId && x.ShipId == y.ShipId && x.Year == y.Year)
@@ -1086,9 +1086,15 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Disembark
                                       .ToListAsync();
 
             //获取对应船舶的定员标准
+            var condition1 = !string.IsNullOrWhiteSpace(requestDto.JobTypeName) && requestDto.JobTypeName.Contains("书记");
+            var condition2 = !string.IsNullOrWhiteSpace(requestDto.JobTypeName) && requestDto.JobTypeName.Contains("电机员");
+            var condition3 = !string.IsNullOrWhiteSpace(requestDto.JobTypeName) && !requestDto.JobTypeName.Contains("书记") && !requestDto.JobTypeName.Contains("电机员");
+
             var shipStandard = await _dbContext.Queryable<ShipPersonnelStandard>().Where(t => t.IsDelete == 1 && t.ShipStatus == 1 && t.ShipId == requestDto.ShipId)
                 .InnerJoin(_dbContext.Queryable<ShipPersonnelPosition>().Where(t => t.IsDelete == 1), (x, y) => x.BusinessId == y.ConnectionId)
-                .Where((x, y) => y.PositionId == requestDto.JobTypeId)
+                .WhereIF(condition1, (x, y) => y.Position == "书记")
+                .WhereIF(condition2, (x, y) => y.Position == "电机员")
+                .WhereIF(condition3, (x, y) => y.PositionId == requestDto.JobTypeId)
                 .Select((x, y) => new
                 {
                     x.ShipId,
@@ -1098,40 +1104,31 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Disembark
                     y.Num
                 })
                 .FirstAsync();
-            var result = false;
-            //先查出同条船上相同职务的人员数量
-
-            var positionNum = 0;
-            if (!string.IsNullOrWhiteSpace(requestDto.JobTypeName) && requestDto.JobTypeName.Contains("书记"))
-            {
-                //书记 船员类型为领导班子的
-                var str1 = await _dbContext.Queryable<PositionOnBoard>().Where(t => t.IsDelete == 1 && t.Name.Contains("书记") && t.Type == 1).Select(t => t.BusinessId.ToString()).ToListAsync();
-                positionNum = userInfos
-               .Where(t => str1.Contains(t.JobTypeId) && t.UserId != requestDto.UserId)
-               .Count();
-            }
-            else if (!string.IsNullOrWhiteSpace(requestDto.JobTypeName) && requestDto.JobTypeName.Contains("电机员"))
-            {
-                //书记 船员类型为领导班子的
-                var str1 = await _dbContext.Queryable<PositionOnBoard>().Where(t => t.IsDelete == 1 && t.Name.Contains("电机员") && t.Type == 2).Select(t => t.BusinessId.ToString()).ToListAsync();
-                positionNum = userInfos
-               .Where(t => str1.Contains(t.JobTypeId) && t.UserId != requestDto.UserId)
-               .Count();
-            }
-            else
-            {
-                positionNum = userInfos
-                    .Where(t => t.JobTypeId == requestDto.JobTypeId.ToString() && t.UserId != requestDto.UserId)
-                    .Count();
-            }
-            //在判断当前人员是否有休假
+            var result = true;
+            //判断对应时间点 同职位的  船上是否有人休假
             if (leaveUser.Any())
             {
-                if (shipStandard != null)
+                var isAny = false;
+                //查出同条船上相同职务的人员数量
+                var positionNum = 0;
+                if (!string.IsNullOrWhiteSpace(requestDto.JobTypeName) && requestDto.JobTypeName.Contains("书记"))
                 {
-                    result = positionNum < shipStandard.Num;
-                    return Result.Success(result);
+                    //书记 船员类型为领导班子的
+                    var str1 = await _dbContext.Queryable<PositionOnBoard>().Where(t => t.IsDelete == 1 && t.Name.Contains("书记") && t.Type == 1).Select(t => t.BusinessId.ToString()).ToListAsync();
+                    positionNum = userInfos.Where(t => str1.Contains(t.JobTypeId) && t.UserId != requestDto.UserId).Count();
                 }
+                else if (!string.IsNullOrWhiteSpace(requestDto.JobTypeName) && requestDto.JobTypeName.Contains("电机员"))
+                {
+                    //电机员
+                    var str2 = await _dbContext.Queryable<PositionOnBoard>().Where(t => t.IsDelete == 1 && t.Name.Contains("电机员") && t.Type == 2).Select(t => t.BusinessId.ToString()).ToListAsync();
+                    positionNum = userInfos.Where(t => str2.Contains(t.JobTypeId) && t.UserId != requestDto.UserId).Count();
+                }
+                else
+                {
+                    positionNum = userInfos.Where(t => t.JobTypeId == requestDto.JobTypeId.ToString() && t.UserId != requestDto.UserId).Count();
+                }
+
+                result = positionNum < shipStandard.Num;
             }
             return Result.Success(result);
         }
@@ -1152,6 +1149,33 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Disembark
                     Name = y.Name ?? "" + z.Name ?? ""
                 }).ToListAsync();
             return Result.Success(certificate);
+        }
+
+        /// <summary>
+        /// 获取船舶定员标准
+        /// </summary>
+        /// <returns></returns>
+        public async Task<Result> SearchShipPersonStandardAsync(ShipPersonRequestDto requestDto)
+        {
+            var condition1 = !string.IsNullOrWhiteSpace(requestDto.JobTypeName) && requestDto.JobTypeName.Contains("书记");
+            var condition2 = !string.IsNullOrWhiteSpace(requestDto.JobTypeName) && requestDto.JobTypeName.Contains("电机员");
+            var condition3 = !string.IsNullOrWhiteSpace(requestDto.JobTypeName) && !requestDto.JobTypeName.Contains("书记") && !requestDto.JobTypeName.Contains("电机员");
+            var data = await _dbContext.Queryable<ShipPersonnelStandard>().Where(t => t.IsDelete == 1 && t.ShipStatus == requestDto.Status && t.ShipId == requestDto.ShipId)
+                  .InnerJoin(_dbContext.Queryable<ShipPersonnelPosition>().Where(t => t.IsDelete == 1), (x, y) => x.BusinessId == y.ConnectionId)
+                  .WhereIF(condition1, (x, y) => y.Position == "书记")
+                  .WhereIF(condition2, (x, y) => y.Position == "电机员")
+                  .WhereIF(condition3, (x, y) => y.PositionId.ToString() == requestDto.JobTypeId)
+                  .Select((x, y) => new
+                  {
+                      x.ShipId,
+                      x.ShipName,
+                      y.PositionId,
+                      y.Position,
+                      Num = y.Num ?? 0
+                  })
+                  .ToListAsync();
+
+            return Result.Success(data);
         }
 
         /// <summary>
