@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using HNKC.CrewManagePlatform.Models.CommonResult;
+using HNKC.CrewManagePlatform.Models.Dtos.Common;
 using HNKC.CrewManagePlatform.Models.Dtos.CrewArchives;
 using HNKC.CrewManagePlatform.Models.Dtos.Salary;
 using HNKC.CrewManagePlatform.Models.Enums;
@@ -102,7 +103,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface
         {
             var userInfo = GlobalCurrentUser;
             #region 获取当前节点下的所有子节点
-            var allInstitution = await _dbContext.Queryable<Institution>().Where(x => x.IsDelete == 1)
+            var addInstitution = await _dbContext.Queryable<Institution>().Where(x => x.IsDelete == 1 && (x.Oid == "101162350" || x.Oid == "101162354"))
                  .Select(x => new InstitutionTree()
                  {
                      GPoid = x.GPoid,
@@ -115,6 +116,21 @@ namespace HNKC.CrewManagePlatform.Services.Interface
                      BusinessId = x.BusinessId
                  })
                 .ToListAsync();
+
+            var allInstitution = await _dbContext.Queryable<Institution>().Where(x => x.IsDelete == 1 && x.Grule.Contains("101341960"))
+                 .Select(x => new InstitutionTree()
+                 {
+                     GPoid = x.GPoid,
+                     Name = x.Name,
+                     POid = x.Poid,
+                     ShortName = x.ShortName,
+                     Oid = x.Oid,
+                     Sno = x.Sno,
+                     Grule = x.Grule,
+                     BusinessId = x.BusinessId
+                 })
+                .ToListAsync();
+            allInstitution.AddRange(addInstitution);
             //获取树形
             var instrturionTree = new ListToTreeUtil().GetTree(userInfo.Oid, allInstitution);
             if (instrturionTree.Count == 0)
@@ -165,6 +181,82 @@ namespace HNKC.CrewManagePlatform.Services.Interface
             #endregion
 
         }
+
+        /// <summary>
+        /// 添加机构树
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        public async Task<Result> AddInstitutionTreeAsync(AddInstutionRequestDto requestDto)
+        {
+            //修改机构树名称
+            if (!string.IsNullOrWhiteSpace(requestDto.Oid))
+            {
+                var instutionInfo = await _dbContext.Queryable<Institution>().Where(t => t.IsDelete == 1 && t.Oid == requestDto.Oid).FirstAsync();
+                instutionInfo.Name = requestDto.Name;
+                instutionInfo.ShortName = requestDto.Name;
+                await _dbContext.Updateable(instutionInfo).ExecuteCommandAsync();
+                return Result.Success("修改成功");
+            }
+            else
+            {
+                //查询对应部门下序号最大的
+                var instutionInfo = await _dbContext.Queryable<Institution>().Where(t => t.IsDelete == 1 && t.Grule.Contains(requestDto.Poid) && t.Ocode.Contains("000S")).OrderByDescending(t => t.Sno + 1).FirstAsync();
+                Institution model = new Institution();
+                model = instutionInfo;
+                model.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
+                var sno = Convert.ToInt32(model.Oid?.Substring(model.Oid.Length - 2)) + 1;
+                var str = model.Oid?.Substring(0, model.Oid.Length - 2);
+                model.Oid = str + sno;
+                model.O2bid = model.BizType + model.Oid;
+                model.Orule = ReplaceStr(model.Orule, model.Oid, 6);
+                model.Grule = ReplaceStr(model.Grule, model.Oid, 10);
+                model.Mrut = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+                model.Sno = (30 + 1).ToString();
+                model.Name = requestDto.Name;
+                model.ShortName = requestDto.Name;
+                string fixedPrefix = "31102139P2023005";
+                int prefixLength = fixedPrefix.Length;
+                // 从目标字符串的固定部分后开始，找到需要替换的内容
+                if (model.Ocode.Length > prefixLength)
+                {
+                    string partToReplace = model.Ocode.Substring(prefixLength, 2);  // 取固定后面的 2 个字符
+                    model.Ocode = model.Ocode.Substring(0, prefixLength) + model.Sno + model.Ocode.Substring(prefixLength + 2);
+                }
+                model.StartDate = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+                model.Global_Sno = ReplaceStr(model.Global_Sno, model.Sno, 11);
+                model.Version = string.Empty;
+                model.BusinessId = GuidUtil.Next();
+
+                await _dbContext.Insertable(model).ExecuteCommandAsync();
+                return Result.Success("新增成功");
+            }
+        }
+
+        /// <summary>
+        /// 内容替换
+        /// </summary>
+        /// <returns></returns>
+        public string ReplaceStr(string? input, string newValue, int index)
+        {
+            int targetIndex = index;
+            if (input == null)
+            {
+                return string.Empty;
+            }
+            // 使用分隔符"-"拆分字符串
+            string[] parts = input.Split('-');
+            // 判断目标索引位置是否合法
+            if (targetIndex >= 0 && targetIndex < parts.Length)
+            {
+                // 替换目标位置的内容
+                parts[targetIndex] = newValue;
+            }
+            // 拼接回新的字符串
+            string output = string.Join("-", parts);
+            return output;
+        }
+
 
         #region 通过身份证与当前日期计算年龄
         /// <summary>

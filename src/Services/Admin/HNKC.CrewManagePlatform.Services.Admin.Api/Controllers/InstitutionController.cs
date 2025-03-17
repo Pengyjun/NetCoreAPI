@@ -1,6 +1,8 @@
 ﻿using HNKC.CrewManagePlatform.Models.CommonResult;
+using HNKC.CrewManagePlatform.Models.Dtos.Common;
 using HNKC.CrewManagePlatform.Services.Interface;
 using HNKC.CrewManagePlatform.Services.Interface.PullResult;
+using HNKC.CrewManagePlatform.SqlSugars.UnitOfTransaction;
 using HNKC.CrewManagePlatform.Util;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -30,7 +32,19 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api.Controllers
         [HttpGet("SearchInstitutionTree")]
         public async Task<Result> SearchInstitutionTreeAsync()
         {
-           return await baseService.SearchInstitutionTreeAsync();
+            return await baseService.SearchInstitutionTreeAsync();
+        }
+
+        /// <summary>
+        /// 添加机构树
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        [HttpPost("AddInstitutionTree")]
+        [Transactional]
+        public async Task<Result> AddInstitutionTreeAsync([FromBody] AddInstutionRequestDto requestDto)
+        {
+            return await baseService.AddInstitutionTreeAsync(requestDto);
         }
 
     }
