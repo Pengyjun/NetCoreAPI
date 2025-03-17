@@ -908,8 +908,8 @@ namespace GHMonitoringCenterApi.Application.Service
                     var isExist = CurrencyConverter.Where(x => x.CurrencyId == item.CurrencyId.Value.ToString()).FirstOrDefault();
                     if (isExist != null)
                     {
-                        item.Amount = item.Amount.Value * isExist.ExchangeRate;
-                        item.ECAmount = item.ECAmount.Value * isExist.ExchangeRate;
+                        item.Amount = item.Amount.HasValue ? item.Amount.Value * isExist.ExchangeRate : 0;
+                        item.ECAmount = item.ECAmount.HasValue ? item.ECAmount.Value * isExist.ExchangeRate : 0;
                     }
                 }
             }
