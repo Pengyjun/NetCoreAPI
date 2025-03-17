@@ -303,6 +303,15 @@ namespace GHMonitoringCenterApi.Application.Service.ProjectAdjustMonthReport
                 historyData.PNodeId = "0";
                 historyData.NodeId = "-1";
             }
+            foreach (var item in data)
+            {
+                if (string.IsNullOrWhiteSpace(item.NodeId))
+                {
+                    var maxNodeId = data.Where(x => x.PNodeId == item.PNodeId).Max(x => SqlFunc.ToInt32(x.NodeId));
+                    maxNodeId += 1;
+                    item.NodeId = maxNodeId.ToString();
+                }
+            }
             await _dbContext.Insertable<ProjectAdjustProductionValue>(projectAdjustProductionValue).ExecuteCommandAsync();
             await _dbContext.Insertable<ProjectAdjustProductionValueDetails>(data).ExecuteCommandAsync();
             responseAjaxResult.Success();
