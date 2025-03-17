@@ -513,7 +513,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Disembark
                 LeaveYear = requestDto.Year <= 0 ? DateTime.Now.Year : requestDto.Year,
                 ShipName = x.ShipName,
                 ShipType = x.ShipType,
-                CountryId = x.CompanyId,
+                CountryId = x.CountryId,
                 CompanyId = x.CompanyId,
                 SubStatus = x.SubStatus,
                 SubUser = x.SubUser,
@@ -555,7 +555,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Disembark
             {
                 item.ShipTypeName = GetEnumDescription(item.ShipType);
                 item.CountryName = countryInfo.FirstOrDefault(t => t.BusinessId == item.CountryId)?.Name ?? "";
-                item.ProjectName = shipProjectInfo.FirstOrDefault(t => t.BusinessId == item.ShipId)?.ProjectName ?? "";
+                item.ProjectName = shipProjectInfo.FirstOrDefault(t => t.RelationShipId == item.ShipId)?.ProjectName ?? "";
                 item.CompanyName = institutionInfo.FirstOrDefault(t => t.BusinessId == item.CompanyId)?.Name ?? "";
                 item.Captain = userInfos.FirstOrDefault(t => t.ShipId == item.ShipId.ToString() && t.JobTypeId == "93f80b81-cf29-11ef-82f9-ecd68ace58a2")?.UserName ?? "";
                 item.Secretary = userInfos.FirstOrDefault(t => t.ShipId == item.ShipId.ToString() && t.JobTypeId == "")?.UserName ?? "";
@@ -588,7 +588,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Disembark
                 .InnerJoin(wShip, (t, ws) => ws.WorkShipId == t.BusinessId)
                 .LeftJoin(_dbContext.Queryable<LeavePlanUser>().Where(t => t.IsDelete == 1), (t, ws, le) => t.BusinessId == le.UserId && ws.OnShip == le.ShipId.ToString())
                 .WhereIF(!string.IsNullOrWhiteSpace(requestDto.KeyWords), (t, ws) => SqlFunc.Contains(t.Name, requestDto.KeyWords) || SqlFunc.Contains(t.Phone, requestDto.KeyWords) || SqlFunc.Contains(t.CardId, requestDto.KeyWords) || SqlFunc.Contains(t.WorkNumber, requestDto.KeyWords))
-                 .WhereIF(!string.IsNullOrWhiteSpace(requestDto.CertificateId.ToString()), (t, ws, le) => le.CertificateId == requestDto.CertificateId)
+                .WhereIF(!string.IsNullOrWhiteSpace(requestDto.CertificateId.ToString()), (t, ws, le) => le.CertificateId == requestDto.CertificateId)
                 .WhereIF(requestDto.Year == 1, (t, ws, le) => le.IsOnShipCurrentYear && le.Year == DateTime.Now.Year)
                 .WhereIF(requestDto.Year == 2, (t, ws, le) => le.IsOnShipLastYear && le.Year == DateTime.Now.Year - 1)
                 .Select((t, ws, le) => new SearchLeavePlanUserResponseDto
