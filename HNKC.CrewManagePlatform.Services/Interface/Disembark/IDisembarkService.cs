@@ -75,6 +75,10 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Disembark
         /// </summary>
         /// <returns></returns>
         Task<Result> LeaveCheckRuleAsync(LeaveCheckRuleRequestDto requestDto);
-
+        /// <summary>
+        /// 获取适任证书下拉
+        /// </summary>
+        /// <returns></returns>
+        Task<Result> SearchCertificateSelectAsync();
     }
 }

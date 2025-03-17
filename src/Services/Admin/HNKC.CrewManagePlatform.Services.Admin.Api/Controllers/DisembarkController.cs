@@ -144,5 +144,14 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api.Controllers
         {
             return await _disembarkService.LeaveCheckRuleAsync(requestDto);
         }
+        /// <summary>
+        /// 获取适任证书下拉
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("SearchCertificateSelect")]
+        public async Task<Result> SearchCertificateSelectAsync()
+        {
+            return await _disembarkService.SearchCertificateSelectAsync();
+        }
     }
 }
