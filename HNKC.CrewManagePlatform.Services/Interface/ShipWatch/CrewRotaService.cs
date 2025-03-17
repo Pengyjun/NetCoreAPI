@@ -83,13 +83,20 @@ namespace HNKC.CrewManagePlatform.Services.Interface.ShipWatch
         /// <returns></returns>
         public async Task<Result> CrewRotaListAsync(SchedulingRequest requestBody)
         {
+
+            if (requestBody.ShipId == Guid.Empty || string.IsNullOrWhiteSpace(requestBody.ShipId.ToString()))
+            {
+                return Result.Fail("船舶ID不能为空");
+            }
+
             SearchScheduling rt = new();
             List<SearchSchedulingDto> jiaBanSchedulings = new();
             List<SearchSchedulingDto> lunJichedulings = new();
 
             var rr = await _dbContext.Queryable<CrewRota>()
-                // .Where(t => t.IsDelete == 1 && requestBody.ShipId == t.ShipId && t.TimeType == requestBody.TimeType)
                 .Where(t => t.IsDelete == 1 && requestBody.ShipId == t.ShipId)
+                .WhereIF(!string.IsNullOrWhiteSpace(requestBody.TimeType.ToString()),
+                    t => t.TimeType == requestBody.TimeType)
                 .OrderByDescending(x => x.Version)
                 .ToListAsync();
             if (rr.Count > 0)
@@ -107,7 +114,9 @@ namespace HNKC.CrewManagePlatform.Services.Interface.ShipWatch
                             OhterUserId = item.OhterUserId,
                             SLeaderUserId = item.SLeaderUserId,
                             TimeSlotType = item.TimeSlotType,
-                            TimeSlotTypeName = EnumUtil.GetDescription(item.TimeSlotType)
+                            TimeSlotTypeName = EnumUtil.GetDescription(item.TimeSlotType),
+                            TeamGroup = item.TeamGroup,
+                            TeamGroupDesc = item.TeamGroupDesc
                         });
                     }
                     else if (item.RotaType == RotaEnum.LunJi)
@@ -117,6 +126,8 @@ namespace HNKC.CrewManagePlatform.Services.Interface.ShipWatch
                             FLeaderUserId = item.FLeaderUserId,
                             OhterUserId = item.OhterUserId,
                             SLeaderUserId = item.SLeaderUserId,
+                            TimeSlotType = item.TimeSlotType,
+                            TimeSlotTypeName = EnumUtil.GetDescription(item.TimeSlotType),
                             TeamGroup = item.TeamGroup,
                             TeamGroupDesc = item.TeamGroupDesc
                         });
@@ -229,7 +240,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.ShipWatch
                     .ToListAsync();
 
                 var schedulingTimeData = await _dbContext.Queryable<CrewRota>().Where(t => t.IsDelete == 1)
-                    .OrderByDescending(t => t.SchedulingTime).ToListAsync();
+                    .OrderByDescending(t => new { t.Version, t.SchedulingTime }).ToListAsync();
                 foreach (var item in rr)
                 {
                     item.CompanyName = company.FirstOrDefault(x => x.BusinessId == item.Company)?.Name;
@@ -241,8 +252,10 @@ namespace HNKC.CrewManagePlatform.Services.Interface.ShipWatch
                         .FirstOrDefault(x => x.ShipId == item.ShipId.ToString() && x.OnBoardName == "书记")?.OnBoardName;
                     item.ChiefEngineer = userInfo
                         .FirstOrDefault(x => x.ShipId == item.ShipId.ToString() && x.OnBoardName == "轮机长")?.OnBoardName;
-                    item.SchedulingTime = schedulingTimeData.Where(x => x.ShipId == item.ShipId)
-                        .OrderByDescending(x => x.SchedulingTime).FirstOrDefault()?.SchedulingTime;
+                    var scheduling = schedulingTimeData.Where(x => x.ShipId == item.ShipId)
+                        .OrderByDescending(x => x.SchedulingTime).FirstOrDefault();
+                    item.SchedulingTime = scheduling?.SchedulingTime;
+                    item.TimeType = scheduling?.TimeType;
                 }
             }
 

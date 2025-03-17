@@ -61,6 +61,10 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.Disembark
         /// 排班更新时间
         /// </summary>
         public DateTime? SchedulingTime { get; set; }
+        /// <summary>
+        /// 固定/非固定时间
+        /// </summary>
+        public TimeEnum? TimeType { get; set; }
     }
     /// <summary>
     /// 船员值班列表
