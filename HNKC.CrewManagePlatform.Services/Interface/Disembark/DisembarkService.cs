@@ -61,20 +61,27 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Disembark
 
             #endregion
 
+            // 获取当前登录用户
+            var userBusinessId = GlobalCurrentUser.UserBusinessId;
+
             var departureApplyVoList =
                 await _dbContext.Queryable<DepartureApply>()
                     .Where(da => da.IsDelete == 1)
+                    .Where(da => da.UserId == userBusinessId || da.ApproveUserId == userBusinessId)
                     .WhereIF(
                         !string.IsNullOrWhiteSpace(query.StartTime.ToString()) &&
                         !string.IsNullOrWhiteSpace(query.EndTime.ToString()),
                         (da) => da.Created >= Convert.ToDateTime(query.StartTime) &&
                                 da.Created < Convert.ToDateTime(query.EndTime.Value.AddDays(1)))
-                    // .WhereIF(!string.IsNullOrEmpty(query.ApproveStatus.ToString()), da => da.ApproveStatus == query.ApproveStatus)
+                    .WhereIF(query.Status == 1,da => da.ApproveStatus == ApproveStatus.PExamination)
+                    .WhereIF(query.Status == 2,da => da.ApproveStatus == ApproveStatus.Pass)
+                    .WhereIF(query.Status == 3,da => da.ApproveStatus == ApproveStatus.Reject)
                     .WhereIF(!string.IsNullOrEmpty(query.ShipId.ToString()), da => da.ShipId == query.ShipId)
+                    .WhereIF(!string.IsNullOrEmpty(query.UserId.ToString()), da => da.UserId == query.UserId)
                     .LeftJoin<User>((da, u) => da.UserId == u.BusinessId)
                     .LeftJoin(wShip, (da, u, ws) => ws.WorkShipId == da.UserId)
                     .LeftJoin<OwnerShip>((da, u, ws, ow) => ws.OnShip == ow.BusinessId.ToString())
-                    // .WhereIF(roleType == 3, (da, u, ws, ow) => da.ApproveUserId == GlobalCurrentUser.UserBusinessId)
+                    .WhereIF(!string.IsNullOrEmpty(query.UserName),(da, u)=>u.Name.Contains(query.UserName))
                     .OrderBy(da => da.ApproveStatus).OrderBy(da => SqlFunc.Desc(da.ApplyTime))
                     .Select((da, u, ws, ow) => new DepartureApplyVo
                     {
@@ -122,6 +129,13 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Disembark
             if (requestBody.DepartureApplyUserDtoList is not { Count: > 0 })
             {
                 return Result.Fail("离船人员不能为空");
+            }
+
+            var roleType = await _baseService.CurRoleType();
+            // 判断角色类型
+            if (roleType == 3)
+            {
+                return Result.Fail("非船长角色无法提交申请");
             }
 
             // 创建申请单据
@@ -610,6 +624,12 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Disembark
         /// <exception cref="NotImplementedException"></exception>
         public async Task<Result> ShipUserListAsync(Guid shipId)
         {
+
+            if (shipId == Guid.Empty || string.IsNullOrWhiteSpace(shipId.ToString()))
+            {
+                return Result.Fail("船舶ID不能为空");
+            }
+
             #region 任职船舶
 
             //任职船舶
@@ -636,13 +656,6 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Disembark
                     WorkNumber = t.WorkNumber
                 })
                 .ToListAsync();
-            /*var posiIds = userInfos.Select(x => x.Position).ToList();
-            var position = await _dbContext.Queryable<PositionOnBoard>()
-                .Where(t => posiIds.Contains(t.BusinessId.ToString())).ToListAsync();
-            foreach (var item in userInfos)
-            {
-                item.PositionName = position.FirstOrDefault(x => x.BusinessId.ToString() == item.Position)?.Name;
-            }*/
 
             return Result.Success(userInfos);
         }
@@ -671,7 +684,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Disembark
                 .LeftJoin<InstitutionRole>((u, ir) => u.BusinessId == ir.UserBusinessId)
                 .LeftJoin<HNKC.CrewManagePlatform.SqlSugars.Models.Role>(
                     (u, ir, r) => r.BusinessId == ir.RoleBusinessId)
-                .Where((u, ir, r) => r.Type == 3 && ir.InstitutionBusinessId == company.Company && r.IsApprove)
+                .Where((u, ir, r) => r.Type == 4 && ir.InstitutionBusinessId == company.Company && r.IsApprove)
                 .Select((u, ir) => new ApproveUser
                 {
                     UserId = u.BusinessId,
