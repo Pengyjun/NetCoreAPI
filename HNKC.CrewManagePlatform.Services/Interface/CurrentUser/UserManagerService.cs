@@ -169,7 +169,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CurrentUser
             var institutionIds = allRole.Select(x => x.InstitutionBusinessId).ToList();
             //机构信息
             var institution = await dbContext.Queryable<Institution>().Where(x => x.IsDelete == 1 && institutionIds.Contains(x.BusinessId)).ToListAsync();
-
+            var ownerShip = await dbContext.Queryable<OwnerShip>().Where(t => t.IsDelete == 1).ToListAsync();
             if (roleList.Count > 0)
             {
 
@@ -186,6 +186,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CurrentUser
                     var institutionInfo = institution.Where(x => x.BusinessId == item.InstitutionBusinessId).FirstOrDefault();
                     if (userLoginResponse.RoleList.Count(x => x.RoleBusinessId == item.RoleBusinessId) == 0)
                     {
+                        var owner = ownerShip.FirstOrDefault(t => t.ShipName == institutionInfo?.Name);
                         RoleResponse role = new RoleResponse()
                         {
                             InstitutionBusinessId = item.InstitutionBusinessId,
@@ -195,6 +196,8 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CurrentUser
                             Name = roleInfo?.Name,
                             Oid = institutionInfo?.Oid,
                             Type = roleInfo?.Type,
+                            ShipId = owner?.BusinessId,
+                            ShipName = owner?.ShipName
                         };
                         userLoginResponse.RoleList.Add(role);
                     }
