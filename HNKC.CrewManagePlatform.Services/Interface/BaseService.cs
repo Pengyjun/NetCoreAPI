@@ -185,40 +185,52 @@ namespace HNKC.CrewManagePlatform.Services.Interface
         /// <summary>
         /// 添加机构树
         /// </summary>
-        /// <param name="path"></param>
+        /// <param name="requestDto"></param>
         /// <returns></returns>
         public async Task<Result> AddInstitutionTreeAsync(AddInstutionRequestDto requestDto)
         {
-            //查询对应部门下序号最大的
-            var instutionInfo = await _dbContext.Queryable<Institution>().Where(t => t.IsDelete == 1 && t.Grule.Contains(requestDto.Oid) && t.Ocode.Contains("000S")).OrderByDescending(t => t.Sno + 1).FirstAsync();
-            Institution model = new Institution();
-            model = instutionInfo;
-            model.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
-            var sno = Convert.ToInt32(model.Oid?.Substring(model.Oid.Length - 2)) + 1;
-            var str = model.Oid?.Substring(0, model.Oid.Length - 2);
-            model.Oid = str + sno;
-            model.O2bid = model.BizType + model.Oid;
-            model.Orule = ReplaceStr(model.Orule, model.Oid, 6);
-            model.Grule = ReplaceStr(model.Grule, model.Oid, 10);
-            model.Mrut = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
-            model.Sno = (30 + 1).ToString();
-            model.Name = requestDto.Name;
-            model.ShortName = requestDto.Name;
-            string fixedPrefix = "31102139P2023005";
-            int prefixLength = fixedPrefix.Length;
-            // 从目标字符串的固定部分后开始，找到需要替换的内容
-            if (model.Ocode.Length > prefixLength)
+            //修改机构树名称
+            if (!string.IsNullOrWhiteSpace(requestDto.Oid))
             {
-                string partToReplace = model.Ocode.Substring(prefixLength, 2);  // 取固定后面的 2 个字符
-                model.Ocode = model.Ocode.Substring(0, prefixLength) + model.Sno + model.Ocode.Substring(prefixLength + 2);
+                var instutionInfo = await _dbContext.Queryable<Institution>().Where(t => t.IsDelete == 1 && t.Oid == requestDto.Oid).FirstAsync();
+                instutionInfo.Name = requestDto.Name;
+                instutionInfo.ShortName = requestDto.Name;
+                await _dbContext.Updateable(instutionInfo).ExecuteCommandAsync();
+                return Result.Success("修改成功");
             }
-            model.StartDate = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
-            model.Global_Sno = ReplaceStr(model.Global_Sno, model.Sno, 11);
-            model.Version = string.Empty;
-            model.BusinessId = GuidUtil.Next();
+            else
+            {
+                //查询对应部门下序号最大的
+                var instutionInfo = await _dbContext.Queryable<Institution>().Where(t => t.IsDelete == 1 && t.Grule.Contains(requestDto.Poid) && t.Ocode.Contains("000S")).OrderByDescending(t => t.Sno + 1).FirstAsync();
+                Institution model = new Institution();
+                model = instutionInfo;
+                model.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
+                var sno = Convert.ToInt32(model.Oid?.Substring(model.Oid.Length - 2)) + 1;
+                var str = model.Oid?.Substring(0, model.Oid.Length - 2);
+                model.Oid = str + sno;
+                model.O2bid = model.BizType + model.Oid;
+                model.Orule = ReplaceStr(model.Orule, model.Oid, 6);
+                model.Grule = ReplaceStr(model.Grule, model.Oid, 10);
+                model.Mrut = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+                model.Sno = (30 + 1).ToString();
+                model.Name = requestDto.Name;
+                model.ShortName = requestDto.Name;
+                string fixedPrefix = "31102139P2023005";
+                int prefixLength = fixedPrefix.Length;
+                // 从目标字符串的固定部分后开始，找到需要替换的内容
+                if (model.Ocode.Length > prefixLength)
+                {
+                    string partToReplace = model.Ocode.Substring(prefixLength, 2);  // 取固定后面的 2 个字符
+                    model.Ocode = model.Ocode.Substring(0, prefixLength) + model.Sno + model.Ocode.Substring(prefixLength + 2);
+                }
+                model.StartDate = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+                model.Global_Sno = ReplaceStr(model.Global_Sno, model.Sno, 11);
+                model.Version = string.Empty;
+                model.BusinessId = GuidUtil.Next();
 
-            await _dbContext.Insertable(model).ExecuteCommandAsync();
-            return Result.Success();
+                await _dbContext.Insertable(model).ExecuteCommandAsync();
+                return Result.Success("新增成功");
+            }
         }
 
         /// <summary>

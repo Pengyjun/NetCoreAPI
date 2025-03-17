@@ -12,9 +12,13 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.Common
     public class AddInstutionRequestDto
     {
         /// <summary>
+        /// 机构id
+        /// </summary>
+        public string? Oid { get; set; }
+        /// <summary>
         /// 父级机构id
         /// </summary>
-        public string Oid { get; set; }
+        public string Poid { get; set; }
         /// <summary>
         /// 机构名称
         /// </summary>
