@@ -307,7 +307,7 @@ namespace GHMonitoringCenterApi.Application.Service.ProjectAdjustMonthReport
             {
                 if (string.IsNullOrWhiteSpace(item.NodeId))
                 {
-                    var maxNodeId = data.Where(x => x.PNodeId == item.PNodeId).Max(x => SqlFunc.ToInt32(x.NodeId));
+                    var maxNodeId = data.Max(x => SqlFunc.ToInt32(x.NodeId));
                     maxNodeId += 1;
                     item.NodeId = maxNodeId.ToString();
                 }
