@@ -24,6 +24,10 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.Disembark
         /// </summary>
         public Guid JobTypeId { get; set; }
         /// <summary>
+        /// 职务名称
+        /// </summary>
+        public string? JobTypeName { get; set; }
+        /// <summary>
         /// 年
         /// </summary>
         public int Year { get; set; }
