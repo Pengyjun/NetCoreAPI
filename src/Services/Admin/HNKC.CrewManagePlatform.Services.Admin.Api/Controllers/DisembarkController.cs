@@ -40,6 +40,18 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api.Controllers
         }
 
         /// <summary>
+        /// 获取离船审批列表
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        [HttpGet("ApproveList")]
+        public async Task<IActionResult> DepartureApproveListAsync([FromQuery] DepartureApplyQuery query)
+        {
+            var data = await _disembarkService.DepartureApplyListAsync(query);
+            return Ok(data);
+        }
+
+        /// <summary>
         /// 提交离船申请
         /// </summary>
         /// <param name="requestBody"></param>

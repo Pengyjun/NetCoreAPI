@@ -43,10 +43,6 @@ public class DepartureApplyDto : IValidatableObject
 /// </summary>
 public class DepartureApplyUserDto
 {
-    /// <summary>
-    /// 申请code
-    /// </summary>
-    public Guid? ApplyCode { get; set; }
 
     /// <summary>
     /// 离船用户ID
@@ -100,14 +96,24 @@ public class DepartureApplyQuery : PageRequest
     public DateTime? EndTime { get; set; }
 
     /// <summary>
-    /// 审批状态 0审批中 1通过 2未通过
+    /// 审批状态 0全部 1审批中 2通过 3未通过
     /// </summary>
-    public ApproveStatus ApproveStatus { get; set; }
+    public int Status { get; set; }
 
     /// <summary>
     /// 船舶ID
     /// </summary>
     public Guid? ShipId { get; set; }
+
+    /// <summary>
+    /// 申请人ID
+    /// </summary>
+    public Guid? UserId { get; set; }
+
+    /// <summary>
+    /// 申请人姓名
+    /// </summary>
+    public string? UserName { get; set; }
 }
 
 /// <summary>
