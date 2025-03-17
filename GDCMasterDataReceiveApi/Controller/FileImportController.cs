@@ -23,6 +23,7 @@ using GDCMasterDataReceiveApi.Application.Contracts.Dto.ValueDomain;
 using GDCMasterDataReceiveApi.Application.Contracts.IService.ISearchService;
 using GDCMasterDataReceiveApi.Domain.Models;
 using GDCMasterDataReceiveApi.Domain.Shared;
+using GDCMasterDataReceiveApi.Domain.Shared.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
@@ -88,7 +89,6 @@ namespace GDCMasterDataReceiveApi.Controller
             var systemInterfaceInfoApi = AppsettingsHelper.GetValue("API:SystemInterfaceFiledRuleApi");
             var appKey = GlobalCurrentUser.AppKey;
             var appinterfaceCode = GlobalCurrentUser.AppinterfaceCode;
-
             FilterCondition condition = new();
             condition.PageIndex = request.PageIndex;
             condition.PageSize = request.IsFullExport ? int.MaxValue : request.PageSize;

@@ -2615,7 +2615,7 @@ namespace GDCMasterDataReceiveApi.Application.Service.ReceiveService
                             SAMEHIGHESTGRADE = string.IsNullOrWhiteSpace(receiveUserRequestDto.user.SAMEHIGHESTGRADE) == true ? isExistUser.SAMEHIGHESTGRADE : receiveUserRequestDto.user.SAMEHIGHESTGRADE,
                             TEL = string.IsNullOrWhiteSpace(receiveUserRequestDto.user.TEL) == true ? isExistUser.TEL : receiveUserRequestDto.user.TEL,
                             SNO = string.IsNullOrWhiteSpace(receiveUserRequestDto.user.SNO) == true ? isExistUser.SNO : receiveUserRequestDto.user.SNO,
-                            //Enable= string.IsNullOrWhiteSpace(receiveUserRequestDto.user.) == true ? isExistUser.CERT_NO : receiveUserRequestDto.user.CERT_NO,
+                             Enable= isExistUser.Enable,
                             FAX = string.IsNullOrWhiteSpace(receiveUserRequestDto.user.FAX) == true ? isExistUser.FAX : receiveUserRequestDto.user.FAX,
                             POSITION_NAME = string.IsNullOrWhiteSpace(receiveUserRequestDto.user.POSITION_NAME) == true ? isExistUser.POSITION_NAME : receiveUserRequestDto.user.POSITION_NAME,
                             SEX = string.IsNullOrWhiteSpace(receiveUserRequestDto.user.SEX) == true ? isExistUser.SEX : receiveUserRequestDto.user.SEX
