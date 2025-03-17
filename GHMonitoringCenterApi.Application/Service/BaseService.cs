@@ -2841,7 +2841,8 @@ namespace GHMonitoringCenterApi.Application.Service
         public async Task<ResponseAjaxResult<bool>> UpdateShowProjectAsync(Guid projectId)
         {
             ResponseAjaxResult<bool> responseAjaxResult = new ResponseAjaxResult<bool>();
-            var project = await dbContext.Queryable<ProjectOpen>().Where(x => x.ProjectId == projectId).FirstAsync();
+            var day = DateTime.Now.AddDays(-1).ToDateDay();
+            var project = await dbContext.Queryable<ProjectOpen>().Where(x => x.ProjectId == projectId&&x.DateDay== day).FirstAsync();
             if (project == null)
             {
                 await dbContext.Insertable<ProjectOpen>(new ProjectOpen()

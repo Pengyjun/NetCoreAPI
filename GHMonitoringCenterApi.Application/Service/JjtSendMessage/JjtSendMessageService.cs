@@ -3381,7 +3381,7 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
                         obj.Icon = 1;
                     } else if (Math.Round(obj.DayProductionValue , 2) < yeaterDayProducution * 0.95M)
                     {
-                        obj.Icon = 1;
+                        obj.Icon = 0;
                     }
                     else if (yeaterDayProducution*0.95M < Math.Round(obj.DayProductionValue, 2)&&
                         Math.Round(obj.DayProductionValue, 2) < Math.Round(yeaterDayProducution * 1.05M, 2))
@@ -3451,61 +3451,65 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
             #endregion
 
             #region 产值异常情况说明
-            //控制是否显示的设置
-            var projectOpen = await dbContext.CopyNew().Queryable<ProjectOpen>().Where(x => x.IsDelete == 1 && x.DateDay == dayTime).ToListAsync();
-            //检查当天查询异常的项目
-            var expreProject = dayYearList.Where(x => x.DateDay == dayTime && x.IsLow == 0).ToList();
-            List<ImpProjectWarning> expProjects = new List<ImpProjectWarning>();
-            List<ProjectOpen> projectOpens = new List<ProjectOpen>();
-            foreach (var exprePro in expreProject)
-            {
-                //项目名称
-                var proName = projectList.Where(x => x.Id == exprePro.ProjectId).FirstOrDefault();
-                expProjects.Add(new ImpProjectWarning()
-                { 
-                    Id= exprePro.ProjectId,
-                    Name = proName?.ShortName,
-                    DeviationWarning = exprePro?.DeviationWarning,
-                    DayAmount = Math.Round(exprePro.DayActualProductionAmount / 10000M, 2),
-                });
-            }
+           
+
             #region 保存数据库
             try
-            {
-                 var existProjectIds = await dbContext.CopyNew().Queryable<ProjectOpen>().Where(x =>x.DateDay==dayTime) .ToListAsync();
-                foreach (var item in expProjects)
+            { 
+                //检查当天查询异常的项目
+                var expreProject = dayYearList.Where(x => x.DateDay == dayTime && x.IsLow == 0).ToList();
+                List<ProjectOpen> projectOpens = new();
+                //删除已存在的数据
+                var existProject= await dbContext.CopyNew().Queryable<ProjectOpen>().Where(x =>x.DateDay==dayTime) .ToListAsync();
+                //保存最新的数据
+                foreach (var item in expreProject)
                 {
-                    if (existProjectIds.Count > 0)
-                    {
-                        item.IsLow = existProjectIds.Where(x => x.ProjectId == item.Id && x.DateDay == dayTime).Select(x => x.IsShow).First();
-                    }
-                }
-                if (existProjectIds.Count > 0)
-                {
-                   await dbContext.CopyNew().Deleteable<ProjectOpen>(existProjectIds).ExecuteCommandAsync();
-                }
-                foreach (var item in expProjects)
-                {
+                    var isShow=existProject.Where(x => x.ProjectId == item.ProjectId).Select(x => x.IsShow).FirstOrDefault();
+                    //项目名称
+                    var proName = projectList.Where(x => x.Id == item.ProjectId).FirstOrDefault();
                     var obj = new ProjectOpen()
                     {   DateDay = dayTime,
                         Id = Guid.NewGuid(),
-                        ProjectId = item.Id,
-                        IsShow = item.IsLow.HasValue ? item.IsLow.Value :0,
-                        Name = item.Name,
+                        ProjectId = item.ProjectId,
+                        IsShow = isShow.HasValue?isShow:0,
+                        Name = proName!=null? proName.ShortName:string.Empty,
                     };
                     projectOpens.Add(obj);
                 }
-                 await dbContext.CopyNew().Insertable<ProjectOpen>(projectOpens).ExecuteCommandAsync();
+                if (existProject.Count > 0)
+                {
+                    await dbContext.CopyNew().Deleteable<ProjectOpen>(existProject).ExecuteCommandAsync();
+                }
+                await dbContext.CopyNew().Insertable<ProjectOpen>(projectOpens).ExecuteCommandAsync();
+                var showIds = projectOpens.Where(x => x.IsShow==1).Select(x=>x.IsShow).ToList();
+                //控制是否显示的设置
+                var projectOpen = await dbContext.CopyNew().Queryable<ProjectOpen>().Where(x => x.IsDelete == 1 && x.DateDay == dayTime && showIds.Contains(x.IsShow)).ToListAsync();
+                List<ImpProjectWarning> expProjects = new();
+                foreach (var item in projectOpen)
+                {
+                   var dayInfo= dayYearList.Where(x => x.ProjectId == item.ProjectId && x.DateDay == dayTime).FirstOrDefault();
+                    if (dayInfo != null)
+                    { 
+                    expProjects.Add(new ImpProjectWarning()
+                    {
+                        Name = item.Name,
+                        Id = item.ProjectId,
+                        IsLow = 0,
+                        DayAmount = Math.Round(dayInfo.DayActualProductionAmount / 10000M, 2),
+                        DeviationWarning = dayInfo.DeviationWarning
+                    });
+                    }
+                }
+                #region 数据组合
+                jjtSendMessageMonitoringDayReportResponseDto.ImpProjectWarning = expProjects;
+                #endregion
             }
             catch (Exception ex)
             {
 
             }
             #endregion
-
-            #region 数据组合
-            jjtSendMessageMonitoringDayReportResponseDto.ImpProjectWarning = expProjects;
-            #endregion
+           
             #endregion
 
             #region 柱形图
