@@ -68,6 +68,10 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.Disembark
         /// </summary>
         public int Year { get; set; }
         /// <summary>
+        /// 备注
+        /// </summary>
+        public string Remark { get; set; }
+        /// <summary>
         /// 休假日期详情
         /// </summary>
         public List<VacationList> vacationLists { get; set; } = new List<VacationList>();

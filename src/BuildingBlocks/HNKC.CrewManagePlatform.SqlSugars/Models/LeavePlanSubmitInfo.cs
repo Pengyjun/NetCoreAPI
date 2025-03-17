@@ -29,6 +29,11 @@ namespace HNKC.CrewManagePlatform.SqlSugars.Models
         [SugarColumn(ColumnDataType = "bit")]
         public bool IsSubmit { get; set; }
         /// <summary>
+        /// 填报用户Id
+        /// </summary>
+        [SugarColumn(Length = 36)]
+        public Guid? SubUserId { get; set; }
+        /// <summary>
         /// 填报用户
         /// </summary>
         [SugarColumn(Length = 50)]
