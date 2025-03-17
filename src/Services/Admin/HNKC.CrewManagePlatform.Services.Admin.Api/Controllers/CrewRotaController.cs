@@ -66,7 +66,8 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api.Controllers
         /// </summary>
         /// <param name="requestBody"></param>
         /// <returns></returns>
-        public async Task<IActionResult> SearchCrewRotaAsync(SearchCrewRotaRequest requestBody)
+        [HttpGet("SearchCrewRota")]
+        public async Task<IActionResult> SearchCrewRotaAsync([FromQuery] SearchCrewRotaRequest requestBody)
         {
             var data = await _crewRotaService.SearchCrewRotaAsync(requestBody);
             return Ok(data);
