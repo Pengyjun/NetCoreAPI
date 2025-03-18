@@ -1,4 +1,5 @@
 ﻿using HNKC.CrewManagePlatform.Models.CommonResult;
+using HNKC.CrewManagePlatform.Models.Dtos;
 using HNKC.CrewManagePlatform.Models.Dtos.Disembark;
 
 namespace HNKC.CrewManagePlatform.Services.Interface.ShipWatch
@@ -34,5 +35,11 @@ namespace HNKC.CrewManagePlatform.Services.Interface.ShipWatch
         /// <param name="requestBody"></param>
         /// <returns></returns>
         Task<PageResult<SearchCrewRota>> SearchCrewRotaAsync(SearchCrewRotaRequest requestBody);
+
+        /// <summary>
+        /// 船舶值班查询
+        /// </summary>
+        /// <returns></returns>
+        Task<Result> SearchShipDutyListAsync(BaseRequest request);
     }
 }
