@@ -1496,5 +1496,172 @@ namespace GHMonitoringCenterApi.Application.Service
             }
             return companyDayProductionValueResponseDto;
         }
+
+
+        /// <summary>
+        /// 获取在建、在建（短暂性停工）、在建（间歇性停工）、中标已签 四种状态的项目信息
+        /// </summary>
+        /// <returns></returns>
+        public async Task<ResponseAjaxResult<List<Project>>> GetConstructionProjectAsync()
+        {
+            ResponseAjaxResult<List<Project>> responseAjaxResult = new ResponseAjaxResult<List<Project>>();
+
+            List<string> statusIds = new List<string>()
+            {
+                "cd3c6e83-1b7c-40c2-a415-5a44f13584cc",
+                "19050a4b-fe95-47cf-aafe-531d5894c88b",
+                "2c800da1-184f-408a-b5a4-fd915e8d6b6a",
+                "75089b9a-b18b-442c-bfc8-fde4024d737f",
+            };
+
+            var project = await _dbContext.Queryable<Project>().Where(t => t.IsDelete == 1 && statusIds.Contains(t.StatusId.ToString())).ToListAsync();
+
+            responseAjaxResult.Data = project;
+            responseAjaxResult.Count = project.Count;
+            responseAjaxResult.Success();
+            return responseAjaxResult;
+        }
+        /// <summary>
+        /// 获取在建、在建（短暂性停工）、在建（间歇性停工）、中标已签 四种状态的项目经理
+        /// </summary>
+        /// <returns></returns>
+        public async Task<ResponseAjaxResult<List<ProjectLeaderInfo>>> GetConstructionProjectLeaderAsync()
+        {
+            ResponseAjaxResult<List<ProjectLeaderInfo>> responseAjaxResult = new ResponseAjaxResult<List<ProjectLeaderInfo>>();
+            List<string> statusIds = new List<string>()
+            {
+                "cd3c6e83-1b7c-40c2-a415-5a44f13584cc",
+                "19050a4b-fe95-47cf-aafe-531d5894c88b",
+                "2c800da1-184f-408a-b5a4-fd915e8d6b6a",
+                "75089b9a-b18b-442c-bfc8-fde4024d737f",
+            };
+
+            var project = await _dbContext.Queryable<Project>().Where(t => t.IsDelete == 1 && statusIds.Contains(t.StatusId.ToString()))
+                .InnerJoin(_dbContext.Queryable<ProjectLeader>().Where(t => t.IsDelete == 1 && t.Type == 1), (x, y) => x.Id == y.ProjectId || x.MasterProjectId == y.ProjectId)
+                .Select((x, y) => new ProjectLeaderInfo
+                {
+                    UserId = y.AssistantManagerId,
+                    Type = y.Type,
+                    ProjectId = y.ProjectId,
+                    ProjectCode = y.ProjectCode,
+                    IsPresent = y.IsPresent,
+                    BeginDate = y.BeginDate,
+                    EndDate = y.EndDate,
+                    Remarks = y.Remarks
+                })
+                .ToListAsync();
+
+            var userIds = project.Select(t => t.UserId).Distinct().ToArray();
+            var userInfo = await _dbContext.Queryable<Domain.Models.User>().Where(t => t.IsDelete == 1 && userIds.Contains(t.PomId)).Select(t => new { t.PomId, t.Name, t.Phone }).ToListAsync();
+            foreach (var item in project)
+            {
+                var user = userInfo.FirstOrDefault(t => t.PomId == item.UserId);
+                if (user != null)
+                {
+                    item.Name = user.Name;
+                    item.Phone = user.Phone;
+                }
+            }
+            responseAjaxResult.Data = project;
+            responseAjaxResult.Count = project.Count;
+            responseAjaxResult.Success();
+            return responseAjaxResult;
+        }
+
+        /// <summary>
+        /// 获取船舶关联的项目
+        /// </summary>
+        /// <returns></returns>
+        public async Task<ResponseAjaxResult<List<ShipMovementProject>>> GetShipProjectAsync()
+        {
+            ResponseAjaxResult<List<ShipMovementProject>> responseAjaxResult = new ResponseAjaxResult<List<ShipMovementProject>>();
+
+            var shipMovement = await _dbContext.Queryable<ShipMovement>()
+                .InnerJoin(_dbContext.Queryable<Project>().Where(t => t.IsDelete == 1), (x, y) => x.ProjectId == y.Id)
+                .Where((x, y) => x.IsDelete == 1 && x.QuitTime == null && x.EnterTime != null)
+                .Select((x, y) => new ShipMovementProject
+                {
+                    ProjectId = y.Id,
+                    ShipId = x.ShipId,
+                    ShipType = x.ShipType,
+                    PomId = y.PomId,
+                    Name = y.Name,
+                    ShortName = y.ShortName,
+                    Score = y.Score,
+                    MasterCode = y.MasterCode,
+                    Code = y.Code,
+                    CompanyId = y.CompanyId,
+                    ProjectDept = y.ProjectDept,
+                    StatusId = y.StatusId,
+                    TypeId = y.TypeId,
+                    ConditionGradeId = y.ConditionGradeId,
+                    GradeId = y.GradeId,
+                    CurrencyId = y.CurrencyId,
+                    AreaId = y.AreaId,
+                    RegionId = y.RegionId,
+                    Amount = y.Amount,
+                    ECAmount = y.ECAmount,
+                    ContractMeaPayProp = y.ContractMeaPayProp,
+                    Rate = y.Rate,
+                    ExchangeRate = y.ExchangeRate,
+                    ProjectConstructionQualificationId = y.ProjectConstructionQualificationId,
+                    ProjectDeptAddress = y.ProjectDeptAddress,
+                    Quantity = y.Quantity,
+                    QuantityRemarks = y.QuantityRemarks,
+                    CompletionDate = y.CompletionDate,
+                    Longitude = y.Longitude,
+                    Latitude = y.Latitude,
+                    Tag = y.Tag,
+                    Tag2 = y.Tag2,
+                    IsChangeStatus = y.IsChangeStatus,
+                    Category = y.Category,
+                    IsStrength = y.IsStrength,
+                    CompleteQuantity = y.CompleteQuantity,
+                    CompleteOutput = y.CompleteOutput,
+                    BudgetInterestRate = y.BudgetInterestRate,
+                    CompilationTime = y.CompilationTime,
+                    BudgetaryReasons = y.BudgetaryReasons,
+                    ClassifyStandard = y.ClassifyStandard,
+                    SocietySpecEffect = y.SocietySpecEffect,
+                    ReclamationArea = y.ReclamationArea,
+                    Administrator = y.Administrator,
+                    Constructor = y.Constructor,
+                    ReportFormer = y.ReportFormer,
+                    Remarks = y.Remarks,
+                    MasterProjectId = y.MasterProjectId,
+                    IsMajor = y.IsMajor,
+                    CommencementTime = y.CommencementTime,
+                    CompletionTime = y.CompletionTime,
+                    StartContractDuration = y.StartContractDuration,
+                    EndContractDuration = y.EndContractDuration,
+                    ProjectLocation = y.ProjectLocation,
+                    BidWinningDate = y.BidWinningDate,
+                    ShutdownDate = y.ShutdownDate,
+                    DurationInformation = y.DurationInformation,
+                    ShutDownReason = y.ShutDownReason,
+                    ContractChangeInfo = y.ContractChangeInfo,
+                    WorkDay = y.WorkDay,
+                    ContractStipulationStartDate = y.ContractStipulationStartDate,
+                    ContractStipulationEndDate = y.ContractStipulationEndDate,
+                    ContractSignDate = y.ContractSignDate,
+                    PProjectMasterCode = y.PProjectMasterCode,
+                    IsSubContractProject = y.IsSubContractProject,
+                    ManagerType = y.ManagerType
+                })
+                .ToListAsync();
+            var shipIds = shipMovement.Select(t => t.ShipId).Distinct().ToArray();
+            var ownerShip = await _dbContext.Queryable<OwnerShip>().Where(t => t.IsDelete == 1 && shipIds.Contains(t.PomId)).ToListAsync();
+            var subShip = await _dbContext.Queryable<SubShip>().Where(t => t.IsDelete == 1 && shipIds.Contains(t.PomId)).ToListAsync();
+            foreach (var item in shipMovement)
+            {
+                if (item.ShipType == ShipType.OwnerShip) item.ShipName = ownerShip.FirstOrDefault(t => t.PomId == item.ShipId)?.Name;
+                else if (item.ShipType == ShipType.SubShip) item.ShipName = subShip.FirstOrDefault(t => t.PomId == item.ShipId)?.Name;
+            }
+
+            responseAjaxResult.Data = shipMovement;
+            responseAjaxResult.Count = shipMovement.Count;
+            responseAjaxResult.Success();
+            return responseAjaxResult;
+        }
     }
 }
