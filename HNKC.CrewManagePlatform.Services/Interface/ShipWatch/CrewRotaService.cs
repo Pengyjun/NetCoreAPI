@@ -1,6 +1,7 @@
 ﻿using HNKC.CrewManagePlatform.Models.CommonResult;
 using HNKC.CrewManagePlatform.Models.Dtos;
 using HNKC.CrewManagePlatform.Models.Dtos.Disembark;
+using HNKC.CrewManagePlatform.Models.Dtos.ShipDuty;
 using HNKC.CrewManagePlatform.Models.Enums;
 using HNKC.CrewManagePlatform.SqlSugars.Models;
 using HNKC.CrewManagePlatform.Utils;
@@ -367,5 +368,45 @@ namespace HNKC.CrewManagePlatform.Services.Interface.ShipWatch
         }
 
         #endregion
+
+
+        /// <summary>
+        /// 船舶值班查询
+        /// </summary>
+        /// <returns></returns>
+        public async Task<Result> SearchShipDutyListAsync(BaseRequest request)
+        {
+            ShipDutyListResponseDto shipDuty = new ShipDutyListResponseDto();
+            var ship = await _dbContext.Queryable<OwnerShip>().Where(t => t.IsDelete == 1 && t.BusinessId == request.BId)
+                .InnerJoin(_dbContext.Queryable<CountryRegion>().Where(t => t.IsDelete == 1), (x, y) => x.Country == y.BusinessId)
+                .LeftJoin(_dbContext.Queryable<ShipProjectRelation>().Where(t => t.IsDelete == 1), (x, y, z) => x.BusinessId == z.RelationShipId)
+                .Select((x, y, z) => new
+                {
+                    x.BusinessId,
+                    x.ShipName,
+                    y.Name,
+                    z.ProjectName
+                })
+                .FirstAsync();
+            if (ship != null)
+            {
+                //获取船舶上的人员总数
+                var crewWorkShip = _dbContext.Queryable<WorkShip>()
+                    .Where(t => t.OnShip == request.BId.ToString())
+                  .GroupBy(u => u.WorkShipId)
+                  .Select(t => new { t.WorkShipId, WorkShipEndTime = SqlFunc.AggregateMax(t.WorkShipEndTime) });
+                var wShip = _dbContext.Queryable<WorkShip>().Where(t => t.OnShip == request.BId.ToString())
+                  .InnerJoin(crewWorkShip, (x, y) => x.WorkShipId == y.WorkShipId && x.WorkShipEndTime == y.WorkShipEndTime);
+                shipDuty.ShipId = ship.BusinessId;
+                shipDuty.ShipName = ship.ShipName;
+                shipDuty.Country = ship.Name;
+                shipDuty.ProjectName = ship.ProjectName;
+            }
+
+
+            return Result.Success();
+        }
+
+
     }
 }

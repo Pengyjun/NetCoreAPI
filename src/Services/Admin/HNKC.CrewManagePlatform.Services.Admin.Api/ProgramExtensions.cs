@@ -30,6 +30,8 @@ using System.Text;
 using HNKC.CrewManagePlatform.Services.Interface.Common;
 using HNKC.CrewManagePlatform.Services.Interface.ShipWatch;
 using UtilsSharp;
+using HNKC.CrewManagePlatform.Common;
+using System.Net;
 
 namespace HNKC.CrewManagePlatform.Services.Admin.Api
 {
@@ -111,26 +113,27 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api
 
                 };
                 //jwt验证事件
-                //x.Events = new JwtBearerEvents()
-                //{
+                x.Events = new JwtBearerEvents()
+                {
 
-                //    //jwt验证成功后出发
-                //    OnTokenValidated = context => {
-                //        //获取token
-                //        var token = HttpContentAccessFactory.GetUserToken;
-                //        //解析Claims
-                //        var userList = context.Principal.Claims.ToList();
-                //        var id = userList?.Where(x => x.Type == "Id").Select(x => x.Value).FirstOrDefault();
-                //        //获取redis存储的token
-                //        var redisToken = RedisUtil.Instance.Get(id);
-                //        if (string.IsNullOrWhiteSpace(redisToken)|| !token.Trim().Equals(redisToken.Trim()))
-                //        {
-                //            context.Response.StatusCode =(int) ResponseHttpCode.AlreadyLogin;
-
-                //        }
-                //        return Task.CompletedTask;
-                //    }
-                //};
+                    //jwt验证成功后出发
+                    OnTokenValidated = context =>
+                    {
+                        //获取token
+                        var token = HttpContentAccessFactory.GetUserToken;
+                        //解析Claims
+                        var userList = context.Principal.Claims.ToList();
+                        var id = userList?.Where(x => x.Type == "Id").Select(x => x.Value).FirstOrDefault();
+                        //获取redis存储的token
+                        var redisToken = RedisUtil.Instance.Get(id);
+                        if (string.IsNullOrWhiteSpace(redisToken) || !token.Trim().Equals(redisToken.Trim()))
+                        {
+                            context.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
+                            context.NoResult();
+                        }
+                        return Task.CompletedTask;
+                    }
+                };
             });
 
             builder.Services.AddHttpClient();
