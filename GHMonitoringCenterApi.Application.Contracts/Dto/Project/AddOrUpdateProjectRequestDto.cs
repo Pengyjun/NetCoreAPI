@@ -267,7 +267,7 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project
         /// <summary>
         /// 关联基准计划
         /// </summary>
-        public string Association { get; set; }
+        public string? Association { get; set; }
 
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
