@@ -160,6 +160,11 @@ public class DepartureApplyDetailVo
     public Guid? ApproveUserId { get; set; }
 
     /// <summary>
+    /// 审批用户名称
+    /// </summary>
+    public string? ApproveUserName { get; set; }
+
+    /// <summary>
     /// 审批状态：0-审批中;1-审批通过;2-审批未通过
     /// </summary>
     public ApproveStatus ApproveStatus { get; set; }
