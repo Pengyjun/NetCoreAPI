@@ -845,13 +845,15 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Disembark
             foreach (var item in userInfos)
             {
                 //第一适任证书职务
-                var position = certificateInfo.FirstOrDefault(x => x.CertificateId == item.UserId)?.FPosition;
-                var area = certificateInfo.FirstOrDefault(x => x.CertificateId == item.UserId)?.FNavigationArea;
+                var positionId = certificateInfo.FirstOrDefault(x => x.CertificateId == item.UserId)?.FPosition;
+                var areaId = certificateInfo.FirstOrDefault(x => x.CertificateId == item.UserId)?.FNavigationArea;
                 //第一适任扫描件
                 var scans = certificateInfo.FirstOrDefault(x => x.CertificateId == item.UserId)?.FScans;
-                item.JobTypeName = positionInfo.FirstOrDefault(x => x.BusinessId.ToString() == position)?.Name ?? "";
+                item.JobTypeName = positionInfo.FirstOrDefault(x => x.BusinessId.ToString() == item.JobTypeId)?.Name ?? "";
                 item.CertificateId = certificateInfo.FirstOrDefault(x => x.CertificateId == item.UserId)?.BusinessId;
-                item.CertificateName = item.JobTypeName + navigationInfo.FirstOrDefault(t => t.BusinessId.ToString() == area)?.Name;
+                var position = positionInfo.FirstOrDefault(x => x.BusinessId.ToString() == positionId)?.Name ?? "";
+                var area = navigationInfo.FirstOrDefault(t => t.BusinessId.ToString() == areaId)?.Name;
+                item.CertificateName = position + area;
                 item.CertificateScans = url + fileAll.FirstOrDefault(t => t.FileId == scans)?.Name;
             }
 
