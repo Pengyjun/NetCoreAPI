@@ -354,17 +354,17 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Disembark
             }
 
             // 判断是否是可审批
-            if (departureApply.ApproveUserId != GlobalCurrentUser.UserBusinessId)
+            /*if (departureApply.ApproveUserId != GlobalCurrentUser.UserBusinessId)
             {
                 return Result.Fail("无权限审批");
-            }
+            }*/
 
             if (departureApply.ApproveStatus != ApproveStatus.PExamination)
             {
                 return Result.Fail("当前非待审批状态");
             }
 
-            if (requestBody.ApproveStatus != ApproveStatus.Pass && departureApply.ApproveStatus != ApproveStatus.Reject)
+            if (requestBody.ApproveStatus != ApproveStatus.Pass && requestBody.ApproveStatus != ApproveStatus.Reject)
             {
                 return Result.Fail("审批状态错误");
             }
