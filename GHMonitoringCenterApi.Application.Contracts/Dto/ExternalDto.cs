@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using GHMonitoringCenterApi.Domain.Enums;
+using System.ComponentModel.DataAnnotations;
 
 namespace GHMonitoringCenterApi.Application.Contracts.Dto
 {
@@ -835,5 +836,346 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto
                 }
             }
         }
+    }
+
+    /// <summary>
+    /// 四种在建状态的项目经理
+    /// </summary>
+    public class ProjectLeaderInfo
+    {
+        /// <summary>
+        /// Id
+        /// </summary>
+        public Guid UserId { get; set; }
+        /// <summary>
+        /// 用户名称
+        /// </summary>
+        public string? Name { get; set; }
+        /// <summary>
+        /// 用户手机号
+        /// </summary>
+        public string? Phone { get; set; }
+        /// <summary>
+        /// 任职类型 1：项目经理
+        /// </summary>
+        public int Type { get; set; }
+        /// <summary>
+        /// 项目id
+        /// </summary>
+        public Guid? ProjectId { get; set; }
+        /// <summary>
+        /// 项目code
+        /// </summary>
+        public string? ProjectCode { get; set; }
+        /// <summary>
+        /// 是否在任  true：在任  false：离任
+        /// </summary>
+        public bool IsPresent { get; set; }
+        /// <summary>
+        /// 任职开始日期
+        /// </summary>
+        public DateTime? BeginDate { get; set; }
+        /// <summary>
+        /// 任职结束日期
+        /// </summary>
+        public DateTime? EndDate { get; set; }
+        /// <summary>
+        /// 备注
+        /// </summary>
+        public string? Remarks { get; set; }
+    }
+
+    public class ShipMovementProject
+    {
+        /// <summary>
+        /// 项目id
+        /// </summary>
+        public Guid ProjectId { get; set; }
+        /// <summary>
+        /// 船舶id
+        /// </summary>
+        public Guid ShipId { get; set; }
+        /// <summary>
+        /// 船舶名称
+        /// </summary>
+        public string? ShipName { get; set; }
+        /// <summary>
+        /// 船舶类型（1：自有船舶，2：分包船舶）
+        /// </summary>
+        public ShipType ShipType { get; set; }
+        /// <summary>
+        /// PomId
+        /// </summary>
+        public int PomId { get; set; }
+        /// <summary>
+        /// 名称
+        /// </summary>
+        public string? Name { get; set; }
+        /// <summary>
+        /// 简称
+        /// </summary>
+        public string? ShortName { get; set; }
+        /// <summary>
+        /// 得分
+        /// </summary>
+        public decimal? Score { get; set; }
+        /// <summary>
+        /// 主数据编码编码
+        /// </summary>
+        public string? MasterCode { get; set; }
+        /// <summary>
+        /// 编码
+        /// </summary>
+        public string? Code { get; set; }
+        /// <summary>
+        /// 项目所属公司 id
+        /// </summary>
+        public Guid? CompanyId { get; set; }
+        /// <summary>
+        /// 项目所属项目部 id
+        /// </summary>
+        public Guid? ProjectDept { get; set; }
+        /// <summary>
+        /// 项目状态 id
+        /// </summary>
+        public Guid? StatusId { get; set; }
+        /// <summary>
+        /// 项目类型 id
+        /// </summary>
+        public Guid? TypeId { get; set; }
+        /// <summary>
+        /// 工况级数 id
+        /// </summary>
+        public string? ConditionGradeId { get; set; }
+        /// <summary>
+        /// 项目规模Id
+        /// </summary>
+        public Guid? GradeId { get; set; }
+        /// <summary>
+        /// 币种 id
+        /// </summary>
+        public Guid? CurrencyId { get; set; }
+        /// <summary>
+        /// 施工地点 id
+        /// </summary>
+        public Guid? AreaId { get; set; }
+
+        /// <summary>
+        /// 施工区域 id
+        /// </summary>
+        public Guid? RegionId { get; set; }
+        /// <summary>
+        /// 项目合同金额
+        /// </summary>
+        public decimal? Amount { get; set; }
+        /// <summary>
+        /// 有效合同额
+        /// </summary>
+        public decimal? ECAmount { get; set; }
+        /// <summary>
+        /// 合同约定的计量支付比例(%)
+        /// </summary>
+        public decimal ContractMeaPayProp { get; set; }
+        /// <summary>
+        /// 税率
+        /// </summary>
+        public decimal? Rate { get; set; }
+        /// <summary>
+        /// 汇率
+        /// </summary>
+        public decimal? ExchangeRate { get; set; }
+        /// <summary>
+        /// 项目施工资质Id
+        /// </summary>
+        public Guid? ProjectConstructionQualificationId { get; set; }
+        /// <summary>
+        /// 项目部地址
+        /// </summary>
+        public string? ProjectDeptAddress { get; set; }
+        /// <summary>
+        /// 合同工程量
+        /// </summary>
+        public decimal? Quantity { get; set; }
+        /// <summary>
+        ///对合同工程量说明
+        /// </summary>
+        public string? QuantityRemarks { get; set; }
+        /// <summary>
+        /// 竣工日期
+        /// </summary>
+        public string? CompletionDate { get; set; }
+        /// <summary>
+        /// 项目所在地点经度
+        /// </summary>
+        public decimal? Longitude { get; set; }
+        /// <summary>
+        /// 项目所在地点维度
+        /// </summary>
+        public decimal? Latitude { get; set; }
+        /// <summary>
+        /// 传统、新兴工程类别标签（0：传统；1：新兴）
+        /// </summary>
+        public int Tag { get; set; }
+
+        /// <summary>
+        /// 现汇、投资工程类别标签（0：现汇；1：投资）
+        /// </summary>
+        public int Tag2 { get; set; }
+        /// <summary>
+        /// 修改项目是否状态发生改变   0 不发生  1发生
+        /// </summary>
+        public int IsChangeStatus { get; set; }
+
+        /// <summary>
+        /// 修改项目是否状态发生改变   记录改变状态的时间
+        /// </summary>
+        public DateTime IsChangeStatusTime { get; set; }
+
+        /// <summary>
+        /// 项目类别 0 境内  1 境外
+        /// </summary>
+        public int Category { get; set; }
+        /// <summary>
+        /// 是否完成编制
+        /// </summary>
+        public bool IsStrength { get; set; }
+        /// <summary>
+        /// 完工工程量
+        /// </summary>
+        public decimal? CompleteQuantity { get; set; }
+        /// <summary>
+        ///  完工产值
+        /// </summary>
+        public decimal? CompleteOutput { get; set; }
+
+        /// <summary>
+        /// 标后预算毛利率
+        /// </summary>
+        public decimal? BudgetInterestRate { get; set; }
+
+        /// <summary>
+        /// 计划完成编制时间
+        /// </summary>
+        public DateTime? CompilationTime { get; set; }
+
+        /// <summary>
+        /// 未编制标后预算原因
+        /// </summary>
+        public string? BudgetaryReasons { get; set; }
+        /// <summary>
+        /// 行业分类标准
+        /// </summary>
+        public string? ClassifyStandard { get; set; }
+        /// <summary>
+        /// 具有特殊社会效应
+        /// </summary>
+        public bool SocietySpecEffect { get; set; }
+        /// <summary>
+        /// 疏浚吹填面积(万方)
+        /// </summary>
+        public decimal ReclamationArea { get; set; }
+        /// <summary>
+        /// 管理员人数(人)
+        /// </summary>
+        public int Administrator { get; set; }
+        /// <summary>
+        /// 施工人数(人)
+        /// </summary>
+        public int Constructor { get; set; }
+        /// <summary>
+        /// 报表负责人
+        /// </summary>
+        public string? ReportFormer { get; set; }
+        /// <summary>
+        /// 报表负责人联系方式
+        /// </summary>
+        public string? ReportForMertel { get; set; }
+        /// <summary>
+        /// 项目描述
+        /// </summary>
+        public string? Remarks { get; set; }
+        /// <summary>
+        /// 主数据项目Id
+        /// </summary>
+        public Guid? MasterProjectId { get; set; }
+
+        /// <summary>
+        /// 是否是重点项目 0 否 1 是
+        /// </summary>
+        public int? IsMajor { get; set; }
+
+        /// <summary>
+        /// 开工时间
+        /// </summary>	
+        public DateTime? CommencementTime { get; set; }
+
+        /// <summary>
+        /// 完工日期
+        /// </summary>
+        public DateTime? CompletionTime { get; set; }
+
+        /// <summary>
+        /// 项目合同工期(开始)
+        /// </summary>
+        public DateTime? StartContractDuration { get; set; }
+
+        /// <summary>
+        /// 项目合同工期(结束)
+        /// </summary>
+        public DateTime? EndContractDuration { get; set; }
+        /// <summary>
+        /// 工程位置
+        /// </summary>
+        public string? ProjectLocation { get; set; }
+        /// <summary>
+        /// 中标日期
+        /// </summary>
+        public DateTime? BidWinningDate { get; set; }
+        /// <summary>
+        /// 停工日期
+        /// </summary>
+        public DateTime? ShutdownDate { get; set; }
+        /// <summary>
+        /// 工期信息
+        /// </summary>
+        public string? DurationInformation { get; set; }
+        /// <summary>
+        /// 停工原因
+        /// </summary>
+        public string? ShutDownReason { get; set; }
+        /// <summary>
+        /// 合同变更原因
+        /// </summary>
+        public string? ContractChangeInfo { get; set; }
+        /// <summary>
+        /// 工期默认给1
+        /// </summary>
+        public int WorkDay { get; set; }
+
+        /// <summary>
+        /// 合同约定开工日期
+        /// </summary>
+        public DateTime? ContractStipulationStartDate { get; set; }
+        /// <summary>
+        /// 合同约定完工日期
+        /// </summary>
+        public DateTime? ContractStipulationEndDate { get; set; }
+        /// <summary>
+        /// 合同签约日期
+        /// </summary>
+        public DateTime? ContractSignDate { get; set; }
+
+        /// <summary>
+        /// 分包项目得上级得主数据编码
+        /// </summary>
+        public string? PProjectMasterCode { get; set; }
+        /// <summary>
+        /// 是否时分包项目
+        /// </summary>
+        public int IsSubContractProject { get; set; }
+        /// <summary>
+        /// 项目管理类型
+        /// </summary>
+        public string? ManagerType { get; set; }
     }
 }

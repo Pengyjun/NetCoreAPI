@@ -263,6 +263,23 @@ namespace GHMonitoringCenterApi.Application.Contracts.IService
 
         Task<CompanyDayProductionValueResponseDto> SearchCompanyProductionValueAsync(BaseExternalRequestDto baseExternalRequest);
 
+        /// <summary>
+        /// 获取在建、在建（短暂性停工）、在建（间歇性停工）、中标已签 四种状态的项目信息
+        /// </summary>
+        /// <returns></returns>
+        Task<ResponseAjaxResult<List<GHMonitoringCenterApi.Domain.Models.Project>>> GetConstructionProjectAsync();
+
+        /// <summary>
+        /// 获取在建、在建（短暂性停工）、在建（间歇性停工）、中标已签 四种状态的项目经理
+        /// </summary>
+        /// <returns></returns>
+        Task<ResponseAjaxResult<List<ProjectLeaderInfo>>> GetConstructionProjectLeaderAsync();
+
+        /// <summary>
+        /// 获取船舶关联的项目
+        /// </summary>
+        /// <returns></returns>
+        Task<ResponseAjaxResult<List<ShipMovementProject>>> GetShipProjectAsync();
         #endregion
     }
 }
