@@ -553,9 +553,12 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             var managerType = await dbContext.Queryable<ProjectMangerType>().Where(x => x.IsDelete == 1).ToListAsync();
             foreach (var item in projectList)
             {
-                var ids = item.ManagerType.Split(",").ToList();
-                var res = managerType.Where(x => ids.Contains(x.Code)).Select(x => x.Name).ToList();
-                item.ManagerTypeName = string.Join(",", res);
+                if (!string.IsNullOrWhiteSpace(item.ManagerType))
+                {
+                    var ids = item.ManagerType.Split(",").ToList();
+                    var res = managerType.Where(x => ids.Contains(x.Code)).Select(x => x.Name).ToList();
+                    item.ManagerTypeName = string.Join(",", res);
+                }
                 item.ProjectDept = institution.Where(x => x.PomId == item.ProjectDeptId).Select(x => x.Name).FirstOrDefault();
             }
             #region 获取所有类型的id
@@ -609,7 +612,6 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             //获取行业分类标准
             var classifyStandardList = await dbContext.Queryable<IndustryClassification>().Where(x => x.IsDelete == 1).ToListAsync();
             #endregion
-
             foreach (var item in projectList)
             {
                 item.CategoryName = item.Category == 0 ? "境内" : "境外";
@@ -632,17 +634,21 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     : item.Amount : item.Amount;
                 item.ConditiongradeName = conditiongradeList.FirstOrDefault(x => x.PomId.ToString() == item.ConditiongradeName)?.Remarks;
                 item.GradeName = gradeList.FirstOrDefault(x => x.PomId.ToString() == item.GradeName)?.Name;
-                item.ProvinceName = await baseService.GetProvince(provinceList, item.AreaName.ToGuid());
-                item.AreaName = await baseService.GetProvincemarket(provinceList, item.AreaName.ToGuid());
+                Guid? areaName = string.IsNullOrWhiteSpace(item.AreaName) ? null : item.AreaName.ToGuid();
+                item.ProvinceName = await baseService.GetProvince(provinceList, areaName);
+                item.AreaName = await baseService.GetProvincemarket(provinceList, areaName);
                 //item.AreaName = areaList.FirstOrDefault(x => x.PomId.ToString() == item.AreaName)?.Zaddvsname;
                 item.RegionName = regionList.FirstOrDefault(x => x.AreaId.ToString() == item.RegionName)?.Name;
                 item.ProjectConstructionQualification = projectConstructionQualificationList.FirstOrDefault(x => x.PomId.ToString() == item.ProjectConstructionQualification)?.Name;
-                var classifyArray = item.ClassifyStandardId.Split(',');
-                foreach (var item2 in classifyArray)
+                var classifyArray = item.ClassifyStandardId?.Split(',');
+                if (classifyArray != null)
                 {
-                    if (!string.IsNullOrWhiteSpace(classifyStandardList.FirstOrDefault(x => x.PomId.ToString() == item2)?.Name))
+                    foreach (var item2 in classifyArray)
                     {
-                        item.ClassifyStandard += classifyStandardList.FirstOrDefault(x => x.PomId.ToString() == item2)?.Name + "/";
+                        if (!string.IsNullOrWhiteSpace(classifyStandardList.FirstOrDefault(x => x.PomId.ToString() == item2)?.Name))
+                        {
+                            item.ClassifyStandard += classifyStandardList.FirstOrDefault(x => x.PomId.ToString() == item2)?.Name + "/";
+                        }
                     }
                 }
                 if (!string.IsNullOrWhiteSpace(item.ClassifyStandard))
@@ -2968,11 +2974,11 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
         }
 
         /// <summary>
-		/// 保存项目产值计划
-		/// </summary>
-		/// <param name="projectPlanRequestDto"></param>
-		/// <returns></returns>
-		/// <exception cref="NotImplementedException"></exception>
+        /// 保存项目产值计划
+        /// </summary>
+        /// <param name="projectPlanRequestDto"></param>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
         public async Task<ResponseAjaxResult<bool>> SaveProjectPlanAsync(SaveProjectPlanRequestDto projectPlanRequestDto)
         {
             ResponseAjaxResult<bool> responseAjaxResult = new ResponseAjaxResult<bool>();
@@ -4136,7 +4142,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     {
 
                         accumulatedOutputValue = monthReport24.Where(x => x.ProjectId == pp.Id).Sum(x => Convert.ToDecimal(x.ActualCompAmount));//开累
-                        //202306历史产值追加
+                                                                                                                                                //202306历史产值追加
                         accumulatedOutputValue += monthReport.Where(x => x.ProjectId == pp.Id && x.DateMonth == 202306).Sum(x => Convert.ToDecimal(x.ActualCompAmount));
                     }
                     else
@@ -4145,7 +4151,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                         var currencyConvert = await dbContext.Queryable<CurrencyConverter>().Where(t => t.IsDelete == 1 && t.CurrencyId == pp.CurrencyId.ToString()).OrderByDescending(x => x.Year).FirstAsync();
                         pp.ECAmount = pp.ECAmount * currencyConvert.ExchangeRate;
                         accumulatedOutputValue = monthReport24.Where(x => x.ProjectId == pp.Id).Sum(x => Convert.ToDecimal(x.RMBHValue));//开累
-                        //202306历史产值追加
+                                                                                                                                         //202306历史产值追加
                         accumulatedOutputValue += monthReport.Where(x => x.ProjectId == pp.Id && x.DateMonth == 202306).Sum(x => Convert.ToDecimal(x.RMBHValue));
                     }
                     //截止到当月的完成产值+历史调整开累产值=开累产值
