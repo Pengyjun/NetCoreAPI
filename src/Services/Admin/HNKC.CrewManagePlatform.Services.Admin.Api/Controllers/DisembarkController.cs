@@ -52,6 +52,18 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api.Controllers
         }
 
         /// <summary>
+        /// 查询离船申请单详情
+        /// </summary>
+        /// <param name="applyCode"></param>
+        /// <returns></returns>
+        [HttpGet("DepartureApplyDetail")]
+        public async Task<IActionResult> DepartureApplyDetail(Guid applyCode)
+        {
+            var data = await _disembarkService.DepartureApplyDetail(applyCode);
+            return Ok(data);
+        }
+
+        /// <summary>
         /// 提交离船申请
         /// </summary>
         /// <param name="requestBody"></param>

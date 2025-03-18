@@ -40,7 +40,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
             if (roleType == -1) { return new PageResult<SearchCrewArchivesResponse>(); }
 
             #region 船员关联
-            //任职船舶 
+            //任职船舶
             var crewWorkShip = _dbContext.Queryable<WorkShip>()
               .GroupBy(u => u.WorkShipId)
               .Select(t => new { t.WorkShipId, WorkShipEndTime = SqlFunc.AggregateMax(t.WorkShipEndTime) });
@@ -167,7 +167,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                 var sctab = await _dbContext.Queryable<SkillCertificates>().Where(t => t.IsDelete == 1 && uIds.Contains(t.SkillcertificateId)).ToListAsync();
                 //特设证书
                 var spctab = await _dbContext.Queryable<SpecialEquips>().Where(t => t.IsDelete == 1 && uIds.Contains(t.SpecialEquipId)).ToListAsync();
-                //航区 
+                //航区
                 var nArea = await _dbContext.Queryable<NavigationArea>().Where(t => t.IsDelete == 1).ToListAsync();
 
                 //名称赋值
@@ -947,7 +947,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                     {
                         return Result.Fail("手机号错误");
                     }
-                    #region 
+                    #region
                     userInfo.BuildAddress = requestBody.BaseInfoDto.BuildAddress;
                     userInfo.CardId = requestBody.BaseInfoDto.CardId;
                     userInfo.WorkNumber = requestBody.BaseInfoDto.WorkNumber;
@@ -1069,7 +1069,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                 if (requestBody.CertificateOfCompetencyDto != null)
                 {
                     cocs = await _dbContext.Queryable<CertificateOfCompetency>().Where(t => t.IsDelete == 1 && t.CertificateId == userInfo.BusinessId).ToListAsync();
-                    #region 
+                    #region
 
                     if (requestBody.CertificateOfCompetencyDto.FirstCertificateDto != null && requestBody.CertificateOfCompetencyDto.FirstCertificateDto.Any())
                     {
@@ -1490,7 +1490,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
             }
             return Result.Fail("无船员/该船员已被删除");
         }
-        #endregion  
+        #endregion
         /// <summary>
         /// 保存备注
         /// </summary>
@@ -2896,15 +2896,28 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                 .InnerJoin(crewWorkShip, (x, y) => x.WorkShipId == y.WorkShipId && x.WorkShipEndTime == y.WorkShipEndTime);
             #endregion
 
+            var departureApplyUser = _dbContext.Queryable<DepartureApplyUser>()
+                .InnerJoin<DepartureApply>( (dau, da) => dau.ApplyCode == da.ApplyCode)
+                .Where((dau,da) => da.ApproveStatus == ApproveStatus.Pass)
+                .GroupBy((dau, da) => new { dau.UserId})
+                .Select((dau, da) => new
+                {
+                    dau.UserId,
+                    HolidayDays = SqlFunc.AggregateSum(SqlFunc.DateDiff(DateType.Day,Convert.ToDateTime(dau.RealDisembarkDate ?? dau.DisembarkDate), Convert.ToDateTime(dau.RealReturnShipDate ?? dau.ReturnShipDate)) + 1)
+                });
+
             var rr = await _dbContext.Queryable<User>()
                 .Where(t1 => t1.IsLoginUser == 1 && t1.IsDelete == 1)
                 .WhereIF(!string.IsNullOrWhiteSpace(requestBody.KeyWords), t1 => t1.Name.Contains(requestBody.KeyWords) || t1.Phone.Contains(requestBody.KeyWords) || t1.WorkNumber.Contains(requestBody.KeyWords) || t1.CardId.Contains(requestBody.KeyWords))
-                .InnerJoin(wShip, (t1, t5) => t1.BusinessId == t5.WorkShipId)
-                .InnerJoin<OwnerShip>((t1, t5, t3) => t5.OnShip == t3.BusinessId.ToString())
-                .WhereIF(roleType == 3, (t1, t5, t3) => GlobalCurrentUser.UserBusinessId.ToString() == t5.OnShip)
-                .WhereIF(!string.IsNullOrWhiteSpace(requestBody.StartTime.ToString()), (t1, t5, t3) => t5.WorkShipStartTime >= requestBody.StartTime && t5.WorkShipStartTime <= requestBody.EndTime)
-                .WhereIF(requestBody.BoardingDays != 0, (t1, t5, t3) => SqlFunc.DateDiff(DateType.Day, Convert.ToDateTime(t5.WorkShipStartTime), DateTime.Now) + 1 >= requestBody.BoardingDays)//在船天数  
-                .Select((t1, t5, t3) => new SearchCrewDynamics
+                .LeftJoin(departureApplyUser,(t1,dau)=>t1.BusinessId == dau.UserId)
+                .InnerJoin(wShip, (t1,dau, t5) => t1.BusinessId == t5.WorkShipId)
+                .InnerJoin<OwnerShip>((t1,dau, t5, t3) => t5.OnShip == t3.BusinessId.ToString())
+                .WhereIF(roleType == 3, (t1,dau, t5, t3) => GlobalCurrentUser.UserBusinessId.ToString() == t5.OnShip)
+                .WhereIF(!string.IsNullOrWhiteSpace(requestBody.StartTime.ToString()), (t1,dau, t5, t3) => t5.WorkShipStartTime >= requestBody.StartTime && t5.WorkShipStartTime <= requestBody.EndTime)
+                .WhereIF(string.IsNullOrWhiteSpace(requestBody.StartTime.ToString()), (t1,dau, t5, t3) => t5.WorkShipStartTime.Year == DateTime.Now.Year)
+                .WhereIF(requestBody.BoardingDays != 0, (t1,dau, t5, t3) => SqlFunc.DateDiff(DateType.Day, Convert.ToDateTime(t5.WorkShipStartTime), DateTime.Now) + 1 >= requestBody.BoardingDays)//在船天数
+                .WhereIF(requestBody.HolidayDays != 0,(t1,dau, t5, t3)=>dau.HolidayDays >= requestBody.HolidayDays)
+                .Select((t1,dau, t5, t3) => new SearchCrewDynamics
                 {
                     BId = t1.BusinessId.ToString(),
                     Country = t3.Country,
@@ -2916,6 +2929,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                     BoardingTime = t5.WorkShipStartTime,
                     DisembarkTime = t5.WorkShipEndTime,
                     CardId = t1.CardId,
+                    HolidayDays = dau.HolidayDays,
                     OnBoardDays = SqlFunc.DateDiff(DateType.Day, Convert.ToDateTime(t5.WorkShipStartTime), DateTime.Now)
                 })
                 .ToPageListAsync(requestBody.PageIndex, requestBody.PageSize, total);
@@ -2936,8 +2950,12 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
             var countryTable = await _dbContext.Queryable<CountryRegion>().Where(t => rr.Select(x => x.Country).Contains(t.BusinessId)).ToListAsync();
             //上下船次数
             var bids = rr.Select(y => y.BId).ToList();
-            var disembark = await _dbContext.Queryable<DepartureApplication>()
+            /*var disembark = await _dbContext.Queryable<DepartureApplication>()
                 .Where(x => x.IsDelete == 1 && x.ApproveStatus == ApproveStatus.PExamination && bids.Contains(x.UserId.ToString()))
+                .ToListAsync();*/
+            var disembark = await _dbContext.Queryable<DepartureApplyUser>()
+                .InnerJoin<DepartureApply>((dau, da) => dau.ApplyCode == da.ApplyCode)
+                .Where((dau, da) => dau.IsDelete == 1 && da.ApproveStatus == ApproveStatus.Pass && bids.Contains(dau.UserId.ToString()))
                 .ToListAsync();
             foreach (var u in rr)
             {
@@ -2948,9 +2966,9 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                 var db = disembark.Where(x => x.UserId.ToString() == u.BId).ToList();
                 u.BoardingNums = db.Count();
                 u.DisembarkNums = u.BoardingNums == 0 ? 0 : u.BoardingNums - 1;
-                var dk = disembark.Where(x => x.UserId.ToString() == u.BId).OrderByDescending(x => x.RealDisembarkTime).FirstOrDefault();
+                /*var dk = disembark.Where(x => x.UserId.ToString() == u.BId).OrderByDescending(x => x.RealDisembarkTime).FirstOrDefault();
                 if (dk != null && dk.RealDisembarkTime != null && dk.RealReturnShipTime != null)
-                    u.HolidayDays = TimeHelper.GetTimeSpan(dk.RealDisembarkTime.Value, dk.RealReturnShipTime.Value).Days + 1;
+                    u.HolidayDays = TimeHelper.GetTimeSpan(dk.RealDisembarkTime.Value, dk.RealReturnShipTime.Value).Days + 1;*/
                 u.OnStatus = EnumUtil.GetDescription(_baseService.ShipUserStatus(u.BoardingTime, u.DeleteResonEnum, u.DisembarkTime));
             }
 
