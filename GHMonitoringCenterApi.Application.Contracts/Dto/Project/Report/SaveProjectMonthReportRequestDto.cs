@@ -24,23 +24,23 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project.Report
             {
                 yield return new ValidationResult("项目Id不存在", new string[] { nameof(ProjectId) });
             }
-            if (PartyAConfirmedProductionAmount == null || PartyAConfirmedProductionAmount < 0)
+            if (PartyAConfirmedProductionAmount == null )
             {
                 yield return new ValidationResult("本月甲方确认产值不能为空或小于0", new string[] { nameof(PartyAConfirmedProductionAmount) });
             }
-            if (PartyAPayAmount == null || PartyAPayAmount < 0)
+            if (PartyAPayAmount == null )
             {
                 yield return new ValidationResult("本月甲方确认产值不能为空或小于0", new string[] { nameof(PartyAPayAmount) });
             }
-            if (ReceivableAmount == null && ReceivableAmount < 0)
+            if (ReceivableAmount == null)
             {
                 yield return new ValidationResult("本月应收金额不能为空或小于0", new string[] { nameof(ReceivableAmount) });
             }
-            if (CostAmount == null && CostAmount < 0)
+            if (CostAmount == null )
             {
                 yield return new ValidationResult("本月实际成本不能为空或小于0", new string[] { nameof(CostAmount) });
             }
-            if (ReceivableAmount == null && ReceivableAmount < 0)
+            if (ReceivableAmount == null )
             {
                 yield return new ValidationResult("本月应收金额不能为空或小于0", new string[] { nameof(ReceivableAmount) });
             }

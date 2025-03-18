@@ -190,6 +190,11 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.JjtSendMsg
     public class CompanyProjectBasePoduction
     {
         /// <summary>
+        /// 相比较昨天增减多少 
+        /// </summary>
+        public int Numner { get; set; }
+        public Guid? CompanyId { get; set; }
+        /// <summary>
         /// 项目名称
         /// </summary>
         public string Name { get; set; }
@@ -236,6 +241,10 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.JjtSendMsg
     /// </summary>
     public class CompanyBasePoductionValue
     {
+        /// <summary>
+        /// 图标标识   1是上升  0是下降   -1  不显示
+        /// </summary>
+        public int Icon { get; set; } = -1;
         /// <summary>
         ///  公司当日完成产值 单位元
         /// </summary>
@@ -728,6 +737,7 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.JjtSendMsg
     #endregion 按天统计重点项目预警值
     public class ImpProjectWarning
     {
+        public Guid Id { get; set; }
         /// <summary>
         /// 当日完成产值
         /// </summary>

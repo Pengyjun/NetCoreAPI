@@ -13,6 +13,7 @@ using GHMonitoringCenterApi.Application.Contracts.Dto.Project.ExcelImport;
 using GHMonitoringCenterApi.Application.Contracts.Dto.Project.MonthReportForProject;
 using GHMonitoringCenterApi.Application.Contracts.Dto.Project.Report;
 using GHMonitoringCenterApi.Application.Contracts.Dto.Project.ShipMovements;
+using GHMonitoringCenterApi.Application.Contracts.Dto.ProjectAdjustMonthReport;
 using GHMonitoringCenterApi.Application.Contracts.Dto.ProjectPlanProduction;
 using GHMonitoringCenterApi.Application.Contracts.Dto.ProjectYearPlan;
 using GHMonitoringCenterApi.Application.Contracts.Dto.Push;
@@ -23,6 +24,7 @@ using GHMonitoringCenterApi.Application.Contracts.Dto.ShipSurvey;
 using GHMonitoringCenterApi.Application.Contracts.Dto.Timing;
 using GHMonitoringCenterApi.Application.Contracts.Dto.Upload;
 using GHMonitoringCenterApi.Domain.Models;
+using GHMonitoringCenterApi.Domain.Shared.Util;
 using static GHMonitoringCenterApi.Application.Contracts.Dto.Project.Report.ProjectMonthReportResponseDto;
 
 namespace GHMonitoringCenterApi.Application.Contracts.AutoMapper
@@ -281,6 +283,7 @@ namespace GHMonitoringCenterApi.Application.Contracts.AutoMapper
             mapperConfigurationExpression.CreateMap<RecordPushDayReportResponseDto, RecordPushDayReport>();
 
             mapperConfigurationExpression.CreateMap<BaseLinePlanAncomparisonResponseDto, BaseLinePlanAncomparison>();
+            mapperConfigurationExpression.CreateMap<ProjectAdjustProductionValueResponseDto, ProjectAdjustProductionValueDetails>();
 
             mapperConfigurationExpression.CreateMap<SaveBaseLinePlanApproverRequestDto, BaseLinePlanApprover>();
 

@@ -3169,6 +3169,9 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
             #endregion
 
             #region 共用数据
+            //昨天数据查询
+            var day = DateTime.Now.AddDays(-2).ToDateDay();
+            var yesterDayData = await dbContext.Queryable<RecordPushDayReport>().Where(x => x.IsDelete == 1 && x.DateDay == day).OrderByDescending(x => x.CreateTime).Select(x=>x.Json).FirstAsync();
             //基础数据
             var commonDataList = await dbContext.CopyNew().Queryable<ProductionMonitoringOperationDayReport>().Where(x => x.IsDelete == 1 && !SqlFunc.IsNullOrEmpty(x.Name)).ToListAsync();
 
@@ -3255,10 +3258,17 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
             var productionBaseInfo = commonDataList.Where(x => x.Type == 1).OrderBy(x => x.Sort).ToList();
             CompanyProjectBasePoduction companyBasePoductionValue = null;
             List<CompanyProjectBasePoduction> companyBasePoductionValues = new List<CompanyProjectBasePoduction>();
+
+            #region 昨天的数据
+            //序列化昨天的数据
+            var res = JsonHelper.FromJson<JjtSendMessageMonitoringDayReportResponseDto>(yesterDayData);
+            //昨天公司各个产值信息
+            var yeaterDayProject = res.projectBasePoduction.CompanyProjectBasePoductions;
+            //昨天公司各个产值信息
+            var yeaterDayCompany = res.projectBasePoduction.CompanyBasePoductionValues;
+            #endregion
             foreach (var production in productionBaseInfo)
             {
-
-
                 var companyProjectId = projectList.Where(x => x.CompanyId == production.ItemId)
                     .WhereIF(!isCalcSub, x => x.IsSubContractProject != 2).Select(x => x.Id).ToList();
                 if (production.Collect == 1)
@@ -3278,12 +3288,15 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
                 else
                 {
 
+
                     //排除掉今天改成在建项目状态的
                     var noDayBuildProjectCount = projectList.Where(x => x.StatusId == buildProjectId && x.CompanyId == production.ItemId && x.IsChangeStatus == 1 && x.IsChangeStatusTime >= startDayTime.ObjToDate() && x.IsChangeStatusTime <= endDayTime.ObjToDate()).Select(x => x.Id).Count();
                     //在建的数量 排除掉今天改成在建项目状态的
                     var toDayProCount = (projectList.Count(x => x.CompanyId == production.ItemId && buildProjectId == x.StatusId.Value) - noDayBuildProjectCount);
-
                     toDayProCount = (toDayProCount - noDayBuildProjectCount) < 0 ? 0 : toDayProCount;
+
+                    
+
                     companyBasePoductionValue = new CompanyProjectBasePoduction();
                     companyBasePoductionValue.Name = production.Name;
                     companyBasePoductionValue.OnContractProjectCount = projectList.Count(x => x.CompanyId == production.ItemId && contractProjectStatusIds.Contains(x.StatusId.Value));
@@ -3294,6 +3307,9 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
                     companyBasePoductionValue.WorkerCount = dayYearList.Where(x => x.DateDay == dayTime && companyProjectId.Contains(x.ProjectId)).Sum(x => x.SiteConstructionPersonNum);
                     companyBasePoductionValue.RiskWorkCount = dayYearList.Where(x => x.DateDay == dayTime && companyProjectId.Contains(x.ProjectId)).Sum(x => x.HazardousConstructionNum);
                     companyBasePoductionValue.NotWorkCount = projectList.Count(x => x.CompanyId == production.ItemId && notWorkIds.Contains(x.StatusId.Value));
+                    companyBasePoductionValue.CompanyId = production.ItemId;
+                    var onProjectCount= yeaterDayProject.Where(x => x.CompanyId== production.ItemId).Select(x=>x.OnBuildProjectCount).FirstOrDefault();
+                    companyBasePoductionValue.Numner = 0;// toDayProCount - onProjectCount;
                     companyBasePoductionValues.Add(companyBasePoductionValue);
                 }
             }
@@ -3308,6 +3324,8 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
             var yearTotalProductionValue = 0M;
             //广航局每天产值
             var dayTotalProductionValue = 0M;
+
+
             foreach (var companyProduction in productionBaseInfo)
             {
                 #region 计算调差产值
@@ -3341,24 +3359,40 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
                          .Sum(x => x.DayActualProductionAmount);
                     //各个公司每天日报产值数
                     var dayProducitionValue = Math.Round((dayYearList.Where(x => companyProjectId.Contains(x.ProjectId) && x.DateDay == dayTime).Sum(x => x.DayActualProductionAmount) + diffValue), 2);
+
+                    
                     //各个公司本年累计数
                     var totalProductionValue = isDayCalc ? Math.Round(monthYearList.Where(x => companyProjectId.Contains(x.ProjectId)).Sum(x => x.CompleteProductionAmount) + companyMonthDayProduction / baseConst, 2) : companyMonthDayProduction;
                     if (companyProduction.ItemId == "3c5b138b-601a-442a-9519-2508ec1c1eb2".ToGuid())
                     {
                         totalProductionValue = totalProductionValue - 3000000;
                     }
-                    companyBasePoductions.Add(new CompanyBasePoductionValue()
+                    var obj = new CompanyBasePoductionValue()
                     {
                         Name = companyProduction.Name,
                         DayProductionValue = Math.Round(dayProducitionValue / baseWanConst, 2),
                         TotalYearProductionValue = Math.Round(totalProductionValue / baseConst, 2),
                         CompanyId = companyProduction.ItemId,
+                    };
+                    //昨天日产值
+                   var yeaterDayProducution= yeaterDayCompany.Where(x => x.CompanyId == companyProduction.ItemId).Select(x => x.DayProductionValue).FirstOrDefault();
+                    if (Math.Round(obj.DayProductionValue, 2) > yeaterDayProducution * 1.05M)
+                    {
+                        obj.Icon = 1;
+                    } else if (Math.Round(obj.DayProductionValue , 2) < yeaterDayProducution * 0.95M)
+                    {
+                        obj.Icon = 0;
+                    }
+                    else if (yeaterDayProducution*0.95M < Math.Round(obj.DayProductionValue, 2)&&
+                        Math.Round(obj.DayProductionValue, 2) < Math.Round(yeaterDayProducution * 1.05M, 2))
+                    {
+                        obj.Icon = -1;
+                    }
 
-                    });
+                    companyBasePoductions.Add(obj);
                 }
 
             }
-
             //计算年度产值占比
             foreach (var calcProduction in companyBasePoductions)
             {
@@ -3417,57 +3451,65 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
             #endregion
 
             #region 产值异常情况说明
+           
 
-            //控制是否显示的设置
-            var projectOpen = await dbContext.CopyNew().Queryable<ProjectOpen>().Where(x => x.IsDelete == 1 && x.DateDay == dayTime).ToListAsync();
-            //检查当天查询异常的项目
-            var expreProject = dayYearList.Where(x => x.DateDay == dayTime && x.IsLow == 0).ToList();
-            List<ImpProjectWarning> expProjects = new List<ImpProjectWarning>();
-            List<ProjectOpen> projectOpens = new List<ProjectOpen>();
-            foreach (var exprePro in expreProject)
-            {
-                //项目名称
-                var proName = projectList.Where(x => x.Id == exprePro.ProjectId).FirstOrDefault();
-                var proOpen = projectOpen.Where(x => x.ProjectId == exprePro.ProjectId).FirstOrDefault();
-                if (proOpen != null && proOpen.IsShow == 1)
-                {
-                    expProjects.Add(new ImpProjectWarning()
-                    {
-                        Name = proName?.ShortName,
-                        DeviationWarning = exprePro?.DeviationWarning,
-                        DayAmount =Math.Round(exprePro.DayActualProductionAmount/10000M,2),
-                    });
-                }
-                projectOpens.Add(new ProjectOpen()
-                {
-                    IsShow = 1,
-                    Name = proName?.ShortName,
-                    ProjectId = exprePro.ProjectId,
-                    DateDay = dayTime,
-
-                });
-            }
             #region 保存数据库
             try
-            {
-                var checkIds = projectOpens.Select(x => x.ProjectId).ToList();
-                var existProjectIds = await dbContext.CopyNew().Queryable<ProjectOpen>().Where(x => checkIds.Contains(x.ProjectId)).Select(x => x.ProjectId).ToListAsync();
-                var insetObj = projectOpens.Where(x => !existProjectIds.Contains(x.ProjectId)).ToList();
-                if (insetObj.Count > 0)
+            { 
+                //检查当天查询异常的项目
+                var expreProject = dayYearList.Where(x => x.DateDay == dayTime && x.IsLow == 0).ToList();
+                List<ProjectOpen> projectOpens = new();
+                //删除已存在的数据
+                var existProject= await dbContext.CopyNew().Queryable<ProjectOpen>().Where(x =>x.DateDay==dayTime) .ToListAsync();
+                //保存最新的数据
+                foreach (var item in expreProject)
                 {
-                    await dbContext.CopyNew().Insertable<ProjectOpen>(insetObj).ExecuteCommandAsync();
+                    var isShow=existProject.Where(x => x.ProjectId == item.ProjectId).Select(x => x.IsShow).FirstOrDefault();
+                    //项目名称
+                    var proName = projectList.Where(x => x.Id == item.ProjectId).FirstOrDefault();
+                    var obj = new ProjectOpen()
+                    {   DateDay = dayTime,
+                        Id = Guid.NewGuid(),
+                        ProjectId = item.ProjectId,
+                        IsShow = isShow.HasValue?isShow:0,
+                        Name = proName!=null? proName.ShortName:string.Empty,
+                    };
+                    projectOpens.Add(obj);
                 }
-
+                if (existProject.Count > 0)
+                {
+                    await dbContext.CopyNew().Deleteable<ProjectOpen>(existProject).ExecuteCommandAsync();
+                }
+                await dbContext.CopyNew().Insertable<ProjectOpen>(projectOpens).ExecuteCommandAsync();
+                var showIds = projectOpens.Where(x => x.IsShow==1).Select(x=>x.IsShow).ToList();
+                //控制是否显示的设置
+                var projectOpen = await dbContext.CopyNew().Queryable<ProjectOpen>().Where(x => x.IsDelete == 1 && x.DateDay == dayTime && showIds.Contains(x.IsShow)).ToListAsync();
+                List<ImpProjectWarning> expProjects = new();
+                foreach (var item in projectOpen)
+                {
+                   var dayInfo= dayYearList.Where(x => x.ProjectId == item.ProjectId && x.DateDay == dayTime).FirstOrDefault();
+                    if (dayInfo != null)
+                    { 
+                    expProjects.Add(new ImpProjectWarning()
+                    {
+                        Name = item.Name,
+                        Id = item.ProjectId,
+                        IsLow = 0,
+                        DayAmount = Math.Round(dayInfo.DayActualProductionAmount / 10000M, 2),
+                        DeviationWarning = dayInfo.DeviationWarning
+                    });
+                    }
+                }
+                #region 数据组合
+                jjtSendMessageMonitoringDayReportResponseDto.ImpProjectWarning = expProjects;
+                #endregion
             }
             catch (Exception ex)
             {
 
             }
             #endregion
-
-            #region 数据组合
-            jjtSendMessageMonitoringDayReportResponseDto.ImpProjectWarning = expProjects;
-            #endregion
+           
             #endregion
 
             #region 柱形图
@@ -3764,7 +3806,7 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
                     ShipId = top.Key,
                     ShipName = ownerShipList.Where(x => x.PomId == top.Key).Select(x => x.Name).FirstOrDefault(),
                     ShipYearOutput = Math.Round(top.Value / baseConst, 2),
-                    TimePercent = shipTimePercent,
+                    TimePercent = shipTimePercent>100?100: shipTimePercent,
                     ShipDayOutput = shipDayValue.HasValue ? Math.Round(shipDayValue.Value / baseWanConst, 2) : 0,
                     ConstructionDays = onDays,
                     WorkingHours = shipYearHours,

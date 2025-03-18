@@ -523,6 +523,8 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     Sequence = ps.Sequence.Value,
                     CommencementTime = p.CommencementTime.Value.ToString("yyyy-MM-dd"),
                     CompletionTime = p.CompletionTime,
+                     ContractStipulationEndDate=p.ContractStipulationEndDate,
+                      ContractStipulationStartDate=p.ContractStipulationStartDate,
                     StartContractDuration = p.StartContractDuration,
                     EndContractDuration = p.EndContractDuration,
                     ProjectLocation = p.ProjectLocation,
