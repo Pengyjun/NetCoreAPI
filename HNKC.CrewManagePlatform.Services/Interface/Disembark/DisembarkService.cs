@@ -331,6 +331,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Disembark
                 ApproveOpinion = result.ApproveOpinion
             });
 
+            result.ApproveUserName = approveUser?.UserName;
             result.DepartureApplyLogList = departureApplyLogList;
 
             return result;
