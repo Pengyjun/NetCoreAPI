@@ -52,12 +52,12 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Disembark
             #region 船舶相关
 
             //任职船舶
-            var crewWorkShip = _dbContext.Queryable<WorkShip>()
+            /*var crewWorkShip = _dbContext.Queryable<WorkShip>()
                 .GroupBy(u => u.WorkShipId)
                 .Select(t => new { t.WorkShipId, WorkShipEndTime = SqlFunc.AggregateMax(t.WorkShipEndTime) });
             var wShip = _dbContext.Queryable<WorkShip>()
                 .InnerJoin(crewWorkShip,
-                    (x, y) => x.WorkShipId == y.WorkShipId && x.WorkShipEndTime == y.WorkShipEndTime);
+                    (x, y) => x.WorkShipId == y.WorkShipId && x.WorkShipEndTime == y.WorkShipEndTime);*/
 
             #endregion
 
@@ -67,7 +67,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Disembark
             var departureApplyVoList =
                 await _dbContext.Queryable<DepartureApply>()
                     .Where(da => da.IsDelete == 1)
-                    .Where(da => da.UserId == userBusinessId || da.ApproveUserId == userBusinessId)
+                    // .Where(da => da.UserId == userBusinessId || da.ApproveUserId == userBusinessId)
                     .WhereIF(
                         !string.IsNullOrWhiteSpace(query.StartTime.ToString()) &&
                         !string.IsNullOrWhiteSpace(query.EndTime.ToString()),
@@ -79,11 +79,11 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Disembark
                     .WhereIF(!string.IsNullOrEmpty(query.ShipId.ToString()), da => da.ShipId == query.ShipId)
                     .WhereIF(!string.IsNullOrEmpty(query.UserId.ToString()), da => da.UserId == query.UserId)
                     .LeftJoin<User>((da, u) => da.UserId == u.BusinessId)
-                    .LeftJoin(wShip, (da, u, ws) => ws.WorkShipId == da.UserId)
-                    .LeftJoin<OwnerShip>((da, u, ws, ow) => ws.OnShip == ow.BusinessId.ToString())
+                    // .LeftJoin(wShip, (da, u, ws) => ws.WorkShipId == da.UserId)
+                    .LeftJoin<OwnerShip>((da, u,  ow) => da.ShipId == ow.BusinessId)
                     .WhereIF(!string.IsNullOrEmpty(query.UserName),(da, u)=>u.Name.Contains(query.UserName))
                     .OrderBy(da => da.ApproveStatus).OrderBy(da => SqlFunc.Desc(da.ApplyTime))
-                    .Select((da, u, ws, ow) => new DepartureApplyVo
+                    .Select((da, u,  ow) => new DepartureApplyVo
                     {
                         ApplyCode = da.ApplyCode,
                         UserId = da.UserId,
@@ -193,25 +193,13 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Disembark
         /// <exception cref="NotImplementedException"></exception>
         public async Task<DepartureApplyDetailVo> DepartureApplyDetail(Guid applyCode)
         {
-            #region 船舶相关
-
-            //任职船舶
-            var crewWorkShip = _dbContext.Queryable<WorkShip>()
-                .GroupBy(u => u.WorkShipId)
-                .Select(t => new { t.WorkShipId, WorkShipEndTime = SqlFunc.AggregateMax(t.WorkShipEndTime) });
-            var wShip = _dbContext.Queryable<WorkShip>()
-                .InnerJoin(crewWorkShip,
-                    (x, y) => x.WorkShipId == y.WorkShipId && x.WorkShipEndTime == y.WorkShipEndTime);
-
-            #endregion
 
             var result =
                 await _dbContext.Queryable<DepartureApply>()
                     .Where(da => da.IsDelete == 1 && da.ApplyCode == applyCode)
                     .LeftJoin<User>((da, u) => da.UserId == u.BusinessId)
-                    .LeftJoin(wShip, (da, u, ws) => ws.WorkShipId == da.UserId)
-                    .LeftJoin<OwnerShip>((da, u, ws, ow) => ws.OnShip == ow.BusinessId.ToString())
-                    .Select((da, u, ws, ow) => new DepartureApplyDetailVo()
+                    .LeftJoin<OwnerShip>((da, u,  ow) => da.ShipId == ow.BusinessId)
+                    .Select((da, u, ow) => new DepartureApplyDetailVo()
                     {
                         ApplyCode = da.ApplyCode,
                         UserId = da.UserId,
@@ -220,7 +208,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Disembark
                         ShipName = ow.ShipName,
                         Company = ow.Company,
                         Country = ow.Country,
-                        ShipId = ow.BusinessId,
+                        ShipId = da.ShipId,
                         ProjectName = ow.ProjectName,
                         ApproveUserId = da.ApproveUserId,
                         ApproveStatus = da.ApproveStatus,
@@ -246,12 +234,27 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Disembark
                 .FirstAsync();
             result.CompanyName = institution?.Name;
 
+            #region 船舶相关
+
+            //任职船舶
+            var crewWorkShip = _dbContext.Queryable<WorkShip>()
+                .Where(u=>u.OnShip == result.ShipId.ToString())
+                .GroupBy(u => u.WorkShipId)
+                .Select(t => new { t.WorkShipId, WorkShipEndTime = SqlFunc.AggregateMax(t.WorkShipEndTime) });
+            var wShip = _dbContext.Queryable<WorkShip>()
+                .Where(ws=>ws.OnShip == result.ShipId.ToString())
+                .InnerJoin(crewWorkShip,
+                    (x, y) => x.WorkShipId == y.WorkShipId && x.WorkShipEndTime == y.WorkShipEndTime);
+
+            #endregion
+
+
             // 查询离船人员
 
             var departureApplyUserList = await _dbContext.Queryable<DepartureApplyUser>()
                 .Where(dau => dau.IsDelete == 1)
                 .LeftJoin<User>((dau, u) => dau.UserId == u.BusinessId)
-                .LeftJoin(wShip, (dau, u, ws) => ws.WorkShipId == u.BusinessId)
+                .LeftJoin(wShip, (dau, u, ws) => ws.WorkShipId == u.BusinessId  && result.ShipId.ToString() == ws.OnShip)
                 .LeftJoin<PositionOnBoard>((dau, u, ws, po) => po.BusinessId.ToString() == ws.Postition)
                 .LeftJoin<User>((dau, u, ws, po, ru) => ru.BusinessId == dau.ReliefUserId)
                 .Select((dau, u, ws, po, ru) => new DepartureApplyUserVo
@@ -354,10 +357,10 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Disembark
             }
 
             // 判断是否是可审批
-            /*if (departureApply.ApproveUserId != GlobalCurrentUser.UserBusinessId)
+            if (departureApply.ApproveUserId != GlobalCurrentUser.UserBusinessId)
             {
                 return Result.Fail("无权限审批");
-            }*/
+            }
 
             if (departureApply.ApproveStatus != ApproveStatus.PExamination)
             {
@@ -635,9 +638,11 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Disembark
 
             //任职船舶
             var crewWorkShip = _dbContext.Queryable<WorkShip>()
+                .Where(u=>u.OnShip == shipId.ToString())
                 .GroupBy(u => u.WorkShipId)
                 .Select(t => new { t.WorkShipId, WorkShipEndTime = SqlFunc.AggregateMax(t.WorkShipEndTime) });
             var wShip = _dbContext.Queryable<WorkShip>()
+                .Where(ws=>ws.OnShip == shipId.ToString())
                 .InnerJoin(crewWorkShip,
                     (x, y) => x.WorkShipId == y.WorkShipId && x.WorkShipEndTime == y.WorkShipEndTime);
 
@@ -645,7 +650,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Disembark
 
             var userInfos = await _dbContext.Queryable<User>()
                 .Where(t => t.IsLoginUser == 1)
-                .LeftJoin(wShip, (t, ws) => ws.WorkShipId == t.BusinessId && shipId.ToString() == ws.OnShip)
+                .InnerJoin(wShip, (t, ws) => ws.WorkShipId == t.BusinessId && shipId.ToString() == ws.OnShip)
                 .LeftJoin<PositionOnBoard>((t, ws, po) => po.BusinessId.ToString() == ws.Postition)
                 .Select((t, ws, po) => new SchedulingUser
                 {
@@ -679,11 +684,15 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Disembark
                         os.Company
                     }
                 ).FirstAsync();
+            if (company == null)
+            {
+                return Result.Success(Array.Empty<Object>());
+            }
 
             var userInfos = await _dbContext.Queryable<User>()
                 .Where(u => u.IsLoginUser == 0)
-                .LeftJoin<InstitutionRole>((u, ir) => u.BusinessId == ir.UserBusinessId)
-                .LeftJoin<HNKC.CrewManagePlatform.SqlSugars.Models.Role>(
+                .InnerJoin<InstitutionRole>((u, ir) => u.BusinessId == ir.UserBusinessId)
+                .InnerJoin<HNKC.CrewManagePlatform.SqlSugars.Models.Role>(
                     (u, ir, r) => r.BusinessId == ir.RoleBusinessId)
                 .Where((u, ir, r) => r.Type == 4 && ir.InstitutionBusinessId == company.Company && r.IsApprove)
                 .Select((u, ir) => new ApproveUser
