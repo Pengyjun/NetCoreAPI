@@ -390,17 +390,47 @@ namespace HNKC.CrewManagePlatform.Services.Interface.ShipWatch
                 .FirstAsync();
             if (ship != null)
             {
+                //用户信息
+                var userInfo = await _dbContext.Queryable<User>().Where(t => t.IsDelete == 1).ToListAsync();
+                //职务信息
+                var positionInfo = await _dbContext.Queryable<PositionOnBoard>().Where(t => t.IsDelete == 1).ToListAsync();
+                //获取审批通过的离船申请
+                var depApply = await _dbContext.Queryable<DepartureApply>().Where(t => t.IsDelete == 1 && t.ShipId == request.BId && t.ApproveStatus == ApproveStatus.Pass).ToListAsync();
+                var applyCodes = depApply.Select(t => t.ApplyCode).Distinct().ToArray();
+                //获取离船用户的详细信息
+                var depApplyUser = await _dbContext.Queryable<DepartureApplyUser>().Where(t => t.IsDelete == 1 && applyCodes.Contains(t.ApplyCode)).ToListAsync();
                 //获取船舶上的人员总数
                 var crewWorkShip = _dbContext.Queryable<WorkShip>()
                     .Where(t => t.OnShip == request.BId.ToString())
                   .GroupBy(u => u.WorkShipId)
                   .Select(t => new { t.WorkShipId, WorkShipEndTime = SqlFunc.AggregateMax(t.WorkShipEndTime) });
-                var wShip = _dbContext.Queryable<WorkShip>().Where(t => t.OnShip == request.BId.ToString())
-                  .InnerJoin(crewWorkShip, (x, y) => x.WorkShipId == y.WorkShipId && x.WorkShipEndTime == y.WorkShipEndTime);
+                var wShip = await _dbContext.Queryable<WorkShip>().Where(t => t.OnShip == request.BId.ToString())
+                  .InnerJoin(crewWorkShip, (x, y) => x.WorkShipId == y.WorkShipId && x.WorkShipEndTime == y.WorkShipEndTime).ToListAsync();
                 shipDuty.ShipId = ship.BusinessId;
                 shipDuty.ShipName = ship.ShipName;
                 shipDuty.Country = ship.Name;
                 shipDuty.ProjectName = ship.ProjectName;
+                shipDuty.Total = wShip.Count;
+
+                //获取排班信息
+                var crew = await _dbContext.Queryable<CrewRota>().Where(t => t.IsDelete == 1 && t.ShipId == request.BId).ToListAsync();
+                //按版本号倒排 获取前三天最新的甲板部排班人员
+                var deck = crew.Where(t => t.RotaType == RotaEnum.JiaBan).OrderByDescending(t => t.Version).Take(3).ToList();
+                foreach (var item in deck)
+                {
+                    DutyPerson duty = new DutyPerson();
+                    var user1 = userInfo.Where(t => t.BusinessId == item.FLeaderUserId).FirstOrDefault()?.Name;
+                    //获取对应职务
+                    var position = wShip.Where(t => t.WorkShipId == item.FLeaderUserId).FirstOrDefault()?.Postition;
+                    var positionName = positionInfo.Where(t => t.BusinessId.ToString() == position).FirstOrDefault()?.Name;
+                    duty.Person1 = user1 + "（" + positionName + "）";
+                    var user2 = userInfo.Where(t => t.BusinessId == item.SLeaderUserId).FirstOrDefault()?.Name;
+                    //获取对应职务
+                    var position2 = wShip.Where(t => t.WorkShipId == item.SLeaderUserId).FirstOrDefault()?.Postition;
+                    var positionName2 = positionInfo.Where(t => t.BusinessId.ToString() == position2).FirstOrDefault()?.Name;
+                    duty.Person1 = user2 + "（" + positionName2 + "）";
+
+                }
             }
 
 
