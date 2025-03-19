@@ -651,28 +651,23 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Contract
             }
             else
             {
-                return Result.Success("失败");
+                //若无考核 则新增一条考核
+                YearCheck yearCheck = new YearCheck();
+                yearCheck.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
+                yearCheck.BusinessId = GuidUtil.Next();
+                yearCheck.TrainingTime = new DateTime(requestBody.Year, 1, 1);
+                yearCheck.CheckType = requestBody.CheckType;
+                yearCheck.TrainingScan = GuidUtil.Next();
+                yearCheck.TrainingId = GuidUtil.Next();
+                yearCheck.BusinessId = GuidUtil.Next();
+                if (requestBody.Scans != null && requestBody.Scans.Any())
+                {
+                    requestBody.Scans.ForEach(x => x.FileId = yearCheck.TrainingScan);
+                    await _baseService.InsertFileAsync(requestBody.Scans, requestBody.UserId);
+                }
+                await _dbContext.Insertable(yearCheck).ExecuteCommandAsync();
+                return Result.Success("成功");
             }
-            //else
-            //{
-            //    var fileId = GuidUtil.Next();
-            //    var addPromotion = new YearCheck
-            //    {
-            //        Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
-            //        BusinessId = GuidUtil.Next(),
-            //        TrainingScan = fileId,
-            //        CheckType = requestBody.CheckType,
-            //        TrainingId = Guid.Parse(requestBody.Id),
-            //        TrainingTime = DateTime.Now
-            //    };
-            //    if (requestBody.Scans != null && requestBody.Scans.Any())
-            //    {
-            //        requestBody.Scans.ForEach(x => x.FileId = fileId);
-            //        await _baseService.InsertFileAsync(requestBody.Scans, Guid.Parse(requestBody.Id));
-            //    }
-            //    await _dbContext.Insertable(addPromotion).ExecuteCommandAsync();
-            //    return Result.Success("成功");
-            //}
         }
 
         #endregion

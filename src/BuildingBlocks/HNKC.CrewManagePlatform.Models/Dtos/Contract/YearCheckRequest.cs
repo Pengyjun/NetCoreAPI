@@ -32,6 +32,10 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.Contract
         /// </summary>
         public int Year { get; set; }
         /// <summary>
+        /// 用户id
+        /// </summary>
+        public Guid UserId { get; set; }
+        /// <summary>
         /// 考核结果
         /// </summary>
         public CheckEnum CheckType { get; set; }
