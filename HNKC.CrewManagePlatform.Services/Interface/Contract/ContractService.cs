@@ -534,7 +534,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Contract
                 .WhereIF(roleType == 3, (t1, t5, t3) => t5.OnShip == t3.BusinessId.ToString() && GlobalCurrentUser.UserBusinessId.ToString() == t5.OnShip)
                 .LeftJoin<YearCheck>((t1, t5, t3, t6) => t1.BusinessId == t6.TrainingId)
                 .WhereIF(requestBody.CheckStatus == 1, (t1, t5, t3, t6) => t6.CheckType != CheckEnum.Normal)
-                .WhereIF(requestBody.CheckStatus == 2, (t1, t5, t3, t6) => t6.CheckType == CheckEnum.Normal)
+                .WhereIF(requestBody.CheckStatus == 2, (t1, t5, t3, t6) => t6.BusinessId == null)
                 .WhereIF(!string.IsNullOrEmpty(requestBody.Year), (t1, t5, t3, t6) => t6.TrainingTime.Value.Year.ToString() == requestBody.Year)
                 .Select((t1, t5, t3, t6) => new YearCheckSearch
                 {
@@ -547,7 +547,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Contract
                     WorkNumber = t1.WorkNumber,
                     CardId = t1.CardId,
                     Scans = t6.TrainingScan,
-                    CheckYear = t6.TrainingTime.Value.Year.ToString(),
+                    CheckYear = t6.TrainingTime == null ? DateTime.Now.Year.ToString() : t6.TrainingTime.Value.Year.ToString(),
                     CheckType = t6.CheckType,
                     CheckFillRepTime = t6.Created.Value.ToString("yyyy/MM/dd HH:mm:ss"),
                     CheckTypeStatus = t6.CheckType != CheckEnum.Normal ? "已考核" : "未考核",
@@ -595,7 +595,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Contract
                         Url = url + x.Name
                     }).ToList();
                 u.CheckTypeName = EnumUtil.GetDescription(u.CheckType);
-                u.OnStatus = EnumUtil.GetDescription(_baseService.ShipUserStatus(u.WorkShipStartTime, u.DeleteResonEnum, u.WorkShipStartTime));
+                u.OnStatus = EnumUtil.GetDescription(u.DeleteResonEnum); //EnumUtil.GetDescription(_baseService.ShipUserStatus(u.WorkShipStartTime, u.DeleteResonEnum, u.WorkShipStartTime));
                 //u.ContractTypeName = EnumUtil.GetDescription(u.ContractType);
                 u.OnBoardName = ownShipTable.FirstOrDefault(x => x.BusinessId.ToString() == u.OnBoard)?.ShipName;
                 u.CountryName = countryTable.FirstOrDefault(x => x.BusinessId == u.Country)?.Name;
