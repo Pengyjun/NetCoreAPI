@@ -56,13 +56,21 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// </summary>
         public CrewStatusEnum DeleteResonEnum { get; set; }
         /// <summary>
-        /// 最近上船时间
+        /// 最近上船时间 列表展示
         /// </summary>
-        public DateTime BoardingTime { get; set; }
+        public string BoardingTime { get; set; }
         /// <summary>
-        /// 最近下船时间
+        /// 最近下船时间 列表展示
         /// </summary>
-        public DateTime? DisembarkTime { get; set; }
+        public string? DisembarkTime { get; set; }
+        /// <summary>
+        /// 最近上船时间 逻辑应用
+        /// </summary>
+        public DateTime LBoardingTime { get; set; }
+        /// <summary>
+        /// 最近下船时间 逻辑应用
+        /// </summary>
+        public DateTime? LDisembarkTime { get; set; }
         /// <summary>
         /// 在船天数
         /// </summary>
