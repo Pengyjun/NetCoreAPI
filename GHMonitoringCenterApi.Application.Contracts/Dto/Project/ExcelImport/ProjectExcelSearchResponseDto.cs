@@ -32,7 +32,7 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project.ExcelImport
         /// <summary>
         /// 合同约定开工日期
         /// </summary>
-        public DateTime? ContractStipulationStartDate { get; set; }
+        public string? ContractStipulationStartDate { get; set; }
 
         /// <summary>
         /// 所属项目部
