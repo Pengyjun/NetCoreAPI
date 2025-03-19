@@ -294,16 +294,20 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Disembark
                 departureApplyUser.EmergencyContactsPhone = emergencyContactsList.FirstOrDefault(t => t.EmergencyContactId == departureApplyUser.UserId)?.Phone;
             }
 
+
+            var url = AppsettingsHelper.GetValue("UpdateItem:Url");
+
             // 审批节点
             List<Guid?> userIds = new() { result.UserId, result.ApproveUserId };
             var userInfos = await _dbContext.Queryable<User>()
                 .Where(u => userIds.Contains(u.BusinessId))
                 .LeftJoin<Institution>((u, i) => u.Oid == i.Oid)
-                .Select((u, i) => new
+                .LeftJoin<Files>((u,i,f)=>u.CrewPhoto == f.FileId && f.IsDelete == 1)
+                .Select((u,i,f) => new
                 {
                     UserId = u.BusinessId,
                     UserName = u.Name,
-                    Picture = u.Phone,
+                    Picture = !string.IsNullOrWhiteSpace(f.Name)?url+f.Name:f.Name,
                     Oid = i.Oid,
                     DepartmentName = i.ShortName
                 })
@@ -786,7 +790,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Disembark
             var shipProjectInfo = await _dbContext.Queryable<ShipProjectRelation>().Where(t => t.IsDelete == 1 && pageResult.Select(t => t.ShipId).Contains(t.RelationShipId)).ToListAsync();
 
             var shipIds = pageResult.Select(t => t.ShipId.ToString()).Distinct().ToArray();
-            //任职船舶 
+            //任职船舶
             var crewWorkShip = _dbContext.Queryable<WorkShip>()
                 .Where(t => shipIds.Contains(t.OnShip))
               .GroupBy(u => u.WorkShipId)
@@ -828,7 +832,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Disembark
         public async Task<Result> SearchLeavePlanUserAsync(SearchLeavePlanUserRequestDto requestDto)
         {
             #region 任职船舶
-            //任职船舶 
+            //任职船舶
             var crewWorkShip = _dbContext.Queryable<WorkShip>()
                 .WhereIF(requestDto.ShipId != null && requestDto.ShipId.Length > 0, t => requestDto.ShipId.Contains(t.OnShip))
               .GroupBy(u => u.WorkShipId)
@@ -1073,7 +1077,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Disembark
         public async Task<Result> LeaveCheckRuleAsync(LeaveCheckRuleRequestDto requestDto)
         {
             #region 任职船舶
-            //任职船舶 
+            //任职船舶
             var crewWorkShip = _dbContext.Queryable<WorkShip>()
                 .Where(t => t.OnShip == requestDto.ShipId.ToString())
               .GroupBy(u => u.WorkShipId)

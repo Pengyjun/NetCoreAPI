@@ -630,7 +630,12 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Contract
         /// <returns></returns>
         public async Task<Result> SaveYearCheckAsync(SaveYearCheck requestBody)
         {
-            var rt = await _dbContext.Queryable<YearCheck>().Where(t => t.IsDelete == 1 && t.BusinessId.ToString() == requestBody.BId && requestBody.Year == t.TrainingTime.Value.Year).FirstAsync();
+            if (requestBody.BId == Guid.Empty || string.IsNullOrWhiteSpace(requestBody.BId.ToString()))
+            {
+                return Result.Fail("BId不能为空");
+            }
+
+            var rt = await _dbContext.Queryable<YearCheck>().Where(t => t.IsDelete == 1 && t.BusinessId == requestBody.BId && requestBody.Year == t.TrainingTime.Value.Year).FirstAsync();
             if (rt != null)
             {
                 if (requestBody.Scans != null && requestBody.Scans.Any())
@@ -658,7 +663,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Contract
                 yearCheck.TrainingTime = new DateTime(requestBody.Year, 1, 1);
                 yearCheck.CheckType = requestBody.CheckType;
                 yearCheck.TrainingScan = GuidUtil.Next();
-                yearCheck.TrainingId = GuidUtil.Next();
+                yearCheck.TrainingId = requestBody.BId;
                 yearCheck.BusinessId = GuidUtil.Next();
                 if (requestBody.Scans != null && requestBody.Scans.Any())
                 {
