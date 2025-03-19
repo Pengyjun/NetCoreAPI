@@ -1,11 +1,13 @@
 ﻿using HNKC.CrewManagePlatform.Models.CommonResult;
 using HNKC.CrewManagePlatform.Models.Dtos;
+using HNKC.CrewManagePlatform.Models.Dtos.CrewArchives;
 using HNKC.CrewManagePlatform.Models.Dtos.Disembark;
 using HNKC.CrewManagePlatform.Models.Dtos.ShipDuty;
 using HNKC.CrewManagePlatform.Models.Enums;
 using HNKC.CrewManagePlatform.SqlSugars.Models;
 using HNKC.CrewManagePlatform.Utils;
 using SqlSugar;
+using System.ComponentModel;
 
 namespace HNKC.CrewManagePlatform.Services.Interface.ShipWatch
 {
@@ -394,11 +396,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.ShipWatch
                 var userInfo = await _dbContext.Queryable<User>().Where(t => t.IsDelete == 1).ToListAsync();
                 //职务信息
                 var positionInfo = await _dbContext.Queryable<PositionOnBoard>().Where(t => t.IsDelete == 1).ToListAsync();
-                //获取审批通过的离船申请
-                var depApply = await _dbContext.Queryable<DepartureApply>().Where(t => t.IsDelete == 1 && t.ShipId == request.BId && t.ApproveStatus == ApproveStatus.Pass).ToListAsync();
-                var applyCodes = depApply.Select(t => t.ApplyCode).Distinct().ToArray();
-                //获取离船用户的详细信息
-                var depApplyUser = await _dbContext.Queryable<DepartureApplyUser>().Where(t => t.IsDelete == 1 && applyCodes.Contains(t.ApplyCode)).ToListAsync();
+
                 //获取船舶上的人员总数
                 var crewWorkShip = _dbContext.Queryable<WorkShip>()
                     .Where(t => t.OnShip == request.BId.ToString())
@@ -411,32 +409,195 @@ namespace HNKC.CrewManagePlatform.Services.Interface.ShipWatch
                 shipDuty.Country = ship.Name;
                 shipDuty.ProjectName = ship.ProjectName;
                 shipDuty.Total = wShip.Count;
+                //船长
+                LeaderInfo leaderInfo = new LeaderInfo();
+                var wFirst = wShip.FirstOrDefault(t => t.Postition == "93f80b81-cf29-11ef-82f9-ecd68ace58a2");
+                if (wFirst != null)
+                {
+                    leaderInfo.Name = userInfo.FirstOrDefault(t => t.BusinessId == wFirst.WorkShipId)?.Name;
+                    leaderInfo.JobType = positionInfo.FirstOrDefault(t => t.BusinessId.ToString() == wFirst.Postition)?.Name;
+                }
+                //书记
+                LeaderInfo leaderInfo2 = new LeaderInfo();
+                var wFirst2 = wShip.FirstOrDefault(t => t.Postition == "93f8e8f2-cf29-11ef-82f9-ecd68ace58a2");
+                if (wFirst2 != null)
+                {
+                    leaderInfo2.Name = userInfo.FirstOrDefault(t => t.BusinessId == wFirst2.WorkShipId)?.Name;
+                    leaderInfo2.JobType = positionInfo.FirstOrDefault(t => t.BusinessId.ToString() == wFirst2.Postition)?.Name;
+                }
+                //轮机长
+                LeaderInfo leaderInfo3 = new LeaderInfo();
+                var wFirst3 = wShip.FirstOrDefault(t => t.Postition == "93f86f23-cf29-11ef-82f9-ecd68ace58a2");
+                if (wFirst3 != null)
+                {
+                    leaderInfo3.Name = userInfo.FirstOrDefault(t => t.BusinessId == wFirst3.WorkShipId)?.Name;
+                    leaderInfo3.JobType = positionInfo.FirstOrDefault(t => t.BusinessId.ToString() == wFirst3.Postition)?.Name;
+                }
 
+                //获取审批通过的离船申请
+                var depApply = await _dbContext.Queryable<DepartureApply>().Where(t => t.IsDelete == 1 && t.ShipId == request.BId && t.ApproveStatus == ApproveStatus.Pass).ToListAsync();
+                var applyCodes = depApply.Select(t => t.ApplyCode).Distinct().ToArray();
+                var time = DateTime.Now;
+                //获取离船用户的详细信息
+                var depApplyUser = await _dbContext.Queryable<DepartureApplyUser>().Where(t => t.IsDelete == 1 && applyCodes.Contains(t.ApplyCode)).ToListAsync();
+                //查看船员是否有离船申请 并且未归船的 这种类型的船员为休假中的
+                var dutyUser = depApplyUser.Where(t => t.DisembarkDate <= time && t.ReturnShipDate >= time).Select(t => t.UserId).ToList();
+                shipDuty.Holiday = dutyUser.Count;
+                shipDuty.OnDuty = wShip.Count - dutyUser.Count;
                 //获取排班信息
                 var crew = await _dbContext.Queryable<CrewRota>().Where(t => t.IsDelete == 1 && t.ShipId == request.BId).ToListAsync();
-                //按版本号倒排 获取前三天最新的甲板部排班人员
-                var deck = crew.Where(t => t.RotaType == RotaEnum.JiaBan).OrderByDescending(t => t.Version).Take(3).ToList();
-                foreach (var item in deck)
+                List<RotaEnum> rotaEnums = new List<RotaEnum>();
+                rotaEnums.Add(RotaEnum.JiaBan);
+                rotaEnums.Add(RotaEnum.LunJi);
+                foreach (var item in rotaEnums)
                 {
-                    DutyPerson duty = new DutyPerson();
-                    var user1 = userInfo.Where(t => t.BusinessId == item.FLeaderUserId).FirstOrDefault()?.Name;
-                    //获取对应职务
-                    var position = wShip.Where(t => t.WorkShipId == item.FLeaderUserId).FirstOrDefault()?.Postition;
-                    var positionName = positionInfo.Where(t => t.BusinessId.ToString() == position).FirstOrDefault()?.Name;
-                    duty.Person1 = user1 + "（" + positionName + "）";
-                    var user2 = userInfo.Where(t => t.BusinessId == item.SLeaderUserId).FirstOrDefault()?.Name;
-                    //获取对应职务
-                    var position2 = wShip.Where(t => t.WorkShipId == item.SLeaderUserId).FirstOrDefault()?.Postition;
-                    var positionName2 = positionInfo.Where(t => t.BusinessId.ToString() == position2).FirstOrDefault()?.Name;
-                    duty.Person1 = user2 + "（" + positionName2 + "）";
+                    var result = await GetCrewRotaInfo(crew, userInfo, positionInfo, wShip, depApplyUser, time, item);
+                    shipDuty.dutyPeople.Add(result);
+                }
 
+                //获取非值班人员
+
+                foreach (var item in rotaEnums)
+                {
+                    var result = await GetOffCrewRotaInfo(crew, userInfo, positionInfo, wShip, depApplyUser, time, item);
+                    shipDuty.offDutyPeople.Add(result);
                 }
             }
 
-
-            return Result.Success();
+            return Result.Success(shipDuty);
         }
 
+        /// <summary>
+        /// 获取甲板部 和 轮机部 值班人员的数据
+        /// </summary>
+        /// <param name="crew"></param>
+        /// <param name="userInfo"></param>
+        /// <param name="positionInfo"></param>
+        /// <param name="wShip"></param>
+        /// <param name="depApplyUser"></param>
+        /// <param name="time"></param>
+        /// <param name="rota"></param>
+        /// <returns></returns>
+        public async Task<DutyPerson> GetCrewRotaInfo(List<CrewRota> crew, List<User> userInfo, List<PositionOnBoard> positionInfo, List<WorkShip> wShip, List<DepartureApplyUser> depApplyUser, DateTime time, RotaEnum rota)
+        {
+            //按版本号倒排 获取前三天最新的甲板部排班人员
+            var deck = crew.Where(t => t.RotaType == rota).OrderByDescending(t => t.Version).Take(3).ToList();
+            DutyPerson dutyPerson = new DutyPerson();
+            List<string> otherUser = new List<string>();
+            foreach (var item in deck)
+            {
+                TeamsGroup team = new TeamsGroup();
+                if (item.TimeType == TimeEnum.FixedTime)
+                {
+                    team.TimeslotType = GetEnumDescription(item.TimeSlotType);
+                }
+                else if (item.TimeType == TimeEnum.NotFixedTime)
+                {
+                    team.TimeslotType = item.TeamGroup;
+                }
+                var user1 = userInfo.Where(t => t.BusinessId == item.FLeaderUserId).FirstOrDefault()?.Name;
+                //获取对应职务
+                var position = wShip.Where(t => t.WorkShipId == item.FLeaderUserId).FirstOrDefault()?.Postition;
+                var positionName = positionInfo.Where(t => t.BusinessId.ToString() == position).FirstOrDefault()?.Name;
+                team.Person1 = user1 + "（" + positionName + "）";
+                var user2 = userInfo.Where(t => t.BusinessId == item.SLeaderUserId).FirstOrDefault()?.Name;
+                //获取对应职务
+                var position2 = wShip.Where(t => t.WorkShipId == item.SLeaderUserId).FirstOrDefault()?.Postition;
+                var positionName2 = positionInfo.Where(t => t.BusinessId.ToString() == position2).FirstOrDefault()?.Name;
+                team.Person1 = user2 + "（" + positionName2 + "）";
+                var other = item.OhterUserId?.Split(',').ToList();
+                otherUser.AddRange(other);
+                dutyPerson.teamsGroup.Add(team);
+            }
+            //查看船员是否有离船申请 并且未归船的 这种类型的船员为休假中的
+            var dutyUser = depApplyUser.Where(t => t.DisembarkDate <= time && t.ReturnShipDate >= time).ToList();
+            List<UserInfo> userList = new List<UserInfo>();
+            foreach (var item in dutyUser)
+            {
+                UserInfo userInfo1 = new UserInfo();
+                var user1 = userInfo.Where(t => t.BusinessId == item.UserId).FirstOrDefault()?.Name;
+                //获取对应职务
+                var position = wShip.Where(t => t.WorkShipId == item.UserId).FirstOrDefault()?.Postition;
+                var positionName = positionInfo.Where(t => t.BusinessId.ToString() == position).FirstOrDefault()?.Name;
+                userInfo1.UserName = "休假中" + user1 + "（" + positionName + "）";
+                userList.Add(userInfo1);
+            }
+            foreach (var item in otherUser)
+            {
+                var user1 = userInfo.Where(t => t.BusinessId.ToString() == item).FirstOrDefault()?.Name;
+                //获取对应职务
+                var position = wShip.Where(t => t.WorkShipId.ToString() == item).FirstOrDefault()?.Postition;
+                var positionName = positionInfo.Where(t => t.BusinessId.ToString() == position).FirstOrDefault()?.Name;
+                var result = user1 + "（" + positionName + "）";
+                dutyPerson.OtherPerson.Add(result);
+            }
+            dutyPerson.HolidayPerson = userList;
+            return dutyPerson;
+        }
 
+        /// <summary>
+        /// 获取甲板部 和 轮机部 非班人员的数据
+        /// </summary>
+        /// <param name="crew"></param>
+        /// <param name="userInfo"></param>
+        /// <param name="positionInfo"></param>
+        /// <param name="wShip"></param>
+        /// <param name="depApplyUser"></param>
+        /// <param name="time"></param>
+        /// <param name="rota"></param>
+        /// <returns></returns>
+        public async Task<OffDutyPerson> GetOffCrewRotaInfo(List<CrewRota> crew, List<User> userInfo, List<PositionOnBoard> positionInfo, List<WorkShip> wShip, List<DepartureApplyUser> depApplyUser, DateTime time, RotaEnum rota)
+        {
+            //当前已排班的人员
+            List<string> crewIds = new List<string>();
+            OffDutyPerson offDutyPerson = new OffDutyPerson();
+            crewIds.Add(crew.Where(t => t.RotaType == rota).Select(t => t.FLeaderUserId.ToString()).FirstOrDefault() ?? "");
+            crewIds.Add(crew.Where(t => t.RotaType == rota).Select(t => t.SLeaderUserId.ToString()).FirstOrDefault() ?? "");
+            foreach (var item in crew)
+            {
+                var splitUser = item.OhterUserId?.Split(',').ToList();
+                crewIds.AddRange(splitUser);
+            }
+            //非班人员
+            var offUser = wShip.Where(t => !crewIds.Contains(t.WorkShipId.ToString())).ToList();
+            foreach (var item in offUser)
+            {
+                UserInfo userInfo1 = new UserInfo();
+                var user1 = userInfo.Where(t => t.BusinessId == item.WorkShipId).FirstOrDefault()?.Name;
+                //获取对应职务
+                var position = wShip.Where(t => t.WorkShipId == item.WorkShipId).FirstOrDefault()?.Postition;
+                var positionName = positionInfo.Where(t => t.BusinessId.ToString() == position).FirstOrDefault()?.Name;
+                userInfo1.UserName = user1 + "（" + positionName + "）";
+                offDutyPerson.Person1.Add(userInfo1);
+            }
+            var offUserIds = offUser.Select(t => t.WorkShipId).Distinct().ToArray();
+            //查看非班中的船员是否有离船申请 并且未归船的 这种类型的船员为休假中的
+            var dutyUser = depApplyUser.Where(t => offUserIds.Contains(t.UserId) && t.DisembarkDate <= time && t.ReturnShipDate >= time).ToList();
+            List<UserInfo> userList = new List<UserInfo>();
+            foreach (var item in dutyUser)
+            {
+                UserInfo userInfo1 = new UserInfo();
+                var user1 = userInfo.Where(t => t.BusinessId == item.UserId).FirstOrDefault()?.Name;
+                //获取对应职务
+                var position = wShip.Where(t => t.WorkShipId == item.UserId).FirstOrDefault()?.Postition;
+                var positionName = positionInfo.Where(t => t.BusinessId.ToString() == position).FirstOrDefault()?.Name;
+                userInfo1.UserName = "休假中" + user1 + "（" + positionName + "）";
+                userList.Add(userInfo1);
+            }
+            offDutyPerson.HolidayPerson = userList;
+            return offDutyPerson;
+        }
+
+        /// <summary>
+        /// 获取枚举项的描述信息
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        private static string GetEnumDescription(Enum value)
+        {
+            var field = value.GetType().GetField(value.ToString());
+            var attribute = (DescriptionAttribute)Attribute.GetCustomAttribute(field, typeof(DescriptionAttribute));
+            return attribute != null ? attribute.Description : value.ToString();
+        }
     }
 }

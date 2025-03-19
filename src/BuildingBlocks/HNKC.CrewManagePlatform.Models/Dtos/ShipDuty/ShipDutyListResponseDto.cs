@@ -1,4 +1,5 @@
-﻿using System;
+﻿using HNKC.CrewManagePlatform.Models.Enums;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -76,6 +77,28 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.ShipDuty
     public class DutyPerson
     {
         /// <summary>
+        /// 休假人员
+        /// </summary>
+        public List<UserInfo> HolidayPerson { get; set; }
+        /// <summary>
+        /// 其他人员
+        /// </summary>
+        public List<string> OtherPerson { get; set; }
+        /// <summary>
+        /// 班组信息
+        /// </summary>
+        public List<TeamsGroup> teamsGroup { get; set; } = new List<TeamsGroup>();
+    }
+    /// <summary>
+    /// 班组信息
+    /// </summary>
+    public class TeamsGroup
+    {
+        /// <summary>
+        /// 班别  1：0-4 2：4-8 3：8-12  或 班组1 班组2  班组3
+        /// </summary>
+        public string? TimeslotType { get; set; }
+        /// <summary>
         /// 人员1
         /// </summary>
         public string Person1 { get; set; }
@@ -83,15 +106,8 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.ShipDuty
         /// 人员2
         /// </summary>
         public string Person2 { get; set; }
-        /// <summary>
-        /// 休假人员
-        /// </summary>
-        public string HolidayPerson { get; set; }
-        /// <summary>
-        /// 其他人员
-        /// </summary>
-        public string OtherPerson { get; set; }
     }
+
     /// <summary>
     /// 非值班人员
     /// </summary>
@@ -100,10 +116,21 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.ShipDuty
         /// <summary>
         /// 人员1
         /// </summary>
-        public string Person1 { get; set; }
+        public List<UserInfo> Person1 { get; set; } = new List<UserInfo>();
         /// <summary>
         /// 休假人员
         /// </summary>
-        public string HolidayPerson { get; set; }
+        public List<UserInfo> HolidayPerson { get; set; } = new List<UserInfo>();
+    }
+    public class UserInfo
+    {
+        /// <summary>
+        /// 图标
+        /// </summary>
+        public string Icon { get; set; }
+        /// <summary>
+        /// 用户名称
+        /// </summary>
+        public string UserName { get; set; }
     }
 }
