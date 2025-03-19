@@ -482,7 +482,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Contract
             var rt = await _dbContext.Queryable<TrainingRecord>().Where(t => t.BusinessId.ToString() == requestBody.Id).FirstAsync();
             if (rt != null)
             {
-                var rr = await _dbContext.Queryable<TrainingRecord>().Where(t => rt.BusinessId == t.BusinessId).ToListAsync();
+                var rr = await _dbContext.Queryable<TrainingRecord>().Where(t => rt.BusinessId == t.BusinessId || t.PId == rt.BusinessId).ToListAsync();
                 if (rr.Any())
                 {
                     await _dbContext.Deleteable(rr).ExecuteCommandAsync();
