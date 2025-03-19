@@ -68,6 +68,11 @@ public class DepartureApplyUserVo
     public string? FiexdLine { get; set; }
 
     /// <summary>
+    /// 紧急联系人电话
+    /// </summary>
+    public string? EmergencyContactsPhone { get; set; }
+
+    /// <summary>
     /// 替班人员
     /// </summary>
     public Guid? ReliefUserId { get; set; }

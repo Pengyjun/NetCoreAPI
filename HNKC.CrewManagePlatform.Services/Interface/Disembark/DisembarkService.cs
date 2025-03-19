@@ -251,9 +251,8 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Disembark
 
 
             // 查询离船人员
-
             var departureApplyUserList = await _dbContext.Queryable<DepartureApplyUser>()
-                .Where(dau => dau.IsDelete == 1)
+                .Where(dau => dau.IsDelete == 1 && dau.ApplyCode == applyCode)
                 .LeftJoin<User>((dau, u) => dau.UserId == u.BusinessId)
                 .LeftJoin(wShip, (dau, u, ws) => ws.WorkShipId == u.BusinessId  && result.ShipId.ToString() == ws.OnShip)
                 .LeftJoin<PositionOnBoard>((dau, u, ws, po) => po.BusinessId.ToString() == ws.Postition)
@@ -278,6 +277,22 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Disembark
                 }).ToListAsync();
 
             result.DepartureApplyUserList = departureApplyUserList;
+
+            var departureApplyUserIds = departureApplyUserList.Select(t => t.UserId).ToArray();
+
+            var emergencyContactsList = await _dbContext.Queryable<EmergencyContacts>()
+                .Where(t => t.IsDelete == 1 && departureApplyUserIds.Contains(t.EmergencyContactId))
+                .OrderByDescending(ec => ec.Created)
+                .Select(ec => new
+                {
+                    ec.EmergencyContactId,
+                    ec.Phone
+                }).ToListAsync();
+
+            foreach (var departureApplyUser in departureApplyUserList)
+            {
+                departureApplyUser.EmergencyContactsPhone = emergencyContactsList.FirstOrDefault(t => t.EmergencyContactId == departureApplyUser.UserId)?.Phone;
+            }
 
             // 审批节点
             List<Guid?> userIds = new() { result.UserId, result.ApproveUserId };
