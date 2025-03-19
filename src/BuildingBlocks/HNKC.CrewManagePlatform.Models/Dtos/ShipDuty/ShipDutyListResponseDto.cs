@@ -99,6 +99,14 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.ShipDuty
         /// </summary>
         public string? TimeslotType { get; set; }
         /// <summary>
+        /// 图标1
+        /// </summary>
+        public string? Icon1 { get; set; }
+        /// <summary>
+        /// 图标2
+        /// </summary>
+        public string? Icon2 { get; set; }
+        /// <summary>
         /// 人员1
         /// </summary>
         public string Person1 { get; set; }
