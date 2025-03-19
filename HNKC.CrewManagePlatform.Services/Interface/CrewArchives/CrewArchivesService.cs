@@ -2692,7 +2692,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                     ContractTypeName = EnumUtil.GetDescription(item.ContractType),
                     EmploymentName = empType.FirstOrDefault(x => x.BusinessId.ToString() == item.EmploymentId)?.Name,
                     EmploymentId = item.EmploymentId,
-                    Staus = item.EndTime >= DateTime.Now ? "进行中" : "已结束"
+                    Staus = item.ContractType == ContractEnum.NoFixedTerm ? "进行中" : item.EndTime >= DateTime.Now ? "进行中" : "已结束"
                 });
             }
 
@@ -2897,27 +2897,27 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
             #endregion
 
             var departureApplyUser = _dbContext.Queryable<DepartureApplyUser>()
-                .InnerJoin<DepartureApply>( (dau, da) => dau.ApplyCode == da.ApplyCode)
-                .Where((dau,da) => da.ApproveStatus == ApproveStatus.Pass)
-                .GroupBy((dau, da) => new { dau.UserId})
+                .InnerJoin<DepartureApply>((dau, da) => dau.ApplyCode == da.ApplyCode)
+                .Where((dau, da) => da.ApproveStatus == ApproveStatus.Pass)
+                .GroupBy((dau, da) => new { dau.UserId })
                 .Select((dau, da) => new
                 {
                     dau.UserId,
-                    HolidayDays = SqlFunc.AggregateSum(SqlFunc.DateDiff(DateType.Day,Convert.ToDateTime(dau.RealDisembarkDate ?? dau.DisembarkDate), Convert.ToDateTime(dau.RealReturnShipDate ?? dau.ReturnShipDate)) + 1)
+                    HolidayDays = SqlFunc.AggregateSum(SqlFunc.DateDiff(DateType.Day, Convert.ToDateTime(dau.RealDisembarkDate ?? dau.DisembarkDate), Convert.ToDateTime(dau.RealReturnShipDate ?? dau.ReturnShipDate)) + 1)
                 });
 
             var rr = await _dbContext.Queryable<User>()
                 .Where(t1 => t1.IsLoginUser == 1 && t1.IsDelete == 1)
                 .WhereIF(!string.IsNullOrWhiteSpace(requestBody.KeyWords), t1 => t1.Name.Contains(requestBody.KeyWords) || t1.Phone.Contains(requestBody.KeyWords) || t1.WorkNumber.Contains(requestBody.KeyWords) || t1.CardId.Contains(requestBody.KeyWords))
-                .LeftJoin(departureApplyUser,(t1,dau)=>t1.BusinessId == dau.UserId)
-                .InnerJoin(wShip, (t1,dau, t5) => t1.BusinessId == t5.WorkShipId)
-                .InnerJoin<OwnerShip>((t1,dau, t5, t3) => t5.OnShip == t3.BusinessId.ToString())
-                .WhereIF(roleType == 3, (t1,dau, t5, t3) => GlobalCurrentUser.UserBusinessId.ToString() == t5.OnShip)
-                .WhereIF(!string.IsNullOrWhiteSpace(requestBody.StartTime.ToString()), (t1,dau, t5, t3) => t5.WorkShipStartTime >= requestBody.StartTime && t5.WorkShipStartTime <= requestBody.EndTime)
-                .WhereIF(string.IsNullOrWhiteSpace(requestBody.StartTime.ToString()), (t1,dau, t5, t3) => t5.WorkShipStartTime.Year == DateTime.Now.Year)
-                .WhereIF(requestBody.BoardingDays != 0, (t1,dau, t5, t3) => SqlFunc.DateDiff(DateType.Day, Convert.ToDateTime(t5.WorkShipStartTime), DateTime.Now) + 1 >= requestBody.BoardingDays)//在船天数
-                .WhereIF(requestBody.HolidayDays != 0,(t1,dau, t5, t3)=>dau.HolidayDays >= requestBody.HolidayDays)
-                .Select((t1,dau, t5, t3) => new SearchCrewDynamics
+                .LeftJoin(departureApplyUser, (t1, dau) => t1.BusinessId == dau.UserId)
+                .InnerJoin(wShip, (t1, dau, t5) => t1.BusinessId == t5.WorkShipId)
+                .InnerJoin<OwnerShip>((t1, dau, t5, t3) => t5.OnShip == t3.BusinessId.ToString())
+                .WhereIF(roleType == 3, (t1, dau, t5, t3) => GlobalCurrentUser.UserBusinessId.ToString() == t5.OnShip)
+                .WhereIF(!string.IsNullOrWhiteSpace(requestBody.StartTime.ToString()), (t1, dau, t5, t3) => t5.WorkShipStartTime >= requestBody.StartTime && t5.WorkShipStartTime <= requestBody.EndTime)
+                .WhereIF(string.IsNullOrWhiteSpace(requestBody.StartTime.ToString()), (t1, dau, t5, t3) => t5.WorkShipStartTime.Year == DateTime.Now.Year)
+                .WhereIF(requestBody.BoardingDays != 0, (t1, dau, t5, t3) => SqlFunc.DateDiff(DateType.Day, Convert.ToDateTime(t5.WorkShipStartTime), DateTime.Now) + 1 >= requestBody.BoardingDays)//在船天数
+                .WhereIF(requestBody.HolidayDays != 0, (t1, dau, t5, t3) => dau.HolidayDays >= requestBody.HolidayDays)
+                .Select((t1, dau, t5, t3) => new SearchCrewDynamics
                 {
                     BId = t1.BusinessId.ToString(),
                     Country = t3.Country,
@@ -2926,8 +2926,10 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                     UserName = t1.Name,
                     WorkNumber = t1.WorkNumber,
                     DeleteResonEnum = t1.DeleteReson,
-                    BoardingTime = t5.WorkShipStartTime,
-                    DisembarkTime = t5.WorkShipEndTime,
+                    BoardingTime = t5.WorkShipStartTime.ToString("yyyy-MM-dd"),
+                    DisembarkTime = t5.WorkShipEndTime == null ? "" : t5.WorkShipEndTime.Value.ToString("yyyy-MM-dd"),
+                    LBoardingTime = t5.WorkShipStartTime,
+                    LDisembarkTime = t5.WorkShipEndTime,
                     CardId = t1.CardId,
                     HolidayDays = dau.HolidayDays,
                     OnBoardDays = SqlFunc.DateDiff(DateType.Day, Convert.ToDateTime(t5.WorkShipStartTime), DateTime.Now)
@@ -2969,7 +2971,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                 /*var dk = disembark.Where(x => x.UserId.ToString() == u.BId).OrderByDescending(x => x.RealDisembarkTime).FirstOrDefault();
                 if (dk != null && dk.RealDisembarkTime != null && dk.RealReturnShipTime != null)
                     u.HolidayDays = TimeHelper.GetTimeSpan(dk.RealDisembarkTime.Value, dk.RealReturnShipTime.Value).Days + 1;*/
-                u.OnStatus = EnumUtil.GetDescription(_baseService.ShipUserStatus(u.BoardingTime, u.DeleteResonEnum, u.DisembarkTime));
+                u.OnStatus = EnumUtil.GetDescription(_baseService.ShipUserStatus(u.LBoardingTime, u.DeleteResonEnum, u.LDisembarkTime));
             }
 
             rt.List = rr.OrderByDescending(t => t.UserName).ToList();
