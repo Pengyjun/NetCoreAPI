@@ -69,7 +69,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                 .LeftJoin<PositionOnBoard>((t, ws, pob) => ws.Postition == pob.BusinessId.ToString())
                 .LeftJoin<OwnerShip>((t, ws, pob, ow) => ws.OnShip == ow.BusinessId.ToString())
                 .LeftJoin(uentity, (t, ws, pob, ow, ue) => t.BusinessId == ue.UserEntryId)
-                .WhereIF(roleType == 3, (t, ws, pob, ow, ue) => ws.OnShip == ow.BusinessId.ToString() && GlobalCurrentUser.UserBusinessId.ToString() == ws.OnShip)//船长
+                .WhereIF(roleType == 3, (t, ws, pob, ow, ue) => ws.OnShip == GlobalCurrentUser.ShipId)//船长
                 .LeftJoin<SkillCertificates>((t, ws, pob, ow, ue, sc) => sc.SkillcertificateId == t.BusinessId)
                 .LeftJoin<EducationalBackground>((t, ws, pob, ow, ue, sc, eb) => eb.QualificationId == t.BusinessId)
                 .WhereIF(requestBody.ServiceBooks != null && requestBody.ServiceBooks.Any(),
