@@ -26,7 +26,7 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.Contract
         /// <summary>
         /// 
         /// </summary>
-        public string? BId { get; set; }
+        public Guid? BId { get; set; }
         /// <summary>
         /// 
         /// </summary>
