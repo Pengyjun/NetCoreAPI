@@ -43,7 +43,7 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.ShipDuty
         /// <summary>
         /// 领导信息
         /// </summary>
-        public LeaderInfo leaderInfo { get; set; } = new LeaderInfo();
+        public List<LeaderInfo> leaderInfo { get; set; } = new List<LeaderInfo>();
         /// <summary>
         /// 甲板部与轮机部
         /// </summary>
