@@ -258,7 +258,7 @@ namespace HNKC.CrewManagePlatform.Services.Role
 
             #endregion
             var userList = await _dbContext.Queryable<User>()
-                .Where(x => x.IsDelete == 1)
+                .Where(x => x.IsDelete == 1 && x.IsLoginUser == 0)
                 .WhereIF(!string.IsNullOrWhiteSpace(addUserRoleRequest.KeyWords), x => x.Name.Contains(addUserRoleRequest.KeyWords)
                 || x.Phone.Contains(addUserRoleRequest.KeyWords)
                 ).ToListAsync();
