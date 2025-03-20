@@ -78,6 +78,10 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Job
                 // 项目月报固定两层审批
                 FinishApproveLevel = ApproveLevel.Level2;
             }
+            else if (BizModule== BizModule.BaseLinePlan)
+            {
+                FinishApproveLevel = ApproveLevel.Level2;
+            }
             else
             {
                 FinishApproveLevel = ApproveLevel.Level1;
