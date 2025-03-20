@@ -196,6 +196,18 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// <summary>
         /// 入职日期
         /// </summary>
+        public DateTime EntryTime { get; set; }
+        /// <summary>
+        /// 截止日期
+        /// </summary>
+        public DateTime? EndTime { get; set; }
+        /// <summary>
+        /// 开始时间
+        /// </summary>
+        public DateTime? StartTime { get; set; }
+        /// <summary>
+        /// 入职日期
+        /// </summary>
         public string? EntryDate { get; set; }
         /// <summary>
         /// 劳务公司
