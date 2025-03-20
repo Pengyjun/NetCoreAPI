@@ -455,7 +455,7 @@ namespace GHMonitoringCenterApi.Application.Service.Job
                   .InnerJoin(_dbJobApprover.AsQueryable(), (j, a) => j.Id == a.JobId && a.IsDelete == 1)
                   .LeftJoin(_dbProject.AsQueryable(), (j, a, p) => j.ProjectId == p.Id && p.IsDelete == 1)
                   .Where((j, a, p) => a.ApproverId == _currentUser.Id && a.ApproverJobStatus == model.JobStatus && j.IsDelete == 1)
-                  .Where((j, p) => j.BizModule != BizModule.BaseLinePlan)
+                  .Where((j, a, p) => j.BizModule != BizModule.BaseLinePlan)
                   .WhereIF(model.BizModule != null, (j, a, p) => j.BizModule == model.BizModule)
                   .WhereIF(model.JobStatus == JobStatus.Handled, (j, a, p) => j.ApproveLevel == a.ApproveLevel)
                   .WhereIF(model.JobStatus == JobStatus.UnHandle, (j, a, p) => j.ApproveLevel == a.ApproveLevel - 1 && (j.ApproveStatus == JobApproveStatus.None || j.ApproveStatus == JobApproveStatus.Pass))
