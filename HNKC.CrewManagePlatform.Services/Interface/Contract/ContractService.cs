@@ -66,7 +66,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Contract
                 .Where((t1, t2) => SqlFunc.DateDiff(DateType.Day, DateTime.Now, Convert.ToDateTime(t2.EndTime)) + 1 <= days)
                 .InnerJoin(wShip, (t1, t2, t5) => t1.BusinessId == t5.WorkShipId)
                 .InnerJoin<OwnerShip>((t1, t2, t5, t3) => t5.OnShip == t3.BusinessId.ToString())
-                .WhereIF(roleType == 3, (t1, t2, t5, t3) => t5.OnShip == t3.BusinessId.ToString() && GlobalCurrentUser.UserBusinessId.ToString() == t5.OnShip)//船长
+                .WhereIF(roleType == 3 || roleType == 4, (t1, t2, t5, t3) => t5.OnShip == t3.BusinessId.ToString() && GlobalCurrentUser.ShipId.ToString() == t5.OnShip)//船长
                 .WhereIF(!string.IsNullOrEmpty(requestBody.EmploymentType), (t1, t2, t5, t3) => requestBody.EmploymentType == t2.EmploymentId)
                 .Select((t1, t2, t5, t3) => new ContractSearch
                 {
@@ -219,7 +219,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Contract
                 .LeftJoin(uentity, (t1, t2) => t1.BusinessId == t2.UserEntryId)
                 .InnerJoin(wShip, (t1, t2, t5) => t1.BusinessId == t5.WorkShipId)
                 .InnerJoin<OwnerShip>((t1, t2, t5, t3) => t5.OnShip == t3.BusinessId.ToString())
-                .WhereIF(roleType == 3, (t1, t2, t5, t3) => t5.OnShip == t3.BusinessId.ToString() && GlobalCurrentUser.UserBusinessId.ToString() == t5.OnShip)//船长
+                .WhereIF(roleType == 3 || roleType == 4, (t1, t2, t5, t3) => t5.OnShip == t3.BusinessId.ToString() && GlobalCurrentUser.ShipId.ToString() == t5.OnShip)//船长
                 .WhereIF(!string.IsNullOrEmpty(requestBody.Position), (t1, t2, t5, t3) => requestBody.Position == t5.Postition)
                 .Select((t1, t2, t5, t3) => new PromotionSearch
                 {
@@ -531,7 +531,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Contract
                 .WhereIF(!string.IsNullOrEmpty(requestBody.KeyWords), t1 => t1.Name.Contains(requestBody.KeyWords) || t1.Phone.Contains(requestBody.KeyWords) || t1.WorkNumber.Contains(requestBody.KeyWords) || t1.CardId.Contains(requestBody.KeyWords))
                 .InnerJoin(wShip, (t1, t5) => t1.BusinessId == t5.WorkShipId)
                 .InnerJoin<OwnerShip>((t1, t5, t3) => t5.OnShip == t3.BusinessId.ToString())
-                .WhereIF(roleType == 3, (t1, t5, t3) => t5.OnShip == t3.BusinessId.ToString() && GlobalCurrentUser.UserBusinessId.ToString() == t5.OnShip)
+                .WhereIF(roleType == 3 || roleType == 4, (t1, t5, t3) => t5.OnShip == t3.BusinessId.ToString() && GlobalCurrentUser.ShipId.ToString() == t5.OnShip)
                 .LeftJoin<YearCheck>((t1, t5, t3, t6) => t1.BusinessId == t6.TrainingId)
                 .WhereIF(requestBody.CheckStatus == 1, (t1, t5, t3, t6) => t6.CheckType != CheckEnum.Normal)
                 .WhereIF(requestBody.CheckStatus == 2, (t1, t5, t3, t6) => t6.BusinessId == null)

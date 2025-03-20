@@ -73,7 +73,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                 .LeftJoin<PositionOnBoard>((t, ws, pob) => ws.Postition == pob.BusinessId.ToString())
                 .LeftJoin<OwnerShip>((t, ws, pob, ow) => ws.OnShip == ow.BusinessId.ToString())
                 .LeftJoin(uentity, (t, ws, pob, ow, ue) => t.BusinessId == ue.UserEntryId)
-                .WhereIF(roleType == 3, (t, ws, pob, ow, ue) => ws.OnShip == GlobalCurrentUser.ShipId)//船长
+                .WhereIF(roleType == 3 || roleType == 4, (t, ws, pob, ow, ue) => ws.OnShip == GlobalCurrentUser.ShipId)//船长
                 .LeftJoin<SkillCertificates>((t, ws, pob, ow, ue, sc) => sc.SkillcertificateId == t.BusinessId)
                 .LeftJoin<EducationalBackground>((t, ws, pob, ow, ue, sc, eb) => eb.QualificationId == t.BusinessId)
                 .WhereIF(requestBody.ServiceBooks != null && requestBody.ServiceBooks.Any(),
@@ -2929,7 +2929,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                 .LeftJoin(departureApplyUser, (t1, dau) => t1.BusinessId == dau.UserId)
                 .InnerJoin(wShip, (t1, dau, t5) => t1.BusinessId == t5.WorkShipId)
                 .InnerJoin<OwnerShip>((t1, dau, t5, t3) => t5.OnShip == t3.BusinessId.ToString())
-                .WhereIF(roleType == 3, (t1, dau, t5, t3) => GlobalCurrentUser.ShipId.ToString() == t5.OnShip)
+                .WhereIF(roleType == 3 || roleType == 4, (t1, dau, t5, t3) => GlobalCurrentUser.ShipId.ToString() == t5.OnShip)
                 .WhereIF(!string.IsNullOrWhiteSpace(requestBody.StartTime.ToString()), (t1, dau, t5, t3) => t5.WorkShipStartTime >= requestBody.StartTime && t5.WorkShipStartTime <= requestBody.EndTime)
                 .WhereIF(string.IsNullOrWhiteSpace(requestBody.StartTime.ToString()), (t1, dau, t5, t3) => t5.WorkShipStartTime.Year == DateTime.Now.Year)
                 .WhereIF(requestBody.BoardingDays != 0, (t1, dau, t5, t3) => SqlFunc.DateDiff(DateType.Day, Convert.ToDateTime(t5.WorkShipStartTime), DateTime.Now) + 1 >= requestBody.BoardingDays)//在船天数
