@@ -60,7 +60,6 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
             //名称相关不赋值
             var rt = await _dbContext.Queryable<User>()
                 .Where(t => t.IsLoginUser == 1)
-                .OrderByDescending(t => t.Created)
                 .WhereIF(!string.IsNullOrWhiteSpace(requestBody.KeyWords), t => t.Name.Contains(escapedKeyword) || t.CardId.Contains(escapedKeyword)
                 || t.Phone.Contains(escapedKeyword) || t.WorkNumber.Contains(escapedKeyword))
                 .WhereIF(!string.IsNullOrWhiteSpace(requestBody.Name), t => t.Name.Contains(requestBody.Name))
@@ -118,6 +117,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                                .Where(skcall => skcall.Type == CertificatesEnum.JKZ && t.BusinessId == skcall.CertificateId).Any())
                 .WhereIF(requestBody.ShipTypes != null && requestBody.ShipTypes.Any(), (t, ws, pob, ow, ue, sc, eb) => SqlFunc.Subqueryable<OwnerShip>()
                                .Where(skcall => requestBody.ShipTypes.Contains(((int)ow.ShipType).ToString())).Any())//船舶类型
+                .OrderByDescending(t => t.Created)
                 .Select((t, ws, pob, ow, ue, sc, eb) => new SearchCrewArchivesResponse
                 {
                     BId = t.BusinessId,
@@ -134,7 +134,8 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                     CrewType = pob.BusinessId.ToString(),
                     EmploymentType = ue.EmploymentId,
                     IsDelete = t.IsDelete,
-                    DeleteReson = t.DeleteReson
+                    DeleteReson = t.DeleteReson,
+                    Created = t.Created
                 })
                 .Distinct()
                 .ToPageListAsync(requestBody.PageIndex, requestBody.PageSize, total);
@@ -2676,7 +2677,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
 
             var userInfo = await GetUserInfoAsync(bId);
             //入职材料
-            var userEntryInfo = await _dbContext.Queryable<UserEntryInfo>().Where(t => t.IsDelete == 1 && t.UserEntryId == userInfo.BusinessId).OrderByDescending(x => x.EntryTime).ToListAsync();
+            var userEntryInfo = await _dbContext.Queryable<UserEntryInfo>().Where(t => t.IsDelete == 1 && t.UserEntryId == userInfo.BusinessId).OrderByDescending(x =>new{x.ContractType ,x.EntryTime}).ToListAsync();
             var fIds = userEntryInfo.Select(x => x.EntryScans.ToString()).ToList();
             //用工类型
             var empType = await _dbContext.Queryable<EmploymentType>().Where(t => t.IsDelete == 1).ToListAsync();
@@ -2697,7 +2698,10 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                     ContractTypeName = EnumUtil.GetDescription(item.ContractType),
                     EmploymentName = empType.FirstOrDefault(x => x.BusinessId.ToString() == item.EmploymentId)?.Name,
                     EmploymentId = item.EmploymentId,
-                    Staus = item.ContractType == ContractEnum.NoFixedTerm ? "进行中" : item.EndTime >= DateTime.Now ? "进行中" : "已结束"
+                    Staus = item.ContractType == ContractEnum.NoFixedTerm ? "进行中" : item.EndTime >= DateTime.Now ? "进行中" : "已结束",
+                    EntryTime =item.EntryTime,
+                    EndTime = item.EndTime,
+                    StartTime = item.StartTime
                 });
             }
 
