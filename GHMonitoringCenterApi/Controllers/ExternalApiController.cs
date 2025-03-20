@@ -410,5 +410,36 @@ namespace GHMonitoringCenterApi.Controllers
         {
             return await _externalApiService.SearchCompanyProductionValueAsync(baseExternalRequestDto);
         }
+
+
+        /// <summary>
+        /// 获取在建、在建（短暂性停工）、在建（间歇性停工）、中标已签 四种状态的项目信息
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("GetConstructionProject")]
+        public async Task<ResponseAjaxResult<List<GHMonitoringCenterApi.Domain.Models.Project>>> GetConstructionProjectAsync()
+        {
+            return await _externalApiService.GetConstructionProjectAsync();
+        }
+
+        /// <summary>
+        /// 获取在建、在建（短暂性停工）、在建（间歇性停工）、中标已签 四种状态的项目经理
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("GetConstructionProjectLeader")]
+        public async Task<ResponseAjaxResult<List<ProjectLeaderInfo>>> GetConstructionProjectLeaderAsync()
+        {
+            return await _externalApiService.GetConstructionProjectLeaderAsync();
+        }
+
+        /// <summary>
+        /// 获取船舶关联的项目
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("GetShipProject")]
+        public async Task<ResponseAjaxResult<List<ShipMovementProject>>> GetShipProjectAsync()
+        {
+            return await _externalApiService.GetShipProjectAsync();
+        }
     }
 }

@@ -24,9 +24,19 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project.ExcelImport
 	/// </summary>
 	public class ProjectExcelSearchResponseDto
 	{
-		/// <summary>
-		/// 所属项目部
-		/// </summary>
+       
+        /// <summary>
+        /// 合同约定完工日期
+        /// </summary>
+        public DateTime? ContractStipulationEndDate { get; set; }
+        /// <summary>
+        /// 合同约定开工日期
+        /// </summary>
+        public string? ContractStipulationStartDate { get; set; }
+
+        /// <summary>
+        /// 所属项目部
+        /// </summary>
         public string? ProjectDept { get; set; }
         public Guid ProjectDeptId { get; set; }
         /// <summary>

@@ -185,6 +185,12 @@ namespace GHMonitoringCenterApi.Controllers.JjtSendMessage
         {
             if (detectionService.Device.Type == Device.Mobile)
             {
+                ResponseAjaxResult<JjtSendMessageMonitoringDayReportResponseDto> res = new ResponseAjaxResult<JjtSendMessageMonitoringDayReportResponseDto>();
+                if (DateTime.Now.Hour < 7 || DateTime.Now.Hour > 12)
+                {
+                    res.Success("今日日报已审批通过链接不可访问谢谢",Domain.Shared.Enums.HttpStatusCode.VerifyFail);
+                    return res;
+                }
                 return await jjtSendMessageService.JjtTextCardMsgDetailsAsync(dateDay, true);
             }
             else {
