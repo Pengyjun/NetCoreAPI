@@ -670,6 +670,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
         private async Task GetPlanVersion(BaseLinePlanProject baseLinePlanProject)
         {
 
+
             var baseLinestatus = await dbContext.Queryable<DictionaryTable>().Where(x => x.TypeNo == 12 && x.IsDelete == 0).FirstAsync();
             string planname = "基准计划";
             if (baseLinestatus != null && baseLinestatus.Name == "1")
@@ -688,13 +689,20 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 else
                 {
                     var baseLinePlan = await dbContext.Queryable<BaseLinePlanProject>().Where(x => x.Year == baseLinePlanProject.Year && x.ShortName == baseLinePlanProject.ShortName).CountAsync();
-                    baseLinePlanProject.PlanVersion = baseLinePlanProject.ShortName.Replace("-基准计划", "") + "-" + planname + "V" + (baseLinePlan + 1);
+                    if (!string.IsNullOrWhiteSpace(baseLinePlanProject.ShortName))
+                    {
+                        baseLinePlanProject.PlanVersion = baseLinePlanProject.ShortName.Replace("-基准计划", "") + "-" + planname + "V" + (baseLinePlan + 1);
+                    }
+
                 }
             }
             else
             {
                 var baseLinePlan = await dbContext.Queryable<BaseLinePlanProject>().Where(x => x.Year == baseLinePlanProject.Year && x.ShortName == baseLinePlanProject.ShortName).CountAsync();
-                baseLinePlanProject.PlanVersion = baseLinePlanProject.ShortName.Replace("-基准计划", "") + "-" + planname + "V" + (baseLinePlan + 1);
+                if (!string.IsNullOrWhiteSpace(baseLinePlanProject.ShortName))
+                {
+                    baseLinePlanProject.PlanVersion = baseLinePlanProject.ShortName.Replace("-基准计划", "") + "-" + planname + "V" + (baseLinePlan + 1);
+                }
             }
         }
 
@@ -1526,7 +1534,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 {
                     item.CompanyId = baseline.CompanyId;
                     item.CompanyName = intitutionList.SingleAsync(x => x.PomId == item.CompanyId).Result.Name;
-                    item.ProjectName = baseline.ShortName;
+                    item.ProjectName = baseline.PlanStatus > 0 ? baseline.PlanVersion : baseline.ShortName;
                     item.Id = baseline.Id;
                     item.PlanStatus = baseline.PlanStatus;
                     item.PlanStatusStr = item.PlanStatusStr = baseline.PlanStatus == 0 ? "已保存" : baseline.PlanStatus == 1 ? "驳回" : baseline.PlanStatus == 2 ? "审核通过" : baseline.PlanStatus == 4 ? "待项目审核" : baseline.PlanStatus == 5 ? "待公司审核" : "撤回";
@@ -1921,7 +1929,8 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 Name = x.Name,
                 MasterCode = x.MasterCode,
                 ShortName = x.ShortName
-            }).ToPageListAsync(input.PageIndex, input.PageSize, total);
+            }).ToListAsync();
+            //.ToPageListAsync(input.PageIndex, input.PageSize, total);
             responseAjaxResult.Success();
             responseAjaxResult.Count = total;
             responseAjaxResult.Data = List;
