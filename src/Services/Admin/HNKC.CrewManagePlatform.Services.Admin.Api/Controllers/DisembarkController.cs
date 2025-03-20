@@ -35,6 +35,7 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api.Controllers
         [HttpGet("ApplyList")]
         public async Task<IActionResult> DepartureApplyListAsync([FromQuery] DepartureApplyQuery query)
         {
+            query.type = 0;
             var data = await _disembarkService.DepartureApplyListAsync(query);
             return Ok(data);
         }
@@ -47,6 +48,7 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api.Controllers
         [HttpGet("ApproveList")]
         public async Task<IActionResult> DepartureApproveListAsync([FromQuery] DepartureApplyQuery query)
         {
+            query.type = 1;
             var data = await _disembarkService.DepartureApplyListAsync(query);
             return Ok(data);
         }

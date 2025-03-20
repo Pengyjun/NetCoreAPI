@@ -114,6 +114,8 @@ public class DepartureApplyQuery : PageRequest
     /// 申请人姓名
     /// </summary>
     public string? UserName { get; set; }
+
+    public int? type { get; set; }
 }
 
 /// <summary>
