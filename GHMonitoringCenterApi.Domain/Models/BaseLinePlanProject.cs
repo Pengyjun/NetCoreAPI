@@ -72,7 +72,7 @@ namespace GHMonitoringCenterApi.Domain.Models
 
 
         /// <summary>
-        /// 计划状态
+        /// 计划状态 0  待审核 （1：驳回，2：通过  3:撤回, 4:待项目部审核，5待公司审核）
         /// </summary>
         public int PlanStatus { get; set; }
 
@@ -85,6 +85,11 @@ namespace GHMonitoringCenterApi.Domain.Models
         /// 驳回原因
         /// </summary>
         public string RejectReason { get; set; }
+
+         /// <summary>
+        /// 数据提交状态(0 已保存,1 已审核)
+        /// </summary>
+        public int? SubmitStatus { get; set; }
 
     }
 
