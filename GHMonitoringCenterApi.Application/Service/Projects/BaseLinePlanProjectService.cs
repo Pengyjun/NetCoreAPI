@@ -669,7 +669,10 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
         /// <returns></returns>
         private async Task GetPlanVersion(BaseLinePlanProject baseLinePlanProject)
         {
-
+            if (!string.IsNullOrWhiteSpace(baseLinePlanProject.PlanVersion) && !string.IsNullOrWhiteSpace(baseLinePlanProject.PlanVersion.Replace("-基准计划", "")))
+            {
+                return;
+            }
 
             var baseLinestatus = await dbContext.Queryable<DictionaryTable>().Where(x => x.TypeNo == 12 && x.IsDelete == 0).FirstAsync();
             string planname = "基准计划";
@@ -683,7 +686,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 var project = await dbContext.Queryable<Project>().Where(p => p.MasterCode == baseLinePlanProject.Association).FirstAsync();
                 if (project != null)
                 {
-                    var baseLinePlan = await dbContext.Queryable<BaseLinePlanProject>().Where(x => x.Year == baseLinePlanProject.Year && x.ShortName.StartsWith(project.ShortName)).CountAsync();
+                    var baseLinePlan = await dbContext.Queryable<BaseLinePlanProject>().Where(x => x.Year == baseLinePlanProject.Year && x.PlanVersion.StartsWith(project.ShortName)).CountAsync();
                     baseLinePlanProject.PlanVersion = project.ShortName.Replace("-基准计划", "") + "-" + planname + "V" + (baseLinePlan + 1);
                 }
                 else
@@ -693,7 +696,6 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     {
                         baseLinePlanProject.PlanVersion = baseLinePlanProject.ShortName.Replace("-基准计划", "") + "-" + planname + "V" + (baseLinePlan + 1);
                     }
-
                 }
             }
             else
