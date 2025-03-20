@@ -55,7 +55,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
             #endregion
 
             // 转义 % 和 _
-            string escapedKeyword = requestBody.KeyWords.Replace("%", "\\%").Replace("_", "\\_");
+            string escapedKeyword = requestBody.KeyWords == null ? string.Empty : requestBody.KeyWords.Replace("%", "\\%").Replace("_", "\\_");
 
             //名称相关不赋值
             var rt = await _dbContext.Queryable<User>()
@@ -2259,6 +2259,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                     .ToList();
                 td.Add(new TrainingRecordsForDetails
                 {
+                    TrainingTitle = item.TrainingTitle,
                     TrainingTime = item.TrainingTime?.ToString("yyyy-MM-dd"),
                     TrainingType = item.TrainingType,
                     TrainingTypeName = trainType.FirstOrDefault(x => x.BusinessId.ToString() == item.TrainingType)?.Name,

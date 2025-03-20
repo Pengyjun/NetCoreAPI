@@ -761,6 +761,10 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
     public class TrainingRecordsForDetails
     {
         /// <summary>
+        /// 培训主题
+        /// </summary>
+        public string? TrainingTitle { get; set; }
+        /// <summary>
         /// 培训类型：安全培训...
         /// </summary>
         public string? TrainingType { get; set; }
