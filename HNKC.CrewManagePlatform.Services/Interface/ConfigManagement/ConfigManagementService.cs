@@ -35,6 +35,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.ConfigManagement
                     rt.ShipType = shipRequest.ShipType;
                     rt.Company = shipRequest.Company;
                     rt.Country = shipRequest.Country;
+                    rt.ProjectName = shipRequest.Project;
                     if (!string.IsNullOrEmpty(shipRequest.Project))
                     {
                         var shirel = await _dbContext.Queryable<ShipProjectRelation>().FirstAsync(t => t.RelationShipId == rt.BusinessId);

@@ -6,6 +6,7 @@ using HNKC.CrewManagePlatform.SqlSugars.Models;
 using HNKC.CrewManagePlatform.Utils;
 using SqlSugar;
 using System.ComponentModel;
+using System.IO;
 using UtilsSharp;
 
 namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
@@ -122,6 +123,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                 {
                     BId = t.BusinessId,
                     BtnType = t.IsDelete == 0 ? 1 : 0,
+                    CrewPhoto = t.CrewPhoto,
                     UserName = t.Name,
                     WorkShipStartTime = ws.WorkShipStartTime,
                     WorkShipEndTime = ws.WorkShipEndTime,
@@ -173,7 +175,10 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                 var spctab = await _dbContext.Queryable<SpecialEquips>().Where(t => t.IsDelete == 1 && uIds.Contains(t.SpecialEquipId)).ToListAsync();
                 //航区
                 var nArea = await _dbContext.Queryable<NavigationArea>().Where(t => t.IsDelete == 1).ToListAsync();
-
+                //文件
+                var url = AppsettingsHelper.GetValue("UpdateItem:Url");
+                var files = rt.Select(t => t.CrewPhoto).ToArray();
+                var fileInfo = await _dbContext.Queryable<Files>().Where(t => t.IsDelete == 1 && files.Contains(t.FileId)).ToListAsync();
                 //名称赋值
                 foreach (var t in rt)
                 {
@@ -240,6 +245,8 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                     t.Age = _baseService.CalculateAgeFromIdCard(t.CardId);
                     t.OnStatus = ob == null ? CrewStatusEnum.DaiGang : ShipUserStatus(ob.WorkShipEndTime, t.DeleteReson);
                     t.OnStatusName = ob == null ? EnumUtil.GetDescription(CrewStatusEnum.DaiGang) : EnumUtil.GetDescription(ShipUserStatus(ob.WorkShipEndTime, t.DeleteReson));
+                    var fileName = fileInfo.FirstOrDefault(x => x.FileId == t.CrewPhoto)?.Name;
+                    t.Icon = string.IsNullOrWhiteSpace(fileName) ? string.Empty : url + fileName;
                 }
             }
             page.List = rt.OrderByDescending(x => x.IsDelete);
@@ -829,6 +836,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                 {
                     foreach (var item in requestBody.WorkShipDto.WorkShips)
                     {
+                        if (item.OnShip == null) continue;
                         wss.Add(new WorkShip
                         {
                             Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
@@ -1834,7 +1842,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
         /// <returns></returns>
         private async Task<Result> GetEmploymentTypeListAsync()
         {
-            var rr = await _dbContext.Queryable<EmploymentType>().Where(t => t.IsDelete == 1).Select(t => new DropDownResponse
+            var rr = await _dbContext.Queryable<EmploymentType>().Where(t => t.IsDelete == 1 && (t.Code == "1" || t.Code == "2" || t.Code == "33")).Select(t => new DropDownResponse
             {
                 Key = t.BusinessId.ToString(),
                 Value = t.Name,
@@ -2280,7 +2288,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
             WorkShipDetails ur = new();
 
             var userInfo = await GetUserInfoAsync(bId);
-            var workShips = await _dbContext.Queryable<WorkShip>().Where(t => t.IsDelete == 1 && t.WorkShipId == userInfo.BusinessId).OrderByDescending(t => t.WorkShipEndTime).ToListAsync();
+            var workShips = await _dbContext.Queryable<WorkShip>().Where(t => t.IsDelete == 1 && t.WorkShipId == userInfo.BusinessId).OrderByDescending(t => t.WorkShipStartTime).ToListAsync();
             var ownships = await _dbContext.Queryable<OwnerShip>().Where(t => t.IsDelete == 1).Select(x => new { x.BusinessId, x.ShipName, x.Country, x.ShipType }).ToListAsync();
             var positions = await _dbContext.Queryable<PositionOnBoard>().Where(t => t.IsDelete == 1).Select(x => new { x.BusinessId, x.Name }).ToListAsync();
             var country = await _dbContext.Queryable<CountryRegion>().Where(t => t.IsDelete == 1).ToListAsync();
@@ -2291,6 +2299,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                 wd.Add(new WorkShipsForDetails
                 {
                     WorkShipEndTime = item.WorkShipEndTime,
+                    WorkShipEndTimeStr = item.WorkShipEndTime == null ? "至今" : string.Empty,
                     OnShipName = ownships.FirstOrDefault(x => x.BusinessId.ToString() == item.OnShip)?.ShipName,
                     OnShip = item.OnShip,
                     Postition = item.Postition,
@@ -2389,7 +2398,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                             FCertificate = item.FCertificate,
                             FSignTime = item.FSignTime,
                             FEffectiveTime = item.FEffectiveTime,
-                            FEffectiveCountdown = TimeHelper.GetTimeSpan(Convert.ToDateTime(item?.FEffectiveTime), DateTime.Now).Days + 1,
+                            FEffectiveCountdown = item?.SEffectiveTime == null ? 0 : TimeHelper.GetTimeSpan(Convert.ToDateTime(item?.FEffectiveTime), DateTime.Now).Days + 1,
                             FNavigationArea = item?.FNavigationArea,
                             FNavigationAreaName = navigationarea.FirstOrDefault(x => x.BusinessId.ToString() == item?.FNavigationArea)?.Name,
                             FPosition = item?.FPosition,
@@ -2418,7 +2427,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                         ss.Add(new SecondCertificateOfCompetencyDetailsDto
                         {
                             SCertificate = item.SCertificate,
-                            SEffectiveCountdown = TimeHelper.GetTimeSpan(Convert.ToDateTime(item?.SEffectiveTime), DateTime.Now).Days + 1,
+                            SEffectiveCountdown = item?.SEffectiveTime == null ? 0 : TimeHelper.GetTimeSpan(Convert.ToDateTime(item?.SEffectiveTime), DateTime.Now).Days + 1,
                             SEffectiveTime = item?.SEffectiveTime,
                             SNavigationArea = item?.SNavigationArea,
                             SNavigationAreaName = navigationarea.FirstOrDefault(x => x.BusinessId.ToString() == item?.SNavigationArea)?.Name,
@@ -2753,11 +2762,10 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
             #region 匹配链表字段
 
             //用户状态
-            if (userInfo.IsDelete == 1)
-            {
-                ur.StatusName = EnumUtil.GetDescription(userInfo.DeleteReson);//删除原因获取用户状态
-            }
-            var userWorkShip = await _dbContext.Queryable<WorkShip>().Where(t => t.IsDelete == 1 && t.WorkShipId == userInfo.BusinessId).OrderByDescending(t => t.WorkShipEndTime).FirstAsync();
+
+            ur.StatusName = EnumUtil.GetDescription(userInfo.DeleteReson);//删除原因获取用户状态
+
+            var userWorkShip = await _dbContext.Queryable<WorkShip>().Where(t => t.IsDelete == 1 && t.WorkShipId == userInfo.BusinessId).OrderByDescending(t => t.WorkShipStartTime).FirstAsync();
             if (userWorkShip != null)
             {
                 ////有休假时间  休假

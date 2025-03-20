@@ -8,6 +8,14 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
     public class SearchCrewArchivesResponse : BaseResponse
     {
         /// <summary>
+        /// 头像
+        /// </summary>
+        public string? Icon { get; set; }
+        /// <summary>
+        /// 头像id
+        /// </summary>
+        public Guid? CrewPhoto { get; set; }
+        /// <summary>
         /// 用户名称
         /// </summary>
         public string? UserName { get; set; }

@@ -725,6 +725,10 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// </summary>
         public DateTime? WorkShipEndTime { get; set; }
         /// <summary>
+        /// 下船日期 至今
+        /// </summary>
+        public string? WorkShipEndTimeStr { get; set; }
+        /// <summary>
         /// 在船天数
         /// </summary>
         public int OnBoardDay { get; set; }
