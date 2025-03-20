@@ -987,25 +987,30 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project
         //public string? ShipName { get; set; }
 
 
-        [ExcelColumnName("PG码")]
+        [ExcelColumnName("主数据编码")]
         /// <summary>
         /// PG码
         /// </summary>
         public string? Association { get; set; }
 
-
-        [ExcelColumnName("年度")]
         /// <summary>
-        /// 年份
+        /// 管理单位
         /// </summary>
-        public string? Year { get; set; }
+        public string ManageMentUnit{get;set;}
+
+
+        //[ExcelColumnName("年度")]
+        ///// <summary>
+        ///// 年份
+        ///// </summary>
+        //public string? Year { get; set; }
 
         /// <summary>
         /// 1月产量
         /// </summary>
         //public decimal JanuaryProductionQuantity { get; set; }
 
-        [ExcelColumnName("一月份产值")]
+        [ExcelColumnName("1月计划")]
         /// <summary>
         /// 1月产值
         /// </summary>
@@ -1016,7 +1021,7 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project
         /// </summary>
         //public decimal FebruaryProductionQuantity { get; set; }
 
-        [ExcelColumnName("二月份产值")]
+        [ExcelColumnName("2月计划")]
         /// <summary>
         /// 2月产值
         /// </summary>
@@ -1028,7 +1033,7 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project
         //public decimal MarchProductionQuantity { get; set; }
 
 
-        [ExcelColumnName("三月份产值")]
+        [ExcelColumnName("3月计划")]
         /// <summary>
         /// 3月产值
         /// </summary>
@@ -1039,7 +1044,7 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project
         /// </summary>
         //public decimal AprilProductionQuantity { get; set; }
 
-        [ExcelColumnName("四月份产值")]
+        [ExcelColumnName("4月计划")]
         /// <summary>
         /// 4月产值
         /// </summary>
@@ -1050,7 +1055,7 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project
         /// </summary>
         //public decimal MayProductionQuantity { get; set; }
 
-        [ExcelColumnName("五月份产值")]
+        [ExcelColumnName("5月计划")]
         /// <summary>
         /// 5月产值
         /// </summary>
@@ -1061,7 +1066,7 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project
         /// </summary>
         //public decimal JuneProductionQuantity { get; set; }
 
-        [ExcelColumnName("六月份产值")]
+        [ExcelColumnName("6月计划")]
         /// <summary>
         /// 6月产值
         /// </summary>
@@ -1073,7 +1078,7 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project
         //public decimal JulyProductionQuantity { get; set; }
 
 
-        [ExcelColumnName("七月份产值")]
+        [ExcelColumnName("7月计划")]
 
         /// <summary>
         /// 7月产值
@@ -1086,7 +1091,7 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project
         //public decimal AugustProductionQuantity { get; set; }
 
 
-        [ExcelColumnName("八月份产值")]
+        [ExcelColumnName("8月计划")]
         /// <summary>
         /// 8月产值
         /// </summary>
@@ -1098,7 +1103,7 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project
         //public decimal SeptemberProductionQuantity { get; set; }
 
 
-        [ExcelColumnName("九月份产值")]
+        [ExcelColumnName("9月计划")]
         /// <summary>
         /// 9月产值
         /// </summary>
@@ -1109,7 +1114,7 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project
         /// </summary>
         //public decimal OctoberProductionQuantity { get; set; }
 
-        [ExcelColumnName("十月份产值")]
+        [ExcelColumnName("10月计划")]
         /// <summary>
         /// 10月产值
         /// </summary>
@@ -1120,7 +1125,7 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project
         /// </summary>
         //public decimal NovemberProductionQuantity { get; set; }
 
-        [ExcelColumnName("十一月份产值")]
+        [ExcelColumnName("11月计划")]
         /// <summary>
         /// 11月产值
         /// </summary>
@@ -1131,7 +1136,7 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project
         /// </summary>
         //public decimal DecemberProductionQuantity { get; set; }
 
-        [ExcelColumnName("十二月份产值")]
+        [ExcelColumnName("12月份计划")]
         /// <summary>
         /// 12月产值
         /// </summary>

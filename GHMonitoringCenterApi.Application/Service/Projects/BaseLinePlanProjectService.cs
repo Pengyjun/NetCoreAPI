@@ -1721,30 +1721,47 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
 
                 foreach (var item in imports)
                 {
-                    var years = item.Year;
-                    if (string.IsNullOrWhiteSpace(years))
-                    {
-                        responseAjaxResult.Fail("年份不能为空");
-                    }
-                    int year;
-                    bool result = int.TryParse(years, out year);
-                    if (result == false)
-                    {
-                        responseAjaxResult.Fail("年份格式异常");
-                    }
+                    //var years = item.Year;
+                    //if (string.IsNullOrWhiteSpace(years))
+                    //{
+                    //    responseAjaxResult.Fail("年份不能为空");
+                    //}
+                    //int year;
+                    //bool result = int.TryParse(years, out year);
+                    //if (result == false)
+                    //{
+                    //    responseAjaxResult.Fail("年份格式异常");
+                    //}
                     var BaseId = GuidUtil.Next();
                     var add = new BaseLinePlanProject()
                     {
                         ShortName = item.ShortName,
                         Id = BaseId,
                         CompanyId = _currentUser.CurrentLoginInstitutionId,
-                        Year = year,
+                        Year = DateTime.Now.Year,
                         CreateTime = DateTime.Now,
                     };
 
-                    if (input.Association > 0)
+                    //if (input.Association > 0)
+                    //{
+                    add.Association = item.Association;
+                    //}
+
+                    if (!string.IsNullOrWhiteSpace(add.Association))
                     {
-                        add.Association = item.Association;
+                        var co = await dbContext.Queryable<Project>().Where(p => p.MasterCode == add.Association).FirstAsync();
+                        if (co != null)
+                        {
+                            add.CompanyId = co.CompanyId.Value;
+                        }
+                        else
+                        {
+                            add.CompanyId = "bd840460-1e3a-45c8-abed-6e66903eb465".ToGuid();
+                        }
+                    }
+                    else
+                    {
+                        add.CompanyId = "bd840460-1e3a-45c8-abed-6e66903eb465".ToGuid();
                     }
                     await GetPlanVersion(add);
                     addbaseLinePlanProjects.Add(add);
@@ -1764,7 +1781,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                         DecemberProductionValue = Setnumericalconversiontwo(item.DecemberProductionValue),
                         ProjectId = BaseId,
                         CompanyId = _currentUser.CurrentLoginInstitutionId,
-                        Year = year
+                        Year = DateTime.Now.Year
                     };
                     b.Id = Guid.NewGuid();
                     addTables.Add(b);
