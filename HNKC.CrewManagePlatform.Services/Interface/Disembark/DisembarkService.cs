@@ -68,7 +68,8 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Disembark
             var departureApplyVoList =
                 await _dbContext.Queryable<DepartureApply>()
                     .Where(da => da.IsDelete == 1)
-                    .Where(da => da.UserId == userBusinessId || da.ApproveUserId == userBusinessId)
+                    .WhereIF(query.type == 0,da => da.UserId == userBusinessId)
+                    .WhereIF(query.type == 1,da => da.ApproveUserId == userBusinessId)
                     .WhereIF(
                         !string.IsNullOrWhiteSpace(query.StartTime.ToString()) &&
                         !string.IsNullOrWhiteSpace(query.EndTime.ToString()),
@@ -134,7 +135,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Disembark
 
             var roleType = await _baseService.CurRoleType();
             // 判断角色类型
-            if (roleType == 3)
+            if (roleType != 3)
             {
                 return Result.Fail("非船长角色无法提交申请");
             }
