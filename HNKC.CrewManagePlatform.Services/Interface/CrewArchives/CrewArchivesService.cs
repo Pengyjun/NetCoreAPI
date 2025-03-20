@@ -53,12 +53,16 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
             var uentity = _dbContext.Queryable<UserEntryInfo>()
                 .InnerJoin(uentityFist, (x, y) => x.UserEntryId == y.UserEntryId && x.EndTime == y.EndTime);
             #endregion
+
+            // 转义 % 和 _
+            string escapedKeyword = requestBody.KeyWords.Replace("%", "\\%").Replace("_", "\\_");
+
             //名称相关不赋值
             var rt = await _dbContext.Queryable<User>()
                 .Where(t => t.IsLoginUser == 1)
                 .OrderByDescending(t => t.Created)
-                .WhereIF(!string.IsNullOrWhiteSpace(requestBody.KeyWords), t => t.Name.Contains(requestBody.KeyWords) || t.CardId.Contains(requestBody.KeyWords)
-                || t.Phone.Contains(requestBody.KeyWords) || t.WorkNumber.Contains(requestBody.KeyWords))
+                .WhereIF(!string.IsNullOrWhiteSpace(requestBody.KeyWords), t => t.Name.Contains(escapedKeyword) || t.CardId.Contains(escapedKeyword)
+                || t.Phone.Contains(escapedKeyword) || t.WorkNumber.Contains(escapedKeyword))
                 .WhereIF(!string.IsNullOrWhiteSpace(requestBody.Name), t => t.Name.Contains(requestBody.Name))
                 .WhereIF(!string.IsNullOrWhiteSpace(requestBody.CardId), t => t.CardId.Contains(requestBody.CardId))
                 .WhereIF(!string.IsNullOrWhiteSpace(requestBody.WorkNumber), t => t.WorkNumber.Contains(requestBody.WorkNumber))
