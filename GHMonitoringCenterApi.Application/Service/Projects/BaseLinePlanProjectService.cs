@@ -471,7 +471,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     baselinefirbaseLinePlanProject.IsSubPackage = input.IsSubPackage;
                     baselinefirbaseLinePlanProject.RemainingAmount = input.RemainingAmount;
                     baselinefirbaseLinePlanProject.SubmitStatus = input.SubmitStatus;
-                    baselinefirbaseLinePlanProject.PlanStatus = input.PlanStatus.Value;
+                    baselinefirbaseLinePlanProject.PlanStatus = input.PlanStatus.GetValueOrDefault();
                     input.ProjectId = baselinefirbaseLinePlanProject.Id;
                     await GetPlanVersion(baselinefirbaseLinePlanProject);
                     await dbContext.Updateable(baselinefirbaseLinePlanProject).ExecuteCommandAsync();
@@ -491,7 +491,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     baseLinePlanProject.RemainingAmount = input.RemainingAmount;
                     baseLinePlanProject.ShortName = input.ShortName;
                     baseLinePlanProject.SubmitStatus = input.SubmitStatus;
-                    baseLinePlanProject.PlanStatus = input.PlanStatus.Value;
+                    baseLinePlanProject.PlanStatus = input.PlanStatus.GetValueOrDefault();
                     if (isbaseline != null && isbaseline.Name == "1")
                     {
                         baseLinePlanProject.PlanType = "1";
