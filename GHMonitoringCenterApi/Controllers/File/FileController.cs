@@ -1186,7 +1186,7 @@ namespace GHMonitoringCenterApi.Controllers.File
         public async Task<IActionResult> ExcelImportBaseLinePlanAsync([FromQuery] BaseLinePlanAncomparisonRequsetDto requestBody)
         {
             //模板位置      
-            var templatePath = $"D:/Project/GHMonitoringCenterApi/GHMonitoringCenterApi.Domain.Shared/Template/Excel/BaseLinePlanTemplate.xlsx";
+            var templatePath = $"Template/Excel/BaseLinePlanTemplate.xlsx";
             var data = await baseLinePlanProjectService.BaseLinePlanExcelOutPutAsync(requestBody);
             var importData = new
             {
