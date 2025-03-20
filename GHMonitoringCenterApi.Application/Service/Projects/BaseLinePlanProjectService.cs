@@ -1067,8 +1067,9 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                      SeptemberProductionValue = SqlFunc.AggregateSum(it.SeptemberProductionValue),
                      OctoberProductionValue = SqlFunc.AggregateSum(it.OctoberProductionValue),
                      NovemberProductionValue = SqlFunc.AggregateSum(it.NovemberProductionValue),
-                     DecemberProductionValue = SqlFunc.AggregateSum(it.DecemberProductionValue)
-                 })
+                     DecemberProductionValue = SqlFunc.AggregateSum(it.DecemberProductionValue),
+                     LatestDate = SqlFunc.AggregateMax(it.CreateTime)
+                 }).OrderByDescending(p => p.LatestDate)
                 .ToPageListAsync(requestBody.PageIndex, requestBody.PageSize, total);
             var jobs = await dbContext.Queryable<Domain.Models.Job>().Where(p => baseplanprojectIds.Contains(p.ProjectId) && p.IsFinish == false).ToListAsync();
             var approvers = await dbContext.Queryable<JobApprover>().Where(p => jobs.Select(p => p.Id).ToList().Contains(p.JobId)).ToListAsync();
@@ -1512,8 +1513,9 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                      SeptemberProductionValue = SqlFunc.AggregateSum(it.SeptemberProductionValue),
                      OctoberProductionValue = SqlFunc.AggregateSum(it.OctoberProductionValue),
                      NovemberProductionValue = SqlFunc.AggregateSum(it.NovemberProductionValue),
-                     DecemberProductionValue = SqlFunc.AggregateSum(it.DecemberProductionValue)
-                 });
+                     DecemberProductionValue = SqlFunc.AggregateSum(it.DecemberProductionValue),
+                     LatestDate = SqlFunc.AggregateMax(it.CreateTime)
+                 }).OrderByDescending(p => p.LatestDate);
             var pPlanProductionList = new List<SearchSubsidiaryCompaniesProjectProductionDto>();
             if (!requestBody.IsFullExport)
             {
@@ -1747,6 +1749,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                         Id = BaseId,
                         CompanyId = _currentUser.CurrentLoginInstitutionId,
                         Year = DateTime.Now.Year,
+                        SubmitStatus = 0,
                         CreateTime = DateTime.Now,
                     };
 
