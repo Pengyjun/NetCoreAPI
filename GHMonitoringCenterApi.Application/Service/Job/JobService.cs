@@ -855,7 +855,15 @@ namespace GHMonitoringCenterApi.Application.Service.Job
                 var baseline = await _dbContext.Queryable<BaseLinePlanProject>().Where(p => p.Id == saveModel.Id).FirstAsync();
                 if (!job.IsFinish)
                 {
-                    baseline.PlanStatus = (int)job.ApproveStatus;
+                    if (job.ApproveStatus== JobApproveStatus.None)
+                    {
+                        baseline.PlanStatus = 4;
+                    }
+                    else
+                    {
+                        baseline.PlanStatus = (int)job.ApproveStatus;
+                    }
+                      
                     if (job.ApproveStatus == JobApproveStatus.Pass && job.ApproveLevel == ApproveLevel.Level1)
                     {
                         baseline.PlanStatus = 5;
