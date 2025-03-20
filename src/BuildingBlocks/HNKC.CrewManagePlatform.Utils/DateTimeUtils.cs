@@ -190,5 +190,36 @@ namespace HNKC.CrewManagePlatform.Utils
         }
 
         #endregion
+
+        /// <summary>
+        /// 计算两个日期之间的天数差
+        /// </summary>
+        /// <param name="startDate">起始日期</param>
+        /// <param name="endDate">结束日期</param>
+        /// <returns>天数差（有效期天数）</returns>
+        public static int GetTimeSpan(DateTime startDate, DateTime endDate)
+        {
+            if (endDate < startDate)
+            {
+                throw new ArgumentException("结束日期不能早于起始日期。");
+            }
+
+            TimeSpan timeSpan = endDate - startDate;
+            return timeSpan.Days;
+        }
+        /// <summary>
+        /// 计算有效期
+        /// </summary>
+        /// <param name="startDate">起始日期</param>
+        /// <returns>天数差（有效期天数）</returns>
+        public static int CalculateValidityDays(DateTime startDate, DateTime endDate)
+        {
+            // 获取当前日期
+            DateTime currentDate = DateTime.Today;
+
+            TimeSpan timeSpan = currentDate - startDate;
+            return timeSpan.Days;
+        }
+
     }
 }
