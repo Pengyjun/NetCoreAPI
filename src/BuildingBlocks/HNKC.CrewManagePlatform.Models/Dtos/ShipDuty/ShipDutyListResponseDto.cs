@@ -59,6 +59,10 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.ShipDuty
     public class LeaderInfo
     {
         /// <summary>
+        /// 用户id
+        /// </summary>
+        public string? UserId { get; set; }
+        /// <summary>
         /// 名称
         /// </summary>
         public string? Name { get; set; }
@@ -107,6 +111,14 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.ShipDuty
         /// </summary>
         public string? Icon2 { get; set; }
         /// <summary>
+        /// 用户id1
+        /// </summary>
+        public string? UserId1 { get; set; }
+        /// <summary>
+        /// 用户id2
+        /// </summary>
+        public string? UserId2 { get; set; }
+        /// <summary>
         /// 人员1
         /// </summary>
         public string Person1 { get; set; }
@@ -136,6 +148,10 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.ShipDuty
         /// 图标
         /// </summary>
         public string Icon { get; set; }
+        /// <summary>
+        /// 用户id
+        /// </summary>
+        public string? UserId { get; set; }
         /// <summary>
         /// 用户名称
         /// </summary>

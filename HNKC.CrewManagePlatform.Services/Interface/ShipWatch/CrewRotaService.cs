@@ -416,6 +416,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.ShipWatch
                 var wFirst = wShip.FirstOrDefault(t => t.Postition == "93f80b81-cf29-11ef-82f9-ecd68ace58a2");
                 if (wFirst != null)
                 {
+                    leaderInfo.UserId = userInfo.FirstOrDefault(t => t.BusinessId == wFirst.WorkShipId)?.BusinessId.ToString();
                     leaderInfo.Name = userInfo.FirstOrDefault(t => t.BusinessId == wFirst.WorkShipId)?.Name;
                     leaderInfo.JobType = positionInfo.FirstOrDefault(t => t.BusinessId.ToString() == wFirst.Postition)?.Name;
                     var file = userInfo.FirstOrDefault(t => t.BusinessId == wFirst.WorkShipId)?.CrewPhoto;
@@ -439,6 +440,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.ShipWatch
                 var wFirst2 = wShip.OrderByDescending(t => t.Postition).FirstOrDefault(t => str.Contains(t.Postition));
                 if (wFirst2 != null)
                 {
+                    leaderInfo2.UserId = userInfo.FirstOrDefault(t => t.BusinessId == wFirst.WorkShipId)?.BusinessId.ToString();
                     leaderInfo2.Name = userInfo.FirstOrDefault(t => t.BusinessId == wFirst2.WorkShipId)?.Name;
                     leaderInfo2.JobType = positionInfo.FirstOrDefault(t => t.BusinessId.ToString() == wFirst2.Postition)?.Name;
                     var file = userInfo.FirstOrDefault(t => t.BusinessId == wFirst.WorkShipId)?.CrewPhoto;
@@ -449,6 +451,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.ShipWatch
                 var wFirst3 = wShip.FirstOrDefault(t => t.Postition == "93f86f23-cf29-11ef-82f9-ecd68ace58a2");
                 if (wFirst3 != null)
                 {
+                    leaderInfo3.UserId = userInfo.FirstOrDefault(t => t.BusinessId == wFirst.WorkShipId)?.BusinessId.ToString();
                     leaderInfo3.Name = userInfo.FirstOrDefault(t => t.BusinessId == wFirst3.WorkShipId)?.Name;
                     leaderInfo3.JobType = positionInfo.FirstOrDefault(t => t.BusinessId.ToString() == wFirst3.Postition)?.Name;
                     var file = userInfo.FirstOrDefault(t => t.BusinessId == wFirst.WorkShipId)?.CrewPhoto;
@@ -523,6 +526,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.ShipWatch
                 //获取对应职务
                 var position = wShip.Where(t => t.WorkShipId == item.FLeaderUserId).FirstOrDefault()?.Postition;
                 var positionName = positionInfo.Where(t => t.BusinessId.ToString() == position).FirstOrDefault()?.Name;
+                team.UserId1 = userInfo.Where(t => t.BusinessId == item.FLeaderUserId).FirstOrDefault()?.BusinessId.ToString();
                 team.Person1 = user1 + "（" + positionName + "）";
                 var file1 = userInfo.FirstOrDefault(t => t.BusinessId == item.FLeaderUserId)?.CrewPhoto;
                 team.Icon1 = url + fileInfo.FirstOrDefault(t => t.FileId == file1)?.Name;
@@ -530,7 +534,8 @@ namespace HNKC.CrewManagePlatform.Services.Interface.ShipWatch
                 //获取对应职务
                 var position2 = wShip.Where(t => t.WorkShipId == item.SLeaderUserId).FirstOrDefault()?.Postition;
                 var positionName2 = positionInfo.Where(t => t.BusinessId.ToString() == position2).FirstOrDefault()?.Name;
-                team.Person1 = user2 + "（" + positionName2 + "）";
+                team.UserId2 = userInfo.Where(t => t.BusinessId == item.FLeaderUserId).FirstOrDefault()?.BusinessId.ToString();
+                team.Person2 = user2 + "（" + positionName2 + "）";
                 var file2 = userInfo.FirstOrDefault(t => t.BusinessId == item.FLeaderUserId)?.CrewPhoto;
                 team.Icon2 = url + fileInfo.FirstOrDefault(t => t.FileId == file2)?.Name;
                 var other = item.OhterUserId?.Split(',').ToList();
@@ -547,6 +552,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.ShipWatch
                 //获取对应职务
                 var position = wShip.Where(t => t.WorkShipId == item.UserId).FirstOrDefault()?.Postition;
                 var positionName = positionInfo.Where(t => t.BusinessId.ToString() == position).FirstOrDefault()?.Name;
+                userInfo1.UserId = userInfo.Where(t => t.BusinessId == item.UserId).FirstOrDefault()?.BusinessId.ToString();
                 userInfo1.UserName = "休假中" + user1 + "（" + positionName + "）";
                 userList.Add(userInfo1);
             }
