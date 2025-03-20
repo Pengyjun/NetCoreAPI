@@ -1177,5 +1177,24 @@ namespace GHMonitoringCenterApi.Controllers.File
 
         #endregion
 
+        #region 基准计划导入导出
+        /// <summary>
+        /// 基准计划导出excel
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("ExcelImportBaseLinePlan")]
+        public async Task<IActionResult> ExcelImportBaseLinePlanAsync([FromQuery] BaseLinePlanAncomparisonRequsetDto requestBody)
+        {
+            //模板位置      
+            var templatePath = $"D:/Project/GHMonitoringCenterApi/GHMonitoringCenterApi.Domain.Shared/Template/Excel/BaseLinePlanTemplate.xlsx";
+            var data = await baseLinePlanProjectService.BaseLinePlanExcelOutPutAsync(requestBody);
+            var importData = new
+            {
+                Title = "",
+                Base = data.Data
+            };
+            return await ExcelTemplateImportAsync(templatePath, importData, DateTime.Now.ToDateDay() + "计划列表");
+        }
+        #endregion
     }
 }
