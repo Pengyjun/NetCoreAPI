@@ -2399,7 +2399,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                             FCertificate = item.FCertificate,
                             FSignTime = item.FSignTime,
                             FEffectiveTime = item.FEffectiveTime,
-                            FEffectiveCountdown = item?.SEffectiveTime == null ? 0 : TimeHelper.GetTimeSpan(Convert.ToDateTime(item?.FEffectiveTime), DateTime.Now).Days + 1,
+                            FEffectiveCountdown = item?.FEffectiveTime == null ? 0 : TimeHelper.GetTimeSpan(Convert.ToDateTime(item?.FEffectiveTime), DateTime.Now).Days + 1,
                             FNavigationArea = item?.FNavigationArea,
                             FNavigationAreaName = navigationarea.FirstOrDefault(x => x.BusinessId.ToString() == item?.FNavigationArea)?.Name,
                             FPosition = item?.FPosition,
@@ -2686,7 +2686,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
 
             var userInfo = await GetUserInfoAsync(bId);
             //入职材料
-            var userEntryInfo = await _dbContext.Queryable<UserEntryInfo>().Where(t => t.IsDelete == 1 && t.UserEntryId == userInfo.BusinessId).OrderByDescending(x =>new{x.ContractType ,x.EntryTime}).ToListAsync();
+            var userEntryInfo = await _dbContext.Queryable<UserEntryInfo>().Where(t => t.IsDelete == 1 && t.UserEntryId == userInfo.BusinessId).OrderByDescending(x => new { x.ContractType, x.EntryTime }).ToListAsync();
             var fIds = userEntryInfo.Select(x => x.EntryScans.ToString()).ToList();
             //用工类型
             var empType = await _dbContext.Queryable<EmploymentType>().Where(t => t.IsDelete == 1).ToListAsync();
@@ -2708,7 +2708,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                     EmploymentName = empType.FirstOrDefault(x => x.BusinessId.ToString() == item.EmploymentId)?.Name,
                     EmploymentId = item.EmploymentId,
                     Staus = item.ContractType == ContractEnum.NoFixedTerm ? "进行中" : item.EndTime >= DateTime.Now ? "进行中" : "已结束",
-                    EntryTime =item.EntryTime,
+                    EntryTime = item.EntryTime,
                     EndTime = item.EndTime,
                     StartTime = item.StartTime
                 });

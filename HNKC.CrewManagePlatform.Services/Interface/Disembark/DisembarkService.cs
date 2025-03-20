@@ -735,13 +735,6 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Disembark
         /// <returns></returns>
         public async Task<PageResult<AnnualLeavePlanResponseDto>> SearchAnnualLeavePlanAsync(AnnualLeavePlanRequestDto requestDto)
         {
-            //for (int i = 0; i < 1000; i++)
-            //{
-            //    ShipPersonnelPosition model = new ShipPersonnelPosition();
-            //    model.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
-            //    model.BusinessId = GuidUtil.Next();
-            //    await _dbContext.Insertable(model).ExecuteCommandAsync();
-            //}
             PageResult<AnnualLeavePlanResponseDto> result = new();
             //RefAsync<int> total = 0;
             if (requestDto.Year <= 0)
@@ -810,6 +803,20 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Disembark
                     JobTypeId = ws.Postition,
                 })
                 .ToListAsync();
+            //书记
+            List<string> str1 = new List<string>()
+            {
+                "93f8e8f2-cf29-11ef-82f9-ecd68ace58a2",
+                "93f9025e-cf29-11ef-82f9-ecd68ace58a2",
+                "93f91a6f-cf29-11ef-82f9-ecd68ace58a2",
+                "93f93632-cf29-11ef-82f9-ecd68ace58a2",
+                "93f94b37-cf29-11ef-82f9-ecd68ace58a2",
+                "93f961ad-cf29-11ef-82f9-ecd68ace58a2",
+                "93f982d6-cf29-11ef-82f9-ecd68ace58a2",
+                "93f99dfe-cf29-11ef-82f9-ecd68ace58a2",
+                "93f9b563-cf29-11ef-82f9-ecd68ace58a2",
+                "93f9d3bb-cf29-11ef-82f9-ecd68ace58a2"
+            };
             foreach (var item in pageResult)
             {
                 item.ShipTypeName = GetEnumDescription(item.ShipType);
@@ -817,7 +824,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Disembark
                 item.ProjectName = shipProjectInfo.FirstOrDefault(t => t.RelationShipId == item.ShipId)?.ProjectName ?? "";
                 item.CompanyName = institutionInfo.FirstOrDefault(t => t.BusinessId == item.CompanyId)?.Name ?? "";
                 item.Captain = userInfos.FirstOrDefault(t => t.ShipId == item.ShipId.ToString() && t.JobTypeId == "93f80b81-cf29-11ef-82f9-ecd68ace58a2")?.UserName ?? "";
-                item.Secretary = userInfos.FirstOrDefault(t => t.ShipId == item.ShipId.ToString() && t.JobTypeId == "")?.UserName ?? "";
+                item.Secretary = userInfos.FirstOrDefault(t => t.ShipId == item.ShipId.ToString() && str1.Contains(t.JobTypeId))?.UserName ?? "";
                 item.ChiefEngineer = userInfos.FirstOrDefault(t => t.ShipId == item.ShipId.ToString() && t.JobTypeId == "93f86f23-cf29-11ef-82f9-ecd68ace58a2")?.UserName ?? "";
             }
             result.List = pageResult;
@@ -867,8 +874,12 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Disembark
             var url = AppsettingsHelper.GetValue("UpdateItem:Url");
             //文件
             var fileAll = await _dbContext.Queryable<Files>().Where(t => t.IsDelete == 1 && userIds.Contains(t.UserId)).ToListAsync();
+            //第一适任证职务
             var certificateInfo = await _dbContext.Queryable<CertificateOfCompetency>().Where(t => t.Type == CertificatesEnum.FCertificate && userIds.Contains(t.CertificateId)).ToListAsync();
-            var positionInfo = await _dbContext.Queryable<PositionOnBoard>().Where(t => jobTypeId.Contains(t.BusinessId.ToString())).ToListAsync();
+            //在船职务
+            var positionOnBoardInfo = await _dbContext.Queryable<PositionOnBoard>().ToListAsync();
+            //适任职务
+            var positionInfo = await _dbContext.Queryable<Position>().ToListAsync();
             var areaIds = certificateInfo.Select(t => t.FNavigationArea).Distinct().ToArray();
             var navigationInfo = await _dbContext.Queryable<NavigationArea>().Where(t => areaIds.Contains(t.BusinessId.ToString())).ToListAsync();
             foreach (var item in userInfos)
@@ -878,7 +889,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Disembark
                 var areaId = certificateInfo.FirstOrDefault(x => x.CertificateId == item.UserId)?.FNavigationArea;
                 //第一适任扫描件
                 var scans = certificateInfo.FirstOrDefault(x => x.CertificateId == item.UserId)?.FScans;
-                item.JobTypeName = positionInfo.FirstOrDefault(x => x.BusinessId.ToString() == item.JobTypeId)?.Name ?? "";
+                item.JobTypeName = positionOnBoardInfo.FirstOrDefault(x => x.BusinessId.ToString() == item.JobTypeId)?.Name ?? "";
                 item.CertificateId = certificateInfo.FirstOrDefault(x => x.CertificateId == item.UserId)?.BusinessId;
                 var position = positionInfo.FirstOrDefault(x => x.BusinessId.ToString() == positionId)?.Name ?? "";
                 var area = navigationInfo.FirstOrDefault(t => t.BusinessId.ToString() == areaId)?.Name;
@@ -1172,14 +1183,14 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Disembark
         public async Task<Result> SearchCertificateSelectAsync()
         {
             var certificate = await _dbContext.Queryable<CertificateOfCompetency>()
-                .LeftJoin(_dbContext.Queryable<PositionOnBoard>().Where(t => t.IsDelete == 1), (x, y) => x.FPosition == y.BusinessId.ToString())
+                .LeftJoin(_dbContext.Queryable<Position>().Where(t => t.IsDelete == 1), (x, y) => x.FPosition == y.BusinessId.ToString())
                 .LeftJoin(_dbContext.Queryable<NavigationArea>().Where(t => t.IsDelete == 1), (x, y, z) => x.FNavigationArea == z.BusinessId.ToString())
                 .Where((x, y, z) => x.IsDelete == 1 && (!string.IsNullOrWhiteSpace(y.Name) || !string.IsNullOrWhiteSpace(z.Name)))
                 .Select((x, y, z) => new
                 {
-                    x.BusinessId,
-                    Name = y.Name ?? "" + z.Name ?? ""
-                }).ToListAsync();
+                    x.FPosition,
+                    Name = (y.Name ?? "") + (z.Name ?? "")
+                }).Distinct().ToListAsync();
             return Result.Success(certificate);
         }
 

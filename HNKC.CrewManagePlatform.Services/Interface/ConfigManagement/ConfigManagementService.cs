@@ -44,6 +44,15 @@ namespace HNKC.CrewManagePlatform.Services.Interface.ConfigManagement
                             shirel.ProjectName = shipRequest.Project;
                             await _dbContext.Updateable(shirel).UpdateColumns(x => x.ProjectName).ExecuteCommandAsync();
                         }
+                        else
+                        {
+                            ShipProjectRelation model = new ShipProjectRelation();
+                            model.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
+                            model.BusinessId = GuidUtil.Next();
+                            model.RelationShipId = rt.BusinessId;
+                            model.ProjectName = shipRequest.Project;
+                            await _dbContext.Insertable(model).ExecuteCommandAsync();
+                        }
                     }
                     await _dbContext.Updateable(rt).ExecuteCommandAsync();
                 }
