@@ -46,9 +46,9 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Certificate
                 .InnerJoin(uentityFist, (x, y) => x.UserEntryId == y.UserEntryId && x.EndTime == y.EndTime);
             var crewWorkShip = _dbContext.Queryable<WorkShip>()
             .GroupBy(u => u.WorkShipId)
-            .Select(t => new { t.WorkShipId, WorkShipEndTime = SqlFunc.AggregateMax(t.WorkShipEndTime) });
+            .Select(t => new { t.WorkShipId, WorkShipStartTime = SqlFunc.AggregateMax(t.WorkShipStartTime) });
             var wShip = _dbContext.Queryable<WorkShip>()
-                .InnerJoin(crewWorkShip, (x, y) => x.WorkShipId == y.WorkShipId && x.WorkShipEndTime == y.WorkShipEndTime);
+                .InnerJoin(crewWorkShip, (x, y) => x.WorkShipId == y.WorkShipId && x.WorkShipStartTime == y.WorkShipStartTime);
             #endregion
 
             //获取提醒天数

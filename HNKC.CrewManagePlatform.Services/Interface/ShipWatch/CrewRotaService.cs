@@ -156,10 +156,10 @@ namespace HNKC.CrewManagePlatform.Services.Interface.ShipWatch
             //任职船舶
             var crewWorkShip = _dbContext.Queryable<WorkShip>()
                 .GroupBy(u => u.WorkShipId)
-                .Select(t => new { t.WorkShipId, WorkShipEndTime = SqlFunc.AggregateMax(t.WorkShipEndTime) });
+                .Select(t => new { t.WorkShipId, WorkShipStartTime = SqlFunc.AggregateMax(t.WorkShipStartTime) });
             var wShip = _dbContext.Queryable<WorkShip>()
                 .InnerJoin(crewWorkShip,
-                    (x, y) => x.WorkShipId == y.WorkShipId && x.WorkShipEndTime == y.WorkShipEndTime);
+                    (x, y) => x.WorkShipId == y.WorkShipId && x.WorkShipStartTime == y.WorkShipStartTime);
 
             #endregion
 
@@ -223,10 +223,10 @@ namespace HNKC.CrewManagePlatform.Services.Interface.ShipWatch
                 //任职船舶
                 var crewWorkShip = _dbContext.Queryable<WorkShip>()
                     .GroupBy(u => u.WorkShipId)
-                    .Select(t => new { t.WorkShipId, WorkShipEndTime = SqlFunc.AggregateMax(t.WorkShipEndTime) });
+                    .Select(t => new { t.WorkShipId, WorkShipStartTime = SqlFunc.AggregateMax(t.WorkShipStartTime) });
                 var wShip = _dbContext.Queryable<WorkShip>()
                     .InnerJoin(crewWorkShip,
-                        (x, y) => x.WorkShipId == y.WorkShipId && x.WorkShipEndTime == y.WorkShipEndTime);
+                        (x, y) => x.WorkShipId == y.WorkShipId && x.WorkShipStartTime == y.WorkShipStartTime);
 
                 var userInfo = await _dbContext.Queryable<User>()
                     .Where(t => t.IsLoginUser == 1)
@@ -290,10 +290,10 @@ namespace HNKC.CrewManagePlatform.Services.Interface.ShipWatch
             //任职船舶
             var crewWorkShip = _dbContext.Queryable<WorkShip>()
                 .GroupBy(u => u.WorkShipId)
-                .Select(t => new { t.WorkShipId, WorkShipEndTime = SqlFunc.AggregateMax(t.WorkShipEndTime) });
+                .Select(t => new { t.WorkShipId, WorkShipStartTime = SqlFunc.AggregateMax(t.WorkShipStartTime) });
             var wShip = _dbContext.Queryable<WorkShip>()
                 .InnerJoin(crewWorkShip,
-                    (x, y) => x.WorkShipId == y.WorkShipId && x.WorkShipEndTime == y.WorkShipEndTime);
+                    (x, y) => x.WorkShipId == y.WorkShipId && x.WorkShipStartTime == y.WorkShipStartTime);
             var userOnboard = await _dbContext.Queryable<User>().Where(t => t.IsLoginUser == 1)
                 .InnerJoin(wShip, (t, ws) => t.BusinessId == ws.WorkShipId)
                 .InnerJoin<PositionOnBoard>((t, ws, po) => po.BusinessId.ToString() == ws.Postition)
@@ -403,9 +403,9 @@ namespace HNKC.CrewManagePlatform.Services.Interface.ShipWatch
                 var crewWorkShip = _dbContext.Queryable<WorkShip>()
                     .Where(t => t.OnShip == request.BId.ToString())
                   .GroupBy(u => u.WorkShipId)
-                  .Select(t => new { t.WorkShipId, WorkShipEndTime = SqlFunc.AggregateMax(t.WorkShipEndTime) });
+                  .Select(t => new { t.WorkShipId, WorkShipStartTime = SqlFunc.AggregateMax(t.WorkShipStartTime) });
                 var wShip = await _dbContext.Queryable<WorkShip>().Where(t => t.OnShip == request.BId.ToString())
-                  .InnerJoin(crewWorkShip, (x, y) => x.WorkShipId == y.WorkShipId && x.WorkShipEndTime == y.WorkShipEndTime).ToListAsync();
+                  .InnerJoin(crewWorkShip, (x, y) => x.WorkShipId == y.WorkShipId && x.WorkShipStartTime == y.WorkShipStartTime).ToListAsync();
                 shipDuty.ShipId = ship.BusinessId;
                 shipDuty.ShipName = ship.ShipName;
                 shipDuty.Country = ship.Name;

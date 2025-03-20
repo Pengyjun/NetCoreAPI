@@ -227,6 +227,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CurrentUser
                         new Claim("Phone",userInfo.Phone?.ToString()),
                         new Claim("RoleBusinessId",loginRole.BusinessId.ToString()),
                         new Claim("RoleType",loginRole.Type.ToString()),
+                        new Claim("ShipId",roleResponse.ShipId.ToString()),
                 };
                 var expores = int.Parse(AppsettingsHelper.GetValue("AccessToken:Expires"));
                 token = jwtService.CreateAccessToken(claims, expores);
