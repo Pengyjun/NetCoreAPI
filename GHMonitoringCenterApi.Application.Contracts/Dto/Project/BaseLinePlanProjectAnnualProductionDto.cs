@@ -564,6 +564,8 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project
         /// </summary>
         public string? ProjectName { get; set; }
 
+        public DateTime? LatestDate { get; set; }
+
         /// <summary>
         /// 基建计划名称
         /// </summary>
