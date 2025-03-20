@@ -49,9 +49,9 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
             //入职时间
             var uentityFist = _dbContext.Queryable<UserEntryInfo>()
                 .GroupBy(u => u.UserEntryId)
-                .Select(x => new { x.UserEntryId, EndTime = SqlFunc.AggregateMax(x.EndTime) });
+                .Select(x => new { x.UserEntryId, StartTime = SqlFunc.AggregateMax(x.StartTime) });
             var uentity = _dbContext.Queryable<UserEntryInfo>()
-                .InnerJoin(uentityFist, (x, y) => x.UserEntryId == y.UserEntryId && x.EndTime == y.EndTime);
+                .InnerJoin(uentityFist, (x, y) => x.UserEntryId == y.UserEntryId && x.StartTime == y.StartTime);
             #endregion
             //名称相关不赋值
             var rt = await _dbContext.Queryable<User>()
@@ -2686,7 +2686,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                 {
                     Id = item.BusinessId.ToString(),
                     ContarctMain = item.ContractMain,
-                    EntryDate = item.StartTime?.ToString("yyyy-MM-dd") + "~" + item.EndTime?.ToString("yyyy-MM-dd"),
+                    EntryDate = item.ContractType == ContractEnum.NoFixedTerm ? "无固定期限合同" : item.StartTime?.ToString("yyyy-MM-dd") + "~" + item.EndTime?.ToString("yyyy-MM-dd"),
                     LaborCompany = item.LaborCompany,
                     ContractType = item.ContractType,
                     ContractTypeName = EnumUtil.GetDescription(item.ContractType),
@@ -2912,7 +2912,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                 .LeftJoin(departureApplyUser, (t1, dau) => t1.BusinessId == dau.UserId)
                 .InnerJoin(wShip, (t1, dau, t5) => t1.BusinessId == t5.WorkShipId)
                 .InnerJoin<OwnerShip>((t1, dau, t5, t3) => t5.OnShip == t3.BusinessId.ToString())
-                .WhereIF(roleType == 3, (t1, dau, t5, t3) => GlobalCurrentUser.UserBusinessId.ToString() == t5.OnShip)
+                .WhereIF(roleType == 3, (t1, dau, t5, t3) => GlobalCurrentUser.ShipId.ToString() == t5.OnShip)
                 .WhereIF(!string.IsNullOrWhiteSpace(requestBody.StartTime.ToString()), (t1, dau, t5, t3) => t5.WorkShipStartTime >= requestBody.StartTime && t5.WorkShipStartTime <= requestBody.EndTime)
                 .WhereIF(string.IsNullOrWhiteSpace(requestBody.StartTime.ToString()), (t1, dau, t5, t3) => t5.WorkShipStartTime.Year == DateTime.Now.Year)
                 .WhereIF(requestBody.BoardingDays != 0, (t1, dau, t5, t3) => SqlFunc.DateDiff(DateType.Day, Convert.ToDateTime(t5.WorkShipStartTime), DateTime.Now) + 1 >= requestBody.BoardingDays)//在船天数
