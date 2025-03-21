@@ -407,7 +407,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.ShipWatch
                 var workShip = _dbContext.Queryable<WorkShip>()
                   .InnerJoin(crewWorkShip, (x, y) => x.WorkShipId == y.WorkShipId && x.WorkShipStartTime == y.WorkShipStartTime)
                   .Where((x, y) => x.OnShip == request.BId.ToString());
-                var wShip = await workShip.ToListAsync();
+                var wShip = await workShip.InnerJoin(_dbContext.Queryable<User>().Where(t => t.IsDelete == 1), (x, y, u) => x.WorkShipId == u.BusinessId).ToListAsync();
                 shipDuty.ShipId = ship.BusinessId;
                 shipDuty.ShipName = ship.ShipName;
                 shipDuty.Country = ship.Name;
@@ -558,10 +558,10 @@ namespace HNKC.CrewManagePlatform.Services.Interface.ShipWatch
                     team.Person2 = user2 + "（" + positionName2 + "）";
                     var file2 = userInfo.FirstOrDefault(t => t.BusinessId == item.FLeaderUserId)?.CrewPhoto;
                     team.Icon2 = url + fileInfo.FirstOrDefault(t => t.FileId == file2)?.Name;
-                    var other = item.OhterUserId?.Split(',').ToList();
-                    otherUser.AddRange(other);
                     dutyPerson.teamsGroup.Add(team);
                 }
+                var other = item.OhterUserId?.Split(',').ToList();
+                otherUser.AddRange(other);
 
 
             }
@@ -580,7 +580,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.ShipWatch
                     var file1 = userInfo.FirstOrDefault(t => t.BusinessId == item.UserId)?.CrewPhoto;
                     userInfo1.Icon = url + fileInfo.FirstOrDefault(t => t.FileId == file1)?.Name;
                     userInfo1.UserId = userInfo.Where(t => t.BusinessId == item.UserId).FirstOrDefault()?.BusinessId.ToString();
-                    userInfo1.UserName = "休假中   " + user1 + "（" + positionName + "）";
+                    userInfo1.UserName = user1 + "（" + positionName + "）";
                     userList.Add(userInfo1);
                 }
             }
@@ -660,7 +660,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.ShipWatch
                     var position = wShip.Where(t => t.WorkShipId == item.UserId).FirstOrDefault()?.Postition;
                     var positionName = positionInfo.Where(t => t.BusinessId.ToString() == position).FirstOrDefault()?.Name;
                     userInfo1.UserId = userInfo.FirstOrDefault(t => t.BusinessId == item.UserId)?.BusinessId.ToString();
-                    userInfo1.UserName = "休假中   " + user1 + "（" + positionName + "）";
+                    userInfo1.UserName = user1 + "（" + positionName + "）";
                     var file = userInfo.FirstOrDefault(t => t.BusinessId == item.UserId)?.CrewPhoto;
                     userInfo1.Icon = url + fileInfo.FirstOrDefault(t => t.FileId == file)?.Name;
                     userList.Add(userInfo1);

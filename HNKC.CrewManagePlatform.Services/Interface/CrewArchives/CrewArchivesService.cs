@@ -244,8 +244,8 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                     t.SpecialCertificate = spctabs;
                     t.SpecialCertificateName = spctabNames;
                     t.Age = _baseService.CalculateAgeFromIdCard(t.CardId);
-                    t.OnStatus = ob == null ? CrewStatusEnum.DaiGang : ShipUserStatus(ob.WorkShipEndTime, t.DeleteReson);
-                    t.OnStatusName = ob == null ? EnumUtil.GetDescription(CrewStatusEnum.DaiGang) : EnumUtil.GetDescription(ShipUserStatus(ob.WorkShipEndTime, t.DeleteReson));
+                    t.OnStatus = ob == null ? CrewStatusEnum.DaiGang : ShipUserStatus(ob.WorkShipStartTime, ob.WorkShipEndTime, t.DeleteReson);
+                    t.OnStatusName = ob == null ? EnumUtil.GetDescription(CrewStatusEnum.DaiGang) : EnumUtil.GetDescription(ShipUserStatus(ob.WorkShipStartTime, ob.WorkShipEndTime, t.DeleteReson));
                     var fileName = fileInfo.FirstOrDefault(x => x.FileId == t.CrewPhoto)?.Name;
                     t.Icon = string.IsNullOrWhiteSpace(fileName) ? string.Empty : url + fileName;
                 }
@@ -257,10 +257,11 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
         /// <summary>
         /// 船员状态
         /// </summary>
-        /// <param name="departureTime">下船时间</param>
+        /// <param name="StartTime">上船时间</param>
+        /// <param name="EndTime">下船时间</param>
         /// <param name="deleteResonEnum">是否删除</param>
         /// <returns></returns>
-        private static CrewStatusEnum ShipUserStatus(DateTime? departureTime, CrewStatusEnum deleteResonEnum)
+        private static CrewStatusEnum ShipUserStatus(DateTime? StartTime, DateTime? EndTime, CrewStatusEnum deleteResonEnum)
         {
             var status = new CrewStatusEnum();
             if (deleteResonEnum != CrewStatusEnum.Normal)
@@ -268,10 +269,20 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                 //删除：管理人员手动操作，包括离职、调离和退休，优先于其他任何状态
                 status = deleteResonEnum;
             }
-            else if (departureTime <= DateTime.Now)
+            else if (EndTime != null)
             {
-                //在岗、待岗:船员登记时必填任职船舶数据，看其中最新的任职船舶上船时间和下船时间，在此时间内为在岗状态，否则为待岗状态
-                status = CrewStatusEnum.XiuJia;
+                if (EndTime <= DateTime.Now)
+                {
+                    //在岗、待岗:船员登记时必填任职船舶数据，看其中最新的任职船舶上船时间和下船时间，在此时间内为在岗状态，否则为待岗状态
+                    status = CrewStatusEnum.XiuJia;
+                }
+            }
+            else
+            {
+                if (StartTime > DateTime.Now)
+                {
+                    status = CrewStatusEnum.XiuJia;
+                }
             }
             return status;
         }
@@ -2748,7 +2759,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
             if (userWorkShip != null)
             {
                 //用户状态
-                ur.StatusName = EnumUtil.GetDescription(ShipUserStatus(userWorkShip.WorkShipEndTime, userInfo.DeleteReson));//删除原因获取用户状态
+                ur.StatusName = EnumUtil.GetDescription(ShipUserStatus(userWorkShip.WorkShipStartTime, userWorkShip.WorkShipEndTime, userInfo.DeleteReson));//删除原因获取用户状态
 
                 //当前船舶任职时间
                 ur.CurrentShipEntryTime = string.IsNullOrWhiteSpace(userWorkShip.WorkShipStartTime.ToString()) || userWorkShip.WorkShipStartTime == DateTime.MinValue
@@ -2957,7 +2968,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                 /*var dk = disembark.Where(x => x.UserId.ToString() == u.BId).OrderByDescending(x => x.RealDisembarkTime).FirstOrDefault();
                 if (dk != null && dk.RealDisembarkTime != null && dk.RealReturnShipTime != null)
                     u.HolidayDays = TimeHelper.GetTimeSpan(dk.RealDisembarkTime.Value, dk.RealReturnShipTime.Value).Days + 1;*/
-                u.OnStatus = EnumUtil.GetDescription(_baseService.ShipUserStatus(u.LDisembarkTime, u.DeleteResonEnum, u.LDisembarkTime));
+                u.OnStatus = EnumUtil.GetDescription(_baseService.ShipUserStatus(u.LBoardingTime, u.LDisembarkTime, u.DeleteResonEnum));
             }
 
             rt.List = rr.OrderByDescending(t => t.UserName).ToList();

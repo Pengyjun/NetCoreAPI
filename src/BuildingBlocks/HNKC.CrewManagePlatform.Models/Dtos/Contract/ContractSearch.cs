@@ -116,9 +116,13 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.Contract
         /// </summary>
         public string? OnStatus { get; set; }
         /// <summary>
-        /// 下船日期
+        /// 上船日期
         /// </summary>
         public DateTime WorkShipStartTime { get; set; }
+        /// <summary>
+        /// 下船日期
+        /// </summary>
+        public DateTime? WorkShipEndTime { get; set; }
         /// <summary>
         /// 删除原因
         /// </summary>

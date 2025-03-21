@@ -87,6 +87,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Certificate
                     OnBoardPosition = t5.Postition,
                     DeleteResonEnum = t1.DeleteReson,
                     WorkShipStartTime = t5.WorkShipStartTime,
+                    WorkShipEndTime = t5.WorkShipEndTime,
                     CardId = t1.CardId
                 })
                 .Distinct()
@@ -172,7 +173,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Certificate
                             //if (existData6 == null) continue;
                             break;
                     }
-                    u.OnStatus = EnumUtil.GetDescription(_baseService.ShipUserStatus(u.WorkShipStartTime, u.DeleteResonEnum, u.WorkShipStartTime));
+                    u.OnStatus = EnumUtil.GetDescription(_baseService.ShipUserStatus(u.WorkShipStartTime, u.WorkShipEndTime, u.DeleteResonEnum));
                     u.OnBoardName = ownShipTable.FirstOrDefault(x => x.BusinessId.ToString() == u.OnBoard)?.ShipName;
                     u.CountryName = countryTable.FirstOrDefault(x => x.BusinessId == u.Country)?.Name;
                     u.ShipTypeName = EnumUtil.GetDescription(u.ShipType);

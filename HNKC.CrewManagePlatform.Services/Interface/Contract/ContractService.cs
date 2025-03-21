@@ -87,6 +87,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Contract
                     DueDays = SqlFunc.DateDiff(DateType.Day, DateTime.Now, Convert.ToDateTime(t2.EndTime)) + 1,
                     OnBoardPosition = t5.Postition,
                     WorkShipStartTime = t5.WorkShipStartTime,
+                    WorkShipEndTime = t5.WorkShipEndTime,
                     DeleteResonEnum = t1.DeleteReson
                 })
                 .Distinct()
@@ -113,7 +114,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Contract
             var cerOfComps = await _dbContext.Queryable<CertificateOfCompetency>().Where(x => uIds.Contains(x.CertificateId.ToString()) && (x.Type == CertificatesEnum.FCertificate || x.Type == CertificatesEnum.SCertificate)).ToListAsync();
             foreach (var u in rr)
             {
-                u.OnStatus = EnumUtil.GetDescription(_baseService.ShipUserStatus(u.WorkShipStartTime, u.DeleteResonEnum, u.WorkShipStartTime));
+                u.OnStatus = EnumUtil.GetDescription(_baseService.ShipUserStatus(u.WorkShipStartTime, u.WorkShipEndTime, u.DeleteResonEnum));
                 u.ContractTypeName = EnumUtil.GetDescription(u.ContractType);
                 u.EmploymentTypeName = empTable.FirstOrDefault(x => x.BusinessId.ToString() == u.EmploymentType)?.Name;
                 u.OnBoardName = ownShipTable.FirstOrDefault(x => x.BusinessId.ToString() == u.OnBoard)?.ShipName;
@@ -234,7 +235,8 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Contract
                     CardId = t1.CardId,
                     OnBoardPosition = t5.Postition,
                     DeleteResonEnum = t1.DeleteReson,
-                    WorkShipStartTime = t5.WorkShipEndTime
+                    WorkShipStartTime = t5.WorkShipEndTime,
+                    WorkShipEndTime = t5.WorkShipEndTime
                 })
                 .Distinct()
                 .ToPageListAsync(requestBody.PageIndex, requestBody.PageSize, total);
@@ -260,7 +262,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Contract
             var cerOfComps = await _dbContext.Queryable<CertificateOfCompetency>().Where(x => uIds.Contains(x.CertificateId.ToString()) && (x.Type == CertificatesEnum.FCertificate || x.Type == CertificatesEnum.SCertificate)).ToListAsync();
             foreach (var u in rr)
             {
-                u.OnStatus = EnumUtil.GetDescription(_baseService.ShipUserStatus(u.WorkShipStartTime, u.DeleteResonEnum, u.WorkShipStartTime));
+                u.OnStatus = EnumUtil.GetDescription(_baseService.ShipUserStatus(u.WorkShipStartTime, u.WorkShipEndTime, u.DeleteResonEnum));
                 u.ContractTypeName = EnumUtil.GetDescription(u.ContractType);
                 u.EmploymentTypeName = empTable.FirstOrDefault(x => x.BusinessId.ToString() == u.EmploymentType)?.Name;
                 u.OnBoardName = ownShipTable.FirstOrDefault(x => x.BusinessId.ToString() == u.OnBoard)?.ShipName;

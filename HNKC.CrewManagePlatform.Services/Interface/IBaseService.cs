@@ -38,11 +38,11 @@ namespace HNKC.CrewManagePlatform.Services.Interface
         /// <summary>
         /// 船员状态
         /// </summary>
-        /// <param name="departureTime"></param>
+        /// <param name="StartTime"></param>
+        /// <param name="EndTime"></param>
         /// <param name="deleteResonEnum"></param>
-        /// <param name="holidayTime"></param>
         /// <returns></returns>
-        CrewStatusEnum ShipUserStatus(DateTime? departureTime, CrewStatusEnum deleteResonEnum, DateTime? holidayTime);
+        CrewStatusEnum ShipUserStatus(DateTime? StartTime, DateTime? EndTime, CrewStatusEnum deleteResonEnum);
         /// <summary>
         /// 新增文件
         /// </summary>

@@ -292,11 +292,11 @@ namespace HNKC.CrewManagePlatform.Services.Interface
         /// <summary>
         /// 船员状态
         /// </summary>
-        /// <param name="departureTime">下船时间</param>
+        /// <param name="StartTime">上船时间</param>
+        /// <param name="EndTime">下船时间</param>
         /// <param name="deleteResonEnum">是否删除</param>
-        /// <param name="holidayTime">休假下船时间</param>
         /// <returns></returns>
-        public CrewStatusEnum ShipUserStatus(DateTime? departureTime, CrewStatusEnum deleteResonEnum, DateTime? holidayTime)
+        public CrewStatusEnum ShipUserStatus(DateTime? StartTime, DateTime? EndTime, CrewStatusEnum deleteResonEnum)
         {
             var status = new CrewStatusEnum();
             if (deleteResonEnum != CrewStatusEnum.Normal)
@@ -312,10 +312,17 @@ namespace HNKC.CrewManagePlatform.Services.Interface
             //        status = CrewStatusEnum.XiuJia;
             //    }
             //}
-            else if (departureTime != null && departureTime <= DateTime.Now)
+            else if (EndTime != null && EndTime <= DateTime.Now)
             {
                 //在岗、待岗:船员登记时必填任职船舶数据，看其中最新的任职船舶上船时间和下船时间，在此时间内为在岗状态，否则为待岗状态
                 status = CrewStatusEnum.XiuJia;
+            }
+            else
+            {
+                if (StartTime > DateTime.Now)
+                {
+                    status = CrewStatusEnum.XiuJia;
+                }
             }
             return status;
         }
