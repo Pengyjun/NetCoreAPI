@@ -129,6 +129,17 @@ namespace GHMonitoringCenterApi.Controllers.Job
         }
 
         /// <summary>
+        /// 审批任务-基准计划
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost("ApproveJobOfBaseLinePlan")]
+        [UnitOfWork]
+        public async Task<ResponseAjaxResult<bool>> ApproveJobOfBaseLinePlanAsync([FromBody] ApproveJobOfBaseLinePlanRequestDto model)
+        {
+            return await _jobService.ApproveJobAsync(model);
+        }
+
+        /// <summary>
         /// 搜索审批流程
         /// </summary>
         /// <returns></returns>

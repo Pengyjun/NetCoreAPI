@@ -1,5 +1,6 @@
 ﻿using GHMonitoringCenterApi.Application.Contracts.Dto;
 using GHMonitoringCenterApi.Application.Contracts.Dto.EquipmentManagement;
+using GHMonitoringCenterApi.Application.Contracts.Dto.Job;
 using GHMonitoringCenterApi.Application.Contracts.Dto.Project;
 using GHMonitoringCenterApi.Application.Contracts.Dto.Project.ExcelImport;
 using GHMonitoringCenterApi.Application.Contracts.Dto.Project.Report;
@@ -30,12 +31,20 @@ namespace GHMonitoringCenterApi.Application.Contracts.IService.Project
         /// <param name="requestBody"></param>
         /// <returns></returns>
         Task<ResponseAjaxResult<List<SearchBaseLinePlanProjectAnnualProductionDto>>> SearchBaseLinePlanProjectAnnualProductionAsync(SearchBaseLinePlanProjectAnnualProductionRequest requestBody);
+
         /// <summary>
-        /// 
+        /// 保存基准计划
         /// </summary>
         /// <param name="requestBody"></param>
         /// <returns></returns>
-        Task<ResponseAjaxResult<bool>> SaveBaseLinePlanProjectAnnualProductionAsync(List<SearchBaseLinePlanProjectAnnualProductionDto>? requestBody);
+        Task<ResponseAjaxResult<bool>> SaveBaseLinePlanProjectAnnualProductionAsync(SaveBaseLinePlanProjectDto? requestBody);
+
+        /// <summary>
+        /// 提交基准计划
+        /// </summary>
+        /// <param name="requestBody"></param>
+        /// <returns></returns>
+        Task<ResponseAjaxResult<bool>> SubmitBaseLinePlanProjectAnnualProductionAsync(SubmitBaseLinePlanProjectDto? requestBody);
 
         /// <summary>
         /// 
@@ -116,14 +125,14 @@ namespace GHMonitoringCenterApi.Application.Contracts.IService.Project
         /// <param name="id"></param>
         /// <returns></returns>
 
-        Task<ResponseAjaxResult<bool>> BaseLinePlanProjectApproveAsync(SearchSubsidiaryCompaniesProjectProductionDto input);
+        //Task<ResponseAjaxResult<bool>> BaseLinePlanProjectApproveAsync(BaseLinePlanProject input);
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="input"></param>
         /// <returns></returns>
-        Task<ResponseAjaxResult<bool>> BaseLinePlanProjectApprove(SearchSubsidiaryCompaniesProjectProductionDto  input);
+        Task<ResponseAjaxResult<bool>> BaseLinePlanProjectApprove(SearchSubsidiaryCompaniesProjectProductionDto input);
 
         /// <summary>
         /// 基准计划新
@@ -132,12 +141,48 @@ namespace GHMonitoringCenterApi.Application.Contracts.IService.Project
         /// <returns></returns>
         Task<ResponseAjaxResult<List<SearchSubsidiaryCompaniesProjectProductionDto>>> SearchBaseLinePlanAncomparisonNewAsync(BaseLinePlanAncomparisonRequsetDto requestBody);
 
+
+        /// <summary>
+        /// 计划基准导出
+        /// </summary>
+        /// <param name="requestBody"></param>
+        /// <returns></returns>
+        Task<ResponseAjaxResult<List<BaseLinePlanExcelOutputDto>>> BaseLinePlanExcelOutPutAsync(BaseLinePlanAncomparisonRequsetDto requestBody);
+
         /// <summary>
         /// 基准计划下拉框
         /// </summary>
         /// <param name="requsetDto"></param>
         /// <returns></returns>
         Task<ResponseAjaxResult<List<BaseLinePlanSelectOptiong>>> SearchBaseLinePlanOptionsAsync(BaseLinePlanAncomparisonRequsetDto requsetDto);
-        
+
+        /// <summary>
+        /// 获取用户审批人列表
+        /// </summary>
+        /// <param name="requsetDto"></param>
+        /// <returns></returns>
+        Task<ResponseAjaxResult<List<ApproveUsersResponseDto>>> SearchBaseLinePlanApproveUsersAsync(ApproveUsersRequsetDto requsetDto);
+
+
+        /// <summary>
+        /// 获取项目列表
+        /// </summary>
+        /// <param name="requsetDto"></param>
+        /// <returns></returns>
+        Task<ResponseAjaxResult<List<BaseLinePlanProjectResponseDto>>> SearchBaseLinePlanProjectAsync(SearchBaseLinePlanProjectRequsetDto input);
+
+        /// <summary>
+        /// 编辑是否基准计划填报期
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
+        Task<ResponseAjaxResult<bool>> ToggleBaseLinePlanPeriodAsync(string input);
+
+        /// <summary>
+        /// 获取是否基准计划填报期
+        /// </summary>
+        /// <returns></returns>
+        Task<ResponseAjaxResult<string>> GetBaseLinePlanPeriodStatusAsync();
+
     }
 }

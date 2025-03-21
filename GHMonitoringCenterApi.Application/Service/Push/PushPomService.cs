@@ -452,10 +452,10 @@ namespace GHMonitoringCenterApi.Application.Service.Push
             var leaders = new List<ProjectStakeholders>();
             var orgs = new List<ProjectStakeholderUnit>();
             _mapper.Map(project, model);
-            model.CompanyId = tCompany.Ocode;
+            model.CompanyId = tCompany?.Ocode;
             model.ProjectDeptName = departMent != null ? departMent.Name : string.Empty;
-            model.TCompanyId = tCompany.PomId.ToString();
-            model.TCompanyName = tCompany.Name;
+            model.TCompanyId = tCompany?.PomId.ToString();
+            model.TCompanyName = tCompany?.Name;
             model.Amount = Convert.ToDecimal(project.Amount);
             model.ECAmount = Convert.ToDecimal(project.ECAmount);
             model.TypeName = projectTypes?.Name;

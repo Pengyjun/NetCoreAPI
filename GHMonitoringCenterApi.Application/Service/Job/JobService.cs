@@ -126,7 +126,7 @@ namespace GHMonitoringCenterApi.Application.Service.Job
         /// <summary>
         /// 基准计划信息业务层
         /// </summary>
-        private readonly IBaseLinePlanProjectService _baseLinePlanProjectService;
+        //private readonly IBaseLinePlanProjectService _baseLinePlanProjectService;
 
         /// <summary>
         /// 全局对象
@@ -169,9 +169,7 @@ namespace GHMonitoringCenterApi.Application.Service.Job
             , IMapper mapper
             , GlobalObject globalObject
             , ISqlSugarClient dbContext
-            , IMonthReportForProjectService mPService
-,
-IBaseLinePlanProjectService baseLinePlanProjectService)
+            , IMonthReportForProjectService mPService)
         {
             _baseService = baseService;
             _dbProject = dbProject;
@@ -195,7 +193,7 @@ IBaseLinePlanProjectService baseLinePlanProjectService)
             _globalObject = globalObject;
             _dbContext = dbContext;
             _mPService = mPService;
-            _baseLinePlanProjectService = baseLinePlanProjectService;
+            //_baseLinePlanProjectService = baseLinePlanProjectService;
         }
         #region 提交任务
 
@@ -457,6 +455,7 @@ IBaseLinePlanProjectService baseLinePlanProjectService)
                   .InnerJoin(_dbJobApprover.AsQueryable(), (j, a) => j.Id == a.JobId && a.IsDelete == 1)
                   .LeftJoin(_dbProject.AsQueryable(), (j, a, p) => j.ProjectId == p.Id && p.IsDelete == 1)
                   .Where((j, a, p) => a.ApproverId == _currentUser.Id && a.ApproverJobStatus == model.JobStatus && j.IsDelete == 1)
+                  .Where((j, a, p) => j.BizModule != BizModule.BaseLinePlan)
                   .WhereIF(model.BizModule != null, (j, a, p) => j.BizModule == model.BizModule)
                   .WhereIF(model.JobStatus == JobStatus.Handled, (j, a, p) => j.ApproveLevel == a.ApproveLevel)
                   .WhereIF(model.JobStatus == JobStatus.UnHandle, (j, a, p) => j.ApproveLevel == a.ApproveLevel - 1 && (j.ApproveStatus == JobApproveStatus.None || j.ApproveStatus == JobApproveStatus.Pass))
@@ -550,6 +549,7 @@ IBaseLinePlanProjectService baseLinePlanProjectService)
             var query = _dbJob.AsQueryable()
                   .LeftJoin(_dbProject.AsQueryable(), (j, p) => j.ProjectId == p.Id && p.IsDelete == 1)
                   .Where((j, p) => j.IsDelete == 1)
+                  .Where((j, p) => j.BizModule != BizModule.BaseLinePlan)
                   .WhereIF(model.BizModule != null, (j, p) => j.BizModule == model.BizModule)
                   .WhereIF(model.JobStatus == JobStatus.Handled, (j, p) => j.IsFinish == true)
                   .WhereIF(model.JobStatus == JobStatus.UnHandle, (j, p) => j.IsFinish == false)
@@ -851,12 +851,35 @@ IBaseLinePlanProjectService baseLinePlanProjectService)
             }
             else if (job.BizModule == BizModule.BaseLinePlan)
             {
-                var saveModel = CastDeserializeObject<SearchSubsidiaryCompaniesProjectProductionDto>(job.BizData);
-                saveModel.JobId = job.Id;
+                var saveModel = CastDeserializeObject<BaseLinePlanProject>(job.BizData);
                 var baseline = await _dbContext.Queryable<BaseLinePlanProject>().Where(p => p.Id == saveModel.Id).FirstAsync();
-                baseline.PlanStatus = (int)job.ApproveStatus;
+                if (!job.IsFinish)
+                {
+                    if (job.ApproveStatus == JobApproveStatus.None)
+                    {
+                        baseline.PlanStatus = 4;
+                    }
+                    else
+                    {
+                        baseline.PlanStatus = (int)job.ApproveStatus;
+                    }
+
+                    if (job.ApproveStatus == JobApproveStatus.Pass && job.ApproveLevel == ApproveLevel.Level1)
+                    {
+                        baseline.PlanStatus = 5;
+                    }
+                }
+                else
+                {
+                    baseline.PlanStatus = (int)job.ApproveStatus;
+                    if (job.ApproveStatus == JobApproveStatus.Pass)
+                    {
+                        baseline.SubmitStatus = 2;
+                    }
+                }
                 baseline.RejectReason = job.RejectReason;
-                result = await _baseLinePlanProjectService.BaseLinePlanProjectApproveAsync(saveModel);
+                await _dbContext.Updateable(baseline).ExecuteCommandAsync();
+                result.SuccessResult(true);
             }
             return result;
         }
@@ -963,6 +986,7 @@ IBaseLinePlanProjectService baseLinePlanProjectService)
             RefAsync<int> total = 0;
             var resJobList = await _dbJob.AsQueryable()
                   .LeftJoin(_dbProject.AsQueryable(), (j, p) => j.ProjectId == p.Id && p.IsDelete == 1)
+                  .Where((j, p) => j.BizModule != BizModule.BaseLinePlan)
                   .Where((j, p) => j.CreateId == _currentUser.Id && j.IsDelete == 1)
                   .Select((j, p) => new JobResponseDto()
                   {

@@ -20,6 +20,7 @@ using GHMonitoringCenterApi.Domain.Shared.Util;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MiniExcelLibs;
+using SkiaSharp;
 using SqlSugar;
 using UtilsSharp;
 
@@ -58,17 +59,17 @@ namespace GHMonitoringCenterApi.Controllers.Project
         #endregion
 
 
-        /// <summary>
-        /// 查询公司在手项目清单下拉框选择
-        /// </summary>
-        /// <param name=""></param>
-        /// <returns></returns>
-        [HttpGet("SearchCompanyProjectPullDown")]
-        [AllowAnonymous]
-        public async Task<ResponseAjaxResult<List<BasePullDownResponseDto>>> SearchCompanyProjectPullDownAsync()
-        {
-            return await projectService.SearchCompanyProjectPullDownAsync();
-        }
+        ///// <summary>
+        ///// 查询公司在手项目清单下拉框选择
+        ///// </summary>
+        ///// <param name=""></param>
+        ///// <returns></returns>
+        //[HttpGet("SearchCompanyProjectPullDown")]
+        //[AllowAnonymous]
+        //public async Task<ResponseAjaxResult<List<BasePullDownResponseDto>>> SearchCompanyProjectPullDownAsync()
+        //{
+        //    return await projectService.SearchCompanyProjectPullDownAsync();
+        //}
 
 
         #region 基准计划
@@ -110,9 +111,21 @@ namespace GHMonitoringCenterApi.Controllers.Project
         /// </summary>
         /// <returns></returns>
         [HttpPost("SaveBaseLinePlanProjectAnnualProduction")]
-        public async Task<ResponseAjaxResult<bool>> SaveBaseLinePlanProjectAnnualProductionAsync([FromBody] List<SearchBaseLinePlanProjectAnnualProductionDto>? requestBody)
+        public async Task<ResponseAjaxResult<bool>> SaveBaseLinePlanProjectAnnualProductionAsync([FromBody] SaveBaseLinePlanProjectDto requestBody)
         {
             return await baseLinePlanProjectService.SaveBaseLinePlanProjectAnnualProductionAsync(requestBody);
+        }
+
+
+        /// <summary>
+        /// 提交基准计划
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
+        [HttpPost("SubmitBaseLinePlanProject")]
+        public async Task<ResponseAjaxResult<bool>> SubmitBaseLinePlanProjectAnnualProductionAsync([FromBody] SubmitBaseLinePlanProjectDto? input)
+        {
+            return await baseLinePlanProjectService.SubmitBaseLinePlanProjectAnnualProductionAsync(input);
         }
 
         /// <summary>
@@ -136,16 +149,16 @@ namespace GHMonitoringCenterApi.Controllers.Project
             return await baseLinePlanProjectService.SearchSubsidiaryCompaniesProjectProductionAsync(requestBody);
         }
 
-        /// <summary>
-        /// 基准列表 分子公司项目合计
-        /// </summary>
-        /// <param name="requestBody"></param>
-        /// <returns></returns>
-        [HttpGet("SearchBaseLinePlanProjectAnnualProductionSum")]
-        public async Task<ResponseAjaxResult<SearchBaseLinePlanProjectAnnualProduction>> SearchBaseLinePlanProjectAnnualProductionSumAsync([FromQuery] SearchBaseLinePlanProjectAnnualProductionRequest requestBody)
-        {
-            return await baseLinePlanProjectService.SearchBaseLinePlanProjectAnnualProductionSumAsync(requestBody);
-        }
+        ///// <summary>
+        ///// 基准列表 分子公司项目合计
+        ///// </summary>
+        ///// <param name="requestBody"></param>
+        ///// <returns></returns>
+        //[HttpGet("SearchBaseLinePlanProjectAnnualProductionSum")]
+        //public async Task<ResponseAjaxResult<SearchBaseLinePlanProjectAnnualProduction>> SearchBaseLinePlanProjectAnnualProductionSumAsync([FromQuery] SearchBaseLinePlanProjectAnnualProductionRequest requestBody)
+        //{
+        //    return await baseLinePlanProjectService.SearchBaseLinePlanProjectAnnualProductionSumAsync(requestBody);
+        //}
 
 
 
@@ -160,16 +173,16 @@ namespace GHMonitoringCenterApi.Controllers.Project
             return await baseLinePlanProjectService.SearchBureauProjectProductionAsync(requestBody);
         }
 
-        /// <summary>
-        /// 局工程部界面 项目界面 项目合计汇总
-        /// </summary>
-        /// <param name="requestBody"></param>
-        /// <returns></returns>
-        [HttpGet("SearchBureauProjectProductionAsyncSum")]
-        public async Task<ResponseAjaxResult<SearchBaseLinePlanProjectAnnualProduction>> SearchBureauProjectProductionAsyncSumAsync([FromQuery] SearchBaseLinePlanProjectAnnualProductionRequest requestBody)
-        {
-            return await baseLinePlanProjectService.SearchBureauProjectProductionAsyncSumAsync(requestBody);
-        }
+        ///// <summary>
+        ///// 局工程部界面 项目界面 项目合计汇总
+        ///// </summary>
+        ///// <param name="requestBody"></param>
+        ///// <returns></returns>
+        //[HttpGet("SearchBureauProjectProductionAsyncSum")]
+        //public async Task<ResponseAjaxResult<SearchBaseLinePlanProjectAnnualProduction>> SearchBureauProjectProductionAsyncSumAsync([FromQuery] SearchBaseLinePlanProjectAnnualProductionRequest requestBody)
+        //{
+        //    return await baseLinePlanProjectService.SearchBureauProjectProductionAsyncSumAsync(requestBody);
+        //}
 
 
         /// <summary>
@@ -185,16 +198,16 @@ namespace GHMonitoringCenterApi.Controllers.Project
 
         #endregion
 
-        /// <summary>
-        /// 计划基准列表
-        /// </summary>
-        /// <param name="requestBody"></param>
-        /// <returns></returns>
-        [HttpGet("SearchBaseLinePlanAncomparison")]
-        public async Task<ResponseAjaxResult<List<BaseLinePlanAncomparisonResponseDto>>> SearchBaseLinePlanAncomparisonAsync([FromQuery] BaseLinePlanAncomparisonRequsetDto requestBody)
-        {
-            return await baseLinePlanProjectService.SearchBaseLinePlanAncomparisonAsync(requestBody);
-        }
+        ///// <summary>
+        ///// 计划基准列表
+        ///// </summary>
+        ///// <param name="requestBody"></param>
+        ///// <returns></returns>
+        //[HttpGet("SearchBaseLinePlanAncomparison")]
+        //public async Task<ResponseAjaxResult<List<BaseLinePlanAncomparisonResponseDto>>> SearchBaseLinePlanAncomparisonAsync([FromQuery] BaseLinePlanAncomparisonRequsetDto requestBody)
+        //{
+        //    return await baseLinePlanProjectService.SearchBaseLinePlanAncomparisonAsync(requestBody);
+        //}
 
         /// <summary>
         /// 计划基准列表新
@@ -218,7 +231,7 @@ namespace GHMonitoringCenterApi.Controllers.Project
         //    return await baseLinePlanProjectService.BaseLinePlanProjectApproveAsync(isApprove, id);
         //}
 
-        #region 项目基准计划
+        #region 项目基准计划 导入和模板
         /// <summary>
         /// 项目基准计划导入模板下载
         /// </summary>
@@ -234,6 +247,7 @@ namespace GHMonitoringCenterApi.Controllers.Project
             };
             return await ExcelTemplateImportAsync(templatePath, importData, importData.title);
         }
+
 
         /// <summary>
         /// 项目基准计划导入
@@ -285,7 +299,6 @@ namespace GHMonitoringCenterApi.Controllers.Project
         /// <param name="requsetDto"></param>
         /// <returns></returns>
         [HttpGet("SearchBaseLinePlanOptions")]
-        [AllowAnonymous]
         public async Task<ResponseAjaxResult<List<BaseLinePlanSelectOptiong>>> SearchBaseLinePlanOptionsAsync([FromQuery] BaseLinePlanAncomparisonRequsetDto requsetDto)
         {
             return await baseLinePlanProjectService.SearchBaseLinePlanOptionsAsync(requsetDto);
@@ -302,5 +315,49 @@ namespace GHMonitoringCenterApi.Controllers.Project
             return await _jobService.SubmitJobAsync(model);
         }
 
+        /// <summary>
+        /// 查询基准计划审批用户列表
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
+        [HttpGet("SearchBaseLinePlanApproveUsers")]
+        public async Task<ResponseAjaxResult<List<ApproveUsersResponseDto>>> SearchBaseLinePlanApproveUsersAsync([FromQuery] ApproveUsersRequsetDto input)
+        {
+            return await baseLinePlanProjectService.SearchBaseLinePlanApproveUsersAsync(input);
+        }
+
+
+        /// <summary>
+        /// 查询在建计划列表
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
+        [HttpGet("SearchBaseLinePlanProject")]
+        public async Task<ResponseAjaxResult<List<BaseLinePlanProjectResponseDto>>> SearchBaseLinePlanProjectAsync([FromQuery] SearchBaseLinePlanProjectRequsetDto input)
+        {
+            return await baseLinePlanProjectService.SearchBaseLinePlanProjectAsync(input);
+        }
+
+        /// <summary>
+        /// 编辑是否基准计划填报期
+        /// </summary>
+        /// <param name="input">0,基准  1:新建</param>
+        /// <returns></returns>
+        [HttpGet("ToggleBaseLinePlanPeriod")]
+        public async Task<ResponseAjaxResult<bool>> ToggleBaseLinePlanPeriodAsync(string input)
+        {
+            return await baseLinePlanProjectService.ToggleBaseLinePlanPeriodAsync(input);
+        }
+
+
+        /// <summary>
+        /// 获取是否基准计划填报期 0,基准  1:新建
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("GetBaseLinePlanPeriodStatusAsync")]
+        public async Task<ResponseAjaxResult<string>> GetBaseLinePlanPeriodStatusAsync()
+        {
+            return await baseLinePlanProjectService.GetBaseLinePlanPeriodStatusAsync();
+        }
     }
 }
