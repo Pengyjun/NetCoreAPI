@@ -2361,7 +2361,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
         /// </summary>
         /// <param name="bId"></param>
         /// <returns></returns>
-        public async Task<Result> GetCertificateOfCompetencyDetailsAsync(string bId)
+        public async Task<Result> GetCertificateOfCompetencyDetailsAsync(string bId, CertificatesEnum type)
         {
             CertificateOfCompetencyDetails ur = new();
             List<FirstCertificateOfCompetencyDetailsDto> ff = new();
@@ -2383,7 +2383,8 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                 //适任职务
                 var position = await _dbContext.Queryable<Position>().Where(t => t.IsDelete == 1).ToListAsync();
                 //技能证书
-                var f = cerOfComps.Where(x => x.Type == CertificatesEnum.FCertificate).OrderByDescending(x => x.FEffectiveTime).ToList();
+                var fResult = cerOfComps.Where(x => x.Type == CertificatesEnum.FCertificate);
+                var f = type == CertificatesEnum.FCertificate ? fResult.OrderByDescending(x => x.FEffectiveTime).ToList() : fResult.OrderByDescending(x => x.FEffectiveTime).Take(1).ToList();
                 if (f.Any())
                 {
                     foreach (var item in f)
@@ -2414,7 +2415,8 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                         });
                     }
                 }
-                var s = cerOfComps.Where(x => x.Type == CertificatesEnum.SCertificate).OrderByDescending(x => x.SEffectiveTime).ToList();
+                var sResult = cerOfComps.Where(x => x.Type == CertificatesEnum.SCertificate);
+                var s = type == CertificatesEnum.SCertificate ? sResult.OrderByDescending(x => x.SEffectiveTime).ToList() : sResult.OrderByDescending(x => x.SEffectiveTime).Take(1).ToList();
                 if (s.Any())
                 {
                     foreach (var item in s)
@@ -2445,7 +2447,8 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                         });
                     }
                 }
-                var t = cerOfComps.Where(x => x.Type == CertificatesEnum.PXHGZ).OrderByDescending(x => x.TrainingSignTime).ToList();
+                var tResult = cerOfComps.Where(x => x.Type == CertificatesEnum.PXHGZ);
+                var t = type == CertificatesEnum.PXHGZ ? tResult.OrderByDescending(x => x.TrainingSignTime).ToList() : tResult.OrderByDescending(x => x.TrainingSignTime).Take(1).ToList();
                 if (t.Any())
                 {
                     foreach (var item in t)
@@ -2478,7 +2481,8 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                         });
                     }
                 }
-                var h = cerOfComps.Where(x => x.Type == CertificatesEnum.JKZ).OrderByDescending(x => x.HealthEffectiveTime).ToList();
+                var hResult = cerOfComps.Where(x => x.Type == CertificatesEnum.JKZ);
+                var h = type == CertificatesEnum.JKZ ? hResult.OrderByDescending(x => x.HealthEffectiveTime).ToList() : hResult.OrderByDescending(x => x.HealthEffectiveTime).Take(1).ToList();
                 if (h.Any())
                 {
                     foreach (var item in h)
@@ -2504,7 +2508,8 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                         });
                     }
                 }
-                var sea = cerOfComps.Where(x => x.Type == CertificatesEnum.HYZ).OrderByDescending(x => x.SeamanEffectiveTime).ToList();
+                var seaResult = cerOfComps.Where(x => x.Type == CertificatesEnum.HYZ);
+                var sea = type == CertificatesEnum.HYZ ? seaResult.OrderByDescending(x => x.SeamanEffectiveTime).ToList() : seaResult.OrderByDescending(x => x.SeamanEffectiveTime).Take(1).ToList();
                 if (sea.Any())
                 {
                     foreach (var item in sea)
@@ -2530,7 +2535,8 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                         });
                     }
                 }
-                var hz = cerOfComps.Where(x => x.Type == CertificatesEnum.HZ).OrderByDescending(x => x.PassportEffectiveTime).ToList();
+                var hzResult = cerOfComps.Where(x => x.Type == CertificatesEnum.HZ);
+                var hz = type == CertificatesEnum.HZ ? hzResult.OrderByDescending(x => x.PassportEffectiveTime).ToList() : hzResult.OrderByDescending(x => x.PassportEffectiveTime).Take(1).ToList();
                 if (hz.Any())
                 {
                     var visarecords = await _dbContext.Queryable<VisaRecords>().Where(t => t.IsDelete == 1 && t.VisareCordId == userInfo.BusinessId).OrderByDescending(x => x.DueTime).ToListAsync();
@@ -2587,7 +2593,8 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                     }
                 }
                 //特种设备证书
-                var specFill = await _dbContext.Queryable<SpecialEquips>().Where(t => t.IsDelete == 1 && t.SpecialEquipId == userInfo.BusinessId).ToListAsync();
+                var specFillResult = await _dbContext.Queryable<SpecialEquips>().Where(t => t.IsDelete == 1 && t.SpecialEquipId == userInfo.BusinessId).ToListAsync();
+                var specFill = type == CertificatesEnum.TZ ? specFillResult.OrderByDescending(x => x.SpecialEquipsEffectiveTime).ToList() : specFillResult.OrderByDescending(x => x.SpecialEquipsEffectiveTime).Take(1).ToList();
                 List<Guid?> specfilesIds = new();
                 foreach (var item in specFill)
                 {

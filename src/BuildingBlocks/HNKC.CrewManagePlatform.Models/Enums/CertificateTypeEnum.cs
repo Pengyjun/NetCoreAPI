@@ -77,6 +77,11 @@ namespace HNKC.CrewManagePlatform.Models.Enums
         /// 护照
         /// </summary>
         [Description("护照")]
-        HZ = 6
+        HZ = 6,
+        /// <summary>
+        /// 特设  历史数据查询使用
+        /// </summary>
+        [Description("特设")]
+        TZ = 7
     }
 }

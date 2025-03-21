@@ -1,5 +1,6 @@
 ﻿using HNKC.CrewManagePlatform.Models.CommonResult;
 using HNKC.CrewManagePlatform.Models.Dtos.CrewArchives;
+using HNKC.CrewManagePlatform.Models.Enums;
 
 namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
 {
@@ -90,7 +91,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
         /// </summary>
         /// <param name="bId"></param>
         /// <returns></returns>
-        Task<Result> GetCertificateOfCompetencyDetailsAsync(string bId);
+        Task<Result> GetCertificateOfCompetencyDetailsAsync(string bId, CertificatesEnum type);
         /// <summary>
         /// 劳务
         /// </summary>

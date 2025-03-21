@@ -1,5 +1,6 @@
 ﻿using HNKC.CrewManagePlatform.Models.CommonResult;
 using HNKC.CrewManagePlatform.Models.Dtos.CrewArchives;
+using HNKC.CrewManagePlatform.Models.Enums;
 using HNKC.CrewManagePlatform.Services.Interface.CrewArchives;
 using HNKC.CrewManagePlatform.SqlSugars.UnitOfTransaction;
 using Microsoft.AspNetCore.Authorization;
@@ -141,9 +142,9 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api.Controllers
         /// <param name="bId"></param>
         /// <returns></returns>
         [HttpGet("GetCertificateOfCompetencyDetails")]
-        public async Task<Result> GetCertificateOfCompetencyDetailsAsync([FromQuery] string bId)
+        public async Task<Result> GetCertificateOfCompetencyDetailsAsync([FromQuery] string bId, [FromQuery] CertificatesEnum type)
         {
-            return await _service.GetCertificateOfCompetencyDetailsAsync(bId);
+            return await _service.GetCertificateOfCompetencyDetailsAsync(bId, type);
         }
         /// <summary>
         /// 获取学历详情
