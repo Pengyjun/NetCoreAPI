@@ -136,7 +136,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Disembark
 
             var roleType = await _baseService.CurRoleType();
             // 判断角色类型
-            if (roleType != 3)
+            if (roleType != 3 && !GlobalCurrentUser.IsAdmin)
             {
                 return Result.Fail("非船长角色无法提交申请");
             }
@@ -386,7 +386,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Disembark
             }
 
             // 判断是否是可审批
-            if (departureApply.ApproveUserId != GlobalCurrentUser.UserBusinessId)
+            if (departureApply.ApproveUserId != GlobalCurrentUser.UserBusinessId && !GlobalCurrentUser.IsAdmin)
             {
                 return Result.Fail("无权限审批");
             }

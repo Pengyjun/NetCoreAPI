@@ -233,8 +233,8 @@ namespace HNKC.CrewManagePlatform.Services.Interface.ShipWatch
                     .Where(t => t.IsLoginUser == 1)
                     .InnerJoin(wShip, (t, ws) => t.BusinessId == ws.WorkShipId)
                     .InnerJoin<PositionOnBoard>((t, ws, po) =>
-                        ws.OnShip == po.BusinessId.ToString() &&
-                        (po.Name == "船长" || po.Name == "书记" || po.Name == "轮机长"))
+                        ws.Postition == po.BusinessId.ToString() &&
+                        (po.Name.Contains("船长")  || po.Name.Contains("书记") || po.Name.Contains("轮机长")))
                     .Select((t, ws, po) => new
                     {
                         t.Name,
@@ -252,11 +252,11 @@ namespace HNKC.CrewManagePlatform.Services.Interface.ShipWatch
                     item.CountryName = country.FirstOrDefault(x => x.BusinessId == item.Country)?.Name;
                     item.ShipTypeName = EnumUtil.GetDescription(item.ShipType);
                     item.Captain = userInfo
-                        .FirstOrDefault(x => x.ShipId == item.ShipId.ToString() && x.OnBoardName == "船长")?.OnBoardName;
+                        .FirstOrDefault(x => x.ShipId == item.ShipId.ToString() && x.OnBoardName.Contains("船长"))?.Name;
                     item.Secretary = userInfo
-                        .FirstOrDefault(x => x.ShipId == item.ShipId.ToString() && x.OnBoardName == "书记")?.OnBoardName;
+                        .FirstOrDefault(x => x.ShipId == item.ShipId.ToString() && x.OnBoardName.Contains("书记"))?.Name;
                     item.ChiefEngineer = userInfo
-                        .FirstOrDefault(x => x.ShipId == item.ShipId.ToString() && x.OnBoardName == "轮机长")?.OnBoardName;
+                        .FirstOrDefault(x => x.ShipId == item.ShipId.ToString() && x.OnBoardName.Contains("轮机长"))?.Name;
                     var scheduling = schedulingTimeData.Where(x => x.ShipId == item.ShipId)
                         .OrderByDescending(x => x.SchedulingTime).FirstOrDefault();
                     item.SchedulingTime = scheduling?.SchedulingTime;

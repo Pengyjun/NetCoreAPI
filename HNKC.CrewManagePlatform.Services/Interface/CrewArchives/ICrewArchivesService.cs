@@ -60,8 +60,9 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
         /// 备注
         /// </summary>
         /// <param name="bId"></param>
+        /// <param name="keyWords"></param>
         /// <returns></returns>
-        Task<Result> GetNotesDetailsAsync(string bId);
+        Task<Result> GetNotesDetailsAsync(string bId,string? keyWords);
         /// <summary>
         /// 职务晋升
         /// </summary>
