@@ -169,7 +169,7 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project
         /// <summary>
         /// 是否分包
         /// </summary>
-        public int? IsSubPackage { get; set; }
+        public int? IsSubPackage { get; set; } = 0;
 
         /// <summary>
         /// 总有效合同额
@@ -545,7 +545,7 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project
     public class SearchSubsidiaryCompaniesProjectProductionDto
     {
 
-       
+
         //public Guid BasePlanProjectId { get; set; }
         /// <summary>
         /// 主键
@@ -563,6 +563,8 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project
         /// 项目名称
         /// </summary>
         public string? ProjectName { get; set; }
+
+        public string? PlanVersion { get; set; }
 
         public DateTime? LatestDate { get; set; }
 
@@ -631,6 +633,17 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project
         /// 数据提交状态(0 保存,1 提交)
         /// </summary>
         public int? SubmitStatus { get; set; }
+
+        /// <summary>
+        /// 关联项目
+        /// </summary>
+        public string? Association { get; set; }
+
+
+        /// <summary>
+        /// 是否关联项目
+        /// </summary>
+        public bool IsAssociationbe { get; set; }
 
         /// <summary>
         /// 1月产值
@@ -998,7 +1011,7 @@ namespace GHMonitoringCenterApi.Application.Contracts.Dto.Project
         /// <summary>
         /// 管理单位
         /// </summary>
-        public string ManageMentUnit{get;set;}
+        public string ManageMentUnit { get; set; }
 
 
         //[ExcelColumnName("年度")]

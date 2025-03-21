@@ -20,6 +20,8 @@ using GHMonitoringCenterApi.Domain.Shared.Enums;
 using GHMonitoringCenterApi.Domain.Shared.Util;
 using Microsoft.AspNetCore.Mvc;
 using SqlSugar;
+using System.ComponentModel.Design;
+using Wangkanai.Extensions;
 
 
 namespace GHMonitoringCenterApi.Application.Service.Projects
@@ -268,6 +270,11 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     if (baseplanproject.RemainingAmount > 0)
                     {
                         rr.EffectiveAmount = baseplanproject.EffectiveAmount;
+                    }
+
+                    if (baseplanproject.CompletionTime != null)
+                    {
+                        rr.CompletionTime = baseplanproject.CompletionTime;
                     }
 
                     var job = await dbContext.Queryable<Domain.Models.Job>().Where(p => p.ProjectId == baseplanproject.Id && p.IsFinish == false).FirstAsync();
@@ -795,7 +802,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
 
             var projects = await dbContext.Queryable<BaseLinePlanProject>()
                 .Where(p => p.IsDelete == 1 && guids.Contains(p.CompanyId))
-                .WhereIF(userIds[0] != userInfo.Id, x => x.CompanyId == companyId)
+                //.WhereIF(userIds[0] != userInfo.Id, x => x.CompanyId == companyId)
                 .WhereIF(requestBody.Year != null, p => p.Year == requestBody.Year)
                 .WhereIF(!string.IsNullOrWhiteSpace(requestBody.StartStatus), p => p.StartStatus == requestBody.StartStatus)
                 .WhereIF(requestBody.CompanyId != null, p => p.CompanyId == requestBody.CompanyId)
@@ -1029,8 +1036,9 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
 
             var baseplanproject = await dbContext.Queryable<BaseLinePlanProject>()
            .Where(t => t.IsDelete == 1)
-            .WhereIF(!userIds.Contains(userInfo.Id), x => x.CompanyId == companyId).
-           WhereIF(!string.IsNullOrWhiteSpace(requestBody.StartStatus), t => t.StartStatus == requestBody.StartStatus).
+           .WhereIF(requestBody.CompanyId != null, t => t.CompanyId == requestBody.CompanyId.GetValueOrDefault())
+            //.WhereIF(!userIds.Contains(userInfo.Id), x => x.CompanyId == companyId).
+           .WhereIF(!string.IsNullOrWhiteSpace(requestBody.StartStatus), t => t.StartStatus == requestBody.StartStatus).
            WhereIF(requestBody.Year != null, t => t.Year == requestBody.Year).ToListAsync();
 
             List<Guid> baseplanprojectIds = new List<Guid>();
@@ -1051,47 +1059,66 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 .Where(x => x.IsDelete == 1)
                 .Select(x => new Project { Id = x.Id, Name = x.Name, CompanyId = x.CompanyId }).ToListAsync();
 
-            var pPlanProduction = await dbContext.Queryable<BaseLinePlanProjectAnnualPlanProduction>()
-                 .Where(t => t.IsDelete == 1 && t.Year == requestBody.Year && baseplanprojectIds.Contains(t.ProjectId.Value))
-                 .WhereIF(requestBody.CompanyId != null, p => p.CompanyId == requestBody.CompanyId)
-                 .GroupBy(p => p.ProjectId)
-                 .Select(it => new SearchSubsidiaryCompaniesProjectProductionDto()
-                 {
-                     ProjectId = it.ProjectId,
-                     JanuaryProductionValue = SqlFunc.AggregateSum(it.JanuaryProductionValue),
-                     FebruaryProductionValue = SqlFunc.AggregateSum(it.FebruaryProductionValue),
-                     MarchProductionValue = SqlFunc.AggregateSum(it.MarchProductionValue),
-                     AprilProductionValue = SqlFunc.AggregateSum(it.AprilProductionValue),
-                     MayProductionValue = SqlFunc.AggregateSum(it.MayProductionValue),
-                     JuneProductionValue = SqlFunc.AggregateSum(it.JuneProductionValue),
-                     JulyProductionValue = SqlFunc.AggregateSum(it.JulyProductionValue),
-                     AugustProductionValue = SqlFunc.AggregateSum(it.AugustProductionValue),
-                     SeptemberProductionValue = SqlFunc.AggregateSum(it.SeptemberProductionValue),
-                     OctoberProductionValue = SqlFunc.AggregateSum(it.OctoberProductionValue),
-                     NovemberProductionValue = SqlFunc.AggregateSum(it.NovemberProductionValue),
-                     DecemberProductionValue = SqlFunc.AggregateSum(it.DecemberProductionValue),
-                     LatestDate = SqlFunc.AggregateMax(it.CreateTime)
-                 }).OrderByDescending(p => p.LatestDate)
-                .ToPageListAsync(requestBody.PageIndex, requestBody.PageSize, total);
+            var pPlanProductions = new List<SearchSubsidiaryCompaniesProjectProductionDto>();
+            //if (_currentUser.CurrentLoginUserType == 3)//项目部
+            //{
+            //    pPlanProductions = await dbContext.Queryable<BaseLinePlanProjectAnnualPlanProduction>()
+            //      .InnerJoin<BaseLinePlanProject>((it, p) => it.Id == p.ProjectId)
+            //     .Where((it, p) => it.IsDelete == 1 && p.Year == requestBody.Year)
+            //     .Where((it, p) => p.CompanyId == companyId && p.Association != null)
+            //     .WhereIF(requestBody.CompanyId != null, (it, p) => p.CompanyId == requestBody.CompanyId)
+            //     .Select((it, p) => new SearchSubsidiaryCompaniesProjectProductionDto()
+            //     {
+            //         ProjectId = it.ProjectId,
+            //         JanuaryProductionValue = it.JanuaryProductionValue,
+            //         FebruaryProductionValue = it.FebruaryProductionValue,
+            //         MarchProductionValue = it.MarchProductionValue,
+            //         AprilProductionValue = it.AprilProductionValue,
+            //         MayProductionValue = it.MayProductionValue,
+            //         JuneProductionValue = it.JuneProductionValue,
+            //         JulyProductionValue = it.JulyProductionValue,
+            //         AugustProductionValue = it.AugustProductionValue,
+            //         SeptemberProductionValue = it.SeptemberProductionValue,
+            //         OctoberProductionValue = it.OctoberProductionValue,
+            //         NovemberProductionValue = it.NovemberProductionValue,
+            //         DecemberProductionValue = it.DecemberProductionValue,
+            //         CompanyId = p.CompanyId,
+            //         ProjectName = p.ShortName,
+            //         Id = p.Id,
+            //         PlanStatus = p.PlanStatus,
+            //         SubmitStatus = p.SubmitStatus,
+            //         RejectReason = p.RejectReason,
+            //         LatestDate = p.CreateTime,
+            //         Association = p.Association,
+            //         PlanVersion = p.PlanVersion
+            //     }).OrderByDescending(it => it.LatestDate).ToPageListAsync(requestBody.PageIndex, requestBody.PageSize, total);
+            //}
+            //else
+            //{
+            pPlanProductions = await GetBaseLinePlans(requestBody, total, pPlanProductions);
+            //}
+
+            //if (_currentUser.CurrentLoginUserType == 3 && pPlanProductions.Count == 0)
+            //{
+            //    pPlanProductions = await GetBaseLinePlans(requestBody, total, pPlanProductions);
+            //}
+
+            //var pPlanProductions = await pPlanProduction.ToPageListAsync(requestBody.PageIndex, requestBody.PageSize, total);
             var jobs = await dbContext.Queryable<Domain.Models.Job>().Where(p => baseplanprojectIds.Contains(p.ProjectId) && p.IsFinish == false).ToListAsync();
             var approvers = await dbContext.Queryable<JobApprover>().Where(p => jobs.Select(p => p.Id).ToList().Contains(p.JobId)).ToListAsync();
-            foreach (var item in pPlanProduction)
+            foreach (var item in pPlanProductions)
             {
                 Converttowanyuan(item);
                 var baseline = baseplanproject.Where(p => p.Id == item.ProjectId).FirstOrDefault();
                 if (baseline != null)
                 {
-                    item.CompanyId = baseline.CompanyId;
-                    item.CompanyName = intitutionList.SingleAsync(x => x.PomId == item.CompanyId).Result.Name;
-                    item.ProjectName = baseline.ShortName;
-                    item.Id = baseline.Id;
-                    item.PlanStatus = baseline.PlanStatus;
-                    item.PlanStatusStr = item.PlanStatusStr = baseline.PlanStatus == 0 ? "已保存" : baseline.PlanStatus == 1 ? "驳回" : baseline.PlanStatus == 2 ? "审核通过" : baseline.PlanStatus == 4 ? "待项目审核" : baseline.PlanStatus == 5 ? "待公司审核" : "撤回";
-                    item.CompanyId = baseline.CompanyId;
-                    item.SubmitStatus = baseline.SubmitStatus;
+                    item.PlanStatusStr = baseline.PlanStatus == 0 ? "已保存" : baseline.PlanStatus == 1 ? "驳回" : baseline.PlanStatus == 2 ? "审核通过" : baseline.PlanStatus == 4 ? "待项目审核" : baseline.PlanStatus == 5 ? "待公司审核" : "撤回";
                     item.HasEdit = baseline.CreateId == _currentUser.Id ? true : false;
-                    item.RejectReason = baseline.RejectReason;
+                    item.CompanyName = intitutionList.SingleAsync(x => x.PomId == item.CompanyId).Result.Name;
                 }
+
+                item.IsAssociationbe = !string.IsNullOrWhiteSpace(item.PlanVersion) ? true : false;
+                item.ProjectName = !string.IsNullOrEmpty(baseline.Association) ? baseline.PlanVersion : !string.IsNullOrWhiteSpace(baseline.PlanVersion) ? baseline.PlanVersion : baseline.ShortName;
 
                 var job = jobs.Where(p => p.ProjectId == item.ProjectId && p.IsFinish == false).FirstOrDefault();
                 if (job != null)
@@ -1120,9 +1147,43 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 }
             }
             rt.Count = total;
-            rt.Data = pPlanProduction;
+            rt.Data = pPlanProductions;
             rt.Success();
             return rt;
+        }
+
+        private async Task<List<SearchSubsidiaryCompaniesProjectProductionDto>> GetBaseLinePlans(SearchBaseLinePlanProjectAnnualProductionRequest requestBody, RefAsync<int> total, List<SearchSubsidiaryCompaniesProjectProductionDto> pPlanProductions)
+        {
+            pPlanProductions = await dbContext.Queryable<BaseLinePlanProjectAnnualPlanProduction>()
+                              .RightJoin<BaseLinePlanProject>((it, p) => it.ProjectId == p.Id)
+                             .Where((it, p) => it.IsDelete == 1 && p.Year == requestBody.Year)
+                             .WhereIF(requestBody.CompanyId != null, (it, p) => p.CompanyId == requestBody.CompanyId)
+                             .Select((it, p) => new SearchSubsidiaryCompaniesProjectProductionDto()
+                             {
+                                 ProjectId = it.ProjectId,
+                                 JanuaryProductionValue = it.JanuaryProductionValue,
+                                 FebruaryProductionValue = it.FebruaryProductionValue,
+                                 MarchProductionValue = it.MarchProductionValue,
+                                 AprilProductionValue = it.AprilProductionValue,
+                                 MayProductionValue = it.MayProductionValue,
+                                 JuneProductionValue = it.JuneProductionValue,
+                                 JulyProductionValue = it.JulyProductionValue,
+                                 AugustProductionValue = it.AugustProductionValue,
+                                 SeptemberProductionValue = it.SeptemberProductionValue,
+                                 OctoberProductionValue = it.OctoberProductionValue,
+                                 NovemberProductionValue = it.NovemberProductionValue,
+                                 DecemberProductionValue = it.DecemberProductionValue,
+                                 CompanyId = p.CompanyId,
+                                 ProjectName = p.ShortName,
+                                 Id = p.Id,
+                                 PlanStatus = p.PlanStatus,
+                                 SubmitStatus = p.SubmitStatus,
+                                 RejectReason = p.RejectReason,
+                                 LatestDate = p.CreateTime,
+                                 Association = p.Association,
+                                 PlanVersion = p.PlanVersion
+                             }).MergeTable().OrderByDescending(p => p.LatestDate).ToPageListAsync(requestBody.PageIndex, requestBody.PageSize, total);
+            return pPlanProductions;
         }
 
 
@@ -1498,35 +1559,27 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             var intitutionList = dbContext.Queryable<Institution>().Where(x => x.IsDelete == 1);
             //var projectList = await dbContext.Queryable<Project>().Where(x => x.IsDelete == 1).Select(x => new Project { Id = x.Id, Name = x.Name, CompanyId = x.CompanyId }).ToListAsync();
 
-            var pPlanProduction = dbContext.Queryable<BaseLinePlanProjectAnnualPlanProduction>()
-                 .Where(t => t.IsDelete == 1 && baseplanprojectIds.Contains(t.ProjectId.Value) && t.Year == requestBody.Year)
-                 .GroupBy(p => p.ProjectId)
-                 .Select(it => new SearchSubsidiaryCompaniesProjectProductionDto()
-                 {
-                     ProjectId = it.ProjectId,
-                     JanuaryProductionValue = SqlFunc.AggregateSum(it.JanuaryProductionValue),
-                     FebruaryProductionValue = SqlFunc.AggregateSum(it.FebruaryProductionValue),
-                     MarchProductionValue = SqlFunc.AggregateSum(it.MarchProductionValue),
-                     AprilProductionValue = SqlFunc.AggregateSum(it.AprilProductionValue),
-                     MayProductionValue = SqlFunc.AggregateSum(it.MayProductionValue),
-                     JuneProductionValue = SqlFunc.AggregateSum(it.JuneProductionValue),
-                     JulyProductionValue = SqlFunc.AggregateSum(it.JulyProductionValue),
-                     AugustProductionValue = SqlFunc.AggregateSum(it.AugustProductionValue),
-                     SeptemberProductionValue = SqlFunc.AggregateSum(it.SeptemberProductionValue),
-                     OctoberProductionValue = SqlFunc.AggregateSum(it.OctoberProductionValue),
-                     NovemberProductionValue = SqlFunc.AggregateSum(it.NovemberProductionValue),
-                     DecemberProductionValue = SqlFunc.AggregateSum(it.DecemberProductionValue),
-                     LatestDate = SqlFunc.AggregateMax(it.CreateTime)
-                 }).OrderByDescending(p => p.LatestDate);
             var pPlanProductionList = new List<SearchSubsidiaryCompaniesProjectProductionDto>();
             if (!requestBody.IsFullExport)
             {
-                pPlanProductionList = await pPlanProduction.ToPageListAsync(requestBody.PageIndex, requestBody.PageSize, total);
+                pPlanProductionList = await GetBaseLineplannew(requestBody, total, companyId).MergeTable().OrderByDescending(p => p.LatestDate).ToPageListAsync(requestBody.PageIndex, requestBody.PageSize, total);
             }
             else
             {
-                pPlanProductionList = await pPlanProduction.ToListAsync();
+                pPlanProductionList = await GetBaseLineplannew(requestBody, total, companyId).MergeTable().OrderByDescending(p => p.LatestDate).ToListAsync();
             }
+            if (pPlanProductionList.Count == 0 && _currentUser.CurrentLoginUserType == 3)
+            {
+                if (!requestBody.IsFullExport)
+                {
+                    pPlanProductionList = await GetBaseLineplannew(requestBody, total, null).MergeTable().OrderByDescending(p => p.LatestDate).ToPageListAsync(requestBody.PageIndex, requestBody.PageSize, total);
+                }
+                else
+                {
+                    pPlanProductionList = await GetBaseLineplannew(requestBody, total, null).MergeTable().OrderByDescending(p => p.LatestDate).ToListAsync();
+                }
+            }
+
 
             var jobs = await dbContext.Queryable<Domain.Models.Job>().Where(p => pPlanProductionList.Select(p => p.ProjectId).ToList().Contains(p.ProjectId) && p.IsFinish == false).ToListAsync();
             var approvers = await dbContext.Queryable<JobApprover>().Where(p => jobs.Select(p => p.Id).ToList().Contains(p.JobId)).ToListAsync();
@@ -1536,16 +1589,18 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 var baseline = baseplanproject.Where(p => p.Id == item.ProjectId).FirstOrDefault();
                 if (baseline != null)
                 {
-                    item.CompanyId = baseline.CompanyId;
+                    //item.CompanyId = baseline.CompanyId;
                     item.CompanyName = intitutionList.SingleAsync(x => x.PomId == item.CompanyId).Result.Name;
-                    item.ProjectName = baseline.PlanStatus > 0 ? baseline.PlanVersion : baseline.ShortName;
-                    item.Id = baseline.Id;
-                    item.PlanStatus = baseline.PlanStatus;
+                    item.ProjectName = !string.IsNullOrEmpty(baseline.Association) ? baseline.PlanVersion : !string.IsNullOrWhiteSpace(baseline.PlanVersion) ? baseline.PlanVersion : baseline.ShortName;
+                    //item.PlanVersion = baseline.PlanVersion;
+                    //item.Id = baseline.Id;
+                    //item.PlanStatus = baseline.PlanStatus;
                     item.PlanStatusStr = item.PlanStatusStr = baseline.PlanStatus == 0 ? "已保存" : baseline.PlanStatus == 1 ? "驳回" : baseline.PlanStatus == 2 ? "审核通过" : baseline.PlanStatus == 4 ? "待项目审核" : baseline.PlanStatus == 5 ? "待公司审核" : "撤回";
-                    item.CompanyId = baseline.CompanyId;
-                    item.SubmitStatus = baseline.SubmitStatus;
+                    //item.SubmitStatus = baseline.SubmitStatus;
                     item.HasEdit = baseline.CreateId == _currentUser.Id ? true : false;
-                    item.RejectReason = baseline.RejectReason;
+                    //item.RejectReason = baseline.RejectReason;
+                    item.IsAssociationbe = !string.IsNullOrWhiteSpace(item.PlanVersion) ? true : false;
+                    //item.Association = baseline.Association;
                 }
 
                 var job = jobs.Where(p => p.ProjectId == item.ProjectId && p.IsFinish == false).FirstOrDefault();
@@ -1581,6 +1636,43 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
 
             rt.Data = pPlanProductionList;
             return rt;
+        }
+
+
+        private ISugarQueryable<SearchSubsidiaryCompaniesProjectProductionDto> GetBaseLineplannew(BaseLinePlanAncomparisonRequsetDto requestBody, RefAsync<int> total, Guid? companyId)
+        {
+            var query = dbContext.Queryable<BaseLinePlanProjectAnnualPlanProduction>()
+                                          .RightJoin<BaseLinePlanProject>((it, p) => it.ProjectId == p.Id)
+                             .Where((it, p) => it.IsDelete == 1)
+                             .WhereIF(_currentUser.CurrentLoginUserType == 3 && companyId != null, (it, p) => p.CompanyId == companyId && p.Association != null)
+                             .WhereIF(requestBody.Year != null, (it, p) => p.Year == requestBody.Year)
+                             .WhereIF(!string.IsNullOrWhiteSpace(requestBody.Name), (it, p) => p.ShortName.Contains(requestBody.Name))
+                             .Select((it, p) => new SearchSubsidiaryCompaniesProjectProductionDto()
+                             {
+                                 ProjectId = it.ProjectId,
+                                 JanuaryProductionValue = it.JanuaryProductionValue,
+                                 FebruaryProductionValue = it.FebruaryProductionValue,
+                                 MarchProductionValue = it.MarchProductionValue,
+                                 AprilProductionValue = it.AprilProductionValue,
+                                 MayProductionValue = it.MayProductionValue,
+                                 JuneProductionValue = it.JuneProductionValue,
+                                 JulyProductionValue = it.JulyProductionValue,
+                                 AugustProductionValue = it.AugustProductionValue,
+                                 SeptemberProductionValue = it.SeptemberProductionValue,
+                                 OctoberProductionValue = it.OctoberProductionValue,
+                                 NovemberProductionValue = it.NovemberProductionValue,
+                                 DecemberProductionValue = it.DecemberProductionValue,
+                                 LatestDate = it.CreateTime,
+                                 CompanyId = p.CompanyId,
+                                 ProjectName = p.ShortName,
+                                 Id = p.Id,
+                                 PlanStatus = p.PlanStatus,
+                                 SubmitStatus = p.SubmitStatus,
+                                 RejectReason = p.RejectReason,
+                                 Association = p.Association,
+                                 PlanVersion = p.PlanVersion
+                             });
+            return query;
         }
 
 

@@ -549,7 +549,7 @@ namespace GHMonitoringCenterApi.Application.Service.Job
             var query = _dbJob.AsQueryable()
                   .LeftJoin(_dbProject.AsQueryable(), (j, p) => j.ProjectId == p.Id && p.IsDelete == 1)
                   .Where((j, p) => j.IsDelete == 1)
-                  .Where((j,p)=>j.BizModule!=BizModule.BaseLinePlan)
+                  .Where((j, p) => j.BizModule != BizModule.BaseLinePlan)
                   .WhereIF(model.BizModule != null, (j, p) => j.BizModule == model.BizModule)
                   .WhereIF(model.JobStatus == JobStatus.Handled, (j, p) => j.IsFinish == true)
                   .WhereIF(model.JobStatus == JobStatus.UnHandle, (j, p) => j.IsFinish == false)
@@ -855,7 +855,7 @@ namespace GHMonitoringCenterApi.Application.Service.Job
                 var baseline = await _dbContext.Queryable<BaseLinePlanProject>().Where(p => p.Id == saveModel.Id).FirstAsync();
                 if (!job.IsFinish)
                 {
-                    if (job.ApproveStatus== JobApproveStatus.None)
+                    if (job.ApproveStatus == JobApproveStatus.None)
                     {
                         baseline.PlanStatus = 4;
                     }
@@ -863,7 +863,7 @@ namespace GHMonitoringCenterApi.Application.Service.Job
                     {
                         baseline.PlanStatus = (int)job.ApproveStatus;
                     }
-                      
+
                     if (job.ApproveStatus == JobApproveStatus.Pass && job.ApproveLevel == ApproveLevel.Level1)
                     {
                         baseline.PlanStatus = 5;
@@ -872,6 +872,10 @@ namespace GHMonitoringCenterApi.Application.Service.Job
                 else
                 {
                     baseline.PlanStatus = (int)job.ApproveStatus;
+                    if (job.ApproveStatus == JobApproveStatus.Pass)
+                    {
+                        baseline.SubmitStatus = 2;
+                    }
                 }
                 baseline.RejectReason = job.RejectReason;
                 await _dbContext.Updateable(baseline).ExecuteCommandAsync();
@@ -982,7 +986,7 @@ namespace GHMonitoringCenterApi.Application.Service.Job
             RefAsync<int> total = 0;
             var resJobList = await _dbJob.AsQueryable()
                   .LeftJoin(_dbProject.AsQueryable(), (j, p) => j.ProjectId == p.Id && p.IsDelete == 1)
-                  .Where((j,p)=>j.BizModule!=BizModule.BaseLinePlan)
+                  .Where((j, p) => j.BizModule != BizModule.BaseLinePlan)
                   .Where((j, p) => j.CreateId == _currentUser.Id && j.IsDelete == 1)
                   .Select((j, p) => new JobResponseDto()
                   {
