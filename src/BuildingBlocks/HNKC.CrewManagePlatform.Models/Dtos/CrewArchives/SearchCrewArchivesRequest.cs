@@ -32,9 +32,17 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// </summary>
         public string? PositionOnBoard { get; set; }
         /// <summary>
-        /// 历史履职
+        /// 历史船舶
         /// </summary>
         public string? HistoryOnBoard { get; set; }
+        /// <summary>
+        /// 历史项目
+        /// </summary>
+        public string? HistoryProject { get; set; }
+        /// <summary>
+        /// 历史国家
+        /// </summary>
+        public Guid? HistoryCountry { get; set; }
         /// <summary>
         /// 船员类型
         /// </summary>

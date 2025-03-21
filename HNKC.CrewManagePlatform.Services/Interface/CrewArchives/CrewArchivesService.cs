@@ -43,6 +43,8 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
             #region 船员关联
             //任职船舶
             var crewWorkShip = _dbContext.Queryable<WorkShip>()
+              .WhereIF(!string.IsNullOrWhiteSpace(requestBody.HistoryProject), t => t.ProjectName.Contains(requestBody.HistoryProject))
+              .WhereIF(!string.IsNullOrWhiteSpace(requestBody.HistoryCountry.ToString()), t => t.Country == requestBody.HistoryCountry)
               .GroupBy(u => u.WorkShipId)
               .Select(t => new { t.WorkShipId, WorkShipStartTime = SqlFunc.AggregateMax(t.WorkShipStartTime) });
             var wShip = _dbContext.Queryable<WorkShip>()
