@@ -83,11 +83,11 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.ShipDuty
         /// <summary>
         /// 休假人员
         /// </summary>
-        public List<UserInfo> HolidayPerson { get; set; }
+        public List<UserInfo> HolidayPerson { get; set; } = new List<UserInfo>();
         /// <summary>
         /// 其他人员
         /// </summary>
-        public List<string> OtherPerson { get; set; }
+        public List<string> OtherPerson { get; set; } = new List<string>();
         /// <summary>
         /// 班组信息
         /// </summary>

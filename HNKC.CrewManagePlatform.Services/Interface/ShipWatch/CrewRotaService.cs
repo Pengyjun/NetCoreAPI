@@ -401,11 +401,11 @@ namespace HNKC.CrewManagePlatform.Services.Interface.ShipWatch
                 var fileInfo = await _dbContext.Queryable<Files>().Where(t => t.IsDelete == 1).ToListAsync();
                 //获取船舶上的人员总数
                 var crewWorkShip = _dbContext.Queryable<WorkShip>()
-                    .Where(t => t.OnShip == request.BId.ToString())
                   .GroupBy(u => u.WorkShipId)
                   .Select(t => new { t.WorkShipId, WorkShipStartTime = SqlFunc.AggregateMax(t.WorkShipStartTime) });
-                var wShip = await _dbContext.Queryable<WorkShip>().Where(t => t.OnShip == request.BId.ToString())
-                  .InnerJoin(crewWorkShip, (x, y) => x.WorkShipId == y.WorkShipId && x.WorkShipStartTime == y.WorkShipStartTime).ToListAsync();
+                var wShip = await _dbContext.Queryable<WorkShip>()
+                  .InnerJoin(crewWorkShip, (x, y) => x.WorkShipId == y.WorkShipId && x.WorkShipStartTime == y.WorkShipStartTime)
+                  .Where((x, y) => x.OnShip == request.BId.ToString()).ToListAsync();
                 shipDuty.ShipId = ship.BusinessId;
                 shipDuty.ShipName = ship.ShipName;
                 shipDuty.Country = ship.Name;
@@ -440,22 +440,22 @@ namespace HNKC.CrewManagePlatform.Services.Interface.ShipWatch
                 var wFirst2 = wShip.OrderByDescending(t => t.Postition).FirstOrDefault(t => str.Contains(t.Postition));
                 if (wFirst2 != null)
                 {
-                    leaderInfo2.UserId = userInfo.FirstOrDefault(t => t.BusinessId == wFirst.WorkShipId)?.BusinessId.ToString();
+                    leaderInfo2.UserId = userInfo.FirstOrDefault(t => t.BusinessId == wFirst2.WorkShipId)?.BusinessId.ToString();
                     leaderInfo2.Name = userInfo.FirstOrDefault(t => t.BusinessId == wFirst2.WorkShipId)?.Name;
                     leaderInfo2.JobType = positionInfo.FirstOrDefault(t => t.BusinessId.ToString() == wFirst2.Postition)?.Name;
-                    var file = userInfo.FirstOrDefault(t => t.BusinessId == wFirst.WorkShipId)?.CrewPhoto;
-                    leaderInfo.Icon = url + fileInfo.FirstOrDefault(t => t.FileId == file)?.Name;
+                    var file = userInfo.FirstOrDefault(t => t.BusinessId == wFirst2.WorkShipId)?.CrewPhoto;
+                    leaderInfo2.Icon = url + fileInfo.FirstOrDefault(t => t.FileId == file)?.Name;
                 }
                 //轮机长
                 LeaderInfo leaderInfo3 = new LeaderInfo();
                 var wFirst3 = wShip.FirstOrDefault(t => t.Postition == "93f86f23-cf29-11ef-82f9-ecd68ace58a2");
                 if (wFirst3 != null)
                 {
-                    leaderInfo3.UserId = userInfo.FirstOrDefault(t => t.BusinessId == wFirst.WorkShipId)?.BusinessId.ToString();
+                    leaderInfo3.UserId = userInfo.FirstOrDefault(t => t.BusinessId == wFirst3.WorkShipId)?.BusinessId.ToString();
                     leaderInfo3.Name = userInfo.FirstOrDefault(t => t.BusinessId == wFirst3.WorkShipId)?.Name;
                     leaderInfo3.JobType = positionInfo.FirstOrDefault(t => t.BusinessId.ToString() == wFirst3.Postition)?.Name;
-                    var file = userInfo.FirstOrDefault(t => t.BusinessId == wFirst.WorkShipId)?.CrewPhoto;
-                    leaderInfo.Icon = url + fileInfo.FirstOrDefault(t => t.FileId == file)?.Name;
+                    var file = userInfo.FirstOrDefault(t => t.BusinessId == wFirst3.WorkShipId)?.CrewPhoto;
+                    leaderInfo3.Icon = url + fileInfo.FirstOrDefault(t => t.FileId == file)?.Name;
                 }
                 shipDuty.leaderInfo.Add(leaderInfo);
                 shipDuty.leaderInfo.Add(leaderInfo2);
@@ -553,7 +553,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.ShipWatch
                 var position = wShip.Where(t => t.WorkShipId == item.UserId).FirstOrDefault()?.Postition;
                 var positionName = positionInfo.Where(t => t.BusinessId.ToString() == position).FirstOrDefault()?.Name;
                 userInfo1.UserId = userInfo.Where(t => t.BusinessId == item.UserId).FirstOrDefault()?.BusinessId.ToString();
-                userInfo1.UserName = "休假中" + user1 + "（" + positionName + "）";
+                userInfo1.UserName = "休假中   " + user1 + "（" + positionName + "）";
                 userList.Add(userInfo1);
             }
             foreach (var item in otherUser)
@@ -604,6 +604,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.ShipWatch
                 //获取对应职务
                 var position = wShip.Where(t => t.WorkShipId == item.WorkShipId).FirstOrDefault()?.Postition;
                 var positionName = positionInfo.Where(t => t.BusinessId.ToString() == position).FirstOrDefault()?.Name;
+                userInfo1.UserId = userInfo.FirstOrDefault(t => t.BusinessId == item.WorkShipId)?.BusinessId.ToString();
                 userInfo1.UserName = user1 + "（" + positionName + "）";
                 var file = userInfo.FirstOrDefault(t => t.BusinessId == item.WorkShipId)?.CrewPhoto;
                 userInfo1.Icon = url + fileInfo.FirstOrDefault(t => t.FileId == file)?.Name;
@@ -620,7 +621,8 @@ namespace HNKC.CrewManagePlatform.Services.Interface.ShipWatch
                 //获取对应职务
                 var position = wShip.Where(t => t.WorkShipId == item.UserId).FirstOrDefault()?.Postition;
                 var positionName = positionInfo.Where(t => t.BusinessId.ToString() == position).FirstOrDefault()?.Name;
-                userInfo1.UserName = "休假中" + user1 + "（" + positionName + "）";
+                userInfo1.UserId = userInfo.FirstOrDefault(t => t.BusinessId == item.UserId)?.BusinessId.ToString();
+                userInfo1.UserName = "休假中   " + user1 + "（" + positionName + "）";
                 var file = userInfo.FirstOrDefault(t => t.BusinessId == item.UserId)?.CrewPhoto;
                 userInfo1.Icon = url + fileInfo.FirstOrDefault(t => t.FileId == file)?.Name;
                 userList.Add(userInfo1);

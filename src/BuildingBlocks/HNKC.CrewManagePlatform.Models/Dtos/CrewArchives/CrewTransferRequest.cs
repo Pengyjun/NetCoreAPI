@@ -6,12 +6,12 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
     /// <summary>
     /// 船员调任
     /// </summary>
-    public class CrewTransferRequest : BaseRequest, IValidatableObject
+    public class CrewTransferRequest : BaseRequest
     {
         /// <summary>
         /// 改变船员计划工作时间 true是 修改原计划
         /// </summary>
-        public bool IsChangePlan {  get; set; }
+        public bool IsChangePlan { get; set; }
         /// <summary>
         /// 船舶
         /// </summary>
@@ -31,11 +31,11 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// <summary>
         /// 下船日期
         /// </summary>
-        public DateTime WorkShipEndTime { get; set; }
+      //  public DateTime WorkShipEndTime { get; set; }
 
-        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
-        {
-            if (WorkShipStartTime > WorkShipEndTime) yield return new ValidationResult("上船日期大于下船日期", new string[] { nameof(WorkShipStartTime) });
-        }
+        //public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+        //{
+        //    if (WorkShipStartTime > WorkShipEndTime) yield return new ValidationResult("上船日期大于下船日期", new string[] { nameof(WorkShipStartTime) });
+        //}
     }
 }

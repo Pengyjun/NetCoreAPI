@@ -1621,42 +1621,26 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
         /// <returns></returns>
         public async Task<Result> CrewTransferAsync(CrewTransferRequest requestBody)
         {
-            #region 调任新增数据
+            //修改原船舶的下船日期
+            var shipWork = await _dbContext.Queryable<WorkShip>()
+                   .Where(t => t.IsDelete == 1 && t.WorkShipId == requestBody.BId)
+                   .OrderByDescending(x => x.WorkShipStartTime).FirstAsync();
+            if (shipWork != null)
+            {
+                shipWork.WorkShipEndTime = requestBody.WorkShipStartTime;
+                await _dbContext.Updateable(shipWork).UpdateColumns(x => x.WorkShipEndTime).ExecuteCommandAsync();
+            }
+            //新增新船舶的任职数据
             var addWorkShip = new WorkShip
             {
                 Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
                 BusinessId = GuidUtil.Next(),
-                WorkShipEndTime = requestBody.WorkShipEndTime,
                 WorkShipStartTime = requestBody.WorkShipStartTime,
                 OnShip = requestBody.OnShip,
                 Postition = requestBody.Postition,
                 WorkShipId = requestBody.BId
             };
             await _dbContext.Insertable(addWorkShip).ExecuteCommandAsync();
-            if (requestBody.IsChangePlan)
-            {
-                var shipWork = await _dbContext.Queryable<WorkShip>()
-                    .OrderByDescending(x => x.WorkShipEndTime)
-                    .FirstAsync(t => t.IsDelete == 1 && t.WorkShipId == requestBody.BId);
-                if (shipWork != null)
-                {
-                    shipWork.WorkShipEndTime = requestBody.WorkShipEndTime;
-                    await _dbContext.Updateable(shipWork).UpdateColumns(x => x.WorkShipEndTime).ExecuteCommandAsync();
-                }
-            }
-            #endregion
-            ////前端自己调用任职船舶接口  这里只处理调任逻辑
-            //var shipWork = await _dbContext.Queryable<WorkShip>()
-            //    .OrderByDescending(x => x.WorkShipEndTime)
-            //    .FirstAsync(t => t.IsDelete == 1 && t.WorkShipId == requestBody.BId);
-            //if (shipWork != null)
-            //{
-            //    shipWork.OnShip = requestBody.OnShip;
-            //    shipWork.Postition = requestBody.Postition;
-            //    shipWork.WorkShipEndTime = requestBody.WorkShipEndTime;
-            //    shipWork.WorkShipEndTime = requestBody.WorkShipEndTime;
-            //    await _dbContext.Updateable(shipWork).ExecuteCommandAsync();
-            //}
 
             return Result.Success("调任成功");
         }
