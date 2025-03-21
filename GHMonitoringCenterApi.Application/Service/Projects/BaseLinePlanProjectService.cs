@@ -467,13 +467,15 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                         baselinefirbaseLinePlanProject.PlanType = "1";
                     }
                     baselinefirbaseLinePlanProject.ShortName = input.ShortName;
-                    baselinefirbaseLinePlanProject.StartStatus = input.StartStatus;
-                    baselinefirbaseLinePlanProject.CompanyId = _currentUser.CurrentLoginInstitutionId;
+                    //baselinefirbaseLinePlanProject.CompanyId = _currentUser.CurrentLoginInstitutionId;
                     baselinefirbaseLinePlanProject.Year = input.Year;
                     baselinefirbaseLinePlanProject.StartStatus = input.StartStatus;
                     baselinefirbaseLinePlanProject.ProjectId = input.ProjectId;
                     baselinefirbaseLinePlanProject.Association = input.Association;
-                    baselinefirbaseLinePlanProject.CompletionTime = input.CompletionTime;
+                    if (input.CompletionTime != null)
+                    {
+                        baselinefirbaseLinePlanProject.CompletionTime = input.CompletionTime;
+                    }
                     baselinefirbaseLinePlanProject.EffectiveAmount = input.EffectiveAmount;
                     baselinefirbaseLinePlanProject.IsSubPackage = input.IsSubPackage;
                     baselinefirbaseLinePlanProject.RemainingAmount = input.RemainingAmount;
@@ -503,7 +505,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     {
                         baseLinePlanProject.PlanType = "1";
                     }
-                    await GetPlanVersion(baseLinePlanProject);
+                    await GetPlanVersion(baseLinePlanProject,1);
                     await dbContext.Insertable(baseLinePlanProject).ExecuteCommandAsync();
                     input.ProjectId = baseid;
                 }
@@ -515,6 +517,10 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                         var first = tables.FirstOrDefault(x => x.Id == item.Id);
                         if (first != null)
                         {
+                            //first.ProjectId = baseid;
+                            //first.CompanyId = _currentUser.CurrentLoginInstitutionId;
+                            //first.Year = DateTime.Now.Year;
+                            //first.Id = GuidUtil.Next();
                             first.JanuaryProductionQuantity = Setnumericalconversiontwo(item.JanuaryProductionQuantity);
                             first.JanuaryProductionValue = Setnumericalconversiontwo(item.JanuaryProductionValue);
                             first.FebruaryProductionQuantity = Setnumericalconversiontwo(item.FebruaryProductionQuantity);
@@ -674,9 +680,9 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
         /// </summary>
         /// <param name="baseLinePlanProject"></param>
         /// <returns></returns>
-        private async Task GetPlanVersion(BaseLinePlanProject baseLinePlanProject)
+        private async Task GetPlanVersion(BaseLinePlanProject baseLinePlanProject,int isadd=0)
         {
-            if (!string.IsNullOrWhiteSpace(baseLinePlanProject.PlanVersion) && !string.IsNullOrWhiteSpace(baseLinePlanProject.PlanVersion.Replace("-基准计划", "")))
+            if (!string.IsNullOrWhiteSpace(baseLinePlanProject.PlanVersion) && !string.IsNullOrWhiteSpace(baseLinePlanProject.PlanVersion.Replace("-基准计划", "")) && isadd!=0)
             {
                 return;
             }
@@ -767,7 +773,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             {
                 Id = "f86a0717-86f2-4695-a472-86204dd6adac".ToGuid(),
                 Name = "其他",
-                SubOrOwn = 1
+                SubOrOwn = 0
             });
 
             rr.ProjectInfosForAnnualProductions = projectInfosForAnnualProductions;
@@ -1115,10 +1121,11 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     item.PlanStatusStr = baseline.PlanStatus == 0 ? "已保存" : baseline.PlanStatus == 1 ? "驳回" : baseline.PlanStatus == 2 ? "审核通过" : baseline.PlanStatus == 4 ? "待项目审核" : baseline.PlanStatus == 5 ? "待公司审核" : "撤回";
                     item.HasEdit = baseline.CreateId == _currentUser.Id ? true : false;
                     item.CompanyName = intitutionList.SingleAsync(x => x.PomId == item.CompanyId).Result.Name;
+                    item.ProjectName = !string.IsNullOrEmpty(baseline.Association) ? baseline.PlanVersion : !string.IsNullOrWhiteSpace(baseline.PlanVersion) ? baseline.PlanVersion : baseline.ShortName;
                 }
 
                 item.IsAssociationbe = !string.IsNullOrWhiteSpace(item.PlanVersion) ? true : false;
-                item.ProjectName = !string.IsNullOrEmpty(baseline.Association) ? baseline.PlanVersion : !string.IsNullOrWhiteSpace(baseline.PlanVersion) ? baseline.PlanVersion : baseline.ShortName;
+
 
                 var job = jobs.Where(p => p.ProjectId == item.ProjectId && p.IsFinish == false).FirstOrDefault();
                 if (job != null)
@@ -1157,6 +1164,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             pPlanProductions = await dbContext.Queryable<BaseLinePlanProjectAnnualPlanProduction>()
                               .RightJoin<BaseLinePlanProject>((it, p) => it.ProjectId == p.Id)
                              .Where((it, p) => it.IsDelete == 1 && p.Year == requestBody.Year)
+                             .WhereIF(!string.IsNullOrWhiteSpace(requestBody.StartStatus), (it, p) => p.StartStatus == requestBody.StartStatus)
                              .WhereIF(requestBody.CompanyId != null, (it, p) => p.CompanyId == requestBody.CompanyId)
                              .Select((it, p) => new SearchSubsidiaryCompaniesProjectProductionDto()
                              {
@@ -1590,14 +1598,17 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 if (baseline != null)
                 {
                     //item.CompanyId = baseline.CompanyId;
-                    item.CompanyName = intitutionList.SingleAsync(x => x.PomId == item.CompanyId).Result.Name;
+                    if (item.CompanyId != null && item.CompanyId != Guid.Empty)
+                    {
+                        item.CompanyName = intitutionList.SingleAsync(x => x.PomId == item.CompanyId).Result.Name;
+                    }
                     item.ProjectName = !string.IsNullOrEmpty(baseline.Association) ? baseline.PlanVersion : !string.IsNullOrWhiteSpace(baseline.PlanVersion) ? baseline.PlanVersion : baseline.ShortName;
                     //item.PlanVersion = baseline.PlanVersion;
                     //item.Id = baseline.Id;
                     //item.PlanStatus = baseline.PlanStatus;
                     item.PlanStatusStr = item.PlanStatusStr = baseline.PlanStatus == 0 ? "已保存" : baseline.PlanStatus == 1 ? "驳回" : baseline.PlanStatus == 2 ? "审核通过" : baseline.PlanStatus == 4 ? "待项目审核" : baseline.PlanStatus == 5 ? "待公司审核" : "撤回";
                     //item.SubmitStatus = baseline.SubmitStatus;
-                    item.HasEdit = baseline.CreateId == _currentUser.Id ? true : false;
+                    item.HasEdit = baseline.CreateId == _currentUser.Id ? true : _currentUser.CurrentLoginUserType == 2 && item.CompanyId == companyId ? true : false;
                     //item.RejectReason = baseline.RejectReason;
                     item.IsAssociationbe = !string.IsNullOrWhiteSpace(item.PlanVersion) ? true : false;
                     //item.Association = baseline.Association;
@@ -1646,7 +1657,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                              .Where((it, p) => it.IsDelete == 1)
                              .WhereIF(_currentUser.CurrentLoginUserType == 3 && companyId != null, (it, p) => p.CompanyId == companyId && p.Association != null)
                              .WhereIF(requestBody.Year != null, (it, p) => p.Year == requestBody.Year)
-                             .WhereIF(!string.IsNullOrWhiteSpace(requestBody.Name), (it, p) => p.ShortName.Contains(requestBody.Name))
+                             .WhereIF(!string.IsNullOrWhiteSpace(requestBody.Name), (it, p) => p.ShortName.Contains(requestBody.Name) || p.PlanVersion.Contains(requestBody.Name))
                              .Select((it, p) => new SearchSubsidiaryCompaniesProjectProductionDto()
                              {
                                  ProjectId = it.ProjectId,
@@ -1868,7 +1879,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                     {
                         add.CompanyId = "bd840460-1e3a-45c8-abed-6e66903eb465".ToGuid();
                     }
-                    await GetPlanVersion(add);
+                    await GetPlanVersion(add,1);
                     addbaseLinePlanProjects.Add(add);
                     var b = new BaseLinePlanProjectAnnualPlanProduction
                     {
