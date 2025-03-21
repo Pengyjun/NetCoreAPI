@@ -121,6 +121,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                 .WhereIF(requestBody.ShipTypes != null && requestBody.ShipTypes.Any(), (t, ws, pob, ow, ue, sc, eb) => SqlFunc.Subqueryable<OwnerShip>()
                                .Where(skcall => requestBody.ShipTypes.Contains(((int)ow.ShipType).ToString())).Any())//船舶类型
                 .OrderBy((t, ws, pob, ow, ue, sc, eb) => new { t.DeleteReson, Created = SqlFunc.Desc(t.Created) })
+
                 .Select((t, ws, pob, ow, ue, sc, eb) => new SearchCrewArchivesResponse
                 {
                     BId = t.BusinessId,
@@ -129,6 +130,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                     UserName = t.Name,
                     WorkShipStartTime = ws.WorkShipStartTime,
                     WorkShipEndTime = ws.WorkShipEndTime,
+                    //OnStatusName = 
                     OnBoard = ws.BusinessId.ToString(),
                     OnCountry = ow.Country,
                     CardId = t.CardId,
