@@ -288,7 +288,7 @@ namespace GHMonitoringCenterApi.Application.Service.File
             #region 检查是否可以发送
             var today = DateTime.Now.AddDays(-1).ToDateDay();
             var approveResult= await dbContext.Queryable<DayPushApprove>().Where(x => x.IsDelete == 1 && x.DayTime == today).FirstAsync();
-            if (approveResult == null)
+            if (approveResult == null&&DateTime.Now.Hour!=9)
             {
                 responseAjaxResult.Data = false;
                 return responseAjaxResult;
@@ -296,7 +296,7 @@ namespace GHMonitoringCenterApi.Application.Service.File
 
             //判断Redis是否已经存在发消息的记录
             var isExist= await RedisUtil.Instance.ExistsAsync(DateTime.Now.AddDays(-1).ToDateDay() + "two");
-            if (isExist)
+            if (isExist && DateTime.Now.Hour != 9)
             {
                 //已存在 说明已发送 不再重复发送
                 responseAjaxResult.Data = false;
