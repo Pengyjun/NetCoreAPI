@@ -404,9 +404,10 @@ namespace HNKC.CrewManagePlatform.Services.Interface.ShipWatch
                 var crewWorkShip = _dbContext.Queryable<WorkShip>()
                   .GroupBy(u => u.WorkShipId)
                   .Select(t => new { t.WorkShipId, WorkShipStartTime = SqlFunc.AggregateMax(t.WorkShipStartTime) });
-                var wShip = await _dbContext.Queryable<WorkShip>()
+                var workShip = _dbContext.Queryable<WorkShip>()
                   .InnerJoin(crewWorkShip, (x, y) => x.WorkShipId == y.WorkShipId && x.WorkShipStartTime == y.WorkShipStartTime)
-                  .Where((x, y) => x.OnShip == request.BId.ToString()).ToListAsync();
+                  .Where((x, y) => x.OnShip == request.BId.ToString());
+                var wShip = await workShip.ToListAsync();
                 shipDuty.ShipId = ship.BusinessId;
                 shipDuty.ShipName = ship.ShipName;
                 shipDuty.Country = ship.Name;
@@ -467,7 +468,18 @@ namespace HNKC.CrewManagePlatform.Services.Interface.ShipWatch
                 var applyCodes = depApply.Select(t => t.ApplyCode).Distinct().ToArray();
                 var time = DateTime.Now;
                 //获取离船用户的详细信息
-                var depApplyUser = await _dbContext.Queryable<DepartureApplyUser>().Where(t => t.IsDelete == 1 && applyCodes.Contains(t.ApplyCode)).ToListAsync();
+                var depApplyUser = await _dbContext.Queryable<DepartureApplyUser>()
+                    .LeftJoin(workShip, (x, y) => x.UserId == y.WorkShipId)
+                    .LeftJoin(_dbContext.Queryable<PositionOnBoard>(), (x, y, z) => y.Postition == z.BusinessId.ToString())
+                    .Where((x, y, z) => x.IsDelete == 1 && y.IsDelete == 1 && z.IsDelete == 1 && applyCodes.Contains(x.ApplyCode))
+                    .Select((x, y, z) => new DepartureResponseDto
+                    {
+                        UserId = x.UserId,
+                        DisembarkDate = x.DisembarkDate,
+                        ReturnShipDate = x.ReturnShipDate,
+                        RotaType = z.RotaType
+                    })
+                    .ToListAsync();
                 //查看船员是否有离船申请 并且未归船的 这种类型的船员为休假中的
                 var dutyUser = depApplyUser.Where(t => t.DisembarkDate <= time && t.ReturnShipDate >= time).Select(t => t.UserId).ToList();
                 shipDuty.Holiday = dutyUser.Count;
@@ -506,7 +518,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.ShipWatch
         /// <param name="time"></param>
         /// <param name="rota"></param>
         /// <returns></returns>
-        public async Task<DutyPerson> GetCrewRotaInfo(List<CrewRota> crew, List<User> userInfo, List<PositionOnBoard> positionInfo, List<WorkShip> wShip, List<DepartureApplyUser> depApplyUser, List<Files> fileInfo, DateTime time, RotaEnum rota, string url)
+        public async Task<DutyPerson> GetCrewRotaInfo(List<CrewRota> crew, List<User> userInfo, List<PositionOnBoard> positionInfo, List<WorkShip> wShip, List<DepartureResponseDto> depApplyUser, List<Files> fileInfo, DateTime time, RotaEnum rota, string url)
         {
             //按版本号倒排 获取前三天最新的甲板部排班人员
             var deck = crew.Where(t => t.RotaType == rota).OrderByDescending(t => t.Version).Take(3).ToList();
@@ -524,47 +536,65 @@ namespace HNKC.CrewManagePlatform.Services.Interface.ShipWatch
                     team.TimeslotType = item.TeamGroup;
                 }
                 var user1 = userInfo.Where(t => t.BusinessId == item.FLeaderUserId).FirstOrDefault()?.Name;
-                //获取对应职务
-                var position = wShip.Where(t => t.WorkShipId == item.FLeaderUserId).FirstOrDefault()?.Postition;
-                var positionName = positionInfo.Where(t => t.BusinessId.ToString() == position).FirstOrDefault()?.Name;
-                team.UserId1 = userInfo.Where(t => t.BusinessId == item.FLeaderUserId).FirstOrDefault()?.BusinessId.ToString();
-                team.Person1 = user1 + "（" + positionName + "）";
-                var file1 = userInfo.FirstOrDefault(t => t.BusinessId == item.FLeaderUserId)?.CrewPhoto;
-                team.Icon1 = url + fileInfo.FirstOrDefault(t => t.FileId == file1)?.Name;
+                if (!string.IsNullOrWhiteSpace(user1))
+                {
+                    //获取对应职务
+                    var position = wShip.Where(t => t.WorkShipId == item.FLeaderUserId).FirstOrDefault()?.Postition;
+                    var positionName = positionInfo.Where(t => t.BusinessId.ToString() == position).FirstOrDefault()?.Name;
+                    team.UserId1 = userInfo.Where(t => t.BusinessId == item.FLeaderUserId).FirstOrDefault()?.BusinessId.ToString();
+                    ////判断当前值班人员是否休假
+                    //var isDep = depApplyUser.Where(t => t.UserId == item.FLeaderUserId).FirstOrDefault();
+                    team.Person1 = user1 + "（" + positionName + "）";
+                    var file1 = userInfo.FirstOrDefault(t => t.BusinessId == item.FLeaderUserId)?.CrewPhoto;
+                    team.Icon1 = url + fileInfo.FirstOrDefault(t => t.FileId == file1)?.Name;
+                }
                 var user2 = userInfo.Where(t => t.BusinessId == item.SLeaderUserId).FirstOrDefault()?.Name;
-                //获取对应职务
-                var position2 = wShip.Where(t => t.WorkShipId == item.SLeaderUserId).FirstOrDefault()?.Postition;
-                var positionName2 = positionInfo.Where(t => t.BusinessId.ToString() == position2).FirstOrDefault()?.Name;
-                team.UserId2 = userInfo.Where(t => t.BusinessId == item.FLeaderUserId).FirstOrDefault()?.BusinessId.ToString();
-                team.Person2 = user2 + "（" + positionName2 + "）";
-                var file2 = userInfo.FirstOrDefault(t => t.BusinessId == item.FLeaderUserId)?.CrewPhoto;
-                team.Icon2 = url + fileInfo.FirstOrDefault(t => t.FileId == file2)?.Name;
-                var other = item.OhterUserId?.Split(',').ToList();
-                otherUser.AddRange(other);
-                dutyPerson.teamsGroup.Add(team);
+                if (!string.IsNullOrWhiteSpace(user2))
+                {
+                    //获取对应职务
+                    var position2 = wShip.Where(t => t.WorkShipId == item.SLeaderUserId).FirstOrDefault()?.Postition;
+                    var positionName2 = positionInfo.Where(t => t.BusinessId.ToString() == position2).FirstOrDefault()?.Name;
+                    team.UserId2 = userInfo.Where(t => t.BusinessId == item.FLeaderUserId).FirstOrDefault()?.BusinessId.ToString();
+                    team.Person2 = user2 + "（" + positionName2 + "）";
+                    var file2 = userInfo.FirstOrDefault(t => t.BusinessId == item.FLeaderUserId)?.CrewPhoto;
+                    team.Icon2 = url + fileInfo.FirstOrDefault(t => t.FileId == file2)?.Name;
+                    var other = item.OhterUserId?.Split(',').ToList();
+                    otherUser.AddRange(other);
+                    dutyPerson.teamsGroup.Add(team);
+                }
+
+
             }
             //查看船员是否有离船申请 并且未归船的 这种类型的船员为休假中的
-            var dutyUser = depApplyUser.Where(t => t.DisembarkDate <= time && t.ReturnShipDate >= time).ToList();
+            var dutyUser = depApplyUser.Where(t => t.RotaType == rota && t.DisembarkDate <= time && t.ReturnShipDate >= time).ToList();
             List<UserInfo> userList = new List<UserInfo>();
             foreach (var item in dutyUser)
             {
                 UserInfo userInfo1 = new UserInfo();
                 var user1 = userInfo.Where(t => t.BusinessId == item.UserId).FirstOrDefault()?.Name;
-                //获取对应职务
-                var position = wShip.Where(t => t.WorkShipId == item.UserId).FirstOrDefault()?.Postition;
-                var positionName = positionInfo.Where(t => t.BusinessId.ToString() == position).FirstOrDefault()?.Name;
-                userInfo1.UserId = userInfo.Where(t => t.BusinessId == item.UserId).FirstOrDefault()?.BusinessId.ToString();
-                userInfo1.UserName = "休假中   " + user1 + "（" + positionName + "）";
-                userList.Add(userInfo1);
+                if (!string.IsNullOrWhiteSpace(user1))
+                {
+                    //获取对应职务
+                    var position = wShip.Where(t => t.WorkShipId == item.UserId).FirstOrDefault()?.Postition;
+                    var positionName = positionInfo.Where(t => t.BusinessId.ToString() == position).FirstOrDefault()?.Name;
+                    var file1 = userInfo.FirstOrDefault(t => t.BusinessId == item.UserId)?.CrewPhoto;
+                    userInfo1.Icon = url + fileInfo.FirstOrDefault(t => t.FileId == file1)?.Name;
+                    userInfo1.UserId = userInfo.Where(t => t.BusinessId == item.UserId).FirstOrDefault()?.BusinessId.ToString();
+                    userInfo1.UserName = "休假中   " + user1 + "（" + positionName + "）";
+                    userList.Add(userInfo1);
+                }
             }
             foreach (var item in otherUser)
             {
                 var user1 = userInfo.Where(t => t.BusinessId.ToString() == item).FirstOrDefault()?.Name;
-                //获取对应职务
-                var position = wShip.Where(t => t.WorkShipId.ToString() == item).FirstOrDefault()?.Postition;
-                var positionName = positionInfo.Where(t => t.BusinessId.ToString() == position).FirstOrDefault()?.Name;
-                var result = user1 + "（" + positionName + "）";
-                dutyPerson.OtherPerson.Add(result);
+                if (!string.IsNullOrWhiteSpace(user1))
+                {
+                    //获取对应职务
+                    var position = wShip.Where(t => t.WorkShipId.ToString() == item).FirstOrDefault()?.Postition;
+                    var positionName = positionInfo.Where(t => t.BusinessId.ToString() == position).FirstOrDefault()?.Name;
+                    var result = user1 + "（" + positionName + "）";
+                    dutyPerson.OtherPerson.Add(result);
+                }
             }
             dutyPerson.HolidayPerson = userList;
             return dutyPerson;
@@ -581,7 +611,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.ShipWatch
         /// <param name="time"></param>
         /// <param name="rota"></param>
         /// <returns></returns>
-        public async Task<OffDutyPerson> GetOffCrewRotaInfo(List<CrewRota> crew, List<User> userInfo, List<PositionOnBoard> positionInfo, List<WorkShip> wShip, List<DepartureApplyUser> depApplyUser, List<Files> fileInfo, DateTime time, RotaEnum rota, string url)
+        public async Task<OffDutyPerson> GetOffCrewRotaInfo(List<CrewRota> crew, List<User> userInfo, List<PositionOnBoard> positionInfo, List<WorkShip> wShip, List<DepartureResponseDto> depApplyUser, List<Files> fileInfo, DateTime time, RotaEnum rota, string url)
         {
             //当前已排班的人员
             List<string> crewIds = new List<string>();
@@ -604,31 +634,37 @@ namespace HNKC.CrewManagePlatform.Services.Interface.ShipWatch
             {
                 UserInfo userInfo1 = new UserInfo();
                 var user1 = userInfo.Where(t => t.BusinessId == item.WorkShipId).FirstOrDefault()?.Name;
-                //获取对应职务
-                var position = wShip.Where(t => t.WorkShipId == item.WorkShipId).FirstOrDefault()?.Postition;
-                var positionName = positionInfo.Where(t => t.BusinessId.ToString() == position).FirstOrDefault()?.Name;
-                userInfo1.UserId = userInfo.FirstOrDefault(t => t.BusinessId == item.WorkShipId)?.BusinessId.ToString();
-                userInfo1.UserName = user1 + "（" + positionName + "）";
-                var file = userInfo.FirstOrDefault(t => t.BusinessId == item.WorkShipId)?.CrewPhoto;
-                userInfo1.Icon = url + fileInfo.FirstOrDefault(t => t.FileId == file)?.Name;
-                offDutyPerson.Person1.Add(userInfo1);
+                if (!string.IsNullOrWhiteSpace(user1))
+                {
+                    //获取对应职务
+                    var position = wShip.Where(t => t.WorkShipId == item.WorkShipId).FirstOrDefault()?.Postition;
+                    var positionName = positionInfo.Where(t => t.BusinessId.ToString() == position).FirstOrDefault()?.Name;
+                    userInfo1.UserId = userInfo.FirstOrDefault(t => t.BusinessId == item.WorkShipId)?.BusinessId.ToString();
+                    userInfo1.UserName = user1 + "（" + positionName + "）";
+                    var file = userInfo.FirstOrDefault(t => t.BusinessId == item.WorkShipId)?.CrewPhoto;
+                    userInfo1.Icon = url + fileInfo.FirstOrDefault(t => t.FileId == file)?.Name;
+                    offDutyPerson.Person1.Add(userInfo1);
+                }
             }
             var offUserIds = offUser.Select(t => t.WorkShipId).Distinct().ToArray();
             //查看非班中的船员是否有离船申请 并且未归船的 这种类型的船员为休假中的
-            var dutyUser = depApplyUser.Where(t => offUserIds.Contains(t.UserId) && t.DisembarkDate <= time && t.ReturnShipDate >= time).ToList();
+            var dutyUser = depApplyUser.Where(t => t.RotaType == rota && offUserIds.Contains(t.UserId) && t.DisembarkDate <= time && t.ReturnShipDate >= time).ToList();
             List<UserInfo> userList = new List<UserInfo>();
             foreach (var item in dutyUser)
             {
                 UserInfo userInfo1 = new UserInfo();
                 var user1 = userInfo.Where(t => t.BusinessId == item.UserId).FirstOrDefault()?.Name;
-                //获取对应职务
-                var position = wShip.Where(t => t.WorkShipId == item.UserId).FirstOrDefault()?.Postition;
-                var positionName = positionInfo.Where(t => t.BusinessId.ToString() == position).FirstOrDefault()?.Name;
-                userInfo1.UserId = userInfo.FirstOrDefault(t => t.BusinessId == item.UserId)?.BusinessId.ToString();
-                userInfo1.UserName = "休假中   " + user1 + "（" + positionName + "）";
-                var file = userInfo.FirstOrDefault(t => t.BusinessId == item.UserId)?.CrewPhoto;
-                userInfo1.Icon = url + fileInfo.FirstOrDefault(t => t.FileId == file)?.Name;
-                userList.Add(userInfo1);
+                if (!string.IsNullOrWhiteSpace(user1))
+                {
+                    //获取对应职务
+                    var position = wShip.Where(t => t.WorkShipId == item.UserId).FirstOrDefault()?.Postition;
+                    var positionName = positionInfo.Where(t => t.BusinessId.ToString() == position).FirstOrDefault()?.Name;
+                    userInfo1.UserId = userInfo.FirstOrDefault(t => t.BusinessId == item.UserId)?.BusinessId.ToString();
+                    userInfo1.UserName = "休假中   " + user1 + "（" + positionName + "）";
+                    var file = userInfo.FirstOrDefault(t => t.BusinessId == item.UserId)?.CrewPhoto;
+                    userInfo1.Icon = url + fileInfo.FirstOrDefault(t => t.FileId == file)?.Name;
+                    userList.Add(userInfo1);
+                }
             }
             offDutyPerson.HolidayPerson = userList;
             return offDutyPerson;

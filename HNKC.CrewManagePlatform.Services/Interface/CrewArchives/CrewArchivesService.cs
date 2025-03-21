@@ -118,7 +118,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                                .Where(skcall => skcall.Type == CertificatesEnum.JKZ && t.BusinessId == skcall.CertificateId).Any())
                 .WhereIF(requestBody.ShipTypes != null && requestBody.ShipTypes.Any(), (t, ws, pob, ow, ue, sc, eb) => SqlFunc.Subqueryable<OwnerShip>()
                                .Where(skcall => requestBody.ShipTypes.Contains(((int)ow.ShipType).ToString())).Any())//船舶类型
-                .OrderByDescending(t => t.Created)
+                .OrderBy((t, ws, pob, ow, ue, sc, eb) => new { t.DeleteReson, Created = SqlFunc.Desc(t.Created) })
                 .Select((t, ws, pob, ow, ue, sc, eb) => new SearchCrewArchivesResponse
                 {
                     BId = t.BusinessId,
