@@ -6,7 +6,6 @@ using HNKC.CrewManagePlatform.SqlSugars.Models;
 using HNKC.CrewManagePlatform.Utils;
 using SqlSugar;
 using System.ComponentModel;
-using System.IO;
 using UtilsSharp;
 
 namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
@@ -75,7 +74,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                 .LeftJoin<PositionOnBoard>((t, ws, pob) => ws.Postition == pob.BusinessId.ToString())
                 .LeftJoin<OwnerShip>((t, ws, pob, ow) => ws.OnShip == ow.BusinessId.ToString())
                 .LeftJoin(uentity, (t, ws, pob, ow, ue) => t.BusinessId == ue.UserEntryId)
-                .WhereIF(roleType == 3 || roleType == 4, (t, ws, pob, ow, ue) => ws.OnShip == GlobalCurrentUser.ShipId)//船长
+                .WhereIF(roleType == 3, (t, ws, pob, ow, ue) => ws.OnShip == GlobalCurrentUser.ShipId)//船长
                 .LeftJoin<SkillCertificates>((t, ws, pob, ow, ue, sc) => sc.SkillcertificateId == t.BusinessId)
                 .LeftJoin<EducationalBackground>((t, ws, pob, ow, ue, sc, eb) => eb.QualificationId == t.BusinessId)
                 .WhereIF(requestBody.ServiceBooks != null && requestBody.ServiceBooks.Any(),
@@ -2153,12 +2152,14 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
         /// 备注
         /// </summary>
         /// <param name="bId"></param>
+        /// <param name="keyWords"></param>
         /// <returns></returns>
-        public async Task<Result> GetNotesDetailsAsync(string bId)
+        public async Task<Result> GetNotesDetailsAsync(string bId,string? keyWords)
         {
             NotesDetails nd = new();
 
-            var users = await _dbContext.Queryable<User>().Select(t => new { t.BusinessId, t.Name }).ToListAsync();
+            var users = await _dbContext.Queryable<User>()
+                .Select(t => new { t.BusinessId, t.Name }).ToListAsync();
             var uNotes = await _dbContext.Queryable<UserNotes>().Where(t => t.IsDelete == 1 && t.UserNoteId.ToString() == bId)
                 .OrderByDescending(x => x.Created)
                 .ToListAsync();
@@ -2174,7 +2175,10 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                     UserName = users.FirstOrDefault(x => x.BusinessId.ToString() == item.WritedUserId)?.Name
                 });
             }
-            nd.NotesForDetails = rt;
+
+            var notesForDetailList =
+                rt.WhereIF(!string.IsNullOrWhiteSpace(keyWords), un => un.Content.Contains(keyWords) || un.UserName.Contains(keyWords)).ToList();
+            nd.NotesForDetails = notesForDetailList;
 
             return Result.Success(nd);
         }

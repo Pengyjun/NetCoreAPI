@@ -199,11 +199,12 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api.Controllers
         /// 获取备注详情
         /// </summary>
         /// <param name="bId"></param>
+        /// <param name="keyWords"></param>
         /// <returns></returns>
         [HttpGet("GetNotesDetails")]
-        public async Task<Result> GetNotesDetailsAsync([FromQuery] string bId)
+        public async Task<Result> GetNotesDetailsAsync([FromQuery] string bId,[FromQuery] string? keyWords)
         {
-            return await _service.GetNotesDetailsAsync(bId);
+            return await _service.GetNotesDetailsAsync(bId,keyWords);
 
         }
         #endregion
