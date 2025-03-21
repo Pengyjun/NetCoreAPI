@@ -120,8 +120,6 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                                .Where(skcall => skcall.Type == CertificatesEnum.JKZ && t.BusinessId == skcall.CertificateId).Any())
                 .WhereIF(requestBody.ShipTypes != null && requestBody.ShipTypes.Any(), (t, ws, pob, ow, ue, sc, eb) => SqlFunc.Subqueryable<OwnerShip>()
                                .Where(skcall => requestBody.ShipTypes.Contains(((int)ow.ShipType).ToString())).Any())//船舶类型
-                .OrderBy((t, ws, pob, ow, ue, sc, eb) => new { t.DeleteReson, Created = SqlFunc.Desc(t.Created) })
-
                 .Select((t, ws, pob, ow, ue, sc, eb) => new SearchCrewArchivesResponse
                 {
                     BId = t.BusinessId,
@@ -130,7 +128,6 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                     UserName = t.Name,
                     WorkShipStartTime = ws.WorkShipStartTime,
                     WorkShipEndTime = ws.WorkShipEndTime,
-                    //OnStatusName = 
                     OnBoard = ws.BusinessId.ToString(),
                     OnCountry = ow.Country,
                     CardId = t.CardId,
@@ -141,9 +138,12 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                     EmploymentType = ue.EmploymentId,
                     IsDelete = t.IsDelete,
                     DeleteReson = t.DeleteReson,
-                    Created = t.Created
+                    Created = t.Created,
+                    StatusOrder = (ws.WorkShipEndTime != null && ws.WorkShipEndTime <= DateTime.Now ? "休假" : ws.WorkShipStartTime > DateTime.Now ? "休假" : string.Empty) == "休假" ? 1 : t.DeleteReson != 0 ? (int)t.DeleteReson + 2 : (int)t.DeleteReson
                 })
                 .Distinct()
+                .MergeTable()
+                .OrderBy((t) => new { t.StatusOrder, Created = SqlFunc.Desc(t.Created) })
                 .ToPageListAsync(requestBody.PageIndex, requestBody.PageSize, total);
 
             return await GetResult(requestBody, rt, total);
@@ -2933,8 +2933,12 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                     LDisembarkTime = t5.WorkShipEndTime,
                     CardId = t1.CardId,
                     HolidayDays = dau.HolidayDays,
-                    OnBoardDays = SqlFunc.DateDiff(DateType.Day, Convert.ToDateTime(t5.WorkShipStartTime), DateTime.Now)
+                    OnBoardDays = SqlFunc.DateDiff(DateType.Day, Convert.ToDateTime(t5.WorkShipStartTime), DateTime.Now),
+                    Created = t1.Created,
+                    StatusOrder = (t5.WorkShipEndTime != null && t5.WorkShipEndTime <= DateTime.Now ? "休假" : t5.WorkShipStartTime > DateTime.Now ? "休假" : string.Empty) == "休假" ? 1 : t1.DeleteReson != 0 ? (int)t1.DeleteReson + 2 : (int)t1.DeleteReson
                 })
+                .MergeTable()
+                .OrderBy(t1 => new { t1.StatusOrder, Created = SqlFunc.Desc(t1.Created) })
                 .ToPageListAsync(requestBody.PageIndex, requestBody.PageSize, total);
             return await GetCrewDynamicsAsync(rr, total);
 
@@ -2975,7 +2979,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                 u.OnStatus = EnumUtil.GetDescription(_baseService.ShipUserStatus(u.LBoardingTime, u.LDisembarkTime, u.DeleteResonEnum));
             }
 
-            rt.List = rr.OrderByDescending(t => t.UserName).ToList();
+            rt.List = rr.ToList();
             rt.TotalCount = total;
             return rt;
         }

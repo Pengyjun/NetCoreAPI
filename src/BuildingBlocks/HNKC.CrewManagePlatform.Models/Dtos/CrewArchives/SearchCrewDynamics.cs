@@ -91,5 +91,13 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// 身份证
         /// </summary>
         public string? CardId { get; set; }
+        /// <summary>
+        /// 人员创建时间
+        /// </summary>
+        public DateTime? Created { get; set; }
+        /// <summary>
+        /// 状态排序 在岗>休假>待岗>删除（离职、调离、退休）
+        /// </summary>
+        public int StatusOrder { get; set; }
     }
 }
