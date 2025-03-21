@@ -69,8 +69,8 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Disembark
             var departureApplyVoList =
                 await _dbContext.Queryable<DepartureApply>()
                     .Where(da => da.IsDelete == 1)
-                    .WhereIF(query.type == 0 && !GlobalCurrentUser.IsAdmin,da => da.UserId == userBusinessId)
-                    .WhereIF(query.type == 1 && !GlobalCurrentUser.IsAdmin,da => da.ApproveUserId == userBusinessId)
+                    .WhereIF(query.type == 0 && !GlobalCurrentUser.IsAdmin, da => da.UserId == userBusinessId)
+                    .WhereIF(query.type == 1 && !GlobalCurrentUser.IsAdmin, da => da.ApproveUserId == userBusinessId)
                     .WhereIF(
                         !string.IsNullOrWhiteSpace(query.StartTime.ToString()) &&
                         !string.IsNullOrWhiteSpace(query.EndTime.ToString()),
@@ -449,21 +449,21 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Disembark
 
             //任职船舶
             var crewWorkShip = _dbContext.Queryable<WorkShip>()
-                .Where(u=>u.OnShip == departureApply.ShipId.ToString())
+                .Where(u => u.OnShip == departureApply.ShipId.ToString())
                 .GroupBy(u => u.WorkShipId)
                 .Select(t => new { t.WorkShipId, WorkShipStartTime = SqlFunc.AggregateMax(t.WorkShipStartTime) });
             var wShipList = _dbContext.Queryable<WorkShip>()
-                .Where(ws=>ws.OnShip == departureApply.ShipId.ToString())
+                .Where(ws => ws.OnShip == departureApply.ShipId.ToString())
                 .InnerJoin(crewWorkShip,
                     (x, y) => x.WorkShipId == y.WorkShipId && x.WorkShipStartTime == y.WorkShipStartTime);
 
             var departureApplyUserList = await _dbContext.Queryable<DepartureApplyUser>().Where(dau =>
                     dau.IsDelete == 1 && dau.ApplyCode == requestBody.ApplyCode && userIds.Contains(dau.UserId))
-                .LeftJoin(wShipList,(dau,ws)=>dau.UserId == ws.WorkShipId && ws.OnShip == departureApply.ShipId.ToString())
-                .Select((dau,ws)=>new
+                .LeftJoin(wShipList, (dau, ws) => dau.UserId == ws.WorkShipId && ws.OnShip == departureApply.ShipId.ToString())
+                .Select((dau, ws) => new
                 {
                     dau.UserId,
-                    shipId = SqlFunc.IsNull(ws.Id,0),
+                    shipId = SqlFunc.IsNull(ws.Id, 0),
                     dau.RealDisembarkDate,
                     dau.RealReturnShipDate,
                     ws.WorkShipStartTime,
@@ -545,7 +545,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Disembark
             if (updateWorkShipEndTime.Any()) await _dbContext.Updateable(updateWorkShipEndTime).UpdateColumns(u => new
             {
                 u.WorkShipEndTime
-            }).WhereColumns(u=>u.Id).ExecuteCommandAsync();
+            }).WhereColumns(u => u.Id).ExecuteCommandAsync();
             if (wss.Any()) await _dbContext.Insertable(wss).ExecuteCommandAsync();
 
             await _dbContext.Updateable(departureApplyUsers).UpdateColumns(dau => new
@@ -1014,14 +1014,18 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Disembark
                 List<LeavePlanUser> addleavePlans = new List<LeavePlanUser>();
                 List<LeavePlanUser> updateleavePlans = new List<LeavePlanUser>();
                 List<LeavePlanUserVacation> addLeavePlanUsers = new List<LeavePlanUserVacation>();
-                List<LeavePlanUserVacation> updateLeavePlanUsers = new List<LeavePlanUserVacation>();
+                List<LeavePlanUserVacation> deleteLeavePlanUsers = new List<LeavePlanUserVacation>();
 
                 //获取船舶年休假填报信息
                 var leaveSubmitInfo = await _dbContext.Queryable<LeavePlanSubmitInfo>().Where(t => t.IsDelete == 1 && t.ShipId == requestDto.ShipId).FirstAsync();
                 //获取船舶年休假 人员信息
                 var leaveUserInfo = await _dbContext.Queryable<LeavePlanUser>().Where(t => t.IsDelete == 1 && requestDto.vacationVBases.Select(t => t.UserId).Contains(t.UserId) && t.ShipId == requestDto.ShipId).ToListAsync();
-                //获取对应船舶年休数据
-                var vacationList = await _dbContext.Queryable<LeavePlanUserVacation>().Where(t => t.ShipId == requestDto.ShipId && t.Year == requestDto.Year).ToListAsync();
+                if (requestDto.vacationVBases.Any())
+                {
+                    //获取对应船舶年休数据  先删后增
+                    var vacationList = await _dbContext.Queryable<LeavePlanUserVacation>().Where(t => t.ShipId == requestDto.ShipId && t.Year == requestDto.Year).ToListAsync();
+                    deleteLeavePlanUsers.AddRange(vacationList);
+                }
                 LeavePlanSubmitInfo leavePlanBaseInfo = new LeavePlanSubmitInfo();
                 if (leaveSubmitInfo == null)
                 {
@@ -1056,39 +1060,30 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Disembark
                     {
                         updateleavePlans.Add(user);
                     }
-
                     foreach (var item2 in item.vacationInfos)
                     {
-                        //查询用户当前年月是否有数据
-                        var data = vacationList.Where(t => t.UserId == item.UserId && t.Month == item2.Month && t.VacationHalfMonth == item2.VacationHalfMonth).FirstOrDefault();
-                        if (data == null)
-                        {
-                            LeavePlanUserVacation model = new LeavePlanUserVacation();
-                            model.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
-                            model.BusinessId = GuidUtil.Next();
-                            model.ShipId = requestDto.ShipId;
-                            model.UserId = item.UserId;
-                            model.Year = requestDto.Year;
-                            model.Month = item2.Month;
-                            model.VacationHalfMonth = item2.VacationHalfMonth;
-                            model.VacationMonth = 0.5;
-                            model.IsAbnormal = item2.IsAbnormal;
-                            addLeavePlanUsers.Add(model);
-                        }
-                        else
-                        {
-                            //若存在 则只修改删除状态 防止重复添加无用数据
-                            if (data.IsDelete == 0)
-                            {
-                                data.IsDelete = 1;
-                            }
-                            else
-                            {
-                                data.IsDelete = 0;
-                            }
-                            updateLeavePlanUsers.Add(data);
-                        }
+                        LeavePlanUserVacation model = new LeavePlanUserVacation();
+                        model.Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId();
+                        model.BusinessId = GuidUtil.Next();
+                        model.ShipId = requestDto.ShipId;
+                        model.UserId = item.UserId;
+                        model.Year = requestDto.Year;
+                        model.Month = item2.Month;
+                        model.VacationHalfMonth = item2.VacationHalfMonth;
+                        model.VacationMonth = 0.5;
+                        model.IsAbnormal = item2.IsAbnormal;
+                        addLeavePlanUsers.Add(model);
                     }
+                }
+
+                //判断休假情况是否全部清空
+                if (!requestDto.vacationVBases.Any())
+                {
+                    //将船舶下所有填报的年休假数据清空
+                    var deleteUser = await _dbContext.Queryable<LeavePlanUser>().Where(t => t.IsDelete == 1 && t.ShipId == requestDto.ShipId).ToListAsync();
+                    var deleteUserVacation = await _dbContext.Queryable<LeavePlanUserVacation>().Where(t => t.IsDelete == 1 && t.ShipId == requestDto.ShipId && t.Year == requestDto.Year).ToListAsync();
+                    await _dbContext.Deleteable(deleteUser).ExecuteCommandAsync();
+                    await _dbContext.Deleteable(deleteUserVacation).ExecuteCommandAsync();
                 }
 
                 if (leaveSubmitInfo == null) await _dbContext.Insertable(leavePlanBaseInfo).ExecuteCommandAsync();
@@ -1102,14 +1097,13 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Disembark
                 {
                     await _dbContext.Updateable(updateleavePlans).ExecuteCommandAsync();
                 }
-
+                if (deleteLeavePlanUsers.Any())
+                {
+                    await _dbContext.Deleteable(deleteLeavePlanUsers).ExecuteCommandAsync();
+                }
                 if (addLeavePlanUsers.Any())
                 {
                     await _dbContext.Insertable(addLeavePlanUsers).ExecuteCommandAsync();
-                }
-                if (updateLeavePlanUsers.Any())
-                {
-                    await _dbContext.Updateable(updateLeavePlanUsers).WhereColumns(t => t.BusinessId).UpdateColumns(t => new { t.IsDelete, t.ModifiedBy, t.Modified }).ExecuteCommandAsync();
                 }
 
             }
