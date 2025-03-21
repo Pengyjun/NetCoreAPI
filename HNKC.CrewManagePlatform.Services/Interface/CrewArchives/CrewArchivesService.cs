@@ -69,7 +69,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                 .WhereIF(!string.IsNullOrWhiteSpace(requestBody.CardId), t => t.CardId.Contains(requestBody.CardId))
                 .WhereIF(!string.IsNullOrWhiteSpace(requestBody.WorkNumber), t => t.WorkNumber.Contains(requestBody.WorkNumber))
                 .WhereIF(!string.IsNullOrWhiteSpace(requestBody.Phone), t => t.Phone.Contains(requestBody.Phone))
-                .LeftJoin(wShip, (t, ws) => t.BusinessId == ws.WorkShipId)
+                .InnerJoin(wShip, (t, ws) => t.BusinessId == ws.WorkShipId)
                 .WhereIF(!string.IsNullOrWhiteSpace(requestBody.OnBoard), (t, ws) => ws.OnShip == requestBody.OnBoard)//所在船舶
                 .WhereIF(!string.IsNullOrWhiteSpace(requestBody.HistoryOnBoard), (t, ws) => ws.OnShip == requestBody.HistoryOnBoard)//履历船舶
                 .LeftJoin<PositionOnBoard>((t, ws, pob) => ws.Postition == pob.BusinessId.ToString())
