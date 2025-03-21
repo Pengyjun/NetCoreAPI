@@ -67,7 +67,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Certificate
                 .LeftJoin(uentity, (t1, t2, t3) => t1.BusinessId == t3.UserEntryId)
                 .InnerJoin(wShip, (t1, t2, t3, t5) => t1.BusinessId == t5.WorkShipId)
                 .InnerJoin<OwnerShip>((t1, t2, t3, t5, t4) => t5.OnShip == t4.BusinessId.ToString())
-                .WhereIF(roleType == 3 || roleType == 4, (t1, t2, t3, t5, t4) => t5.OnShip == t3.BusinessId.ToString() && GlobalCurrentUser.ShipId.ToString() == t5.OnShip)//船长
+                .WhereIF(roleType == 3 || roleType == 4, (t1, t2, t3, t5, t4) => GlobalCurrentUser.ShipId.ToString() == t5.OnShip)//船长
                 .InnerJoin<RemindSetting>((t1, t2, t3, t5, t4, t6) => t6.Types == t2.Type && t6.RemindType == 22 && t6.Enable == 1)
                 .WhereIF(requestBody.Certificates == CertificatesEnum.FCertificate, (t1, t2, t3, t5, t4, t6) => SqlFunc.DateDiff(DateType.Day, DateTime.Now, Convert.ToDateTime(t2.FEffectiveTime)) + 1 <= t6.Days)
                 .WhereIF(requestBody.Certificates == CertificatesEnum.SCertificate, (t1, t2, t3, t5, t4, t6) => SqlFunc.DateDiff(DateType.Day, DateTime.Now, Convert.ToDateTime(t2.SEffectiveTime)) + 1 <= t6.Days)
