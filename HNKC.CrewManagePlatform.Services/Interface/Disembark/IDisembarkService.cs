@@ -24,7 +24,6 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Disembark
         /// <returns></returns>
         Task<Result> SubmitDepartureApplyAsync(DepartureApplyDto requestBody);
 
-
         /// <summary>
         /// 查询离船申请单
         /// </summary>

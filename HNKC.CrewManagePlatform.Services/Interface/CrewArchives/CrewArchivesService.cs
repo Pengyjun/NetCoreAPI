@@ -2389,7 +2389,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                             FCertificate = item.FCertificate,
                             FSignTime = item.FSignTime,
                             FEffectiveTime = item.FEffectiveTime,
-                            FEffectiveCountdown = item?.FEffectiveTime == null ? 0 : TimeHelper.GetTimeSpan(Convert.ToDateTime(item?.FEffectiveTime), DateTime.Now).Days + 1,
+                            FEffectiveCountdown = item?.FEffectiveTime == null ? 0 : DateTimeUtils.CalculateValidityDays(Convert.ToDateTime(item?.FEffectiveTime)),
                             FNavigationArea = item?.FNavigationArea,
                             FNavigationAreaName = navigationarea.FirstOrDefault(x => x.BusinessId.ToString() == item?.FNavigationArea)?.Name,
                             FPosition = item?.FPosition,
@@ -2418,7 +2418,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                         ss.Add(new SecondCertificateOfCompetencyDetailsDto
                         {
                             SCertificate = item.SCertificate,
-                            SEffectiveCountdown = item?.SEffectiveTime == null ? 0 : TimeHelper.GetTimeSpan(Convert.ToDateTime(item?.SEffectiveTime), DateTime.Now).Days + 1,
+                            SEffectiveCountdown = item?.SEffectiveTime == null ? 0 : DateTimeUtils.CalculateValidityDays(Convert.ToDateTime(item?.SEffectiveTime)),
                             SEffectiveTime = item?.SEffectiveTime,
                             SNavigationArea = item?.SNavigationArea,
                             SNavigationAreaName = navigationarea.FirstOrDefault(x => x.BusinessId.ToString() == item?.SNavigationArea)?.Name,
