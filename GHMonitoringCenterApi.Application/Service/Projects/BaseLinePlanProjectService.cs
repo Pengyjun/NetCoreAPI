@@ -1053,8 +1053,9 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
 
             var baseplanproject = await dbContext.Queryable<BaseLinePlanProject>()
            .Where(t => t.IsDelete == 1)
-            .WhereIF(!userIds.Contains(userInfo.Id), x => x.CompanyId == companyId).
-           WhereIF(!string.IsNullOrWhiteSpace(requestBody.StartStatus), t => t.StartStatus == requestBody.StartStatus).
+            //.WhereIF(!userIds.Contains(userInfo.Id), x => x.CompanyId == companyId).
+            .WhereIF(requestBody.CompanyId != null, x => x.CompanyId == requestBody.CompanyId)
+           .WhereIF(!string.IsNullOrWhiteSpace(requestBody.StartStatus), t => t.StartStatus == requestBody.StartStatus).
            WhereIF(requestBody.Year != null, t => t.Year == requestBody.Year).ToListAsync();
 
             List<Guid> baseplanprojectIds = new List<Guid>();
