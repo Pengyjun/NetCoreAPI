@@ -8,6 +8,7 @@ using HNKC.CrewManagePlatform.SqlSugars.Models;
 using HNKC.CrewManagePlatform.Utils;
 using SqlSugar;
 using System.ComponentModel;
+using System.Data;
 using UtilsSharp;
 using System.Linq;
 
@@ -68,8 +69,8 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Disembark
             var departureApplyVoList =
                 await _dbContext.Queryable<DepartureApply>()
                     .Where(da => da.IsDelete == 1)
-                    .WhereIF(query.type == 0,da => da.UserId == userBusinessId)
-                    .WhereIF(query.type == 1,da => da.ApproveUserId == userBusinessId)
+                    .WhereIF(query.type == 0 && !GlobalCurrentUser.IsAdmin,da => da.UserId == userBusinessId)
+                    .WhereIF(query.type == 1 && !GlobalCurrentUser.IsAdmin,da => da.ApproveUserId == userBusinessId)
                     .WhereIF(
                         !string.IsNullOrWhiteSpace(query.StartTime.ToString()) &&
                         !string.IsNullOrWhiteSpace(query.EndTime.ToString()),
@@ -138,6 +139,11 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Disembark
             if (roleType != 3)
             {
                 return Result.Fail("非船长角色无法提交申请");
+            }
+
+            if (string.IsNullOrWhiteSpace(requestBody.ApproveUserId.ToString()))
+            {
+                return Result.Fail("审批人员不能为空");
             }
 
             // 创建申请单据
@@ -275,7 +281,9 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Disembark
                     ReliefUserId = dau.ReliefUserId,
                     ReliefUserName = ru.Name,
                     Remark = dau.Remark
-                }).ToListAsync();
+                })
+                .Distinct()
+                .ToListAsync();
 
             result.DepartureApplyUserList = departureApplyUserList;
 
@@ -435,20 +443,112 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Disembark
                 return Result.Fail("非审批通过状态");
             }
 
-            List<DepartureApplyUser> departureApplyUserList = new();
+            List<DepartureApplyUser> departureApplyUsers = new();
 
-            foreach (var registerActualUser in requestBody.RegisterActualUserList)
-            {
-                departureApplyUserList.Add(new DepartureApplyUser
+            var userIds = requestBody.RegisterActualUserList.Select(t => t.UserId).ToList();
+
+            //任职船舶
+            var crewWorkShip = _dbContext.Queryable<WorkShip>()
+                .Where(u=>u.OnShip == departureApply.ShipId.ToString())
+                .GroupBy(u => u.WorkShipId)
+                .Select(t => new { t.WorkShipId, WorkShipStartTime = SqlFunc.AggregateMax(t.WorkShipStartTime) });
+            var wShipList = _dbContext.Queryable<WorkShip>()
+                .Where(ws=>ws.OnShip == departureApply.ShipId.ToString())
+                .InnerJoin(crewWorkShip,
+                    (x, y) => x.WorkShipId == y.WorkShipId && x.WorkShipStartTime == y.WorkShipStartTime);
+
+            var departureApplyUserList = await _dbContext.Queryable<DepartureApplyUser>().Where(dau =>
+                    dau.IsDelete == 1 && dau.ApplyCode == requestBody.ApplyCode && userIds.Contains(dau.UserId))
+                .LeftJoin(wShipList,(dau,ws)=>dau.UserId == ws.WorkShipId && ws.OnShip == departureApply.ShipId.ToString())
+                .Select((dau,ws)=>new
                 {
-                    BusinessId = registerActualUser.BusinessId,
-                    RealDisembarkDate = registerActualUser.RealDisembarkDate,
-                    RealReturnShipDate = registerActualUser.RealReturnShipDate,
+                    dau.UserId,
+                    shipId = SqlFunc.IsNull(ws.Id,0),
+                    dau.RealDisembarkDate,
+                    dau.RealReturnShipDate,
+                    ws.WorkShipStartTime,
+                    ws.WorkShipEndTime,
+                    ws.Postition,
+                    ws.BusinessId,
+                    ws.OnShip,
+                    ws.WorkShipId,
+                    ws.Country,
+                    ws.ProjectName
+                })
+                .ToListAsync();
+
+            List<WorkShip> wss = new();
+            List<WorkShip> updateWorkShipEndTime = new();
+            foreach (var departureApplyUser in departureApplyUserList)
+            {
+                // 实际离船日期
+                var realDisembarkDate = departureApplyUser.RealDisembarkDate;
+                // 实际归船日期
+                var realReturnShipDate = departureApplyUser.RealReturnShipDate;
+                if (realDisembarkDate != null && realReturnShipDate != null)
+                {
+                    throw new BusinessException("实际离船、归船日期已填报");
+                }
+                var registerActualUser = requestBody.RegisterActualUserList.FirstOrDefault(x => x.UserId == departureApplyUser.UserId);
+                if (registerActualUser?.RealDisembarkDate == null && registerActualUser?.RealDisembarkDate == null)
+                {
+                    continue;
+                }
+
+                if (registerActualUser?.RealDisembarkDate == null && registerActualUser?.RealReturnShipDate != null)
+                {
+                    throw new BusinessException("实际离船时间未填报");
+                }
+
+                if ((registerActualUser?.RealDisembarkDate != null && registerActualUser?.RealReturnShipDate != null) && registerActualUser.RealDisembarkDate > registerActualUser?.RealReturnShipDate)
+                {
+                    throw new BusinessException("实际离船日期不能大于实际归船日期");
+                }
+
+                // 实际离船日期
+                if (registerActualUser?.RealDisembarkDate != null && realDisembarkDate == null)
+                {
+                    // 更改下船记录
+                    updateWorkShipEndTime.Add(new WorkShip
+                    {
+                        Id = departureApplyUser.shipId,
+                        WorkShipEndTime = registerActualUser?.RealDisembarkDate
+                    });
+                }
+                // 实际归船日期
+                if (registerActualUser?.RealReturnShipDate != null)
+                {
+                    //添加上船记录
+                    wss.Add(new WorkShip
+                    {
+                        Id = SnowFlakeAlgorithmUtil.GenerateSnowflakeId(),
+                        BusinessId = GuidUtil.Next(),
+                        OnShip = departureApplyUser.OnShip,
+                        WorkShipStartTime = Convert.ToDateTime(registerActualUser?.RealReturnShipDate),
+                        Postition = departureApplyUser.Postition,
+                        WorkShipId = departureApplyUser.WorkShipId,
+                        Country = departureApplyUser.Country,
+                        ProjectName = departureApplyUser.ProjectName
+                    });
+                }
+
+                departureApplyUsers.Add(new DepartureApplyUser
+                {
+                    BusinessId = registerActualUser?.BusinessId,
+                    RealDisembarkDate = registerActualUser?.RealDisembarkDate,
+                    RealReturnShipDate = registerActualUser?.RealReturnShipDate,
                     ModifiedBy = GlobalCurrentUser.UserBusinessId.ToString()
                 });
+
             }
 
-            await _dbContext.Updateable(departureApplyUserList).UpdateColumns(dau => new
+            if (updateWorkShipEndTime.Any()) await _dbContext.Updateable(updateWorkShipEndTime).UpdateColumns(u => new
+            {
+                u.WorkShipEndTime
+            }).WhereColumns(u=>u.Id).ExecuteCommandAsync();
+            if (wss.Any()) await _dbContext.Insertable(wss).ExecuteCommandAsync();
+
+            await _dbContext.Updateable(departureApplyUsers).UpdateColumns(dau => new
             {
                 dau.RealDisembarkDate,
                 dau.RealReturnShipDate,
@@ -670,7 +770,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Disembark
             #endregion
 
             var userInfos = await _dbContext.Queryable<User>()
-                .Where(t => t.IsLoginUser == 1)
+                .Where(t => t.IsLoginUser == 1 && t.IsDelete == 1)
                 .InnerJoin(wShip, (t, ws) => ws.WorkShipId == t.BusinessId && shipId.ToString() == ws.OnShip)
                 .LeftJoin<PositionOnBoard>((t, ws, po) => po.BusinessId.ToString() == ws.Postition)
                 .Select((t, ws, po) => new SchedulingUser
@@ -679,9 +779,11 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Disembark
                     UserName = t.Name,
                     Position = ws.Postition,
                     PositionName = po.Name,
+
                     RotaEnum = po.RotaType,
                     WorkNumber = t.WorkNumber
                 })
+                .Distinct()
                 .ToListAsync();
 
             return Result.Success(userInfos);
@@ -711,7 +813,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Disembark
             }
 
             var userInfos = await _dbContext.Queryable<User>()
-                .Where(u => u.IsLoginUser == 0)
+                .Where(u => u.IsLoginUser == 0 && u.IsDelete == 1)
                 .InnerJoin<InstitutionRole>((u, ir) => u.BusinessId == ir.UserBusinessId)
                 .InnerJoin<HNKC.CrewManagePlatform.SqlSugars.Models.Role>(
                     (u, ir, r) => r.BusinessId == ir.RoleBusinessId)

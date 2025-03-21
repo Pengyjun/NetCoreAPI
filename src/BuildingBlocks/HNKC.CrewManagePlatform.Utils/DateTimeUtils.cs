@@ -205,20 +205,21 @@ namespace HNKC.CrewManagePlatform.Utils
             }
 
             TimeSpan timeSpan = endDate - startDate;
-            return timeSpan.Days;
+            return (int)timeSpan.TotalDays;
         }
         /// <summary>
         /// 计算有效期
         /// </summary>
         /// <param name="startDate">起始日期</param>
         /// <returns>天数差（有效期天数）</returns>
-        public static int CalculateValidityDays(DateTime startDate, DateTime endDate)
+        public static int CalculateValidityDays(DateTime startDate)
         {
+
             // 获取当前日期
             DateTime currentDate = DateTime.Today;
 
-            TimeSpan timeSpan = currentDate - startDate;
-            return timeSpan.Days;
+            TimeSpan timeSpan = startDate - currentDate;
+            return (int)timeSpan.TotalDays;
         }
 
     }
