@@ -268,15 +268,10 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                 //删除：管理人员手动操作，包括离职、调离和退休，优先于其他任何状态
                 status = deleteResonEnum;
             }
-            //else if (holidayTime.HasValue)
-            //{
-            //    //休假：提交离船申请且经审批同意后，按所申请离船、归船日期设置为休假状态，优先于在岗、待岗状态
-            //    status = CrewStatusEnum.XiuJia;
-            //}
             else if (departureTime <= DateTime.Now)
             {
                 //在岗、待岗:船员登记时必填任职船舶数据，看其中最新的任职船舶上船时间和下船时间，在此时间内为在岗状态，否则为待岗状态
-                status = CrewStatusEnum.Normal;
+                status = CrewStatusEnum.XiuJia;
             }
             return status;
         }
@@ -2749,21 +2744,11 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
 
             #region 匹配链表字段
 
-            //用户状态
-
-            ur.StatusName = EnumUtil.GetDescription(userInfo.DeleteReson);//删除原因获取用户状态
-
             var userWorkShip = await _dbContext.Queryable<WorkShip>().Where(t => t.IsDelete == 1 && t.WorkShipId == userInfo.BusinessId).OrderByDescending(t => t.WorkShipStartTime).FirstAsync();
             if (userWorkShip != null)
             {
-                ////有休假时间  休假
-                //if (userWorkShip.HolidayTime != DateTime.MinValue && !string.IsNullOrWhiteSpace(userWorkShip.HolidayTime.ToString()))
-                //{
-                //    ur.StatusName = userWorkShip.HolidayTime > DateTime.Now ? EnumUtil.GetDescription(CrewStatusEnum.XiuJia) : "";
-                //}
-
-                //在岗 待岗
-                //ur.StatusName = userWorkShip.WorkShipEndTime > DateTime.Now ? EnumUtil.GetDescription(CrewStatusEnum.Normal) : EnumUtil.GetDescription(CrewStatusEnum.DaiGang);
+                //用户状态
+                ur.StatusName = EnumUtil.GetDescription(ShipUserStatus(userWorkShip.WorkShipEndTime, userInfo.DeleteReson));//删除原因获取用户状态
 
                 //当前船舶任职时间
                 ur.CurrentShipEntryTime = string.IsNullOrWhiteSpace(userWorkShip.WorkShipStartTime.ToString()) || userWorkShip.WorkShipStartTime == DateTime.MinValue
@@ -2972,7 +2957,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                 /*var dk = disembark.Where(x => x.UserId.ToString() == u.BId).OrderByDescending(x => x.RealDisembarkTime).FirstOrDefault();
                 if (dk != null && dk.RealDisembarkTime != null && dk.RealReturnShipTime != null)
                     u.HolidayDays = TimeHelper.GetTimeSpan(dk.RealDisembarkTime.Value, dk.RealReturnShipTime.Value).Days + 1;*/
-                u.OnStatus = EnumUtil.GetDescription(_baseService.ShipUserStatus(u.LBoardingTime, u.DeleteResonEnum, u.LDisembarkTime));
+                u.OnStatus = EnumUtil.GetDescription(_baseService.ShipUserStatus(u.LDisembarkTime, u.DeleteResonEnum, u.LDisembarkTime));
             }
 
             rt.List = rr.OrderByDescending(t => t.UserName).ToList();

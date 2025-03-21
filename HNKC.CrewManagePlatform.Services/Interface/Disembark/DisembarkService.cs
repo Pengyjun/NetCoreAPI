@@ -850,7 +850,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Disembark
             #endregion
 
             var userInfos = await _dbContext.Queryable<User>()
-                .Where(t => t.IsLoginUser == 1)
+                .Where(t => t.IsLoginUser == 1 && t.IsDelete == 1)
                 .InnerJoin(wShip, (t, ws) => ws.WorkShipId == t.BusinessId)
                 .LeftJoin(_dbContext.Queryable<LeavePlanUser>().Where(t => t.IsDelete == 1), (t, ws, le) => t.BusinessId == le.UserId && ws.OnShip == le.ShipId.ToString())
                 .WhereIF(!string.IsNullOrWhiteSpace(requestDto.KeyWords), (t, ws) => SqlFunc.Contains(t.Name, requestDto.KeyWords) || SqlFunc.Contains(t.Phone, requestDto.KeyWords) || SqlFunc.Contains(t.CardId, requestDto.KeyWords) || SqlFunc.Contains(t.WorkNumber, requestDto.KeyWords))

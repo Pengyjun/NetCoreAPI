@@ -7,6 +7,7 @@ using HNKC.CrewManagePlatform.Models.Enums;
 using HNKC.CrewManagePlatform.SqlSugars.Models;
 using HNKC.CrewManagePlatform.Utils;
 using SqlSugar;
+using System.Collections.Generic;
 using System.ComponentModel;
 using UtilsSharp;
 
@@ -585,8 +586,10 @@ namespace HNKC.CrewManagePlatform.Services.Interface.ShipWatch
             //当前已排班的人员
             List<string> crewIds = new List<string>();
             OffDutyPerson offDutyPerson = new OffDutyPerson();
-            crewIds.Add(crew.Where(t => t.RotaType == rota).Select(t => t.FLeaderUserId.ToString()).FirstOrDefault() ?? "");
-            crewIds.Add(crew.Where(t => t.RotaType == rota).Select(t => t.SLeaderUserId.ToString()).FirstOrDefault() ?? "");
+            var userId1 = crew.Where(t => t.RotaType == rota).Select(t => t.FLeaderUserId.ToString() ?? "").ToList();
+            var userId2 = crew.Where(t => t.RotaType == rota).Select(t => t.SLeaderUserId.ToString() ?? "").ToList();
+            if (userId1 != null && userId1.Any()) crewIds.AddRange(userId1);
+            if (userId2 != null && userId2.Any()) crewIds.AddRange(userId2);
             foreach (var item in crew)
             {
                 var splitUser = item.OhterUserId?.Split(',').ToList();
