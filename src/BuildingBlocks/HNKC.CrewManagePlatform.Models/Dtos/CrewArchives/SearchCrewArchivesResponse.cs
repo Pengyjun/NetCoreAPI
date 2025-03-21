@@ -156,5 +156,9 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// 第二航区
         /// </summary>
         public string? SNareaName { get; set; }
+        /// <summary>
+        /// 状态排序 在岗>休假>待岗>删除（离职、调离、退休）
+        /// </summary>
+        public int StatusOrder { get; set; }
     }
 }
