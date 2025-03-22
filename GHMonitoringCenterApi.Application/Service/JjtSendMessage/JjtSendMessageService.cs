@@ -3471,7 +3471,7 @@ namespace GHMonitoringCenterApi.Application.Service.JjtSendMessage
                     {   DateDay = dayTime,
                         Id = Guid.NewGuid(),
                         ProjectId = item.ProjectId,
-                        IsShow = isShow.HasValue?isShow:0,
+                        IsShow = (isShow==null||isShow.Value!=0)?isShow:0,
                         Name = proName!=null? proName.ShortName:string.Empty,
                     };
                     projectOpens.Add(obj);
