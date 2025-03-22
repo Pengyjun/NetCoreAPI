@@ -42,14 +42,14 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
             #region 船员关联
             //任职船舶
             var crewWorkShip = _dbContext.Queryable<WorkShip>()
-              .GroupBy(u => u.WorkShipId)
-              .Select(t => new { t.WorkShipId, WorkShipStartTime = SqlFunc.AggregateMax(t.WorkShipStartTime) });
+                      .GroupBy(u => new { u.WorkShipId, u.OnShip })
+                      .Select(t => new { t.WorkShipId, t.OnShip, WorkShipStartTime = SqlFunc.AggregateMax(t.WorkShipStartTime) });
             var wShip = _dbContext.Queryable<WorkShip>()
-              .InnerJoin(crewWorkShip, (x, y) => x.WorkShipId == y.WorkShipId && x.WorkShipStartTime == y.WorkShipStartTime);
+              .InnerJoin(crewWorkShip, (x, y) => x.WorkShipId == y.WorkShipId && x.OnShip == y.OnShip && x.WorkShipStartTime == y.WorkShipStartTime);
             //入职时间
             var uentityFist = _dbContext.Queryable<UserEntryInfo>()
-                .GroupBy(u => u.UserEntryId)
-                .Select(x => new { x.UserEntryId, StartTime = SqlFunc.AggregateMax(x.StartTime) });
+                    .GroupBy(u => u.UserEntryId)
+                    .Select(x => new { x.UserEntryId, StartTime = SqlFunc.AggregateMax(x.StartTime) });
             var uentity = _dbContext.Queryable<UserEntryInfo>()
                 .InnerJoin(uentityFist, (x, y) => x.UserEntryId == y.UserEntryId && x.StartTime == y.StartTime);
             #endregion
@@ -128,6 +128,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                     WorkShipStartTime = ws.WorkShipStartTime,
                     WorkShipEndTime = ws.WorkShipEndTime,
                     OnBoard = ws.BusinessId.ToString(),
+                    ShipId = ws.OnShip,
                     OnCountry = ow.Country,
                     CardId = t.CardId,
                     ShipType = ow.ShipType,
@@ -138,11 +139,15 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                     IsDelete = t.IsDelete,
                     DeleteReson = t.DeleteReson,
                     Created = t.Created,
-                    StatusOrder = (ws.WorkShipEndTime != null && ws.WorkShipEndTime <= DateTime.Now ? "休假" : ws.WorkShipStartTime > DateTime.Now ? "休假" : string.Empty) == "休假" ? 1 : t.DeleteReson != 0 ? (int)t.DeleteReson + 2 : (int)t.DeleteReson
+                    StatusOrder = (DateTime.Now < ws.WorkShipStartTime ? "休假" : ws.WorkShipEndTime != null && DateTime.Now > ws.WorkShipEndTime ? "休假" : string.Empty) == "休假" ? 1 : t.DeleteReson != 0 ? (int)t.DeleteReson + 2 : (int)t.DeleteReson
                 })
                 .Distinct()
                 .MergeTable()
-                .OrderBy((t) => new { t.StatusOrder, Created = SqlFunc.Desc(t.Created) })
+                .OrderBy((t) => new
+                {
+                    t.StatusOrder,
+                    Created = SqlFunc.Desc(t.Created)
+                })
                 .ToPageListAsync(requestBody.PageIndex, requestBody.PageSize, total);
 
             return await GetResult(requestBody, rt, total);
@@ -210,7 +215,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                     {
                         spctabNames = spctabNames.Substring(0, spctabNames.Length - 1);
                     }
-                    var ob = onBoardtab.Where(x => x.WorkShipId == t.BId).OrderByDescending(x => x.WorkShipStartTime).FirstOrDefault();
+                    var ob = onBoardtab.Where(x => x.WorkShipId == t.BId && x.OnShip == t.ShipId).OrderByDescending(x => x.WorkShipStartTime).FirstOrDefault();
                     if (ob != null)
                     {
                         //所在船舶
@@ -247,13 +252,13 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                     t.SpecialCertificate = spctabs;
                     t.SpecialCertificateName = spctabNames;
                     t.Age = _baseService.CalculateAgeFromIdCard(t.CardId);
-                    t.OnStatus = ob == null ? CrewStatusEnum.DaiGang : ShipUserStatus(ob.WorkShipStartTime, ob.WorkShipEndTime, t.DeleteReson);
-                    t.OnStatusName = ob == null ? EnumUtil.GetDescription(CrewStatusEnum.DaiGang) : EnumUtil.GetDescription(ShipUserStatus(ob.WorkShipStartTime, ob.WorkShipEndTime, t.DeleteReson));
+                    t.OnStatus = ob == null ? CrewStatusEnum.DaiGang : ShipUserStatus(t.WorkShipStartTime, t.WorkShipEndTime, t.DeleteReson);
+                    t.OnStatusName = ob == null ? EnumUtil.GetDescription(CrewStatusEnum.DaiGang) : EnumUtil.GetDescription(ShipUserStatus(t.WorkShipStartTime, t.WorkShipEndTime, t.DeleteReson));
                     var fileName = fileInfo.FirstOrDefault(x => x.FileId == t.CrewPhoto)?.Name;
                     t.Icon = string.IsNullOrWhiteSpace(fileName) ? string.Empty : url + fileName;
                 }
             }
-            page.List = rt.OrderByDescending(x => x.IsDelete);
+            page.List = rt;
             page.TotalCount = total;
             return page;
         }
@@ -272,17 +277,15 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                 //删除：管理人员手动操作，包括离职、调离和退休，优先于其他任何状态
                 status = deleteResonEnum;
             }
-            else if (EndTime != null)
+            //若当前时间小于上船时间 则表示还在休假
+            else if (DateTime.Now < StartTime)
             {
-                if (EndTime <= DateTime.Now)
-                {
-                    //在岗、待岗:船员登记时必填任职船舶数据，看其中最新的任职船舶上船时间和下船时间，在此时间内为在岗状态，否则为待岗状态
-                    status = CrewStatusEnum.XiuJia;
-                }
+                status = CrewStatusEnum.XiuJia;
             }
-            else
+            else if (DateTime.Now > StartTime && EndTime != null)
             {
-                if (StartTime > DateTime.Now)
+                //若当前时间大于下船日期 则表示去休假了
+                if (DateTime.Now > EndTime)
                 {
                     status = CrewStatusEnum.XiuJia;
                 }
@@ -2902,10 +2905,10 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
             if (roleType == -1) { return new PageResult<SearchCrewDynamics>(); }
             #region 船员关联
             var crewWorkShip = _dbContext.Queryable<WorkShip>()
-                .GroupBy(u => u.WorkShipId)
-                .Select(t => new { t.WorkShipId, WorkShipStartTime = SqlFunc.AggregateMax(t.WorkShipStartTime) });
+                     .GroupBy(u => new { u.WorkShipId, u.OnShip })
+                     .Select(t => new { t.WorkShipId, t.OnShip, WorkShipStartTime = SqlFunc.AggregateMax(t.WorkShipStartTime) });
             var wShip = _dbContext.Queryable<WorkShip>()
-                .InnerJoin(crewWorkShip, (x, y) => x.WorkShipId == y.WorkShipId && x.WorkShipStartTime == y.WorkShipStartTime);
+              .InnerJoin(crewWorkShip, (x, y) => x.WorkShipId == y.WorkShipId && x.OnShip == y.OnShip && x.WorkShipStartTime == y.WorkShipStartTime);
             #endregion
 
             var departureApplyUser = _dbContext.Queryable<DepartureApplyUser>()
@@ -2946,7 +2949,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                     HolidayDays = dau.HolidayDays,
                     OnBoardDays = SqlFunc.DateDiff(DateType.Day, Convert.ToDateTime(t5.WorkShipStartTime), DateTime.Now),
                     Created = t1.Created,
-                    StatusOrder = (t5.WorkShipEndTime != null && t5.WorkShipEndTime <= DateTime.Now ? "休假" : t5.WorkShipStartTime > DateTime.Now ? "休假" : string.Empty) == "休假" ? 1 : t1.DeleteReson != 0 ? (int)t1.DeleteReson + 2 : (int)t1.DeleteReson
+                    StatusOrder = (DateTime.Now < t5.WorkShipStartTime ? "休假" : t5.WorkShipEndTime != null && DateTime.Now > t5.WorkShipEndTime ? "休假" : string.Empty) == "休假" ? 1 :t1.DeleteReson != 0 ? (int)t1.DeleteReson + 2 : (int)t1.DeleteReson
                 })
                 .MergeTable()
                 .OrderBy(t1 => new { t1.StatusOrder, Created = SqlFunc.Desc(t1.Created) })

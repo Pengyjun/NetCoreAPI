@@ -156,11 +156,10 @@ namespace HNKC.CrewManagePlatform.Services.Interface.ShipWatch
 
             //任职船舶
             var crewWorkShip = _dbContext.Queryable<WorkShip>()
-                .GroupBy(u => u.WorkShipId)
-                .Select(t => new { t.WorkShipId, WorkShipStartTime = SqlFunc.AggregateMax(t.WorkShipStartTime) });
+                         .GroupBy(u => new { u.WorkShipId, u.OnShip })
+                         .Select(t => new { t.WorkShipId, t.OnShip, WorkShipStartTime = SqlFunc.AggregateMax(t.WorkShipStartTime) });
             var wShip = _dbContext.Queryable<WorkShip>()
-                .InnerJoin(crewWorkShip,
-                    (x, y) => x.WorkShipId == y.WorkShipId && x.WorkShipStartTime == y.WorkShipStartTime);
+              .InnerJoin(crewWorkShip, (x, y) => x.WorkShipId == y.WorkShipId && x.OnShip == y.OnShip && x.WorkShipStartTime == y.WorkShipStartTime);
 
             #endregion
 
@@ -221,13 +220,11 @@ namespace HNKC.CrewManagePlatform.Services.Interface.ShipWatch
                 var country = await _dbContext.Queryable<CountryRegion>()
                     .Where(t => t.IsDelete == 1 && coIds.Contains(t.BusinessId)).ToListAsync();
 
-                //任职船舶
                 var crewWorkShip = _dbContext.Queryable<WorkShip>()
-                    .GroupBy(u => u.WorkShipId)
-                    .Select(t => new { t.WorkShipId, WorkShipStartTime = SqlFunc.AggregateMax(t.WorkShipStartTime) });
+                          .GroupBy(u => new { u.WorkShipId, u.OnShip })
+                          .Select(t => new { t.WorkShipId, t.OnShip, WorkShipStartTime = SqlFunc.AggregateMax(t.WorkShipStartTime) });
                 var wShip = _dbContext.Queryable<WorkShip>()
-                    .InnerJoin(crewWorkShip,
-                        (x, y) => x.WorkShipId == y.WorkShipId && x.WorkShipStartTime == y.WorkShipStartTime);
+                  .InnerJoin(crewWorkShip, (x, y) => x.WorkShipId == y.WorkShipId && x.OnShip == y.OnShip && x.WorkShipStartTime == y.WorkShipStartTime);
 
                 var userInfo = await _dbContext.Queryable<User>()
                     .Where(t => t.IsLoginUser == 1)
@@ -290,11 +287,10 @@ namespace HNKC.CrewManagePlatform.Services.Interface.ShipWatch
 
             //任职船舶
             var crewWorkShip = _dbContext.Queryable<WorkShip>()
-                .GroupBy(u => u.WorkShipId)
-                .Select(t => new { t.WorkShipId, WorkShipStartTime = SqlFunc.AggregateMax(t.WorkShipStartTime) });
+               .GroupBy(u => new { u.WorkShipId, u.OnShip })
+               .Select(t => new { t.WorkShipId, t.OnShip, WorkShipStartTime = SqlFunc.AggregateMax(t.WorkShipStartTime) });
             var wShip = _dbContext.Queryable<WorkShip>()
-                .InnerJoin(crewWorkShip,
-                    (x, y) => x.WorkShipId == y.WorkShipId && x.WorkShipStartTime == y.WorkShipStartTime);
+              .InnerJoin(crewWorkShip, (x, y) => x.WorkShipId == y.WorkShipId && x.OnShip == y.OnShip && x.WorkShipStartTime == y.WorkShipStartTime);
             var userOnboard = await _dbContext.Queryable<User>().Where(t => t.IsLoginUser == 1)
                 .InnerJoin(wShip, (t, ws) => t.BusinessId == ws.WorkShipId)
                 .InnerJoin<PositionOnBoard>((t, ws, po) => po.BusinessId.ToString() == ws.Postition)
@@ -402,10 +398,10 @@ namespace HNKC.CrewManagePlatform.Services.Interface.ShipWatch
                 var fileInfo = await _dbContext.Queryable<Files>().Where(t => t.IsDelete == 1).ToListAsync();
                 //获取船舶上的人员总数
                 var crewWorkShip = _dbContext.Queryable<WorkShip>()
-                  .GroupBy(u => u.WorkShipId)
-                  .Select(t => new { t.WorkShipId, WorkShipStartTime = SqlFunc.AggregateMax(t.WorkShipStartTime) });
+                  .GroupBy(u => new { u.WorkShipId, u.OnShip })
+                  .Select(t => new { t.WorkShipId, t.OnShip, WorkShipStartTime = SqlFunc.AggregateMax(t.WorkShipStartTime) });
                 var workShip = _dbContext.Queryable<WorkShip>()
-                  .InnerJoin(crewWorkShip, (x, y) => x.WorkShipId == y.WorkShipId && x.WorkShipStartTime == y.WorkShipStartTime)
+                  .InnerJoin(crewWorkShip, (x, y) => x.WorkShipId == y.WorkShipId && x.OnShip == y.OnShip && x.WorkShipStartTime == y.WorkShipStartTime)
                   .Where((x, y) => x.OnShip == request.BId.ToString());
                 var wShip = await workShip.InnerJoin(_dbContext.Queryable<User>().Where(t => t.IsDelete == 1), (x, y, u) => x.WorkShipId == u.BusinessId).ToListAsync();
                 shipDuty.ShipId = ship.BusinessId;
@@ -469,11 +465,11 @@ namespace HNKC.CrewManagePlatform.Services.Interface.ShipWatch
                 var time = DateTime.Now;
                 //获取离船用户的详细信息
                 var depApplyUser = await _dbContext.Queryable<DepartureApplyUser>()
-                    .InnerJoin(_dbContext.Queryable<User>().Where(t => t.IsDelete == 1),(x,u)=>x.UserId == u.BusinessId)
-                    .LeftJoin(workShip, (x,u, y) => x.UserId == y.WorkShipId)
-                    .LeftJoin(_dbContext.Queryable<PositionOnBoard>(), (x,u, y, z) => y.Postition == z.BusinessId.ToString())
-                    .Where((x,u, y, z) => x.IsDelete == 1 && y.IsDelete == 1 && z.IsDelete == 1 && applyCodes.Contains(x.ApplyCode))
-                    .Select((x,u, y, z) => new DepartureResponseDto
+                    .InnerJoin(_dbContext.Queryable<User>().Where(t => t.IsDelete == 1), (x, u) => x.UserId == u.BusinessId)
+                    .LeftJoin(workShip, (x, u, y) => x.UserId == y.WorkShipId)
+                    .LeftJoin(_dbContext.Queryable<PositionOnBoard>(), (x, u, y, z) => y.Postition == z.BusinessId.ToString())
+                    .Where((x, u, y, z) => x.IsDelete == 1 && y.IsDelete == 1 && z.IsDelete == 1 && applyCodes.Contains(x.ApplyCode))
+                    .Select((x, u, y, z) => new DepartureResponseDto
                     {
                         UserId = x.UserId,
                         DisembarkDate = x.DisembarkDate,

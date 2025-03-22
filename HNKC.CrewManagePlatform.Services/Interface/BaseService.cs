@@ -304,22 +304,15 @@ namespace HNKC.CrewManagePlatform.Services.Interface
                 //删除：管理人员手动操作，包括离职、调离和退休，优先于其他任何状态
                 status = deleteResonEnum;
             }
-            //else if (holidayTime.HasValue)
-            //{
-            //    if (holidayTime < DateTime.Now)
-            //    {
-            //        //休假：提交离船申请且经审批同意后，按所申请离船、归船日期设置为休假状态，优先于在岗、待岗状态
-            //        status = CrewStatusEnum.XiuJia;
-            //    }
-            //}
-            else if (EndTime != null && EndTime <= DateTime.Now)
+            //若当前时间小于上船时间 则表示还在休假
+            else if (DateTime.Now < StartTime)
             {
-                //在岗、待岗:船员登记时必填任职船舶数据，看其中最新的任职船舶上船时间和下船时间，在此时间内为在岗状态，否则为待岗状态
                 status = CrewStatusEnum.XiuJia;
             }
-            else
+            else if (DateTime.Now > StartTime && EndTime != null)
             {
-                if (StartTime > DateTime.Now)
+                //若当前时间大于下船日期 则表示去休假了
+                if (DateTime.Now > EndTime)
                 {
                     status = CrewStatusEnum.XiuJia;
                 }

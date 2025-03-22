@@ -52,6 +52,10 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// </summary>
         public string? OnBoard { get; set; }
         /// <summary>
+        /// 船舶id
+        /// </summary>
+        public string? ShipId { get; set; }
+        /// <summary>
         /// 
         /// </summary>
         public string? OnBoardName { get; set; }
