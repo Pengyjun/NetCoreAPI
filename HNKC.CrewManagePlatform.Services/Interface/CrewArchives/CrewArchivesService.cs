@@ -42,8 +42,6 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
             #region 船员关联
             //任职船舶
             var crewWorkShip = _dbContext.Queryable<WorkShip>()
-              .WhereIF(!string.IsNullOrWhiteSpace(requestBody.HistoryProject), t => t.ProjectName.Contains(requestBody.HistoryProject))
-              .WhereIF(!string.IsNullOrWhiteSpace(requestBody.HistoryCountry.ToString()), t => t.Country == requestBody.HistoryCountry)
               .GroupBy(u => u.WorkShipId)
               .Select(t => new { t.WorkShipId, WorkShipStartTime = SqlFunc.AggregateMax(t.WorkShipStartTime) });
             var wShip = _dbContext.Queryable<WorkShip>()
@@ -68,9 +66,11 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                 .WhereIF(!string.IsNullOrWhiteSpace(requestBody.CardId), t => t.CardId.Contains(requestBody.CardId))
                 .WhereIF(!string.IsNullOrWhiteSpace(requestBody.WorkNumber), t => t.WorkNumber.Contains(requestBody.WorkNumber))
                 .WhereIF(!string.IsNullOrWhiteSpace(requestBody.Phone), t => t.Phone.Contains(requestBody.Phone))
-                .InnerJoin(wShip, (t, ws) => t.BusinessId == ws.WorkShipId)
+                .LeftJoin(wShip, (t, ws) => t.BusinessId == ws.WorkShipId)
                 .WhereIF(!string.IsNullOrWhiteSpace(requestBody.OnBoard), (t, ws) => ws.OnShip == requestBody.OnBoard)//所在船舶
                 .WhereIF(!string.IsNullOrWhiteSpace(requestBody.HistoryOnBoard), (t, ws) => ws.OnShip == requestBody.HistoryOnBoard)//履历船舶
+                .WhereIF(!string.IsNullOrWhiteSpace(requestBody.HistoryProject), (t, ws) => ws.ProjectName.Contains(requestBody.HistoryProject))
+                .WhereIF(!string.IsNullOrWhiteSpace(requestBody.HistoryCountry.ToString()), (t, ws) => ws.Country == requestBody.HistoryCountry)
                 .LeftJoin<PositionOnBoard>((t, ws, pob) => ws.Postition == pob.BusinessId.ToString())
                 .LeftJoin<OwnerShip>((t, ws, pob, ow) => ws.OnShip == ow.BusinessId.ToString())
                 .LeftJoin(uentity, (t, ws, pob, ow, ue) => t.BusinessId == ue.UserEntryId)
@@ -2154,7 +2154,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
         /// <param name="bId"></param>
         /// <param name="keyWords"></param>
         /// <returns></returns>
-        public async Task<Result> GetNotesDetailsAsync(string bId,string? keyWords)
+        public async Task<Result> GetNotesDetailsAsync(string bId, string? keyWords)
         {
             NotesDetails nd = new();
 
