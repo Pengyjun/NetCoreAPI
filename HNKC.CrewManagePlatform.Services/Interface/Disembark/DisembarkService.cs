@@ -828,6 +828,29 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Disembark
 
             return Result.Success(userInfos);
         }
+
+        /// <summary>
+        /// 船舶排班审批用户列表
+        /// </summary>
+        /// <returns></returns>
+        public async Task<Result> ApproveUserListAsync()
+        {
+            var userInfos = await _dbContext.Queryable<User>()
+                .Where(u => u.IsLoginUser == 0 && u.IsDelete == 1)
+                .InnerJoin<InstitutionRole>((u, ir) => u.BusinessId == ir.UserBusinessId)
+                .InnerJoin<HNKC.CrewManagePlatform.SqlSugars.Models.Role>(
+                    (u, ir, r) => r.BusinessId == ir.RoleBusinessId)
+                .Where((u, ir, r) => r.Type == 4  && r.IsApprove)
+                .Select((u, ir) => new ApproveUser
+                {
+                    UserId = u.BusinessId,
+                    UserName = u.Name,
+                })
+                .Distinct()
+                .ToListAsync();
+
+            return Result.Success(userInfos);
+        }
         #endregion
 
         /// <summary>

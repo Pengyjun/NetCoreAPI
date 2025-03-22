@@ -65,6 +65,12 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Disembark
         Task<Result> ApproveUserListAsync(Guid shipId);
 
         /// <summary>
+        /// 船舶审批用户列表
+        /// </summary>
+        /// <returns></returns>
+        Task<Result> ApproveUserListAsync();
+
+        /// <summary>
         /// 填报实际离船时间
         /// </summary>
         /// <param name="requestBody"></param>

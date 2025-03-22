@@ -141,9 +141,9 @@ namespace HNKC.CrewManagePlatform.Services.Admin.Api.Controllers
         /// <param name="shipId"></param>
         /// <returns></returns>
         [HttpGet("approveUserList")]
-        public async Task<Result> CrewRotaApproveUserListAsync(Guid shipId)
+        public async Task<Result> CrewRotaApproveUserListAsync()
         {
-            return await _disembarkService.ApproveUserListAsync(shipId);
+            return await _disembarkService.ApproveUserListAsync();
         }
         /// <summary>
         /// 年休假计划列表

@@ -2927,7 +2927,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                 .WhereIF(roleType == 3 || roleType == 4, (t1, dau, t5, t3) => GlobalCurrentUser.ShipId.ToString() == t5.OnShip)
                 .WhereIF(!string.IsNullOrWhiteSpace(requestBody.StartTime.ToString()), (t1, dau, t5, t3) => t5.WorkShipStartTime >= requestBody.StartTime && t5.WorkShipStartTime <= requestBody.EndTime)
                 .WhereIF(string.IsNullOrWhiteSpace(requestBody.StartTime.ToString()), (t1, dau, t5, t3) => t5.WorkShipStartTime.Year == DateTime.Now.Year)
-                .WhereIF(requestBody.BoardingDays != 0, (t1, dau, t5, t3) => SqlFunc.DateDiff(DateType.Day, Convert.ToDateTime(t5.WorkShipStartTime), DateTime.Now) + 1 >= requestBody.BoardingDays)//在船天数
+                .WhereIF(requestBody.BoardingDays != 0, (t1, dau, t5, t3) => SqlFunc.DateDiff(DateType.Day, Convert.ToDateTime(t5.WorkShipStartTime), DateTime.Now) >= requestBody.BoardingDays)//在船天数
                 .WhereIF(requestBody.HolidayDays != 0, (t1, dau, t5, t3) => dau.HolidayDays >= requestBody.HolidayDays)
                 .Select((t1, dau, t5, t3) => new SearchCrewDynamics
                 {
