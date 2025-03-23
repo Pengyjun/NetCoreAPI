@@ -146,7 +146,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CurrentUser
                         new Claim("RoleBusinessId",firstRoleLogin.RoleBusinessId.ToString()),
                         new Claim("RoleType",firstRoleLogin.Type.ToString()),
                         new Claim("ShipId",ship == null ? "" : ship.BusinessId.ToString()),
-                        new Claim("ShipName",ship!=null?"":ship.ShipName.ToString()),
+                        new Claim("ShipName",ship==null?"":ship.ShipName.ToString()),
                     };
                     var expores = int.Parse(AppsettingsHelper.GetValue("AccessToken:Expires"));
                     token = jwtService.CreateAccessToken(claims, expores);

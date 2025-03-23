@@ -13,6 +13,10 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.CrewArchives
         /// </summary>
         public bool IsChangePlan { get; set; }
         /// <summary>
+        /// 原船舶id
+        /// </summary>
+        public string? OldShipId { get; set; }
+        /// <summary>
         /// 船舶
         /// </summary>
         public string? OnShip { get; set; }

@@ -47,7 +47,6 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
             var wShip = _dbContext.Queryable<WorkShip>().WhereIF(roleType == 3, t => t.OnShip == GlobalCurrentUser.ShipId)//船长
               .InnerJoin(crewWorkShip, (x, y) => x.WorkShipId == y.WorkShipId && x.WorkShipStartTime == y.WorkShipStartTime);
 
-            var a = "";
             //// 在这些最新上船时间的记录中，取 id 最大的一条
             //var crewWorkShip2 = _dbContext.Queryable<WorkShip>()
             //    .Where(al => SqlFunc.Subqueryable<WorkShip>()
@@ -112,9 +111,9 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                 .WhereIF(!string.IsNullOrWhiteSpace(requestBody.OnBoard), (t, ws) => ws.OnShip == requestBody.OnBoard)//所在船舶
                 .WhereIF(!string.IsNullOrWhiteSpace(requestBody.HistoryOnBoard), (t, ws) => ws.OnShip == requestBody.HistoryOnBoard)//履历船舶
                 .WhereIF(!string.IsNullOrWhiteSpace(requestBody.HistoryProject), (t, ws) => ws.ProjectName.Contains(requestBody.HistoryProject))
-                .WhereIF(!string.IsNullOrWhiteSpace(requestBody.HistoryCountry.ToString()), (t, ws) => ws.Country == requestBody.HistoryCountry)
                 .LeftJoin<PositionOnBoard>((t, ws, pob) => ws.Postition == pob.BusinessId.ToString())
                 .LeftJoin<OwnerShip>((t, ws, pob, ow) => ws.OnShip == ow.BusinessId.ToString())
+               .WhereIF(!string.IsNullOrWhiteSpace(requestBody.HistoryCountry.ToString()), (t, ws, pob, ow) => ws.Country == requestBody.HistoryCountry || ow.Country == requestBody.HistoryCountry)
                 .LeftJoin(result, (t, ws, pob, ow, ue) => t.BusinessId == ue.UserEntryId)
                 .WhereIF(roleType == 3, (t, ws, pob, ow, ue) => ws.OnShip == GlobalCurrentUser.ShipId)//船长
                 .LeftJoin<SkillCertificates>((t, ws, pob, ow, ue, sc) => sc.SkillcertificateId == t.BusinessId)
@@ -179,13 +178,20 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                 })
                 .Distinct()
                 .MergeTable()
-                .WhereIF(requestBody.Staus != null && requestBody.Staus.Any() && requestBody.Staus.Contains("4"), t => t.StatusOrder == 1)
-                .WhereIF(requestBody.Staus != null && requestBody.Staus.Any(), t =>
+                //.WhereIF(requestBody.Staus != null && requestBody.Staus.Any() && requestBody.Staus.Contains("4"), t => t.StatusOrder == 1)
+                .WhereIF(requestBody.Staus != null && requestBody.Staus.Any() && !requestBody.Staus.Contains("4"), t =>
                  (requestBody.Staus.Contains("0") && t.DeleteReson == 0 && t.StatusOrder != 1) || // 在岗
                  (requestBody.Staus.Contains("1") && (int)t.DeleteReson == 1 && t.StatusOrder != 1) || // 离职
                  (requestBody.Staus.Contains("2") && (int)t.DeleteReson == 2 && t.StatusOrder != 1) || // 调离
                  (requestBody.Staus.Contains("3") && (int)t.DeleteReson == 3 && t.StatusOrder != 1) || //退休
-                 (requestBody.Staus.Contains("5") && (int)t.DeleteReson == 5 && t.StatusOrder != 1))//待岗 
+                 (requestBody.Staus.Contains("5") && (int)t.DeleteReson == 5 && t.StatusOrder != 1))//待岗                                                                     
+                .WhereIF(requestBody.Staus != null && requestBody.Staus.Any() && requestBody.Staus.Contains("4"), t =>  //用于查询 包含休假的多条件筛选
+                   t.StatusOrder == 1 || //休假
+                (requestBody.Staus.Contains("0") && t.DeleteReson == 0) || // 在岗
+                (requestBody.Staus.Contains("1") && (int)t.DeleteReson == 1) || // 离职
+                (requestBody.Staus.Contains("2") && (int)t.DeleteReson == 2) || // 调离
+                (requestBody.Staus.Contains("3") && (int)t.DeleteReson == 3) || //退休
+                (requestBody.Staus.Contains("5") && (int)t.DeleteReson == 5))//待岗 
                 .OrderBy((t) => new
                 {
                     t.StatusOrder,
@@ -1677,9 +1683,15 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
         /// <returns></returns>
         public async Task<Result> CrewTransferAsync(CrewTransferRequest requestBody)
         {
+            //查询当前船员是否排班
+            var crew = await _dbContext.Queryable<CrewRota>().Where(t => t.IsDelete == 1 && (t.FLeaderUserId == requestBody.BId || t.SLeaderUserId == requestBody.BId || t.OhterUserId.Contains(requestBody.BId.ToString()))).AnyAsync();
+            if (crew)
+            {
+                return Result.Fail("该船员正在值班中，不能进行调任");
+            }
             //修改原船舶的下船日期
             var shipWork = await _dbContext.Queryable<WorkShip>()
-                   .Where(t => t.IsDelete == 1 && t.WorkShipId == requestBody.BId && t.OnShip == requestBody.OnShip)
+                   .Where(t => t.IsDelete == 1 && t.WorkShipId == requestBody.BId && t.OnShip == requestBody.OldShipId)
                    .OrderByDescending(x => x.WorkShipStartTime).FirstAsync();
             if (shipWork != null)
             {
