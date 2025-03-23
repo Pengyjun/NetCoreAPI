@@ -2983,7 +2983,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                 .Where(t1 => t1.IsLoginUser == 1 && t1.IsDelete == 1)
                 .WhereIF(!string.IsNullOrWhiteSpace(requestBody.KeyWords), t1 => t1.Name.Contains(requestBody.KeyWords) || t1.Phone.Contains(requestBody.KeyWords) || t1.WorkNumber.Contains(requestBody.KeyWords) || t1.CardId.Contains(requestBody.KeyWords))
                 .LeftJoin(departureApplyUser, (t1, dau) => t1.BusinessId == dau.UserId)
-                .InnerJoin(wShip, (t1, dau, t5) => t1.BusinessId == t5.WorkShipId)
+                .LeftJoin(wShip, (t1, dau, t5) => t1.BusinessId == t5.WorkShipId)
                 .InnerJoin<OwnerShip>((t1, dau, t5, t3) => t5.OnShip == t3.BusinessId.ToString())
                 .WhereIF(roleType == 3, (t1, dau, t5, t3) => GlobalCurrentUser.ShipId.ToString() == t5.OnShip)
                 .WhereIF(!string.IsNullOrWhiteSpace(requestBody.StartTime.ToString()), (t1, dau, t5, t3) => t5.WorkShipStartTime >= requestBody.StartTime && t5.WorkShipStartTime <= requestBody.EndTime)
@@ -3013,7 +3013,6 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                 .OrderBy(t1 => new { t1.StatusOrder, Created = SqlFunc.Desc(t1.Created) })
                 .ToPageListAsync(requestBody.PageIndex, requestBody.PageSize, total);
             return await GetCrewDynamicsAsync(rr, total);
-
         }
         /// <summary>
         /// 获取结果集

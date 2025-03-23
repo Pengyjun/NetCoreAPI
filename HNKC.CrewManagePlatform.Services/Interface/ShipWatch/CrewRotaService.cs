@@ -397,13 +397,13 @@ namespace HNKC.CrewManagePlatform.Services.Interface.ShipWatch
                 var positionInfo = await _dbContext.Queryable<PositionOnBoard>().Where(t => t.IsDelete == 1).ToListAsync();
                 var fileInfo = await _dbContext.Queryable<Files>().Where(t => t.IsDelete == 1).ToListAsync();
                 //获取船舶上的人员总数
-                var crewWorkShip = _dbContext.Queryable<WorkShip>().Where(t => t.IsDelete == 1 && t.OnShip == GlobalCurrentUser.ShipId)
+                var crewWorkShip = _dbContext.Queryable<WorkShip>().Where(t => t.IsDelete == 1 && t.OnShip == request.BId.ToString())
                   .GroupBy(u => u.WorkShipId)
                   .Select(t => new { t.WorkShipId, WorkShipStartTime = SqlFunc.AggregateMax(t.WorkShipStartTime) });
-                var workShip = _dbContext.Queryable<WorkShip>().Where(t => t.IsDelete == 1 && t.OnShip == GlobalCurrentUser.ShipId)
+                var workShip = _dbContext.Queryable<WorkShip>().Where(t => t.IsDelete == 1 && t.OnShip == request.BId.ToString())
                   .InnerJoin(crewWorkShip, (x, y) => x.WorkShipId == y.WorkShipId && x.WorkShipStartTime == y.WorkShipStartTime)
                   .Where((x, y) => x.OnShip == request.BId.ToString());
-                var wShip = await workShip.InnerJoin(_dbContext.Queryable<User>().Where(t => t.IsDelete == 1), (x, y, u) => x.WorkShipId == u.BusinessId).ToListAsync();
+                var wShip = await workShip.InnerJoin(_dbContext.Queryable<User>().Where(t => t.IsDelete == 1 && t.IsLoginUser == 1), (x, y, u) => x.WorkShipId == u.BusinessId).ToListAsync();
                 shipDuty.ShipId = ship.BusinessId;
                 shipDuty.ShipName = ship.ShipName;
                 shipDuty.Country = ship.Name;
@@ -465,7 +465,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.ShipWatch
                 var time = DateTime.Now;
                 //获取离船用户的详细信息
                 var depApplyUser = await _dbContext.Queryable<DepartureApplyUser>()
-                    .InnerJoin(_dbContext.Queryable<User>().Where(t => t.IsDelete == 1), (x, u) => x.UserId == u.BusinessId)
+                    .InnerJoin(_dbContext.Queryable<User>().Where(t => t.IsDelete == 1 && t.IsLoginUser == 1), (x, u) => x.UserId == u.BusinessId)
                     .LeftJoin(workShip, (x, u, y) => x.UserId == y.WorkShipId)
                     .LeftJoin(_dbContext.Queryable<PositionOnBoard>(), (x, u, y, z) => y.Postition == z.BusinessId.ToString())
                     .Where((x, u, y, z) => x.IsDelete == 1 && y.IsDelete == 1 && z.IsDelete == 1 && applyCodes.Contains(x.ApplyCode))
