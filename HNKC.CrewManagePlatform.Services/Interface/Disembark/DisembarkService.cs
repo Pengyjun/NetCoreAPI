@@ -455,6 +455,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Disembark
                 .InnerJoin(crewWorkShip, (x, y) => x.WorkShipId == y.WorkShipId && x.WorkShipStartTime == y.WorkShipStartTime)
                 .Where(x => x.OnShip == departureApply.ShipId.ToString());
 
+
             var departureApplyUserList = await _dbContext.Queryable<DepartureApplyUser>().Where(dau =>
                     dau.IsDelete == 1 && dau.ApplyCode == requestBody.ApplyCode && userIds.Contains(dau.UserId))
                 .LeftJoin(wShipList, (dau, ws) => dau.UserId == ws.WorkShipId && ws.OnShip == departureApply.ShipId.ToString())
@@ -768,18 +769,20 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Disembark
                 .Where(t => t.IsLoginUser == 1 && t.IsDelete == 1)
                 .InnerJoin(wShip, (t, ws) => ws.WorkShipId == t.BusinessId && shipId.ToString() == ws.OnShip)
                 .LeftJoin<PositionOnBoard>((t, ws, po) => po.BusinessId.ToString() == ws.Postition)
-               .Where((t, ws, po) => ws.OnShip == shipId.ToString())
+                .Where((t, ws, po) => ws.OnShip == shipId.ToString())
                 .Select((t, ws, po) => new SchedulingUser
                 {
                     UserId = t.BusinessId,
                     UserName = t.Name,
                     Position = ws.Postition,
                     PositionName = po.Name,
-
+                    StatusOrder = (DateTime.Now < ws.WorkShipStartTime ? "休假" : ws.WorkShipEndTime != null && DateTime.Now > ws.WorkShipEndTime ? "休假" : string.Empty) == "休假" ? 1 : t.DeleteReson != 0 ? (int)t.DeleteReson + 2 : (int)t.DeleteReson,
                     RotaEnum = po.RotaType,
                     WorkNumber = t.WorkNumber
                 })
                 .Distinct()
+                .MergeTable()
+                .Where(t=>t.StatusOrder != 1)
                 .ToListAsync();
 
             return Result.Success(userInfos);

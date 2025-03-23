@@ -335,6 +335,10 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.Disembark
         /// 职工号
         /// </summary>
         public string? WorkNumber { get; set; }
+        /// <summary>
+        /// 状态排序 在岗>休假>待岗>删除（离职、调离、退休）
+        /// </summary>
+        public int StatusOrder { get; set; }
     }
 
     /// <summary>
