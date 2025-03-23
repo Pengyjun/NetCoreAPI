@@ -64,5 +64,9 @@ namespace HNKC.CrewManagePlatform.Models.Dtos
         /// 船舶id
         /// </summary>
         public string? ShipId { get; set; }
+        /// <summary>
+        /// 船舶名称
+        /// </summary>
+        public string? ShipName { get; set; }
     }
 }

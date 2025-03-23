@@ -112,12 +112,20 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CurrentUser
 
                     }
                     var firstRoleLogin = userLoginResponse.RoleList.Where(x => x.RoleBusinessId == firstRole.BusinessId).FirstOrDefault();
+                    var ship = new OwnerShip();
                     //激活角色标识
                     if (firstRoleLogin != null)
                     {
                         firstRoleLogin.IsActivate = true;
+                        var institutionId = await dbContext.Queryable<InstitutionRole>().Where(t => t.IsDelete == 1 && t.RoleBusinessId == firstRoleLogin.RoleBusinessId).Select(t => t.InstitutionBusinessId).FirstAsync();
+                        var institutionName = await dbContext.Queryable<Institution>().Where(t => t.IsDelete == 1 && t.BusinessId == institutionId).Select(t => t.Name).FirstAsync();
+                        ship = await dbContext.Queryable<OwnerShip>().Where(t => t.IsDelete == 1 && institutionName == t.ShipName).FirstAsync();
+                        if (ship != null)
+                        {
+                            userLoginResponse.ShipId = ship.BusinessId;
+                            userLoginResponse.ShipName = ship.ShipName;
+                        }
                     }
-
                     ////切换角色
                     //if (userLoginRequest.RoleBusinessId.HasValue)
                     //{
@@ -137,7 +145,8 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CurrentUser
                         new Claim("Phone",userInfo.Phone?.ToString()?? string.Empty),
                         new Claim("RoleBusinessId",firstRoleLogin.RoleBusinessId.ToString()),
                         new Claim("RoleType",firstRoleLogin.Type.ToString()),
-                        new Claim("ShipId",firstRoleLogin.ShipId.ToString()),
+                        new Claim("ShipId",ship == null ? "" : ship.BusinessId.ToString()),
+                        new Claim("ShipName",ship!=null?"":ship.ShipName.ToString()),
                     };
                     var expores = int.Parse(AppsettingsHelper.GetValue("AccessToken:Expires"));
                     token = jwtService.CreateAccessToken(claims, expores);
@@ -211,8 +220,11 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CurrentUser
                 var institutionId = await dbContext.Queryable<InstitutionRole>().Where(t => t.IsDelete == 1 && t.RoleBusinessId == loginRole.BusinessId).Select(t => t.InstitutionBusinessId).FirstAsync();
                 var institutionName = await dbContext.Queryable<Institution>().Where(t => t.IsDelete == 1 && t.BusinessId == institutionId).Select(t => t.Name).FirstAsync();
                 var ship = await dbContext.Queryable<OwnerShip>().Where(t => t.IsDelete == 1 && institutionName == t.ShipName).FirstAsync();
-                userLoginResponse.ShipId = ship.BusinessId;
-                userLoginResponse.ShipName = ship.ShipName;
+                if (ship != null)
+                {
+                    userLoginResponse.ShipId = ship.BusinessId;
+                    userLoginResponse.ShipName = ship.ShipName;
+                }
                 var roleResponse = userLoginResponse.RoleList.Where(x => x.RoleBusinessId == loginRole.BusinessId).FirstOrDefault();
                 if (roleResponse != null)
                 {
@@ -231,8 +243,8 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CurrentUser
                         new Claim("Phone",userInfo.Phone?.ToString()),
                         new Claim("RoleBusinessId",loginRole.BusinessId.ToString()),
                         new Claim("RoleType",loginRole.Type.ToString()),
-                        new Claim("ShipId",ship.BusinessId.ToString()),
-                        new Claim("ShipName",ship.ShipName.ToString()),
+                        new Claim("ShipId",ship==null?"": ship.BusinessId.ToString()),
+                        new Claim("ShipName",ship==null?"":ship.ShipName.ToString()),
                 };
                 var expores = int.Parse(AppsettingsHelper.GetValue("AccessToken:Expires"));
                 token = jwtService.CreateAccessToken(claims, expores);
