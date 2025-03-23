@@ -21,6 +21,14 @@ namespace HNKC.CrewManagePlatform.Models.Dtos.UserManager
         /// </summary>
         public string? WorkNumber { get; set; }
         /// <summary>
+        /// 船舶id
+        /// </summary>
+        public Guid? ShipId { get; set; }
+        /// <summary>
+        /// 船舶名称
+        /// </summary>
+        public string? ShipName { get; set; }
+        /// <summary>
         /// 响应Token
         /// </summary>
         public string? Token { get; set; }

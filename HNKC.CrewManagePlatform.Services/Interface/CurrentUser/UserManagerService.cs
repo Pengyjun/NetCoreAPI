@@ -202,13 +202,17 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CurrentUser
                         };
                         userLoginResponse.RoleList.Add(role);
                     }
-
                 }
                 var loginRole = roleList.Where(x => x.BusinessId == changRoleRequest.RoleBusinessId).FirstOrDefault();
                 if (loginRole == null)
                 {
                     return Result.Fail("角色切换失败;当前用户不存在角色", (int)ResponseHttpCode.LoginFail);
                 }
+                var institutionId = await dbContext.Queryable<InstitutionRole>().Where(t => t.IsDelete == 1 && t.RoleBusinessId == loginRole.BusinessId).Select(t => t.InstitutionBusinessId).FirstAsync();
+                var institutionName = await dbContext.Queryable<Institution>().Where(t => t.IsDelete == 1 && t.BusinessId == institutionId).Select(t => t.Name).FirstAsync();
+                var ship = await dbContext.Queryable<OwnerShip>().Where(t => t.IsDelete == 1 && institutionName == t.ShipName).FirstAsync();
+                userLoginResponse.ShipId = ship.BusinessId;
+                userLoginResponse.ShipName = ship.ShipName;
                 var roleResponse = userLoginResponse.RoleList.Where(x => x.RoleBusinessId == loginRole.BusinessId).FirstOrDefault();
                 if (roleResponse != null)
                 {
@@ -227,7 +231,8 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CurrentUser
                         new Claim("Phone",userInfo.Phone?.ToString()),
                         new Claim("RoleBusinessId",loginRole.BusinessId.ToString()),
                         new Claim("RoleType",loginRole.Type.ToString()),
-                        new Claim("ShipId",roleResponse.ShipId.ToString()),
+                        new Claim("ShipId",ship.BusinessId.ToString()),
+                        new Claim("ShipName",ship.ShipName.ToString()),
                 };
                 var expores = int.Parse(AppsettingsHelper.GetValue("AccessToken:Expires"));
                 token = jwtService.CreateAccessToken(claims, expores);
