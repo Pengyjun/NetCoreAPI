@@ -44,10 +44,10 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Certificate
                 .Select(x => new { x.UserEntryId, EndTime = SqlFunc.AggregateMax(x.EndTime) });
             var uentity = _dbContext.Queryable<UserEntryInfo>()
                 .InnerJoin(uentityFist, (x, y) => x.UserEntryId == y.UserEntryId && x.EndTime == y.EndTime);
-            var crewWorkShip = _dbContext.Queryable<WorkShip>().Where(t => t.IsDelete == 1).WhereIF(roleType == 3, t => t.OnShip == GlobalCurrentUser.ShipId)//船长
+            var crewWorkShip = _dbContext.Queryable<WorkShip>().Where(t => t.IsDelete == 1)
                                 .GroupBy(u => u.WorkShipId)
                                 .Select(t => new { t.WorkShipId, WorkShipStartTime = SqlFunc.AggregateMax(t.WorkShipStartTime) });
-            var wShip = _dbContext.Queryable<WorkShip>().Where(t => t.IsDelete == 1).WhereIF(roleType == 3, t => t.OnShip == GlobalCurrentUser.ShipId)//船长
+            var wShip = _dbContext.Queryable<WorkShip>().Where(t => t.IsDelete == 1)
               .InnerJoin(crewWorkShip, (x, y) => x.WorkShipId == y.WorkShipId && x.WorkShipStartTime == y.WorkShipStartTime);
             #endregion
 
