@@ -453,7 +453,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Disembark
                 .Select(t => new { t.WorkShipId, WorkShipStartTime = SqlFunc.AggregateMax(t.WorkShipStartTime) });
             var wShipList = _dbContext.Queryable<WorkShip>().Where(t => t.IsDelete == 1)
                 .InnerJoin(crewWorkShip, (x, y) => x.WorkShipId == y.WorkShipId && x.WorkShipStartTime == y.WorkShipStartTime)
-                .Where(ws => ws.OnShip == departureApply.ShipId.ToString());
+                .Where(x => x.OnShip == departureApply.ShipId.ToString());
 
             var departureApplyUserList = await _dbContext.Queryable<DepartureApplyUser>().Where(dau =>
                     dau.IsDelete == 1 && dau.ApplyCode == requestBody.ApplyCode && userIds.Contains(dau.UserId))
