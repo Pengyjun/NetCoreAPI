@@ -44,10 +44,10 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Certificate
                 .Select(x => new { x.UserEntryId, EndTime = SqlFunc.AggregateMax(x.EndTime) });
             var uentity = _dbContext.Queryable<UserEntryInfo>()
                 .InnerJoin(uentityFist, (x, y) => x.UserEntryId == y.UserEntryId && x.EndTime == y.EndTime);
-            var crewWorkShip = _dbContext.Queryable<WorkShip>().Where(t => t.IsDelete == 1)
+            var crewWorkShip = _dbContext.Queryable<WorkShip>().Where(t => t.IsDelete == 1).WhereIF(roleType == 3, t => t.OnShip == GlobalCurrentUser.ShipId)//船长
                                 .GroupBy(u => u.WorkShipId)
                                 .Select(t => new { t.WorkShipId, WorkShipStartTime = SqlFunc.AggregateMax(t.WorkShipStartTime) });
-            var wShip = _dbContext.Queryable<WorkShip>().Where(t => t.IsDelete == 1)
+            var wShip = _dbContext.Queryable<WorkShip>().Where(t => t.IsDelete == 1).WhereIF(roleType == 3, t => t.OnShip == GlobalCurrentUser.ShipId)//船长
               .InnerJoin(crewWorkShip, (x, y) => x.WorkShipId == y.WorkShipId && x.WorkShipStartTime == y.WorkShipStartTime);
             #endregion
 
@@ -67,7 +67,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Certificate
                 .LeftJoin(uentity, (t1, t2, t3) => t1.BusinessId == t3.UserEntryId)
                 .InnerJoin(wShip, (t1, t2, t3, t5) => t1.BusinessId == t5.WorkShipId)
                 .InnerJoin<OwnerShip>((t1, t2, t3, t5, t4) => t5.OnShip == t4.BusinessId.ToString())
-                .WhereIF(roleType == 3 || roleType == 4, (t1, t2, t3, t5, t4) => GlobalCurrentUser.ShipId.ToString() == t5.OnShip)//船长
+                .WhereIF(roleType == 3, (t1, t2, t3, t5, t4) => GlobalCurrentUser.ShipId.ToString() == t5.OnShip)//船长
                 .InnerJoin<RemindSetting>((t1, t2, t3, t5, t4, t6) => t6.Types == t2.Type && t6.RemindType == 22 && t6.Enable == 1)
                 .WhereIF(requestBody.Certificates == CertificatesEnum.FCertificate, (t1, t2, t3, t5, t4, t6) => SqlFunc.DateDiff(DateType.Day, DateTime.Now, Convert.ToDateTime(t2.FEffectiveTime)) + 1 <= t6.Days)
                 .WhereIF(requestBody.Certificates == CertificatesEnum.SCertificate, (t1, t2, t3, t5, t4, t6) => SqlFunc.DateDiff(DateType.Day, DateTime.Now, Convert.ToDateTime(t2.SEffectiveTime)) + 1 <= t6.Days)

@@ -965,10 +965,10 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Disembark
         {
             #region 任职船舶
             //任职船舶
-            var crewWorkShip = _dbContext.Queryable<WorkShip>().Where(t => t.IsDelete == 1)
+            var crewWorkShip = _dbContext.Queryable<WorkShip>().Where(t => t.IsDelete == 1 && t.OnShip == GlobalCurrentUser.ShipId)
                     .GroupBy(u => u.WorkShipId)
                     .Select(t => new { t.WorkShipId, WorkShipStartTime = SqlFunc.AggregateMax(t.WorkShipStartTime) });
-            var wShip = _dbContext.Queryable<WorkShip>().Where(t => t.IsDelete == 1)
+            var wShip = _dbContext.Queryable<WorkShip>().Where(t => t.IsDelete == 1 && t.OnShip == GlobalCurrentUser.ShipId)
               .InnerJoin(crewWorkShip, (x, y) => x.WorkShipId == y.WorkShipId && x.WorkShipStartTime == y.WorkShipStartTime)
               .WhereIF(requestDto.ShipId != null && requestDto.ShipId.Length > 0, (x, y) => requestDto.ShipId.Contains(x.OnShip));
             #endregion

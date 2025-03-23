@@ -41,23 +41,42 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
 
             #region 船员关联
             //任职船舶
-            var crewWorkShip = _dbContext.Queryable<WorkShip>().Where(t => t.IsDelete == 1)
-                     
+            var crewWorkShip = _dbContext.Queryable<WorkShip>().Where(t => t.IsDelete == 1).WhereIF(roleType == 3, t => t.OnShip == GlobalCurrentUser.ShipId)//船长
                       .GroupBy(u => u.WorkShipId)
                       .Select(t => new { t.WorkShipId, WorkShipStartTime = SqlFunc.AggregateMax(t.WorkShipStartTime) });
-            var wShip = _dbContext.Queryable<WorkShip>()
+            var wShip = _dbContext.Queryable<WorkShip>().WhereIF(roleType == 3, t => t.OnShip == GlobalCurrentUser.ShipId)//船长
               .InnerJoin(crewWorkShip, (x, y) => x.WorkShipId == y.WorkShipId && x.WorkShipStartTime == y.WorkShipStartTime);
+
+            var a = "";
+            //// 在这些最新上船时间的记录中，取 id 最大的一条
+            //var crewWorkShip2 = _dbContext.Queryable<WorkShip>()
+            //    .Where(al => SqlFunc.Subqueryable<WorkShip>()
+            //        .Where(sub => sub.WorkShipId == al.WorkShipId && sub.WorkShipStartTime == al.WorkShipStartTime)
+            //        .Any())
+            //    .GroupBy(al => al.WorkShipId)
+            //    .Select(al => new
+            //    {
+            //        WorkShipId = al.WorkShipId,
+            //        LatestId = SqlFunc.AggregateMax(al.Id)
+            //    });
+
+
+            //// 根据 id 获取完整记录
+            //var wShip = _dbContext.Queryable<WorkShip>()
+            //    .InnerJoin(crewWorkShip2, (a, latest) => a.Id == latest.LatestId)
+            //    .Select(a => a).ToList();
+
             //入职时间
-            var uentityFist = _dbContext.Queryable<UserEntryInfo>()
-                    .GroupBy(u => new {u.UserEntryId})
-                    .Select(x => new { x.UserEntryId, StartTime = SqlFunc.AggregateMax(x.StartTime) });
-            var uentity = _dbContext.Queryable<UserEntryInfo>()
-                .InnerJoin(uentityFist, (x, y) => x.UserEntryId == y.UserEntryId && x.StartTime == y.StartTime);
+            //var uentityFist = _dbContext.Queryable<UserEntryInfo>()
+            //        .GroupBy(u => new {u.UserEntryId})
+            //        .Select(x => new { x.UserEntryId, StartTime = SqlFunc.AggregateMax(x.StartTime) });
+            //var uentity = _dbContext.Queryable<UserEntryInfo>()
+            //    .InnerJoin(uentityFist, (x, y) => x.UserEntryId == y.UserEntryId && x.StartTime == y.StartTime);
             #endregion
 
             // 获取每个用户的最新入职时间
             var subQuery1 = _dbContext.Queryable<UserEntryInfo>()
-                .GroupBy(u => new {u.UserEntryId})
+                .GroupBy(u => new { u.UserEntryId })
                 .Select(x => new { x.UserEntryId, StartTime = SqlFunc.AggregateMax(x.StartTime) });
 
             // 在这些最新入职时间的记录中，取 id 最大的一条
@@ -175,6 +194,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                 .ToPageListAsync(requestBody.PageIndex, requestBody.PageSize, total);
 
             return await GetResult(requestBody, rt, total);
+            //return new PageResult<SearchCrewArchivesResponse>();
         }
         /// <summary>
         /// 获取列表结果集
@@ -2930,10 +2950,10 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
             var roleType = await _baseService.CurRoleType();
             if (roleType == -1) { return new PageResult<SearchCrewDynamics>(); }
             #region 船员关联
-            var crewWorkShip = _dbContext.Queryable<WorkShip>().Where(t => t.IsDelete == 1)
+            var crewWorkShip = _dbContext.Queryable<WorkShip>().Where(t => t.IsDelete == 1).WhereIF(roleType == 3, t => t.OnShip == GlobalCurrentUser.ShipId)//船长
                      .GroupBy(u => u.WorkShipId)
                      .Select(t => new { t.WorkShipId, WorkShipStartTime = SqlFunc.AggregateMax(t.WorkShipStartTime) });
-            var wShip = _dbContext.Queryable<WorkShip>().Where(t => t.IsDelete == 1)
+            var wShip = _dbContext.Queryable<WorkShip>().Where(t => t.IsDelete == 1).WhereIF(roleType == 3, t => t.OnShip == GlobalCurrentUser.ShipId)//船长
               .InnerJoin(crewWorkShip, (x, y) => x.WorkShipId == y.WorkShipId && x.WorkShipStartTime == y.WorkShipStartTime);
             #endregion
 
@@ -2953,7 +2973,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                 .LeftJoin(departureApplyUser, (t1, dau) => t1.BusinessId == dau.UserId)
                 .InnerJoin(wShip, (t1, dau, t5) => t1.BusinessId == t5.WorkShipId)
                 .InnerJoin<OwnerShip>((t1, dau, t5, t3) => t5.OnShip == t3.BusinessId.ToString())
-                .WhereIF(roleType == 3 || roleType == 4, (t1, dau, t5, t3) => GlobalCurrentUser.ShipId.ToString() == t5.OnShip)
+                .WhereIF(roleType == 3, (t1, dau, t5, t3) => GlobalCurrentUser.ShipId.ToString() == t5.OnShip)
                 .WhereIF(!string.IsNullOrWhiteSpace(requestBody.StartTime.ToString()), (t1, dau, t5, t3) => t5.WorkShipStartTime >= requestBody.StartTime && t5.WorkShipStartTime <= requestBody.EndTime)
                 .WhereIF(string.IsNullOrWhiteSpace(requestBody.StartTime.ToString()), (t1, dau, t5, t3) => t5.WorkShipStartTime.Year == DateTime.Now.Year)
                 .WhereIF(requestBody.BoardingDays != 0, (t1, dau, t5, t3) => SqlFunc.DateDiff(DateType.Day, Convert.ToDateTime(t5.WorkShipStartTime), DateTime.Now) >= requestBody.BoardingDays)//在船天数

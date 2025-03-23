@@ -397,10 +397,10 @@ namespace HNKC.CrewManagePlatform.Services.Interface.ShipWatch
                 var positionInfo = await _dbContext.Queryable<PositionOnBoard>().Where(t => t.IsDelete == 1).ToListAsync();
                 var fileInfo = await _dbContext.Queryable<Files>().Where(t => t.IsDelete == 1).ToListAsync();
                 //获取船舶上的人员总数
-                var crewWorkShip = _dbContext.Queryable<WorkShip>().Where(t => t.IsDelete == 1)
+                var crewWorkShip = _dbContext.Queryable<WorkShip>().Where(t => t.IsDelete == 1 && t.OnShip == GlobalCurrentUser.ShipId)
                   .GroupBy(u => u.WorkShipId)
                   .Select(t => new { t.WorkShipId, WorkShipStartTime = SqlFunc.AggregateMax(t.WorkShipStartTime) });
-                var workShip = _dbContext.Queryable<WorkShip>().Where(t => t.IsDelete == 1)
+                var workShip = _dbContext.Queryable<WorkShip>().Where(t => t.IsDelete == 1 && t.OnShip == GlobalCurrentUser.ShipId)
                   .InnerJoin(crewWorkShip, (x, y) => x.WorkShipId == y.WorkShipId  && x.WorkShipStartTime == y.WorkShipStartTime)
                   .Where((x, y) => x.OnShip == request.BId.ToString());
                 var wShip = await workShip.InnerJoin(_dbContext.Queryable<User>().Where(t => t.IsDelete == 1), (x, y, u) => x.WorkShipId == u.BusinessId).ToListAsync();
