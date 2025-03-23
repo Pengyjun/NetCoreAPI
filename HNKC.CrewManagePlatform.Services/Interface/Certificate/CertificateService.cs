@@ -44,11 +44,11 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Certificate
                 .Select(x => new { x.UserEntryId, EndTime = SqlFunc.AggregateMax(x.EndTime) });
             var uentity = _dbContext.Queryable<UserEntryInfo>()
                 .InnerJoin(uentityFist, (x, y) => x.UserEntryId == y.UserEntryId && x.EndTime == y.EndTime);
-            var crewWorkShip = _dbContext.Queryable<WorkShip>()
-                                .GroupBy(u => new { u.WorkShipId, u.OnShip })
-                                .Select(t => new { t.WorkShipId, t.OnShip, WorkShipStartTime = SqlFunc.AggregateMax(t.WorkShipStartTime) });
-            var wShip = _dbContext.Queryable<WorkShip>()
-              .InnerJoin(crewWorkShip, (x, y) => x.WorkShipId == y.WorkShipId && x.OnShip == y.OnShip && x.WorkShipStartTime == y.WorkShipStartTime);
+            var crewWorkShip = _dbContext.Queryable<WorkShip>().Where(t => t.IsDelete == 1)
+                                .GroupBy(u => u.WorkShipId)
+                                .Select(t => new { t.WorkShipId, WorkShipStartTime = SqlFunc.AggregateMax(t.WorkShipStartTime) });
+            var wShip = _dbContext.Queryable<WorkShip>().Where(t => t.IsDelete == 1)
+              .InnerJoin(crewWorkShip, (x, y) => x.WorkShipId == y.WorkShipId && x.WorkShipStartTime == y.WorkShipStartTime);
             #endregion
 
             //获取提醒天数
