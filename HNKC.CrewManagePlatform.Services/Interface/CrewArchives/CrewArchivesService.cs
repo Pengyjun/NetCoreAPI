@@ -49,11 +49,33 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
               .InnerJoin(crewWorkShip, (x, y) => x.WorkShipId == y.WorkShipId && x.WorkShipStartTime == y.WorkShipStartTime);
             //入职时间
             var uentityFist = _dbContext.Queryable<UserEntryInfo>()
-                    .GroupBy(u => u.UserEntryId)
+                    .GroupBy(u => new {u.UserEntryId})
                     .Select(x => new { x.UserEntryId, StartTime = SqlFunc.AggregateMax(x.StartTime) });
             var uentity = _dbContext.Queryable<UserEntryInfo>()
                 .InnerJoin(uentityFist, (x, y) => x.UserEntryId == y.UserEntryId && x.StartTime == y.StartTime);
             #endregion
+
+            // 获取每个用户的最新入职时间
+            var subQuery1 = _dbContext.Queryable<UserEntryInfo>()
+                .GroupBy(u => new {u.UserEntryId})
+                .Select(x => new { x.UserEntryId, StartTime = SqlFunc.AggregateMax(x.StartTime) });
+
+            // 在这些最新入职时间的记录中，取 id 最大的一条
+            var subQuery2 = _dbContext.Queryable<UserEntryInfo>()
+                .Where(al => SqlFunc.Subqueryable<UserEntryInfo>()
+                    .Where(sub => sub.UserEntryId == al.UserEntryId && sub.StartTime == al.StartTime)
+                    .Any())
+                .GroupBy(al => al.UserEntryId)
+                .Select(al => new
+                {
+                    UserId = al.UserEntryId,
+                    LatestId = SqlFunc.AggregateMax(al.Id)
+                });
+
+            // 根据 id 获取完整记录
+            var result = _dbContext.Queryable<UserEntryInfo>()
+                .InnerJoin(subQuery2, (a, latest) => a.Id == latest.LatestId)
+                .Select(a => a);
 
             // 转义 % 和 _
             string escapedKeyword = requestBody.KeyWords == null ? string.Empty : requestBody.KeyWords.Replace("%", "\\%").Replace("_", "\\_");
@@ -74,7 +96,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
                 .WhereIF(!string.IsNullOrWhiteSpace(requestBody.HistoryCountry.ToString()), (t, ws) => ws.Country == requestBody.HistoryCountry)
                 .LeftJoin<PositionOnBoard>((t, ws, pob) => ws.Postition == pob.BusinessId.ToString())
                 .LeftJoin<OwnerShip>((t, ws, pob, ow) => ws.OnShip == ow.BusinessId.ToString())
-                .LeftJoin(uentity, (t, ws, pob, ow, ue) => t.BusinessId == ue.UserEntryId)
+                .LeftJoin(result, (t, ws, pob, ow, ue) => t.BusinessId == ue.UserEntryId)
                 .WhereIF(roleType == 3, (t, ws, pob, ow, ue) => ws.OnShip == GlobalCurrentUser.ShipId)//船长
                 .LeftJoin<SkillCertificates>((t, ws, pob, ow, ue, sc) => sc.SkillcertificateId == t.BusinessId)
                 .LeftJoin<EducationalBackground>((t, ws, pob, ow, ue, sc, eb) => eb.QualificationId == t.BusinessId)
