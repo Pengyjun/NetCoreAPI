@@ -1684,7 +1684,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
         public async Task<Result> CrewTransferAsync(CrewTransferRequest requestBody)
         {
             //查询当前船员是否排班
-            var crew = await _dbContext.Queryable<CrewRota>().Where(t => t.IsDelete == 1 && (t.FLeaderUserId == requestBody.BId || t.SLeaderUserId == requestBody.BId || t.OhterUserId.Contains(requestBody.BId.ToString()))).AnyAsync();
+            var crew = await _dbContext.Queryable<CrewRota>().Where(t => t.IsDelete == 1 && (t.FLeaderUserId == requestBody.BId || t.SLeaderUserId == requestBody.BId || t.OhterUserId.Contains(requestBody.BId.ToString()))).OrderByDescending(t => t.Version).Take(6).AnyAsync();
             if (crew)
             {
                 return Result.Fail("该船员正在值班中，不能进行调任");
@@ -1693,6 +1693,11 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
             var shipWork = await _dbContext.Queryable<WorkShip>()
                    .Where(t => t.IsDelete == 1 && t.WorkShipId == requestBody.BId && t.OnShip == requestBody.OldShipId)
                    .OrderByDescending(x => x.WorkShipStartTime).FirstAsync();
+            //若调任的上传时间小于原船舶的上传时间 则不允许进行调任
+            if (requestBody.WorkShipStartTime < shipWork.WorkShipStartTime)
+            {
+                return Result.Fail("当前船舶上船时间不能小于原船舶的上传时间");
+            }
             if (shipWork != null)
             {
                 shipWork.WorkShipEndTime = requestBody.WorkShipStartTime;

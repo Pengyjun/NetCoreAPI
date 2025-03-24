@@ -660,7 +660,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Contract
                 return Result.Fail("BId不能为空");
             }
 
-            var rt = await _dbContext.Queryable<YearCheck>().Where(t => t.IsDelete == 1 && t.BusinessId == requestBody.BId && requestBody.Year == t.TrainingTime.Value.Year).FirstAsync();
+            var rt = await _dbContext.Queryable<YearCheck>().Where(t => t.IsDelete == 1 && t.TrainingId == requestBody.BId && requestBody.Year == t.TrainingTime.Value.Year).FirstAsync();
             if (rt != null)
             {
                 if (requestBody.Scans != null && requestBody.Scans.Any())
@@ -671,7 +671,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Contract
                     rt.TrainingScan = GuidUtil.Next();
                     requestBody.Scans.ForEach(x => x.FileId = rt.TrainingScan);
                     await _baseService.InsertFileAsync(requestBody.Scans, rt.TrainingId);
-                    await _dbContext.Updateable(rt).UpdateColumns(x => new { x.CheckType, x.TrainingScan }).ExecuteCommandAsync();
+                    await _dbContext.Updateable(rt).UpdateColumns(x => new { x.CheckType, x.TrainingScan, x.ModifiedBy, x.Modified }).ExecuteCommandAsync();
                     return Result.Success("成功");
                 }
                 else

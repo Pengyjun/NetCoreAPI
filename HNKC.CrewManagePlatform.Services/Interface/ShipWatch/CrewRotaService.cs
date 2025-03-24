@@ -465,7 +465,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.ShipWatch
                 var time = DateTime.Now;
                 //获取离船用户的详细信息
                 var depApplyUser = await _dbContext.Queryable<DepartureApplyUser>()
-                    .InnerJoin(_dbContext.Queryable<User>().Where(t => t.IsDelete == 1 && t.IsLoginUser == 1), (x, u) => x.UserId == u.BusinessId)
+                    .InnerJoin(_dbContext.Queryable<User>().Where(t => t.IsDelete == 1 && t.IsLoginUser == 1 && (t.DeleteReson != CrewStatusEnum.TuiXiu && t.DeleteReson != CrewStatusEnum.DiaoLi && t.DeleteReson != CrewStatusEnum.LiZhi)), (x, u) => x.UserId == u.BusinessId)
                     .LeftJoin(workShip, (x, u, y) => x.UserId == y.WorkShipId)
                     .LeftJoin(_dbContext.Queryable<PositionOnBoard>(), (x, u, y, z) => y.Postition == z.BusinessId.ToString())
                     .Where((x, u, y, z) => x.IsDelete == 1 && y.IsDelete == 1 && z.IsDelete == 1 && applyCodes.Contains(x.ApplyCode))
@@ -484,9 +484,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.ShipWatch
                 shipDuty.Holiday = dutyUser.Count;
                 shipDuty.OnDuty = wShip.Count - dutyUser.Count;
                 //获取排班信息 根据版本号 倒排取最新的
-                var crewList = await _dbContext.Queryable<CrewRota>().Where(t => t.IsDelete == 1 && t.ShipId == request.BId).OrderByDescending(t => t.Version).ToListAsync();
-                var version = crewList.Max(t => t.Version);
-                var crew = crewList.Where(t => t.Version == version).ToList();
+                var crew = await _dbContext.Queryable<CrewRota>().Where(t => t.IsDelete == 1 && t.ShipId == request.BId).ToListAsync();
                 List<RotaEnum> rotaEnums = new List<RotaEnum>();
                 rotaEnums.Add(RotaEnum.JiaBan);
                 rotaEnums.Add(RotaEnum.LunJi);
@@ -563,11 +561,13 @@ namespace HNKC.CrewManagePlatform.Services.Interface.ShipWatch
                 dutyPerson.teamsGroup.Add(team);
                 var other = item.OhterUserId?.Split(',').ToList();
                 otherUser.AddRange(other);
-
-
             }
+            //值班人员id
+            var crewIds = deck.Select(t => t.FLeaderUserId).ToList();
+            crewIds.AddRange(deck.Select(t => t.SLeaderUserId).ToList());
+            crewIds = crewIds.Distinct().ToList();
             //查看船员是否有离船申请 并且未归船的 这种类型的船员为休假中的
-            var dutyUser = depApplyUser.Where(t => (t.RotaType == rota && t.DisembarkDate <= time && t.ReturnShipDate >= time) || (t.RotaType == rota && t.DisembarkDate != null && t.ReturnShipDate == null)).ToList();
+            var dutyUser = depApplyUser.Where(t => (t.RotaType == rota && t.DisembarkDate <= time && t.ReturnShipDate >= time) || (t.RotaType == rota && t.DisembarkDate != null && t.ReturnShipDate == null) && crewIds.Contains(t.UserId)).ToList();
             List<UserInfo> userList = new List<UserInfo>();
             foreach (var item in dutyUser)
             {
@@ -614,14 +614,16 @@ namespace HNKC.CrewManagePlatform.Services.Interface.ShipWatch
         /// <returns></returns>
         public async Task<OffDutyPerson> GetOffCrewRotaInfo(List<CrewRota> crew, List<User> userInfo, List<PositionOnBoard> positionInfo, List<WorkShip> wShip, List<DepartureResponseDto> depApplyUser, List<Files> fileInfo, DateTime time, RotaEnum rota, string url)
         {
+            //按版本号倒排 获取前三条最新的甲板部排班人员
+            var deck = crew.Where(t => t.RotaType == rota).OrderByDescending(t => t.Version).Take(3).ToList();
             //当前已排班的人员
             List<string> crewIds = new List<string>();
             OffDutyPerson offDutyPerson = new OffDutyPerson();
-            var userId1 = crew.Where(t => t.RotaType == rota).Select(t => t.FLeaderUserId.ToString() ?? "").ToList();
-            var userId2 = crew.Where(t => t.RotaType == rota).Select(t => t.SLeaderUserId.ToString() ?? "").ToList();
+            var userId1 = deck.Select(t => t.FLeaderUserId.ToString() ?? "").ToList();
+            var userId2 = deck.Select(t => t.SLeaderUserId.ToString() ?? "").ToList();
             if (userId1 != null && userId1.Any()) crewIds.AddRange(userId1);
             if (userId2 != null && userId2.Any()) crewIds.AddRange(userId2);
-            foreach (var item in crew)
+            foreach (var item in deck)
             {
                 var splitUser = item.OhterUserId?.Split(',').ToList();
                 crewIds.AddRange(splitUser);
@@ -649,7 +651,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.ShipWatch
             }
             var offUserIds = offUser.Select(t => t.WorkShipId).Distinct().ToArray();
             //查看非班中的船员是否有离船申请 并且未归船的 这种类型的船员为休假中的
-            var dutyUser = depApplyUser.Where(t => t.RotaType == rota && offUserIds.Contains(t.UserId) && t.DisembarkDate <= time && t.ReturnShipDate >= time).ToList();
+            var dutyUser = depApplyUser.Where(t => offUserIds.Contains(t.UserId) && (t.RotaType == rota && t.DisembarkDate <= time && t.ReturnShipDate >= time) || (t.RotaType == rota && t.DisembarkDate != null && t.ReturnShipDate == null)).ToList();
             List<UserInfo> userList = new List<UserInfo>();
             foreach (var item in dutyUser)
             {
@@ -667,6 +669,10 @@ namespace HNKC.CrewManagePlatform.Services.Interface.ShipWatch
                     userList.Add(userInfo1);
                 }
             }
+            //将已休假的人员从非值班人员集合中去除
+            var dutyUserIds = dutyUser.Select(t => t.UserId.ToString()).ToList();
+            offDutyPerson.Person1 = offDutyPerson.Person1.Where(t => !dutyUserIds.Contains(t.UserId)).ToList();
+
             offDutyPerson.HolidayPerson = userList;
             return offDutyPerson;
         }
