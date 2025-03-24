@@ -2799,7 +2799,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.CrewArchives
             {
                 EntryTime = userEntryInfo.FirstOrDefault()?.EntryTime.ToString("yyyy-MM-dd"),
                 EntryMaterial = newFiles,
-                UserEntryInfosForDetails = uEntry
+                UserEntryInfosForDetails = uEntry.OrderByDescending(t => t.StartTime).ToList()
             };
 
             return Result.Success(ur);
