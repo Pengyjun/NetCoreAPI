@@ -553,7 +553,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Contract
             var rr = await _dbContext.Queryable<User>()
                 .Where(t1 => t1.IsLoginUser == 1 && t1.IsDelete == 1)
                 .WhereIF(!string.IsNullOrEmpty(requestBody.KeyWords), t1 => t1.Name.Contains(requestBody.KeyWords) || t1.Phone.Contains(requestBody.KeyWords) || t1.WorkNumber.Contains(requestBody.KeyWords) || t1.CardId.Contains(requestBody.KeyWords))
-                .InnerJoin(wShip, (t1, t5) => t1.BusinessId == t5.WorkShipId)
+                .LeftJoin(wShip, (t1, t5) => t1.BusinessId == t5.WorkShipId)
                 .InnerJoin<OwnerShip>((t1, t5, t3) => t5.OnShip == t3.BusinessId.ToString())
                 .WhereIF(roleType == 3, (t1, t5, t3) => t5.OnShip == t3.BusinessId.ToString() && GlobalCurrentUser.ShipId.ToString() == t5.OnShip)
                 .LeftJoin<YearCheck>((t1, t5, t3, t6) => t1.BusinessId == t6.TrainingId)
@@ -579,6 +579,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Contract
                     //ContractType = t2.ContractType,
                     OnBoardPosition = t5.Postition,
                     WorkShipStartTime = t5.WorkShipStartTime,
+                    WorkShipEndTime = t5.WorkShipEndTime
                 })
                 .ToPageListAsync(requestBody.PageIndex, requestBody.PageSize, total);
             return await GetYearCheckResultAsync(rr, total);
@@ -619,7 +620,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Contract
                         Url = url + x.Name
                     }).ToList();
                 u.CheckTypeName = EnumUtil.GetDescription(u.CheckType);
-                u.OnStatus = EnumUtil.GetDescription(u.DeleteResonEnum); //EnumUtil.GetDescription(_baseService.ShipUserStatus(u.WorkShipStartTime, u.DeleteResonEnum, u.WorkShipStartTime));
+                u.OnStatus = EnumUtil.GetDescription(_baseService.ShipUserStatus(u.WorkShipStartTime, u.WorkShipEndTime, u.DeleteResonEnum));
                 //u.ContractTypeName = EnumUtil.GetDescription(u.ContractType);
                 u.OnBoardName = ownShipTable.FirstOrDefault(x => x.BusinessId.ToString() == u.OnBoard)?.ShipName;
                 u.CountryName = countryTable.FirstOrDefault(x => x.BusinessId == u.Country)?.Name;
