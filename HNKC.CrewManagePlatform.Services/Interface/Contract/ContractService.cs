@@ -202,11 +202,32 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Contract
             var roleType = await _baseService.CurRoleType();
             if (roleType == -1) { return new PageResult<PromotionSearch>(); }
             #region 船员关联
-            var uentityFist = _dbContext.Queryable<UserEntryInfo>()
-                .GroupBy(u => u.UserEntryId)
+            //var uentityFist = _dbContext.Queryable<UserEntryInfo>()
+            //    .GroupBy(u => u.UserEntryId)
+            //    .Select(x => new { x.UserEntryId, StartTime = SqlFunc.AggregateMax(x.StartTime) });
+            //var uentity = _dbContext.Queryable<UserEntryInfo>()
+            //    .InnerJoin(uentityFist, (x, y) => x.UserEntryId == y.UserEntryId && x.StartTime == y.StartTime);
+
+            // 获取每个用户的最新入职时间
+            var subQuery1 = _dbContext.Queryable<UserEntryInfo>()
+                .GroupBy(u => new { u.UserEntryId })
                 .Select(x => new { x.UserEntryId, StartTime = SqlFunc.AggregateMax(x.StartTime) });
-            var uentity = _dbContext.Queryable<UserEntryInfo>()
-                .InnerJoin(uentityFist, (x, y) => x.UserEntryId == y.UserEntryId && x.StartTime == y.StartTime);
+            // 在这些最新入职时间的记录中，取 id 最大的一条
+            var subQuery2 = _dbContext.Queryable<UserEntryInfo>()
+                .Where(al => SqlFunc.Subqueryable<UserEntryInfo>()
+                    .Where(sub => sub.UserEntryId == al.UserEntryId && sub.StartTime == al.StartTime)
+                    .Any())
+                .GroupBy(al => al.UserEntryId)
+                .Select(al => new
+                {
+                    UserId = al.UserEntryId,
+                    LatestId = SqlFunc.AggregateMax(al.Id)
+                });
+            // 根据 id 获取完整记录
+            var result = _dbContext.Queryable<UserEntryInfo>()
+                .InnerJoin(subQuery2, (a, latest) => a.Id == latest.LatestId)
+                .Select(a => a);
+
             var crewWorkShip = _dbContext.Queryable<WorkShip>().Where(t => t.IsDelete == 1)
                          .GroupBy(u => u.WorkShipId)
                          .Select(t => new { t.WorkShipId, WorkShipStartTime = SqlFunc.AggregateMax(t.WorkShipStartTime) });
@@ -217,8 +238,8 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Contract
             var rr = await _dbContext.Queryable<User>()
                 .Where(t1 => t1.IsLoginUser == 1 && t1.IsDelete == 1)
                 .WhereIF(!string.IsNullOrEmpty(requestBody.KeyWords), t1 => t1.Name.Contains(requestBody.KeyWords) || t1.Phone.Contains(requestBody.KeyWords) || t1.WorkNumber.Contains(requestBody.KeyWords) || t1.CardId.Contains(requestBody.KeyWords))
-                .LeftJoin(uentity, (t1, t2) => t1.BusinessId == t2.UserEntryId)
-                .InnerJoin(wShip, (t1, t2, t5) => t1.BusinessId == t5.WorkShipId)
+                .LeftJoin(result, (t1, t2) => t1.BusinessId == t2.UserEntryId)
+                .LeftJoin(wShip, (t1, t2, t5) => t1.BusinessId == t5.WorkShipId)
                 .InnerJoin<OwnerShip>((t1, t2, t5, t3) => t5.OnShip == t3.BusinessId.ToString())
                 .WhereIF(roleType == 3, (t1, t2, t5, t3) => t5.OnShip == t3.BusinessId.ToString() && GlobalCurrentUser.ShipId.ToString() == t5.OnShip)//船长
                 .WhereIF(!string.IsNullOrEmpty(requestBody.Position), (t1, t2, t5, t3) => requestBody.Position == t5.Postition)
@@ -235,7 +256,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Contract
                     CardId = t1.CardId,
                     OnBoardPosition = t5.Postition,
                     DeleteResonEnum = t1.DeleteReson,
-                    WorkShipStartTime = t5.WorkShipEndTime,
+                    WorkShipStartTime = t5.WorkShipStartTime,
                     WorkShipEndTime = t5.WorkShipEndTime
                 })
                 .Distinct()
