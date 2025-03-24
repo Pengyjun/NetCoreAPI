@@ -782,7 +782,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Disembark
                 })
                 .Distinct()
                 .MergeTable()
-                .Where(t=>t.StatusOrder != 1)
+                .Where(t => t.StatusOrder != 1)
                 .ToListAsync();
 
             return Result.Success(userInfos);
@@ -978,9 +978,9 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Disembark
                 .WhereIF(requestDto.ShipId != null && requestDto.ShipId.Length > 0, (t, ws) => requestDto.ShipId.Contains(ws.OnShip))
                 .LeftJoin(_dbContext.Queryable<LeavePlanUser>().Where(t => t.IsDelete == 1), (t, ws, le) => t.BusinessId == le.UserId && ws.OnShip == le.ShipId.ToString())
                 .WhereIF(!string.IsNullOrWhiteSpace(requestDto.KeyWords), (t, ws) => SqlFunc.Contains(t.Name, requestDto.KeyWords) || SqlFunc.Contains(t.Phone, requestDto.KeyWords) || SqlFunc.Contains(t.CardId, requestDto.KeyWords) || SqlFunc.Contains(t.WorkNumber, requestDto.KeyWords))
-                .WhereIF(!string.IsNullOrWhiteSpace(requestDto.CertificateId.ToString()), (t, ws, le) => le.CertificateId == requestDto.CertificateId)
-                .WhereIF(requestDto.Year == 1, (t, ws, le) => le.IsOnShipCurrentYear && le.Year == DateTime.Now.Year)
-                .WhereIF(requestDto.Year == 2, (t, ws, le) => le.IsOnShipLastYear && le.Year == DateTime.Now.Year - 1)
+                .WhereIF(!string.IsNullOrWhiteSpace(requestDto.FPositionId.ToString()) && !string.IsNullOrWhiteSpace(requestDto.FNavigationAreaId.ToString()), (t, ws, le) => le.JobTypeId == requestDto.FPositionId && le.CertificateId == requestDto.FNavigationAreaId)
+                .WhereIF(requestDto.Year == 1, (t, ws, le) => le.IsOnShipCurrentYear && le.Year == DateTime.Now.AddYears(-1).Year)
+                .WhereIF(requestDto.Year == 2, (t, ws, le) => le.IsOnShipLastYear && le.Year == DateTime.Now.AddYears(-2).Year)
                 .Select((t, ws, le) => new SearchLeavePlanUserResponseDto
                 {
                     UserId = t.BusinessId,
@@ -1306,6 +1306,7 @@ namespace HNKC.CrewManagePlatform.Services.Interface.Disembark
                 .Select((x, y, z) => new
                 {
                     x.FPosition,
+                    x.FNavigationArea,
                     Name = (y.Name ?? "") + (z.Name ?? "")
                 }).Distinct().ToListAsync();
             return Result.Success(certificate);

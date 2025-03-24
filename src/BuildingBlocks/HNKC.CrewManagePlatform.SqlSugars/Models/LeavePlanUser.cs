@@ -39,12 +39,12 @@ namespace HNKC.CrewManagePlatform.SqlSugars.Models
         [SugarColumn(Length = 36)]
         public Guid CertificateId { get; set; }
         /// <summary>
-        /// 是否在船过年 去年
+        /// 是否在船过年 上上年
         /// </summary>
         [SugarColumn(ColumnDataType = "bit")]
         public bool IsOnShipLastYear { get; set; }
         /// <summary>
-        /// 是否在船过年 当前年
+        /// 是否在船过年 上一年
         /// </summary>
         [SugarColumn(ColumnDataType = "bit")]
         public bool IsOnShipCurrentYear { get; set; }

@@ -483,8 +483,10 @@ namespace HNKC.CrewManagePlatform.Services.Interface.ShipWatch
                     .Select(t => t.UserId).Distinct().ToList();
                 shipDuty.Holiday = dutyUser.Count;
                 shipDuty.OnDuty = wShip.Count - dutyUser.Count;
-                //获取排班信息
-                var crew = await _dbContext.Queryable<CrewRota>().Where(t => t.IsDelete == 1 && t.ShipId == request.BId).ToListAsync();
+                //获取排班信息 根据版本号 倒排取最新的
+                var crewList = await _dbContext.Queryable<CrewRota>().Where(t => t.IsDelete == 1 && t.ShipId == request.BId).OrderByDescending(t => t.Version).ToListAsync();
+                var version = crewList.Max(t => t.Version);
+                var crew = crewList.Where(t => t.Version == version).ToList();
                 List<RotaEnum> rotaEnums = new List<RotaEnum>();
                 rotaEnums.Add(RotaEnum.JiaBan);
                 rotaEnums.Add(RotaEnum.LunJi);
