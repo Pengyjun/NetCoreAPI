@@ -815,9 +815,12 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
             List<Guid> userIds = new List<Guid>();
             userIds.Add("08db4e0d-a531-4619-8fae-d97e57eeb375".ToGuid());
 
-
+            if (requestBody.Year == null)
+            {
+                requestBody.Year = DateTime.Now.Year;
+            }
             var projects = await dbContext.Queryable<BaseLinePlanProject>()
-                .Where(p => p.IsDelete == 1 && guids.Contains(p.CompanyId))
+                .Where(p => p.IsDelete == 1)
                 //.WhereIF(userIds[0] != userInfo.Id, x => x.CompanyId == companyId)
                 .WhereIF(requestBody.Year != null, p => p.Year == requestBody.Year)
                 .WhereIF(!string.IsNullOrWhiteSpace(requestBody.StartStatus), p => p.StartStatus == requestBody.StartStatus)
@@ -825,10 +828,7 @@ namespace GHMonitoringCenterApi.Application.Service.Projects
                 .Select(p => p.Id).ToListAsync();
 
 
-            if (requestBody.Year == null)
-            {
-                requestBody.Year = DateTime.Now.Year;
-            }
+           
             var intitutionList = dbContext.Queryable<Institution>().Where(x => x.IsDelete == 1);
             //var list= dbContext.Queryable<BaseLinePlanAncomparison>().LeftJoin<Project>((b,p)=>b.Code==p.MasterCode).
             RefAsync<int> total = 0;
