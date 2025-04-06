@@ -1,14 +1,10 @@
 ﻿using Autofac;
 using Autofac.Extras.DynamicProxy;
-using GDCMasterDataReceiveApi.Application.Contracts;
-using GDCMasterDataReceiveApi.Application;
-using GDCMasterDataReceiveApi.Domain.IRepository;
 using GDCMasterDataReceiveApi.SqlSugarCore;
 using GHElectronicFileApi.AopInterceptor;
 using System.Reflection;
 using GDCMasterDataReceiveApi.Application.Service.ReceiveService;
 using GDCMasterDataReceiveApi.Application.Contracts.IService.IReceiveService;
-using Microsoft.AspNetCore.Mvc.ApiExplorer;
 
 namespace GDCMasterDataReceiveApi.Ioc
 {

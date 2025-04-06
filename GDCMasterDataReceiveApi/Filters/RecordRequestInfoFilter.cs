@@ -1,8 +1,6 @@
 ﻿using GDCMasterDataReceiveApi.Application.Contracts.Dto.DataInterface;
 using GDCMasterDataReceiveApi.Domain.Shared;
-using GDCMasterDataReceiveApi.Domain.Shared.Annotation;
 using GDCMasterDataReceiveApi.Domain.Shared.Const;
-using GDCMasterDataReceiveApi.Domain.Shared.Enums;
 using GDCMasterDataReceiveApi.Domain.Shared.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -11,8 +9,6 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Serialization;
-using System.Net;
-using System.Net.Sockets;
 using System.Text;
 using UtilsSharp;
 using HttpStatusCode = GDCMasterDataReceiveApi.Domain.Shared.Enums.HttpStatusCode;
